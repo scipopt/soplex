@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.10 2001/11/25 14:58:28 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.11 2001/11/29 14:00:25 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -140,7 +140,7 @@ void SoPlex::setType(Type tp)
          SPxBasis::load(this);
          SPxBasis::load(desc());
       }
-      factorized = 0;
+      factorized = false;
       m_numCycle = 0;
    }
    if (thepricer && thepricer->solver() == this)
@@ -215,7 +215,7 @@ void SoPlex::init()
    }
    if (!matrixIsSetup)
       SPxBasis::load(desc());
-   factorized = 0;
+   factorized = false;
    m_numCycle = 0;
 
    if (type() == ENTER)

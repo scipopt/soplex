@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.7 2001/11/13 21:01:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.8 2001/11/29 14:00:25 bzfkocht Exp $"
 
 
 
@@ -117,8 +117,8 @@ void SPxBasis::loadMatrixVecs()
       matrix[i] = &theLP->vector(baseId(i));
       nzCount += matrix[i]->size();
    }
-   matrixIsSetup = 1;
-   factorized = 0;
+   matrixIsSetup = true;
+   factorized = false;
 }
 
 /*
@@ -184,8 +184,8 @@ void SPxBasis::load(const Desc& ds)
 
    assert(j == matrix.size());
 
-   matrixIsSetup = 1;
-   factorized = 0;
+   matrixIsSetup = true;
+   factorized = false;
    if (factor)
       factor->clear();
 }
@@ -227,7 +227,7 @@ void SPxBasis::load(SoPlex* lp)
 void SPxBasis::load(SLinSolver* p_solver)
 {
    factor = p_solver;
-   factorized = 0;
+   factorized = false;
    factor->clear();
 }
 
@@ -409,7 +409,7 @@ void SPxBasis::factorize()
       load(thedesc);
 
    updateCount = 0;
-   factorized = 1;
+   factorized = true;
    switch (factor->load(matrix.get_ptr(), matrix.size()))
    {
    case SLinSolver::OK :
@@ -429,7 +429,7 @@ void SPxBasis::factorize()
    default :
       std::cerr << "ERROR: unknown status of factorization.\n";
       abort();
-      // factorized = 0;
+      // factorized = false;
    }
    lastFill = double(factor->memory()) * nonzeroFactor / double(nzCount);
    nzFac = 0;
@@ -544,12 +544,12 @@ int SPxBasis::isConsistent() const
 
 SPxBasis::SPxBasis()
    : theLP (0)
-      , thestatus (NO_PROBLEM)
-      , matrixIsSetup (0)
-      , maxUpdates (1000)
-      , nonzeroFactor (10)
-      , factor (0)
-      , nzCount (1)
+   , thestatus (NO_PROBLEM)
+   , matrixIsSetup (false)
+   , factor (0)
+   , maxUpdates (1000)
+   , nonzeroFactor (10)
+   , nzCount (1)
 {}
 } // namespace soplex
 

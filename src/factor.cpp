@@ -13,8 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.9 2001/11/28 17:15:51 bzfkocht Exp $"
-
+#pragma ident "@(#) $Id: factor.cpp,v 1.10 2001/11/29 14:00:25 bzfkocht Exp $"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -307,6 +306,8 @@ static void initMatrix(SVector** vec)
       lastcring = cring;
       ++cring;
    }
+   rbeg[dim]       = 0;
+   rmax[dim]       = 0;
    fac->u.row.used = m;
 
    lastrring->next = &(fac->u.row.list);
@@ -314,8 +315,6 @@ static void initMatrix(SVector** vec)
 
    lastcring->next = &(fac->u.col.list);
    lastcring->next->prev = lastcring;
-
-
 
    /*  Copy matrix to row and column file
     *  excluding and marking column singletons!
@@ -780,14 +779,25 @@ static void eliminateColSingletons(void)
 
 
 /*
- *      No singletons available:        Select pivot elements.
+ * No singletons available: Select pivot elements.
  */
 static void selectPivots(void)
 {
-   int ii, i, j, k, ll, l, m;
-   int count, num, rw, cl;
-   int len, beg;
-   double maxabs, x;
+   int ii;
+   int i;
+   int j;
+   int k; 
+   int ll = -1; // This value should never be used.
+   int l;
+   int m;
+   int count;
+   int num;
+   int rw = -1; // This value should never be used.
+   int cl = -1; // This value should never be used.
+   int len;
+   int beg;
+   double maxabs;
+   double x = 0.0; // This value should never be used.
    int mkwtz;
    int candidates;
 
@@ -1092,7 +1102,7 @@ static int updateRow
 static void eliminatePivot(int prow, int pos)
 {
    int i, j, k, l;
-   int lv;
+   int lv = -1;  // This value should never be used.
    int pcol;
    double pval;
    int pbeg = rbeg[prow];
@@ -1113,9 +1123,13 @@ static void eliminatePivot(int prow, int pos)
 
    /*  set pivot element and construct L vector */
    setPivot(stage++, pcol, prow, pval);
+
+   /**@todo If this test failes, lv has no value. I suppose that in this
+    *       case none of the loops below that uses lv is executed.
+    *       But this is unproven.
+    */
    if (s_cact[pcol] - 1 > 0)
       lv = makeLvec(fac, s_cact[pcol] - 1, prow);
-
 
    /*  init working vector,
     *  remove pivot row from working matrix
@@ -1145,6 +1159,7 @@ static void eliminatePivot(int prow, int pos)
   )
    {
       assert(fac->row.perm[l] < 0);
+      assert(lv >= 0);
       updateRow(l, lv++, prow, pcol, pval);
    }
 
@@ -1152,8 +1167,10 @@ static void eliminatePivot(int prow, int pos)
 
    l = clen[pcol];
    for (++i; i < l; ++i)
+   {
+      assert(lv >= 0);
       updateRow(cidx[cbeg[pcol] + i], lv++, prow, pcol, pval);
-
+   }
 
    /*  remove pivot column from column file.
     */

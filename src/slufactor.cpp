@@ -13,9 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.6 2001/11/13 21:55:18 bzfkocht Exp $"
-
-
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.7 2001/11/29 14:00:25 bzfkocht Exp $"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,8 +34,6 @@ extern double verySparseFactor4left;
 
 
 #define MINSTABILITY    1e-2
-
-//@ ----------------------------------------------------------------------------
 
 void SLUFactor::solve2right(Vector& x, Vector& b) //const
 {
@@ -788,25 +784,26 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
     */
 
 #ifndef NDEBUG
-   int i = 0;
-   if (i)
+#if 0
+   int i;
+   FILE* fl = fopen("dump.lp", "w");
+   std::cout << "Basis:\n";
+   int j = 0;
+   for (i = 0; i < dim(); ++i)
+      j += matrix[i]->size();
+   for (i = 0; i < dim(); ++i)
    {
-      FILE* fl = fopen("dump.lp", "w");
-      std::cout << "Basis:\n";
-      int j = 0;
-      for (i = 0; i < dim(); ++i)
-         j += matrix[i]->size();
-      for (i = 0; i < dim(); ++i)
-      {
-         for (j = 0; j < matrix[i]->size(); ++j)
-            fprintf(fl, "%8d  %8d  %16g\n",
-                     i + 1, matrix[i]->index(j) + 1, matrix[i]->value(j));
-      }
-      fclose(fl);
-      std::cout << "LU-Factors:\n";
-      dump();
+      for (j = 0; j < matrix[i]->size(); ++j)
+         fprintf(fl, "%8d  %8d  %16g\n",
+            i + 1, matrix[i]->index(j) + 1, matrix[i]->value(j));
    }
-   std::cerr << "threshold = " << lastThreshold << "\tstability = " << stability() << std::endl;
+   fclose(fl);
+   std::cout << "LU-Factors:\n";
+   dump();
+#endif
+
+   std::cerr << "threshold = " << lastThreshold 
+             << "\tstability = " << stability() << std::endl;
 #endif
 
    assert(isConsistent());

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.6 2001/11/26 15:55:39 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.7 2001/11/29 14:00:25 bzfkocht Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -305,13 +305,13 @@ protected:
    DataArray < const SVector* > matrix;
 
    /// is TRUE iff the pointers in #matrix are set up correctly.
-   int matrixIsSetup;
+   bool matrixIsSetup;
 
    /* The factorization of the matrix is stored in #factor if #factorized != 0.
       Otherwise #factor is undefined.
    */
    SLinSolver* factor;    ///< LU factorization of basis matrix
-   int factorized;        ///< TRUE iff #factor = matrix\f$^{-1}\f$.
+   bool factorized;        ///< TRUE iff #factor = matrix\f$^{-1}\f$.
 
    /// number of updates before refactorization.
    /** When a vector of the basis matrix is exchanged by a call to method

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vsolve.cpp,v 1.4 2001/11/20 16:43:33 bzfpfend Exp $"
+#pragma ident "@(#) $Id: vsolve.cpp,v 1.5 2001/11/29 14:00:25 bzfkocht Exp $"
 
 
 #include <string.h>
@@ -1296,7 +1296,7 @@ int solveLleft(CLUFactor* fac, double eps, double* vec, int* nonz, int rn)
 
    i = fac->l.firstUpdate - 1;
 #ifndef WITH_L_ROWS
-   ERROR NOT YET IMPLEMENTED
+#error Not yet implemented, define WITH_L_LOOPS
    for (; i >= 0; --i)
    {
       k = lbeg[i];

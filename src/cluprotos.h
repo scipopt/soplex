@@ -13,14 +13,14 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: cluprotos.h,v 1.4 2001/11/13 21:55:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: cluprotos.h,v 1.5 2001/11/29 14:00:25 bzfkocht Exp $"
 
 
 #ifndef _CLUPROTOS_H_
 #define _CLUPROTOS_H_
 
 
-#define WITH_L_ROWS
+#define WITH_L_ROWS             1
 
 #define CLU_OK                  0
 #define CLU_INSTABLE            1

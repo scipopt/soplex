@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: solve.cpp,v 1.4 2001/11/20 16:43:27 bzfpfend Exp $"
+#pragma ident "@(#) $Id: solve.cpp,v 1.5 2001/11/29 14:00:25 bzfkocht Exp $"
 
 #include <string.h>
 #include <stdio.h>
@@ -786,7 +786,7 @@ static void solveLleft2
       vec2[lrow[i]] -= x2;
    }
 #else
-for (i = fac->thedim; i--;)
+   for (i = fac->thedim; i--;)
    {
       r = rorig[i];
       x1 = vec1[r];

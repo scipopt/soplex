@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.4 2001/11/20 16:43:28 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.5 2001/11/29 14:00:25 bzfkocht Exp $"
 
 
 //@ -----------------------------------------------------------------------------
@@ -46,8 +46,8 @@ void SPxBasis::reDim()
    {
       matrix.reSize (theLP->dim());
       theBaseId.reSize(theLP->dim());
-      matrixIsSetup = 0;
-      factorized = 0;
+      matrixIsSetup = false;
+      factorized = false;
    }
 }
 
@@ -64,7 +64,7 @@ void SPxBasis::addedRows(int n)
          thedesc.rowStatus(i) = dualRowStatus(i);
          baseId(i) = theLP->SPxLP::rId(i);
       }
-      matrixIsSetup = 0;
+      matrixIsSetup = false;
    }
    else
    {
@@ -87,7 +87,7 @@ void SPxBasis::removedRow(int i)
       if (theLP->isBasic(thedesc.rowStatus(i)))
       {
          setStatus(NO_PROBLEM);
-         factorized = 0;
+         factorized = false;
          // std::cout << "Are you sure, you wanna do that?\n";
       }
 
@@ -95,7 +95,7 @@ void SPxBasis::removedRow(int i)
    else
    {
       assert(theLP->rep() == SoPlex::COLUMN);
-      factorized = 0;
+      factorized = false;
       if (!theLP->isBasic(thedesc.rowStatus(i)))
       {
          setStatus(NO_PROBLEM);
@@ -142,7 +142,7 @@ void SPxBasis::removedRows(int perm[])
                if (theLP->isBasic(thedesc.rowStatus(i)))
                {
                   setStatus(NO_PROBLEM);
-                  factorized = 0;
+                  factorized = false;
                   // std::cout << "Are you sure, you wanna do that?\n";
                }
 
@@ -155,7 +155,7 @@ void SPxBasis::removedRows(int perm[])
    else
    {
       assert(theLP->rep() == SoPlex::COLUMN);
-      factorized = matrixIsSetup = 0;
+      factorized = matrixIsSetup = false;
       for (i = 0; i < n; ++i)
       {
          if (perm[i] != i)
@@ -249,7 +249,7 @@ void SPxBasis::removedCol(int i)
    else
    {
       assert(theLP->rep() == SoPlex::ROW);
-      factorized = 0;
+      factorized = false;
       if (!theLP->isBasic(thedesc.colStatus(i)))
          setStatus(NO_PROBLEM);
       else if (status() > NO_PROBLEM)
@@ -297,7 +297,7 @@ void SPxBasis::removedCols(int perm[])
    else
    {
       assert(theLP->rep() == SoPlex::ROW);
-      factorized = matrixIsSetup = 0;
+      factorized = matrixIsSetup = false;
       for (i = 0; i < n; ++i)
       {
          if (perm[i] != i)
@@ -320,21 +320,21 @@ void SPxBasis::removedCols(int perm[])
  */
 void SPxBasis::changedRow(int /*row*/)
 {
-   factorized = matrixIsSetup = 0;
+   factorized = matrixIsSetup = false;
 }
 
 /**@todo is this correctly implemented?
  */
 void SPxBasis::changedCol(int /*col*/)
 {
-   factorized = matrixIsSetup = 0;
+   factorized = matrixIsSetup = false;
 }
 
 /**@todo is this correctly implemented?
  */
 void SPxBasis::changedElement(int /*row*/, int /*col*/)
 {
-   factorized = matrixIsSetup = 0;
+   factorized = matrixIsSetup = false;
 }
 } // namespace soplex
 
