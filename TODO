@@ -78,7 +78,7 @@ cring.h
 *lpcolset.h
 *lprow.h
 *lprowset.h
-lpsolver.h
+*lpsolver.h
 nameset.h
 random.h
 slinsolver.h
