@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.3 2002/03/12 12:18:29 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.4 2002/03/12 13:03:09 bzfpfend Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
@@ -69,7 +69,7 @@ private:
    static int s_indent;
 
 public:
-   TraceMethod()
+   TraceMethod(const char* s, const char* file, int line )
    {
       int i;
  
