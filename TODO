@@ -49,30 +49,18 @@ greenbeb LR
 pilot-ja ER
 pilot87  EC *
 
+irix.mips.sgi LC 0 5962
+greenbeb LR
+pilot-ja ER
 
-OLD {
-linux.x86.intel LC 1 977
-greenbea ER
-maros-r7 LC
+linux.x86.intel LC 0 923
 pilot-ja ER
 pilot87  EC *
+pilot87  LR *
+pilot87  ER *
 
-irix.mips.sgi LC 1 7065
-greenbea LR
-maros    ER
-pilot-ja ER
-pilot87  LC *
-pilot87  LR * 
-}
 
-Probleme:
 
-KAI C++ Internal Compiler Error
-Gnu C++ Internal Compiler Error
-Compaq C++ illegal instruction / super slow code
-Insure wrong messages and errors
-flexelint ???
-doxygen
 
 
 

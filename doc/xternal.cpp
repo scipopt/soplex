@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 /**@mainpage SoPlex 
-   @version  1.2
+   @version  1.2.0
    @author   Roland Wunderling
    @author   Andreas Bley
    @author   Tobias Pfender
@@ -8,31 +8,29 @@
 
    @section The Sequential object-oriented simplex class library.
 
-   The SoPlex class library comprises classes that may be categorized into
-   three different types:
+   This software has been implemented as a part of Roland Wunderlings 
+   Ph.D. thesis "Paralleler und Objektorientierter Simplex-Algorithmus"
+   which can be found at http://www.zib.de/PaperWeb/abstracts/TR-96-09
+   (in German).
 
-   - Elementary classes are provided for general purpose use in
-     projects way bejond the scope of numerical software or linear
-     programming.
-   - Linear algebra classes provide basic data types for (sparse)
-     linear algebra computations. However, their functionality is
-     restricted to simple operations such as addition and scaling.
-     For complex tasks, such as solving linear systems of equations,
-     algorithmic classes are provided instead.
-   - Algorithmic classes serve for implementing maybe a variaty of
-     algorithms for solving numerical (sub-)problems.
+   SoPlex is implememted in C++. The code should be compliend with the 
+   actual ANSI standard. Exceptions, RTTI and STL (other then iostream) 
+   are not used. Everything is in one namespace \em soplex.
 
-  This software has been implemented as a part of Roland Wunderlings 
-  Ph.D. thesis 
-  "Paralleler und Objektorientierter Simplex-Algorithmus"
-  http://www.zib.de/PaperWeb/abstracts/TR-96-09
+   Note, that you are allowed to retreive SoPlex only for research purpose 
+   as a member of a \em noncommercial and \em academic institution.
 
-  SoPlex is implememted in C++. The code should be compliend with the 
-  ANSI standard. Exceptions, RTTI and STL are not 
-  used in the code. Everything is in one namespace \em soplex.
+   - \ref RUN      "Where does it run"
 
-  Note, that you are allowed to retreive SoPlex only for research purpose as a
-  member of a \em noncommercial and \em academic institution.
+   - \ref DOWNLOAD "Download"
+
+   - \ref INST     "Installation"
+
+   - \ref FAQ      "Frequently asked questions"
+
+   - \ref PROG     "Programming with SoPlex"
+
+   - \ref License  "ZIB Academic License"
 */
 //-----------------------------------------------------------------------------
 /**@namespace soplex
@@ -89,22 +87,34 @@
     DataArray or Array.  
 */
 //-----------------------------------------------------------------------------
-/**@page Platforms Where is SoPlex running?
-   We have tested SoPlex at least to compile with the following 
-   Compilers:
+/**@page RUN On which Platforms is SoPlex running
+
+   We tested SoPlex to compile with the following Compilers:
+
    <TABLE>
    <TR><TD>Vendor</TD><TD>Version  </TD><TD>OS                </TD></TR>
+   <TR><TD>Gnu   </TD><TD>2.95.1   </TD><TD>Solaris 7         </TD></TR>
    <TR><TD>Gnu   </TD><TD>2.95.3   </TD><TD>SuSE 7.3/x86 Linux</TD></TR>
    <TR><TD>Gnu   </TD><TD>2.96     </TD><TD>SuSE 7.1/AXP Linux</TD></TR>
+   <TR><TD>Gnu   </TD><TD>3.0.3    </TD><TD>SuSE 7.3/x86 Linux</TD></TR>
    <TR><TD>Intel </TD><TD>5.0.1    </TD><TD>SuSE 7.3/x86 Linux</TD></TR>
-   <TR><TD>Compaq</TD><TD>6.2-024  </TD><TD>Tru64 5.0         </TD></TR>
-   <TR><TD>Compaq</TD><TD>6.3-010  </TD><TD>SuSE 7.1/AXP Linux</TD></TR>
+   <TR><TD>Compaq</TD><TD>T6.4-001 </TD><TD>Tru64 5.0         </TD></TR>
+   <TR><TD>Compaq</TD><TD>6.3-007  </TD><TD>SuSE 7.1/AXP Linux</TD></TR>
    <TR><TD>Sun   </TD><TD>WS6U2 5.3</TD><TD>Solaris 7         </TD></TR>
    <TR><TD>SGI   </TD><TD>7.3.1.1m </TD><TD>IRIX 6.5          </TD></TR>
    <TR><TD>HP    </TD><TD>A.03.27  </TD><TD>HP-UX 11.00       </TD></TR>
-   <TR><TD></TD><TD></TD><TD></TD></TR>
-   <TR><TD></TD><TD></TD><TD></TD></TR>
    </TABLE>
+
+   The CPU's used where Intel Pentium-III/800, Pentium-4/1.7, 
+   AMD Athlon/1000, AMD AthlonXP/1800+, 
+   Compaq Alpha 21264A/750/8, Compaq Alpha 21264A/833/4,
+   UltraSparc-IIi/299, HPPA-8600/550/1, MIPS R8000.
+
+   At some time during development, some versions of the following 
+   Compilers had internal erros, crashed or generated invalid code:
+   KAI, Gnu, Compaq, HP (The others were only seldom used). 
+
+   Remeber, your milage may vary.
  */
 //-----------------------------------------------------------------------------
 /**@page FAQ Frequently Asked Questions
@@ -112,7 +122,7 @@
    Here are some answers that can not be answered from the code alone:
 
    <ol>
-   <li> Why is <iostream> used but <assert.h> and not <cassert>
+   <li> Why is <iostream> used but <assert.h> and not <cassert> ?
      
       The reason is twofold. From the theoretical point we were not
       able to exactly find out in TC++PL in what namespace cassert 
@@ -128,14 +138,15 @@
       standard the .h header has to be there and uses global namespace.
       That seems acceptable to us, especially for C functions.
       
-   <li> Why is malloc/free sometimes used and not new/delete.
+   <li> Why is malloc/free sometimes used and not new/delete ?
       
       Because there is no realloc with new/delete. Because malloc
-      is faster. And we only use it for builtin types.
-      If you do not like this descision, it's easy to change spxalloc.h
-      to use new/delete.
+      is faster. And we only use it for builtin types or so called 
+      \ref DataObjects "Data Objects" .
+      If you do not like this descision, it's quite easy to change 
+      spxalloc.h to use new/delete.
 
-   <li> Can SoPlex solve Integer Programs (IP's).
+   <li> Can SoPlex solve Integer Programs (IP's) ?
       
       No. You need an IP-Solver for this. Most IP-Solver use LP-Solvers
       as a subroutine and do some kind of Branch-and-Bound.
@@ -143,7 +154,7 @@
    <li> Is there a Windows version ?
 
       The code is tested to compile under some version of Visual C.
-      We do \b not provide any make or project files for VC.
+      We do \b not provide any make or project files for VC++.
 
    <li> What is the academic license ?
 
@@ -154,31 +165,57 @@
 
    <li> What is the commercial license ?
   
-      If you want to make with SoPlex you need one. We give the license,
+      If you want to make or save money with SoPlex you need one. 
+      We give the license,
       you pay for it. The amount is completely negotiable depending on
       what you want to do with SoPlex, which rights you want and what
       you are willing to tell us.
 
-   <li> I want I primal and a dual simplex, where are they ?
+   <li> I want a primal and a dual simplex, where are they ?
 
       That is quite easy. You can set ENTERing and LEAVEing algorithm and
       COLUMN and ROW representation.
 
       <TABLE>
       <TR><TD>&nbsp;</TD><TD>ENTER </TD><TD>LEAVE </TD></TR>
-      <TR><TD>COLUMN</TD><TD>Primal</TD><TD>Primal</TD></TR>
-      <TR><TD>ROW   </TD><TD>Dual  </TD><TD>Dual  </TD></TR>
+      <TR><TD>COLUMN</TD><TD>Primal</TD><TD>Dual  </TD></TR>
+      <TR><TD>ROW   </TD><TD>Dual  </TD><TD>Primal</TD></TR>
       </TABLE>
 
       COLUMN oriented is the "usual" representation.
-      then   Entering is the Primal and Leaving is the Dual algorithm.
+      Then Entering is the Primal and Leaving is the Dual algorithm.
       In ROW oriented representation, we have in principle the
       explicit dual and then the algorithms reverse.
+
+   <li> SoPlex means \em Sequential Simplex. Is there a parallel version
+        available? 
+ 
+        No. There was done research in this direction. You can find most of 
+        the results in http://www.zib.de/PaperWeb/abstracts/TR-96-09 and 
+        http://www.zib.de/PaperWeb/abstracts/SC-95-45 .
+
+   <li> Is there a wrapper class/library to use SoPlex instead of CPLEX ? 
+
+        No. 
    </ol>
 */           
 //-----------------------------------------------------------------------------
-/**@page Programming Programming with SoPlex 
+/**@page PROG Programming with SoPlex 
    
+   The SoPlex class library comprises classes that may be categorized into
+   three different types:
+
+   - Elementary classes are provided for general purpose use in
+     projects way bejond the scope of numerical software or linear
+     programming.
+   - Linear algebra classes provide basic data types for (sparse)
+     linear algebra computations. However, their functionality is
+     restricted to simple operations such as addition and scaling.
+     For complex tasks, such as solving linear systems of equations,
+     algorithmic classes are provided instead.
+   - Algorithmic classes serve for implementing maybe a variaty of
+     algorithms for solving numerical (sub-)problems.
+
    The following sections are dedicated to users, that want to
    provide own pricers, ratio test, start basis generation codes or
    LP simplifiers to use with #SoPlex or that want to derive own
