@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.71 2005/01/12 12:00:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.72 2005/02/10 10:32:48 bzfkocht Exp $"
 
 #include <iostream>
 
@@ -75,6 +75,9 @@ SPxSolver::Status SoPlex::solve()
    if (nRows() <= 0 && nCols() <= 0) // no problem loaded
       return SPxSolver::NO_PROBLEM;
 
+   // assume presolver did NOT solve problem
+   m_vanished = false; 
+
    {  // context for working LP
       SPxLP work(*this);
 
@@ -115,13 +118,21 @@ SPxSolver::Status SoPlex::getPrimal(Vector& x) const
 {
    METHOD( "SoPlex::getPrimal()" );
 
-   DVector psp_x(m_solver.nCols()); // prescaled simplified postscaled
+   DVector           psp_x(m_solver.nCols()); // prescaled simplified postscaled
+   SPxSolver::Status stat;
 
-   SPxSolver::Status stat = m_solver.getPrimal(psp_x);
-   
-   if (m_postScaler != 0)
-      m_postScaler->unscalePrimal(psp_x);
-   
+   if (!m_vanished)
+   {
+      stat = m_solver.getPrimal(psp_x);
+
+      if (m_postScaler != 0)
+         m_postScaler->unscalePrimal(psp_x);
+   }
+   else
+   {
+      stat = SPxSolver::OPTIMAL;
+      psp_x.reDim(0);
+   }
    if (m_simplifier != 0)
       x = m_simplifier->unsimplifiedPrimal(psp_x);
    else
@@ -135,13 +146,23 @@ SPxSolver::Status SoPlex::getPrimal(Vector& x) const
 
 SPxSolver::Status SoPlex::getSlacks(Vector& s) const
 {
+   METHOD( "SoPlex::getSlacks()" );
+
    /// Does not work yet with presolve
    if (has_simplifier())
    {
       std::cerr << "Not yet implemented" << std::endl;
       return SPxSolver::ERROR;
    }
-   return m_solver.getSlacks(s);
+   SPxSolver::Status stat = m_solver.getSlacks(s);
+
+   if (m_postScaler != 0)
+      m_postScaler->unscaleDual(s);
+
+   if (m_preScaler != 0)
+      m_preScaler->unscaleDual(s);
+
+   return stat;
 }
 
 SPxSolver::Status SoPlex::getDual(Vector& pi) const
@@ -152,7 +173,15 @@ SPxSolver::Status SoPlex::getDual(Vector& pi) const
       std::cerr << "Not yet implemented" << std::endl;
       return SPxSolver::ERROR;
    }
-   return m_solver.getDual(pi);
+   SPxSolver::Status stat = m_solver.getDual(pi);
+
+   if (m_postScaler != 0)
+      m_postScaler->unscaleDual(pi);
+
+   if (m_preScaler != 0)
+      m_preScaler->unscaleDual(pi);
+   
+   return stat;
 }
   
 SPxSolver::Status SoPlex::getRedCost(Vector& rdcost) const
@@ -163,9 +192,16 @@ SPxSolver::Status SoPlex::getRedCost(Vector& rdcost) const
       std::cerr << "Not yet implemented" << std::endl;
       return SPxSolver::ERROR;
    }
-   return m_solver.getRedCost(rdcost);
-}
+   SPxSolver::Status stat = m_solver.getRedCost(rdcost);
 
+   if (m_postScaler != 0)
+      m_postScaler->unscalePrimal(rdcost);
+
+   if (m_preScaler != 0)
+      m_preScaler->unscalePrimal(rdcost);
+
+   return stat;
+}
 
 void SoPlex::qualConstraintViolation(
    Real& maxviol, 

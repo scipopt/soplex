@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.62 2004/02/24 10:54:55 bzfpfend Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.63 2005/02/10 10:32:48 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief preconfigured #SoPlex LP-solver.
@@ -58,6 +58,26 @@ public:
    void setUtype(SLUFactor::UpdateType tp)
    {
       m_slu.setUtype(tp);
+   }
+   /// return current #Pricing.
+   virtual SPxSolver::Pricing pricing() const
+   {
+      return m_solver.pricing();
+   }
+   /// set #FULL or #PARTIAL pricing.
+   virtual void setPricing(SPxSolver::Pricing pr)
+   {
+      m_solver.setPricing(pr);
+   }
+   /// return current #Type.
+   virtual SPxSolver::Type type() const
+   {
+      return m_solver.type();
+   }
+   /// set #LEAVE or #ENTER algorithm.
+   virtual void setType(SPxSolver::Type tp)
+   {
+      m_solver.setType(tp);
    }
    /// setup prescaler to use.
    virtual void setPreScaler(SPxScaler* scaler);
