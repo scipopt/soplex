@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.26 2002/01/16 15:39:56 bzfkocht Exp $
+# $Id: Makefile,v 1.27 2002/01/21 16:27:25 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -105,7 +105,7 @@ doc:
 		cd doc; $(DOXY) soplex.dxy
 
 check:		
-		cd check; ./check.sh normal.test $(BINARY)
+		cd check; ./check.sh netlib.test $(BINARY)
 
 quick:		
 		cd check; ./check.sh quick.test $(BINARY)

@@ -1,4 +1,4 @@
-# $Id: check.sh,v 1.9 2002/01/16 15:40:01 bzfkocht Exp $
+# $Id: check.sh,v 1.10 2002/01/21 16:27:31 bzfkocht Exp $
 BINNAME=`basename $2`
 TSTNAME=`basename $1 .test`
 OUTFILE=check.$TSTNAME.$BINNAME.out
@@ -34,5 +34,5 @@ do
 done | tee -a $OUTFILE
 date >>$OUTFILE
 date >>$ERRFILE
-gawk -f check.awk $OUTFILE | tee $RESFILE
+gawk -f check.awk $TSTNAME.solu $OUTFILE | tee $RESFILE
  
