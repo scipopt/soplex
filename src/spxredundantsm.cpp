@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.13 2002/01/31 16:30:48 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.14 2002/01/31 22:36:06 bzfkocht Exp $"
 
 //#define DEBUG 1
 
@@ -130,7 +130,7 @@ int SPxRedundantSM::simplify()
    if (num)
    {
       lp->removeCols(rem.get_ptr());
-      VERBOSE_MIN({ std::cout << "SPxRedundantSM: removed " << num
+      VERBOSE1({ std::cout << "SPxRedundantSM: removed " << num
                               << " column(s)" << std::endl; });
       assert(lp->isConsistent());
    }
@@ -276,7 +276,7 @@ int SPxRedundantSM::simplify()
    if (num)
    {
       lp->removeRows(rem.get_ptr());
-      VERBOSE_MIN({ std::cout << "SPxRedundantSM:\tremoved " << num
+      VERBOSE1({ std::cout << "SPxRedundantSM:\tremoved " << num
                               << " row(s)" << std::endl; });
       assert(lp->isConsistent());
    }

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.18 2002/01/31 16:30:48 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.19 2002/01/31 22:36:06 bzfkocht Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.
@@ -49,7 +49,7 @@ static void readName(MPSInput& mps)
       // Sometimes the name is omitted.
       mps.setProbName((mps.field1() == 0) ? "_MPS_" : mps.field1());
 
-      VERBOSE_MED({ std::cout << "Problem name   : " << mps.probName()
+      VERBOSE2({ std::cout << "Problem name   : " << mps.probName()
                               << std::endl; });
  
       // This hat to be a new section
@@ -144,7 +144,7 @@ static void readRows(
    {
       if (mps.field0() != 0)
       {
-         VERBOSE_MED({ std::cout << "Objective name : " << mps.objName()
+         VERBOSE2({ std::cout << "Objective name : " << mps.objName()
                                  << std::endl; });
 
          if (strcmp(mps.field0(), "COLUMNS"))
@@ -301,7 +301,7 @@ static void readRhs(
    {
       if (mps.field0() != 0)
       {
-         VERBOSE_MED({ std::cout << "RHS name       : " << rhsname
+         VERBOSE2({ std::cout << "RHS name       : " << rhsname
                                  << std::endl; });
 
          if (!strcmp(mps.field0(), "RANGES"))
@@ -375,7 +375,7 @@ static void readRanges(
    {
       if (mps.field0() != 0)
       {
-         VERBOSE_MED({ std::cout << "Range name     : " << rngname
+         VERBOSE2({ std::cout << "Range name     : " << rngname
                                  << std::endl; });
 
          if (!strcmp(mps.field0(), "BOUNDS"))
@@ -483,7 +483,7 @@ static void readBounds(
    {
       if (mps.field0() != 0)
       {
-         VERBOSE_MED({ std::cout << "Bound name     : " << bndname
+         VERBOSE2({ std::cout << "Bound name     : " << bndname
                                  << std::endl; });
 
          if (strcmp(mps.field0(), "ENDATA"))
@@ -648,7 +648,7 @@ bool SPxLP::readMPS(
    {
       changeSense(mps.objSense());
 
-      VERBOSE_MED({
+      VERBOSE2({
          std::cout << "Objective sense: " 
                    << ((mps.objSense() == MINIMIZE) ? "Minimize" : "Maximize") 
                    << std::endl;         
@@ -661,6 +661,7 @@ bool SPxLP::readMPS(
       addedCols(cset.num());
       assert(isConsistent());
    }
+
    if (p_cnames == 0) 
       delete cnames;
    if (p_rnames == 0)

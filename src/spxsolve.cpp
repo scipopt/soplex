@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.34 2002/01/31 16:30:48 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.35 2002/01/31 22:36:06 bzfkocht Exp $"
 
 //#define DEBUG 1
 
@@ -233,7 +233,7 @@ SoPlex::Status SoPlex::solve()
    if (m_status == RUNNING)
       m_status = ERROR;
 
-   VERBOSE_MIN({
+   VERBOSE1({
       std::cout << "Finished solving (status=" << int(status());
       if( status() == OPTIMAL )
          std::cout << ", objValue=" << value();
@@ -266,20 +266,20 @@ void SoPlex::testVecs()
    tmp -= *theCoPrhs;
    if (tmp.length() > delta())
    {
-      VERBOSE_MAX({ std::cout << iteration() << ":\tcoP error = "
+      VERBOSE3({ std::cout << iteration() << ":\tcoP error = "
                               << tmp.length(); });
       tmp.clear();
       SPxBasis::coSolve(tmp, *theCoPrhs);
       multWithBase(tmp);
       tmp -= *theCoPrhs;
 
-      VERBOSE_MAX( std::cout << "\t[" << tmp.length() << "]\t("; );
+      VERBOSE3( std::cout << "\t[" << tmp.length() << "]\t("; );
 
       tmp.clear();
       SPxBasis::coSolve(tmp, *theCoPrhs);
       tmp -= *theCoPvec;
       
-      VERBOSE_MAX( std::cout << tmp.length() << ")" << std::endl; );
+      VERBOSE3( std::cout << tmp.length() << ")" << std::endl; );
    }
 
    tmp = *theFvec;
@@ -287,13 +287,13 @@ void SoPlex::testVecs()
    tmp -= *theFrhs;
    if (tmp.length() > delta())
    {
-      VERBOSE_MAX({ std::cout << iteration() << ":\t  F error = "
+      VERBOSE3({ std::cout << iteration() << ":\t  F error = "
                               << tmp.length() << "\t("; });
       tmp.clear();
       SPxBasis::solve(tmp, *theFrhs);
       tmp -= *theFvec;
 
-      VERBOSE_MAX( std::cout << tmp.length() << ")" << std::endl; );
+      VERBOSE3( std::cout << tmp.length() << ")" << std::endl; );
    }
 
 #ifndef NDEBUG
@@ -379,14 +379,14 @@ bool SoPlex::terminate()
 
    if ( maxIters >= 0 && iterations() >= maxIters )
    {
-      VERBOSE_MED({ std::cout << "Maximum number of iterations (" << maxIters
+      VERBOSE2({ std::cout << "Maximum number of iterations (" << maxIters
                               << ") reached" << std::endl; });
       m_status = ABORT_ITER;
       return true;
    }
    if ( maxTime >= 0 && maxTime < infinity && time() >= maxTime )
    {
-      VERBOSE_MED({ std::cout << "Timelimit (" << maxTime
+      VERBOSE2({ std::cout << "Timelimit (" << maxTime
                               << ") reached" << std::endl; });
       m_status = ABORT_TIME;
       return true;   
@@ -403,7 +403,7 @@ bool SoPlex::terminate()
          
          if( sign * (value() - maxValue) >= 0.0 )
          {
-            VERBOSE_MED({ std::cout << "Objective value limit (" << maxValue
+            VERBOSE2({ std::cout << "Objective value limit (" << maxValue
                                     << ") reached" << std::endl; });
             TRACE({
                std::cerr << "Objective value limit reached" << std::endl

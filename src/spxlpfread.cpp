@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.20 2002/01/31 16:30:47 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.21 2002/01/31 22:36:06 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -679,7 +679,7 @@ bool SPxLP::readLPF(
  syntax_error:
    if (finished)
      {
-       VERBOSE_MED({ std::cout << "Finished reading " << lineno
+       VERBOSE2({ std::cout << "Finished reading " << lineno
 			       << " lines" << std::endl; });
      }
    else

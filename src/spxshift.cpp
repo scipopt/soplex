@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxshift.cpp,v 1.9 2002/01/31 16:30:48 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxshift.cpp,v 1.10 2002/01/31 22:36:06 bzfkocht Exp $"
 
 //#define DEBUG 1
 
@@ -445,7 +445,7 @@ void SoPlex::perturbMaxLeave(void)
 
 void SoPlex::unShift(void)
 {
-   VERBOSE_MAX( std::cout << "unshifting ..." << std::endl; );
+   VERBOSE3( std::cout << "unshifting ..." << std::endl; );
 
    if (isInitialized())
    {

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.17 2002/01/31 16:30:47 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.18 2002/01/31 22:36:06 bzfkocht Exp $"
 
 //#define DEBUG 1
 
@@ -840,7 +840,7 @@ int SPxFastRT::selectLeave(Real& val)
    else
       return -1;
 
-   VERBOSE_MAX({
+   VERBOSE3({
       if (leave >= 0)
          std::cout 
             << thesolver->basis().iteration() << "("
@@ -1151,7 +1151,7 @@ SoPlex::Id SPxFastRT::selectEnter(Real& val)
       while (cnt < TRIES);
    }
 
-   VERBOSE_MAX({
+   VERBOSE3({
       if (enterId.isValid())
          {
             Real x;

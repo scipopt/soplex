@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxrem1sm.cpp,v 1.10 2002/01/31 16:30:48 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxrem1sm.cpp,v 1.11 2002/01/31 22:36:06 bzfkocht Exp $"
 
 //#define DEBUG 1
 
@@ -87,7 +87,7 @@ int SPxRem1SM::simplify()
       {
          cont += num;
          lp->removeRows(rem.get_ptr());
-         VERBOSE_MIN({ std::cout << "SPxRem1SM:\tremoved " << num
+         VERBOSE1({ std::cout << "SPxRem1SM:\tremoved " << num
                                  << " row(s)" << std::endl; });
          assert(lp->isConsistent());
       }
@@ -172,7 +172,7 @@ int SPxRem1SM::simplify()
       {
          cont += num;
          lp->removeCols(rem.get_ptr());
-         VERBOSE_MIN({ std::cout << "SPxRem1SM:\tremoved " << num
+         VERBOSE1({ std::cout << "SPxRem1SM:\tremoved " << num
                                  << " column(s)" << std::endl; });
          assert(lp->isConsistent());
       }

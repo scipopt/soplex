@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: real.h,v 1.9 2002/01/31 16:30:46 bzfpfend Exp $"
+#pragma ident "@(#) $Id: real.h,v 1.10 2002/01/31 22:36:06 bzfkocht Exp $"
 
 /**@file  real.h
  * @brief Floating point type definition.
@@ -33,9 +33,9 @@ namespace soplex
 #define TRACE(x) /**/
 #endif
 
-#define VERBOSE_MIN(x) { if(Param::verbose() >= 1) {x} }
-#define VERBOSE_MED(x) { if(Param::verbose() >= 2) {x} }
-#define VERBOSE_MAX(x) { if(Param::verbose() >= 3) {x} }
+#define VERBOSE1(x) { if(Param::verbose() >= 1) {x} }
+#define VERBOSE2(x) { if(Param::verbose() >= 2) {x} }
+#define VERBOSE3(x) { if(Param::verbose() >= 3) {x} }
 
 
 #ifdef WITH_LONG_DOUBLE
