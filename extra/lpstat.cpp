@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpstat.cpp,v 1.1 2002/12/16 09:25:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpstat.cpp,v 1.2 2003/01/05 17:50:15 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -119,9 +119,9 @@ int main(int argc, char **argv)
 
    for(int i = 0; i < lp.nCols(); ++i)
    {
-      if (lp.lower(i) > infinity && lp.upper(i) < infinity)
+      if (lp.lower(i) > -infinity && lp.upper(i) < infinity)
          boxed++;
-      else if (lp.lower(i) <= infinity && lp.upper(i) >= infinity)
+      else if (lp.lower(i) <= -infinity && lp.upper(i) >= infinity)
          frees++;
    }
    for(int i = 0; i < intvars.size(); ++i)
@@ -151,10 +151,24 @@ int main(int argc, char **argv)
    int cints = 0;
    int mixed = 0;
    int conts = 0;
+   int rngs  = 0;
+   int equls = 0;
+   int grets = 0;
+   int lests = 0;
    int bin28 = 0;
+   int sos3s = 0;
 
    for(int i = 0; i < lp.nRows(); ++i)
    {
+      if (lp.lhs(i) == lp.rhs(i))
+         equls++;
+      else if (lp.lhs(i) > -infinity && lp.rhs(i) < infinity)
+         rngs++;
+      else if (lp.lhs(i) > -infinity)
+         grets++;
+      else
+         lests++;
+
       SVector row     = lp.rowVector(i);
       int     bin_cnt = 0;
       int     int_cnt = 0;
@@ -173,9 +187,15 @@ int main(int argc, char **argv)
       }
       if (int_cnt == 0 && con_cnt == 0 && bin_cnt > 0)
       {
-         cbins++;
-         if (bin_cnt <= 28)
-            bin28++;
+         if (lp.rhs(i) == 1.0)
+            sos3s++;
+         else
+         {
+            cbins++;
+
+            if (bin_cnt <= 28)
+               bin28++;
+         }
       }
       else if (int_cnt > 0 && con_cnt == 0)
          cints++;
@@ -186,9 +206,14 @@ int main(int argc, char **argv)
    }
    std::cout << "Constraints: " << std::setw(8) << cons  << std::endl
              << "     binary: " << std::setw(8) << cbins << " " << bin28 << std::endl
+             << "     SOS-T3: " << std::setw(8) << sos3s << std::endl
              << "    integer: " << std::setw(8) << cints << std::endl
              << "      mixed: " << std::setw(8) << mixed << std::endl
              << "  continous: " << std::setw(8) << conts << std::endl
+             << "         ==: " << std::setw(8) << equls << std::endl
+             << "         >=: " << std::setw(8) << grets << std::endl
+             << "         <=: " << std::setw(8) << lests << std::endl
+             << "     ranged: " << std::setw(8) << rngs  << std::endl
              << std::endl;
 
    return 0;
