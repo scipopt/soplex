@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.2 2001/11/06 23:31:05 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.3 2001/11/09 13:25:22 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -58,7 +58,7 @@ int SPxRedundantSM::simplify()
    rem.reSize(lp->nCols());
    for (i = lp->nCols() - 1; i >= 0; --i)
    {
-      const SVector& col = ((const SPxLP*)lp)->colVector(i);
+      const SVector& col = (const_cast<const SPxLP*>(lp))->colVector(i);
       rem[i] = 0;
       if (lp->upper(i) != lp->lower(i))
       {
@@ -154,7 +154,7 @@ int SPxRedundantSM::simplify()
    {
       if (lp->rhs(i) < lp->infinity || lp->lhs(i) > -lp->infinity)
       {
-         const SVector& row = ((const SPxLP*)lp)->rowVector(i);
+         const SVector& row = (const_cast<const SPxLP*>(lp))->rowVector(i);
 
          rem[i] = 0;
 

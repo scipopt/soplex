@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.3 2001/11/07 17:31:21 bzfbleya Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.4 2001/11/09 13:25:20 bzfpfend Exp $"
 
 
 
@@ -54,7 +54,7 @@ SPxBasis::dualStatus(const SPxLP::SPxColId& id) const
 SPxBasis::Desc::Status
 SPxBasis::dualStatus(const SPxLP::SPxRowId& id) const
 {
-   return dualRowStatus(((SPxLP*)theLP)->number(id));
+   return dualRowStatus((static_cast<SPxLP*>(theLP))->number(id));
 }
 
 SPxBasis::Desc::Status
@@ -448,7 +448,7 @@ Vector& SPxBasis::multWithBase(Vector& x) const
    DVector tmp(x);
 
    if (!matrixIsSetup)
-      ((SPxBasis*)this)->load(thedesc);
+      (const_cast<SPxBasis*>(this))->load(thedesc);
 
    for (i = x.dim() - 1; i >= 0; --i)
       x[i] = *(matrix[i]) * tmp;
@@ -465,7 +465,7 @@ Vector& SPxBasis::multBaseWith(Vector& x) const
    DVector tmp(x);
 
    if (!matrixIsSetup)
-      ((SPxBasis*)this)->load(thedesc);
+      (const_cast<SPxBasis*>(this))->load(thedesc);
 
    x.clear();
    for (i = x.dim() - 1; i >= 0; --i)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxrem1sm.cpp,v 1.2 2001/11/06 23:31:05 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxrem1sm.cpp,v 1.3 2001/11/09 13:25:23 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -65,7 +65,7 @@ int SPxRem1SM::simplify()
       for (i = lp->nRows() - 1; i >= 0; --i)
       {
          rem[i] = 0;
-         const SVector& row = ((const SPxLP*)lp)->rowVector(i);
+         const SVector& row = (const_cast<const SPxLP*>(lp))->rowVector(i);
          if (row.size() == 0)
          {
             if (lp->rhs(i) < 0 || lp->lhs(i) > 0)
@@ -120,7 +120,7 @@ int SPxRem1SM::simplify()
       rem.reSize(lp->nCols());
       for (i = lp->nCols() - 1; i >= 0; --i)
       {
-         const SVector& col = ((const SPxLP*)lp)->colVector(i);
+         const SVector& col = (const_cast<const SPxLP*>(lp))->colVector(i);
          rem[i] = 0;
          if (col.size() == 0)
          {

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: timer.cpp,v 1.2 2001/11/06 23:31:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: timer.cpp,v 1.3 2001/11/09 13:25:31 bzfpfend Exp $"
 
 
 
@@ -77,7 +77,7 @@ double Timer_ticks2sec(clock_t ticks)
    assert(TIMES_TICKS_PER_SEC > 0);
    sec = ticks / TIMES_TICKS_PER_SEC;
    msec = ((ticks % TIMES_TICKS_PER_SEC) * 1000) / TIMES_TICKS_PER_SEC;
-   return (((double)sec) + (((double)msec) / 1000.0));
+   return (static_cast<double>(sec) + (static_cast<double>(msec) / 1000.0));
 
    /* another way to compute seconds ...
       return (((double) ((ticks * 1000) / TIMES_TICKS_PER_SEC)) / 1000.0); */
@@ -124,7 +124,7 @@ void Timer_getTicks(clock_t* usrTicks,
 long Timer_resolution(void)
 {
    assert(TIMES_TICKS_PER_SEC > 0);
-   return (long) TIMES_TICKS_PER_SEC;
+   return static_cast<long>(TIMES_TICKS_PER_SEC);
 }
 
 

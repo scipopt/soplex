@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmps.cpp,v 1.2 2001/11/06 23:31:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmps.cpp,v 1.3 2001/11/09 13:25:21 bzfpfend Exp $"
 
 
 #include <iostream>
@@ -134,7 +134,7 @@ int SPxLP::readLine(
 
          return 1;
       }
-      length = (int)strlen(buf);   // -1
+      length = static_cast<int>(strlen(buf));   // -1
 
       /* Split Sections
        */
@@ -658,8 +658,8 @@ static MPS_Section readBounds(
 
 void SPxLP::readMPS(std::istream& is, NameSet* rn, NameSet* cn)
 {
-   LPRowSet& rowSet = *(LPRowSet*)this;
-   LPColSet& colSet = *(LPColSet*)this;
+   LPRowSet& rowSet = *(static_cast<LPRowSet*>(this));
+   LPColSet& colSet = *(static_cast<LPColSet*>(this));
    NameSet* rowNames = rn;
    NameSet* colNames = cn;
    NameSet _rowNames(1000, 10000);
@@ -701,7 +701,7 @@ void SPxLP::readMPS(std::istream& is, NameSet* rn, NameSet* cn)
    assert(next == ENDATA);
    changeSense(MINIMIZE);
 
-   added2Set(*(SVSet*)(LPRowSet*)this, *(SVSet*)(LPColSet*)this, colSet.num());
+   added2Set(*(static_cast<SVSet*>(static_cast<LPRowSet*>(this))), *(static_cast<SVSet*>(static_cast<LPColSet*>(this))), colSet.num());
    addedCols(colSet.num());
    assert(isConsistent());
 }

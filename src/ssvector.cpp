@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.2 2001/11/06 23:31:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.3 2001/11/09 13:25:29 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -399,7 +399,7 @@ SSVector& SSVector::multAdd(double xx, const SSVector& svec)
       double y;
       int* ii = idx;
       double* v = val;
-      double* rv = (double*)svec.val;
+      double* rv = static_cast<double*>(svec.val);
       double* last = rv + svec.dim() - 1;
       double x = *last;
       const double eps = epsilon;
@@ -598,7 +598,7 @@ SSVector& SSVector::operator=(const SSVector& rhs)
    {
       int* ii = idx;
       double* v = val;
-      double* rv = (double*)rhs.val;
+      double* rv = static_cast<double*>(rhs.val);
       double* last = rv + rhs.dim() - 1;
       double x = *last;
       const double eps = epsilon;
@@ -741,7 +741,7 @@ SSVector& SSVector::assign2product1(const SVSet& A, const SSVector& x)
    const int* xi = x.idx;
 
    int* ii = idx;
-   SVector* svec = (SVector*) & A[*xi];
+   SVector* svec = const_cast<SVector*>( & A[*xi] );
    const SVector::Element* e = &svec->element(0);
    const SVector::Element* last = e + (num = svec->size());
    double* v = val;
@@ -763,7 +763,7 @@ SSVector& SSVector::assign2productShort(const SVSet& A, const SSVector& x)
 
    double y;
    int* ii = idx;
-   SVector* svec = (SVector*) & A[*xi];
+   SVector* svec = const_cast<SVector*>( & A[*xi] );
    const SVector::Element* e = &svec->element(0);
    const SVector::Element* last = e + (num = svec->size());
    double* v = val;
@@ -779,7 +779,7 @@ SSVector& SSVector::assign2productShort(const SVSet& A, const SSVector& x)
    for (i = x.size(); --i > 0;)
    {
       xx = vl[*xi];
-      svec = (SVector*) & A[*xi++];
+      svec = const_cast<SVector*>( & A[*xi++] );
       e = &svec->element(0);
       for (k = svec->size(); --k >= 0;)
       {
@@ -824,7 +824,7 @@ SSVector& SSVector::assign2productFull(const SVSet& A, const SSVector& x)
 
    for (i = x.size(); i-- > 0; ++xi)
    {
-      svec = (SVector*) & A[*xi];
+      svec = const_cast<SVector*>( & A[*xi] );
       elem = &svec->element(0);
       last = elem + svec->size();
       y = vl[*xi];
@@ -913,7 +913,7 @@ SSVector& SSVector::assign2productAndSetup(const SVSet& A, SSVector& x)
       if (*xv > eps || *xv < meps)
       {
          y = *xv;
-         svec = (SVector*) & A[ *xi++ = xv - x.val ];
+         svec = const_cast<SVector*>( & A[ *xi++ = xv - x.val ] );
          elem = &svec->element(0);
          last = elem + svec->size();
          for (; elem < last; ++elem)
@@ -933,7 +933,7 @@ SSVector& SSVector::assign2productAndSetup(const SVSet& A, SSVector& x)
    if (lastval > eps || lastval < meps)
    {
       y = *xv = lastval;
-      svec = (SVector*) & A[ *xi++ = xv - x.val ];
+      svec = const_cast<SVector*>( & A[ *xi++ = xv - x.val ] );
       elem = &svec->element(0);
       last = elem + svec->size();
       for (; elem < last; ++elem)

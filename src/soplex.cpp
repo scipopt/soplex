@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.2 2001/11/06 23:31:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.3 2001/11/09 13:25:17 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -304,7 +304,7 @@ int SoPlex::sortLP(int pe, int nPes)
    for (i = pe; i < thecovectors->num(); i += nPes)
    {
       n += (*thecovectors)[i].size();
-      ((SVector*)&((*thecovectors)[i]))->sort();
+      (const_cast<SVector*>(&((*thecovectors)[i])))->sort();
    }
    return n;
 }
@@ -358,7 +358,7 @@ void SoPlex::splitLP(int pe, int nPes)
          }
          if (first < 0)
             first = j;
-         subcovectors[n][i] = SubSVector((SVector*) & vec, first, j - first);
+         subcovectors[n][i] = SubSVector(const_cast<SVector*>(&vec), first, j - first);
       }
    }
 
@@ -716,7 +716,7 @@ double SoPlex::value() const
    double x;
 
    if (!isInitialized())
-      ((SoPlex*)this)->init();
+      (const_cast<SoPlex*>(this))->init();
 
    if (rep() == ROW)
    {
@@ -821,8 +821,8 @@ SoPlex::SoPlex(const SoPlex& old)
 
 SoPlex& SoPlex::operator=(const SoPlex& old)
 {
-   *(SPxLP*)this = old;
-   *(SPxBasis*)this = old;
+   *(static_cast<SPxLP*>(this)) = old;
+   *(static_cast<SPxBasis*>(this)) = old;
 
    therep = old.therep;
    unitVecs = old.unitVecs;
@@ -920,8 +920,8 @@ int SoPlex::isConsistent() const
    {
       if
       (
-         thecovectors != (SVSet*)(LPRowSet*)this ||
-         thevectors != (SVSet*)(LPColSet*)this ||
+         thecovectors != static_cast<SVSet*>(static_cast<LPRowSet*>(const_cast<SoPlex*>(this))) ||
+         thevectors != static_cast<SVSet*>(static_cast<LPColSet*>(const_cast<SoPlex*>(this))) ||
          theFrhs != &primRhs ||
          theFvec != &primVec ||
          theCoPrhs != &dualRhs ||
@@ -940,8 +940,8 @@ int SoPlex::isConsistent() const
    {
       if
       (
-         thecovectors != (SVSet*)(LPColSet*)this ||
-         thevectors != (SVSet*)(LPRowSet*)this ||
+         thecovectors != static_cast<SVSet*>(static_cast<LPColSet*>(const_cast<SoPlex*>(this))) ||
+         thevectors != static_cast<SVSet*>(static_cast<LPRowSet*>(const_cast<SoPlex*>(this))) ||
          theFrhs != &dualRhs ||
          theFvec != &dualVec ||
          theCoPrhs != &primRhs ||

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.cpp,v 1.3 2001/11/07 17:31:24 bzfbleya Exp $"
+#pragma ident "@(#) $Id: svset.cpp,v 1.4 2001/11/09 13:25:30 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -128,7 +128,7 @@ void SVSet::xtend(SVector& svec, int newmax)
    if (svec.max() < newmax)
    {
       assert(has(&svec));
-      DLPSV* ps = (DLPSV*) & svec;
+      DLPSV* ps = static_cast<DLPSV*>( & svec );
 
       if (ps == list.last())
       {
@@ -262,9 +262,9 @@ void SVSet::memRemax(int newmax)
    {
       for (DLPSV* ps = list.first(); ps; ps = list.next(ps))
       {
-         SVector::Element * info = (SVector::Element*)(delta + long(ps->mem()));
+         SVector::Element * info = reinterpret_cast<SVector::Element*>(delta + long(ps->mem()));
          int sz = info->idx;
-         int max = *(int*) & info->val;
+         int max = *(reinterpret_cast<int*>( & info->val ));
          ps->setMem (max + 1, info);
          ps->size() = sz;
       }
@@ -329,15 +329,15 @@ SVSet& SVSet::operator=(const SVSet& rhs)
 
    DLPSV* ps;
    DLPSV* newps;
-   void* delta0 = &(*(SVSet_Base*)this)[0];
-   void* delta1 = &(*(SVSet_Base*) & rhs)[0];
+   void* delta0 = &(*(static_cast<SVSet_Base*>(this)))[0];
+   void* delta1 = &(*(static_cast<SVSet_Base*>(const_cast<SVSet*>(&rhs))))[0];
    long delta = long(delta0) - long(delta1);
 
    for (ps = rhs.list.first(); ps; ps = rhs.list.next(ps))
    {
       newps = & set[ rhs.number(ps) ];
       list.append(newps);
-      newps->setMem(ps->max() + 1, (SVector::Element*)(long(ps->mem()) + delta));
+      newps->setMem(ps->max() + 1, reinterpret_cast<SVector::Element*>(long(ps->mem()) + delta));
       newps->size() = ps->size();
    }
 

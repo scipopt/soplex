@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.2 2001/11/06 23:31:05 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.3 2001/11/09 13:25:24 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -373,7 +373,7 @@ int SoPlex::terminate()
 LPSolver::Status SoPlex::getPrimal (Vector& vector) const
 {
    if (!isInitialized())
-      ((SoPlex*)this)->init();
+      const_cast<SoPlex*>(this)->init();
 
    if (rep() == ROW)
       vector = coPvec();
@@ -420,7 +420,7 @@ LPSolver::Status SoPlex::getPrimal (Vector& vector) const
 LPSolver::Status SoPlex::getDual (Vector& vector) const
 {
    if (!isInitialized())
-      ((SoPlex*)this)->init();
+      const_cast<SoPlex*>(this)->init();
 
    if (rep() == ROW)
    {
@@ -444,7 +444,7 @@ LPSolver::Status SoPlex::getDual (Vector& vector) const
 LPSolver::Status SoPlex::getRdCost (Vector& vector) const
 {
    if (!isInitialized())
-      ((SoPlex*)this)->init();
+      const_cast<SoPlex*>(this)->init();
 
    if (rep() == ROW)
    {
@@ -482,7 +482,7 @@ LPSolver::Status SoPlex::getRdCost (Vector& vector) const
 LPSolver::Status SoPlex::getSlacks (Vector& vector) const
 {
    if (!isInitialized())
-      ((SoPlex*)this)->init();
+      const_cast<SoPlex*>(this)->init();
 
    if (rep() == COLUMN)
    {

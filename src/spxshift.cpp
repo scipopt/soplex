@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxshift.cpp,v 1.3 2001/11/07 13:48:13 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxshift.cpp,v 1.4 2001/11/09 13:25:24 bzfpfend Exp $"
 
 /*      \SubSection{Shifting bounds}
  */
@@ -169,12 +169,12 @@ void SoPlex::perturbMin
       l = p_low[i];
       if (p_up[i] <= vec[i] + eps)
       {
-         p_up[i] = vec[i] + (double)mult;
+         p_up[i] = vec[i] + static_cast<double>(mult);
          theShift += p_up[i] - u;
       }
       if (p_low[i] >= vec[i] - eps)
       {
-         p_low[i] = vec[i] - (double)mult;
+         p_low[i] = vec[i] - static_cast<double>(mult);
          theShift -= p_low[i] - l;
       }
    }
@@ -190,7 +190,7 @@ for (j = uvec.delta().size() - start - 1; j >= 0; j -= incr)
       {
          if (u != l && vec[i] >= u - eps)
          {
-            p_up[i] = vec[i] + (double)mult;
+            p_up[i] = vec[i] + static_cast<double>(mult);
             theShift += p_up[i] - u;
          }
       }
@@ -198,7 +198,7 @@ for (j = uvec.delta().size() - start - 1; j >= 0; j -= incr)
       {
          if (u != l && vec[i] <= l + eps)
          {
-            p_low[i] = vec[i] - (double)mult;
+            p_low[i] = vec[i] - static_cast<double>(mult);
             theShift -= p_low[i] - l;
          }
       }
@@ -234,12 +234,12 @@ void SoPlex::perturbMax
       l = p_low[i];
       if (p_up[i] <= vec[i] + eps)
       {
-         p_up[i] = vec[i] + (double)mult;
+         p_up[i] = vec[i] + static_cast<double>(mult);
          theShift += p_up[i] - u;
       }
       if (p_low[i] >= vec[i] - eps)
       {
-         p_low[i] = vec[i] - (double)mult;
+         p_low[i] = vec[i] - static_cast<double>(mult);
          theShift -= p_low[i] - l;
       }
    }
@@ -255,7 +255,7 @@ void SoPlex::perturbMax
       {
          if (u != l && vec[i] >= u - eps)
          {
-            p_up[i] = vec[i] + (double)mult;
+            p_up[i] = vec[i] + static_cast<double>(mult);
             theShift += p_up[i] - u;
          }
       }
@@ -263,7 +263,7 @@ void SoPlex::perturbMax
       {
          if (u != l && vec[i] <= l + eps)
          {
-            p_low[i] = vec[i] - (double)mult;
+            p_low[i] = vec[i] - static_cast<double>(mult);
             theShift -= p_low[i] - l;
          }
       }
@@ -320,12 +320,12 @@ double SoPlex::perturbMin
       l = p_low[i];
       if (p_up[i] <= vec[i] + eps && rep()*stat[i] < 0)
       {
-         p_up[i] = vec[i] + (double)mult;
+         p_up[i] = vec[i] + static_cast<double>(mult);
          theShift += p_up[i] - u;
       }
       if (p_low[i] >= vec[i] - eps && rep()*stat[i] < 0)
       {
-         p_low[i] = vec[i] - (double)mult;
+         p_low[i] = vec[i] - static_cast<double>(mult);
          theShift -= p_low[i] - l;
       }
    }
@@ -341,7 +341,7 @@ double SoPlex::perturbMin
       {
          if (u != l && vec[i] >= u - eps && rep()*stat[i] < 0)
          {
-            p_up[i] = vec[i] + (double)mult;
+            p_up[i] = vec[i] + static_cast<double>(mult);
             theShift += p_up[i] - u;
          }
       }
@@ -349,7 +349,7 @@ double SoPlex::perturbMin
       {
          if (u != l && vec[i] <= l + eps && rep()*stat[i] < 0)
          {
-            p_low[i] = vec[i] - (double)mult;
+            p_low[i] = vec[i] - static_cast<double>(mult);
             theShift -= p_low[i] - l;
          }
       }
@@ -389,12 +389,12 @@ double SoPlex::perturbMax
       l = p_low[i];
       if (p_up[i] <= vec[i] + eps && rep()*stat[i] < 0)
       {
-         p_up[i] = vec[i] + (double)mult;
+         p_up[i] = vec[i] + static_cast<double>(mult);
          theShift += p_up[i] - u;
       }
       if (p_low[i] >= vec[i] - eps && rep()*stat[i] < 0)
       {
-         p_low[i] = vec[i] - (double)mult;
+         p_low[i] = vec[i] - static_cast<double>(mult);
          theShift -= p_low[i] - l;
       }
    }
@@ -410,7 +410,7 @@ double SoPlex::perturbMax
       {
          if (u != l && vec[i] >= u - eps && rep()*stat[i] < 0)
          {
-            p_up[i] = vec[i] + (double)mult;
+            p_up[i] = vec[i] + static_cast<double>(mult);
             theShift += p_up[i] - u;
          }
       }
@@ -418,7 +418,7 @@ double SoPlex::perturbMax
       {
          if (u != l && vec[i] <= l + eps && rep()*stat[i] < 0)
          {
-            p_low[i] = vec[i] - (double)mult;
+            p_low[i] = vec[i] - static_cast<double>(mult);
             theShift -= p_low[i] - l;
          }
       }

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.3 2001/11/07 17:31:23 bzfbleya Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.4 2001/11/09 13:25:26 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -73,8 +73,6 @@ void SPxSteepPR::load(SoPlex* base)
 void SPxSteepPR::setType(SoPlex::Type type)
 {
    int i;
-
-   (void)type;
 
    workRhs.epsilon = thesolver->epsilon();
 
@@ -222,9 +220,8 @@ void SPxSteepPR::setupPrefs(SoPlex::Type tp)
    }
 }
 
-void SPxSteepPR::setRep(SoPlex::Representation rep)
+void SPxSteepPR::setRep(SoPlex::Representation)
 {
-   (void)rep;
    if (workVec.dim() != thesolver->dim())
    {
       DVector tmp = penalty;
@@ -361,10 +358,9 @@ int SPxSteepPR::selectLeave()
 //@ ----------------------------------------------------------------------------
 /*      \SubSection{Entering Simplex}
  */
-void SPxSteepPR::entered4(SoPlex::Id id, int n, int start2, int incr2, int start1, int incr1)
+void SPxSteepPR::entered4(SoPlex::Id, int n, int start2, int incr2, int start1, int incr1)
 {
    assert(thesolver->type() == SoPlex::ENTER);
-   (void)id;
 
    if (n >= 0 && n < thesolver->dim())
    {
@@ -524,7 +520,7 @@ void SPxSteepPR::addedVecs(int n)
       for (; n < penalty.dim(); ++n)
          penalty[n] = 2;
    }
-   *(int*)&prefSetup = 0;
+   prefSetup = 0;
 }
 
 void SPxSteepPR::addedCoVecs(int n)
@@ -539,7 +535,7 @@ void SPxSteepPR::addedCoVecs(int n)
    coPenalty.reDim (thesolver->dim());
    for (; n < coPenalty.dim(); ++n)
       coPenalty[n] = 1;
-   *(int*)&prefSetup = 0;
+   prefSetup = 0;
 }
 
 
@@ -551,7 +547,7 @@ void SPxSteepPR::removedVec(int i)
    assert(thesolver);
    penalty[i] = penalty[penalty.dim()];
    penalty.reDim(thesolver->coDim());
-   *(int*)&prefSetup = 0;
+   prefSetup = 0;
 }
 
 void SPxSteepPR::removedVecs(const int perm[])
@@ -566,7 +562,7 @@ void SPxSteepPR::removedVecs(const int perm[])
             penalty[perm[i]] = penalty[i];
    }
    penalty.reDim(thesolver->coDim());
-   *(int*)&prefSetup = 0;
+   prefSetup = 0;
 }
 
 void SPxSteepPR::removedCoVec(int i)
@@ -574,7 +570,7 @@ void SPxSteepPR::removedCoVec(int i)
    assert(thesolver);
    coPenalty[i] = coPenalty[coPenalty.dim()];
    coPenalty.reDim(thesolver->dim());
-   *(int*)&prefSetup = 0;
+   prefSetup = 0;
 }
 
 void SPxSteepPR::removedCoVecs(const int perm[])
@@ -586,7 +582,7 @@ void SPxSteepPR::removedCoVecs(const int perm[])
       if (perm[i] >= 0)
          coPenalty[perm[i]] = coPenalty[i];
    coPenalty.reDim(thesolver->dim());
-   *(int*)&prefSetup = 0;
+   prefSetup = 0;
 }
 
 

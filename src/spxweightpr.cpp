@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.3 2001/11/09 11:28:54 bzfbleya Exp $"
+#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.4 2001/11/09 13:25:28 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -240,7 +240,6 @@ SoPlex::Id SPxWeightPR::selectEnter()
  */
 void SPxWeightPR::addedVecs(int)
 {
-   (void)n;
    if (solver()->rep() == SoPlex::ROW)
    {
       int start = rPenalty.dim();

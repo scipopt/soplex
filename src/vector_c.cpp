@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector_c.cpp,v 1.2 2001/11/06 23:31:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vector_c.cpp,v 1.3 2001/11/09 13:25:32 bzfpfend Exp $"
 
 #include "vector_c.h"
 
@@ -153,7 +153,7 @@ void Vector_MultAddSVector(
 
 #ifndef OLD
    struct Tmp* end;
-   end = ((struct Tmp*)elem) + 16 * (int)(n / 16);
+   end = static_cast<struct Tmp*>(elem) + 16 * static_cast<int>(n / 16);
    while (e < end)
    {
       vec[e->idx] += x * e->val;
@@ -189,7 +189,7 @@ void Vector_MultAddSVector(
       vec[e->idx] += x * e->val;
       ++e;
    }
-   end = ((struct Tmp*)elem) + 4 * (int)(n / 4);
+   end = static_cast<struct Tmp*>(elem) + 4 * static_cast<int>(n / 4);
    while (e < end)
    {
       vec[e->idx] += x * e->val;
@@ -201,7 +201,7 @@ void Vector_MultAddSVector(
       vec[e->idx] += x * e->val;
       ++e;
    }
-   end = ((struct Tmp*)elem) + n;
+   end = static_cast<struct Tmp*>(elem) + n;
    while (e < end)
    {
       vec[e->idx] += x * e->val;
