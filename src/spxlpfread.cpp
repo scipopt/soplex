@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.32 2002/08/20 10:38:38 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.33 2002/08/27 07:20:37 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -320,6 +320,9 @@ static Real readInfinity(char*& pos)
  *  This routine should read (most?) valid LP format files. 
  *  What it will not do, is find all cases where a file is ill formed. 
  *  If this happens it may complain and read nothing or read "something".
+ *
+ *  Problem: A line ending in '+' or '-' followed by a line starting
+ *  with a number, will be regarded as an error.
  * 
  *  The reader will accept the keyword INT[egers] as a synonym for 
  *  GEN[erals] which is an undocumented feature in CPLEX.
@@ -525,8 +528,23 @@ bool SPxLP::readLPF(
          case CONSTRAINTS :
             if (isValue(pos))
             {
+               Real pre_sign = 1.0;
+
+               /* Allready having here a value could only result from
+                * being the first number in a constraint, or a sign
+                * '+' or '-' as last token on the previous line.
+                */
+               if (have_value)
+               {
+                  if (NE(fabs(val), 1.0))
+                     goto syntax_error;
+               
+                  if (EQ(val, -1.0))
+                     pre_sign = val;
+               }
+                     
                have_value = true;
-               val        = readValue(pos);
+               val        = readValue(pos) * pre_sign;
                
                if (sense != 0)
                {
@@ -566,7 +584,7 @@ bool SPxLP::readLPF(
                   // next line
                   continue;
                }         
-            }            
+            }
             if (have_value)
             {
                if (!isColName(pos)) /* implies !isSense(pos) */

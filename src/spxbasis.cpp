@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.30 2002/05/15 13:38:43 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.31 2002/08/27 07:20:37 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -262,7 +262,7 @@ bool SPxBasis::readBasis(
          int c = -1;
          int r = -1;
 
-         if (!strcmp(mps.field0(), "ENDATA"))
+         if ((mps.field0() != 0) && !strcmp(mps.field0(), "ENDATA"))
          {
             mps.setSection(MPSInput::ENDATA);
             break;
@@ -309,6 +309,8 @@ bool SPxBasis::readBasis(
       else
          mps.syntaxError();
    }
+   thedesc.dump();
+
    return !mps.hasError();
 }
 
@@ -320,43 +322,58 @@ void SPxBasis::writeBasis(
    METHOD( "SPxBasis::writeBasis()" );
    assert(theLP != 0);
 
-   int i = 0;
-   int k = 0;
+   int col = 0;
+   int row = 0;
 
    os << "NAME  soplex.bas\n";     
 
-   for(; i < theLP->nCols(); i++)
+   for(; col < theLP->nCols(); col++)
    {
-      if( theLP->isBasic( thedesc.colStatus( i ))) 
+      os << " ";
+
+      if( theLP->isBasic( thedesc.colStatus( col ))) 
       {
-         for(; k < theLP->nRows(); k++)
-            if( !theLP->isBasic( thedesc.rowStatus( k )))
+         for(; row < theLP->nRows(); row++)
+            if( !theLP->isBasic( thedesc.rowStatus( row )))
                break;
 
-         assert( k != theLP->nRows() );
+         assert( row != theLP->nRows() );
 
-         os << "  "
-            << ( thedesc.rowStatus( k ) == Desc::D_ON_UPPER ? "XU " : "XL " )
-            << colnames[theLP->SPxLP::cId( i )]
-            << " " 
-            << rownames[theLP->SPxLP::rId( k )]
+         os << ( thedesc.rowStatus( row ) == Desc::D_ON_UPPER ? "XU " : "XL " )
+            << colnames[theLP->SPxLP::cId( col )]
+            << "       " 
+            << rownames[theLP->SPxLP::rId( row )]
             << std::endl;
+
+         row++;
       }
       else
       {
-         if( thedesc.colStatus( i ) == Desc::P_ON_UPPER)
+         if( thedesc.colStatus( col ) == Desc::P_ON_UPPER)
          {
-            os << "  UL"
-               << colnames[theLP->SPxLP::cId( i )]
+            os << "UL "
+               << colnames[theLP->SPxLP::cId( col )]
                << std::endl;
          }
+         else if( thedesc.colStatus( col ) == Desc::P_ON_LOWER)
+         {
+            os << "LL "
+               << colnames[theLP->SPxLP::cId( col )]
+               << std::endl;
+         }
+         else
+            abort();
       }
    }
 #ifndef NDEBUG
-   for(; k < theLP->nRows(); k++)
-      if( !theLP->isBasic( thedesc.rowStatus( k )))
+   thedesc.dump();
+
+   for(; row < theLP->nRows(); row++)
+      if( !theLP->isBasic( thedesc.rowStatus( row )))
          break;
-   assert( k == theLP->nRows() );
+   std::cout << row << " " << theLP->nRows() << std::endl;
+
+   assert( row == theLP->nRows() );
 #endif // NDEBUG
 
    os << "ENDATA" << std::endl;
@@ -367,6 +384,7 @@ void SPxBasis::writeBasis(
 int SPxBasis::doFactorize()
 {
    METHOD( "SPxBasis::doFactorize()" );
+
    if (!factorized)
       return true;
 
@@ -375,7 +393,7 @@ int SPxBasis::doFactorize()
 
    Real newFac = nzFac + factor->memory();
    Real neu = (newFac + lastFill * nzCount) / (updateCount + 1);
-   Real alt = (nzFac + lastFill * nzCount) / updateCount;
+   Real alt = (nzFac + lastFill * nzCount) / (updateCount + 1);
 
    return (updateCount >= maxUpdates || neu > alt);
 }
@@ -440,6 +458,7 @@ void SPxBasis::factorize()
    assert(matrixIsSetup);
 
    updateCount = 0;
+
    switch (factor->load(matrix.get_ptr(), matrix.size()))
    {
    case SLinSolver::OK :
@@ -461,6 +480,7 @@ void SPxBasis::factorize()
       abort();
       // factorized = false;
    }
+   assert(nzCount > 0);
    lastFill = Real(factor->memory()) * nonzeroFactor / Real(nzCount);
    nzFac = 0;
    factorized = true;

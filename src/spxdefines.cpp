@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.cpp,v 1.3 2002/05/01 08:18:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefines.cpp,v 1.4 2002/08/27 07:20:37 bzfkocht Exp $"
 
 /**@file  spxdefines.cpp
  * @brief Debugging, floating point type and parameter definitions.
@@ -45,21 +45,6 @@ void Param::setVerbose(int p_verbose)
 {
    s_verbose = p_verbose;
 }
-
-#if 0
-// This results (correctly) in a exception on alpha processors
-void Param::computeEpsilon()
-{
-   volatile Real one = 1.0;
-   volatile Real x;
-   volatile Real store;
-
-   for(x = one; store != one; x /= 10.0)
-      store = one + x;
-
-   s_epsilon = x / 100.0;
-}
-#endif
 
 } // namespace soplex
 

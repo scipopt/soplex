@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.50 2002/07/26 08:14:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.51 2002/08/27 07:20:37 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -361,8 +361,12 @@ public:
 
    /// load basis from \p filename in MPS format.
    virtual bool readBasisFile(const char* filename, 
-                              const NameSet& rowNames,
-                              const NameSet& colNames);
+      const NameSet& rowNames,
+      const NameSet& colNames);
+
+   /// write basis to \p filename in MPS format.
+   virtual bool writeBasisFile(const char* filename, 
+      const NameSet& rowNames, const NameSet& colNames);
 
    //@}
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.h,v 1.13 2002/03/21 16:06:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.h,v 1.14 2002/08/27 07:20:37 bzfkocht Exp $"
 
 /**@file  spxharrisrt.h
  * @brief Harris pricing with shifting.
@@ -42,6 +42,8 @@ namespace soplex
 class SPxHarrisRT : public SPxRatioTester
 {
 private:
+   Real degenerateEps();
+
    int maxDelta(
       Real* /*max*/,       ///< max abs value in upd
       Real* val,           ///< initial and chosen value

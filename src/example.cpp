@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.42 2002/05/15 13:38:43 bzfpfend Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.43 2002/08/27 07:20:37 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -142,7 +142,7 @@ int main(int argc, char **argv)
    ;
 
    const char* usage =
-   "[options] LPfile\n\n"
+   "[options] LPfile [Basfile]\n\n"
    "          LPfile can be either in MPS or LPF format\n\n"
    "options:  (*) indicates default\n" 
    " -e        select entering algorithm (default is leaving)\n"
@@ -150,7 +150,8 @@ int main(int argc, char **argv)
    " -i        select Eta-update (default is Forest-Tomlin)\n"
    " -x        output solution vector (works only together with -s0)\n"
    " -q        display solution quality\n"
-   " -bBasfile read file with starting basis\n"
+   " -br       read file with starting basis from Basfile\n"
+   " -bw       write file with optimal basis to Basfile\n"
    " -lSec     set timelimit to Sec seconds\n"
    " -dDelta   set maximal allowed bound violation to Delta\n"
    " -zZero    set zero tolerance to Zero\n\n"
@@ -189,6 +190,8 @@ int main(int argc, char **argv)
    int                    verbose        = 1;
    bool                   print_solution = false;
    bool                   print_quality  = false;
+   bool                   read_basis     = false;
+   bool                   write_basis    = false;
    int                    precision;
    int                    optidx;
 
@@ -200,8 +203,10 @@ int main(int argc, char **argv)
       switch(argv[optidx][1])
       {
       case 'b' :
-         basisname = strcpy(
-            new char[strlen(&argv[optidx][1]) + 1], &argv[optidx][1]); 
+         if (argv[optidx][2] == 'r')
+            read_basis = true;
+         if (argv[optidx][2] == 'w')
+            write_basis = true;
          break;
       case 'c' :
          starting = atoi(&argv[optidx][2]);
@@ -257,12 +262,19 @@ int main(int argc, char **argv)
          exit(0);
       }
    }
-   if ((argc - optidx) < 1)
+   if ((argc - optidx) < 1 + (read_basis ? 1 : 0) + (write_basis ? 1 : 0))
    {
       std::cout << "usage: " << argv[0] << " " << usage << std::endl;
       exit(0);
    }
    filename  = argv[optidx];
+
+   optidx++;
+
+   if (read_basis || write_basis)
+      basisname = strcpy(
+         new char[strlen(argv[optidx]) + 1], argv[optidx]); 
+
    precision = int(-log10(delta)) + 1;
 
    Param::setEpsilon(epsilon);
@@ -433,7 +445,7 @@ int main(int argc, char **argv)
              << std::endl;
 
    // Should we read a basis ?
-   if (basisname != 0)
+   if (read_basis)
    {
       if (!work.readBasisFile(basisname, rownames, colnames))
       {
@@ -493,6 +505,11 @@ int main(int argc, char **argv)
             std::cout << "All other variable are zero." << std::endl;
          }
       }
+
+      if (write_basis)
+         if (!work.writeBasisFile(basisname, rownames, colnames))
+            std::cerr << "error while writing file \"" 
+                      << basisname << "\"" << std::endl;
       break;
    case SoPlex::UNBOUNDED:
       std::cout << "LP is unbounded";

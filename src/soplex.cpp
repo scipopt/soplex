@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.60 2002/07/26 08:14:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.61 2002/08/27 07:20:37 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -373,6 +373,23 @@ bool SoPlex::readBasisFile(
  
    return readBasis(file, rowNames, colNames);
 }
+
+bool SoPlex::writeBasisFile(
+   const char*    filename, 
+   const NameSet& rowNames,
+   const NameSet& colNames)
+{
+   METHOD( "SoPlex::writeBasisFile()" );
+   std::ofstream file(filename);
+
+   if (!file)
+      return false;
+ 
+   writeBasis(file, rowNames, colNames);
+
+   return true;
+}
+
 
 bool SoPlex::readFile( 
    const char* filename, 

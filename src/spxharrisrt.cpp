@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.18 2002/05/15 13:38:43 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.19 2002/08/27 07:20:37 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -29,6 +29,18 @@ namespace soplex
          (with the default setting *max=1) in selectLeave and selectEnter
          The question might be if max shouldn't be updated with themax?
 */
+
+/**@todo numCycle and maxCycle are integers. So degeneps will be 
+  *       exactly delta until numCycle >= maxCycle. Then it will be
+  *       0 until numCycle >= 2 * maxCycle, after wich it becomes
+  *       negative. This does not look ok.
+  */
+Real SPxHarrisRT::degenerateEps()
+{
+   return solver()->delta() 
+      * (1.0 - solver()->numCycle() / solver()->maxCycle());
+}
+
 int SPxHarrisRT::maxDelta(
    Real* /*max*/,             /* max abs value in upd */
    Real* val,             /* initial and chosen value */
@@ -152,15 +164,9 @@ int SPxHarrisRT::selectLeave(Real& val)
    int leave = -1;
    Real maxabs = 1;
 
-   Real epsilon = solver()->epsilon();
-   Real delta = solver()->delta();
-
-   /**@todo numCycle and maxCycle are integers. So degeneps will be 
-    *       exactly delta until numCycle >= maxCycle. Then it will be
-    *       0 until numCycle >= 2 * maxCycle, after wich it becomes
-    *       negative. This does not look ok.
-    */
-   Real degeneps = delta * (1 - solver()->numCycle() / solver()->maxCycle());
+   Real epsilon  = solver()->epsilon();
+   Real delta    = solver()->delta();
+   Real degeneps = degenerateEps();
 
    SSVector& upd = solver()->fVec().delta();
    Vector& vec = solver()->fVec();
@@ -337,14 +343,9 @@ SPxId SPxHarrisRT::selectEnter(Real& val)
    int pnr, cnr;
 
    Real minStability = 0.0001;
-   Real epsilon = solver()->epsilon();
-   Real delta = solver()->delta();
-   /**@todo numCycle and maxCycle are integers. So degeneps will be 
-    *       exactly delta until numCycle >= maxCycle. Then it will be
-    *       0 until numCycle >= 2 * maxCycle, after wich it becomes
-    *       negative. This does not look ok.
-    */
-   Real degeneps = delta * (1 - solver()->numCycle() / solver()->maxCycle());
+   Real epsilon      = solver()->epsilon();
+   Real delta        = solver()->delta();
+   Real degeneps     = degenerateEps();
 
    Vector& pvec = solver()->pVec();
    SSVector& pupd = solver()->pVec().delta();
