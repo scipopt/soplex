@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.13 2002/01/03 22:14:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.14 2002/01/06 11:14:19 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -164,8 +164,8 @@ SoPlex::Status SoPlex::solve()
             leaveCount += lastEntered().isValid();
             //@ assert(isConsistent());
          }
-
          while (!stop);
+
          if (!stop)
          {
             if (shift() <= epsilon())

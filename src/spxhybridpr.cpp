@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.10 2002/01/04 17:31:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.11 2002/01/06 11:14:19 bzfkocht Exp $"
 
 #include <iostream>
 
@@ -69,21 +69,19 @@ void SPxHybridPR::setType(SoPlex::Type tp)
    }
    else
    {
-      if (thesolver->dim() > hybridFactor*thesolver->coDim())
+      if (thesolver->dim() > hybridFactor * thesolver->coDim())
       {
          thepricer = &devex;
          thesolver->setPricing(SoPlex::FULL);
-#ifndef NDEBUG
-         std::cerr << "switching to devex\n";
-#endif
+
+         std::cout << "switching to devex" << std::endl;
       }
       else
       {
          thepricer = &parmult;
          thesolver->setPricing(SoPlex::PARTIAL);
-#ifndef NDEBUG
-         std::cerr << "switching to partial multiple pricing\n";
-#endif
+
+         std::cout << "switching to partial multiple pricing" << std::endl;
       }
    }
    thepricer->setType(tp);

@@ -1,4 +1,4 @@
-# $Id: check.awk,v 1.8 2001/12/13 15:00:27 bzfkocht Exp $
+# $Id: check.awk,v 1.9 2002/01/06 11:14:19 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: check.awk                                                     *
@@ -136,7 +136,7 @@ BEGIN {
     sol["wood1p"] =     1.4429024116E+00;
     sol["woodw"] =      1.3044763331E+00;
 
-    print "$Id: check.awk,v 1.8 2001/12/13 15:00:27 bzfkocht Exp $";
+    print "$Id: check.awk,v 1.9 2002/01/06 11:14:19 bzfkocht Exp $";
     print "";
 }
 /=type=/      { type = $2; }
@@ -168,13 +168,13 @@ BEGIN {
            relerr = 0.0;
     }
     if (name == prevname)
-        printf("%23s", "");
+        printf("%25s", "");
     else
     {
-        printf("----------------------------------------------------------------------------\n");
-	printf("%-10s %5d %5d ", name, rows, cols);
+        printf("-----------------------------------------------------------------------------\n");
+	printf("%-10s %6d %6d ", name, rows, cols);
     }
-    printf("%s %5d %8.2f %+e ", type, iter, time, obj);
+    printf("%s %7d %8.2f %+e ", type, iter, time, obj);
 
     if ((abserr < 1e-6) || (relerr < 0.01))
     {
