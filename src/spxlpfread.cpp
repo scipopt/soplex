@@ -13,12 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.40 2004/05/21 14:55:42 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.41 2004/10/13 13:16:41 bzfpfend Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
  */
-/*#define DEBUGGING 1*/
+//#define DEBUGGING 1
 
 #include <assert.h>
 #include <stdio.h>
@@ -115,25 +115,25 @@ static Real readValue(char*& pos)
          s++;
       }
    }
+   // 5. Exponent
+   if (tolower(*s) == 'e')
+   {
+      s++;
+
+      // 6. Exponent sign 
+      if ((*s == '+') || (*s == '-'))
+         s++;
+
+      // 7. Exponent digits
+      while((*s >= '0') && (*s <= '9'))
+         s++;      
+   }
+   assert(s != pos);
+   
    if (!has_digits)
       value = (*pos == '-') ? -1.0 : 1.0;
    else
    {
-      // 5. Exponent
-      if (tolower(*s) == 'e')
-      {
-         s++;
-
-         // 6. Exponent sign 
-         if ((*s == '+') || (*s == '-'))
-            s++;
-
-         // 7. Exponent digits
-         while((*s >= '0') && (*s <= '9'))
-            s++;      
-      }
-      assert(s != pos);
-
       for(t = tmp; pos != s; pos++)
          *t++ = *pos;   
       *t = '\0';
@@ -473,7 +473,7 @@ bool SPxLP::readLPF(
             unnamed = false;
 
       // 4. Remove spaces.
-      if ((section == BINARYS) || (section == INTEGERS))
+      if ((section == BINARYS) || (section == INTEGERS) || (section == BOUNDS))
       {
          // only inital spaces
          while(isSpace(*pos))
@@ -637,6 +637,8 @@ bool SPxLP::readLPF(
                sense = readSense(pos);
             break;
          case BOUNDS :
+            /**@todo the fixed case (e.g. "x = 17") is missing */
+            /* we cannot remove all spaces in the bounds section, because of e.g. "x free" (see above) */
             other = false;
             sense = 0;
 
@@ -644,21 +646,34 @@ bool SPxLP::readLPF(
             {
                val = isInfinity(pos) ? readInfinity(pos) : readValue(pos);
 
+               while(isSpace(*pos))
+                  pos++;
+
                if (!isSense(pos))
                   goto syntax_error;
 
                sense = readSense(pos);
                other = true;
             }
+
+	    // before reading the column name remove spaces
+	    while(isSpace(*pos))
+	       pos++;
+
             if (!isColName(pos))
                goto syntax_error;
-            
+
             if ((colidx = readColName(pos, cnames, cset, 0)) < 0)
             {
                std::cerr << "in Bounds section line " << lineno 
                          << " ignored" << std::endl;
                continue;
             }
+
+	    // after reading the column names remove spaces
+	    while(isSpace(*pos))
+	       pos++;
+
             if (sense)
             {
                if (sense == '<') 
@@ -672,16 +687,21 @@ bool SPxLP::readLPF(
                   cset.upper(colidx) = val;
                }
             }
+
             if (isFree(pos))
             {
                cset.lower(colidx) = -infinity;
                cset.upper(colidx) =  infinity;
                other              = true;
+	       pos += 4;  // set position after the word "free"
             }
             else if (isSense(pos))
             {
                sense = readSense(pos);
                other = true;
+
+               while(isSpace(*pos))
+                  pos++;
 
                if (!isValue(pos))
                   goto syntax_error;
@@ -699,6 +719,9 @@ bool SPxLP::readLPF(
                   cset.upper(colidx) = val;
                }
             }
+            while(isSpace(*pos)) // remove spaces (hopefully) to end of line
+               pos++;
+
             /* Do we have only a single column name in the input line?
              * We could ignore this savely, but it is probably a sign 
              * of some other error.
@@ -763,10 +786,3 @@ syntax_error:
    return finished;
 }
 } // namespace soplex
-
-
-
-
-
-
-

@@ -13,13 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxproof.cpp,v 1.3 2004/03/22 11:35:24 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxproof.cpp,v 1.4 2004/10/13 13:16:41 bzfpfend Exp $"
 
 /**@file  spxproof.cpp
  * @brief provable bounds
  */
 
-#if 0
+#ifdef WITH_EASYVAL
 
 #include "Easyval.hh"
 #include "spxsolver.h"
