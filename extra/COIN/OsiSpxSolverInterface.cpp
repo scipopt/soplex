@@ -157,6 +157,9 @@ OsiSpxSolverInterface::setDblParam(OsiDblParam key, double value)
       spxsolver_.setDelta( value );
       retval = true;
       break;
+    case OsiObjOffset:
+      retval = OsiSolverInterface::setDblParam(key,value);
+      break;
     case OsiLastDblParam:
       retval = false;
       break;
@@ -214,6 +217,9 @@ OsiSpxSolverInterface::getDblParam(OsiDblParam key, double& value) const
     case OsiPrimalTolerance:
       value = spxsolver_.delta();
       retval = true;
+      break;
+    case OsiObjOffset:
+      retval = OsiSolverInterface::getDblParam(key, value);
       break;
     case OsiLastDblParam:
       retval = false;
@@ -462,15 +468,15 @@ void OsiSpxSolverInterface::unmarkHotStart()
 //------------------------------------------------------------------
 int OsiSpxSolverInterface::getNumCols() const
 {
-  return spxsolver_.nofCols();
+  return spxsolver_.nCols();
 }
 int OsiSpxSolverInterface::getNumRows() const
 {
-  return spxsolver_.nofRows();
+  return spxsolver_.nRows();
 }
 int OsiSpxSolverInterface::getNumElements() const
 {
-  return spxsolver_.nofNZEs();
+  return spxsolver_.nNzos();
 }
 
 //------------------------------------------------------------------
@@ -563,6 +569,7 @@ double OsiSpxSolverInterface::getObjSense() const
       return -1.0;
     default:
       throwSPXerror( "invalid optimization sense", "getObjSense" );
+      return 0.0;
     }
 }
 
@@ -747,15 +754,26 @@ const double * OsiSpxSolverInterface::getRowActivity() const
 //------------------------------------------------------------------
 double OsiSpxSolverInterface::getObjValue() const
 {
+  double objval;
+
   switch( spxsolver_.status() )
     {
     case soplex::SoPlex::OPTIMAL:
     case soplex::SoPlex::UNBOUNDED:
     case soplex::SoPlex::INFEASIBLE:
-      return spxsolver_.value();
+      objval = spxsolver_.value();
+      break;
     default:
-      return 0.0;
+      objval = 0.0;
+      break;
     }
+
+  // Adjust objective function value by constant term in objective function
+  double objOffset;
+  getDblParam(OsiObjOffset,objOffset);
+  objval = objval - objOffset;
+
+  return objval;
 }
 //------------------------------------------------------------------
 int OsiSpxSolverInterface::getIterationCount() const
@@ -1026,10 +1044,19 @@ OsiSpxSolverInterface::loadProblem( const OsiPackedMatrix& matrix,
 
   if( matrix.isColOrdered() )
     {
-      int col, pos;
+      int row, col, pos;
+      soplex::LPRowSet rowset( nrows, 0 );
+      soplex::DSVector rowvec;
       soplex::LPColSet colset( ncols, matrix.getNumElements() );
       soplex::DSVector colvec;
 
+      /* insert empty rows */
+      rowvec.clear();
+      for( row = 0; row < nrows; ++row )
+         rowset.add( therowlb[row], rowvec, therowub[row] );
+      spxsolver_.addRows( rowset );
+
+      /* create columns */
       for( col = 0; col < ncols; ++col )
 	{
 	  pos = start[col];
@@ -1039,14 +1066,23 @@ OsiSpxSolverInterface::loadProblem( const OsiPackedMatrix& matrix,
 	}
       
       spxsolver_.addCols( colset );
-      spxsolver_.changeRange( soplex::Vector( nrows, therowlb ), soplex::Vector( nrows, therowub ) );
+      // spxsolver_.changeRange( soplex::Vector( nrows, therowlb ), soplex::Vector( nrows, therowub ) );
     }
   else
     {
-      int row, pos;
+      int row, col, pos;
       soplex::LPRowSet rowset( nrows, matrix.getNumElements() );
       soplex::DSVector rowvec;
+      soplex::LPColSet colset( ncols, 0 );
+      soplex::DSVector colvec;
 
+      /* insert empty columns */
+      colvec.clear();
+      for( col = 0; col < ncols; ++col )
+         colset.add( theobj[col], thecollb[col], colvec, thecolub[col] );
+      spxsolver_.addCols( colset );
+
+      /* create rows */
       for( row = 0; row < nrows; ++row )
 	{
 	  pos = start[row];
@@ -1056,8 +1092,8 @@ OsiSpxSolverInterface::loadProblem( const OsiPackedMatrix& matrix,
 	}
       
       spxsolver_.addRows( rowset );
-      spxsolver_.changeObj( soplex::Vector( ncols, theobj ) );
-      spxsolver_.changeBounds( soplex::Vector( ncols, thecollb ), soplex::Vector( ncols, thecolub ) );
+      // spxsolver_.changeObj( soplex::Vector( ncols, theobj ) );
+      // spxsolver_.changeBounds( soplex::Vector( ncols, thecollb ), soplex::Vector( ncols, thecolub ) );
     }
 
   // switch sense to minimization problem
@@ -1223,9 +1259,10 @@ OsiSpxSolverInterface::loadProblem(const int numcols, const int numrows,
 //-----------------------------------------------------------------------------
 // Read mps files
 //-----------------------------------------------------------------------------
-void OsiSpxSolverInterface::readMps( const char * filename,
-				     const char * extension )
+int OsiSpxSolverInterface::readMps( const char * filename,
+				    const char * extension )
 {
+#if 0
   std::string f(filename);
   std::string e(extension);
   std::string fullname = f + "." + e;
@@ -1234,6 +1271,9 @@ void OsiSpxSolverInterface::readMps( const char * filename,
   spxintvars_.clear();
   if( !spxsolver_.readFile( fullname.c_str(), NULL, NULL, &spxintvars_ ) )
     throwSPXerror( "error reading file <" + fullname + ">", "readMps" );
+#endif
+  // just call base class method
+  return OsiSolverInterface::readMps(filename,extension);
 }
 
 //-----------------------------------------------------------------------------
@@ -1277,7 +1317,11 @@ OsiSpxSolverInterface::OsiSpxSolverInterface ()
     matrixByRow_(NULL),
     matrixByCol_(NULL)
 {
+#ifndef NDEBUG
+  soplex::Param::setVerbose( 3 );
+#else
   soplex::Param::setVerbose( 0 );
+#endif
 }
 
 
@@ -1313,10 +1357,11 @@ OsiSpxSolverInterface::OsiSpxSolverInterface( const OsiSpxSolverInterface & sour
     matrixByCol_(NULL)
 {
   spxsolver_.loadLP( source.spxsolver_ );
-  spxsolver_.loadBasis( source.spxsolver_.basis().desc() );
+  if( source.spxsolver_.basis().status() != soplex::SPxBasis::NO_PROBLEM )
+     spxsolver_.loadBasis( source.spxsolver_.basis().desc() );
   spxsolver_.setTerminationTime ( source.spxsolver_.terminationTime() );
   spxsolver_.setTerminationIter ( source.spxsolver_.terminationIter() );
-  // spxsolver_.setTerminationValue( source.spxsolver_.terminationValue() );
+  // spxsolver_.setTerminationValue( source.spxsolver_.terminationValue() ); // ???
   spxsolver_.setPricing( source.spxsolver_.pricing() );
   spxsolver_.setDelta  ( source.spxsolver_.delta()   );
   setColSolution(source.getColSolution());

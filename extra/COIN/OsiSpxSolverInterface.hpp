@@ -553,7 +553,7 @@ public:
 			     const double* rowrng);
 
     /** Read an mps file from the given filename */
-    virtual void readMps(const char *filename,
+    virtual int readMps(const char *filename,
 			 const char *extension = "mps");
 
     /** Write the problem into an mps file of the given filename */

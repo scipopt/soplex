@@ -1,0 +1,21 @@
+SpxIncDir ?= NONE
+
+DETECTDEFINES ?=
+DETECTINCDIRS ?=
+DETECTLIBDIRS ?=
+DETECTLIBNAMES ?=
+
+ifeq (${SpxIncDir},PROBE)
+    $(error "I'm sorry, SOPLEX's dir structure is way too messy for autodetect")
+endif
+
+ifeq (${SpxLibDir},PROBE)
+    $(error "I'm sorry, SOPLEX's dir structure is way too messy for autodetect")
+endif
+
+ifneq ($(SpxIncDir),NONE)
+    DETECTDEFINES += COIN_USE_SPX
+    DETECTINCDIRS += $(SpxIncDir)
+    DETECTLIBDIRS += $(SpxLibDir)
+    DETECTLIBNAMES += $(SpxLibName)
+endif
