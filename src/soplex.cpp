@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.39 2002/01/28 22:49:58 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.40 2002/01/29 14:49:25 bzfpfend Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -156,11 +156,13 @@ void SoPlex::setType(Type tp)
    if ((theratiotester != 0) && (theratiotester->solver() == this))
       theratiotester->setType(tp);
 
+#ifdef DEBUG
    std::cout << "switching to " 
              << static_cast<const char*>
                 ((tp == LEAVE) ? "leaving" : "entering")
              << " algorithm" 
              << std::endl;
+#endif
 }
 
 void SoPlex::setRep(Representation p_rep)
