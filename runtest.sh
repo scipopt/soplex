@@ -1,4 +1,5 @@
 #!/bin/sh
+# $Id: runtest.sh,v 1.2 2002/01/12 21:45:29 bzfkocht Exp $
 ARCH=`uname -m | sed -e s/sun../sparc/ -e s/i.86/x86/ -e s/IP../mips/ -e s/9000..../hppa/`
 OSTYPE=`uname -s | tr A-Z a-z`
 case $OSTYPE in
@@ -18,6 +19,7 @@ linux)
       gmake COMP=gnu    OPT=opt check >/dev/null 2>&1 &
       ;;
    esac
+   ;;
 osf1)
    gmake COMP=compaq OPT=opt clean 
    gmake COMP=compaq OPT=opt
