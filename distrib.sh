@@ -1,1 +1,1 @@
-tar -cvzhf soplex-1.2.0.tar.gz --files-from=soplex-1.2.0/distrib.list --exclude="*CVS*"
+tar -cvzhf soplex-1.2.1.tar.gz --files-from=soplex-1.2.1/distrib.list --exclude="*CVS*"
