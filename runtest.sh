@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: runtest.sh,v 1.4 2002/01/12 22:00:46 bzfkocht Exp $
+# $Id: runtest.sh,v 1.5 2002/01/12 22:02:44 bzfkocht Exp $
 ARCH=`uname -m | sed -e s/sun../sparc/ -e s/i.86/x86/ -e s/IP../mips/ -e s/9000..../hppa/`
 OSTYPE=`uname -s | tr A-Z a-z`
 case $OSTYPE in
@@ -43,14 +43,18 @@ sunos)
    ;;
 hp-ux)   
    PATH=$PATH:/usr/local/bin:/client/bin
+   CVS_RSH=ssh
+   export CVS_RSH
    cd $HOME/soplex
    cvs update
-   gmake COMP=sun    OPT=opt clean 
-   gmake COMP=sun    OPT=opt
-   gmake COMP=sun    OPT=opt check >/dev/null 2>&1 &
+   gmake COMP=hp     OPT=opt clean 
+   gmake COMP=hp     OPT=opt
+   gmake COMP=hp     OPT=opt check >/dev/null 2>&1 &
    ;;
 irix)
    PATH=$PATH:/usr/local/bin:/client/bin
+   CVS_RSH=ssh
+   export CVS_RSH
    cd $HOME/soplex
    cvs update
    gmake COMP=sgi    OPT=std clean 
