@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.4 2001/12/14 12:49:10 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.5 2001/12/15 15:50:28 bzfkocht Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read MPS format files.
@@ -727,16 +727,21 @@ static void readBounds(
          mps.setSection(MPSInput::ENDATA);
          return;
       }
-      if (!strcmp(mps.field1(), "FR"))
-      {
-         if ((mps.field2() != 0) && (mps.field3() == 0))
-            mps.insertName("_BND_", true);
-      }
-      else
+      // Is the value field used ?
+      if (  (!strcmp(mps.field1(), "LO"))
+         || (!strcmp(mps.field1(), "UP"))
+         || (!strcmp(mps.field1(), "FX"))
+         || (!strcmp(mps.field1(), "UI")))
       {
          if ((mps.field3() != 0) && (mps.field4() == 0))
             mps.insertName("_BND_", true);
       }
+      else
+      {
+         if ((mps.field2() != 0) && (mps.field3() == 0))
+            mps.insertName("_BND_", true);
+      }
+
       if ((mps.field1() == 0) || (mps.field2() == 0) || (mps.field3() == 0))
          break;
 

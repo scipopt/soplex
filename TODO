@@ -1,8 +1,3 @@
-ctimer/timer integrieren.
-
-Netlib orginal holen und leseroutinen testen. maros-r7 ist nicht im test.
-andere auch?
-
 LPSolver zusammenstutzen oder ganz entfernen.
 
 in dataarray.h:reSize(int newsize) steht in der docxygen docu immer int n ???

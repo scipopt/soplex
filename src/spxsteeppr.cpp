@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.6 2001/12/04 19:28:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.7 2001/12/15 15:50:28 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -285,8 +285,9 @@ int SPxSteepPR::selectLeave(double& best, int start, int incr)
    for (i = thesolver->dim() - 1 - start; i >= 0; i -= incr)
    {
       x = fTest[i];
+
       if (x < -theeps)
-      {
+      {         
          assert(coPenalty_ptr[i] >= theeps);
          x = x * x / coPenalty_ptr[i] * p[i];
          if (x > best)
