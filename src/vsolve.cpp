@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vsolve.cpp,v 1.7 2001/12/04 19:28:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vsolve.cpp,v 1.8 2001/12/12 09:30:22 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -25,10 +25,11 @@ namespace soplex
 
 #define ZERO    1e-100
 
-
 static const double verySparseFactor4right = 0.2;
 static const double verySparseFactor4left  = 0.1;
 
+/**@todo The same queueing code is in vsolve.cpp. This should be unified. 
+ */
 static void enQueueMax(int* heap, int* size, int elem)
 {
    int i, j;
@@ -234,7 +235,6 @@ int CLUFactor::vSolveLright(double* vec, int* ridx, int rn, double eps)
          vec[j] += ZERO * (vec[j] == 0);
       }
    }
-
    return rn;
 }
 

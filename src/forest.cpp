@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: forest.cpp,v 1.8 2001/12/04 19:28:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: forest.cpp,v 1.9 2001/12/12 09:30:22 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -29,13 +29,18 @@ namespace soplex
  * explizit auf 0 gesetzt und ist 0 zu unterscheiden.
  * Sehr mehrkwuerdige Konstruktion.
  */
-#define ZERO    1e-100
+#define ZERO     1e-100
+
+/* TK20011212
+ * This constant is used to discriminate to small elements
+ * Probably it should be suitable to some general epsilon.
+ */
+#define TOOSMALL 1e-12
 
 static const double verySparseFactor = 0.001;
 
 /*****************************************************************************/
-static
-void enQueueMin(int* heap, int* size, int elem)
+static void enQueueMin(int* heap, int* size, int elem)
 {
    int i, j;
 
@@ -60,8 +65,7 @@ void enQueueMin(int* heap, int* size, int elem)
 #endif  /* DEBUG */
 }
 
-static
-int deQueueMin(int* heap, int* size)
+static int deQueueMin(int* heap, int* size)
 {
    int e, elem;
    int i, j, s;
@@ -286,7 +290,6 @@ void CLUFactor::forestUpdate(int p_col, double* p_work, int num, int *nonz)
       rval[k] = rval[h];
    }
 
-
    /*  Insert new vector column col
     *  thereby determining the highest permuted row index r.
     */
@@ -304,12 +307,11 @@ void CLUFactor::forestUpdate(int p_col, double* p_work, int num, int *nonz)
          i = *nonz++;
          x = p_work[i];
          p_work[i] = 0;
-         if (x > 1.e-12 || x < -1.e-12)
+
+         if (fabs(x) > TOOSMALL)
          {
-            if (x > l_maxabs)
-               l_maxabs = x;
-            else if (-x > l_maxabs)
-               l_maxabs = -x;
+            if (fabs(x) > l_maxabs)
+               l_maxabs = fabs(x);
 
             /* insert to column file */
             assert(k - cbeg[p_col] < cmax[p_col]);
@@ -334,7 +336,6 @@ void CLUFactor::forestUpdate(int p_col, double* p_work, int num, int *nonz)
       }
       nzCnt += (clen[p_col] = k - cbeg[p_col]);
    }
-
    else
    {
       /*
@@ -350,12 +351,11 @@ void CLUFactor::forestUpdate(int p_col, double* p_work, int num, int *nonz)
       {
          x = p_work[i];
          p_work[i] = 0;
-         if (x > 1.e-12 || x < -1.e-12)
+
+         if (fabs(x) > TOOSMALL)
          {
-            if (x > l_maxabs)
-               l_maxabs = x;
-            else if (-x > l_maxabs)
-               l_maxabs = -x;
+            if (fabs(x) > l_maxabs)
+               l_maxabs = fabs(x);
 
             /* insert to column file */
             if (k >= j)
@@ -427,7 +427,7 @@ void CLUFactor::forestUpdate(int p_col, double* p_work, int num, int *nonz)
       i = rlen[rowno];
       nzCnt -= i;
 
-      if (i < verySparseFactor*(dim - c))      /* few nonzeros to be eliminated        */
+      if (i < verySparseFactor * (dim - c)) // few nonzeros to be eliminated
       {
          /*  move row r from U to p_work
           */
@@ -454,41 +454,38 @@ void CLUFactor::forestUpdate(int p_col, double* p_work, int num, int *nonz)
          while (num)
          {
 #ifndef NDEBUG
+            // The numbers seem to be often 1e-100, is this ok ?
             for (i = 0; i < num; ++i)
-            {
-               if (p_work[corig[nonz[i]]] == 0)
+               if (p_work[corig[nonz[i]]] == 0.0)
                   abort();
-            }
-#endif  // NDEBUG
+#endif // NDEBUG
             i = deQueueMin(nonz, &num);
             if (i == r)
                break;
             k = corig[i];
-            assert(p_work[k]);
+
+            assert(p_work[k] != 0.0);
+
+            n = rorig[i];
+            x = p_work[k] * diag[n];
+            lidx[ll] = n;
+            lval[ll] = x;
+            p_work[k] = 0;
+            ll++;
+
+            if (fabs(x) > l_maxabs)
+               l_maxabs = fabs(x);
+
+            j = rbeg[n];
+            m = rlen[n] + j;
+            for (; j < m; ++j)
             {
-               n = rorig[i];
-               x = p_work[k] * diag[n];
-               lidx[ll] = n;
-               lval[ll] = x;
-               p_work[k] = 0;
-               ll++;
-
-               if (x > l_maxabs)
-                  l_maxabs = x;
-               else if (-x > l_maxabs)
-                  l_maxabs = -x;
-
-               j = rbeg[n];
-               m = rlen[n] + j;
-               for (; j < m; ++j)
-               {
-                  int jj = ridx[j];
-                  double y = p_work[jj];
-                  if (y == 0)
-                     enQueueMin(nonz, &num, cperm[jj]);
-                  y -= x * rval[j];
-                  p_work[jj] = y + (y == 0) * ZERO;
-               }
+               int jj = ridx[j];
+               double y = p_work[jj];
+               if (y == 0)
+                  enQueueMin(nonz, &num, cperm[jj]);
+               y -= x * rval[j];
+               p_work[jj] = y + (y == 0) * ZERO;
             }
          }
          if (lbeg[l.firstUnused - 1] == ll)
@@ -530,10 +527,8 @@ void CLUFactor::forestUpdate(int p_col, double* p_work, int num, int *nonz)
             x = p_work[j];
             assert(x != 0.0);
             {
-               if (x > l_maxabs)
-                  l_maxabs = x;
-               else if (-x > l_maxabs)
-                  l_maxabs = -x;
+               if (fabs(x) > l_maxabs)
+                  l_maxabs = fabs(x);
 
                ridx[n] = j;
                rval[n] = x;
@@ -552,7 +547,6 @@ void CLUFactor::forestUpdate(int p_col, double* p_work, int num, int *nonz)
          }
          rlen[rowno] = n - rbeg[rowno];
       }
-
       else            /* few nonzeros to be eliminated        */
       {
          /*  move row r from U to p_work
@@ -586,10 +580,8 @@ void CLUFactor::forestUpdate(int p_col, double* p_work, int num, int *nonz)
                p_work[k] = 0;
                ll++;
 
-               if (x > l_maxabs)
-                  l_maxabs = x;
-               else if (-x > l_maxabs)
-                  l_maxabs = -x;
+               if (fabs(x) > l_maxabs)
+                  l_maxabs = fabs(x);
 
                j = rbeg[n];
                m = rlen[n] + j;
@@ -640,10 +632,8 @@ void CLUFactor::forestUpdate(int p_col, double* p_work, int num, int *nonz)
             x = p_work[j];
             if (x != 0.0)
             {
-               if (x > l_maxabs)
-                  l_maxabs = x;
-               else if (-x > l_maxabs)
-                  l_maxabs = -x;
+               if (fabs(x) > l_maxabs)
+                  l_maxabs = fabs(x);
 
                ridx[n] = j;
                rval[n] = x;
