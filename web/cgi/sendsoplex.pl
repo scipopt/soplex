@@ -1,5 +1,5 @@
 #!/softis/bin/perl
-# $Id: sendsoplex.pl,v 1.2 2002/01/16 14:49:17 bzfkocht Exp $
+# $Id: sendsoplex.pl,v 1.3 2002/01/17 17:42:30 bzfkocht Exp $
 
 # einige Vereinbarungen, fuer die Lage von Dateien
 # Arbeitsverzeichnis, ggf. aendern
@@ -11,7 +11,8 @@ $DATAFILE  = $DOPATH."/users.dat";          # Benutzerdaten
 # in FIELDDATA stehen spaeter die zugehoerigen Daten
 
 @FORMFIELDS = 
-("tname", "email", "street", "city", "zip", "country", "accept1", "accept2");
+("tname", "email", "inst", "street", "city", "zip", "country", 
+ "accept1", "accept2");
 
 # in jedem Datensatz werden die einzelnen Felder durch FSEPARATOR
 # getrennt
@@ -45,10 +46,11 @@ sub NoLock_Fail {
 
 sub CheckFields {
     if ($cgi->{"tname"} eq '') { $fault=1; $FString=$fault.'. Full name<br>'; }
-    if (($cgi->{"email"} eq '')|| (!($cgi->{"email"} =~ /.+@.+\..+/))) { 
+    if (($cgi->{"email"} eq '') || (!($cgi->{"email"} =~ /.+@.+\..+/))) { 
         $fault++; 
         $FString.=$fault.'. Email<br>'; 
     }
+    if ($cgi->{"inst"} eq '') { $fault++; $FString.=$fault.'. Institution<br>'; }
     if ($cgi->{"street"} eq '') { $fault++; $FString.=$fault.'. Street address<br>'; }
     if ($cgi->{"city"} eq '') { $fault++; $FString.=$fault.'. City<br>'; }
     if ($cgi->{"zip"} eq '') { $fault++; $FString.=$fault.'. Zip Code<br>'; }
@@ -128,7 +130,7 @@ open (DATA, ">>".$DATAFILE);
 foreach $elem (@FORMFIELDS) { print DATA $cgi->{$elem},$FSEPARATOR; }
 
 # der Counter wird ans Ende gehaengt
-
+print DATA &ctime(time),$FSEPARATOR;
 print DATA $counter;
 print DATA "\n";
 close (DATA);
@@ -149,6 +151,7 @@ print "<html><head><title>SoPlex Registration</title></head><body>";
 print "Your request was succesful. You are registered with the following data:<br><br>";
 print $cgi->{"tname"}."<br>";
 print $cgi->{"email"}."<br>";
+print $cgi->{"inst"}."<br>";
 print $cgi->{"street"}."<br>";
 print $cgi->{"city"}."<br>";
 print $cgi->{"zip"}."<br>";
