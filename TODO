@@ -1,4 +1,4 @@
-$Id: TODO,v 1.48 2002/01/14 09:32:08 bzfkocht Exp $
+$Id: TODO,v 1.49 2002/01/15 08:32:32 bzfkocht Exp $
 
 Diesen Kram mal als @todo's schreiben ;-)
 
@@ -35,8 +35,9 @@ clufactor.h
 +slufactor.h  // hier fehlen noch ein paar Sachen  -> Thorsten!
 +soplex.h // in Arbeit ;-)
 
-sunos.sparc.sun LC 0 2417
-greenbea LR   =infeasible=  /-p1 hilft
+sunos.sparc.sun LC 0 2494 14255
+greenbea ER 
+greenbeb ER
 
 linux.alpha.compaq LC 0 542 3142
 greenbea ER   =infeasible=
@@ -62,9 +63,9 @@ hp-ux.hppa.hp LC 0 755 4626
 greenbea LR
 pilot-ja LR
 
-irix.mips.sgi LC 0 5962
-greenbeb LR
-pilot-ja ER
+irix.mips.sgi LC 0 6223 35624
+greenbea LR
+pilot-ja LR
 
 linux.x86.intel LC 0 936 5121
 greenbea ER
