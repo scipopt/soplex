@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.cpp,v 1.4 2002/08/27 07:20:37 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefines.cpp,v 1.5 2002/10/13 16:06:00 bzfkocht Exp $"
 
 /**@file  spxdefines.cpp
  * @brief Debugging, floating point type and parameter definitions.
@@ -39,6 +39,16 @@ int  Param::s_verbose               = 1;
 void Param::setEpsilon(Real eps)
 {
    s_epsilon = eps;
+}
+
+void Param::setEpsilonFactorization(Real eps)
+{
+   s_epsilon_factorization = eps;
+}
+
+void Param::setEpsilonUpdate(Real eps)
+{
+   s_epsilon_update = eps;
 }
 
 void Param::setVerbose(int p_verbose)
