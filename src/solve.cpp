@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: solve.cpp,v 1.24 2003/01/20 19:35:09 bzfkocht Exp $"
+#pragma ident "@(#) $Id: solve.cpp,v 1.25 2003/01/20 19:49:13 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -607,30 +607,33 @@ void CLUFactor::solveUleft(Real* p_work, Real* vec)
       int  r  = row.orig[i];
       Real x  = vec[c];
 
-      assert(fabs(x) < infinity);
-      assert(fabs(vec[c]) < infinity);
+      assert(fabs(x) < 1e40);
+      assert(fabs(vec[c]) < 1e40);
+
+      Real y = vec[c];
 
       vec[c]  = 0.0;
 
       if (x != 0.0)
       {
-         assert(fabs(diag[r]) < infinity);
+         assert(fabs(diag[r]) < 1e40);
 
          x        *= diag[r];
          p_work[r] = x;
 
-         assert(fabs(x) < infinity);
+         assert(fabs(x) < 1e40);
 
          int end = u.row.start[r] + u.row.len[r];
 
          for(int m = u.row.start[r]; m < end; m++)
          {
-            assert(fabs(u.row.val[m]) < infinity);
+            assert(fabs(u.row.val[m]) < 1e40);
             assert(fabs(vec[u.row.idx[m]]) < infinity);
             vec[u.row.idx[m]] -= x * u.row.val[m];
-            assert(fabs(vec[u.row.idx[m]]) < infinity);
+            assert(fabs(vec[u.row.idx[m]]) < 1e40);
          }
       }
+      assert(fabs(y) < 1e40);
    }
 }
 #endif
