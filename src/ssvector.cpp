@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.14 2002/01/19 18:59:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.15 2002/01/30 14:14:01 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -28,6 +28,7 @@
  */
 namespace soplex
 {
+#define MARKER   1e-100
 
 static const Real shortProductFactor = 0.5;
 
@@ -153,7 +154,7 @@ void SSVector::setup()
 
          /* setze weissen Elefanten */
          Real last = *end;
-         *end = 1e-100;
+         *end = MARKER;
 
          /* erstes element extra */
          if (fabs(*v) > epsilon)
@@ -399,7 +400,7 @@ SSVector& SSVector::multAdd(Real xx, const SSVector& svec)
       const Real eps = epsilon;
       const Real meps = -eps;
 
-      *last = 1e-100;
+      *last = MARKER;
       for(;;)
       {
          while (!*rv)
@@ -444,7 +445,6 @@ SSVector& SSVector::multAdd(Real xx, const SVector& svec)
       Real* v = val;
       const Real eps = epsilon;
       const Real meps = -eps;
-      const Real mark = 1e-100;
       int adjust = 0;
 
       for (i = svec.size() - 1; i >= 0; --i)
@@ -458,7 +458,7 @@ SSVector& SSVector::multAdd(Real xx, const SVector& svec)
             else
             {
                adjust = 1;
-               v[j] = mark;
+               v[j] = MARKER;
             }
          }
          else
@@ -504,7 +504,6 @@ SSVector& SSVector::multAdd(Real xx, const SubSVector& svec)
       Real* v = val;
       const Real eps = epsilon;
       const Real meps = -epsilon;
-      const Real mark = 1e-100;
       int adjust = 0;
 
       for (i = svec.size() - 1; i >= 0; --i)
@@ -518,7 +517,7 @@ SSVector& SSVector::multAdd(Real xx, const SubSVector& svec)
             else
             {
                adjust = 1;
-               v[j] = mark;
+               v[j] = MARKER;
             }
          }
          else
@@ -594,7 +593,7 @@ SSVector& SSVector::operator=(const SSVector& rhs)
          const Real eps = epsilon;
          const Real meps = -eps;
          
-         *last = 1e-100;
+         *last = MARKER;
          for(;;)
          {
             while (!*rv)
@@ -659,7 +658,7 @@ void SSVector::setup_and_assign(SSVector& rhs)
       const Real eps = rhs.epsilon;
       const Real meps = -eps;
 
-      *last = 1e-100;
+      *last = MARKER;
       for(;;)
       {
          while (!*rv)
@@ -764,7 +763,6 @@ SSVector& SSVector::assign2productShort(const SVSet& A, const SSVector& x)
    }
 
    int k;
-   Real mark = 1e-100;
    for (i = x.size(); --i > 0;)
    {
       xx = vl[*xi];
@@ -775,7 +773,7 @@ SSVector& SSVector::assign2productShort(const SVSet& A, const SSVector& x)
          *ii = j = e->idx;
          ii += ((y = v[j]) == 0);
          y += xx * e++->val;
-         v[j] = y + (y == 0) * mark;
+         v[j] = y + (y == 0) * MARKER;
       }
    }
 
@@ -893,7 +891,7 @@ SSVector& SSVector::assign2productAndSetup(const SVSet& A, SSVector& x)
 
    /* setze weissen Elefanten */
    Real lastval = *end;
-   *end = 1e-100;
+   *end = MARKER;
 
    for(;;)
    {

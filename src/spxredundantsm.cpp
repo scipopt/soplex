@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.10 2002/01/29 15:38:49 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.11 2002/01/30 14:14:01 bzfkocht Exp $"
 
 #include <iostream>
 
@@ -23,8 +23,6 @@
 
 namespace soplex
 {
-static const Real eps = 1e-10;    ///< epslion for what is regarded equal.
-
 int SPxRedundantSM::simplify()
 {
    int    num;
@@ -173,23 +171,23 @@ int SPxRedundantSM::simplify()
             }
          }
 
-         if (((lp->rhs(i) >= up - eps && upcnt <= 0)
+         if (((GE(lp->rhs(i), up) && upcnt <= 0)
                || lp->rhs(i) >= infinity)
-              && ((lp->lhs(i) <= lo + eps && locnt <= 0)
+              && ((LE(lp->lhs(i), lo) && locnt <= 0)
                   || lp->lhs(i) <= -infinity))
          {
             rem[i] = -1;
             num++;
          }
-         else if ((lp->rhs(i) < lo - eps && locnt <= 0)
-                   || (lp->lhs(i) > up + eps && upcnt <= 0))
+         else if ((LT(lp->rhs(i), lo) && locnt <= 0)
+                   || (GT(lp->lhs(i), up) && upcnt <= 0))
             return -1;
          else
          {
             /*
-                if(lp->lhs(i) <= lo+eps && locnt <= 0)
+                if (LE(lp->lhs(i), lo) && locnt <= 0)
                     lp->changeLhs(i, -infinity);
-                else if(lp->rhs(i) >= up-eps && upcnt <= 0)
+                else if (GE(lp->rhs(i), up) && upcnt <= 0)
                     lp->changeRhs(i, infinity);
                 else
              */

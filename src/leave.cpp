@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.11 2002/01/29 15:38:47 bzfkocht Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.12 2002/01/30 14:14:00 bzfkocht Exp $"
 
 /* Updating the Basis for Leaving Variables
  */
@@ -492,7 +492,7 @@ int SoPlex::leave(int leaveIdx)
 #ifndef NDEBUG
    else
    {
-      SSVector tmp(dim());
+      SSVector tmp(dim(), epsilon());
       tmp.clear();
       coSolve(tmp, unitVecs[leaveIdx]);
       tmp -= theCoPvec->delta();
@@ -573,7 +573,7 @@ int SoPlex::leave(int leaveIdx)
 
 #ifndef NDEBUG
          {
-            SSVector tmp(dim());
+            SSVector tmp(dim(), epsilon());
             SPxBasis::solve(tmp, newVector);
             tmp -= fVec().delta();
             if (tmp.length() > delta())

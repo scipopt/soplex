@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.23 2002/01/29 15:38:47 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.24 2002/01/30 14:14:00 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -104,8 +104,7 @@ int main(int argc, char **argv)
    " -i       select Eta-update (default is Forest-Tomlin)\n"
    " -x       output solution vector (works only together with -s0)\n"
    " -lSec    set timelimit to Sec seconds\n"
-   " -dDelta  set maximal allowed bound violation to Delta (1e-6)\n"
-   " -zZero   set zero tolerance to Zero (1e-16)\n\n"
+   " -dDelta  set maximal allowed bound violation to Delta\n\n"
    "Simplifier:         Starter:        Pricer:           Ratiotester:\n"
    " -s0  none           -c0  none*      -p0  Textbook     -t0  Textbook\n" 
    " -s1  General        -c1  Weight     -p1  ParMult      -t1  Harris\n"
@@ -129,9 +128,8 @@ int main(int argc, char **argv)
    int                    pricing        = 4;
    int                    ratiotest      = 2;
    int                    simplifing     = 3;
-   Real                 timelimit      = -1.0;
-   Real                 delta          = 1e-6;
-   Real                 epsilon        = 1e-16;
+   Real                   timelimit      = -1.0;
+   Real                   delta          = DEFAULT_BND_VIOL;
    bool                   print_solution = false;
    int                    precision;
    int                    optind;
@@ -176,9 +174,6 @@ int main(int argc, char **argv)
       case 'x' :
          print_solution = true;
          break;
-      case 'z' :
-         epsilon = atof(&argv[optind][2]);
-         break;
       case 'h' :
       case '?' :
          std::cout << banner << std::endl;
@@ -196,6 +191,8 @@ int main(int argc, char **argv)
    filename  = argv[optind];
    precision = int(-log10(delta)) + 1;
 
+   Param::computeEpsilon();
+
    std::cout.setf(std::ios::scientific | std::ios::showpoint);
 
    MySoPlex work(type, representation);
@@ -203,7 +200,10 @@ int main(int argc, char **argv)
    work.setUtype(update);
    work.setTerminationTime(timelimit);
    work.setDelta(delta);
-   work.setEpsilon(epsilon);
+
+   std::cout << "Delta   = " << std::setw(16) << delta << std::endl
+             << "Epsilon = " << std::setw(16) 
+             << Param::epsilon() << std::endl;
 
    assert(work.isConsistent());
 
@@ -378,7 +378,7 @@ int main(int argc, char **argv)
             work.getPrimal(objx);
             
             for(int i = 0; i < work.nCols(); i++)
-               if (objx[i] >= epsilon)
+               if (isNotZero(objx[i]))
                   std::cout << colnames[work.cId(i)] << "\t" 
                             << std::setw(16)
                             << std::setprecision(precision)

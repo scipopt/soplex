@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.31 2002/01/29 15:38:48 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.32 2002/01/30 14:14:01 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -467,12 +467,12 @@ public:
    //@{
 
    /// values \f$|x| < \epsilon\f$ are considered to be 0.
+   /** if you want another value for epsilon, use #Param::setEpsilon().
+    */
    Real epsilon() const
    {
       return primVec.delta().epsilon;
    }
-   /// set parameter \p epsilon.
-   void setEpsilon(Real eps);
 
    /// allowed bound violation for optimal Solution.
    /** When all vectors do not violate their bounds by more than \f$\delta\f$,

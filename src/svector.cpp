@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.cpp,v 1.12 2002/01/23 12:58:50 bzfpfend Exp $"
+#pragma ident "@(#) $Id: svector.cpp,v 1.13 2002/01/30 14:14:01 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -133,7 +133,7 @@ Real SVector::maxAbs() const
 
 Real SVector::minAbs() const
 {
-   Real           x = 1e100;
+   Real           x = infinity;
    int            n = size();
    const Element* e = m_elem;
 
@@ -186,29 +186,6 @@ SVector& SVector::operator=(const Vector& vec)
          assert(n < max());
          e->idx = i;
          e->val = vec[i];
-         ++e;
-         ++n;
-      }
-   }
-   set_size( n );
-   return *this;
-}
-
-SVector& SVector::assign(const Vector& vec, Real eps)
-{
-   int n = 0;
-   int i = vec.dim();
-   Real x;
-   Element* e = m_elem;
-   clear();
-   while (i--)
-   {
-      x = vec[i];
-      if (x > eps || x < -eps)
-      {
-         assert(n < max());
-         e->idx = i;
-         e->val = x;
          ++e;
          ++n;
       }

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: solve.cpp,v 1.11 2002/01/19 18:59:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: solve.cpp,v 1.12 2002/01/30 14:14:00 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -74,8 +74,8 @@ void CLUFactor::solveUright(Real* wrk, Real* vec)
 
       vec[r] = 0.0;
 
-      // if (x != 0.0)
-      if (fabs(x) > 1e-20)
+      if (x != 0.0)
+         //if (isNotZero(x))
       {
          for(int j = u.col.start[c]; j < u.col.start[c] + u.col.len[c]; j++)
             vec[u.col.idx[j]] -= x * u.col.val[j];

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscale.cpp,v 1.9 2002/01/29 15:38:49 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscale.cpp,v 1.10 2002/01/30 14:14:01 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -23,31 +23,6 @@
 
 namespace soplex
 {
-static const Real MinScale = 1e-4;
-
-/** This routine looks for a suitabel scaling factor.
- *  First the maximum value is scaled to 1.0.
- *  If this results in the minimum to drop below #min_scale
- *  The new mimium is scaled up to #min_scale.
- *  The scaling factor returned is the combination of both factors.
- */
-static Real find_scale(Real vmin, Real vmax)
-{
-   assert(vmin <= vmax);
-
-   Real fmax  = 1.0 / vmax;
-   Real fmin  = 1.0;
-
-   if (vmin > 1e-16)
-   { 
-      vmin *= fmax;
-
-      if (vmin < MinScale)
-         fmin = MinScale / vmin;
-   }
-   return fmax * fmin;  
-}
-
 int SPxScale::simplify()
 {
    assert(lp != 0);
@@ -73,8 +48,7 @@ int SPxScale::simplify()
 
          if (x > 0)
          {
-            y = find_scale(vec.minAbs(), x);
-            //y = 1 / x;
+            y = 1.0 / x;
             colscale[i] = y;
             vec *= y;
             lp->maxObj(i) *= y;
@@ -102,8 +76,7 @@ int SPxScale::simplify()
          }
          if (x > 0)
          {
-            y = find_scale(z, x);
-            //y = 1 / x;
+            y = 1.0 / x;
             rowscale[i] = y;
             vec *= y;
             if (lp->rhs(i) < infinity)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: real.h,v 1.6 2002/01/29 15:38:48 bzfkocht Exp $"
+#pragma ident "@(#) $Id: real.h,v 1.7 2002/01/30 14:14:00 bzfkocht Exp $"
 
 /**@file  real.h
  * @brief Floating point type definition.
@@ -29,49 +29,74 @@ namespace soplex
 
 typedef long double Real;
 
-#define DEFAULT_EPS_ZERO  1e-32  // additive zero. 1.0 + EPS_ZERO == 1.0
+#define DEFAULT_BND_VIOL  1e-12
+#define DEFAULT_EPS_ZERO  1e-32  // ~ additive zero. 1.0 + EPS_ZERO == 1.0
 #define DEFAULT_INFINITY  1e100
 
 #else
 
 typedef double Real;
 
-#define DEFAULT_EPS_ZERO  1e-16  // additive zero. 1.0 + EPS_ZERO == 1.0
+#define DEFAULT_BND_VIOL  1e-6
+#define DEFAULT_EPS_ZERO  1e-18  // ~ additive zero. 1.0 + EPS_ZERO == 1.0
 #define DEFAULT_INFINITY  1e100
 
 #endif // !WITH_LONG_DOUBLE
 
-extern const Real eps_zero;
 extern const Real infinity;
 
-inline bool EQ(Real a, Real b, Real eps = eps_zero)
+class Param
+{
+private:
+   static Real s_epsilon;
+
+public:
+   inline static Real epsilon()
+   {
+      return s_epsilon;
+   }
+   static void setEpsilon(Real eps);
+   static void computeEpsilon();
+};
+
+inline bool EQ(Real a, Real b, Real eps = Param::epsilon())
 {
    return fabs(a - b) <= eps;
 }
 
-inline bool NE(Real a, Real b, Real eps = eps_zero)
+inline bool NE(Real a, Real b, Real eps = Param::epsilon())
 {
    return fabs(a - b) > eps;
 }
 
-inline bool LT(Real a, Real b, Real eps = eps_zero)
+inline bool LT(Real a, Real b, Real eps = Param::epsilon())
 {
    return (a - b) < -eps;
 }
 
-inline bool LE(Real a, Real b, Real eps = eps_zero)
+inline bool LE(Real a, Real b, Real eps = Param::epsilon())
 {
    return (a - b) < eps;
 }
 
-inline bool GT(Real a, Real b, Real eps = eps_zero)
+inline bool GT(Real a, Real b, Real eps = Param::epsilon())
 {
    return (a - b) > eps;
 }
 
-inline bool GE(Real a, Real b, Real eps = eps_zero)
+inline bool GE(Real a, Real b, Real eps = Param::epsilon())
 {
    return (a - b) > -eps;
+}
+
+inline bool isZero(Real a, Real eps = Param::epsilon())
+{
+   return fabs(a) <= eps;
+}
+
+inline bool isNotZero(Real a, Real eps = Param::epsilon())
+{
+   return fabs(a) > eps;
 }
 
 } // namespace soplex

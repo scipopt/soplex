@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.h,v 1.9 2002/01/19 18:59:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.h,v 1.10 2002/01/30 14:14:01 bzfkocht Exp $"
 
 
 /**@file  ssvector.h
@@ -313,14 +313,14 @@ public:
 
    /**@name Constructors / Destructors */
    //@{
-   /// default constructor.
-   explicit SSVector(int pdim = 0, Real peps = 1e-16)
-      : DVector (pdim)
+   /// constructor.
+   explicit SSVector(int p_dim, Real p_eps = Param::epsilon())
+      : DVector (p_dim)
       , IdxSet  ()
       , setupStatus(true)
-      , epsilon (peps)
+      , epsilon (p_eps)
    {
-      len = (pdim < 1) ? 1 : pdim;
+      len = (p_dim < 1) ? 1 : p_dim;
       spx_alloc(idx, len);
 
       Vector::clear();
@@ -339,7 +339,7 @@ public:
    }
 
    /// constructs nonsetup copy of \p vec.
-   explicit SSVector(const Vector& vec, Real eps = 1e-16)
+   explicit SSVector(const Vector& vec, Real eps = Param::epsilon())
       : DVector (vec)
       , IdxSet ()
       , setupStatus(false)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: forest.cpp,v 1.11 2002/01/19 18:59:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: forest.cpp,v 1.12 2002/01/30 14:14:00 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -25,18 +25,16 @@
 namespace soplex
 {
 
-/* TK20011102 
- * Nicht aendern, die Konstante wird benutzt um zwischen
- * explizit auf 0 gesetzt und ist 0 zu unterscheiden.
- * Sehr mehrkwuerdige Konstruktion.
+/* This number is used to decide wether a value is zero
+ * or was explicitly set to zero.
  */
-#define ZERO     1e-100
+#define MARKER     1e-100
 
-/* TK20011212
- * This constant is used to discriminate to small elements
- * Probably it should be suitable to some general epsilon.
+/** This constant is used to discriminate to small elements
+ *  @todo This was 1e-12. It is not clear why it is larger then the
+ *        usual 1e-16.
  */
-#define TOOSMALL 1e-12
+#define TOOSMALL   Param::epsilon()  // was 1e-12
 
 static const Real verySparseFactor = 0.001;
 
@@ -491,7 +489,7 @@ void CLUFactor::forestUpdate(int p_col, Real* p_work, int num, int *nonz)
                if (y == 0)
                   enQueueMin(nonz, &num, cperm[jj]);
                y -= x * rval[j];
-               p_work[jj] = y + (y == 0) * ZERO;
+               p_work[jj] = y + (y == 0) * MARKER;
             }
          }
          if (lbeg[l.firstUnused - 1] == ll)

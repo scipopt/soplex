@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dsvector.h,v 1.6 2002/01/19 18:59:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dsvector.h,v 1.7 2002/01/30 14:14:00 bzfkocht Exp $"
 
 /**@file  dsvector.h
  * @brief Dynamic sparse vectors.
@@ -91,8 +91,6 @@ public:
    }
    /// assignment operator from vector.
    DSVector& operator=(const Vector& vec);
-   /// assignment from vector with chooseable epsilon.
-   DSVector& assign(const Vector& vec, Real eps = 1e-16);
 
    /// append nonzeros of \p sv.
    void add(const SVector& sv)

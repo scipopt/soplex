@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.42 2002/01/29 15:47:00 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.43 2002/01/30 14:14:01 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -748,13 +748,6 @@ void SoPlex::setDelta(Real d)
    thedelta = d;
 }
 
-void SoPlex::setEpsilon(Real eps)
-{
-   primVec.delta().epsilon = eps;
-   dualVec.delta().epsilon = eps;
-   addVec.delta().epsilon = eps;
-}
-
 SoPlex::SoPlex(Type p_type, Representation p_rep,
                 SPxPricer* pric, SPxRatioTester* rt,
                 SPxStarter* start, SPxSimplifier* simple)
@@ -772,17 +765,16 @@ SoPlex::SoPlex(Type p_type, Representation p_rep,
    , coSolveVector2(0)
    , cacheProductFactor(4.0)
    , unitVecs (0)
-   , primVec (0, 1e-16)
-   , dualVec (0, 1e-16)
-   , addVec (0, 1e-16)
+   , primVec (0, Param::epsilon())
+   , dualVec (0, Param::epsilon())
+   , addVec (0, Param::epsilon())
    , thepricer (pric)
    , theratiotester(rt)
    , thestarter (start)
    , thesimplifier (simple)
 {
    setRep (p_rep);
-   setDelta (1e-6);
-   setEpsilon(1e-16);
+   setDelta (DEFAULT_BND_VIOL);
    theLP = this;
    coVecDim = 400;
 }

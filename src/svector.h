@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.h,v 1.17 2002/01/23 12:58:50 bzfpfend Exp $"
+#pragma ident "@(#) $Id: svector.h,v 1.18 2002/01/30 14:14:01 bzfkocht Exp $"
 
 /**@file  svector.h
  * @brief Sparse vectors.
@@ -305,8 +305,6 @@ public:
    SVector& operator=(const SVector& sv);
    /// assignment operator from vector.
    SVector& operator=(const Vector& sv);
-   /// assignment from Vector with chooseable epsilon.
-   SVector& assign(const Vector& vec, Real eps = 1e-12);
 
    /// consistency check.
    bool isConsistent() const;

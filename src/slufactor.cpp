@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.16 2002/01/19 18:59:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.17 2002/01/30 14:14:00 bzfkocht Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -354,7 +354,8 @@ void SLUFactor::clear()
    l.firstUnused = 0;
    thedim = 1;
 
-   epsilon = 1e-24;
+   /**@todo This was 1e-24, why not the usual 1e-16. */
+   epsilon = Param::epsilon(); // 1e-24;
    usetup = 0;
    maxabs = 1;
    initMaxabs = 1;
@@ -562,11 +563,11 @@ SLUFactor& SLUFactor::operator=(const SLUFactor& old)
 SLUFactor::SLUFactor()
    : CLUFactor() 
    , vec (1)
-   , ssvec (1, 1e-16)
+   , ssvec (1)
    , usetup (0)
    , uptype (FOREST_TOMLIN)
-   , eta (1, 1e-16)
-   , forest (1, 1e-16)
+   , eta (1)
+   , forest (1)
 {
    nzCnt = 0;
    thedim = 1;
