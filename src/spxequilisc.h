@@ -13,9 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxequilisc.h,v 1.1 2002/04/04 14:59:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxequilisc.h,v 1.2 2002/04/10 07:13:17 bzfkocht Exp $"
 
-/**@file  spxequili.h
+/**@file  spxequilisc.h
  * @brief LP euilibrium scaling.
  */
 #ifndef _SPXEQUILI_H_

@@ -3,6 +3,7 @@
 
 1.	All the documentation is available online at 
 
+        http://www.zib.de/Optimization/Software/Soplex
         http://www.zib.de/Optimization/Software/Soplex/html/index.html
 
 	you can also generate it, if you have doxgen installed by 
@@ -20,6 +21,7 @@
         Solaris with SUN Forte C++:  gmake COMP=sun OPT=opt
         IRIX with SGI Mips Pro C++:  gmake COMP=sgi OPT=opt
 	HP-UX with HP aCC         :  gmake COMP=hp OPT=opt
+        AIX with VisualAge C++    :  gmake COMP=ibm OPT=opt
 
         Then get and unpack in the check directory the Netlib testset from 
         http://www.zib.de/Optimization/Software/Soplex/netlib.tgz
@@ -54,7 +56,5 @@
 
 	A copy of the thesis can be retreived from
 	www.zib.de/PaperWeb/abstracts/TR-96-09/
-
-
 
 

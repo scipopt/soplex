@@ -13,9 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxequilisc.cpp,v 1.1 2002/04/04 14:59:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxequilisc.cpp,v 1.2 2002/04/10 07:13:17 bzfkocht Exp $"
 
-/**@file  spxsequili.cpp
+/**@file  spxequilisc.cpp
  * @brief Equilibrium row/column scaling.
  */
 #include <assert.h>

@@ -24,6 +24,8 @@
 
    - \ref INST     "Installation"
 
+   - \ref FLAGS    "How to use the flags in the example program"
+
    - \ref FAQ      "Frequently asked questions"
 
    - \ref PROG     "Programming with SoPlex"
@@ -88,18 +90,18 @@
    We tested SoPlex to compile with the following Compilers:
 
    <TABLE>
-   <TR><TD>Vendor</TD><TD>Version  </TD><TD>OS                </TD></TR>
-   <TR><TD>Gnu   </TD><TD>2.95.1   </TD><TD>Solaris 7         </TD></TR>
-   <TR><TD>Gnu   </TD><TD>2.95.3   </TD><TD>SuSE 7.3/x86 Linux</TD></TR>
-   <TR><TD>Gnu   </TD><TD>2.96     </TD><TD>SuSE 7.1/AXP Linux</TD></TR>
-   <TR><TD>Gnu   </TD><TD>3.0.3    </TD><TD>SuSE 7.3/x86 Linux</TD></TR>
-   <TR><TD>Intel </TD><TD>5.0.1    </TD><TD>SuSE 7.3/x86 Linux</TD></TR>
-   <TR><TD>Compaq</TD><TD>T6.4-001 </TD><TD>Tru64 5.0         </TD></TR>
-   <TR><TD>Compaq</TD><TD>6.3-007  </TD><TD>SuSE 7.1/AXP Linux</TD></TR>
-   <TR><TD>Sun   </TD><TD>WS6U2 5.3</TD><TD>Solaris 7         </TD></TR>
-   <TR><TD>SGI   </TD><TD>7.3.1.1m </TD><TD>IRIX 6.5          </TD></TR>
-   <TR><TD>HP    </TD><TD>A.03.27  </TD><TD>HP-UX 11.00       </TD></TR>
-   <TR><TD>IBM   </TD><TD>5        </TD><TD>AIX 5.1           </TD></TR>
+   <TR><TD>Vendor</TD><TD>Version    </TD><TD>OS                </TD></TR>
+   <TR><TD>Gnu   </TD><TD>2.95.1     </TD><TD>Solaris 7         </TD></TR>
+   <TR><TD>Gnu   </TD><TD>2.95.3     </TD><TD>SuSE 7.3/x86 Linux</TD></TR>
+   <TR><TD>Gnu   </TD><TD>2.96       </TD><TD>SuSE 7.1/AXP Linux</TD></TR>
+   <TR><TD>Gnu   </TD><TD>3.0.3      </TD><TD>SuSE 7.3/x86 Linux</TD></TR>
+   <TR><TD>Intel </TD><TD>5.0.1      </TD><TD>SuSE 7.3/x86 Linux</TD></TR>
+   <TR><TD>Compaq</TD><TD>T6.4-001   </TD><TD>Tru64 5.0         </TD></TR>
+   <TR><TD>Compaq</TD><TD>6.3-007    </TD><TD>SuSE 7.1/AXP Linux</TD></TR>
+   <TR><TD>Sun   </TD><TD>WS6U2 5.3  </TD><TD>Solaris 7         </TD></TR>
+   <TR><TD>SGI   </TD><TD>7.3.1.1m   </TD><TD>IRIX 6.5          </TD></TR>
+   <TR><TD>HP    </TD><TD>A.03.27    </TD><TD>HP-UX 11.00       </TD></TR>
+   <TR><TD>IBM   </TD><TD>VisualAge 5</TD><TD>AIX 5.1           </TD></TR>
    </TABLE>
 
    The CPU's used where Intel Pentium-III/800, Pentium-4/1.7, 
@@ -134,7 +136,8 @@
  
  \c gmake \c COMP=xxx \c OPT=yyy
 
- with \c xxx being one of \c gnu, \c intel, \c sun, \c hp, \c sgi or \c compaq
+ with \c xxx being one of \c gnu, \c intel, \c sun, \c hp, \c sgi, \c compaq
+ or \c ibm
  and \c yyy one of \c dbg (if you want the debug version) or \c opt 
  (if you want the optimized version).
 
@@ -178,7 +181,10 @@
  \c LC and \c EC columns and in the \c LR and \c ER columns only with 
  the instances greenbea, greenbeb, pilot-ja or pilot87. 
  One or two fails is normal, above four is probably a problem with the 
- compiler. Try again with less optimization.
+ compiler. Look how big the error is. Try again with less optimization. 
+ Our results are available at 
+ http://www.zib.de/Optimization/Software/Soplex/results
+ to compare with.
 
  \section Documentation  Generating the documentation
  If you have \c doygen (and \c dot) installed, you just can say 
@@ -208,7 +214,9 @@
   - opt-XXX (optimizied for XXX) like opt-p4. This includes optimization
     for a specific processor. 
 
-  - pro (profile) like opt, but generate profile data.
+  - prf (profile) like opt, but generate profile data.
+
+  - XXX-ld (long-double) same as XXX but with long doubles.
  */
 //-----------------------------------------------------------------------------
 /**@page FAQ Frequently Asked Questions
@@ -291,6 +299,27 @@
 
    </ol>
 */           
+//-----------------------------------------------------------------------------
+/**@page FLAGS How to use the flags in the example program
+
+   Here are some tips on which flags to use with the example program:
+
+   If yout have more constrains (rows) than variables (cols) it is 
+   a good idea to try the \c -r flag.
+
+   Setting \c -z to a smaller value like 1e-18 or 1e-20 might improve
+   the quality of the solution, but may also slow down the
+   program. Setting \c -z to bigger values may speed up the algorithm,
+   but values greater than 1e-12 are definately a bad idea.
+
+   Setting \c -d to smaller values like 1e-7 or 1e-8 will improve the
+   quality of the solution, but it will take longer. Values smaller
+   then 1e-9 are not recommended. The \c -d value should be
+   substantial bigger then the \c -z value.
+
+   If the default settings are too slow, using \c -e eventually together 
+   with \c -p1 might improve the running time.  
+*/
 //-----------------------------------------------------------------------------
 /**@page PROG Programming with SoPlex 
    
