@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.58 2003/03/30 08:58:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.59 2003/03/30 13:23:31 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -544,6 +544,9 @@ int main(int argc, const char* const argv[])
       break;
    case SPxSolver::ABORT_VALUE:
       std::cout << "IEXAMP35 aborted due to objective value limit";
+      break;
+   case SPxSolver::SINGULAR:
+      std::cerr << "EEXAMP39 basis is singular";
       break;
    default:
       std::cerr << "EEXAMP36 An error occurred during the solution process";
