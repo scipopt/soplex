@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.cpp,v 1.20 2002/03/11 11:41:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.cpp,v 1.21 2002/04/01 15:09:36 bzfkocht Exp $"
 
 #include <string.h>
 #include "spxdefines.h"
@@ -52,15 +52,13 @@ void NameSet::add(DataKey& p_key, const char* str)
             assert(memSize() + int(strlen(str)) < memMax());
          }
       }
+      int   idx = memused;
+      char* tmp = &(mem[idx]);
+      memused  += int(strlen(str)) + 1;
 
-      char* tmp = &(mem[memused]);
-      memused += int(strlen(str)) + 1;
       strcpy(tmp, str);
-
-      CharPtr* name = set.create(p_key);
-      name->name = tmp;
-      list.append(name);
-      Name memname(name->name);
+      *(set.create(p_key)) = idx;
+      Name memname(tmp);
       hashtab.add(memname, p_key);
    }
 }
@@ -92,7 +90,6 @@ void NameSet::remove(const char *str)
    {
       DataKey* hkey = hashtab.get(nam);
       hashtab.remove (nam);
-      list.remove(&(set[*hkey]));
       set.remove(*hkey);
    }
 }
@@ -100,9 +97,8 @@ void NameSet::remove(const char *str)
 void NameSet::remove(DataKey p_key)
 {
    assert(has(p_key));
-   const Name nam = set[p_key].name;
-   hashtab.remove (nam);
-   list.remove(&(set[p_key]));
+
+   hashtab.remove(Name(&mem[set[p_key]]));
    set.remove(p_key);
 }
 
@@ -118,80 +114,71 @@ void NameSet::remove(int nums[], int n)
       remove(nums[i]);
 }
 
+void NameSet::remove(int dstat[])
+{
+   for(int i = 0; i < set.num(); i++)
+   {
+      if (dstat[i] < 0)
+      {
+         const Name nam = &mem[set[i]];
+         hashtab.remove(nam);
+      }
+   }
+   set.remove(dstat);
+
+   assert(isConsistent());
+}
+
 void NameSet::clear()
 {
    set.clear();
    hashtab.clear();
-   list.clear();
    memused = 0;
 }
 
 void NameSet::reMax(int newmax)
 {
-   hashtab.reMax (newmax);
-
-   ptrdiff_t delta = set.reMax(newmax);
-   CharPtr* first = list.first();
-
-   if (delta != 0 && first != 0)
-   {
-      CharPtr* last = ( reinterpret_cast<CharPtr*>
-                                (reinterpret_cast<char*>(list.last()) + delta) );
-      CharPtr* name = ( reinterpret_cast<CharPtr*>
-                                (reinterpret_cast<char*>(first) + delta) );
-      first = name;
-      for (; name != last; name = name->next())
-         name->next() = reinterpret_cast<CharPtr*>
-            (reinterpret_cast<char*>(name->next()) + delta);
-
-      list = IsList < CharPtr > (first, last);
-   }
+   hashtab.reMax(newmax);
+   set.reMax(newmax);
 }
 
 void NameSet::memRemax(int newmax)
 {
-   char* old = mem;
-   ptrdiff_t delta;
-
    memmax = (newmax < memSize()) ? memSize() : newmax;
    spx_realloc(mem, memmax);
 
-   delta = mem - old;
-
    hashtab.clear ();
 
-   /* update pointers to new targets */
-   for (CharPtr* name = list.first(); name; name = list.next(name))
-      name->name += delta;
-
    for (int i = num() - 1; i >= 0; --i)
-   {
-      Name nam(set[key(i)].name);
-      hashtab.add(nam, key(i));
-   }
+      hashtab.add(Name(&mem[set[key(i)]]), key(i));
 }
 
 void NameSet::memPack()
 {
-   int i;
+   char* newmem = 0;
+   int   newlast = 0;
+   int   i;
 
-   hashtab.clear ();
+   hashtab.clear();
 
-   CharPtr* name = list.first();
-   for (memused = 0; name != 0; name = list.next(name))
+   spx_alloc(newmem, memSize());
+
+   for(i = 0; i < num(); i++)
    {
-      for (i = 0; (mem[memused + i] = name->name[i]) != 0; ++i)
-        ;
-      name->name = &(mem[memused]);
-      memused += i + 1;
+      const char* t = &mem[set[i]];
+      strcpy(&newmem[newlast], t);
+      set[i] = newlast;
+      newlast += strlen(t) + 1;      
    }
+   memcpy(mem, newmem, newlast);
+   memused = newlast;
+
    assert(memSize() <= memMax());
 
-   for (i = num() - 1; i >= 0; --i)
-   {
-      Name nam(set[key(i)].name);
-      hashtab.add(nam, key(i));
-   }
+   spx_free(newmem);
+
+   for (i = 0; i < num(); i++)
+      hashtab.add(Name(&mem[set[key(i)]]), key(i));
 }
 
 /// returns the hash value of the name.
@@ -209,6 +196,7 @@ int NameSetNameHashFunction(const NameSet::Name* str)
    return res;
 }
 
+#if 0
 NameSet& NameSet::operator=(const NameSet& rhs)
 {
    if (this != &rhs)
@@ -220,11 +208,9 @@ NameSet& NameSet::operator=(const NameSet& rhs)
 
       set = rhs.set;
 
-      list.clear();
       hashtab.clear();
       for (int i = 0; i < set.num(); ++i)
       {
-         list.append(&(set[i]));
          Name iname(set[i].name);
          DataKey ikey = DataKey(set.key(i));
          hashtab.add(iname, ikey);
@@ -256,6 +242,7 @@ NameSet::NameSet(const NameSet& org)
    }
    memPack();
 }
+#endif
 
 NameSet::NameSet(int p_max, int mmax, Real fac, Real memFac)
    : set(p_max)
@@ -274,39 +261,38 @@ NameSet::~NameSet()
    spx_free(mem);
 }
 
-void NameSet::dump() const
-{
-   for(int i = 0; i < num(); i++)
-   {
-      std::cout << i << " " 
-                << key(i).info << " "
-                << key(i).idx << " "
-                << operator[](i) 
-                << std::endl;
-   }
-}
-
 bool NameSet::isConsistent() const
 {
    if (memused > memmax)
       return MSGinconsistent("NameSet");
 
-   CharPtr* next;
-
-   for (CharPtr *name = list.first(); name; name = next)
+   for(int i = 0; i < num(); i++)
    {
-      int len = int(strlen(name->name)) + 1;
+      const char* t = &mem[set[i]];
 
-      if (&(name->name[len]) > &(mem[memused]))
+      if (!has(t))
          return MSGinconsistent("NameSet");
 
-      next = list.next(name);
-
-      if (next != 0 && &(name->name[len]) > next->name)
+      if (strcmp(t, operator[](key(t))))
          return MSGinconsistent("NameSet");
    }
-   return set.isConsistent() && list.isConsistent() && hashtab.isConsistent();
+   return set.isConsistent() && hashtab.isConsistent();
 }
+
+std::ostream& operator<<(std::ostream& s, const NameSet& nset)
+{
+   for(int i = 0; i < nset.num(); i++)
+   {
+      s << i << " " 
+        << nset.key(i).info << "."
+        << nset.key(i).idx << "= "
+        << nset[i] 
+        << std::endl;
+   }
+   return s;
+}
+
+
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

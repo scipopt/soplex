@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.h,v 1.17 2002/03/11 11:41:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.h,v 1.18 2002/04/01 15:09:37 bzfkocht Exp $"
 
 /**@file  nameset.h
  * @brief Set of strings.
@@ -26,7 +26,6 @@
 #include "spxdefines.h"
 #include "dataset.h"
 #include "datahashtable.h"
-#include "islist.h"
 #include "datakey.h"
 
 namespace soplex
@@ -62,7 +61,7 @@ public:
     *
     *  Class #Name provides the handles (i.e. #char*%s) of names in a
     *  #NameSet.
-    */
+    */   
    class Name
    {
    private:
@@ -102,15 +101,11 @@ public:
       {}
    };
 
-   /// Single linked list of #Name%s.
-   typedef IsElement<Name> CharPtr;
-
 private:
-   IsList < CharPtr > list;  ///< sorted name list.
-   DataSet < CharPtr > set;  ///< name set.
-   char* mem;                        ///< string memory
-   int memmax;                       ///< size of string memory
-   int memused;                      ///< size of used string memory
+   DataSet < int > set;  ///< name set.
+   char* mem;            ///< string memory
+   int memmax;           ///< size of string memory
+   int memused;          ///< size of used string memory
 
    /** Every name in a #NameSet is assigned a #Key by which it can be
        accessed (see #NameSet::operator[]()). See #DataSet::Key for a more
@@ -124,13 +119,13 @@ public:
    /// returns \p num 'th name of #NameSet.
    const char* operator[](int pnum) const
    {
-      return set[pnum].name;
+      return &mem[set[pnum]];
    }
 
    /// returns name for #DataKey \p pkey of #NameSet.
    const char* operator[](DataKey pkey) const
    {
-      return set[pkey].name;
+      return &mem[set[pkey]];
    }
 
    /// returns nr. of names in #NameSet.
@@ -248,6 +243,9 @@ public:
    /// removes \p n names with numbers \p nums from #NameSet.
    void remove(int nums[], int n);
 
+   /// remove all entries where \p dstat is less than zero.
+   void remove(int dstat[]);
+
    /// removes all names from #NameSet.
    void clear();
    //@}
@@ -290,7 +288,6 @@ public:
    /// consistency check.
    bool isConsistent() const;
 
-   void dump() const;
    //@}
 
    /**@name Constructors / Destructors */
@@ -306,16 +303,21 @@ public:
            Real fac = 2,
            Real memFac = 2);
 
+   /// destructor.
+   ~NameSet();
+
+private:
    /// copy constructor.
    NameSet(const NameSet& old);
 
    /// assignment operator.
    NameSet& operator=(const NameSet& rhs);
 
-   /// destructor.
-   ~NameSet();
    //@}
 };
+
+extern std::ostream& operator<<(std::ostream& s, const NameSet& nset);
+
 } // namespace soplex
 #endif
 

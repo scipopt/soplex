@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.25 2002/03/11 17:43:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.26 2002/04/01 15:09:36 bzfkocht Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -304,7 +304,6 @@ public:
       DataArray<int> perm(num());
       remove(keys, n, perm.get_ptr());
    }
-
    /// ???
    void remove(int *nums, int n, int* perm)
    {

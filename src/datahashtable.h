@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datahashtable.h,v 1.14 2002/03/03 13:50:31 bzfkocht Exp $"
+#pragma ident "@(#) $Id: datahashtable.h,v 1.15 2002/04/01 15:09:36 bzfkocht Exp $"
 
 /**@file  datahashtable.h
  * @brief Generic hash table for data objects.
@@ -273,8 +273,7 @@ public:
    void remove (const HashItem& h)
    {
       assert(has(h));
-      element[index(h)].status
-      = Element < HashItem, Info > ::RELEASED;
+      element[index(h)].status = Element < HashItem, Info > ::RELEASED;
       --thenum;
    }
 
@@ -282,8 +281,7 @@ public:
    void clear ()
    {
       for (int i = element.size() - 1; i >= 0; --i)
-         element[i].status
-         = Element < HashItem, Info > ::FREE;
+         element[i].status = Element < HashItem, Info > ::FREE;
       thenum = 0;
    }
 
@@ -313,9 +311,9 @@ public:
    /// checks, whether #DataHashTable is consistent
    bool isConsistent () const
    {
-      int i, tot;
+      int tot;
 
-      for (i = element.size() - 1, tot = 0; i >= 0; --i)
+      for (int i = element.size() - 1, tot = 0; i >= 0; --i)
       {
          if (element[i].status == Element < HashItem, Info > ::USED)
          {
@@ -386,12 +384,18 @@ private:
 
       assert(element.size() > 0);
 
-      for(i = j = (*hashval)(&h) % element.size();
-          element[i].status != Element < HashItem, Info > ::FREE;)
+      i = (*hashval)(&h) % element.size();
+      j = i;
+
+      while(element[i].status != Element < HashItem, Info > ::FREE) 
       {
-         if (element[i].item == h)
+         // found ?
+         if (  (element[i].status == Element < HashItem, Info > ::USED)
+            && (element[i].item == h))
             return i;
+
          i = (i + hashsize) % element.size();
+
          if (i == j)
             break;
       }
