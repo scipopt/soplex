@@ -13,9 +13,8 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.31 2005/01/09 17:32:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.32 2005/01/09 20:10:41 bzfkocht Exp $"
 
-#undef NDEBUG
 #include <iostream>
 #include <iomanip>
 #include <assert.h>
@@ -251,7 +250,7 @@ SSVector& SSVector::operator+=(const SVector& vec)
    return *this;
 }
 
-#if USE_OLD // old version
+#if 0 // USE_OLD // old version
 SSVector& SSVector::operator+=(const SSVector& vec)
 {
    for (int i = vec.size() - 1; i >= 0; --i)
@@ -303,7 +302,7 @@ SSVector& SSVector::operator-=(const SVector& vec)
    return *this;
 }
 
-#if USE_OLD // old version
+#if 0 // USE_OLD // old version
 SSVector& SSVector::operator-=(const SSVector& vec)
 {
    if (vec.isSetup())
@@ -345,7 +344,7 @@ SSVector& SSVector::operator-=(const SSVector& vec)
 }
 #endif
 
-#if USE_OLD // old version
+#if 0 // USE_OLD // old version
 SSVector& SSVector::operator*=(Real x)
 {
    assert(isSetup());
@@ -831,7 +830,7 @@ SSVector& SSVector::operator=(const SVector& rhs)
    return assign(rhs);
 }
 
-#if USE_OLD // old version
+#if 0 // USE_OLD // old version
 SSVector& SSVector::assign(const SVector& rhs)
 {
    assert(rhs.dim() <= Vector::dim());

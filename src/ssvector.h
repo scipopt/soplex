@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.h,v 1.18 2005/01/09 16:01:08 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.h,v 1.19 2005/01/09 20:10:41 bzfkocht Exp $"
 
 
 /**@file  ssvector.h
@@ -271,11 +271,11 @@ public:
    SSVector& multAdd(Real x, const SVector& vec);
    /// adds scaled vector (+= \p x * \p vec).
    SSVector& multAdd(Real x, const Vector& vec);
-
    /// assigns #SSVector to \f$x^T \cdot A\f$.
    SSVector& assign2product(const SSVector& x, const SVSet& A);
    /// assigns #SSVector to \f$A \cdot x\f$ for a setup \p x.
    SSVector& assign2product4setup(const SVSet& A, const SSVector& x);
+public:
    /// assigns #SSVector to \f$A \cdot x\f$ thereby setting up \p x.
    SSVector& assign2productAndSetup(const SVSet& A, SSVector& x);
 
