@@ -1,7 +1,7 @@
-#--- $Id: make.sunos.sparc.sun.dbg,v 1.4 2001/11/09 21:23:35 bzfkocht Exp $
+#--- $Id: make.sunos.sparc.sun.dbg,v 1.5 2001/11/23 13:38:03 bzfkocht Exp $
 CXX	=	CC
 CPPFLAGS=	-Isrc 
-CXXFLAGS=	-g #+w2
+CXXFLAGS=	-g +w
 LDFLAGS	=	-lm
 RANLIB	=	true
 AR	=	CC
