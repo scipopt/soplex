@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.32 2002/01/18 12:58:58 bzfpfend Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.33 2002/01/18 14:30:05 bzfpfend Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -162,10 +162,9 @@ void SoPlex::setType(Type tp)
              << std::endl;
 }
 
-void SoPlex::setRep(int rp)
+void SoPlex::setRep(Representation p_rep)
 {
-   Representation l_rep = Representation(rp);
-   if (l_rep == COLUMN)
+   if (p_rep == COLUMN)
    {
       thevectors = colset();
       thecovectors = rowset();
@@ -183,7 +182,7 @@ void SoPlex::setRep(int rp)
    }
    else
    {
-      assert(l_rep == ROW);
+      assert(p_rep == ROW);
 
       thevectors = rowset();
       thecovectors = colset();
@@ -199,7 +198,7 @@ void SoPlex::setRep(int rp)
       theCoUbound = &theUCbound;
       theCoLbound = &theLCbound;
    }
-   therep = l_rep;
+   therep = p_rep;
    unInit();
    reDim();
 
@@ -210,7 +209,7 @@ void SoPlex::setRep(int rp)
    }
 
    if (thepricer && thepricer->solver() == this)
-      thepricer->setRep(l_rep);
+      thepricer->setRep(p_rep);
 }
 
 void SoPlex::init()

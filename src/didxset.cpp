@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: didxset.cpp,v 1.5 2001/12/28 14:55:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: didxset.cpp,v 1.6 2002/01/18 14:30:05 bzfpfend Exp $"
 
 #include <iostream>
 #include "didxset.h"
@@ -34,10 +34,16 @@ DIdxSet::DIdxSet(const IdxSet& old)
    : IdxSet(0, 0)
 {
    len = old.size();
-
    spx_alloc(idx, len);
-
    IdxSet::operator= ( old );
+}
+
+DIdxSet::DIdxSet(const DIdxSet& old)
+   : IdxSet(0, 0)
+{
+   len = old.size();
+   spx_alloc(idx, len);
+   IdxSet::operator= ( static_cast<IdxSet>(old) );
 }
 
 DIdxSet::DIdxSet(int n)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.24 2002/01/17 14:51:41 bzfpfend Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.25 2002/01/18 14:30:06 bzfpfend Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -364,7 +364,7 @@ public:
    virtual void loadBasis(const SPxBasis::Desc&);
 
    /// set #ROW or #COLUMN representation.
-   void setRep (int rep);
+   void setRep (Representation p_rep);
    /// set #LEAVE or #ENTER algorithm.
    void setType(Type tp);
    /// set #FULL or #PARTIAL pricing.

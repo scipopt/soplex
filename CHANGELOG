@@ -1,3 +1,4 @@
 16.Jan 2001 Release 1.2.0
 
 - Interface of SoPlex::terminate() changed
+- SoPlex::setRep(int) changed to SoPlex::setRep(Representation)
