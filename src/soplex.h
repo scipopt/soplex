@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.5 2001/12/04 18:25:57 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.6 2001/12/10 15:46:48 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -374,8 +374,8 @@ public:
       return is;
    }
    /// read LP from input stream.
-   virtual void read(std::istream& in, NameSet* rowNames = 0,
-                      NameSet* colNames = 0, DIdxSet* intVars = 0);
+   virtual void read(std::istream& in, 
+      NameSet* rowNames = 0, NameSet* colNames = 0);
 
    /// copy LP.
    void load(const SPxLP& LP);

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.8 2001/11/29 14:00:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.9 2001/12/10 15:46:49 bzfkocht Exp $"
 
 
 
@@ -42,9 +42,6 @@ static double minStab;
 #define EPS     minStab
 //#define       EPS     1e-6
 
-//@ -----------------------------------------------------------------------------
-/*      \SubSection{Variable Status Handling}
- */
 SPxBasis::Desc::Status
 SPxBasis::dualStatus(const SPxLP::SPxColId& id) const
 {
@@ -103,9 +100,6 @@ SPxBasis::dualColStatus(int i) const
       return Desc::D_UNDEFINED;
 }
 
-//@ -----------------------------------------------------------------------------
-/*      \SubSection{Initializations}
- */
 void SPxBasis::loadMatrixVecs()
 {
    assert(theLP != 0);
@@ -231,8 +225,12 @@ void SPxBasis::load(SLinSolver* p_solver)
    factor->clear();
 }
 
+/**@todo Reimplement with new MPS Reader.
+ */
 void SPxBasis::readBasis(std::istream& is, NameSet& rn, NameSet& cn)
 {
+   std::cout << "Not implemented yet!" << std::endl;
+#if 0
    int i, r, c;
    char* f1;
    char* f2;
@@ -326,6 +324,7 @@ void SPxBasis::readBasis(std::istream& is, NameSet& rn, NameSet& cn)
 
    load(l_desc);
    return;
+#endif
 }
 
 //@ -----------------------------------------------------------------------------

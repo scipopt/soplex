@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.11 2001/11/29 14:00:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.12 2001/12/10 15:46:48 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -31,8 +31,7 @@ const double LPSolver::infinity = SPxLP::infinity;
 
 #define MAX(x,y)        ((x)>(y) ? (x) : (y))
 
-void SoPlex::read(std::istream& in, NameSet* rowNames,
-                   NameSet* colNames, DIdxSet* intVars)
+void SoPlex::read(std::istream& in, NameSet* rowNames, NameSet* colNames)
 {
    clear();
    unInit();
@@ -41,7 +40,7 @@ void SoPlex::read(std::istream& in, NameSet* rowNames,
       thepricer->clear();
    if (theratiotester)
       theratiotester->clear();
-   SPxLP::read(in, rowNames, colNames, intVars);
+   SPxLP::read(in, rowNames, colNames);
    SPxBasis::load(this);
    int tmp = coDim() / (20 * dim()) + 1;
    coVecDim = coDim() / tmp + 1;

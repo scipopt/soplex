@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.8 2001/11/29 14:43:46 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.9 2001/12/10 15:46:49 bzfkocht Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -69,9 +69,6 @@ class SPxLP : protected LPRowSet, protected LPColSet
    friend class SPxScale;
    friend int getmarsz (SoPlex*);
    friend int getmartz (SoPlex*);
-   friend int SPxLP__readLine(std::istream& is, 
-                              char*& f1, char*& f2, char*& f3,
-                              char*& f4, char*& f5, char*& f6);
 
    /// input operator.
    friend std::istream& operator>>(std::istream& is, SPxLP& lp)
@@ -81,7 +78,6 @@ class SPxLP : protected LPRowSet, protected LPColSet
    }
    /// output operator.
    friend std::ostream& operator<<(std::ostream& os, const SPxLP& lp);
-
 
    /*
       \SubSection{Data structures and layout}
@@ -658,16 +654,16 @@ public:
    /**@name IO */
    //@{
    /// reads a file from input stream \p in.
-   virtual void read (std::istream& in, NameSet* rowNames = 0,
-                      NameSet* colNames = 0, DIdxSet* intVars = 0);
+   virtual void read (std::istream& in, 
+      NameSet* rowNames = 0, NameSet* colNames = 0);
 
    /// reads a file in LP format from \p in.
-   virtual void readLP (std::istream& in, NameSet* rowNames = 0,
-                         NameSet* colNames = 0, DIdxSet* intVars = 0);
+   virtual void readLP (std::istream& in, 
+      NameSet* rowNames = 0, NameSet* colNames = 0);
 
    /// reads a file in MPS format from \p in.
-   virtual void readMPS(std::istream& in, NameSet* rowNames = 0,
-                        NameSet* colNames = 0);
+   virtual void readMPS(std::istream& in, 
+      NameSet* rowNames = 0, NameSet* colNames = 0);
    //@}
 
 

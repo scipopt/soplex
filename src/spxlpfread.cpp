@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.6 2001/11/21 20:15:41 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.7 2001/12/10 15:46:49 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -306,8 +306,7 @@ static double readInfinity(char*& pos)
 void SPxLP::readLP(
    std::istream& p_input, 
    NameSet*      p_rnames,               ///< row names.
-   NameSet*      p_cnames,               ///< column names.
-   DIdxSet*      p_intvars)              ///< integer variables.
+   NameSet*      p_cnames)               ///< column names.
 {
    enum 
    { 
@@ -579,9 +578,6 @@ void SPxLP::readLP(
                cset.lower(colidx) = 0.0;
                cset.upper(colidx) = 1.0;
             }
-            if (p_intvars != 0)
-               p_intvars->addIdx(colidx);
-
             while(isSpace(*pos))
                pos++;
             break;
