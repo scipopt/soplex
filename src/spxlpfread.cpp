@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.31 2002/07/26 08:14:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.32 2002/08/20 10:38:38 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -566,16 +566,20 @@ bool SPxLP::readLPF(
                   // next line
                   continue;
                }         
+            }            
+            if (have_value)
+            {
+               if (!isColName(pos)) /* implies !isSense(pos) */
+                  goto syntax_error;
+
+               colidx = readColName(pos, cnames, cset, &emptycol);
+
+               if (val != 0.0)
+                  vec.add(colidx, val);
+
+               have_value = false;
             }
-            if (!have_value || !isColName(pos))
-               goto syntax_error;
-
-            colidx = readColName(pos, cnames, cset, &emptycol);
-
-            if (val != 0.0)
-               vec.add(colidx, val);
-
-            have_value = false;
+            assert(!have_value);
 
             if (isSense(pos))
                sense = readSense(pos);
