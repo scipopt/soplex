@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.44 2002/01/31 08:19:27 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.45 2002/01/31 14:04:13 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -433,15 +433,31 @@ void SoPlex::reDim()
    }
 }
 
-bool SoPlex::readFile( const char* filename, NameSet* rowNames,
-                       NameSet* colNames, DIdxSet* intVars)
+bool SoPlex::readBasisFile(
+   const char*    filename, 
+   const NameSet& rowNames,
+   const NameSet& colNames)
 {
    std::ifstream file(filename);
 
    if (!file)
       return false;
-   else
-      return read(file, rowNames, colNames, intVars);
+ 
+   return readBasis(file, rowNames, colNames);
+}
+
+bool SoPlex::readFile( 
+   const char* filename, 
+   NameSet*    rowNames,
+   NameSet*    colNames, 
+   DIdxSet*    intVars)
+{
+   std::ifstream file(filename);
+
+   if (!file)
+      return false;
+
+   return read(file, rowNames, colNames, intVars);
 }
 
 void SoPlex::dumpFile(const char* filename) const

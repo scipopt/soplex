@@ -13,10 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.26 2002/01/31 08:19:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.27 2002/01/31 14:04:13 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
+#include <string.h>
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -96,15 +97,17 @@ int main(int argc, char **argv)
    ;
 
    const char* usage =
-   "[options] file\n\n"
-   "          file can be either in MPS or LPF format\n\n"
-   "options: (*) indicates default\n"
-   " -e       select entering algorithm (default is leaving)\n"
-   " -r       select row wise representation (default is column)\n"
-   " -i       select Eta-update (default is Forest-Tomlin)\n"
-   " -x       output solution vector (works only together with -s0)\n"
-   " -lSec    set timelimit to Sec seconds\n"
-   " -dDelta  set maximal allowed bound violation to Delta\n\n"
+   "[options] LPfile\n\n"
+   "          LPfile can be either in MPS or LPF format\n\n"
+   "options:  (*) indicates default\n" 
+   " -e        select entering algorithm (default is leaving)\n"
+   " -r        select row wise representation (default is column)\n"
+   " -i        select Eta-update (default is Forest-Tomlin)\n"
+   " -x        output solution vector (works only together with -s0)\n"
+   " -bBasfile read file with starting basis\n"
+   " -lSec     set timelimit to Sec seconds\n"
+   " -dDelta   set maximal allowed bound violation to Delta\n"
+   " -zZero    set zero tolerance to Zero\n\n"
    "Simplifier:         Starter:        Pricer:           Ratiotester:\n"
    " -s0  none           -c0  none*      -p0  Textbook     -t0  Textbook\n" 
    " -s1  General        -c1  Weight     -p1  ParMult      -t1  Harris\n"
@@ -115,6 +118,7 @@ int main(int argc, char **argv)
    ;
 
    const char*            filename;
+   const char*            basename       = 0;
    SoPlex::Type           type           = SoPlex::LEAVE;
    SoPlex::Representation representation = SoPlex::COLUMN;
    SLUFactor::UpdateType  update         = SLUFactor::FOREST_TOMLIN;
@@ -130,6 +134,7 @@ int main(int argc, char **argv)
    int                    simplifing     = 3;
    Real                   timelimit      = -1.0;
    Real                   delta          = DEFAULT_BND_VIOL;
+   Real                   epsilon        = DEFAULT_EPS_ZERO;
    bool                   print_solution = false;
    int                    precision;
    int                    optind;
@@ -141,6 +146,10 @@ int main(int argc, char **argv)
 
       switch(argv[optind][1])
       {
+      case 'b' :
+         basename = strcpy(
+            new char[strlen(&argv[optind][1]) + 1], &argv[optind][1]); 
+         break;
       case 'c' :
          starting = atoi(&argv[optind][2]);
          break;
@@ -174,6 +183,9 @@ int main(int argc, char **argv)
       case 'x' :
          print_solution = true;
          break;
+      case 'z' :
+         epsilon = atof(&argv[optind][2]);
+         break;
       case 'h' :
       case '?' :
          std::cout << banner << std::endl;
@@ -191,7 +203,7 @@ int main(int argc, char **argv)
    filename  = argv[optind];
    precision = int(-log10(delta)) + 1;
 
-   //Param::computeEpsilon();
+   Param::setEpsilon(epsilon);
 
    std::cout.setf(std::ios::scientific | std::ios::showpoint);
 
@@ -326,7 +338,8 @@ int main(int argc, char **argv)
 
    if (!work.readFile(filename, &rownames, &colnames))
    {
-      std::cout << "error while reading file" << std::endl;
+      std::cout << "error while reading file \"" 
+                << filename << "\"" << std::endl;
       exit(1);
    }
    assert(work.isConsistent());
@@ -338,6 +351,16 @@ int main(int argc, char **argv)
              << "\tcolumns" 
              << std::endl;
 
+   // Should we read a basis ?
+   if (basename != 0)
+   {
+      if (!work.readBasisFile(basename, rownames, colnames))
+      {
+         std::cout << "error while reading file \"" 
+                   << basename << "\"" << std::endl;
+         exit(1);
+      }
+   }
    timer.start();
    std::cout << "solving LP" 
              << std::endl;
@@ -378,7 +401,7 @@ int main(int argc, char **argv)
             work.getPrimal(objx);
             
             for(int i = 0; i < work.nCols(); i++)
-               if (isNotZero(objx[i]))
+               if (isNotZero(objx[i], epsilon))
                   std::cout << colnames[work.cId(i)] << "\t" 
                             << std::setw(16)
                             << std::setprecision(precision)
@@ -412,6 +435,9 @@ int main(int argc, char **argv)
    delete starter;
    delete pricer;
    delete ratiotester;
+
+   if (basename != 0)
+      delete [] basename;
 
    return 0;
 }

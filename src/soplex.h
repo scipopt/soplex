@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.33 2002/01/31 08:19:27 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.34 2002/01/31 14:04:13 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -353,7 +353,7 @@ public:
    virtual void reLoad();
 
    /// load LP from \p filename in MPS or LPF format.
-   bool readFile( const char* filename, NameSet* rowNames = 0,
+   bool readFile(const char* filename, NameSet* rowNames = 0,
       NameSet* colNames = 0, DIdxSet* intVars = 0);
 
    /// dump loaded LP to \p filename in LPF format.
@@ -361,6 +361,11 @@ public:
 
    /// clear all data in solver.
    void clear();
+
+   /// load basis from \p filename in MPS format.
+   virtual bool readBasisFile(const char* filename, 
+      const NameSet& rowNames, const NameSet& colNames);
+
    //@}
 
    /**@name Solving LPs */

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.17 2002/01/31 12:23:42 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.18 2002/01/31 14:04:14 bzfkocht Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -697,8 +697,12 @@ public:
                         const SVector* enterVec, const SSVector* eta = 0);
 
    /// reads a file in MPS basis format from \p in.
-   virtual void readBasis(std::istream& in,
-                          NameSet& rowNames, NameSet& colNames);
+   virtual bool readBasis(std::istream& in,
+      const NameSet& rowNames, const NameSet& colNames);
+
+   /// writes a file in MPS basis format to \p os.
+   virtual void writeBasis(std::ostream& os, 
+      const NameSet& rownames, const NameSet& colnames);
 
    /// sets up basis.
    /** Loads a #Desc%riptor to the basis and sets up the basis matrix and

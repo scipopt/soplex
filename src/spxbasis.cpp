@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.20 2002/01/31 12:23:42 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.21 2002/01/31 14:04:13 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -216,9 +216,21 @@ void SPxBasis::load(SLinSolver* p_solver)
    factor->clear();
 }
 
-/**@todo This routine is untested.
+/** 
+ *  The specification is taken from the
+ *
+ *  ILOG CPLEX 7.0 Reference Manual, Appendix E, Page 543.
+ *
+ *  This routine should read valid BAS format files. 
+ *
+ *  @return true if the file was read correctly.
+ *
+ *  @todo This routine is untested.
  */
-void SPxBasis::readBasis(std::istream& is, NameSet& rn, NameSet& cn)
+bool SPxBasis::readBasis(
+   std::istream&  is, 
+   const NameSet& rownames, 
+   const NameSet& colnames)
 {
    assert(theLP != 0);
 
@@ -248,11 +260,11 @@ void SPxBasis::readBasis(std::istream& is, NameSet& rn, NameSet& cn)
          if ((mps.field1() == 0) || (mps.field2() == 0))
             break;
 
-         if ((c = cn.number(mps.field2())) < 0)
+         if ((c = colnames.number(mps.field2())) < 0)
             break;
 
          if (*mps.field1() == 'X')
-            if ((mps.field3() == 0) || ((r = rn.number(mps.field3())) < 0))
+            if (mps.field3() == 0 || (r = rownames.number(mps.field3())) < 0)
                break;
 
          if (!strcmp(mps.field1(), "XU"))
@@ -275,6 +287,7 @@ void SPxBasis::readBasis(std::istream& is, NameSet& rn, NameSet& cn)
          }
          else
          {
+            mps.syntaxError();
             break;
          }
       }
@@ -286,6 +299,19 @@ void SPxBasis::readBasis(std::istream& is, NameSet& rn, NameSet& cn)
       else
          mps.syntaxError();
    }
+   return !mps.hasError();
+}
+
+void SPxBasis::writeBasis(   
+   std::ostream&  os, 
+   const NameSet& /*rownames*/, 
+   const NameSet& /*colnames*/)
+{
+   assert(theLP != 0);
+
+   os << "NAME  soplex.bas\n";     
+   os << "not yet implemented\n";
+   os << "ENDATA" << std::endl;
 }
 
 /*      \SubSection{Pivoting Methods}
