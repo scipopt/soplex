@@ -13,14 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.h,v 1.7 2001/11/26 12:19:13 bzfpfend Exp $"
+#pragma ident "@(#) $Id: nameset.h,v 1.8 2001/11/30 22:14:59 bzfkocht Exp $"
 
 /**@file  nameset.h
  * @brief Set of strings.
  */
 #ifndef _NAMESET_H_
 #define _NAMESET_H_
-
 
 #include <assert.h>
 #include <sys/types.h>

@@ -1,29 +1,20 @@
-/*@ ----------------------------------------------------------------------------
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/*                                                                           */
+/*                  This file is part of the class library                   */
+/*       SoPlex --- the Sequential object-oriented simPlex.                  */
+/*                                                                           */
+/*    Copyright (C) 1997-1999 Roland Wunderling                              */
+/*                  1997-2001 Konrad-Zuse-Zentrum                            */
+/*                            fuer Informationstechnik Berlin                */
+/*                                                                           */
+/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*                                                                           */
+/*  You should have received a copy of the ZIB Academic License              */
+/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*                                                                           */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+#pragma ident "@(#) $Id: itfcplex.cpp,v 1.2 2001/11/30 22:14:59 bzfkocht Exp $"
 
-   CPLEX api using SoPlex
-
-   Identification:
-   $Id: itfcplex.cpp,v 1.1 2001/11/30 15:49:20 bzfkocht Exp $
-
-   Program history:
-   $Log: itfcplex.cpp,v $
-   Revision 1.1  2001/11/30 15:49:20  bzfkocht
-   Der Rest des alten cplex interfaces.
-
-// Revision 1.2  1995/07/05  09:36:32  bzfwunde
-// minor changes
-//
-// Revision 1.1.1.1  1995/03/31  14:53:53  bzfwunde
-// tested Version running with set packing
-//
-// Revision 1.1.1.1  1995/03/09  15:47:02  bzfwunde
-// Initial version:
-//     Tested for rowwise simplex
-//     Error in columnwise part --- probably in doplex
-//
-
-    ----------------------------------------------------------------------------
- */
 /*	\Section{Complex Methods}
  */
 #ifndef PRICER
@@ -35,17 +26,9 @@
 #define	COLUMN_SIMPLEX
 #endif
 
-
-/*  Import system include files
- */
 #include <assert.h>
 #include <iostream.h>
 #include <fstream.h>
-
-
-/*  and class header files
- */
-#ifndef	SUBDIR_INCLUDE
 
 #include "spxhybridpr.hh"
 #include "spxsteeppr.hh"
@@ -53,24 +36,12 @@
 #include "slufactor.hh"
 #include "spxweightst.hh"
 
-#else 	// #SUBDIR_INCLUDE#
-
-#include "spxhybridpr/spxhybridpr.hh"
-#include "spxsteeppr/spxsteeppr.hh"
-#include "spxfastrt/spxfastrt.hh"
-#include "slufactor/slufactor.hh"
-#include "spxweightst/spxweightst.hh"
-
-#endif	// #SUBDIR_INCLUDE#
-
 extern "C"
 {
 #include "spxcplex.h"
 }
 
 int	SPX_verbose = 0 ;
-
-//@ ----------------------------------------------------------------------------
 
 static void*	Malloc	( int size )
 {

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: array.h,v 1.9 2001/11/21 20:15:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: array.h,v 1.10 2001/11/30 22:14:59 bzfkocht Exp $"
 
 /**@file  array.h
  * @brief Save arrays of arbitrary types.
@@ -240,7 +240,7 @@ public:
    }
 };
 } // namespace soplex
-#endif
+#endif // _ARRAY_H_
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.8 2001/11/29 22:52:54 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.9 2001/11/30 22:14:59 bzfkocht Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -46,7 +46,7 @@ void SLUFactor::solve2right(Vector& x, Vector& b) //const
 
 void SLUFactor::solve2right(Vector& x, SSVector& b) //const
 {
-   vSolveRightNoNZ(static_cast<CLUFactor*>(this), x.get_ptr(), b.epsilon,
+   vSolveRightNoNZ(x.get_ptr(), b.epsilon,
                     b.altValues(), b.altIndexMem(), b.size());
 }
 
@@ -62,8 +62,7 @@ void SLUFactor::solve2right(SSVector& x, SSVector& b) //const
    int bs = b.size();
    x.clear();
 
-   n = vSolveRight4update(static_cast<CLUFactor*>(this), 
-                          x.epsilon, x.altValues(), x.altIndexMem(),
+   n = vSolveRight4update(x.epsilon, x.altValues(), x.altIndexMem(),
                            b.altValues(), b.altIndexMem(), bs, 0, 0, 0);
    if (n > 0)
    {
@@ -114,7 +113,7 @@ void SLUFactor::solveRight4update(SSVector& x,
    n = b.size();
    if (l.updateType == ETA)
    {
-      m = vSolveRight4update(this, x.epsilon,
+      m = vSolveRight4update(x.epsilon,
                               x.altValues(), x.altIndexMem(),
                               ssvec.altValues(), ssvec.altIndexMem(), n,
                               0, 0, 0);
@@ -125,7 +124,7 @@ void SLUFactor::solveRight4update(SSVector& x,
    else
    {
       forest.clear();
-      m = vSolveRight4update(this, x.epsilon,
+      m = vSolveRight4update(x.epsilon,
                               x.altValues(), x.altIndexMem(),
                               ssvec.altValues(), ssvec.altIndexMem(), n,
                               forest.altValues(), &f, forest.altIndexMem());
@@ -154,7 +153,7 @@ void SLUFactor::solve2right4update(SSVector& x,
    if (l.updateType == ETA)
    {
       n = b.size();
-      m = vSolveRight4update2(this, x.epsilon,
+      m = vSolveRight4update2(x.epsilon,
                                x.altValues(), x.altIndexMem(), ssvec.get_ptr(),
                                sidx, n, y.get_ptr(),
                                rhs.epsilon, rhs.altValues(), ridx, rsize,
@@ -168,7 +167,7 @@ void SLUFactor::solve2right4update(SSVector& x,
    {
       forest.clear();
       n = ssvec.size();
-      m = vSolveRight4update2(this, x.epsilon,
+      m = vSolveRight4update2(x.epsilon,
                                x.altValues(), x.altIndexMem(), ssvec.get_ptr(),
                                sidx, n, y.get_ptr(),
                                rhs.epsilon, rhs.altValues(), ridx, rsize,
@@ -191,7 +190,7 @@ void SLUFactor::solve2left (Vector& x, Vector& b) //const
 void SLUFactor::solve2left(Vector& x, SSVector& b) //const
 {
    x.clear();
-   vSolveLeftNoNZ(static_cast<CLUFactor*>(this), b.epsilon, x.get_ptr(),
+   vSolveLeftNoNZ(b.epsilon, x.get_ptr(),
                    b.altValues(), b.altIndexMem(), b.size());
 }
 
@@ -214,8 +213,7 @@ void SLUFactor::solve2left(SSVector& x, SSVector& b) //const
    int bs = b.size();
    x.clear();
 
-   n = vSolveLeft(static_cast<CLUFactor*>(this), 
-                  x.epsilon, x.altValues(), x.altIndexMem(),
+   n = vSolveLeft(x.epsilon, x.altValues(), x.altIndexMem(),
                    b.altValues(), b.altIndexMem(), bs);
 
    if (n > 0)
@@ -273,7 +271,7 @@ void SLUFactor::solveLeft (SSVector& x,
    y.clear();
    ssvec.assign(rhs1);
    n = ssvec.size();
-   n = vSolveLeft2(static_cast<CLUFactor*>(this), x.epsilon,
+   n = vSolveLeft2(x.epsilon,
                     x.altValues(), x.altIndexMem(), svec, sidx, n,
                     y.get_ptr(), rhs2.altValues(), ridx, rn);
    x.setSize(n);

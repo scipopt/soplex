@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: cluprotos.h,v 1.6 2001/11/29 22:52:54 bzfkocht Exp $"
+#pragma ident "@(#) $Id: cluprotos.h,v 1.7 2001/11/30 22:14:59 bzfkocht Exp $"
 
 
 #ifndef _CLUPROTOS_H_
@@ -38,39 +38,6 @@ int factor(CLUFactor*,
             double,          /* pivoting threshold                */
             double           /* epsilon for zero detection        */
          );
-#if 0
-void solveRight (CLUFactor*, double*, double*);
-int solveRight4update (CLUFactor*, double*, int*, double,
-                        double*, double*, int*, int*);
-
-void solveRight2(CLUFactor* fac,
-                  double* vec1,
-                  double* vec2,
-                  double* rhs1,
-                  double* rhs2);
-
-int solveRight2update(CLUFactor* fac,
-                       double* vec1,
-                       double* vec2,
-                       double* rhs1,
-                       double* rhs2,
-                       int* nonz,
-                       double eps,
-                       double* tmp,
-                       int* forestNum,
-                       int* forestIdx);
-
-void solveLeft (double*, CLUFactor*, double*);
-int solveLeftEps (double*, CLUFactor*, double*, int*, double);
-
-int solveLeft2(CLUFactor* fac,
-                double* vec1,
-                int* nonz,
-                double* vec2,
-                double eps,
-                double* rhs1,
-                double* rhs2);
-#endif
 
 int updateCLUFactor (CLUFactor*, int, double*, const int*, int);
 int updateCLUFactorNoClear(CLUFactor*, int, const double*, const int*, int);
@@ -80,40 +47,7 @@ int CLUFactorIsConsistent (const CLUFactor*);
 #if 0
 void solveLright(CLUFactor* fac, double* vec);
 #endif
-/********************************************************************************
-        very sparse solution methods
-*/
 
-int vSolveRight4update(CLUFactor* fac, double eps,
-                        double* vec, int* idx,               /* result       */
-                        double* rhs, int* ridx, int rn,      /* rhs & Forest */
-                        double* forest, int* forestNum, int* forestIdx);
-
-int vSolveRight4update2(CLUFactor* fac, double eps,
-                         double* vec, int* idx,                      /* result1 */
-                         double* rhs, int* ridx, int rn,             /* rhs1    */
-                         double* vec2, double eps2,                  /* result2 */
-                         double* rhs2, int* ridx2, int rn2,          /* rhs2    */
-                         double* forest, int* forestNum, int* forestIdx);
-void vSolveRightNoNZ(CLUFactor* fac,
-                      double* vec2, double eps2,              /* result2 */
-                      double* rhs2, int* ridx2, int rn2);   /* rhs2    */
-
-int vSolveLeft(CLUFactor* fac, double eps,
-                double* vec, int* idx,                               /* result */
-                double* rhs, int* ridx, int rn);                   /* rhs    */
-
-void vSolveLeftNoNZ(CLUFactor* fac, double eps,
-                     double* vec,                             /* result */
-                     double* rhs, int* ridx, int rn);       /* rhs    */
-
-int vSolveLeft2(CLUFactor* fac, double eps,
-                 double* vec, int* idx,                              /* result */
-                 double* rhs, int* ridx, int rn,                     /* rhs    */
-                 double* vec2,                                       /* result2 */
-                 double* rhs2, int* ridx2, int rn2);               /* rhs2    */
-
-/********************************************************************************/
 void remaxRow(CLUFactor*, int, int);
 void remaxCol(CLUFactor*, int, int);
 int makeLvec(CLUFactor*, int, int);
