@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.67 2003/01/20 16:46:13 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.68 2003/01/22 14:50:30 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -28,6 +28,39 @@
 
 namespace soplex
 {
+
+bool SPxSolver::precisionReached() const
+{
+   Real maxViolRedCost;
+   Real sumViolRedCost;
+   Real maxViolBounds;
+   Real sumViolBounds;
+   Real maxViolConst;
+   Real sumViolConst;
+
+   qualRedCostViolation(maxViolRedCost, sumViolRedCost);
+   qualBoundViolation(maxViolBounds, sumViolBounds);
+   qualConstraintViolation(maxViolConst, sumViolConst);
+
+   // is the solution good enough ?
+   bool reached = maxViolRedCost < delta() && maxViolBounds < delta() && maxViolConst < delta();
+
+   if (!reached)
+   {
+      VERBOSE3({ std::cout << "Precision not reached: Pricer delta= " << thepricer->epsilon() 
+                           << std::endl
+                           << " maxViolRedCost= " << maxViolRedCost
+                           << " maxViolBounds= " << maxViolBounds
+                           << " maxViolConst= " << maxViolConst
+                           << std::endl
+                           << " sumViolRedCost= " << sumViolRedCost
+                           << " sumViolBounds= " << sumViolBounds
+                           << " sumViolConst= " << sumViolConst
+                           << std::endl; });
+   }
+   return reached;
+}
+
 /**@todo After solve() returned, the algorithm type may have changed.
  *       This may be a problem if solve() is called again.
  * @todo The errors at the beginnin do not set m_status. On the other
@@ -40,6 +73,8 @@ SPxSolver::Status SPxSolver::solve()
 
    SPxId enterId;
    int   leaveNum;
+   Real  minDelta;
+   Real  maxDelta;
 
    if (dim() <= 0 && coDim() <= 0) // no problem loaded
       return NO_PROBLEM;
@@ -73,6 +108,9 @@ SPxSolver::Status SPxSolver::solve()
 
       init();
    }
+   maxDelta = 1e-6 > delta() ? 1e-6 : delta();
+   minDelta = delta() * 1e-2;
+
    //thepricer->setEpsilon(delta());
 
    //setType(type());
@@ -107,7 +145,7 @@ SPxSolver::Status SPxSolver::solve()
    {
       if (type() == ENTER)
       {
-         thepricer->setEpsilon(delta());
+         thepricer->setEpsilon(maxDelta);
 
          do
          {
@@ -126,35 +164,18 @@ SPxSolver::Status SPxSolver::solve()
                   || SPxBasis::status() == SPxBasis::DUAL 
                   || SPxBasis::status() == SPxBasis::PRIMAL)
                {
-                  Real maxViolRedCost;
-                  Real sumViolRedCost;
-                  Real maxViolBounds;
-                  Real sumViolBounds;
-                  Real maxViolConst;
-                  Real sumViolConst;
-
-                  qualRedCostViolation(maxViolRedCost, sumViolRedCost);
-                  qualBoundViolation(maxViolBounds, sumViolBounds);
-                  qualConstraintViolation(maxViolConst, sumViolConst);
-
                   // is the solution good enough ?
-                  if ((delta() / thepricer->epsilon() < 50) // max three times reduced
-                     && (maxViolRedCost > delta() || maxViolBounds > delta() || maxViolConst > delta())) 
+                  // max three times reduced
+                  if ((thepricer->epsilon() > minDelta) && !precisionReached())
                   {  // no!
                      // we reduce delta(). Note that if the pricer does not find a candiate
                      // with the reduced delta, we quit, regardless of the violations.
                      thepricer->setEpsilon(thepricer->epsilon() * 0.1);
 
-                     VERBOSE3({ std::cout << "Setting delta= " << thepricer->epsilon() 
-                                          << " maxViolRedCost= " << maxViolRedCost
-                                          << " sumViolRedCost= " << sumViolRedCost
-                                          << " maxViolBounds= " << maxViolBounds
-                                          << " sumViolBounds= " << sumViolBounds
-                                          << " maxViolConst= " << maxViolConst
-                                          << " sumViolConst= " << sumViolConst
+                     VERBOSE2({ std::cout << "Setting delta= " << thepricer->epsilon() 
                                           << std::endl; });
                   }
-                  // solution seems good, no check we are precide enough
+                  // solution seems good, no check we are precice enough
                   else if (lastUpdate() == 0)
                      break;
                   // We have a iterationlimit and everything look good? Then stop!
@@ -223,7 +244,7 @@ SPxSolver::Status SPxSolver::solve()
       {
          assert(type() == LEAVE);
          
-         thepricer->setEpsilon(delta());
+         thepricer->setEpsilon(maxDelta);
 
          do
          {
@@ -243,32 +264,15 @@ SPxSolver::Status SPxSolver::solve()
                   || SPxBasis::status() == SPxBasis::DUAL 
                   || SPxBasis::status() == SPxBasis::PRIMAL)
                {
-                  Real maxViolRedCost;
-                  Real sumViolRedCost;
-                  Real maxViolBounds;
-                  Real sumViolBounds;
-                  Real maxViolConst;
-                  Real sumViolConst;
-
-                  qualRedCostViolation(maxViolRedCost, sumViolRedCost);
-                  qualBoundViolation(maxViolBounds, sumViolBounds);
-                  qualConstraintViolation(maxViolConst, sumViolConst);
-
                   // is the solution good enough ?
-                  if ((delta() / thepricer->epsilon() < 50) // max three times reduced
-                     && (maxViolRedCost > delta() || maxViolBounds > delta() || maxViolConst > delta())) 
+                  // max three times reduced
+                  if ((delta() > minDelta) && !precisionReached())
                   {  // no
                      // we reduce delta(). Note that if the pricer does not find a candiate
                      // with the reduced delta, we quit, regardless of the violations.
                      thepricer->setEpsilon(thepricer->epsilon() * 0.1);
 
-                     VERBOSE3({ std::cout << "Setting delta= " << thepricer->epsilon() 
-                                          << " maxViolRedCost= " << maxViolRedCost
-                                          << " sumViolRedCost= " << sumViolRedCost
-                                          << " maxViolBounds= " << maxViolBounds
-                                          << " sumViolBounds= " << sumViolBounds
-                                          << " maxViolConst= " << maxViolConst
-                                          << " sumViolConst= " << sumViolConst
+                     VERBOSE2({ std::cout << "Setting delta= " << thepricer->epsilon() 
                                           << std::endl; });
                   }
                   // solution seems good, no check we are precide enough

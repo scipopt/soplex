@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: solve.cpp,v 1.26 2003/01/20 20:33:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: solve.cpp,v 1.27 2003/01/22 14:50:30 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -600,7 +600,7 @@ void CLUFactor::solveUleft(Real* p_work, Real* vec)
 void CLUFactor::solveUleft(Real* p_work, Real* vec)
 {
    METHOD( "CLUFactor::solveUleft()" );
-
+#if 0
    for (int i = 0; i < thedim; ++i)
    {
       int  r  = row.orig[i];
@@ -612,6 +612,7 @@ void CLUFactor::solveUleft(Real* p_work, Real* vec)
       }
       std::cout << "\n";
    }
+#endif
    for (int i = 0; i < thedim; ++i)
    {
       int  c  = col.orig[i];
