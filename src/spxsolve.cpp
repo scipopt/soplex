@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.10 2001/12/26 12:49:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.11 2002/01/03 15:25:49 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -23,6 +23,8 @@
 #include "spxratiotester.h"
 #include "spxstarter.h"
 #include "spxsimplifier.h"
+
+//#define DEBUG 1
 
 namespace soplex
 {
@@ -153,7 +155,7 @@ SoPlex::Status SoPlex::solve()
             break;
          }
       }
-      std::cout << "\n" << flush;
+      std::cout << std::endl;
    }
 #endif  // DEBUG
 

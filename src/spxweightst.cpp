@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.cpp,v 1.5 2001/12/30 11:30:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightst.cpp,v 1.6 2002/01/03 15:25:49 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -258,8 +258,7 @@ void SPxWeightST::generate(SoPlex& base)
                double x = bVec.value(j);
                int k = bVec.index(j);
                int l = base.coVector(k).size();
-               if (!forbidden[k] && (x > STABLE*max || -x > STABLE*max)
-                    && l < best)
+               if (!forbidden[k] && (fabs(x) > STABLE * max) && (l < best))
                {
                   best = l;
                   sel = k;
@@ -374,78 +373,66 @@ void SPxWeightST::generate(SoPlex& base)
 void SPxWeightST::setupWeights(SoPlex& bse)
 {
    const SoPlex& base = bse;
-   const Vector& obj = bse.maxObj();
-   const Vector& low = bse.SPxLP::lower();
-   const Vector& up = bse.SPxLP::upper();
-   const Vector& rhs = bse.rhs();
-   const Vector& lhs = bse.lhs();
-   double len1;
-   double nne, ax, bx;
-   double r_fixed, r_dbl_bounded, r_bounded, r_free;
-   double c_fixed, c_dbl_bounded, c_bounded, c_free;
-   double x, l, u, n;
-   int i;
+   const Vector& obj  = bse.maxObj();
+   const Vector& low  = bse.SPxLP::lower();
+   const Vector& up   = bse.SPxLP::upper();
+   const Vector& rhs  = bse.rhs();
+   const Vector& lhs  = bse.lhs();
+   int    i;
 
-   x = 1;
-   for (i = bse.nCols(); i-- > 0;)
+   double maxabs = 1.0;
+
+   // find absolut biggest entry in bounds and left-/right hand side
+   for (i = 0; i < bse.nCols(); i++)
    {
-      if (up[i] < SPxLP::infinity)
-      {
-         if (up[i] > x)
-            x = up[i];
-         else if (-up[i] > x)
-            x = -up[i];
-      }
-      if (low[i] > -SPxLP::infinity)
-      {
-         if (low[i] > x)
-            x = low[i];
-         else if (-low[i] > x)
-            x = -low[i];
-      }
+      if ((up[i] < SPxLP::infinity) && (fabs(up[i]) > maxabs))
+         maxabs = fabs(up[i]);
+      
+      if ((low[i] > -SPxLP::infinity) && (fabs(low[i]) > maxabs))
+         maxabs = fabs(low[i]);
    }
-   for (i = bse.nRows(); i-- > 0;)
+   for (i = 0; i < bse.nRows(); i++)
    {
-      if (rhs[i] < SPxLP::infinity)
-      {
-         if (rhs[i] > x)
-            x = rhs[i];
-         else if (-rhs[i] > x)
-            x = -rhs[i];
-      }
-      if (lhs[i] > -SPxLP::infinity)
-      {
-         if (lhs[i] > x)
-            x = lhs[i];
-         else if (-lhs[i] > x)
-            x = -lhs[i];
-      }
+      if ((rhs[i] < SPxLP::infinity) && (fabs(rhs[i]) > maxabs))
+         maxabs = fabs(rhs[i]);
+      
+      if ((lhs[i] > -SPxLP::infinity) && (fabs(lhs[i]) > maxabs))
+         maxabs = fabs(lhs[i]);
    }
 
+   /**@todo The comments are wrong. The first is for dual simplex and
+    *       the secound for primal one. Is anything else wrong?
+    *       Also the values are nearly the same for both cases.
+    *       Should this be ? Changed the values for
+    *       r_fixed to 0 because of maros-r7. It is not clear why
+    *       this makes a difference because all inequalites in that
+    *       instance are of equality type.
+    *       Why is rowRight sometimes not set?
+    */
    if (bse.rep() * bse.type() > 0)            // primal simplex
    {
-      bx = 1e+0 / x;
-      ax = 1e-3 / obj.maxAbs();
-      nne = ax / lhs.dim();  // 1e-4 * ax;
-      c_fixed = 1e+5;
-      r_fixed = 1e+4;
-      c_dbl_bounded = 1e+1;
-      r_dbl_bounded = 0;
-      c_bounded = 1e+1;
-      r_bounded = 0;
-      c_free = -1e+4;
-      r_free = -1e+5;
+      const double bx            = 1.0 / maxabs;
+      const double ax            = 1e-3 / obj.maxAbs();
+      const double nne           = ax / lhs.dim();  // 1e-4 * ax;
+      const double c_fixed       = 1e+5;
+      const double r_fixed       = 0; // TK20010103: was 1e+4 (maros-r7)
+      const double c_dbl_bounded = 1e+1;
+      const double r_dbl_bounded = 0;
+      const double c_bounded     = 1e+1;
+      const double r_bounded     = 0;
+      const double c_free        = -1e+4;
+      const double r_free        = -1e+5;
 
-      for (i = bse.nCols(); i-- > 0;)
+      for (i = bse.nCols() - 1; i >= 0; i--)
       {
-         n = nne * (bse.colVector(i).size() - 1);
-         x = ax * obj[i];
-         u = bx * up [i];
-         l = bx * low[i];
+         double n = nne * (bse.colVector(i).size() - 1);
+         double x = ax * obj[i];
+         double u = bx * up [i];
+         double l = bx * low[i];
 
          if (up[i] < SPxLP::infinity)
          {
-            if (low[i] > up[i] - base.epsilon())
+            if (fabs(low[i] - up[i]) < base.epsilon())
                colWeight[i] = c_fixed + n + fabs(x);
             else if (low[i] > -SPxLP::infinity)
             {
@@ -456,19 +443,19 @@ void SPxWeightST::setupWeights(SoPlex& bse)
 
                if (u < l)
                {
-                  colUp[i] = 1;
+                  colUp[i]      = true;
                   colWeight[i] += x;
                }
                else
                {
-                  colUp[i] = 0;
+                  colUp[i]      = false;
                   colWeight[i] -= x;
                }
             }
             else
             {
                colWeight[i] = c_bounded - u + x + n;
-               colUp[i] = 1;
+               colUp[i]     = true;
             }
          }
          else
@@ -476,32 +463,35 @@ void SPxWeightST::setupWeights(SoPlex& bse)
             if (low[i] > -SPxLP::infinity)
             {
                colWeight[i] = c_bounded + l + n - x;
-               colUp[i] = 0;
+               colUp[i]     = false;
             }
             else
-               colWeight[i] = c_free + n - (x > 0) ? x : -x;
+            {
+               colWeight[i] = c_free + n - fabs(x);
+            }
          }
       }
 
-      for (i = bse.nRows(); i-- > 0;)
+      for (i = bse.nRows() - 1; i >= 0; i--)
       {
          if (rhs[i] < SPxLP::infinity)
          {
-            if (lhs[i] > rhs[i] - base.epsilon())
+            if (fabs(lhs[i] - rhs[i]) < base.epsilon())
+            {
                rowWeight[i] = r_fixed;
+            }
             else if (lhs[i] > -SPxLP::infinity)
             {
-               u = bx * rhs[i];
-               l = bx * lhs[i];
+               double u = bx * rhs[i];
+               double l = bx * lhs[i];
+
                rowWeight[i] = r_dbl_bounded + l - u;
-               l = fabs(l);
-               u = fabs(u);
-               rowRight[i] = (u < l);
+               rowRight[i]  = fabs(u) < fabs(l);
             }
             else
             {
                rowWeight[i] = r_bounded - bx * rhs[i];
-               rowRight[i] = 1;
+               rowRight[i]  = true;
             }
          }
          else
@@ -509,57 +499,59 @@ void SPxWeightST::setupWeights(SoPlex& bse)
             if (lhs[i] > -SPxLP::infinity)
             {
                rowWeight[i] = r_bounded + bx * lhs[i];
-               rowRight[i] = 0;
+               rowRight[i]  = false;
             }
             else
+            {
                rowWeight[i] = r_free;
+            }
          }
       }
    }
-
    else
    {
       assert(bse.rep() * bse.type() < 0);           // dual simplex
-      ax = 1e+0 / obj.maxAbs();
-      bx = 1e-2 / x;
-      nne = 1e-4 * bx;
-      c_fixed = 1e+5;
-      r_fixed = 1e+4;
-      c_dbl_bounded = 1;
-      r_dbl_bounded = 0;
-      c_bounded = 0;
-      r_bounded = 0;
-      c_free = -1e+4;
-      r_free = -1e+5;
 
-      for (i = bse.nCols(); i-- > 0;)
+      const double ax            = 1.0  / obj.maxAbs();
+      const double bx            = 1e-2 / maxabs;
+      const double nne           = 1e-4 * bx;
+      const double c_fixed       = 1e+5;
+      const double r_fixed       = 1e+4;
+      const double c_dbl_bounded = 1;
+      const double r_dbl_bounded = 0;
+      const double c_bounded     = 0;
+      const double r_bounded     = 0;
+      const double c_free        = -1e+4;
+      const double r_free        = -1e+5;
+
+      for (i = bse.nCols() - 1; i >= 0; i--)
       {
-         n = nne * (bse.colVector(i).size() - 1);
-         x = ax * obj[i];
-         u = bx * up [i];
-         l = bx * low[i];
+         double n = nne * (bse.colVector(i).size() - 1);
+         double x = ax  * obj[i];
+         double u = bx  * up [i];
+         double l = bx  * low[i];
 
          if (up[i] < SPxLP::infinity)
          {
-            if (low[i] > up[i] - base.epsilon())
+            if (fabs(low[i] - up[i]) < base.epsilon())
                colWeight[i] = c_fixed + n + fabs(x);
             else if (low[i] > -SPxLP::infinity)
             {
                if (x > 0)
                {
                   colWeight[i] = c_dbl_bounded + x - u + n;
-                  colUp[i] = 1;
+                  colUp[i]     = true;
                }
                else
                {
                   colWeight[i] = c_dbl_bounded - x + l + n;
-                  colUp[i] = 0;
+                  colUp[i]     = false;
                }
             }
             else
             {
                colWeight[i] = c_bounded - u + x + n;
-               colUp[i] = 1;
+               colUp[i]     = true;
             }
          }
          else
@@ -567,42 +559,42 @@ void SPxWeightST::setupWeights(SoPlex& bse)
             if (low[i] > -SPxLP::infinity)
             {
                colWeight[i] = c_bounded - x + l + n;
-               colUp[i] = 0;
+               colUp[i]     = false;
             }
             else
                colWeight[i] = c_free + n - fabs(x);
          }
       }
 
-      for (i = bse.nRows(); i-- > 0;)
+      for (i = bse.nRows() - 1; i >= 0; i--)
       {
-         len1 = 1;  // (bse.rowVector(i).length() + bse.epsilon());
-         n = 0;  // nne * (bse.rowVector(i).size() - 1);
-         u = bx * len1 * rhs[i];
-         l = bx * len1 * lhs[i];
-         x = ax * len1 * (obj * bse.rowVector(i));
+         const double len1 = 1; // (bse.rowVector(i).length() + bse.epsilon());
+         double n    = 0;  // nne * (bse.rowVector(i).size() - 1);
+         double u    = bx * len1 * rhs[i];
+         double l    = bx * len1 * lhs[i];
+         double x    = ax * len1 * (obj * bse.rowVector(i));
 
          if (rhs[i] < SPxLP::infinity)
          {
-            if (lhs[i] > rhs[i] - base.epsilon())
+            if (fabs(lhs[i] - rhs[i]) < base.epsilon())
                rowWeight[i] = r_fixed + n + fabs(x);
             else if (lhs[i] > -SPxLP::infinity)
             {
                if (x > 0)
                {
                   rowWeight[i] = r_dbl_bounded + x - u + n;
-                  rowRight[i] = 1;
+                  rowRight[i]  = true;
                }
                else
                {
                   rowWeight[i] = r_dbl_bounded - x + l + n;
-                  rowRight[i] = 0;
+                  rowRight[i]  = false;
                }
             }
             else
             {
                rowWeight[i] = r_bounded - u + n + x;
-               rowRight[i] = 1;
+               rowRight[i]  = true;
             }
          }
          else
@@ -610,13 +602,27 @@ void SPxWeightST::setupWeights(SoPlex& bse)
             if (lhs[i] > -SPxLP::infinity)
             {
                rowWeight[i] = r_bounded + l + n - x;
-               rowRight[i] = 0;
+               rowRight[i]  = false;
             }
             else
+            {
                rowWeight[i] = r_free + n - fabs(x);
+            }
          }
       }
    }
+#ifdef DEBUG
+   for(i = 0; i < bse.nCols(); i++)
+      std::cout << "C i= " << i 
+                << " up= " << colUp[i]
+                << " w= " << colWeight[i]
+                << std::endl;
+   for(i = 0; i < bse.nRows(); i++)
+      std::cout << "R i= " << i 
+                << " rr= " << rowRight[i]
+                << " w= " << rowWeight[i]
+                << std::endl;
+#endif // DEBUG
 }
 } // namespace soplex
 
