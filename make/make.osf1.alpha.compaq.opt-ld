@@ -1,0 +1,8 @@
+#--- $Id: make.osf1.alpha.compaq.opt-ld,v 1.1 2003/03/29 08:16:55 bzfkocht Exp $
+CXX	=	cxx
+CPPFLAGS=	-Isrc -I/usr/local/include -DNDEBUG -DWITH_LONG_DOUBLE -DWITH_ZLIB
+CXXFLAGS=	-std strict_ansi -O4 -fast -nortti -nocleanup \
+		-ptr $(OBJDIR)/cxx_repository   
+REPOSIT	=	$(OBJDIR)/cxx_repository/*.o
+LDFLAGS	=	-non_shared -L/usr/local/lib -lz -lm -spike
+ARFLAGS	=	crs 
