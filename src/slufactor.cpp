@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.37 2003/03/04 19:30:45 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.38 2005/03/11 11:43:33 bzfpfend Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -825,7 +825,7 @@ static Real betterThreshold(Real th)
 SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
 {
    METHOD( "SLUFactor::Status()" );
-   assert(dm     > 0);
+   assert(dm     >= 0);
    assert(matrix != 0);
 
    Real lastStability = stability();

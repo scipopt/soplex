@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.42 2005/01/12 12:00:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.43 2005/03/11 11:43:34 bzfpfend Exp $"
 
 //#define DEBUGGING 1
 
@@ -518,10 +518,9 @@ void SPxBasis::factorize()
       assert(false);
       // factorized = false;
    }
-   assert(nzCount > 0);
 
    lastMem    = factor->memory();
-   lastFill   = fillFactor * Real(factor->memory()) / Real(nzCount);
+   lastFill   = fillFactor * Real(factor->memory()) / Real(nzCount > 0 ? nzCount : 1);
    factorized = true;
 }
 

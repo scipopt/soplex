@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clufactor.h,v 1.17 2002/12/16 07:29:47 bzfkocht Exp $"
+#pragma ident "@(#) $Id: clufactor.h,v 1.18 2005/03/11 11:43:33 bzfpfend Exp $"
 
 /**@file  clufactor.h
  * @brief Implementation of sparse LU factorization.
@@ -182,7 +182,7 @@ protected:
 
    Real*   work;              ///< Working array: must always be left as 0! 
 
-   Timer   factorTime;        ///< Time spend in factorizations
+   Timer   factorTime;        ///< Time spent in factorizations
    int     factorCount;       ///< Number of factorizations
 
 private:

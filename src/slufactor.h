@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.h,v 1.16 2002/12/08 11:09:21 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.h,v 1.17 2005/03/11 11:43:33 bzfpfend Exp $"
 
 /**@file  slufactor.h
  * @brief Implementation of Sparse Linear Solver.
@@ -70,7 +70,7 @@ protected:
    /// |x| < epsililon is considered to be 0.
    Real epsilon;
 
-   Timer   solveTime;         ///< Time spend in solves
+   Timer   solveTime;         ///< Time spent in solves
    int     solveCount;        ///< Number of solves
 
 protected:

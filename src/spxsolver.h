@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.17 2004/11/09 17:10:44 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.18 2005/03/11 11:43:34 bzfpfend Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -173,11 +173,12 @@ public:
    enum Status
    {
 
-      ERROR          = -12, ///< an error occured.
-      NO_RATIOTESTER = -11, ///< No ratiotester loaded
-      NO_PRICER      = -10, ///< No pricer loaded
-      NO_SOLVER      = -9,  ///< No linear solver loaded
-      NOT_INIT       = -8,  ///< not initialised error
+      ERROR          = -13, ///< an error occured.
+      NO_RATIOTESTER = -12, ///< No ratiotester loaded
+      NO_PRICER      = -11, ///< No pricer loaded
+      NO_SOLVER      = -10, ///< No linear solver loaded
+      NOT_INIT       = -9,  ///< not initialised error
+      ABORT_CYCLING  = -8,  ///< #solve() aborted due to detection of cycling.
       ABORT_TIME     = -7,  ///< #solve() aborted due to time limit.
       ABORT_ITER     = -6,  ///< #solve() aborted due to iteration limit.
       ABORT_VALUE    = -5,  ///< #solve() aborted due to objective limit.

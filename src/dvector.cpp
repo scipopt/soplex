@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dvector.cpp,v 1.14 2002/11/25 16:51:58 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dvector.cpp,v 1.15 2005/03/11 11:43:33 bzfpfend Exp $"
 
 
 #include "spxdefines.h"
@@ -83,7 +83,7 @@ void DVector::reSize(int newsize)
 {
    assert(newsize >= dim());
 
-   spx_realloc(mem, ((newsize > 0) ? newsize : 1));
+   spx_realloc(mem, newsize);
 
    val = mem;
    memsize = newsize;
@@ -93,7 +93,7 @@ void DVector::reSize(int newsize, int newdim)
 {
    assert(newsize >= newdim);
    
-   spx_realloc(mem, ((newsize > 0) ? newsize : 1));
+   spx_realloc(mem, newsize);
 
    val = mem;
    memsize = newsize;

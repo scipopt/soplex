@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.66 2005/01/06 19:51:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.67 2005/03/11 11:43:33 bzfpfend Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -519,9 +519,9 @@ int main(int argc, const char* const argv[])
    timer.stop();
 
    std::cout << "IEXAMP01 Factorizations   : " << work.getFactorCount() << std::endl;
-   std::cout << "IEXAMO02     Time spend   : " << work.getFactorTime() << std::endl;
+   std::cout << "IEXAMO02     Time spent   : " << work.getFactorTime() << std::endl;
    std::cout << "IEXAMP03 Solves           : " << work.getSolveCount() << std::endl;
-   std::cout << "IEXAMP04     Time spend   : " << work.getSolveTime() << std::endl;
+   std::cout << "IEXAMP04     Time spent   : " << work.getSolveTime() << std::endl;
 
    std::cout << "IEXAMP27 solution time  is: " 
              << timer.userTime() 
@@ -570,6 +570,9 @@ int main(int argc, const char* const argv[])
       std::cout << "IEXAMP32 LP is infeasible" << std::endl;
       if (print_quality)
          work.displayInfeasibility();
+      break;
+   case SPxSolver::ABORT_CYCLING:
+      std::cout << "EEXAMP40 aborted due to cycling" << std::endl;
       break;
    case SPxSolver::ABORT_TIME:
       std::cout << "IEXAMP33 aborted due to time limit" << std::endl;

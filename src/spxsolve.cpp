@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.76 2005/01/12 12:00:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.77 2005/03/11 11:43:34 bzfpfend Exp $"
 
 //#define DEBUGGING 1
 
@@ -25,6 +25,8 @@
 #include "spxpricer.h"
 #include "spxratiotester.h"
 #include "spxstarter.h"
+
+#define MAXCYCLES 100
 
 namespace soplex
 {
@@ -80,6 +82,8 @@ SPxSolver::Status SPxSolver::solve()
    Real  minDelta;
    Real  maxDelta;
    Real  newDelta;
+   Real  minShift = infinity;
+   int   cycleCount = 0;
 
    if (dim() <= 0 && coDim() <= 0) // no problem loaded
       return NO_PROBLEM;
@@ -332,8 +336,30 @@ SPxSolver::Status SPxSolver::solve()
 
          if (!stop)
          {
+            if( shift() < minShift )
+            {
+               minShift = shift();
+               cycleCount = 0;
+            }
+            else
+            {
+               cycleCount++;
+               if( cycleCount > MAXCYCLES )
+               {
+                  m_status = ABORT_CYCLING;
+                  stop = true;
+               }
+               VERBOSE3({
+                  std::cout << "maxInfeas: " << maxInfeas()
+                            << ", shift: " << shift()
+                            << ", delta: " << delta()
+                            << ", cycle count: " << cycleCount << std::endl;
+               });
+            }
+
             if (shift() <= epsilon())
             {
+               cycleCount = 0;
                // factorize();
                unShift();
 
@@ -835,6 +861,7 @@ SPxSolver::Status SPxSolver::status() const
    case OPTIMAL :
       assert( SPxBasis::status() == SPxBasis::OPTIMAL );
       /*lint -fallthrough*/
+   case ABORT_CYCLING :
    case ABORT_TIME :
    case ABORT_ITER :
    case ABORT_VALUE :
