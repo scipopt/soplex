@@ -13,11 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.19 2002/01/31 12:23:42 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.20 2002/01/31 16:30:47 bzfpfend Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
  */
+//#define DEBUG 1
+
 #include <assert.h>
 #include <stdio.h>
 #include <ctype.h>
@@ -143,7 +145,7 @@ static Real readValue(char*& pos)
 
    assert(pos == s);
 
-   // std::cout << "readValue = " << value << std::endl;
+   TRACE( std::cerr << "readValue = " << value << std::endl; );
 
    return value;
 }
@@ -185,7 +187,8 @@ static int readColName(
          colset.add(*emptycol);
       }
    }
-   // std::cout << "readColName [" << name << "] = " << colidx << std::endl;
+   TRACE({ std::cerr << "readColName [" << name << "] = "
+		     << colidx << std::endl; });
 
    return colidx;
 }
@@ -202,7 +205,8 @@ static int readSense(char*& pos)
    else if (*pos == '=')
       pos++;
 
-   // std::cout << "readSense = " << static_cast<char>(sense) << std::endl;
+   TRACE({ std::cerr << "readSense = " << static_cast<char>(sense)
+		     << std::endl; });
 
    return sense;
 }
@@ -244,7 +248,7 @@ static bool hasKeyword(char*& pos, const char* keyword)
    {
       pos += k;
 
-      // std::cout << "hasKeyowrd: " << keyword << std::endl;
+      TRACE( std::cerr << "hasKeyowrd: " << keyword << std::endl; );
       return true;
    }
    return false;
@@ -395,8 +399,8 @@ bool SPxLP::readLPF(
       pos = buf;
       val = 1.0;
 
-      // std::cout << "Reading line " << lineno << std::endl;
-      // std::cout << pos << std::endl;
+      TRACE({ std::cerr << "Reading line " << lineno << 
+			<< " (pos=" << pos << ")" << std::endl; });
 
       // 1. Remove comments.
       if (0 != (s = strchr(buf, '\\')))
@@ -497,7 +501,7 @@ bool SPxLP::readLPF(
       //-----------------------------------------------------------------------
       pos = line;
       
-      //std::cout << "we have [" << pos << "]" << std::endl;
+      TRACE( std::cerr << "pos=" << pos << std::endl; );
 
       // 7. We have something left to process. 
       while((pos != 0) && (*pos != '\0'))
@@ -674,16 +678,20 @@ bool SPxLP::readLPF(
 
  syntax_error:
    if (finished)
-      std::cout << "Finished reading " << lineno << " lines" << std::endl;
+     {
+       VERBOSE_MED({ std::cout << "Finished reading " << lineno
+			       << " lines" << std::endl; });
+     }
    else
-      std::cerr << "Syntax error in line " << lineno << std::endl;
+     std::cerr << "Syntax error in line " << lineno << std::endl;
 
    if (p_cnames == 0)
       delete cnames;
    if (p_rnames == 0)
       delete rnames;
 
-   // std::cout << *this;
+   TRACE( std::cerr << *this; );
+
    return finished;
 }
 } // namespace soplex

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: real.h,v 1.8 2002/01/31 08:19:27 bzfkocht Exp $"
+#pragma ident "@(#) $Id: real.h,v 1.9 2002/01/31 16:30:46 bzfpfend Exp $"
 
 /**@file  real.h
  * @brief Floating point type definition.
@@ -23,8 +23,21 @@
 
 #include <math.h>
 
+
 namespace soplex
 {
+
+#if defined(DEBUG)
+#define TRACE(x) {x}
+#else
+#define TRACE(x) /**/
+#endif
+
+#define VERBOSE_MIN(x) { if(Param::verbose() >= 1) {x} }
+#define VERBOSE_MED(x) { if(Param::verbose() >= 2) {x} }
+#define VERBOSE_MAX(x) { if(Param::verbose() >= 3) {x} }
+
+
 #ifdef WITH_LONG_DOUBLE
 
 typedef long double Real;
@@ -49,6 +62,7 @@ class Param
 {
 private:
    static Real s_epsilon;
+   static int  s_verbose;
 
 public:
    inline static Real epsilon()
@@ -57,6 +71,11 @@ public:
    }
    static void setEpsilon(Real eps);
    static void computeEpsilon();
+   inline static int verbose()
+   {
+      return s_verbose;
+   }
+   static void setVerbose(int p_verbose);
 };
 
 inline bool EQ(Real a, Real b, Real eps = Param::epsilon())

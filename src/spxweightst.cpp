@@ -13,7 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.cpp,v 1.11 2002/01/31 08:19:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightst.cpp,v 1.12 2002/01/31 16:30:48 bzfpfend Exp $"
+
+//#define DEBUG 1
+//#define TEST 1
 
 #include <assert.h>
 #include <iostream>
@@ -22,9 +25,6 @@
 #include "spxweightst.h"
 #include "svset.h"
 #include "sorter.h"
-
-// #define TEST  1
-// #define DEBUG 1
 
 namespace soplex
 {
@@ -272,12 +272,13 @@ void SPxWeightST::generate(SoPlex& base)
 
          if (sel >= 0)
          {
-#ifndef NDEBUG
-            if (pref[i].type() == SPxLP::Id::ROWID)
-               std::cerr << " r" << base.number(pref[i]);
-            else
-               std::cerr << " c" << base.number(pref[i]);
-#endif  // NDEBUG
+            TRACE({
+               if (pref[i].type() == SPxLP::Id::ROWID)
+                  std::cerr << " r" << base.number(pref[i]);
+               else
+                  std::cerr << " c" << base.number(pref[i]);
+            });
+
             forbidden[sel] = 2;
             if (base.rep() == SoPlex::COLUMN)
                setDualStatus(desc, base, pref[i]);
@@ -615,18 +616,18 @@ void SPxWeightST::setupWeights(SoPlex& bse)
          }
       }
    }
-#ifdef DEBUG
-   for(i = 0; i < bse.nCols(); i++)
-      std::cout << "C i= " << i 
-                << " up= " << colUp[i]
-                << " w= " << colWeight[i]
-                << std::endl;
-   for(i = 0; i < bse.nRows(); i++)
-      std::cout << "R i= " << i 
-                << " rr= " << rowRight[i]
-                << " w= " << rowWeight[i]
-                << std::endl;
-#endif // DEBUG
+   TRACE({
+      for(i = 0; i < bse.nCols(); i++)
+         std::cerr << "C i= " << i 
+                   << " up= " << colUp[i]
+                   << " w= " << colWeight[i]
+                   << std::endl;
+      for(i = 0; i < bse.nRows(); i++)
+         std::cerr << "R i= " << i 
+                   << " rr= " << rowRight[i]
+                   << " w= " << rowWeight[i]
+                   << std::endl;
+   });
 }
 } // namespace soplex
 

@@ -13,7 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.13 2002/01/31 08:19:28 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.14 2002/01/31 16:30:47 bzfpfend Exp $"
+
+//#define DEBUG 1
 
 #include <assert.h>
 #include <iostream>
@@ -237,10 +239,7 @@ int SPxHarrisRT::selectLeave(Real& val)
             }
          }
          else
-         {
-            //@     std::cerr << "  " << upd[i] << '\n';
             upd.clearNum(j);
-         }
       }
    }
 
@@ -306,10 +305,7 @@ int SPxHarrisRT::selectLeave(Real& val)
             }
          }
          else
-         {
-            //@     std::cerr << "  " << vec[i] << '\n';
             upd.clearNum(j);
-         }
       }
    }
 
@@ -452,7 +448,7 @@ SoPlex::Id SPxHarrisRT::selectEnter(Real& val)
             }
             else
             {
-               //@     std::cout << "removing value " << pupd[i] << '\n';
+               TRACE( std::cerr << "removing value " << pupd[i] << std::endl; );
                pupd.clearNum(j);
             }
          }
@@ -496,7 +492,7 @@ SoPlex::Id SPxHarrisRT::selectEnter(Real& val)
             }
             else
             {
-               //@     std::cout << "removing value " << cupd[i] << '\n';
+               TRACE( std::cerr << "removing value " << cupd[i] << std::endl; );
                cupd.clearNum(j);
             }
          }
@@ -648,7 +644,7 @@ SoPlex::Id SPxHarrisRT::selectEnter(Real& val)
             }
             else
             {
-               //@     std::cout << "removing value " << pupd[i] << '\n';
+               TRACE( std::cerr << "removing value " << pupd[i] << std::endl; );
                pupd.clearNum(j);
             }
          }
@@ -692,7 +688,7 @@ SoPlex::Id SPxHarrisRT::selectEnter(Real& val)
             }
             else
             {
-               //@     std::cout << "removing value " << x << '\n';
+               TRACE( std::cerr << "removing value " << x << std::endl; );
                cupd.clearNum(j);
             }
          }

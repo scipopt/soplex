@@ -13,7 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.45 2002/01/31 14:04:13 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.46 2002/01/31 16:30:46 bzfpfend Exp $"
+
+//#define DEBUG 1
 
 #include <assert.h>
 #include <iostream>
@@ -25,6 +27,7 @@
 #include "spxratiotester.h"
 #include "spxstarter.h"
 #include "spxsimplifier.h"
+
 
 namespace soplex
 {
@@ -156,13 +159,11 @@ void SoPlex::setType(Type tp)
    if ((theratiotester != 0) && (theratiotester->solver() == this))
       theratiotester->setType(tp);
 
-#ifdef DEBUG
-   std::cout << "switching to " 
-             << static_cast<const char*>
-                ((tp == LEAVE) ? "leaving" : "entering")
-             << " algorithm" 
-             << std::endl;
-#endif
+   TRACE({ std::cerr << "switching to " 
+                     << static_cast<const char*>((tp == LEAVE)
+                                                 ? "leaving" : "entering")
+                     << " algorithm" 
+                     << std::endl; });
 }
 
 void SoPlex::setRep(Representation p_rep)
@@ -364,20 +365,20 @@ void SoPlex::splitLP(int pe, int nPes)
       }
    }
 
-#ifdef DEBUG
-   if (pe == 0)
-   {
-      for (i = 0; i < dim(); i++)
+#ifndef NDEBUG
+      if (pe == 0)
       {
-         int sum = 0;
-         for (j = 0; j < nVecs; ++j)
-            sum += subcovectors[j][i].size();
-         if (sum != (*thecovectors)[i].size())
-            std::cerr << pe << ": " << sum << "<->"
-            << (*thecovectors)[i].size() << std::endl;
+         for (i = 0; i < dim(); i++)
+         {
+            int sum = 0;
+            for (j = 0; j < nVecs; ++j)
+               sum += subcovectors[j][i].size();
+            if (sum != (*thecovectors)[i].size())
+               std::cerr << pe << ": " << sum << "<->"
+                         << (*thecovectors)[i].size() << std::endl;
+         }
       }
-   }
-#endif // DEBUG
+#endif
 }
 
 void SoPlex::splitLP()
@@ -530,10 +531,7 @@ void SoPlex::factorize()
       ctmp -= coPvec();
       if (ftmp.length() > delta())
       {
-         std::cerr << std::endl;
-         std::cerr << "fVec:      ";
-         std::cerr << ftmp.length() << std::endl;
-         std::cerr << std::endl;
+         TRACE( std::cerr << "fVec:   " << ftmp.length() << std::endl; );
          ftmp = fVec();
          multBaseWith(ftmp);
          ftmp -= fRhs();
@@ -544,9 +542,7 @@ void SoPlex::factorize()
       if (ctmp.length() > delta())
       {
          std::cerr << std::endl;
-         std::cerr << "coPvec:    ";
-         std::cerr << ctmp.length() << std::endl;
-         std::cerr << std::endl;
+         TRACE( std::cerr << "coPvec: " << ctmp.length() << std::endl; );
          ctmp = coPvec();
          multWithBase(ctmp);
          ctmp -= coPrhs();
@@ -556,10 +552,7 @@ void SoPlex::factorize()
       }
       if (ptmp.length() > delta())
       {
-         std::cerr << std::endl;
-         std::cerr << "pVec:      ";
-         std::cerr << ptmp.length() << std::endl;
-         std::cerr << std::endl;
+         TRACE( std::cerr << "pVec:   " << ptmp.length() << std::endl; );
       }
 #endif  // NDEBUG
 
@@ -1059,7 +1052,7 @@ SoPlex::basisStatusToVarStatus( SPxBasis::Desc::Status stat ) const
       vstat = BASIC;
       break;
    default:
-      std::cout << "ERROR: unknown basis status (" << stat << ")" << std::endl;
+      std::cerr << "ERROR: unknown basis status (" << stat << ")" << std::endl;
       abort();
    }
    return vstat;
@@ -1092,7 +1085,7 @@ SoPlex::varStatusToBasisStatusRow( int row, SoPlex::VarStatus stat ) const
       rstat = dualRowStatus(row);
       break;
    default:
-      std::cout << "ERROR: unknown VarStatus (" << int(stat)
+      std::cerr << "ERROR: unknown VarStatus (" << int(stat)
                 << ")" << std::endl;
       abort();
    }
@@ -1126,7 +1119,7 @@ SoPlex::varStatusToBasisStatusCol( int col, SoPlex::VarStatus stat ) const
       cstat = dualColStatus(col);
       break;
    default:
-      std::cout << "ERROR: unknown VarStatus (" << int(stat)
+      std::cerr << "ERROR: unknown VarStatus (" << int(stat)
                 << ")" << std::endl;
       abort();
    }

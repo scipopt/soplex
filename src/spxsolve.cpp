@@ -13,7 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.33 2002/01/31 12:23:42 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.34 2002/01/31 16:30:48 bzfpfend Exp $"
+
+//#define DEBUG 1
 
 #include <assert.h>
 #include <iostream>
@@ -25,11 +27,6 @@
 #include "spxstarter.h"
 #include "spxsimplifier.h"
 
-//#define DEBUG 1
-
-#ifdef DEBUG
-#undef NDEBUG
-#endif // DEBUG
 
 namespace soplex
 {
@@ -87,25 +84,18 @@ SoPlex::Status SoPlex::solve()
    thepricer->setEpsilon(delta());
    setType(type());
 
-#ifdef DEBUG
-   std::cout << "starting value = " << value() << '\n';
-   std::cout << "starting shift = " << shift() << '\n';
-   {
-      int i;
-
-      std::cout << "column status:\t";
-
+   TRACE({
+      int i;      
+      std::cerr << "starting value = " << value() << '\n';
+      std::cerr << "starting shift = " << shift() << '\n';      
+      std::cerr << "column status:\t";      
       for (i = 0; i < desc().nCols(); ++i)
-         std::cout << desc().colStatus(i);
-
-      std::cout << "\nrow status:\t";
-
+         std::cerr << desc().colStatus(i);     
+      std::cerr << "\nrow status:\t";      
       for (i = 0; i < desc().nRows(); ++i)
-         std::cout << desc().rowStatus(i);
-
-      std::cout << std::endl;
-   }
-#endif  // DEBUG
+         std::cerr << desc().rowStatus(i);      
+      std::cerr << std::endl;
+   });
 
    if (SPxBasis::status() == SPxBasis::OPTIMAL)
       setStatus(SPxBasis::REGULAR);
@@ -125,11 +115,12 @@ SoPlex::Status SoPlex::solve()
    {
       if (type() == ENTER)
       {
-#ifndef NDEBUG
-         std::cout << "Enter iteration: " << iteration()
-                   << "\tValue = " << value()
-                   << "\tShift = " << shift() << std::endl;
-#endif  // NDEBUG
+         TRACE({
+            std::cerr << "Enter iteration: " << iteration()
+                      << "\tValue = " << value()
+                      << "\tShift = " << shift() << std::endl;
+         });
+
          do
          {
             enterId = thepricer->selectEnter();
@@ -145,15 +136,15 @@ SoPlex::Status SoPlex::solve()
          }
          while (!stop);
 
-#ifndef NDEBUG
-         std::cout << "Enter finished. iteration: " << iteration() 
-                   << " value: " << value()
-                   << " shift: " << shift()
-                   << " epsilon: " << epsilon()
-                   << " stop: " << stop
-                   << " basis status: " << int(SPxBasis::status())
-                   << " solver status: " << int(m_status) << std::endl;
-#endif // NDEBUG
+         TRACE({
+            std::cerr << "Enter finished. iteration: " << iteration() 
+                      << " value: " << value()
+                      << " shift: " << shift()
+                      << " epsilon: " << epsilon()
+                      << " stop: " << stop
+                      << " basis status: " << int(SPxBasis::status())
+                      << " solver status: " << int(m_status) << std::endl;
+         });
 
          if (!stop)
          {
@@ -162,11 +153,11 @@ SoPlex::Status SoPlex::solve()
                factorize();
                unShift();
 
-#ifdef DEBUG
-               std::cout << "maxInfeas: " << maxInfeas()
-                         << " shift: " << shift()
-                         << " delta: " << delta() << std::endl;
-#endif // DEBUG
+               TRACE({
+                  std::cerr << "maxInfeas: " << maxInfeas()
+                            << " shift: " << shift()
+                            << " delta: " << delta() << std::endl;
+               });
 
                if (maxInfeas() + shift() <= delta())
                {
@@ -181,11 +172,13 @@ SoPlex::Status SoPlex::solve()
       else
       {
          assert(type() == LEAVE);
-#ifndef NDEBUG
-         std::cout << "Leave Iteration: " << iteration()
-                   << "\tValue = " << value()
-                   << "\tShift = " << shift() << std::endl;
-#endif  // NDEBUG
+
+         TRACE({
+            std::cerr << "Leave Iteration: " << iteration()
+                      << "\tValue = " << value()
+                      << "\tShift = " << shift() << std::endl;
+         });
+
          do
          {
             leaveNum = thepricer->selectLeave();
@@ -201,15 +194,15 @@ SoPlex::Status SoPlex::solve()
          }
          while (!stop);
 
-#ifndef NDEBUG
-         std::cout << "Leave finished. iteration: " << iteration() 
-                   << " value: " << value()
-                   << " shift: " << shift()
-                   << " epsilon: " << epsilon()
-                   << " stop: " << stop
-                   << " basis status: " << int(SPxBasis::status())
-                   << " solver status: " << int(m_status) << std::endl;
-#endif // NDEBUG
+         TRACE({
+            std::cerr << "Leave finished. iteration: " << iteration() 
+                      << " value: " << value()
+                      << " shift: " << shift()
+                      << " epsilon: " << epsilon()
+                      << " stop: " << stop
+                      << " basis status: " << int(SPxBasis::status())
+                      << " solver status: " << int(m_status) << std::endl;
+         });
 
          if (!stop)
          {
@@ -218,11 +211,12 @@ SoPlex::Status SoPlex::solve()
                factorize();
                unShift();
 
-#ifdef DEBUG
-               std::cout << "maxInfeas: " << maxInfeas()
-                         << " shift: " << shift()
-                         << " delta: " << delta() << std::endl;
-#endif // DEBUG
+               TRACE({
+                  std::cerr << "maxInfeas: " << maxInfeas()
+                            << " shift: " << shift()
+                            << " delta: " << delta() << std::endl;
+               });
+
                if (maxInfeas() + shift() <= delta())
                {
                   setStatus(SPxBasis::OPTIMAL);
@@ -239,12 +233,12 @@ SoPlex::Status SoPlex::solve()
    if (m_status == RUNNING)
       m_status = ERROR;
 
-#ifndef NDEBUG
-   std::cout << "----> finished solving (status=" << int(status());
-   if( status() == OPTIMAL )
-      std::cout << ", objValue=" << value();
-   std::cout << ")" << std::endl;
-#endif // NDEBUG
+   VERBOSE_MIN({
+      std::cout << "Finished solving (status=" << int(status());
+      if( status() == OPTIMAL )
+         std::cout << ", objValue=" << value();
+      std::cout << ")" << std::endl;
+   });
 
 #if 1
    /**@todo Here we should invalidate the basis, because it is
@@ -252,7 +246,7 @@ SoPlex::Status SoPlex::solve()
    // ??? restore old basis
    if( status() != OPTIMAL )
    {
-      std::cout << "Restoring old basis (DEBUG!)" << std::endl;
+      std::cout << "SoPlex::solve(): Restoring old basis (TODO!)" << std::endl;
       setBasis( oldbasis_rows, oldbasis_cols );
    }
    delete[] oldbasis_rows;
@@ -272,16 +266,20 @@ void SoPlex::testVecs()
    tmp -= *theCoPrhs;
    if (tmp.length() > delta())
    {
-      std::cout << iteration() << ":\tcoP error = " << tmp.length();
+      VERBOSE_MAX({ std::cout << iteration() << ":\tcoP error = "
+                              << tmp.length(); });
       tmp.clear();
       SPxBasis::coSolve(tmp, *theCoPrhs);
       multWithBase(tmp);
       tmp -= *theCoPrhs;
-      std::cout << "\t[" << tmp.length() << "]\t(";
+
+      VERBOSE_MAX( std::cout << "\t[" << tmp.length() << "]\t("; );
+
       tmp.clear();
       SPxBasis::coSolve(tmp, *theCoPrhs);
       tmp -= *theCoPvec;
-      std::cout << tmp.length() << ")\n";
+      
+      VERBOSE_MAX( std::cout << tmp.length() << ")" << std::endl; );
    }
 
    tmp = *theFvec;
@@ -289,20 +287,24 @@ void SoPlex::testVecs()
    tmp -= *theFrhs;
    if (tmp.length() > delta())
    {
-      std::cout << iteration() << ":\t  F error = " << tmp.length() << "\t(";
+      VERBOSE_MAX({ std::cout << iteration() << ":\t  F error = "
+                              << tmp.length() << "\t("; });
       tmp.clear();
       SPxBasis::solve(tmp, *theFrhs);
       tmp -= *theFvec;
-      std::cout << tmp.length() << ")\n";
+
+      VERBOSE_MAX( std::cout << tmp.length() << ")" << std::endl; );
    }
 
+#ifndef NDEBUG
    if (type() == ENTER)
    {
       for (i = 0; i < dim(); ++i)
       {
          if (theCoTest[i] < -delta() && isCoBasic(i))
          {
-            std::cout << "testVecs: theCoTest: this shalt not be!" << std::endl
+            std::cerr << "testVecs: theCoTest: this shalt not be!"
+                      << std::endl
                       << "  i=" << i 
                       << ", theCoTest[i]=" << theCoTest[i]
                       << ", delta()=" << delta() << std::endl;
@@ -312,13 +314,15 @@ void SoPlex::testVecs()
       {
          if (theTest[i] < -delta() && isBasic(i))
          {
-            std::cout << "testVecs: theTest: this shalt not be!" << std::endl
+            std::cerr << "testVecs: theTest: this shalt not be!"
+                      << std::endl
                       << "  i=" << i 
                       << ", theTest[i]=" << theTest[i]
                       << ", delta()=" << delta() << std::endl;
          }
       }
    }
+#endif
 }
 
 bool SoPlex::terminate()
@@ -350,10 +354,10 @@ bool SoPlex::terminate()
       cr -= *theCoPrhs;
       fr -= *theFrhs;
       if (cr.length() > delta())
-         std::cout << "unexpected change of coPrhs " 
+         std::cerr << "unexpected change of coPrhs " 
                    << cr.length() << std::endl;
       if (fr.length() > delta())
-         std::cout << "unexpected change of   Frhs " 
+         std::cerr << "unexpected change of   Frhs " 
                    << fr.length() << std::endl;
 #endif  // !NDEBUG
 
@@ -375,20 +379,15 @@ bool SoPlex::terminate()
 
    if ( maxIters >= 0 && iterations() >= maxIters )
    {
-#ifndef NDEBUG
-      std::cout << "Maximum number of iterations (" << maxIters
-                << ") reached" << std::endl;
-#endif // !NDEBUG
-
+      VERBOSE_MED({ std::cout << "Maximum number of iterations (" << maxIters
+                              << ") reached" << std::endl; });
       m_status = ABORT_ITER;
       return true;
    }
    if ( maxTime >= 0 && maxTime < infinity && time() >= maxTime )
    {
-#ifndef NDEBUG
-      std::cout << "Timelimit (" << maxTime << ") reached" << std::endl;
-#endif // !NDEBUG
-
+      VERBOSE_MED({ std::cout << "Timelimit (" << maxTime
+                              << ") reached" << std::endl; });
       m_status = ABORT_TIME;
       return true;   
    }
@@ -404,14 +403,16 @@ bool SoPlex::terminate()
          
          if( sign * (value() - maxValue) >= 0.0 )
          {
-#ifndef NDEBUG
-            std::cout << "Objective value limit reached" << std::endl;
-            std::cout << " (value: " << value()
-                      << ", limit: " << maxValue << ")" << std::endl;
-            std::cout << " (spxSense: " << int(spxSense())
-                      << ", rep: " << int(rep())
-                      << ", type: " << int(type()) << std::endl; // ???
-#endif // !NDEBUG
+            VERBOSE_MED({ std::cout << "Objective value limit (" << maxValue
+                                    << ") reached" << std::endl; });
+            TRACE({
+               std::cerr << "Objective value limit reached" << std::endl
+                         << " (value: " << value()
+                         << ", limit: " << maxValue << ")" << std::endl
+                         << " (spxSense: " << int(spxSense())
+                         << ", rep: " << int(rep())
+                         << ", type: " << int(type()) << std::endl;
+            });
             
             m_status = ABORT_VALUE;
             return true;

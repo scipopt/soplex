@@ -13,20 +13,23 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: mpsinput.cpp,v 1.3 2002/01/23 17:47:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: mpsinput.cpp,v 1.4 2002/01/31 16:30:46 bzfpfend Exp $"
 
 /**@file  mpsinput.cpp
  * @brief Read MPS format files.
  */
+//#define DEBUG 1                   // Setting this generates a lot of output
+
 #include <assert.h>
 #include <string.h>
 
+#include "real.h"
 #include "mpsinput.h"
 
 #define PATCH_CHAR    '_'
 #define BLANK         ' '
 
-#define DEBUG 0                   // Setting this generates a lot of output
+
 
 namespace soplex
 { 
@@ -73,10 +76,8 @@ bool MPSInput::readLine()
             return false;
         m_lineno++;
 
-#if DEBUG
-        std::cout << "Line " << m_lineno << " " << m_buf << std::endl;
-#endif // DEBUG
-
+        TRACE({ std::cerr << "Line " << m_lineno
+                          << " " << m_buf << std::endl; });        
       } 
       while(*m_buf == '*');
 
@@ -189,16 +190,19 @@ bool MPSInput::readLine()
    }
    while(is_marker);
 
-#if DEBUG
-   std::cout << "-----------------------------------------------" << std::endl;
-   std::cout << "f0=" << ((m_f0 == 0) ? "nil" : m_f0) << std::endl; 
-   std::cout << "f1=" << ((m_f1 == 0) ? "nil" : m_f1) << std::endl; 
-   std::cout << "f2=" << ((m_f2 == 0) ? "nil" : m_f2) << std::endl; 
-   std::cout << "f3=" << ((m_f3 == 0) ? "nil" : m_f3) << std::endl; 
-   std::cout << "f4=" << ((m_f4 == 0) ? "nil" : m_f4) << std::endl; 
-   std::cout << "f5=" << ((m_f5 == 0) ? "nil" : m_f5) << std::endl; 
-   std::cout << "-----------------------------------------------" << std::endl;
-#endif
+   TRACE({
+      std::cerr << "-----------------------------------------------" 
+                << std::endl
+                << "f0=" << ((m_f0 == 0) ? "nil" : m_f0) << std::endl
+                << "f1=" << ((m_f1 == 0) ? "nil" : m_f1) << std::endl
+                << "f2=" << ((m_f2 == 0) ? "nil" : m_f2) << std::endl
+                << "f3=" << ((m_f3 == 0) ? "nil" : m_f3) << std::endl
+                << "f4=" << ((m_f4 == 0) ? "nil" : m_f4) << std::endl
+                << "f5=" << ((m_f5 == 0) ? "nil" : m_f5) << std::endl
+                << "-----------------------------------------------" 
+                << std::endl;
+   });
+
    return true;
 }
 

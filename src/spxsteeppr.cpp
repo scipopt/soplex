@@ -13,7 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.15 2002/01/31 12:23:42 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.16 2002/01/31 16:30:48 bzfpfend Exp $"
+
+//#define DEBUG 1
 
 #include <assert.h>
 #include <iostream>
@@ -295,9 +297,9 @@ int SPxSteepPR::selectLeaveX(Real& best, int start, int incr)
 #ifndef NDEBUG
          if( coPenalty_ptr[i] < theeps )
          {
-            std::cout << "SPxSteepPR::selectLeaveX(): This shall not be!"
+            std::cerr << "SPxSteepPR::selectLeaveX(): This shall not be!"
                       << std::endl;
-            std::cout << "i=" << i
+            std::cerr << "i=" << i
                       << " x=" << x
                       << " coPenalty_ptr[i]=" << coPenalty_ptr[i]
                       << " theeps=" << theeps << std::endl;

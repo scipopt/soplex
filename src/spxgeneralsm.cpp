@@ -13,7 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeneralsm.cpp,v 1.10 2002/01/31 08:19:28 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeneralsm.cpp,v 1.11 2002/01/31 16:30:47 bzfpfend Exp $"
+
+//#define DEBUG 1
 
 #include <iostream>
 
@@ -64,8 +66,10 @@ int SPxGeneralSM::simplify()
    rows -= lp->nRows();
    cols -= lp->nCols();
 
-   std::cout << "removed " << rows << " rows\n";
-   std::cout << "removed " << cols << " columns\n";
+   VERBOSE_MIN({
+      std::cout << "removed " << rows << " rows" << std::endl;
+      std::cout << "removed " << cols << " columns" << std::endl;
+   });
 
    assert(lp->isConsistent());
 

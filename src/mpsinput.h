@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: mpsinput.h,v 1.2 2002/01/31 08:19:27 bzfkocht Exp $"
+#pragma ident "@(#) $Id: mpsinput.h,v 1.3 2002/01/31 16:30:46 bzfpfend Exp $"
 
 /**@file  mpsinput.h
  * @brief Read MPS format files.
@@ -22,7 +22,6 @@
 
 #include "spxlp.h"
 
-#define DEBUG 0                   // Setting this generates a lot of output
 
 namespace soplex
 { 

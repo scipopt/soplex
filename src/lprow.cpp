@@ -13,7 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprow.cpp,v 1.10 2002/01/31 08:19:27 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprow.cpp,v 1.11 2002/01/31 16:30:46 bzfpfend Exp $"
+
+//#define DEBUG 1
 
 #include <stdlib.h>
 #include <math.h>
@@ -53,9 +55,9 @@ void LPRow::setType(
    case GREATER_EQUAL:
       right = infinity;
       break;
-   case RANGE :
+   case RANGE:
       std::cerr << __FILE__ << __LINE__
-      << "RANGE not supported in LPRow::setType()";
+                << "RANGE not supported in LPRow::setType()" << std::endl;
       abort();
    default:
       abort();

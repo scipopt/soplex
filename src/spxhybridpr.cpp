@@ -13,7 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.14 2002/01/31 08:19:28 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.15 2002/01/31 16:30:47 bzfpfend Exp $"
+
+//#define DEBUG 1
 
 #include <iostream>
 
@@ -86,7 +88,9 @@ void SPxHybridPR::setType(SoPlex::Type tp)
          thesolver->setPricing(SoPlex::PARTIAL);
       }
    }
-   std::cout << "switching to " << thepricer->name() << std::endl;
+   
+   VERBOSE_MIN({ std::cout << "switching to "
+                           << thepricer->name() << std::endl; });
 
    thepricer->setType(tp);
 }

@@ -13,11 +13,14 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.8 2002/01/31 08:19:28 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.9 2002/01/31 16:30:47 bzfpfend Exp $"
+
+//#define DEBUG 1
 
 #include <iostream>
 #include <math.h>
 
+#include "real.h"
 #include "spxbasis.h"
 #include "soplex.h"
 
@@ -76,7 +79,7 @@ void SPxBasis::removedRow(int i)
       {
          setStatus(NO_PROBLEM);
          factorized = false;
-         // std::cout << "Are you sure, you wanna do that?\n";
+         TRACE( std::cerr << "Are you sure, you wanna do that?\n"; );
       }
 
    }
@@ -87,7 +90,7 @@ void SPxBasis::removedRow(int i)
       if (!theLP->isBasic(thedesc.rowStatus(i)))
       {
          setStatus(NO_PROBLEM);
-         // std::cout << "Are you sure, you wanna do that?\n";
+         TRACE( std::cerr << "Are you sure, you wanna do that?\n"; );
       }
 
       else if (status() > NO_PROBLEM && matrixIsSetup)
@@ -131,7 +134,7 @@ void SPxBasis::removedRows(int perm[])
                {
                   setStatus(NO_PROBLEM);
                   factorized = false;
-                  // std::cout << "Are you sure, you wanna do that?\n";
+                  TRACE( std::cerr << "Are you sure, you wanna do that?\n"; );
                }
 
             }

@@ -13,7 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.16 2002/01/31 08:19:28 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.17 2002/01/31 16:30:47 bzfpfend Exp $"
+
+//#define DEBUG 1
 
 #include <assert.h>
 #include <stdio.h>
@@ -661,7 +663,6 @@ int SPxFastRT::maxShortLeave(Real& sel, int leave,
          sel = (thesolver->ubBound()[leave] - thesolver->fVec()[leave]) / sel;
       else
          sel = (thesolver->lbBound()[leave] - thesolver->fVec()[leave]) / sel;
-      //@ std::cerr << '+';
       return 1;
    }
    return 0;
@@ -681,7 +682,6 @@ int SPxFastRT::minShortLeave(Real& sel, int leave,
          sel = (thesolver->lbBound()[leave] - thesolver->fVec()[leave]) / sel;
       else
          sel = (thesolver->ubBound()[leave] - thesolver->fVec()[leave]) / sel;
-      //@ std::cerr << '+';
       return 1;
    }
    return 0;
@@ -692,8 +692,6 @@ int SPxFastRT::maxReleave(Real& sel, int leave, Real maxabs)
    UpdateVector& vec = thesolver->fVec();
    Vector& low = thesolver->lbBound();
    Vector& up = thesolver->ubBound();
-
-   //    std::cerr << thesolver->theShift << "\t->\t";
 
    if (leave >= 0)
    {
@@ -728,8 +726,6 @@ int SPxFastRT::minReleave(Real& sel, int leave, Real maxabs)
    UpdateVector& vec = thesolver->fVec();
    Vector& low = thesolver->lbBound();
    Vector& up = thesolver->ubBound();
-
-   //    std::cerr << thesolver->theShift << "\t-)\t";
 
    if (leave >= 0)
    {
@@ -795,7 +791,6 @@ int SPxFastRT::selectLeave(Real& val)
             // phase 2:
             Real stab, bestDelta;
             stab = 100 * minStability(minStab, maxabs);
-            // std::cerr << '\t' << stab << '\t' << maxabs << std::endl;
             leave = maxSelect(sel, stab, bestDelta, max);
             if (bestDelta < DELTA_SHIFT*TRIES)
                cnt++;
@@ -830,7 +825,6 @@ int SPxFastRT::selectLeave(Real& val)
             // phase 2:
             Real stab, bestDelta;
             stab = 100 * minStability(minStab, maxabs);
-            // std::cerr << '\t' << stab << '\t' << maxabs << std::endl;
             leave = minSelect(sel, stab, bestDelta, max);
             if (bestDelta < DELTA_SHIFT*TRIES)
                cnt++;
@@ -846,23 +840,22 @@ int SPxFastRT::selectLeave(Real& val)
    else
       return -1;
 
-#ifndef NDEBUG
-   if (leave >= 0)
-      // fprintf(stderr, "%d(%10.6g,%8.2g):%10d\t%10.4g %10.4g %10.6g\n",
-      std::cout 
-         << thesolver->basis().iteration() << "("
-         << std::setprecision(6) << thesolver->value() << ","
-         << std::setprecision(2) << thesolver->basis().stability() << "):"
-         << leave << "\t"
-         << std::setprecision(4) << sel << " "
-         << std::setprecision(4) << thesolver->fVec().delta()[leave] << " "
-         << std::setprecision(6) << maxabs 
-         << std::endl;
-   else
-      std::cout << thesolver->basis().iteration() 
-                << ": skipping instable pivot"
-                << std::endl;
-#endif  // NDEBUG
+   VERBOSE_MAX({
+      if (leave >= 0)
+         std::cout 
+            << thesolver->basis().iteration() << "("
+            << std::setprecision(6) << thesolver->value() << ","
+            << std::setprecision(2) << thesolver->basis().stability() << "):"
+            << leave << "\t"
+            << std::setprecision(4) << sel << " "
+            << std::setprecision(4) << thesolver->fVec().delta()[leave] << " "
+            << std::setprecision(6) << maxabs 
+            << std::endl;
+      else
+         std::cout << thesolver->basis().iteration() 
+                   << ": skipping instable pivot"
+                   << std::endl;
+   });
 
    if (leave >= 0 || minStab > 2*solver()->epsilon())
    {
@@ -1080,7 +1073,6 @@ int SPxFastRT::shortEnter(
       if (max != 0)
       {
          Real x = thesolver->pVec().delta()[nr];
-         // std::cerr << x << ' ';
          if (x < maxabs * SHORT && -x < maxabs * SHORT)
             return 0;
       }
@@ -1122,14 +1114,10 @@ SoPlex::Id SPxFastRT::selectEnter(Real& val)
             if (bestDelta < DELTA_SHIFT*TRIES)
                cnt++;
             else
-            {
-               // std::cerr << "break";
                cnt += TRIES;
-            }
          }
          if (!maxReenter(sel, max, maxabs, enterId, nr))
             break;
-         // std::cerr << " ++ ";
          relax();
       }
       while (cnt < TRIES);
@@ -1163,21 +1151,21 @@ SoPlex::Id SPxFastRT::selectEnter(Real& val)
       while (cnt < TRIES);
    }
 
-#ifndef NDEBUG
-   if (enterId.isValid())
-   {
-      Real x;
-      if (thesolver->isCoId(enterId))
-         x = thesolver->coPvec().delta()[ thesolver->number(enterId) ];
+   VERBOSE_MAX({
+      if (enterId.isValid())
+         {
+            Real x;
+            if (thesolver->isCoId(enterId))
+               x = thesolver->coPvec().delta()[ thesolver->number(enterId) ];
+            else
+               x = thesolver->pVec().delta()[ thesolver->number(enterId) ];
+            std::cout << thesolver->basis().iteration() << ": " << sel
+                      << '\t' << x << " (" << maxabs << ")" << std::endl;
+         }
       else
-         x = thesolver->pVec().delta()[ thesolver->number(enterId) ];
-      std::cout << thesolver->basis().iteration() << ": " << sel << '\t'
-                << x << " (" << maxabs << ")\n";
-   }
-   else
-      std::cout << thesolver->basis().iteration() 
-                << ": skipping instable pivot\n";
-#endif  // NDEBUG
+         std::cout << thesolver->basis().iteration() 
+                   << ": skipping instable pivot" << std::endl;
+   });
 
    if (enterId.isValid() || minStab > 2*epsilon)
    {

@@ -13,8 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxio.cpp,v 1.12 2002/01/31 08:50:14 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxio.cpp,v 1.13 2002/01/31 16:30:47 bzfpfend Exp $"
 
+
+//#define DEBUG 1
 
 #include <iostream>
 #include <stdio.h>
@@ -68,7 +70,7 @@ bool SPxLP::read(
       ? readMPS(is, rowNames, colNames, intVars)
       : readLPF(is, rowNames, colNames, intVars);
 
-   // std::cout << *this;
+   TRACE( std::cerr << *this; );
 
    return ok;
 }

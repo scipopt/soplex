@@ -13,7 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.28 2002/01/31 12:23:42 bzfpfend Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.29 2002/01/31 16:30:46 bzfpfend Exp $"
+
+//#define DEBUG 1
 
 #include <iostream>
 #include <assert.h>
@@ -82,9 +84,6 @@ void CLUFactor::setPivot(const int p_stage,
                          const int p_row, 
                          const Real val)
 {
-   // std::cout << p_stage << ": (" << p_row ", " 
-   //           << p_col << ") = " << val << std::endl;
-
    assert(row.perm[p_row] < 0);
    assert(col.perm[p_col] < 0);
 
@@ -1314,34 +1313,37 @@ void CLUFactor::eliminateNucleus( const Real eps,
 
    while (temp.stage < thedim - 1)
    {
-#ifdef DEBUG
+#ifndef NDEBUG
       int i;
-      CLUFactorIsConsistent(fac);
+      // CLUFactorIsConsistent(fac);
       for (i = 0; i < thedim; ++i)
          if (col.perm[i] < 0)
-         {
-            assert(s_mark[i] == 0);
-         }
+            assert(temp.s_mark[i] == 0);
 #endif
 
-      if (temp.pivot_rowNZ[1].next != &(temp.pivot_rowNZ[1]))        /* row singleton available */
+      if (temp.pivot_rowNZ[1].next != &(temp.pivot_rowNZ[1]))
+         /* row singleton available */
          eliminateRowSingletons();
-      else if (temp.pivot_colNZ[1].next != &(temp.pivot_colNZ[1]))   /* column singleton available */
+      else if (temp.pivot_colNZ[1].next != &(temp.pivot_colNZ[1]))
+         /* column singleton available */
          eliminateColSingletons();
       else
       {
          initDR(temp.pivots);
          selectPivots( threshold);
 
-         assert ( temp.pivots.next != &temp.pivots &&  "ERROR: no pivot element selected" );
+         assert ( temp.pivots.next != &temp.pivots &&
+                  "ERROR: no pivot element selected" );
 
-         for (pivot = temp.pivots.next; pivot != &temp.pivots; pivot = pivot->next)
+         for (pivot = temp.pivots.next; pivot != &temp.pivots;
+              pivot = pivot->next)
          {
             eliminatePivot(pivot->idx, pivot->pos, eps );
          }
       }
 
-      if (temp.pivot_rowNZ->next != temp.pivot_rowNZ || temp.pivot_colNZ->next != temp.pivot_colNZ)
+      if (temp.pivot_rowNZ->next != temp.pivot_rowNZ ||
+          temp.pivot_colNZ->next != temp.pivot_colNZ)
       {
          stat = SLinSolver::SINGULAR;
          return;
@@ -1353,8 +1355,10 @@ void CLUFactor::eliminateNucleus( const Real eps,
       /*      Eliminate remaining element.
        *      Note, that this must be both, column and row singleton.
        */
-      assert(temp.pivot_rowNZ[1].next != &(temp.pivot_rowNZ[1]) && "ERROR: one row must be left");
-      assert(temp.pivot_colNZ[1].next != &(temp.pivot_colNZ[1]) && "ERROR: one col must be left");
+      assert(temp.pivot_rowNZ[1].next != &(temp.pivot_rowNZ[1]) &&
+             "ERROR: one row must be left");
+      assert(temp.pivot_colNZ[1].next != &(temp.pivot_colNZ[1]) &&
+             "ERROR: one col must be left");
       r = temp.pivot_rowNZ[1].next->idx;
       c = temp.pivot_colNZ[1].next->idx;
       u.row.len[r] = 0;

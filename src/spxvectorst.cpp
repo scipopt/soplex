@@ -13,7 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvectorst.cpp,v 1.6 2002/01/31 08:19:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxvectorst.cpp,v 1.7 2002/01/31 16:30:48 bzfpfend Exp $"
+
+//#define DEBUG 1
 
 #include <assert.h>
 #include <iostream>
@@ -40,6 +42,7 @@ void SPxVectorST::setupWeights(SoPlex& base)
       Real x, y;
       int i;
 
+      TRACE( std::cerr << "colWeight[]: " );
       for (i = base.nCols(); i--;)
       {
          x = vec[i] - base.SPxLP::lower(i);
@@ -54,12 +57,11 @@ void SPxVectorST::setupWeights(SoPlex& base)
             colWeight[i] = -y + bias * obj[i];
             colUp[i] = 1;
          }
-         //@ std::cout << colWeight[i] << " ";
+         TRACE( std::cerr << colWeight[i] << " "; );
       }
-      //@ std::cout << std::endl;
-      //@ std::cout << std::endl;
+      TRACE( std::cerr << std::endl << std::endl; );
 
-
+      TRACE( std::cerr << "rowWeight[]: " );
       for (i = base.nRows(); i--;)
       {
          const SVector& row = (const_cast<const SoPlex&>(base)).rowVector(i);
@@ -76,9 +78,9 @@ void SPxVectorST::setupWeights(SoPlex& base)
             rowWeight[i] = -y - eps * row.size() + bias * (obj * row);
             rowRight[i] = 1;
          }
-         //@ std::cout << rowWeight[i] << " ";
+         TRACE( std::cerr << rowWeight[i] << " "; );
       }
-      //@ std::cout << std::endl;
+      TRACE( std::cerr << std::endl; );
    }
 
    else if (state == DVEC)

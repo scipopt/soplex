@@ -13,7 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.21 2002/01/31 14:04:13 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.22 2002/01/31 16:30:47 bzfpfend Exp $"
+
+//#define DEBUG 1
 
 #include <assert.h>
 #include <iostream>
@@ -143,11 +145,11 @@ void SPxBasis::load(const Desc& ds)
          theBaseId[j] = id;
          matrix[j] = &theLP->vector(id);
          nzCount += matrix[j++]->size();
-#if 0
-         std::cerr << "\tR" << theLP->number(id); // ???
-         if(j % 8 == 0)
-            std::cerr << std::endl;
-#endif
+         TRACE({
+            std::cerr << "\tR" << theLP->number(id);
+            if(j % 8 == 0)
+               std::cerr << std::endl;
+         });
       }
    }
 
@@ -159,11 +161,11 @@ void SPxBasis::load(const Desc& ds)
          theBaseId[j] = id;
          matrix[j] = &theLP->vector(id);
          nzCount += matrix[j++]->size();      
-#if 0
-         std::cerr << "\tC" << theLP->number(id); // ???
-         if(j % 8 == 0)
-            std::cerr << std::endl;
-#endif          
+         TRACE({
+            std::cerr << "\tC" << theLP->number(id);
+            if(j % 8 == 0)
+               std::cerr << std::endl;
+         });
       }
    }
 
@@ -345,22 +347,6 @@ void SPxBasis::change
 
    if (id.isValid() && i >= 0)
    {
-      /*
-      if(iterCount < 80)
-   {
-          std::cerr << i << ":\t";
-          if(theBaseId[i].isSPxRowId())
-              std::cerr << 'R';
-          else
-              std::cerr << 'C';
-          std::cerr << theLP->number(theBaseId[i]) << "\t->  ";
-          if(id.isSPxRowId())
-              std::cerr << 'R';
-          else
-              std::cerr << 'C';
-          std::cerr << theLP->number(id) << "\n";
-   }
-       */
       assert(enterVec != 0);
 
       nzCount = nzCount - matrix[i]->size() + enterVec->size();

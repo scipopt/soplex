@@ -13,16 +13,17 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.13 2002/01/31 08:19:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.14 2002/01/31 16:30:46 bzfpfend Exp $"
+
+//#define DEBUG 1
 
 /* Updating the Basis for Leaving Variables
  */
-#include        <assert.h>
-#include        <stdio.h>
+#include <assert.h>
+#include <stdio.h>
+
 #include "real.h"
-#include        "soplex.h"
-
-
+#include "soplex.h"
 #include "spxratiotester.h"
 
 namespace soplex
@@ -88,7 +89,7 @@ void SoPlex::getLeaveVals
    {
       leaveNum = number(SPxRowId(leaveId));
       leaveStat = ds.rowStatus(leaveNum);
-      //@ std::cerr << "R" << leaveNum << ":" << int(leaveStat);
+      TRACE( std::cerr << "R" << leaveNum << ":" << int(leaveStat); );
 
       assert(isBasic(leaveStat));
       switch (leaveStat)
@@ -158,7 +159,7 @@ void SoPlex::getLeaveVals
       assert(leaveId.isSPxColId());
       leaveNum = number(SPxColId(leaveId));
       leaveStat = ds.colStatus(leaveNum);
-      //@ std::cerr << "C" << leaveNum << ":" << int(leaveStat);
+      TRACE( std::cerr << "C" << leaveNum << ":" << int(leaveStat); );
 
       assert(isBasic(leaveStat));
       switch (leaveStat)
@@ -250,7 +251,9 @@ void SoPlex::getLeaveVals2(
    if (enterId.isSPxRowId())
    {
       int idx = number(SPxRowId(enterId));
-      //@ std::cerr << "\t->\tC" << idx << ": " << int(ds.rowStatus(idx)) << '\n';
+      TRACE({ std::cerr << "\t->\tC" << idx << ": " << int(ds.rowStatus(idx))
+                        << std::endl; });
+
       switch (ds.rowStatus(idx))
       {
       case SPxBasis::Desc::D_FREE :
@@ -350,7 +353,9 @@ void SoPlex::getLeaveVals2(
    {
       assert(enterId.isSPxColId());
       int idx = number(SPxColId(enterId));
-      //@ std::cerr << "\t->\tC" << idx << ": " << int(ds.colStatus(idx)) << '\n';
+      TRACE({ std::cerr << "\t->\tC" << idx << ": " << int(ds.colStatus(idx))
+                        << std::endl; });
+
       switch (ds.colStatus(idx))
       {
       case SPxBasis::Desc::D_ON_UPPER :
@@ -498,11 +503,10 @@ int SoPlex::leave(int leaveIdx)
       tmp -= theCoPvec->delta();
       if (tmp.length() > delta())
          std::cerr << basis().iteration() << ": coPvec.delta error = "
-         << tmp.length() << std::endl;
+                   << tmp.length() << std::endl;
    }
-   if (!theCoPvec->isConsistent())
-      std::cerr << "fuck\n";
 #endif  // NDEBUG
+
    setupPupdate();
 
    assert(thePvec->isConsistent());
@@ -541,7 +545,7 @@ int SoPlex::leave(int leaveIdx)
          change(leaveIdx, none, 0);
          if (enterVal != leaveMax)
          {
-            // std::cerr << "rejecting leave\n";
+            TRACE( std::cerr << "rejecting leave" << std::endl; );
             rejectLeave(leaveNum, leaveId, leaveStat);
             theCoTest[leaveIdx] *= 0.01;            // #== fTest()#
             theCoTest[leaveIdx] -= 2 * delta();       // #== fTest()#
@@ -588,7 +592,7 @@ int SoPlex::leave(int leaveIdx)
             change(leaveIdx, none, 0);
             theFvec->delta().clear();
             rejectLeave(leaveNum, leaveId, leaveStat, &newVector);
-            std::cerr << "rejecting leave\n";
+            TRACE( std::cerr << "rejecting leave" << std::endl; );
             // factorize();
             theCoTest[leaveIdx] *= 0.01;            // #== fTest()#
             return 1;

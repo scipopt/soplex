@@ -13,14 +13,16 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.11 2002/01/31 08:19:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.12 2002/01/31 16:30:46 bzfpfend Exp $"
+
+//#define DEBUG 1
 
 /*      \SubSection{Updating the Basis for Entering Variables}
  */
-#include        <assert.h>
-#include "real.h"
-#include        "soplex.h"
+#include <assert.h>
 
+#include "real.h"
+#include "soplex.h"
 #include "spxratiotester.h"
 
 namespace soplex
@@ -728,7 +730,7 @@ int SoPlex::enter(Id& enterId)
    {
       rejectEnter(enterId, enterTest, enterStat);
       change(-1, enterId, enterVec);
-      // std::cerr << "rejecting false enter pivot\n";
+      TRACE( std::cerr << "rejecting false enter pivot" << std::endl; );
       return 1;
    }
 

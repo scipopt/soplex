@@ -13,12 +13,14 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.18 2002/01/31 08:19:27 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.19 2002/01/31 16:30:46 bzfpfend Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
  *       This should be properly integrated and demangled.
  */
+//#define DEBUG 1
+
 #include <assert.h>
 
 #include "real.h"
@@ -26,7 +28,7 @@
 #include "cring.h"
 #include "spxalloc.h"
 
-//define DEBUG 1
+
 
 namespace soplex
 {
@@ -336,9 +338,10 @@ SLUFactor::Status SLUFactor::change(
       changeEta(idx, eta);
    }
    usetup = 0;
-#ifdef  DEBUG
-   std::cout << "\tupdated\t\tstability = " << stability() << std::endl;
-#endif 
+
+   TRACE({ std::cerr << "\tupdated\t\tstability = " << stability()
+                     << std::endl; });
+   
    return status();
 }
 
@@ -447,7 +450,8 @@ void SLUFactor::assign(const SLUFactor& old)
       u.row.list = old.u.row.list;
       const Dring* oring = &old.u.row.list;
       Dring* ring = &u.row.list;
-      for (; oring->next != &old.u.row.list; oring = oring->next, ring = ring->next)
+      for (; oring->next != &old.u.row.list; 
+           oring = oring->next, ring = ring->next)
       {
          ring->next = &(u.row.elem[oring->next->idx]);
          ring->next->prev = ring;
@@ -483,7 +487,8 @@ void SLUFactor::assign(const SLUFactor& old)
       u.col.list = old.u.col.list;
       const Dring* oring = &old.u.col.list;
       Dring* ring = &u.col.list;
-      for(; oring->next != &old.u.col.list; oring = oring->next, ring = ring->next)
+      for(; oring->next != &old.u.col.list;
+          oring = oring->next, ring = ring->next)
       {
          ring->next = &(u.col.elem[oring->next->idx]);
          ring->next->prev = ring;
@@ -779,34 +784,30 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
          break;
       minStability /= 2;
    }
-   /*
-   std::cerr << "threshold = " << lastThreshold
-        << "\tstability = " << stability()
-        << "\tminStability = " << minStability << std::endl;
-    */
 
-#ifndef NDEBUG
-#if 0
-   int i;
-   FILE* fl = fopen("dump.lp", "w");
-   std::cout << "Basis:\n";
-   int j = 0;
-   for (i = 0; i < dim(); ++i)
-      j += matrix[i]->size();
-   for (i = 0; i < dim(); ++i)
-   {
-      for (j = 0; j < matrix[i]->size(); ++j)
-         fprintf(fl, "%8d  %8d  %16g\n",
-            i + 1, matrix[i]->index(j) + 1, matrix[i]->value(j));
-   }
-   fclose(fl);
-   std::cout << "LU-Factors:\n";
-   dump();
-#endif
-
-   std::cout << "threshold = " << lastThreshold 
-             << "\tstability = " << stability() << std::endl;
-#endif
+   TRACE({ std::cerr << "threshold = " << lastThreshold
+                     << "\tstability = " << stability()
+                     << "\tminStability = " << minStability << std::endl; });   
+   TRACE({
+      int i;
+      FILE* fl = fopen("dump.lp", "w");
+      std::cerr << "Basis:\n";
+      int j = 0;
+      for (i = 0; i < dim(); ++i)
+         j += matrix[i]->size();
+      for (i = 0; i < dim(); ++i)
+      {
+         for (j = 0; j < matrix[i]->size(); ++j)
+            fprintf(fl, "%8d  %8d  %16g\n",
+                    i + 1, matrix[i]->index(j) + 1, matrix[i]->value(j));
+      }
+      fclose(fl);
+      std::cerr << "LU-Factors:" << std::endl;
+      dump();
+      
+      std::cerr << "threshold = " << lastThreshold 
+                << "\tstability = " << stability() << std::endl;
+   });
 
    assert(isConsistent());
    return Status(stat);

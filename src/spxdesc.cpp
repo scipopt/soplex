@@ -13,10 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdesc.cpp,v 1.6 2002/01/31 08:19:28 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdesc.cpp,v 1.7 2002/01/31 16:30:47 bzfpfend Exp $"
+
+//#define DEBUG 1
 
 #include <iostream>
 
+#include "real.h"
 #include "spxbasis.h"
 
 namespace soplex

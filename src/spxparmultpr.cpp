@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxparmultpr.cpp,v 1.8 2002/01/31 08:19:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxparmultpr.cpp,v 1.9 2002/01/31 16:30:48 bzfpfend Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -126,8 +126,6 @@ SPxLP::Id SPxParMultPR::selectEnter()
       }
       while (used < min && last != lastlast);
 
-      // std::cerr << count << '\t' << used << std::endl;
-
       if (used > 0)
       {
          min = (used + 1);
@@ -148,7 +146,6 @@ SPxLP::Id SPxParMultPR::selectEnter()
 
    else
    {
-      // std::cerr << '.';
       assert(thesolver->pricing() == SoPlex::FULL);
       Real bestx = -theeps;
       for (i = thesolver->dim() - 1; i >= 0; --i)

@@ -13,7 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.11 2002/01/31 08:19:27 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.12 2002/01/31 16:30:47 bzfpfend Exp $"
+
+//#define DEBUG 1
 
 #include <iostream>
 
@@ -250,7 +252,7 @@ int SPxAggregateSM::simplify()
       ++stage;
       if (last)
       {
-         std::cerr << "looping ...\n";
+         VERBOSE_MAX( std::cout << "looping ..." << std::endl; );
          maxFill = (maxFill + 20) / 2;
       }
       last = num;
@@ -319,8 +321,10 @@ int SPxAggregateSM::simplify()
       assert(lp->isConsistent());
       lp->removeCols (remCol.get_ptr());
       assert(lp->isConsistent());
-      std::cout << "SPxAggregateSM:\tremoved " << num << " row(s) and column(s)\n";
-      std::cout << "SPxAggregateSM:\tdelta = " << delta << std::endl;
+      VERBOSE_MIN({ std::cout << "SPxAggregateSM:\tremoved " << num
+                              << " row(s) and column(s)" << std::endl
+                              << "SPxAggregateSM:\tdelta = " << delta
+                              << std::endl; });
    }
 
    return 0;
