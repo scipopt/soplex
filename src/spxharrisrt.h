@@ -13,41 +13,31 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.h,v 1.3 2001/11/07 17:31:22 bzfbleya Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.h,v 1.4 2001/11/29 12:11:42 bzfpfend Exp $"
 
+/**@file  spxharrisrt.h
+ * @brief Harris pricing with shifting.
+ */
 #ifndef _SPXHARRISRT_H_
 #define _SPXHARRISRT_H_
 
 
-//@ ----------------------------------------------------------------------------
-/*      \Section{Imports}
-    Import required system include files
- */
 #include <assert.h>
-
-
-/*  and class header files
- */
 
 #include "spxratiotester.h"
 
 namespace soplex
 {
 
+/**@brief Harris pricing with shifting.
+   @ingroup Algo
+   
+   Class #SPxHarrisRT is a stable implementation of a #SPxRatioTester class
+   along the lines of Harris' two phase algorithm. Additionally it uses
+   shifting of bounds in order to avoid cycling.
 
-
-
-
-
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
-
-/** Harris pricing with shifting.
-    Class #SPxHarrisRT# is a stable implementation of a #SPxRatioTester# class
-    along the lines of Harris' two phase algorithm. Additionally it uses
-    shifting of bounds in order to avoid cycling.
- */
+   See #SPxRatioTester for a class documentation.
+*/
 class SPxHarrisRT : public SPxRatioTester
 {
 protected:
@@ -55,32 +45,32 @@ protected:
 
    int maxDelta
    (
-      double* max,             /* max abs value in upd */
-      double* val,             /* initial and chosen value */
-      int num,             /* # of indices in idx */
-      const int* idx,             /* nonzero indices in upd */
-      const double* upd,             /* update vector for vec */
-      const double* vec,             /* current vector */
-      const double* low,             /* lower bounds for vec */
-      const double* up,              /* upper bounds for vec */
-      double delta,           /* allowed bound violation */
-      double epsilon,         /* what is 0? */
-      double infinity        /* what is $\infty$? */
-  );
+      double* max,           ///< max abs value in upd
+      double* val,           ///< initial and chosen value
+      int num,               ///< # of indices in idx
+      const int* idx,        ///< nonzero indices in upd
+      const double* upd,     ///< update vector for vec
+      const double* vec,     ///< current vector
+      const double* low,     ///< lower bounds for vec
+      const double* up,      ///< upper bounds for vec
+      double delta,          ///< allowed bound violation
+      double epsilon,        ///< what is 0?
+      double infinity        ///< what is $\infty$?
+   );
 
    int minDelta
    (
-      double* max,             /* max abs value in upd */
-      double* val,             /* initial and chosen value */
-      int num,             /* # of indices in idx */
-      const int* idx,             /* nonzero indices in upd */
-      const double* upd,             /* update vector for vec */
-      const double* vec,             /* current vector */
-      const double* low,             /* lower bounds for vec */
-      const double* up,              /* upper bounds for vec */
-      double delta,           /* allowed bound violation */
-      double epsilon,         /* what is 0? */
-      double infinity        /* what is $\infty$? */
+      double* max,           ///< max abs value in upd
+      double* val,           ///< initial and chosen value
+      int num,               ///< of indices in idx
+      const int* idx,        ///< nonzero indices in upd
+      const double* upd,     ///< update vector for vec
+      const double* vec,     ///< current vector
+      const double* low,     ///< lower bounds for vec
+      const double* up,      ///< upper bounds for vec
+      double delta,          ///< allowed bound violation
+      double epsilon,        ///< what is 0?
+      double infinity        ///< what is $\infty$?
   );
 
 public:
