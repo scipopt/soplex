@@ -13,13 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.11 2003/03/04 10:49:05 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.12 2004/02/24 10:54:55 bzfpfend Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
  */
-#ifndef _SOPLEX_H_
-#define _SOPLEX_H_
+#ifndef _SPXSOLVER_H_
+#define _SPXSOLVER_H_
 
 #include <assert.h>
 
@@ -1607,7 +1607,7 @@ private:
 };
 
 } // namespace soplex
-#endif // _SOPLEX_H_
+#endif // _SPXSOLVER_H_
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:

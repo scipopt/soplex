@@ -13,13 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.61 2003/04/20 08:32:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.62 2004/02/24 10:54:55 bzfpfend Exp $"
 
 /**@file  soplex.h
  * @brief preconfigured #SoPlex LP-solver.
  */
-#ifndef _SPXSOLVER_H_
-#define _SPXSOLVER_H_
+#ifndef _SOPLEX_H_
+#define _SOPLEX_H_
 
 #include <assert.h>
 
@@ -208,7 +208,7 @@ private:
    SoPlex(const SoPlex&);
 };
 } // namespace soplex
-#endif // _SPXSOLVER_H_
+#endif // _SOPLEX_H_
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:
