@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.31 2002/01/29 14:30:08 bzfkocht Exp $
+# $Id: Makefile,v 1.32 2002/02/01 17:33:52 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -109,6 +109,9 @@ check:
 
 quick:		
 		cd check; ./check.sh quick.test $(BINARY)
+
+mittel:		
+		cd check; ./check.sh mittelmann.test $(BINARY)
 
 cover:
 		cd check; ./cover.sh cover.test $(BINARY)
