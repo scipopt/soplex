@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeneralsm.cpp,v 1.4 2001/11/22 08:57:23 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeneralsm.cpp,v 1.5 2001/11/22 16:30:01 bzfkocht Exp $"
 
 #include <stdlib.h>
 #include <iostream>
@@ -39,12 +39,6 @@ void SPxGeneralSM::unload()
    scale.unload();
 }
 
-SPxLP* SPxGeneralSM::loadedLP() const
-{
-   /**@todo Why this one and not this->lp ? */
-   return rem1.loadedLP();
-}
-
 int SPxGeneralSM::simplify()
 {
    int i, cnt;
@@ -54,9 +48,13 @@ int SPxGeneralSM::simplify()
    do
    {
       cnt = lp->nRows() + lp->nCols();
-      if ((i = rem1.simplify ()) != 0) return i;
-      if ((i = aggr.simplify ()) != 0) return i;
-      if ((i = redu.simplify ()) != 0) return i;
+
+      if ((i = rem1.simplify()) != 0) 
+         return i;
+      if ((i = aggr.simplify()) != 0) 
+         return i;
+      if ((i = redu.simplify()) != 0) 
+         return i;
    }
    while (0.99*cnt > lp->nRows() + lp->nCols());
 
@@ -66,28 +64,32 @@ int SPxGeneralSM::simplify()
    rows -= lp->nRows();
    cols -= lp->nCols();
 
-   std::cerr << "removed " << rows << " rows\n";
-   std::cerr << "removed " << cols << " columns\n";
+   std::cout << "removed " << rows << " rows\n";
+   std::cout << "removed " << cols << " columns\n";
 
    assert(lp->isConsistent());
 
    return 0;
 }
 
+/**bugs This is not correctly implented, since the simplifiers may be
+ *      called several times one after the others, this sequence has
+ *      to be tracked to make the calls of unsimplify in exactly the
+ *      reverse order.
+ *      At the moment this is irrelevant because all the unsimplifiers
+ *      are not implemented anyway.
+ */
 void SPxGeneralSM::unsimplify()
 {
-   rem1.unsimplify ();
-   aggr.unsimplify ();
-   redu.unsimplify ();
+   //rem1.unsimplify ();
+   //aggr.unsimplify ();
+   //redu.unsimplify ();
    scale.unsimplify();
 }
 
 double SPxGeneralSM::value(double x)
 {
-   /**@todo Even though scale() is known not to change the objective
-    *       value it should be called here because we never can be sure.
-    */
-   return rem1.value(aggr.value(redu.value(x)));
+   return rem1.value(aggr.value(redu.value(scale.value(x))));
 }
 } // namespace soplex
 

@@ -13,8 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxaggregatesm.h,v 1.4 2001/11/22 09:03:28 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxaggregatesm.h,v 1.5 2001/11/22 16:30:01 bzfkocht Exp $"
 
+/**@file  spxaggregatesm.h
+ * @brief LP variable aggregation.
+ */
 #ifndef _SPXAGGREGATESM_H_
 #define _SPXAGGREGATESM_H_
 
@@ -24,39 +27,34 @@
 
 namespace soplex
 {
-/** Remove redundant row and columns.
-    !!! Das ist vermutlich falsch.
-    This \Ref{SPxSimplifier} thries to eliminat redundant rows or columns from
-    its loaded \Ref{SPxLP}.
+/** @brief
+    @ingroup Algo
+
+    This #SPxSimplifier does variable aggregation.
  */
 class SPxAggregateSM : public SPxSimplifier
 {
 private:
-   double maxFill;     ///<  
-   double stability;   ///<
+   static const double stability  = 0.01;  ///< stability factor.
+   
+   double maxFill;                         ///< ???  
 
-protected:
+   /// ???
    int eliminate(const SVector& row, double b);
 
 public:
-   ///
-   void load(SPxLP*);
-   ///
+   /// Aggregate variable.
    int simplify();
-   ///
+
+   /// Undo #simplify().
    void unsimplify();
-   ///
+
+   /// objective value for unsimplified LP.
    double value(double x)
    {
       return x + lp->spxSense()*delta;
    }
-   int isConsistent() const
-   {
-      return 1;
-   };
-
 };
-
 } // namespace soplex
 #endif // _SPXAGGREGATESM_H_
 

@@ -13,31 +13,17 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.cpp,v 1.5 2001/11/19 09:30:47 bzfkocht Exp $"
-
-
-/* \Section{Complex Methods}
- */
+#pragma ident "@(#) $Id: spxlp.cpp,v 1.6 2001/11/22 16:30:01 bzfkocht Exp $"
 
 #include <stdio.h>
 #include <iostream>
+
 #include "spxlp.h"
 
 namespace soplex
 {
-
 const double SPxLP::infinity = 1e+100;
 
-#if 0
-void SPxLP::readLP(std::istream& in, NameSet* rowNames,
-   NameSet* colNames, DIdxSet* intVars)
-{
-   std::cout << "not yet implementet, sorry!" << std::endl; 
-}
-#endif
-//@ -----------------------------------------------------------------------------
-/*      \SubSection{Access}
- */
 void SPxLP::getRow(int i, LPRow& row) const
 {
    row.lhs() = lhs(i);
@@ -76,9 +62,6 @@ void SPxLP::getObj(Vector& p_obj) const
       p_obj *= -1;
 }
 
-//@ -----------------------------------------------------------------------------
-/*      \SubSection{Extension}
- */
 void SPxLP::doAddRow(const LPRow& row)
 {
    int idx = nRows();
@@ -235,7 +218,7 @@ void SPxLP::doAddRows(const LPRowSet& p_set)
       for (j = vec.size() - 1; j >= 0; --j)
       {
          k = vec.index(j);
-         col = &LPColSet::colVector(k);
+         col = &colVector_w(k);
          idx = col->size() - newCols[k];
          assert(newCols[k] >= 0);
          newCols[k]--;
@@ -296,7 +279,7 @@ void SPxLP::doAddCols(const LPColSet& p_set)
       {
          int len = newRows[i] + rowVector(i).size();
          LPRowSet::xtend(i, len);
-         rowVector(i).set_size( len );
+         rowVector_w(i).set_size( len );
       }
    }
 
@@ -308,7 +291,7 @@ void SPxLP::doAddCols(const LPColSet& p_set)
       for (j = vec.size() - 1; j >= 0; --j)
       {
          int k = vec.index(j);
-         SVector& col = LPRowSet::rowVector(k);
+         SVector& col = rowVector_w(k);
          int idx = col.size() - newRows[k];
          assert(newRows[k] >= 0);
          newRows[k]--;
@@ -337,10 +320,6 @@ void SPxLP::addCols(SPxColId id[], const LPColSet& p_set)
       id[j] = cId(i);
 }
 
-
-//@ -----------------------------------------------------------------------------
-/*      \SubSection{Shrinking}
- */
 void SPxLP::doRemoveRow(int j)
 {
    const SVector& vec = rowVector(j);
@@ -349,7 +328,7 @@ void SPxLP::doRemoveRow(int j)
    // remove row vector from column file
    for (i = vec.size() - 1; i >= 0; --i)
    {
-      SVector& remvec = LPColSet::colVector(vec.index(i));
+      SVector& remvec = colVector_w(vec.index(i));
       remvec.remove(remvec.number(j));
    }
 
@@ -359,7 +338,7 @@ void SPxLP::doRemoveRow(int j)
       const SVector& l_vec = rowVector(idx);
       for (i = l_vec.size() - 1; i >= 0; --i)
       {
-         SVector& movevec = LPColSet::colVector(l_vec.index(i));
+         SVector& movevec = colVector_w(l_vec.index(i));
          movevec.index(movevec.number(idx)) = j;
       }
    }
@@ -375,7 +354,7 @@ void SPxLP::doRemoveCol(int j)
    // remove column vector from row file
    for (i = vec.size() - 1; i >= 0; --i)
    {
-      SVector& remvec = LPRowSet::rowVector(vec.index(i));
+      SVector& remvec = rowVector_w(vec.index(i));
       remvec.remove(remvec.number(j));
    }
 
@@ -385,7 +364,7 @@ void SPxLP::doRemoveCol(int j)
       const SVector& l_vec = colVector(idx);
       for (i = l_vec.size() - 1; i >= 0; --i)
       {
-         SVector& movevec = LPRowSet::rowVector(l_vec.index(i));
+         SVector& movevec = rowVector_w(l_vec.index(i));
          movevec.index(movevec.number(idx)) = j;
       }
    }
@@ -400,7 +379,7 @@ void SPxLP::doRemoveRows(int perm[])
    LPRowSet::remove(perm);
    for (int i = 0; i < j; ++i)
    {
-      SVector& vec = LPColSet::colVector(i);
+      SVector& vec = colVector_w(i);
       for (int k = vec.size() - 1; k >= 0; --k)
       {
          int idx = vec.index(k);
@@ -419,7 +398,7 @@ void SPxLP::doRemoveCols(int perm[])
    LPColSet::remove(perm);
    for (int i = 0; i < j; ++i)
    {
-      SVector& vec = LPRowSet::rowVector(i);
+      SVector& vec = rowVector_w(i);
       for (int k = vec.size() - 1; k >= 0; --k)
       {
          int idx = vec.index(k);
@@ -430,7 +409,6 @@ void SPxLP::doRemoveCols(int perm[])
       }
    }
 }
-
 
 void SPxLP::removeRows(SPxRowId id[], int n, int perm[])
 {
@@ -482,8 +460,6 @@ void SPxLP::removeRowRange(int start, int end, int* perm)
       perm[i] = i;
    removeRows(perm);
 }
-
-
 
 void SPxLP::removeCols(SPxColId id[], int n, int perm[])
 {
@@ -543,10 +519,6 @@ void SPxLP::clear()
    thesense = MAXIMIZE;
 }
 
-
-//@ -----------------------------------------------------------------------------
-/*      \SubSection{Modification}
- */
 void SPxLP::changeObj(const Vector& newObj)
 {
    assert(maxObj().dim() == newObj.dim());
@@ -645,10 +617,10 @@ void SPxLP::changeRange(int i, double newLhs, double newRhs)
 void SPxLP::changeRow(int n, const LPRow& newRow)
 {
    int j;
-   SVector& row = LPRowSet::rowVector(n);
+   SVector& row = rowVector_w(n);
    for (j = row.size() - 1; j >= 0; --j)
    {
-      SVector& col = LPColSet::colVector(row.index(j));
+      SVector& col = colVector_w(row.index(j));
       col.remove(col.number(n));
    }
    row.clear();
@@ -669,10 +641,10 @@ void SPxLP::changeRow(int n, const LPRow& newRow)
 void SPxLP::changeCol(int n, const LPCol& newCol)
 {
    int j;
-   SVector& col = LPColSet::colVector(n);
+   SVector& col = colVector_w(n);
    for (j = col.size() - 1; j >= 0; --j)
    {
-      SVector& row = LPRowSet::rowVector(col.index(j));
+      SVector& row = rowVector_w(col.index(j));
       row.remove(row.number(n));
    }
    col.clear();
@@ -693,8 +665,8 @@ void SPxLP::changeCol(int n, const LPCol& newCol)
 
 void SPxLP::changeElement(int i, int j, double val)
 {
-   SVector& row = LPRowSet::rowVector(i);
-   SVector& col = LPColSet::colVector(j);
+   SVector& row = rowVector_w(i);
+   SVector& col = colVector_w(j);
 
    if (val != 0)
    {
@@ -717,10 +689,6 @@ void SPxLP::changeElement(int i, int j, double val)
    assert(isConsistent());
 }
 
-
-//@ -----------------------------------------------------------------------------
-/* \SubSection{Miscellaneous}
- */
 #define inconsistent    \
 {       \
 std::cout << "Inconsistency detected in class SPxLP\n"; \

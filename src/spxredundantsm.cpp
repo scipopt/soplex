@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.5 2001/11/22 08:57:23 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.6 2001/11/22 16:30:01 bzfkocht Exp $"
 
 #include <stdlib.h>
 #include <iostream>
@@ -25,17 +25,23 @@ namespace soplex
 {
 int SPxRedundantSM::simplify()
 {
-   int num, j, i, k;
-   int upcnt, locnt;
-   double up, lo, x, y;
+   int    num;
+   int    j;
+   int    i;
+   int    k;
+   int    upcnt;
+   int    locnt;
+   double up;
+   double lo;
+   double x;
+   double y;
    DataArray < int > rem(lp->nRows());
-   double eps = 1e-10;
 
    num = 0;
    rem.reSize(lp->nCols());
    for (i = lp->nCols() - 1; i >= 0; --i)
    {
-      const SVector& col = (const_cast<const SPxLP*>(lp))->colVector(i);
+      const SVector& col = lp->colVector(i);
       rem[i] = 0;
       if (lp->upper(i) != lp->lower(i))
       {
@@ -122,7 +128,7 @@ int SPxRedundantSM::simplify()
    if (num)
    {
       lp->removeCols(rem.get_ptr());
-      std::cerr << "SPxRedundantSM: removed " << num << " column(s)\n";
+      std::cout << "SPxRedundantSM: removed " << num << " column(s)\n";
       assert(lp->isConsistent());
    }
 
@@ -131,7 +137,7 @@ int SPxRedundantSM::simplify()
    {
       if (lp->rhs(i) < lp->infinity || lp->lhs(i) > -lp->infinity)
       {
-         const SVector& row = (const_cast<const SPxLP*>(lp))->rowVector(i);
+         const SVector& row = lp->rowVector(i);
 
          rem[i] = 0;
 
@@ -267,7 +273,7 @@ int SPxRedundantSM::simplify()
    if (num)
    {
       lp->removeRows(rem.get_ptr());
-      std::cerr << "SPxRedundantSM:\tremoved " << num << " row(s)\n";
+      std::cout << "SPxRedundantSM:\tremoved " << num << " row(s)\n";
       assert(lp->isConsistent());
    }
    return 0;

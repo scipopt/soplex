@@ -13,8 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscale.h,v 1.3 2001/11/22 08:57:24 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscale.h,v 1.4 2001/11/22 16:30:01 bzfkocht Exp $"
 
+/**@file  spxscale.h
+ * @brief LP row/column scaling.
+ */
 #ifndef _SPXSCALE_H_
 #define _SPXSCALE_H_
 
@@ -25,35 +28,39 @@
 
 namespace soplex
 {
-/** LP scaling.
-    This #SPxSimplifier implementation performs simple scaling of the LPs rows
-    and columns.
- */
+/**@brief LP row/column scaling.
+   @ingroup Algo
+
+   This #SPxSimplifier implementation performs simple scaling of the 
+   LPs rows and columns.
+
+   @todo The type of scaling (row/column) can is hard coded. This should
+         br selectable.
+*/
 class SPxScale : public SPxSimplifier
 {
-   DataArray < double > colscale;
-   DataArray < double > rowscale;
-   int                  rowScale;
+   DataArray < double > colscale;  ///< column scaleing factors
+   DataArray < double > rowscale;  ///< row scaleing factors
+   bool                 rowScale;  ///< do row scaleing (not column scaleing)
    
 public:
-   ///
+   /// Scale the loaded #SPxLP.
    virtual int simplify();
 
-   ///
+   /// Unscale the loaded #SPxLP.
    virtual void unsimplify();
 
-   ///
+   /// consistency check.
    int isConsistent() const
    {
-      return colscale.isConsistent()
-             && rowscale.isConsistent();
+      return colscale.isConsistent() && rowscale.isConsistent();
    }
 
    /// default constructor.
    SPxScale() 
-      : rowScale(1)
+      : rowScale(true)
    {}
-
+   
    /// destructor.
    virtual ~SPxScale()
    {}

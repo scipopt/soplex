@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsimplifier.h,v 1.3 2001/11/22 08:57:24 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsimplifier.h,v 1.4 2001/11/22 16:30:01 bzfkocht Exp $"
 
 /**@file  spxsimplifier.h
  * @brief LP simplification base class.
@@ -43,13 +43,20 @@ protected:
    double delta;  ///< Offset for the objective function.
 
 public:
+   SPxSimplifier() 
+      : lp(0), delta(0)
+   {}
+
    /// Load the #SPxLP to be simplified.
    virtual void load(SPxLP* p_lp)
    {
-      assert(lp != 0);
+      assert(p_lp != 0);
 
-      lp    = p_lp;
-      delta = 0;
+      if (lp != p_lp)
+      {
+         lp    = p_lp;
+         delta = 0;
+      }
    }
    /// Unload the #SPxLP.
    virtual void unload()
@@ -57,13 +64,9 @@ public:
       lp = 0;
    }
 
-   /// Return the loaded #SPxLP.
-   virtual SPxLP* loadedLP() const
-   {
-      return lp;
-   }
-
-   /** Simplify loaded #SPxLP. It returns
+   /// Simplify loaded #SPxLP. 
+   /**
+    * @return 
     *  <TABLE>
     *  <TR><TD> 0 </TD><TD>if this could be done,</TD></TR>
     *  <TR><TD> 1 </TD><TD>if the LP was detected to be unbounded or</TD></TR>

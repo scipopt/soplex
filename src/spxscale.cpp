@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscale.cpp,v 1.4 2001/11/22 08:57:24 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscale.cpp,v 1.5 2001/11/22 16:30:01 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -39,8 +39,10 @@ int SPxScale::simplify()
    {
       for (i = lp->nCols(); i--;)
       {
-         SVector& vec = lp->colVector(i);
+         SVector& vec = lp->colVector_w(i);
+
          x = vec.maxAbs();
+
          if (x > 0)
          {
             y = 1 / x;
@@ -58,7 +60,7 @@ int SPxScale::simplify()
 
       for (i = lp->nRows(); i--;)
       {
-         SVector& vec = lp->rowVector(i);
+         SVector& vec = lp->rowVector_w(i);
          x = 0;
          for (j = vec.size(); j--;)
          {
@@ -81,21 +83,18 @@ int SPxScale::simplify()
          else
             rowscale[i] = 1;
       }
-
       for (i = lp->nCols(); i--;)
       {
-         SVector& vec = lp->colVector(i);
+         SVector& vec = lp->colVector_w(i);
          for (j = vec.size(); j--;)
             vec.value(j) *= rowscale[vec.index(j)];
       }
-
    }
    else
    {
-
       for (i = lp->nRows(); i--;)
       {
-         SVector& vec = lp->rowVector(i);
+         SVector& vec = lp->rowVector_w(i);
          x = 0;
          for (j = vec.size(); j--;)
          {
@@ -121,7 +120,7 @@ int SPxScale::simplify()
 
       for (i = lp->nCols(); i--;)
       {
-         SVector& vec = lp->colVector(i);
+         SVector& vec = lp->colVector_w(i);
          x = 0;
          for (j = vec.size(); j--;)
          {
@@ -149,7 +148,7 @@ int SPxScale::simplify()
 
       for (i = lp->nRows(); i--;)
       {
-         SVector& vec = lp->rowVector(i);
+         SVector& vec = lp->rowVector_w(i);
          for (j = vec.size(); j--;)
             vec.value(j) *= colscale[vec.index(j)];
       }
@@ -169,7 +168,7 @@ void SPxScale::unsimplify()
 
    for (i = lp->nRows(); i--;)
    {
-      SVector& vec = lp->rowVector(i);
+      SVector& vec = lp->rowVector_w(i);
       for (j = vec.size(); j--;)
          vec.value(j) /= colscale[vec.index(j)];
       vec *= 1 / rowscale[i];
@@ -180,7 +179,7 @@ void SPxScale::unsimplify()
    }
    for (i = lp->nCols(); i--;)
    {
-      SVector& vec = lp->colVector(i);
+      SVector& vec = lp->colVector_w(i);
       vec *= 1 / colscale[i];
       for (j = vec.size(); j--;)
          vec.value(j) /= rowscale[vec.index(j)];

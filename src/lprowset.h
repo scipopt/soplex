@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.h,v 1.6 2001/11/21 09:30:13 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprowset.h,v 1.7 2001/11/22 16:30:00 bzfkocht Exp $"
 
 #ifndef _LPROWSET_H_
 #define _LPROWSET_H_
@@ -141,7 +141,7 @@ public:
    }
 
    ///
-   SVector& rowVector(int i)
+   SVector& rowVector_w(int i)
    {
       return operator[](i);
    }
@@ -151,13 +151,13 @@ public:
       return operator[](i);
    }
 
-   ///
-   const SVector& rowVector(const Key& k) const
+   /// #rowVector# of #k#-th #LPRow#.
+   SVector& rowVector_w(const Key& k)
    {
       return operator[](k);
    }
-   /// #rowVector# of #k#-th #LPRow#.
-   SVector& rowVector(const Key& k)
+   ///
+   const SVector& rowVector(const Key& k) const
    {
       return operator[](k);
    }
@@ -253,22 +253,22 @@ public:
    /// extend row #n# to fit #newmax# nonzeros.
    void xtend(int n, int newmax)
    {
-      SVSet::xtend(rowVector(n), newmax);
+      SVSet::xtend(rowVector_w(n), newmax);
    }
    /// extend row #key# to fit #newmax# nonzeros.
    void xtend(const Key& pkey, int pnewmax)
    {
-      SVSet::xtend(rowVector(pkey), pnewmax);
+      SVSet::xtend(rowVector_w(pkey), pnewmax);
    }
    ///
    void add2(const Key& k, int n, int idx[], double val[])
    {
-      SVSet::add2(rowVector(k), n, idx, val);
+      SVSet::add2(rowVector_w(k), n, idx, val);
    }
    /// add #n# nonzero (#idx#, #val#) to #i#-th #rowVector#..
    void add2(int i, int n, int idx[], double val[])
    {
-      SVSet::add2(rowVector(i), n, idx, val);
+      SVSet::add2(rowVector_w(i), n, idx, val);
    }
 
    ///

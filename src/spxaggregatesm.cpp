@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.4 2001/11/22 08:57:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.5 2001/11/22 16:30:00 bzfkocht Exp $"
 
 #include <stdlib.h>
 #include <iostream>
@@ -25,17 +25,10 @@
 
 namespace soplex
 {
-void SPxAggregateSM::load(SPxLP* l)
-{
-   lp        = l;
-   delta     = 0;
-   maxFill   = 10;
-   stability = 0.01;
-}
-
 struct RowCnt
 {
-   int row, size;
+   int row;
+   int size;
 };
 
 struct Compare
@@ -205,7 +198,7 @@ int SPxAggregateSM::eliminate(const SVector& row, double b)
 
             if (okLow && okUp)
             {
-               int f = (const_cast<const SPxLP*>(lp))->colVector(k).size();
+               int f = lp->colVector(k).size();
                if (f < fill)
                {
                   best = j;
@@ -217,7 +210,6 @@ int SPxAggregateSM::eliminate(const SVector& row, double b)
       if ((fill - 1)*(row.size() - 1) > maxFill)
          best = -1;
    }
-
    return best;
 }
 
@@ -240,6 +232,7 @@ int SPxAggregateSM::simplify()
    DataArray < RowCnt > rowcnt(lp->nRows());
    Compare compare;
 
+   maxFill = 10;
    stage = 0;
    last = 0;
    num = 0;
@@ -261,7 +254,7 @@ int SPxAggregateSM::simplify()
       for (i = lp->nRows() - 1; i >= 0; --i)
       {
          rowcnt[i].row = i;
-         rowcnt[i].size = (const_cast<const SPxLP*>(lp))->rowVector(i).size();
+         rowcnt[i].size = lp->rowVector(i).size();
       }
       sorter_qsort(rowcnt.get_ptr(), rowcnt.size(), compare);
 
@@ -273,7 +266,7 @@ int SPxAggregateSM::simplify()
             b = lhs[i];
             if (b == rhs[i])
             {
-               const SVector& row = (const_cast<const SPxLP*>(lp))->rowVector(i);
+               const SVector& row = lp->rowVector(i);
                best = eliminate(row, b);
                if (best >= 0)
                {
@@ -281,7 +274,7 @@ int SPxAggregateSM::simplify()
                   int idx = row.index(best);
                   double obj = lp->obj(idx);
 
-                  pcol = (const_cast<const SPxLP*>(lp))->colVector(idx);
+                  pcol = lp->colVector(idx);
                   pcol.remove(pcol.number(i));
                   lp->changeCol(idx, emptyCol);
                   prow = row;
@@ -295,7 +288,7 @@ int SPxAggregateSM::simplify()
                   {
                      x = prow.value(j);
                      k = prow.index(j);
-                     tmp = (const_cast<const SPxLP*>(lp))->colVector(k);
+                     tmp = lp->colVector(k);
                      tmp.multAdd(-(x / a), pcol);
                      newCol.colVector() = tmp;
                      newCol.upper() = lp->upper(k);
@@ -322,8 +315,8 @@ int SPxAggregateSM::simplify()
       assert(lp->isConsistent());
       lp->removeCols (remCol.get_ptr());
       assert(lp->isConsistent());
-      std::cerr << "SPxAggregateSM:\tremoved " << num << " row(s) and column(s)\n";
-      std::cerr << "SPxAggregateSM:\tdelta = " << delta << std::endl;
+      std::cout << "SPxAggregateSM:\tremoved " << num << " row(s) and column(s)\n";
+      std::cout << "SPxAggregateSM:\tdelta = " << delta << std::endl;
    }
 
    return 0;

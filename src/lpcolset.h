@@ -13,21 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcolset.h,v 1.5 2001/11/12 17:09:55 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpcolset.h,v 1.6 2001/11/22 16:30:00 bzfkocht Exp $"
 
 #ifndef _LPCOLSET_H_
 #define _LPCOLSET_H_
 
-
-//@ ----------------------------------------------------------------------------
-/*      \Section{Imports}
-    Import required system include files
- */
 #include <assert.h>
 
-
-/*  and class header files
- */
 #include "lpcol.h"
 #include "dvector.h"
 #include "svset.h"
@@ -35,12 +27,6 @@
 
 namespace soplex
 {
-
-
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
-
 /** Set of LP columns.
     Class #LPColSet# implements a set of #LPCol#s. Unless for memory
     limitations, any number of #LPCol#s may be #add#ed to an #LPColSet#. Single
@@ -176,23 +162,23 @@ public:
    }
 
    ///
-   SVector& colVector(int i)
+   SVector& colVector_w(int i)
    {
       return operator[](i);
    }
-   /// return #colVector# of #i#-th #LPCol# in #LPColSet#.
+   /// return writeable #colVector# of #i#-th #LPCol# in #LPColSet#.
    const SVector& colVector(int i) const
    {
       return operator[](i);
    }
 
-   ///
-   const SVector& colVector(const Key& k) const
+   /// return writeable #colVector# of #k#-th #LPCol# in #LPColSet#.
+   SVector& colVector_w(const Key& k)
    {
       return operator[](k);
    }
-   /// return #colVector# of #k#-th #LPCol# in #LPColSet#.
-   SVector& colVector(const Key& k)
+   ///
+   const SVector& colVector(const Key& k) const
    {
       return operator[](k);
    }
@@ -258,12 +244,12 @@ public:
    ///
    void add2(const Key& k, int n, int idx[], double val[])
    {
-      SVSet::add2(colVector(k), n, idx, val);
+      SVSet::add2(colVector_w(k), n, idx, val);
    }
    /// add #n# nonzero (#idx#, #val#) to #i#-th #colVector#..
    void add2(int i, int n, int idx[], double val[])
    {
-      SVSet::add2(colVector(i), n, idx, val);
+      SVSet::add2(colVector_w(i), n, idx, val);
    }
 
    ///

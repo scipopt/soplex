@@ -13,14 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.6 2001/11/12 17:10:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.7 2001/11/22 16:30:01 bzfkocht Exp $"
 
 #ifndef _SPXLP_H_
 #define _SPXLP_H_
 
-/*
-    \Section{Imports}
- */
 #include <assert.h>
 #include <iostream>
 
@@ -35,70 +32,54 @@
 
 namespace soplex
 {
-
-
 class SoPlex;
 
-//@ -----------------------------------------------------------------------------
-/** saving LPs in a form suitable for SoPlex.
-    Class #SPxLP# provides the data structures required for saving a linear program
-    in the form
-    \[
-    \begin{array}{rl}
-        \hbox{max}      & c^T x         \\
-        \hbox{s.t.}     & l_r \le Ax \le u_r    \\
-                        & l_c \le x \le u_c
-    \end{array}
-    \]
-    suitable for solving with #SoPlex#. This includes:
-    \begin{itemize}
-    \item       SVSets for both, columns and rows
-    \item       objective Vector
-    \item       upper and lower bound Vectors for variables ($l_c$ and $u_c$)
-    \item       upper and lower bound Vectors for inequalities ($l_r$ and $u_r$)
-    \end{itemize}
+/**@brief Saving LPs in a form suitable for SoPlex.
+   @ingroup Algo
+
+   Class #SPxLP provides the data structures required for saving a 
+   linear program in the form
+   \f[
+   \begin{array}{rl}
+       \hbox{max}  & c^T x              \\
+       \hbox{s.t.} & l_r \le Ax \le u_r \\
+                   & l_c \le x \le u_c
+   \end{array}
+   \f]
+   suitable for solving with #SoPlex. This includes:
+   - SVSets for both, columns and rows
+   - objective Vector
+   - upper and lower bound Vectors for variables (\f$l_c\f$ and \f$u_c\f$)
+   - upper and lower bound Vectors for inequalities (\f$l_r\f$ and \f$u_r\f$)
  
-    Note, that the optimization sense is not saved directly. Instead, the
-    objective function are multiplied by -1 to transform the LP to our standard
-    form maximizing the objective function. However, the sense of the loaded LP
-    can be retreived with method #spxSense()#.
+   Note, that the optimization sense is not saved directly. Instead, the
+   objective function are multiplied by -1 to transform the LP to our standard
+   form maximizing the objective function. However, the sense of the loaded LP
+   can be retreived with method #spxSense().
  
-    Further, equality constraints are modelled by $l_r = u_r$. Analogously, fixed
-    variables have $l_c = u_c$.
+   Further, equality constraints are modelled by \f$l_r = u_r\f$. 
+   Analogously, fixed variables have \f$l_c = u_c\f$.
 */
 class SPxLP : protected LPRowSet, protected LPColSet
-{
+{  
    friend class SPxBasis;
    friend class SPxScale;
    friend int getmarsz (SoPlex*);
    friend int getmartz (SoPlex*);
-   friend int SPxLP__readLine(
-      std::istream& is,
-      char*& f1,
-      char*& f2,
-      char*& f3,
-      char*& f4,
-      char*& f5,
-      char*& f6
-  );
+   friend int SPxLP__readLine(std::istream& is, 
+      char*& f1, char*& f2, char*& f3, char*& f4, char*& f5, char*& f6);
 
-   static int readLine(
-      std::istream& is,
-      char*& f1,
-      char*& f2,
-      char*& f3,
-      char*& f4,
-      char*& f5,
-      char*& f6
-  );
+private:
+   static int readLine(std::istream& is,
+      char*& f1, char*& f2, char*& f3, char*& f4, char*& f5, char*& f6);
 
-   SVector& colVector(int i)
+   SVector& colVector_w(int i)
    {
-      return LPColSet::colVector(i);
+      return LPColSet::colVector_w(i);
    }
-   SVector& rowVector(int i)
+   SVector& rowVector_w(int i)
    {
-      return LPRowSet::rowVector(i);
+      return LPRowSet::rowVector_w(i);
    }
 
 protected:
@@ -111,6 +92,9 @@ protected:
       return static_cast<const LPColSet*>(this);
    }
 
+   /**todo What sense does it make to have private inheritance, if then
+    *      we do something like this here?
+    */
    SVSet* rowset()
    {
       return reinterpret_cast<SVSet*>(static_cast<LPRowSet*>(this));
@@ -121,9 +105,10 @@ protected:
    }
 
    /*
-       \SubSection{Data structures and layout}
-       #SPxLP#s are saved as an #SVSet# for both, the columns and rows. Note that this
-       is redundant but eases the access.
+      \SubSection{Data structures and layout}
+      #SPxLP%s are saved as an #SVSet for both, 
+      the columns and rows. Note that this
+      is redundant but eases the access.
    */
 public:
    /**@name Datatypes */
@@ -312,7 +297,7 @@ private:
 
 public:
    ///
-   static const double infinity;               //@Memo: value used as $\infty$.
+   static const double infinity;      ///< value used as \f$\infty\f$.
 
    ///
    int nRows() const

@@ -22,12 +22,17 @@
    - Algorithmic classes serve for implementing maybe a variaty of
      algorithms for solving numerical (sub-)problems.
 
-  This software has been implemented as a part of my Ph.D. thesis 
+  This software has been implemented as a part of Roland Wunderlings 
+  Ph.D. thesis 
   "Paralleler und Objektorientierter Simplex-Algorithmus"
   http://www.zib.de/PaperWeb/abstracts/TR-96-09
 
+  SoPlex is implememted in C++. The code should be compliend with the 
+  ANSI standard. Exception, RunTime-Type-Information and STL are not 
+  used in the code. Everything is in one namespace \em soplex.
+
   Note, that you are allowed to retreive SoPlex only for research purpose as a
-  member of a {\em noncommercial and academic} institution.
+  member of a \em noncommercial and \em academic institution.
 */
 //-----------------------------------------------------------------------------
 /**@namespace soplex

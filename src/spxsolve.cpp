@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.5 2001/11/12 16:42:10 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.6 2001/11/22 16:30:01 bzfkocht Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -56,8 +56,9 @@ LPSolver::Status SoPlex::solve()
 
    if (thesimplifier)
    {
-      if (thesimplifier->loadedLP() != this)
-         thesimplifier->load(this);
+      // if (thesimplifier->loadedLP() != this)
+      thesimplifier->load(this);
+
       switch (thesimplifier->simplify())
       {
       case 1:

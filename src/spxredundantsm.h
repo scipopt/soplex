@@ -13,8 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.h,v 1.3 2001/11/22 08:57:23 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.h,v 1.4 2001/11/22 16:30:01 bzfkocht Exp $"
 
+/**@file  spxredundant.h
+ * @brief Remove redundant row and columns.
+ */
 #ifndef _SPXREDUNDANTSM_H_
 #define _SPXREDUNDANTSM_H_
 
@@ -24,25 +27,28 @@
 
 namespace soplex
 {
-/** Remove redundant row and columns.
-    This #SPxSimplifier thries to eliminat redundant rows or columns from
-    its loaded #SPxLP.
+/**@brief   Remove redundant row and columns.
+   @ingroup Algo
+
+   This #SPxSimplifier tries to eliminate redundant rows and columns from
+   its loaded #SPxLP.
  */
 class SPxRedundantSM : public SPxSimplifier
 {
 private:
-   double delta;
-   SPxLP* lp;
+   static const double eps = 1e-10; ///< epslion for what is regarded equal.
 
 public:
-   ///
+   /// Remove redundant rows and columns.
    int simplify();
-   ///
+
+   /// Reverse the doings of #simplify().
    void unsimplify();
-   ///
+
+   /// objective value for unsimplified LP.
    double value(double x)
    {
-      return x + lp->spxSense()*delta;
+      return x + lp->spxSense() * delta;
    }
 };
 } // namespace soplex

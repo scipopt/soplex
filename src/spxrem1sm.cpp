@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxrem1sm.cpp,v 1.4 2001/11/22 08:57:23 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxrem1sm.cpp,v 1.5 2001/11/22 16:30:01 bzfkocht Exp $"
 
 #include <stdlib.h>
 #include <iostream>
@@ -38,7 +38,7 @@ int SPxRem1SM::simplify()
       for (i = lp->nRows() - 1; i >= 0; --i)
       {
          rem[i] = 0;
-         const SVector& row = (const_cast<const SPxLP*>(lp))->rowVector(i);
+         const SVector& row = lp->rowVector(i);
          if (row.size() == 0)
          {
             if (lp->rhs(i) < 0 || lp->lhs(i) > 0)
@@ -85,7 +85,7 @@ int SPxRem1SM::simplify()
       {
          cont += num;
          lp->removeRows(rem.get_ptr());
-         std::cerr << "SPxRem1SM:\tremoved " << num << " row(s)\n";
+         std::cout << "SPxRem1SM:\tremoved " << num << " row(s)\n";
          assert(lp->isConsistent());
       }
 
@@ -93,7 +93,7 @@ int SPxRem1SM::simplify()
       rem.reSize(lp->nCols());
       for (i = lp->nCols() - 1; i >= 0; --i)
       {
-         const SVector& col = (const_cast<const SPxLP*>(lp))->colVector(i);
+         const SVector& col = lp->colVector(i);
          rem[i] = 0;
          if (col.size() == 0)
          {
@@ -169,7 +169,7 @@ int SPxRem1SM::simplify()
       {
          cont += num;
          lp->removeCols(rem.get_ptr());
-         std::cerr << "SPxRem1SM:\tremoved " << num << " column(s)\n";
+         std::cout << "SPxRem1SM:\tremoved " << num << " column(s)\n";
          assert(lp->isConsistent());
       }
    }
