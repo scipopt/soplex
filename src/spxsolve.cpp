@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.58 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.59 2003/01/12 13:09:40 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -118,7 +118,6 @@ SPxSolver::Status SPxSolver::solve()
                             << ", Value = " << value()
                             << ", Shift = " << shift() << std::endl;
             });
-
             enterId = thepricer->selectEnter();
 
             if (!enterId.isValid())
@@ -484,7 +483,7 @@ bool SPxSolver::terminate()
          if (type() == ENTER)
             computeTest();
       }
-      if (shift() > 0)
+      if (shift() > 0.0)
          unShift();
    }
 

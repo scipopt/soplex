@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxrem1sm.cpp,v 1.17 2003/01/10 13:49:27 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxrem1sm.cpp,v 1.18 2003/01/12 13:09:40 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -117,7 +117,8 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
          Real x = row.value(j);
          int  k = row.index(j);
          
-         // std::cout << "\t\tx= " << x << " lower= " << lp.lower(k) << " upper= " << lp.upper(k) << std::endl;
+         // std::cout << "\t\tx= " << x << " lower= " << lp.lower(k) 
+         // << " upper= " << lp.upper(k) << std::endl;
 
          assert(isNotZero(x, epsZero()));
 
@@ -214,7 +215,7 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
       }
 
       // redundant rhs ?
-      if (lp.rhs(i) <=  infinity && upcnt == 0 && GE(lp.rhs(i), upbnd, deltaBnd()))
+      if (lp.rhs(i) <  infinity && upcnt == 0 && GE(lp.rhs(i), upbnd, deltaBnd()))
       {
          VERBOSE3({ std::cout << "\tredundant rhs row " << i
                               << " rhs= " << lp.rhs(i)
@@ -224,7 +225,7 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
          lp.changeRhs(i, infinity);
       }
       // redundant lhs ?
-      if (lp.lhs(i) >= -infinity && locnt == 0 && LE(lp.lhs(i), lobnd, deltaBnd()))
+      if (lp.lhs(i) > -infinity && locnt == 0 && LE(lp.lhs(i), lobnd, deltaBnd()))
       {
          VERBOSE3({ std::cout << "\tredundant lhs row " << i
                               << " lhs= " << lp.lhs(i)
@@ -243,7 +244,7 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
          num++;
          continue;
       }
-#if 0
+#if 1
       if (upcnt <= 1 || locnt <= 1)
       {
          for(int j = 0; j < row.size(); ++j )
@@ -257,14 +258,18 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
             {
                if (lp.lhs(i) > -infinity && lp.lower(k) > -infinity && upcnt <= 1)
                {
-                  Real y = -infinity;
+                  Real y     = -infinity;
+                  Real scale = maxAbs(lp.lhs(i), upbnd);
+                  Real z     = (lp.lhs(i) / scale) - (upbnd / scale);
 
-                  if (lp.upper(k) < infinity && upcnt == 0)
-                     y = lp.upper(k) + (lp.lhs(i) - upbnd) / x;
+                  assert(upcnt > 0 || lp.upper(k) < infinity);
+                  
+                  if (upcnt == 0)
+                     y = lp.upper(k) + z * scale / x;
                   else if (lp.upper(k) >= infinity)
-                     y = lp.lhs(i) - upbnd;
+                     y = z * scale / x;
 
-                  if (isZero(y, epsilonSimplifier()))
+                  if (isZero(y, deltaBnd()))
                      y = 0.0;
 
                   if (GE(y, lp.lower(k)))
@@ -275,20 +280,25 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
                                           << " lower= " << lp.lower(k)
                                           << std::endl; });
 
+                     locnt++;
+                     lobnd -= lp.lower(k) * x;
                      lp.changeLower(k, -infinity);
-                     break;
                   }
                }
                if (lp.rhs(i) < infinity && lp.upper(k) < infinity && locnt <= 1)
                {
                   Real y = infinity;
+                  Real scale = maxAbs(lp.rhs(i), lobnd);
+                  Real z     = (lp.rhs(i) / scale) - (lobnd / scale);
                   
-                  if (lp.lower(k) > -infinity && locnt == 0)
-                     y = lp.lower(k) + (lp.rhs(i) - lobnd) / x;
+                  assert(locnt > 0 || lp.lower(k) > -infinity);
+
+                  if (locnt == 0)
+                     y = lp.lower(k) + z * scale / x;
                   else if (lp.lower(k) <= -infinity)
-                     y = lp.rhs(i) - lobnd;
+                     y = z * scale / x;
                   
-                  if (isZero(y, epsilonSimplifier()))
+                  if (isZero(y, deltaBnd()))
                      y = 0.0;
 
                   if (LE(y, lp.upper(k)))
@@ -299,8 +309,9 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
                                           << " lower= " << lp.lower(k)
                                           << std::endl; });
 
+                     upcnt++;
+                     upbnd -= lp.upper(k) * x;
                      lp.changeUpper(k, infinity);
-                     break;
                   }
                }
             }
@@ -309,13 +320,17 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
                if (lp.lhs(i) >= -infinity && lp.upper(k) < infinity && upcnt <= 1)
                {
                   Real y = infinity;
+                  Real scale = maxAbs(lp.lhs(i), upbnd);
+                  Real z     = (lp.lhs(i) / scale) - (upbnd / scale);
                   
-                  if (lp.lower(k) > -infinity && upcnt == 0)
-                     y = lp.lower(k) + (lp.lhs(i) - upbnd) / x;
+                  assert(upcnt > 0 || lp.lower(k) > -infinity);
+
+                  if (upcnt == 0)
+                     y = lp.lower(k) + z * scale / x;
                   else if (lp.lower(k) <= -infinity)
-                     y = -(lp.lhs(i) - upbnd);
+                     y = z * scale / x;
                   
-                  if (isZero(y, epsilonSimplifier()))
+                  if (isZero(y, deltaBnd()))
                      y = 0.0;
 
                   if (LE(y, lp.upper(k)))
@@ -326,20 +341,25 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
                                           << " lower= " << lp.lower(k)
                                           << std::endl; });
 
+                     locnt++;
+                     lobnd -= lp.upper(k) * x;
                      lp.changeUpper(k, infinity);
-                     break;
                   }
                }
                if (lp.rhs(i) <= infinity && lp.lower(k) > -infinity && locnt <= 1)
                {
                   Real y = -infinity;
+                  Real scale = maxAbs(lp.rhs(i), lobnd);
+                  Real z     = (lp.rhs(i) / scale) - (lobnd / scale);
 
-                  if (lp.upper(k) < infinity && locnt == 0)
-                     y = lp.upper(k) + (lp.rhs(i) - lobnd) / x;
+                  assert(locnt > 0 || lp.upper(k) < infinity);
+
+                  if (locnt == 0)
+                     y = lp.upper(k) + z * scale / x;
                   else if (lp.upper(k) >= infinity)
-                     y = -(lp.rhs(i) - lobnd);
+                     y = z * scale / x;
                   
-                  if (isZero(y, epsilonSimplifier()))
+                  if (isZero(y, deltaBnd()))
                      y = 0.0;
 
                   if (GE(y, lp.lower(k)))
@@ -350,8 +370,9 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
                                           << " lower= " << lp.lower(k)
                                           << std::endl; });
 
+                     upcnt++;
+                     upbnd -= lp.lower(k) * x;
                      lp.changeLower(k, -infinity);
-                     break;
                   }
                }
             }

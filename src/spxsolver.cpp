@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.9 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.10 2003/01/12 13:09:40 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -166,37 +166,37 @@ void SPxSolver::setRep(Representation p_rep)
    METHOD( "SPxSolver::setRep()" );
    if (p_rep == COLUMN)
    {
-      thevectors = colset();
-      thecovectors = rowset();
-      theFrhs = &primRhs;
-      theFvec = &primVec;
-      theCoPrhs = &dualRhs;
-      theCoPvec = &dualVec;
-      thePvec = &addVec;
-      theRPvec = theCoPvec;
-      theCPvec = thePvec;
-      theUbound = &theUCbound;
-      theLbound = &theLCbound;
-      theCoUbound = &theURbound;
-      theCoLbound = &theLRbound;
+      thevectors   = colSet();
+      thecovectors = rowSet(); 
+      theFrhs      = &primRhs;
+      theFvec      = &primVec;
+      theCoPrhs    = &dualRhs;
+      theCoPvec    = &dualVec;
+      thePvec      = &addVec;
+      theRPvec     = theCoPvec;
+      theCPvec     = thePvec;
+      theUbound    = &theUCbound;
+      theLbound    = &theLCbound;
+      theCoUbound  = &theURbound;
+      theCoLbound  = &theLRbound;
    }
    else
    {
       assert(p_rep == ROW);
 
-      thevectors = rowset();
-      thecovectors = colset();
-      theFrhs = &dualRhs;
-      theFvec = &dualVec;
-      theCoPrhs = &primRhs;
-      theCoPvec = &primVec;
-      thePvec = &addVec;
-      theRPvec = thePvec;
-      theCPvec = theCoPvec;
-      theUbound = &theURbound;
-      theLbound = &theLRbound;
-      theCoUbound = &theUCbound;
-      theCoLbound = &theLCbound;
+      thevectors   = rowSet(); 
+      thecovectors = colSet();
+      theFrhs      = &dualRhs;
+      theFvec      = &dualVec;
+      theCoPrhs    = &primRhs;
+      theCoPvec    = &primVec;
+      thePvec      = &addVec;
+      theRPvec     = thePvec;
+      theCPvec     = theCoPvec;
+      theUbound    = &theURbound;
+      theLbound    = &theLRbound;
+      theCoUbound  = &theUCbound;
+      theCoLbound  = &theLCbound;
    }
    theRep = p_rep;
    unInit();
@@ -207,7 +207,6 @@ void SPxSolver::setRep(Representation p_rep)
       SPxBasis::setRep();
       SPxBasis::loadDesc(desc());
    }
-
    if (thepricer && thepricer->solver() == this)
       thepricer->setRep(p_rep);
 }

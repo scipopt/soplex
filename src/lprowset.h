@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.h,v 1.19 2002/12/08 11:09:21 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprowset.h,v 1.20 2003/01/12 13:09:40 bzfkocht Exp $"
 
 /**@file  lprowset.h
  * @brief Set of LP columns.
@@ -51,6 +51,13 @@ class LPRowSet : protected SVSet
 private:
    DVector left;  ///< vector of left hand sides (lower bounds) of #LPRow%s.
    DVector right; ///< vector of right hand sides (upper bounds) of #LPRow%s.
+
+protected:
+   /// return the complete #SVSet.
+   const SVSet* rowSet() const 
+   {
+      return this;
+   }
 
 public:
 

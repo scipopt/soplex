@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.33 2003/01/10 12:46:14 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.34 2003/01/12 13:09:40 bzfkocht Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -651,18 +651,6 @@ protected:
    const LPColSet* lpcolset() const
    {
       return static_cast<const LPColSet*>(this);
-   }
-
-   /**todo What sense does it make to have private inheritance, if then
-    *      we do something like this here?
-    */
-   SVSet* rowset()
-   {
-      return reinterpret_cast<SVSet*>(static_cast<LPRowSet*>(this));
-   }
-   SVSet* colset()
-   {
-      return reinterpret_cast<SVSet*>(static_cast<LPColSet*>(this));
    }
 
    //@Memo: These  methods are use for implemementing the public remove methods

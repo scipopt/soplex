@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcolset.h,v 1.17 2002/12/08 11:09:21 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpcolset.h,v 1.18 2003/01/12 13:09:40 bzfkocht Exp $"
 
 /**@file  lpcolset.h
  * @brief Set of LP columns.
@@ -51,6 +51,13 @@ private:
    DVector low;     ///< vector of lower bounds.
    DVector up;      ///< vector of upper bounds.
    DVector object;  ///< vector of objective coefficients.
+
+protected:
+   /// return the complete #SVSet.
+   const SVSet* colSet() const 
+   {
+      return this;
+   }
 
 public:
 

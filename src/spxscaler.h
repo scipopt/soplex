@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscaler.h,v 1.4 2003/01/10 12:46:14 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscaler.h,v 1.5 2003/01/12 13:09:40 bzfkocht Exp $"
 
 /**@file  spxscaler.h
  * @brief LP scaling base class.
@@ -49,10 +49,15 @@ protected:
 
    /// setup scale array for the LP.
    virtual void setup(SPxLP& lp);
-   ///
-   virtual Real computeColscale(const SVector& col) const = 0;
-   ///
-   virtual Real computeRowscale(const SVector& row) const = 0;
+   /// computes scaling value for a minimum and maximum pair.
+   virtual Real computeScale(Real mini, Real maxi) const;
+   /// iterates through vecset and calls computeScale() for each vector.
+   /**@return maximum ratio between absolute biggest and smallest element for any vector.
+    */
+   virtual Real computeScalingVecs(const SVSet* vecset, 
+      const DataArray<Real>& coScaleval, DataArray<Real>& scaleval);
+   /// applies m_colscale and m_rowscale to the \p lp.
+   virtual void applyScaling(SPxLP& lp);
 
 public:
    friend std::ostream& operator<<(std::ostream& s, const SPxScaler& sc);
@@ -74,7 +79,7 @@ public:
    virtual void setBoth(bool both); 
 
    /// Scale #SPxLP. 
-   virtual void scale(SPxLP& lp);
+   virtual void scale(SPxLP& lp) = 0;
    /// Unscale dense primal solution vector given in \p x. 
    virtual void unscalePrimal(Vector& x) const;
    /// Unscale dense dual solution vector given in \p pi. 

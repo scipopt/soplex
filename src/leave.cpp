@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.26 2003/01/10 12:46:14 bzfkocht Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.27 2003/01/12 13:09:40 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -562,6 +562,7 @@ int SPxSolver::leave(int leaveIdx)
             we need it in the unbounded/infeasible case, too, to have the 
             correct basis size */
          rejectLeave(leaveNum, leaveId, leaveStat);
+
          if (enterVal != leaveMax)
          {
             DEBUG( std::cout << "rejecting leave" << std::endl; );
@@ -569,6 +570,8 @@ int SPxSolver::leave(int leaveIdx)
             theCoTest[leaveIdx] -= 2 * delta();     // #== fTest()#
             return 1;
          }
+         std::cout << "== in leave infeasible/unbounded\n";
+
          if (rep() != COLUMN)
             setBasisStatus(SPxBasis::UNBOUNDED);
          else

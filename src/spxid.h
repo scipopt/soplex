@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxid.h,v 1.2 2002/10/23 10:40:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxid.h,v 1.3 2003/01/12 13:09:40 bzfkocht Exp $"
 
 /**@file  spxid.h
  * @brief Row and columns Id's #SPxLP.
@@ -21,6 +21,7 @@
 #ifndef _SPXID_H_
 #define _SPXID_H_
 
+#include <iostream>
 #include <assert.h>
 
 #include "datakey.h"
@@ -85,6 +86,8 @@ public:
  */
 class SPxId : public DataKey
 {
+   friend std::ostream& operator<<(std::ostream& os, const SPxId& id);
+
 public:
    /// type of the id.
    enum Type
@@ -168,6 +171,7 @@ public:
       return getIdx() < id.getIdx();
    }
 };
+
 
 } // namespace soplex
 #endif // _SPXID_H_

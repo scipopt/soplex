@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.48 2003/01/05 19:03:15 bzfkocht Exp $
+# $Id: Makefile,v 1.49 2003/01/12 13:09:39 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -8,8 +8,7 @@
 #*                                                                           *
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-.PHONY:		depend clean distclean lint doc lib
-.PHONY:		tests quick check mittel infeas cover
+.PHONY:		depend clean distclean lint doc lib check
 
 ARCH            :=      $(shell uname -m | \
                         sed \
@@ -23,6 +22,9 @@ OSTYPE		:=	$(shell uname -s | \
 			sed \
 			-e s/irix../irix/ )
 OPT		=	opt
+TEST		=	quick
+ALGO		=	1 2 3 4 5 6
+LIMIT		=	#
 
 COMP		=	gnu
 CXX		=	g++
@@ -113,22 +115,8 @@ doc:
 
 lib:		$(LIBRARY)
 
-tests:		check infeas mittel
-
 check:		
-		cd check; ./check.sh netlib.test $(BINARY)
-
-quick:		
-		cd check; ./check.sh quick.test $(BINARY)
-
-mittel:		
-		cd check; ./check.sh mittelmann.test $(BINARY)
-
-infeas:		
-		cd check; ./check.sh infeas.test $(BINARY)
-
-cover:
-		cd check; ./cover.sh cover.test $(BINARY)
+		cd check; ./check.sh $(TEST).test ../$(BINARY) '$(ALGO)' $(LIMIT)
 
 clean:
 		-rm -rf $(OBJDIR)/* $(LIBRARY) $(BINARY)

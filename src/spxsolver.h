@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.6 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.7 2003/01/12 13:09:40 bzfkocht Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -1296,7 +1296,9 @@ protected:
 
 private:
    int leave(int i);
-   int enter(SPxId& id);
+   /// let id enter the basis and manage leaving of another one.
+   ///@returns false if LP is unbounded/infeasible.
+   bool enter(SPxId& id);
 
    /// test coVector #i# with status #stat#.
    Real coTest(int, SPxBasis::Desc::Status) const;

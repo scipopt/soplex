@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.23 2003/01/05 19:03:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.24 2003/01/12 13:09:40 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -777,7 +777,7 @@ void SPxSolver::rejectEnter(
    }
 }
 
-int SPxSolver::enter(SPxId& enterId)
+bool SPxSolver::enter(SPxId& enterId)
 {
    METHOD( "SPxSolver::enter()" );
    assert(enterId.isValid());
@@ -802,7 +802,7 @@ int SPxSolver::enter(SPxId& enterId)
       rejectEnter(enterId, enterTest, enterStat);
       change(-1, enterId, enterVec);
       DEBUG( std::cout << "rejecting false enter pivot" << std::endl; );
-      return 1;
+      return true;
    }
 
    /*  Before performing the actual basis update, we must determine, how this
@@ -895,8 +895,6 @@ int SPxSolver::enter(SPxId& enterId)
       //  change basis matrix
       change(leaveIdx, enterId, enterVec, &(theFvec->delta()));
    }
-
-
    /*  No leaving vector could be found that would yield a stable pivot step.
     */
    else if (leaveVal != -enterMax)
@@ -904,9 +902,7 @@ int SPxSolver::enter(SPxId& enterId)
       rejectEnter(enterId, 0.01*enterTest - 2*delta(), enterStat);
       change(-1, enterId, enterVec);
    }
-
-   /*
-       No leaving vector has been selected from the basis. However, if the
+   /*  No leaving vector has been selected from the basis. However, if the
        shift amount for |fVec| is bounded, we are in the case, that the
        entering variable is moved from one bound to its other, before any of
        the basis feasibility variables reaches their bound. This may only
@@ -925,16 +921,15 @@ int SPxSolver::enter(SPxId& enterId)
 
       ungetEnterVal(enterId, enterStat, leaveVal, *enterVec);
    }
-
-   /*
-       No variable could be selected to leave the basis and even the entering
+   /*  No variable could be selected to leave the basis and even the entering
        variable is unbounded --- this is a failure.  
     */
    else
    {
       /* The following line originally was in the "lastUpdate() > 1" case;
          we need it in the INFEASIBLE/UNBOUNDED case, too, to have the
-         basis descriptor at the correct size. */
+         basis descriptor at the correct size. 
+       */
       rejectEnter(enterId, enterTest, enterStat);
 
       if (lastUpdate() > 1)
@@ -951,10 +946,9 @@ int SPxSolver::enter(SPxId& enterId)
          setBasisStatus(SPxBasis::INFEASIBLE);
       else
          setBasisStatus(SPxBasis::UNBOUNDED);
-      return 0;
+      return false;
    }
-
-   return 1;
+   return true;
 }
 } // namespace soplex
 

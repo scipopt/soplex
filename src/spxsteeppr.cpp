@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.23 2003/01/10 12:46:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.24 2003/01/12 13:09:40 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -246,23 +246,22 @@ void SPxSteepPR::left4(int n, SPxId id)
    }
 }
 
-int SPxSteepPR::selectLeaveX(Real& best, int start, int incr)
+int SPxSteepPR::selectLeave()
 {
+   assert(isConsistent());
+
    const Real* coPenalty_ptr = coPenalty.get_const_ptr();
-   const Real* fTest = thesolver->fTest().get_const_ptr();
-   //    const Real* low   = thesolver->lbBound();
-   //    const Real* up    = thesolver->ubBound();
-   const Real* p = leavePref.get_const_ptr();
+   const Real* fTest         = thesolver->fTest().get_const_ptr();
+   //    const Real* low     = thesolver->lbBound();
+   //    const Real* up      = thesolver->ubBound();
+   const Real* p             = leavePref.get_const_ptr();
 
+   Real best = -infinity;
    Real x;
-   int selIdx;
 
-   best = -infinity;
-   selIdx = -1;
+   int lastIdx = -1;
 
-   //for(int i = 0; i < thesolver->dim() - start; i += incr)
- 
-   for (int i = thesolver->dim() - 1 - start; i >= 0; i -= incr)
+   for (int i = thesolver->dim() - 1; i >= 0; --i)
    {
       x = fTest[i];
 
@@ -284,27 +283,20 @@ int SPxSteepPR::selectLeaveX(Real& best, int start, int incr)
          else
 #endif
             x = x * x / coPenalty_ptr[i] * p[i];
+
          if (x > best)
          {
             best = x;
-            selIdx = i;
+            lastIdx = i;
          }
       }
    }
 
    /*
-       if(selIdx >= 0)
-           std::cout << fTest[selIdx] << std::endl;
+       if(lastIdx >= 0)
+           std::cout << fTest[lastIdx] << std::endl;
     */ 
-   return selIdx;
-}
 
-int SPxSteepPR::selectLeave()
-{
-   assert(isConsistent());
-   Real best;
-
-   lastIdx = selectLeaveX(best);
    if (lastIdx >= 0)
    {
       thesolver->basis().coSolve(thesolver->coPvec().delta(),
@@ -332,8 +324,7 @@ int SPxSteepPR::selectLeave()
 
 /* Entering Simplex
  */
-void SPxSteepPR::entered4X(
-   SPxId, int n, int start2, int incr2, int start1, int incr1)
+void SPxSteepPR::entered4(SPxId /* id */, int n)
 {
    assert(thesolver->type() == SPxSolver::ENTER);
 
@@ -354,7 +345,7 @@ void SPxSteepPR::entered4X(
       assert(thesolver->fVec().delta()[n] > thesolver->epsilon()
               || thesolver->fVec().delta()[n] < -thesolver->epsilon());
 
-      for (j = coPidx.size() - 1 - start1; j >= 0; j -= incr1)
+      for (j = coPidx.size() - 1; j >= 0; --j)
       {
          i = coPidx.index(j);
          xi_ip = xi_p * coPvec[i];
@@ -370,7 +361,7 @@ void SPxSteepPR::entered4X(
             coPenalty_ptr[i] = 1 / thesolver->epsilon();
       }
 
-      for (j = pIdx.size() - 1 - start2; j >= 0; j -= incr2)
+      for (j = pIdx.size() - 1; j >= 0; --j)
       {
          i = pIdx.index(j);
          xi_ip = xi_p * pVec[i];
@@ -393,34 +384,28 @@ void SPxSteepPR::entered4X(
        else if(thesolver->isCoId(id))
            coPenalty[ thesolver->number(id) ] *= 1.0001;
    */
+
 }
 
-void SPxSteepPR::entered4(SPxId id, int n)
+SPxId SPxSteepPR::selectEnter()
 {
-   entered4X(id, n, 0, 1, 0, 1);
-}
-
-SPxId SPxSteepPR::selectEnterX(Real& best, int start1, int incr1, int start2, int incr2) const
-{
-   /*
-       std::cout << "selectEnter " << start1 << '(' << incr1 << ")\t"
-                              << start2 << '(' << incr2 << ")\n";
-    */
-   const Real* p = pref.get_const_ptr();
-   const Real* cp = coPref.get_const_ptr();
-   const Real* test = thesolver->test().get_const_ptr();
-   const Real* coTest = thesolver->coTest().get_const_ptr();
-   const Real* penalty_ptr = penalty.get_const_ptr();
+   const Real* p             = pref.get_const_ptr();
+   const Real* cp            = coPref.get_const_ptr();
+   const Real* test          = thesolver->test().get_const_ptr();
+   const Real* coTest        = thesolver->coTest().get_const_ptr();
+   const Real* penalty_ptr   = penalty.get_const_ptr();
    const Real* coPenalty_ptr = coPenalty.get_const_ptr();
-   Real x;
-   int i, end;
 
-   SPxId selId;
-   best = -infinity;
+   SPxId lastId;
+   Real  best = -infinity;
+   Real  x;
+   int   i;
+   int   end;
 
-   for (end = thesolver->coDim(), i = start2; i < end; i += incr2)
+   for(i = 0, end = thesolver->coDim(); i < end; ++i)
    {
       x = test[i];
+
       if (x < -theeps)
       {
          x *= x / penalty_ptr[i];
@@ -428,14 +413,12 @@ SPxId SPxSteepPR::selectEnterX(Real& best, int start1, int incr1, int start2, in
          // x *= 1 + p[i];
          if (x > best)
          {
-            best = x;
-            selId = thesolver->id(i);
+            best   = x;
+            lastId = thesolver->id(i);
          }
       }
    }
-   incr2 = end;
-
-   for (end = thesolver->dim(), i = start1; i < end; i += incr1)
+   for (end = thesolver->dim(), i = 0; i < end; ++i)
    {
       x = coTest[i];
       if (x < -theeps)
@@ -446,19 +429,11 @@ SPxId SPxSteepPR::selectEnterX(Real& best, int start1, int incr1, int start2, in
          if (x > best)
          {
             best = x;
-            selId = thesolver->coId(i);
+            lastId = thesolver->coId(i);
          }
       }
    }
-
    assert(isConsistent());
-   return selId;
-}
-
-SPxId SPxSteepPR::selectEnter()
-{
-   Real best;
-   lastId = SPxSteepPR::selectEnterX(best);
 
    if (lastId.isValid())
    {
@@ -473,7 +448,6 @@ SPxId SPxSteepPR::selectEnter()
 
       thesolver->setup4coSolve(&workVec, &workRhs);
    }
-
    return lastId;
 }
 

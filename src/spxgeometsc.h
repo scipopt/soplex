@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeometsc.h,v 1.2 2003/01/10 12:46:14 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeometsc.h,v 1.3 2003/01/12 13:09:40 bzfkocht Exp $"
 
 /**@file  spxgeometsc.h
  * @brief LP geometric mean scaling.
@@ -37,20 +37,19 @@ namespace soplex
 class SPxGeometSC : public SPxScaler
 {
 protected:
-   ///
-   virtual Real computeColscale(const SVector& col) const;
-   ///
-   virtual Real computeRowscale(const SVector& row) const;
+   const int  m_maxIterations;    ///< maximum number of scaling iterations.
+   const Real m_minImprovement;   ///< improvement nesseccary to carry on.
+   const Real m_goodEnoughRatio;  ///< no scaling needed if ratio is less than this.
 
-   virtual Real doRow(const SPxLP& lp);
-   virtual Real doCol(const SPxLP& lp);
+   ///@return \f$\sqrt{\mbox{mini}\cdot\mbox{maxi}}\f$.
+   virtual Real computeScale(Real mini, Real maxi) const;
 
 public:
    /// Scale the loaded #SPxLP.
    virtual void scale(SPxLP& lp);
 
    /// default constructor.
-   explicit SPxGeometSC(bool colFirst = true, bool doBoth = true);
+   explicit SPxGeometSC(bool colFirst = true, int maxIters = 8, Real minImpr = 0.9, Real goodEnough = 1e2);
 };
 } // namespace soplex
 #endif // _SPXGEOMETSC_H_

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.h,v 1.16 2003/01/10 12:46:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.h,v 1.17 2003/01/12 13:09:40 bzfkocht Exp $"
 
 
 /**@file  spxsteeppr.h
@@ -60,10 +60,7 @@ private:
    DVector workVec;                // working vector
    SSVector workRhs;               // working vector
 
-   int lastIdx;
-   SPxId lastId;
    Real pi_p;
-
 
    int prefSetup;
    DataArray < Real > coPref; // preference multiplier for selecting as pivot
@@ -74,14 +71,7 @@ private:
    void setupPrefsX(Real mult, Real /*tie*/, Real /*cotie*/, Real shift, Real coshift);
    ///
    void setupPrefs(SPxSolver::Type);
-   ///
-   int selectLeaveX(Real& best, int start = 0, int incr = 1);
-   ///
-   SPxId selectEnterX(Real& best, 
-      int start1 = 0, int incr1 = 1, int start2 = 0, int incr2 = 1) const;
-   ///
-   void entered4X(SPxId id, int n, 
-      int start1, int incr1, int start2, int incr2);
+
 public:
    /**@todo make setup and accuracy private or protected */
    /// setup type.

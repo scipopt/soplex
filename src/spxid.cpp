@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxid.cpp,v 1.1 2002/03/21 16:06:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxid.cpp,v 1.2 2003/01/12 13:09:40 bzfkocht Exp $"
 
 #include "spxid.h"
 
@@ -45,6 +45,27 @@ SPxRowId::SPxRowId(const SPxId& p_key)
    assert(!p_key.isSPxColId());
 
    info = SPxId::ROW_ID;
+}
+
+std::ostream& operator<<(std::ostream& os, const SPxId& id)
+{
+   switch(id.type())
+   {
+   case SPxId::ROW_ID:
+      os << "row ";
+      break;
+   case SPxId::COL_ID :
+      os << "col ";
+      break;
+   case SPxId::INVALID :
+      os << "Invalid ";
+      break;
+   default :
+      abort();
+   }
+   os << id.idx << " (" << id.info << ")";
+
+   return os;
 }
 
 } // namespace soplex

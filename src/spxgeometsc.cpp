@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeometsc.cpp,v 1.3 2003/01/10 13:49:27 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeometsc.cpp,v 1.4 2003/01/12 13:09:40 bzfkocht Exp $"
 
 /**@file  spxgeometsc.cpp
  * @brief Geometric mean row/column scaling.
@@ -24,247 +24,109 @@
 
 namespace soplex
 {
-static const char* makename(bool colFirst, bool doBoth)
+static const char* makename(bool colFirst)
 {
-   const char* name;
-
-   if (doBoth)
-      name = colFirst ? "CR-Geometric" : "RC-Geometric";
-   else
-      name = colFirst ? "C-Geometric" : "R-Geometric";
-
-   return name;
+   return colFirst ? "CR-Geometric" : "RC-Geometric";
 }
 
-SPxGeometSC::SPxGeometSC(bool colFirst, bool doBoth)
-   : SPxScaler(makename(colFirst, doBoth), colFirst, doBoth)
+/**@param maxIters   arbitrary small number, we choose 8
+   @param minImpr    Bixby said Fourer said in MP 23, 274 ff. that 0.9 is a good value.
+   @param goodEnough if the max/min ratio is allready less then 100/1 we do not scale.
+*/ 
+SPxGeometSC::SPxGeometSC(bool colFirst, int maxIters, Real minImpr, Real goodEnough)
+   : SPxScaler(makename(colFirst), colFirst, true)
+   , m_maxIterations(maxIters)
+   , m_minImprovement(minImpr)
+   , m_goodEnoughRatio(goodEnough)
 {}
 
-
-Real SPxGeometSC::computeColscale(const SVector& col) const
+Real SPxGeometSC::computeScale(Real mini, Real maxi) const
 {
-   Real mini = col.minAbs();
-   Real maxi = col.maxAbs();
+   METHOD( "SPxGeometSC::computeScale()" );
 
    return sqrt(mini * maxi);
 }
 
-Real SPxGeometSC::computeRowscale(const SVector& row) const
-{
-   Real mini = row.minAbs();
-   Real maxi = row.maxAbs();
-
-   return sqrt(mini * maxi);
-}
-
-
-Real SPxGeometSC::doRow(const SPxLP& lp) 
-{
-   Real pmax = 0.0;
-
-   for(int i = 0; i < lp.nRows(); ++i )
-   {
-      const SVector& vec = lp.rowVector(i);
-            
-      Real maxi = 0.0;
-      Real mini = infinity;
-            
-      for( int j = 0; j < vec.size(); ++j)
-      {
-         Real x = fabs(vec.value(j) * m_colscale[vec.index(j)]);
-               
-         if (!isZero(x))
-         {
-            if (x > maxi)
-               maxi = x;
-            if (x < mini)
-               mini = x;
-         }
-      }
-      // empty rows/cols are possible
-      if (mini == infinity || maxi == 0.0)
-      {
-         mini = 1.0;
-         maxi = 1.0;
-      }
-      assert(mini < infinity);
-      assert(maxi > 0.0);
-
-      m_rowscale[i] = 1.0 / sqrt(mini * maxi);
-            
-      Real p = maxi / mini;
-            
-      if (p > pmax)
-         pmax = p;
-   }
-   return pmax;
-}
-
-Real SPxGeometSC::doCol(const SPxLP& lp) 
-{
-   Real pmax = 0.0;
-
-   for(int i = 0; i < lp.nCols(); ++i )
-   {
-      const SVector& vec = lp.colVector(i);
-            
-      Real maxi = 0.0;
-      Real mini = infinity;
-            
-      for( int j = 0; j < vec.size(); ++j)
-      {
-         Real x = fabs(vec.value(j) * m_rowscale[vec.index(j)]);
-
-         if (!isZero(x))
-         {
-            if (x > maxi)
-               maxi = x;
-            if (x < mini)
-               mini = x;
-         }
-      }
-      // empty rows/cols are possible
-      if (mini == infinity || maxi == 0.0)
-      {
-         mini = 1.0;
-         maxi = 1.0;
-      }
-      assert(mini < infinity);
-      assert(maxi > 0.0);
-
-      m_colscale[i] = 1.0 / sqrt(mini * maxi);
-      
-      Real p = maxi / mini;
-      
-      if (p > pmax)
-         pmax = p;
-   }
-   return pmax;
-}
-
-#if 0
 void SPxGeometSC::scale(SPxLP& lp) 
 {
-   VERBOSE2({ std::cout << "Geometric scaling LP" << std::endl; });   
+   METHOD( "SPxGeometSC::scale()" );
 
-   VERBOSE3({ std::cout << "\tNon zero min= " << lp.minAbsNzo()
-                        << " max= " << lp.maxAbsNzo()
-                        << std::endl; });
-   
-   SPxScaler::scale(lp);
+   VERBOSE1({ std::cout << "Geometric scaling LP" << std::endl; });   
 
-   VERBOSE3({ std::cout << "\tRow scaling min= " << minAbsRowscale()
-                        << " max= " << maxAbsRowscale()
-                        << std::endl
-                        << "\tCol scaling min= " << minAbsColscale()
-                        << " max= " << maxAbsColscale()
-                        << std::endl
-                        << "\tNon zero min= " << lp.minAbsNzo()
-                        << " max= " << lp.maxAbsNzo()
-                        << std::endl; });
-}
-#else
-void SPxGeometSC::scale(SPxLP& lp) 
-{
    Real pstart = 0.0;
    Real p0;
    Real p1;
 
    setup(lp);
 
-   VERBOSE2({ std::cout << "Geometric scaling LP" << std::endl; });   
-
-   VERBOSE3({ std::cout << "LP scaling statistics:" 
+   VERBOSE2({ std::cout << "LP scaling statistics:" 
                         << " min= " << lp.minAbsNzo()
                         << " max= " << lp.maxAbsNzo()
                         << " col-ratio= " << maxColRatio(lp)
                         << " row-ratio= " << maxRowRatio(lp)
                         << std::endl; });
 
-   // We make at most 8 (random number) iterations. 
-   for(int count = 0; count < 8; count++)
+   // We make at most m_maxIterations. 
+   for(int count = 0; count < m_maxIterations; count++)
    {
       if (m_colFirst)
       {
-         p0 = doCol(lp);
-         p1 = doRow(lp);
+         p0 = computeScalingVecs(lp.colSet(), m_rowscale, m_colscale);
+         p1 = computeScalingVecs(lp.rowSet(), m_colscale, m_rowscale);
       }
       else
       {
-         p0 = doRow(lp);
-         p1 = doCol(lp);
+         p0 = computeScalingVecs(lp.rowSet(), m_colscale, m_rowscale);
+         p1 = computeScalingVecs(lp.colSet(), m_rowscale, m_colscale);
       }
       VERBOSE3({ std::cout << "Geometric scaling round " << count
                            << " col-ratio= " << (m_colFirst ? p0 : p1)
                            << " row-ratio= " << (m_colFirst ? p1 : p0)
                            << std::endl; });
 
-      // rcord start value
+      // record start value, this is done with m_col/rowscale = 1.0, so it is the
+      // value frome the "original" (as passed to the scaler) LP.
       if (count == 0)
+      {
          pstart = p0;
+         // are we allready good enough ?
+         if (pstart < m_goodEnoughRatio)
+            break;
+      }
       else // do not test at the first iteration, then abort if no improvement.
-         if (p1 > 0.9 * p0)
+         if (p1 > m_minImprovement * p0)
             break;
    }      
    
-   // we scale only if either
-   // we had at the beginng a ratio worse then 1/100
-   // we have at least a 10% improvement.
-   if (pstart < 1e3 || p1 > pstart * 0.9)
+   // we scale only if either:
+   // - we had at the beginng a ratio worse then 100/1
+   // - we have at least a 10% improvement.
+   if (pstart < m_goodEnoughRatio || p1 > pstart * m_minImprovement)
    {
+      // reset m_colscale/m_rowscale to 1.0
       setup(lp);
 
       VERBOSE2({ std::cout << "No scaling done." << std::endl; });
    }
    else
    {
-      int i;
+      applyScaling(lp);
 
-      // now doit
-      for(i = 0; i < lp.nRows(); ++i )
-      {
-         SVector& vec = lp.rowVector_w(i);
+      VERBOSE3({ std::cout << "Row scaling min= " << minAbsRowscale()
+                           << " max= " << maxAbsRowscale()
+                           << std::endl
+                           << "Col scaling min= " << minAbsColscale()
+                           << " max= " << maxAbsColscale()
+                           << std::endl; });
 
-         for( int j = 0; j < vec.size(); ++j)
-            vec.value(j) *= m_colscale[vec.index(j)] * m_rowscale[i];
-
-         if (lp.rhs(i) < infinity)
-            lp.rhs_w(i) *= m_rowscale[i];
-         if (lp.lhs(i) > -infinity)
-            lp.lhs_w(i) *= m_rowscale[i];
-      }
-      for(i = 0; i < lp.nCols(); ++i )
-      {
-         SVector& vec = lp.colVector_w(i);
-         
-         for( int j = 0; j < vec.size(); ++j)
-            vec.value(j) *= m_rowscale[vec.index(j)] * m_colscale[i];
-         
-         lp.maxObj_w(i) *= m_colscale[i];
-         
-         if (lp.upper(i) < infinity)
-            lp.upper_w(i) /= m_colscale[i];
-         if (lp.lower(i) > -infinity)
-            lp.lower_w(i) /= m_colscale[i];
-      }
+      VERBOSE2({ std::cout << "LP scaling statistics:" 
+                           << " min= " << lp.minAbsNzo()
+                           << " max= " << lp.maxAbsNzo()
+                           << " col-ratio= " << maxColRatio(lp) 
+                           << " row-ratio= " << maxRowRatio(lp) 
+                           << std::endl; });
    }
-   assert(lp.isConsistent());
-
-   VERBOSE3({ std::cout << "Row scaling min= " << minAbsRowscale()
-                        << " max= " << maxAbsRowscale()
-                        << std::endl
-                        << "Col scaling min= " << minAbsColscale()
-                        << " max= " << maxAbsColscale()
-                        << std::endl; });
-
-   VERBOSE3({ std::cout << "LP scaling statistics:" 
-                        << " min= " << lp.minAbsNzo()
-                        << " max= " << lp.maxAbsNzo()
-                        << " col-ratio= " << maxColRatio(lp) 
-                        << " row-ratio= " << maxRowRatio(lp) 
-                        << std::endl; });
 }
-#endif
 
 } // namespace soplex
 
