@@ -13,7 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxid.cpp,v 1.2 2003/01/12 13:09:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxid.cpp,v 1.3 2003/01/13 10:38:47 bzfkocht Exp $"
+
+#include <stdlib.h>
+#include <assert.h>
 
 #include "spxid.h"
 

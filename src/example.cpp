@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.52 2003/01/10 12:46:14 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.53 2003/01/13 10:38:47 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -119,11 +119,11 @@ public:
                 << std::setw(16) << maxviol << "  " 
                 << std::setw(16) << sumviol << std::endl;
 
-      // qualRdCostViolation(maxviol, sumviol);
+      m_solver.qualRdCostViolation(maxviol, sumviol);
 
-      //std::cout << "Reduced costs    :" 
-      //          << std::setw(16) << maxviol << "  " 
-      //          << std::setw(16) << sumviol << std::endl;
+      std::cout << "Reduced costs    :" 
+                << std::setw(16) << maxviol << "  " 
+                << std::setw(16) << sumviol << std::endl;
    }
 };
 

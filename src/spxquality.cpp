@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxquality.cpp,v 1.4 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxquality.cpp,v 1.5 2003/01/13 10:38:47 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -117,39 +117,72 @@ void SPxSolver::qualSlackViolation(Real& maxviol, Real& sumviol) const
    }
 }
 
-// This should be computed freshly.
 void SPxSolver::qualRdCostViolation(Real& maxviol, Real& sumviol) const
-{
+{   
    maxviol = 0.0;
    sumviol = 0.0;
 
+   int i;
    // TODO:   y = c_B * B^-1  => coSolve(y, c_B)
    //         redcost = c_N - yA_N 
    // solve system "x = e_i^T * B^-1" to get i'th row of B^-1
    // DVector y( nRows() );
    // basis().coSolve( x, spx->unitVector( i ) );
+   // DVector rdcost( nCols() );
+#if 0 // un-const
+   if (lastUpdate() > 0)
+      factorize();
 
-   DVector rdcost( nCols() );
+   computePvec();
 
-   for( int col = 0; col < nCols(); ++col)
+   if (type() == ENTER)
+      computeTest();
+#endif
+   if (type() == ENTER)
    {
-      Real viol = 0.0;
-
-      if (spxSense() == SPxLP::MINIMIZE)
+      for(i = 0; i < dim(); ++i)
       {
-         if (rdcost[col] < 0.0)
-            viol = -rdcost[col];
+         Real x = coTest()[i];
+         
+         if (x < 0.0)
+         {
+            sumviol -= x;
+            
+            if (x < maxviol)
+               maxviol = x;
+         }
       }
-      else
+      for(i = 0; i < coDim(); ++i)
       {
-         if (rdcost[col] > 0.0)
-            viol = rdcost[col];
-      }
-      if (viol > maxviol)
-         maxviol = viol;
-
-      sumviol += viol;
+         Real x = test()[i];
+         
+         if (x < 0.0)
+         {
+            sumviol -= x;
+            
+            if (x < maxviol)
+               maxviol = x;
+         }
+      } 
    }
+   else
+   {
+      assert(type() == LEAVE);
+
+      for(i = 0; i < dim(); ++i)
+      {
+         Real x = fTest()[i];
+         
+         if (x < 0.0)
+         {
+            sumviol -= x;
+            
+            if (x < maxviol)
+               maxviol = x;
+         }
+      }
+   }
+   maxviol *= -1;
 }
 
 } // namespace soplex

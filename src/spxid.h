@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxid.h,v 1.3 2003/01/12 13:09:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxid.h,v 1.4 2003/01/13 10:38:47 bzfkocht Exp $"
 
 /**@file  spxid.h
  * @brief Row and columns Id's #SPxLP.
@@ -22,7 +22,6 @@
 #define _SPXID_H_
 
 #include <iostream>
-#include <assert.h>
 
 #include "datakey.h"
 

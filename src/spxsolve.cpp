@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.59 2003/01/12 13:09:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.60 2003/01/13 10:38:47 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -73,7 +73,7 @@ SPxSolver::Status SPxSolver::solve()
 
       init();
    }
-   thepricer->setEpsilon(delta());
+   thepricer->setEpsilon(delta() * 10.0);
 
    //setType(type());
 
@@ -122,18 +122,36 @@ SPxSolver::Status SPxSolver::solve()
 
             if (!enterId.isValid())
             {
-               if (lastUpdate() == 0)
-                  break;
-              
-               // We have a iterationlimit and everything look good? Then stop!
-               // 6 is just a number picked.
-               if (maxIters > 0 && lastUpdate() < 6
-                  && (  SPxBasis::status() == SPxBasis::REGULAR 
-                     || SPxBasis::status() == SPxBasis::DUAL 
-                     || SPxBasis::status() == SPxBasis::PRIMAL))
-                  break;
+               // we are not infeasible
+               if (  SPxBasis::status() == SPxBasis::REGULAR 
+                  || SPxBasis::status() == SPxBasis::DUAL 
+                  || SPxBasis::status() == SPxBasis::PRIMAL)
+               {
+                  Real maxviol;
+                  Real sumviol;
 
+                  qualRdCostViolation(maxviol, sumviol);
+
+                  // is the solution good enough ?
+                  if (sumviol > delta()) // no
+                  {
+                     thepricer->setEpsilon(thepricer->epsilon() * 0.1);
+
+                     VERBOSE3({ std::cout << "Setting delta= " << thepricer->epsilon() 
+                                          << " maxviol= " << maxviol
+                                          << " sumviol= " << sumviol
+                                          << std::endl; });
+                  }
+                  // solution seems good, no check we are precide enough
+                  else if (lastUpdate() == 0)
+                     break;
+                  // We have a iterationlimit and everything look good? Then stop!
+                  // 6 is just a number picked.
+                  else if (maxIters > 0 && lastUpdate() < 6)
+                     break;
+               }
                std::cout << "== in solve == " << maxIters << " " << int(SPxBasis::status()) << std::endl;
+
                // We better refactor to make sure the solution is ok.
                factorize();
 
@@ -205,19 +223,36 @@ SPxSolver::Status SPxSolver::solve()
 
             if (leaveNum < 0)
             {
-               // We have a fresh factorization? Then stop!
-               if (lastUpdate() == 0)
-                  break;
+               // we are not infeasible
+               if (  SPxBasis::status() == SPxBasis::REGULAR 
+                  || SPxBasis::status() == SPxBasis::DUAL 
+                  || SPxBasis::status() == SPxBasis::PRIMAL)
+               {
+                  Real maxviol;
+                  Real sumviol;
 
-               // We have a iterationlimit and everything look good? Then stop!
-               // 6 is just a number picked.
-               if (maxIters > 0 && lastUpdate() < 6
-                  && (  SPxBasis::status() == SPxBasis::REGULAR 
-                     || SPxBasis::status() == SPxBasis::DUAL 
-                     || SPxBasis::status() == SPxBasis::PRIMAL))
-                  break;
-               
+                  qualRdCostViolation(maxviol, sumviol);
+
+                  // is the solution good enough ?
+                  if (sumviol > delta()) // no
+                  {
+                     thepricer->setEpsilon(thepricer->epsilon() * 0.1);
+
+                     VERBOSE3({ std::cout << "Setting delta= " << thepricer->epsilon() 
+                                          << " maxviol= " << maxviol
+                                          << " sumviol= " << sumviol
+                                          << std::endl; });
+                  }
+                  // solution seems good, no check we are precide enough
+                  else if (lastUpdate() == 0)
+                     break;
+                  // We have a iterationlimit and everything look good? Then stop!
+                  // 6 is just a number picked.
+                  else if (maxIters > 0 && lastUpdate() < 6)
+                     break;
+               }
                std::cout << "== in solve == " << maxIters << " " << int(SPxBasis::status()) << std::endl;
+
                // We better refactor to make sure the solution is ok.
                factorize();
 
