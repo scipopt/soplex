@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.7 2001/12/10 19:05:54 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.8 2001/12/11 09:09:26 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -170,6 +170,12 @@ private:
    double         lastShift;   ///< for forcing feasibility.
    int            m_maxCycle;  ///< maximum steps before cycling is detected.
    int            m_numCycle;  ///< actual number of degenerate steps so far.
+   bool           initialized; ///< true, if all vectors are setup.
+
+   Vector*        solveVector2;      ///< when 2 systems are to solve at a time
+   SSVector*      solveVector2rhs;   ///< when 2 systems are to solve at a time
+   Vector*        coSolveVector2;    ///< when 2 systems are to solve at a time
+   SSVector*      coSolveVector2rhs; ///< when 2 systems are to solve at a time
 
 protected:
    Array < UnitVector > unitVecs; ///< array of unit vectors
@@ -220,6 +226,14 @@ protected:
    // The following vectors serve for the virtualization of testing vectors
    DVector        theCoTest;
    DVector        theTest;
+
+   int            leaveCount;     ///< number of LEAVE iterations
+   int            enterCount;     ///< number of ENTER iterations
+
+   SPxPricer*      thepricer;
+   SPxRatioTester* theratiotester;
+   SPxStarter*     thestarter;
+   SPxSimplifier*  thesimplifier;
 
 public:
    /// return the current basis representation.
@@ -606,9 +620,9 @@ public:
     *  chosen representation.
     */
    //@{
-   /// id of \p i -th vector.
-   /** The \p i -th #id is the \p i -th #SPxRowId for a rowwise and the
-    *  \p i -th #SPxColId for a columnwise basis represenation. Hence,
+   /// id of \p i 'th vector.
+   /** The \p i 'th #id is the \p i 'th #SPxRowId for a rowwise and the
+    *  \p i 'th #SPxColId for a columnwise basis represenation. Hence,
     *  0 <= i < #coDim().
     */
    Id id(int i) const
@@ -625,9 +639,9 @@ public:
       }
    }
 
-   /// id of \p i -th covector.
-   /** The \p i -th #coId() is the \p i -th #SPxColId for a rowwise and the
-    *  \p i -th #SPxRowId for a columnwise basis represenation. Hence,
+   /// id of \p i 'th covector.
+   /** The \p i 'th #coId() is the \p i 'th #SPxColId for a rowwise and the
+    *  \p i 'th #SPxRowId for a columnwise basis represenation. Hence,
     *  0 <= i < #dim().
     */
    Id coId(int i) const
@@ -675,8 +689,8 @@ protected:
    virtual void splitLP();
 
 public:
-   /// \p i -th vector.
-   /**@return a reference to the \p i -th, 0 <= i < #coDim(), vector of
+   /// \p i 'th vector.
+   /**@return a reference to the \p i 'th, 0 <= i < #coDim(), vector of
     *         the loaded LP (with respect to the chosen representation).
     */
    const SVector& vector(int i) const
@@ -719,8 +733,8 @@ public:
          : vector(SPxLP::SPxColId(p_id));
    }
 
-   /// \p i -th covector of LP.
-   /**@return a reference to the \p i -th, 0 <= i < #dim(), covector of
+   /// \p i 'th covector of LP.
+   /**@return a reference to the \p i 'th, 0 <= i < #dim(), covector of
     *  the loaded LP (with respect to the chosen representation).
     */
    const SVector& coVector(int i) const
@@ -757,7 +771,7 @@ public:
              ? coVector(SPxLP::SPxRowId(p_id))
           : coVector(SPxLP::SPxColId(p_id));
    }
-   /// return \p i -th unit vector.
+   /// return \p i 'th unit vector.
    const SVector& unitVector(int i) const
    {
       return unitVecs[i];
@@ -770,10 +784,10 @@ public:
     *  indicates that the corresponding vector is in the basis matrix or not.
     */
    //@{
-   /// #Status of \p i -th variable.
+   /// #Status of \p i 'th variable.
    SPxBasis::Desc::Status status(int i);
 
-   /// #Status of \p i -th covariable.
+   /// #Status of \p i 'th covariable.
    SPxBasis::Desc::Status coStatus(int i);
 
    /// does \p stat describe a basic index ?
@@ -782,7 +796,7 @@ public:
       return (stat * rep() > 0);
    }
 
-   /// is the \p p_id -th vector basic ?
+   /// is the \p p_id 'th vector basic ?
    int isBasic(SPxLP::Id p_id) const
    {
       assert(p_id.isValid());
@@ -791,37 +805,37 @@ public:
           : isBasic(SPxLP::SPxColId(p_id));
    }
 
-   /// is the \p rid -th vector basic ?
+   /// is the \p rid 'th vector basic ?
    int isBasic(SPxLP::SPxRowId rid) const
    {
       return isBasic(desc().rowStatus(number(rid)));
    }
 
-   /// is the \p cid -th vector basic ?
+   /// is the \p cid 'th vector basic ?
    int isBasic(SPxLP::SPxColId cid) const
    {
       return isBasic(desc().colStatus(number(cid)));
    }
 
-   /// is the \p i -th row vector basic ?
+   /// is the \p i 'th row vector basic ?
    int isRowBasic(int i) const
    {
       return isBasic(desc().rowStatus(i));
    }
 
-   /// is the \p i -th column vector basic ?
+   /// is the \p i 'th column vector basic ?
    int isColBasic(int i) const
    {
       return isBasic(desc().colStatus(i));
    }
 
-   /// is the \p i -th vector basic ?
+   /// is the \p i 'th vector basic ?
    int isBasic(int i) const
    {
       return isBasic(desc().status(i));
    }
 
-   /// is the \p i -th covector basic ?
+   /// is the \p i 'th covector basic ?
    int isCoBasic(int i) const
    {
       return isBasic(desc().coStatus(i));
@@ -896,7 +910,7 @@ public:
     *  variable from #fVec that violates its bounds that is to leave
     *  the basis. When a #SPxPricer is called to select such a
     *  leaving variable, #fTest() contains the vector of violations:
-    *  For #fTest()[i] < 0, the \c i -th basic variable violates one of
+    *  For #fTest()[i] < 0, the \c i 'th basic variable violates one of
     *  its bounds by the given value. Otherwise no bound is violated.
     */
    const Vector& fTest() const
@@ -976,7 +990,7 @@ public:
    /** In entering Simplex pricing selects checks vectors #coPvec()
     *  and #pVec()# for violation of its bounds. #coTest() contains
     *  the violations for #coPvec() which are indicated by a negative
-    *  value. I.e. if #coTest(i) < 0, the \p i -th element of #coPvec()
+    *  value. I.e. if #coTest(i) < 0, the \p i 'th element of #coPvec()
     *  is violated by #-coTest(i).
     */
    const Vector& coTest() const
@@ -1042,7 +1056,7 @@ public:
    /** In entering Simplex pricing selects checks vectors #coPvec()
     *  and #pVec() for violation of its bounds. Vector #test()
     *  contains the violations for #pVec(), i.e.~if #test(i) < 0,
-    *  the i-th element of #pVec() is violated by #test(i).
+    *  the i'th element of #pVec() is violated by #test(i).
     *  Vector #test() is only up to date for #FULL pricing.
     */
    const Vector& test() const
@@ -1061,84 +1075,76 @@ public:
    void computeTest();
 
    /**@name Shifting
-       The task of the ratio test (implemented in \Ref{SPxRatioTester} classes)
-       is to select a variable for the basis update, such that the basis
-       remains priced (i.e. both, the pricing and copricing vectors satisfy
-       their bounds) or feasible (i.e. the feasibility vector satisfies its
-       bounds). However, this can lead to numerically instable basis matrices
-       or --- after accumulation of various errors --- even to a singular basis
-       matrix.
-
-       The key to overcome this problem is to allow the basis to become ``a
-       bit'' infeasible or unpriced, in order provide a better choice for the
-       ratio test to select a stable variable. This is equivalent to enlarging
-       the bounds by a small amount. This is referred to as {\em shifting}.
-
-       The following methods are used to shift individual bounds. They are
-       mainly intended for stable implenentations of \Ref{SPxRatioTester}.
+    *  The task of the ratio test (implemented in #SPxRatioTester classes)
+    *  is to select a variable for the basis update, such that the basis
+    *  remains priced (i.e. both, the pricing and copricing vectors satisfy
+    *  their bounds) or feasible (i.e. the feasibility vector satisfies its
+    *  bounds). However, this can lead to numerically instable basis matrices
+    *  or -- after accumulation of various errors -- even to a singular basis
+    *  matrix.
+    *
+    *  The key to overcome this problem is to allow the basis to become "a
+    *  bit" infeasible or unpriced, in order provide a better choice for the
+    *  ratio test to select a stable variable. This is equivalent to enlarging
+    *  the bounds by a small amount. This is referred to as \em shifting.
+    *
+    *  These methods serve for shifting feasibility bounds, either in order
+    *  to maintain numerical stability or initially for computation of
+    *  phase 1. The sum of all shifts applied to any bound is stored in
+    *  #theShift.
+    *
+    *  The following methods are used to shift individual bounds. They are
+    *  mainly intended for stable implenentations of #SPxRatioTester.
     */
    //@{
-private:
-   /*
-       These methods serve for shifting feasibility bounds, either in order
-       to maintain numerical stability or initially for computation of
-       phase 1. The sum of all shifts applied to any bound is stored in
-       #theShift#.
-    */
-
-protected:
-   int leaveCount;             // number of LEAVE iterations
-   int enterCount;             // number of ENTER iterations
-
-public:
-   /*  These method perform an initial shifting to optaion an feasible or
-       pricable basis.
-    */
+   /// Perform initial shifting to optain an feasible or pricable basis.
    void shiftFvec();
+   /// Perform initial shifting to optain an feasible or pricable basis.
    void shiftPvec();
 
-   /// shift #i#-th #ubBound# to #to#.
+   /// shift \p i 'th #ubBound to \p to.
    void shiftUBbound(int i, double to)
    {
       assert(theType == ENTER);
       theShift += to - theUBbound[i];
       theUBbound[i] = to;
    }
-   /// shift #i#-th #lbBound# to #to#.
+   /// shift \p i 'th #lbBound to \p to.
    void shiftLBbound(int i, double to)
    {
       assert(theType == ENTER);
       theShift += theLBbound[i] - to;
       theLBbound[i] = to;
    }
-   /// shift #i#-th #upBound# to #to#.
+   /// shift \p i 'th #upBound to \p to.
    void shiftUPbound(int i, double to)
    {
       assert(theType == LEAVE);
       theShift += to - (*theUbound)[i];
       (*theUbound)[i] = to;
    }
-   /// shift #i#-th #lpBound# to #to#.
+   /// shift \p i 'th #lpBound# to \p to.
    void shiftLPbound(int i, double to)
    {
       assert(theType == LEAVE);
       theShift += (*theLbound)[i] - to;
       (*theLbound)[i] = to;
    }
-   /// shift #i#-th #ucBound# to #to#.
+   /// shift \p i 'th #ucBound# to \p to.
    void shiftUCbound(int i, double to)
    {
       assert(theType == LEAVE);
       theShift += to - (*theCoUbound)[i];
       (*theCoUbound)[i] = to;
    }
-   /// shift #i#-th #lcBound# to #to#.
+   /// shift \p i 'th #lcBound# to \p to.
    void shiftLCbound(int i, double to)
    {
       assert(theType == LEAVE);
       theShift += (*theCoLbound)[i] - to;
       (*theCoLbound)[i] = to;
    }
+   ///
    void testBounds() const;
 
    /// total current shift amount.
@@ -1146,75 +1152,88 @@ public:
    {
       return theShift;
    }
-
    /// remove shift as much as possible.
    virtual void unShift(void);
 
 private:
+   ///
    void perturbMin(
       const UpdateVector& vec, Vector& low, Vector& up, double eps,
       int start = 0, int incr = 1);
-
+   ///
    void perturbMax(
       const UpdateVector& vec, Vector& low, Vector& up, double eps,
       int start = 0, int incr = 1);
-
+   ///
    double perturbMin(const UpdateVector& uvec,
-                      Vector& low,
-                      Vector& up,
-                      double eps,
-                      double delta,
-                      const SPxBasis::Desc::Status* stat,
-                      int start,
-                      int incr);
-
+      Vector& low, Vector& up, double eps, double delta,
+      const SPxBasis::Desc::Status* stat, int start, int incr);
+   ///
    double perturbMax(const UpdateVector& uvec,
-                      Vector& low,
-                      Vector& up,
-                      double eps,
-                      double delta,
-                      const SPxBasis::Desc::Status* stat,
-                      int start,
-                      int incr);
-public:
+      Vector& low, Vector& up, double eps, double delta,
+      const SPxBasis::Desc::Status* stat, int start, int incr);
    //@}
 
-
    /**@name The Simplex Loop
-       We now present a set of methods that may be usefull when implementing
-       own \Ref{SPxPricer} or \Ref{SPxRatioTester} classes. Here is, how
-       #SoPlex# will call methods from its loaded \Ref{SPxPricer} end
-       \Ref{SPxRatioTester}.
-       
-       For the entering Simplex:
-       \begin{enumerate}
-       \item   #SPxPricer::selectEnter()#
-       \item   #SPxRatioTester::selectLeave()#
-       \item   #SPxPricer::entered4()#
-       \end{enumerate}
-       
-       For the leaving Simplex:
-       \begin{enumerate}
-       \item   #SPxPricer::selectLeave()#
-       \item   #SPxRatioTester::selectEnter()#
-       \item   #SPxPricer::left4()#
-       \end{enumerate}
+    *  We now present a set of methods that may be usefull when implementing
+    *  own #SPxPricer or #SPxRatioTester classes. Here is, how
+    *  #SoPlex will call methods from its loaded #SPxPricer and
+    *  #SPxRatioTester.
+    *  
+    *  For the entering Simplex:
+    *    -# #SPxPricer::selectEnter()
+    *    -# #SPxRatioTester::selectLeave()
+    *    -# #SPxPricer::entered4()
+    *  
+    *  For the leaving Simplex:
+    *    -# #SPxPricer::selectLeave()
+    *    -# #SPxRatioTester::selectEnter()
+    *    -# #SPxPricer::left4()
     */
    //@{
-   /**@name maximal infeasibility of basis
-       This method is called for prooving optimality. Since it is
-       possible, that some stable implementation of class
-       \Ref{SPxRatioTester} yielded a slightly infeasible (or unpriced)
-       basis, this must be checked before terminating with an optimal
-       solution.
+public:
+   /// Setup vectors to be solved within Simplex loop.
+   /** Load vector \p y to be #solve%d with the basis matrix during the
+    *  #LEAVE Simplex. The system will be solved after #SoPlex%'s call
+    *  to #SPxRatioTester.  The system will be solved along with
+    *  another system. Solving two linear system at a time has
+    *  performance advantages over solving the two linear systems
+    *  seperately.
+    */
+   void setup4solve(Vector* p_y, SSVector* p_rhs)
+   {
+      assert(type() == LEAVE);
+      solveVector2    = p_y;
+      solveVector2rhs = p_rhs;
+   }
+   /// Setup vectors to be cosolved within Simplex loop.
+   /** Load vector \p y to be #coSolve%#d with the basis matrix during
+    *  the #ENTER Simplex. The system will be solved after #SoPlex%'s
+    *  call to #SPxRatioTester.  The system will be solved along
+    *  with another system. Solving two linear system at a time has
+    *  performance advantages over solving the two linear systems
+    *  seperately.
+    */
+   void setup4coSolve(Vector* p_y, SSVector* p_rhs)
+   {
+      assert(type() == ENTER);
+      coSolveVector2    = p_y;
+      coSolveVector2rhs = p_rhs;
+   }
+   /// maximal infeasibility of basis
+   /** This method is called for prooving optimality. Since it is
+    *  possible, that some stable implementation of class
+    *  #SPxRatioTester yielded a slightly infeasible (or unpriced)
+    *  basis, this must be checked before terminating with an optimal
+    *  solution.
     */
    virtual double maxInfeas() const;
 
-   /** Return current basis.
-       Note, that the basis can be used to solve linear systems or use
-       any other of its (#const#) methods.  It is, however, encuraged
-       to use methods #setup4solve()# and #setup4coSolve()# for solving
-       systems, since this is likely to have perfomance advantages.
+   /// Return current basis.
+   /**@note The basis can be used to solve linear systems or use
+    *  any other of its (const) methods.  It is, however, encuraged
+    *  to use methods #setup4solve() and #setup4coSolve() for solving
+    *  systems, since this is likely to have perfomance advantages.
     */
    const SPxBasis& basis() const
    {
@@ -1225,27 +1244,27 @@ public:
    {
       return *this;
    }
-   /// return loaded \Ref{SPxPricer}.
+   /// return loaded #SPxPricer.
    const SPxPricer* pricer() const
    {
       return thepricer;
    }
-   /// return loaded \Ref{SLinSolver}.
+   /// return loaded #SLinSolver.
    const SLinSolver* slinSolver() const
    {
       return SPxBasis::factor;
    }
-   /// return loaded \Ref{SPxRatioTester}.
+   /// return loaded #SPxRatioTester.
    const SPxRatioTester* ratiotester() const
    {
       return theratiotester;
    }
-   /// return loaded \Ref{SPxStarter}.
+   /// return loaded #SPxStarter.
    const SPxStarter* starter() const
    {
       return thestarter;
    }
-   /// return loaded \Ref{SPxSimplifier}.
+   /// return loaded #SPxSimplifier.
    const SPxSimplifier* simplifier() const
    {
       return thesimplifier;
@@ -1256,15 +1275,6 @@ protected:
    virtual void factorize();
 
 private:
-   ///
-   SPxPricer* thepricer;
-   ///
-   SPxRatioTester* theratiotester;
-   ///
-   SPxStarter* thestarter;
-   ///
-   SPxSimplifier* thesimplifier;
-
    int leave(int i);
    int enter(Id& id);
 
@@ -1284,92 +1294,52 @@ private:
    void computeFtest();
    /// update basis feasibility test vector.
    void updateFtest();
-
-   Vector* solveVector2;           // when 2 systems are to be solved at a time
-   SSVector* solveVector2rhs;      // when 2 systems are to be solved at a time
-   Vector* coSolveVector2;         // when 2 systems are to be solved at a time
-   SSVector* coSolveVector2rhs;    // when 2 systems are to be solved at a time
-
-public:
-   /** Setup vectors to be solved within Simplex loop.
-    *  Load vector #y# to be #solve#d with the basis matrix during the
-    *  #LEAVE# Simplex. The system will be solved after #SoPlex#'s call
-    *  to \Ref{SPxRatioTester}.  The system will be solved along with
-    *  another system. Solving two linear system at a time has
-    *  performance advantages over solving the two linear systems
-    *  seperately.
-    */
-   void setup4solve(Vector* p_y, SSVector* p_rhs)
-   {
-      assert(type() == LEAVE);
-      solveVector2    = p_y;
-      solveVector2rhs = p_rhs;
-   }
-   /** Setup vectors to be cosolved within Simplex loop.
-    *  Load vector #y# to be #coSolve#d with the basis matrix during
-    *  the #ENTER# Simplex. The system will be solved after #SoPlex#'s
-    *  call to \Ref{SPxRatioTester}.  The system will be solved along
-    *  with another system. Solving two linear system at a time has
-    *  performance advantages over solving the two linear systems
-    *  seperately.
-    */
-   void setup4coSolve(Vector* p_y, SSVector* p_rhs)
-   {
-      assert(type() == ENTER);
-      coSolveVector2    = p_y;
-      coSolveVector2rhs = p_rhs;
-   }
    //@}
 
-protected:
    /**@name Parallelization
-       In this section we present the methods, that are provided in order to
-       allow a parallel version to be implemented as a derived class, thereby
-       inheriting most of the code of #SoPlex#.
-
-       @par Initialization
-       These methods are used to setup all the vectors used in the Simplex
-       loop, that where described in the previous sectios.
+    *  In this section we present the methods, that are provided in order to
+    *  allow a parallel version to be implemented as a derived class, thereby
+    *  inheriting most of the code of #SoPlex#.
+    *
+    *  @par Initialization
+    *  These methods are used to setup all the vectors used in the Simplex
+    *  loop, that where described in the previous sectios.
     */
    //@{
-private:
-   int initialized;    // 1, if all vectors are setup 0 otherwise
-
 protected:
-   /** Has the internal data been initialized.
-       As long as an instance of #SoPlex# is not #initialized#, no member
-       contains setup data. Initialization is performed via method
-       #init()#.  Afterwards all data structures are kept up to date (even
-       for all manipulation methods), until #unInit()# is called. However,
-       some manipulation methods call #unInit()# themselfs.
+   /// has the internal data been initialized?
+   /** As long as an instance of #SoPlex is not #initialized, no member
+    *  contains setup data. Initialization is performed via method
+    *  #init().  Afterwards all data structures are kept up to date (even
+    *  for all manipulation methods), until #unInit() is called. However,
+    *  some manipulation methods call #unInit()# themselfs.
     */
-   int isInitialized() const
+   bool isInitialized() const
    {
       return initialized;
    }
-   /** Intialize data structures.
-       If #SoPlex# is not #isInitialized()#, method solve calls
-       #init()# to setup all vectors and internal data structures.
-       Most of the other methods within this section are called by
-       #init()#.
-
-       Derived classes should add the initialization of additional
-       data structures by overriding this method. Don't forget,
-       however to call #SoPlex::init()#.
-    */
 public:
+   /// intialize data structures.
+   /** If #SoPlex is not #isInitialized(), method solve calls
+    *  #init() to setup all vectors and internal data structures.
+    *  Most of the other methods within this section are called by
+    *  #init().
+    *
+    *  Derived classes should add the initialization of additional
+    *  data structures by overriding this method. Don't forget,
+    *  however to call #SoPlex::init().
+    */
    virtual void init();
+
 protected:
    /// unintialize data structures.
    virtual void unInit()
    {
-      initialized = 0;
+      initialized = false;
    }
 
    /// reset dimensions of vectors according to loaded LP.
    virtual void reDim();
-
-
    /// compute feasibility vector from scratch.
    void computeFrhs();
    ///
@@ -1378,93 +1348,77 @@ protected:
    virtual void computeFrhs1(const Vector&, const Vector&);
    ///
    void computeFrhs2(const Vector&, const Vector&);
-
-   /// compute #theCoPrhs# for entering Simplex.
+   /// compute #theCoPrhs for entering Simplex.
    virtual void computeEnterCoPrhs();
+   ///
    void computeEnterCoPrhs4Row(int i, int n);
+   ///
    void computeEnterCoPrhs4Col(int i, int n);
-
-   /// compute #theCoPrhs# for leaving Simplex.
+   /// compute #theCoPrhs for leaving Simplex.
    virtual void computeLeaveCoPrhs();
+   ///
    void computeLeaveCoPrhs4Row(int i, int n);
+   ///
    void computeLeaveCoPrhs4Col(int i, int n);
-   //@}
 
-   /** Compute part of objective value.
-       This method is called from #value()# in order to compute the part of
-       the objective value resulting form nonbasic variables for #COLUMN#
-       \Ref{Representation}.
+   /// Compute part of objective value.
+   /** This method is called from #value() in order to compute the part of
+    *  the objective value resulting form nonbasic variables for #COLUMN
+    *  #Representation.
     */
    double nonbasicValue() const;
 
-   /// Get pointer to the #id#'th vector
+   /// Get pointer to the \p id 'th vector
    virtual const SVector* enterVector(const Id& p_id)
    {
       assert(p_id.isValid());
-      return p_id.isSPxRowId()
-             ? &vector(SPxRowId(p_id))
-          : &vector(SPxColId(p_id));
+      return p_id.isSPxRowId() 
+         ? &vector(SPxRowId(p_id)) : &vector(SPxColId(p_id));
    }
-
+   ///
    virtual void getLeaveVals(int i,
-                              SPxBasis::Desc::Status& leaveStat,
-                              Id& leaveId,
-                              double& leaveMax,
-                              double& leavebound,
-                              int& leaveNum);
-   virtual void getLeaveVals2(double leaveMax,
-                              Id enterId,
-                              double& enterBound,
-                              double& newUBbound,
-                              double& newLBbound,
-                              double& newCoPrhs);
-
-   virtual void getEnterVals(Id id,
-                              double& enterTest,
-                              double& enterUB,
-                              double& enterLB,
-                              double& enterVal,
-                              double& enterMax,
-                              double& enterPric,
-                              SPxBasis::Desc::Status& enterStat,
-                              double& enterRO);
-   virtual void getEnterVals2(int leaveIdx,
-                              double enterMax,
-                              double& leaveBound);
-   virtual void ungetEnterVal(Id enterId,
-                              SPxBasis::Desc::Status enterStat,
-                              double leaveVal,
-                              const SVector& vec);
-
+      SPxBasis::Desc::Status& leaveStat, Id& leaveId,
+      double& leaveMax, double& leavebound, int& leaveNum);
+   ///
+   virtual void getLeaveVals2(double leaveMax, Id enterId,
+      double& enterBound, double& newUBbound,
+      double& newLBbound, double& newCoPrhs);
+   ///
+   virtual void getEnterVals(Id id, double& enterTest,
+      double& enterUB, double& enterLB, double& enterVal, double& enterMax,
+      double& enterPric, SPxBasis::Desc::Status& enterStat, double& enterRO);
+   ///
+   virtual void getEnterVals2(int leaveIdx, 
+      double enterMax, double& leaveBound);
+   ///
+   virtual void ungetEnterVal(Id enterId, SPxBasis::Desc::Status enterStat,
+      double leaveVal, const SVector& vec);
+   ///
    virtual void rejectEnter(Id enterId,
-                            double enterTest,
-                            SPxBasis::Desc::Status enterStat);
-   virtual void rejectLeave(int leaveNum,
-                             Id leaveId,
-                             SPxBasis::Desc::Status leaveStat,
-                             const SVector* newVec = 0);
-
+      double enterTest, SPxBasis::Desc::Status enterStat);
+   ///
+   virtual void rejectLeave(int leaveNum, Id leaveId,
+      SPxBasis::Desc::Status leaveStat, const SVector* newVec = 0);
    ///
    virtual void setupPupdate(void);
    ///
    virtual void doPupdate(void);
    ///
    virtual void clearUpdateVecs(void);
-
    ///
    virtual void perturbMinEnter(void);
    /// perturb basis bounds.
    virtual void perturbMaxEnter(void);
-
    ///
    virtual void perturbMinLeave(void);
    /// perturb nonbasic bounds.
    virtual void perturbMaxLeave(void);
 
-   /*
-       The following methods serve for initializing the bounds for dual or
-       primal Simplex algorithm of entering or leaving type.
+   //@}
+   /*  The following methods serve for initializing the bounds for dual or
+    *  primal Simplex algorithm of entering or leaving type.
     */
+   //@{
    void clearDualBounds(SPxBasis::Desc::Status, double&, double&);
 
    void setDualColBounds();
@@ -1481,17 +1435,17 @@ protected:
    //@}
 
 public:
-   /**@name Derived from #LPSolver# */
+   /**@name Derived from #LPSolver 
+    */
    //@{
+
    /// adjust conditions for termination.
    void setTermination(double value = LPSolver::infinity,
-                       double time = -1 ,
-                       int iteration = -1);
+      double time = -1, int iteration = -1);
 
    /// get adjusted conditions for termination.
    virtual void getTermination(double* value = 0 ,
-                               double* time = 0 ,
-                               int* iteration = 0) const;
+      double* time = 0, int* iteration = 0) const;
 
    /// get objective value of current solution.
    double objValue() const
@@ -1500,19 +1454,14 @@ public:
    }
 
    /// get all results of last solve.
-   LPSolver::Status getResult(double* value = 0,
-                              Vector* primal = 0,
-                              Vector* slacks = 0,
-                              Vector* dual = 0,
-                              Vector* reduCost = 0) const;
+   LPSolver::Status getResult(double* value = 0, Vector* primal = 0,
+      Vector* slacks = 0, Vector* dual = 0, Vector* reduCost = 0) const;
 
    /// set #LPSolver#s basis.
-   void setBasis(const signed char rows[],
-                 const signed char cols[]);
+   void setBasis(const signed char rows[], const signed char cols[]);
 
    /// get current basis.
-   LPSolver::Status getBasis(signed char rows[],
-                             signed char cols[]) const;
+   LPSolver::Status getBasis(signed char rows[], signed char cols[]) const;
 
    /// get number of iterations of current solution.
    int iterations() const
@@ -1520,85 +1469,85 @@ public:
       return basis().iteration();
    }
 
-   /// time spent in last call to method #solve()#.
+   /// time spent in last call to method #solve().
    double time() const
    {
       return theTime.userTime();
    }
 
-   ///
+   /// add \p row to #LPSolver%s LP.
    void addRow(const LPRow& row)
    {
       SPxLP::addRow(row);
    }
-   /// add #row# to #LPSolver#s LP.
+   /// add \p row to #LPSolver%s LP.
    void addRow(LPSolver::RowId& p_id, const LPRow& p_row)
    {
       SPxLP::addRow( *reinterpret_cast<SPxRowId*>(&p_id), p_row);
    }
 
-   ///
+   /// add all #LPRow%s of \p p_set to #LPSolver%s LP.
    void addRows(const LPRowSet& p_set)
    {
       SPxLP::addRows(p_set);
    }
-   /// add all #LPRow#s of #set# to #LPSolver#s LP.
+   /// add all #LPRow%s of \p p_set to #LPSolver%s LP.
    void addRows(LPSolver::RowId p_id[], const LPRowSet& p_set)
    {
       SPxLP::addRows( reinterpret_cast<SPxRowId*>(p_id), p_set);
    }
 
-   ///
+   /// add \p p_col to #LPSolver%s LP.
    void addCol(const LPCol& col)
    {
       SPxLP::addCol(col);
    }
-   /// add #col# to #LPSolver#s LP.
+   /// add \p p_col to #LPSolver%s LP.
    void addCol(LPSolver::ColId& p_id, const LPCol& p_col)
    {
       SPxLP::addCol(*reinterpret_cast<SPxColId*>(&p_id), p_col);
    }
 
-   ///
+   /// add all #LPCol%s of \p set to #LPSolver%s LP.
    void addCols(const LPColSet& p_set)
    {
       SPxLP::addCols(p_set);
    }
-   /// add all #LPCol#s of #set# to #LPSolver#s LP.
+   /// add all #LPCol%s of \p set to #LPSolver%s LP.
    void addCols(LPSolver::ColId p_id[], const LPColSet& p_set)
    {
       SPxLP::addCols(reinterpret_cast<SPxColId*>(p_id), p_set);
    }
 
 
-   /// remove #i#-th row.
+   /// remove \p i 'th row.
    void removeRow(int i)
    {
       SPxLP::removeRow(i);
    }
-   /// remove row with #RowId id#.
+   /// remove row with #RowId \p id.
    void removeRow(LPSolver::RowId p_id)
    {
       SPxLP::removeRow(*reinterpret_cast<SPxRowId*>(&p_id));
    }
 
-   /// remove #i#-th column.
+   /// remove \p i 'th column.
    void removeCol(int i)
    {
       SPxLP::removeCol(i);
    }
-   /// remove column with #LPSolver::ColId id#.
+   /// remove column with #LPSolver::ColId \p id.
    void removeCol(LPSolver::ColId p_id)
    {
       SPxLP::removeCol(*reinterpret_cast<SPxColId*>(&p_id));
    }
 
-   /// remove #n# rows.
+   /// remove \p n rows.
    void removeRows(LPSolver::RowId p_id[], int p_n, int p_perm[] = 0)
    {
       SPxLP::removeRows(reinterpret_cast<SPxRowId*>(p_id), p_n, p_perm);
    }
-   /// remove #n# rows.
+   /// remove \p n rows.
    void removeRows(int nums[], int n, int perm[] = 0)
    {
       SPxLP::removeRows(nums, n, perm);
@@ -1608,18 +1557,18 @@ public:
    {
       SPxLP::removeRows(perm);
    }
-   /// remove rows from #start# to #end# (including both).
+   /// remove rows from \p start to \p end (including both).
    void removeRowRange(int start, int end, int perm[] = 0)
    {
       SPxLP::removeRowRange(start, end, perm);
    }
 
-   /// remove #n# columns.
+   /// remove \p n columns.
    void removeCols(LPSolver::ColId p_id[], int p_n, int p_perm[] = 0)
    {
       SPxLP::removeCols(reinterpret_cast<SPxColId*>(p_id), p_n, p_perm);
    }
-   /// remove #n# columns.
+   /// remove \p n columns.
    void removeCols(int nums[], int n, int perm[] = 0)
    {
       SPxLP::removeCols(nums, n, perm);
@@ -1629,62 +1578,63 @@ public:
    {
       SPxLP::removeCols(perm);
    }
-   /// remove columns from #start# to #end# (including both).
+   /// remove columns from \p start to \p end (including both).
    void removeColRange(int start, int end, int perm[] = 0)
    {
       SPxLP::removeColRange(start, end, perm);
    }
 
 
-   /// change objective value to variable with #ColId id#.
+   /// change objective value to variable with #ColId \p id.
    void changeObj(LPSolver::ColId p_id, double p_newVal)
    {
       changeObj(*reinterpret_cast<SPxColId*>(&p_id), p_newVal);
    }
 
-   /// change lower bound of variable with #ColId id#.
+   /// change lower bound of variable with #ColId \p id.
    void changeLower(LPSolver::ColId p_id, double p_newLower)
    {
       changeLower(*reinterpret_cast<SPxColId*>(&p_id), p_newLower);
    }
 
-   /// change #id#-th upper bound.
+   /// change \p id 'th upper bound.
    void changeUpper(LPSolver::ColId p_id, double p_newUpper)
    {
       changeUpper(*reinterpret_cast<SPxColId*>(&p_id), p_newUpper);
    }
 
-   /// change #id#-th lower and upper bound.
-   void changeBounds(LPSolver::ColId p_id, double p_newLower, double p_newUpper)
+   /// change \p id 'th lower and upper bound.
+   void changeBounds(LPSolver::ColId p_id, 
+      double p_newLower, double p_newUpper)
    {
       changeBounds(*reinterpret_cast<SPxColId*>(&p_id), p_newLower, p_newUpper);
    }
 
-   /// change #id#-th lhs value.
+   /// change #id#'th lhs value.
    void changeLhs(LPSolver::RowId p_id, double p_newLhs)
    {
       changeLhs(*reinterpret_cast<SPxRowId*>(&p_id), p_newLhs);
    }
 
-   /// change #id#-th rhs value.
+   /// change #id#'th rhs value.
    void changeRhs(LPSolver::RowId p_id, double p_newRhs)
    {
       changeRhs(*reinterpret_cast<SPxRowId*>(&p_id), p_newRhs);
    }
 
-   /// change #id#-th lhs and rhs value.
+   /// change #id#'th lhs and rhs value.
    void changeRange(LPSolver::RowId p_id, double p_newLhs, double p_newRhs)
    {
       changeRange(*reinterpret_cast<SPxRowId*>(&p_id), p_newLhs, p_newRhs);
    }
 
-   /// change #id#-th row of LP.
+   /// change #id#'th row of LP.
    void changeRow(LPSolver::RowId p_id, const LPRow& p_newRow)
    {
       changeRow(*reinterpret_cast<SPxRowId*>(&p_id), p_newRow);
    }
 
-   /// change #id#-th column of LP.
+   /// change #id#'th column of LP.
    void changeCol(LPSolver::ColId p_id, const LPCol& p_newCol)
    {
       changeCol(*reinterpret_cast<SPxColId*>(&p_id), p_newCol);
@@ -1705,13 +1655,13 @@ public:
    }
 
 
-   /// get #i#-th row.
+   /// get \p i 'th row.
    void getRow(int p_i, LPRow& p_row) const
    {
       SPxLP::getRow(p_i, p_row);
    }
 
-   /// get #id#-th row.
+   /// get #id#'th row.
    void getRow(LPSolver::RowId p_id, LPRow& p_row) const
    {
       SPxLP::getRow(*reinterpret_cast<SPxRowId*>(&p_id), p_row);
@@ -1723,13 +1673,13 @@ public:
       SPxLP::getRows(p_start, p_end, p_set);
    }
 
-   /// return const #i#-th row if available.
+   /// return const \p i 'th row if available.
    const SVector& rowVector(int i) const
    {
       return SPxLP::rowVector(i);
    }
 
-   /// return const #id#-th row if available.
+   /// return const #id#'th row if available.
    const SVector& rowVector(LPSolver::RowId p_id) const
    {
       return SPxLP::rowVector(*reinterpret_cast<SPxRowId*>(&p_id));
@@ -1741,13 +1691,13 @@ public:
       return *lprowset();
    }
 
-   /// get #i#-th column.
+   /// get \p i 'th column.
    void getCol(int p_i, LPCol& p_column) const
    {
       SPxLP::getCol(p_i, p_column);
    }
 
-   /// get #id#-th column.
+   /// get #id#'th column.
    void getCol(LPSolver::ColId p_id, LPCol& p_column) const
    {
       SPxLP::getCol(*reinterpret_cast<SPxColId*>(&p_id), p_column);
@@ -1759,13 +1709,13 @@ public:
       SPxLP::getCols(p_start, p_end, p_set);
    }
 
-   /// return const #i#-th col if available.
+   /// return const \p i 'th col if available.
    const SVector& colVector(int i) const
    {
       return SPxLP::colVector(i);
    }
 
-   /// return const #id#-th col if available.
+   /// return const #id#'th col if available.
    const SVector& colVector(LPSolver::ColId p_id) const
    {
       return SPxLP::colVector(*reinterpret_cast<SPxColId*>(&p_id));
@@ -1777,13 +1727,13 @@ public:
       return *lpcolset();
    }
 
-   /// #i#-th value of objective vector.
+   /// \p i 'th value of objective vector.
    double obj(int i) const
    {
       return SPxLP::obj(i);
    }
 
-   /// #id#-th value of objective vector.
+   /// #id#'th value of objective vector.
    double obj(LPSolver::ColId p_id) const
    {
       return SPxLP::obj(*reinterpret_cast<SPxColId*>(&p_id));
@@ -1800,13 +1750,13 @@ public:
       SPxLP::getObj(p_obj);
    }
 
-   /// #i#-th lower bound.
+   /// \p i 'th lower bound.
    double lower(int i) const
    {
       return SPxLP::lower(i);
    }
 
-   /// #id#-th lower bound.
+   /// #id#'th lower bound.
    double lower(LPSolver::ColId p_id) const
    {
       return SPxLP::lower(*reinterpret_cast<SPxColId*>(&p_id));
@@ -1825,13 +1775,13 @@ public:
    }
 
 
-   /// #i#-th upper bound.
+   /// \p i 'th upper bound.
    double upper(int i) const
    {
       return SPxLP::upper(i);
    }
 
-   /// #id#-th upper bound.
+   /// #id#'th upper bound.
    double upper(LPSolver::ColId p_id) const
    {
       return SPxLP::upper(*reinterpret_cast<SPxColId*>(&p_id));
@@ -1850,13 +1800,13 @@ public:
    }
 
 
-   /// #i#-th lhs value.
+   /// \p i 'th lhs value.
    double lhs(int i) const
    {
       return SPxLP::lhs(i);
    }
 
-   /// #id#-th lhs value.
+   /// #id#'th lhs value.
    double lhs(LPSolver::RowId p_id) const
    {
       return SPxLP::lhs(*reinterpret_cast<SPxRowId*>(&p_id));
@@ -1875,13 +1825,13 @@ public:
    }
 
 
-   /// #i#-th rhs value.
+   /// \p i 'th rhs value.
    double rhs(int i) const
    {
       return SPxLP::rhs(i);
    }
 
-   /// #id#-th rhs value.
+   /// #id#'th rhs value.
    double rhs(LPSolver::RowId p_id) const
    {
       return SPxLP::rhs(*reinterpret_cast<SPxRowId*>(&p_id));
@@ -1920,13 +1870,13 @@ public:
    /// number of nonzeros of loaded LP.
    int nofNZEs() const;
 
-   /// #RowId# of #i#-th inequality.
+   /// #RowId# of \p i 'th inequality.
    LPSolver::RowId rowId(int i) const
    {
       SPxRowId p_id = rId(i);
       return *reinterpret_cast<LPSolver::RowId*>(&p_id);
    }
-   /// #ColId# of #i#-th column.
+   /// #ColId# of \p i 'th column.
    LPSolver::ColId colId(int i) const
    {
       SPxColId p_id = cId(i);

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.12 2001/12/10 15:46:48 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.13 2001/12/11 09:09:26 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -206,11 +206,11 @@ void SoPlex::init()
 
    if (!initialized)
    {
-      initialized = 1;
+      initialized = true;
       reDim();
       if (SPxBasis::status() <= NO_PROBLEM || solver() != this)
          SPxBasis::load(this);
-      initialized = 0;
+      initialized = false;
    }
    if (!matrixIsSetup)
       SPxBasis::load(desc());
@@ -274,7 +274,7 @@ void SoPlex::init()
       thepricer->load(this);
       // if(theratiotester->solver() != this)
       theratiotester->load(this);
-      initialized = 1;
+      initialized = true;
    }
 }
 
@@ -745,7 +745,7 @@ SoPlex::SoPlex(Type p_type, Representation p_rep,
    , thesimplifier (simple)
    , solveVector2 (0)
    , coSolveVector2(0)
-   , initialized (0)
+   , initialized (false)
    , cacheProductFactor(4.0)
 {
    setRep (p_rep);

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpsolver.h,v 1.4 2001/11/23 15:51:55 bzfpfend Exp $"
+#pragma ident "@(#) $Id: lpsolver.h,v 1.5 2001/12/11 09:09:26 bzfkocht Exp $"
 
 
 /**@file  lpsolver.h
@@ -54,9 +54,9 @@ namespace soplex
    dual simplex algorithm, by calling method #solve(). A termination criterion
    for the solution method can be set with method #setTermination().
    
-   An #LPSolver has a #Status associated to it, indicating what the solver knows
-   about the problem loaded to it. Most non-#const methods change the status of
-   the solver.
+   An #LPSolver has a #Status associated to it, indicating what the
+   solver knows about the problem loaded to it. Most non-#const
+   methods change the status of the solver.
    
    There are various methods available for changing the problem loaded to an
    #LPSolver. They allow to add, change or remove rows or columns of the
@@ -64,13 +64,14 @@ namespace soplex
    objective vector or the left- and right hand sides and senses of the
    constraint inequalities.
    
-   The rows and columns of the LP loaded to an #LPSolver are numbered implicitly
-   from 0 to #nofRows()-1 and 0 to #nofCols()-1, respectively. When rows or
-   columns are added to the LP, they receive indices #nofRows(), #nofRows()+1,
-   ... or #nofCols(), #nofCols()+1, ..., respectively. The indices of the first
-   rows and columns in the LP remain unchanged. When adding rows or columns, no
-   precautions with respect to memory management are required, i.e. all memory
-   is reset to the required size automatically.
+   The rows and columns of the LP loaded to an #LPSolver are numbered
+   implicitly from 0 to #nofRows()-1 and 0 to #nofCols()-1,
+   respectively. When rows or columns are added to the LP, they
+   receive indices #nofRows(), #nofRows()+1, ... or #nofCols(),
+   #nofCols()+1, ..., respectively. The indices of the first rows and
+   columns in the LP remain unchanged. When adding rows or columns, no
+   precautions with respect to memory management are required,
+   i.e. all memory is reset to the required size automatically.
    
    When removing rows or columns from the LP loaded to an #LPSolver the
    remaining rows and columns are renumbered. However, all rows or columns with
@@ -89,8 +90,7 @@ namespace soplex
    associates a unique #RowId to each row and a #ColId to each column of the
    loaded LP.  The Id of a row or column remains fixed throughout the time, the
    row or column belongs to the LP. In most methods, #RowId%s and #ColId%s may
-   be used instead of indices.
- */
+   be used instead of indices.  */
 class LPSolver
 {
 public:
@@ -119,16 +119,16 @@ public:
    };
 
    /// unique id to access columns in an #LPSolver.
-   struct ColId
+   class ColId : public DataKey
    {
-      int id;        ///< column id number.
    };
+   //   int id;        ///< column id number.
 
    /// unique id to access rows in an #LPSolver.
-   struct RowId
+   class RowId : public DataKey
    {
-      int id;        ///< row id number
    };
+   //   int id;        ///< row id number
 
    /// status of variables.
    /** A basis assigns a #VarStatus to each variable of the loaded
@@ -297,14 +297,15 @@ public:
       Either it is the last row or column, already, or the last one is moved
       to the  position (number) of the removed row or column.
       
-      When multiple rows or columns are removed with one method invocation,
-      the renumbering scheme is not specified. Instead, all such removal methods
-      provide an additional parameter \p perm. If nonzero, \p perm must point to
-      an array of #int%s of (at least) the size of the number of rows or
-      columns. After termination, #perm[i] is the permuted number of the former
-      \p i 'th row or column, or < 0, if the \p i 'th row or column has been
-      removed.
-   */
+      When multiple rows or columns are removed with one method
+      invocation, the renumbering scheme is not specified. Instead,
+      all such removal methods provide an additional parameter \p
+      perm. If nonzero, \p perm must point to an array of #int%s of
+      (at least) the size of the number of rows or columns. After
+      termination, #perm[i] is the permuted number of the former \p i
+      'th row or column, or < 0, if the \p i 'th row or column has
+      been removed.  
+    */
    //@{
    /// removes \p i 'th row.
    virtual void removeRow(int i) = 0;
@@ -377,13 +378,16 @@ public:
    /// changes the upper bound of column with #ColId \p id to \p newUpper.
    virtual void changeUpper(ColId id, double newUpper) = 0;
 
-   /// makes \p newLower the new lower bound and \p newUpper the new upper bound vector.
-   virtual void changeBounds(const Vector& newLower, const Vector& newUpper) = 0;
+   /// makes \p newLower the new lower bound and \p newUpper 
+   /// the new upper bound vector.
+   virtual void changeBounds(
+      const Vector& newLower, const Vector& newUpper) = 0;
 
    /// changes the bounds of column \p i to \p newLower and \p newUpper.
    virtual void changeBounds(int i, double newLower, double newUpper) = 0;
 
-   /// changes the bounds of column with #ColId \p id to \p newLower and \p newUpper.
+   /// changes the bounds of column with #ColId \p id to \p newLower 
+   /// and \p newUpper.
    virtual void changeBounds(ColId id, double newLower, double newUpper) = 0;
 
    /// makes \p newLhs the new left hand side vector for constraints.
@@ -404,15 +408,16 @@ public:
    /// changes the right hand side value of row with #RowId \p id to \p newRhs.
    virtual void changeRhs(RowId id, double newRhs) = 0;
 
-   /// makes \p newLhs the new left and \p newRhs the new right hand side vector for constraints.
+   /// makes \p newLhs the new left and \p newRhs 
+   /// the new right hand side vector for constraints.
    virtual void changeRange(const Vector& newLhs, const Vector& newRhs) = 0;
 
    /// changes the range values of row \p i to \p newLhs and \p newRhs.
    virtual void changeRange(int i, double newLhs, double newRhs) = 0;
 
-   /// changes the range values of row with #Rowid \p id to \p newLhs and \p newRhs.
+   /// changes the range values of row with #Rowid \p id 
+   /// to \p newLhs and \p newRhs.
    virtual void changeRange(RowId id, double newLhs, double newRhs) = 0;
-
 
    /// replaces row \p i with \p newRow.
    virtual void changeRow(int i, const LPRow& newRow) = 0;
@@ -426,16 +431,17 @@ public:
    /// replaces column with #ColId \p id with \p newCol.
    virtual void changeCol(ColId id, const LPCol& newCol) = 0;
 
-   /// changes element (\p i, \p j) of coefficient matrix A to new value \p val.
+   /// changes element (\p i, \p j) of coefficient matrix A 
+   /// to new value \p val.
    virtual void changeElement(int i, int j, double val) = 0;
 
-   /// changes element of coefficient matrix A corresponding to #RowId \p rid and #ColId \p cid to new value \p val.
+   /// changes element of coefficient matrix A corresponding 
+   /// to #RowId \p rid and #ColId \p cid to new value \p val.
    virtual void changeElement(RowId rid, ColId cid, double val) = 0;
 
    /// change optimization sense to \p sns.
    virtual void changeSense(Sense sns) = 0;
    //@}
-
 
    /**@name Accessing Loaded LP */
    //@{
@@ -538,7 +544,6 @@ public:
    /// returns optimization sense.
    virtual Sense sense() const = 0;
    //@}
-
 
    /**@name Inquiry */
    //@{

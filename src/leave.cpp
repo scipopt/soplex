@@ -13,10 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.6 2001/11/25 14:58:28 bzfkocht Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.7 2001/12/11 09:09:26 bzfkocht Exp $"
 
-
-/*      \SubSection{Updating the Basis for Leaving Variables}
+/* Updating the Basis for Leaving Variables
  */
 #include        <assert.h>
 #include        <stdio.h>
@@ -27,11 +26,6 @@
 
 namespace soplex
 {
-
-
-
-
-
 /*
     Vector |fTest| gives the feasibility test of all basic variables. For its
     compution |fVec|, |theUBbound| and |theLBbound| must be setup correctly.
@@ -483,7 +477,7 @@ int SoPlex::leave(int leaveIdx)
 {
    assert(leaveIdx < dim() && leaveIdx >= 0);
    assert(type() == LEAVE);
-   assert(initialized != 0);
+   assert(initialized);
 
    /*
        Before performing the actual basis update, we must determine, how this
