@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.25 2002/01/15 17:14:22 bzfkocht Exp $
+# $Id: Makefile,v 1.26 2002/01/16 15:39:56 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -18,7 +18,7 @@ ARCH            :=      $(shell uname -m | \
 			-e s/9000..../hppa/)
 OSTYPE		:=	$(shell uname -s | tr A-Z a-z)
 
-OPT		=	dbg
+OPT		=	opt
 
 COMP		=	gnu
 CXX		=	g++
@@ -93,7 +93,7 @@ $(BINARY):	$(OBJDIR) $(BINDIR) $(OBJXXX) $(LIBRARY)
 		-L$(LIBDIR) -l$(TARGET) $(LDFLAGS) -o $@
 
 $(LIBRARY):	$(LIBDIR) $(LIBXXX) 
-		-rm $(LIBRARY)
+		-rm -f $(LIBRARY)
 		$(AR) $(ARFLAGS) $@ $(LIBXXX) 
 		$(RANLIB) $@
 

@@ -155,7 +155,7 @@
 
  \c CC \c *.cpp 
 
- This should to the trick. Adding \c -DNDEBUG gives you a non debugging 
+ This should do the trick. Adding \c -DNDEBUG gives you a non debugging 
  version. Add flags as needed. 
 
  \section Testing Testing the Binary
