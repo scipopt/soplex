@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.6 2001/12/25 14:25:55 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.7 2001/12/26 12:04:47 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -296,21 +296,21 @@ int main(int argc, char **argv)
                 << work.basis().iteration() 
                 << std::endl;
       
-      LPSolver::Status stat = work.status();
+      SoPlex::ProbStatus stat = work.status();
 
       switch (stat)
       {
-      case LPSolver::SOLVED:
+      case SoPlex::SOLVED:
          std::cout << "solution value is: "
                    << std::setprecision(10)
                    << work.value()
                    << std::endl;
          break;
-      case LPSolver::UNBOUNDED:
+      case SoPlex::UNBOUNDED:
          std::cout << "LP is unbounded" 
                    << std::endl;
          break;
-      case LPSolver::INFEASIBLE:
+      case SoPlex::INFEASIBLE:
          std::cout << "LP is infeasible" 
                    << std::endl;
          break;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.8 2001/12/25 14:25:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.9 2001/12/26 12:04:47 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -26,16 +26,16 @@
 
 namespace soplex
 {
-LPSolver::Status SoPlex::solve()
+SoPlex::ProbStatus SoPlex::solve()
 {
    Id enterId;
    int leaveNum;
 
    if (dim() <= 0 && coDim() <= 0)          // no problem loaded
-      return LPSolver::ERROR;
+      return ERROR;
 
    if (slinSolver() == 0)             // linear system solver is required.
-      return LPSolver::ERROR;
+      return ERROR;
 
    if (thesimplifier)
    {
@@ -46,16 +46,16 @@ LPSolver::Status SoPlex::solve()
       {
       case 1:
          setStatus(SPxBasis::UNBOUNDED);
-         return LPSolver::UNBOUNDED;
+         return UNBOUNDED;
       case - 1:
          setStatus(SPxBasis::INFEASIBLE);
-         return LPSolver::INFEASIBLE;
+         return INFEASIBLE;
       default:
          break;
       }
    }
    if (thepricer == 0)                                // pricer is required.
-      return LPSolver::ERROR;
+      return ERROR;
 
    theTime.reset();
    theTime.start();
@@ -359,7 +359,7 @@ int SoPlex::terminate()
       || SPxBasis::status() <= SPxBasis::SINGULAR;
 }
 
-LPSolver::Status SoPlex::getPrimal (Vector& p_vector) const
+SoPlex::ProbStatus SoPlex::getPrimal (Vector& p_vector) const
 {
    if (!isInitialized())
       const_cast<SoPlex*>(this)->init();
@@ -405,7 +405,7 @@ LPSolver::Status SoPlex::getPrimal (Vector& p_vector) const
    return status();
 }
 
-LPSolver::Status SoPlex::getDual (Vector& p_vector) const
+SoPlex::ProbStatus SoPlex::getDual (Vector& p_vector) const
 {
    if (!isInitialized())
       const_cast<SoPlex*>(this)->init();
@@ -429,7 +429,7 @@ LPSolver::Status SoPlex::getDual (Vector& p_vector) const
    return status();
 }
 
-LPSolver::Status SoPlex::getRdCost (Vector& p_vector) const
+SoPlex::ProbStatus SoPlex::getRdCost (Vector& p_vector) const
 {
    if (!isInitialized())
       const_cast<SoPlex*>(this)->init();
@@ -467,7 +467,7 @@ LPSolver::Status SoPlex::getRdCost (Vector& p_vector) const
    return status();
 }
 
-LPSolver::Status SoPlex::getSlacks (Vector& p_vector) const
+SoPlex::ProbStatus SoPlex::getSlacks (Vector& p_vector) const
 {
    if (!isInitialized())
       const_cast<SoPlex*>(this)->init();
@@ -513,32 +513,32 @@ LPSolver::Status SoPlex::getSlacks (Vector& p_vector) const
    return status();
 }
 
-LPSolver::Status SoPlex::status() const
+SoPlex::ProbStatus SoPlex::status() const
 {
    switch (SPxBasis::status())
    {
    case SPxBasis::NO_PROBLEM :
-      return LPSolver::UNKNOWN;
+      return UNKNOWN;
    case SPxBasis::SINGULAR :
-      return LPSolver::ERROR;
+      return ERROR;
    case SPxBasis::REGULAR :
-      return LPSolver::UNKNOWN;
+      return UNKNOWN;
    case SPxBasis::DUAL :
-      return LPSolver::DUAL;
+      return DUAL;
    case SPxBasis::PRIMAL :
-      return LPSolver::PRIMAL;
+      return PRIMAL;
    case SPxBasis::OPTIMAL :
-      return LPSolver::SOLVED;
+      return SOLVED;
    case SPxBasis::UNBOUNDED :
-      return LPSolver::UNBOUNDED;
+      return UNBOUNDED;
    case SPxBasis::INFEASIBLE :
-      return LPSolver::INFEASIBLE;
+      return INFEASIBLE;
    default:
-      return LPSolver::ERROR;
+      return ERROR;
    }
 }
 
-LPSolver::Status SoPlex::getResult(
+SoPlex::ProbStatus SoPlex::getResult(
    double* p_value,
    Vector* p_primal,
    Vector* p_slacks,

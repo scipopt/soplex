@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.17 2001/12/25 16:03:24 bzfkocht Exp $
+# $Id: Makefile,v 1.18 2001/12/26 12:04:47 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -35,7 +35,7 @@ BINDIR		=	bin
 LIBDIR		=	lib
 NAME		=	soplex
 FLAGS		=       #
-LIBOBJ		= 	cachelpsolver.o changesoplex.o didxset.o \
+LIBOBJ		= 	changesoplex.o didxset.o \
 			dsvector.o dvector.o enter.o factor.o \
 			forest.o idxset.o leave.o lpcolset.o lprowset.o \
 			lprow.o nameset.o slufactor.o solve.o soplex.o \

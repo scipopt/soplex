@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.16 2001/12/25 14:57:43 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.17 2001/12/26 12:04:47 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -27,8 +27,6 @@
 
 namespace soplex
 {
-const double LPSolver::infinity = SPxLP::infinity;
-
 #define MAX(x,y)        ((x)>(y) ? (x) : (y))
 
 void SoPlex::read(std::istream& in, NameSet* rowNames, NameSet* colNames)
@@ -732,7 +730,7 @@ SoPlex::SoPlex(Type p_type, Representation p_rep,
    , thePricing(FULL)
    , maxIters (-1)
    , maxTime (-1)
-   , maxValue(LPSolver::infinity)
+   , maxValue(infinity)
    , theShift (0)
    , m_maxCycle(100)
    , m_numCycle(0)
@@ -762,8 +760,7 @@ SoPlex::SoPlex(Type p_type, Representation p_rep,
  */
 #if 0 
 SoPlex::SoPlex(const SoPlex& old)
-   : CacheLPSolver()
-   , SPxLP (old)
+   : SPxLP (old)
    , SPxBasis (old)
    , theType (old.theType)
    , thePricing (old.thePricing)
@@ -982,7 +979,7 @@ const
       *p_value = maxValue;
 }
 
-LPSolver::Status SoPlex::getBasis(signed char row[], signed char col[]) const
+SoPlex::ProbStatus SoPlex::getBasis(signed char row[], signed char col[]) const
 {
    const SPxBasis::Desc& d = desc();
    int i;
@@ -992,23 +989,23 @@ LPSolver::Status SoPlex::getBasis(signed char row[], signed char col[]) const
          switch (d.colStatus(i))
          {
          case SPxBasis::Desc::P_ON_LOWER:
-            col[i] = LPSolver::ON_LOWER;
+            col[i] = ON_LOWER;
             break;
          case SPxBasis::Desc::P_ON_UPPER:
-            col[i] = LPSolver::ON_UPPER;
+            col[i] = ON_UPPER;
             break;
          case SPxBasis::Desc::P_FIXED:
-            col[i] = LPSolver::FIXED;
+            col[i] = FIXED;
             break;
          case SPxBasis::Desc::P_FREE:
-            col[i] = LPSolver::ZERO;
+            col[i] = ZERO;
             break;
          case SPxBasis::Desc::D_ON_UPPER:
          case SPxBasis::Desc::D_ON_LOWER:
          case SPxBasis::Desc::D_ON_BOTH:
          case SPxBasis::Desc::D_UNDEFINED:
          case SPxBasis::Desc::D_FREE:
-            col[i] = LPSolver::BASIC;
+            col[i] = BASIC;
             break;
          default:
             std::cout << std::endl << "ERROR: "
@@ -1023,23 +1020,23 @@ LPSolver::Status SoPlex::getBasis(signed char row[], signed char col[]) const
          switch (d.rowStatus(i))
          {
          case SPxBasis::Desc::P_ON_LOWER:
-            row[i] = LPSolver::ON_LOWER;
+            row[i] = ON_LOWER;
             break;
          case SPxBasis::Desc::P_ON_UPPER:
-            row[i] = LPSolver::ON_UPPER;
+            row[i] = ON_UPPER;
             break;
          case SPxBasis::Desc::P_FIXED:
-            row[i] = LPSolver::FIXED;
+            row[i] = FIXED;
             break;
          case SPxBasis::Desc::P_FREE:
-            row[i] = LPSolver::ZERO;
+            row[i] = ZERO;
             break;
          case SPxBasis::Desc::D_ON_UPPER:
          case SPxBasis::Desc::D_ON_LOWER:
          case SPxBasis::Desc::D_ON_BOTH:
          case SPxBasis::Desc::D_UNDEFINED:
          case SPxBasis::Desc::D_FREE:
-            row[i] = LPSolver::BASIC;
+            row[i] = BASIC;
             break;
          default:
             std::cout << std::endl << "ERROR: "
@@ -1062,23 +1059,23 @@ void SoPlex::setBasis(const signed char p_rows[], const signed char p_cols[])
    {
       switch (p_rows[i])
       {
-      case LPSolver::FIXED :
+      case FIXED :
          assert(rhs(i) == lhs(i));
          ds.rowStatus(i) = SPxBasis::Desc::P_FIXED;
          break;
-      case LPSolver::ON_UPPER :
+      case ON_UPPER :
          assert(rhs(i) < SPxLP::infinity);
          ds.rowStatus(i) = SPxBasis::Desc::P_ON_UPPER;
          break;
-      case LPSolver::ON_LOWER :
+      case ON_LOWER :
          assert(lhs(i) > -SPxLP::infinity);
          ds.rowStatus(i) = SPxBasis::Desc::P_ON_LOWER;
          break;
-      case LPSolver::ZERO :
+      case ZERO :
          assert(lhs(i) <= -SPxLP::infinity && rhs(i) >= SPxLP::infinity);
          ds.rowStatus(i) = SPxBasis::Desc::P_FREE;
          break;
-      case LPSolver::BASIC :
+      case BASIC :
          ds.rowStatus(i) = dualRowStatus(i);
          break;
       default:
@@ -1091,23 +1088,23 @@ void SoPlex::setBasis(const signed char p_rows[], const signed char p_cols[])
    {
       switch (p_cols[i])
       {
-      case LPSolver::FIXED :
+      case FIXED :
          assert(upper(i) == lower(i));
          ds.colStatus(i) = SPxBasis::Desc::P_FIXED;
          break;
-      case LPSolver::ON_UPPER :
+      case ON_UPPER :
          assert(upper(i) < SPxLP::infinity);
          ds.colStatus(i) = SPxBasis::Desc::P_ON_UPPER;
          break;
-      case LPSolver::ON_LOWER :
+      case ON_LOWER :
          assert(lower(i) > -SPxLP::infinity);
          ds.colStatus(i) = SPxBasis::Desc::P_ON_LOWER;
          break;
-      case LPSolver::ZERO :
+      case ZERO :
          assert(lower(i) <= -SPxLP::infinity && upper(i) >= SPxLP::infinity);
          ds.colStatus(i) = SPxBasis::Desc::P_FREE;
          break;
-      case LPSolver::BASIC :
+      case BASIC :
          ds.colStatus(i) = dualColStatus(i);
          break;
       default:

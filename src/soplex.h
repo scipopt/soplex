@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.12 2001/12/25 18:03:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.13 2001/12/26 12:04:47 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -23,7 +23,6 @@
 
 #include <assert.h>
 
-#include "cachelpsolver.h"
 #include "timer.h"
 #include "spxlp.h"
 #include "spxbasis.h"
@@ -69,11 +68,13 @@ class SPxSimplifier;
    Also, #SPxLP provide all manipulation methods for the LP. They allow
    #SoPlex to be used within cutting plane algorithms. (@see Programming)
 */
-class SoPlex : public CacheLPSolver, public SPxLP, protected SPxBasis
+class SoPlex : public SPxLP, protected SPxBasis
 {
    friend class SPxFastRT;
 
 public:
+   typedef SPxSense Sense;
+
    /**@name Data Types */
    //@{
    /// LP basis representation.
@@ -156,6 +157,26 @@ public:
        */
       PARTIAL  
    };
+
+   enum VarStatus
+   {
+      ON_UPPER,   ///< variable set to its upper bound.
+      ON_LOWER,   ///< variable set to its lower bound.
+      FIXED,      ///< variable fixed to identical bounds.
+      ZERO,       ///< free variable fixed to zero.
+      BASIC       ///< variable is basic.
+   };
+   enum ProbStatus
+   {
+      UNKNOWN = 0,   ///< nothing known on loaded problem.
+      UNBOUNDED,     ///< loaded problem is unbounded.
+      INFEASIBLE,    ///< loaded problem is infeasible.
+      PRIMAL,        ///< primal (not yet optimal) solution available.
+      DUAL,          ///< dual (not yet optimal) solution available.
+      SOLVED,        ///< loaded problem has been solved.
+      ERROR          ///< an error occurred.
+   };
+
    //@}
 
 private:
@@ -336,10 +357,10 @@ public:
     *  the termination criteria is fullfilled (see #terminate()). 
     *  The #SPxStatus of the solver will indicate the reason for termination.
     */
-   LPSolver::Status solve();
+   ProbStatus solve();
 
    /// #Status of basis.
-   LPSolver::Status status() const;
+   ProbStatus status() const;
 
    /// current objective value.
    /**@return Objective value of the current solution vector 
@@ -354,7 +375,7 @@ public:
     *  to the argument \p vector. Hence, \p vector must be of dimension
     *  #nCols().
     */
-   LPSolver::Status getPrimal (Vector& vector) const;
+   ProbStatus getPrimal (Vector& vector) const;
 
    /// get vector of slack variables.
    /** This method returns the #Status of the basis.
@@ -369,7 +390,7 @@ public:
     *     matrix. Then the vector of slack variables is defined as
     *     \f$s = Ax\f$.
     */
-   LPSolver::Status getSlacks (Vector& vector) const;
+   ProbStatus getSlacks (Vector& vector) const;
 
    /// get current solution vector for dual variables.
    /** This method returns the #Status of the basis.
@@ -395,7 +416,7 @@ public:
     *       constraint is given with the standard definition, while
     *       the other constraint is implicitely set to 0.
     */
-   LPSolver::Status getDual (Vector& vector) const;
+   ProbStatus getDual (Vector& vector) const;
 
    /// get current solution vector for dual variables.
    /** This method returns the \Ref{Status} of the basis.
@@ -408,7 +429,7 @@ public:
     *  and \i A the LPs constraint matrix. Then the reduced cost vector
     *  \i r is defined as \f$r^T = c^T - d^TA\f$.
     */
-   LPSolver::Status getRdCost (Vector& vector) const;
+   ProbStatus getRdCost (Vector& vector) const;
 
    /// Termination criterion.
    /** This method is called in each Simplex iteration to determine, if
@@ -603,6 +624,7 @@ public:
       return thevectors->num();
    }
    /// number of row \p p_id.
+#if 0
    int number(SPxRowId p_id) const
    {
       return SPxLP::number(p_id);
@@ -617,7 +639,7 @@ public:
    {
       return SPxLP::number(p_id);
    }
-
+#endif
    /**@name Variables and Covariables
     *  Class #SPxLP introduces #Id%s to identify row or column data of
     *  an LP. #SoPlex uses this concept to access data with respect to the
@@ -1439,33 +1461,29 @@ protected:
    //@}
 
 public:
-   /**@name Derived from #LPSolver 
-    */
-   //@{
-
    /// adjust conditions for termination.
-   void setTermination(double time = -1, int iteration = -1, 
-      double value = LPSolver::infinity);
+   virtual void setTermination(double time = -1, int iteration = -1, 
+      double value = infinity);
 
    /// get adjusted conditions for termination.
    virtual void getTermination(double* time = 0, int* iteration = 0, 
       double* value = 0) const;
 
    /// get objective value of current solution.
-   double objValue() const
+   virtual double objValue() const
    {
       return value();
    }
 
    /// get all results of last solve.
-   LPSolver::Status getResult(double* value = 0, Vector* primal = 0,
+   ProbStatus getResult(double* value = 0, Vector* primal = 0,
       Vector* slacks = 0, Vector* dual = 0, Vector* reduCost = 0) const;
 
    /// set #LPSolver#s basis.
    void setBasis(const signed char rows[], const signed char cols[]);
 
    /// get current basis.
-   LPSolver::Status getBasis(signed char rows[], signed char cols[]) const;
+   ProbStatus getBasis(signed char rows[], signed char cols[]) const;
 
    /// get number of iterations of current solution.
    int iterations() const
@@ -1478,252 +1496,10 @@ public:
    {
       return theTime.userTime();
    }
-#if 0
-   /// add \p row to #LPSolver%s LP.
-   void addRow(const LPRow& row)
-   {
-      SPxLP::addRow(row);
-   }
-   /// add \p row to #LPSolver%s LP.
-   void addRow(LPSolver::RowId& p_id, const LPRow& p_row)
-   {
-      SPxLP::addRow( *reinterpret_cast<SPxRowId*>(&p_id), p_row);
-   }
-
-   /// add all #LPRow%s of \p p_set to #LPSolver%s LP.
-   void addRows(const LPRowSet& p_set)
-   {
-      SPxLP::addRows(p_set);
-   }
-   /// add all #LPRow%s of \p p_set to #LPSolver%s LP.
-   void addRows(LPSolver::RowId p_id[], const LPRowSet& p_set)
-   {
-      SPxLP::addRows( reinterpret_cast<SPxRowId*>(p_id), p_set);
-   }
-
-   /// add \p p_col to #LPSolver%s LP.
-   void addCol(const LPCol& col)
-   {
-      SPxLP::addCol(col);
-   }
-   /// add \p p_col to #LPSolver%s LP.
-   void addCol(LPSolver::ColId& p_id, const LPCol& p_col)
-   {
-      SPxLP::addCol(*reinterpret_cast<SPxColId*>(&p_id), p_col);
-   }
-
-   /// add all #LPCol%s of \p set to #LPSolver%s LP.
-   void addCols(const LPColSet& p_set)
-   {
-      SPxLP::addCols(p_set);
-   }
-   /// add all #LPCol%s of \p set to #LPSolver%s LP.
-   void addCols(LPSolver::ColId p_id[], const LPColSet& p_set)
-   {
-      SPxLP::addCols(reinterpret_cast<SPxColId*>(p_id), p_set);
-   }
-
-
-   /// remove \p i 'th row.
-   void removeRow(int i)
-   {
-      SPxLP::removeRow(i);
-   }
-   /// remove row with #RowId \p id.
-   void removeRow(LPSolver::RowId p_id)
-   {
-      SPxLP::removeRow(*reinterpret_cast<SPxRowId*>(&p_id));
-   }
-
-   /// remove \p i 'th column.
-   void removeCol(int i)
-   {
-      SPxLP::removeCol(i);
-   }
-   /// remove column with #LPSolver::ColId \p id.
-   void removeCol(LPSolver::ColId p_id)
-   {
-      SPxLP::removeCol(*reinterpret_cast<SPxColId*>(&p_id));
-   }
-
-   /// remove \p n rows.
-   void removeRows(LPSolver::RowId p_id[], int p_n, int p_perm[] = 0)
-   {
-      SPxLP::removeRows(reinterpret_cast<SPxRowId*>(p_id), p_n, p_perm);
-   }
-   /// remove \p n rows.
-   void removeRows(int nums[], int n, int perm[] = 0)
-   {
-      SPxLP::removeRows(nums, n, perm);
-   }
-   /// remove multiple rows.
-   void removeRows(int perm[])
-   {
-      SPxLP::removeRows(perm);
-   }
-   /// remove rows from \p start to \p end (including both).
-   void removeRowRange(int start, int end, int perm[] = 0)
-   {
-      SPxLP::removeRowRange(start, end, perm);
-   }
-
-   /// remove \p n columns.
-   void removeCols(LPSolver::ColId p_id[], int p_n, int p_perm[] = 0)
-   {
-      SPxLP::removeCols(reinterpret_cast<SPxColId*>(p_id), p_n, p_perm);
-   }
-   /// remove \p n columns.
-   void removeCols(int nums[], int n, int perm[] = 0)
-   {
-      SPxLP::removeCols(nums, n, perm);
-   }
-   /// remove multiple columns.
-   void removeCols(int perm[])
-   {
-      SPxLP::removeCols(perm);
-   }
-   /// remove columns from \p start to \p end (including both).
-   void removeColRange(int start, int end, int perm[] = 0)
-   {
-      SPxLP::removeColRange(start, end, perm);
-   }
-#endif
-
-   /// change objective value to variable with #ColId \p id.
-   void changeObj(LPSolver::ColId p_id, double p_newVal)
-   {
-      changeObj(*reinterpret_cast<SPxColId*>(&p_id), p_newVal);
-   }
-
-   /// change lower bound of variable with #ColId \p id.
-   void changeLower(LPSolver::ColId p_id, double p_newLower)
-   {
-      changeLower(*reinterpret_cast<SPxColId*>(&p_id), p_newLower);
-   }
-
-   /// change \p id 'th upper bound.
-   void changeUpper(LPSolver::ColId p_id, double p_newUpper)
-   {
-      changeUpper(*reinterpret_cast<SPxColId*>(&p_id), p_newUpper);
-   }
-
-   /// change \p id 'th lower and upper bound.
-   void changeBounds(LPSolver::ColId p_id, 
-      double p_newLower, double p_newUpper)
-   {
-      changeBounds(
-         *reinterpret_cast<SPxColId*>(&p_id), p_newLower, p_newUpper);
-   }
-
-   /// change \p id 'th lhs value.
-   void changeLhs(LPSolver::RowId p_id, double p_newLhs)
-   {
-      changeLhs(*reinterpret_cast<SPxRowId*>(&p_id), p_newLhs);
-   }
-
-   /// change \p id 'th rhs value.
-   void changeRhs(LPSolver::RowId p_id, double p_newRhs)
-   {
-      changeRhs(*reinterpret_cast<SPxRowId*>(&p_id), p_newRhs);
-   }
-
-   /// change \p id 'th lhs and rhs value.
-   void changeRange(LPSolver::RowId p_id, double p_newLhs, double p_newRhs)
-   {
-      changeRange(*reinterpret_cast<SPxRowId*>(&p_id), p_newLhs, p_newRhs);
-   }
-
-   /// change \p id 'th row of LP.
-   void changeRow(LPSolver::RowId p_id, const LPRow& p_newRow)
-   {
-      changeRow(*reinterpret_cast<SPxRowId*>(&p_id), p_newRow);
-   }
-
-   /// change \p id 'th column of LP.
-   void changeCol(LPSolver::ColId p_id, const LPCol& p_newCol)
-   {
-      changeCol(*reinterpret_cast<SPxColId*>(&p_id), p_newCol);
-   }
-
-   /// change LP element (#rid#, #cid#).
-   void changeElement(
-      LPSolver::RowId p_rid, LPSolver::ColId p_cid, double p_val)
-   {
-      changeElement(*reinterpret_cast<SPxRowId*>(&p_rid),
-                    *reinterpret_cast<SPxColId*>(&p_cid),
-                    p_val);
-   }
-
-   /// change optimization sense to #sns#.
-   void changeSense(LPSolver::Sense p_sns)
-   {
-      changeSense(SPxSense(int(p_sns)));
-   }
-
-   /// get \p i 'th row.
-   void getRow(int p_i, LPRow& p_row) const
-   {
-      SPxLP::getRow(p_i, p_row);
-   }
-
-   /// get \p id 'th row.
-   void getRow(LPSolver::RowId p_id, LPRow& p_row) const
-   {
-      SPxLP::getRow(*reinterpret_cast<SPxRowId*>(&p_id), p_row);
-   }
-
-   /// get rows #start# .. #end#.
-   void getRows(int p_start, int p_end, LPRowSet& p_set) const
-   {
-      SPxLP::getRows(p_start, p_end, p_set);
-   }
-
-   /// return const \p i 'th row if available.
-   const SVector& rowVector(int i) const
-   {
-      return SPxLP::rowVector(i);
-   }
-
-   /// return const \p id 'th row if available.
-   const SVector& rowVector(LPSolver::RowId p_id) const
-   {
-      return SPxLP::rowVector(*reinterpret_cast<SPxRowId*>(&p_id));
-   }
-
    /// return const lp's rows if available.
    const LPRowSet& rows() const
    {
       return *lprowset();
-   }
-
-   /// get \p i 'th column.
-   void getCol(int p_i, LPCol& p_column) const
-   {
-      SPxLP::getCol(p_i, p_column);
-   }
-
-   /// get \p id 'th column.
-   void getCol(LPSolver::ColId p_id, LPCol& p_column) const
-   {
-      SPxLP::getCol(*reinterpret_cast<SPxColId*>(&p_id), p_column);
-   }
-
-   /// get columns #start# .. #end#.
-   void getCols(int p_start, int p_end, LPColSet& p_set) const
-   {
-      SPxLP::getCols(p_start, p_end, p_set);
-   }
-
-   /// return const \p i 'th col if available.
-   const SVector& colVector(int i) const
-   {
-      return SPxLP::colVector(i);
-   }
-
-   /// return const \p id 'th col if available.
-   const SVector& colVector(LPSolver::ColId p_id) const
-   {
-      return SPxLP::colVector(*reinterpret_cast<SPxColId*>(&p_id));
    }
 
    /// return const lp's cols if available.
@@ -1732,88 +1508,15 @@ public:
       return *lpcolset();
    }
 
-   /// \p i 'th value of objective vector.
-   double obj(int i) const
-   {
-      return SPxLP::obj(i);
-   }
-
-   /// \p id 'th value of objective vector.
-   double obj(LPSolver::ColId p_id) const
-   {
-      return SPxLP::obj(*reinterpret_cast<SPxColId*>(&p_id));
-   }
-   ///
-   virtual const Vector& obj() const
-   {
-      return CacheLPSolver::obj();
-   }
-
-   /// copy objective vector to #obj#.
-   void getObj(Vector& p_obj) const
-   {
-      SPxLP::getObj(p_obj);
-   }
-
-   /// \p i 'th lower bound.
-   double lower(int i) const
-   {
-      return SPxLP::lower(i);
-   }
-
-   /// \p id 'th lower bound.
-   double lower(LPSolver::ColId p_id) const
-   {
-      return SPxLP::lower(*reinterpret_cast<SPxColId*>(&p_id));
-   }
-
    /// copy lower bound vector to #low#.
    void getLower(Vector& lw) const
    {
       lw = SPxLP::lower();
    }
-
-   /// return const lower bound vector.
-   const Vector& lower() const
-   {
-      return SPxLP::lower();
-   }
-
-
-   /// \p i 'th upper bound.
-   double upper(int i) const
-   {
-      return SPxLP::upper(i);
-   }
-
-   /// \p id 'th upper bound.
-   double upper(LPSolver::ColId p_id) const
-   {
-      return SPxLP::upper(*reinterpret_cast<SPxColId*>(&p_id));
-   }
-
    /// copy upper bound vector to #up#.
    void getUpper(Vector& upp) const
    {
       upp = SPxLP::upper();
-   }
-
-   /// return const upper bound vector.
-   const Vector& upper() const
-   {
-      return SPxLP::upper();
-   }
-
-   /// \p i 'th lhs value.
-   double lhs(int i) const
-   {
-      return SPxLP::lhs(i);
-   }
-
-   /// \p id 'th lhs value.
-   double lhs(LPSolver::RowId p_id) const
-   {
-      return SPxLP::lhs(*reinterpret_cast<SPxRowId*>(&p_id));
    }
 
    /// copy lhs value vector to #lhs#.
@@ -1822,40 +1525,16 @@ public:
       p_lhs = SPxLP::lhs();
    }
 
-   /// return const lhs vector.
-   const Vector& lhs() const
-   {
-      return SPxLP::lhs();
-   }
-
-   /// \p i 'th rhs value.
-   double rhs(int i) const
-   {
-      return SPxLP::rhs(i);
-   }
-
-   /// \p id 'th rhs value.
-   double rhs(LPSolver::RowId p_id) const
-   {
-      return SPxLP::rhs(*reinterpret_cast<SPxRowId*>(&p_id));
-   }
-
    /// copy rhs value vector to #rhs#.
    void getRhs(Vector& p_rhs) const
    {
       p_rhs = SPxLP::rhs();
    }
 
-   /// return const rhs vector.
-   const Vector& rhs() const
-   {
-      return SPxLP::rhs();
-   }
-
    /// optimization sense.
-   LPSolver::Sense sense() const
+   Sense sense() const
    {
-      return LPSolver::Sense(spxSense());
+      return spxSense();
    }
 
    /// number of rows of loaded LP.
@@ -1872,40 +1551,15 @@ public:
    int nofNZEs() const;
 
    /// #RowId# of \p i 'th inequality.
-   LPSolver::RowId rowId(int i) const
+   SPxRowId rowId(int i) const
    {
-      SPxRowId p_id = rId(i);
-      return *reinterpret_cast<LPSolver::RowId*>(&p_id);
+      return rId(i);
    }
    /// #ColId# of \p i 'th column.
-   LPSolver::ColId colId(int i) const
+   SPxColId colId(int i) const
    {
-      SPxColId p_id = cId(i);
-      return *reinterpret_cast<LPSolver::ColId*>(&p_id);
+      return cId(i);
    }
-
-   /// number of row #id#.
-   int number(LPSolver::RowId p_id) const
-   {
-      return number(*reinterpret_cast<SPxRowId*>(&p_id));
-   }
-   /// number of column #id#.
-   int number(LPSolver::ColId p_id) const
-   {
-      return number(*reinterpret_cast<SPxColId*>(&p_id));
-   }
-
-   /// does #LPSolver# have row with #id#.
-   int has(LPSolver::RowId p_id) const
-   {
-      return number(p_id) >= 0;
-   }
-   /// does #LPSolver# have column with #id#.
-   int has(LPSolver::ColId p_id) const
-   {
-      return number(p_id) >= 0;
-   }
-   //@}
 
    /// assignment operator.
    /// default constructor.
