@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: timer.h,v 1.2 2001/11/06 23:31:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: timer.h,v 1.3 2001/11/07 17:31:26 bzfbleya Exp $"
 
 #ifndef _TIMER_H_
 #define _TIMER_H_
@@ -413,11 +413,11 @@ inline double Timer::realTime() const
 
 
 // get accounted user, system or real time
-inline void Timer::getTimes(double *userTime,
-                            double *systemTime,
-                            double *realTime) const
+inline void Timer::getTimes(double *puserTime,
+                            double *psystemTime,
+                            double *prealTime) const
 {
-   Timer_getTimes(&timer, userTime, systemTime, realTime);
+   Timer_getTimes(&timer, puserTime, psystemTime, prealTime);
 }
 
 

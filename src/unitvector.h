@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: unitvector.h,v 1.2 2001/11/06 23:31:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: unitvector.h,v 1.3 2001/11/07 17:31:26 bzfbleya Exp $"
 
 
 #ifndef _UNITVECTOR_H_
@@ -55,10 +55,10 @@ private:
 
 public:
    ///
+   /* ARGSUSED n */
    double value(int n) const
    {
-      (void)n;
-      assert(n == 0);
+      assert( n == 0 );
       return 1;
    }
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.h,v 1.2 2001/11/06 23:31:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.h,v 1.3 2001/11/07 17:31:25 bzfbleya Exp $"
 
 
 /*      \Section{Imports}
@@ -65,7 +65,7 @@ public:
    }
    SVector& svector()
    {
-      return *((SVector*)this);
+      return static_cast<SVector&>(*this);
    }
    SVSet_DLPSV()
    {}
@@ -355,7 +355,7 @@ public:
    ///
    Key key(const SVector* svec) const
    {
-      return set.key((DLPSV*)svec);
+      return set.key(static_cast<const DLPSV*>(svec));
    }
 
    ///
@@ -367,7 +367,7 @@ public:
    ///
    int number(const SVector* svec) const
    {
-      return set.number((DLPSV*)svec);
+      return set.number(static_cast<const DLPSV*>(svec));
    }
 
 
@@ -386,7 +386,7 @@ public:
    /// is an #SVector# in the set.
    int has(const SVector* svec) const
    {
-      return set.has((DLPSV*)svec);
+      return set.has(static_cast<const DLPSV*>(svec));
    }
    //@}
 
@@ -428,14 +428,14 @@ public:
    SVSet(const SVSet& old);
 
    /// default constructor.
-   SVSet(int max = -1,
-         int memmax = -1,
-         double fac = 1.1,
-         double memFac = 1.2)
+   SVSet(int pmax = -1,
+         int pmemmax = -1,
+         double pfac = 1.1,
+         double pmemFac = 1.2)
       : DataArray < SVector::Element >
-         (0, (memmax > 0) ? memmax : 8 * ((max > 0) ? max : 8), memFac)
-         , set ((max > 0) ? max : 8)
-         , factor (fac)
+         (0, (pmemmax > 0) ? pmemmax : 8 * ((pmax > 0) ? pmax : 8), pmemFac)
+         , set ((pmax > 0) ? pmax : 8)
+         , factor (pfac)
          , memFactor (DataArray < SVector::Element > ::memFactor)
    { }
    //@}

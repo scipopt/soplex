@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.h,v 1.2 2001/11/06 23:31:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.h,v 1.3 2001/11/07 17:31:24 bzfbleya Exp $"
 
 
 #ifndef _SSVECTOR_H_
@@ -338,11 +338,11 @@ public:
 
    ///
 
-   SSVector(int dim = 0, double eps = 1e-16)
-      : DVector (dim)
-         , DIdxSet (dim + 1)
+   SSVector(int pdim = 0, double peps = 1e-16)
+      : DVector (pdim)
+         , DIdxSet (pdim + 1)
          , setupStatus(1)
-         , epsilon (eps)
+         , epsilon (peps)
    {
       Vector::clear();
    }
@@ -355,7 +355,8 @@ public:
          , setupStatus(vec.setupStatus)
          , epsilon (vec.epsilon)
    {
-      *((DIdxSet*)this) = vec;
+      DIdxSet::operator= ( vec );
+      //*((DIdxSet*)this) = vec;
    }
 
    ///
@@ -375,7 +376,7 @@ inline Vector& Vector::multAdd(double x, const SSVector& svec)
                               svec.indexMem(),
                               svec.val);
    else
-      multAdd(x, *(const Vector*)&svec);
+      multAdd(x, static_cast<const Vector&>(svec));
    return *this;
 }
 
@@ -385,7 +386,7 @@ inline Vector& Vector::assign(const SSVector& svec)
    if (svec.isSetup())
       Vector_Set0toSSVector(val, svec.size(), svec.indexMem(), svec.val);
    else
-      operator=(*(const Vector*) & svec);
+      operator= (static_cast<const Vector&>(svec));
    return *this;
 }
 
@@ -397,7 +398,7 @@ inline Vector& Vector::operator=(const SSVector& vec)
       assign(vec);
    }
    else
-      operator=(*(const Vector*) & vec);
+      operator= (static_cast<const Vector&>(vec));
    return *this;
 }
 
@@ -407,7 +408,7 @@ inline double Vector::operator*(const SSVector& v) const
    if (v.isSetup())
       return MultiplyVectorSSVector(val, v.size(), v.indexMem(), v.val);
    else
-      return operator*(*(const Vector*)&v);
+      return operator*(static_cast<const Vector&>(v));
 }
 
 } // namespace soplex

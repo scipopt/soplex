@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.2 2001/11/06 23:31:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.3 2001/11/07 17:31:21 bzfbleya Exp $"
 
 
 
@@ -45,6 +45,18 @@ static double minStab;
 //@ -----------------------------------------------------------------------------
 /*      \SubSection{Variable Status Handling}
  */
+SPxBasis::Desc::Status
+SPxBasis::dualStatus(const SPxLP::SPxColId& id) const
+{
+   return dualColStatus(static_cast<SPxLP*>(theLP)->number(id));
+}
+
+SPxBasis::Desc::Status
+SPxBasis::dualStatus(const SPxLP::SPxRowId& id) const
+{
+   return dualRowStatus(((SPxLP*)theLP)->number(id));
+}
+
 SPxBasis::Desc::Status
 SPxBasis::dualRowStatus(int i) const
 {

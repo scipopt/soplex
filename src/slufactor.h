@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.h,v 1.2 2001/11/06 23:31:02 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.h,v 1.3 2001/11/07 17:31:20 bzfbleya Exp $"
 
 #ifndef _SLUFACTOR_H_
 #define _SLUFACTOR_H_
@@ -129,7 +129,7 @@ public:
    ///
    Status status() const
    {
-      return (Status)stat;
+      return Status(stat);
    }
    ///
    double stability() const;
@@ -138,26 +138,26 @@ public:
    Status load(const SVector* vec[], int dim);
 
    ///
-   void solve2right(Vector& x, Vector& b) const;
+   void solve2right(Vector& x, Vector& b);
    ///
-   void solve2right(Vector& x, SSVector& b) const;
+   void solve2right(Vector& x, SSVector& b);
    ///
-   void solve2right(SSVector& x, Vector& b) const;
+   void solve2right(SSVector& x, Vector& b);
    ///
-   void solve2right(SSVector& x, SSVector& b) const;
+   void solve2right(SSVector& x, SSVector& b);
 
    ///
    void solveRight (Vector& x,
-                     const Vector& b) const;
+                     const Vector& b);
    ///
    void solveRight (Vector& x,
-                     const SVector& b) const;
+                     const SVector& b);
    ///
    void solveRight (SSVector& x,
-                     const Vector& b) const;
+                     const Vector& b);
    ///
    void solveRight (SSVector& x,
-                     const SVector& b) const;
+                     const SVector& b);
 
    ///
    void solveRight4update(SSVector& x,
@@ -169,32 +169,32 @@ public:
                             SSVector& rhs);
 
    ///
-   void solve2left(Vector& x, Vector& b) const;
+   void solve2left(Vector& x, Vector& b);
    ///
-   void solve2left(Vector& x, SSVector& b) const;
+   void solve2left(Vector& x, SSVector& b);
    ///
-   void solve2left(SSVector& x, Vector& b) const;
+   void solve2left(SSVector& x, Vector& b);
    ///
-   void solve2left(SSVector& x, SSVector& b) const;
+   void solve2left(SSVector& x, SSVector& b);
 
    ///
    void solveLeft (Vector& x,
-                    const Vector& b) const;
+                    const Vector& b);
    ///
    void solveLeft (Vector& x,
-                    const SVector& b) const;
+                    const SVector& b);
    ///
    void solveLeft (SSVector& x,
-                    const Vector& b) const;
+                    const Vector& b);
    ///
    void solveLeft (SSVector& x,
-                    const SVector& b) const;
+                    const SVector& b);
 
    ///
    void solveLeft (SSVector& x,
                     Vector& two,
                     const SVector& b,
-                    SSVector& rhs2) const;
+                    SSVector& rhs2);
 
    ///
    Status change(int idx, const SVector& subst, const SSVector* eta = 0);
@@ -206,9 +206,9 @@ public:
     *  memory (management overhead), but {\em must be reset to 0} when a
     *  method of #SLUFactor# is called.
     */
-   Vector& zeroVec() const
+   Vector& zeroVec() //const
    {
-      return ((SLUFactor*)this)->vec;
+      return vec; //((SLUFactor*)this)->vec;
    }
 
    ///
@@ -219,7 +219,8 @@ public:
    SLUFactor& operator=(const SLUFactor& old);
    ///
    SLUFactor(const SLUFactor& old)
-      : vec (old.vec)
+      : SLinSolver( old )
+         , vec (old.vec)
          , ssvec (old.ssvec)
          , eta (old.eta)
          , forest(old.forest)

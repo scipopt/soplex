@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcolset.h,v 1.2 2001/11/06 23:31:02 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpcolset.h,v 1.3 2001/11/07 17:31:18 bzfbleya Exp $"
 
 #ifndef _LPCOLSET_H_
 #define _LPCOLSET_H_
@@ -227,17 +227,17 @@ public:
       add(k, col);
    }
    /// add #col# to #LPColSet#.
-   void add(Key& key, const LPCol& col)
+   void add(Key& pkey, const LPCol& pcol)
    {
-      add(key, col.obj(), col.lower(),
-           col.colVector(), col.upper());
+      add(pkey, pcol.obj(), pcol.lower(),
+           pcol.colVector(), pcol.upper());
    }
 
    ///
-   void add(double obj, double lower, const SVector& colVector, double upper)
+   void add(double pobj, double plower, const SVector& pcolVector, double pupper)
    {
       Key k;
-      add(k, obj, lower, colVector, upper);
+      add(k, pobj, plower, pcolVector, pupper);
    }
    /** add #LPCol# consisting of #lower#, #colVector# and #upper# to
        #LPColSet#
@@ -265,10 +265,10 @@ public:
    }
 
    ///
-   SVector& create(int nonzeros = 0, double obj = 1, double lw = 0, double upp = 1)
+   SVector& create(int pnonzeros = 0, double pobj = 1, double plw = 0, double pupp = 1)
    {
       Key k;
-      return create(k, nonzeros, obj, lw, upp);
+      return create(k, pnonzeros, pobj, plw, pupp);
    }
    /** Create new #LPCol# with specified arguments and return a reference
        to its column vector.
@@ -367,8 +367,8 @@ public:
    }
 
    ///
-   LPColSet(int max = -1, int memmax = -1)
-      : SVSet(max, memmax), low(0), up(0), object(0)
+   LPColSet(int pmax = -1, int pmemmax = -1)
+      : SVSet(pmax, pmemmax), low(0), up(0), object(0)
    { }
    //@}
 

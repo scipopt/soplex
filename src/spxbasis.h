@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.2 2001/11/06 23:31:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.3 2001/11/07 17:31:21 bzfbleya Exp $"
 
 
 
@@ -80,7 +80,7 @@ class SPxBasis
 {
 protected:
    SoPlex* theLP;
-
+   
 public:
 
    /**@name Basis status */
@@ -348,18 +348,12 @@ public:
    /// dual #Status# for the #i#-th column variable of the loaded LP.
    Desc::Status dualColStatus(int i) const;
    /// dual #Status# for the #id#-th column variable of the loaded LP.
-   Desc::Status dualStatus(const SPxLP::SPxColId& id) const
-   {
-      return dualColStatus(((SPxLP*)theLP)->number(id));
-   }
+   Desc::Status dualStatus(const SPxLP::SPxColId& id) const;
 
    /// dual #Status# for the #i#-th row variable of the loaded LP.
    Desc::Status dualRowStatus(int i) const;
    /// dual #Status# for the #id#-th row variable of the loaded LP.
-   Desc::Status dualStatus(const SPxLP::SPxRowId& id) const
-   {
-      return dualRowStatus(((SPxLP*)theLP)->number(id));
-   }
+   Desc::Status dualStatus(const SPxLP::SPxRowId& id) const;
 
    /// dual #Status# for the #id#-th variable of the loaded LP.
    Desc::Status dualStatus(const SPxLP::Id& id) const
@@ -541,76 +535,66 @@ public:
        matrix #B# and a right handside vector #x# aligned the same way as
        the {\em vectors} of #B#.
     */
-   void solve2 (Vector& x, Vector& rhs) const
+    void solve2 (Vector& x, Vector& rhs)
+    {
+       if (!factorized) factorize();
+       factor->solve2right(x, rhs);
+    }
+    ///
+    void solve2 (Vector& x, SSVector& rhs)
+    {
+       if (!factorized) factorize();
+       factor->solve2right(x, rhs);
+    }
+   ///
+   void solve2 (SSVector& x, Vector& rhs)
    {
-      if (!factorized)
-         ((SPxBasis*)this)->SPxBasis::factorize();
+      if (!factorized) factorize();
       factor->solve2right(x, rhs);
    }
    ///
-   void solve2 (Vector& x, SSVector& rhs) const
+   void solve2 (SSVector& x, SSVector& rhs)
    {
-      if (!factorized)
-         ((SPxBasis*)this)->SPxBasis::factorize();
-      factor->solve2right(x, rhs);
-   }
-   ///
-   void solve2 (SSVector& x, Vector& rhs) const
-   {
-      if (!factorized)
-         ((SPxBasis*)this)->SPxBasis::factorize();
-      factor->solve2right(x, rhs);
-   }
-   ///
-   void solve2 (SSVector& x, SSVector& rhs) const
-   {
-      if (!factorized)
-         ((SPxBasis*)this)->SPxBasis::factorize();
+      if (!factorized) factorize();
       factor->solve2right(x, rhs);
    }
 
-   ///
-   void solve (Vector& x, const Vector& rhs) const
-   {
-      if (!factorized)
-         ((SPxBasis*)this)->SPxBasis::factorize();
-      factor->solveRight(x, rhs);
-   }
-   ///
-   void solve (Vector& x, const SVector& rhs) const
-   {
-      if (!factorized)
-         ((SPxBasis*)this)->SPxBasis::factorize();
-      factor->solveRight(x, rhs);
-   }
-   ///
-   void solve (SSVector& x, const SVector& rhs) const
-   {
-      if (!factorized)
-         ((SPxBasis*)this)->SPxBasis::factorize();
-      factor->solveRight(x, rhs);
-   }
-   ///
-   void solve (SSVector& x, const Vector& rhs) const
-   {
-      if (!factorized)
-         ((SPxBasis*)this)->SPxBasis::factorize();
-      factor->solveRight(x, rhs);
-   }
+    ///
+    void solve (Vector& x, const Vector& rhs)
+    {
+       if (!factorized) factorize();
+       factor->solveRight(x, rhs);
+    }
+    ///
+    void solve (Vector& x, const SVector& rhs)
+    {
+       if (!factorized) factorize();
+       factor->solveRight(x, rhs);
+    }
+    ///
+    void solve (SSVector& x, const SVector& rhs)
+    {
+       if (!factorized) factorize();
+       factor->solveRight(x, rhs);
+    }
+    ///
+    void solve (SSVector& x, const Vector& rhs)
+    {
+       if (!factorized) factorize();
+       factor->solveRight(x, rhs);
+    }
 
    ///
-   void solve4update(SSVector& x, const SVector& rhs) const
+   void solve4update(SSVector& x, const SVector& rhs)
    {
-      if (!factorized)
-         ((SPxBasis*)this)->SPxBasis::factorize();
+      if (!factorized) factorize();
       factor->solveRight4update(x, rhs);
    }
    ///
    void solve4update(SSVector& x, Vector& y,
-                     const SVector& rhsx, SSVector& rhsy) const
+                     const SVector& rhsx, SSVector& rhsy)
    {
-      if (!factorized)
-         ((SPxBasis*)this)->SPxBasis::factorize();
+      if (!factorized) factorize();
       factor->solve2right4update(x, y, rhsx, rhsy);
    }
 
@@ -629,69 +613,60 @@ public:
        the nonzeros of the result vector. #idx# must be allocated to fit
        enough indeces.
     */
-   void coSolve2(Vector& x, Vector& rhs) const
+   void coSolve2(Vector& x, Vector& rhs)
    {
-      if (!factorized)
-         ((SPxBasis*)this)->SPxBasis::factorize();
+      if (!factorized) factorize();
       factor->solve2left(x, rhs);
    }
    ///
-   void coSolve2(Vector& x, SSVector& rhs) const
+   void coSolve2(Vector& x, SSVector& rhs)
    {
-      if (!factorized)
-         ((SPxBasis*)this)->SPxBasis::factorize();
+      if (!factorized) factorize();
       factor->solve2left(x, rhs);
    }
    ///
-   void coSolve2(SSVector& x, Vector& rhs) const
+   void coSolve2(SSVector& x, Vector& rhs)
    {
-      if (!factorized)
-         ((SPxBasis*)this)->SPxBasis::factorize();
+      if (!factorized) factorize();
       factor->solve2left(x, rhs);
    }
    ///
-   void coSolve2(SSVector& x, SSVector& rhs) const
+   void coSolve2(SSVector& x, SSVector& rhs)
    {
-      if (!factorized)
-         ((SPxBasis*)this)->SPxBasis::factorize();
+      if (!factorized) factorize();
       factor->solve2left(x, rhs);
    }
 
    ///
-   void coSolve(Vector& x, const Vector& rhs) const
+   void coSolve(Vector& x, const Vector& rhs)
    {
-      if (!factorized)
-         ((SPxBasis*)this)->SPxBasis::factorize();
+      if (!factorized) factorize();
       factor->solveLeft(x, rhs);
    }
    ///
-   void coSolve(Vector& x, const SVector& rhs) const
+   void coSolve(Vector& x, const SVector& rhs)
    {
-      if (!factorized)
-         ((SPxBasis*)this)->SPxBasis::factorize();
+      if (!factorized) factorize();
       factor->solveLeft(x, rhs);
    }
    ///
-   void coSolve(SSVector& x, const SVector& rhs) const
+   void coSolve(SSVector& x, const SVector& rhs)
    {
-      if (!factorized)
-         ((SPxBasis*)this)->SPxBasis::factorize();
+      if (!factorized) factorize();
       factor->solveLeft(x, rhs);
    }
    ///
-   void coSolve(SSVector& x, const Vector& rhs) const
+   void coSolve(SSVector& x, const Vector& rhs)
    {
-      if (!factorized)
-         ((SPxBasis*)this)->SPxBasis::factorize();
+      if (!factorized) factorize();
       factor->solveLeft(x, rhs);
    }
 
    /// solve 2 systems in 1 call.
    void coSolve(SSVector& x, Vector& y,
-                 const SVector& rhsx, SSVector& rhsy) const
+                 const SVector& rhsx, SSVector& rhsy)
    {
-      if (!factorized)
-         ((SPxBasis*)this)->SPxBasis::factorize();
+      if (!factorized) factorize();
       factor->solveLeft(x, y, rhsx, rhsy);
    }
    //@}

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slinsolver.h,v 1.2 2001/11/06 23:31:02 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slinsolver.h,v 1.3 2001/11/07 17:31:20 bzfbleya Exp $"
 
 #ifndef _SLINSOLVER_H_
 #define _SLINSOLVER_H_
@@ -116,26 +116,26 @@ public:
     */
    //@{
    /// solve $Ax=b$ using $b$ and leaving $b=0$.
-   virtual void solve2right(Vector& x, Vector& b) const = 0;
+   virtual void solve2right(Vector& x, Vector& b) /* const */ = 0;
    /// solve $Ax=b$ using $b$ and leaving $b=0$.
-   virtual void solve2right(Vector& x, SSVector& b) const = 0;
+   virtual void solve2right(Vector& x, SSVector& b) /* const */ = 0;
    /// solve $Ax=b$ using $b$ and leaving $b=0$.
-   virtual void solve2right(SSVector& x, Vector& b) const = 0;
+   virtual void solve2right(SSVector& x, Vector& b) /* const */ = 0;
    /// solve $Ax=b$ using $b$ and leaving $b=0$.
-   virtual void solve2right(SSVector& x, SSVector& b) const = 0;
+   virtual void solve2right(SSVector& x, SSVector& b) /* const */ = 0;
 
    /// solve $Ax=b$.
    virtual void solveRight (Vector& x,
-                             const Vector& b) const = 0;
+                             const Vector& b) /* const */ = 0;
    /// solve $Ax=b$.
    virtual void solveRight (Vector& x,
-                             const SVector& b) const = 0;
+                             const SVector& b) /* const */ = 0;
    /// solve $Ax=b$.
    virtual void solveRight (SSVector& x,
-                             const Vector& b) const = 0;
+                             const Vector& b) /* const */ = 0;
    /// solve $Ax=b$.
    virtual void solveRight (SSVector& x,
-                             const SVector& b) const = 0;
+                             const SVector& b) /* const */ = 0;
 
    /** Solve $Ax=b$.
     * This method solves $Ax=b$ thereby (possibly) setting up internal data
@@ -152,31 +152,31 @@ public:
                                     SSVector& rhs) = 0;
 
    /// solve $x^TA=b$ using $b$ and leaveing $b=0$.
-   virtual void solve2left(Vector& x, Vector& b) const = 0;
+   virtual void solve2left(Vector& x, Vector& b) /* const */ = 0;
    /// solve $x^TA=b$ using $b$ and leaveing $b=0$.
-   virtual void solve2left(Vector& x, SSVector& b) const = 0;
+   virtual void solve2left(Vector& x, SSVector& b) /* const */ = 0;
    /// solve $x^TA=b$ using $b$ and leaveing $b=0$.
-   virtual void solve2left(SSVector& x, Vector& b) const = 0;
+   virtual void solve2left(SSVector& x, Vector& b) /* const */ = 0;
    /// solve $x^TA=b$ using $b$ and leaveing $b=0$.
-   virtual void solve2left(SSVector& x, SSVector& b) const = 0;
+   virtual void solve2left(SSVector& x, SSVector& b) /* const */ = 0;
 
    /// solve $x^TA=b$.
    virtual void solveLeft (Vector& x,
-                            const SVector& b) const = 0;
+                            const SVector& b) /* const */ = 0;
    /// solve $x^TA=b$.
    virtual void solveLeft (Vector& x,
-                            const Vector& b) const = 0;
+                            const Vector& b) /* const */ = 0;
    /// solve $x^TA=b$.
    virtual void solveLeft (SSVector& x,
-                            const SVector& b) const = 0;
+                            const SVector& b) /* const */ = 0;
    /// solve $x^TA=b$.
    virtual void solveLeft (SSVector& x,
-                            const Vector& b) const = 0;
+                            const Vector& b) /* const */ = 0;
    /// solve $x^TA=b$ and $x^TA=rhs2$ internally using $rhs2$.
    virtual void solveLeft (SSVector& x,
                             Vector& two,
                             const SVector& b,
-                            SSVector& rhs2) const = 0;
+                            SSVector& rhs2) /* const */ = 0;
    //@}
 
 

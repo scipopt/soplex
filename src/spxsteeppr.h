@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.h,v 1.2 2001/11/06 23:31:05 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.h,v 1.3 2001/11/07 17:31:23 bzfbleya Exp $"
 
 
 #ifndef _SPXSTEEPPR_H_
@@ -175,84 +175,47 @@ public:
    /**@name Manipulation */
    //@{
    ///
-   void changeObj(const Vector& newObj)
-   {
-      (void)newObj;
-   }
+   void changeObj(const Vector&)
+   {}
    ///
-   void changeObj(int i, double newVal)
-   {
-      (void)newVal;
-      (void)i;
-   }
+   void changeObj(int, double)
+   {}
    ///
-   void changeLower(const Vector& newLower)
-   {
-      (void)newLower;
-   }
+   void changeLower(const Vector&)
+   {}
    ///
-   void changeLower(int i, double newLower)
-   {
-      (void)i;
-      (void)newLower;
-   }
+   void changeLower(int, double)
+   {}
    ///
-   void changeUpper(const Vector& newUpper)
-   {
-      (void)newUpper;
-   }
+   void changeUpper(const Vector&)
+   {}
    ///
-   void changeUpper(int i, double newUpper)
-   {
-      (void)i;
-      (void)newUpper;
-   }
+   void changeUpper(int, double)
+   {}
    ///
-   void changeLhs(const Vector& newLhs)
-   {
-      (void)newLhs;
-   }
+   void changeLhs(const Vector&)
+   {}
    ///
-   void changeLhs(int i, double newLhs)
-   {
-      (void)i;
-      (void)newLhs;
-   }
+   void changeLhs(int, double)
+   {}
    ///
-   void changeRhs(const Vector& newRhs)
-   {
-      (void)newRhs;
-   }
+   void changeRhs(const Vector&)
+   {}
    ///
-   void changeRhs(int i, double newRhs)
-   {
-      (void)i;
-      (void)newRhs;
-   }
+   void changeRhs(int, double)
+   {}
    ///
-   void changeRow(int i, const LPRow& newRow)
-   {
-      (void)i;
-      (void)newRow;
-   }
+   void changeRow(int, const LPRow&)
+   {}
    ///
-   void changeCol(int i, const LPCol& newCol)
-   {
-      (void)i;
-      (void)newCol;
-   }
+   void changeCol(int, const LPCol&)
+   {}
    ///
-   void changeElement(int i, int j, double val)
-   {
-      (void)i;
-      (void)j;
-      (void)val;
-   }
+   void changeElement(int, int, double)
+   {}
    ///
-   void changeSense(SoPlex::Sense sns)
-   {
-      (void)sns;
-   }
+   void changeSense(SoPlex::Sense)
+   {}
    //@}
 
    /// check consistency.

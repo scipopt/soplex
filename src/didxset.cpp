@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: didxset.cpp,v 1.2 2001/11/06 23:31:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: didxset.cpp,v 1.3 2001/11/07 17:31:15 bzfbleya Exp $"
 
 
 /*      \Section{Complex Members}
@@ -28,7 +28,7 @@ void DIdxSet::setMax(int newmax)
 {
    len = (newmax < size()) ? size() : newmax;
    len = (len < 1) ? 1 : len;
-   idx = (int*)realloc(idx, len * sizeof(int));
+   idx = reinterpret_cast<int*>(realloc(idx, len * sizeof(int)));
    if (idx == 0)
    {
       std::cerr << "ERROR: DIdxSet could not reallocate memory\n";
@@ -40,33 +40,33 @@ DIdxSet::DIdxSet(const IdxSet& old)
    : IdxSet(0, 0)
 {
    len = old.size();
-   idx = (int*)malloc(len * sizeof(int));
+   idx = reinterpret_cast<int*>(malloc(len * sizeof(int)));
    if (idx == 0)
    {
       std::cerr << "ERROR: DIdxSet could not allocate memory\n";
       exit(-1);
    }
-   *(IdxSet*)this = (IdxSet&)old;
+   IdxSet::operator= ( old );
 }
 
 DIdxSet::DIdxSet(const DIdxSet& old)
    : IdxSet(0, 0)
 {
    len = old.size();
-   idx = (int*)malloc(len * sizeof(int));
+   idx = reinterpret_cast<int*>(malloc(len * sizeof(int)));
    if (idx == 0)
    {
       std::cerr << "ERROR: DIdxSet could not allocate memory\n";
       exit(-1);
    }
-   *(IdxSet*)this = (IdxSet&)old;
+   IdxSet::operator= ( old );
 }
 
 DIdxSet::DIdxSet(int n)
    : IdxSet()
 {
    len = (n < 1) ? 1 : n;
-   idx = (int*)malloc(len * sizeof(int));
+   idx = reinterpret_cast<int*>(malloc(len * sizeof(int)));
    if (idx == 0)
    {
       std::cerr << "ERROR: DIdxSet could not allocate memory\n";

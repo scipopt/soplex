@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprow.h,v 1.2 2001/11/06 23:31:02 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprow.h,v 1.3 2001/11/07 17:31:18 bzfbleya Exp $"
 
 
 #ifndef _LPROW_H_
@@ -154,8 +154,8 @@ public:
    /** Construct #LPRow# with the given left-hand side, right-hand side
        and rowVector.
     */
-   LPRow(double lhs, const SVector& rowVector, double rhs)
-      : left(lhs), right(rhs), vec(rowVector)
+   LPRow(double plhs, const SVector& prowVector, double prhs)
+      : left(plhs), right(prhs), vec(prowVector)
    {}
 
    /** Construct #LPRow# from passed #rowVector#, #type# and #value#

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idxset.cpp,v 1.2 2001/11/06 23:31:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: idxset.cpp,v 1.3 2001/11/07 17:31:17 bzfbleya Exp $"
 
 
 /*      \Section{Complex Members}
@@ -28,10 +28,10 @@ namespace soplex
  */
 int IdxSet::dim() const
 {
-   int dim = -1;
+   int ddim = -1;
    for (int i = 0; i < size(); ++i)
-      dim = (idx[i] > dim) ? idx[i] : dim;
-   return dim -1;
+      ddim = (idx[i] > ddim) ? idx[i] : ddim;
+   return ddim -1;
 }
 
 int IdxSet::number(int i) const
@@ -57,9 +57,9 @@ void IdxSet::add(int n, const int i[])
 void IdxSet::toFront(int n)
 {
    assert(n >= 0 && n < size());
-   int idx = index(0);
+   int iidx = index(0);
    index(0) = index(n);
-   index(n) = idx;
+   index(n) = iidx;
 }
 
 void IdxSet::remove(int n, int m)

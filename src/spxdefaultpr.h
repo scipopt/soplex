@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultpr.h,v 1.2 2001/11/06 23:31:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefaultpr.h,v 1.3 2001/11/07 17:31:21 bzfbleya Exp $"
 
 
 #ifndef _SPXDEFAULTPR_H_
@@ -73,9 +73,9 @@ public:
    }
 
    ///
-   void load(SoPlex* solver)
+   void load(SoPlex* p_solver)
    {
-      thesolver = solver;
+      thesolver = p_solver;
    }
 
    ///
@@ -85,152 +85,93 @@ public:
    }
 
    ///
-   void setType(SoPlex::Type tp)
-   {
-      (void)tp;
-   }
+   void setType(SoPlex::Type)
+   {}
    ///
-   void setRep(SoPlex::Representation rep)
-   {
-      (void)rep;
-   }
+   void setRep(SoPlex::Representation)
+   {}
 
    ///
    int selectLeave(double& bst, int start, int incr);
    ///
    int selectLeave();
    ///
-   void left4(int n, SoPlex::Id id)
-   {
-      (void)n;
-      (void)id;
-   }
+   void left4(int, SoPlex::Id)
+   {}
 
    ///
    SoPlex::Id selectEnter(double& bst, int start1, int incr1, int start2, int incr2);
    ///
    SoPlex::Id selectEnter();
    ///
-   void entered4(SoPlex::Id id, int n)
-   {
-      (void)n;
-      (void)id;
-   }
+   void entered4(SoPlex::Id, int)
+   {}
 
 
    ///
-   void addedVecs (int n)
-   {
-      (void)n;
-   }
+   void addedVecs (int)
+   {}
    ///
-   void addedCoVecs(int n)
-   {
-      (void)n;
-   }
+   void addedCoVecs(int)
+   {}
 
 
    ///
-   void removedVec(int i)
-   {
-      (void)i;
-   }
+   void removedVec(int)
+   {}
    ///
-   void removedVecs(const int perm[])
-   {
-      (void)perm;
-   }
+   void removedVecs(const int[])
+   {}
    ///
-   void removedCoVec(int i)
-   {
-      (void)i;
-   }
+   void removedCoVec(int)
+   {}
    ///
-   void removedCoVecs(const int perm[])
-   {
-      (void)perm;
-   }
+   void removedCoVecs(const int[])
+   {}
 
 
    ///
-   void changeObj(const Vector& newObj)
-   {
-      (void)newObj;
-   }
+   void changeObj(const Vector&)
+   {}
    ///
-   void changeObj(int i, double newVal)
-   {
-      (void)newVal;
-      (void)i;
-   }
+   void changeObj(int, double)
+   {}
    ///
-   void changeLower(const Vector& newLower)
-   {
-      (void)newLower;
-   }
+   void changeLower(const Vector&)
+   {}
    ///
-   void changeLower(int i, double newLower)
-   {
-      (void)i;
-      (void)newLower;
-   }
+   void changeLower(int, double)
+   {}
    ///
-   void changeUpper(const Vector& newUpper)
-   {
-      (void)newUpper;
-   }
+   void changeUpper(const Vector&)
+   {}
    ///
-   void changeUpper(int i, double newUpper)
-   {
-      (void)i;
-      (void)newUpper;
-   }
+   void changeUpper(int, double)
+   {}
    ///
-   void changeLhs(const Vector& newLhs)
-   {
-      (void)newLhs;
-   }
+   void changeLhs(const Vector&)
+   {}
    ///
-   void changeLhs(int i, double newLhs)
-   {
-      (void)i;
-      (void)newLhs;
-   }
+   void changeLhs(int, double)
+   {}
    ///
-   void changeRhs(const Vector& newRhs)
-   {
-      (void)newRhs;
-   }
+   void changeRhs(const Vector&)
+   {}
    ///
-   void changeRhs(int i, double newRhs)
-   {
-      (void)i;
-      (void)newRhs;
-   }
+   void changeRhs(int, double)
+   {}
    ///
-   void changeRow(int i, const LPRow& newRow)
-   {
-      (void)i;
-      (void)newRow;
-   }
+   void changeRow(int, const LPRow&)
+   {}
    ///
-   void changeCol(int i, const LPCol& newCol)
-   {
-      (void)i;
-      (void)newCol;
-   }
+   void changeCol(int, const LPCol&)
+   {}
    ///
-   void changeElement(int i, int j, double val)
-   {
-      (void)i;
-      (void)j;
-      (void)val;
-   }
+   void changeElement(int, int, double)
+   {}
    ///
-   void changeSense(SoPlex::Sense sns)
-   {
-      (void)sns;
-   }
+   void changeSense(SoPlex::Sense)
+   {}
 };
 
 

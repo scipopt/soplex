@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dvector.cpp,v 1.2 2001/11/06 23:31:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dvector.cpp,v 1.3 2001/11/07 17:31:16 bzfbleya Exp $"
 
 
 /*  \Section{Complex Methods}
@@ -84,7 +84,8 @@ DVector operator*(const Vector& v, double x)
 void DVector::reSize(int newsize)
 {
    assert(newsize >= dim());
-   mem = (double*)realloc(mem, ((newsize > 0) ? newsize : 1) * sizeof(double));
+   mem = reinterpret_cast<double*>(realloc(mem, ((newsize > 0) ? newsize : 1)
+                                           * sizeof(double)));
    val = mem;
    memsize = newsize;
    if (mem == 0)
@@ -97,7 +98,8 @@ void DVector::reSize(int newsize)
 void DVector::reSize(int newsize, int newdim)
 {
    assert(newsize >= newdim);
-   mem = (double*)realloc(mem, ((newsize > 0) ? newsize : 1) * sizeof(double));
+   mem = reinterpret_cast<double*>(realloc(mem, ((newsize > 0) ? newsize : 1)
+                                           * sizeof(double)));
    val = mem;
    memsize = newsize;
    dimen = newdim;
@@ -161,7 +163,7 @@ DVector::DVector(const Vector& old)
 {
    dimen = old.dim();
    memsize = dimen;
-   mem = (double*)malloc(memsize * sizeof(double));
+   mem = reinterpret_cast<double*>(malloc(memsize * sizeof(double)));
    val = mem;
    *this = old;
    if (mem == 0)
@@ -176,7 +178,7 @@ DVector::DVector(const DVector& old)
 {
    dimen = old.dim();
    memsize = old.memsize;
-   mem = (double*)malloc(memsize * sizeof(double));
+   mem = reinterpret_cast<double*>(malloc(memsize * sizeof(double)));
    val = mem;
    *this = old;
    if (mem == 0)
@@ -186,13 +188,13 @@ DVector::DVector(const DVector& old)
    }
 }
 
-DVector::DVector(int dim)
+DVector::DVector(int p_dim)
    : Vector(0, 0)
 {
-   memsize = (dim > 0) ? dim : 4;
-   mem = (double*)malloc(memsize * sizeof(double));
+   memsize = (p_dim > 0) ? p_dim : 4;
+   mem = reinterpret_cast<double*>(malloc(memsize * sizeof(double)));
    val = mem;
-   dimen = dim;
+   dimen = p_dim;
    if (mem == 0)
    {
       std::cerr << "ERROR: DVector could not allocate memory\n";

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultrt.h,v 1.2 2001/11/06 23:31:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefaultrt.h,v 1.3 2001/11/07 17:31:22 bzfbleya Exp $"
 
 #ifndef _SPXDEFAULTRT_H_
 #define _SPXDEFAULTRT_H_
@@ -69,9 +69,9 @@ public:
    }
 
    ///
-   void load(SoPlex* solver)
+   void load(SoPlex* p_solver)
    {
-      thesolver = solver;
+      thesolver = p_solver;
    }
 
    ///

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datahashtable.h,v 1.2 2001/11/06 23:31:00 bzfkocht Exp $"
+#pragma ident "@(#) $Id: datahashtable.h,v 1.3 2001/11/07 17:31:15 bzfbleya Exp $"
 
 #ifndef _DATAHAHSTABLE_H_
 #define _DATAHAHSTABLE_H_
@@ -102,7 +102,7 @@ private:
    int thenum;                         // current number of entries
    int (*hashval) (const HashItem*);   // pointer to hash function
    double factor;                         // memory increment factor
-   int theCurrent;                     // index for iterator.
+   mutable int theCurrent;               // index for iterator.
 
    /*  Compute a good hashsize as the product of all prime numbers not dividors
        of size() that are <= the maximum dividor of size().
@@ -236,27 +236,27 @@ public:
    /// return first #Item# in hash table and set marker to it.
    const HashItem* first() const
    {
-      *(int*)&theCurrent = -1;
+      theCurrent = -1;
       return next();
    }
    /// return last #Item# in hash table and set marker to it.
    const HashItem* last() const
    {
-      *(int*)&theCurrent = element.size();
+      theCurrent = element.size();
       return prev();
    }
    /// return #Item# following current marker thereby increasing marker.
    const HashItem* next() const
    {
       if (theCurrent < 0)
-         *(int*)&theCurrent = -1;
-      while (++*(int*)&theCurrent < element.size())
+         theCurrent = -1;
+      while (++theCurrent < element.size())
       {
          if (element[theCurrent].status
               == DataHashTable_Element < HashItem, Info > ::USED)
             return &element[theCurrent].item;
       }
-      *(int*)&theCurrent = -1;
+      theCurrent = -1;
       return 0;
    }
    /// return #Item# referenced by current marker.
@@ -268,8 +268,8 @@ public:
    const HashItem* prev() const
    {
       if (theCurrent > element.size())
-         *(int*)&theCurrent = element.size();
-      while (--*(int*)&theCurrent >= 0)
+         theCurrent = element.size();
+      while (--theCurrent >= 0)
       {
          if (element[theCurrent].status
               == DataHashTable_Element < HashItem, Info > ::USED)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.cpp,v 1.2 2001/11/06 23:31:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.cpp,v 1.3 2001/11/07 17:31:24 bzfbleya Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -93,7 +93,7 @@ SVector* SVSet::create(int idxmax)
    {
       ps = list.last();
       removeLast(ps->max() - ps->size());
-      ps->max() = ps->size();
+      ps->set_max( ps->size() );
    }
 
    if (idxmax < 0)

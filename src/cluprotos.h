@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: cluprotos.h,v 1.2 2001/11/06 23:31:00 bzfkocht Exp $"
+#pragma ident "@(#) $Id: cluprotos.h,v 1.3 2001/11/07 17:31:14 bzfbleya Exp $"
 
 
 #ifndef _CLUPROTOS_H_
@@ -74,7 +74,7 @@ int solveLeft2(CLUFactor* fac,
 int updateCLUFactor (CLUFactor*, int, double*, const int*, int);
 int updateCLUFactorNoClear(CLUFactor*, int, const double*, const int*, int);
 int forestUpdateCLUFactor (CLUFactor* fac, int col, double* work, int n, int *nonz);
-int CLUFactorIsConsistent (CLUFactor*);
+int CLUFactorIsConsistent (const CLUFactor*);
 
 void solveLright(CLUFactor* fac, double* vec);
 
@@ -115,7 +115,7 @@ void remaxCol(CLUFactor*, int, int);
 int makeLvec(CLUFactor*, int, int);
 void packRows(CLUFactor* fac);
 
-void dumpCLUFactor(CLUFactor* fac);
+void dumpCLUFactor(const CLUFactor* fac);
 
 void* Malloc (int);
 void* Realloc (void*, int);

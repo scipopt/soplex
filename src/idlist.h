@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idlist.h,v 1.2 2001/11/06 23:31:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: idlist.h,v 1.3 2001/11/07 17:31:17 bzfbleya Exp $"
 
 
 #ifndef _IDLIST_H_
@@ -106,25 +106,25 @@ public:
    /// return first element in list.
    T* first() const
    {
-      return (T*)the_first;
+      return static_cast<T*>(the_first);
    }
 
    /// return last element in list.
    T* last() const
    {
-      return (T*)the_last;
+      return static_cast<T*>(the_last);
    }
 
    /// return successor of #elem#.
    T* next(const T *elem) const
    {
-      return (elem == last()) ? 0 : (T*)(elem->next());
+      return (elem == last()) ? 0 : static_cast<T*>(elem->next());
    }
 
    /// return predecessor of #elem#.
    T* prev(const T *elem) const
    {
-      return (elem == first()) ? 0 : (T*)(elem->prev());
+      return (elem == first()) ? 0 : static_cast<T*>(elem->prev());
    }
    //@}
 
@@ -280,7 +280,7 @@ public:
          IsList<T>::move(delta);
          for (elem = last(); elem; elem = prev(elem))
             if (elem != first())
-               elem->prev() = (T*)(delta + long(elem->prev()));
+               elem->prev() = reinterpret_cast<T*>(delta + long(elem->prev()));
       }
    }
 
@@ -296,12 +296,12 @@ public:
       if (start)
       {
          assert(find(start));
-         part.the_first = (T*)start;
+         part.the_first = static_cast<T*>(start);
       }
       if (end)
       {
          assert(part.find(end));
-         part.the_last = (T*)end;
+         part.the_last = static_cast<T*>(end);
       }
       return part;
    }
@@ -311,8 +311,8 @@ public:
        providing a #first# and a #last# element. Element #last# must be a
        successor of #first#.
     */
-   IdList(T* first = 0, T* last = 0)
-      : IsList<T>(first, last)
+   IdList(T* pfirst = 0, T* plast = 0)
+      : IsList<T>(pfirst, plast)
    {}
 
    ///

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.4 2001/11/07 13:47:51 bzfkocht Exp $
+# $Id: Makefile,v 1.5 2001/11/07 17:31:14 bzfbleya Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -65,6 +65,7 @@ GCCWARN		=	-Wall -W -Wpointer-arith -Wbad-function-cast \
 			-Wcast-qual -Wold-style-cast -Wshadow 
 #			-Weffc++ -Wredundant-decls    
 
+#GCCWARN =
 #-----------------------------------------------------------------------------
 include make/make.$(OSTYPE).$(ARCH).$(COMP).$(OPT)
 #-----------------------------------------------------------------------------

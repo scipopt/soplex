@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.2 2001/11/06 23:31:05 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.3 2001/11/07 17:31:23 bzfbleya Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -336,7 +336,7 @@ int SPxSteepPR::selectLeave()
    if (lastIdx >= 0)
    {
       thesolver->basis().coSolve(thesolver->coPvec().delta(),
-                                  thesolver->unitVector(lastIdx));
+                                 thesolver->unitVector(lastIdx));
       workRhs.epsilon = accuracy;
       workRhs.setup_and_assign(thesolver->coPvec().delta());
       thesolver->setup4solve(&workVec, &workRhs);

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: islist.h,v 1.2 2001/11/06 23:31:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: islist.h,v 1.3 2001/11/07 17:31:17 bzfbleya Exp $"
 
 
 #ifndef _ISLIST_H_
@@ -291,7 +291,7 @@ public:
     */
    T* next(const T *elem) const
    {
-      return (elem == the_last) ? 0 : (T*)(elem->next());
+      return (elem == the_last) ? 0 : static_cast<T*>(elem->next());
    }
 
    /// return nr. of elements in #IsList#.
@@ -333,12 +333,12 @@ public:
       if (start)
       {
          assert(find(start));
-         part.the_first = (T *)start;
+         part.the_first = /*(T *)*/start;
       }
       if (end)
       {
          assert(part.find(end));
-         part.the_last = (T *)end;
+         part.the_last = /*(T *)*/end;
       }
       return part;
    }
@@ -360,11 +360,11 @@ public:
       if (the_first)
       {
          T* elem;
-         the_last = (T*)(delta + long(the_last));
-         the_first = (T*)(delta + long(the_first));
+         the_last  = reinterpret_cast<T*>(delta + long(the_last));
+         the_first = reinterpret_cast<T*>(delta + long(the_first));
          for (elem = first(); elem; elem = next(elem))
             if (elem != last())
-               elem->next() = (T*)(delta + long(elem->next()));
+               elem->next() = reinterpret_cast<T*>(delta + long(elem->next()));
       }
    }
 
@@ -373,13 +373,13 @@ public:
        specifying a #first# and #last# element. Then #last# must be a
        successor of #first#.
     */
-   IsList(T* first = 0, T* last = 0)
-      : the_first(first), the_last(last)
+   IsList(T* pfirst = 0, T* plast = 0)
+      : the_first(pfirst), the_last(plast)
    {
-      if (first)
+      if (pfirst)
       {
-         assert(last);
-         assert(find(last));
+         assert(plast);
+         assert(find(plast));
       }
    }
 

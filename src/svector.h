@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.h,v 1.2 2001/11/06 23:31:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svector.h,v 1.3 2001/11/07 17:31:24 bzfbleya Exp $"
 
 #ifndef _SVECTOR_H_ 
 #define _SVECTOR_H_
@@ -177,7 +177,7 @@ public:
    /// maximal number indeces.
    int max() const
    {
-      return *(int*)&(elem[ -1].val);
+      return int(elem[ -1].val);
    }
 
    /// maximal index.
@@ -331,10 +331,10 @@ public:
       assert(elem);
       return elem[ -1].idx;
    }
-   int& max()
+   void set_max(int m)
    {
       assert(elem);
-      return *(int*)(&elem[ -1].val);
+      elem[ -1].val = m;
    }
    void setMem(int n, Element* elmem)
    {
@@ -345,7 +345,7 @@ public:
          elmem->val = 0;        // for purify to shut up
          elem = &(elmem[1]);
          size() = 0;
-         max() = n - 1;
+         set_max( n - 1 );
       }
       else
          elem = 0;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.2 2001/11/06 23:31:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.3 2001/11/07 17:31:18 bzfbleya Exp $"
 
 
 /*      \SubSection{Updating the Basis for Leaving Variables}
@@ -458,7 +458,7 @@ void SoPlex::rejectLeave(
    int leaveNum,
    Id leaveId,
    SPxBasis::Desc::Status leaveStat,
-   const SVector* newVec
+   const SVector* //newVec
 )
 {
    SPxBasis::Desc& ds = desc();

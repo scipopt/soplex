@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcol.h,v 1.2 2001/11/06 23:31:02 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpcol.h,v 1.3 2001/11/07 17:31:18 bzfbleya Exp $"
 
 
 #ifndef _LPCOL_H_
@@ -124,8 +124,8 @@ public:
        Construct #LPCol# with the given objective value #obj#, a column
        vector #vec#, upper bound #upper# and lower bound #lower#.
     */
-   LPCol(double obj, const SVector& vector, double upper, double lower)
-      : up(upper), low(lower), object(obj), vec(vector)
+   LPCol(double pobj, const SVector& pvector, double pupper, double plower)
+      : up(pupper), low(plower), object(pobj), vec(pvector)
    { }
 
    ///

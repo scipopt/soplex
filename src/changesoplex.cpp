@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: changesoplex.cpp,v 1.2 2001/11/06 23:31:00 bzfkocht Exp $"
+#pragma ident "@(#) $Id: changesoplex.cpp,v 1.3 2001/11/07 17:31:14 bzfbleya Exp $"
 
 
 /*  Import system include files
@@ -56,20 +56,20 @@ void SoPlex::localAddRows(int start)
             setEnterBound4Row(i, i);
             computeEnterCoPrhs4Row(i, i);
             // init #theFrhs[i]#:
-            double& rhs = (*theFrhs)[i];
-            const SVector& row = ((const SoPlex*)this)->rowVector(i);
-            rhs = 0;
+            double& v_rhs = (*theFrhs)[i];
+            const SVector& row = rowVector(i); // ((const SoPlex*)this)->rowVector(i);
+            v_rhs = 0;
             for (int j = row.size() - 1; j >= 0; --j)
             {
                int idx = row.index(j);
                switch (ds.colStatus(idx))
                {
                case Desc::P_ON_UPPER:
-                  rhs += row.value(j) * theUCbound[idx];
+                  v_rhs += row.value(j) * theUCbound[idx];
                   break;
                case Desc::P_ON_LOWER:
                case Desc::P_FIXED:
-                  rhs += row.value(j) * theLCbound[idx];
+                  v_rhs += row.value(j) * theLCbound[idx];
                   break;
                default:
                   break;
@@ -130,20 +130,20 @@ void SoPlex::localAddRows(int start)
             setLeaveBound4Row(i, i);
             computeLeaveCoPrhs4Row(i, i);
             // init #theFrhs[i]#
-            double& rhs = (*theFrhs)[i];
-            const SVector& row = ((const SoPlex*)this)->rowVector(i);
-            rhs = 0;
+            double& v_rhs = (*theFrhs)[i];
+            const SVector& row = rowVector(i); //((const SoPlex*)this)->rowVector(i);
+            v_rhs = 0;
             for (int j = row.size() - 1; j >= 0; --j)
             {
                int idx = row.index(j);
                switch (ds.colStatus(idx))
                {
                case Desc::P_ON_UPPER:
-                  rhs += row.value(j) * SPxLP::upper(idx);
+                  v_rhs += row.value(j) * SPxLP::upper(idx);
                   break;
                case Desc::P_ON_LOWER:
                case Desc::P_FIXED:
-                  rhs += row.value(j) * SPxLP::lower(idx);
+                  v_rhs += row.value(j) * SPxLP::lower(idx);
                   break;
                default:
                   break;

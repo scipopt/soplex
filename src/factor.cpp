@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.2 2001/11/06 23:31:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.3 2001/11/07 17:31:16 bzfbleya Exp $"
 
 
 #include <stdio.h>
@@ -103,15 +103,15 @@ static Pring *col,            /* column index handlers for double linked list */
 *rowNZ;         /* same for rows */
 
 
-static void newTmp(int dim)
+static void newTmp(int p_dim)
 {
-   s_max = (double*)Malloc(dim * sizeof(double));
+   s_max = reinterpret_cast<double*>(Malloc(p_dim * sizeof(double)));
    assert(s_max);
 
-   s_cact = (int *)Malloc(dim * sizeof(int));
+   s_cact = reinterpret_cast<int*>(Malloc(p_dim * sizeof(int)));
    assert(s_cact);
 
-   s_mark = (int *)Malloc(dim * sizeof(int));
+   s_mark = reinterpret_cast<int*>(Malloc(p_dim * sizeof(int)));
    assert(s_mark);
 }
 
@@ -136,8 +136,10 @@ static void minRowMem(int size)
    if (fac->u.row.size < size)
    {
       fac->u.row.size = size;
-      fac->u.row.val = (double*)Realloc(fac->u.row.val, size * sizeof(double));
-      fac->u.row.idx = (int *)Realloc(fac->u.row.idx, size * sizeof(int));
+      fac->u.row.val = reinterpret_cast<double*>(Realloc(fac->u.row.val, 
+                                                         size * sizeof(double)));
+      fac->u.row.idx = reinterpret_cast<int*>(Realloc(fac->u.row.idx, 
+                                                      size * sizeof(int)));
       assert(fac->u.row.idx);
       assert(fac->u.row.val);
       ridx = fac->u.row.idx;
@@ -154,7 +156,7 @@ static void minColMem(int size)
    if (fac->u.col.size < size)
    {
       fac->u.col.size = size;
-      fac->u.col.idx = (int *)Realloc(fac->u.col.idx, size * sizeof(int));
+      fac->u.col.idx = reinterpret_cast<int*>(Realloc(fac->u.col.idx, size * sizeof(int)));
       assert(fac->u.col.idx);
       cidx = fac->u.col.idx;
    }
@@ -166,41 +168,44 @@ static void minColMem(int size)
  *      Make new Lvector to fit len nonzeros.
  *      return index to the 
  */
-static void minLMem(CLUFactor *fac, int size)
+static void minLMem(CLUFactor *p_fac, int size)
 {
-   if (size > fac->l.size)
+   if (size > p_fac->l.size)
    {
-      fac->l.size = int(0.2 * fac->l.size + size);
-      fac->l.val = (double*)Realloc(fac->l.val, fac->l.size * sizeof(double));
-      fac->l.idx = (int *)Realloc(fac->l.idx, fac->l.size * sizeof(int));
-      assert(fac->l.idx);
-      assert(fac->l.val);
-      lidx = fac->l.idx;
-      lval = fac->l.val;
+      p_fac->l.size = int(0.2 * p_fac->l.size + size);
+      p_fac->l.val = reinterpret_cast<double*>(Realloc(p_fac->l.val, 
+                                                       p_fac->l.size * sizeof(double)));
+      p_fac->l.idx = reinterpret_cast<int*>(Realloc(p_fac->l.idx, 
+                                                    p_fac->l.size * sizeof(int)));
+      assert(p_fac->l.idx);
+      assert(p_fac->l.val);
+      lidx = p_fac->l.idx;
+      lval = p_fac->l.val;
    }
 }
 
-int makeLvec(CLUFactor* fac, int len, int row)
+int makeLvec(CLUFactor* p_fac, int p_len, int p_row)
 {
-   int* lrow = fac->l.row;
-   int* lbeg = fac->l.start;
-   int first = lbeg[fac->l.firstUnused];
+   int* p_lrow = p_fac->l.row;
+   int* p_lbeg = p_fac->l.start;
+   int first = p_lbeg[p_fac->l.firstUnused];
 
-   if (fac->l.firstUnused >= fac->l.startSize)
+   if (p_fac->l.firstUnused >= p_fac->l.startSize)
    {
-      fac->l.startSize += 100;
-      fac->l.start = (int *)Realloc(fac->l.start, fac->l.startSize * sizeof(int));
-      lbeg = fac->l.start;
+      p_fac->l.startSize += 100;
+      p_fac->l.start = reinterpret_cast<int*>(Realloc(p_fac->l.start, 
+                                                      p_fac->l.startSize * sizeof(int)));
+      p_lbeg = p_fac->l.start;
    }
 
-   assert(len > 0 && "ERROR: no empty columns allowed in L vectors");
+   assert(p_len > 0 && "ERROR: no empty columns allowed in L vectors");
 
-   minLMem(fac, first + len);
-   lrow[fac->l.firstUnused] = row;
-   lbeg[++(fac->l.firstUnused)] = first + len;
+   minLMem(p_fac, first + p_len);
+   p_lrow[p_fac->l.firstUnused] = p_row;
+   lbeg[++(p_fac->l.firstUnused)] = first + p_len;
 
-   assert(lbeg[fac->l.firstUnused] <= fac->l.size);
-   assert(fac->l.firstUnused <= fac->l.startSize);
+   assert(lbeg[p_fac->l.firstUnused] <= p_fac->l.size);
+   assert(p_fac->l.firstUnused <= p_fac->l.startSize);
    return first;
 }
 
@@ -218,22 +223,22 @@ static void initPerm()
       p_or[i] = p_pr[i] = p_oc[i] = p_pc[i] = -1;
 }
 
-static void setPivot(int stage, int col, int row, double val)
+static void setPivot(int p_stage, int p_col, int p_row, double val)
 {
    /*@
-   assert(printf("%5d:   (%3d, %3d) = %g\n", stage, row, col, val) || 1);
+   assert(printf("%5d:   (%3d, %3d) = %g\n", p_stage, p_row, p_col, val) || 1);
    */
-   assert(fac->row.perm[row] < 0);
-   assert(fac->col.perm[col] < 0);
-   fac->row.orig[stage] = row;
-   fac->col.orig[stage] = col;
-   fac->row.perm[row] = stage;
-   fac->col.perm[col] = stage;
-   diag[row] = 1 / val;
-   if (diag[row] > fac->maxabs)
-      fac->maxabs = diag[row];
-   else if (-diag[row] > fac->maxabs)
-      fac->maxabs = -diag[row];
+   assert(fac->row.perm[p_row] < 0);
+   assert(fac->col.perm[p_col] < 0);
+   fac->row.orig[p_stage] = p_row;
+   fac->col.orig[p_stage] = p_col;
+   fac->row.perm[p_row] = p_stage;
+   fac->col.perm[p_col] = p_stage;
+   diag[p_row] = 1 / val;
+   if (diag[p_row] > fac->maxabs)
+      fac->maxabs = diag[p_row];
+   else if (-diag[p_row] > fac->maxabs)
+      fac->maxabs = -diag[p_row];
 }
 
 
@@ -412,7 +417,7 @@ static void colSingletons(void)
 {
    int i, j, k, n;
    int len;
-   int col, row, newrow;
+   int p_col, p_row, newrow;
    int *idx;
    int *rorig = fac->row.orig;
    int *rperm = fac->row.perm;
@@ -427,10 +432,10 @@ static void colSingletons(void)
    fac->u.lastColSing = -1;
    for (i = 0; i < stage; ++i)
    {
-      row = rorig[i];
-      assert(row >= 0);
-      idx = &(ridx[rbeg[row]]);
-      len = rlen[row];
+      p_row = rorig[i];
+      assert(p_row >= 0);
+      idx = &(ridx[rbeg[p_row]]);
+      len = rlen[p_row];
 
       if (len)
          fac->u.lastColSing = i;
@@ -439,19 +444,19 @@ static void colSingletons(void)
       {
          /*  Move pivotal nonzeros to front of column.
           */
-         col = idx[j];
-         n = cbeg[col] + clen[col] - s_cact[col];
-         for (k = n; cidx[k] != row; ++k)
+         p_col = idx[j];
+         n = cbeg[p_col] + clen[p_col] - s_cact[p_col];
+         for (k = n; cidx[k] != p_row; ++k)
            ;
-         assert(k < cbeg[col] + clen[col]);
+         assert(k < cbeg[p_col] + clen[p_col]);
          cidx[k] = cidx[n];
-         cidx[n] = row;
+         cidx[n] = p_row;
 
-         n = --(s_cact[col]);          /* column nonzeros of ACTIVE matrix */
+         n = --(s_cact[p_col]);          /* column nonzeros of ACTIVE matrix */
 
          if (n == 1)                  /* Here is another singleton */
          {
-            newrow = cidx[--clen[col] + cbeg[col]];
+            newrow = cidx[--clen[p_col] + cbeg[p_col]];
 
             /*      Ensure, matrix not singular
              */
@@ -464,13 +469,13 @@ static void colSingletons(void)
             /*      Find singleton in row.
              */
             n = rbeg[newrow] + (--(rlen[newrow]));
-            for (k = n; ridx[k] != col; --k)
+            for (k = n; ridx[k] != p_col; --k)
               ;
 
             /*      Remove singleton from column.
              */
-            setPivot(stage, col, newrow, rval[k]);
-            sing[stage++] = col;
+            setPivot(stage, p_col, newrow, rval[k]);
+            sing[stage++] = p_col;
 
             /*      Move pivot element to diag.
              */
@@ -497,7 +502,7 @@ static void rowSingletons(void)
 {
    double pval;
    int i, j, k, l, r;
-   int row, col, len, rs, lk;
+   int p_row, p_col, len, rs, lk;
    int *idx;
    int *rperm = fac->row.perm;
    int *sing = s_mark;
@@ -519,32 +524,32 @@ static void rowSingletons(void)
    {
       /*      Move pivot element from row file to diag
        */
-      row = sing[rs];
-      j = rbeg[row];
-      col = ridx[j];
+      p_row = sing[rs];
+      j = rbeg[p_row];
+      p_col = ridx[j];
       pval = rval[j];
-      setPivot(rs, col, row, pval);
-      rlen[row] = 0;
+      setPivot(rs, p_col, p_row, pval);
+      rlen[p_row] = 0;
 
       /*      Remove pivot column form workingmatrix
        *      thereby building up L vector.
        */
-      idx = &(cidx[cbeg[col]]);
-      i = s_cact[col];                /* nr. nonzeros of new L vector */
-      lk = makeLvec(fac, i - 1, row);
-      len = clen[col];
-      i = (clen[col] -= i);         /* remove pivot column from U */
+      idx = &(cidx[cbeg[p_col]]);
+      i = s_cact[p_col];                /* nr. nonzeros of new L vector */
+      lk = makeLvec(fac, i - 1, p_row);
+      len = clen[p_col];
+      i = (clen[p_col] -= i);         /* remove pivot column from U */
 
       for (; i < len; ++i)
       {
          r = idx[i];
-         if (r != row)
+         if (r != p_row)
          {
             /*      Find pivot column in row.
              */
             l = --(rlen[r]);
             k = rbeg[r] + l;
-            for (j = k; ridx[j] != col; --j)
+            for (j = k; ridx[j] != p_col; --j)
               ;
             assert(k >= rbeg[r]);
 
@@ -589,10 +594,10 @@ static void initRings(void)
    int *cperm = fac->col.perm;
    Pring *ring;
 
-   col = (Pring*)Malloc((dim + 1) * sizeof(Pring));
-   colNZ = (Pring*)Malloc((dim + 1) * sizeof(Pring));
-   row = (Pring*)Malloc((dim + 1) * sizeof(Pring));
-   rowNZ = (Pring*)Malloc((dim + 1) * sizeof(Pring));
+   col = reinterpret_cast<Pring*>(Malloc((dim + 1) * sizeof(Pring)));
+   colNZ = reinterpret_cast<Pring*>(Malloc((dim + 1) * sizeof(Pring)));
+   row = reinterpret_cast<Pring*>(Malloc((dim + 1) * sizeof(Pring)));
+   rowNZ = reinterpret_cast<Pring*>(Malloc((dim + 1) * sizeof(Pring)));
    assert(col && colNZ && row && rowNZ);
 
    for (i = dim - stage; i >= 0; --i)
@@ -1268,7 +1273,7 @@ static int setupColVals(CLUFactor* fc)
 
    if (fc->u.col.val)
       free(fc->u.col.val);
-   fc->u.col.val = (double*)Malloc(fc->u.col.size * sizeof(double));
+   fc->u.col.val = reinterpret_cast<double*>(Malloc(fc->u.col.size * sizeof(double)));
    cval = fc->u.col.val;
 
    cval = fc->u.col.val;
@@ -1334,11 +1339,11 @@ static void setupRowVals(CLUFactor* fc)
       free(fc->l.rorig);
       free(fc->l.rperm);
    }
-   fc->l.rval = (double*)Malloc(mem * sizeof(double));
-   fc->l.ridx = (int *)Malloc(mem * sizeof(int));
-   fc->l.rbeg = (int *)Malloc((dim + 1) * sizeof(int));
-   fc->l.rorig = (int *)Malloc(dim * sizeof(int));
-   fc->l.rperm = (int *)Malloc(dim * sizeof(int));
+   fc->l.rval = reinterpret_cast<double*>(Malloc(mem * sizeof(double)));
+   fc->l.ridx = reinterpret_cast<int *>(Malloc(mem * sizeof(int)));
+   fc->l.rbeg = reinterpret_cast<int *>(Malloc((dim + 1) * sizeof(int)));
+   fc->l.rorig = reinterpret_cast<int *>(Malloc(dim * sizeof(int)));
+   fc->l.rperm = reinterpret_cast<int *>(Malloc(dim * sizeof(int)));
 
    ridx = fc->l.ridx;
    rval = fc->l.rval;
@@ -1462,7 +1467,7 @@ TERMINATE:
    return fac->stat;
 }
 
-void dumpCLUFactor(CLUFactor* fac)
+void dumpCLUFactor(const CLUFactor* fac)
 {
    int i, j, k;
 
@@ -1739,7 +1744,7 @@ void remaxCol(CLUFactor* fc, int col, int len)
 
 /*****************************************************************************/
 
-int CLUFactorIsConsistent(CLUFactor *fac)
+int CLUFactorIsConsistent(const CLUFactor *fac)
 {
    int i, j, k, l;
    Dring *ring;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.2 2001/11/06 23:31:02 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.3 2001/11/07 17:31:20 bzfbleya Exp $"
 
 
 
@@ -39,30 +39,31 @@ extern double verySparseFactor4left;
 
 //@ ----------------------------------------------------------------------------
 
-void SLUFactor::solve2right(Vector& x, Vector& b) const
+void SLUFactor::solve2right(Vector& x, Vector& b) //const
 {
-soplex::solveRight((CLUFactor*)this, x.get_ptr(), b.get_ptr());
+   soplex::solveRight( static_cast<CLUFactor*>(this), x.get_ptr(), b.get_ptr());
 }
 
-void SLUFactor::solve2right(Vector& x, SSVector& b) const
+void SLUFactor::solve2right(Vector& x, SSVector& b) //const
 {
-   vSolveRightNoNZ((CLUFactor*)this, x.get_ptr(), b.epsilon,
+   vSolveRightNoNZ(static_cast<CLUFactor*>(this), x.get_ptr(), b.epsilon,
                     b.altValues(), b.altIndexMem(), b.size());
 }
 
-void SLUFactor::solve2right(SSVector& x, Vector& b) const
+void SLUFactor::solve2right(SSVector& x, Vector& b) //const
 {
    x.clear();
-soplex::solveRight((CLUFactor*)this, x.altValues(), b.get_ptr());
+   soplex::solveRight(static_cast<CLUFactor*>(this), x.altValues(), b.get_ptr());
 }
 
-void SLUFactor::solve2right(SSVector& x, SSVector& b) const
+void SLUFactor::solve2right(SSVector& x, SSVector& b) //const
 {
    int n;
    int bs = b.size();
    x.clear();
 
-   n = vSolveRight4update((CLUFactor*)this, x.epsilon, x.altValues(), x.altIndexMem(),
+   n = vSolveRight4update(static_cast<CLUFactor*>(this), 
+                          x.epsilon, x.altValues(), x.altIndexMem(),
                            b.altValues(), b.altIndexMem(), bs, 0, 0, 0);
    if (n > 0)
    {
@@ -76,31 +77,31 @@ void SLUFactor::solve2right(SSVector& x, SSVector& b) const
    b.forceSetup();
 }
 
-void SLUFactor::solveRight (Vector& x, const Vector& b) const
+void SLUFactor::solveRight (Vector& x, const Vector& b) //const
 {
-   ((SLUFactor*)this)->vec = b;
-   solve2right(x, ((SLUFactor*)this)->vec);
+   vec = b;
+   solve2right(x, vec);
 }
 
 void SLUFactor::solveRight (Vector& x,
-                             const SVector& b) const
+                            const SVector& b) //const
 {
-   ((SLUFactor*)this)->vec.assign(b);
-   solve2right(x, ((SLUFactor*)this)->vec);
+   vec.assign(b);
+   solve2right(x, vec);
 }
 
 void SLUFactor::solveRight (SSVector& x,
-                             const Vector& b) const
+                            const Vector& b) //const
 {
-   ((SLUFactor*)this)->vec = b;
-   solve2right(x, ((SLUFactor*)this)->vec);
+   vec = b;
+   solve2right(x, vec);
 }
 
 void SLUFactor::solveRight (SSVector& x,
-                             const SVector& b) const
+                            const SVector& b) //const
 {
-   ((SLUFactor*)this)->vec.assign(b);
-   solve2right(x, ((SLUFactor*)this)->vec);
+   vec.assign(b);
+   solve2right(x, vec);
 }
 
 void SLUFactor::solveRight4update(SSVector& x,
@@ -133,7 +134,7 @@ void SLUFactor::solveRight4update(SSVector& x,
       x.setSize(m);
       x.forceSetup();
    }
-   ((SLUFactor*)this)->usetup = 1;
+   usetup = 1;
 }
 
 void SLUFactor::solve2right4update(SSVector& x,
@@ -143,15 +144,15 @@ void SLUFactor::solve2right4update(SSVector& x,
 {
    int m, n, f;
 
-   Vector& svec = *(Vector*) & ((SLUFactor*)this)->ssvec;
+   Vector& svec = static_cast<Vector&>(ssvec);
    int* sidx = ssvec.altIndexMem();
    int rsize = rhs.size();
    int* ridx = rhs.altIndexMem();
 
    x.clear();
    y.clear();
-   ((SLUFactor*)this)->usetup = 1;
-   ((SLUFactor*)this)->ssvec = b;
+   usetup = 1;
+   ssvec = b;
    if (l.updateType == ETA)
    {
       n = b.size();
@@ -167,7 +168,7 @@ void SLUFactor::solve2right4update(SSVector& x,
    }
    else
    {
-      ((SLUFactor*)this)->forest.clear();
+      forest.clear();
       n = ssvec.size();
       m = vSolveRight4update2(this, x.epsilon,
                                x.altValues(), x.altIndexMem(), svec.get_ptr(),
@@ -177,31 +178,32 @@ void SLUFactor::solve2right4update(SSVector& x,
       x.setSize(m);
       x.forceSetup();
       forest.setSize(f);
-      ((SLUFactor*)this)->forest.forceSetup();
+      forest.forceSetup();
    }
 }
 
 //@ ----------------------------------------------------------------------------
 
-void SLUFactor::solve2left (Vector& x, Vector& b) const
+void SLUFactor::solve2left (Vector& x, Vector& b) //const
 {
    x.clear();
-soplex::solveLeft(x.get_ptr(), (CLUFactor*)this, b.get_ptr());
+   soplex::solveLeft(x.get_ptr(), static_cast<CLUFactor*>(this), b.get_ptr());
 }
 
-void SLUFactor::solve2left(Vector& x, SSVector& b) const
+void SLUFactor::solve2left(Vector& x, SSVector& b) //const
 {
    x.clear();
-   vSolveLeftNoNZ((CLUFactor*)this, b.epsilon, x.get_ptr(),
+   vSolveLeftNoNZ(static_cast<CLUFactor*>(this), b.epsilon, x.get_ptr(),
                    b.altValues(), b.altIndexMem(), b.size());
 }
 
-void SLUFactor::solve2left(SSVector& x, Vector& b) const
+void SLUFactor::solve2left(SSVector& x, Vector& b) //const
 {
    int n;
    x.clear();
-   n = soplex::solveLeftEps (x.altValues(), (CLUFactor*)this,
-                        b.get_ptr(), x.altIndexMem(), x.epsilon);
+   n = soplex::solveLeftEps (x.altValues(), 
+                             static_cast<CLUFactor*>(this),
+                             b.get_ptr(), x.altIndexMem(), x.epsilon);
    if (n)
    {
       x.setSize(n);
@@ -209,13 +211,14 @@ void SLUFactor::solve2left(SSVector& x, Vector& b) const
    }
 }
 
-void SLUFactor::solve2left(SSVector& x, SSVector& b) const
+void SLUFactor::solve2left(SSVector& x, SSVector& b) //const
 {
    int n;
    int bs = b.size();
    x.clear();
 
-   n = vSolveLeft((CLUFactor*)this, x.epsilon, x.altValues(), x.altIndexMem(),
+   n = vSolveLeft(static_cast<CLUFactor*>(this), 
+                  x.epsilon, x.altValues(), x.altIndexMem(),
                    b.altValues(), b.altIndexMem(), bs);
 
    if (n > 0)
@@ -230,50 +233,50 @@ void SLUFactor::solve2left(SSVector& x, SSVector& b) const
 }
 
 void SLUFactor::solveLeft(Vector& x,
-                           const SVector& b) const
+                          const SVector& b) //const
 {
-   ((SLUFactor*)this)->ssvec = b;
-   solve2left(x, ((SLUFactor*)this)->ssvec);
+   ssvec = b;
+   solve2left(x, ssvec);
 }
 
 
 void SLUFactor::solveLeft (Vector& x,
-                            const Vector& b) const
+                           const Vector& b) //const
 {
-   ((SLUFactor*)this)->vec = b;
-   solve2left(x, ((SLUFactor*)this)->vec);
+   vec = b;
+   solve2left(x, vec);
 }
 
 void SLUFactor::solveLeft (SSVector& x,
-                            const Vector& b) const
+                           const Vector& b) //const
 {
-   ((SLUFactor*)this)->vec = b;
-   solve2left(x, ((SLUFactor*)this)->vec);
+   vec = b;
+   solve2left(x, vec);
 }
 
 void SLUFactor::solveLeft (SSVector& x,
-                            const SVector& b) const
+                           const SVector& b) //const
 {
-   ((SLUFactor*)this)->ssvec.assign(b);
-   SLUFactor::solve2left(x, ((SLUFactor*)this)->ssvec);
+   ssvec.assign(b);
+   SLUFactor::solve2left(x, ssvec);
 }
 
 void SLUFactor::solveLeft (SSVector& x,
                             Vector& y,
                             const SVector& rhs1,
-                            SSVector& rhs2) const
+                           SSVector& rhs2) //const
 {
    int n;
-   double* svec = ((SLUFactor*)this)->ssvec.altValues();
-   int* sidx = ((SLUFactor*)this)->ssvec.altIndexMem();
+   double* svec = ssvec.altValues();
+   int* sidx = ssvec.altIndexMem();
    int rn = rhs2.size();
    int* ridx = rhs2.altIndexMem();
 
    x.clear();
    y.clear();
-   ((SLUFactor*)this)->ssvec.assign(rhs1);
+   ssvec.assign(rhs1);
    n = ssvec.size();
-   n = vSolveLeft2((CLUFactor*)this, x.epsilon,
+   n = vSolveLeft2(static_cast<CLUFactor*>(this), x.epsilon,
                     x.altValues(), x.altIndexMem(), svec, sidx, n,
                     y.get_ptr(), rhs2.altValues(), ridx, rn);
    x.setSize(n);
@@ -283,8 +286,8 @@ void SLUFactor::solveLeft (SSVector& x,
       x.unSetup();
    rhs2.setSize(0);
    rhs2.forceSetup();
-   ((SLUFactor*)this)->ssvec.setSize(0);
-   ((SLUFactor*)this)->ssvec.forceSetup();
+   ssvec.setSize(0);
+   ssvec.forceSetup();
 }
 
 
@@ -393,13 +396,13 @@ void SLUFactor::clear()
       Free(l.row);
    }
 
-   u.row.val = (double*)Malloc(u.row.size * sizeof(double));
-   u.row.idx = (int *)Malloc(u.row.size * sizeof(int));
-   u.col.idx = (int *)Malloc(u.col.size * sizeof(int));
-   l.val = (double*)Malloc(l.size * sizeof(double));
-   l.idx = (int *)Malloc(l.size * sizeof(int));
-   l.start = (int *)Malloc(l.startSize * sizeof(int));
-   l.row = (int *)Malloc(l.startSize * sizeof(int));
+   u.row.val = reinterpret_cast<double*>(Malloc(u.row.size * sizeof(double)));
+   u.row.idx = reinterpret_cast<int *>(Malloc(u.row.size * sizeof(int)));
+   u.col.idx = reinterpret_cast<int *>(Malloc(u.col.size * sizeof(int)));
+   l.val = reinterpret_cast<double*>(Malloc(l.size * sizeof(double)));
+   l.idx = reinterpret_cast<int *>(Malloc(l.size * sizeof(int)));
+   l.start = reinterpret_cast<int *>(Malloc(l.startSize * sizeof(int)));
+   l.row = reinterpret_cast<int *>(Malloc(l.startSize * sizeof(int)));
 }
 
 void SLUFactor::assign(const SLUFactor& old)
@@ -415,11 +418,11 @@ void SLUFactor::assign(const SLUFactor& old)
    maxabs = old.maxabs;
    initMaxabs = old.initMaxabs;
 
-   row.perm = (int*)Malloc(thedim * sizeof(int));
-   row.orig = (int*)Malloc(thedim * sizeof(int));
-   col.perm = (int*)Malloc(thedim * sizeof(int));
-   col.orig = (int*)Malloc(thedim * sizeof(int));
-   diag = (double*)Malloc(thedim * sizeof(double));
+   row.perm = reinterpret_cast<int*>(Malloc(thedim * sizeof(int)));
+   row.orig = reinterpret_cast<int*>(Malloc(thedim * sizeof(int)));
+   col.perm = reinterpret_cast<int*>(Malloc(thedim * sizeof(int)));
+   col.orig = reinterpret_cast<int*>(Malloc(thedim * sizeof(int)));
+   diag = reinterpret_cast<double*>(Malloc(thedim * sizeof(double)));
 
    memcpy(row.perm, old.row.perm, thedim * sizeof(int));
    memcpy(row.orig, old.row.orig, thedim * sizeof(int));
@@ -431,12 +434,12 @@ void SLUFactor::assign(const SLUFactor& old)
 
    u.row.size = old.u.row.size;
    u.row.used = old.u.row.used;
-   u.row.elem = (Dring *)Malloc(thedim * sizeof(Dring));
-   u.row.val = (double*)Malloc(u.row.size * sizeof(double));
-   u.row.idx = (int *)Malloc(u.row.size * sizeof(int));
-   u.row.start = (int *)Malloc((thedim + 1) * sizeof(int));
-   u.row.len = (int *)Malloc((thedim + 1) * sizeof(int));
-   u.row.max = (int *)Malloc((thedim + 1) * sizeof(int));
+   u.row.elem = reinterpret_cast<Dring *>(Malloc(thedim * sizeof(Dring)));
+   u.row.val = reinterpret_cast<double*>(Malloc(u.row.size * sizeof(double)));
+   u.row.idx = reinterpret_cast<int *>(Malloc(u.row.size * sizeof(int)));
+   u.row.start = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
+   u.row.len = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
+   u.row.max = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
 
    memcpy(u.row.elem , old.u.row.elem, thedim * sizeof(Dring));
    memcpy(u.row.val , old.u.row.val, u.row.size * sizeof(double));
@@ -461,14 +464,14 @@ void SLUFactor::assign(const SLUFactor& old)
 
    u.col.size = old.u.col.size;
    u.col.used = old.u.col.used;
-   u.col.elem = (Dring *)Malloc(thedim * sizeof(Dring));
-   u.col.idx = (int *)Malloc(u.col.size * sizeof(int));
-   u.col.start = (int *)Malloc((thedim + 1) * sizeof(int));
-   u.col.len = (int *)Malloc((thedim + 1) * sizeof(int));
-   u.col.max = (int *)Malloc((thedim + 1) * sizeof(int));
+   u.col.elem = reinterpret_cast<Dring *>(Malloc(thedim * sizeof(Dring)));
+   u.col.idx = reinterpret_cast<int *>(Malloc(u.col.size * sizeof(int)));
+   u.col.start = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
+   u.col.len = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
+   u.col.max = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
    if (old.u.col.val)
    {
-      u.col.val = (double*)Malloc(u.col.size * sizeof(double));
+      u.col.val = reinterpret_cast<double*>(Malloc(u.col.size * sizeof(double)));
       memcpy(u.col.val, old.u.col.val, u.col.size * sizeof(double));
    }
    else
@@ -501,15 +504,15 @@ void SLUFactor::assign(const SLUFactor& old)
    l.firstUpdate = old.l.firstUpdate;
    l.firstUnused = old.l.firstUnused;
    l.updateType = old.l.updateType;
-   l.val = (double*)Malloc(l.size * sizeof(double));
-   l.idx = (int *)Malloc(l.size * sizeof(int));
-   l.start = (int *)Malloc(l.startSize * sizeof(int));
-   l.row = (int *)Malloc(l.startSize * sizeof(int));
+   l.val = reinterpret_cast<double*>(Malloc(l.size * sizeof(double)));
+   l.idx = reinterpret_cast<int *>(Malloc(l.size * sizeof(int)));
+   l.start = reinterpret_cast<int *>(Malloc(l.startSize * sizeof(int)));
+   l.row = reinterpret_cast<int *>(Malloc(l.startSize * sizeof(int)));
    if (old.l.rbeg)
    {
-      l.rval = (double*)Malloc(l.firstUpdate * sizeof(double));
-      l.ridx = (int *)Malloc(l.firstUpdate * sizeof(int));
-      l.rbeg = (int *)Malloc((thedim + 1) * sizeof(int));
+      l.rval = reinterpret_cast<double*>(Malloc(l.firstUpdate * sizeof(double)));
+      l.ridx = reinterpret_cast<int *>(Malloc(l.firstUpdate * sizeof(int)));
+      l.rbeg = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
       memcpy(l.rval, old.l.rval, l.firstUpdate * sizeof(double));
       memcpy(l.ridx, old.l.ridx, l.firstUpdate * sizeof(int));
       memcpy(l.rbeg, old.l.rbeg, (thedim + 1) * sizeof(int));
@@ -571,23 +574,23 @@ SLUFactor::SLUFactor()
    nzCnt = 0;
    thedim = 1;
 
-   row.perm = (int*)Malloc(thedim * sizeof(int));
-   row.orig = (int*)Malloc(thedim * sizeof(int));
-   col.perm = (int*)Malloc(thedim * sizeof(int));
-   col.orig = (int*)Malloc(thedim * sizeof(int));
+   row.perm = reinterpret_cast<int*>(Malloc(thedim * sizeof(int)));
+   row.orig = reinterpret_cast<int*>(Malloc(thedim * sizeof(int)));
+   col.perm = reinterpret_cast<int*>(Malloc(thedim * sizeof(int)));
+   col.orig = reinterpret_cast<int*>(Malloc(thedim * sizeof(int)));
 
-   diag = (double*)Malloc(thedim * sizeof(double));
+   diag = reinterpret_cast<double*>(Malloc(thedim * sizeof(double)));
    assert(diag && "ERROR: out of memory");
    work = vec.get_ptr();
 
    u.row.size = 1;
    u.row.used = 0;
-   u.row.elem = (Dring *)Malloc(thedim * sizeof(Dring));
-   u.row.val = (double*)Malloc(u.row.size * sizeof(double));
-   u.row.idx = (int *)Malloc(u.row.size * sizeof(int));
-   u.row.start = (int *)Malloc((thedim + 1) * sizeof(int));
-   u.row.len = (int *)Malloc((thedim + 1) * sizeof(int));
-   u.row.max = (int *)Malloc((thedim + 1) * sizeof(int));
+   u.row.elem = reinterpret_cast<Dring *>(Malloc(thedim * sizeof(Dring)));
+   u.row.val = reinterpret_cast<double*>(Malloc(u.row.size * sizeof(double)));
+   u.row.idx = reinterpret_cast<int *>(Malloc(u.row.size * sizeof(int)));
+   u.row.start = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
+   u.row.len = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
+   u.row.max = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
 
    u.row.list.idx = thedim;
    u.row.start[thedim] = 0;
@@ -596,11 +599,11 @@ SLUFactor::SLUFactor()
 
    u.col.size = 1;
    u.col.used = 0;
-   u.col.elem = (Dring *)Malloc(thedim * sizeof(Dring));
-   u.col.idx = (int *)Malloc(u.col.size * sizeof(int));
-   u.col.start = (int *)Malloc((thedim + 1) * sizeof(int));
-   u.col.len = (int *)Malloc((thedim + 1) * sizeof(int));
-   u.col.max = (int *)Malloc((thedim + 1) * sizeof(int));
+   u.col.elem = reinterpret_cast<Dring *>(Malloc(thedim * sizeof(Dring)));
+   u.col.idx = reinterpret_cast<int *>(Malloc(u.col.size * sizeof(int)));
+   u.col.start = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
+   u.col.len = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
+   u.col.max = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
    u.col.val = 0;
 
    u.col.list.idx = thedim;
@@ -609,13 +612,13 @@ SLUFactor::SLUFactor()
    u.col.len[thedim] = 0;
 
    l.size = 1;
-   l.val = (double*)Malloc(l.size * sizeof(double));
-   l.idx = (int *)Malloc(l.size * sizeof(int));
+   l.val = reinterpret_cast<double*>(Malloc(l.size * sizeof(double)));
+   l.idx = reinterpret_cast<int *>(Malloc(l.size * sizeof(int)));
    l.startSize = 1;
    l.firstUpdate = 0;
    l.firstUnused = 0;
-   l.start = (int *)Malloc(l.startSize * sizeof(int));
-   l.row = (int *)Malloc(l.startSize * sizeof(int));
+   l.start = reinterpret_cast<int *>(Malloc(l.startSize * sizeof(int)));
+   l.row = reinterpret_cast<int *>(Malloc(l.startSize * sizeof(int)));
    l.rval = 0;
    l.ridx = 0;
    l.rbeg = 0;
@@ -749,25 +752,25 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
       forest.reDim(thedim);
       work = vec.get_ptr();
 
-      row.perm = (int*)Realloc(row.perm, thedim * sizeof(int));
-      row.orig = (int*)Realloc(row.orig, thedim * sizeof(int));
-      col.perm = (int*)Realloc(col.perm, thedim * sizeof(int));
-      col.orig = (int*)Realloc(col.orig, thedim * sizeof(int));
-      diag = (double*)Realloc(diag, thedim * sizeof(double));
+      row.perm = reinterpret_cast<int*>(Realloc(row.perm, thedim * sizeof(int)));
+      row.orig = reinterpret_cast<int*>(Realloc(row.orig, thedim * sizeof(int)));
+      col.perm = reinterpret_cast<int*>(Realloc(col.perm, thedim * sizeof(int)));
+      col.orig = reinterpret_cast<int*>(Realloc(col.orig, thedim * sizeof(int)));
+      diag = reinterpret_cast<double*>(Realloc(diag, thedim * sizeof(double)));
 
-      u.row.elem = (Dring*)Realloc(u.row.elem, thedim * sizeof(Dring));
-      u.row.len = (int *)Realloc(u.row.len, (thedim + 1) * sizeof(int));
-      u.row.max = (int *)Realloc(u.row.max, (thedim + 1) * sizeof(int));
-      u.row.start = (int *)Realloc(u.row.start, (thedim + 1) * sizeof(int));
+      u.row.elem = reinterpret_cast<Dring*>(Realloc(u.row.elem, thedim * sizeof(Dring)));
+      u.row.len = reinterpret_cast<int *>(Realloc(u.row.len, (thedim + 1) * sizeof(int)));
+      u.row.max = reinterpret_cast<int *>(Realloc(u.row.max, (thedim + 1) * sizeof(int)));
+      u.row.start = reinterpret_cast<int *>(Realloc(u.row.start, (thedim + 1) * sizeof(int)));
 
-      u.col.elem = (Dring*)Realloc(u.col.elem, thedim * sizeof(Dring));
-      u.col.len = (int *)Realloc(u.col.len, (thedim + 1) * sizeof(int));
-      u.col.max = (int *)Realloc(u.col.max, (thedim + 1) * sizeof(int));
-      u.col.start = (int *)Realloc(u.col.start, (thedim + 1) * sizeof(int));
+      u.col.elem = reinterpret_cast<Dring*>(Realloc(u.col.elem, thedim * sizeof(Dring)));
+      u.col.len = reinterpret_cast<int *>(Realloc(u.col.len, (thedim + 1) * sizeof(int)));
+      u.col.max = reinterpret_cast<int *>(Realloc(u.col.max, (thedim + 1) * sizeof(int)));
+      u.col.start = reinterpret_cast<int *>(Realloc(u.col.start, (thedim + 1) * sizeof(int)));
 
       l.startSize = thedim + MAXUPDATES;
-      l.row = (int *)Realloc(l.row, (l.startSize) * sizeof(int));
-      l.start = (int *)Realloc(l.start, (l.startSize) * sizeof(int));
+      l.row = reinterpret_cast<int *>(Realloc(l.row, (l.startSize) * sizeof(int)));
+      l.start = reinterpret_cast<int *>(Realloc(l.start, (l.startSize) * sizeof(int)));
 
       assert
       (
@@ -814,7 +817,7 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
    for (;;)
    {
       stat = OK;
-      factor(this, (SVector**)matrix, lastThreshold, epsilon);
+      factor(this, const_cast<SVector**>(matrix), lastThreshold, epsilon);
       if (stability() >= minStability)
          break;
       double x = lastThreshold;
@@ -858,12 +861,12 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
 
 int SLUFactor::isConsistent() const
 {
-   return CLUFactorIsConsistent((CLUFactor*)this);
+   return CLUFactorIsConsistent(static_cast<const CLUFactor*>(this));
 }
 
 void SLUFactor::dump() const
 {
-soplex::dumpCLUFactor((CLUFactor*)this);
+soplex::dumpCLUFactor(static_cast<const CLUFactor*>(this));
 }
 } // namespace soplex
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataarray.h,v 1.2 2001/11/06 23:31:00 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataarray.h,v 1.3 2001/11/07 17:31:14 bzfbleya Exp $"
 
 #ifndef _DATAARRAY_H_
 #define _DATAARRAY_H_
@@ -266,10 +266,10 @@ public:
       if (thesize <= 0)
       {
          free(data);
-         data = (T*)malloc(themax * sizeof(T));
+         data = reinterpret_cast<T*>(malloc(themax * sizeof(T)));
       }
       else
-         data = (T*)realloc(data, themax * sizeof(T));
+         data = reinterpret_cast<T*>(realloc(data, themax * sizeof(T)));
       if (data == 0)
       {
          std::cerr << "ERROR: DataArray could not reallocate memory\n";
@@ -315,7 +315,7 @@ public:
          , themax (old.themax)
          , memFactor (old.memFactor)
    {
-      data = (T*)malloc(max() * sizeof(T));
+      data = reinterpret_cast<T*>(malloc(max() * sizeof(T)));
       if (data == 0)
       {
          std::cerr << "ERROR: DataArray could not allocate memory\n";
@@ -331,15 +331,15 @@ public:
        elements. The internal array is allocated to have #max# nonzeros,
        and the memory extension factor is set to #fac#.
     */
-   DataArray(int size = 0, int max = 0, double fac = 1.2)
-      : memFactor (fac)
+   DataArray(int psize = 0, int pmax = 0, double pfac = 1.2)
+      : memFactor (pfac)
    {
-      thesize = (size < 0) ? 0 : size;
-      if (max > thesize)
-         themax = max;
+      thesize = (psize < 0) ? 0 : psize;
+      if (pmax > thesize)
+         themax = pmax;
       else
          themax = (thesize == 0) ? 1 : thesize;
-      data = (T*)malloc(themax * sizeof(T));
+      data = reinterpret_cast<T*>(malloc(themax * sizeof(T)));
       if (data == 0)
       {
          std::cerr << "ERROR: DataArray could not allocate memory\n";

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.h,v 1.2 2001/11/06 23:31:02 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.h,v 1.3 2001/11/07 17:31:19 bzfbleya Exp $"
 
 #ifndef _NAMESET_H_
 #define _NAMESET_H_
@@ -165,16 +165,14 @@ public:
    /**@name Inquiry */
    //@{
    /// return #num#-th name of #NameSet#.
-   const char* operator[](int num) const
+   const char* operator[](int pnum) const
    {
-      return set[num].name;
+      return set[pnum].name;
    }
    /// return name to #key# of #NameSet#.
-   const char* operator[](Key key) const
+   const char* operator[](Key pkey) const
    {
-      DataSet < NameSet_CharPtr > ::Key* keyptr =
-         (DataSet < NameSet_CharPtr > ::Key*) & key;
-      return set[*keyptr].name;
+      return set[static_cast<DataSet<NameSet_CharPtr>::Key>(pkey)].name;
    }
 
    /// return nr. of names in #NameSet#.
@@ -204,9 +202,9 @@ public:
    }
 
    /// return #Key# to #num#-th name in #NameSet#.
-   Key key(int num) const
+   Key key(int pnum) const
    {
-      return set.key(num);
+      return set.key(pnum);
    }
    /// return #Key# to name #str# in #NameSet#.
    Key key(const char* str) const
@@ -216,11 +214,9 @@ public:
    }
 
    /// return number of name with #key# in #NameSet#.
-   int number(Key key) const
+   int number(Key pkey) const
    {
-      DataSet < NameSet_CharPtr > ::Key* keyptr =
-         (DataSet < NameSet_CharPtr > ::Key*) & key;
-      return set.number(*keyptr);
+      return set.number(static_cast<DataSet<NameSet_CharPtr>::Key>(pkey));
    }
    /// return number of name #str# in #NameSet#.
    int number(const char *str) const
@@ -233,9 +229,9 @@ public:
    }
 
    /// does #NameSet# have name with number #num#?.
-   int has(int num) const
+   int has(int pnum) const
    {
-      return set.has(num);
+      return set.has(pnum);
    }
    /// does #NameSet# have name #str#?.
    int has(const char* str) const
@@ -244,11 +240,9 @@ public:
       return hashtab.has(nam);
    }
    /// does #NameSet# have name with #Key key#?.
-   int has(Key key) const
+   int has(Key pkey) const
    {
-      DataSet < NameSet_CharPtr > ::Key* keyptr =
-         (DataSet < NameSet_CharPtr > ::Key*) & key;
-      return set.has(*keyptr);
+      return set.has(static_cast<DataSet<NameSet_CharPtr>::Key>(pkey));
    }
    //@}
 
@@ -271,9 +265,9 @@ public:
    /// remove name to #key# from #NameSet#.
    void remove(Key key);
    /// remove #i#-th name from #NameSet#.
-   void remove(int num)
+   void remove(int pnum)
    {
-      remove(key(num));
+      remove(key(pnum));
    }
    /// remove name #str# from #NameSet#.
    void remove(const char* str);

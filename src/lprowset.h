@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.h,v 1.2 2001/11/06 23:31:02 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprowset.h,v 1.3 2001/11/07 17:31:19 bzfbleya Exp $"
 
 #ifndef _LPROWSET_H_
 #define _LPROWSET_H_
@@ -229,16 +229,16 @@ public:
       add(k, row);
    }
    /// add #row# to #LPRowSet#.
-   void add(Key& key, const LPRow& row)
+   void add(Key& pkey, const LPRow& prow)
    {
-      add(key, row.lhs(), row.rowVector(), row.rhs());
+      add(pkey, prow.lhs(), prow.rowVector(), prow.rhs());
    }
 
    ///
-   void add(double lhs, const SVector& rowVector, double rhs)
+   void add(double plhs, const SVector& prowVector, double prhs)
    {
       Key k;
-      add(k, lhs, rowVector, rhs);
+      add(k, plhs, prowVector, prhs);
    }
    /// add #LPRow# consisting of #lhs#, #rowVector# and #rhs# to #LPRowSet#.
    void add(Key& key, double lhs, const SVector& rowVector, double rhs);
@@ -254,9 +254,9 @@ public:
       SVSet::xtend(rowVector(n), newmax);
    }
    /// extend row #key# to fit #newmax# nonzeros.
-   void xtend(const Key& key, int newmax)
+   void xtend(const Key& pkey, int pnewmax)
    {
-      SVSet::xtend(rowVector(key), newmax);
+      SVSet::xtend(rowVector(pkey), pnewmax);
    }
    ///
    void add2(const Key& k, int n, int idx[], double val[])
@@ -270,10 +270,10 @@ public:
    }
 
    ///
-   SVector& create(int nonzeros = 0, double lhs = 0, double rhs = 1)
+   SVector& create(int pnonzeros = 0, double plhs = 0, double prhs = 1)
    {
       Key k;
-      return create(k, nonzeros, lhs, rhs);
+      return create(k, pnonzeros, plhs, prhs);
    }
    /** Create new #LPRow# with specified parameters and return a reference
        to its row vector.
@@ -375,8 +375,8 @@ public:
    }
 
    ///
-   LPRowSet(int max = -1, int memmax = -1)
-      : SVSet(max, memmax), left(0), right(0)
+   LPRowSet(int pmax = -1, int pmemmax = -1)
+      : SVSet(pmax, pmemmax), left(0), right(0)
    { }
 
    /// check consistency.

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: random.h,v 1.2 2001/11/06 23:31:02 bzfkocht Exp $"
+#pragma ident "@(#) $Id: random.h,v 1.3 2001/11/07 17:31:19 bzfbleya Exp $"
 
 #ifndef _RANDOM_H_
 #define _RANDOM_H_
@@ -57,8 +57,8 @@ private:
    }
    double last_random() const
    {
-      int i = (int) (next / RDIVIDE) % RMULT;
-      return ((double) i / RMULT);
+      double i = int ((next / RDIVIDE) % RMULT);
+      return ( i / RMULT );
    }
 
 public:
@@ -90,22 +90,22 @@ public:
    }
 
    /// reset lower bound for random numbers.
-   void setMin(double min)
+   void setMin(double p_min)
    {
-      themin = min;
+      themin = p_min;
    }
 
    /// reset lower bound for random numbers.
-   void setMax(double max)
+   void setMax(double p_max)
    {
-      themax = max;
+      themax = p_max;
    }
 
    /// reset seed for next random number.
    void setSeed(double seed)
    {
       seed = (seed - themin) / (themax - themin);
-      next = (unsigned long)(seed * RMULT * RDIVIDE);
+      next = static_cast<unsigned int>(seed * RMULT * RDIVIDE);
    }
 
    /** Default constructor.
@@ -114,12 +114,12 @@ public:
        sequence. However, in the current implementation seeds are not
        handled.
     */
-   Random(double min = 0, double max = 1, double seed = 0.5)
-      : themin(min), themax(max)
+   Random(double p_min = 0, double p_max = 1, double p_seed = 0.5)
+      : themin(p_min), themax(p_max)
    {
-      if (seed < min || seed > max)
-         seed = (min + max) / 2;
-      setSeed(seed);
+      if (p_seed < p_min || p_seed > p_max)
+         p_seed = (p_min + p_max) / 2;
+      setSeed(p_seed);
    }
 
    /// consistency check.

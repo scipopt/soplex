@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.2 2001/11/06 23:31:00 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.3 2001/11/07 17:31:15 bzfbleya Exp $"
 
 #ifndef _DATASET_H_
 #define _DATASET_H_
@@ -463,7 +463,7 @@ public:
    }
 
    /// return #Key# to element #item# in #DataSet#.
-   Key key(DATA* item) const
+   Key key(const DATA* item) const
    {
       assert(number(item) >= 0);
       return thekey[number(item)];
@@ -477,12 +477,16 @@ public:
    }
 
    /// return number of element #item# in #DataSet#.
-   int number(DATA* item) const
+   int number(const DATA* item) const
    {
-      if ((unsigned long)item < (unsigned long)theitem
-          || (unsigned long)item >= (unsigned long)&(theitem[size()]))
+      if ((reinterpret_cast<unsigned long>(item) < 
+           reinterpret_cast<unsigned long>(theitem) )
+           || 
+          ( reinterpret_cast<unsigned long>(item) >= 
+            reinterpret_cast<unsigned long>(&(theitem[size()]))))
          return -1;
-      long idx = (((long)item) - ((long)theitem)) / sizeof(Item);
+      long idx = ((reinterpret_cast<long>(item)) - (reinterpret_cast<long>(theitem))) 
+         / sizeof(Item);
       return theitem[idx].info;
    }
 
@@ -499,7 +503,7 @@ public:
    }
 
    /// does #item# belong to #DataSet#?.
-   int has(DATA* item) const
+   int has(const DATA* item) const
    {
       return number(item) >= 0;
    }
@@ -527,8 +531,8 @@ public:
 
       themax = newmax;
 
-      theitem = (Item*)realloc(theitem, themax * sizeof(Item));
-      thekey = (Key *)realloc(thekey, themax * sizeof(Key));
+      theitem = reinterpret_cast<Item*>(realloc(theitem, themax * sizeof(Item)));
+      thekey  = reinterpret_cast<Key*> (realloc(thekey,  themax * sizeof(Key)));
       if (theitem == 0 || thekey == 0)
       {
          std::cerr << "ERROR: DataSet could not reallocate memory\n";
@@ -582,8 +586,8 @@ public:
          firstfree = -themax - 1;
       else
          firstfree = old.firstfree;
-      theitem = (Item*)malloc(themax * sizeof(Item));
-      thekey = (Key *)malloc(themax * sizeof(Key));
+      theitem = reinterpret_cast<Item*>(malloc(themax * sizeof(Item)));
+      thekey  = reinterpret_cast<Key*> (malloc(themax * sizeof(Key)));
       if (theitem == 0 || thekey == 0)
       {
          std::cerr << "ERROR: DataSet could not allocate memory\n";
@@ -596,13 +600,13 @@ public:
    }
 
    /// default constructor.
-   DataSet(int max = 8)
+   DataSet(int pmax = 8)
    {
-      themax = (max < 1) ? 8 : max;
+      themax = (pmax < 1) ? 8 : pmax;
       thesize = thenum = 0;
       firstfree = -themax - 1;
-      theitem = (Item*)malloc(themax * sizeof(Item));
-      thekey = (Key *)malloc(themax * sizeof(Key));
+      theitem = reinterpret_cast<Item*>(malloc(themax * sizeof(Item)));
+      thekey  = reinterpret_cast<Key*> (malloc(themax * sizeof(Key)));
       if (theitem == 0 || thekey == 0)
       {
          std::cerr << "ERROR: DataSet could not allocate memory\n";

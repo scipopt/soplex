@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.cpp,v 1.2 2001/11/06 23:31:02 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.cpp,v 1.3 2001/11/07 17:31:19 bzfbleya Exp $"
 
 #include <string.h>
 #include "nameset.h"
@@ -40,14 +40,14 @@ void NameSet::add(Key& key, const char* str)
          reMax(int(factor*max() + 8));
       }
 
-      if (memSize() + (int)strlen(str) >= memMax())
+      if (memSize() + int(strlen(str)) >= memMax())
       {
          memPack();
-         if (memSize() + (int)strlen(str) >= memMax())
+         if (memSize() + int(strlen(str)) >= memMax())
          {
             assert(memFactor >= 1);
             memRemax(int(memFactor*memMax()) + 9 + strlen(str));
-            assert(memSize() + (int)strlen(str) < memMax());
+            assert(memSize() + int(strlen(str)) < memMax());
          }
       }
 
@@ -55,8 +55,7 @@ void NameSet::add(Key& key, const char* str)
       memused += strlen(str) + 1;
       strcpy(tmp, str);
 
-      DataSet < NameSet_CharPtr > ::Key* keyptr = (DataSet < NameSet_CharPtr > ::Key*) & key;
-      NameSet_CharPtr* name = set.create(*keyptr);
+      NameSet_CharPtr* name = set.create(static_cast<DataSet<NameSet_CharPtr>::Key&>(key));
       name->name = tmp;
       list.append(name);
       NameSet_Name memname(name->name);
@@ -90,7 +89,8 @@ void NameSet::remove(const char *str)
    const NameSet_Name nam(str);
    if (hashtab.has (nam))
    {
-      DataSet < NameSet_CharPtr > ::Key* key = (DataSet < NameSet_CharPtr > ::Key*)hashtab.get (nam);
+      DataSet<NameSet_CharPtr>::Key* 
+         key = static_cast<DataSet<NameSet_CharPtr>::Key*>(hashtab.get (nam));
       hashtab.remove (nam);
       list.remove(&(set[*key]));
       set.remove(*key);
@@ -100,11 +100,10 @@ void NameSet::remove(const char *str)
 void NameSet::remove(Key key)
 {
    assert(has(key));
-   DataSet < NameSet_CharPtr > ::Key* keyptr = (DataSet < NameSet_CharPtr > ::Key*) & key;
-   const NameSet_Name nam = set[*keyptr].name;
+   const NameSet_Name nam = set[static_cast<DataSet<NameSet_CharPtr>::Key>(key)].name;
    hashtab.remove (nam);
-   list.remove(&(set[*keyptr]));
-   set.remove(*keyptr);
+   list.remove(&(set[static_cast<DataSet<NameSet_CharPtr>::Key>(key)]));
+   set.remove(static_cast<DataSet<NameSet_CharPtr>::Key>(key));
 }
 
 void NameSet::remove(Key keys[], int n)
@@ -138,11 +137,14 @@ void NameSet::reMax(int newmax)
 
    if (delta != 0 && first != 0)
    {
-      NameSet_CharPtr* last = (NameSet_CharPtr*)((char*)list.last() + delta);
-      NameSet_CharPtr* name = (NameSet_CharPtr*)((char*)first + delta);
+      NameSet_CharPtr* last = ( reinterpret_cast<NameSet_CharPtr*>
+                                (reinterpret_cast<char*>(list.last()) + delta) );
+      NameSet_CharPtr* name = ( reinterpret_cast<NameSet_CharPtr*>
+                                (reinterpret_cast<char*>(first) + delta) );
       first = name;
       for (; name != last; name = name->next())
-         name->next() = (NameSet_CharPtr*)((char*)name->next() + delta);
+         name->next() = ( reinterpret_cast<NameSet_CharPtr*>
+                          ( reinterpret_cast<char*>(name->next()) + delta) );
 
       list = IsList < NameSet_CharPtr > (first, last);
    }
@@ -154,7 +156,7 @@ void NameSet::memRemax(int newmax)
    long delta;
 
    memmax = (newmax < memSize()) ? memSize() : newmax;
-   mem = (char*)realloc(mem, memmax * sizeof(char));
+   mem = reinterpret_cast<char*>(realloc(mem, memmax * sizeof(char)));
    if (mem == 0)
    {
       std::cerr << "ERROR: NameSet could not reallocate memory\n";
@@ -170,7 +172,8 @@ void NameSet::memRemax(int newmax)
    for (int i = num() - 1; i >= 0; --i)
    {
       Key ikey = key(i);
-      DataSet < NameSet_CharPtr > ::Key* keyptr = (DataSet < NameSet_CharPtr > ::Key*) & ikey;
+      DataSet < NameSet_CharPtr > ::Key* 
+         keyptr = static_cast<DataSet < NameSet_CharPtr > ::Key*>( & ikey );
       NameSet_Name nam(set[*keyptr].name);
       hashtab.add(nam, *keyptr);
    }
@@ -195,7 +198,8 @@ void NameSet::memPack()
    for (i = num() - 1; i >= 0; --i)
    {
       Key ikey = key(i);
-      DataSet < NameSet_CharPtr > ::Key* keyptr = (DataSet < NameSet_CharPtr > ::Key*) & ikey;
+      DataSet < NameSet_CharPtr > ::Key* 
+         keyptr = static_cast<DataSet < NameSet_CharPtr > ::Key*>( & ikey );
       NameSet_Name nam(set[*keyptr].name);
       hashtab.add(nam, *keyptr);
    }
@@ -246,7 +250,7 @@ NameSet::NameSet(const NameSet& org)
 {
    memused = 0;
    memmax = org.memSize();
-   mem = (char*)malloc(memmax * sizeof(char));
+   mem = reinterpret_cast<char*>(malloc(memmax * sizeof(char)));
    if (mem == 0)
    {
       std::cerr << "ERROR: NameSet could not allocate memory\n";
@@ -273,7 +277,7 @@ NameSet::NameSet(int max, int mmax, double fac, double memFac)
 {
    memused = 0;
    memmax = (mmax < 1) ? (8 * set.max() + 1) : mmax;
-   mem = (char*)malloc(memmax * sizeof(char));
+   mem = reinterpret_cast<char*>(malloc(memmax * sizeof(char)));
    if (mem == 0)
    {
       std::cerr << "ERROR: NameSet could not allocate memory\n";

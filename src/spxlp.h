@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.2 2001/11/06 23:31:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.3 2001/11/07 17:31:22 bzfbleya Exp $"
 
 #ifndef _SPXLP_H_
 #define _SPXLP_H_
@@ -166,26 +166,29 @@ public:
    ///
    int operator==(const SPxLP_Id& id)
    {
-      return (*(int*)this == *(int*)&id);
+      return (this == &id);//(*(int*)this == *(int*)&id);
    }
 
    ///
    int operator!=(const SPxLP_Id& id)
    {
-      return (*(int*)this != *(int*)&id);
+      return (this != &id); //(*(int*)this != *(int*)&id);
    }
 
    ///
    SPxLP_Id& operator=(const SPxLP_Id& id)
    {
-      *((int*)this) = *((int*)(&id));
+      // what the fuck is this!!!
+      //* reinterpret_cast<int*>(this) = * reinterpret_cast<const int*>(&id);
+      SVSet_Key::operator= ( id );
       return *this;
    }
 
    ///
    SPxLP_Id& operator=(const SPxLP_SPxColId cid)
    {
-      *(int*)this = *(int*) & cid;
+      //*(int*)this = *(int*) & cid;
+      SVSet_Key::operator= ( cid );
       info = COLID * (cid.info + 1);
       return *this;
    }
@@ -193,7 +196,8 @@ public:
    ///
    SPxLP_Id& operator=(const SPxLP_SPxRowId rid)
    {
-      *(int*)this = *(int*) & rid;
+      //*(int*)this = *(int*) & rid;
+      SVSet_Key::operator= ( rid );
       info = ROWID * (rid.info + 1);
       return *this;
    }
@@ -303,24 +307,20 @@ class SPxLP : protected LPRowSet, protected LPColSet
 protected:
    const LPRowSet* lprowset() const
    {
-      LPRowSet* svs = (LPRowSet*)this;
-      return svs;
+      return static_cast<const LPRowSet*>(this);
    }
    const LPColSet* lpcolset() const
    {
-      LPColSet* svs = (LPColSet*)this;
-      return svs;
+      return static_cast<const LPColSet*>(this);
    }
 
    SVSet* rowset()
    {
-      SVSet* svs = (SVSet*)(LPRowSet*)this;
-      return svs;
+      return static_cast<SVSet*>(static_cast<LPRowSet*>(this));
    }
    SVSet* colset()
    {
-      SVSet* svs = (SVSet*)(LPColSet*)this;
-      return svs;
+      return static_cast<SVSet*>(static_cast<LPColSet*>(this));
    }
 
    /*
@@ -598,9 +598,9 @@ public:
    }
 
    ///
-   void addRows(const LPRowSet& set)
+   void addRows(const LPRowSet& pset)
    {
-      doAddRows(set);
+      doAddRows(pset);
    }
    /// add all #LPRow#s of #set# to #LPRowSet#.
    void addRows(SPxRowId id[], const LPRowSet& set);
@@ -618,24 +618,20 @@ public:
    }
 
    ///
-   void addCols(const LPColSet& set)
+   void addCols(const LPColSet& pset)
    {
-      doAddCols(set);
+      doAddCols(pset);
    }
    /// add all #LPCol#s of #set# to #LPColSet#.
    void addCols(SPxColId id[], const LPColSet& set);
 
 protected:
    /// called after the last #n# rows have just been added.
-   virtual void addedRows(int n)
-   {
-      (void)n;
-   }
+   virtual void addedRows(int)
+   {}
    /// called after the last #n# columns have just been added.
-   virtual void addedCols(int n)
-   {
-      (void)n;
-   }
+   virtual void addedCols(int)
+   {}
 
    void added2Set(SVSet& set, const SVSet& add, int n);
    //@}
