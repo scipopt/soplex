@@ -1,4 +1,4 @@
-# $Id: check.awk,v 1.4 2001/11/10 22:05:55 bzfkocht Exp $
+# $Id: check.awk,v 1.5 2001/11/12 08:13:59 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: check.awk                                                     *
@@ -13,7 +13,7 @@ function abs(x)
 }
 BEGIN {
     sol["baxter"]       = 5.6007255672e+07;
-    sol["dano3mip"]     = 5.7623162027e+02;
+    sol["dano3mip"]     = 5.7623162474e+02;
     sol["dbir2"]        = -6.1169165000e+06;
     sol["fome12"]       = 0; # NAME in der RHS Sec fehlt
     sol["gen4"]         = 2.8533467713e-06;
@@ -158,8 +158,12 @@ BEGIN {
     if (sol[name] == "")
 	print name, "nicht gefunden";
     else
-       relerr = abserr / abs(sol[name]) * 1000.0
-
+    {
+       if (sol[name] != 0.0)
+	   relerr = abserr / abs(sol[name]) * 1000.0
+       else
+           relerr = 0.0;
+    }
     if (name == prevname)
         printf("%23s", "");
     else
