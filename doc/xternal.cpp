@@ -158,7 +158,9 @@
  version. Add flags as needed. 
 
  \section Testing Testing the Binary
- After you compiled the binary you could say 
+ After you compiled the binary you should get the Netlib LP files at
+ http://www.zib.de/Optimization/Software/Soplex/netlib.tgz and
+ unpack them in the \c check directory. Then you can try
 
  \c gmake \c COMP=xxx \c OPT=dbg \c quick
 

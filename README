@@ -21,7 +21,7 @@
         IRIX with SGI Mips Pro C++:  gmake COMP=sgi OPT=opt
 	HP-UX with HP aCC         :  gmake COMP=hp OPT=opt
 
-        Then get and install the Netlib testset from 
+        Then get and unpack in the check directory the Netlib testset from 
         http://www.zib.de/Optimization/Software/Soplex/netlib.tgz
         and say gmake COMP=<as before> OPT=<as before> quick
         This should report no fails.
