@@ -13,63 +13,56 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.h,v 1.3 2001/11/07 17:31:22 bzfbleya Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.h,v 1.4 2001/11/28 16:41:22 bzfpfend Exp $"
 
 
+/**@file  spxdevexpr.h
+ * @brief Devex pricer.
+ */
 #ifndef _SPXDEVEXPR_H_
 #define _SPXDEVEXPR_H_
 
-//@ ----------------------------------------------------------------------------
-/*  \Section{Imports}
-    Import required system include files ...
- */
+
 #include <assert.h>
-
-
-/*  ... and class header files
- */
 
 #include "spxpricer.h"
 
 namespace soplex
 {
 
+/**@brief   Devex pricer.
+   @ingroup Algo
 
+   The Devex Pricer for SoPlex implements an approximate steepest edge pricing,
+   that does without solving an extra linear system and computing the scalar
+   products.
 
-
-
-
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
-
-/// Devex Pricer for SoPlex.
-/** The Devex Pricer for SoPlex implements an approximate steepest edge pricing,
-    that does without solving an extra linear system and computing the scalar
-    products.
- */
+   See #SPxPricer for a class documentation.
+*/
 class SPxDevexPR : public SPxPricer
 {
 private:
 protected:
-   double last;           // penalty, selected at last iteration
-   DVector penalty;        // vector of pricing penalties
-   DVector coPenalty;      // vector of pricing penalties
+   double last;            ///< penalty, selected at last iteration.
+   DVector penalty;        ///< vector of pricing penalties.
+   DVector coPenalty;      ///< vector of pricing penalties.
 
    SoPlex* thesolver;
    double theeps;
 
 public:
-   /// return loaded solver.
+   /// returns loaded solver.
    SoPlex* solver() const
    {
       return thesolver;
    }
-   /// bound violations up to #epsilon# are tollerated.
+
+   /// bound violations up to #epsilon are tolerated.
    double epsilon() const
    {
       return theeps;
    }
+
    ///
    void setEpsilon(double eps)
    {
@@ -78,13 +71,16 @@ public:
 
    ///
    void load(SoPlex* base);
+
    ///
    void clear()
    {
       thesolver = 0;
    }
+
    ///
    void setType(SoPlex::Type);
+
    ///
    void setRep(SoPlex::Representation rep);
 
@@ -110,23 +106,24 @@ public:
    ///
    void entered4(SoPlex::Id id, int n);
 protected:
-   void entered4(SoPlex::Id id, int n, int start1, int incr1, int start2, int incr2);
+   void entered4(SoPlex::Id id, int n, int start1, int incr1, int start2,
+                 int incr2);
 public:
 
 
-   /// #n# vectors have been added to loaded LP.
+   /// \p n vectors have been added to loaded LP.
    virtual void addedVecs (int n);
-   /// #n# covectors have been added to loaded LP.
+   /// \p n covectors have been added to loaded LP.
    virtual void addedCoVecs(int n);
 
 
-   /// These  methods are use for implemementing the public remove methods.
+   ///
    virtual void removedVec(int i);
    ///
    virtual void removedCoVecs(const int perm[]);
    ///
    virtual void removedVecs(const int perm[]);
-   ///
+   /// These  methods are use for implemementing the public remove methods.
    virtual void removedCoVec(int i);
 
 

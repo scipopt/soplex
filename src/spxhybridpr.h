@@ -13,21 +13,16 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.h,v 1.2 2001/11/06 23:31:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.h,v 1.3 2001/11/28 16:41:22 bzfpfend Exp $"
 
 
+/**@file  spxhybridpr.h
+ * @brief Hybrid pricer.
+ */
 #ifndef _SPXHYBRIDPR_H_
 #define _SPXHYBRIDPR_H_
 
-//@ ----------------------------------------------------------------------------
-/*  \Section{Imports}
-    Import required system include files ...
- */
 #include <assert.h>
-
-
-/*  ... and class header files
- */
 
 #include "spxpricer.h"
 #include "spxdevexpr.h"
@@ -37,21 +32,16 @@
 namespace soplex
 {
 
+/**@brief   Hybrid pricer.
+   @ingroup Algo
 
+   The hybrid pricer for SoPlex tries to guess the best pricing strategy to
+   use for pricing the loaded LP with the loaded algorithm type and basis
+   representation. Currently it does so by switching between #SPxSteepPR,
+   #SPxDevexPR and #SPxParMultPR.
 
-
-
-
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
-
-/** Hybrid Pricer for SoPlex.
-    The hybrid pricer for SoPlex tries to guess the best pricing strategy to
-    use for pricing the loaded LP with the loaded algorithm type and basis
-    representation. Currently it does so by switching between \Ref{SPxSteepPR},
-    \Ref{SPxDevexPR} and \Ref{SPxParMultPR}.
- */
+   See #SPxPricer for a class documentation.
+*/
 class SPxHybridPR : public SPxPricer
 {
    SPxSteepPR steep;

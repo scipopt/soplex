@@ -13,39 +13,33 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightpr.h,v 1.3 2001/11/07 17:31:24 bzfbleya Exp $"
+#pragma ident "@(#) $Id: spxweightpr.h,v 1.4 2001/11/28 16:41:23 bzfpfend Exp $"
 
 
+/**@file  spxweightpr.h
+ * @brief Weighted pricing.
+ */
 #ifndef _SPXWEIGHTPR_H_
 #define _SPXWEIGHTPR_H_
-
-//@ ----------------------------------------------------------------------------
-/*      \Section{Imports}
-    Import required classes
- */
 
 #include "spxpricer.h"
 
 namespace soplex
 {
 
-
-
-
-
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
-
-/** weighted pricing.
-    Class #SPxWeightPR# is an implemantation class of #SPxPricer# that uses
-    weights for columns and rows for selecting the Simplex pivots. The weights
-    are computed by methods #computeCP()# and #computeRP()# which may be
-    overridden by derived classes.
- 
-    The weights are interpreted as follows: The higher a value is, the more
-    likely the corresponding row or column is set on one of its bounds.
- */
+/**@brief   Weighted pricing.
+   @ingroup Algo
+      
+   Class #SPxWeightPR is an implemantation class of #SPxPricer that uses
+   weights for columns and rows for selecting the Simplex pivots. The weights
+   are computed by methods #computeCP() and #computeRP() which may be
+   overridden by derived classes.
+   
+   The weights are interpreted as follows: The higher a value is, the more
+   likely the corresponding row or column is set on one of its bounds.
+   
+   See #SPxPricer for a class documentation.
+*/
 class SPxWeightPR : public SPxPricer
 {
 protected:
@@ -57,10 +51,6 @@ protected:
    const double* penalty;
 
    double objlength;              // length of objective vector.
-   /// compute weights for columns.
-   virtual void computeCP(int start, int end);
-   /// compute weights for rows.
-   virtual void computeRP(int start, int end);
 
    SoPlex* thesolver;
    double theeps;
@@ -171,6 +161,13 @@ public:
 
    ///
    int isConsistent() const;
+
+
+protected:
+   /// compute weights for columns.
+   virtual void computeCP(int start, int end);
+   /// compute weights for rows.
+   virtual void computeRP(int start, int end);
 };
 
 

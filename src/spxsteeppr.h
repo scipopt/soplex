@@ -13,21 +13,17 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.h,v 1.3 2001/11/07 17:31:23 bzfbleya Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.h,v 1.4 2001/11/28 16:41:23 bzfpfend Exp $"
 
 
+/**@file  spxsteeppr.h
+ * @brief Steepest edge pricer.
+ */
 #ifndef _SPXSTEEPPR_H_
 #define _SPXSTEEPPR_H_
 
-//@ ----------------------------------------------------------------------------
-/*      \Section{Imports}
-    Import required system include files
- */
+
 #include <assert.h>
-
-
-/*  and class header files
- */
 
 #include "spxpricer.h"
 #include "random.h"
@@ -35,26 +31,33 @@
 namespace soplex
 {
 
-
-
-
-
-
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
-
-/** steepest edge pricer.
-    Class #SPxSteepPR# implements a steepest edge pricer to be used with #SoPlex#.
- */
+/**@brief   Steepest edge pricer.
+   @ingroup Algo
+      
+   Class #SPxSteepPR implements a steepest edge pricer to be used with
+   #SoPlex.
+   
+   See #SPxPricer for a class documentation.
+*/
 class SPxSteepPR : public SPxPricer
 {
+public:
+   /// How to setup the direction multipliers.
+   /** Possible settings are #EXACT for starting with exactly computed
+       values, or #DEFAULT for starting with multipliers set to 1. The
+       latter is the default.
+   */
+   enum Setup {
+      EXACT,   ///< starting with exactly computed values
+      DEFAULT  ///< starting with multipliers set to 1
+   };
+
 protected:
    DVector penalty;                // vector of pricing penalties
    DVector coPenalty;              // vector of pricing penalties
 
    DVector workVec;                // working vector
-   SSVector workRhs;                // working vector
+   SSVector workRhs;               // working vector
 
    int lastIdx;
    SoPlex::Id lastId;
@@ -64,49 +67,37 @@ protected:
    SoPlex* thesolver;
 
    int prefSetup;
-   DataArray < double > coPref;         // preference multiplier for selecting as pivot
-   DataArray < double > pref;           // preference multiplier for selecting as pivot
+   DataArray < double > coPref; // preference multiplier for selecting as pivot
+   DataArray < double > pref;   // preference multiplier for selecting as pivot
    DataArray < double > leavePref;
 
    void setupPrefs(double mult,
-                    double tie, double cotie,
-                    double shift, double coshift,
-                    int rstart = 0, int cstart = 0,
-                    int rend = -1, int cend = -1);
+                   double tie, double cotie,
+                   double shift, double coshift,
+                   int rstart = 0, int cstart = 0,
+                   int rend = -1, int cend = -1);
+
    virtual void setupPrefs(SoPlex::Type);
 
 public:
-   /**@name constrol parameters */
-   //@{
-   /** How to setup the direction multipliers.
-       Possible settings are #EXACT# for starting with exactly computed
-       values, or #DEFAULT# for starting with multipliers set to 1. The
-       latter is the default.
-    */
-   enum Setup {
-      ///
-      EXACT,
-      ///
-      DEFAULT
-   };
-
-   /// Setup type.
+   /**@todo make setup and accuracy private or protected */
+   /// setup type.
    Setup setup;
 
    /// accuracy for computing steepest directions.
    double accuracy;
-   //@}
 
-   /// return loaded solver.
+   /// 
    SoPlex* solver() const
    {
       return thesolver;
    }
-   /// bound violations up to #epsilon# are tollerated.
+   /// 
    double epsilon() const
    {
       return theeps;
    }
+
    ///
    void setEpsilon(double eps)
    {
@@ -143,24 +134,14 @@ public:
 
    ///
    void entered4(SoPlex::Id id, int n);
-   void entered4(SoPlex::Id id, int n, int start1, int incr1, int start2, int incr2);
+   void entered4(SoPlex::Id id, int n, int start1, int incr1, int start2, 
+                 int incr2);
 
-
-   /**@name    Extension
-      @memo    Methods for implemementing the public add methods
-    */
-   //@{
-   /// #n# vectors have been added to loaded LP.
+   ///
    virtual void addedVecs (int n);
-   /// #n# covectors have been added to loaded LP.
+   ///
    virtual void addedCoVecs(int n);
-   //@}
 
-
-   /**@name    Shrinking
-      @memo    Methods for implemementing the public remove methods
-    */
-   //@{
    ///
    virtual void removedVec(int i);
    ///
@@ -169,11 +150,7 @@ public:
    virtual void removedVecs(const int perm[]);
    ///
    virtual void removedCoVec(int i);
-   //@}
 
-
-   /**@name Manipulation */
-   //@{
    ///
    void changeObj(const Vector&)
    {}
@@ -216,16 +193,15 @@ public:
    ///
    void changeSense(SoPlex::Sense)
    {}
-   //@}
 
-   /// check consistency.
+   ///
    int isConsistent() const;
 
-
+   ///
    SPxSteepPR()
       : workRhs (0, 1e-16)
-         , setup (DEFAULT)
-         , accuracy(1e-4)
+      , setup (DEFAULT)
+      , accuracy(1e-4)
    {}
 
 };

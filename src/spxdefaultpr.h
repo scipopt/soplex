@@ -13,41 +13,31 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultpr.h,v 1.3 2001/11/07 17:31:21 bzfbleya Exp $"
+#pragma ident "@(#) $Id: spxdefaultpr.h,v 1.4 2001/11/28 16:41:22 bzfpfend Exp $"
 
 
+/**@file  spxdefaultpr.h
+ * @brief Default pricer.
+ */
 #ifndef _SPXDEFAULTPR_H_
 #define _SPXDEFAULTPR_H_
 
-//@ ----------------------------------------------------------------------------
-/*      \Section{Imports}
-    Import required system include files
- */
 #include <assert.h>
-
-
-/*  and class header files
- */
 
 #include "spxpricer.h"
 
 namespace soplex
 {
 
+/**@brief   Default pricer.
+   @ingroup Algo
 
+   Class #SPxDefaultPR is an implementation class for #SPxPricer implementing
+   Dantzig's the default pricing strategy, i.e. maximal/minimal reduced cost or
+   maximal violated constraint.
 
-
-
-
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
-
-/** default pricer.
-    Class #SPxDefaultPR# is an implementation class for #SPxPricer# implementing
-    Dantzig's the default pricing strategy, i.e. maximal/minimal reduced cost or
-    maximal violated constraint.
- */
+   See #SPxPricer for a class documentation.
+*/
 class SPxDefaultPR : public SPxPricer
 {
 protected:

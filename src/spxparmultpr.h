@@ -13,21 +13,17 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxparmultpr.h,v 1.3 2001/11/07 17:31:23 bzfbleya Exp $"
+#pragma ident "@(#) $Id: spxparmultpr.h,v 1.4 2001/11/28 16:41:22 bzfpfend Exp $"
 
 
+/**@file  spxparmultpr.h
+ * @brief Partial multiple pricing.
+ */
 #ifndef _SPXPARMULTPR_H_
 #define _SPXPARMULTPR_H_
 
-//@ ----------------------------------------------------------------------------
-/*      \Section{Imports}
-    Import required system include files
- */
+
 #include <assert.h>
-
-
-/*  and class header files
- */
 
 #include "spxpricer.h"
 #include "dataarray.h"
@@ -37,30 +33,26 @@
 namespace soplex
 {
 
-
-
-
-
-
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
 struct SPxParMultPr_Tmp
 {
    SoPlex::Id id;
    double test;
 };
 
-/** partial multiple pricing.
-    Class #SPxParMultPr# is an implementation class for #SPxPricer# implementing
-    Dantzig's the default pricing strategy with partial multiple pricing.
-    Partial multiple pricing applies to the #ENTER#ing Simplex only. A set of
-    #partialSize# eligible pivot indices is selected (partial pricing). In the
-    following Simplex iterations pricing is are restricted to these indices
-    (multiple pricing) until no more eligable pivots are available. Partial
-    multiple pricing significantly reduces the computation time for computing
-    the matrix-vector-product in the Simplex algorithm.
- */
+/**@brief   Partial multiple pricing.
+   @ingroup Algo
+
+   Class #SPxParMultPr is an implementation class for #SPxPricer implementing
+   Dantzig's default pricing strategy with partial multiple pricing.
+   Partial multiple pricing applies to the #ENTER%ing Simplex only. A set of
+   #partialSize eligible pivot indices is selected (partial pricing). In the
+   following Simplex iterations pricing is restricted to these indices
+   (multiple pricing) until no more eligable pivots are available. Partial
+   multiple pricing significantly reduces the computation time for computing
+   the matrix-vector-product in the Simplex algorithm.
+
+   See #SPxPricer for a class documentation.
+*/
 class SPxParMultPR : public SPxPricer
 {
 protected:
@@ -74,6 +66,7 @@ protected:
    int count;
 
 public:
+   /**@todo make this member variable private (or protected) */
    /// Set size for partial pricing.
    static int partialSize;
 
