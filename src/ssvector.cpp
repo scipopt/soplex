@@ -13,8 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.27 2005/01/06 19:51:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.28 2005/01/09 16:01:08 bzfkocht Exp $"
 
+#undef NDEBUG
 #include <assert.h>
 
 #include "spxdefines.h"
@@ -25,6 +26,8 @@
 /**@file ssvector.cpp
  * @todo There is a lot pointer arithmetic done here. It is not clear if
  *       this is an advantage at all. See all the function int() casts.
+ * @todo Several operations like maxAbs could setup the vector while
+ *       computing there result.
  */
 namespace soplex
 {
@@ -97,7 +100,7 @@ void SSVector::setValue(int i, Real x)
    assert(isConsistent());
 }
 
-#if USE_OLD // old version
+#if 0 // USE_OLD // old version
 void SSVector::setup()
 {
    if (!isSetup())
@@ -225,6 +228,7 @@ void SSVector::setup()
 SSVector& SSVector::operator+=(const Vector& vec)
 {
    Vector::operator+=(vec);
+
    if (isSetup())
    {
       setupStatus = false;
@@ -236,6 +240,7 @@ SSVector& SSVector::operator+=(const Vector& vec)
 SSVector& SSVector::operator+=(const SVector& vec)
 {
    Vector::operator+=(vec);
+
    if (isSetup())
    {
       setupStatus = false;
@@ -244,10 +249,12 @@ SSVector& SSVector::operator+=(const SVector& vec)
    return *this;
 }
 
+#if 0 // USE_OLD // old version
 SSVector& SSVector::operator+=(const SSVector& vec)
 {
    for (int i = vec.size() - 1; i >= 0; --i)
       val[vec.index(i)] += vec.value(i);
+
    if (isSetup())
    {
       setupStatus = false;
@@ -255,10 +262,25 @@ SSVector& SSVector::operator+=(const SSVector& vec)
    }
    return *this;
 }
+#else
+SSVector& SSVector::operator+=(const SSVector& vec)
+{
+   for (int i = 0; i < vec.size(); ++i)
+      val[vec.index(i)] += vec.value(i);
+
+   if (isSetup())
+   {
+      setupStatus = false;
+      setup();
+   }
+   return *this;
+}
+#endif
 
 SSVector& SSVector::operator-=(const Vector& vec)
 {
    Vector::operator-=(vec);
+
    if (isSetup())
    {
       setupStatus = false;
@@ -270,6 +292,7 @@ SSVector& SSVector::operator-=(const Vector& vec)
 SSVector& SSVector::operator-=(const SVector& vec)
 {
    Vector::operator-=(vec);
+
    if (isSetup())
    {
       setupStatus = false;
@@ -278,6 +301,7 @@ SSVector& SSVector::operator-=(const SVector& vec)
    return *this;
 }
 
+#if 0 // USE_OLD // old version
 SSVector& SSVector::operator-=(const SSVector& vec)
 {
    if (vec.isSetup())
@@ -295,19 +319,55 @@ SSVector& SSVector::operator-=(const SSVector& vec)
       setupStatus = false;
       setup();
    }
-
    return *this;
 }
+#else
+SSVector& SSVector::operator-=(const SSVector& vec)
+{
+   if (vec.isSetup())
+   {
+      for (int i = 0; i < vec.size(); ++i)
+         val[vec.index(i)] -= vec.value(i);
+   }
+   else
+   {
+      Vector::operator-=(Vector(vec));
+   }
 
+   if (isSetup())
+   {
+      setupStatus = false;
+      setup();
+   }
+   return *this;
+}
+#endif
+
+#if 0 // USE_OLD // old version
 SSVector& SSVector::operator*=(Real x)
 {
+   assert(isSetup());
+
    for (int i = size() - 1; i >= 0; --i)
       val[index(i)] *= x;
    assert(isConsistent());
    return *this;
 }
+#else
+SSVector& SSVector::operator*=(Real x)
+{
+   assert(isSetup());
 
-#if USE_OLD // old
+   for (int i = 0; i < size(); ++i)
+      val[index(i)] *= x;
+
+   assert(isConsistent());
+
+   return *this;
+}
+#endif
+
+#if 0 // USE_OLD // old
 Real SSVector::maxAbs() const
 {
    if (isSetup())
@@ -333,7 +393,7 @@ Real SSVector::maxAbs() const
 {
    if (isSetup())
    {
-      Real maxabs = 0.0;
+      Real maxabs = REAL(0.0);
 
       for(int i = 0; i < num; ++i)
       {
@@ -370,6 +430,8 @@ Real SSVector::length() const
 }
 
 #if 0 // buggy and not used
+/* @todo check if really not used or if the Vector version is used instead.
+ */
 SSVector& SSVector::multAdd(Real xx, const SSVector& svec)
 {
    if (svec.isSetup())
@@ -463,6 +525,8 @@ SSVector& SSVector::multAdd(Real xx, const SSVector& svec)
 }
 #endif // 0
 
+/* @todo This function does not look good. MARKER is set but never really used.
+ */
 SSVector& SSVector::multAdd(Real xx, const SVector& svec)
 {
    if (isSetup())
@@ -532,7 +596,7 @@ SSVector& SSVector::multAdd(Real x, const Vector& vec)
    return *this;
 }
 
-#if USE_OLD // old version
+#if 0 // USE_OLD // old version
 SSVector& SSVector::operator=(const SSVector& rhs)
 {
    assert(rhs.isConsistent());
@@ -641,7 +705,7 @@ SSVector& SSVector::operator=(const SSVector& rhs)
 }
 #endif // 0
 
-#if USE_OLD // old version
+#if 0 // USE_OLD // old version
 void SSVector::setup_and_assign(SSVector& rhs)
 {
    assert(rhs.isConsistent());
@@ -708,6 +772,8 @@ void SSVector::setup_and_assign(SSVector& rhs)
    assert(isConsistent());
 }
 #else // new version
+/* setup rhs and assign to this
+ */
 void SSVector::setup_and_assign(SSVector& rhs)
 {
    clear();
@@ -826,6 +892,8 @@ SSVector& SSVector::assign2product1(const SVSet& A, const SSVector& x)
    for (; e < last; ++e)
       v[ *ii++ = e->idx ] = y * e->val;
 
+   assert(isConsistent());
+
    return *this;
 }
 
@@ -882,6 +950,7 @@ SSVector& SSVector::assign2productShort(const SVSet& A, const SSVector& x)
    num = int(it - idx);
 
    assert(isConsistent());
+
    return *this;
 }
 
@@ -908,6 +977,7 @@ SSVector& SSVector::assign2productFull(const SVSet& A, const SSVector& x)
       for (; elem < last; ++elem)
          v[elem->idx] += y * elem->val;
    }
+   assert(isConsistent());
 
    return *this;
 }
@@ -938,6 +1008,7 @@ SSVector& SSVector::assign2product4setup(const SVSet& A, const SSVector& x)
       assign2productFull(A, x);
       setupStatus = false;
    }
+   assert(isConsistent());
 
    return *this;
 }
@@ -960,6 +1031,8 @@ SSVector& SSVector::assign2product(const SSVector& x, const SVSet& A)
          IdxSet::addIdx(i);
       }
    }
+   assert(isConsistent());
+
    return *this;
 }
 
@@ -1020,6 +1093,8 @@ SSVector& SSVector::assign2productAndSetup(const SVSet& A, SSVector& x)
    x.setupStatus = true;
    setupStatus = false;
 
+   assert(isConsistent());
+
    return *this;
 }
 
@@ -1037,9 +1112,7 @@ bool SSVector::isConsistent() const
       {
          int j = number(i);
 
-         if (j < 0 && fabs(val[i]) >= epsilon) 
-            return MSGinconsistent("SSVector");
-         if (j >= 0 && fabs(val[i]) < epsilon)
+         if (j < 0 && fabs(val[i]) > 0.0) 
             return MSGinconsistent("SSVector");
       }
    }
@@ -1055,3 +1128,4 @@ bool SSVector::isConsistent() const
 //Emacs indent-tabs-mode:nil
 //Emacs End:
 //-----------------------------------------------------------------------------
+

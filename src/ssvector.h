@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.h,v 1.17 2003/04/22 08:04:32 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.h,v 1.18 2005/01/09 16:01:08 bzfkocht Exp $"
 
 
 /**@file  ssvector.h
@@ -40,10 +40,13 @@ class SVSet;
    This class implements Semi Sparse Vectors. Such are
    #DVector%s where the indices of its nonzero elements can be stored in an
    extra #IdxSet. Only elements with absolute value > #epsilon are considered
-   to be nonzero. Since really storing the nonzeros is not allways convenient,
+   to be nonzero. 
+   Since really storing the nonzeros is not allways convenient,
    an #SSVector provides two different statuses: setup and not setup.
    An #SSVector being setup means that the nonzero indices are available,
    otherwise an #SSVector is just an ordinary #Vector with an empty #IdxSet.
+   Note that due to arithmetic operation, zeros can slip in, i.e. it is only
+   guaranteed that at least every non-zero is in the #IdxSet.
 */
 class SSVector : protected DVector, protected IdxSet
 {
@@ -177,6 +180,8 @@ public:
             remove(n);
       }
       val[i] = 0;
+
+      assert(isConsistent());
    }
 
    /// sets \p n 'th nonzero element to 0 (index \p n must exist!).
@@ -186,6 +191,8 @@ public:
       assert(index(n) >= 0);
       val[index(n)] = 0;
       remove(n);
+
+      assert(isConsistent());
    }
    //@}
 
@@ -239,7 +246,7 @@ public:
    //@}
 
 
-   /**@name Mathematical opeations */
+   /**@name Mathematical operations */
    //@{
    ///
    SSVector& operator+=(const Vector& vec);
@@ -325,6 +332,8 @@ public:
       spx_alloc(idx, len);
 
       Vector::clear();
+
+      assert(isConsistent());
    }
 
    /// copy constructor.
@@ -337,6 +346,8 @@ public:
       len = (vec.dim() < 1) ? 1 : vec.dim();
       spx_alloc(idx, len);
       IdxSet::operator= ( vec );
+
+      assert(isConsistent());
    }
 
    /// constructs nonsetup copy of \p vec.
@@ -348,6 +359,8 @@ public:
    { 
       len = (vec.dim() < 1) ? 1 : vec.dim();
       spx_alloc(idx, len);
+
+      assert(isConsistent());
    }
 
    /// sets up \p rhs vector, and assigns it.
@@ -365,6 +378,8 @@ public:
    {
       unSetup();
       Vector::operator=(rhs);
+
+      assert(isConsistent());
       return *this;
    }
 
