@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector.h,v 1.10 2002/01/31 08:19:31 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vector.h,v 1.11 2002/04/06 13:05:03 bzfkocht Exp $"
 
 /**@file  vector.h
  * @brief Dense vector for linear algebra.
@@ -31,7 +31,6 @@ namespace soplex
 class SLUFactor;
 class SVector;
 class SSVector;
-class SubSVector;
 
 /**@brief   Dense vector
    @ingroup Algebra
@@ -168,16 +167,12 @@ public:
    /// vector addition
    Vector& operator+=(const SVector& vec);
    /// vector addition
-   Vector& operator+=(const SubSVector& vec);
-   /// vector addition
    Vector& operator+=(const SSVector& vec);
 
    /// vector difference
    Vector& operator-=(const Vector& vec);
    /// vector difference
    Vector& operator-=(const SVector& vec);
-   /// vector difference
-   Vector& operator-=(const SubSVector& vec);
    /// vector difference
    Vector& operator-=(const SSVector& vec);
 
@@ -188,8 +183,6 @@ public:
    Real operator*(const SSVector& v) const;
    /// inner product.
    Real operator*(const SVector& v) const;
-   /// inner product.
-   Real operator*(const SubSVector& v) const;
    /// inner product.
    Real operator*(const Vector& v) const
    {
@@ -209,8 +202,6 @@ public:
 
    /// addition of scaled vector
    Vector& multAdd(Real x, const SVector& vec);
-   /// addition of scaled vector
-   Vector& multAdd(Real x, const SubSVector& vec);
    /// addition of scaled vector
    Vector& multAdd(Real x, const SSVector& svec);
    ///  addition of scaled vector

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.28 2002/04/03 11:22:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.29 2002/04/06 13:05:01 bzfkocht Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -242,12 +242,6 @@ public:
    void remove(const DataKey& removekey)
    {
       remove(number(removekey));
-   }
-
-   /// removes element \p item.
-   void remove(DATA& item)
-   {
-      remove(number(&item));
    }
 
    /// remove multiple elements.

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.55 2002/04/04 14:59:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.56 2002/04/06 13:05:02 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -314,21 +314,6 @@ void SoPlex::init()
    }
 }
 
-#ifdef USE_SUBCOVECTORS
-int SoPlex::sortLP(int pe, int nPes)
-{
-   METHOD( "SoPlex::sortLP()" );
-   int n = 0;
-   int i;
-   for (i = pe; i < thecovectors->num(); i += nPes)
-   {
-      n += (*thecovectors)[i].size();
-      (const_cast<SVector*>(&((*thecovectors)[i])))->sort();
-   }
-   return n;
-}
-#endif // USE_SUBCOVECTORS
-
 void SoPlex::setPricing(Pricing pr)
 {
    METHOD( "SoPlex::setPricing()" );
@@ -340,85 +325,6 @@ void SoPlex::setPricing(Pricing pr)
       computeTest();
    }
 }
-
-#ifdef USE_SUBCOVECTORS
-
-void SoPlex::splitLP(int pe, int nPes)
-{
-   METHOD( "SoPlex::splitLP()" );
-   assert(pe   >= 0);
-   assert(nPes > 0);
-
-   int i, j, n;
-   int start;
-   int nnes = 0;
-   int end = 0;
-   int nVecs = subcovectors.size();
-
-   for (n = pe; n < nVecs; n += nPes)
-   {
-      subcovectors[n].reSize(dim());
-      start = nnes = 0;
-      assert(nVecs > 0);
-      for (j = (n * nNZEs) / nVecs; start < coDim(); ++start)
-      {
-         if (nnes >= j)
-            break;
-         nnes += vector(start).size();
-      }
-      end = start;
-      for (j = ((n + 1) * nNZEs) / nVecs; end < coDim(); ++end)
-      {
-         if (nnes >= j)
-            break;
-         nnes += vector(end).size();
-      }
-      for (i = 0; i < thecovectors->num(); i++)
-      {
-         const SVector& vec = (*thecovectors)[i];
-         int first = -1;
-         for (j = 0; j < vec.size(); ++j)
-         {
-            if (vec.index(j) >= start && first < 0)
-               first = j;
-            if (vec.index(j) >= end)
-               break;
-         }
-         if (first < 0)
-            first = j;
-         //  subcovectors[n][i] = SubSVector(&vec, first, j - first);
-         subcovectors[n][i].assign(&vec, first, j - first);
-      }
-   }
-
-#ifndef NDEBUG
-      if (pe == 0)
-      {
-         for (i = 0; i < dim(); i++)
-         {
-            int sum = 0;
-            for (j = 0; j < nVecs; ++j)
-               sum += subcovectors[j][i].size();
-            if (sum != (*thecovectors)[i].size())
-               std::cerr << pe << ": " << sum << "<->"
-                         << (*thecovectors)[i].size() << std::endl;
-         }
-      }
-#endif // NDEBUG
-}
-
-void SoPlex::splitLP()
-{
-   METHOD( "SoPlex::splitLP()" );
-   subcovectors.reSize(coDim() / coVecDim + 1);
-
-   if (subcovectors.size() > 1)
-   {
-      nNZEs = sortLP (0, 1);
-      splitLP(0, 1);
-   }
-}
-#endif // USE_SUBCOVECTORS
 
 /*
     The following method resizes all vectors and arrays of |SoPlex|

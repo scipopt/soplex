@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.48 2002/04/04 19:36:51 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.49 2002/04/06 13:05:02 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -74,10 +74,6 @@ SoPlex::Status SoPlex::solve()
 
    m_numCycle = 0;
    iterCount  = 0;
-
-#ifdef USE_SUBCOVECTORS
-   splitLP();
-#endif
 
    if (!isInitialized())
    {

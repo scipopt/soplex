@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.38 2002/04/05 16:13:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.39 2002/04/06 13:05:02 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -185,7 +185,7 @@ int main(int argc, char **argv)
    int                    simplifing     = 3;
    Real                   timelimit      = -1.0;
    Real                   delta          = DEFAULT_BND_VIOL;
-   Real                   epsilon        = 1e-15; //DEFAULT_EPS_ZERO;
+   Real                   epsilon        = DEFAULT_EPS_ZERO;
    int                    verbose        = 1;
    bool                   print_solution = false;
    bool                   print_quality  = false;

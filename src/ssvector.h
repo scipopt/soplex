@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.h,v 1.14 2002/03/03 13:50:35 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.h,v 1.15 2002/04/06 13:05:02 bzfkocht Exp $"
 
 
 /**@file  ssvector.h
@@ -26,7 +26,6 @@
 
 #include "spxdefines.h"
 #include "dvector.h"
-#include "subsvector.h"
 #include "svector.h"
 #include "didxset.h"
 #include "spxalloc.h"
@@ -235,8 +234,6 @@ public:
    SSVector& operator+=(const Vector& vec);
    ///
    SSVector& operator+=(const SVector& vec);
-   ///
-   SSVector& operator+=(const SubSVector& vec);
    /// vector summation.
    SSVector& operator+=(const SSVector& vec);
 
@@ -244,8 +241,6 @@ public:
    SSVector& operator-=(const Vector& vec);
    ///
    SSVector& operator-=(const SVector& vec);
-   ///
-   SSVector& operator-=(const SubSVector& vec);
    /// vector subtraction.
    SSVector& operator-=(const SSVector& vec);
 
@@ -256,15 +251,11 @@ public:
    SSVector& multAdd(Real x, const SSVector& vec);
    ///
    SSVector& multAdd(Real x, const SVector& vec);
-   ///
-   SSVector& multAdd(Real x, const SubSVector& vec);
    /// adds scaled vector (+= \p x * \p vec).
    SSVector& multAdd(Real x, const Vector& vec);
 
    /// assigns #SSVector to \f$x^T \cdot A\f$.
    SSVector& assign2product(const SSVector& x, const SVSet& A);
-   /// assigns #SSVector to \f$A \cdot x\f$.
-   SSVector& assign2product(const SVSet& A, const SSVector& x);
    /// assigns #SSVector to \f$A \cdot x\f$ for a setup \p x.
    SSVector& assign2product4setup(const SVSet& A, const SSVector& x);
    /// assigns #SSVector to \f$A \cdot x\f$ thereby setting up \p x.

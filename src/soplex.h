@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.45 2002/04/05 16:13:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.46 2002/04/06 13:05:02 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -31,12 +31,6 @@
 #include "random.h"
 #include "unitvector.h"
 #include "updatevector.h"
-
-#ifdef USE_SUBCOVECTORS
-#include "subsvector.h"
-#endif
-
-#define SOPLEX_VERSION   121
 
 namespace soplex
 {
@@ -228,13 +222,6 @@ protected:
 
    int            nNZEs;          ///< number of nonzero elements
    int            coVecDim;
-
-#ifdef USE_SUBCOVECTORS
-   /**@todo Do we need the subcovectors? In principle no. Where they ment
-    *       for parallelization or for speedup?
-    */
-   Array < Array < SubSVector > > subcovectors;
-#endif
 
    DVector        primRhs;     ///< rhs vector for computing the primal vector
    UpdateVector   primVec;     ///< primal vector
@@ -729,18 +716,6 @@ public:
 
    /**@name Vectors and Covectors */
    //@{
-
-#ifdef USE_SUBCOVECTORS
-protected:
-   /// ???
-   int sortLP (int pe, int nPes);
-   /// ???
-   void splitLP(int pe, int nPes);
-   /// ???
-   virtual void splitLP();
-#endif // USE_SUBCOVECTORS
-
-public:
    /// \p i 'th vector.
    /**@return a reference to the \p i 'th, 0 <= i < #coDim(), vector of
     *         the loaded LP (with respect to the chosen representation).

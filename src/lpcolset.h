@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcolset.h,v 1.14 2002/03/03 13:50:32 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpcolset.h,v 1.15 2002/04/06 13:05:02 bzfkocht Exp $"
 
 /**@file  lpcolset.h
  * @brief Set of LP columns.
@@ -299,23 +299,12 @@ public:
    /// removes multiple elements.
    void remove(int perm[]);
 
-   /// removes all #LPCol%s associated to the \p n #DataKey%s \p keys.
-   void remove(DataKey keys[], int n)
-   {
-      DataArray < int > perm(num());
-      remove(keys, n, perm.get_ptr());
-   }
-
    /// removes #LPCol%s with numbers \p nums, where \p n is the length of the array \p nums
    void remove(int nums[], int n)
    {
       DataArray < int > perm(num());
       remove(nums, n, perm.get_ptr());
    }
-
-   /// removes all #LPCol%s associated to the \p n #DataKey%s \p keys, and stores the index permutation in array \p perm.
-   void remove(DataKey keys[], int n, int* perm);
-
    /// removes #LPCol%s with numbers \p nums, where \p n is the length of the array \p nums, and stores the index permutation in array \p perm.
    void remove(int nums[], int n, int* perm);
 

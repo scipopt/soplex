@@ -1,6 +1,9 @@
-$Id: TODO,v 1.61 2002/04/04 14:59:04 bzfkocht Exp $
+$Id: TODO,v 1.62 2002/04/06 13:05:01 bzfkocht Exp $
 
 Diesen Kram mal als @todo's schreiben ;-)
+
+Einzel removed so implemnetieren das alles weitergeschoben wird.
+
 
 Es gibt probleme, wenn der preprocessor das problem komplett erledigt.
 Den die rueckgabe ist dann nicht UNBOUNDED/INFEASIBLE, sondern fertig.

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.h,v 1.16 2002/03/03 13:50:32 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprowset.h,v 1.17 2002/04/06 13:05:02 bzfkocht Exp $"
 
 /**@file  lprowset.h
  * @brief Set of LP columns.
@@ -306,24 +306,14 @@ public:
    /// removes multiple #LPRow%s.
    void remove(int perm[]);
 
-   /// removes \p n #LPRow%s with #DataKey%s \p keys.
-   void remove(DataKey keys[], int n)
-   {
-      DataArray<int> perm(num());
-      remove(keys, n, perm.get_ptr());
-   }
-
    /// removes \p n #LPRow%s with row numbers given by \p nums.
    void remove(int nums[], int n)
    {
       DataArray<int> perm(num());
       remove(nums, n, perm.get_ptr());
    }
-
-   /// removes \p n #LPRow%s with #DataKey%s \p keys, and stores permutation of row indices in \p perm.
-   void remove(DataKey keys[], int n, int* perm);
-
-   /// removes \p n #LPRow%s with row numbers given by \p nums, and stores permutation of row indices in \p perm.
+   /// removes \p n #LPRow%s with row numbers given by \p nums, 
+   /// and stores permutation of row indices in \p perm.
    void remove(int nums[], int n, int* perm);
 
    /// removes all #LPRow%s.

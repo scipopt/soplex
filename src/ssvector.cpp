@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.18 2002/03/10 10:01:00 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.19 2002/04/06 13:05:02 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -219,17 +219,6 @@ SSVector& SSVector::operator+=(const SVector& vec)
    return *this;
 }
 
-SSVector& SSVector::operator+=(const SubSVector& vec)
-{
-   Vector::operator+=(vec);
-   if (isSetup())
-   {
-      setupStatus = false;
-      setup();
-   }
-   return *this;
-}
-
 SSVector& SSVector::operator+=(const SSVector& vec)
 {
    for (int i = vec.size() - 1; i >= 0; --i)
@@ -254,17 +243,6 @@ SSVector& SSVector::operator-=(const Vector& vec)
 }
 
 SSVector& SSVector::operator-=(const SVector& vec)
-{
-   Vector::operator-=(vec);
-   if (isSetup())
-   {
-      setupStatus = false;
-      setup();
-   }
-   return *this;
-}
-
-SSVector& SSVector::operator-=(const SubSVector& vec)
 {
    Vector::operator-=(vec);
    if (isSetup())
@@ -434,63 +412,6 @@ SSVector& SSVector::multAdd(Real xx, const SSVector& svec)
 }
 
 SSVector& SSVector::multAdd(Real xx, const SVector& svec)
-{
-   if (isSetup())
-   {
-      int i, j;
-      Real x;
-      Real* v = val;
-      int adjust = 0;
-
-      for (i = svec.size() - 1; i >= 0; --i)
-      {
-         j = svec.index(i);
-         if (v[j])
-         {
-            x = v[j] + xx * svec.value(i);
-            if (isNotZero(x, epsilon))
-               v[j] = x;
-            else
-            {
-               adjust = 1;
-               v[j] = MARKER;
-            }
-         }
-         else
-         {
-            x = xx * svec.value(i);
-            if (isNotZero(x, epsilon))
-            {
-               v[j] = x;
-               addIdx(j);
-            }
-         }
-      }
-
-      if (adjust)
-      {
-         int* iptr = idx;
-         int* iiptr = idx;
-         int* endptr = idx + num;
-         for (; iptr < endptr; ++iptr)
-         {
-            x = v[*iptr];
-            if (isNotZero(x, epsilon))
-               *iiptr++ = *iptr;
-            else
-               v[*iptr] = 0;
-         }
-         num = int(iiptr - idx);
-      }
-   }
-   else
-      Vector::multAdd(xx, svec);
-
-   assert(isConsistent());
-   return *this;
-}
-
-SSVector& SSVector::multAdd(Real xx, const SubSVector& svec)
 {
    if (isSetup())
    {

@@ -13,14 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector.cpp,v 1.10 2002/03/03 13:50:36 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vector.cpp,v 1.11 2002/04/06 13:05:03 bzfkocht Exp $"
 
 #include <iostream>
 
 #include "spxdefines.h"
 #include "vector.h"
 #include "ssvector.h"
-#include "subsvector.h"
 #include "svector.h"
 #include "message.h"
 
@@ -70,18 +69,6 @@ Vector& Vector::operator+=(const SVector& vec)
    return *this;
 }
 
-Vector& Vector::operator+=(const SubSVector& vec)
-{
-   // for (int i = vec.size(); i > 0; --i)
-   for( int i = 0; i < vec.size(); ++i )
-   {
-      assert(vec.index(i) >= 0);
-      assert(vec.index(i) < dim());
-      val[vec.index(i)] += vec.value(i);
-   }
-   return *this;
-}
-
 Vector& Vector::operator-=(const Vector& vec)
 {
    assert(dim() == vec.dim());
@@ -91,18 +78,6 @@ Vector& Vector::operator-=(const Vector& vec)
 }
 
 Vector& Vector::operator-=(const SVector& vec)
-{
-   // for (int i = vec.size(); i--;)
-   for( int i = 0; i < vec.size(); ++i )
-   {
-      assert(vec.index(i) >= 0);
-      assert(vec.index(i) < dim());
-      val[vec.index(i)] -= vec.value(i);
-   }
-   return *this;
-}
-
-Vector& Vector::operator-=(const SubSVector& vec)
 {
    // for (int i = vec.size(); i--;)
    for( int i = 0; i < vec.size(); ++i )
@@ -155,16 +130,6 @@ std::ostream& operator<<(std::ostream& s, const Vector& vec)
 }
 
 Real Vector::operator*(const SVector& v) const
-{
-   assert(dim() >= v.dim());
-   int i;
-   Real x = 0;
-   for (i = v.size(); i-- > 0;)
-      x += val[v.index(i)] * v.value(i);
-   return x;
-}
-
-Real Vector::operator*(const SubSVector& v) const
 {
    assert(dim() >= v.dim());
    int i;
