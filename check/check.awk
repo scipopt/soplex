@@ -1,3 +1,12 @@
+# $Id: check.awk,v 1.2 2001/11/06 23:30:58 bzfkocht Exp $
+#* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+#*                                                                           *
+#*   File....: check.awk                                                     *
+#*   Name....: SoPlex Check Report Generator                                 *
+#*   Author..: Thorsten Koch                                                 *
+#*   Copyright by Author, All rights reserved                                *
+#*                                                                           *
+#* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 function abs(x)
 {
     return x < 0 ? -x : x;

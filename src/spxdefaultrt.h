@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultrt.h,v 1.1 2001/11/06 16:18:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefaultrt.h,v 1.2 2001/11/06 23:31:03 bzfkocht Exp $"
 
 #ifndef _SPXDEFAULTRT_H_
 #define _SPXDEFAULTRT_H_
@@ -97,6 +97,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:
+//Emacs mode:c++
 //Emacs c-basic-offset:3
 //Emacs tab-width:8
 //Emacs indent-tabs-mode:nil

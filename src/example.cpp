@@ -13,13 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.1 2001/11/06 16:18:31 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.2 2001/11/06 23:31:01 bzfkocht Exp $"
 
 
 /*  Import system include files
  */
 #include <assert.h>
-#include <unistd.h>
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -59,30 +58,33 @@ using namespace soplex;
  */
 class MySoPlex : public SPxSolver
 {
+private:
+   SLUFactor m_slu;
+
 public:
-   SLUFactor slu;
-
-   int terminate();
-
    //@ManMemo:     default constructor
-   MySoPlex(Type type = LEAVE, Representation rep = COLUMN)
-      : SPxSolver(type, rep)
+   MySoPlex(Type p_type = LEAVE, Representation p_rep = COLUMN)
+      : SPxSolver(p_type, p_rep)
    {}
 
+   int terminate()
+   {
+      if (iteration() % 100 == 0)
+         std::cout << iteration() << ":\t" << value() << std::endl;
+
+      return SoPlex::terminate();
+   }
+
+   void setUtype(SLUFactor::UpdateType tp)
+   {
+      m_slu.setUtype(tp);
+   }
 };
-
-int MySoPlex::terminate()
-{
-   if (iteration() % 100 == 0)
-      std::cout << iteration() << ":\t" << value() << std::endl;
-
-   return SoPlex::terminate();
-}
 
 //@ ----------------------------------------------------------------------------
 int main(int argc, char **argv)
 {
-   const char* usage = "[-eri][-b n][-p n][-s n][-t n] mpsfile";
+   const char* usage = "[-eri][-bn][-ltime][-pn][-sn][-tn] mpsfile";
    const char*            filename;
    SoPlex::Type           type           = SoPlex::LEAVE;
    SoPlex::Representation representation = SoPlex::COLUMN;
@@ -91,14 +93,18 @@ int main(int argc, char **argv)
    int                    pricing        = 3;
    int                    ratiotest      = 2;
    int                    simplifier     = 0;
-   int                    c;
+   double                 timelimit      = -1.0;
+   int                    optind;
 
-   while((c = getopt(argc, argv, "c:eip:rs:t:")) != -1)
+   for(optind = 1; optind < argc; optind++)
    {
-      switch(c)
+      if (*argv[optind] != '-')
+         break;
+
+      switch(argv[optind][1])
       {
       case 'c' :
-         starter = atoi(optarg);
+         starter = atoi(&argv[optind][2]);
          break;
       case 'e':
          type = SoPlex::ENTER;
@@ -106,17 +112,20 @@ int main(int argc, char **argv)
       case 'i' :
          update = SLUFactor::ETA;
          break;
+      case 'l' :
+         timelimit = atof(&argv[optind][2]);
+         break;
       case 'p' :
-         pricing = atoi(optarg);
+         pricing = atoi(&argv[optind][2]);
          break;
       case 'r' :
          representation = SoPlex::ROW;
          break;
       case 's' :
-         simplifier = atoi(optarg);
+         simplifier = atoi(&argv[optind][2]);
          break;
       case 't' :
-         ratiotest = atoi(optarg);
+         ratiotest = atoi(&argv[optind][2]);
          break;
       case '?' :
          std::cerr << "usage: " << argv[0] << ":" << usage << std::endl;
@@ -136,7 +145,8 @@ int main(int argc, char **argv)
 
    MySoPlex work(type, representation);
 
-   work.slu.setUtype(update);
+   work.setUtype(update);
+   work.setTermination(LPSolver::infinity, timelimit, -1);
 
    assert(work.isConsistent());
 
@@ -173,6 +183,7 @@ int main(int argc, char **argv)
       std::cout << "Partial multiple";
       break;
    case 0 :
+      /*FALLTHROUGH*/
    default:
       work.load(new SPxDefaultPR);
       std::cout << "Default";
@@ -192,6 +203,7 @@ int main(int argc, char **argv)
       std::cout << "Harris";
       break;
    case 0 :
+      /*FALLTHROUGH*/
    default:
       work.load(new SPxDefaultRT);
       std::cout << "Default";
@@ -223,6 +235,7 @@ int main(int argc, char **argv)
       std::cout << "General";
       break;
    case 0  :
+      /*FALLTHROUGH*/
    default :
       std::cout << "No";
    }
@@ -232,21 +245,19 @@ int main(int argc, char **argv)
 
    switch(starter)
    {
-   case 3 :
-      work.load(new SPxVectorST);
-      std::cout << "Sum";
-      break;
    case 2 :
-      work.load(new SPxWeightST);
-      std::cout << "Weight";
+      work.load(new SPxVectorST);
+      std::cout << "Vector";
       break;
    case 1 :
       work.load(new SPxSumST);
       std::cout << "Sum";
       break;
    case 0 :
+      /*FALLTHROUGH*/
    default :
-      std::cout << "Default";
+      work.load(new SPxWeightST);
+      std::cout << "Weight";
       break;
    }
 
@@ -280,7 +291,9 @@ int main(int argc, char **argv)
       timer.start();
       std::cout << "solving LP" 
                 << std::endl;
+
       work.solve();
+
       timer.stop();
       std::cout << "solution time  is: " 
                 << timer.userTime() 
@@ -290,6 +303,7 @@ int main(int argc, char **argv)
                 << std::endl;
       
       LPSolver::Status stat = work.status();
+
       switch (stat)
       {
       case LPSolver::SOLVED:
@@ -320,6 +334,7 @@ int main(int argc, char **argv)
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:
+//Emacs mode:c++
 //Emacs c-basic-offset:3
 //Emacs tab-width:8
 //Emacs indent-tabs-mode:nil

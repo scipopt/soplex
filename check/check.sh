@@ -1,3 +1,4 @@
+# $Id: check.sh,v 1.2 2001/11/06 23:30:58 bzfkocht Exp $
 BINNAME=`basename $2`
 OUTFILE=check.$BINNAME.out
 ERRFILE=check.$BINNAME.err

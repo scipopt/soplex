@@ -1,7 +1,7 @@
-#--- Linux.x86.gnu.dbg settings -----------------------------------------------
+#--- $Id: make.linux.x86.kai.dbg,v 1.2 2001/11/06 23:30:59 bzfkocht Exp $
 CXX	=	KCC
 CPPFLAGS=	-Isrc 
-CXXFLAGS=	-g --lint #--strict 
+CXXFLAGS=	-g --linux_headers # --lint
 LDFLAGS	=	--static_libKCC -lm
 AR	=	KCC
 ARFLAGS	=	-o

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.2 2001/11/06 16:47:24 bzfkocht Exp $
+# $Id: Makefile,v 1.3 2001/11/06 23:30:51 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -8,7 +8,7 @@
 #*                                                                           *
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-.PHONY:		clean lint check quick cover
+.PHONY:		depend clean lint check quick cover
 
 ARCH            :=      $(shell uname -m | \
                         sed -e s/sun../sparc/ -e s/i.86/x86/)
@@ -58,10 +58,9 @@ GCCWARN		=	-Wall -W -Wpointer-arith -Wbad-function-cast \
 			-Wstrict-prototypes -Wmissing-prototypes \
 			-Wmissing-declarations -Wno-unknown-pragmas \
 			-Wctor-dtor-privacy -Wnon-virtual-dtor -Wreorder \
-			-Woverloaded-virtual -Wsign-promo -Wsynth -Wundef 
-#			-fhonor-std -fno-implicit-templates -fstrict-prototype
-#			-Wcast-qual -Weffc++ -Wold-style-cast -Wshadow 
-#			-Wredundant-decls    
+			-Woverloaded-virtual -Wsign-promo -Wsynth -Wundef \
+			-Wcast-qual -Wold-style-cast -Wshadow 
+#			-Weffc++ -Wredundant-decls    
 
 #-----------------------------------------------------------------------------
 include make/make.$(OSTYPE).$(ARCH).$(COMP).$(OPT)
@@ -73,17 +72,17 @@ DEPEND		=	src/depend
 
 OBJDIR		=	O.$(OSTYPE).$(ARCH).$(COMP).$(OPT)
 SRCDIR		=	src
+BINDIR		=	bin
+LIBDIR		=	lib
 OBJXXX		=	$(addprefix $(OBJDIR)/,$(OBJECT))
 LIBXXX		=	$(addprefix $(OBJDIR)/,$(LIBOBJ))
 OBJSRC		=	$(addprefix $(SRCDIR)/,$(OBJECT:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
 
-$(TARGET):	$(OBJDIR) $(OBJXXX) $(LIBRARY)
-		-mkdir bin
+$(TARGET):	$(OBJDIR) $(BINDIR) $(OBJXXX) $(LIBRARY) 
 		$(CXX) $(CXXFLAGS) $(OBJXXX) $(LIBRARY) $(LDFLAGS) -o $@
 
-$(LIBRARY):	$(LIBXXX)
-		-mkdir lib
+$(LIBRARY):	$(LIBDIR) $(LIBXXX) 
 		-rm $(LIBRARY)
 		$(AR) $(ARFLAGS) $@ $(LIBXXX) 
 		$(RANLIB) $@
@@ -110,13 +109,19 @@ clean:
 		-rm -rf $(OBJDIR)/* $(LIBRARY) $(TARGET)
 
 $(OBJDIR):	
-		mkdir $(OBJDIR)
+		-mkdir $(OBJDIR)
 
-$(DEPEND):	
+$(LIBDIR):
+		-mkdir $(LIBDIR)
+
+$(BINDIR):
+		-mkdir $(BINDIR)
+
+depend:
 		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
 		$(OBJSRC:.o=.cpp) $(LIBSRC:.o=.cpp) \
 		| sed '\''s/^\([0-9A-z]\{1,\}\)\.o/$(OBJDIR:/=\/)\/\1.o/g'\'' \
-		>$@'
+		>$(DEPEND)'
 
 include		$(DEPEND)
 

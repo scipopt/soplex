@@ -1,9 +1,7 @@
-#--- Linux.x86.gnu.opt settings -----------------------------------------------
+#--- $Id: make.linux.x86.gnu.opt,v 1.2 2001/11/06 23:30:59 bzfkocht Exp $
 CXX	=	g++
-DCXX	=	g++
 CPPFLAGS=	-Isrc -DNDEBUG
 CXXFLAGS=	-O3 -march=pentiumpro -fno-exceptions \
 		-ffast-math -fforce-addr -funroll-loops
-DFLAGS	=	-MM
 LDFLAGS	=	-lm
 ARFLAGS	=	crs

@@ -1,8 +1,6 @@
-#--- Linux.x86.insure.dbg settings --------------------------------------------
+#--- $Id: make.linux.x86.insure.dbg,v 1.2 2001/11/06 23:30:59 bzfkocht Exp $
 CXX	=	insure g++
-DCXX	=	g++
 CPPFLAGS=	-Isrc 
 CXXFLAGS=	-g -DNDEBUG
-DFLAGS	=	-MM
 LDFLAGS	=	-lm
 ARFLAGS	=	crs

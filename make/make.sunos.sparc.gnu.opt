@@ -1,0 +1,7 @@
+#--- $Id: make.sunos.sparc.gnu.opt,v 1.1 2001/11/06 23:31:00 bzfkocht Exp $
+CXX	=	g++
+CPPFLAGS=	-Isrc -DNDEBUG
+CXXFLAGS=	-O3 -mcpu=v9 -fno-exceptions \
+		-ffast-math -fforce-addr -funroll-loops
+LDFLAGS	=	-lm
+ARFLAGS	=	crs

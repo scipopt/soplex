@@ -1,4 +1,4 @@
-#--- Linux.alpha.compaq.opt settings ------------------------------------------
+#--- $Id: make.osf1.alpha.compaq.opt,v 1.2 2001/11/06 23:30:59 bzfkocht Exp $
 CXX	=	cxx
 CPPFLAGS=	-Isrc -DNDEBUG
 CXXFLAGS=	-std strict_ansi -O4 -fast -noexceptions  

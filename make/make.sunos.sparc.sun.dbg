@@ -1,4 +1,4 @@
-#--- Sunos.sparc.sun.dbg settings ---------------------------------------------
+#--- $Id: make.sunos.sparc.sun.dbg,v 1.2 2001/11/06 23:31:00 bzfkocht Exp $
 CXX	=	CC
 CPPFLAGS=	-Isrc 
 CXXFLAGS=	-g -native #+w2

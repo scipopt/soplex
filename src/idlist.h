@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idlist.h,v 1.1 2001/11/06 16:18:32 bzfkocht Exp $"
+#pragma ident "@(#) $Id: idlist.h,v 1.2 2001/11/06 23:31:01 bzfkocht Exp $"
 
 
 #ifndef _IDLIST_H_
@@ -46,8 +46,6 @@ namespace soplex
     controls members #next()# and #prev()#. However, #IdList# should provide
     enough functionality for the user not to requirer any modification to these
     members.
- 
-    WARNING: This does not compile with AT\&T cfront compiler!
  */
 template < class T >
 class IdElement : public T
@@ -344,6 +342,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:
+//Emacs mode:c++
 //Emacs c-basic-offset:3
 //Emacs tab-width:8
 //Emacs indent-tabs-mode:nil

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.1 2001/11/06 16:18:32 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.2 2001/11/06 23:31:05 bzfkocht Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -634,6 +634,7 @@ int SPxSteepPR::isConsistent() const
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:
+//Emacs mode:c++
 //Emacs c-basic-offset:3
 //Emacs tab-width:8
 //Emacs indent-tabs-mode:nil

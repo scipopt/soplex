@@ -1,9 +1,7 @@
-#--- Linux.alpha.compaq.dbg settings ------------------------------------------
+#--- $Id: make.osf1.alpha.compaq.dbg,v 1.2 2001/11/06 23:30:59 bzfkocht Exp $
 CXX	=	cxx
-DCXX	=	cxx
 CPPFLAGS=	-Isrc 
 CXXFLAGS=	-O0 -w0 -std strict_ansi -gall -verbose -check 
 # -ieee -msg_disable
-DFLAGS	=	-M
 LDFLAGS	=	-lm
 ARFLAGS	=	crs

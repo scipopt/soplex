@@ -8,12 +8,11 @@ O.linux.x86.gnu.dbg/example.o: src/example.cpp src/spxsolver.h src/spxsteeppr.h 
  src/slinsolver.h src/array.h src/random.h src/unitvector.h \
  src/updatevector.h src/spxfastrt.h src/spxratiotester.h \
  src/spxweightst.h src/spxstarter.h src/slufactor.h src/clutypes.h \
- src/clumembers.h src/cmdline.h src/spxdefaultpr.h src/spxparmultpr.h \
+ src/clumembers.h src/spxdefaultpr.h src/spxparmultpr.h \
  src/spxdevexpr.h src/spxhybridpr.h src/spxweightpr.h \
  src/spxharrisrt.h src/spxdefaultrt.h src/spxsimplifier.h \
  src/spxaggregatesm.h src/spxredundantsm.h src/spxrem1sm.h \
- src/spxscale.h src/spxgeneralsm.h
-O.linux.x86.gnu.dbg/cmdline.o: src/cmdline.cpp src/cmdline.h src/dataarray.h
+ src/spxscale.h src/spxgeneralsm.h src/spxsumst.h src/spxvectorst.h
 O.linux.x86.gnu.dbg/cachelpsolver.o: src/cachelpsolver.cpp src/cachelpsolver.h \
  src/lpsolver.h src/svector.h src/vector.h src/vector_c.h \
  src/lpcolset.h src/lpcol.h src/dsvector.h src/ssvector.h \

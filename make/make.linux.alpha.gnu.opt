@@ -1,4 +1,4 @@
-#--- Linux.x86.gnu.opt settings -----------------------------------------------
+#--- $Id: make.linux.alpha.gnu.opt,v 1.2 2001/11/06 23:30:59 bzfkocht Exp $
 CXX	=	g++
 CPPFLAGS=	-Isrc -DNDEBUG
 CXXFLAGS=	-O3 -mcpu=ev6 -fno-exceptions \

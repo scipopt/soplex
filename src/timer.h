@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: timer.h,v 1.1 2001/11/06 16:18:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: timer.h,v 1.2 2001/11/06 23:31:06 bzfkocht Exp $"
 
 #ifndef _TIMER_H_
 #define _TIMER_H_
@@ -449,6 +449,7 @@ inline Timer::Timer()
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:
+//Emacs mode:c++
 //Emacs c-basic-offset:3
 //Emacs tab-width:8
 //Emacs indent-tabs-mode:nil
