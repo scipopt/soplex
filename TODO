@@ -69,13 +69,13 @@ cring.h
 *lpsolver.h
 *nameset.h
 *random.h
-slinsolver.h
-slufactor.h
+*slinsolver.h
++slufactor.h  // hier fehlen noch ein paar Sachen  -> Thorsten!
 +soplex.h // in Arbeit ;-)
-sorter.h
+*sorter.h
 *spxaggregatesm.h
 *spxalloc.h
-spxbasis.h
+*spxbasis.h
 spxdefaultpr.h
 spxdefaultrt.h
 spxdevexpr.h

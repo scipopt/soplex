@@ -13,38 +13,27 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: sorter.h,v 1.2 2001/11/06 23:31:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: sorter.h,v 1.3 2001/11/26 15:55:39 bzfpfend Exp $"
 
 
+/**@file  sorter.h
+ * @brief Generic QuickSort implementation.
+ */
 #ifndef _SORTER_H_
 #define _SORTER_H_
 
-//@ ----------------------------------------------------------------------------
-/*      \Section{Imports}
-    Import required system include files
- */
 #include <assert.h>
 
 namespace soplex
 {
-
-
-//@ ----------------------------------------------------------------------------
-/* \Section{Implementation}
-    This is quicksort.
- */
-/**@name sorting        functions */
-//@{
-/** Sort array.
-    The template function #sort# sorts an array #t# holding #n# elements of type
-    #T# using #c# for comparisions. Class #COMPARATOR# must be provide an
-    overloaded #operator()(const T& t1,const T& t2)#, that returns
-    \begin{description}
-    \item[#<0#]         if #t1# is to appear before #t2#,
-    \item[#==0#]        if #t1# and #t2# can appear in any order or
-    \item[#>0#]         if #t1# is to appear after #t2#.
-    \end{description}
- */
+/// Generic QuickSort implementation.
+/** This template function sorts an array \p t holding \p n elements of
+    type #T using \p compare for comparisions. Class #COMPARATOR must provide
+    an overloaded #operator()(const T& t1,const T& t2), that returns
+    - < 0, if \p t1 is to appear before \p t2,
+    - = 0, if \p t1 and \p t2 can appear in any order, or
+    - > 0, if \p t1 is to appear after \p t2.
+*/
 
 template < class T, class COMPARATOR >
 void sorter_qsort(T* t, int end, COMPARATOR& compare, int start = 0)
@@ -93,8 +82,6 @@ void sorter_qsort(T* t, int end, COMPARATOR& compare, int start = 0)
    if (i1 + 1 < end)
       sorter_qsort(t, end, compare, i1 + 1);
 }
-
-//@}
 
 
 } // namespace soplex

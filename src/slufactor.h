@@ -13,21 +13,15 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.h,v 1.3 2001/11/07 17:31:20 bzfbleya Exp $"
+#pragma ident "@(#) $Id: slufactor.h,v 1.4 2001/11/26 15:55:39 bzfpfend Exp $"
 
+/**@file  slufactor.h
+ * @brief Sparse LU factorization.
+ */
 #ifndef _SLUFACTOR_H_
 #define _SLUFACTOR_H_
 
-
-//@ ----------------------------------------------------------------------------
-/*      \Section{Imports}
-    Import required system include files
- */
 #include <assert.h>
-
-
-/*  and class header files
- */
 
 #include "dvector.h"
 #include "slinsolver.h"
@@ -42,44 +36,43 @@
 namespace soplex
 {
 
-#define MAXUPDATES      1000            // maximum nr. of factorization updates
-// allowed before refactorization .
+/// maximum nr. of factorization updates allowed before refactorization.
+#define MAXUPDATES      1000     
 
 
-//@ ----------------------------------------------------------------------------
-/*      \Section{Class Declaration}
- */
-/** Sparse LU factorization.
- *  This is an implementation class for \Ref{SLinSolver} using sparse LU
- *  factorization.
- */
+/**@brief   Sparse LU factorization.
+   @ingroup Algo
+   
+   This is an implementation class for #SLinSolver using sparse LU
+   factorization.
+*/
 class SLUFactor : public SLinSolver, private CLUFactor
 {
 public:
-   /// how to perform #change# method.
+   /**@todo document the two change methods ETA and FOREST_TOMLIN */
+   /// how to perform #change method.
    enum UpdateType
-   {       ///
-      ETA = 0,
-      ///
-      FOREST_TOMLIN
+   {
+      ETA = 0,       ///< 
+      FOREST_TOMLIN  ///<
    };
 
 protected:
+   /**@todo document these protected methods and attributes */
    void assign(const SLUFactor& old);
    void freeAll();
    void changeEta(int idx, SSVector& eta);
 
-   DVector vec;
-   SSVector ssvec;
+   DVector    vec;           ///<
+   SSVector   ssvec;         ///<
 
-   int usetup;         // 1 if update vector has been setup
-   UpdateType uptype;
-   SSVector eta;
-   SSVector forest;
-   double lastThreshold;
+   int        usetup;        ///< TRUE iff update vector has been setup
+   UpdateType uptype;        ///< the current #UpdateType.
+   SSVector   eta;           ///< 
+   SSVector   forest;        ///<
+   double     lastThreshold; ///<
 
 public:
-   ///
    typedef SLinSolver::Status Status;
 
    /**@name Control Parameters */
@@ -87,32 +80,33 @@ public:
    /// minimum threshold to use.
    double minThreshold;
 
-   /// #|x| < epsililon# is considered to be 0.
+   /// |x| < epsililon is considered to be 0.
    double epsilon;
 
-   /// minimum stability to acchieve by setting threshold.
+   /// minimum stability to achieve by setting threshold.
    double minStability;
 
-   ///
+   /// returns the current update type #uptype.
    UpdateType utype()
    {
       return uptype;
    }
 
-   /** Set UpdateType.
-    *  The new #UpdateType# becomes valid only after the next call to
-    *  method #load()#.
-    */
+   /// sets update type.
+   /** The new #UpdateType becomes valid only after the next call to
+       method #load().
+   */
    void setUtype(UpdateType tp)
    {
       uptype = tp;
    }
    //@}
 
-   /**@name derived from \Ref{SLinSolver}
-    *  See documentation of \Ref{SLinSolver} for a documentation of these
-    *  methods.
-    */
+   /**@todo should we document reimplemented derived methods again? */
+   /**@name derived from SLinSolver
+      See documentation of #SLinSolver for a documentation of these
+      methods.
+   */
    //@{
    ///
    void clear();
@@ -200,37 +194,48 @@ public:
    Status change(int idx, const SVector& subst, const SSVector* eta = 0);
    //@}
 
-   /** A zero vector.
-    *  Return a zero #Vector# of the factorizations dimension. This may
-    *  {\em temporarily} be used by other the caller in order to save
-    *  memory (management overhead), but {\em must be reset to 0} when a
-    *  method of #SLUFactor# is called.
-    */
+   /**@name Miscellaneous */
+   //@{
+   /// returns a zero vector.
+   /** Returns a zero #Vector of the factorizations dimension. This may
+       \em temporarily be used by other the caller in order to save
+       memory (management overhead), but \em must \em be \em reset \em to \em 0
+       when a method of #SLUFactor is called.
+   */
    Vector& zeroVec() //const
    {
       return vec; //((SLUFactor*)this)->vec;
    }
 
-   ///
+   /// prints the LU factorization to stdout.
    void dump() const;
-   ///
+
+   /// consistency check.
    int isConsistent() const;
-   ///
-   SLUFactor& operator=(const SLUFactor& old);
-   ///
+   //@}
+
+   /**@name Constructors / Destructors */
+   //@{
+   /// default constructor.
+   SLUFactor();
+
+   /// copy constructor.
    SLUFactor(const SLUFactor& old)
       : SLinSolver( old )
-         , vec (old.vec)
-         , ssvec (old.ssvec)
-         , eta (old.eta)
-         , forest(old.forest)
+      , vec (old.vec)
+      , ssvec (old.ssvec)
+      , eta (old.eta)
+      , forest(old.forest)
    {
       assign(old);
    }
-   ///
-   SLUFactor();
-   ///
+
+   /// assignment operator.
+   SLUFactor& operator=(const SLUFactor& old);
+
+   /// destructor.
    virtual ~SLUFactor();
+   //@}
 };
 
 } // namespace soplex
