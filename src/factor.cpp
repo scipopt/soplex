@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.12 2001/12/01 18:21:16 bzfbleya Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.13 2001/12/03 15:07:38 bzfkocht Exp $"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,10 +28,10 @@
 namespace soplex
 {
    /************************************************************/
-   CLUFactor::Temp::Temp():
-      s_mark( NULL ),
-      s_max( NULL ),
-      s_cact( NULL )
+   CLUFactor::Temp::Temp()
+      : s_mark(0)
+      , s_max(0)
+      , s_cact(0)
    {}
 
    void CLUFactor::Temp::init(int p_dim)
@@ -43,9 +43,12 @@ namespace soplex
    
    void CLUFactor::Temp::clear()
    {
-      spx_free(s_mark);
-      spx_free(s_cact);
-      spx_free(s_max);
+      if (s_mark != 0)
+         spx_free(s_mark);
+      if (s_cact != 0)
+         spx_free(s_cact);
+      if (s_max != 0)
+         spx_free(s_max);
    }
    
    CLUFactor::Temp::~Temp()
@@ -205,7 +208,7 @@ namespace soplex
          }
    }
 
-   /*****************************************************************************/
+   /*************************************************************************/
    /*
     *      Perform garbage collection on column file
     */
