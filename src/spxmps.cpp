@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmps.cpp,v 1.3 2001/11/09 13:25:21 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxmps.cpp,v 1.4 2001/11/09 21:23:42 bzfkocht Exp $"
 
 
 #include <iostream>
@@ -701,7 +701,10 @@ void SPxLP::readMPS(std::istream& is, NameSet* rn, NameSet* cn)
    assert(next == ENDATA);
    changeSense(MINIMIZE);
 
-   added2Set(*(static_cast<SVSet*>(static_cast<LPRowSet*>(this))), *(static_cast<SVSet*>(static_cast<LPColSet*>(this))), colSet.num());
+   added2Set(
+      *(reinterpret_cast<SVSet*>(static_cast<LPRowSet*>(this))), 
+      *(reinterpret_cast<SVSet*>(static_cast<LPColSet*>(this))), 
+      colSet.num());
    addedCols(colSet.num());
    assert(isConsistent());
 }

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.3 2001/11/07 17:31:22 bzfbleya Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.4 2001/11/09 21:23:42 bzfkocht Exp $"
 
 #ifndef _SPXLP_H_
 #define _SPXLP_H_
@@ -316,11 +316,11 @@ protected:
 
    SVSet* rowset()
    {
-      return static_cast<SVSet*>(static_cast<LPRowSet*>(this));
+      return reinterpret_cast<SVSet*>(static_cast<LPRowSet*>(this));
    }
    SVSet* colset()
    {
-      return static_cast<SVSet*>(static_cast<LPColSet*>(this));
+      return reinterpret_cast<SVSet*>(static_cast<LPColSet*>(this));
    }
 
    /*

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idlist.h,v 1.3 2001/11/07 17:31:17 bzfbleya Exp $"
+#pragma ident "@(#) $Id: idlist.h,v 1.4 2001/11/09 21:23:40 bzfkocht Exp $"
 
 
 #ifndef _IDLIST_H_
@@ -118,13 +118,13 @@ public:
    /// return successor of #elem#.
    T* next(const T *elem) const
    {
-      return (elem == last()) ? 0 : static_cast<T*>(elem->next());
+      return (elem == last()) ? 0 : const_cast<T*>(elem->next());
    }
 
    /// return predecessor of #elem#.
    T* prev(const T *elem) const
    {
-      return (elem == first()) ? 0 : static_cast<T*>(elem->prev());
+      return (elem == first()) ? 0 : const_cast<T*>(elem->prev());
    }
    //@}
 

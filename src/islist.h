@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: islist.h,v 1.3 2001/11/07 17:31:17 bzfbleya Exp $"
+#pragma ident "@(#) $Id: islist.h,v 1.4 2001/11/09 21:23:41 bzfkocht Exp $"
 
 
 #ifndef _ISLIST_H_
@@ -291,7 +291,7 @@ public:
     */
    T* next(const T *elem) const
    {
-      return (elem == the_last) ? 0 : static_cast<T*>(elem->next());
+      return (elem == the_last) ? 0 : const_cast<T*>(elem->next());
    }
 
    /// return nr. of elements in #IsList#.

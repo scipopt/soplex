@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.3 2001/11/07 17:31:16 bzfbleya Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.4 2001/11/09 21:23:40 bzfkocht Exp $"
 
 /*      \SubSection{Updating the Basis for Entering Variables}
  */
@@ -743,7 +743,7 @@ int SoPlex::enter(Id& enterId)
    else
    {
       DVector tmp(dim());
-      tmp = static_cast<DVector&>(theFvec->delta());
+      tmp = reinterpret_cast<DVector&>(theFvec->delta());
       multBaseWith(tmp);
       tmp -= *enterVec;
       if (tmp.length() > delta())
