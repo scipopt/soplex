@@ -1,4 +1,4 @@
-# $Id: check.sh,v 1.7 2001/11/28 17:13:27 bzfkocht Exp $
+# $Id: check.sh,v 1.8 2002/01/05 22:38:32 bzfkocht Exp $
 BINNAME=`basename $2`
 TSTNAME=`basename $1 .test`
 OUTFILE=check.$TSTNAME.$BINNAME.out
@@ -7,14 +7,16 @@ RESFILE=check.$TSTNAME.$BINNAME.res
 date >$OUTFILE
 date >$ERRFILE
 case $TSTNAME in
-mittelbach) timelimit="-l10000" ;;
-*)          timelimit="" ;;
+mittelbach) timelimit="-l10000" 
+            algorithm="1" ;;
+*)          timelimit="" 
+            algorithm="1 2 3 4" ;;
 esac
 for i in `cat $1`
 do
     echo @01 $i ===========
     echo @01 $i =========== >>$ERRFILE
-    for k in 1 2 3 4
+    for k in $algorithm
     do
         case $k in
 	1)  echo =type= LC
