@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.72 2004/11/05 20:11:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.73 2005/01/03 11:30:12 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -47,16 +47,7 @@ bool SPxSolver::precisionReached(Real& newDelta) const
 
    if (!reached)
    {
-      /* get the biggest violation less than delta
-       */
-      if (maxViolRedCost < delta())
-         newDelta = maxViolRedCost;
-      if (maxViolBounds < delta() && maxViolBounds > newDelta)
-         newDelta = maxViolBounds;
-      if (maxViolConst < delta() && maxViolConst > newDelta)
-         newDelta = maxViolConst;
-
-      newDelta /= 2.0;
+      newDelta = delta() / 10.0;
 
       VERBOSE3({ std::cout << "Precision not reached: Pricer delta= " << thepricer->epsilon() 
                            << " new delta= " << newDelta
@@ -85,6 +76,7 @@ SPxSolver::Status SPxSolver::solve()
 
    SPxId enterId;
    int   leaveNum;
+   int   loopCount = 0;
    Real  minDelta;
    Real  maxDelta;
    Real  newDelta;
@@ -225,7 +217,9 @@ SPxSolver::Status SPxSolver::solve()
                       << ", value: " << value()
                       << ", shift: " << shift()
                       << ", epsilon: " << epsilon()
-                      << ", stop: " << stop
+                      << ", delta: " << delta()
+                      << std::endl
+                      << "\tstop: " << stop
                       << ", basis status: " << int(SPxBasis::status())
                       << ", solver status: " << int(m_status) << std::endl;
          });
@@ -327,7 +321,9 @@ SPxSolver::Status SPxSolver::solve()
                       << ", value: " << value()
                       << ", shift: " << shift()
                       << ", epsilon: " << epsilon()
-                      << ", stop: " << stop
+                      << ", delta: " << delta()
+                      << std::endl
+                      << "\tstop: " << stop
                       << ", basis status: " << int(SPxBasis::status())
                       << ", solver status: " << int(m_status) << std::endl;
          });
@@ -345,12 +341,16 @@ SPxSolver::Status SPxSolver::solve()
                             << ", delta: " << delta() << std::endl;
                });
 
-               if (maxInfeas() + shift() <= delta())
+               // We stop if we are indeed optimal, or if we have already been
+               // two times at this place. In this case it seems futile to
+               // continue.
+               if (maxInfeas() + shift() <= delta() || loopCount >= 2)
                {
                   setBasisStatus(SPxBasis::OPTIMAL);
                   m_status = OPTIMAL;
                   break;
                }
+               loopCount++;
             }
             setType(ENTER);
             init();
