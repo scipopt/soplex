@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.22 2003/01/15 17:26:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.23 2003/04/20 08:32:30 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -1047,7 +1047,7 @@ SPxSimplifier::Result SPxRedundantSM::simplify(SPxLP& lp, Real eps, Real delta)
 {
    METHOD("SPxRedundantSM::simplify()");
 
-   Result ret;
+   Result ret = OKAY;
    bool   again;
    bool   rcagain;
    bool   rragain;
@@ -1077,28 +1077,27 @@ SPxSimplifier::Result SPxRedundantSM::simplify(SPxLP& lp, Real eps, Real delta)
    {
       again = false;
  
-      if( (ret = simpleRows(lp, again)) != OKAY)
-         return ret;
+      if (ret == OKAY)
+         ret = simpleRows(lp, again);
 
-      // std::cout << lp << std::endl;
+      if (ret == OKAY)
+         ret = simpleCols(lp, again);
 
-      if( (ret = simpleCols(lp, again)) != OKAY)
-         return ret;
+      assert(ret == OKAY || again == false);
 
       //std::cout << lp << std::endl;
-      //abort();
    }
    while(again);
 
    //std::cout << lp << std::endl;
 #if 1
-   if( (ret = redundantCols(lp, rcagain)) != OKAY)
-      return ret;
+   if (ret == OKAY)
+      ret = redundantCols(lp, rcagain);
 
-   if( (ret = redundantRows(lp, rragain)) != OKAY)
-      return ret;
+   if (ret == OKAY)
+      ret = redundantRows(lp, rragain);
 
-   again = rcagain || rragain;
+   again = (ret == OKAY) && (rcagain || rragain);
 
    // This has to be a loop, otherwise we could end up with
    // empty rows.
@@ -1106,11 +1105,13 @@ SPxSimplifier::Result SPxRedundantSM::simplify(SPxLP& lp, Real eps, Real delta)
    {
       again = false;
 
-      if( (ret = simpleRows(lp, again)) != OKAY)
-         return ret;
+      if (ret == OKAY)
+         ret = simpleRows(lp, again);
 
-      if( (ret = simpleCols(lp, again)) != OKAY)
-         return ret;
+      if (ret == OKAY)
+         ret = simpleCols(lp, again);
+
+      assert(ret == OKAY || again == false);
    }
 #endif
    VERBOSE1({ std::cout << "IREDSM25 redundant simplifier removed "
@@ -1120,9 +1121,14 @@ SPxSimplifier::Result SPxRedundantSM::simplify(SPxLP& lp, Real eps, Real delta)
                         << m_chgLRhs << " row bounds,"
                         << std::endl; });
 
+   if (lp.nCols() == 0 && lp.nRows() == 0)
+   {
+      VERBOSE1({ std::cout << "IREDSM26 simplifier removed all rows and columns" << std::endl; });
+      ret = VANISHED;
+   }
    m_timeUsed.stop();
 
-   return OKAY;
+   return ret;
 }
 
 const Vector& SPxRedundantSM::unsimplifiedPrimal(const Vector& x)

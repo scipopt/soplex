@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.23 2002/12/16 07:29:47 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.24 2003/04/20 08:32:30 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -99,6 +99,7 @@ void SSVector::setValue(int i, Real x)
    assert(isConsistent());
 }
 
+#if 0 // old version
 void SSVector::setup()
 {
    if (!isSetup())
@@ -195,6 +196,33 @@ void SSVector::setup()
       assert(isConsistent());
    }
 }
+#else // new version, not yet fully testet
+void SSVector::setup()
+{
+   if (!isSetup())
+   {
+      IdxSet::clear();
+
+      num = 0;
+
+      for(int i = 0; i < dim(); ++i)
+      {
+         if (val[i] != 0.0)
+         {
+            if (isZero(val[i], epsilon))
+               val[i] = 0.0;
+            else
+            {
+               idx[num] = i;
+               num++;
+            }
+         }
+      }
+      setupStatus = true;
+      assert(isConsistent());
+   }
+}
+#endif
 
 SSVector& SSVector::operator+=(const Vector& vec)
 {
@@ -281,6 +309,7 @@ SSVector& SSVector::operator*=(Real x)
    return *this;
 }
 
+#if 0 // old
 Real SSVector::maxAbs() const
 {
    if (isSetup())
@@ -301,6 +330,26 @@ Real SSVector::maxAbs() const
    else
       return Vector::maxAbs();
 }
+#else // new, not fully tested
+Real SSVector::maxAbs() const
+{
+   if (isSetup())
+   {
+      Real maxabs = 0.0;
+
+      for(int i = 0; i < num; ++i)
+      {
+         Real x = fabs(val[idx[i]]);
+
+         if (x > maxabs)
+            maxabs = x;
+      }
+      return maxabs;
+   }
+   else
+      return Vector::maxAbs();
+}
+#endif // !0
 
 Real SSVector::length2() const
 {

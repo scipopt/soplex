@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: mpsinput.cpp,v 1.8 2003/04/16 12:41:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: mpsinput.cpp,v 1.9 2003/04/20 08:32:30 bzfkocht Exp $"
 
 /**@file  mpsinput.cpp
  * @brief Read MPS format files.
@@ -21,6 +21,7 @@
 //#define DEBUGGING 1             // Setting this generates a lot of output
 
 #include <assert.h>
+#include <ctype.h>
 #include <string.h>
 
 #include "spxdefines.h"

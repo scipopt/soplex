@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.60 2003/03/03 08:30:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.61 2003/04/20 08:32:30 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief preconfigured #SoPlex LP-solver.
@@ -47,6 +47,7 @@ protected:
    SPxScaler*      m_preScaler;
    SPxScaler*      m_postScaler;
    SPxSimplifier*  m_simplifier;
+   bool            m_vanished;  ///< did the presolver solve the problem ?
 
 public:
    /// default construtor.
@@ -105,26 +106,26 @@ public:
    /// time spent in factorizations
    virtual Real getFactorTime() const
    {
-      return m_slu.getFactorTime();
+      return m_vanished ? REAL(0.0) : m_slu.getFactorTime();
    }
    /// number of factorizations performed
    virtual int getFactorCount() const
    {
-      return m_slu.getFactorCount();
+      return m_vanished ? 0 : m_slu.getFactorCount();
    }
    /// time spent in factorizations
    virtual Real getSolveTime() const
    {
-      return m_slu.getSolveTime();
+      return m_vanished ? REAL(0.0) : m_slu.getSolveTime();
    }
    /// number of factorizations performed
    virtual int getSolveCount() const
    {
-      return m_slu.getSolveCount();
+      return m_vanished ? 0 : m_slu.getSolveCount();
    }
    virtual int iteration() const
-   {
-      return m_solver.basis().iteration();
+   {      
+      return m_vanished ? 0 : m_solver.basis().iteration();
    }
    virtual bool terminate() 
    {
@@ -190,11 +191,21 @@ public:
    }
    virtual SPxSolver::Status status()
    {
+      if (m_vanished)
+         return SPxSolver::OPTIMAL;
+
       return m_solver.status();
    }
    /// write basis to \p filename in MPS format.
    virtual bool writeBasisFile(const char* filename, 
       const NameSet& rowNames, const NameSet& colNames);
+
+private:
+   /// assignment operator is not implemented.
+   SoPlex& operator=(const SoPlex& rhs);
+
+   /// copy constructor is not implemented.
+   SoPlex(const SoPlex&);
 };
 } // namespace soplex
 #endif // _SPXSOLVER_H_

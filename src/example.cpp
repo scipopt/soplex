@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.59 2003/03/30 13:23:31 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.60 2003/04/20 08:32:30 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -97,17 +97,20 @@ public:
                 << std::setw(16) << maxviol << "  " 
                 << std::setw(16) << sumviol << std::endl;
 
-      m_solver.qualSlackViolation(maxviol, sumviol);
+      if (!m_vanished)
+      {
+         m_solver.qualSlackViolation(maxviol, sumviol);
 
-      std::cout << "IEXAMP10 Slacks           :" 
-                << std::setw(16) << maxviol << "  " 
-                << std::setw(16) << sumviol << std::endl;
+         std::cout << "IEXAMP10 Slacks           :" 
+                   << std::setw(16) << maxviol << "  " 
+                   << std::setw(16) << sumviol << std::endl;
 
-      m_solver.qualRedCostViolation(maxviol, sumviol);
+         m_solver.qualRedCostViolation(maxviol, sumviol);
 
-      std::cout << "IEXAMP11 Reduced costs    :" 
-                << std::setw(16) << maxviol << "  " 
-                << std::setw(16) << sumviol << std::endl;
+         std::cout << "IEXAMP11 Reduced costs    :" 
+                   << std::setw(16) << maxviol << "  " 
+                   << std::setw(16) << sumviol << std::endl;
+      }
    }
 };
 
