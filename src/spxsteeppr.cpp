@@ -13,11 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.7 2001/12/15 15:50:28 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.8 2001/12/25 16:03:24 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
+#include "spxmessage.h"
 #include "spxsteeppr.h"
 #include "random.h"
 
@@ -121,14 +122,14 @@ void SPxSteepPR::setType(SoPlex::Type type)
    workRhs.clear();
 }
 
-void SPxSteepPR::setupPrefs(double mult, double tie, double cotie,
+void SPxSteepPR::setupPrefs(double mult, double /*tie*/, double /*cotie*/,
                              double shift, double coshift,
                              int rs, int cs, int re, int ce)
 {
    double *p;
    double *cp;
    double *end;
-   double rtie, ctie;
+   // double rtie, ctie;
    double rshift, cshift;
    int i;
 
@@ -136,8 +137,8 @@ void SPxSteepPR::setupPrefs(double mult, double tie, double cotie,
    {
       cp = pref.get_ptr();
       p = coPref.get_ptr();
-      ctie = tie;
-      rtie = cotie;
+      // ctie = tie;
+      // rtie = cotie;
       cshift = shift;
       rshift = coshift;
    }
@@ -145,8 +146,8 @@ void SPxSteepPR::setupPrefs(double mult, double tie, double cotie,
    {
       p = pref.get_ptr();
       cp = coPref.get_ptr();
-      rtie = tie;
-      ctie = cotie;
+      // rtie = tie;
+      // ctie = cotie;
       rshift = shift;
       cshift = coshift;
    }
@@ -566,16 +567,6 @@ void SPxSteepPR::removedCoVecs(const int perm[])
    prefSetup = 0;
 }
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Consistency}
- */
-#define inconsistent                                                    \
-do {                                                                    \
-std::cout << "ERROR: Inconsistency detected in class SPxSteepPR\n";      \
-return 0;                                                          \
-} while(0)
-
 int SPxSteepPR::isConsistent() const
 {
    if (thesolver != 0 && thesolver->type() == SoPlex::LEAVE && setup == EXACT)
@@ -599,12 +590,12 @@ int SPxSteepPR::isConsistent() const
       int i;
       for (i = thesolver->dim() - 1; i >= 0; --i)
          if (coPenalty[i] < thesolver->epsilon())
-            inconsistent;
+            return SPXinconsistent("SPxSteepPR");
+
       for (i = thesolver->coDim() - 1; i >= 0; --i)
          if (penalty[i] < thesolver->epsilon())
-            inconsistent;
+            return SPXinconsistent("SPxSteepPR");
    }
-
    return 1;
 }
 } // namespace soplex

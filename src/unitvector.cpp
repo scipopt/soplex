@@ -13,44 +13,27 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: unitvector.cpp,v 1.2 2001/11/06 23:31:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: unitvector.cpp,v 1.3 2001/12/25 16:03:25 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <assert.h>
-#include <iostream>
 
-
-/*  and class header files
- */
 #include "unitvector.h"
+#include "spxmessage.h"
 
 namespace soplex
 {
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Consistency}
- */
-#define inconsistent                                                    \
-{                                                                       \
-std::cout << "ERROR: Inconsistency detected in class UnitVector\n";      \
-return 0;                                                          \
-}
-
 int UnitVector::isConsistent() const
 {
    if (mem() != &themem)
-      inconsistent;
+      return SPXinconsistent("UnitVector");
    if (mem() + 1 != &themem1)
-      inconsistent;
+      return SPXinconsistent("UnitVector");
    if (size() != 1)
-      inconsistent;
+      return SPXinconsistent("UnitVector");
    if (max() != 1)
-      inconsistent;
+      return SPXinconsistent("UnitVector");
+
    return SVector::isConsistent();
 }
 } // namespace soplex

@@ -13,41 +13,19 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxstarter.cpp,v 1.3 2001/11/11 20:27:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxstarter.cpp,v 1.4 2001/12/25 16:03:24 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <assert.h>
 #include <iostream>
 
-
-/*  and class header files
- */
 #include "spxstarter.h"
 
 namespace soplex
 {
 
-
-//@ global macros
-//@ #define
-
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Consistency}
- */
-#define inconsistent                                                    \
-{                                                                       \
-std::cout << "ERROR: Inconsistency detected in class SPxStarter\n";      \
-return 0;                                                          \
-}
-
 int SPxStarter::isConsistent() const
 {
-   std::cout << "Not implemented" << std::endl;
+   std::cout << "Not yet implemented" << std::endl;
 
    abort();
 

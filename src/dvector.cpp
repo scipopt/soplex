@@ -13,20 +13,16 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dvector.cpp,v 1.6 2001/12/11 08:39:00 bzfbleya Exp $"
+#pragma ident "@(#) $Id: dvector.cpp,v 1.7 2001/12/25 16:03:24 bzfkocht Exp $"
 
 
-/*  \Section{Complex Methods}
- */
 #include "dvector.h"
+#include "spxmessage.h"
 #include "spxalloc.h"
 
 namespace soplex
 {
 
-
-/* \SubSection{Maths Operators}
- */
 DVector operator+(const Vector& v, const Vector& w)
 {
    assert(v.dim() == v.dim());
@@ -192,10 +188,8 @@ DVector::~DVector()
 int DVector::isConsistent() const
 {
    if (val != mem || dimen > memsize || dimen < 0)
-   {
-      std::cerr << "ERROR: inconsistency detected in class DVector\n";
-      return 0;
-   }
+      return SPXinconsistent("DVector");
+
    return Vector::isConsistent();
 }
 } // namespace soplex

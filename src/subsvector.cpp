@@ -13,26 +13,17 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: subsvector.cpp,v 1.2 2001/11/06 23:31:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: subsvector.cpp,v 1.3 2001/12/25 16:03:25 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <assert.h>
 #include <iostream>
 
-
-/*  and class header files
- */
 #include "subsvector.h"
+#include "spxmessage.h"
 
 namespace soplex
 {
 
-
-//@ ----------------------------------------------------------------------------
 void SubSVector::sort()
 {
    SVector::Element dummy;
@@ -142,30 +133,20 @@ std::ostream& operator<<(std::ostream& os, const SubSVector& v)
    return os;
 }
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Consistency}
-*/
-#define inconsistent                                                    \
-{                                                                       \
-std::cout << "ERROR: Inconsistency detected in class SubSVector\n";      \
-return 0;                                                          \
-}
-
 int SubSVector::isConsistent() const
 {
    if (elem)
    {
 #ifndef NDEBUG
       if (elem < &svec->element(0))
-         inconsistent;
+         return SPXinconsistent("SubSVector");
       if (elem + num > (&svec->element(0)) + svec->size())
-         inconsistent;
+         return SPXinconsistent("SubSVector");
       return svec->isConsistent();
 #endif
    }
    else if (num)
-      inconsistent;
+      return SPXinconsistent("SubSVector");
    return 1;
 }
 } // namespace soplex

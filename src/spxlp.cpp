@@ -13,12 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.cpp,v 1.6 2001/11/22 16:30:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.cpp,v 1.7 2001/12/25 16:03:24 bzfkocht Exp $"
 
 #include <stdio.h>
-#include <iostream>
 
 #include "spxlp.h"
+#include "spxmessage.h"
 
 namespace soplex
 {
@@ -689,12 +689,6 @@ void SPxLP::changeElement(int i, int j, double val)
    assert(isConsistent());
 }
 
-#define inconsistent    \
-{       \
-std::cout << "Inconsistency detected in class SPxLP\n"; \
-return 0;  \
-}
-
 int SPxLP::isConsistent() const
 {
    int i, j, n;
@@ -707,9 +701,9 @@ int SPxLP::isConsistent() const
          const SVector& w = rowVector(v.index(j));
          n = w.number(i);
          if (n < 0)
-            inconsistent;
+            return SPXinconsistent("SPxLP");
          if (v.value(j) != w.value(n))
-            inconsistent;
+            return SPXinconsistent("SPxLP");
       }
    }
 
@@ -721,12 +715,11 @@ int SPxLP::isConsistent() const
          const SVector& w = colVector(v.index(j));
          n = w.number(i);
          if (n < 0)
-            inconsistent;
+            return SPXinconsistent("SPxLP");
          if (v.value(j) != w.value(n))
-            inconsistent;
+            return SPXinconsistent("SPxLP");
       }
    }
-
    return LPRowSet::isConsistent() && LPColSet::isConsistent();
 }
 } // namespace soplex

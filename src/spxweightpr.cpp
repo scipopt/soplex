@@ -13,28 +13,16 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.5 2001/11/11 20:27:34 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.6 2001/12/25 16:03:24 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <assert.h>
-#include <iostream>
 
-
-/*  and class header files
- */
 #include "spxweightpr.h"
+#include "spxmessage.h"
 
 namespace soplex
 {
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Setup}
- */
 void SPxWeightPR::setRep(SoPlex::Representation rep)
 {
    if (rep == SoPlex::ROW)
@@ -72,10 +60,11 @@ void SPxWeightPR::computeRP(int start, int end)
 {
    for (int i = start; i < end; ++i)
    {
-      // !!! TK04NOV98 here is a bug.
-      // solver()->rowVector(i).length() could be zero, so
-      // solver()->rowVector(i).length2() is also zero and we
-      // get an arithmetic exception.
+      /**@todo TK04NOV98 here is a bug.
+       *       solver()->rowVector(i).length() could be zero, so
+       *       solver()->rowVector(i).length2() is also zero and we
+       *       get an arithmetic exception.
+       */
       assert(solver()->rowVector(i).length() > 0);
 
       rPenalty[i] = (solver()->rowVector(i) * solver()->maxObj()) * objlength
@@ -105,10 +94,6 @@ void SPxWeightPR::load(SoPlex* base)
    computeRP(0, base->nRows());
 }
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Leaving Simplex}
- */
 int SPxWeightPR::selectLeave()
 {
    const double* test = thesolver->fTest().get_const_ptr();
@@ -136,10 +121,6 @@ int SPxWeightPR::selectLeave()
    return lastIdx;
 }
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Entering Simplex}
- */
 SoPlex::Id SPxWeightPR::selectEnter()
 {
    const Vector& rTest = (solver()->rep() == SoPlex::ROW)
@@ -227,15 +208,10 @@ SoPlex::Id SPxWeightPR::selectEnter()
          }
       }
    }
-
    assert(isConsistent());
    return lastId;
 }
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Extension}
- */
 void SPxWeightPR::addedVecs(int)
 {
    if (solver()->rep() == SoPlex::ROW)
@@ -268,10 +244,6 @@ void SPxWeightPR::addedCoVecs(int)
    }
 }
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Shrinking}
- */
 void SPxWeightPR::removedVec(int i)
 {
    assert(solver());
@@ -356,26 +328,15 @@ void SPxWeightPR::removedCoVecs(const int perm[])
    }
 }
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Consistency}
- */
-#define inconsistent                                                    \
-do {                                                                    \
-std::cout << "ERROR: Inconsistency detected in class SPxPenalty\n";      \
-return 0;                                                          \
-} while(0)
-
 int SPxWeightPR::isConsistent() const
 {
    if (solver() != 0)
    {
       if (rPenalty.dim() != solver()->nRows())
-         inconsistent;
+         return SPXinconsistent("SPxWeightPR");
       if (cPenalty.dim() != solver()->nCols())
-         inconsistent;
+         return SPXinconsistent("SPxWeightPR");
    }
-
    return 1;
 }
 } // namespace soplex

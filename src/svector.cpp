@@ -13,13 +13,14 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.cpp,v 1.5 2001/11/28 17:15:52 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svector.cpp,v 1.6 2001/12/25 16:03:25 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
 #include "svector.h"
 #include "ssvector.h"
+#include "spxmessage.h"
 
 namespace soplex
 {
@@ -254,18 +255,12 @@ std::ostream& operator<<(std::ostream& os, const SVector& v)
    return os;
 }
 
-#define inconsistent                                                    \
-{                                                                       \
-std::cout << "ERROR: Inconsistency detected in class SVector, Line " << __LINE__ << std::endl; \
-return 0;                                                          \
-}
-
 int SVector::isConsistent() const
 {
-   if (m_elem)
+   if (m_elem != 0)
    {
       if (size() > max()){
-         inconsistent;
+         return SPXinconsistent("SVector");
       }
       for (int i = 1; i < size(); ++i)
       {
@@ -273,7 +268,7 @@ int SVector::isConsistent() const
          {
             if (m_elem[i].idx == m_elem[j].idx &&
                 m_elem[i].idx != 0 ) { // allow trailing zeros
-               inconsistent;
+               return SPXinconsistent("SVector");
             }
          }
       }

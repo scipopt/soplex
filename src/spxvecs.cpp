@@ -13,23 +13,16 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvecs.cpp,v 1.3 2001/11/12 16:42:12 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxvecs.cpp,v 1.4 2001/12/25 16:03:24 bzfkocht Exp $"
 
-/*  Import system include files
- */
 #include <assert.h>
 #include <iostream>
 
-/*  and class header files
- */
 #include "soplex.h"
 
 namespace soplex
 {
-
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Initialize Vectors}
+/*  Initialize Vectors
  
     Computing the right hand side vector for the feasibility vector depends on
     the chosen representation and type of the basis.
@@ -78,9 +71,9 @@ void SoPlex::computeFrhs()
                   break;
 
                default:
-                  assert(0 && "inconsistent basis");
-                  std::cerr << __FILE__ << __LINE__ << " ERROR: must not happen!\n";
-                  break;
+                  std::cerr << __FILE__ << __LINE__ 
+                            << " ERROR: inconsistent basis must not happen!\n";
+                  abort();
                }
                assert(x < SPxLP::infinity);
                assert(x > -SPxLP::infinity);
@@ -90,7 +83,7 @@ void SoPlex::computeFrhs()
          }
       }
       else
-{
+      {
          computeFrhs1(*theUbound, *theLbound);
          computeFrhs2(*theCoUbound, *theCoLbound);
       }
@@ -138,9 +131,9 @@ void SoPlex::computeFrhsXtra()
             break;
 
          default:
-            assert(0 && "inconsistent basis");
-            std::cerr << __FILE__ << __LINE__ << " ERROR: must not happen!\n";
-            break;
+            std::cerr << __FILE__ << __LINE__ 
+                      << " ERROR: inconsistent basis must not happen!\n";
+            abort();
          }
          assert(x < SPxLP::infinity);
          assert(x > -SPxLP::infinity);
@@ -188,15 +181,15 @@ void SoPlex::computeFrhs1
             break;
 
          case (SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER) :
-                  case (SPxBasis::Desc::D_ON_UPPER + SPxBasis::Desc::D_ON_LOWER) :
-                        assert(lfb[i] == ufb[i]);
+         case (SPxBasis::Desc::D_ON_UPPER + SPxBasis::Desc::D_ON_LOWER) :
+            assert(lfb[i] == ufb[i]);
             x = lfb[i];
             break;
 
          default:
-            assert(0 && "inconsistent basis");
-            std::cerr << __FILE__ << __LINE__ << "ERROR: must not happen!\n";
-            break;
+            std::cerr << __FILE__ << __LINE__ 
+                      << "ERROR: inconsistent basis must not happen!\n";
+            abort();
          }
          assert(x < SPxLP::infinity);
          assert(x > -SPxLP::infinity);
@@ -242,15 +235,15 @@ void SoPlex::computeFrhs2
             x = colfb[i];
             break;
          case (SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER) :
-                  case (SPxBasis::Desc::D_ON_UPPER + SPxBasis::Desc::D_ON_LOWER) :
-                        assert(colfb[i] == coufb[i]);
+         case (SPxBasis::Desc::D_ON_UPPER + SPxBasis::Desc::D_ON_LOWER) :
+            assert(colfb[i] == coufb[i]);
             x = colfb[i];
             break;
 
          default:
-            assert(0 && "inconsistent basis");
-            std::cerr << __FILE__ << __LINE__ << "ERROR: must not happen!\n";
-            break;
+            std::cerr << __FILE__ << __LINE__ 
+                      << "ERROR: inconsistent basis must not happen!\n";
+            abort();
          }
          assert(x < SPxLP::infinity);
          assert(x > -SPxLP::infinity);
@@ -260,11 +253,11 @@ void SoPlex::computeFrhs2
 }
 
 
-//@ ----------------------------------------------------------------------------
 /*
-    Computing the right hand side vector for |theCoPvec| depends on the type of
-    the simplex algorithm. In entering algorithms, the values are taken from the
-    inequality's right handside or the column's objective value.
+    Computing the right hand side vector for |theCoPvec| depends on
+    the type of the simplex algorithm. In entering algorithms, the
+    values are taken from the inequality's right handside or the
+    column's objective value.
     
     In contrast to this leaving algorithms take the values from vectors
     |theURbound| and so on.
@@ -278,15 +271,16 @@ void SoPlex::computeFrhs2
  
     Both methods are again split up into two methods named |...4Row(i,n)| and
     |...4Col(i,n)|, respectively. They do their job for the |i|-th basis
-    variable, being the |n|-th row or column.
- */
+    variable, being the |n|-th row or column.  
+*/
 void SoPlex::computeEnterCoPrhs4Row(int i, int n)
 {
    assert(baseId(i).isSPxRowId());
    assert(number(SPxRowId(baseId(i))) == n);
+
    switch (desc().rowStatus(n))
    {
-      // rowwise representation:
+   // rowwise representation:
    case SPxBasis::Desc::P_ON_LOWER + SPxBasis::Desc::P_ON_UPPER :
       assert(lhs(n) > -SPxLP::infinity);
       assert(rhs(n) == lhs(n));

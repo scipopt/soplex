@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.11 2001/12/25 14:25:55 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.12 2001/12/25 16:03:24 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -23,6 +23,7 @@
 #include "didxset.h"
 #include "dvector.h"
 #include "soplex.h"
+#include "spxmessage.h"
 
 namespace soplex
 {
@@ -422,10 +423,6 @@ void SPxBasis::factorize()
    nzFac = 0;
 }
 
-
-//@ -----------------------------------------------------------------------------
-/*      \SubSection{Linear Algebra}
- */
 Vector& SPxBasis::multWithBase(Vector& x) const
 {
    assert(status() > SINGULAR);
@@ -464,15 +461,6 @@ Vector& SPxBasis::multBaseWith(Vector& x) const
    return x;
 }
 
-//@ -----------------------------------------------------------------------------
-/*      \SubSubSection{Consistency Check}
- */
-#define inconsistent                                            \
-{                                                               \
-std::cout << "Inconsistency detected in class SPxBasis\n";      \
-return 0;                                                  \
-}
-
 int SPxBasis::isConsistent() const
 {
    int primals = 0;
@@ -481,48 +469,39 @@ int SPxBasis::isConsistent() const
    if (status() > NO_PROBLEM)
    {
       if (theLP == 0)
-         inconsistent
+         return SPXinconsistent("SPxBasis");
 
-         if
-         (
-            theBaseId.size() != theLP->dim() ||
-            matrix.size() != theLP->dim()
-        )
-            inconsistent
+      if (theBaseId.size() != theLP->dim() || matrix.size() != theLP->dim())
+         return SPXinconsistent("SPxBasis");
 
-            if
-            (
-               thedesc.nCols() != theLP->nCols() ||
-               thedesc.nRows() != theLP->nRows()
-           )
-               inconsistent
+      if (thedesc.nCols() != theLP->nCols() 
+         || thedesc.nRows() != theLP->nRows())
+         return SPXinconsistent("SPxBasis");
 
-               for (i = thedesc.nRows() - 1; i >= 0; --i)
-               {
-                  if (thedesc.rowStatus(i) >= 0)
-                  {
-                     if (thedesc.rowStatus(i) != dualRowStatus(i))
-                        inconsistent;
-                  }
-                  else
-                     ++primals;
-               }
-
+      for (i = thedesc.nRows() - 1; i >= 0; --i)
+      {
+         if (thedesc.rowStatus(i) >= 0)
+         {
+            if (thedesc.rowStatus(i) != dualRowStatus(i))
+               return SPXinconsistent("SPxBasis");
+         }
+         else
+            ++primals;
+      }
+      
       for (i = thedesc.nCols() - 1; i >= 0; --i)
       {
          if (thedesc.colStatus(i) >= 0)
          {
             if (thedesc.colStatus(i) != dualColStatus(i))
-               inconsistent;
+               return SPXinconsistent("SPxBasis");
          }
          else
             ++primals;
       }
-
       if (primals != thedesc.nCols())
-         inconsistent
-      }
-
+         return SPXinconsistent("SPxBasis");
+   }
    return thedesc.isConsistent()
           && theBaseId.isConsistent()
           && matrix.isConsistent()

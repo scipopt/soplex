@@ -13,30 +13,19 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.6 2001/11/13 17:04:17 bzfbleya Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.7 2001/12/25 16:03:24 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <assert.h>
-#include <iostream>
 
-
-/*  and class header files
- */
 #include "ssvector.h"
-
 #include "svset.h"
+#include "spxmessage.h"
 
 namespace soplex
 {
 
-
 static const double shortProductFactor = 0.5;
 
-//@ ----------------------------------------------------------------------------
 void SSVector::reDim (int newdim)
 {
    for (int i = DIdxSet::size() - 1; i >= 0; --i)
@@ -92,10 +81,6 @@ void SSVector::setValue(int i, double x)
    assert(isConsistent());
 }
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Maths}
- */
 void SSVector::setup()
 {
    if (!isSetup())
@@ -571,10 +556,6 @@ SSVector& SSVector::multAdd(double x, const Vector& vec)
    return *this;
 }
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Assignment}
- */
 SSVector& SSVector::operator=(const SSVector& rhs)
 {
    clear();
@@ -944,27 +925,18 @@ SSVector& SSVector::assign2productAndSetup(const SVSet& A, SSVector& x)
    return *this;
 }
 
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Consistency}
- */
-#define inconsistent                                                    \
-{                                                                       \
-std::cout << "ERROR: Inconsistency detected in class SSVector\n";        \
-return 0;                                                          \
-}
-
 int SSVector::isConsistent() const
 {
    if (Vector::dim() > DIdxSet::max())
-      inconsistent;
+      return SPXinconsistent("SSVector");
    if (Vector::dim() < DIdxSet::dim())
-      inconsistent;
+      return SPXinconsistent("SSVector");
 
    if (isSetup())
    {
       for (int i = Vector::dim() - 1; i >= 0; --i)
          if (val[i] != 0 && number(i) < 0)
-            inconsistent;
+            return SPXinconsistent("SSVector");
    }
 
    return DVector::isConsistent() && DIdxSet::isConsistent();

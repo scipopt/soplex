@@ -13,19 +13,14 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idxset.cpp,v 1.4 2001/11/23 12:26:53 bzfpfend Exp $"
+#pragma ident "@(#) $Id: idxset.cpp,v 1.5 2001/12/25 16:03:24 bzfkocht Exp $"
 
-
-/*      \Section{Complex Members}
- */
-#include <iostream>
 #include "idxset.h"
+#include "spxmessage.h"
 
 namespace soplex
 {
 
-/*      \SubSection{Inquiry}
- */
 /**@todo suspicious: Is there any reason to return maxidx-1 instead of maxidx?
  */
 int IdxSet::dim() const
@@ -46,8 +41,6 @@ int IdxSet::number(int i) const
    return -1;
 }
 
-/*      \SubSection{Manipulation}
- */
 void IdxSet::add(int n, const int i[])
 {
    assert(n >= 0 && size() + n <= max());
@@ -83,8 +76,6 @@ void IdxSet::remove(int n, int m)
    num = newnum;
 }
 
-/*      \SubSection{Miscellaneous}
- */
 IdxSet& IdxSet::operator=(const IdxSet& set)
 {
    assert(max() >= set.size());
@@ -93,28 +84,22 @@ IdxSet& IdxSet::operator=(const IdxSet& set)
    return *this;
 }
 
-#define inconsistent                                            \
-{                                                               \
-std::cerr << "Inconsistency detected in class IdxSet\n";        \
-return 0;                                                  \
-}
-
 int IdxSet::isConsistent() const
 {
    int i, j;
 
    if (len > 0 && idx == 0)
-      inconsistent;
+      return SPXinconsistent("IdxSet");
 
    for (i = 0; i < size(); ++i)
    {
       if (index(i) < 0)
-         inconsistent;
+         return SPXinconsistent("IdxSet");
+
       for (j = 0; j < i; ++j)
          if (index(i) == index(j))
-            inconsistent;
+            return SPXinconsistent("IdxSet");
    }
-
    return 1;
 }
 } // namespace soplex

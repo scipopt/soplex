@@ -13,13 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: updatevector.cpp,v 1.2 2001/11/06 23:31:07 bzfkocht Exp $"
-
-
-/* \Section{Complex Methods}
- */
+#pragma ident "@(#) $Id: updatevector.cpp,v 1.3 2001/12/25 16:03:25 bzfkocht Exp $"
 
 #include "updatevector.h"
+#include "spxmessage.h"
 
 namespace soplex
 {
@@ -32,18 +29,12 @@ UpdateVector& UpdateVector::operator=(const UpdateVector& rhs)
    return *this;
 }
 
-#define inconsistent    \
-{       \
-std::cout << "Inconsistency detected in class UpdateVector\n";  \
-return 0;  \
-}
-
 int UpdateVector::isConsistent() const
 {
    if (dim() != thedelta.dim())
-      inconsistent;
-   return DVector::isConsistent()
-          && thedelta.isConsistent();
+      return SPXinconsistent("UpdateVector");
+
+   return DVector::isConsistent() && thedelta.isConsistent();
 }
 } // namespace soplex
 

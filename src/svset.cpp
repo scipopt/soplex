@@ -13,12 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.cpp,v 1.9 2001/12/25 14:25:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.cpp,v 1.10 2001/12/25 16:03:25 bzfkocht Exp $"
 
 #include <assert.h>
-#include <iostream>
 
 #include "svset.h"
+#include "spxmessage.h"
 
 namespace soplex
 {
@@ -284,12 +284,6 @@ void SVSet::memPack()
    SVSet_Base::reSize(used);
 }
 
-#define inconsistent                                                    \
-{                                                                       \
-std::cout << "ERROR: Inconsistency detected in class SVSet, Line " << __LINE__ << std::endl;           \
-return 0;                                                          \
-}
-
 int SVSet::isConsistent() const
 {
    DLPSV* ps;
@@ -297,12 +291,12 @@ int SVSet::isConsistent() const
    for (ps = list.first(); ps; ps = next)
    {
       if (!ps->isConsistent())
-         inconsistent;
+         return SPXinconsistent("SVSet");
       if (ps->mem() > &last())
-         inconsistent;
+         return SPXinconsistent("SVSet");
       next = list.next(ps);
       if (next && ps->mem() + ps->max() + 1 != next->mem()) {
-         inconsistent;
+         return SPXinconsistent("SVSet");
       }
    }
    return DataArray < SVector::Element > ::isConsistent() && set.isConsistent() && list.isConsistent();

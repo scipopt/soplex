@@ -13,28 +13,16 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcolset.cpp,v 1.3 2001/11/12 16:41:53 bzfpfend Exp $"
+#pragma ident "@(#) $Id: lpcolset.cpp,v 1.4 2001/12/25 16:03:24 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <assert.h>
-#include <iostream>
 
-
-/*  and class header files
- */
 #include "lpcolset.h"
+#include "spxmessage.h"
 
 namespace soplex
 {
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Extension}
- */
 void LPColSet::add
 (
    Key& p_key,
@@ -160,23 +148,14 @@ void LPColSet::clear()
    object.reDim(num());
 }
 
-
-/*      \SubSection{Consistency}
- */
-#define inconsistent                                                    \
-{                                                                       \
-std::cout << "ERROR: Inconsistency detected in class LPColSet\n";        \
-return 0;                                                          \
-}
-
 int LPColSet::isConsistent() const
 {
    if (low.dim() != object.dim())
-      inconsistent;
+      return SPXinconsistent("LPColSet");
    if (low.dim() != up.dim())
-      inconsistent;
+      return SPXinconsistent("LPColSet");
    if (low.dim() != num())
-      inconsistent;
+      return SPXinconsistent("LPColSet");
 
    return low.isConsistent() && up.isConsistent() && SVSet::isConsistent();
 }

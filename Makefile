@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.16 2001/12/13 21:53:00 bzfkocht Exp $
+# $Id: Makefile,v 1.17 2001/12/25 16:03:24 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -43,7 +43,7 @@ LIBOBJ		= 	cachelpsolver.o changesoplex.o didxset.o \
 			spxchangebasis.o spxdefaultpr.o spxdefaultrt.o \
 			spxdesc.o spxdevexpr.o spxfastrt.o spxgeneralsm.o \
 			spxharrisrt.o spxhybridpr.o spxio.o spxlp.o \
-			spxlpfread.o spxmpsread.o \
+			spxlpfread.o spxmessage.o spxmpsread.o \
 			spxparmultpr.o spxredundantsm.o spxrem1sm.o \
 			spxscale.o spxshift.o spxsolver.o spxsolve.o \
 			spxstarter.o spxsteeppr.o spxsumst.o spxvecs.o \

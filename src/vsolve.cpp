@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vsolve.cpp,v 1.8 2001/12/12 09:30:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vsolve.cpp,v 1.9 2001/12/25 16:03:25 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -350,11 +350,10 @@ int CLUFactor::vSolveUright(double* vec, int* vidx,
 {
    int i, j, k, r, c, n;
    int *rorig, *corig;
-   int *rperm, *cperm;
+   int *rperm;
    int *cidx, *clen, *cbeg;
    double *cval;
    double x, y, meps;
-   int lastRowSing, lastColSing;
 
    int *idx;
    double *val;
@@ -362,15 +361,11 @@ int CLUFactor::vSolveUright(double* vec, int* vidx,
    rorig = row.orig;
    corig = col.orig;
    rperm = row.perm;
-   cperm = col.perm;
 
    cidx = u.col.idx;
    cval = u.col.val;
    clen = u.col.len;
    cbeg = u.col.start;
-
-   lastRowSing = u.lastRowSing;
-   lastColSing = u.lastColSing;
 
    meps = -eps;
    n = 0;
@@ -446,11 +441,10 @@ void CLUFactor::vSolveUrightNoNZ(double* vec,
 {
    int i, j, k, r, c;
    int *rorig, *corig;
-   int *rperm, *cperm;
+   int *rperm;
    int *cidx, *clen, *cbeg;
    double *cval;
    double x, y, meps;
-   int lastRowSing, lastColSing;
 
    int *idx;
    double *val;
@@ -458,15 +452,11 @@ void CLUFactor::vSolveUrightNoNZ(double* vec,
    rorig = row.orig;
    corig = col.orig;
    rperm = row.perm;
-   cperm = col.perm;
 
    cidx = u.col.idx;
    cval = u.col.val;
    clen = u.col.len;
    cbeg = u.col.start;
-
-   lastRowSing = u.lastRowSing;
-   lastColSing = u.lastColSing;
 
    meps = -eps;
    while (rn > 0)
@@ -537,12 +527,11 @@ int CLUFactor::vSolveUright2(
 {
    int i, j, k, r, c, n;
    int *rorig, *corig;
-   int *rperm, *cperm;
+   int *rperm;
    int *cidx, *clen, *cbeg;
    double *cval;
    double x, y, meps;
    double x2, y2, meps2;
-   int lastRowSing, lastColSing;
 
    int *idx;
    double *val;
@@ -550,15 +539,11 @@ int CLUFactor::vSolveUright2(
    rorig = row.orig;
    corig = col.orig;
    rperm = row.perm;
-   cperm = col.perm;
 
    cidx = u.col.idx;
    cval = u.col.val;
    clen = u.col.len;
    cbeg = u.col.start;
-
-   lastRowSing = u.lastRowSing;
-   lastColSing = u.lastColSing;
 
    meps = -eps;
    meps2 = -eps2;
@@ -1238,16 +1223,12 @@ int CLUFactor::solveLleft(double eps, double* vec, int* nonz, int rn)
    int i, j, k, n;
    int r;
    double x, y, meps;
-   double *rval, *lval, *val;
-   int *ridx, *lidx, *idx, *lrow;
-   int *rbeg, *lbeg;
+   double *rval, *val;
+   int *ridx, *idx;
+   int *rbeg;
    int *rorig, *rperm;
    int *last;
 
-   lval = l.val;
-   lidx = l.idx;
-   lrow = l.row;
-   lbeg = l.start;
    ridx = l.ridx;
    rval = l.rval;
    rbeg = l.rbeg;
@@ -1259,6 +1240,11 @@ int CLUFactor::solveLleft(double eps, double* vec, int* nonz, int rn)
    i = l.firstUpdate - 1;
 #ifndef WITH_L_ROWS
 #error Not yet implemented, define WITH_L_LOOPS
+   double* lval = l.val;
+   int*    lidx = l.idx;
+   int*    lrow = l.row;
+   int*    lbeg = l.start;
+
    for (; i >= 0; --i)
    {
       k = lbeg[i];
@@ -1327,21 +1313,22 @@ void CLUFactor::solveLleftNoNZ(double* vec)
    int i, j, k;
    int r;
    double x;
-   double *rval, *lval, *val;
-   int *ridx, *lidx, *idx, *lrow;
-   int *rbeg, *lbeg;
+   double *rval, *val;
+   int *ridx, *idx;
+   int *rbeg;
    int* rorig;
 
-   lval = l.val;
-   lidx = l.idx;
-   lrow = l.row;
-   lbeg = l.start;
    ridx = l.ridx;
    rval = l.rval;
    rbeg = l.rbeg;
    rorig = l.rorig;
 
 #ifndef WITH_L_ROWS
+   double* lval = l.val;
+   int*    lidx = l.idx;
+   int*    lrow = l.row;
+   int*    lbeg = l.start;
+
    i = l.firstUpdate - 1;
    for (; i >= 0; --i)
    {

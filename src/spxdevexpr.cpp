@@ -13,11 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.6 2001/12/25 14:25:55 bzfkocht Exp $"
-
-#include <iostream>
+#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.7 2001/12/25 16:03:24 bzfkocht Exp $"
 
 #include "spxdevexpr.h"
+#include "spxmessage.h"
 
 namespace soplex
 {
@@ -32,14 +31,10 @@ void SPxDevexPR::load(SoPlex* base)
 int SPxDevexPR::isConsistent() const
 {
    if (thesolver != 0)
-   {
       if (penalty.dim() != thesolver->coDim()
            || coPenalty.dim() != thesolver->dim())
-      {
-         std::cerr << "ERROR: inconsistency detected in class SPxDevex\n";
-         return 0;
-      }
-   }
+         return SPXinconsistent("SPxDevexPR");
+
    return 1;
 }
 

@@ -13,28 +13,17 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.cpp,v 1.4 2001/11/12 16:41:55 bzfpfend Exp $"
+#pragma ident "@(#) $Id: lprowset.cpp,v 1.5 2001/12/25 16:03:24 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <assert.h>
 #include <iostream>
 
-
-/*  and class header files
- */
 #include "lprowset.h"
+#include "spxmessage.h"
 
 namespace soplex
 {
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Extension}
- */
 void LPRowSet::add(Key& p_key, double p_lhs, const SVector& vector, double p_rhs)
 {
    SVSet::add(p_key, vector);
@@ -168,21 +157,12 @@ void LPRowSet::setType(
    }
 }
 
-
-/*      \SubSection{Consistency}
- */
-#define inconsistent                                                    \
-{                                                                       \
-std::cout << "ERROR: Inconsistency detected in class LPRowSet\n";        \
-return 0;                                                          \
-}
-
 int LPRowSet::isConsistent() const
 {
    if (left.dim() != right.dim())
-      inconsistent;
+      return SPXinconsistent("LPRowSet");
    if (left.dim() != num())
-      inconsistent;
+      return SPXinconsistent("LPRowSet");
 
    return left.isConsistent() && right.isConsistent() && SVSet::isConsistent();
 }
