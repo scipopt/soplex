@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.16 2002/01/12 15:51:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.17 2002/01/12 21:43:24 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -108,8 +108,8 @@ int main(int argc, char **argv)
    " -s0  none           -c0  none*      -p0  Textbook     -t0  Textbook\n" 
    " -s1  General        -c1  Weight     -p1  ParMult      -t1  Harris\n"
    " -s2  Aggregate      -c2  Sum        -p2  Devex        -t2  Fast*\n"
-   " -s3  Remove-1*      -c3  vector     -p3  Hybrid*\n"
-   " -s4  Redundant                      -p4  Steep\n"
+   " -s3  Remove-1*      -c3  vector     -p3  Hybrid\n"
+   " -s4  Redundant                      -p4  Steep*\n"
    " -s5  Scale                          -p5  Weight\n" 
    ;
 
@@ -117,10 +117,12 @@ int main(int argc, char **argv)
    SoPlex::Type           type           = SoPlex::LEAVE;
    SoPlex::Representation representation = SoPlex::COLUMN;
    SLUFactor::UpdateType  update         = SLUFactor::FOREST_TOMLIN;
+   SPxSimplifier*         simplifier     = 0;
    SPxStarter*            starter        = 0;
    SPxPricer*             pricer         = 0;
-   int                    starting        = 0;
-   int                    pricing        = 3;
+   SPxRatioTester*        ratiotester    = 0;
+   int                    starting       = 0;
+   int                    pricing        = 4;
    int                    ratiotest      = 2;
    int                    simplifing     = 3;
    double                 timelimit      = -1.0;
@@ -204,7 +206,7 @@ int main(int argc, char **argv)
              << " update"
              << std::endl;
 
-   switch (pricing)
+   switch(pricing)
    {
    case 5 :
       pricer = new SPxWeightPR;
@@ -232,46 +234,47 @@ int main(int argc, char **argv)
    std::cout << pricer->name() << " pricing" << std::endl;
    assert(work.isConsistent());
 
-   switch (ratiotest)
+   switch(ratiotest)
    {
    case 2 :
-      work.setTester(new SPxFastRT);
+      ratiotester = new SPxFastRT;
       std::cout << "Fast";
       break;
    case 1 :
-      work.setTester(new SPxHarrisRT);
+      ratiotester = new SPxHarrisRT;
       std::cout << "Harris";
       break;
    case 0 :
       /*FALLTHROUGH*/
    default:
-      work.setTester(new SPxDefaultRT);
+      ratiotester = new SPxDefaultRT;
       std::cout << "Default";
       break;
    }
    std::cout << " ratiotest" << std::endl;
+   work.setTester(ratiotester);
    assert(work.isConsistent());
 
    switch(simplifing)
    {
    case 5 :
-      work.setSimplifier(new SPxScale);
+      simplifier = new SPxScale;
       std::cout << "Scale";
       break;
    case 4 : 
-      work.setSimplifier(new SPxRedundantSM);
+      simplifier = new SPxRedundantSM;
       std::cout << "Redundant";
       break;
    case 3 : 
-      work.setSimplifier(new SPxRem1SM);
+      simplifier = new SPxRem1SM;
       std::cout << "Remove 1";
       break;
    case 2 :
-      work.setSimplifier(new SPxAggregateSM);
+      simplifier = new SPxAggregateSM;
       std::cout << "Aggregate";
       break;
    case 1 :
-      work.setSimplifier(new SPxGeneralSM);
+      simplifier = new SPxGeneralSM;
       std::cout << "General";
       break;
    case 0  :
@@ -280,33 +283,31 @@ int main(int argc, char **argv)
       std::cout << "No";
    }
    std::cout << " simplifier" << std::endl;
-
+   work.setSimplifier(simplifier);
    assert(work.isConsistent());
 
    switch(starting)
    {
    case 3 :
-      work.setStarter(new SPxVectorST);
+      starter = new SPxVectorST;
       std::cout << "Vector";
       break;
    case 2 :
-      work.setStarter(new SPxSumST);
+      starter = new SPxSumST;
       std::cout << "Sum";
       break;
    case 1 :
-      work.setStarter(new SPxWeightST);
+      starter = new SPxWeightST;
       std::cout << "Weight";
       break;
    case 0 :
       /*FALLTHROUGH*/
    default :
-      work.setStarter(static_cast<SPxStarter*>(0));
-      std::cout << "Default";
+      std::cout << "No";
       break;
    }
-
    std::cout << " starter" << std::endl;
-
+   work.setStarter(starter);
    assert(work.isConsistent());
 
    Timer timer;
@@ -361,7 +362,10 @@ int main(int argc, char **argv)
    }
    std::cout << std::endl;
 
+   delete simplifier;
+   delete starter;
    delete pricer;
+   delete ratiotester;
 
    return 0;
 }
