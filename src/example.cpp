@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.44 2002/10/23 10:40:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.45 2002/11/26 14:03:07 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -258,7 +258,7 @@ int main(int argc, char **argv)
       case 'h' :
       case '?' :
          std::cout << banner << std::endl;
-         /*FALLTHROUGH*/
+         //lint -fallthrough
       default :
          std::cout << "usage: " << argv[0] << " " << usage << std::endl;
          exit(0);

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.33 2002/11/25 16:51:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.34 2002/11/26 14:03:07 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -585,11 +585,10 @@ bool SPxBasis::isConsistent() const
       if (theBaseId.size() != theLP->dim() || matrix.size() != theLP->dim())
          return MSGinconsistent("SPxBasis");
 
-      if (thedesc.nCols() != theLP->nCols() 
-         || thedesc.nRows() != theLP->nRows())
+      if (thedesc.nCols() != theLP->nCols() || thedesc.nRows() != theLP->nRows())
          return MSGinconsistent("SPxBasis");
 
-      for (i = thedesc.nRows() - 1; i >= 0; --i)
+      for (i = 0; i < thedesc.nRows(); ++i)
       {
          if (thedesc.rowStatus(i) >= 0)
          {
@@ -600,7 +599,7 @@ bool SPxBasis::isConsistent() const
             ++primals;
       }
       
-      for (i = thedesc.nCols() - 1; i >= 0; --i)
+      for (i = 0; i < thedesc.nCols(); ++i)
       {
          if (thedesc.colStatus(i) >= 0)
          {

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.15 2002/05/15 13:38:43 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.16 2002/11/26 14:03:07 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -45,7 +45,7 @@ void SPxBasis::reDim()
       matrix.reSize (theLP->dim());
       theBaseId.reSize(theLP->dim());
       matrixIsSetup = false;
-      factorized = false;
+      factorized    = false;
    }
 
    DEBUG({ std::cout << "SPxBasis::reDim(): -->"
@@ -60,6 +60,7 @@ void SPxBasis::reDim()
 void SPxBasis::addedRows(int n)
 {
    METHOD( "SPxBasis::addedRows()" );
+
    assert(theLP != 0);
 
    if( n > 0 )
@@ -86,6 +87,7 @@ void SPxBasis::addedRows(int n)
       else
       {
          assert(theLP->rep() == SoPlex::ROW);
+
          for (int i = theLP->nRows() - n; i < theLP->nRows(); ++i)
             thedesc.rowStatus(i) = dualRowStatus(i);
       }
@@ -116,8 +118,9 @@ void SPxBasis::addedRows(int n)
 void SPxBasis::removedRow(int i)
 {
    METHOD( "SPxBasis::removedRow()" );
-   assert(status() > NO_PROBLEM);
-   assert(theLP != 0);
+
+   assert(status() >  NO_PROBLEM);
+   assert(theLP    != 0);
 
    if (theLP->rep() == SoPlex::ROW)
    {
@@ -125,9 +128,9 @@ void SPxBasis::removedRow(int i)
       {
          setStatus(NO_PROBLEM);
          factorized = false;
+
          DEBUG( std::cout << "Are you sure, you wanna do that?\n"; );
       }
-
    }
    else
    {
@@ -138,16 +141,16 @@ void SPxBasis::removedRow(int i)
          setStatus(NO_PROBLEM);
          DEBUG( std::cout << "Are you sure, you wanna do that?\n"; );
       }
-
       else if (status() > NO_PROBLEM && matrixIsSetup)
       {
          for (int j = theLP->dim(); j >= 0; --j)
          {
             SPxId id = baseId(j);
-            if (id.isSPxRowId()
-                 && theLP->number(SPxRowId(id)) < 0)
+
+            if (id.isSPxRowId() && theLP->number(SPxRowId(id)) < 0)
             {
                baseId(j) = baseId(theLP->dim());
+
                if (j < theLP->dim())
                   matrix[j] = &theLP->vector(baseId(j));
                break;
@@ -155,7 +158,6 @@ void SPxBasis::removedRow(int i)
          }
       }
    }
-
    thedesc.rowStatus(i) = thedesc.rowStatus(theLP->nRows());
    reDim();
 }
@@ -183,7 +185,6 @@ void SPxBasis::removedRows(int perm[])
                   factorized = matrixIsSetup = false;
                   DEBUG( std::cout << "Are you sure, you wanna do that?\n"; );
                }
-
             }
             else                            // row was moved
                thedesc.rowStatus(perm[i]) = thedesc.rowStatus(i);
@@ -193,7 +194,10 @@ void SPxBasis::removedRows(int perm[])
    else
    {
       assert(theLP->rep() == SoPlex::COLUMN);
-      factorized = matrixIsSetup = false;
+
+      factorized    = false;
+      matrixIsSetup = false;
+
       for (i = 0; i < n; ++i)
       {
          if (perm[i] != i)
@@ -208,7 +212,6 @@ void SPxBasis::removedRows(int perm[])
          }
       }
    }
-
    reDim();
 }
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: changesoplex.cpp,v 1.17 2002/10/23 10:40:38 bzfkocht Exp $"
+#pragma ident "@(#) $Id: changesoplex.cpp,v 1.18 2002/11/26 14:03:07 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -29,6 +29,7 @@
 namespace soplex
 {
 
+#if 0
 void SoPlex::localAddRows(int start)
 {
    METHOD( "SoPlex::localAddRows()" );
@@ -37,14 +38,11 @@ void SoPlex::localAddRows(int start)
    /**@todo This method seems to be called, to update
     *       theFvec, theFrhs, ..., but a resolve after
     *       adding a row results in a failure.
-    *       To fix this, we call init() before solving
+    *       To fix this, we call unInit() so that init() is called before solving
     *       in spxsolve.cpp:solve(). In init(), the
     *       vectors are set up, so there is no need
     *       to update them here.
     */
-   return;
-
-#if 0
    if( start == SPxLP::nRows() )
       return;
 
@@ -167,12 +165,12 @@ void SoPlex::localAddRows(int start)
          }
       }
    }
-#endif //0
 }
 
 void SoPlex::addedRows(int n)
 {
    METHOD( "SoPlex::addedRows()" );
+
    SPxLP::addedRows(n);
 
    if( n > 0 )
@@ -182,10 +180,13 @@ void SoPlex::addedRows(int n)
       if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
       {
          SPxBasis::addedRows(n);
+
          if (isInitialized())
          {
             localAddRows(nRows() - n);
+
             assert(thepricer != 0);
+
             if (rep() == ROW)
                thepricer->addedVecs(n);
             else
@@ -195,8 +196,26 @@ void SoPlex::addedRows(int n)
    }
    assert(isConsistent());
 }
+#endif //0
 
+void SoPlex::addedRows(int n)
+{
+   METHOD( "SoPlex::addedRows()" );
 
+   if( n > 0 )
+   {
+      SPxLP::addedRows(n);
+
+      unInit();
+      reDim();
+
+      if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+         SPxBasis::addedRows(n);
+   }
+   assert(isConsistent());
+}
+
+#if 0
 void SoPlex::localAddCols(int start)
 {
    METHOD( "SoPlex::localAddCols()" );
@@ -205,13 +224,11 @@ void SoPlex::localAddCols(int start)
    /**@todo This method seems to be called, to update
     *       theFvec, theFrhs, ..., but a resolve after
     *       adding a row results in a failure.
-    *       To fix this, we call init() before solving
+    *       To fix this, we call unIinit() so that init() is called before solving
     *       in spxsolve.cpp:solve(). In init(), the
     *       vectors are set up, so there is no need
     *       to update them here.
     */
-   return;
-#if 0
    if( start == SPxLP::nCols() )
       return;
 
@@ -355,7 +372,6 @@ void SoPlex::localAddCols(int start)
          }
       }
    }
-#endif //0
 }
 
 void SoPlex::addedCols(int n)
@@ -383,22 +399,45 @@ void SoPlex::addedCols(int n)
    }
    assert(isConsistent());
 }
+#endif //0
+
+void SoPlex::addedCols(int n)
+{
+   METHOD( "SoPlex::addedCols()" );
+
+   if( n > 0 )
+   {
+      SPxLP::addedCols(n);
+
+      unInit();
+      reDim();
+
+      if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+         SPxBasis::addedCols(n);
+   }
+   assert(isConsistent());
+}
    
 void SoPlex::doRemoveRow(int i)
 {
    METHOD( "SoPlex::doRemoveRow()" );
+
    SPxLP::doRemoveRow(i);
+
+   unInit();
 
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       removedRow(i);
-      unInit();
+
+#if 0
       if (isInitialized())
       {
          int n = SPxLP::nRows();
 
          theURbound[i] = theURbound[n];
          theLRbound[i] = theLRbound[n];
+
          if (rep() == ROW)
          {
             (*thePvec)[i] = (*thePvec)[n];
@@ -413,6 +452,7 @@ void SoPlex::doRemoveRow(int i)
             unInit();
          }
       }
+#endif // 0
 
       switch (SPxBasis::status())
       {
@@ -432,15 +472,19 @@ void SoPlex::doRemoveRow(int i)
 void SoPlex::doRemoveRows(int perm[])
 {
    METHOD( "SoPlex::doRemoveRows()" );
-   int n = SPxLP::nRows();
+
    SPxLP::doRemoveRows(perm);
+
+   unInit();
 
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       removedRows(perm);
-      unInit();
+#if 0
       if (isInitialized())
       {
+         int n = SPxLP::nRows();
+
          if (rep() == ROW)
          {
             if (type() == ENTER)
@@ -473,7 +517,7 @@ void SoPlex::doRemoveRows(int perm[])
             unInit();
          }
       }
-
+#endif
       switch (SPxBasis::status())
       {
       case SPxBasis::DUAL:
@@ -492,12 +536,16 @@ void SoPlex::doRemoveRows(int perm[])
 void SoPlex::doRemoveCol(int i)
 {
    METHOD( "SoPlex::doRemoveCol()" );
+
    SPxLP::doRemoveCol(i);
+
+   unInit();
 
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       removedCol(i);
-      unInit();
+
+#if 0
       if (isInitialized())
       {
          int n = SPxLP::nCols();
@@ -518,7 +566,7 @@ void SoPlex::doRemoveCol(int i)
             unInit();
          }
       }
-
+#endif //0
       switch (SPxBasis::status())
       {
       case SPxBasis::PRIMAL:
@@ -537,15 +585,20 @@ void SoPlex::doRemoveCol(int i)
 void SoPlex::doRemoveCols(int perm[])
 {
    METHOD( "SoPlex::doRemoveCols()" );
-   int n = SPxLP::nCols();
+
    SPxLP::doRemoveCols(perm);
+
+   unInit();
 
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       removedCols(perm);
-      unInit();
+
+#if 0
       if (isInitialized())
       {
+         int n = SPxLP::nCols();
+
          if (rep() == COLUMN)
          {
             if (type() == ENTER)
@@ -578,7 +631,7 @@ void SoPlex::doRemoveCols(int perm[])
             unInit();
          }
       }
-
+#endif //0
       switch (SPxBasis::status())
       {
       case SPxBasis::PRIMAL:
@@ -597,35 +650,46 @@ void SoPlex::doRemoveCols(int perm[])
 void SoPlex::changeObj(const Vector& newObj)
 {
    METHOD( "SoPlex::changeObj()" );
+
    SPxLP::changeObj(newObj);
+
+   /**@todo Factorization remains valid, we do not need a reDim()
+    *       pricing vectors should be recomputed.
+    */
    unInit();
 }
 
 void SoPlex::changeObj(int i, Real newVal)
 {
    METHOD( "SoPlex::changeObj()" );
+
    SPxLP::changeObj(i, newVal);
+
+   /**@todo Factorization remains valid, we do not need a reDim()
+    *       pricing vectors should be recomputed.
+    */
    unInit();
 }
 
-static void changeLowerStatus
-(
+#define DEBUGGING 1
+
+static void changeLowerStatus(
    SPxBasis::Desc::Status& stat,
-   Real newLower,
-   Real upper,
-   const SPxBasis& basis,
-   int i
-)
+   Real                    newLower,
+   Real                    upper,
+   const SPxBasis&         basis,
+   int                     i)
 {
    DEBUG({ std::cout << "changeLowerStatus(): col " << i
-                     << ": " << stat; });
+                     << "[" << newLower << ":" << upper << "] " << stat; });
+   //std::cout << "changeLowerStatus(): col " << i
+   //          << "[" << newLower << ":" << upper << "] " << stat;
+
    switch (stat)
    {
    case SPxBasis::Desc::P_ON_LOWER:
       if (newLower <= -infinity)
-         stat = (upper >= infinity)
-                ? SPxBasis::Desc::P_FREE
-             : SPxBasis::Desc::P_ON_UPPER;
+         stat = (upper >= infinity) ? SPxBasis::Desc::P_FREE : SPxBasis::Desc::P_ON_UPPER;
       else if (newLower == upper)
          stat = SPxBasis::Desc::P_FIXED;
       break;
@@ -652,17 +716,20 @@ static void changeLowerStatus
       abort();
    }
    DEBUG( std::cout << " -> " << stat << std::endl; );
+   //std::cout << " -> " << stat << std::endl; 
 }
 
 void SoPlex::changeLower(const Vector& newLower)
 {
    METHOD( "SoPlex::changeLower()" );
+
    SPxLP::changeLower(newLower);
+
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
-      for (int i = newLower.dim() - 1; i >= 0; --i)
-         changeLowerStatus(
-            desc().colStatus(i), newLower[i], SPxLP::upper(i), *this, i);
+      for (int i = 0; i < newLower.dim(); ++i)
+         changeLowerStatus(desc().colStatus(i), newLower[i], upper(i), *this, i);
+
       unInit();
    }
 }
@@ -673,11 +740,13 @@ void SoPlex::changeLower(int i, Real newLower)
 
    if (NE(newLower, lower(i)))
    {
+      // This has to be done before calling changeLowerStatus() because that is calling
+      // basis.dualColStatus() which calls lower() and needs the changed value.
       SPxLP::changeLower(i, newLower);
+
       if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
       {
-         changeLowerStatus(
-            desc().colStatus(i), newLower, SPxLP::upper(i), *this, i);
+         changeLowerStatus(desc().colStatus(i), newLower, upper(i), *this, i);
          unInit();
       }
    }
@@ -691,7 +760,10 @@ static void changeUpperStatus(
    int                     i)
 {
    DEBUG({ std::cout << "changeUpperStatus(): col " << i
-                     << ": " << stat; });
+                     << "[" << lower << ":" << newUpper << "] " << stat; });
+   //   std::cout << "changeUpperStatus(): col " << i
+   //        << "[" << lower << ":" << newUpper << "] " << stat;
+
    switch (stat)
    {
    case SPxBasis::Desc::P_ON_LOWER:
@@ -700,9 +772,7 @@ static void changeUpperStatus(
       break;
    case SPxBasis::Desc::P_ON_UPPER:
       if (newUpper >= infinity)
-         stat = (lower <= -infinity)
-            ? SPxBasis::Desc::P_FREE
-            : SPxBasis::Desc::P_ON_LOWER;
+         stat = (lower <= -infinity) ? SPxBasis::Desc::P_FREE : SPxBasis::Desc::P_ON_LOWER;
       else if (newUpper == lower)
          stat = SPxBasis::Desc::P_FIXED;
       break;
@@ -725,6 +795,7 @@ static void changeUpperStatus(
       abort();
    }
    DEBUG( std::cout << " -> " << stat << std::endl; );
+   //std::cout << " -> " << stat << std::endl;
 }
 
 void SoPlex::changeUpper(const Vector& newUpper)
@@ -732,11 +803,12 @@ void SoPlex::changeUpper(const Vector& newUpper)
    METHOD( "SoPlex::changeUpper()" );
 
    SPxLP::changeUpper(newUpper);
+
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
-      for (int i = newUpper.dim() - 1; i >= 0; --i)
-         changeUpperStatus(
-            desc().colStatus(i), newUpper[i], SPxLP::lower(i), *this, i);
+      for (int i = 0; i < newUpper.dim(); ++i)
+         changeUpperStatus(desc().colStatus(i), newUpper[i], lower(i), *this, i);
+
       unInit();
    }
 }
@@ -748,10 +820,10 @@ void SoPlex::changeUpper(int i, Real newUpper)
    if (NE(newUpper, upper(i)))
    {
       SPxLP::changeUpper(i, newUpper);
+
       if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
       {
-         changeUpperStatus(
-            desc().colStatus(i), newUpper, SPxLP::lower(i), *this, i);
+         changeUpperStatus(desc().colStatus(i), newUpper, lower(i), *this, i);
          unInit();
       }
    }
@@ -760,45 +832,27 @@ void SoPlex::changeUpper(int i, Real newUpper)
 void SoPlex::changeBounds(const Vector& newLower, const Vector& newUpper)
 {
    METHOD( "SoPlex::changeBounds()" );
-   SPxLP::changeLower(newLower);
-   SPxLP::changeUpper(newUpper);
-   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
-   {
-      for (int i = newUpper.dim() - 1; i >= 0; --i)
-      {
-         changeUpperStatus(
-            desc().colStatus(i), newUpper[i], SPxLP::lower(i), *this, i);
-         changeLowerStatus(
-            desc().colStatus(i), newLower[i], SPxLP::upper(i), *this, i);
-      }
-      unInit();
-   }
+
+   changeLower(newLower);
+   changeUpper(newUpper);
 }
 
 void SoPlex::changeBounds(int i, Real newLower, Real newUpper)
 {
    METHOD( "SoPlex::changeBounds()" );
 
-   SPxLP::changeLower(i, newLower);
-   SPxLP::changeUpper(i, newUpper);
-   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
-   {
-      changeUpperStatus(
-         desc().colStatus(i), newUpper, SPxLP::lower(i), *this, i);
-      changeLowerStatus(
-         desc().colStatus(i), newLower, SPxLP::upper(i), *this, i);
-      unInit();
-   }
+   changeLower(i, newLower);
+   changeUpper(i, newUpper);
 }
 
-static void changeLhsStatus
-(
+/**@todo Change Lhs/Rhs Status the same way as changeBounds
+ */
+static void changeLhsStatus(
    SPxBasis::Desc::Status& stat,
    Real newLhs,
    Real rhs,
    const SPxBasis& basis,
-   int i
-)
+   int i)
 {
    DEBUG({ std::cout << "changeLhsStatus()  : row " << i
                      << ": " << stat; });
@@ -806,9 +860,7 @@ static void changeLhsStatus
    {
    case SPxBasis::Desc::P_ON_LOWER:
       if (newLhs <= -infinity)
-         stat = (rhs >= infinity)
-            ? SPxBasis::Desc::P_FREE
-            : SPxBasis::Desc::P_ON_UPPER;
+         stat = (rhs >= infinity) ? SPxBasis::Desc::P_FREE : SPxBasis::Desc::P_ON_UPPER;
       else if (newLhs == rhs)
          stat = SPxBasis::Desc::P_FIXED;
       break;
@@ -840,11 +892,14 @@ static void changeLhsStatus
 void SoPlex::changeLhs(const Vector& newLhs)
 {
    METHOD( "SoPlex::changeLhs()" );
+
    SPxLP::changeLhs(newLhs);
+
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
-      for (int i = nRows() - 1; i >= 0; --i)
+      for (int i = 0; i < nRows(); ++i)
          changeLhsStatus(desc().rowStatus(i), newLhs[i], rhs(i), *this, i);
+
       unInit();
    }
 }
@@ -852,7 +907,9 @@ void SoPlex::changeLhs(const Vector& newLhs)
 void SoPlex::changeLhs(int i, Real newLhs)
 {
    METHOD( "SoPlex::changeLhs()" );
+
    SPxLP::changeLhs(i, newLhs);
+
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       changeLhsStatus(desc().rowStatus(i), newLhs, rhs(i), *this, i);
@@ -860,14 +917,12 @@ void SoPlex::changeLhs(int i, Real newLhs)
    }
 }
 
-static void changeRhsStatus
-(
+static void changeRhsStatus(
    SPxBasis::Desc::Status& stat,
    Real newRhs,
    Real lhs,
    const SPxBasis& basis,
-   int i
-)
+   int i)
 {
    DEBUG({ std::cout << "changeRhsStatus()  : row " << i
                      << ": " << stat; });
@@ -875,9 +930,7 @@ static void changeRhsStatus
    {
    case SPxBasis::Desc::P_ON_UPPER:
       if (newRhs >= infinity)
-         stat = (lhs <= -infinity)
-            ? SPxBasis::Desc::P_FREE
-            : SPxBasis::Desc::P_ON_LOWER;
+         stat = (lhs <= -infinity) ? SPxBasis::Desc::P_FREE : SPxBasis::Desc::P_ON_LOWER;
       else if (newRhs == lhs)
          stat = SPxBasis::Desc::P_FIXED;
       break;
@@ -910,10 +963,12 @@ static void changeRhsStatus
 void SoPlex::changeRhs(const Vector& newRhs)
 {
    METHOD( "SoPlex::changeRhs()" );
+
    SPxLP::changeRhs(newRhs);
+
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
-      for (int i = nRows() - 1; i >= 0; --i)
+      for (int i = 0; i < nRows(); ++i)
          changeRhsStatus(desc().rowStatus(i), newRhs[i], lhs(i), *this, i);
       unInit();
    }
@@ -922,7 +977,9 @@ void SoPlex::changeRhs(const Vector& newRhs)
 void SoPlex::changeRhs(int i, Real newRhs)
 {
    METHOD( "SoPlex::changeRhs()" );
+
    SPxLP::changeRhs(i, newRhs);
+
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       changeRhsStatus(desc().rowStatus(i), newRhs, lhs(i), *this, i);
@@ -949,8 +1006,10 @@ void SoPlex::changeRange(const Vector& newLhs, const Vector& newRhs)
 void SoPlex::changeRange(int i, Real newLhs, Real newRhs)
 {
    METHOD( "SoPlex::changeRange()" );
+
    SPxLP::changeLhs(i, newLhs);
    SPxLP::changeRhs(i, newRhs);
+
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       changeLhsStatus(desc().rowStatus(i), newLhs, rhs(i), *this, i);
@@ -962,6 +1021,7 @@ void SoPlex::changeRange(int i, Real newLhs, Real newRhs)
 void SoPlex::changeRow(int i, const LPRow& newRow)
 {
    METHOD( "SoPlex::changeRow()" );
+
    SPxLP::changeRow(i, newRow);
    unInit();
 }
@@ -969,6 +1029,7 @@ void SoPlex::changeRow(int i, const LPRow& newRow)
 void SoPlex::changeCol(int i, const LPCol& newCol)
 {
    METHOD( "SoPlex::changeCol()" );
+
    SPxLP::changeCol(i, newCol);
    unInit();
 }
@@ -976,6 +1037,7 @@ void SoPlex::changeCol(int i, const LPCol& newCol)
 void SoPlex::changeElement(int i, int j, Real val)
 {
    METHOD( "SoPlex::changeElement()" );
+
    SPxLP::changeElement(i, j, val);
    unInit();
 }
@@ -983,6 +1045,7 @@ void SoPlex::changeElement(int i, int j, Real val)
 void SoPlex::changeSense(SPxSense sns)
 {
    METHOD( "SoPlex::changeSense()" );
+
    SPxLP::changeSense(sns);
    unInit();
 }

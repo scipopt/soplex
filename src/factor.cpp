@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.36 2002/11/25 16:51:58 bzfkocht Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.37 2002/11/26 14:03:07 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -1525,6 +1525,9 @@ void CLUFactor::factor(
    Real            eps)          ///< epsilon for zero detection        
 {
    METHOD( "CLUFactor::factor()" );
+
+   std::cout << "== factoring == " << std::endl;
+
    stat = SLinSolver::OK;
 
    l.start[0] = 0;

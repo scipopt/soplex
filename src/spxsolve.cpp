@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.52 2002/11/01 08:19:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.53 2002/11/26 14:03:08 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -81,17 +81,14 @@ SoPlex::Status SoPlex::solve()
       if(SPxBasis::status() <= NO_PROBLEM)
           SPxBasis::load(this);
        */
+      /*@todo != REGULAR is not enough. Also OPTIMAL/DUAL/PRIMAL should
+       * be tested and acted accordingly.
+       */
       if (thestarter != 0 && status() != REGULAR)  // no basis and no starter.
          thestarter->generate(*this);              // generate start basis.
+
+      init();
    }
-
-   /* Originally, init() was only called in the "!isInitialized()" case,
-      but the update of theFvec, theFrhs, ... in SoPlex::localAddRows() and
-      SoPlex::localAddCols() doesn't seem to work. Therefore, we call
-      init() here to set up all the vectors correctly.
-   */
-   init();
-
    thepricer->setEpsilon(delta());
    setType(type());
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.61 2002/08/27 07:20:37 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.62 2002/11/26 14:03:07 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -234,7 +234,8 @@ void SoPlex::setRep(Representation p_rep)
 void SoPlex::init()
 {
    METHOD( "SoPlex::init()" );
-   assert(thepricer != 0);
+
+   assert(thepricer      != 0);
    assert(theratiotester != 0);
 
    if (!initialized)
@@ -247,7 +248,8 @@ void SoPlex::init()
    }
    if (!matrixIsSetup)
       SPxBasis::loadDesc(desc());
-   factorized = false;
+
+   //factorized = false;
    m_numCycle = 0;
 
    if (type() == ENTER)
@@ -283,11 +285,11 @@ void SoPlex::init()
 
    SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
    computePvec();
-
    computeFrhs();
    SPxBasis::solve(*theFvec, *theFrhs);
 
-   theShift = 0;
+   theShift = 0.0;
+
    if (type() == ENTER)
    {
       shiftFvec();
@@ -330,12 +332,14 @@ void SoPlex::setPricing(Pricing pr)
 void SoPlex::reDim()
 {
    METHOD( "SoPlex::reDim()" );
+
    int newdim = (rep() == ROW) ? SPxLP::nCols() : SPxLP::nRows();
 
    if (newdim > unitVecs.size())
    {
-      unitVecs.reSize (newdim);
-      while (newdim-- > 0)
+      unitVecs.reSize(newdim);
+
+      while(newdim-- > 0)
          unitVecs[newdim] = newdim;
    }
 
