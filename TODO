@@ -20,6 +20,7 @@ Entsprechender Aufruf fehlt auch in spxgeneralsm.cc
 
 for();    -> for()
                 ;
+
 explicit einfuegen.
 
 reinterpret_cast durchsehen

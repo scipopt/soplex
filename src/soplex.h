@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.11 2001/12/25 14:25:55 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.12 2001/12/25 18:03:42 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -1611,41 +1611,43 @@ public:
    void changeBounds(LPSolver::ColId p_id, 
       double p_newLower, double p_newUpper)
    {
-      changeBounds(*reinterpret_cast<SPxColId*>(&p_id), p_newLower, p_newUpper);
+      changeBounds(
+         *reinterpret_cast<SPxColId*>(&p_id), p_newLower, p_newUpper);
    }
 
-   /// change #id#'th lhs value.
+   /// change \p id 'th lhs value.
    void changeLhs(LPSolver::RowId p_id, double p_newLhs)
    {
       changeLhs(*reinterpret_cast<SPxRowId*>(&p_id), p_newLhs);
    }
 
-   /// change #id#'th rhs value.
+   /// change \p id 'th rhs value.
    void changeRhs(LPSolver::RowId p_id, double p_newRhs)
    {
       changeRhs(*reinterpret_cast<SPxRowId*>(&p_id), p_newRhs);
    }
 
-   /// change #id#'th lhs and rhs value.
+   /// change \p id 'th lhs and rhs value.
    void changeRange(LPSolver::RowId p_id, double p_newLhs, double p_newRhs)
    {
       changeRange(*reinterpret_cast<SPxRowId*>(&p_id), p_newLhs, p_newRhs);
    }
 
-   /// change #id#'th row of LP.
+   /// change \p id 'th row of LP.
    void changeRow(LPSolver::RowId p_id, const LPRow& p_newRow)
    {
       changeRow(*reinterpret_cast<SPxRowId*>(&p_id), p_newRow);
    }
 
-   /// change #id#'th column of LP.
+   /// change \p id 'th column of LP.
    void changeCol(LPSolver::ColId p_id, const LPCol& p_newCol)
    {
       changeCol(*reinterpret_cast<SPxColId*>(&p_id), p_newCol);
    }
 
    /// change LP element (#rid#, #cid#).
-   void changeElement(LPSolver::RowId p_rid, LPSolver::ColId p_cid, double p_val)
+   void changeElement(
+      LPSolver::RowId p_rid, LPSolver::ColId p_cid, double p_val)
    {
       changeElement(*reinterpret_cast<SPxRowId*>(&p_rid),
                     *reinterpret_cast<SPxColId*>(&p_cid),
@@ -1658,14 +1660,13 @@ public:
       changeSense(SPxSense(int(p_sns)));
    }
 
-
    /// get \p i 'th row.
    void getRow(int p_i, LPRow& p_row) const
    {
       SPxLP::getRow(p_i, p_row);
    }
 
-   /// get #id#'th row.
+   /// get \p id 'th row.
    void getRow(LPSolver::RowId p_id, LPRow& p_row) const
    {
       SPxLP::getRow(*reinterpret_cast<SPxRowId*>(&p_id), p_row);
@@ -1683,7 +1684,7 @@ public:
       return SPxLP::rowVector(i);
    }
 
-   /// return const #id#'th row if available.
+   /// return const \p id 'th row if available.
    const SVector& rowVector(LPSolver::RowId p_id) const
    {
       return SPxLP::rowVector(*reinterpret_cast<SPxRowId*>(&p_id));
@@ -1701,7 +1702,7 @@ public:
       SPxLP::getCol(p_i, p_column);
    }
 
-   /// get #id#'th column.
+   /// get \p id 'th column.
    void getCol(LPSolver::ColId p_id, LPCol& p_column) const
    {
       SPxLP::getCol(*reinterpret_cast<SPxColId*>(&p_id), p_column);
@@ -1719,7 +1720,7 @@ public:
       return SPxLP::colVector(i);
    }
 
-   /// return const #id#'th col if available.
+   /// return const \p id 'th col if available.
    const SVector& colVector(LPSolver::ColId p_id) const
    {
       return SPxLP::colVector(*reinterpret_cast<SPxColId*>(&p_id));
@@ -1737,7 +1738,7 @@ public:
       return SPxLP::obj(i);
    }
 
-   /// #id#'th value of objective vector.
+   /// \p id 'th value of objective vector.
    double obj(LPSolver::ColId p_id) const
    {
       return SPxLP::obj(*reinterpret_cast<SPxColId*>(&p_id));
@@ -1760,7 +1761,7 @@ public:
       return SPxLP::lower(i);
    }
 
-   /// #id#'th lower bound.
+   /// \p id 'th lower bound.
    double lower(LPSolver::ColId p_id) const
    {
       return SPxLP::lower(*reinterpret_cast<SPxColId*>(&p_id));
@@ -1785,7 +1786,7 @@ public:
       return SPxLP::upper(i);
    }
 
-   /// #id#'th upper bound.
+   /// \p id 'th upper bound.
    double upper(LPSolver::ColId p_id) const
    {
       return SPxLP::upper(*reinterpret_cast<SPxColId*>(&p_id));
@@ -1803,14 +1804,13 @@ public:
       return SPxLP::upper();
    }
 
-
    /// \p i 'th lhs value.
    double lhs(int i) const
    {
       return SPxLP::lhs(i);
    }
 
-   /// #id#'th lhs value.
+   /// \p id 'th lhs value.
    double lhs(LPSolver::RowId p_id) const
    {
       return SPxLP::lhs(*reinterpret_cast<SPxRowId*>(&p_id));
@@ -1828,14 +1828,13 @@ public:
       return SPxLP::lhs();
    }
 
-
    /// \p i 'th rhs value.
    double rhs(int i) const
    {
       return SPxLP::rhs(i);
    }
 
-   /// #id#'th rhs value.
+   /// \p id 'th rhs value.
    double rhs(LPSolver::RowId p_id) const
    {
       return SPxLP::rhs(*reinterpret_cast<SPxRowId*>(&p_id));
@@ -1853,13 +1852,11 @@ public:
       return SPxLP::rhs();
    }
 
-
    /// optimization sense.
    LPSolver::Sense sense() const
    {
       return LPSolver::Sense(spxSense());
    }
-
 
    /// number of rows of loaded LP.
    int nofRows() const
@@ -1910,8 +1907,6 @@ public:
    }
    //@}
 
-   /**@name Miscellaneous */
-   //@{
    /// assignment operator.
    /// default constructor.
    SoPlex(Type type = LEAVE, Representation rep = ROW,
@@ -1921,7 +1916,6 @@ public:
 
    /// check consistency.
    int isConsistent() const;
-   //@}
 
 private:
    /// assignment operator is not implemented.

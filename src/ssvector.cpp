@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.8 2001/12/25 17:00:09 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.9 2001/12/25 18:03:42 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -480,7 +480,7 @@ SSVector& SSVector::multAdd(double xx, const SVector& svec)
             else
                v[*iptr] = 0;
          }
-         num = iiptr - idx;
+         num = int(iiptr - idx);
       }
    }
    else
