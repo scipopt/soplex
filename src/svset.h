@@ -13,7 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.h,v 1.6 2001/11/17 22:15:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.h,v 1.7 2001/11/26 15:38:29 bzfbleya Exp $"
+
+/**@file  svset.h
+ * @brief Set of sparse vectors.
+ */
 
 #ifndef _SVSET_H_
 #define _SVSET_H_
@@ -30,16 +34,16 @@ namespace soplex
 {
 typedef DataArray < SVector::Element > SVSet_Base;
 
-/**@brief   sparse vector set.
+/**@brief   sparse vector %set.
    @ingroup Algebra
 
-   Class SVSet provides a set of sparse vectors SVector. All SVector%s
+   Class SVSet provides a %set of sparse vectors SVector. All SVector%s
    in a SVSet share one big memory block for their nonzeros. This
-   memory is reffered to as the {\em nonzero memory}. The SVector%s
-   themselfs are saved in another memory block reffered to as the 
+   memory is reffered to as the \em nonzero \em memory. The SVector%s
+   themselfs are saved in another memory block refered to as the 
    \em vector \em memory. Both memory blocks will grow automatically if
-   required, when adding more SVector%s to the set or enlarging
-   SVector%s within the set. For controlling memory consumption,
+   required, when adding more SVector%s to the %set or enlarging
+   SVector%s within the %set. For controlling memory consumption,
    methods are provided to inquire and reset the size of the memory
    blocks used for vectors and nonzeros.
  
@@ -49,71 +53,81 @@ typedef DataArray < SVector::Element > SVSet_Base;
    with a smaller number than the lowest number of the removed
    SVector%s will remain unchanged.
  
-   For providing a uniform access to SVector%s in a set even if others
-   are removed or added, SVSet assigns a Key to each SVector in the
-   set. Such a Key remains unchanged as long as the corresponding
+   For providing a uniform access to SVector%s in a %set even if others
+   are removed or added, SVSet assigns a \ref Key to each SVector in the
+   %set. Such a \ref Key remains unchanged as long as the corresponding
    SVector is in the SVSet, no matter what other SVector%s are added
    to or removed from the SVSet. Methods are provided for getting the
-   Key to a SVector or its number and vice versa.  Further, each add()
+   \ref Key to a SVector or its number and vice versa.  Further, each add()
    method for enlarging an SVSet is provided with two signatures. One
-   of them returns the Key%s assigned to the SVector%s added to the
+   of them returns the \ref Key%s assigned to the SVector%s added to the
    SVSet.
 */
 class SVSet : protected SVSet_Base
 {
 private:
+
+
+   /**@name Memory management implementation
+      The management of the SVectors is implemented by by a DataSet<DLPSV>, the keys used 
+      externally are DataKey%s.
+
+      The management of nonzeros is done by a
+      double linked list IdList<DLPSV>, where the SVector%s are kept in the
+      order their indices occurr in the DataArray. The
+      SVector%s are kept without holes: If one is removed or moved to the end, the
+      SVector preceeding it obtains all the nonzeros that previously belonged to
+      the (re-)moved one.  However, the nonzeros in use are uneffected by
+      this.
+   */
+   //@{
+   /**@brief SVector with prev/next pointers
+      @todo Check whether SVSet::DLPSV can be implemented as IdElement<SVector>
+   */
    class DLPSV : public SVector
    {
    private:
-      DLPSV *thenext;
-      DLPSV *theprev;
+      DLPSV *thenext; ///< previous SVector
+      DLPSV *theprev; ///< next SVector
 
    public:
+      /// next SVector
       DLPSV*& next()
       {
          return thenext;
       }
+      /// next SVector
       DLPSV*const& next() const
       {
          return thenext;
       }
+      /// previous SVector
       DLPSV*const& prev() const
       {
          return theprev;
       }
+      /// previous SVector
       DLPSV*& prev()
       {
          return theprev;
       }
+      /// access to SVector
       SVector& svector()
       {
          return static_cast<SVector&>(*this);
       }
-      // default constructor.
+      /// default constructor.
       DLPSV()
       {}      
       /// copy constructor.
       DLPSV(const DLPSV& copy) : SVector(copy)
       {}
    };
-
-   /*  The management of Keys is left for DataSet
-    */
-   typedef DataKey Key;
-
-   DataSet < DLPSV > set;
-
-   /*  while the management of nonzeros is done in this class. It requires a
-       double linked #list# of #DLPSV#s, where the #SVector#s are kept in the
-       order their indices occurr in the inherited #DataArray#. It keeps the
-       #SVector#s without holes: If one is removed or moved to the end, the
-       one preceeding it optains all the nonzeros that previously belonged to
-       the (re-)moved one.  However, the nonzeros in use are uneffected by
-       this.
-    */
-   IdList < DLPSV > list;
-
-   /*  Make sure to provide enough vector memory for #n# more #SVector#s.
+   typedef DataKey Key;    ///< keys inherited from the DataSet   
+   DataSet < DLPSV > set;  ///< %set of SVectors
+   IdList < DLPSV > list;  ///< doubly linked list for non-zero management
+   
+   /// provides enough vector memory for \p n more SVector%s.
     */
    void ensurePSVec(int n)
    {
@@ -124,32 +138,35 @@ private:
       }
    }
 
-   /*  Make sure to provide enough nonzero memory for #n# more #Elements#s.
-    */
+   ///  provides enough nonzero memory for \p n more Elements%s.
    void ensureMem(int n);
+   //@}
 
 public:
-   /**@name Control Parameters */
+   /**@name Control Parameters 
+      @todo Should factor amd memFactor really be public variables in svset?
+   */
    //@{
-   /** Sparse vector memory enlargment factor.
-       If the #SVSet# runs out of vector memory, it is enlareged by
-       #factor#.
+   /// Sparse vector memory enlargment factor.
+   /** If the SVSet runs out of vector memory, it is enlareged by
+       \p factor.
     */
    double factor;
 
-   /** Nonzero element memory enlargment factor.
-       If the #SVSet# runs out of nonzero memory it is enlareged by a
-       #memFactor#.
+   /// Nonzero element memory enlargment factor.
+   /** If the SVSet runs out of nonzero memory it is enlareged by a
+       memFactor.
+       @todo Should memFactor really be a double& instead of a plain double in svset?
     */
    double& memFactor;
    //@}
-
+   
 
    /**@name Extension */
    //@{
-   /** Add #SVector svec# to the set.
-    *  This includes copying its nonzeros to the sets nonzero memory and
-    *  creating an additional #SVector# entry in vector memory. If
+   /// Add \p svec to the %set.
+   /**  This includes copying its nonzeros to the sets nonzero memory and
+    *  creating an additional SVector entry in vector memory. If
     *  neccessary, the memory blocks are enlarged appropriately.
     */
    void add(const SVector& svec)
@@ -159,12 +176,13 @@ public:
       *new_svec = svec;
    }
 
-   /** Add #svec# to #SVSet#.
-    *  Adds #SVector svec# to the set. This includes copying its nonzeros
-    *  to the sets nonzero memory and creating an additional #SVector#
+   /// Add \p svec to SVSet.
+   /**  Adds SVector \p svec to the %set. This includes copying its nonzeros
+    *  to the sets nonzero memory and creating an additional SVector
     *  entry in vector memory. If neccessary, the memory blocks are
-    *  enlarged appropriately. Upon return #nkey# contains the #Key#, that
-    *  the #SVSet# has assosicated to the new #SVector#.
+    *  enlarged appropriately. 
+    *  @return \p nkey contains the Key, that
+    *  the SVSet has assosicated to the new SVector.
     */
    void add(Key& nkey, const SVector& svec)
    {
@@ -173,98 +191,111 @@ public:
       *new_svec = svec;
    }
 
-   /// Add all #n# #SVector#s in the array #svec# to the set.
+   /// Add all \p n SVector%s in the array \p svec to the %set.
+   /** @pre \p svec must be not larger than \p n
+    */
    void add(const SVector svec[], int n);
 
-   /** Add #n# #SVector#s to #SVSet#.
-    *  Adds all #n# #SVector#s in the array #svec# to the set.  Upon return
-    *  #nkey# contains the #Key#s, that the #SVSet# has assosicated to the
-    *  new #SVector#s. Hence, array #nkey# must be large enough to fit #n#
-    *  #Key#s.
+   /// Add n SVector%s to SVSet.
+   /**  Adds all \p n SVector%s in the array \p svec to the %set.  
+    * @return \p nkey contains the Key%s, that the SVSet has assosicated to the
+    *  new SVector%s. 
+    * @pre \p nkey must be large enough to fit \p n
+    *  Key%s.
     */
    void add(Key nkey[], const SVector svec[], int n);
 
-   /// Add all #SVector#s in #set# to an #SVSet#.
-   void add(const SVSet& set);
+   /// Add all SVector%s in \p pset to an SVSet.
+   void add(const SVSet& pset);
 
-   /** Add all #SVector#s of #set# to #SVSet#.
-    *  Adds all #n# #SVector#s in the #set# to an #SVSet#. Upon return
-    *  #nkey# contains the #Key#s, that the #SVSet# has assosicated to the
-    *  new #SVector#s. Hence, array #nkey# must be large enough to fit
-    *  #set.num()# #Key#s.
+   /// Add all SVector%s of \p pset to SVSet.
+   /**  Adds all \p n SVector%s in the \p pset to an SVSet. 
+    * @return \p nkey contains the Key%s, that the SVSet has assosicated to the
+    *  new SVector%s. 
+    * @pre \p nkey must be large enough to fit
+    *  \p pset.num() Key%s.
     */
-   void add(Key nkey[], const SVSet& set);
+   void add(Key nkey[], const SVSet& pset);
 
-   /** Creates new #SVector# in set.
-    *  The new #SVector# will be ready to fit at least #idxmax# nonzeros.
+   /// Creates new SVector in %set.
+   /**  The new SVector will be ready to fit at least \p idxmax nonzeros.
     */
    SVector* create(int idxmax = -1);
 
-   /** Creates new #SVector# in set.
-    *  The new #SVector# will be ready to fit at least #idxmax# nonzeros.
-    *  Upon return #nkey# contains the #Key# associated to the new
-    *  #SVector#.
+   /// Creates new SVector in %set.
+   /**  The new SVector will be ready to fit at least \p idxmax nonzeros.
+    * @return \p nkey contains the Key associated to the new
+    *  SVector.
     */
    SVector* create(Key& nkey, int idxmax = -1);
 
-   /** Extend #svec# to fit #newmax# nonzeros.
-       It is an error, if #svec# is not an #SVector# of the #SVSet#.
+   /// Extend \p svec to fit \p newmax nonzeros.
+   /** @pre \p svec must be an SVector of the SVSet.
     */
    void xtend(SVector& svec, int newmax);
 
-   /** Add nonzero (#idx#, #val#) to #svec# of this #SVSet#.
-    *  Adds one nonzero (#idx#, #val#) to #SVector svec# in the #SVSet#. It
-    *  is an error, if #svec# is not an #SVector# of the #SVSet#. If #svec#
-    *  is not large enough to hold the additional nonzero, it will be
-    *  automatically enlarged within the set.
+   /// Add nonzero (\p idx, \p val) to \p svec of this SVSet.
+   /**  Adds one nonzero (\p idx, \p val) to SVector \p svec in the SVSet. 
+    *  If \p svec is not large enough to hold the additional nonzero, it will be
+    *  automatically enlarged within the %set.
+    * @pre \p svec must be an SVector of the SVSet. 
     */
    void add2(SVector &svec, int idx, double val);
 
-   /** Add #n# nonzeros to #svec# of this #SVSet#.
-    *  Adds #n# nonzero to #SVector svec# in the #SVSet#. It is an error,
-    *  if #svec# is not an #SVector# of the #SVSet#. If #svec# is not large
+   /// Add \p n nonzeros to \p svec of this SVSet.
+   /**  Adds \p n nonzeros to SVector \p svec in the SVSet. If \p svec is not large
     *  enough to hold the additional nonzeros, it will be automatically
-    *  enlarged within the set.
+    *  enlarged within the %set.
+    * @pre \p svec must be an SVector of the SVSet. 
     */
-
    void add2(SVector &svec, int n, const int idx[], const double val[]);
    //@}
 
 
    /**@name Shrinking */
    //@{
-   ///
+   /// removes the vector with key \p removekey from the %set
+   /** @pre \p removekey must be a key from SVSet */
    void remove(Key removekey);
 
-   ///
+   /// removes the vector with number \p removenum from the %set
+   /** @pre \p removenum must be a valid vector number from SVSet */
    void remove(int removenum)
    {
       remove(key(removenum));
    }
 
-   /// remove one #SVector# from set.
+   /// remove one SVector from %set.
+   /** @pre \p svec must be from SVSet */
    void remove(SVector *svec)
    {
       remove(key(svec));
    }
 
-   /** remove multiple elements.
-       The following method removes all #Svector#s for the #SVSet# with an
-       index #i# such that #perm[i] < 0#. Upon completion, #perm[i] >= 0#
-       indicates the new index where the #i#-th #SVector# has been moved to
-       due to this removal. Note, that #perm# must point to an array of at
-       least #num()# #int#s.
-    */
+   /// remove multiple elements.
+   /** Removes all SVector%s for the SVSet with an
+       index \c i such that \p perm[i] < 0. Upon completion, \p perm[i] >= 0
+       indicates the new index where the \c i 'th SVector has been moved to
+       due to this removal. 
+       @pre \p perm must point to an array of at
+       least num() integers.
+   */
    void remove(int perm[]);
 
-   ///
+   /// Remove \p n SVector%s from %set.
+   /** 
+    * @pre  \p keys must be at least of size \p n and valid keys
+    */
    void remove(Key keys[], int n)
    {
       DataArray < int > perm(num());
       remove(keys, n, perm.get_ptr());
    }
 
-   ///
+   /// Remove \p n SVector%s from %set.
+   /** 
+    * @pre  \p nums must be at least of size \p n and valid vector numbers
+    */
    void remove(int nums[], int n)
    {
       DataArray < int > perm(num());
@@ -274,17 +305,17 @@ public:
    ///
    void remove(Key keys[], int n, int* perm);
 
-   /** Remove #n# #SVector#s from set.
-    *  Removing multiple #SVector#s with one method invocation is available
-    *  two flavours. An array #perm# can be passed as third argument or
-    *  left not, which must be at least of size #num()# and returns the
-    *  permutations resulting from this removal: #perm[i] < 0# indicates,
-    *  that the element to index #i# has been removed. Otherwise, #perm[i]#
-    *  is the new index of the element with index #i# before the removal.
+   /// Remove \p n SVector%s from %set.
+   /** 
+    * @pre  \p perm must be at least of size num() 
+    * @pre  \p nums must be at least of size \p n
+    * @return \p perm is the permutations resulting from this removal: \p perm[i] < 0
+    * indicates, that the element to index \c i has been removed. Otherwise, \p perm[i]
+    *  is the new index of the element with index \c i before the removal.
     */
    void remove(int nums[], int n, int* perm);
 
-   /// remove all #SVector#s from set.
+   /// remove all SVector%s from %set.
    void clear()
    {
       DataArray < SVector::Element > ::clear();
@@ -297,25 +328,25 @@ public:
 
    /**@name Access */
    //@{
-   ///
+   /// get SVector by number, writeable
    SVector& operator[](int n)
    {
       return set[n];
    }
 
-   ///
+   ///get SVector by number
    const SVector& operator[](int n) const
    {
       return set[n];
    }
 
-   ///
+   ///get SVector by Key, writeable
    SVector& operator[](const Key& k)
    {
       return set[k];
    }
 
-   ///
+   ///get SVector by Key
    const SVector& operator[](const Key& k) const
    {
       return set[k];
@@ -325,56 +356,56 @@ public:
 
    /**@name Inquiry */
    //@{
-   /// current nr. of #SVector#s.
+   /// current number of SVector%s.
    int num() const
    {
       return set.num();
    }
 
-   /// current maximum nr. of #SVector#s.
+   /// current maximum number of SVector%s.
    int max() const
    {
       return set.max();
    }
 
-   ///
+   /// get Key of vector number
    Key key(int n) const
    {
       return set.key(n);
    }
 
-   ///
+   ///get Key of SVector
    Key key(const SVector* svec) const
    {
       return set.key(static_cast<const DLPSV*>(svec));
    }
 
-   ///
+   ///get vector number of Key
    int number(const Key& k) const
    {
       return set.number(k);
    }
 
-   ///
+   ///get vector number of SVector
    int number(const SVector* svec) const
    {
       return set.number(static_cast<const DLPSV*>(svec));
    }
 
 
-   ///
+   /// true iff SVSet contains a SVector for Key \p k
    int has(const Key& k) const
    {
       return set.has(k);
    }
 
-   ///
+   ///true iff SVSet contains a SVector for vector number n
    int has(int n) const
    {
       return set.has(n);
    }
 
-   /// is an #SVector# in the set.
+   /// is an SVector in the %set.
    int has(const SVector* svec) const
    {
       return set.has(static_cast<const DLPSV*>(svec));
@@ -406,7 +437,7 @@ public:
 
    /**@name Miscellaneous */
    //@{
-   /// reset maximum number of #SVector#s.
+   /// reset maximum number of SVector%s.
    void reMax(int newmax = 0);
 
    /// consistency check.

@@ -51,6 +51,7 @@ clumembers.h
 cluprotos.h
 clutypes.h
 cring.h
+*ctimer.h
 *dataarray.h
 *datahashtable.h
 *datakey.h
@@ -100,7 +101,7 @@ spxweightst.h
 ssvector.h
 subsvector.h
 *svector.h
-svset.h
+*svset.h
 *timer.h
 *unitvector.h
 *updatevector.h
