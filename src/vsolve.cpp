@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vsolve.cpp,v 1.16 2002/03/03 13:50:36 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vsolve.cpp,v 1.17 2002/03/10 09:15:41 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -190,7 +190,6 @@ int CLUFactor::vSolveLright(Real* vec, int* ridx, int rn, Real eps)
    int i, j, k, n;
    int end;
    Real x;
-   Real meps;
    Real *lval, *val;
    int *lrow, *lidx, *idx;
    int *lbeg;
@@ -199,13 +198,12 @@ int CLUFactor::vSolveLright(Real* vec, int* ridx, int rn, Real eps)
    lidx = l.idx;
    lrow = l.row;
    lbeg = l.start;
-   meps = -eps;
 
    end = l.firstUpdate;
    for (i = 0; i < end; ++i)
    {
       x = vec[lrow[i]];
-      if (x > eps || x < meps)
+      if (isNotZero(x, eps))
       {
          k = lbeg[i];
          idx = &(lidx[k]);
@@ -250,7 +248,6 @@ void CLUFactor::vSolveLright2(
    int end;
    Real x, y;
    Real x2, y2;
-   Real meps2, meps;
    Real *lval, *val;
    int *lrow, *lidx, *idx;
    int *lbeg;
@@ -262,8 +259,6 @@ void CLUFactor::vSolveLright2(
    lidx = l.idx;
    lrow = l.row;
    lbeg = l.start;
-   meps = -eps;
-   meps2 = -eps2;
 
    end = l.firstUpdate;
    for (i = 0; i < end; ++i)
@@ -271,12 +266,12 @@ void CLUFactor::vSolveLright2(
       j = lrow[i];
       x2 = vec2[j];
       x = vec[j];
-      if (x > eps || x < meps)
+      if (isNotZero(x, eps))
       {
          k = lbeg[i];
          idx = &(lidx[k]);
          val = &(lval[k]);
-         if (x2 > eps2 || x2 < meps2)
+         if (isNotZero(x2, eps2))
          {
             for (j = lbeg[i + 1]; j > k; --j)
             {
@@ -303,7 +298,7 @@ void CLUFactor::vSolveLright2(
             }
          }
       }
-      else if (x2 > eps2 || x2 < meps2)
+      else if (isNotZero(x2, eps2))
       {
          k = lbeg[i];
          idx = &(lidx[k]);
@@ -357,7 +352,7 @@ int CLUFactor::vSolveUright(Real* vec, int* vidx,
    int *rperm;
    int *cidx, *clen, *cbeg;
    Real *cval;
-   Real x, y, meps;
+   Real x, y;
 
    int *idx;
    Real *val;
@@ -371,7 +366,6 @@ int CLUFactor::vSolveUright(Real* vec, int* vidx,
    clen = u.col.len;
    cbeg = u.col.start;
 
-   meps = -eps;
    n = 0;
 
    while (rn > 0)
@@ -383,7 +377,7 @@ int CLUFactor::vSolveUright(Real* vec, int* vidx,
 
       x = diag[r] * rhs[r];
       rhs[r] = 0;
-      if (x > eps || x < meps)
+      if (isNotZero(x, eps))
       {
          c = corig[i];
          vidx[n++] = c;
@@ -398,7 +392,7 @@ int CLUFactor::vSolveUright(Real* vec, int* vidx,
             if (y == 0)
             {
                y = -x * (*val++);
-               if (y < meps || y > eps)
+               if (isNotZero(y, eps))
                {
                   rhs[k] = y;
                   enQueueMax(ridx, &rn, rperm[k]);
@@ -419,7 +413,7 @@ int CLUFactor::vSolveUright(Real* vec, int* vidx,
                r = rorig[i];
                x = diag[r] * rhs[r];
                rhs[r] = 0;
-               if (x > eps || x < meps)
+               if (isNotZero(x, eps))
                {
                   c = corig[i];
                   vidx[n++] = c;
@@ -449,7 +443,7 @@ void CLUFactor::vSolveUrightNoNZ(Real* vec,
    int *rperm;
    int *cidx, *clen, *cbeg;
    Real *cval;
-   Real x, y, meps;
+   Real x, y;
 
    int *idx;
    Real *val;
@@ -463,7 +457,6 @@ void CLUFactor::vSolveUrightNoNZ(Real* vec,
    clen = u.col.len;
    cbeg = u.col.start;
 
-   meps = -eps;
    while (rn > 0)
    {
       if (rn > *ridx * verySparseFactor4right)
@@ -473,7 +466,7 @@ void CLUFactor::vSolveUrightNoNZ(Real* vec,
             r = rorig[i];
             x = diag[r] * rhs[r];
             rhs[r] = 0;
-            if (x > eps || x < meps)
+            if (isNotZero(x, eps))
             {
                c = corig[i];
                vec[c] = x;
@@ -494,7 +487,7 @@ void CLUFactor::vSolveUrightNoNZ(Real* vec,
 
       x = diag[r] * rhs[r];
       rhs[r] = 0;
-      if (x > eps || x < meps)
+      if (isNotZero(x, eps))
       {
          c = corig[i];
          vec[c] = x;
@@ -508,7 +501,7 @@ void CLUFactor::vSolveUrightNoNZ(Real* vec,
             if (y == 0)
             {
                y = -x * (*val++);
-               if (y < meps || y > eps)
+               if (isNotZero(y, eps))
                {
                   rhs[k] = y;
                   enQueueMax(ridx, &rn, rperm[k]);
@@ -536,8 +529,8 @@ int CLUFactor::vSolveUright2(
    int *rperm;
    int *cidx, *clen, *cbeg;
    Real *cval;
-   Real x, y, meps;
-   Real x2, y2, meps2;
+   Real x, y;
+   Real x2, y2;
 
    int *idx;
    Real *val;
@@ -551,8 +544,6 @@ int CLUFactor::vSolveUright2(
    clen = u.col.len;
    cbeg = u.col.start;
 
-   meps = -eps;
-   meps2 = -eps2;
    n = 0;
 
    while (rn + rn2 > 0)
@@ -578,7 +569,7 @@ int CLUFactor::vSolveUright2(
       x2 = diag[r] * rhs2[r];
       rhs[r] = 0;
       rhs2[r] = 0;
-      if (x > eps || x < meps)
+      if (isNotZero(x, eps))
       {
          c = corig[i];
          vidx[n++] = c;
@@ -587,7 +578,7 @@ int CLUFactor::vSolveUright2(
          val = &cval[cbeg[c]];
          idx = &cidx[cbeg[c]];
          j = clen[c];
-         if (x2 > eps2 || x2 < meps2)
+         if (isNotZero(x2, eps2))
          {
             while (j-- > 0)
             {
@@ -596,7 +587,7 @@ int CLUFactor::vSolveUright2(
                if (y2 == 0)
                {
                   y2 = -x2 * (*val);
-                  if (y2 < meps2 || y2 > eps2)
+                  if (isNotZero(y2, eps2))
                   {
                      rhs2[k] = y2;
                      enQueueMax(ridx2, &rn2, rperm[k]);
@@ -611,7 +602,7 @@ int CLUFactor::vSolveUright2(
                if (y == 0)
                {
                   y = -x * (*val++);
-                  if (y < meps || y > eps)
+                  if (isNotZero(y, eps))
                   {
                      rhs[k] = y;
                      enQueueMax(ridx, &rn, rperm[k]);
@@ -634,7 +625,7 @@ int CLUFactor::vSolveUright2(
                if (y == 0)
                {
                   y = -x * (*val++);
-                  if (y < meps || y > eps)
+                  if (isNotZero(y, eps))
                   {
                      rhs[k] = y;
                      enQueueMax(ridx, &rn, rperm[k]);
@@ -649,7 +640,7 @@ int CLUFactor::vSolveUright2(
             }
          }
       }
-      else if (x2 > eps2 || x2 < meps2)
+      else if (isNotZero(x2, eps2))
       {
          c = corig[i];
          vec2[c] = x2;
@@ -663,7 +654,7 @@ int CLUFactor::vSolveUright2(
             if (y2 == 0)
             {
                y2 = -x2 * (*val++);
-               if (y2 < meps2 || y2 > eps2)
+               if (isNotZero(y2, eps2))
                {
                   rhs2[k] = y2;
                   enQueueMax(ridx2, &rn2, rperm[k]);
@@ -690,14 +681,14 @@ int CLUFactor::vSolveUright2(
             x2 = diag[r] * rhs2[r];
             rhs[r] = 0;
             rhs2[r] = 0;
-            if (x2 > eps2 || x2 < meps2)
+            if (isNotZero(x2, eps2))
             {
                c = corig[i];
                vec2[c] = x2;
                val = &cval[cbeg[c]];
                idx = &cidx[cbeg[c]];
                j = clen[c];
-               if (x > eps || x < meps)
+               if (isNotZero(x, eps))
                {
                   vidx[n++] = c;
                   vec[c] = x;
@@ -713,7 +704,7 @@ int CLUFactor::vSolveUright2(
                      rhs2[*idx++] -= x2 * (*val++);
                }
             }
-            else if (x > eps || x < meps)
+            else if (isNotZero(x, eps))
             {
                c = corig[i];
                vidx[n++] = c;
@@ -737,7 +728,7 @@ int CLUFactor::vSolveUpdateRight(Real* vec, int* ridx, int n, Real eps)
    METHOD( "CLUFactor::vSolveUpdateRight()" );
    int i, j, k;
    int end;
-   Real meps, x, y;
+   Real x, y;
    Real *lval, *val;
    int *lrow, *lidx, *idx;
    int *lbeg;
@@ -748,13 +739,12 @@ int CLUFactor::vSolveUpdateRight(Real* vec, int* ridx, int n, Real eps)
    lidx = l.idx;
    lrow = l.row;
    lbeg = l.start;
-   meps = -eps;
    end = l.firstUnused;
 
    for (i = l.firstUpdate; i < end; ++i)
    {
       x = vec[lrow[i]];
-      if (x > eps || x < meps)
+      if (isNotZero(x, eps))
       {
          k = lbeg[i];
          idx = &(lidx[k]);
@@ -816,18 +806,18 @@ int CLUFactor::vSolveRight4update(Real eps,
     */
    if (forest)
    {
-      Real meps, x;
+      Real x;
       int i, j, k;
       int* rperm;
       int* it = forestIdx;
 
       rperm = row.perm;
-      meps = -eps;
+
       for (i = j = 0; i < rn; ++i)
       {
          k = ridx[i];
          x = rhs[k];
-         if (x < meps || x > eps)
+         if (isNotZero(x, eps))
          {
             enQueueMax(ridx, &j, rperm[*it++ = k]);
             forest[k] = x;
@@ -839,17 +829,17 @@ int CLUFactor::vSolveRight4update(Real eps,
    }
    else
    {
-      Real meps, x;
+      Real x;
       int i, j, k;
       int* rperm;
 
       rperm = row.perm;
-      meps = -eps;
+    
       for (i = j = 0; i < rn; ++i)
       {
          k = ridx[i];
          x = rhs[k];
-         if (x < meps || x > eps)
+         if (isNotZero(x, eps))
             enQueueMax(ridx, &j, rperm[k]);
          else
             rhs[k] = 0;
@@ -881,7 +871,6 @@ int CLUFactor::vSolveRight4update2(Real eps,
     */
    if (forest)
    {
-      Real meps = -eps;
       Real x;
       int i, j, k;
       int* rperm;
@@ -892,7 +881,7 @@ int CLUFactor::vSolveRight4update2(Real eps,
       {
          k = ridx[i];
          x = rhs[k];
-         if (x < meps || x > eps)
+         if (isNotZero(x, eps))
          {
             enQueueMax(ridx, &j, rperm[*it++ = k]);
             forest[k] = x;
@@ -904,7 +893,6 @@ int CLUFactor::vSolveRight4update2(Real eps,
    }
    else
    {
-      Real meps = -eps;
       Real x;
       int i, j, k;
       int* rperm;
@@ -914,7 +902,7 @@ int CLUFactor::vSolveRight4update2(Real eps,
       {
          k = ridx[i];
          x = rhs[k];
-         if (x < meps || x > eps)
+         if (isNotZero(x, eps))
             enQueueMax(ridx, &j, rperm[k]);
          else
             rhs[k] = 0;
@@ -932,7 +920,6 @@ int CLUFactor::vSolveRight4update2(Real eps,
       /*      Real  maxabs; */
       int i, j, k;
       int* rperm;
-      Real meps = -eps2;
 
       /*      maxabs = 1;    */
       rperm = row.perm;
@@ -940,7 +927,7 @@ int CLUFactor::vSolveRight4update2(Real eps,
       {
          k = ridx2[i];
          x = rhs2[k];
-         if (x < meps)
+         if (x < -eps2)
          {
             /*              maxabs = (maxabs < -x) ? -x : maxabs;  */
             enQueueMax(ridx2, &j, rperm[k]);
@@ -990,7 +977,6 @@ void CLUFactor::vSolveRightNoNZ(
       /*      Real  maxabs; */
       int i, j, k;
       int* rperm;
-      Real meps = -eps2;
 
       /*      maxabs = 1;    */
       rperm = row.perm;
@@ -998,7 +984,7 @@ void CLUFactor::vSolveRightNoNZ(
       {
          k = ridx2[i];
          x = rhs2[k];
-         if (x < meps)
+         if (x < -eps2)
          {
             /*              maxabs = (maxabs < -x) ? -x : maxabs;  */
             enQueueMax(ridx2, &j, rperm[k]);
@@ -1029,7 +1015,7 @@ int CLUFactor::solveUleft(Real eps,
                 Real* rhs, int* rhsidx, int rhsn)
 {
    METHOD( "CLUFactor::solveUleft()" );
-   Real x, y, meps;
+   Real x, y;
    int i, j, k, n, r, c;
    int *rorig, *corig, *cperm;
    int *ridx, *rlen, *rbeg, *idx;
@@ -1049,7 +1035,6 @@ int CLUFactor::solveUleft(Real eps,
    rlen = u.row.len;
    rbeg = u.row.start;
 
-   meps = -eps;
    n = 0;
 
    while (rhsn > 0)
@@ -1058,7 +1043,7 @@ int CLUFactor::solveUleft(Real eps,
       c = corig[i];
       x = rhs[c];
       rhs[c] = 0;
-      if (x < meps || x > eps)
+      if (isNotZero(x, eps))
       {
          r = rorig[i];
          vecidx[n++] = r;
@@ -1074,7 +1059,7 @@ int CLUFactor::solveUleft(Real eps,
             if (y == 0)
             {
                y = -x * (*val++);
-               if (y < meps || y > eps)
+               if (isNotZero(y, eps))
                {
                   rhs[j] = y;
                   enQueueMin(rhsidx, &rhsn, cperm[j]);
@@ -1097,7 +1082,7 @@ void CLUFactor::solveUleftNoNZ(Real eps, Real* vec,
    Real* rhs, int* rhsidx, int rhsn)
 {
    METHOD( "CLUFactor::solveUleftNoNZ()" );
-   Real x, y, meps;
+   Real x, y;
    int i, j, k, r, c;
    int *rorig, *corig, *cperm;
    int *ridx, *rlen, *rbeg, *idx;
@@ -1117,15 +1102,14 @@ void CLUFactor::solveUleftNoNZ(Real eps, Real* vec,
    rlen = u.row.len;
    rbeg = u.row.start;
 
-   meps = -eps;
-
    while (rhsn > 0)
    {
       i = deQueueMin(rhsidx, &rhsn);
       c = corig[i];
       x = rhs[c];
       rhs[c] = 0;
-      if (x < meps || x > eps)
+
+      if (isNotZero(x, eps))
       {
          r = rorig[i];
          x *= diag[r];
@@ -1140,7 +1124,7 @@ void CLUFactor::solveUleftNoNZ(Real eps, Real* vec,
             if (y == 0)
             {
                y = -x * (*val++);
-               if (y < meps || y > eps)
+               if (isNotZero(y, eps))
                {
                   rhs[j] = y;
                   enQueueMin(rhsidx, &rhsn, cperm[j]);
@@ -1161,11 +1145,10 @@ int CLUFactor::solveLleftForest(Real eps, Real* vec, int* nonz, int n)
 {
    METHOD( "CLUFactor::solveLleftForest()" );
    int i, j, k, end;
-   Real x, y, meps;
+   Real x, y;
    Real *val, *lval;
    int *idx, *lidx, *lrow, *lbeg;
 
-   meps = -eps;
    lval = l.val;
    lidx = l.idx;
    lrow = l.row;
@@ -1186,7 +1169,7 @@ int CLUFactor::solveLleftForest(Real eps, Real* vec, int* nonz, int n)
             if (y == 0)
             {
                y = -x * (*val++);
-               if (y < meps || y > eps)
+               if (isNotZero(y, eps))
                {
                   vec[m] = y;
                   nonz[n++] = m;
@@ -1238,7 +1221,7 @@ int CLUFactor::solveLleft(Real eps, Real* vec, int* nonz, int rn)
    METHOD( "CLUFactor::solveLleft()" );
    int i, j, k, n;
    int r;
-   Real x, y, meps;
+   Real x, y;
    Real *rval, *val;
    int *ridx, *idx;
    int *rbeg;
@@ -1250,7 +1233,6 @@ int CLUFactor::solveLleft(Real eps, Real* vec, int* nonz, int rn)
    rbeg = l.rbeg;
    rorig = l.rorig;
    rperm = l.rperm;
-   meps = -eps;
    n = 0;
 
    i = l.firstUpdate - 1;
@@ -1283,7 +1265,7 @@ int CLUFactor::solveLleft(Real eps, Real* vec, int* nonz, int rn)
       i = deQueueMax(nonz, &rn);
       r = rorig[i];
       x = vec[r];
-      if (x < meps || x > eps)
+      if (isNotZero(x, eps))
       {
          *(--last) = r;
          n++;
@@ -1299,7 +1281,7 @@ int CLUFactor::solveLleft(Real eps, Real* vec, int* nonz, int rn)
             if (y == 0)
             {
                y = -x * *val++;
-               if (y < meps || y > eps)
+               if (isNotZero(y, eps))
                {
                   vec[m] = y;
                   enQueueMax(nonz, &rn, rperm[m]);
@@ -1383,7 +1365,7 @@ int CLUFactor::solveUpdateLeft(Real eps, Real* vec, int* nonz, int n)
 {
    METHOD( "CLUFactor::solveUpdateLeft()" );
    int i, j, k, end;
-   Real x, y, meps;
+   Real x, y;
    Real *lval, *val;
    int *lrow, *lidx, *idx;
    int *lbeg;
@@ -1394,7 +1376,6 @@ int CLUFactor::solveUpdateLeft(Real eps, Real* vec, int* nonz, int n)
    lidx = l.idx;
    lrow = l.row;
    lbeg = l.start;
-   meps = -eps;
 
    end = l.firstUpdate;
    for (i = l.firstUnused - 1; i >= end; --i)
@@ -1410,7 +1391,7 @@ int CLUFactor::solveUpdateLeft(Real eps, Real* vec, int* nonz, int n)
       if (y == 0)
       {
          y = -x;
-         if (y < meps || y > eps)
+         if (isNotZero(y, eps))
          {
             nonz[n++] = k;
             vec[k] = y;
