@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.26 2002/03/04 16:50:50 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.27 2002/03/05 13:24:46 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -314,14 +314,51 @@ bool SPxBasis::readBasis(
 
 void SPxBasis::writeBasis(   
    std::ostream&  os, 
-   const NameSet& /*rownames*/, 
-   const NameSet& /*colnames*/)
+   const NameSet& rownames, 
+   const NameSet& colnames)
 {
    METHOD( "SPxBasis::writeBasis()" );
    assert(theLP != 0);
 
+   int i = 0;
+   int k = 0;
+
    os << "NAME  soplex.bas\n";     
-   os << "not yet implemented\n";
+
+   for(; i < theLP->nCols(); i++)
+   {
+      if( theLP->isBasic( thedesc.colStatus( i ))) 
+      {
+         for(; k < theLP->nRows(); k++)
+            if( !theLP->isBasic( thedesc.rowStatus( k )))
+               break;
+
+         assert( k != theLP->nRows() );
+
+         os << "  "
+            << ( thedesc.rowStatus( k ) == Desc::D_ON_UPPER ? "XU " : "XL " )
+            << colnames[theLP->SPxLP::cId( i )]
+            << " " 
+            << rownames[theLP->SPxLP::rId( k )]
+            << std::endl;
+      }
+      else
+      {
+         if( thedesc.colStatus( i ) == Desc::P_ON_UPPER)
+         {
+            os << "  UL"
+               << colnames[theLP->SPxLP::cId( i )]
+               << std::endl;
+         }
+      }
+   }
+#ifndef NDEBUG
+   for(; k < theLP->nRows(); k++)
+      if( !theLP->isBasic( thedesc.rowStatus( k )))
+         break;
+   assert( k == theLP->nRows() );
+#endif // NDEBUG
+
    os << "ENDATA" << std::endl;
 }
 
