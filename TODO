@@ -1,6 +1,15 @@
-$Id: TODO,v 1.56 2002/02/24 16:17:14 bzfkocht Exp $
+$Id: TODO,v 1.57 2002/02/28 14:41:16 bzfkocht Exp $
 
 Diesen Kram mal als @todo's schreiben ;-)
+
+Abbruch bei minimieren mit Upper Bound
+
+primal: >= UB und optimal
+dual  : >= UB und shift = 0
+
+---------------
+
+spxbasis  load(xxx) umbennen in loadDesc, loadLP usw.
 
 -----------------------------------------------------------------------------
 
