@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.33 2002/12/16 07:29:47 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.34 2003/03/04 12:32:28 bzfkocht Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -808,12 +808,15 @@ SLUFactor::~SLUFactor()
 
 static Real betterThreshold(Real th)
 {
-   if (th < 0.1)
+   if (LT(th, 0.1))
       th *= 10.0;
-   else if (th < 0.9)
+   else if (LT(th, 0.9))
       th = (th + 1.0) / 2.0;
-   else if (th < 0.999)
+   else if (LT(th, 0.999))
       th = 0.99999;
+
+   assert(th < 1.0);
+
    return th;
 }
 

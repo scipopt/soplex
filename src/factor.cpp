@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.39 2002/12/12 09:48:53 bzfkocht Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.40 2003/03/04 12:32:28 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -966,7 +966,7 @@ void CLUFactor::selectPivots(Real threshold)
             k = u.row.idx[i];
             j = temp.s_cact[k];
             x = u.row.val[i];
-            if (j < mkwtz && (x > l_maxabs || -x > l_maxabs))
+            if (j < mkwtz && fabs(x) > l_maxabs)
             {
                mkwtz = j;
                cl = k;
@@ -1055,6 +1055,8 @@ void CLUFactor::selectPivots(Real threshold)
          ++count;
          continue;
       }
+      assert(cl >= 0);
+
       removeDR(temp.pivot_col[cl]);
       initDR(temp.pivot_col[cl]);
 
