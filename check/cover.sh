@@ -1,8 +1,9 @@
-# $Id: cover.sh,v 1.2 2001/11/06 23:30:59 bzfkocht Exp $
+# $Id: cover.sh,v 1.3 2001/11/08 08:47:18 bzfkocht Exp $
 BINNAME=`basename $2`
-OUTFILE=cover.$BINNAME.out
-ERRFILE=cover.$BINNAME.err
-RESFILE=cover.$BINNAME.result
+TSTNAME=`basename $1 .test`
+OUTFILE=cover.$TSTNAME.$BINNAME.out
+ERRFILE=cover.$TSTNAME.$BINNAME.err
+RESFILE=cover.$TSTNAME.$BINNAME.res
 date >$OUTFILE
 date >$ERRFILE
 for i in `cat $1`
@@ -33,4 +34,3 @@ done >>$OUTFILE
 date >>$OUTFILE
 date >>$ERRFILE
 gawk -f check.awk $OUTFILE | tee $RESFILE
- 
