@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.32 2002/12/12 09:48:53 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.33 2002/12/16 07:29:47 bzfkocht Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -81,16 +81,17 @@ void SLUFactor::solveRight4update(SSVector& x, const SVector& b)
    n = b.size();
    if (l.updateType == ETA)
    {
-      m = vSolveRight4update(x.epsilon, x.altValues(), x.altIndexMem(),
+      m = vSolveRight4update(x.getEpsilon(), x.altValues(), x.altIndexMem(),
          ssvec.altValues(), ssvec.altIndexMem(), n, 0, 0, 0);
       x.setSize(m);
-      x.forceSetup();
+      //x.forceSetup();
+      x.unSetup();
       eta.setup_and_assign(x);
    }
    else
    {
       forest.clear();
-      m = vSolveRight4update(x.epsilon, x.altValues(), x.altIndexMem(),
+      m = vSolveRight4update(x.getEpsilon(), x.altValues(), x.altIndexMem(),
          ssvec.altValues(), ssvec.altIndexMem(), n,
          forest.altValues(), &f, forest.altIndexMem());
       forest.setSize(f);
@@ -129,20 +130,21 @@ void SLUFactor::solve2right4update(
    if (l.updateType == ETA)
    {
       n = b.size();
-      m = vSolveRight4update2(x.epsilon, x.altValues(), x.altIndexMem(), 
+      m = vSolveRight4update2(x.getEpsilon(), x.altValues(), x.altIndexMem(), 
          ssvec.get_ptr(), sidx, n, y.get_ptr(),
-         rhs.epsilon, rhs.altValues(), ridx, rsize, 0, 0, 0);
+         rhs.getEpsilon(), rhs.altValues(), ridx, rsize, 0, 0, 0);
       x.setSize(m);
-      x.forceSetup();
+      //      x.forceSetup();
+      x.unSetup();
       eta.setup_and_assign(x);
    }
    else
    {
       forest.clear();
       n = ssvec.size();
-      m = vSolveRight4update2(x.epsilon, x.altValues(), x.altIndexMem(), 
+      m = vSolveRight4update2(x.getEpsilon(), x.altValues(), x.altIndexMem(), 
          ssvec.get_ptr(), sidx, n, y.get_ptr(),
-         rhs.epsilon, rhs.altValues(), ridx, rsize,
+         rhs.getEpsilon(), rhs.altValues(), ridx, rsize,
          forest.altValues(), &f, forest.altIndexMem());
       x.setSize(m);
       x.forceSetup();
@@ -178,7 +180,7 @@ void SLUFactor::solveLeft(SSVector& x, const SVector& b) //const
 
    x.clear();
    int sz = ssvec.size(); // see .altValues()
-   int n = vSolveLeft(x.epsilon, x.altValues(), x.altIndexMem(),
+   int n = vSolveLeft(x.getEpsilon(), x.altValues(), x.altIndexMem(),
       ssvec.altValues(), ssvec.altIndexMem(), sz);
 
    if (n > 0)
@@ -216,7 +218,7 @@ void SLUFactor::solveLeft(
    y.clear();
    ssvec.assign(rhs1);
    n = ssvec.size(); // see altValues();
-   n = vSolveLeft2(x.epsilon, x.altValues(), x.altIndexMem(), svec, sidx, n,
+   n = vSolveLeft2(x.getEpsilon(), x.altValues(), x.altIndexMem(), svec, sidx, n,
       y.get_ptr(), rhs2.altValues(), ridx, rn);
 
    x.setSize(n);
@@ -757,7 +759,7 @@ SLUFactor::SLUFactor(const SLUFactor& old)
 #endif
 
    assign(old);
-   assert(isConsistent());
+   assert(SLUFactor::isConsistent());
 }
 
 void SLUFactor::freeAll()

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.64 2002/12/12 09:48:53 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.65 2002/12/16 07:29:47 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -894,10 +894,10 @@ bool SoPlex::isConsistent() const
    if (epsilon() < 0)
       return MSGinconsistent("SoPlex");
 
-   if (primVec.delta().epsilon != dualVec.delta().epsilon)
+   if (primVec.delta().getEpsilon() != dualVec.delta().getEpsilon())
       return MSGinconsistent("SoPlex");
 
-   if (dualVec.delta().epsilon != addVec.delta().epsilon)
+   if (dualVec.delta().getEpsilon() != addVec.delta().getEpsilon())
       return MSGinconsistent("SoPlex");
 
    if (unitVecs.size() < ((rep() == ROW) ? SPxLP::nCols() : SPxLP::nRows()))

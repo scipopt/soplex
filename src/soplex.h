@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.55 2002/12/12 09:48:53 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.56 2002/12/16 07:29:47 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -487,7 +487,7 @@ public:
     */
    Real epsilon() const
    {
-      return primVec.delta().epsilon;
+      return primVec.delta().getEpsilon();
    }
 
    /// allowed bound violation for optimal Solution.

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.47 2002/12/12 09:48:53 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.48 2002/12/16 07:29:47 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -131,7 +131,7 @@ public:
    }
 };
 
-int main(int argc, const char* argv[])
+int main(int argc, const char* const argv[])
 {
    const char* banner =
    "************************************************************************\n"

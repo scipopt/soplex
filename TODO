@@ -1,4 +1,10 @@
-$Id: TODO,v 1.67 2002/12/08 11:09:20 bzfkocht Exp $
+$Id: TODO,v 1.68 2002/12/16 07:29:47 bzfkocht Exp $
+
+Vermutlich sind die meisten solve() methoden in 
+CLUFactor::solve.cpp const. Müßten von den Pointern
+befreit werden
+
+SSVector sollte von den pointern befreit werden.
 
 simplifier sollten nicht unsimplify machen, sondern
 uncrush_x und uncrush_pi, das LP kann man sich auch merken.

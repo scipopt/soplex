@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.h,v 1.13 2002/12/08 11:09:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.h,v 1.14 2002/12/16 07:29:47 bzfkocht Exp $"
 
 
 /**@file  spxsteeppr.h
@@ -71,12 +71,7 @@ private:
    DataArray < Real > leavePref;
 
    ///
-   void setupPrefs(Real mult,
-      Real /*tie*/, Real /*cotie*/,
-      Real shift, Real coshift,
-      int rstart = 0, int cstart = 0,
-      int rend = -1, int cend = -1);
-
+   void setupPrefsX(Real mult, Real /*tie*/, Real /*cotie*/, Real shift, Real coshift);
    ///
    void setupPrefs(SoPlex::Type);
    ///

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.55 2002/12/12 09:48:53 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.56 2002/12/16 07:29:47 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -147,8 +147,17 @@ SoPlex::Status SoPlex::solve()
             {
                if (lastUpdate() == 0)
                   break;
-               
-               std::cout << "== in solve ==" << std::endl;
+              
+               // We have a iterationlimit and everything look good? Then stop!
+               // 6 is just a number picked.
+               if (maxIters > 0 && lastUpdate() < 6
+                  && (  SPxBasis::status() == SPxBasis::REGULAR 
+                     || SPxBasis::status() == SPxBasis::DUAL 
+                     || SPxBasis::status() == SPxBasis::PRIMAL))
+                  break;
+
+               std::cout << "== in solve == " << maxIters << " " << int(SPxBasis::status()) << std::endl;
+               // We better refactor to make sure the solution is ok.
                factorize();
 
                enterId = thepricer->selectEnter();
@@ -219,13 +228,24 @@ SoPlex::Status SoPlex::solve()
 
             if (leaveNum < 0)
             {
+               // We have a fresh factorization? Then stop!
                if (lastUpdate() == 0)
                   break;
 
-               std::cout << "== in solve ==" << std::endl;
+               // We have a iterationlimit and everything look good? Then stop!
+               // 6 is just a number picked.
+               if (maxIters > 0 && lastUpdate() < 6
+                  && (  SPxBasis::status() == SPxBasis::REGULAR 
+                     || SPxBasis::status() == SPxBasis::DUAL 
+                     || SPxBasis::status() == SPxBasis::PRIMAL))
+                  break;
+               
+               std::cout << "== in solve == " << maxIters << " " << int(SPxBasis::status()) << std::endl;
+               // We better refactor to make sure the solution is ok.
                factorize();
 
                leaveNum = thepricer->selectLeave();
+
                if (leaveNum < 0)
                   break;
             }
@@ -624,7 +644,7 @@ SoPlex::Status SoPlex::getDual (Vector& p_vector) const
    else
       p_vector = coPvec();
 
-   p_vector *= static_cast<double>(spxSense());
+   p_vector *= Real(spxSense());
 
    return status();
 }

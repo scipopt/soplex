@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.22 2002/12/14 07:48:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.23 2002/12/16 07:29:47 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -478,6 +478,7 @@ SSVector& SSVector::multAdd(Real x, const Vector& vec)
    return *this;
 }
 
+#if 0 // old version
 SSVector& SSVector::operator=(const SSVector& rhs)
 {
    assert(rhs.isConsistent());
@@ -542,11 +543,57 @@ SSVector& SSVector::operator=(const SSVector& rhs)
 
    return *this;
 }
+#else // new version
+SSVector& SSVector::operator=(const SSVector& rhs)
+{
+   assert(rhs.isConsistent());
 
+   if (this != &rhs)
+   {
+      clear();
+      epsilon = rhs.epsilon;
+      setMax(rhs.max());
+      DVector::reDim(rhs.dim());
+
+      if (rhs.isSetup())
+      {
+         IdxSet::operator=(rhs);
+
+         for(int i = 0; i < size(); ++i)
+         {
+            int j  = index(i);
+            val[j] = rhs.val[j];
+         }
+      }
+      else
+      {
+         num = 0;
+
+         for(int i = 0; i < rhs.dim(); ++i)
+         {
+            if (isNotZero(rhs.val[i], epsilon))
+            {
+               val[i]       = rhs.val[i];
+               idx[num]     = i;
+               num++;
+            }
+         }
+      }
+      setupStatus = true;
+   }
+   assert(isConsistent());
+
+   return *this;
+}
+#endif // 0
+
+#if 0 // old version
 void SSVector::setup_and_assign(SSVector& rhs)
 {
-   clear();
+   assert(rhs.isConsistent());
 
+   clear();
+   epsilon = rhs.epsilon;
    setMax(rhs.max());
    DVector::reDim(rhs.dim());
 
@@ -606,6 +653,55 @@ void SSVector::setup_and_assign(SSVector& rhs)
 
    assert(isConsistent());
 }
+#else // new version
+void SSVector::setup_and_assign(SSVector& rhs)
+{
+   clear();
+   epsilon = rhs.epsilon;
+   setMax(rhs.max());
+   DVector::reDim(rhs.dim());
+
+   if (rhs.isSetup())
+   {
+      IdxSet::operator=(rhs);
+      
+      for(int i = 0; i < size(); ++i)
+      {
+         int j  = index(i);
+         val[j] = rhs.val[j];
+      }
+   }
+   else
+   {
+      num = 0;
+
+      for(int i = 0; i < rhs.dim(); ++i)
+      {
+         if (rhs.val[i] != 0.0)
+         {
+            if (isNotZero(rhs.val[i], epsilon))
+            {
+               rhs.idx[num] = i;
+               idx[num]     = i;
+               val[i]       = rhs.val[i];
+               num++;
+            }
+            else
+            {
+               rhs.val[i] = 0.0;
+            }
+         }
+      }
+      rhs.num         = num;
+      rhs.setupStatus = true;
+   }
+   setupStatus = true;
+
+   assert(rhs.isConsistent());
+   assert(isConsistent());
+}
+#endif // 0
+
 
 SSVector& SSVector::operator=(const SVector& rhs)
 {
@@ -613,6 +709,7 @@ SSVector& SSVector::operator=(const SVector& rhs)
    return assign(rhs);
 }
 
+#if 0 // old version
 SSVector& SSVector::assign(const SVector& rhs)
 {
    assert(rhs.dim() <= Vector::dim());
@@ -633,7 +730,7 @@ SSVector& SSVector::assign(const SVector& rhs)
    return *this;
 }
 
-#if 0 // neuer versuch noch testen
+#else // new version not yet fully testet, could be put into operator=()
 SSVector& SSVector::assign(const SVector& rhs)
 {
    assert(rhs.dim() <= Vector::dim());
@@ -642,12 +739,12 @@ SSVector& SSVector::assign(const SVector& rhs)
 
    for(int i = 0; i < rhs.size(); ++i)
    {
-      int  k = rhs.index[i];
-      Real v = rhs.value[i];
+      int  k = rhs.index(i);
+      Real v = rhs.value(i);
 
       val[k] = v;
 
-      if (isNotZero(v))
+      if (isNotZero(v, epsilon))
          idx[num++] = k;
    }
    setupStatus = true;
@@ -877,11 +974,16 @@ bool SSVector::isConsistent() const
 
    if (isSetup())
    {
-      for (int i = Vector::dim() - 1; i >= 0; --i)
-         if (val[i] != 0 && number(i) < 0)
-            return MSGinconsistent("SSVector");
-   }
+      for (int i = 0; i < Vector::dim(); ++i)
+      {
+         int j = number(i);
 
+         if (j < 0 && fabs(val[i]) >= epsilon) 
+            return MSGinconsistent("SSVector");
+         if (j > 0 && fabs(val[i]) < epsilon)
+            return MSGinconsistent("SSVector");
+      }
+   }
    return DVector::isConsistent() && IdxSet::isConsistent();
 }
 } // namespace soplex

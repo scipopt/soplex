@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: solve.cpp,v 1.20 2002/12/12 09:48:53 bzfkocht Exp $"
+#pragma ident "@(#) $Id: solve.cpp,v 1.21 2002/12/16 07:29:47 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -844,7 +844,7 @@ int CLUFactor::solveLleftForest(Real* vec, int* /* nonz */, Real /* eps */)
    return 0;
 }
 
-void CLUFactor::solveLleft(Real* vec)
+void CLUFactor::solveLleft(Real* vec) const
 {
    METHOD( "CLUFactor::solveLleft()" );
 

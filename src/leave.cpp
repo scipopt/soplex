@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.23 2002/12/12 09:48:53 bzfkocht Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.24 2002/12/16 07:29:47 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -621,8 +621,6 @@ int SoPlex::leave(int leaveIdx)
          if (leavebound > epsilon() || leavebound < -epsilon())
             theFrhs->multAdd(-leavebound, baseVec(leaveIdx));
 
-
-
          //      process entering variable
          Real enterBound;
          Real newUBbound;
@@ -645,7 +643,6 @@ int SoPlex::leave(int leaveIdx)
          if (enterVal > epsilon() || enterVal < -epsilon())
             doPupdate();
 
-
          // update feasibility vector
          theFvec->value() = -((*theFvec)[leaveIdx] - leavebound)
                             / theFvec->delta()[leaveIdx];
@@ -653,11 +650,9 @@ int SoPlex::leave(int leaveIdx)
          (*theFvec)[leaveIdx] = enterBound - theFvec->value();
          updateFtest();
 
-
          //  change basis matrix
          change(leaveIdx, enterId, &newVector, &(theFvec->delta()));
       }
-
 
       /*
           No entering vector has been selected from the basis. However, if the
@@ -671,7 +666,6 @@ int SoPlex::leave(int leaveIdx)
       {
          assert(rep() == ROW);
          SPxBasis::Desc& ds = desc();
-
 
          SPxId none;
          change(leaveIdx, none, 0);
@@ -708,13 +702,11 @@ int SoPlex::leave(int leaveIdx)
             theLBbound[leaveIdx] = 0;
          }
 
-
          // update copricing vector
          theCoPvec->value() = enterVal;
          thePvec->value() = enterVal;
          if (enterVal > epsilon() || enterVal < -epsilon())
             doPupdate();
-
 
          // update feasibility vectors
          theFvec->value() = 0;

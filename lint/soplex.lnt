@@ -1,4 +1,4 @@
-// $Id: soplex.lnt,v 1.8 2002/12/08 11:09:20 bzfkocht Exp $
+// $Id: soplex.lnt,v 1.9 2002/12/16 07:29:47 bzfkocht Exp $
 -passes(1)
 +cpp(.h,.cpp)
 // esoteric size settings to find erros.
@@ -34,6 +34,7 @@
 -function(exit,__assertfail)
 -efile(766,./lint/posix/assert.h)
 -efile(766,spxdefines.h)
+-efile(766,iomanip)
 -e506 // Constant value Boolean
 -e534 // Ignoring return value of function
 -e537 // Repeated include file

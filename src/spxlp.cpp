@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.cpp,v 1.19 2002/12/08 11:09:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.cpp,v 1.20 2002/12/16 07:29:47 bzfkocht Exp $"
 
 #include <stdio.h>
 
@@ -565,14 +565,14 @@ void SPxLP::changeObj(const Vector& newObj)
    METHOD( "SPxLP::changeObj()" );
    assert(maxObj().dim() == newObj.dim());
    LPColSet::obj() = newObj;
-   LPColSet::obj() *= (double)spxSense();
+   LPColSet::obj() *= Real(spxSense());
    assert(isConsistent());
 }
 
 void SPxLP::changeObj(int i, Real newVal)
 {
    METHOD( "SPxLP::changeObj()" );
-   LPColSet::obj(i) = spxSense() * newVal;
+   LPColSet::obj(i) = Real(spxSense()) * newVal;
    assert(isConsistent());
 }
 

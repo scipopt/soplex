@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.20 2002/12/08 11:09:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.21 2002/12/16 07:29:47 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -58,7 +58,7 @@ void SPxSteepPR::setType(SoPlex::Type type)
 {
    int i;
 
-   workRhs.epsilon = thesolver->epsilon();
+   workRhs.setEpsilon(thesolver->epsilon());
 
    pref.reSize (thesolver->coDim());
    coPref.reSize(thesolver->dim());
@@ -85,21 +85,16 @@ void SPxSteepPR::setType(SoPlex::Type type)
          for (i = thesolver->dim() - 1; i >= 0; --i)
          {
             // coPenalty[i] = 1;
-            SPxId id = thesolver->basis().baseId(i);
-            int n = thesolver->number(id);
-            if (thesolver->isId(id))
-               leavePref[i] = pref[n];
-            else
-               leavePref[i] = coPref[n];
-            coPenalty[i] = 1 + thesolver->basis().baseVec(i).size()
-                           / Real(thesolver->dim());
+            SPxId id     = thesolver->basis().baseId(i);
+            int n        = thesolver->number(id);
+            leavePref[i] = thesolver->isId(id) ? pref[n] : coPref[n];
+            coPenalty[i] = 1.0 + thesolver->basis().baseVec(i).size() / Real(thesolver->dim());
          }
       }
    }
    else
    {
-      std::cerr << 
-         "sorry, no exact setup for steepest edge multipliers implemented\n";
+      std::cerr << "sorry, no exact setup for steepest edge multipliers implemented\n";
 
       if (type == SoPlex::ENTER)
       {
@@ -121,26 +116,28 @@ void SPxSteepPR::setType(SoPlex::Type type)
          }
       }
    }
-
    workVec.clear();
    workRhs.clear();
 }
 
-void SPxSteepPR::setupPrefs(Real mult, Real /*tie*/, Real /*cotie*/,
-                             Real shift, Real coshift,
-                             int rs, int cs, int re, int ce)
+void SPxSteepPR::setupPrefsX(
+   Real mult, 
+   Real /*tie*/, 
+   Real /*cotie*/,
+   Real shift, 
+   Real coshift)
 {
-   Real *p;
-   Real *cp;
-   Real *end;
-   // Real rtie, ctie;
-   Real rshift, cshift;
-   int i;
+   DataArray<Real>* p;
+   DataArray<Real>* cp;
+   // Real rtie;
+   // Real ctie;
+   Real rshift;
+   Real cshift;
 
    if (thesolver->rep() == SoPlex::COLUMN)
    {
-      cp = pref.get_ptr();
-      p = coPref.get_ptr();
+      cp = &pref;
+      p  = &coPref;
       // ctie = tie;
       // rtie = cotie;
       cshift = shift;
@@ -148,48 +145,33 @@ void SPxSteepPR::setupPrefs(Real mult, Real /*tie*/, Real /*cotie*/,
    }
    else
    {
-      p = pref.get_ptr();
-      cp = coPref.get_ptr();
+      p  = &pref;
+      cp = &coPref;
       // rtie = tie;
       // ctie = cotie;
       rshift = shift;
       cshift = coshift;
    }
 
-   if (re < 0)
-      re = thesolver->nRows();
-   for (i = re; --i >= rs;)
-   {
-      p[i] = rshift;
-      //      p[i] += rtie * thesolver->rowVector(i).size() / Real(thesolver->nCols());
-      //      p[i] += EQ_PREF * (thesolver->rhs(i) == thesolver->lhs(i));
-      //      p[i] += EQ_PREF * (thesolver->rhs(i) >=  infinity
-      //                     &&  thesolver->lhs(i) <= -infinity);
-   }
+   //      p[i] += rtie * thesolver->rowVector(i).size() / Real(thesolver->nCols());
+   //      p[i] += EQ_PREF * (thesolver->rhs(i) == thesolver->lhs(i));
+   //      p[i] += EQ_PREF * (thesolver->rhs(i) >=  infinity
+   //                     &&  thesolver->lhs(i) <= -infinity);
+   for(int i = 0; i < thesolver->nRows(); ++i)
+      (*p)[i] = rshift;
 
-   if (ce < 0)
-      ce = thesolver->nCols();
-   for (i = ce; --i >= cs;)
-   {
-      cp[i] = cshift;
-      //      cp[i] += ctie * thesolver->colVector(i).size() / Real(thesolver->nRows());
-      //      cp[i] += EQ_PREF * (thesolver->upper(i) == thesolver->lower(i));
-      //      cp[i] += EQ_PREF * (thesolver->upper(i) >=  infinity
-      //                      &&  thesolver->lower(i) <= -infinity);
-   }
+   //      cp[i] += ctie * thesolver->colVector(i).size() / Real(thesolver->nRows());
+   //      cp[i] += EQ_PREF * (thesolver->upper(i) == thesolver->lower(i));
+   //      cp[i] += EQ_PREF * (thesolver->upper(i) >=  infinity
+   //                      &&  thesolver->lower(i) <= -infinity);
+   for(int i = 0; i < thesolver->nCols(); ++i)
+      (*cp)[i] = cshift;
 
+   for(int i = 0; i < coPref.size(); ++i)
+      coPref[i] *= 1.0 - mult * i;
 
-   i = 0;
-   cp = coPref.get_ptr();
-   end = cp + coPref.size();
-   while (cp < end)
-      *cp++ *= 1.0 - mult * i++;
-
-   p = pref.get_ptr();
-   end = p + pref.size();
-   i = pref.size();
-   while (p < end)
-      *p++ *= 1.0 + mult * i--;
+   for(int i = 0; i < pref.size(); ++i)
+      pref[i] *= 1.0 + mult * i;
 }
 
 void SPxSteepPR::setupPrefs(SoPlex::Type tp)
@@ -197,10 +179,12 @@ void SPxSteepPR::setupPrefs(SoPlex::Type tp)
    if (tp != prefSetup)
    {
       Real mult = 1e-8 / Real(1 + thesolver->dim() + thesolver->coDim());
+
       if (tp == SoPlex::ENTER)
-         setupPrefs(-mult, -1e-5, -1e-5, 1.0, 1.0);
+         setupPrefsX(-mult, -1e-5, -1e-5, 1.0, 1.0);
       else
-         setupPrefs(mult, 1e-5, 1e-5, 1.0, 1.0);
+         setupPrefsX(mult, 1e-5, 1e-5, 1.0, 1.0);
+
       prefSetup = tp;
    }
 }
@@ -220,54 +204,85 @@ void SPxSteepPR::setRep(SoPlex::Representation)
 
 void SPxSteepPR::left4X(int n, const SPxId& id, int start, int incr)
 {
+#if 0
    assert(thesolver->type() == SoPlex::LEAVE);
 
    if (id.isValid())
    {
-      int i, j;
-      Real x;
       // Real               delta         = 0.1;   // thesolver->epsilon();
-      Real delta = 0.1 + 1.0 / thesolver->basis().iteration();
-      Real* coPenalty_ptr = coPenalty.get_ptr();
-      const Real* workVec_ptr = workVec.get_const_ptr();
-      const Real* rhoVec = thesolver->fVec().delta().values();
-      Real rhov_1 = 1 / rhoVec[n];
-      Real beta_q = thesolver->coPvec().delta().length2()
-                      * rhov_1 * rhov_1;
+      Real        delta         = 0.1 + 1.0 / thesolver->basis().iteration();
+      Real*       coPenalty_ptr = coPenalty.get_ptr();
+      const Real* workVec_ptr   = workVec.get_const_ptr();
+      const Real* rhoVec        = thesolver->fVec().delta().values();
+      Real        rhov_1        = 1.0 / rhoVec[n];
+      Real        beta_q        = thesolver->coPvec().delta().length2() * rhov_1 * rhov_1;
 
-      assert(rhoVec[n] >= theeps || -rhoVec[n] >= theeps);
+      assert(fabs(rhoVec[n]) >= theeps);
 
       //  Update #coPenalty# vector
       const IdxSet& rhoIdx = thesolver->fVec().idx();
-      int len = thesolver->fVec().idx().size();
-      for (i = len - 1 - start; i >= 0; i -= incr)
-      {
-         j = rhoIdx.index(i);
-         x = coPenalty_ptr[j] += rhoVec[j]
-            * (beta_q * rhoVec[j] - 2 * rhov_1 * workVec_ptr[j]);
-         if (x < delta)
-            // coPenalty_ptr[j] = delta / (1+delta-x);
-            coPenalty_ptr[j] = delta;
-         else if (x >= infinity)
-            coPenalty_ptr[j] = 1 / theeps;
-      }
+      int           len    = thesolver->fVec().idx().size();
 
+      for(int i = 0; i < len; ++i)
+      {
+         int  j = rhoIdx.index(i);
+         
+         coPenalty_ptr[j] += rhoVec[j] * (beta_q * rhoVec[j] - 2.0 * rhov_1 * workVec_ptr[j]);
+
+         if (coPenalty_ptr[j] < delta)
+            coPenalty_ptr[j] = delta; // coPenalty_ptr[j] = delta / (1+delta-x);
+         else if (coPenalty_ptr[j] >= infinity)
+            coPenalty_ptr[j] = 1.0 / theeps;
+      }
       coPenalty_ptr[n] = beta_q;
       //@ coPenalty_ptr[n] = 0.999*beta_q;
       //@ coPenalty_ptr[n] = 1.001*beta_q;
    }
-
+#endif
 }
 
 void SPxSteepPR::left4(int n, SPxId id)
 {
+   assert(thesolver->type() == SoPlex::LEAVE);
+
    //  Update preference multiplier in #leavePref#
    if (thesolver->isId(id))
       leavePref[n] = pref[thesolver->number(id)];
    else if (thesolver->isCoId(id))
       leavePref[n] = coPref[thesolver->number(id)];
 
-   left4X(n, id, 0, 1);
+   if (id.isValid())
+   {
+      // Real               delta         = 0.1;   // thesolver->epsilon();
+      Real        delta         = 0.1 + 1.0 / thesolver->basis().iteration();
+      Real*       coPenalty_ptr = coPenalty.get_ptr();
+      const Real* workVec_ptr   = workVec.get_const_ptr();
+      const Real* rhoVec        = thesolver->fVec().delta().values();
+      Real        rhov_1        = 1.0 / rhoVec[n];
+      Real        beta_q        = thesolver->coPvec().delta().length2() * rhov_1 * rhov_1;
+
+      //TK: I gave the 0.5 extra, because I am not sure how hard this assert is.
+      assert(fabs(rhoVec[n]) >= theeps * 0.5);
+
+      //  Update #coPenalty# vector
+      const IdxSet& rhoIdx = thesolver->fVec().idx();
+      int           len    = thesolver->fVec().idx().size();
+
+      for(int i = 0; i < len; ++i)
+      {
+         int  j = rhoIdx.index(i);
+         
+         coPenalty_ptr[j] += rhoVec[j] * (beta_q * rhoVec[j] - 2.0 * rhov_1 * workVec_ptr[j]);
+
+         if (coPenalty_ptr[j] < delta)
+            coPenalty_ptr[j] = delta; // coPenalty_ptr[j] = delta / (1+delta-x);
+         else if (coPenalty_ptr[j] >= infinity)
+            coPenalty_ptr[j] = 1.0 / theeps;
+      }
+      coPenalty_ptr[n] = beta_q;
+      //@ coPenalty_ptr[n] = 0.999*beta_q;
+      //@ coPenalty_ptr[n] = 1.001*beta_q;
+   }
 }
 
 int SPxSteepPR::selectLeaveX(Real& best, int start, int incr)
@@ -333,7 +348,7 @@ int SPxSteepPR::selectLeave()
    {
       thesolver->basis().coSolve(thesolver->coPvec().delta(),
                                  thesolver->unitVector(lastIdx));
-      workRhs.epsilon = accuracy;
+      workRhs.setEpsilon(accuracy);
       workRhs.setup_and_assign(thesolver->coPvec().delta());
       thesolver->setup4solve(&workVec, &workRhs);
    }
@@ -493,7 +508,7 @@ SPxId SPxSteepPR::selectEnter()
       thesolver->basis().solve4update(delta, thesolver->vector(lastId));
 
       // workRhs.epsilon = 0.1*accuracy;
-      workRhs.epsilon = accuracy;
+      workRhs.setEpsilon(accuracy);
       workRhs.setup_and_assign(delta);
       pi_p = 1 + delta.length2();
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.h,v 1.15 2002/04/06 13:05:02 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.h,v 1.16 2002/12/16 07:29:48 bzfkocht Exp $"
 
 
 /**@file  ssvector.h
@@ -56,10 +56,9 @@ private:
 
    void setMax(int newmax);
 
-public:
-   /**@todo member variable epsilon should be private. */
    /// a value x with |x| < epsilon is considered zero.
    Real epsilon;
+public:
 
    /**@name Status of an #SSVector
       An #SSVector can be set up or not. In case it is set up, its #IdxSet
@@ -84,7 +83,19 @@ public:
    {
       return DVector::get_ptr();
    }
-
+   /// returns the non-zero epsilon used.
+   Real getEpsilon() const
+   {
+      return epsilon;
+   }
+   /// sets the non-zero epsilon.
+   /** This invalidates the setup.
+    */
+   void setEpsilon(Real eps)
+   {
+      epsilon     = eps;
+      setupStatus = false;
+   }
    /// returns setup status.
    bool isSetup() const
    {

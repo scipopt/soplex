@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbounds.cpp,v 1.16 2002/12/12 09:48:53 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbounds.cpp,v 1.17 2002/12/16 07:29:47 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -321,53 +321,62 @@ void SoPlex::testBounds() const
 {
    METHOD( "SoPlex::testBounds()" );
 
-   Real l_max = (1 + iterCount) * delta();
-   int i;
+   Real viol_max = (1 + iterCount) * delta();
 
    if (type() == ENTER)
    {
-      for( i = 0; i < dim(); ++i )
+      for(int i = 0; i < dim(); ++i )
       {
-         if ((*theFvec)[i] > theUBbound[i] + l_max
-              //@ &&  theUBbound[i] != theLBbound[i])
-           )
-            std::cerr << i << ": invalid upper enter bound found ...\n";
-         if ((*theFvec)[i] < theLBbound[i] - l_max
-              //@ &&  theUBbound[i] != theLBbound[i])
-           )
-            std::cerr << i << ": invalid lower enter bound found ...\n";
+         if ((*theFvec)[i] > theUBbound[i] + viol_max)  //@ &&  theUBbound[i] != theLBbound[i])
+         {
+            std::cerr << "Invalid upper enter bound " << i 
+                      << " viol_max: " << viol_max
+                      << " Fvec: " << (*theFvec)[i] 
+                      << " UBbound: "<< theUBbound[i] << std::endl;
+         }
+         if ((*theFvec)[i] < theLBbound[i] - viol_max)  //@ &&  theUBbound[i] != theLBbound[i])
+         {
+            std::cerr << "Invalid lower enter bound " << i 
+                      << " viol_max: " << viol_max
+                      << " Fvec: " << (*theFvec)[i] 
+                      << " LBbound: "<< theLBbound[i] << std::endl;
+         }
       }
    }
    else
    {
-      for( i = 0; i < dim(); ++i )
+      for(int i = 0; i < dim(); ++i )
       {
-         if ((*theCoPvec)[i] > (*theCoUbound)[i] + l_max) // && (*theCoUbound)[i] != (*theCoLbound)[i])
+         if ((*theCoPvec)[i] > (*theCoUbound)[i] + viol_max) // && (*theCoUbound)[i] != (*theCoLbound)[i])
          {
-            std::cerr << i << ": invalid upper cobound found ...\n";
-            std::cerr << *theCoPvec << std::endl;
-            std::cerr << *theCoUbound << std::endl;
-            abort();
+            std::cerr << "Invalid upper cobound " << i
+                      << " viol_max: " << viol_max
+                      << " CoPvec: " << (*theCoPvec)[i]
+                      << " CoUbound: "<< (*theCoUbound)[i] << std::endl;
          }
-         if ((*theCoPvec)[i] < (*theCoLbound)[i] - l_max) // && (*theCoUbound)[i] != (*theCoLbound)[i])
+         if ((*theCoPvec)[i] < (*theCoLbound)[i] - viol_max) // && (*theCoUbound)[i] != (*theCoLbound)[i])
          {
-            std::cerr << i << ": invalid lower cobound found ...\n";          
-            std::cerr << *theCoPvec << std::endl;
-            std::cerr << *theCoLbound << std::endl;
-            abort();
+            std::cerr << "Invalid lower cobound " << i 
+                      << " viol_max: " << viol_max
+                      << " CoPvec: " << (*theCoPvec )[i]
+                      << " CoLbound: " << (*theCoLbound)[i] << std::endl;
          }
       }
-      for( i = 0; i < coDim(); ++i )
+      for(int i = 0; i < coDim(); ++i )
       {
-         if ((*thePvec)[i] > (*theUbound)[i] + l_max)  // &&  (*theUbound)[i] != (*theLbound)[i])
+         if ((*thePvec)[i] > (*theUbound)[i] + viol_max)  // &&  (*theUbound)[i] != (*theLbound)[i])
          {
-            std::cerr << i << ": invalid upper bound found ...\n";
-            abort();
+            std::cerr << "Invalid upper bound " << i 
+                      << " viol_max: " << viol_max
+                      << " Pvec: " << (*thePvec)[i]
+                      << " Ubound: " << (*theUbound)[i] << std::endl;
          }
-         if ((*thePvec)[i] < (*theLbound)[i] - l_max)  // &&  (*theUbound)[i] != (*theLbound)[i])
+         if ((*thePvec)[i] < (*theLbound)[i] - viol_max)  // &&  (*theUbound)[i] != (*theLbound)[i])
          {
-            std::cerr << i << ": invalid lower bound found ...\n";
-            abort();
+            std::cerr << "Invalid lower bound " << i 
+                      << " viol_max: " << viol_max
+                      << " Pvec: " << (*thePvec)[i]
+                      << " Lbound: " << (*theLbound)[i] << std::endl;
          }
       }
    }
