@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.7 2001/11/15 16:54:14 bzfpfend Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.8 2001/11/20 09:08:43 bzfkocht Exp $"
 
 
 #include <stdio.h>
@@ -61,8 +61,6 @@ static double *work;
 static double *lval;
 static int *lidx;
 static int *lbeg;
-static int *lrow;
-
 
 /*****************************************************************************/
 /*
@@ -1387,7 +1385,6 @@ int factor(CLUFactor* fc,
 
    lidx = fac->l.idx;
    lval = fac->l.val;
-   lrow = fac->l.row;
    lbeg = fac->l.start;
    lbeg[0] = 0;
    fac->l.firstUpdate = 0;

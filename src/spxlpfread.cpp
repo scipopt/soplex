@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.2 2001/11/19 22:08:10 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.3 2001/11/20 09:08:44 bzfkocht Exp $"
 
 /**@file  spflpfread.cpp
  * @brief Read LP format files.
@@ -24,7 +24,7 @@
 
 #include "spxlp.h"
 
-#define MAX_LINE_LEN  256
+#define MAX_LINE_LEN  256         ///< maximum length of a line
 
 #define INIT_COLS     10000       ///< initialy allocated columns.
 #define INIT_ROWS     10000       ///< initialy allocated rows.
@@ -33,22 +33,20 @@
 
 namespace soplex
 {
-/// Report error and give up.
-static void syntaxError(int lineno)
+/// Is \p c a \c space, \c tab, \c nl or \c cr ?
+static inline bool isSpace(int c)
 {
-   // Let's do it the professional way.
-   std::cerr << "Syntax error in line " << lineno << std::endl
-             << "Terminating program" << std::endl;
-   
-   abort();
+   return (c == ' ') || (c == '\t') || (c == '\n') || (c == '\r'); 
 }
 
+/// Is there a number at the beginning of \p s ?
 static bool isValue(const char* s)
 {
    return ((*s >= '0') && (*s <= '9'))  
       || (*s == '+') || (*s == '-') || (*s == '.');
 }
 
+/// Is there a posiible column name at the beginning of \p s ?
 static bool isColName(const char* s)
 {
    return ((*s >= 'A') && (*s <= 'Z'))
@@ -56,13 +54,16 @@ static bool isColName(const char* s)
       || (strchr("!\"#$%&()/,;?@_'`{}|~", *s) != 0);
 }
 
+/// Is there a comparison operator at the beginning of \p s ?
 static bool isSense(const char* s)
 {
    return (*s == '<') || (*s == '>') || (*s == '=');
 }
 
-/**
- * This will not catch malformatted numbers like .e10 !
+/// Read the next number and advance \p pos.
+/** If only a sign is encountered, the number is assumed to 
+ *  be \c sign * 1.0. 
+ * This routine will not catch malformatted numbers like .e10 !
  */
 static double readValue(char*& pos)
 {
@@ -111,25 +112,29 @@ static double readValue(char*& pos)
    }
    assert(s != pos);
    
-   if (has_digits)
+   if (!has_digits)
+      value = (*pos == '-') ? -1.0 : 1.0;
+   else
    {
       for(t = tmp; pos != s; pos++)
          *t++ = *pos;   
       *t = '\0';
       value = atof(tmp);
    }
-   else
-      value = (*pos == '-') ? -1.0 : 1.0;
-
    pos += s - pos;
 
    assert(pos == s);
 
-   std::cout << "readValue: " << value << std::endl;
+   // std::cout << "readValue = " << value << std::endl;
 
    return value;
 }
 
+/// Read the next column name from the input.
+/** The name read is looked up and if not found \p emptycol
+ *  is added to \p colset. \p pos is advanced behind the name.
+ *  @return The Index of the named column.
+ */
 static int readColName(
    char*& pos, NameSet* colnames, LPColSet& colset, LPCol& emptycol)
 {
@@ -141,6 +146,7 @@ static int readColName(
    int         i;
    int         colidx;
 
+   // This are the characters that are not allowed in a column name.
    while((strchr("+-.<>=", *s) == 0) && (*s != '\0'))
       s++;
 
@@ -149,17 +155,18 @@ static int readColName(
 
    name[i] = '\0';
 
-   std::cout << "Name [" << name << "]\n";
-
    if ((colidx = colnames->number(name)) < 0)
    {
       colidx = colnames->num();
       colnames->add(name);
       colset.add(emptycol);
    }
+   // std::cout << "readColName [" << name << "] = " << colidx << std::endl;
+
    return colidx;
 }
 
+/// Read the next <,>,=,==,<=,=<,>=,=> and advance \p pos.
 static int readSense(char*& pos)
 {
    assert(isSense(pos));
@@ -171,12 +178,15 @@ static int readSense(char*& pos)
    else if (*pos == '=')
       pos++;
 
-   std::cout << "readSense " << static_cast<char>(sense) << std::endl;
+   // std::cout << "readSense = " << static_cast<char>(sense) << std::endl;
 
    return sense;
 }
 
-/// Is the \p keyword present in \p buf ?
+/// Is the \p keyword present in \p buf ? If yes, advance \p pos.
+/** \p keyword should be lower case. It can contain optional sections
+ *  which are enclosed in '[' ']' like "min[imize]". 
+ */
 static bool hasKeyword(char*& pos, const char* keyword)
 {
    int i;
@@ -210,13 +220,14 @@ static bool hasKeyword(char*& pos, const char* keyword)
    {
       pos += k;
 
-      std::cout << "*** Found " << keyword << std::endl;
+      // std::cout << "hasKeyowrd: " << keyword << std::endl;
       return true;
    }
    return false;
 }
 
-/// If \p buf start with "name:" extract the name and store it. 
+/// If \p buf start with "name:" store the name in \p rownames 
+/// and advance \p pos. 
 static int hasRowName(char*& pos, NameSet* rownames)
 {
    assert(rownames != 0);
@@ -251,19 +262,20 @@ static int hasRowName(char*& pos, NameSet* rownames)
    return true;
 }
 
-/**
- *  Read "LP File Format"
+/// Read LP in "CPLEX LP File Format".
+/** 
  *  The specification is taken from the
- *  ILOG CPLEX 7.0 Reference Manual, Appendix E, Page 527
+ *  ILOG CPLEX 7.0 Reference Manual, Appendix E, Page 527.
  *
- *  @todo BINARY and GENERAL keywords are ignored and nothing is
- *        ever put into p_intvars.
+ *  This routine should read (most?) valid LP format files. 
+ *  What it will not do, is find all cases where a file is ill formed. 
+ *  If this happens it may complain and read nothing or read "something".
  */  
 void SPxLP::readLP(
    istream& p_input, 
-   NameSet* p_rnames,           ///< row names.
-   NameSet* p_cnames,           ///< column names.
-   DIdxSet* p_intvars)            ///< integer variables.
+   NameSet* p_rnames,               ///< row names.
+   NameSet* p_cnames,               ///< column names.
+   DIdxSet* p_intvars)              ///< integer variables.
 {
    enum 
    { 
@@ -273,11 +285,11 @@ void SPxLP::readLP(
    NameSet*  rnames;                ///< row names.
    NameSet*  cnames;                ///< column names.
 
-   LPCol     emptycol;                ///< reusable empty column.
+   LPCol     emptycol;              ///< reusable empty column.
    LPColSet  cset;                  ///< the set of columns read.
-   LPRow     row;                     ///< last assembled row.
+   LPRow     row;                   ///< last assembled row.
    LPRowSet  rset;                  ///< the set of rows read.
-   DSVector& vec = row.rowVector();   ///< last assembled vector (from row).
+   DSVector& vec = row.rowVector(); ///< last assembled vector (from row).
    double    val = 1.0;
    int       colidx;
    int       sense = 0;
@@ -286,6 +298,7 @@ void SPxLP::readLP(
    char      tmp [MAX_LINE_LEN];
    char      line[MAX_LINE_LEN];
    int       lineno = 0;
+   bool      finished = false;
    int       i;
    int       k;
    char*     s;
@@ -301,27 +314,33 @@ void SPxLP::readLP(
 
    rnames->clear();
 
-   clear();
+   clear(); // clear the LP.
 
+   //--------------------------------------------------------------------------
+   //--- Main Loop
    //--------------------------------------------------------------------------
    for(;;)
    {      
+      // 0. Read a line from the file.
       if (p_input.getline(buf, sizeof(buf)) == 0)
+      {
+         std::cerr << "No 'End' marker found" << std::endl;
+         finished = true;
          break;
-
+      }
       lineno++;
       i = 0;
       pos = buf;
       val = 1.0;
 
-      cout << "Reading line " << lineno << std::endl;
-      cout << pos << std::endl;
+      // cout << "Reading line " << lineno << std::endl;
+      // cout << pos << std::endl;
 
       // 1. Remove comments.
       if (0 != (s = strchr(buf, '\\')))
          *s = '\0';
 
-      // 2. look for keywords. 
+      // 2. Look for keywords. 
       if (section == START)
       {
          if (hasKeyword(pos, "max[imize]"))
@@ -350,33 +369,47 @@ void SPxLP::readLP(
       }
       else
       {
-         if (hasKeyword(pos, "bounds"))
+         if (hasKeyword(pos, "bound[s]"))
             section = BOUNDS;
          else if (hasKeyword(pos, "bin[arys]"))
             section = BINARYS;
          else if (hasKeyword(pos, "gen[erals]"))
             section = INTEGERS;
          else if (hasKeyword(pos, "end"))
+         {
+            finished = true;
             break;
+         }
       }
 
-      // 3. look for row names.
+      // 3. Look for row names.
       if ((section == OBJECTIVE) || (section == CONSTRAINTS))
          hasRowName(pos, rnames);
 
-      // 4. remove spaces.
-      for(k = 0; pos[i] != '\0'; i++)
-         if ((pos[i] != ' ') && (pos[i] != '\t') 
-            && (pos[i] != '\n') && (pos[i] != '\r'))
-            tmp[k++] = pos[i];
+      // 4. Remove spaces.
+      if ((section == BINARYS) || (section == INTEGERS))
+      {
+         // only inital spaces
+         while(isSpace(*pos))
+            pos++;
 
-      tmp[k] = '\0';
+         strcpy(tmp, pos);
+      }
+      else
+      {
+         // all spaces
+         for(k = 0; pos[i] != '\0'; i++)
+            if (!isSpace(pos[i]))
+               tmp[k++] = pos[i];
+
+         tmp[k] = '\0';
+      }
 
       // 5. Is this a empty line ?
-      if (k == 0)
+      if (tmp[0] == '\0')
          continue;
 
-      // 6. collapse sequences of '+' and '-'. e.g ++---+ => -
+      // 6. Collapse sequences of '+' and '-'. e.g ++---+ => -
       for(i = 0, k = 0; tmp[i] != '\0'; i++)
       {
          while(((tmp[i] == '+') || (tmp[i] == '-')) 
@@ -389,12 +422,14 @@ void SPxLP::readLP(
       }
       line[k] = '\0';
 
-      // 7. We have something left to process. 
+      //-----------------------------------------------------------------------
+      //--- Line processing loop
       //-----------------------------------------------------------------------
       pos = line;
       
-      cout << "we have [" << pos << "]" << std::endl;
+      // cout << "we have [" << pos << "]" << std::endl;
 
+      // 7. We have something left to process. 
       while((pos != 0) && (*pos != '\0'))
       {
          // Now process the sections 
@@ -417,8 +452,6 @@ void SPxLP::readLP(
                
                if (sense != 0)
                {
-                  std::cout << "row stored" << std::endl;
-                  
                   if (sense == '<')
                   { 
                      row.lhs() = -SPxLP::infinity; 
@@ -462,12 +495,12 @@ void SPxLP::readLP(
                val = readValue(pos);
                
                if (!isSense(pos))
-                  syntaxError(lineno);
-               else
-                  sense = readSense(pos);
+                  goto syntax_error;
+
+               sense = readSense(pos);
             }
             if (!isColName(pos))
-               syntaxError(lineno);
+               goto syntax_error;
             
             colidx = readColName(pos, cnames, cset, emptycol);
             
@@ -489,7 +522,7 @@ void SPxLP::readLP(
                sense = readSense(pos);
                
                if (!isValue(pos))
-                  syntaxError(lineno);
+                  goto syntax_error;
                
                val = readValue(pos);
                
@@ -505,16 +538,21 @@ void SPxLP::readLP(
                }
             }
             break;
-         case BINARYS :
-            pos = 0;
-            continue; // read next line
-            
-            //if ((intVars != 0) && (colIdx >= 0))
-            //   intVars->addIdx(colIdx);
-            break;
+         case BINARYS  :
          case INTEGERS :
-            pos = 0;
-            continue; // read next line 
+            colidx = readColName(pos, cnames, cset, emptycol);
+
+            if (section == BINARYS)
+            {
+               cset.lower(colidx) = 0.0;
+               cset.upper(colidx) = 1.0;
+            }
+            if (p_intvars != 0)
+               p_intvars->addIdx(colidx);
+
+            while(isSpace(*pos))
+               pos++;
+            break;
          default :
             abort();
          }
@@ -526,15 +564,22 @@ void SPxLP::readLP(
 
    addCols(cset);
    assert(isConsistent());
+
    addRows(rset); 
    assert(isConsistent());
+
+ syntax_error:
+   if (finished)
+      std::cout << "Finished reading " << lineno << " lines" << std::endl;
+   else
+      std::cerr << "Syntax error in line " << lineno << std::endl;
 
    if (p_cnames == 0)
       delete cnames;
    if (p_rnames == 0)
       delete rnames;
 
-   std::cout << *this;
+   // std::cout << *this;
 }
 } // namespace soplex
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: solve.cpp,v 1.2 2001/11/06 23:31:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: solve.cpp,v 1.3 2001/11/20 09:08:44 bzfkocht Exp $"
 
 #include <string.h>
 #include <stdio.h>
@@ -38,7 +38,6 @@ static void solveUright(double* wrk, CLUFactor* fac, double* vec)
    int *cidx, *clen, *cbeg;
    double *cval, *diag;
    double x;
-   int lastRowSing, lastColSing;
 
    int *idx;
    double *val;
@@ -52,9 +51,6 @@ static void solveUright(double* wrk, CLUFactor* fac, double* vec)
    cval = fac->u.col.val;
    clen = fac->u.col.len;
    cbeg = fac->u.col.start;
-
-   lastRowSing = fac->u.lastRowSing;
-   lastColSing = fac->u.lastColSing;
 
    diag = fac->diag;
 
@@ -83,7 +79,6 @@ static int solveUrightEps(CLUFactor* fac, double* vec,
    int *cidx, *clen, *cbeg;
    double *cval, *diag;
    double x, meps;
-   int lastRowSing, lastColSing;
 
    int *idx;
    double *val;
@@ -97,9 +92,6 @@ static int solveUrightEps(CLUFactor* fac, double* vec,
    cval = fac->u.col.val;
    clen = fac->u.col.len;
    cbeg = fac->u.col.start;
-
-   lastRowSing = fac->u.lastRowSing;
-   lastColSing = fac->u.lastColSing;
 
    diag = fac->diag;
    meps = -eps;
@@ -139,7 +131,6 @@ static void solveUright2
    int *cidx, *clen, *cbeg;
    double *cval, *diag;
    double x1, x2;
-   int lastRowSing, lastColSing;
 
    int* idx;
    double* val;
@@ -151,9 +142,6 @@ static void solveUright2
    cval = fac->u.col.val;
    clen = fac->u.col.len;
    cbeg = fac->u.col.start;
-
-   lastRowSing = fac->u.lastRowSing;
-   lastColSing = fac->u.lastColSing;
 
    diag = fac->diag;
 
@@ -212,7 +200,6 @@ static int solveUright2eps
    double *cval, *diag;
    double x1, x2;
    double meps;
-   int lastRowSing, lastColSing;
 
    int* idx;
    double* val;
@@ -224,9 +211,6 @@ static int solveUright2eps
    cval = fac->u.col.val;
    clen = fac->u.col.len;
    cbeg = fac->u.col.start;
-
-   lastRowSing = fac->u.lastRowSing;
-   lastColSing = fac->u.lastColSing;
 
    diag = fac->diag;
    meps = -eps;
@@ -704,7 +688,6 @@ static int solveLleft2forest
    int i;
    int j;
    int k;
-   int n;
    int end;
    double x1, x2;
    double *lval, *val;
@@ -718,7 +701,6 @@ static int solveLleft2forest
    lrow = fac->l.row;
    lbeg = fac->l.start;
 
-   n = 0;
    end = fac->l.firstUpdate;
    for (i = fac->l.firstUnused - 1; i >= end; --i)
    {
@@ -756,7 +738,6 @@ static int solveLleft2forest
             vec2[*idx++] -= x2 * (*val++);
       }
    }
-
    return 0;
 }
 
