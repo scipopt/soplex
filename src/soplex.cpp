@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.31 2002/01/17 14:51:41 bzfpfend Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.32 2002/01/18 12:58:58 bzfpfend Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -1042,8 +1042,8 @@ const
       *p_value = terminationValue();
 }
 
-SoPlex::VarStatus SoPlex::basisStatusToVarStatus( SPxBasis::Desc::Status stat )
-const
+SoPlex::VarStatus
+SoPlex::basisStatusToVarStatus( SPxBasis::Desc::Status stat ) const
 {
    switch( stat )
    {
@@ -1067,9 +1067,8 @@ const
    }
 }
 
-SPxBasis::Desc::Status SoPlex::varStatusToBasisStatusRow( int row,
-                                                          SoPlex::VarStatus stat )
-const
+SPxBasis::Desc::Status
+SoPlex::varStatusToBasisStatusRow( int row, SoPlex::VarStatus stat ) const
 {
    switch( stat )
    {
@@ -1090,14 +1089,14 @@ const
       return dualRowStatus(row);
       break;
    default:
-      std::cout << "ERROR: unknown VarStatus (" << int(stat) << ")" << std::endl;
+      std::cout << "ERROR: unknown VarStatus (" << int(stat)
+                << ")" << std::endl;
       abort();
    }
 }
 
-SPxBasis::Desc::Status SoPlex::varStatusToBasisStatusCol( int col,
-                                                          SoPlex::VarStatus stat )
-const
+SPxBasis::Desc::Status 
+SoPlex::varStatusToBasisStatusCol( int col, SoPlex::VarStatus stat ) const
 {
    switch( stat )
    {
@@ -1116,7 +1115,8 @@ const
    case BASIC :
       return dualColStatus(col);
    default:
-      std::cout << "ERROR: unknown VarStatus (" << int(stat) << ")" << std::endl;
+      std::cout << "ERROR: unknown VarStatus (" << int(stat)
+                << ")" << std::endl;
       abort();
    }
 }

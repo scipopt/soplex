@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: didxset.h,v 1.7 2002/01/04 17:31:38 bzfkocht Exp $"
+#pragma ident "@(#) $Id: didxset.h,v 1.8 2002/01/18 12:58:58 bzfpfend Exp $"
 
 /**@file  didxset.h
  * @brief Dymnamic index set.
@@ -43,38 +43,7 @@ namespace soplex
 */
 class DIdxSet : public IdxSet
 {
-private:
-   /// make member from IdxSet unavailable.
-   int*& indexMem();  
-
-   /// no assignment operator.
-   /** The assignment operator for IdxSet needed in the public implementation
-    *  below is not implemented. So it won't work anyway.
-    * @todo This needs cleanup.
-    */
-   DIdxSet& operator=(const IdxSet& sv);
-   /// no copy constructor implemented yet.
-   DIdxSet(const DIdxSet& old);
-
 public:
-#if 0
-   /// assignment operator
-   DIdxSet& operator=(const IdxSet& sv)
-   {
-      int n = sv.size();
-      if (max() - size() < n)
-         setMax(size() + n);
-      IdxSet::operator=(sv);
-      return *this;
-   }
-
-   /// assignment operator.
-   DIdxSet& operator=(const DIdxSet& sv)
-   {
-      return operator=(IdxSet(sv));
-   }
-#endif 
-
    /// adds \p n uninitialized indices.
    void add(int n)
    {
@@ -115,14 +84,32 @@ public:
     */
    void setMax(int newmax = 1);
 
-   /// copy constructor from #IdxSet.
-   explicit DIdxSet(const IdxSet& old);
-
    /// default constructor. \p n gives the initial size of the index space.
    explicit DIdxSet(int n = 8);
 
+   /// copy constructor from #IdxSet.
+   explicit DIdxSet(const IdxSet& old);
+
+   /// assignment operator
+   DIdxSet& operator=(const IdxSet& sv)
+   {
+      setMax( sv.size() );
+      IdxSet::operator=(sv);
+      return *this;
+   }
+
+   /// assignment operator.
+   DIdxSet& operator=(const DIdxSet& sv)
+   {
+      return operator=(IdxSet(sv));
+   }
+
    /// destructor.
    ~DIdxSet();
+
+private:
+   /// make member from IdxSet unavailable.
+   int*& indexMem();  
 };
 
 } // namespace soplex
