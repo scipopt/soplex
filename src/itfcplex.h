@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: itfcplex.h,v 1.3 2001/12/06 19:55:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: itfcplex.h,v 1.4 2002/01/04 17:31:38 bzfkocht Exp $"
 
 /**@file  itfcplex.h
  * @brief Simple CPLEX Interface to SoPlex
@@ -282,7 +282,5 @@ int getitc (CPXLPptr lp);
 int getcols (CPXLPptr lp, int *nzcnt, int *cmatbeg, int *cmatind,
       double *cmatval, int cmatsz, int *surplus, int begin,
       int end);
-
-/*@}*/
 
 #endif // _ITFCPLEX_H_

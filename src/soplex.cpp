@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.19 2001/12/28 14:55:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.20 2002/01/04 17:31:39 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -55,7 +55,7 @@ void SoPlex::reLoad()
       theratiotester->clear();
 }
 
-void SoPlex::load(const SPxLP& lp)
+void SoPlex::loadLP(const SPxLP& lp)
 {
    if (thepricer)
       thepricer->clear();
@@ -69,12 +69,12 @@ void SoPlex::load(const SPxLP& lp)
    SPxBasis::load(this);
 }
 
-void SoPlex::load(SLinSolver* slu)
+void SoPlex::setSolver(SLinSolver* slu)
 {
    SPxBasis::load(slu);
 }
 
-void SoPlex::load(const SPxBasis::Desc& p_desc)
+void SoPlex::loadBasis(const SPxBasis::Desc& p_desc)
 {
    unInit();
    if (SPxBasis::status() == SPxBasis::NO_PROBLEM)
@@ -82,7 +82,7 @@ void SoPlex::load(const SPxBasis::Desc& p_desc)
    SPxBasis::load(p_desc);
 }
 
-void SoPlex::load(SPxPricer* x)
+void SoPlex::setPricer(SPxPricer* x)
 {
    if (x)
    {
@@ -97,7 +97,7 @@ void SoPlex::load(SPxPricer* x)
    thepricer = x;
 }
 
-void SoPlex::load(SPxRatioTester* x)
+void SoPlex::setTester(SPxRatioTester* x)
 {
    if (x)
    {
@@ -111,12 +111,12 @@ void SoPlex::load(SPxRatioTester* x)
    theratiotester = x;
 }
 
-void SoPlex::load(SPxStarter* x)
+void SoPlex::setStarter(SPxStarter* x)
 {
    thestarter = x;
 }
 
-void SoPlex::load(SPxSimplifier* x)
+void SoPlex::setSimplifier(SPxSimplifier* x)
 {
    thesimplifier = x;
 }
@@ -190,7 +190,7 @@ void SoPlex::setRep(int rp)
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       SPxBasis::setRep();
-      load(desc());
+      SPxBasis::load(desc());
    }
 
    if (thepricer && thepricer->solver() == this)
@@ -1116,8 +1116,7 @@ void SoPlex::setBasis(const signed char p_rows[], const signed char p_cols[])
          << std::endl << std::endl;
       }
    }
-
-   load(ds);
+   loadBasis(ds);
 }
 } // namespace soplex
 

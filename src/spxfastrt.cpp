@@ -13,11 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.10 2001/12/28 14:55:13 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.11 2002/01/04 17:31:39 bzfkocht Exp $"
 
 #include <assert.h>
 #include <stdio.h>
 #include <iostream>
+#include <iomanip>
 
 #include "spxfastrt.h"
 
@@ -349,8 +350,7 @@ int SPxFastRT::maxDelta(
    double& p_abs)
 {
    return maxDelta(val, p_abs,
-                    thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(),
-                    0, 1);
+      thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(), 0, 1);
 }
 
 int SPxFastRT::minDelta(
@@ -358,8 +358,7 @@ int SPxFastRT::minDelta(
    double& p_abs)
 {
    return minDelta(val, p_abs,
-                    thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(),
-                    0, 1);
+      thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(), 0, 1);
 }
 
 SoPlex::Id SPxFastRT::maxDelta(
@@ -367,13 +366,10 @@ SoPlex::Id SPxFastRT::maxDelta(
    double& max,
    double& maxabs)
 {
-   int indc, indp;
-   indc = maxDelta(max, maxabs,
-                    thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(),
-                    0, 1);
-   indp = maxDelta(max, maxabs,
-                    thesolver->pVec(), thesolver->lpBound(), thesolver->upBound(),
-                    0, 1);
+   int indc = maxDelta(max, maxabs,
+      thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
+   int indp = maxDelta(max, maxabs,
+      thesolver->pVec(), thesolver->lpBound(), thesolver->upBound(), 0, 1);
 
    if (indp >= 0)
    {
@@ -385,10 +381,8 @@ SoPlex::Id SPxFastRT::maxDelta(
       nr = indc;
       return thesolver->coId(indc);
    }
-
-   SoPlex::Id enterId;
    nr = -1;
-   return enterId;
+   return SoPlex::Id();
 }
 
 SoPlex::Id SPxFastRT::minDelta(
@@ -396,13 +390,10 @@ SoPlex::Id SPxFastRT::minDelta(
    double& max,
    double& maxabs)
 {
-   int indc, indp;
-   indc = minDelta(max, maxabs,
-                    thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(),
-                    0, 1);
-   indp = minDelta(max, maxabs,
-                    thesolver->pVec(), thesolver->lpBound(), thesolver->upBound(),
-                    0, 1);
+   int indc = minDelta(max, maxabs,
+      thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
+   int indp = minDelta(max, maxabs,
+      thesolver->pVec(), thesolver->lpBound(), thesolver->upBound(), 0, 1);
 
    if (indp >= 0)
    {
@@ -414,15 +405,12 @@ SoPlex::Id SPxFastRT::minDelta(
       nr = indc;
       return thesolver->coId(indc);
    }
-
-   SoPlex::Id enterId;
    nr = -1;
-   return enterId;
+   return SoPlex::Id();
 }
 
 
-int SPxFastRT::minSelect
-(
+int SPxFastRT::minSelect(
    double& val,
    double& stab,
    double& best,
@@ -432,8 +420,7 @@ int SPxFastRT::minSelect
    const Vector& lowBound,
    const Vector& upBound,
    int start,
-   int incr
-)
+   int incr)
 {
    int i;
    double x, y;
@@ -491,12 +478,10 @@ int SPxFastRT::minSelect
       else
          bestDelta = vec[bestNr] - low[bestNr];
    }
-
    return nr;
 }
 
-int SPxFastRT::maxSelect
-(
+int SPxFastRT::maxSelect(
    double& val,
    double& stab,
    double& best,
@@ -506,8 +491,7 @@ int SPxFastRT::maxSelect
    const Vector& lowBound,
    const Vector& upBound,
    int start,
-   int incr
-)
+   int incr)
 {
    int i;
    double x, y;
@@ -557,14 +541,10 @@ int SPxFastRT::maxSelect
          }
       }
    }
-
    if (nr < 0 && bestNr > 0)
-   {
-      if (upd[bestNr] > 0)
-         bestDelta = up[bestNr] - vec[bestNr];
-      else
-         bestDelta = vec[bestNr] - low[bestNr];
-   }
+      bestDelta = (upd[bestNr] > 0)
+         ? up[bestNr] - vec[bestNr]
+         : vec[bestNr] - low[bestNr];
 
    return nr;
 }
@@ -574,14 +554,12 @@ int SPxFastRT::maxSelect(
    double& val,
    double& stab,
    double& bestDelta,
-   double max
-)
+   double max)
 {
    double best = -SPxLP::infinity;
    bestDelta = 0;
    return maxSelect(val, stab, best, bestDelta, max,
-                     thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(),
-                     0, 1);
+      thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(),  0, 1);
 }
 
 SoPlex::Id SPxFastRT::maxSelect(
@@ -596,11 +574,9 @@ SoPlex::Id SPxFastRT::maxSelect(
    double best = -SPxLP::infinity;
    bestDelta = 0;
    indc = maxSelect(val, stab, best, bestDelta, max,
-                     thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(),
-                     0, 1);
+      thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
    indp = maxSelect(val, stab, best, bestDelta, max,
-                     thesolver->pVec(), thesolver->lpBound(), thesolver->upBound(),
-                     0, 1);
+      thesolver->pVec(), thesolver->lpBound(), thesolver->upBound(), 0, 1);
 
    if (indp >= 0)
    {
@@ -612,25 +588,20 @@ SoPlex::Id SPxFastRT::maxSelect(
       nr = indc;
       return thesolver->coId(indc);
    }
-
-
    nr = -1;
-   SoPlex::Id enterId;
-   return enterId;
+   return SoPlex::Id();
 }
 
 int SPxFastRT::minSelect(
    double& val,
    double& stab,
    double& bestDelta,
-   double max
-)
+   double max)
 {
    double best = SPxLP::infinity;
    bestDelta = 0;
    return minSelect(val, stab, best, bestDelta, max,
-                     thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(),
-                     0, 1);
+      thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(), 0, 1);
 }
 
 SoPlex::Id SPxFastRT::minSelect(
@@ -638,18 +609,14 @@ SoPlex::Id SPxFastRT::minSelect(
    double& val,
    double& stab,
    double& bestDelta,
-   double max
-)
+   double max)
 {
-   int indp, indc;
    double best = SPxLP::infinity;
    bestDelta = 0;
-   indc = minSelect(val, stab, best, bestDelta, max,
-                     thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(),
-                     0, 1);
-   indp = minSelect(val, stab, best, bestDelta, max,
-                     thesolver->pVec(), thesolver->lpBound(), thesolver->upBound(),
-                     0, 1);
+   int indc = minSelect(val, stab, best, bestDelta, max,
+      thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
+   int indp = minSelect(val, stab, best, bestDelta, max,
+      thesolver->pVec(), thesolver->lpBound(), thesolver->upBound(), 0, 1);
 
    if (indp >= 0)
    {
@@ -661,15 +628,10 @@ SoPlex::Id SPxFastRT::minSelect(
       nr = indc;
       return thesolver->coId(indc);
    }
-
-
    nr = -1;
-   SoPlex::Id enterId;
-   return enterId;
+   return SoPlex::Id();
 }
 
-
-//@ ----------------------------------------------------------------------------
 /*
     Here comes our implementation of the Haris procedure improved by shifting
     bounds. The basic idea is to allow a slight infeasibility within |delta| to
@@ -884,12 +846,20 @@ int SPxFastRT::selectLeave(double& val)
 
 #ifndef NDEBUG
    if (leave >= 0)
-      fprintf(stderr, "%d(%10.6g,%8.2g):%10d\t%10.4g %10.4g %10.6g\n",
-               thesolver->basis().iteration(), thesolver->value(),
-               thesolver->basis().stability(),
-               leave, sel, thesolver->fVec().delta()[leave], maxabs);
+      // fprintf(stderr, "%d(%10.6g,%8.2g):%10d\t%10.4g %10.4g %10.6g\n",
+      std::cout 
+         << thesolver->basis().iteration() << "("
+         << std::setprecision(6) << thesolver->value() << ","
+         << std::setprecision(2) << thesolver->basis().stability() << "):"
+         << leave << "\t"
+         << std::setprecision(4) << sel << " "
+         << std::setprecision(4) << thesolver->fVec().delta()[leave] << " "
+         << std::setprecision(6) << maxabs 
+         << std::endl;
    else
-      std::cerr << thesolver->basis().iteration() << ": skipping instable pivot\n";
+      std::cout << thesolver->basis().iteration() 
+                << ": skipping instable pivot"
+                << std::endl;
 #endif  // NDEBUG
 
    if (leave >= 0 || minStab > 2*solver()->epsilon())
@@ -898,11 +868,10 @@ int SPxFastRT::selectLeave(double& val)
       if (leave >= 0)
          tighten();
    }
-
    return leave;
 }
 
-//@ ----------------------------------------------------------------------------
+
 /**@todo suspicious: max is not used, 
  *       but it looks like a used parameter in selectEnter()
  */
@@ -1200,11 +1169,12 @@ SoPlex::Id SPxFastRT::selectEnter(double& val)
          x = thesolver->coPvec().delta()[ thesolver->number(enterId) ];
       else
          x = thesolver->pVec().delta()[ thesolver->number(enterId) ];
-      std::cerr << thesolver->basis().iteration() << ": " << sel << '\t'
-      << x << " (" << maxabs << ")\n";
+      std::cout << thesolver->basis().iteration() << ": " << sel << '\t'
+                << x << " (" << maxabs << ")\n";
    }
    else
-      std::cerr << thesolver->basis().iteration() << ": skipping instable pivot\n";
+      std::cout << thesolver->basis().iteration() 
+                << ": skipping instable pivot\n";
 #endif  // NDEBUG
 
    if (enterId.isValid() || minStab > 2*epsilon)
@@ -1221,11 +1191,6 @@ void SPxFastRT::load(SoPlex* spx)
 {
    thesolver = spx;
    setType(spx->type());
-}
-
-void SPxFastRT::clear()
-{
-   thesolver = 0;
 }
 
 /**@todo suspicious: Why is the type never used? 

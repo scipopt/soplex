@@ -13,14 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.h,v 1.6 2001/12/26 12:49:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.h,v 1.7 2002/01/04 17:31:39 bzfkocht Exp $"
 
 /**@file  spxdevexpr.h
  * @brief Devex pricer.
  */
 #ifndef _SPXDEVEXPR_H_
 #define _SPXDEVEXPR_H_
-
 
 #include <assert.h>
 
@@ -41,92 +40,42 @@ namespace soplex
 class SPxDevexPR : public SPxPricer
 {
 private:
-protected:
-   double last;            ///< penalty, selected at last iteration.
+   double  last;           ///< penalty, selected at last iteration.
    DVector penalty;        ///< vector of pricing penalties.
    DVector coPenalty;      ///< vector of pricing penalties.
 
-   SoPlex* thesolver;
-   double theeps;
+   ///
+   int selectLeaveX(double& best, int start = 0, int incr = 1);
+   ///
+   void left4X(int n, SoPlex::Id id, int start, int incr);
+   ///
+   SoPlex::Id selectEnterX(double& best, 
+      int start1 = 0, int incr1 = 1, int start2 = 0, int incr2 = 1);
+   ///
+   void entered4X(SoPlex::Id id, int n, 
+      int start1, int incr1, int start2, int incr2);
 
 public:
-   /// returns loaded solver.
-   SoPlex* solver() const
-   {
-      return thesolver;
-   }
-
-   /// bound violations up to #epsilon are tolerated.
-   double epsilon() const
-   {
-      return theeps;
-   }
-
    ///
-   void setEpsilon(double eps)
-   {
-      theeps = eps;
-   }
-
+   virtual void load(SoPlex* base);
    ///
-   void load(SoPlex* base);
-
+   virtual void setType(SoPlex::Type);
    ///
-   void clear()
-   {
-      thesolver = 0;
-   }
-
+   virtual void setRep(SoPlex::Representation);
    ///
-   void setType(SoPlex::Type);
-
+   virtual int selectLeave();
    ///
-   void setRep(SoPlex::Representation);
-
+   virtual void left4(int n, SoPlex::Id id);
    ///
-   int selectLeave();
-protected:
-   int selectLeave(double& best, int start = 0, int incr = 1);
-public:
-
+   virtual SoPlex::Id selectEnter();
    ///
-   void left4(int n, SoPlex::Id id);
-protected:
-   void left4(int n, SoPlex::Id id, int start, int incr);
-public:
-
-   ///
-   SoPlex::Id selectEnter();
-protected:
-   SoPlex::Id selectEnter(double& best, int start1 = 0, int incr1 = 1,
-                          int start2 = 0, int incr2 = 1);
-public:
-
-   ///
-   void entered4(SoPlex::Id id, int n);
-protected:
-   void entered4(SoPlex::Id id, int n, int start1, int incr1, int start2,
-                 int incr2);
-public:
-
-
+   virtual void entered4(SoPlex::Id id, int n);
    /// \p n vectors have been added to loaded LP.
    virtual void addedVecs (int n);
    /// \p n covectors have been added to loaded LP.
    virtual void addedCoVecs(int n);
-
-
    ///
-   virtual void removedVec(int i);
-   ///
-   virtual void removedCoVecs(const int perm[]);
-   ///
-   virtual void removedVecs(const int perm[]);
-   /// These  methods are use for implemementing the public remove methods.
-   virtual void removedCoVec(int i);
-
-   ///
-   int isConsistent() const;
+   virtual bool isConsistent() const;
 };
 
 } // namespace soplex

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: array.h,v 1.12 2001/12/28 14:55:11 bzfkocht Exp $"
+#pragma ident "@(#) $Id: array.h,v 1.13 2002/01/04 17:31:38 bzfkocht Exp $"
 
 /**@file  array.h
  * @brief Save arrays of arbitrary types.
@@ -22,6 +22,8 @@
 #define _ARRAY_H_
 
 #include <assert.h>
+
+#include "message.h"
 
 namespace soplex
 {
@@ -230,15 +232,13 @@ public:
          delete[] data;
    }
 
-   /// consitency check
-   int isConsistent() const
+   /// consistency check
+   bool isConsistent() const
    {
       if (num < 0 || (num > 0 && data == 0))
-      {
-         std::cerr << "Inconsistency detected in class array\n";
-         return 0;
-      }
-      return 1;
+         return MSGinconsistent("Array");
+
+      return true;
    }
 };
 } // namespace soplex

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.h,v 1.4 2001/12/26 12:49:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.h,v 1.5 2002/01/04 17:31:39 bzfkocht Exp $"
 
 /**@file  spxhybridpr.h
  * @brief Hybrid pricer.
@@ -43,84 +43,44 @@ namespace soplex
 */
 class SPxHybridPR : public SPxPricer
 {
-   SPxSteepPR steep;
+   SPxSteepPR   steep;
    SPxParMultPR parmult;
-   SPxDevexPR devex;
+   SPxDevexPR   devex;
 
-   SPxPricer* thepricer;
-   SoPlex* thesolver;
-   double theeps;
+   SPxPricer*   thepricer;
 
    double hybridFactor; 
 
 public:
    ///
-   SoPlex* solver() const
-   {
-      return thesolver;
-   }
-
+   virtual void setEpsilon(double eps);
    ///
-   double epsilon() const
-   {
-      return theeps;
-   }
+   virtual void load(SoPlex* solver);
    ///
-   void setEpsilon(double eps);
-
+   virtual void clear();
    ///
-   void load(SoPlex* solver);
-
+   virtual void setType(SoPlex::Type tp);
    ///
-   void clear();
-
+   virtual void setRep(SoPlex::Representation rep);
    ///
-   void setType(SoPlex::Type tp);
+   virtual int selectLeave();
    ///
-   void setRep(SoPlex::Representation rep);
-
+   virtual void left4(int n, SoPlex::Id id);
    ///
-   int selectLeave();
+   virtual SoPlex::Id selectEnter();
    ///
-   void left4(int n, SoPlex::Id id);
-
+   virtual void entered4(SoPlex::Id id, int n);
    ///
-   SoPlex::Id selectEnter();
+   virtual bool isConsistent() const;
    ///
-   void entered4(SoPlex::Id id, int n);
-
-   ///
-   void addedVecs (int) 
-   {}
-   ///
-   void addedCoVecs(int)
-   {}
-   ///
-   void removedVec(int)
-   {}
-   ///
-   void removedVecs(const int*)
-   {}
-   ///
-   void removedCoVec(int)
-   {}
-   ///
-   void removedCoVecs(const int*)
-   {}
-   ///
-   int isConsistent() const;
-
-   ///
-   SPxHybridPR()
-   {
-      thesolver = 0;
-      /**@todo TK20011102 I have no idea what is a reasonable value here.
+      /**@todo TK20011102 I have no idea what is a reasonable value 
+       *       for hybridFactor.
        */
-      hybridFactor = 0.5;
-   }
-   virtual ~SPxHybridPR()
+   SPxHybridPR() 
+      : SPxPricer()
+      , thepricer(0)
+      , hybridFactor(0.5)
    {}
-
 };
 
 } // namespace soplex

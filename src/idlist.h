@@ -13,8 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idlist.h,v 1.6 2001/11/23 12:26:53 bzfpfend Exp $"
-
+#pragma ident "@(#) $Id: idlist.h,v 1.7 2002/01/04 17:31:38 bzfkocht Exp $"
 
 /**@file  idlist.h
  * @brief Generic double linked list.
@@ -282,20 +281,15 @@ public:
    }
 
    /// consistency check.
-   int isConsistent() const
+   bool isConsistent() const
    {
       for (T * it = first(); it; it = next(it))
       {
          if (it != first() && it->prev()->next() != it)
-         {
-            std::cerr << "Inconsistency detected in class idlist\n";
-            return 0;
-         }
+            return MSGinconsistent("IdList");
+
          if (it != last() && it->next()->prev() != it)
-         {
-            std::cerr << "Inconsistency detected in class idlist\n";
-            return 0;
-         }
+            return MSGinconsistent("IdList");
       }
       return IsList<T>::isConsistent();
    }

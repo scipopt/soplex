@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.14 2001/12/26 12:49:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.15 2002/01/04 17:31:39 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -315,19 +315,19 @@ public:
       NameSet* rowNames = 0, NameSet* colNames = 0);
 
    /// copy LP.
-   void load(const SPxLP& LP);
+   virtual void loadLP(const SPxLP& LP);
    /// setup linear solver to use.
-   void load(SLinSolver* slu);
+   virtual void setSolver(SLinSolver* slu);
    /// setup pricer to use.
-   void load(SPxPricer*);
+   virtual void setPricer(SPxPricer*);
    /// setup ratio-tester to use.
-   void load(SPxRatioTester*);
+   virtual void setTester(SPxRatioTester*);
    /// setup starting basis generator to use.
-   void load(SPxStarter*);
+   virtual void setStarter(SPxStarter*);
    /// setup simplifier to use.
-   void load(SPxSimplifier*);
+   virtual void setSimplifier(SPxSimplifier*);
    /// set a start basis.
-   void load(const SPxBasis::Desc&);
+   virtual void loadBasis(const SPxBasis::Desc&);
 
    /// set #ROW or #COLUMN representation.
    void setRep (int rep);
@@ -794,10 +794,16 @@ public:
     */
    //@{
    /// #Status of \p i 'th variable.
-   SPxBasis::Desc::Status status(int i);
+   SPxBasis::Desc::Status status(int i) const
+   {
+      return desc().status(i);
+   }
 
    /// #Status of \p i 'th covariable.
-   SPxBasis::Desc::Status coStatus(int i);
+   SPxBasis::Desc::Status coStatus(int i) const
+   {
+      return desc().coStatus(i);
+   }
 
    /// does \p stat describe a basic index ?
    int isBasic(SPxBasis::Desc::Status stat) const
@@ -810,8 +816,8 @@ public:
    {
       assert(p_id.isValid());
       return p_id.isSPxRowId()
-             ? isBasic(SPxLP::SPxRowId(p_id))
-          : isBasic(SPxLP::SPxColId(p_id));
+         ? isBasic(SPxLP::SPxRowId(p_id))
+         : isBasic(SPxLP::SPxColId(p_id));
    }
 
    /// is the \p rid 'th vector basic ?

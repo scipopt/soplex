@@ -1,4 +1,4 @@
-// $Id: soplex.lnt,v 1.1 2001/12/28 16:24:18 bzfkocht Exp $
+// $Id: soplex.lnt,v 1.2 2002/01/04 17:31:38 bzfkocht Exp $
 -passes(1)
 +cpp(.h,.cpp)
 // esoteric size settings to find erros.
@@ -62,6 +62,7 @@
 // didxset.h 
 -esym(1526,DIdxSet::operator=)   // correctly not implemented
 -esym(1526,DIdxSet::DIdxSet)     // correctly not implemented
+-esym(1526,DIdxSet::indexMem)    // correctly not implemented
 
 // cflufactor.h
 -esym(1401,CLUFactor::*)         // no initialisation
@@ -97,6 +98,10 @@
 // factor.cpp
 -esym(666,isZero)
 
+// datahashtable.h
+-efunc(414,DataHashTable*::add)   // no possible zero division
+-efunc(414,DataHashTable*::index) // no possible zero division
+
 // Temporary
 -w2    // Only warnings and Errors
 -e1509 // base class destructor for class is not virtual
@@ -104,7 +109,6 @@
 -e641  // Converting enum to int
 -e656  // Arithmetic operation uses (compatible) enum's
 -e655  // bit-wise operation uses (compatible) enum's
--e1411 // Member with different signature hides virtual member 
 -e514  // Unusual use of a Boolean
 -e1401 // Member not initialized by constructor
 -e1541 // Member possibly not initialized by constructor
@@ -112,3 +116,10 @@
 -e1516 // Data member hides inherited member 
 -e613  // Possible use of null pointer in left argument to operator '->'
 -e679  // Suspicious Truncation in arithmetic expression combining with pointer
+
+
+
+
+
+
+

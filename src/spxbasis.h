@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.10 2002/01/03 22:09:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.11 2002/01/04 17:31:39 bzfkocht Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -288,8 +288,6 @@ public:
       /// consistency check.
       int isConsistent() const;
    };
-
-
 
 protected:
    SoPlex* theLP;

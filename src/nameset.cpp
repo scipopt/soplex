@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.cpp,v 1.11 2001/12/28 14:55:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.cpp,v 1.12 2002/01/04 17:31:38 bzfkocht Exp $"
 
 #include <string.h>
 #include "nameset.h"
@@ -143,8 +143,8 @@ void NameSet::reMax(int newmax)
                                 (reinterpret_cast<char*>(first) + delta) );
       first = name;
       for (; name != last; name = name->next())
-         name->next() = ( reinterpret_cast<NameSet_CharPtr*>
-                          ( reinterpret_cast<char*>(name->next()) + delta) );
+         name->next() = reinterpret_cast<NameSet_CharPtr*>
+            (reinterpret_cast<char*>(name->next()) + delta);
 
       list = IsList < NameSet_CharPtr > (first, last);
    }
@@ -273,32 +273,25 @@ NameSet::~NameSet()
    spx_free(mem);
 }
 
-int NameSet::isConsistent() const
+bool NameSet::isConsistent() const
 {
    if (memused > memmax)
-   {
-      std::cerr << "Inconsistency detected in class NameSet!\n";
-      return 0;
-   }
+      return MSGinconsistent("NameSet");
 
    NameSet_CharPtr* next;
+
    for (NameSet_CharPtr *name = list.first(); name; name = next)
    {
       int len = int(strlen(name->name)) + 1;
+
       if (&(name->name[len]) > &(mem[memused]))
-      {
-         std::cerr << "Inconsistency detected in class NameSet!\n";
-         return 0;
-      }
+         return MSGinconsistent("NameSet");
 
       next = list.next(name);
-      if (next != 0 && &(name->name[len]) > next->name)
-      {
-         std::cerr << "Inconsistency detected in class NameSet!\n";
-         return 0;
-      }
-   }
 
+      if (next != 0 && &(name->name[len]) > next->name)
+         return MSGinconsistent("NameSet");
+   }
    return set.isConsistent() && list.isConsistent() && hashtab.isConsistent();
 }
 } // namespace soplex

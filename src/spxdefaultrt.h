@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultrt.h,v 1.5 2001/11/29 14:43:46 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxdefaultrt.h,v 1.6 2002/01/04 17:31:39 bzfkocht Exp $"
 
 /**@file  spxdefaultrt.h
  * @brief Textbook ratio test for #SoPlex.
@@ -42,45 +42,22 @@ namespace soplex
 */
 class SPxDefaultRT : public SPxRatioTester
 {
-protected:
-   SoPlex* thesolver;
-
+private:
    ///
-   int selectLeave(double& val, int start, int incr);
-
+   int selectLeaveX(double& val, int start, int incr);
    ///
-   SoPlex::Id selectEnter(double& val, int start1, int incr1, int start2,
-                          int incr2);
+   SoPlex::Id selectEnterX(double& val, 
+      int start1, int incr1, int start2, int incr2);
 
 public:
    ///
-   SoPlex* solver() const
-   {
-      return thesolver;
-   }
-
+   virtual int selectLeave(double& val);
    ///
-   void load(SoPlex* p_solver)
-   {
-      thesolver = p_solver;
-   }
-
-   ///
-   void clear()
-   {
-      thesolver = 0;
-   }
-
-   ///
-   int selectLeave(double& val);
-
-   ///
-   SoPlex::Id selectEnter(double& val);
-
-   ///
-   void setType(SoPlex::Type)
+   virtual SoPlex::Id selectEnter(double& val);
+   /// default constructor
+   SPxDefaultRT() 
+      : SPxRatioTester()
    {}
-
 };
 
 } // namespace soplex

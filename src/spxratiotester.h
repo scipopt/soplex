@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxratiotester.h,v 1.3 2001/11/29 12:11:42 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxratiotester.h,v 1.4 2002/01/04 17:31:39 bzfkocht Exp $"
 
 /**@file  spxratiotester.h
  * @brief Abstract ratio test base class.
@@ -40,17 +40,29 @@ namespace soplex
 */
 class SPxRatioTester
 {
+protected:
+   SoPlex* thesolver;
+
 public:
    /// loads LP.
    /** Load the solver and LP for which pricing steps are to be performed.
     */
-   virtual void load(SoPlex* lp) = 0;
+   virtual void load(SoPlex* p_solver)
+   {
+      thesolver = p_solver;
+   }
 
    /// unloads LP.
-   virtual void clear() = 0;
+   virtual void clear()
+   {
+      thesolver = 0;
+   }
 
    /// returns loaded LP solver.
-   virtual SoPlex* solver() const = 0;
+   virtual SoPlex* solver() const
+   {
+      return thesolver;
+   }
 
    /// selects index to leave the basis.
    /** Method #selectLeave() is called by the loaded #SoPlex solver, when
@@ -95,11 +107,17 @@ public:
    /** Informs pricer about (a change of) the loaded #SoPlex's #Type. In
        the sequel, only the corresponding select methods may be called.
    */
-   virtual void setType(SoPlex::Type) = 0;
-
+   virtual void setType(SoPlex::Type)
+   {}
+   /// default constructor
+   SPxRatioTester()
+      : thesolver(0)
+   {}
    /// destructor.
    virtual ~SPxRatioTester()
-   {}
+   {
+      thesolver = 0;
+   }
 
 };
 

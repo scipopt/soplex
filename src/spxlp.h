@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.11 2001/12/28 14:55:13 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.12 2002/01/04 17:31:39 bzfkocht Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -214,7 +214,8 @@ public:
       ///
       Id& operator=(const Id& id)
       {
-         DataKey::operator= ( id );
+         if (this != &id)
+            DataKey::operator= ( id );
          return *this;
       }
       ///

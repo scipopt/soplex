@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.10 2002/01/03 22:09:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.11 2002/01/04 17:31:38 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -157,29 +157,29 @@ int main(int argc, char **argv)
    switch (pricing)
    {
    case 5 :
-      work.load(new SPxWeightPR);
+      work.setPricer(new SPxWeightPR);
       std::cout << "Weight";
       break;
    case 4 :
-      work.load(new SPxSteepPR);
+      work.setPricer(new SPxSteepPR);
       std::cout << "Steepest edge";
       break;
    case 3 :
-      work.load(new SPxHybridPR);
+      work.setPricer(new SPxHybridPR);
       std::cout << "Hybrid";
       break;
    case 2 :
-      work.load(new SPxDevexPR);
+      work.setPricer(new SPxDevexPR);
       std::cout << "Devex";
       break;
    case 1 :
-      work.load(new SPxParMultPR);
+      work.setPricer(new SPxParMultPR);
       std::cout << "Partial multiple";
       break;
    case 0 :
       /*FALLTHROUGH*/
    default:
-      work.load(new SPxDefaultPR);
+      work.setPricer(new SPxDefaultPR);
       std::cout << "Default";
       break;
    }
@@ -189,17 +189,17 @@ int main(int argc, char **argv)
    switch (ratiotest)
    {
    case 2 :
-      work.load(new SPxFastRT);
+      work.setTester(new SPxFastRT);
       std::cout << "Fast";
       break;
    case 1 :
-      work.load(new SPxHarrisRT);
+      work.setTester(new SPxHarrisRT);
       std::cout << "Harris";
       break;
    case 0 :
       /*FALLTHROUGH*/
    default:
-      work.load(new SPxDefaultRT);
+      work.setTester(new SPxDefaultRT);
       std::cout << "Default";
       break;
    }
@@ -209,23 +209,23 @@ int main(int argc, char **argv)
    switch(simplifier)
    {
    case 5 :
-      work.load(new SPxScale);
+      work.setSimplifier(new SPxScale);
       std::cout << "Scale";
       break;
    case 4 : 
-      work.load(new SPxRedundantSM);
+      work.setSimplifier(new SPxRedundantSM);
       std::cout << "Redundant";
       break;
    case 3 : 
-      work.load(new SPxRem1SM);
+      work.setSimplifier(new SPxRem1SM);
       std::cout << "Remove 1";
       break;
    case 2 :
-      work.load(new SPxAggregateSM);
+      work.setSimplifier(new SPxAggregateSM);
       std::cout << "Aggregate";
       break;
    case 1 :
-      work.load(new SPxGeneralSM);
+      work.setSimplifier(new SPxGeneralSM);
       std::cout << "General";
       break;
    case 0  :
@@ -240,21 +240,21 @@ int main(int argc, char **argv)
    switch(starter)
    {
    case 3 :
-      work.load(new SPxVectorST);
+      work.setStarter(new SPxVectorST);
       std::cout << "Vector";
       break;
    case 2 :
-      work.load(new SPxSumST);
+      work.setStarter(new SPxSumST);
       std::cout << "Sum";
       break;
    case 1 :
-      work.load(new SPxWeightST);
+      work.setStarter(new SPxWeightST);
       std::cout << "Weight";
       break;
    case 0 :
       /*FALLTHROUGH*/
    default :
-      work.load(static_cast<SPxStarter*>(0));
+      work.setStarter(static_cast<SPxStarter*>(0));
       std::cout << "Default";
       break;
    }
@@ -290,7 +290,7 @@ int main(int argc, char **argv)
 
    assert(lp.isConsistent());
 
-   work.load(lp);
+   work.loadLP(lp);
    assert(work.isConsistent());
 
    timer.start();

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultpr.h,v 1.6 2001/12/26 12:49:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefaultpr.h,v 1.7 2002/01/04 17:31:39 bzfkocht Exp $"
 
 /**@file  spxdefaultpr.h
  * @brief Default pricer.
@@ -39,80 +39,17 @@ namespace soplex
 */
 class SPxDefaultPR : public SPxPricer
 {
-protected:
-   SoPlex* thesolver;
-   double theeps;
-
+private:
    ///
    int selectLeaveX(int start, int incr);
-
    ///
    SoPlex::Id selectEnterX(int start1, int incr1, int start2, int incr2);
 
 public:
    ///
-   SoPlex* solver() const
-   {
-      return thesolver;
-   }
+   virtual int selectLeave();
    ///
-   double epsilon() const
-   {
-      return theeps;
-   }
-   ///
-   void setEpsilon(double eps)
-   {
-      theeps = eps;
-   }
-   ///
-   void load(SoPlex* p_solver)
-   {
-      thesolver = p_solver;
-   }
-   ///
-   void clear()
-   {
-      thesolver = 0;
-   }
-   ///
-   void setType(SoPlex::Type)
-   {}
-   ///
-   void setRep(SoPlex::Representation)
-   {}
-   ///
-   int selectLeave();
-   ///
-   void left4(int, SoPlex::Id)
-   {}
-
-   ///
-   SoPlex::Id selectEnter();
-   ///
-   void entered4(SoPlex::Id, int)
-   {}
-
-   ///
-   void addedVecs (int)
-   {}
-   ///
-   void addedCoVecs(int)
-   {}
-
-
-   ///
-   void removedVec(int)
-   {}
-   ///
-   void removedVecs(const int[])
-   {}
-   ///
-   void removedCoVec(int)
-   {}
-   ///
-   void removedCoVecs(const int[])
-   {}
+   virtual SoPlex::Id selectEnter();
 };
 } // namespace soplex
 #endif // _SPXDEFAULTPRR_H_

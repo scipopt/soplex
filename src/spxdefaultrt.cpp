@@ -13,43 +13,32 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.2 2001/11/06 23:31:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.3 2002/01/04 17:31:39 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <assert.h>
 #include <iostream>
 
-
-/*  and class header files
- */
 #include "spxdefaultrt.h"
 
 namespace soplex
 {
-
-
-//@ ----------------------------------------------------------------------------
 /*
-    Here comes the ratio test for selecting a variable to leave the basis. it is
-    assumed, that #Vec.delta()# and #fVec.idx()# have been setup
-    correctly!
+   Here comes the ratio test for selecting a variable to leave the basis. it is
+   assumed, that #Vec.delta()# and #fVec.idx()# have been setup
+   correctly!
  
-    The leaving variable is selected such that the update of #fVec()# (using
-    #fVec.value() * fVec.delta()#) keeps the basis feasible within
-    #solver()->delta()#. Hence, #fVec.value()# must be chosen such that one
-    updated value of #thefvec# just reaches its bound and no other one exceeds
-    them by more than #solver()->delta()#. Further, #fVec.value()# must have the
-    same sign as argument #val#.
+   The leaving variable is selected such that the update of #fVec()# (using
+   #fVec.value() * fVec.delta()#) keeps the basis feasible within
+   #solver()->delta()#. Hence, #fVec.value()# must be chosen such that one
+   updated value of #thefvec# just reaches its bound and no other one exceeds
+   them by more than #solver()->delta()#. Further, #fVec.value()# must have the
+   same sign as argument #val#.
  
-    The return value of #selectLeave()# is the number of a variable in the
-    basis selected to leave the basis. -1 indicates that no variable could be
-    selected. Otherwise, parameter #val# contains the chosen #fVec.value()#.
+   The return value of #selectLeave()# is the number of a variable in the
+   basis selected to leave the basis. -1 indicates that no variable could be
+   selected. Otherwise, parameter #val# contains the chosen #fVec.value()#.
  */
-int SPxDefaultRT::selectLeave(double& val, int start, int incr)
+int SPxDefaultRT::selectLeaveX(double& val, int start, int incr)
 {
    const double* vec = solver()->fVec().get_const_ptr();
    const double* upd = solver()->fVec().delta().values();
@@ -92,10 +81,10 @@ int SPxDefaultRT::selectLeave(double& val, int start, int incr)
       if (leave >= 0)
       {
          x = upd[leave];
-         if (x > epsilon)
-            val = (ub[leave] - vec[leave]) / x;
-         else
-            val = (lb[leave] - vec[leave]) / x;
+         val = ((x > epsilon)
+            ? (ub[leave] - vec[leave])
+            : (lb[leave] - vec[leave])) 
+            / x;
       }
       assert(val > -epsilon);
    }
@@ -142,16 +131,15 @@ SoPlex::Id SPxDefaultRT::selectEnter(double& val)
 {
    solver()->coPvec().delta().setup();
    solver()->pVec().delta().setup();
-   return selectEnter(val, 0, 1, 0, 1);
+   return selectEnterX(val, 0, 1, 0, 1);
 }
-
 
 /*
     Here comes the ratio test. It is assumed, that #theCoPvec.delta()# and
     #theCoPvec.idx()# have been setup correctly!
  */
-SoPlex::Id SPxDefaultRT::selectEnter
-(double& max, int start1, int incr1, int start2, int incr2)
+SoPlex::Id SPxDefaultRT::selectEnterX(
+   double& max, int start1, int incr1, int start2, int incr2)
 {
    const double* pvec = solver()->pVec().get_const_ptr();
    const double* pupd = solver()->pVec().delta().values();
@@ -334,7 +322,7 @@ SoPlex::Id SPxDefaultRT::selectEnter
 int SPxDefaultRT::selectLeave(double& val)
 {
    solver()->fVec().delta().setup();
-   return selectLeave(val, 0, 1);
+   return selectLeaveX(val, 0, 1);
 }
 } // namespace soplex
 

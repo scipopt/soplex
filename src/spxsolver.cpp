@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.5 2001/12/04 19:28:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.6 2002/01/04 17:31:39 bzfkocht Exp $"
 
 #include <iostream>
 
@@ -24,10 +24,10 @@ namespace soplex
 SPxSolver::SPxSolver(Type p_type, SoPlex::Representation p_rep)
    : SoPlex(p_type, p_rep)
 {
-   load(&rt);
-   load(&pr);
-   load(&st);
-   load(&slu);
+   SoPlex::setTester(&rt);
+   SoPlex::setPricer(&pr);
+   SoPlex::setStarter(&st);
+   SoPlex::setSolver(&slu);
 }
 } // namespace soplex
 

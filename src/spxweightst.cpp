@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.cpp,v 1.6 2002/01/03 15:25:49 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightst.cpp,v 1.7 2002/01/04 17:31:39 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -21,6 +21,9 @@
 #include "spxweightst.h"
 #include "svset.h"
 #include "sorter.h"
+
+// #define TEST  1
+// #define DEBUG 1
 
 namespace soplex
 {
@@ -333,7 +336,7 @@ void SPxWeightST::generate(SoPlex& base)
       assert(dim == 0);
    }
 
-   base.load(desc);
+   base.loadBasis(desc);
 #ifdef  TEST
    base.init();
 
@@ -359,11 +362,11 @@ void SPxWeightST::generate(SoPlex& base)
 
    if (changed)
    {
-      std::cerr << "changed basis\n";
-      base.load(desc);
+      std::cout << "changed basis\n";
+      base.loadBasis(desc);
    }
    else
-      std::cerr << "nothing changed\n";
+      std::cout << "nothing changed\n";
 #endif  // TEST
 }
 

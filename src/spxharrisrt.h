@@ -13,14 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.h,v 1.6 2001/12/25 14:25:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.h,v 1.7 2002/01/04 17:31:39 bzfkocht Exp $"
 
 /**@file  spxharrisrt.h
  * @brief Harris pricing with shifting.
  */
 #ifndef _SPXHARRISRT_H_
 #define _SPXHARRISRT_H_
-
 
 #include <assert.h>
 
@@ -40,9 +39,7 @@ namespace soplex
 */
 class SPxHarrisRT : public SPxRatioTester
 {
-protected:
-   SoPlex* thesolver;
-
+private:
    int maxDelta(
       double* /*max*/,       ///< max abs value in upd
       double* val,           ///< initial and chosen value
@@ -71,33 +68,13 @@ protected:
 
 public:
    ///
-   SoPlex* solver() const
-   {
-      return thesolver;
-   }
-
+   virtual int selectLeave(double& val);
    ///
-   void load(SoPlex* p_solver)
-   {
-      thesolver = p_solver;
-   }
-
-   ///
-   void clear()
-   {
-      thesolver = 0;
-   }
-
-   ///
-   int selectLeave(double& val);
-
-   ///
-   SoPlex::Id selectEnter(double& val);
-
-   ///
-   void setType(SoPlex::Type)
+   virtual SoPlex::Id selectEnter(double& val);
+   /// default constructor
+   SPxHarrisRT() 
+      : SPxRatioTester()
    {}
-
 };
 
 } // namespace soplex

@@ -13,15 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxparmultpr.h,v 1.5 2001/12/26 12:49:42 bzfkocht Exp $"
-
+#pragma ident "@(#) $Id: spxparmultpr.h,v 1.6 2002/01/04 17:31:39 bzfkocht Exp $"
 
 /**@file  spxparmultpr.h
  * @brief Partial multiple pricing.
  */
 #ifndef _SPXPARMULTPR_H_
 #define _SPXPARMULTPR_H_
-
 
 #include <assert.h>
 
@@ -55,9 +53,7 @@ struct SPxParMultPr_Tmp
 */
 class SPxParMultPR : public SPxPricer
 {
-protected:
-   SoPlex* thesolver;
-   double theeps;
+private:
    DataArray < SPxParMultPr_Tmp > pricSet;
    int multiParts;
    int used;
@@ -71,72 +67,13 @@ public:
    static int partialSize;
 
    ///
-   SoPlex* solver() const
-   {
-      return thesolver;
-   }
-
+   virtual void load(SoPlex* solver);
    ///
-   double epsilon() const
-   {
-      return theeps;
-   }
+   virtual void setType(SoPlex::Type tp);
    ///
-   void setEpsilon(double eps)
-   {
-      theeps = eps;
-   }
-
+   virtual int selectLeave();
    ///
-   void load(SoPlex* solver);
-
-   ///
-   void clear()
-   {
-      thesolver = 0;
-   }
-
-   ///
-   void setType(SoPlex::Type tp);
-   ///
-   void setRep(SoPlex::Representation)
-   {}
-
-   ///
-   int selectLeave();
-   ///
-   void left4(int, SoPlex::Id)
-   {}
-
-   ///
-   SPxLP::Id selectEnter();
-   ///
-   void entered4(SoPlex::Id id, int n);
-
-
-   ///
-   void addedVecs (int)
-   {}
-   ///
-   void addedCoVecs(int)
-   {}
-
-
-   ///
-   void removedVec(int)
-   {}
-   ///
-   void removedVecs(const int[])
-   {}
-   ///
-   void removedCoVec(int)
-   {}
-   ///
-   void removedCoVecs(const int[])
-   {}
-
-   ///
-   int isConsistent() const;
+   virtual SPxLP::Id selectEnter();
 };
 
 

@@ -13,14 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.h,v 1.6 2001/12/28 14:55:13 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfastrt.h,v 1.7 2002/01/04 17:31:39 bzfkocht Exp $"
 
 /**@file  spxfastrt.h
  * @brief Fast shifting ratio test.
  */
 #ifndef _SPXFASTRT_H_
 #define _SPXFASTRT_H_
-
 
 #include <assert.h>
 
@@ -42,9 +41,7 @@ namespace soplex
 */
 class SPxFastRT : public SPxRatioTester
 {
-protected:
-   SoPlex* thesolver;
-
+private:
    /// minimum stability parameter for stopping after phase 1.
    double minStab;
    /// |value| < epsilon is considered 0.
@@ -69,22 +66,12 @@ protected:
        of \p upd.delta() is computed and returned in \p abs. Internally all
        loops are started at \p start and incremented by \p incr.
     */
-   int maxDelta(double& val,
-                double& p_abs,
-                UpdateVector& upd,
-                Vector& low,
-                Vector& up,
-                int start,
-                int incr);
-
+   int maxDelta(double& val, double& p_abs, UpdateVector& upd,
+      Vector& low, Vector& up, int start, int incr);
    ///
-   virtual int maxDelta(double& val,
-                        double& p_abs);
-
+   int maxDelta(double& val, double& p_abs);
    ///
-   virtual SoPlex::Id maxDelta(int& nr,
-                               double& val,
-                               double& p_abs);
+   SoPlex::Id maxDelta(int& nr, double& val, double& p_abs);
 
    /// Min phase 1 value.
    /** Computes the minimum value \p val that could be used for updating \p upd
@@ -94,32 +81,19 @@ protected:
        of \p upd.delta() is computed and returned in \p abs. Internally all
        loops are started at \p start and incremented by \p incr.
    */
-   int minDelta(double& val,
-                double& p_abs,
-                UpdateVector& upd,
-                Vector& low,
-                Vector& up,
-                int start,
-                int incr);
-
+   int minDelta(double& val, double& p_abs, UpdateVector& upd,
+      Vector& low, Vector& up, int start, int incr);
+   
    ///
-   virtual int minDelta(double& val,
-                         double& p_abs,
-                         UpdateVector& upd,
-                         Vector& low,
-                         Vector& up)
+   int minDelta(double& val, double& p_abs,
+      UpdateVector& upd, Vector& low, Vector& up)
    {
       return minDelta(val, p_abs, upd, low, up, 0, 1);
    }
-
    ///
-   virtual int minDelta(double& val,
-                        double& p_abs);
-
+   int minDelta(double& val, double& p_abs);
    ///
-   virtual SoPlex::Id minDelta(int& nr,
-                               double& val,
-                               double& p_abs);
+   SoPlex::Id minDelta(int& nr, double& val, double& p_abs);
    
    /// selects stable index for maximizing ratio test.
    /** Selects form all update values \p val < \p max the one with the largest
@@ -128,27 +102,14 @@ protected:
        update value \p val. Internally all loops are started at \p start and
        incremented by \p incr.
    */
-   int maxSelect(double& val,
-                  double& stab,
-                  double& best,
-                  double& bestDelta,
-                  double max,
-                  const UpdateVector& upd,
-                  const Vector& low,
-                  const Vector& up,
-                  int start = 0,
-                  int incr = 1);
-
-   virtual int maxSelect(double& val,
-                         double& stab,
-                         double& bestDelta,
-                         double max);
-   
-   virtual SoPlex::Id maxSelect(int& nr,
-                                double& val,
-                                double& stab,
-                                double& bestDelta,
-                                double max);
+   int maxSelect(double& val, double& stab, double& best, double& bestDelta, 
+      double max, const UpdateVector& upd, const Vector& low, 
+      const Vector& up, int start = 0, int incr = 1);
+   ///
+   int maxSelect(double& val, double& stab, double& bestDelta, double max);
+   ///
+   SoPlex::Id maxSelect(int& nr, double& val, double& stab,
+      double& bestDelta, double max);
 
    /// selects stable index for minimizing ratio test.
    /** Select form all update values \p val > \p max the one with the largest
@@ -157,28 +118,15 @@ protected:
        update value \p val. Internally all loops are started at \p start and
        incremented by \p incr.
    */
-   int minSelect(double& val,
-                  double& stab,
-                  double& best,
-                  double& bestDelta,
-                  double max,
-                  const UpdateVector& upd,
-                  const Vector& low,
-                  const Vector& up,
-                  int start = 0,
-                  int incr = 1);
+   int minSelect(double& val, double& stab, double& best, double& bestDelta,
+      double max, const UpdateVector& upd, const Vector& low,
+      const Vector& up, int start = 0, int incr = 1);
 
-   virtual int minSelect(double& val,
-                         double& stab,
-                         double& bestDelta,
-                         double max);
+   int minSelect(double& val, double& stab,
+      double& bestDelta, double max);
 
-   virtual SoPlex::Id minSelect(int& nr,
-                                double& val,
-                                double& stab,
-                                double& bestDelta,
-                                double max);
-
+   SoPlex::Id minSelect(int& nr, double& val, double& stab,
+      double& bestDelta, double max);
 
    ///
    int minReleave(double& sel, int leave, double maxabs);
@@ -198,13 +146,13 @@ protected:
    int maxShortLeave(double& sel, int leave, double /*max*/, double p_abs);
 
    ///
-   virtual int minReenter(double& sel, double /*max*/, double maxabs,
+   int minReenter(double& sel, double /*max*/, double maxabs,
                           SoPlex::Id id, int nr);
    /// numerical stability check.
    /** Tests whether the selected enter \p id needs to be discarded (and do so)
        and the ratio test is to be recomputed.
    */
-   virtual int maxReenter(double& sel, double /*max*/, double maxabs,
+   int maxReenter(double& sel, double /*max*/, double maxabs,
                           SoPlex::Id id, int nr);
 
    /**@todo the documentation seems to be incorrect. 
@@ -215,35 +163,22 @@ protected:
        the selected enter
        pivot. In this case return the update value in \p sel.
    */
-   virtual int shortEnter(SoPlex::Id& enterId,
-                          int nr,
-                          double max,
-                          double maxabs
-                          );
+   int shortEnter(SoPlex::Id& enterId, int nr, double max, double maxabs);
 
 public:
    ///
-   SoPlex* solver() const
-   {
-      return thesolver;
-   }
-
+   virtual void load(SoPlex* solver);
    ///
-   void load(SoPlex* solver);
-
+   virtual int selectLeave(double& val);
    ///
-   void clear();
-
+   virtual SoPlex::Id selectEnter(double& val);
    ///
-   int selectLeave(double& val);
-
-   ///
-   SoPlex::Id selectEnter(double& val);
-
-   ///
-   void setType(SoPlex::Type);
+   virtual void setType(SoPlex::Type);
+   /// default constructor
+   SPxFastRT() 
+      : SPxRatioTester()
+   {}
 };
-
 } // namespace soplex
 #endif // _SPXFASTRT_H_
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datahashtable.h,v 1.9 2001/12/28 14:55:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: datahashtable.h,v 1.10 2002/01/04 17:31:38 bzfkocht Exp $"
 
 /**@file  datahashtable.h
  * @brief Generic hash table for data objects.
@@ -253,6 +253,8 @@ public:
       if (thenum >= element.size())
          reMax(int(factor * thenum) + 1);
 
+      assert(element.size() > 0);
+
       for(
          i = (*hashval)(&h) % element.size();
          element[i].status == Element < HashItem, Info > ::USED;
@@ -334,7 +336,7 @@ public:
    /// Output operator. Displays all elements contained in hash table.
    /**@todo Is there any reason not to define this operator? */
    friend std::ostream& operator<<(std::ostream& out,
-                                   const DataHashTable < HashItem, Info > & h)
+      const DataHashTable < HashItem, Info > & h)
    {
       const HashItem* item;
       for (item = h.first(); item; item = h.next())
@@ -393,11 +395,14 @@ private:
    int index(const HashItem& h) const
    {
       int i, j;
-      for
-         (
-          i = j = (*hashval)(&h) % element.size();
-          element[i].status != Element < HashItem, Info > ::FREE;
-         )
+
+      if (thenum == 0)
+         return -1;
+
+      assert(element.size() > 0);
+
+      for(i = j = (*hashval)(&h) % element.size();
+          element[i].status != Element < HashItem, Info > ::FREE;)
       {
          if (element[i].item == h)
             return i;

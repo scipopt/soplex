@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.7 2001/12/26 12:58:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.8 2002/01/04 17:31:39 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -116,7 +116,6 @@ int SPxWeightPR::selectLeave()
          }
       }
    }
-
    assert(isConsistent());
    return lastIdx;
 }
@@ -328,7 +327,7 @@ void SPxWeightPR::removedCoVecs(const int perm[])
    }
 }
 
-int SPxWeightPR::isConsistent() const
+bool SPxWeightPR::isConsistent() const
 {
    if (solver() != 0)
    {
@@ -337,7 +336,7 @@ int SPxWeightPR::isConsistent() const
       if (cPenalty.dim() != solver()->nCols())
          return MSGinconsistent("SPxWeightPR");
    }
-   return 1;
+   return true;
 }
 } // namespace soplex
 

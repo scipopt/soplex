@@ -13,43 +13,29 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxparmultpr.cpp,v 1.5 2001/11/20 16:43:32 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxparmultpr.cpp,v 1.6 2002/01/04 17:31:39 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <assert.h>
 #include <iostream>
 
-/*  and class header files
- */
 #include "spxparmultpr.h"
 
 namespace soplex
 {
-
-//@ ----------------------------------------------------------------------------
-
 #define EQ_PREF 1000
 
 int SPxParMultPR::partialSize = 17;
 
-//@ ----------------------------------------------------------------------------
 void SPxParMultPR::setType(SoPlex::Type tp)
 {
    if (tp == SoPlex::ENTER)
    {
       used = 0;
       thesolver->setPricing(SoPlex::PARTIAL);
-      // std::cerr << "OK\n";
    }
-
    else
    {
       thesolver->setPricing(SoPlex::FULL);
-      // std::cerr << "fuck\n";
    }
 
    last = 0;
@@ -63,9 +49,6 @@ void SPxParMultPR::load(SoPlex* p_solver)
    multiParts = (thesolver->dim() + thesolver->coDim()) / partialSize + 1;
    pricSet.reSize(10 * partialSize);
 }
-
-
-//@ ----------------------------------------------------------------------------
 
 SPxLP::Id SPxParMultPR::selectEnter()
 {
@@ -195,10 +178,6 @@ SPxLP::Id SPxParMultPR::selectEnter()
    }
 }
 
-void SPxParMultPR::entered4(SoPlex::Id /*id*/, int /*n*/)
-{}
-
-
 int SPxParMultPR::selectLeave()
 {
    int i, n;
@@ -221,11 +200,6 @@ int SPxParMultPR::selectLeave()
    }
 
    return n;
-}
-
-int SPxParMultPR::isConsistent() const
-{
-   return 1;
 }
 } // namespace soplex
 

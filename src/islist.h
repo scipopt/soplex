@@ -13,8 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: islist.h,v 1.8 2001/12/28 14:55:12 bzfkocht Exp $"
-
+#pragma ident "@(#) $Id: islist.h,v 1.9 2002/01/04 17:31:38 bzfkocht Exp $"
 
 /**@file  islist.h
  * @brief Generic single linked list.
@@ -24,6 +23,8 @@
 
 #include <assert.h>
 #include <iostream>
+
+#include "message.h"
 
 namespace soplex
 {
@@ -362,24 +363,18 @@ public:
    }
 
    /// consistency check.
-   int isConsistent() const
+   bool isConsistent() const
    {
       if (first() != 0 && last() == 0)
-      {
-         std::cerr << "Inconsistency detected in class IsList\n";
-         return 0;
-      }
+         return MSGinconsistent("IsList");
+
       if (first() == 0 && last() != 0)
-      {
-         std::cerr << "Inconsistency detected in class IsList\n";
-         return 0;
-      }
+         return MSGinconsistent("IsList");
+
       if (first() && find(last()) == 0)
-      {
-         std::cerr << "Inconsistency detected in class IsList\n";
-         return 0;
-      }
-      return 1;
+         return MSGinconsistent("IsList");
+
+      return true;
    }
    //@}
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.h,v 1.9 2001/12/04 19:28:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.h,v 1.10 2002/01/04 17:31:38 bzfkocht Exp $"
 
 /**@file  nameset.h
  * @brief Set of strings.
@@ -63,7 +63,7 @@ public:
    friend int hashFunction (const NameSet_Name&);
 
    /// consistency check.
-   int isConsistent () const
+   bool isConsistent () const
    {
       return (name != 0);
    }
@@ -337,7 +337,7 @@ public:
    /**@name Miscellaneous */
    //@{
    /// consistency check.
-   int isConsistent() const;
+   bool isConsistent() const;
    //@}
 
    /**@name Constructors / Destructors */

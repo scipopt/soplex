@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.10 2001/12/30 11:30:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.11 2002/01/04 17:31:39 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -95,7 +95,9 @@ void SPxSteepPR::setType(SoPlex::Type type)
    }
    else
    {
-      std::cerr << "sorry, no exact setup for steepest edge multipliers implemented\n";
+      std::cerr << 
+         "sorry, no exact setup for steepest edge multipliers implemented\n";
+
       if (type == SoPlex::ENTER)
       {
          coPenalty.reDim(thesolver->dim());
@@ -213,9 +215,10 @@ void SPxSteepPR::setRep(SoPlex::Representation)
    }
 }
 
-void SPxSteepPR::left4(int n, SoPlex::Id id, int start, int incr)
+void SPxSteepPR::left4X(int n, SoPlex::Id id, int start, int incr)
 {
    assert(thesolver->type() == SoPlex::LEAVE);
+
    if (id.isValid())
    {
       int i, j;
@@ -261,10 +264,10 @@ void SPxSteepPR::left4(int n, SoPlex::Id id)
    else if (thesolver->isCoId(id))
       leavePref[n] = coPref[thesolver->number(id)];
 
-   left4(n, id, 0, 1);
+   left4X(n, id, 0, 1);
 }
 
-int SPxSteepPR::selectLeave(double& best, int start, int incr)
+int SPxSteepPR::selectLeaveX(double& best, int start, int incr)
 {
    const double* coPenalty_ptr = coPenalty.get_const_ptr();
    const double* fTest = thesolver->fTest().get_const_ptr();
@@ -308,7 +311,7 @@ int SPxSteepPR::selectLeave()
    assert(isConsistent());
    double best;
 
-   lastIdx = selectLeave(best);
+   lastIdx = selectLeaveX(best);
    if (lastIdx >= 0)
    {
       thesolver->basis().coSolve(thesolver->coPvec().delta(),
@@ -334,10 +337,10 @@ int SPxSteepPR::selectLeave()
 }
 
 
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Entering Simplex}
+/* Entering Simplex
  */
-void SPxSteepPR::entered4(SoPlex::Id, int n, int start2, int incr2, int start1, int incr1)
+void SPxSteepPR::entered4X(
+   SoPlex::Id, int n, int start2, int incr2, int start1, int incr1)
 {
    assert(thesolver->type() == SoPlex::ENTER);
 
@@ -379,7 +382,7 @@ void SPxSteepPR::entered4(SoPlex::Id, int n, int start2, int incr2, int start1, 
          i = pIdx.index(j);
          xi_ip = xi_p * pVec[i];
          x = penalty_ptr[i] += xi_ip * (xi_ip * pi_p
-                                         - 2 * (thesolver->vector(i) * workVec));
+            - 2 * (thesolver->vector(i) * workVec));
          /*
          if(x < 1)
              penalty_ptr[i] = 1 / (2-x);
@@ -402,11 +405,11 @@ void SPxSteepPR::entered4(SoPlex::Id, int n, int start2, int incr2, int start1, 
 
 void SPxSteepPR::entered4(SoPlex::Id id, int n)
 {
-   entered4(id, n, 0, 1, 0, 1);
+   entered4X(id, n, 0, 1, 0, 1);
 }
 
-SoPlex::Id SPxSteepPR::selectEnter(double& best, int start1, int incr1,
-                                   int start2, int incr2)
+SoPlex::Id SPxSteepPR::selectEnterX(
+   double& best, int start1, int incr1, int start2, int incr2)
 {
    /*
        std::cerr << "selectEnter " << start1 << '(' << incr1 << ")\t"
@@ -464,7 +467,7 @@ SoPlex::Id SPxSteepPR::selectEnter(double& best, int start1, int incr1,
 SoPlex::Id SPxSteepPR::selectEnter()
 {
    double best;
-   lastId = SPxSteepPR::selectEnter(best);
+   lastId = SPxSteepPR::selectEnterX(best);
 
    if (lastId.isValid())
    {
@@ -483,10 +486,6 @@ SoPlex::Id SPxSteepPR::selectEnter()
    return lastId;
 }
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Extension}
- */
 void SPxSteepPR::addedVecs(int n)
 {
    n = penalty.dim();
@@ -517,10 +516,6 @@ void SPxSteepPR::addedCoVecs(int n)
    prefSetup = 0;
 }
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Shrinking}
- */
 void SPxSteepPR::removedVec(int i)
 {
    assert(thesolver != 0);
@@ -564,7 +559,7 @@ void SPxSteepPR::removedCoVecs(const int perm[])
    prefSetup = 0;
 }
 
-int SPxSteepPR::isConsistent() const
+bool SPxSteepPR::isConsistent() const
 {
    if (thesolver != 0 && thesolver->type() == SoPlex::LEAVE && setup == EXACT)
    {
@@ -593,7 +588,7 @@ int SPxSteepPR::isConsistent() const
          if (penalty[i] < thesolver->epsilon())
             return MSGinconsistent("SPxSteepPR");
    }
-   return 1;
+   return true;
 }
 } // namespace soplex
 

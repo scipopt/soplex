@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.15 2001/12/28 14:55:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.16 2002/01/04 17:31:38 bzfkocht Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -28,6 +28,7 @@
 #include "dataarray.h"
 #include "datakey.h"
 #include "spxalloc.h"
+#include "message.h"
 
 namespace soplex
 {
@@ -495,46 +496,25 @@ public:
    }
 
    /// consistencty check.
-   int isConsistent() const
+   bool isConsistent() const
    {
       if (theitem == 0 || thekey == 0)
-      {
-         std::cerr << "Inconsistency detected at " 
-                   << __FILE__ << "(" << __LINE__ << ")" << std::endl;
-         return 0;
-      }
+         return MSGinconsistent("DataSet");
 
       if (thesize > themax || thenum > themax || thenum > thesize)
-      {
-         std::cerr << "Inconsistency detected at " 
-                   << __FILE__ << "(" << __LINE__ << ")" << std::endl;
-         return 0;
-      }
+         return MSGinconsistent("DataSet");
 
       if (thesize == thenum && firstfree != -themax - 1)
-      {
-         std::cerr << "Inconsistency detected at " 
-                   << __FILE__ << "(" << __LINE__ << ")" << std::endl;
-         return 0;
-      }
+         return MSGinconsistent("DataSet");
 
       if (thesize != thenum && firstfree == -themax - 1)
-      {
-         std::cerr << "Inconsistency detected at " 
-                   << __FILE__ << "(" << __LINE__ << ")" << std::endl;
-         return 0;
-      }
+         return MSGinconsistent("DataSet");
 
       for (int i = 0; i < thenum; ++i)
-      {
          if (theitem[thekey[i].idx].info != i)
-         {
-            std::cerr << "Inconsistency detected at " 
-                      << __FILE__ << "(" << __LINE__ << ")" << std::endl;
-            return 0;
-         }
-      }
-      return 1;
+            return MSGinconsistent("DataSet");
+
+      return true;
    }
    //@}
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.8 2001/12/26 12:58:58 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.9 2002/01/04 17:31:39 bzfkocht Exp $"
 
 #include "spxdevexpr.h"
 #include "message.h"
@@ -28,14 +28,14 @@ void SPxDevexPR::load(SoPlex* base)
    assert(isConsistent());
 }
 
-int SPxDevexPR::isConsistent() const
+bool SPxDevexPR::isConsistent() const
 {
    if (thesolver != 0)
       if (penalty.dim() != thesolver->coDim()
            || coPenalty.dim() != thesolver->dim())
          return MSGinconsistent("SPxDevexPR");
 
-   return 1;
+   return true;
 }
 
 void SPxDevexPR::setType(SoPlex::Type tp)
@@ -72,10 +72,10 @@ void SPxDevexPR::setRep(SoPlex::Representation)
 int SPxDevexPR::selectLeave()
 {
    double val;
-   return selectLeave(val);
+   return selectLeaveX(val);
 }
 
-int SPxDevexPR::selectLeave(double& best, int start, int incr)
+int SPxDevexPR::selectLeaveX(double& best, int start, int incr)
 {
    double x;
 
@@ -98,17 +98,16 @@ int SPxDevexPR::selectLeave(double& best, int start, int incr)
          }
       }
    }
-
    best = bstX;
    return bstI;
 }
 
 void SPxDevexPR::left4(int n, SoPlex::Id id)
 {
-   left4(n, id, 0, 1);
+   left4X(n, id, 0, 1);
 }
 
-void SPxDevexPR::left4(int n, SoPlex::Id id, int start, int incr)
+void SPxDevexPR::left4X(int n, SoPlex::Id id, int start, int incr)
 {
    if (id.isValid())
    {
@@ -139,16 +138,15 @@ void SPxDevexPR::left4(int n, SoPlex::Id id, int start, int incr)
 SoPlex::Id SPxDevexPR::selectEnter()
 {
    double val;
-   return selectEnter(val);
+   return selectEnterX(val);
 }
 
-SoPlex::Id SPxDevexPR::selectEnter(
+SoPlex::Id SPxDevexPR::selectEnterX(
    double& best,
    int start1,
    int incr1,
    int start2,
-   int incr2
-)
+   int incr2)
 {
    double x;
 
@@ -212,14 +210,14 @@ SoPlex::Id SPxDevexPR::selectEnter(
 
 void SPxDevexPR::entered4(SoPlex::Id id, int n)
 {
-   entered4(id, n, 0, 1, 0, 1);
+   entered4X(id, n, 0, 1, 0, 1);
 }
 
 /**@todo suspicious: the pricer should be informed, that variable id has entered the basis at position n, but the id is not used here (this is true
                      for all pricers)
 */
-void SPxDevexPR::entered4(SoPlex::Id /*id*/, int n,
-                          int start1, int incr1, int start2, int incr2)
+void SPxDevexPR::entered4X(SoPlex::Id /*id*/, int n,
+   int start1, int incr1, int start2, int incr2)
 {
    if (n >= 0 && n < thesolver->dim())
    {
@@ -277,20 +275,6 @@ void SPxDevexPR::addedCoVecs(int n)
       coPenalty[i] = init;
 }
 
-void SPxDevexPR::removedVec(int /*i*/)
-{}
-
-
-void SPxDevexPR::removedCoVec(int /*i*/)
-{}
-
-
-void SPxDevexPR::removedCoVecs(const int * /*perm[]*/)
-{}
-
-
-void SPxDevexPR::removedVecs(const int * /*perm[]*/)
-{}
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

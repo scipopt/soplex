@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.9 2001/12/26 12:58:58 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.10 2002/01/04 17:31:39 bzfkocht Exp $"
 
 #include <iostream>
 
@@ -23,7 +23,7 @@
 namespace soplex
 {
 
-int SPxHybridPR::isConsistent() const
+bool SPxHybridPR::isConsistent() const
 {
    if (thesolver != 0 &&
       (thesolver != steep.solver() ||

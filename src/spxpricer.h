@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxpricer.h,v 1.4 2001/12/26 12:49:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxpricer.h,v 1.5 2002/01/04 17:31:39 bzfkocht Exp $"
 
 
 /**@file  spxpricer.h
@@ -48,41 +48,63 @@ namespace soplex
 */
 class SPxPricer
 {
+protected:
+   SoPlex* thesolver;
+   double  theeps;
+
 public:
    /**@name Initialization */
    //@{
    /// loads LP.
    /** Loads the solver and LP for which pricing steps are to be performed.
     */
-   virtual void load(SoPlex* lp) = 0;
+   virtual void load(SoPlex* p_solver)
+   {
+      thesolver = p_solver;
+   }
 
    /// unloads LP.
-   virtual void clear() = 0;
+   virtual void clear()
+   {
+      thesolver = 0;
+   }
 
    /// returns loaded #SoPlex object.
-   virtual SoPlex* solver() const = 0;
+   virtual SoPlex* solver() const
+   {
+      return thesolver;
+   }
 
    /// returns violation bound #epsilon.
-   virtual double epsilon() const = 0;
+   virtual double epsilon() const
+   {
+      return theeps;
+   }
 
    /// sets violation bound.
    /** Inequality violations are accepted, if their size is less than \p eps.
     */
-   virtual void setEpsilon(double eps) = 0;
+   virtual void setEpsilon(double eps)
+   {
+      assert(eps >= 0.0);
+
+      theeps = eps;
+   }
 
    /// sets pricing type.
    /** Informs pricer about (a change of) the loaded #SoPlex's #Type. In
        the sequel, only the corresponding select methods may be called.
     */
-   virtual void setType(SoPlex::Type) = 0;
+   virtual void setType(SoPlex::Type)
+   {}
 
    /// sets basis representation.
    /** Informs pricer about (a change of) the loaded #SoPlex's
        #Representation.
    */
-   virtual void setRep(SoPlex::Representation) = 0;
+   virtual void setRep(SoPlex::Representation)
+   {}
    //@}
-
 
    /**@name Pivoting */
    //@{
@@ -103,7 +125,8 @@ public:
        the one returned by the #SPxPricer at the previous call to
        #selectLeave(). However, one can not rely on this.
     */
-   virtual void left4(int n, SoPlex::Id id) = 0;
+   virtual void left4(int /*n*/, SoPlex::Id /*id*/)
+   {}
 
    /// selects Id to enter basis.
    /** Selects the #SoPlex::Id of a vector to enter the basis. The selected
@@ -129,36 +152,55 @@ public:
        #SPxPricer at the previous call to #selectEnter(). However, one
        can not rely on this.
     */
-   virtual void entered4(SoPlex::Id id, int n) = 0;
+   virtual void entered4(SoPlex::Id /*id*/, int /*n*/)
+   {}
    //@}
 
 
    /**@name Extension */
    //@{
    /// \p n vectors have been added to loaded LP.
-   virtual void addedVecs (int n) = 0;
+   virtual void addedVecs (int /*n*/)
+   {}
    /// \p n covectors have been added to loaded LP.
-   virtual void addedCoVecs(int n) = 0;
+   virtual void addedCoVecs(int /*n*/)
+   {}
    //@}
-
 
    /**@name Shrinking */
    //@{
    /// vector \p i was removed from loaded LP.
-   virtual void removedVec(int i) = 0;
+   virtual void removedVec(int /*i*/)
+   {}
    /// vectors given by \p perm have been removed from loaded LP.
-   virtual void removedVecs(const int perm[]) = 0;
+   virtual void removedVecs(const int* /*perm*/)
+   {}
    /// covector \p i was removed from loaded LP.
-   virtual void removedCoVec(int i) = 0;
+   virtual void removedCoVec(int /*i*/)
+   {}
    /// covectors given by \p perm have been removed from loaded LP.
-   virtual void removedCoVecs(const int perm[]) = 0;
+   virtual void removedCoVecs(const int* /*perm*/)
+   {}
    //@}
+
+   virtual bool isConsistent() const 
+   {
+      return thesolver != 0;
+   }
 
    /**@name Constructors / Destructors */
    //@{
+   /// default constructor
+   SPxPricer()
+      : thesolver(0)
+      , theeps(0.0)
+   {}
+
    /// destructor.
    virtual ~SPxPricer()
-   {}
+   {
+      thesolver = 0;
+   }
    //@}
 
 };

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.8 2001/12/28 14:55:13 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.9 2002/01/04 17:31:39 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -126,7 +126,6 @@ int SPxHarrisRT::minDelta(
    return sel;
 }
 
-//@ ----------------------------------------------------------------------------
 /*
     Here comes our implementation of the Haris procedure improved by shifting
     bounds. The basic idea is to used the tollerated infeasibility within
@@ -210,7 +209,7 @@ int SPxHarrisRT::selectLeave(double& val)
          {
             y = up[i] - vec[i];
             if (y < -degeneps)
-               solver()->shiftUBbound(i, vec[i]);   // ensure simplex improvement
+               solver()->shiftUBbound(i, vec[i]); // ensure simplex improvement
             else
             {
                y /= x;
@@ -226,7 +225,7 @@ int SPxHarrisRT::selectLeave(double& val)
          {
             y = low[i] - vec[i];
             if (y > degeneps)
-               solver()->shiftLBbound(i, vec[i]);   // ensure simplex improvement
+               solver()->shiftLBbound(i, vec[i]); // ensure simplex improvement
             else
             {
                y /= x;
@@ -297,7 +296,7 @@ int SPxHarrisRT::selectLeave(double& val)
          {
             y = low[i] - vec[i];
             if (y > degeneps)
-               solver()->shiftLBbound(i, vec[i]);   // ensure simplex improvement
+               solver()->shiftLBbound(i, vec[i]); // ensure simplex improvement
             else
             {
                y /= x;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.h,v 1.6 2001/12/26 12:49:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.h,v 1.7 2002/01/04 17:31:39 bzfkocht Exp $"
 
 
 /**@file  spxsteeppr.h
@@ -52,7 +52,7 @@ public:
       DEFAULT  ///< starting with multipliers set to 1
    };
 
-protected:
+private:
    DVector penalty;                // vector of pricing penalties
    DVector coPenalty;              // vector of pricing penalties
 
@@ -62,23 +62,32 @@ protected:
    int lastIdx;
    SoPlex::Id lastId;
    double pi_p;
-   double theeps;
 
-   SoPlex* thesolver;
 
    int prefSetup;
    DataArray < double > coPref; // preference multiplier for selecting as pivot
    DataArray < double > pref;   // preference multiplier for selecting as pivot
    DataArray < double > leavePref;
 
+   ///
    void setupPrefs(double mult,
       double /*tie*/, double /*cotie*/,
       double shift, double coshift,
       int rstart = 0, int cstart = 0,
       int rend = -1, int cend = -1);
 
-   virtual void setupPrefs(SoPlex::Type);
-
+   ///
+   void setupPrefs(SoPlex::Type);
+   ///
+   int selectLeaveX(double& best, int start = 0, int incr = 1);
+   ///
+   SoPlex::Id selectEnterX(double& best, 
+      int start1 = 0, int incr1 = 1, int start2 = 0, int incr2 = 1);
+   ///
+   void left4X(int n, SoPlex::Id id, int start, int incr);
+   ///
+   void entered4X(SoPlex::Id id, int n, 
+      int start1, int incr1, int start2, int incr2);
 public:
    /**@todo make setup and accuracy private or protected */
    /// setup type.
@@ -87,61 +96,26 @@ public:
    /// accuracy for computing steepest directions.
    double accuracy;
 
-   /// 
-   SoPlex* solver() const
-   {
-      return thesolver;
-   }
-   /// 
-   double epsilon() const
-   {
-      return theeps;
-   }
-
    ///
-   void setEpsilon(double eps)
-   {
-      theeps = eps;
-   }
-
+   virtual void load(SoPlex* base);
    ///
-   void load(SoPlex* base);
+   virtual void clear();
    ///
-   void clear();
+   virtual void setType(SoPlex::Type);
    ///
-   void setType(SoPlex::Type);
+   virtual void setRep(SoPlex::Representation rep);
    ///
-   void setRep(SoPlex::Representation rep);
-
+   virtual int selectLeave();
    ///
-   int selectLeave();
-protected:
-   int selectLeave(double& best, int start = 0, int incr = 1);
-public:
-
+   virtual void left4(int n, SoPlex::Id id);
    ///
-   void left4(int n, SoPlex::Id id);
-   void left4(int n, SoPlex::Id id, int start, int incr);
-
+   virtual SoPlex::Id selectEnter();
    ///
-   SoPlex::Id selectEnter();
-protected:
-   SoPlex::Id selectEnter(double& best, int start1 = 0, int incr1 = 1,
-                          int start2 = 0, int incr2 = 1);
-   SoPlex::Id otherSelectEnter(double& best, int start1 = 0, int incr1 = 1,
-                               int start2 = 0, int incr2 = 1);
-public:
-
-   ///
-   void entered4(SoPlex::Id id, int n);
-   void entered4(SoPlex::Id id, int n, int start1, int incr1, int start2, 
-                 int incr2);
-
+   virtual void entered4(SoPlex::Id id, int n);
    ///
    virtual void addedVecs (int n);
    ///
    virtual void addedCoVecs(int n);
-
    ///
    virtual void removedVec(int i);
    ///
@@ -151,15 +125,15 @@ public:
    ///
    virtual void removedCoVec(int i);
    ///
-   int isConsistent() const;
+   virtual bool isConsistent() const;
 
    ///
    SPxSteepPR()
-      : workRhs (0, 1e-16)
+      : SPxPricer()
+      , workRhs (0, 1e-16)
       , setup (DEFAULT)
       , accuracy(1e-4)
    {}
-
 };
 
 } // namespace soplex

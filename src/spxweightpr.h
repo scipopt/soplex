@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightpr.h,v 1.5 2001/12/26 12:49:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightpr.h,v 1.6 2002/01/04 17:31:39 bzfkocht Exp $"
 
 /**@file  spxweightpr.h
  * @brief Weighted pricing.
@@ -41,7 +41,7 @@ namespace soplex
 */
 class SPxWeightPR : public SPxPricer
 {
-protected:
+private:
    DVector cPenalty;               // column penalties
    DVector rPenalty;               // row    penalties
    DVector leavePenalty;           // penalties for leaveing alg
@@ -51,49 +51,26 @@ protected:
 
    double objlength;              // length of objective vector.
 
-   SoPlex* thesolver;
-   double theeps;
+   /// compute weights for columns.
+   void computeCP(int start, int end);
+   /// compute weights for rows.
+   void computeRP(int start, int end);
 
 public:
    ///
-   SoPlex* solver() const
-   {
-      return thesolver;
-   }
-
+   virtual void load(SoPlex* base);
    ///
-   double epsilon() const
-   {
-      return theeps;
-   }
+   void setType(SoPlex::Type tp);
    ///
-   void setEpsilon(double eps)
-   {
-      theeps = eps;
-   }
-
+   void setRep(SoPlex::Representation rep);
    ///
-   void load(SoPlex* base);
-
+   virtual int selectLeave();
    ///
-   void clear()
-   {
-      thesolver = 0;
-   }
-
-   ///
-   int selectLeave();
-
-   ///
-   SoPlex::Id selectEnter();
-
-
+   virtual SoPlex::Id selectEnter();
    ///
    virtual void addedVecs (int n);
    ///
    virtual void addedCoVecs(int n);
-
-
    ///
    virtual void removedVec(int i);
    ///
@@ -102,30 +79,9 @@ public:
    virtual void removedVecs(const int perm[]);
    ///
    virtual void removedCoVec(int i);
-
-
    ///
-   void setType(SoPlex::Type tp);
-   ///
-   void setRep(SoPlex::Representation rep);
-   ///
-   void left4(int, SoPlex::Id)
-   {}
-   ///
-   void entered4(SoPlex::Id, int)
-   {}
-   ///
-   int isConsistent() const;
-
-
-protected:
-   /// compute weights for columns.
-   virtual void computeCP(int start, int end);
-   /// compute weights for rows.
-   virtual void computeRP(int start, int end);
+   virtual bool isConsistent() const;
 };
-
-
 } // namespace soplex
 #endif // _SPXWEIGHTPR_H_
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.h,v 1.8 2001/12/25 14:25:55 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.h,v 1.9 2002/01/04 17:31:39 bzfkocht Exp $"
 
 /**@file  slufactor.h
  * @brief Sparse LU factorization.
@@ -197,7 +197,7 @@ public:
    */
    Vector& zeroVec() //const
    {
-      return vec; //((SLUFactor*)this)->vec;
+      return vec; 
    }
 
    /// prints the LU factorization to stdout.

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: didxset.h,v 1.6 2001/12/28 14:55:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: didxset.h,v 1.7 2002/01/04 17:31:38 bzfkocht Exp $"
 
 /**@file  didxset.h
  * @brief Dymnamic index set.
@@ -44,7 +44,8 @@ namespace soplex
 class DIdxSet : public IdxSet
 {
 private:
-   int*& indexMem();  ///< points to the allocated memory
+   /// make member from IdxSet unavailable.
+   int*& indexMem();  
 
    /// no assignment operator.
    /** The assignment operator for IdxSet needed in the public implementation
