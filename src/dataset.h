@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.23 2002/02/11 15:32:52 bzfpfend Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.24 2002/03/11 11:41:56 bzfkocht Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -89,11 +89,11 @@ protected:
    struct Item
    {
       DATA data;       ///< data element
-      int info;        ///< element number. info \f$\in\f$ [0,thesize-1] 
+      int  info;       ///< element number. info \f$\in\f$ [0,thesize-1] 
                        ///< iff element is used
    }* theitem;         ///< array of elements in the #DataSet
 
-   DataKey* thekey;        ///< #DataKey::idx%s of elements
+   DataKey* thekey;    ///< #DataKey::idx%s of elements
 
    int themax;         ///< length of arrays #theitem and #thekey
    int thesize;        ///< highest used element in #theitem
@@ -109,79 +109,62 @@ public:
     */
    //@{
    /// adds an element.
-   /**@return 0 on success and non-zero, if an error occured.
-    */
-   int add(DataKey& newkey, const DATA& item)
+   void add(DataKey& newkey, const DATA& item)
    {
       DATA* data = create(newkey);
-      if (data == 0)
-         return 1;
-      /**@todo patch suggests: (*data) = item */
-      memcpy(data, &item, sizeof(*data));
-      return 0;
+
+      assert(data != 0);
+
+      *data = item;
    }
    /// adds element \p item.
    /**@return 0 on success and non-zero, if an error occured.
     */
-   int add(const DATA& item)
+   void add(const DATA& item)
    {
       DATA* data = create();
-      if (data == 0)
-         return 1;
-      memcpy(data, &item, sizeof(*data));
-      return 0;
+
+      assert(data != 0);
+
+      *data = item;
    }
 
    /// add several items.
-   /**@return 0 on success and non-zero, if an error occured.
-    *
-    * @todo The add-methods for multiple items ignore the return value 
-    *       of the standard add-methods; they should return a non-zero, 
-    *       if one of the add's failed! 
-    */
-   int add(DataKey newkey[], const DATA* item, int n)
+   void add(DataKey newkey[], const DATA* item, int n)
    {
-      assert(n >= 0);
-      if (num() + n > max())
-         return 1;
+      assert(n         >= 0);
+      assert(num() + n <= max());
+
       for (int i = 0; i < n; ++i)
          add(newkey[i], item[i]);
-      return 0;
    }
 
    /// adds \p n elements from \p items.
-   /**@return 0 on success and non-zero, if an error occured.
-    */
-   int add(const DATA* items, int n)
+   void add(const DATA* items, int n)
    {
-      assert(n >= 0);
-      if (num() + n > max())
-         return 1;
+      assert(n         >= 0);
+      assert(num() + n <= max());
+
       for (int i = 0; i < n; ++i)
          add(items[i]);
-      return 0;
    }
 
    /// adds several new items.
-   int add(DataKey newkey[], const DataSet < DATA > & set)
+   void add(DataKey newkey[], const DataSet < DATA > & set)
    {
-      if (num() + set.num() > max())
-         return 1;
+      assert(num() + set.num() <= max());
+
       for (int i = 0; i < set.num(); ++i)
          add(newkey[i], set[i]);
-      return 0;
    }
 
    /// adds all elements of \p set.
-   /**@return 0 on success and non-zero, if an error occured.
-    */
-   int add(const DataSet < DATA > & set)
+   void add(const DataSet < DATA > & set)
    {
-      if (num() + set.num() > max())
-         return 1;
+      assert(num() + set.num() <= max());
+
       for (int i = 0; i < set.num(); ++i)
          add(set[i]);
-      return 0;
    }
 
    /// creates new data element in #DataSet.
@@ -190,7 +173,7 @@ public:
    DATA* create(DataKey& newkey)
    {
       if (num() >= max())
-         return 0;
+         ABORT();
 
       if (firstfree != -themax - 1)
       {
@@ -545,10 +528,9 @@ public:
       , thesize( old.thesize )
       , thenum ( old.thenum )
    {
-      if (old.firstfree == -old.themax - 1)
-         firstfree = -themax - 1;
-      else
-         firstfree = old.firstfree;
+      firstfree = (old.firstfree == -old.themax - 1)
+         ? -themax - 1
+         : old.firstfree;
 
       spx_alloc(theitem, themax);
       spx_alloc(thekey, themax);

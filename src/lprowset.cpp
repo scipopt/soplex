@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.cpp,v 1.14 2002/03/03 13:50:32 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprowset.cpp,v 1.15 2002/03/11 11:41:56 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -60,6 +60,7 @@ void LPRowSet::add(const LPRowSet& p_set)
 void LPRowSet::add(DataKey nkey[], const LPRowSet& p_set)
 {
    int i = num();
+ 
    add(p_set);
 
    for (int j = 0; i < num(); ++i, ++j)

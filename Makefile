@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.37 2002/03/10 10:00:59 bzfkocht Exp $
+# $Id: Makefile,v 1.38 2002/03/11 11:41:55 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -92,10 +92,6 @@ LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
 
 $(BINARY):	_$(OBJDIR) _$(BINDIR) $(OBJXXX) $(LIBRARY) 
 		$(CXX) $(CXXFLAGS) $(OBJXXX) \
-		-L$(LIBDIR) -l$(TARGET) $(LDFLAGS) -o $@
-
-$(BINDIR)/lpconv: $(OBJDIR)/lpconv.o $(LIBRARY)
-		$(CXX) $(CXXFLAGS) $(OBJDIR)/lpconv.o \
 		-L$(LIBDIR) -l$(TARGET) $(LDFLAGS) -o $@
 
 $(LIBRARY):	_$(LIBDIR) $(LIBXXX) 

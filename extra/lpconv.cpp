@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpconv.cpp,v 1.1 2002/03/10 10:00:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpconv.cpp,v 1.2 2002/03/11 11:41:56 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -45,11 +45,13 @@ int main(int argc, char **argv)
    "[options] input-file output-file\n\n"
    "          input-file can be either in MPS or LPF format\n\n"
    "options:  (*) indicates default\n" 
-   " -v        show program version\n"
+   " -vLevel   set verbosity Level [0-3], default 1\n"
+   " -V        show program version\n"
    " -h        show this help\n"
    ;
 
    int verbose = 1;
+   int optidx;
 
    for(optidx = 1; optidx < argc; optidx++)
    {
@@ -59,6 +61,9 @@ int main(int argc, char **argv)
       switch(argv[optidx][1])
       {
       case 'v' :
+         verbose = atoi(&argv[optidx][2]);
+         break;
+      case 'V' :
          std::cout << banner << std::endl;
          exit(0);
       case 'h' :
@@ -72,7 +77,7 @@ int main(int argc, char **argv)
    }
    if ((argc - optidx) < 2)
    {
-      std::cerr << argv[0] << ":" << usage << std::endl;
+      std::cerr << "usage: " << argv[0] << " " << usage << std::endl;
       exit(0);
    }
    const char* inpfile  = argv[optidx];
@@ -92,7 +97,7 @@ int main(int argc, char **argv)
       std::cerr << "Can't open file: " << inpfile << std::endl;
       exit(1);
    }
-   if (!lp.read(ifile, rownames, colnames, intvars))
+   if (!lp.read(ifile, &rownames, &colnames, &intvars))
    {
       std::cerr << "Error while reading file: " << inpfile << std::endl;
       exit(1);
@@ -105,7 +110,7 @@ int main(int argc, char **argv)
       std::cerr << "Can't open file: " << outfile << std::endl;
       exit(1);
    }
-   lp.writeMPS(ofile, rownames, colnames, intvars);
+   lp.writeMPS(ofile, &rownames, &colnames, &intvars);
 
    return 0;
 }

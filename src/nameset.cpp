@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.cpp,v 1.19 2002/03/06 10:28:52 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.cpp,v 1.20 2002/03/11 11:41:56 bzfkocht Exp $"
 
 #include <string.h>
 #include "spxdefines.h"
@@ -85,7 +85,6 @@ void NameSet::add(DataKey p_key[], const NameSet& p_set)
    }
 }
 
-
 void NameSet::remove(const char *str)
 {
    const Name nam(str);
@@ -126,8 +125,6 @@ void NameSet::clear()
    list.clear();
    memused = 0;
 }
-
-
 
 void NameSet::reMax(int newmax)
 {

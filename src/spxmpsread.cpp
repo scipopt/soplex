@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.22 2002/03/06 10:28:52 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.23 2002/03/11 11:41:56 bzfkocht Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.
@@ -50,7 +50,7 @@ static void readName(MPSInput& mps)
       mps.setProbName((mps.field1() == 0) ? "_MPS_" : mps.field1());
 
       VERBOSE2({ std::cout << "Problem name   : " << mps.probName()
-                              << std::endl; });
+                           << std::endl; });
  
       // This hat to be a new section
       if (!mps.readLine() || (mps.field0() == 0))
@@ -301,8 +301,8 @@ static void readRhs(
    {
       if (mps.field0() != 0)
       {
-         VERBOSE2({ std::cout << "RHS name       : " << rhsname
-                                 << std::endl; });
+         VERBOSE2({ std::cout << "RHS name       : " << rhsname 
+                              << std::endl; });
 
          if (!strcmp(mps.field0(), "RANGES"))
             mps.setSection(MPSInput::RANGES);
@@ -376,7 +376,7 @@ static void readRanges(
       if (mps.field0() != 0)
       {
          VERBOSE2({ std::cout << "Range name     : " << rngname
-                                 << std::endl; });
+                              << std::endl; });
 
          if (!strcmp(mps.field0(), "BOUNDS"))
             mps.setSection(MPSInput::BOUNDS);
@@ -484,7 +484,7 @@ static void readBounds(
       if (mps.field0() != 0)
       {
          VERBOSE2({ std::cout << "Bound name     : " << bndname
-                                 << std::endl; });
+                              << std::endl; });
 
          if (strcmp(mps.field0(), "ENDATA"))
             break;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.h,v 1.16 2002/03/06 10:28:52 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.h,v 1.17 2002/03/11 11:41:56 bzfkocht Exp $"
 
 /**@file  nameset.h
  * @brief Set of strings.
@@ -224,7 +224,7 @@ public:
    ///
    void add(const NameSet& set);
    /// adds all names in \p set to #NameSet.
-   void add(DataKey key[], const NameSet& set);
+   void add(DataKey key[], const NameSet& nset);
    //@}
 
 

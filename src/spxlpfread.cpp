@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.25 2002/03/10 10:00:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.26 2002/03/11 11:41:56 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -308,7 +308,7 @@ static Real readInfinity(char*& pos)
 
    Real sense = (*pos == '-') ? -1.0 : 1.0;
 
-   hasKeyword(pos, "inf[inity]");
+   hasKeyword(++pos, "inf[inity]");
 
    return sense * infinity;
 }
@@ -578,7 +578,7 @@ bool SPxLP::readLPF(
             if (isValue(pos))
             {
                val = isInfinity(pos) ? readInfinity(pos) : readValue(pos);
-               
+
                if (!isSense(pos))
                   goto syntax_error;
 
@@ -622,7 +622,7 @@ bool SPxLP::readLPF(
                   goto syntax_error;
                
                val = isInfinity(pos) ? readInfinity(pos) : readValue(pos);
-               
+
                if (sense == '<') 
                   cset.upper(colidx) = val;
                else if (sense == '>')
@@ -676,14 +676,14 @@ bool SPxLP::readLPF(
    addRows(rset); 
    assert(isConsistent());
 
- syntax_error:
+syntax_error:
    if (finished)
-     {
-       VERBOSE2({ std::cout << "Finished reading " << lineno
-			       << " lines" << std::endl; });
-     }
+   {
+      VERBOSE2({ std::cout << "Finished reading " << lineno
+                           << " lines" << std::endl; });
+   }
    else
-     std::cerr << "Syntax error in line " << lineno << std::endl;
+      std::cerr << "Syntax error in line " << lineno << std::endl;
 
    if (p_cnames == 0)
       delete cnames;

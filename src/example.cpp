@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.33 2002/03/10 10:00:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.34 2002/03/11 11:41:56 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -108,7 +108,8 @@ int main(int argc, char **argv)
    " -lSec     set timelimit to Sec seconds\n"
    " -dDelta   set maximal allowed bound violation to Delta\n"
    " -zZero    set zero tolerance to Zero\n\n"
-   " -v        show program version\n"
+   " -vLevel   set verbosity Level [0-3], default 1\n"
+   " -V        show program version\n"
    " -h        show this help\n"
    "Simplifier:         Starter:        Pricer:           Ratiotester:\n"
    " -s0  none           -c0  none*      -p0  Textbook     -t0  Textbook\n" 
@@ -181,6 +182,9 @@ int main(int argc, char **argv)
          ratiotest = atoi(&argv[optidx][2]);
          break;
       case 'v' :
+         verbose = atoi(&argv[optidx][2]);
+         break;
+      case 'V' :
          std::cout << banner << std::endl;
          exit(0);
       case 'x' :
@@ -200,7 +204,7 @@ int main(int argc, char **argv)
    }
    if ((argc - optidx) < 1)
    {
-      std::cerr << argv[0] << ":" << usage << std::endl;
+      std::cerr << "usage: " << argv[0] << " " << usage << std::endl;
       exit(0);
    }
    filename  = argv[optidx];

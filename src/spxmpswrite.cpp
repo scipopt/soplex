@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpswrite.cpp,v 1.3 2002/03/10 10:00:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpswrite.cpp,v 1.4 2002/03/11 11:41:56 bzfkocht Exp $"
 
 /**@file  spxmpswrite.cpp
  * @brief Write LP as MPS format file.
@@ -174,7 +174,8 @@ void SPxLP::writeMPS(
       bool is_intrun = has_intvars && (j == 1);
 
       if (is_intrun)
-         p_output << "    MARK0001  'MARKER'                 'INTORG'";
+         p_output << "    MARK0001  'MARKER'                 'INTORG'" 
+                  << std::endl;
 
       for(i = 0; i < nCols(); i++)
       {
@@ -208,7 +209,8 @@ void SPxLP::writeMPS(
                "MINIMIZE", -maxObj(i));
       }
       if (is_intrun)
-         p_output << "    MARK0001  'MARKER'                 'INTEND'";
+         p_output << "    MARK0001  'MARKER'                 'INTEND'"
+                  << std::endl;
    }
    // --- RHS Section ---
    p_output << "RHS" << std::endl;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.cpp,v 1.18 2002/03/03 13:50:35 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.cpp,v 1.19 2002/03/11 11:41:56 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -68,10 +68,13 @@ void SVSet::add(const SVSet& pset)
 
 void SVSet::add(DataKey nkey[], const SVSet& pset)
 {
-   int i, n;
    add(pset);
-   for (n = pset.size(), i = size() - 1; --n; --i)
-      nkey[n] = key(i);
+
+   int i = size();
+   int n = pset.size();
+
+   while(n > 0)
+      nkey[--n] = key(--i);
 }
 
 SVector* SVSet::create(int idxmax)
