@@ -13,39 +13,20 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.h,v 1.2 2001/11/06 23:31:05 bzfkocht Exp $"
-
+#pragma ident "@(#) $Id: spxredundantsm.h,v 1.3 2001/11/22 08:57:23 bzfkocht Exp $"
 
 #ifndef _SPXREDUNDANTSM_H_
 #define _SPXREDUNDANTSM_H_
 
-//@ ----------------------------------------------------------------------------
-/*  \Section{Imports}
-    Import required system include files ...
- */
 #include <assert.h>
-
-
-/*  ... and class header files
- */
 
 #include "spxsimplifier.h"
 
 namespace soplex
 {
-
-
-
-
-
-
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
-
 /** Remove redundant row and columns.
-    This \Ref{SPxSimplifier} thries to eliminat redundant rows or columns from
-    its loaded \Ref{SPxLP}.
+    This #SPxSimplifier thries to eliminat redundant rows or columns from
+    its loaded #SPxLP.
  */
 class SPxRedundantSM : public SPxSimplifier
 {
@@ -54,15 +35,6 @@ private:
    SPxLP* lp;
 
 public:
-   ///
-   void load(SPxLP*);
-   ///
-   void unload();
-   ///
-   SPxLP* loadedLP() const
-   {
-      return lp;
-   }
    ///
    int simplify();
    ///
@@ -73,7 +45,6 @@ public:
       return x + lp->spxSense()*delta;
    }
 };
-
 } // namespace soplex
 #endif // _SPXREDUNDANTSM_H_
 

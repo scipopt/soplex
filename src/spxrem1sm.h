@@ -13,57 +13,25 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxrem1sm.h,v 1.2 2001/11/06 23:31:05 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxrem1sm.h,v 1.3 2001/11/22 08:57:24 bzfkocht Exp $"
 
 
 #ifndef _SPXREM1SM_H_
 #define _SPXREM1SM_H_
 
-//@ ----------------------------------------------------------------------------
-/*  \Section{Imports}
-    Import required system include files ...
- */
 #include <assert.h>
-
-
-/*  ... and class header files
- */
 
 #include "spxsimplifier.h"
 
 namespace soplex
 {
-
-
-
-
-
-
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
-
 /** LP simplifier for removing singletons.
-    This \Ref{SPxSimplifier} removes rows and possibly columns containing one
+    This #SPxSimplifier removes rows and possibly columns containing one
     nonzero value only.
  */
 class SPxRem1SM : public SPxSimplifier
 {
-private:
-   SPxLP* lp;
-   double delta;
-
-protected:
 public:
-   ///
-   void load(SPxLP*);
-   ///
-   void unload();
-   ///
-   SPxLP* loadedLP() const
-   {
-      return lp;
-   }
    ///
    int simplify();
    ///
@@ -71,10 +39,10 @@ public:
    ///
    double value(double x)
    {
+      /**@todo Stimmt das und warum ist es anders als bei den anderen? */
       return x - lp->spxSense()*delta;
    }
 };
-
 } // namespace soplex
 #endif // _SPXREM1SM_H_
 

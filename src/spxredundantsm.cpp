@@ -13,39 +13,16 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.4 2001/11/12 16:42:08 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.5 2001/11/22 08:57:23 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <stdlib.h>
 #include <iostream>
 
-
-/*  and class header files
- */
 #include "spxredundantsm.h"
-
-
 #include "dataarray.h"
 
 namespace soplex
 {
-
-//@ ----------------------------------------------------------------------------
-void SPxRedundantSM::load(SPxLP* l)
-{
-   lp = l;
-   delta = 0;
-}
-
-void SPxRedundantSM::unload()
-{
-   lp = 0;
-}
-
 int SPxRedundantSM::simplify()
 {
    int num, j, i, k;
@@ -293,7 +270,6 @@ int SPxRedundantSM::simplify()
       std::cerr << "SPxRedundantSM:\tremoved " << num << " row(s)\n";
       assert(lp->isConsistent());
    }
-
    return 0;
 }
 

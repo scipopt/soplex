@@ -13,46 +13,24 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxaggregatesm.h,v 1.2 2001/11/06 23:31:03 bzfkocht Exp $"
-
+#pragma ident "@(#) $Id: spxaggregatesm.h,v 1.3 2001/11/22 08:57:22 bzfkocht Exp $"
 
 #ifndef _SPXAGGREGATESM_H_
 #define _SPXAGGREGATESM_H_
 
-//@ ----------------------------------------------------------------------------
-/*  \Section{Imports}
-    Import required system include files ...
- */
 #include <assert.h>
-
-
-/*  ... and class header files
- */
 
 #include "spxsimplifier.h"
 
 namespace soplex
 {
-
-
-
-
-
-
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
-
 /** Remove redundant row and columns.
+    !!! Das ist vermutlich falsch.
     This \Ref{SPxSimplifier} thries to eliminat redundant rows or columns from
     its loaded \Ref{SPxLP}.
  */
 class SPxAggregateSM : public SPxSimplifier
 {
-private:
-   double delta;
-   SPxLP* lp;
-
 protected:
    int eliminate(const SVector& row, double b);
 
@@ -64,13 +42,6 @@ public:
    ///
    void load(SPxLP*);
    ///
-   void unload();
-   ///
-   SPxLP* loadedLP() const
-   {
-      return lp;
-   }
-   ///
    int simplify();
    ///
    void unsimplify();
@@ -79,7 +50,6 @@ public:
    {
       return x + lp->spxSense()*delta;
    }
-
    int isConsistent() const
    {
       return 1;

@@ -13,21 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeneralsm.h,v 1.2 2001/11/06 23:31:04 bzfkocht Exp $"
-
+#pragma ident "@(#) $Id: spxgeneralsm.h,v 1.3 2001/11/22 08:57:23 bzfkocht Exp $"
 
 #ifndef _SPXGENERALSM_H_
 #define _SPXGENERALSM_H_
 
-//@ ----------------------------------------------------------------------------
-/*  \Section{Imports}
-    Import required system include files ...
- */
 #include <assert.h>
-
-
-/*  ... and class header files
- */
 
 #include "spxredundantsm.h"
 #include "spxaggregatesm.h"
@@ -36,26 +27,17 @@
 
 namespace soplex
 {
-
-
-
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
-
 /** General LP preprocessing.
-    This \Ref{SPxSimplifier} iterativly applies a number of preprocessors to its
-    loaded \Ref{SPxLP}.
+    This #SPxSimplifier iterativly applies a number of preprocessors to its
+    loaded #SPxLP.
  */
 class SPxGeneralSM : public SPxSimplifier
 {
 private:
-   SPxRem1SM rem1;
+   SPxRem1SM      rem1;
    SPxRedundantSM redu;
    SPxAggregateSM aggr;
-   SPxScale scale;
-
-   SPxLP* lp;
+   SPxScale       scale;
 
 public:
    ///
@@ -70,14 +52,14 @@ public:
    virtual void unsimplify();
    ///
    virtual double value(double x);
-   ///
+
+   /// default constructor.
    SPxGeneralSM()
    {}
-  ;
-
+  
+   /// destructor.
    virtual ~SPxGeneralSM()
-   {}
-  ;
+   {}  
 };
 
 } // namespace soplex

@@ -13,43 +13,16 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxrem1sm.cpp,v 1.3 2001/11/09 13:25:23 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxrem1sm.cpp,v 1.4 2001/11/22 08:57:23 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <stdlib.h>
 #include <iostream>
 
-
-/*  and class header files
- */
 #include "spxrem1sm.h"
-
-
 #include "dataarray.h"
 
 namespace soplex
 {
-
-
-
-
-//@ ----------------------------------------------------------------------------
-
-void SPxRem1SM::load(SPxLP* l)
-{
-   lp = l;
-   delta = 0;
-}
-
-void SPxRem1SM::unload()
-{
-   lp = 0;
-}
-
 int SPxRem1SM::simplify()
 {
    int cont, num, j, i;
@@ -200,7 +173,7 @@ int SPxRem1SM::simplify()
          assert(lp->isConsistent());
       }
    }
-   while (cont);
+   while(cont);
 
    return 0;
 }

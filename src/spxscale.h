@@ -13,60 +13,32 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscale.h,v 1.2 2001/11/06 23:31:05 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscale.h,v 1.3 2001/11/22 08:57:24 bzfkocht Exp $"
 
 #ifndef _SPXSCALE_H_
 #define _SPXSCALE_H_
 
-
-//@ ----------------------------------------------------------------------------
-/*      \Section{Imports}
-    Import required system include files
- */
 #include <assert.h>
-
-
-/*  and class header files
- */
 
 #include "spxsimplifier.h"
 #include "dataarray.h"
 
 namespace soplex
 {
-
-
-
-
-
-
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
-
 /** LP scaling.
-    This #SPxSimplifier# implementation performs simple scaling of the LPs rows
+    This #SPxSimplifier implementation performs simple scaling of the LPs rows
     and columns.
  */
 class SPxScale : public SPxSimplifier
 {
-   SPxLP* lp;
    DataArray < double > colscale;
    DataArray < double > rowscale;
-   int rowScale;
+   int                  rowScale;
    
 public:
    ///
-   virtual void load(SPxLP*);
-   ///
-   virtual void unload();
-   ///
-   virtual SPxLP* loadedLP() const
-   {
-      return lp;
-   }
-   ///
    virtual int simplify();
+
    ///
    virtual void unsimplify();
 
@@ -76,16 +48,16 @@ public:
       return colscale.isConsistent()
              && rowscale.isConsistent();
    }
-   ///
-   SPxScale() : rowScale(1)
+
+   /// default constructor.
+   SPxScale() 
+      : rowScale(1)
    {}
 
+   /// destructor.
    virtual ~SPxScale()
    {}
-
 };
-
-
 } // namespace soplex
 #endif // _SPXSCALE_H_
 

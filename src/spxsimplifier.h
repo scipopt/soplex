@@ -13,85 +13,85 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsimplifier.h,v 1.2 2001/11/06 23:31:05 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsimplifier.h,v 1.3 2001/11/22 08:57:24 bzfkocht Exp $"
 
+/**@file  spxsimplifier.h
+ * @brief LP simplification base class.
+ */
 #ifndef _SPXSIMPLIFIER_H_
 #define _SPXSIMPLIFIER_H_
 
-
-//@ ----------------------------------------------------------------------------
-/*      \Section{Imports}
-    Import required system include files
- */
 #include <assert.h>
-
-
-/*  and class header files
- */
 
 #include "spxlp.h"
 
 namespace soplex
 {
+/**@brief   LP simplification abstract base class.
+   @ingroup Algo
 
-
-
-
-
-
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
-
-/** LP simplification base class.
-    Instances of classes derived from #SPxSimplifier# may be loaded to #SoPlex# in
-    order to simplify LPs before solving them. #SoPlex# will #load()# itself to
-    the #SPxSimplifier# and then call #simplify()#. Generally any #SPxLP# can be
-    loaded to a #SPxSimplifier# for #simplify()#ing it. The simplification can
-    be undone by calling #unsimplify()#.
- */
+   Instances of classes derived from #SPxSimplifier may be loaded to #SoPlex in
+   order to simplify LPs before solving them. #SoPlex# will #load()# itself to
+   the #SPxSimplifier and then call #simplify(). Generally any #SPxLP can be
+   loaded to a #SPxSimplifier for #simplify()%ing it. The simplification can
+   be undone by calling #unsimplify().
+*/
 class SPxSimplifier
 {
-private:
 protected:
-public:
-   ///
-   virtual void load(SPxLP*) = 0;
-   ///
-   virtual void unload() = 0;
-   ///
-   virtual SPxLP* loadedLP() const = 0;
+   SPxLP* lp;     ///< LP to work on.
+   double delta;  ///< Offset for the objective function.
 
-   /** Simplify loaded #SPxLP#. It returns
-       \begin{description}
-       \item[0]     if this could be done,
-       \item[1]     if the LP was detected to be unbounded or
-       \item[-1]    if the LP was detected to be infeasible.
-       \end{description}
+public:
+   /// Load the #SPxLP to be simplified.
+   virtual void load(SPxLP* p_lp)
+   {
+      assert(lp != 0);
+
+      lp    = p_lp;
+      delta = 0;
+   }
+   /// Unload the #SPxLP.
+   virtual void unload()
+   {
+      lp = 0;
+   }
+
+   /// Return the loaded #SPxLP.
+   virtual SPxLP* loadedLP() const
+   {
+      return lp;
+   }
+
+   /** Simplify loaded #SPxLP. It returns
+    *  <TABLE>
+    *  <TR><TD> 0 </TD><TD>if this could be done,</TD></TR>
+    *  <TR><TD> 1 </TD><TD>if the LP was detected to be unbounded or</TD></TR>
+    *  <TR><TD>-1 </TD><TD>if the LP was detected to be infeasible.</TD></TR>
+    *  </TABLE>
     */
    virtual int simplify() = 0;
-   ///
+
+   /// Unsimplify the loaded #SPxLP.
    virtual void unsimplify() = 0;
 
-   /** objective value for unsimplified LP.
-       The simplifyed LP may show other objective values than the
-       original, if a constant part has been removed from the LP.
-       This method returns the value for the original LP, for a
-       value #x# of the simplified LP.
+   /// objective value for unsimplified LP.
+   /** The simplifyed LP may show other objective values than the
+    *  original, if a constant part has been removed from the LP.
+    *  This method returns the value for the original LP, for a
+    *  value \p x of the simplified LP.
     */
    virtual double value(double x)
    {
-      return x;
+      return x + delta;
    }
 
-   ///
+   /// consistency check
    int isConsistent() const
    {
       return 1;
    }
 };
-
-
 } // namespace soplex
 #endif // _SPXSIMPLIFIER_H_
 
@@ -103,3 +103,4 @@ public:
 //Emacs indent-tabs-mode:nil
 //Emacs End:
 //-----------------------------------------------------------------------------
+

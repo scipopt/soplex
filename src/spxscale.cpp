@@ -13,41 +13,24 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscale.cpp,v 1.3 2001/11/13 21:01:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscale.cpp,v 1.4 2001/11/22 08:57:24 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <assert.h>
 #include <iostream>
 
-
-/*  and class header files
- */
 #include "spxscale.h"
 
 namespace soplex
 {
-
-
-//@ ----------------------------------------------------------------------------
-void SPxScale::load(SPxLP* spx)
-{
-   lp = spx;
-}
-
-void SPxScale::unload()
-{
-   lp = 0;
-}
-
 int SPxScale::simplify()
 {
    assert(lp != 0);
-   double x, y;
-   int i, j;
+   assert(lp->isConsistent());
+
+   double x;
+   double y;
+   int    i; 
+   int    j;
 
    rowscale.reSize(lp->nRows());
    colscale.reSize(lp->nCols());
@@ -171,8 +154,8 @@ int SPxScale::simplify()
             vec.value(j) *= colscale[vec.index(j)];
       }
    }
-
    assert(lp->isConsistent());
+
    return 0;
 }
 
@@ -181,7 +164,9 @@ void SPxScale::unsimplify()
    assert(lp != 0);
    assert(lp->isConsistent());
 
-   int i, j;
+   int i;
+   int j;
+
    for (i = lp->nRows(); i--;)
    {
       SVector& vec = lp->rowVector(i);

@@ -13,42 +13,24 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.3 2001/11/09 13:25:19 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.4 2001/11/22 08:57:22 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <stdlib.h>
 #include <iostream>
 
-
-/*  and class header files
- */
 #include "spxaggregatesm.h"
-
-
 #include "dataarray.h"
 #include "ssvector.h"
 #include "sorter.h"
 
 namespace soplex
 {
-
-
-//@ ----------------------------------------------------------------------------
 void SPxAggregateSM::load(SPxLP* l)
 {
-   lp = l;
-   delta = 0;
-   maxFill = 10;
+   lp        = l;
+   delta     = 0;
+   maxFill   = 10;
    stability = 0.01;
-}
-
-void SPxAggregateSM::unload()
-{
-   lp = 0;
 }
 
 struct RowCnt
