@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: solve.cpp,v 1.21 2002/12/16 07:29:47 bzfkocht Exp $"
+#pragma ident "@(#) $Id: solve.cpp,v 1.22 2003/01/20 17:46:58 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -560,7 +560,7 @@ void CLUFactor::solveRight2(
 }
 
 /*****************************************************************************/
-
+#if 0
 void CLUFactor::solveUleft(Real* p_work, Real* vec)
 {
    METHOD( "CLUFactor::solveUleft()" );
@@ -596,6 +596,33 @@ void CLUFactor::solveUleft(Real* p_work, Real* vec)
       }
    }
 }
+#else
+void CLUFactor::solveUleft(Real* p_work, Real* vec)
+{
+   METHOD( "CLUFactor::solveUleft()" );
+
+   for (int i = 0; i < thedim; ++i)
+   {
+      int  c  = col.orig[i];
+      int  r  = row.orig[i];
+      Real x  = vec[c];
+      vec[c]  = 0.0;
+
+      assert(fabs(x) < infinity);
+
+      if (x != 0.0)
+      {
+         x        *= diag[r];
+         p_work[r] = x;
+
+         int end = u.row.start[r] + u.row.len[r];
+
+         for(int m = u.row.start[r]; m < end; m++)
+            vec[u.row.idx[m]] -= x * u.row.val[m];
+      }
+   }
+}
+#endif
 
 void CLUFactor::solveUleft2(
    Real* p_work1, Real* vec1, Real* p_work2, Real* vec2)
