@@ -13,24 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: docupdate.cpp,v 1.2 2001/11/06 23:31:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: docupdate.cpp,v 1.3 2001/11/23 14:34:55 bzfbleya Exp $"
 
 
 namespace soplex
 {
-
-/*      \Section{C functions}
-    For compiler optimization, the following functions are implemented in C.
- */
-void UpdateUpdateVector
-(
-   double* res, double x,
-   int n, const int* idx, const double* val
-)
-{
-   while (--n >= 0)
-      res[idx[n]] += x * val[idx[n]];
-}
+#warning THIS FILE CAN BE REMOVED FROM CVS,
+#warning C-FUNCTION MOVED TO vector_c.cpp
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

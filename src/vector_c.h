@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector_c.h,v 1.3 2001/11/23 12:56:37 bzfbleya Exp $"
+#pragma ident "@(#) $Id: vector_c.h,v 1.4 2001/11/23 14:34:55 bzfbleya Exp $"
 
 /**@file  vector_v.h
  * @brief Algebraic functions for vectors.
@@ -62,6 +62,11 @@ double MultiplyVectorSSVector(const double* dense, int n,
 */
 double MultiplyVectorVector(const double* v1, int dim,
                             const double* v2);
+/**@brief   C-implementation of UpdateVector::update
+   @ingroup Algebra 
+*/
+void UpdateUpdateVector(double*, double, int, const int*, const double*);
+
 //@}
 
 } // namespace soplex

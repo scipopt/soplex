@@ -13,8 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector.h,v 1.2 2001/11/06 23:31:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vector.h,v 1.3 2001/11/23 14:34:55 bzfbleya Exp $"
 
+/**@file  vector.h
+ * @brief Dense vector for linear algebra.
+ */
 #ifndef _VECTOR_H_
 #define _VECTOR_H_
 
@@ -34,76 +37,76 @@ class SSVector;
 class SubSVector;
 class IdxSet;
 
-/** Dense Vector.
+/**@brief   Dense vector
+   @ingroup Algebra
  
-    Class #Vector# provides dense linear algebra vectors. It does not
-    provide memory management for the array of values. Instead, the
+    Class Vector provides dense linear algebra vectors. It does not
+    provide memory management for the %array of values. Instead, the
     constructor requires a pointer to a memory block large enough to
-    fit the desired dimension of #double# values.
+    fit the desired dimension of double values.
  
-    After construction, the values of a #Vector# can be accessed with
-    the subscript operator.  A #Vector# ensures that no access to
-    values bejond the specified dimension is done. However, this
-    feature can be turned off, if compiled with #-DNDEBUG#.
+    After construction, the values of a Vector can be accessed with
+    the subscript operator[]() .  Safety is provided by
+    - checking of array bound when accessing elements with the
+      subscript operator[]() (only when compiled without \c -DNDEBUG).
  
-    A #Vector# is distinguished from a simple array of #double#s, by
-    providing a set of mathematical operations. Since #Vector# does
+    A Vector is distinguished from a simple %array of double%s, by
+    providing a set of mathematical operations. Since Vector does
     not provide any memory management features, no operations are
     available that would require allocation of temporary memory
-    space. Here is a list of provided operations, where the examples
-    asume that #Vector a, b# and #double x# have been declared.
- 
-    \begin{center}
-    \begin{tabular}{lll}
-        Operation   & Description      &                                  \\
-        \hline
-        #-=#        & subtraction      & #a -= b#                         \\
-        #+=#        & addition         & #a += b#                         \\
-        #*#         & scalar product   & #x = a * b#                      \\
-        #*=#        & scaling          & #a *= x#                         \\
-        #maxAbs()#  & infinity norm    & #a.maxAbs()# == $\|a\|_{\infty}$ \\
-        #length()#  & norm             & #a.length()# == $\sqrt(a*a)$ \\
-        #length2()# & squared norm     & #a.length2()# == $a*a$       \\
-        #multAdd()# & add scaled vector& #a.multAdd(b, x)#                \\
-    \end{tabular}
-    \end{center}
- 
-    When using any of these operations, the vector involved must be of
-    the same dimension. For #b# also #SVector b# are allowed, if it
-    does not contain nonzeros with index greater than the dimension of
-    #x#.
-*/
+    space.
 
+   The following mathematical operations are provided by class Vector
+   (Vector \p a, \p b; double \p x): 
+ 
+   <TABLE>
+   <TR><TD>Operation</TD><TD>Description   </TD><TD></TD>&nbsp;</TR>
+   <TR><TD>\c -=    </TD><TD>subtraction   </TD><TD>\c a \c -= \c b </TD></TR>
+   <TR><TD>\c +=    </TD><TD>addition      </TD><TD>\c a \c += \c b </TD></TR>
+   <TR><TD>\c *     </TD><TD>skalar product</TD>
+       <TD>\c x = \c a \c * \c b </TD></TR>
+   <TR><TD>\c *=    </TD><TD>scaling       </TD><TD>\c a \c *= \c x </TD></TR>
+   <TR><TD>maxAbs() </TD><TD>infinity norm </TD>
+       <TD>\c a.maxAbs() == \f$\|a\|_{\infty}\f$ </TD></TR>
+
+   <TR><TD>length() </TD><TD>eucledian norm</TD>
+       <TD>\c a.length() == \f$\sqrt{a^2}\f$ </TD></TR>
+   <TR><TD>length2()</TD><TD>square norm   </TD>
+       <TD>\c a.length2() == \f$a^2\f$ </TD></TR>
+   <TR><TD>multAdd(\c x,\c b)</TD><TD>add scaled vector</TD>
+       <TD> \c a +=  \c x * \c b </TD></TR>
+   </TABLE>
+
+ 
+    When using any of these operations, the vectors involved must be of
+    the same dimension. For \c b also SVector \c b are allowed, if it
+    does not contain nonzeros with index greater than the dimension of
+    \c a.
+*/
 class Vector
 {
-   /* A vector consists of its dimension #dimen# and a pointer to
-    * its values #val#. Both are protected, since derived classes may want
-    * to do some automatic memory management.
-    */
    friend class LP;
    friend Vector& Usolve(Vector&, const SLUFactor&);
    friend Vector& Usolve2(Vector&, Vector&, const SLUFactor&);
 
 protected:
-   /// dimension of vector.
+   /// dimension of vector
    int dimen;
 
-   /** Pointer to values of a vector.
-    *  The memory block pointed to by #val# must at least have size
-    *  #dimen * sizeof(double)#.  
+   /// values of a vector
+   /** The memory block pointed to by val must at least have size
+    *  dimen * sizeof(double).  
     */
    double* val;
 
 public:
-   /**@name Construction/Destruction
-    *  There is no default constructor since the storage for a 
-    *  #Vector# must be provides in any case.
-    */
+   /**@name Construction and assignment */
    //@{
-   /** constructor.
-    *  #Vector#s do not provide their own memory for storing values.
-    *  Instead, it must be passed a memory block #val# at construction. It
-    *  must be large enough to fit at least #dimen# double values.
+   /// construction
+   /** There is no default constructor since the storage for a 
+    *  Vector must be provided externally.
+    *  Storage must be passed as a memory block val at construction. It
+    *  must be large enough to fit at least dimen double values.
     */
    //lint -e1712
    Vector(int p_dimen, double *p_val)
@@ -112,59 +115,82 @@ public:
    {
       assert(dimen >= 0);
    }
-   /// destructor
-   //lint -esym(1540,Vector::val) we do not manage the storage val points to.
-   //~Vector() { }
+   /// Assignment operator.
+   Vector& operator=(const Vector& vec);
+   /// Assignment operator.
+   /** Assigning a SVector to a Vector using operator=()
+    *  will set all values to 0 except the nonzeros of \p vec. 
+    *  This is diffent in method assign().
+    */
+   Vector& operator=(const SVector& vec);
+   /// Assignment operator.
+   /** Assigning a SSVector to a Vector using operator=()
+    *  will set all values to 0 except the nonzeros of \p vec. 
+    *  This is diffent in method assign().
+    */
+   Vector& operator=(const SSVector& vec);
 
+   /// Assign values of \p sv.
+   /** Assigns all nonzeros of \p sv to the vector. 
+    *  All other values remain unchanged.
+   */
+   Vector& assign(const SVector& sv);
+   /// Assign values of \p sv.
+   /** Assigns all nonzeros of \p sv to the vector. 
+    *  All other values remain unchanged.
+    */
+   Vector& assign(const SSVector& sv);
    //@}
-   /**@name Query */
+   
+   /**@name Access */
    //@{
-   /// dimension of vector.
+   /// dimension of vector
    int dim() const
    {
       return dimen;
    }
-   //@}
-
-   /// return #n#-th value.
+   /// return \p n 'th value by reference
    double& operator[](int n)
    {
       assert(n >= 0 && n < dim());
       return val[n];
    }
 
-   /// return #n#-th value.
+   /// return \p n 'th value
    double operator[](int n) const
    {
       assert(n >= 0 && n < dim());
       return val[n];
    }
-   ///
+   //@}
+   /**@name Algebraic methods */
+   //@{   
+   /// vector addition
    Vector& operator+=(const Vector& vec);
-   ///
+   /// vector addition
    Vector& operator+=(const SVector& vec);
-   ///
+   /// vector addition
    Vector& operator+=(const SubSVector& vec);
-   ///
+   /// vector addition
    Vector& operator+=(const SSVector& vec);
 
-   ///
+   /// vector difference
    Vector& operator-=(const Vector& vec);
-   ///
+   /// vector difference
    Vector& operator-=(const SVector& vec);
-   ///
+   /// vector difference
    Vector& operator-=(const SubSVector& vec);
-   ///
+   /// vector difference
    Vector& operator-=(const SSVector& vec);
 
-   /// scaling.
+   /// scaling
    Vector& operator*=(double x);
 
-   ///
+   /// inner product.
    double operator*(const SSVector& v) const;
-   ///
+   /// inner product.
    double operator*(const SVector& v) const;
-   ///
+   /// inner product.
    double operator*(const SubSVector& v) const;
    /// inner product.
    double operator*(const Vector& v) const
@@ -173,39 +199,47 @@ public:
       return MultiplyVectorVector(val, dimen, v.val);
    }
 
-   /// infinity norm of a Vector.
+   /// infinity norm.
    double maxAbs() const;
-   /// euclidian norm of a Vector.
+   /// euclidian norm.
    double length() const;
-   /// squared norm of a Vector.
+   /// squared norm.
    double length2() const;
 
-   ///
+   /// addition of scaled vector
    Vector& multAdd(double x, const SVector& vec);
-   ///
+   /// addition of scaled vector
    Vector& multAdd(double x, const SubSVector& vec);
-   ///
+   /// addition of scaled vector
    Vector& multAdd(double x, const SSVector& svec);
-   /// add scaled vector (#+= x*vec#).
+   ///  addition of scaled vector
    Vector& multAdd(double x, const Vector& vec)
    {
       assert(vec.dim() == dim());
       Vector_MultAddVector(x, dim(), this->get_ptr(), vec.get_const_ptr());
       return *this;
    }
-   /** Conversion to C-style pointer.
-       This function serves for using a #Vector# in an old C
-       function. It returns a pointer to the first value of the array.
-   */
+   //@}
+   /**@name Utilities */
+   //@{
+   /// Conversion to C-style pointer.
+   /** This function serves for using a Vector in an C-style
+    *  function. It returns a pointer to the first value of the array.
+    * 
+    *  @todo check whether this non-const c-style acces should indeed be public
+    */   
    double* get_ptr()
    {
       return val;
    }
+   /// Conversion to C-style pointer.
+   /** This function serves for using a Vector in an C-style
+    *  function. It returns a pointer to the first value of the array.
+    */
    const double* get_const_ptr() const
    {
       return val;
    }
-
    /// output operator.
    friend std::ostream& operator<<(std::ostream& s, const Vector& vec);
 
@@ -219,27 +253,11 @@ public:
          memset(val, 0, dimen*sizeof(double));
    }
 
-   /// zero values given by #idx#.
+   /// set values given by \p idx to 0
    Vector& clear(const IdxSet& idx);
+   //@}
 
-   ///
-   Vector& operator=(const Vector& vec);
-   ///
-   Vector& operator=(const SVector& vec);
-   /** Assignment operator.
-       Assigning a #SVector# or #SSVector# to a #Vector# using the operator
-       will set all values to 0 except the nonzeros of the right handside
-       #SVector#.  This is in constrast to method #assign()#.
-   */
-   Vector& operator=(const SSVector& vec);
 
-   /// assign values of #sv# only.
-   Vector& assign(const SVector& psv);
-   /** Assign values of #sv#.
-       Assigns all nonzeros of #sv# to a vector. All other values remain
-       unchanged.
-   */
-   Vector& assign(const SSVector& sv);
 };
 
 } // namespace soplex

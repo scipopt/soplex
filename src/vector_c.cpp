@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector_c.cpp,v 1.3 2001/11/09 13:25:32 bzfpfend Exp $"
+#pragma ident "@(#) $Id: vector_c.cpp,v 1.4 2001/11/23 14:34:55 bzfbleya Exp $"
 
 #include "vector_c.h"
 
@@ -402,6 +402,15 @@ double MultiplyVectorVector(
       x += (*v1++) * (*v2++);
    return x;
 }
+
+void UpdateUpdateVector(
+   double* res, double x,
+   int n, const int* idx, const double* val)
+{
+   while (--n >= 0)
+      res[idx[n]] += x * val[idx[n]];
+}
+
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

@@ -13,8 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: updatevector.h,v 1.3 2001/11/07 17:31:26 bzfbleya Exp $"
+#pragma ident "@(#) $Id: updatevector.h,v 1.4 2001/11/23 14:34:55 bzfbleya Exp $"
 
+/**@file  vector.h
+ * @brief Dense vector for linear algebra.
+ */
 
 #ifndef _UPDATEVECTOR_H_
 #define _UPDATEVECTOR_H_
@@ -31,9 +34,7 @@ namespace soplex
 
 
 
-extern void UpdateUpdateVector(double*, double, int, const int*, const double*);
 
-//@ ----------------------------------------------------------------------------
 
 /*  \Section{Class Declaration}
     The datastructur of #UpdateVector# is straightforward. It adds to the
