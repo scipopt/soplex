@@ -1,4 +1,4 @@
-$Id: TODO,v 1.52 2002/01/30 16:22:18 bzfkocht Exp $
+$Id: TODO,v 1.53 2002/01/31 08:19:25 bzfkocht Exp $
 
 Diesen Kram mal als @todo's schreiben ;-)
 
@@ -11,8 +11,7 @@ Als unterscheid zu simplifier kommt noch ein
 getObjValue(col) aufruf dazu, auﬂerdem kann dann der scaler
 gleichseitig mit dem simplifiern eingesetzt werden.
 
-
-sed   Copyright 1997-2001 Zib ersetzen durch -2002
+vsolve/solve/update isNotZero() benutzen
 
 openMP insbesondere pricer/ratiotest (compaq,intel)
 

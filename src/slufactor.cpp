@@ -4,7 +4,7 @@
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1997-1999 Roland Wunderling                              */
-/*                  1997-2001 Konrad-Zuse-Zentrum                            */
+/*                  1997-2002 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.17 2002/01/30 14:14:00 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.18 2002/01/31 08:19:27 bzfkocht Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
