@@ -13,96 +13,81 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataarray.h,v 1.6 2001/11/15 16:54:14 bzfpfend Exp $"
+#pragma ident "@(#) $Id: dataarray.h,v 1.7 2001/11/15 22:35:14 bzfkocht Exp $"
 
+/**@file  dataarray.h
+ * @brief Save arrays of data objects.
+ */
 #ifndef _DATAARRAY_H_
 #define _DATAARRAY_H_
 
-
-//@ ----------------------------------------------------------------------------
-/*      \Section{Imports}
-    Import required system include files
- */
 #include <assert.h>
 #include <stdlib.h>
 #include <memory.h>
-#include <iostream>
 #include <malloc.h>
+#include <iostream>
 
 #include "spxalloc.h"
 
 namespace soplex
 {
+/**@brief   Safe arrays of data objects.
+   @ingroup Elementary
 
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
+   Class DataArray provides safe arrays of \ref DataObjects. For general
+   C++ objects (i.e. no data objects) class Array is provided which
+   manages memory in a C++ compliant way.
+ 
+   The elements of an instance of DataArray can be accessed just like
+   ordinary C++ array elements by means of the index operator[](). Safety is
+   provided by
 
-/**@name Data Objects
-    {\em Data Objects} refer to C++ objects that do not allocate any resources,
-    particularly that do not allocate any memory.  This makes them behave just
-    like ordinary C structures, in that both, the copy constructor and
-    assignment operator are equivalent to a memcopy of the memory taken by the
-    object. Examples for data objects are all builtin types such as #int# or
-    #double# or ``simple'' classes such as #complex#.
+    - automatic memory management in constructor and destructor
+      preventing memory leaks
+    - checking of array bounds when accessing elements with the
+      indexing operator[]() (only when compiled without \c -DNDEBUG).
  
-    We distinguish {\em data objects} from general C++ objects that may include
-    some allocation of resources. (Note, that for general C++ objects that do
-    allocate resources, this must be respected by providing apropriate copy
-    constructor and assignment operators.) An example for a general C++ class is
-    class \Ref{DataArray}.
+   Moreover, DataArray%s may easily be extended by #insert%ing or #append%ing
+   elements to the DataArray or shrunken by #remove%ing elements. Method
+   #reSize(int n) resets the DataArray%s length to \p n thereby possibly
+   appending elements or truncating the DataArray to the required size.
  
-    The distingtion between data and general C++ objects becomes relevant when
-    using such objects in container classes such as \Ref{DataArray} or
-    \Ref{Array}.
- */
+   A DataArray%s may be used as arguments for standard C functions requiring
+   pointers through the use of get_ptr() and get_const_ptr().
+ 
+   Internally, a DataArray object allocates a block of memory that fits up
+   to max() elements, only size() of them are used. This makes extension
+   and shrinking methods perform better.
 
-/** Safe arrays of data objects.
-    Class #DataArray# provides safe arrays of \Ref{Data Objects}. For general
-    C++ objects (i.e. no data objects) class \Ref{Array} is provided which
-    manages memory in a C++ compliant way.
- 
-    The elements of an instance of #DataArray# can be accessed just like
-    ordinary C++ array elements by means of the index #operator[]#. Safety is
-    provided by
-    \begin{itemize}
-    \item       automatic memory management in constructor and destructor
-                preventing memory leaks
-    \item       checking of array bounds when accessing elements with the
-                indexing #operator[]# (only when compiled without #-DNDEBUG#).
-    \end{itemize}
- 
-    Moreover, #DataArray#s may easily be extended by #insert#ing or #append#ing
-    elements to the #DataArray# or shrunken by #remov#ing elements. Method
-    #reSize(int n)# resets the #DataArray#s length to #n# thereby possibly
-    appending elements or truncating the #DataArray# to the required size.
- 
-    A #DataArray#s may be used as arguments for standard C functions requiring
-    pointers through a cast operator.
- 
-    Internally, a #DataArray# objects allocates a block of memory that fits up
-    to #max()# elements, only #size()# of them are used. This makes extension
-    and shrinking methods perform better.
-    @see        Array, Data Objects
- */
+   @see Array, \ref DataObjects "Data Objects"
+*/
 template < class T >
 class DataArray
 {
-   /*  For the implementation we simply store:
+private:
+   int thesize;           ///< number of used elements in array #data
+   int themax;            ///< the length of array #data and
+   T*  data;              ///< the array of elements
+
+protected:
+   /** When a DataArray is reSize()%d to more than max() elements, the
+       new value for max() is not just set to the new size but rather to
+       \p memFactor * \p size. This makes #reSize%ing perform better in codes
+       where a DataArray is extended often by a small number of elements
+       only.
     */
-   int thesize;                // nr. of used elements in array #data# and
-   int themax;                 // the length of array #data# and
-   T *data;                  // the array of elements
+   double memFactor;     ///< memory extension factor.
 
 public:
-   /// reference #n#'th element.
+
+   /// reference \p n'th element.
    T& operator[](int n)
    {
       assert(n >= 0);
       assert(n < thesize);
       return data[n];
    }
-   /// reference #n#'th const element.
+   /// reference \p n'th const element.
    const T& operator[](int n) const
    {
       assert(n >= 0);
@@ -123,39 +108,34 @@ public:
       return data[thesize -1];
    }
 
-   /// cast to C array.
+   /// get a C pointer to the data.
    T* get_ptr()
    {
       return data;
    }
+   /// get a const C pointer to the data.
    const T* get_const_ptr() const
    {
       return data;
    }
 
-   //           operator T* ()                          { return data; }
-   /// cast to const C array for const object.
-   //           operator const T* () const              { return data; }
-   /// cast to const C array
-   //                   operator const T* ()                    { return data; }
-
-   /// append element #t#.
+   /// append element \p t.
    void append(const T& t)
    {
       insert(thesize, 1, &t);
    }
-   /// append #n# elements from #t#.
+   /// append \p n elements from \p t.
    void append(int n, const T t[])
    {
       insert(thesize, n, t);
    }
-   /// append all elements from #t#.
+   /// append all elements from \p t.
    void append(const DataArray<T>& t)
    {
       insert(thesize, t);
    }
 
-   /// insert #n# uninitialized elements before #i#-th element.
+   /// insert \p n uninitialized elements before \p i'th element.
    void insert(int i, int n)
    {
       int j = size();
@@ -164,7 +144,7 @@ public:
          data[j + n] = data[j];
    }
 
-   /// insert #n# elements from #t# before #i#-the element.
+   /// insert \p n elements from \p t before \p i'the element.
    void insert(int i, int n, const T t[])
    {
       if (n > 0)
@@ -174,7 +154,7 @@ public:
       }
    }
 
-   /// insert all elements from #t# before #i#-the element.
+   /// insert all elements from \p t before \p i'th element.
    void insert(int i, const DataArray<T>& t)
    {
       if (t.size())
@@ -184,7 +164,7 @@ public:
       }
    }
 
-   /// remove #m# elements starting at #n#.
+   /// remove \p m elements starting at \p n.
    void remove(int n = 0, int m = 1)
    {
       assert(n < size() && n >= 0);
@@ -194,7 +174,7 @@ public:
          m = size() - n;
       thesize -= m;
    }
-   /// remove #m# last elements.
+   /// remove \p m last elements.
    void removeLast(int m = 1)
    {
       assert(m <= size() && m >= 0);
@@ -212,11 +192,12 @@ public:
       return thesize;
    }
 
-   /** reset size to #newsize#.
-       Resizing a #DataArray# to less than the previous size, involves
+   /// reset size to \p newsize.
+   /** Resizing a DataArray to less than the previous size, involves
        discarding its last elements. Resizing to a larger value involves
-       adding uninitialized elements (similar to #append#). If neccessary,
+       adding uninitialized elements (similar to #append). If neccessary,
        also memory will be reallocated.
+       @param newsize the new number of elements the array can hold.
     */
    void reSize(int newsize)
    {
@@ -229,9 +210,9 @@ public:
          thesize = newsize;
    }
 
-   /** return maximum nr. of elements.
-       Even though the #DataArray# currently holds no more than #size()#
-       elements, up to #max()# elements could be added without need to
+   /// return maximum number of elements.
+   /** Even though the DataArray currently holds no more than size()
+       elements, up to max() elements could be added without need to
        reallocated free store.
     */
    int max() const
@@ -239,17 +220,18 @@ public:
       return themax;
    }
 
-   /** reset maximum nr. of elements.
-       The value of #max()# is reset to #newMax# thereby setting #size()#
-       to #newSize#. However, if #newSize# has a value #< 0# (as the
-       default argument does) #size()# remains unchanged and #max()# is set
-       to #MIN(size(), newMax)#. Hence, calling #reMax()# without the
+   /// reset maximum number of elements.
+   /** The value of max() is reset to \p newMax thereby setting size()
+       to \p newSize. However, if \p newSize has a value \c < \ c0 (as the
+       default argument does) size() remains unchanged and max() is set
+       to MIN(size(), newMax). Hence, calling reMax() without the
        default arguments, will reduce the memory consumption to a minimum.
-       In no instance #max()# will be set to a value less than 1 (even if
+       In no instance max() will be set to a value less than 1 (even if
        specified).
-       #reMax# returns the difference in bytes of the new and the old
-       memory block, which can be used to update pointers pointing to
-       elements of the memory block.
+
+       @return reMax returns the difference in bytes of the new and the old
+               memory block, which can be used to update pointers pointing 
+               to elements of the memory block.
     */
    ptrdiff_t reMax(int newMax = 1, int newSize = -1)
    {
@@ -275,16 +257,7 @@ public:
       diff = reinterpret_cast<char*>(data) - reinterpret_cast<char*>(olddata);
       return diff;
    }
-   /** memory extension factor.
-       When a #DataArray# is #reSize()#d to more than #max()# elements, the
-       new value for #max()# is not just set to the new size but rather to
-       #memFactor * size#. This makes #reSize#ing perform better in codes
-       where a #DataArray# is extended often by a small number of elements
-       only.
-    */
-   double memFactor;
-
-   ///
+   /// assignment operator
    DataArray& operator=(const DataArray& rhs)
    {
       reSize(rhs.size());
@@ -292,7 +265,7 @@ public:
       return *this;
    }
 
-   ///
+   /// consistency check
    int isConsistent() const
    {
       if (data == 0
@@ -305,12 +278,11 @@ public:
       return 1;
    }
 
-
-   ///
+   /// copy constructor
    DataArray(const DataArray& old)
       : thesize(old.thesize)
-         , themax (old.themax)
-         , memFactor (old.memFactor)
+      , themax (old.themax)
+      , memFactor (old.memFactor)
    {
       spx_alloc(data, max());
 
@@ -320,17 +292,21 @@ public:
       assert(isConsistent());
    }
 
-   /** Default constructor.
-       The constructor allocates an #Array# containing #size# uninitialized
-       elements. The internal array is allocated to have #max# nonzeros,
-       and the memory extension factor is set to #fac#.
+   /// default constructor.
+   /** The constructor allocates an Array containing \p size uninitialized
+       elements. The internal array is allocated to have \p max nonzeros,
+       and the memory extension factor is set to \p fac.
+
+       @param p_size number of unitialised elements.
+       @param p_max  maximum number of elements the array can hold.
+       @param p_fax  value for memFactor.
     */
-   DataArray(int psize = 0, int pmax = 0, double pfac = 1.2)
-      : memFactor (pfac)
+   DataArray(int p_size = 0, int p_max = 0, double p_fac = 1.2)
+      : memFactor(p_fac)
    {
-      thesize = (psize < 0) ? 0 : psize;
-      if (pmax > thesize)
-         themax = pmax;
+      thesize = (p_size < 0) ? 0 : p_size;
+      if (p_max > thesize)
+         themax = p_max;
       else
          themax = (thesize == 0) ? 1 : thesize;
 
@@ -339,7 +315,7 @@ public:
       assert(isConsistent());
    }
 
-   ///
+   /// destructor
    ~DataArray()
    {
       spx_free(data);

@@ -13,13 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.h,v 1.6 2001/11/13 21:01:27 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svector.h,v 1.7 2001/11/15 22:35:14 bzfkocht Exp $"
 
 #ifndef _SVECTOR_H_ 
 #define _SVECTOR_H_
 
-/*      \Section{Imports}
- */
 #include <iostream>
 #include <stdlib.h>
 #include <assert.h>
@@ -29,8 +27,6 @@
 
 namespace soplex
 {
-
-//@ -----------------------------------------------------------------------------
 /** Sparse vectors.
  *  Class #SVector# provides packed sparse vectors. Such are a sparse vectors,
  *  with a storage scheme that keeps all data in one contiguous block of memory.
@@ -84,20 +80,15 @@ class SVector
    friend class Vector;
    friend class SSVector;
 public:
-   //typedef SVector_Element Element;
-
    /** Sparse vector nonzero element.
     *  #SVector# keep their nonzeros in an array of #Element#s providing
     *  members for saving the nonzero's index and value.
     */
    struct Element
    {
-      /// Value of nonzero element
-      double val;
-      /// Index of nonzero element
-      int idx;
+      double val;  ///< Value of nonzero element
+      int idx;     ///< Index of nonzero element
    };
-
 
 protected:
    /*   \Section{Datastructures}

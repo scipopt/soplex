@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxalloc.h,v 1.3 2001/11/15 16:54:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxalloc.h,v 1.4 2001/11/15 22:35:14 bzfkocht Exp $"
 
 /**@file  spxalloc.h
  * @brief Memory allocation routines.
@@ -27,8 +27,8 @@
 
 namespace soplex
 {
-/**@defgroup MAR Memory allocation routines
- *
+/**@name    Memory allocation routines
+ * @ingroup Elementary
  * Here we have cover functions for malloc/realloc/free, to make sure
  * that we allays succeed. Otherwise abort() is called.
  *
@@ -99,6 +99,3 @@ inline void spx_free(T& p)
 //Emacs indent-tabs-mode:nil
 //Emacs End:
 //-----------------------------------------------------------------------------
-
-
-

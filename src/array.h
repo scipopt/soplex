@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: array.h,v 1.4 2001/11/15 16:54:00 bzfkocht Exp $"
+#pragma ident "@(#) $Id: array.h,v 1.5 2001/11/15 22:35:13 bzfkocht Exp $"
 
 /**@file  array.h
  * @brief Save arrays of arbitrary types.
@@ -36,16 +36,13 @@ namespace soplex
     - automatic memory management in constructor and destructure
       preventing memory leaks
     - checking of array bound when accessing elements with the
-      indexing operator[]() (only when compiled without -DNDEBUG).
+      indexing operator[]() (only when compiled without \c -DNDEBUG).
  
     Moreover, Array%s may easily be extended by #insert%ing or
     #append%ing elements to the Array or shrunken by #remove%ing
-    elements. Method #reSize(int n) resets the Array%s length to #n
+    elements. Method #reSize(int n) resets the Array%s length to \p n
     thereby appending elements or truncating the Array to the
     required size.
- 
-    Array%s may be used as arguments of standard C functions
-    requiring pointers.
  
     An Array is implemented in a C++ complient way with respect to
     how memory is managemed: Only operators ::new and ::delete are
@@ -68,36 +65,36 @@ protected:
    T*  data;    ///< the array of elements
 
 public:
-   /// reference #n'th element.
+   /// reference \p n'th element.
    T& operator[](int n)
    {
       assert(n >= 0 && n < size());
       return data[n];
    }
-   /// reference #n'th element.
+   /// reference \p n'th element.
    const T& operator[](int n) const
    {
       assert(n >= 0 && n < size());
       return data[n];
    }
 
-   /// append #n uninitialized elements.
+   /// append \p n uninitialized elements.
    void append(int n)
    {
       insert(size(), n);
    }
-   /// append #n elements from #p_array.
+   /// append \p n elements from \p p_array.
    void append(int n, const T* p_array)
    {
       insert(size(), n, p_array);
    }
-   /// append all elements from #p_array.
+   /// append all elements from \p p_array.
    void append(const Array<T>& p_array)
    {
       insert(size(), p_array);
    }
 
-   /// insert #n uninitialized elements before #i-th element.
+   /// insert \p n uninitialized elements before \p i'th element.
    void insert(int i, int n)
    {
       assert(i <= size());
@@ -119,24 +116,24 @@ public:
       }
    }
 
-   /// insert #n elements from #tarray before #i-th element.
-   void insert(int i, int n, const T* tarray)
+   /// insert \p n elements from \p p_array before \p i'th element.
+   void insert(int i, int n, const T* p_array)
    {
       insert(i, n);
       for (n--; n >= 0; --n)
-         data[n + i] = tarray[n];
+         data[n + i] = p_array[n];
    }
 
-   /// insert all elements from #tarray before #i-th element.
-   void insert(int i, const Array<T>& tarray)
+   /// insert all elements from \p p_array before \p i'th element.
+   void insert(int i, const Array<T>& p_array)
    {
-      int n = tarray.size();
+      int n = p_array.size();
       insert(i, n);
       for (n--; n >= 0; --n)
-         data[n + i] = tarray.data[n];
+         data[n + i] = p_array.data[n];
    }
 
-   /// remove #m elements starting at #n.
+   /// remove \p m elements starting at \p n.
    void remove(int n = 0, int m = 1)
    {
       assert(n >= 0 && m >= 0);
@@ -197,7 +194,7 @@ public:
    }
 
    /// default constructor.
-   /** The constructor allocates an Array of #n uninitialized elements.
+   /** The constructor allocates an Array of \p n uninitialized elements.
     */
    Array(int n = 0) : data(0)
    {

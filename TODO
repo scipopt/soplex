@@ -1,3 +1,5 @@
+in dataarray.h:reSize(int newsize) steht in der docxygen docu immer int n ???
+
 spxfastrt.cpp(865) Testen ob das ; korrekt ist.
 
 Was macht SPxSolver in example. Warum können wir nicht einfach SoPlex 
@@ -13,8 +15,6 @@ Entsprechender Aufruf fehlt auch in spxgeneralsm.cc
 In slufactor.cpp sind lauter cast auf CLUFactor* drin, die
 man wohl wennehmen könnte, wenn man in solve.c und vsolve.c überall
 const hinschreibt.
-
-long durch ptrdiff_t ersetzen (include <stddef.h>
 
 for();    -> for()
                 ;
@@ -55,3 +55,64 @@ SORTIERUNG
    destructor
    initialisierung
 
+*array.h
+*cachelpsolver.h
+clumembers.h
+cluprotos.h
+clutypes.h
+cring.h
+*dataarray.h
+datahashtable.h
+datakey.h
+dataset.h
+didxset.h
+dsvector.h
+dvector.h
+idlist.h
+idxset.h
+islist.h
+lpcol.h
+lpcolset.h
+lprow.h
+lprowset.h
+lpsolver.h
+nameset.h
+random.h
+slinsolver.h
+slufactor.h
+soplex.h
+sorter.h
+spxaggregatesm.h
+*spxalloc.h
+spxbasis.h
+spxdefaultpr.h
+spxdefaultrt.h
+spxdevexpr.h
+spxfastrt.h
+spxgeneralsm.h
+spxharrisrt.h
+spxhybridpr.h
+spxlp.h
+spxparmultpr.h
+spxpricer.h
+spxratiotester.h
+spxredundantsm.h
+spxrem1sm.h
+spxscale.h
+spxsimplifier.h
+spxsolver.h
+spxstarter.h
+spxsteeppr.h
+spxsumst.h
+spxvectorst.h
+spxweightpr.h
+spxweightst.h
+ssvector.h
+subsvector.h
+svector.h
+svset.h
+timer.h
+unitvector.h
+updatevector.h
+vector.h
+vector_c.h

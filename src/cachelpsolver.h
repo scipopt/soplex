@@ -13,8 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: cachelpsolver.h,v 1.3 2001/11/15 16:54:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: cachelpsolver.h,v 1.4 2001/11/15 22:35:13 bzfkocht Exp $"
 
+/**@file  cachelpsolver.h
+ * @brief LP solver with result caching.
+ */
 #ifndef _CACHELPSOLVER_H_
 #define _CACHELPSOLVER_H_
 
