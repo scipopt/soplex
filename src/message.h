@@ -13,7 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: message.h,v 1.3 2002/01/31 08:19:27 bzfkocht Exp $"
+#pragma ident "@(#) $Id: message.h,v 1.4 2002/10/23 10:40:39 bzfkocht Exp $"
+
+/**@file  message.h
+ * @brief Messagefunctions
+ */
+#ifndef _MESSAGE_H_
+#define _MESSAGE_H_
 
 namespace soplex
 {
@@ -23,6 +29,8 @@ extern bool msginconsistent(const char* name, const char* file, int line);
 #define MSGinconsistent(name) msginconsistent(name, __FILE__, __LINE__)
  
 } // namespace soplex
+
+#endif // _MESSAGE_H_
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:

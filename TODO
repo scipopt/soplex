@@ -1,4 +1,4 @@
-$Id: TODO,v 1.65 2002/10/22 15:31:06 bzfkocht Exp $
+$Id: TODO,v 1.66 2002/10/23 10:40:38 bzfkocht Exp $
 
 neos4, neos5werden fälschlicherweise als infeasible gemeldet.
 
@@ -102,9 +102,6 @@ SVSet::memPack, vermutlichen bug in flexelint melden. this-> ist überflüssig.
 die constructoren auf einparametriege durchsehen (explicit)
 
 in dataarray.h:reSize(int newsize) steht in der docxygen docu immer int n ???
-
-Was macht SPxSolver in example. Warum können wir nicht einfach SoPlex 
-benutzen?
 
 BUG in spxscalesm.cc value() wird nicht descaliert. 
 Entsprechender Aufruf fehlt auch in spxgeneralsm.cc

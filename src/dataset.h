@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.29 2002/04/06 13:05:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.30 2002/10/23 10:40:38 bzfkocht Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -283,7 +283,7 @@ public:
    }
 
    /// ???
-   void remove(DataKey *keys, int n, int* perm)
+   void remove(const DataKey *keys, int n, int* perm)
    {
       assert(perm != 0);
       for (int i = num() - 1; i >= 0; --i)
@@ -293,13 +293,13 @@ public:
       remove(perm);
    }
    /// remove \p n elements given by \p keys.
-   void remove(DataKey *keys, int n)
+   void remove(const DataKey *keys, int n)
    {
       DataArray<int> perm(num());
       remove(keys, n, perm.get_ptr());
    }
    /// ???
-   void remove(int *nums, int n, int* perm)
+   void remove(const int *nums, int n, int* perm)
    {
       assert(perm != 0);
       for (int i = num() - 1; i >= 0; --i)
@@ -309,7 +309,7 @@ public:
       remove(perm);
    }
    /// remove \p n elements with numbers \p nums.
-   void remove(int *nums, int n)
+   void remove(const int *nums, int n)
    {
       DataArray<int> perm(num());
       remove(nums, n, perm.get_ptr());

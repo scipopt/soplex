@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.21 2002/05/15 13:38:43 bzfpfend Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.22 2002/10/23 10:40:39 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -591,7 +591,7 @@ int SoPlex::leave(int leaveIdx)
          // update feasibility vectors
          if (solveVector2)
             SPxBasis::solve4update (theFvec->delta(), *solveVector2,
-                                     newVector, *solveVector2rhs);
+               newVector, *solveVector2rhs);
          else
             SPxBasis::solve4update (theFvec->delta(), newVector);
 

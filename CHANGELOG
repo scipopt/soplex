@@ -1,3 +1,8 @@
+- Fixed a Bug in example.cpp which resulted in ignoring the
+  Update type switch.
+
+- Droped all unsued functions from the LinSolver interface.
+
 - methods rhs(), lhs(), upper(), lower(), maxObj() of SPxLP
   that returned a non const reference renamed in *_w and 
   made protected. Use changeXXX() methods outside the class.

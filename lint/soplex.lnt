@@ -1,4 +1,4 @@
-// $Id: soplex.lnt,v 1.6 2002/04/06 13:05:01 bzfkocht Exp $
+// $Id: soplex.lnt,v 1.7 2002/10/23 10:40:38 bzfkocht Exp $
 -passes(1)
 +cpp(.h,.cpp)
 // esoteric size settings to find erros.
@@ -37,12 +37,17 @@
 -e537 // Repeated include file
 -e737 // Loss of sign in promotion from int to unsigned int
 -e713 // loss of precision
+-e717 // do ... while(0)
 -e788 // enum constant not used within defaulted switch
 -e801 // keine Warnungen wegen goto
 -e834 // Operator followed by operator ist confusing -- unsinn
 -e1511 // Member hides non-virtual member
 -e1550 // exception thrown by function is not on throw-list of function
 -e1551 // Function may throw exception in destructor
+-e1702 // operator is both an ordinary and a member function
+-e1735 // Virtual function has default parameter
+-e1736 // Redundant access specifier 
+-e1748 // non-virtual base class included twice in class 
 
 -esym(1704,Vector::Vector) // Vector has no (private) default constructor
 -esym(1526,Vector::Vector) // correctly not implemented
@@ -118,8 +123,11 @@
 -esym(1554,SubSVector::elem) // Direct pointer copy of member
 -esym(1554,SubSVector::svec) // Direct pointer copy of member
 
+// idxset.h
+-esym(1704,IdxSet::IdxSet)) // Vector has no (private) default constructor
+
 // Temporary
--w2    // Only warnings and Errors
+//-w2    // Only warnings and Errors
 -e1509 // base class destructor for class is not virtual
 -e1510 // base class has no destructor
 -e641  // Converting enum to int
@@ -136,7 +144,11 @@
 -esym(631,soplex::Compare) // defined differently 
 -e1536 // Exposing low access member
 
-
-
+-e740  // Unusual pointer cast (incompatible indirect types)
+-e763  // Redundant declaration for symbol
+-e826  // Suspicious pointer-to-pointer conversion (area too small)
+-e1712 // default constructor not defined for class 
+-e1725 // class member is a reference
+-e1763 // Member function marked as const indirectly modifies class
 
 

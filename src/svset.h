@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.h,v 1.17 2002/03/03 13:50:36 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.h,v 1.18 2002/10/23 10:40:39 bzfkocht Exp $"
 
 /**@file  svset.h
  * @brief Set of sparse vectors.
@@ -471,3 +471,5 @@ public:
 //Emacs indent-tabs-mode:nil
 //Emacs End:
 //-----------------------------------------------------------------------------
+
+

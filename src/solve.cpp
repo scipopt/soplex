@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: solve.cpp,v 1.16 2002/03/10 10:00:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: solve.cpp,v 1.17 2002/10/23 10:40:39 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -68,10 +68,11 @@ void CLUFactor::solveUright(Real* wrk, Real* vec)
 void CLUFactor::solveUright(Real* wrk, Real* vec)
 {
    METHOD( "CLUFactor::solveUright()" );
+
    for(int i = thedim - 1; i >= 0; i--)
    {
-      int    r = row.orig[i];
-      int    c = col.orig[i];
+      int  r = row.orig[i];
+      int  c = col.orig[i];
       Real x = wrk[c] = diag[r] * vec[r];
 
       vec[r] = 0.0;

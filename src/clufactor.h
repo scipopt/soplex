@@ -13,8 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clufactor.h,v 1.13 2002/03/03 13:50:31 bzfkocht Exp $"
+#pragma ident "@(#) $Id: clufactor.h,v 1.14 2002/10/23 10:40:38 bzfkocht Exp $"
 
+/**@file  clufactor.h
+ * @brief Implementation of sparse LU factorization.
+ */
 #ifndef _CLUFACTOR_H_
 #define _CLUFACTOR_H_
 
@@ -26,10 +29,11 @@
 
 namespace soplex
 {
-
-/**todo I think that CLUFactor should be a descendent of SLinSolver.
-        This has to be muddled out with SLUFactor also.
-        Probably CLUFactor should be inlined in SLUFactor.
+/**@brief   Implementation of sparse LU factorization.
+ * @ingroup Algo
+ * 
+ * This class implements a sparse LU factorization with either
+ * FOREST-TOMLIN or ETA updates.
  */
 class CLUFactor
 {
@@ -50,9 +54,9 @@ public:
    public:
       Pring* next;
       Pring* prev;
-      int   idx;            ///< index of pivot row
-      int   pos;            ///< position of pivot column in row 
-      int   mkwtz;          ///< markowitz number of pivot 
+      int    idx;            ///< index of pivot row
+      int    pos;            ///< position of pivot column in row 
+      int    mkwtz;          ///< markowitz number of pivot 
 
       Pring() : next(0), prev(0) 
       {}      
@@ -101,14 +105,14 @@ protected:
          Dring list;         /* Double linked ringlist of vector
                                 indices in the order they appear
                                 in the row file */
-         Dring *elem;        /* Array of ring elements.            */
-         int size;           /* size of arrays val and idx         */
-         int used;           /* used entries of arrays idx and val */
-         Real *val;          /* hold nonzero values                */
-         int *idx;           /* hold nonzero indices               */
-         int *start;         /* starting positions in val and idx  */
-         int *len;           /* used nonzeros per row vectors      */
-         int *max;           /* maximum available nonzeros per row:
+         Dring* elem;        /* Array of ring elements.            */
+         int    size;        /* size of arrays val and idx         */
+         int    used;        /* used entries of arrays idx and val */
+         Real*  val;         /* hold nonzero values                */
+         int*   idx;         /* hold nonzero indices               */
+         int*   start;       /* starting positions in val and idx  */
+         int*   len;         /* used nonzeros per row vectors      */
+         int*   max;         /* maximum available nonzeros per row:
                                 start[i] + max[i] == start[elem[i].next->idx] 
                                 len[i] <= max[i]. */
       } row;
@@ -269,7 +273,7 @@ private:
    ///
    void initPerm();
    ///
-   void initFactorMatrix(SVector** vec, const Real eps );
+   void initFactorMatrix(const SVector** vec, const Real eps );
    ///
    void minLMem(int size);
    ///
@@ -394,7 +398,7 @@ public:
 
    // from factor.cpp
    ///
-   void factor(SVector** vec,     ///< Array of column vector pointers  
+   void factor(const SVector** vec,     ///< Array of column vector pointers  
                Real threshold,    ///< pivoting threshold                
                Real eps);         ///< epsilon for zero detection        
 

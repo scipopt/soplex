@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.25 2002/08/27 07:20:37 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.26 2002/10/23 10:40:39 bzfkocht Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -199,19 +199,16 @@ public:
       {
          return rowstat.size();
       }
-
       /// returns dimension.
       int dim() const
       {
          return stat->size();
       }
-
       /// returns codimension.
       int coDim() const
       {
          return costat->size();
       }
-
       ///
       Status& rowStatus(int i)
       {
@@ -222,13 +219,11 @@ public:
       {
          return rowstat[i];
       }
-
       /// returns the array of row #Status%es.
       const Status* rowStatus(void) const
       {
          return rowstat.get_const_ptr();
       }
-
       ///
       Status& colStatus(int i)
       {
@@ -239,13 +234,11 @@ public:
       {
          return colstat[i];
       }
-
       /// returns the array of column #Status%es.
       const Status* colStatus(void) const
       {
          return colstat.get_const_ptr();
       }
-
       ///
       Status& status(int i)
       {
@@ -256,13 +249,11 @@ public:
       {
          return (*stat)[i];
       }
-
       /// returns the array of variable #Status%es.
       const Status* status(void) const
       {
          return stat->get_const_ptr();
       }
-
       ///
       Status& coStatus(int i)
       {
@@ -273,13 +264,11 @@ public:
       {
          return (*costat)[i];
       }
-
       /// returns the array of covariable #Status%es.
       const Status* coStatus(void) const
       {
          return costat->get_const_ptr();
       }
-
       /// resets dimensions.
       void reSize(int rowDim, int colDim);
 
@@ -494,42 +483,8 @@ public:
    {
       return factor->stability();
    }
-
-   /**@todo should we document the differences between solve2, solve, ... ? */
    ///
-   void solve2 (Vector& x, Vector& rhs)
-   {
-      METHOD( "SPxBasis::solve2()" );
-      if (!factorized) 
-         factorize();
-      factor->solve2right(x, rhs);
-   }
-   ///
-   void solve2 (Vector& x, SSVector& rhs)
-   {
-      METHOD( "SPxBasis::solve2()" );
-      if (!factorized) 
-         factorize();
-      factor->solve2right(x, rhs);
-   }
-   ///
-   void solve2 (SSVector& x, Vector& rhs)
-   {
-      METHOD( "SPxBasis::solve2()" );
-      if (!factorized) 
-         factorize();
-      factor->solve2right(x, rhs);
-   }
-   ///
-   void solve2 (SSVector& x, SSVector& rhs)
-   {
-      METHOD( "SPxBasis::solve2()" );
-      if (!factorized) 
-         factorize();
-      factor->solve2right(x, rhs);
-   }   
-   ///
-   void solve (Vector& x, const Vector& rhs)
+   void solve(Vector& x, const Vector& rhs)
    {
       METHOD( "SPxBasis::solve()" );
       if (!factorized) 
@@ -537,23 +492,7 @@ public:
       factor->solveRight(x, rhs);
    }
    ///
-   void solve (Vector& x, const SVector& rhs)
-   {
-      METHOD( "SPxBasis::solve()" );
-       if (!factorized) 
-          factorize();
-       factor->solveRight(x, rhs);
-   }
-   ///
-   void solve (SSVector& x, const SVector& rhs)
-   {
-      METHOD( "SPxBasis::solve()" );
-      if (!factorized) 
-         factorize();
-      factor->solveRight(x, rhs);
-   }
-   ///
-   void solve (SSVector& x, const Vector& rhs)
+   void solve(SSVector& x, const SVector& rhs)
    {
       METHOD( "SPxBasis::solve()" );
       if (!factorized) 
@@ -587,51 +526,17 @@ public:
       factor->solve2right4update(x, y, rhsx, rhsy);
    }
 
-   /**@todo What is 'idx' appearing as parameter in the following description
-            but not in the method's signatures */
+   /// Cosolves linear system with basis matrix.
+   /** Depending on the representation, for a #SPxBasis B,
+       B.coSolve(x) computes
+       - \f$x \leftarrow rhs^TB^{-1}\f$     in the columnwise case and
+       - \f$x \leftarrow B^{-1}rhs\f$       in the rowwise case.
 
-   ///
-   void coSolve2(Vector& x, Vector& rhs)
-   {
-      METHOD( "SPxBasis::coSolve2()" );
-      if (!factorized) 
-         factorize();
-      factor->solve2left(x, rhs);
-   }
-   ///
-   void coSolve2(Vector& x, SSVector& rhs)
-   {
-      METHOD( "SPxBasis::coSolve2()" );
-      if (!factorized) 
-         factorize();
-      factor->solve2left(x, rhs);
-   }
-   ///
-   void coSolve2(SSVector& x, Vector& rhs)
-   {
-      METHOD( "SPxBasis::coSolve2()" );
-      if (!factorized) 
-         factorize();
-      factor->solve2left(x, rhs);
-   }
-   ///
-   void coSolve2(SSVector& x, SSVector& rhs)
-   {
-      METHOD( "SPxBasis::coSolve2()" );
-      if (!factorized) 
-         factorize();
-      factor->solve2left(x, rhs);
-   }
-   ///
+       Both can be seen uniformly as solving a linear system with the basis
+       matrix #B and a right handside vector #x alligned the same way as
+       the \em covectors of #B.
+    */
    void coSolve(Vector& x, const Vector& rhs)
-   {
-      METHOD( "SPxBasis::coSolve()" );
-      if (!factorized) 
-         factorize();
-      factor->solveLeft(x, rhs);
-   }
-   ///
-   void coSolve(Vector& x, const SVector& rhs)
    {
       METHOD( "SPxBasis::coSolve()" );
       if (!factorized) 
@@ -646,28 +551,6 @@ public:
          factorize();
       factor->solveLeft(x, rhs);
    }
-   /// Cosolves linear system with basis matrix.
-   /** Depending on the representation, for a #SPxBasis B,
-       B.coSolve(x) computes
-       - \f$x \leftarrow rhs^TB^{-1}\f$     in the columnwise case and
-       - \f$x \leftarrow B^{-1}rhs\f$       in the rowwise case.
-
-       Both can be seen uniformly as solving a linear system with the basis
-       matrix #B and a right handside vector #x alligned the same way as
-       the \em covectors of #B.
-
-       If #idx != 0 is given, upon return #idx contains the indeces of
-       the nonzeros of the result vector. #idx must be allocated to fit
-       enough indeces.
-    */
-   void coSolve(SSVector& x, const Vector& rhs)
-   {
-      METHOD( "SPxBasis::coSolve()" );
-      if (!factorized) 
-         factorize();
-      factor->solveLeft(x, rhs);
-   }
-
    /// solves two systems in one call.
    void coSolve(SSVector& x, Vector& y, const SVector& rhsx, SSVector& rhsy)
    {
@@ -737,7 +620,7 @@ public:
        #SLinSolver implementation class.
     */
    virtual void change(int i, SPxId& id,
-                        const SVector* enterVec, const SSVector* eta = 0);
+      const SVector* enterVec, const SSVector* eta = 0);
 
    /// reads a file in MPS basis format from \p in.
    virtual bool readBasis(std::istream& in,

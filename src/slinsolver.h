@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slinsolver.h,v 1.8 2002/03/03 13:50:32 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slinsolver.h,v 1.9 2002/10/23 10:40:39 bzfkocht Exp $"
 
 /**@file  slinsolver.h
  * @brief Sparse Linear Solver virtual base class.
@@ -94,7 +94,7 @@ public:
        readily  availabble. This may improve on the performance of the update.
    */
    virtual Status change(int idx, const SVector& subst,
-                         const SSVector* eta = 0) = 0;
+      const SSVector* eta = 0) = 0;
 
    /// consistency check.
    virtual bool isConsistent() const = 0;
@@ -109,12 +109,8 @@ public:
       Method names related to the first and second type are #solveRight() and
       #solveLeft(), respectively.
       
-      The default methods receive their right hand-side vector \f$b\f$ as a
+      The methods receive their right hand-side vector \f$b\f$ as a
       #const parameter, that will hence be unchanged after termination.
-      Instead methods named #solve2... are allowed to use the passed
-      non-#const right hand-side vector internally for the solution. This may
-      save one copy operation, or may be used for solving different linear
-      systems concurrently. Upon termination, this vector is cleared.
       
       Some methods are available with two parameters for right hand-side
       vectors. Then two system are solved in one method invocation. This
@@ -124,21 +120,8 @@ public:
       types of result vectors are supported, #Vector and #SSVector.
    */
    //@{
-   /// 
-   virtual void solve2right(Vector& x, Vector& b) /* const */ = 0;
-   /// 
-   virtual void solve2right(Vector& x, SSVector& b) /* const */ = 0;
-   /// 
-   virtual void solve2right(SSVector& x, Vector& b) /* const */ = 0;
-   /// solves \f$Ax=b\f$ using \f$b\f$ and leaving \f$b=0\f$.
-   virtual void solve2right(SSVector& x, SSVector& b) /* const */ = 0;
-
    ///
    virtual void solveRight (Vector& x, const Vector& b) /* const */ = 0;
-   ///
-   virtual void solveRight (Vector& x, const SVector& b) /* const */ = 0;
-   ///
-   virtual void solveRight (SSVector& x, const Vector& b) /* const */ = 0;
    /// solves \f$Ax=b\f$.
    virtual void solveRight (SSVector& x, const SVector& b) /* const */ = 0;
 
@@ -154,25 +137,10 @@ public:
                                    Vector& two,
                                    const SVector& b,
                                    SSVector& rhs) = 0;
-
-   ///
-   virtual void solve2left(Vector& x, Vector& b) /* const */ = 0;
-   ///
-   virtual void solve2left(Vector& x, SSVector& b) /* const */ = 0;
-   ///
-   virtual void solve2left(SSVector& x, Vector& b) /* const */ = 0;
-   /// solves \f$x^TA=b^T\f$ using \f$b\f$ and leaving \f$b=0\f$.
-   virtual void solve2left(SSVector& x, SSVector& b) /* const */ = 0;
-
-   /// 
-   virtual void solveLeft (Vector& x, const SVector& b) /* const */ = 0;
-   /// 
+   /// solves \f$x^TA=b^T\f$.
    virtual void solveLeft (Vector& x, const Vector& b) /* const */ = 0;
    /// 
    virtual void solveLeft (SSVector& x, const SVector& b) /* const */ = 0;
-   /// solves \f$x^TA=b^T\f$.
-   virtual void solveLeft (SSVector& x, const Vector& b) /* const */ = 0;
-
    /// solves \f$x^TA=b^T\f$ and \f$x^TA=rhs2^T\f$ internally using \f$rhs2\f$.
    virtual void solveLeft (SSVector& x,
                            Vector& two,

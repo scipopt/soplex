@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.29 2002/05/01 08:18:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.30 2002/10/23 10:40:39 bzfkocht Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -115,7 +115,7 @@ public:
    void getRow(int i, LPRow& row) const;
 
    /// gets row with identifier \p id.
-   void getRow(SPxRowId id, LPRow& row) const
+   void getRow(const SPxRowId& id, LPRow& row) const
    {
       getRow(number(id), row);
    }
@@ -130,7 +130,7 @@ public:
    }
 
    /// gets row vector of row with identifier \p id.
-   const SVector& rowVector(SPxRowId& id) const
+   const SVector& rowVector(const SPxRowId& id) const
    {
       return LPRowSet::rowVector(id);
    }
@@ -148,7 +148,7 @@ public:
    }
 
    /// returns right hand side of row with identifier \p id.
-   Real rhs(SPxRowId& id) const
+   Real rhs(const SPxRowId& id) const
    {
       return LPRowSet::rhs(id);
    }
@@ -166,7 +166,7 @@ public:
    }
 
    /// returns left hand side of row with identifier \p id.
-   Real lhs(SPxRowId& id) const
+   Real lhs(const SPxRowId& id) const
    {
       return LPRowSet::lhs(id);
    }
@@ -187,7 +187,7 @@ public:
    void getCol(int i, LPCol& column) const;
 
    /// gets column with identifier \p id.
-   void getCol(SPxColId id, LPCol& col) const
+   void getCol(const SPxColId& id, LPCol& col) const
    {
       getCol(number(id), col);
    }
@@ -202,7 +202,7 @@ public:
    }
 
    /// returns column vector of column with identifier \p id.
-   const SVector& colVector(SPxColId& id) const
+   const SVector& colVector(const SPxColId& id) const
    {
       return LPColSet::colVector(id);
    }
@@ -241,7 +241,7 @@ public:
 
    /// returns objective value of column with identifier \p id 
    /// for maximization problem.
-   Real maxObj(SPxColId& id) const
+   Real maxObj(const SPxColId& id) const
    {
       return LPColSet::obj(id);
    }
@@ -276,7 +276,7 @@ public:
    }
 
    /// returns lower bound of column with identifier \p id.
-   Real lower(SPxColId& id) const
+   Real lower(const SPxColId& id) const
    {
       return LPColSet::lower(id);
    }
@@ -592,7 +592,7 @@ public:
    virtual void changeSense(SPxSense sns)
    {
       if (sns != thesense)
-         LPColSet::obj() *= -1;
+         LPColSet::obj() *= -1.0;
       thesense = sns;
    }
    //@}

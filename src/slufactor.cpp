@@ -13,11 +13,14 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.28 2002/05/15 13:38:43 bzfpfend Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.29 2002/10/23 10:40:39 bzfkocht Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
  *       This should be properly integrated and demangled.
+ * @todo Does is make sense, to call x.clear() when next x.altValues()
+ *       is called.
+ *       
  */
 //#define DEBUGGING 1
 
@@ -32,85 +35,26 @@
 #include <stdio.h>
 #endif
 
-
 namespace soplex
 {
 #define MINSTABILITY    1e-2
-
-void SLUFactor::solve2right(Vector& x, Vector& b) //const
-{
-   METHOD( "SLUFactor::solve2right()" );
-   CLUFactor::solveRight(x.get_ptr(), b.get_ptr());
-}
-
-void SLUFactor::solve2right(Vector& x, SSVector& b) //const
-{
-   METHOD( "SLUFactor::solve2right()" );
-   vSolveRightNoNZ(x.get_ptr(), b.epsilon,
-                    b.altValues(), b.altIndexMem(), b.size());
-}
-
-void SLUFactor::solve2right(SSVector& x, Vector& b) //const
-{
-   METHOD( "SLUFactor::solve2right()" );
-   x.clear();
-   CLUFactor::solveRight(x.altValues(), b.get_ptr());
-}
-
-void SLUFactor::solve2right(SSVector& x, SSVector& b) //const
-{
-   METHOD( "SLUFactor::solve2right()" );
-   int n;
-   int bs = b.size();
-   x.clear();
-
-   n = vSolveRight4update(x.epsilon, x.altValues(), x.altIndexMem(),
-                           b.altValues(), b.altIndexMem(), bs, 0, 0, 0);
-   if (n > 0)
-   {
-      x.setSize(n);
-      x.forceSetup();
-   }
-   else
-      x.unSetup();
-
-   b.setSize(0);
-   b.forceSetup();
-}
-
-void SLUFactor::solveRight (Vector& x, const Vector& b) //const
+ 
+void SLUFactor::solveRight(Vector& x, const Vector& b) //const
 {
    METHOD( "SLUFactor::solveRight()" );
    vec = b;
-   solve2right(x, vec);
+   CLUFactor::solveRight(x.get_ptr(), vec.get_ptr());
 }
 
-void SLUFactor::solveRight (Vector& x,
-                            const SVector& b) //const
+void SLUFactor::solveRight(SSVector& x, const SVector& b) //const
 {
    METHOD( "SLUFactor::solveRight()" );
    vec.assign(b);
-   solve2right(x, vec);
+   x.clear();
+   CLUFactor::solveRight(x.altValues(), vec.get_ptr());
 }
 
-void SLUFactor::solveRight (SSVector& x,
-                            const Vector& b) //const
-{
-   METHOD( "SLUFactor::solveRight()" );
-   vec = b;
-   solve2right(x, vec);
-}
-
-void SLUFactor::solveRight (SSVector& x,
-                            const SVector& b) //const
-{
-   METHOD( "SLUFactor::solveRight()" );
-   vec.assign(b);
-   solve2right(x, vec);
-}
-
-void SLUFactor::solveRight4update(SSVector& x,
-                                   const SVector& b)
+void SLUFactor::solveRight4update(SSVector& x, const SVector& b)
 {
    METHOD( "SLUFactor::solveRight4update()" );
    int m, n, f;
@@ -120,10 +64,8 @@ void SLUFactor::solveRight4update(SSVector& x,
    n = b.size();
    if (l.updateType == ETA)
    {
-      m = vSolveRight4update(x.epsilon,
-                              x.altValues(), x.altIndexMem(),
-                              ssvec.altValues(), ssvec.altIndexMem(), n,
-                              0, 0, 0);
+      m = vSolveRight4update(x.epsilon, x.altValues(), x.altIndexMem(),
+         ssvec.altValues(), ssvec.altIndexMem(), n, 0, 0, 0);
       x.setSize(m);
       x.forceSetup();
       eta.setup_and_assign(x);
@@ -131,53 +73,53 @@ void SLUFactor::solveRight4update(SSVector& x,
    else
    {
       forest.clear();
-      m = vSolveRight4update(x.epsilon,
-                              x.altValues(), x.altIndexMem(),
-                              ssvec.altValues(), ssvec.altIndexMem(), n,
-                              forest.altValues(), &f, forest.altIndexMem());
+      m = vSolveRight4update(x.epsilon, x.altValues(), x.altIndexMem(),
+         ssvec.altValues(), ssvec.altIndexMem(), n,
+         forest.altValues(), &f, forest.altIndexMem());
       forest.setSize(f);
       forest.forceSetup();
       x.setSize(m);
       x.forceSetup();
    }
-   usetup = 1;
+   usetup = true;
 }
 
-void SLUFactor::solve2right4update(SSVector& x,
-                                    Vector& y,
-                                    const SVector& b,
-                                    SSVector& rhs)
+void SLUFactor::solve2right4update(
+   SSVector&      x,
+   Vector&        y,
+   const SVector& b,
+   SSVector&      rhs)
 {
    METHOD( "SLUFactor::solve2right4update()" );
-   int m, n, f;
+
+   int  m;
+   int  n;
+   int  f;
    int* sidx = ssvec.altIndexMem();
-   int rsize = rhs.size();
+   int  rsize = rhs.size();
    int* ridx = rhs.altIndexMem();
 
    x.clear();
    y.clear();
-   usetup = 1;
+   usetup = true;
    ssvec = b;
+
    if (l.updateType == ETA)
    {
       n = b.size();
-      m = vSolveRight4update2(x.epsilon,
-                               x.altValues(), x.altIndexMem(), ssvec.get_ptr(),
-                               sidx, n, y.get_ptr(),
-                               rhs.epsilon, rhs.altValues(), ridx, rsize,
-                               0, 0, 0);
+      m = vSolveRight4update2(x.epsilon, x.altValues(), x.altIndexMem(), 
+         ssvec.get_ptr(), sidx, n, y.get_ptr(),
+         rhs.epsilon, rhs.altValues(), ridx, rsize, 0, 0, 0);
       x.setSize(m);
       x.forceSetup();
       eta.setup_and_assign(x);
-      //      ((SLUFactor*)this)->eta.setup_and_assign(x);
    }
    else
    {
       forest.clear();
       n = ssvec.size();
-      m = vSolveRight4update2(x.epsilon,
-         x.altValues(), x.altIndexMem(), ssvec.get_ptr(),
-         sidx, n, y.get_ptr(),
+      m = vSolveRight4update2(x.epsilon, x.altValues(), x.altIndexMem(), 
+         ssvec.get_ptr(), sidx, n, y.get_ptr(),
          rhs.epsilon, rhs.altValues(), ridx, rsize,
          forest.altValues(), &f, forest.altIndexMem());
       x.setSize(m);
@@ -187,47 +129,26 @@ void SLUFactor::solve2right4update(SSVector& x,
    }
 }
 
-void SLUFactor::solve2left (Vector& x, Vector& b) //const
+void SLUFactor::solveLeft(Vector& x, const Vector& b) //const
 {
-   METHOD( "SLUFactor::solve2left()" );
+   METHOD( "SLUFactor::solveLeft()" );
+   vec = b;
+   ///@todo Why is x.clear() here used and not with solveRight() ?
    x.clear();
-   CLUFactor::solveLeft(x.get_ptr(), b.get_ptr());
+   CLUFactor::solveLeft(x.get_ptr(), vec.get_ptr());
+
 }
 
-void SLUFactor::solve2left(Vector& x, SSVector& b) //const
+void SLUFactor::solveLeft(SSVector& x, const SVector& b) //const
 {
-   METHOD( "SLUFactor::solve2left()" );
-   int bs = b.size();
+   METHOD( "SLUFactor::solveLeft()" );
+
+   ssvec.assign(b);
 
    x.clear();
-   vSolveLeftNoNZ(b.epsilon, x.get_ptr(),
-      b.altValues(), b.altIndexMem(), bs);
-}
-
-void SLUFactor::solve2left(SSVector& x, Vector& b) //const
-{
-   METHOD( "SLUFactor::solve2left()" );
-   int n;
-   x.clear();
-   n = CLUFactor::solveLeftEps (x.altValues(), 
-      b.get_ptr(), x.altIndexMem(), x.epsilon);
-
-   if (n)
-   {
-      x.setSize(n);
-      x.forceSetup();
-   }
-}
-
-void SLUFactor::solve2left(SSVector& x, SSVector& b) //const
-{
-   METHOD( "SLUFactor::solve2left()" );
-   int n;
-   int bs = b.size();
-   x.clear();
-
-   n = vSolveLeft(x.epsilon, x.altValues(), x.altIndexMem(),
-      b.altValues(), b.altIndexMem(), bs);
+   int sz = ssvec.size(); // see .altValues()
+   int n = vSolveLeft(x.epsilon, x.altValues(), x.altIndexMem(),
+      ssvec.altValues(), ssvec.altIndexMem(), sz);
 
    if (n > 0)
    {
@@ -236,67 +157,39 @@ void SLUFactor::solve2left(SSVector& x, SSVector& b) //const
    }
    else
       x.unSetup();
-   b.setSize(0);
-   b.forceSetup();
+
+   ssvec.setSize(0);
+   ssvec.forceSetup();
 }
 
-void SLUFactor::solveLeft(Vector& x,
-                          const SVector& b) //const
+void SLUFactor::solveLeft(
+   SSVector&      x,
+   Vector&        y,
+   const SVector& rhs1,
+   SSVector&      rhs2) //const
 {
    METHOD( "SLUFactor::solveLeft()" );
-   ssvec = b;
-   solve2left(x, ssvec);
-}
 
-
-void SLUFactor::solveLeft (Vector& x,
-                           const Vector& b) //const
-{
-   METHOD( "SLUFactor::solveLeft()" );
-   vec = b;
-   solve2left(x, vec);
-}
-
-void SLUFactor::solveLeft (SSVector& x,
-                           const Vector& b) //const
-{
-   METHOD( "SLUFactor::solveLeft()" );
-   vec = b;
-   solve2left(x, vec);
-}
-
-void SLUFactor::solveLeft (SSVector& x,
-                           const SVector& b) //const
-{
-   METHOD( "SLUFactor::solveLeft()" );
-   ssvec.assign(b);
-   SLUFactor::solve2left(x, ssvec);
-}
-
-void SLUFactor::solveLeft (SSVector& x,
-                            Vector& y,
-                            const SVector& rhs1,
-                           SSVector& rhs2) //const
-{
-   METHOD( "SLUFactor::solve2left()" );
-   int n;
+   int   n;
    Real* svec = ssvec.altValues();
-   int* sidx = ssvec.altIndexMem();
-   int rn = rhs2.size();
-   int* ridx = rhs2.altIndexMem();
+   int*  sidx = ssvec.altIndexMem();
+   int   rn   = rhs2.size();
+   int*  ridx = rhs2.altIndexMem();
 
    x.clear();
    y.clear();
    ssvec.assign(rhs1);
-   n = ssvec.size();
-   n = vSolveLeft2(x.epsilon,
-                    x.altValues(), x.altIndexMem(), svec, sidx, n,
-                    y.get_ptr(), rhs2.altValues(), ridx, rn);
+   n = ssvec.size(); // see altValues();
+   n = vSolveLeft2(x.epsilon, x.altValues(), x.altIndexMem(), svec, sidx, n,
+      y.get_ptr(), rhs2.altValues(), ridx, rn);
+
    x.setSize(n);
+
    if (n > 0)
       x.forceSetup();
    else
       x.unSetup();
+
    rhs2.setSize(0);
    rhs2.forceSetup();
    ssvec.setSize(0);
@@ -317,38 +210,43 @@ Real SLUFactor::stability() const
 void SLUFactor::changeEta(int idx, SSVector& et)
 {
    METHOD( "SLUFactor::changeEta()" );
-   int es = et.size();
+
+   int es = et.size(); // see altValues()
    update(idx, et.altValues(), et.altIndexMem(), es);
    et.setSize(0);
    et.forceSetup();
 }
 
 SLUFactor::Status SLUFactor::change(
-   int idx,
+   int            idx,
    const SVector& subst,
-   const SSVector* e
-)
+   const SSVector* e)
 {
    METHOD( "SLUFactor::Status()" );
+
    if (usetup)
    {
-      if (l.updateType)                      /// Forest-Tomlin updates
+      if (l.updateType == FOREST_TOMLIN)              // FOREST_TOMLIN updates
       {
-         int fsize = forest.size();
-         forestUpdate(
-            idx, forest.altValues(), fsize, forest.altIndexMem());
+         int fsize = forest.size(); // see altValues()
+         forestUpdate(idx, forest.altValues(), fsize, forest.altIndexMem());
          forest.setSize(0);
          forest.forceSetup();
       }
-      else                                    /// ETA updates
+      else                               
+      {
+         assert(l.updateType == ETA);
          changeEta(idx, eta);
+      }
    }
-   else if (e)                                /// ETA updates
+   else if (e != 0)                                   // ETA updates
    {
+      // Only to test if this happens ?
+      assert(l.updateType == ETA);
       l.updateType = ETA;
       updateNoClear(idx, e->values(), e->indexMem(), e->size());
    }
-   else if (l.updateType)                     /// Forest-Tomlin updates
+   else if (l.updateType == FOREST_TOMLIN)            // FOREST_TOMLIN updates
    {
       forest = subst;
       CLUFactor::solveLright(forest.altValues());
@@ -356,13 +254,15 @@ SLUFactor::Status SLUFactor::change(
       forest.setSize(0);
       forest.forceSetup();
    }
-   else                                        /// ETA updates
+   else                                               // ETA updates
    {
+      assert(l.updateType == ETA);
       vec = subst;
-      solve2right(eta, vec);
+      eta.clear();
+      CLUFactor::solveRight(eta.altValues(), vec.get_ptr());
       changeEta(idx, eta);
    }
-   usetup = 0;
+   usetup = false;
 
    DEBUG({ std::cout << "\tupdated\t\tstability = " << stability()
                      << std::endl; });
@@ -373,32 +273,33 @@ SLUFactor::Status SLUFactor::change(
 void SLUFactor::clear()
 {
    METHOD( "SLUFactor::clear()" );
-   rowMemMult = 5;             /* factor of minimum Memory * #of nonzeros */
-   colMemMult = 5;             /* factor of minimum Memory * #of nonzeros */
-   lMemMult = 1;             /* factor of minimum Memory * #of nonzeros */
+
+   rowMemMult    = 5;          /* factor of minimum Memory * #of nonzeros */
+   colMemMult    = 5;          /* factor of minimum Memory * #of nonzeros */
+   lMemMult      = 1;          /* factor of minimum Memory * #of nonzeros */
 
    l.firstUpdate = 0;
    l.firstUnused = 0;
-   thedim = 1;
+   thedim        = 1;
 
-   epsilon = Param::epsilonFactorization(); 
-   usetup = 0;
-   maxabs = 1;
-   initMaxabs = 1;
-   minThreshold = 0.01;
+   epsilon       = Param::epsilonFactorization(); 
+   usetup        = false;
+   maxabs        = 1;
+   initMaxabs    = 1;
+   minThreshold  = 0.01;
    lastThreshold = minThreshold;
-   minStability = MINSTABILITY;
-   stat = UNLOADED;
+   minStability  = MINSTABILITY;
+   stat          = UNLOADED;
 
    vec.clear();
    eta.clear();
    ssvec.clear();
    forest.clear();
 
-   u.row.size = 100;
-   u.col.size = 100;
-   l.size = 100;
-   l.startSize = 100;
+   u.row.size    = 100;
+   u.col.size    = 100;
+   l.size        = 100;
+   l.startSize   = 100;
 
    if (l.val)
    {
@@ -594,7 +495,7 @@ SLUFactor::SLUFactor()
    : CLUFactor() 
    , vec (1)
    , ssvec (1)
-   , usetup (0)
+   , usetup (false)
    , uptype (FOREST_TOMLIN)
    , eta (1)
    , forest (1)
@@ -752,9 +653,9 @@ SLUFactor::~SLUFactor()
 static Real betterThreshold(Real th)
 {
    if (th < 0.1)
-      th *= 10;
+      th *= 10.0;
    else if (th < 0.9)
-      th = (th + 1) / 2;
+      th = (th + 1.0) / 2.0;
    else if (th < 0.999)
       th = 0.99999;
    return th;
@@ -770,7 +671,7 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
    initDR(u.row.list);
    initDR(u.col.list);
 
-   usetup = 0;
+   usetup = false;
    l.updateType = uptype;
    l.firstUpdate = 0;
    l.firstUnused = 0;
@@ -806,7 +707,7 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
       spx_realloc(l.row, l.startSize);
       spx_realloc(l.start, l.startSize);
    }
-   else if (lastStability > 2*minStability)
+   else if (lastStability > 2.0 * minStability)
    {
       Real last = minThreshold;
       Real better = betterThreshold(last);
@@ -832,14 +733,14 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
    for (;;)
    {
       stat = OK;
-      factor(const_cast<SVector**>(matrix), lastThreshold, epsilon);
+      factor(matrix, lastThreshold, epsilon);
       if (stability() >= minStability)
          break;
       Real x = lastThreshold;
       lastThreshold = betterThreshold(lastThreshold);
       if (x == lastThreshold)
          break;
-      minStability /= 2;
+      minStability /= 2.0;
    }
 
    DEBUG({ std::cout << "threshold = " << lastThreshold

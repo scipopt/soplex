@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: changesoplex.cpp,v 1.16 2002/04/10 14:36:30 bzfpfend Exp $"
+#pragma ident "@(#) $Id: changesoplex.cpp,v 1.17 2002/10/23 10:40:38 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -670,23 +670,25 @@ void SoPlex::changeLower(const Vector& newLower)
 void SoPlex::changeLower(int i, Real newLower)
 {
    METHOD( "SoPlex::changeLower()" );
-   SPxLP::changeLower(i, newLower);
-   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+
+   if (NE(newLower, lower(i)))
    {
-      changeLowerStatus(
-         desc().colStatus(i), newLower, SPxLP::upper(i), *this, i);
-      unInit();
+      SPxLP::changeLower(i, newLower);
+      if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+      {
+         changeLowerStatus(
+            desc().colStatus(i), newLower, SPxLP::upper(i), *this, i);
+         unInit();
+      }
    }
 }
 
-static void changeUpperStatus
-(
+static void changeUpperStatus(
    SPxBasis::Desc::Status& stat,
-   Real newUpper,
-   Real lower,
-   const SPxBasis& basis,
-   int i
-)
+   Real                    newUpper,
+   Real                    lower,
+   const SPxBasis&         basis,
+   int                     i)
 {
    DEBUG({ std::cout << "changeUpperStatus(): col " << i
                      << ": " << stat; });
@@ -728,6 +730,7 @@ static void changeUpperStatus
 void SoPlex::changeUpper(const Vector& newUpper)
 {
    METHOD( "SoPlex::changeUpper()" );
+
    SPxLP::changeUpper(newUpper);
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
@@ -741,12 +744,16 @@ void SoPlex::changeUpper(const Vector& newUpper)
 void SoPlex::changeUpper(int i, Real newUpper)
 {
    METHOD( "SoPlex::changeUpper()" );
-   SPxLP::changeUpper(i, newUpper);
-   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+
+   if (NE(newUpper, upper(i)))
    {
-      changeUpperStatus(
-         desc().colStatus(i), newUpper, SPxLP::lower(i), *this, i);
-      unInit();
+      SPxLP::changeUpper(i, newUpper);
+      if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+      {
+         changeUpperStatus(
+            desc().colStatus(i), newUpper, SPxLP::lower(i), *this, i);
+         unInit();
+      }
    }
 }
 
@@ -771,6 +778,7 @@ void SoPlex::changeBounds(const Vector& newLower, const Vector& newUpper)
 void SoPlex::changeBounds(int i, Real newLower, Real newUpper)
 {
    METHOD( "SoPlex::changeBounds()" );
+
    SPxLP::changeLower(i, newLower);
    SPxLP::changeUpper(i, newUpper);
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: islist.h,v 1.12 2002/01/31 08:19:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: islist.h,v 1.13 2002/10/23 10:40:39 bzfkocht Exp $"
 
 /**@file  islist.h
  * @brief Generic single linked list.
@@ -227,7 +227,7 @@ public:
        (i.e.  #append%ing, #insert%ing or #prepend%ing) a list or
        explicitely constructing a sublist with method #sublist().
    */
-   void remove(const IsList<T>& list)
+   void remove(IsList<T>& list)
    {
       if (the_first != 0 && list.the_first != 0)
       {
@@ -305,13 +305,14 @@ public:
    /// returns the position of element \p elem within #IsList.
    int find(const T* elem) const
    {
-      T *test = the_first;
-      do
-      {
+      const T* test;
+
+      assert(elem != 0);
+
+      for(test = the_first; test != 0; test = next(test))
          if (test == elem)
             return 1;
-      }
-      while ((test = next(test)));
+
       return 0;
    }
 

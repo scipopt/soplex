@@ -13,10 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.h,v 1.13 2002/03/03 13:50:32 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.h,v 1.14 2002/10/23 10:40:39 bzfkocht Exp $"
 
 /**@file  slufactor.h
- * @brief Sparse LU factorization.
+ * @brief Implementation of Sparse Linear Solver.
  */
 #ifndef _SLUFACTOR_H_
 #define _SLUFACTOR_H_
@@ -30,17 +30,15 @@
 
 namespace soplex
 {
-
 /// maximum nr. of factorization updates allowed before refactorization.
 #define MAXUPDATES      1000     
 
-
-/**@brief   Sparse LU factorization.
-   @ingroup Algo
-   
-   This is an implementation class for #SLinSolver using sparse LU
-   factorization.
-*/
+/**@brief   Implementation of Sparse Linear Solver.
+ * @ingroup Algo
+ * 
+ * This class implements a #SLinSolver interface by using the sparse LU
+ * factorization implementet in #CLUFactor.
+ */
 class SLUFactor : public SLinSolver, private CLUFactor
 {
 public:
@@ -52,33 +50,36 @@ public:
       FOREST_TOMLIN  ///<
    };
 
+private:
+   DVector    vec;           ///< Temporary vector
+   SSVector   ssvec;         ///< Temporary semi-sparse vector
+
 protected:
-   /**@todo document these protected methods and attributes */
-   void freeAll();
-   void changeEta(int idx, SSVector& eta);
-
-   DVector    vec;           ///<
-   SSVector   ssvec;         ///<
-
-   int        usetup;        ///< TRUE iff update vector has been setup
+   bool       usetup;        ///< TRUE iff update vector has been setup
    UpdateType uptype;        ///< the current #UpdateType.
    SSVector   eta;           ///< 
    SSVector   forest;        ///<
-   Real       lastThreshold; ///<
-
-public:
-   typedef SLinSolver::Status Status;
+   Real       lastThreshold; ///< pivoting threshold of last factorization
 
    /**@name Control Parameters */
    //@{
    /// minimum threshold to use.
    Real minThreshold;
-
+   /// minimum stability to achieve by setting threshold.
+   Real minStability;
    /// |x| < epsililon is considered to be 0.
    Real epsilon;
 
-   /// minimum stability to achieve by setting threshold.
-   Real minStability;
+protected:
+   /**@todo document these protected methods and attributes */
+   ///
+   void freeAll();
+   ///
+   void changeEta(int idx, SSVector& eta);
+
+
+public:
+   typedef SLinSolver::Status Status;
 
    /// returns the current update type #uptype.
    UpdateType utype()
@@ -125,82 +126,29 @@ public:
    ///
    Status load(const SVector* vec[], int dim);
 
+public:
    ///
-   void solve2right(Vector& x, Vector& b);
+   void solveRight (Vector& x, const Vector& b);
    ///
-   void solve2right(Vector& x, SSVector& b);
-   ///
-   void solve2right(SSVector& x, Vector& b);
-   ///
-   void solve2right(SSVector& x, SSVector& b);
+   void solveRight (SSVector& x, const SVector& b);
 
    ///
-   void solveRight (Vector& x,
-                     const Vector& b);
+   void solveRight4update(SSVector& x, const SVector& b);
    ///
-   void solveRight (Vector& x,
-                     const SVector& b);
+   void solve2right4update(SSVector& x, Vector& y,
+      const SVector& b, SSVector& rhs);
    ///
-   void solveRight (SSVector& x,
-                     const Vector& b);
+   void solveLeft(Vector& x, const Vector& b);
    ///
-   void solveRight (SSVector& x,
-                     const SVector& b);
-
+   void solveLeft(SSVector& x, const SVector& b);
    ///
-   void solveRight4update(SSVector& x,
-                           const SVector& b);
-   ///
-   void solve2right4update(SSVector& x,
-                            Vector& two,
-                            const SVector& b,
-                            SSVector& rhs);
-
-   ///
-   void solve2left(Vector& x, Vector& b);
-   ///
-   void solve2left(Vector& x, SSVector& b);
-   ///
-   void solve2left(SSVector& x, Vector& b);
-   ///
-   void solve2left(SSVector& x, SSVector& b);
-
-   ///
-   void solveLeft (Vector& x,
-                    const Vector& b);
-   ///
-   void solveLeft (Vector& x,
-                    const SVector& b);
-   ///
-   void solveLeft (SSVector& x,
-                    const Vector& b);
-   ///
-   void solveLeft (SSVector& x,
-                    const SVector& b);
-
-   ///
-   void solveLeft (SSVector& x,
-                    Vector& two,
-                    const SVector& b,
-                    SSVector& rhs2);
-
+   void solveLeft(SSVector& x, Vector& y, const SVector& rhs1, SSVector& rhs2);
    ///
    Status change(int idx, const SVector& subst, const SSVector* eta = 0);
    //@}
 
    /**@name Miscellaneous */
    //@{
-   /// returns a zero vector.
-   /** Returns a zero #Vector of the factorizations dimension. This may
-       \em temporarily be used by other the caller in order to save
-       memory (management overhead), but \em must \em be \em reset \em to \em 0
-       when a method of #SLUFactor is called.
-   */
-   Vector& zeroVec() //const
-   {
-      return vec; 
-   }
-
    /// prints the LU factorization to stdout.
    void dump() const;
 

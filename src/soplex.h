@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.51 2002/08/27 07:20:37 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.52 2002/10/23 10:40:39 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -697,7 +697,7 @@ public:
    /** This method returns wheather or not \p p_id identifies a vector
     *  with respect to the chosen representation.
     */
-   int isId(SPxId p_id) const
+   int isId(const SPxId& p_id) const
    {
       return p_id.info * theRep > 0;
    }
@@ -706,7 +706,7 @@ public:
    /** This method returns wheather or not \p p_id identifies a coVector
     *  with respect to the chosen representation.
     */
-   int isCoId(SPxId p_id) const
+   int isCoId(const SPxId& p_id) const
    {
       return p_id.info * theRep < 0;
    }
@@ -828,7 +828,7 @@ public:
    }
 
    /// is the \p p_id 'th vector basic ?
-   int isBasic(SPxId p_id) const
+   int isBasic(const SPxId& p_id) const
    {
       assert(p_id.isValid());
       return p_id.isSPxRowId()
@@ -837,13 +837,13 @@ public:
    }
 
    /// is the \p rid 'th vector basic ?
-   int isBasic(SPxRowId rid) const
+   int isBasic(const SPxRowId& rid) const
    {
       return isBasic(desc().rowStatus(number(rid)));
    }
 
    /// is the \p cid 'th vector basic ?
-   int isBasic(SPxColId cid) const
+   int isBasic(const SPxColId& cid) const
    {
       return isBasic(desc().colStatus(number(cid)));
    }

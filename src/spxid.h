@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxid.h,v 1.1 2002/03/21 16:06:19 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxid.h,v 1.2 2002/10/23 10:40:39 bzfkocht Exp $"
 
 /**@file  spxid.h
  * @brief Row and columns Id's #SPxLP.
@@ -153,17 +153,17 @@ public:
       : DataKey(ROW_ID, rid.idx) 
    {}
    /// equality operator.
-   int operator==(const SPxId& id)
+   int operator==(const SPxId& id) const
    {
       return (this == &id);
    }
    /// inequality operator.
-   int operator!=(const SPxId& id)
+   int operator!=(const SPxId& id) const
    {
       return (this != &id);
    }
    /// less then operator
-   bool operator<(const SPxId& id)
+   bool operator<(const SPxId& id) const
    {
       return getIdx() < id.getIdx();
    }

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.19 2002/08/27 07:20:37 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.20 2002/10/23 10:40:39 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -531,7 +531,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val)
                      sel = upb[pnr] - pvec[pnr];
                      if (x < minStability && sel < delta)
                      {
-                        minStability /= 2;
+                        minStability /= 2.0;
                         solver()->shiftUPbound(pnr, pvec[pnr]);
                         continue;
                      }
@@ -541,7 +541,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val)
                      sel = lpb[pnr] - pvec[pnr];
                      if (-x < minStability && -sel < delta)
                      {
-                        minStability /= 2;
+                        minStability /= 2.0;
                         solver()->shiftLPbound(pnr, pvec[pnr]);
                         continue;
                      }
@@ -716,7 +716,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val)
                pvec[pnr] = solver()->vector(pnr) * cvec;
                if (solver()->isBasic(enterId))
                {
-                  pupd.setValue(pnr, 0);
+                  pupd.setValue(pnr, 0.0);
                   continue;
                }
                else

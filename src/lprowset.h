@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.h,v 1.17 2002/04/06 13:05:02 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprowset.h,v 1.18 2002/10/23 10:40:39 bzfkocht Exp $"
 
 /**@file  lprowset.h
  * @brief Set of LP columns.
@@ -267,13 +267,13 @@ public:
    }
 
    /// adds \p n nonzero (\p idx, \p val)-pairs to #rowVector with #DataKey \p k.
-   void add2(const DataKey& k, int n, int idx[], Real val[])
+   void add2(const DataKey& k, int n, const int idx[], const Real val[])
    {
       SVSet::add2(rowVector_w(k), n, idx, val);
    }
 
    /// adds \p n nonzero (\p idx, \p val)-pairs to \p i 'th #rowVector.
-   void add2(int i, int n, int idx[], Real val[])
+   void add2(int i, int n, const int idx[], const Real val[])
    {
       SVSet::add2(rowVector_w(i), n, idx, val);
    }

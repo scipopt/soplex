@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbounds.cpp,v 1.13 2002/07/26 08:14:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbounds.cpp,v 1.14 2002/10/23 10:40:39 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -53,8 +53,8 @@ void SoPlex::setPrimalBounds()
    {
       theURbound = lhs();
       theLRbound = rhs();
-      theURbound *= -1;
-      theLRbound *= -1;
+      theURbound *= -1.0;
+      theLRbound *= -1.0;
    }
 }
 

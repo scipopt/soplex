@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.43 2002/08/27 07:20:37 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.44 2002/10/23 10:40:39 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -54,7 +54,7 @@ using namespace soplex;
 /** Here comes a simple derived class from #SoPlex, which uses #terminate() as
  *  callback method for outputting statistics.
  */
-class MySoPlex : public SPxSolver
+class MySoPlex : public SoPlex
 {
 private:
    SLUFactor m_slu;
@@ -62,8 +62,10 @@ private:
 public:
    /// default constructor
    MySoPlex(Type p_type = LEAVE, Representation p_rep = COLUMN)
-      : SPxSolver(p_type, p_rep)
-   {}
+      : SoPlex(p_type, p_rep)
+   {
+      setSolver(&m_slu);
+   }
 
    virtual bool terminate()
    {

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.34 2002/03/03 13:50:31 bzfkocht Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.35 2002/10/23 10:40:39 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -348,13 +348,12 @@ void CLUFactor::remaxCol(int p_col, int len)
         the active submatrix.
  */
 
- /*****************************************************************************/
+ /****************************************************************************/
  /*
   *      Initialize row and column file of working matrix and
   *      mark column singletons.
   */
-void CLUFactor::initFactorMatrix(SVector** vec, 
-                                 const Real eps )
+void CLUFactor::initFactorMatrix(const SVector** vec, const Real eps )
 {
    METHOD( "CLUFactor::initFactorMatrix()" );
    Real x;
@@ -362,7 +361,7 @@ void CLUFactor::initFactorMatrix(SVector** vec,
    int tot;
    Dring *rring, *lastrring;
    Dring *cring, *lastcring;
-   SVector *psv;
+   const SVector *psv;
    int *sing = temp.s_mark;
 
    /*  Initialize:
@@ -1529,9 +1528,9 @@ void CLUFactor::setupRowVals()
 /*****************************************************************************/
 
 void CLUFactor::factor( 
-   SVector** vec,           ///< Array of column vector pointers   
-   Real    threshold,     ///< pivoting threshold                
-   Real    eps)           ///< epsilon for zero detection        
+   const SVector** vec,          ///< Array of column vector pointers   
+   Real            threshold,    ///< pivoting threshold                
+   Real            eps)          ///< epsilon for zero detection        
 {
    METHOD( "CLUFactor::factor()" );
    stat = SLinSolver::OK;

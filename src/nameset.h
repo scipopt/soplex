@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.h,v 1.19 2002/04/03 10:15:45 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.h,v 1.20 2002/10/23 10:40:39 bzfkocht Exp $"
 
 /**@file  nameset.h
  * @brief Set of strings.
@@ -128,7 +128,7 @@ public:
    }
 
    /// returns name for #DataKey \p pkey of #NameSet.
-   const char* operator[](DataKey pkey) const
+   const char* operator[](const DataKey& pkey) const
    {
       return &mem[set[pkey]];
    }
@@ -179,7 +179,7 @@ public:
    }
 
    /// returns number of name with #DataKey \p pkey in #NameSet.
-   int number(DataKey pkey) const
+   int number(const DataKey& pkey) const
    {
       return set.number(pkey);
    }
