@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.12 2002/01/19 18:59:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.13 2002/01/22 14:17:16 bzfkocht Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.
@@ -196,7 +196,7 @@ static void readCols(
    NameSet&  cnames,
    DIdxSet*  intvars)
 {
-   Real   val;
+   Real     val;
    int      idx;
    char     colname[MPSInput::MAX_LINE_LEN] = { '\0' };
    LPCol    col(rset.num());
@@ -245,6 +245,10 @@ static void readCols(
 
             if (intvars != 0)
                intvars->addIdx(cnames.number(colname));
+
+            // For Integer variable the default bounds are 0/1 according
+            // to the ILOG documentation. 
+            col.setUpper(1.0);
          }
       }
       val = atof(mps.field3());
@@ -547,7 +551,7 @@ static void readBounds(
  *  What it will not do, is find all cases where a file is ill formed. 
  *  If this happens it may complain and read nothing or read "something".
  *
- *  @return true if an error has occurred.
+ *  @return true if the file was read correctly.
  */  
 bool SPxLP::readMPS(
    std::istream& p_input, 

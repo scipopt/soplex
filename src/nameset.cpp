@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.cpp,v 1.14 2002/01/19 18:59:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.cpp,v 1.15 2002/01/22 14:17:15 bzfkocht Exp $"
 
 #include <string.h>
 #include "real.h"
@@ -33,6 +33,7 @@ void NameSet::add(const char* str)
 void NameSet::add(DataKey& p_key, const char* str)
 {
    const Name nstr (str);
+
    if (!hashtab.has(nstr))
    {
       if (size() + 1 > max())
