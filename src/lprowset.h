@@ -13,21 +13,17 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.h,v 1.7 2001/11/22 16:30:00 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprowset.h,v 1.8 2001/11/23 14:48:40 bzfpfend Exp $"
 
+/**@file  lpcolset.h
+ * @brief Set of LP columns.
+ */
 #ifndef _LPROWSET_H_
 #define _LPROWSET_H_
 
 
-//@ ----------------------------------------------------------------------------
-/*      \Section{Imports}
-    Import required system include files
- */
 #include <assert.h>
 
-
-/*  and class header files
- */
 #include "lprow.h"
 #include "dvector.h"
 #include "svset.h"
@@ -35,40 +31,40 @@
 
 namespace soplex
 {
-
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
-
-/** set of LP rows.
-    Class #LPRowSet# implements a set of #LPRow#s. Unless for memory
-    limitations, any number of #LPRow#s may be #add#ed to an #LPRowSet#. Single
-    or multiple #LPRow#s may be #add#ed to an #LPRowSet#, where each method
-    #add()# comes with two different signatures. One with an one without a
-    parameter, used for returning the #Key#s assigned to the new #LPRow#s
-    by the set. See \Ref{DataSet::Key} for a more detailed description of the
-    concept of #Key#s. For the concept of renumbering #LPRow#s within an
-    #LPRowSet# after removal of some #LPRow#s see \Ref{DataSet}.
- */
+/**@brief   Set of LP rows.
+   @ingroup Algebra
+   
+   Class #LPRowSet implements a set of #LPRow%s. Unless for memory
+   limitations, any number of #LPRow%s may be #add%ed to an #LPRowSet. Single
+   or multiple #LPRow%s may be #add%ed to an #LPRowSet, where each method
+   #add() comes with two different signatures. One with and one without a
+   parameter, used for returning the #Key%s assigned to the new #LPRow%s
+   by the set. See #DataSet::Key for a more detailed description of the
+   concept of #Key%s. For the concept of renumbering #LPRow%s within an
+   #LPRowSet after removal of some #LPRow%s see #DataSet.
+   
+   @see        DataSet, DataSet::Key
+*/
 class LPRowSet : protected SVSet
 {
 private:
-   ///
+   /**@todo  get rid of this typedef! */
    typedef DataKey Key;
 
-   DVector left;
-   DVector right;
+   DVector left;  ///< vector of left hand sides (lower bounds) of #LPRow%s.
+   DVector right; ///< vector of right hand sides (upper bounds) of #LPRow%s.
 
 public:
 
    /**@name Inquiry */
    //@{
-   /// number of #LPRow#s in #LPRowSet#.
+   /// returns the number of #LPRow%s in #LPRowSet.
    int num() const
    {
       return SVSet::num();
    }
-   /// maximum number of #LPRow#s that fit.
+
+   /// returns the maximum number of #LPRow%s that fit.
    int max() const
    {
       return SVSet::max();
@@ -79,7 +75,7 @@ public:
    {
       return left;
    }
-   /// vector of #lhs# values.
+   /// returns the vector of #lhs values.
    Vector& lhs()
    {
       return left;
@@ -90,7 +86,7 @@ public:
    {
       return left[i];
    }
-   /// #lhs# of #i#-th #LPRow#.
+   /// returns the #lhs of the \p i 'th #LPRow.
    double& lhs(int i)
    {
       return left[i];
@@ -101,7 +97,7 @@ public:
    {
       return left[number(k)];
    }
-   /// #lhs# of #k#-th #LPRow# in #LPRowSet#.
+   /// returns the #lhs of the #LPRow with #Key \k in #LPRowSet.
    double& lhs(const Key& k)
    {
       return left[number(k)];
@@ -112,7 +108,7 @@ public:
    {
       return right;
    }
-   /// vector of #rhs# values.
+   /// returns the vector of #rhs values.
    Vector& rhs()
    {
       return right;
@@ -123,7 +119,7 @@ public:
    {
       return right[i];
    }
-   /// #rhs# of #i#-th #LPRow#.
+   /// returns the #rhs of the \p i 'th #LPRow.
    double& rhs(int i)
    {
       return right[i];
@@ -134,35 +130,37 @@ public:
    {
       return right[number(k)];
    }
-   /// #rhs# of #k#-th #LPRow#.
+   /// returns the #rhs of the #LPRow with #Key \k in #LPRowSet.
    double& rhs(const Key& k)
    {
       return right[number(k)];
    }
 
-   ///
+   /// returns a writable #rowVector of the \p i 'th #LPRow.
    SVector& rowVector_w(int i)
    {
       return operator[](i);
    }
-   /// #rowVector# of #i#-th #LPRow#.
+
+   /// returns the #rowVector of the \p i 'th #LPRow.
    const SVector& rowVector(int i) const
    {
       return operator[](i);
    }
 
-   /// #rowVector# of #k#-th #LPRow#.
+   /// returns a writable #rowVector of the #LPRow# with #Key \p k.
    SVector& rowVector_w(const Key& k)
    {
       return operator[](k);
    }
-   ///
+
+   /// returns the #rowVector of the #LPRow# with #Key \p k.
    const SVector& rowVector(const Key& k) const
    {
       return operator[](k);
    }
 
-   ///
+   /// returns the inequalitiy type of the \p i 'th #LPRow.
    LPRow::Type type(int i) const
    {
       if (rhs(i) >= LPRow::infinity)
@@ -173,16 +171,17 @@ public:
          return LPRow::EQUAL;
       return LPRow::RANGE;
    }
-   /// inequality type of #k#-th #LPRow#.
+
+   /// returns the inequality type of the #LPRow with #Key \p k.
    LPRow::Type type(const Key& k) const
    {
       return type(number(k));
    }
 
-   /// change type of row i
+   /// changes the inequality type of row \p i to \p type.
    void setType(int i, LPRow::Type type);
 
-   ///
+   /// returns the value of the \p i'th #LPRow.
    double value(int i) const
    {
       if (rhs(i) < LPRow::infinity)
@@ -193,23 +192,30 @@ public:
          return lhs(i);
       }
    }
-   /// value of #k#-th #LPRow#.
+
+   /// returns the value of the #LPRow with #Key \p k.
+   /** The \em value of a row depends on its type: if the inequality is of
+       type "greater or equal", the value is the #lhs of the row. Otherwise,
+       the value is the #rhs.
+   */
    double value(const Key& k) const
    {
       return value(number(k));
    }
 
-   /// return #Key# of #i#-th #LPRow# in #LPRowSet#.
+   /// returns the #Key of the \p i 'th #LPRow in #LPRowSet.
    Key key(int i) const
    {
       return SVSet::key(i);
    }
-   /// return number of #k#-th #LPRow# in #LPRowSet#.
+
+   /// returns the number of the #LPRow# with #Key \p k in #LPRowSet.
    int number(const Key& k) const
    {
       return SVSet::number(k);
    }
-   /// does #Key k# belong to #LPRowSet#?.
+
+   /// does #Key \p k belong to #LPRowSet ?
    int has(const Key& k) const
    {
       return SVSet::has(k);
@@ -218,11 +224,11 @@ public:
 
 
    /**@name Extension
-       Extension methods come with two signatures, one of which providing a
-       parameter to return the assigned #Key#(s). See \Ref{DataSet} for a more
-       detailed description. All extension methods will automatically rearrange
-       or allocate more memory if required.
-    */
+      Extension methods come with two signatures, one of them providing a
+      parameter to return the assigned #Key(s). See #DataSet for a more
+      detailed description. All extension methods will automatically rearrange
+      or allocate more memory if required.
+   */
    //@{
    ///
    void add(const LPRow& row)
@@ -230,7 +236,7 @@ public:
       Key k;
       add(k, row);
    }
-   /// add #row# to #LPRowSet#.
+   /// adds \p row to #LPRowSet.
    void add(Key& pkey, const LPRow& prow)
    {
       add(pkey, prow.lhs(), prow.rowVector(), prow.rhs());
@@ -242,30 +248,33 @@ public:
       Key k;
       add(k, plhs, prowVector, prhs);
    }
-   /// add #LPRow# consisting of #lhs#, #rowVector# and #rhs# to #LPRowSet#.
+   /// adds #LPRow consisting of left hand side \p lhs, row vector \p rowVector, and right hand side \p rhs to #LPRowSet.
    void add(Key& key, double lhs, const SVector& rowVector, double rhs);
 
    ///
    void add(const LPRowSet& set);
-   /// add all #LPRow#s of #set# to #LPRowSet#.
+   /// adds all #LPRow%s of \p set to #LPRowSet.
    void add(Key key[], const LPRowSet& set);
 
-   /// extend row #n# to fit #newmax# nonzeros.
+   /// extends row \p n to fit \p newmax nonzeros.
    void xtend(int n, int newmax)
    {
       SVSet::xtend(rowVector_w(n), newmax);
    }
-   /// extend row #key# to fit #newmax# nonzeros.
+
+   /// extend row with #Key \p key to fit \p newmax nonzeros.
    void xtend(const Key& pkey, int pnewmax)
    {
       SVSet::xtend(rowVector_w(pkey), pnewmax);
    }
-   ///
+
+   /// adds \p n nonzero (\p idx, \p val)-pairs to #rowVector with #Key \p k.
    void add2(const Key& k, int n, int idx[], double val[])
    {
       SVSet::add2(rowVector_w(k), n, idx, val);
    }
-   /// add #n# nonzero (#idx#, #val#) to #i#-th #rowVector#..
+
+   /// adds \p n nonzero (\p idx, \p val)-pairs to \p i 'th #rowVector.
    void add2(int i, int n, int idx[], double val[])
    {
       SVSet::add2(rowVector_w(i), n, idx, val);
@@ -277,9 +286,7 @@ public:
       Key k;
       return create(k, pnonzeros, plhs, prhs);
    }
-   /** Create new #LPRow# with specified parameters and return a reference
-       to its row vector.
-    */
+   /// creates new #LPRow with specified parameters and returns a reference to its row vector.
    SVector& create(Key& nkey, int nonzeros = 0, double lhs = 0, double rhs = 1);
    //@}
 
@@ -289,69 +296,70 @@ public:
        #LPRow#s in a #LPRowSet# after the call of a removal method.
     */
    //@{
-   /// remove #i#-th #LPRow#.
+   /// removes \p i 'th #LPRow.
    void remove(int i);
-   /// remove #k#-th #LPRow#.
+   /// removes #LPRow with #Key \p k.
    void remove(const Key& k)
    {
       remove(number(k));
    }
 
 
-   /// remove multiple elements.
+   /// removes multiple #LPRow%s.
    void remove(int perm[]);
 
-   ///
+   /// removes \p n #LPRow%s with #Key%s \p keys.
    void remove(Key keys[], int n)
    {
       DataArray<int> perm(num());
       remove(keys, n, perm.get_ptr());
    }
 
-   ///
+   /// removes \p n #LPRow%s with row numbers given by \p nums.
    void remove(int nums[], int n)
    {
       DataArray<int> perm(num());
       remove(nums, n, perm.get_ptr());
    }
 
-   ///
+   /// removes \p n #LPRow%s with #Key%s \p keys, and stores permutation of row indices in \p perm.
    void remove(Key keys[], int n, int* perm);
 
-   /// remove #n# #LPRow#s.
+   /// removes \p n #LPRow%s with row numbers given by \p nums, and stores permutation of row indices in \p perm.
    void remove(int nums[], int n, int* perm);
 
-   /// remove all #LPRow#s.
+   /// removes all #LPRow%s.
    void clear();
    //@}
 
 
    /**@name Memory Management
        For a description of the memory management methods, see the
-       documentation of #SVSet#, which has benn used for implementating
-       #LPRowSet#.
+       documentation of #SVSet, which has been used for implementating
+       #LPRowSet.
     */
    //@{
-   ///
+   /// reallocates memory to be able to store \newmax #LPRow%s.
    void reMax(int newmax = 0)
    {
       SVSet::reMax(newmax);
       left.reSize (max());
       right.reSize(max());
    }
-   /// used nonzero memory.
+
+   /// returns number of used nonzero entries.
    int memSize() const
    {
       return SVSet::memSize();
    }
 
-   /// length of nonzero memory.
+   /// returns length of nonzero memory.
    int memMax() const
    {
       return SVSet::memMax();
    }
 
-   /// reset length of nonzero memory.
+   /// reallocates memory to be able to store \newmax nonzeros.
    void memRemax(int newmax)
    {
       SVSet::memRemax(newmax);
@@ -367,7 +375,24 @@ public:
 
    /**@name Miscellaneous */
    //@{
-   ///
+   /// check consistency.
+   int isConsistent() const;
+   //@}
+
+   /**@name Constructors / Destructors */
+   //@{
+   /// default constructor.
+   /** The user can specify the initial maximum number of rows \p max
+       and the initial maximum number of nonzero entries \p memmax. If these
+       parameters are omitted, a default size is used. However, one can add
+       an arbitrary number of rows to the #LPRowSet, which may result in
+       automated memory realllocation.
+   */
+   LPRowSet(int pmax = -1, int pmemmax = -1)
+      : SVSet(pmax, pmemmax), left(0), right(0)
+   { }
+
+   /// assignment operator.
    LPRowSet& operator=(const LPRowSet& rs)
    {
       SVSet::operator=(rs);
@@ -375,15 +400,6 @@ public:
       right = rs.right;
       return *this;
    }
-
-   ///
-   LPRowSet(int pmax = -1, int pmemmax = -1)
-      : SVSet(pmax, pmemmax), left(0), right(0)
-   { }
-
-   /// check consistency.
-
-   int isConsistent() const;
    //@}
 };
 } // namespace soplex
