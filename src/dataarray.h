@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataarray.h,v 1.13 2002/01/05 19:24:09 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataarray.h,v 1.14 2002/01/07 14:07:17 bzfkocht Exp $"
 
 /**@file  dataarray.h
  * @brief Save arrays of data objects.
@@ -276,7 +276,7 @@ public:
    }
 
    /// copy constructor
-   explicit DataArray(const DataArray& old)
+   DataArray(const DataArray& old)
       : thesize(old.thesize)
       , themax (old.themax)
       , memFactor (old.memFactor)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: array.h,v 1.13 2002/01/04 17:31:38 bzfkocht Exp $"
+#pragma ident "@(#) $Id: array.h,v 1.14 2002/01/07 14:07:17 bzfkocht Exp $"
 
 /**@file  array.h
  * @brief Save arrays of arbitrary types.
@@ -214,7 +214,7 @@ public:
    }
 
    /// copy constructor
-   explicit Array(const Array<T>& old) 
+   Array(const Array<T>& old) 
       : num(old.num)
    {
       if (num > 0)
