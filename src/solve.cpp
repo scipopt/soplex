@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: solve.cpp,v 1.15 2002/03/03 13:50:32 bzfkocht Exp $"
+#pragma ident "@(#) $Id: solve.cpp,v 1.16 2002/03/10 10:00:59 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -93,7 +93,7 @@ int CLUFactor::solveUrightEps(Real* vec, int* nonz, Real eps, Real* rhs)
    int *rorig, *corig;
    int *cidx, *clen, *cbeg;
    Real *cval;
-   Real x, meps;
+   Real x;
 
    int *idx;
    Real *val;
@@ -106,14 +106,13 @@ int CLUFactor::solveUrightEps(Real* vec, int* nonz, Real eps, Real* rhs)
    clen = u.col.len;
    cbeg = u.col.start;
 
-   meps = -eps;
    n = 0;
 
    for (i = thedim - 1; i >= 0; --i)
    {
       r = rorig[i];
       x = diag[r] * rhs[r];
-      if (x > eps || x < meps)
+      if (isNotZero(x, eps))
       {
          c = corig[i];
          vec[c] = x;
@@ -195,10 +194,9 @@ int CLUFactor::solveUright2eps(
    int i, j, r, c, n;
    int *rorig, *corig;
    int *cidx, *clen, *cbeg;
-   int notzero1, notzero2;
+   bool notzero1, notzero2;
    Real *cval;
    Real x1, x2;
-   Real meps;
 
    int* idx;
    Real* val;
@@ -211,7 +209,6 @@ int CLUFactor::solveUright2eps(
    clen = u.col.len;
    cbeg = u.col.start;
 
-   meps = -eps;
    n = 0;
 
    for (i = thedim - 1; i >= 0; --i)
@@ -221,8 +218,9 @@ int CLUFactor::solveUright2eps(
       p_work1[c] = x1 = diag[r] * vec1[r];
       p_work2[c] = x2 = diag[r] * vec2[r];
       vec1[r] = vec2[r] = 0;
-      notzero1 = (x1 < meps || x1 > eps);
-      notzero2 = (x2 < meps || x2 > eps);
+      notzero1 = isNotZero(x1, eps);
+      notzero2 = isNotZero(x2, eps);
+
       if (notzero1 && notzero2)
       {
          *nonz++ = c;
@@ -905,7 +903,7 @@ int CLUFactor::solveLleftEps(Real* vec, int* nonz, Real eps)
    METHOD( "CLUFactor::solveLleftEps()" );
    int i, j, k, n;
    int r;
-   Real x, meps;
+   Real x;
    Real *rval, *val;
    int *ridx, *idx;
    int *rbeg;
@@ -915,7 +913,6 @@ int CLUFactor::solveLleftEps(Real* vec, int* nonz, Real eps)
    rval = l.rval;
    rbeg = l.rbeg;
    rorig = l.rorig;
-   meps = -eps;
    n = 0;
    i = l.firstUpdate - 1;
 #ifndef WITH_L_ROWS
@@ -939,7 +936,7 @@ int CLUFactor::solveLleftEps(Real* vec, int* nonz, Real eps)
    {
       r = rorig[i];
       x = vec[r];
-      if (x < meps || x > eps)
+      if (isNotZero(x, eps))
       {
          *nonz++ = r;
          n++;

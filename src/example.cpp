@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.32 2002/03/03 13:50:31 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.33 2002/03/10 10:00:59 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -108,6 +108,8 @@ int main(int argc, char **argv)
    " -lSec     set timelimit to Sec seconds\n"
    " -dDelta   set maximal allowed bound violation to Delta\n"
    " -zZero    set zero tolerance to Zero\n\n"
+   " -v        show program version\n"
+   " -h        show this help\n"
    "Simplifier:         Starter:        Pricer:           Ratiotester:\n"
    " -s0  none           -c0  none*      -p0  Textbook     -t0  Textbook\n" 
    " -s1  General        -c1  Weight     -p1  ParMult      -t1  Harris\n"

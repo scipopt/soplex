@@ -1,6 +1,8 @@
-$Id: TODO,v 1.57 2002/02/28 14:41:16 bzfkocht Exp $
+$Id: TODO,v 1.58 2002/03/10 10:00:59 bzfkocht Exp $
 
 Diesen Kram mal als @todo's schreiben ;-)
+
+Memberfunctionen .has -> bool
 
 Abbruch bei minimieren mit Upper Bound
 
@@ -46,8 +48,6 @@ Each sample counts as 0.01 seconds.
 
 -----------------------------------------------------------------------------
 
-
-in ssvector/solve/vsolve etc. die vergleiche mit eps richtig.
 
 stdio.h/printf die letzten erlegen.
 

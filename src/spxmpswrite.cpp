@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpswrite.cpp,v 1.2 2002/03/06 11:45:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpswrite.cpp,v 1.3 2002/03/10 10:00:59 bzfkocht Exp $"
 
 /**@file  spxmpswrite.cpp
  * @brief Write LP as MPS format file.
@@ -23,7 +23,6 @@
 #include <assert.h>
 #include <stdio.h>
 #include <iostream>
-#include <iomanip>
 
 #include "spxdefines.h"
 #include "spxlp.h"
@@ -39,32 +38,6 @@ static void writeRecord(
    const char*    name2  = 0,
    const Real     value2 = 0.0) 
 {
-   ///@todo This would be nicer with iostreams, but it seems just too dumb.
-#if 0
-   //scientific std::ios::showpoint | 
-   os.setf(std::ios::scientific | std::ios::left);
-
-   os << " " 
-      << std::setw(2) <<  ((indicator == 0) ? "" : indicator)
-      << std::setw(8) <<  ((name == 0)      ? "" : name);
-
-   if (name1 != 0)
-   {
-      os << "  "
-         << std::setw(8) << name1
-         << "  "
-         << std::setw(12) << std::setprecision(9) << value1;
-
-      if (name2 != 0)
-      {
-      os << "   "
-         << std::setw(8) << name2
-         << "  "
-         << std::setw(12) << std::setprecision(9) << value2;
-      }
-   }
-   os << std::endl;
-#endif   
    char buf[81];
 
    sprintf(buf, " %-2.2s %-8.8s",
@@ -91,8 +64,7 @@ static Real getRHS(Real left, Real right)
 {
    Real rhsval;
 
-   ///@todo Ranges are not handle by this.
-   if (left > -infinity)
+   if (left > -infinity) /// This includes ranges
       rhsval = left;
    else if (right <  infinity)
       rhsval = right;
@@ -102,32 +74,74 @@ static Real getRHS(Real left, Real right)
    return rhsval;
 }
 
+static const char* getRowName(
+   const SPxLP&   lp,
+   int            idx,
+   const NameSet* rnames, 
+   char*          buf)
+{
+   assert(buf != 0);
+   assert(idx >= 0);
+   assert(idx <  lp.nRows());
+
+   if (rnames != 0) 
+   {
+      DataKey key = lp.rId(idx);
+
+      if (rnames->has(key))
+         return (*rnames)[key];
+   }
+   sprintf(buf, "C%d_", idx);
+   
+   return buf;
+}
+   
+static const char* getColName(
+   const SPxLP&   lp,
+   int            idx,
+   const NameSet* cnames, 
+   char*          buf)
+{
+   assert(buf != 0);
+   assert(idx >= 0);
+   assert(idx <  lp.nCols());
+
+   if (cnames != 0) 
+   {
+      DataKey key = lp.cId(idx);
+
+      if (cnames->has(key))
+         return (*cnames)[key];
+   }
+   sprintf(buf, "x%d_", idx);
+   
+   return buf;
+}
+   
 /// Write LP in "MPS File Format".
-/**@todo Ranges are not supported.
- *       Integer Variable are not supported.
- *       Names must be given. They will not be automatically generated.
+/** @note There will always be a BOUNDS section, even if there are no bounds.
  */
 void SPxLP::writeMPS(
    std::ostream&  p_output, 
    const NameSet* p_rnames,          ///< row names.
    const NameSet* p_cnames,          ///< column names.
-   const DIdxSet* /*p_intvars*/)     ///< integer variables.
+   const DIdxSet* p_intvars)         ///< integer variables.
    const
 {
    METHOD("writeMPS");
 
-   assert(p_rnames != 0);
-   assert(p_cnames != 0);
-
-   const char* indicator;
-
-   int i;
-   int k;
-
+   const char*    indicator;
+   char           name [16];
+   char           name1[16];
+   char           name2[16];
+   bool           has_ranges = false;
+   int            i;
+   int            k;
+   
    // --- NAME Section ---
    p_output << "NAME          MPSDATA" << std::endl;
 
-   // --- ROWS Setction ---
+   // --- ROWS Section ---
    p_output << "ROWS" << std::endl;
 
    for(i = 0; i < nRows(); i++)
@@ -135,7 +149,10 @@ void SPxLP::writeMPS(
       if (lhs(i) == rhs(i))
          indicator = "E";
       else if ((lhs(i) > -infinity) && (rhs(i) < infinity))
-         indicator = "R";
+      {
+         indicator  = "E";
+         has_ranges = true;
+      }
       else if (lhs(i) > -infinity)
          indicator = "G";
       else if (rhs(i) <  infinity)
@@ -143,31 +160,55 @@ void SPxLP::writeMPS(
       else
          ABORT();
 
-      writeRecord(p_output, indicator, (*p_rnames)[rId(i)]); 
+      writeRecord(p_output, indicator, getRowName(*this, i, p_rnames, name)); 
    }
    writeRecord(p_output, "N", "MINIMIZE"); 
    
    // --- COLUMNS Section ---
    p_output << "COLUMNS" << std::endl;
 
-   for(i = 0; i < nCols(); i++)
+   bool has_intvars = (p_intvars != 0) && (p_intvars->size() > 0);
+
+   for(int j = 0; j < (has_intvars ? 2 : 1); j++)
    {
-      const SVector& col = colVector(i);
-      int colsize2       = (col.size() / 2) * 2;
+      bool is_intrun = has_intvars && (j == 1);
 
-      assert(colsize2 % 2 == 0);
+      if (is_intrun)
+         p_output << "    MARK0001  'MARKER'                 'INTORG'";
 
-      for(k = 0; k < colsize2; k += 2)
-         writeRecord(p_output, 0, (*p_cnames)[cId(i)], 
-            (*p_rnames)[rId(col.index(k))    ], col.value(k), 
-            (*p_rnames)[rId(col.index(k + 1))], col.value(k + 1));
+      for(i = 0; i < nCols(); i++)
+      {
+         bool is_intvar = has_intvars && (p_intvars->number(i) >= 0);
 
-      if (colsize2 != col.size())
-         writeRecord(p_output, 0, (*p_cnames)[cId(i)], 
-            (*p_rnames)[rId(col.index(k))], col.value(k));
+         if (  ( is_intrun && !is_intvar)
+            || (!is_intrun &&  is_intvar))
+             continue;
 
-      if (isNotZero(maxObj(i)))
-         writeRecord(p_output, 0, (*p_cnames)[cId(i)], "MINIMIZE", -maxObj(i));
+         const SVector& col = colVector(i);
+         int colsize2       = (col.size() / 2) * 2;
+
+         assert(colsize2 % 2 == 0);
+
+         for(k = 0; k < colsize2; k += 2)
+            writeRecord(p_output, 0, 
+               getColName(*this, i,                p_cnames, name),
+               getRowName(*this, col.index(k),     p_rnames, name1),
+               col.value(k),
+               getRowName(*this, col.index(k + 1), p_rnames, name2),
+               col.value(k + 1));
+
+         if (colsize2 != col.size())
+            writeRecord(p_output, 0,
+               getColName(*this, i,            p_cnames, name),
+               getRowName(*this, col.index(k), p_rnames, name1),
+               col.value(k));
+
+         if (isNotZero(maxObj(i)))
+            writeRecord(p_output, 0, getColName(*this, i, p_cnames, name),
+               "MINIMIZE", -maxObj(i));
+      }
+      if (is_intrun)
+         p_output << "    MARK0001  'MARKER'                 'INTEND'";
    }
    // --- RHS Section ---
    p_output << "RHS" << std::endl;
@@ -190,17 +231,28 @@ void SPxLP::writeMPS(
 
          if (k < nRows())
             writeRecord(p_output, 0, "RHS", 
-               (*p_rnames)[rId(i)], rhsval1, 
-               (*p_rnames)[rId(k)], rhsval2);
+               getRowName(*this, i, p_rnames, name1),
+               rhsval1, 
+               getRowName(*this, k, p_rnames, name2),
+               rhsval2);
          else
             writeRecord(p_output, 0, "RHS", 
-               (*p_rnames)[rId(i)], rhsval1); 
+               getRowName(*this, i, p_rnames, name1),
+               rhsval1);
 
          i = k + 1;
       }
    }
 
    // --- RANGES Section ---
+   if (has_ranges)
+   {
+      for(i = 0; i < nRows(); i++)
+         if ((lhs(i) > -infinity) && (rhs(i) < infinity))
+            writeRecord(p_output, "", "RANGE", 
+               getRowName(*this, i, p_rnames, name1),
+               rhs(i) - lhs(i));
+   }
    // --- BOUNDS Section ---
    p_output << "BOUNDS" << std::endl;
 
@@ -208,26 +260,44 @@ void SPxLP::writeMPS(
    {
       if (lower(i) == upper(i))
       {
-         writeRecord(p_output, "FX", "BOUND", (*p_cnames)[cId(i)], lower(i));
+         writeRecord(p_output, "FX", "BOUND", 
+            getColName(*this, i, p_cnames, name1),
+            lower(i));
+
          continue;
       }
       if ((lower(i) <= -infinity) && (upper(i) >= infinity))
       {
-         writeRecord(p_output, "FR", "BOUND", (*p_cnames)[cId(i)]);
+         writeRecord(p_output, "FR", "BOUND", 
+            getColName(*this, i, p_cnames, name1));
          continue;
       }
       if (lower(i) != 0.0)
       {
          if (lower(i) > -infinity)
             writeRecord(p_output, "LO", "BOUND", 
-               (*p_cnames)[cId(i)], lower(i));
+               getColName(*this, i, p_cnames, name1),
+               lower(i));
          else
-            writeRecord(p_output, "MI", "BOUND", (*p_cnames)[cId(i)]);
+            writeRecord(p_output, "MI", "BOUND", 
+               getColName(*this, i, p_cnames, name1));
       }
-      if (upper(i) < infinity)
+
+      if (has_intvars && (p_intvars->number(i) >= 0))
       {
-         writeRecord(p_output, "UP", "BOUND", (*p_cnames)[cId(i)], upper(i));
-         continue;
+         // Integer variables have default upper bound 1.0
+         if (upper(i) != 1.0)
+            writeRecord(p_output, "UP", "BOUND", 
+               getColName(*this, i, p_cnames, name1),
+               upper(i));
+      }
+      else
+      {
+         // Continous variables have default upper bound infinity
+         if (upper(i) < infinity)
+            writeRecord(p_output, "UP", "BOUND", 
+               getColName(*this, i, p_cnames, name1),
+               upper(i));
       }
    }   
    // --- ENDATA Section ---
@@ -244,3 +314,4 @@ void SPxLP::writeMPS(
 //Emacs indent-tabs-mode:nil
 //Emacs End:
 //-----------------------------------------------------------------------------
+

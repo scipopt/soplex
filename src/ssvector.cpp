@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.17 2002/03/03 13:50:35 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.18 2002/03/10 10:01:00 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -88,7 +88,7 @@ void SSVector::setValue(int i, Real x)
 
       if (n < 0)
       {
-         if (x > epsilon || x < -epsilon)
+         if (isNotZero(x, epsilon))
             IdxSet::add(1, &i);
       }
       else if (x == 0)
@@ -127,7 +127,7 @@ void SSVector::setup()
       for (; id < last; ++id)
       {
          x = v[*id];
-         if (fabs(x) > eps)
+         if (isNotZero(x, epsilon))
             *ii++ = *id;
          else
             v[*id] = 0;
@@ -140,7 +140,7 @@ void SSVector::setup()
       {
          if (dim())
          {
-            if (fabs(*val) > epsilon)
+            if (isNotZero(*val, epsilon))
                IdxSet::add(0);
             else
                *val = 0;
@@ -157,7 +157,7 @@ void SSVector::setup()
          *end = MARKER;
 
          /* erstes element extra */
-         if (fabs(*v) > epsilon)
+         if (isNotZero(*v, epsilon))
             *ii++ = 0;
          else
             *v = 0;
@@ -165,7 +165,7 @@ void SSVector::setup()
          for(;;)
          {
             while (!*++v);
-            if (fabs(*v) > epsilon)
+            if (isNotZero(*v, epsilon))
             {
                *ii++ = int(v - val);
             }
@@ -179,7 +179,7 @@ void SSVector::setup()
          }
 
          /* fange weissen Elefanten wieder ein */
-         if (fabs(last) > epsilon)
+         if (isNotZero(last, epsilon))
          {
             *v = last;
             *ii++ = dim() - 1;
@@ -356,7 +356,6 @@ SSVector& SSVector::multAdd(Real xx, const SSVector& svec)
       {
          int i, j;
          Real x;
-         const Real eps = epsilon;
 
          for (i = svec.size() - 1; i >= 0; --i)
          {
@@ -364,7 +363,7 @@ SSVector& SSVector::multAdd(Real xx, const SSVector& svec)
             if (val[j])
             {
                x = val[j] + xx * svec.value(i);
-               if (x > eps || x < -eps)
+               if (isNotZero(x, epsilon))
                   val[j] = x;
                else
                {
@@ -378,7 +377,7 @@ SSVector& SSVector::multAdd(Real xx, const SSVector& svec)
             else
             {
                x = xx * svec.value(i);
-               if (x > eps || x < -eps)
+               if (isNotZero(x, epsilon))
                {
                   val[j] = x;
                   addIdx(j);
@@ -397,8 +396,6 @@ SSVector& SSVector::multAdd(Real xx, const SSVector& svec)
       Real* rv = static_cast<Real*>(svec.val);
       Real* last = rv + svec.dim() - 1;
       Real x = *last;
-      const Real eps = epsilon;
-      const Real meps = -eps;
 
       *last = MARKER;
       for(;;)
@@ -409,7 +406,7 @@ SSVector& SSVector::multAdd(Real xx, const SSVector& svec)
             ++v;
          }
          y = *rv++ * xx;
-         if (y < meps || y > eps)
+         if (isNotZero(y, epsilon))
          {
             *ii++ = int(v - val);
             *v++ = y;
@@ -422,7 +419,7 @@ SSVector& SSVector::multAdd(Real xx, const SSVector& svec)
       *rv = x;
 
       x *= xx;
-      if (x < meps || x > eps)
+      if (isNotZero(x, epsilon))
       {
          *ii++ = int(v - val);
          *v = x;
@@ -443,8 +440,6 @@ SSVector& SSVector::multAdd(Real xx, const SVector& svec)
       int i, j;
       Real x;
       Real* v = val;
-      const Real eps = epsilon;
-      const Real meps = -eps;
       int adjust = 0;
 
       for (i = svec.size() - 1; i >= 0; --i)
@@ -453,7 +448,7 @@ SSVector& SSVector::multAdd(Real xx, const SVector& svec)
          if (v[j])
          {
             x = v[j] + xx * svec.value(i);
-            if (x > eps || x < meps)
+            if (isNotZero(x, epsilon))
                v[j] = x;
             else
             {
@@ -464,7 +459,7 @@ SSVector& SSVector::multAdd(Real xx, const SVector& svec)
          else
          {
             x = xx * svec.value(i);
-            if (x > eps || x < meps)
+            if (isNotZero(x, epsilon))
             {
                v[j] = x;
                addIdx(j);
@@ -480,7 +475,7 @@ SSVector& SSVector::multAdd(Real xx, const SVector& svec)
          for (; iptr < endptr; ++iptr)
          {
             x = v[*iptr];
-            if (x > eps || x < meps)
+            if (isNotZero(x, epsilon))
                *iiptr++ = *iptr;
             else
                v[*iptr] = 0;
@@ -502,8 +497,6 @@ SSVector& SSVector::multAdd(Real xx, const SubSVector& svec)
       int i, j;
       Real x;
       Real* v = val;
-      const Real eps = epsilon;
-      const Real meps = -epsilon;
       int adjust = 0;
 
       for (i = svec.size() - 1; i >= 0; --i)
@@ -512,7 +505,7 @@ SSVector& SSVector::multAdd(Real xx, const SubSVector& svec)
          if (v[j])
          {
             x = v[j] + xx * svec.value(i);
-            if (x > eps || x < meps)
+            if (isNotZero(x, epsilon))
                v[j] = x;
             else
             {
@@ -523,7 +516,7 @@ SSVector& SSVector::multAdd(Real xx, const SubSVector& svec)
          else
          {
             x = xx * svec.value(i);
-            if (x > eps || x < meps)
+            if (isNotZero(x, epsilon))
             {
                v[j] = x;
                addIdx(j);
@@ -539,7 +532,7 @@ SSVector& SSVector::multAdd(Real xx, const SubSVector& svec)
          for (; iptr < endptr; ++iptr)
          {
             x = v[*iptr];
-            if (x > eps || x < meps)
+            if (isNotZero(x, epsilon))
                *iiptr++ = *iptr;
             else
                v[*iptr] = 0;
@@ -590,8 +583,6 @@ SSVector& SSVector::operator=(const SSVector& rhs)
          Real* rv = static_cast<Real*>(rhs.val);
          Real* last = rv + rhs.dim() - 1;
          Real x = *last;
-         const Real eps = epsilon;
-         const Real meps = -eps;
          
          *last = MARKER;
          for(;;)
@@ -601,7 +592,7 @@ SSVector& SSVector::operator=(const SSVector& rhs)
                ++rv;
                ++v;
             }
-            if (*rv < meps || *rv > eps)
+            if (isNotZero(*rv, epsilon))
             {
                *ii++ = int(v - val);
                *v++ = *rv++;
@@ -616,7 +607,7 @@ SSVector& SSVector::operator=(const SSVector& rhs)
          }
          *rv = x;
          
-         if (x < meps || x > eps)
+         if (isNotZero(x, epsilon))
          {
             *ii++ = int(v - val);
             *v++ = x;
@@ -655,10 +646,9 @@ void SSVector::setup_and_assign(SSVector& rhs)
       Real* v = val;
       Real* last = rv + rhs.dim() - 1;
       Real x = *last;
-      const Real eps = rhs.epsilon;
-      const Real meps = -eps;
 
       *last = MARKER;
+
       for(;;)
       {
          while (!*rv)
@@ -666,7 +656,7 @@ void SSVector::setup_and_assign(SSVector& rhs)
             ++rv;
             ++v;
          }
-         if (*rv < meps || *rv > eps)
+         if (isNotZero(*rv, rhs.epsilon))
          {
             *ri++ = *ii++ = int(v - val);
             *v++ = *rv++;
@@ -680,7 +670,7 @@ void SSVector::setup_and_assign(SSVector& rhs)
          }
       }
 
-      if (x < meps || x > eps)
+      if (isNotZero(x, rhs.epsilon))
       {
          *ri++ = *ii++ = int(v - val);
          *v++ = *rv = x;
@@ -777,14 +767,11 @@ SSVector& SSVector::assign2productShort(const SVSet& A, const SSVector& x)
       }
    }
 
-   const Real eps = epsilon;
-   const Real meps = -eps;
    int* is = idx;
    int* it = idx;
    for (; is < ii; ++is)
    {
-      y = v[*is];
-      if (y > eps || y < meps)
+      if (isNotZero(v[*is], epsilon))
          *it++ = *is;
       else
          v[*is] = 0;
@@ -855,21 +842,21 @@ SSVector& SSVector::assign2product4setup(const SVSet& A, const SSVector& x)
 SSVector& SSVector::assign2product(const SSVector& x, const SVSet& A)
 {
    assert(A.num() == dim());
-   const Real eps = epsilon;
-   const Real minuseps = -epsilon;
+
    Real y;
 
    clear();
+
    for (int i = dim(); i-- > 0;)
    {
       y = A[i] * x;
-      if (y > eps || y < minuseps)
+
+      if (isNotZero(y, epsilon))
       {
          val[i] = y;
          IdxSet::addIdx(i);
       }
    }
-
    return *this;
 }
 
@@ -886,8 +873,6 @@ SSVector& SSVector::assign2productAndSetup(const SVSet& A, SSVector& x)
    int* xi = x.idx;
    Real* xv = x.val;
    Real* end = xv + x.dim() - 1;
-   const Real eps = epsilon;
-   const Real meps = -epsilon;
 
    /* setze weissen Elefanten */
    Real lastval = *end;
@@ -897,7 +882,7 @@ SSVector& SSVector::assign2productAndSetup(const SVSet& A, SSVector& x)
    {
       while (!*xv)
          ++xv;
-      if (*xv > eps || *xv < meps)
+      if (isNotZero(*xv, epsilon))
       {
          y = *xv;
          svec = const_cast<SVector*>( & A[ *xi++ = int(xv - x.val) ] );
@@ -916,7 +901,7 @@ SSVector& SSVector::assign2productAndSetup(const SVSet& A, SSVector& x)
    }
 
    /* fange weissen Elefanten wieder ein */
-   if (lastval > eps || lastval < meps)
+   if (isNotZero(lastval, epsilon))
    {
       y = *xv = lastval;
       svec = const_cast<SVector*>( & A[ *xi++ = int(xv - x.val) ] );

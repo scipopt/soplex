@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.24 2002/03/06 10:28:52 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.25 2002/03/10 10:00:59 bzfkocht Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -657,7 +657,7 @@ public:
 
    virtual void writeMPS(std::ostream& out, 
       const NameSet* rowNames, const NameSet* colNames, 
-      const DIdxSet* /*p_intvars*/ = 0) const;
+      const DIdxSet* p_intvars = 0) const;
 
    //@}
 
