@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.6 2001/12/14 09:32:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.7 2001/12/25 14:25:56 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -24,10 +24,10 @@ namespace soplex
 {
 /**@todo suspicious: *max is not set, but it is used 
          (with the default setting *max=1) in selectLeave and selectEnter
+         The question might be if max shouldn't be updated with themax?
 */
-int SPxHarrisRT::maxDelta
-(
-   double* max,             /* max abs value in upd */
+int SPxHarrisRT::maxDelta(
+   double* /*max*/,             /* max abs value in upd */
    double* val,             /* initial and chosen value */
    int num,             /* # of indices in idx */
    const int* idx,             /* nonzero indices in upd */
@@ -37,8 +37,7 @@ int SPxHarrisRT::maxDelta
    const double* up,              /* upper bounds for vec */
    double delta,           /* allowed bound violation */
    double epsilon,         /* what is 0? */
-   double infinity        /* what is $\infty$? */
-)
+   double infinity)        /* what is $\infty$? */
 {
    double x;
    double theval;
@@ -71,17 +70,16 @@ int SPxHarrisRT::maxDelta
             theval = x;
       }
    }
-
    *val = theval;
    return sel;
 }
 
-/**@todo suspicious: *max is not set, but it is used (with the default setting *max=1)
-                     in selectLeave and selectEnter
+/**@todo suspicious: *max is not set, but it is used 
+    (with the default setting *max=1)
+    in selectLeave and selectEnter
 */
-int SPxHarrisRT::minDelta
-(
-   double* max,             /* max abs value in upd */
+int SPxHarrisRT::minDelta(
+   double* /*max*/,             /* max abs value in upd */
    double* val,             /* initial and chosen value */
    int num,             /* # of indices in idx */
    const int* idx,             /* nonzero indices in upd */
@@ -91,8 +89,7 @@ int SPxHarrisRT::minDelta
    const double* up,              /* upper bounds for vec */
    double delta,           /* allowed bound violation */
    double epsilon,         /* what is 0? */
-   double infinity        /* what is $\infty$? */
-)
+   double infinity)       /* what is $\infty$? */
 {
    double x;
    double theval;
@@ -125,7 +122,6 @@ int SPxHarrisRT::minDelta
             theval = x;
       }
    }
-
    *val = theval;
    return sel;
 }
@@ -177,8 +173,7 @@ int SPxHarrisRT::selectLeave(double& val)
    if (max > epsilon)
    {
       // phase 1:
-      maxDelta
-      (
+      maxDelta(
          &maxabs,             /* max abs value in upd */
          &max,                /* initial and chosen value */
          upd.size(),          /* # of indices in upd */
@@ -189,8 +184,7 @@ int SPxHarrisRT::selectLeave(double& val)
          up.get_const_ptr(),                  /* upper bounds for vec */
          delta,               /* allowed bound violation */
          epsilon,             /* what is 0? */
-         infinity            /* what is $\infty$? */
-     );
+         infinity);           /* what is $\infty$? */
 
       if (max == val)
          return -1;
@@ -250,8 +244,7 @@ int SPxHarrisRT::selectLeave(double& val)
    else if (max < -epsilon)
    {
       // phase 1:
-      minDelta
-      (
+      minDelta(
          &maxabs,             /* max abs value in upd */
          &max,                /* initial and chosen value */
          upd.size(),          /* # of indices in upd */
@@ -262,9 +255,8 @@ int SPxHarrisRT::selectLeave(double& val)
          up.get_const_ptr(),                  /* upper bounds for vec */
          delta,               /* allowed bound violation */
          epsilon,             /* what is 0? */
-         infinity            /* what is $\infty$? */
-     );
-
+         infinity);            /* what is $\infty$? */
+    
       if (max == val)
          return -1;
 

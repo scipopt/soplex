@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.h,v 1.4 2001/11/28 16:41:22 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.h,v 1.5 2001/12/25 14:25:55 bzfkocht Exp $"
 
 
 /**@file  spxdevexpr.h
@@ -82,7 +82,7 @@ public:
    void setType(SoPlex::Type);
 
    ///
-   void setRep(SoPlex::Representation rep);
+   void setRep(SoPlex::Representation);
 
    ///
    int selectLeave();

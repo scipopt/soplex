@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.5 2001/12/05 22:25:36 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.6 2001/12/25 14:25:55 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -140,7 +140,7 @@ int main(int argc, char **argv)
    MySoPlex work(type, representation);
 
    work.setUtype(update);
-   work.setTermination(LPSolver::infinity, timelimit, -1);
+   work.setTermination(timelimit);
 
    assert(work.isConsistent());
 

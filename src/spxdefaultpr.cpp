@@ -13,39 +13,32 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultpr.cpp,v 1.4 2001/11/20 16:43:29 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxdefaultpr.cpp,v 1.5 2001/12/25 14:25:55 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <assert.h>
 #include <iostream>
 
 #define EQ_PREF 1000
 
-/*  and class header files
- */
 #include "spxdefaultpr.h"
 
 namespace soplex
 {
 
-
-int SPxDefaultPR::selectLeave(double& best, int start, int incr)
+int SPxDefaultPR::selectLeaveX(int start, int incr)
 {
-   int i, n;
-   double x;
+   assert(thesolver != 0);
+
    //    const double* up  = thesolver->ubBound();
    //    const double* low = thesolver->lbBound();
 
-   assert(thesolver != 0);
-   best = -theeps;
-   n = -1;
-   for (i = thesolver->dim() - start - 1; i >= 0; i -= incr)
+   double best = -theeps;
+   int    n    = -1;
+
+   for(int i = thesolver->dim() - start - 1; i >= 0; i -= incr)
    {
-      x = thesolver->fTest()[i];
+      double x = thesolver->fTest()[i];
+
       if (x < -theeps)
       {
          // x *= EQ_PREF * (1 + (up[i] == low[i]));
@@ -56,33 +49,29 @@ int SPxDefaultPR::selectLeave(double& best, int start, int incr)
          }
       }
    }
-
    return n;
 }
 
 int SPxDefaultPR::selectLeave()
 {
-   double best;
-   return selectLeave(best, 0, 1);
+   return selectLeaveX(0, 1);
 }
 
-
-/**@todo suspicious: first loop consists of start1 and incr2, second loop consists of start2 and incr2. Why is incr1 not used in the first loop?
- */
-SoPlex::Id SPxDefaultPR::selectEnter(double& best, int start1, int incr1,
+SoPlex::Id SPxDefaultPR::selectEnterX(int start1, int incr1,
                                      int start2, int incr2)
 {
-   SoPlex::Id id;
-   int i;
-   double x;
+   assert(thesolver != 0);
+
    // const SPxBasis::Desc&    ds   = thesolver->basis().desc();
 
-   assert(thesolver != 0);
-   best = -theeps;
+   SoPlex::Id id;
+   int        i;
+   double     best = -theeps;
 
-   for (i = thesolver->dim() - start1 - 1; i >= 0; i -= incr2)  // ??? really use incr2 instead of incr1 ?
+   for (i = thesolver->dim() - start1 - 1; i >= 0; i -= incr1) 
    {
-      x = thesolver->coTest()[i];
+      double x = thesolver->coTest()[i];
+
       if (x < -theeps)
       {
          // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasis::Desc::P_FREE
@@ -97,7 +86,8 @@ SoPlex::Id SPxDefaultPR::selectEnter(double& best, int start1, int incr1,
 
    for (i = thesolver->coDim() - start2 - 1; i >= 0; i -= incr2)
    {
-      x = thesolver->test()[i];
+      double x = thesolver->test()[i];
+
       if (x < -theeps)
       {
          // x *= EQ_PREF * (1 + (ds.status(i) == SPxBasis::Desc::P_FREE
@@ -109,14 +99,12 @@ SoPlex::Id SPxDefaultPR::selectEnter(double& best, int start1, int incr1,
          }
       }
    }
-
    return id;
 }
 
 SoPlex::Id SPxDefaultPR::selectEnter()
 {
-   double best;
-   return selectEnter(best, 0, 1, 0, 1);
+   return selectEnterX(0, 1, 0, 1);
 }
 } // namespace soplex
 

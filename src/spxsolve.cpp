@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.7 2001/11/25 14:58:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.8 2001/12/25 14:25:56 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -344,16 +344,21 @@ int SoPlex::terminate()
    if (maxIters >= 0 && iterations() >= maxIters)
       return 1;
    if (maxTime >= 0 && time() >= maxTime)
-      return 1;
+      return 1;   
+   if (maxValue < SPxLP::infinity)
+   {
+      // This is *NOT* tested.
 
-   return (SPxBasis::status() >= SPxBasis::OPTIMAL
-            || SPxBasis::status() <= SPxBasis::SINGULAR);
+      double objective = value();
+
+      if (  ((spxSense() == SPxLP::MAXIMIZE) && (objective > maxValue))
+         || ((spxSense() == SPxLP::MINIMIZE) && (objective < maxValue)))
+         return 1;
+   }
+   return SPxBasis::status() >= SPxBasis::OPTIMAL
+      || SPxBasis::status() <= SPxBasis::SINGULAR;
 }
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Accessing Results}
- */
 LPSolver::Status SoPlex::getPrimal (Vector& p_vector) const
 {
    if (!isInitialized())

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.8 2001/12/12 10:26:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.9 2001/12/25 14:25:56 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -62,12 +62,18 @@ static bool isSense(const char* s)
 
 static bool isInfinity(const char* s)
 {
-   if ((*s == '-') || (*s == '+'))
-      s++;
+   return ((s[0] == '-') || (s[0] == '+'))
+      && (tolower(s[1]) == 'i') 
+      && (tolower(s[2]) == 'n') 
+      && (tolower(s[3]) == 'f');
+}
 
-   return (tolower(s[0]) == 'i') 
-      && ( tolower(s[1]) == 'n') 
-      && ( tolower(s[2]) == 'f');
+static bool isFree(const char* s)
+{
+   return (tolower(s[0]) == 'f') 
+      && ( tolower(s[1]) == 'r') 
+      && ( tolower(s[2]) == 'e') 
+      && ( tolower(s[3]) == 'e');
 }
 
 /// Read the next number and advance \p pos.
@@ -276,16 +282,11 @@ static double readInfinity(char*& pos)
 {
    assert(isInfinity(pos));
 
-   double sense = 1.0;
+   double sense = (*pos == '-') ? -1.0 : 1.0;
 
-   if ((*pos == '-') || (*pos == '+'))
-   {
-      sense = (*pos == '-') ? -1.0 : 1.0;
-      pos++;
-   }
    hasKeyword(pos, "inf[inity]");
 
-   return sense;
+   return sense * SPxLP::infinity;
 }
 
 /// Read LP in "CPLEX LP File Format".
@@ -296,12 +297,6 @@ static double readInfinity(char*& pos)
  *  This routine should read (most?) valid LP format files. 
  *  What it will not do, is find all cases where a file is ill formed. 
  *  If this happens it may complain and read nothing or read "something".
- *
- *  @todo Keyword \c free in BOUNDS section is not implemented.
- *  @todo Keyword \c Infinity in BOUNDS section is not implemented.
- *        Problem is that inf is a valid variable name in the format.
- *        readColName should be changed with a parameter to select, if 
- *        new names should be atomatically added to the column set.
  */  
 void SPxLP::readLPF(
    std::istream& p_input, 
@@ -524,7 +519,7 @@ void SPxLP::readLPF(
 
             if (isValue(pos))
             {
-               val = readValue(pos);
+               val = isInfinity(pos) ? readInfinity(pos) : readValue(pos);
                
                if (!isSense(pos))
                   goto syntax_error;
@@ -549,14 +544,19 @@ void SPxLP::readLPF(
                   cset.upper(colidx) = val;
                }
             }
-            if (isSense(pos))
+            if (isFree(pos))
+            {
+               cset.lower(colidx) = -SPxLP::infinity;
+               cset.upper(colidx) =  SPxLP::infinity;
+            }
+            else if (isSense(pos))
             {
                sense = readSense(pos);
                
                if (!isValue(pos))
                   goto syntax_error;
                
-               val = readValue(pos);
+               val = isInfinity(pos) ? readInfinity(pos) : readValue(pos);
                
                if (sense == '<') 
                   cset.upper(colidx) = val;

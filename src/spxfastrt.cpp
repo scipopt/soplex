@@ -13,20 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.7 2001/11/20 16:43:30 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.8 2001/12/25 14:25:55 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <assert.h>
 #include <stdio.h>
 #include <iostream>
 
-
-/*  and class header files
- */
 #include "spxfastrt.h"
 
 namespace soplex
@@ -38,8 +30,6 @@ namespace soplex
 #define SHORT           1e-5
 #define DELTA_SHIFT     1e-5
 #define EPSILON         1e-10
-
-//@ ----------------------------------------------------------------------------
 
 void SPxFastRT::resetTols()
 {
@@ -74,8 +64,6 @@ void SPxFastRT::tighten()
       if (minStab < 1e-6)
          minStab /= 0.90;
    }
-   /*
-    */
 }
 
 void SPxFastRT::relax()
@@ -89,14 +77,10 @@ void SPxFastRT::relax()
 
 static double minStability(double minStab, double maxabs)
 {
-   if (maxabs < 1000)
+   if (maxabs < 1000.0)
       return minStab;
-   return maxabs*minStab / 1000;
+   return maxabs*minStab / 1000.0;
 }
-
-
-
-//@ ----------------------------------------------------------------------------
 
 int SPxFastRT::maxDelta(
    double& val,
@@ -105,8 +89,7 @@ int SPxFastRT::maxDelta(
    Vector& lowBound,
    Vector& upBound,
    int start,
-   int incr
-)
+   int incr)
 {
    int i, sel;
    double x, y, max;
@@ -235,8 +218,7 @@ int SPxFastRT::minDelta(
    Vector& lowBound,
    Vector& upBound,
    int start,
-   int incr
-)
+   int incr)
 {
    int i, sel;
    double x, y, max;
@@ -698,9 +680,11 @@ SoPlex::Id SPxFastRT::minSelect(
     allways yield an improvement. In that case, we shift the variable toward
     infeasibility and retry. This avoids cycling in the shifted LP.
  */
-/**@todo suspicious: max is not used, but it looks like a used parameter in selectLeave()
+/**@todo suspicious: max is not used, but it looks like a used parameter 
+ *       in selectLeave()
  */
-int SPxFastRT::maxShortLeave(double& sel, int leave, double max, double abs)
+int SPxFastRT::maxShortLeave(double& sel, int leave, 
+   double /*max*/, double abs)
 {
    assert(leave >= 0);
    sel = thesolver->fVec().delta()[leave];
@@ -716,9 +700,11 @@ int SPxFastRT::maxShortLeave(double& sel, int leave, double max, double abs)
    return 0;
 }
 
-/**@todo suspicious: max is not used, but it looks like a used parameter in selectLeave()
+/**@todo suspicious: max is not used, but it looks like a used parameter 
+ *       in selectLeave()
  */
-int SPxFastRT::minShortLeave(double& sel, int leave, double max, double abs)
+int SPxFastRT::minShortLeave(double& sel, int leave, 
+   double /*max*/, double abs)
 {
    assert(leave >= 0);
    sel = thesolver->fVec().delta()[leave];
@@ -913,9 +899,10 @@ int SPxFastRT::selectLeave(double& val)
 }
 
 //@ ----------------------------------------------------------------------------
-/**@todo suspicious: max is not used, but it looks like a used parameter in selectEnter()
+/**@todo suspicious: max is not used, 
+ *       but it looks like a used parameter in selectEnter()
  */
-int SPxFastRT::maxReenter(double& sel, double max, double maxabs,
+int SPxFastRT::maxReenter(double& sel, double /*max*/, double maxabs,
                            SoPlex::Id id, int nr)
 {
    double x, d;
@@ -1005,9 +992,10 @@ int SPxFastRT::maxReenter(double& sel, double max, double maxabs,
    return 0;
 }
 
-/**@todo suspicious: max is not used, but it looks like a used parameter in selectEnter()
+/**@todo suspicious: max is not used, but it looks 
+ *       like a used parameter in selectEnter()
  */
-int SPxFastRT::minReenter(double& sel, double max, double maxabs,
+int SPxFastRT::minReenter(double& sel, double /*max*/, double maxabs,
                            SoPlex::Id id, int nr)
 {
    double x, d;
@@ -1237,9 +1225,10 @@ void SPxFastRT::clear()
    thesolver = 0;
 }
 
-/**@todo suspicious: Why is the type never used? This holds for all implementations of SPxRatioTester!
+/**@todo suspicious: Why is the type never used? 
+ *       This holds for all implementations of SPxRatioTester!
  */
-void SPxFastRT::setType(SoPlex::Type tp)
+void SPxFastRT::setType(SoPlex::Type)
 {
    minStab = MINSTAB;
    delta = thesolver->delta();

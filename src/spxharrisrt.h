@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.h,v 1.5 2001/11/29 14:43:46 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.h,v 1.6 2001/12/25 14:25:56 bzfkocht Exp $"
 
 /**@file  spxharrisrt.h
  * @brief Harris pricing with shifting.
@@ -43,9 +43,8 @@ class SPxHarrisRT : public SPxRatioTester
 protected:
    SoPlex* thesolver;
 
-   int maxDelta
-   (
-      double* max,           ///< max abs value in upd
+   int maxDelta(
+      double* /*max*/,       ///< max abs value in upd
       double* val,           ///< initial and chosen value
       int num,               ///< # of indices in idx
       const int* idx,        ///< nonzero indices in upd
@@ -55,12 +54,10 @@ protected:
       const double* up,      ///< upper bounds for vec
       double delta,          ///< allowed bound violation
       double epsilon,        ///< what is 0?
-      double infinity        ///< what is $\infty$?
-   );
+      double infinity);      ///< what is $\infty$?
 
-   int minDelta
-   (
-      double* max,           ///< max abs value in upd
+   int minDelta(
+      double* /*max*/,       ///< max abs value in upd
       double* val,           ///< initial and chosen value
       int num,               ///< of indices in idx
       const int* idx,        ///< nonzero indices in upd
@@ -70,8 +67,7 @@ protected:
       const double* up,      ///< upper bounds for vec
       double delta,          ///< allowed bound violation
       double epsilon,        ///< what is 0?
-      double infinity        ///< what is $\infty$?
-  );
+      double infinity);      ///< what is $\infty$?
 
 public:
    ///

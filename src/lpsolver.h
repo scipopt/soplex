@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpsolver.h,v 1.6 2001/12/12 10:26:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpsolver.h,v 1.7 2001/12/25 14:25:55 bzfkocht Exp $"
 
 
 /**@file  lpsolver.h
@@ -173,15 +173,14 @@ public:
                          const signed char cols[]) = 0;
 
    /// adjusts conditions for termination.
-   /**@todo the termination criterion "value" is not yet implemented! */
-   virtual void setTermination(double value = infinity,
-                               double time = -1,
-                               int iteration = -1) = 0;
+   virtual void setTermination(double time   = -1,
+                               int iteration = -1, 
+                               double value  = infinity) = 0;
 
    /// gets adjusted conditions for termination.
-   virtual void getTermination(double* value = 0,
-                               double* time = 0,
-                               int* iteration = 0) const = 0;
+   virtual void getTermination(double* time = 0,
+                               int*    iteration = 0, 
+                               double* value = 0) const = 0;
    //@}
 
 

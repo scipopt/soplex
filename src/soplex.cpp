@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.14 2001/12/14 09:32:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.15 2001/12/25 14:25:55 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -732,6 +732,7 @@ SoPlex::SoPlex(Type p_type, Representation p_rep,
    , thePricing(FULL)
    , maxIters (-1)
    , maxTime (-1)
+   , maxValue(LPSolver::infinity)
    , theShift (0)
    , m_maxCycle(100)
    , m_numCycle(0)
@@ -755,14 +756,21 @@ SoPlex::SoPlex(Type p_type, Representation p_rep,
    coVecDim = 400;
 }
 
+/* We forbid the copyconstructor and the assignment operator
+ * untill we are sure the work and we have an idea what exactly
+ * they should be used to. Why would somebody copy an SoPlex Object?
+ */
+#if 0 
 SoPlex::SoPlex(const SoPlex& old)
-   : SPxLP (old)
+   : CacheLPSolver()
+   , SPxLP (old)
    , SPxBasis (old)
    , theType (old.theType)
    , thePricing (old.thePricing)
    , therep (old.therep)  /// ??? siehe unten
    , maxIters (old.maxIters)
    , maxTime (old.maxTime)
+   , maxValue(old.maxValue)
    , theShift (old.theShift)
    , m_maxCycle (old.m_maxCycle)
    , m_numCycle (old.m_numCycle)
@@ -835,12 +843,13 @@ SoPlex& SoPlex::operator=(const SoPlex& old)
    theLP = this;
    return *this;
 }
+#endif // no copy constructor and assignment operator
 
 #define inconsistent                                                    \
 do {                                                                    \
 std::cout << "ERROR: Inconsistency detected in class SoPlex\n";  \
 return 0;                                                          \
-} while(0)
+} while(false)
 
 int SoPlex::isConsistent() const
 {
@@ -955,18 +964,22 @@ int SoPlex::nofNZEs() const
 
 /**@todo p_value should implement an objective value termination criterion!
  */
-void SoPlex::setTermination(double p_value, double p_time, int p_iteration)
+void SoPlex::setTermination(double p_time, int p_iteration, double p_value)
 {
-   maxTime = p_time;
+   maxTime  = p_time;
    maxIters = p_iteration;
+   maxValue = p_value;
 }
 
-void SoPlex::getTermination(double* p_value, double* p_time, int* p_iteration) const
+void SoPlex::getTermination(double* p_time, int* p_iteration, double* p_value)
+const
 {
-   if (p_time)
+   if (p_time != 0)
       *p_time = maxTime;
-   if (p_iteration)
+   if (p_iteration != 0)
       *p_iteration = maxIters;
+   if (p_value != 0)
+      *p_value = maxValue;
 }
 
 LPSolver::Status SoPlex::getBasis(signed char row[], signed char col[]) const

@@ -13,31 +13,19 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.10 2001/12/14 09:32:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.11 2001/12/25 14:25:55 bzfkocht Exp $"
 
-
-
-//@ -----------------------------------------------------------------------------
-/*      \Section{Complex Method Implementations}
- */
 #include <assert.h>
 #include <iostream>
 #include <math.h>
 
 #include "spxbasis.h"
-
-
-
 #include "didxset.h"
 #include "dvector.h"
 #include "soplex.h"
 
 namespace soplex
 {
-
-
-
-
 static double minStab;
 #define EPS     minStab
 //#define       EPS     1e-6

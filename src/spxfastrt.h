@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.h,v 1.4 2001/11/29 14:43:46 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxfastrt.h,v 1.5 2001/12/25 14:25:56 bzfkocht Exp $"
 
 /**@file  spxfastrt.h
  * @brief Fast shifting ratio test.
@@ -189,27 +189,30 @@ protected:
    int maxReleave(double& sel, int leave, double maxabs);
 
    ///
-   int minShortLeave(double& sel, int leave, double max, double abs);
+   int minShortLeave(double& sel, int leave, double /*max*/, double abs);
    /// tests for stop after phase 1.
-   /** Tests whether a shortcut after phase 1 is feasible for the selected leave
+   /** Tests whether a shortcut after phase 1 is feasible for the 
+       selected leave
        pivot. In this case return the update value in \p sel.
    */
-   int maxShortLeave(double& sel, int leave, double max, double abs);
+   int maxShortLeave(double& sel, int leave, double /*max*/, double abs);
 
    ///
-   virtual int minReenter(double& sel, double max, double maxabs,
+   virtual int minReenter(double& sel, double /*max*/, double maxabs,
                           SoPlex::Id id, int nr);
    /// numerical stability check.
    /** Tests whether the selected enter \p id needs to be discarded (and do so)
        and the ratio test is to be recomputed.
    */
-   virtual int maxReenter(double& sel, double max, double maxabs,
+   virtual int maxReenter(double& sel, double /*max*/, double maxabs,
                           SoPlex::Id id, int nr);
 
-   /**@todo the documentation seems to be incorrect. No parameter \p sel exists.
+   /**@todo the documentation seems to be incorrect. 
+            No parameter \p sel exists.
     */
    /// tests for stop after phase 1.
-   /** Tests whether a shortcut after phase 1 is feasible for the selected enter
+   /** Tests whether a shortcut after phase 1 is feasible for 
+       the selected enter
        pivot. In this case return the update value in \p sel.
    */
    virtual int shortEnter(SoPlex::Id& enterId,

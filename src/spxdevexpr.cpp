@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.5 2001/12/04 19:28:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.6 2001/12/25 14:25:55 bzfkocht Exp $"
 
 #include <iostream>
 
@@ -61,11 +61,12 @@ void SPxDevexPR::setType(SoPlex::Type tp)
    assert(isConsistent());
 }
 
-/**@todo suspicious: Shouldn't the relation between dim, coDim, Vecs, and CoVecs be influenced by the representation ?
+/**@todo suspicious: Shouldn't the relation between dim, coDim, Vecs, 
+ *       and CoVecs be influenced by the representation ?
  */
-void SPxDevexPR::setRep(SoPlex::Representation rep)
+void SPxDevexPR::setRep(SoPlex::Representation)
 {
-   if (thesolver)
+   if (thesolver != 0)
    {
       addedVecs(thesolver->coDim());
       addedCoVecs(thesolver->dim());

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.12 2001/12/04 19:28:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.13 2001/12/25 14:25:55 bzfkocht Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -394,6 +394,11 @@ void SLUFactor::clear()
    spx_alloc(l.row, l.startSize);
 }
 
+/* Since I am not sure, this really works and because I see at the 
+ * moment no use in copying SLUFactor objects, the assignment operator and
+ * copy constructor are deoperationable.
+ */
+#if 0
 void SLUFactor::assign(const SLUFactor& old)
 {
    thedim = old.thedim;
@@ -553,14 +558,16 @@ SLUFactor& SLUFactor::operator=(const SLUFactor& old)
    assign(old);
    return *this;
 }
+#endif // no assignment.
 
 SLUFactor::SLUFactor()
-   : vec (1)
-      , ssvec (1, 1e-16)
-      , usetup (0)
-      , uptype (FOREST_TOMLIN)
-      , eta (1, 1e-16)
-      , forest (1, 1e-16)
+   : CLUFactor() 
+   , vec (1)
+   , ssvec (1, 1e-16)
+   , usetup (0)
+   , uptype (FOREST_TOMLIN)
+   , eta (1, 1e-16)
+   , forest (1, 1e-16)
 {
    nzCnt = 0;
    thedim = 1;

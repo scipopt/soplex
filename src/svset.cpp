@@ -13,28 +13,16 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.cpp,v 1.8 2001/11/16 20:12:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.cpp,v 1.9 2001/12/25 14:25:56 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <assert.h>
 #include <iostream>
 
-
-/*  and class header files
- */
 #include "svset.h"
 
 namespace soplex
 {
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Extension}
- */
 void SVSet::ensureMem(int n)
 {
    if (memSize() + n > memMax())
@@ -296,10 +284,6 @@ void SVSet::memPack()
    SVSet_Base::reSize(used);
 }
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Miscellaneous}
- */
 #define inconsistent                                                    \
 {                                                                       \
 std::cout << "ERROR: Inconsistency detected in class SVSet, Line " << __LINE__ << std::endl;           \
@@ -326,30 +310,34 @@ int SVSet::isConsistent() const
 
 SVSet& SVSet::operator=(const SVSet& rhs)
 {
-   clear();
-   DataArray < SVector::Element > ::operator=(rhs);
-   set = rhs.set;
-
-   DLPSV* ps;
-   DLPSV* newps;
-   void* delta0 = &(*(static_cast<SVSet_Base*>(this)))[0];
-   void* delta1 = &(*(static_cast<SVSet_Base*>(const_cast<SVSet*>(&rhs))))[0];
-   ptrdiff_t delta = reinterpret_cast<char*>(delta0) - reinterpret_cast<char*>(delta1);
-
-   for (ps = rhs.list.first(); ps; ps = rhs.list.next(ps))
+   if (this != &rhs)
    {
-      newps = & set[ rhs.number(ps) ];
-      list.append(newps);
-      newps->setMem(ps->max() + 1, reinterpret_cast<SVector::Element*>(reinterpret_cast<char*>(ps->mem()) + delta));
-      newps->set_size( ps->size() );
-   }
+      clear();
+      DataArray < SVector::Element > ::operator=(rhs);
+      set = rhs.set;
 
-   assert(isConsistent());
+      DLPSV* ps;
+      DLPSV* newps;
+      void* delta0 = &(*(static_cast<SVSet_Base*>(this)))[0];
+      void* delta1 = &(*(static_cast<SVSet_Base*>(const_cast<SVSet*>(&rhs))))[0];
+      ptrdiff_t delta = reinterpret_cast<char*>(delta0) - reinterpret_cast<char*>(delta1);
+
+      for (ps = rhs.list.first(); ps; ps = rhs.list.next(ps))
+      {
+         newps = & set[ rhs.number(ps) ];
+         list.append(newps);
+         newps->setMem(ps->max() + 1, reinterpret_cast<SVector::Element*>(reinterpret_cast<char*>(ps->mem()) + delta));
+         newps->set_size( ps->size() );
+      }
+      
+      assert(isConsistent());
+   }
    return *this;
 }
 
 SVSet::SVSet(const SVSet& old)
-   : factor (old.factor)
+   : DataArray < SVector::Element > ()
+   , factor (old.factor)
    , memFactor (DataArray < SVector::Element > ::memFactor)
 {
    *this = old;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultpr.h,v 1.4 2001/11/28 16:41:22 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxdefaultpr.h,v 1.5 2001/12/25 14:25:55 bzfkocht Exp $"
 
 
 /**@file  spxdefaultpr.h
@@ -44,13 +44,18 @@ protected:
    SoPlex* thesolver;
    double theeps;
 
+   ///
+   int selectLeaveX(int start, int incr);
+
+   ///
+   SoPlex::Id selectEnterX(int start1, int incr1, int start2, int incr2);
+
 public:
    ///
    SoPlex* solver() const
    {
       return thesolver;
    }
-
    ///
    double epsilon() const
    {
@@ -61,28 +66,22 @@ public:
    {
       theeps = eps;
    }
-
    ///
    void load(SoPlex* p_solver)
    {
       thesolver = p_solver;
    }
-
    ///
    void clear()
    {
       thesolver = 0;
    }
-
    ///
    void setType(SoPlex::Type)
    {}
    ///
    void setRep(SoPlex::Representation)
    {}
-
-   ///
-   int selectLeave(double& bst, int start, int incr);
    ///
    int selectLeave();
    ///
@@ -90,13 +89,10 @@ public:
    {}
 
    ///
-   SoPlex::Id selectEnter(double& bst, int start1, int incr1, int start2, int incr2);
-   ///
    SoPlex::Id selectEnter();
    ///
    void entered4(SoPlex::Id, int)
    {}
-
 
    ///
    void addedVecs (int)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.h,v 1.7 2001/12/04 19:28:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.h,v 1.8 2001/12/25 14:25:55 bzfkocht Exp $"
 
 /**@file  slufactor.h
  * @brief Sparse LU factorization.
@@ -53,7 +53,6 @@ public:
 
 protected:
    /**@todo document these protected methods and attributes */
-   void assign(const SLUFactor& old);
    void freeAll();
    void changeEta(int idx, SSVector& eta);
 
@@ -213,9 +212,21 @@ public:
    /// default constructor.
    SLUFactor();
 
+   /// destructor.
+   virtual ~SLUFactor();
+
+private:
+   /// no assignment operator.
+   SLUFactor& operator=(const SLUFactor& old);
+   /// no copy construtor.
+   SLUFactor(const SLUFactor& old);
+#if 0
+   void assign(const SLUFactor& old);
+
    /// copy constructor.
    SLUFactor(const SLUFactor& old)
       : SLinSolver( old )
+      , CLUFactor()
       , vec (old.vec)
       , ssvec (old.ssvec)
       , eta (old.eta)
@@ -223,12 +234,7 @@ public:
    {
       assign(old);
    }
-
-   /// assignment operator.
-   SLUFactor& operator=(const SLUFactor& old);
-
-   /// destructor.
-   virtual ~SLUFactor();
+#endif
    //@}
 };
 

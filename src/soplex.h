@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.10 2001/12/14 09:32:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.11 2001/12/25 14:25:55 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -165,6 +165,8 @@ private:
    Timer          theTime;
    int            maxIters;    ///< maximum allowed iterations.
    double         maxTime;     ///< maximum allowed time.
+   double         maxValue;    ///< maximum allowed objective value.
+
    double         thedelta;
    double         theShift;    ///< shift of r/lhs or objective.
    double         lastShift;   ///< for forcing feasibility.
@@ -1442,12 +1444,12 @@ public:
    //@{
 
    /// adjust conditions for termination.
-   void setTermination(double value = LPSolver::infinity,
-      double time = -1, int iteration = -1);
+   void setTermination(double time = -1, int iteration = -1, 
+      double value = LPSolver::infinity);
 
    /// get adjusted conditions for termination.
-   virtual void getTermination(double* value = 0 ,
-      double* time = 0, int* iteration = 0) const;
+   virtual void getTermination(double* time = 0, int* iteration = 0, 
+      double* value = 0) const;
 
    /// get objective value of current solution.
    double objValue() const
@@ -1911,11 +1913,6 @@ public:
    /**@name Miscellaneous */
    //@{
    /// assignment operator.
-   SoPlex& operator=(const SoPlex& base);
-
-   /// copy constructor.
-   SoPlex(const SoPlex& base);
-
    /// default constructor.
    SoPlex(Type type = LEAVE, Representation rep = ROW,
            SPxPricer* pric = 0, SPxRatioTester* rt = 0,
@@ -1927,8 +1924,13 @@ public:
    //@}
 
 private:
-   void testVecs();
+   /// assignment operator is not implemented.
+   SoPlex& operator=(const SoPlex& base);
 
+   /// copy constructor is not implemented.
+   SoPlex(const SoPlex& base);
+
+   void testVecs();
 };
 
 } // namespace soplex
