@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.24 2002/03/11 17:43:57 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.25 2002/04/03 10:15:45 bzfkocht Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.
@@ -29,9 +29,7 @@
 #include "mpsinput.h"
 
 #define INIT_COLS     10000       ///< initialy allocated columns.
-#define INIT_ROWS     10000       ///< initialy allocated rows.
 #define INIT_NZOS     100000      ///< initialy allocated non zeros.
-#define INIT_NAME_MEM 100000      ///< initialy memory for names.
 
 namespace soplex
 { 
@@ -598,12 +596,12 @@ bool SPxLP::readMPS(
    NameSet*  cnames;                ///< column names.
 
    cnames = (p_cnames != 0) 
-      ? p_cnames : new NameSet(INIT_COLS, INIT_NAME_MEM);
+      ? p_cnames : new NameSet();
 
    cnames->clear();
 
    rnames = (p_rnames != 0)
-      ? p_rnames : new NameSet(INIT_ROWS, INIT_NAME_MEM);
+      ? p_rnames : new NameSet();
 
    rnames->clear();
 

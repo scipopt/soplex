@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.cpp,v 1.21 2002/04/01 15:09:36 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.cpp,v 1.22 2002/04/03 10:15:44 bzfkocht Exp $"
 
 #include <string.h>
 #include "spxdefines.h"
@@ -86,10 +86,10 @@ void NameSet::add(DataKey p_key[], const NameSet& p_set)
 void NameSet::remove(const char *str)
 {
    const Name nam(str);
-   if (hashtab.has (nam))
+   if (hashtab.has(nam))
    {
-      DataKey* hkey = hashtab.get(nam);
-      hashtab.remove (nam);
+      const DataKey* hkey = hashtab.get(nam);
+      hashtab.remove(nam);
       set.remove(*hkey);
    }
 }

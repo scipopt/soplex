@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datahashtable.h,v 1.15 2002/04/01 15:09:36 bzfkocht Exp $"
+#pragma ident "@(#) $Id: datahashtable.h,v 1.16 2002/04/03 10:15:44 bzfkocht Exp $"
 
 /**@file  datahashtable.h
  * @brief Generic hash table for data objects.
@@ -47,29 +47,26 @@ namespace soplex
    to a #HashItem can be accessed through the subscript #operator[]() with
    #Info as subscript.
    
-   A #DataHashTable can hold up to #max() entries. This #max() can be
+   The maximum number of elemens a #DataHashTable can hold can be
    specified upon construction and may be reset with #reMax() later on.
-   Further, a value #hashSize is required. This value must be #< max() and must
-   not have a common dominator with #max(). If not specified explicitely, it
-   is set automatically to a reasonable value. It may be reset with method
-   #reHash(). Note that both, #reMax()%ing and #reHash()%ing renders any
-   reference to entries of a #DataHashTable invalid. This also happens, if the
-   #DataHashTable is #reMax()%ed automatically, if more than #max() entries
-   are added to it.
+   Further, a value hash size value is required. This value must be less then 
+   the maximum number of elements and must not have a common dominator with 
+   the maximum number of elements. If not specified explicitely, it
+   is set automatically to a reasonable value. 
 
    The implementation relies on an array of #DataHashTable::Element%s, from
    now on referred to as elements. Upon construction, all elements are
    marked #FREE in their member #status. When an entry is added
-   to the #DataHashTable, the hash value is computed by calling #hashval
+   to the #DataHashTable, the hash value is computed by calling #m_hashfun
    for its #HashItem. If this array element is unused, it is
    taken right away. Otherwise, the array index is incremented by
-   #hashsize (modulo the element array #size()%) until an unused element
+   the hash size (modulo the element array #size()%) until an unused element
    is found.
    
    Removing elements is simply done by marking it as #RELEASED. Hence,
    when searching for an element, the search loop may not stop, when a
    #RELEASED element is encountered. However, such an element may be
-   reused when adding a new element to the #DataHashTable.
+   reused when adding a new element to the #DataHashTable. 
    
    Further, memory management with resizing of the element array is
    straight forward.
@@ -78,297 +75,227 @@ template < class HashItem, class Info >
 class DataHashTable
 {
 private:
-
    /// template class for elements stored in the hash table
    template < class ElemHashItem, class ElemInfo >
    class Element
    {
    public:
-      ElemHashItem item;
-      ElemInfo     info;
-      enum
+      ElemHashItem    item;
+      ElemInfo        info;
+      enum 
       {
          FREE,            ///< element has never been used
          RELEASED,        ///< element had been used, but released
          USED             ///< element is in use
-      } status;
+      } stat;
    };
-   /// stores all elements of the hash table
-   DataArray < Element < HashItem, Info > > element;   
+   typedef Element< HashItem, Info > Elem;
 
-   int hashsize;           ///< increment added to hash index, if allready used
-   int thenum;             ///< current number of entries in the hash table
+   /// stores all elements of the hash table
+   DataArray < Elem > m_elem;   
+
+   int m_hashsize;        ///< increment added to hash index, if allready used
+   int m_used;            ///< current number of entries in the hash table
 
    /// pointer to hash function (mapping: #HashItem -> int)
-   int (*hashval) (const HashItem*);  
+   int (*m_hashfun) (const HashItem*);  
 
    /// memory is #reMax()%ed by this factor, if a new element does't fit
-   Real factor;  
+   Real m_memfactor;  
 
-   mutable int theCurrent; ///< index for iterator
-   
 public:
-   /**@name Inquiry Methods */
-   //@{
-   /// number of elements that would fit
-   int max () const
-   {
-      return element.size();
-   }
-
-   /// number of hashed elements
-   int num () const
-   {
-      return thenum;
-   }
-
-   /// returns #hashsize, i.e. the increment when searching for elements
-   int hashSize () const
-   {
-      return hashsize;
-   }
-
    /// Is item \p h present in #DataHashTable ?
-   int has (const HashItem& h) const
+   bool has(const HashItem& h) const
    {
-      return index(h) >= 0 ? 1 : 0;
+      return index(h) >= 0;
    }
-   //@}
 
-   /**@name Access Methods */
-   //@{
-   /// returns pointer to #Info of #HashItem \p h or 0, if \p h is not found.
-   /** Returns a pointer to #Info component of hash element \p h or a zero
-       pointer if element \p h is not in the table.
-    */
-   Info* get (const HashItem& h)
-   {
-      int i = index(h);
-      return i >= 0 ? &element[i].info : 0;
-   }
    /// returns const pointer to #Info of #HashItem \p h or 0, 
    /// if item is not found.
    /** Returns a pointer to #Info component of hash element \p h or a zero
-       pointer if element \p h is not in the table.
+    *  pointer if element \p h is not in the table.
     */
-   const Info* get (const HashItem& h) const
+   const Info* get(const HashItem& h) const
    {
       int i = index(h);
-      return i >= 0 ? &element[i].info : 0;
-   }
 
-   /// references #Info of #HashItem \p h.
-   /** Index operator for accessing the #Info associated to
-       #HashItem \p h. It is required, that \p h belongs to the
-       #DataHashTable, otherwise it core dumps. Methods #has() or
-       #get() can be used for inquiring wheater \p h belongs to the
-       #DataHashTable or not.
-   */
-   Info& operator[](const HashItem& h)
-   {
-      return element[index(h)].info;
+      return (i >= 0) ? &m_elem[i].info : 0;
    }
    /// references #Info of #HashItem \p h.
    /** Index operator for accessing the #Info associated to
-       #HashItem \p h. It is required, that \p h belongs to the
-       #DataHashTable, otherwise it core dumps. Methods #has() or
-       #get() can be used for inquiring wheater \p h belongs to the
-       #DataHashTable or not.
-   */
+    *  #HashItem \p h. It is required, that \p h belongs to the
+    *  #DataHashTable, otherwise it core dumps. Methods #has() or
+    *  #get() can be used for inquiring wheater \p h belongs to the
+    *  #DataHashTable or not.
+    */
    const Info& operator[](const HashItem& h) const
    {
-      return element[index(h)].info;
-   }
-   //@}
+      assert(has(h));
 
-   /**@name Iteration
-    *  Often it is desired to loop through all elements in a #DataHashTable.
-    *  This is provided by means of the following 5 methods. They imply an
-    *  arbitray order to all elements currently in the #DataHashTable. This
-    *  order may change after any non const member function invocation. When
-    *  calling one of these methods, a marker is set that serves as reference
-    *  point for the next call.
-    *  All iteration methods return 0, if the marker points to a non existing
-    *  element (for example, calling #next() returns 0, if there doesn't exist
-    *  another element).
-    */
-   //@{
-   /// returns first #HashItem in hash table and sets marker to it.
-   const HashItem* first() const
-   {
-      theCurrent = -1;
-      return next();
+      return m_elem[index(h)].info;
    }
-   /// returns last #Item in hash table and sets marker to it.
-   const HashItem* last() const
-   {
-      theCurrent = element.size();
-      return prev();
-   }
-   /// returns #HashItem following current marker and increasing the marker.
-   const HashItem* next() const
-   {
-      if (theCurrent < 0)
-         theCurrent = -1;
-      while (++theCurrent < element.size())
-      {
-         if (element[theCurrent].status
-              == Element < HashItem, Info > ::USED)
-            return &element[theCurrent].item;
-      }
-      theCurrent = -1;
-      return 0;
-   }
-   /// returns #HashItem referenced by current marker.
-   const HashItem* current() const
-   {
-      return (theCurrent < 0) ? 0 : &element[theCurrent].item;
-   }
-   /// returns #HashItem preceding current marker thereby decreasing marker.
-   const HashItem* prev() const
-   {
-      if (theCurrent > element.size())
-         theCurrent = element.size();
-      while (--theCurrent >= 0)
-      {
-         if (element[theCurrent].status
-              == Element < HashItem, Info > ::USED)
-            return &element[theCurrent].item;
-      }
-      return 0;
-   }
-   //@}
-
-   /**@name Manipulation Methods */
-   //@{
    /// adds a new entry to the hash table.
-   /** Adds a new entry consisting of #HashItem \p h and #Info \p x to the
+   /** Adds a new entry consisting of #HashItem \p h and #Info \p info to the
     *  #DataHashTable. No entry with #HashItem \p h must yet be in the
-    *  #DataHashTable. After completion, \p x may be accessed via #get() or
+    *  #DataHashTable. After completion, \p info may be accessed via #get() or
     *  #operator[]() with \p h as parameter. The #DataHashTable is #reMax()%ed
     *  if it becomes neccessary.
     */
-   void add (const HashItem& h, const Info& x)
+   void add(const HashItem& h, const Info& info)
    {
       assert(!has(h));
+
+      if (m_used >= m_elem.size())
+         reMax(int(m_memfactor * m_used) + 1);
+
+      assert(m_used < m_elem.size());
+
       int i;
 
-      if (thenum >= element.size())
-         reMax(int(factor * thenum) + 1);
+      for(i = (*m_hashfun)(&h) % m_elem.size();
+          m_elem[i].stat == Elem::USED;
+          i = (i + m_hashsize) % m_elem.size())
+         ;
 
-      assert(element.size() > 0);
+      assert(m_elem[i].stat != Elem::USED);
 
-      for(
-         i = (*hashval)(&h) % element.size();
-         element[i].status == Element < HashItem, Info > ::USED;
-         i = (i + hashsize) % element.size())
-        ;
-      element[i].status = Element < HashItem, Info > ::USED;
-      memcpy(&(element[i].info), &x, sizeof(Info));
-      memcpy(&(element[i].item), &h, sizeof(HashItem));
-      ++thenum;
+      m_elem[i].stat = Elem::USED;
+      m_elem[i].info = info;
+      m_elem[i].item = h;
+
+      m_used++;
+
+      assert(has(h));
    }
 
    /// remove #HashItem \p h from the #DataHashTable.
-   void remove (const HashItem& h)
+   void remove(const HashItem& h)
    {
       assert(has(h));
-      element[index(h)].status = Element < HashItem, Info > ::RELEASED;
-      --thenum;
+      m_elem[index(h)].stat = Elem::RELEASED;
+      m_used--;
+      assert(!has(h));
    }
 
    /// remove all entries from #DataHashTable.
-   void clear ()
+   void clear()
    {
-      for (int i = element.size() - 1; i >= 0; --i)
-         element[i].status = Element < HashItem, Info > ::FREE;
-      thenum = 0;
+      for(int i = 0; i < m_elem.size(); i++)
+         m_elem[i].stat = Elem::FREE;
+      m_used = 0;
    }
-
-   /// reset #max() and #hashSize().
-   /** Reset the #max() of a #DataHashTable to \p nel. However, if
-    *  \p nel < #num(), it is resized to #num() only. If \p hashsze < 1, a
-    *  new hash size is computed automatically. Otherwise, the specified
-    *  value will be taken.
+   /// reset size of the #DataHashTable.
+   /** Reset the maximum number of elements of a #DataHashTable to \p newSize.
+    *  However, if \p newSize < #m_used, it is resized to #m_used only. 
+    *  If \p newHashSize < 1, a new hash size is computed automatically. 
+    *  Otherwise, the specified value will be taken.
     */
-   void reMax (int nel = -1, int hashsze = 0)
+   void reMax (int newSize = -1, int newHashSize = 0)
    {
-      DataArray < Element < HashItem, Info > > cpy(element);
-      element.reSize(nel < num() ? num() : nel);
+      DataArray< Elem > save(m_elem);
+
+      m_elem.reSize(newSize < m_used ? m_used : newSize);
+
       clear();
-      if (hashsze < 1)
-         this->hashsize = autoHashSize();
-      else
-         this->hashsize = hashsze;
-      for (int i = cpy.size() - 1; i >= 0; --i)
-         if (cpy[i].status == Element < HashItem, Info > ::USED)
-            add(cpy[i].item, cpy[i].info);
+
+      m_hashsize = (newHashSize < 1) ? autoHashSize() : newHashSize;
+
+      for(int i = 0; i < save.size(); i++)
+         if (save[i].stat == Elem::USED)
+            add(save[i].item, save[i].info);
    }
-   //@}
-
-   /**@name Miscellaneous */
-   //@{
    /// checks, whether #DataHashTable is consistent
-   bool isConsistent () const
+   bool isConsistent() const
    {
-      int tot;
+      int total = 0;
+      int i;
 
-      for (int i = element.size() - 1, tot = 0; i >= 0; --i)
+      for(i = 0; i < m_elem.size(); i++)
       {
-         if (element[i].status == Element < HashItem, Info > ::USED)
+         if (m_elem[i].stat == Elem::USED)
          {
-            ++tot;
-            if (!has(element[i].item))
+            total++;
+            if (!has(m_elem[i].item))
                return MSGinconsistent("DataHashTable");
          }
       }
-      if (tot != thenum)
+      if (total != m_used)
          return MSGinconsistent("DataHashTable");
 
-      return element.isConsistent();
+      return m_elem.isConsistent();
    }
-   //@}
+   /// default constructor.
+   /** Allocates a #DataHashTable for \p maxsize entries using \p hashfun
+    *  as hash function. If \p hashsize > 0, #m_hashsize is set to the 
+    *  specified value, otherwise a suitable hash size is computed 
+    *  automatically. Parameter \p factor is used for memory management: 
+    *  If more than \p maxsize entries are added to the #DataHashTable, it 
+    *  will automatically be #reMax()%ed by a factor of \p factor.
+    *
+    *  @param hashfun      pointer to hash function.
+    *  @param maxsize      maximum number of hash elements.
+    *  @param hashsize     hash size.
+    *  @param factor       factor for increasing data block.
+    */
+   explicit DataHashTable(
+      int (*hashfun)(const HashItem*), 
+      int maxsize  = 256, 
+      int hashsize = 0, 
+      Real factor  = 2.0)
+      : m_elem(maxsize)
+      , m_hashfun(hashfun)
+      , m_memfactor(factor)
+   {
+      clear();
+
+      m_hashsize = (hashsize < 1) ? autoHashSize() : hashsize;
+
+      assert(m_memfactor > 1.0);
+   }
 
 private:
-   /// automatically computes a good #hashsize.
-   /** Computes a good #hashsize as the product of all prime numbers 
-    *  not divisors of #size() that are <= the maximum divisor of #size().
-    *  @return good value for #hashsize
+   /// automatically computes a good #m_hashsize.
+   /** Computes a good #m_hashsize as the product of all prime numbers 
+    *  not divisors of the number of elements that are <= 
+    *  the maximum divisor of the number of elemens.
+    *  @return good value for #m_hashsize
     */
    int autoHashSize() const
    {
-      int i, j;
-      int hashsze = 1;
-      int size = element.size();
-      DataArray < char > prime(size);
+      DataArray< bool > prime(m_elem.size());
+      int hashsize = 1;
+      int maxsize  = m_elem.size();
+      int i;
 
-      for (i = 2; i < size; ++i)
-         prime[i] = 1;
+      for (i = 2; i < maxsize; i++)
+         prime[i] = true;
 
-      for (i = 2; i < size; ++i)
+      for (i = 2; i < maxsize; ++i)
       {
          if (prime[i])
          {
-            for (j = i; j < size; j += i)
-               prime[j] = 0;
-            if (size % i != 0)
+            for (int j = i; j < maxsize; j += i)
+               prime[j] = false;
+
+            if (m_elem.size() % i != 0)
             {
-               hashsze *= i;
-               if (hashsze > size)
+               hashsize *= i;
+
+               if (hashsize > maxsize)
                {
-                  hashsze /= i;
+                  hashsize /= i;
                   break;
                }
             }
          }
       }
-
-      return hashsze;
+      return hashsize;
    }
 
    /// returns hash index of #HashItem \p h or -1, if \p h is not present.
-   /** Using the hash function #hashval, the hash value of \p h is calculated.
-    *  Starting with this hash index, every #hashsize%-th #element is
+   /** Using the hash function #m_hashfun, the hash value of \p h 
+    *  is calculated.
+    *  Starting with this hash index, every #m_hashsize%-th #element is
     *  compared with \p h until \p h is found or all #element%s are checked.
     *
     *  @param  h  #HashItem, for which the hash index should be calculated
@@ -377,61 +304,32 @@ private:
     */
    int index(const HashItem& h) const
    {
-      int i, j;
-
-      if (thenum == 0)
+      if (m_used == 0)
          return -1;
 
-      assert(element.size() > 0);
+      assert(m_elem.size() > 0);
 
-      i = (*hashval)(&h) % element.size();
-      j = i;
-
-      while(element[i].status != Element < HashItem, Info > ::FREE) 
+      int i = (*m_hashfun)(&h) % m_elem.size();
+      int j = i;
+      
+      while(m_elem[i].stat != Elem::FREE)
       {
-         // found ?
-         if (  (element[i].status == Element < HashItem, Info > ::USED)
-            && (element[i].item == h))
+         if (  (m_elem[i].stat == Elem::USED)
+            && (m_elem[i].item == h))
             return i;
 
-         i = (i + hashsize) % element.size();
+         i = (i + m_hashsize) % m_elem.size();
 
          if (i == j)
             break;
       }
       return -1;
    }
+   /// assignment operator is not implemented.
+   DataHashTable& operator=(const DataHashTable& base);
 
-public:
-   /**@name Constructors / Destructors */
-   //@{
-   /// default constructor.
-   /** Allocates a #DataHashTable for \p nel entries using \p f as hash
-    *  function. If \p hashsze > 0, #hashSize() is set to the specified
-    *  value, otherwise a suitable #hashSize() is computed automatically.
-    *  Parameter \p incr is used for memory management: If more than
-    *  \p nel entries are added to the #DataHashTable, it will
-    *  automatically be #reMax()%ed by a factor of \p incr.
-    *
-    *  @param f            pointer to hash function.
-    *  @param nel          number of hash elements.
-    *  @param hashsze      hash size.
-    *  @param incr         factor for increasing data block.
-    */
-   DataHashTable(int (*f)(const HashItem*), 
-      int nel = 256, int hashsze = 0, Real incr = 2.0)
-      : element(nel)
-      , hashval(f)
-      , factor (incr)
-   {
-      clear();
-      if (hashsze < 1)
-         this->hashsize = autoHashSize();
-      else
-         this->hashsize = hashsze;
-      assert(factor > 1);
-   }
-   //@}
+   /// copy constructor is not implemented.
+   DataHashTable(const DataHashTable& base);
 };
 } // namespace soplex
 #endif   // _DATAHAHSTABLE_H_
@@ -444,6 +342,7 @@ public:
 //Emacs indent-tabs-mode:nil
 //Emacs End:
 //-----------------------------------------------------------------------------
+
 
 
 

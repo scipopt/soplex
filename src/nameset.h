@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.h,v 1.18 2002/04/01 15:09:37 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.h,v 1.19 2002/04/03 10:15:45 bzfkocht Exp $"
 
 /**@file  nameset.h
  * @brief Set of strings.
@@ -52,6 +52,11 @@ namespace soplex
    additional names. #memRemax() can be used to reset #memMax() but not lower
    than to #memSize(). Method #memPack() performs a garbage collection to
    gain free memory resulting from removed names.
+
+   @warning Since the keys the #NameSet uses to reference the strings are
+            generated internally, it is extremly important that the calls
+            to #DataSet from within #NameSet are syncronous to any calls
+            outside to #DataSet, such as in row or column adding.
 */
 class NameSet
 {
@@ -294,11 +299,11 @@ public:
    //@{
    /// default constructor.
    /** @param      max     start value for #max()
-       @param      mmax    start value for #memMax()
-       @param      fac     start value for #factor
-       @param      memFac  start value for #memFactor
+    *  @param      mmax    start value for #memMax()
+    *  @param      fac     start value for #factor
+    *  @param      memFac  start value for #memFactor
     */
-   NameSet(int max = 8,
+   NameSet(int max = 10000,
            int mmax = -1,
            Real fac = 2,
            Real memFac = 2);

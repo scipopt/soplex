@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.27 2002/03/11 17:43:57 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.28 2002/04/03 10:15:45 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -33,7 +33,6 @@
 #define INIT_COLS     10000     ///< initialy allocated columns.
 #define INIT_ROWS     10000     ///< initialy allocated rows.
 #define INIT_NZOS     100000    ///< initialy allocated non zeros.
-#define INIT_NAME_MEM 100000    ///< initialy memory for names.
 
 namespace soplex
 {
@@ -341,10 +340,10 @@ bool SPxLP::readLPF(
    NameSet*  rnames;                ///< row names.
    NameSet*  cnames;                ///< column names.
 
-   LPCol     emptycol;              ///< reusable empty column.
    LPColSet  cset;                  ///< the set of columns read.
-   LPRow     row;                   ///< last assembled row.
    LPRowSet  rset;                  ///< the set of rows read.
+   LPCol     emptycol;              ///< reusable empty column.
+   LPRow     row;                   ///< last assembled row.
    DSVector  vec;                   ///< last assembled vector (from row).
    Real      val = 1.0;
    int       colidx;
@@ -363,12 +362,12 @@ bool SPxLP::readLPF(
    char*     pos;
 
    cnames = (p_cnames != 0) 
-      ? p_cnames : new NameSet(INIT_COLS, INIT_NAME_MEM);
+      ? p_cnames : new NameSet();
 
    cnames->clear();
 
    rnames = (p_rnames != 0)
-      ? p_rnames : new NameSet(INIT_ROWS, INIT_NAME_MEM);
+      ? p_rnames : new NameSet();
 
    rnames->clear();
 

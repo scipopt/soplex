@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.26 2002/04/01 15:09:36 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.27 2002/04/03 10:15:44 bzfkocht Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -493,7 +493,9 @@ public:
       if (thesize != thenum && firstfree == -themax - 1)
          return MSGinconsistent("DataSet");
 
-      for (int i = 0; i < thenum; ++i)
+      int i;
+
+      for (i = 0; i < thenum; ++i)
          if (theitem[thekey[i].idx].info != i)
             return MSGinconsistent("DataSet");
 
