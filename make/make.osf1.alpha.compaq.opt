@@ -1,6 +1,6 @@
-#--- $Id: make.osf1.alpha.compaq.opt,v 1.8 2002/12/14 07:46:04 bzfkocht Exp $
+#--- $Id: make.osf1.alpha.compaq.opt,v 1.9 2003/01/15 17:26:05 bzfkocht Exp $
 CXX	=	cxx
-CPPFLAGS=	-Isrc -I/usr/local/include -DNDEBUG
+CPPFLAGS=	-Isrc -I/usr/local/include -DNDEBUG -DWITH_ZLIB
 CXXFLAGS=	-std strict_ansi -O4 -fast -nortti -nocleanup \
 		-ptr $(OBJDIR)/cxx_repository   
 REPOSIT	=	$(OBJDIR)/cxx_repository/*.o

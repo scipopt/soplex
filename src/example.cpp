@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.54 2003/01/13 19:04:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.55 2003/01/15 17:26:06 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -66,22 +66,6 @@ public:
       : SoPlex(p_type, p_rep)
    {
    }
-
-   virtual bool terminate()
-   {
-      if (m_solver.basis().iteration() % 100 == 0)
-         std::cout << m_solver.basis().iteration() << ":\t" << m_solver.value() << std::endl;
-
-      return SoPlex::terminate();
-   }
-
-   void displayStats() const
-   {
-      std::cout << "IEXAMP01 Factorizations   : " << getFactorCount() << std::endl;
-      std::cout << "IEXAMO02     Time spend   : " << getFactorTime() << std::endl;
-      std::cout << "IEXAMP03 Solves           : " << getSolveCount() << std::endl;
-      std::cout << "IEXAMP04     Time spend   : " << getSolveTime() << std::endl;
-   }
    void displayQuality() const
    {
       Real maxviol;
@@ -119,7 +103,7 @@ public:
                 << std::setw(16) << maxviol << "  " 
                 << std::setw(16) << sumviol << std::endl;
 
-      m_solver.qualRdCostViolation(maxviol, sumviol);
+      m_solver.qualRedCostViolation(maxviol, sumviol);
 
       std::cout << "IEXAMP11 Reduced costs    :" 
                 << std::setw(16) << maxviol << "  " 
@@ -337,29 +321,30 @@ int main(int argc, const char* const argv[])
    }
    work.setPricer(pricer);
 
-   std::cout << "IEXAMP17 " << pricer->getName() << " pricing" << std::endl;
+   std::cout << "IEXAMP17 " << pricer->getName() 
+             << " pricing" << std::endl;
+
    assert(work.isConsistent());
 
-   std::cout << "IEXAMP18 ";
    switch(ratiotest)
    {
    case 2 :
       ratiotester = new SPxFastRT;
-      std::cout << "Fast";
       break;
    case 1 :
       ratiotester = new SPxHarrisRT;
-      std::cout << "Harris";
       break;
    case 0 :
       /*FALLTHROUGH*/
    default:
       ratiotester = new SPxDefaultRT;
-      std::cout << "Default";
       break;
    }
-   std::cout << " ratiotest" << std::endl;
    work.setTester(ratiotester);
+
+   std::cout << "IEXAMP18 " << ratiotester->getName() 
+             << " ratiotest" << std::endl;
+
    assert(work.isConsistent());
 
    switch(scaling)
@@ -411,35 +396,35 @@ int main(int argc, const char* const argv[])
       break;
    }
    work.setSimplifier(simplifier);
+
    std::cout << "IEXAMP20 "
              << ((simplifier == 0) ? "no" : simplifier->getName()) 
              << " simplifier" << std::endl;
-   assert(work.isConsistent());
 
-   std::cout << "IEXAMP21 ";
+   assert(work.isConsistent());
 
    switch(starting)
    {
    case 3 :
       starter = new SPxVectorST;
-      std::cout << "Vector";
       break;
    case 2 :
       starter = new SPxSumST;
-      std::cout << "Sum";
       break;
    case 1 :
       starter = new SPxWeightST;
-      std::cout << "Weight";
       break;
    case 0 :
       /*FALLTHROUGH*/
    default :
-      std::cout << "no";
       break;
    }
-   std::cout << " starter" << std::endl;
    work.setStarter(starter);
+
+   std::cout << "IEXAMP21 "
+             << ((starter == 0) ? "no" : starter->getName())
+             << " starter" << std::endl;
+
    assert(work.isConsistent());
 
    Timer timer;
@@ -478,7 +463,10 @@ int main(int argc, const char* const argv[])
 
    timer.stop();
 
-   work.displayStats();
+   std::cout << "IEXAMP01 Factorizations   : " << work.getFactorCount() << std::endl;
+   std::cout << "IEXAMO02     Time spend   : " << work.getFactorTime() << std::endl;
+   std::cout << "IEXAMP03 Solves           : " << work.getSolveCount() << std::endl;
+   std::cout << "IEXAMP04     Time spend   : " << work.getSolveTime() << std::endl;
 
    std::cout << "IEXAMP27 solution time  is: " 
              << timer.userTime() 

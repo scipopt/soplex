@@ -1,6 +1,6 @@
-#--- $Id: make.linux.ppc.gnu.dbg,v 1.1 2002/03/15 11:24:20 bzfkocht Exp $
+#--- $Id: make.linux.ppc.gnu.dbg,v 1.2 2003/01/15 17:26:04 bzfkocht Exp $
 CXX	=	g++
-CPPFLAGS=	-Isrc
+CPPFLAGS=	-Isrc -DWITH_ZLIB
 CXXFLAGS=	-O0 -g -ansi $(GCCWARN)
-LDFLAGS	=	-lm
+LDFLAGS	=	-lz -lm
 ARFLAGS	=	crs

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.37 2003/01/05 19:03:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.38 2003/01/15 17:26:06 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -475,8 +475,6 @@ void SPxBasis::change(
 void SPxBasis::factorize()
 {
    METHOD( "SPxBasis::factorize()" );
-
-   std::cout << "** factoring ** " << factorized << " " << updateCount << std::endl;
 
    assert(factor != 0);
 

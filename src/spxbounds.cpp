@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbounds.cpp,v 1.18 2003/01/05 19:03:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbounds.cpp,v 1.19 2003/01/15 17:26:06 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -114,7 +114,9 @@ void SPxSolver::setDualColBounds()
 
    const SPxBasis::Desc& ds = desc();
 
-   for(int i = 0; i < nRows(); ++i)
+   int i;
+
+   for(i = 0; i < nRows(); ++i)
    {
       theURbound[i] = 0.0;
       theLRbound[i] = 0.0;
@@ -122,7 +124,7 @@ void SPxSolver::setDualColBounds()
       clearDualBounds(ds.rowStatus(i), theURbound[i], theLRbound[i]);
    }
 
-   for(int i = 0; i < nCols(); ++i)
+   for(i = 0; i < nCols(); ++i)
    {
       theUCbound[i] = -maxObj(i);
       theLCbound[i] = -maxObj(i);
@@ -141,7 +143,9 @@ void SPxSolver::setDualRowBounds()
 
    assert(rep() == ROW);
 
-   for(int i = 0; i < nRows(); ++i)
+   int i;
+
+   for(i = 0; i < nRows(); ++i)
    {
       theURbound[i] = 0.0;
       theLRbound[i] = 0.0;
@@ -149,7 +153,7 @@ void SPxSolver::setDualRowBounds()
       clearDualBounds(dualRowStatus(i), theURbound[i], theLRbound[i]);
    }
 
-   for(int i = 0; i < nCols(); ++i)
+   for(i = 0; i < nCols(); ++i)
    {
       theUCbound[i] = 0.0;
       theLCbound[i] = 0.0;
@@ -340,7 +344,9 @@ void SPxSolver::testBounds() const
    }
    else
    {
-      for(int i = 0; i < dim(); ++i )
+      int i;
+
+      for(i = 0; i < dim(); ++i )
       {
          if ((*theCoPvec)[i] > (*theCoUbound)[i] + viol_max) // && (*theCoUbound)[i] != (*theCoLbound)[i])
          {
@@ -357,7 +363,7 @@ void SPxSolver::testBounds() const
                       << " CoLbound: " << (*theCoLbound)[i] << std::endl;
          }
       }
-      for(int i = 0; i < coDim(); ++i )
+      for(i = 0; i < coDim(); ++i )
       {
          if ((*thePvec)[i] > (*theUbound)[i] + viol_max)  // &&  (*theUbound)[i] != (*theLbound)[i])
          {

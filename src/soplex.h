@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.58 2003/01/05 19:03:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.59 2003/01/15 17:26:06 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief preconfigured #SoPlex LP-solver.
@@ -90,7 +90,7 @@ public:
    ///
    virtual SPxSolver::Status getDual(Vector& vector) const;
    ///
-   virtual SPxSolver::Status getRdCost(Vector& vector) const;
+   virtual SPxSolver::Status getRedCost(Vector& vector) const;
 
    /// get violation of constraints.
    virtual void qualConstraintViolation(Real& maxviol, Real& sumviol) const;
@@ -100,7 +100,7 @@ public:
    /// get the residuum |Ax-b|.
    virtual void qualSlackViolation(Real& maxviol, Real& sumviol) const;
    /// get violation of optimality criterion.
-   virtual void qualRdCostViolation(Real& maxviol, Real& sumviol) const;
+   virtual void qualRedCostViolation(Real& maxviol, Real& sumviol) const;
 #endif
    /// time spent in factorizations
    virtual Real getFactorTime() const

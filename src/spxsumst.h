@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsumst.h,v 1.6 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsumst.h,v 1.7 2003/01/15 17:26:08 bzfkocht Exp $"
 
 
 /**@file  spxsumst.h
@@ -45,8 +45,12 @@ protected:
 public:
    /// default constructor.
    SPxSumST()
-   {}
-
+   {
+      m_name = "Sum";
+   }
+   /// destructor.
+   virtual ~SPxSumST()
+   {}  
 };
 
 } // namespace soplex

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.21 2003/01/13 19:04:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.22 2003/01/15 17:26:07 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -107,6 +107,7 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
    int                chgLRhs = 0;
    int                chgBnds = 0;
    int                i;
+   int                j;
 
    for(i = 0; i < lp.nRows(); ++i )
    {
@@ -122,7 +123,7 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
       rowhash[i].hid = DISPERSE(row.size());
       rem[i]         = 0;
 
-      for(int j = 0; j < row.size(); ++j )
+      for(j = 0; j < row.size(); ++j )
       {
          Real x = row.value(j);
          int  k = row.index(j);
@@ -182,7 +183,7 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
                                  << " up= " << upbnd 
                                  << std::endl; });
 
-            for(int j = 0; j < row.size(); ++j )
+            for(j = 0; j < row.size(); ++j )
             {
                Real x = row.value(j);
                int  k = row.index(j);
@@ -210,7 +211,7 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
                                  << " lo= " << lobnd 
                                  << std::endl; });
 
-            for(int j = 0; j < row.size(); ++j )
+            for(j = 0; j < row.size(); ++j )
             {
                Real x = row.value(j);
                int  k = row.index(j);
@@ -270,7 +271,7 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
       }
       if (upcnt <= 1 || locnt <= 1)
       {
-         for(int j = 0; j < row.size(); ++j )
+         for(j = 0; j < row.size(); ++j )
          {
             Real x = row.value(j);
             int  k = row.index(j);
@@ -451,8 +452,6 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
 
       assert(isNotZero(alpha));
 
-      int j;
-
       for(j = 0; j < row1.size(); ++j)
       {
          int  k1 = row1.index(j);
@@ -570,8 +569,9 @@ SPxSimplifier::Result SPxRedundantSM::redundantCols(SPxLP& lp, bool& again)
          // test if all coefficents are going in one direction
          int upcnt = 0;
          int locnt = 0;
-         
-         for(int j = 0; j < col.size(); ++j )
+         int j;
+
+         for(j = 0; j < col.size(); ++j )
          {            
             if (upcnt > 0 && locnt > 0)
                break;
@@ -628,7 +628,7 @@ SPxSimplifier::Result SPxRedundantSM::redundantCols(SPxLP& lp, bool& again)
                lp.changeUpper(i, infinity);
                chgBnds++;
 #ifndef NDEBUG
-               for(int j = 0; j < col.size(); ++j )
+               for(j = 0; j < col.size(); ++j )
                {
                   if (col.value(j) < 0.0)
                      assert(lp.rhs(col.index(j)) >= infinity); // lp.changeRhs(col.index(j), infinity);
@@ -643,7 +643,7 @@ SPxSimplifier::Result SPxRedundantSM::redundantCols(SPxLP& lp, bool& again)
                lp.changeLower(i, -infinity);
                chgBnds++;
 #ifndef NDEBUG
-               for(int j = 0; j < col.size(); ++j )
+               for(j = 0; j < col.size(); ++j )
                {
                   if (col.value(j) > 0.0)
                      assert(lp.rhs(col.index(j)) >= infinity); // lp.changeRhs(col.index(j), infinity);

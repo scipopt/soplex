@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxintervalsm.cpp,v 1.3 2003/01/13 14:30:55 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxintervalsm.cpp,v 1.4 2003/01/15 17:26:07 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -39,8 +39,9 @@ SPxSimplifier::Result SPxIntervalSM::simplify(SPxLP& lp, Real eps, Real delta)
    int  bdcnt  = 0;
    int  lrcnt  = 0;
    int  ojcnt  = 0;
-  
-   for(int i = 0; i < lp.nRows(); ++i)
+   int  i;
+
+   for(i = 0; i < lp.nRows(); ++i)
    {
       // LHS 
       Real x = lp.lhs(i);
@@ -80,7 +81,7 @@ SPxSimplifier::Result SPxIntervalSM::simplify(SPxLP& lp, Real eps, Real delta)
          lrcnt++;
       }
    }
-   for(int i = 0; i < lp.nCols(); ++i)
+   for(i = 0; i < lp.nCols(); ++i)
    {
       // lower bound
       Real lo = lp.lower(i);

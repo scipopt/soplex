@@ -13,92 +13,38 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfileio.cpp,v 1.4 2003/01/15 17:26:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfileio.h,v 1.1 2003/01/15 17:26:07 bzfkocht Exp $"
 
-//#define DEBUGGING 1
+/**@file  spxfileio.h
+ * @brief declaration of types for file output
+ *
+ * This is to make the use of compressed input files transparent
+ * when programming.
+ */
+#ifndef _SPXFILEIO_H_
+#define _SPXFILEIO_H_
 
-#include <assert.h>
+#include <iostream>
+#include <fstream>
 
-#include "spxdefines.h"
-#include "spxsolver.h"
-#include "spxfileio.h"
+/*-----------------------------------------------------------------------------
+ * compressed file support
+ *-----------------------------------------------------------------------------
+ */
+#ifdef WITH_ZLIB
+#include "gzstream.h"
+#endif // WITH_GSZSTREAM
 
 namespace soplex
 {
-bool SPxSolver::readBasisFile(
-   const char*    filename, 
-   const NameSet& rowNames,
-   const NameSet& colNames)
-{
-   METHOD( "SPxSolver::readBasisFile()" );
-
-   spxifstream file(filename);
-
-   if (!file)
-      return false;
- 
-   return readBasis(file, rowNames, colNames);
-}
-
-bool SPxSolver::writeBasisFile(
-   const char*    filename, 
-   const NameSet& rowNames,
-   const NameSet& colNames)
-{
-   METHOD( "SPxSolver::writeBasisFile()" );
-   std::ofstream file(filename);
-
-   if (!file)
-      return false;
- 
-   writeBasis(file, rowNames, colNames);
-
-   return true;
-}
-
-
-bool SPxSolver::readFile( 
-   const char* filename, 
-   NameSet*    rowNames,
-   NameSet*    colNames, 
-   DIdxSet*    intVars)
-{
-   METHOD( "SPxSolver::readFile()" );
-
-   spxifstream file(filename);
-
-   if (!file)
-      return false;
-
-   return read(file, rowNames, colNames, intVars);
-}
-
-bool SPxLP::readFile( 
-   const char* filename, 
-   NameSet*    rowNames,
-   NameSet*    colNames, 
-   DIdxSet*    intVars)
-{
-   METHOD( "SPxLP::readFile()" );
-
-   spxifstream file(filename);
-
-   if (!file)
-      return false;
-
-   return read(file, rowNames, colNames, intVars);
-}
-
-void SPxSolver::dumpFile(const char* filename) const
-{
-   METHOD( "SPxSolver::dumpFile()" );
-   std::ofstream file(filename);
-
-   if (file.good())
-      file << *this;
-}
+#ifdef WITH_ZLIB
+   typedef gzstream::igzstream spxifstream;
+#else
+   typedef std::ifstream spxifstream;
+#endif // WITH_ZLIB
 
 } // namespace soplex
+#endif // _SPXFILEIO_H_
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:

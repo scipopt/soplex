@@ -1,6 +1,6 @@
-#--- $Id: make.linux.x86.insure.dbg,v 1.2 2001/11/06 23:30:59 bzfkocht Exp $
+#--- $Id: make.linux.x86.insure.dbg,v 1.3 2003/01/15 17:26:04 bzfkocht Exp $
 CXX	=	insure g++
 CPPFLAGS=	-Isrc 
-CXXFLAGS=	-g -DNDEBUG
-LDFLAGS	=	-lm
+CXXFLAGS=	-g -DNDEBUG -DWITH_ZLIB
+LDFLAGS	=	-lz -lm
 ARFLAGS	=	crs

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.7 2003/01/12 13:09:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.8 2003/01/15 17:26:08 bzfkocht Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -444,7 +444,7 @@ public:
     *  and \i A the LPs constraint matrix. Then the reduced cost vector
     *  \i r is defined as \f$r^T = c^T - d^TA\f$.
     */
-   virtual Status getRdCost (Vector& vector) const;
+   virtual Status getRedCost (Vector& vector) const;
 
    /// Termination criterion.
    /** This method is called in each Simplex iteration to determine, if
@@ -1183,7 +1183,7 @@ public:
    /// get the residuum |Ax-b|.
    virtual void qualSlackViolation(Real& maxviol, Real& sumviol) const;
    /// get violation of optimality criterion.
-   virtual void qualRdCostViolation(Real& maxviol, Real& sumviol) const;
+   virtual void qualRedCostViolation(Real& maxviol, Real& sumviol) const;
 
 private:
    ///

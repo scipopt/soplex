@@ -18,8 +18,8 @@
 // ============================================================================
 //
 // File          : gzstream.h
-// Revision      : $Revision: 1.3 $
-// Revision_date : $Date: 2003/01/06 14:36:20 $
+// Revision      : $Revision: 1.4 $
+// Revision_date : $Date: 2003/01/15 17:26:06 $
 // Author(s)     : Deepak Bandyopadhyay, Lutz Kettner
 // 
 // Standard streambuf implementation following Nicolai Josuttis, "The 
@@ -65,7 +65,7 @@ public:
         // ASSERT: both input & output capabilities will not be used together
     }
     int is_open() const { return opened; }
-    gzstreambuf* open( const char* name, int open_mode);
+    gzstreambuf* open( const char* name, int omode);
     gzstreambuf* close();
     ~gzstreambuf() { close(); file = 0; }
     
@@ -79,9 +79,9 @@ protected:
     gzstreambuf buf;
 public:
     gzstreambase() { init(&buf); }
-    gzstreambase( const char* name, int open_mode);
+    gzstreambase( const char* name, int omode);
     ~gzstreambase();
-    void open( const char* name, int open_mode);
+    void open( const char* name, int omode);
     void close();
     gzstreambuf* rdbuf() { return &buf; }
 };
@@ -95,11 +95,11 @@ public:
 class igzstream : public gzstreambase, public std::istream {
 public:
     igzstream() : std::istream( &buf) {} 
-    igzstream( const char* name, int open_mode = std::ios::in)
-        : gzstreambase( name, open_mode), std::istream( &buf) {}  
+    igzstream( const char* name, int omode = std::ios::in)
+        : gzstreambase( name, omode), std::istream( &buf) {}  
     gzstreambuf* rdbuf() { return gzstreambase::rdbuf(); }
-    void open( const char* name, int open_mode = std::ios::in) {
-        gzstreambase::open( name, open_mode);
+    void open( const char* name, int omode = std::ios::in) {
+        gzstreambase::open( name, omode);
     }
 };
 
@@ -109,8 +109,8 @@ public:
     ogzstream( const char* name, int mode = std::ios::out)
         : gzstreambase( name, mode), std::ostream( &buf) {}  
     gzstreambuf* rdbuf() { return gzstreambase::rdbuf(); }
-    void open( const char* name, int open_mode = std::ios::out) {
-        gzstreambase::open( name, open_mode);
+    void open( const char* name, int omode = std::ios::out) {
+        gzstreambase::open( name, omode);
     }
 };
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.67 2003/01/10 12:46:14 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.68 2003/01/15 17:26:06 bzfkocht Exp $"
 
 #include <iostream>
 
@@ -142,9 +142,9 @@ SPxSolver::Status SoPlex::getDual(Vector& pi) const
    return m_solver.getDual(pi);
 }
   
-SPxSolver::Status SoPlex::getRdCost(Vector& rdcost) const
+SPxSolver::Status SoPlex::getRedCost(Vector& rdcost) const
 {
-   return m_solver.getRdCost(rdcost);
+   return m_solver.getRedCost(rdcost);
 }
 
 

@@ -1,4 +1,4 @@
-# $Id: check.sh,v 1.17 2003/01/12 13:09:39 bzfkocht Exp $
+# $Id: check.sh,v 1.18 2003/01/15 17:26:03 bzfkocht Exp $
 # Parameters
 # $1 Name of the test, e.g. netlib (needs netlib.test, netlib.solu)
 # $2 Path/Name of the binary, e.g. ../bin/soplex.linux.x86.gnu.opt
@@ -32,7 +32,7 @@ do
 	6)  echo =type= ECi
             opt="-e -i" ;;
         esac
-        $2 $opt $4 $i 2>>$ERRFILE
+        $2 $opt -q $4 $i 2>>$ERRFILE
         echo =ready=
     done
 done | tee -a $OUTFILE

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.h,v 1.13 2003/01/13 19:04:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.h,v 1.14 2003/01/15 17:26:07 bzfkocht Exp $"
 
 /**@file  spxredundantsm.h
  * @brief Remove singletons from LP.
@@ -32,9 +32,19 @@ namespace soplex
    @ingroup Algo
 
    This #SPxSimplifier removes redundant rows and columns and bounds.
-   For example those who containing one nonzero value only. 
-   Also empty rows and columns are removed.   
-   
+   Also infeasibility/unboundness may be detected.
+   Removed are:
+   - empty rows / columns
+   - unconstraint constraints
+   - row sigletons
+   - fixed columns
+   - some columns singletons
+   - rows with all fixed variables due to implied bounds
+   - redundant rhs/lhs
+   - redundant column bounds
+   - dublicate rows
+   - columns which are implicit fixed to a bound
+   - columns with redundant bounds
 */
 class SPxRedundantSM : public SPxSimplifier
 {
@@ -97,7 +107,7 @@ private:
 public:
    /// default constructor
    SPxRedundantSM() 
-      : SPxSimplifier("Rem1")
+      : SPxSimplifier("Redundant")
    {}   
    /// destructor.
    virtual ~SPxRedundantSM()

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.24 2003/01/12 13:09:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.25 2003/01/15 17:26:08 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -133,6 +133,7 @@ void SPxSteepPR::setupPrefsX(
    // Real ctie;
    Real rshift;
    Real cshift;
+   int  i;
 
    if (thesolver->rep() == SPxSolver::COLUMN)
    {
@@ -157,20 +158,20 @@ void SPxSteepPR::setupPrefsX(
    //      p[i] += EQ_PREF * (thesolver->rhs(i) == thesolver->lhs(i));
    //      p[i] += EQ_PREF * (thesolver->rhs(i) >=  infinity
    //                     &&  thesolver->lhs(i) <= -infinity);
-   for(int i = 0; i < thesolver->nRows(); ++i)
+   for(i = 0; i < thesolver->nRows(); ++i)
       (*p)[i] = rshift;
 
    //      cp[i] += ctie * thesolver->colVector(i).size() / Real(thesolver->nRows());
    //      cp[i] += EQ_PREF * (thesolver->upper(i) == thesolver->lower(i));
    //      cp[i] += EQ_PREF * (thesolver->upper(i) >=  infinity
    //                      &&  thesolver->lower(i) <= -infinity);
-   for(int i = 0; i < thesolver->nCols(); ++i)
+   for(i = 0; i < thesolver->nCols(); ++i)
       (*cp)[i] = cshift;
 
-   for(int i = 0; i < coPref.size(); ++i)
+   for(i = 0; i < coPref.size(); ++i)
       coPref[i] *= 1.0 - mult * i;
 
-   for(int i = 0; i < pref.size(); ++i)
+   for(i = 0; i < pref.size(); ++i)
       pref[i] *= 1.0 + mult * i;
 }
 

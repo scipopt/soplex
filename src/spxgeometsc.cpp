@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeometsc.cpp,v 1.5 2003/01/13 19:04:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeometsc.cpp,v 1.6 2003/01/15 17:26:07 bzfkocht Exp $"
 
 /**@file  spxgeometsc.cpp
  * @brief Geometric mean row/column scaling.
@@ -51,7 +51,7 @@ void SPxGeometSC::scale(SPxLP& lp)
 {
    METHOD( "SPxGeometSC::scale()" );
 
-   VERBOSE1({ std::cout << "Geometric scaling LP" << std::endl; });   
+   VERBOSE1({ std::cout << "IGEOSC01 Geometric scaling LP" << std::endl; });   
 
    Real pstart = 0.0;
    Real p0     = 0.0;
@@ -59,7 +59,7 @@ void SPxGeometSC::scale(SPxLP& lp)
 
    setup(lp);
 
-   VERBOSE2({ std::cout << "LP scaling statistics:" 
+   VERBOSE2({ std::cout << "IGEOSC02 LP scaling statistics:" 
                         << " min= " << lp.minAbsNzo()
                         << " max= " << lp.maxAbsNzo()
                         << " col-ratio= " << maxColRatio(lp)
@@ -79,7 +79,7 @@ void SPxGeometSC::scale(SPxLP& lp)
          p0 = computeScalingVecs(lp.rowSet(), m_colscale, m_rowscale);
          p1 = computeScalingVecs(lp.colSet(), m_rowscale, m_colscale);
       }
-      VERBOSE3({ std::cout << "Geometric scaling round " << count
+      VERBOSE3({ std::cout << "IGEOSC03 Geometric scaling round " << count
                            << " col-ratio= " << (m_colFirst ? p0 : p1)
                            << " row-ratio= " << (m_colFirst ? p1 : p0)
                            << std::endl; });
@@ -106,20 +106,20 @@ void SPxGeometSC::scale(SPxLP& lp)
       // reset m_colscale/m_rowscale to 1.0
       setup(lp);
 
-      VERBOSE2({ std::cout << "No scaling done." << std::endl; });
+      VERBOSE2({ std::cout << "IGEOSC04 No scaling done." << std::endl; });
    }
    else
    {
       applyScaling(lp);
 
-      VERBOSE3({ std::cout << "Row scaling min= " << minAbsRowscale()
+      VERBOSE3({ std::cout << "IGEOSC05 Row scaling min= " << minAbsRowscale()
                            << " max= " << maxAbsRowscale()
                            << std::endl
-                           << "Col scaling min= " << minAbsColscale()
+                           << "IGEOSC06 Col scaling min= " << minAbsColscale()
                            << " max= " << maxAbsColscale()
                            << std::endl; });
 
-      VERBOSE2({ std::cout << "LP scaling statistics:" 
+      VERBOSE2({ std::cout << "IGEOSC07 LP scaling statistics:" 
                            << " min= " << lp.minAbsNzo()
                            << " max= " << lp.maxAbsNzo()
                            << " col-ratio= " << maxColRatio(lp) 

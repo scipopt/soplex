@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.h,v 1.11 2003/01/10 12:46:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightst.h,v 1.12 2003/01/15 17:26:08 bzfkocht Exp $"
 
 
 /**@file  spxweightst.h
@@ -84,15 +84,17 @@ protected:
    virtual void setupWeights(SPxSolver& base);
 
 public:
-   /// generates start basis for loaded basis.
-   void generate(SPxSolver& base);
-
-   /// consistency check.
-   bool isConsistent() const;
-
    /// default constructor.
    SPxWeightST()
+      : SPxStarter("Weight")
    {}
+   /// destructor.
+   virtual ~SPxWeightST()
+   {}  
+   /// generates start basis for loaded basis.
+   void generate(SPxSolver& base);
+   /// consistency check.
+   bool isConsistent() const;
 };
 
 } // namespace soplex

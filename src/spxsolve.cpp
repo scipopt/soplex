@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.62 2003/01/15 07:17:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.63 2003/01/15 17:26:07 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -73,7 +73,7 @@ SPxSolver::Status SPxSolver::solve()
 
       init();
    }
-   thepricer->setEpsilon(delta());
+   //thepricer->setEpsilon(delta());
 
    //setType(type());
 
@@ -110,6 +110,8 @@ SPxSolver::Status SPxSolver::solve()
    {
       if (type() == ENTER)
       {
+         thepricer->setEpsilon(delta());
+
          do
          {
             VERBOSE3({
@@ -127,19 +129,31 @@ SPxSolver::Status SPxSolver::solve()
                   || SPxBasis::status() == SPxBasis::DUAL 
                   || SPxBasis::status() == SPxBasis::PRIMAL)
                {
-                  Real maxviol;
-                  Real sumviol;
+                  Real maxViolRedCost;
+                  Real sumViolRedCost;
+                  Real maxViolBounds;
+                  Real sumViolBounds;
+                  Real maxViolConst;
+                  Real sumViolConst;
 
-                  qualRdCostViolation(maxviol, sumviol);
+                  qualRedCostViolation(maxViolRedCost, sumViolRedCost);
+                  qualBoundViolation(maxViolBounds, sumViolBounds);
+                  qualConstraintViolation(maxViolConst, sumViolConst);
 
                   // is the solution good enough ?
-                  if (sumviol > delta()) // no
+                  if (sumViolRedCost > delta() || sumViolBounds > delta() || sumViolConst > delta()) // no
                   {
+                     // we reduce delta(). Note that if the pricer does not find a candiate
+                     // with the reduced delta, we quit, regardless of the violations.
                      thepricer->setEpsilon(thepricer->epsilon() * 0.1);
 
                      VERBOSE3({ std::cout << "Setting delta= " << thepricer->epsilon() 
-                                          << " maxviol= " << maxviol
-                                          << " sumviol= " << sumviol
+                                          << " maxViolRedCost= " << maxViolRedCost
+                                          << " sumViolRedCost= " << sumViolRedCost
+                                          << " maxViolBounds= " << maxViolBounds
+                                          << " sumViolBounds= " << sumViolBounds
+                                          << " maxViolConst= " << maxViolConst
+                                          << " sumViolConst= " << sumViolConst
                                           << std::endl; });
                   }
                   // solution seems good, no check we are precide enough
@@ -210,6 +224,8 @@ SPxSolver::Status SPxSolver::solve()
       else
       {
          assert(type() == LEAVE);
+         
+         thepricer->setEpsilon(delta());
 
          do
          {
@@ -229,19 +245,31 @@ SPxSolver::Status SPxSolver::solve()
                   || SPxBasis::status() == SPxBasis::DUAL 
                   || SPxBasis::status() == SPxBasis::PRIMAL)
                {
-                  Real maxviol;
-                  Real sumviol;
+                  Real maxViolRedCost;
+                  Real sumViolRedCost;
+                  Real maxViolBounds;
+                  Real sumViolBounds;
+                  Real maxViolConst;
+                  Real sumViolConst;
 
-                  qualRdCostViolation(maxviol, sumviol);
+                  qualRedCostViolation(maxViolRedCost, sumViolRedCost);
+                  qualBoundViolation(maxViolBounds, sumViolBounds);
+                  qualConstraintViolation(maxViolConst, sumViolConst);
 
                   // is the solution good enough ?
-                  if (sumviol > delta()) // no
+                  if (sumViolRedCost > delta() || sumViolBounds > delta() || sumViolConst > delta()) // no
                   {
+                     // we reduce delta(). Note that if the pricer does not find a candiate
+                     // with the reduced delta, we quit, regardless of the violations.
                      thepricer->setEpsilon(thepricer->epsilon() * 0.1);
 
                      VERBOSE3({ std::cout << "Setting delta= " << thepricer->epsilon() 
-                                          << " maxviol= " << maxviol
-                                          << " sumviol= " << sumviol
+                                          << " maxViolRedCost= " << maxViolRedCost
+                                          << " sumViolRedCost= " << sumViolRedCost
+                                          << " maxViolBounds= " << maxViolBounds
+                                          << " sumViolBounds= " << sumViolBounds
+                                          << " maxViolConst= " << maxViolConst
+                                          << " sumViolConst= " << sumViolConst
                                           << std::endl; });
                   }
                   // solution seems good, no check we are precide enough
@@ -612,10 +640,10 @@ SPxSolver::Status SPxSolver::getPrimal (Vector& p_vector) const
             abort();
          }
       }
-      for (int i = 0; i < dim(); ++i)
+      for (int j = 0; j < dim(); ++j)
       {
-         if (baseId(i).isSPxColId())
-            p_vector[ number(SPxColId(baseId(i))) ] = fVec()[i];
+         if (baseId(j).isSPxColId())
+            p_vector[ number(SPxColId(baseId(j))) ] = fVec()[j];
       }
    }
    return status();
@@ -648,9 +676,9 @@ SPxSolver::Status SPxSolver::getDual (Vector& p_vector) const
    return status();
 }
 
-SPxSolver::Status SPxSolver::getRdCost (Vector& p_vector) const
+SPxSolver::Status SPxSolver::getRedCost (Vector& p_vector) const
 {
-   METHOD( "SPxSolver::getRdCost()" );
+   METHOD( "SPxSolver::getRedCost()" );
 
    assert(isInitialized());
 
@@ -800,7 +828,7 @@ SPxSolver::Status SPxSolver::getResult(
    if (p_dual)
       getDual(*p_dual);
    if (reduCosts)
-      getRdCost(*reduCosts);
+      getRedCost(*reduCosts);
    return status();
 }
 } // namespace soplex

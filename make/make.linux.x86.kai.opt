@@ -1,7 +1,0 @@
-#--- $Id: make.linux.x86.kai.opt,v 1.2 2001/11/06 23:30:59 bzfkocht Exp $
-CXX	=	KCC
-CPPFLAGS=	-Isrc -DNDEBUG
-CXXFLAGS=	+K3 --abstract_float --abstract_pointer --no_exceptions --inline_keyword_space_time=20.0
-LDFLAGS	=	--static_libKCC -lm
-AR	=	KCC
-ARFLAGS	=	$(CPPFLAGS) $(CXXFLAGS) -o

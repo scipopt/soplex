@@ -1,4 +1,4 @@
-# $Id: check.awk,v 1.17 2003/01/13 19:04:41 bzfkocht Exp $
+# $Id: check.awk,v 1.18 2003/01/15 17:26:03 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: check.awk                                                     *
@@ -9,11 +9,25 @@
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 function abs(x)
 {
-    return x < 0 ? -x : x;
+   if (x < 0)
+      return -x;
+   if (x > 0)
+      return x;
+   return 0.0;  # get rid of -0.0
+}
+function printviol(x)
+{
+   if (x < 1e-9)
+      printf("         ");
+   else
+      printf(" %.2e", abs(x));
 }
 BEGIN {
-    print "$Id: check.awk,v 1.17 2003/01/13 19:04:41 bzfkocht Exp $";
+    print "$Id: check.awk,v 1.18 2003/01/15 17:26:03 bzfkocht Exp $";
     print "";
+    line = "--------------------------------------------------------------------------------------------------------------------------------\n";
+    printf(line);
+    printf("Name         Rows   Cols Type   Iter     Time Objective                    maxVCons sumVCons maxVBoun sumVBoun maxVRedc sumVRedc\n");
 }
 /=opt=/          { sol[$2] = $3; }
 /=type=/         { type = $2; }
@@ -25,6 +39,9 @@ BEGIN {
 /IEXAMP31/       { infeas = 1; }
 /IEXAMP32/       { infeas = 1; } 
 /IEXAMP33/       { timeout = 1; }
+/IEXAMP07/       { cvm = $4; cvs = $5; if (cvm > cvmax[type]) cvmax[type] = cvm; cvsum[type] += cvs; }
+/IEXAMP09/       { bvm = $4; bvs = $5; if (bvm > bvmax[type]) bvmax[type] = bvm; bvsum[type] += bvs; }
+/IEXAMP11/       { rcm = $5; rcs = $6; if (rcm > rcmax[type]) rcmax[type] = rcm; rcsum[type] += rcs; }
 /=start=/        {
    type = "";
    for(i = 2; i <= NF; i++)
@@ -43,7 +60,7 @@ BEGIN {
             printf("%25s", "");
         else
         {
-            printf("------------------------------------------------------------------------------\n");
+            printf(line);
 	    printf("%-10s %6d %6d ", name, rows, cols);
         }
 	printf("%-3s %7d %8.2f ", type, iter, time);
@@ -70,16 +87,23 @@ BEGIN {
 
     	        if ((abserr < 1e-4) || (relerr < 0.01))
 		{
-		   printf("ok\n");
+		   printf("ok            ");
 		   pass[type]++;
 		   passes++;
 		}
 		else
 		{
-		   printf("error %e\n", abserr);
+		   printf("error %.2e", abserr);
 		   fail[type]++;
 		   fails++;
 		}
+		printviol(cvm);
+		printviol(cvs);
+		printviol(bvm);
+		printviol(bvs);
+		printviol(rcm);
+		printviol(rcs); 
+		print "";
 	    }
 	    else
 	    {
@@ -116,19 +140,45 @@ BEGIN {
     cols     = 0;
 }
 END {
-    printf("\n------------------------------------------\n");
-    printf("Alg            Cnt  Pass  Fail       Time\n");
-    printf("------------------------------------------\n");
+    print "";
+    printf(line);
+    printf("Alg            Cnt  Pass  Fail       Time                                  maxVCons sumVCons maxVBoun sumVBoun maxVRedc sumVRedc\n");
+    printf(line);
     for(i in sum)
     {
-	printf("%-12s %5d %5d %5d %10.2f \n", 
+        printf("%-12s %5d %5d %5d %10.2f                                 ",
 	   i, cnt[i], pass[i], fail[i], sum[i]);
+	printviol(cvmax[i]);
+	printviol(cvsum[i]);
+	printviol(bvmax[i]);
+	printviol(bvsum[i]);
+	printviol(rcmax[i]);
+	printviol(rcsum[i]);
+	print "";
+
+	cvmaxsum += cvmax[i];
+	cvsumsum += cvsum[i];
+	bvmaxsum += bvmax[i];
+	bvsumsum += bvsum[i];
+	rcmaxsum += rcmax[i];
+	rcsumsum += rcsum[i];
     }
-    printf("------------------------------------------\n");
-    printf("%-12s %5d %5d %5d %10.2f \n",
+    printf(line);
+    printf("%-12s %5d %5d %5d %10.2f                                 ",
        "Sum", counts, passes, fails, times);
-    printf("------------------------------------------\n");
+
+    printviol(cvmaxsum);
+    printviol(cvsumsum);
+    printviol(bvmaxsum);
+    printviol(bvsumsum);
+    printviol(rcmaxsum);
+    printviol(rcsumsum);
+    print "";
+    printf(line);
 }
+
+
+
 
 
 

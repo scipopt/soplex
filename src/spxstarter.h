@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxstarter.h,v 1.6 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxstarter.h,v 1.7 2003/01/15 17:26:08 bzfkocht Exp $"
 
 
 /**@file  spxstarter.h
@@ -42,14 +42,24 @@ namespace soplex
 */
 class SPxStarter
 {
-public:
-   /// generates start basis for loaded basis.
-   virtual void generate(SPxSolver& base) = 0;
+protected:
+   const char* m_name;
 
+public:
+   /// constructor
+   explicit SPxStarter(const char* name)
+      : m_name(name)
+   {}
    /// destructor.
    virtual ~SPxStarter()
-   { }
-
+   {}
+   /// get name of starter.
+   virtual const char* getName() const
+   {
+      return m_name;
+   }
+   /// generates start basis for loaded basis.
+   virtual void generate(SPxSolver& base) = 0;
    /// checks consistency.
    virtual bool isConsistent() const;
 };

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscaler.cpp,v 1.7 2003/01/12 13:09:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscaler.cpp,v 1.8 2003/01/15 17:26:07 bzfkocht Exp $"
 
 /**@file  spxscaler.cpp
  * @brief LP scaling base class.
@@ -31,13 +31,13 @@ std::ostream& operator<<(std::ostream& s, const SPxScaler& sc)
 {
    s << sc.getName() << " scaler:" << std::endl;
    s << "colscale = [ ";
-   for(int i = 0; i < sc.m_colscale.size(); ++i )
-      s << sc.m_colscale[i] << " ";
+   for(int ci = 0; ci < sc.m_colscale.size(); ++ci )
+      s << sc.m_colscale[ci] << " ";
    s << "]" << std::endl;
       
    s << "rowscale = [ ";
-   for(int i = 0; i < sc.m_rowscale.size(); ++i )
-      s << sc.m_rowscale[i] << " ";
+   for(int ri = 0; ri < sc.m_rowscale.size(); ++ri )
+      s << sc.m_rowscale[ri] << " ";
    s << "]" << std::endl;
 
    return s;

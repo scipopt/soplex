@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxquality.cpp,v 1.5 2003/01/13 10:38:47 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxquality.cpp,v 1.6 2003/01/15 17:26:07 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -117,7 +117,7 @@ void SPxSolver::qualSlackViolation(Real& maxviol, Real& sumviol) const
    }
 }
 
-void SPxSolver::qualRdCostViolation(Real& maxviol, Real& sumviol) const
+void SPxSolver::qualRedCostViolation(Real& maxviol, Real& sumviol) const
 {   
    maxviol = 0.0;
    sumviol = 0.0;

@@ -1,7 +1,7 @@
-#--- $Id: make.linux.x86.gnu.prf,v 1.2 2002/02/20 16:17:59 bzfkocht Exp $
+#--- $Id: make.linux.x86.gnu.prf,v 1.3 2003/01/15 17:26:04 bzfkocht Exp $
 CXX	=	g++
-CPPFLAGS=	-Isrc -DNDEBUG
+CPPFLAGS=	-Isrc -DNDEBUG -DWITH_ZLIB
 CXXFLAGS=	-O2 -g -pg -march=pentiumpro -fno-exceptions \
 		-ffast-math -fforce-addr -funroll-loops
-LDFLAGS	=	-lm
+LDFLAGS	=	-lz -lm
 ARFLAGS	=	crs

@@ -18,8 +18,8 @@
 // ============================================================================
 //
 // File          : gzstream.C
-// Revision      : $Revision: 1.3 $
-// Revision_date : $Date: 2003/01/10 12:46:14 $
+// Revision      : $Revision: 1.4 $
+// Revision_date : $Date: 2003/01/15 17:26:06 $
 // Author(s)     : Deepak Bandyopadhyay, Lutz Kettner
 // 
 // Standard streambuf implementation following Nicolai Josuttis, "The 
@@ -29,6 +29,7 @@
 #include <gzstream.h>
 #include <iostream>
 #include <string.h>  // for memcpy
+#include <stddef.h>  // for ptrdiff_t
 
 #ifdef GZSTREAM_NAMESPACE
 namespace GZSTREAM_NAMESPACE {
@@ -42,10 +43,10 @@ namespace GZSTREAM_NAMESPACE {
 // class gzstreambuf:
 // --------------------------------------
 
-gzstreambuf* gzstreambuf::open( const char* name, int open_mode) {
+gzstreambuf* gzstreambuf::open( const char* name, int omode) {
     if ( is_open())
         return 0;
-    mode = open_mode;
+    mode = omode;
     // no append nor read/write mode
     if ((mode & std::ios::ate) || (mode & std::ios::app)
         || ((mode & std::ios::in) && (mode & std::ios::out)))
@@ -147,8 +148,8 @@ gzstreambase::~gzstreambase() {
     buf.close();
 }
 
-void gzstreambase::open( const char* name, int open_mode) {
-    if ( ! buf.open( name, open_mode))
+void gzstreambase::open( const char* name, int omode) {
+    if ( ! buf.open( name, omode))
         clear( rdstate() & std::ios::badbit);
 }
 

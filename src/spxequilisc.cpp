@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxequilisc.cpp,v 1.6 2003/01/12 13:09:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxequilisc.cpp,v 1.7 2003/01/15 17:26:07 bzfkocht Exp $"
 
 /**@file  spxequilisc.cpp
  * @brief Equilibrium row/column scaling.
@@ -51,11 +51,11 @@ void SPxEquiliSC::scale(SPxLP& lp)
 {
    METHOD( "SPxEquiliSC::scale()" );
 
-   VERBOSE1({ std::cout << "Equilibrium scaling LP" << std::endl; });   
+   VERBOSE1({ std::cout << "IEQUSC01 Equilibrium scaling LP" << std::endl; });   
 
    setup(lp);
 
-   VERBOSE2({ std::cout << "LP scaling statistics:" 
+   VERBOSE2({ std::cout << "IEQUSC02 LP scaling statistics:" 
                         << " min= " << lp.minAbsNzo()
                         << " max= " << lp.maxAbsNzo()
                         << " col-ratio= " << maxColRatio(lp) 
@@ -77,14 +77,14 @@ void SPxEquiliSC::scale(SPxLP& lp)
    }
    applyScaling(lp);
 
-   VERBOSE3({ std::cout << "\tRow scaling min= " << minAbsRowscale()
+   VERBOSE3({ std::cout << "IEQUSC03 \tRow scaling min= " << minAbsRowscale()
                         << " max= " << maxAbsRowscale()
                         << std::endl
                         << "\tCol scaling min= " << minAbsColscale()
                         << " max= " << maxAbsColscale()
                         << std::endl; });
 
-   VERBOSE2({ std::cout << "LP scaling statistics:" 
+   VERBOSE2({ std::cout << "IEQUSC04 LP scaling statistics:" 
                         << " min= " << lp.minAbsNzo()
                         << " max= " << lp.maxAbsNzo()
                         << " col-ratio= " << maxColRatio(lp) 
@@ -102,6 +102,8 @@ void SPxEquiliSC::scale(SPxLP& lp)
 //Emacs indent-tabs-mode:nil
 //Emacs End:
 //-----------------------------------------------------------------------------
+
+
 
 
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultrt.h,v 1.11 2002/07/26 08:14:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefaultrt.h,v 1.12 2003/01/15 17:26:06 bzfkocht Exp $"
 
 /**@file  spxdefaultrt.h
  * @brief Textbook ratio test for #SoPlex.
@@ -50,7 +50,10 @@ public:
    virtual SPxId selectEnter(Real& val);
    /// default constructor
    SPxDefaultRT() 
-      : SPxRatioTester()
+      : SPxRatioTester("Default")
+   {}
+   /// destructor.
+   virtual ~SPxDefaultRT()
    {}
 };
 

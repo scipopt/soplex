@@ -1,7 +1,9 @@
-#--- $Id: make.osf1.alpha.compaq.std,v 1.4 2001/11/22 16:30:00 bzfkocht Exp $
+#--- $Id: make.osf1.alpha.compaq.std,v 1.5 2003/01/15 17:26:05 bzfkocht Exp $
 CXX	=	cxx
-CPPFLAGS=	-Isrc -DNDEBUG
-CXXFLAGS=	-std strict_ansi -O2 -arch host -noexceptions -nortti \
-		-ansi_alias -inline speed -assume accuracy_sensitive -ieee -g
-LDFLAGS	=	-non_shared -om -lm
+CPPFLAGS=	-Isrc -DNDEBUG -DWITH_ZLIB
+CXXFLAGS=	-std strict_ansi -O2 -arch host -nortti \
+		-ansi_alias -inline speed -assume accuracy_sensitive -ieee -g \
+		-ptr $(OBJDIR)/cxx_repository   
+REPOSIT	=	$(OBJDIR)/cxx_repository/*.o
+LDFLAGS	=	-non_shared -L/usr/local/lib -lz -lm
 ARFLAGS	=	crs

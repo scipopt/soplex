@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvectorst.h,v 1.6 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxvectorst.h,v 1.7 2003/01/15 17:26:08 bzfkocht Exp $"
 
 /**@file  spxvectorst.h
  * @brief Solution vector based start basis.
@@ -53,24 +53,27 @@ protected:
    void setupWeights(SPxSolver& base);
 
 public:
+   /// default constructor.
+   SPxVectorST() 
+      : state(NONE)
+   {
+      m_name = "Vector";
+   }
+   /// destructor.
+   virtual ~SPxVectorST()
+   {}  
    /// sets up primal solution vector.
    void primal(const Vector& v)
    {
       vec = v;
       state = PVEC;
    }
-
    /// sets up primal solution vector.
    void dual(const Vector& v)
    {
       vec = v;
       state = DVEC;
    }
-
-   /// default constructor.
-   SPxVectorST() : state(NONE)
-   {}
-
 };
 
 } // namespace soplex
