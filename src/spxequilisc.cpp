@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxequilisc.cpp,v 1.7 2003/01/15 17:26:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxequilisc.cpp,v 1.8 2003/02/11 09:29:40 bzfkocht Exp $"
 
 /**@file  spxequilisc.cpp
  * @brief Equilibrium row/column scaling.
@@ -55,11 +55,32 @@ void SPxEquiliSC::scale(SPxLP& lp)
 
    setup(lp);
 
+   /* We want to do that direction first, with the lower ratio.
+    * Reason:           
+    *                               Rowratio
+    *            0.04  0.02  0.01      4
+    *            4000    20  1000    200
+    * Colratio    1e5   1e3   1e5
+    *
+    * Row first =>                  Col next =>
+    *               1   0.5  0.25         1   1   1 
+    *               1   0.05 0.25         1  0.1  1
+    *
+    * Col first =>                  Row next =>
+    *            1e-5  1e-3  1e-5        0.01  1  0.01
+    *               1     1     1          1   1    1
+    *
+    */
+   Real colratio = maxColRatio(lp);
+   Real rowratio = maxRowRatio(lp);
+
+   m_colFirst = colratio < rowratio;
+
    VERBOSE2({ std::cout << "IEQUSC02 LP scaling statistics:" 
                         << " min= " << lp.minAbsNzo()
                         << " max= " << lp.maxAbsNzo()
-                        << " col-ratio= " << maxColRatio(lp) 
-                        << " row-ratio= " << maxRowRatio(lp) 
+                        << " col-ratio= " << colratio 
+                        << " row-ratio= " << rowratio
                         << std::endl; });
    if (m_colFirst)
    {

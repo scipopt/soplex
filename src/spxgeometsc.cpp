@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeometsc.cpp,v 1.6 2003/01/15 17:26:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeometsc.cpp,v 1.7 2003/02/11 09:29:40 bzfkocht Exp $"
 
 /**@file  spxgeometsc.cpp
  * @brief Geometric mean row/column scaling.
@@ -59,11 +59,19 @@ void SPxGeometSC::scale(SPxLP& lp)
 
    setup(lp);
 
+   /* We want to do that direction first, with the lower ratio.
+    * See SPxEquiliSC::scale() for a reasoning.
+    */
+   Real colratio = maxColRatio(lp);
+   Real rowratio = maxRowRatio(lp);
+
+   m_colFirst = colratio < rowratio;
+
    VERBOSE2({ std::cout << "IGEOSC02 LP scaling statistics:" 
                         << " min= " << lp.minAbsNzo()
                         << " max= " << lp.maxAbsNzo()
-                        << " col-ratio= " << maxColRatio(lp)
-                        << " row-ratio= " << maxRowRatio(lp)
+                        << " col-ratio= " << colratio
+                        << " row-ratio= " << rowratio
                         << std::endl; });
 
    // We make at most m_maxIterations. 
