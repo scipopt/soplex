@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.3 2001/11/20 16:43:29 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.4 2001/11/27 10:31:30 bzfbleya Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -302,11 +302,11 @@ void SPxDevexPR::removedCoVec(int /*i*/)
 {}
 
 
-void SPxDevexPR::removedCoVecs(const int */*perm[]*/)
+void SPxDevexPR::removedCoVecs(const int * /*perm[]*/)
 {}
 
 
-void SPxDevexPR::removedVecs(const int */*perm[]*/)
+void SPxDevexPR::removedVecs(const int * /*perm[]*/)
 {}
 } // namespace soplex
 

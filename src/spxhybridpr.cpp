@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.4 2001/11/20 16:43:31 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.5 2001/11/27 10:31:30 bzfbleya Exp $"
 
 /*  \Section{Complex Methods}
  */
@@ -143,7 +143,7 @@ void SPxHybridPR::removedVec(int /*i*/)
 {}
 
 
-void SPxHybridPR::removedVecs(const int */*perm[]*/)
+void SPxHybridPR::removedVecs(const int * /*perm[]*/)
 {}
 
 
@@ -151,7 +151,7 @@ void SPxHybridPR::removedCoVec(int /*i*/)
 {}
 
 
-void SPxHybridPR::removedCoVecs(const int */*perm[]*/)
+void SPxHybridPR::removedCoVecs(const int * /*perm[]*/)
 {}
 
 

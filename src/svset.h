@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.h,v 1.7 2001/11/26 15:38:29 bzfbleya Exp $"
+#pragma ident "@(#) $Id: svset.h,v 1.8 2001/11/27 10:31:30 bzfbleya Exp $"
 
 /**@file  svset.h
  * @brief Set of sparse vectors.
@@ -128,7 +128,6 @@ private:
    IdList < DLPSV > list;  ///< doubly linked list for non-zero management
    
    /// provides enough vector memory for \p n more SVector%s.
-    */
    void ensurePSVec(int n)
    {
       if (num() + n > max())
