@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idxset.cpp,v 1.3 2001/11/07 17:31:17 bzfbleya Exp $"
+#pragma ident "@(#) $Id: idxset.cpp,v 1.4 2001/11/23 12:26:53 bzfpfend Exp $"
 
 
 /*      \Section{Complex Members}
@@ -25,6 +25,8 @@ namespace soplex
 {
 
 /*      \SubSection{Inquiry}
+ */
+/**@todo suspicious: Is there any reason to return maxidx-1 instead of maxidx?
  */
 int IdxSet::dim() const
 {

@@ -13,52 +13,44 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idlist.h,v 1.5 2001/11/15 16:54:15 bzfpfend Exp $"
+#pragma ident "@(#) $Id: idlist.h,v 1.6 2001/11/23 12:26:53 bzfpfend Exp $"
 
 
+/**@file  idlist.h
+ * @brief Generic double linked list.
+ */
 #ifndef _IDLIST_H_
 #define _IDLIST_H_
 
-//@ ----------------------------------------------------------------------------
-/*      \Section{Imports}
-    Import required system include files
- */
 #include <assert.h>
 
-
-/*      and classes
- */
 #include "islist.h"
 
 namespace soplex
 {
+/**@brief   Elements for #IdList%s.
+   @ingroup Elementary
 
-
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
-
-/** Elements for \Ref{IdList}s.
-    #IdElement#s are derived from the template parameter class #T# and can hence
-    be used as such. The additional methods #next()# and #prev()# provid access
-    to the links for the list. They may freely be used by the programmer as long
-    as an #IdElement# is not member of a #IdList#. In this case, the #IdList#
-    controls members #next()# and #prev()#. However, #IdList# should provide
-    enough functionality for the user not to requirer any modification to these
-    members.
+   #IdElement%s are derived from the template parameter class #T and can hence
+   be used as such. The additional methods #next() and #prev() provid access
+   to the links for the list. They may freely be used by the programmer as long
+   as an #IdElement is not member of a #IdList. In this case, the #IdList
+   controls members #next() and #prev(). However, #IdList should provide
+   enough functionality for the user not to requirer any modification to these
+   members.
  */
 template < class T >
 class IdElement : public T
 {
-   IdElement<T>* theprev;
-   IdElement<T>* thenext;
+   IdElement<T>* theprev;   ///< pointer to previous element in the #IdList
+   IdElement<T>* thenext;   ///< pointer to next element in the #IdList
 public:
    ///
    IdElement<T>*& next()
    {
       return thenext;
    }
-   ///
+   /// returns the next element in the #IdList.
    IdElement<T>*const& next() const
    {
       return thenext;
@@ -69,19 +61,22 @@ public:
    {
       return theprev;
    }
-   ///
+   /// returns the previous element in the #IdList.
    IdElement<T>*const& prev() const
    {
       return theprev;
    }
 
-   ///
+   /// default constructor.
    IdElement()
       : theprev(0)
          , thenext(0)
    {}
-   ///
 
+   /// copy constructor.
+   /** Only the element itself is copied, while the links to the previous and
+       the next list element are set to zero pointers.
+   */
    IdElement(const T& old)
       : T(old)
          , theprev(0)
@@ -90,11 +85,13 @@ public:
 };
 
 
-/** intrusive double linked list.
-    Class #IdList# implements an intrusive double linked list as a #template#
-    class.  As such, the list elements must provide the links themselfs. For
-    conveniance, we also provide class #IdElement# that adds both links to an
-    arbitrary class as #template# parameter (see below).
+/**@brief   Generic double linked list.
+   @ingroup Elementary
+
+   Class #IdList implements an intrusive double linked list as a #template
+   class.  As such, the list elements must provide the links themselfs. For
+   conveniance, we also provide class #IdElement that adds both links to an
+   arbitrary class as #template parameter.
  */
 template < class T >
 class IdList : public IsList<T>
@@ -103,25 +100,25 @@ public:
 
    /**@name Access */
    //@{
-   /// return first element in list.
+   /// returns first element in list.
    T* first() const
    {
       return static_cast<T*>(the_first);
    }
 
-   /// return last element in list.
+   /// returns last element in list.
    T* last() const
    {
       return static_cast<T*>(the_last);
    }
 
-   /// return successor of #elem#.
+   /// returns successor of \p elem or 0, if \p elem is the last element.
    T* next(const T *elem) const
    {
       return (elem == last()) ? 0 : const_cast<T*>(elem->next());
    }
 
-   /// return predecessor of #elem#.
+   /// returns predecessor of \p elem or 0, if \p elem is the first element.
    T* prev(const T *elem) const
    {
       return (elem == first()) ? 0 : const_cast<T*>(elem->prev());
@@ -131,7 +128,7 @@ public:
 
    /**@name Extension */
    //@{
-   /// append #elem# to end of list.
+   /// appends \p elem to end of list.
    void append (T* elem)
    {
       if (last())
@@ -144,7 +141,7 @@ public:
       the_last = elem;
    }
 
-   /// prepend #elem# at beginnig of list.
+   /// prepends \p elem at beginnig of list.
    void prepend(T* elem)
    {
       if (first())
@@ -157,7 +154,7 @@ public:
       the_first = elem;
    }
 
-   /// insert #elem# after #after#.
+   /// inserts \p elem after \p after.
    void insert (T* elem, T* after)
    {
       assert(find(after));
@@ -171,7 +168,7 @@ public:
       }
    }
 
-   /// append #list# to end of list.
+   /// appends \p list to end of list.
    void append (IdList<T>& list)
    {
       if (list.first())
@@ -181,7 +178,7 @@ public:
       }
    }
 
-   /// prepend #list# at beginnig of list.
+   /// prepends \p list at beginnig of list.
    void prepend(IdList<T>& list)
    {
       if (list.first())
@@ -191,7 +188,7 @@ public:
       }
    }
 
-   /// insert #list# after #after#.
+   /// inserts \p list after \p after.
    void insert (IdList<T>& list, T* after)
    {
       assert(find(after));
@@ -210,13 +207,13 @@ public:
 
    /**@name Removal */
    //@{
-   /// remove element following #after#.
+   /// removes element following \p after.
    void remove_next(T* after)
    {
       remove(next(after));
    }
 
-   /// remove #elem# from list.
+   /// removes \p elem from list.
    void remove(T* elem)
    {
       if (elem == first())
@@ -234,7 +231,7 @@ public:
       }
    }
 
-   /// remove sub#list#.
+   /// removes sublist \p list.
    void remove(IdList<T>& list)
    {
       if (first() != 0 && list.first() != 0)
@@ -267,11 +264,11 @@ public:
 
    /**@name Miscellaneous */
    //@{
-   /** Element memory has moved.
-       When all elements have been moved in memory (e.g. because of
-       reallocation), with a fixed offeset #delta#, the list will be reset
+   /// adjusts list pointers to a new memory address.
+   /** When all elements have been moved in memory (e.g. because of
+       reallocation) with a fixed offset \p delta, the list will be reset
        to the new adresses.
-    */
+   */
    void move(ptrdiff_t delta)
    {
       if (the_first)
@@ -284,8 +281,39 @@ public:
       }
    }
 
-   /** Construct sublist form #start# to #end#.
-       When constructing sublists, special care is required, since a
+   /// consistency check.
+   int isConsistent() const
+   {
+      for (T * it = first(); it; it = next(it))
+      {
+         if (it != first() && it->prev()->next() != it)
+         {
+            std::cerr << "Inconsistency detected in class idlist\n";
+            return 0;
+         }
+         if (it != last() && it->next()->prev() != it)
+         {
+            std::cerr << "Inconsistency detected in class idlist\n";
+            return 0;
+         }
+      }
+      return IsList<T>::isConsistent();
+   }
+   //@}
+
+   /**@name Constructors / Destructors */
+   //@{
+   /// default constructor.
+   /** The default constructor may also be used to construct a sublist, by
+       providing a \p first and a \p last element. Element \p last must be a
+       successor of \p first.
+    */
+   IdList(T* pfirst = 0, T* plast = 0)
+      : IsList<T>(pfirst, plast)
+   {}
+
+   /// constructs sublist form \p start to \p end.
+   /** When constructing sublists, special care is required, since a
        sublist really is a sublist: No new elements are created! Hence, if
        the sublist is modified, this also modifies the original list
        itself.
@@ -304,35 +332,6 @@ public:
          part.the_last = static_cast<T*>(end);
       }
       return part;
-   }
-
-   /** Default constructor.
-       The default constructor may also be used to construct a sublist, by
-       providing a #first# and a #last# element. Element #last# must be a
-       successor of #first#.
-    */
-   IdList(T* pfirst = 0, T* plast = 0)
-      : IsList<T>(pfirst, plast)
-   {}
-
-   ///
-
-   int isConsistent() const
-   {
-      for (T * it = first(); it; it = next(it))
-      {
-         if (it != first() && it->prev()->next() != it)
-         {
-            std::cerr << "Inconsistency detected in class idlist\n";
-            return 0;
-         }
-         if (it != last() && it->next()->prev() != it)
-         {
-            std::cerr << "Inconsistency detected in class idlist\n";
-            return 0;
-         }
-      }
-      return IsList<T>::isConsistent();
    }
    //@}
 };

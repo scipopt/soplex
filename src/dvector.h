@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dvector.h,v 1.3 2001/11/21 20:15:41 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dvector.h,v 1.4 2001/11/23 12:26:53 bzfpfend Exp $"
 
 /**@file  dvector.h
  * @brief Dymnamic vectors.
@@ -86,33 +86,33 @@ public:
    /**@todo Do we really have to reimplement the following operators 
     *       (inheritance from Vector?)  
     */
-   /// add \p vec to %vector.
+   /// adds \p vec to %vector.
    DVector& operator+=(const Vector& vec)
    {
       Vector::operator+=(vec);
       return *this;
    }
-   /// add \p vec to %vector.
+   /// adds \p vec to %vector.
    DVector& operator+=(const SVector& vec)
    {
       Vector::operator+=(vec);
       return *this;
    }
 
-   /// subtract \p vec from %vector.
+   /// subtracts \p vec from %vector.
    DVector& operator-=(const Vector& vec)
    {
       Vector::operator-=(vec);
       return *this;
    }
-   /// subtract \p vec from %vector.
+   /// subtracts \p vec from %vector.
    DVector& operator-=(const SVector& vec)
    {
       Vector::operator-=(vec);
       return *this;
    }
 
-   /// scale vector with factor \p x
+   /// scales vector with factor \p x
    DVector& operator*=(double x)
    {
       Vector::operator*=(x);
