@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.49 2002/04/06 13:05:02 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.50 2002/04/10 14:36:31 bzfpfend Exp $"
 
 //#define DEBUGGING 1
 
@@ -52,10 +52,10 @@ SoPlex::Status SoPlex::solve()
       switch (thesimplifier->simplify())
       {
       case 1:
-         setStatus(SPxBasis::UNBOUNDED);
+         setBasisStatus(SPxBasis::UNBOUNDED);
          return UNBOUNDED;
       case - 1:
-         setStatus(SPxBasis::INFEASIBLE);
+         setBasisStatus(SPxBasis::INFEASIBLE);
          return INFEASIBLE;
       default:
          break;
@@ -102,7 +102,7 @@ SoPlex::Status SoPlex::solve()
    DEBUG( desc().dump(); );
 
    if (SPxBasis::status() == SPxBasis::OPTIMAL)
-      setStatus(SPxBasis::REGULAR);
+      setBasisStatus(SPxBasis::REGULAR);
 
    m_status   = RUNNING;
    bool stop  = terminate();
@@ -164,7 +164,7 @@ SoPlex::Status SoPlex::solve()
 
                if (maxInfeas() + shift() <= delta())
                {
-                  setStatus(SPxBasis::OPTIMAL);
+                  setBasisStatus(SPxBasis::OPTIMAL);
                   m_status = OPTIMAL;
                   break;
                }
@@ -227,7 +227,7 @@ SoPlex::Status SoPlex::solve()
 
                if (maxInfeas() + shift() <= delta())
                {
-                  setStatus(SPxBasis::OPTIMAL);
+                  setBasisStatus(SPxBasis::OPTIMAL);
                   m_status = OPTIMAL;
                   break;
                }
@@ -680,6 +680,7 @@ SoPlex::Status SoPlex::getSlacks (Vector& p_vector) const
 SoPlex::Status SoPlex::status() const
 {
    METHOD( "SoPlex::status()" );
+
    switch( m_status )
    {
    case UNKNOWN:      

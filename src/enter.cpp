@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.16 2002/03/21 16:06:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.17 2002/04/10 14:36:30 bzfpfend Exp $"
 
 // #define DEBUGGING 1
 
@@ -943,9 +943,9 @@ int SoPlex::enter(SPxId& enterId)
       SPxId none;
       change(-1, none, 0);
       if (rep() != COLUMN)
-         setStatus(SPxBasis::INFEASIBLE);
+         setBasisStatus(SPxBasis::INFEASIBLE);
       else
-         setStatus(SPxBasis::UNBOUNDED);
+         setBasisStatus(SPxBasis::UNBOUNDED);
       return 0;
    }
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.56 2002/04/06 13:05:02 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.57 2002/04/10 14:36:31 bzfpfend Exp $"
 
 //#define DEBUGGING 1
 
@@ -258,12 +258,12 @@ void SoPlex::init()
       if (rep() == COLUMN)
       {
          setPrimalBounds();
-         setStatus(SPxBasis::PRIMAL);
+         setBasisStatus(SPxBasis::PRIMAL);
       }
       else
       {
          setDualRowBounds();
-         setStatus(SPxBasis::DUAL);
+         setBasisStatus(SPxBasis::DUAL);
       }
       setEnterBounds();
       computeEnterCoPrhs();
@@ -273,12 +273,12 @@ void SoPlex::init()
       if (rep() == ROW)
       {
          setPrimalBounds();
-         setStatus(SPxBasis::PRIMAL);
+         setBasisStatus(SPxBasis::PRIMAL);
       }
       else
       {
          setDualColBounds();
-         setStatus(SPxBasis::DUAL);
+         setBasisStatus(SPxBasis::DUAL);
       }
       setLeaveBounds();
       computeLeaveCoPrhs();
@@ -429,7 +429,7 @@ void SoPlex::clear()
 
    unInit();
    SPxLP::clear();
-   setStatus(SPxBasis::NO_PROBLEM);
+   setBasisStatus(SPxBasis::NO_PROBLEM);
    SPxBasis::reDim();
 }
 

@@ -165,7 +165,7 @@ void OsiSpxSolverInterfaceUnitTest( const std::string & mpsDir )
     // test infinity
     {
       OsiSpxSolverInterface si;
-      assert( eq( si.getInfinity(), soplex::SPxLP::infinity ) );
+      assert( eq( si.getInfinity(), soplex::infinity ) );
     }     
     
     // Test setting solution

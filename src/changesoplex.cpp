@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: changesoplex.cpp,v 1.15 2002/03/11 17:43:55 bzfkocht Exp $"
+#pragma ident "@(#) $Id: changesoplex.cpp,v 1.16 2002/04/10 14:36:30 bzfpfend Exp $"
 
 // #define DEBUGGING 1
 
@@ -418,10 +418,10 @@ void SoPlex::doRemoveRow(int i)
       {
       case SPxBasis::DUAL:
       case SPxBasis::INFEASIBLE:
-         setStatus(SPxBasis::REGULAR);
+         setBasisStatus(SPxBasis::REGULAR);
          break;
       case SPxBasis::OPTIMAL:
-         setStatus(SPxBasis::PRIMAL);
+         setBasisStatus(SPxBasis::PRIMAL);
          break;
       default:
          break;
@@ -478,10 +478,10 @@ void SoPlex::doRemoveRows(int perm[])
       {
       case SPxBasis::DUAL:
       case SPxBasis::INFEASIBLE:
-         setStatus(SPxBasis::REGULAR);
+         setBasisStatus(SPxBasis::REGULAR);
          break;
       case SPxBasis::OPTIMAL:
-         setStatus(SPxBasis::PRIMAL);
+         setBasisStatus(SPxBasis::PRIMAL);
          break;
       default:
          break;
@@ -523,10 +523,10 @@ void SoPlex::doRemoveCol(int i)
       {
       case SPxBasis::PRIMAL:
       case SPxBasis::UNBOUNDED:
-         setStatus(SPxBasis::REGULAR);
+         setBasisStatus(SPxBasis::REGULAR);
          break;
       case SPxBasis::OPTIMAL:
-         setStatus(SPxBasis::DUAL);
+         setBasisStatus(SPxBasis::DUAL);
          break;
       default:
          break;
@@ -583,10 +583,10 @@ void SoPlex::doRemoveCols(int perm[])
       {
       case SPxBasis::PRIMAL:
       case SPxBasis::UNBOUNDED:
-         setStatus(SPxBasis::REGULAR);
+         setBasisStatus(SPxBasis::REGULAR);
          break;
       case SPxBasis::OPTIMAL:
-         setStatus(SPxBasis::DUAL);
+         setBasisStatus(SPxBasis::DUAL);
          break;
       default:
          break;

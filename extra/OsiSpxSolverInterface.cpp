@@ -133,13 +133,17 @@ OsiSpxSolverInterface::setDblParam(OsiDblParam key, double value)
     {
     case OsiDualObjectiveLimit:
       // SOPLEX doesn't support different termination values for primal and dual simplex
-      spxsolver_.setTerminationValue( value );
-      retval = true;
+      // at the moment, setting a termination value is not supported in SOPLEX
+      // spxsolver_.setTerminationValue( value );
+      // retval = true;
+      retval = false;
       break;
     case OsiPrimalObjectiveLimit:
       // SOPLEX doesn't support different termination values for primal and dual simplex
-      spxsolver_.setTerminationValue( value );
-      retval = true;
+      // at the moment, setting a termination value is not supported in SOPLEX
+      // spxsolver_.setTerminationValue( value );
+      // retval = true;
+      retval = false;
       break;
     case OsiDualTolerance:
       // ??? Is delta the correct SOPLEX equivalent of dual tolerance?
@@ -192,12 +196,16 @@ OsiSpxSolverInterface::getDblParam(OsiDblParam key, double& value) const
   switch (key) 
     {
     case OsiDualObjectiveLimit:
-      value = spxsolver_.terminationValue();
-      retval = true;
+      // at the moment, setting a termination value is not supported in SOPLEX
+      // value = spxsolver_.terminationValue();
+      // retval = true;
+      retval = false;
       break;
     case OsiPrimalObjectiveLimit:
-      value = spxsolver_.terminationValue();
-      retval = true;
+      // at the moment, setting a termination value is not supported in SOPLEX
+      // value = spxsolver_.terminationValue();
+      // retval = true;
+      retval = false;
       break;
     case OsiDualTolerance:
       value = spxsolver_.delta();
@@ -652,7 +660,7 @@ const OsiPackedMatrix * OsiSpxSolverInterface::getMatrixByCol() const
 //------------------------------------------------------------------
 double OsiSpxSolverInterface::getInfinity() const
 {
-  return soplex::SPxLP::infinity;
+  return soplex::infinity;
 }
 
 //#############################################################################
@@ -669,7 +677,10 @@ const double * OsiSpxSolverInterface::getColSolution() const
       if( ncols > 0 )
 	{
 	  colsol_ = new soplex::DVector( ncols );
-	  spxsolver_.getPrimal( *colsol_ );
+	  if( isProvenOptimal() )
+	    spxsolver_.getPrimal( *colsol_ );
+	  else
+	    colsol_->clear();
 	}
       else
 	return NULL;
@@ -685,7 +696,10 @@ const double * OsiSpxSolverInterface::getRowPrice() const
       if( nrows > 0 )
 	{
 	  rowsol_ = new soplex::DVector( nrows );
-	  spxsolver_.getDual( *rowsol_ );
+	  if( isProvenOptimal() )
+	    spxsolver_.getDual( *rowsol_ );
+	  else
+	    rowsol_->clear();
 	}
       else
 	return NULL;
@@ -701,7 +715,10 @@ const double * OsiSpxSolverInterface::getReducedCost() const
       if( ncols > 0 )
 	{
 	  redcost_ = new soplex::DVector( ncols );
-	  spxsolver_.getRdCost( *redcost_ );
+	  if( isProvenOptimal() )
+	    spxsolver_.getRdCost( *redcost_ );
+	  else
+	    redcost_->clear();
 	}
       else
 	return NULL;
@@ -717,7 +734,10 @@ const double * OsiSpxSolverInterface::getRowActivity() const
       if( nrows > 0 )
 	{
 	  rowact_ = new soplex::DVector( nrows );
-	  spxsolver_.getSlacks( *rowact_ );
+	  if( isProvenOptimal() )
+	    spxsolver_.getSlacks( *rowact_ );
+	  else
+	    rowact_->clear();
 	}
       else
 	return NULL;
@@ -1257,6 +1277,7 @@ OsiSpxSolverInterface::OsiSpxSolverInterface ()
     matrixByRow_(NULL),
     matrixByCol_(NULL)
 {
+  soplex::Param::setVerbose( 0 );
 }
 
 
@@ -1293,11 +1314,10 @@ OsiSpxSolverInterface::OsiSpxSolverInterface( const OsiSpxSolverInterface & sour
 {
   spxsolver_.loadLP( source.spxsolver_ );
   spxsolver_.loadBasis( source.spxsolver_.basis().desc() );
-  spxsolver_.setTermination( source.spxsolver_.terminationTime(),
-			     source.spxsolver_.terminationIter(),
-			     source.spxsolver_.terminationValue() );
+  spxsolver_.setTerminationTime ( source.spxsolver_.terminationTime() );
+  spxsolver_.setTerminationIter ( source.spxsolver_.terminationIter() );
+  // spxsolver_.setTerminationValue( source.spxsolver_.terminationValue() );
   spxsolver_.setPricing( source.spxsolver_.pricing() );
-  spxsolver_.setEpsilon( source.spxsolver_.epsilon() );
   spxsolver_.setDelta  ( source.spxsolver_.delta()   );
   setColSolution(source.getColSolution());
   setRowPrice(source.getRowPrice());
@@ -1328,11 +1348,10 @@ OsiSpxSolverInterface& OsiSpxSolverInterface::operator=( const OsiSpxSolverInter
       spxsolver_.setType       ( source.spxsolver_.type() );
       spxsolver_.loadLP        ( source.spxsolver_ );
       spxsolver_.loadBasis     ( source.spxsolver_.basis().desc() );
-      spxsolver_.setTermination( source.spxsolver_.terminationTime(), 
-				 source.spxsolver_.terminationIter(),
-				 source.spxsolver_.terminationValue() );
+      spxsolver_.setTerminationTime ( source.spxsolver_.terminationTime() );
+      spxsolver_.setTerminationIter ( source.spxsolver_.terminationIter() );
+      // spxsolver_.setTerminationValue( source.spxsolver_.terminationValue() );
       spxsolver_.setPricing    ( source.spxsolver_.pricing() );
-      spxsolver_.setEpsilon    ( source.spxsolver_.epsilon() );
       spxsolver_.setDelta      ( source.spxsolver_.delta()   );
       setColSolution(source.getColSolution());
       setRowPrice(source.getRowPrice());

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.19 2002/03/21 16:06:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.20 2002/04/10 14:36:31 bzfpfend Exp $"
 
 // #define DEBUGGING 1
 
@@ -573,9 +573,9 @@ int SoPlex::leave(int leaveIdx)
             return 1;
          }
          if (rep() != COLUMN)
-            setStatus(SPxBasis::UNBOUNDED);
+            setBasisStatus(SPxBasis::UNBOUNDED);
          else
-            setStatus(SPxBasis::INFEASIBLE);
+            setBasisStatus(SPxBasis::INFEASIBLE);
          return 0;
       }
 

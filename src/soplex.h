@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.47 2002/04/09 07:07:48 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.48 2002/04/10 14:36:31 bzfpfend Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -1542,6 +1542,14 @@ public:
 
    /// set #LPSolver's basis.
    void setBasis(const VarStatus rows[], const VarStatus cols[]);
+
+   /// set #LPSolver's basis status.
+   void setBasisStatus( SPxBasis::SPxStatus stat )
+   {
+      if( m_status == OPTIMAL )
+         m_status = UNKNOWN;
+      SPxBasis::setStatus( stat );
+   }
 
    /// get number of iterations of current solution.
    int iterations() const
