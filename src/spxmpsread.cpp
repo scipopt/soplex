@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.28 2003/04/16 12:41:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.29 2003/11/23 08:58:07 bzfkocht Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.
@@ -494,6 +494,7 @@ static void readBounds(
       if (  (!strcmp(mps.field1(), "LO"))
          || (!strcmp(mps.field1(), "UP"))
          || (!strcmp(mps.field1(), "FX"))
+         || (!strcmp(mps.field1(), "LI"))
          || (!strcmp(mps.field1(), "UI")))
       {
          if ((mps.field3() != 0) && (mps.field4() == 0))

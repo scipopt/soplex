@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxio.cpp,v 1.17 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxio.cpp,v 1.18 2003/11/23 08:58:07 bzfkocht Exp $"
 
 
 //#define DEBUGGING 1
@@ -95,7 +95,7 @@ static void dumpRows(std::ostream& s, const SPxLP& lp)
       else if (low <= -infinity)
          s << lp.rowVector(i) << " <= " << up << '\n';
       else
-         s << lp.rowVector(i) <<">= " << low << '\n';
+         s << lp.rowVector(i) << " >= " << low << '\n';
    }
 }
 
