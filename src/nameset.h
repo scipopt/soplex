@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.h,v 1.11 2002/01/05 19:24:10 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.h,v 1.12 2002/01/05 20:53:59 bzfkocht Exp $"
 
 /**@file  nameset.h
  * @brief Set of strings.
@@ -55,7 +55,7 @@ namespace soplex
 */
 class NameSet
 {
-private:
+public:
    /**@brief   Handles of names in a #NameSet.
     * @ingroup Elementary
     *
@@ -100,8 +100,6 @@ private:
          : name(str)
       {}
    };
-   /// returns the hash value of the name.
-   friend int NameSetNameHashFunction (const Name*);
 
    /// Single linked list of #Name%s.
    typedef IsElement<Name> CharPtr;
