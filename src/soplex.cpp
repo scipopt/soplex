@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.41 2002/01/29 15:38:48 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.42 2002/01/29 15:47:00 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -1012,13 +1012,11 @@ int SoPlex::terminationIter() const
 /**@todo Terminationvalue should be implemented. The Problem is that
  *       with allowing bound violations (shifting) it is quite 
  *       difficult to determine if we allready reached the limit.
- *       The idea would be to look at the shift() and maxInfeas() 
- *       and only stop if they are  small enough.
  */
-void SoPlex::setTerminationValue(Real p_value)
+void SoPlex::setTerminationValue(Real /*p_value*/)
 {
-   //std::cerr << "setTerminationValue not yet implemented" << std::endl;
-   maxValue = p_value;
+   std::cerr << "setTerminationValue not yet implemented" << std::endl;
+   //maxValue = p_value;
 }
 
 Real SoPlex::terminationValue() const
