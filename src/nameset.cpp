@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.cpp,v 1.6 2001/11/12 16:41:58 bzfpfend Exp $"
+#pragma ident "@(#) $Id: nameset.cpp,v 1.7 2001/11/12 17:10:01 bzfkocht Exp $"
 
 #include <string.h>
 #include "nameset.h"
@@ -159,7 +159,7 @@ void NameSet::memRemax(int newmax)
    if (mem == 0)
    {
       std::cerr << "ERROR: NameSet could not reallocate memory\n";
-      exit(-1);
+      abort();
    }
    delta = mem - old;
 
@@ -170,11 +170,8 @@ void NameSet::memRemax(int newmax)
 
    for (int i = num() - 1; i >= 0; --i)
    {
-      Key ikey = key(i);
-      DataSet < NameSet_CharPtr > ::Key* 
-         keyptr = static_cast<DataSet < NameSet_CharPtr > ::Key*>( & ikey );
-      NameSet_Name nam(set[*keyptr].name);
-      hashtab.add(nam, *keyptr);
+      NameSet_Name nam(set[key(i)].name);
+      hashtab.add(nam, key(i));
    }
 }
 
@@ -196,11 +193,8 @@ void NameSet::memPack()
 
    for (i = num() - 1; i >= 0; --i)
    {
-      Key ikey = key(i);
-      DataSet < NameSet_CharPtr > ::Key* 
-         keyptr = static_cast<DataSet < NameSet_CharPtr > ::Key*>( & ikey );
-      NameSet_Name nam(set[*keyptr].name);
-      hashtab.add(nam, *keyptr);
+      NameSet_Name nam(set[key(i)].name);
+      hashtab.add(nam, key(i));
    }
 }
 
@@ -253,7 +247,7 @@ NameSet::NameSet(const NameSet& org)
    if (mem == 0)
    {
       std::cerr << "ERROR: NameSet could not allocate memory\n";
-      exit(-1);
+      abort();
    }
 
    list.clear();
@@ -280,7 +274,7 @@ NameSet::NameSet(int p_max, int mmax, double fac, double memFac)
    if (mem == 0)
    {
       std::cerr << "ERROR: NameSet could not allocate memory\n";
-      exit(-1);
+      abort();
    }
 }
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.h,v 1.4 2001/11/11 20:27:34 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.h,v 1.5 2001/11/12 17:10:05 bzfkocht Exp $"
 
 
 /*      \Section{Imports}
@@ -36,45 +36,6 @@ namespace soplex
 
 /*      \Section{Class Declarataion}
  */
-
-/*      \SubSection{Double Linked SVector --- implementation class}
-    This class is used for implementation purposes only. It should hence be
-    better made a local class of #SVSet#. However, CRI T3D's C++ compiler does
-    not support templete instantiation with subclasses. This is why we define it
-    here and add a typedef in #SVSet#'s class scope.
- */
-class SVSet_DLPSV : public SVector
-{
-   SVSet_DLPSV *thenext;
-   SVSet_DLPSV *theprev;
-public:
-   SVSet_DLPSV*& next()
-   {
-      return thenext;
-   }
-   SVSet_DLPSV*const& next() const
-   {
-      return thenext;
-   }
-   SVSet_DLPSV*const& prev() const
-   {
-      return theprev;
-   }
-   SVSet_DLPSV*& prev()
-   {
-      return theprev;
-   }
-   SVector& svector()
-   {
-      return static_cast<SVector&>(*this);
-   }
-   SVSet_DLPSV()
-   {}
-
-   SVSet_DLPSV(const SVSet_DLPSV& copy) : SVector(copy)
-   {}
-
-};
 
 typedef DataArray < SVector::Element > SVSet_Base;
 
@@ -104,13 +65,44 @@ the #SVSet#.
  */
 class SVSet : protected SVSet_Base
 {
+private:
+   class DLPSV : public SVector
+   {
+      DLPSV *thenext;
+      DLPSV *theprev;
+   public:
+      DLPSV*& next()
+      {
+         return thenext;
+      }
+      DLPSV*const& next() const
+      {
+         return thenext;
+      }
+      DLPSV*const& prev() const
+      {
+         return theprev;
+      }
+      DLPSV*& prev()
+      {
+         return theprev;
+      }
+      SVector& svector()
+      {
+         return static_cast<SVector&>(*this);
+      }
+      DLPSV()
+      {}
+      
+      DLPSV(const DLPSV& copy) : SVector(copy)
+      {}
+   };
+
    /*  The management of Keys is left for #DataSet#
     */
-public:
    typedef DataKey Key;
-private:
-   typedef SVSet_DLPSV DLPSV;
-   DataSet < SVSet_DLPSV > set;
+
+   DataSet < DLPSV > set;
 
    /*  while the management of nonzeros is done in this class. It requires a
        double linked #list# of #DLPSV#s, where the #SVector#s are kept in the
@@ -120,7 +112,7 @@ private:
        the (re-)moved one.  However, the nonzeros in use are uneffected by
        this.
     */
-   IdList < SVSet_DLPSV > list;
+   IdList < DLPSV > list;
 
    /*  Make sure to provide enough vector memory for #n# more #SVector#s.
     */

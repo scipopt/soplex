@@ -13,10 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datakey.h,v 1.1 2001/11/11 20:27:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: datakey.h,v 1.2 2001/11/12 17:09:52 bzfkocht Exp $"
 
 #ifndef _DATAKEY_H_
 #define _DATAKEY_H_
+
+#include <assert.h>
 
 namespace soplex
 {
@@ -43,6 +45,15 @@ public: // Should be private
    signed int idx : (8 * sizeof(int) - 8);
 
 public:
+   DataKey& operator=(const DataKey& rhs)
+   {
+      /// 
+      assert(sizeof(*this) == sizeof(int));
+      // dirty implementation of the week.
+      *reinterpret_cast<int*>(this) = *reinterpret_cast<const int*>(&rhs);
+
+      return *this;
+   }
    ///
    inline int getInfo() const
    {
@@ -77,6 +88,12 @@ public:
    ///    
    DataKey() : info(0), idx(-1) 
    {}
+#if 0
+   explicit DataKey(const DataKey& old) 
+      : info(old.info) 
+      , idx(old.idx)
+   {}
+#endif
 };
 
 } // namespace soplex

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.5 2001/11/12 16:41:49 bzfpfend Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.6 2001/11/12 17:09:54 bzfkocht Exp $"
 
 #ifndef _DATASET_H_
 #define _DATASET_H_
@@ -65,7 +65,7 @@ namespace soplex
 template<class DATA>
 class DataSet
 {
-public:
+private:
    typedef DataKey Key;
 
 protected:

@@ -1,8 +1,9 @@
-Was macht SPxSolver in example. Warum könne wir nicht einfach SoPlex 
-benutzen
+Was macht SPxSolver in example. Warum können wir nicht einfach SoPlex 
+benutzen?
 
-in datahashtable.h idlist.h spxlp.h die
-subclassen einsetzen.
+Warum kann ich in DataKey.h nicht den expliziten CopyConstruktor einführen?
+
+in idlist.h die subclassen einsetzen.
 
 BUG in spxscalesm.cc value() wird nicht descaliert. 
 Entsprechender Aufruf fehlt auch in spxgeneralsm.cc
@@ -15,6 +16,8 @@ long durch ptrdiff_t ersetzen (include <stddef.h>
 
 for();    -> for()
                 ;
+assert(xxx) -> assert(xxx != 0)
+
 explicit einfuegen.
 
 vector_c.cpp in vector.cpp einbauen (this)

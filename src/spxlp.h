@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.5 2001/11/11 20:27:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.6 2001/11/12 17:10:04 bzfkocht Exp $"
 
 #ifndef _SPXLP_H_
 #define _SPXLP_H_
@@ -136,17 +136,18 @@ public:
        Class #SPxRowId# provides #DataSet::Key#s for the column indices of an
        #SPxLP#.
    */
-   class SPxColId : public SVSet::Key
+   class SPxColId : public DataKey
    {
+   private:
       friend class SPxLP;
 
-      explicit SPxColId(const SVSet::Key& p_key) : SVSet::Key(p_key) {}
+      explicit SPxColId(const DataKey& p_key) : DataKey(p_key) {}
    public:
       ///
       SPxColId() {}
 
       ///
-      explicit SPxColId(const Id& p_key) : SVSet::Key(p_key)
+      explicit SPxColId(const Id& p_key) : DataKey(p_key)
       {
          assert(!p_key.isSPxRowId());
          info = info * Id::COLID - 1;
@@ -157,17 +158,18 @@ public:
        Class #SPxColId# provides #DataSet::Key#s for the row indices of an
        #SPxLP#.
    */
-   class SPxRowId : public SVSet::Key
+   class SPxRowId : public DataKey
    {
+   private:
       friend class SPxLP;
 
-      explicit SPxRowId(const SVSet::Key& p_key) : SVSet::Key(p_key) {}
+      explicit SPxRowId(const DataKey& p_key) : DataKey(p_key) {}
    public:
       ///
       SPxRowId() {}
 
       ///
-      explicit SPxRowId(const Id& p_key) : SVSet::Key(p_key)
+      explicit SPxRowId(const Id& p_key) : DataKey(p_key)
       {
          assert(!p_key.isSPxColId());
          info = info * Id::ROWID - 1;
@@ -196,7 +198,7 @@ public:
        belongs to a #SPxLP#, no matter what other rows or columns are added 
        to it or removed from it.
    */
-   class Id : public SVSet::Key
+   class Id : public DataKey
    {
    public:
       ///
@@ -248,16 +250,14 @@ public:
       ///
       Id& operator=(const Id& id)
       {
-         // what the fuck is this!!!
-         //* reinterpret_cast<int*>(this)= * reinterpret_cast<const int*>(&id);
-         SVSet::Key::operator= ( id );
+         DataKey::operator= ( id );
          return *this;
       }
       ///
       Id& operator=(const SPxColId cid)
       {
          //*(int*)this = *(int*) & cid;
-         SVSet::Key::operator= ( cid );
+         DataKey::operator= ( cid );
          info = COLID * (cid.info + 1);
          return *this;
       }
@@ -265,7 +265,7 @@ public:
       Id& operator=(const SPxRowId rid)
       {
          //*(int*)this = *(int*) & rid;
-         SVSet::Key::operator= ( rid );
+         DataKey::operator= ( rid );
          info = ROWID * (rid.info + 1);
          return *this;
       }

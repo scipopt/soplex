@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.h,v 1.4 2001/11/11 20:27:32 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.h,v 1.5 2001/11/12 17:10:02 bzfkocht Exp $"
 
 #ifndef _NAMESET_H_
 #define _NAMESET_H_
@@ -139,7 +139,7 @@ public:
  */
 class NameSet
 {
-public:
+private:
    /** Identifier for set entries.
        Every name in a #NameSet# is assigned a #Key# by which it can be
        accessed (see #NameSet::operator[]#). See \Ref{DataSet::Key} for a more
@@ -173,7 +173,7 @@ public:
    /// return name to #key# of #NameSet#.
    const char* operator[](Key pkey) const
    {
-      return set[static_cast<DataSet<NameSet_CharPtr>::Key>(pkey)].name;
+      return set[pkey].name;
    }
 
    /// return nr. of names in #NameSet#.
@@ -217,7 +217,7 @@ public:
    /// return number of name with #key# in #NameSet#.
    int number(Key pkey) const
    {
-      return set.number(static_cast<DataSet<NameSet_CharPtr>::Key>(pkey));
+      return set.number(pkey);
    }
    /// return number of name #str# in #NameSet#.
    int number(const char *str) const
@@ -243,7 +243,7 @@ public:
    /// does #NameSet# have name with #Key key#?.
    int has(Key pkey) const
    {
-      return set.has(static_cast<DataSet<NameSet_CharPtr>::Key>(pkey));
+      return set.has(pkey);
    }
    //@}
 
