@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.23 2003/04/20 08:32:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.24 2005/01/03 14:46:48 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -28,16 +28,11 @@
 
 namespace soplex
 {
-static Real maxAbs(Real a, Real b)
-{
-   return fabs(a) > fabs(b) ? fabs(a) : fabs(b);
-}
-
 void SPxRedundantSM::fixColumn(SPxLP& lp, int i)
 {
    METHOD( "SPxRedundantSM::fixColumn" );
 
-   assert(EQ(lp.lower(i), lp.upper(i), deltaBnd()));
+   assert(EQrel(lp.lower(i), lp.upper(i), deltaBnd()));
 
    Real x = lp.lower(i);
 
@@ -161,8 +156,8 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
          }
       }
       // infeasible ?
-      if (  (LT(lp.rhs(i), lobnd, deltaBnd()) && locnt == 0) 
-         || (GT(lp.lhs(i), upbnd, deltaBnd()) && upcnt == 0))
+      if (  (LTrel(lp.rhs(i), lobnd, deltaBnd()) && locnt == 0) 
+         || (GTrel(lp.lhs(i), upbnd, deltaBnd()) && upcnt == 0))
       {
          VERBOSE3({ std::cout << "IREDSM04 infeasible row " << i 
                               << " lo= " << lobnd
@@ -173,10 +168,10 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
          return INFEASIBLE;
       }
       // forcing equality constraint ?
-      if (EQ(lp.lhs(i), lp.rhs(i), deltaBnd()))
+      if (EQrel(lp.lhs(i), lp.rhs(i), deltaBnd()))
       {
          // all fixed on upper bound ?
-         if (upcnt == 0 && EQ(lp.rhs(i), upbnd, deltaBnd()))
+         if (upcnt == 0 && EQrel(lp.rhs(i), upbnd, deltaBnd()))
          {
             VERBOSE3({ std::cout << "IREDSM05 rhs fixed on upbnd row " << i
                                  << " rhs= " << lp.rhs(i)
@@ -204,7 +199,7 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
             continue;
          }
          // all fixed on lower bound ?
-         if (locnt == 0 && EQ(lp.lhs(i), lobnd, deltaBnd()))
+         if (locnt == 0 && EQrel(lp.lhs(i), lobnd, deltaBnd()))
          {
             VERBOSE3({ std::cout << "IREDSM06 rhs fixed on lowbnd row " << i
                                  << " lhs= " << lp.lhs(i)
@@ -234,7 +229,7 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
       }
 
       // redundant rhs ?
-      if (lp.rhs(i) <  infinity && upcnt == 0 && GE(lp.rhs(i), upbnd, deltaBnd()))
+      if (lp.rhs(i) <  infinity && upcnt == 0 && GErel(lp.rhs(i), upbnd, deltaBnd()))
       {
          VERBOSE3({ std::cout << "IREDSM07 redundant rhs row " << i
                               << " rhs= " << lp.rhs(i)
@@ -245,7 +240,7 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
          chgLRhs++;
       }
       // redundant lhs ?
-      if (lp.lhs(i) > -infinity && locnt == 0 && LE(lp.lhs(i), lobnd, deltaBnd()))
+      if (lp.lhs(i) > -infinity && locnt == 0 && LErel(lp.lhs(i), lobnd, deltaBnd()))
       {
          VERBOSE3({ std::cout << "IREDSM08 redundant lhs row " << i
                               << " lhs= " << lp.lhs(i)
@@ -280,7 +275,7 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
 
             if (x > 0.0)
             {
-               if (lp.lhs(i) > -infinity && lp.lower(k) > -infinity && upcnt <= 1 && NE(lp.lhs(i), upbnd))
+               if (lp.lhs(i) > -infinity && lp.lower(k) > -infinity && upcnt <= 1 && NErel(lp.lhs(i), upbnd))
                {
                   Real y     = -infinity;
                   Real scale = maxAbs(lp.lhs(i), upbnd);
@@ -310,7 +305,7 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
                      chgBnds++;
                   }
                }
-               if (lp.rhs(i) < infinity && lp.upper(k) < infinity && locnt <= 1 && NE(lp.rhs(i), lobnd))
+               if (lp.rhs(i) < infinity && lp.upper(k) < infinity && locnt <= 1 && NErel(lp.rhs(i), lobnd))
                {
                   Real y = infinity;
                   Real scale = maxAbs(lp.rhs(i), lobnd);
@@ -343,7 +338,7 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
             }
             else if (x < 0.0)
             {
-               if (lp.lhs(i) >= -infinity && lp.upper(k) < infinity && upcnt <= 1 && NE(lp.lhs(i), upbnd))
+               if (lp.lhs(i) >= -infinity && lp.upper(k) < infinity && upcnt <= 1 && NErel(lp.lhs(i), upbnd))
                {
                   Real y = infinity;
                   Real scale = maxAbs(lp.lhs(i), upbnd);
@@ -373,7 +368,7 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
                      chgBnds++;
                   }
                }
-               if (lp.rhs(i) <= infinity && lp.lower(k) > -infinity && locnt <= 1 && NE(lp.rhs(i), lobnd))
+               if (lp.rhs(i) <= infinity && lp.lower(k) > -infinity && locnt <= 1 && NErel(lp.rhs(i), lobnd))
                {
                   Real y = -infinity;
                   Real scale = maxAbs(lp.rhs(i), lobnd);
@@ -463,7 +458,7 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
          x1 = row1.value(j);
          x2 = row2.value(j);
 
-         if (NE(x1, x2 * alpha))
+         if (NErel(x1, x2 * alpha))
             break;
       }
       if (j < row1.size())
@@ -564,7 +559,7 @@ SPxSimplifier::Result SPxRedundantSM::redundantCols(SPxLP& lp, bool& again)
 
       const SVector& col = lp.colVector(i);
 
-      if (NE(lp.upper(i), lp.lower(i), deltaBnd()))
+      if (NErel(lp.upper(i), lp.lower(i), deltaBnd()))
       {
          // test if all coefficents are going in one direction
          int upcnt = 0;
@@ -655,7 +650,7 @@ SPxSimplifier::Result SPxRedundantSM::redundantCols(SPxLP& lp, bool& again)
          }
       }
       // remove fixed variables
-      if (EQ(lp.lower(i), lp.upper(i), deltaBnd()))
+      if (EQrel(lp.lower(i), lp.upper(i), deltaBnd()))
       {
          fixColumn(lp, i);
 
@@ -698,7 +693,7 @@ SPxSimplifier::Result SPxRedundantSM::simpleRows(SPxLP& lp, bool& again)
       rem[i]             = 0;
 
       // infeasible range row
-      if (LT(lp.rhs(i), lp.lhs(i), deltaBnd()))
+      if (LTrel(lp.rhs(i), lp.lhs(i), deltaBnd()))
       {
          VERBOSE3({ std::cout << "IREDSM17 infeasible row " << i 
                               <<"  lhs= " << lp.lhs(i) 
@@ -778,7 +773,7 @@ SPxSimplifier::Result SPxRedundantSM::simpleRows(SPxLP& lp, bool& again)
          if (isZero(up, epsZero()))
             up = 0.0;
          
-         assert(LE(lp.lower(j), lp.upper(j)));
+         assert(LErel(lp.lower(j), lp.upper(j)));
 
          VERBOSE3({ std::cout << " removed lo= " << lo
                               << " up= " << up
@@ -791,7 +786,7 @@ SPxSimplifier::Result SPxRedundantSM::simpleRows(SPxLP& lp, bool& again)
          if (GT(lo, lp.lower(j), epsZero()))
             lp.changeLower(j, lo);
 
-         assert(LE(lp.lower(j), lp.upper(j), epsZero()));
+         assert(LErel(lp.lower(j), lp.upper(j), epsZero()));
       }
    }
    assert(remRows != 0 || remNzos == 0);
@@ -873,7 +868,7 @@ SPxSimplifier::Result SPxRedundantSM::simpleCols(SPxLP& lp, bool& again)
       }
 
       // infeasible bounds ?
-      if (GT(lp.lower(i), lp.upper(i), deltaBnd()))
+      if (GTrel(lp.lower(i), lp.upper(i), deltaBnd()))
       {
          VERBOSE3({ std::cout << "IREDSM23 infeasible bounds column " << i 
                               << " lower= " << lp.lower(i)
@@ -882,7 +877,7 @@ SPxSimplifier::Result SPxRedundantSM::simpleCols(SPxLP& lp, bool& again)
          return INFEASIBLE;
       }
       // Fixed column ?
-      if (EQ(lp.lower(i), lp.upper(i), deltaBnd()))
+      if (EQrel(lp.lower(i), lp.upper(i), deltaBnd()))
       {
          fixColumn(lp, i);
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.19 2004/03/22 11:35:24 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.20 2005/01/03 14:46:48 bzfkocht Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
@@ -156,6 +156,20 @@ public:
    static void setVerbose(int p_verbose);
 };
 
+// (max(|a|,|b|)
+inline static Real maxAbs(Real a, Real b)
+{
+   return fabs(a) > fabs(b) ? fabs(a) : fabs(b);
+}
+
+// (a-b)/max(|a|,|b|,1.0)
+inline static Real relDiff(Real a, Real b)
+{
+   Real scale = 1.0 / maxAbs(maxAbs(a, b), 1.0);
+
+   return a * scale - b * scale;
+}
+
 inline bool EQ(Real a, Real b, Real eps = Param::epsilon())
 {
    return fabs(a - b) <= eps;
@@ -194,6 +208,36 @@ inline bool isZero(Real a, Real eps = Param::epsilon())
 inline bool isNotZero(Real a, Real eps = Param::epsilon())
 {
    return fabs(a) > eps;
+}
+
+inline bool EQrel(Real a, Real b, Real eps = Param::epsilon())
+{
+   return fabs(relDiff(a, b)) <= eps;
+}
+
+inline bool NErel(Real a, Real b, Real eps = Param::epsilon())
+{
+   return fabs(relDiff(a, b)) > eps;
+}
+
+inline bool LTrel(Real a, Real b, Real eps = Param::epsilon())
+{
+   return relDiff(a, b) < -eps;
+}
+
+inline bool LErel(Real a, Real b, Real eps = Param::epsilon())
+{
+   return relDiff(a, b) < eps;
+}
+
+inline bool GTrel(Real a, Real b, Real eps = Param::epsilon())
+{
+   return relDiff(a, b) > eps;
+}
+
+inline bool GErel(Real a, Real b, Real eps = Param::epsilon())
+{
+   return relDiff(a, b) > -eps;
 }
 
 } // namespace soplex
