@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxaggregatesm.h,v 1.5 2001/11/22 16:30:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxaggregatesm.h,v 1.6 2001/11/22 16:59:10 bzfkocht Exp $"
 
 /**@file  spxaggregatesm.h
  * @brief LP variable aggregation.
@@ -35,9 +35,8 @@ namespace soplex
 class SPxAggregateSM : public SPxSimplifier
 {
 private:
-   static const double stability  = 0.01;  ///< stability factor.
-   
-   double maxFill;                         ///< ???  
+   double stability;   ///< stability factor, e.g. 0.01.   
+   double maxFill;     ///< ???  
 
    /// ???
    int eliminate(const SVector& row, double b);

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.6 2001/11/22 16:30:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.7 2001/11/22 16:59:10 bzfkocht Exp $"
 
 #include <stdlib.h>
 #include <iostream>
@@ -23,6 +23,8 @@
 
 namespace soplex
 {
+static const double eps = 1e-10;    ///< epslion for what is regarded equal.
+
 int SPxRedundantSM::simplify()
 {
    int    num;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.5 2001/11/22 16:30:00 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.6 2001/11/22 16:59:10 bzfkocht Exp $"
 
 #include <stdlib.h>
 #include <iostream>
@@ -25,12 +25,14 @@
 
 namespace soplex
 {
+/**todo Should be moved inside SPxAggregateSM. */
 struct RowCnt
 {
    int row;
    int size;
 };
 
+/**todo Should be moved inside SPxAggregateSM. */
 struct Compare
 {
    int operator()(RowCnt i1, RowCnt i2)
@@ -232,7 +234,9 @@ int SPxAggregateSM::simplify()
    DataArray < RowCnt > rowcnt(lp->nRows());
    Compare compare;
 
+   stability = 0.01;
    maxFill = 10;
+
    stage = 0;
    last = 0;
    num = 0;
