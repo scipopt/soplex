@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.9 2001/12/25 14:25:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.10 2001/12/25 17:00:09 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -253,7 +253,7 @@ static int hasRowName(char*& pos, NameSet* rownames)
    if (s == 0)
       return false;
 
-   int end = s - pos;
+   int end = int(s - pos);
    int srt = end - 1;
       
    for(; srt >= 0; srt--)

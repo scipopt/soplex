@@ -13,13 +13,18 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.7 2001/12/25 16:03:24 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.8 2001/12/25 17:00:09 bzfkocht Exp $"
 
 #include <assert.h>
 
 #include "ssvector.h"
 #include "svset.h"
 #include "spxmessage.h"
+
+/**@file ssvector.cpp
+ * @todo There is a lot pointer arithmetic done here. It is not clear if
+ *       this is an advantage at all. See all the function int() casts.
+ */
 
 namespace soplex
 {
@@ -120,7 +125,7 @@ void SSVector::setup()
 
 #else
 
-if (dim() <= 1)
+      if (dim() <= 1)
       {
          if (dim())
          {
@@ -153,7 +158,7 @@ if (dim() <= 1)
             while (!*++v);
             if (*v > eps || *v < meps)
             {
-               *ii++ = v - val;
+               *ii++ = int(v - val);
             }
             else
             {
@@ -173,7 +178,7 @@ if (dim() <= 1)
          else
             *v = 0;
 
-         num = ii - idx;
+         num = int(ii - idx);
       }
 
 #endif
@@ -400,7 +405,7 @@ SSVector& SSVector::multAdd(double xx, const SSVector& svec)
          y = *rv++ * xx;
          if (y < meps || y > eps)
          {
-            *ii++ = v - val;
+            *ii++ = int(v - val);
             *v++ = y;
          }
          else if (rv == last)
@@ -413,10 +418,10 @@ SSVector& SSVector::multAdd(double xx, const SSVector& svec)
       x *= xx;
       if (x < meps || x > eps)
       {
-         *ii++ = v - val;
+         *ii++ = int(v - val);
          *v = x;
       }
-      num = ii - idx;
+      num = int(ii - idx);
 
       setupStatus = 1;
    }
@@ -535,7 +540,7 @@ SSVector& SSVector::multAdd(double xx, const SubSVector& svec)
             else
                v[*iptr] = 0;
          }
-         num = iiptr - idx;
+         num = int(iiptr - idx);
       }
    }
    else
@@ -593,7 +598,7 @@ SSVector& SSVector::operator=(const SSVector& rhs)
          }
          if (*rv < meps || *rv > eps)
          {
-            *ii++ = v - val;
+            *ii++ = int(v - val);
             *v++ = *rv++;
          }
          else if (rv == last)
@@ -608,10 +613,10 @@ SSVector& SSVector::operator=(const SSVector& rhs)
 
       if (x < meps || x > eps)
       {
-         *ii++ = v - val;
+         *ii++ = int(v - val);
          *v++ = x;
       }
-      num = ii - idx;
+      num = int(ii - idx);
    }
    setupStatus = 1;
 
@@ -657,7 +662,7 @@ void SSVector::setup_and_assign(SSVector& rhs)
          }
          if (*rv < meps || *rv > eps)
          {
-            *ri++ = *ii++ = v - val;
+            *ri++ = *ii++ = int(v - val);
             *v++ = *rv++;
          }
          else if (rv == last)
@@ -671,12 +676,12 @@ void SSVector::setup_and_assign(SSVector& rhs)
 
       if (x < meps || x > eps)
       {
-         *ri++ = *ii++ = v - val;
+         *ri++ = *ii++ = int(v - val);
          *v++ = *rv = x;
       }
       else
          *rv = 0;
-      num = rhs.num = ii - idx;
+      num = rhs.num = int(ii - idx);
       rhs.setupStatus = 1;
    }
    setupStatus = 1;
@@ -703,7 +708,7 @@ SSVector& SSVector::assign(const SVector& rhs)
       val[*p = e->idx] = e->val;
       p += ((e++)->val != 0);
    }
-   num = p - idx;
+   num = int(p - idx);
    setupStatus = 1;
 
    assert(isConsistent());
@@ -779,7 +784,7 @@ SSVector& SSVector::assign2productShort(const SVSet& A, const SSVector& x)
       else
          v[*is] = 0;
    }
-   num = it - idx;
+   num = int(it - idx);
 
    assert(isConsistent());
    return *this;
@@ -890,7 +895,7 @@ SSVector& SSVector::assign2productAndSetup(const SVSet& A, SSVector& x)
       if (*xv > eps || *xv < meps)
       {
          y = *xv;
-         svec = const_cast<SVector*>( & A[ *xi++ = xv - x.val ] );
+         svec = const_cast<SVector*>( & A[ *xi++ = int(xv - x.val) ] );
          elem = &svec->element(0);
          last = elem + svec->size();
          for (; elem < last; ++elem)
@@ -909,7 +914,7 @@ SSVector& SSVector::assign2productAndSetup(const SVSet& A, SSVector& x)
    if (lastval > eps || lastval < meps)
    {
       y = *xv = lastval;
-      svec = const_cast<SVector*>( & A[ *xi++ = xv - x.val ] );
+      svec = const_cast<SVector*>( & A[ *xi++ = int(xv - x.val) ] );
       elem = &svec->element(0);
       last = elem + svec->size();
       for (; elem < last; ++elem)
@@ -918,7 +923,7 @@ SSVector& SSVector::assign2productAndSetup(const SVSet& A, SSVector& x)
    else
       *xv = 0;
 
-   x.num = xi - x.idx;
+   x.num = int(xi - x.idx);
    x.setupStatus = 1;
    setupStatus = 0;
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.cpp,v 1.9 2001/11/15 16:54:16 bzfpfend Exp $"
+#pragma ident "@(#) $Id: nameset.cpp,v 1.10 2001/12/25 17:00:08 bzfkocht Exp $"
 
 #include <string.h>
 #include "nameset.h"
@@ -47,13 +47,13 @@ void NameSet::add(Key& p_key, const char* str)
          if (memSize() + int(strlen(str)) >= memMax())
          {
             assert(memFactor >= 1);
-            memRemax(int(memFactor*memMax()) + 9 + strlen(str));
+            memRemax(int(memFactor*memMax()) + 9 + int(strlen(str)));
             assert(memSize() + int(strlen(str)) < memMax());
          }
       }
 
       char* tmp = &(mem[memused]);
-      memused += strlen(str) + 1;
+      memused += int(strlen(str)) + 1;
       strcpy(tmp, str);
 
       NameSet_CharPtr* name = set.create(p_key);
@@ -282,7 +282,7 @@ int NameSet::isConsistent() const
    NameSet_CharPtr* next;
    for (NameSet_CharPtr *name = list.first(); name; name = next)
    {
-      int len = strlen(name->name) + 1;
+      int len = int(strlen(name->name)) + 1;
       if (&(name->name[len]) > &(mem[memused]))
       {
          std::cerr << "Inconsistency detected in class NameSet!\n";

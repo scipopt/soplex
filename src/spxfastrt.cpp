@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.8 2001/12/25 14:25:55 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.9 2001/12/25 17:00:09 bzfkocht Exp $"
 
 #include <assert.h>
 #include <stdio.h>
@@ -162,6 +162,10 @@ int SPxFastRT::maxDelta(
          if (*uval)
          {
             x = *uval;
+
+            /**@todo The type of i is wrong, this should be ptrdiff_t, 
+             *        but what exactly is done here anyway?
+             */
             i = uval - upd;
             if (x > epsilon)
             {

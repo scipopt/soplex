@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.6 2001/12/25 09:34:00 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.7 2001/12/25 17:00:09 bzfkocht Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read MPS format files.
@@ -176,7 +176,7 @@ bool MPSInput::readLine()
 
       /* Normalize line
        */
-      len = strlen(m_buf);
+      len = int(strlen(m_buf));
 
       for(int i = 0; i < len; i++)
          if ((m_buf[i] == '\t') || (m_buf[i] == '\n') || (m_buf[i] == '\r'))
