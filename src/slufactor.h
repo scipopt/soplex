@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.h,v 1.14 2002/10/23 10:40:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.h,v 1.15 2002/11/25 16:51:59 bzfkocht Exp $"
 
 /**@file  slufactor.h
  * @brief Implementation of Sparse Linear Solver.
@@ -131,12 +131,10 @@ public:
    void solveRight (Vector& x, const Vector& b);
    ///
    void solveRight (SSVector& x, const SVector& b);
-
    ///
    void solveRight4update(SSVector& x, const SVector& b);
    ///
-   void solve2right4update(SSVector& x, Vector& y,
-      const SVector& b, SSVector& rhs);
+   void solve2right4update(SSVector& x, Vector& y, const SVector& b, SSVector& rhs);
    ///
    void solveLeft(Vector& x, const Vector& b);
    ///
@@ -160,18 +158,8 @@ public:
    //@{
    /// default constructor.
    SLUFactor();
-
-   /// destructor.
-   virtual ~SLUFactor();
-
-private:
-   /// no assignment operator.
+   /// assignment operator.
    SLUFactor& operator=(const SLUFactor& old);
-   /// no copy construtor.
-   SLUFactor(const SLUFactor& old);
-#if 0
-   void assign(const SLUFactor& old);
-
    /// copy constructor.
    SLUFactor(const SLUFactor& old)
       : SLinSolver( old )
@@ -183,7 +171,13 @@ private:
    {
       assign(old);
    }
-#endif
+   /// destructor.
+   virtual ~SLUFactor();
+
+private:
+
+   void assign(const SLUFactor& old);
+
    //@}
 };
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: solve.cpp,v 1.17 2002/10/23 10:40:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: solve.cpp,v 1.18 2002/11/25 16:51:59 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -745,7 +745,7 @@ void CLUFactor::solveLleft2(
    rorig = l.rorig;
 
 #ifndef WITH_L_ROWS
-   Real* lval  = l.val;
+   Real*   lval  = l.val;
    int*    lidx  = l.idx;
    int*    lrow  = l.row;
    int*    lbeg  = l.start;
@@ -1025,6 +1025,7 @@ void CLUFactor::solveUpdateLeft2(Real* vec1, Real* vec2)
 void CLUFactor::solveLeft(Real* vec, Real* rhs)
 {
    METHOD( "CLUFactor::solveLeft()" );
+
    if (!l.updateType)            /* no Forest-Tomlin Updates */
    {
       solveUpdateLeft(rhs);

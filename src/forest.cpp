@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: forest.cpp,v 1.19 2002/05/01 08:18:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: forest.cpp,v 1.20 2002/11/25 16:51:59 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -394,11 +394,6 @@ void CLUFactor::forestUpdate(int p_col, Real* p_work, int num, int *nonz)
          u.col.used += cmax[p_col];
       }
    }
-
-
-   /*  Adjust stages of column and row singletons in U.
-    */
-   u.lastRowSing = u.lastColSing;
 
    c = cperm[p_col];
    if (r > c)                         /* Forest Tomlin update */

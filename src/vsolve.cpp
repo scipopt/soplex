@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vsolve.cpp,v 1.17 2002/03/10 09:15:41 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vsolve.cpp,v 1.18 2002/11/25 16:51:59 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -1228,27 +1228,27 @@ int CLUFactor::solveLleft(Real eps, Real* vec, int* nonz, int rn)
    int *rorig, *rperm;
    int *last;
 
-   ridx = l.ridx;
-   rval = l.rval;
-   rbeg = l.rbeg;
+   ridx  = l.ridx;
+   rval  = l.rval;
+   rbeg  = l.rbeg;
    rorig = l.rorig;
    rperm = l.rperm;
-   n = 0;
+   n     = 0;
 
    i = l.firstUpdate - 1;
 #ifndef WITH_L_ROWS
-#error Not yet implemented, define WITH_L_LOOPS
-   Real* lval = l.val;
+#pragma warn "Not yet implemented, define WITH_L_ROWS"
+   Real*   lval = l.val;
    int*    lidx = l.idx;
    int*    lrow = l.row;
    int*    lbeg = l.start;
 
    for (; i >= 0; --i)
    {
-      k = lbeg[i];
+      k   = lbeg[i];
       val = &lval[k];
       idx = &lidx[k];
-      x = 0;
+      x   = 0;
       for (j = lbeg[i + 1]; j > k; --j)
          x += vec[*idx++] * (*val++);
       vec[lrow[i]] -= x;

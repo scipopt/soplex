@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.26 2002/10/23 10:40:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.27 2002/11/25 16:51:59 bzfkocht Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -271,12 +271,32 @@ public:
       }
       /// resets dimensions.
       void reSize(int rowDim, int colDim);
-
       /// Prints out status.
       void dump() const;
-
       /// consistency check.
       bool isConsistent() const;
+      /// default constructor
+      Desc()
+      {}
+      /// copy constructor
+      Desc(const Desc& old)
+         : rowstat(old.rowstat)
+         , colstat(old.colstat)
+         , stat(old.stat)
+         , costat(old.costat)
+      {}
+      /// assignment operator
+      Desc& operator=(const Desc& rhs)
+      {
+         if (this != &rhs)
+         {
+            rowstat = rhs.rowstat;
+            colstat = rhs.colstat;
+            stat    = rhs.stat;
+            costat  = rhs.costat;
+         }
+         return *this;
+      }
    };
 
 protected:
@@ -672,7 +692,10 @@ public:
    //@{
    /// default constructor.
    SPxBasis();
-
+   /// copy constructor
+   SPxBasis(const SPxBasis& old);
+   /// assignment operator
+   SPxBasis& operator=(const SPxBasis& rhs);
    /// destructor.
    virtual ~SPxBasis()
    {}

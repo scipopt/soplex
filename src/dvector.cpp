@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dvector.cpp,v 1.13 2002/03/03 13:50:31 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dvector.cpp,v 1.14 2002/11/25 16:51:58 bzfkocht Exp $"
 
 
 #include "spxdefines.h"
@@ -122,7 +122,6 @@ std::istream& operator>>(std::istream& s, DVector& vec)
 
    if (c != '(')
       s.putback(c);
-
    else
    {
       do

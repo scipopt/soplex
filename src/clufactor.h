@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clufactor.h,v 1.14 2002/10/23 10:40:38 bzfkocht Exp $"
+#pragma ident "@(#) $Id: clufactor.h,v 1.15 2002/11/25 16:51:58 bzfkocht Exp $"
 
 /**@file  clufactor.h
  * @brief Implementation of sparse LU factorization.
@@ -134,33 +134,31 @@ protected:
                                 start[i] + max[i] == start[elem[i].next->idx] 
                                 len[i] <= max[i]. */
       } col;
-      int lastColSing;       /* stage of last eliminated column singleton */
-      int lastRowSing;       /* stage of last eliminated row singleton */
    };
 
 
    /// Data structures for saving the working matrix and U factor.
    struct L
    {
-      int size;           /* size of arrays val and idx        */
-      Real *val;          /* values of L vectors               */
-      int *idx;           /* indices of L vectors              */
-      int startSize;      /* size of array start               */
-      int firstUpdate;    /* number of first update L vector   */
-      int firstUnused;    /* number of first unused L vector   */
-      int *start;         /* starting positions in val and idx */
-      int *row;           /* column indices of L vectors       */
-      int updateType;     /* type of updates to be used.       */
+      int  size;           /* size of arrays val and idx        */
+      Real *val;           /* values of L vectors               */
+      int  *idx;           /* indices of L vectors              */
+      int  startSize;      /* size of array start               */
+      int  firstUpdate;    /* number of first update L vector   */
+      int  firstUnused;    /* number of first unused L vector   */
+      int  *start;         /* starting positions in val and idx */
+      int  *row;           /* column indices of L vectors       */
+      int  updateType;     /* type of updates to be used.       */
 
       /* The following arrays have length |firstUpdate|, since they keep
        * rows of the L-vectors occuring during the factorization (without
        * updates), only:
        */
-      Real *rval;         /* values of rows of L               */
-      int *ridx;          /* indices of rows of L              */
-      int *rbeg;          /* start of rows in rval and ridx    */
-      int *rorig;         /* original row permutation          */
-      int *rperm;         /* original row permutation          */
+      Real *rval;          /* values of rows of L               */
+      int  *ridx;          /* indices of rows of L              */
+      int  *rbeg;          /* start of rows in rval and ridx    */
+      int  *rorig;         /* original row permutation          */
+      int  *rperm;         /* original row permutation          */
    };
 
    SLinSolver::Status stat;   ///< Status indicator.
@@ -182,7 +180,6 @@ protected:
    U       u;                 ///< U matrix 
 
    Real*   work;              ///< Working array: must always be left as 0! 
-   Real*   work2;             ///< Working array: must always be left as 0! 
 
 private:
    Temp    temp;              ///< Temporary storage
@@ -195,8 +192,7 @@ private:
    ///
    void solveUright2(Real* work1, Real* vec1, Real* work2, Real* vec2);
    ///
-   int  solveUright2eps(Real* work1, Real* vec1, Real* work2, 
-      Real* vec2, int* nonz, Real eps);
+   int  solveUright2eps(Real* work1, Real* vec1, Real* work2, Real* vec2, int* nonz, Real eps);
    ///
    void solveLright2(Real* vec1, Real* vec2);
    ///
@@ -206,14 +202,11 @@ private:
    ///
    void solveUleft(Real* work, Real* vec);
    ///
-   void solveUleft2(
-      Real* work1, Real* vec1, Real* work2, Real* vec2);
+   void solveUleft2(Real* work1, Real* vec1, Real* work2, Real* vec2);
    ///
-   int solveLleft2forest(Real* vec1, int* /* nonz */,
-      Real* vec2, Real /* eps */);
+   int solveLleft2forest(Real* vec1, int* /* nonz */, Real* vec2, Real /* eps */);
    ///
-   void solveLleft2(Real* vec1, int* /* nonz */,
-      Real* vec2, Real /* eps */);
+   void solveLleft2(Real* vec1, int* /* nonz */, Real* vec2, Real /* eps */);
    ///
    int solveLleftForest(Real* vec, int* /* nonz */, Real /* eps */);
    ///
@@ -229,27 +222,22 @@ private:
    ///
    int vSolveLright(Real* vec, int* ridx, int rn, Real eps);
    void vSolveLright2(Real* vec, int* ridx, int* rnptr, Real eps,
-                      Real* vec2, int* ridx2, int* rn2ptr, Real eps2);
+      Real* vec2, int* ridx2, int* rn2ptr, Real eps2);
    ///
-   int vSolveUright(Real* vec, int* vidx,
-                    Real* rhs, int* ridx, int rn, Real eps);
+   int vSolveUright(Real* vec, int* vidx, Real* rhs, int* ridx, int rn, Real eps);
    ///
-   void vSolveUrightNoNZ(Real* vec,
-                         Real* rhs, int* ridx, int rn, Real eps);
+   void vSolveUrightNoNZ(Real* vec, Real* rhs, int* ridx, int rn, Real eps);
    ///
-   int vSolveUright2(Real* vec, int* vidx, Real* rhs, 
-                     int* ridx, int rn, Real eps,
-                     Real* vec2, Real* rhs2, int* ridx2, int rn2, Real eps2);
+   int vSolveUright2(Real* vec, int* vidx, Real* rhs, int* ridx, int rn, Real eps,
+      Real* vec2, Real* rhs2, int* ridx2, int rn2, Real eps2);
    ///
    int vSolveUpdateRight(Real* vec, int* ridx, int n, Real eps);
    ///
    void vSolveUpdateRightNoNZ(Real* vec, Real /*eps*/);
    ///
-   int solveUleft(Real eps, Real* vec, int* vecidx,
-                  Real* rhs, int* rhsidx, int rhsn);
+   int solveUleft(Real eps, Real* vec, int* vecidx, Real* rhs, int* rhsidx, int rhsn);
    ///
-   void solveUleftNoNZ(Real eps, Real* vec,
-                       Real* rhs, int* rhsidx, int rhsn);
+   void solveUleftNoNZ(Real eps, Real* vec, Real* rhs, int* rhsidx, int rhsn);
    ///
    int solveLleftForest(Real eps, Real* vec, int* nonz, int n);
    ///
@@ -277,8 +265,7 @@ private:
    ///
    void minLMem(int size);
    ///
-   void setPivot(const int p_stage, const int p_col, 
-                 const int p_row, const Real val);
+   void setPivot(const int p_stage, const int p_col, const int p_row, const Real val);
    ///
    void colSingletons();
    ///
@@ -340,13 +327,12 @@ public:
    void solveLright(Real* vec);
    ///
    int  solveRight4update(Real* vec, int* nonz, Real eps, Real* rhs,
-                          Real* forest, int* forestNum, int* forestIdx);
+      Real* forest, int* forestNum, int* forestIdx);
    ///
    void solveRight(Real* vec, Real* rhs);
    ///
    int  solveRight2update(Real* vec1, Real* vec2, Real* rhs1,
-                          Real* rhs2, int* nonz, Real eps, Real* forest,
-                          int* forestNum, int* forestIdx);
+      Real* rhs2, int* nonz, Real eps, Real* forest, int* forestNum, int* forestIdx);
    ///
    void solveRight2(Real* vec1, Real* vec2, Real* rhs1, Real* rhs2);
    ///
@@ -354,51 +340,50 @@ public:
    ///
    int solveLeftEps(Real* vec, Real* rhs, int* nonz, Real eps);
    ///
-   int solveLeft2(Real* vec1, int* nonz, Real* vec2, 
-      Real eps, Real* rhs1, Real* rhs2);
+   int solveLeft2(Real* vec1, int* nonz, Real* vec2, Real eps, Real* rhs1, Real* rhs2);
 
    // From vsolve.cpp: Very sparse solution methods.
    ///
-   int vSolveRight4update(Real eps, Real* vec, int* idx,     /* result       */
-                          Real* rhs, int* ridx, int rn,      /* rhs & Forest */
-                          Real* forest, int* forestNum, int* forestIdx);
+   int vSolveRight4update(Real eps, 
+      Real* vec, int* idx,               /* result       */
+      Real* rhs, int* ridx, int rn,      /* rhs & Forest */
+      Real* forest, int* forestNum, int* forestIdx);
    ///
    int vSolveRight4update2(Real eps,
-                           Real* vec, int* idx,              /* result1 */
-                           Real* rhs, int* ridx, int rn,     /* rhs1    */
-                           Real* vec2, Real eps2,            /* result2 */
-                           Real* rhs2, int* ridx2, int rn2,  /* rhs2    */
-                           Real* forest, int* forestNum, int* forestIdx);
+      Real* vec, int* idx,              /* result1 */
+      Real* rhs, int* ridx, int rn,     /* rhs1    */
+      Real* vec2, Real eps2,            /* result2 */
+      Real* rhs2, int* ridx2, int rn2,  /* rhs2    */
+      Real* forest, int* forestNum, int* forestIdx);
    ///
    void vSolveRightNoNZ(Real* vec2, Real eps2,              /* result2 */
-                        Real* rhs2, int* ridx2, int rn2);   /* rhs2    */
+      Real* rhs2, int* ridx2, int rn2);   /* rhs2    */
    ///
    int vSolveLeft(Real eps,
-                  Real* vec, int* idx,                      /* result */
-                  Real* rhs, int* ridx, int rn);            /* rhs    */
+      Real* vec, int* idx,                      /* result */
+      Real* rhs, int* ridx, int rn);            /* rhs    */
    ///
    void vSolveLeftNoNZ(Real eps,
-                       Real* vec,                           /* result */
-                       Real* rhs, int* ridx, int rn);       /* rhs    */
+      Real* vec,                           /* result */
+      Real* rhs, int* ridx, int rn);       /* rhs    */
    ///
    int vSolveLeft2(Real eps,
-                   Real* vec, int* idx,                     /* result */
-                   Real* rhs, int* ridx, int rn,            /* rhs    */
-                   Real* vec2,                              /* result2 */
-                   Real* rhs2, int* ridx2, int rn2);        /* rhs2    */
+      Real* vec, int* idx,                     /* result */
+      Real* rhs, int* ridx, int rn,            /* rhs    */
+      Real* vec2,                              /* result2 */
+      Real* rhs2, int* ridx2, int rn2);        /* rhs2    */
 
    // from forest.cpp
    void forestUpdate(int col, Real* work, int num, int *nonz);
 
    // from update.cpp
    void update(int p_col, Real* p_work, const int* p_idx, int num);
-   void updateNoClear(int p_col, const Real* p_work,
-                      const int* p_idx, int num);
+   void updateNoClear(int p_col, const Real* p_work, const int* p_idx, int num);
 
 
    // from factor.cpp
    ///
-   void factor(const SVector** vec,     ///< Array of column vector pointers  
+   void factor(const SVector** vec,   ///< Array of column vector pointers  
                Real threshold,    ///< pivoting threshold                
                Real eps);         ///< epsilon for zero detection        
 

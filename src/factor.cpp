@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.35 2002/10/23 10:40:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.36 2002/11/25 16:51:58 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -41,12 +41,9 @@ CLUFactor::Temp::Temp()
 
 void CLUFactor::Temp::init(int p_dim)
 {
-   if ( s_max == 0 )  spx_alloc(s_max, p_dim);
-   else               spx_realloc(s_max, p_dim);
-   if ( s_cact == 0 ) spx_alloc(s_cact, p_dim);
-   else               spx_realloc(s_cact, p_dim);
-   if ( s_mark == 0 ) spx_alloc(s_mark, p_dim);
-   else               spx_realloc(s_mark, p_dim);
+   spx_realloc(s_max,  p_dim);
+   spx_realloc(s_cact, p_dim);
+   spx_realloc(s_mark, p_dim);
    stage = 0;
 }
 
@@ -533,16 +530,12 @@ void CLUFactor::colSingletons()
     *  and computing the index of the first row singleton (-1)
     *  until no more can be found.
     */
-   u.lastColSing = -1;
    for (i = 0; i < temp.stage; ++i)
    {
       p_row = rorig[i];
       assert(p_row >= 0);
       idx = &(u.row.idx[u.row.start[p_row]]);
       len = u.row.len[p_row];
-
-      if (len)
-         u.lastColSing = i;
 
       for (j = 0; j < len; ++j)
       {
@@ -681,8 +674,6 @@ void CLUFactor::rowSingletons()
          }
       }
    }
-
-   u.lastRowSing = temp.stage - 1;
 }
 
 
@@ -1446,7 +1437,7 @@ void CLUFactor::setupRowVals()
 {
    METHOD( "CLUFactor::setupRowVals()" );
    int   i, j, k, m;
-   int   l_dim, vecs, mem;
+   int   vecs, mem;
    int*  l_row;
    int*  idx;
    Real* val;
@@ -1454,10 +1445,11 @@ void CLUFactor::setupRowVals()
    int*  l_ridx;
    Real* l_rval;
    int*  l_rbeg;
-   int   *rorig, *rrorig;
-   int   *rperm, *rrperm;
+   int*  rorig;
+   int*  rrorig;
+   int*  rperm;
+   int*  rrperm;
 
-   l_dim = thedim;
    vecs  = l.firstUpdate;
    l_row = l.row;
    idx   = l.idx;
@@ -1475,9 +1467,9 @@ void CLUFactor::setupRowVals()
    }
    spx_alloc(l.rval, mem);
    spx_alloc(l.ridx, mem);
-   spx_alloc(l.rbeg, l_dim + 1);
-   spx_alloc(l.rorig, l_dim);
-   spx_alloc(l.rperm, l_dim);
+   spx_alloc(l.rbeg, thedim + 1);
+   spx_alloc(l.rorig, thedim);
+   spx_alloc(l.rperm, thedim);
 
    l_ridx = l.ridx;
    l_rval = l.rval;
@@ -1487,7 +1479,7 @@ void CLUFactor::setupRowVals()
    rperm  = l.rperm;
    rrperm = row.perm;
 
-   for (i = l_dim; i--; *l_rbeg++ = 0)
+   for (i = thedim; i--; *l_rbeg++ = 0)
    {
       *rorig++ = *rrorig++;
       *rperm++ = *rrperm++;
@@ -1499,7 +1491,7 @@ void CLUFactor::setupRowVals()
       l_rbeg[*idx++]++;
    idx = l.idx;
 
-   for (m = 0, i = l_dim; i--; l_rbeg++)
+   for (m = 0, i = thedim; i--; l_rbeg++)
    {
       j = *l_rbeg;
       *l_rbeg = m;
@@ -1520,7 +1512,7 @@ void CLUFactor::setupRowVals()
          l_rval[k] = *val++;
       }
    }
-   assert(l.rbeg[l_dim] == mem);
+   assert(l.rbeg[thedim] == mem);
    assert(l.rbeg[0] == 0);
 }
 #endif

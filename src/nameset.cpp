@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.cpp,v 1.23 2002/04/03 11:22:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.cpp,v 1.24 2002/11/25 16:51:59 bzfkocht Exp $"
 
 #include <string.h>
 #include "spxdefines.h"
@@ -182,7 +182,7 @@ void NameSet::memPack()
 }
 
 /// returns the hash value of the name.
-int NameSetNameHashFunction(const NameSet::Name* str)
+static int NameSetNameHashFunction(const NameSet::Name* str)
 {
    unsigned int res = 0;
    const char* sptr = str->name;

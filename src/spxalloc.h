@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxalloc.h,v 1.9 2002/03/11 17:43:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxalloc.h,v 1.10 2002/11/25 16:51:59 bzfkocht Exp $"
 
 /**@file  spxalloc.h
  * @brief Memory allocation routines.
@@ -67,7 +67,6 @@ inline void spx_alloc(T& p, int n)
 template <class T>
 inline void spx_realloc(T& p, int n)
 {
-   assert(p != 0);
    assert(n >= 0);
 
    p = reinterpret_cast<T>(realloc(p, sizeof(*p) * n));

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.32 2002/11/01 08:19:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.33 2002/11/25 16:51:59 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -190,13 +190,13 @@ void SPxBasis::setRep()
 
    if (theLP->rep() == SoPlex::ROW)
    {
-      thedesc.stat = & thedesc.rowstat;
-      thedesc.costat = & thedesc.colstat;
+      thedesc.stat   = &thedesc.rowstat;
+      thedesc.costat = &thedesc.colstat;
    }
    else
    {
-      thedesc.stat = & thedesc.colstat;
-      thedesc.costat = & thedesc.rowstat;
+      thedesc.stat   = &thedesc.colstat;
+      thedesc.costat = &thedesc.rowstat;
    }
 }
 
@@ -613,10 +613,8 @@ bool SPxBasis::isConsistent() const
       if (primals != thedesc.nCols())
          return MSGinconsistent("SPxBasis");
    }
-   return thedesc.isConsistent()
-          && theBaseId.isConsistent()
-          && matrix.isConsistent()
-          && factor->isConsistent();
+   return thedesc.isConsistent() && theBaseId.isConsistent() 
+      && matrix.isConsistent() && factor->isConsistent();
 }
 
 SPxBasis::SPxBasis()
@@ -631,6 +629,62 @@ SPxBasis::SPxBasis()
 {
    METHOD( "SPxBasis::SPxBasis()" );
 }
+
+/**@warning Do not change the #LP or the #SLinSolver object.
+ *  Only pointers to those objects are copied.
+ */
+SPxBasis::SPxBasis(const SPxBasis& old)
+   : theLP(old.theLP)
+   , theBaseId(old.theBaseId)
+   , matrix(old.matrix)
+   , matrixIsSetup(old.matrixIsSetup)
+   , factor(old.factor)
+   , factorized(old.factorized)
+   , maxUpdates(old.maxUpdates)
+   , nonzeroFactor(old.nonzeroFactor)
+   , iterCount(old.iterCount)
+   , nzCount(old.nzCount)
+   , nzFac(old.nzFac)
+   , lastFill(old.lastFill)
+   , lastin(old.lastin)
+   , lastout(old.lastout)
+   , lastidx(old.lastidx)
+   , thestatus(old.thestatus)
+   , thedesc(old.thedesc)
+{
+   METHOD( "SPxBasis::SPxBasis()" );
+}
+
+/**@warning Do not change the #LP or the #SLinSolver object.
+ *  Only pointers to those objects are copied.
+ */
+SPxBasis& SPxBasis::operator=(const SPxBasis& rhs)
+{
+   METHOD( "SPxBasis::operator=()" );
+
+   if (this != &rhs)
+   {
+      theLP         = rhs.theLP;
+      theBaseId     = rhs.theBaseId;
+      matrix        = rhs.matrix;
+      matrixIsSetup = rhs.matrixIsSetup;
+      factor        = rhs.factor;
+      factorized    = rhs.factorized;
+      maxUpdates    = rhs.maxUpdates;
+      nonzeroFactor = rhs.nonzeroFactor;
+      iterCount     = rhs.iterCount;
+      nzCount       = rhs.nzCount;
+      nzFac         = rhs.nzFac;
+      lastFill      = rhs.lastFill;
+      lastin        = rhs.lastin;
+      lastout       = rhs.lastout;
+      lastidx       = rhs.lastidx;
+      thestatus     = rhs.thestatus;
+      thedesc       = rhs.thedesc;
+   }
+   return *this;
+}
+
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

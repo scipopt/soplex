@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.29 2002/10/23 10:40:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.30 2002/11/25 16:51:59 bzfkocht Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -218,8 +218,8 @@ void SLUFactor::changeEta(int idx, SSVector& et)
 }
 
 SLUFactor::Status SLUFactor::change(
-   int            idx,
-   const SVector& subst,
+   int             idx,
+   const SVector&  subst,
    const SSVector* e)
 {
    METHOD( "SLUFactor::Status()" );
@@ -311,185 +311,220 @@ void SLUFactor::clear()
       spx_free(l.start);
       spx_free(l.row);
    }
-
    spx_alloc(u.row.val, u.row.size);
    spx_alloc(u.row.idx, u.row.size);
    spx_alloc(u.col.idx, u.col.size);
-   spx_alloc(l.val, l.size);
-   spx_alloc(l.idx, l.size);
+
+   spx_alloc(l.val,   l.size);
+   spx_alloc(l.idx,   l.size);
    spx_alloc(l.start, l.startSize);
-   spx_alloc(l.row, l.startSize);
+   spx_alloc(l.row,   l.startSize);
 }
 
-/* Since I am not sure, this really works and because I see at the 
- * moment no use in copying SLUFactor objects, the assignment operator and
- * copy constructor are deoperationable.
+/** assignment used to implement operator=() and copy constructor.
+ *  If this is initialised, freeAll() has to be called before.
+ *  Class objects from SLUFactor are not copied here.
  */
-#if 0
 void SLUFactor::assign(const SLUFactor& old)
 {
-   METHOD( "SLUFactor::assign()" );
-   thedim = old.thedim;
-   rowMemMult = old.rowMemMult;
-   colMemMult = old.colMemMult;
-   lMemMult = old.lMemMult;
-   stat = old.stat;
-   epsilon = old.epsilon;
-   minThreshold = old.minThreshold;
-   minStability = old.minStability;
-   maxabs = old.maxabs;
-   initMaxabs = old.initMaxabs;
+   METHOD( "SLUFactor::operator=()" );
+
+   // slufactor
+   uptype        = old.uptype;
+   minThreshold  = old.minThreshold;
+   minStability  = old.minStability;
+   epsilon       = old.epsilon;
+   lastThreshold = old.lastThreshold;
+
+   // clufactor
+   stat          = old.stat;
+   thedim        = old.thedim;
+   nzCnt         = old.nzCnt;
+   initMaxabs    = old.initMaxabs;
+   maxabs        = old.maxabs;
+   rowMemMult    = old.rowMemMult;
+   colMemMult    = old.colMemMult;
+   lMemMult      = old.lMemMult;
 
    spx_alloc(row.perm, thedim);
    spx_alloc(row.orig, thedim);
    spx_alloc(col.perm, thedim);
    spx_alloc(col.orig, thedim);
-   spx_alloc(diag, thedim);
+   spx_alloc(diag,     thedim);
 
-   memcpy(row.perm, old.row.perm, thedim * sizeof(int));
-   memcpy(row.orig, old.row.orig, thedim * sizeof(int));
-   memcpy(col.perm, old.col.perm, thedim * sizeof(int));
-   memcpy(col.orig, old.col.orig, thedim * sizeof(int));
-   memcpy(diag, old.diag, thedim * sizeof(Real));
+   memcpy(row.perm, old.row.perm, thedim * sizeof(*row.perm));
+   memcpy(row.orig, old.row.orig, thedim * sizeof(*row.orig));
+   memcpy(col.perm, old.col.perm, thedim * sizeof(*col.perm));
+   memcpy(col.orig, old.col.orig, thedim * sizeof(*col.orig));
+   memcpy(diag,     old.diag,     thedim * sizeof(*diag));
 
    work = vec.get_ptr();
 
+   /* setup U
+    */
    u.row.size = old.u.row.size;
    u.row.used = old.u.row.used;
-   spx_alloc(u.row.elem, thedim);
-   spx_alloc(u.row.val, u.row.size);
-   spx_alloc(u.row.idx, u.row.size);
-   spx_alloc(u.row.start, (thedim + 1));
-   spx_alloc(u.row.len, (thedim + 1));
-   spx_alloc(u.row.max, (thedim + 1));
 
-   memcpy(u.row.elem , old.u.row.elem, thedim * sizeof(Dring));
-   memcpy(u.row.val , old.u.row.val, u.row.size * sizeof(Real));
-   memcpy(u.row.idx , old.u.row.idx, u.row.size * sizeof(int));
-   memcpy(u.row.start , old.u.row.start, (thedim + 1) * sizeof(int));
-   memcpy(u.row.len , old.u.row.len, (thedim + 1) * sizeof(int));
-   memcpy(u.row.max , old.u.row.max, (thedim + 1) * sizeof(int));
+   spx_alloc(u.row.elem,  thedim);
+   spx_alloc(u.row.val,   u.row.size);
+   spx_alloc(u.row.idx,   u.row.size);
+   spx_alloc(u.row.start, thedim + 1);
+   spx_alloc(u.row.len,   thedim + 1);
+   spx_alloc(u.row.max,   thedim + 1);
 
-   if (thedim && stat == OK)
-   {           // make row list ok
-      u.row.list = old.u.row.list;
+   memcpy(u.row.elem,  old.u.row.elem,  thedim       * sizeof(*u.row.elem));
+   memcpy(u.row.val,   old.u.row.val,   u.row.size   * sizeof(*u.row.val));
+   memcpy(u.row.idx,   old.u.row.idx,   u.row.size   * sizeof(*u.row.idx));
+   memcpy(u.row.start, old.u.row.start, (thedim + 1) * sizeof(*u.row.start));
+   memcpy(u.row.len,   old.u.row.len,   (thedim + 1) * sizeof(*u.row.len));
+   memcpy(u.row.max,   old.u.row.max,   (thedim + 1) * sizeof(*u.row.max));
+
+   // need to make row list ok ?
+   if (thedim > 0 && stat == OK)
+   { 
+      u.row.list.idx = old.u.row.list.idx; // .idx neu
+
       const Dring* oring = &old.u.row.list;
-      Dring* ring = &u.row.list;
-      for (; oring->next != &old.u.row.list; 
-           oring = oring->next, ring = ring->next)
+      Dring*       ring  = &u.row.list;
+
+      while(oring->next != &old.u.row.list)
       {
-         ring->next = &(u.row.elem[oring->next->idx]);
+         ring->next       = &u.row.elem[oring->next->idx];
          ring->next->prev = ring;
+         oring            = oring->next;
+         ring             = ring->next;
       }
-      ring->next = &u.row.list;
+      ring->next       = &u.row.list;
       ring->next->prev = ring;
    }
 
    u.col.size = old.u.col.size;
    u.col.used = old.u.col.used;
-   spx_alloc(u.col.elem, thedim);
-   spx_alloc(u.col.idx, u.col.size);
-   spx_alloc(u.col.start, (thedim + 1));
-   spx_alloc(u.col.len, (thedim + 1));
-   spx_alloc(u.col.max, (thedim + 1));
+
+   spx_alloc(u.col.elem,  thedim);
+   spx_alloc(u.col.idx,   u.col.size);
+   spx_alloc(u.col.start, thedim + 1);
+   spx_alloc(u.col.len,   thedim + 1);
+   spx_alloc(u.col.max,   thedim + 1);
 
    if (old.u.col.val)
    {
       spx_alloc(u.col.val, u.col.size);
-      memcpy(u.col.val, old.u.col.val, u.col.size * sizeof(Real));
+      memcpy(u.col.val, old.u.col.val, u.col.size * sizeof(*u.col.val));
    }
    else
       u.col.val = 0;
 
-   memcpy(u.col.elem , old.u.col.elem , thedim * sizeof(Dring));
-   memcpy(u.col.idx , old.u.col.idx , u.col.size * sizeof(int));
-   memcpy(u.col.start , old.u.col.start , (thedim + 1) * sizeof(int));
-   memcpy(u.col.len , old.u.col.len , (thedim + 1) * sizeof(int));
-   memcpy(u.col.max , old.u.col.max , (thedim + 1) * sizeof(int));
+   memcpy(u.col.elem,  old.u.col.elem,  thedim       * sizeof(*u.col.elem));
+   memcpy(u.col.idx,   old.u.col.idx,   u.col.size   * sizeof(*u.col.idx));
+   memcpy(u.col.start, old.u.col.start, (thedim + 1) * sizeof(*u.col.start));
+   memcpy(u.col.len,   old.u.col.len,   (thedim + 1) * sizeof(*u.col.len));
+   memcpy(u.col.max,   old.u.col.max,   (thedim + 1) * sizeof(*u.col.max));
 
-   if (thedim && stat == OK)
-   {           // make col list ok
-      u.col.list = old.u.col.list;
+   // need to make col list ok
+   if (thedim > 0 && stat == OK)
+   {           
+      u.col.list.idx = old.u.col.list.idx; // .idx neu
+
       const Dring* oring = &old.u.col.list;
-      Dring* ring = &u.col.list;
-      for(; oring->next != &old.u.col.list;
-          oring = oring->next, ring = ring->next)
+      Dring*       ring  = &u.col.list;
+
+      while(oring->next != &old.u.col.list)
       {
-         ring->next = &(u.col.elem[oring->next->idx]);
+         ring->next       = &u.col.elem[oring->next->idx];
          ring->next->prev = ring;
+         oring            = oring->next;
+         ring             = ring->next;
       }
-      ring->next = &u.col.list;
+      ring->next       = &u.col.list;
       ring->next->prev = ring;
    }
 
-   nzCnt = old.nzCnt;
-   uptype = old.uptype;
-   l.size = old.l.size;
-   l.startSize = old.l.startSize;
+   /* Setup L 
+    */
+   l.size        = old.l.size;
+   l.startSize   = old.l.startSize;
    l.firstUpdate = old.l.firstUpdate;
    l.firstUnused = old.l.firstUnused;
-   l.updateType = old.l.updateType;
-   spx_alloc(l.val, l.size);
-   spx_alloc(l.idx, l.size);
-   spx_alloc(l.start, l.startSize);
-   spx_alloc(l.row, l.startSize);
+   l.updateType  = old.l.updateType;
 
-   if (old.l.rbeg)
+   spx_alloc(l.val,   l.size);
+   spx_alloc(l.idx,   l.size);
+   spx_alloc(l.start, l.startSize);
+   spx_alloc(l.row,   l.startSize);
+
+   memcpy(l.val,   old.l.val,   l.size      * sizeof(*l.val));
+   memcpy(l.idx,   old.l.idx,   l.size      * sizeof(*l.idx));
+   memcpy(l.start, old.l.start, l.startSize * sizeof(*l.start));
+   memcpy(l.row,   old.l.row,   l.startSize * sizeof(*l.row));
+
+   if (old.l.rval != 0)
    {
-      spx_alloc(l.rval, l.firstUpdate);
-      spx_alloc(l.ridx, l.firstUpdate);
-      spx_alloc(l.rbeg, (thedim + 1));
-      memcpy(l.rval, old.l.rval, l.firstUpdate * sizeof(Real));
-      memcpy(l.ridx, old.l.ridx, l.firstUpdate * sizeof(int));
-      memcpy(l.rbeg, old.l.rbeg, (thedim + 1) * sizeof(int));
+      assert(old.l.ridx != 0);
+      assert(old.l.rbeg != 0);
+
+      spx_alloc(l.rval,  l.firstUpdate);
+      spx_alloc(l.ridx,  l.firstUpdate);
+      spx_alloc(l.rbeg,  thedim + 1);
+      spx_alloc(l.rorig, thedim);
+      spx_alloc(l.rperm, thedim);
+
+      memcpy(l.rval,  old.l.rval,  l.firstUpdate * sizeof(*l.rval));
+      memcpy(l.ridx,  old.l.ridx,  l.firstUpdate * sizeof(*l.ridx));
+      memcpy(l.rbeg,  old.l.rbeg, (thedim + 1)   * sizeof(*l.rbeg));
+      memcpy(l.rorig, old.l.rorig, thedim        * sizeof(*l.rorig));
+      memcpy(l.rperm, old.l.rperm, thedim        * sizeof(*l.rperm));
    }
    else
    {
-      l.rval = 0;
-      l.ridx = 0;
-      l.rbeg = 0;
+      l.rval  = 0;
+      l.ridx  = 0;
+      l.rbeg  = 0;
+      l.rorig = 0;
+      l.rperm = 0;
    }
 
-   memcpy(l.val , old.l.val , l.size * sizeof(Real));
-   memcpy(l.idx , old.l.idx , l.size * sizeof(int));
-   memcpy(l.start , old.l.start , l.startSize * sizeof(int));
-   memcpy(l.row , old.l.row , l.startSize * sizeof(int));
+   assert(row.perm != 0);
+   assert(row.orig != 0);
+   assert(col.perm != 0);
+   assert(col.orig != 0);
+   assert(diag     != 0);
 
-   assert
-   (
-      row.perm != 0
-      && row.orig != 0
-      && col.perm != 0
-      && col.orig != 0
-      && diag != 0
-      && u.row.elem != 0
-      && u.row.val != 0
-      && u.row.idx != 0
-      && u.row.start != 0
-      && u.row.len != 0
-      && u.row.max != 0
-      && u.col.elem != 0
-      && u.col.idx != 0
-      && u.col.start != 0
-      && u.col.len != 0
-      && u.col.max != 0
-      && l.val != 0
-      && l.idx != 0
-      && l.start != 0
-      && l.row != 0
-  );
+   assert(u.row.elem  != 0);
+   assert(u.row.val   != 0);
+   assert(u.row.idx   != 0);
+   assert(u.row.start != 0);
+   assert(u.row.len   != 0);
+   assert(u.row.max   != 0);
+
+   assert(u.col.elem  != 0);
+   assert(u.col.idx   != 0);
+   assert(u.col.start != 0);
+   assert(u.col.len   != 0);
+   assert(u.col.max   != 0);
+
+   assert(l.val   != 0);
+   assert(l.idx   != 0);
+   assert(l.start != 0);
+   assert(l.row   != 0);
 }
 
 SLUFactor& SLUFactor::operator=(const SLUFactor& old)
 {
-   METHOD( "SLUFactor::operator()" );
-   freeAll();
-   vec = old.vec;
-   ssvec = old.ssvec;
-   assign(old);
+   METHOD( "SLUFactor::operator=()" );
+
+   if (this != &old)
+   {
+      vec    = old.vec;
+      ssvec  = old.ssvec;
+      eta    = old.eta;
+      forest = old.forest;
+
+      freeAll();
+      assign(old);
+   }
    return *this;
 }
-#endif // no assignment.
 
 SLUFactor::SLUFactor()
    : CLUFactor() 
@@ -529,7 +564,7 @@ SLUFactor::SLUFactor()
    l.rperm     = 0;
 #endif
 
-   nzCnt = 0;
+   nzCnt  = 0;
    thedim = 1;
 
    spx_alloc(row.perm, thedim);
@@ -543,73 +578,81 @@ SLUFactor::SLUFactor()
 
    u.row.size = 1;
    u.row.used = 0;
-   spx_alloc(u.row.elem, thedim);
-   spx_alloc(u.row.val, u.row.size);
-   spx_alloc(u.row.idx, u.row.size);
-   spx_alloc(u.row.start, (thedim + 1));
-   spx_alloc(u.row.len, (thedim + 1));
-   spx_alloc(u.row.max, (thedim + 1));
+   spx_alloc(u.row.elem,  thedim);
+   spx_alloc(u.row.val,   u.row.size);
+   spx_alloc(u.row.idx,   u.row.size);
+   spx_alloc(u.row.start, thedim + 1);
+   spx_alloc(u.row.len,   thedim + 1);
+   spx_alloc(u.row.max,   thedim + 1);
 
-   u.row.list.idx = thedim;
+   u.row.list.idx      = thedim;
    u.row.start[thedim] = 0;
-   u.row.max[thedim] = 0;
-   u.row.len[thedim] = 0;
+   u.row.max[thedim]   = 0;
+   u.row.len[thedim]   = 0;
 
    u.col.size = 1;
    u.col.used = 0;
-   spx_alloc(u.col.elem, thedim);
-   spx_alloc(u.col.idx, u.col.size);
-   spx_alloc(u.col.start, (thedim + 1));
-   spx_alloc(u.col.len, (thedim + 1));
-   spx_alloc(u.col.max, (thedim + 1));
+   spx_alloc(u.col.elem,  thedim);
+   spx_alloc(u.col.idx,   u.col.size);
+   spx_alloc(u.col.start, thedim + 1);
+   spx_alloc(u.col.len,   thedim + 1);
+   spx_alloc(u.col.max,   thedim + 1);
    u.col.val = 0;
 
-   u.col.list.idx = thedim;
+   u.col.list.idx      = thedim;
    u.col.start[thedim] = 0;
-   u.col.max[thedim] = 0;
-   u.col.len[thedim] = 0;
+   u.col.max[thedim]   = 0;
+   u.col.len[thedim]   = 0;
 
    l.size = 1;
+
    spx_alloc(l.val, l.size);
    spx_alloc(l.idx, l.size);
-   l.startSize = 1;
+
+   l.startSize   = 1;
    l.firstUpdate = 0;
    l.firstUnused = 0;
+
    spx_alloc(l.start, l.startSize);
-   spx_alloc(l.row, l.startSize);
-   l.rval = 0;
-   l.ridx = 0;
-   l.rbeg = 0;
+   spx_alloc(l.row,   l.startSize);
+
+   l.rval  = 0;
+   l.ridx  = 0;
+   l.rbeg  = 0;
+   l.rorig = 0;
+   l.rperm = 0;
+
    SLUFactor::clear(); // clear() is virtual
 
-   assert
-   (
-      row.perm != 0
-      && row.orig != 0
-      && col.perm != 0
-      && col.orig != 0
-      && diag != 0
-      && u.row.elem != 0
-      && u.row.val != 0
-      && u.row.idx != 0
-      && u.row.start != 0
-      && u.row.len != 0
-      && u.row.max != 0
-      && u.col.elem != 0
-      && u.col.idx != 0
-      && u.col.start != 0
-      && u.col.len != 0
-      && u.col.max != 0
-      && l.val != 0
-      && l.idx != 0
-      && l.start != 0
-      && l.row != 0
-  );
+   assert(row.perm != 0);
+   assert(row.orig != 0);
+   assert(col.perm != 0);
+   assert(col.orig != 0);
+   assert(diag     != 0);
+
+   assert(u.row.elem  != 0);
+   assert(u.row.val   != 0);
+   assert(u.row.idx   != 0);
+   assert(u.row.start != 0);
+   assert(u.row.len   != 0);
+   assert(u.row.max   != 0);
+
+   assert(u.col.elem  != 0);
+   assert(u.col.idx   != 0);
+   assert(u.col.start != 0);
+   assert(u.col.len   != 0);
+   assert(u.col.max   != 0);
+
+   assert(l.val   != 0);
+   assert(l.idx   != 0);
+   assert(l.start != 0);
+   assert(l.row   != 0);
 }
 
 void SLUFactor::freeAll()
 {
-   METHOD( "SLUFactor::clear()" );
+   METHOD( "SLUFactor::freeAll()" );
+
    spx_free(row.perm);
    spx_free(row.orig);
    spx_free(col.perm);
@@ -634,7 +677,7 @@ void SLUFactor::freeAll()
    if (u.col.val)
       spx_free(u.col.val);
 
-   if (l.rbeg)
+   if (l.rval)
    {
       spx_free(l.rval);
       spx_free(l.ridx);
@@ -664,15 +707,16 @@ static Real betterThreshold(Real th)
 SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
 {
    METHOD( "SLUFactor::Status()" );
-   assert(dm > 0);
+   assert(dm     > 0);
    assert(matrix != 0);
+
    Real lastStability = stability();
 
    initDR(u.row.list);
    initDR(u.col.list);
 
-   usetup = false;
-   l.updateType = uptype;
+   usetup        = false;
+   l.updateType  = uptype;
    l.firstUpdate = 0;
    l.firstUnused = 0;
 
@@ -691,55 +735,63 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
       spx_realloc(row.orig, thedim);
       spx_realloc(col.perm, thedim);
       spx_realloc(col.orig, thedim);
-      spx_realloc(diag, thedim);
+      spx_realloc(diag,     thedim);
 
-      spx_realloc(u.row.elem, thedim);
-      spx_realloc(u.row.len, (thedim + 1));
-      spx_realloc(u.row.max, (thedim + 1));
-      spx_realloc(u.row.start, (thedim + 1));
+      spx_realloc(u.row.elem,  thedim);
+      spx_realloc(u.row.len,   thedim + 1);
+      spx_realloc(u.row.max,   thedim + 1);
+      spx_realloc(u.row.start, thedim + 1);
 
-      spx_realloc(u.col.elem, thedim);
-      spx_realloc(u.col.len, (thedim + 1));
-      spx_realloc(u.col.max, (thedim + 1));
-      spx_realloc(u.col.start, (thedim + 1));
+      spx_realloc(u.col.elem,  thedim);
+      spx_realloc(u.col.len,   thedim + 1);
+      spx_realloc(u.col.max,   thedim + 1);
+      spx_realloc(u.col.start, thedim + 1);
 
       l.startSize = thedim + MAXUPDATES;
-      spx_realloc(l.row, l.startSize);
+
+      spx_realloc(l.row,   l.startSize);
       spx_realloc(l.start, l.startSize);
    }
    else if (lastStability > 2.0 * minStability)
    {
-      Real last = minThreshold;
+      Real last   = minThreshold;
       Real better = betterThreshold(last);
+
       while (better < lastThreshold)
       {
-         last = better;
+         last   = better;
          better = betterThreshold(last);
       }
-      minStability = 2 * MINSTABILITY;
+      minStability  = 2 * MINSTABILITY;
       lastThreshold = last;
    }
 
-   u.row.list.idx = thedim;
+   u.row.list.idx      = thedim;
    u.row.start[thedim] = 0;
-   u.row.max[thedim] = 0;
-   u.row.len[thedim] = 0;
+   u.row.max[thedim]   = 0;
+   u.row.len[thedim]   = 0;
 
-   u.col.list.idx = thedim;
+   u.col.list.idx      = thedim;
    u.col.start[thedim] = 0;
-   u.col.max[thedim] = 0;
-   u.col.len[thedim] = 0;
+   u.col.max[thedim]   = 0;
+   u.col.len[thedim]   = 0;
 
    for (;;)
    {
       stat = OK;
+
       factor(matrix, lastThreshold, epsilon);
+
       if (stability() >= minStability)
          break;
+
       Real x = lastThreshold;
+
       lastThreshold = betterThreshold(lastThreshold);
+
       if (x == lastThreshold)
          break;
+
       minStability /= 2.0;
    }
 

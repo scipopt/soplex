@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slinsolver.h,v 1.9 2002/10/23 10:40:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slinsolver.h,v 1.10 2002/11/25 16:51:59 bzfkocht Exp $"
 
 /**@file  slinsolver.h
  * @brief Sparse Linear Solver virtual base class.
@@ -93,8 +93,7 @@ public:
        optional parameter \p eta to the solution of #solveRight(subst) if
        readily  availabble. This may improve on the performance of the update.
    */
-   virtual Status change(int idx, const SVector& subst,
-      const SSVector* eta = 0) = 0;
+   virtual Status change(int idx, const SVector& subst, const SSVector* eta = 0) = 0;
 
    /// consistency check.
    virtual bool isConsistent() const = 0;
