@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.37 2002/02/07 17:39:47 bzfpfend Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.38 2002/02/27 20:03:30 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -265,6 +265,7 @@ protected:
    UpdateVector*  theCPvec;    /// column pricing vector
 
    // The following vectors serve for the virtualization of shift bounds
+   //@todo In prinziple this schould be refernces.
    DVector*       theUbound;      ///< Upper bound for vars
    DVector*       theLbound;      ///< Lower bound for vars
    DVector*       theCoUbound;    ///< Upper bound for covars

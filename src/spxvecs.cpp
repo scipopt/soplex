@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvecs.cpp,v 1.12 2002/02/01 11:22:37 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxvecs.cpp,v 1.13 2002/02/27 20:03:30 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -37,7 +37,7 @@ namespace soplex
  
     In rowwise case, |theFvec| = $\pi^T_B = (c^T - 0^T A_N) A_B^{-1}$. However,
     this applies only to leaving type algorithm, where no bounds on dual
-    variables are altered. In entering type algorith they are changed and,
+    variables are altered. In entering type algorithm they are changed and,
     hence, retreived from the column or row upper or lower bound vectors.
  */
 void SoPlex::computeFrhs()
@@ -94,6 +94,7 @@ void SoPlex::computeFrhs()
    else
    {
       assert(rep() == ROW);
+
       if (type() == ENTER)
       {
          theFrhs->clear();
@@ -215,7 +216,7 @@ void SoPlex::computeFrhs2(
    int i;
    const SPxBasis::Desc& ds = desc();
 
-   for (i = dim() - 1; i >= 0; --i)
+   for(i = 0; i < dim(); i++)
    {
       SPxBasis::Desc::Status stat = ds.coStatus(i);
       if (!isBasic(stat))
@@ -235,9 +236,16 @@ void SoPlex::computeFrhs2(
          case SPxBasis::Desc::D_ON_LOWER :
             x = colfb[i];
             break;
-         case (SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER) :
-         case (SPxBasis::Desc::D_ON_UPPER + SPxBasis::Desc::D_ON_LOWER) :
-            assert(colfb[i] == coufb[i]);
+         case SPxBasis::Desc::P_FIXED :
+         case SPxBasis::Desc::D_ON_BOTH :
+
+            if (colfb[i] != coufb[i])
+            {
+               std::cerr << "Frhs2: " << stat << " " 
+                        << colfb[i] << " " << coufb[i] << 
+                        << " shouln't be" << std::endl;
+            }
+            //assert(colfb[i] == coufb[i]);
             x = colfb[i];
             break;
 
