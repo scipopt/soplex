@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.68 2003/01/22 14:50:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.69 2003/03/04 10:49:04 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -29,7 +29,7 @@
 namespace soplex
 {
 
-bool SPxSolver::precisionReached() const
+bool SPxSolver::precisionReached(Real& newDelta) const
 {
    Real maxViolRedCost;
    Real sumViolRedCost;
@@ -47,7 +47,19 @@ bool SPxSolver::precisionReached() const
 
    if (!reached)
    {
+      /* get the biggest violation less than delta
+       */
+      if (maxViolRedCost < delta())
+         newDelta = maxViolRedCost;
+      if (maxViolBounds < delta() && maxViolBounds > newDelta)
+         newDelta = maxViolBounds;
+      if (maxViolConst < delta() && maxViolConst > newDelta)
+         newDelta = maxViolConst;
+
+      newDelta /= 2.0;
+
       VERBOSE3({ std::cout << "Precision not reached: Pricer delta= " << thepricer->epsilon() 
+                           << " new delta= " << newDelta
                            << std::endl
                            << " maxViolRedCost= " << maxViolRedCost
                            << " maxViolBounds= " << maxViolBounds
@@ -75,6 +87,7 @@ SPxSolver::Status SPxSolver::solve()
    int   leaveNum;
    Real  minDelta;
    Real  maxDelta;
+   Real  newDelta;
 
    if (dim() <= 0 && coDim() <= 0) // no problem loaded
       return NO_PROBLEM;
@@ -166,11 +179,14 @@ SPxSolver::Status SPxSolver::solve()
                {
                   // is the solution good enough ?
                   // max three times reduced
-                  if ((thepricer->epsilon() > minDelta) && !precisionReached())
+                  if ((thepricer->epsilon() > minDelta) && !precisionReached(newDelta))
                   {  // no!
                      // we reduce delta(). Note that if the pricer does not find a candiate
                      // with the reduced delta, we quit, regardless of the violations.
-                     thepricer->setEpsilon(thepricer->epsilon() * 0.1);
+                     if (newDelta < minDelta)
+                        newDelta = minDelta;
+
+                     thepricer->setEpsilon(newDelta);
 
                      VERBOSE2({ std::cout << "Setting delta= " << thepricer->epsilon() 
                                           << std::endl; });
@@ -266,11 +282,14 @@ SPxSolver::Status SPxSolver::solve()
                {
                   // is the solution good enough ?
                   // max three times reduced
-                  if ((delta() > minDelta) && !precisionReached())
+                  if ((delta() > minDelta) && !precisionReached(newDelta))
                   {  // no
                      // we reduce delta(). Note that if the pricer does not find a candiate
                      // with the reduced delta, we quit, regardless of the violations.
-                     thepricer->setEpsilon(thepricer->epsilon() * 0.1);
+                     if (newDelta < minDelta)
+                        newDelta = minDelta;
+
+                     thepricer->setEpsilon(newDelta);
 
                      VERBOSE2({ std::cout << "Setting delta= " << thepricer->epsilon() 
                                           << std::endl; });

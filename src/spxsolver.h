@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.10 2003/01/22 14:50:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.11 2003/03/04 10:49:05 bzfkocht Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -269,7 +269,7 @@ protected:
    SPxStarter*     thestarter;
 
    /// is the solution precise enough, or should we increase delta() ? 
-   virtual bool precisionReached() const;
+   virtual bool precisionReached(Real& newDelta) const;
 
 public:
    /// return the version of SPxSolver as number like 123 for 1.2.3
