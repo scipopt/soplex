@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprow.h,v 1.7 2002/01/19 18:59:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprow.h,v 1.8 2002/01/29 15:38:47 bzfkocht Exp $"
 
 /**@file  lprow.h
  * @brief (In)equality for LPs.
@@ -64,9 +64,6 @@ private:
    DSVector vec;
 
 public:
-   /// values >= infinity are treated as \f$\infty\f$.
-   static Real infinity;
-
    /// (In)Equality of an LP row.
    /** LPRow%s may be of one of the above Types. This datatype may be
     *  used for constructing new LPRow%s in the regular form.

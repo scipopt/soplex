@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: changesoplex.cpp,v 1.10 2002/01/19 18:59:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: changesoplex.cpp,v 1.11 2002/01/29 15:38:47 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -599,8 +599,8 @@ static void changeLowerStatus
    switch (stat)
    {
    case SPxBasis::Desc::P_ON_LOWER:
-      if (newLower <= -SPxLP::infinity)
-         stat = (upper >= SPxLP::infinity)
+      if (newLower <= -infinity)
+         stat = (upper >= infinity)
                 ? SPxBasis::Desc::P_FREE
              : SPxBasis::Desc::P_ON_UPPER;
       else if (newLower == upper)
@@ -611,7 +611,7 @@ static void changeLowerStatus
          stat = SPxBasis::Desc::P_FIXED;
       break;
    case SPxBasis::Desc::P_FREE:
-      if (newLower > -SPxLP::infinity)
+      if (newLower > -infinity)
          stat = SPxBasis::Desc::P_ON_LOWER;
       break;
    case SPxBasis::Desc::P_FIXED:
@@ -669,15 +669,15 @@ static void changeUpperStatus
          stat = SPxBasis::Desc::P_FIXED;
       break;
    case SPxBasis::Desc::P_ON_UPPER:
-      if (newUpper >= SPxLP::infinity)
-         stat = (lower <= -SPxLP::infinity)
+      if (newUpper >= infinity)
+         stat = (lower <= -infinity)
             ? SPxBasis::Desc::P_FREE
             : SPxBasis::Desc::P_ON_LOWER;
       else if (newUpper == lower)
          stat = SPxBasis::Desc::P_FIXED;
       break;
    case SPxBasis::Desc::P_FREE:
-      if (newUpper < SPxLP::infinity)
+      if (newUpper < infinity)
          stat = SPxBasis::Desc::P_ON_UPPER;
       break;
    case SPxBasis::Desc::P_FIXED:
@@ -762,8 +762,8 @@ static void changeLhsStatus
    switch (stat)
    {
    case SPxBasis::Desc::P_ON_LOWER:
-      if (newLhs <= -SPxLP::infinity)
-         stat = (rhs >= SPxLP::infinity)
+      if (newLhs <= -infinity)
+         stat = (rhs >= infinity)
                 ? SPxBasis::Desc::P_FREE
              : SPxBasis::Desc::P_ON_UPPER;
       else if (newLhs == rhs)
@@ -774,7 +774,7 @@ static void changeLhsStatus
          stat = SPxBasis::Desc::P_FIXED;
       break;
    case SPxBasis::Desc::P_FREE:
-      if (newLhs > -SPxLP::infinity)
+      if (newLhs > -infinity)
          stat = SPxBasis::Desc::P_ON_LOWER;
       break;
    case SPxBasis::Desc::P_FIXED:
@@ -826,8 +826,8 @@ static void changeRhsStatus
    switch (stat)
    {
    case SPxBasis::Desc::P_ON_UPPER:
-      if (newRhs >= SPxLP::infinity)
-         stat = (lhs <= -SPxLP::infinity)
+      if (newRhs >= infinity)
+         stat = (lhs <= -infinity)
                 ? SPxBasis::Desc::P_FREE
              : SPxBasis::Desc::P_ON_LOWER;
       else if (newRhs == lhs)
@@ -838,7 +838,7 @@ static void changeRhsStatus
          stat = SPxBasis::Desc::P_FIXED;
       break;
    case SPxBasis::Desc::P_FREE:
-      if (newRhs < SPxLP::infinity)
+      if (newRhs < infinity)
          stat = SPxBasis::Desc::P_ON_UPPER;
       break;
    case SPxBasis::Desc::P_FIXED:

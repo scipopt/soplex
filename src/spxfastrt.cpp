@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.14 2002/01/19 18:59:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.15 2002/01/29 15:38:48 bzfkocht Exp $"
 
 #include <assert.h>
 #include <stdio.h>
@@ -100,7 +100,7 @@ int SPxFastRT::maxDelta(
    Real l_delta = this->delta;
    // Real           delta01 = 0.5*l_delta;
    Real delta01 = 0;
-   Real inf = SPxLP::infinity;
+   Real inf = infinity;
    Real mabs = p_abs;
 
    Real* up = upBound.get_ptr();
@@ -233,7 +233,7 @@ int SPxFastRT::minDelta(
    Real l_delta = this->delta;
    // Real           delta01 = 0.5*l_delta;
    Real delta01 = 0;
-   Real inf = SPxLP::infinity;
+   Real inf = infinity;
    Real mabs = p_abs;
 
    Real* up = upBound.get_ptr();
@@ -557,7 +557,7 @@ int SPxFastRT::maxSelect(
    Real& bestDelta,
    Real max)
 {
-   Real best = -SPxLP::infinity;
+   Real best = -infinity;
    bestDelta = 0;
    return maxSelect(val, stab, best, bestDelta, max,
       thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(),  0, 1);
@@ -572,7 +572,7 @@ SoPlex::Id SPxFastRT::maxSelect(
 )
 {
    int indp, indc;
-   Real best = -SPxLP::infinity;
+   Real best = -infinity;
    bestDelta = 0;
    indc = maxSelect(val, stab, best, bestDelta, max,
       thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
@@ -599,7 +599,7 @@ int SPxFastRT::minSelect(
    Real& bestDelta,
    Real max)
 {
-   Real best = SPxLP::infinity;
+   Real best = infinity;
    bestDelta = 0;
    return minSelect(val, stab, best, bestDelta, max,
       thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(), 0, 1);
@@ -612,7 +612,7 @@ SoPlex::Id SPxFastRT::minSelect(
    Real& bestDelta,
    Real max)
 {
-   Real best = SPxLP::infinity;
+   Real best = infinity;
    bestDelta = 0;
    int indc = minSelect(val, stab, best, bestDelta, max,
       thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);

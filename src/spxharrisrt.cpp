@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.11 2002/01/19 18:59:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.12 2002/01/29 15:38:48 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -37,8 +37,7 @@ int SPxHarrisRT::maxDelta(
    const Real* low,             /* lower bounds for vec */
    const Real* up,              /* upper bounds for vec */
    Real delta,           /* allowed bound violation */
-   Real epsilon,         /* what is 0? */
-   Real infinity)        /* what is $\infty$? */
+   Real epsilon)         /* what is 0? */
 {
    Real x;
    Real theval;
@@ -90,8 +89,7 @@ int SPxHarrisRT::minDelta(
    const Real* low,             /* lower bounds for vec */
    const Real* up,              /* upper bounds for vec */
    Real delta,           /* allowed bound violation */
-   Real epsilon,         /* what is 0? */
-   Real infinity)       /* what is $\infty$? */
+   Real epsilon)         /* what is 0? */
 {
    Real x;
    Real theval;
@@ -152,7 +150,6 @@ int SPxHarrisRT::selectLeave(Real& val)
    int leave = -1;
    Real maxabs = 1;
 
-   Real infinity = solver()->SPxLP::infinity;
    Real epsilon = solver()->epsilon();
    Real delta = solver()->delta();
 
@@ -191,8 +188,7 @@ int SPxHarrisRT::selectLeave(Real& val)
          low.get_const_ptr(),                 /* lower bounds for vec */
          up.get_const_ptr(),                  /* upper bounds for vec */
          delta,               /* allowed bound violation */
-         epsilon,             /* what is 0? */
-         infinity);           /* what is $\infty$? */
+         epsilon);             /* what is 0? */
 
       if (max == val)
          return -1;
@@ -262,12 +258,10 @@ int SPxHarrisRT::selectLeave(Real& val)
          low.get_const_ptr(),                 /* lower bounds for vec */
          up.get_const_ptr(),                  /* upper bounds for vec */
          delta,               /* allowed bound violation */
-         epsilon,             /* what is 0? */
-         infinity);            /* what is $\infty$? */
+         epsilon);             /* what is 0? */
     
       if (max == val)
          return -1;
-
 
       // phase 2:
       stab = 0;
@@ -347,7 +341,6 @@ SoPlex::Id SPxHarrisRT::selectEnter(Real& val)
    int pnr, cnr;
 
    Real minStability = 0.0001;
-   Real infinity = solver()->SPxLP::infinity;
    Real epsilon = solver()->epsilon();
    Real delta = solver()->delta();
    Real degeneps = delta * (1 - solver()->numCycle() / solver()->maxCycle());
@@ -382,8 +375,7 @@ SoPlex::Id SPxHarrisRT::selectEnter(Real& val)
          assert(delta > epsilon);
 
          // phase 1:
-         maxDelta
-         (
+         maxDelta(
             &rmaxabs,            /* max abs value in upd */
             &max,                /* initial and chosen value */
             pupd.size(),         /* # of indices in pupd */
@@ -393,12 +385,9 @@ SoPlex::Id SPxHarrisRT::selectEnter(Real& val)
             lpb.get_const_ptr(),                 /* lower bounds for vec */
             upb.get_const_ptr(),                 /* upper bounds for vec */
             delta,               /* allowed bound violation */
-            epsilon,             /* what is 0? */
-            infinity            /* what is $\infty$? */
-        );
-
-         maxDelta
-         (
+            epsilon);             /* what is 0? */
+            
+         maxDelta(
             &cmaxabs,            /* max abs value in upd */
             &max,                /* initial and chosen value */
             cupd.size(),         /* # of indices in cupd */
@@ -408,9 +397,7 @@ SoPlex::Id SPxHarrisRT::selectEnter(Real& val)
             lcb.get_const_ptr(),                 /* lower bounds for vec */
             ucb.get_const_ptr(),                 /* upper bounds for vec */
             delta,               /* allowed bound violation */
-            epsilon,             /* what is 0? */
-            infinity            /* what is $\infty$? */
-        );
+            epsilon);            /* what is 0? */
 
          if (max == val)
             return enterId;
@@ -597,9 +584,7 @@ SoPlex::Id SPxHarrisRT::selectEnter(Real& val)
             lpb.get_const_ptr(),                 /* lower bounds for vec */
             upb.get_const_ptr(),                 /* upper bounds for vec */
             delta,               /* allowed bound violation */
-            epsilon,             /* what is 0? */
-            infinity            /* what is $\infty$? */
-        );
+            epsilon);             /* what is 0? */
 
          minDelta
          (
@@ -612,9 +597,7 @@ SoPlex::Id SPxHarrisRT::selectEnter(Real& val)
             lcb.get_const_ptr(),                 /* lower bounds for vec */
             ucb.get_const_ptr(),                 /* upper bounds for vec */
             delta,               /* allowed bound violation */
-            epsilon,             /* what is 0? */
-            infinity            /* what is $\infty$? */
-        );
+            epsilon);             /* what is 0? */
 
          if (max == val)
             return enterId;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.cpp,v 1.13 2002/01/23 12:58:50 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxlp.cpp,v 1.14 2002/01/29 15:38:49 bzfkocht Exp $"
 
 #include <stdio.h>
 
@@ -23,8 +23,6 @@
 
 namespace soplex
 {
-const Real SPxLP::infinity = 1e+100;
-
 void SPxLP::getRow(int i, LPRow& row) const
 {
    row.setLhs(lhs(i));

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.40 2002/01/29 14:49:25 bzfpfend Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.41 2002/01/29 15:38:48 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -722,7 +722,7 @@ Real SoPlex::value() const
 {
    Real x;
 
-   /**@todo patch suggests returning SPxLP::infinity instead of initializing 
+   /**@todo patch suggests returning infinity instead of initializing 
     */
    if (!isInitialized())      
       (const_cast<SoPlex*>(this))->init();
@@ -1009,8 +1009,15 @@ int SoPlex::terminationIter() const
    return maxIters;
 }
 
+/**@todo Terminationvalue should be implemented. The Problem is that
+ *       with allowing bound violations (shifting) it is quite 
+ *       difficult to determine if we allready reached the limit.
+ *       The idea would be to look at the shift() and maxInfeas() 
+ *       and only stop if they are  small enough.
+ */
 void SoPlex::setTerminationValue(Real p_value)
 {
+   //std::cerr << "setTerminationValue not yet implemented" << std::endl;
    maxValue = p_value;
 }
 
@@ -1019,24 +1026,6 @@ Real SoPlex::terminationValue() const
    return maxValue;
 }
    
-void SoPlex::setTermination(Real p_time, int p_iteration, Real p_value)
-{
-   setTerminationTime( p_time );
-   setTerminationIter( p_iteration );
-   setTerminationValue( p_value );
-}
-
-void SoPlex::getTermination(Real* p_time, int* p_iteration, Real* p_value)
-const
-{
-   if (p_time != 0)
-      *p_time = terminationTime();
-   if (p_iteration != 0)
-      *p_iteration = terminationIter();
-   if (p_value != 0)
-      *p_value = terminationValue();
-}
-
 SoPlex::VarStatus
 SoPlex::basisStatusToVarStatus( SPxBasis::Desc::Status stat ) const
 {
@@ -1082,15 +1071,15 @@ SoPlex::varStatusToBasisStatusRow( int row, SoPlex::VarStatus stat ) const
       rstat = SPxBasis::Desc::P_FIXED;
       break;
    case ON_UPPER :
-      assert(rhs(row) < SPxLP::infinity);
+      assert(rhs(row) < infinity);
       rstat = SPxBasis::Desc::P_ON_UPPER;
       break;
    case ON_LOWER :
-      assert(lhs(row) > -SPxLP::infinity);
+      assert(lhs(row) > -infinity);
       rstat = SPxBasis::Desc::P_ON_LOWER;
       break;
    case ZERO :
-      assert(lhs(row) <= -SPxLP::infinity && rhs(row) >= SPxLP::infinity);
+      assert(lhs(row) <= -infinity && rhs(row) >= infinity);
       rstat = SPxBasis::Desc::P_FREE;
       break;
    case BASIC :
@@ -1116,15 +1105,15 @@ SoPlex::varStatusToBasisStatusCol( int col, SoPlex::VarStatus stat ) const
       cstat = SPxBasis::Desc::P_FIXED;
       break;
    case ON_UPPER :
-      assert(upper(col) < SPxLP::infinity);
+      assert(upper(col) < infinity);
       cstat = SPxBasis::Desc::P_ON_UPPER;
       break;
    case ON_LOWER :
-      assert(lower(col) > -SPxLP::infinity);
+      assert(lower(col) > -infinity);
       cstat = SPxBasis::Desc::P_ON_LOWER;
       break;
    case ZERO :
-      assert(lower(col) <= -SPxLP::infinity && upper(col) >= SPxLP::infinity);
+      assert(lower(col) <= -infinity && upper(col) >= infinity);
       cstat = SPxBasis::Desc::P_FREE;
       break;
    case BASIC :

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.9 2002/01/19 18:59:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.10 2002/01/29 15:38:48 bzfkocht Exp $"
 
 #include <iostream>
 
@@ -71,23 +71,23 @@ int SPxAggregateSM::eliminate(const SVector& row, Real b)
 
       if (y / x > 0)
       {
-         if (lp->lower(k) <= -lp->infinity)
-            up = lp->infinity;
+         if (lp->lower(k) <= -infinity)
+            up = infinity;
          else
             up = b / x - y / x * lp->lower(k);
-         if (lp->upper(k) >= lp->infinity)
-            lo = -lp->infinity;
+         if (lp->upper(k) >= infinity)
+            lo = -infinity;
          else
             lo = b / x - y / x * lp->upper(k);
       }
       else
       {
-         if (lp->upper(k) <= -lp->infinity)
-            up = lp->infinity;
+         if (lp->upper(k) <= -infinity)
+            up = infinity;
          else
             up = b / x - y / x * lp->upper(k);
-         if (lp->lower(k) >= lp->infinity)
-            lo = -lp->infinity;
+         if (lp->lower(k) >= infinity)
+            lo = -infinity;
          else
             lo = b / x - y / x * lp->lower(k);
       }
@@ -113,11 +113,11 @@ int SPxAggregateSM::eliminate(const SVector& row, Real b)
          {
             if (x > maxabs)
                maxabs = x;
-            if (lp->upper(k) >= lp->infinity)
+            if (lp->upper(k) >= infinity)
                upcnt++;
             else
                up += lp->upper(k) * x;
-            if (lp->lower(k) <= -lp->infinity)
+            if (lp->lower(k) <= -infinity)
                locnt++;
             else
                lo += lp->lower(k) * x;
@@ -126,11 +126,11 @@ int SPxAggregateSM::eliminate(const SVector& row, Real b)
          {
             if (-x > maxabs)
                maxabs = -x;
-            if (lp->upper(k) >= lp->infinity)
+            if (lp->upper(k) >= infinity)
                locnt++;
             else
                lo += lp->upper(k) * x;
-            if (lp->lower(k) <= -lp->infinity)
+            if (lp->lower(k) <= -infinity)
                upcnt++;
             else
                up += lp->lower(k) * x;
@@ -145,8 +145,8 @@ int SPxAggregateSM::eliminate(const SVector& row, Real b)
          if (x > maxabs || -x > maxabs)
          {
             k = row.index(j);
-            okLow = (lp->lower(k) <= -lp->infinity);
-            okUp = (lp->upper(k) >= lp->infinity);
+            okLow = (lp->lower(k) <= -infinity);
+            okUp = (lp->upper(k) >= infinity);
 
             if (!okLow)
             {
@@ -179,7 +179,7 @@ int SPxAggregateSM::eliminate(const SVector& row, Real b)
                   if (locnt == 0)
                      y = (b - lo) / x + lp->lower(k);
                   else if (locnt == 1
-                            && lp->lower(k) <= -lp->infinity)
+                            && lp->lower(k) <= -infinity)
                      y = (b - lo) / x;
                   else
                      continue;
@@ -190,7 +190,7 @@ int SPxAggregateSM::eliminate(const SVector& row, Real b)
                   if (upcnt == 0)
                      y = (b - up) / x + lp->lower(k);
                   else if (upcnt == 1
-                            && lp->lower(k) <= -lp->infinity)
+                            && lp->lower(k) <= -infinity)
                      y = (b - up) / x;
                   else
                      continue;

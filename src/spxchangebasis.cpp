@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.6 2002/01/19 18:59:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.7 2002/01/29 15:38:48 bzfkocht Exp $"
 
 #include <iostream>
 #include <math.h>
@@ -168,9 +168,9 @@ primalColStatus(int i, const SPxLP* theLP)
 {
    assert(theLP != 0);
 
-   if (theLP->upper(i) < SPxLP::infinity)
+   if (theLP->upper(i) < infinity)
    {
-      if (theLP->lower(i) > -SPxLP::infinity)
+      if (theLP->lower(i) > -infinity)
       {
          if (theLP->lower(i) == theLP->SPxLP::upper(i))
             return SPxBasis::Desc::P_FIXED;
@@ -192,7 +192,7 @@ primalColStatus(int i, const SPxLP* theLP)
       else
          return SPxBasis::Desc::P_ON_UPPER;
    }
-   else if (theLP->lower(i) > -SPxLP::infinity)
+   else if (theLP->lower(i) > -infinity)
       return SPxBasis::Desc::P_ON_LOWER;
    else
       return SPxBasis::Desc::P_FREE;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.22 2002/01/19 18:59:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.23 2002/01/29 15:38:47 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -201,7 +201,7 @@ int main(int argc, char **argv)
    MySoPlex work(type, representation);
 
    work.setUtype(update);
-   work.setTermination(timelimit);
+   work.setTerminationTime(timelimit);
    work.setDelta(delta);
    work.setEpsilon(epsilon);
 

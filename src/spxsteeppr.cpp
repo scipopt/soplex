@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.12 2002/01/19 18:59:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.13 2002/01/29 15:38:49 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -161,8 +161,8 @@ void SPxSteepPR::setupPrefs(Real mult, Real /*tie*/, Real /*cotie*/,
       p[i] = rshift;
       //      p[i] += rtie * thesolver->rowVector(i).size() / Real(thesolver->nCols());
       //      p[i] += EQ_PREF * (thesolver->rhs(i) == thesolver->lhs(i));
-      //      p[i] += EQ_PREF * (thesolver->rhs(i) >=  SPxLP::infinity
-      //                     &&  thesolver->lhs(i) <= -SPxLP::infinity);
+      //      p[i] += EQ_PREF * (thesolver->rhs(i) >=  infinity
+      //                     &&  thesolver->lhs(i) <= -infinity);
    }
 
    if (ce < 0)
@@ -172,8 +172,8 @@ void SPxSteepPR::setupPrefs(Real mult, Real /*tie*/, Real /*cotie*/,
       cp[i] = cshift;
       //      cp[i] += ctie * thesolver->colVector(i).size() / Real(thesolver->nRows());
       //      cp[i] += EQ_PREF * (thesolver->upper(i) == thesolver->lower(i));
-      //      cp[i] += EQ_PREF * (thesolver->upper(i) >=  SPxLP::infinity
-      //                      &&  thesolver->lower(i) <= -SPxLP::infinity);
+      //      cp[i] += EQ_PREF * (thesolver->upper(i) >=  infinity
+      //                      &&  thesolver->lower(i) <= -infinity);
    }
 
 
@@ -246,7 +246,7 @@ void SPxSteepPR::left4X(int n, SoPlex::Id id, int start, int incr)
          if (x < delta)
             // coPenalty_ptr[j] = delta / (1+delta-x);
             coPenalty_ptr[j] = delta;
-         else if (x >= thesolver->SPxLP::infinity)
+         else if (x >= infinity)
             coPenalty_ptr[j] = 1 / theeps;
       }
 
@@ -279,7 +279,7 @@ int SPxSteepPR::selectLeaveX(Real& best, int start, int incr)
    Real x;
    int selIdx;
 
-   best = -thesolver->SPxLP::infinity;
+   best = -infinity;
    selIdx = -1;
 
    //for(int i = 0; i < thesolver->dim() - start; i += incr)
@@ -374,7 +374,7 @@ void SPxSteepPR::entered4X(
          if (x < delta)
             coPenalty_ptr[i] = delta;
          // coPenalty_ptr[i] = 1;
-         else if (x > thesolver->SPxLP::infinity)
+         else if (x > infinity)
             coPenalty_ptr[i] = 1 / thesolver->epsilon();
       }
 
@@ -391,7 +391,7 @@ void SPxSteepPR::entered4X(
          if (x < delta)
             penalty_ptr[i] = delta;
          // penalty_ptr[i] = 1;
-         else if (x > thesolver->SPxLP::infinity)
+         else if (x > infinity)
             penalty_ptr[i] = 1 / thesolver->epsilon();
       }
    }
@@ -426,7 +426,7 @@ SoPlex::Id SPxSteepPR::selectEnterX(
    int i, end;
 
    SoPlex::Id selId;
-   best = -thesolver->SPxLP::infinity;
+   best = -infinity;
 
    for (end = thesolver->coDim(), i = start2; i < end; i += incr2)
    {

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxio.cpp,v 1.9 2002/01/27 16:07:43 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxio.cpp,v 1.10 2002/01/29 15:38:49 bzfkocht Exp $"
 
 
 #include <iostream>
@@ -72,13 +72,13 @@ static void dumpRows(std::ostream& s, const SPxLP& lp)
       Real up;
       low = lp.lhs(i);
       up = lp.rhs(i);
-      if (low > -SPxLP::infinity && up < SPxLP::infinity && low != up)
+      if (low > -infinity && up < infinity && low != up)
       {
          s << low << " <= " << lp.rowVector(i) << " <= " << up << '\n';
       }
       else if (low == up)
          s << lp.rowVector(i) << " = " << up << '\n';
-      else if (low <= -SPxLP::infinity)
+      else if (low <= -infinity)
          s << lp.rowVector(i) << " <= " << up << '\n';
       else
          s << lp.rowVector(i) <<">= " << low << '\n';
@@ -98,15 +98,15 @@ static void dumpBounds(std::ostream& s, const SPxLP& lp)
       low = lp.lower(i);
       if (low == up)
          s << "  x" << i << " = " << up << '\n';
-      else if (low > -SPxLP::infinity)
+      else if (low > -infinity)
       {
-         if (up < SPxLP::infinity)
+         if (up < infinity)
             s << "  " << low << " <= x" << i
             << " <= " << up << '\n';
          else if (low != 0)
             s << "  x" << i <<">= " << low << '\n';
       }
-      else if (up < SPxLP::infinity)
+      else if (up < infinity)
          s << "  x" << i << " <= " << up << '\n';
       else
          s << "  x" << i << " FREE\n";

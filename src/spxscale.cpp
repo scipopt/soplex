@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscale.cpp,v 1.8 2002/01/19 18:59:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscale.cpp,v 1.9 2002/01/29 15:38:49 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -78,9 +78,9 @@ int SPxScale::simplify()
             colscale[i] = y;
             vec *= y;
             lp->maxObj(i) *= y;
-            if (lp->upper(i) < SPxLP::infinity)
+            if (lp->upper(i) < infinity)
                lp->upper(i) *= x;
-            if (lp->lower(i) > -SPxLP::infinity)
+            if (lp->lower(i) > -infinity)
                lp->lower(i) *= x;
          }
          else
@@ -106,9 +106,9 @@ int SPxScale::simplify()
             //y = 1 / x;
             rowscale[i] = y;
             vec *= y;
-            if (lp->rhs(i) < SPxLP::infinity)
+            if (lp->rhs(i) < infinity)
                lp->rhs(i) *= y;
-            if (lp->lhs(i) > -SPxLP::infinity)
+            if (lp->lhs(i) > -infinity)
                lp->lhs(i) *= y;
          }
          else
@@ -140,9 +140,9 @@ int SPxScale::simplify()
             y = 1 / x;
             rowscale[i] = y;
             vec *= y;
-            if (lp->rhs(i) < SPxLP::infinity)
+            if (lp->rhs(i) < infinity)
                lp->rhs(i) *= y;
-            if (lp->lhs(i) > -SPxLP::infinity)
+            if (lp->lhs(i) > -infinity)
                lp->lhs(i) *= y;
          }
          else
@@ -168,9 +168,9 @@ int SPxScale::simplify()
             colscale[i] = y;
             vec *= y;
             lp->maxObj(i) *= y;
-            if (lp->upper(i) < SPxLP::infinity)
+            if (lp->upper(i) < infinity)
                lp->upper(i) *= x;
-            if (lp->lower(i) > -SPxLP::infinity)
+            if (lp->lower(i) > -infinity)
                lp->lower(i) *= x;
          }
          else
@@ -206,9 +206,9 @@ void SPxScale::unsimplify()
       for (j = vec.size(); j--;)
          vec.value(j) /= colscale[vec.index(j)];
       vec *= 1 / rowscale[i];
-      if (lp->rhs(i) < SPxLP::infinity)
+      if (lp->rhs(i) < infinity)
          lp->rhs(i) *= rowscale[i];
-      if (lp->lhs(i) > -SPxLP::infinity)
+      if (lp->lhs(i) > -infinity)
          lp->lhs(i) *= rowscale[i];
    }
    for (i = lp->nCols(); i--;)
@@ -218,9 +218,9 @@ void SPxScale::unsimplify()
       for (j = vec.size(); j--;)
          vec.value(j) /= rowscale[vec.index(j)];
       lp->maxObj(i) *= colscale[i];
-      if (lp->upper(i) < SPxLP::infinity)
+      if (lp->upper(i) < infinity)
          lp->upper(i) *= 1 / colscale[i];
-      if (lp->lower(i) > -SPxLP::infinity)
+      if (lp->lower(i) > -infinity)
          lp->lower(i) *= 1 / colscale[i];
    }
    assert(lp->isConsistent());

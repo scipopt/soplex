@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.10 2002/01/19 18:59:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.11 2002/01/29 15:38:49 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -99,7 +99,7 @@ int SPxWeightPR::selectLeave()
 {
    const Real* test = thesolver->fTest().get_const_ptr();
    Real type = 1 - 2 * (thesolver->rep() == SoPlex::COLUMN);
-   Real best = type * SPxLP::infinity;
+   Real best = type * infinity;
    int lastIdx = -1;
    Real x;
    int i;
@@ -128,7 +128,7 @@ SoPlex::Id SPxWeightPR::selectEnter()
    const Vector& cTest = (solver()->rep() == SoPlex::ROW)
                          ? solver()->coTest() : solver()->test();
    const SPxBasis::Desc& ds = solver()->basis().desc();
-   Real best = SPxLP::infinity;
+   Real best = infinity;
    SoPlex::Id lastId;
    Real x;
    int i;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.17 2002/01/27 16:07:43 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.18 2002/01/29 15:38:49 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -293,7 +293,7 @@ static Real readInfinity(char*& pos)
 
    hasKeyword(pos, "inf[inity]");
 
-   return sense * SPxLP::infinity;
+   return sense * infinity;
 }
 
 /// Read LP in "CPLEX LP File Format".
@@ -511,13 +511,13 @@ bool SPxLP::readLPF(
                {
                   if (sense == '<')
                   { 
-                     row.setLhs(-SPxLP::infinity); 
+                     row.setLhs(-infinity); 
                      row.setRhs(val);
                   }
                   else if (sense == '>')
                   {
                      row.setLhs(val);
-                     row.setRhs(SPxLP::infinity);
+                     row.setRhs(infinity);
                   }
                   else 
                   {
@@ -592,8 +592,8 @@ bool SPxLP::readLPF(
             }
             if (isFree(pos))
             {
-               cset.lower(colidx) = -SPxLP::infinity;
-               cset.upper(colidx) =  SPxLP::infinity;
+               cset.lower(colidx) = -infinity;
+               cset.upper(colidx) =  infinity;
                other              = true;
             }
             else if (isSense(pos))

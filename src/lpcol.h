@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcol.h,v 1.7 2002/01/19 18:59:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpcol.h,v 1.8 2002/01/29 15:38:47 bzfkocht Exp $"
 
 /**@file  lpcol.h
  * @brief LP column.
@@ -107,18 +107,17 @@ public:
    /// default constructor.
    /** Construct LPCol with a column vector ready for taking \p defDim
     *  nonzeros.
-    * @todo 1e300 seems wrong. This should be the symbolic constant infinity.
     */
    explicit LPCol(int defDim = 0)
-      : up(1e+300), low(0), object(0), vec(defDim)
+      : up(infinity), low(0), object(0), vec(defDim)
    {}
 
    /// initializing constructor.
    /*  Construct LPCol with the given objective value \p obj, a column
     *  %vector \p vec, upper bound \p upper and lower bound \p lower.
     */
-   LPCol(Real pobj, const SVector& pvector, Real pupper, Real plower)
-      : up(pupper), low(plower), object(pobj), vec(pvector)
+   LPCol(Real p_obj, const SVector& p_vector, Real p_upper, Real p_lower)
+      : up(p_upper), low(p_lower), object(p_obj), vec(p_vector)
    {}
 
    /// check consistency.

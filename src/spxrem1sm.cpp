@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxrem1sm.cpp,v 1.7 2002/01/19 18:59:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxrem1sm.cpp,v 1.8 2002/01/29 15:38:49 bzfkocht Exp $"
 
 #include <iostream>
 
@@ -46,7 +46,7 @@ int SPxRem1SM::simplify()
             rem[i] = -1;
             num++;
          }
-         else if (lp->rhs(i) >= lp->infinity && lp->lhs(i) <= -lp->infinity)
+         else if (lp->rhs(i) >= infinity && lp->lhs(i) <= -infinity)
          {
             rem[i] = -1;
             num++;
@@ -99,13 +99,13 @@ int SPxRem1SM::simplify()
          {
             if (lp->maxObj(i) > 0)
             {
-               if (lp->upper(i) >= lp->infinity)
+               if (lp->upper(i) >= infinity)
                   return 1;
                delta += lp->upper(i) * lp->obj(i);
             }
             else if (lp->maxObj(i) < 0)
             {
-               if (lp->lower(i) <= -lp->infinity)
+               if (lp->lower(i) <= -infinity)
                   return 1;
                delta += lp->lower(i) * lp->obj(i);
             }
@@ -121,9 +121,9 @@ int SPxRem1SM::simplify()
                for (j = col.size() - 1; j >= 0; --j)
                {
                   int k = col.index(j);
-                  if (lp->rhs(k) < lp->infinity)
+                  if (lp->rhs(k) < infinity)
                      lp->changeRhs(k, lp->rhs(k) - x*col.value(j));
-                  if (lp->lhs(k) > -lp->infinity)
+                  if (lp->lhs(k) > -infinity)
                      lp->changeLhs(k, lp->lhs(k) - x*col.value(j));
                }
                delta += x * lp->obj(i);
@@ -135,25 +135,25 @@ int SPxRem1SM::simplify()
             j = col.index(0);
             if (x > 0)
             {
-               if (lp->lower(i) > -lp->infinity)
+               if (lp->lower(i) > -infinity)
                   up = lp->rhs(j) - lp->lower(i) * x;
                else
-                  up = lp->infinity;
-               if (lp->upper(i) < lp->infinity)
+                  up = infinity;
+               if (lp->upper(i) < infinity)
                   lo = lp->lhs(j) - lp->upper(i) * x;
                else
-                  lo = -lp->infinity;
+                  lo = -infinity;
             }
             else if (x < 0)
             {
-               if (lp->lower(i) > -lp->infinity)
+               if (lp->lower(i) > -infinity)
                   lo = lp->lhs(j) - lp->lower(i) * x;
                else
-                  lo = -lp->infinity;
-               if (lp->upper(i) < lp->infinity)
+                  lo = -infinity;
+               if (lp->upper(i) < infinity)
                   up = lp->rhs(j) - lp->upper(i) * x;
                else
-                  up = lp->infinity;
+                  up = infinity;
             }
             else
             {

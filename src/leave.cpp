@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.10 2002/01/19 18:59:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.11 2002/01/29 15:38:47 bzfkocht Exp $"
 
 /* Updating the Basis for Leaving Variables
  */
@@ -94,20 +94,20 @@ void SoPlex::getLeaveVals
       switch (leaveStat)
       {
       case SPxBasis::Desc::P_ON_UPPER :
-         if (SPxLP::lhs(leaveNum) > -SPxLP::infinity)
+         if (SPxLP::lhs(leaveNum) > -infinity)
             ds.rowStatus(leaveNum) = SPxBasis::Desc::D_ON_BOTH;
          else
             ds.rowStatus(leaveNum) = SPxBasis::Desc::D_ON_LOWER;
          leavebound = 0;
-         leaveMax = -SPxLP::infinity;
+         leaveMax = -infinity;
          break;
       case SPxBasis::Desc::P_ON_LOWER :
-         if (SPxLP::rhs(leaveNum) < SPxLP::infinity)
+         if (SPxLP::rhs(leaveNum) < infinity)
             ds.rowStatus(leaveNum) = SPxBasis::Desc::D_ON_BOTH;
          else
             ds.rowStatus(leaveNum) = SPxBasis::Desc::D_ON_UPPER;
          leavebound = 0;
-         leaveMax = SPxLP::infinity;
+         leaveMax = infinity;
          break;
       case SPxBasis::Desc::P_FREE :
          abort();
@@ -117,34 +117,34 @@ void SoPlex::getLeaveVals
          assert(lhs(leaveNum) == rhs(leaveNum));
          leavebound = -rhs(leaveNum);
          if ((*theFvec)[leaveIdx] < theLBbound[leaveIdx])
-            leaveMax = SPxLP::infinity;
+            leaveMax = infinity;
          else
-            leaveMax = -SPxLP::infinity;
+            leaveMax = -infinity;
          break;
       case SPxBasis::Desc::D_ON_LOWER :
          ds.rowStatus(leaveNum) = SPxBasis::Desc::P_ON_UPPER;
          leavebound = -rhs(leaveNum);                // slack !!
-         leaveMax = SPxLP::infinity;
+         leaveMax = infinity;
          break;
       case SPxBasis::Desc::D_ON_UPPER :
          ds.rowStatus(leaveNum) = SPxBasis::Desc::P_ON_LOWER;
          leavebound = -lhs(leaveNum);                // slack !!
-         leaveMax = -SPxLP::infinity;
+         leaveMax = -infinity;
          break;
       case SPxBasis::Desc::D_ON_BOTH :
          if ((*theFvec)[leaveIdx] > theLBbound[leaveIdx])
          {
             ds.rowStatus(leaveNum) = SPxBasis::Desc::P_ON_LOWER;
-            theLRbound[leaveNum] = -SPxLP::infinity;
+            theLRbound[leaveNum] = -infinity;
             leavebound = -lhs(leaveNum);            // slack !!
-            leaveMax = -SPxLP::infinity;
+            leaveMax = -infinity;
          }
          else
          {
             ds.rowStatus(leaveNum) = SPxBasis::Desc::P_ON_UPPER;
-            theURbound[leaveNum] = SPxLP::infinity;
+            theURbound[leaveNum] = infinity;
             leavebound = -rhs(leaveNum);            // slack !!
-            leaveMax = SPxLP::infinity;
+            leaveMax = infinity;
          }
          break;
 
@@ -164,31 +164,31 @@ void SoPlex::getLeaveVals
       switch (leaveStat)
       {
       case SPxBasis::Desc::P_ON_UPPER :
-         if (SPxLP::lower(leaveNum) > -SPxLP::infinity)
+         if (SPxLP::lower(leaveNum) > -infinity)
             ds.colStatus(leaveNum) = SPxBasis::Desc::D_ON_BOTH;
          else
             ds.colStatus(leaveNum) = SPxBasis::Desc::D_ON_LOWER;
          leavebound = 0;
-         leaveMax = -SPxLP::infinity;
+         leaveMax = -infinity;
          break;
       case SPxBasis::Desc::P_ON_LOWER :
-         if (SPxLP::upper(leaveNum) < SPxLP::infinity)
+         if (SPxLP::upper(leaveNum) < infinity)
             ds.colStatus(leaveNum) = SPxBasis::Desc::D_ON_BOTH;
          else
             ds.colStatus(leaveNum) = SPxBasis::Desc::D_ON_UPPER;
          leavebound = 0;
-         leaveMax = SPxLP::infinity;
+         leaveMax = infinity;
          break;
       case SPxBasis::Desc::P_FREE :
          if ((*theFvec)[leaveIdx] < theLBbound[leaveIdx])
          {
             leavebound = theLBbound[leaveIdx];
-            leaveMax = -SPxLP::infinity;
+            leaveMax = -infinity;
          }
          else
          {
             leavebound = theUBbound[leaveIdx];
-            leaveMax = SPxLP::infinity;
+            leaveMax = infinity;
          }
          ds.colStatus(leaveNum) = SPxBasis::Desc::D_UNDEFINED;
          break;
@@ -198,33 +198,33 @@ void SoPlex::getLeaveVals
          ds.colStatus(leaveNum) = SPxBasis::Desc::P_FIXED;
          leavebound = SPxLP::upper(leaveNum);
          if ((*theFvec)[leaveIdx] < theLBbound[leaveIdx])
-            leaveMax = SPxLP::infinity;
+            leaveMax = infinity;
          else
-            leaveMax = -SPxLP::infinity;
+            leaveMax = -infinity;
          break;
       case SPxBasis::Desc::D_ON_LOWER :
          ds.colStatus(leaveNum) = SPxBasis::Desc::P_ON_UPPER;
          leavebound = SPxLP::upper(leaveNum);
-         leaveMax = -SPxLP::infinity;
+         leaveMax = -infinity;
          break;
       case SPxBasis::Desc::D_ON_UPPER :
          ds.colStatus(leaveNum) = SPxBasis::Desc::P_ON_LOWER;
          leavebound = SPxLP::lower(leaveNum);
-         leaveMax = SPxLP::infinity;
+         leaveMax = infinity;
          break;
       case SPxBasis::Desc::D_ON_BOTH :
          if ((*theFvec)[leaveIdx] > theUBbound[leaveIdx])
          {
-            leaveMax = -SPxLP::infinity;
+            leaveMax = -infinity;
             leavebound = SPxLP::upper(leaveNum);
-            theLCbound[leaveNum] = -SPxLP::infinity;
+            theLCbound[leaveNum] = -infinity;
             ds.colStatus(leaveNum) = SPxBasis::Desc::P_ON_UPPER;
          }
          else
          {
-            leaveMax = SPxLP::infinity;
+            leaveMax = infinity;
             leavebound = SPxLP::lower(leaveNum);
-            theUCbound[leaveNum] = SPxLP::infinity;
+            theUCbound[leaveNum] = infinity;
             ds.colStatus(leaveNum) = SPxBasis::Desc::P_ON_LOWER;
          }
          break;
@@ -259,20 +259,20 @@ void SoPlex::getLeaveVals2(
             newCoPrhs = theLRbound[idx];
          else
             newCoPrhs = theURbound[idx];
-         newUBbound = SPxLP::infinity;
-         newLBbound = -SPxLP::infinity;
+         newUBbound = infinity;
+         newLBbound = -infinity;
          ds.rowStatus(idx) = SPxBasis::Desc::P_FIXED;
          break;
       case SPxBasis::Desc::D_ON_UPPER :
          assert(rep() == ROW);
          newUBbound = 0;
-         newLBbound = -SPxLP::infinity;
+         newLBbound = -infinity;
          ds.rowStatus(idx) = SPxBasis::Desc::P_ON_LOWER;
          newCoPrhs = theLRbound[idx];
          break;
       case SPxBasis::Desc::D_ON_LOWER :
          assert(rep() == ROW);
-         newUBbound = SPxLP::infinity;
+         newUBbound = infinity;
          newLBbound = 0;
          ds.rowStatus(idx) = SPxBasis::Desc::P_ON_UPPER;
          newCoPrhs = theURbound[idx];
@@ -282,13 +282,13 @@ void SoPlex::getLeaveVals2(
          if (leaveMax * thePvec->delta()[idx] < 0)
          {
             newUBbound = 0;
-            newLBbound = -SPxLP::infinity;
+            newLBbound = -infinity;
             ds.rowStatus(idx) = SPxBasis::Desc::P_ON_LOWER;
             newCoPrhs = theLRbound[idx];
          }
          else
          {
-            newUBbound = SPxLP::infinity;
+            newUBbound = infinity;
             newLBbound = 0;
             ds.rowStatus(idx) = SPxBasis::Desc::P_ON_UPPER;
             newCoPrhs = theURbound[idx];
@@ -296,7 +296,7 @@ void SoPlex::getLeaveVals2(
          break;
 
       case SPxBasis::Desc::P_ON_UPPER :
-         if (lhs(idx) > -SPxLP::infinity)
+         if (lhs(idx) > -infinity)
          {
             ds.rowStatus(idx) = SPxBasis::Desc::D_ON_BOTH;
             theURbound[idx] = theLRbound[idx];
@@ -311,7 +311,7 @@ void SoPlex::getLeaveVals2(
          enterBound = -rhs(idx);
          break;
       case SPxBasis::Desc::P_ON_LOWER :
-         if (rhs(idx) < SPxLP::infinity)
+         if (rhs(idx) < infinity)
          {
             ds.rowStatus(idx) = SPxBasis::Desc::D_ON_BOTH;
             theLRbound[idx] = theURbound[idx];
@@ -332,8 +332,8 @@ void SoPlex::getLeaveVals2(
          std::cerr << __FILE__ << __LINE__ << "ERROR: not yet debugged!\n";
 
          newCoPrhs = theURbound[idx];        // slack !!
-         newUBbound = SPxLP::infinity;
-         newLBbound = -SPxLP::infinity;
+         newUBbound = infinity;
+         newLBbound = -infinity;
          enterBound = 0;
 #endif
          break;
@@ -356,21 +356,21 @@ void SoPlex::getLeaveVals2(
       case SPxBasis::Desc::D_ON_UPPER :
          assert(rep() == ROW);
          newUBbound = 0;
-         newLBbound = -SPxLP::infinity;
+         newLBbound = -infinity;
          ds.colStatus(idx) = SPxBasis::Desc::P_ON_LOWER;
          newCoPrhs = theLCbound[idx];
          break;
       case SPxBasis::Desc::D_ON_LOWER :
          assert(rep() == ROW);
-         newUBbound = SPxLP::infinity;
+         newUBbound = infinity;
          newLBbound = 0;
          ds.colStatus(idx) = SPxBasis::Desc::P_ON_UPPER;
          newCoPrhs = theUCbound[idx];
          break;
       case SPxBasis::Desc::D_FREE :
          assert(rep() == ROW);
-         newUBbound = SPxLP::infinity;
-         newLBbound = -SPxLP::infinity;
+         newUBbound = infinity;
+         newLBbound = -infinity;
          newCoPrhs = theLCbound[idx];
          ds.colStatus(idx) = SPxBasis::Desc::P_FIXED;
          break;
@@ -379,13 +379,13 @@ void SoPlex::getLeaveVals2(
          if (leaveMax * theCoPvec->delta()[idx] < 0)
          {
             newUBbound = 0;
-            newLBbound = -SPxLP::infinity;
+            newLBbound = -infinity;
             ds.colStatus(idx) = SPxBasis::Desc::P_ON_LOWER;
             newCoPrhs = theLCbound[idx];
          }
          else
          {
-            newUBbound = SPxLP::infinity;
+            newUBbound = infinity;
             newLBbound = 0;
             ds.colStatus(idx) = SPxBasis::Desc::P_ON_UPPER;
             newCoPrhs = theUCbound[idx];
@@ -393,7 +393,7 @@ void SoPlex::getLeaveVals2(
          break;
 
       case SPxBasis::Desc::P_ON_UPPER :
-         if (SPxLP::lower(idx) > -SPxLP::infinity)
+         if (SPxLP::lower(idx) > -infinity)
          {
             ds.colStatus(idx) = SPxBasis::Desc::D_ON_BOTH;
             theLCbound[idx] = theUCbound[idx];
@@ -408,7 +408,7 @@ void SoPlex::getLeaveVals2(
          enterBound = SPxLP::upper(idx);
          break;
       case SPxBasis::Desc::P_ON_LOWER :
-         if (SPxLP::upper(idx) < SPxLP::infinity)
+         if (SPxLP::upper(idx) < infinity)
          {
             ds.colStatus(idx) = SPxBasis::Desc::D_ON_BOTH;
             theUCbound[idx] = theLCbound[idx];
@@ -666,7 +666,7 @@ int SoPlex::leave(int leaveIdx)
                (*theCoPrhs)[leaveIdx] = theLCbound[leaveNum];
             }
             theUBbound[leaveIdx] = 0;
-            theLBbound[leaveIdx] = -SPxLP::infinity;
+            theLBbound[leaveIdx] = -infinity;
          }
          else
          {
@@ -680,7 +680,7 @@ int SoPlex::leave(int leaveIdx)
                ds.colStatus(leaveNum) = SPxBasis::Desc::P_ON_UPPER;
                (*theCoPrhs)[leaveIdx] = theUCbound[leaveNum];
             }
-            theUBbound[leaveIdx] = SPxLP::infinity;
+            theUBbound[leaveIdx] = infinity;
             theLBbound[leaveIdx] = 0;
          }
 
@@ -700,8 +700,8 @@ int SoPlex::leave(int leaveIdx)
       if ((leaveMax > delta() && enterVal <= delta())
            || (leaveMax < -delta() && enterVal >= -delta()))
       {
-         m_numCycle += ((theUBbound[leaveIdx] < SPxLP::infinity ||
-                        theLBbound[leaveIdx] > -SPxLP::infinity)
+         m_numCycle += ((theUBbound[leaveIdx] < infinity ||
+                        theLBbound[leaveIdx] > -infinity)
                         && leaveStat != SPxBasis::Desc::P_FREE
                         && leaveStat != SPxBasis::Desc::D_FREE);
       }

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.17 2002/01/19 18:59:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.18 2002/01/29 15:38:48 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -50,9 +50,9 @@ SPxBasis::dualRowStatus(int i) const
 {
    assert(theLP != 0);
 
-   if (theLP->rhs(i) < SPxLP::infinity)
+   if (theLP->rhs(i) < infinity)
    {
-      if (theLP->lhs(i) > -SPxLP::infinity)
+      if (theLP->lhs(i) > -infinity)
       {
          if (theLP->lhs(i) == theLP->rhs(i))
             return Desc::D_FREE;
@@ -62,7 +62,7 @@ SPxBasis::dualRowStatus(int i) const
       else
          return Desc::D_ON_LOWER;
    }
-   else if (theLP->lhs(i) > -SPxLP::infinity)
+   else if (theLP->lhs(i) > -infinity)
       return Desc::D_ON_UPPER;
    else
       return Desc::D_UNDEFINED;
@@ -73,9 +73,9 @@ SPxBasis::dualColStatus(int i) const
 {
    assert(theLP != 0);
 
-   if (theLP->SPxLP::upper(i) < SPxLP::infinity)
+   if (theLP->SPxLP::upper(i) < infinity)
    {
-      if (theLP->SPxLP::lower(i) > -SPxLP::infinity)
+      if (theLP->SPxLP::lower(i) > -infinity)
       {
          if (theLP->SPxLP::lower(i) == theLP->SPxLP::upper(i))
             return Desc::D_FREE;
@@ -85,7 +85,7 @@ SPxBasis::dualColStatus(int i) const
       else
          return Desc::D_ON_LOWER;
    }
-   else if (theLP->SPxLP::lower(i) > -SPxLP::infinity)
+   else if (theLP->SPxLP::lower(i) > -infinity)
       return Desc::D_ON_UPPER;
    else
       return Desc::D_UNDEFINED;

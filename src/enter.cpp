@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.9 2002/01/19 18:59:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.10 2002/01/29 15:38:47 bzfkocht Exp $"
 
 /*      \SubSection{Updating the Basis for Entering Variables}
  */
@@ -273,7 +273,7 @@ void SoPlex::getEnterVals
          enterPric = (*thePvec)[enterIdx];
          enterRO = maxObj(enterIdx);
          ds.colStatus(enterIdx)
-         = (enterLB <= -SPxLP::infinity)
+         = (enterLB <= -infinity)
            ? SPxBasis::Desc::D_ON_LOWER
         : SPxBasis::Desc::D_ON_BOTH;
          break;
@@ -285,7 +285,7 @@ void SoPlex::getEnterVals
          enterPric = (*thePvec)[enterIdx];
          enterRO = maxObj(enterIdx);
          ds.colStatus(enterIdx)
-         = (enterUB >= SPxLP::infinity)
+         = (enterUB >= infinity)
            ? SPxBasis::Desc::D_ON_UPPER
         : SPxBasis::Desc::D_ON_BOTH;
          break;
@@ -296,25 +296,25 @@ void SoPlex::getEnterVals
          enterPric = (*thePvec)[enterIdx];
          enterRO = maxObj(enterIdx);
          ds.colStatus(enterIdx) = SPxBasis::Desc::D_UNDEFINED;
-         enterMax = (enterRO > 0) ? SPxLP::infinity : -SPxLP::infinity;
+         enterMax = (enterRO > 0) ? infinity : -infinity;
          break;
 
          // dual/rowwise cases:
       case SPxBasis::Desc::D_ON_UPPER :
-         assert(theUCbound[enterIdx] < SPxLP::infinity);
+         assert(theUCbound[enterIdx] < infinity);
          enterUB = theUCbound[enterIdx];
-         enterLB = -SPxLP::infinity;
-         enterMax = -SPxLP::infinity;
+         enterLB = -infinity;
+         enterMax = -infinity;
          enterVal = enterUB;
          enterPric = (*theCoPvec)[enterIdx];
          enterRO = SPxLP::lower(enterIdx);
          ds.colStatus(enterIdx) = SPxBasis::Desc::P_ON_LOWER;
          break;
       case SPxBasis::Desc::D_ON_LOWER :
-         assert(theLCbound[enterIdx] > -SPxLP::infinity);
+         assert(theLCbound[enterIdx] > -infinity);
          enterLB = theLCbound[enterIdx];
-         enterUB = SPxLP::infinity;
-         enterMax = SPxLP::infinity;
+         enterUB = infinity;
+         enterMax = infinity;
          enterVal = enterLB;
          enterPric = (*theCoPvec)[enterIdx];
          enterRO = SPxLP::upper(enterIdx);
@@ -322,15 +322,15 @@ void SoPlex::getEnterVals
          break;
       case SPxBasis::Desc::D_FREE:
          assert(SPxLP::lower(enterIdx) == SPxLP::upper(enterIdx));
-         enterUB = SPxLP::infinity;
-         enterLB = -SPxLP::infinity;
+         enterUB = infinity;
+         enterLB = -infinity;
          enterVal = 0;
          enterRO = SPxLP::upper(enterIdx);
          enterPric = (*theCoPvec)[enterIdx];
          if (enterPric > enterRO)
-            enterMax = SPxLP::infinity;
+            enterMax = infinity;
          else
-            enterMax = -SPxLP::infinity;
+            enterMax = -infinity;
          ds.colStatus(enterIdx) = SPxBasis::Desc::P_FIXED;
          break;
       case SPxBasis::Desc::D_ON_BOTH :
@@ -338,8 +338,8 @@ void SoPlex::getEnterVals
          if (enterPric > SPxLP::upper(enterIdx))
          {
             enterLB = theLCbound[enterIdx];
-            enterUB = SPxLP::infinity;
-            enterMax = SPxLP::infinity;
+            enterUB = infinity;
+            enterMax = infinity;
             enterVal = enterLB;
             enterRO = SPxLP::upper(enterIdx);
             ds.colStatus(enterIdx) = SPxBasis::Desc::P_ON_UPPER;
@@ -349,8 +349,8 @@ void SoPlex::getEnterVals
             enterUB = theUCbound[enterIdx];
             enterVal = enterUB;
             enterRO = SPxLP::lower(enterIdx);
-            enterLB = -SPxLP::infinity;
-            enterMax = -SPxLP::infinity;
+            enterLB = -infinity;
+            enterMax = -infinity;
             ds.colStatus(enterIdx) = SPxBasis::Desc::P_ON_LOWER;
          }
          break;
@@ -392,7 +392,7 @@ void SoPlex::getEnterVals
          enterPric = (*theCoPvec)[enterIdx];
          enterRO = 0;
          ds.rowStatus(enterIdx)
-         = (enterUB >= SPxLP::infinity)
+         = (enterUB >= infinity)
            ? SPxBasis::Desc::D_ON_LOWER
         : SPxBasis::Desc::D_ON_BOTH;
          break;
@@ -404,7 +404,7 @@ void SoPlex::getEnterVals
          enterPric = (*theCoPvec)[enterIdx];
          enterRO = 0;
          ds.rowStatus(enterIdx)
-         = (enterLB <= -SPxLP::infinity)
+         = (enterLB <= -infinity)
            ? SPxBasis::Desc::D_ON_UPPER
         : SPxBasis::Desc::D_ON_BOTH;
          break;
@@ -420,34 +420,34 @@ void SoPlex::getEnterVals
 
          // dual/rowwise cases:
       case SPxBasis::Desc::D_ON_UPPER :
-         assert(theURbound[enterIdx] < SPxLP::infinity);
+         assert(theURbound[enterIdx] < infinity);
          enterUB = theURbound[enterIdx];
-         enterLB = -SPxLP::infinity;
+         enterLB = -infinity;
          enterVal = enterUB;
-         enterMax = -SPxLP::infinity;
+         enterMax = -infinity;
          enterPric = (*thePvec)[enterIdx];
          enterRO = lhs(enterIdx);
          ds.rowStatus(enterIdx) = SPxBasis::Desc::P_ON_LOWER;
          break;
       case SPxBasis::Desc::D_ON_LOWER :
-         assert(theLRbound[enterIdx] > -SPxLP::infinity);
+         assert(theLRbound[enterIdx] > -infinity);
          enterLB = theLRbound[enterIdx];
-         enterUB = SPxLP::infinity;
+         enterUB = infinity;
          enterVal = enterLB;
-         enterMax = SPxLP::infinity;
+         enterMax = infinity;
          enterPric = (*thePvec)[enterIdx];
          enterRO = rhs(enterIdx);
          ds.rowStatus(enterIdx) = SPxBasis::Desc::P_ON_UPPER;
          break;
       case SPxBasis::Desc::D_FREE:
          assert(rhs(enterIdx) == lhs(enterIdx));
-         enterUB = SPxLP::infinity;
-         enterLB = -SPxLP::infinity;
+         enterUB = infinity;
+         enterLB = -infinity;
          enterVal = 0;
          enterPric = (*thePvec)[enterIdx];
          enterRO = rhs(enterIdx);
-         enterMax = (enterPric > enterRO) ? SPxLP::infinity
-                 : -SPxLP::infinity;
+         enterMax = (enterPric > enterRO) ? infinity
+                 : -infinity;
          ds.rowStatus(enterIdx) = SPxBasis::Desc::P_FIXED;
          break;
       case SPxBasis::Desc::D_ON_BOTH :
@@ -456,8 +456,8 @@ void SoPlex::getEnterVals
          {
             enterLB = theLRbound[enterIdx];
             enterVal = enterLB;
-            enterUB = SPxLP::infinity;
-            enterMax = SPxLP::infinity;
+            enterUB = infinity;
+            enterMax = infinity;
             enterRO = rhs(enterIdx);
             ds.rowStatus(enterIdx) = SPxBasis::Desc::P_ON_UPPER;
          }
@@ -465,8 +465,8 @@ void SoPlex::getEnterVals
          {
             enterUB = theURbound[enterIdx];
             enterVal = enterUB;
-            enterLB = -SPxLP::infinity;
-            enterMax = -SPxLP::infinity;
+            enterLB = -infinity;
+            enterMax = -infinity;
             enterRO = lhs(enterIdx);
             ds.rowStatus(enterIdx) = SPxBasis::Desc::P_ON_LOWER;
          }
@@ -843,7 +843,7 @@ int SoPlex::enter(Id& enterId)
        happen in primal/columnwise case with upper and lower bounds on
        variables.
     */
-   else if (leaveVal < SPxLP::infinity && leaveVal > -SPxLP::infinity)
+   else if (leaveVal < infinity && leaveVal > -infinity)
    {
       assert(rep() == COLUMN);
       assert(leaveVal == -enterMax);

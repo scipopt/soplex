@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.h,v 1.13 2002/01/19 18:59:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprowset.h,v 1.14 2002/01/29 15:38:48 bzfkocht Exp $"
 
 /**@file  lprowset.h
  * @brief Set of LP columns.
@@ -161,9 +161,9 @@ public:
    /// returns the inequalitiy type of the \p i 'th #LPRow.
    LPRow::Type type(int i) const
    {
-      if (rhs(i) >= LPRow::infinity)
+      if (rhs(i) >= infinity)
          return LPRow::GREATER_EQUAL;
-      if (lhs(i) <= -LPRow::infinity)
+      if (lhs(i) <= -infinity)
          return LPRow::LESS_EQUAL;
       if (lhs(i) == rhs(i))
          return LPRow::EQUAL;
@@ -182,11 +182,11 @@ public:
    /// returns the value of the \p i'th #LPRow.
    Real value(int i) const
    {
-      if (rhs(i) < LPRow::infinity)
+      if (rhs(i) < infinity)
          return rhs(i);
       else
       {
-         assert(lhs(i) > -LPRow::infinity);
+         assert(lhs(i) > -infinity);
          return lhs(i);
       }
    }

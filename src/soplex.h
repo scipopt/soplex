@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.30 2002/01/21 11:28:13 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.31 2002/01/29 15:38:48 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -1482,14 +1482,6 @@ public:
    /// return objective limit.
    virtual Real terminationValue() const;
    
-   /// adjust conditions for termination.
-   virtual void setTermination(Real time = infinity, int iteration = -1, 
-      Real value = infinity);
-
-   /// get adjusted conditions for termination.
-   virtual void getTermination(Real* time = 0, int* iteration = 0, 
-      Real* value = 0) const;
-
    /// get objective value of current solution.
    virtual Real objValue() const
    {

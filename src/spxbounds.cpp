@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbounds.cpp,v 1.5 2002/01/19 18:59:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbounds.cpp,v 1.6 2002/01/29 15:38:48 bzfkocht Exp $"
 
 
 /*  Import system include files
@@ -92,16 +92,16 @@ void SoPlex::clearDualBounds
    {
    case SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER :
    case SPxBasis::Desc::D_FREE :
-      upp = SPxLP::infinity;
-      lw = -SPxLP::infinity;
+      upp = infinity;
+      lw = -infinity;
       break;
    case SPxBasis::Desc::P_ON_UPPER :
    case SPxBasis::Desc::D_ON_LOWER :
-      upp = SPxLP::infinity;
+      upp = infinity;
       break;
    case SPxBasis::Desc::P_ON_LOWER :
    case SPxBasis::Desc::D_ON_UPPER :
-      lw = -SPxLP::infinity;
+      lw = -infinity;
       break;
 
    default:
@@ -168,12 +168,12 @@ void SoPlex::setEnterBound4Row(int i, int n)
    switch (desc().rowStatus(n))
    {
    case SPxBasis::Desc::P_ON_LOWER :
-      theLBbound[i] = -SPxLP::infinity;
+      theLBbound[i] = -infinity;
       theUBbound[i] = theURbound[n];
       break;
    case SPxBasis::Desc::P_ON_UPPER :
       theLBbound[i] = theLRbound[n];
-      theUBbound[i] = SPxLP::infinity;
+      theUBbound[i] = infinity;
       break;
 
    default:
@@ -190,12 +190,12 @@ void SoPlex::setEnterBound4Col(int i, int n)
    switch (desc().colStatus(n))
    {
    case SPxBasis::Desc::P_ON_LOWER :
-      theLBbound[i] = -SPxLP::infinity;
+      theLBbound[i] = -infinity;
       theUBbound[i] = theUCbound[n];
       break;
    case SPxBasis::Desc::P_ON_UPPER :
       theLBbound[i] = theLCbound[n];
-      theUBbound[i] = SPxLP::infinity;
+      theUBbound[i] = infinity;
       break;
 
    default:
@@ -233,16 +233,16 @@ void SoPlex::setLeaveBound4Row(int i, int n)
    switch (desc().rowStatus(n))
    {
    case SPxBasis::Desc::P_ON_LOWER :
-      theLBbound[i] = -SPxLP::infinity;
+      theLBbound[i] = -infinity;
       theUBbound[i] = 0;
       break;
    case SPxBasis::Desc::P_ON_UPPER :
       theLBbound[i] = 0;
-      theUBbound[i] = SPxLP::infinity;
+      theUBbound[i] = infinity;
       break;
    case SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER :
-      theLBbound[i] = -SPxLP::infinity;
-      theUBbound[i] = SPxLP::infinity;
+      theLBbound[i] = -infinity;
+      theUBbound[i] = infinity;
       break;
    case SPxBasis::Desc::P_FREE :
       theLBbound[i] = theUBbound[i] = 0;
@@ -263,16 +263,16 @@ void SoPlex::setLeaveBound4Col(int i, int n)
    switch (desc().colStatus(n))
    {
    case SPxBasis::Desc::P_ON_LOWER :
-      theLBbound[i] = -SPxLP::infinity;
+      theLBbound[i] = -infinity;
       theUBbound[i] = 0;
       break;
    case SPxBasis::Desc::P_ON_UPPER :
       theLBbound[i] = 0;
-      theUBbound[i] = SPxLP::infinity;
+      theUBbound[i] = infinity;
       break;
    case SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER :
-      theLBbound[i] = -SPxLP::infinity;
-      theUBbound[i] = SPxLP::infinity;
+      theLBbound[i] = -infinity;
+      theUBbound[i] = infinity;
       break;
    case SPxBasis::Desc::P_FREE :
       theLBbound[i] = theUBbound[i] = 0;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.15 2002/01/22 16:48:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.16 2002/01/29 15:38:49 bzfkocht Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.
@@ -165,14 +165,14 @@ static void readRows(
          {
          case 'G' :
             row.setLhs(0.0);
-            row.setRhs(SPxLP::infinity);
+            row.setRhs(infinity);
             break;
          case 'E' :
             row.setLhs(0.0);
             row.setRhs(0.0);
             break;
          case 'L' :
-            row.setLhs(-SPxLP::infinity);
+            row.setLhs(-infinity);
             row.setRhs(0.0);
             break;
          default :
@@ -237,7 +237,7 @@ static void readCols(
          vec.clear();
          col.setObj(0.0);
          col.setLower(0.0);
-         col.setUpper(SPxLP::infinity);
+         col.setUpper(infinity);
 
          if (mps.isInteger())
          {
@@ -329,10 +329,10 @@ static void readRhs(
             val = atof(mps.field3());
 
             // LE or EQ
-            if (rset.rhs(idx) < SPxLP::infinity)
+            if (rset.rhs(idx) < infinity)
                rset.rhs(idx) = val;
             // GE or EQ
-            if (rset.lhs(idx) > -SPxLP::infinity)
+            if (rset.lhs(idx) > -infinity)
                rset.lhs(idx) = val;
          }
       }
@@ -345,10 +345,10 @@ static void readRhs(
             val = atof(mps.field5());
          
             // LE or EQ
-            if (rset.rhs(idx) < SPxLP::infinity)
+            if (rset.rhs(idx) < infinity)
                rset.rhs(idx) = val;
             // GE or EQ
-            if (rset.lhs(idx) > -SPxLP::infinity)
+            if (rset.lhs(idx) > -infinity)
                rset.lhs(idx) = val;
          }
       }
@@ -409,8 +409,8 @@ static void readRanges(
             val = atof(mps.field3());
 
             // EQ
-            if (  (rset.lhs(idx) > -SPxLP::infinity) 
-               && (rset.rhs(idx) <  SPxLP::infinity))
+            if (  (rset.lhs(idx) > -infinity) 
+               && (rset.rhs(idx) <  infinity))
             {
                assert(rset.lhs(idx) == rset.rhs(idx));
 
@@ -422,7 +422,7 @@ static void readRanges(
             else
             {
                // GE 
-               if (rset.lhs(idx) > -SPxLP::infinity)
+               if (rset.lhs(idx) > -infinity)
                   rset.rhs(idx)  = rset.lhs(idx) + fabs(val);
                else // LE
                   rset.lhs(idx)  = rset.rhs(idx) - fabs(val);
@@ -437,8 +437,8 @@ static void readRanges(
                val = atof(mps.field5());
 
                // EQ
-               if (  (rset.lhs(idx) > -SPxLP::infinity) 
-                  && (rset.rhs(idx) <  SPxLP::infinity))
+               if (  (rset.lhs(idx) > -infinity) 
+                  && (rset.rhs(idx) <  infinity))
                {
                   assert(rset.lhs(idx) == rset.rhs(idx));
 
@@ -450,7 +450,7 @@ static void readRanges(
                else
                {
                   // GE 
-                  if (rset.lhs(idx) > -SPxLP::infinity)
+                  if (rset.lhs(idx) > -infinity)
                      rset.rhs(idx)  = rset.lhs(idx) + fabs(val);
                   else // LE
                      rset.lhs(idx)  = rset.rhs(idx) - fabs(val);
@@ -535,15 +535,15 @@ static void readBounds(
             }
             else
             {
-               cset.lower(idx) = -SPxLP::infinity;
-               cset.upper(idx) = SPxLP::infinity;
+               cset.lower(idx) = -infinity;
+               cset.upper(idx) = infinity;
             }
             break;
          case 'M':
-            cset.lower(idx) = -SPxLP::infinity;
+            cset.lower(idx) = -infinity;
             break;
          case 'P':
-            cset.upper(idx) = SPxLP::infinity;
+            cset.upper(idx) = infinity;
             break;
          case 'B' : // Ilog extension (Binary)
             cset.lower(idx) = 0.0;

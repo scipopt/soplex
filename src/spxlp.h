@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.19 2002/01/22 16:48:38 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.20 2002/01/29 15:38:49 bzfkocht Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -257,9 +257,6 @@ private:
    SPxSense thesense;   ///< optimization sense.
 
 public:
-   /**@todo member variable infinity should be private. */
-   static const Real infinity;      ///< value used as \f$\infty\f$.
-
 
    /**@name Inquiry */
    //@{

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.cpp,v 1.9 2002/01/19 18:59:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightst.cpp,v 1.10 2002/01/29 15:38:50 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -67,16 +67,16 @@ void SPxWeightST::setPrimalStatus(
    {
       int n = base.number(SoPlex::SPxRowId(id));
 
-      if (base.rhs(n) >= SPxLP::infinity)
+      if (base.rhs(n) >= infinity)
       {
-         if (base.lhs(n) <= -SPxLP::infinity)
+         if (base.lhs(n) <= -infinity)
             desc.rowStatus(n) = SPxBasis::Desc::P_FREE;
          else
             desc.rowStatus(n) = SPxBasis::Desc::P_ON_LOWER;
       }
       else
       {
-         if (base.lhs(n) <= -SPxLP::infinity)
+         if (base.lhs(n) <= -infinity)
             desc.rowStatus(n) = SPxBasis::Desc::P_ON_UPPER;
          else if (base.lhs(n) >= base.rhs(n) - base.epsilon())
             desc.rowStatus(n) = SPxBasis::Desc::P_FIXED;
@@ -89,16 +89,16 @@ void SPxWeightST::setPrimalStatus(
    else
    {
       int n = base.number(SoPlex::SPxColId(id));
-      if (base.SPxLP::upper(n) >= SPxLP::infinity)
+      if (base.SPxLP::upper(n) >= infinity)
       {
-         if (base.SPxLP::lower(n) <= -SPxLP::infinity)
+         if (base.SPxLP::lower(n) <= -infinity)
             desc.colStatus(n) = SPxBasis::Desc::P_FREE;
          else
             desc.colStatus(n) = SPxBasis::Desc::P_ON_LOWER;
       }
       else
       {
-         if (base.SPxLP::lower(n) <= -SPxLP::infinity)
+         if (base.SPxLP::lower(n) <= -infinity)
             desc.colStatus(n) = SPxBasis::Desc::P_ON_UPPER;
          else if (base.SPxLP::lower(n) >= base.SPxLP::upper(n) - base.epsilon())
             desc.colStatus(n) = SPxBasis::Desc::P_FIXED;
@@ -346,14 +346,14 @@ void SPxWeightST::generate(SoPlex& base)
    for (i = pvec.dim() - 1; i >= 0; --i)
    {
       if (desc.colStatus(i) == SPxBasis::Desc::P_ON_UPPER
-           && base.lower(i) > -SPxLP::infinity
+           && base.lower(i) > -infinity
            && pvec[i] > base.maxObj(i))
       {
          changed = 1;
          desc.colStatus(i) = SPxBasis::Desc::P_ON_LOWER;
       }
       else if (desc.colStatus(i) == SPxBasis::Desc::P_ON_LOWER
-                && base.upper(i) < SPxLP::infinity
+                && base.upper(i) < infinity
                 && pvec[i] < base.maxObj(i))
       {
          changed = 1;
@@ -389,18 +389,18 @@ void SPxWeightST::setupWeights(SoPlex& bse)
    // find absolut biggest entry in bounds and left-/right hand side
    for (i = 0; i < bse.nCols(); i++)
    {
-      if ((up[i] < SPxLP::infinity) && (fabs(up[i]) > maxabs))
+      if ((up[i] < infinity) && (fabs(up[i]) > maxabs))
          maxabs = fabs(up[i]);
       
-      if ((low[i] > -SPxLP::infinity) && (fabs(low[i]) > maxabs))
+      if ((low[i] > -infinity) && (fabs(low[i]) > maxabs))
          maxabs = fabs(low[i]);
    }
    for (i = 0; i < bse.nRows(); i++)
    {
-      if ((rhs[i] < SPxLP::infinity) && (fabs(rhs[i]) > maxabs))
+      if ((rhs[i] < infinity) && (fabs(rhs[i]) > maxabs))
          maxabs = fabs(rhs[i]);
       
-      if ((lhs[i] > -SPxLP::infinity) && (fabs(lhs[i]) > maxabs))
+      if ((lhs[i] > -infinity) && (fabs(lhs[i]) > maxabs))
          maxabs = fabs(lhs[i]);
    }
 
@@ -434,11 +434,11 @@ void SPxWeightST::setupWeights(SoPlex& bse)
          Real u = bx * up [i];
          Real l = bx * low[i];
 
-         if (up[i] < SPxLP::infinity)
+         if (up[i] < infinity)
          {
             if (fabs(low[i] - up[i]) < base.epsilon())
                colWeight[i] = c_fixed + n + fabs(x);
-            else if (low[i] > -SPxLP::infinity)
+            else if (low[i] > -infinity)
             {
                colWeight[i] = c_dbl_bounded + l - u + n;
 
@@ -464,7 +464,7 @@ void SPxWeightST::setupWeights(SoPlex& bse)
          }
          else
          {
-            if (low[i] > -SPxLP::infinity)
+            if (low[i] > -infinity)
             {
                colWeight[i] = c_bounded + l + n - x;
                colUp[i]     = false;
@@ -478,13 +478,13 @@ void SPxWeightST::setupWeights(SoPlex& bse)
 
       for (i = bse.nRows() - 1; i >= 0; i--)
       {
-         if (rhs[i] < SPxLP::infinity)
+         if (rhs[i] < infinity)
          {
             if (fabs(lhs[i] - rhs[i]) < base.epsilon())
             {
                rowWeight[i] = r_fixed;
             }
-            else if (lhs[i] > -SPxLP::infinity)
+            else if (lhs[i] > -infinity)
             {
                Real u = bx * rhs[i];
                Real l = bx * lhs[i];
@@ -500,7 +500,7 @@ void SPxWeightST::setupWeights(SoPlex& bse)
          }
          else
          {
-            if (lhs[i] > -SPxLP::infinity)
+            if (lhs[i] > -infinity)
             {
                rowWeight[i] = r_bounded + bx * lhs[i];
                rowRight[i]  = false;
@@ -535,11 +535,11 @@ void SPxWeightST::setupWeights(SoPlex& bse)
          Real u = bx  * up [i];
          Real l = bx  * low[i];
 
-         if (up[i] < SPxLP::infinity)
+         if (up[i] < infinity)
          {
             if (fabs(low[i] - up[i]) < base.epsilon())
                colWeight[i] = c_fixed + n + fabs(x);
-            else if (low[i] > -SPxLP::infinity)
+            else if (low[i] > -infinity)
             {
                if (x > 0)
                {
@@ -560,7 +560,7 @@ void SPxWeightST::setupWeights(SoPlex& bse)
          }
          else
          {
-            if (low[i] > -SPxLP::infinity)
+            if (low[i] > -infinity)
             {
                colWeight[i] = c_bounded - x + l + n;
                colUp[i]     = false;
@@ -578,11 +578,11 @@ void SPxWeightST::setupWeights(SoPlex& bse)
          Real l    = bx * len1 * lhs[i];
          Real x    = ax * len1 * (obj * bse.rowVector(i));
 
-         if (rhs[i] < SPxLP::infinity)
+         if (rhs[i] < infinity)
          {
             if (fabs(lhs[i] - rhs[i]) < base.epsilon())
                rowWeight[i] = r_fixed + n + fabs(x);
-            else if (lhs[i] > -SPxLP::infinity)
+            else if (lhs[i] > -infinity)
             {
                if (x > 0)
                {
@@ -603,7 +603,7 @@ void SPxWeightST::setupWeights(SoPlex& bse)
          }
          else
          {
-            if (lhs[i] > -SPxLP::infinity)
+            if (lhs[i] > -infinity)
             {
                rowWeight[i] = r_bounded + l + n - x;
                rowRight[i]  = false;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.9 2002/01/19 18:59:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.10 2002/01/29 15:38:49 bzfkocht Exp $"
 
 #include <iostream>
 
@@ -55,56 +55,56 @@ int SPxRedundantSM::simplify()
             k = col.index(j);
             if (x > 0)
             {
-               up += (lp->rhs(k) < lp->infinity);
-               lo += (lp->lhs(k) > -lp->infinity);
+               up += (lp->rhs(k) < infinity);
+               lo += (lp->lhs(k) > -infinity);
             }
             else if (x < 0)
             {
-               lo += (lp->rhs(k) < lp->infinity);
-               up += (lp->lhs(k) > -lp->infinity);
+               lo += (lp->rhs(k) < infinity);
+               up += (lp->lhs(k) > -infinity);
             }
          }
          x = lp->maxObj(i);
          if (lo == 0 && x < 0)
          {
-            if (lp->lower(i) <= -lp->infinity)
+            if (lp->lower(i) <= -infinity)
                return 1;           // LP is unbounded
             lp->changeUpper(i, lp->lower(i));
          }
          else if (up == 0 && x > 0)
          {
-            if (lp->upper(i) >= lp->infinity)
+            if (lp->upper(i) >= infinity)
                return 1;           // LP is unbounded
             lp->changeLower(i, lp->upper(i));
          }
          else if (x == 0)
          {
-            up += (lp->upper(i) < lp->infinity);
-            lo += (lp->lower(i) > -lp->infinity);
+            up += (lp->upper(i) < infinity);
+            lo += (lp->lower(i) > -infinity);
             if (lo == 0)
             {
-               lp->changeUpper(i, lp->infinity);
+               lp->changeUpper(i, infinity);
                for (j = col.size() - 1; j >= 0; --j)
                {
                   x = col.value(j);
                   k = col.index(j);
                   if (x > 0)
-                     lp->changeRhs(k, lp->infinity);
+                     lp->changeRhs(k, infinity);
                   else
-                     lp->changeLhs(k, -lp->infinity);
+                     lp->changeLhs(k, -infinity);
                }
             }
             if (up == 0)
             {
-               lp->changeLower(i, -lp->infinity);
+               lp->changeLower(i, -infinity);
                for (j = col.size() - 1; j >= 0; --j)
                {
                   x = col.value(j);
                   k = col.index(j);
                   if (x < 0)
-                     lp->changeRhs(k, lp->infinity);
+                     lp->changeRhs(k, infinity);
                   else
-                     lp->changeLhs(k, -lp->infinity);
+                     lp->changeLhs(k, -infinity);
                }
             }
          }
@@ -118,9 +118,9 @@ int SPxRedundantSM::simplify()
             for (j = col.size() - 1; j >= 0; --j)
             {
                k = col.index(j);
-               if (lp->rhs(k) < lp->infinity)
+               if (lp->rhs(k) < infinity)
                   lp->changeRhs(k, lp->rhs(k) - x*col.value(j));
-               if (lp->lhs(k) > -lp->infinity)
+               if (lp->lhs(k) > -infinity)
                   lp->changeLhs(k, lp->lhs(k) - x*col.value(j));
             }
             delta += x * lp->obj(i);
@@ -137,7 +137,7 @@ int SPxRedundantSM::simplify()
    num = 0;
    for (i = lp->nRows() - 1; i >= 0; --i)
    {
-      if (lp->rhs(i) < lp->infinity || lp->lhs(i) > -lp->infinity)
+      if (lp->rhs(i) < infinity || lp->lhs(i) > -infinity)
       {
          const SVector& row = lp->rowVector(i);
 
@@ -151,22 +151,22 @@ int SPxRedundantSM::simplify()
             k = row.index(j);
             if (x > 0)
             {
-               if (lp->upper(k) >= lp->infinity)
+               if (lp->upper(k) >= infinity)
                   upcnt++;
                else
                   up += lp->upper(k) * x;
-               if (lp->lower(k) <= -lp->infinity)
+               if (lp->lower(k) <= -infinity)
                   locnt++;
                else
                   lo += lp->lower(k) * x;
             }
             else if (x < 0)
             {
-               if (lp->upper(k) >= lp->infinity)
+               if (lp->upper(k) >= infinity)
                   locnt++;
                else
                   lo += lp->upper(k) * x;
-               if (lp->lower(k) <= -lp->infinity)
+               if (lp->lower(k) <= -infinity)
                   upcnt++;
                else
                   up += lp->lower(k) * x;
@@ -174,9 +174,9 @@ int SPxRedundantSM::simplify()
          }
 
          if (((lp->rhs(i) >= up - eps && upcnt <= 0)
-               || lp->rhs(i) >= lp->infinity)
+               || lp->rhs(i) >= infinity)
               && ((lp->lhs(i) <= lo + eps && locnt <= 0)
-                  || lp->lhs(i) <= -lp->infinity))
+                  || lp->lhs(i) <= -infinity))
          {
             rem[i] = -1;
             num++;
@@ -188,9 +188,9 @@ int SPxRedundantSM::simplify()
          {
             /*
                 if(lp->lhs(i) <= lo+eps && locnt <= 0)
-                    lp->changeLhs(i, -lp->infinity);
+                    lp->changeLhs(i, -infinity);
                 else if(lp->rhs(i) >= up-eps && upcnt <= 0)
-                    lp->changeRhs(i, lp->infinity);
+                    lp->changeRhs(i, infinity);
                 else
              */
             if (upcnt < 2 || locnt < 2)
@@ -201,66 +201,66 @@ int SPxRedundantSM::simplify()
                   k = row.index(j);
                   if (x > 0)
                   {
-                     if (lp->lhs(i) > -lp->infinity
-                          && lp->lower(k) > -lp->infinity
+                     if (lp->lhs(i) > -infinity
+                          && lp->lower(k) > -infinity
                           && upcnt < 2)
                      {
-                        y = -lp->infinity;
-                        if (lp->upper(k) < lp->infinity && upcnt < 1)
+                        y = -infinity;
+                        if (lp->upper(k) < infinity && upcnt < 1)
                            y = lp->upper(k) + (lp->lhs(i) - up) / x;
-                        else if (lp->upper(k) >= lp->infinity)
+                        else if (lp->upper(k) >= infinity)
                            y = lp->lhs(i) - up;
                         if (y >= lp->lower(k))
                         {
-                           lp->changeLower(k, -lp->infinity);
+                           lp->changeLower(k, -infinity);
                            break;
                         }
                      }
-                     if (lp->rhs(i) < lp->infinity
-                          && lp->upper(k) < lp->infinity
+                     if (lp->rhs(i) < infinity
+                          && lp->upper(k) < infinity
                           && locnt < 2)
                      {
-                        y = lp->infinity;
-                        if (lp->lower(k) > -lp->infinity && locnt < 1)
+                        y = infinity;
+                        if (lp->lower(k) > -infinity && locnt < 1)
                            y = lp->lower(k) + (lp->rhs(i) - lo) / x;
-                        else if (lp->lower(k) <= -lp->infinity)
+                        else if (lp->lower(k) <= -infinity)
                            y = lp->rhs(i) - lo;
                         if (y <= lp->upper(k))
                         {
-                           lp->changeUpper(k, lp->infinity);
+                           lp->changeUpper(k, infinity);
                            break;
                         }
                      }
                   }
                   else if (x < 0)
                   {
-                     if (lp->lhs(i) >= -lp->infinity
-                          && lp->upper(k) < lp->infinity
+                     if (lp->lhs(i) >= -infinity
+                          && lp->upper(k) < infinity
                           && upcnt < 2)
                      {
-                        y = lp->infinity;
-                        if (lp->lower(k) > -lp->infinity && upcnt < 1)
+                        y = infinity;
+                        if (lp->lower(k) > -infinity && upcnt < 1)
                            y = lp->lower(k) + (lp->lhs(i) - up) / x;
-                        else if (lp->lower(k) <= -lp->infinity)
+                        else if (lp->lower(k) <= -infinity)
                            y = -(lp->lhs(i) - up);
                         if (y <= lp->upper(k))
                         {
-                           lp->changeUpper(k, lp->infinity);
+                           lp->changeUpper(k, infinity);
                            break;
                         }
                      }
-                     if (lp->rhs(i) <= lp->infinity
-                          && lp->lower(k) > -lp->infinity
+                     if (lp->rhs(i) <= infinity
+                          && lp->lower(k) > -infinity
                           && locnt < 2)
                      {
-                        y = -lp->infinity;
-                        if (lp->upper(k) < lp->infinity && locnt < 1)
+                        y = -infinity;
+                        if (lp->upper(k) < infinity && locnt < 1)
                            y = lp->upper(k) + (lp->rhs(i) - lo) / x;
-                        else if (lp->upper(k) >= lp->infinity)
+                        else if (lp->upper(k) >= infinity)
                            y = -(lp->rhs(i) - lo);
                         if (y >= lp->lower(k))
                         {
-                           lp->changeLower(k, -lp->infinity);
+                           lp->changeLower(k, -infinity);
                            break;
                         }
                      }

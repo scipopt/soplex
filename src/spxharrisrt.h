@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.h,v 1.8 2002/01/19 18:59:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.h,v 1.9 2002/01/29 15:38:48 bzfkocht Exp $"
 
 /**@file  spxharrisrt.h
  * @brief Harris pricing with shifting.
@@ -51,8 +51,7 @@ private:
       const Real* low,     ///< lower bounds for vec
       const Real* up,      ///< upper bounds for vec
       Real delta,          ///< allowed bound violation
-      Real epsilon,        ///< what is 0?
-      Real infinity);      ///< what is $\infty$?
+      Real epsilon);       ///< what is 0?
 
    int minDelta(
       Real* /*max*/,       ///< max abs value in upd
@@ -64,8 +63,7 @@ private:
       const Real* low,     ///< lower bounds for vec
       const Real* up,      ///< upper bounds for vec
       Real delta,          ///< allowed bound violation
-      Real epsilon,        ///< what is 0?
-      Real infinity);      ///< what is $\infty$?
+      Real epsilon);        ///< what is 0?
 
 public:
    ///

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvecs.cpp,v 1.9 2002/01/19 18:59:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxvecs.cpp,v 1.10 2002/01/29 15:38:49 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -79,8 +79,8 @@ void SoPlex::computeFrhs()
                             << " ERROR: inconsistent basis must not happen!\n";
                   abort();
                }
-               assert(x < SPxLP::infinity);
-               assert(x > -SPxLP::infinity);
+               assert(x < infinity);
+               assert(x > -infinity);
                (*theFrhs)[i] += x;                         // slack !
             }
          }
@@ -140,8 +140,8 @@ void SoPlex::computeFrhsXtra()
                       << " ERROR: inconsistent basis must not happen!\n";
             abort();
          }
-         assert(x < SPxLP::infinity);
-         assert(x > -SPxLP::infinity);
+         assert(x < infinity);
+         assert(x > -infinity);
          if (x != 0.0)
             theFrhs->multAdd(-x, vector(i));
       }
@@ -194,8 +194,8 @@ void SoPlex::computeFrhs1(
                       << "ERROR: inconsistent basis must not happen!\n";
             abort();
          }
-         assert(x < SPxLP::infinity);
-         assert(x > -SPxLP::infinity);
+         assert(x < infinity);
+         assert(x > -infinity);
          if (x != 0.0)
             theFrhs->multAdd(-x, vector(i));
       }
@@ -246,8 +246,8 @@ void SoPlex::computeFrhs2(
                       << "ERROR: inconsistent basis must not happen!\n";
             abort();
          }
-         assert(x < SPxLP::infinity);
-         assert(x > -SPxLP::infinity);
+         assert(x < infinity);
+         assert(x > -infinity);
          (*theFrhs)[i] -= x;
       }
    }
@@ -282,17 +282,17 @@ void SoPlex::computeEnterCoPrhs4Row(int i, int n)
    {
    // rowwise representation:
    case SPxBasis::Desc::P_ON_LOWER + SPxBasis::Desc::P_ON_UPPER :
-      assert(lhs(n) > -SPxLP::infinity);
+      assert(lhs(n) > -infinity);
       assert(rhs(n) == lhs(n));
       /*FALLTHROUGH*/
    case SPxBasis::Desc::P_ON_UPPER :
       assert(rep() == ROW);
-      assert(rhs(n) < SPxLP::infinity);
+      assert(rhs(n) < infinity);
       (*theCoPrhs)[i] = rhs(n);
       break;
    case SPxBasis::Desc::P_ON_LOWER :
       assert(rep() == ROW);
-      assert(lhs(n) > -SPxLP::infinity);
+      assert(lhs(n) > -infinity);
       (*theCoPrhs)[i] = lhs(n);
       break;
 
@@ -313,16 +313,16 @@ void SoPlex::computeEnterCoPrhs4Col(int i, int n)
       // rowwise representation:
    case SPxBasis::Desc::P_ON_LOWER + SPxBasis::Desc::P_ON_UPPER :
       assert(SPxLP::upper(n) == SPxLP::lower(n));
-      assert(SPxLP::lower(n) > -SPxLP::infinity);
+      assert(SPxLP::lower(n) > -infinity);
       /*FALLTHROUGH*/
    case SPxBasis::Desc::P_ON_UPPER :
       assert(rep() == ROW);
-      assert(SPxLP::upper(n) < SPxLP::infinity);
+      assert(SPxLP::upper(n) < infinity);
       (*theCoPrhs)[i] = SPxLP::upper(n);
       break;
    case SPxBasis::Desc::P_ON_LOWER :
       assert(rep() == ROW);
-      assert(SPxLP::lower(n) > -SPxLP::infinity);
+      assert(SPxLP::lower(n) > -infinity);
       (*theCoPrhs)[i] = SPxLP::lower(n);
       break;
 
@@ -364,18 +364,18 @@ void SoPlex::computeLeaveCoPrhs4Row(int i, int n)
    {
    case SPxBasis::Desc::D_ON_LOWER + SPxBasis::Desc::D_ON_UPPER :
    case SPxBasis::Desc::P_ON_LOWER + SPxBasis::Desc::P_ON_UPPER :
-      assert(theLRbound[n] > -SPxLP::infinity);
+      assert(theLRbound[n] > -infinity);
       assert(theURbound[n] == theLRbound[n]);
       /*FALLTHROUGH*/
    case SPxBasis::Desc::D_ON_UPPER :
    case SPxBasis::Desc::P_ON_UPPER :
-      assert(theURbound[n] < SPxLP::infinity);
+      assert(theURbound[n] < infinity);
       (*theCoPrhs)[i] = theURbound[n];
       break;
 
    case SPxBasis::Desc::D_ON_LOWER :
    case SPxBasis::Desc::P_ON_LOWER :
-      assert(theLRbound[n] > -SPxLP::infinity);
+      assert(theLRbound[n] > -infinity);
       (*theCoPrhs)[i] = theLRbound[n];
       break;
 
@@ -394,17 +394,17 @@ void SoPlex::computeLeaveCoPrhs4Col(int i, int n)
    case SPxBasis::Desc::D_UNDEFINED :
    case SPxBasis::Desc::D_ON_LOWER + SPxBasis::Desc::D_ON_UPPER :
    case SPxBasis::Desc::P_ON_LOWER + SPxBasis::Desc::P_ON_UPPER :
-      assert(theLCbound[n] > -SPxLP::infinity);
+      assert(theLCbound[n] > -infinity);
       assert(theUCbound[n] == theLCbound[n]);
       /*FALLTHROUGH*/
    case SPxBasis::Desc::D_ON_LOWER :
    case SPxBasis::Desc::P_ON_UPPER :
-      assert(theUCbound[n] < SPxLP::infinity);
+      assert(theUCbound[n] < infinity);
       (*theCoPrhs)[i] = theUCbound[n];
       break;
    case SPxBasis::Desc::D_ON_UPPER :
    case SPxBasis::Desc::P_ON_LOWER :
-      assert(theLCbound[n] > -SPxLP::infinity);
+      assert(theLCbound[n] > -infinity);
       (*theCoPrhs)[i] = theLCbound[n];
       break;
 

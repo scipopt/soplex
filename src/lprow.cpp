@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprow.cpp,v 1.8 2002/01/19 18:59:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprow.cpp,v 1.9 2002/01/29 15:38:47 bzfkocht Exp $"
 
 #include <stdlib.h>
 #include <math.h>
@@ -25,8 +25,6 @@
 
 namespace soplex
 {
-Real LPRow::infinity = 1e+100;
-
 LPRow::Type LPRow::type() const
 {
    if (rhs() >= infinity)

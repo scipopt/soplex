@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.cpp,v 1.9 2002/01/19 18:59:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprowset.cpp,v 1.10 2002/01/29 15:38:47 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -138,16 +138,16 @@ void LPRowSet::setType(
    switch (p_type)
    {
    case LPRow::LESS_EQUAL:
-      lhs(i) = -LPRow::infinity;
+      lhs(i) = -infinity;
       break;
    case LPRow::EQUAL:
-      if (lhs(i) > -LPRow::infinity)
+      if (lhs(i) > -infinity)
          rhs(i) = lhs(i);
       else
          lhs(i) = rhs(i);
       break;
    case LPRow::GREATER_EQUAL:
-      rhs(i) = LPRow::infinity;
+      rhs(i) = infinity;
       break;
    case LPRow::RANGE :
       std::cerr << __FILE__ << __LINE__
