@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.h,v 1.13 2002/01/05 19:24:10 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svector.h,v 1.14 2002/01/15 17:58:38 bzfbleya Exp $"
 
 /**@file  svector.h
  * @brief Sparse vectors.
@@ -300,7 +300,7 @@ public:
    SVector& assign(const Vector& vec, double eps = 1e-12);
 
    /// consistency check.
-   int isConsistent() const;
+   bool isConsistent() const;
 
    /// default constructor.
    /** The constructor expects one memory block where to store the nonzero

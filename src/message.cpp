@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: message.cpp,v 1.1 2001/12/26 12:58:58 bzfkocht Exp $"
+#pragma ident "@(#) $Id: message.cpp,v 1.2 2002/01/15 17:58:38 bzfbleya Exp $"
 
 #include <iostream>
 #include <assert.h>
@@ -21,7 +21,7 @@
 namespace soplex
 {
 
-int msginconsistent(const char* name, const char* file, int line)
+bool msginconsistent(const char* name, const char* file, int line)
 {
    assert(name != 0);
    assert(file != 0);
