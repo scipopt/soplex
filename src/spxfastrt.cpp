@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.12 2002/01/05 09:59:43 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.13 2002/01/15 18:50:01 bzfkocht Exp $"
 
 #include <assert.h>
 #include <stdio.h>
@@ -822,7 +822,9 @@ int SPxFastRT::selectLeave(double& val)
           *       minShortLeave changes sel. Have a look what happens
           *       if we drop the if above also.
           */
-         if (!minShortLeave(sel, leave, max, maxabs));
+         // if (!
+         minShortLeave(sel, leave, max, maxabs);
+         // );
          {
             // phase 2:
             double stab, bestDelta;
