@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.33 2002/01/18 14:30:05 bzfpfend Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.34 2002/01/19 13:06:29 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -1083,10 +1083,8 @@ SoPlex::varStatusToBasisStatusRow( int row, SoPlex::VarStatus stat ) const
    case SoPlex::ZERO :
       assert(lhs(row) <= -SPxLP::infinity && rhs(row) >= SPxLP::infinity);
       return SPxBasis::Desc::P_FREE;
-      break;
    case SoPlex::BASIC :
       return dualRowStatus(row);
-      break;
    default:
       std::cout << "ERROR: unknown VarStatus (" << int(stat)
                 << ")" << std::endl;

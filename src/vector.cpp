@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector.cpp,v 1.5 2001/12/28 14:55:13 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vector.cpp,v 1.6 2002/01/19 13:06:30 bzfkocht Exp $"
 
 #include <iostream>
 
@@ -21,6 +21,7 @@
 #include "ssvector.h"
 #include "subsvector.h"
 #include "svector.h"
+#include "message.h"
 
 namespace soplex
 {
@@ -168,14 +169,12 @@ double Vector::operator*(const SubSVector& v) const
    return x;
 }
 
-int Vector::isConsistent() const
+bool Vector::isConsistent() const
 {
    if (dim() > 0 && val == 0)
-   {
-      std::cerr << "Inconsistency detected in class Vector\n";
-      return 0;
-   }
-   return 1;
+      return MSGinconsistent("Vector");
+
+   return true;
 }
 } // namespace soplex
 

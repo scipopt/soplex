@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.h,v 1.14 2002/01/15 17:58:38 bzfbleya Exp $"
+#pragma ident "@(#) $Id: svector.h,v 1.15 2002/01/19 13:06:30 bzfkocht Exp $"
 
 /**@file  svector.h
  * @brief Sparse vectors.
@@ -119,8 +119,6 @@ private:
 public:
    /**@name Modification */
    //@{
-   /// switch \p n 'th with \p 0 'th nonzero.
-   void toFront(int n);
 
    /// append one nonzero \p (i,v).
    void add(int i, double v)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idxset.cpp,v 1.7 2001/12/28 14:55:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: idxset.cpp,v 1.8 2002/01/19 13:06:29 bzfkocht Exp $"
 
 #include "idxset.h"
 #include "message.h"
@@ -21,40 +21,32 @@
 namespace soplex
 {
 
-/**@todo suspicious: Is there any reason to return maxidx-1 instead of maxidx?
- */
 int IdxSet::dim() const
 {
    int ddim = -1;
-   for (int i = 0; i < size(); ++i)
-      ddim = (idx[i] > ddim) ? idx[i] : ddim;
-   return ddim -1;
+
+   for (int i = 0; i < size(); i++)
+      if (ddim < idx[i])
+         ddim = idx[i];
+
+   return ddim; 
 }
 
 int IdxSet::number(int i) const
 {
-   for (int n = size() - 1; n >= 0; --n)
-   {
+   for(int n = 0; n < size(); n++)
       if (idx[n] == i)
          return n;
-   }
+
    return -1;
 }
 
 void IdxSet::add(int n, const int i[])
 {
    assert(n >= 0 && size() + n <= max());
-   for (int j = 0; j < n; ++j)
+   for (int j = 0; j < n; j++)
       idx[size() + j] = i[j];
    add(n);
-}
-
-void IdxSet::toFront(int n)
-{
-   assert(n >= 0 && n < size());
-   int iidx = index(0);
-   index(0) = index(n);
-   index(n) = iidx;
 }
 
 void IdxSet::remove(int n, int m)
@@ -76,18 +68,22 @@ void IdxSet::remove(int n, int m)
    num = newnum;
 }
 
-IdxSet& IdxSet::operator=(const IdxSet& set)
+IdxSet& IdxSet::operator=(const IdxSet& rhs)
 {
-   if (this != &set)
+   if (this != &rhs)
    {
-      assert(max() >= set.size());
-      for (num = 0; num < set.size(); ++num)
-         idx[num] = set.idx[num];
+      assert(max() >= rhs.size());
+
+      for (num = 0; num < rhs.size(); num++)
+         idx[num] = rhs.idx[num];
    }
+   assert(size() == rhs.size());
+   assert(size() <= max());
+
    return *this;
 }
 
-int IdxSet::isConsistent() const
+bool IdxSet::isConsistent() const
 {
    int i, j;
 
@@ -99,11 +95,11 @@ int IdxSet::isConsistent() const
       if (index(i) < 0)
          return MSGinconsistent("IdxSet");
 
-      for (j = 0; j < i; ++j)
+      for (j = 0; j < i; j++)
          if (index(i) == index(j))
             return MSGinconsistent("IdxSet");
    }
-   return 1;
+   return true;
 }
 } // namespace soplex
 

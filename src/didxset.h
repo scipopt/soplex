@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: didxset.h,v 1.9 2002/01/18 14:30:05 bzfpfend Exp $"
+#pragma ident "@(#) $Id: didxset.h,v 1.10 2002/01/19 13:06:29 bzfkocht Exp $"
 
 /**@file  didxset.h
  * @brief Dymnamic index set.
@@ -91,28 +91,29 @@ public:
    explicit DIdxSet(const IdxSet& old);
 
    /// copy constructor from #DIdxSet.
-   explicit DIdxSet(const DIdxSet& old);
+   DIdxSet(const DIdxSet& old);
 
    /// assignment operator
    DIdxSet& operator=(const IdxSet& sv)
    {
-      setMax( sv.size() );
-      IdxSet::operator=(sv);
+      if (this != &sv)
+      {
+         setMax( sv.size() );
+         IdxSet::operator=(sv);
+      }
       return *this;
    }
-
-   /// assignment operator.
    DIdxSet& operator=(const DIdxSet& sv)
    {
-      return operator=(static_cast<IdxSet>(sv));
+      if (this != &sv)
+      {
+         setMax( sv.size() );
+         IdxSet::operator=(sv);
+      }
+      return *this;
    }
-
    /// destructor.
    ~DIdxSet();
-
-private:
-   /// make member from IdxSet unavailable.
-   int*& indexMem();  
 };
 
 } // namespace soplex

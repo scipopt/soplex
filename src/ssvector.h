@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.h,v 1.7 2001/11/29 14:43:46 bzfpfend Exp $"
+#pragma ident "@(#) $Id: ssvector.h,v 1.8 2002/01/19 13:06:29 bzfkocht Exp $"
 
 
 /**@file  ssvector.h
@@ -28,6 +28,7 @@
 #include "subsvector.h"
 #include "svector.h"
 #include "didxset.h"
+#include "spxalloc.h"
 
 namespace soplex
 {
@@ -44,15 +45,17 @@ class SVSet;
    An #SSVector being setup means that the nonzero indices are available,
    otherwise an #SSVector is just an ordinary #Vector with an empty #IdxSet.
 */
-class SSVector : protected DVector, protected DIdxSet
+class SSVector : protected DVector, protected IdxSet
 {
 private:
-   int setupStatus;        ///< is the #SSVector set up?
+   bool setupStatus;        ///< is the #SSVector set up?
 
    friend class DVector;
    friend class Vector;
    friend class DSVector;
    friend class SMoPlex;
+
+   void setMax(int newmax);
 
 public:
    /**@todo member variable epsilon should be private. */
@@ -84,7 +87,7 @@ public:
    }
 
    /// returns setup status.
-   int isSetup() const
+   bool isSetup() const
    {
       return setupStatus;
    }
@@ -92,7 +95,7 @@ public:
    /// makes #SSVector not setup.
    void unSetup()
    {
-      setupStatus = 0;
+      setupStatus = false;
    }
 
    /// initializes nonzero indices
@@ -104,7 +107,7 @@ public:
    /// forces setup status.
    void forceSetup()
    {
-      setupStatus = 1;
+      setupStatus = true;
    }
    //@}
 
@@ -188,7 +191,7 @@ public:
    /// returns array indices.
    const int* indexMem() const
    {
-      return IdxSet::indexMem();
+      return idx;
    }
 
    /// returns array values.
@@ -207,7 +210,7 @@ public:
    int* altIndexMem()
    {
       unSetup();
-      return IdxSet::indexMem();
+      return idx;
    }
 
    /// returns array values.
@@ -290,8 +293,10 @@ public:
    /// sets number of nonzeros (thereby unSetup SSVector).
    void setSize(int n)
    {
+      assert(n >= 0);
+      assert(n <= IdxSet::max());
       unSetup();
-      IdxSet::setSize(n);
+      num = n;
    }
 
    /// resets memory consumption to \p newsize.
@@ -301,40 +306,47 @@ public:
    void clear ();
 
    /// consistency check.
-   int isConsistent() const;
+   bool isConsistent() const;
    //@}
 
 
    /**@name Constructors / Destructors */
    //@{
    /// default constructor.
-   SSVector(int pdim = 0, double peps = 1e-16)
+   explicit SSVector(int pdim = 0, double peps = 1e-16)
       : DVector (pdim)
-      , DIdxSet (pdim + 1)
-      , setupStatus(1)
+      , IdxSet  ()
+      , setupStatus(true)
       , epsilon (peps)
    {
+      len = (pdim < 1) ? 1 : pdim;
+      spx_alloc(idx, len);
+
       Vector::clear();
    }
 
    /// copy constructor.
    SSVector(const SSVector& vec)
       : DVector (vec)
-      , DIdxSet (vec.dim() + 1)
+      , IdxSet ()
       , setupStatus(vec.setupStatus)
       , epsilon (vec.epsilon)
    {
-      DIdxSet::operator= ( vec );
-      //*((DIdxSet*)this) = vec;
+      len = (vec.dim() < 1) ? 1 : vec.dim();
+      spx_alloc(idx, len);
+      IdxSet::operator= ( vec );
    }
 
    /// constructs nonsetup copy of \p vec.
-   SSVector(const Vector& vec, double eps = 1e-16)
+   explicit SSVector(const Vector& vec, double eps = 1e-16)
       : DVector (vec)
-      , DIdxSet (vec.dim() + 1)
-      , setupStatus(0)
+      , IdxSet ()
+      , setupStatus(false)
       , epsilon (eps)
-   { }
+   { 
+      len = (vec.dim() < 1) ? 1 : vec.dim();
+      spx_alloc(idx, len);
+   }
 
    /// sets up \p rhs vector, and assigns it.
    void setup_and_assign(SSVector& rhs);

@@ -13,9 +13,8 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: didxset.cpp,v 1.6 2002/01/18 14:30:05 bzfpfend Exp $"
+#pragma ident "@(#) $Id: didxset.cpp,v 1.7 2002/01/19 13:06:29 bzfkocht Exp $"
 
-#include <iostream>
 #include "didxset.h"
 #include "spxalloc.h"
 
@@ -23,9 +22,14 @@ namespace soplex
 {
 
 void DIdxSet::setMax(int newmax)
-{
+{ 
+   assert(idx   != 0);
+   assert(max() >  0);
+
    len = (newmax < size()) ? size() : newmax;
    len = (len < 1) ? 1 : len;
+
+   assert(len > 0);
 
    spx_realloc(idx, len);
 }
@@ -35,6 +39,7 @@ DIdxSet::DIdxSet(const IdxSet& old)
 {
    len = old.size();
    spx_alloc(idx, len);
+
    IdxSet::operator= ( old );
 }
 
@@ -43,7 +48,8 @@ DIdxSet::DIdxSet(const DIdxSet& old)
 {
    len = old.size();
    spx_alloc(idx, len);
-   IdxSet::operator= ( static_cast<IdxSet>(old) );
+
+   IdxSet::operator= ( old );
 }
 
 DIdxSet::DIdxSet(int n)

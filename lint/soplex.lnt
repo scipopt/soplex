@@ -1,4 +1,4 @@
-// $Id: soplex.lnt,v 1.4 2002/01/05 20:31:11 bzfkocht Exp $
+// $Id: soplex.lnt,v 1.5 2002/01/19 13:06:29 bzfkocht Exp $
 -passes(1)
 +cpp(.h,.cpp)
 // esoteric size settings to find erros.
@@ -60,9 +60,12 @@
 -esym(1539,DataKey::idx)  // is assigned
 
 // didxset.h 
--esym(1526,DIdxSet::operator=)   // correctly not implemented
--esym(1526,DIdxSet::DIdxSet)     // correctly not implemented
--esym(1526,DIdxSet::indexMem)    // correctly not implemented
+-esym(1526,IdxSet::IdxSet)       // correctly not implemented
+
+// didxset.h 
+//esym(1526,DIdxSet::operator=)   // correctly not implemented
+//esym(1526,DIdxSet::DIdxSet)     // correctly not implemented
+//sym(1526,DIdxSet::indexMem)    // correctly not implemented
 
 // cflufactor.h
 -esym(1401,CLUFactor::*)         // no initialisation

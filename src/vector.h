@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector.h,v 1.7 2002/01/04 17:31:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vector.h,v 1.8 2002/01/19 13:06:30 bzfkocht Exp $"
 
 /**@file  vector.h
  * @brief Dense vector for linear algebra.
@@ -32,7 +32,6 @@ class SLUFactor;
 class SVector;
 class SSVector;
 class SubSVector;
-class IdxSet;
 
 /**@brief   Dense vector
    @ingroup Algebra
@@ -250,7 +249,7 @@ public:
    friend std::ostream& operator<<(std::ostream& s, const Vector& vec);
 
    /// consistency check.
-   int isConsistent() const;
+   bool isConsistent() const;
 
    /// set vector to 0.
    void clear()

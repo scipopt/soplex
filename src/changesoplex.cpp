@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: changesoplex.cpp,v 1.8 2002/01/16 16:52:23 bzfpfend Exp $"
+#pragma ident "@(#) $Id: changesoplex.cpp,v 1.9 2002/01/19 13:06:29 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -174,7 +174,7 @@ void SoPlex::addedRows(int n)
       case SPxBasis::UNBOUNDED:
          setStatus(SPxBasis::REGULAR);
          break;
-      case OPTIMAL:
+      case SPxBasis::OPTIMAL:
       case SPxBasis::INFEASIBLE:
          setStatus(SPxBasis::DUAL);
          break;
@@ -357,7 +357,7 @@ void SoPlex::addedCols(int n)
       case SPxBasis::INFEASIBLE:
          setStatus(SPxBasis::REGULAR);
          break;
-      case OPTIMAL:
+      case SPxBasis::OPTIMAL:
       case SPxBasis::UNBOUNDED:
          setStatus(SPxBasis::PRIMAL);
          break;
@@ -403,7 +403,7 @@ void SoPlex::doRemoveRow(int i)
       case SPxBasis::INFEASIBLE:
          setStatus(SPxBasis::REGULAR);
          break;
-      case OPTIMAL:
+      case SPxBasis::OPTIMAL:
          setStatus(SPxBasis::PRIMAL);
          break;
       default:
@@ -462,7 +462,7 @@ void SoPlex::doRemoveRows(int perm[])
       case SPxBasis::INFEASIBLE:
          setStatus(SPxBasis::REGULAR);
          break;
-      case OPTIMAL:
+      case SPxBasis::OPTIMAL:
          setStatus(SPxBasis::PRIMAL);
          break;
       default:
@@ -506,7 +506,7 @@ void SoPlex::doRemoveCol(int i)
       case SPxBasis::UNBOUNDED:
          setStatus(SPxBasis::REGULAR);
          break;
-      case OPTIMAL:
+      case SPxBasis::OPTIMAL:
          setStatus(SPxBasis::DUAL);
          break;
       default:
@@ -565,7 +565,7 @@ void SoPlex::doRemoveCols(int perm[])
       case SPxBasis::UNBOUNDED:
          setStatus(SPxBasis::REGULAR);
          break;
-      case OPTIMAL:
+      case SPxBasis::OPTIMAL:
          setStatus(SPxBasis::DUAL);
          break;
       default:

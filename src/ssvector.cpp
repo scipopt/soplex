@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.12 2002/01/10 13:34:49 bzfpfend Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.13 2002/01/19 13:06:29 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -25,19 +25,30 @@
  * @todo There is a lot pointer arithmetic done here. It is not clear if
  *       this is an advantage at all. See all the function int() casts.
  */
-
 namespace soplex
 {
 
 static const double shortProductFactor = 0.5;
 
+void SSVector::setMax(int newmax)
+{
+   assert(idx    != 0);
+   assert(newmax != 0);
+   assert(newmax >= IdxSet::size());
+
+   // len = (newmax < IdxSet::max()) ? IdxSet::max() : newmax;
+   len = newmax;
+
+   spx_realloc(idx, len);
+}
+
 void SSVector::reDim (int newdim)
 {
-   for (int i = DIdxSet::size() - 1; i >= 0; --i)
+   for (int i = IdxSet::size() - 1; i >= 0; --i)
       if (index(i) >= newdim)
          remove(i);
    DVector::reDim(newdim);
-   DIdxSet::setMax(DVector::memSize() + 1);
+   setMax(DVector::memSize() + 1);
    assert(isConsistent());
 }
 
@@ -45,14 +56,14 @@ void SSVector::reMem(int newsize)
 {
    DVector::reSize(newsize);
    assert(isConsistent());
-   DIdxSet::setMax(DVector::memSize() + 1);
+   setMax(DVector::memSize() + 1);
 }
 
 void SSVector::clear ()
 {
    if (isSetup())
    {
-      int i = DIdxSet::size();
+      int i = IdxSet::size();
       int* iptr;
       for (iptr = idx; i--; iptr++)
          val[*iptr] = 0;
@@ -61,7 +72,7 @@ void SSVector::clear ()
       Vector::clear();
 
    IdxSet::clear();
-   setupStatus = 1;
+   setupStatus = true;
    assert(isConsistent());
 }
 
@@ -109,14 +120,12 @@ void SSVector::setup()
       double x;
       int* ii = idx;
       int* last = idx + n;
-      const double eps = epsilon;
-      const double meps = -eps;
       v = val;
 
       for (; id < last; ++id)
       {
          x = v[*id];
-         if (x > eps || x < meps)
+         if (fabs(x) > eps)
             *ii++ = *id;
          else
             v[*id] = 0;
@@ -129,7 +138,7 @@ void SSVector::setup()
       {
          if (dim())
          {
-            if (*val > epsilon || *val < -epsilon)
+            if (fabs(*val) > epsilon)
                IdxSet::add(0);
             else
                *val = 0;
@@ -140,15 +149,13 @@ void SSVector::setup()
          int* ii = idx;
          double* v = val;
          double* end = v + dim() - 1;
-         const double eps = epsilon;
-         const double meps = -eps;
 
          /* setze weissen Elefanten */
          double last = *end;
          *end = 1e-100;
 
          /* erstes element extra */
-         if (*v > eps || *v < meps)
+         if (fabs(*v) > epsilon)
             *ii++ = 0;
          else
             *v = 0;
@@ -156,7 +163,7 @@ void SSVector::setup()
          for(;;)
          {
             while (!*++v);
-            if (*v > eps || *v < meps)
+            if (fabs(*v) > epsilon)
             {
                *ii++ = int(v - val);
             }
@@ -170,7 +177,7 @@ void SSVector::setup()
          }
 
          /* fange weissen Elefanten wieder ein */
-         if (last > eps || last < meps)
+         if (fabs(last) > epsilon)
          {
             *v = last;
             *ii++ = dim() - 1;
@@ -183,7 +190,7 @@ void SSVector::setup()
 
 #endif
 
-      setupStatus = 1;
+      setupStatus = true;
       assert(isConsistent());
    }
 }
@@ -193,7 +200,7 @@ SSVector& SSVector::operator+=(const Vector& vec)
    Vector::operator+=(vec);
    if (isSetup())
    {
-      setupStatus = 0;
+      setupStatus = false;
       setup();
    }
    return *this;
@@ -204,7 +211,7 @@ SSVector& SSVector::operator+=(const SVector& vec)
    Vector::operator+=(vec);
    if (isSetup())
    {
-      setupStatus = 0;
+      setupStatus = false;
       setup();
    }
    return *this;
@@ -215,7 +222,7 @@ SSVector& SSVector::operator+=(const SubSVector& vec)
    Vector::operator+=(vec);
    if (isSetup())
    {
-      setupStatus = 0;
+      setupStatus = false;
       setup();
    }
    return *this;
@@ -227,7 +234,7 @@ SSVector& SSVector::operator+=(const SSVector& vec)
       val[vec.index(i)] += vec.value(i);
    if (isSetup())
    {
-      setupStatus = 0;
+      setupStatus = false;
       setup();
    }
    return *this;
@@ -238,7 +245,7 @@ SSVector& SSVector::operator-=(const Vector& vec)
    Vector::operator-=(vec);
    if (isSetup())
    {
-      setupStatus = 0;
+      setupStatus = false;
       setup();
    }
    return *this;
@@ -249,7 +256,7 @@ SSVector& SSVector::operator-=(const SVector& vec)
    Vector::operator-=(vec);
    if (isSetup())
    {
-      setupStatus = 0;
+      setupStatus = false;
       setup();
    }
    return *this;
@@ -260,7 +267,7 @@ SSVector& SSVector::operator-=(const SubSVector& vec)
    Vector::operator-=(vec);
    if (isSetup())
    {
-      setupStatus = 0;
+      setupStatus = false;
       setup();
    }
    return *this;
@@ -280,7 +287,7 @@ SSVector& SSVector::operator-=(const SSVector& vec)
 
    if (isSetup())
    {
-      setupStatus = 0;
+      setupStatus = false;
       setup();
    }
 
@@ -420,7 +427,7 @@ SSVector& SSVector::multAdd(double xx, const SSVector& svec)
       }
       num = int(ii - idx);
 
-      setupStatus = 1;
+      setupStatus = true;
    }
 
    assert(isConsistent());
@@ -552,7 +559,7 @@ SSVector& SSVector::multAdd(double x, const Vector& vec)
    Vector::multAdd(x, vec);
    if (isSetup())
    {
-      setupStatus = 0;
+      setupStatus = false;
       setup();
    }
    return *this;
@@ -564,8 +571,8 @@ SSVector& SSVector::operator=(const SSVector& rhs)
    {
       clear();
 
-      DIdxSet::setMax(rhs.max());
-      DIdxSet::operator=(rhs);
+      setMax(rhs.max());
+      IdxSet::operator=(rhs);
       DVector::reDim(rhs.dim());
 
       if (rhs.isSetup())
@@ -616,7 +623,7 @@ SSVector& SSVector::operator=(const SSVector& rhs)
          }
          num = int(ii - idx);
       }
-      setupStatus = 1;
+      setupStatus = true;
    }
    assert(isConsistent());
 
@@ -627,13 +634,13 @@ void SSVector::setup_and_assign(SSVector& rhs)
 {
    clear();
 
-   DIdxSet::setMax(rhs.max());
+   setMax(rhs.max());
    DVector::reDim(rhs.dim());
 
    if (rhs.isSetup())
    {
       int i, j;
-      DIdxSet::operator=(rhs);
+      IdxSet::operator=(rhs);
       for (i = size() - 1; i >= 0; --i)
       {
          j = index(i);
@@ -681,9 +688,9 @@ void SSVector::setup_and_assign(SSVector& rhs)
       else
          *rv = 0;
       num = rhs.num = int(ii - idx);
-      rhs.setupStatus = 1;
+      rhs.setupStatus = true;
    }
-   setupStatus = 1;
+   setupStatus = true;
 
    assert(isConsistent());
 }
@@ -708,7 +715,7 @@ SSVector& SSVector::assign(const SVector& rhs)
       p += ((e++)->val != 0);
    }
    num = int(p - idx);
-   setupStatus = 1;
+   setupStatus = true;
 
    assert(isConsistent());
    return *this;
@@ -827,20 +834,20 @@ SSVector& SSVector::assign2product4setup(const SVSet& A, const SSVector& x)
    if (x.size() == 1)
    {
       assign2product1(A, x);
-      setupStatus = 1;
+      setupStatus = true;
    }
 
    else if (double(x.size())*A.memSize() <= shortProductFactor*dim()*A.num()
              && isSetup())
    {
       assign2productShort(A, x);
-      setupStatus = 1;
+      setupStatus = true;
    }
 
    else
    {
       assign2productFull(A, x);
-      setupStatus = 0;
+      setupStatus = false;
    }
 
    return *this;
@@ -923,17 +930,18 @@ SSVector& SSVector::assign2productAndSetup(const SVSet& A, SSVector& x)
       *xv = 0;
 
    x.num = int(xi - x.idx);
-   x.setupStatus = 1;
-   setupStatus = 0;
+   x.setupStatus = true;
+   setupStatus = false;
 
    return *this;
 }
 
-int SSVector::isConsistent() const
+bool SSVector::isConsistent() const
 {
-   if (Vector::dim() > DIdxSet::max())
+   if (Vector::dim() > IdxSet::max())
       return MSGinconsistent("SSVector");
-   if (Vector::dim() < DIdxSet::dim())
+
+   if (Vector::dim() < IdxSet::dim())
       return MSGinconsistent("SSVector");
 
    if (isSetup())
@@ -943,7 +951,7 @@ int SSVector::isConsistent() const
             return MSGinconsistent("SSVector");
    }
 
-   return DVector::isConsistent() && DIdxSet::isConsistent();
+   return DVector::isConsistent() && IdxSet::isConsistent();
 }
 } // namespace soplex
 

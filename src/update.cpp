@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: update.cpp,v 1.5 2001/12/04 19:28:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: update.cpp,v 1.6 2002/01/19 13:06:30 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -22,19 +22,15 @@
 
 namespace soplex
 {
-
-
-/*****************************************************************************/
-
 void CLUFactor::update(int p_col, double* p_work, const int* p_idx, int num)
 {
    int ll, i, j;
    int* lidx;
    double* lval;
-   double x, div;
+   double x, rezi;
 
    assert(p_work[p_col] != 0);
-   div = 1 / p_work[p_col];
+   rezi = 1 / p_work[p_col];
    p_work[p_col] = 0;
 
    ll = makeLvec(num, p_col);
@@ -45,20 +41,20 @@ void CLUFactor::update(int p_col, double* p_work, const int* p_idx, int num)
    for (i = num - 1; (j = p_idx[i]) != p_col; --i)
    {
       lidx[ll] = j;
-      lval[ll] = div * p_work[j];
+      lval[ll] = rezi * p_work[j];
       p_work[j] = 0;
       ++ll;
    }
 
    lidx[ll] = p_col;
-   lval[ll] = 1 - div;
+   lval[ll] = 1 - rezi;
    ++ll;
 
    for (--i; i >= 0; --i)
    {
       j = p_idx[i];
       lidx[ll] = j;
-      lval[ll] = x = div * p_work[j];
+      lval[ll] = x = rezi * p_work[j];
       p_work[j] = 0;
       ++ll;
 
@@ -77,10 +73,10 @@ void CLUFactor::updateNoClear(
    int ll, i, j;
    int* lidx;
    double* lval;
-   double x, div;
+   double x, rezi;
 
    assert(p_work[p_col] != 0);
-   div = 1 / p_work[p_col];
+   rezi = 1 / p_work[p_col];
    ll = makeLvec(num, p_col);
    //ll = fac->makeLvec(num, col);
    lval = l.val;
@@ -89,19 +85,19 @@ void CLUFactor::updateNoClear(
    for (i = num - 1; (j = p_idx[i]) != p_col; --i)
    {
       lidx[ll] = j;
-      lval[ll] = div * p_work[j];
+      lval[ll] = rezi * p_work[j];
       ++ll;
    }
 
    lidx[ll] = p_col;
-   lval[ll] = 1 - div;
+   lval[ll] = 1 - rezi;
    ++ll;
 
    for (--i; i >= 0; --i)
    {
       j = p_idx[i];
       lidx[ll] = j;
-      lval[ll] = x = div * p_work[j];
+      lval[ll] = x = rezi * p_work[j];
       ++ll;
 
       if (fabs(x) > maxabs)

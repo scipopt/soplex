@@ -13,13 +13,14 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dsvector.cpp,v 1.9 2002/01/10 13:34:49 bzfpfend Exp $"
+#pragma ident "@(#) $Id: dsvector.cpp,v 1.10 2002/01/19 13:06:29 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
 #include "dsvector.h"
 #include "spxalloc.h"
+#include "message.h"
 
 namespace soplex
 {
@@ -90,14 +91,12 @@ DSVector::~DSVector()
    spx_free(theelem);
 }
 
-int DSVector::isConsistent() const
+bool DSVector::isConsistent() const
 {
    if ((theelem != 0) && (mem() != theelem))
-   {
-      std::cout << "ERROR: Inconsistency detected in class DSVector\n";
-      return 0;
-   }
-   return 1;
+      return MSGinconsistent("DSVector");
+
+   return true;
 }
 } // namespace soplex
 

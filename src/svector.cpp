@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.cpp,v 1.9 2002/01/15 17:58:38 bzfbleya Exp $"
+#pragma ident "@(#) $Id: svector.cpp,v 1.10 2002/01/19 13:06:29 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -24,14 +24,6 @@
 
 namespace soplex
 {
-void SVector::toFront(int n)
-{
-   assert(n < size() && n >= 0);
-   Element dummy = m_elem[n];
-   m_elem[n] = m_elem[0];
-   m_elem[0] = dummy;
-}
-
 void SVector::add(int n, const int i[], const double v[])
 {
    assert(n + size() <= max());
