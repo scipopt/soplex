@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.66 2003/01/19 20:58:11 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.67 2003/01/20 16:46:13 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -139,7 +139,7 @@ SPxSolver::Status SPxSolver::solve()
 
                   // is the solution good enough ?
                   if ((delta() / thepricer->epsilon() < 50) // max three times reduced
-                     && (sumViolRedCost > delta() || sumViolBounds > delta() || sumViolConst > delta())) 
+                     && (maxViolRedCost > delta() || maxViolBounds > delta() || maxViolConst > delta())) 
                   {  // no!
                      // we reduce delta(). Note that if the pricer does not find a candiate
                      // with the reduced delta, we quit, regardless of the violations.
@@ -256,7 +256,7 @@ SPxSolver::Status SPxSolver::solve()
 
                   // is the solution good enough ?
                   if ((delta() / thepricer->epsilon() < 50) // max three times reduced
-                     && (sumViolRedCost > delta() || sumViolBounds > delta() || sumViolConst > delta())) 
+                     && (maxViolRedCost > delta() || maxViolBounds > delta() || maxViolConst > delta())) 
                   {  // no
                      // we reduce delta(). Note that if the pricer does not find a candiate
                      // with the reduced delta, we quit, regardless of the violations.

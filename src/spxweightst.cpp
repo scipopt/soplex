@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.cpp,v 1.18 2003/01/10 12:46:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightst.cpp,v 1.19 2003/01/20 16:46:13 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 //#define TEST 1
@@ -225,8 +225,8 @@ void SPxWeightST::generate(SPxSolver& base)
 
    setupWeights(base);
 
-   SPxBasis::Desc desc;
-   desc.reSize(base.nRows(), base.nCols());
+   SPxBasis::Desc desc(base);
+   //   desc.reSize(base.nRows(), base.nCols());
 
    DataArray < SPxId > pref(base.nRows() + base.nCols());
    initPrefs(pref, base, rowWeight, colWeight);

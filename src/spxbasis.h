@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.32 2003/01/10 12:46:14 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.33 2003/01/20 16:46:12 bzfkocht Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -277,9 +277,14 @@ public:
       bool isConsistent() const;
       /// default constructor
       Desc()
+         : stat(0)
+         , costat(0)
       {}
+      explicit Desc(const SPxSolver& base);
+
       /// copy constructor
-      Desc(const Desc& old)
+      Desc(const Desc& old);
+#if 0
          : rowstat(old.rowstat)
          , colstat(old.colstat)
       {
@@ -298,8 +303,10 @@ public:
             costat = &rowstat;
          }
       }
+#endif
       /// assignment operator
-      Desc& operator=(const Desc& rhs)
+      Desc& operator=(const Desc& rhs);
+#if 0
       {
          if (this != &rhs)
          {
@@ -323,6 +330,7 @@ public:
          }
          return *this;
       }
+#endif
    };
 
 protected:

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.39 2003/01/16 09:17:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.40 2003/01/20 16:46:12 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -643,7 +643,7 @@ SPxBasis::SPxBasis()
    , matrixIsSetup (false)
    , factor (0)
    , factorized (false)
-   , maxUpdates (200)
+   , maxUpdates (200) 
    , nonzeroFactor(10.0)
    , fillFactor(5.0)
    , nzCount (1)

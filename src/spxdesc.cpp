@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdesc.cpp,v 1.10 2002/03/11 17:43:57 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdesc.cpp,v 1.11 2003/01/20 16:46:13 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -21,9 +21,74 @@
 
 #include "spxdefines.h"
 #include "spxbasis.h"
+#include "spxsolver.h"
 
 namespace soplex
 {
+ 
+SPxBasis::Desc::Desc(const SPxSolver& base)
+{
+   rowstat.reSize(base.nRows());
+   colstat.reSize(base.nCols());
+
+   if (base.rep() == SPxSolver::ROW)
+   {
+      stat   = &rowstat;
+      costat = &colstat;
+   }
+   else
+   {
+      assert(base.rep() == SPxSolver::COLUMN);
+
+      stat   = &colstat;
+      costat = &rowstat;
+   }
+}
+
+SPxBasis::Desc::Desc(const Desc& old)
+   : rowstat(old.rowstat)
+   , colstat(old.colstat)
+{
+   if (old.stat == &old.rowstat)
+   {
+      assert(old.costat == &old.colstat);
+      
+      stat   = &rowstat;
+      costat = &colstat;
+   }
+   else
+   {
+      assert(old.costat == &old.rowstat);
+      
+      stat   = &colstat;
+      costat = &rowstat;
+   }
+}
+
+SPxBasis::Desc& SPxBasis::Desc::operator=(const SPxBasis::Desc& rhs)
+{
+   if (this != &rhs)
+   {
+      rowstat = rhs.rowstat;
+      colstat = rhs.colstat;
+      
+      if (rhs.stat == &rhs.rowstat)
+      {
+         assert(rhs.costat == &rhs.colstat);
+         
+         stat   = &rowstat;
+         costat = &colstat;
+      }
+      else
+      {
+         assert(rhs.costat == &rhs.rowstat);
+         
+         stat   = &colstat;
+         costat = &rowstat;
+      }
+   }
+   return *this;
+}
 
 void SPxBasis::Desc::reSize(int rowDim, int colDim)
 {

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.14 2002/08/27 07:20:37 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.15 2003/01/20 16:46:13 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -179,8 +179,6 @@ SPxId SPxDefaultRT::selectEnter(Real& max)
    int   j;
    Real  x;
 
-   std::cout << "1val: " << val << std::endl;
-   
    // PARALLEL the j loops could be parallelized
    if (val > 0)
    {
@@ -369,9 +367,6 @@ SPxId SPxDefaultRT::selectEnter(Real& max)
       if( !enterId.isValid() )
          std::cerr << "!isValid(): max=" << max << ", x=" << x << std::endl;
    });
-
-   std::cout << "2val: " << val << std::endl;
-
    max = val;
 
    return enterId;
