@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clufactor.h,v 1.5 2001/12/14 09:32:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: clufactor.h,v 1.6 2001/12/25 09:16:39 bzfkocht Exp $"
 
 #ifndef _CLUFACTOR_H_
 #define _CLUFACTOR_H_
@@ -356,6 +356,8 @@ private:
       
    ///
    int setupColVals();
+   ///
+   void setupRowVals();
 
    ///
    void eliminateRowSingletons();

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.23 2001/12/15 11:52:32 bzfkocht Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.24 2001/12/25 09:16:39 bzfkocht Exp $"
 
 #include <iostream>
 #include <assert.h>
@@ -1415,9 +1415,9 @@ int CLUFactor::setupColVals()
 /*****************************************************************************/
 
 #ifdef WITH_L_ROWS
-static void setupRowVals(CLUFactor* fc)
+void CLUFactor::setupRowVals()
 {
-   int i, j, k, l;
+   int i, j, k, m;
    int l_dim, vecs, mem;
    int* l_row;
    int* idx;
@@ -1429,35 +1429,35 @@ static void setupRowVals(CLUFactor* fc)
    int *rorig, *rrorig;
    int *rperm, *rrperm;
 
-   l_dim = fc->thedim;
-   vecs  = fc->l.firstUpdate;
-   l_row = fc->l.row;
-   idx   = fc->l.idx;
-   val   = fc->l.val;
-   beg   = fc->l.start;
+   l_dim = thedim;
+   vecs  = l.firstUpdate;
+   l_row = l.row;
+   idx   = l.idx;
+   val   = l.val;
+   beg   = l.start;
    mem   = beg[vecs];
 
-   if (fc->l.rval)
+   if (l.rval)
    {
-      spx_free(fc->l.rval);
-      spx_free(fc->l.ridx);
-      spx_free(fc->l.rbeg);
-      spx_free(fc->l.rorig);
-      spx_free(fc->l.rperm);
+      spx_free(l.rval);
+      spx_free(l.ridx);
+      spx_free(l.rbeg);
+      spx_free(l.rorig);
+      spx_free(l.rperm);
    }
-   spx_alloc(fc->l.rval, mem);
-   spx_alloc(fc->l.ridx, mem);
-   spx_alloc(fc->l.rbeg, l_dim + 1);
-   spx_alloc(fc->l.rorig, l_dim);
-   spx_alloc(fc->l.rperm, l_dim);
+   spx_alloc(l.rval, mem);
+   spx_alloc(l.ridx, mem);
+   spx_alloc(l.rbeg, l_dim + 1);
+   spx_alloc(l.rorig, l_dim);
+   spx_alloc(l.rperm, l_dim);
 
-   l_ridx = fc->l.ridx;
-   l_rval = fc->l.rval;
-   l_rbeg = fc->l.rbeg;
-   rorig  = fc->l.rorig;
-   rrorig = fc->row.orig;
-   rperm  = fc->l.rperm;
-   rrperm = fc->row.perm;
+   l_ridx = l.ridx;
+   l_rval = l.rval;
+   l_rbeg = l.rbeg;
+   rorig  = l.rorig;
+   rrorig = row.orig;
+   rperm  = l.rperm;
+   rrperm = row.perm;
 
    for (i = l_dim; i--; *l_rbeg++ = 0)
    {
@@ -1466,34 +1466,34 @@ static void setupRowVals(CLUFactor* fc)
    }
    *l_rbeg = 0;
 
-   l_rbeg = fc->l.rbeg + 1;
+   l_rbeg = l.rbeg + 1;
    for (i = mem; i--;)
       l_rbeg[*idx++]++;
-   idx = fc->l.idx;
+   idx = l.idx;
 
-   for (l = 0, i = l_dim; i--; l_rbeg++)
+   for (m = 0, i = l_dim; i--; l_rbeg++)
    {
       j = *l_rbeg;
-      *l_rbeg = l;
-      l += j;
+      *l_rbeg = m;
+      m += j;
    }
-   assert(l == mem);
+   assert(m == mem);
 
-   l_rbeg = fc->l.rbeg + 1;
+   l_rbeg = l.rbeg + 1;
    for (i = j = 0; i < vecs; ++i)
    {
-      l = l_row[i];
-      assert(idx == &fc->l.idx[fc->l.start[i]]);
+      m = l_row[i];
+      assert(idx == &l.idx[l.start[i]]);
       for (; j < beg[i + 1]; j++)
       {
          k = l_rbeg[*idx++]++;
          assert(k < mem);
-         l_ridx[k] = l;
+         l_ridx[k] = m;
          l_rval[k] = *val++;
       }
    }
-   assert(fc->l.rbeg[l_dim] == mem);
-   assert(fc->l.rbeg[0] == 0);
+   assert(l.rbeg[l_dim] == mem);
+   assert(l.rbeg[0] == 0);
 }
 #endif
 
@@ -1539,7 +1539,7 @@ void CLUFactor::factor(
    if (stat == SLinSolver::OK)
    {
 #ifdef WITH_L_ROWS
-      setupRowVals(this);
+      setupRowVals();
 #endif
       nzCnt = setupColVals();
    }
