@@ -50,3 +50,28 @@ clufactor.h
 +soplex.h // in Arbeit ;-)
 
 
+sunos.sparc.sun LC 0 3046
+fit2p    LR 
+maros    LR
+pilot-ja LR
+pilot87  EC *
+
+linux.alpha.compaq LC 0 526
+maros-r7 EC
+pilot87  EC *
+pilot87  LR *
+
+linux.x86.gnu LC 1 598
+bnl1     LR
+greenbea ER
+maros-r7 LC
+maros    ER
+pilot87  EC *
+
+linux.x86.intel LC 1 977
+greenbea ER
+maros-r7 LC
+pilot-ja ER
+pilot87  EC *
+
+
