@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.65 2003/01/16 09:17:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.66 2003/01/19 20:58:11 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -342,7 +342,7 @@ SPxSolver::Status SPxSolver::solve()
       m_status = ERROR;
 
    VERBOSE1({
-      std::cout << "Finished solving (status=" << int(status());
+      std::cout << "ISOLVE02 Finished solving (status=" << int(status());
       std::cout << ", iters=" << iterCount
                 << ", leave=" << leaveCount
                 << ", enter=" << enterCount;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.29 2003/01/16 09:17:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.30 2003/01/19 20:58:11 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -495,7 +495,7 @@ void SPxSolver::rejectLeave(
 }
 
 
-int SPxSolver::leave(int leaveIdx)
+bool SPxSolver::leave(int leaveIdx)
 {
    METHOD( "SPxSolver::leave()" );
    assert(leaveIdx < dim() && leaveIdx >= 0);
@@ -557,6 +557,7 @@ int SPxSolver::leave(int leaveIdx)
       if (!enterId.isValid())
       {
          SPxId none;
+
          change(leaveIdx, none, 0);
          /* the following line originally was below in "rejecting leave" case;
             we need it in the unbounded/infeasible case, too, to have the 
@@ -568,18 +569,22 @@ int SPxSolver::leave(int leaveIdx)
             DEBUG( std::cout << "rejecting leave" << std::endl; );
             theCoTest[leaveIdx] *= 0.01;            // #== fTest()#
             theCoTest[leaveIdx] -= 2 * delta();     // #== fTest()#
-            return 1;
+            return true;
          }
-         VERBOSE3({ std::cout << "ILEAVE01 unboundness/infeasiblity found in leave()" << std::endl; });
+         if (lastUpdate() > 1)
+         {
+            VERBOSE3({ std::cout << "ILEAVE01 factorization triggered in leave() for feasibility test" << std::endl; });
+            factorize();
+            return leave(leaveIdx);
+         }
+         VERBOSE3({ std::cout << "ILEAVE02 unboundness/infeasiblity found in leave()" << std::endl; });
 
          if (rep() != COLUMN)
             setBasisStatus(SPxBasis::UNBOUNDED);
          else
             setBasisStatus(SPxBasis::INFEASIBLE);
-         return 0;
+         return false;
       }
-
-
       /*
           If an entering variable has been found, a regular basis update is to
           be performed.
@@ -615,7 +620,7 @@ int SPxSolver::leave(int leaveIdx)
             DEBUG( std::cout << "rejecting leave" << std::endl; );
             // factorize();
             theCoTest[leaveIdx] *= 0.01;            // #== fTest()#
-            return 1;
+            return true;
          }
 
          //      process leaving variable
@@ -740,7 +745,7 @@ int SPxSolver::leave(int leaveIdx)
       }
 #endif  // NDEBUG
 
-      return 1;
+      return true;
    }
 }
 } // namespace soplex
