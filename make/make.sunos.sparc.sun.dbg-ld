@@ -1,0 +1,8 @@
+#--- $Id: make.sunos.sparc.sun.dbg-ld,v 1.1 2002/02/21 13:26:59 bzfkocht Exp $
+CXX	=	CC
+CPPFLAGS=	-Isrc -DWITH_LONG_DOUBLE
+CXXFLAGS=	-g +w
+LDFLAGS	=	-lm
+RANLIB	=	true
+AR	=	CC
+ARFLAGS	=	$(CPPFLAGS) $(CXXFLAGS) -xar -o
