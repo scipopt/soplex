@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpconv.cpp,v 1.3 2003/04/16 12:41:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpconv.cpp,v 1.4 2004/11/01 07:37:39 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -110,8 +110,8 @@ int main(int argc, char **argv)
       std::cerr << "Can't open file: " << outfile << std::endl;
       exit(1);
    }
-   //lp.writeMPS(ofile, &rownames, &colnames, &intvars);
-   std::cout << lp;
+   lp.writeMPS(ofile, &rownames, &colnames, &intvars);
+   //std::cout << lp;
 
    return 0;
 }
