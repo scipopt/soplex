@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.16 2001/12/05 15:05:32 bzfkocht Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.17 2001/12/10 22:41:57 bzfbleya Exp $"
 
 #include <iostream>
 #include <assert.h>
@@ -52,10 +52,23 @@ CLUFactor::Temp::~Temp()
 {
    clear();
 }
-
 /************************************************************/   
 
-CLUFactor::Pivots CLUFactor::pivots;
+CLUFactor::Pivots::Pivots()
+   :
+   pivot_col   ( 0 ),
+   pivot_colNZ ( 0 ),
+   pivot_row   ( 0 ),
+   pivot_rowNZ ( 0 )
+{}
+
+CLUFactor::Pivots::~Pivots()
+{
+   if ( pivot_col )   spx_free(pivot_col);
+   if( pivot_colNZ )  spx_free(pivot_colNZ);
+   if ( pivot_row )   spx_free(pivot_row);
+   if ( pivot_rowNZ ) spx_free(pivot_rowNZ);
+}
 
 /************************************************************/   
 void CLUFactor::initPerm()
@@ -716,10 +729,14 @@ void CLUFactor::initFactorRings( const int stage )
 
 void CLUFactor::freeFactorRings(void)
 {
-   spx_free(pivots.pivot_col);
-   spx_free(pivots.pivot_colNZ);
-   spx_free(pivots.pivot_row);
-   spx_free(pivots.pivot_rowNZ);
+   if ( pivots.pivot_col )
+      spx_free(pivots.pivot_col);
+   if( pivots.pivot_colNZ )
+      spx_free(pivots.pivot_colNZ);
+   if ( pivots.pivot_row )
+      spx_free(pivots.pivot_row);
+   if ( pivots.pivot_rowNZ )
+      spx_free(pivots.pivot_rowNZ);
 }
    
 

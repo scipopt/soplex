@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clufactor.h,v 1.2 2001/12/05 15:05:32 bzfkocht Exp $"
+#pragma ident "@(#) $Id: clufactor.h,v 1.3 2001/12/10 22:41:57 bzfbleya Exp $"
 
 #ifndef _CLUFACTOR_H_
 #define _CLUFACTOR_H_
@@ -153,8 +153,11 @@ struct L
 };
 
 
-   struct Pivots 
+   class Pivots 
    {
+   public:
+      Pivots();
+      ~Pivots();
       Pring pivots;                /* ring of selected pivot rows */
       Pring *pivot_col;            /* column index handlers for double linked list */
       Pring *pivot_colNZ;          /* lists for columns to number of nonzeros      */
@@ -329,12 +332,10 @@ public:
 
    
 private:
-   /// Pivot ring
    ///
    Temp temp;
    ///
-   /**@todo Why must pivot datastructures be static in CLU for factor.cpp? */
-   static Pivots pivots;
+   Pivots pivots;
 
 private:
    ///

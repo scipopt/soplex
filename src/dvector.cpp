@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dvector.cpp,v 1.4 2001/11/13 21:55:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dvector.cpp,v 1.5 2001/12/10 22:41:57 bzfbleya Exp $"
 
 
 /*  \Section{Complex Methods}
@@ -105,7 +105,7 @@ void DVector::reSize(int newsize, int newdim)
 
 void DVector::reDim(int newdim)
 {
-   if (newdim > memsize)
+   if ( /*newdim > memsize && */ newdim >= dim() )
       reSize(int(newdim + 0.2 * memsize));
    // Seems lint is wrong here. Replace with memset anyway.
    for (int i = dimen; i < newdim; i++)

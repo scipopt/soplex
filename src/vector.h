@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector.h,v 1.4 2001/11/25 14:58:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vector.h,v 1.5 2001/12/10 22:41:57 bzfbleya Exp $"
 
 /**@file  vector.h
  * @brief Dense vector for linear algebra.
@@ -262,6 +262,8 @@ public:
    /// set values given by \p idx to 0
    Vector& clear(const IdxSet& idx);
    //@}
+private:
+   Vector();
 };
 } // namespace soplex
 #endif // _VECTOR_H_
