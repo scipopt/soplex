@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.34 2003/03/04 12:32:28 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.35 2003/03/04 15:42:19 bzfkocht Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -24,6 +24,8 @@
  */
 //#define DEBUGGING 1
 
+#include <iostream>
+#include <iomanip>
 #include <assert.h>
 
 #include "spxdefines.h"
@@ -808,12 +810,18 @@ SLUFactor::~SLUFactor()
 
 static Real betterThreshold(Real th)
 {
+   assert(th < 1.0);
+
+   std::cout << "betterThreashold in: " << std::setw(32) << th << std::endl;
+
    if (LT(th, 0.1))
       th *= 10.0;
    else if (LT(th, 0.9))
       th = (th + 1.0) / 2.0;
    else if (LT(th, 0.999))
       th = 0.99999;
+
+   std::cout << "                out: " << std::setw(32) << th << std::endl;
 
    assert(th < 1.0);
 
@@ -896,6 +904,8 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
    {
       stat = OK;
 
+      std::cout << "lastThreshold: " << std::setw(32) << lastThreshold << std::endl;
+
       factor(matrix, lastThreshold, epsilon);
 
       if (stability() >= minStability)
@@ -905,11 +915,14 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
 
       lastThreshold = betterThreshold(lastThreshold);
 
-      if (x == lastThreshold)
+      if (EQ(x, lastThreshold))
          break;
 
       minStability /= 2.0;
    }
+   { std::cout << "threshold = " << lastThreshold
+                     << "\tstability = " << stability()
+                     << "\tminStability = " << minStability << std::endl; }
 
    DEBUG({ std::cout << "threshold = " << lastThreshold
                      << "\tstability = " << stability()
