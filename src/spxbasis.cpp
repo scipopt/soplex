@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.19 2002/01/31 08:19:28 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.20 2002/01/31 12:23:42 bzfpfend Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -143,11 +143,11 @@ void SPxBasis::load(const Desc& ds)
          theBaseId[j] = id;
          matrix[j] = &theLP->vector(id);
          nzCount += matrix[j++]->size();
-         /*
-         std::cerr << "\tR" << theLP->number(id);
+#if 0
+         std::cerr << "\tR" << theLP->number(id); // ???
          if(j % 8 == 0)
-             std::cerr << std::endl;
-          */
+            std::cerr << std::endl;
+#endif
       }
    }
 
@@ -158,12 +158,12 @@ void SPxBasis::load(const Desc& ds)
          SPxLP::SPxColId id = theLP->SPxLP::cId(i);
          theBaseId[j] = id;
          matrix[j] = &theLP->vector(id);
-         nzCount += matrix[j++]->size();
-         /*
-         std::cerr << "\tC" << theLP->number(id);
+         nzCount += matrix[j++]->size();      
+#if 0
+         std::cerr << "\tC" << theLP->number(id); // ???
          if(j % 8 == 0)
-             std::cerr << std::endl;
-          */
+            std::cerr << std::endl;
+#endif          
       }
    }
 

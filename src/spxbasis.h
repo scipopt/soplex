@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.16 2002/01/31 08:19:28 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.17 2002/01/31 12:23:42 bzfpfend Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -672,7 +672,7 @@ public:
        \p id. This includes:
        - updating the factorization, or recomputing it from scratch by
          calling #factorize(),
-       - resetting #lastEnered(),
+       - resetting #lastEntered(),
        - resetting #lastIndex(),
        - resetting #lastLeft(),
        - resetting #lastUpdate(),

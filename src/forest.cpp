@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: forest.cpp,v 1.13 2002/01/31 08:19:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: forest.cpp,v 1.14 2002/01/31 12:23:42 bzfpfend Exp $"
 
 #include <assert.h>
 
@@ -273,23 +273,24 @@ void CLUFactor::forestUpdate(int p_col, Real* p_work, int num, int *nonz)
    Real l_maxabs = maxabs;
    int dim = thedim;
 
-   /*  Remove column col form U
+   /*  Remove column p_col from U
     */
    j = cbeg[p_col];
    i = clen[p_col];
    nzCnt -= i;
    for (i += j - 1; i >= j; --i)
    {
-      m = cidx[i];
+      m = cidx[i];          // remove column p_col from row m
       k = rbeg[m];
-      h = --(rlen[m]) + k;
+      h = --(rlen[m]) + k;  // decrease length of row m
       while (ridx[k] != p_col)
          ++k;
-      ridx[k] = ridx[h];
+      assert( k <= h );     // k is the position of p_col, h is last position
+      ridx[k] = ridx[h];    // store last index at the position of p_col
       rval[k] = rval[h];
    }
 
-   /*  Insert new vector column col
+   /*  Insert new vector column p_col
     *  thereby determining the highest permuted row index r.
     */
    if (num)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.27 2002/01/31 08:19:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.28 2002/01/31 12:23:42 bzfpfend Exp $"
 
 #include <iostream>
 #include <assert.h>
@@ -162,6 +162,7 @@ void CLUFactor::remaxRow(int p_row, int len)
       if (delta > u.row.size - u.row.used)
       {
          packRows();
+         delta = len - u.row.max[p_row];  // packRows() changes u.row.max[] !
          if (u.row.size < rowMemMult * u.row.used + len)
             minRowMem(2 * u.row.used + len);
          /* minRowMem(rowMemMult * u.row.used + len); */
@@ -209,6 +210,8 @@ void CLUFactor::remaxRow(int p_row, int len)
          idx[j] = idx[i];
       }
    }
+   assert( u.row.start[u.row.list.prev->idx] + u.row.max[u.row.list.prev->idx]
+           == u.row.used );
 }
 
 /*************************************************************************/
@@ -257,8 +260,8 @@ void CLUFactor::packColumns()
 }
 
 /*
-    *      Make column col of fac large enough to hold len nonzeros.
-    */
+ *      Make column col of fac large enough to hold len nonzeros.
+ */
 void CLUFactor::remaxCol(int p_col, int len)
 {
    assert(u.col.max[p_col] < len);

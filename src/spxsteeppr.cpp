@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.14 2002/01/31 08:19:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.15 2002/01/31 12:23:42 bzfpfend Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -290,8 +290,22 @@ int SPxSteepPR::selectLeaveX(Real& best, int start, int incr)
 
       if (x < -theeps)
       {         
-         assert(coPenalty_ptr[i] >= theeps);
-         x = x * x / coPenalty_ptr[i] * p[i];
+         /**@todo this was an assert! is an assertion correct?*/
+         // assert(coPenalty_ptr[i] >= theeps);
+#ifndef NDEBUG
+         if( coPenalty_ptr[i] < theeps )
+         {
+            std::cout << "SPxSteepPR::selectLeaveX(): This shall not be!"
+                      << std::endl;
+            std::cout << "i=" << i
+                      << " x=" << x
+                      << " coPenalty_ptr[i]=" << coPenalty_ptr[i]
+                      << " theeps=" << theeps << std::endl;
+            x = x * x / theeps * p[i];
+         }
+         else
+#endif
+            x = x * x / coPenalty_ptr[i] * p[i];
          if (x > best)
          {
             best = x;

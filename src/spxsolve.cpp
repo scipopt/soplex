@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.32 2002/01/31 08:19:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.33 2002/01/31 12:23:42 bzfpfend Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -114,6 +114,13 @@ SoPlex::Status SoPlex::solve()
    bool stop  = terminate();
    leaveCount = enterCount = 0;
 
+#if 1
+   // ??? remember old basis
+   VarStatus *oldbasis_rows = new VarStatus[nRows()];
+   VarStatus *oldbasis_cols = new VarStatus[nCols()];
+   getBasis( oldbasis_rows, oldbasis_cols );
+#endif
+
    while (!stop)
    {
       if (type() == ENTER)
@@ -138,15 +145,18 @@ SoPlex::Status SoPlex::solve()
          }
          while (!stop);
 
+#ifndef NDEBUG
+         std::cout << "Enter finished. iteration: " << iteration() 
+                   << " value: " << value()
+                   << " shift: " << shift()
+                   << " epsilon: " << epsilon()
+                   << " stop: " << stop
+                   << " basis status: " << int(SPxBasis::status())
+                   << " solver status: " << int(m_status) << std::endl;
+#endif // NDEBUG
+
          if (!stop)
          {
-#ifdef DEBUG
-            std::cout << "iteration: " << iteration() 
-                      << " value: " << value()
-                      << " shift: " << shift()
-                      << " epsilon: " << epsilon() << std::endl;
-#endif // DEBUG
-
             if (shift() <= epsilon())
             {
                factorize();
@@ -191,15 +201,18 @@ SoPlex::Status SoPlex::solve()
          }
          while (!stop);
 
+#ifndef NDEBUG
+         std::cout << "Leave finished. iteration: " << iteration() 
+                   << " value: " << value()
+                   << " shift: " << shift()
+                   << " epsilon: " << epsilon()
+                   << " stop: " << stop
+                   << " basis status: " << int(SPxBasis::status())
+                   << " solver status: " << int(m_status) << std::endl;
+#endif // NDEBUG
+
          if (!stop)
          {
-#ifdef DEBUG
-            std::cout << "iteration: " << iteration() 
-                      << " value: " << value()
-                      << " shift: " << shift()
-                      << " epsilon: " << epsilon() << std::endl;
-#endif // DEBUG
-
             if (shift() <= epsilon())
             {
                factorize();
@@ -232,6 +245,19 @@ SoPlex::Status SoPlex::solve()
       std::cout << ", objValue=" << value();
    std::cout << ")" << std::endl;
 #endif // NDEBUG
+
+#if 1
+   /**@todo Here we should invalidate the basis, because it is
+      destroyed if the problem was infeasible */
+   // ??? restore old basis
+   if( status() != OPTIMAL )
+   {
+      std::cout << "Restoring old basis (DEBUG!)" << std::endl;
+      setBasis( oldbasis_rows, oldbasis_cols );
+   }
+   delete[] oldbasis_rows;
+   delete[] oldbasis_cols;
+#endif
 
    return status();
 }
@@ -369,28 +395,34 @@ bool SoPlex::terminate()
    if (maxValue < infinity)
    {
       /**@todo This code is *NOT* tested. */
-
-      // SPxSense::MINIMIZE == -1, so we have sign = 1 on minimizing
-      // rep() * type() > 0 == DUAL, -1 == PRIMAL.
-      int sign = -1 * spxSense() * rep() * type();
-
-      if( sign * (value() - maxValue) >= 0.0 )
-      {
-#ifndef NDEBUG
-         std::cout << "Objective value limit reached" << std::endl;
-         std::cout << " (value: " << value()
-                   << ", limit: " << maxValue << ")" << std::endl;
-#endif // !NDEBUG
          
-         m_status = ABORT_VALUE;
-         return true;
+      if( shift() < epsilon() && maxInfeas() + shift() <= delta() )
+      {
+         // SPxSense::MINIMIZE == -1, so we have sign = 1 on minimizing
+         // rep() * type() > 0 == DUAL, -1 == PRIMAL.
+         int sign = -1 * spxSense() * rep() * type();
+         
+         if( sign * (value() - maxValue) >= 0.0 )
+         {
+#ifndef NDEBUG
+            std::cout << "Objective value limit reached" << std::endl;
+            std::cout << " (value: " << value()
+                      << ", limit: " << maxValue << ")" << std::endl;
+            std::cout << " (spxSense: " << int(spxSense())
+                      << ", rep: " << int(rep())
+                      << ", type: " << int(type()) << std::endl; // ???
+#endif // !NDEBUG
+            
+            m_status = ABORT_VALUE;
+            return true;
+         }
       }
    }
 
    if( SPxBasis::status() >= SPxBasis::OPTIMAL  ||
        SPxBasis::status() <= SPxBasis::SINGULAR )
    {
-      m_status = OPTIMAL;
+      m_status = UNKNOWN;
       return true;
    }
    return false;
@@ -559,7 +591,6 @@ SoPlex::Status SoPlex::status() const
    switch( m_status )
    {
    case UNKNOWN:      
-   case OPTIMAL:
       switch (SPxBasis::status())
       {
       case SPxBasis::NO_PROBLEM :
@@ -579,6 +610,9 @@ SoPlex::Status SoPlex::status() const
       default:
          return ERROR;
       }
+   case OPTIMAL:
+      assert( SPxBasis::status() == SPxBasis::OPTIMAL );
+      /*lint -fallthrough*/
    case ABORT_TIME :
    case ABORT_ITER :
    case ABORT_VALUE :

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.18 2002/01/29 15:38:49 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.19 2002/01/31 12:23:42 bzfpfend Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -259,20 +259,33 @@ static bool hasRowName(char*& pos, NameSet* rownames)
    if (s == 0)
       return false;
 
-   int end = int(s - pos);
-   int srt = end - 1;
-      
-   for(; srt >= 0; srt--)
+   int dcolpos = int(s - pos);
+
+   int end, srt;
+
+   for(end = dcolpos-1; end >= 0; end--)  // skip spaces between name and ":"
+     if( pos[end] != ' ')
+       break;
+
+   if( end < 0 )  // are there only spaces in front of the ":" ?
+   {
+     pos = &(pos[dcolpos+1]);
+     return false;
+   }
+
+   for(srt = end-1; srt >= 0; srt--) // skip spaces in front of name
       if (pos[srt] == ' ')
          break;
 
-   srt++;
+   srt++; // go back to the non-space character
+
+   assert( srt <= end && pos[srt] != ' ' );
 
    char name[MAX_LINE_LEN]; 
-   int  i = srt;
+   int  i;
    int  k = 0;
 
-   for(i = srt; i < end; i++)
+   for(i = srt; i <= end; i++)
       name[k++] = pos[i];
 
    name[k] = '\0';
@@ -280,7 +293,7 @@ static bool hasRowName(char*& pos, NameSet* rownames)
    if (rownames != 0)
       rownames->add(name);
 
-   pos += end + 1;
+   pos = &(pos[dcolpos+1]);
 
    return true;
 }
