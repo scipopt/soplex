@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.13 2002/01/22 14:17:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.14 2002/01/22 14:20:39 bzfkocht Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.
@@ -203,8 +203,6 @@ static void readCols(
    DSVector vec;
 
    col.setObj(0.0);
-   col.setLower(0.0);
-   col.setUpper(SPxLP::infinity);
    vec.clear();
 
    while(mps.readLine())
@@ -238,6 +236,8 @@ static void readCols(
          cnames.add(colname);
          vec.clear();
          col.setObj(0.0);
+         col.setLower(0.0);
+         col.setUpper(SPxLP::infinity);
 
          if (mps.isInteger())
          {
