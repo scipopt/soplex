@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.21 2002/01/16 11:32:46 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.22 2002/01/16 15:56:42 bzfbleya Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -160,7 +160,7 @@ public:
        */
       PARTIAL  
    };
-
+   ///@todo in setBasis/getBasis signature: signed char[]
    enum VarStatus
    {
       ON_UPPER,      ///< variable set to its upper bound.
