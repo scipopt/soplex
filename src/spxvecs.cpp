@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvecs.cpp,v 1.11 2002/01/31 08:19:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxvecs.cpp,v 1.12 2002/02/01 11:22:37 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -453,6 +453,7 @@ void SoPlex::setupPupdate(void)
    {
       if (c.size() < 0.95 * theCoPvec->dim())
       {
+#ifdef USE_SUBCOVECTORS
          if (Real(c.size()) * thecovectors->memSize()
               >= cacheProductFactor * coDim() * thecovectors->num()
               && subcovectors.size() > 1)
@@ -466,6 +467,7 @@ void SoPlex::setupPupdate(void)
             }
          }
          else
+#endif // USE_SUBCOVECTORS
             p.assign2product4setup(*thecovectors, c);
       }
       else

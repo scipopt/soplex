@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.47 2002/02/01 08:24:23 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.48 2002/02/01 11:22:37 bzfkocht Exp $"
 
 //#define DEBUG 1
 
@@ -295,6 +295,7 @@ void SoPlex::init()
    }
 }
 
+#ifdef USE_SUBCOVECTORS
 int SoPlex::sortLP(int pe, int nPes)
 {
    int n = 0;
@@ -306,6 +307,7 @@ int SoPlex::sortLP(int pe, int nPes)
    }
    return n;
 }
+#endif // USE_SUBCOVECTORS
 
 void SoPlex::setPricing(Pricing pr)
 {
@@ -317,6 +319,8 @@ void SoPlex::setPricing(Pricing pr)
       computeTest();
    }
 }
+
+#ifdef USE_SUBCOVECTORS
 
 void SoPlex::splitLP(int pe, int nPes)
 {
@@ -378,7 +382,7 @@ void SoPlex::splitLP(int pe, int nPes)
                          << (*thecovectors)[i].size() << std::endl;
          }
       }
-#endif
+#endif // NDEBUG
 }
 
 void SoPlex::splitLP()
@@ -391,7 +395,7 @@ void SoPlex::splitLP()
       splitLP(0, 1);
    }
 }
-
+#endif // USE_SUBCOVECTORS
 
 /*
     The following method resizes all vectors and arrays of |SoPlex|

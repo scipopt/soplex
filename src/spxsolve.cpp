@@ -13,9 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.36 2002/02/01 08:24:23 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.37 2002/02/01 11:22:37 bzfkocht Exp $"
 
-#define DEBUG 1
+//#define DEBUG 1
 
 #include <assert.h>
 #include <iostream>
@@ -68,8 +68,11 @@ SoPlex::Status SoPlex::solve()
    theTime.start();
 
    m_numCycle = 0;
+   iterCount  = 0;
 
+#ifdef USE_SUBCOVECTORS
    splitLP();
+#endif
 
    if (!isInitialized())
    {
@@ -102,7 +105,8 @@ SoPlex::Status SoPlex::solve()
 
    m_status   = RUNNING;
    bool stop  = terminate();
-   leaveCount = enterCount = 0;
+   leaveCount = 0;
+   enterCount = 0;
 
 #if 1
    // ??? remember old basis
@@ -235,8 +239,11 @@ SoPlex::Status SoPlex::solve()
 
    VERBOSE1({
       std::cout << "Finished solving (status=" << int(status());
+      std::cout << " Iters=" << iterCount
+                << " leave=" << leaveCount
+                << " enter=" << enterCount;
       if( status() == OPTIMAL )
-         std::cout << ", objValue=" << value();
+         std::cout << " objValue=" << value();
       std::cout << ")" << std::endl;
    });
 

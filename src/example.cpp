@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.28 2002/01/31 22:36:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.29 2002/02/01 11:22:37 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -118,7 +118,7 @@ int main(int argc, char **argv)
    ;
 
    const char*            filename;
-   const char*            basename       = 0;
+   const char*            basisname      = 0;
    SoPlex::Type           type           = SoPlex::LEAVE;
    SoPlex::Representation representation = SoPlex::COLUMN;
    SLUFactor::UpdateType  update         = SLUFactor::FOREST_TOMLIN;
@@ -147,7 +147,7 @@ int main(int argc, char **argv)
       switch(argv[optind][1])
       {
       case 'b' :
-         basename = strcpy(
+         basisname = strcpy(
             new char[strlen(&argv[optind][1]) + 1], &argv[optind][1]); 
          break;
       case 'c' :
@@ -352,12 +352,12 @@ int main(int argc, char **argv)
              << std::endl;
 
    // Should we read a basis ?
-   if (basename != 0)
+   if (basisname != 0)
    {
-      if (!work.readBasisFile(basename, rownames, colnames))
+      if (!work.readBasisFile(basisname, rownames, colnames))
       {
          std::cout << "error while reading file \"" 
-                   << basename << "\"" << std::endl;
+                   << basisname << "\"" << std::endl;
          exit(1);
       }
    }
@@ -436,8 +436,8 @@ int main(int argc, char **argv)
    delete pricer;
    delete ratiotester;
 
-   if (basename != 0)
-      delete [] basename;
+   if (basisname != 0)
+      delete [] basisname;
 
    return 0;
 }
