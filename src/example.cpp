@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.17 2002/01/12 21:43:24 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.18 2002/01/12 23:01:08 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -126,8 +126,8 @@ int main(int argc, char **argv)
    int                    ratiotest      = 2;
    int                    simplifing     = 3;
    double                 timelimit      = -1.0;
-   double                 delta          = 1e-7;
-   double                 epsilon        = 1e-15;
+   double                 delta          = 5e-7;
+   double                 epsilon        = 1e-16;
    int                    optind;
 
    for(optind = 1; optind < argc; optind++)
