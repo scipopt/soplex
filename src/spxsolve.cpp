@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.17 2002/01/12 11:41:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.18 2002/01/12 11:42:16 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -32,6 +32,9 @@
 
 namespace soplex
 {
+/**@todo After solve() returned, the algorithm type may have changed.
+ *       This may be a problem if solve() is called again.
+ */
 SoPlex::Status SoPlex::solve()
 {
    Id enterId;
@@ -160,7 +163,6 @@ SoPlex::Status SoPlex::solve()
             setType(LEAVE);
          }
       }
-
       else
       {
          assert(type() == LEAVE);
