@@ -75,7 +75,7 @@ cring.h
 *idxset.h
 *islist.h
 *lpcol.h
-lpcolset.h
+*lpcolset.h
 *lprow.h
 lprowset.h
 lpsolver.h

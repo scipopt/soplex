@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dvector.h,v 1.4 2001/11/23 12:26:53 bzfpfend Exp $"
+#pragma ident "@(#) $Id: dvector.h,v 1.5 2001/11/23 13:35:56 bzfpfend Exp $"
 
 /**@file  dvector.h
  * @brief Dymnamic vectors.
@@ -31,7 +31,7 @@
 namespace soplex
 {
 /**@brief   Dynamic vectors.
-   @ingroup Elementary
+   @ingroup Algebra
 
    Class #DVector is a derived class of #Vector adding automatic
    memory management to such objects. This allows to implement maths
