@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.22 2002/03/03 13:50:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.23 2002/03/04 16:50:50 bzfkocht Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -465,7 +465,6 @@ public:
    }
    //@}
 
-
    /**@name Linear Algebra */
    //@{
    /// Basis-vector product.
@@ -735,19 +734,19 @@ public:
        all vectors accordingly. The #Desc%riptor must have the same number of
        rows and columns as the currently loaded LP.
    */
-   virtual void load(const Desc&);
+   virtual void loadDesc(const Desc&);
 
    /// sets up linear solver to use.
-   void load(SLinSolver* solver);
+   virtual void loadSolver(SLinSolver* solver);
 
    /// loads the LP \p lp to the basis.
    /** This involves resetting all counters to 0 and setting up a regular
        default basis consisting of slacks, artificial variables or bounds.
    */
-   void load(SoPlex* lp);
+   virtual void load(SoPlex* lp);
 
    /// unloads the LP from the basis.
-   void unLoad()
+   virtual void unLoad()
    {
       METHOD( "SPxBasis::unLoad()" );
       theLP = 0;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.52 2002/03/03 13:50:32 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.53 2002/03/04 16:50:49 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -88,7 +88,7 @@ void SoPlex::loadLP(const SPxLP& lp)
 void SoPlex::setSolver(SLinSolver* slu)
 {
    METHOD( "SoPlex::setSolver()" );
-   SPxBasis::load(slu);
+   SPxBasis::loadSolver(slu);
 }
 
 void SoPlex::loadBasis(const SPxBasis::Desc& p_desc)
@@ -97,7 +97,7 @@ void SoPlex::loadBasis(const SPxBasis::Desc& p_desc)
    unInit();
    if (SPxBasis::status() == SPxBasis::NO_PROBLEM)
       SPxBasis::load(this);
-   SPxBasis::load(p_desc);
+   SPxBasis::loadDesc(p_desc);
 }
 
 void SoPlex::setPricer(SPxPricer* x)
@@ -220,7 +220,7 @@ void SoPlex::setRep(Representation p_rep)
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       SPxBasis::setRep();
-      SPxBasis::load(desc());
+      SPxBasis::loadDesc(desc());
    }
 
    if (thepricer && thepricer->solver() == this)
@@ -242,7 +242,7 @@ void SoPlex::init()
       initialized = false;
    }
    if (!matrixIsSetup)
-      SPxBasis::load(desc());
+      SPxBasis::loadDesc(desc());
    factorized = false;
    m_numCycle = 0;
 

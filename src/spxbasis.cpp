@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.25 2002/03/03 13:50:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.26 2002/03/04 16:50:50 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -122,7 +122,7 @@ void SPxBasis::loadMatrixVecs()
     representation. This implementation hides this distingtion in the use of
     methods #isBasic()# and #vector()#.
  */
-void SPxBasis::load(const Desc& ds)
+void SPxBasis::loadDesc(const Desc& ds)
 {
    METHOD( "SPxBasis::load()" );
    assert(status() > NO_PROBLEM);
@@ -213,10 +213,10 @@ void SPxBasis::load(SoPlex* lp)
 
    setStatus(REGULAR);
 
-   load(thedesc);
+   loadDesc(thedesc);
 }
 
-void SPxBasis::load(SLinSolver* p_solver)
+void SPxBasis::loadSolver(SLinSolver* p_solver)
 {
    METHOD( "SPxBasis::load()" );
    factor = p_solver;
@@ -305,7 +305,7 @@ bool SPxBasis::readBasis(
    if (!mps.hasError())
    {
       if (mps.section() == MPSInput::ENDATA)
-         load(l_desc);
+         loadDesc(l_desc);
       else
          mps.syntaxError();
    }
@@ -398,7 +398,7 @@ void SPxBasis::factorize()
    assert(factor != 0);
 
    if (!matrixIsSetup)
-      load(thedesc);
+      loadDesc(thedesc);
 
    assert(matrixIsSetup);
 
@@ -439,7 +439,7 @@ Vector& SPxBasis::multWithBase(Vector& x) const
    DVector tmp(x);
 
    if (!matrixIsSetup)
-      (const_cast<SPxBasis*>(this))->load(thedesc);
+      (const_cast<SPxBasis*>(this))->loadDesc(thedesc);
 
    assert( matrixIsSetup );
 
@@ -459,7 +459,7 @@ Vector& SPxBasis::multBaseWith(Vector& x) const
    DVector tmp(x);
 
    if (!matrixIsSetup)
-      (const_cast<SPxBasis*>(this))->load(thedesc);
+      (const_cast<SPxBasis*>(this))->loadDesc(thedesc);
 
    assert( matrixIsSetup );
 
