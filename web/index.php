@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
 "http://www.w3.org/TR/REC-html40/loose.dtd">
-<!-- $Id: soplex.php,v 1.12 2003/11/01 21:40:59 bzfkocht Exp $ -->
+<!-- $Id: index.php,v 1.1 2003/11/01 21:40:59 bzfkocht Exp $ -->
 <?php
 $counter = "cgi/counter.dat";  # the data storage file
 
