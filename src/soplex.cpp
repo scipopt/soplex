@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.54 2002/03/11 17:43:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.55 2002/04/04 14:59:04 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -26,6 +26,7 @@
 #include "spxpricer.h"
 #include "spxratiotester.h"
 #include "spxstarter.h"
+#include "spxscaler.h"
 #include "spxsimplifier.h"
 
 
@@ -135,6 +136,12 @@ void SoPlex::setStarter(SPxStarter* x)
 {
    METHOD( "SoPlex::setStarter()" );
    thestarter = x;
+}
+
+void SoPlex::setScaler(SPxScaler* x)
+{
+   METHOD( "SoPlex::setScaler()" );
+   thescaler = x;
 }
 
 void SoPlex::setSimplifier(SPxSimplifier* x)
@@ -510,6 +517,7 @@ void SoPlex::clear()
    theLCbound.clear();
    theTest.clear();
    theCoTest.clear();
+
    if (thesimplifier)
       thesimplifier->unload();
 
@@ -789,9 +797,14 @@ void SoPlex::setDelta(Real d)
    thedelta = d;
 }
 
-SoPlex::SoPlex(Type p_type, Representation p_rep,
-                SPxPricer* pric, SPxRatioTester* rt,
-                SPxStarter* start, SPxSimplifier* simple)
+SoPlex::SoPlex(
+   Type            p_type, 
+   Representation  p_rep,
+   SPxPricer*      pric, 
+   SPxRatioTester* rt,
+   SPxStarter*     start, 
+   SPxScaler*      scaler, 
+   SPxSimplifier*  simpli)
    : theType (p_type)
    , thePricing(FULL)
    , maxIters (-1)
@@ -812,7 +825,8 @@ SoPlex::SoPlex(Type p_type, Representation p_rep,
    , thepricer (pric)
    , theratiotester(rt)
    , thestarter (start)
-   , thesimplifier (simple)
+   , thescaler (scaler)
+   , thesimplifier (simpli)
 {
    METHOD( "SoPlex::SoPlex()" );
    setRep (p_rep);
@@ -859,6 +873,7 @@ SoPlex::SoPlex(const SoPlex& old)
    , thepricer (old.thepricer)
    , theratiotester (old.theratiotester)
    , thestarter (old.thestarter)
+   , thescaler (old.thescaler)
    , thesimplifier (old.thesimplifier)
 {
    METHOD( "SoPlex::SoPlex()" );
@@ -899,6 +914,7 @@ SoPlex& SoPlex::operator=(const SoPlex& old)
    thepricer = old.thepricer;
    theratiotester = old.theratiotester;
    thestarter = old.thestarter;
+   thescaler = old.thescaler;
    thesimplifier = old.thesimplifier;
    solveVector2 = 0;
    coSolveVector2 = 0;

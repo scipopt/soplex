@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscale.cpp,v 1.12 2002/03/03 13:50:34 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscale.cpp,v 1.13 2002/04/04 14:59:04 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -65,14 +65,14 @@ int SPxScale::simplify()
       {
          SVector& vec = lp->rowVector_w(i);
          x = 0;
-         z = 1e100;
 
          for (j = vec.size(); j--;)
          {
-            y = vec.value(j) *= colscale[vec.index(j)];
-            w = fabs(y);            
-            x = (x < w) ? w : x;
-            z = (z > w) ? w : z;
+            vec.value(j) *= colscale[vec.index(j)];
+            y = fabs(vec.value(j));
+
+            if (x < y)
+               x = y;
          }
          if (x > 0)
          {

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.41 2002/04/03 19:16:11 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.42 2002/04/04 14:59:04 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -43,6 +43,7 @@ namespace soplex
 class SPxPricer;
 class SPxRatioTester;
 class SPxStarter;
+class SPxScaler;
 class SPxSimplifier;
 
 /**@brief   Sequential objectoriented simPlex.
@@ -179,7 +180,8 @@ public:
      */
    enum Status
    {
-      ERROR       = -8,  ///< an error occured.
+      ERROR       = -9,  ///< an error occured.
+      NOT_INIT    = -8,  ///< not initialised error
       ABORT_TIME  = -7,  ///< #solve() aborted due to time limit.
       ABORT_ITER  = -6,  ///< #solve() aborted due to iteration limit.
       ABORT_VALUE = -5,  ///< #solve() aborted due to objective limit.
@@ -281,6 +283,7 @@ protected:
    SPxPricer*      thepricer;
    SPxRatioTester* theratiotester;
    SPxStarter*     thestarter;
+   SPxScaler*      thescaler;
    SPxSimplifier*  thesimplifier;
 
 public:
@@ -347,6 +350,8 @@ public:
    virtual void setTester(SPxRatioTester*);
    /// setup starting basis generator to use.
    virtual void setStarter(SPxStarter*);
+   /// setup scaler to use.
+   virtual void setScaler(SPxScaler*);
    /// setup simplifier to use.
    virtual void setSimplifier(SPxSimplifier*);
    /// set a start basis.
@@ -404,7 +409,12 @@ public:
     *  to the argument \p vector. Hence, \p vector must be of dimension
     *  #nCols().
     */
-   virtual Status getPrimal (Vector& vector) const;
+   virtual Status getPrimal(Vector& vector) const;
+
+   /// get unscaled solution vector for primal variables.
+   /** The same as #getPrimal(), but with unscaled values.
+    */
+   virtual Status getPrimalUnscaled(Vector& vector) const;
 
    /// get vector of slack variables.
    /** This method returns the #Status of the basis.
@@ -1628,9 +1638,9 @@ public:
 
    /// default constructor.
    SoPlex(Type type = LEAVE, Representation rep = ROW,
-           SPxPricer* pric = 0, SPxRatioTester* rt = 0,
-           SPxStarter* start = 0, SPxSimplifier* simple = 0
-        );
+      SPxPricer* pric = 0, SPxRatioTester* rt = 0,
+      SPxStarter* start = 0, SPxScaler* scaler = 0, 
+      SPxSimplifier* simple = 0);
 
    /// check consistency.
    bool isConsistent() const;

@@ -1,12 +1,11 @@
-$Id: TODO,v 1.60 2002/03/11 17:43:55 bzfkocht Exp $
+$Id: TODO,v 1.61 2002/04/04 14:59:04 bzfkocht Exp $
 
 Diesen Kram mal als @todo's schreiben ;-)
 
-isConsistent sollte eigendlich virtuell sein.
+Es gibt probleme, wenn der preprocessor das problem komplett erledigt.
+Den die rueckgabe ist dann nicht UNBOUNDED/INFEASIBLE, sondern fertig.
 
-Man sollte mal feststellen was passiert, wenn eine Variable aus der 
-Basis geht. Wird der Wert dann auf die bound gesetzt oder der berechnete
-behalten. Sollte gesetzt werden.
+isConsistent sollte eigendlich virtuell sein.
 
 Memberfunctionen .has -> bool
 

@@ -13,83 +13,42 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeneralsm.cpp,v 1.14 2002/04/04 14:59:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxequilisc.h,v 1.1 2002/04/04 14:59:04 bzfkocht Exp $"
 
-//#define DEBUGGING 1
+/**@file  spxequili.h
+ * @brief LP euilibrium scaling.
+ */
+#ifndef _SPXEQUILI_H_
+#define _SPXEQUILI_H_
 
-#include <iostream>
+#include <assert.h>
 
 #include "spxdefines.h"
-#include "spxgeneralsm.h"
+#include "spxscaler.h"
+#include "dataarray.h"
 
 namespace soplex
 {
-void SPxGeneralSM::load(SPxLP* p_lp)
+/**@brief Equilibrium row/column scaling.
+   @ingroup Algo
+
+   This #SPxScaler implementation performs equilibrium scaling of the 
+   LPs rows and columns.
+
+   @todo The type of scaling (row/column) is hard coded. This should
+         be selectable.
+*/
+class SPxEquili : public SPxScaler
 {
-   lp       = p_lp;
-   rem1.load (p_lp);
-   redu.load (p_lp);
-   aggr.load (p_lp);
-}
+public:
+   /// Scale the loaded #SPxLP.
+   virtual void scale();
 
-void SPxGeneralSM::unload()
-{
-   rem1.unload ();
-   redu.unload ();
-   aggr.unload ();
-}
-
-int SPxGeneralSM::simplify()
-{
-   int i, cnt;
-   int rows = lp->nRows();
-   int cols = lp->nCols();
-
-   do
-   {
-      cnt = lp->nRows() + lp->nCols();
-
-      if ((i = rem1.simplify()) != 0) 
-         return i;
-      if ((i = aggr.simplify()) != 0) 
-         return i;
-      if ((i = redu.simplify()) != 0) 
-         return i;
-   }
-   while (0.99 * cnt > lp->nRows() + lp->nCols());
-
-   rows -= lp->nRows();
-   cols -= lp->nCols();
-
-   VERBOSE1({
-      std::cout << "removed " << rows << " rows" << std::endl;
-      std::cout << "removed " << cols << " columns" << std::endl;
-   });
-
-   assert(lp->isConsistent());
-
-   return 0;
-}
-
-/**@todo This is not correctly implented, since the simplifiers may be
- *      called several times one after the others, this sequence has
- *      to be tracked to make the calls of unsimplify in exactly the
- *      reverse order.
- *      At the moment this is irrelevant because all the unsimplifiers
- *      are not implemented anyway.
- */
-void SPxGeneralSM::unsimplify()
-{
-   //rem1.unsimplify ();
-   //aggr.unsimplify ();
-   //redu.unsimplify ();
-}
-
-Real SPxGeneralSM::value(Real x)
-{
-   return rem1.value(aggr.value(redu.value(x)));
-}
+   /// default constructor.
+   explicit SPxEquili(bool colFirst = true, bool doBoth = true);
+};
 } // namespace soplex
+#endif // _SPXEQUILI_H_
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:

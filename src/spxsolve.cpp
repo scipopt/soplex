@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.46 2002/04/03 19:16:11 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.47 2002/04/04 14:59:04 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -25,8 +25,8 @@
 #include "spxpricer.h"
 #include "spxratiotester.h"
 #include "spxstarter.h"
+#include "spxscaler.h"
 #include "spxsimplifier.h"
-
 
 namespace soplex
 {
@@ -39,15 +39,14 @@ SoPlex::Status SoPlex::solve()
    SPxId enterId;
    int leaveNum;
 
-   if (dim() <= 0 && coDim() <= 0)          // no problem loaded
+   if (dim() <= 0 && coDim() <= 0) // no problem loaded
       return ERROR;
 
-   if (slinSolver() == 0)             // linear system solver is required.
+   if (slinSolver() == 0) // linear system solver is required.
       return ERROR;
 
-   if (thesimplifier)
+   if (thesimplifier != 0)
    {
-      // if (thesimplifier->loadedLP() != this)
       thesimplifier->load(this);
 
       switch (thesimplifier->simplify())
@@ -62,7 +61,12 @@ SoPlex::Status SoPlex::solve()
          break;
       }
    }
-   if (thepricer == 0)                                // pricer is required.
+   if (thescaler != 0)
+   {
+      thescaler->setLP(this);
+      thescaler->scale();
+   }
+   if (thepricer == 0) // pricer is required.
       return ERROR;
 
    theTime.reset();
@@ -267,6 +271,7 @@ SoPlex::Status SoPlex::solve()
          val = 0.0;         
          for( c = 0; c < rowvec.size(); ++c )
             val += rowvec.value( c ) * sol[rowvec.index( c )];
+
          if( LT( val, lhs( row ), delta() ) ||
              GT( val, rhs( row ), delta() ) )
          {
@@ -303,13 +308,14 @@ SoPlex::Status SoPlex::solve()
             std::cerr << "   lower:" << lower( col )
                       << " <= val:" << sol[col]
                       << " <= upper:" << upper( col ) << std::endl;
+
             if( type() == LEAVE && isColBasic( col ) )
             {
-               for( c = 0; c < nRows() && 
-                       ( basis().baseId( c ).isSPxRowId()     ||
-                         number( basis().baseId( c ) ) != col );
-                    ++c )
-                  {}
+               for( c = 0; c < nRows() ; ++c)
+                  if ( basis().baseId( c ).isSPxColId()    
+                     && ( number( basis().baseId( c ) ) == col ))
+                     break;
+
                assert( c < nRows() );
                std::cerr << "   basis idx:" << c
                          << " fVec:" << fVec()[c]
@@ -449,14 +455,14 @@ bool SoPlex::terminate()
    if ( maxIters >= 0 && iterations() >= maxIters )
    {
       VERBOSE2({ std::cout << "Maximum number of iterations (" << maxIters
-                              << ") reached" << std::endl; });
+                           << ") reached" << std::endl; });
       m_status = ABORT_ITER;
       return true;
    }
    if ( maxTime >= 0 && maxTime < infinity && time() >= maxTime )
    {
       VERBOSE2({ std::cout << "Timelimit (" << maxTime
-                              << ") reached" << std::endl; });
+                           << ") reached" << std::endl; });
       m_status = ABORT_TIME;
       return true;   
    }
@@ -473,7 +479,7 @@ bool SoPlex::terminate()
          if( sign * (value() - maxValue) >= 0.0 )
          {
             VERBOSE2({ std::cout << "Objective value limit (" << maxValue
-                                    << ") reached" << std::endl; });
+                                 << ") reached" << std::endl; });
             DEBUG({
                std::cerr << "Objective value limit reached" << std::endl
                          << " (value: " << value()
@@ -501,13 +507,14 @@ bool SoPlex::terminate()
 SoPlex::Status SoPlex::getPrimal (Vector& p_vector) const
 {
    METHOD( "SoPlex::getPrimal()" );
+
+   assert(isInitialized());
+
    if (!isInitialized())
-      /**@todo patch suggests returning ERROR instead of initializing */
-      const_cast<SoPlex*>(this)->init();
+      return NOT_INIT;
 
    if (rep() == ROW)
       p_vector = coPvec();
-
    else
    {
       int i;
@@ -542,16 +549,29 @@ SoPlex::Status SoPlex::getPrimal (Vector& p_vector) const
             p_vector[ number(SPxColId(baseId(i))) ] = fVec()[i];
       }
    }
-
    return status();
+}
+
+SoPlex::Status SoPlex::getPrimalUnscaled (Vector& p_vector) const
+{
+   METHOD( "SoPlex::getPrimalUnscaled()" );
+
+   Status stat = getPrimal( p_vector );
+
+   if (thescaler != 0)
+      thescaler->unscaleColVector( p_vector );
+
+   return stat;
 }
 
 SoPlex::Status SoPlex::getDual (Vector& p_vector) const
 {
    METHOD( "SoPlex::getDual()" );
+
+   assert(isInitialized());
+
    if (!isInitialized())
-      /**@todo patch suggests returning ERROR instead of initializing */
-      const_cast<SoPlex*>(this)->init();
+      return NOT_INIT;
 
    if (rep() == ROW)
    {
@@ -563,7 +583,6 @@ SoPlex::Status SoPlex::getDual (Vector& p_vector) const
             p_vector[ number(SPxRowId(baseId(i))) ] = fVec()[i];
       }
    }
-
    else
       p_vector = coPvec();
 
@@ -575,9 +594,11 @@ SoPlex::Status SoPlex::getDual (Vector& p_vector) const
 SoPlex::Status SoPlex::getRdCost (Vector& p_vector) const
 {
    METHOD( "SoPlex::getRdCost()" );
+
+   assert(isInitialized());
+
    if (!isInitialized())
-      /**@todo patch suggests returning ERROR instead of initializing */
-      const_cast<SoPlex*>(this)->init();
+      return NOT_INIT;
 
    if (rep() == ROW)
    {
@@ -600,7 +621,6 @@ SoPlex::Status SoPlex::getRdCost (Vector& p_vector) const
          }
       }
    }
-
    else
    {
       p_vector = maxObj();
@@ -615,9 +635,11 @@ SoPlex::Status SoPlex::getRdCost (Vector& p_vector) const
 SoPlex::Status SoPlex::getSlacks (Vector& p_vector) const
 {
    METHOD( "SoPlex::getSlacks()" );
+
+   assert(isInitialized());
+
    if (!isInitialized())
-      /**@todo patch suggests returning ERROR instead of initializing */
-      const_cast<SoPlex*>(this)->init();
+      return NOT_INIT;
 
    if (rep() == COLUMN)
    {
@@ -653,7 +675,6 @@ SoPlex::Status SoPlex::getSlacks (Vector& p_vector) const
             p_vector[ number(SPxRowId(baseId(i))) ] = -(*theFvec)[i];
       }
    }
-
    else
       p_vector = pVec();
 
@@ -693,6 +714,7 @@ SoPlex::Status SoPlex::status() const
    case ABORT_VALUE:
    case RUNNING:
    case REGULAR:
+   case NOT_INIT:
    case ERROR:
       return m_status;
    default:

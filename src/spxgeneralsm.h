@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeneralsm.h,v 1.7 2002/03/03 13:50:34 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeneralsm.h,v 1.8 2002/04/04 14:59:04 bzfkocht Exp $"
 
 /**@file  spxgeneralsm.h
  * @brief General LP preprocessing.
@@ -27,7 +27,6 @@
 #include "spxredundantsm.h"
 #include "spxaggregatesm.h"
 #include "spxrem1sm.h"
-#include "spxscale.h"
 
 namespace soplex
 {
@@ -43,7 +42,6 @@ private:
    SPxRem1SM      rem1;   ///< remove row/column singletons .
    SPxRedundantSM redu;   ///< remove redundant rows/columns.
    SPxAggregateSM aggr;   ///< do variable aggregation.
-   SPxScale       scale;  ///< scale LP.
 
 public:
    /// Load the #SPxLP to be simplified.

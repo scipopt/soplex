@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxpricer.h,v 1.10 2002/03/21 16:06:19 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxpricer.h,v 1.11 2002/04/04 14:59:04 bzfkocht Exp $"
 
 
 /**@file  spxpricer.h
@@ -52,13 +52,13 @@ class SPxPricer
 protected:
    const char* m_name;
    SoPlex*     thesolver;
-   Real      theeps;
+   Real        theeps;
 
 public:
    /**@name Initialization */
    //@{
    /// get name of pricer.
-   virtual const char* name()
+   virtual const char* getName() const
    {
       return m_name;
    }

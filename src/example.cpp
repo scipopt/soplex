@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.35 2002/04/03 19:16:11 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.36 2002/04/04 14:59:04 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -41,8 +41,9 @@
 #include "spxaggregatesm.h"
 #include "spxredundantsm.h"
 #include "spxrem1sm.h"
-#include "spxscale.h"
 #include "spxgeneralsm.h"
+#include "spxscaler.h"
+#include "spxequilisc.h"
 #include "spxsumst.h"
 #include "spxweightst.h"
 #include "spxvectorst.h"
@@ -144,13 +145,13 @@ int main(int argc, char **argv)
    " -vLevel   set verbosity Level [0-3], default 1\n"
    " -V        show program version\n"
    " -h        show this help\n"
-   "Simplifier:         Starter:        Pricer:           Ratiotester:\n"
-   " -s0  none           -c0  none*      -p0  Textbook     -t0  Textbook\n" 
-   " -s1  General        -c1  Weight     -p1  ParMult      -t1  Harris\n"
-   " -s2  Aggregate      -c2  Sum        -p2  Devex        -t2  Fast*\n"
-   " -s3  Remove-1*      -c3  vector     -p3  Hybrid\n"
-   " -s4  Redundant                      -p4  Steep*\n"
-   " -s5  Scale                          -p5  Weight\n" 
+   "Simplifier:     Scaler:         Starter:     Pricer:        Ratiotester:\n"
+   " -s0 none       -g0 none         -c0 none*   -p0 Textbook  -t0 Textbook\n"
+   " -s1 General    -g1 CR-Equi*     -c1 Weight  -p1 ParMult   -t1 Harris\n"
+   " -s2 Aggregate  -g2 RC-Equi      -c2 Sum     -p2 Devex     -t2 Fast*\n"
+   " -s3 Remove-1*  -g3 C-Equi       -c3 Vector  -p3 Hybrid\n"
+   " -s4 Redundant  -g4 R-Equi                   -p4 Steep*\n"
+   "                                             -p5 Weight\n" 
    ;
 
    const char*            filename;
@@ -162,15 +163,17 @@ int main(int argc, char **argv)
    SPxStarter*            starter        = 0;
    SPxPricer*             pricer         = 0;
    SPxRatioTester*        ratiotester    = 0;
+   SPxScaler*             scaler         = 0;
    NameSet                rownames;
    NameSet                colnames;
    int                    starting       = 0;
    int                    pricing        = 4;
    int                    ratiotest      = 2;
+   int                    scaling        = 1;
    int                    simplifing     = 3;
    Real                   timelimit      = -1.0;
    Real                   delta          = DEFAULT_BND_VIOL;
-   Real                   epsilon        = DEFAULT_EPS_ZERO;
+   Real                   epsilon        = 1e-14; //DEFAULT_EPS_ZERO;
    int                    verbose        = 1;
    bool                   print_solution = false;
    bool                   print_quality  = false;
@@ -196,6 +199,9 @@ int main(int argc, char **argv)
          break;
       case 'e':
          type = SoPlex::ENTER;
+         break;
+      case 'g' :
+         scaling = atoi(&argv[optidx][2]);
          break;
       case 'i' :
          update = SLUFactor::ETA;
@@ -299,7 +305,7 @@ int main(int argc, char **argv)
    }
    work.setPricer(pricer);
 
-   std::cout << pricer->name() << " pricing" << std::endl;
+   std::cout << pricer->getName() << " pricing" << std::endl;
    assert(work.isConsistent());
 
    switch(ratiotest)
@@ -323,12 +329,37 @@ int main(int argc, char **argv)
    work.setTester(ratiotester);
    assert(work.isConsistent());
 
+   switch(scaling)
+   {
+   case 4 :
+      scaler = new SPxEquili(false, false);
+      break;
+   case 3 :
+      scaler = new SPxEquili(true, false);
+      break;
+   case 2 :
+      scaler = new SPxEquili(false, true);
+      break;
+   case 1 :
+      scaler = new SPxEquili(true, true);
+      break;
+   case 0 : 
+      /*FALLTHROUGH*/
+   default :
+      scaler = 0;
+      std::cout << "No";
+      break;
+   }
+   work.setScaler(scaler);
+
+   if (scaler != 0) 
+      std::cout << scaler->getName();
+
+   std::cout << " scaling" << std::endl;
+   assert(work.isConsistent());
+
    switch(simplifing)
    {
-   case 5 :
-      simplifier = new SPxScale;
-      std::cout << "Scale";
-      break;
    case 4 : 
       simplifier = new SPxRedundantSM;
       std::cout << "Redundant";
@@ -446,7 +477,7 @@ int main(int argc, char **argv)
          {
             DVector objx(work.nCols());
             
-            work.getPrimal(objx);
+            work.getPrimalUnscaled(objx);
             
             for(int i = 0; i < work.nCols(); i++)
                if (isNotZero(objx[i], epsilon))
@@ -479,9 +510,17 @@ int main(int argc, char **argv)
    }
    std::cout << std::endl;
 
-   delete simplifier;
-   delete starter;
+   if (scaler != 0)
+      delete scaler;
+   if (simplifier != 0)
+      delete simplifier;
+   if (starter != 0)
+      delete starter;
+
+   assert(pricer != 0);
    delete pricer;
+
+   assert(ratiotester != 0);
    delete ratiotester;
 
    if (basisname != 0)
