@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscaler.cpp,v 1.1 2002/04/04 14:59:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscaler.cpp,v 1.2 2002/04/04 19:36:51 bzfkocht Exp $"
 
 /**@file  spxscaler.cpp
  * @brief LP scaling base class.
@@ -146,45 +146,105 @@ void SPxScaler::unscale()
    assert(m_lp->isConsistent());
 }
 
-void SPxScaler::unscaleColVector(Vector& vec) const
+void SPxScaler::unscaleSolution(Vector& usol) const
 {
-   assert(m_lp      != 0);
-   assert(vec.dim() == m_lp->nCols());
+   assert(m_lp       != 0);
+   assert(usol.dim() == m_lp->nCols());
 
    for( int i = 0; i < m_lp->nCols(); ++i )
-      vec[i] *= m_colscale[i];
+      usol[i] *= m_colscale[i];
 }
 
-void SPxScaler::unscaleColVector(SVector& vec) const
+void SPxScaler::unscaledMaxObj(Vector& uobj) const
+{
+   assert(m_lp       != 0);
+   assert(uobj.dim() == m_lp->nCols());
+
+   uobj = m_lp->maxObj();
+
+   for( int i = 0; i < m_lp->nCols(); ++i )
+      uobj[i] *= 1.0 / m_colscale[i];   
+}
+
+void SPxScaler::unscaledLower(Vector& ulower) const
+{
+   assert(m_lp         != 0);
+   assert(ulower.dim() == m_lp->nCols());
+
+   ulower = m_lp->lower();
+
+   for( int i = 0; i < m_lp->nCols(); ++i )
+      if (ulower[i] > -infinity)
+         ulower[i] *= m_colscale[i];   
+}
+
+void SPxScaler::unscaledUpper(Vector& uupper) const
+{
+   assert(m_lp         != 0);
+   assert(uupper.dim() == m_lp->nCols());
+
+   uupper = m_lp->upper();
+
+   for( int i = 0; i < m_lp->nCols(); ++i )
+      if (uupper[i] < infinity)
+         uupper[i] *= m_colscale[i];   
+}
+
+void SPxScaler::unscaledLhs(Vector& ulhs) const
+{ 
+   assert(m_lp       != 0);
+   assert(ulhs.dim() == m_lp->nRows());
+
+   ulhs = m_lp->lhs();
+
+   for( int i = 0; i < m_lp->nRows(); ++i )
+      if (ulhs[i] > -infinity)
+         ulhs[i] *= 1.0 / m_rowscale[i];   
+}
+
+void SPxScaler::unscaledRhs(Vector& urhs) const
+{
+   assert(m_lp       != 0);
+   assert(urhs.dim() == m_lp->nRows());
+
+   urhs = m_lp->rhs();
+
+   for( int i = 0; i < m_lp->nRows(); ++i )
+      if (urhs[i] < infinity)
+         urhs[i] *= 1.0 / m_rowscale[i];   
+}
+
+void SPxScaler::unscaledRowVector(int row, DSVector& uvec) const
 {
    assert(m_lp != 0);
+   assert(row  >= 0);
+   assert(row  <  m_lp->nRows());
 
-   for( int i = 0; i < vec.size(); ++i )
+   uvec  = m_lp->rowVector( row );
+   uvec *= 1.0 / m_rowscale[row];
+   
+   for( int i = 0; i < uvec.size(); ++i )
    {
-      assert(vec.index(i) < m_lp->nCols());
-
-      vec.value(i) *= m_colscale[vec.index(i)];
+      assert(uvec.index(i) < m_lp->nCols());
+      
+      uvec.value(i) *= 1.0 / m_colscale[uvec.index(i)];   
    }
 }
 
-void SPxScaler::unscaleRowVector(Vector& vec) const
-{
-   assert(m_lp      != 0);
-   assert(vec.dim() == m_lp->nRows());
-
-   for( int i = 0; i < m_lp->nRows(); ++i )
-      vec[i] *= m_rowscale[i];
-}
-
-void SPxScaler::unscaleRowVector(SVector& vec) const
+void SPxScaler::unscaledColVector(int col, DSVector& uvec) const
 {
    assert(m_lp != 0);
+   assert(col  >= 0);
+   assert(col  <  m_lp->nCols());
 
-   for( int i = 0; i < vec.size(); ++i )
+   uvec  = m_lp->colVector( col );
+   uvec *= 1.0 / m_colscale[col];
+
+   for( int i = 0; i < uvec.size(); ++i )
    {
-      assert(vec.index(i) < m_lp->nRows());
-
-      vec.value(i) *= m_rowscale[vec.index(i)];
+      assert(uvec.index(i) < m_lp->nRows());
+      
+      uvec.value(i) *= 1.0 / m_rowscale[uvec.index(i)];   
    }
 }
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.36 2002/04/04 14:59:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.37 2002/04/04 19:36:50 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -83,17 +83,29 @@ public:
       double maxviol;
       double sumviol;
 
-      qualConstraintViolation(maxviol, sumviol);
-
       std::cout << "Violations (max/sum)" << std::endl;
                 
+      qualConstraintViolation(maxviol, sumviol);
+
       std::cout << "Constraints      :" 
+                << std::setw(16) << maxviol << "  " 
+                << std::setw(16) << sumviol << std::endl;
+
+      qualConstraintViolationUnscaled(maxviol, sumviol);
+
+      std::cout << "      (unscaled) :" 
                 << std::setw(16) << maxviol << "  " 
                 << std::setw(16) << sumviol << std::endl;
 
       qualBoundViolation(maxviol, sumviol);
 
       std::cout << "Bounds           :" 
+                << std::setw(16) << maxviol << "  " 
+                << std::setw(16) << sumviol << std::endl;
+
+      qualBoundViolationUnscaled(maxviol, sumviol);
+
+      std::cout << "      (unscaled) :" 
                 << std::setw(16) << maxviol << "  " 
                 << std::setw(16) << sumviol << std::endl;
 
@@ -172,8 +184,8 @@ int main(int argc, char **argv)
    int                    scaling        = 1;
    int                    simplifing     = 3;
    Real                   timelimit      = -1.0;
-   Real                   delta          = DEFAULT_BND_VIOL;
-   Real                   epsilon        = 1e-14; //DEFAULT_EPS_ZERO;
+   Real                   delta          = 1e-7; //DEFAULT_BND_VIOL;
+   Real                   epsilon        = 1e-13; //DEFAULT_EPS_ZERO;
    int                    verbose        = 1;
    bool                   print_solution = false;
    bool                   print_quality  = false;

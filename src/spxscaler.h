@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscaler.h,v 1.1 2002/04/04 14:59:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscaler.h,v 1.2 2002/04/04 19:36:51 bzfkocht Exp $"
 
 /**@file  spxscaler.h
  * @brief LP scaling base class.
@@ -68,14 +68,22 @@ public:
    virtual void scale() = 0;
    /// Unscale the loaded #SPxLP.
    virtual void unscale();
-   /// Unscale dense column vector \p vec. 
-   virtual void unscaleColVector(Vector& vec) const;
-   /// Unscale sparse column vector \p vec. 
-   virtual void unscaleColVector(SVector& vec) const;
-   /// Unscale dense row vector \p vec. 
-   virtual void unscaleRowVector(Vector& vec) const;
-   /// Unscale sparse row vector \p vec. 
-   virtual void unscaleRowVector(SVector& vec) const;
+   /// Unscale dense solution vector given in \p usol. 
+   virtual void unscaleSolution(Vector& usol) const;
+   /// Get unscaled maximization objective in \p uobj. 
+   virtual void unscaledMaxObj(Vector& uobj) const;
+   /// Get unscaled lower bounds vector in \p ulower. 
+   virtual void unscaledLower(Vector& ulower) const;
+   /// Get unscaled upper bounds vector in \p uupper. 
+   virtual void unscaledUpper(Vector& uupper) const;
+   /// Get unscaled LHS vector in \p ulhs. 
+   virtual void unscaledLhs(Vector& ulhs) const;
+   /// Get unscaled RHS vector in \p urhs. 
+   virtual void unscaledRhs(Vector& urhs) const;
+   /// Get unscaled row vector number \p row in \p uvec. 
+   virtual void unscaledRowVector(int row, DSVector& uvec) const;
+   /// Get unscaled col vector number \p col in \p uvec. 
+   virtual void unscaledColVector(int col, DSVector& uvec) const;
    /// consistency check
    virtual bool isConsistent() const;
    

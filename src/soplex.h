@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.42 2002/04/04 14:59:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.43 2002/04/04 19:36:51 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -1216,8 +1216,16 @@ public:
    virtual void qualConstraintViolation(
       double& maxviol, double& sumviol) const;
 
+   /// get unscaled violation of constraints
+   virtual void qualConstraintViolationUnscaled(
+      double& maxviol, double& sumviol) const;
+
    /// get violations of bounds.
    virtual void qualBoundViolation(
+      double& maxviol, double& sumviol) const;
+
+   /// get unscaled violations of bounds.
+   virtual void SoPlex::qualBoundViolationUnscaled(
       double& maxviol, double& sumviol) const;
 
    /// get the residuum |Ax-b|.

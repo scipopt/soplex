@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.47 2002/04/04 14:59:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.48 2002/04/04 19:36:51 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -559,7 +559,7 @@ SoPlex::Status SoPlex::getPrimalUnscaled (Vector& p_vector) const
    Status stat = getPrimal( p_vector );
 
    if (thescaler != 0)
-      thescaler->unscaleColVector( p_vector );
+      thescaler->unscaleSolution( p_vector );
 
    return stat;
 }

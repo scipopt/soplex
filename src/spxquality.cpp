@@ -13,13 +13,14 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxquality.cpp,v 1.1 2002/04/03 19:16:44 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxquality.cpp,v 1.2 2002/04/04 19:36:51 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
 #include "spxdefines.h"
 #include "soplex.h"
+#include "spxscaler.h"
 
 namespace soplex
 {
@@ -59,7 +60,55 @@ void SoPlex::qualConstraintViolation(double& maxviol, double& sumviol) const
    }
 }
 
-void SoPlex::qualBoundViolation(double& maxviol, double& sumviol) const
+void SoPlex::qualConstraintViolationUnscaled(
+   double& maxviol, double& sumviol) const
+{
+   maxviol = 0.0;
+   sumviol = 0.0;
+
+   if (thescaler == 0)
+      return;
+
+   DVector usol( nCols() );
+   DVector ulhs( nRows() );
+   DVector urhs( nRows() );
+
+   getPrimal( usol );
+
+   thescaler->unscaleSolution( usol );
+   thescaler->unscaledLhs( ulhs );
+   thescaler->unscaledRhs( urhs );
+
+   for( int row = 0; row < nRows(); ++row )
+   {
+      DSVector urowvec;
+
+      thescaler->unscaledRowVector( row, urowvec );
+
+      double val = 0.0;         
+
+      for( int col = 0; col < urowvec.size(); ++col )
+         val += urowvec.value( col ) * usol[urowvec.index( col )];
+
+      double viol = 0.0;
+
+      assert( ulhs[row] <= urhs[row] );
+
+      if( val < ulhs[row] ) 
+         viol = fabs(val - ulhs[row] );
+      else
+         if( val > urhs[row] )
+            viol = fabs( val - urhs[row] );
+
+      if (viol > maxviol)
+         maxviol = viol;
+
+      sumviol += viol;
+   }
+}
+
+void SoPlex::qualBoundViolation(
+   double& maxviol, double& sumviol) const
 {
    maxviol = 0.0;
    sumviol = 0.0;
@@ -79,6 +128,44 @@ void SoPlex::qualBoundViolation(double& maxviol, double& sumviol) const
       else
          if (solu[col] > upper( col ))
             viol = fabs( solu[col] - upper( col ));
+         
+      if (viol > maxviol)
+         maxviol = viol;
+
+      sumviol += viol;
+   }
+}
+
+void SoPlex::qualBoundViolationUnscaled(
+   double& maxviol, double& sumviol) const
+{
+   maxviol = 0.0;
+   sumviol = 0.0;
+
+   if (thescaler == 0)
+      return;
+
+   DVector usol  ( nCols() );
+   DVector ulower( nCols() );
+   DVector uupper( nCols() );
+
+   getPrimal( usol );
+
+   thescaler->unscaleSolution( usol );
+   thescaler->unscaledLower( ulower );
+   thescaler->unscaledUpper( uupper );
+
+   for( int col = 0; col < nCols(); ++col )
+   {
+      assert( ulower[col] <= uupper[col] );
+
+      double viol = 0.0;
+
+      if (usol[col] < ulower[col])
+         viol = fabs( usol[col] - ulower[col]);
+      else
+         if (usol[col] > uupper[col])
+            viol = fabs( usol[col] - uupper[col] );
          
       if (viol > maxviol)
          maxviol = viol;
@@ -121,6 +208,12 @@ void SoPlex::qualRdCostViolation(double& maxviol, double& sumviol) const
 {
    maxviol = 0.0;
    sumviol = 0.0;
+
+   // TODO:   y = c_B * B^-1  => coSolve(y, c_B)
+   //         redcost = c_N - yA_N 
+   // solve system "x = e_i^T * B^-1" to get i'th row of B^-1
+   // DVector y( nRows() );
+   // basis().coSolve( x, spx->unitVector( i ) );
 
    DVector rdcost( nCols() );
 
