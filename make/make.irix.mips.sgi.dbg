@@ -1,5 +1,7 @@
-#--- $Id: make.irix.mips.sgi.dbg,v 1.1 2001/12/03 15:07:18 bzfkocht Exp $
+#--- $Id: make.irix.mips.sgi.dbg,v 1.2 2001/12/04 18:25:56 bzfkocht Exp $
 CXX	=	CC
-CXXFLAGS=	-fullwarn -g
+CXXFLAGS=	-fullwarn -g -LANG ansi-for-init-scope=on exceptions=off
 AR	=	CC
 ARFLAGS	=	-ar
+
+

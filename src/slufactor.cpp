@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.10 2001/12/01 18:21:16 bzfbleya Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.11 2001/12/04 18:25:56 bzfkocht Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -299,7 +299,7 @@ double SLUFactor::stability() const
 void SLUFactor::changeEta(int idx, SSVector& et)
 {
    int es = et.size();
-   stat = updateCLUFactor(this, idx, et.altValues(), et.altIndexMem(), es);
+   update(idx, et.altValues(), et.altIndexMem(), es);
    et.setSize(0);
    et.forceSetup();
 }
@@ -315,8 +315,8 @@ SLUFactor::Status SLUFactor::change(
       if (l.updateType)                      /// Forest-Tomlin updates
       {
          int fsize = forest.size();
-         stat = forestUpdateCLUFactor(this, idx,
-                                       forest.altValues(), fsize, forest.altIndexMem());
+         forestUpdate(
+            idx, forest.altValues(), fsize, forest.altIndexMem());
          forest.setSize(0);
          forest.forceSetup();
       }
@@ -326,13 +326,13 @@ SLUFactor::Status SLUFactor::change(
    else if (e)                                /// ETA updates
    {
       l.updateType = ETA;
-      stat = updateCLUFactorNoClear(this, idx, e->values(), e->indexMem(), e->size());
+      updateNoClear(idx, e->values(), e->indexMem(), e->size());
    }
    else if (l.updateType)                     /// Forest-Tomlin updates
    {
       forest = subst;
       CLUFactor::solveLright(forest.altValues());
-      stat = forestUpdateCLUFactor(this, idx, forest.altValues(), 0, 0);
+      forestUpdate(idx, forest.altValues(), 0, 0);
       forest.setSize(0);
       forest.forceSetup();
    }

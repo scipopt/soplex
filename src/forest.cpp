@@ -13,15 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: forest.cpp,v 1.6 2001/12/01 18:21:16 bzfbleya Exp $"
+#pragma ident "@(#) $Id: forest.cpp,v 1.7 2001/12/04 18:25:56 bzfkocht Exp $"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 
-#include "clutypes.h"
 #include "clumembers.h"
-#include "cluprotos.h"
 #include "cring.h"
 #include "spxalloc.h"
 
@@ -121,31 +119,31 @@ int deQueueMin(int* heap, int* size)
 /*
  *      Perform garbage collection on column file
  */
-static void packColumns(CLUFactor* fac)
+void CLUFactor::forestPackColumns()
 {
-   int n, i, j, col;
+   int n, i, j, colno;
    Dring *ring, *list;
 
-   double *cval = fac->u.col.val;
-   int *cidx = fac->u.col.idx;
-   int *clen = fac->u.col.len;
-   int *cmax = fac->u.col.max;
-   int *cbeg = fac->u.col.start;
+   double *cval = u.col.val;
+   int *cidx = u.col.idx;
+   int *clen = u.col.len;
+   int *cmax = u.col.max;
+   int *cbeg = u.col.start;
 
    n = 0;
-   list = &(fac->u.col.list);
+   list = &u.col.list;
    for (ring = list->next; ring != list; ring = ring->next)
    {
-      col = ring->idx;
-      if (cbeg[col] != n)
+      colno = ring->idx;
+      if (cbeg[colno] != n)
       {
          do
          {
-            col = ring->idx;
-            i = cbeg[col];
-            cbeg[col] = n;
-            cmax[col] = clen[col];
-            j = i + clen[col];
+            colno = ring->idx;
+            i = cbeg[colno];
+            cbeg[colno] = n;
+            cmax[colno] = clen[colno];
+            j = i + clen[colno];
             for (; i < j; ++i)
             {
                cval[n] = cval[i];
@@ -156,25 +154,25 @@ static void packColumns(CLUFactor* fac)
          while (ring != list);
          goto terminatePackColumns;
       }
-      n += clen[col];
-      cmax[col] = clen[col];
+      n += clen[colno];
+      cmax[colno] = clen[colno];
    }
 
 terminatePackColumns :
-   fac->u.col.used = n;
-   fac->u.col.max[fac->thedim] = 0;
+   u.col.used = n;
+   u.col.max[thedim] = 0;
 }
 
 /*
  *      Ensure that column memory is at least size.
  */
-static void minColMem(CLUFactor* fac, int size)
+void CLUFactor::forestMinColMem(int size)
 {
-   if (fac->u.col.size < size)
+   if (u.col.size < size)
    {
-      fac->u.col.size = size;
-      spx_realloc(fac->u.col.idx, size);
-      spx_realloc(fac->u.col.val, size);
+      u.col.size = size;
+      spx_realloc(u.col.idx, size);
+      spx_realloc(u.col.val, size);
    }
 }
 
@@ -182,26 +180,26 @@ static void minColMem(CLUFactor* fac, int size)
 /*
  *      Make column col of fac large enough to hold len nonzeros.
  */
-static void reMaxCol(CLUFactor* fac, int col, int len)
+void CLUFactor::forestReMaxCol(int p_col, int len)
 {
-   assert(fac->u.col.max[col] < len);
+   assert(u.col.max[p_col] < len);
 
-   if (fac->u.col.elem[col].next == &(fac->u.col.list)) /* last in column file */
+   if (u.col.elem[p_col].next == &(u.col.list)) /* last in column file */
    {
-      int delta = len - fac->u.col.max[col];
+      int delta = len - u.col.max[p_col];
 
-      if (delta > fac->u.col.size - fac->u.col.used)
+      if (delta > u.col.size - u.col.used)
       {
-         packColumns(fac);
-         delta = len - fac->u.col.max[col];
-         if (fac->u.col.size < fac->colMemMult * fac->u.col.used + len)
-            minColMem(fac, int(fac->colMemMult * fac->u.col.used + len));
+         forestPackColumns();
+         delta = len - u.col.max[p_col];
+         if (u.col.size < colMemMult * u.col.used + len)
+            forestMinColMem(int(colMemMult * u.col.used + len));
       }
-      assert(delta <= fac->u.col.size - fac->u.col.used
+      assert(delta <= u.col.size - u.col.used
              && "ERROR: could not allocate memory for column file");
 
-      fac->u.col.used += delta;
-      fac->u.col.max[col] = len;
+      u.col.used += delta;
+      u.col.max[p_col] = len;
    }
 
    else                        /* column must be moved to end of column file */
@@ -211,29 +209,29 @@ static void reMaxCol(CLUFactor* fac, int col, int len)
       double *val;
       Dring *ring;
 
-      if (len > fac->u.col.size - fac->u.col.used)
+      if (len > u.col.size - u.col.used)
       {
-         packColumns(fac);
-         if (fac->u.col.size < fac->colMemMult * fac->u.col.used + len)
-            minColMem(fac, int(fac->colMemMult * fac->u.col.used + len));
+         forestPackColumns();
+         if (u.col.size < colMemMult * u.col.used + len)
+            forestMinColMem(int(colMemMult * u.col.used + len));
       }
-      assert(len <= fac->u.col.size - fac->u.col.used
+      assert(len <= u.col.size - u.col.used
              && "ERROR: could not allocate memory for column file");
 
-      j = fac->u.col.used;
-      i = fac->u.col.start[col];
-      k = fac->u.col.len[col] + i;
-      fac->u.col.start[col] = j;
-      fac->u.col.used += len;
+      j = u.col.used;
+      i = u.col.start[p_col];
+      k = u.col.len[p_col] + i;
+      u.col.start[p_col] = j;
+      u.col.used += len;
 
-      fac->u.col.max[fac->u.col.elem[col].prev->idx] += fac->u.col.max[col];
-      fac->u.col.max[col] = len;
-      removeDR(fac->u.col.elem[col]);
-      ring = fac->u.col.list.prev;
-      init2DR (fac->u.col.elem[col], *ring);
+      u.col.max[u.col.elem[p_col].prev->idx] += u.col.max[p_col];
+      u.col.max[p_col] = len;
+      removeDR(u.col.elem[p_col]);
+      ring = u.col.list.prev;
+      init2DR (u.col.elem[p_col], *ring);
 
-      idx = fac->u.col.idx;
-      val = fac->u.col.val;
+      idx = u.col.idx;
+      val = u.col.val;
       for (; i < k; ++i)
       {
          val[j] = val[i];
@@ -245,53 +243,50 @@ static void reMaxCol(CLUFactor* fac, int col, int len)
 /*****************************************************************************/
 
 
-int forestUpdateCLUFactor(CLUFactor* fac, int col, double* work, int num, int *nonz)
+void CLUFactor::forestUpdate(int p_col, double* p_work, int num, int *nonz)
 {
-   int i, j, k, l, m, n;
-   int ll, c, r, row;
+   int i, j, k, h, m, n;
+   int ll, c, r, rowno;
    double x;
 
    double *lval;
    int *lidx;
-   int *lbeg = fac->l.start;
+   int *lbeg = l.start;
 
-   double *cval = fac->u.col.val;
-   int *cidx = fac->u.col.idx;
-   int *cmax = fac->u.col.max;
-   int *clen = fac->u.col.len;
-   int *cbeg = fac->u.col.start;
+   double *cval = u.col.val;
+   int *cidx = u.col.idx;
+   int *cmax = u.col.max;
+   int *clen = u.col.len;
+   int *cbeg = u.col.start;
 
-   double *rval = fac->u.row.val;
-   int *ridx = fac->u.row.idx;
-   int *rmax = fac->u.row.max;
-   int *rlen = fac->u.row.len;
-   int *rbeg = fac->u.row.start;
+   double *rval = u.row.val;
+   int *ridx = u.row.idx;
+   int *rmax = u.row.max;
+   int *rlen = u.row.len;
+   int *rbeg = u.row.start;
 
-   int *rperm = fac->row.perm;
-   int *rorig = fac->row.orig;
-   int *cperm = fac->col.perm;
-   int *corig = fac->col.orig;
+   int *rperm = row.perm;
+   int *rorig = row.orig;
+   int *cperm = col.perm;
+   int *corig = col.orig;
 
-   double *diag = fac->diag;
-   double maxabs = fac->maxabs;
-   int dim = fac->thedim;
-   int stat = CLU_OK;
-
+   double l_maxabs = maxabs;
+   int dim = thedim;
 
    /*  Remove column col form U
     */
-   j = cbeg[col];
-   i = clen[col];
-   fac->nzCnt -= i;
+   j = cbeg[p_col];
+   i = clen[p_col];
+   nzCnt -= i;
    for (i += j - 1; i >= j; --i)
    {
       m = cidx[i];
       k = rbeg[m];
-      l = --(rlen[m]) + k;
-      while (ridx[k] != col)
+      h = --(rlen[m]) + k;
+      while (ridx[k] != p_col)
          ++k;
-      ridx[k] = ridx[l];
-      rval[k] = rval[l];
+      ridx[k] = ridx[h];
+      rval[k] = rval[h];
    }
 
 
@@ -300,47 +295,47 @@ int forestUpdateCLUFactor(CLUFactor* fac, int col, double* work, int num, int *n
     */
    if (num)
    {
-      clen[col] = 0;
-      if (num > cmax[col])
-         reMaxCol(fac, col, num);
-      cidx = fac->u.col.idx;
-      cval = fac->u.col.val;
-      k = cbeg[col];
+      clen[p_col] = 0;
+      if (num > cmax[p_col])
+         forestReMaxCol(p_col, num);
+      cidx = u.col.idx;
+      cval = u.col.val;
+      k = cbeg[p_col];
       r = 0;
       for (j = 0; j < num; ++j)
       {
          i = *nonz++;
-         x = work[i];
-         work[i] = 0;
+         x = p_work[i];
+         p_work[i] = 0;
          if (x > 1.e-12 || x < -1.e-12)
          {
-            if (x > maxabs)
-               maxabs = x;
-            else if (-x > maxabs)
-               maxabs = -x;
+            if (x > l_maxabs)
+               l_maxabs = x;
+            else if (-x > l_maxabs)
+               l_maxabs = -x;
 
             /* insert to column file */
-            assert(k - cbeg[col] < cmax[col]);
+            assert(k - cbeg[p_col] < cmax[p_col]);
             cval[k] = x;
             cidx[k++] = i;
 
             /* insert to row file */
             if (rmax[i] <= rlen[i])
             {
-               fac->remaxRow(i, rlen[i] + 1);
-               rval = fac->u.row.val;
-               ridx = fac->u.row.idx;
+               remaxRow(i, rlen[i] + 1);
+               rval = u.row.val;
+               ridx = u.row.idx;
             }
-            l = rbeg[i] + (rlen[i])++;
-            rval[l] = x;
-            ridx[l] = col;
+            h = rbeg[i] + (rlen[i])++;
+            rval[h] = x;
+            ridx[h] = p_col;
 
             /* check permuted row index */
             if (rperm[i] > r)
                r = rperm[i];
          }
       }
-      fac->nzCnt += (clen[col] = k - cbeg[col]);
+      nzCnt += (clen[p_col] = k - cbeg[p_col]);
    }
 
    else
@@ -349,68 +344,68 @@ int forestUpdateCLUFactor(CLUFactor* fac, int col, double* work, int num, int *n
       clen[col] = 0;
       reMaxCol(fac, col, dim);
        */
-      cidx = fac->u.col.idx;
-      cval = fac->u.col.val;
-      k = cbeg[col];
-      j = k + cmax[col];
+      cidx = u.col.idx;
+      cval = u.col.val;
+      k = cbeg[p_col];
+      j = k + cmax[p_col];
       r = 0;
       for (i = 0; i < dim; ++i)
       {
-         x = work[i];
-         work[i] = 0;
+         x = p_work[i];
+         p_work[i] = 0;
          if (x > 1.e-12 || x < -1.e-12)
          {
-            if (x > maxabs)
-               maxabs = x;
-            else if (-x > maxabs)
-               maxabs = -x;
+            if (x > l_maxabs)
+               l_maxabs = x;
+            else if (-x > l_maxabs)
+               l_maxabs = -x;
 
             /* insert to column file */
             if (k >= j)
             {
-               clen[col] = k - cbeg[col];
-               reMaxCol(fac, col, dim - i);
-               cidx = fac->u.col.idx;
-               cval = fac->u.col.val;
-               k = cbeg[col];
-               j = k + cmax[col];
-               k += clen[col];
+               clen[p_col] = k - cbeg[p_col];
+               forestReMaxCol(p_col, dim - i);
+               cidx = u.col.idx;
+               cval = u.col.val;
+               k = cbeg[p_col];
+               j = k + cmax[p_col];
+               k += clen[p_col];
             }
-            assert(k - cbeg[col] < cmax[col]);
+            assert(k - cbeg[p_col] < cmax[p_col]);
             cval[k] = x;
             cidx[k++] = i;
 
             /* insert to row file */
             if (rmax[i] <= rlen[i])
             {
-               fac->remaxRow(i, rlen[i] + 1);
-               rval = fac->u.row.val;
-               ridx = fac->u.row.idx;
+               remaxRow(i, rlen[i] + 1);
+               rval = u.row.val;
+               ridx = u.row.idx;
             }
-            l = rbeg[i] + (rlen[i])++;
-            rval[l] = x;
-            ridx[l] = col;
+            h = rbeg[i] + (rlen[i])++;
+            rval[h] = x;
+            ridx[h] = p_col;
 
             /* check permuted row index */
             if (rperm[i] > r)
                r = rperm[i];
          }
       }
-      fac->nzCnt += (clen[col] = k - cbeg[col]);
-      if (cbeg[col] + cmax[col] == fac->u.col.used)
+      nzCnt += (clen[p_col] = k - cbeg[p_col]);
+      if (cbeg[p_col] + cmax[p_col] == u.col.used)
       {
-         fac->u.col.used -= cmax[col];
-         cmax[col] = clen[col];
-         fac->u.col.used += cmax[col];
+         u.col.used -= cmax[p_col];
+         cmax[p_col] = clen[p_col];
+         u.col.used += cmax[p_col];
       }
    }
 
 
    /*  Adjust stages of column and row singletons in U.
     */
-   fac->u.lastRowSing = fac->u.lastColSing;
+   u.lastRowSing = u.lastColSing;
 
-   c = cperm[col];
+   c = cperm[p_col];
    if (r > c)                         /* Forest Tomlin update */
    {
       /*      update permutations
@@ -430,42 +425,42 @@ int forestUpdateCLUFactor(CLUFactor* fac, int col, double* work, int num, int *n
          cperm[corig[i]] = i;
 
 
-      row = rorig[r];
-      j = rbeg[row];
-      i = rlen[row];
-      fac->nzCnt -= i;
+      rowno = rorig[r];
+      j = rbeg[rowno];
+      i = rlen[rowno];
+      nzCnt -= i;
 
       if (i < verySparseFactor*(dim - c))      /* few nonzeros to be eliminated        */
       {
-         /*  move row r from U to work
+         /*  move row r from U to p_work
          fprintf(stderr, ".");
           */
          num = 0;
          for (i += j - 1; i >= j; --i)
          {
             k = ridx[i];
-            work[k] = rval[i];
+            p_work[k] = rval[i];
             enQueueMin(nonz, &num, cperm[k]);
             m = --(clen[k]) + cbeg[k];
-            for (l = m; cidx[l] != row; --l)
+            for (h = m; cidx[h] != rowno; --h)
               ;
-            cidx[l] = cidx[m];
-            cval[l] = cval[m];
+            cidx[h] = cidx[m];
+            cval[h] = cval[m];
          }
 
 
          /*  Eliminate row r from U to L file
           */
-         ll = fac->makeLvec(r - c, row);
-         lval = fac->l.val;
-         lidx = fac->l.idx;
+         ll = makeLvec(r - c, rowno);
+         lval = l.val;
+         lidx = l.idx;
          /* for(i = c; i < r; ++i)       */
          while (num)
          {
 #ifndef NDEBUG
             for (i = 0; i < num; ++i)
             {
-               if (work[corig[nonz[i]]] == 0)
+               if (p_work[corig[nonz[i]]] == 0)
                   abort();
             }
 #endif  // NDEBUG
@@ -473,151 +468,157 @@ int forestUpdateCLUFactor(CLUFactor* fac, int col, double* work, int num, int *n
             if (i == r)
                break;
             k = corig[i];
-            assert(work[k]);
+            assert(p_work[k]);
             {
                n = rorig[i];
-               x = work[k] * diag[n];
+               x = p_work[k] * diag[n];
                lidx[ll] = n;
                lval[ll] = x;
-               work[k] = 0;
+               p_work[k] = 0;
                ll++;
 
-               if (x > maxabs)
-                  maxabs = x;
-               else if (-x > maxabs)
-                  maxabs = -x;
+               if (x > l_maxabs)
+                  l_maxabs = x;
+               else if (-x > l_maxabs)
+                  l_maxabs = -x;
 
                j = rbeg[n];
                m = rlen[n] + j;
                for (; j < m; ++j)
                {
                   int jj = ridx[j];
-                  double y = work[jj];
+                  double y = p_work[jj];
                   if (y == 0)
                      enQueueMin(nonz, &num, cperm[jj]);
                   y -= x * rval[j];
-                  work[jj] = y + (y == 0) * ZERO;
+                  p_work[jj] = y + (y == 0) * ZERO;
                }
             }
          }
-         if (lbeg[fac->l.firstUnused - 1] == ll)
-            (fac->l.firstUnused)--;
+         if (lbeg[l.firstUnused - 1] == ll)
+            (l.firstUnused)--;
          else
-            lbeg[fac->l.firstUnused] = ll;
+            lbeg[l.firstUnused] = ll;
 
 
          /*  Set diagonal value
           */
          if (i != r)
-            return fac->stat = CLU_SINGULAR;
+         {
+            stat = SLinSolver::SINGULAR;
+            return;
+         }
          k = corig[r];
-         x = work[k];
-         diag[row] = 1 / x;
-         work[k] = 0;
+         x = p_work[k];
+         diag[rowno] = 1 / x;
+         p_work[k] = 0;
 
 
          /*  make row large enough to fit all nonzeros.
           */
-         if (rmax[row] < num)
+         if (rmax[rowno] < num)
          {
-            rlen[row] = 0;
-            fac->remaxRow(row, num);
-            rval = fac->u.row.val;
-            ridx = fac->u.row.idx;
+            rlen[rowno] = 0;
+            remaxRow(rowno, num);
+            rval = u.row.val;
+            ridx = u.row.idx;
          }
-         fac->nzCnt += num;
+         nzCnt += num;
 
          /*  Insert work to updated row thereby clearing work;
           */
-         n = rbeg[row];
+         n = rbeg[rowno];
          for (i = 0; i < num; ++i)
          {
             j = corig[nonz[i]];
-            x = work[j];
+            x = p_work[j];
             assert(x != 0.0);
             {
-               if (x > maxabs)
-                  maxabs = x;
-               else if (-x > maxabs)
-                  maxabs = -x;
+               if (x > l_maxabs)
+                  l_maxabs = x;
+               else if (-x > l_maxabs)
+                  l_maxabs = -x;
 
                ridx[n] = j;
                rval[n] = x;
-               work[j] = 0;
+               p_work[j] = 0;
                ++n;
 
                if (clen[j] >= cmax[j])
                {
-                  reMaxCol(fac, j, clen[j] + 1);
-                  cidx = fac->u.col.idx;
-                  cval = fac->u.col.val;
+                  forestReMaxCol(j, clen[j] + 1);
+                  cidx = u.col.idx;
+                  cval = u.col.val;
                }
                cval[cbeg[j] + clen[j]] = x;
-               cidx[cbeg[j] + clen[j]++] = row;
+               cidx[cbeg[j] + clen[j]++] = rowno;
             }
          }
-         rlen[row] = n - rbeg[row];
+         rlen[rowno] = n - rbeg[rowno];
       }
 
       else            /* few nonzeros to be eliminated        */
       {
-         /*  move row r from U to work
+         /*  move row r from U to p_work
          fprintf(stderr, " ");
           */
          for (i += j - 1; i >= j; --i)
          {
             k = ridx[i];
-            work[k] = rval[i];
+            p_work[k] = rval[i];
             m = --(clen[k]) + cbeg[k];
-            for (l = m; cidx[l] != row; --l)
+            for (h = m; cidx[h] != rowno; --h)
               ;
-            cidx[l] = cidx[m];
-            cval[l] = cval[m];
+            cidx[h] = cidx[m];
+            cval[h] = cval[m];
          }
 
 
          /*  Eliminate row r from U to L file
           */
-         ll = fac->makeLvec(r - c, row);
-         lval = fac->l.val;
-         lidx = fac->l.idx;
+         ll = makeLvec(r - c, rowno);
+         lval = l.val;
+         lidx = l.idx;
          for (i = c; i < r; ++i)
          {
             k = corig[i];
-            if (work[k])
+            if (p_work[k])
             {
                n = rorig[i];
-               x = work[k] * diag[n];
+               x = p_work[k] * diag[n];
                lidx[ll] = n;
                lval[ll] = x;
-               work[k] = 0;
+               p_work[k] = 0;
                ll++;
 
-               if (x > maxabs)
-                  maxabs = x;
-               else if (-x > maxabs)
-                  maxabs = -x;
+               if (x > l_maxabs)
+                  l_maxabs = x;
+               else if (-x > l_maxabs)
+                  l_maxabs = -x;
 
                j = rbeg[n];
                m = rlen[n] + j;
                for (; j < m; ++j)
-                  work[ridx[j]] -= x * rval[j];
+                  p_work[ridx[j]] -= x * rval[j];
             }
          }
-         if (lbeg[fac->l.firstUnused - 1] == ll)
-            (fac->l.firstUnused)--;
+         if (lbeg[l.firstUnused - 1] == ll)
+            (l.firstUnused)--;
          else
-            lbeg[fac->l.firstUnused] = ll;
+            lbeg[l.firstUnused] = ll;
 
 
          /*  Set diagonal value
           */
          k = corig[r];
-         x = work[k];
+         x = p_work[k];
          if (x == 0.0)
-            return fac->stat = CLU_SINGULAR;
-         diag[row] = 1 / x;
-         work[k] = 0;
+         {
+            stat = SLinSolver::SINGULAR;
+            return;
+         }
+         diag[rowno] = 1 / x;
+         p_work[k] = 0;
 
 
          /*  count remaining nonzeros in work and make row large enough
@@ -625,46 +626,46 @@ int forestUpdateCLUFactor(CLUFactor* fac, int col, double* work, int num, int *n
           */
          n = 0;
          for (i = r + 1; i < dim; ++i)
-            n += (work[corig[i]] != 0.0);
-         if (rmax[row] < n)
+            n += (p_work[corig[i]] != 0.0);
+         if (rmax[rowno] < n)
          {
-            rlen[row] = 0;
-            fac->remaxRow(row, n);
-            rval = fac->u.row.val;
-            ridx = fac->u.row.idx;
+            rlen[rowno] = 0;
+            remaxRow(rowno, n);
+            rval = u.row.val;
+            ridx = u.row.idx;
          }
-         fac->nzCnt += n;
+         nzCnt += n;
 
-         /*  Insert work to updated row thereby clearing work;
+         /*  Insert p_work to updated row thereby clearing p_work;
           */
-         n = rbeg[row];
+         n = rbeg[rowno];
          for (i = r + 1; i < dim; ++i)
          {
             j = corig[i];
-            x = work[j];
+            x = p_work[j];
             if (x != 0.0)
             {
-               if (x > maxabs)
-                  maxabs = x;
-               else if (-x > maxabs)
-                  maxabs = -x;
+               if (x > l_maxabs)
+                  l_maxabs = x;
+               else if (-x > l_maxabs)
+                  l_maxabs = -x;
 
                ridx[n] = j;
                rval[n] = x;
-               work[j] = 0;
+               p_work[j] = 0;
                ++n;
 
                if (clen[j] >= cmax[j])
                {
-                  reMaxCol(fac, j, clen[j] + 1);
-                  cidx = fac->u.col.idx;
-                  cval = fac->u.col.val;
+                  forestReMaxCol(j, clen[j] + 1);
+                  cidx = u.col.idx;
+                  cval = u.col.val;
                }
                cval[cbeg[j] + clen[j]] = x;
-               cidx[cbeg[j] + clen[j]++] = row;
+               cidx[cbeg[j] + clen[j]++] = rowno;
             }
          }
-         rlen[row] = n - rbeg[row];
+         rlen[rowno] = n - rbeg[rowno];
       }
    }
 
@@ -673,21 +674,23 @@ int forestUpdateCLUFactor(CLUFactor* fac, int col, double* work, int num, int *n
       /*  Move diagonal element to diag.  Note, that it must be the last
        *  element, since it has just been inserted above.
        */
-      row = rorig[r];
-      i = rbeg[row] + --(rlen[row]);
-      diag[row] = 1 / rval[i];
-      for (j = i = --(clen[col]) + cbeg[col]; cidx[i] != row; --i)
+      rowno = rorig[r];
+      i = rbeg[rowno] + --(rlen[rowno]);
+      diag[rowno] = 1 / rval[i];
+      for (j = i = --(clen[p_col]) + cbeg[p_col]; cidx[i] != rowno; --i)
         ;
       cidx[i] = cidx[j];
       cval[i] = cval[j];
    }
-
    else /* r < c */
-      return fac->stat = CLU_SINGULAR;
+   {
+      stat = SLinSolver::SINGULAR;
+      return;
+   }
+   maxabs = l_maxabs;
 
-   fac->maxabs = maxabs;
-   assert( fac->isConsistent());
-   return stat;
+   assert(isConsistent());
+   stat = SLinSolver::OK;
 }
 } // namespace soplex
 

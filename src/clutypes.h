@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clutypes.h,v 1.4 2001/11/28 17:15:51 bzfkocht Exp $"
+#pragma ident "@(#) $Id: clutypes.h,v 1.5 2001/12/04 18:25:56 bzfkocht Exp $"
 
 #ifndef _CLUTYPES_H_
 #define _CLUTYPES_H_
@@ -25,7 +25,7 @@ namespace soplex
  *      This file defines all C data structures involved in the high-speed
  *      C sparse LU factorization routine.
  */
-
+#if 0
 /*      Data structures for saving the row and column permutations.
  */
 struct Perm
@@ -115,7 +115,7 @@ struct L
    int *rorig;         /* original row permutation          */
    int *rperm;         /* original row permutation          */
 };
-
+#endif
 
 } // namespace soplex
 #endif // _CLUTYPES_H_

@@ -88,4 +88,59 @@
     relevant when using such objects in container classes such as
     DataArray or Array.  
 */
+//-----------------------------------------------------------------------------
+/**@page FAQ Frequently Asked Questions
+
+   Here are some answers that can not be answered from the code alone:
+
+   -# Why is <iostream> used but <assert.h> and not <cassert>
+      
+      The reason is twofold. From the theoretical point we were not
+      able to exactly find out in TC++PL in what namespace cassert 
+      should load it's declarations. Shurely in std. But since this are
+      normally functions with C linkage this won't work.
+      The some, like assert are macros, which have no namespace.
+      The practical point is, that the compiler vendors seem to be 
+      unsure also. Most put everything in both namespaces std and global.
+      So there is no advantage in using <cassert>. Compaq even left them
+      off because it seemed unclear to them.
+      So our reasoning was: If it is a C++ header we use the correct form
+      without the .h and in std. If it is a C header, according to the
+      standard the .h header has to be there and uses global namespace.
+      That seems acceptable to us, especially for C functions.
+      
+   -# Why is malloc/free sometimes used and not new/delete.
+      
+      Because there is no realloc with new/delete. Because malloc
+      is faster. And we only use it for builtin types.
+      If you do not like this descision, it's easy to change spxalloc.h
+      to use new/delete.
+
+   -# Can SoPlex solve Integer Programs (IP's).
+      
+      No. You need an IP-Solver for this. Most IP-Solver use LP-Solvers
+      as a subroutine and do some kind of Branch-and-Bound.
+
+   -# Is there a Windows version ?
+
+      The code is tested to compile under some version of Visual C.
+      We do \b not provide any make or project files for VC.
+
+   -# What is the academic license ?
+
+      Essentially, you can do what you want, except: Give SoPlex to 
+      anybody else. Do anything with SoPlex that makes money (this 
+      includes saving your money on any commercial activity).
+      See the license for details http://pengpuffblub.html
+
+   -# What is the commercial license ?
+  
+      If you want to make with SoPlex you need one. We give the license,
+      you pay for it. The amount is completely negotiable depending on
+      what you want to do with SoPlex, which rights you want and what
+      you are willing to tell us.
+
+*/      
+      
+
 

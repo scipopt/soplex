@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.12 2001/11/26 12:19:13 bzfpfend Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.13 2001/12/04 18:25:56 bzfkocht Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -77,6 +77,10 @@ namespace soplex
    #-firstfree-1, the next free element is given by #-info-1. The last
    free element in the list is marked by #info == -themax-1. Finally all
    elements in #theitem with index >= #thesize are unused as well.  
+
+   @todo We use here malloc/realloc for objects of type Item/DATA.
+         I am not sure that this is a good idea. Maybe we should switch
+         do new/delete here.
 */
 template<class DATA>
 class DataSet

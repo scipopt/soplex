@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: update.cpp,v 1.3 2001/12/01 18:21:16 bzfbleya Exp $"
+#pragma ident "@(#) $Id: update.cpp,v 1.4 2001/12/04 18:25:57 bzfkocht Exp $"
 
 
 #include <stdio.h>
@@ -31,108 +31,88 @@ namespace soplex
 
 /*****************************************************************************/
 
-int updateCLUFactor
-(
-   CLUFactor* fac,
-   int col,
-   double* work,
-   const int* idx,
-   int num
-)
+void CLUFactor::update(int p_col, double* p_work, const int* p_idx, int num)
 {
    int ll, i, j;
    int* lidx;
    double* lval;
    double x, div;
-   double maxabs;
 
-   assert(work[col] != 0);
-   div = 1 / work[col];
-   work[col] = 0;
+   assert(p_work[p_col] != 0);
+   div = 1 / p_work[p_col];
+   p_work[p_col] = 0;
 
-   ll = fac->makeLvec(num, col);
+   ll = makeLvec(num, p_col);
    //   ll = fac->makeLvec(num, col);
-   lval = fac->l.val;
-   lidx = fac->l.idx;
-   maxabs = fac->maxabs;
+   lval = l.val;
+   lidx = l.idx;
 
-   for (i = num - 1; (j = idx[i]) != col; --i)
+   for (i = num - 1; (j = p_idx[i]) != p_col; --i)
    {
       lidx[ll] = j;
-      lval[ll] = div * work[j];
-      work[j] = 0;
+      lval[ll] = div * p_work[j];
+      p_work[j] = 0;
       ++ll;
    }
 
-   lidx[ll] = col;
+   lidx[ll] = p_col;
    lval[ll] = 1 - div;
    ++ll;
 
    for (--i; i >= 0; --i)
    {
-      j = idx[i];
+      j = p_idx[i];
       lidx[ll] = j;
-      lval[ll] = x = div * work[j];
-      work[j] = 0;
+      lval[ll] = x = div * p_work[j];
+      p_work[j] = 0;
       ++ll;
-      if (x > maxabs)
-         maxabs = x;
-      else if (-x > maxabs)
-         maxabs = -x;
-   }
 
-   fac->maxabs = maxabs;
-   return CLU_OK;
+      if (fabs(x) > maxabs)
+         maxabs = fabs(x);
+   }
+   stat = SLinSolver::OK;
 }
 
-int updateCLUFactorNoClear
-(
-   CLUFactor* fac,
-   int col,
-   const double* work,
-   const int* idx,
-   int num
-)
+void CLUFactor::updateNoClear(
+   int p_col, 
+   const double* p_work, 
+   const int* p_idx,
+   int num)
 {
    int ll, i, j;
    int* lidx;
    double* lval;
    double x, div;
-   double maxabs;
 
-   assert(work[col] != 0);
-   div = 1 / work[col];
-   ll = fac->makeLvec(num, col);
+   assert(p_work[p_col] != 0);
+   div = 1 / p_work[p_col];
+   ll = makeLvec(num, p_col);
    //ll = fac->makeLvec(num, col);
-   lval = fac->l.val;
-   lidx = fac->l.idx;
-   maxabs = fac->maxabs;
+   lval = l.val;
+   lidx = l.idx;
 
-   for (i = num - 1; (j = idx[i]) != col; --i)
+   for (i = num - 1; (j = p_idx[i]) != p_col; --i)
    {
       lidx[ll] = j;
-      lval[ll] = div * work[j];
+      lval[ll] = div * p_work[j];
       ++ll;
    }
 
-   lidx[ll] = col;
+   lidx[ll] = p_col;
    lval[ll] = 1 - div;
    ++ll;
 
    for (--i; i >= 0; --i)
    {
-      j = idx[i];
+      j = p_idx[i];
       lidx[ll] = j;
-      lval[ll] = x = div * work[j];
+      lval[ll] = x = div * p_work[j];
       ++ll;
-      if (x > maxabs)
-         maxabs = x;
-      else if (-x > maxabs)
-         maxabs = -x;
-   }
 
-   fac->maxabs = maxabs;
-   return CLU_OK;
+      if (fabs(x) > maxabs)
+         maxabs = fabs(x);
+   }
+   stat = SLinSolver::OK;
 }
 } // namespace soplex
 

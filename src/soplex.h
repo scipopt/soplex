@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.4 2001/11/25 14:58:28 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.5 2001/12/04 18:25:57 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -932,7 +932,7 @@ public:
    /// feasibility vector.
    /** This method return the \em feasibility vector. If it satisfies its
     *  bound, the basis is called feasible (independently of the chosen
-    *  representation). The feasibility vector has dimenstin #dim().
+    *  representation). The feasibility vector has dimension #dim().
     *
     *  For the entering Simplex, #fVec is kept within its bounds. In
     *  contrast to this, the pricing of the leaving Simplex selects an
