@@ -44,6 +44,12 @@ pilot    EC *
 linux.x86.gnu LC 0 593
 greenbea LR
 
+hp-ux.hppa.hp LC 0 699
+greenbeb LR
+pilot-ja ER
+pilot87  EC *
+
+
 OLD {
 linux.x86.intel LC 1 977
 greenbea ER

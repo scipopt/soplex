@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idlist.h,v 1.9 2002/01/07 15:40:37 bzfkocht Exp $"
+#pragma ident "@(#) $Id: idlist.h,v 1.10 2002/01/08 09:27:27 bzfkocht Exp $"
 
 /**@file  idlist.h
  * @brief Generic double linked list.
@@ -37,6 +37,12 @@ namespace soplex
    controls members #next() and #prev(). However, #IdList should provide
    enough functionality for the user not to requirer any modification to these
    members.
+ */
+/* The use of this->the_last and this->the_first instead of just the_last
+ * and the_first is bcause the HP aCC Compiler claims that according to the
+ * Standard these otherwise could not be seen. An since I ws not able to 
+ * even identify a hint on this in the Draft Standard we just do it, so
+ * the HP compiler is happy since it will not hurt the others.
  */
 template < class T >
 class IdElement : public T
@@ -136,8 +142,8 @@ public:
          elem->prev() = last();
       }
       else
-         the_first = elem;
-      the_last = elem;
+         this->the_first = elem;
+      this->the_last = elem;
    }
 
    /// prepends \p elem at beginnig of list.
@@ -149,8 +155,8 @@ public:
          first()->prev() = elem;
       }
       else
-         the_last = elem;
-      the_first = elem;
+         this->the_last = elem;
+      this->the_first = elem;
    }
 
    /// inserts \p elem after \p after.
@@ -173,7 +179,7 @@ public:
       if (list.first())
       {
          append(list.first());
-         the_last = list.last();
+         this->the_last = list.last();
       }
    }
 
@@ -183,7 +189,7 @@ public:
       if (list.first())
       {
          prepend(list.last());
-         the_first = list.the_first;
+         this->the_first = list.the_first;
       }
    }
 
@@ -219,10 +225,10 @@ public:
       {
          the_first = next(elem);
          if (first() == 0)
-            the_last = 0;
+            this->the_last = 0;
       }
       else if (elem == last())
-         the_last = elem->prev();
+         this->the_last = elem->prev();
       else
       {
          elem->next()->prev() = elem->prev();
@@ -240,19 +246,19 @@ public:
          if (first() == list.first())
          {
             if (last() == list.last())
-               the_first = the_last = 0;
+               this->the_first = this->the_last = 0;
             else
-               the_first = list.last()->next();
+               this->the_first = list.last()->next();
          }
          else if (last() == list.last())
-            the_last = list.last()->prev();
+            this->the_last = list.last()->prev();
          else
          {
             T* after = first();
             for (; after->next() != list.first(); after = after->next())
               ;
             if (last() == list.last())
-               the_last = after;
+               this->the_last = after;
             else
                after->next() = list.last()->next();
          }
@@ -270,7 +276,7 @@ public:
    */
    void move(ptrdiff_t delta)
    {
-      if (the_first)
+      if (this->the_first)
       {
          T* elem;
          IsList<T>::move(delta);

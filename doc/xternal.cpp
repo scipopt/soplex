@@ -101,6 +101,7 @@
    <TR><TD>Compaq</TD><TD>6.3-010  </TD><TD>SuSE 7.1/AXP Linux</TD></TR>
    <TR><TD>Sun   </TD><TD>WS6U2 5.3</TD><TD>Solaris 7         </TD></TR>
    <TR><TD>SGI   </TD><TD>7.3.1.1m </TD><TD>IRIX 6.5          </TD></TR>
+   <TR><TD>HP    </TD><TD>A.03.27  </TD><TD>HP-UX 11.00       </TD></TR>
    <TR><TD></TD><TD></TD><TD></TD></TR>
    <TR><TD></TD><TD></TD><TD></TD></TR>
    </TABLE>
