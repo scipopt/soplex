@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.1 2001/12/10 15:46:49 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.2 2001/12/10 19:05:54 bzfkocht Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read MPS format files.
@@ -171,19 +171,6 @@ bool MPSInput::readLine()
       } 
       while(*m_buf == '*');
 
-      /* Look for new section
-       */
-      if (*m_buf != BLANK)
-      {
-         m_f0 = strtok(&m_buf[0], " ");
-
-         assert(m_f0 != 0);
-
-         m_f1 = strtok(0, " ");
-
-         return true;
-      }
-
       /* Normalize line
        */
       len = strlen(m_buf);
@@ -196,6 +183,19 @@ bool MPSInput::readLine()
          clear_from(m_buf, len);
 
       assert(strlen(m_buf) >= 80);
+
+      /* Look for new section
+       */
+      if (*m_buf != BLANK)
+      {
+         m_f0 = strtok(&m_buf[0], " ");
+
+         assert(m_f0 != 0);
+
+         m_f1 = strtok(0, " ");
+
+         return true;
+      }
 
       /* Test for fixed format comments
        */

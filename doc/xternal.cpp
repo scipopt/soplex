@@ -89,7 +89,7 @@
     DataArray or Array.  
 */
 //-----------------------------------------------------------------------------
-/**@page Where is SoPlex running?
+/**@page Platforms Where is SoPlex running?
    We have tested SoPlex at least to compile with the following 
    Compilers:
    <TABLE>
@@ -110,7 +110,8 @@
 
    Here are some answers that can not be answered from the code alone:
 
-   -# Why is <iostream> used but <assert.h> and not <cassert>
+   <ol>
+   <li> Why is <iostream> used but <assert.h> and not <cassert>
      
       The reason is twofold. From the theoretical point we were not
       able to exactly find out in TC++PL in what namespace cassert 
@@ -126,38 +127,38 @@
       standard the .h header has to be there and uses global namespace.
       That seems acceptable to us, especially for C functions.
       
-   -# Why is malloc/free sometimes used and not new/delete.
+   <li> Why is malloc/free sometimes used and not new/delete.
       
       Because there is no realloc with new/delete. Because malloc
       is faster. And we only use it for builtin types.
       If you do not like this descision, it's easy to change spxalloc.h
       to use new/delete.
 
-   -# Can SoPlex solve Integer Programs (IP's).
+   <li> Can SoPlex solve Integer Programs (IP's).
       
       No. You need an IP-Solver for this. Most IP-Solver use LP-Solvers
       as a subroutine and do some kind of Branch-and-Bound.
 
-   -# Is there a Windows version ?
+   <li> Is there a Windows version ?
 
       The code is tested to compile under some version of Visual C.
       We do \b not provide any make or project files for VC.
 
-   -# What is the academic license ?
+   <li> What is the academic license ?
 
       Essentially, you can do what you want, except: Give SoPlex to 
       anybody else. Do anything with SoPlex that makes money (this 
       includes saving your money on any commercial activity).
       See the license for details http://pengpuffblub.html
 
-   -# What is the commercial license ?
+   <li> What is the commercial license ?
   
       If you want to make with SoPlex you need one. We give the license,
       you pay for it. The amount is completely negotiable depending on
       what you want to do with SoPlex, which rights you want and what
       you are willing to tell us.
 
-   -# I want I primal and a dual simplex, where are they ?
+   <li> I want I primal and a dual simplex, where are they ?
 
       That is quite easy. You can set ENTERing and LEAVEing algorithm and
       COLUMN and ROW representation.
@@ -172,8 +173,111 @@
       then   Entering is the Primal and Leaving is the Dual algorithm.
       In ROW oriented representation, we have in principle the
       explicit dual and then the algorithms reverse.
+   </ol>
+*/           
+//-----------------------------------------------------------------------------
+/**@page Programming Programming with SoPlex 
+   
+   The following sections are dedicated to users, that want to
+   provide own pricers, ratio test, start basis generation codes or
+   LP simplifiers to use with #SoPlex or that want to derive own
+   implementations (e.g. parallel versions) using SoPlex.
 
-*/      
+   @section Virtualizing the Representation
+   The primal Simplex on the columnwise representation is
+   structurely equivalent to the dual Simplex on the rowwise
+   representation and vice versa (see above). Hence, it is
+   desirable to treat both cases in a very similar manner. This
+   is supported by the programmers interface of #Soplex, that
+   provides access methods for all internal data in two ways: one
+   is relative to the "physical" representation of the LP in
+   rows and columns, while the other is relative to the chosen
+   basis #Representation. If e.g. a #SPxPricer is
+   written using the second type of methods only (which will
+   generally be the case), the same code can be used for running
+   SoPlex's the Simplex algorithm for both
+   #Representation%s. We will now give two examples for this
+   virtualization from the chosen representation.
+
+   Methods #vector will return a column or a row vector,
+   corresponding to the chosen basis representation. 
+   The other "vectors" will be referred to as \em covectors:
+     
+   <TABLE>
+   <TR><TD>&nbsp;  </TD><TD>ROW      </TD><TD>COLUMN   </TD></TR>
+   <TR><TD>vector  </TD><TD>rowVector</TD><TD>colVector</TD></TR>
+   <TR><TD>coVector</TD><TD>colVector</TD><TD>rowVector</TD></TR>
+   </TABLE>
+    
+   Weather the #SPxBasis::Desc::Status of a variable indicates that the
+   corresponding #vector is in the basis matrix or not also depends on the
+   chosen representation. Hence, methods #isBasic() are provided to get the
+   correct answer for both representations.  
+   
+   @section Simplex Vectors and Bounds
+   The Simplex algorithms keeps three vectors, that are defined to a basis.
+   Two of them are required for the pricing, while the other is needed for
+   detecting feasibility of the basis. For all three vectors, bounds are
+   defined. The Simplex alogrithm changes the basis until all three vectors
+   satisfy their bounds. In this case the optimal solution is found.
+    
+   Whith each update of the basis, also the three vectors need to be
+   updated. This is best supported by the use of #UpdateVector%s.
+    
+   @subsection Variables
+   The Simplex algorithm works with two types of variables, primals and
+   duals.  The primal variables are the ones associated to each column of
+   an LP, whereas the dual variables are the ones associated to each row.
+   However, to each row a slack variable must be added to the set of
+   primals (to represent inequalities), and a reduced cost variable must be
+   added for each column (to represent upper or lower bounds). Note, that
+   mathematically, on dual variable for each bound (upper and lower) should
+   be added. However, this variable would always yield the same value and
+   can, hence, be implemented as one.
+    
+   To summarize, we have a primal variable for each LP column and row
+   (i.e. its slack) as well as a dual variable for each LP row and column
+   (i.e. its bounds). However, not all these values need to be stored and
+   computed, since the structure of the Simplex algorithms allow to
+   implicitely keep them.
       
+   If the #SPxBasis's #Status of a row or column is one of #P_ON_LOWER,
+   #P_ON_UPPER, #P_FIXED or #P_FREE the value of the corresponding
+   primal variable is the lower, upper or both bound(s) or 0, respectively.
+   The corresponding dual variable needs to be computed. Equivalently, for
+   a #Status of #D_FREE, #D_ON_UPPER, #D_ON_LOWER, #D_ON_BOTH or
+   #D_UNDEFINED the corresponding dual variable is 0, whereas the primal 
+   one needs to be computed.
+
+   We declare the following vectors for holding the values to be computed.
+   Primal variables (dimension #nCols()): #primRhs, #primVec.
+   Dual variables (dimension #nRows()): #dualRhs, #dualVec.
+   Additional variables depending on representation (dimension coDim()):
+   #addvec.
+
+   @subsection Bounds 
+   Dual and primal variables are bounded (including \f$\pm\infty\f$ as
+   bounds).  If all primal variables are within their bounds, the
+   Simplex basis is said to be primal feasible. Analogously, if all
+   dual variables are within their bounds, its is called dual
+   feasible.  If a basis is both, primal and dual feasible, the
+   optimal solution is been found.
+
+   In the dual Simplex, the basis is maintained to be dual, while
+   primal feasibility is improved via basis updates. However, for
+   numerical reasons dual feasibility must from time to time be
+   relaxed.  Equivalently, primal feasibility will be relaxed to
+   retain numerical stability in the primal Simplex algorithm.
+
+   Relaxation of (dual or primal) feasibility is acchieved by
+   enlarging the bounds to primal or dual variables. However, for each
+   type of Simplex only the corresponding bounds need to be
+   enlarged. Hence, we define only one vector of upper and lower bound
+   for each row and column and initialize it with primal or dual
+   bound, depending on the Simplex type.  (see #theURbound,
+   #theLRbound, #theUCbound, #theLCbound.) 
+*/
+
+
 
 

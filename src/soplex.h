@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.6 2001/12/10 15:46:48 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.7 2001/12/10 19:05:54 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -67,108 +67,7 @@ class SPxSimplifier;
    \f]
  
    Also, #SPxLP provide all manipulation methods for the LP. They allow
-   #SoPlex to be used within cutting plane algorithms.
-
-   @section Programming with #SoPlex# 
-   The following sections are dedicated to users, that want to
-   provide own pricers, ratio test, start basis generation codes or
-   LP simplifiers to use with #SoPlex or that want to derive own
-   implementations (e.g. parallel versions) using #SoPlex.
-
-   @subsection Virtualizing the Representation
-   The primal Simplex on the columnwise representation is
-   structurely equivalent to the dual Simplex on the rowwise
-   representation and vice versa (see above). Hence, it is
-   desirable to treat both cases in a very similar manner. This
-   is supported by the programmers interface of #Soplex, that
-   provides access methods for all internal data in two ways: one
-   is relative to the "physical" representation of the LP in
-   rows and columns, while the other is relative to the chosen
-   basis #Representation. If e.g. a #SPxPricer is
-   written using the second type of methods only (which will
-   generally be the case), the same code can be used for running
-   #SoPlex%'s the Simplex algorithm for both
-   #Representation%s. We will now give two examples for this
-   virtualization from the chosen representation.
-
-   Methods #vector will return a column or a row vector,
-   corresponding to the chosen basis representation. 
-   The other "vectors" will be referred to as \em covectors:
-     
-   <TABLE>
-   <TR><TD>&nbsp;  </TD><TD>ROW      </TD><TD>COLUMN   </TD></TR>
-   <TR><TD>vector  </TD><TD>rowVector</TD><TD>colVector</TD></TR>
-   <TR><TD>coVector</TD><TD>colVector</TD><TD>rowVector</TD></TR>
-   </TABLE>
-    
-   Weather the #SPxBasis::Desc::Status of a variable indicates that the
-   corresponding #vector is in the basis matrix or not also depends on the
-   chosen representation. Hence, methods #isBasic() are provided to get the
-   correct answer for both representations.  
-   
-   @subsection Simplex Vectors and Bounds
-   The Simplex algorithms keeps three vectors, that are defined to a basis.
-   Two of them are required for the pricing, while the other is needed for
-   detecting feasibility of the basis. For all three vectors, bounds are
-   defined. The Simplex alogrithm changes the basis until all three vectors
-   satisfy their bounds. In this case the optimal solution is found.
-    
-   Whith each update of the basis, also the three vectors need to be
-   updated. This is best supported by the use of #UpdateVector%s.
-    
-   @par Variables
-   The Simplex algorithm works with two types of variables, primals and
-   duals.  The primal variables are the ones associated to each column of
-   an LP, whereas the dual variables are the ones associated to each row.
-   However, to each row a slack variable must be added to the set of
-   primals (to represent inequalities), and a reduced cost variable must be
-   added for each column (to represent upper or lower bounds). Note, that
-   mathematically, on dual variable for each bound (upper and lower) should
-   be added. However, this variable would always yield the same value and
-   can, hence, be implemented as one.
-    
-   To summarize, we have a primal variable for each LP column and row
-   (i.e. its slack) as well as a dual variable for each LP row and column
-   (i.e. its bounds). However, not all these values need to be stored and
-   computed, since the structure of the Simplex algorithms allow to
-   implicitely keep them.
-      
-   If the #SPxBasis's #Status of a row or column is one of #P_ON_LOWER,
-   #P_ON_UPPER, #P_FIXED or #P_FREE the value of the corresponding
-   primal variable is the lower, upper or both bound(s) or 0, respectively.
-   The corresponding dual variable needs to be computed. Equivalently, for
-   a #Status of #D_FREE, #D_ON_UPPER, #D_ON_LOWER, #D_ON_BOTH or
-   #D_UNDEFINED the corresponding dual variable is 0, whereas the primal 
-   one needs to be computed.
-
-   We declare the following vectors for holding the values to be computed.
-   Primal variables (dimension #nCols()): #primRhs, #primVec.
-   Dual variables (dimension #nRows()): #dualRhs, #dualVec.
-   Additional variables depending on representation (dimension coDim()):
-   #addvec.
-
-   @par Bounds 
-   Dual and primal variables are bounded (including \f$\pm\infty\f$ as
-   bounds).  If all primal variables are within their bounds, the
-   Simplex basis is said to be primal feasible. Analogously, if all
-   dual variables are within their bounds, its is called dual
-   feasible.  If a basis is both, primal and dual feasible, the
-   optimal solution is been found.
-
-   In the dual Simplex, the basis is maintained to be dual, while
-   primal feasibility is improved via basis updates. However, for
-   numerical reasons dual feasibility must from time to time be
-   relaxed.  Equivalently, primal feasibility will be relaxed to
-   retain numerical stability in the primal Simplex algorithm.
-
-   Relaxation of (dual or primal) feasibility is acchieved by
-   enlarging the bounds to primal or dual variables. However, for each
-   type of Simplex only the corresponding bounds need to be
-   enlarged. Hence, we define only one vector of upper and lower bound
-   for each row and column and initialize it with primal or dual
-   bound, depending on the Simplex type.  (see #theURbound,
-   #theLRbound, #theUCbound, #theLCbound.) 
-
+   #SoPlex to be used within cutting plane algorithms. (@see Programming)
 */
 class SoPlex : public CacheLPSolver, public SPxLP, protected SPxBasis
 {
@@ -960,7 +859,7 @@ public:
    {
       return theUBbound;
    }
-   /// upper bound for #fVec#.
+   /// upper bound for #fVec.
    /** This method returns the upper bound for the feasibility vector.
     *  It may only be called for the #ENTER%ing Simplex.
     *  
@@ -992,12 +891,12 @@ public:
       return theLBbound;
    }
 
-   /// Violations of #fVec#.
+   /// Violations of #fVec.
    /** For the leaving Simplex algorithm, pricing involves selecting a
-    *  variable from #fVec# that violates its bounds that is to leave
-    *  the basis. When a \Ref{SPxPricer} is called to select such a
-    *  leaving variable, #fTest# contains the vector of violations:
-    *  For #fTest()[i] < 0#, the #i#-th basic variable violates one of
+    *  variable from #fVec that violates its bounds that is to leave
+    *  the basis. When a #SPxPricer is called to select such a
+    *  leaving variable, #fTest() contains the vector of violations:
+    *  For #fTest()[i] < 0, the \c i -th basic variable violates one of
     *  its bounds by the given value. Otherwise no bound is violated.
     */
    const Vector& fTest() const
@@ -1007,10 +906,10 @@ public:
    }
 
    /// copricing vector.
-   /** The copricing vector #coPvec# along with the pricing vector
-    *  #pVec# are used for pricing in the #ENTER#ing Simplex algorithm,
+   /** The copricing vector #coPvec along with the pricing vector
+    *  #pVec are used for pricing in the #ENTER%ing Simplex algorithm,
     *  i.e. one variable is selected, that violates its bounds. In
-    *  contrast to this, the #LEAVE#ing Simplex algorithm keeps both
+    *  contrast to this, the #LEAVE%ing Simplex algorithm keeps both
     *  vectors within their bounds.
     */
    UpdateVector& coPvec() const
@@ -1018,10 +917,10 @@ public:
       return *theCoPvec;
    }
 
-   /// Right-hand side vector for #coPvec#.
-   /** Vector #coPvec# is computed by solving a linear system with the
-    *  basis matrix and #coPrhs# as the right-hand side vector. For
-    *  column basis representation, #coPrhs# is build up of the
+   /// Right-hand side vector for #coPvec.
+   /** Vector #coPvec is computed by solving a linear system with the
+    *  basis matrix and #coPrhs as the right-hand side vector. For
+    *  column basis representation, #coPrhs is build up of the
     *  objective vector elements of all basic variables. For a row
     *  basis, it consists of the thight bounds of all basic
     *  constraints.
@@ -1037,12 +936,12 @@ public:
       assert(theType == LEAVE);
       return *theCoUbound;
    }
-   /// upper bound for #coPvec#.
-   /** This method returns the upper bound for #coPvec#. It may only be
+   /// upper bound for #coPvec.
+   /** This method returns the upper bound for #coPvec. It may only be
     *  called for the leaving Simplex algorithm.
     *
-    *  For the leaving Simplex algorithms #coPvec# is maintained to
-    *  fullfill its bounds. As #coPvec# itself, also its bound depend
+    *  For the leaving Simplex algorithms #coPvec is maintained to
+    *  fullfill its bounds. As #coPvec itself, also its bound depend
     *  on the chosen representation. Further, they may need to be
     *  shifted (see below).
     */
@@ -1058,12 +957,12 @@ public:
       assert(theType == LEAVE);
       return *theCoLbound;
    }
-   /// lower bound for #coPvec#.
-   /** This method returns the lower bound for #coPvec#. It may only be
+   /// lower bound for #coPvec.
+   /** This method returns the lower bound for #coPvec. It may only be
     *  called for the leaving Simplex algorithm.
     *
-    *  For the leaving Simplex algorithms #coPvec# is maintained to
-    *  fullfill its bounds. As #coPvec# itself, also its bound depend
+    *  For the leaving Simplex algorithms #coPvec is maintained to
+    *  fullfill its bounds. As #coPvec itself, also its bound depend
     *  on the chosen representation. Further, they may need to be
     *  shifted (see below).
     */
@@ -1073,12 +972,12 @@ public:
       return *theCoLbound;
    }
 
-   /// violations of #coPvec#.
-   /** In entering Simplex pricing selects checks vectors #coPvec()#
-    *  and #pVec()# for violation of its bounds. #coTest()# contains
-    *  the violations for #coPvec()# which are indicated by a negative
-    *  value. I.e.~if #coTest(i) < 0#, the #i#-th element of #coPvec()#
-    *  is violated by #-coTest(i)#.
+   /// violations of #coPvec.
+   /** In entering Simplex pricing selects checks vectors #coPvec()
+    *  and #pVec()# for violation of its bounds. #coTest() contains
+    *  the violations for #coPvec() which are indicated by a negative
+    *  value. I.e. if #coTest(i) < 0, the \p i -th element of #coPvec()
+    *  is violated by #-coTest(i).
     */
    const Vector& coTest() const
    {
@@ -1086,12 +985,12 @@ public:
       return theCoTest;
    }
    /// pricing vector.
-   /** The pricing vector #pVec# is the product of #coPvec# with the
-    *  constraint matrix. As #coPvec#, also #pVec# is maintained within
+   /** The pricing vector #pVec is the product of #coPvec with the
+    *  constraint matrix. As #coPvec, also #pVec is maintained within
     *  its bound for the leaving Simplex algorithm, while the bounds
-    *  are tested for the entering Simplex. #pVec# is of dimension
-    *  #dim()#. Vector #pVec()# is only up to date for #LEAVE#ing
-    *  Simplex or #FULL# pricing in #ENTER#ing Simplex.
+    *  are tested for the entering Simplex. #pVec is of dimension
+    *  #dim(). Vector #pVec() is only up to date for #LEAVE%ing
+    *  Simplex or #FULL pricing in #ENTER%ing Simplex.
     */
    UpdateVector& pVec() const
    {
@@ -1103,14 +1002,14 @@ public:
       assert(theType == LEAVE);
       return *theUbound;
    }
-   /** upper bound for #pVec#.
-       This method returns the upper bound for #pVec#. It may only be
-       called for the leaving Simplex algorithm.
-
-       For the leaving Simplex algorithms #pVec# is maintained to
-       fullfill its bounds. As #pVec# itself, also its bound depend
-       on the chosen representation. Further, they may need to be
-       shifted (see below).
+   /// upper bound for #pVec.
+   /** This method returns the upper bound for #pVec. It may only be
+    *  called for the leaving Simplex algorithm.
+    *
+    *  For the leaving Simplex algorithms #pVec is maintained to
+    *  fullfill its bounds. As #pVec itself, also its bound depend
+    *  on the chosen representation. Further, they may need to be
+    *  shifted (see below).
     */
    Vector& upBound()
    {
@@ -1124,14 +1023,14 @@ public:
       assert(theType == LEAVE);
       return *theLbound;
    }
-   /** lower bound for #pVec#.
-       This method returns the lower bound for #pVec#. It may only be
-       called for the leaving Simplex algorithm.
-
-       For the leaving Simplex algorithms #pVec# is maintained to
-       fullfill its bounds. As #pVec# itself, also its bound depend
-       on the chosen representation. Further, they may need to be
-       shifted (see below).
+   /// lower bound for #pVec.
+   /** This method returns the lower bound for #pVec. It may only be
+    *  called for the leaving Simplex algorithm.
+    *
+    *  For the leaving Simplex algorithms #pVec is maintained to
+    *  fullfill its bounds. As #pVec itself, also its bound depend
+    *  on the chosen representation. Further, they may need to be
+    *  shifted (see below).
     */
    Vector& lpBound()
    {
@@ -1139,12 +1038,12 @@ public:
       return *theLbound;
    }
 
-   /** Violations of #pVec#.
-       In entering Simplex pricing selects checks vectors #coPvec()#
-       and #pVec()# for violation of its bounds. Vector #test()#
-       contains the violations for #pVec()#, i.e.~if #test(i) < 0#,
-       the #i#-th element of #pVec()# is violated by #-test(i)#.
-       Vector #test()# is only up to date for #FULL# pricing.
+   /// Violations of #pVec.
+   /** In entering Simplex pricing selects checks vectors #coPvec()
+    *  and #pVec() for violation of its bounds. Vector #test()
+    *  contains the violations for #pVec(), i.e.~if #test(i) < 0,
+    *  the i-th element of #pVec() is violated by #test(i).
+    *  Vector #test() is only up to date for #FULL pricing.
     */
    const Vector& test() const
    {
@@ -1152,13 +1051,13 @@ public:
       return theTest;
    }
 
-   /// compute and return #pVec(i)#.
+   /// compute and return #pVec(i).
    double computePvec(int i);
-   /// compute entire #pVec()#.
+   /// compute entire #pVec().
    void computePvec();
-   /// compute and return #test(i)# in #ENTER#ing Simplex.
+   /// compute and return #test(i) in #ENTER%ing Simplex.
    double computeTest(int i);
-   /// compute test vector in #ENTER#ing Simplex.
+   /// compute test vector in #ENTER%ing Simplex.
    void computeTest();
 
    /**@name Shifting
