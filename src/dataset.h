@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.20 2002/01/15 16:52:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.21 2002/01/23 12:58:50 bzfpfend Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -358,22 +358,26 @@ public:
    ///
    DATA& operator[](int n)
    {
+      assert( n < thenum );
       return theitem[thekey[n].idx].data;
    }
    /// returns element number \p n.
    const DATA& operator[](int n) const
    {
+      assert( n < thenum );
       return theitem[thekey[n].idx].data;
    }
 
    ///
    DATA& operator[](const DataKey& k)
    {
+      assert( k.idx < thesize );
       return theitem[k.idx].data;
    }
    /// returns element with #DataKey \p k.
    const DATA& operator[](const DataKey& k) const
    {
+      assert( k.idx < thesize );
       return theitem[k.idx].data;
    }
    //@}

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.cpp,v 1.12 2002/01/19 18:59:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.cpp,v 1.13 2002/01/23 12:58:50 bzfpfend Exp $"
 
 #include <stdio.h>
 
@@ -64,6 +64,7 @@ void SPxLP::getObj(Vector& p_obj) const
 void SPxLP::doAddRow(const LPRow& row)
 {
    int idx = nRows();
+   int oldColNumber = nCols();
    const SVector& vec = row.rowVector();
 
    LPRowSet::add(row);
@@ -77,8 +78,8 @@ void SPxLP::doAddRow(const LPRow& row)
       {
          LPCol empty;
          for (int k = nCols(); k <= i; ++k)
-            doAddCol(empty);
-         //              LPColSet::add(empty);
+            LPColSet::add(empty);
+         // doAddCol(empty);
       }
 
       assert(i < nCols());
@@ -86,11 +87,13 @@ void SPxLP::doAddRow(const LPRow& row)
    }
 
    addedRows(1);
+   addedCols( nCols() - oldColNumber );
 }
 
 void SPxLP::doAddCol(const LPCol& col)
 {
    int idx = nCols();
+   int oldRowNumber = nRows();
    const SVector& vec = col.colVector();
 
    LPColSet::add(col);
@@ -105,8 +108,8 @@ void SPxLP::doAddCol(const LPCol& col)
       {
          LPRow empty;
          for (int k = nRows(); k <= i; ++k)
-            doAddRow(empty);
-         //              LPRowSet::add(empty);
+            LPRowSet::add(empty);
+         // doAddRow(empty);
       }
 
       assert(i < nRows());
@@ -114,6 +117,7 @@ void SPxLP::doAddCol(const LPCol& col)
    }
 
    addedCols(1);
+   addedRows( nRows() - oldRowNumber );
 }
 
 void SPxLP::added2Set(SVSet& p_set, const SVSet& p_add, int n)
@@ -163,8 +167,8 @@ void SPxLP::doAddRows(const LPRowSet& p_set)
    int i, j, k, ii, idx;
    SVector* col;
    DataArray < int > newCols(nCols());
-   DataArray < Real > newColVals(nCols());
    int oldRowNumber = nRows();
+   int oldColNumber = nCols();
 
    if (&p_set != this)
       LPRowSet::add(p_set);
@@ -173,10 +177,7 @@ void SPxLP::doAddRows(const LPRowSet& p_set)
 
    // count additional nonzeros per column
    for (i = nCols() - 1; i >= 0; --i)
-   {
       newCols[i] = 0;
-      newColVals[i] = 0;
-   }
    for (i = p_set.num() - 1; i >= 0; --i)
    {
       const SVector& vec = p_set.rowVector(i);
@@ -187,27 +188,27 @@ void SPxLP::doAddRows(const LPRowSet& p_set)
          {
             LPCol empty;
             newCols.reSize(ii + 1);
-            newColVals.reSize(ii + 1);
             for (k = nCols(); k <= ii; ++k)
             {
                newCols[k] = 0;
-               newColVals[k] = 0;
-               doAddCol(empty);
-               //                  LPColSet::add(empty);
+               // doAddCol(empty);
+               LPColSet::add(empty);
             }
-
          }
          assert(ii < nCols());
          newCols[ii]++;
       }
    }
 
-   // extend columns as required, with dummy elements
-   for (i = newCols.size() - 1; i >= 0; --i)
+   // extend columns as required
+   for( i = 0; i < nCols(); ++i )
    {
-      if (newCols[i] >= 0)
-         LPColSet::add2(i, newCols[i],
-                        newCols.get_ptr(), newColVals.get_ptr());
+      if (newCols[i] > 0)
+      {
+         int len = newCols[i] + colVector(i).size();
+         LPColSet::xtend(i, len);
+         colVector_w(i).set_size( len );
+      }
    }
 
    // insert new elements to column file
@@ -219,33 +220,37 @@ void SPxLP::doAddRows(const LPRowSet& p_set)
          k = vec.index(j);
          col = &colVector_w(k);
          idx = col->size() - newCols[k];
-         assert(newCols[k] >= 0);
+         assert(newCols[k] > 0);
          newCols[k]--;
          col->index(idx) = i;
          col->value(idx) = vec.value(j);
       }
    }
+#ifndef NDEBUG
+   for( i = 0; i < nCols(); ++i )
+      assert( newCols[i] == 0 );
+#endif
 
-   addedRows(p_set.num());
+   assert( p_set.num() == nRows() - oldRowNumber );
+   addedRows( nRows() - oldRowNumber );
+   addedCols( nCols() - oldColNumber );
 }
 
 void SPxLP::doAddCols(const LPColSet& p_set)
 {
    int i, j;
    int oldColNumber = nCols();
+   int oldRowNumber = nRows();
    DataArray < int > newRows(nRows());
-   DataArray < Real > newRowVals(nRows());
 
    if (&p_set != this)
       LPColSet::add(p_set);
    assert(LPColSet::isConsistent());
+   assert(LPRowSet::isConsistent());
 
    // count additional nonzeros per row
    for (i = nRows() - 1; i >= 0; --i)
-   {
       newRows[i] = 0;
-      newRowVals[i] = 0;
-   }
    for (i = p_set.num() - 1; i >= 0; --i)
    {
       const SVector& vec = p_set.colVector(i);
@@ -256,13 +261,11 @@ void SPxLP::doAddCols(const LPColSet& p_set)
          {
             LPRow empty;
             newRows.reSize(l + 1);
-            newRowVals.reSize(l + 1);
             for (int k = nRows(); k <= l; ++k)
             {
                newRows[k] = 0;
-               newRowVals[k] = 0;
-               doAddRow(empty);
-               //                  LPRowSet::add(empty);
+               // doAddRow(empty);
+               LPRowSet::add(empty);
             }
 
          }
@@ -271,10 +274,10 @@ void SPxLP::doAddCols(const LPColSet& p_set)
       }
    }
 
-   // extend rows as required, with dummy elements
-   for (i = newRows.size() - 1; i >= 0; --i)
+   // extend rows as required
+   for( i = 0; i < nRows(); ++i )
    {
-      if (newRows[i] >= 0)
+      if (newRows[i] > 0)
       {
          int len = newRows[i] + rowVector(i).size();
          LPRowSet::xtend(i, len);
@@ -290,17 +293,23 @@ void SPxLP::doAddCols(const LPColSet& p_set)
       for (j = vec.size() - 1; j >= 0; --j)
       {
          int k = vec.index(j);
-         SVector& col = rowVector_w(k);
-         int idx = col.size() - newRows[k];
-         assert(newRows[k] >= 0);
+         SVector& row = rowVector_w(k);
+         int idx = row.size() - newRows[k];
+         assert(newRows[k] > 0);
          newRows[k]--;
-         col.index(idx) = i;
-         col.value(idx) = vec.value(j);
+         row.index(idx) = i;
+         row.value(idx) = vec.value(j);
       }
    }
+#ifndef NDEBUG
+   for( i = 0; i < nRows(); ++i )
+      assert( newRows[i] == 0 );
+#endif
    assert(SPxLP::isConsistent());
 
-   addedCols(p_set.num());
+   assert( p_set.num() == nCols() - oldColNumber );
+   addedCols( nCols() - oldColNumber );
+   addedRows( nRows() - oldRowNumber );
 }
 
 void SPxLP::addRows(SPxRowId id[], const LPRowSet& p_set)

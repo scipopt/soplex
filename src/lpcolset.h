@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcolset.h,v 1.11 2002/01/19 18:59:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpcolset.h,v 1.12 2002/01/23 12:58:50 bzfpfend Exp $"
 
 /**@file  lpcolset.h
  * @brief Set of LP columns.
@@ -247,6 +247,18 @@ public:
    void add(const LPColSet& set);
    /// adds all #LPCol%s of \p set to #LPColSet.
    void add(DataKey key[], const LPColSet& set);
+
+   /// extends column \p n to fit \p newmax nonzeros.
+   void xtend(int n, int newmax)
+   {
+      SVSet::xtend(colVector_w(n), newmax);
+   }
+
+   /// extend column with #DataKey \p key to fit \p newmax nonzeros.
+   void xtend(const DataKey& pkey, int pnewmax)
+   {
+      SVSet::xtend(colVector_w(pkey), pnewmax);
+   }
 
    ///
    void add2(const DataKey& k, int n, int idx[], Real val[])

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.cpp,v 1.11 2002/01/19 18:59:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svector.cpp,v 1.12 2002/01/23 12:58:50 bzfpfend Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -80,24 +80,27 @@ int SVector::dim() const
 
 void SVector::sort()
 {
-   Element dummy;
-   Element* w;
-   Element* l;
-   Element* s = &(m_elem[0]);
-   Element* e = s + size();
-   for (l = s, w = s + 1; w < e; l = w, ++w)
+   if( m_elem != 0 )
    {
-      if (l->idx > w->idx)
+      Element dummy;
+      Element* w;
+      Element* l;
+      Element* s = &(m_elem[0]);
+      Element* e = s + size();
+      for (l = s, w = s + 1; w < e; l = w, ++w)
       {
-         dummy = *w;
-         do
+         if (l->idx > w->idx)
          {
-            l[1] = *l;
-            if (l-- == s)
-               break;
+            dummy = *w;
+            do
+            {
+               l[1] = *l;
+               if (l-- == s)
+                  break;
+            }
+            while (l->idx > dummy.idx);
+            l[1] = dummy;
          }
-         while (l->idx > dummy.idx);
-         l[1] = dummy;
       }
    }
 }
@@ -130,7 +133,7 @@ Real SVector::maxAbs() const
 
 Real SVector::minAbs() const
 {
-   Real         x = 1e100;
+   Real           x = 1e100;
    int            n = size();
    const Element* e = m_elem;
 
@@ -269,7 +272,7 @@ bool SVector::isConsistent() const
          }
       }
    }
-   return 1;
+   return true;
 }
 } // namespace soplex
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: didxset.cpp,v 1.7 2002/01/19 13:06:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: didxset.cpp,v 1.8 2002/01/23 12:58:50 bzfpfend Exp $"
 
 #include "didxset.h"
 #include "spxalloc.h"
@@ -38,6 +38,7 @@ DIdxSet::DIdxSet(const IdxSet& old)
    : IdxSet(0, 0)
 {
    len = old.size();
+   len = (len < 1) ? 1 : len;
    spx_alloc(idx, len);
 
    IdxSet::operator= ( old );
@@ -47,6 +48,7 @@ DIdxSet::DIdxSet(const DIdxSet& old)
    : IdxSet(0, 0)
 {
    len = old.size();
+   len = (len < 1) ? 1 : len;
    spx_alloc(idx, len);
 
    IdxSet::operator= ( old );

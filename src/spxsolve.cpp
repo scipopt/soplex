@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.26 2002/01/22 14:17:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.27 2002/01/23 12:58:50 bzfpfend Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -225,6 +225,13 @@ SoPlex::Status SoPlex::solve()
 
    if (m_status == RUNNING)
       m_status = ERROR;
+
+#ifndef NDEBUG
+   std::cout << "----> finished solving (status=" << int(status());
+   if( status() == OPTIMAL )
+      std::cout << ", objValue=" << value();
+   std::cout << ")" << std::endl;
+#endif // NDEBUG
 
    return status();
 }

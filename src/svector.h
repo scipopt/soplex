@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.h,v 1.16 2002/01/19 18:59:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svector.h,v 1.17 2002/01/23 12:58:50 bzfpfend Exp $"
 
 /**@file  svector.h
  * @brief Sparse vectors.
@@ -124,6 +124,7 @@ public:
    /// append one nonzero \p (i,v).
    void add(int i, Real v)
    {
+      assert( m_elem != 0 );
       int n = size();
       m_elem[n].idx = i;
       m_elem[n].val = v;
@@ -168,13 +169,19 @@ public:
    /// number of used indeces.
    int size() const
    {
-      return m_elem[ -1].idx;
+      if( m_elem != 0 )
+         return m_elem[ -1].idx;
+      else
+         return 0;
    }
 
    /// maximal number indeces.
    int max() const
    {
-      return int(m_elem[ -1].val);
+      if( m_elem != 0 )
+         return int(m_elem[ -1].val);
+      else
+         return 0;
    }
 
    /// maximal index.
@@ -187,13 +194,16 @@ public:
     */
    int number(int i) const
    {
-      int n = size();
-      Element* e = &(m_elem[n]);
-      while (n--)
+      if( m_elem != 0 )
       {
-         --e;
-         if (e->idx == i)
-            return n;
+         int n = size();
+         Element* e = &(m_elem[n]);
+         while (n--)
+         {
+            --e;
+            if (e->idx == i)
+               return n;
+         }
       }
       return -1;
    }

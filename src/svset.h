@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.h,v 1.14 2002/01/19 18:59:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.h,v 1.15 2002/01/23 12:58:50 bzfpfend Exp $"
 
 /**@file  svset.h
  * @brief Set of sparse vectors.
@@ -118,7 +118,7 @@ private:
          return *this; 
       }
       /// default constructor.
-      DLPSV()
+      DLPSV() : SVector()
       {}      
       /// copy constructor.
       DLPSV(const DLPSV& copy) : SVector(copy)
