@@ -13,9 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.3 2001/11/20 09:08:44 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.4 2001/11/20 15:47:27 bzfkocht Exp $"
 
-/**@file  spflpfread.cpp
+/**@file  spxlpfread.cpp
  * @brief Read LP format files.
  */
 #include <assert.h>

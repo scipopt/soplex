@@ -1,4 +1,4 @@
-# $Id: check.awk,v 1.6 2001/11/15 08:26:58 bzfkocht Exp $
+# $Id: check.awk,v 1.7 2001/11/20 15:47:00 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: check.awk                                                     *
@@ -36,7 +36,7 @@ BEGIN {
     sol["stormG2-125"]  = 0; # read error
     sol["stormG2-1000"] = 0; # nicht gerechnet
     sol["watson_1"]     = -1.7871977857e+03;
-    sol["world.mps"]    = 6.9133045823e+07;
+    sol["world"]        = 6.9133045823e+07;
 
     sol["25fv45"] =     5.5018458883E+03;
     sol["80bau3b"] =    9.8723216072E+05;
@@ -136,7 +136,7 @@ BEGIN {
     sol["wood1p"] =     1.4429024116E+00;
     sol["woodw"] =      1.3044763331E+00;
 
-    print "$Id: check.awk,v 1.6 2001/11/15 08:26:58 bzfkocht Exp $";
+    print "$Id: check.awk,v 1.7 2001/11/20 15:47:00 bzfkocht Exp $";
     print "";
 }
 /=type=/      { type = $2; }
