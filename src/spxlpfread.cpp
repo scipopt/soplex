@@ -13,12 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.44 2004/11/10 11:17:02 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.45 2004/11/10 11:18:21 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
  */
-#define DEBUGGING 1
+// #define DEBUGGING 1
 
 #include <assert.h>
 #include <stdio.h>
@@ -685,27 +685,21 @@ bool SPxLP::readLPF(
             {
                val = isInfinity(pos) ? readInfinity(pos) : readValue(pos);
 
-               std::cout << "A " << val << " X" << pos << "X\n";
-
-
                if (!isSense(pos))
                   goto syntax_error;
 
                sense = readSense(pos);
                other = true;
             }
-               std::cout << "B\n";
             if (!isColName(pos))
                goto syntax_error;
 
-               std::cout << "C\n";
             if ((colidx = readColName(pos, cnames, cset, 0)) < 0)
             {
                std::cerr << "in Bounds section line " << lineno 
                          << " ignored" << std::endl;
                continue;
             }
-               std::cout << "D\n";
             if (sense)
             {
                if (sense == '<') 
@@ -719,7 +713,6 @@ bool SPxLP::readLPF(
                   cset.upper(colidx) = val;
                }
             }
-               std::cout << "E\n";
             if (isFree(pos))
             {
                cset.lower(colidx) = -infinity;
