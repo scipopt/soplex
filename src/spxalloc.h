@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxalloc.h,v 1.1 2001/11/13 16:17:52 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxalloc.h,v 1.2 2001/11/13 21:55:19 bzfkocht Exp $"
 
 #ifndef _SPXALLOC_H_
 #define _SPXALLOC_H_
@@ -26,7 +26,7 @@ namespace soplex
 {
 ///
 template <class T>
-void spx_alloc(T& p, int n)
+inline void spx_alloc(T& p, int n)
 {
    assert(n >= 0);
 
@@ -44,7 +44,7 @@ void spx_alloc(T& p, int n)
 
 /// 
 template <class T>
-void spx_realloc(T& p, int n)
+inline void spx_realloc(T& p, int n)
 {
    assert(p != 0);
    assert(n >= 0);
@@ -60,7 +60,7 @@ void spx_realloc(T& p, int n)
 
 ///
 template <class T>
-void spx_free(T& p)
+inline void spx_free(T& p)
 {
    assert(p != 0);
 

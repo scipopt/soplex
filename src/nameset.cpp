@@ -13,10 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.cpp,v 1.7 2001/11/12 17:10:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.cpp,v 1.8 2001/11/13 21:55:18 bzfkocht Exp $"
 
 #include <string.h>
 #include "nameset.h"
+#include "spxalloc.h"
 
 namespace soplex
 {
@@ -155,12 +156,8 @@ void NameSet::memRemax(int newmax)
    long delta;
 
    memmax = (newmax < memSize()) ? memSize() : newmax;
-   mem = reinterpret_cast<char*>(realloc(mem, memmax * sizeof(char)));
-   if (mem == 0)
-   {
-      std::cerr << "ERROR: NameSet could not reallocate memory\n";
-      abort();
-   }
+   spx_realloc(mem, memmax);
+
    delta = mem - old;
 
    hashtab.clear ();
@@ -243,12 +240,7 @@ NameSet::NameSet(const NameSet& org)
 {
    memused = 0;
    memmax = org.memSize();
-   mem = reinterpret_cast<char*>(malloc(memmax * sizeof(char)));
-   if (mem == 0)
-   {
-      std::cerr << "ERROR: NameSet could not allocate memory\n";
-      abort();
-   }
+   spx_alloc(mem, memmax);
 
    list.clear();
    hashtab.clear();
@@ -270,17 +262,12 @@ NameSet::NameSet(int p_max, int mmax, double fac, double memFac)
 {
    memused = 0;
    memmax = (mmax < 1) ? (8 * set.max() + 1) : mmax;
-   mem = reinterpret_cast<char*>(malloc(memmax * sizeof(char)));
-   if (mem == 0)
-   {
-      std::cerr << "ERROR: NameSet could not allocate memory\n";
-      abort();
-   }
+   spx_alloc(mem, memmax);
 }
 
 NameSet::~NameSet()
 {
-   free(mem);
+   spx_free(mem);
 }
 
 int NameSet::isConsistent() const

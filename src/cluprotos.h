@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: cluprotos.h,v 1.3 2001/11/07 17:31:14 bzfbleya Exp $"
+#pragma ident "@(#) $Id: cluprotos.h,v 1.4 2001/11/13 21:55:15 bzfkocht Exp $"
 
 
 #ifndef _CLUPROTOS_H_
@@ -116,10 +116,6 @@ int makeLvec(CLUFactor*, int, int);
 void packRows(CLUFactor* fac);
 
 void dumpCLUFactor(const CLUFactor* fac);
-
-void* Malloc (int);
-void* Realloc (void*, int);
-void Free (void*);
 
 } // namespace soplex
 #endif // _CLUPROTOS_H_

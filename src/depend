@@ -45,9 +45,11 @@ O.linux.x86.gnu.dbg/enter.o: src/enter.cpp src/soplex.h src/cachelpsolver.h src/
  src/spxbasis.h src/slinsolver.h src/array.h src/random.h \
  src/unitvector.h src/updatevector.h src/spxratiotester.h
 O.linux.x86.gnu.dbg/factor.o: src/factor.cpp src/clutypes.h src/clumembers.h \
- src/cluprotos.h src/svector.h src/vector.h src/vector_c.h src/cring.h
+ src/cluprotos.h src/svector.h src/vector.h src/vector_c.h src/cring.h \
+ src/spxalloc.h
 O.linux.x86.gnu.dbg/forest.o: src/forest.cpp src/clutypes.h src/clumembers.h \
- src/cluprotos.h src/svector.h src/vector.h src/vector_c.h src/cring.h
+ src/cluprotos.h src/svector.h src/vector.h src/vector_c.h src/cring.h \
+ src/spxalloc.h
 O.linux.x86.gnu.dbg/idxset.o: src/idxset.cpp src/idxset.h
 O.linux.x86.gnu.dbg/leave.o: src/leave.cpp src/soplex.h src/cachelpsolver.h src/lpsolver.h \
  src/svector.h src/vector.h src/vector_c.h src/lpcolset.h src/lpcol.h \
@@ -74,7 +76,7 @@ O.linux.x86.gnu.dbg/slufactor.o: src/slufactor.cpp src/slufactor.h src/dvector.h
  src/vector.h src/vector_c.h src/svector.h src/slinsolver.h \
  src/ssvector.h src/subsvector.h src/didxset.h src/idxset.h \
  src/dsvector.h src/clutypes.h src/clumembers.h src/cluprotos.h \
- src/cring.h
+ src/cring.h src/spxalloc.h
 O.linux.x86.gnu.dbg/solve.o: src/solve.cpp src/clutypes.h src/clumembers.h src/cluprotos.h \
  src/svector.h src/vector.h src/vector_c.h src/cring.h
 O.linux.x86.gnu.dbg/soplex.o: src/soplex.cpp src/soplex.h src/cachelpsolver.h \

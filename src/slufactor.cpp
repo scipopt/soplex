@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.5 2001/11/13 21:01:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.6 2001/11/13 21:55:18 bzfkocht Exp $"
 
 
 
@@ -25,9 +25,9 @@
 
 #include "slufactor.h"
 
-
 #include "cluprotos.h"
 #include "cring.h"
+#include "spxalloc.h"
 
 namespace soplex
 {
@@ -385,22 +385,22 @@ void SLUFactor::clear()
 
    if (l.val)
    {
-      Free(u.row.val);
-      Free(u.row.idx);
-      Free(u.col.idx);
-      Free(l.val);
-      Free(l.idx);
-      Free(l.start);
-      Free(l.row);
+      spx_free(u.row.val);
+      spx_free(u.row.idx);
+      spx_free(u.col.idx);
+      spx_free(l.val);
+      spx_free(l.idx);
+      spx_free(l.start);
+      spx_free(l.row);
    }
 
-   u.row.val = reinterpret_cast<double*>(Malloc(u.row.size * sizeof(double)));
-   u.row.idx = reinterpret_cast<int *>(Malloc(u.row.size * sizeof(int)));
-   u.col.idx = reinterpret_cast<int *>(Malloc(u.col.size * sizeof(int)));
-   l.val = reinterpret_cast<double*>(Malloc(l.size * sizeof(double)));
-   l.idx = reinterpret_cast<int *>(Malloc(l.size * sizeof(int)));
-   l.start = reinterpret_cast<int *>(Malloc(l.startSize * sizeof(int)));
-   l.row = reinterpret_cast<int *>(Malloc(l.startSize * sizeof(int)));
+   spx_alloc(u.row.val, u.row.size);
+   spx_alloc(u.row.idx, u.row.size);
+   spx_alloc(u.col.idx, u.col.size);
+   spx_alloc(l.val, l.size);
+   spx_alloc(l.idx, l.size);
+   spx_alloc(l.start, l.startSize);
+   spx_alloc(l.row, l.startSize);
 }
 
 void SLUFactor::assign(const SLUFactor& old)
@@ -416,11 +416,11 @@ void SLUFactor::assign(const SLUFactor& old)
    maxabs = old.maxabs;
    initMaxabs = old.initMaxabs;
 
-   row.perm = reinterpret_cast<int*>(Malloc(thedim * sizeof(int)));
-   row.orig = reinterpret_cast<int*>(Malloc(thedim * sizeof(int)));
-   col.perm = reinterpret_cast<int*>(Malloc(thedim * sizeof(int)));
-   col.orig = reinterpret_cast<int*>(Malloc(thedim * sizeof(int)));
-   diag = reinterpret_cast<double*>(Malloc(thedim * sizeof(double)));
+   spx_alloc(row.perm, thedim);
+   spx_alloc(row.orig, thedim);
+   spx_alloc(col.perm, thedim);
+   spx_alloc(col.orig, thedim);
+   spx_alloc(diag, thedim);
 
    memcpy(row.perm, old.row.perm, thedim * sizeof(int));
    memcpy(row.orig, old.row.orig, thedim * sizeof(int));
@@ -432,12 +432,12 @@ void SLUFactor::assign(const SLUFactor& old)
 
    u.row.size = old.u.row.size;
    u.row.used = old.u.row.used;
-   u.row.elem = reinterpret_cast<Dring *>(Malloc(thedim * sizeof(Dring)));
-   u.row.val = reinterpret_cast<double*>(Malloc(u.row.size * sizeof(double)));
-   u.row.idx = reinterpret_cast<int *>(Malloc(u.row.size * sizeof(int)));
-   u.row.start = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
-   u.row.len = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
-   u.row.max = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
+   spx_alloc(u.row.elem, thedim);
+   spx_alloc(u.row.val, u.row.size);
+   spx_alloc(u.row.idx, u.row.size);
+   spx_alloc(u.row.start, (thedim + 1));
+   spx_alloc(u.row.len, (thedim + 1));
+   spx_alloc(u.row.max, (thedim + 1));
 
    memcpy(u.row.elem , old.u.row.elem, thedim * sizeof(Dring));
    memcpy(u.row.val , old.u.row.val, u.row.size * sizeof(double));
@@ -462,14 +462,15 @@ void SLUFactor::assign(const SLUFactor& old)
 
    u.col.size = old.u.col.size;
    u.col.used = old.u.col.used;
-   u.col.elem = reinterpret_cast<Dring *>(Malloc(thedim * sizeof(Dring)));
-   u.col.idx = reinterpret_cast<int *>(Malloc(u.col.size * sizeof(int)));
-   u.col.start = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
-   u.col.len = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
-   u.col.max = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
+   spx_alloc(u.col.elem, thedim);
+   spx_alloc(u.col.idx, u.col.size);
+   spx_alloc(u.col.start, (thedim + 1));
+   spx_alloc(u.col.len, (thedim + 1));
+   spx_alloc(u.col.max, (thedim + 1));
+
    if (old.u.col.val)
    {
-      u.col.val = reinterpret_cast<double*>(Malloc(u.col.size * sizeof(double)));
+      spx_alloc(u.col.val, u.col.size);
       memcpy(u.col.val, old.u.col.val, u.col.size * sizeof(double));
    }
    else
@@ -486,7 +487,7 @@ void SLUFactor::assign(const SLUFactor& old)
       u.col.list = old.u.col.list;
       const Dring* oring = &old.u.col.list;
       Dring* ring = &u.col.list;
-      for (; oring->next != &old.u.col.list; oring = oring->next, ring = ring->next)
+      for(; oring->next != &old.u.col.list; oring = oring->next, ring = ring->next)
       {
          ring->next = &(u.col.elem[oring->next->idx]);
          ring->next->prev = ring;
@@ -502,15 +503,16 @@ void SLUFactor::assign(const SLUFactor& old)
    l.firstUpdate = old.l.firstUpdate;
    l.firstUnused = old.l.firstUnused;
    l.updateType = old.l.updateType;
-   l.val = reinterpret_cast<double*>(Malloc(l.size * sizeof(double)));
-   l.idx = reinterpret_cast<int *>(Malloc(l.size * sizeof(int)));
-   l.start = reinterpret_cast<int *>(Malloc(l.startSize * sizeof(int)));
-   l.row = reinterpret_cast<int *>(Malloc(l.startSize * sizeof(int)));
+   spx_alloc(l.val, l.size);
+   spx_alloc(l.idx, l.size);
+   spx_alloc(l.start, l.startSize);
+   spx_alloc(l.row, l.startSize);
+
    if (old.l.rbeg)
    {
-      l.rval = reinterpret_cast<double*>(Malloc(l.firstUpdate * sizeof(double)));
-      l.ridx = reinterpret_cast<int *>(Malloc(l.firstUpdate * sizeof(int)));
-      l.rbeg = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
+      spx_alloc(l.rval, l.firstUpdate);
+      spx_alloc(l.ridx, l.firstUpdate);
+      spx_alloc(l.rbeg, (thedim + 1));
       memcpy(l.rval, old.l.rval, l.firstUpdate * sizeof(double));
       memcpy(l.ridx, old.l.ridx, l.firstUpdate * sizeof(int));
       memcpy(l.rbeg, old.l.rbeg, (thedim + 1) * sizeof(int));
@@ -572,23 +574,23 @@ SLUFactor::SLUFactor()
    nzCnt = 0;
    thedim = 1;
 
-   row.perm = reinterpret_cast<int*>(Malloc(thedim * sizeof(int)));
-   row.orig = reinterpret_cast<int*>(Malloc(thedim * sizeof(int)));
-   col.perm = reinterpret_cast<int*>(Malloc(thedim * sizeof(int)));
-   col.orig = reinterpret_cast<int*>(Malloc(thedim * sizeof(int)));
+   spx_alloc(row.perm, thedim);
+   spx_alloc(row.orig, thedim);
+   spx_alloc(col.perm, thedim);
+   spx_alloc(col.orig, thedim);
 
-   diag = reinterpret_cast<double*>(Malloc(thedim * sizeof(double)));
-   assert(diag && "ERROR: out of memory");
+   spx_alloc(diag, thedim);
+
    work = vec.get_ptr();
 
    u.row.size = 1;
    u.row.used = 0;
-   u.row.elem = reinterpret_cast<Dring *>(Malloc(thedim * sizeof(Dring)));
-   u.row.val = reinterpret_cast<double*>(Malloc(u.row.size * sizeof(double)));
-   u.row.idx = reinterpret_cast<int *>(Malloc(u.row.size * sizeof(int)));
-   u.row.start = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
-   u.row.len = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
-   u.row.max = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
+   spx_alloc(u.row.elem, thedim);
+   spx_alloc(u.row.val, u.row.size);
+   spx_alloc(u.row.idx, u.row.size);
+   spx_alloc(u.row.start, (thedim + 1));
+   spx_alloc(u.row.len, (thedim + 1));
+   spx_alloc(u.row.max, (thedim + 1));
 
    u.row.list.idx = thedim;
    u.row.start[thedim] = 0;
@@ -597,11 +599,11 @@ SLUFactor::SLUFactor()
 
    u.col.size = 1;
    u.col.used = 0;
-   u.col.elem = reinterpret_cast<Dring *>(Malloc(thedim * sizeof(Dring)));
-   u.col.idx = reinterpret_cast<int *>(Malloc(u.col.size * sizeof(int)));
-   u.col.start = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
-   u.col.len = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
-   u.col.max = reinterpret_cast<int *>(Malloc((thedim + 1) * sizeof(int)));
+   spx_alloc(u.col.elem, thedim);
+   spx_alloc(u.col.idx, u.col.size);
+   spx_alloc(u.col.start, (thedim + 1));
+   spx_alloc(u.col.len, (thedim + 1));
+   spx_alloc(u.col.max, (thedim + 1));
    u.col.val = 0;
 
    u.col.list.idx = thedim;
@@ -610,13 +612,13 @@ SLUFactor::SLUFactor()
    u.col.len[thedim] = 0;
 
    l.size = 1;
-   l.val = reinterpret_cast<double*>(Malloc(l.size * sizeof(double)));
-   l.idx = reinterpret_cast<int *>(Malloc(l.size * sizeof(int)));
+   spx_alloc(l.val, l.size);
+   spx_alloc(l.idx, l.size);
    l.startSize = 1;
    l.firstUpdate = 0;
    l.firstUnused = 0;
-   l.start = reinterpret_cast<int *>(Malloc(l.startSize * sizeof(int)));
-   l.row = reinterpret_cast<int *>(Malloc(l.startSize * sizeof(int)));
+   spx_alloc(l.start, l.startSize);
+   spx_alloc(l.row, l.startSize);
    l.rval = 0;
    l.ridx = 0;
    l.rbeg = 0;
@@ -649,63 +651,37 @@ SLUFactor::SLUFactor()
 
 void SLUFactor::freeAll()
 {
-   Free (row.perm);
-   Free (row.orig);
-   Free (col.perm);
-   Free (col.orig);
-   Free (u.row.elem);
-   Free (u.row.val);
-   Free (u.row.idx);
-   Free (u.row.start);
-   Free (u.row.len);
-   Free (u.row.max);
-   Free (u.col.elem);
-   Free (u.col.idx);
-   Free (u.col.start);
-   Free (u.col.len);
-   Free (u.col.max);
-   Free (l.val);
-   Free (l.idx);
-   Free (l.start);
-   Free (l.row);
-   Free (diag);
-   row.perm = 0;
-   row.orig = 0;
-   col.perm = 0;
-   col.orig = 0;
-   u.row.elem = 0;
-   u.row.val = 0;
-   u.row.idx = 0;
-   u.row.start = 0;
-   u.row.len = 0;
-   u.row.max = 0;
-   u.col.elem = 0;
-   u.col.idx = 0;
-   u.col.start = 0;
-   u.col.len = 0;
-   u.col.max = 0;
-   l.val = 0;
-   l.idx = 0;
-   l.row = 0;
-   l.start = 0;
-   diag = 0;
+   spx_free(row.perm);
+   spx_free(row.orig);
+   spx_free(col.perm);
+   spx_free(col.orig);
+   spx_free(u.row.elem);
+   spx_free(u.row.val);
+   spx_free(u.row.idx);
+   spx_free(u.row.start);
+   spx_free(u.row.len);
+   spx_free(u.row.max);
+   spx_free(u.col.elem);
+   spx_free(u.col.idx);
+   spx_free(u.col.start);
+   spx_free(u.col.len);
+   spx_free(u.col.max);
+   spx_free(l.val);
+   spx_free(l.idx);
+   spx_free(l.start);
+   spx_free(l.row);
+   spx_free(diag);
+
    if (u.col.val)
-   {
-      free (u.col.val);
-      u.col.val = 0;
-   }
+      spx_free(u.col.val);
+
    if (l.rbeg)
    {
-      Free(l.rval);
-      Free(l.ridx);
-      Free(l.rbeg);
-      Free(l.rorig);
-      Free(l.rperm);
-      l.rval = 0;
-      l.ridx = 0;
-      l.rbeg = 0;
-      l.rorig = 0;
-      l.rperm = 0;
+      spx_free(l.rval);
+      spx_free(l.ridx);
+      spx_free(l.rbeg);
+      spx_free(l.rorig);
+      spx_free(l.rperm);
    }
 }
 
@@ -750,44 +726,25 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
       forest.reDim(thedim);
       work = vec.get_ptr();
 
-      row.perm = reinterpret_cast<int*>(Realloc(row.perm, thedim * sizeof(int)));
-      row.orig = reinterpret_cast<int*>(Realloc(row.orig, thedim * sizeof(int)));
-      col.perm = reinterpret_cast<int*>(Realloc(col.perm, thedim * sizeof(int)));
-      col.orig = reinterpret_cast<int*>(Realloc(col.orig, thedim * sizeof(int)));
-      diag = reinterpret_cast<double*>(Realloc(diag, thedim * sizeof(double)));
+      spx_realloc(row.perm, thedim);
+      spx_realloc(row.orig, thedim);
+      spx_realloc(col.perm, thedim);
+      spx_realloc(col.orig, thedim);
+      spx_realloc(diag, thedim);
 
-      u.row.elem = reinterpret_cast<Dring*>(Realloc(u.row.elem, thedim * sizeof(Dring)));
-      u.row.len = reinterpret_cast<int *>(Realloc(u.row.len, (thedim + 1) * sizeof(int)));
-      u.row.max = reinterpret_cast<int *>(Realloc(u.row.max, (thedim + 1) * sizeof(int)));
-      u.row.start = reinterpret_cast<int *>(Realloc(u.row.start, (thedim + 1) * sizeof(int)));
+      spx_realloc(u.row.elem, thedim);
+      spx_realloc(u.row.len, (thedim + 1));
+      spx_realloc(u.row.max, (thedim + 1));
+      spx_realloc(u.row.start, (thedim + 1));
 
-      u.col.elem = reinterpret_cast<Dring*>(Realloc(u.col.elem, thedim * sizeof(Dring)));
-      u.col.len = reinterpret_cast<int *>(Realloc(u.col.len, (thedim + 1) * sizeof(int)));
-      u.col.max = reinterpret_cast<int *>(Realloc(u.col.max, (thedim + 1) * sizeof(int)));
-      u.col.start = reinterpret_cast<int *>(Realloc(u.col.start, (thedim + 1) * sizeof(int)));
+      spx_realloc(u.col.elem, thedim);
+      spx_realloc(u.col.len, (thedim + 1));
+      spx_realloc(u.col.max, (thedim + 1));
+      spx_realloc(u.col.start, (thedim + 1));
 
       l.startSize = thedim + MAXUPDATES;
-      l.row = reinterpret_cast<int *>(Realloc(l.row, (l.startSize) * sizeof(int)));
-      l.start = reinterpret_cast<int *>(Realloc(l.start, (l.startSize) * sizeof(int)));
-
-      assert
-      (
-         row.perm != 0
-         || row.orig != 0
-         || col.perm != 0
-         || col.orig != 0
-         || diag != 0
-         || u.row.elem != 0
-         || u.row.start != 0
-         || u.row.len != 0
-         || u.row.max != 0
-         || u.col.elem != 0
-         || u.col.start != 0
-         || u.col.len != 0
-         || u.col.max != 0
-         || l.row != 0
-         || l.start != 0
-     );
+      spx_realloc(l.row, l.startSize);
+      spx_realloc(l.start, l.startSize);
    }
    else if (lastStability > 2*minStability)
    {

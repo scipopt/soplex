@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dsvector.cpp,v 1.5 2001/11/13 17:04:15 bzfbleya Exp $"
+#pragma ident "@(#) $Id: dsvector.cpp,v 1.6 2001/11/13 21:55:17 bzfkocht Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -27,6 +27,7 @@
 /*  and class header files
  */
 #include "dsvector.h"
+#include "spxalloc.h"
 
 namespace soplex
 {
@@ -38,13 +39,7 @@ namespace soplex
  */
 void DSVector::allocMem(int len)
 {
-   theelem = reinterpret_cast<Element*>(malloc(len * sizeof(Element)));
-
-   if (theelem == 0)
-   {
-      std::cerr << "ERROR: DSVector could not allocate memory\n";
-      exit(-1);
-   }
+   spx_alloc(theelem, len);
    setMem(len, theelem);
 }
 
@@ -52,12 +47,8 @@ void DSVector::setMax(int newmax)
 {
    int siz = size();
    int len = ((newmax < siz) ? siz : newmax) + 1;
-   theelem = reinterpret_cast<Element*>(realloc(theelem, len * sizeof(Element)));
-   if (theelem == 0)
-   {
-      std::cerr << "ERROR: DSVector could not reallocate memory\n";
-      exit(-1);
-   }
+
+   spx_realloc(theelem, len);
    setMem (len, theelem);
    set_size( siz );
 }
@@ -104,19 +95,16 @@ DSVector::DSVector(const Vector& vec)
 
 DSVector::~DSVector()
 {
-   free(theelem);
-}
-
-#define inconsistent                                                    \
-{                                                                       \
-std::cout << "ERROR: Inconsistency detected in class DSVector\n";        \
-return 0;                                                          \
+   spx_free(theelem);
 }
 
 int DSVector::isConsistent() const
 {
    if (theelem && m_elem - 1 != theelem)
-      inconsistent;
+   {
+      std::cout << "ERROR: Inconsistency detected in class DSVector\n";
+      return 0;
+   }
    return 1;
 }
 } // namespace soplex
@@ -129,3 +117,5 @@ int DSVector::isConsistent() const
 //Emacs indent-tabs-mode:nil
 //Emacs End:
 //-----------------------------------------------------------------------------
+
+

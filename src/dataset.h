@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.7 2001/11/13 21:01:23 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.8 2001/11/13 21:55:16 bzfkocht Exp $"
 
 #ifndef _DATASET_H_
 #define _DATASET_H_
@@ -32,6 +32,7 @@
  */
 #include "dataarray.h"
 #include "datakey.h"
+#include "spxalloc.h"
 
 namespace soplex
 {
@@ -471,13 +472,8 @@ public:
 
       themax = newmax;
 
-      theitem = reinterpret_cast<Item*>(realloc(theitem, themax * sizeof(Item)));
-      thekey  = reinterpret_cast<Key*> (realloc(thekey,  themax * sizeof(Key)));
-      if (theitem == 0 || thekey == 0)
-      {
-         std::cerr << "ERROR: DataSet could not reallocate memory\n";
-         exit(-1);
-      }
+      spx_realloc(theitem, themax);
+      spx_realloc(thekey,  themax);
 
       return long(theitem) - delta;
    }
@@ -526,15 +522,10 @@ public:
          firstfree = -themax - 1;
       else
          firstfree = old.firstfree;
-      theitem = reinterpret_cast<Item*>(malloc(themax * sizeof(Item)));
-      thekey  = reinterpret_cast<Key*> (malloc(themax * sizeof(Key)));
-      if (theitem == 0 || thekey == 0)
-      {
-         std::cerr << "ERROR: DataSet could not allocate memory\n";
-         exit(-1);
-      }
-      assert(theitem != 0);
-      assert(thekey != 0);
+
+      spx_alloc(theitem, themax);
+      spx_alloc(thekey, themax);
+
       memcpy(theitem, old.theitem, themax * sizeof(Item));
       memcpy(thekey, old.thekey, themax * sizeof(Key));
    }
@@ -545,22 +536,16 @@ public:
       themax = (pmax < 1) ? 8 : pmax;
       thesize = thenum = 0;
       firstfree = -themax - 1;
-      theitem = reinterpret_cast<Item*>(malloc(themax * sizeof(Item)));
-      thekey  = reinterpret_cast<Key*> (malloc(themax * sizeof(Key)));
-      if (theitem == 0 || thekey == 0)
-      {
-         std::cerr << "ERROR: DataSet could not allocate memory\n";
-         exit(-1);
-      }
-      assert(theitem != 0);
-      assert(thekey != 0);
+
+      spx_alloc(theitem, themax);
+      spx_alloc(thekey, themax);
    }
 
    /// destructor.
    ~DataSet()
    {
-      free(theitem);
-      free(thekey);
+      spx_free(theitem);
+      spx_free(thekey);
    }
 
    /// consistencty check.

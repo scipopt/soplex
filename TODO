@@ -16,8 +16,6 @@ long durch ptrdiff_t ersetzen (include <stddef.h>
 
 for();    -> for()
                 ;
-assert(xxx) -> assert(xxx != 0)
-
 explicit einfuegen.
 
 vector_c.cpp in vector.cpp einbauen (this)
@@ -38,7 +36,6 @@ Es wird viel Platz verschwendet durch das zusammensetzen von
 Element { int, double } (padding),
 Ist vermutlich dann auch schneller.
 Es muessen dann aber auch DSVector und SVSet überarbeitet werden.
-
 
 // lprow.cpp:double LPRow::infinity = 1e+100;
 // spxlp.cpp:const double SPxLP::infinity = 1e+100;

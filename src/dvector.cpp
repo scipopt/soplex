@@ -13,12 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dvector.cpp,v 1.3 2001/11/07 17:31:16 bzfbleya Exp $"
+#pragma ident "@(#) $Id: dvector.cpp,v 1.4 2001/11/13 21:55:17 bzfkocht Exp $"
 
 
 /*  \Section{Complex Methods}
  */
 #include "dvector.h"
+#include "spxalloc.h"
 
 namespace soplex
 {
@@ -84,30 +85,22 @@ DVector operator*(const Vector& v, double x)
 void DVector::reSize(int newsize)
 {
    assert(newsize >= dim());
-   mem = reinterpret_cast<double*>(realloc(mem, ((newsize > 0) ? newsize : 1)
-                                           * sizeof(double)));
+
+   spx_realloc(mem, ((newsize > 0) ? newsize : 1));
+
    val = mem;
    memsize = newsize;
-   if (mem == 0)
-   {
-      std::cerr << "ERROR: DVector could not reallocate memory\n";
-      exit(-1);
-   }
 }
 
 void DVector::reSize(int newsize, int newdim)
 {
    assert(newsize >= newdim);
-   mem = reinterpret_cast<double*>(realloc(mem, ((newsize > 0) ? newsize : 1)
-                                           * sizeof(double)));
+   
+   spx_realloc(mem, ((newsize > 0) ? newsize : 1));
+
    val = mem;
    memsize = newsize;
    dimen = newdim;
-   if (mem == 0)
-   {
-      std::cerr << "ERROR: DVector could not reallocate memory\n";
-      exit(-1);
-   }
 }
 
 void DVector::reDim(int newdim)
@@ -163,14 +156,9 @@ DVector::DVector(const Vector& old)
 {
    dimen = old.dim();
    memsize = dimen;
-   mem = reinterpret_cast<double*>(malloc(memsize * sizeof(double)));
+   spx_alloc(mem, memsize);
    val = mem;
    *this = old;
-   if (mem == 0)
-   {
-      std::cerr << "ERROR: DVector could not allocate memory\n";
-      exit(-1);
-   }
 }
 
 DVector::DVector(const DVector& old)
@@ -178,28 +166,18 @@ DVector::DVector(const DVector& old)
 {
    dimen = old.dim();
    memsize = old.memsize;
-   mem = reinterpret_cast<double*>(malloc(memsize * sizeof(double)));
+   spx_alloc(mem, memsize);
    val = mem;
    *this = old;
-   if (mem == 0)
-   {
-      std::cerr << "ERROR: DVector could not allocate memory\n";
-      exit(-1);
-   }
 }
 
 DVector::DVector(int p_dim)
    : Vector(0, 0)
 {
    memsize = (p_dim > 0) ? p_dim : 4;
-   mem = reinterpret_cast<double*>(malloc(memsize * sizeof(double)));
+   spx_alloc(mem, memsize);
    val = mem;
    dimen = p_dim;
-   if (mem == 0)
-   {
-      std::cerr << "ERROR: DVector could not allocate memory\n";
-      exit(-1);
-   }
    /*
        for(int i = 0; i < memsize; ++i)
            mem[i] = 0;
@@ -208,7 +186,7 @@ DVector::DVector(int p_dim)
 
 DVector::~DVector()
 {
-   free(mem);
+   spx_free(mem);
 }
 
 int DVector::isConsistent() const

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.5 2001/11/13 21:01:23 bzfkocht Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.6 2001/11/13 21:55:17 bzfkocht Exp $"
 
 
 #include <stdio.h>
@@ -24,6 +24,7 @@
 #include "clumembers.h"
 #include "cluprotos.h"
 #include "cring.h"
+#include "spxalloc.h"
 
 namespace soplex
 {
@@ -105,26 +106,16 @@ static Pring *col,            /* column index handlers for double linked list */
 
 static void newTmp(int p_dim)
 {
-   s_max = reinterpret_cast<double*>(Malloc(p_dim * sizeof(double)));
-   assert(s_max != 0);
-
-   s_cact = reinterpret_cast<int*>(Malloc(p_dim * sizeof(int)));
-   assert(s_cact != 0);
-
-   s_mark = reinterpret_cast<int*>(Malloc(p_dim * sizeof(int)));
-   assert(s_mark != 0);
+   spx_alloc(s_max, p_dim);
+   spx_alloc(s_cact, p_dim);
+   spx_alloc(s_mark, p_dim);
 }
 
 static void deleteTmp()
 {
-   Free(s_max);
-   s_max = 0;
-
-   Free(s_mark);
-   s_mark = 0;
-
-   Free(s_cact);
-   s_cact = 0;
+   spx_free(s_mark);
+   spx_free(s_cact);
+   spx_free(s_max);
 }
 
 /*****************************************************************************/
@@ -136,12 +127,9 @@ static void minRowMem(int size)
    if (fac->u.row.size < size)
    {
       fac->u.row.size = size;
-      fac->u.row.val = reinterpret_cast<double*>(Realloc(fac->u.row.val, 
-                                                         size * sizeof(double)));
-      fac->u.row.idx = reinterpret_cast<int*>(Realloc(fac->u.row.idx, 
-                                                      size * sizeof(int)));
-      assert(fac->u.row.idx);
-      assert(fac->u.row.val);
+      spx_realloc(fac->u.row.val, size);
+      spx_realloc(fac->u.row.idx, size);
+
       ridx = fac->u.row.idx;
       rval = fac->u.row.val;
    }
@@ -156,8 +144,7 @@ static void minColMem(int size)
    if (fac->u.col.size < size)
    {
       fac->u.col.size = size;
-      fac->u.col.idx = reinterpret_cast<int*>(Realloc(fac->u.col.idx, size * sizeof(int)));
-      assert(fac->u.col.idx);
+      spx_realloc(fac->u.col.idx, size);
       cidx = fac->u.col.idx;
    }
 }
@@ -173,12 +160,8 @@ static void minLMem(CLUFactor *p_fac, int size)
    if (size > p_fac->l.size)
    {
       p_fac->l.size = int(0.2 * p_fac->l.size + size);
-      p_fac->l.val = reinterpret_cast<double*>(Realloc(p_fac->l.val, 
-                                                       p_fac->l.size * sizeof(double)));
-      p_fac->l.idx = reinterpret_cast<int*>(Realloc(p_fac->l.idx, 
-                                                    p_fac->l.size * sizeof(int)));
-      assert(p_fac->l.idx);
-      assert(p_fac->l.val);
+      spx_realloc(p_fac->l.val, p_fac->l.size);
+      spx_realloc(p_fac->l.idx, p_fac->l.size);
       lidx = p_fac->l.idx;
       lval = p_fac->l.val;
    }
@@ -193,8 +176,7 @@ int makeLvec(CLUFactor* p_fac, int p_len, int p_row)
    if (p_fac->l.firstUnused >= p_fac->l.startSize)
    {
       p_fac->l.startSize += 100;
-      p_fac->l.start = reinterpret_cast<int*>(Realloc(p_fac->l.start, 
-                                                      p_fac->l.startSize * sizeof(int)));
+      spx_realloc(p_fac->l.start, p_fac->l.startSize);
       p_lbeg = p_fac->l.start;
    }
 
@@ -594,11 +576,10 @@ static void initRings(void)
    int *cperm = fac->col.perm;
    Pring *ring;
 
-   col = reinterpret_cast<Pring*>(Malloc((dim + 1) * sizeof(Pring)));
-   colNZ = reinterpret_cast<Pring*>(Malloc((dim + 1) * sizeof(Pring)));
-   row = reinterpret_cast<Pring*>(Malloc((dim + 1) * sizeof(Pring)));
-   rowNZ = reinterpret_cast<Pring*>(Malloc((dim + 1) * sizeof(Pring)));
-   assert(col && colNZ && row && rowNZ);
+   spx_alloc(col,   dim + 1);
+   spx_alloc(colNZ, dim + 1);
+   spx_alloc(row,   dim + 1);
+   spx_alloc(rowNZ, dim + 1);
 
    for (i = dim - stage; i >= 0; --i)
    {
@@ -629,11 +610,10 @@ static void initRings(void)
 
 static void freeRings(void)
 {
-   Free(col);
-   Free(colNZ);
-   Free(row);
-   Free(rowNZ);
-   col = colNZ = row = rowNZ = 0;
+   spx_free(col);
+   spx_free(colNZ);
+   spx_free(row);
+   spx_free(rowNZ);
 }
 
 
@@ -1272,9 +1252,9 @@ static int setupColVals(CLUFactor* fc)
    double maxabs;
 
    if (fc->u.col.val)
-      free(fc->u.col.val);
-   fc->u.col.val = reinterpret_cast<double*>(Malloc(fc->u.col.size * sizeof(double)));
-   cval = fc->u.col.val;
+      spx_free(fc->u.col.val);
+
+   spx_alloc(fc->u.col.val, fc->u.col.size);
 
    cval = fc->u.col.val;
 
@@ -1333,17 +1313,17 @@ static void setupRowVals(CLUFactor* fc)
 
    if (fc->l.rval)
    {
-      free(fc->l.rval);
-      free(fc->l.ridx);
-      free(fc->l.rbeg);
-      free(fc->l.rorig);
-      free(fc->l.rperm);
+      spx_free(fc->l.rval);
+      spx_free(fc->l.ridx);
+      spx_free(fc->l.rbeg);
+      spx_free(fc->l.rorig);
+      spx_free(fc->l.rperm);
    }
-   fc->l.rval  = reinterpret_cast<double*>(Malloc(mem * sizeof(double)));
-   fc->l.ridx  = reinterpret_cast<int *>(Malloc(mem * sizeof(int)));
-   fc->l.rbeg  = reinterpret_cast<int *>(Malloc((l_dim + 1) * sizeof(int)));
-   fc->l.rorig = reinterpret_cast<int *>(Malloc(l_dim * sizeof(int)));
-   fc->l.rperm = reinterpret_cast<int *>(Malloc(l_dim * sizeof(int)));
+   spx_alloc(fc->l.rval, mem);
+   spx_alloc(fc->l.ridx, mem);
+   spx_alloc(fc->l.rbeg, l_dim + 1);
+   spx_alloc(fc->l.rorig, l_dim);
+   spx_alloc(fc->l.rperm, l_dim);
 
    l_ridx = fc->l.ridx;
    l_rval = fc->l.rval;
@@ -1894,23 +1874,6 @@ int CLUFactorIsConsistent(const CLUFactor *p_fac)
    return 1;
 }
 
-
-/*****************************************************************************/
-
-void* Malloc (int size)
-{
-   return malloc(size + (size <= 0));
-}
-
-void* Realloc (void* old, int size)
-{
-   return realloc(old, size);
-}
-
-void Free (void* old)
-{
-   free(old);
-}
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: forest.cpp,v 1.4 2001/11/11 20:27:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: forest.cpp,v 1.5 2001/11/13 21:55:18 bzfkocht Exp $"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,6 +23,7 @@
 #include "clumembers.h"
 #include "cluprotos.h"
 #include "cring.h"
+#include "spxalloc.h"
 
 namespace soplex
 {
@@ -172,12 +173,8 @@ static void minColMem(CLUFactor* fac, int size)
    if (fac->u.col.size < size)
    {
       fac->u.col.size = size;
-      fac->u.col.idx = reinterpret_cast<int *>(Realloc(fac->u.col.idx, 
-                                                       size * sizeof(int)));
-      fac->u.col.val = reinterpret_cast<double*>(Realloc(fac->u.col.val, 
-                                                         size * sizeof(double)));
-      assert(fac->u.col.idx);
-      assert(fac->u.col.val);
+      spx_realloc(fac->u.col.idx, size);
+      spx_realloc(fac->u.col.val, size);
    }
 }
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataarray.h,v 1.4 2001/11/13 21:01:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataarray.h,v 1.5 2001/11/13 21:55:16 bzfkocht Exp $"
 
 #ifndef _DATAARRAY_H_
 #define _DATAARRAY_H_
@@ -27,6 +27,8 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <iostream>
+
+#include "spxalloc.h"
 
 namespace soplex
 {
@@ -265,17 +267,12 @@ public:
       long olddata = long(data);
       if (thesize <= 0)
       {
-         free(data);
-         data = reinterpret_cast<T*>(malloc(themax * sizeof(T)));
+         spx_free(data);
+         spx_alloc(data, themax);
       }
       else
-         data = reinterpret_cast<T*>(realloc(data, themax * sizeof(T)));
-      if (data == 0)
-      {
-         std::cerr << "ERROR: DataArray could not reallocate memory\n";
-         exit(-1);
-      }
-      assert(data != 0);
+         spx_realloc(data, themax);
+
       return long(data) - olddata;
    }
    /** memory extension factor.
@@ -315,14 +312,11 @@ public:
          , themax (old.themax)
          , memFactor (old.memFactor)
    {
-      data = reinterpret_cast<T*>(malloc(max() * sizeof(T)));
-      if (data == 0)
-      {
-         std::cerr << "ERROR: DataArray could not allocate memory\n";
-         exit(-1);
-      }
+      spx_alloc(data, max());
+
       if (thesize)
          memcpy(data, old.data, thesize * sizeof(T));
+
       assert(isConsistent());
    }
 
@@ -339,19 +333,16 @@ public:
          themax = pmax;
       else
          themax = (thesize == 0) ? 1 : thesize;
-      data = reinterpret_cast<T*>(malloc(themax * sizeof(T)));
-      if (data == 0)
-      {
-         std::cerr << "ERROR: DataArray could not allocate memory\n";
-         exit(-1);
-      }
+
+      spx_alloc(data, themax);
+
       assert(isConsistent());
    }
 
    ///
    ~DataArray()
    {
-      free(data);
+      spx_free(data);
    }
 };
 
