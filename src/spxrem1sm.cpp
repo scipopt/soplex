@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxrem1sm.cpp,v 1.16 2003/01/10 12:46:14 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxrem1sm.cpp,v 1.17 2003/01/10 13:49:27 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -953,8 +953,14 @@ SPxSimplifier::Result SPxRem1SM::simplify(SPxLP& lp, Real eps, Real delta)
    if( (ret = redundantRows(lp, rragain)) != OKAY)
       return ret;
 
-   if (rcagain || rragain)
+   again = rcagain || rragain;
+
+   // This has to be a loop, otherwise we could end up with
+   // empty rows.
+   while(again)
    {
+      again = false;
+
       if( (ret = simpleRows(lp, again)) != OKAY)
          return ret;
 

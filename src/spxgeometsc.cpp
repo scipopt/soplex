@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeometsc.cpp,v 1.2 2003/01/10 12:46:14 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeometsc.cpp,v 1.3 2003/01/10 13:49:27 bzfkocht Exp $"
 
 /**@file  spxgeometsc.cpp
  * @brief Geometric mean row/column scaling.
@@ -81,6 +81,15 @@ Real SPxGeometSC::doRow(const SPxLP& lp)
                mini = x;
          }
       }
+      // empty rows/cols are possible
+      if (mini == infinity || maxi == 0.0)
+      {
+         mini = 1.0;
+         maxi = 1.0;
+      }
+      assert(mini < infinity);
+      assert(maxi > 0.0);
+
       m_rowscale[i] = 1.0 / sqrt(mini * maxi);
             
       Real p = maxi / mini;
@@ -105,7 +114,7 @@ Real SPxGeometSC::doCol(const SPxLP& lp)
       for( int j = 0; j < vec.size(); ++j)
       {
          Real x = fabs(vec.value(j) * m_rowscale[vec.index(j)]);
-         
+
          if (!isZero(x))
          {
             if (x > maxi)
@@ -114,6 +123,15 @@ Real SPxGeometSC::doCol(const SPxLP& lp)
                mini = x;
          }
       }
+      // empty rows/cols are possible
+      if (mini == infinity || maxi == 0.0)
+      {
+         mini = 1.0;
+         maxi = 1.0;
+      }
+      assert(mini < infinity);
+      assert(maxi > 0.0);
+
       m_colscale[i] = 1.0 / sqrt(mini * maxi);
       
       Real p = maxi / mini;
