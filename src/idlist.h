@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idlist.h,v 1.7 2002/01/04 17:31:38 bzfkocht Exp $"
+#pragma ident "@(#) $Id: idlist.h,v 1.8 2002/01/07 14:11:11 bzfkocht Exp $"
 
 /**@file  idlist.h
  * @brief Generic double linked list.
@@ -114,13 +114,13 @@ public:
    /// returns successor of \p elem or 0, if \p elem is the last element.
    T* next(const T *elem) const
    {
-      return (elem == last()) ? 0 : const_cast<T*>(elem->next());
+      return (elem == last()) ? 0 : elem->next();
    }
 
    /// returns predecessor of \p elem or 0, if \p elem is the first element.
    T* prev(const T *elem) const
    {
-      return (elem == first()) ? 0 : const_cast<T*>(elem->prev());
+      return (elem == first()) ? 0 : elem->prev();
    }
    //@}
 

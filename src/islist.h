@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: islist.h,v 1.10 2002/01/05 19:24:09 bzfkocht Exp $"
+#pragma ident "@(#) $Id: islist.h,v 1.11 2002/01/07 14:11:11 bzfkocht Exp $"
 
 /**@file  islist.h
  * @brief Generic single linked list.
@@ -285,7 +285,7 @@ public:
     */
    T* next(const T *elem) const
    {
-      return (elem == the_last) ? 0 : const_cast<T*>(elem->next());
+      return (elem == the_last) ? 0 : elem->next();
    }
 
    /// returns the number of elements in #IsList.
