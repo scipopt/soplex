@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxrem1sm.cpp,v 1.18 2003/01/12 13:09:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxrem1sm.cpp,v 1.19 2003/01/12 20:09:48 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -256,7 +256,7 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
 
             if (x > 0.0)
             {
-               if (lp.lhs(i) > -infinity && lp.lower(k) > -infinity && upcnt <= 1)
+               if (lp.lhs(i) > -infinity && lp.lower(k) > -infinity && upcnt <= 1 && NE(lp.lhs(i), upbnd))
                {
                   Real y     = -infinity;
                   Real scale = maxAbs(lp.lhs(i), upbnd);
@@ -285,7 +285,7 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
                      lp.changeLower(k, -infinity);
                   }
                }
-               if (lp.rhs(i) < infinity && lp.upper(k) < infinity && locnt <= 1)
+               if (lp.rhs(i) < infinity && lp.upper(k) < infinity && locnt <= 1 && NE(lp.rhs(i), lobnd))
                {
                   Real y = infinity;
                   Real scale = maxAbs(lp.rhs(i), lobnd);
@@ -317,7 +317,7 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
             }
             else if (x < 0.0)
             {
-               if (lp.lhs(i) >= -infinity && lp.upper(k) < infinity && upcnt <= 1)
+               if (lp.lhs(i) >= -infinity && lp.upper(k) < infinity && upcnt <= 1 && NE(lp.lhs(i), upbnd))
                {
                   Real y = infinity;
                   Real scale = maxAbs(lp.lhs(i), upbnd);
@@ -346,7 +346,7 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
                      lp.changeUpper(k, infinity);
                   }
                }
-               if (lp.rhs(i) <= infinity && lp.lower(k) > -infinity && locnt <= 1)
+               if (lp.rhs(i) <= infinity && lp.lower(k) > -infinity && locnt <= 1 && NE(lp.rhs(i), lobnd))
                {
                   Real y = -infinity;
                   Real scale = maxAbs(lp.rhs(i), lobnd);
