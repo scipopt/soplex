@@ -13,11 +13,8 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ctimer.cpp,v 1.1 2001/11/26 15:38:29 bzfbleya Exp $"
+#pragma ident "@(#) $Id: ctimer.cpp,v 1.2 2001/12/05 15:05:32 bzfkocht Exp $"
 
-
-
-/* import system includes */
 #include <assert.h>
 
 #ifdef _WIN32
@@ -28,20 +25,15 @@
 
 #include <sys/times.h>
 #include <limits.h>
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>
-#endif /* HAVE_UNISTD_H */
 #include <sys/param.h>
 
 #endif  /* !_WIN32 */
 
-/* import interface of timer */
 #include "timer.h"
 
 namespace soplex
 {
-
-
 /* determine TIMES_TICKS_PER_SEC for clock ticks delivered by times().
  * (don't use CLOCKS_PER_SEC since this is related to clock() only).
  */

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clufactor.h,v 1.1 2001/12/04 19:28:19 bzfkocht Exp $"
+#pragma ident "@(#) $Id: clufactor.h,v 1.2 2001/12/05 15:05:32 bzfkocht Exp $"
 
 #ifndef _CLUFACTOR_H_
 #define _CLUFACTOR_H_
@@ -32,23 +32,53 @@ namespace soplex
  */
 class CLUFactor
 {
+public:
+/*      Double linked ring structure for garbage collection of column or
+ *      row file in working matrix.
+ */
+   struct Dring
+   {  
+      Dring *next;
+      Dring *prev;
+      int idx;
+   };
+
+   class Pring
+   {
+   public:
+      Pring(): next(NULL), prev(NULL){}      
+      Pring *next;
+      Pring *prev;
+      int idx;            /* index of pivot row */
+      int pos;            /* position of pivot column in row */
+      int mkwtz;          /* markowitz number of pivot */
+   private:
+      Pring(const Pring&);
+      Pring& operator= (const Pring&);
+   };
+   /// Temporary data structures.
 protected:
+   class Temp 
+   {
+   public: 
+      Temp();
+      ~Temp();
+      void init(int p_dim);
+      void clear();
+      int*    s_mark;
+      double* s_max;           /* maximum absolute value per row (or -1) */
+      int*    s_cact;          /* lengths of columns of active submatrix */
+   private:
+      Temp( const Temp& );
+      Temp& operator= ( const Temp& );
+   };
+
 /*      Data structures for saving the row and column permutations.
  */
 struct Perm
 {
    int *orig;          /* orig[p] original index from p */
    int *perm;          /* perm[i] permuted index from i */
-};
-
-/*      Double linked ring structure for garbage collection of column or
- *      row file in working matrix.
- */
-struct Dring
-{
-   Dring *next;
-   Dring *prev;
-   int idx;
 };
 
 /*      Data structures for saving the working matrix and U factor.
@@ -122,34 +152,6 @@ struct L
    int *rperm;         /* original row permutation          */
 };
 
-   class Pring
-   {
-   public:
-      Pring(): next(NULL), prev(NULL){}      
-      Pring *next;
-      Pring *prev;
-      int idx;            /* index of pivot row */
-      int pos;            /* position of pivot column in row */
-      int mkwtz;          /* markowitz number of pivot */
-   private:
-      Pring(const Pring&);
-      Pring& operator= (const Pring&);
-   };
-   /// Temporary data structures.
-   class Temp 
-   {
-   public: 
-      Temp();
-      ~Temp();
-      void init(int p_dim);
-      void clear();
-      int*    s_mark;
-      double* s_max;           /* maximum absolute value per row (or -1) */
-      int*    s_cact;          /* lengths of columns of active submatrix */
-   private:
-      Temp( const Temp& );
-      Temp& operator= ( const Temp& );
-   };
 
    struct Pivots 
    {

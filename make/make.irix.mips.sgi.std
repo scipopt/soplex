@@ -1,5 +1,7 @@
-#--- $Id: make.irix.mips.sgi.std,v 1.1 2001/12/03 15:07:19 bzfkocht Exp $
+#--- $Id: make.irix.mips.sgi.std,v 1.2 2001/12/05 15:05:32 bzfkocht Exp $
 CXX	=	CC
-CXXFLAGS=	-O2 -DNDEBUG
+CXXFLAGS=	-O2 -DNDEBUG -LANG:std:ansi-for-init-scope=on:exceptions=off
 AR	=	CC
-ARFLAGS	=	-ar
+ARFLAGS	=	$(CXXFLAGS) -ar -o
+RANLIB	=	true
+LDFLAGS	=	-lCio

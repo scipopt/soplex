@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.15 2001/12/04 19:28:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.16 2001/12/05 15:05:32 bzfkocht Exp $"
 
 #include <iostream>
 #include <assert.h>
@@ -1500,7 +1500,7 @@ void CLUFactor::factor(
    double eps           /* epsilon for zero detection        */
                    )
 {
-#warning remove this assignmnent
+#pragma warning "remove this assignmnent"
    //fac = this;
    int stage = 0;
    stat = SLinSolver::OK;

@@ -13,8 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprow.cpp,v 1.5 2001/11/17 22:15:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprow.cpp,v 1.6 2001/12/05 15:05:32 bzfkocht Exp $"
 
+#include <stdlib.h>
 #include <math.h>
 #include <assert.h>
 #include <iostream>
