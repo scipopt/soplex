@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.38 2002/01/21 11:28:13 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.39 2002/01/28 22:49:58 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -1172,10 +1172,10 @@ void SoPlex::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
    SPxBasis::Desc ds = desc();
    int i;
 
-   for (i = nRows() - 1; i >= 0; i--)
+   for(i = 0; i < nRows(); i++)
       ds.rowStatus(i) = varStatusToBasisStatusRow( i, p_rows[i] );
 
-   for (i = nCols() - 1; i >= 0; i--)
+   for(i = 0; i < nCols(); i++)
       ds.colStatus(i) = varStatusToBasisStatusCol( i, p_cols[i] );
 
    loadBasis(ds);
