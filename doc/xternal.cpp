@@ -119,7 +119,8 @@
  You need the following programs to compile SoPlex:
 
   - C++ compiler (e.g. http://www.gnu.org/software/gcc)
-  - gnu make http://www.gnu.org/software/make/make.html
+  - gnu make http://www.gnu.org/software/make
+  - gnu awk http://www.gnu.org/software/gawk (if you want the check target)
   - doxygen http://www.doxygen.org (if you want to generate the documentation)
 
  After receiving SoPlex you have to uncompress it 
@@ -188,6 +189,25 @@
  \section Installation Installation
  The binary is in the \c bin directory, the library in \c lib and all
  headers are in \c src. Feel free to install at a suitable place.
+
+ \section Naming Naming of the OPT Variable
+
+  - dbg (debugging) -DNDEBUG is \b not set. Optimization is mostly off
+    and debugging info is generated
+
+  - std (standard) -DNDEBUG is set. All optimizations may be switch on,
+    which do \b not \b alter the floating point behaviour or may 
+    otherwise by result in wrong code 
+
+  - opt (optimized) -DNDEBUG is set. All optimizations may be switch on,
+    as long as the code seems to run correctly. The code should run
+    on the relevant architectures. Best is something like -fast that
+    uses the right optimizations for the architecture that is used.
+
+  - opt-XXX (optimizied for XXX) like opt-p4. This includes optimization
+    for a specific processor. 
+
+  - pro (profile) like opt, but generate profile data.
  */
 //-----------------------------------------------------------------------------
 /**@page FAQ Frequently Asked Questions
