@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.24 2003/04/20 08:32:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.25 2003/04/22 08:04:32 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -65,10 +65,8 @@ void SSVector::clear ()
 {
    if (isSetup())
    {
-      int i = IdxSet::size();
-      int* iptr;
-      for (iptr = idx; i--; iptr++)
-         val[*iptr] = 0;
+      for(int i = 0; i < num; ++i)
+         val[idx[i]] = 0.0;
    }
    else
       Vector::clear();
@@ -353,19 +351,17 @@ Real SSVector::maxAbs() const
 
 Real SSVector::length2() const
 {
+   Real x = REAL(0.0);
+
    if (isSetup())
    {
-      int* i = idx;
-      int* end = idx + num;
-      Real* v = val;
-      Real x = 0;
-
-      for (; i < end; ++i)
-         x += v[*i] * v[*i];
-      return x;
+      for(int i = 0; i < num; ++i)
+         x += val[idx[i]] * val[idx[i]];
    }
    else
-      return Vector::length2();
+      x = Vector::length2();
+
+   return x;
 }
 
 Real SSVector::length() const
@@ -373,7 +369,7 @@ Real SSVector::length() const
    return sqrt(length2());
 }
 
-
+#if 0 // buggy and not used
 SSVector& SSVector::multAdd(Real xx, const SSVector& svec)
 {
    if (svec.isSetup())
@@ -416,6 +412,13 @@ SSVector& SSVector::multAdd(Real xx, const SSVector& svec)
    }
    else
    {
+      /**@todo this code does not work, because in is never something
+       *       added to v. Also the idx will not be setup correctly
+       *       Fortunately the whole function seems not to be called
+       *       at all. 
+       */
+      abort();
+
       Real y;
       int* ii = idx;
       Real* v = val;
@@ -458,6 +461,7 @@ SSVector& SSVector::multAdd(Real xx, const SSVector& svec)
    assert(isConsistent());
    return *this;
 }
+#endif // 0
 
 SSVector& SSVector::multAdd(Real xx, const SVector& svec)
 {
@@ -519,6 +523,7 @@ SSVector& SSVector::multAdd(Real xx, const SVector& svec)
 SSVector& SSVector::multAdd(Real x, const Vector& vec)
 {
    Vector::multAdd(x, vec);
+
    if (isSetup())
    {
       setupStatus = false;
@@ -1029,7 +1034,7 @@ bool SSVector::isConsistent() const
 
          if (j < 0 && fabs(val[i]) >= epsilon) 
             return MSGinconsistent("SSVector");
-         if (j > 0 && fabs(val[i]) < epsilon)
+         if (j >= 0 && fabs(val[i]) < epsilon)
             return MSGinconsistent("SSVector");
       }
    }

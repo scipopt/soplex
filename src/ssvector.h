@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.h,v 1.16 2002/12/16 07:29:48 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.h,v 1.17 2003/04/22 08:04:32 bzfkocht Exp $"
 
 
 /**@file  ssvector.h
@@ -259,7 +259,7 @@ public:
    SSVector& operator*=(Real x);
 
    ///
-   SSVector& multAdd(Real x, const SSVector& vec);
+   //SSVector& multAdd(Real x, const SSVector& vec);
    ///
    SSVector& multAdd(Real x, const SVector& vec);
    /// adds scaled vector (+= \p x * \p vec).
