@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: message.cpp,v 1.2 2002/01/15 17:58:38 bzfbleya Exp $"
+#pragma ident "@(#) $Id: message.cpp,v 1.3 2002/01/19 13:54:42 bzfkocht Exp $"
 
 #include <iostream>
 #include <assert.h>
@@ -28,7 +28,7 @@ bool msginconsistent(const char* name, const char* file, int line)
    assert(line >= 0);
 
    std::cout << file << "(" << line << ") "
-             << "Inconsistency detected in" << name << std::endl; 
+             << "Inconsistency detected in " << name << std::endl; 
 
    return 0;
 }

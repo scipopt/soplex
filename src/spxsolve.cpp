@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.19 2002/01/16 16:52:24 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.20 2002/01/19 13:54:42 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -327,7 +327,7 @@ bool SoPlex::terminate()
                 << ") reached" << std::endl;
 #endif // !NDEBUG
 
-      m_abortType = ITERATION;
+      m_abortReason = ABORT_ITER;
       return true;
    }
    if ( maxTime >= 0 && maxTime < infinity && time() >= maxTime )
@@ -336,7 +336,7 @@ bool SoPlex::terminate()
       std::cout << "Timelimit (" << maxTime << ") reached" << std::endl;
 #endif // !NDEBUG
 
-      m_abortType = TIME;
+      m_abortReason = ABORT_TIME;
       return true;   
    }
    if (maxValue < infinity)
@@ -346,7 +346,7 @@ bool SoPlex::terminate()
 
       if( spxSense() == SPxLP::MAXIMIZE )
          sign *= -1;
-      if( simplexType() == PRIMAL_SIMPLEX )
+      if( simplexType() == PRIMAL )
          sign *= -1;
 
       if( sign * (value() - maxValue) >= 0.0 )
@@ -357,7 +357,7 @@ bool SoPlex::terminate()
                    << ", limit: " << maxValue << ")" << std::endl;
 #endif // !NDEBUG
          
-         m_abortType = VALUE;
+         m_abortReason = ABORT_VALUE;
          return true;
       }
    }
@@ -365,11 +365,10 @@ bool SoPlex::terminate()
    if( SPxBasis::status() >= SPxBasis::OPTIMAL  ||
        SPxBasis::status() <= SPxBasis::SINGULAR )
    {
-      m_abortType = FINISHED;
+      m_abortReason = OPTIMAL;
       return true;
    }
-
-   m_abortType = RUNNING;
+   m_abortReason = REGULAR;
    return false;
 }
 
@@ -533,10 +532,10 @@ SoPlex::Status SoPlex::getSlacks (Vector& p_vector) const
 
 SoPlex::Status SoPlex::status() const
 {
-   switch( m_abortType )
+   switch( m_abortReason )
    {
-   case RUNNING:      
-   case FINISHED:
+   case REGULAR:      
+   case OPTIMAL:
       switch (SPxBasis::status())
       {
       case SPxBasis::NO_PROBLEM :
@@ -544,11 +543,9 @@ SoPlex::Status SoPlex::status() const
       case SPxBasis::SINGULAR :
          return SINGULAR;
       case SPxBasis::REGULAR :
-         return REGULAR;
       case SPxBasis::DUAL :
-         return DUAL;
       case SPxBasis::PRIMAL :
-         return PRIMAL;
+         return REGULAR;
       case SPxBasis::OPTIMAL :
          return OPTIMAL;
       case SPxBasis::UNBOUNDED :
@@ -558,12 +555,10 @@ SoPlex::Status SoPlex::status() const
       default:
          return ERROR;
       }
-   case TIME:
-      return ABORT_TIME;
-   case ITERATION:
-      return ABORT_ITER;
-   case VALUE:
-      return ABORT_VALUE;
+   case ABORT_TIME:
+   case ABORT_ITER:
+   case ABORT_VALUE:
+      return m_abortReason;
    default:
       return ERROR;
    }

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.25 2002/01/18 14:30:06 bzfpfend Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.26 2002/01/19 13:54:42 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -32,7 +32,7 @@
 #include "updatevector.h"
 #include "subsvector.h"
 
-#define SOPLEX_VERSION   120
+#define SOPLEX_VERSION   121
 
 namespace soplex
 {
@@ -138,8 +138,8 @@ public:
    */
    enum SimplexType
    {
-      PRIMAL_SIMPLEX = -1,      ///< Primal Simplex Algorithm.
-      DUAL_SIMPLEX   = +1       ///< Dual Simplex Algorithm.
+      PRIMAL  = -1,      ///< Primal Simplex Algorithm.
+      DUAL    =  1       ///< Dual Simplex Algorithm.
    };
 
    /// Pricing type.
@@ -183,31 +183,20 @@ public:
 
    enum Status
    {
+      ABORT_TIME  = -6,  ///< #solve() aborted due to time limit.
+      ABORT_ITER  = -5,  ///< #solve() aborted due to iteration limit.
+      ABORT_VALUE = -4,  ///< #solve() aborted due to objective limit.
       ERROR       = -3,  ///< an error occured.
       NO_PROBLEM  = -2,  ///< No Problem has been loaded.
       SINGULAR    = -1,  ///< Basis is singular, numerical troubles?
       REGULAR     = 0,   ///< nothing known on loaded problem.
-      DUAL        = 1,   ///< dual (not yet optimal) solution available.
-      PRIMAL      = 2,   ///< primal (not yet optimal) solution available.
-      OPTIMAL     = 3,   ///< LP has been solved to optimality.
-      UNBOUNDED   = 4,   ///< LP has been proven to be unbounded.
-      INFEASIBLE  = 5,   ///< LP has been proven to be infeasible.
-      ABORT_TIME  = 6,   ///< algorithm has beed aborted due to time limit.
-      ABORT_ITER  = 7,   ///< algorithm has beed aborted due to iteration limit.
-      ABORT_VALUE = 8    ///< algorithm has beed aborted due to objective limit.
+      OPTIMAL     = 1,   ///< LP has been solved to optimality.
+      UNBOUNDED   = 2,   ///< LP has been proven to be unbounded.
+      INFEASIBLE  = 3,   ///< LP has been proven to be infeasible.
    };
    //@}
 
 private:
-   enum AbortType
-   {
-      RUNNING     = 0,   ///< not finished yet or unknown reason.
-      FINISHED    = 1,   ///< regular termination (e.g. with proof of optimality).
-      TIME        = 2,   ///< aborted due to time limit.
-      ITERATION   = 3,   ///< aborted due to iteration limit.
-      VALUE       = 4    ///< aborted due to objective limit.
-   };
-
    Type           theType;     ///< entering or leaving algortihm.
    Pricing        thePricing;  ///< full or partial pricing.
    Representation therep;      ///< row or column representation.
@@ -215,7 +204,7 @@ private:
    int            maxIters;    ///< maximum allowed iterations.
    double         maxTime;     ///< maximum allowed time.
    double         maxValue;    ///< maximum allowed objective value.
-   AbortType      m_abortType; ///< reason, why algorithm has been aborted.
+   Status         m_abortReason; ///< reason, why algorithm has been aborted.
 
    double         thedelta;
    double         theShift;    ///< shift of r/lhs or objective.
@@ -290,6 +279,11 @@ protected:
    SPxSimplifier*  thesimplifier;
 
 public:
+   /// Return the version of SoPlex as number like 123 for 1.2.3
+   int version() const
+   {
+      return SOPLEX_VERSION;
+   }
    /// return the current basis representation.
    Representation rep() const
    {
@@ -302,14 +296,10 @@ public:
       return theType;
    }
 
-   /// return simplex type, which is calculated from representation() and type().
+   /// return simplex type, calculated from representation() and type().
    SimplexType simplexType() const
    {
-      if( (rep() == ROW    && type() == ENTER) ||
-          (rep() == COLUMN && type() == LEAVE) )
-         return DUAL_SIMPLEX;
-      else
-         return PRIMAL_SIMPLEX;
+      return (rep() * type() > 0) ? DUAL : PRIMAL;
    }
 
    /// return current #Pricing.
@@ -346,7 +336,7 @@ public:
    //@{
    /// read LP from input stream.
    virtual bool read(std::istream& in, NameSet* rowNames = 0,
-                     NameSet* colNames = 0, DIdxSet* intVars = 0);
+      NameSet* colNames = 0, DIdxSet* intVars = 0);
 
    /// copy LP.
    virtual void loadLP(const SPxLP& LP);
@@ -375,7 +365,7 @@ public:
 
    /// load LP from \p filename in MPS or LPF format.
    bool readFile( const char* filename, NameSet* rowNames = 0,
-                  NameSet* colNames = 0, DIdxSet* intVars = 0);
+      NameSet* colNames = 0, DIdxSet* intVars = 0);
 
    /// dump loaded LP to \p filename in LPF format.
    void dumpFile(const char* filename) const;
