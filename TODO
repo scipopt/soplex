@@ -1,10 +1,25 @@
-$Id: TODO,v 1.49 2002/01/15 08:32:32 bzfkocht Exp $
+$Id: TODO,v 1.50 2002/01/16 21:58:31 bzfkocht Exp $
 
 Diesen Kram mal als @todo's schreiben ;-)
 
+real.h
+#ifdef WITH_LONG_DOUBLE
+typedef long double Real;
+#else
+typedef double Real;
+#endif
+change.awk
+/#include \"/ { print "include "real.h"; print }
+
+
+openMP insbesondere pricer/ratiotest (compaq,intel)
+
+cplexrun mit delta = 1e-9 für bessere werte in check.
+
 Wir bräuchten ein Programm, das ein LP ließt, eine Liste mit den 
 Variablenwerten der Lösung von SoPlex und dann guckt ob die Bounds
-stimmen usw. und so sagt ob die Lösung zulässig ist.
+stimmen usw. und so sagt ob die Lösung zulässig ist. AM besten mit
+rationaler arithmetik.
 
 SVSet::memPack, vermutlichen bug in flexelint melden. this-> ist überflüssig.
 
