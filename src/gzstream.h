@@ -18,8 +18,8 @@
 // ============================================================================
 //
 // File          : gzstream.h
-// Revision      : $Revision: 1.2 $
-// Revision_date : $Date: 2002/12/12 09:48:53 $
+// Revision      : $Revision: 1.3 $
+// Revision_date : $Date: 2003/01/06 14:36:20 $
 // Author(s)     : Deepak Bandyopadhyay, Lutz Kettner
 // 
 // Standard streambuf implementation following Nicolai Josuttis, "The 
@@ -46,7 +46,8 @@ namespace GZSTREAM_NAMESPACE {
 
 class gzstreambuf : public std::streambuf {
 private:
-    static const int bufferSize = 47+256;    // size of data buff
+    enum constants { bufferSize = 256 };
+    //    static const int bufferSize = 47+256;    // size of data buff
     // totals 512 bytes under g++ for igzstream at the end.
 
     gzFile           file;               // file handle for compressed file
