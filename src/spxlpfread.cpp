@@ -13,12 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.16 2002/01/27 09:59:10 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.17 2002/01/27 16:07:43 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
  */
 #include <assert.h>
+#include <stdio.h>
 #include <ctype.h>
 #include <iostream>
 
@@ -251,10 +252,8 @@ static bool hasKeyword(char*& pos, const char* keyword)
 
 /// If \p buf start with "name:" store the name in \p rownames 
 /// and advance \p pos. 
-static int hasRowName(char*& pos, NameSet* rownames)
+static bool hasRowName(char*& pos, NameSet* rownames)
 {
-   assert(rownames != 0);
-
    const char* s = strchr(pos, ':');
 
    if (s == 0)
@@ -278,7 +277,8 @@ static int hasRowName(char*& pos, NameSet* rownames)
 
    name[k] = '\0';
 
-   rownames->add(name);
+   if (rownames != 0)
+      rownames->add(name);
 
    pos += end + 1;
 
@@ -329,7 +329,7 @@ bool SPxLP::readLPF(
    LPRow     row;                   ///< last assembled row.
    LPRowSet  rset;                  ///< the set of rows read.
    DSVector  vec;                   ///< last assembled vector (from row).
-   Real    val = 1.0;
+   Real      val = 1.0;
    int       colidx;
    int       sense = 0;
 
@@ -337,6 +337,7 @@ bool SPxLP::readLPF(
    char      tmp [MAX_LINE_LEN];
    char      line[MAX_LINE_LEN];
    int       lineno = 0;
+   bool      unnamed  = true;
    bool      finished = false;
    bool      other;
    int       i;
@@ -412,6 +413,7 @@ bool SPxLP::readLPF(
             for(int j = vec.size() - 1; j >= 0; --j)
                cset.obj(vec.index(j)) = vec.value(j);
             vec.clear();
+
             section = CONSTRAINTS;
          }
       }
@@ -432,9 +434,14 @@ bool SPxLP::readLPF(
          }
       }
 
-      // 3. Look for row names.
-      if ((section == OBJECTIVE) || (section == CONSTRAINTS))
-         hasRowName(pos, rnames);
+      // 3a. Look for row names in objective and drop it.
+      if (section == OBJECTIVE)
+         hasRowName(pos, 0);
+
+      // 3b. Look for row name in constraint and store it.
+      if (section == CONSTRAINTS)
+         if (hasRowName(pos, rnames))
+            unnamed = false;
 
       // 4. Remove spaces.
       if ((section == BINARYS) || (section == INTEGERS))
@@ -522,6 +529,15 @@ bool SPxLP::readLPF(
                   row.setRowVector(vec);
                   rset.add(row);
                   vec.clear();
+
+                  if (!unnamed)
+                     unnamed = true;
+                  else
+                  {
+                     char name[16];
+                     sprintf(name, "_C%d", rset.num());
+                     rnames->add(name);
+                  }
                   sense = 0;
                   pos   = 0;
                   // next line

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxio.cpp,v 1.8 2002/01/19 18:59:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxio.cpp,v 1.9 2002/01/27 16:07:43 bzfkocht Exp $"
 
 
 #include <iostream>
@@ -55,7 +55,7 @@ bool SPxLP::read(
       ? readMPS(is, rowNames, colNames, intVars)
       : readLPF(is, rowNames, colNames, intVars);
 
-   //   std::cout << *this;
+   // std::cout << *this;
 
    return ok;
 }
@@ -67,7 +67,7 @@ static void dumpRows(std::ostream& s, const SPxLP& lp)
    s << "\nSubject To\n";
    for (i = 0; i < lp.nRows(); ++i)
    {
-      s << "  C" << i << ": ";
+      s << "  C" << (i + 1) << ": ";
       Real low;
       Real up;
       low = lp.lhs(i);

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.29 2002/01/24 10:08:09 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.30 2002/01/27 16:07:43 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -25,7 +25,7 @@
 #include "spxstarter.h"
 #include "spxsimplifier.h"
 
-//#define DEBUG 1
+#define DEBUG 1
 
 #ifdef DEBUG
 #undef NDEBUG
