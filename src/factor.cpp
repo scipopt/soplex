@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.19 2001/12/14 09:32:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.20 2001/12/14 22:33:33 bzfkocht Exp $"
 
 #include <iostream>
 #include <assert.h>
@@ -1364,39 +1364,48 @@ void CLUFactor::eliminateNucleus( const double eps,
 
 int CLUFactor::setupColVals()
 {
-   int i, j, k, n;
-   int*    idx;
-   double* val;
-   double* cval;
+   int i;
+   int n = thedim;
 
    if (u.col.val)
       spx_free(u.col.val);
 
+   // if we would know the old size of u.col.val, this could be a realloc.
    spx_alloc(u.col.val, u.col.size);
 
-   cval = u.col.val;
-
-   for (i = thedim - 1; i >= 0; --i)
+   for(i = 0; i < thedim; i++)
       u.col.len[i] = 0;
 
    maxabs = 0.0;
 
-   for (n = thedim, i = thedim - 1; i >= 0; --i)
+   for(i = 0; i < thedim; i++)
    {
-      j = u.row.start[i];
-      idx = &u.row.idx[j];
-      val = &u.row.val[j];
-      j = u.row.len[i];
-      n += j;
-      while (j--)
+      int     k   = u.row.start[i];
+      int*    idx = &u.row.idx[k];
+      double* val = &u.row.val[k];
+
+      n  += u.row.len[i];
+
+      for(int j = 0; j < u.row.len[i]; j++)
       {
-         k = u.col.start[*idx] + u.col.len[*idx]++;
+         assert((*idx >= 0) && (*idx < thedim));
+
+         k = u.col.start[*idx] + u.col.len[*idx];
+
+         assert(k < u.col.size);
+
+         u.col.len[*idx]++;
+
+         assert(u.col.len[*idx] <= u.col.max[*idx]);
+
          u.col.idx[k] = i;
-         cval[k] = *val;
+         u.col.val[k] = *val;
+
          if (fabs(*val) > maxabs)
             maxabs = fabs(*val);
-         ++idx;
-         ++val;
+
+         idx++;
+         val++;
       }
    }
    return n;
@@ -1488,12 +1497,10 @@ static void setupRowVals(CLUFactor* fc)
 
 /*****************************************************************************/
 
- 
 void CLUFactor::factor( 
-   SVector** vec,   /* Array of column vector pointers   */
-   double threshold,           /* pivoting threshold                */
-   double eps           /* epsilon for zero detection        */
-                   )
+   SVector** vec,           ///< Array of column vector pointers   
+   double    threshold,     ///< pivoting threshold                
+   double    eps)           ///< epsilon for zero detection        
 {
    stat = SLinSolver::OK;
 
