@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpswrite.cpp,v 1.1 2002/03/06 10:28:52 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpswrite.cpp,v 1.2 2002/03/06 11:45:22 bzfkocht Exp $"
 
 /**@file  spxmpswrite.cpp
  * @brief Write LP as MPS format file.
@@ -39,6 +39,7 @@ static void writeRecord(
    const char*    name2  = 0,
    const Real     value2 = 0.0) 
 {
+   ///@todo This would be nicer with iostreams, but it seems just too dumb.
 #if 0
    //scientific std::ios::showpoint | 
    os.setf(std::ios::scientific | std::ios::left);
@@ -101,7 +102,10 @@ static Real getRHS(Real left, Real right)
    return rhsval;
 }
 
-/**@todo Ranges are not yet supported.
+/// Write LP in "MPS File Format".
+/**@todo Ranges are not supported.
+ *       Integer Variable are not supported.
+ *       Names must be given. They will not be automatically generated.
  */
 void SPxLP::writeMPS(
    std::ostream&  p_output, 
