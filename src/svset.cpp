@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.cpp,v 1.5 2001/11/12 16:42:13 bzfpfend Exp $"
+#pragma ident "@(#) $Id: svset.cpp,v 1.6 2001/11/13 17:04:19 bzfbleya Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -136,7 +136,7 @@ void SVSet::xtend(SVector& svec, int newmax)
          ensureMem (newmax - ps->max() + 1);
          insert(memSize(), newmax - ps->max());
          ps->setMem (newmax + 1, ps->mem());
-         ps->size() = sz;
+         ps->set_size( sz );
       }
 
       else
@@ -153,13 +153,13 @@ void SVSet::xtend(SVector& svec, int newmax)
             int prevsz = prev->size();
             prev->setMem (prev->max()
                            + ps->max() + 2, prev->mem());
-            prev->size() = prevsz;
+            prev->set_size(prevsz);
          }
          list.remove(ps);
          list.append(ps);
 
          ps->setMem(newmax + 1, newps.mem());
-         ps->size() = sz;
+         ps->set_size(sz);
       }
    }
 }
@@ -192,7 +192,7 @@ void SVSet::remove(Key removekey)
       int sz = prev->size();
       prev->setMem (prev->max()
                      + ps->max() + 2, prev->mem());
-      prev->size() = sz;
+      prev->set_size(sz);
    }
 
    list.remove(ps);
@@ -216,7 +216,7 @@ void SVSet::remove(int perm[])
             SVector* prev = ps->prev();
             int sz = prev->size();
             prev->setMem (prev->max() + ps->max() + 2, prev->mem());
-            prev->size() = sz;
+            prev->set_size(sz);
          }
 
          list.remove(ps);
@@ -264,9 +264,11 @@ void SVSet::memRemax(int newmax)
       {
          SVector::Element * info = reinterpret_cast<SVector::Element*>(delta + long(ps->mem()));
          int sz = info->idx;
-         int l_max = *(reinterpret_cast<int*>( & info->val ));
+         int l_max = int( info->val );
+         assert(l_max >= sz );
          ps->setMem (l_max + 1, info);
-         ps->size() = sz;
+         ps->set_max (l_max);
+         ps->set_size(sz);
       }
    }
 }
@@ -286,7 +288,7 @@ void SVSet::memPack()
          for (j = 0; j <= sz; ++j)
             SVSet_Base::operator[](used + j) = ps->mem()[j];
          ps->setMem(sz + 1, &(SVSet_Base::operator[](used)));
-         ps->size() = sz;
+         ps->set_size(sz);
 
       }
       used += sz + 1;
@@ -300,7 +302,7 @@ void SVSet::memPack()
  */
 #define inconsistent                                                    \
 {                                                                       \
-std::cout << "ERROR: Inconsistency detected in class SVSet\n";           \
+std::cout << "ERROR: Inconsistency detected in class SVSet, Line " << __LINE__ << std::endl;           \
 return 0;                                                          \
 }
 
@@ -310,13 +312,14 @@ int SVSet::isConsistent() const
    DLPSV* next;
    for (ps = list.first(); ps; ps = next)
    {
+      if (!ps->isConsistent())
+         inconsistent;
       if (ps->mem() > &last())
          inconsistent;
       next = list.next(ps);
-      if (next && ps->mem() + ps->max() + 1 != next->mem())
+      if (next && ps->mem() + ps->max() + 1 != next->mem()) {
          inconsistent;
-      if (!ps->isConsistent())
-         inconsistent;
+      }
    }
    return DataArray < SVector::Element > ::isConsistent() && set.isConsistent() && list.isConsistent();
 }
@@ -338,7 +341,7 @@ SVSet& SVSet::operator=(const SVSet& rhs)
       newps = & set[ rhs.number(ps) ];
       list.append(newps);
       newps->setMem(ps->max() + 1, reinterpret_cast<SVector::Element*>(long(ps->mem()) + delta));
-      newps->size() = ps->size();
+      newps->set_size( ps->size() );
    }
 
    assert(isConsistent());

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.cpp,v 1.2 2001/11/06 23:31:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svector.cpp,v 1.3 2001/11/13 17:04:17 bzfbleya Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -45,16 +45,16 @@ namespace soplex
 void SVector::toFront(int n)
 {
    assert(n < size() && n >= 0);
-   Element dummy = elem[n];
-   elem[n] = elem[0];
-   elem[0] = dummy;
+   Element dummy = m_elem[n];
+   m_elem[n] = m_elem[0];
+   m_elem[0] = dummy;
 }
 
 void SVector::add(int n, const int i[], const double v[])
 {
    assert(n + size() <= max());
-   Element* e = elem + size();
-   size() += n;
+   Element* e = m_elem + size();
+   set_size( size() + n );
    while (n--)
    {
       e->idx = *i++;
@@ -66,8 +66,8 @@ void SVector::add(int n, const int i[], const double v[])
 void SVector::add(int n, const Element e[])
 {
    assert(n + size() <= max());
-   Element* ee = elem + size();
-   size() += n;
+   Element* ee = m_elem + size();
+   set_size( size() + n );
    while (n--)
       *ee++ = *e++;
 }
@@ -80,9 +80,9 @@ void SVector::remove(int n, int m)
    int cpy = m - n;
    cpy = (size() - m >= cpy) ? cpy : size() - m;
 
-   Element* e = &elem[size() - 1];
-   Element* r = &elem[n];
-   size() -= cpy;
+   Element* e = &m_elem[size() - 1];
+   Element* r = &m_elem[n];
+   set_size( size() - cpy );
    do
    {
       *r++ = *e--;
@@ -92,7 +92,7 @@ void SVector::remove(int n, int m)
 
 int SVector::dim() const
 {
-   Element* e = elem;
+   const Element* e = m_elem;
    int d = -1;
    int n = size();
    while (n--)
@@ -108,7 +108,7 @@ void SVector::sort()
    Element dummy;
    Element* w;
    Element* l;
-   Element* s = &(elem[0]);
+   Element* s = &(m_elem[0]);
    Element* e = s + size();
    for (l = s, w = s + 1; w < e; l = w, ++w)
    {
@@ -135,7 +135,7 @@ double SVector::length2() const
 {
    double x = 0;
    int n = size();
-   Element* e = elem;
+   const Element* e = m_elem;
    while (n--)
    {
       x += e->val * e->val;
@@ -148,7 +148,7 @@ double SVector::maxAbs() const
 {
    double x = 0;
    int n = size();
-   Element* e = elem;
+   const Element* e = m_elem;
    while (n--)
    {
       x = (e->val > x) ? e->val : ((-e->val > x) ? -e->val : x);
@@ -160,7 +160,7 @@ double SVector::maxAbs() const
 SVector& SVector::operator*=(double x)
 {
    int n = size();
-   Element* e = elem;
+   Element* e = m_elem;
    while (n--)
    {
       e->val *= x;
@@ -175,9 +175,9 @@ SVector& SVector::operator*=(double x)
 SVector& SVector::operator=(const SSVector& sv)
 {
    assert(max() >= sv.size());
-   size() = sv.size();
+   set_size( sv.size() );
    int i = size();
-   Element *e = elem;
+   Element *e = m_elem;
 
    while (i--)
    {
@@ -185,7 +185,6 @@ SVector& SVector::operator=(const SSVector& sv)
       e->val = sv[e->idx];
       ++e;
    }
-
    return *this;
 }
 
@@ -193,7 +192,7 @@ SVector& SVector::operator=(const Vector& vec)
 {
    int n = 0;
    int i = vec.dim();
-   Element *e = elem;
+   Element *e = m_elem;
    clear();
    while (i--)
    {
@@ -206,8 +205,7 @@ SVector& SVector::operator=(const Vector& vec)
          ++n;
       }
    }
-   size() = n;
-   assert(isConsistent());
+   set_size( n );
    return *this;
 }
 
@@ -216,7 +214,7 @@ SVector& SVector::assign(const Vector& vec, double eps)
    int n = 0;
    int i = vec.dim();
    double x;
-   Element* e = elem;
+   Element* e = m_elem;
    clear();
    while (i--)
    {
@@ -230,19 +228,19 @@ SVector& SVector::assign(const Vector& vec, double eps)
          ++n;
       }
    }
-   size() = n;
-   assert(isConsistent());
+   set_size( n );
    return *this;
 }
 
 SVector& SVector::operator=(const SVector& sv)
 {
    assert(max() >= sv.size());
-   int i = size() = sv.size();
-   Element *e = elem;
-   Element *s = sv.elem;
+   int i = sv.size();
+   Element       *e = m_elem;
+   const Element *s = sv.m_elem;
    while (i--)
       *e++ = *s++;
+   set_size( sv.size() );
    return *this;
 }
 
@@ -274,22 +272,25 @@ std::ostream& operator<<(std::ostream& os, const SVector& v)
  */
 #define inconsistent                                                    \
 {                                                                       \
-std::cout << "ERROR: Inconsistency detected in class SVector\n"; \
+std::cout << "ERROR: Inconsistency detected in class SVector, Line " << __LINE__ << std::endl; \
 return 0;                                                          \
 }
 
 int SVector::isConsistent() const
 {
-   if (elem)
+   if (m_elem)
    {
-      if (size() > max())
+      if (size() > max()){
          inconsistent;
+      }
       for (int i = 1; i < size(); ++i)
       {
          for (int j = 0; j < i; ++j)
          {
-            if (elem[i].idx == elem[j].idx)
+            if (m_elem[i].idx == m_elem[j].idx &&
+                m_elem[i].idx != 0 ) { // allow trailing zeros
                inconsistent;
+            }
          }
       }
    }

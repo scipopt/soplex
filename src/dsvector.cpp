@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dsvector.cpp,v 1.4 2001/11/11 20:27:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dsvector.cpp,v 1.5 2001/11/13 17:04:15 bzfbleya Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -59,7 +59,7 @@ void DSVector::setMax(int newmax)
       exit(-1);
    }
    setMem (len, theelem);
-   size() = siz;
+   set_size( siz );
 }
 
 DSVector& DSVector::operator=(const Vector& vec)
@@ -115,7 +115,7 @@ return 0;                                                          \
 
 int DSVector::isConsistent() const
 {
-   if (theelem && elem - 1 != theelem)
+   if (theelem && m_elem - 1 != theelem)
       inconsistent;
    return 1;
 }

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.h,v 1.4 2001/11/11 20:27:34 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svector.h,v 1.5 2001/11/13 17:04:18 bzfbleya Exp $"
 
 #ifndef _SVECTOR_H_ 
 #define _SVECTOR_H_
@@ -105,7 +105,7 @@ protected:
         number of elements allowed is stored in the -1st #Element# in its members
         #idx# and #val# respectively.
    */
-   Element *elem;
+   Element *m_elem;
 
 public:
    /**@name Modification */
@@ -117,16 +117,16 @@ public:
    void add(int i, double v)
    {
       int n = size();
-      elem[n].idx = i;
-      elem[n].val = v;
-      size() = n + 1;
+      m_elem[n].idx = i;
+      m_elem[n].val = v;
+      set_size( n + 1 );
       assert(size() <= max());
    }
 
    /// append nonzeros of #sv#.
    void add(const SVector& sv)
    {
-      add(sv.size(), sv.elem);
+      add(sv.size(), sv.m_elem);
    }
 
    /// append #n# nonzeros.
@@ -142,12 +142,13 @@ public:
    void remove(int n)
    {
       assert(n < size() && n >= 0);
-      elem[n] = elem[--size()];
+      set_size( size() - 1 );
+      m_elem[n] = m_elem[size()];
    }
    /// remove all indices.
    void clear()
    {
-      size() = 0;
+      set_size(0);
    }
 
    /// sort nonzero to increasing indices.
@@ -160,13 +161,13 @@ public:
    /// number of used indeces.
    int size() const
    {
-      return elem[ -1].idx;
+      return m_elem[ -1].idx;
    }
 
    /// maximal number indeces.
    int max() const
    {
-      return int(elem[ -1].val);
+      return int(m_elem[ -1].val);
    }
 
    /// maximal index.
@@ -180,7 +181,7 @@ public:
    int number(int i) const
    {
       int n = size();
-      Element* e = &(elem[n]);
+      Element* e = &(m_elem[n]);
       while (n--)
       {
          --e;
@@ -195,7 +196,7 @@ public:
    {
       int n = number(i);
       if (n >= 0)
-         return elem[n].val;
+         return m_elem[n].val;
       return 0;
    }
 
@@ -203,42 +204,42 @@ public:
    Element& element(int n)
    {
       assert(n >= 0 && n < max());
-      return elem[n];
+      return m_elem[n];
    }
 
    /// get #n#-th nonzero element.
    Element element(int n) const
    {
       assert(n >= 0 && n < size());
-      return elem[n];
+      return m_elem[n];
    }
 
    ///
    int& index(int n)
    {
       assert(n >= 0 && n < size());
-      return elem[n].idx;
+      return m_elem[n].idx;
    }
 
    /// get index of #n#-th nonzero.
    int index(int n) const
    {
       assert(n >= 0 && n < size());
-      return elem[n].idx;
+      return m_elem[n].idx;
    }
 
    ///
    double& value(int n)
    {
       assert(n >= 0 && n < size());
-      return elem[n].val;
+      return m_elem[n].val;
    }
 
    /// get value of #n#-th nonzero.
    double value(int n) const
    {
       assert(n >= 0 && n < size());
-      return elem[n].val;
+      return m_elem[n].val;
    }
    //@}
 
@@ -265,7 +266,7 @@ public:
    {
       double x = 0;
       int n = size();
-      Element* e = elem;
+      Element* e = m_elem;
 
       while (n--)
       {
@@ -313,17 +314,23 @@ public:
    // Internals.
    Element* mem() const
    {
-      return elem -1;
+      return m_elem -1;
    }
-   int& size()
+//     int& size()
+//     {
+//        assert(m_elem);
+//        return m_elem[ -1].idx;
+//     }
+   void set_size(int s)
    {
-      assert(elem);
-      return elem[ -1].idx;
+      assert(m_elem);
+      m_elem[ -1].idx = s;
    }
+      
    void set_max(int m)
    {
-      assert(elem);
-      elem[ -1].val = m;
+      assert(m_elem);
+      m_elem[ -1].val = m;
    }
    void setMem(int n, Element* elmem)
    {
@@ -332,12 +339,12 @@ public:
          assert(n > 0);
          assert(elmem);
          elmem->val = 0;        // for purify to shut up
-         elem = &(elmem[1]);
-         size() = 0;
-         set_max( n - 1 );
+         m_elem = &(elmem[1]);
+         set_size( 0 );
+         set_max ( n - 1 );
       }
       else
-         elem = 0;
+         m_elem = 0;
    }
    //@}
 
@@ -346,7 +353,7 @@ public:
 inline Vector& Vector::multAdd(double x, const SVector& vec)
 {
    assert(vec.dim() <= dim());
-   Vector_MultAddSVector(val, x, vec.size(), vec.elem);
+   Vector_MultAddSVector(val, x, vec.size(), vec.m_elem);
    return *this;
 }
 

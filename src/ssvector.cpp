@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.5 2001/11/12 16:42:12 bzfpfend Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.6 2001/11/13 17:04:17 bzfbleya Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -713,7 +713,7 @@ SSVector& SSVector::assign(const SVector& rhs)
 {
    assert(rhs.dim() <= Vector::dim());
 
-   SVector::Element* e = rhs.elem;
+   const SVector::Element* e = rhs.m_elem;
    int* p = idx;
    int i = rhs.size();
 

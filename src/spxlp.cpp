@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.cpp,v 1.3 2001/11/12 16:42:06 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxlp.cpp,v 1.4 2001/11/13 17:04:16 bzfbleya Exp $"
 
 
 /* \Section{Complex Methods}
@@ -158,7 +158,7 @@ void SPxLP::added2Set(SVSet& p_set, const SVSet& p_add, int n)
    {
       j = p_set[i].size();
       p_set.xtend(p_set[i], j + more[i]);
-      p_set[i].size() = j + more[i];
+      p_set[i].set_size( j + more[i] );
       more[i] = j;
    }
 
@@ -296,7 +296,7 @@ void SPxLP::doAddCols(const LPColSet& p_set)
       {
          int len = newRows[i] + rowVector(i).size();
          LPRowSet::xtend(i, len);
-         rowVector(i).size() = len;
+         rowVector(i).set_size( len );
       }
    }
 
