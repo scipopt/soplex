@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.51 2002/05/15 13:38:44 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.52 2002/11/01 08:19:17 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -40,10 +40,10 @@ SoPlex::Status SoPlex::solve()
    int leaveNum;
 
    if (dim() <= 0 && coDim() <= 0) // no problem loaded
-      return ERROR;
+      return NO_PROBLEM;
 
    if (slinSolver() == 0) // linear system solver is required.
-      return ERROR;
+      return NO_SOLVER;
 
    if (thesimplifier != 0)
    {
@@ -67,7 +67,7 @@ SoPlex::Status SoPlex::solve()
       thescaler->scale();
    }
    if (thepricer == 0) // pricer is required.
-      return ERROR;
+      return NO_PRICER;
 
    theTime.reset();
    theTime.start();
@@ -714,6 +714,8 @@ SoPlex::Status SoPlex::status() const
    case RUNNING:
    case REGULAR:
    case NOT_INIT:
+   case NO_SOLVER:
+   case NO_PRICER:
    case ERROR:
       return m_status;
    default:

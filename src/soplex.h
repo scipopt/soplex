@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.52 2002/10/23 10:40:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.53 2002/11/01 08:19:17 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -174,7 +174,10 @@ public:
      */
    enum Status
    {
-      ERROR       = -9,  ///< an error occured.
+
+      ERROR       = -11, ///< an error occured.
+      NO_PRICER   = -10, ///< No pricer loaded
+      NO_SOLVER   = -9,  ///< No linear solver loaded
       NOT_INIT    = -8,  ///< not initialised error
       ABORT_TIME  = -7,  ///< #solve() aborted due to time limit.
       ABORT_ITER  = -6,  ///< #solve() aborted due to iteration limit.

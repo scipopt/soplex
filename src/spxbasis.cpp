@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.31 2002/08/27 07:20:37 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.32 2002/11/01 08:19:17 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -391,20 +391,20 @@ int SPxBasis::doFactorize()
    if (nonzeroFactor < 0)
       return (updateCount >= -nonzeroFactor);
 
+   assert(updateCount > 0);
+
    Real newFac = nzFac + factor->memory();
-   Real neu = (newFac + lastFill * nzCount) / (updateCount + 1);
-   Real alt = (nzFac + lastFill * nzCount) / (updateCount + 1);
+   Real neu    = (newFac + lastFill * nzCount) / (updateCount + 1);
+   Real alt    = (nzFac + lastFill * nzCount) / updateCount;
 
    return (updateCount >= maxUpdates || neu > alt);
 }
 
-void SPxBasis::change
-(
+void SPxBasis::change(
    int i,
    SPxId& id,
    const SVector* enterVec,
-   const SSVector* eta
-)
+   const SSVector* eta)
 {
    METHOD( "SPxBasis::change()" );
    assert(matrixIsSetup);
