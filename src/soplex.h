@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.18 2002/01/10 23:07:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.19 2002/01/12 11:41:25 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -67,6 +67,9 @@ class SPxSimplifier;
  
    Also, #SPxLP provide all manipulation methods for the LP. They allow
    #SoPlex to be used within cutting plane algorithms. (@see Programming)
+
+   @todo We need a quiet or verbose variable to select the amount of
+         information messages we give.
 */
 class SoPlex : public SPxLP, protected SPxBasis
 {

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.h,v 1.8 2002/01/11 21:05:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.h,v 1.9 2002/01/12 11:41:25 bzfkocht Exp $"
 
 /**@file  spxdevexpr.h
  * @brief Devex pricer.
@@ -80,6 +80,10 @@ public:
    virtual void addedCoVecs(int n);
    ///
    virtual bool isConsistent() const;
+   /// default constructor
+   SPxDevexPR() 
+      : SPxPricer("Devex")
+   {}   
 };
 
 } // namespace soplex

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.h,v 1.7 2002/01/04 17:31:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.h,v 1.8 2002/01/12 11:41:25 bzfkocht Exp $"
 
 
 /**@file  spxsteeppr.h
@@ -129,7 +129,7 @@ public:
 
    ///
    SPxSteepPR()
-      : SPxPricer()
+      : SPxPricer("Steep")
       , workRhs (0, 1e-16)
       , setup (DEFAULT)
       , accuracy(1e-4)

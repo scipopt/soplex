@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxparmultpr.h,v 1.6 2002/01/04 17:31:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxparmultpr.h,v 1.7 2002/01/12 11:41:25 bzfkocht Exp $"
 
 /**@file  spxparmultpr.h
  * @brief Partial multiple pricing.
@@ -74,6 +74,10 @@ public:
    virtual int selectLeave();
    ///
    virtual SPxLP::Id selectEnter();
+   /// default constructor
+   SPxParMultPR() 
+      : SPxPricer("ParMult")
+   {}   
 };
 
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultpr.h,v 1.7 2002/01/04 17:31:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefaultpr.h,v 1.8 2002/01/12 11:41:25 bzfkocht Exp $"
 
 /**@file  spxdefaultpr.h
  * @brief Default pricer.
@@ -36,6 +36,8 @@ namespace soplex
    maximal violated constraint.
 
    See #SPxPricer for a class documentation.
+
+   @todo This should be renamed to something like Danzig or Textbook pricing.
 */
 class SPxDefaultPR : public SPxPricer
 {
@@ -50,6 +52,11 @@ public:
    virtual int selectLeave();
    ///
    virtual SoPlex::Id selectEnter();
+
+   /// default constructor
+   SPxDefaultPR() 
+      : SPxPricer("Danzig")
+   {}   
 };
 } // namespace soplex
 #endif // _SPXDEFAULTPRR_H_

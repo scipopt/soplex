@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.11 2002/01/06 11:14:19 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.12 2002/01/12 11:41:25 bzfkocht Exp $"
 
 #include <iostream>
 
@@ -71,19 +71,22 @@ void SPxHybridPR::setType(SoPlex::Type tp)
    {
       if (thesolver->dim() > hybridFactor * thesolver->coDim())
       {
-         thepricer = &devex;
+         /**@todo I changed from devex to steepest edge pricing here 
+          *       because of numerical difficulties, this should be 
+          *       investigated.
+          */
+         // thepricer = &devex;
+         thepricer = &steep;
          thesolver->setPricing(SoPlex::FULL);
-
-         std::cout << "switching to devex" << std::endl;
       }
       else
       {
          thepricer = &parmult;
          thesolver->setPricing(SoPlex::PARTIAL);
-
-         std::cout << "switching to partial multiple pricing" << std::endl;
       }
    }
+   std::cout << "switching to " << thepricer->name() << std::endl;
+
    thepricer->setType(tp);
 }
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.26 2002/01/10 23:07:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.27 2002/01/12 11:41:25 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -92,7 +92,7 @@ void SoPlex::loadBasis(const SPxBasis::Desc& p_desc)
 
 void SoPlex::setPricer(SPxPricer* x)
 {
-   if (x)
+   if (x != 0)
    {
       setPricing(FULL);
       if (isInitialized() && x != thepricer)
@@ -153,6 +153,12 @@ void SoPlex::setType(Type tp)
       thepricer->setType(tp);
    if ((theratiotester != 0) && (theratiotester->solver() == this))
       theratiotester->setType(tp);
+
+   std::cout << "switching to " 
+             << static_cast<const char*>
+                ((tp == LEAVE) ? "leaving" : "entering")
+             << " algorithm" 
+             << std::endl;
 }
 
 void SoPlex::setRep(int rp)

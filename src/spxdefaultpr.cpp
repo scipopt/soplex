@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultpr.cpp,v 1.5 2001/12/25 14:25:55 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefaultpr.cpp,v 1.6 2002/01/12 11:41:25 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -24,7 +24,6 @@
 
 namespace soplex
 {
-
 int SPxDefaultPR::selectLeaveX(int start, int incr)
 {
    assert(thesolver != 0);

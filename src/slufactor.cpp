@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.14 2001/12/28 14:55:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.15 2002/01/12 11:41:25 bzfkocht Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -24,6 +24,8 @@
 #include "slufactor.h"
 #include "cring.h"
 #include "spxalloc.h"
+
+//define DEBUG 1
 
 namespace soplex
 {
@@ -334,7 +336,7 @@ SLUFactor::Status SLUFactor::change(
    }
    usetup = 0;
 #ifdef  DEBUG
-   std::cerr << "\tupdated\t\tstability = " << stability() << std::endl;
+   std::cout << "\tupdated\t\tstability = " << stability() << std::endl;
 #endif 
    return status();
 }
@@ -800,7 +802,7 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
    dump();
 #endif
 
-   std::cerr << "threshold = " << lastThreshold 
+   std::cout << "threshold = " << lastThreshold 
              << "\tstability = " << stability() << std::endl;
 #endif
 

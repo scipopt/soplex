@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxpricer.h,v 1.5 2002/01/04 17:31:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxpricer.h,v 1.6 2002/01/12 11:41:25 bzfkocht Exp $"
 
 
 /**@file  spxpricer.h
@@ -49,12 +49,19 @@ namespace soplex
 class SPxPricer
 {
 protected:
-   SoPlex* thesolver;
-   double  theeps;
+   const char* m_name;
+   SoPlex*     thesolver;
+   double      theeps;
 
 public:
    /**@name Initialization */
    //@{
+   /// get name of pricer.
+   virtual const char* name()
+   {
+      return m_name;
+   }
+
    /// loads LP.
    /** Loads the solver and LP for which pricing steps are to be performed.
     */
@@ -190,15 +197,17 @@ public:
 
    /**@name Constructors / Destructors */
    //@{
-   /// default constructor
-   SPxPricer()
-      : thesolver(0)
+   /// constructor
+   explicit SPxPricer(const char* p_name)
+      : m_name(p_name)
+      , thesolver(0)
       , theeps(0.0)
    {}
 
    /// destructor.
    virtual ~SPxPricer()
    {
+      m_name    = 0;
       thesolver = 0;
    }
    //@}

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.14 2002/01/11 21:05:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.15 2002/01/12 11:41:25 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -85,7 +85,7 @@ int main(int argc, char **argv)
    SoPlex::Representation representation = SoPlex::COLUMN;
    SLUFactor::UpdateType  update         = SLUFactor::FOREST_TOMLIN;
    int                    starter        = 0;
-   int                    pricing        = 4;
+   int                    pricing        = 3;
    int                    ratiotest      = 2;
    int                    simplifier     = 3;
    double                 timelimit      = -1.0;
@@ -155,36 +155,34 @@ int main(int argc, char **argv)
              << " update"
              << std::endl;
 
+   SPxPricer* pricer;
+
    switch (pricing)
    {
    case 5 :
-      work.setPricer(new SPxWeightPR);
-      std::cout << "Weight";
+      pricer = new SPxWeightPR;
       break;
    case 4 :
-      work.setPricer(new SPxSteepPR);
-      std::cout << "Steepest edge";
+      pricer = new SPxSteepPR;
       break;
    case 3 :
-      work.setPricer(new SPxHybridPR);
-      std::cout << "Hybrid";
+      pricer = new SPxHybridPR;
       break;
    case 2 :
-      work.setPricer(new SPxDevexPR);
-      std::cout << "Devex";
+      pricer = new SPxDevexPR;
       break;
    case 1 :
-      work.setPricer(new SPxParMultPR);
-      std::cout << "Partial multiple";
+      pricer = new SPxParMultPR;
       break;
-   case 0 :
+   case 0 : 
       /*FALLTHROUGH*/
-   default:
-      work.setPricer(new SPxDefaultPR);
-      std::cout << "Default";
+   default :
+      pricer = new SPxDefaultPR;
       break;
    }
-   std::cout << " pricing" << std::endl;
+   work.setPricer(pricer);
+
+   std::cout << pricer->name() << " pricing" << std::endl;
    assert(work.isConsistent());
 
    switch (ratiotest)
@@ -315,6 +313,8 @@ int main(int argc, char **argv)
       break;
    }
    std::cout << std::endl;
+
+   delete pricer;
 
    return 0;
 }
