@@ -1,7 +1,8 @@
-#--- $Id: make.aix.pwr4.ibm.dbg,v 1.2 2002/03/15 19:05:53 bzfkocht Exp $
-CXX	=	xlC
+#--- $Id: make.aix.pwr4.ibm.dbg,v 1.3 2002/03/17 20:44:39 bzfkocht Exp $
+CXX	=	xlC_r
 CPPFLAGS=	-Isrc 
-CXXFLAGS=	-g -q32 \
+CXXFLAGS=	-g -q32  \
 		-qsuppress=1540-1405:1540-5314 
+# -qheapdebug -qflttrap -qcheck=all -qinfo=all -qwarn64 -extchk
 LDFLAGS	=	-lm
 ARFLAGS	=	crs
