@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.65 2005/01/06 18:23:52 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.66 2005/01/06 19:51:39 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -173,9 +173,9 @@ int main(int argc, const char* const argv[])
    " -s0 none       -g0 none         -c0 none*   -p0 Textbook  -t0 Textbook\n"
    " -s1 General*   -g1 C-uni-Equi   -c1 Weight  -p1 ParMult   -t1 Harris\n"
    " -s2 Aggregate  -g2 R-uni-Equi   -c2 Sum     -p2 Devex     -t2 Fast*\n"
-   " -s3 Redundant  -g3 bi-Equi*     -c3 Vector  -p3 Hybrid\n"
-   " -s4 Interval   -g4 bi-Equi+Geom             -p4 Steep*\n"
-   "                                             -p5 Weight\n" 
+   " -s3 Redundant  -g3 bi-Equi      -c3 Vector  -p3 Hybrid\n"
+   " -s4 Interval   -g4 bi-Equi+Geom1*           -p4 Steep*\n"
+   "                -g5 bi-Equi+Geom8            -p5 Weight\n" 
    ;
 
    const char*               filename;
@@ -194,7 +194,7 @@ int main(int argc, const char* const argv[])
    int                       starting       = 0;
    int                       pricing        = 4;
    int                       ratiotest      = 2;
-   int                       scaling        = 3;
+   int                       scaling        = 4;
    int                       simplifing     = 1;
    Real                      timelimit      = -1.0;
    Real                      delta          = DEFAULT_BND_VIOL;
@@ -392,9 +392,13 @@ int main(int argc, const char* const argv[])
 
    switch(scaling)
    {
+   case 5:
+      prescaler  = new SPxEquiliSC(representation == SPxSolver::COLUMN, true);
+      postscaler = new SPxGeometSC(representation == SPxSolver::COLUMN, 8);
+      break; 
    case 4:
       prescaler  = new SPxEquiliSC(representation == SPxSolver::COLUMN, true);
-      postscaler = new SPxGeometSC(representation == SPxSolver::COLUMN);
+      postscaler = new SPxGeometSC(representation == SPxSolver::COLUMN, 1);
       break; 
    case 3 :
       prescaler  = new SPxEquiliSC(representation == SPxSolver::COLUMN, true);

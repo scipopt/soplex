@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.26 2005/01/06 17:12:10 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.27 2005/01/06 19:51:40 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -97,7 +97,7 @@ void SSVector::setValue(int i, Real x)
    assert(isConsistent());
 }
 
-#if 0 // old version
+#if USE_OLD // old version
 void SSVector::setup()
 {
    if (!isSetup())
@@ -307,7 +307,7 @@ SSVector& SSVector::operator*=(Real x)
    return *this;
 }
 
-#if 0 // old
+#if USE_OLD // old
 Real SSVector::maxAbs() const
 {
    if (isSetup())
@@ -532,7 +532,7 @@ SSVector& SSVector::multAdd(Real x, const Vector& vec)
    return *this;
 }
 
-#if 0 // old version
+#if USE_OLD // old version
 SSVector& SSVector::operator=(const SSVector& rhs)
 {
    assert(rhs.isConsistent());
@@ -641,7 +641,7 @@ SSVector& SSVector::operator=(const SSVector& rhs)
 }
 #endif // 0
 
-#if 0 // old version
+#if USE_OLD // old version
 void SSVector::setup_and_assign(SSVector& rhs)
 {
    assert(rhs.isConsistent());
@@ -763,7 +763,7 @@ SSVector& SSVector::operator=(const SVector& rhs)
    return assign(rhs);
 }
 
-#if 0 // old version
+#if USE_OLD // old version
 SSVector& SSVector::assign(const SVector& rhs)
 {
    assert(rhs.dim() <= Vector::dim());

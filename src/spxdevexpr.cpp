@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.19 2003/01/13 19:04:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.20 2005/01/06 19:51:40 bzfkocht Exp $"
 
 #include "spxdefines.h"
 #include "spxdevexpr.h"
@@ -258,25 +258,7 @@ void SPxDevexPR::entered4X(SPxId /*id*/, int n,
    }
 }
 
-void SPxDevexPR::addedVecs (int n)
-{
-   int init = (thesolver->type() == SPxSolver::ENTER) ? 2 : 1;
-   n = penalty.dim();
-   penalty.reDim (thesolver->coDim());
-   for (int i = penalty.dim()-1; i >= n; --i )
-      penalty[i] = init;
-}
-
-void SPxDevexPR::addedCoVecs(int n)
-{
-   int init = (thesolver->type() == SPxSolver::ENTER) ? 2 : 1;
-   n = coPenalty.dim();
-   coPenalty.reDim(thesolver->dim());
-   for (int i = coPenalty.dim()-1; i >= n; --i)
-      coPenalty[i] = init;
-}
-
-#if 0
+#if USE_OLD
 /**@todo remove this code */
 // ??? This is the old (buggy?) code
 void SPxDevexPR::addedVecs (int n)
@@ -296,7 +278,26 @@ void SPxDevexPR::addedCoVecs(int n)
    for (int i = coPenalty.dim(); --i >= n;)
       coPenalty[i] = init;
 }
+#else
+void SPxDevexPR::addedVecs (int n)
+{
+   int init = (thesolver->type() == SPxSolver::ENTER) ? 2 : 1;
+   n = penalty.dim();
+   penalty.reDim (thesolver->coDim());
+   for (int i = penalty.dim()-1; i >= n; --i )
+      penalty[i] = init;
+}
+
+void SPxDevexPR::addedCoVecs(int n)
+{
+   int init = (thesolver->type() == SPxSolver::ENTER) ? 2 : 1;
+   n = coPenalty.dim();
+   coPenalty.reDim(thesolver->dim());
+   for (int i = coPenalty.dim()-1; i >= n; --i)
+      coPenalty[i] = init;
+}
 #endif
+
 
 } // namespace soplex
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeometsc.h,v 1.3 2003/01/12 13:09:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeometsc.h,v 1.4 2005/01/06 19:51:40 bzfkocht Exp $"
 
 /**@file  spxgeometsc.h
  * @brief LP geometric mean scaling.
@@ -49,7 +49,7 @@ public:
    virtual void scale(SPxLP& lp);
 
    /// default constructor.
-   explicit SPxGeometSC(bool colFirst = true, int maxIters = 8, Real minImpr = 0.9, Real goodEnough = 1e2);
+   explicit SPxGeometSC(bool colFirst = true, int maxIters = 8, Real minImpr = 0.85, Real goodEnough = 1e3);
 };
 } // namespace soplex
 #endif // _SPXGEOMETSC_H_

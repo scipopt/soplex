@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeometsc.cpp,v 1.7 2003/02/11 09:29:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeometsc.cpp,v 1.8 2005/01/06 19:51:40 bzfkocht Exp $"
 
 /**@file  spxgeometsc.cpp
  * @brief Geometric mean row/column scaling.
@@ -31,7 +31,7 @@ static const char* makename(bool colFirst)
 
 /**@param maxIters   arbitrary small number, we choose 8
    @param minImpr    Bixby said Fourer said in MP 23, 274 ff. that 0.9 is a good value.
-   @param goodEnough if the max/min ratio is allready less then 100/1 we do not scale.
+   @param goodEnough if the max/min ratio is allready less then 1000/1 we do not scale.
 */ 
 SPxGeometSC::SPxGeometSC(bool colFirst, int maxIters, Real minImpr, Real goodEnough)
    : SPxScaler(makename(colFirst), colFirst, true)
@@ -107,8 +107,8 @@ void SPxGeometSC::scale(SPxLP& lp)
    }      
    
    // we scale only if either:
-   // - we had at the beginng a ratio worse then 100/1
-   // - we have at least a 10% improvement.
+   // - we had at the beginng a ratio worse then 1000/1
+   // - we have at least a 15% improvement.
    if (pstart < m_goodEnoughRatio || p1 > pstart * m_minImprovement)
    {
       // reset m_colscale/m_rowscale to 1.0
