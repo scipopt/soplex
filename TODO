@@ -1,5 +1,3 @@
-die ganzen "inconstent" macros durch was vernümftiges ersetzen.
-
 die assignment operatoren auf if (this == rhs) durchsehen)
 
 die constructoren auf einparametriege durchsehen (explicit)
