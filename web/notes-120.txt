@@ -9,8 +9,8 @@ What's new
  - New MPS and LPF format loading routines 
  - Everything is contained in the namespace "soplex"
  - Extended HTML documentation now generated with doxygen
- - Extended example (commandline solver) program
- - Testscripts to run the Netlib up and down
+ - Extended example (command line solver) program
+ - Test scripts to run the Netlib up and down
  
 
 Remarks
@@ -34,7 +34,7 @@ in the LC/EC column are in seconds.
 CPU          OS      COMP           LC   EC Fails 
 -------------------------------------------------------------------------------
 P4/1.7       Linux   GNU 2.95.3    594  550 greenbea(ER)
-AMD XP1800+  Linux   GNU 3.03      643  624 greenbea(ER),pilot(ER)
+AMD XP1800+  Linux   GNU 3.0.3     643  624 greenbea(ER),pilot(ER)
 AMD 1000     Linux   Intel 5.0.1   937  913 greenbea(ER)
 EV67/833/4   Linux   Compaq 6.3    543  507 greenbea(ER),greenbeb(LR) 
 EV67/833/4   Linux   GNU 2.96      570  652 greenbea(LR),pilot-ja(LR) 

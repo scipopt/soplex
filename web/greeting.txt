@@ -1,0 +1,12 @@
+This is SoPlex Release 1.2.0
+
+To unpack do the following:
+
+1. save the atachment as "soplex-1.2.0.tar.gz"
+2. uncompress it with "gunzip soplex-1.2.0.tar.gz"
+3. unpack it with "tar xf soplex-1.2.0.tar"
+4. Have fun
+
+
+
+

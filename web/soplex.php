@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
 "http://www.w3.org/TR/REC-html40/loose.dtd">
-<!-- $Id: soplex.php,v 1.4 2002/01/16 11:57:55 bzfkocht Exp $ -->
+<!-- $Id: soplex.php,v 1.5 2002/01/16 14:49:06 bzfkocht Exp $ -->
 <?php
 $counter = "cgi/counter.dat";  # the data storage file
 
@@ -23,7 +23,7 @@ fclose($fp);
 <meta name="author" content="Thorsten Koch">
 <meta name="description" content="SoPlex Homepage">
 <meta name="keywords" content="SoPlex, Simplex, Solver, LP, Linear Programming, Mathematical Programming, Optimization">
-<meta name="date" content="$Date: 2002/01/16 11:57:55 $">
+<meta name="date" content="$Date: 2002/01/16 14:49:06 $">
 <meta name="robots" content="index|follow">
 <meta http-equiv="content-type" content="text/html;charset=iso-8859-1">
 <title>SoPlex</title> 
@@ -67,7 +67,7 @@ given in
 <a href="http://www6.software.ibm.com/sos/features/featur11.htm">MPS</a>
 or LPF files is also included.</p>
 <p>
-SoPlex has been implemented as a part of Roland Wunderlings 
+SoPlex has been implemented as a part of Roland Wunderling's 
 Ph.D. thesis 
 <a href="http://www.zib.de/PaperWeb/abstracts/TR-96-09">
 <em>Paralleler und Objektorientierter Simplex-Algorithmus</em></a>
@@ -75,10 +75,10 @@ Ph.D. thesis
 </p>
 <h3>Where does is run?</h3>
 <p>
-SoPlex is now completely implememted in C++. 
-The code should be compliend with the current ANSI standard. 
-Exceptions, RTTI and STL (other then iostream) 
-are not used. With a decent modern C++ compiler you should have a change.
+SoPlex is now completely implemented in C++. 
+The code should be compliant with the current ANSI standard. 
+Exceptions, RTTI, and STL (other then iostream) 
+are not used. With a decent modern C++ compiler you should have a chance.
 <br>
 We have tested SoPlex with compilers from 
 <a href="http://www.gnu.org/software/gcc">GNU</a>,
@@ -87,18 +87,18 @@ We have tested SoPlex with compilers from
 href="http://support.intel.com/support/performancetools/c/v5/linux/index.htm">Intel</a>,
 <a href="http://www.sun.com/forte/cplusplus">SUN</a>, 
 <a href="http://h21007.www2.hp.com/dspp/tech/tech_TechSoftwareDetailPage_IDX/1,1703,1740,00.html">HP</a>,
-<a href="http://www.sgi.com/developers/devtools/languages/mipspro.html">SGI</a> and even M$.
+<a href="http://www.sgi.com/developers/devtools/languages/mipspro.html">SGI</a>, and even M$.
 </p>
 <h3>What are the license terms?</h3>
 <p>
 SoPlex is distributed under the 
 <a href="academic.txt">ZIB Academic License</a>.
-You are allowed to retreive SoPlex only for research purpose 
-as a member of a <em>noncommercial</em> and <em>academic</em> institution.
+You are allowed to retrieve SoPlex only for research purpose 
+as a member of a <em>non-commercial</em> and <em>academic</em> institution.
 </p>
 <p>
 <b>Any publication for which SoPlex is used must include an
-aknowledgement and a reference to the Ph.D. thesis:
+acknowledgment and a reference to the Ph.D. thesis:
 Roland Wunderling, 
 <em>Paralleler und Objektorientierter Simplex-Algorithmus</em>,
 <a href="http://www.zib.de/PaperWeb/abstracts/TR-96-09">
@@ -107,7 +107,7 @@ ZIB technical report TR 96-09</a>, Berlin 1996</b>
 <p>
 If you are not applicable for the academic license, 
 here are some notes on 
-<a href="commercial.html">commercial licening</a>.
+<a href="commercial.html">commercial licensing</a>.
 </p>
 <p>
 <hr noshade>
@@ -120,8 +120,8 @@ code and documentation.
 <p>
 Here are the 
 <a href="http://elib.zib.de/pub/Packages/mp-testdata/lp/netlib-lp">Netlib</a>
-LP files, allready decompressed and assembled as an archive 
-<a href="cgi/netlib.tar.gz">netlib.tar.gz</a>. These instances are used by the
+LP files, already decompressed and assembled as an archive 
+<a href="netlib.tar.gz">netlib.tar.gz</a>. These instances are used by the
 <em>check</em> target in the Makefile.
 </p>
 <h3>Bugs</h3>
@@ -129,9 +129,9 @@ LP files, allready decompressed and assembled as an archive
 If you find one (shouldn't be to difficult), it would be nice if you 
 send a description together with a data file that shows the
 problem or even better a working fix to 
-<a href="mailto://koch@zib.de">me.</a>
+<a href="mailto://koch@zib.de">koch@zib.de</a>.
 </p>
-<h3>Mailinglist</h3>
+<h3>Mailing list</h3>
 <p>
 <a href="mailto:soplex@zib.de">soplex@zib.de</a>.
 To subscribe send "subscribe soplex" in the body to 
@@ -141,7 +141,7 @@ To subscribe send "subscribe soplex" in the body to
 <p>
 You can browse the complete (that means this is all we have) 
 <a href="html/index.html">documentation</a>. There you will find
-information how to compile, install, use and modify SoPlex.
+information on how to compile, install, use, and modify SoPlex.
 </p>
 <hr noshade>
 <h3>Links</h3>
@@ -182,7 +182,7 @@ border="0" width="88" height="36" align="bottom"></a>
 <img src="images/valid-html40.png" alt="Valid HTML 4.0!"
 border="0" height="31" width="88" align="bottom"></a>
 <hr noshade><address><font size=-1>
-Last Update $Date: 2002/01/16 11:57:55 $ by
+Last Update $Date: 2002/01/16 14:49:06 $ by
 <a href="/personal/personal.pl?name=koch">Thorsten Koch</a>
 <br>&copy; 2002 by Konrad-Zuse-Zentrum für Informationstechnik Berlin (ZIB)<br>
 http://www.zib.de/Optimization/Software/Soplex/soplex.php
