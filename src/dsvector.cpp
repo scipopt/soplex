@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dsvector.cpp,v 1.3 2001/11/07 17:31:15 bzfbleya Exp $"
+#pragma ident "@(#) $Id: dsvector.cpp,v 1.4 2001/11/11 20:27:30 bzfkocht Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -39,6 +39,7 @@ namespace soplex
 void DSVector::allocMem(int len)
 {
    theelem = reinterpret_cast<Element*>(malloc(len * sizeof(Element)));
+
    if (theelem == 0)
    {
       std::cerr << "ERROR: DSVector could not allocate memory\n";

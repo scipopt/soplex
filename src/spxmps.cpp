@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmps.cpp,v 1.4 2001/11/09 21:23:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmps.cpp,v 1.5 2001/11/11 20:27:33 bzfkocht Exp $"
 
 
 #include <iostream>
@@ -126,11 +126,11 @@ int SPxLP::readLine(
       if (buf[0] != ' ')
       {
          f1 = &buf[0];
-         f2 = NULL;
-         f3 = NULL;
-         f4 = NULL;
-         f5 = NULL;
-         f6 = NULL;
+         f2 = 0;
+         f3 = 0;
+         f4 = 0;
+         f5 = 0;
+         f6 = 0;
 
          return 1;
       }
@@ -311,7 +311,7 @@ static MPS_Section readObj(
                strcpy(objName, f2);
             break;
          default:
-            assert(0);
+            abort();
          }
 #ifndef    NDEBUG
          if (*f1 != 'N')

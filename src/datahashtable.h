@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datahashtable.h,v 1.3 2001/11/07 17:31:15 bzfbleya Exp $"
+#pragma ident "@(#) $Id: datahashtable.h,v 1.4 2001/11/11 20:27:29 bzfkocht Exp $"
 
 #ifndef _DATAHAHSTABLE_H_
 #define _DATAHAHSTABLE_H_
@@ -30,24 +30,6 @@ namespace soplex
 {
 
 //@ ----------------------------------------------------------------------------
-/*
-    This should be a private subclass of #DataHashTable. However, since cfront
-    is not able to compile this constrution, we had move the class to global
-    scope.
- */
-template < class HashItem, class Info >
-struct DataHashTable_Element
-{
-   HashItem item;
-   Info info;
-   enum
-   {
-      FREE,            // element has never been used
-      RELEASED,        // element had been used, but released
-      USED            // element is in use
-   } status;
-};
-
 /** Hashtable for data objects.
     Class #DataHashTable# provides a generic hash table for \Ref{Data Objects},
     i.e. a map that maps arguments called #HashItem#s to values called #Info#s.
@@ -95,8 +77,22 @@ private:
        Further, memory management with resizing of the element array is
        straight forward.
     */
-   typedef DataHashTable_Element < HashItem, Info > Element;
-   DataArray < DataHashTable_Element < HashItem, Info > > element;
+
+   template < class ElemHashItem, class ElemInfo >
+   class Element
+   {
+   public:
+      ElemHashItem item;
+      ElemInfo     info;
+      enum
+      {
+         FREE,            // element has never been used
+         RELEASED,        // element had been used, but released
+         USED            // element is in use
+      } status;
+   };
+
+   DataArray < Element < HashItem, Info > > element;
 
    int hashsize;
    int thenum;                         // current number of entries
@@ -146,7 +142,7 @@ private:
       for
       (
          i = j = (*hashval)(&h) % element.size();
-         element[i].status != DataHashTable_Element < HashItem, Info > ::FREE;
+         element[i].status != Element < HashItem, Info > ::FREE;
      )
       {
          if (element[i].item == h)
@@ -253,7 +249,7 @@ public:
       while (++theCurrent < element.size())
       {
          if (element[theCurrent].status
-              == DataHashTable_Element < HashItem, Info > ::USED)
+              == Element < HashItem, Info > ::USED)
             return &element[theCurrent].item;
       }
       theCurrent = -1;
@@ -272,7 +268,7 @@ public:
       while (--theCurrent >= 0)
       {
          if (element[theCurrent].status
-              == DataHashTable_Element < HashItem, Info > ::USED)
+              == Element < HashItem, Info > ::USED)
             return &element[theCurrent].item;
       }
       return 0;
@@ -297,11 +293,11 @@ public:
       for
       (
          i = (*hashval)(&h) % element.size();
-         element[i].status == DataHashTable_Element < HashItem, Info > ::USED;
+         element[i].status == Element < HashItem, Info > ::USED;
          i = (i + hashsize) % element.size()
      )
         ;
-      element[i].status = DataHashTable_Element < HashItem, Info > ::USED;
+      element[i].status = Element < HashItem, Info > ::USED;
       memcpy(&(element[i].info), &x, sizeof(Info));
       memcpy(&(element[i].item), &h, sizeof(HashItem));
       ++thenum;
@@ -312,7 +308,7 @@ public:
    {
       assert(has(h));
       element[index(h)].status
-      = DataHashTable_Element < HashItem, Info > ::RELEASED;
+      = Element < HashItem, Info > ::RELEASED;
       --thenum;
    }
 
@@ -321,7 +317,7 @@ public:
    {
       for (int i = element.size() - 1; i >= 0; --i)
          element[i].status
-         = DataHashTable_Element < HashItem, Info > ::FREE;
+         = Element < HashItem, Info > ::FREE;
       thenum = 0;
    }
 
@@ -333,7 +329,7 @@ public:
     */
    void reMax (int nel = -1, int hashsze = 0)
    {
-      DataArray < DataHashTable_Element < HashItem, Info > > cpy(element);
+      DataArray < Element < HashItem, Info > > cpy(element);
       element.reSize(nel < num() ? num() : nel);
       clear();
       if (hashsze < 1)
@@ -341,7 +337,7 @@ public:
       else
          this->hashsize = hashsze;
       for (int i = cpy.size() - 1; i >= 0; --i)
-         if (cpy[i].status == DataHashTable_Element < HashItem, Info > ::USED)
+         if (cpy[i].status == Element < HashItem, Info > ::USED)
             add(cpy[i].item, cpy[i].info);
    }
    //@}
@@ -355,7 +351,7 @@ public:
 
       for (i = element.size() - 1, tot = 0; i >= 0; --i)
          if (element[i].status
-              == DataHashTable_Element < HashItem, Info > ::USED)
+              == Element < HashItem, Info > ::USED)
          {
             ++tot;
             if (!has(element[i].item))

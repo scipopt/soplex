@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: changesoplex.cpp,v 1.3 2001/11/07 17:31:14 bzfbleya Exp $"
+#pragma ident "@(#) $Id: changesoplex.cpp,v 1.4 2001/11/11 20:27:27 bzfkocht Exp $"
 
 
 /*  Import system include files
@@ -646,8 +646,7 @@ static void changeLowerStatus
       stat = basis.dualColStatus(i);
       break;
    default:
-      assert(0);
-      break;
+      abort();
    }
 }
 
@@ -712,8 +711,7 @@ static void changeUpperStatus
       stat = basis.dualColStatus(i);
       break;
    default:
-      assert(0);
-      break;
+      abort();
    }
 }
 
@@ -806,8 +804,7 @@ static void changeLhsStatus
       stat = basis.dualRowStatus(i);
       break;
    default:
-      assert(0);
-      break;
+      abort();
    }
 }
 
@@ -871,8 +868,7 @@ static void changeRhsStatus
       stat = basis.dualRowStatus(i);
       break;
    default:
-      assert(0);
-      break;
+      abort();
    }
 }
 

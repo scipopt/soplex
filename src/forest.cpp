@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: forest.cpp,v 1.3 2001/11/07 17:31:16 bzfbleya Exp $"
+#pragma ident "@(#) $Id: forest.cpp,v 1.4 2001/11/11 20:27:30 bzfkocht Exp $"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -469,7 +469,7 @@ int forestUpdateCLUFactor(CLUFactor* fac, int col, double* work, int num, int *n
             for (i = 0; i < num; ++i)
             {
                if (work[corig[nonz[i]]] == 0)
-                  assert(0);
+                  abort();
             }
 #endif  // NDEBUG
             i = deQueueMin(nonz, &num);

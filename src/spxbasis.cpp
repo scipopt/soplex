@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.4 2001/11/09 13:25:20 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.5 2001/11/11 20:27:32 bzfkocht Exp $"
 
 
 
@@ -428,8 +428,8 @@ void SPxBasis::factorize()
       break;
    default :
       std::cerr << "ERROR: unknown status of factorization.\n";
-      assert(0);
-      factorized = 0;
+      abort();
+      // factorized = 0;
    }
    lastFill = double(factor->memory()) * nonzeroFactor / double(nzCount);
    nzFac = 0;

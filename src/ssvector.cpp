@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.3 2001/11/09 13:25:29 bzfpfend Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.4 2001/11/11 20:27:34 bzfkocht Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -163,7 +163,7 @@ if (dim() <= 1)
          else
             *v = 0;
 
-         do
+         for(;;)
          {
             while (!*++v);
             if (*v > eps || *v < meps)
@@ -178,7 +178,6 @@ if (dim() <= 1)
             }
 
          }
-         while (1);
 
          /* fange weissen Elefanten wieder ein */
          if (last > eps || last < meps)
@@ -406,7 +405,7 @@ SSVector& SSVector::multAdd(double xx, const SSVector& svec)
       const double meps = -eps;
 
       *last = 1e-100;
-      do
+      for(;;)
       {
          while (!*rv)
          {
@@ -424,7 +423,6 @@ SSVector& SSVector::multAdd(double xx, const SSVector& svec)
          else
             v++;
       }
-      while (1);
       *rv = x;
 
       x *= xx;
@@ -605,7 +603,7 @@ SSVector& SSVector::operator=(const SSVector& rhs)
       const double meps = -eps;
 
       *last = 1e-100;
-      do
+      for(;;)
       {
          while (!*rv)
          {
@@ -625,7 +623,6 @@ SSVector& SSVector::operator=(const SSVector& rhs)
             rv++;
          }
       }
-      while (1);
       *rv = x;
 
       if (x < meps || x > eps)
@@ -670,7 +667,7 @@ void SSVector::setup_and_assign(SSVector& rhs)
       const double meps = -eps;
 
       *last = 1e-100;
-      do
+      for(;;)
       {
          while (!*rv)
          {
@@ -690,7 +687,6 @@ void SSVector::setup_and_assign(SSVector& rhs)
             *rv++ = 0;
          }
       }
-      while (1);
 
       if (x < meps || x > eps)
       {
@@ -906,7 +902,7 @@ SSVector& SSVector::assign2productAndSetup(const SVSet& A, SSVector& x)
    double lastval = *end;
    *end = 1e-100;
 
-   do
+   for(;;)
    {
       while (!*xv)
          ++xv;
@@ -927,7 +923,6 @@ SSVector& SSVector::assign2productAndSetup(const SVSet& A, SSVector& x)
       }
       xv++;
    }
-   while (1);
 
    /* fange weissen Elefanten wieder ein */
    if (lastval > eps || lastval < meps)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.4 2001/11/09 21:23:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.5 2001/11/11 20:27:33 bzfkocht Exp $"
 
 #ifndef _SPXLP_H_
 #define _SPXLP_H_
@@ -36,209 +36,6 @@
 namespace soplex
 {
 
-/*
-    \Section{Class Declaration}
- */
-class SPxLP_Id;
-
-/** Ids for LP columns.
-    This class should be called #SPxLP::SPxColId#. However, since AT\&T cfront
-    does not support subclasses as template arguments, we had to perform an own
-    name mangling.
- 
-    Class #SPxLP_SPxRowId# provides #DataSet::Key#s for the column indices of an
-    #SPxLP#.
- */
-class SPxLP_SPxColId : public SVSet_Key
-{
-   friend class SPxLP;
-   SPxLP_SPxColId(const SVSet::Key& key)
-      : SVSet_Key(key)
-   { }
-
-public:
-   ///
-   SPxLP_SPxColId()
-   { }
-
-   ///
-
-   SPxLP_SPxColId(const SPxLP_Id& key);
-};
-
-/** Ids for LP rows.
-    This class should be called #SPxLP::SPxRowId#. However, since AT\&T cfront
-    does not support subclasses as template arguments, we had to perform an own
-    name mangling.
- 
-    Class #SPxLP_SPxColId# provides #DataSet::Key#s for the row indices of an
-    #SPxLP#.
- */
-class SPxLP_SPxRowId : public SVSet_Key
-{
-   friend class SPxLP;
-   SPxLP_SPxRowId(const SVSet::Key& key)
-      : SVSet_Key(key)
-   { }
-
-public:
-   ///
-   SPxLP_SPxRowId()
-   { }
-
-   ///
-
-   SPxLP_SPxRowId(const SPxLP_Id& key);
-};
-
-
-/*
-    \SubSubSection{SPxLP\_Ids}
-    Ids use the 2 msb of an #int# to store the id's #Type#,
-    #SPX_MAX_PE_LOG# for storing the PE number
-    and the remaining for the index.
-*/
-/** Generic Ids for LP rows or columns.
-    This class should be called #SPxLP::Id#. However, since AT\&T cfront does
-    not support subclasses as template arguments, we had to perform an own name
-    mangling.
- 
-    Both, #SPxLP_SPxColId#s and #SPxLP_SPxRowId#s may be treated uniformly as
-    #SPxLP_Id#s:
- 
-    Rows and columns are numbered from 0 to #num()# and 0 to #dim()#
-    respectively.  These numbers may be used to select individual rows or
-    columns. However, these numbers may change if other rows or columns are
-    added or removed.
- 
-    Further, each row or column of the problem matrix is assigned a
-    #SPxLP_SPxRowId# or #SPxLP_SPxColId#, respectively. They are be used to select
-    individual rows or columns just like numbers. In contrast to row and column
-    numbers, ids remain unchanges for the time a row or column belongs to a
-    #SPxLP#, no matter what other rows or columns are added to it or removed
-    from it.
- */
-class SPxLP_Id : public SVSet_Key
-{
-public:
-   ///
-   enum Type
-   {
-      /// row identifier.
-      ROWID = -1,
-      /// none.
-      NONE = 0,
-      /// column identifier.
-      COLID = 1
-   };
-
-   ///
-   Type type() const
-   {
-      return info ? (info < 0 ? ROWID : COLID) : NONE;
-   }
-
-   ///
-   int isValid() const
-   {
-      return info != 0;
-   }
-
-   ///
-   void inValidate()
-   {
-      info = 0;
-   }
-
-   ///
-   int isSPxRowId() const
-   {
-      return info < 0;
-   }
-
-   ///
-   int isSPxColId() const
-   {
-      return info > 0;
-   }
-
-
-   ///
-   int operator==(const SPxLP_Id& id)
-   {
-      return (this == &id);//(*(int*)this == *(int*)&id);
-   }
-
-   ///
-   int operator!=(const SPxLP_Id& id)
-   {
-      return (this != &id); //(*(int*)this != *(int*)&id);
-   }
-
-   ///
-   SPxLP_Id& operator=(const SPxLP_Id& id)
-   {
-      // what the fuck is this!!!
-      //* reinterpret_cast<int*>(this) = * reinterpret_cast<const int*>(&id);
-      SVSet_Key::operator= ( id );
-      return *this;
-   }
-
-   ///
-   SPxLP_Id& operator=(const SPxLP_SPxColId cid)
-   {
-      //*(int*)this = *(int*) & cid;
-      SVSet_Key::operator= ( cid );
-      info = COLID * (cid.info + 1);
-      return *this;
-   }
-
-   ///
-   SPxLP_Id& operator=(const SPxLP_SPxRowId rid)
-   {
-      //*(int*)this = *(int*) & rid;
-      SVSet_Key::operator= ( rid );
-      info = ROWID * (rid.info + 1);
-      return *this;
-   }
-
-
-
-   ///
-   SPxLP_Id()
-   {
-      info = NONE;
-      idx = -1;
-   }
-
-   ///
-   SPxLP_Id(const SPxLP_SPxColId& cid)
-   {
-      info = COLID * (cid.info + 1);
-      idx = cid.idx;
-   }
-
-   ///
-   SPxLP_Id(const SPxLP_SPxRowId& rid)
-   {
-      info = ROWID * (rid.info + 1);
-      idx = rid.idx;
-   }
-};
-
-inline SPxLP_SPxRowId::SPxLP_SPxRowId(const SPxLP_Id& key)
-   : SVSet_Key(key)
-{
-   assert(!key.isSPxColId());
-   info = info * SPxLP_Id::ROWID - 1;
-}
-
-inline SPxLP_SPxColId::SPxLP_SPxColId(const SPxLP_Id& key)
-   : SVSet_Key(key)
-{
-   assert(!key.isSPxRowId());
-   info = info * SPxLP_Id::COLID - 1;
-}
 
 class SoPlex;
 
@@ -332,14 +129,175 @@ public:
    /**@name Datatypes */
    //@{
    ///
-   typedef SPxLP_SPxRowId SPxRowId;
+
+   class Id;
+
+   /** Ids for LP columns.
+       Class #SPxRowId# provides #DataSet::Key#s for the column indices of an
+       #SPxLP#.
+   */
+   class SPxColId : public SVSet::Key
+   {
+      friend class SPxLP;
+
+      explicit SPxColId(const SVSet::Key& p_key) : SVSet::Key(p_key) {}
+   public:
+      ///
+      SPxColId() {}
+
+      ///
+      explicit SPxColId(const Id& p_key) : SVSet::Key(p_key)
+      {
+         assert(!p_key.isSPxRowId());
+         info = info * Id::COLID - 1;
+      }
+   };
+
+   /** Ids for LP rows.
+       Class #SPxColId# provides #DataSet::Key#s for the row indices of an
+       #SPxLP#.
+   */
+   class SPxRowId : public SVSet::Key
+   {
+      friend class SPxLP;
+
+      explicit SPxRowId(const SVSet::Key& p_key) : SVSet::Key(p_key) {}
+   public:
+      ///
+      SPxRowId() {}
+
+      ///
+      explicit SPxRowId(const Id& p_key) : SVSet::Key(p_key)
+      {
+         assert(!p_key.isSPxColId());
+         info = info * Id::ROWID - 1;
+      }
+   };
+
+   /*
+    \SubSubSection{SPxLP\_Ids}
+    Ids use the 2 msb of an #int# to store the id's #Type#,
+    #SPX_MAX_PE_LOG# for storing the PE number
+    and the remaining for the index.
+   */
+   /** Generic Ids for LP rows or columns.
+       Both, #SPxColId#s and #SPxRowId#s may be treated uniformly as
+       #Id#s:
+ 
+       Rows and columns are numbered from 0 to #num()# and 0 to #dim()#
+       respectively.  These numbers may be used to select individual rows or
+       columns. However, these numbers may change if other rows or columns are
+       added or removed.
+ 
+       Further, each row or column of the problem matrix is assigned a
+       #SPxRowId# or #SPxColId#, respectively. They are be used to select
+       individual rows or columns just like numbers. In contrast to row and 
+       column numbers, ids remain unchanges for the time a row or column 
+       belongs to a #SPxLP#, no matter what other rows or columns are added 
+       to it or removed from it.
+   */
+   class Id : public SVSet::Key
+   {
+   public:
+      ///
+      enum Type
+      {
+         /// row identifier.
+         ROWID = -1,
+         /// none.
+         NONE = 0,
+         /// column identifier.
+         COLID = 1
+      };
+
+      ///
+      Type type() const
+      {
+         return info ? (info < 0 ? ROWID : COLID) : NONE;
+      }
+      ///
+      int isValid() const
+      {
+         return info != 0;
+      }
+      ///
+      void inValidate()
+      {
+         info = 0;
+      }
+      ///
+      int isSPxRowId() const
+      {
+         return info < 0;
+      }
+      ///
+      int isSPxColId() const
+      {
+         return info > 0;
+      }
+      ///
+      int operator==(const Id& id)
+      {
+         return (this == &id);//(*(int*)this == *(int*)&id);
+      }
+      ///
+      int operator!=(const Id& id)
+      {
+         return (this != &id); //(*(int*)this != *(int*)&id);
+      }
+      ///
+      Id& operator=(const Id& id)
+      {
+         // what the fuck is this!!!
+         //* reinterpret_cast<int*>(this)= * reinterpret_cast<const int*>(&id);
+         SVSet::Key::operator= ( id );
+         return *this;
+      }
+      ///
+      Id& operator=(const SPxColId cid)
+      {
+         //*(int*)this = *(int*) & cid;
+         SVSet::Key::operator= ( cid );
+         info = COLID * (cid.info + 1);
+         return *this;
+      }
+      ///
+      Id& operator=(const SPxRowId rid)
+      {
+         //*(int*)this = *(int*) & rid;
+         SVSet::Key::operator= ( rid );
+         info = ROWID * (rid.info + 1);
+         return *this;
+      }
+      ///
+      Id()
+      {
+         info = NONE;
+         idx  = -1;
+      }
+      ///
+      explicit Id(const SPxColId& cid)
+      {
+         info = COLID * (cid.info + 1);
+         idx = cid.idx;
+      }
+      ///
+      explicit Id(const SPxRowId& rid)
+      {
+         info = ROWID * (rid.info + 1);
+         idx = rid.idx;
+      }
+   };
+
+
+//typedef SPxLP_SPxRowId SPxRowId;
    ///
-   typedef SPxLP_SPxColId SPxColId;
+// typedef SPxLP_SPxColId SPxColId;
    /** Generic Identifier for LP rows and columns.
        All #Id# classes should better be local classes of #SPxLP#. However,
        AT\&T's cfront compiler won't allow to do do so. :-(
     */
-   typedef SPxLP_Id Id;
+//   typedef SPxLP_Id Id;
 
    /// Optimization SPxSense.
    enum SPxSense
@@ -567,13 +525,13 @@ public:
    ///
    SPxRowId rId(int n) const
    {
-      return LPRowSet::key(n);
+      return SPxRowId(LPRowSet::key(n));
    }
 
    ///
    SPxColId cId(int n) const
    {
-      return LPColSet::key(n);
+      return SPxColId(LPColSet::key(n));
    }
 
 private:

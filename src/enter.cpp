@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.4 2001/11/09 21:23:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.5 2001/11/11 20:27:30 bzfkocht Exp $"
 
 /*      \SubSection{Updating the Basis for Entering Variables}
  */
@@ -360,8 +360,7 @@ void SoPlex::getEnterVals
          break;
 
       default:
-         assert(0);
-         std::cerr << __FILE__ << __LINE__ << "ERROR: must not happen!\n";
+         abort();
       }
    }
 
@@ -414,11 +413,13 @@ void SoPlex::getEnterVals
         : SPxBasis::Desc::D_ON_BOTH;
          break;
       case SPxBasis::Desc::P_FREE :
-         assert(0);
+         abort();
+#if 0
          std::cerr << __FILE__ << __LINE__ << "ERROR: not yet debugged!\n";
          enterPric = (*theCoPvec)[enterIdx];
          enterRO = 0;
          ds.rowStatus(enterIdx) = SPxBasis::Desc::D_UNDEFINED;
+#endif
          break;
 
          // dual/rowwise cases:
@@ -476,8 +477,7 @@ void SoPlex::getEnterVals
          break;
 
       default:
-         assert(0);
-         std::cerr << __FILE__ << __LINE__ << "ERROR: must not happen!\n";
+         abort();
       }
    }
 }
@@ -502,8 +502,7 @@ void SoPlex::getEnterVals2
       {
       case SPxBasis::Desc::P_FIXED :
       case SPxBasis::Desc::D_UNDEFINED :
-         std::cerr << __FILE__ << __LINE__ << "ERROR: must not happen!\n";
-         assert(0);
+         abort();
 
       case SPxBasis::Desc::P_ON_UPPER :
          assert(rep() == ROW);
@@ -518,9 +517,11 @@ void SoPlex::getEnterVals2
          ds.rowStatus(idx) = dualRowStatus(idx);
          break;
       case SPxBasis::Desc::P_FREE :
+         abort();
+#if 0
          std::cerr << __FILE__ << __LINE__ << "ERROR: not yet debugged!\n";
          assert(rep() == ROW);
-         assert(0);
+
          if ((*theCoPvec)[leaveIdx] - theLBbound[leaveIdx] <
               theUBbound[leaveIdx] - (*theCoPvec)[leaveIdx])
          {
@@ -533,6 +534,7 @@ void SoPlex::getEnterVals2
             theURbound[idx] = leavebound;
          }
          ds.rowStatus(idx) = SPxBasis::Desc::D_UNDEFINED;
+#endif
          break;
 
          // primal/columnwise cases:

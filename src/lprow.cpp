@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprow.cpp,v 1.2 2001/11/06 23:31:02 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprow.cpp,v 1.3 2001/11/11 20:27:31 bzfkocht Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -68,9 +68,9 @@ void LPRow::setType(
    case RANGE :
       std::cerr << __FILE__ << __LINE__
       << "RANGE not supported in LPRow::setType()";
-      /*FALLTHROUGH*/
+      abort();
    default:
-      assert(0);
+      abort();
    }
 }
 
@@ -102,7 +102,7 @@ LPRow::LPRow(
       right = infinity;
       break;
    default:
-      assert(0);
+      abort();
    }
 }
 } // namespace soplex

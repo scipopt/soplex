@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idxset.h,v 1.2 2001/11/06 23:31:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: idxset.h,v 1.3 2001/11/11 20:27:30 bzfkocht Exp $"
 
 
 /*      \Section{Imports}
@@ -230,7 +230,7 @@ public:
       assert(isConsistent());
    }
    IdxSet()
-      : num(0), len(0), idx(NULL)
+      : num(0), len(0), idx(0)
    {
       assert(isConsistent());
    }

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.cpp,v 1.2 2001/11/06 23:31:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightst.cpp,v 1.3 2001/11/11 20:27:34 bzfkocht Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -258,13 +258,13 @@ void SPxWeightST::generate(SoPlex& base)
             for (j = bVec.size(); --j >= 0;)
             {
                double x = bVec.value(j);
-               int i = bVec.index(j);
-               int j = base.coVector(i).size();
-               if (!forbidden[i] && (x > STABLE*max || -x > STABLE*max)
-                    && j < best)
+               int k = bVec.index(j);
+               int l = base.coVector(k).size();
+               if (!forbidden[k] && (x > STABLE*max || -x > STABLE*max)
+                    && l < best)
                {
-                  best = j;
-                  sel = i;
+                  best = l;
+                  sel = k;
                }
             }
          }
@@ -286,10 +286,10 @@ void SPxWeightST::generate(SoPlex& base)
             for (j = bVec.size(); --j >= 0;)
             {
                double x = bVec.value(j);
-               int i = bVec.index(j);
-               if (!forbidden[i] && (x > EPS*max || -x > EPS*max))
+               int k = bVec.index(j);
+               if (!forbidden[k] && (x > EPS*max || -x > EPS*max))
                {
-                  forbidden[i] = 1;
+                  forbidden[k] = 1;
                   --dim;
                }
             }

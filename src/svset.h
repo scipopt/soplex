@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.h,v 1.3 2001/11/07 17:31:25 bzfbleya Exp $"
+#pragma ident "@(#) $Id: svset.h,v 1.4 2001/11/11 20:27:34 bzfkocht Exp $"
 
 
 /*      \Section{Imports}
@@ -29,6 +29,7 @@
 #include "dataset.h"
 #include "dataarray.h"
 #include "idlist.h"
+#include "datakey.h"
 
 namespace soplex
 {
@@ -75,8 +76,7 @@ public:
 
 };
 
-typedef DataSet < SVSet_DLPSV > ::Key SVSet_Key;
-typedef DataArray < SVector_Element > SVSet_Base;
+typedef DataArray < SVector::Element > SVSet_Base;
 
 /** sparse vector set.
 Class #SVSet# provides a set of sparse vectors #SVector#. All #SVector#s in a
@@ -106,6 +106,9 @@ class SVSet : protected SVSet_Base
 {
    /*  The management of Keys is left for #DataSet#
     */
+public:
+   typedef DataKey Key;
+private:
    typedef SVSet_DLPSV DLPSV;
    DataSet < SVSet_DLPSV > set;
 
@@ -135,9 +138,6 @@ class SVSet : protected SVSet_Base
    void ensureMem(int n);
 
 public:
-   // typedef DataSet<DLPSV>::Key      Key;
-   typedef SVSet_Key Key;
-
    /**@name Control Parameters */
    //@{
    /** Sparse vector memory enlargment factor.

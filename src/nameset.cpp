@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.cpp,v 1.4 2001/11/09 22:48:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.cpp,v 1.5 2001/11/11 20:27:32 bzfkocht Exp $"
 
 #include <string.h>
 #include "nameset.h"
@@ -25,11 +25,11 @@ char NameSet_Name::deflt = '\0';
 
 void NameSet::add(const char* str)
 {
-   Key key;
-   add(key, str);
+   Key k;
+   add(k, str);
 }
 
-void NameSet::add(Key& key, const char* str)
+void NameSet::add(Key& p_key, const char* str)
 {
    const NameSet_Name nstr (str);
    if (!hashtab.has(nstr))
@@ -55,11 +55,11 @@ void NameSet::add(Key& key, const char* str)
       memused += strlen(str) + 1;
       strcpy(tmp, str);
 
-      NameSet_CharPtr* name = set.create(static_cast<DataSet<NameSet_CharPtr>::Key&>(key));
+      NameSet_CharPtr* name = set.create(p_key);
       name->name = tmp;
       list.append(name);
       NameSet_Name memname(name->name);
-      hashtab.add(memname, key);
+      hashtab.add(memname, p_key);
    }
 }
 
@@ -73,13 +73,13 @@ void NameSet::add(const NameSet& p_set)
    }
 }
 
-void NameSet::add(Key key[], const NameSet& p_set)
+void NameSet::add(Key p_key[], const NameSet& p_set)
 {
    for (int i = 0; i < p_set.num(); ++i)
    {
       NameSet_Name iname = p_set[i];
       if (!hashtab.has(iname))
-         add(key[i], p_set[i]);
+         add(p_key[i], p_set[i]);
    }
 }
 
@@ -89,21 +89,20 @@ void NameSet::remove(const char *str)
    const NameSet_Name nam(str);
    if (hashtab.has (nam))
    {
-      DataSet<NameSet_CharPtr>::Key* 
-         key = static_cast<DataSet<NameSet_CharPtr>::Key*>(hashtab.get (nam));
+      DataKey* hkey = hashtab.get(nam);
       hashtab.remove (nam);
-      list.remove(&(set[*key]));
-      set.remove(*key);
+      list.remove(&(set[*hkey]));
+      set.remove(*hkey);
    }
 }
 
-void NameSet::remove(Key key)
+void NameSet::remove(Key p_key)
 {
-   assert(has(key));
-   const NameSet_Name nam = set[static_cast<DataSet<NameSet_CharPtr>::Key>(key)].name;
+   assert(has(p_key));
+   const NameSet_Name nam = set[p_key].name;
    hashtab.remove (nam);
-   list.remove(&(set[static_cast<DataSet<NameSet_CharPtr>::Key>(key)]));
-   set.remove(static_cast<DataSet<NameSet_CharPtr>::Key>(key));
+   list.remove(&(set[p_key]));
+   set.remove(p_key);
 }
 
 void NameSet::remove(Key keys[], int n)
@@ -186,7 +185,7 @@ void NameSet::memPack()
    hashtab.clear ();
 
    NameSet_CharPtr* name = list.first();
-   for (memused = 0; name != NULL; name = list.next(name))
+   for (memused = 0; name != 0; name = list.next(name))
    {
       for (i = 0; (mem[memused + i] = name->name[i]) != 0; ++i)
         ;
@@ -263,8 +262,8 @@ NameSet::NameSet(const NameSet& org)
    {
       list.append(&(set[i]));
       NameSet_Name iname = set[i];
-      Key key = Key(set.key(i));
-      hashtab.add(iname, key);
+      Key k = Key(set.key(i));
+      hashtab.add(iname, k);
    }
    memPack();
 }

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcolset.h,v 1.3 2001/11/07 17:31:18 bzfbleya Exp $"
+#pragma ident "@(#) $Id: lpcolset.h,v 1.4 2001/11/11 20:27:31 bzfkocht Exp $"
 
 #ifndef _LPCOLSET_H_
 #define _LPCOLSET_H_
@@ -31,6 +31,7 @@
 #include "lpcol.h"
 #include "dvector.h"
 #include "svset.h"
+#include "datakey.h"
 
 namespace soplex
 {
@@ -59,7 +60,7 @@ private:
 
 public:
    ///
-   typedef SVSet::Key Key;
+   typedef DataKey Key;
 
    /**@name Inquiry */
    //@{

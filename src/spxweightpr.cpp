@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.4 2001/11/09 13:25:28 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.5 2001/11/11 20:27:34 bzfkocht Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -170,7 +170,7 @@ SoPlex::Id SPxWeightPR::selectEnter()
             break;
          case SPxBasis::Desc::P_FREE :
          case SPxBasis::Desc::D_FREE :
-            return solver()->rId(i);
+            return SoPlex::Id(solver()->rId(i));
          case SPxBasis::Desc::D_ON_BOTH :
             if (solver()->pVec()[i] > solver()->upBound()[i])
                x *= 1 + rPenalty[i];
@@ -180,8 +180,7 @@ SoPlex::Id SPxWeightPR::selectEnter()
          case SPxBasis::Desc::D_UNDEFINED :
          case SPxBasis::Desc::P_FIXED :
          default:
-            assert(0);
-            break;
+            abort();
          }
          if (x < best)
          {
@@ -209,7 +208,7 @@ SoPlex::Id SPxWeightPR::selectEnter()
             break;
          case SPxBasis::Desc::P_FREE :
          case SPxBasis::Desc::D_FREE :
-            return solver()->cId(i);
+            return SoPlex::Id(solver()->cId(i));
          case SPxBasis::Desc::D_ON_BOTH :
             if (solver()->coPvec()[i] > solver()->ucBound()[i])
                x *= 1 + cPenalty[i];
@@ -219,8 +218,7 @@ SoPlex::Id SPxWeightPR::selectEnter()
          case SPxBasis::Desc::P_FIXED :
          case SPxBasis::Desc::D_UNDEFINED :
          default:
-            assert(0);
-            break;
+            abort();
          }
          if (x < best)
          {

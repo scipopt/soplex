@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.2 2001/11/06 23:31:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.3 2001/11/11 20:27:33 bzfkocht Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -379,7 +379,7 @@ SoPlex::Id SPxHarrisRT::selectEnter(double& val)
    solver()->pVec().delta().setup();
 
    if (val > epsilon)
-      while (1)
+      for(;;)
       {
          pnr = -1;
          cnr = -1;
@@ -581,7 +581,7 @@ SoPlex::Id SPxHarrisRT::selectEnter(double& val)
       }
 
    else if (val < -epsilon)
-      while (1)
+      for(;;)
       {
          pnr = -1;
          cnr = -1;

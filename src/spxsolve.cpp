@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.3 2001/11/09 13:25:24 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.4 2001/11/11 20:27:33 bzfkocht Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -403,8 +403,7 @@ LPSolver::Status SoPlex::getPrimal (Vector& vector) const
          case SPxBasis::Desc::D_UNDEFINED :
             break;
          default:
-            assert(0);
-            break;
+            abort();
          }
       }
       for (i = dim() - 1; i >= 0; --i)
@@ -509,8 +508,7 @@ LPSolver::Status SoPlex::getSlacks (Vector& vector) const
          case SPxBasis::Desc::D_UNDEFINED :
             break;
          default:
-            assert(0);
-            break;
+            abort();
          }
       }
       for (i = dim() - 1; i >= 0; --i)

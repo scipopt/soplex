@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.3 2001/11/07 17:31:18 bzfbleya Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.4 2001/11/11 20:27:31 bzfkocht Exp $"
 
 
 /*      \SubSection{Updating the Basis for Leaving Variables}
@@ -114,9 +114,7 @@ void SoPlex::getLeaveVals
          leaveMax = SPxLP::infinity;
          break;
       case SPxBasis::Desc::P_FREE :
-         std::cerr << __FILE__ << __LINE__ << "ERROR: must not happen!\n";
-         assert(0);
-         break;
+         abort();
 
       case SPxBasis::Desc::D_FREE :
          ds.rowStatus(leaveNum) = SPxBasis::Desc::P_FIXED;
@@ -155,8 +153,7 @@ void SoPlex::getLeaveVals
          break;
 
       default:
-         std::cerr << __FILE__ << __LINE__ << "ERROR: must not happen!\n";
-         assert(0);
+         abort();
       }
    }
 
@@ -237,8 +234,7 @@ void SoPlex::getLeaveVals
          break;
 
       default:
-         std::cerr << __FILE__ << __LINE__ << "ERROR: must not happen!\n";
-         assert(0);
+         abort();
       }
    }
 }
@@ -334,22 +330,22 @@ void SoPlex::getLeaveVals2(
          enterBound = -lhs(idx);
          break;
       case SPxBasis::Desc::P_FREE :
+         abort();
+#if 0
          ds.rowStatus(idx) = SPxBasis::Desc::D_UNDEFINED;
          std::cerr << __FILE__ << __LINE__ << "ERROR: not yet debugged!\n";
-         assert(0);
+
          newCoPrhs = theURbound[idx];        // slack !!
          newUBbound = SPxLP::infinity;
          newLBbound = -SPxLP::infinity;
          enterBound = 0;
+#endif
          break;
       case SPxBasis::Desc::P_FIXED :
-         std::cerr << __FILE__ << __LINE__ << "ERROR: must not happen (1)!\n";
-         assert(0);
-         exit(0);
+         abort();
 
       default:
-         assert(0);
-         std::cerr << __FILE__ << __LINE__ << "ERROR: must not happen!\n";
+         abort();
          break;
       }
    }
@@ -441,14 +437,10 @@ void SoPlex::getLeaveVals2(
          enterBound = 0;
          break;
       case SPxBasis::Desc::P_FIXED :
-         std::cerr << __FILE__ << __LINE__ << "ERROR: must not happen!\n";
-         assert(0);
-         break;
+         abort();
 
       default:
-         std::cerr << __FILE__ << __LINE__ << "ERROR: must not happen!\n";
-         assert(0);
-         break;
+         abort();
       }
    }
 
@@ -538,7 +530,7 @@ int SoPlex::leave(int leaveIdx)
    //@ testBounds();
 
 
-   do
+   for(;;)
    {
       double enterVal = leaveMax;
       Id enterId = theratiotester->selectEnter(enterVal);
@@ -739,7 +731,6 @@ int SoPlex::leave(int leaveIdx)
 
       return 1;
    }
-   while (1);
 }
 } // namespace soplex
 

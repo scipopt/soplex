@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.h,v 1.3 2001/11/07 17:31:19 bzfbleya Exp $"
+#pragma ident "@(#) $Id: nameset.h,v 1.4 2001/11/11 20:27:32 bzfkocht Exp $"
 
 #ifndef _NAMESET_H_
 #define _NAMESET_H_
@@ -34,6 +34,7 @@
 #include "dataset.h"
 #include "datahashtable.h"
 #include "islist.h"
+#include "datakey.h"
 
 namespace soplex
 {
@@ -144,7 +145,7 @@ public:
        accessed (see #NameSet::operator[]#). See \Ref{DataSet::Key} for a more
        detailed description of the concept of Keys.
    */
-   typedef DataSet_Key Key;
+   typedef DataKey Key; 
 
 protected:
    /*

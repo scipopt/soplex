@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxstarter.cpp,v 1.2 2001/11/06 23:31:05 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxstarter.cpp,v 1.3 2001/11/11 20:27:33 bzfkocht Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -47,8 +47,10 @@ return 0;                                                          \
 
 int SPxStarter::isConsistent() const
 {
-   if (1)
-      inconsistent;
+   std::cout << "Not implemented" << std::endl;
+
+   abort();
+
    return 0;
 }
 } // namespace soplex
