@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.20 2002/12/08 11:09:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.21 2002/12/12 09:48:54 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -480,6 +480,8 @@ SSVector& SSVector::multAdd(Real x, const Vector& vec)
 
 SSVector& SSVector::operator=(const SSVector& rhs)
 {
+   assert(rhs.isConsistent());
+
    if (this != &rhs)
    {
       clear();

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvecs.cpp,v 1.20 2002/12/08 11:09:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxvecs.cpp,v 1.21 2002/12/12 09:48:54 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -23,19 +23,19 @@
 
 namespace soplex
 {
-/*  Initialize Vectors
+/** Initialize Vectors
  
     Computing the right hand side vector for the feasibility vector depends on
     the chosen representation and type of the basis.
  
-    In columnwise case, |theFvec| = $x_B = A_B^{-1} (- A_N x_N)$, where $x_N$
+    In columnwise case, |theFvec| = \f$x_B = A_B^{-1} (- A_N x_N)\f$, where \f$x_N\f$
     are either upper or lower bounds for the nonbasic variables (depending on
     the variables |Status|). If these values remain unchanged throughout the
     simplex algorithm, they may be taken directly from LP. However, in the
     entering type algorith they are changed and, hence, retreived from the
     column or row upper or lower bound vectors.
  
-    In rowwise case, |theFvec| = $\pi^T_B = (c^T - 0^T A_N) A_B^{-1}$. However,
+    In rowwise case, |theFvec| = \f$\pi^T_B = (c^T - 0^T A_N) A_B^{-1}\f$. However,
     this applies only to leaving type algorithm, where no bounds on dual
     variables are altered. In entering type algorithm they are changed and,
     hence, retreived from the column or row upper or lower bound vectors.
@@ -43,6 +43,7 @@ namespace soplex
 void SoPlex::computeFrhs()
 {
    METHOD( "SoPlex::computeFrhs()" );
+
    if (rep() == COLUMN)
    {
       theFrhs->clear();
@@ -111,17 +112,18 @@ void SoPlex::computeFrhs()
 void SoPlex::computeFrhsXtra()
 {
    METHOD( "SoPlex::computeFrhsXtra()" );
-   assert(rep() == COLUMN);
-   assert(type() == LEAVE);
-   Real x;
-   int i;
 
-   for (i = nCols() - 1; i >= 0; --i)
+   assert(rep()  == COLUMN);
+   assert(type() == LEAVE);
+
+   for (int i = 0; i < nCols(); ++i)
    {
       SPxBasis::Desc::Status stat = desc().colStatus(i);
 
       if (!isBasic(stat))
       {
+         Real x;
+
          switch (stat)
          {
             // columnwise cases:
@@ -145,6 +147,7 @@ void SoPlex::computeFrhsXtra()
          }
          assert(x < infinity);
          assert(x > -infinity);
+
          if (x != 0.0)
             theFrhs->multAdd(-x, vector(i));
       }
@@ -152,25 +155,26 @@ void SoPlex::computeFrhsXtra()
 }
 
 
-/*
-    This methods subtracts $A_N x_N$ or $\pi_N^T A_N$ from |theFrhs| as
-    specified by the |Status| of all nonbasic variables. The values of $x_N$ or
-    $\pi_N$ are taken from the passed arrays.
+/** This methods subtracts \f$A_N x_N\f$ or \f$\pi_N^T A_N\f$ from |theFrhs| as
+    specified by the |Status| of all nonbasic variables. The values of \f$x_N\f$ or
+    \f$\pi_N\f$ are taken from the passed arrays.
  */
 void SoPlex::computeFrhs1(
    const Vector& ufb,    ///< upper feasibility bound for variables
    const Vector& lfb)    ///< lower feasibility bound for variables
 {
    METHOD( "SoPlex::computeFrhs1()" );
-   Real x;
-   int i;
+
    const SPxBasis::Desc& ds = desc();
 
-   for (i = coDim() - 1; i >= 0; --i)
+   for (int i = 0; i < coDim(); ++i)
    {
       SPxBasis::Desc::Status stat = ds.status(i);
+
       if (!isBasic(stat))
       {
+         Real x;
+
          switch (stat)
          {
          case SPxBasis::Desc::D_FREE :
@@ -200,31 +204,32 @@ void SoPlex::computeFrhs1(
          }
          assert(x < infinity);
          assert(x > -infinity);
+
          if (x != 0.0)
             theFrhs->multAdd(-x, vector(i));
       }
    }
 }
 
-/*
-    This methods subtracts $A_N x_N$ or $\pi_N^T A_N$ from |theFrhs| as
-    specified by the |Status| of all nonbasic variables. The values of $x_N$ or
-    $\pi_N$ are taken from the passed arrays.
+/** This methods subtracts \f$A_N x_N\f$ or \f$\pi_N^T A_N\f$ from |theFrhs| as
+    specified by the |Status| of all nonbasic variables. The values of \f$x_N\f$ or
+    \f$\pi_N\f$ are taken from the passed arrays.
  */
 void SoPlex::computeFrhs2(
    const Vector& coufb,   ///< upper feasibility bound for covariables
    const Vector& colfb)   ///< lower feasibility bound for covariables
 {
    METHOD( "SoPlex::computeFrhs2()" );
-   Real x;
-   int i;
    const SPxBasis::Desc& ds = desc();
 
-   for(i = 0; i < dim(); i++)
+   for(int i = 0; i < dim(); ++i)
    {
       SPxBasis::Desc::Status stat = ds.coStatus(i);
+
       if (!isBasic(stat))
       {
+         Real x;
+
          switch (stat)
          {
          case SPxBasis::Desc::D_FREE :
@@ -260,13 +265,13 @@ void SoPlex::computeFrhs2(
          }
          assert(x < infinity);
          assert(x > -infinity);
-         (*theFrhs)[i] -= x;
+
+         (*theFrhs)[i] -= x; // This is a slack, so no need to multiply a vector.
       }
    }
 }
 
-/*
-    Computing the right hand side vector for |theCoPvec| depends on
+/** Computing the right hand side vector for |theCoPvec| depends on
     the type of the simplex algorithm. In entering algorithms, the
     values are taken from the inequality's right handside or the
     column's objective value.
@@ -278,7 +283,7 @@ void SoPlex::computeFrhs2(
     |computeEnterCoPrhs(n, stat)| and |computeLeaveCoPrhs(n, stat)|. The first
     pair operates for entering algorithms, while the second one is intended for
     leaving algorithms.  The return value of these methods is the right hand
-    side value for the $n$-th row or column id, respectively, if it had the
+    side value for the \f$n\f$-th row or column id, respectively, if it had the
     passed |Status| for both.
  
     Both methods are again split up into two methods named |...4Row(i,n)| and
@@ -448,8 +453,7 @@ void SoPlex::computeLeaveCoPrhs()
 }
 
 
-/*
-    When computing the copricing vector, we expect the pricing vector to be
+/** When computing the copricing vector, we expect the pricing vector to be
     setup correctly. Then computing the copricing vector is nothing but
     computing all scalar products of the pricing vector with the vectors of the
     LPs constraint matrix.

@@ -9,8 +9,8 @@ class ostream : public ios
 {
 public:
    ostream();
+   ostream(streambuf* b);
    ~ostream();
-   
    ostream& operator<<(bool);
    ostream& operator<<(char);
    ostream& operator<<(short);

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: solve.cpp,v 1.19 2002/12/08 11:09:21 bzfkocht Exp $"
+#pragma ident "@(#) $Id: solve.cpp,v 1.20 2002/12/12 09:48:53 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -847,54 +847,74 @@ int CLUFactor::solveLleftForest(Real* vec, int* /* nonz */, Real /* eps */)
 void CLUFactor::solveLleft(Real* vec)
 {
    METHOD( "CLUFactor::solveLleft()" );
-   int i, j, k;
-   int r;
-   Real x;
-   Real *rval, *val;
-   int *ridx, *idx;
-   int *rbeg;
-   int* rorig;
-
-   ridx  = l.ridx;
-   rval  = l.rval;
-   rbeg  = l.rbeg;
-   rorig = l.rorig;
 
 #ifndef WITH_L_ROWS
+   int*  idx;
+   Real* val;
    Real* lval  = l.val;
-   int*    lidx  = l.idx;
-   int*    lrow  = l.row;
-   int*    lbeg  = l.start;
+   int*  lidx  = l.idx;
+   int*  lrow  = l.row;
+   int*  lbeg  = l.start;
    
-   for (i = l.firstUpdate - 1; i >= 0; --i)
+   for(int i = l.firstUpdate - 1; i >= 0; --i)
    {
-      k = lbeg[i];
+      int k = lbeg[i];
       val = &lval[k];
       idx = &lidx[k];
       x = 0;
-      for (j = lbeg[i + 1]; j > k; --j)
+      for(int j = lbeg[i + 1]; j > k; --j)
          x += vec[*idx++] * (*val++);
       vec[lrow[i]] -= x;
    }
 #else
-   for (i = thedim; i--;)
+#if 0 // old
+   int*  idx;
+   Real* val;
+   Real* rval  = l.rval;
+   int*  ridx  = l.ridx;
+   int*  rbeg  = l.rbeg;
+   int*  rorig = l.rorig;
+
+   for(int i = thedim; i--;)
    {
-      r = rorig[i];
-      x = vec[r];
+      int  r = rorig[i];
+      Real x = vec[r];
+
       if (x != 0.0)
       {
-         k = rbeg[r];
-         j = rbeg[r + 1] - k;
+         int k = rbeg[r];
+         int j = rbeg[r + 1] - k;
          val = &rval[k];
          idx = &ridx[k];
          while (j-- > 0)
          {
+            std::cout << "i=" << i << " r=" << r << " idx=" << *idx << std::endl;
             assert(l.rperm[*idx] < i);
             vec[*idx++] -= x * *val++;
          }
       }
    }
+#else // understandable
+   for(int i = thedim - 1; i >= 0; --i)
+   {
+      int  r = l.rorig[i];
+      Real x = vec[r];
+
+      if (x != 0.0)
+      {
+         for(int k = l.rbeg[r]; k < l.rbeg[r + 1]; k++)
+         { 
+            int j = l.ridx[k];
+
+            assert(l.rperm[j] < i);
+
+            vec[j] -= x * l.rval[k];
+         }
+      }
+   }
 #endif
+
+#endif // WITH_L_ROWS
 }
 
 int CLUFactor::solveLleftEps(Real* vec, int* nonz, Real eps)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.22 2002/10/23 10:40:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.23 2002/12/12 09:48:53 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -39,13 +39,12 @@ static const Real reject_leave_tol = 1e-8;
 void SoPlex::computeFtest()
 {
    METHOD( "SoPlex::computeFtest()" );
-   assert(type() == LEAVE);
-   Vector& ftest = theCoTest;                  // |== fTest()|
-   assert(&ftest == &fTest());
 
-   for (int i = dim() - 1; i >= 0; --i)
+   assert(type() == LEAVE);
+
+   for(int i = 0; i < dim(); ++i)
    {
-      ftest[i] = ((*theFvec)[i] > theUBbound[i])
+      theCoTest[i] = ((*theFvec)[i] > theUBbound[i])
          ? theUBbound[i] - (*theFvec)[i]
          : (*theFvec)[i] - theLBbound[i];
    }

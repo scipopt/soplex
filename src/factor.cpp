@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.38 2002/12/08 11:09:21 bzfkocht Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.39 2002/12/12 09:48:53 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -1457,7 +1457,7 @@ void CLUFactor::setupRowVals()
    beg   = l.start;
    mem   = beg[vecs];
 
-   if (l.rval)
+   if (l.rval != 0)
    {
       spx_free(l.rval);
       spx_free(l.ridx);
@@ -1530,7 +1530,7 @@ void CLUFactor::factor(
 
    stat = SLinSolver::OK;
 
-   l.start[0] = 0;
+   l.start[0]    = 0;
    l.firstUpdate = 0;
    l.firstUnused = 0;
 
@@ -1743,14 +1743,10 @@ bool CLUFactor::isConsistent() const
     */
    for (i = 0; i < thedim; ++i)
    {
-      for(j = u.row.start[i] + u.row.len[i] - 1;
-          j >= u.row.start[i];
-          j--)
+      for(j = u.row.start[i] + u.row.len[i] - 1; j >= u.row.start[i]; j--)
       {
          k = u.row.idx[j];
-         for(ll = u.col.start[k] + u.col.len[k] - 1;
-             ll >= u.col.start[k];
-             ll-- )
+         for(ll = u.col.start[k] + u.col.len[k] - 1; ll >= u.col.start[k]; ll-- )
          {
             if (u.col.idx[ll] == i)
                break;
@@ -1762,8 +1758,7 @@ bool CLUFactor::isConsistent() const
          }
          else
          {
-            assert(col.perm[k] < 0 
-               || col.perm[k] > row.perm[i]);
+            assert(col.perm[k] < 0 || col.perm[k] > row.perm[i]);
          }
       }
    }
@@ -1772,42 +1767,55 @@ bool CLUFactor::isConsistent() const
     */
    for (i = 0; i < thedim; ++i)
    {
-      for(j = u.col.start[i] + u.col.len[i] - 1;
-          j >= u.col.start[i];
-          j--)
+      for(j = u.col.start[i] + u.col.len[i] - 1; j >= u.col.start[i]; j--)
       {
          k = u.col.idx[j];
-         for( ll = u.row.start[k] + u.row.len[k] - 1;
-              ll >= u.row.start[k];
-              ll--)
+         for( ll = u.row.start[k] + u.row.len[k] - 1; ll >= u.row.start[k]; ll--)
          {
             if (u.row.idx[ll] == i)
                break;
          }
          assert(u.row.idx[ll] == i);
-         assert(col.perm[i] < 0
-            || row.perm[k] < col.perm[i]);
+         assert(col.perm[i] < 0 || row.perm[k] < col.perm[i]);
       }
    }
 
    /*  Test consistency of nonzero count lists
     */
    if (temp.pivot_colNZ && temp.pivot_rowNZ)
+   {
       for (i = 0; i < thedim - temp.stage; ++i)  {
-         for (pring = temp.pivot_rowNZ[i].next; 
-              pring != &(temp.pivot_rowNZ[i]); 
-              pring = pring->next)
-            {
-               assert(row.perm[pring->idx] < 0);
-            }
-         for (pring = temp.pivot_colNZ[i].next; 
-              pring != &(temp.pivot_colNZ[i]); 
-              pring = pring->next)
-            {
-               assert(col.perm[pring->idx] < 0);
-            }
+         for (pring = temp.pivot_rowNZ[i].next; pring != &(temp.pivot_rowNZ[i]); pring = pring->next)
+         {
+            assert(row.perm[pring->idx] < 0);
+         }
+         for (pring = temp.pivot_colNZ[i].next; pring != &(temp.pivot_colNZ[i]); pring = pring->next)
+         {
+            assert(col.perm[pring->idx] < 0);
+         }
       }
-   
+   }
+#if 0 // Stimmt leider nicht
+   /* Test on L
+    */
+   if (l.rval != 0 && l.firstUnused > 0)
+   {
+      for(i = 0; i < thedim; i++)
+      {
+         assert(l.rbeg[i] >= 0);
+         assert(l.rbeg[i] <= l.firstUpdate);         
+         assert(l.rbeg[i] <= l.rbeg[i + 1]);
+
+         assert(l.rorig[i] >= 0);
+         assert(l.rorig[i] <  thedim);
+         assert(l.rperm[i] >= 0);
+         assert(l.rperm[i] <  thedim);
+
+         assert(l.ridx[i] >= 0);
+         assert(l.ridx[i] <  thedim);
+      }
+   }
+#endif
    return true;
 }
 

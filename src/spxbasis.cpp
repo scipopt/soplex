@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.35 2002/12/08 11:09:21 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.36 2002/12/12 09:48:53 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -30,10 +30,6 @@
 
 namespace soplex
 {
-static Real minStab;
-#define EPS     minStab
-//#define       EPS     1e-6
-
 SPxBasis::Desc::Status
 SPxBasis::dualStatus(const SPxColId& id) const
 {
@@ -190,7 +186,7 @@ void SPxBasis::setRep()
    assert(theLP != 0);
 
    reDim();
-   minStab = 1e-4;
+   minStab = 0.0;
 
    if (theLP->rep() == SoPlex::ROW)
    {
@@ -386,64 +382,6 @@ void SPxBasis::writeBasis(
    os << "ENDATA" << std::endl;
 }
 
-/*      \SubSection{Pivoting Methods}
- */
-#if 0
-int SPxBasis::needFactorize() const
-{
-   METHOD( "SPxBasis::needFactorize()" );
-
-   if (!factorized)
-      return true;
-
-   if (nonzeroFactor < 0)
-      return (updateCount >= -nonzeroFactor);
-
-   assert(updateCount > 0);
-
-   Real neu    = (nzFac + factor->memory() + lastFill * nzCount) / (updateCount + 1);
-   Real alt    = (nzFac                    + lastFill * nzCount) /  updateCount;
-
-#if 0
-   if (updateCount >= maxUpdates || neu > alt)
-      std::cout << "== neccessary == " 
-                << " nzFac= " << nzFac
-                << " memory= " << factor->memory()
-                << " lastFill= " << lastFill
-                << " nzCount= " << nzCount
-                << " updateCount= " << updateCount
-                << " neu= " << neu
-                << " alt= " << alt
-                << std::endl;
-#endif
-   return (updateCount >= maxUpdates || neu > alt);
-}
-#else
-
-int SPxBasis::needFactorize() const
-{
-   METHOD( "SPxBasis::needFactorize()" );
-
-   if (!factorized)
-      return true;
-
-   assert(nonzeroFactor > 0);
-   assert(updateCount > 0);
-
-#if 0
-   std::cout << "== neccessary == " 
-             << " nonzeroFactor= " << nonzeroFactor
-             << " memory= " << factor->memory()
-             << " nzCount= " << nzCount
-             << " updateCount= " << updateCount
-             << std::endl;
-#endif
-   if (factor->memory() > 5 * nzCount) // nonzeroFactor
-      return true;
-
-   return updateCount >= 100; //maxUpdates;
-}
-#endif
 
 void SPxBasis::change(
    int i,
@@ -452,39 +390,82 @@ void SPxBasis::change(
    const SSVector* eta)
 {
    METHOD( "SPxBasis::change()" );
+
    assert(matrixIsSetup);
    assert(!id.isValid() || (enterVec != 0));
-
    assert(factor != 0);
+
    lastidx = i;
-   lastin = id;
+   lastin  = id;
 
    if (id.isValid() && i >= 0)
    {
       assert(enterVec != 0);
 
-      nzCount = nzCount - matrix[i]->size() + enterVec->size();
-      matrix[i] = enterVec;
-      lastout = theBaseId[i];
+      nzCount      = nzCount - matrix[i]->size() + enterVec->size();
+      matrix[i]    = enterVec;
+      lastout      = theBaseId[i];
       theBaseId[i] = id;
 
       ++iterCount;
       ++updateCount;
-      Real newFac = nzFac + factor->memory();
-      if (needFactorize())
+
+      // never factorize? Just do it !
+      if (!factorized)
+      {
+         VERBOSE3(std::cout << "== unfactorized ==" << std::endl; ); 
          factorize();
+      }
+      // relative fill too high ?
+      else if (Real(factor->memory()) > lastFill * Real(lastMem))
+      {
+         VERBOSE3(std::cout 
+            << "== fill factor =="
+            << " memory= " << factor->memory()
+            << " lastMem= " << lastMem
+            << " lastFill= " << lastFill
+            << std::endl;);
+
+         factorize();
+      }
+      // absolute fill too high ?
+      else if (Real(factor->memory()) > nonzeroFactor * Real(nzCount))
+      {
+         VERBOSE3(std::cout 
+            << "== nonzero factor =="
+            << " memory= " << factor->memory()
+            << " nzCount= " << nzCount
+            << " nonzeroFactor= " << nonzeroFactor
+            << std::endl;);
+         factorize();
+      }
+      // too many updates ?
+      else if (updateCount >= maxUpdates)
+      {
+         VERBOSE3(std::cout 
+            << "== update count =="
+            << " updateCount= " << updateCount
+            << " maxUpdates= " << maxUpdates
+            << std::endl;);
+         factorize();
+      }
       else
       {
-         // Real    s = factor->stability();
          factor->change(i, *enterVec, eta);
-         if (factor->status() != SLinSolver::OK || factor->stability() < EPS)
+
+         assert(minStab > 0.0);
+
+         if (factor->status() != SLinSolver::OK || factor->stability() < minStab)
          {
             // std::cout << s << " -> " << factor->stability() << '\t';
-            std::cout << "== change == " << std::endl;
+            VERBOSE3(std::cout 
+               << "== stability =="
+               << " stability= " << factor->stability()
+               << " minStab= " << minStab
+               << std::endl;);
+
             factorize();
          }
-         else
-            nzFac = newFac;
       }
    }
    else
@@ -511,7 +492,10 @@ void SPxBasis::factorize()
    case SLinSolver::OK :
       if (status() == SINGULAR)
          setStatus(REGULAR);
+
       minStab = factor->stability();
+
+      // This seems allways be about 1e-7 
       if (minStab > 1e-4)
          minStab *= 0.001;
       if (minStab > 1e-5)
@@ -528,8 +512,9 @@ void SPxBasis::factorize()
       // factorized = false;
    }
    assert(nzCount > 0);
-   lastFill = Real(factor->memory()) * nonzeroFactor / Real(nzCount);
-   nzFac = 0;
+
+   lastMem    = factor->memory();
+   lastFill   = fillFactor * Real(factor->memory()) / Real(nzCount);
    factorized = true;
 }
 
@@ -668,9 +653,11 @@ SPxBasis::SPxBasis()
    , matrixIsSetup (false)
    , factor (0)
    , factorized (false)
-   , maxUpdates (1000)
-   , nonzeroFactor (10)
+   , maxUpdates (200)
+   , nonzeroFactor(10.0)
+   , fillFactor(5.0)
    , nzCount (1)
+   , minStab(0.0)
    , thestatus (NO_PROBLEM)
 {
    METHOD( "SPxBasis::SPxBasis()" );
@@ -688,13 +675,14 @@ SPxBasis::SPxBasis(const SPxBasis& old)
    , factorized(old.factorized)
    , maxUpdates(old.maxUpdates)
    , nonzeroFactor(old.nonzeroFactor)
+   , fillFactor(old.fillFactor)
    , iterCount(old.iterCount)
    , nzCount(old.nzCount)
-   , nzFac(old.nzFac)
    , lastFill(old.lastFill)
    , lastin(old.lastin)
    , lastout(old.lastout)
    , lastidx(old.lastidx)
+   , minStab(old.minStab)
    , thestatus(old.thestatus)
    , thedesc(old.thedesc)
 {
@@ -718,13 +706,14 @@ SPxBasis& SPxBasis::operator=(const SPxBasis& rhs)
       factorized    = rhs.factorized;
       maxUpdates    = rhs.maxUpdates;
       nonzeroFactor = rhs.nonzeroFactor;
+      fillFactor    = rhs.fillFactor;
       iterCount     = rhs.iterCount;
       nzCount       = rhs.nzCount;
-      nzFac         = rhs.nzFac;
       lastFill      = rhs.lastFill;
       lastin        = rhs.lastin;
       lastout       = rhs.lastout;
       lastidx       = rhs.lastidx;
+      minStab       = rhs.minStab;
       thestatus     = rhs.thestatus;
       thedesc       = rhs.thedesc;
    }

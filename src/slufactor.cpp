@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.31 2002/12/08 11:09:21 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.32 2002/12/12 09:48:53 bzfkocht Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -239,10 +239,13 @@ void SLUFactor::solveLeft(
 Real SLUFactor::stability() const
 {
    METHOD( "SLUFactor::stability()" );
+
    if (status() != OK)
       return 0;
+
    if (maxabs < initMaxabs)
       return 1;
+
    return initMaxabs / maxabs;
 }
 
@@ -339,6 +342,15 @@ void SLUFactor::clear()
    u.col.size    = 100;
    l.size        = 100;
    l.startSize   = 100;
+
+   if (l.rval)
+   {
+      spx_free(l.rval);
+      spx_free(l.ridx);
+      spx_free(l.rbeg);
+      spx_free(l.rorig);
+      spx_free(l.rperm);
+   }
 
    if (l.val)
    {
@@ -446,7 +458,7 @@ void SLUFactor::assign(const SLUFactor& old)
    spx_alloc(u.col.len,   thedim + 1);
    spx_alloc(u.col.max,   thedim + 1);
 
-   if (old.u.col.val)
+   if (old.u.col.val != 0)
    {
       spx_alloc(u.col.val, u.col.size);
       memcpy(u.col.val, old.u.col.val, u.col.size * sizeof(*u.col.val));
@@ -499,23 +511,32 @@ void SLUFactor::assign(const SLUFactor& old)
 
    if (old.l.rval != 0)
    {
-      assert(old.l.ridx != 0);
-      assert(old.l.rbeg != 0);
+      assert(old.l.ridx  != 0);
+      assert(old.l.rbeg  != 0);
+      assert(old.l.rorig != 0);
+      assert(old.l.rperm != 0);
 
-      spx_alloc(l.rval,  l.firstUpdate);
-      spx_alloc(l.ridx,  l.firstUpdate);
+      int memsize = l.start[l.firstUpdate];
+
+      spx_alloc(l.rval,  memsize);
+      spx_alloc(l.ridx,  memsize);
       spx_alloc(l.rbeg,  thedim + 1);
       spx_alloc(l.rorig, thedim);
       spx_alloc(l.rperm, thedim);
 
-      memcpy(l.rval,  old.l.rval,  l.firstUpdate * sizeof(*l.rval));
-      memcpy(l.ridx,  old.l.ridx,  l.firstUpdate * sizeof(*l.ridx));
-      memcpy(l.rbeg,  old.l.rbeg, (thedim + 1)   * sizeof(*l.rbeg));
-      memcpy(l.rorig, old.l.rorig, thedim        * sizeof(*l.rorig));
-      memcpy(l.rperm, old.l.rperm, thedim        * sizeof(*l.rperm));
+      memcpy(l.rval,  old.l.rval,  memsize     * sizeof(*l.rval));
+      memcpy(l.ridx,  old.l.ridx,  memsize     * sizeof(*l.ridx));
+      memcpy(l.rbeg,  old.l.rbeg, (thedim + 1) * sizeof(*l.rbeg));
+      memcpy(l.rorig, old.l.rorig, thedim      * sizeof(*l.rorig));
+      memcpy(l.rperm, old.l.rperm, thedim      * sizeof(*l.rperm));
    }
    else
    {
+      assert(old.l.ridx  == 0);
+      assert(old.l.rbeg  == 0);
+      assert(old.l.rorig == 0);
+      assert(old.l.rperm == 0);
+
       l.rval  = 0;
       l.ridx  = 0;
       l.rbeg  = 0;
@@ -554,13 +575,20 @@ SLUFactor& SLUFactor::operator=(const SLUFactor& old)
 
    if (this != &old)
    {
+#if 1
+      vec.clear();
+      ssvec.clear();
+#else
+      ///@todo Why does this not work ? (Gives isConsisten() failure in idxset)
       vec    = old.vec;
       ssvec  = old.ssvec;
+#endif
       eta    = old.eta;
       forest = old.forest;
 
       freeAll();
       assign(old);
+      assert(isConsistent());
    }
    return *this;
 }
@@ -716,6 +744,7 @@ SLUFactor::SLUFactor(const SLUFactor& old)
    u.col.start = 0;
    u.col.len   = 0;
    u.col.max   = 0;
+   u.col.val   = 0;
    l.val       = 0;
    l.idx       = 0;
    l.start     = 0;
@@ -728,6 +757,7 @@ SLUFactor::SLUFactor(const SLUFactor& old)
 #endif
 
    assign(old);
+   assert(isConsistent());
 }
 
 void SLUFactor::freeAll()

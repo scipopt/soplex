@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.54 2002/12/08 11:09:21 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.55 2002/12/12 09:48:53 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -253,7 +253,7 @@ protected:
    UpdateVector*  theCPvec;    /// column pricing vector
 
    // The following vectors serve for the virtualization of shift bounds
-   //@todo In prinziple this schould be refernces.
+   //@todo In prinziple this schould be references.
    DVector*       theUbound;      ///< Upper bound for vars
    DVector*       theLbound;      ///< Lower bound for vars
    DVector*       theCoUbound;    ///< Upper bound for covars
@@ -903,30 +903,30 @@ public:
    {
       return *theFrhs;
    }
-   ///
+   /// upper bound for #fVec.
    const Vector& ubBound() const
    {
       return theUBbound;
    }
-   /// upper bound for #fVec.
+   /// upper bound for #fVec, writable.
    /** This method returns the upper bound for the feasibility vector.
     *  It may only be called for the #ENTER%ing Simplex.
     *  
     *  For the #ENTER%ing Simplex algorithms, the feasibility vector is
     *  maintained to fullfill its bounds. As #fVec itself, also its
-    *  bounds depend on the chosen representation. Furhter, they may
+    *  bounds depend on the chosen representation. Further, they may
     *  need to be shifted (see below).
     */
    Vector& ubBound()
    {
       return theUBbound;
    }
-   ///
+   /// lower bound for #fVec, 
    const Vector& lbBound() const
    {
       return theLBbound;
    }
-   /// lower bound for #fVec.
+   /// lower bound for #fVec, writable.
    /** This method returns the lower bound for the feasibility vector.
     *  It may only be called for the #ENTER%ing Simplex.
     *
@@ -1394,7 +1394,8 @@ protected:
    {
       initialized = false;
    }
-
+   /// setup all vecs fresh
+   virtual void reinitializeVecs();
    /// reset dimensions of vectors according to loaded LP.
    virtual void reDim();
    /// compute feasibility vector from scratch.
@@ -1480,6 +1481,7 @@ protected:
 
    void setDualColBounds();
    void setDualRowBounds();
+   /// setup feasibility bounds for entering algorithm
    void setPrimalBounds();
 
    void setEnterBound4Col(int, int);

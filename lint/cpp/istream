@@ -10,6 +10,7 @@ class istream : public ios
 {
 public:
    istream();
+   istream(streambuf* b);
    ~istream();
    istream& get(char&);
    istream& putback(char);

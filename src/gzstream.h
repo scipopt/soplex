@@ -18,8 +18,8 @@
 // ============================================================================
 //
 // File          : gzstream.h
-// Revision      : $Revision: 1.1 $
-// Revision_date : $Date: 2002/12/08 11:09:21 $
+// Revision      : $Revision: 1.2 $
+// Revision_date : $Date: 2002/12/12 09:48:53 $
 // Author(s)     : Deepak Bandyopadhyay, Lutz Kettner
 // 
 // Standard streambuf implementation following Nicolai Josuttis, "The 
@@ -63,10 +63,10 @@ public:
               buffer + 4);    // end position      
         // ASSERT: both input & output capabilities will not be used together
     }
-    int is_open() { return opened; }
+    int is_open() const { return opened; }
     gzstreambuf* open( const char* name, int open_mode);
     gzstreambuf* close();
-    ~gzstreambuf() { close(); }
+    ~gzstreambuf() { close(); file = 0; }
     
     virtual int     overflow( int c = EOF);
     virtual int     underflow();

@@ -1,12 +1,34 @@
 #ifndef _STREAM_
 #define _STREAM_
 
+#ifndef EOF
+#define EOF (-1)
+#endif
+
 namespace std
 {
+
+class streambuf
+{
+protected:
+   setp(char* begin, char* end);
+   setg(char* begin, char* next, char* end);
+   char* pbase() const;
+   char* pptr() const;
+   char* gptr() const;
+   char* egptr() const;
+   char* epptr() const;
+   char* eback() const;
+   void pbump(int n);
+   void gbump(int n);
+};
+
 class ios
 {
 public:
    enum fmtflags { scientific, showpoint };
+   enum openmode { ate, app, in, out };
+   enum iostate  { badbit, eofbit, failbit, goodbit };
    bool good() const;
    bool eof()  const;
    bool fail() const;
@@ -14,6 +36,10 @@ public:
    operator void*() const;
    bool operator!() const;
    fmtflags setf(fmtflags);
+   iostate rdstate() const;
+   void clear(iostate f = goodbit);
+   void setstate(iostate f);
+   void init(streambuf* b);   
 };
 
 class smanip
@@ -22,6 +48,7 @@ class smanip
 
 smanip& setprecision(int);
 smanip& setw(int);
+
 }
 
 #endif

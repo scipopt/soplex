@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.54 2002/12/08 11:09:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.55 2002/12/12 09:48:53 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -142,11 +142,17 @@ SoPlex::Status SoPlex::solve()
             });
 
             enterId = thepricer->selectEnter();
+
             if (!enterId.isValid())
             {
+               if (lastUpdate() == 0)
+                  break;
+               
                std::cout << "== in solve ==" << std::endl;
                factorize();
+
                enterId = thepricer->selectEnter();
+
                if (!enterId.isValid())
                   break;
             }
@@ -210,10 +216,15 @@ SoPlex::Status SoPlex::solve()
             });
             
             leaveNum = thepricer->selectLeave();
+
             if (leaveNum < 0)
             {
+               if (lastUpdate() == 0)
+                  break;
+
                std::cout << "== in solve ==" << std::endl;
                factorize();
+
                leaveNum = thepricer->selectLeave();
                if (leaveNum < 0)
                   break;

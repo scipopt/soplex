@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.28 2002/12/08 11:09:21 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.29 2002/12/12 09:48:53 bzfkocht Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -358,28 +358,34 @@ protected:
        factorization, it is recomputed in order to regain numerical
        stability and reduce fill in.
    */
-   int maxUpdates;
+   int   maxUpdates;
 
-   /// increase of nonzeros before refactorization.
+   /// allowed increase of nonzeros before refactorization.
    /** When the number of nonzeros in LU factorization exceeds
-       #nonzeroFactor times the number of nonzeros of a fresh one, the
+       #nonzeroFactor times the number of nonzeros in B, the
        basis matrix is refactorized.
    */
-   Real nonzeroFactor;
+   Real   nonzeroFactor;
 
+   /// allowed increase in realtive fill before refactorization
+   /** When the real relative fill is bigger than fillFactor times lastFill
+    *  the Basis will be refactorized.
+    */ 
+   Real   fillFactor;
    /* Rank-1-updates to the basis may be performed via method #change(). In
       this case, the factorization is updated, and the following members are
       reset.
    */
-   int iterCount;     ///< number of calls to #change() since last manipulation
-   int updateCount;   ///< number of calls to #change() since last #factorize()
-   int nzCount;       ///< number of nonzeros in basis matrix
-   Real nzFac;      ///< current nzFactor
-   Real lastFill;   ///< fill occured during last factorization
+   int    iterCount;     ///< number of calls to #change() since last manipulation
+   int    updateCount;   ///< number of calls to #change() since last #factorize()
+   int    nzCount;       ///< number of nonzeros in basis matrix
+   int    lastMem;       ///< memory needed after last fresh factorization
+   Real   lastFill;      ///< fill ratio that occured during last factorization
 
-   SPxId lastin;  ///< #lastEntered(): variable entered the base last
-   SPxId lastout; ///< #lastLeft(): variable left the base last
-   int lastidx;       ///< #lastIndex(): basis index where last update was done
+   SPxId  lastin;        ///< #lastEntered(): variable entered the base last
+   SPxId  lastout;       ///< #lastLeft(): variable left the base last
+   int    lastidx;       ///< #lastIndex(): basis index where last update was done
+   double minStab;       ///< minimum stability
 
 private:
    SPxStatus thestatus;      ///< current status of the basis.
@@ -492,8 +498,8 @@ public:
    {
       return iterCount;
    }
-
    /// returns loaded solver.
+   ///@todo Name should be changed, or loadSolver should be renamed.
    SoPlex* solver() const
    {
       return theLP;
@@ -742,9 +748,6 @@ protected:
        dimensions of the loaded LP.
    */
    void reDim();
-
-   /// refactorize basis instead of updating the factorization?
-   virtual int needFactorize() const; 
 
    /// factorizes the basis matrix.
    virtual void factorize();

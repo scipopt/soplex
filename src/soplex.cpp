@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.63 2002/12/08 11:09:21 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.64 2002/12/12 09:48:53 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -226,6 +226,54 @@ void SoPlex::setRep(Representation p_rep)
 
    if (thepricer && thepricer->solver() == this)
       thepricer->setRep(p_rep);
+}
+
+// needed for strongbranching. use carefully
+void SoPlex::reinitializeVecs()
+{
+   METHOD( "SoPlex::reinitializeVecs" );
+   
+   initialized = true;
+
+   if (type() == ENTER)
+   {
+      if (rep() == COLUMN)
+         setPrimalBounds();
+      else
+         setDualRowBounds();
+
+      setEnterBounds();
+      computeEnterCoPrhs();
+   }
+   else
+   {
+      if (rep() == ROW)
+         setPrimalBounds();
+      else
+         setDualColBounds();
+
+      setLeaveBounds();
+      computeLeaveCoPrhs();
+   }
+
+   SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
+   computePvec();
+   computeFrhs();
+   SPxBasis::solve(*theFvec, *theFrhs);
+
+   theShift  = 0.0;
+   lastShift = 0.0;
+
+   if (type() == ENTER)
+   {
+      computeCoTest();
+      computeTest();
+   }
+   else
+   {
+      computeFtest();
+   }
+   assert((testBounds(), 1));
 }
 
 void SoPlex::init()

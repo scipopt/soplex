@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector.h,v 1.13 2002/11/23 08:06:00 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vector.h,v 1.14 2002/12/12 09:48:54 bzfkocht Exp $"
 
 /**@file  vector.h
  * @brief Dense vector for linear algebra.
@@ -245,8 +245,8 @@ public:
    /// set vector to 0.
    void clear()
    {
-      if (dimen)
-         memset(val, 0, dimen*sizeof(Real));
+      if (dimen > 0)
+         memset(val, 0, dimen * sizeof(Real));
    }
    //@}
 private:

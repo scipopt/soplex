@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.46 2002/12/08 11:09:21 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.47 2002/12/12 09:48:53 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -64,7 +64,7 @@ public:
    MySoPlex(Type p_type = LEAVE, Representation p_rep = COLUMN)
       : SoPlex(p_type, p_rep)
    {
-      setSolver(&m_slu);
+      SoPlex::setSolver(&m_slu); // virtual function call in constructor
    }
 
    virtual bool terminate()
@@ -131,7 +131,7 @@ public:
    }
 };
 
-int main(int argc, const char **argv)
+int main(int argc, const char* argv[])
 {
    const char* banner =
    "************************************************************************\n"

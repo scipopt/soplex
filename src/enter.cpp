@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.21 2002/12/08 11:09:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.22 2002/12/12 09:48:53 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -105,22 +105,21 @@ Real SoPlex::test(int i, SPxBasis::Desc::Status stat) const
 void SoPlex::computeTest()
 {
    METHOD( "SoPlex::computeTest()" );
-   int i;
+
    const SPxBasis::Desc& ds = desc();
 
-   for (i = coDim() - 1; i >= 0; --i)
+   for(int i = 0; i < coDim(); ++i)
    {
       SPxBasis::Desc::Status stat = ds.status(i);
-      if (isBasic(stat))
-         theTest[i] = 0;
-      else
-         theTest[i] = test(i, stat);
+
+      theTest[i] = isBasic(stat) ? 0.0 : test(i, stat);
    }
 }
 
 Real SoPlex::computePvec(int i)
 {
    METHOD( "SoPlex::computePvec()" );
+
    return (*thePvec)[i] = vector(i) * (*theCoPvec);
 }
 
@@ -796,7 +795,7 @@ int SoPlex::enter(SPxId& enterId)
    const SVector* enterVec = enterVector(enterId);
 
    getEnterVals(enterId, enterTest, enterUB, enterLB,
-                enterVal, enterMax, enterPric, enterStat, enterRO);
+      enterVal, enterMax, enterPric, enterStat, enterRO);
    //@ if(enterTest > ((theShift>epsilon()) ? -delta() : -epsilon()))
    if (enterTest > -epsilon())
    {
@@ -932,7 +931,7 @@ int SoPlex::enter(SPxId& enterId)
 
    /*
        No variable could be selected to leave the basis and even the entering
-       variable is unbounded --- this is a failiour.
+       variable is unbounded --- this is a failure.  
     */
    else
    {
@@ -940,6 +939,7 @@ int SoPlex::enter(SPxId& enterId)
          we need it in the INFEASIBLE/UNBOUNDED case, too, to have the
          basis descriptor at the correct size. */
       rejectEnter(enterId, enterTest, enterStat);
+
       if (lastUpdate() > 1)
       {
          std::cout << "== enter == " << std::endl;
@@ -949,6 +949,7 @@ int SoPlex::enter(SPxId& enterId)
 
       SPxId none;
       change(-1, none, 0);
+
       if (rep() != COLUMN)
          setBasisStatus(SPxBasis::INFEASIBLE);
       else
