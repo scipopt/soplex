@@ -21,6 +21,7 @@ class smanip
 };
 
 smanip& setprecision(int);
+smanip& setw(int);
 }
 
 #endif
