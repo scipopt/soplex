@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.22 2001/12/15 11:36:52 bzfkocht Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.23 2001/12/15 11:52:32 bzfkocht Exp $"
 
 #include <iostream>
 #include <assert.h>
@@ -1367,17 +1367,16 @@ int CLUFactor::setupColVals()
    int i;
    int n = thedim;
 
-   if (u.col.val)
+   if (u.col.val != 0)
       spx_free(u.col.val);
 
+   // if we would know the old size of u.col.val, this could be a realloc.
+   spx_alloc(u.col.val, u.col.size);
 
    for(i = 0; i < thedim; i++)
       u.col.len[i] = 0;
 
    maxabs = 0.0;
-
-   // if we would know the old size of u.col.val, this could be a realloc.
-   spx_alloc(u.col.val, u.col.size);
 
    for(i = 0; i < thedim; i++)
    {
@@ -1488,6 +1487,7 @@ static void setupRowVals(CLUFactor* fc)
       for (; j < beg[i + 1]; j++)
       {
          k = l_rbeg[*idx++]++;
+         assert(k < mem);
          l_ridx[k] = l;
          l_rval[k] = *val++;
       }
