@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.10 2001/11/29 14:00:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.11 2001/11/30 14:35:02 bzfbleya Exp $"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -65,9 +65,7 @@ static int *lbeg;
 /*
  *      Temporary data structures.
  */
-static int*    s_mark;
-static double* s_max;           /* maximum absolute value per row (or -1) */
-static int*    s_cact;          /* lengths of columns of active submatrix */
+
 /*
         For the i=th column the situation might look like this:
  
@@ -84,35 +82,26 @@ static int*    s_cact;          /* lengths of columns of active submatrix */
         the active submatrix.
  */
 
-struct Pring   /* Pivot ring */
-{
-   Pring *next;
-   Pring *prev;
-   int idx;            /* index of pivot row */
-   int pos;            /* position of pivot column in row */
-   int mkwtz;          /* markowitz number of pivot */
-};
-
-static Pring pivots;         /* ring of selected pivot rows */
-static Pring *col,            /* column index handlers for double linked list */
+static CLUFactor::Pring pivots;         /* ring of selected pivot rows */
+static CLUFactor::Pring *col,            /* column index handlers for double linked list */
 *colNZ,          /* lists for columns to number of nonzeros      */
 *row,            /* same for rows */
 *rowNZ;         /* same for rows */
 
 
-static void newTmp(int p_dim)
-{
-   spx_alloc(s_max, p_dim);
-   spx_alloc(s_cact, p_dim);
-   spx_alloc(s_mark, p_dim);
-}
-
-static void deleteTmp()
-{
-   spx_free(s_mark);
-   spx_free(s_cact);
-   spx_free(s_max);
-}
+   /************************************************************/
+   CLUFactor::Temp::Temp(int p_dim)
+   {
+      spx_alloc(s_max, p_dim);
+      spx_alloc(s_cact, p_dim);
+      spx_alloc(s_mark, p_dim);
+   }
+   CLUFactor::Temp::~Temp()
+   {
+      spx_free(s_mark);
+      spx_free(s_cact);
+      spx_free(s_max);
+   }
 
 /*****************************************************************************/
 /*
@@ -225,7 +214,7 @@ static void setPivot(int p_stage, int p_col, int p_row, double val)
  *      Initialize row and column file of working matrix and
  *      mark column singletons.
  */
-static void initMatrix(SVector** vec)
+static void initMatrix(SVector** vec, CLUFactor::Temp& temp )
 {
    double x;
    int i, j, l, k, m;
@@ -233,7 +222,7 @@ static void initMatrix(SVector** vec)
    Dring *rring, *lastrring;
    Dring *cring, *lastcring;
    SVector *psv;
-   int *sing = s_mark;
+   int *sing = temp.s_mark;
 
    /*  Initialize:
     *  - column file thereby remembering column singletons in |sing|.
@@ -354,7 +343,7 @@ static void initMatrix(SVector** vec)
       if (l > 1)
       {
          ++m;
-         s_cact[i] = clen[i] = cmax[i] = l;
+         temp.s_cact[i] = clen[i] = cmax[i] = l;
       }
       else if (l <= 0)       /* singular */
       {
@@ -391,7 +380,7 @@ static void initMatrix(SVector** vec)
  *      Remove column singletons
  */
 
-static void colSingletons(void)
+static void colSingletons(CLUFactor::Temp& temp)
 {
    int i, j, k, n;
    int len;
@@ -399,7 +388,7 @@ static void colSingletons(void)
    int *idx;
    int *rorig = fac->row.orig;
    int *rperm = fac->row.perm;
-   int *sing = s_mark;
+   int *sing = temp.s_mark;
 
 
    /*  Iteratively update column counts due to removed column singletons
@@ -423,14 +412,14 @@ static void colSingletons(void)
          /*  Move pivotal nonzeros to front of column.
           */
          p_col = idx[j];
-         n = cbeg[p_col] + clen[p_col] - s_cact[p_col];
+         n = cbeg[p_col] + clen[p_col] - temp.s_cact[p_col];
          for (k = n; cidx[k] != p_row; ++k)
            ;
          assert(k < cbeg[p_col] + clen[p_col]);
          cidx[k] = cidx[n];
          cidx[n] = p_row;
 
-         n = --(s_cact[p_col]);          /* column nonzeros of ACTIVE matrix */
+         n = --(temp.s_cact[p_col]);          /* column nonzeros of ACTIVE matrix */
 
          if (n == 1)                  /* Here is another singleton */
          {
@@ -476,14 +465,14 @@ static void colSingletons(void)
 /*
  *      Remove row singletons
  */
-static void rowSingletons(void)
+static void rowSingletons(CLUFactor::Temp& temp)
 {
    double pval;
    int i, j, k, l, r;
    int p_row, p_col, len, rs, lk;
    int *idx;
    int *rperm = fac->row.perm;
-   int *sing = s_mark;
+   int *sing = temp.s_mark;
 
    /*  Mark row singletons
     */
@@ -513,7 +502,7 @@ static void rowSingletons(void)
        *      thereby building up L vector.
        */
       idx = &(cidx[cbeg[p_col]]);
-      i = s_cact[p_col];                /* nr. nonzeros of new L vector */
+      i = temp.s_cact[p_col];                /* nr. nonzeros of new L vector */
       lk = makeLvec(fac, i - 1, p_row);
       len = clen[p_col];
       i = (clen[p_col] -= i);         /* remove pivot column from U */
@@ -565,12 +554,12 @@ static void rowSingletons(void)
  *      and required entries of arrays max and mark
  */
 
-static void initRings(void)
+static void initRings(CLUFactor::Temp& temp)
 {
    int i;
    int *rperm = fac->row.perm;
    int *cperm = fac->col.perm;
-   Pring *ring;
+   CLUFactor::Pring *ring;
 
    spx_alloc(col,   dim + 1);
    spx_alloc(colNZ, dim + 1);
@@ -591,15 +580,15 @@ static void initRings(void)
          ring = &(rowNZ[rlen[i]]);
          init2DR(row[i], *ring);
          row[i].idx = i;
-         s_max[i] = -1;
+         temp.s_max[i] = -1;
       }
       if (cperm[i] < 0)
       {
-         assert(s_cact[i] > 1);
-         ring = &(colNZ[s_cact[i]]);
+         assert(temp.s_cact[i] > 1);
+         ring = &(colNZ[temp.s_cact[i]]);
          init2DR(col[i], *ring);
          col[i].idx = i;
-         s_mark[i] = 0;
+         temp.s_mark[i] = 0;
       }
    }
 }
@@ -619,14 +608,14 @@ static void freeRings(void)
  *      Eliminate all row singletons from nucleus.
  *      A row singleton may well be column singleton at the same time!
  */
-static void eliminateRowSingletons(void)
+static void eliminateRowSingletons(CLUFactor::Temp& temp)
 {
    int i, j, k, l, r;
    int len, lk;
    int pcol, prow;
    double pval;
    int *idx;
-   Pring *sing;
+   CLUFactor::Pring *sing;
 
    for (sing = rowNZ[1].prev; sing != &(rowNZ[1]); sing = sing->prev)
    {
@@ -640,7 +629,7 @@ static void eliminateRowSingletons(void)
 
       /*      Eliminate pivot column and build L vector.
        */
-      i = s_cact[pcol];
+      i = temp.s_cact[pcol];
       if (i > 1)
       {
          idx = &(cidx[cbeg[pcol]]);
@@ -674,7 +663,7 @@ static void eliminateRowSingletons(void)
             removeDR(row[r]);
             init2DR (row[r], rowNZ[l]);
             assert(fac->row.perm[r] < 0);
-            s_max[r] = -1;
+            temp.s_max[r] = -1;
          }
 
          /* skip pivot element */
@@ -707,7 +696,7 @@ static void eliminateRowSingletons(void)
             removeDR(row[r]);
             init2DR (row[r], rowNZ[l]);
             assert(fac->row.perm[r] < 0);
-            s_max[r] = -1;
+            temp.s_max[r] = -1;
          }
       }
       else
@@ -723,11 +712,11 @@ static void eliminateRowSingletons(void)
  *      Eliminate all column singletons from nucleus.
  *      A column singleton must not be row singleton at the same time!
  */
-static void eliminateColSingletons(void)
+static void eliminateColSingletons(CLUFactor::Temp& temp)
 {
    int i, j, k, l, c;
    int pcol, prow;
-   Pring *sing;
+   CLUFactor::Pring *sing;
 
    for (sing = colNZ[1].prev; sing != &(colNZ[1]); sing = sing->prev)
    {
@@ -741,12 +730,12 @@ static void eliminateColSingletons(void)
       j = --(rlen[prow]) + rbeg[prow];
       for (i = j; (c = ridx[i]) != pcol; --i)
       {
-         l = clen[c] + cbeg[c] - (s_cact[c])--;
+         l = clen[c] + cbeg[c] - (temp.s_cact[c])--;
          for (k = l; cidx[k] != prow; ++k)
            ;
          cidx[k] = cidx[l];
          cidx[l] = prow;
-         l = s_cact[c];
+         l = temp.s_cact[c];
          removeDR(col[c]);
          init2DR(col[c], colNZ[l]);
          assert(fac->col.perm[c] < 0);
@@ -762,12 +751,12 @@ static void eliminateColSingletons(void)
       for (--i; i >= j; --i)
       {
          c = ridx[i];
-         l = clen[c] + cbeg[c] - (s_cact[c])--;
+         l = clen[c] + cbeg[c] - (temp.s_cact[c])--;
          for (k = l; cidx[k] != prow; ++k)
            ;
          cidx[k] = cidx[l];
          cidx[l] = prow;
-         l = s_cact[c];
+         l = temp.s_cact[c];
          removeDR(col[c]);
          init2DR(col[c], colNZ[l]);
          assert(fac->col.perm[c] < 0);
@@ -781,7 +770,7 @@ static void eliminateColSingletons(void)
 /*
  * No singletons available: Select pivot elements.
  */
-static void selectPivots(void)
+static void selectPivots(CLUFactor::Temp& temp)
 {
    int ii;
    int i;
@@ -821,7 +810,7 @@ static void selectPivots(void)
          /*  set maxabs to maximum absolute value in row
           *  (compute it if necessary).
           */
-         if ((maxabs = s_max[rw]) < 0)
+         if ((maxabs = temp.s_max[rw]) < 0)
          {
             maxabs = rval[len];
             if (maxabs < 0)
@@ -831,7 +820,7 @@ static void selectPivots(void)
                   maxabs = rval[i];
                else if (maxabs < -rval[i])
                   maxabs = -rval[i];
-            s_max[rw] = maxabs;               /* ##### */
+            temp.s_max[rw] = maxabs;               /* ##### */
          }
          maxabs *= threshold;
 
@@ -841,7 +830,7 @@ static void selectPivots(void)
          for (i = len; i >= beg; --i)
          {
             k = ridx[i];
-            j = s_cact[k];
+            j = temp.s_cact[k];
             x = rval[i];
             if (j < mkwtz && (x > maxabs || -x > maxabs))
             {
@@ -859,8 +848,8 @@ static void selectPivots(void)
          cl = colNZ[count].next->idx;
          beg = cbeg[cl];
          len = clen[cl] + beg - 1;
-         beg = len - s_cact[cl] + 1;
-         assert(count == s_cact[cl]);
+         beg = len - temp.s_cact[cl] + 1;
+         assert(count == temp.s_cact[cl]);
 
          /*  select pivot element with lowest markowitz number in column
           */
@@ -873,7 +862,7 @@ static void selectPivots(void)
             {
                /*  ensure that element (cl,k) is stable.
                 */
-               if (s_max[k] > 0)
+               if (temp.s_max[k] > 0)
                {
                   /*  case 1: maxabs is known
                    */
@@ -886,7 +875,7 @@ static void selectPivots(void)
                         break;
                      }
                   }
-                  maxabs = s_max[k];
+                  maxabs = temp.s_max[k];
                }
                else
                {
@@ -915,7 +904,7 @@ static void selectPivots(void)
                      else if (maxabs < -rval[l])
                         maxabs = -rval[l];
                   }
-                  s_max[k] = maxabs;
+                  temp.s_max[k] = maxabs;
                }
                maxabs *= threshold;
 
@@ -944,7 +933,7 @@ static void selectPivots(void)
       {
          /*  Initialize selected pivot element
           */
-         Pring *pr;
+         CLUFactor::Pring *pr;
          row[rw].pos = ii - rbeg[rw];
          row[rw].mkwtz = mkwtz = (mkwtz - 1) * (count - 1);  // ??? mkwtz originally was long, maybe to avoid an overflow in this instruction?
          for (pr = pivots.next; pr->idx >= 0; pr = pr->next)
@@ -988,7 +977,8 @@ static int updateRow
    int lv,
    int prow,
    int pcol,
-   double pval
+   double pval,
+   CLUFactor::Temp& temp
 )
 {
    int fill;
@@ -1019,11 +1009,11 @@ static int updateRow
    for (j = m - 1; j >= n; --j)
    {
       c = ridx[j];
-      if (s_mark[c])
+      if (temp.s_mark[c])
       {
          /*  count fill elements.
           */
-         s_mark[c] = 0;
+         temp.s_mark[c] = 0;
          --fill;
 
          /*  update row values
@@ -1040,7 +1030,7 @@ static int updateRow
 
             /* Eliminate zero from column c
              */
-            --(s_cact[c]);
+            --(temp.s_cact[c]);
             k = --(clen[c]) + cbeg[c];
             for (i = k; cidx[i] != r; --i)
               ;
@@ -1062,7 +1052,7 @@ static int updateRow
    for (j = rbeg[prow], m = j + rlen[prow]; j < m; ++j)
    {
       c = ridx[j];
-      if (s_mark[c])
+      if (temp.s_mark[c])
       {
          x = - work[c] * lx;
          if (isNonZero(x, epsilon))
@@ -1079,11 +1069,11 @@ static int updateRow
             if (clen[c] >= cmax[c])
                remaxCol(fac, c, clen[c] + 1);
             cidx[cbeg[c] + (clen[c])++] = r;
-            s_cact[c]++;
+            temp.s_cact[c]++;
          }
       }
       else
-         s_mark[c] = 1;
+         temp.s_mark[c] = 1;
    }
 
    /*  move row to appropriate list.
@@ -1091,7 +1081,7 @@ static int updateRow
    removeDR(row[r]);
    init2DR(row[r], rowNZ[rlen[r]]);
    assert(fac->row.perm[r] < 0);
-   s_max[r] = -1;
+   temp.s_max[r] = -1;
 
    return lv;
 }
@@ -1099,9 +1089,9 @@ static int updateRow
 /*
  *      Eliminate pivot element
  */
-static void eliminatePivot(int prow, int pos)
+static void eliminatePivot(int prow, int pos, CLUFactor::Temp& temp )
 {
-   int i, j, k, l;
+   int i, j, k, l = -1;
    int lv = -1;  // This value should never be used.
    int pcol;
    double pval;
@@ -1128,8 +1118,8 @@ static void eliminatePivot(int prow, int pos)
     *       case none of the loops below that uses lv is executed.
     *       But this is unproven.
     */
-   if (s_cact[pcol] - 1 > 0)
-      lv = makeLvec(fac, s_cact[pcol] - 1, prow);
+   if (temp.s_cact[pcol] - 1 > 0)
+      lv = makeLvec(fac, temp.s_cact[pcol] - 1, prow);
 
    /*  init working vector,
     *  remove pivot row from working matrix
@@ -1138,29 +1128,29 @@ static void eliminatePivot(int prow, int pos)
    for (i = pbeg; i < pend; ++i)
    {
       j = ridx[i];
-      s_mark[j] = 1;
+      temp.s_mark[j] = 1;
       work[j] = rval[i];
       removeDR(col[j]);
-      l = cbeg[j] + clen[j] - s_cact[j];
+      l = cbeg[j] + clen[j] - temp.s_cact[j];
       for (k = l; cidx[k] != prow; ++k)
         ;
       cidx[k] = cidx[l];
       cidx[l] = prow;
-      s_cact[j]--;
+      temp.s_cact[j]--;
    }
 
    /*  perform L and update loop
     */
    for
    (
-      i = clen[pcol] - s_cact[pcol];
+      i = clen[pcol] - temp.s_cact[pcol];
       (l = cidx[cbeg[pcol] + i]) != prow;
       ++i
   )
    {
       assert(fac->row.perm[l] < 0);
       assert(lv >= 0);
-      updateRow(l, lv++, prow, pcol, pval);
+      updateRow(l, lv++, prow, pcol, pval, temp);
    }
 
    /*  skip pivot row  */
@@ -1169,12 +1159,12 @@ static void eliminatePivot(int prow, int pos)
    for (++i; i < l; ++i)
    {
       assert(lv >= 0);
-      updateRow(cidx[cbeg[pcol] + i], lv++, prow, pcol, pval);
+      updateRow(cidx[cbeg[pcol] + i], lv++, prow, pcol, pval, temp);
    }
 
    /*  remove pivot column from column file.
     */
-   clen[pcol] -= s_cact[pcol];
+   clen[pcol] -= temp.s_cact[pcol];
 
    /*  clear working vector and reinsert columns to lists
     */
@@ -1182,8 +1172,8 @@ static void eliminatePivot(int prow, int pos)
    {
       j = ridx[i];
       work[j] = 0;
-      s_mark[j] = 0;
-      init2DR(col[j], colNZ[s_cact[j]]);
+      temp.s_mark[j] = 0;
+      init2DR(col[j], colNZ[temp.s_cact[j]]);
       assert(fac->col.perm[j] < 0);
    }
 }
@@ -1192,10 +1182,10 @@ static void eliminatePivot(int prow, int pos)
 /*
  *      Factorize nucleus.
  */
-static void eliminateNucleus(void)
+static void eliminateNucleus(CLUFactor::Temp& temp)
 {
    int r, c;
-   Pring *pivot;
+   CLUFactor::Pring *pivot;
 
    pivots.mkwtz = -1;
    pivots.idx = -1;
@@ -1214,13 +1204,13 @@ static void eliminateNucleus(void)
 #endif
 
       if (rowNZ[1].next != &(rowNZ[1]))        /* row singleton available */
-         eliminateRowSingletons();
+         eliminateRowSingletons(temp);
       else if (colNZ[1].next != &(colNZ[1]))   /* column singleton available */
-         eliminateColSingletons();
+         eliminateColSingletons(temp);
       else
       {
          initDR(pivots);
-         selectPivots();
+         selectPivots(temp);
 
          assert (\
                   pivots.next != &pivots && \
@@ -1229,7 +1219,7 @@ static void eliminateNucleus(void)
 
          for (pivot = pivots.next; pivot != &pivots; pivot = pivot->next)
          {
-            eliminatePivot(pivot->idx, pivot->pos);
+            eliminatePivot(pivot->idx, pivot->pos,temp);
          }
       }
 
@@ -1420,31 +1410,30 @@ int factor(CLUFactor* fc,
    diag = fac->diag;
    work = fac->work;
 
-   newTmp(dim);
+   CLUFactor::Temp temp(dim);
    initPerm();
 
-   initMatrix(vec);
+   initMatrix(vec, temp);
    if (fac->stat)
       goto TERMINATE;
    fac->initMaxabs = initMaxabs;
 
-   colSingletons();
+   colSingletons(temp);
    if (fac->stat)
       goto TERMINATE;
 
-   rowSingletons();
+   rowSingletons(temp);
    if (fac->stat)
       goto TERMINATE;
 
    if (stage < dim)
    {
-      initRings();
-      eliminateNucleus();
+      initRings(temp);
+      eliminateNucleus(temp);
       freeRings();
    }
 
 TERMINATE:
-   deleteTmp();
    fac->l.firstUpdate = fac->l.firstUnused;
 
    if (!fac->stat)
@@ -1741,7 +1730,7 @@ int CLUFactorIsConsistent(const CLUFactor *p_fac)
 {
    int i, j, k, l;
    Dring *ring;
-   Pring *pring;
+   CLUFactor::Pring *pring;
 
    /*  Consistency only relevant for real factorizations
     */

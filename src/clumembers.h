@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clumembers.h,v 1.5 2001/11/29 22:52:54 bzfkocht Exp $"
+#pragma ident "@(#) $Id: clumembers.h,v 1.6 2001/11/30 14:35:02 bzfbleya Exp $"
 
 #ifndef _CLUMEMBERS_H_
 #define _CLUMEMBERS_H_
@@ -82,7 +82,35 @@ public:
    int solveLeft2(double* vec1, int* nonz, double* vec2, 
       double eps, double* rhs1, double* rhs2);
 
+#warning MAKE Pring and Temp private when factor.cpp is finished
+private:
+public: 
 
+   class Pring   /* Pivot ring */
+   {
+   public:
+      Pring(): next(NULL), prev(NULL){}      
+      Pring *next;
+      Pring *prev;
+      int idx;            /* index of pivot row */
+      int pos;            /* position of pivot column in row */
+      int mkwtz;          /* markowitz number of pivot */
+   private:
+      Pring(const Pring&);
+      Pring& operator= (const Pring&);
+   };
+   class Temp  /* Temporary data structures. */
+   {
+   public: 
+      Temp(int p_dim);
+      ~Temp();
+      int*    s_mark;
+      double* s_max;           /* maximum absolute value per row (or -1) */
+      int*    s_cact;          /* lengths of columns of active submatrix */
+   private:
+      Temp( const Temp& );
+      Temp& operator= ( const Temp& );
+   };
 };
 
 } // namespace soplex
