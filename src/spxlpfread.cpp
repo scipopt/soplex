@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.42 2004/11/05 20:11:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.43 2004/11/10 10:53:47 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -621,40 +621,54 @@ bool SPxLP::readLPF(
 
             if (have_value)
             {
-               if (!isColName(pos)) /* implies !isSense(pos) */
-                  goto syntax_error;
-
-               colidx = readColName(pos, cnames, cset, &emptycol);
-
-               if (val != 0.0)
+               if (isColName(pos))
                {
-                  // Do we have this index allready in the row ?
-                  int n = vec.number(colidx);
+                  colidx = readColName(pos, cnames, cset, &emptycol);
 
-                  // No! So add it.
-                  if (n < 0)
-                     vec.add(colidx, val);
-                  else
-                  {                
-                     /* Yes. So we add them up and remove the element
-                      * if it amounts to zero.
-                      */
-                     assert(vec.index(n) == colidx);
+                  if (val != 0.0)
+                  {
+                     // Do we have this index allready in the row ?
+                     int n = vec.number(colidx);
 
-                     val += vec.value(n);
-
-                     if (val == 0.0)
-                        vec.remove(n);
+                     // No! So add it.
+                     if (n < 0)
+                        vec.add(colidx, val);
                      else
-                        vec.value(n) = val;
+                     {                
+                        /* Yes. So we add them up and remove the element
+                         * if it amounts to zero.
+                         */
+                        assert(vec.index(n) == colidx);
 
-                     assert(cnames->has(colidx));
+                        val += vec.value(n);
 
-                     std::cerr << "Doublicate index " << (*cnames)[colidx] 
-                               << " in line " << lineno << std::endl;
+                        if (val == 0.0)
+                           vec.remove(n);
+                        else
+                           vec.value(n) = val;
+
+                        assert(cnames->has(colidx));
+
+                        std::cerr << "Doublicate index " << (*cnames)[colidx] 
+                                  << " in line " << lineno << std::endl;
+                     }
                   }
+                  have_value = false;
                }
-               have_value = false;
+               else
+               {
+                  /* This means we have a row like c1: <= 5 with no variables in it.
+                   * We can not handle 10 <= 5. In this case we issue an syntax error.
+                   */
+                  if (val != 1.0)
+                     goto syntax_error;
+
+                  // If the next thing is not the sense we give up also.
+                  if (!isSense(pos))
+                     goto syntax_error;
+
+                  have_value = false;
+               }
             }
             assert(!have_value);
 
