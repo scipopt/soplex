@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.5 2001/12/15 15:50:28 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.6 2001/12/25 09:34:00 bzfkocht Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read MPS format files.
@@ -322,9 +322,10 @@ static void readName(MPSInput& mps)
          || (mps.field0() == 0) || (strcmp(mps.field0(), "NAME")))
          break;
 
-      mps.setProbName(mps.field1());
+      // Sometimes the name is omitted.
+      mps.setProbName((mps.field1() == 0) ? "_MPS_" : mps.field1());
 
-      std::cout << "Problem name   : " << mps.field1() << std::endl;
+      std::cout << "Problem name   : " << mps.probName() << std::endl;
  
       // This hat to be a new section
       if (!mps.readLine() || (mps.field0() == 0))
