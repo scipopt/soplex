@@ -1,4 +1,4 @@
-// $Id: soplex.lnt,v 1.3 2002/01/05 19:24:08 bzfkocht Exp $
+// $Id: soplex.lnt,v 1.4 2002/01/05 20:31:11 bzfkocht Exp $
 -passes(1)
 +cpp(.h,.cpp)
 // esoteric size settings to find erros.
@@ -104,6 +104,10 @@
 
 // nameset.h
 -esym(1554,Name::name) // direct pointer copy ok
+
+// subsvector.h
+-esym(1554,SubSVector::elem) // Direct pointer copy of member
+-esym(1554,SubSVector::svec) // Direct pointer copy of member
 
 // Temporary
 -w2    // Only warnings and Errors

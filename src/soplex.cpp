@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.21 2002/01/05 09:59:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.22 2002/01/05 20:31:11 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -341,7 +341,8 @@ void SoPlex::splitLP(int pe, int nPes)
          }
          if (first < 0)
             first = j;
-         subcovectors[n][i] = SubSVector(const_cast<SVector*>(&vec), first, j - first);
+         //  subcovectors[n][i] = SubSVector(&vec, first, j - first);
+         subcovectors[n][i].assign(&vec, first, j - first);
       }
    }
 

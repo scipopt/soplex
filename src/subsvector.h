@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: subsvector.h,v 1.6 2002/01/05 19:24:10 bzfkocht Exp $"
+#pragma ident "@(#) $Id: subsvector.h,v 1.7 2002/01/05 20:31:11 bzfkocht Exp $"
 
 
 /**@file  subsvector.h
@@ -46,7 +46,7 @@ private:
    friend Vector& Vector::multAdd(double x, const SubSVector& vec);
 
    const SVector::Element* elem;   ///< element array.
-   const int               num;    ///< number of nonzero elements.
+   int                     num;    ///< number of nonzero elements.
 #ifndef NDEBUG
    const SVector*          svec;   ///< pointer to underlying #SVector.
 #endif
@@ -109,9 +109,23 @@ public:
 
    /// consistency check.
    bool isConsistent() const;
-   
+
+   /// direct assignment.
+   void assign(const SVector* sv, int first , int len)
+   {
+      assert(sv          != 0);
+      assert(first       >= 0);
+      assert(first + len < sv->max());
+
+      elem = &sv->element(first);
+      num  = len;
+#ifndef NDEBUG
+      svec = sv;
+#endif
+      assert(isConsistent());      
+   }
    /// default constructor.
-   SubSVector(SVector* sv = 0, int first = 0, int len = 0)
+   explicit SubSVector(const SVector* sv = 0, int first = 0, int len = 0)
       : elem((sv && first < sv->max()) ? &sv->element(first) : 0)
       , num (len)
 #ifndef NDEBUG
