@@ -118,5 +118,5 @@ timer.h
 unitvector.h
 updatevector.h
 vector.h
-vector_c.h
+*vector_c.h
 

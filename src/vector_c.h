@@ -13,26 +13,56 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector_c.h,v 1.2 2001/11/06 23:31:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vector_c.h,v 1.3 2001/11/23 12:56:37 bzfbleya Exp $"
 
+/**@file  vector_v.h
+ * @brief Algebraic functions for vectors.
+ */
 #ifndef _VECTOR_C_H_
 #define _VECTOR_C_H_
 
 namespace soplex
 {
+/**@name C-implementation of vector algebra and utils 
+   @ingroup Algebra 
+   
+   Several algebraic and utility methods of vector are implemented in
+   C-code for efficiency.
+*/
+//@{
+
+/**@brief   C-implementation of Vector::multAdd
+   @ingroup Algebra 
+*/
 void Vector_MultAddSSVector(double* vec, double x,
-                             int n, const int *idx,
-                             const double *val);
+                            int n, const int *idx,
+                            const double *val);
+/**@brief   C-implementation of Vector::multAdd
+   @ingroup Algebra 
+*/
 void Vector_MultAddSVector(double* vec, double x,
-                            int n, void *elem);
+                           int n, void *elem);
+/**@brief   C-implementation of Vector::multAdd
+   @ingroup Algebra 
+*/
 void Vector_MultAddVector(double x, int n,
-                           double* v, const double* w);
+                          double* v, const double* w);
+/**@brief   C-implementation to assign 0-vector to SSVector
+   @ingroup Algebra 
+*/
 void Vector_Set0toSSVector(double*zero, int n,
-                            const int* idx, const double* val);
+                           const int* idx, const double* val);
+/**@brief   C-implementation of Vector::operator*
+   @ingroup Algebra 
+*/
 double MultiplyVectorSSVector(const double* dense, int n,
-                               const int* idx, const double* val);
+                              const int* idx, const double* val);
+/**@brief   C-implementation of Vector::operator*
+   @ingroup Algebra 
+*/
 double MultiplyVectorVector(const double* v1, int dim,
-                             const double* v2);
+                            const double* v2);
+//@}
 
 } // namespace soplex
 #endif /* _VECTOR_C_H_ */
