@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvecs.cpp,v 1.2 2001/11/06 23:31:05 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxvecs.cpp,v 1.3 2001/11/12 16:42:12 bzfpfend Exp $"
 
 /*  Import system include files
  */
@@ -352,11 +352,11 @@ void SoPlex::computeEnterCoPrhs()
 
    for (int i = dim() - 1; i >= 0; --i)
    {
-      Id id = baseId(i);
-      if (id.isSPxRowId())
-         computeEnterCoPrhs4Row(i, number(SPxRowId(id)));
+      Id l_id = baseId(i);
+      if (l_id.isSPxRowId())
+         computeEnterCoPrhs4Row(i, number(SPxRowId(l_id)));
       else
-         computeEnterCoPrhs4Col(i, number(SPxColId(id)));
+         computeEnterCoPrhs4Col(i, number(SPxColId(l_id)));
    }
 }
 
@@ -423,11 +423,11 @@ void SoPlex::computeLeaveCoPrhs()
 
    for (int i = dim() - 1; i >= 0; --i)
    {
-      Id id = baseId(i);
-      if (id.isSPxRowId())
-         computeLeaveCoPrhs4Row(i, number(SPxRowId(id)));
+      Id l_id = baseId(i);
+      if (l_id.isSPxRowId())
+         computeLeaveCoPrhs4Row(i, number(SPxRowId(l_id)));
       else
-         computeLeaveCoPrhs4Col(i, number(SPxColId(id)));
+         computeLeaveCoPrhs4Col(i, number(SPxColId(l_id)));
    }
 }
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.5 2001/11/09 21:23:41 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.6 2001/11/12 16:41:59 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -92,12 +92,12 @@ void SoPlex::load(SLinSolver* slu)
    SPxBasis::load(slu);
 }
 
-void SoPlex::load(const SPxBasis::Desc& desc)
+void SoPlex::load(const SPxBasis::Desc& p_desc)
 {
    unInit();
    if (SPxBasis::status() == SPxBasis::NO_PROBLEM)
       SPxBasis::load(this);
-   SPxBasis::load(desc);
+   SPxBasis::load(p_desc);
 }
 
 void SoPlex::load(SPxPricer* x)
@@ -166,8 +166,8 @@ void SoPlex::setType(Type tp)
 
 void SoPlex::setRep(int rp)
 {
-   Representation rep = Representation(rp);
-   if (rep == COLUMN)
+   Representation l_rep = Representation(rp);
+   if (l_rep == COLUMN)
    {
       thevectors = colset();
       thecovectors = rowset();
@@ -185,7 +185,7 @@ void SoPlex::setRep(int rp)
    }
    else
    {
-      assert(rep == ROW);
+      assert(l_rep == ROW);
 
       thevectors = rowset();
       thecovectors = colset();
@@ -201,7 +201,7 @@ void SoPlex::setRep(int rp)
       theCoUbound = &theUCbound;
       theCoLbound = &theLCbound;
    }
-   therep = rep;
+   therep = l_rep;
    unInit();
    reDim();
 
@@ -212,7 +212,7 @@ void SoPlex::setRep(int rp)
    }
 
    if (thepricer && thepricer->solver() == this)
-      thepricer->setRep(rep);
+      thepricer->setRep(l_rep);
 }
 
 //@ ----------------------------------------------------------------------------
@@ -749,10 +749,10 @@ void SoPlex::setEpsilon(double eps)
    addVec.delta().epsilon = eps;
 }
 
-SoPlex::SoPlex(Type type, Representation rep,
+SoPlex::SoPlex(Type p_type, Representation p_rep,
                 SPxPricer* pric, SPxRatioTester* rt,
                 SPxStarter* start, SPxSimplifier* simple)
-   : theType (type)
+   : theType (p_type)
    , thePricing(FULL)
    , maxCycle (100)
    , numCycle (0)
@@ -772,7 +772,7 @@ SoPlex::SoPlex(Type type, Representation rep,
    , maxTime (-1)
    , cacheProductFactor(4.0)
 {
-   setRep (rep);
+   setRep (p_rep);
    setDelta (1e-6);
    setEpsilon(1e-16);
    theLP = this;
@@ -981,18 +981,18 @@ int SoPlex::nofNZEs() const
    return n;
 }
 
-void SoPlex::setTermination(double value, double time, int iteration)
+void SoPlex::setTermination(double p_value, double p_time, int p_iteration)
 {
-   maxTime = time;
-   maxIters = iteration;
+   maxTime = p_time;
+   maxIters = p_iteration;
 }
 
-void SoPlex::getTermination(double* value, double* time, int* iteration) const
+void SoPlex::getTermination(double* p_value, double* p_time, int* p_iteration) const
 {
-   if (time)
-      *time = maxTime;
-   if (iteration)
-      *iteration = maxIters;
+   if (p_time)
+      *p_time = maxTime;
+   if (p_iteration)
+      *p_iteration = maxIters;
 }
 
 LPSolver::Status SoPlex::getBasis(signed char row[], signed char col[]) const
@@ -1063,7 +1063,7 @@ LPSolver::Status SoPlex::getBasis(signed char row[], signed char col[]) const
    return status();
 }
 
-void SoPlex::setBasis(const signed char rows[], const signed char cols[])
+void SoPlex::setBasis(const signed char p_rows[], const signed char p_cols[])
 {
    if (SPxBasis::status() == SPxBasis::NO_PROBLEM)
       SPxBasis::load(this);
@@ -1073,7 +1073,7 @@ void SoPlex::setBasis(const signed char rows[], const signed char cols[])
 
    for (i = nRows() - 1; i >= 0; i--)
    {
-      switch (rows[i])
+      switch (p_rows[i])
       {
       case LPSolver::FIXED :
          assert(rhs(i) == lhs(i));
@@ -1102,7 +1102,7 @@ void SoPlex::setBasis(const signed char rows[], const signed char cols[])
 
    for (i = nCols() - 1; i >= 0; i--)
    {
-      switch (cols[i])
+      switch (p_cols[i])
       {
       case LPSolver::FIXED :
          assert(upper(i) == lower(i));

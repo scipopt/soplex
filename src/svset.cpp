@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.cpp,v 1.4 2001/11/09 13:25:30 bzfpfend Exp $"
+#pragma ident "@(#) $Id: svset.cpp,v 1.5 2001/11/12 16:42:13 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -150,10 +150,10 @@ void SVSet::xtend(SVector& svec, int newmax)
          if (ps != list.first())
          {
             SVector* prev = ps->prev();
-            int sz = prev->size();
+            int prevsz = prev->size();
             prev->setMem (prev->max()
                            + ps->max() + 2, prev->mem());
-            prev->size() = sz;
+            prev->size() = prevsz;
          }
          list.remove(ps);
          list.append(ps);
@@ -264,8 +264,8 @@ void SVSet::memRemax(int newmax)
       {
          SVector::Element * info = reinterpret_cast<SVector::Element*>(delta + long(ps->mem()));
          int sz = info->idx;
-         int max = *(reinterpret_cast<int*>( & info->val ));
-         ps->setMem (max + 1, info);
+         int l_max = *(reinterpret_cast<int*>( & info->val ));
+         ps->setMem (l_max + 1, info);
          ps->size() = sz;
       }
    }

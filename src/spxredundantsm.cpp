@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.3 2001/11/09 13:25:22 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.4 2001/11/12 16:42:08 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -132,7 +132,7 @@ int SPxRedundantSM::simplify()
          {
             for (j = col.size() - 1; j >= 0; --j)
             {
-               int k = col.index(j);
+               k = col.index(j);
                if (lp->rhs(k) < lp->infinity)
                   lp->changeRhs(k, lp->rhs(k) - x*col.value(j));
                if (lp->lhs(k) > -lp->infinity)

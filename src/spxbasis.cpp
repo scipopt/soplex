@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.5 2001/11/11 20:27:32 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.6 2001/11/12 16:42:00 bzfpfend Exp $"
 
 
 
@@ -224,9 +224,9 @@ void SPxBasis::load(SoPlex* lp)
    load(thedesc);
 }
 
-void SPxBasis::load(SLinSolver* solver)
+void SPxBasis::load(SLinSolver* p_solver)
 {
-   factor = solver;
+   factor = p_solver;
    factorized = 0;
    factor->clear();
 }
@@ -240,15 +240,15 @@ void SPxBasis::readBasis(std::istream& is, NameSet& rn, NameSet& cn)
    char* f4;
    char* f5;
    char* f6;
-   Desc desc(thedesc);
+   Desc l_desc(thedesc);
 
    assert(theLP);
 
    for (i = theLP->nRows() - 1; i >= 0; --i)
-      desc.rowstat[i] = dualRowStatus(i);
+      l_desc.rowstat[i] = dualRowStatus(i);
 
    for (i = theLP->nCols() - 1; i >= 0; --i)
-      desc.colstat[i] = Desc::P_ON_LOWER;
+      l_desc.colstat[i] = Desc::P_ON_LOWER;
 
    if (!SPxLP::readLine(is, f1, f2, f3, f4, f5, f6))
    {
@@ -292,8 +292,8 @@ void SPxBasis::readBasis(std::istream& is, NameSet& rn, NameSet& cn)
             std::cerr << "ERROR: incorrect basis file format\n";
             return;
          }
-         desc.colstat[c] = dualColStatus(c);
-         desc.rowstat[r] = Desc::P_ON_UPPER;
+         l_desc.colstat[c] = dualColStatus(c);
+         l_desc.rowstat[r] = Desc::P_ON_UPPER;
       }
       else if (strncmp(f1, "XL", 2))
       {
@@ -303,16 +303,16 @@ void SPxBasis::readBasis(std::istream& is, NameSet& rn, NameSet& cn)
             std::cerr << "ERROR: incorrect basis file format\n";
             return;
          }
-         desc.colstat[c] = dualColStatus(c);
-         desc.rowstat[r] = Desc::P_ON_LOWER;
+         l_desc.colstat[c] = dualColStatus(c);
+         l_desc.rowstat[r] = Desc::P_ON_LOWER;
       }
       else if (strncmp(f1, "UL", 2))
       {
-         desc.colstat[c] = Desc::P_ON_UPPER;
+         l_desc.colstat[c] = Desc::P_ON_UPPER;
       }
       else if (strncmp(f1, "LL", 2))
       {
-         desc.colstat[c] = Desc::P_ON_LOWER;
+         l_desc.colstat[c] = Desc::P_ON_LOWER;
       }
       else
       {
@@ -324,7 +324,7 @@ void SPxBasis::readBasis(std::istream& is, NameSet& rn, NameSet& cn)
 
    while (is.good());
 
-   load(desc);
+   load(l_desc);
    return;
 }
 

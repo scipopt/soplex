@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprow.cpp,v 1.3 2001/11/11 20:27:31 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprow.cpp,v 1.4 2001/11/12 16:41:53 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -49,9 +49,9 @@ LPRow::Type LPRow::type() const
 
 // TK13OCT1998
 void LPRow::setType(
-   LPRow::Type type)
+   LPRow::Type p_type)
 {
-   switch (type)
+   switch (p_type)
    {
    case LESS_EQUAL:
       lhs() = -infinity;
@@ -82,23 +82,23 @@ double LPRow::value() const
 }
 
 LPRow::LPRow(
-   const SVector& rowVector,
-   LPRow::Type type,
-   double value)
-   : vec(rowVector)
+   const SVector& p_rowVector,
+   LPRow::Type p_type,
+   double p_value)
+   : vec(p_rowVector)
 {
-   switch (type)
+   switch (p_type)
    {
    case LESS_EQUAL:
       left = -infinity;
-      right = value;
+      right = p_value;
       break;
    case EQUAL:
-      left = value;
-      right = value;
+      left = p_value;
+      right = p_value;
       break;
    case GREATER_EQUAL:
-      left = value;
+      left = p_value;
       right = infinity;
       break;
    default:

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcolset.cpp,v 1.2 2001/11/06 23:31:02 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpcolset.cpp,v 1.3 2001/11/12 16:41:53 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -37,30 +37,30 @@ namespace soplex
  */
 void LPColSet::add
 (
-   Key& key,
-   double obj,
-   double lower,
-   const SVector& colVector,
-   double upper
+   Key& p_key,
+   double p_obj,
+   double p_lower,
+   const SVector& p_colVector,
+   double p_upper
 )
 {
-   SVSet::add(key, colVector);
+   SVSet::add(p_key, p_colVector);
    if (num() > low.dim())
    {
       low.reDim (num());
       up.reDim (num());
       object.reDim (num());
    }
-   low [num() - 1] = lower;
-   up [num() - 1] = upper;
-   object[num() - 1] = obj;
+   low [num() - 1] = p_lower;
+   up [num() - 1] = p_upper;
+   object[num() - 1] = p_obj;
 }
 
-void LPColSet::add(const LPColSet& set)
+void LPColSet::add(const LPColSet& p_set)
 {
    int i = num();
 
-   SVSet::add(set);
+   SVSet::add(p_set);
    if (num() > low.dim())
    {
       low.reDim (num());
@@ -70,22 +70,22 @@ void LPColSet::add(const LPColSet& set)
 
    for (int j = 0; i < num(); ++i, ++j)
    {
-      low [i] = set.lower(j);
-      up [i] = set.upper(j);
-      object[i] = set.obj(j);
+      low [i] = p_set.lower(j);
+      up [i] = p_set.upper(j);
+      object[i] = p_set.obj(j);
    }
 }
 
-void LPColSet::add(Key nkey[], const LPColSet& set)
+void LPColSet::add(Key nkey[], const LPColSet& p_set)
 {
    int i = num();
-   add(set);
+   add(p_set);
 
    for (int j = 0; i < num(); ++i, ++j)
       nkey[j] = key(i);
 }
 
-SVector& LPColSet::create(Key& nkey, int nonzeros, double obj, double lhs, double rhs)
+SVector& LPColSet::create(Key& nkey, int nonzeros, double p_obj, double lhs, double rhs)
 {
    if (num() + 1 > low.dim())
    {
@@ -95,7 +95,7 @@ SVector& LPColSet::create(Key& nkey, int nonzeros, double obj, double lhs, doubl
    }
    low [num()] = lhs;
    up [num()] = rhs;
-   object[num()] = obj;
+   object[num()] = p_obj;
 
    return *SVSet::create(nkey, nonzeros);
 }

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.2 2001/11/06 23:31:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.3 2001/11/12 16:42:05 bzfpfend Exp $"
 
 /*  \Section{Complex Methods}
  */
@@ -49,13 +49,13 @@ int SPxHybridPR::isConsistent() const
           && parmult.isConsistent();
 }
 
-void SPxHybridPR::load(SoPlex* solver)
+void SPxHybridPR::load(SoPlex* p_solver)
 {
-   steep.load(solver);
-   devex.load(solver);
-   parmult.load(solver);
-   thesolver = solver;
-   setType(solver->type());
+   steep.load(p_solver);
+   devex.load(p_solver);
+   parmult.load(p_solver);
+   thesolver = p_solver;
+   setType(p_solver->type());
 }
 
 void SPxHybridPR::clear()

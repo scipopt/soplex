@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeneralsm.cpp,v 1.2 2001/11/06 23:31:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeneralsm.cpp,v 1.3 2001/11/12 16:42:03 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -34,13 +34,13 @@ namespace soplex
 
 
 //@ ----------------------------------------------------------------------------
-void SPxGeneralSM::load(SPxLP* lp)
+void SPxGeneralSM::load(SPxLP* p_lp)
 {
-   this->lp = lp;
-   rem1.load (lp);
-   redu.load (lp);
-   aggr.load (lp);
-   scale.load(lp);
+   this->lp = p_lp;
+   rem1.load (p_lp);
+   redu.load (p_lp);
+   aggr.load (p_lp);
+   scale.load(p_lp);
 }
 
 void SPxGeneralSM::unload()

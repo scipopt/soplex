@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.cpp,v 1.3 2001/11/11 20:27:31 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprowset.cpp,v 1.4 2001/11/12 16:41:55 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -35,23 +35,23 @@ namespace soplex
 //@ ----------------------------------------------------------------------------
 /*      \SubSection{Extension}
  */
-void LPRowSet::add(Key& key, double lhs, const SVector& vector, double rhs)
+void LPRowSet::add(Key& p_key, double p_lhs, const SVector& vector, double p_rhs)
 {
-   SVSet::add(key, vector);
+   SVSet::add(p_key, vector);
    if (num() > left.dim())
    {
       left.reDim(num());
       right.reDim(num());
    }
-   left [num() - 1] = lhs;
-   right[num() - 1] = rhs;
+   left [num() - 1] = p_lhs;
+   right[num() - 1] = p_rhs;
 }
 
-void LPRowSet::add(const LPRowSet& set)
+void LPRowSet::add(const LPRowSet& p_set)
 {
    int i = num();
 
-   SVSet::add(set);
+   SVSet::add(p_set);
    if (num() > left.dim())
    {
       left.reDim(num());
@@ -60,29 +60,29 @@ void LPRowSet::add(const LPRowSet& set)
 
    for (int j = 0; i < num(); ++i, ++j)
    {
-      left [i] = set.lhs(j);
-      right[i] = set.rhs(j);
+      left [i] = p_set.lhs(j);
+      right[i] = p_set.rhs(j);
    }
 }
 
-void LPRowSet::add(Key nkey[], const LPRowSet& set)
+void LPRowSet::add(Key nkey[], const LPRowSet& p_set)
 {
    int i = num();
-   add(set);
+   add(p_set);
 
    for (int j = 0; i < num(); ++i, ++j)
       nkey[j] = key(i);
 }
 
-SVector& LPRowSet::create(Key& nkey, int nonzeros, double lhs, double rhs)
+SVector& LPRowSet::create(Key& nkey, int nonzeros, double p_lhs, double p_rhs)
 {
    if (num() + 1 > left.dim())
    {
       left.reDim(num() + 1);
       right.reDim(num() + 1);
    }
-   left [num()] = lhs;
-   right[num()] = rhs;
+   left [num()] = p_lhs;
+   right[num()] = p_rhs;
 
    return *SVSet::create(nkey, nonzeros);
 }
@@ -143,9 +143,9 @@ void LPRowSet::clear()
 // TK13OCT1998
 void LPRowSet::setType(
    int i,
-   LPRow::Type type)
+   LPRow::Type p_type)
 {
-   switch (type)
+   switch (p_type)
    {
    case LPRow::LESS_EQUAL:
       lhs(i) = -LPRow::infinity;

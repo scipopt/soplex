@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.4 2001/11/11 20:27:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.5 2001/11/12 16:42:10 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -370,13 +370,13 @@ int SoPlex::terminate()
 //@ ----------------------------------------------------------------------------
 /*      \SubSection{Accessing Results}
  */
-LPSolver::Status SoPlex::getPrimal (Vector& vector) const
+LPSolver::Status SoPlex::getPrimal (Vector& p_vector) const
 {
    if (!isInitialized())
       const_cast<SoPlex*>(this)->init();
 
    if (rep() == ROW)
-      vector = coPvec();
+      p_vector = coPvec();
 
    else
    {
@@ -387,14 +387,14 @@ LPSolver::Status SoPlex::getPrimal (Vector& vector) const
          switch (ds.colStatus(i))
          {
          case SPxBasis::Desc::P_ON_LOWER :
-            vector[i] = SPxLP::lower(i);
+            p_vector[i] = SPxLP::lower(i);
             break;
          case SPxBasis::Desc::P_ON_UPPER :
          case SPxBasis::Desc::P_FIXED :
-            vector[i] = SPxLP::upper(i);
+            p_vector[i] = SPxLP::upper(i);
             break;
          case SPxBasis::Desc::P_FREE :
-            vector[i] = 0;
+            p_vector[i] = 0;
             break;
          case SPxBasis::Desc::D_FREE :
          case SPxBasis::Desc::D_ON_UPPER :
@@ -409,14 +409,14 @@ LPSolver::Status SoPlex::getPrimal (Vector& vector) const
       for (i = dim() - 1; i >= 0; --i)
       {
          if (baseId(i).isSPxColId())
-            vector[ number(SPxColId(baseId(i))) ] = fVec()[i];
+            p_vector[ number(SPxColId(baseId(i))) ] = fVec()[i];
       }
    }
 
    return status();
 }
 
-LPSolver::Status SoPlex::getDual (Vector& vector) const
+LPSolver::Status SoPlex::getDual (Vector& p_vector) const
 {
    if (!isInitialized())
       const_cast<SoPlex*>(this)->init();
@@ -424,23 +424,23 @@ LPSolver::Status SoPlex::getDual (Vector& vector) const
    if (rep() == ROW)
    {
       int i;
-      vector.clear ();
+      p_vector.clear ();
       for (i = nCols() - 1; i >= 0; --i)
       {
          if (baseId(i).isSPxRowId())
-            vector[ number(SPxRowId(baseId(i))) ] = fVec()[i];
+            p_vector[ number(SPxRowId(baseId(i))) ] = fVec()[i];
       }
    }
 
    else
-      vector = coPvec();
+      p_vector = coPvec();
 
-   vector *= spxSense();
+   p_vector *= spxSense();
 
    return status();
 }
 
-LPSolver::Status SoPlex::getRdCost (Vector& vector) const
+LPSolver::Status SoPlex::getRdCost (Vector& p_vector) const
 {
    if (!isInitialized())
       const_cast<SoPlex*>(this)->init();
@@ -448,13 +448,13 @@ LPSolver::Status SoPlex::getRdCost (Vector& vector) const
    if (rep() == ROW)
    {
       int i;
-      vector.clear();
+      p_vector.clear();
       if (spxSense() == SPxLP::MINIMIZE)
       {
          for (i = dim() - 1; i >= 0; --i)
          {
             if (baseId(i).isSPxColId())
-               vector[ number(SPxColId(baseId(i))) ] = -fVec()[i];
+               p_vector[ number(SPxColId(baseId(i))) ] = -fVec()[i];
          }
       }
       else
@@ -462,23 +462,23 @@ LPSolver::Status SoPlex::getRdCost (Vector& vector) const
          for (i = dim() - 1; i >= 0; --i)
          {
             if (baseId(i).isSPxColId())
-               vector[ number(SPxColId(baseId(i))) ] = fVec()[i];
+               p_vector[ number(SPxColId(baseId(i))) ] = fVec()[i];
          }
       }
    }
 
    else
    {
-      vector = maxObj();
-      vector -= pVec();
+      p_vector = maxObj();
+      p_vector -= pVec();
       if (spxSense() == SPxLP::MINIMIZE)
-         vector *= -1;
+         p_vector *= -1;
    }
 
    return status();
 }
 
-LPSolver::Status SoPlex::getSlacks (Vector& vector) const
+LPSolver::Status SoPlex::getSlacks (Vector& p_vector) const
 {
    if (!isInitialized())
       const_cast<SoPlex*>(this)->init();
@@ -492,14 +492,14 @@ LPSolver::Status SoPlex::getSlacks (Vector& vector) const
          switch (ds.rowStatus(i))
          {
          case SPxBasis::Desc::P_ON_LOWER :
-            vector[i] = lhs(i);
+            p_vector[i] = lhs(i);
             break;
          case SPxBasis::Desc::P_ON_UPPER :
          case SPxBasis::Desc::P_FIXED :
-            vector[i] = rhs(i);
+            p_vector[i] = rhs(i);
             break;
          case SPxBasis::Desc::P_FREE :
-            vector[i] = 0;
+            p_vector[i] = 0;
             break;
          case SPxBasis::Desc::D_FREE :
          case SPxBasis::Desc::D_ON_UPPER :
@@ -514,12 +514,12 @@ LPSolver::Status SoPlex::getSlacks (Vector& vector) const
       for (i = dim() - 1; i >= 0; --i)
       {
          if (baseId(i).isSPxRowId())
-            vector[ number(SPxRowId(baseId(i))) ] = -(*theFvec)[i];
+            p_vector[ number(SPxRowId(baseId(i))) ] = -(*theFvec)[i];
       }
    }
 
    else
-      vector = pVec();
+      p_vector = pVec();
 
    return status();
 }
@@ -550,20 +550,20 @@ LPSolver::Status SoPlex::status() const
 }
 
 LPSolver::Status SoPlex::getResult(
-   double* value,
-   Vector* primal,
-   Vector* slacks,
-   Vector* dual,
+   double* p_value,
+   Vector* p_primal,
+   Vector* p_slacks,
+   Vector* p_dual,
    Vector* reduCosts) const
 {
-   if (value)
-      *value = this->value();
-   if (primal)
-      getPrimal(*primal);
-   if (slacks)
-      getSlacks(*slacks);
-   if (dual)
-      getDual(*dual);
+   if (p_value)
+      *p_value = this->value();
+   if (p_primal)
+      getPrimal(*p_primal);
+   if (p_slacks)
+      getSlacks(*p_slacks);
+   if (p_dual)
+      getDual(*p_dual);
    if (reduCosts)
       getRdCost(*reduCosts);
    return status();

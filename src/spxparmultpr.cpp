@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxparmultpr.cpp,v 1.2 2001/11/06 23:31:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxparmultpr.cpp,v 1.3 2001/11/12 16:42:07 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -57,9 +57,9 @@ void SPxParMultPR::setType(SoPlex::Type tp)
    min = partialSize / 2;
 }
 
-void SPxParMultPR::load(SoPlex* solver)
+void SPxParMultPR::load(SoPlex* p_solver)
 {
-   thesolver = solver;
+   thesolver = p_solver;
    multiParts = (thesolver->dim() + thesolver->coDim()) / partialSize + 1;
    pricSet.reSize(10 * partialSize);
 }
@@ -166,16 +166,16 @@ SPxLP::Id SPxParMultPR::selectEnter()
    {
       // std::cerr << '.';
       assert(thesolver->pricing() == SoPlex::FULL);
-      double best = -theeps;
+      double bestx = -theeps;
       for (i = thesolver->dim() - 1; i >= 0; --i)
       {
          x = thesolver->coTest()[i];
          // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasis::Desc::P_FREE
          //                || ds.coStatus(i) == SPxBasis::Desc::D_FREE));
-         if (x < best)
+         if (x < bestx)
          {
             id = thesolver->coId(i);
-            best = thesolver->coTest()[i];
+            bestx = thesolver->coTest()[i];
          }
       }
 
@@ -184,10 +184,10 @@ SPxLP::Id SPxParMultPR::selectEnter()
          x = thesolver->test()[i];
          // x *= EQ_PREF * (1 + (ds.status(i) == SPxBasis::Desc::P_FREE
          //                || ds.status(i) == SPxBasis::Desc::D_FREE));
-         if (x < best)
+         if (x < bestx)
          {
             id = thesolver->id(i);
-            best = thesolver->test()[i];
+            bestx = thesolver->test()[i];
          }
       }
 

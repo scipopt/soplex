@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.cpp,v 1.5 2001/11/11 20:27:32 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.cpp,v 1.6 2001/11/12 16:41:58 bzfpfend Exp $"
 
 #include <string.h>
 #include "nameset.h"
@@ -268,8 +268,8 @@ NameSet::NameSet(const NameSet& org)
    memPack();
 }
 
-NameSet::NameSet(int max, int mmax, double fac, double memFac)
-   : set(max)
+NameSet::NameSet(int p_max, int mmax, double fac, double memFac)
+   : set(p_max)
       , hashtab(hashFunction, set.max(), 0, fac)
       , factor(fac)
       , memFactor(memFac)

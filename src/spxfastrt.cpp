@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.2 2001/11/06 23:31:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.3 2001/11/12 16:42:02 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -112,8 +112,8 @@ int SPxFastRT::maxDelta(
    double x, y, max;
    double u, l;
 
-   double delta = this->delta;
-   // double           delta01 = 0.5*delta;
+   double l_delta = this->delta;
+   // double           delta01 = 0.5*l_delta;
    double delta01 = 0;
    double inf = SPxLP::infinity;
    double mabs = abs;
@@ -141,8 +141,8 @@ int SPxFastRT::maxDelta(
             if (u < inf)
             {
                y = u - vec[i];
-               // x = ((1 - (y<=0)) * y + delta) / x;
-               x = (y - (y <= 0) * (y + delta01) + delta) / x;
+               // x = ((1 - (y<=0)) * y + l_delta) / x;
+               x = (y - (y <= 0) * (y + delta01) + l_delta) / x;
                if (x < max)
                {
                   max = x;
@@ -157,8 +157,8 @@ int SPxFastRT::maxDelta(
             if (l > -inf)
             {
                y = l - vec[i];
-               // x = ((1 - (y>=0)) * y - delta) / x;
-               x = (y - (y >= 0) * (y - delta01) - delta) / x;
+               // x = ((1 - (y>=0)) * y - l_delta) / x;
+               x = (y - (y >= 0) * (y - delta01) - l_delta) / x;
                if (x < max)
                {
                   max = x;
@@ -170,7 +170,7 @@ int SPxFastRT::maxDelta(
    }
    else
    {
-      int* idx = update.delta().altIndexMem();
+      int* l_idx = update.delta().altIndexMem();
       double* uval = update.delta().altValues();
       const double* uend = uval + update.dim();
 
@@ -182,14 +182,14 @@ int SPxFastRT::maxDelta(
             i = uval - upd;
             if (x > epsilon)
             {
-               *idx++ = i;
+               *l_idx++ = i;
                mabs = (x > mabs) ? x : mabs;
                u = up[i];
                if (u < inf)
                {
                   y = u - vec[i];
-                  // x = ((1 - (y<=0)) * y + delta) / x;
-                  x = (y - (y <= 0) * (y + delta01) + delta) / x;
+                  // x = ((1 - (y<=0)) * y + l_delta) / x;
+                  x = (y - (y <= 0) * (y + delta01) + l_delta) / x;
                   if (x < max)
                   {
                      max = x;
@@ -199,14 +199,14 @@ int SPxFastRT::maxDelta(
             }
             else if (x < -epsilon)
             {
-               *idx++ = i;
+               *l_idx++ = i;
                mabs = (-x > mabs) ? -x : mabs;
                l = low[i];
                if (l > -inf)
                {
                   y = l - vec[i];
-                  // x = ((1 - (y>=0)) * y - delta) / x;
-                  x = (y - (y >= 0) * (y - delta01) - delta) / x;
+                  // x = ((1 - (y>=0)) * y - l_delta) / x;
+                  x = (y - (y >= 0) * (y - delta01) - l_delta) / x;
                   if (x < max)
                   {
                      max = x;
@@ -218,7 +218,7 @@ int SPxFastRT::maxDelta(
                *uval = 0;
          }
       }
-      update.delta().setSize(idx - update.delta().indexMem());
+      update.delta().setSize(l_idx - update.delta().indexMem());
       update.delta().forceSetup();
    }
 
@@ -242,8 +242,8 @@ int SPxFastRT::minDelta(
    double x, y, max;
    double u, l;
 
-   double delta = this->delta;
-   // double           delta01 = 0.5*delta;
+   double l_delta = this->delta;
+   // double           delta01 = 0.5*l_delta;
    double delta01 = 0;
    double inf = SPxLP::infinity;
    double mabs = abs;
@@ -271,8 +271,8 @@ int SPxFastRT::minDelta(
             if (l > -inf)
             {
                y = l - vec[i];
-               // x = ((1 - (y>=0)) * y - delta) / x;
-               x = (y - (y >= 0) * (y - delta01) - delta) / x;
+               // x = ((1 - (y>=0)) * y - l_delta) / x;
+               x = (y - (y >= 0) * (y - delta01) - l_delta) / x;
                if (x > max)
                {
                   max = x;
@@ -287,8 +287,8 @@ int SPxFastRT::minDelta(
             if (u < inf)
             {
                y = u - vec[i];
-               // x = ((1 - (y<=0)) * y + delta) / x;
-               x = (y - (y <= 0) * (y + delta01) + delta) / x;
+               // x = ((1 - (y<=0)) * y + l_delta) / x;
+               x = (y - (y <= 0) * (y + delta01) + l_delta) / x;
                if (x > max)
                {
                   max = x;
@@ -300,7 +300,7 @@ int SPxFastRT::minDelta(
    }
    else
    {
-      int* idx = update.delta().altIndexMem();
+      int* l_idx = update.delta().altIndexMem();
       double* uval = update.delta().altValues();
       const double* uend = uval + update.dim();
 
@@ -312,14 +312,14 @@ int SPxFastRT::minDelta(
             i = uval - upd;
             if (x > epsilon)
             {
-               *idx++ = i;
+               *l_idx++ = i;
                mabs = (x > mabs) ? x : mabs;
                l = low[i];
                if (l > -inf)
                {
                   y = l - vec[i];
-                  // x = ((1 - (y>=0)) * y - delta) / x;
-                  x = (y - (y >= 0) * (y - delta01) - delta) / x;
+                  // x = ((1 - (y>=0)) * y - l_delta) / x;
+                  x = (y - (y >= 0) * (y - delta01) - l_delta) / x;
                   if (x > max)
                   {
                      max = x;
@@ -329,14 +329,14 @@ int SPxFastRT::minDelta(
             }
             else if (x < -epsilon)
             {
-               *idx++ = i;
+               *l_idx++ = i;
                mabs = (-x > mabs) ? -x : mabs;
                u = up[i];
                if (u < inf)
                {
                   y = u - vec[i];
-                  // x = ((1 - (y<=0)) * y + delta) / x;
-                  x = (y - (y <= 0) * (y + delta01) + delta) / x;
+                  // x = ((1 - (y<=0)) * y + l_delta) / x;
+                  x = (y - (y <= 0) * (y + delta01) + l_delta) / x;
                   if (x > max)
                   {
                      max = x;
@@ -348,7 +348,7 @@ int SPxFastRT::minDelta(
                *uval = 0;
          }
       }
-      update.delta().setSize(idx - update.delta().indexMem());
+      update.delta().setSize(l_idx - update.delta().indexMem());
       update.delta().forceSetup();
    }
 

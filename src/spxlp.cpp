@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.cpp,v 1.2 2001/11/06 23:31:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.cpp,v 1.3 2001/11/12 16:42:06 bzfpfend Exp $"
 
 
 /* \Section{Complex Methods}
@@ -45,12 +45,12 @@ void SPxLP::getRow(int i, LPRow& row) const
    row.rowVector() = rowVector(i);
 }
 
-void SPxLP::getRows(int start, int end, LPRowSet& set) const
+void SPxLP::getRows(int start, int end, LPRowSet& p_set) const
 {
    int i;
-   set.clear();
+   p_set.clear();
    for (i = 0; start <= end; ++i, ++start)
-      set.add(lhs(start), rowVector(start), rhs(start));
+      p_set.add(lhs(start), rowVector(start), rhs(start));
 }
 
 void SPxLP::getCol(int i, LPCol& col) const
@@ -61,19 +61,19 @@ void SPxLP::getCol(int i, LPCol& col) const
    col.colVector() = colVector(i);
 }
 
-void SPxLP::getCols(int start, int end, LPColSet& set) const
+void SPxLP::getCols(int start, int end, LPColSet& p_set) const
 {
    int i;
-   set.clear();
+   p_set.clear();
    for (i = 0; start <= end; ++i, ++start)
-      set.add(obj(start), lower(start), colVector(start), upper(start));
+      p_set.add(obj(start), lower(start), colVector(start), upper(start));
 }
 
-void SPxLP::getObj(Vector& obj) const
+void SPxLP::getObj(Vector& p_obj) const
 {
-   obj = LPColSet::obj();
+   p_obj = LPColSet::obj();
    if (spxSense() == MINIMIZE)
-      obj *= -1;
+      p_obj *= -1;
 }
 
 //@ -----------------------------------------------------------------------------
@@ -134,49 +134,49 @@ void SPxLP::doAddCol(const LPCol& col)
    addedCols(1);
 }
 
-void SPxLP::added2Set(SVSet& set, const SVSet& add, int n)
+void SPxLP::added2Set(SVSet& p_set, const SVSet& p_add, int n)
 {
    int i, j, end, tot;
-   DataArray < int > moreArray(set.num());
+   DataArray < int > moreArray(p_set.num());
    int* more = moreArray.get_ptr();
 
-   for (i = set.num() - 1; i >= 0; --i)
+   for (i = p_set.num() - 1; i >= 0; --i)
       more[i] = 0;
 
-   for (tot = 0, i = add.num() - n, end = add.num(); i < end; ++i)
+   for (tot = 0, i = p_add.num() - n, end = p_add.num(); i < end; ++i)
    {
-      const SVector& vec = add[i];
+      const SVector& vec = p_add[i];
       tot += vec.size();
       for (j = vec.size() - 1; j >= 0; --j)
          more[ vec.index(j) ]++;
    }
 
-   if (set.memMax() < tot)
-      set.memRemax(tot);
+   if (p_set.memMax() < tot)
+      p_set.memRemax(tot);
 
-   for (i = set.num() - 1; i >= 0; --i)
+   for (i = p_set.num() - 1; i >= 0; --i)
    {
-      j = set[i].size();
-      set.xtend(set[i], j + more[i]);
-      set[i].size() = j + more[i];
+      j = p_set[i].size();
+      p_set.xtend(p_set[i], j + more[i]);
+      p_set[i].size() = j + more[i];
       more[i] = j;
    }
 
-   for (i = add.num() - n; i < add.num(); ++i)
+   for (i = p_add.num() - n; i < p_add.num(); ++i)
    {
-      const SVector& vec = add[i];
+      const SVector& vec = p_add[i];
       for (j = vec.size() - 1; j >= 0; --j)
       {
          int n = vec.index(j);
          int m = more[n] ++;
-         SVector& xtend = set[n];
-         xtend.index(m) = i;
-         xtend.value(m) = vec.value(j);
+         SVector& l_xtend = p_set[n];
+         l_xtend.index(m) = i;
+         l_xtend.value(m) = vec.value(j);
       }
    }
 }
 
-void SPxLP::doAddRows(const LPRowSet& set)
+void SPxLP::doAddRows(const LPRowSet& p_set)
 {
    int i, j, k, ii, idx;
    SVector* col;
@@ -184,8 +184,8 @@ void SPxLP::doAddRows(const LPRowSet& set)
    DataArray < double > newColVals(nCols());
    int oldRowNumber = nRows();
 
-   if (&set != this)
-      LPRowSet::add(set);
+   if (&p_set != this)
+      LPRowSet::add(p_set);
    assert(LPRowSet::isConsistent());
    assert(LPColSet::isConsistent());
 
@@ -195,9 +195,9 @@ void SPxLP::doAddRows(const LPRowSet& set)
       newCols[i] = 0;
       newColVals[i] = 0;
    }
-   for (i = set.num() - 1; i >= 0; --i)
+   for (i = p_set.num() - 1; i >= 0; --i)
    {
-      const SVector& vec = set.rowVector(i);
+      const SVector& vec = p_set.rowVector(i);
       for (j = vec.size() - 1; j >= 0; --j)
       {
          ii = vec.index(j);
@@ -244,18 +244,18 @@ void SPxLP::doAddRows(const LPRowSet& set)
       }
    }
 
-   addedRows(set.num());
+   addedRows(p_set.num());
 }
 
-void SPxLP::doAddCols(const LPColSet& set)
+void SPxLP::doAddCols(const LPColSet& p_set)
 {
    int i, j;
    int oldColNumber = nCols();
    DataArray < int > newRows(nRows());
    DataArray < double > newRowVals(nRows());
 
-   if (&set != this)
-      LPColSet::add(set);
+   if (&p_set != this)
+      LPColSet::add(p_set);
    assert(LPColSet::isConsistent());
 
    // count additional nonzeros per row
@@ -264,18 +264,18 @@ void SPxLP::doAddCols(const LPColSet& set)
       newRows[i] = 0;
       newRowVals[i] = 0;
    }
-   for (i = set.num() - 1; i >= 0; --i)
+   for (i = p_set.num() - 1; i >= 0; --i)
    {
-      const SVector& vec = set.colVector(i);
+      const SVector& vec = p_set.colVector(i);
       for (j = vec.size() - 1; j >= 0; --j)
       {
-         int i = vec.index(j);
-         if (i >= nRows())  // create new rows if required
+         int l = vec.index(j);
+         if (l >= nRows())  // create new rows if required
          {
             LPRow empty;
-            newRows.reSize(i + 1);
-            newRowVals.reSize(i + 1);
-            for (int k = nRows(); k <= i; ++k)
+            newRows.reSize(l + 1);
+            newRowVals.reSize(l + 1);
+            for (int k = nRows(); k <= l; ++k)
             {
                newRows[k] = 0;
                newRowVals[k] = 0;
@@ -284,8 +284,8 @@ void SPxLP::doAddCols(const LPColSet& set)
             }
 
          }
-         assert(i < nRows());
-         newRows[i]++;
+         assert(l < nRows());
+         newRows[l]++;
       }
    }
 
@@ -318,21 +318,21 @@ void SPxLP::doAddCols(const LPColSet& set)
    }
    assert(SPxLP::isConsistent());
 
-   addedCols(set.num());
+   addedCols(p_set.num());
 }
 
-void SPxLP::addRows(SPxRowId id[], const LPRowSet& set)
+void SPxLP::addRows(SPxRowId id[], const LPRowSet& p_set)
 {
    int i = nRows();
-   addRows(set);
+   addRows(p_set);
    for (int j = 0; i < nRows(); ++i, ++j)
       id[j] = rId(i);
 }
 
-void SPxLP::addCols(SPxColId id[], const LPColSet& set)
+void SPxLP::addCols(SPxColId id[], const LPColSet& p_set)
 {
    int i = nCols();
-   addCols(set);
+   addCols(p_set);
    for (int j = 0; i < nCols(); ++i, ++j)
       id[j] = cId(i);
 }
@@ -344,9 +344,10 @@ void SPxLP::addCols(SPxColId id[], const LPColSet& set)
 void SPxLP::doRemoveRow(int j)
 {
    const SVector& vec = rowVector(j);
+   int i;
 
    // remove row vector from column file
-   for (int i = vec.size() - 1; i >= 0; --i)
+   for (i = vec.size() - 1; i >= 0; --i)
    {
       SVector& remvec = LPColSet::colVector(vec.index(i));
       remvec.remove(remvec.number(j));
@@ -355,10 +356,10 @@ void SPxLP::doRemoveRow(int j)
    int idx = nRows() - 1;
    if (j != idx)              // move last row to removed position
    {
-      const SVector& vec = rowVector(idx);
-      for (int i = vec.size() - 1; i >= 0; --i)
+      const SVector& l_vec = rowVector(idx);
+      for (i = l_vec.size() - 1; i >= 0; --i)
       {
-         SVector& movevec = LPColSet::colVector(vec.index(i));
+         SVector& movevec = LPColSet::colVector(l_vec.index(i));
          movevec.index(movevec.number(idx)) = j;
       }
    }
@@ -369,9 +370,10 @@ void SPxLP::doRemoveRow(int j)
 void SPxLP::doRemoveCol(int j)
 {
    const SVector& vec = colVector(j);
+   int i;
 
    // remove column vector from row file
-   for (int i = vec.size() - 1; i >= 0; --i)
+   for (i = vec.size() - 1; i >= 0; --i)
    {
       SVector& remvec = LPRowSet::rowVector(vec.index(i));
       remvec.remove(remvec.number(j));
@@ -380,10 +382,10 @@ void SPxLP::doRemoveCol(int j)
    int idx = nCols() - 1;
    if (j != idx)              // move last column to removed position
    {
-      const SVector& vec = colVector(idx);
-      for (int i = vec.size() - 1; i >= 0; --i)
+      const SVector& l_vec = colVector(idx);
+      for (i = l_vec.size() - 1; i >= 0; --i)
       {
-         SVector& movevec = LPRowSet::rowVector(vec.index(i));
+         SVector& movevec = LPRowSet::rowVector(l_vec.index(i));
          movevec.index(movevec.number(idx)) = j;
       }
    }

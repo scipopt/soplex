@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.3 2001/11/07 17:31:16 bzfbleya Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.4 2001/11/12 16:41:51 bzfpfend Exp $"
 
 
 #include <stdio.h>
@@ -1312,24 +1312,24 @@ static int setupColVals(CLUFactor* fc)
 static void setupRowVals(CLUFactor* fc)
 {
    int i, j, k, l;
-   int dim, vecs, mem;
-   int* row;
+   int l_dim, vecs, mem;
+   int* l_row;
    int* idx;
    double* val;
    int* beg;
-   int* ridx;
-   double* rval;
-   int* rbeg;
+   int* l_ridx;
+   double* l_rval;
+   int* l_rbeg;
    int *rorig, *rrorig;
    int *rperm, *rrperm;
 
-   dim = fc->thedim;
-   vecs = fc->l.firstUpdate;
-   row = fc->l.row;
-   idx = fc->l.idx;
-   val = fc->l.val;
-   beg = fc->l.start;
-   mem = beg[vecs];
+   l_dim = fc->thedim;
+   vecs  = fc->l.firstUpdate;
+   l_row = fc->l.row;
+   idx   = fc->l.idx;
+   val   = fc->l.val;
+   beg   = fc->l.start;
+   mem   = beg[vecs];
 
    if (fc->l.rval)
    {
@@ -1339,53 +1339,53 @@ static void setupRowVals(CLUFactor* fc)
       free(fc->l.rorig);
       free(fc->l.rperm);
    }
-   fc->l.rval = reinterpret_cast<double*>(Malloc(mem * sizeof(double)));
-   fc->l.ridx = reinterpret_cast<int *>(Malloc(mem * sizeof(int)));
-   fc->l.rbeg = reinterpret_cast<int *>(Malloc((dim + 1) * sizeof(int)));
-   fc->l.rorig = reinterpret_cast<int *>(Malloc(dim * sizeof(int)));
-   fc->l.rperm = reinterpret_cast<int *>(Malloc(dim * sizeof(int)));
+   fc->l.rval  = reinterpret_cast<double*>(Malloc(mem * sizeof(double)));
+   fc->l.ridx  = reinterpret_cast<int *>(Malloc(mem * sizeof(int)));
+   fc->l.rbeg  = reinterpret_cast<int *>(Malloc((l_dim + 1) * sizeof(int)));
+   fc->l.rorig = reinterpret_cast<int *>(Malloc(l_dim * sizeof(int)));
+   fc->l.rperm = reinterpret_cast<int *>(Malloc(l_dim * sizeof(int)));
 
-   ridx = fc->l.ridx;
-   rval = fc->l.rval;
-   rbeg = fc->l.rbeg;
-   rorig = fc->l.rorig;
+   l_ridx = fc->l.ridx;
+   l_rval = fc->l.rval;
+   l_rbeg = fc->l.rbeg;
+   rorig  = fc->l.rorig;
    rrorig = fc->row.orig;
-   rperm = fc->l.rperm;
+   rperm  = fc->l.rperm;
    rrperm = fc->row.perm;
 
-   for (i = dim; i--; *rbeg++ = 0)
+   for (i = l_dim; i--; *l_rbeg++ = 0)
    {
       *rorig++ = *rrorig++;
       *rperm++ = *rrperm++;
    }
-   *rbeg = 0;
+   *l_rbeg = 0;
 
-   rbeg = fc->l.rbeg + 1;
+   l_rbeg = fc->l.rbeg + 1;
    for (i = mem; i--;)
-      rbeg[*idx++]++;
+      l_rbeg[*idx++]++;
    idx = fc->l.idx;
 
-   for (l = 0, i = dim; i--; rbeg++)
+   for (l = 0, i = l_dim; i--; l_rbeg++)
    {
-      j = *rbeg;
-      *rbeg = l;
+      j = *l_rbeg;
+      *l_rbeg = l;
       l += j;
    }
    assert(l == mem);
 
-   rbeg = fc->l.rbeg + 1;
+   l_rbeg = fc->l.rbeg + 1;
    for (i = j = 0; i < vecs; ++i)
    {
-      l = row[i];
+      l = l_row[i];
       assert(idx == &fc->l.idx[fc->l.start[i]]);
       for (; j < beg[i + 1]; j++)
       {
-         k = rbeg[*idx++]++;
-         ridx[k] = l;
-         rval[k] = *val++;
+         k = l_rbeg[*idx++]++;
+         l_ridx[k] = l;
+         l_rval[k] = *val++;
       }
    }
-   assert(fc->l.rbeg[dim] == mem);
+   assert(fc->l.rbeg[l_dim] == mem);
    assert(fc->l.rbeg[0] == 0);
 }
 #endif
@@ -1467,42 +1467,42 @@ TERMINATE:
    return fac->stat;
 }
 
-void dumpCLUFactor(const CLUFactor* fac)
+void dumpCLUFactor(const CLUFactor* p_fac)
 {
    int i, j, k;
 
    /*  Dump U:
     */
-   for (i = 0; i < fac->thedim; ++i)
+   for (i = 0; i < p_fac->thedim; ++i)
    {
-      if (fac->row.perm[i] >= 0)
+      if (p_fac->row.perm[i] >= 0)
          printf("diag[%2d]: [%2d] = %g\n",
-                i, fac->col.orig[fac->row.perm[i]], fac->diag[i]);
-      for (j = 0; j < fac->u.row.len[i]; ++j)
+                i, p_fac->col.orig[p_fac->row.perm[i]], p_fac->diag[i]);
+      for (j = 0; j < p_fac->u.row.len[i]; ++j)
          printf
          (
             "   u[%2d]:  [%2d] = %g\n",
             i,
-            fac->u.row.idx[fac->u.row.start[i] + j],
-            fac->u.row.val[fac->u.row.start[i] + j]
+            p_fac->u.row.idx[p_fac->u.row.start[i] + j],
+            p_fac->u.row.val[p_fac->u.row.start[i] + j]
         );
    }
 
    /*  Dump L:
     */
-   for (i = 0; i < fac->thedim; ++i)
+   for (i = 0; i < p_fac->thedim; ++i)
    {
-      for (j = 0; j < fac->l.firstUnused; ++j)
-         if (fac->col.orig[fac->row.perm[fac->l.row[j]]] == i)
+      for (j = 0; j < p_fac->l.firstUnused; ++j)
+         if (p_fac->col.orig[p_fac->row.perm[p_fac->l.row[j]]] == i)
          {
             printf("l[%2d]:\n", i);
-            for (k = fac->l.start[j]; k < fac->l.start[j + 1]; ++k)
+            for (k = p_fac->l.start[j]; k < p_fac->l.start[j + 1]; ++k)
                printf
                (
                   "   l[%2d]:  [%2d] = %g\n",
-                  k - fac->l.start[j],
-                  fac->l.idx[k],
-                  fac->l.val[k]
+                  k - p_fac->l.start[j],
+                  p_fac->l.idx[k],
+                  p_fac->l.val[k]
               );
             break;
          }
@@ -1515,67 +1515,67 @@ void dumpCLUFactor(const CLUFactor* fac)
 /*
  *      Perform garbage collection on row file
  */
-void packRows(CLUFactor* fac)
+void packRows(CLUFactor* p_fac)
 {
-   int n, i, j, row;
+   int n, i, j, l_row;
    Dring *ring, *list;
 
-   int *ridx = fac->u.row.idx;
-   double *rval = fac->u.row.val;
-   int *rlen = fac->u.row.len;
-   int *rmax = fac->u.row.max;
-   int *rbeg = fac->u.row.start;
+   int *l_ridx = p_fac->u.row.idx;
+   double *l_rval = p_fac->u.row.val;
+   int *l_rlen = p_fac->u.row.len;
+   int *l_rmax = p_fac->u.row.max;
+   int *l_rbeg = p_fac->u.row.start;
 
    n = 0;
-   list = &(fac->u.row.list);
+   list = &(p_fac->u.row.list);
    for (ring = list->next; ring != list; ring = ring->next)
    {
-      row = ring->idx;
-      if (rbeg[row] != n)
+      l_row = ring->idx;
+      if (l_rbeg[l_row] != n)
       {
          /*@
          fprintf(stderr, "packing rows ...\n");
          */
          do
          {
-            row = ring->idx;
-            i = rbeg[row];
-            assert(rlen[row] <= rmax[row]);
-            rbeg[row] = n;
-            rmax[row] = rlen[row];
-            j = i + rlen[row];
+            l_row = ring->idx;
+            i = l_rbeg[l_row];
+            assert(l_rlen[l_row] <= l_rmax[l_row]);
+            l_rbeg[l_row] = n;
+            l_rmax[l_row] = l_rlen[l_row];
+            j = i + l_rlen[l_row];
             for (; i < j; ++i, ++n)
             {
                assert(n <= i);
-               ridx[n] = ridx[i];
-               rval[n] = rval[i];
+               l_ridx[n] = l_ridx[i];
+               l_rval[n] = l_rval[i];
             }
             ring = ring->next;
          }
          while (ring != list);
          goto terminatePackRows;
       }
-      n += rlen[row];
-      rmax[row] = rlen[row];
+      n += l_rlen[l_row];
+      l_rmax[l_row] = l_rlen[l_row];
    }
 
 terminatePackRows:
-   fac->u.row.max[dim] = 0;
-   fac->u.row.used = n;
+   p_fac->u.row.max[dim] = 0;
+   p_fac->u.row.used = n;
 }
 
 
 /*
  *      Make row of fac large enough to hold len nonzeros.
  */
-void remaxRow(CLUFactor* fc, int row, int len)
+void remaxRow(CLUFactor* fc, int p_row, int len)
 {
    fac = fc;
-   assert(fac->u.row.max[row] < len);
+   assert(fac->u.row.max[p_row] < len);
 
-   if (fac->u.row.elem[row].next == &(fac->u.row.list)) /* last in row file */
+   if (fac->u.row.elem[p_row].next == &(fac->u.row.list)) /* last in row file */
    {
-      int delta = len - fac->u.row.max[row];
+      int delta = len - fac->u.row.max[p_row];
 
       if (delta > fac->u.row.size - fac->u.row.used)
       {
@@ -1588,7 +1588,7 @@ void remaxRow(CLUFactor* fc, int row, int len)
              && "ERROR: could not allocate memory for row file");
 
       fac->u.row.used += delta;
-      fac->u.row.max[row] = len;
+      fac->u.row.max[p_row] = len;
    }
 
    else                        /* row must be moved to end of row file */
@@ -1609,16 +1609,16 @@ void remaxRow(CLUFactor* fc, int row, int len)
              && "ERROR: could not allocate memory for row file");
 
       j = fac->u.row.used;
-      i = fac->u.row.start[row];
-      k = fac->u.row.len[row] + i;
-      fac->u.row.start[row] = j;
+      i = fac->u.row.start[p_row];
+      k = fac->u.row.len[p_row] + i;
+      fac->u.row.start[p_row] = j;
       fac->u.row.used += len;
 
-      fac->u.row.max[fac->u.row.elem[row].prev->idx] += fac->u.row.max[row];
-      fac->u.row.max[row] = len;
-      removeDR(fac->u.row.elem[row]);
+      fac->u.row.max[fac->u.row.elem[p_row].prev->idx] += fac->u.row.max[p_row];
+      fac->u.row.max[p_row] = len;
+      removeDR(fac->u.row.elem[p_row]);
       ring = fac->u.row.list.prev;
-      init2DR (fac->u.row.elem[row], *ring);
+      init2DR (fac->u.row.elem[p_row], *ring);
 
       idx = fac->u.row.idx;
       val = fac->u.row.val;
@@ -1635,67 +1635,67 @@ void remaxRow(CLUFactor* fc, int row, int len)
 /*
  *      Perform garbage collection on column file
  */
-static void packColumns(CLUFactor* fac)
+static void packColumns(CLUFactor* p_fac)
 {
-   int n, i, j, col;
+   int n, i, j, l_col;
    Dring *ring, *list;
 
-   int *cidx = fac->u.col.idx;
-   int *clen = fac->u.col.len;
-   int *cmax = fac->u.col.max;
-   int *cbeg = fac->u.col.start;
+   int *l_cidx = p_fac->u.col.idx;
+   int *l_clen = p_fac->u.col.len;
+   int *l_cmax = p_fac->u.col.max;
+   int *l_cbeg = p_fac->u.col.start;
 
    /*@
    fprintf(stderr, "packing columns ...\n");
    */
 
    n = 0;
-   list = &(fac->u.col.list);
+   list = &(p_fac->u.col.list);
    for (ring = list->next; ring != list; ring = ring->next)
    {
-      col = ring->idx;
-      if (cbeg[col] != n)
+      l_col = ring->idx;
+      if (l_cbeg[l_col] != n)
       {
          do
          {
-            col = ring->idx;
-            i = cbeg[col];
-            cbeg[col] = n;
-            cmax[col] = clen[col];
-            j = i + clen[col];
+            l_col = ring->idx;
+            i = l_cbeg[l_col];
+            l_cbeg[l_col] = n;
+            l_cmax[l_col] = l_clen[l_col];
+            j = i + l_clen[l_col];
             for (; i < j; ++i)
-               cidx[n++] = cidx[i];
+               l_cidx[n++] = l_cidx[i];
             ring = ring->next;
          }
          while (ring != list);
          goto terminatePackColumns;
       }
-      n += clen[col];
-      cmax[col] = clen[col];
+      n += l_clen[l_col];
+      l_cmax[l_col] = l_clen[l_col];
    }
 
 terminatePackColumns :
-   fac->u.col.used = n;
-   fac->u.col.max[dim] = 0;
+   p_fac->u.col.used = n;
+   p_fac->u.col.max[dim] = 0;
 }
 
 
 /*
  *      Make column col of fac large enough to hold len nonzeros.
  */
-void remaxCol(CLUFactor* fc, int col, int len)
+void remaxCol(CLUFactor* fc, int p_col, int len)
 {
    fac = fc;
-   assert(fac->u.col.max[col] < len);
+   assert(fac->u.col.max[p_col] < len);
 
-   if (fac->u.col.elem[col].next == &(fac->u.col.list)) /* last in column file */
+   if (fac->u.col.elem[p_col].next == &(fac->u.col.list)) /* last in column file */
    {
-      int delta = len - fac->u.col.max[col];
+      int delta = len - fac->u.col.max[p_col];
 
       if (delta > fac->u.col.size - fac->u.col.used)
       {
          packColumns(fac);
-         delta = len - fac->u.col.max[col];
+         delta = len - fac->u.col.max[p_col];
          if (fac->u.col.size < fac->colMemMult * fac->u.col.used + len)
             minColMem(2 * fac->u.col.used + len);
          /* minColMem(fac->colMemMult * fac->u.col.used + len); */
@@ -1704,7 +1704,7 @@ void remaxCol(CLUFactor* fc, int col, int len)
              && "ERROR: could not allocate memory for column file");
 
       fac->u.col.used += delta;
-      fac->u.col.max[col] = len;
+      fac->u.col.max[p_col] = len;
    }
 
    else                        /* column must be moved to end of column file */
@@ -1724,16 +1724,16 @@ void remaxCol(CLUFactor* fc, int col, int len)
              && "ERROR: could not allocate memory for column file");
 
       j = fac->u.col.used;
-      i = fac->u.col.start[col];
-      k = fac->u.col.len[col] + i;
-      fac->u.col.start[col] = j;
+      i = fac->u.col.start[p_col];
+      k = fac->u.col.len[p_col] + i;
+      fac->u.col.start[p_col] = j;
       fac->u.col.used += len;
 
-      fac->u.col.max[fac->u.col.elem[col].prev->idx] += fac->u.col.max[col];
-      fac->u.col.max[col] = len;
-      removeDR(fac->u.col.elem[col]);
+      fac->u.col.max[fac->u.col.elem[p_col].prev->idx] += fac->u.col.max[p_col];
+      fac->u.col.max[p_col] = len;
+      removeDR(fac->u.col.elem[p_col]);
       ring = fac->u.col.list.prev;
-      init2DR (fac->u.col.elem[col], *ring);
+      init2DR (fac->u.col.elem[p_col], *ring);
 
       idx = fac->u.col.idx;
       for (; i < k; ++i)
@@ -1744,7 +1744,7 @@ void remaxCol(CLUFactor* fc, int col, int len)
 
 /*****************************************************************************/
 
-int CLUFactorIsConsistent(const CLUFactor *fac)
+int CLUFactorIsConsistent(const CLUFactor *p_fac)
 {
    int i, j, k, l;
    Dring *ring;
@@ -1752,23 +1752,23 @@ int CLUFactorIsConsistent(const CLUFactor *fac)
 
    /*  Consistency only relevant for real factorizations
     */
-   if (fac->stat)
+   if (p_fac->stat)
       return 1;
 
    /*  Test column ring list consistency.
     */
    i = 0;
-   for (ring = fac->u.col.list.next; ring != &(fac->u.col.list); ring = ring->next)
+   for (ring = p_fac->u.col.list.next; ring != &(p_fac->u.col.list); ring = ring->next)
    {
       assert(ring->idx >= 0);
       assert(ring->idx < dim);
       assert(ring->prev->next == ring);
-      if (ring != fac->u.col.list.next)
+      if (ring != p_fac->u.col.list.next)
       {
          assert
          (
-            fac->u.col.start[ring->prev->idx] + fac->u.col.max[ring->prev->idx]
-            == fac->u.col.start[ring->idx]
+            p_fac->u.col.start[ring->prev->idx] + p_fac->u.col.max[ring->prev->idx]
+            == p_fac->u.col.start[ring->idx]
         );
       }
       ++i;
@@ -1776,31 +1776,31 @@ int CLUFactorIsConsistent(const CLUFactor *fac)
    assert(i == dim);
    assert
    (
-      fac->u.col.start[ring->prev->idx] + fac->u.col.max[ring->prev->idx]
-      == fac->u.col.used
+      p_fac->u.col.start[ring->prev->idx] + p_fac->u.col.max[ring->prev->idx]
+      == p_fac->u.col.used
   );
 
 
    /*  Test row ring list consistency.
     */
    i = 0;
-   for (ring = fac->u.row.list.next; ring != &(fac->u.row.list); ring = ring->next)
+   for (ring = p_fac->u.row.list.next; ring != &(p_fac->u.row.list); ring = ring->next)
    {
       assert(ring->idx >= 0);
       assert(ring->idx < dim);
       assert(ring->prev->next == ring);
       assert
       (
-         fac->u.row.start[ring->prev->idx] + fac->u.row.max[ring->prev->idx]
-         == fac->u.row.start[ring->idx]
+         p_fac->u.row.start[ring->prev->idx] + p_fac->u.row.max[ring->prev->idx]
+         == p_fac->u.row.start[ring->idx]
      );
       ++i;
    }
    assert(i == dim);
    assert
    (
-      fac->u.row.start[ring->prev->idx] + fac->u.row.max[ring->prev->idx]
-      == fac->u.row.used
+      p_fac->u.row.start[ring->prev->idx] + p_fac->u.row.max[ring->prev->idx]
+      == p_fac->u.row.used
   );
 
 
@@ -1808,8 +1808,8 @@ int CLUFactorIsConsistent(const CLUFactor *fac)
     */
    for (i = 0; i < dim; ++i)
    {
-      assert(fac->u.row.max[i] >= fac->u.row.len[i]);
-      assert(fac->u.col.max[i] >= fac->u.col.len[i]);
+      assert(p_fac->u.row.max[i] >= p_fac->u.row.len[i]);
+      assert(p_fac->u.col.max[i] >= p_fac->u.col.len[i]);
    }
 
 
@@ -1819,31 +1819,31 @@ int CLUFactorIsConsistent(const CLUFactor *fac)
    {
       for
       (
-         j = fac->u.row.start[i] + fac->u.row.len[i] - 1;
-         j >= fac->u.row.start[i];
+         j = p_fac->u.row.start[i] + p_fac->u.row.len[i] - 1;
+         j >= p_fac->u.row.start[i];
          j--
      )
       {
-         k = fac->u.row.idx[j];
+         k = p_fac->u.row.idx[j];
          for
          (
-            l = fac->u.col.start[k] + fac->u.col.len[k] - 1;
-            l >= fac->u.col.start[k];
+            l = p_fac->u.col.start[k] + p_fac->u.col.len[k] - 1;
+            l >= p_fac->u.col.start[k];
             l--
         )
          {
-            if (fac->u.col.idx[l] == i)
+            if (p_fac->u.col.idx[l] == i)
                break;
          }
-         assert(fac->u.col.idx[l] == i);
-         if (fac->row.perm[i] < 0)
+         assert(p_fac->u.col.idx[l] == i);
+         if (p_fac->row.perm[i] < 0)
          {
-            assert(fac->col.perm[k] < 0);
+            assert(p_fac->col.perm[k] < 0);
          }
          else
          {
-            assert(fac->col.perm[k] < 0
-                    || fac->col.perm[k] > fac->row.perm[i]);
+            assert(p_fac->col.perm[k] < 0
+                    || p_fac->col.perm[k] > p_fac->row.perm[i]);
          }
       }
    }
@@ -1854,25 +1854,25 @@ int CLUFactorIsConsistent(const CLUFactor *fac)
    {
       for
       (
-         j = fac->u.col.start[i] + fac->u.col.len[i] - 1;
-         j >= fac->u.col.start[i];
+         j = p_fac->u.col.start[i] + p_fac->u.col.len[i] - 1;
+         j >= p_fac->u.col.start[i];
          j--
      )
       {
-         k = fac->u.col.idx[j];
+         k = p_fac->u.col.idx[j];
          for
          (
-            l = fac->u.row.start[k] + fac->u.row.len[k] - 1;
-            l >= fac->u.row.start[k];
+            l = p_fac->u.row.start[k] + p_fac->u.row.len[k] - 1;
+            l >= p_fac->u.row.start[k];
             l--
         )
          {
-            if (fac->u.row.idx[l] == i)
+            if (p_fac->u.row.idx[l] == i)
                break;
          }
-         assert(fac->u.row.idx[l] == i);
-         assert(fac->col.perm[i] < 0
-                 || fac->row.perm[k] < fac->col.perm[i]);
+         assert(p_fac->u.row.idx[l] == i);
+         assert(p_fac->col.perm[i] < 0
+                 || p_fac->row.perm[k] < p_fac->col.perm[i]);
       }
    }
 
@@ -1883,11 +1883,11 @@ int CLUFactorIsConsistent(const CLUFactor *fac)
       {
          for (pring = rowNZ[i].next; pring != &(rowNZ[i]); pring = pring->next)
          {
-            assert(fac->row.perm[pring->idx] < 0);
+            assert(p_fac->row.perm[pring->idx] < 0);
          }
          for (pring = colNZ[i].next; pring != &(colNZ[i]); pring = pring->next)
          {
-            assert(fac->col.perm[pring->idx] < 0);
+            assert(p_fac->col.perm[pring->idx] < 0);
          }
       }
 

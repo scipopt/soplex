@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.4 2001/11/11 20:27:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.5 2001/11/12 16:41:49 bzfpfend Exp $"
 
 #ifndef _DATASET_H_
 #define _DATASET_H_
@@ -265,30 +265,30 @@ public:
     */
    void remove(int perm[])
    {
-      int i, j, first = -1;
+      int k, j, first = -1;
       // setup permutation and remove items
-      for (i = j = 0; i < num(); ++i)
+      for (k = j = 0; k < num(); ++k)
       {
-         if (perm[i] >= 0)      // #j# has not been removed ...
-            perm[i] = j++;
+         if (perm[k] >= 0)      // #j# has not been removed ...
+            perm[k] = j++;
          else
          {
-            int idx = thekey[i].idx;
+            int idx = thekey[k].idx;
             theitem[idx].info = firstfree;
             firstfree = -idx - 1;
             if (first < 0)
-               first = i;
+               first = k;
          }
       }
       if (first >= 0)        // move remaining items
       {
-         for (i = first, j = num(); i < j; ++i)
+         for (k = first, j = num(); k < j; ++k)
          {
-            if (perm[i] >= 0)
+            if (perm[k] >= 0)
             {
-               thekey[perm[i]] = thekey[i];
-               theitem[thekey[i].idx].info = perm[i];
-               thekey[i].idx = -1;
+               thekey[perm[k]] = thekey[k];
+               theitem[thekey[k].idx].info = perm[k];
+               thekey[k].idx = -1;
             }
             else
                --thenum;

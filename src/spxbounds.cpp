@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbounds.cpp,v 1.2 2001/11/06 23:31:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbounds.cpp,v 1.3 2001/11/12 16:42:01 bzfpfend Exp $"
 
 
 /*  Import system include files
@@ -214,11 +214,11 @@ void SoPlex::setEnterBounds()
 
    for (i = dim() - 1; i >= 0; --i)
    {
-      SPxLP::Id id = baseId(i);
-      if (id.isSPxRowId())
-         setEnterBound4Row(i, number(SPxRowId(id)));
+      SPxLP::Id l_id = baseId(i);
+      if (l_id.isSPxRowId())
+         setEnterBound4Row(i, number(SPxRowId(l_id)));
       else
-         setEnterBound4Col(i, number(SPxColId(id)));
+         setEnterBound4Col(i, number(SPxColId(l_id)));
    }
 }
 
@@ -294,28 +294,28 @@ void SoPlex::setLeaveBounds()
 
    for (i = dim() - 1; i >= 0; --i)
    {
-      SPxLP::Id id = baseId(i);
-      if (id.isSPxRowId())
-         setLeaveBound4Row(i, number(SPxRowId(id)));
+      SPxLP::Id l_id = baseId(i);
+      if (l_id.isSPxRowId())
+         setLeaveBound4Row(i, number(SPxRowId(l_id)));
       else
-         setLeaveBound4Col(i, number(SPxColId(id)));
+         setLeaveBound4Col(i, number(SPxColId(l_id)));
    }
 }
 
 void SoPlex::testBounds() const
 {
-   double max = (1 + iterCount) * delta();
+   double l_max = (1 + iterCount) * delta();
    int i;
 
    if (type() == ENTER)
    {
       for (i = dim(); i-- > 0;)
       {
-         if ((*theFvec)[i] > theUBbound[i] + max
+         if ((*theFvec)[i] > theUBbound[i] + l_max
               //@ &&  theUBbound[i] != theLBbound[i])
            )
             std::cerr << i << ": invalid upper enter bound found ...\n";
-         if ((*theFvec)[i] < theLBbound[i] - max
+         if ((*theFvec)[i] < theLBbound[i] - l_max
               //@ &&  theUBbound[i] != theLBbound[i])
            )
             std::cerr << i << ": invalid lower enter bound found ...\n";
@@ -325,22 +325,22 @@ void SoPlex::testBounds() const
    {
       for (i = dim(); i-- > 0;)
       {
-         if ((*theCoPvec)[i] > (*theCoUbound)[i] + max
+         if ((*theCoPvec)[i] > (*theCoUbound)[i] + l_max
               //@ &&  (*theCoUbound)[i] != (*theCoLbound)[i])
            )
             std::cerr << i << "invalid upper cobound found ...\n";
-         if ((*theCoPvec)[i] < (*theCoLbound)[i] - max
+         if ((*theCoPvec)[i] < (*theCoLbound)[i] - l_max
               //@ &&  (*theCoUbound)[i] != (*theCoLbound)[i])
            )
             std::cerr << i << "invalid lower cobound found ...\n";
       }
       for (i = coDim(); i-- > 0;)
       {
-         if ((*thePvec)[i] > (*theUbound)[i] + max
+         if ((*thePvec)[i] > (*theUbound)[i] + l_max
               //@ &&  (*theUbound)[i] != (*theLbound)[i])
            )
             std::cerr << i << "invalid upper bound found ...\n";
-         if ((*thePvec)[i] < (*theLbound)[i] - max
+         if ((*thePvec)[i] < (*theLbound)[i] - l_max
               //@ &&  (*theUbound)[i] != (*theLbound)[i])
            )
             std::cerr << i << "invalid lower bound found ...\n";

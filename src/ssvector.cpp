@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.4 2001/11/11 20:27:34 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.5 2001/11/12 16:42:12 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -479,18 +479,18 @@ SSVector& SSVector::multAdd(double xx, const SVector& svec)
 
       if (adjust)
       {
-         int* i = idx;
-         int* ii = idx;
-         int* end = idx + num;
-         for (; i < end; ++i)
+         int* iptr = idx;
+         int* iiptr = idx;
+         int* endptr = idx + num;
+         for (; iptr < endptr; ++iptr)
          {
-            x = v[*i];
+            x = v[*iptr];
             if (x > eps || x < meps)
-               *ii++ = *i;
+               *iiptr++ = *iptr;
             else
-               v[*i] = 0;
+               v[*iptr] = 0;
          }
-         num = ii - idx;
+         num = iiptr - idx;
       }
    }
    else
@@ -539,18 +539,18 @@ SSVector& SSVector::multAdd(double xx, const SubSVector& svec)
 
       if (adjust)
       {
-         int* i = idx;
-         int* ii = idx;
-         int* end = idx + num;
-         for (; i < end; ++i)
+         int* iptr = idx;
+         int* iiptr = idx;
+         int* endptr = idx + num;
+         for (; iptr < endptr; ++iptr)
          {
-            x = v[*i];
+            x = v[*iptr];
             if (x > eps || x < meps)
-               *ii++ = *i;
+               *iiptr++ = *iptr;
             else
-               v[*i] = 0;
+               v[*iptr] = 0;
          }
-         num = ii - idx;
+         num = iiptr - idx;
       }
    }
    else
