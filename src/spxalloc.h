@@ -13,8 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxalloc.h,v 1.2 2001/11/13 21:55:19 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxalloc.h,v 1.3 2001/11/15 16:54:01 bzfkocht Exp $"
 
+/**@file  spxalloc.h
+ * @brief Memory allocation routines.
+ */
 #ifndef _SPXALLOC_H_
 #define _SPXALLOC_H_
 
@@ -24,7 +27,19 @@
 
 namespace soplex
 {
-///
+/**@defgroup MAR Memory allocation routines
+ *
+ * Here we have cover functions for malloc/realloc/free, to make sure
+ * that we allays succeed. Otherwise abort() is called.
+ *
+ * We use templates to get the types right, otherwise casts would have 
+ * been neccessary.
+ */
+//@{
+/**@brief Allocate memory.
+ * @param p some pointer
+ * @param n the number of elements #p will point to.
+ */
 template <class T>
 inline void spx_alloc(T& p, int n)
 {
@@ -42,7 +57,10 @@ inline void spx_alloc(T& p, int n)
    }
 }
 
-/// 
+/**@brief Change amount of allocated memory.
+ * @param p some pointer
+ * @param n the number of elements p should point to.
+ */
 template <class T>
 inline void spx_realloc(T& p, int n)
 {
@@ -58,7 +76,7 @@ inline void spx_realloc(T& p, int n)
    }
 }
 
-///
+/// Release memory
 template <class T>
 inline void spx_free(T& p)
 {
@@ -69,6 +87,7 @@ inline void spx_free(T& p)
    p = 0;
 }
 
+//@}
 } // namespace soplex
 #endif // _SPXALLOC_H_
 

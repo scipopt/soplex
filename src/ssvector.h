@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.h,v 1.4 2001/11/08 14:27:28 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.h,v 1.5 2001/11/15 16:54:01 bzfkocht Exp $"
 
 
 #ifndef _SSVECTOR_H_
@@ -313,9 +313,6 @@ public:
 
    ///
    SSVector& operator=(const SSVector& rhs);
- private:
-   /// use setup_and_assign if you want this
-   SSVector& operator=(SSVector& rhs);
 
  public:
    /// setup #rhs# vector, if it is not allready.

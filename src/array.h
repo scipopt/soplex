@@ -13,111 +13,91 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: array.h,v 1.3 2001/11/13 21:01:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: array.h,v 1.4 2001/11/15 16:54:00 bzfkocht Exp $"
 
+/**@file  array.h
+ * @brief Save arrays of arbitrary types.
+ */
 #ifndef _ARRAY_H_
 #define _ARRAY_H_
 
-//@ ----------------------------------------------------------------------------
-/*      \Section{Imports}
-    Import required system include files
- */
 #include <stdlib.h>
 #include <assert.h>
 
 namespace soplex
 {
+/**@brief   Save arrays of arbitrary types.
+   @ingroup Elementary
 
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
+   Class Array provides safe arrays of arbitrary type. Array elements are
+   accessed just like ordinary C++ array elements by means of the index
+   operator[](). Safety is provided by
 
-/**
-    Class #Array# provides safe arrays of arbitrary type. #Array# elements are
-    accessed just like ordinary C++ array elements by means of the index
-    #operator[]#. Safety is provided by
-    \begin{itemize}
-    \item       automatic memory management in constructor and destructure
-                preventing memory leaks
-    \item       checking of array bound when accessing elements with the
-                indexing #operator[]# (only when compiled without #-DNDEBUG#).
-    \end{itemize}
+    - automatic memory management in constructor and destructure
+      preventing memory leaks
+    - checking of array bound when accessing elements with the
+      indexing operator[]() (only when compiled without -DNDEBUG).
  
-    Moreover, #Array#s may easily be extended by #insert#ing or #append#ing elements
-    to the #Array# or shrunken by #remov#ing elements. Method #reSize(int n)# resets
-    the #Array#s length to #n# thereby appending elements or truncating the
-    #Array# to the required size.
+    Moreover, Array%s may easily be extended by #insert%ing or
+    #append%ing elements to the Array or shrunken by #remove%ing
+    elements. Method #reSize(int n) resets the Array%s length to #n
+    thereby appending elements or truncating the Array to the
+    required size.
  
-    Finally, #Array#s may be used as arguments of standard C functions requiring
-    pointers thru a cast operator.
+    Array%s may be used as arguments of standard C functions
+    requiring pointers.
  
-    An #Array# is implemented in a C++ complient way with respect to how memory
-    is managemed: Only operators #new# and #delete# are used for allocating
-    memory. This involves some overhead for all methods effecting the length of
-    an #Array#, i.e. all methods #insert#, #append#, #remove# and #reSize#. This
-    involves allocating a new C++ array of the new size and copying all elements
-    with the template parameters #operator=#.
+    An Array is implemented in a C++ complient way with respect to
+    how memory is managemed: Only operators ::new and ::delete are
+    used for allocating memory. This involves some overhead for all
+    methods effecting the length of an Array, i.e. all methods
+    #insert, #append, #remove and #reSize. This involves
+    allocating a new C++ array of the new size and copying all
+    elements with the template parameters operator=().
  
-    For this reason, it is not convenient to use class #Array#, if its elements
-    are \Ref{Data Objects}. In this case use class \Ref{DataArray} instead.
+    For this reason, it is not convenient to use class Array, if its elements
+    are \Ref{Data Objects}. In this case use class DataArray instead.
  
-    @see        DataArray, Data Objects
- */
+    @see DataArray, \ref DataObjects "Data Objects" 
+*/
 template < class T >
 class Array
 {
 protected:
-   /*  For the implementation we simply store:
-    */
-   int num;                    // the length of array #data# and
-   T *data;                  // the array of elements
+   int num;     ///< the length of array #data 
+   T*  data;    ///< the array of elements
 
 public:
-   /// reference #n#'th element.
+   /// reference #n'th element.
    T& operator[](int n)
    {
       assert(n >= 0 && n < size());
       return data[n];
    }
-   /// reference #n#'th element.
+   /// reference #n'th element.
    const T& operator[](int n) const
    {
       assert(n >= 0 && n < size());
       return data[n];
    }
 
-   /// Cast to C arrey.
-   operator T* ()
-   {
-      return data;
-   }
-   /** Cast to constant C array.
-       This method allows it to use an #Array<T># as argument for all
-       functions expecting #T*# or #const T*#. However, when used, bound
-       checking can no longer be performed in the function using #T*#.
-    */
-   operator const T* () const
-   {
-      return data;
-   }
-
-   /// append #n# uninitialized elements.
+   /// append #n uninitialized elements.
    void append(int n)
    {
       insert(size(), n);
    }
-   /// append #n# elements from #tarray#.
-   void append(int n, const T* tarray)
+   /// append #n elements from #p_array.
+   void append(int n, const T* p_array)
    {
-      insert(size(), n, tarray);
+      insert(size(), n, p_array);
    }
-   /// append all elements from #tarray#.
-   void append(const Array<T>& tarray)
+   /// append all elements from #p_array.
+   void append(const Array<T>& p_array)
    {
-      insert(size(), tarray);
+      insert(size(), p_array);
    }
 
-   /// insert #n# uninitialized elements before #i#-th element.
+   /// insert #n uninitialized elements before #i-th element.
    void insert(int i, int n)
    {
       assert(i <= size());
@@ -139,7 +119,7 @@ public:
       }
    }
 
-   /// insert #n# elements from #tarray# before #i#-th element.
+   /// insert #n elements from #tarray before #i-th element.
    void insert(int i, int n, const T* tarray)
    {
       insert(i, n);
@@ -147,7 +127,7 @@ public:
          data[n + i] = tarray[n];
    }
 
-   /// insert all elements from #tarray# before #i#-th element.
+   /// insert all elements from #tarray before #i-th element.
    void insert(int i, const Array<T>& tarray)
    {
       int n = tarray.size();
@@ -156,7 +136,7 @@ public:
          data[n + i] = tarray.data[n];
    }
 
-   /// remove #m# elements starting at #n#.
+   /// remove #m elements starting at #n.
    void remove(int n = 0, int m = 1)
    {
       assert(n >= 0 && m >= 0);
@@ -188,14 +168,13 @@ public:
       }
    }
 
-
-   /// return nr. of elements.
+   /// return the number of elements.
    int size() const
    {
       return num;
    }
 
-   /// reset nr. of elements.
+   /// reset the number of elements.
    void reSize(int newsize)
    {
       if (newsize < size())
@@ -204,10 +183,10 @@ public:
          append(newsize - size());
    }
 
-   /** Assignment operator.
-       Assigning an rvalue #Array# to an lvalue #Array# involves resizing
-       the lvalue to the rvalues #size()# and copying all elements via
-       the #Array# element's assignment #operator=#.
+   /// assignment operator.
+   /** Assigning an rvalue Array to an lvalue Array involves resizing
+    *  the lvalue to the rvalues size() and copying all elements via
+    *  the Array element's assignment operator=().
     */
    Array<T>& operator=(const Array<T>& rhs)
    {
@@ -217,11 +196,10 @@ public:
       return *this;
    }
 
-   /** Default Constructor.
-       The constructor allocates an #Array# of #n# uninitialized elements.
+   /// default constructor.
+   /** The constructor allocates an Array of #n uninitialized elements.
     */
-   Array(int n = 0)
-      : data(0)
+   Array(int n = 0) : data(0)
    {
       assert(n >= 0);
       num = n;
@@ -232,9 +210,8 @@ public:
       }
    }
 
-   ///
-   Array(const Array<T>& old)
-      : num(old.num)
+   /// copy constructor
+   Array(const Array<T>& old) : num(old.num)
    {
       if (num > 0)
       {
@@ -244,14 +221,14 @@ public:
       }
    }
 
-   ///
+   /// destructor
    ~Array()
    {
       if (num > 0)
          delete[] data;
    }
 
-   ///
+   /// consitency check
    int isConsistent() const
    {
       if (num < 0 || (num > 0 && data == 0))
@@ -262,7 +239,6 @@ public:
       return 1;
    }
 };
-
 } // namespace soplex
 #endif
 

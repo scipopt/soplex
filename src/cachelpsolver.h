@@ -13,21 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: cachelpsolver.h,v 1.2 2001/11/06 23:31:00 bzfkocht Exp $"
-
+#pragma ident "@(#) $Id: cachelpsolver.h,v 1.3 2001/11/15 16:54:01 bzfkocht Exp $"
 
 #ifndef _CACHELPSOLVER_H_
 #define _CACHELPSOLVER_H_
 
-//@ ----------------------------------------------------------------------------
-/*      \Section{Imports}
-    Import required system include files
- */
 #include <assert.h>
-
-
-/*  and class header files
- */
 
 #include "lpsolver.h"
 #include "dvector.h"
@@ -35,17 +26,14 @@
 
 namespace soplex
 {
+/**@brief   LP solver with result caching.
+   @ingroup Algorithmic 
 
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
-
-/** LP solver with result caching.
-    Class #CacheLPSolver# provides some caching for some of the data access
-    methods of #LPSolver#. E.g. when multiple successive calls to method
-    #primal()# occur, only the first call the primal solution vector is really
-    constructed. The following calls will return the previously constructed
-    vector.
+   Class CacheLPSolver provides some caching for some of the data access
+   methods of LPSolver. E.g. when multiple successive calls to method
+   primal() occur, only the first call the primal solution vector is really
+   constructed. The following calls will return the previously constructed
+   vector.
  */
 class CacheLPSolver : public LPSolver
 {
@@ -60,10 +48,10 @@ private:
    mutable DataArray < signed char > rowBase;
 
 public:
-   /// #i#-th value of objective vector.
+   /// #i-th value of objective vector.
    virtual double obj(int i) const = 0;
 
-   /// #id#-th value of objective vector.
+   /// #id-th value of objective vector.
    virtual double obj(ColId id) const = 0;
 
    /// return const objective vector.
