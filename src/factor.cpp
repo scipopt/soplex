@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.30 2002/02/04 15:34:08 bzfpfend Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.31 2002/02/07 15:46:30 bzfbleya Exp $"
 
 //#define DEBUG 1
 
@@ -1551,6 +1551,7 @@ void CLUFactor::factor(
       nzCnt = setupColVals();
    }
 
+   temp.clear();
    /* assert(dump()); */
 }
 
