@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataarray.h,v 1.8 2001/11/16 20:12:24 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataarray.h,v 1.9 2001/11/17 22:15:58 bzfkocht Exp $"
 
 /**@file  dataarray.h
  * @brief Save arrays of data objects.
@@ -235,8 +235,6 @@ public:
     */
    ptrdiff_t reMax(int newMax = 1, int newSize = -1)
    {
-      ptrdiff_t diff;
-
       if (newSize >= 0)
          thesize = newSize;
       if (newMax < newSize)
@@ -254,8 +252,8 @@ public:
       }
       else
          spx_realloc(data, themax);
-      diff = reinterpret_cast<char*>(data) - reinterpret_cast<char*>(olddata);
-      return diff;
+
+      return reinterpret_cast<char*>(data) - reinterpret_cast<char*>(olddata);
    }
    /// assignment operator
    DataArray& operator=(const DataArray& rhs)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: array.h,v 1.6 2001/11/16 20:12:24 bzfkocht Exp $"
+#pragma ident "@(#) $Id: array.h,v 1.7 2001/11/17 22:15:58 bzfkocht Exp $"
 
 /**@file  array.h
  * @brief Save arrays of arbitrary types.
@@ -196,7 +196,8 @@ public:
    /// default constructor.
    /** The constructor allocates an Array of \p n uninitialized elements.
     */
-   Array(int n = 0) : data(0)
+   Array(int n = 0) 
+      : data(0)
    {
       assert(n >= 0);
       num = n;
@@ -208,7 +209,8 @@ public:
    }
 
    /// copy constructor
-   explicit Array(const Array<T>& old) : num(old.num)
+   explicit Array(const Array<T>& old) 
+      : num(old.num)
    {
       if (num > 0)
       {

@@ -13,17 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.h,v 1.5 2001/11/12 17:10:05 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.h,v 1.6 2001/11/17 22:15:59 bzfkocht Exp $"
 
-
-/*      \Section{Imports}
- */
 #ifndef _SVSET_H_
 #define _SVSET_H_
 
-
 #include <assert.h>
-
 
 #include "svector.h"
 #include "dataset.h"
@@ -33,43 +28,46 @@
 
 namespace soplex
 {
-
-/*      \Section{Class Declarataion}
- */
-
 typedef DataArray < SVector::Element > SVSet_Base;
 
-/** sparse vector set.
-Class #SVSet# provides a set of sparse vectors #SVector#. All #SVector#s in a
-#SVSet# share one big memory block for their nonzeros. This memory is reffered
-to as the {\em nonzero memory}. The #SVector#s themselfs are saved in another
-memory block reffered to as the {\em vector memory}. Both memory blocks will
-grow automatically if required, when adding more #SVector#s to the set or
-enlarging #SVector#s within the set. For controlling memory consumption, methods
-are provided to inquire and reset the size of the memory blocks used for vectors
-and nonzeros.
+/**@brief   sparse vector set.
+   @ingroup Algebra
+
+   Class SVSet provides a set of sparse vectors SVector. All SVector%s
+   in a SVSet share one big memory block for their nonzeros. This
+   memory is reffered to as the {\em nonzero memory}. The SVector%s
+   themselfs are saved in another memory block reffered to as the 
+   \em vector \em memory. Both memory blocks will grow automatically if
+   required, when adding more SVector%s to the set or enlarging
+   SVector%s within the set. For controlling memory consumption,
+   methods are provided to inquire and reset the size of the memory
+   blocks used for vectors and nonzeros.
  
-#SVector#s in an #SVSet# are numbered from 0 thru #num()#-1. They can be
-accessed using the index #operator[]#. When removing #SVector#s of a #SVSet#
-the remaining ones will be renumbered. However, all #SVector# with a smaller
-number than the lowest number of the removed #SVector#s will remain unchanged.
+   SVector%s in an SVSet are numbered from 0 thru num()-1. They can be
+   accessed using the index operator[](). When removing SVector%s of a
+   SVSet the remaining ones will be renumbered. However, all SVector
+   with a smaller number than the lowest number of the removed
+   SVector%s will remain unchanged.
  
-For providing a uniform access to #SVector#s in a set even if others are removed
-or added, #SVSet# assigns a #Key# to each #SVector# in the set. Such a #Key#
-remains unchanged as long as the corresponding #SVector# is in the #SVSet#, no
-matter what other #SVector#s are added to or removed from the #SVSet#. Methods
-are provided for getting the #Key# to a #SVector# or its number and vice versa.
-Further, each #add()# method for enlarging an #SVSet# is provided with two
-signatures. One of them returns the #Key#s assigned to the #SVector#s added to
-the #SVSet#.
- */
+   For providing a uniform access to SVector%s in a set even if others
+   are removed or added, SVSet assigns a Key to each SVector in the
+   set. Such a Key remains unchanged as long as the corresponding
+   SVector is in the SVSet, no matter what other SVector%s are added
+   to or removed from the SVSet. Methods are provided for getting the
+   Key to a SVector or its number and vice versa.  Further, each add()
+   method for enlarging an SVSet is provided with two signatures. One
+   of them returns the Key%s assigned to the SVector%s added to the
+   SVSet.
+*/
 class SVSet : protected SVSet_Base
 {
 private:
    class DLPSV : public SVector
    {
+   private:
       DLPSV *thenext;
       DLPSV *theprev;
+
    public:
       DLPSV*& next()
       {
@@ -91,14 +89,15 @@ private:
       {
          return static_cast<SVector&>(*this);
       }
+      // default constructor.
       DLPSV()
-      {}
-      
+      {}      
+      /// copy constructor.
       DLPSV(const DLPSV& copy) : SVector(copy)
       {}
    };
 
-   /*  The management of Keys is left for #DataSet#
+   /*  The management of Keys is left for DataSet
     */
    typedef DataKey Key;
 

@@ -56,7 +56,7 @@
    algorithmic classes are provided instead.
 */
 //-----------------------------------------------------------------------------
-/**@defgroup Algorithmic Algorithmic Classes
+/**@defgroup Algo Algorithmic Classes
    @brief Implementation of numerical algorithms.   
    
    Algorithmic classes serve for implementing a variaty of

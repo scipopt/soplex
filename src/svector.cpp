@@ -13,35 +13,16 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.cpp,v 1.3 2001/11/13 17:04:17 bzfbleya Exp $"
+#pragma ident "@(#) $Id: svector.cpp,v 1.4 2001/11/17 22:15:59 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <assert.h>
 #include <iostream>
 
-
-/*  and class header files
- */
 #include "svector.h"
-
-
 #include "ssvector.h"
 
 namespace soplex
 {
-
-
-
-
-
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Modification}
- */
 void SVector::toFront(int n)
 {
    assert(n < size() && n >= 0);
@@ -127,10 +108,6 @@ void SVector::sort()
    }
 }
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Maths}
- */
 double SVector::length2() const
 {
    double x = 0;
@@ -169,9 +146,6 @@ SVector& SVector::operator*=(double x)
    return *this;
 }
 
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Miscellaneous}
- */
 SVector& SVector::operator=(const SSVector& sv)
 {
    assert(max() >= sv.size());
@@ -266,10 +240,6 @@ std::ostream& operator<<(std::ostream& os, const SVector& v)
    return os;
 }
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Consistency}
- */
 #define inconsistent                                                    \
 {                                                                       \
 std::cout << "ERROR: Inconsistency detected in class SVector, Line " << __LINE__ << std::endl; \

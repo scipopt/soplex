@@ -13,26 +13,15 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: cachelpsolver.cpp,v 1.2 2001/11/06 23:31:00 bzfkocht Exp $"
+#pragma ident "@(#) $Id: cachelpsolver.cpp,v 1.3 2001/11/17 22:15:58 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <assert.h>
 #include <iostream>
 
-
-/*  and class header files
- */
 #include "cachelpsolver.h"
 
 namespace soplex
 {
-
-
-//@ ----------------------------------------------------------------------------
 const Vector& CacheLPSolver::primal() const
 {
    if (thePrimal.dim() != nofCols())

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: cachelpsolver.h,v 1.4 2001/11/15 22:35:13 bzfkocht Exp $"
+#pragma ident "@(#) $Id: cachelpsolver.h,v 1.5 2001/11/17 22:15:58 bzfkocht Exp $"
 
 /**@file  cachelpsolver.h
  * @brief LP solver with result caching.
@@ -30,7 +30,7 @@
 namespace soplex
 {
 /**@brief   LP solver with result caching.
-   @ingroup Algorithmic 
+   @ingroup Algo
 
    Class CacheLPSolver provides some caching for some of the data access
    methods of LPSolver. E.g. when multiple successive calls to method

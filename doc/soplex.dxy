@@ -311,7 +311,7 @@ INPUT                  = ./ ../src
 # and *.h) to filter out the source-files in the directories. If left 
 # blank all files are included.
 
-FILE_PATTERNS          = array.h cachelpsolver.h dataarray.h spxalloc.h svector.h dsvector.h xternal.cpp
+FILE_PATTERNS          = array.h cachelpsolver.h dataarray.h spxalloc.h svector.h dsvector.h lpcol.h lprow.h xternal.cpp
 # *.h *.cpp
 
 # The RECURSIVE tag can be used to turn specify whether or not subdirectories 

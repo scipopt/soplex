@@ -13,29 +13,18 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprow.cpp,v 1.4 2001/11/12 16:41:53 bzfpfend Exp $"
+#pragma ident "@(#) $Id: lprow.cpp,v 1.5 2001/11/17 22:15:59 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <math.h>
 #include <assert.h>
 #include <iostream>
 
-
-/*  and class header files
- */
 #include "lprow.h"
 
 namespace soplex
 {
-
-
 double LPRow::infinity = 1e+100;
 
-//@ ----------------------------------------------------------------------------
 LPRow::Type LPRow::type() const
 {
    if (rhs() >= infinity)
@@ -47,7 +36,6 @@ LPRow::Type LPRow::type() const
    return RANGE;
 }
 
-// TK13OCT1998
 void LPRow::setType(
    LPRow::Type p_type)
 {

@@ -13,57 +13,47 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcol.h,v 1.3 2001/11/07 17:31:18 bzfbleya Exp $"
+#pragma ident "@(#) $Id: lpcol.h,v 1.4 2001/11/17 22:15:58 bzfkocht Exp $"
 
-
+/**@file  lpcol.h
+ * @brief LP column.
+ */
 #ifndef _LPCOL_H_
 #define _LPCOL_H_
 
-//@ ----------------------------------------------------------------------------
-/*      \Section{Imports}
-    Import required system include files
- */
 #include <assert.h>
-
-
-/*  and class header files
- */
 
 #include "dsvector.h"
 
 namespace soplex
 {
+/**@brief   LP column.
+   @ingroup Algo
 
-
-
-
-
-
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
-/** LP column.
-    Class #LPCol# provides a datatype for storing the column of an LP a the
-    form similar to
-        \[
-        \begin{array}{rl}
-            \hbox{max}  & c^T x         \\
-            \hbox{s.t.} & Ax \le b      \\
-                        & l \le x \le u
-        \end{array}
-        \]
-    Hence, an #LPCol# consists of an objective value, a column #DSVector# and
-    an upper and lower bound to the corresponding variable, which may include
-    $\pm\infty$. However, it depends on the LP code to use, what values are
-    actually treated as $\infty$.
+   Class LPCol provides a datatype for storing the column of an LP a the
+   form similar to
+   \f[
+      \begin{array}{rl}
+         \hbox{max}  & c^T x         \\
+         \hbox{s.t.} & Ax \le b      \\
+                     & l \le x \le u
+      \end{array}
+   \f]
+   Hence, an LPCol consists of an objective value, a column DSVector and
+   an upper and lower bound to the corresponding variable, which may include
+   \f$\pm\infty\f$. However, it depends on the LP code to use, what values are
+   actually treated as \f$\infty\f$.
  */
 class LPCol
 {
 private:
-   double up, low, object;
+   double   up;
+   double   low;
+   double   object;
    DSVector vec;
+
 public:
-   ///
+   /// get objective value.
    double obj() const
    {
       return object;
@@ -74,7 +64,7 @@ public:
       return object;
    }
 
-   ///
+   /// get upper bound.
    double upper() const
    {
       return up;
@@ -85,7 +75,7 @@ public:
       return up;
    }
 
-   ///
+   /// get lower bound.
    double lower() const
    {
       return low;
@@ -96,7 +86,7 @@ public:
       return low;
    }
 
-   ///
+   /// get constraint column vector.
    const SVector& colVector() const
    {
       return vec;
@@ -107,36 +97,33 @@ public:
       return vec;
    }
 
-   ///
+   /// copy constructor.
    LPCol(const LPCol& old)
       : up(old.up), low(old.low), object(old.object), vec(old.vec)
-   { }
+   {}
 
-   /** Default Constructor.
-       Construct #LPCol# with a column vector ready for taking #defDim#
-       nonzeros.
+   /// default constructor.
+   /** Construct LPCol with a column vector ready for taking \p defDim
+    *  nonzeros.
     */
-   LPCol(int defDim = 0)
+   explicit LPCol(int defDim = 0)
       : up(1e+300), low(0), object(0), vec(defDim)
-   { }
+   {}
 
-   /** Initializing Constructor.
-       Construct #LPCol# with the given objective value #obj#, a column
-       vector #vec#, upper bound #upper# and lower bound #lower#.
+   /// initializing constructor.
+   /*  Construct LPCol with the given objective value \p obj, a column
+    *  %vector \p vec, upper bound \p upper and lower bound \p lower.
     */
    LPCol(double pobj, const SVector& pvector, double pupper, double plower)
       : up(pupper), low(plower), object(pobj), vec(pvector)
-   { }
+   {}
 
-   ///
-
+   /// check consistency.
    int isConsistent() const
    {
       return vec.isConsistent();
    }
 };
-
-
 } // namespace soplex
 #endif // _LPCOL_H_
 
