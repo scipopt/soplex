@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.33 2002/08/27 07:20:37 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.34 2002/09/09 13:01:19 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -327,6 +327,9 @@ static Real readInfinity(char*& pos)
  *  The reader will accept the keyword INT[egers] as a synonym for 
  *  GEN[erals] which is an undocumented feature in CPLEX.
  *
+ *  A difference to the CPLEX reader, ist that no name for the objective 
+ *  row is required.
+ *
  *  @return true if the file was read correctly
  */  
 bool SPxLP::readLPF(
@@ -426,7 +429,8 @@ bool SPxLP::readLPF(
       {
          if (hasKeyword(pos, "s[ubject][   ]t[o]")
             || hasKeyword(pos, "s[uch][    ]t[hat]")
-            || hasKeyword(pos, "s[.][    ]t[.]"))
+            || hasKeyword(pos, "s[.][    ]t[.]")
+            || hasKeyword(pos, "lazy con[straints]"))
          {
             // store objective vector            
             for(int j = vec.size() - 1; j >= 0; --j)
@@ -437,9 +441,11 @@ bool SPxLP::readLPF(
             section    = CONSTRAINTS;
          }
       }
-      else
+      else 
       {
-         if (hasKeyword(pos, "bound[s]"))
+         if (hasKeyword(pos, "lazy con[straints]"))
+            ;
+         else if (hasKeyword(pos, "bound[s]"))
             section = BOUNDS;
          else if (hasKeyword(pos, "bin[arys]"))
             section = BINARYS;
@@ -593,8 +599,33 @@ bool SPxLP::readLPF(
                colidx = readColName(pos, cnames, cset, &emptycol);
 
                if (val != 0.0)
-                  vec.add(colidx, val);
+               {
+                  // Do we have this index allready in the row ?
+                  int n = vec.number(colidx);
 
+                  // No! So add it.
+                  if (n < 0)
+                     vec.add(colidx, val);
+                  else
+                  {                
+                     /* Yes. So we add them up and remove the element
+                      * if it amounts to zero.
+                      */
+                     assert(vec.index(n) == colidx);
+
+                     val += vec.value(n);
+
+                     if (val == 0.0)
+                        vec.remove(n);
+                     else
+                        vec.value(n) = val;
+
+                     assert(cnames->has(colidx));
+
+                     std::cerr << "Doublicate index " << (*cnames)[colidx] 
+                               << " in line " << lineno << std::endl;
+                  }
+               }
                have_value = false;
             }
             assert(!have_value);

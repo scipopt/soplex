@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.cpp,v 1.16 2002/03/03 13:50:35 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svector.cpp,v 1.17 2002/09/09 13:01:19 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -242,8 +242,9 @@ bool SVector::isConsistent() const
       {
          for (int j = 0; j < i; ++j)
          {
-            if (m_elem[i].idx == m_elem[j].idx &&
-                m_elem[i].idx != 0 ) { // allow trailing zeros
+            if (m_elem[i].idx == m_elem[j].idx && m_elem[i].idx != 0 ) 
+            { 
+               // allow trailing zeros
                return MSGinconsistent("SVector");
             }
          }
