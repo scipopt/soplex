@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscale.h,v 1.7 2002/01/19 18:59:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscale.h,v 1.8 2002/01/30 16:22:18 bzfkocht Exp $"
 
 /**@file  spxscale.h
  * @brief LP row/column scaling.
@@ -42,7 +42,7 @@ class SPxScale : public SPxSimplifier
 {
    DataArray < Real > colscale;  ///< column scaleing factors
    DataArray < Real > rowscale;  ///< row scaleing factors
-   bool                 rowScale;  ///< do row scaleing (not column scaleing)
+   bool               rowScale;  ///< do row scaleing (not column scaleing)
    
 public:
    /// Scale the loaded #SPxLP.

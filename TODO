@@ -1,18 +1,18 @@
-$Id: TODO,v 1.51 2002/01/23 17:47:00 bzfkocht Exp $
+$Id: TODO,v 1.52 2002/01/30 16:22:18 bzfkocht Exp $
 
 Diesen Kram mal als @todo's schreiben ;-)
 
+neue abstracte basisklasse spxscaler mit spxequilim=spxscale
+als erste implementierung.
+   DataArray < Real > colscale;  ///< column scaleing factors
+   DataArray < Real > rowscale;  ///< row scaleing factors
+kann in die basisklasse
+Als unterscheid zu simplifier kommt noch ein
+getObjValue(col) aufruf dazu, außerdem kann dann der scaler
+gleichseitig mit dem simplifiern eingesetzt werden.
+
+
 sed   Copyright 1997-2001 Zib ersetzen durch -2002
-
-real.h
-#ifdef WITH_LONG_DOUBLE
-typedef long double Real;
-#else
-typedef double Real;
-#endif
-change.awk
-/#include \"/ { print "include "real.h"; print }
-
 
 openMP insbesondere pricer/ratiotest (compaq,intel)
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: real.cpp,v 1.2 2002/01/30 14:14:00 bzfkocht Exp $"
+#pragma ident "@(#) $Id: real.cpp,v 1.3 2002/01/30 16:22:18 bzfkocht Exp $"
 
 /**@file  real.cpp
  * @brief Floating point type definition.
@@ -27,6 +27,13 @@ const Real infinity = DEFAULT_INFINITY;
 
 Real Param::s_epsilon = DEFAULT_EPS_ZERO;
 
+void Param::setEpsilon(Real eps)
+{
+   s_epsilon = eps;
+}
+
+#if 0
+// This results (correctly) in a exception on alpha processors
 void Param::computeEpsilon()
 {
    volatile Real one = 1.0;
@@ -38,6 +45,7 @@ void Param::computeEpsilon()
 
    s_epsilon = x / 100.0;
 }
+#endif
 
 } // namespace soplex
 

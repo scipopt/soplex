@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.24 2002/01/30 14:14:00 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.25 2002/01/30 16:22:18 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -191,7 +191,7 @@ int main(int argc, char **argv)
    filename  = argv[optind];
    precision = int(-log10(delta)) + 1;
 
-   Param::computeEpsilon();
+   //Param::computeEpsilon();
 
    std::cout.setf(std::ios::scientific | std::ios::showpoint);
 

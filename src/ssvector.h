@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.h,v 1.10 2002/01/30 14:14:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.h,v 1.11 2002/01/30 16:22:18 bzfkocht Exp $"
 
 
 /**@file  ssvector.h
@@ -54,7 +54,6 @@ private:
    friend class DVector;
    friend class Vector;
    friend class DSVector;
-   friend class SMoPlex;
 
    void setMax(int newmax);
 
