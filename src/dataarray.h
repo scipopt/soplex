@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataarray.h,v 1.7 2001/11/15 22:35:14 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataarray.h,v 1.8 2001/11/16 20:12:24 bzfkocht Exp $"
 
 /**@file  dataarray.h
  * @brief Save arrays of data objects.
@@ -24,7 +24,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <memory.h>
-#include <malloc.h>
+#include <stddef.h>
 #include <iostream>
 
 #include "spxalloc.h"
@@ -80,14 +80,14 @@ protected:
 
 public:
 
-   /// reference \p n'th element.
+   /// reference \p n 'th element.
    T& operator[](int n)
    {
       assert(n >= 0);
       assert(n < thesize);
       return data[n];
    }
-   /// reference \p n'th const element.
+   /// reference \p n 'th const element.
    const T& operator[](int n) const
    {
       assert(n >= 0);
@@ -135,7 +135,7 @@ public:
       insert(thesize, t);
    }
 
-   /// insert \p n uninitialized elements before \p i'th element.
+   /// insert \p n uninitialized elements before \p i 'th element.
    void insert(int i, int n)
    {
       int j = size();
@@ -144,7 +144,7 @@ public:
          data[j + n] = data[j];
    }
 
-   /// insert \p n elements from \p t before \p i'the element.
+   /// insert \p n elements from \p t before \p i 'the element.
    void insert(int i, int n, const T t[])
    {
       if (n > 0)
@@ -154,7 +154,7 @@ public:
       }
    }
 
-   /// insert all elements from \p t before \p i'th element.
+   /// insert all elements from \p t before \p i 'th element.
    void insert(int i, const DataArray<T>& t)
    {
       if (t.size())
@@ -279,7 +279,7 @@ public:
    }
 
    /// copy constructor
-   DataArray(const DataArray& old)
+   explicit DataArray(const DataArray& old)
       : thesize(old.thesize)
       , themax (old.themax)
       , memFactor (old.memFactor)
@@ -301,7 +301,7 @@ public:
        @param p_max  maximum number of elements the array can hold.
        @param p_fax  value for memFactor.
     */
-   DataArray(int p_size = 0, int p_max = 0, double p_fac = 1.2)
+   explicit DataArray(int p_size = 0, int p_max = 0, double p_fac = 1.2)
       : memFactor(p_fac)
    {
       thesize = (p_size < 0) ? 0 : p_size;

@@ -1,4 +1,4 @@
-# $Id: check.sh,v 1.4 2001/11/15 08:26:59 bzfkocht Exp $
+# $Id: check.sh,v 1.5 2001/11/16 20:12:24 bzfkocht Exp $
 BINNAME=`basename $2`
 TSTNAME=`basename $1 .test`
 OUTFILE=check.$TSTNAME.$BINNAME.out
@@ -6,6 +6,10 @@ ERRFILE=check.$TSTNAME.$BINNAME.err
 RESFILE=check.$TSTNAME.$BINNAME.res
 date >$OUTFILE
 date >$ERRFILE
+case $TSTNAME in
+mittelbach) timelimit="-l10000" ;;
+*)          timelimit="" ;;
+esac
 for i in `cat $1`
 do
     echo @01 $i ===========
@@ -22,7 +26,7 @@ do
 	4)  echo =type= ER
             opt="-e -r" ;;
         esac
-        ../$2 $opt -l3600 $i 2>>$ERRFILE
+        ../$2 $opt $timelimit $i 2>>$ERRFILE
         echo =ready=
     done
 done | tee -a $OUTFILE

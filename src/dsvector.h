@@ -13,9 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dsvector.h,v 1.2 2001/11/06 23:31:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dsvector.h,v 1.3 2001/11/16 20:12:25 bzfkocht Exp $"
 
-/*      \Section{Imports}
+/**@file  dsvector.h
+ * @brief Dynamic sparse vectors.
  */
 #ifndef _DSVECTOR_H_
 #define _DSVECTOR_H_
@@ -27,24 +28,29 @@
 
 namespace soplex
 {
+/**@brief   Dynamic sparse vectors.
+   @ingroup Algebra
 
-/*      \Section{Class Declaration}
- */
-/** Dynamic sparse vectors.
-    Class #DSVector# implements dynamic sparse vectors, i.e. #SVector#s
-    with an automatic memory management. This allows the user to freely #add()#
-    as many nonzeros to a #DSVector# as desired, without any precautions.
-    For saving memory method #setMax()# allows to reduce memory consumption to
-    the amount really required.
+   Class DSVector implements dynamic sparse vectors, i.e. SVector%s
+   with an automatic memory management. This allows the user to freely add()
+   as many nonzeros to a DSVector as desired, without any precautions.
+   For saving memory method setMax() allows to reduce memory consumption to
+   the amount really required.
+
+   @todo Both DSVector and SVector have a member variable that points to
+         allocated memory. This seems not to make too much sense.
  */
 class DSVector : public SVector
 {
    friend class SLinSolver;
 
-   Element* theelem;                // here is where the memory is
-   int* mem();
+private:
+   Element* theelem;       ///< here is where the memory is
 
-   void allocMem(int);
+   /// allocate memory for \p n nonzeros. 
+   void allocMem(int n);
+
+   /// make sure there is room for \p n new nonzeros.
    void makeMem(int n)
    {
       if (max() - size() < ++n)
@@ -52,7 +58,7 @@ class DSVector : public SVector
    }
 
 public:
-   ///
+   /// assignment operator from semi sparse vector.
    DSVector& operator=(const SSVector& sv)
    {
       int n = sv.size();
@@ -61,7 +67,7 @@ public:
       SVector::operator=(sv);
       return *this;
    }
-   ///
+   /// assignment operator from sparse vector.
    DSVector& operator=(const SVector& sv)
    {
       int n = sv.size();
@@ -70,7 +76,7 @@ public:
       SVector::operator=(sv);
       return *this;
    }
-   ///
+   /// assignment operator.
    DSVector& operator=(const DSVector& sv)
    {
       int n = sv.size();
@@ -79,12 +85,12 @@ public:
       SVector::operator=(sv);
       return *this;
    }
-   ///
+   /// assignment operator from vector.
    DSVector& operator=(const Vector& vec);
-   ///
+   /// assignment from vector with chooseable epsilon.
    DSVector& assign(const Vector& vec, double eps = 1e-16);
 
-   ///
+   /// append nonzeros of \p sv.
    void add(const SVector& sv)
    {
       int n = sv.size();
@@ -93,48 +99,46 @@ public:
       SVector::add(sv);
    }
 
-   ///
+   /// append one nonzero \p (i,v).
    void add(int i, double v)
    {
       makeMem(1);
       SVector::add(i, v);
    }
 
-   ///
-   void add(int n, const int *i, const double *v)
+   /// append \p n nonzeros.
+   void add(int n, const int i[], const double v[])
    {
       makeMem(n);
       SVector::add(n, i, v);
    }
 
-   /** reset nonzero memory to #>= newmax#.
-       This methods resets the memory consumption of the #DIdxSet# to
-       #newmax#. However, if #newmax < size()#, it is reset to #size()#
-       only.
+   /// reset nonzero memory to >= \p newmax.
+   /** This methods resets the memory consumption of the DIdxSet to
+    *  \p newmax. However, if \p newmax < size(), it is reset to size()
+    *  only.
     */
    void setMax(int newmax = 1);
 
-   ///
-   DSVector(const Vector& vec);
-
-   ///
-   DSVector(const SVector& old);
-   ///
+   /// copy constructor from vector.
+   explicit DSVector(const Vector& vec);
+   /// copy constructor from sparse vector.
+   explicit DSVector(const SVector& old);
+   /// copy constructor.
    DSVector(const DSVector& old);
 
-   /** Default constructor.
-       Creates a #DSVector# ready to hold #n# nonzeros. However, the memory is
-       automatically enlarged, if more nonzeros are added to the #DSVector#.
+   /// default constructor.
+   /** Creates a DSVector ready to hold \p n nonzeros. However, the memory is
+    *  automatically enlarged, if more nonzeros are added to the DSVector.
     */
-   DSVector(int n = 8);
+   explicit DSVector(int n = 8);
 
-   ///
+   /// destructor.
    ~DSVector();
 
-   ///
+   /// consistency check.
    int isConsistent() const;
 };
-
 } // namespace soplex
 #endif // _DSVECTOR_H_
 
@@ -146,3 +150,4 @@ public:
 //Emacs indent-tabs-mode:nil
 //Emacs End:
 //-----------------------------------------------------------------------------
+

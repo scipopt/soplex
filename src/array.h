@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: array.h,v 1.5 2001/11/15 22:35:13 bzfkocht Exp $"
+#pragma ident "@(#) $Id: array.h,v 1.6 2001/11/16 20:12:24 bzfkocht Exp $"
 
 /**@file  array.h
  * @brief Save arrays of arbitrary types.
@@ -65,13 +65,13 @@ protected:
    T*  data;    ///< the array of elements
 
 public:
-   /// reference \p n'th element.
+   /// reference \p n 'th element.
    T& operator[](int n)
    {
       assert(n >= 0 && n < size());
       return data[n];
    }
-   /// reference \p n'th element.
+   /// reference \p n 'th element.
    const T& operator[](int n) const
    {
       assert(n >= 0 && n < size());
@@ -94,7 +94,7 @@ public:
       insert(size(), p_array);
    }
 
-   /// insert \p n uninitialized elements before \p i'th element.
+   /// insert \p n uninitialized elements before \p i 'th element.
    void insert(int i, int n)
    {
       assert(i <= size());
@@ -116,7 +116,7 @@ public:
       }
    }
 
-   /// insert \p n elements from \p p_array before \p i'th element.
+   /// insert \p n elements from \p p_array before \p i 'th element.
    void insert(int i, int n, const T* p_array)
    {
       insert(i, n);
@@ -124,7 +124,7 @@ public:
          data[n + i] = p_array[n];
    }
 
-   /// insert all elements from \p p_array before \p i'th element.
+   /// insert all elements from \p p_array before \p i 'th element.
    void insert(int i, const Array<T>& p_array)
    {
       int n = p_array.size();
@@ -208,7 +208,7 @@ public:
    }
 
    /// copy constructor
-   Array(const Array<T>& old) : num(old.num)
+   explicit Array(const Array<T>& old) : num(old.num)
    {
       if (num > 0)
       {

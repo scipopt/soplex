@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmps.cpp,v 1.5 2001/11/11 20:27:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmps.cpp,v 1.6 2001/11/16 20:12:25 bzfkocht Exp $"
 
 
 #include <iostream>
@@ -230,7 +230,7 @@ static MPS_Section readRows(
    char* f4;
    char* f5;
    char* f6;
-   MPS_Section next;
+   MPS_Section next = ENDATA;
 
    do
    {

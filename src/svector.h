@@ -13,8 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.h,v 1.7 2001/11/15 22:35:14 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svector.h,v 1.8 2001/11/16 20:12:25 bzfkocht Exp $"
 
+/**@file  svector.h
+ * @brief Sparse vectors.
+ */
 #ifndef _SVECTOR_H_ 
 #define _SVECTOR_H_
 
@@ -27,84 +30,100 @@
 
 namespace soplex
 {
-/** Sparse vectors.
- *  Class #SVector# provides packed sparse vectors. Such are a sparse vectors,
- *  with a storage scheme that keeps all data in one contiguous block of memory.
- *  This is best suited for using them for parallel computing on a distributed
- *  memory multiprocessor.
- *
- * #SVector# does not provide any memory management (this will be done by class
- * #DSVector#). This means, that the constructor of #SVector# expects memory
- * where to save the nonzeros. Further, adding nonzeros to an #SVector# may fail
- * if no more memory is available for saving them (see also #DSVector#).
- *
- * When nonzeros are added to an #SVector#, they are appended to the set of
- * nonzeros, i.e. they recieve numbers #size()#, #size()+1# ... . An #SVector#
- * can hold atmost #max()# nonzeros, where #max()# is given in the constructor.
- * When removing nonzeros, the remaining nonzeros are renumbered. However, only
- * the numbers greater than the number of the first removed nonzero are
- * affected.
- *
- * The following mathematical operations are provided by class #SVector#
- * (#SVector a, b, c; double x#): \\
- * \begin{center}
- * \begin{tabular}{lll}
- *     Operation        & Description           & \\
- *       \hline
- *     #-=#             & subtraction           & #a -= b#      \\
- *     #+=#             & addition              & #a += b#      \\
- *     #*#              & skalar product        & #x = a * b#   \\
- *     #*=#             & scaling               & #a *= x#      \\
- *     #maxAbs()#       & infinity norm         & #a.maxAbs()# == $\|a\|_{\infty}$ \\
- *     #length()#       & eucledian norm        & #a.length()# == $\sqrt{a^2}$  \\
- *     #length2()#      & square norm           & #a.length2()# == $a^2$        \\
- * \end{tabular}
- * \end{center}
- * 
- * Operators #+=# and #-=# should be used with caution, since no efficient
- * implementation is available. One should think of assigning the left handside
- * vector to a dense #Vector# first and perform the addition on it. The same
- * applies to the scalar product #*#.
- *
- * There are two numberings of the nonzeros of an #SVector#. First, an #SVector#
- * is supposed to act like a linear algebra #Vector#. An {\em index} reffers to
- * this view of an #SVector#: #operator[]# is provided which return the value of
- * the vector to the given index, i.e. 0 for all indeces not in the set of
- * nonzeros.  The other view of #SVector#s is that of a set of nonzeros. The
- * nonzeros are numbered from 0 to #size()-1#. Methods #index(n)# and #value(n)#
- * allow to access the index and value of the #n#-th nonzero. #n# is reffered to
- * as the {\em number} of a nonzero.
- */
+/**@brief   Sparse vectors.
+   @ingroup Algebra
+
+   Class SVector provides packed sparse vectors. Such are a sparse vectors,
+   with a storage scheme that keeps all data in one contiguous block of memory.
+   This is best suited for using them for parallel computing on a distributed
+   memory multiprocessor.
+ 
+   SVector does not provide any memory management (this will be done by class
+   DSVector). This means, that the constructor of SVector expects memory
+   where to save the nonzeros. Further, adding nonzeros to an SVector may fail
+   if no more memory is available for saving them (see also DSVector).
+ 
+   When nonzeros are added to an SVector, they are appended to the set of
+   nonzeros, i.e. they recieve numbers size(), size()+1 ... . An SVector
+   can hold atmost max() nonzeros, where max() is given in the constructor.
+   When removing nonzeros, the remaining nonzeros are renumbered. However, 
+   only the numbers greater than the number of the first removed nonzero are
+   affected.
+ 
+   The following mathematical operations are provided by class SVector
+   (SVector \p a, \p b, \p c; double \p x): 
+
+   <TABLE>
+   <TR><TD>Operation</TD><TD>Description   </TD><TD></TD>&nbsp;</TR>
+   <TR><TD>\c -=    </TD><TD>subtraction   </TD><TD>\c a \c -= \c b </TD></TR>
+   <TR><TD>\c +=    </TD><TD>addition      </TD><TD>\c a \c += \c b </TD></TR>
+   <TR><TD>\c *     </TD><TD>skalar product</TD>
+       <TD>\c x = \c a \c * \c b </TD></TR>
+   <TR><TD>\c *=    </TD><TD>scaling       </TD><TD>\c a \c *= \c x </TD></TR>
+   <TR><TD>maxAbs() </TD><TD>infinity norm </TD>
+       <TD>\c a.maxAbs() == \f$\|a\|_{\infty}\f$ </TD></TR>
+   <TR><TD>length() </TD><TD>eucledian norm</TD>
+       <TD>\c a.length() == \f$\sqrt{a^2}\f$ </TD></TR>
+   <TR><TD>length2()</TD><TD>square norm   </TD>
+       <TD>\c a.length2() == \f$a^2\f$ </TD></TR>
+   </TABLE>
+  
+   Operators \c += and \c -= should be used with caution, since no efficient
+   implementation is available. One should think of assigning the left handside
+   vector to a dense Vector first and perform the addition on it. The same
+   applies to the scalar product \c *.
+ 
+   There are two numberings of the nonzeros of an SVector. First, an SVector
+   is supposed to act like a linear algebra Vector. An \em index reffers to
+   this view of an SVector: operator[]() is provided which return the value of
+   the vector to the given index, i.e. 0 for all indeces not in the set of
+   nonzeros.  The other view of SVector%s is that of a set of nonzeros. The
+   nonzeros are numbered from 0 to size()-1. 
+   Methods index(int n) and value(int n)
+   allow to access the index and value of the \p n 'th nonzero. 
+   \p n is referred to as the \em number of a nonzero.
+
+   @todo SVector should get a new implementation.
+         The trick to shift the storage by one element and then 
+         store the actual and maximum size of the vector
+         in m_elem[-1] is ugly. 
+         Also there maybe a lot of memory lost due to padding the Element
+         structure. A better idea seems to be 
+         class SVector { int size; int used; int* idx; double* val; };
+         which for several reason could be faster or slower.
+         If SVector is changed, also DSVector and SVSet have to be modified.
+*/
 class SVector
 {
    friend class Vector;
    friend class SSVector;
+   friend std::ostream& operator<<(std::ostream& os, const SVector& v);
+
 public:
-   /** Sparse vector nonzero element.
-    *  #SVector# keep their nonzeros in an array of #Element#s providing
+   /// Sparse vector nonzero element.
+   /** SVector keep their nonzeros in an array of Element%s providing
     *  members for saving the nonzero's index and value.
     */
    struct Element
    {
-      double val;  ///< Value of nonzero element
-      int idx;     ///< Index of nonzero element
+      double val;     ///< Value of nonzero element
+      int    idx;     ///< Index of nonzero element
    };
 
-protected:
-   /*   \Section{Datastructures}
-        An #SVector# keeps its data in an array of #Element#s. The size and maximum
-        number of elements allowed is stored in the -1st #Element# in its members
-        #idx# and #val# respectively.
-   */
-   Element *m_elem;
+private:
+   /** An SVector keeps its data in an array of Element%s. The size and 
+    *  maximum number of elements allowed is stored in the -1st Element 
+    *  in its members #idx and #val respectively.
+    */
+   Element *m_elem;   ///< Array of Element%s.
 
 public:
    /**@name Modification */
    //@{
-   /// switch n'th with 0'th nonzero.
+   /// switch \p n 'th with \p 0 'th nonzero.
    void toFront(int n);
 
-   /// append one nonzero #(i,v)#.
+   /// append one nonzero \p (i,v).
    void add(int i, double v)
    {
       int n = size();
@@ -114,22 +133,22 @@ public:
       assert(size() <= max());
    }
 
-   /// append nonzeros of #sv#.
+   /// append nonzeros of \p sv.
    void add(const SVector& sv)
    {
       add(sv.size(), sv.m_elem);
    }
 
-   /// append #n# nonzeros.
+   /// append \p n nonzeros.
    void add(int n, const int i[], const double v[]);
 
-   /// append #n# nonzeros.
+   /// append \p n nonzeros.
    void add(int n, const Element e[]);
 
-   /// remove nonzeros n thru m.
+   /// remove nonzeros \p n thru \p m.
    void remove(int n, int m);
 
-   /// remove n-th nonzero.
+   /// remove \p n 'th nonzero.
    void remove(int n)
    {
       assert(n < size() && n >= 0);
@@ -141,13 +160,12 @@ public:
    {
       set_size(0);
    }
-
-   /// sort nonzero to increasing indices.
+   /// sort nonzeros to increasing indices.
    void sort();
    //@}
 
 
-   /**@name Inquiery*/
+   /**@name Inquiery */
    //@{
    /// number of used indeces.
    int size() const
@@ -164,11 +182,11 @@ public:
    /// maximal index.
    int dim() const;
 
-   /** Number of index #i#.
-       Return the number of the first index #i#. If no index #i# is available
-       in the #IdxSet#, -1 is returned. Otherwise, #index(number(i)) == i#
-       hods.
-   */
+   /// Number of index \p i.
+   /** @return The number of the first index \p i. If no index \p i 
+    *          is available in the IdxSet, -1 is returned. Otherwise, 
+    *          index(number(i)) == i holds.
+    */
    int number(int i) const
    {
       int n = size();
@@ -182,7 +200,7 @@ public:
       return -1;
    }
 
-   /// get value to index #i#.
+   /// get value to index \p i.
    double operator[](int i) const
    {
       int n = number(i);
@@ -191,42 +209,42 @@ public:
       return 0;
    }
 
-   ///
+   /// get reference to the \p n 'th nonzero element.
    Element& element(int n)
    {
       assert(n >= 0 && n < max());
       return m_elem[n];
    }
 
-   /// get #n#-th nonzero element.
+   /// get \p n 'th nonzero element.
    Element element(int n) const
    {
       assert(n >= 0 && n < size());
       return m_elem[n];
    }
 
-   ///
+   /// get reference to index of \p n 'th nonzero.
    int& index(int n)
    {
       assert(n >= 0 && n < size());
       return m_elem[n].idx;
    }
 
-   /// get index of #n#-th nonzero.
+   /// get index of \p n 'th nonzero.
    int index(int n) const
    {
       assert(n >= 0 && n < size());
       return m_elem[n].idx;
    }
 
-   ///
+   /// get reference to value of \p n 'th nonzero.
    double& value(int n)
    {
       assert(n >= 0 && n < size());
       return m_elem[n].val;
    }
 
-   /// get value of #n#-th nonzero.
+   /// get value of \p n 'th nonzero.
    double value(int n) const
    {
       assert(n >= 0 && n < size());
@@ -249,7 +267,7 @@ public:
    /// squared eucledian norm.
    double length2() const;
 
-   /// scale with #x#.
+   /// scale with \p x.
    SVector& operator*=(double x);
 
    /// inner product.
@@ -266,68 +284,60 @@ public:
       }
       return x;
    }
-
    //@}
-
 
    /**@name Miscellaneous*/
    //@{
-   ///
-   friend std::ostream& operator<<(std::ostream& os, const SVector& v);
-
-   ///
+   /// assignment operator from semi sparse vector.
    SVector& operator=(const SSVector& sv);
    /// assignment operator.
    SVector& operator=(const SVector& sv);
-   ///
+   /// assignment operator from vector.
    SVector& operator=(const Vector& sv);
-   ///
+   /// assignment from Vector with chooseable epsilon.
    SVector& assign(const Vector& vec, double eps = 1e-12);
 
    /// consistency check.
    int isConsistent() const;
 
-   /** default constructor.
-       The constructor expects one memory block where to store the nonzero
-       elements. This must passed to the constructor, where the {\em number
-       of #Element#s} needs that fit into the memory must be given and a
-       pointer to the begining of the memory block. Once this memory has
-       been passed, it shall not be modified until the #SVector# is no
-       longer used. Note, that when a memory block for $n$, say, #Element#s
-       has been passed, only $n-1$ are available for actually storing
-       nonzeros. The remaining one is used for bookkeeping purposes.
-   */
+   /// default constructor.
+   /** The constructor expects one memory block where to store the nonzero
+    *  elements. This must passed to the constructor, where the \em number
+    *  of Element%s needs that fit into the memory must be given and a
+    *  pointer to the begining of the memory block. Once this memory has
+    *  been passed, it shall not be modified until the SVector is no
+    *  longer used. Note, that when a memory block for \p n, say, Element%s
+    *  has been passed, only \p n-1 are available for actually storing
+    *  nonzeros. The remaining one is used for bookkeeping purposes.
+    */
    SVector(int n = 0, Element* p_mem = 0)
    {
       setMem(n, p_mem);
    }
-
-   // Internals.
+   /// get pointer to internal memory.
    Element* mem() const
    {
-      return m_elem -1;
+      return m_elem - 1;
    }
-//     int& size()
-//     {
-//        assert(m_elem != 0);
-//        return m_elem[ -1].idx;
-//     }
+   /// set the size of the Vector,
    void set_size(int s)
    {
       assert(m_elem != 0);
       m_elem[ -1].idx = s;
    }
-      
+   /// set the maximum number of nonzeros in the Vector.   
    void set_max(int m)
    {
       assert(m_elem != 0);
       m_elem[ -1].val = m;
    }
+   /// set the memory area where the nonzeros will be stored.
    void setMem(int n, Element* elmem)
    {
-      if (n)
+      assert(n >= 0);
+
+      if (n > 0)
       {
-         assert(n > 0);
          assert(elmem != 0);
          elmem->val = 0;        // for purify to shut up
          m_elem = &(elmem[1]);
@@ -338,9 +348,13 @@ public:
          m_elem = 0;
    }
    //@}
-
 };
 
+/// multiply Vector with \p and add a SVector. 
+/** This is located in svector.h because it should be inlined and 
+ *  the cross dependencys of Vector and SVector.
+ * @todo Can we move this function to a better place?
+ */
 inline Vector& Vector::multAdd(double x, const SVector& vec)
 {
    assert(vec.dim() <= dim());

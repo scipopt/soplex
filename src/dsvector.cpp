@@ -13,30 +13,16 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dsvector.cpp,v 1.6 2001/11/13 21:55:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dsvector.cpp,v 1.7 2001/11/16 20:12:24 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <assert.h>
 #include <iostream>
 
-
-/*  and class header files
- */
 #include "dsvector.h"
 #include "spxalloc.h"
 
 namespace soplex
 {
-
-
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Consistency}
- */
 void DSVector::allocMem(int len)
 {
    spx_alloc(theelem, len);
@@ -100,7 +86,7 @@ DSVector::~DSVector()
 
 int DSVector::isConsistent() const
 {
-   if (theelem && m_elem - 1 != theelem)
+   if ((theelem != 0) && (mem() != theelem))
    {
       std::cout << "ERROR: Inconsistency detected in class DSVector\n";
       return 0;

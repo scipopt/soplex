@@ -46,7 +46,7 @@
    programming.
 */
 //-----------------------------------------------------------------------------
-/**@defgroup Algebra Linea Algebra Classes
+/**@defgroup Algebra Linear Algebra Classes
    @brief Basic data types for linear algebra computations.
    
    Linear algebra classes provide basic data types for (sparse)
