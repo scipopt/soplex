@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.28 2002/04/04 14:59:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.29 2002/05/01 08:18:20 bzfkocht Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -72,8 +72,6 @@ class SPxLP : protected LPRowSet, protected LPColSet
    friend class SPxBasis;
    friend class SPxScaler;
    friend class SPxEquili;
-   friend int getmarsz (SoPlex*);
-   friend int getmartz (SoPlex*);
 
    /// output operator.
    friend std::ostream& operator<<(std::ostream& os, const SPxLP& lp);
@@ -110,6 +108,9 @@ public:
       return LPColSet::num();
    }
 
+   /// number of nonzeros in LP.
+   int nNzos() const;
+
    /// gets \p i 'th row.
    void getRow(int i, LPRow& row) const;
 
@@ -145,11 +146,6 @@ public:
    {
       return LPRowSet::rhs(i);
    }
-   /// returns right hand side of row \p i.
-   Real& rhs(int i)
-   {
-      return LPRowSet::rhs(i);
-   }
 
    /// returns right hand side of row with identifier \p id.
    Real rhs(SPxRowId& id) const
@@ -165,11 +161,6 @@ public:
 
    ///
    Real lhs(int i) const
-   {
-      return LPRowSet::lhs(i);
-   }
-   /// returns left hand side of row \p i.
-   Real& lhs(int i)
    {
       return LPRowSet::lhs(i);
    }
@@ -242,13 +233,8 @@ public:
       return LPColSet::obj();
    }
 
-   /// 
-   Real maxObj(int i) const
-   {
-      return LPColSet::obj(i);
-   }
    /// returns objective value of column \p i for maximization problem.
-   Real& maxObj(int i)
+   Real maxObj(int i) const
    {
       return LPColSet::obj(i);
    }
@@ -266,17 +252,11 @@ public:
       return LPColSet::upper();
    }
 
-   ///
+   /// returns upper bound of column \p i.
    Real upper(int i) const
    {
       return LPColSet::upper(i);
    }
-   /// returns upper bound of column \p i.
-   Real& upper(int i)
-   {
-      return LPColSet::upper(i);
-   }
-
    /// returns upper bound of column with identifier \p id.
    Real upper(SPxColId& id) const
    {
@@ -289,13 +269,8 @@ public:
       return LPColSet::lower();
    }
 
-   ///
-   Real lower(int i) const
-   {
-      return LPColSet::lower(i);
-   }
    /// returns lower bound of column \p i.
-   Real& lower(int i)
+   Real lower(int i) const
    {
       return LPColSet::lower(i);
    }
@@ -630,6 +605,31 @@ public:
    //@}
 
 protected:
+   /// returns right hand side of row \p i.
+   Real& rhs_w(int i)
+   {
+      return LPRowSet::rhs(i);
+   }
+   /// returns left hand side of row \p i.
+   Real& lhs_w(int i)
+   {
+      return LPRowSet::lhs(i);
+   }
+   /// returns objective value of column \p i for maximization problem.
+   Real& maxObj_w(int i)
+   {
+      return LPColSet::obj(i);
+   }
+   /// returns upper bound of column \p i.
+   Real& upper_w(int i)
+   {
+      return LPColSet::upper(i);
+   }
+   /// returns lower bound of column \p i.
+   Real& lower_w(int i)
+   {
+      return LPColSet::lower(i);
+   }
    /// returns the LP as a #LPRowSet.
    const LPRowSet* lprowset() const
    {

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.7 2002/04/10 14:36:31 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.8 2002/05/01 08:18:20 bzfkocht Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
@@ -39,7 +39,7 @@
 
 namespace soplex
 {
-#define SOPLEX_VERSION   121
+#define SOPLEX_VERSION   122
 
 /*-----------------------------------------------------------------------------
  * Debugging Macros etc.
@@ -107,24 +107,36 @@ public:
 typedef long double Real;
 
 #ifndef DEFAULT_BND_VIOL
-#define DEFAULT_BND_VIOL  1e-12
+#define DEFAULT_BND_VIOL   1e-12
 #endif
 #ifndef DEFAULT_EPS_ZERO
-#define DEFAULT_EPS_ZERO  1e-30  // ~ additive zero. 1.0 + EPS_ZERO == 1.0
+#define DEFAULT_EPS_ZERO   1e-28  // ~ additive zero. 1.0 + EPS_ZERO == 1.0
 #endif
-#define DEFAULT_INFINITY  1e100
+#ifndef DEFAULT_EPS_FACTOR
+#define DEFAULT_EPS_FACTOR 1e-30
+#endif
+#ifndef DEFAULT_EPS_UPDATE
+#define DEFAULT_EPS_UPDATE 1e-26
+#endif
+#define DEFAULT_INFINITY   1e100
 
 #else
 
 typedef double Real;
 
 #ifndef DEFAULT_BND_VIOL
-#define DEFAULT_BND_VIOL  1e-6
+#define DEFAULT_BND_VIOL   1e-6
 #endif
 #ifndef DEFAULT_EPS_ZERO
-#define DEFAULT_EPS_ZERO  1e-17  // ~ additive zero. 1.0 + EPS_ZERO == 1.0
+#define DEFAULT_EPS_ZERO   1e-15  // ~ additive zero. 1.0 + EPS_ZERO == 1.0
 #endif
-#define DEFAULT_INFINITY  1e100
+#ifndef DEFAULT_EPS_FACTOR
+#define DEFAULT_EPS_FACTOR 1e-18
+#endif
+#ifndef DEFAULT_EPS_UPDATE
+#define DEFAULT_EPS_UPDATE 1e-12
+#endif
+#define DEFAULT_INFINITY   1e100
 
 #endif // !WITH_LONG_DOUBLE
 
@@ -134,15 +146,31 @@ class Param
 {
 private:
    static Real s_epsilon;
+   static Real s_epsilon_factorization;
+   static Real s_epsilon_update;
    static int  s_verbose;
 
 public:
-   inline static Real epsilon()
+   ///
+   inline static Real epsilon() 
    {
       return s_epsilon;
    }
+   ///
    static void setEpsilon(Real eps);
+   ///
    static void computeEpsilon();
+   ///
+   inline static Real epsilonFactorization()
+   {
+      return s_epsilon_factorization;
+   }
+   ///
+   inline static Real epsilonUpdate()
+   {
+      return s_epsilon_factorization;
+   }
+   ///
    inline static int verbose()
    {
       return s_verbose;

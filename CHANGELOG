@@ -1,4 +1,15 @@
-16.Jan 2001 Release 1.2.0
+- methods rhs(), lhs(), upper(), lower(), maxObj() of SPxLP
+  that returned a non const reference renamed in *_w and 
+  made protected. Use changeXXX() methods outside the class.
+
+- methods nofCols(), nofRows(), nofNZEs() deleted.
+  use nCols(), nRows(), nNzos().
+
+10.Apr 2002 Release 1.2.1
 
 - Interface of SoPlex::terminate() changed
 - SoPlex::setRep(int) changed to SoPlex::setRep(Representation)
+
+16.Jan 2002 Release 1.2.0
+
+

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.48 2002/04/10 14:36:31 bzfpfend Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.49 2002/05/01 08:18:20 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -1602,19 +1602,6 @@ public:
    {
       return spxSense();
    }
-
-   /// number of rows of loaded LP.
-   int nofRows() const
-   {
-      return nRows();
-   }
-   /// number of columns of loaded LP.
-   int nofCols() const
-   {
-      return nCols();
-   }
-   /// number of nonzeros of loaded LP.
-   int nofNZEs() const;
 
    /// #RowId# of \p i 'th inequality.
    SPxRowId rowId(int i) const

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: forest.cpp,v 1.18 2002/03/11 17:43:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: forest.cpp,v 1.19 2002/05/01 08:18:20 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -29,12 +29,6 @@ namespace soplex
  * or was explicitly set to zero.
  */
 #define MARKER     1e-100
-
-/** This constant is used to discriminate to small elements
- *  @todo This was 1e-12. It is not clear why it is larger then the
- *        usual 1e-16.
- */
-#define TOOSMALL   Param::epsilon()  // was 1e-12
 
 static const Real verySparseFactor = 0.001;
 
@@ -312,7 +306,7 @@ void CLUFactor::forestUpdate(int p_col, Real* p_work, int num, int *nonz)
          x = p_work[i];
          p_work[i] = 0;
 
-         if (fabs(x) > TOOSMALL)
+         if (isNotZero(x, Param::epsilonUpdate()))
          {
             if (fabs(x) > l_maxabs)
                l_maxabs = fabs(x);
@@ -356,7 +350,7 @@ void CLUFactor::forestUpdate(int p_col, Real* p_work, int num, int *nonz)
          x = p_work[i];
          p_work[i] = 0;
 
-         if (fabs(x) > TOOSMALL)
+         if (isNotZero(x, Param::epsilonUpdate()))
          {
             if (fabs(x) > l_maxabs)
                l_maxabs = fabs(x);

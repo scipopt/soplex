@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.40 2002/04/14 12:41:54 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.41 2002/05/01 08:18:20 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -426,11 +426,10 @@ int main(int argc, char **argv)
    }
    assert(work.isConsistent());
 
-   std::cout << "LP has " 
-             << work.nRows() 
-             << "\trows and\n       "
-             << work.nCols() 
-             << "\tcolumns" 
+   std::cout << "LP has\t" 
+             << work.nRows() << "\trows\n\t"
+             << work.nCols() << "\tcolumns\n\t" 
+             << work.nNzos() << "\tnonzeros"
              << std::endl;
 
    // Should we read a basis ?

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscaler.cpp,v 1.2 2002/04/04 19:36:51 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscaler.cpp,v 1.3 2002/05/01 08:18:20 bzfkocht Exp $"
 
 /**@file  spxscaler.cpp
  * @brief LP scaling base class.
@@ -121,10 +121,10 @@ void SPxScaler::unscale()
       vec *= y;
 
       if (m_lp->rhs(i) < infinity)
-         m_lp->rhs(i) *= y;
+         m_lp->rhs_w(i) *= y;
 
       if (m_lp->lhs(i) > -infinity)
-         m_lp->lhs(i) *= y;
+         m_lp->lhs_w(i) *= y;
    }
    for( i = 0; i < m_lp->nCols(); ++i )
    {
@@ -135,13 +135,13 @@ void SPxScaler::unscale()
       for( j = 0; j < vec.size(); ++j )
          vec.value(j) /= m_rowscale[vec.index(j)];
 
-      m_lp->maxObj(i) /= m_colscale[i];
+      m_lp->maxObj_w(i) /= m_colscale[i];
 
       if (m_lp->upper(i) < infinity)
-         m_lp->upper(i) *= m_colscale[i];
+         m_lp->upper_w(i) *= m_colscale[i];
 
       if (m_lp->lower(i) > -infinity)
-         m_lp->lower(i) *= m_colscale[i];
+         m_lp->lower_w(i) *= m_colscale[i];
    }
    assert(m_lp->isConsistent());
 }

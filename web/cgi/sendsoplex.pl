@@ -1,9 +1,9 @@
 #!/softis/bin/perl
-# $Id: sendsoplex.pl,v 1.5 2002/04/10 06:48:56 bzfkocht Exp $
+# $Id: sendsoplex.pl,v 1.6 2002/05/01 08:18:20 bzfkocht Exp $
 
 # einige Vereinbarungen, fuer die Lage von Dateien
 # Arbeitsverzeichnis, ggf. aendern
-$DOPATH    = "/zibis/Optimization/Software/Soplex/Test/cgi"; 
+$DOPATH    = "/zibis/Optimization/Software/Soplex/cgi"; 
 $COUNTFILE = $DOPATH."/usercount.dat";      # Zaehlerdatei
 $DATAFILE  = $DOPATH."/users.dat";          # Benutzerdaten
 

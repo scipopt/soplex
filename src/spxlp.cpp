@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.cpp,v 1.17 2002/03/03 13:50:34 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.cpp,v 1.18 2002/05/01 08:18:20 bzfkocht Exp $"
 
 #include <stdio.h>
 
@@ -23,6 +23,15 @@
 
 namespace soplex
 {
+int SPxLP::nNzos() const
+{
+   METHOD( "SoPlex::nNzos()" );
+   int n = 0;
+   for( int i = 0; i < nCols(); ++i )
+      n += colVector(i).size();
+   return n;
+}
+
 void SPxLP::getRow(int i, LPRow& row) const
 {
    METHOD( "SPxLP::getRow()" );

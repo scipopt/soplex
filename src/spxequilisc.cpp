@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxequilisc.cpp,v 1.2 2002/04/10 07:13:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxequilisc.cpp,v 1.3 2002/05/01 08:18:20 bzfkocht Exp $"
 
 /**@file  spxequilisc.cpp
  * @brief Equilibrium row/column scaling.
@@ -58,15 +58,15 @@ void SPxEquili::scale()
             m_colscale[i] = 1.0;
          else
          {
-            Real y           = 1.0 / x;
-            m_colscale[i]    = y;
-            vec             *= y;
-            m_lp->maxObj(i) *= y;
+            Real y             = 1.0 / x;
+            m_colscale[i]      = y;
+            vec               *= y;
+            m_lp->maxObj_w(i) *= y;
 
             if (m_lp->upper(i) < infinity)
-               m_lp->upper(i) *= x;
+               m_lp->upper_w(i) *= x;
             if (m_lp->lower(i) > -infinity)
-               m_lp->lower(i) *= x;
+               m_lp->lower_w(i) *= x;
          }
       }
       
@@ -91,9 +91,9 @@ void SPxEquili::scale()
             vec           *= y;
 
             if (m_lp->rhs(i) < infinity)
-               m_lp->rhs(i) *= y;
+               m_lp->rhs_w(i) *= y;
             if (m_lp->lhs(i) > -infinity)
-               m_lp->lhs(i) *= y;
+               m_lp->lhs_w(i) *= y;
          }
       }
       if (m_doBoth)
@@ -125,9 +125,9 @@ void SPxEquili::scale()
             vec          *= y;
 
             if (m_lp->rhs(i) < infinity)
-               m_lp->rhs(i) *= y;
+               m_lp->rhs_w(i) *= y;
             if (m_lp->lhs(i) > -infinity)
-               m_lp->lhs(i) *= y;
+               m_lp->lhs_w(i) *= y;
          }
       }
 
@@ -147,15 +147,15 @@ void SPxEquili::scale()
             m_colscale[i] = 1.0;
          else
          {
-            y                = 1.0 / x;
-            m_colscale[i]    = y;
-            vec             *= y;
-            m_lp->maxObj(i) *= y;
+            y                  = 1.0 / x;
+            m_colscale[i]      = y;
+            vec               *= y;
+            m_lp->maxObj_w(i) *= y;
 
             if (m_lp->upper(i) < infinity)
-               m_lp->upper(i) *= x;
+               m_lp->upper_w(i) *= x;
             if (m_lp->lower(i) > -infinity)
-               m_lp->lower(i) *= x;
+               m_lp->lower_w(i) *= x;
          }
       }
       if (m_doBoth)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.26 2002/03/03 13:50:32 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.27 2002/05/01 08:18:20 bzfkocht Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -381,8 +381,7 @@ void SLUFactor::clear()
    l.firstUnused = 0;
    thedim = 1;
 
-   /**@todo This was 1e-24, why not the usual 1e-16. */
-   epsilon = Param::epsilon(); // 1e-24;
+   epsilon = Param::epsilonFactorization(); 
    usetup = 0;
    maxabs = 1;
    initMaxabs = 1;

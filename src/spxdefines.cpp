@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.cpp,v 1.2 2002/03/12 12:18:29 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxdefines.cpp,v 1.3 2002/05/01 08:18:20 bzfkocht Exp $"
 
 /**@file  spxdefines.cpp
  * @brief Debugging, floating point type and parameter definitions.
@@ -29,10 +29,12 @@ int TraceMethod::s_indent = 0;
 
 #endif //TRACE_METHOD
 
-const Real infinity   = DEFAULT_INFINITY;
+const Real infinity                 = DEFAULT_INFINITY;
 
-Real Param::s_epsilon = DEFAULT_EPS_ZERO;
-int  Param::s_verbose = 1;
+Real Param::s_epsilon               = DEFAULT_EPS_ZERO;
+Real Param::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
+Real Param::s_epsilon_update        = DEFAULT_EPS_UPDATE;
+int  Param::s_verbose               = 1;
    
 void Param::setEpsilon(Real eps)
 {

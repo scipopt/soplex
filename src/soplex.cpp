@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.57 2002/04/10 14:36:31 bzfpfend Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.58 2002/05/01 08:18:20 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -934,15 +934,6 @@ bool SoPlex::isConsistent() const
           && theLCbound.isConsistent()
           && SPxBasis::isConsistent()
          ;
-}
-
-int SoPlex::nofNZEs() const
-{
-   METHOD( "SoPlex::nofNZEs()" );
-   int n = 0;
-   for (int i = nCols(); --i >= 0;)
-      n += colVector(i).size();
-   return n;
 }
 
 void SoPlex::setTerminationTime(Real p_time)
