@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdesc.cpp,v 1.9 2002/03/03 13:50:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdesc.cpp,v 1.10 2002/03/11 17:43:57 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -89,7 +89,7 @@ std::ostream& operator<<(std::ostream& os, const SPxBasis::Desc::Status& stat)
       break;
    default :
       os << std::endl << "Invalid status <" << int(stat) << ">" << std::endl;
-      ABORT();
+      abort();
    }
    os << text;
 

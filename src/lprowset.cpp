@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.cpp,v 1.15 2002/03/11 11:41:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprowset.cpp,v 1.16 2002/03/11 17:43:56 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -155,9 +155,9 @@ void LPRowSet::setType(
    case LPRow::RANGE :
       std::cerr << __FILE__ << __LINE__
                 << "RANGE not supported in LPRowSet::setType()" << std::endl;
-      ABORT();
+      abort();
    default:
-      ABORT();
+      abort();
    }
 }
 

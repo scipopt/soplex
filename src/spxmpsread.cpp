@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.23 2002/03/11 11:41:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.24 2002/03/11 17:43:57 bzfkocht Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.
@@ -607,7 +607,7 @@ bool SPxLP::readMPS(
 
    rnames->clear();
 
-   clear(); // clear the LP.
+   SPxLP::clear(); // clear the LP.
 
    cset.memRemax(INIT_NZOS);
    cset.reMax(INIT_COLS);

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvecs.cpp,v 1.16 2002/03/03 13:50:35 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxvecs.cpp,v 1.17 2002/03/11 17:43:57 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -78,7 +78,7 @@ void SoPlex::computeFrhs()
                default:
                   std::cerr << __FILE__ << __LINE__ 
                             << " ERROR: inconsistent basis must not happen!\n";
-                  ABORT();
+                  abort();
                }
                assert(x < infinity);
                assert(x > -infinity);
@@ -141,7 +141,7 @@ void SoPlex::computeFrhsXtra()
          default:
             std::cerr << __FILE__ << __LINE__ 
                       << " ERROR: inconsistent basis must not happen!\n";
-            ABORT();
+            abort();
          }
          assert(x < infinity);
          assert(x > -infinity);
@@ -196,7 +196,7 @@ void SoPlex::computeFrhs1(
          default:
             std::cerr << __FILE__ << __LINE__ 
                       << "ERROR: inconsistent basis must not happen!\n";
-            ABORT();
+            abort();
          }
          assert(x < infinity);
          assert(x > -infinity);
@@ -256,7 +256,7 @@ void SoPlex::computeFrhs2(
          default:
             std::cerr << __FILE__ << __LINE__ 
                       << "ERROR: inconsistent basis must not happen!\n";
-            ABORT();
+            abort();
          }
          assert(x < infinity);
          assert(x > -infinity);

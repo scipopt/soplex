@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.17 2002/03/03 13:50:31 bzfkocht Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.18 2002/03/11 17:43:56 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -110,8 +110,7 @@ void SoPlex::getLeaveVals
          break;
       case SPxBasis::Desc::P_FREE :
          assert( rep() == ROW );
-         ABORT();
-
+         abort();
       case SPxBasis::Desc::D_FREE :
          assert( rep() == COLUMN );
          ds.rowStatus(leaveNum) = SPxBasis::Desc::P_FIXED;
@@ -153,7 +152,7 @@ void SoPlex::getLeaveVals
          break;
 
       default:
-         ABORT();
+         abort();
       }
       DEBUG({ std::cout << "SoPlex::getLeaveVals() : row " << leaveNum
                         << ": " << leaveStat
@@ -236,9 +235,8 @@ void SoPlex::getLeaveVals
             ds.colStatus(leaveNum) = SPxBasis::Desc::P_ON_LOWER;
          }
          break;
-
       default:
-         ABORT();
+         abort();
       }
       DEBUG({ std::cout << "SoPlex::getLeaveVals() : col " << leaveNum
                         << ": " << leaveStat
@@ -332,7 +330,7 @@ void SoPlex::getLeaveVals2(
       case SPxBasis::Desc::P_FREE :
          assert(rep() == COLUMN);
 #if 1
-         ABORT();
+         abort();
 #else
          std::cerr << __FILE__ << __LINE__ << "ERROR: not yet debugged!\n";
          ds.rowStatus(idx) = dualRowStatus(idx);
@@ -350,10 +348,10 @@ void SoPlex::getLeaveVals2(
          std::cerr << "SoPlex::getLeaveVals2(): idx=" << idx
                    << ", lhs=" << lhs(idx)
                    << ", rhs=" << rhs(idx) << std::endl;
-         ABORT();
+         abort();
 
       default:
-         ABORT();
+         abort();
       }
       DEBUG({ std::cout << "SoPlex::getLeaveVals2(): row " << idx
                         << ": " << enterStat
@@ -447,10 +445,10 @@ void SoPlex::getLeaveVals2(
          std::cerr << "SoPlex::getLeaveVals2(): idx=" << idx
                    << ", lower=" << lower(idx)
                    << ", upper=" << upper(idx) << std::endl;
-         ABORT();
+         abort();
 
       default:
-         ABORT();
+         abort();
       }
       DEBUG({ std::cout << "SoPlex::getLeaveVals2(): col " << idx
                         << ": " << enterStat

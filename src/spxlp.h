@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.25 2002/03/10 10:00:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.26 2002/03/11 17:43:57 bzfkocht Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -511,44 +511,44 @@ public:
    /**@name Extension */
    //@{
    ///
-   void addRow(const LPRow& row)
+   virtual void addRow(const LPRow& row)
    {
       doAddRow(row);
    }
    /// adds \p row to #LPRowSet.
-   void addRow(SPxRowId& id, const LPRow& row)
+   virtual void addRow(SPxRowId& id, const LPRow& row)
    {
       addRow(row);
       id = rId(nRows() - 1);
    }
 
    ///
-   void addRows(const LPRowSet& pset)
+   virtual void addRows(const LPRowSet& pset)
    {
       doAddRows(pset);
    }
    /// adds all #LPRow%s of \p pset to #LPRowSet.
-   void addRows(SPxRowId id[], const LPRowSet& set);
+   virtual void addRows(SPxRowId id[], const LPRowSet& set);
 
    ///
-   void addCol(const LPCol& col)
+   virtual void addCol(const LPCol& col)
    {
       doAddCol(col);
    }
    /// adds \p col to #LPColSet.
-   void addCol(SPxColId& id, const LPCol& col)
+   virtual void addCol(SPxColId& id, const LPCol& col)
    {
       addCol(col);
       id = cId(nCols() - 1);
    }
 
    ///
-   void addCols(const LPColSet& pset)
+   virtual void addCols(const LPColSet& pset)
    {
       doAddCols(pset);
    }
    /// adds all #LPCol%s of \p set to #LPColSet.
-   void addCols(SPxColId id[], const LPColSet& set);
+   virtual void addCols(SPxColId id[], const LPColSet& set);
 
    //@}
 
@@ -556,13 +556,13 @@ public:
    /**@name Shrinking */
    //@{
    /// removes \p i 'th row.
-   void removeRow(int i)
+   virtual void removeRow(int i)
    {
       doRemoveRow(i);
    }
 
    /// removes row with identifier \p id.
-   void removeRow(SPxRowId id)
+   virtual void removeRow(SPxRowId id)
    {
       removeRow(number(id));
    }
@@ -574,13 +574,13 @@ public:
        due to this removal. Note, that \p perm must point to an array of at
        least #nRows() #int%s.
     */
-   void removeRows(int perm[])
+   virtual void removeRows(int perm[])
    {
       doRemoveRows(perm);
    }
 
    ///
-   void removeRows(SPxRowId id[], int n, int perm[] = 0);
+   virtual void removeRows(SPxRowId id[], int n, int perm[] = 0);
    /// removes \p n #LPRow%s.
    /** Removing multiple rows with one method invocation is available in
        two flavours. An array \p perm can be passed as third argument or
@@ -590,19 +590,19 @@ public:
        removed.  Otherwise, \p perm[i] is the new index of the element with
        index \p i before the removal.
     */
-   void removeRows(int nums[], int n, int perm[] = 0);
+   virtual void removeRows(int nums[], int n, int perm[] = 0);
 
    /// removes rows from \p start to \p end (including both).
-   void removeRowRange(int start, int end, int perm[] = 0);
+   virtual void removeRowRange(int start, int end, int perm[] = 0);
 
    /// removes \p i 'th column.
-   void removeCol(int i)
+   virtual void removeCol(int i)
    {
       doRemoveCol(i);
    }
 
    /// removes column with identifier \p id.
-   void removeCol(SPxColId id)
+   virtual void removeCol(SPxColId id)
    {
       removeCol(number(id));
    }
@@ -614,13 +614,13 @@ public:
        due to this removal. Note, that \p perm must point to an array of at
        least #nCols() #int%s.
     */
-   void removeCols(int perm[])
+   virtual void removeCols(int perm[])
    {
       doRemoveCols(perm);
    }
 
    ///
-   void removeCols(SPxColId id[], int n, int perm[] = 0);
+   virtual void removeCols(SPxColId id[], int n, int perm[] = 0);
    /// removes \p n #LPCol%s.
    /** Removing multiple columns with one method invocation is available in
        two flavours. An array \p perm can be passed as third argument or
@@ -630,13 +630,13 @@ public:
        removed.  Otherwise, \p perm[i] is the new index of the element with
        index \p i before the removal.
     */
-   void removeCols(int nums[], int n, int perm[] = 0);
+   virtual void removeCols(int nums[], int n, int perm[] = 0);
 
    /// removes columns from \p start to \p end (including both).
-   void removeColRange(int start, int end, int perm[] = 0);
+   virtual void removeColRange(int start, int end, int perm[] = 0);
 
    /// clears the LP.
-   void clear();
+   virtual void clear();
 
    //@}
 

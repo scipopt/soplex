@@ -1,6 +1,8 @@
-$Id: TODO,v 1.59 2002/03/11 11:41:55 bzfkocht Exp $
+$Id: TODO,v 1.60 2002/03/11 17:43:55 bzfkocht Exp $
 
 Diesen Kram mal als @todo's schreiben ;-)
+
+isConsistent sollte eigendlich virtuell sein.
 
 Man sollte mal feststellen was passiert, wenn eine Variable aus der 
 Basis geht. Wird der Wert dann auf die bound gesetzt oder der berechnete

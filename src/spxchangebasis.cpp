@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.12 2002/03/03 13:50:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.13 2002/03/11 17:43:56 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -30,6 +30,7 @@ namespace soplex
 void SPxBasis::reDim()
 {
    METHOD( "SPxBasis::reDim()" );
+
    assert(theLP != 0);
 
    DEBUG({ std::cout << "SPxBasis::reDim():"
@@ -107,7 +108,7 @@ void SPxBasis::addedRows(int n)
          break;
       default:
          std::cerr << "Unknown basis status!" << std::endl;
-         ABORT();
+         abort();
       }
    }
 }
@@ -298,7 +299,7 @@ void SPxBasis::addedCols(int n)
          break;
       default:
          std::cerr << "Unknown basis status!" << std::endl;
-         ABORT();
+         abort();
       }
    }
 }

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.26 2002/03/11 11:41:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.27 2002/03/11 17:43:57 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -372,7 +372,7 @@ bool SPxLP::readLPF(
 
    rnames->clear();
 
-   clear(); // clear the LP.
+   SPxLP::clear(); // clear the LP.
 
    //--------------------------------------------------------------------------
    //--- Main Loop
@@ -662,7 +662,7 @@ bool SPxLP::readLPF(
                pos++;
             break;
          default :
-            ABORT();
+            abort();
          }
       }
    }

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: forest.cpp,v 1.17 2002/03/03 13:50:31 bzfkocht Exp $"
+#pragma ident "@(#) $Id: forest.cpp,v 1.18 2002/03/11 17:43:56 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -465,8 +465,7 @@ void CLUFactor::forestUpdate(int p_col, Real* p_work, int num, int *nonz)
 
             // The numbers seem to be often 1e-100, is this ok ?
             for (i = 0; i < num; ++i)
-               if (p_work[corig[nonz[i]]] == 0.0)
-                  ABORT();
+               assert(p_work[corig[nonz[i]]] != 0.0);
 #endif // NDEBUG
             i = deQueueMin(nonz, &num);
             if (i == r)

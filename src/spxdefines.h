@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.1 2002/03/03 13:50:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.2 2002/03/11 17:43:57 bzfkocht Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
@@ -49,13 +49,7 @@ namespace soplex
 
 #ifndef NDEBUG
 #define TRACE(x) {x}
-#define ABORT()  {                                      \
-   std::cerr << "Abort in " << __FILE__ << ":"         \
-                            << __LINE__ << std::endl;  \
-   abort();                                            \
-}
 #else
-#define ABORT()  abort()
 #define TRACE(x) /**/
 #endif //!ABORT
 

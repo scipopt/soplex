@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: changesoplex.cpp,v 1.14 2002/03/03 13:50:31 bzfkocht Exp $"
+#pragma ident "@(#) $Id: changesoplex.cpp,v 1.15 2002/03/11 17:43:55 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -649,7 +649,7 @@ static void changeLowerStatus
       stat = basis.dualColStatus(i);
       break;
    default:
-      ABORT();
+      abort();
    }
    DEBUG( std::cout << " -> " << stat << std::endl; );
 }
@@ -720,7 +720,7 @@ static void changeUpperStatus
       stat = basis.dualColStatus(i);
       break;
    default:
-      ABORT();
+      abort();
    }
    DEBUG( std::cout << " -> " << stat << std::endl; );
 }
@@ -824,7 +824,7 @@ static void changeLhsStatus
       stat = basis.dualRowStatus(i);
       break;
    default:
-      ABORT();
+      abort();
    }
    DEBUG( std::cout << " -> " << stat << std::endl; );
 }
@@ -893,7 +893,7 @@ static void changeRhsStatus
       stat = basis.dualRowStatus(i);
       break;
    default:
-      ABORT();
+      abort();
    }
    DEBUG( std::cout << " -> " << stat << std::endl; );
 }

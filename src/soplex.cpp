@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.53 2002/03/04 16:50:49 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.54 2002/03/11 17:43:56 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -1097,7 +1097,7 @@ SoPlex::basisStatusToVarStatus( SPxBasis::Desc::Status stat ) const
       break;
    default:
       std::cerr << "ERROR: unknown basis status (" << stat << ")" << std::endl;
-      ABORT();
+      abort();
    }
    return vstat;
 }
@@ -1136,7 +1136,7 @@ SoPlex::varStatusToBasisStatusRow( int row, SoPlex::VarStatus stat ) const
    default:
       std::cerr << "ERROR: unknown VarStatus (" << int(stat)
                 << ")" << std::endl;
-      ABORT();
+      abort();
    }
    return rstat;
 }
@@ -1175,7 +1175,7 @@ SoPlex::varStatusToBasisStatusCol( int col, SoPlex::VarStatus stat ) const
    default:
       std::cerr << "ERROR: unknown VarStatus (" << int(stat)
                 << ")" << std::endl;
-      ABORT();
+      abort();
    }
    return cstat;
 }
