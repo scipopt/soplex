@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.12 2002/01/03 22:09:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.13 2002/01/03 22:14:01 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -85,76 +85,16 @@ SoPlex::Status SoPlex::solve()
    {
       int i;
 
-      std::cout << "column status':\t";
-      for (i = 0; i < desc().nCols(); ++i)
-      {
-         switch (desc().colStatus(i))
-         {
-         case SPxBasis::Desc::P_ON_LOWER + SPxBasis::Desc::P_ON_UPPER:
-            std::cout << "X ";
-            break;
-         case SPxBasis::Desc::P_ON_LOWER:
-            std::cout << "L ";
-            break;
-         case SPxBasis::Desc::P_ON_UPPER:
-            std::cout << "U ";
-            break;
-         case SPxBasis::Desc::P_FREE:
-            std::cout << "F ";
-            break;
-         case SPxBasis::Desc::D_ON_LOWER + SPxBasis::Desc::D_ON_UPPER:
-            std::cout << "x ";
-            break;
-         case SPxBasis::Desc::D_ON_LOWER:
-            std::cout << "l ";
-            break;
-         case SPxBasis::Desc::D_ON_UPPER:
-            std::cout << "u ";
-            break;
-         case SPxBasis::Desc::D_FREE:
-            std::cout << "f ";
-            break;
-         default:
-            std::cout << ". ";
-            break;
-         }
-      }
-      std::cout << "\n";
+      std::cout << "column status:\t";
 
-      std::cout << "row status':\t";
+      for (i = 0; i < desc().nCols(); ++i)
+         std::cout << desc().colStatus(i);
+
+      std::cout << "\nrow status:\t";
+
       for (i = 0; i < desc().nRows(); ++i)
-      {
-         switch (desc().rowStatus(i))
-         {
-         case SPxBasis::Desc::P_ON_LOWER + SPxBasis::Desc::P_ON_UPPER:
-            std::cout << "X ";
-            break;
-         case SPxBasis::Desc::P_ON_LOWER:
-            std::cout << "L ";
-            break;
-         case SPxBasis::Desc::P_ON_UPPER:
-            std::cout << "U ";
-            break;
-         case SPxBasis::Desc::P_FREE:
-            std::cout << "F ";
-            break;
-         case SPxBasis::Desc::D_ON_LOWER + SPxBasis::Desc::D_ON_UPPER:
-            std::cout << "x ";
-            break;
-         case SPxBasis::Desc::D_ON_LOWER:
-            std::cout << "l ";
-            break;
-         case SPxBasis::Desc::D_ON_UPPER:
-            std::cout << "u ";
-            break;
-         case SPxBasis::Desc::D_FREE:
-            std::cout << "f ";
-            break;
-         default:
-            std::cout << ". ";
-            break;
-         }
-      }
+         std::cout << desc().rowStatus(i);
+
       std::cout << std::endl;
    }
 #endif  // DEBUG
