@@ -1,8 +1,19 @@
-$Id: TODO,v 1.62 2002/04/06 13:05:01 bzfkocht Exp $
+$Id: TODO,v 1.63 2002/04/14 12:41:54 bzfkocht Exp $
 
 Diesen Kram mal als @todo's schreiben ;-)
 
-Einzel removed so implemnetieren das alles weitergeschoben wird.
+Genau gucken was spxredundantsm eigendlich macht. Das scheint mir
+mehr ein bounds strengtehning zu sein.
+Ich habe nicht den eindruck, das der doppelte zeilen/spaltebn finden
+würde.
+
+
+Man kann im MPS format einen Wert für die RHS der Zielfunktion angeben.
+Dies wird ignoriert und eine warning ausgegeben. Vielleicht sollte
+man das irgendwo in der docu vermerken.
+
+
+Einzel remove so implemnetieren das alles weitergeschoben wird.
 
 
 Es gibt probleme, wenn der preprocessor das problem komplett erledigt.

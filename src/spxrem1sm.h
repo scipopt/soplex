@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxrem1sm.h,v 1.7 2002/03/03 13:50:34 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxrem1sm.h,v 1.8 2002/04/14 12:41:54 bzfkocht Exp $"
 
 /**@file  spxrem1sm.h
  * @brief Remove singletons from LP.
@@ -42,15 +42,6 @@ public:
 
    /// Reverse the doings of #simplify().
    void unsimplify();
-
-   /// objective value for unsimplified LP.
-   /**@todo This is different implementet then the others. 
-    *       Why? Is this ok?
-    */
-   Real value(Real x)
-   {
-      return x - lp->spxSense() * delta;
-   }
 };
 } // namespace soplex
 #endif // _SPXREM1SM_H_

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeneralsm.cpp,v 1.14 2002/04/04 14:59:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeneralsm.cpp,v 1.15 2002/04/14 12:41:54 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -26,46 +26,47 @@ namespace soplex
 {
 void SPxGeneralSM::load(SPxLP* p_lp)
 {
-   lp       = p_lp;
-   rem1.load (p_lp);
-   redu.load (p_lp);
-   aggr.load (p_lp);
+   lp         = p_lp;
+   m_rem1.load (p_lp);
+   m_redu.load (p_lp);
+   m_aggr.load (p_lp);
 }
 
 void SPxGeneralSM::unload()
 {
-   rem1.unload ();
-   redu.unload ();
-   aggr.unload ();
+   m_rem1.unload ();
+   m_redu.unload ();
+   m_aggr.unload ();
 }
 
 int SPxGeneralSM::simplify()
 {
-   int i, cnt;
+   int ret;
    int rows = lp->nRows();
    int cols = lp->nCols();
+   int cnt  = rows + cols;
 
-   do
+   if ((ret = m_rem1.simplify()) != 0) 
+      return ret;
+   if ((ret = m_redu.simplify()) != 0) 
+      return ret;
+
+   while(m_repth * cnt > lp->nRows() + lp->nCols())
    {
       cnt = lp->nRows() + lp->nCols();
 
-      if ((i = rem1.simplify()) != 0) 
-         return i;
-      if ((i = aggr.simplify()) != 0) 
-         return i;
-      if ((i = redu.simplify()) != 0) 
-         return i;
+      if ((ret = m_rem1.simplify()) != 0) 
+         return ret;
+
+      if (cnt == lp->nRows() + lp->nCols())
+         break;
+
+      // if ((ret = m_aggr.simplify()) != 0) 
+      //   return ret;
+
+      if ((ret = m_redu.simplify()) != 0) 
+         return ret;
    }
-   while (0.99 * cnt > lp->nRows() + lp->nCols());
-
-   rows -= lp->nRows();
-   cols -= lp->nCols();
-
-   VERBOSE1({
-      std::cout << "removed " << rows << " rows" << std::endl;
-      std::cout << "removed " << cols << " columns" << std::endl;
-   });
-
    assert(lp->isConsistent());
 
    return 0;
@@ -80,14 +81,14 @@ int SPxGeneralSM::simplify()
  */
 void SPxGeneralSM::unsimplify()
 {
-   //rem1.unsimplify ();
-   //aggr.unsimplify ();
-   //redu.unsimplify ();
+   //m_rem1.unsimplify ();
+   //m_aggr.unsimplify ();
+   //m_redu.unsimplify ();
 }
 
 Real SPxGeneralSM::value(Real x)
 {
-   return rem1.value(aggr.value(redu.value(x)));
+   return m_rem1.value(m_aggr.value(m_redu.value(x)));
 }
 } // namespace soplex
 

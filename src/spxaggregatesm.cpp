@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.14 2002/03/03 13:50:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.15 2002/04/14 12:41:54 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -322,9 +322,9 @@ int SPxAggregateSM::simplify()
       lp->removeCols (remCol.get_ptr());
       assert(lp->isConsistent());
       VERBOSE1({ std::cout << "SPxAggregateSM:\tremoved " << num
-                              << " row(s) and column(s)" << std::endl
-                              << "SPxAggregateSM:\tdelta = " << delta
-                              << std::endl; });
+                           << " row(s) and column(s)" << std::endl
+                           << "SPxAggregateSM:\tdelta = " << delta
+                           << std::endl; });
    }
 
    return 0;

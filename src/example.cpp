@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.39 2002/04/06 13:05:02 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.40 2002/04/14 12:41:54 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -182,7 +182,7 @@ int main(int argc, char **argv)
    int                    pricing        = 4;
    int                    ratiotest      = 2;
    int                    scaling        = 2;
-   int                    simplifing     = 3;
+   int                    simplifing     = 1;
    Real                   timelimit      = -1.0;
    Real                   delta          = DEFAULT_BND_VIOL;
    Real                   epsilon        = DEFAULT_EPS_ZERO;

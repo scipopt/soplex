@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.h,v 1.9 2002/03/03 13:50:34 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.h,v 1.10 2002/04/14 12:41:54 bzfkocht Exp $"
 
 /**@file  spxredundantsm.h
  * @brief Remove redundant row and columns.
@@ -36,18 +36,17 @@ namespace soplex
  */
 class SPxRedundantSM : public SPxSimplifier
 {
+private:
+   int treat_fixed();
+   int treat_cols();
+   int treat_rows();
+
 public:
    /// Remove redundant rows and columns.
    int simplify();
 
    /// Reverse the doings of #simplify().
    void unsimplify();
-
-   /// objective value for unsimplified LP.
-   Real value(Real x)
-   {
-      return x + lp->spxSense() * delta;
-   }
 };
 } // namespace soplex
 #endif // _SPXREDUNDANTSM_H_

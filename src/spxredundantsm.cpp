@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.15 2002/03/03 13:50:34 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.16 2002/04/14 12:41:54 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -25,137 +25,155 @@
 
 namespace soplex
 {
-int SPxRedundantSM::simplify()
-{
-   int    num;
-   int    j;
-   int    i;
-   int    k;
-   int    upcnt;
-   int    locnt;
-   Real up;
-   Real lo;
-   Real x;
-   Real y;
-   DataArray < int > rem(lp->nRows());
 
-   num = 0;
-   rem.reSize(lp->nCols());
-   for (i = lp->nCols() - 1; i >= 0; --i)
+int SPxRedundantSM::treat_cols()
+{
+   DataArray < int > rem(lp->nCols());
+   int               num = 0;
+   int               j;
+   int               k;
+   Real              x;
+
+   for( int i = 0; i < lp->nCols(); ++i )
    {
-      const SVector& col = lp->colVector(i);
       rem[i] = 0;
+
+      const SVector& col = lp->colVector(i);
+
       if (lp->upper(i) != lp->lower(i))
       {
-         up = 0;
-         lo = 0;
-         for (j = col.size() - 1; j >= 0 && (up == 0 || lo == 0); --j)
-         {
+         int upcnt = 0;
+         int locnt = 0;
+
+         for( j = 0; (j < col.size()) && (upcnt == 0 || locnt == 0); ++j )
+         {            
             x = col.value(j);
             k = col.index(j);
-            if (x > 0)
+
+            if (x > 0.0)
             {
-               up += (lp->rhs(k) < infinity);
-               lo += (lp->lhs(k) > -infinity);
+               upcnt += (lp->rhs(k) <  infinity) ? 1 : 0;
+               locnt += (lp->lhs(k) > -infinity) ? 1 : 0;
             }
-            else if (x < 0)
+            else if (x < 0.0)
             {
-               lo += (lp->rhs(k) < infinity);
-               up += (lp->lhs(k) > -infinity);
+               locnt += (lp->rhs(k) <  infinity) ? 1 : 0;
+               upcnt += (lp->lhs(k) > -infinity) ? 1 : 0;
             }
          }
          x = lp->maxObj(i);
-         if (lo == 0 && x < 0)
+
+         if (locnt == 0 && x < 0.0)
          {
             if (lp->lower(i) <= -infinity)
                return 1;           // LP is unbounded
             lp->changeUpper(i, lp->lower(i));
          }
-         else if (up == 0 && x > 0)
+         else if (upcnt == 0 && x > 0.0)
          {
             if (lp->upper(i) >= infinity)
                return 1;           // LP is unbounded
             lp->changeLower(i, lp->upper(i));
          }
-         else if (x == 0)
+         else if (x == 0.0)
          {
-            up += (lp->upper(i) < infinity);
-            lo += (lp->lower(i) > -infinity);
-            if (lo == 0)
+            upcnt += (lp->upper(i) <  infinity) ? 1 : 0;
+            locnt += (lp->lower(i) > -infinity) ? 1 : 0;
+
+            if (locnt == 0)
             {
                lp->changeUpper(i, infinity);
-               for (j = col.size() - 1; j >= 0; --j)
+
+               for( j = 0; j < col.size(); ++j )
                {
-                  x = col.value(j);
-                  k = col.index(j);
-                  if (x > 0)
-                     lp->changeRhs(k, infinity);
+                  if (col.value(j) < 0.0)
+                     lp->changeRhs(col.index(j), infinity);
                   else
-                     lp->changeLhs(k, -infinity);
+                     lp->changeLhs(col.index(j), -infinity);
                }
             }
-            if (up == 0)
+            if (upcnt == 0)
             {
                lp->changeLower(i, -infinity);
-               for (j = col.size() - 1; j >= 0; --j)
+
+               for( j = 0; j < col.size(); ++j )
                {
-                  x = col.value(j);
-                  k = col.index(j);
-                  if (x < 0)
-                     lp->changeRhs(k, infinity);
+                  if (col.value(j) > 0.0)
+                     lp->changeRhs(col.index(j), infinity);
                   else
-                     lp->changeLhs(k, -infinity);
+                     lp->changeLhs(col.index(j), -infinity);
                }
             }
          }
       }
-      if ((x = lp->upper(i)) == lp->lower(i))
+      // remove fixed variables
+      if (lp->upper(i) == lp->lower(i))
       {
+         x      = lp->upper(i);
          rem[i] = -1;
          num++;
-         if (x != 0)
+
+         if (x != 0.0)
          {
-            for (j = col.size() - 1; j >= 0; --j)
+            for( j = 0; j < col.size(); ++j )
             {
                k = col.index(j);
-               if (lp->rhs(k) < infinity)
-                  lp->changeRhs(k, lp->rhs(k) - x*col.value(j));
+
+               if (lp->rhs(k) <  infinity)
+                  lp->changeRhs(k, lp->rhs(k) - x * col.value(j));
                if (lp->lhs(k) > -infinity)
-                  lp->changeLhs(k, lp->lhs(k) - x*col.value(j));
+                  lp->changeLhs(k, lp->lhs(k) - x * col.value(j));
             }
             delta += x * lp->obj(i);
          }
       }
    }
-   if (num)
+   if (num > 0)
    {
       lp->removeCols(rem.get_ptr());
-      VERBOSE1({ std::cout << "SPxRedundantSM: removed " << num
-                              << " column(s)" << std::endl; });
       assert(lp->isConsistent());
-   }
 
-   num = 0;
-   for (i = lp->nRows() - 1; i >= 0; --i)
+      VERBOSE1({ std::cout << "SPxRedundantSM: removed " << num
+                           << " column(s)" << std::endl; });
+   }
+   return 0;
+}
+
+
+int SPxRedundantSM::treat_rows()
+{
+   DataArray < int > rem(lp->nRows());
+   int               num = 0;
+   int               j;
+   int               k;
+   Real              x;
+   Real              y;
+
+   for( int i = 0; i < lp->nRows(); ++i )
    {
       if (lp->rhs(i) < infinity || lp->lhs(i) > -infinity)
       {
-         const SVector& row = lp->rowVector(i);
-
          rem[i] = 0;
 
-         up = lo = 0;
-         upcnt = locnt = 0;
-         for (j = row.size() - 1; j >= 0; --j)
+         const SVector& row = lp->rowVector(i);
+         
+         Real up    = 0.0;
+         Real lo    = 0.0;
+         int  upcnt = 0;
+         int  locnt = 0;
+
+         for( j = 0; j < row.size(); ++j )
          {
             x = row.value(j);
             k = row.index(j);
+
             if (x > 0)
             {
                if (lp->upper(k) >= infinity)
                   upcnt++;
                else
                   up += lp->upper(k) * x;
+
                if (lp->lower(k) <= -infinity)
                   locnt++;
                else
@@ -167,6 +185,7 @@ int SPxRedundantSM::simplify()
                   locnt++;
                else
                   lo += lp->upper(k) * x;
+
                if (lp->lower(k) <= -infinity)
                   upcnt++;
                else
@@ -174,17 +193,15 @@ int SPxRedundantSM::simplify()
             }
          }
 
-         if (((GE(lp->rhs(i), up) && upcnt <= 0)
-               || lp->rhs(i) >= infinity)
-              && ((LE(lp->lhs(i), lo) && locnt <= 0)
-                  || lp->lhs(i) <= -infinity))
+         if (  ((GE(lp->rhs(i), up) && upcnt == 0) || lp->rhs(i) >=  infinity)
+            && ((LE(lp->lhs(i), lo) && locnt == 0) || lp->lhs(i) <= -infinity))
          {
             rem[i] = -1;
             num++;
          }
-         else if ((LT(lp->rhs(i), lo) && locnt <= 0)
-                   || (GT(lp->lhs(i), up) && upcnt <= 0))
-            return -1;
+         else if ((LT(lp->rhs(i), lo) && locnt == 0)
+            ||    (GT(lp->lhs(i), up) && upcnt == 0))
+            return -1; // infeasible
          else
          {
             /*
@@ -196,36 +213,38 @@ int SPxRedundantSM::simplify()
              */
             if (upcnt < 2 || locnt < 2)
             {
-               for (j = row.size() - 1; j >= 0; --j)
+               for( j = 0; j < row.size(); ++j )
                {
                   x = row.value(j);
                   k = row.index(j);
-                  if (x > 0)
+
+                  if (x > 0.0)
                   {
-                     if (lp->lhs(i) > -infinity
-                          && lp->lower(k) > -infinity
-                          && upcnt < 2)
+                     if (lp->lhs(i) > -infinity && lp->lower(k) > -infinity
+                        && upcnt < 2)
                      {
                         y = -infinity;
                         if (lp->upper(k) < infinity && upcnt < 1)
                            y = lp->upper(k) + (lp->lhs(i) - up) / x;
                         else if (lp->upper(k) >= infinity)
                            y = lp->lhs(i) - up;
+
                         if (y >= lp->lower(k))
                         {
                            lp->changeLower(k, -infinity);
                            break;
                         }
                      }
-                     if (lp->rhs(i) < infinity
-                          && lp->upper(k) < infinity
-                          && locnt < 2)
+                     if (lp->rhs(i) < infinity && lp->upper(k) < infinity
+                        && locnt < 2)
                      {
                         y = infinity;
+
                         if (lp->lower(k) > -infinity && locnt < 1)
                            y = lp->lower(k) + (lp->rhs(i) - lo) / x;
                         else if (lp->lower(k) <= -infinity)
                            y = lp->rhs(i) - lo;
+
                         if (y <= lp->upper(k))
                         {
                            lp->changeUpper(k, infinity);
@@ -233,32 +252,34 @@ int SPxRedundantSM::simplify()
                         }
                      }
                   }
-                  else if (x < 0)
+                  else if (x < 0.0)
                   {
-                     if (lp->lhs(i) >= -infinity
-                          && lp->upper(k) < infinity
-                          && upcnt < 2)
+                     if (lp->lhs(i) >= -infinity && lp->upper(k) < infinity
+                        && upcnt < 2)
                      {
                         y = infinity;
+
                         if (lp->lower(k) > -infinity && upcnt < 1)
                            y = lp->lower(k) + (lp->lhs(i) - up) / x;
                         else if (lp->lower(k) <= -infinity)
                            y = -(lp->lhs(i) - up);
+
                         if (y <= lp->upper(k))
                         {
                            lp->changeUpper(k, infinity);
                            break;
                         }
                      }
-                     if (lp->rhs(i) <= infinity
-                          && lp->lower(k) > -infinity
-                          && locnt < 2)
+                     if (lp->rhs(i) <= infinity && lp->lower(k) > -infinity
+                        && locnt < 2)
                      {
                         y = -infinity;
+
                         if (lp->upper(k) < infinity && locnt < 1)
                            y = lp->upper(k) + (lp->rhs(i) - lo) / x;
                         else if (lp->upper(k) >= infinity)
                            y = -(lp->rhs(i) - lo);
+
                         if (y >= lp->lower(k))
                         {
                            lp->changeLower(k, -infinity);
@@ -273,14 +294,25 @@ int SPxRedundantSM::simplify()
       else
          rem[i] = -1;
    }
-   if (num)
+   if (num > 0)
    {
       lp->removeRows(rem.get_ptr());
-      VERBOSE1({ std::cout << "SPxRedundantSM:\tremoved " << num
-                              << " row(s)" << std::endl; });
       assert(lp->isConsistent());
+
+      VERBOSE1({ std::cout << "SPxRedundantSM:\tremoved " << num
+                           << " row(s)" << std::endl; });
    }
    return 0;
+}
+
+int SPxRedundantSM::simplify()
+{
+   int ret;
+
+   if( (ret = treat_cols()) == 0)
+      ret = treat_rows();
+
+   return ret;
 }
 
 void SPxRedundantSM::unsimplify()

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeneralsm.h,v 1.8 2002/04/04 14:59:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeneralsm.h,v 1.9 2002/04/14 12:41:54 bzfkocht Exp $"
 
 /**@file  spxgeneralsm.h
  * @brief General LP preprocessing.
@@ -39,9 +39,10 @@ namespace soplex
 class SPxGeneralSM : public SPxSimplifier
 {
 private:
-   SPxRem1SM      rem1;   ///< remove row/column singletons .
-   SPxRedundantSM redu;   ///< remove redundant rows/columns.
-   SPxAggregateSM aggr;   ///< do variable aggregation.
+   SPxRem1SM      m_rem1;   ///< remove row/column singletons .
+   SPxRedundantSM m_redu;   ///< remove redundant rows/columns.
+   SPxAggregateSM m_aggr;   ///< do variable aggregation.
+   Real           m_repth;  ///< repetition threashold.
 
 public:
    /// Load the #SPxLP to be simplified.
@@ -60,7 +61,8 @@ public:
    virtual Real value(Real x);
 
    /// default constructor.
-   SPxGeneralSM()
+   SPxGeneralSM(Real repth = 0.95)
+      : m_repth(repth)
    {}
   
    /// destructor.

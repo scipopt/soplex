@@ -281,6 +281,19 @@
       but then an arbitrary number of switches may occur. (Even so, often
       no switch at all happens.)
 
+   <li> I got an segment violation or a signal 11
+
+      If all the testcases from Netlib work, but your LP gives
+      this problem, mail your LP in as an gzip'ed MPS of LPF file
+      and we will check.
+
+      If you have this problem also with the testcases, 
+      check your stack space: \c ulimit \c -s will report the actual
+      size in kilobytes. Try a higher value. 
+
+      If this doesn't help, maybe your compiler is broken. Try compiling
+      without optimization. 
+       
    <li> SoPlex means \em Sequential Simplex. Is there a parallel version
         available? 
  
@@ -296,6 +309,10 @@
 
       Yes, have a look at 
       http://oss.software.ibm.com/developerworks/opensource/coin/COIN
+
+   <li> If I add rows or columns to an LP, are they checked for reduncy ?
+
+      No. You have to do it yourself.
 
    </ol>
 */           
