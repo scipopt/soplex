@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.4 2001/11/28 17:15:51 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.5 2001/12/05 22:25:36 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -86,7 +86,7 @@ int main(int argc, char **argv)
    int                    starter        = 0;
    int                    pricing        = 3;
    int                    ratiotest      = 2;
-   int                    simplifier     = 1;
+   int                    simplifier     = 3;
    double                 timelimit      = -1.0;
    int                    optind;
 
