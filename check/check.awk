@@ -1,4 +1,4 @@
-# $Id: check.awk,v 1.7 2001/11/20 15:47:00 bzfkocht Exp $
+# $Id: check.awk,v 1.8 2001/12/13 15:00:27 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: check.awk                                                     *
@@ -38,7 +38,7 @@ BEGIN {
     sol["watson_1"]     = -1.7871977857e+03;
     sol["world"]        = 6.9133045823e+07;
 
-    sol["25fv45"] =     5.5018458883E+03;
+    sol["25fv47"] =     5.5018458883E+03;
     sol["80bau3b"] =    9.8723216072E+05;
     sol["adlittle"] =   2.2549496316E+05;
     sol["afiro"] =     -4.6475314286E+02;
@@ -132,11 +132,11 @@ BEGIN {
     sol["stocfor3"] =  -3.9976661576E+04;
     sol["truss"] =      4.5881584719E+05;
     sol["tuff"] =       2.9214776509E-01;
-    sol["vtp"] =        1.2983146246E+05;
+    sol["vtp-base"] =   1.2983146246E+05;
     sol["wood1p"] =     1.4429024116E+00;
     sol["woodw"] =      1.3044763331E+00;
 
-    print "$Id: check.awk,v 1.7 2001/11/20 15:47:00 bzfkocht Exp $";
+    print "$Id: check.awk,v 1.8 2001/12/13 15:00:27 bzfkocht Exp $";
     print "";
 }
 /=type=/      { type = $2; }
