@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clufactor.h,v 1.3 2001/12/10 22:41:57 bzfbleya Exp $"
+#pragma ident "@(#) $Id: clufactor.h,v 1.4 2001/12/11 12:43:59 bzfbleya Exp $"
 
 #ifndef _CLUFACTOR_H_
 #define _CLUFACTOR_H_
@@ -68,6 +68,13 @@ protected:
       int*    s_mark;
       double* s_max;           /* maximum absolute value per row (or -1) */
       int*    s_cact;          /* lengths of columns of active submatrix */
+      int     stage;           
+      Pring  pivots;       /* ring of selected pivot rows */
+      Pring *pivot_col;    /* column index handlers for double linked list */
+      Pring *pivot_colNZ;  /* lists for columns to number of nonzeros      */
+      Pring *pivot_row;    /* same for rows */
+      Pring *pivot_rowNZ;  /* same for rows */
+
    private:
       Temp( const Temp& );
       Temp& operator= ( const Temp& );
@@ -152,18 +159,6 @@ struct L
    int *rperm;         /* original row permutation          */
 };
 
-
-   class Pivots 
-   {
-   public:
-      Pivots();
-      ~Pivots();
-      Pring pivots;                /* ring of selected pivot rows */
-      Pring *pivot_col;            /* column index handlers for double linked list */
-      Pring *pivot_colNZ;          /* lists for columns to number of nonzeros      */
-      Pring *pivot_row;            /* same for rows */
-      Pring *pivot_rowNZ;          /* same for rows */
-   };
 
    SLinSolver::Status stat;   ///< Status indicator.
 
@@ -334,31 +329,28 @@ public:
 private:
    ///
    Temp temp;
-   ///
-   Pivots pivots;
 
 private:
    ///
    void initPerm();
    ///
    void initFactorMatrix(SVector** vec, 
-                         const double eps, 
-                         int& stage );
+                         const double eps );
    ///
    void minLMem(int size);
    ///
-   void setPivot(int p_stage, 
-                 int p_col, 
-                 int p_row, 
-                 double val);
+   void setPivot(const int p_stage,
+                 const int p_col, 
+                 const int p_row, 
+                 const double val);
 
    ///
-   void colSingletons(int& stage);
+   void colSingletons();
    ///
-   void rowSingletons(int& stage);
+   void rowSingletons();
 
    ///
-   void initFactorRings(const int stage);
+   void initFactorRings();
    ///
    void freeFactorRings();
       
@@ -366,11 +358,11 @@ private:
    int setupColVals( CLUFactor* fac );
 
    ///
-   void eliminateRowSingletons(int& stage );
+   void eliminateRowSingletons();
    ///
-   void eliminateColSingletons(int& stage);
+   void eliminateColSingletons();
    ///
-   void selectPivots(double threshold, const int stage);
+   void selectPivots(double threshold);
    ///
    int updateRow   (int r,
                     int lv,
@@ -380,11 +372,10 @@ private:
                     double eps );
 
    ///
-   void eliminatePivot(int prow, int pos, double eps, int& stage );
+   void eliminatePivot(int prow, int pos, double eps);
    ///
    void eliminateNucleus(const double eps, 
-                         const double threshold, 
-                         int& stage);
+                         const double threshold);
    ///
    void minRowMem(int size);
    ///

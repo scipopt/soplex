@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.17 2001/12/10 22:41:57 bzfbleya Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.18 2001/12/11 12:43:59 bzfbleya Exp $"
 
 #include <iostream>
 #include <assert.h>
@@ -29,6 +29,11 @@ CLUFactor::Temp::Temp()
    : s_mark(0)
    , s_max(0)
    , s_cact(0)
+   , stage( 0 )
+   , pivot_col   ( 0 )
+   , pivot_colNZ ( 0 )
+   , pivot_row   ( 0 )
+   , pivot_rowNZ ( 0 )
 {}
 
 void CLUFactor::Temp::init(int p_dim)
@@ -36,38 +41,23 @@ void CLUFactor::Temp::init(int p_dim)
    spx_alloc(s_max, p_dim);
    spx_alloc(s_cact, p_dim);
    spx_alloc(s_mark, p_dim);
+   stage = 0;
 }
    
 void CLUFactor::Temp::clear()
 {
-   if (s_mark != 0)
-      spx_free(s_mark);
-   if (s_cact != 0)
-      spx_free(s_cact);
-   if (s_max != 0)
-      spx_free(s_max);
+   if (s_mark != 0)   spx_free(s_mark);
+   if (s_cact != 0)   spx_free(s_cact);
+   if (s_max != 0)    spx_free(s_max);
+   if ( pivot_col )   spx_free(pivot_col);
+   if ( pivot_colNZ ) spx_free(pivot_colNZ);
+   if ( pivot_row )   spx_free(pivot_row);
+   if ( pivot_rowNZ ) spx_free(pivot_rowNZ);
 }
    
 CLUFactor::Temp::~Temp()
 {
    clear();
-}
-/************************************************************/   
-
-CLUFactor::Pivots::Pivots()
-   :
-   pivot_col   ( 0 ),
-   pivot_colNZ ( 0 ),
-   pivot_row   ( 0 ),
-   pivot_rowNZ ( 0 )
-{}
-
-CLUFactor::Pivots::~Pivots()
-{
-   if ( pivot_col )   spx_free(pivot_col);
-   if( pivot_colNZ )  spx_free(pivot_colNZ);
-   if ( pivot_row )   spx_free(pivot_row);
-   if ( pivot_rowNZ ) spx_free(pivot_rowNZ);
 }
 
 /************************************************************/   
@@ -83,7 +73,10 @@ void CLUFactor::initPerm()
 
 /*****************************************************************************/
    
-void CLUFactor::setPivot(int p_stage, int p_col, int p_row, double val)
+void CLUFactor::setPivot(const int p_stage,
+                         const int p_col, 
+                         const int p_row, 
+                         const double val)
 {
    // std::cout << p_stage << ": (" << p_row ", " 
    //           << p_col << ") = " << val << std::endl;
@@ -347,8 +340,7 @@ void CLUFactor::remaxCol(int p_col, int len)
   *      mark column singletons.
   */
 void CLUFactor::initFactorMatrix(SVector** vec, 
-   const double eps, 
-   int& stage )
+                                 const double eps )
 {
    double x;
    int i, j, ll, k, m;
@@ -443,7 +435,7 @@ void CLUFactor::initFactorMatrix(SVector** vec,
     *  excluding and marking column singletons!
     */
    m = 0;
-   stage = 0;
+   temp.stage = 0;
 
    initMaxabs = 0;
    for (i = 0; i < thedim; ++i)
@@ -499,8 +491,8 @@ void CLUFactor::initFactorMatrix(SVector** vec,
             initMaxabs = x;
          else if (-x > initMaxabs)
             initMaxabs = -x;
-         setPivot(stage, i, psv->index(j), x);
-         sing[stage++] = i;
+         setPivot(temp.stage, i, psv->index(j), x);
+         sing[temp.stage++] = i;
       }
    }
 
@@ -514,7 +506,7 @@ void CLUFactor::initFactorMatrix(SVector** vec,
  *      Remove column singletons
  */
 
-void CLUFactor::colSingletons( int& stage )
+void CLUFactor::colSingletons()
 {
    int i, j, k, n;
    int len;
@@ -531,7 +523,7 @@ void CLUFactor::colSingletons( int& stage )
     *  until no more can be found.
     */
    u.lastColSing = -1;
-   for (i = 0; i < stage; ++i)
+   for (i = 0; i < temp.stage; ++i)
    {
       p_row = rorig[i];
       assert(p_row >= 0);
@@ -575,8 +567,8 @@ void CLUFactor::colSingletons( int& stage )
 
             /*      Remove singleton from column.
              */
-            setPivot(stage, p_col, newrow, u.row.val[k]);
-            sing[stage++] = p_col;
+            setPivot(temp.stage, p_col, newrow, u.row.val[k]);
+            sing[temp.stage++] = p_col;
 
             /*      Move pivot element to diag.
              */
@@ -591,7 +583,7 @@ void CLUFactor::colSingletons( int& stage )
       }
    }
 
-   assert(stage <= thedim);
+   assert(temp.stage <= thedim);
 }
  
 
@@ -599,7 +591,7 @@ void CLUFactor::colSingletons( int& stage )
 /*
  *      Remove row singletons
  */
-void CLUFactor::rowSingletons( int& stage )
+void CLUFactor::rowSingletons()
 {
    double pval;
    int i, j, k, ll, r;
@@ -610,18 +602,18 @@ void CLUFactor::rowSingletons( int& stage )
 
    /*  Mark row singletons
     */
-   rs = stage;
+   rs = temp.stage;
    for (i = 0; i < thedim; ++i)
    {
       if (rperm[i] < 0 && u.row.len[i] == 1)
-         sing[stage++] = i;
+         sing[temp.stage++] = i;
    }
 
    /*  Eliminate row singletons
     *  thereby marking newly arising ones
     *  until no more can be found.
     */
-   for (; rs < stage; ++rs)
+   for (; rs < temp.stage; ++rs)
    {
       /*      Move pivot element from row file to diag
        */
@@ -668,7 +660,7 @@ void CLUFactor::rowSingletons( int& stage )
             /*      Check new row length.
              */
             if (ll == 1)
-               sing[stage++] = r;
+               sing[temp.stage++] = r;
             else if (ll == 0)
             {
                stat = SLinSolver::SINGULAR;
@@ -678,7 +670,7 @@ void CLUFactor::rowSingletons( int& stage )
       }
    }
 
-   u.lastRowSing = stage - 1;
+   u.lastRowSing = temp.stage - 1;
 }
 
 
@@ -688,22 +680,22 @@ void CLUFactor::rowSingletons( int& stage )
  *      and required entries of arrays max and mark
  */
 
-void CLUFactor::initFactorRings( const int stage )
+void CLUFactor::initFactorRings()
 {
    int i;
    int *rperm = row.perm;
    int *cperm = col.perm;
    CLUFactor::Pring *ring;
 
-   spx_alloc(pivots.pivot_col,   thedim + 1);
-   spx_alloc(pivots.pivot_colNZ, thedim + 1);
-   spx_alloc(pivots.pivot_row,   thedim + 1);
-   spx_alloc(pivots.pivot_rowNZ, thedim + 1);
+   spx_alloc(temp.pivot_col,   thedim + 1);
+   spx_alloc(temp.pivot_colNZ, thedim + 1);
+   spx_alloc(temp.pivot_row,   thedim + 1);
+   spx_alloc(temp.pivot_rowNZ, thedim + 1);
 
-   for (i = thedim - stage; i >= 0; --i)
+   for (i = thedim - temp.stage; i >= 0; --i)
    {
-      initDR(pivots.pivot_colNZ[i]);
-      initDR(pivots.pivot_rowNZ[i]);
+      initDR(temp.pivot_colNZ[i]);
+      initDR(temp.pivot_rowNZ[i]);
    }
 
    for (i = 0; i < thedim; ++i)
@@ -711,17 +703,17 @@ void CLUFactor::initFactorRings( const int stage )
       if (rperm[i] < 0)
       {
          assert(u.row.len[i] > 1);
-         ring = &(pivots.pivot_rowNZ[u.row.len[i]]);
-         init2DR(pivots.pivot_row[i], *ring);
-         pivots.pivot_row[i].idx = i;
+         ring = &(temp.pivot_rowNZ[u.row.len[i]]);
+         init2DR(temp.pivot_row[i], *ring);
+         temp.pivot_row[i].idx = i;
          temp.s_max[i] = -1;
       }
       if (cperm[i] < 0)
       {
          assert(temp.s_cact[i] > 1);
-         ring = &(pivots.pivot_colNZ[temp.s_cact[i]]);
-         init2DR(pivots.pivot_col[i], *ring);
-         pivots.pivot_col[i].idx = i;
+         ring = &(temp.pivot_colNZ[temp.s_cact[i]]);
+         init2DR(temp.pivot_col[i], *ring);
+         temp.pivot_col[i].idx = i;
          temp.s_mark[i] = 0;
       }
    }
@@ -729,14 +721,14 @@ void CLUFactor::initFactorRings( const int stage )
 
 void CLUFactor::freeFactorRings(void)
 {
-   if ( pivots.pivot_col )
-      spx_free(pivots.pivot_col);
-   if( pivots.pivot_colNZ )
-      spx_free(pivots.pivot_colNZ);
-   if ( pivots.pivot_row )
-      spx_free(pivots.pivot_row);
-   if ( pivots.pivot_rowNZ )
-      spx_free(pivots.pivot_rowNZ);
+   if ( temp.pivot_col )
+      spx_free(temp.pivot_col);
+   if( temp.pivot_colNZ )
+      spx_free(temp.pivot_colNZ);
+   if ( temp.pivot_row )
+      spx_free(temp.pivot_row);
+   if ( temp.pivot_rowNZ )
+      spx_free(temp.pivot_rowNZ);
 }
    
 
@@ -746,7 +738,7 @@ void CLUFactor::freeFactorRings(void)
     *      Eliminate all row singletons from nucleus.
     *      A row singleton may well be column singleton at the same time!
     */
-void CLUFactor::eliminateRowSingletons( int& stage )
+void CLUFactor::eliminateRowSingletons()
 {
    int i, j, k, ll, r;
    int len, lk;
@@ -755,15 +747,15 @@ void CLUFactor::eliminateRowSingletons( int& stage )
    int *idx;
    CLUFactor::Pring *sing;
 
-   for (sing = pivots.pivot_rowNZ[1].prev; sing != &(pivots.pivot_rowNZ[1]); sing = sing->prev)
+   for (sing = temp.pivot_rowNZ[1].prev; sing != &(temp.pivot_rowNZ[1]); sing = sing->prev)
    {
       prow = sing->idx;
       i = u.row.start[prow];
       pcol = u.row.idx[i];
       pval = u.row.val[i];
-      setPivot(stage++, pcol, prow, pval);
+      setPivot(temp.stage++,pcol, prow, pval);      
       u.row.len[prow] = 0;
-      removeDR(pivots.pivot_col[pcol]);
+      removeDR(temp.pivot_col[pcol]);
 
       /*      Eliminate pivot column and build L vector.
        */
@@ -798,8 +790,8 @@ void CLUFactor::eliminateRowSingletons( int& stage )
 
             /*      Move column to appropriate nonzero ring.
              */
-            removeDR(pivots.pivot_row[r]);
-            init2DR (pivots.pivot_row[r], pivots.pivot_rowNZ[ll]);
+            removeDR(temp.pivot_row[r]);
+            init2DR (temp.pivot_row[r], temp.pivot_rowNZ[ll]);
             assert(row.perm[r] < 0);
             temp.s_max[r] = -1;
          }
@@ -831,8 +823,8 @@ void CLUFactor::eliminateRowSingletons( int& stage )
 
             /*      Move column to appropriate nonzero ring.
              */
-            removeDR(pivots.pivot_row[r]);
-            init2DR (pivots.pivot_row[r], pivots.pivot_rowNZ[ll]);
+            removeDR(temp.pivot_row[r]);
+            init2DR (temp.pivot_row[r], temp.pivot_rowNZ[ll]);
             assert(row.perm[r] < 0);
             temp.s_max[r] = -1;
          }
@@ -841,7 +833,7 @@ void CLUFactor::eliminateRowSingletons( int& stage )
          u.col.len[pcol] -= i;
    }
 
-   initDR(pivots.pivot_rowNZ[1]);           /* Remove all row singletons from list */
+   initDR(temp.pivot_rowNZ[1]);           /* Remove all row singletons from list */
 }
 
 
@@ -850,20 +842,20 @@ void CLUFactor::eliminateRowSingletons( int& stage )
     *      Eliminate all column singletons from nucleus.
     *      A column singleton must not be row singleton at the same time!
     */
-void CLUFactor::eliminateColSingletons( int& stage)
+void CLUFactor::eliminateColSingletons()
 {
    int i, j, k, l, c;
    int pcol, prow;
    CLUFactor::Pring *sing;
 
-   for (sing = pivots.pivot_colNZ[1].prev; sing != &(pivots.pivot_colNZ[1]); sing = sing->prev)
+   for (sing = temp.pivot_colNZ[1].prev; sing != &(temp.pivot_colNZ[1]); sing = sing->prev)
    {
       /*      Find pivot value
        */
       pcol = sing->idx;
       j = --(u.col.len[pcol]) + u.col.start[pcol];     /* remove pivot column */
       prow = u.col.idx[j];
-      removeDR(pivots.pivot_row[prow]);
+      removeDR(temp.pivot_row[prow]);
 
       j = --(u.row.len[prow]) + u.row.start[prow];
       for (i = j; (c = u.row.idx[i]) != pcol; --i)
@@ -874,14 +866,15 @@ void CLUFactor::eliminateColSingletons( int& stage)
          u.col.idx[k] = u.col.idx[l];
          u.col.idx[l] = prow;
          l = temp.s_cact[c];
-         removeDR(pivots.pivot_col[c]);
-         init2DR(pivots.pivot_col[c], pivots.pivot_colNZ[l]);
+         removeDR(temp.pivot_col[c]);
+         init2DR(temp.pivot_col[c], temp.pivot_colNZ[l]);
          assert(col.perm[c] < 0);
       }
 
       /*      remove pivot element from pivot row
        */
-      setPivot(stage++, pcol, prow, u.row.val[i]);
+      setPivot(temp.stage++,pcol, prow, u.row.val[i]);
+      
       u.row.idx[i] = u.row.idx[j];
       u.row.val[i] = u.row.val[j];
 
@@ -895,20 +888,20 @@ void CLUFactor::eliminateColSingletons( int& stage)
          u.col.idx[k] = u.col.idx[l];
          u.col.idx[l] = prow;
          l = temp.s_cact[c];
-         removeDR(pivots.pivot_col[c]);
-         init2DR(pivots.pivot_col[c], pivots.pivot_colNZ[l]);
+         removeDR(temp.pivot_col[c]);
+         init2DR(temp.pivot_col[c], temp.pivot_colNZ[l]);
          assert(col.perm[c] < 0);
       }
    }
 
-   initDR(pivots.pivot_colNZ[1]);           /* Remove all column singletons from list */
+   initDR(temp.pivot_colNZ[1]);           /* Remove all column singletons from list */
 }
 
 
 /*
     * No singletons available: Select pivot elements.
     */
-void CLUFactor::selectPivots( double threshold, const int stage)
+void CLUFactor::selectPivots( double threshold)
 {
    int ii;
    int i;
@@ -928,7 +921,7 @@ void CLUFactor::selectPivots( double threshold, const int stage)
    int mkwtz;
    int candidates;
 
-   candidates = thedim - stage - 1;
+   candidates = thedim - temp.stage - 1;
    if (candidates > 4)
       candidates = 4;
 
@@ -939,9 +932,9 @@ void CLUFactor::selectPivots( double threshold, const int stage)
    {
       ii = -1;
 
-      if (pivots.pivot_rowNZ[count].next != &(pivots.pivot_rowNZ[count]))
+      if (temp.pivot_rowNZ[count].next != &(temp.pivot_rowNZ[count]))
       {
-         rw = pivots.pivot_rowNZ[count].next->idx;
+         rw = temp.pivot_rowNZ[count].next->idx;
          beg = u.row.start[rw];
          len = u.row.len[rw] + beg - 1;
 
@@ -981,9 +974,9 @@ void CLUFactor::selectPivots( double threshold, const int stage)
          }
       }
 
-      else if (pivots.pivot_colNZ[count].next != &(pivots.pivot_colNZ[count]))
+      else if (temp.pivot_colNZ[count].next != &(temp.pivot_colNZ[count]))
       {
-         cl = pivots.pivot_colNZ[count].next->idx;
+         cl = temp.pivot_colNZ[count].next->idx;
          beg = u.col.start[cl];
          len = u.col.len[cl] + beg - 1;
          beg = len - temp.s_cact[cl] + 1;
@@ -1064,17 +1057,17 @@ void CLUFactor::selectPivots( double threshold, const int stage)
          continue;
       }
 
-      removeDR(pivots.pivot_col[cl]);
-      initDR(pivots.pivot_col[cl]);
+      removeDR(temp.pivot_col[cl]);
+      initDR(temp.pivot_col[cl]);
 
       if (ii >= 0)
       {
          /*  Initialize selected pivot element
           */
          CLUFactor::Pring *pr;
-         pivots.pivot_row[rw].pos = ii - u.row.start[rw];
-         pivots.pivot_row[rw].mkwtz = mkwtz = (mkwtz - 1) * (count - 1);  // ??? mkwtz originally was long, maybe to avoid an overflow in this instruction?
-         for (pr = pivots.pivots.next; pr->idx >= 0; pr = pr->next)
+         temp.pivot_row[rw].pos = ii - u.row.start[rw];
+         temp.pivot_row[rw].mkwtz = mkwtz = (mkwtz - 1) * (count - 1);  // ??? mkwtz originally was long, maybe to avoid an overflow in this instruction?
+         for (pr = temp.pivots.next; pr->idx >= 0; pr = pr->next)
          {
             if (pr->idx == rw || pr->mkwtz >= mkwtz)
                break;
@@ -1082,8 +1075,8 @@ void CLUFactor::selectPivots( double threshold, const int stage)
          pr = pr->prev;
          if (pr->idx != rw)
          {
-            removeDR(pivots.pivot_row[rw]);
-            init2DR (pivots.pivot_row[rw], *pr);
+            removeDR(temp.pivot_row[rw]);
+            init2DR (temp.pivot_row[rw], *pr);
          }
          num++;
          if (num >= candidates)
@@ -1092,10 +1085,10 @@ void CLUFactor::selectPivots( double threshold, const int stage)
    }
 
    /*
-     while(pivots.pivots.next->mkwtz < pivots.pivots.prev->mkwtz)
+     while(temp.temp.next->mkwtz < temp.temp.prev->mkwtz)
      {
      Pring   *pr;
-     pr = pivots.pivots.prev;
+     pr = temp.temp.prev;
      removeDR(*pr);
      init2DR (*pr, rowNZ[u.row.len[pr->idx]]);
      }
@@ -1213,8 +1206,8 @@ int CLUFactor::updateRow   (int r,
 
    /*  move row to appropriate list.
     */
-   removeDR(pivots.pivot_row[r]);
-   init2DR(pivots.pivot_row[r], pivots.pivot_rowNZ[u.row.len[r]]);
+   removeDR(temp.pivot_row[r]);
+   init2DR(temp.pivot_row[r], temp.pivot_rowNZ[u.row.len[r]]);
    assert(row.perm[r] < 0);
    temp.s_max[r] = -1;
 
@@ -1224,7 +1217,7 @@ int CLUFactor::updateRow   (int r,
 /*
     *      Eliminate pivot element
     */
-void CLUFactor::eliminatePivot(int prow, int pos, double eps, int& stage )
+void CLUFactor::eliminatePivot(int prow, int pos, double eps)
 {
    int i, j, k, l = -1;
    int lv = -1;  // This value should never be used.
@@ -1239,16 +1232,16 @@ void CLUFactor::eliminatePivot(int prow, int pos, double eps, int& stage )
    i = pbeg + pos;
    pcol = u.row.idx[i];
    pval = u.row.val[i];
-   removeDR(pivots.pivot_col[pcol]);
-   initDR(pivots.pivot_col[pcol]);
+   removeDR(temp.pivot_col[pcol]);
+   initDR(temp.pivot_col[pcol]);
 
    /*  remove pivot from pivot row     */
    u.row.idx[i] = u.row.idx[pend];
    u.row.val[i] = u.row.val[pend];
 
    /*  set pivot element and construct L vector */
-   setPivot(stage++, pcol, prow, pval);
-
+   setPivot(temp.stage++,pcol, prow, pval);
+   
    /**@todo If this test failes, lv has no value. I suppose that in this
     *       case none of the loops below that uses lv is executed.
     *       But this is unproven.
@@ -1265,7 +1258,7 @@ void CLUFactor::eliminatePivot(int prow, int pos, double eps, int& stage )
       j = u.row.idx[i];
       temp.s_mark[j] = 1;
       work[j] = u.row.val[i];
-      removeDR(pivots.pivot_col[j]);
+      removeDR(temp.pivot_col[j]);
       l = u.col.start[j] + u.col.len[j] - temp.s_cact[j];
       for (k = l; u.col.idx[k] != prow; ++k)
          ;
@@ -1308,7 +1301,7 @@ void CLUFactor::eliminatePivot(int prow, int pos, double eps, int& stage )
       j = u.row.idx[i];
       work[j] = 0;
       temp.s_mark[j] = 0;
-      init2DR(pivots.pivot_col[j], pivots.pivot_colNZ[temp.s_cact[j]]);
+      init2DR(temp.pivot_col[j], temp.pivot_colNZ[temp.s_cact[j]]);
       assert(col.perm[j] < 0);
    }
 }
@@ -1318,17 +1311,16 @@ void CLUFactor::eliminatePivot(int prow, int pos, double eps, int& stage )
     *      Factorize nucleus.
     */
 void CLUFactor::eliminateNucleus( const double eps, 
-   const double threshold, 
-   int& stage)
+                                  const double threshold)
 {
    int r, c;
    CLUFactor::Pring *pivot;
 
-   pivots.pivots.mkwtz = -1;
-   pivots.pivots.idx = -1;
-   pivots.pivots.pos = -1;
+   temp.pivots.mkwtz = -1;
+   temp.pivots.idx = -1;
+   temp.pivots.pos = -1;
 
-   while (stage < thedim - 1)
+   while (temp.stage < thedim - 1)
    {
 #ifdef DEBUG
       int i;
@@ -1340,42 +1332,42 @@ void CLUFactor::eliminateNucleus( const double eps,
          }
 #endif
 
-      if (pivots.pivot_rowNZ[1].next != &(pivots.pivot_rowNZ[1]))        /* row singleton available */
-         eliminateRowSingletons( stage );
-      else if (pivots.pivot_colNZ[1].next != &(pivots.pivot_colNZ[1]))   /* column singleton available */
-         eliminateColSingletons( stage );
+      if (temp.pivot_rowNZ[1].next != &(temp.pivot_rowNZ[1]))        /* row singleton available */
+         eliminateRowSingletons();
+      else if (temp.pivot_colNZ[1].next != &(temp.pivot_colNZ[1]))   /* column singleton available */
+         eliminateColSingletons();
       else
       {
-         initDR(pivots.pivots);
-         selectPivots( threshold, stage );
+         initDR(temp.pivots);
+         selectPivots( threshold);
 
-         assert ( pivots.pivots.next != &pivots.pivots &&  "ERROR: no pivot element selected" );
+         assert ( temp.pivots.next != &temp.pivots &&  "ERROR: no pivot element selected" );
 
-         for (pivot = pivots.pivots.next; pivot != &pivots.pivots; pivot = pivot->next)
+         for (pivot = temp.pivots.next; pivot != &temp.pivots; pivot = pivot->next)
          {
-            eliminatePivot(pivot->idx, pivot->pos, eps, stage);
+            eliminatePivot(pivot->idx, pivot->pos, eps );
          }
       }
 
-      if (pivots.pivot_rowNZ->next != pivots.pivot_rowNZ || pivots.pivot_colNZ->next != pivots.pivot_colNZ)
+      if (temp.pivot_rowNZ->next != temp.pivot_rowNZ || temp.pivot_colNZ->next != temp.pivot_colNZ)
       {
          stat = SLinSolver::SINGULAR;
          return;
       }
    }
 
-   if (stage < thedim)
+   if (temp.stage < thedim)
    {
       /*      Eliminate remaining element.
        *      Note, that this must be both, column and row singleton.
        */
-      assert(pivots.pivot_rowNZ[1].next != &(pivots.pivot_rowNZ[1]) && "ERROR: one row must be left");
-      assert(pivots.pivot_colNZ[1].next != &(pivots.pivot_colNZ[1]) && "ERROR: one col must be left");
-      r = pivots.pivot_rowNZ[1].next->idx;
-      c = pivots.pivot_colNZ[1].next->idx;
+      assert(temp.pivot_rowNZ[1].next != &(temp.pivot_rowNZ[1]) && "ERROR: one row must be left");
+      assert(temp.pivot_colNZ[1].next != &(temp.pivot_colNZ[1]) && "ERROR: one col must be left");
+      r = temp.pivot_rowNZ[1].next->idx;
+      c = temp.pivot_colNZ[1].next->idx;
       u.row.len[r] = 0;
       u.col.len[c]--;
-      setPivot(stage, c, r, u.row.val[u.row.start[r]]);
+      setPivot(temp.stage, c, r, u.row.val[u.row.start[r]]);
    }
 }
 
@@ -1517,9 +1509,6 @@ void CLUFactor::factor(
    double eps           /* epsilon for zero detection        */
                    )
 {
-#pragma warning "remove this assignmnent"
-   //fac = this;
-   int stage = 0;
    stat = SLinSolver::OK;
 
    l.start[0] = 0;
@@ -1529,23 +1518,23 @@ void CLUFactor::factor(
    temp.init(thedim);
    initPerm();
 
-   initFactorMatrix(vec, eps, stage);
+   initFactorMatrix(vec, eps);
    if (stat)
       goto TERMINATE;
    //   initMaxabs = initMaxabs;
 
-   colSingletons(stage);
+   colSingletons();
    if (stat != SLinSolver::OK)
       goto TERMINATE;
 
-   rowSingletons(stage);
+   rowSingletons();
    if (stat != SLinSolver::OK)
       goto TERMINATE;
 
-   if (stage < thedim)
+   if (temp.stage < thedim)
    {
-      initFactorRings(stage);
-      eliminateNucleus(eps,threshold,stage);
+      initFactorRings();
+      eliminateNucleus(eps,threshold);
       freeFactorRings();
    }
 
@@ -1773,22 +1762,24 @@ bool CLUFactor::isConsistent() const
       }
    }
 
-   //       impossible without global stage variable
-   //       /*  Test consistency of nonzero count lists
-   //        */
-   //       if (colNZ && rowNZ)
-   //          for (i = 0; i < thedim - stage; ++i)
-   //             {
-   //                for (pring = rowNZ[i].next; pring != &(rowNZ[i]); pring = pring->next)
-   //                   {
-   //                      assert(row.perm[pring->idx] < 0);
-   //                   }
-   //                for (pring = colNZ[i].next; pring != &(colNZ[i]); pring = pring->next)
-   //                   {
-   //                      assert(col.perm[pring->idx] < 0);
-   //                   }
-   //             }
-
+   /*  Test consistency of nonzero count lists
+    */
+   if (temp.pivot_colNZ && temp.pivot_rowNZ)
+      for (i = 0; i < thedim - temp.stage; ++i)  {
+         for (pring = temp.pivot_rowNZ[i].next; 
+              pring != &(temp.pivot_rowNZ[i]); 
+              pring = pring->next)
+            {
+               assert(row.perm[pring->idx] < 0);
+            }
+         for (pring = temp.pivot_colNZ[i].next; 
+              pring != &(temp.pivot_colNZ[i]); 
+              pring = pring->next)
+            {
+               assert(col.perm[pring->idx] < 0);
+            }
+      }
+   
    return true;
 }
 
