@@ -74,4 +74,10 @@ maros-r7 LC
 pilot-ja ER
 pilot87  EC *
 
+irix.mips.sgi LC 1 7065
+greenbea LR
+maros    ER
+pilot-ja ER
+pilot87  LC *
+pilot87  LR * 
 
