@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.27 2002/01/23 12:58:50 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.28 2002/01/23 15:54:32 bzfpfend Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -274,13 +274,23 @@ void SoPlex::testVecs()
    {
       for (i = 0; i < dim(); ++i)
       {
-         if (theCoTest[i] < 0 && isCoBasic(i))
-            std::cout << "testVecs: theCoTest: this shalt not be!\n";
+         if (theCoTest[i] < -epsilon() && isCoBasic(i))
+         {
+            std::cout << "testVecs: theCoTest: this shalt not be!" << std::endl
+                      << "  i=" << i 
+                      << ", theCoTest[i]=" << theCoTest[i]
+                      << ", epsilon()=" << epsilon() << std::endl;
+         }
       }
       for (i = 0; i < coDim(); ++i)
       {
-         if (theTest[i] < 0 && isBasic(i))
-            std::cout << "testVecs: theTest: this shalt not be!\n";
+         if (theTest[i] < -epsilon() && isBasic(i))
+         {
+            std::cout << "testVecs: theTest: this shalt not be!" << std::endl
+                      << "  i=" << i 
+                      << ", theTest[i]=" << theTest[i]
+                      << ", epsilon()=" << epsilon() << std::endl;
+         }
       }
    }
 }
