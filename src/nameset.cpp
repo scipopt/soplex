@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.cpp,v 1.3 2001/11/07 17:31:19 bzfbleya Exp $"
+#pragma ident "@(#) $Id: nameset.cpp,v 1.4 2001/11/09 22:48:04 bzfkocht Exp $"
 
 #include <string.h>
 #include "nameset.h"
@@ -63,23 +63,23 @@ void NameSet::add(Key& key, const char* str)
    }
 }
 
-void NameSet::add(const NameSet& set)
+void NameSet::add(const NameSet& p_set)
 {
-   for (int i = 0; i < set.num(); ++i)
+   for (int i = 0; i < p_set.num(); ++i)
    {
-      NameSet_Name iname(set[i]);
+      NameSet_Name iname(p_set[i]);
       if (!hashtab.has(iname))
-         add(set[i]);
+         add(p_set[i]);
    }
 }
 
-void NameSet::add(Key key[], const NameSet& set)
+void NameSet::add(Key key[], const NameSet& p_set)
 {
-   for (int i = 0; i < set.num(); ++i)
+   for (int i = 0; i < p_set.num(); ++i)
    {
-      NameSet_Name iname = set[i];
+      NameSet_Name iname = p_set[i];
       if (!hashtab.has(iname))
-         add(key[i], set[i]);
+         add(key[i], p_set[i]);
    }
 }
 

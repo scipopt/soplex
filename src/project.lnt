@@ -1,0 +1,22 @@
+//
+// include file errors
+//
+-esym(1702,operator<<,operator>>)
+-esym(534,ostream::operator<<,istream::operator>>,istream::putback)
+
+//
+// unwanted messages
+//
+-e737 // signed -> unsigned
+-e713 // loss of precision
+//
+// code specials
+//
+-esym(1510,Vector) // Vector has no destructor, this is ok
+-emacro(666,assert) // Expression with side effects passed to 
+-esym(666,assert)   // repeated parameter 1 in macro
+
+//
+// Temporary
+//
+-e537 // Repeated include file

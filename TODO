@@ -1,0 +1,54 @@
+Was macht SPxSolver in example. Warum könne wir nicht einfach SoPlex 
+benutzen
+
+in datahashtable.h dataset.h idlist.h spxlp.h svector.h die
+subclassen einsetzen.
+
+BUG in spxscalesm.cc value() wird nicht descaliert. 
+Entsprechender Aufruf fehlt auch in spxgeneralsm.cc
+
+In slufactor.cpp sind lauter cast auf CLUFactor* drin, die
+man wohl wennehmen könnte, wenn man in solve.c und vsolve.c überall
+const hinschreibt.
+
+assert(0) -> abort()
+while(1)  -> for(;;)
+for();    -> for()
+                ;
+explicit einfuegen.
+
+vector_c.cpp in vector.cpp einbauen (this)
+
+documentieren  doc++
+
+reinterpret_cast durchsehen
+
+svector neu implementieren. Den [-1] Zugriff erstezen durch
+class SVector
+{
+   int     size;
+   int     used;
+   int*    idx;
+   double* val;
+};
+Es wird viel Platz verschwendet durch das zusammensetzen von
+Element { int, double } (padding),
+Ist vermutlich dann auch schneller.
+
+
+// lprow.cpp:double LPRow::infinity = 1e+100;
+// spxlp.cpp:const double SPxLP::infinity = 1e+100;
+
+SORTIERUNG 
+
+   daten
+   public daten werden ersetzt.
+   -------
+   public
+   protected
+   private
+
+   constructor/assignment operator (alle typen)
+   destructor
+   initialisierung
+
