@@ -1,9 +1,9 @@
 #!/softis/bin/perl
-# $Id: sendsoplex.pl,v 1.1 2002/01/15 16:52:39 bzfkocht Exp $
+# $Id: sendsoplex.pl,v 1.2 2002/01/16 14:49:17 bzfkocht Exp $
 
 # einige Vereinbarungen, fuer die Lage von Dateien
 # Arbeitsverzeichnis, ggf. aendern
-$DOPATH    = "/zibis/Optimization/Software/Soplex/cgi"; 
+$DOPATH    = "/zibis/Optimization/Software/Soplex/Test/cgi"; 
 $COUNTFILE = $DOPATH."/usercount.dat";      # Zaehlerdatei
 $DATAFILE  = $DOPATH."/users.dat";          # Benutzerdaten
 
@@ -81,8 +81,7 @@ sub CheckCertification {
 
 sub MailSoPlex {
    #system("/usr/ucb/mail -s SoPlex ".@_[0]." < ".$DOPATH."/soplex120.tgz.uu");
-
-   system("metasend -z -b -S 1000000 -t ".@_[0]." -F koch@zib.de -s \'Soplex Release 1.2.0\' -f ".$DOPATH."/greeting.txt -m text/plain -e quoted-printable -D \'Here is SoPlex\' -n -e base64 -f ".$DOPATH."/soplex-1.2.0.tar.gz -m application/x-gzip -D soplex-1.2.0.tar.gz");
+    system("sh ".$DOPATH."/sendit.sh ".@_[0]);
 }
 
 
