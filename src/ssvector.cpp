@@ -13,9 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.29 2005/01/09 16:21:50 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.30 2005/01/09 16:52:10 bzfkocht Exp $"
 
 #undef NDEBUG
+#include <iostream>
+#include <iomanip>
 #include <assert.h>
 
 #include "spxdefines.h"
@@ -1111,7 +1113,10 @@ bool SSVector::isConsistent() const
          int j = number(i);
 
          if (j < 0 && fabs(val[i]) > 0.0) 
+         {
+            std::cerr << "i= " << i << " idx= " << j << " val= " << std::setprecision(16) << val[i] << std::endl;
             return MSGinconsistent("SSVector");
+         }
       }
    }
    return DVector::isConsistent() && IdxSet::isConsistent();
