@@ -1,6 +1,6 @@
-#--- $Id: make.osf1.alpha.compaq.opt,v 1.4 2001/11/21 20:20:33 bzfkocht Exp $
+#--- $Id: make.osf1.alpha.compaq.opt,v 1.5 2001/11/21 20:22:55 bzfkocht Exp $
 CXX	=	cxx
 CPPFLAGS=	-Isrc -DNDEBUG
 CXXFLAGS=	-std strict_ansi -O4 -fast -noexceptions -nortti
-LDFLAGS	=	-non_shared -om -lcpml -lm
+LDFLAGS	=	-non_shared -om -lm
 ARFLAGS	=	crs
