@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: forest.cpp,v 1.15 2002/01/31 16:30:46 bzfpfend Exp $"
+#pragma ident "@(#) $Id: forest.cpp,v 1.16 2002/03/01 13:15:30 bzfpfend Exp $"
 
 #include <assert.h>
 
@@ -121,6 +121,7 @@ static int deQueueMin(int* heap, int* size)
  */
 void CLUFactor::forestPackColumns()
 {
+   TRACE_METHOD( "CLUFactor::forestPackColumns()" );
    int n, i, j, colno;
    Dring *ring, *list;
 
@@ -168,6 +169,7 @@ terminatePackColumns :
  */
 void CLUFactor::forestMinColMem(int size)
 {
+   TRACE_METHOD( "CLUFactor::forestMinColMem()" );
    if (u.col.size < size)
    {
       u.col.size = size;
@@ -182,6 +184,7 @@ void CLUFactor::forestMinColMem(int size)
  */
 void CLUFactor::forestReMaxCol(int p_col, int len)
 {
+   TRACE_METHOD( "CLUFactor::forestReMaxCol()" );
    assert(u.col.max[p_col] < len);
 
    if (u.col.elem[p_col].next == &(u.col.list)) /* last in column file */
@@ -245,6 +248,7 @@ void CLUFactor::forestReMaxCol(int p_col, int len)
 
 void CLUFactor::forestUpdate(int p_col, Real* p_work, int num, int *nonz)
 {
+   TRACE_METHOD( "CLUFactor::forestUpdate()" );
    int i, j, k, h, m, n;
    int ll, c, r, rowno;
    Real x;
@@ -462,7 +466,7 @@ void CLUFactor::forestUpdate(int p_col, Real* p_work, int num, int *nonz)
             // The numbers seem to be often 1e-100, is this ok ?
             for (i = 0; i < num; ++i)
                if (p_work[corig[nonz[i]]] == 0.0)
-                  abort();
+                  ABORT();
 #endif // NDEBUG
             i = deQueueMin(nonz, &num);
             if (i == r)

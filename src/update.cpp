@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: update.cpp,v 1.8 2002/01/31 08:19:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: update.cpp,v 1.9 2002/03/01 13:15:33 bzfpfend Exp $"
 
 #include <assert.h>
 
@@ -25,6 +25,7 @@ namespace soplex
 {
 void CLUFactor::update(int p_col, Real* p_work, const int* p_idx, int num)
 {
+   TRACE_METHOD( "CLUFactor::update()" );
    int ll, i, j;
    int* lidx;
    Real* lval;
@@ -71,6 +72,7 @@ void CLUFactor::updateNoClear(
    const int* p_idx,
    int num)
 {
+   TRACE_METHOD( "CLUFactor::updateNoClear()" );
    int ll, i, j;
    int* lidx;
    Real* lval;

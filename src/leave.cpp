@@ -13,9 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.15 2002/02/04 15:34:08 bzfpfend Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.16 2002/03/01 13:15:30 bzfpfend Exp $"
 
-//#define DEBUG 1
+// #define DEBUG 1
 
 /* Updating the Basis for Leaving Variables
  */
@@ -38,6 +38,7 @@ static const Real reject_leave_tol = 1e-8;
  */
 void SoPlex::computeFtest()
 {
+   TRACE_METHOD( "SoPlex::computeFtest()" );
    assert(type() == LEAVE);
    Vector& ftest = theCoTest;                  // |== fTest()|
    assert(&ftest == &fTest());
@@ -52,6 +53,7 @@ void SoPlex::computeFtest()
 
 void SoPlex::updateFtest()
 {
+   TRACE_METHOD( "SoPlex::updateFtest()" );
    const IdxSet& idx = theFvec->idx();
    Vector& ftest = theCoTest;      // |== fTest()|
    assert(&ftest == &fTest());
@@ -82,6 +84,7 @@ void SoPlex::getLeaveVals
    int& leaveNum
 )
 {
+   TRACE_METHOD( "SoPlex::getLeaveVals()" );
    SPxBasis::Desc& ds = desc();
    leaveId = baseId(leaveIdx);
 
@@ -89,31 +92,28 @@ void SoPlex::getLeaveVals
    {
       leaveNum = number(SPxRowId(leaveId));
       leaveStat = ds.rowStatus(leaveNum);
-      TRACE( std::cerr << "R" << leaveNum << ":" << int(leaveStat); );
 
       assert(isBasic(leaveStat));
       switch (leaveStat)
       {
       case SPxBasis::Desc::P_ON_UPPER :
-         if (SPxLP::lhs(leaveNum) > -infinity)
-            ds.rowStatus(leaveNum) = SPxBasis::Desc::D_ON_BOTH;
-         else
-            ds.rowStatus(leaveNum) = SPxBasis::Desc::D_ON_LOWER;
+         assert( rep() == ROW );
+         ds.rowStatus(leaveNum) = dualRowStatus(leaveNum);
          leavebound = 0;
          leaveMax = -infinity;
          break;
       case SPxBasis::Desc::P_ON_LOWER :
-         if (SPxLP::rhs(leaveNum) < infinity)
-            ds.rowStatus(leaveNum) = SPxBasis::Desc::D_ON_BOTH;
-         else
-            ds.rowStatus(leaveNum) = SPxBasis::Desc::D_ON_UPPER;
+         assert( rep() == ROW );
+         ds.rowStatus(leaveNum) = dualRowStatus(leaveNum);
          leavebound = 0;
          leaveMax = infinity;
          break;
       case SPxBasis::Desc::P_FREE :
-         abort();
+         assert( rep() == ROW );
+         ABORT();
 
       case SPxBasis::Desc::D_FREE :
+         assert( rep() == COLUMN );
          ds.rowStatus(leaveNum) = SPxBasis::Desc::P_FIXED;
          assert(lhs(leaveNum) == rhs(leaveNum));
          leavebound = -rhs(leaveNum);
@@ -123,16 +123,19 @@ void SoPlex::getLeaveVals
             leaveMax = -infinity;
          break;
       case SPxBasis::Desc::D_ON_LOWER :
+         assert( rep() == COLUMN );
          ds.rowStatus(leaveNum) = SPxBasis::Desc::P_ON_UPPER;
          leavebound = -rhs(leaveNum);                // slack !!
          leaveMax = infinity;
          break;
       case SPxBasis::Desc::D_ON_UPPER :
+         assert( rep() == COLUMN );
          ds.rowStatus(leaveNum) = SPxBasis::Desc::P_ON_LOWER;
          leavebound = -lhs(leaveNum);                // slack !!
          leaveMax = -infinity;
          break;
       case SPxBasis::Desc::D_ON_BOTH :
+         assert( rep() == COLUMN );
          if ((*theFvec)[leaveIdx] > theLBbound[leaveIdx])
          {
             ds.rowStatus(leaveNum) = SPxBasis::Desc::P_ON_LOWER;
@@ -150,8 +153,12 @@ void SoPlex::getLeaveVals
          break;
 
       default:
-         abort();
+         ABORT();
       }
+      TRACE({ std::cout << "SoPlex::getLeaveVals() : row " << leaveNum
+                        << ": " << leaveStat
+                        << " -> " << ds.rowStatus(leaveNum)
+                        << std::endl; });
    }
 
    else
@@ -159,28 +166,25 @@ void SoPlex::getLeaveVals
       assert(leaveId.isSPxColId());
       leaveNum = number(SPxColId(leaveId));
       leaveStat = ds.colStatus(leaveNum);
-      TRACE( std::cerr << "C" << leaveNum << ":" << int(leaveStat); );
 
       assert(isBasic(leaveStat));
       switch (leaveStat)
       {
       case SPxBasis::Desc::P_ON_UPPER :
-         if (SPxLP::lower(leaveNum) > -infinity)
-            ds.colStatus(leaveNum) = SPxBasis::Desc::D_ON_BOTH;
-         else
-            ds.colStatus(leaveNum) = SPxBasis::Desc::D_ON_LOWER;
+         assert( rep() == ROW );
+         ds.colStatus(leaveNum) = dualColStatus(leaveNum);
          leavebound = 0;
          leaveMax = -infinity;
          break;
       case SPxBasis::Desc::P_ON_LOWER :
-         if (SPxLP::upper(leaveNum) < infinity)
-            ds.colStatus(leaveNum) = SPxBasis::Desc::D_ON_BOTH;
-         else
-            ds.colStatus(leaveNum) = SPxBasis::Desc::D_ON_UPPER;
+         assert( rep() == ROW );
+         ds.colStatus(leaveNum) = dualColStatus(leaveNum);
          leavebound = 0;
          leaveMax = infinity;
          break;
       case SPxBasis::Desc::P_FREE :
+         assert( rep() == ROW );
+         ds.colStatus(leaveNum) = dualColStatus(leaveNum);
          if ((*theFvec)[leaveIdx] < theLBbound[leaveIdx])
          {
             leavebound = theLBbound[leaveIdx];
@@ -191,10 +195,10 @@ void SoPlex::getLeaveVals
             leavebound = theUBbound[leaveIdx];
             leaveMax = infinity;
          }
-         ds.colStatus(leaveNum) = SPxBasis::Desc::D_UNDEFINED;
          break;
 
       case SPxBasis::Desc::D_FREE :
+         assert( rep() == COLUMN );
          assert(SPxLP::upper(leaveNum) == SPxLP::lower(leaveNum));
          ds.colStatus(leaveNum) = SPxBasis::Desc::P_FIXED;
          leavebound = SPxLP::upper(leaveNum);
@@ -204,16 +208,19 @@ void SoPlex::getLeaveVals
             leaveMax = -infinity;
          break;
       case SPxBasis::Desc::D_ON_LOWER :
+         assert( rep() == COLUMN );
          ds.colStatus(leaveNum) = SPxBasis::Desc::P_ON_UPPER;
          leavebound = SPxLP::upper(leaveNum);
          leaveMax = -infinity;
          break;
       case SPxBasis::Desc::D_ON_UPPER :
+         assert( rep() == COLUMN );
          ds.colStatus(leaveNum) = SPxBasis::Desc::P_ON_LOWER;
          leavebound = SPxLP::lower(leaveNum);
          leaveMax = infinity;
          break;
       case SPxBasis::Desc::D_ON_BOTH :
+         assert( rep() == COLUMN );
          if ((*theFvec)[leaveIdx] > theUBbound[leaveIdx])
          {
             leaveMax = -infinity;
@@ -231,8 +238,12 @@ void SoPlex::getLeaveVals
          break;
 
       default:
-         abort();
+         ABORT();
       }
+      TRACE({ std::cout << "SoPlex::getLeaveVals() : col " << leaveNum
+                        << ": " << leaveStat
+                        << " -> " << ds.colStatus(leaveNum)
+                        << std::endl; });
    }
 }
 
@@ -245,16 +256,16 @@ void SoPlex::getLeaveVals2(
    Real& newCoPrhs
 )
 {
+   TRACE_METHOD( "SoPlex::getLeaveVals2()" );
    SPxBasis::Desc& ds = desc();
 
    enterBound = 0;
    if (enterId.isSPxRowId())
    {
       int idx = number(SPxRowId(enterId));
-      TRACE({ std::cerr << "\t->\tC" << idx << ": " << int(ds.rowStatus(idx))
-                        << std::endl; });
+      SPxBasis::Desc::Status enterStat = ds.rowStatus(idx);
 
-      switch (ds.rowStatus(idx))
+      switch (enterStat)
       {
       case SPxBasis::Desc::D_FREE :
          assert(rep() == ROW);
@@ -299,41 +310,32 @@ void SoPlex::getLeaveVals2(
          break;
 
       case SPxBasis::Desc::P_ON_UPPER :
+         assert(rep() == COLUMN);
+         ds.rowStatus(idx) = dualRowStatus(idx);
          if (lhs(idx) > -infinity)
-         {
-            ds.rowStatus(idx) = SPxBasis::Desc::D_ON_BOTH;
             theURbound[idx] = theLRbound[idx];
-            //@             theURbound[idx]   = 0;
-         }
-
-         else
-            ds.rowStatus(idx) = SPxBasis::Desc::D_ON_LOWER;
          newCoPrhs = theLRbound[idx];        // slack !!
          newUBbound = -lhs(idx);
          newLBbound = -rhs(idx);
          enterBound = -rhs(idx);
          break;
       case SPxBasis::Desc::P_ON_LOWER :
+         assert(rep() == COLUMN);
+         ds.rowStatus(idx) = dualRowStatus(idx);
          if (rhs(idx) < infinity)
-         {
-            ds.rowStatus(idx) = SPxBasis::Desc::D_ON_BOTH;
             theLRbound[idx] = theURbound[idx];
-            //@             theLRbound[idx]   = 0;
-         }
-
-         else
-            ds.rowStatus(idx) = SPxBasis::Desc::D_ON_UPPER;
          newCoPrhs = theURbound[idx];        // slack !!
          newLBbound = -rhs(idx);
          newUBbound = -lhs(idx);
          enterBound = -lhs(idx);
          break;
       case SPxBasis::Desc::P_FREE :
-         abort();
-#if 0
-         ds.rowStatus(idx) = SPxBasis::Desc::D_UNDEFINED;
+         assert(rep() == COLUMN);
+#if 1
+         ABORT();
+#else
          std::cerr << __FILE__ << __LINE__ << "ERROR: not yet debugged!\n";
-
+         ds.rowStatus(idx) = dualRowStatus(idx);
          newCoPrhs = theURbound[idx];        // slack !!
          newUBbound = infinity;
          newLBbound = -infinity;
@@ -341,22 +343,31 @@ void SoPlex::getLeaveVals2(
 #endif
          break;
       case SPxBasis::Desc::P_FIXED :
-         abort();
+         assert(rep() == COLUMN);
+         std::cerr << "SoPlex::getLeaveVals2(): "
+                   << "ERROR! Tried to put a fixed row variable into the basis."
+                   << std::endl;
+         std::cerr << "SoPlex::getLeaveVals2(): idx=" << idx
+                   << ", lhs=" << lhs(idx)
+                   << ", rhs=" << rhs(idx) << std::endl;
+         ABORT();
 
       default:
-         abort();
-         break;
+         ABORT();
       }
+      TRACE({ std::cout << "SoPlex::getLeaveVals2(): row " << idx
+                        << ": " << enterStat
+                        << " -> " << ds.rowStatus(idx)
+                        << std::endl; });
    }
 
    else
    {
       assert(enterId.isSPxColId());
       int idx = number(SPxColId(enterId));
-      TRACE({ std::cerr << "\t->\tC" << idx << ": " << int(ds.colStatus(idx))
-                        << std::endl; });
+      SPxBasis::Desc::Status enterStat = ds.colStatus(idx);
 
-      switch (ds.colStatus(idx))
+      switch (enterStat)
       {
       case SPxBasis::Desc::D_ON_UPPER :
          assert(rep() == ROW);
@@ -398,51 +409,53 @@ void SoPlex::getLeaveVals2(
          break;
 
       case SPxBasis::Desc::P_ON_UPPER :
+         assert(rep() == COLUMN);
+         ds.colStatus(idx) = dualColStatus(idx);
          if (SPxLP::lower(idx) > -infinity)
-         {
-            ds.colStatus(idx) = SPxBasis::Desc::D_ON_BOTH;
             theLCbound[idx] = theUCbound[idx];
-            //@             theLCbound[idx]   = object[i];
-         }
-
-         else
-            ds.colStatus(idx) = SPxBasis::Desc::D_ON_LOWER;
          newCoPrhs = theUCbound[idx];
          newUBbound = SPxLP::upper(idx);
          newLBbound = SPxLP::lower(idx);
          enterBound = SPxLP::upper(idx);
          break;
       case SPxBasis::Desc::P_ON_LOWER :
+         assert(rep() == COLUMN);
+         ds.colStatus(idx) = dualColStatus(idx);
          if (SPxLP::upper(idx) < infinity)
-         {
-            ds.colStatus(idx) = SPxBasis::Desc::D_ON_BOTH;
             theUCbound[idx] = theLCbound[idx];
-            //@             theUCbound[idx]   = object[i];
-         }
-
-         else
-            ds.colStatus(idx) = SPxBasis::Desc::D_ON_UPPER;
          newCoPrhs = theLCbound[idx];
          newUBbound = SPxLP::upper(idx);
          newLBbound = SPxLP::lower(idx);
          enterBound = SPxLP::lower(idx);
          break;
       case SPxBasis::Desc::P_FREE :
+         assert(rep() == COLUMN);
+         ds.colStatus(idx) = dualColStatus(idx);
          if (thePvec->delta()[idx] * leaveMax > 0)
             newCoPrhs = theUCbound[idx];
          else
             newCoPrhs = theLCbound[idx];
-         ds.colStatus(idx) = SPxBasis::Desc::D_UNDEFINED;
          newUBbound = SPxLP::upper(idx);
          newLBbound = SPxLP::lower(idx);
          enterBound = 0;
          break;
       case SPxBasis::Desc::P_FIXED :
-         abort();
+         assert(rep() == COLUMN);
+         std::cerr << "SoPlex::getLeaveVals2(): "
+                   << "ERROR! Tried to put a fixed column variable into the basis."
+                   << std::endl;
+         std::cerr << "SoPlex::getLeaveVals2(): idx=" << idx
+                   << ", lower=" << lower(idx)
+                   << ", upper=" << upper(idx) << std::endl;
+         ABORT();
 
       default:
-         abort();
+         ABORT();
       }
+      TRACE({ std::cout << "SoPlex::getLeaveVals2(): col " << idx
+                        << ": " << enterStat
+                        << " -> " << ds.colStatus(idx)
+                        << std::endl; });
    }
 
 }
@@ -454,9 +467,13 @@ void SoPlex::rejectLeave(
    const SVector* //newVec
 )
 {
+   TRACE_METHOD( "SoPlex::rejectLeave()" );
    SPxBasis::Desc& ds = desc();
    if (leaveId.isSPxRowId())
    {
+      TRACE({ std::cout << "SoPlex::rejectLeave()  : row " << leaveNum
+                        << ": " << ds.rowStatus(leaveNum)
+                        << " -> " << leaveStat << std::endl; });
       if (leaveStat == SPxBasis::Desc::D_ON_BOTH)
       {
          if (ds.rowStatus(leaveNum) == SPxBasis::Desc::P_ON_LOWER)
@@ -468,6 +485,9 @@ void SoPlex::rejectLeave(
    }
    else
    {
+      TRACE({ std::cout << "SoPlex::rejectLeave()  : col " << leaveNum
+                        << ": " << ds.colStatus(leaveNum)
+                        << " -> " << leaveStat << std::endl; });
       if (leaveStat == SPxBasis::Desc::D_ON_BOTH)
       {
          if (ds.colStatus(leaveNum) == SPxBasis::Desc::P_ON_UPPER)
@@ -482,6 +502,7 @@ void SoPlex::rejectLeave(
 
 int SoPlex::leave(int leaveIdx)
 {
+   TRACE_METHOD( "SoPlex::leave()" );
    assert(leaveIdx < dim() && leaveIdx >= 0);
    assert(type() == LEAVE);
    assert(initialized);
@@ -513,10 +534,10 @@ int SoPlex::leave(int leaveIdx)
    assert(theCoPvec->isConsistent());
 
    SPxBasis::Desc::Status leaveStat;      // status of leaving var
-   Id leaveId;        // id of leaving var
+   Id   leaveId;        // id of leaving var
    Real leaveMax;       // maximium lambda of leaving var
    Real leavebound;     // current fVec value of leaving var
-   int leaveNum;       // number of leaveId in bounds
+   int  leaveNum;       // number of leaveId in bounds
    getLeaveVals(leaveIdx, leaveStat, leaveId, leaveMax, leavebound, leaveNum);
 
    if (m_numCycle > m_maxCycle)
@@ -528,7 +549,6 @@ int SoPlex::leave(int leaveIdx)
       //@ m_numCycle /= 2;
    }
    //@ testBounds();
-
 
    for(;;)
    {
@@ -543,12 +563,15 @@ int SoPlex::leave(int leaveIdx)
       {
          Id none;
          change(leaveIdx, none, 0);
+         /* the following line originally was below in "rejecting leave" case;
+            we need it in the unbounded/infeasible case, too, to have the 
+            correct basis size */
+         rejectLeave(leaveNum, leaveId, leaveStat);
          if (enterVal != leaveMax)
          {
             TRACE( std::cerr << "rejecting leave" << std::endl; );
-            rejectLeave(leaveNum, leaveId, leaveStat);
             theCoTest[leaveIdx] *= 0.01;            // #== fTest()#
-            theCoTest[leaveIdx] -= 2 * delta();       // #== fTest()#
+            theCoTest[leaveIdx] -= 2 * delta();     // #== fTest()#
             return 1;
          }
          if (rep() != COLUMN)
@@ -566,7 +589,6 @@ int SoPlex::leave(int leaveIdx)
       else if (enterId != baseId(leaveIdx))
       {
          const SVector& newVector = *enterVector(enterId);
-
 
          // update feasibility vectors
          if (solveVector2)
@@ -611,7 +633,7 @@ int SoPlex::leave(int leaveIdx)
          Real newCoPrhs;
 
          getLeaveVals2(leaveMax, enterId,
-                        enterBound, newUBbound, newLBbound, newCoPrhs);
+                       enterBound, newUBbound, newLBbound, newCoPrhs);
 
          theUBbound[leaveIdx] = newUBbound;
          theLBbound[leaveIdx] = newLBbound;
@@ -674,6 +696,7 @@ int SoPlex::leave(int leaveIdx)
          }
          else
          {
+            assert( leaveStat == SPxBasis::Desc::P_ON_LOWER );
             if (leaveId.isSPxRowId())
             {
                ds.rowStatus(leaveNum) = SPxBasis::Desc::P_ON_UPPER;

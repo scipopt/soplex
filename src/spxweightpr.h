@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightpr.h,v 1.9 2002/01/31 08:19:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightpr.h,v 1.10 2002/03/01 13:15:32 bzfpfend Exp $"
 
 /**@file  spxweightpr.h
  * @brief Weighted pricing.
@@ -52,6 +52,8 @@ private:
 
    Real objlength;              // length of objective vector.
 
+   /// compute leave penalties.
+   void computeLeavePenalty(int start, int end);
    /// compute weights for columns.
    void computeCP(int start, int end);
    /// compute weights for rows.

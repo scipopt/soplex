@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultpr.cpp,v 1.8 2002/01/31 08:19:28 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefaultpr.cpp,v 1.9 2002/03/01 13:15:31 bzfpfend Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -33,7 +33,7 @@ int SPxDefaultPR::selectLeaveX(int start, int incr)
    //    const Real* low = thesolver->lbBound();
 
    Real best = -theeps;
-   int    n    = -1;
+   int  n    = -1;
 
    for(int i = thesolver->dim() - start - 1; i >= 0; i -= incr)
    {

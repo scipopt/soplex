@@ -13,9 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.23 2002/02/13 16:56:06 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.24 2002/03/01 13:15:31 bzfpfend Exp $"
 
-//#define DEBUG 1
+// #define DEBUG 1
 
 #include <assert.h>
 #include <iostream>
@@ -38,18 +38,21 @@ static Real minStab;
 SPxBasis::Desc::Status
 SPxBasis::dualStatus(const SPxLP::SPxColId& id) const
 {
+   TRACE_METHOD( "SPxBasis::dualStatus()" );
    return dualColStatus(static_cast<SPxLP*>(theLP)->number(id));
 }
 
 SPxBasis::Desc::Status
 SPxBasis::dualStatus(const SPxLP::SPxRowId& id) const
 {
+   TRACE_METHOD( "SPxBasis::dualStatus()" );
    return dualRowStatus((static_cast<SPxLP*>(theLP))->number(id));
 }
 
 SPxBasis::Desc::Status
 SPxBasis::dualRowStatus(int i) const
 {
+   TRACE_METHOD( "SPxBasis::dualRowStatus()" );
    assert(theLP != 0);
 
    if (theLP->rhs(i) < infinity)
@@ -73,6 +76,7 @@ SPxBasis::dualRowStatus(int i) const
 SPxBasis::Desc::Status
 SPxBasis::dualColStatus(int i) const
 {
+   TRACE_METHOD( "SPxBasis::dualColStatus()" );
    assert(theLP != 0);
 
    if (theLP->SPxLP::upper(i) < infinity)
@@ -95,6 +99,7 @@ SPxBasis::dualColStatus(int i) const
 
 void SPxBasis::loadMatrixVecs()
 {
+   TRACE_METHOD( "SPxBasis::loadMatrixVecs()" );
    assert(theLP != 0);
    assert(theLP->dim() == matrix.size());
 
@@ -107,6 +112,8 @@ void SPxBasis::loadMatrixVecs()
    }
    matrixIsSetup = true;
    factorized = false;
+   if (factor != 0)
+      factor->clear();
 }
 
 /*
@@ -117,6 +124,7 @@ void SPxBasis::loadMatrixVecs()
  */
 void SPxBasis::load(const Desc& ds)
 {
+   TRACE_METHOD( "SPxBasis::load()" );
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
    assert(ds.nRows() == theLP->nRows());
@@ -139,6 +147,8 @@ void SPxBasis::load(const Desc& ds)
 
    assert(theLP->dim() == matrix.size());
 
+   TRACE( dump(); );
+
    nzCount = 0;
    for (j = i = 0; i < theLP->nRows(); ++i)
    {
@@ -148,11 +158,6 @@ void SPxBasis::load(const Desc& ds)
          theBaseId[j] = id;
          matrix[j] = &theLP->vector(id);
          nzCount += matrix[j++]->size();
-         TRACE({
-            std::cerr << "\tR" << theLP->number(id);
-            if(j % 8 == 0)
-               std::cerr << std::endl;
-         });
       }
    }
 
@@ -164,11 +169,6 @@ void SPxBasis::load(const Desc& ds)
          theBaseId[j] = id;
          matrix[j] = &theLP->vector(id);
          nzCount += matrix[j++]->size();      
-         TRACE({
-            std::cerr << "\tC" << theLP->number(id);
-            if(j % 8 == 0)
-               std::cerr << std::endl;
-         });
       }
    }
 
@@ -182,6 +182,7 @@ void SPxBasis::load(const Desc& ds)
 
 void SPxBasis::setRep()
 {
+   TRACE_METHOD( "SPxBasis::setRep()" );
    assert(theLP != 0);
 
    reDim();
@@ -201,6 +202,7 @@ void SPxBasis::setRep()
 
 void SPxBasis::load(SoPlex* lp)
 {
+   TRACE_METHOD( "SPxBasis::load()" );
    assert(lp != 0);
    theLP = lp;
 
@@ -216,6 +218,7 @@ void SPxBasis::load(SoPlex* lp)
 
 void SPxBasis::load(SLinSolver* p_solver)
 {
+   TRACE_METHOD( "SPxBasis::load()" );
    factor = p_solver;
    factorized = false;
    factor->clear();
@@ -231,12 +234,14 @@ void SPxBasis::load(SLinSolver* p_solver)
  *  @return true if the file was read correctly.
  *
  *  @todo This routine is untested.
+ *  @todo We have to check for P_FIXED, if lower == upper
  */
 bool SPxBasis::readBasis(
    std::istream&  is, 
    const NameSet& rownames, 
    const NameSet& colnames)
 {
+   TRACE_METHOD( "SPxBasis::readBasis()" );
    assert(theLP != 0);
 
    int  i;
@@ -312,6 +317,7 @@ void SPxBasis::writeBasis(
    const NameSet& /*rownames*/, 
    const NameSet& /*colnames*/)
 {
+   TRACE_METHOD( "SPxBasis::writeBasis()" );
    assert(theLP != 0);
 
    os << "NAME  soplex.bas\n";     
@@ -323,6 +329,10 @@ void SPxBasis::writeBasis(
  */
 int SPxBasis::doFactorize()
 {
+   TRACE_METHOD( "SPxBasis::doFactorize()" );
+   if (!factorized)
+      return true;
+
    if (nonzeroFactor < 0)
       return (updateCount >= -nonzeroFactor);
 
@@ -341,6 +351,7 @@ void SPxBasis::change
    const SSVector* eta
 )
 {
+   TRACE_METHOD( "SPxBasis::change()" );
    assert(matrixIsSetup);
    assert(!id.isValid() || (enterVec != 0));
 
@@ -383,13 +394,15 @@ void SPxBasis::change
 
 void SPxBasis::factorize()
 {
+   TRACE_METHOD( "SPxBasis::factorize()" );
    assert(factor != 0);
 
    if (!matrixIsSetup)
       load(thedesc);
 
+   assert(matrixIsSetup);
+
    updateCount = 0;
-   factorized = true;
    switch (factor->load(matrix.get_ptr(), matrix.size()))
    {
    case SLinSolver::OK :
@@ -408,15 +421,17 @@ void SPxBasis::factorize()
       break;
    default :
       std::cerr << "ERROR: unknown status of factorization.\n";
-      abort();
+      ABORT();
       // factorized = false;
    }
    lastFill = Real(factor->memory()) * nonzeroFactor / Real(nzCount);
    nzFac = 0;
+   factorized = true;
 }
 
 Vector& SPxBasis::multWithBase(Vector& x) const
 {
+   TRACE_METHOD( "SPxBasis::multWithBase()" );
    assert(status() > SINGULAR);
    assert(theLP->dim() == x.dim());
 
@@ -425,6 +440,8 @@ Vector& SPxBasis::multWithBase(Vector& x) const
 
    if (!matrixIsSetup)
       (const_cast<SPxBasis*>(this))->load(thedesc);
+
+   assert( matrixIsSetup );
 
    for (i = x.dim() - 1; i >= 0; --i)
       x[i] = *(matrix[i]) * tmp;
@@ -434,6 +451,7 @@ Vector& SPxBasis::multWithBase(Vector& x) const
 
 Vector& SPxBasis::multBaseWith(Vector& x) const
 {
+   TRACE_METHOD( "SPxBasis::multBaseWith()" );
    assert(status() > SINGULAR);
    assert(theLP->dim() == x.dim());
 
@@ -442,6 +460,8 @@ Vector& SPxBasis::multBaseWith(Vector& x) const
 
    if (!matrixIsSetup)
       (const_cast<SPxBasis*>(this))->load(thedesc);
+
+   assert( matrixIsSetup );
 
    x.clear();
    for (i = x.dim() - 1; i >= 0; --i)
@@ -453,8 +473,50 @@ Vector& SPxBasis::multBaseWith(Vector& x) const
    return x;
 }
 
+void SPxBasis::dump()
+{
+   TRACE_METHOD( "SPxBasis::dump()" );
+   assert(status() > NO_PROBLEM);
+   assert(theLP != 0);
+   assert(thedesc.nRows() == theLP->nRows());
+   assert(thedesc.nCols() == theLP->nCols());
+   assert(theLP->dim() == matrix.size());
+
+   int i, basesize;
+
+   std::cout << "Basis entries:" << std::endl;
+   basesize = 0;
+   for (i = 0; i < theLP->nRows(); ++i)
+   {
+      if (theLP->isBasic(thedesc.rowStatus(i)))
+      {
+         SPxLP::SPxRowId id = theLP->SPxLP::rId(i);
+         std::cout << "\tR" << theLP->number(id);
+         basesize++;
+         if(basesize % 8 == 0)
+            std::cout << std::endl;
+      }
+   }
+
+   for (i = 0; i < theLP->nCols(); ++i)
+   {
+      if (theLP->isBasic(thedesc.colStatus(i)))
+      {
+         SPxLP::SPxColId id = theLP->SPxLP::cId(i);
+         std::cout << "\tC" << theLP->number(id);
+         basesize++;
+         if(basesize % 8 == 0)
+            std::cout << std::endl;
+      }
+   }
+   std::cout << std::endl;
+
+   assert(basesize == matrix.size());
+}
+
 bool SPxBasis::isConsistent() const
 {
+   TRACE_METHOD( "SPxBasis::isConsistent()" );
    int primals = 0;
    int i;
 
@@ -504,11 +566,14 @@ SPxBasis::SPxBasis()
    : theLP (0)
    , matrixIsSetup (false)
    , factor (0)
+   , factorized (false)
    , maxUpdates (1000)
    , nonzeroFactor (10)
    , nzCount (1)
    , thestatus (NO_PROBLEM)
-{}
+{
+   TRACE_METHOD( "SPxBasis::SPxBasis()" );
+}
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

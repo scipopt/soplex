@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxalloc.h,v 1.6 2002/02/11 15:32:53 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxalloc.h,v 1.7 2002/03/01 13:15:31 bzfpfend Exp $"
 
 /**@file  spxalloc.h
  * @brief Memory allocation routines.
@@ -24,6 +24,8 @@
 #include <iostream>
 #include <stdlib.h>
 #include <assert.h>
+
+#include "real.h"
 
 namespace soplex
 {
@@ -54,7 +56,7 @@ inline void spx_alloc(T& p, int n)
    if (0 == p)
    {
       std::cerr << "malloc: Out of memory" << std::endl;
-      abort();
+      ABORT();
    }
 }
 
@@ -73,7 +75,7 @@ inline void spx_realloc(T& p, int n)
    if (0 == p)
    {
       std::cerr << "realloc: Out of memory" << std::endl;
-      abort();
+      ABORT();
    }
 }
 

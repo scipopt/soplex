@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.cpp,v 1.15 2002/01/31 08:19:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.cpp,v 1.16 2002/03/01 13:15:32 bzfpfend Exp $"
 
 #include <stdio.h>
 
@@ -25,6 +25,7 @@ namespace soplex
 {
 void SPxLP::getRow(int i, LPRow& row) const
 {
+   TRACE_METHOD( "SPxLP::getRow()" );
    row.setLhs(lhs(i));
    row.setRhs(rhs(i));
    row.setRowVector(DSVector(rowVector(i)));
@@ -32,6 +33,7 @@ void SPxLP::getRow(int i, LPRow& row) const
 
 void SPxLP::getRows(int start, int end, LPRowSet& p_set) const
 {
+   TRACE_METHOD( "SPxLP::getRows()" );
    p_set.clear();
    for(int i = start; i <= end; i++)
       p_set.add(lhs(i), rowVector(i), rhs(i));
@@ -39,6 +41,7 @@ void SPxLP::getRows(int start, int end, LPRowSet& p_set) const
 
 void SPxLP::getCol(int i, LPCol& col) const
 {
+   TRACE_METHOD( "SPxLP::getCol()" );
    col.setUpper(upper(i));
    col.setLower(lower(i));
    col.setObj(spxSense() * obj(i));
@@ -47,6 +50,7 @@ void SPxLP::getCol(int i, LPCol& col) const
 
 void SPxLP::getCols(int start, int end, LPColSet& p_set) const
 {
+   TRACE_METHOD( "SPxLP::getCols()" );
    p_set.clear();
    for(int i = start; i <= end; i++)
       p_set.add(obj(i), lower(i), colVector(i), upper(i));
@@ -54,6 +58,7 @@ void SPxLP::getCols(int start, int end, LPColSet& p_set) const
 
 void SPxLP::getObj(Vector& p_obj) const
 {
+   TRACE_METHOD( "SPxLP::getObj()" );
    p_obj = LPColSet::obj();
    if (spxSense() == MINIMIZE)
       p_obj *= -1;
@@ -61,6 +66,7 @@ void SPxLP::getObj(Vector& p_obj) const
 
 void SPxLP::doAddRow(const LPRow& row)
 {
+   TRACE_METHOD( "SPxLP::doAddRow()" );
    int idx = nRows();
    int oldColNumber = nCols();
    const SVector& vec = row.rowVector();
@@ -90,6 +96,7 @@ void SPxLP::doAddRow(const LPRow& row)
 
 void SPxLP::doAddCol(const LPCol& col)
 {
+   TRACE_METHOD( "SPxLP::doAddCol()" );
    int idx = nCols();
    int oldRowNumber = nRows();
    const SVector& vec = col.colVector();
@@ -120,6 +127,10 @@ void SPxLP::doAddCol(const LPCol& col)
 
 void SPxLP::added2Set(SVSet& p_set, const SVSet& p_add, int n)
 {
+   TRACE_METHOD( "SPxLP::added2Set()" );
+   if( n == 0 )
+      return;
+
    int i, j, end, tot;
    DataArray < int > moreArray(p_set.num());
    int* more = moreArray.get_ptr();
@@ -162,6 +173,7 @@ void SPxLP::added2Set(SVSet& p_set, const SVSet& p_add, int n)
 
 void SPxLP::doAddRows(const LPRowSet& p_set)
 {
+   TRACE_METHOD( "SPxLP::doAddRows()" );
    int i, j, k, ii, idx;
    SVector* col;
    DataArray < int > newCols(nCols());
@@ -236,6 +248,7 @@ void SPxLP::doAddRows(const LPRowSet& p_set)
 
 void SPxLP::doAddCols(const LPColSet& p_set)
 {
+   TRACE_METHOD( "SPxLP::doAddCols()" );
    int i, j;
    int oldColNumber = nCols();
    int oldRowNumber = nRows();
@@ -312,6 +325,7 @@ void SPxLP::doAddCols(const LPColSet& p_set)
 
 void SPxLP::addRows(SPxRowId id[], const LPRowSet& p_set)
 {
+   TRACE_METHOD( "SPxLP::isConsistent()" );
    int i = nRows();
    addRows(p_set);
    for (int j = 0; i < nRows(); ++i, ++j)
@@ -320,6 +334,7 @@ void SPxLP::addRows(SPxRowId id[], const LPRowSet& p_set)
 
 void SPxLP::addCols(SPxColId id[], const LPColSet& p_set)
 {
+   TRACE_METHOD( "SPxLP::addCols()" );
    int i = nCols();
    addCols(p_set);
    for (int j = 0; i < nCols(); ++i, ++j)
@@ -328,6 +343,7 @@ void SPxLP::addCols(SPxColId id[], const LPColSet& p_set)
 
 void SPxLP::doRemoveRow(int j)
 {
+   TRACE_METHOD( "SPxLP::doRemoveRow()" );
    const SVector& vec = rowVector(j);
    int i;
 
@@ -354,6 +370,7 @@ void SPxLP::doRemoveRow(int j)
 
 void SPxLP::doRemoveCol(int j)
 {
+   TRACE_METHOD( "SPxLP::doRemoveCol()" );
    const SVector& vec = colVector(j);
    int i;
 
@@ -380,6 +397,7 @@ void SPxLP::doRemoveCol(int j)
 
 void SPxLP::doRemoveRows(int perm[])
 {
+   TRACE_METHOD( "SPxLP::doRemoveRows()" );
    int j = nCols();
 
    LPRowSet::remove(perm);
@@ -399,6 +417,7 @@ void SPxLP::doRemoveRows(int perm[])
 
 void SPxLP::doRemoveCols(int perm[])
 {
+   TRACE_METHOD( "SPxLP::doRemoveCols()" );
    int j = nRows();
 
    LPColSet::remove(perm);
@@ -418,6 +437,7 @@ void SPxLP::doRemoveCols(int perm[])
 
 void SPxLP::removeRows(SPxRowId id[], int n, int perm[])
 {
+   TRACE_METHOD( "SPxLP::removeRows()" );
    if (perm == 0)
    {
       DataArray < int > p(nRows());
@@ -433,6 +453,7 @@ void SPxLP::removeRows(SPxRowId id[], int n, int perm[])
 
 void SPxLP::removeRows(int nums[], int n, int perm[])
 {
+   TRACE_METHOD( "SPxLP::removeRows()" );
    if (perm == 0)
    {
       DataArray < int > p(nRows());
@@ -448,6 +469,7 @@ void SPxLP::removeRows(int nums[], int n, int perm[])
 
 void SPxLP::removeRowRange(int start, int end, int perm[])
 {
+   TRACE_METHOD( "SPxLP::removeRowRange()" );
    if (perm == 0)
    {
       int i = end - start + 1;
@@ -469,6 +491,7 @@ void SPxLP::removeRowRange(int start, int end, int perm[])
 
 void SPxLP::removeCols(SPxColId id[], int n, int perm[])
 {
+   TRACE_METHOD( "SPxLP::removeCols()" );
    if (perm == 0)
    {
       DataArray < int > p(nCols());
@@ -484,6 +507,7 @@ void SPxLP::removeCols(SPxColId id[], int n, int perm[])
 
 void SPxLP::removeCols(int nums[], int n, int perm[])
 {
+   TRACE_METHOD( "SPxLP::removeCols()" );
    if (perm == 0)
    {
       DataArray < int > p(nCols());
@@ -499,6 +523,7 @@ void SPxLP::removeCols(int nums[], int n, int perm[])
 
 void SPxLP::removeColRange(int start, int end, int perm[])
 {
+   TRACE_METHOD( "SPxLP::removeColRange()" );
    if (perm == 0)
    {
       int i = end - start + 1;
@@ -520,6 +545,7 @@ void SPxLP::removeColRange(int start, int end, int perm[])
 
 void SPxLP::clear()
 {
+   TRACE_METHOD( "SPxLP::clear()" );
    LPRowSet::clear();
    LPColSet::clear();
    thesense = MAXIMIZE;
@@ -527,6 +553,7 @@ void SPxLP::clear()
 
 void SPxLP::changeObj(const Vector& newObj)
 {
+   TRACE_METHOD( "SPxLP::changeObj()" );
    assert(maxObj().dim() == newObj.dim());
    LPColSet::obj() = newObj;
    LPColSet::obj() *= spxSense();
@@ -535,12 +562,14 @@ void SPxLP::changeObj(const Vector& newObj)
 
 void SPxLP::changeObj(int i, Real newVal)
 {
+   TRACE_METHOD( "SPxLP::changeObj()" );
    LPColSet::obj(i) = spxSense() * newVal;
    assert(isConsistent());
 }
 
 void SPxLP::changeLower(const Vector& newLower)
 {
+   TRACE_METHOD( "SPxLP::changeLower()" );
    assert(lower().dim() == newLower.dim());
    LPColSet::lower() = newLower;
    assert(isConsistent());
@@ -548,12 +577,14 @@ void SPxLP::changeLower(const Vector& newLower)
 
 void SPxLP::changeLower(int i, Real newLower)
 {
+   TRACE_METHOD( "SPxLP::changeLower()" );
    LPColSet::lower(i) = newLower;
    assert(isConsistent());
 }
 
 void SPxLP::changeUpper(const Vector& newUpper)
 {
+   TRACE_METHOD( "SPxLP::changeUpper()" );
    assert(upper().dim() == newUpper.dim());
    LPColSet::upper() = newUpper;
    assert(isConsistent());
@@ -561,12 +592,14 @@ void SPxLP::changeUpper(const Vector& newUpper)
 
 void SPxLP::changeUpper(int i, Real newUpper)
 {
+   TRACE_METHOD( "SPxLP::changeUpper()" );
    LPColSet::upper(i) = newUpper;
    assert(isConsistent());
 }
 
 void SPxLP::changeLhs(const Vector& newLhs)
 {
+   TRACE_METHOD( "SPxLP::changeLhs()" );
    assert(lhs().dim() == newLhs.dim());
    LPRowSet::lhs() = newLhs;
    assert(isConsistent());
@@ -574,6 +607,7 @@ void SPxLP::changeLhs(const Vector& newLhs)
 
 void SPxLP::changeBounds(const Vector& newLower, const Vector& newUpper)
 {
+   TRACE_METHOD( "SPxLP::changeBounds()" );
    changeLower(newLower);
    changeUpper(newUpper);
    assert(isConsistent());
@@ -581,6 +615,7 @@ void SPxLP::changeBounds(const Vector& newLower, const Vector& newUpper)
 
 void SPxLP::changeBounds(int i, Real newLower, Real newUpper)
 {
+   TRACE_METHOD( "SPxLP::changeBounds()" );
    changeLower(i, newLower);
    changeUpper(i, newUpper);
    assert(isConsistent());
@@ -588,12 +623,14 @@ void SPxLP::changeBounds(int i, Real newLower, Real newUpper)
 
 void SPxLP::changeLhs(int i, Real newLhs)
 {
+   TRACE_METHOD( "SPxLP::changeLhs()" );
    LPRowSet::lhs(i) = newLhs;
    assert(isConsistent());
 }
 
 void SPxLP::changeRhs(const Vector& newRhs)
 {
+   TRACE_METHOD( "SPxLP::changeRhs()" );
    assert(rhs().dim() == newRhs.dim());
    LPRowSet::rhs() = newRhs;
    assert(isConsistent());
@@ -601,12 +638,14 @@ void SPxLP::changeRhs(const Vector& newRhs)
 
 void SPxLP::changeRhs(int i, Real newRhs)
 {
+   TRACE_METHOD( "SPxLP::changeRhs()" );
    LPRowSet::rhs(i) = newRhs;
    assert(isConsistent());
 }
 
 void SPxLP::changeRange(const Vector& newLhs, const Vector& newRhs)
 {
+   TRACE_METHOD( "SPxLP::changeRange()" );
    changeLhs(newLhs);
    changeRhs(newRhs);
    assert(isConsistent());
@@ -614,6 +653,7 @@ void SPxLP::changeRange(const Vector& newLhs, const Vector& newRhs)
 
 void SPxLP::changeRange(int i, Real newLhs, Real newRhs)
 {
+   TRACE_METHOD( "SPxLP::changeRange()" );
    changeLhs(i, newLhs);
    changeRhs(i, newRhs);
    assert(isConsistent());
@@ -622,6 +662,7 @@ void SPxLP::changeRange(int i, Real newLhs, Real newRhs)
 
 void SPxLP::changeRow(int n, const LPRow& newRow)
 {
+   TRACE_METHOD( "SPxLP::changeRow()" );
    int j;
    SVector& row = rowVector_w(n);
    for (j = row.size() - 1; j >= 0; --j)
@@ -646,6 +687,7 @@ void SPxLP::changeRow(int n, const LPRow& newRow)
 
 void SPxLP::changeCol(int n, const LPCol& newCol)
 {
+   TRACE_METHOD( "SPxLP::changeCol()" );
    int j;
    SVector& col = colVector_w(n);
    for (j = col.size() - 1; j >= 0; --j)
@@ -671,6 +713,7 @@ void SPxLP::changeCol(int n, const LPCol& newCol)
 
 void SPxLP::changeElement(int i, int j, Real val)
 {
+   TRACE_METHOD( "SPxLP::changeElement()" );
    SVector& row = rowVector_w(i);
    SVector& col = colVector_w(j);
 
@@ -697,6 +740,7 @@ void SPxLP::changeElement(int i, int j, Real val)
 
 bool SPxLP::isConsistent() const
 {
+   TRACE_METHOD( "SPxLP::isConsistent()" );
    int i, j, n;
 
    for (i = nCols() - 1; i >= 0; --i)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.20 2002/02/13 16:56:06 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.21 2002/03/01 13:15:31 bzfpfend Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -362,7 +362,13 @@ public:
    /// sets basis #SPxStatus to #stat.
    void setStatus(SPxStatus stat)
    {
+      TRACE_METHOD( "SPxBasis::setStatus()" );
+      TRACE({ std::cout << "SPxBasis::setStatus(): status: "
+                        << int(thestatus) << " -> "
+                        << int(stat) << std::endl; });
       thestatus = stat;
+      if( stat == NO_PROBLEM )
+         invalidate();
    }
 
    ///
@@ -494,56 +500,64 @@ public:
    ///
    void solve2 (Vector& x, Vector& rhs)
    {
+      TRACE_METHOD( "SPxBasis::solve2()" );
       if (!factorized) factorize();
       factor->solve2right(x, rhs);
    }
    ///
    void solve2 (Vector& x, SSVector& rhs)
    {
+      TRACE_METHOD( "SPxBasis::solve2()" );
       if (!factorized) factorize();
       factor->solve2right(x, rhs);
    }
    ///
    void solve2 (SSVector& x, Vector& rhs)
    {
+      TRACE_METHOD( "SPxBasis::solve2()" );
       if (!factorized) factorize();
       factor->solve2right(x, rhs);
    }
    ///
    void solve2 (SSVector& x, SSVector& rhs)
    {
+      TRACE_METHOD( "SPxBasis::solve2()" );
       if (!factorized) factorize();
       factor->solve2right(x, rhs);
    }   
    ///
    void solve (Vector& x, const Vector& rhs)
    {
+      TRACE_METHOD( "SPxBasis::solve()" );
       if (!factorized) factorize();
       factor->solveRight(x, rhs);
    }
    ///
    void solve (Vector& x, const SVector& rhs)
    {
+      TRACE_METHOD( "SPxBasis::solve()" );
        if (!factorized) factorize();
        factor->solveRight(x, rhs);
    }
    ///
    void solve (SSVector& x, const SVector& rhs)
    {
+      TRACE_METHOD( "SPxBasis::solve()" );
       if (!factorized) factorize();
       factor->solveRight(x, rhs);
    }
    ///
    void solve (SSVector& x, const Vector& rhs)
    {
+      TRACE_METHOD( "SPxBasis::solve()" );
       if (!factorized) factorize();
       factor->solveRight(x, rhs);
    }
    /// solves linear system with basis matrix.
    /** Depending on the representation, for a #SPxBasis B,
        B.solve(x) computes
-       - \f$x \leftarrow B^{-1}x\f$       in the columnwise case and
-       - \f$x \leftarrow x^TB^{-1}\f$     in the rowwise case.
+       - \f$x \leftarrow B^{-1}rhs\f$       in the columnwise case and
+       - \f$x \leftarrow rhs^TB^{-1}\f$     in the rowwise case.
 
        Both can be seen uniformly as solving a linear system with the basis
        matrix #B and a right handside vector #x aligned the same way as
@@ -551,6 +565,7 @@ public:
     */
    void solve4update(SSVector& x, const SVector& rhs)
    {
+      TRACE_METHOD( "SPxBasis::solve4update()" );
       if (!factorized) factorize();
       factor->solveRight4update(x, rhs);
    }
@@ -558,6 +573,7 @@ public:
    void solve4update(SSVector& x, Vector& y,
                      const SVector& rhsx, SSVector& rhsy)
    {
+      TRACE_METHOD( "SPxBasis::solve4update()" );
       if (!factorized) factorize();
       factor->solve2right4update(x, y, rhsx, rhsy);
    }
@@ -568,50 +584,57 @@ public:
    ///
    void coSolve2(Vector& x, Vector& rhs)
    {
+      TRACE_METHOD( "SPxBasis::coSolve2()" );
       if (!factorized) factorize();
       factor->solve2left(x, rhs);
    }
    ///
    void coSolve2(Vector& x, SSVector& rhs)
    {
+      TRACE_METHOD( "SPxBasis::coSolve2()" );
       if (!factorized) factorize();
       factor->solve2left(x, rhs);
    }
    ///
    void coSolve2(SSVector& x, Vector& rhs)
    {
+      TRACE_METHOD( "SPxBasis::coSolve2()" );
       if (!factorized) factorize();
       factor->solve2left(x, rhs);
    }
    ///
    void coSolve2(SSVector& x, SSVector& rhs)
    {
+      TRACE_METHOD( "SPxBasis::coSolve2()" );
       if (!factorized) factorize();
       factor->solve2left(x, rhs);
    }
    ///
    void coSolve(Vector& x, const Vector& rhs)
    {
+      TRACE_METHOD( "SPxBasis::coSolve()" );
       if (!factorized) factorize();
       factor->solveLeft(x, rhs);
    }
    ///
    void coSolve(Vector& x, const SVector& rhs)
    {
+      TRACE_METHOD( "SPxBasis::coSolve()" );
       if (!factorized) factorize();
       factor->solveLeft(x, rhs);
    }
    ///
    void coSolve(SSVector& x, const SVector& rhs)
    {
+      TRACE_METHOD( "SPxBasis::coSolve()" );
       if (!factorized) factorize();
       factor->solveLeft(x, rhs);
    }
    /// Cosolves linear system with basis matrix.
    /** Depending on the representation, for a #SPxBasis B,
        B.coSolve(x) computes
-       - \f$x \leftarrow x^TB^{-1}\f$     in the columnwise case and
-       - \f$x \leftarrow B^{-1}x\f$       in the rowwise case.
+       - \f$x \leftarrow rhs^TB^{-1}\f$     in the columnwise case and
+       - \f$x \leftarrow B^{-1}rhs\f$       in the rowwise case.
 
        Both can be seen uniformly as solving a linear system with the basis
        matrix #B and a right handside vector #x alligned the same way as
@@ -623,6 +646,7 @@ public:
     */
    void coSolve(SSVector& x, const Vector& rhs)
    {
+      TRACE_METHOD( "SPxBasis::coSolve()" );
       if (!factorized) factorize();
       factor->solveLeft(x, rhs);
    }
@@ -631,6 +655,7 @@ public:
    void coSolve(SSVector& x, Vector& y,
                  const SVector& rhsx, SSVector& rhsy)
    {
+      TRACE_METHOD( "SPxBasis::coSolve()" );
       if (!factorized) factorize();
       factor->solveLeft(x, y, rhsx, rhsy);
    }
@@ -724,6 +749,7 @@ public:
    /// unloads the LP from the basis.
    void unLoad()
    {
+      TRACE_METHOD( "SPxBasis::unLoad()" );
       theLP = 0;
       setStatus(NO_PROBLEM);
    }
@@ -734,6 +760,9 @@ public:
    */
    void invalidate();
 
+   /// output basis entries.
+   void dump();
+   
    /// consistency check.
    bool isConsistent() const;
    //@}

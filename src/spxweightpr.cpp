@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.12 2002/01/31 08:19:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.13 2002/03/01 13:15:32 bzfpfend Exp $"
 
 #include <assert.h>
 
@@ -42,18 +42,22 @@ void SPxWeightPR::setType(SoPlex::Type tp)
 {
    if (thesolver && tp == SoPlex::LEAVE)
    {
-      int i;
-      const SPxBasis& basis = solver()->basis();
+      leavePenalty.reDim( thesolver->dim() );
+      computeLeavePenalty( 0, thesolver->dim() );
+   }
+}
 
-      leavePenalty.reDim(thesolver->dim());
-      for (i = thesolver->dim() - 1; i >= 0; --i)
-      {
-         SoPlex::Id id = basis.baseId(i);
-         if (id.type() == SPxLP::Id::ROWID)
-            leavePenalty[i] = rPenalty[ thesolver->number(id) ];
-         else
-            leavePenalty[i] = cPenalty[ thesolver->number(id) ];
-      }
+void SPxWeightPR::computeLeavePenalty(int start, int end)
+{
+   const SPxBasis& basis = solver()->basis();
+
+   for (int i = start; i < end; ++i)
+   {
+      SoPlex::Id id = basis.baseId(i);
+      if (id.type() == SPxLP::Id::ROWID)
+         leavePenalty[i] = rPenalty[ thesolver->number(id) ];
+      else
+         leavePenalty[i] = cPenalty[ thesolver->number(id) ];
    }
 }
 
@@ -110,6 +114,35 @@ int SPxWeightPR::selectLeave()
       if (x < -theeps)
       {
          x *= leavePenalty[i];
+         if (type * (x-best) < 0.0)
+         {
+            best = x;
+            lastIdx = i;
+         }
+      }
+   }
+   assert(isConsistent());
+   return lastIdx;
+}
+
+#if 0
+/**@todo remove this code */
+// ??? This is the old (buggy) version
+int SPxWeightPR::selectLeave()
+{
+   const Real* test = thesolver->fTest().get_const_ptr();
+   Real type = 1 - 2 * (thesolver->rep() == SoPlex::COLUMN);
+   Real best = type * infinity;
+   int lastIdx = -1;
+   Real x;
+   int i;
+
+   for (i = solver()->dim() - 1; i >= 0; --i)
+   {
+      x = test[i];
+      if (x < -theeps)
+      {
+         x *= leavePenalty[i];
          if (x < best)
          {
             best = x;
@@ -120,6 +153,7 @@ int SPxWeightPR::selectLeave()
    assert(isConsistent());
    return lastIdx;
 }
+#endif
 
 SoPlex::Id SPxWeightPR::selectEnter()
 {
@@ -161,7 +195,7 @@ SoPlex::Id SPxWeightPR::selectEnter()
          case SPxBasis::Desc::D_UNDEFINED :
          case SPxBasis::Desc::P_FIXED :
          default:
-            abort();
+            ABORT();
          }
          if (x < best)
          {
@@ -199,7 +233,7 @@ SoPlex::Id SPxWeightPR::selectEnter()
          case SPxBasis::Desc::P_FIXED :
          case SPxBasis::Desc::D_UNDEFINED :
          default:
-            abort();
+            ABORT();
          }
          if (x < best)
          {
@@ -226,6 +260,12 @@ void SPxWeightPR::addedVecs(int)
       cPenalty.reDim(solver()->nCols());
       computeCP(start, solver()->nCols());
    }
+   if (solver()->type() == SoPlex::LEAVE)
+   {
+      int start = leavePenalty.dim();
+      leavePenalty.reDim( solver()->dim() );
+      computeLeavePenalty( start, solver()->dim() );
+   }
 }
 
 void SPxWeightPR::addedCoVecs(int)
@@ -241,6 +281,12 @@ void SPxWeightPR::addedCoVecs(int)
       int start = cPenalty.dim();
       cPenalty.reDim(solver()->nCols());
       computeCP(start, solver()->nCols());
+   }
+   if (solver()->type() == SoPlex::LEAVE)
+   {
+      int start = leavePenalty.dim();
+      leavePenalty.reDim( solver()->dim() );
+      computeLeavePenalty( start, solver()->dim() );
    }
 }
 

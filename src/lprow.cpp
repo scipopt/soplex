@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprow.cpp,v 1.11 2002/01/31 16:30:46 bzfpfend Exp $"
+#pragma ident "@(#) $Id: lprow.cpp,v 1.12 2002/03/01 13:15:30 bzfpfend Exp $"
 
 //#define DEBUG 1
 
@@ -58,9 +58,9 @@ void LPRow::setType(
    case RANGE:
       std::cerr << __FILE__ << __LINE__
                 << "RANGE not supported in LPRow::setType()" << std::endl;
-      abort();
+      ABORT();
    default:
-      abort();
+      ABORT();
    }
 }
 
@@ -89,7 +89,7 @@ LPRow::LPRow(const SVector& p_rowVector, LPRow::Type p_type, Real p_value)
       right = infinity;
       break;
    default:
-      abort();
+      ABORT();
    }
 }
 } // namespace soplex

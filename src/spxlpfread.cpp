@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.22 2002/02/13 16:56:07 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.23 2002/03/01 13:15:32 bzfpfend Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -442,7 +442,7 @@ bool SPxLP::readLPF(
             section = BINARYS;
          else if (hasKeyword(pos, "gen[erals]"))
             section = INTEGERS;
-         else if (hasKeyword(pos, "int[tegers]")) // this is undocumented
+         else if (hasKeyword(pos, "int[egers]")) // this is undocumented
             section = INTEGERS;
          else if (hasKeyword(pos, "end"))
          {
@@ -662,7 +662,7 @@ bool SPxLP::readLPF(
                pos++;
             break;
          default :
-            abort();
+            ABORT();
          }
       }
    }

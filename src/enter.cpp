@@ -13,9 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.12 2002/01/31 16:30:46 bzfpfend Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.13 2002/03/01 13:15:30 bzfpfend Exp $"
 
-//#define DEBUG 1
+// #define DEBUG 1
 
 /*      \SubSection{Updating the Basis for Entering Variables}
  */
@@ -60,6 +60,7 @@ all $j \ne i^*$ $f^{(i^*)}_j$ remains within its bounds $l_j$ and $u_j$.
  */
 Real SoPlex::test(int i, SPxBasis::Desc::Status stat) const
 {
+   TRACE_METHOD( "SoPlex::test()" );
    assert(type() == ENTER);
    assert(!isBasic(stat));
 
@@ -98,6 +99,7 @@ Real SoPlex::test(int i, SPxBasis::Desc::Status stat) const
 
 void SoPlex::computeTest()
 {
+   TRACE_METHOD( "SoPlex::computeTest()" );
    int i;
    const SPxBasis::Desc& ds = desc();
 
@@ -113,11 +115,13 @@ void SoPlex::computeTest()
 
 Real SoPlex::computePvec(int i)
 {
+   TRACE_METHOD( "SoPlex::computePvec()" );
    return (*thePvec)[i] = vector(i) * (*theCoPvec);
 }
 
 Real SoPlex::computeTest(int i)
 {
+   TRACE_METHOD( "SoPlex::computeTest()" );
    SPxBasis::Desc::Status stat = desc().status(i);
    if (isBasic(stat))
       return theTest[i] = 0;
@@ -131,6 +135,7 @@ Real SoPlex::computeTest(int i)
  */
 Real SoPlex::coTest(int i, SPxBasis::Desc::Status stat) const
 {
+   TRACE_METHOD( "SoPlex::coTest()" );
    assert(type() == ENTER);
    assert(!isBasic(stat));
 
@@ -166,6 +171,7 @@ Real SoPlex::coTest(int i, SPxBasis::Desc::Status stat) const
 
 void SoPlex::computeCoTest()
 {
+   TRACE_METHOD( "SoPlex::computeCoTest()" );
    int i;
    const SPxBasis::Desc& ds = desc();
 
@@ -186,6 +192,7 @@ void SoPlex::computeCoTest()
  */
 void SoPlex::updateTest()
 {
+   TRACE_METHOD( "SoPlex::updateTest()" );
    thePvec->delta().setup();
 
    const IdxSet& idx = thePvec->idx();
@@ -205,6 +212,7 @@ void SoPlex::updateTest()
 
 void SoPlex::updateCoTest()
 {
+   TRACE_METHOD( "SoPlex::updateCoTest()" );
    theCoPvec->delta().setup();
 
    const IdxSet& idx = theCoPvec->idx();
@@ -241,6 +249,7 @@ void SoPlex::getEnterVals
    Real& enterRO
 )
 {
+   TRACE_METHOD( "SoPlex::getEnterVals()" );
    int enterIdx;
    SPxBasis::Desc& ds = desc();
 
@@ -268,30 +277,37 @@ void SoPlex::getEnterVals
       {
          // primal/columnwise cases:
       case SPxBasis::Desc::P_ON_UPPER :
+         assert( rep() == COLUMN );
          enterUB = theUCbound[enterIdx];
          enterLB = theLCbound[enterIdx];
          enterVal = enterUB;
          enterMax = enterLB - enterUB;
          enterPric = (*thePvec)[enterIdx];
          enterRO = maxObj(enterIdx);
-         ds.colStatus(enterIdx)
-         = (enterLB <= -infinity)
-           ? SPxBasis::Desc::D_ON_LOWER
-        : SPxBasis::Desc::D_ON_BOTH;
+         if( enterLB <= -infinity )
+            ds.colStatus(enterIdx) = SPxBasis::Desc::D_ON_LOWER;
+         else if( EQ( enterLB, enterUB ) )
+            ds.colStatus(enterIdx) = SPxBasis::Desc::D_FREE;
+         else
+            ds.colStatus(enterIdx) = SPxBasis::Desc::D_ON_BOTH;
          break;
       case SPxBasis::Desc::P_ON_LOWER :
+         assert( rep() == COLUMN );
          enterUB = theUCbound[enterIdx];
          enterLB = theLCbound[enterIdx];
          enterVal = enterLB;
          enterMax = enterUB - enterLB;
          enterPric = (*thePvec)[enterIdx];
          enterRO = maxObj(enterIdx);
-         ds.colStatus(enterIdx)
-         = (enterUB >= infinity)
-           ? SPxBasis::Desc::D_ON_UPPER
-        : SPxBasis::Desc::D_ON_BOTH;
+         if( enterUB >= infinity )
+            ds.colStatus(enterIdx) = SPxBasis::Desc::D_ON_UPPER;
+         else if( EQ( enterLB, enterUB ) )
+            ds.colStatus(enterIdx) = SPxBasis::Desc::D_FREE;
+         else
+            ds.colStatus(enterIdx) = SPxBasis::Desc::D_ON_BOTH;
          break;
       case SPxBasis::Desc::P_FREE :
+         assert( rep() == COLUMN );
          enterUB = theUCbound[enterIdx];
          enterLB = theLCbound[enterIdx];
          enterVal = 0;
@@ -303,6 +319,7 @@ void SoPlex::getEnterVals
 
          // dual/rowwise cases:
       case SPxBasis::Desc::D_ON_UPPER :
+         assert( rep() == ROW );
          assert(theUCbound[enterIdx] < infinity);
          enterUB = theUCbound[enterIdx];
          enterLB = -infinity;
@@ -313,6 +330,7 @@ void SoPlex::getEnterVals
          ds.colStatus(enterIdx) = SPxBasis::Desc::P_ON_LOWER;
          break;
       case SPxBasis::Desc::D_ON_LOWER :
+         assert( rep() == ROW );
          assert(theLCbound[enterIdx] > -infinity);
          enterLB = theLCbound[enterIdx];
          enterUB = infinity;
@@ -323,6 +341,7 @@ void SoPlex::getEnterVals
          ds.colStatus(enterIdx) = SPxBasis::Desc::P_ON_UPPER;
          break;
       case SPxBasis::Desc::D_FREE:
+         assert( rep() == ROW );
          assert(SPxLP::lower(enterIdx) == SPxLP::upper(enterIdx));
          enterUB = infinity;
          enterLB = -infinity;
@@ -336,6 +355,7 @@ void SoPlex::getEnterVals
          ds.colStatus(enterIdx) = SPxBasis::Desc::P_FIXED;
          break;
       case SPxBasis::Desc::D_ON_BOTH :
+         assert( rep() == ROW );
          enterPric = (*theCoPvec)[enterIdx];
          if (enterPric > SPxLP::upper(enterIdx))
          {
@@ -358,8 +378,12 @@ void SoPlex::getEnterVals
          break;
 
       default:
-         abort();
+         ABORT();
       }
+      TRACE({ std::cout << "SoPlex::getEnterVals() : col " << enterIdx
+                        << ": " << enterStat
+                        << " -> " << ds.colStatus(enterIdx)
+                        << std::endl; });
    }
 
    else
@@ -387,32 +411,40 @@ void SoPlex::getEnterVals
       {
          // primal/columnwise cases:
       case SPxBasis::Desc::P_ON_UPPER :
+         assert( rep() == COLUMN );
          enterUB = theURbound[enterIdx];
          enterLB = theLRbound[enterIdx];
          enterVal = enterLB;
          enterMax = enterUB - enterLB;
          enterPric = (*theCoPvec)[enterIdx];
          enterRO = 0;
-         ds.rowStatus(enterIdx)
-         = (enterUB >= infinity)
-           ? SPxBasis::Desc::D_ON_LOWER
-        : SPxBasis::Desc::D_ON_BOTH;
+         if( enterUB >= infinity )
+            ds.rowStatus(enterIdx) = SPxBasis::Desc::D_ON_LOWER;
+         else if( EQ( enterLB, enterUB ) )
+            ds.rowStatus(enterIdx) = SPxBasis::Desc::D_FREE;
+         else
+            ds.rowStatus(enterIdx) = SPxBasis::Desc::D_ON_BOTH;
          break;
       case SPxBasis::Desc::P_ON_LOWER :
+         assert( rep() == COLUMN );
          enterUB = theURbound[enterIdx];
          enterLB = theLRbound[enterIdx];
          enterVal = enterUB;
          enterMax = enterLB - enterUB;
          enterPric = (*theCoPvec)[enterIdx];
          enterRO = 0;
-         ds.rowStatus(enterIdx)
-         = (enterLB <= -infinity)
-           ? SPxBasis::Desc::D_ON_UPPER
-        : SPxBasis::Desc::D_ON_BOTH;
+         if( enterLB <= -infinity )
+            ds.rowStatus(enterIdx) = SPxBasis::Desc::D_ON_UPPER;
+         else if( EQ( enterLB, enterUB ) )
+            ds.rowStatus(enterIdx) = SPxBasis::Desc::D_FREE;
+         else
+            ds.rowStatus(enterIdx) = SPxBasis::Desc::D_ON_BOTH;
          break;
       case SPxBasis::Desc::P_FREE :
-         abort();
-#if 0
+         assert( rep() == COLUMN );
+#if 1
+         ABORT();
+#else
          std::cerr << __FILE__ << __LINE__ << "ERROR: not yet debugged!\n";
          enterPric = (*theCoPvec)[enterIdx];
          enterRO = 0;
@@ -422,6 +454,7 @@ void SoPlex::getEnterVals
 
          // dual/rowwise cases:
       case SPxBasis::Desc::D_ON_UPPER :
+         assert( rep() == ROW );
          assert(theURbound[enterIdx] < infinity);
          enterUB = theURbound[enterIdx];
          enterLB = -infinity;
@@ -432,6 +465,7 @@ void SoPlex::getEnterVals
          ds.rowStatus(enterIdx) = SPxBasis::Desc::P_ON_LOWER;
          break;
       case SPxBasis::Desc::D_ON_LOWER :
+         assert( rep() == ROW );
          assert(theLRbound[enterIdx] > -infinity);
          enterLB = theLRbound[enterIdx];
          enterUB = infinity;
@@ -442,17 +476,18 @@ void SoPlex::getEnterVals
          ds.rowStatus(enterIdx) = SPxBasis::Desc::P_ON_UPPER;
          break;
       case SPxBasis::Desc::D_FREE:
+         assert( rep() == ROW );
          assert(rhs(enterIdx) == lhs(enterIdx));
          enterUB = infinity;
          enterLB = -infinity;
          enterVal = 0;
          enterPric = (*thePvec)[enterIdx];
          enterRO = rhs(enterIdx);
-         enterMax = (enterPric > enterRO) ? infinity
-                 : -infinity;
+         enterMax = (enterPric > enterRO) ? infinity : -infinity;
          ds.rowStatus(enterIdx) = SPxBasis::Desc::P_FIXED;
          break;
       case SPxBasis::Desc::D_ON_BOTH :
+         assert( rep() == ROW );
          enterPric = (*thePvec)[enterIdx];
          if (enterPric > rhs(enterIdx))
          {
@@ -475,8 +510,12 @@ void SoPlex::getEnterVals
          break;
 
       default:
-         abort();
+         ABORT();
       }
+      TRACE({ std::cout << "SoPlex::getEnterVals() : row " << enterIdx
+                        << ": " << enterStat
+                        << " -> " << ds.rowStatus(enterIdx)
+                        << std::endl; });
    }
 }
 
@@ -489,6 +528,7 @@ void SoPlex::getEnterVals2
    Real& leavebound
 )
 {
+   TRACE_METHOD( "SoPlex::getEnterVals2()" );
    int idx;
    SPxBasis::Desc& ds = desc();
    Id leftId = baseId(leaveIdx);
@@ -496,12 +536,13 @@ void SoPlex::getEnterVals2
    if (leftId.isSPxRowId())
    {
       idx = number(SPxRowId(leftId));
-      switch (ds.rowStatus(idx))
+      SPxBasis::Desc::Status leaveStat = ds.rowStatus(idx);
+
+      switch (leaveStat)
       {
       case SPxBasis::Desc::P_FIXED :
-      case SPxBasis::Desc::D_UNDEFINED :
-         abort();
-
+         assert(rep() == ROW);
+         ABORT();
       case SPxBasis::Desc::P_ON_UPPER :
          assert(rep() == ROW);
          leavebound = theLBbound[leaveIdx];
@@ -515,11 +556,11 @@ void SoPlex::getEnterVals2
          ds.rowStatus(idx) = dualRowStatus(idx);
          break;
       case SPxBasis::Desc::P_FREE :
-         abort();
-#if 0
-         std::cerr << __FILE__ << __LINE__ << "ERROR: not yet debugged!\n";
          assert(rep() == ROW);
-
+#if 1
+         ABORT();
+#else
+         std::cerr << __FILE__ << __LINE__ << "ERROR: not yet debugged!\n";
          if ((*theCoPvec)[leaveIdx] - theLBbound[leaveIdx] <
               theUBbound[leaveIdx] - (*theCoPvec)[leaveIdx])
          {
@@ -532,10 +573,13 @@ void SoPlex::getEnterVals2
             theURbound[idx] = leavebound;
          }
          ds.rowStatus(idx) = SPxBasis::Desc::D_UNDEFINED;
-#endif
          break;
+#endif
 
          // primal/columnwise cases:
+      case SPxBasis::Desc::D_UNDEFINED :
+         assert(rep() == COLUMN);
+         ABORT();
       case SPxBasis::Desc::D_FREE :
          assert(rep() == COLUMN);
          if (theFvec->delta()[leaveIdx] * enterMax < 0)
@@ -558,7 +602,7 @@ void SoPlex::getEnterVals2
          theLRbound[idx] = leavebound;
          ds.rowStatus(idx) = SPxBasis::Desc::P_ON_UPPER;
          break;
-      default:
+      case SPxBasis::Desc::D_ON_BOTH :
          assert(rep() == COLUMN);
          if (enterMax * theFvec->delta()[leaveIdx] < 0)
          {
@@ -573,14 +617,23 @@ void SoPlex::getEnterVals2
             ds.rowStatus(idx) = SPxBasis::Desc::P_ON_UPPER;
          }
          break;
+
+      default:
+         ABORT();
       }
+      TRACE({ std::cout << "SoPlex::getEnterVals2(): row " << idx
+                        << ": " << leaveStat
+                        << " -> " << ds.rowStatus(idx)
+                        << std::endl; });
    }
 
    else
    {
-      assert(baseId(leaveIdx).isSPxColId());
+      assert(leftId.isSPxColId());
       idx = number(SPxColId(leftId));
-      switch (ds.colStatus(idx))
+      SPxBasis::Desc::Status leaveStat = ds.colStatus(idx);
+
+      switch (leaveStat)
       {
       case SPxBasis::Desc::P_ON_UPPER :
          assert(rep() == ROW);
@@ -608,6 +661,9 @@ void SoPlex::getEnterVals2
          }
          ds.colStatus(idx) = SPxBasis::Desc::D_UNDEFINED;
          break;
+      case SPxBasis::Desc::P_FIXED:
+         assert(rep() == ROW);
+         ABORT();
 
          // primal/columnwise cases:
       case SPxBasis::Desc::D_FREE :
@@ -632,7 +688,8 @@ void SoPlex::getEnterVals2
          theUCbound[idx] = leavebound;
          ds.colStatus(idx) = SPxBasis::Desc::P_ON_UPPER;
          break;
-      default:
+      case SPxBasis::Desc::D_ON_BOTH :
+      case SPxBasis::Desc::D_UNDEFINED :
          assert(rep() == COLUMN);
          if (enterMax * theFvec->delta()[leaveIdx] < 0)
          {
@@ -647,7 +704,14 @@ void SoPlex::getEnterVals2
             ds.colStatus(idx) = SPxBasis::Desc::P_ON_LOWER;
          }
          break;
+
+      default:
+         ABORT();
       }
+      TRACE({ std::cout << "SoPlex::getEnterVals2(): col " << idx
+                        << ": " << leaveStat
+                        << " -> " << ds.colStatus(idx)
+                        << std::endl; });
    }
 }
 
@@ -660,6 +724,7 @@ SoPlex::ungetEnterVal(
    const SVector& vec
 )
 {
+   TRACE_METHOD( "SoPlex::ungetEnterVal()" );
    int enterIdx;
    SPxBasis::Desc& ds = desc();
 
@@ -694,6 +759,7 @@ void SoPlex::rejectEnter(
    SPxBasis::Desc::Status enterStat
 )
 {
+   TRACE_METHOD( "SoPlex::rejectEnter()" );
    int enterIdx = number(enterId);
    if (isId(enterId))
    {
@@ -709,6 +775,7 @@ void SoPlex::rejectEnter(
 
 int SoPlex::enter(Id& enterId)
 {
+   TRACE_METHOD( "SoPlex::enter()" );
    assert(enterId.isValid());
    assert(type() == ENTER);
    assert(initialized);
@@ -724,7 +791,7 @@ int SoPlex::enter(Id& enterId)
    const SVector* enterVec = enterVector(enterId);
 
    getEnterVals(enterId, enterTest, enterUB, enterLB,
-                 enterVal, enterMax, enterPric, enterStat, enterRO);
+                enterVal, enterMax, enterPric, enterStat, enterRO);
    //@ if(enterTest > ((theShift>epsilon()) ? -delta() : -epsilon()))
    if (enterTest > -epsilon())
    {
@@ -864,9 +931,12 @@ int SoPlex::enter(Id& enterId)
     */
    else
    {
+      /* The following line originally was in the "lastUpdate() > 1" case;
+         we need it in the INFEASIBLE/UNBOUNDED case, too, to have the
+         basis descriptor at the correct size. */
+      rejectEnter(enterId, enterTest, enterStat);
       if (lastUpdate() > 1)
       {
-         rejectEnter(enterId, enterTest, enterStat);
          factorize();
          return enter(enterId);
       }

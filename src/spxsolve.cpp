@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.41 2002/03/01 07:52:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.42 2002/03/01 13:15:32 bzfpfend Exp $"
 
 //#define DEBUG 1
 
@@ -35,6 +35,7 @@ namespace soplex
  */
 SoPlex::Status SoPlex::solve()
 {
+   TRACE_METHOD( "SoPlex::solve()" );
    Id enterId;
    int leaveNum;
 
@@ -82,8 +83,15 @@ SoPlex::Status SoPlex::solve()
        */
       if (thestarter != 0 && status() != REGULAR)  // no basis and no starter.
          thestarter->generate(*this);              // generate start basis.
-      init();
    }
+
+   /* Originally, init() was only called in the "!isInitialized()" case,
+      but the update of theFvec, theFrhs, ... in SoPlex::localAddRows() and
+      SoPlex::localAddCols() doesn't seem to work. Therefore, we call
+      init() here to set up all the vectors correctly.
+   */
+   init();
+
    thepricer->setEpsilon(delta());
    setType(type());
 
@@ -91,16 +99,7 @@ SoPlex::Status SoPlex::solve()
       std::cerr << "starting value = " << value() << std::endl;
       std::cerr << "starting shift = " << shift() << std::endl;
    });
-   TRACE({
-      int i;      
-      std::cerr << "column status:\t";      
-      for (i = 0; i < desc().nCols(); ++i)
-         std::cerr << desc().colStatus(i);     
-      std::cerr << "\nrow status:\t";      
-      for (i = 0; i < desc().nRows(); ++i)
-         std::cerr << desc().rowStatus(i);      
-      std::cerr << std::endl;
-   });
+   TRACE( desc().dump(); );
 
    if (SPxBasis::status() == SPxBasis::OPTIMAL)
       setStatus(SPxBasis::REGULAR);
@@ -109,14 +108,6 @@ SoPlex::Status SoPlex::solve()
    bool stop  = terminate();
    leaveCount = 0;
    enterCount = 0;
-
-#if 0
-   /**@todo Delete this #if 0 case, if the #else case below is tested and
-      works */
-   VarStatus *oldbasis_rows = new VarStatus[nRows()];
-   VarStatus *oldbasis_cols = new VarStatus[nCols()];
-   getBasis( oldbasis_rows, oldbasis_cols );
-#endif
 
    while (!stop)
    {
@@ -134,9 +125,7 @@ SoPlex::Status SoPlex::solve()
             if (!enterId.isValid())
             {
                factorize();
-
                enterId = thepricer->selectEnter();
-
                if (!enterId.isValid())
                   break;
             }
@@ -164,6 +153,7 @@ SoPlex::Status SoPlex::solve()
          {
             if (shift() <= epsilon())
             {
+               // factorize();
                unShift();
 
                VERBOSE3({
@@ -198,9 +188,7 @@ SoPlex::Status SoPlex::solve()
             if (leaveNum < 0)
             {
                factorize();
-
                leaveNum = thepricer->selectLeave();
-
                if (leaveNum < 0)
                   break;
             }
@@ -228,6 +216,7 @@ SoPlex::Status SoPlex::solve()
          {
             if (shift() <= epsilon())
             {
+               // factorize();
                unShift();
 
                VERBOSE3({
@@ -262,28 +251,77 @@ SoPlex::Status SoPlex::solve()
       std::cout << ")" << std::endl;
    });
 
-#if 0
-   /**@todo Delete this #if 0 case, if the #else case is tested and works */
-   if( status() != OPTIMAL )
-   {
 #ifndef NDEBUG
-      std::cout << "SoPlex::solve(): Restoring old basis (TODO!)" << std::endl;
-#endif
-      setBasis( oldbasis_rows, oldbasis_cols );
-   }
-   delete[] oldbasis_rows;
-   delete[] oldbasis_cols;
-#else
-   if( status() == UNBOUNDED  ||
-       status() == INFEASIBLE )
-      SPxBasis::invalidate();   // infeasible/unbounded basis is unusable
-#endif
+   /* check, if solution is really feasible */
+   if( status() == OPTIMAL )
+   {
+      int row, col, c;
+      double val;
+      DVector sol( nCols() );
 
+      getPrimal( sol );
+      for( row = 0; row < nRows(); ++row )
+      {
+         const SVector& rowvec = rowVector( row );
+         val = 0.0;         
+         for( c = 0; c < rowvec.size(); ++c )
+            val += rowvec.value( c ) * sol[rowvec.index( c )];
+         if( LT( val, lhs( row ), delta() ) ||
+             GT( val, rhs( row ), delta() ) )
+         {
+            std::cerr << "Warning! Constraint " << row
+                      << " is violated by solution" << std::endl;
+            std::cerr << "   lhs:" << lhs( row )
+                      << " <= val:" << val
+                      << " <= rhs:" << rhs( row ) << std::endl;
+            if( type() == LEAVE && isRowBasic( row ) )
+            {
+               for( c = 0; c < nRows() && 
+                       ( basis().baseId( c ).isSPxColId()     ||
+                         number( basis().baseId( c ) ) != row );
+                    ++c )
+                  {}
+               assert( c < nRows() );
+               std::cerr << "   basis idx:" << c
+                         << " fVec:" << fVec()[c]
+                         << " fRhs:" << fRhs()[c]
+                         << " fTest:" << fTest()[c] << std::endl;
+            }
+         }
+      }
+      for( col = 0; col < nCols(); ++col )
+      {
+         if( LT( sol[col], lower( col ), delta() ) ||
+             GT( sol[col], upper( col ), delta() ) )
+         {
+            std::cerr << "Warning! Bound for column " << col
+                      << " is violated by solution" << std::endl;
+            std::cerr << "   lower:" << lower( col )
+                      << " <= val:" << sol[col]
+                      << " <= upper:" << upper( col ) << std::endl;
+            if( type() == LEAVE && isColBasic( col ) )
+            {
+               for( c = 0; c < nRows() && 
+                       ( basis().baseId( c ).isSPxRowId()     ||
+                         number( basis().baseId( c ) ) != col );
+                    ++c )
+                  {}
+               assert( c < nRows() );
+               std::cerr << "   basis idx:" << c
+                         << " fVec:" << fVec()[c]
+                         << " fRhs:" << fRhs()[c]
+                         << " fTest:" << fTest()[c] << std::endl;
+            }
+         }
+      }
+   }
+#endif   
    return status();
 }
 
 void SoPlex::testVecs()
 {
+   TRACE_METHOD( "SoPlex::testVecs()" );
    int i;
    DVector tmp(dim());
 
@@ -292,20 +330,20 @@ void SoPlex::testVecs()
    tmp -= *theCoPrhs;
    if (tmp.length() > delta())
    {
-      VERBOSE3({ std::cout << iteration() << ":\tcoP error = "
-                           << tmp.length(); });
+      VERBOSE3({ std::cout << iteration() << ":\tcoP error = \t"
+                           << tmp.length() << std::endl; });
       tmp.clear();
       SPxBasis::coSolve(tmp, *theCoPrhs);
       multWithBase(tmp);
       tmp -= *theCoPrhs;
 
-      VERBOSE3( std::cout << "\t[" << tmp.length() << "]\t("; );
+      VERBOSE3( std::cout << "\t\t\t" << tmp.length() << std::endl; );
 
       tmp.clear();
       SPxBasis::coSolve(tmp, *theCoPrhs);
       tmp -= *theCoPvec;
       
-      VERBOSE3( std::cout << tmp.length() << ")" << std::endl; );
+      VERBOSE3( std::cout << "\t\t\t" << tmp.length() << std::endl; );
    }
 
    tmp = *theFvec;
@@ -313,13 +351,13 @@ void SoPlex::testVecs()
    tmp -= *theFrhs;
    if (tmp.length() > delta())
    {
-      VERBOSE3({ std::cout << iteration() << ":\t  F error = "
-                              << tmp.length() << "\t("; });
+      VERBOSE3({ std::cout << iteration() << ":\t  F error = \t"
+                           << tmp.length() << std::endl; });
       tmp.clear();
       SPxBasis::solve(tmp, *theFrhs);
       tmp -= *theFvec;
 
-      VERBOSE3( std::cout << tmp.length() << ")" << std::endl; );
+      VERBOSE3( std::cout << "\t\t\t" << tmp.length() << std::endl; );
    }
 
 #ifndef NDEBUG
@@ -353,6 +391,7 @@ void SoPlex::testVecs()
 
 bool SoPlex::terminate()
 {
+   TRACE_METHOD( "SoPlex::terminate()" );
 #ifndef NDEBUG
    testVecs();
 #endif  // NDEBUG
@@ -457,6 +496,7 @@ bool SoPlex::terminate()
 
 SoPlex::Status SoPlex::getPrimal (Vector& p_vector) const
 {
+   TRACE_METHOD( "SoPlex::getPrimal()" );
    if (!isInitialized())
       /**@todo patch suggests returning ERROR instead of initializing */
       const_cast<SoPlex*>(this)->init();
@@ -489,7 +529,7 @@ SoPlex::Status SoPlex::getPrimal (Vector& p_vector) const
          case SPxBasis::Desc::D_UNDEFINED :
             break;
          default:
-            abort();
+            ABORT();
          }
       }
       for (i = dim() - 1; i >= 0; --i)
@@ -504,6 +544,7 @@ SoPlex::Status SoPlex::getPrimal (Vector& p_vector) const
 
 SoPlex::Status SoPlex::getDual (Vector& p_vector) const
 {
+   TRACE_METHOD( "SoPlex::getDual()" );
    if (!isInitialized())
       /**@todo patch suggests returning ERROR instead of initializing */
       const_cast<SoPlex*>(this)->init();
@@ -529,6 +570,7 @@ SoPlex::Status SoPlex::getDual (Vector& p_vector) const
 
 SoPlex::Status SoPlex::getRdCost (Vector& p_vector) const
 {
+   TRACE_METHOD( "SoPlex::getRdCost()" );
    if (!isInitialized())
       /**@todo patch suggests returning ERROR instead of initializing */
       const_cast<SoPlex*>(this)->init();
@@ -568,6 +610,7 @@ SoPlex::Status SoPlex::getRdCost (Vector& p_vector) const
 
 SoPlex::Status SoPlex::getSlacks (Vector& p_vector) const
 {
+   TRACE_METHOD( "SoPlex::getSlacks()" );
    if (!isInitialized())
       /**@todo patch suggests returning ERROR instead of initializing */
       const_cast<SoPlex*>(this)->init();
@@ -597,7 +640,7 @@ SoPlex::Status SoPlex::getSlacks (Vector& p_vector) const
          case SPxBasis::Desc::D_UNDEFINED :
             break;
          default:
-            abort();
+            ABORT();
          }
       }
       for (i = dim() - 1; i >= 0; --i)
@@ -615,6 +658,7 @@ SoPlex::Status SoPlex::getSlacks (Vector& p_vector) const
 
 SoPlex::Status SoPlex::status() const
 {
+   TRACE_METHOD( "SoPlex::status()" );
    switch( m_status )
    {
    case UNKNOWN:      
@@ -659,6 +703,7 @@ SoPlex::Status SoPlex::getResult(
    Vector* p_dual,
    Vector* reduCosts) const
 {
+   TRACE_METHOD( "SoPlex::getResult()" );
    if (p_value)
       *p_value = this->value();
    if (p_primal)

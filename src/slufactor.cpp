@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.24 2002/03/01 07:52:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.25 2002/03/01 13:15:31 bzfpfend Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -39,23 +39,27 @@ namespace soplex
 
 void SLUFactor::solve2right(Vector& x, Vector& b) //const
 {
+   TRACE_METHOD( "SLUFactor::solve2right()" );
    CLUFactor::solveRight(x.get_ptr(), b.get_ptr());
 }
 
 void SLUFactor::solve2right(Vector& x, SSVector& b) //const
 {
+   TRACE_METHOD( "SLUFactor::solve2right()" );
    vSolveRightNoNZ(x.get_ptr(), b.epsilon,
                     b.altValues(), b.altIndexMem(), b.size());
 }
 
 void SLUFactor::solve2right(SSVector& x, Vector& b) //const
 {
+   TRACE_METHOD( "SLUFactor::solve2right()" );
    x.clear();
    CLUFactor::solveRight(x.altValues(), b.get_ptr());
 }
 
 void SLUFactor::solve2right(SSVector& x, SSVector& b) //const
 {
+   TRACE_METHOD( "SLUFactor::solve2right()" );
    int n;
    int bs = b.size();
    x.clear();
@@ -76,6 +80,7 @@ void SLUFactor::solve2right(SSVector& x, SSVector& b) //const
 
 void SLUFactor::solveRight (Vector& x, const Vector& b) //const
 {
+   TRACE_METHOD( "SLUFactor::solveRight()" );
    vec = b;
    solve2right(x, vec);
 }
@@ -83,6 +88,7 @@ void SLUFactor::solveRight (Vector& x, const Vector& b) //const
 void SLUFactor::solveRight (Vector& x,
                             const SVector& b) //const
 {
+   TRACE_METHOD( "SLUFactor::solveRight()" );
    vec.assign(b);
    solve2right(x, vec);
 }
@@ -90,6 +96,7 @@ void SLUFactor::solveRight (Vector& x,
 void SLUFactor::solveRight (SSVector& x,
                             const Vector& b) //const
 {
+   TRACE_METHOD( "SLUFactor::solveRight()" );
    vec = b;
    solve2right(x, vec);
 }
@@ -97,6 +104,7 @@ void SLUFactor::solveRight (SSVector& x,
 void SLUFactor::solveRight (SSVector& x,
                             const SVector& b) //const
 {
+   TRACE_METHOD( "SLUFactor::solveRight()" );
    vec.assign(b);
    solve2right(x, vec);
 }
@@ -104,6 +112,7 @@ void SLUFactor::solveRight (SSVector& x,
 void SLUFactor::solveRight4update(SSVector& x,
                                    const SVector& b)
 {
+   TRACE_METHOD( "SLUFactor::solveRight4update()" );
    int m, n, f;
 
    x.clear();
@@ -139,6 +148,7 @@ void SLUFactor::solve2right4update(SSVector& x,
                                     const SVector& b,
                                     SSVector& rhs)
 {
+   TRACE_METHOD( "SLUFactor::solve2right4update()" );
    int m, n, f;
    int* sidx = ssvec.altIndexMem();
    int rsize = rhs.size();
@@ -166,10 +176,10 @@ void SLUFactor::solve2right4update(SSVector& x,
       forest.clear();
       n = ssvec.size();
       m = vSolveRight4update2(x.epsilon,
-                               x.altValues(), x.altIndexMem(), ssvec.get_ptr(),
-                               sidx, n, y.get_ptr(),
-                               rhs.epsilon, rhs.altValues(), ridx, rsize,
-                               forest.altValues(), &f, forest.altIndexMem());
+         x.altValues(), x.altIndexMem(), ssvec.get_ptr(),
+         sidx, n, y.get_ptr(),
+         rhs.epsilon, rhs.altValues(), ridx, rsize,
+         forest.altValues(), &f, forest.altIndexMem());
       x.setSize(m);
       x.forceSetup();
       forest.setSize(f);
@@ -179,13 +189,16 @@ void SLUFactor::solve2right4update(SSVector& x,
 
 void SLUFactor::solve2left (Vector& x, Vector& b) //const
 {
+   TRACE_METHOD( "SLUFactor::solve2left()" );
    x.clear();
    CLUFactor::solveLeft(x.get_ptr(), b.get_ptr());
 }
 
 void SLUFactor::solve2left(Vector& x, SSVector& b) //const
 {
+   TRACE_METHOD( "SLUFactor::solve2left()" );
    int bs = b.size();
+
    x.clear();
    vSolveLeftNoNZ(b.epsilon, x.get_ptr(),
       b.altValues(), b.altIndexMem(), bs);
@@ -193,6 +206,7 @@ void SLUFactor::solve2left(Vector& x, SSVector& b) //const
 
 void SLUFactor::solve2left(SSVector& x, Vector& b) //const
 {
+   TRACE_METHOD( "SLUFactor::solve2left()" );
    int n;
    x.clear();
    n = CLUFactor::solveLeftEps (x.altValues(), 
@@ -207,6 +221,7 @@ void SLUFactor::solve2left(SSVector& x, Vector& b) //const
 
 void SLUFactor::solve2left(SSVector& x, SSVector& b) //const
 {
+   TRACE_METHOD( "SLUFactor::solve2left()" );
    int n;
    int bs = b.size();
    x.clear();
@@ -228,6 +243,7 @@ void SLUFactor::solve2left(SSVector& x, SSVector& b) //const
 void SLUFactor::solveLeft(Vector& x,
                           const SVector& b) //const
 {
+   TRACE_METHOD( "SLUFactor::solveLeft()" );
    ssvec = b;
    solve2left(x, ssvec);
 }
@@ -236,6 +252,7 @@ void SLUFactor::solveLeft(Vector& x,
 void SLUFactor::solveLeft (Vector& x,
                            const Vector& b) //const
 {
+   TRACE_METHOD( "SLUFactor::solveLeft()" );
    vec = b;
    solve2left(x, vec);
 }
@@ -243,6 +260,7 @@ void SLUFactor::solveLeft (Vector& x,
 void SLUFactor::solveLeft (SSVector& x,
                            const Vector& b) //const
 {
+   TRACE_METHOD( "SLUFactor::solveLeft()" );
    vec = b;
    solve2left(x, vec);
 }
@@ -250,6 +268,7 @@ void SLUFactor::solveLeft (SSVector& x,
 void SLUFactor::solveLeft (SSVector& x,
                            const SVector& b) //const
 {
+   TRACE_METHOD( "SLUFactor::solveLeft()" );
    ssvec.assign(b);
    SLUFactor::solve2left(x, ssvec);
 }
@@ -259,6 +278,7 @@ void SLUFactor::solveLeft (SSVector& x,
                             const SVector& rhs1,
                            SSVector& rhs2) //const
 {
+   TRACE_METHOD( "SLUFactor::solve2left()" );
    int n;
    Real* svec = ssvec.altValues();
    int* sidx = ssvec.altIndexMem();
@@ -286,6 +306,7 @@ void SLUFactor::solveLeft (SSVector& x,
 
 Real SLUFactor::stability() const
 {
+   TRACE_METHOD( "SLUFactor::stability()" );
    if (status() != OK)
       return 0;
    if (maxabs < initMaxabs)
@@ -295,6 +316,7 @@ Real SLUFactor::stability() const
 
 void SLUFactor::changeEta(int idx, SSVector& et)
 {
+   TRACE_METHOD( "SLUFactor::changeEta()" );
    int es = et.size();
    update(idx, et.altValues(), et.altIndexMem(), es);
    et.setSize(0);
@@ -307,6 +329,7 @@ SLUFactor::Status SLUFactor::change(
    const SSVector* e
 )
 {
+   TRACE_METHOD( "SLUFactor::Status()" );
    if (usetup)
    {
       if (l.updateType)                      /// Forest-Tomlin updates
@@ -349,6 +372,7 @@ SLUFactor::Status SLUFactor::change(
 
 void SLUFactor::clear()
 {
+   TRACE_METHOD( "SLUFactor::clear()" );
    rowMemMult = 5;             /* factor of minimum Memory * #of nonzeros */
    colMemMult = 5;             /* factor of minimum Memory * #of nonzeros */
    lMemMult = 1;             /* factor of minimum Memory * #of nonzeros */
@@ -404,6 +428,7 @@ void SLUFactor::clear()
 #if 0
 void SLUFactor::assign(const SLUFactor& old)
 {
+   TRACE_METHOD( "SLUFactor::assign()" );
    thedim = old.thedim;
    rowMemMult = old.rowMemMult;
    colMemMult = old.colMemMult;
@@ -557,6 +582,7 @@ void SLUFactor::assign(const SLUFactor& old)
 
 SLUFactor& SLUFactor::operator=(const SLUFactor& old)
 {
+   TRACE_METHOD( "SLUFactor::operator()" );
    freeAll();
    vec = old.vec;
    ssvec = old.ssvec;
@@ -574,6 +600,7 @@ SLUFactor::SLUFactor()
    , eta (1)
    , forest (1)
 {
+   TRACE_METHOD( "SLUFactor::SLUFactor()" );
 #ifndef NDEBUG
    row.perm    = 0;
    row.orig    = 0;
@@ -682,6 +709,7 @@ SLUFactor::SLUFactor()
 
 void SLUFactor::freeAll()
 {
+   TRACE_METHOD( "SLUFactor::clear()" );
    spx_free(row.perm);
    spx_free(row.orig);
    spx_free(col.perm);
@@ -718,6 +746,7 @@ void SLUFactor::freeAll()
 
 SLUFactor::~SLUFactor()
 {
+   TRACE_METHOD( "SLUFactor::~SLUFactor()" );
    freeAll();
 }
 
@@ -734,6 +763,7 @@ static Real betterThreshold(Real th)
 
 SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
 {
+   TRACE_METHOD( "SLUFactor::Status()" );
    assert(dm > 0);
    assert(matrix != 0);
    Real lastStability = stability();
@@ -844,11 +874,13 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
 
 bool SLUFactor::isConsistent() const
 {
+   TRACE_METHOD( "SLUFactor::isConsistent()" );
    return CLUFactor::isConsistent();
 }
 
 void SLUFactor::dump() const
 {
+   TRACE_METHOD( "SLUFactor::dump()" );
    CLUFactor::dump();
 }
 } // namespace soplex

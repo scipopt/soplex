@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.h,v 1.10 2002/01/31 08:19:28 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.h,v 1.11 2002/03/01 13:15:32 bzfpfend Exp $"
 
 /**@file  spxhybridpr.h
  * @brief Hybrid pricer.
@@ -73,6 +73,10 @@ public:
    virtual void entered4(SoPlex::Id id, int n);
    ///
    virtual bool isConsistent() const;
+   ///
+   virtual void addedVecs (int n);
+   ///
+   virtual void addedCoVecs (int n);
    ///
    SPxHybridPR() 
       : SPxPricer("Hybrid")

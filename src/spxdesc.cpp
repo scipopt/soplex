@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdesc.cpp,v 1.7 2002/01/31 16:30:47 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxdesc.cpp,v 1.8 2002/03/01 13:15:31 bzfpfend Exp $"
 
 //#define DEBUG 1
 
@@ -27,31 +27,30 @@ namespace soplex
 
 void SPxBasis::Desc::reSize(int rowDim, int colDim)
 {
+   TRACE_METHOD( "SPxBasis::Desc::reSize()" );
    rowstat.reSize(rowDim);
    colstat.reSize(colDim);
 }
 
 void SPxBasis::Desc::dump() const
 {
+   TRACE_METHOD( "SPxBasis::Desc::dump()" );
    int i;
 
-   std::cout << "Basis description" << std::endl;
-
-   for(i = 0; i < nRows(); i++)
-      std::cout << rowStatus(i); 
-   
-   std::cout << std::endl 
-             << "------------------------------------------" 
-             << std::endl;
-
+   std::cout << "column status: ";
    for(i = 0; i < nCols(); i++)
       std::cout << colStatus(i);
+   std::cout << std::endl;
 
+   std::cout << "row status:    ";
+   for(i = 0; i < nRows(); i++)
+      std::cout << rowStatus(i); 
    std::cout << std::endl;
 }
 
 bool SPxBasis::Desc::isConsistent() const
 {
+   TRACE_METHOD( "SPxBasis::Desc::isConsistent()" );
    return rowstat.isConsistent() && colstat.isConsistent();
 }
 
@@ -89,7 +88,8 @@ std::ostream& operator<<(std::ostream& os, const SPxBasis::Desc::Status& stat)
       text = '.';
       break;
    default :
-      abort();
+      os << std::endl << "Invalid status <" << int(stat) << ">" << std::endl;
+      ABORT();
    }
    os << text;
 

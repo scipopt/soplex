@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.16 2002/01/31 22:36:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.17 2002/03/01 13:15:32 bzfpfend Exp $"
 
 //#define DEBUG 1
 
@@ -90,7 +90,7 @@ void SPxHybridPR::setType(SoPlex::Type tp)
    }
    
    VERBOSE1({ std::cout << "switching to "
-                           << thepricer->name() << std::endl; });
+                        << thepricer->name() << std::endl; });
 
    thepricer->setType(tp);
 }
@@ -120,6 +120,20 @@ SoPlex::Id SPxHybridPR::selectEnter()
 void SPxHybridPR::entered4(SoPlex::Id id, int n)
 {
    thepricer->entered4(id, n);
+}
+
+void SPxHybridPR::addedVecs (int n)
+{
+   steep.addedVecs(n);
+   devex.addedVecs(n);
+   parmult.addedVecs(n);
+}
+
+void SPxHybridPR::addedCoVecs(int n)
+{
+   steep.addedCoVecs(n);
+   devex.addedCoVecs(n);
+   parmult.addedCoVecs(n);
 }
 
 } // namespace soplex

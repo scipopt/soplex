@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.33 2002/02/03 14:02:25 bzfkocht Exp $
+# $Id: Makefile,v 1.34 2002/03/01 13:15:29 bzfpfend Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -8,7 +8,7 @@
 #*                                                                           *
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-.PHONY:		depend clean distclean lint doc 
+.PHONY:		depend clean distclean lint doc lib
 .PHONY:		tests quick check mittel infeas cover
 
 ARCH            :=      $(shell uname -m | \
@@ -89,11 +89,11 @@ LIBXXX		=	$(addprefix $(OBJDIR)/,$(LIBOBJ))
 OBJSRC		=	$(addprefix $(SRCDIR)/,$(OBJECT:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
 
-$(BINARY):	$(OBJDIR) $(BINDIR) $(OBJXXX) $(LIBRARY) 
+$(BINARY):	_$(OBJDIR) _$(BINDIR) $(OBJXXX) $(LIBRARY) 
 		$(CXX) $(CXXFLAGS) $(OBJXXX) \
 		-L$(LIBDIR) -l$(TARGET) $(LDFLAGS) -o $@
 
-$(LIBRARY):	$(LIBDIR) $(LIBXXX) 
+$(LIBRARY):	_$(LIBDIR) $(LIBXXX) 
 		-rm -f $(LIBRARY)
 		$(AR) $(ARFLAGS) $@ $(LIBXXX) 
 		$(RANLIB) $@
@@ -104,6 +104,8 @@ lint:		$(OBJSRC) $(LIBSRC)
 
 doc:		
 		cd doc; $(DOXY) soplex.dxy
+
+lib:		$(LIBRARY)
 
 tests:		check infeas mittel
 
@@ -128,13 +130,13 @@ clean:
 distclean:
 		-rm -rf obj/* lib/libsoplex.* bin/soplex.* 
 
-$(OBJDIR):	
+_$(OBJDIR):	
 		-mkdir -p $(OBJDIR)
 
-$(LIBDIR):
+_$(LIBDIR):
 		-mkdir -p $(LIBDIR)
 
-$(BINDIR):
+_$(BINDIR):
 		-mkdir -p $(BINDIR)
 
 depend:

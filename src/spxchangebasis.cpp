@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.10 2002/02/13 16:56:07 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.11 2002/03/01 13:15:31 bzfpfend Exp $"
 
 //#define DEBUG 1
 
@@ -29,7 +29,13 @@ namespace soplex
 
 void SPxBasis::reDim()
 {
+   TRACE_METHOD( "SPxBasis::reDim()" );
    assert(theLP != 0);
+
+   TRACE({ std::cout << "SPxBasis::reDim():"
+                     << " matrixIsSetup=" << matrixIsSetup
+                     << " fatorized=" << factorized
+                     << std::endl; });
 
    thedesc.reSize (theLP->nRows(), theLP->nCols());
 
@@ -40,36 +46,75 @@ void SPxBasis::reDim()
       matrixIsSetup = false;
       factorized = false;
    }
+
+   TRACE({ std::cout << "SPxBasis::reDim(): -->"
+                     << " matrixIsSetup=" << matrixIsSetup
+                     << " fatorized=" << factorized
+                     << std::endl; });
+
+   assert( matrix.size()    >= theLP->dim() );
+   assert( theBaseId.size() >= theLP->dim() );
 }
 
 void SPxBasis::addedRows(int n)
 {
+   TRACE_METHOD( "SPxBasis::addedRows()" );
    assert(theLP != 0);
 
-   reDim();
-
-   if (theLP->rep() == SoPlex::COLUMN)
+   if( n > 0 )
    {
-      for (int i = theLP->nRows() - n; i < theLP->nRows(); ++i)
+      reDim();
+      
+      if (theLP->rep() == SoPlex::COLUMN)
       {
-         thedesc.rowStatus(i) = dualRowStatus(i);
-         baseId(i) = theLP->SPxLP::rId(i);
-      }
-      matrixIsSetup = false;
-   }
-   else
-   {
-      assert(theLP->rep() == SoPlex::ROW);
-      for (int i = theLP->nRows() - n; i < theLP->nRows(); ++i)
-         thedesc.rowStatus(i) = dualRowStatus(i);
-   }
+         /* I think, after adding rows in column representation,
+            reDim should set these bools to false. */
+         assert( !matrixIsSetup && !factorized );
 
-   if (status() > NO_PROBLEM && matrixIsSetup)
-      loadMatrixVecs();
+         for (int i = theLP->nRows() - n; i < theLP->nRows(); ++i)
+         {
+            thedesc.rowStatus(i) = dualRowStatus(i);
+            baseId(i) = theLP->SPxLP::rId(i);
+         }
+
+         /* ??? I think, this cannot happen. */
+         /* if matrix was set up, load new basis vectors to the matrix */
+         if (status() > NO_PROBLEM && matrixIsSetup)
+            loadMatrixVecs();
+      }
+      else
+      {
+         assert(theLP->rep() == SoPlex::ROW);
+         for (int i = theLP->nRows() - n; i < theLP->nRows(); ++i)
+            thedesc.rowStatus(i) = dualRowStatus(i);
+      }
+
+      /* update basis status */
+      switch (status())
+      {
+      case PRIMAL:
+      case UNBOUNDED:
+         setStatus(REGULAR);
+         break;
+      case OPTIMAL:
+      case INFEASIBLE:
+         setStatus(DUAL);
+         break;
+      case NO_PROBLEM:
+      case SINGULAR:
+      case REGULAR:
+      case DUAL:
+         break;
+      default:
+         std::cerr << "Unknown basis status!" << std::endl;
+         ABORT();
+      }
+   }
 }
 
 void SPxBasis::removedRow(int i)
 {
+   TRACE_METHOD( "SPxBasis::removedRow()" );
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
 
@@ -116,6 +161,7 @@ void SPxBasis::removedRow(int i)
 
 void SPxBasis::removedRows(int perm[])
 {
+   TRACE_METHOD( "SPxBasis::removedRows()" );
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
 
@@ -133,7 +179,7 @@ void SPxBasis::removedRows(int perm[])
                if (theLP->isBasic(thedesc.rowStatus(i)))
                {
                   setStatus(NO_PROBLEM);
-                  factorized = false;
+                  factorized = matrixIsSetup = false;
                   TRACE( std::cerr << "Are you sure, you wanna do that?\n"; );
                }
 
@@ -185,12 +231,12 @@ primalColStatus(int i, const SPxLP* theLP)
          */
          else if (theLP->maxObj(i) == 0)
             return (-theLP->lower(i) < theLP->upper(i))
-                   ? SPxBasis::Desc::P_ON_LOWER
-                : SPxBasis::Desc::P_ON_UPPER;
+               ? SPxBasis::Desc::P_ON_LOWER
+               : SPxBasis::Desc::P_ON_UPPER;
          else
             return (theLP->maxObj(i) < 0)
-                   ? SPxBasis::Desc::P_ON_LOWER
-                : SPxBasis::Desc::P_ON_UPPER;
+               ? SPxBasis::Desc::P_ON_LOWER
+               : SPxBasis::Desc::P_ON_UPPER;
       }
       else
          return SPxBasis::Desc::P_ON_UPPER;
@@ -204,31 +250,62 @@ primalColStatus(int i, const SPxLP* theLP)
 
 void SPxBasis::addedCols(int n)
 {
+   TRACE_METHOD( "SPxBasis::addedCols()" );
    assert(theLP != 0);
 
-   reDim();
-
-   if (theLP->rep() == SoPlex::ROW)
+   if( n > 0 )
    {
-      for (int i = theLP->nCols() - n; i < theLP->nCols(); ++i)
+      reDim();
+      
+      if (theLP->rep() == SoPlex::ROW)
       {
-         thedesc.colStatus(i) = primalColStatus(i, theLP);
-         baseId(i) = theLP->SPxLP::cId(i);
+         /* I think, after adding columns in row representation,
+            reDim should set these bools to false. */
+         assert( !matrixIsSetup && !factorized );
+
+         for (int i = theLP->nCols() - n; i < theLP->nCols(); ++i)
+         {
+            thedesc.colStatus(i) = primalColStatus(i, theLP);
+            baseId(i) = theLP->SPxLP::cId(i);
+         }
+
+         /* ??? I think, this cannot happen. */
+         /* if matrix was set up, load new basis vectors to the matrix */
+         if (status() > NO_PROBLEM && matrixIsSetup)
+            loadMatrixVecs();
+      }
+      else
+      {
+         assert(theLP->rep() == SoPlex::COLUMN);
+         for (int i = theLP->nCols() - n; i < theLP->nCols(); ++i)
+            thedesc.colStatus(i) = primalColStatus(i, theLP);
+      }
+         
+      switch (status())
+      {
+      case DUAL:
+      case INFEASIBLE:
+         setStatus(REGULAR);
+         break;
+      case OPTIMAL:
+      case UNBOUNDED:
+         setStatus(PRIMAL);
+         break;
+      case NO_PROBLEM:
+      case SINGULAR:
+      case REGULAR:
+      case PRIMAL:
+         break;
+      default:
+         std::cerr << "Unknown basis status!" << std::endl;
+         ABORT();
       }
    }
-   else
-   {
-      assert(theLP->rep() == SoPlex::COLUMN);
-      for (int i = theLP->nCols() - n; i < theLP->nCols(); ++i)
-         thedesc.colStatus(i) = primalColStatus(i, theLP);
-   }
-
-   if (status() > NO_PROBLEM && matrixIsSetup)
-      loadMatrixVecs();
 }
 
 void SPxBasis::removedCol(int i)
 {
+   TRACE_METHOD( "SPxBasis::removedCol()" );
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
 
@@ -267,6 +344,7 @@ void SPxBasis::removedCol(int i)
 
 void SPxBasis::removedCols(int perm[])
 {
+   TRACE_METHOD( "SPxBasis::removedCols()" );
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
 
@@ -313,6 +391,7 @@ void SPxBasis::removedCols(int perm[])
  */
 void SPxBasis::invalidate()
 {
+   TRACE_METHOD( "SPxBasis::invalidate()" );
    factorized = matrixIsSetup = false;
 }
 
@@ -320,6 +399,7 @@ void SPxBasis::invalidate()
  */
 void SPxBasis::changedRow(int /*row*/)
 {
+   TRACE_METHOD( "SPxBasis::changedRow()" );
    invalidate();
 }
 
@@ -327,6 +407,7 @@ void SPxBasis::changedRow(int /*row*/)
  */
 void SPxBasis::changedCol(int /*col*/)
 {
+   TRACE_METHOD( "SPxBasis::changedCol()" );
    invalidate();
 }
 
@@ -334,6 +415,7 @@ void SPxBasis::changedCol(int /*col*/)
  */
 void SPxBasis::changedElement(int /*row*/, int /*col*/)
 {
+   TRACE_METHOD( "SPxBasis::changedElement()" );
    invalidate();
 }
 } // namespace soplex

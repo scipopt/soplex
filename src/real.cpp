@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: real.cpp,v 1.7 2002/02/04 15:34:09 bzfpfend Exp $"
+#pragma ident "@(#) $Id: real.cpp,v 1.8 2002/03/01 13:15:30 bzfpfend Exp $"
 
 /**@file  real.cpp
  * @brief Floating point type definition.
@@ -22,6 +22,10 @@
 
 namespace soplex
 {
+
+#if defined(DEBUG_METHOD)
+int TraceMethodIndent::indent = 0;
+#endif
 
 const Real infinity = DEFAULT_INFINITY;
 

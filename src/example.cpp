@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.30 2002/02/04 15:34:08 bzfpfend Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.31 2002/03/01 13:15:30 bzfpfend Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -135,26 +135,27 @@ int main(int argc, char **argv)
    Real                   timelimit      = -1.0;
    Real                   delta          = DEFAULT_BND_VIOL;
    Real                   epsilon        = DEFAULT_EPS_ZERO;
+   int                    verbose        = 1;
    bool                   print_solution = false;
    int                    precision;
-   int                    optind;
+   int                    optidx;
 
-   for(optind = 1; optind < argc; optind++)
+   for(optidx = 1; optidx < argc; optidx++)
    {
-      if (*argv[optind] != '-')
+      if (*argv[optidx] != '-')
          break;
 
-      switch(argv[optind][1])
+      switch(argv[optidx][1])
       {
       case 'b' :
          basisname = strcpy(
-            new char[strlen(&argv[optind][1]) + 1], &argv[optind][1]); 
+            new char[strlen(&argv[optidx][1]) + 1], &argv[optidx][1]); 
          break;
       case 'c' :
-         starting = atoi(&argv[optind][2]);
+         starting = atoi(&argv[optidx][2]);
          break;
       case 'd' :
-         delta = atof(&argv[optind][2]);
+         delta = atof(&argv[optidx][2]);
          break;
       case 'e':
          type = SoPlex::ENTER;
@@ -163,19 +164,19 @@ int main(int argc, char **argv)
          update = SLUFactor::ETA;
          break;
       case 'l' :
-         timelimit = atof(&argv[optind][2]);
+         timelimit = atof(&argv[optidx][2]);
          break;
       case 'p' :
-         pricing = atoi(&argv[optind][2]);
+         pricing = atoi(&argv[optidx][2]);
          break;
       case 'r' :
          representation = SoPlex::ROW;
          break;
       case 's' :
-         simplifing = atoi(&argv[optind][2]);
+         simplifing = atoi(&argv[optidx][2]);
          break;
       case 't' :
-         ratiotest = atoi(&argv[optind][2]);
+         ratiotest = atoi(&argv[optidx][2]);
          break;
       case 'v' :
          std::cout << banner << std::endl;
@@ -184,7 +185,7 @@ int main(int argc, char **argv)
          print_solution = true;
          break;
       case 'z' :
-         epsilon = atof(&argv[optind][2]);
+         epsilon = atof(&argv[optidx][2]);
          break;
       case 'h' :
       case '?' :
@@ -195,15 +196,16 @@ int main(int argc, char **argv)
          exit(0);
       }
    }
-   if ((argc - optind) < 1)
+   if ((argc - optidx) < 1)
    {
       std::cerr << argv[0] << ":" << usage << std::endl;
       exit(0);
    }
-   filename  = argv[optind];
+   filename  = argv[optidx];
    precision = int(-log10(delta)) + 1;
 
    Param::setEpsilon(epsilon);
+   Param::setVerbose(verbose);
 
    std::cout.setf(std::ios::scientific | std::ios::showpoint);
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvecs.cpp,v 1.14 2002/03/01 07:53:00 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxvecs.cpp,v 1.15 2002/03/01 13:15:32 bzfpfend Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -42,6 +42,7 @@ namespace soplex
  */
 void SoPlex::computeFrhs()
 {
+   TRACE_METHOD( "SoPlex::computeFrhs()" );
    if (rep() == COLUMN)
    {
       theFrhs->clear();
@@ -77,7 +78,7 @@ void SoPlex::computeFrhs()
                default:
                   std::cerr << __FILE__ << __LINE__ 
                             << " ERROR: inconsistent basis must not happen!\n";
-                  abort();
+                  ABORT();
                }
                assert(x < infinity);
                assert(x > -infinity);
@@ -109,6 +110,7 @@ void SoPlex::computeFrhs()
 
 void SoPlex::computeFrhsXtra()
 {
+   TRACE_METHOD( "SoPlex::computeFrhsXtra()" );
    assert(rep() == COLUMN);
    assert(type() == LEAVE);
    Real x;
@@ -139,7 +141,7 @@ void SoPlex::computeFrhsXtra()
          default:
             std::cerr << __FILE__ << __LINE__ 
                       << " ERROR: inconsistent basis must not happen!\n";
-            abort();
+            ABORT();
          }
          assert(x < infinity);
          assert(x > -infinity);
@@ -159,6 +161,7 @@ void SoPlex::computeFrhs1(
    const Vector& ufb,    ///< upper feasibility bound for variables
    const Vector& lfb)    ///< lower feasibility bound for variables
 {
+   TRACE_METHOD( "SoPlex::computeFrhs1()" );
    Real x;
    int i;
    const SPxBasis::Desc& ds = desc();
@@ -193,7 +196,7 @@ void SoPlex::computeFrhs1(
          default:
             std::cerr << __FILE__ << __LINE__ 
                       << "ERROR: inconsistent basis must not happen!\n";
-            abort();
+            ABORT();
          }
          assert(x < infinity);
          assert(x > -infinity);
@@ -212,6 +215,7 @@ void SoPlex::computeFrhs2(
    const Vector& coufb,   ///< upper feasibility bound for covariables
    const Vector& colfb)   ///< lower feasibility bound for covariables
 {
+   TRACE_METHOD( "SoPlex::computeFrhs2()" );
    Real x;
    int i;
    const SPxBasis::Desc& ds = desc();
@@ -242,8 +246,8 @@ void SoPlex::computeFrhs2(
             if (colfb[i] != coufb[i])
             {
                std::cerr << "Frhs2: " << stat << " " 
-                        << colfb[i] << " " << coufb[i] 
-                        << " shouln't be" << std::endl;
+                         << colfb[i] << " " << coufb[i]
+                         << " shouln't be" << std::endl;
             }
             //assert(colfb[i] == coufb[i]);
             x = colfb[i];
@@ -252,7 +256,7 @@ void SoPlex::computeFrhs2(
          default:
             std::cerr << __FILE__ << __LINE__ 
                       << "ERROR: inconsistent basis must not happen!\n";
-            abort();
+            ABORT();
          }
          assert(x < infinity);
          assert(x > -infinity);
@@ -283,6 +287,7 @@ void SoPlex::computeFrhs2(
 */
 void SoPlex::computeEnterCoPrhs4Row(int i, int n)
 {
+   TRACE_METHOD( "SoPlex::computeEnterCoPrhs4Row()" );
    assert(baseId(i).isSPxRowId());
    assert(number(SPxRowId(baseId(i))) == n);
 
@@ -314,6 +319,7 @@ void SoPlex::computeEnterCoPrhs4Row(int i, int n)
 
 void SoPlex::computeEnterCoPrhs4Col(int i, int n)
 {
+   TRACE_METHOD( "SoPlex::computeEnterCoPrhs4Col()" );
    assert(baseId(i).isSPxColId());
    assert(number(SPxColId(baseId(i))) == n);
    switch (desc().colStatus(n))
@@ -352,6 +358,7 @@ void SoPlex::computeEnterCoPrhs4Col(int i, int n)
 
 void SoPlex::computeEnterCoPrhs()
 {
+   TRACE_METHOD( "SoPlex::computeEnterCoPrhs()" );
    assert(type() == ENTER);
 
    for (int i = dim() - 1; i >= 0; --i)
@@ -366,6 +373,7 @@ void SoPlex::computeEnterCoPrhs()
 
 void SoPlex::computeLeaveCoPrhs4Row(int i, int n)
 {
+   TRACE_METHOD( "SoPlex::computeLeaveCoPrhs4Row()" );
    assert(baseId(i).isSPxRowId());
    assert(number(SPxRowId(baseId(i))) == n);
    switch (desc().rowStatus(n))
@@ -395,6 +403,7 @@ void SoPlex::computeLeaveCoPrhs4Row(int i, int n)
 
 void SoPlex::computeLeaveCoPrhs4Col(int i, int n)
 {
+   TRACE_METHOD( "SoPlex::computeLeaveCoPrhs4Col()" );
    assert(baseId(i).isSPxColId());
    assert(number(SPxColId(baseId(i))) == n);
    switch (desc().colStatus(n))
@@ -425,6 +434,7 @@ void SoPlex::computeLeaveCoPrhs4Col(int i, int n)
 
 void SoPlex::computeLeaveCoPrhs()
 {
+   TRACE_METHOD( "SoPlex::computeLeaveCoPrhs()" );
    assert(type() == LEAVE);
 
    for (int i = dim() - 1; i >= 0; --i)
@@ -446,6 +456,7 @@ void SoPlex::computeLeaveCoPrhs()
  */
 void SoPlex::computePvec()
 {
+   TRACE_METHOD( "SoPlex::computePvec()" );
    int i;
 
    for (i = coDim() - 1; i >= 0; --i)
@@ -454,6 +465,7 @@ void SoPlex::computePvec()
 
 void SoPlex::setupPupdate(void)
 {
+   TRACE_METHOD( "SoPlex::setupPupdate()" );
    SSVector& p = thePvec->delta();
    SSVector& c = theCoPvec->delta();
 
@@ -491,6 +503,7 @@ void SoPlex::setupPupdate(void)
 
 void SoPlex::doPupdate(void)
 {
+   TRACE_METHOD( "SoPlex::doPupdate()" );
    theCoPvec->update();
    if (pricing() == FULL)
    {

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: real.h,v 1.11 2002/02/24 16:17:14 bzfkocht Exp $"
+#pragma ident "@(#) $Id: real.h,v 1.12 2002/03/01 13:15:30 bzfpfend Exp $"
 
 /**@file  real.h
  * @brief Floating point type definition.
@@ -22,15 +22,50 @@
 #define _REAL_H_
 
 #include <math.h>
-
+#include <iostream>
 
 namespace soplex
 {
+
+#define ABORT() { std::cerr << "Abort in " << __FILE__ << ":"     \
+                            << __LINE__ << std::endl;             \
+                  abort(); }
 
 #if defined(DEBUG)
 #define TRACE(x) {x}
 #else
 #define TRACE(x) /**/
+#endif
+
+#if defined(DEBUG_METHOD)
+
+class TraceMethodIndent
+{
+private:
+   static int indent;
+
+public:
+   TraceMethodIndent()
+   {
+      int i;
+      for( i = 0; i < indent; ++i )
+         std::cerr << ".";
+      indent++;
+   }
+   virtual ~TraceMethodIndent()
+   {
+      indent--;
+   }
+};
+
+#define TRACE_METHOD(x) \
+  std::cerr << "\t\t\t\t\t";                        \
+  TraceMethodIndent __INDENT;                       \
+  std::cerr << x                                    \
+            << " [" << __FILE__                     \
+            << ":" << __LINE__ << "]" << std::endl;
+#else
+#define TRACE_METHOD(x) /**/
 #endif
 
 #define VERBOSE1(x) { if(Param::verbose() >= 1) {x} }

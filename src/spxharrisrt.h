@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.h,v 1.10 2002/01/31 08:19:28 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.h,v 1.11 2002/03/01 13:15:32 bzfpfend Exp $"
 
 /**@file  spxharrisrt.h
  * @brief Harris pricing with shifting.
@@ -38,6 +38,7 @@ namespace soplex
 
    See #SPxRatioTester for a class documentation.
 */
+/**@todo HarrisRT leads to cycling in dcmulti.sub.lp */
 class SPxHarrisRT : public SPxRatioTester
 {
 private:

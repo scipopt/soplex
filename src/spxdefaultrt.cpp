@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.7 2002/01/31 16:30:47 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.8 2002/03/01 13:15:31 bzfpfend Exp $"
 
 //#define DEBUG 1
 
@@ -65,7 +65,7 @@ int SPxDefaultRT::selectLeaveX(Real& val, int start, int incr)
          if (x > epsilon)
          {
             x = (ub[i] - vec[i] + delta) / x;
-            if (x < val)
+            if (x < val && ub[i] < infinity)  // added "&& ub[i] < infinity"
             {
                leave = i;
                val = x;
@@ -74,7 +74,7 @@ int SPxDefaultRT::selectLeaveX(Real& val, int start, int incr)
          else if (x < -epsilon)
          {
             x = (lb[i] - vec[i] - delta) / x;
-            if (x < val)
+            if (x < val && lb[i] > -infinity)    // added "&& lb[i] > -infinity"
             {
                leave = i;
                val = x;
@@ -100,7 +100,7 @@ int SPxDefaultRT::selectLeaveX(Real& val, int start, int incr)
          if (x < -epsilon)
          {
             x = (ub[i] - vec[i] + delta) / x;
-            if (x > val)
+            if (x > val && ub[i] < infinity)    // added "&& ub[i] < infinity"
             {
                leave = i;
                val = x;
@@ -109,7 +109,7 @@ int SPxDefaultRT::selectLeaveX(Real& val, int start, int incr)
          else if (x > epsilon)
          {
             x = (lb[i] - vec[i] - delta) / x;
-            if (x > val)
+            if (x > val && lb[i] > -infinity)    // added "&& lb[i] > -infinity"
             {
                leave = i;
                val = x;
@@ -175,7 +175,7 @@ SoPlex::Id SPxDefaultRT::selectEnterX(
          if (x > epsilon)
          {
             x = (upb[i] - pvec[i] + delta) / x;
-            if (x < val)
+            if (x < val && upb[i] < infinity)  // added "&& upb[i] < infinity"
             {
                enterId = solver()->id(i);
                val = x;
@@ -185,7 +185,7 @@ SoPlex::Id SPxDefaultRT::selectEnterX(
          else if (x < -epsilon)
          {
             x = (lpb[i] - pvec[i] - delta) / x;
-            if (x < val)
+            if (x < val && lpb[i] > -infinity)  // added "&& lpb[i] > -infinity"
             {
                enterId = solver()->id(i);
                val = x;
@@ -200,7 +200,7 @@ SoPlex::Id SPxDefaultRT::selectEnterX(
          if (x > epsilon)
          {
             x = (ucb[i] - cvec[i] + delta) / x;
-            if (x < val)
+            if (x < val && ucb[i] < infinity)  // added "&& ucb[i] < infinity"
             {
                enterId = solver()->coId(i);
                val = x;
@@ -210,7 +210,7 @@ SoPlex::Id SPxDefaultRT::selectEnterX(
          else if (x < -epsilon)
          {
             x = (lcb[i] - cvec[i] - delta) / x;
-            if (x < val)
+            if (x < val && lcb[i] > -infinity)  // added "&& lcb[i] > -infinity"
             {
                enterId = solver()->coId(i);
                val = x;
@@ -246,7 +246,7 @@ SoPlex::Id SPxDefaultRT::selectEnterX(
          if (x > epsilon)
          {
             x = (lpb[i] - pvec[i] - delta) / x;
-            if (x > val)
+            if (x > val && lpb[i] > -infinity)  // added "&& lpb[i] > -infinity"
             {
                enterId = solver()->id(i);
                val = x;
@@ -256,7 +256,7 @@ SoPlex::Id SPxDefaultRT::selectEnterX(
          else if (x < -epsilon)
          {
             x = (upb[i] - pvec[i] + delta) / x;
-            if (x > val)
+            if (x > val && upb[i] < infinity)  // added "&& upb[i] < infinity"
             {
                enterId = solver()->id(i);
                val = x;
@@ -271,7 +271,7 @@ SoPlex::Id SPxDefaultRT::selectEnterX(
          if (x > epsilon)
          {
             x = (lcb[i] - cvec[i] - delta) / x;
-            if (x > val)
+            if (x > val && lcb[i] > -infinity)  // added "&& lcb[i] > -infinity"
             {
                enterId = solver()->coId(i);
                val = x;
@@ -281,7 +281,7 @@ SoPlex::Id SPxDefaultRT::selectEnterX(
          else if (x < -epsilon)
          {
             x = (ucb[i] - cvec[i] + delta) / x;
-            if (x > val)
+            if (x > val && ucb[i] < infinity)  // added "&& ucb[i] < infinity"
             {
                enterId = solver()->coId(i);
                val = x;

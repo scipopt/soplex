@@ -13,11 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: changesoplex.cpp,v 1.12 2002/01/31 08:19:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: changesoplex.cpp,v 1.13 2002/03/01 13:15:30 bzfpfend Exp $"
+
+// #define DEBUG 1
+
 
 #include <assert.h>
 #include <iostream>
-
 
 #include "real.h"
 #include "soplex.h"
@@ -29,6 +31,22 @@ namespace soplex
 
 void SoPlex::localAddRows(int start)
 {
+   TRACE_METHOD( "SoPlex::localAddRows()" );
+   assert( start <= SPxLP::nRows() );
+
+   /**@todo This method seems to be called, to update
+    *       theFvec, theFrhs, ..., but a resolve after
+    *       adding a row results in a failure.
+    *       To fix this, we call init() before solving
+    *       in spxsolve.cpp:solve(). In init(), the
+    *       vectors are set up, so there is no need
+    *       to update them here.
+    */
+   return;
+
+   if( start == SPxLP::nRows() )
+      return;
+
    const SPxBasis::Desc& ds = desc();
 
    if (type() == ENTER)
@@ -152,35 +170,25 @@ void SoPlex::localAddRows(int start)
 
 void SoPlex::addedRows(int n)
 {
+   TRACE_METHOD( "SoPlex::addedRows()" );
    SPxLP::addedRows(n);
-   reDim();
 
-   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+   if( n > 0 )
    {
-      SPxBasis::addedRows(n);
-      if (isInitialized())
+      reDim();
+      
+      if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
       {
-         localAddRows(nRows() - n);
-         assert(thepricer != 0);
-         if (rep() == ROW)
-            thepricer->addedVecs(n);
-         else
-            thepricer->addedCoVecs(n);
-
-      }
-
-      switch (SPxBasis::status())
-      {
-      case SPxBasis::PRIMAL:
-      case SPxBasis::UNBOUNDED:
-         setStatus(SPxBasis::REGULAR);
-         break;
-      case SPxBasis::OPTIMAL:
-      case SPxBasis::INFEASIBLE:
-         setStatus(SPxBasis::DUAL);
-         break;
-      default:
-         break;
+         SPxBasis::addedRows(n);
+         if (isInitialized())
+         {
+            localAddRows(nRows() - n);
+            assert(thepricer != 0);
+            if (rep() == ROW)
+               thepricer->addedVecs(n);
+            else
+               thepricer->addedCoVecs(n);            
+         }
       }
    }
    assert(isConsistent());
@@ -189,6 +197,22 @@ void SoPlex::addedRows(int n)
 
 void SoPlex::localAddCols(int start)
 {
+   TRACE_METHOD( "SoPlex::localAddCols()" );
+   assert( start <= SPxLP::nCols() );
+
+   /**@todo This method seems to be called, to update
+    *       theFvec, theFrhs, ..., but a resolve after
+    *       adding a row results in a failure.
+    *       To fix this, we call init() before solving
+    *       in spxsolve.cpp:solve(). In init(), the
+    *       vectors are set up, so there is no need
+    *       to update them here.
+    */
+   return;
+
+   if( start == SPxLP::nCols() )
+      return;
+
    const SPxBasis::Desc& ds = desc();
 
    if (type() == ENTER)
@@ -336,41 +360,33 @@ void SoPlex::localAddCols(int start)
 
 void SoPlex::addedCols(int n)
 {
+   TRACE_METHOD( "SoPlex::addedCols()" );
    SPxLP::addedCols(n);
-   reDim();
 
-   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+   if( n > 0 )
    {
-      SPxBasis::addedCols(n);
-      if (isInitialized())
+      reDim();
+      
+      if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
       {
-         localAddCols(nCols() - n);
-         assert(thepricer != 0);
-         if (rep() == COLUMN)
-            thepricer->addedVecs(n);
-         else
-            thepricer->addedCoVecs(n);
-      }
-
-      switch (SPxBasis::status())
-      {
-      case SPxBasis::DUAL:
-      case SPxBasis::INFEASIBLE:
-         setStatus(SPxBasis::REGULAR);
-         break;
-      case SPxBasis::OPTIMAL:
-      case SPxBasis::UNBOUNDED:
-         setStatus(SPxBasis::PRIMAL);
-         break;
-      default:
-         break;
+         SPxBasis::addedCols(n);
+         if (isInitialized())
+         {
+            localAddCols(nCols() - n);
+            assert(thepricer != 0);
+            if (rep() == COLUMN)
+               thepricer->addedVecs(n);
+            else
+               thepricer->addedCoVecs(n);
+         }
       }
    }
    assert(isConsistent());
 }
-
+   
 void SoPlex::doRemoveRow(int i)
 {
+   TRACE_METHOD( "SoPlex::doRemoveRow()" );
    SPxLP::doRemoveRow(i);
 
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
@@ -415,6 +431,7 @@ void SoPlex::doRemoveRow(int i)
 
 void SoPlex::doRemoveRows(int perm[])
 {
+   TRACE_METHOD( "SoPlex::doRemoveRows()" );
    int n = SPxLP::nRows();
    SPxLP::doRemoveRows(perm);
 
@@ -474,6 +491,7 @@ void SoPlex::doRemoveRows(int perm[])
 
 void SoPlex::doRemoveCol(int i)
 {
+   TRACE_METHOD( "SoPlex::doRemoveCol()" );
    SPxLP::doRemoveCol(i);
 
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
@@ -518,6 +536,7 @@ void SoPlex::doRemoveCol(int i)
 
 void SoPlex::doRemoveCols(int perm[])
 {
+   TRACE_METHOD( "SoPlex::doRemoveCols()" );
    int n = SPxLP::nCols();
    SPxLP::doRemoveCols(perm);
 
@@ -577,12 +596,14 @@ void SoPlex::doRemoveCols(int perm[])
 
 void SoPlex::changeObj(const Vector& newObj)
 {
+   TRACE_METHOD( "SoPlex::changeObj()" );
    SPxLP::changeObj(newObj);
    unInit();
 }
 
 void SoPlex::changeObj(int i, Real newVal)
 {
+   TRACE_METHOD( "SoPlex::changeObj()" );
    SPxLP::changeObj(i, newVal);
    unInit();
 }
@@ -596,6 +617,8 @@ static void changeLowerStatus
    int i
 )
 {
+   TRACE({ std::cout << "changeLowerStatus(): col " << i
+                     << ": " << stat; });
    switch (stat)
    {
    case SPxBasis::Desc::P_ON_LOWER:
@@ -626,12 +649,14 @@ static void changeLowerStatus
       stat = basis.dualColStatus(i);
       break;
    default:
-      abort();
+      ABORT();
    }
+   TRACE( std::cout << " -> " << stat << std::endl; );
 }
 
 void SoPlex::changeLower(const Vector& newLower)
 {
+   TRACE_METHOD( "SoPlex::changeLower()" );
    SPxLP::changeLower(newLower);
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
@@ -644,6 +669,7 @@ void SoPlex::changeLower(const Vector& newLower)
 
 void SoPlex::changeLower(int i, Real newLower)
 {
+   TRACE_METHOD( "SoPlex::changeLower()" );
    SPxLP::changeLower(i, newLower);
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
@@ -662,6 +688,8 @@ static void changeUpperStatus
    int i
 )
 {
+   TRACE({ std::cout << "changeUpperStatus(): col " << i
+                     << ": " << stat; });
    switch (stat)
    {
    case SPxBasis::Desc::P_ON_LOWER:
@@ -692,12 +720,14 @@ static void changeUpperStatus
       stat = basis.dualColStatus(i);
       break;
    default:
-      abort();
+      ABORT();
    }
+   TRACE( std::cout << " -> " << stat << std::endl; );
 }
 
 void SoPlex::changeUpper(const Vector& newUpper)
 {
+   TRACE_METHOD( "SoPlex::changeUpper()" );
    SPxLP::changeUpper(newUpper);
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
@@ -710,6 +740,7 @@ void SoPlex::changeUpper(const Vector& newUpper)
 
 void SoPlex::changeUpper(int i, Real newUpper)
 {
+   TRACE_METHOD( "SoPlex::changeUpper()" );
    SPxLP::changeUpper(i, newUpper);
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
@@ -721,6 +752,7 @@ void SoPlex::changeUpper(int i, Real newUpper)
 
 void SoPlex::changeBounds(const Vector& newLower, const Vector& newUpper)
 {
+   TRACE_METHOD( "SoPlex::changeBounds()" );
    SPxLP::changeLower(newLower);
    SPxLP::changeUpper(newUpper);
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
@@ -738,6 +770,7 @@ void SoPlex::changeBounds(const Vector& newLower, const Vector& newUpper)
 
 void SoPlex::changeBounds(int i, Real newLower, Real newUpper)
 {
+   TRACE_METHOD( "SoPlex::changeBounds()" );
    SPxLP::changeLower(i, newLower);
    SPxLP::changeUpper(i, newUpper);
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
@@ -759,13 +792,15 @@ static void changeLhsStatus
    int i
 )
 {
+   TRACE({ std::cout << "changeLhsStatus()  : row " << i
+                     << ": " << stat; });
    switch (stat)
    {
    case SPxBasis::Desc::P_ON_LOWER:
       if (newLhs <= -infinity)
          stat = (rhs >= infinity)
-                ? SPxBasis::Desc::P_FREE
-             : SPxBasis::Desc::P_ON_UPPER;
+            ? SPxBasis::Desc::P_FREE
+            : SPxBasis::Desc::P_ON_UPPER;
       else if (newLhs == rhs)
          stat = SPxBasis::Desc::P_FIXED;
       break;
@@ -789,12 +824,14 @@ static void changeLhsStatus
       stat = basis.dualRowStatus(i);
       break;
    default:
-      abort();
+      ABORT();
    }
+   TRACE( std::cout << " -> " << stat << std::endl; );
 }
 
 void SoPlex::changeLhs(const Vector& newLhs)
 {
+   TRACE_METHOD( "SoPlex::changeLhs()" );
    SPxLP::changeLhs(newLhs);
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
@@ -806,6 +843,7 @@ void SoPlex::changeLhs(const Vector& newLhs)
 
 void SoPlex::changeLhs(int i, Real newLhs)
 {
+   TRACE_METHOD( "SoPlex::changeLhs()" );
    SPxLP::changeLhs(i, newLhs);
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
@@ -823,13 +861,15 @@ static void changeRhsStatus
    int i
 )
 {
+   TRACE({ std::cout << "changeRhsStatus()  : row " << i
+                     << ": " << stat; });
    switch (stat)
    {
    case SPxBasis::Desc::P_ON_UPPER:
       if (newRhs >= infinity)
          stat = (lhs <= -infinity)
-                ? SPxBasis::Desc::P_FREE
-             : SPxBasis::Desc::P_ON_LOWER;
+            ? SPxBasis::Desc::P_FREE
+            : SPxBasis::Desc::P_ON_LOWER;
       else if (newRhs == lhs)
          stat = SPxBasis::Desc::P_FIXED;
       break;
@@ -853,13 +893,15 @@ static void changeRhsStatus
       stat = basis.dualRowStatus(i);
       break;
    default:
-      abort();
+      ABORT();
    }
+   TRACE( std::cout << " -> " << stat << std::endl; );
 }
 
 
 void SoPlex::changeRhs(const Vector& newRhs)
 {
+   TRACE_METHOD( "SoPlex::changeRhs()" );
    SPxLP::changeRhs(newRhs);
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
@@ -871,6 +913,7 @@ void SoPlex::changeRhs(const Vector& newRhs)
 
 void SoPlex::changeRhs(int i, Real newRhs)
 {
+   TRACE_METHOD( "SoPlex::changeRhs()" );
    SPxLP::changeRhs(i, newRhs);
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
@@ -881,6 +924,7 @@ void SoPlex::changeRhs(int i, Real newRhs)
 
 void SoPlex::changeRange(const Vector& newLhs, const Vector& newRhs)
 {
+   TRACE_METHOD( "SoPlex::changeRange()" );
    SPxLP::changeLhs(newLhs);
    SPxLP::changeRhs(newRhs);
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
@@ -896,6 +940,7 @@ void SoPlex::changeRange(const Vector& newLhs, const Vector& newRhs)
 
 void SoPlex::changeRange(int i, Real newLhs, Real newRhs)
 {
+   TRACE_METHOD( "SoPlex::changeRange()" );
    SPxLP::changeLhs(i, newLhs);
    SPxLP::changeRhs(i, newRhs);
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
@@ -908,24 +953,28 @@ void SoPlex::changeRange(int i, Real newLhs, Real newRhs)
 
 void SoPlex::changeRow(int i, const LPRow& newRow)
 {
+   TRACE_METHOD( "SoPlex::changeRow()" );
    SPxLP::changeRow(i, newRow);
    unInit();
 }
 
 void SoPlex::changeCol(int i, const LPCol& newCol)
 {
+   TRACE_METHOD( "SoPlex::changeCol()" );
    SPxLP::changeCol(i, newCol);
    unInit();
 }
 
 void SoPlex::changeElement(int i, int j, Real val)
 {
+   TRACE_METHOD( "SoPlex::changeElement()" );
    SPxLP::changeElement(i, j, val);
    unInit();
 }
 
 void SoPlex::changeSense(SPxSense sns)
 {
+   TRACE_METHOD( "SoPlex::changeSense()" );
    SPxLP::changeSense(sns);
    unInit();
 }
