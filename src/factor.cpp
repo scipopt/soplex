@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.20 2001/12/14 22:33:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.21 2001/12/15 11:33:42 bzfkocht Exp $"
 
 #include <iostream>
 #include <assert.h>
@@ -1370,29 +1370,31 @@ int CLUFactor::setupColVals()
    if (u.col.val)
       spx_free(u.col.val);
 
-   // if we would know the old size of u.col.val, this could be a realloc.
-   spx_alloc(u.col.val, u.col.size);
 
    for(i = 0; i < thedim; i++)
       u.col.len[i] = 0;
 
    maxabs = 0.0;
 
+   // if we would know the old size of u.col.val, this could be a realloc.
+   spx_alloc(u.col.val, u.col.size);
+
    for(i = 0; i < thedim; i++)
    {
       int     k   = u.row.start[i];
       int*    idx = &u.row.idx[k];
       double* val = &u.row.val[k];
+      int     len = u.row.len[i]
 
-      n  += u.row.len[i];
+      n += len;
 
-      for(int j = 0; j < u.row.len[i]; j++)
+      while(len-- > 0)
       {
          assert((*idx >= 0) && (*idx < thedim));
 
          k = u.col.start[*idx] + u.col.len[*idx];
 
-         assert(k < u.col.size);
+         assert((k >= 0) && (k < u.col.size));
 
          u.col.len[*idx]++;
 
