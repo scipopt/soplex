@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datahashtable.h,v 1.16 2002/04/03 10:15:44 bzfkocht Exp $"
+#pragma ident "@(#) $Id: datahashtable.h,v 1.17 2002/04/03 11:22:04 bzfkocht Exp $"
 
 /**@file  datahashtable.h
  * @brief Generic hash table for data objects.
@@ -208,9 +208,8 @@ public:
    bool isConsistent() const
    {
       int total = 0;
-      int i;
 
-      for(i = 0; i < m_elem.size(); i++)
+      for(int i = 0; i < m_elem.size(); i++)
       {
          if (m_elem[i].stat == Elem::USED)
          {

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.cpp,v 1.22 2002/04/03 10:15:44 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.cpp,v 1.23 2002/04/03 11:22:04 bzfkocht Exp $"
 
 #include <string.h>
 #include "spxdefines.h"
@@ -266,7 +266,9 @@ bool NameSet::isConsistent() const
    if (memused > memmax)
       return MSGinconsistent("NameSet");
 
-   for(int i = 0; i < num(); i++)
+   int i;
+
+   for(i = 0; i < num(); i++)
    {
       const char* t = &mem[set[i]];
 
