@@ -13,33 +13,19 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: changesoplex.cpp,v 1.5 2001/11/13 21:01:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: changesoplex.cpp,v 1.6 2001/12/26 12:49:42 bzfkocht Exp $"
 
-
-/*  Import system include files
- */
 #include <assert.h>
 #include <iostream>
 
 
-/*  and class header files
- */
 #include "soplex.h"
-
-
 #include "spxpricer.h"
 #include "spxratiotester.h"
 
 namespace soplex
 {
 
-
-
-
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Extension}
- */
 void SoPlex::localAddRows(int start)
 {
    const SPxBasis::Desc& ds = desc();
@@ -380,10 +366,6 @@ void SoPlex::addedCols(int n)
    assert(isConsistent());
 }
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Shrinking}
- */
 void SoPlex::doRemoveRow(int i)
 {
    SPxLP::doRemoveRow(i);
@@ -590,10 +572,6 @@ void SoPlex::doRemoveCols(int perm[])
    }
 }
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Modification}
- */
 void SoPlex::changeObj(const Vector& newObj)
 {
    SPxLP::changeObj(newObj);
@@ -606,7 +584,6 @@ void SoPlex::changeObj(int i, double newVal)
    unInit();
 }
 
-//@ ----------------------------------------------------------------------------
 static void changeLowerStatus
 (
    SPxBasis::Desc::Status& stat,
@@ -656,7 +633,8 @@ void SoPlex::changeLower(const Vector& newLower)
    if (SPxBasis::status() > NO_PROBLEM)
    {
       for (int i = newLower.dim() - 1; i >= 0; --i)
-         changeLowerStatus(desc().colStatus(i), newLower[i], SPxLP::upper(i), *this, i);
+         changeLowerStatus(
+            desc().colStatus(i), newLower[i], SPxLP::upper(i), *this, i);
       unInit();
    }
 }
@@ -666,12 +644,12 @@ void SoPlex::changeLower(int i, double newLower)
    SPxLP::changeLower(i, newLower);
    if (SPxBasis::status() > NO_PROBLEM)
    {
-      changeLowerStatus(desc().colStatus(i), newLower, SPxLP::upper(i), *this, i);
+      changeLowerStatus(
+         desc().colStatus(i), newLower, SPxLP::upper(i), *this, i);
       unInit();
    }
 }
 
-//@ ----------------------------------------------------------------------------
 static void changeUpperStatus
 (
    SPxBasis::Desc::Status& stat,
@@ -721,7 +699,8 @@ void SoPlex::changeUpper(const Vector& newUpper)
    if (SPxBasis::status() > NO_PROBLEM)
    {
       for (int i = newUpper.dim() - 1; i >= 0; --i)
-         changeUpperStatus(desc().colStatus(i), newUpper[i], SPxLP::lower(i), *this, i);
+         changeUpperStatus(
+            desc().colStatus(i), newUpper[i], SPxLP::lower(i), *this, i);
       unInit();
    }
 }
@@ -731,7 +710,8 @@ void SoPlex::changeUpper(int i, double newUpper)
    SPxLP::changeUpper(i, newUpper);
    if (SPxBasis::status() > NO_PROBLEM)
    {
-      changeUpperStatus(desc().colStatus(i), newUpper, SPxLP::lower(i), *this, i);
+      changeUpperStatus(
+         desc().colStatus(i), newUpper, SPxLP::lower(i), *this, i);
       unInit();
    }
 }
@@ -744,8 +724,10 @@ void SoPlex::changeBounds(const Vector& newLower, const Vector& newUpper)
    {
       for (int i = newUpper.dim() - 1; i >= 0; --i)
       {
-         changeUpperStatus(desc().colStatus(i), newUpper[i], SPxLP::lower(i), *this, i);
-         changeLowerStatus(desc().colStatus(i), newLower[i], SPxLP::upper(i), *this, i);
+         changeUpperStatus(
+            desc().colStatus(i), newUpper[i], SPxLP::lower(i), *this, i);
+         changeLowerStatus(
+            desc().colStatus(i), newLower[i], SPxLP::upper(i), *this, i);
       }
       unInit();
    }
@@ -757,14 +739,14 @@ void SoPlex::changeBounds(int i, double newLower, double newUpper)
    SPxLP::changeUpper(i, newUpper);
    if (SPxBasis::status() > NO_PROBLEM)
    {
-      changeUpperStatus(desc().colStatus(i), newUpper, SPxLP::lower(i), *this, i);
-      changeLowerStatus(desc().colStatus(i), newLower, SPxLP::upper(i), *this, i);
+      changeUpperStatus(
+         desc().colStatus(i), newUpper, SPxLP::lower(i), *this, i);
+      changeLowerStatus(
+         desc().colStatus(i), newLower, SPxLP::upper(i), *this, i);
       unInit();
    }
 }
 
-
-//@ ----------------------------------------------------------------------------
 static void changeLhsStatus
 (
    SPxBasis::Desc::Status& stat,
@@ -921,8 +903,6 @@ void SoPlex::changeRange(int i, double newLhs, double newRhs)
    }
 }
 
-
-//@ ----------------------------------------------------------------------------
 void SoPlex::changeRow(int i, const LPRow& newRow)
 {
    SPxLP::changeRow(i, newRow);

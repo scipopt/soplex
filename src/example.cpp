@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.7 2001/12/26 12:04:47 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.8 2001/12/26 12:49:42 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -296,7 +296,7 @@ int main(int argc, char **argv)
                 << work.basis().iteration() 
                 << std::endl;
       
-      SoPlex::ProbStatus stat = work.status();
+      SoPlex::Status stat = work.status();
 
       switch (stat)
       {

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.h,v 1.5 2001/12/25 16:03:24 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.h,v 1.6 2001/12/26 12:49:42 bzfkocht Exp $"
 
 
 /**@file  spxsteeppr.h
@@ -150,50 +150,6 @@ public:
    virtual void removedVecs(const int perm[]);
    ///
    virtual void removedCoVec(int i);
-
-   ///
-   void changeObj(const Vector&)
-   {}
-   ///
-   void changeObj(int, double)
-   {}
-   ///
-   void changeLower(const Vector&)
-   {}
-   ///
-   void changeLower(int, double)
-   {}
-   ///
-   void changeUpper(const Vector&)
-   {}
-   ///
-   void changeUpper(int, double)
-   {}
-   ///
-   void changeLhs(const Vector&)
-   {}
-   ///
-   void changeLhs(int, double)
-   {}
-   ///
-   void changeRhs(const Vector&)
-   {}
-   ///
-   void changeRhs(int, double)
-   {}
-   ///
-   void changeRow(int, const LPRow&)
-   {}
-   ///
-   void changeCol(int, const LPCol&)
-   {}
-   ///
-   void changeElement(int, int, double)
-   {}
-   ///
-   void changeSense(SoPlex::Sense)
-   {}
-
    ///
    int isConsistent() const;
 

@@ -13,8 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.h,v 1.3 2001/11/28 16:41:22 bzfpfend Exp $"
-
+#pragma ident "@(#) $Id: spxhybridpr.h,v 1.4 2001/12/26 12:49:42 bzfkocht Exp $"
 
 /**@file  spxhybridpr.h
  * @brief Hybrid pricer.
@@ -91,48 +90,23 @@ public:
    void entered4(SoPlex::Id id, int n);
 
    ///
-   void addedVecs (int n);
+   void addedVecs (int) 
+   {}
    ///
-   void addedCoVecs(int n);
-
+   void addedCoVecs(int)
+   {}
    ///
-   void removedVec(int i);
+   void removedVec(int)
+   {}
    ///
-   void removedVecs(const int perm[]);
+   void removedVecs(const int*)
+   {}
    ///
-   void removedCoVec(int i);
+   void removedCoVec(int)
+   {}
    ///
-   void removedCoVecs(const int perm[]);
-
-
-   ///
-   void changeObj(const Vector& newObj);
-   ///
-   void changeObj(int i, double newVal);
-   ///
-   void changeLower(const Vector& newLower);
-   ///
-   void changeLower(int i, double newLower);
-   ///
-   void changeUpper(const Vector& newUpper);
-   ///
-   void changeUpper(int i, double newUpper);
-   ///
-   void changeLhs(const Vector& newLhs);
-   ///
-   void changeLhs(int i, double newLhs);
-   ///
-   void changeRhs(const Vector& newRhs);
-   ///
-   void changeRhs(int i, double newRhs);
-   ///
-   void changeRow(int i, const LPRow& newRow);
-   ///
-   void changeCol(int i, const LPCol& newCol);
-   ///
-   void changeElement(int i, int j, double val);
-   ///
-   void changeSense(SoPlex::Sense sns);
+   void removedCoVecs(const int*)
+   {}
    ///
    int isConsistent() const;
 
@@ -140,7 +114,8 @@ public:
    SPxHybridPR()
    {
       thesolver = 0;
-      // ??? TK20011102 I have no idea what is a reasonable value here.
+      /**@todo TK20011102 I have no idea what is a reasonable value here.
+       */
       hybridFactor = 0.5;
    }
    virtual ~SPxHybridPR()

@@ -1,8 +1,8 @@
+SPXinconsistent in MSGinconsistent und spxmessage in message umbenennen.
+
 die assignment operatoren auf if (this == rhs) durchsehen)
 
 die constructoren auf einparametriege durchsehen (explicit)
-
-LPSolver zusammenstutzen oder ganz entfernen.
 
 in dataarray.h:reSize(int newsize) steht in der docxygen docu immer int n ???
 

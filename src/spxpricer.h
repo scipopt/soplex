@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxpricer.h,v 1.3 2001/11/28 16:41:22 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxpricer.h,v 1.4 2001/12/26 12:49:42 bzfkocht Exp $"
 
 
 /**@file  spxpricer.h
@@ -152,52 +152,6 @@ public:
    virtual void removedCoVec(int i) = 0;
    /// covectors given by \p perm have been removed from loaded LP.
    virtual void removedCoVecs(const int perm[]) = 0;
-   //@}
-
-
-   /**@name Manipulation */
-   //@{
-   /// objective vector has been changed to \p newObj.
-   virtual void changeObj(const Vector& newObj) = 0;
-
-   /// objective value of column \p i has been changed to \p newVal.
-   virtual void changeObj(int i, double newVal) = 0;
-
-   /// lower bound vector has been changed to \p newLower.
-   virtual void changeLower(const Vector& newLower) = 0;
-
-   /// lower bound of column \p i has been changed to \p newLower.
-   virtual void changeLower(int i, double newLower) = 0;
-
-   /// upper bound vector has been changed to \p newUpper.
-   virtual void changeUpper(const Vector& newUpper) = 0;
-
-   /// upper bound of column \p i has been changed to \p newUpper.
-   virtual void changeUpper(int i, double newUpper) = 0;
-
-   /// left hand side vector for constraints has been changed to \p newLhs.
-   virtual void changeLhs(const Vector& newLhs) = 0;
-
-   /// left hand side of row \p i has been changed to \p newLhs.
-   virtual void changeLhs(int i, double newLhs) = 0;
-
-   /// right hand side vector for constraints has been changed to \p newRhs.
-   virtual void changeRhs(const Vector& newRhs) = 0;
-
-   /// right hand side of row \p i has been changed to \p newRhs.
-   virtual void changeRhs(int i, double newRhs) = 0;
-
-   /// row \p i has been replaced by \p newRow.
-   virtual void changeRow(int i, const LPRow& newRow) = 0;
-
-   /// column \p i has been replaced by \p newCol.
-   virtual void changeCol(int i, const LPCol& newCol) = 0;
-
-   /// constraint matrix element (\p i, \p j) has been changed to \p val.
-   virtual void changeElement(int i, int j, double val) = 0;
-
-   /// optimization sense has been changed to \p sns.
-   virtual void changeSense(SoPlex::Sense sns) = 0;
    //@}
 
    /**@name Constructors / Destructors */

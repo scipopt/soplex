@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxparmultpr.h,v 1.4 2001/11/28 16:41:22 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxparmultpr.h,v 1.5 2001/12/26 12:49:42 bzfkocht Exp $"
 
 
 /**@file  spxparmultpr.h
@@ -133,50 +133,6 @@ public:
    {}
    ///
    void removedCoVecs(const int[])
-   {}
-
-
-   ///
-   void changeObj(const Vector&)
-   {}
-   ///
-   void changeObj(int, double)
-   {}
-   ///
-   void changeLower(const Vector&)
-   {}
-   ///
-   void changeLower(int, double)
-   {}
-   ///
-   void changeUpper(const Vector&)
-   {}
-   ///
-   void changeUpper(int, double)
-   {}
-   ///
-   void changeLhs(const Vector&)
-   {}
-   ///
-   void changeLhs(int, double)
-   {}
-   ///
-   void changeRhs(const Vector&)
-   {}
-   ///
-   void changeRhs(int, double)
-   {}
-   ///
-   void changeRow(int, const LPRow&)
-   {}
-   ///
-   void changeCol(int, const LPCol&)
-   {}
-   ///
-   void changeElement(int, int, double)
-   {}
-   ///
-   void changeSense(SoPlex::Sense)
    {}
 
    ///

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.17 2001/12/26 12:04:47 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.18 2001/12/26 12:49:42 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -979,7 +979,7 @@ const
       *p_value = maxValue;
 }
 
-SoPlex::ProbStatus SoPlex::getBasis(signed char row[], signed char col[]) const
+SoPlex::Status SoPlex::getBasis(signed char row[], signed char col[]) const
 {
    const SPxBasis::Desc& d = desc();
    int i;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.9 2001/12/26 12:04:47 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.10 2001/12/26 12:49:42 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -26,7 +26,7 @@
 
 namespace soplex
 {
-SoPlex::ProbStatus SoPlex::solve()
+SoPlex::Status SoPlex::solve()
 {
    Id enterId;
    int leaveNum;
@@ -359,7 +359,7 @@ int SoPlex::terminate()
       || SPxBasis::status() <= SPxBasis::SINGULAR;
 }
 
-SoPlex::ProbStatus SoPlex::getPrimal (Vector& p_vector) const
+SoPlex::Status SoPlex::getPrimal (Vector& p_vector) const
 {
    if (!isInitialized())
       const_cast<SoPlex*>(this)->init();
@@ -405,7 +405,7 @@ SoPlex::ProbStatus SoPlex::getPrimal (Vector& p_vector) const
    return status();
 }
 
-SoPlex::ProbStatus SoPlex::getDual (Vector& p_vector) const
+SoPlex::Status SoPlex::getDual (Vector& p_vector) const
 {
    if (!isInitialized())
       const_cast<SoPlex*>(this)->init();
@@ -429,7 +429,7 @@ SoPlex::ProbStatus SoPlex::getDual (Vector& p_vector) const
    return status();
 }
 
-SoPlex::ProbStatus SoPlex::getRdCost (Vector& p_vector) const
+SoPlex::Status SoPlex::getRdCost (Vector& p_vector) const
 {
    if (!isInitialized())
       const_cast<SoPlex*>(this)->init();
@@ -467,7 +467,7 @@ SoPlex::ProbStatus SoPlex::getRdCost (Vector& p_vector) const
    return status();
 }
 
-SoPlex::ProbStatus SoPlex::getSlacks (Vector& p_vector) const
+SoPlex::Status SoPlex::getSlacks (Vector& p_vector) const
 {
    if (!isInitialized())
       const_cast<SoPlex*>(this)->init();
@@ -513,7 +513,7 @@ SoPlex::ProbStatus SoPlex::getSlacks (Vector& p_vector) const
    return status();
 }
 
-SoPlex::ProbStatus SoPlex::status() const
+SoPlex::Status SoPlex::status() const
 {
    switch (SPxBasis::status())
    {
@@ -538,7 +538,7 @@ SoPlex::ProbStatus SoPlex::status() const
    }
 }
 
-SoPlex::ProbStatus SoPlex::getResult(
+SoPlex::Status SoPlex::getResult(
    double* p_value,
    Vector* p_primal,
    Vector* p_slacks,

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.7 2001/12/25 16:03:24 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.8 2001/12/26 12:49:42 bzfkocht Exp $"
 
 #include <iostream>
 
@@ -116,86 +116,6 @@ void SPxHybridPR::entered4(SoPlex::Id id, int n)
    thepricer->entered4(id, n);
 }
 
-/**@todo What is the reason for these empty methods?
- */
-void SPxHybridPR::addedVecs (int /*n*/)
-{}
-
-
-void SPxHybridPR::addedCoVecs(int /*n*/)
-{}
-
-
-void SPxHybridPR::removedVec(int /*i*/)
-{}
-
-
-void SPxHybridPR::removedVecs(const int * /*perm[]*/)
-{}
-
-
-void SPxHybridPR::removedCoVec(int /*i*/)
-{}
-
-
-void SPxHybridPR::removedCoVecs(const int * /*perm[]*/)
-{}
-
-
-void SPxHybridPR::changeObj(const Vector& /*newObj*/)
-{}
-
-
-void SPxHybridPR::changeObj(int /*i*/, double /*newVal*/)
-{}
-
-
-void SPxHybridPR::changeLower(const Vector& /*newLower*/)
-{}
-
-
-void SPxHybridPR::changeLower(int /*i*/, double /*newLower*/)
-{}
-
-
-void SPxHybridPR::changeUpper(const Vector& /*newUpper*/)
-{}
-
-
-void SPxHybridPR::changeUpper(int /*i*/, double /*newUpper*/)
-{}
-
-
-void SPxHybridPR::changeLhs(const Vector& /*newLhs*/)
-{}
-
-
-void SPxHybridPR::changeLhs(int /*i*/, double /*newLhs*/)
-{}
-
-
-void SPxHybridPR::changeRhs(const Vector& /*newRhs*/)
-{}
-
-
-void SPxHybridPR::changeRhs(int /*i*/, double /*newRhs*/)
-{}
-
-
-void SPxHybridPR::changeRow(int /*i*/, const LPRow& /*newRow*/)
-{}
-
-
-void SPxHybridPR::changeCol(int /*i*/, const LPCol& /*newCol*/)
-{}
-
-
-void SPxHybridPR::changeElement(int /*i*/, int /*j*/, double /*val*/)
-{}
-
-
-void SPxHybridPR::changeSense(SoPlex::Sense /*sns*/)
-{}
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

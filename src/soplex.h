@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.13 2001/12/26 12:04:47 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.14 2001/12/26 12:49:42 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -73,8 +73,6 @@ class SoPlex : public SPxLP, protected SPxBasis
    friend class SPxFastRT;
 
 public:
-   typedef SPxSense Sense;
-
    /**@name Data Types */
    //@{
    /// LP basis representation.
@@ -160,13 +158,14 @@ public:
 
    enum VarStatus
    {
-      ON_UPPER,   ///< variable set to its upper bound.
-      ON_LOWER,   ///< variable set to its lower bound.
-      FIXED,      ///< variable fixed to identical bounds.
-      ZERO,       ///< free variable fixed to zero.
-      BASIC       ///< variable is basic.
+      ON_UPPER,      ///< variable set to its upper bound.
+      ON_LOWER,      ///< variable set to its lower bound.
+      FIXED,         ///< variable fixed to identical bounds.
+      ZERO,          ///< free variable fixed to zero.
+      BASIC          ///< variable is basic.
    };
-   enum ProbStatus
+
+   enum Status
    {
       UNKNOWN = 0,   ///< nothing known on loaded problem.
       UNBOUNDED,     ///< loaded problem is unbounded.
@@ -357,10 +356,10 @@ public:
     *  the termination criteria is fullfilled (see #terminate()). 
     *  The #SPxStatus of the solver will indicate the reason for termination.
     */
-   ProbStatus solve();
+   Status solve();
 
    /// #Status of basis.
-   ProbStatus status() const;
+   Status status() const;
 
    /// current objective value.
    /**@return Objective value of the current solution vector 
@@ -375,7 +374,7 @@ public:
     *  to the argument \p vector. Hence, \p vector must be of dimension
     *  #nCols().
     */
-   ProbStatus getPrimal (Vector& vector) const;
+   Status getPrimal (Vector& vector) const;
 
    /// get vector of slack variables.
    /** This method returns the #Status of the basis.
@@ -390,7 +389,7 @@ public:
     *     matrix. Then the vector of slack variables is defined as
     *     \f$s = Ax\f$.
     */
-   ProbStatus getSlacks (Vector& vector) const;
+   Status getSlacks (Vector& vector) const;
 
    /// get current solution vector for dual variables.
    /** This method returns the #Status of the basis.
@@ -416,7 +415,7 @@ public:
     *       constraint is given with the standard definition, while
     *       the other constraint is implicitely set to 0.
     */
-   ProbStatus getDual (Vector& vector) const;
+   Status getDual (Vector& vector) const;
 
    /// get current solution vector for dual variables.
    /** This method returns the \Ref{Status} of the basis.
@@ -429,7 +428,7 @@ public:
     *  and \i A the LPs constraint matrix. Then the reduced cost vector
     *  \i r is defined as \f$r^T = c^T - d^TA\f$.
     */
-   ProbStatus getRdCost (Vector& vector) const;
+   Status getRdCost (Vector& vector) const;
 
    /// Termination criterion.
    /** This method is called in each Simplex iteration to determine, if
@@ -623,23 +622,7 @@ public:
    {
       return thevectors->num();
    }
-   /// number of row \p p_id.
-#if 0
-   int number(SPxRowId p_id) const
-   {
-      return SPxLP::number(p_id);
-   }
-   /// number of column \p p_id.
-   int number(SPxColId p_id) const
-   {
-      return SPxLP::number(p_id);
-   }
-   /// number of column \p p_id.
-   int number(Id p_id) const
-   {
-      return SPxLP::number(p_id);
-   }
-#endif
+
    /**@name Variables and Covariables
     *  Class #SPxLP introduces #Id%s to identify row or column data of
     *  an LP. #SoPlex uses this concept to access data with respect to the
@@ -1476,14 +1459,14 @@ public:
    }
 
    /// get all results of last solve.
-   ProbStatus getResult(double* value = 0, Vector* primal = 0,
+   Status getResult(double* value = 0, Vector* primal = 0,
       Vector* slacks = 0, Vector* dual = 0, Vector* reduCost = 0) const;
 
    /// set #LPSolver#s basis.
    void setBasis(const signed char rows[], const signed char cols[]);
 
    /// get current basis.
-   ProbStatus getBasis(signed char rows[], signed char cols[]) const;
+   Status getBasis(signed char rows[], signed char cols[]) const;
 
    /// get number of iterations of current solution.
    int iterations() const
@@ -1532,7 +1515,7 @@ public:
    }
 
    /// optimization sense.
-   Sense sense() const
+   SPxSense sense() const
    {
       return spxSense();
    }
