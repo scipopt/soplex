@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.6 2001/11/12 17:09:54 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.7 2001/11/13 21:01:23 bzfkocht Exp $"
 
 #ifndef _DATASET_H_
 #define _DATASET_H_
@@ -299,7 +299,7 @@ public:
    ///
    void remove(Key *keys, int n, int* perm)
    {
-      assert(perm);
+      assert(perm != 0);
       for (int i = num() - 1; i >= 0; --i)
          perm[i] = i;
       while (--n >= 0)
@@ -317,7 +317,7 @@ public:
    ///
    void remove(int *nums, int n, int* perm)
    {
-      assert(perm);
+      assert(perm != 0);
       for (int i = num() - 1; i >= 0; --i)
          perm[i] = i;
       while (--n >= 0)
@@ -533,8 +533,8 @@ public:
          std::cerr << "ERROR: DataSet could not allocate memory\n";
          exit(-1);
       }
-      assert(theitem);
-      assert(thekey);
+      assert(theitem != 0);
+      assert(thekey != 0);
       memcpy(theitem, old.theitem, themax * sizeof(Item));
       memcpy(thekey, old.thekey, themax * sizeof(Key));
    }
@@ -552,8 +552,8 @@ public:
          std::cerr << "ERROR: DataSet could not allocate memory\n";
          exit(-1);
       }
-      assert(theitem);
-      assert(thekey);
+      assert(theitem != 0);
+      assert(thekey != 0);
    }
 
    /// destructor.

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: array.h,v 1.2 2001/11/06 23:31:00 bzfkocht Exp $"
+#pragma ident "@(#) $Id: array.h,v 1.3 2001/11/13 21:01:22 bzfkocht Exp $"
 
 #ifndef _ARRAY_H_
 #define _ARRAY_H_
@@ -126,7 +126,7 @@ public:
          int k;
          T *olddata = data;
          data = new T[size() + n];
-         assert(data);
+         assert(data != 0);
          if (size() > 0)
          {
             for (k = 0; k < i; ++k)
@@ -228,7 +228,7 @@ public:
       if (num > 0)
       {
          data = new T[num];
-         assert(data);
+         assert(data != 0);
       }
    }
 
@@ -239,7 +239,7 @@ public:
       if (num > 0)
       {
          data = new T[num];
-         assert(data);
+         assert(data != 0);
          *this = old;
       }
    }

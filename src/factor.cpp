@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.4 2001/11/12 16:41:51 bzfpfend Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.5 2001/11/13 21:01:23 bzfkocht Exp $"
 
 
 #include <stdio.h>
@@ -106,13 +106,13 @@ static Pring *col,            /* column index handlers for double linked list */
 static void newTmp(int p_dim)
 {
    s_max = reinterpret_cast<double*>(Malloc(p_dim * sizeof(double)));
-   assert(s_max);
+   assert(s_max != 0);
 
    s_cact = reinterpret_cast<int*>(Malloc(p_dim * sizeof(int)));
-   assert(s_cact);
+   assert(s_cact != 0);
 
    s_mark = reinterpret_cast<int*>(Malloc(p_dim * sizeof(int)));
-   assert(s_mark);
+   assert(s_mark != 0);
 }
 
 static void deleteTmp()

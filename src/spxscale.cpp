@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscale.cpp,v 1.2 2001/11/06 23:31:05 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscale.cpp,v 1.3 2001/11/13 21:01:26 bzfkocht Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -45,7 +45,7 @@ void SPxScale::unload()
 
 int SPxScale::simplify()
 {
-   assert(lp);
+   assert(lp != 0);
    double x, y;
    int i, j;
 
@@ -178,7 +178,7 @@ int SPxScale::simplify()
 
 void SPxScale::unsimplify()
 {
-   assert(lp);
+   assert(lp != 0);
    assert(lp->isConsistent());
 
    int i, j;

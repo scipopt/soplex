@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxparmultpr.cpp,v 1.3 2001/11/12 16:42:07 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxparmultpr.cpp,v 1.4 2001/11/13 21:01:26 bzfkocht Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -75,7 +75,7 @@ SPxLP::Id SPxParMultPR::selectEnter()
    int best = -1;
    //    const SPxBasis::Desc& ds   = thesolver->basis().desc();
 
-   assert(thesolver);
+   assert(thesolver != 0);
    int lastlast = -1;
 
    if (thesolver->pricing() == SoPlex::PARTIAL)
@@ -207,7 +207,7 @@ int SPxParMultPR::selectLeave()
    //    const double* up  = thesolver->ubBound();
    //    const double* low = thesolver->lbBound();
 
-   assert(thesolver);
+   assert(thesolver != 0);
    n = -1;
    for (i = thesolver->dim() - 1; i >= 0; --i)
    {

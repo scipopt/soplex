@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: changesoplex.cpp,v 1.4 2001/11/11 20:27:27 bzfkocht Exp $"
+#pragma ident "@(#) $Id: changesoplex.cpp,v 1.5 2001/11/13 21:01:22 bzfkocht Exp $"
 
 
 /*  Import system include files
@@ -174,7 +174,7 @@ void SoPlex::addedRows(int n)
       if (isInitialized())
       {
          localAddRows(nRows() - n);
-         assert(thepricer);
+         assert(thepricer != 0);
          if (rep() == ROW)
             thepricer->addedVecs(n);
          else
@@ -356,7 +356,7 @@ void SoPlex::addedCols(int n)
       if (isInitialized())
       {
          localAddCols(nCols() - n);
-         assert(thepricer);
+         assert(thepricer != 0);
          if (rep() == COLUMN)
             thepricer->addedVecs(n);
          else
@@ -404,7 +404,7 @@ void SoPlex::doRemoveRow(int i)
             if (type() == ENTER)
                theTest[i] = theTest[n];
             reDim();
-            assert(thepricer);
+            assert(thepricer != 0);
             thepricer->removedVec(i);
          }
          else
@@ -462,7 +462,7 @@ void SoPlex::doRemoveRows(int perm[])
                      (*thePvec)[perm[i]] = (*thePvec)[i];
                   }
             }
-            assert(thepricer);
+            assert(thepricer != 0);
             thepricer->removedVecs(perm);
             reDim();
          }
@@ -506,7 +506,7 @@ void SoPlex::doRemoveCol(int i)
             (*thePvec)[i] = (*thePvec)[n];
             if (type() == ENTER)
                theTest[i] = theTest[n];
-            assert(thepricer);
+            assert(thepricer != 0);
             thepricer->removedVec(i);
             reDim();
          }
@@ -565,7 +565,7 @@ void SoPlex::doRemoveCols(int perm[])
                      (*thePvec)[perm[i]] = (*thePvec)[i];
                   }
             }
-            assert(thepricer);
+            assert(thepricer != 0);
             thepricer->removedVecs(perm);
             reDim();
          }

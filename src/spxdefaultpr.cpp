@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultpr.cpp,v 1.2 2001/11/06 23:31:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefaultpr.cpp,v 1.3 2001/11/13 21:01:26 bzfkocht Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -40,7 +40,7 @@ int SPxDefaultPR::selectLeave(double& best, int start, int incr)
    //    const double* up  = thesolver->ubBound();
    //    const double* low = thesolver->lbBound();
 
-   assert(thesolver);
+   assert(thesolver != 0);
    best = -theeps;
    n = -1;
    for (i = thesolver->dim() - start - 1; i >= 0; i -= incr)
@@ -75,7 +75,7 @@ SoPlex::Id SPxDefaultPR::selectEnter(double& best, int start1, int incr1,
    double x;
    // const SPxBasis::Desc&    ds   = thesolver->basis().desc();
 
-   assert(thesolver);
+   assert(thesolver != 0);
    best = -theeps;
 
    for (i = thesolver->dim() - start1 - 1; i >= 0; i -= incr2)

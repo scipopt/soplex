@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.6 2001/11/12 16:42:00 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.7 2001/11/13 21:01:25 bzfkocht Exp $"
 
 
 
@@ -60,7 +60,7 @@ SPxBasis::dualStatus(const SPxLP::SPxRowId& id) const
 SPxBasis::Desc::Status
 SPxBasis::dualRowStatus(int i) const
 {
-   assert(theLP);
+   assert(theLP != 0);
 
    if (theLP->rhs(i) < SPxLP::infinity)
    {
@@ -83,7 +83,7 @@ SPxBasis::dualRowStatus(int i) const
 SPxBasis::Desc::Status
 SPxBasis::dualColStatus(int i) const
 {
-   assert(theLP);
+   assert(theLP != 0);
 
    if (theLP->SPxLP::upper(i) < SPxLP::infinity)
    {
@@ -108,7 +108,7 @@ SPxBasis::dualColStatus(int i) const
  */
 void SPxBasis::loadMatrixVecs()
 {
-   assert(theLP);
+   assert(theLP != 0);
 
    int i;
    nzCount = 0;
@@ -130,7 +130,7 @@ void SPxBasis::loadMatrixVecs()
 void SPxBasis::load(const Desc& ds)
 {
    assert(status() > NO_PROBLEM);
-   assert(theLP);
+   assert(theLP != 0);
    assert(ds.nRows() == theLP->nRows());
    assert(ds.nCols() == theLP->nCols());
 
@@ -192,7 +192,7 @@ void SPxBasis::load(const Desc& ds)
 
 void SPxBasis::setRep()
 {
-   assert(theLP);
+   assert(theLP != 0);
 
    reDim();
    minStab = 1e-4;
@@ -211,7 +211,7 @@ void SPxBasis::setRep()
 
 void SPxBasis::load(SoPlex* lp)
 {
-   assert(lp);
+   assert(lp != 0);
    theLP = lp;
 
    setRep();
@@ -242,7 +242,7 @@ void SPxBasis::readBasis(std::istream& is, NameSet& rn, NameSet& cn)
    char* f6;
    Desc l_desc(thedesc);
 
-   assert(theLP);
+   assert(theLP != 0);
 
    for (i = theLP->nRows() - 1; i >= 0; --i)
       l_desc.rowstat[i] = dualRowStatus(i);
@@ -351,7 +351,7 @@ void SPxBasis::change
    const SSVector* eta
 )
 {
-   assert(factor);
+   assert(factor != 0);
    lastidx = i;
    lastin = id;
 
@@ -403,7 +403,7 @@ void SPxBasis::change
 
 void SPxBasis::factorize()
 {
-   assert(factor);
+   assert(factor != 0);
 
    if (!matrixIsSetup)
       load(thedesc);

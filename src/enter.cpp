@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.5 2001/11/11 20:27:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.6 2001/11/13 21:01:23 bzfkocht Exp $"
 
 /*      \SubSection{Updating the Basis for Entering Variables}
  */
@@ -713,7 +713,7 @@ int SoPlex::enter(Id& enterId)
 {
    assert(enterId.isValid());
    assert(type() == ENTER);
-   assert(initialized);
+   assert(initialized != 0);
 
    double enterTest;      // correct test value of entering var
    double enterUB;        // upper bound of entering variable

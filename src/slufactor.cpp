@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.4 2001/11/08 14:27:27 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.5 2001/11/13 21:01:25 bzfkocht Exp $"
 
 
 
@@ -728,7 +728,7 @@ static double betterThreshold(double th)
 SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
 {
    assert(dm > 0);
-   assert(matrix);
+   assert(matrix != 0);
    double lastStability = stability();
 
    initDR(u.row.list);

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.6 2001/11/12 16:41:59 bzfpfend Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.7 2001/11/13 21:01:25 bzfkocht Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -220,8 +220,8 @@ void SoPlex::setRep(int rp)
  */
 void SoPlex::init()
 {
-   assert(thepricer);
-   assert(theratiotester);
+   assert(thepricer != 0);
+   assert(theratiotester != 0);
 
    if (!initialized)
    {

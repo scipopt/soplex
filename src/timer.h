@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: timer.h,v 1.3 2001/11/07 17:31:26 bzfbleya Exp $"
+#pragma ident "@(#) $Id: timer.h,v 1.4 2001/11/13 21:01:27 bzfkocht Exp $"
 
 #ifndef _TIMER_H_
 #define _TIMER_H_
@@ -95,7 +95,7 @@ extern "C"
    /* initialize timer, set timing accounts to zero */
    static inline void Timer_reset(Timer_t *timer)
    {
-      assert(timer);
+      assert(timer != 0);
       timer->status = Timer_RESET;
       timer->uAccount = timer->rAccount = timer->sAccount = 0;
    }
@@ -104,7 +104,7 @@ extern "C"
    /* start timer, resume accounting user, system and real time */
    static inline void Timer_start(Timer_t *timer)
    {
-      assert(timer);
+      assert(timer != 0);
       assert(timer->status == Timer_RESET
              || timer->status == Timer_STOPPED
              || timer->status == Timer_RUNNING);
@@ -125,7 +125,7 @@ extern "C"
    /* stop timer, return accounted user time */
    static inline double Timer_stop(Timer_t *timer)
    {
-      assert(timer);
+      assert(timer != 0);
       assert(timer->status == Timer_RESET
              || timer->status == Timer_STOPPED
              || timer->status == Timer_RUNNING);
@@ -153,7 +153,7 @@ extern "C"
                                      double *systemTime,
                                      double *realTime)
    {
-      assert(timer);
+      assert(timer != 0);
       assert(timer->status == Timer_RESET
              || timer->status == Timer_STOPPED
              || timer->status == Timer_RUNNING);
@@ -189,7 +189,7 @@ extern "C"
    static inline double Timer_userTime(const Timer_t *timer)
    {
       double uTime;
-      assert(timer);
+      assert(timer != 0);
       assert(timer->status == Timer_RESET
              || timer->status == Timer_STOPPED
              || timer->status == Timer_RUNNING);
@@ -203,7 +203,7 @@ extern "C"
    static inline double Timer_systemTime(const Timer_t *timer)
    {
       double sTime;
-      assert(timer);
+      assert(timer != 0);
       assert(timer->status == Timer_RESET
              || timer->status == Timer_STOPPED
              || timer->status == Timer_RUNNING);
@@ -217,7 +217,7 @@ extern "C"
    static inline double Timer_realTime(const Timer_t *timer)
    {
       double rTime;
-      assert(timer);
+      assert(timer != 0);
       assert(timer->status == Timer_RESET
              || timer->status == Timer_STOPPED
              || timer->status == Timer_RUNNING);

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.h,v 1.5 2001/11/13 17:04:18 bzfbleya Exp $"
+#pragma ident "@(#) $Id: svector.h,v 1.6 2001/11/13 21:01:27 bzfkocht Exp $"
 
 #ifndef _SVECTOR_H_ 
 #define _SVECTOR_H_
@@ -318,18 +318,18 @@ public:
    }
 //     int& size()
 //     {
-//        assert(m_elem);
+//        assert(m_elem != 0);
 //        return m_elem[ -1].idx;
 //     }
    void set_size(int s)
    {
-      assert(m_elem);
+      assert(m_elem != 0);
       m_elem[ -1].idx = s;
    }
       
    void set_max(int m)
    {
-      assert(m_elem);
+      assert(m_elem != 0);
       m_elem[ -1].val = m;
    }
    void setMem(int n, Element* elmem)
@@ -337,7 +337,7 @@ public:
       if (n)
       {
          assert(n > 0);
-         assert(elmem);
+         assert(elmem != 0);
          elmem->val = 0;        // for purify to shut up
          m_elem = &(elmem[1]);
          set_size( 0 );

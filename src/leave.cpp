@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.4 2001/11/11 20:27:31 bzfkocht Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.5 2001/11/13 21:01:24 bzfkocht Exp $"
 
 
 /*      \SubSection{Updating the Basis for Leaving Variables}
@@ -483,7 +483,7 @@ int SoPlex::leave(int leaveIdx)
 {
    assert(leaveIdx < dim() && leaveIdx >= 0);
    assert(type() == LEAVE);
-   assert(initialized);
+   assert(initialized != 0);
 
    /*
        Before performing the actual basis update, we must determine, how this

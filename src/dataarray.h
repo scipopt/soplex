@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataarray.h,v 1.3 2001/11/07 17:31:14 bzfbleya Exp $"
+#pragma ident "@(#) $Id: dataarray.h,v 1.4 2001/11/13 21:01:22 bzfkocht Exp $"
 
 #ifndef _DATAARRAY_H_
 #define _DATAARRAY_H_
@@ -275,7 +275,7 @@ public:
          std::cerr << "ERROR: DataArray could not reallocate memory\n";
          exit(-1);
       }
-      assert(data);
+      assert(data != 0);
       return long(data) - olddata;
    }
    /** memory extension factor.

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: islist.h,v 1.4 2001/11/09 21:23:41 bzfkocht Exp $"
+#pragma ident "@(#) $Id: islist.h,v 1.5 2001/11/13 21:01:24 bzfkocht Exp $"
 
 
 #ifndef _ISLIST_H_
@@ -378,7 +378,7 @@ public:
    {
       if (pfirst)
       {
-         assert(plast);
+         assert(plast != 0);
          assert(find(plast));
       }
    }

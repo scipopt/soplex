@@ -20,3 +20,9 @@
 // Temporary
 //
 -e537 // Repeated include file
+
+//
+// Things that are correct
+//
+-esym(1509,DVector) // base class destructor for class 'DVector' is not virtual
+//-esym(1510,SVector) // 

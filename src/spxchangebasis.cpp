@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.2 2001/11/06 23:31:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.3 2001/11/13 21:01:26 bzfkocht Exp $"
 
 
 //@ -----------------------------------------------------------------------------
@@ -38,7 +38,7 @@ namespace soplex
 //@ -----------------------------------------------------------------------------
 void SPxBasis::reDim()
 {
-   assert(theLP);
+   assert(theLP != 0);
 
    thedesc.reSize (theLP->nRows(), theLP->nCols());
 
@@ -53,7 +53,7 @@ void SPxBasis::reDim()
 
 void SPxBasis::addedRows(int n)
 {
-   assert(theLP);
+   assert(theLP != 0);
 
    reDim();
 
@@ -80,7 +80,7 @@ void SPxBasis::addedRows(int n)
 void SPxBasis::removedRow(int i)
 {
    assert(status() > NO_PROBLEM);
-   assert(theLP);
+   assert(theLP != 0);
 
    if (theLP->rep() == SoPlex::ROW)
    {
@@ -126,7 +126,7 @@ void SPxBasis::removedRow(int i)
 void SPxBasis::removedRows(int perm[])
 {
    assert(status() > NO_PROBLEM);
-   assert(theLP);
+   assert(theLP != 0);
 
    int i;
    int n = thedesc.nRows();
@@ -178,7 +178,7 @@ void SPxBasis::removedRows(int perm[])
 static SPxBasis::Desc::Status
 primalColStatus(int i, const SPxLP* theLP)
 {
-   assert(theLP);
+   assert(theLP != 0);
 
    if (theLP->upper(i) < SPxLP::infinity)
    {
@@ -213,7 +213,7 @@ primalColStatus(int i, const SPxLP* theLP)
 
 void SPxBasis::addedCols(int n)
 {
-   assert(theLP);
+   assert(theLP != 0);
 
    reDim();
 
@@ -239,7 +239,7 @@ void SPxBasis::addedCols(int n)
 void SPxBasis::removedCol(int i)
 {
    assert(status() > NO_PROBLEM);
-   assert(theLP);
+   assert(theLP != 0);
 
    if (theLP->rep() == SoPlex::COLUMN)
    {
@@ -276,7 +276,7 @@ void SPxBasis::removedCol(int i)
 void SPxBasis::removedCols(int perm[])
 {
    assert(status() > NO_PROBLEM);
-   assert(theLP);
+   assert(theLP != 0);
 
    int i;
    int n = thedesc.nCols();
