@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.32 2002/02/01 17:33:52 bzfkocht Exp $
+# $Id: Makefile,v 1.33 2002/02/03 14:02:25 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -8,7 +8,8 @@
 #*                                                                           *
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-.PHONY:		depend clean distclean lint doc check quick cover
+.PHONY:		depend clean distclean lint doc 
+.PHONY:		tests quick check mittel infeas cover
 
 ARCH            :=      $(shell uname -m | \
                         sed \
@@ -104,6 +105,8 @@ lint:		$(OBJSRC) $(LIBSRC)
 doc:		
 		cd doc; $(DOXY) soplex.dxy
 
+tests:		check infeas mittel
+
 check:		
 		cd check; ./check.sh netlib.test $(BINARY)
 
@@ -112,6 +115,9 @@ quick:
 
 mittel:		
 		cd check; ./check.sh mittelmann.test $(BINARY)
+
+infeas:		
+		cd check; ./check.sh infeas.test $(BINARY)
 
 cover:
 		cd check; ./cover.sh cover.test $(BINARY)
