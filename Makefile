@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.23 2002/01/06 21:16:17 bzfkocht Exp $
+# $Id: Makefile,v 1.24 2002/01/08 08:11:56 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -11,7 +11,7 @@
 .PHONY:		depend clean distclean lint doc check quick cover
 
 ARCH            :=      $(shell uname -m | \
-                        sed -e s/sun../sparc/ -e s/i.86/x86/ -e s/IP../mips/)
+                        sed -e s/sun../sparc/ -e s/i.86/x86/ -e s/IP../mips/ -e s/9000..../hppa/)
 OSTYPE		:=	$(shell uname -s | tr A-Z a-z)
 
 OPT		=	dbg
