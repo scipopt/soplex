@@ -1,4 +1,4 @@
-# $Id: check.awk,v 1.2 2001/11/06 23:30:58 bzfkocht Exp $
+# $Id: check.awk,v 1.3 2001/11/08 08:47:18 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: check.awk                                                     *
@@ -12,7 +12,7 @@ function abs(x)
     return x < 0 ? -x : x;
 }
 BEGIN {
-    sol["25fv47"] =     5.5018458883E+03;
+    sol["25fv45"] =     5.5018458883E+03;
     sol["80bau3b"] =    9.8723216072E+05;
     sol["adlittle"] =   2.2549496316E+05;
     sol["afiro"] =     -4.6475314286E+02;
@@ -47,7 +47,7 @@ BEGIN {
     sol["forplan"] =   -6.6421873953E+02;
     sol["ganges"] =    -1.0958636356E+05;
     sol["gfrd-pnc"] =   6.9022359995E+06;
-    sol["greenbea"] =  -7.2462405908E+07;
+    sol["greenbea"] =  -7.2555248130e+07;
     sol["greenbeb"] =  -4.3022602612E+06;
     sol["grow15"] =    -1.0687094129E+08;
     sol["grow22"] =    -1.6083433648E+08;

@@ -1,8 +1,9 @@
-# $Id: check.sh,v 1.2 2001/11/06 23:30:58 bzfkocht Exp $
+# $Id: check.sh,v 1.3 2001/11/08 08:47:18 bzfkocht Exp $
 BINNAME=`basename $2`
-OUTFILE=check.$BINNAME.out
-ERRFILE=check.$BINNAME.err
-RESFILE=check.$BINNAME.result
+TSTNAME=`basename $1 .test`
+OUTFILE=check.$TSTNAME.$BINNAME.out
+ERRFILE=check.$TSTNAME.$BINNAME.err
+RESFILE=check.$TSTNAME.$BINNAME.res
 date >$OUTFILE
 date >$ERRFILE
 for i in `cat $1`
