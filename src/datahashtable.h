@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datahashtable.h,v 1.6 2001/11/21 16:25:34 bzfpfend Exp $"
+#pragma ident "@(#) $Id: datahashtable.h,v 1.7 2001/11/21 20:15:40 bzfkocht Exp $"
 
 /**@file  datahashtable.h
  * @brief Generic hash table for data objects.
@@ -30,7 +30,8 @@ namespace soplex
 /**@brief   Generic hash table for data objects.
    @ingroup Elementary
 
-   Class #DataHashTable provides a generic hash table for \ref DataObjects "Data Objects",
+   Class DataHashTable provides a generic hash table for 
+   \ref DataObjects "Data Objects",
    i.e. a map that maps arguments called #HashItem%s to values called #Info%s.
    #HashItem and #Info types are passed as template arguments. #HashItem%s
    must provide a comparision #operator==().  Further both, the HashItem and
@@ -90,14 +91,19 @@ private:
          USED             ///< element is in use
       } status;
    };
+   /// stores all elements of the hash table
+   DataArray < Element < HashItem, Info > > element;   
 
-   DataArray < Element < HashItem, Info > > element;   ///< stores all elements of the hash table
+   int hashsize;           ///< increment added to hash index, if allready used
+   int thenum;             ///< current number of entries in the hash table
 
-   int hashsize;                                       ///< increment added to hash index, if hash index is allready used
-   int thenum;                                         ///< current number of entries in the hash table
-   int (*hashval) (const HashItem*);                   ///< pointer to hash function (mapping: #HashItem -> int)
-   double factor;                                      ///< memory is #reMax()%ed by this factor, if a new element does't fit
-   mutable int theCurrent;                             ///< index for iterator
+   /// pointer to hash function (mapping: #HashItem -> int)
+   int (*hashval) (const HashItem*);  
+
+   /// memory is #reMax()%ed by this factor, if a new element does't fit
+   double factor;  
+
+   mutable int theCurrent; ///< index for iterator
    
 public:
    /**@name Inquiry Methods */
@@ -127,10 +133,9 @@ public:
    }
    //@}
 
-
    /**@name Access Methods */
    //@{
-   ///
+   /// returns pointer to #Info of #HashItem \p h or 0, if \p h is not found.
    /** Returns a pointer to #Info component of hash element \p h or a zero
        pointer if element \p h is not in the table.
     */
@@ -139,7 +144,8 @@ public:
       int i = index(h);
       return i >= 0 ? &element[i].info : 0;
    }
-   /// returns pointer to #Info of #HashItem \p h or 0, if \p h is not found.
+   /// returns const pointer to #Info of #HashItem \p h or 0, 
+   /// if item is not found.
    /** Returns a pointer to #Info component of hash element \p h or a zero
        pointer if element \p h is not in the table.
     */
@@ -149,7 +155,7 @@ public:
       return i >= 0 ? &element[i].info : 0;
    }
 
-   ///
+   /// references #Info of #HashItem \p h.
    /** Index operator for accessing the #Info associated to
        #HashItem \p h. It is required, that \p h belongs to the
        #DataHashTable, otherwise it core dumps. Methods #has() or
@@ -173,18 +179,17 @@ public:
    }
    //@}
 
-
    /**@name Iteration
-       Often it is desired to loop through all elements in a #DataHashTable.
-       This is provided by means of the following 5 methods. They imply an
-       arbitray order to all elements currently in the #DataHashTable. This
-       order may change after any non const member function invocation. When
-       calling one of these methods, a marker is set that serves as reference
-       point for the next call.
-       All iteration methods return 0, if the marker points to a non existing
-       element (for example, calling #next() returns 0, if there doesn't exist
-       another element).
-   */
+    *  Often it is desired to loop through all elements in a #DataHashTable.
+    *  This is provided by means of the following 5 methods. They imply an
+    *  arbitray order to all elements currently in the #DataHashTable. This
+    *  order may change after any non const member function invocation. When
+    *  calling one of these methods, a marker is set that serves as reference
+    *  point for the next call.
+    *  All iteration methods return 0, if the marker points to a non existing
+    *  element (for example, calling #next() returns 0, if there doesn't exist
+    *  another element).
+    */
    //@{
    /// returns first #HashItem in hash table and sets marker to it.
    const HashItem* first() const
@@ -198,7 +203,7 @@ public:
       theCurrent = element.size();
       return prev();
    }
-   /// returns #HashItem following current marker thereby increasing the marker.
+   /// returns #HashItem following current marker and increasing the marker.
    const HashItem* next() const
    {
       if (theCurrent < 0)
@@ -232,17 +237,15 @@ public:
    }
    //@}
 
-
    /**@name Manipulation Methods */
    //@{
-
    /// adds a new entry to the hash table.
-   /**Adds a new entry consisting of #HashItem \p h and #Info \p x to the
-      #DataHashTable. No entry with #HashItem \p h must yet be in the
-      #DataHashTable. After completion, \p x may be accessed via #get() or
-      #operator[]() with \p h as parameter. The #DataHashTable is #reMax()%ed
-      if it becomes neccessary.
-   */
+   /** Adds a new entry consisting of #HashItem \p h and #Info \p x to the
+    *  #DataHashTable. No entry with #HashItem \p h must yet be in the
+    *  #DataHashTable. After completion, \p x may be accessed via #get() or
+    *  #operator[]() with \p h as parameter. The #DataHashTable is #reMax()%ed
+    *  if it becomes neccessary.
+    */
    void add (const HashItem& h, const Info& x)
    {
       assert(!has(h));
@@ -282,9 +285,9 @@ public:
 
    /// reset #max() and #hashSize().
    /** Reset the #max() of a #DataHashTable to \p nel. However, if
-       \p nel < #num(), it is resized to #num() only. If \p hashsze < 1, a
-       new hash size is computed automatically. Otherwise, the specified
-       value will be taken.
+    *  \p nel < #num(), it is resized to #num() only. If \p hashsze < 1, a
+    *  new hash size is computed automatically. Otherwise, the specified
+    *  value will be taken.
     */
    void reMax (int nel = -1, int hashsze = 0)
    {
@@ -329,7 +332,8 @@ public:
    }
 
 #ifdef DEFINE_OUTPUT_OPERATOR
-   /// Output operator. Displays all elements currently contained in hash table.
+   /// Output operator. Displays all elements contained in hash table.
+   /**@todo Is there any reason not to define this operator? */
    friend std::ostream& operator<<(std::ostream& out,
                                    const DataHashTable < HashItem, Info > & h)
    {
@@ -341,14 +345,12 @@ public:
 #endif
    //@}
 
-
 private:
    /// automatically computes a good #hashsize.
-   /** Computes a good #hashsize as the product of all prime numbers not divisors
-       of #size() that are <= the maximum divisor of #size().
-
-       @return   good value for #hashsize
-   */
+   /** Computes a good #hashsize as the product of all prime numbers 
+    *  not divisors of #size() that are <= the maximum divisor of #size().
+    *  @return good value for #hashsize
+    */
    int autoHashSize() const
    {
       int i, j;
@@ -382,13 +384,13 @@ private:
 
    /// returns hash index of #HashItem \p h or -1, if \p h is not present.
    /** Using the hash function #hashval, the hash value of \p h is calculated.
-       Starting with this hash index, every #hashsize%-th #element is
-       compared with \p h until \p h is found or all #element%s are checked.
-
-       @param  h    #HashItem, for which the hash index should be calculated
-
-       @return      hash index of \p h or -1, if \p h is not a member of the hash table
-   */
+    *  Starting with this hash index, every #hashsize%-th #element is
+    *  compared with \p h until \p h is found or all #element%s are checked.
+    *
+    *  @param  h  #HashItem, for which the hash index should be calculated
+    *  @return hash index of \p h or -1, 
+    *          if \p h is not a member of the hash table
+    */
    int index(const HashItem& h) const
    {
       int i, j;
@@ -407,23 +409,22 @@ private:
       return -1;
    }
 
-
 public:
    /**@name Constructors / Destructors */
    //@{
    /// default constructor.
    /** Allocates a #DataHashTable for \p nel entries using \p f as hash
-       function. If \p hashsze > 0, #hashSize() is set to the specified
-       value, otherwise a suitable #hashSize() is computed automatically.
-       Parameter \p incr is used for memory management: If more than
-       \p nel entries are added to the #DataHashTable, it will
-       automatically be #reMax()%ed by a factor of \p incr.
-
-       @param f            pointer to hash function.
-       @param nel          number of hash elements.
-       @param hashsze      hash size.
-       @param incr         factor for increasing data block.
-   */
+    *  function. If \p hashsze > 0, #hashSize() is set to the specified
+    *  value, otherwise a suitable #hashSize() is computed automatically.
+    *  Parameter \p incr is used for memory management: If more than
+    *  \p nel entries are added to the #DataHashTable, it will
+    *  automatically be #reMax()%ed by a factor of \p incr.
+    *
+    *  @param f            pointer to hash function.
+    *  @param nel          number of hash elements.
+    *  @param hashsze      hash size.
+    *  @param incr         factor for increasing data block.
+    */
    DataHashTable
    (int (*f)(const HashItem*),
      int nel = 256 ,
@@ -454,3 +455,7 @@ public:
 //Emacs indent-tabs-mode:nil
 //Emacs End:
 //-----------------------------------------------------------------------------
+
+
+
+

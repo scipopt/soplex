@@ -13,8 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: didxset.h,v 1.3 2001/11/21 16:25:35 bzfpfend Exp $"
-
+#pragma ident "@(#) $Id: didxset.h,v 1.4 2001/11/21 20:15:41 bzfkocht Exp $"
 
 /**@file  didxset.h
  * @brief Dymnamic index set.
@@ -49,7 +48,7 @@ private:
    int*& indexMem();  ///< points to the allocated memory
 
 public:
-   ///
+   /// assignment operator
    DIdxSet& operator=(const IdxSet& sv)
    {
       int n = sv.size();
@@ -99,17 +98,20 @@ public:
 
    /// sets the maximum number of indices.
    /** This methods resets the memory consumption of the #DIdxSet to
-       \p newmax. However, if \p newmax < #size(), it is reset to #size()
-       only.
+    *  \p newmax. However, if \p newmax < #size(), it is reset to #size()
+    *  only.
     */
    void setMax(int newmax = 1);
 
-   ///
-   DIdxSet(const IdxSet& old);
+   /// copy constructor.
+   explicit DIdxSet(const IdxSet& old);
+
    /// copy constructor.
    DIdxSet(const DIdxSet& old);
+
    /// default constructor. \p n gives the initial size of the index space.
-   DIdxSet(int n = 8);
+   explicit DIdxSet(int n = 8);
+
    /// destructor.
    ~DIdxSet();
 };

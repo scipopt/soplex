@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datakey.h,v 1.3 2001/11/21 16:25:34 bzfpfend Exp $"
+#pragma ident "@(#) $Id: datakey.h,v 1.4 2001/11/21 20:15:40 bzfkocht Exp $"
 
 /**@file  datakey.h
  * @brief Entry identifier class for items of a #DataSet.
@@ -42,10 +42,11 @@ namespace soplex
    generally will) manage the same #Key%s. When an element is removed from
    a #DataSet its #Key may (and generally will) be reused for other
    elements added to the #DataSet later on.
+
+   @todo data members should be private.
 */
 class DataKey
 {
-   /**@todo  data members should be private! */
 public:
    signed int info: 8;                        ///< user information (8 bit)
    signed int idx : (8 * sizeof(int) - 8);    ///< (locally) unique key index
@@ -56,11 +57,10 @@ public:
    {
       return info;
    }
-   /**@todo  suspicious: getIdx() returns info instead of idx! */
    /// gets the index number (#idx) of the #Key.
    inline int getIdx() const
    {
-      return info;
+      return idx;
    }
    /// sets the user information (#info) attached to the #Key.
    inline void setInfo(int p_info) 
@@ -84,10 +84,9 @@ public:
       info = 0;
    }
    /// Default constructor. Constructs an invalid #Key.
-   DataKey() : info(0), idx(-1) 
+   DataKey() 
+      : info(0), idx(-1) 
    {}
-   /**@todo  Is it too slow to implement it via info = rhs.info, idx = rhs.idx
-      (instead of the reinterpret_cast) ? */
    /// Assignment operator.
    DataKey& operator=(const DataKey& rhs)
    {

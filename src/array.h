@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: array.h,v 1.8 2001/11/21 16:25:33 bzfpfend Exp $"
+#pragma ident "@(#) $Id: array.h,v 1.9 2001/11/21 20:15:40 bzfkocht Exp $"
 
 /**@file  array.h
  * @brief Save arrays of arbitrary types.
@@ -53,7 +53,8 @@ namespace soplex
     elements with the template parameters operator=().
  
     For this reason, it is not convenient to use class Array, if its elements
-    are \ref DataObjects "Data Objects". In this case use class DataArray instead.
+    are \ref DataObjects "Data Objects". In this case use class DataArray 
+    instead.
  
     @see DataArray, \ref DataObjects "Data Objects" 
 */

@@ -13,14 +13,14 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dvector.h,v 1.2 2001/11/06 23:31:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dvector.h,v 1.3 2001/11/21 20:15:41 bzfkocht Exp $"
 
+/**@file  dvector.h
+ * @brief Dymnamic vectors.
+ */
 #ifndef _DVECTOR_H_
 #define _DVECTOR_H_
 
-/*      \Section{Imports}
-    Import required system include files
- */
 #include <iostream>
 #include <stdlib.h>
 #include <assert.h>
@@ -30,99 +30,122 @@
 
 namespace soplex
 {
+/**@brief   Dynamic vectors.
+   @ingroup Elementary
 
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
-/** Dynamic vectors.
-    Class #DVector# is a derived class of #Vector# adding automatic memory
-    management to such objects. This allows to implement maths operations
-    #operator+# and #operator-#. Further, it is possible to reset the dimension
-    of a #DVector#s via method #reDim()#. However, this may render all
-    references to values of a #reDim()#ed #DVector# invalid.
- 
-    For vectors that are often subject to #reDim()# it may be
-    unconvenient to reallocate the required memory every
-    time. Instead, an array of values of length #memSize()# is kept,
-    where only the first #dim()# elements are used.  Initially,
-    #memSize() == dim()#. However, if the dimension is increased,
-    #memSize()# will be increased at least by a factor of 1.2 to be
-    prepared for futur (small) #reDim()#s. Finally, one can explicitly
-    set #memSize()# with method #reSize()#, but not lower than
-    #dim()#.
+   Class #DVector is a derived class of #Vector adding automatic
+   memory management to such objects. This allows to implement maths
+   operations #operator+() and #operator-(). Further, it is possible
+   to reset the dimension of a #DVector via method #reDim(). However,
+   this may render all references to values of a #reDim()%ed #DVector
+   invalid.
+   
+   For vectors that are often subject to #reDim() it may be
+   unconvenient to reallocate the required memory every
+   time. Instead, an array of values of length #memSize() is kept,
+   where only the first #dim() elements are used.  Initially,
+   #memSize() == #dim(). However, if the dimension is increased,
+   #memSize() will be increased at least by a factor of 1.2 to be
+   prepared for future (small) #reDim()%s. Finally, one can explicitly
+   set #memSize() with method #reSize(), but not lower than
+   #dim().  
 */
 class DVector : public Vector
 {
-   int memsize;        // length of array of values #mem#
-   double* mem;            // value array to be used
+   int     memsize;        ///< length of array of values #mem
+   double* mem;            ///< value array to be used
 
 public:
-   /**@name Maths */
-   //@{
-   ///
+   /// adding vectors.
    friend DVector operator+(const Vector& v, const Vector& w);
-   ///
+   /// adding vectors.
    friend DVector operator+(const SVector& v, const Vector& w);
    /// adding vectors.
    friend DVector operator+(const Vector& v, const SVector& w);
 
-   ///
+   /// subtracting vectors.
    friend DVector operator-(const Vector& v, const Vector& w);
-   ///
+   /// subtracting vectors.
    friend DVector operator-(const SVector& v, const Vector& w);
    /// subtracting vectors.
    friend DVector operator-(const Vector& v, const SVector& w);
 
-   ///
+   /// negation operator.
    friend DVector operator-(const Vector& vec);
-   /// negative vectors.
+   /// negation operator.
    friend DVector operator-(const SVector& vec);
 
-   ///
+   /// scaling vectors with a real number.
    friend DVector operator*(const Vector& v, double x);
-   /// scaled vectors.
+   /// scaling vectors with a real number.
    friend DVector operator*(double x, const Vector& v);
-   //@}
 
+   /// output operator.
+   friend std::istream& operator>>(std::istream& s, DVector& vec);
 
-   /**@name Assignments */
-   //@{
-   ///
+   /**@todo Do we really have to reimplement the following operators 
+    *       (inheritance from Vector?)  
+    */
+   /// add \p vec to %vector.
    DVector& operator+=(const Vector& vec)
    {
       Vector::operator+=(vec);
       return *this;
    }
-
-   ///
+   /// add \p vec to %vector.
    DVector& operator+=(const SVector& vec)
    {
       Vector::operator+=(vec);
       return *this;
    }
 
-   ///
+   /// subtract \p vec from %vector.
    DVector& operator-=(const Vector& vec)
    {
       Vector::operator-=(vec);
       return *this;
    }
-
-   ///
+   /// subtract \p vec from %vector.
    DVector& operator-=(const SVector& vec)
    {
       Vector::operator-=(vec);
       return *this;
    }
 
-   ///
+   /// scale vector with factor \p x
    DVector& operator*=(double x)
    {
       Vector::operator*=(x);
       return *this;
    }
 
-   ///
+   /// resets #DVector%s dimension to \p newdim.
+   void reDim(int newdim);
+
+   /// resets #DVector%s memory size to \p newsize.
+   void reSize(int newsize);
+
+   /// resets #DVector%s memory size to \p newsize and dimension to \p newdim.
+   void reSize(int newsize, int newdim);
+
+   /// returns #DVector%s memory size.
+   int memSize() const
+   {
+      return memsize;
+   }
+
+   /// consistency check.
+   int isConsistent() const;
+
+   /// default constructor. \p dim is the initial dimension.
+   DVector(int dim = 0);
+
+   /// copy constructor.
+   explicit DVector(const Vector& old);
+   /// copy constructor.
+   DVector(const DVector& old);
+
+   /// assignment operator.
    DVector& operator=(const Vector& vec)
    {
       if (vec.dim() != dim())
@@ -130,58 +153,30 @@ public:
       Vector::operator=(vec);
       return *this;
    }
-
-   /// assingment operator
-   //lint -e1529 Test for self assignment is not neccessary here.
+   /// assignment operator.
    DVector& operator=(const DVector& vec)
    {
-      if (vec.dim() != dim())
-         reDim(vec.dim());
-      Vector::operator=(vec);
-
+      if (this != &vec)
+      {
+         if (vec.dim() != dim())
+            reDim(vec.dim());
+         Vector::operator=(vec);
+      }
       return *this;
    }
-   ///
+   /// assingment operator.
    DVector& operator=(const SVector& vec)
    {
-      if (vec.dim() != dim())  // ??? TK inserted here. I am not sure
-         reDim(vec.dim());    // ??? TK if it is really needed
-
+      if (vec.dim() != dim())
+         reDim(vec.dim()); 
       Vector::operator=(vec);
+
       return *this;
    }
 
-   //@}
-
-   /**@name Miscellaneous */
-   //@{
-   /// reset #DVector#s dimension to #newdim#.
-   void reDim(int newdim);
-   /// reset #DVector#s memory size to #newsize#.
-   void reSize(int newsize);
-   ///  reset #DVector#s memory size to #newsize# and dimension to #newdim#
-   void reSize(int newsize, int newdim);
-   /// get #DVector#s memory size.
-   int memSize() const
-   {
-      return memsize;
-   }
-
-   ///
-   friend std::istream& operator>>(std::istream& s, DVector& vec);
-   ///
-   DVector(const Vector& old);
-   ///
-   DVector(const DVector& old);
-   ///
-   DVector(int dim = 0);
-   ///
+   /// destructor.
    ~DVector();
-   ///
-   int isConsistent() const;
-   //@}
 };
-
 } // namespace soplex
 #endif // _DVECTOR_H_
 

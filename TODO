@@ -70,7 +70,7 @@ cring.h
 *dataset.h
 *didxset.h
 *dsvector.h
-dvector.h
+*dvector.h
 idlist.h
 idxset.h
 islist.h

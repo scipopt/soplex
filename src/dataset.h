@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.10 2001/11/21 16:25:35 bzfpfend Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.11 2001/11/21 20:15:41 bzfkocht Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -32,13 +32,14 @@
 
 namespace soplex
 {
-
 /**@brief   Set of data objects.
    @ingroup Elementary
 
    Class #DataSet manages of sets of \Ref DataObjects "Data Objects" of a
-   template type #DATA. For constructing a #DataSet the maximum number of entries
-   must be given. The current maximum number may be inquired with method #max().
+   template type #DATA. For constructing a #DataSet the maximum number 
+   of entries must be given. The current maximum number may be inquired 
+   with method #max().
+
    Adding more then #max() elements to a #DataSet will core dump. However,
    method #reMax() allows to reset #max() without loss of elements currently
    in the #DataSet. The current number of elements in a #DataSet is returned
@@ -50,13 +51,13 @@ namespace soplex
    access #DATA elements in a set via a version of the subscript
    #operator[](#Key).
    
-   For convenience all elements in a #DataSet are implicitely numbered from 0
-   through #num()-1 and can be accessed with these numbers using a 2nd subscript
-   #operator[](int). The reason for providing #Key%s to access elements of a
-   #DataSet is that the #Key of an element remains unchanged as long as the
-   element is a member of the #DataSet, while the numbers will change in an
-   undefined way, if other elements are added to or removed from the
-   #DataSet.
+   For convenience all elements in a #DataSet are implicitely numbered
+   from 0 through #num()-1 and can be accessed with these numbers
+   using a 2nd subscript #operator[](int). The reason for providing
+   #Key%s to access elements of a #DataSet is that the #Key of an
+   element remains unchanged as long as the element is a member of the
+   #DataSet, while the numbers will change in an undefined way, if
+   other elements are added to or removed from the #DataSet.
 
    The elements in a #DataSet and their #Key%s are stored in two arrays:
    - #theitem keeps the elements #data along with their number stored in #item.
@@ -75,20 +76,21 @@ namespace soplex
    elements are linked in a single linked list: starting with element
    #-firstfree-1, the next free element is given by #-info-1. The last
    free element in the list is marked by #info == -themax-1. Finally all
-   elements in #theitem with index >= #thesize are unused as well.
+   elements in #theitem with index >= #thesize are unused as well.  
 */
 template<class DATA>
 class DataSet
 {
 private:
-   /**@todo   replace all "Key"s with "DataKey" and get rid of this typedef! */
+   /**@todo replace all "Key"s with "DataKey" and get rid of this typedef */
    typedef DataKey Key;
 
 protected:
    struct Item
    {
       DATA data;       ///< data element
-      int info;        ///< element number. info \f$\in\f$ [0,thesize-1] iff element is used
+      int info;        ///< element number. info \f$\in\f$ [0,thesize-1] 
+                       ///< iff element is used
    }* theitem;         ///< array of elements in the #DataSet
 
    Key* thekey;        ///< #Key::idx%s of elements
@@ -100,13 +102,15 @@ protected:
 
 public:
    /**@name Extension
-       Whenever a new element is added to a #DataSet, the latter assigns it a
-       #Key. For this all methods that extend a #DataSet by one ore more
-       elements are provided with two signatures, one of them having a
-       parameter for returning the assigned #Key(s).
+    *  Whenever a new element is added to a #DataSet, the latter assigns it a
+    *  #Key. For this all methods that extend a #DataSet by one ore more
+    *  elements are provided with two signatures, one of them having a
+    *  parameter for returning the assigned #Key(s).
     */
    //@{
-   ///
+   /// adds an element.
+   /**@return 0 on success and non-zero, if an error occured.
+    */
    int add(Key& newkey, const DATA& item)
    {
       DATA* data = create(newkey);
@@ -115,7 +119,9 @@ public:
       memcpy(data, &item, sizeof(DATA));
       return 0;
    }
-   /// adds element \p item, returns 0 on success and non-zero, if an error occured.
+   /// adds element \p item.
+   /**@return 0 on success and non-zero, if an error occured.
+    */
    int add(const DATA& item)
    {
       DATA* data = create();
@@ -125,9 +131,13 @@ public:
       return 0;
    }
 
-   /**@todo  the add-methods for multiple items ignore the return value of the standard add-methods; 
-      they should return a non-zero, if one of the add's failed! */
-   ///
+   /// add several items.
+   /**@return 0 on success and non-zero, if an error occured.
+    *
+    * @todo The add-methods for multiple items ignore the return value 
+    *       of the standard add-methods; they should return a non-zero, 
+    *       if one of the add's failed! 
+    */
    int add(Key newkey[], const DATA* item, int n)
    {
       assert(n >= 0);
@@ -137,7 +147,10 @@ public:
          add(newkey[i], item[i]);
       return 0;
    }
-   /// adds \p n elements from \p items, returns 0 on success and non-zero, if an error occured.
+
+   /// adds \p n elements from \p items.
+   /**@return 0 on success and non-zero, if an error occured.
+    */
    int add(const DATA* items, int n)
    {
       assert(n >= 0);
@@ -148,9 +161,7 @@ public:
       return 0;
    }
 
-   /**@todo  the add-methods for data sets ignore the return value of the standard add-methods; 
-      they should return a non-zero, if one of the add's failed! */
-   ///
+   /// adds several new items.
    int add(Key newkey[], const DataSet < DATA > & set)
    {
       if (num() + set.num() > max())
@@ -159,7 +170,10 @@ public:
          add(newkey[i], set[i]);
       return 0;
    }
-   /// adds all elements of #set, returns 0 on success and non-zero, if an error occured.
+
+   /// adds all elements of \p set.
+   /**@return 0 on success and non-zero, if an error occured.
+    */
    int add(const DataSet < DATA > & set)
    {
       if (num() + set.num() > max())
@@ -169,7 +183,9 @@ public:
       return 0;
    }
 
-   ///
+   /// creates new data element in #DataSet.
+   /**@return Pointer to the newly created element.
+    */
    DATA* create(Key& newkey)
    {
       if (num() >= max())
@@ -189,7 +205,9 @@ public:
 
       return &(theitem[newkey.idx].data);
    }
-   /// creates new (uninitialized) data element in #DataSet, returns a pointer to the newly created element.
+   /// creates new (uninitialized) data element in #DataSet.
+   /**@return Pointer to the newly created element.
+    */
    DATA* create()
    {
       Key tmp;
@@ -198,18 +216,18 @@ public:
    //@}
 
    /**@name Shrinkage
-      When elements are removed from a #DataSet, the remaining ones are
-      renumbered from 0 through the new #size()-1. How this renumbering is
-      performed will not be revealed, since it might be target of future
-      changes. However, some methods provide a parameter int* #perm, which
-      returns the new order after the removal: If #perm[i] < 0, the element
-      numbered i prior to the removal operation has been removed from the
-      set. Otherwise, #perm[i] = j >= 0 means, that the element with number
-      i prior to the removal operation has been renumberd to j.
-      Removing a single elements from a #DataSet yields a simple
-      renumbering of the elements: The last element in the set (i.e.
-      element #num()-1) is moved to the index of the removed element.
-   */
+    * When elements are removed from a #DataSet, the remaining ones are
+    * renumbered from 0 through the new #size()-1. How this renumbering is
+    * performed will not be revealed, since it might be target of future
+    * changes. However, some methods provide a parameter int* #perm, which
+    * returns the new order after the removal: If #perm[i] < 0, the element
+    * numbered i prior to the removal operation has been removed from the
+    * set. Otherwise, #perm[i] = j >= 0 means, that the element with number
+    * i prior to the removal operation has been renumberd to j.
+    * Removing a single elements from a #DataSet yields a simple
+    * renumbering of the elements: The last element in the set (i.e.
+    * element #num()-1) is moved to the index of the removed element.
+    */
    //@{
    /// removes the \p removenum 'th element.
    void remove(int removenum)
@@ -250,9 +268,9 @@ public:
 
    /// remove multiple elements.
    /** This method removes all elements for the #DataSet with an
-       index i such that #perm[i] < 0. Upon completion, #perm contains
-       the new numbering of elements.
-   */
+    *  index i such that #perm[i] < 0. Upon completion, #perm contains
+    *  the new numbering of elements.
+    */
    void remove(int perm[])
    {
       int k, j, first = -1;
@@ -286,7 +304,7 @@ public:
       }
    }
 
-   ///
+   /// ???
    void remove(Key *keys, int n, int* perm)
    {
       assert(perm != 0);
@@ -303,7 +321,7 @@ public:
       remove(keys, n, perm.get_ptr());
    }
 
-   ///
+   /// ???
    void remove(int *nums, int n, int* perm)
    {
       assert(perm != 0);
@@ -329,15 +347,14 @@ public:
    }
    //@}
 
-
    /**@name Access   
-      When accessing elements from a #DataSet with one of the index
-      operators, it must be ensured, that the index is valid for the
-      #DataSet. If this is not known afore, it is the programmers
-      responsability to ensure this using the inquiry methods below.
-   */
+    * When accessing elements from a #DataSet with one of the index
+    * operators, it must be ensured, that the index is valid for the
+    * #DataSet. If this is not known afore, it is the programmers
+    *  responsability to ensure this using the inquiry methods below.
+    */
    //@{
-   ///
+   /// ???
    DATA& operator[](int n)
    {
       return theitem[thekey[n].idx].data;
@@ -348,7 +365,7 @@ public:
       return theitem[thekey[n].idx].data;
    }
 
-   ///
+   /// ???
    DATA& operator[](const Key& k)
    {
       return theitem[k.idx].data;
@@ -359,7 +376,6 @@ public:
       return theitem[k.idx].data;
    }
    //@}
-
 
    /**@name Inquiry */
    //@{
@@ -395,20 +411,24 @@ public:
       return thekey[number(item)];
    }
 
-   /// returns the number of the element with #Key \p k in #DataSet or -1, if it doesn't exist.
+   /// returns the number of the element with #Key \p k in #DataSet or -1, 
+   /// if it doesn't exist.
    int number(const Key& k) const
    {
       return (k.idx < 0 || k.idx >= size()) ? -1
           : theitem[k.idx].info;
    }
 
-   /**@todo  please check, whether this is correctly implemented! */
-   /// returns the number of element \p item in #DataSet or -1, if it doesn't exist.
+   /**@todo Please check, whether this is correctly implemented! */
+   /// returns the number of element \p item in #DataSet or -1, 
+   /// if it doesn't exist.
    int number(const DATA* item) const
    {      
-      ptrdiff_t idx = reinterpret_cast<const struct Item *>(item) - theitem;
-      if( idx < 0 || idx >= size() )
+      ptrdiff_t idx = reinterpret_cast<const struct Item*>(item) - theitem;
+
+      if( idx < 0 || idx >= size())
          return -1;
+
       /* ??? old code:
          if ((reinterpret_cast<unsigned long>(item) < 
               reinterpret_cast<unsigned long>(theitem) )
@@ -416,7 +436,8 @@ public:
              ( reinterpret_cast<unsigned long>(item) >= 
                reinterpret_cast<unsigned long>(&(theitem[size()]))))
             return -1;
-         long idx = ((reinterpret_cast<long>(item)) - (reinterpret_cast<long>(theitem))) 
+         long idx = ((reinterpret_cast<long>(item)) 
+                  - (reinterpret_cast<long>(theitem))) 
                     / sizeof(Item);
       */
       return theitem[idx].info;
@@ -445,11 +466,11 @@ public:
    //@{
    /// resets #max() to \p newmax.
    /** This method will not succeed if \p newmax < #size(), in which case
-       \p newmax == #size() will be taken. As generally this method involves
-       copying the #DataSet%s elements in memory, #reMax() returns the
-       number of bytes the addresses of elements in the #DataSet have been
-       moved. Note, that this is identical for all elements in the
-       #DataSet.
+    *  \p newmax == #size() will be taken. As generally this method involves
+    *  copying the #DataSet%s elements in memory, #reMax() returns the
+    *  number of bytes the addresses of elements in the #DataSet have been
+    *  moved. Note, that this is identical for all elements in the
+    *  #DataSet.
     */
    ptrdiff_t reMax(int newmax = 0)
    {
@@ -466,7 +487,8 @@ public:
       spx_realloc(theitem, themax);
       spx_realloc(thekey,  themax);
 
-      return reinterpret_cast<char*>(theitem) - reinterpret_cast<char*>(old_theitem);
+      return reinterpret_cast<char*>(theitem) 
+         - reinterpret_cast<char*>(old_theitem);
    }
 
    /// consistencty check.
@@ -474,25 +496,29 @@ public:
    {
       if (theitem == 0 || thekey == 0)
       {
-         std::cerr << "Inconsistency detected in class DataSet\n";
+         std::cerr << "Inconsistency detected at " 
+                   << __FILE__ << "(" << __LINE__ << ")" << std::endl;
          return 0;
       }
 
       if (thesize > themax || thenum > themax || thenum > thesize)
       {
-         std::cerr << "Inconsistency detected in class DataSet\n";
+         std::cerr << "Inconsistency detected at " 
+                   << __FILE__ << "(" << __LINE__ << ")" << std::endl;
          return 0;
       }
 
       if (thesize == thenum && firstfree != -themax - 1)
       {
-         std::cerr << "Inconsistency detected in class DataSet\n";
+         std::cerr << "Inconsistency detected at " 
+                   << __FILE__ << "(" << __LINE__ << ")" << std::endl;
          return 0;
       }
 
       if (thesize != thenum && firstfree == -themax - 1)
       {
-         std::cerr << "Inconsistency detected in class DataSet\n";
+         std::cerr << "Inconsistency detected at " 
+                   << __FILE__ << "(" << __LINE__ << ")" << std::endl;
          return 0;
       }
 
@@ -500,7 +526,8 @@ public:
       {
          if (theitem[thekey[i].idx].info != i)
          {
-            std::cerr << "Inconsistency detected in class DataSet\n";
+            std::cerr << "Inconsistency detected at " 
+                      << __FILE__ << "(" << __LINE__ << ")" << std::endl;
             return 0;
          }
       }
@@ -542,9 +569,9 @@ public:
 
    /// assignment operator.
    /** The assignment operator involves #reMax()%ing the lvalue #DataSet
-       to the size needed for copying all elements of the rvalue. After the
-       assignment all #Key%s from the lvalue are valid for the rvalue as
-       well. They refer to a copy of the corresponding data elements.
+    *  to the size needed for copying all elements of the rvalue. After the
+    *  assignment all #Key%s from the lvalue are valid for the rvalue as
+    *  well. They refer to a copy of the corresponding data elements.
     */
    DataSet < DATA > & operator=(const DataSet < DATA > & rhs)
    {
