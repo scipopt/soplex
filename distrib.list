@@ -1,0 +1,12 @@
+soplex-1.2.0/COPYING
+soplex-1.2.0/README
+soplex-1.2.0/Makefile
+soplex-1.2.0/notes-120.txt
+soplex-1.2.0/check/normal.test
+soplex-1.2.0/check/quick.test
+soplex-1.2.0/check/check.sh
+soplex-1.2.0/check/check.awk
+soplex-1.2.0/doc/soplex.dxy
+soplex-1.2.0/doc/xternal.cpp
+soplex-1.2.0/make
+soplex-1.2.0/src
