@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.h,v 1.3 2001/11/29 14:43:46 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxweightst.h,v 1.4 2002/01/03 21:01:33 bzfkocht Exp $"
 
 
 /**@file  spxweightst.h
@@ -69,9 +69,9 @@ protected:
    DataArray < double > colWeight;
 
    /// set variable to rhs?.
-   DataArray < int > rowRight;
+   DataArray < bool > rowRight;
    /// set primal variable to upper bound.
-   DataArray < int > colUp;
+   DataArray < bool > colUp;
 
    /// sets up variable weights.
    /** This method is called in order to setup the weights for all
