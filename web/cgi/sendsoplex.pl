@@ -1,5 +1,5 @@
 #!/softis/bin/perl
-# $Id: sendsoplex.pl,v 1.3 2002/01/17 17:42:30 bzfkocht Exp $
+# $Id: sendsoplex.pl,v 1.4 2002/01/17 17:57:14 bzfkocht Exp $
 
 # einige Vereinbarungen, fuer die Lage von Dateien
 # Arbeitsverzeichnis, ggf. aendern
@@ -25,6 +25,7 @@ push(@INC,$DOPATH);
 require WWW::CGI;
 require Util::Lock;
 require "pwd.pl";
+require "ctime.pl";
 
 ###################
 # Fehlerbehandlung
