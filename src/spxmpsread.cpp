@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.3 2001/12/12 10:26:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.4 2001/12/14 12:49:10 bzfkocht Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read MPS format files.
@@ -122,7 +122,7 @@ public:
                 << row_name << "\" ignored" << std::endl;
    }
    bool readLine();
-   void insertName(const char* name);
+   void insertName(const char* name, bool second);
 };
 
 /// fill the line from \p pos up to column 80 with blanks.
@@ -209,10 +209,11 @@ bool MPSInput::readLine()
 
       /* Test for fixed format
        */
-      space = m_buf[12] | m_buf[13] | m_buf[14] 
-         | m_buf[22] | m_buf[23] | m_buf[24] 
-         | m_buf[36] | m_buf[37] | m_buf[38] | m_buf[39]
-         | m_buf[61] | m_buf[62] | m_buf[63] | m_buf[64];
+      space = m_buf[12] | m_buf[13] 
+         | m_buf[22] | m_buf[23] 
+         | m_buf[36] | m_buf[37] | m_buf[38]
+         | m_buf[47] | m_buf[48] 
+         | m_buf[61] | m_buf[62] | m_buf[63];
       
       if (space == BLANK)
       {
@@ -296,13 +297,19 @@ bool MPSInput::readLine()
 }
 
 /// Insert \p name as field 1 and shift all other fields up.
-void MPSInput::insertName(const char* name)
+void MPSInput::insertName(const char* name, bool second = false)
 {
    m_f5 = m_f4;
    m_f4 = m_f3;
    m_f3 = m_f2;
-   m_f2 = m_f1;
-   m_f1 = name;
+
+   if (second)
+      m_f2 = name;
+   else
+   {
+      m_f2 = m_f1;
+      m_f1 = name;
+   }
 }
 
 /// Process NAME section.
@@ -720,9 +727,16 @@ static void readBounds(
          mps.setSection(MPSInput::ENDATA);
          return;
       }
-      if ((mps.field2() != 0) && (mps.field3() == 0))
-         mps.insertName("_BND_");
-
+      if (!strcmp(mps.field1(), "FR"))
+      {
+         if ((mps.field2() != 0) && (mps.field3() == 0))
+            mps.insertName("_BND_", true);
+      }
+      else
+      {
+         if ((mps.field3() != 0) && (mps.field4() == 0))
+            mps.insertName("_BND_", true);
+      }
       if ((mps.field1() == 0) || (mps.field2() == 0) || (mps.field3() == 0))
          break;
 
