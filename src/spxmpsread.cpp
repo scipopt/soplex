@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.2 2001/12/10 19:05:54 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.3 2001/12/12 10:26:06 bzfkocht Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read MPS format files.
@@ -62,6 +62,7 @@ private:
    const char*     m_f5;
    char            m_probname[MAX_LINE_LEN];
    char            m_objname [MAX_LINE_LEN];
+   bool            m_is_integer;
 
 public:
    MPSInput(std::istream& p_input)
@@ -70,22 +71,24 @@ public:
       , m_lineno(0)
       , m_objsense(SPxLP::MINIMIZE)
       , m_has_error(false)
+      , m_is_integer(false)
    {
       m_probname[0] = '\0';
       m_objname [0] = '\0';
    }
-   Section         section()  const { return m_section; }
-   int             lineno()   const { return m_lineno; }
-   const char*     field0()   const { return m_f0; }
-   const char*     field1()   const { return m_f1; }
-   const char*     field2()   const { return m_f2; }
-   const char*     field3()   const { return m_f3; }
-   const char*     field4()   const { return m_f4; }
-   const char*     field5()   const { return m_f5; }
-   const char*     probName() const { return m_probname; }
-   const char*     objName()  const { return m_objname; }
-   SPxLP::SPxSense objSense() const { return m_objsense; }
-   bool            hasError() const { return m_has_error; }
+   Section         section()   const { return m_section; }
+   int             lineno()    const { return m_lineno; }
+   const char*     field0()    const { return m_f0; }
+   const char*     field1()    const { return m_f1; }
+   const char*     field2()    const { return m_f2; }
+   const char*     field3()    const { return m_f3; }
+   const char*     field4()    const { return m_f4; }
+   const char*     field5()    const { return m_f5; }
+   const char*     probName()  const { return m_probname; }
+   const char*     objName()   const { return m_objname; }
+   SPxLP::SPxSense objSense()  const { return m_objsense; }
+   bool            hasError()  const { return m_has_error; }
+   bool            isInteger() const { return m_is_integer; }
 
    void setSection(Section p_section)
    {
@@ -248,6 +251,14 @@ bool MPSInput::readLine()
             m_f3 = 0;
             break;      
          }
+         if (is_marker)
+            if (!strcmp(m_f3, "'INTBEG'"))
+               m_is_integer = true;
+            else if (!strcmp(m_f3, "'INTEND'"))
+               m_is_integer = false;
+            else
+               break; // unknown marker
+
          if (!strcmp(m_f3, "'MARKER'"))
             is_marker = true;
 
@@ -256,6 +267,14 @@ bool MPSInput::readLine()
             m_f4 = 0;
             break;      
          }
+         if (is_marker)
+            if (!strcmp(m_f4, "'INTBEG'"))
+               m_is_integer = true;
+            else if (!strcmp(m_f4, "'INTEND'"))
+               m_is_integer = false;
+            else
+               break; // unknown marker
+
          if ((0 == (m_f5 = strtok(0, " "))) || (*m_f5 == '$'))
             m_f5 = 0;
       }
@@ -444,7 +463,8 @@ static void readCols(
    LPRowSet& rset,
    NameSet&  rnames,
    LPColSet& cset,
-   NameSet&  cnames)
+   NameSet&  cnames,
+   DIdxSet*  intvars)
 {
    double val;
    int    idx;
@@ -483,6 +503,14 @@ static void readCols(
          cnames.add(colname);
          col.colVector().clear();
          col.obj() = 0.0;
+
+         if (mps.isInteger())
+         {
+            assert(cnames.number(colname) == cset.num());
+
+            if (intvars != 0)
+               intvars->addIdx(cnames.number(colname));
+         }
       }
       val = atof(mps.field3());
 
@@ -673,7 +701,8 @@ static void readRanges(
 static void readBounds(
    MPSInput& mps,
    LPColSet& cset,
-   NameSet&  cnames)
+   NameSet&  cnames,
+   DIdxSet*  intvars)
 {
    char   bndname[MAX_LINE_LEN] = { '\0' };
    int    idx;
@@ -709,9 +738,17 @@ static void readBounds(
          {
          case 'L':
             cset.lower(idx) = val;
+
+            // ILOG extension (Integer Lower Bound)
+            if ((intvars != 0) && (mps.field1()[1] == 'I'))
+               intvars->add(idx);
             break;
          case 'U':
             cset.upper(idx) = val;
+
+            // ILOG extension (Integer Upper Bound)
+            if ((intvars != 0) && (mps.field1()[1] == 'I'))
+               intvars->add(idx);
             break;
          case 'F':
             if (mps.field1()[1] == 'X')
@@ -730,6 +767,13 @@ static void readBounds(
             break;
          case 'P':
             cset.upper(idx) = SPxLP::infinity;
+            break;
+         case 'B' : // Ilog extension (Binary)
+            cset.lower(idx) = 0.0;
+            cset.upper(idx) = 1.0;
+
+            if (intvars != 0)
+               intvars->add(idx);
             break;
          default:
             mps.syntaxError();
@@ -759,7 +803,8 @@ static void readBounds(
 void SPxLP::readMPS(
    std::istream& p_input, 
    NameSet*      p_rnames,          ///< row names.
-   NameSet*      p_cnames)          ///< column names.
+   NameSet*      p_cnames,          ///< column names.
+   DIdxSet*      p_intvars)         ///< integer variables.
 {
    LPRowSet& rset = *this;
    LPColSet& cset = *this;
@@ -797,7 +842,7 @@ void SPxLP::readMPS(
    addedRows(rset.num());
 
    if (mps.section() == MPSInput::COLUMNS)
-      readCols(mps, rset, *rnames, cset, *cnames);
+      readCols(mps, rset, *rnames, cset, *cnames, p_intvars);
 
    if (mps.section() == MPSInput::RHS)
       readRhs(mps, rset, *rnames);
@@ -806,7 +851,7 @@ void SPxLP::readMPS(
       readRanges(mps, rset, *rnames);
 
    if (mps.section() == MPSInput::BOUNDS)
-      readBounds(mps, cset, *cnames);
+      readBounds(mps, cset, *cnames, p_intvars);
 
    if (mps.section() != MPSInput::ENDATA)
       mps.syntaxError();

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxio.cpp,v 1.3 2001/12/10 15:46:49 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxio.cpp,v 1.4 2001/12/12 10:26:06 bzfkocht Exp $"
 
 
 #include <iostream>
@@ -51,7 +51,7 @@ void SPxLP::read(
    if ((c == '*') || (c == 'N'))
       readMPS(is, rowNames, colNames);
    else
-      readLP(is, rowNames, colNames);
+      readLPF(is, rowNames, colNames);
 }
 
 static void dumpRows(std::ostream& s, const SPxLP& lp)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.8 2001/12/11 09:09:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.9 2001/12/12 10:26:06 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -1474,7 +1474,7 @@ public:
    {
       return theTime.userTime();
    }
-
+#if 0
    /// add \p row to #LPSolver%s LP.
    void addRow(const LPRow& row)
    {
@@ -1583,7 +1583,7 @@ public:
    {
       SPxLP::removeColRange(start, end, perm);
    }
-
+#endif
 
    /// change objective value to variable with #ColId \p id.
    void changeObj(LPSolver::ColId p_id, double p_newVal)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpsolver.h,v 1.5 2001/12/11 09:09:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpsolver.h,v 1.6 2001/12/12 10:26:06 bzfkocht Exp $"
 
 
 /**@file  lpsolver.h
@@ -254,8 +254,7 @@ public:
    /// dumps loaded LP to \p filename in LP format.
    virtual void dumpFile(char* filename) const = 0;
    //@}
-
-
+#if 0
    /**@name Adding Rows and Columns
       Each row and column in an #LPSolver is associated to #RowId and
       #ColId, respectively, which remains unchanged, as long as the row or
@@ -347,7 +346,7 @@ public:
    /// removes columns from \p start to \p end (including both).
    virtual void removeColRange(int start, int end, int perm[] = 0) = 0;
    //@}
-
+#endif
 
    /**@name Manipulating the LP */
    //@{

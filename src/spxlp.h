@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.9 2001/12/10 15:46:49 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.10 2001/12/12 10:26:06 bzfkocht Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -658,12 +658,12 @@ public:
       NameSet* rowNames = 0, NameSet* colNames = 0);
 
    /// reads a file in LP format from \p in.
-   virtual void readLP (std::istream& in, 
-      NameSet* rowNames = 0, NameSet* colNames = 0);
+   virtual void readLPF (std::istream& in, 
+      NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
 
    /// reads a file in MPS format from \p in.
    virtual void readMPS(std::istream& in, 
-      NameSet* rowNames = 0, NameSet* colNames = 0);
+      NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
    //@}
 
 
