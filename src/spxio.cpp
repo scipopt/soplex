@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxio.cpp,v 1.6 2002/01/11 21:05:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxio.cpp,v 1.7 2002/01/17 12:08:59 bzfpfend Exp $"
 
 
 #include <iostream>
@@ -35,7 +35,8 @@ namespace soplex
 bool SPxLP::read(
    std::istream& is, 
    NameSet* rowNames,
-   NameSet* colNames)
+   NameSet* colNames,
+   DIdxSet* intVars)
 {
    bool ok;
    char c;
@@ -50,8 +51,8 @@ bool SPxLP::read(
     * There is no possible valid LPF file starting with a '*' or 'N'.
     */
    ok = ((c == '*') || (c == 'N'))
-      ? readMPS(is, rowNames, colNames)
-      : readLPF(is, rowNames, colNames);
+      ? readMPS(is, rowNames, colNames, intVars)
+      : readLPF(is, rowNames, colNames, intVars);
 
    //   std::cout << *this;
 

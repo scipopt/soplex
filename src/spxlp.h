@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.14 2002/01/10 23:07:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.15 2002/01/17 12:08:59 bzfpfend Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -344,6 +344,18 @@ public:
       return LPRowSet::lhs(id);
    }
 
+   /// returns the inequality type of the \p i'th LPRow.
+   LPRow::Type type(int i) const
+   {
+      return LPRowSet::type(i);
+   }
+
+   /// returns the inequality type of the row with DataKey \p k.
+   LPRow::Type type(const DataKey &k) const
+   {
+      return LPRowSet::type(k);
+   }
+
    /// gets \p i 'th column.
    void getCol(int i, LPCol& column) const;
 
@@ -370,6 +382,12 @@ public:
 
    /// gets objective vector.
    void getObj(Vector& obj) const;
+
+   /// returns objective vector.
+   const Vector& obj() const
+   {
+      return LPColSet::obj();
+   }
 
    /// returns objective value of column \p i.
    double obj(int i) const
@@ -634,7 +652,7 @@ public:
    //@{
    /// reads a file from input stream \p in.
    virtual bool read (std::istream& in, 
-      NameSet* rowNames = 0, NameSet* colNames = 0);
+      NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
 
    /// reads a file in LP format from \p in.
    virtual bool readLPF (std::istream& in, 
