@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.73 2005/01/03 11:30:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.74 2005/01/04 19:50:57 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -47,7 +47,7 @@ bool SPxSolver::precisionReached(Real& newDelta) const
 
    if (!reached)
    {
-      newDelta = delta() / 10.0;
+      newDelta = thepricer->epsilon() / 10.0;
 
       VERBOSE3({ std::cout << "Precision not reached: Pricer delta= " << thepricer->epsilon() 
                            << " new delta= " << newDelta
@@ -276,7 +276,7 @@ SPxSolver::Status SPxSolver::solve()
                {
                   // is the solution good enough ?
                   // max three times reduced
-                  if ((delta() > minDelta) && !precisionReached(newDelta))
+                  if ((thepricer->epsilon() > minDelta) && !precisionReached(newDelta))
                   {  // no
                      // we reduce delta(). Note that if the pricer does not find a candiate
                      // with the reduced delta, we quit, regardless of the violations.

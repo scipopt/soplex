@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.33 2004/11/09 17:10:44 bzfkocht Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.34 2005/01/04 19:50:57 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -533,6 +533,7 @@ bool SPxSolver::leave(int leaveIdx)
    Real leaveMax;       // maximium lambda of leaving var
    Real leavebound;     // current fVec value of leaving var
    int  leaveNum;       // number of leaveId in bounds
+
    getLeaveVals(leaveIdx, leaveStat, leaveId, leaveMax, leavebound, leaveNum);
 
    if (m_numCycle > m_maxCycle)
@@ -568,8 +569,11 @@ bool SPxSolver::leave(int leaveIdx)
          if (enterVal != leaveMax)
          {
             DEBUG( std::cout << "rejecting leave A " << std::endl; );
+
+            // Problem: These changes do not survive a refactorization
             theCoTest[leaveIdx] *= 0.01;            // #== fTest()#
-            theCoTest[leaveIdx] -= 2 * delta();     // #== fTest()#
+            //            theCoTest[leaveIdx] -= 2 * delta();     // #== fTest()#
+
             return true;
          }
          if (lastUpdate() > 1)
