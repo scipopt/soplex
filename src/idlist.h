@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idlist.h,v 1.10 2002/01/08 09:27:27 bzfkocht Exp $"
+#pragma ident "@(#) $Id: idlist.h,v 1.11 2002/01/08 09:29:57 bzfkocht Exp $"
 
 /**@file  idlist.h
  * @brief Generic double linked list.
@@ -203,7 +203,7 @@ public:
          list.first()->prev() = after;
          after->next() = list.first();
          if (after == last())
-            the_last = list.last();
+            this->the_last = list.last();
          else
             list.last()->next()->prev() = list.last();
       }
@@ -223,7 +223,7 @@ public:
    {
       if (elem == first())
       {
-         the_first = next(elem);
+         this->the_first = next(elem);
          if (first() == 0)
             this->the_last = 0;
       }
