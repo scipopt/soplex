@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.27 2002/01/19 16:05:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.28 2002/01/19 16:10:19 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -183,7 +183,7 @@ public:
       OPTIMAL     = 1,   ///< LP has been solved to optimality.
       UNBOUNDED   = 2,   ///< LP has been proven to be unbounded.
       INFEASIBLE  = 3,   ///< LP has been proven to be infeasible.
-      CHANGED     = 4,   ///< LP has been changed.
+      CHANGED     = 4    ///< LP has been changed.
    };
    //@}
 
