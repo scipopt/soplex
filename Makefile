@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.11 2001/11/26 15:38:29 bzfbleya Exp $
+# $Id: Makefile,v 1.12 2001/11/30 13:45:07 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -76,11 +76,13 @@ LIBRARY		=	$(LIBDIR)/lib$(NAME).$(OSTYPE).$(ARCH).$(COMP).$(OPT).a
 BINARY		=	$(BINDIR)/$(TARGET)
 DEPEND		=	src/depend
 
-OBJDIR		=	O.$(OSTYPE).$(ARCH).$(COMP).$(OPT)
+OBJDIR		=	obj/O.$(OSTYPE).$(ARCH).$(COMP).$(OPT)
 OBJXXX		=	$(addprefix $(OBJDIR)/,$(OBJECT))
 LIBXXX		=	$(addprefix $(OBJDIR)/,$(LIBOBJ))
 OBJSRC		=	$(addprefix $(SRCDIR)/,$(OBJECT:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
+
+vpath		%.o	$(OBJDIR)
 
 $(BINARY):	$(OBJDIR) $(BINDIR) $(OBJXXX) $(LIBRARY) 
 		$(CXX) $(CXXFLAGS) $(OBJXXX) \
@@ -111,7 +113,7 @@ clean:
 		-rm -rf $(OBJDIR)/* $(LIBRARY) $(BINARY)
 
 $(OBJDIR):	
-		-mkdir $(OBJDIR)
+		-mkdir -p $(OBJDIR)
 
 $(LIBDIR):
 		-mkdir $(LIBDIR)
@@ -119,20 +121,16 @@ $(LIBDIR):
 $(BINDIR):
 		-mkdir $(BINDIR)
 
-depend:
+$(DEPEND):
 		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
 		$(OBJSRC:.o=.cpp) $(LIBSRC:.o=.cpp) \
-		| sed '\''s/^\([0-9A-z]\{1,\}\)\.o/$(OBJDIR:/=\/)\/\1.o/g'\'' \
 		>$(DEPEND)'
+
+#		| sed '\''s|^\([0-9A-z]\{1,\}\)\.o|$(OBJDIR)/\1.o|g'\'' \
 
 include		$(DEPEND)
 
 $(OBJDIR)/%.o:	$(SRCDIR)/%.cpp
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
-
-
-
-
-
-
+# --- EOF ---------------------------------------------------------------------
