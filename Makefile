@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.7 2001/11/20 15:34:05 bzfkocht Exp $
+# $Id: Makefile,v 1.8 2001/11/20 15:46:48 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -8,7 +8,7 @@
 #*                                                                           *
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-.PHONY:		depend clean lint check quick cover
+.PHONY:		depend clean lint doc check quick cover
 
 ARCH            :=      $(shell uname -m | \
                         sed -e s/sun../sparc/ -e s/i.86/x86/)
@@ -22,7 +22,7 @@ DCXX		=	g++
 LINT		=	lintgcc
 AR		=	ar
 RANLIB		=	ranlib
-DOCXX		=	docxx
+DOXY		=	doxygen
 
 CPPFLAGS	=	-Isrc
 CXXFLAGS	=	-O
@@ -95,11 +95,9 @@ lint:		$(OBJSRC) $(LIBSRC)
 		$(LINT) src/project.lnt -os\(src/lint.out\) \
 		$(CPPFLAGS) -UNDEBUG $^
 
-#doc:		$(DOCDIR)/soplex.dvi
-#
-#html:		$(DOCSRC)
-#		-@mkdir $(HTMLDIR)
-#		$(DOCXX) -d $(HTMLDIR) $(DOCSRC)
+doc:		
+		cd doc; $(DOXY) soplex.dxy
+
 check:		
 		cd check; ./check.sh normal.test $(BINARY)
 
