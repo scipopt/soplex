@@ -13,406 +13,88 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.1 2001/11/19 09:30:47 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.2 2001/11/19 22:08:10 bzfkocht Exp $"
 
-#include <ctype.h>
+/**@file  spflpfread.cpp
+ * @brief Read LP format files.
+ */
 #include <assert.h>
+#include <ctype.h>
 #include <iostream>
 
 #include "spxlp.h"
 
+#define MAX_LINE_LEN  256
+
+#define INIT_COLS     10000       ///< initialy allocated columns.
+#define INIT_ROWS     10000       ///< initialy allocated rows.
+#define INIT_NZOS     100000      ///< initialy allocated non zeros.
+#define INIT_NAME_MEM 100000      ///< initialy memory for names.
+
 namespace soplex
 {
-class LPFReader
+/// Report error and give up.
+static void syntaxError(int lineno)
 {
-private:
-   enum Section { START, OBJECTIVE, LHS, RHS, BOUNDS, INTEGERS, BINARYS };
-
-   static const int MaxLineLen  = 256;    ///< maximum input line length.
-   static const int InitCols    = 10000;  ///< initialy allocated columns.
-   static const int InitRows    = 10000;  ///< initialy allocated rows.
-   static const int InitNzos    = 100000; ///< initialy allocated non zeros.
-   static const int InitNameMem = 100000; ///< initialy memory for names.
-
-   istream&        m_input;               ///< where to read input from.
-   char            m_line[MaxLineLen];    ///< last read line.
-   int             m_lineno;              ///< current line number.
-   char*           m_pos;                 ///< current position in line.
-   double          m_coeff;               ///< last read coefficient. 
-   int             m_colIdx;              ///< index of last read column name.
-   int             m_sense;               ///< last read sense.
-
-   LPCol           m_emptyCol;            ///< reusable empty column.
-   LPColSet        m_colSet;              ///< the set of columns read.
-
-   LPRow           m_row;                 ///< last assembled row.
-   LPRowSet        m_rowSet;              ///< the set of rows read.
-   DSVector&       m_vec;                 ///< last assembled vector (from row).
-
-   Section         m_section;
-
-   SPxLP::SPxSense m_optSense;            ///< objective sense (min or max?).
-   NameSet*        m_colNames;            ///< column names.
-   NameSet*        m_rowNames;            ///< row names.
-   DIdxSet*        m_intVars;             ///< integer variables.
-   bool            m_freeColNames;        ///< should we free m_colNames.
-   bool            m_freeRowNames;        ///< should we free m_rowNames.
-   bool            m_error;               ///< was an error encountered.
-
-   /// read a line from the file.
-   bool readLine();
-
-
-   bool isSense();
-   bool isCoeff();
-   bool isColName();
-
-   bool readSense();
-
-   /// read the next coefficent (if any) from the input.
-   bool readCoeff();
-
-   /// read the next identifier from the input.
-   bool readColName();
-
-   /// does the line start with a keyoword ?
-   int hasKeyword(const char* keyword, const char* buf);
-
-   int hasRowName(const char* buf);
-
-   bool syntaxError();
-
-public:
-   /// constructor.
-   LPFReader(istream& p_input, NameSet* p_rowNames, 
-      NameSet* p_colNames, DIdxSet* p_intVars);
-
-   /// destructor.
-   ~LPFReader();
-
-   bool readLP();
-};
-
-LPFReader::LPFReader(
-   istream& p_input, 
-   NameSet* p_rowNames, 
-   NameSet* p_colNames, 
-   DIdxSet* p_intVars)
-   : m_input(p_input)
-   , m_lineno(0)
-   , m_pos(0)
-   , m_emptyCol()
-   , m_colSet(InitCols, 1)
-   , m_row(100)
-   , m_rowSet(InitRows, InitNzos)
-   , m_vec(m_row.rowVector())
-   , m_section(START)
-   , m_optSense(SPxLP::MAXIMIZE)
-   , m_colNames(p_colNames)
-   , m_rowNames(p_rowNames)
-   , m_intVars(p_intVars)
-   , m_freeColNames(false)
-   , m_freeRowNames(false)
-   , m_error(false)
-{
-   assert(m_input != 0);
-
-   if (m_colNames == 0)
-   {
-      m_colNames     = new NameSet(InitCols, InitNameMem);
-      m_freeColNames = true;
-   }
-   assert(m_colNames != 0);
-
-   if (m_rowNames == 0)
-   {
-      m_rowNames     = new NameSet(InitRows, InitNameMem);
-      m_freeRowNames = true;
-   }
-   assert(m_rowNames != 0);
+   // Let's do it the professional way.
+   std::cerr << "Syntax error in line " << lineno << std::endl
+             << "Terminating program" << std::endl;
+   
+   abort();
 }
 
-LPFReader::~LPFReader()
+static bool isValue(const char* s)
 {
-   if (m_freeColNames)
-      delete m_colNames;
-   if (m_freeRowNames)
-      delete m_rowNames;
+   return ((*s >= '0') && (*s <= '9'))  
+      || (*s == '+') || (*s == '-') || (*s == '.');
 }
 
-bool LPFReader::readLP()
+static bool isColName(const char* s)
 {
-   for(;;)
-   {
-      if ((m_pos == 0) || (*m_pos == '\0'))
-         if (readLine())
-            break;
-
-      // Now process the sections 
-      switch(m_section)
-      {
-      case OBJECTIVE :
-         if (isCoeff())
-            readCoeff();
-
-         if (isColName())
-         {
-            readColName();
-            m_vec.add(m_colIdx, m_coeff);
-         }
-         break;
-      case LHS :
-         if (isCoeff())
-            readCoeff();
-
-         if (isColName())
-         {
-            readColName();
-            m_vec.add(m_colIdx, m_coeff);
-         }
-         if (isSense())
-         {
-            // Hier muesste man wissen of gerade ein ColName gekommen ist
-            // andernfalls hat man ein range.
-            readSense();
-            m_section = RHS;
-         }
-         break;
-      case RHS :
-         if (isCoeff())
-         {
-            readCoeff();
-
-            if (m_sense == '<')
-            { 
-               m_row.lhs() = -SPxLP::infinity; 
-               m_row.rhs() = m_coeff;
-            }
-            else if (m_sense == '>')
-            {
-               m_row.lhs() = m_coeff;
-               m_row.rhs() = SPxLP::infinity;
-            }
-            else if (m_sense == '=')
-            {
-               m_row.lhs() = m_coeff;
-               m_row.rhs() = m_coeff;
-            }
-            else if (m_sense == 'R')
-            {
-               std::cerr << "Ranges not yet implemented" << std::endl;
-               // m_row.lhs() = ???;
-               // m_row.rhs() = m_coeff;
-            }
-            else
-               abort();
-
-            // add inequality 
-            m_rowSet.add(m_row);
-            m_vec.clear();
-
-            m_section = LHS;
-            continue;
-         }
-         return syntaxError();
-      case BOUNDS :
-         // gucken ob wir schon einen namen haben bzw sense haben und
-         // dann entsprechend das richtige tun.
-         if (isCoeff())
-            readCoeff();
-
-         if (isColName())
-         {
-            readColName();
-         }
-         if (isSense())
-         {
-            readSense();
-         }
-         break;
-      case BINARYS :
-         if (isColName())
-         {
-            readColName();
-
-            if ((m_intVars != 0) && (m_colIdx >= 0))
-               m_intVars->addIdx(m_colIdx);
-         }
-         break;
-      case INTEGERS :
-         if (isColName())
-         {
-            readColName();
-
-            if ((m_intVars != 0) && (m_colIdx >= 0))
-               m_intVars->addIdx(m_colIdx);
-         }
-         break;
-      case START :
-      default :
-         abort();
-      }
-   }
-   if (!m_error)
-   {
-      assert(m_colSet.isConsistent());
-      assert(m_rowSet.isConsistent());
-   }
-
-   return m_error;
+   return ((*s >= 'A') && (*s <= 'Z'))
+      || ((*s >= 'a') && (*s <= 'z'))
+      || (strchr("!\"#$%&()/,;?@_'`{}|~", *s) != 0);
 }
 
-bool LPFReader::readLine()
+static bool isSense(const char* s)
 {
-   char buf[MaxLineLen];
-   char tmp[MaxLineLen];
-   int  i;
-   int  k;
-
-   do
-   {      
-      if (m_input.getline(buf, sizeof(buf)) == 0)
-         return true;
-
-      m_lineno++;
-      i = 0;
-
-      // 1. Remove comments.
-      char* s = strchr(buf, '\\');
-
-      if (s != 0)
-         *s = '\0';
-
-      // 2. look for keywords. 
-      switch(m_section)
-      {
-      case START :
-         if ((i = hasKeyword("max[imize]", buf)) > 0)
-         {
-            m_optSense = SPxLP::MAXIMIZE;
-            m_section  = OBJECTIVE;
-            m_vec.clear();
-         } 
-         else if ((i = hasKeyword("min[imize]", buf)) > 0)
-         {
-            m_optSense = SPxLP::MINIMIZE;
-            m_section  = OBJECTIVE;
-            m_vec.clear();
-         } 
-         break;
-      case OBJECTIVE :
-         i = hasKeyword("s[ubject][   ]t[o]", buf);
-         if (i == 0)
-            i = hasKeyword("s[uch][    ]t[hat]", buf);
-         if (i == 0)
-            i = hasKeyword("s[.][    ]t[.]", buf);
-         if (i > 0)
-         {
-            // store objective vector            
-            for(int j = m_vec.size() - 1; j >= 0; --j)
-               m_colSet.obj(m_vec.index(j)) = m_vec.value(j);
-            m_vec.clear();
-            m_section = LHS;
-         }
-      case LHS :
-      case BOUNDS :
-      case BINARYS :
-      case INTEGERS :
-         if (hasKeyword("bounds", buf))
-         {
-            m_section = BOUNDS;
-         } 
-         if (hasKeyword("bin[arys]", buf))
-         {
-            m_section = BINARYS;
-         } 
-         if (hasKeyword("int[egers]", buf))
-         {
-            m_section = INTEGERS;
-         } 
-         if (hasKeyword("end", buf))
-         {
-            return false;
-         } 
-         break;
-      case RHS :
-      default :
-         syntaxError();
-         return false;
-      }
-      // 3. look for row names.
-      i += hasRowName(&buf[i]);
-
-      // 4. remove spaces.
-      for(k = 0; buf[i] != '\0'; i++)
-         if (!isspace(buf[i]))
-            tmp[k++] = buf[i];
-
-      tmp[k] = '\0';
-
-   } // 5. Is this a empty line ?
-   while(tmp[0] == '\0');
-
-   // 6. collapse sequences of '+' and '-'. e.g ++---+ => -
-   for(i = 0, k = 0; tmp[i] != '\0'; i++)
-   {
-      while(((tmp[i] == '+') || (tmp[i] == '-')) 
-         && ((tmp[i + 1] == '+') || (tmp[i + 1] == '-')))
-      {
-         if (tmp[i++] == '-')
-            tmp[i] = (tmp[i] == '-') ? '+' : '-';
-      }
-      m_line[k++] = tmp[i];
-   }
-   m_line[k] = '\0';
-
-   // 7. We have something to process. 
-   m_pos = m_line;
-
-   return false;
+   return (*s == '<') || (*s == '>') || (*s == '=');
 }
 
-bool LPFReader::isCoeff()
+/**
+ * This will not catch malformatted numbers like .e10 !
+ */
+static double readValue(char*& pos)
 {
-   return isdigit(*m_pos) 
-      || (*m_pos == '+') || (*m_pos == '-') || (*m_pos == '.');
-}
+   assert(isValue(pos));
 
-bool LPFReader::isColName()
-{
-   return isalpha(*m_pos) || (*m_pos == '_');
-}
-
-bool LPFReader::isSense()
-{
-   return (*m_pos == '<') || (*m_pos == '>') || (*m_pos == '=');
-}
-
-bool LPFReader::readCoeff()
-{
-   if (!isCoeff())
-      return syntaxError();
-
-   char        tmp[MaxLineLen];
-   const char* s = m_pos;
+   char        tmp[MAX_LINE_LEN];
+   const char* s = pos;
    char*       t;
+   double      value = 1.0;
+   bool        has_digits = false;
 
    // 1. sign 
    if ((*s == '+') || (*s == '-'))
       s++;
 
    // 2. Digits before the decimal dot
-   while(isdigit(*s))
+   while((*s >= '0') && (*s <= '9'))
+   {
+      has_digits = true;
       s++;
-
+   }
    // 3. Decimal dot
    if (*s == '.')
    {
       s++;
 
       // 4. If there was a dot, posible digit behind it
-      while(isdigit(*s))
+      while((*s >= '0') && (*s <= '9'))
+      {
+         has_digits = true;
          s++;
+      }
    }
    // 5. Exponent
    if (tolower(*s) == 'e')
@@ -424,209 +106,441 @@ bool LPFReader::readCoeff()
          s++;
 
       // 7. Exponent digits
-      while(isdigit(*s))
+      while((*s >= '0') && (*s <= '9'))
          s++;      
    }
-   if (s == m_pos)
-      m_coeff = 1.0;
-   else
-   {
-      for(t = tmp; m_pos != s; m_pos++)
-         *t++ = *m_pos;
+   assert(s != pos);
    
+   if (has_digits)
+   {
+      for(t = tmp; pos != s; pos++)
+         *t++ = *pos;   
       *t = '\0';
-      
-      m_coeff = atof(tmp);
+      value = atof(tmp);
    }
-   assert(m_pos == s);
+   else
+      value = (*pos == '-') ? -1.0 : 1.0;
 
-   return false;
+   pos += s - pos;
+
+   assert(pos == s);
+
+   std::cout << "readValue: " << value << std::endl;
+
+   return value;
 }
 
-bool LPFReader::readColName()
+static int readColName(
+   char*& pos, NameSet* colnames, LPColSet& colset, LPCol& emptycol)
 {
-   if (!isColName())
-      return syntaxError();
+   assert(isColName(pos));
+   assert(colnames != 0);
 
-   char        name[MaxLineLen];
-   const char* s = m_pos;
+   char        name[MAX_LINE_LEN];
+   const char* s = pos;
    int         i;
+   int         colidx;
 
-   while((*s != '+') && (*s != '-') && (*s != ':') && (*s != '\0'))
+   while((strchr("+-.<>=", *s) == 0) && (*s != '\0'))
       s++;
 
-   for(i = 0; m_pos != s; i++, m_pos++)
-      name[i] = *m_pos;
+   for(i = 0; pos != s; i++, pos++)
+      name[i] = *pos;
 
    name[i] = '\0';
 
-   if ((m_colIdx = m_colNames->number(name)) < 0)
+   std::cout << "Name [" << name << "]\n";
+
+   if ((colidx = colnames->number(name)) < 0)
    {
-      m_colIdx = m_colNames->num();
-      m_colNames->add(name);
-      m_colSet.add(m_emptyCol);
+      colidx = colnames->num();
+      colnames->add(name);
+      colset.add(emptycol);
    }
-   return false;
+   return colidx;
 }
 
-bool LPFReader::readSense()
+static int readSense(char*& pos)
 {
-   if (m_pos[0] == '<') 
-      m_sense = m_pos[0];
-   else if (m_pos[0] == '>') 
-      m_sense = m_pos[0];
-   else if (m_pos[0] != '=')
-      return syntaxError();
-   else 
-   {
-      assert(m_pos[0] == '=');
+   assert(isSense(pos));
 
-      if (m_pos[1] == '<') 
-         m_sense = m_pos[1];
-      else if (m_pos[1] == '>') 
-         m_sense = m_pos[1];
-      else 
-         m_sense = m_pos[0];
-   }
-   m_pos++;
+   int sense = *pos++;
 
-   if ((m_pos[0] == '<') || (m_pos[0] == '>') || (m_pos[0] == '=')) 
-      m_pos++;
+   if ((*pos == '<') || (*pos == '>'))
+      sense = *pos++;
+   else if (*pos == '=')
+      pos++;
 
-   return false;
+   std::cout << "readSense " << static_cast<char>(sense) << std::endl;
+
+   return sense;
 }
 
-#if 0
-bool LPFReader::hasKeyword(const char* keyword)
-{
-   int i;
-   int k;
-
-   for(i = 0, k = 0; keyword[i] != '\0'; i++, k++)
-   {
-      if (keyword[i] == '*')
-      {
-         i++;
-         while((tolower(m_line[k]) != keyword[i]) && (m_line[k] != '\0'))
-            k++;
-      }
-      if (keyword[i] != tolower(m_line[k]))
-         break;
-   }
-   return keyword[i] == '\0';
-}
-#endif
-
-int LPFReader::hasKeyword(const char* keyword, const char* buf)
+/// Is the \p keyword present in \p buf ?
+static bool hasKeyword(char*& pos, const char* keyword)
 {
    int i;
    int k;
 
    assert(keyword != 0);
-   assert(buf     != 0);
 
    for(i = 0, k = 0; keyword[i] != '\0'; i++, k++)
    {
       if (keyword[i] == '[')
       {
          i++;
+
          // Here we assumed that we have a ']' for the '['.
-         while((tolower(buf[k]) == keyword[i]) && (buf[k] != '\0'))
-            k++;
+         while((tolower(pos[k]) == keyword[i]) && (pos[k] != '\0'))
+         {
+           k++;
+           i++;
+         }
          while(keyword[i] != ']')
             i++;         
-         k--;
-         i--;
+         --k;
       }
       else
-         if (keyword[i] != tolower(buf[k]))
+      {
+         if (keyword[i] != tolower(pos[k]))
             break;
+      }
    }
-   return keyword[i] == '\0' ? k : 0;
+   if (keyword[i] == '\0')
+   {
+      pos += k;
+
+      std::cout << "*** Found " << keyword << std::endl;
+      return true;
+   }
+   return false;
 }
 
-int LPFReader::hasRowName(const char* buf)
+/// If \p buf start with "name:" extract the name and store it. 
+static int hasRowName(char*& pos, NameSet* rownames)
 {
-   assert(buf != 0);
+   assert(rownames != 0);
 
-   const char* s = strchr(buf, ':');
+   const char* s = strchr(pos, ':');
 
    if (s == 0)
-      return 0;
+      return false;
 
-   int end = s - buf;
+   int end = s - pos;
    int srt = end - 1;
       
    for(; srt >= 0; srt--)
-      if (isspace(buf[srt]))
+      if (pos[srt] == ' ')
          break;
 
    srt++;
 
-   char name[MaxLineLen]; 
+   char name[MAX_LINE_LEN]; 
    int  i = srt;
    int  k = 0;
 
    for(i = srt; i < end; i++)
-      name[k++] = buf[i];
+      name[k++] = pos[i];
 
    name[k] = '\0';
 
-   m_rowNames->add(name);
+   rownames->add(name);
 
-   return end + 1;
-}
-
-bool LPFReader::syntaxError()
-{
-   std::cerr << "Syntax error in line " << m_lineno << std::endl;
-
-   m_error = true;
+   pos += end + 1;
 
    return true;
 }
 
-void SPxLP::readLP(istream& is, NameSet* rn, NameSet* cn, DIdxSet* iv)
+/**
+ *  Read "LP File Format"
+ *  The specification is taken from the
+ *  ILOG CPLEX 7.0 Reference Manual, Appendix E, Page 527
+ *
+ *  @todo BINARY and GENERAL keywords are ignored and nothing is
+ *        ever put into p_intvars.
+ */  
+void SPxLP::readLP(
+   istream& p_input, 
+   NameSet* p_rnames,           ///< row names.
+   NameSet* p_cnames,           ///< column names.
+   DIdxSet* p_intvars)            ///< integer variables.
 {
-#if 0
-    if( cn )
- colnames = cn ;
-    else
- colnames = new NameSet(10000, 100000) ;
-    colnames->clear()  ;
+   enum 
+   { 
+      START, OBJECTIVE, CONSTRAINTS, BOUNDS, INTEGERS, BINARYS 
+   } section = START;
 
-    if( rn )
- rownames = rn ;
-    else
- rownames = new NameSet(10000, 100000) ;
-    rownames->clear()  ;
+   NameSet*  rnames;                ///< row names.
+   NameSet*  cnames;                ///< column names.
 
+   LPCol     emptycol;                ///< reusable empty column.
+   LPColSet  cset;                  ///< the set of columns read.
+   LPRow     row;                     ///< last assembled row.
+   LPRowSet  rset;                  ///< the set of rows read.
+   DSVector& vec = row.rowVector();   ///< last assembled vector (from row).
+   double    val = 1.0;
+   int       colidx;
+   int       sense = 0;
 
-    clear() ;
-    changeSense( optSense ) ;
-    assert( isConsistent() ) ;
-    addCols ( _colset ) ;
-    assert( isConsistent() ) ;
-    addRows ( _rowset ) ;
+   char      buf [MAX_LINE_LEN];
+   char      tmp [MAX_LINE_LEN];
+   char      line[MAX_LINE_LEN];
+   int       lineno = 0;
+   int       i;
+   int       k;
+   char*     s;
+   char*     pos;
 
-    assert( isConsistent() ) ;
+   cnames = (p_cnames != 0) 
+      ? p_cnames : new NameSet(INIT_COLS, INIT_NAME_MEM);
 
-    if( cn == 0 )
- delete colnames ;
-    if( rn == 0 )
- delete rownames ;
-#endif
+   cnames->clear();
 
-    LPFReader reader(is, rn, cn, iv);
+   rnames = (p_rnames != 0)
+      ? p_rnames : new NameSet(INIT_ROWS, INIT_NAME_MEM);
 
-    if (reader.readLP())
-       std::cerr << "An Error occurred" << std::endl;
-    else
-       std::cout << "Yipppiiiieeeeeeee" << std::endl;
+   rnames->clear();
 
-    abort();
+   clear();
+
+   //--------------------------------------------------------------------------
+   for(;;)
+   {      
+      if (p_input.getline(buf, sizeof(buf)) == 0)
+         break;
+
+      lineno++;
+      i = 0;
+      pos = buf;
+      val = 1.0;
+
+      cout << "Reading line " << lineno << std::endl;
+      cout << pos << std::endl;
+
+      // 1. Remove comments.
+      if (0 != (s = strchr(buf, '\\')))
+         *s = '\0';
+
+      // 2. look for keywords. 
+      if (section == START)
+      {
+         if (hasKeyword(pos, "max[imize]"))
+         {
+            changeSense(SPxLP::MAXIMIZE);
+            section = OBJECTIVE;
+         } 
+         else if (hasKeyword(pos, "min[imize]"))
+         {
+            changeSense(SPxLP::MINIMIZE);
+            section = OBJECTIVE;
+         } 
+      }
+      else if (section == OBJECTIVE)
+      {
+         if (hasKeyword(pos, "s[ubject][   ]t[o]")
+            || hasKeyword(pos, "s[uch][    ]t[hat]")
+            || hasKeyword(pos, "s[.][    ]t[.]"))
+         {
+            // store objective vector            
+            for(int j = vec.size() - 1; j >= 0; --j)
+               cset.obj(vec.index(j)) = vec.value(j);
+            vec.clear();
+            section = CONSTRAINTS;
+         }
+      }
+      else
+      {
+         if (hasKeyword(pos, "bounds"))
+            section = BOUNDS;
+         else if (hasKeyword(pos, "bin[arys]"))
+            section = BINARYS;
+         else if (hasKeyword(pos, "gen[erals]"))
+            section = INTEGERS;
+         else if (hasKeyword(pos, "end"))
+            break;
+      }
+
+      // 3. look for row names.
+      if ((section == OBJECTIVE) || (section == CONSTRAINTS))
+         hasRowName(pos, rnames);
+
+      // 4. remove spaces.
+      for(k = 0; pos[i] != '\0'; i++)
+         if ((pos[i] != ' ') && (pos[i] != '\t') 
+            && (pos[i] != '\n') && (pos[i] != '\r'))
+            tmp[k++] = pos[i];
+
+      tmp[k] = '\0';
+
+      // 5. Is this a empty line ?
+      if (k == 0)
+         continue;
+
+      // 6. collapse sequences of '+' and '-'. e.g ++---+ => -
+      for(i = 0, k = 0; tmp[i] != '\0'; i++)
+      {
+         while(((tmp[i] == '+') || (tmp[i] == '-')) 
+            && ((tmp[i + 1] == '+') || (tmp[i + 1] == '-')))
+         {
+            if (tmp[i++] == '-')
+               tmp[i] = (tmp[i] == '-') ? '+' : '-';
+         }
+         line[k++] = tmp[i];
+      }
+      line[k] = '\0';
+
+      // 7. We have something left to process. 
+      //-----------------------------------------------------------------------
+      pos = line;
+      
+      cout << "we have [" << pos << "]" << std::endl;
+
+      while((pos != 0) && (*pos != '\0'))
+      {
+         // Now process the sections 
+         switch(section)
+         {
+         case OBJECTIVE :
+            if (isValue(pos))
+               val = readValue(pos);
+            
+            if (isColName(pos))
+            {
+               colidx = readColName(pos, cnames, cset, emptycol);
+               vec.add(colidx, val);
+            }
+            break;
+         case CONSTRAINTS :
+            if (isValue(pos))
+            {
+               val = readValue(pos);
+               
+               if (sense != 0)
+               {
+                  std::cout << "row stored" << std::endl;
+                  
+                  if (sense == '<')
+                  { 
+                     row.lhs() = -SPxLP::infinity; 
+                     row.rhs() = val;
+                  }
+                  else if (sense == '>')
+                  {
+                     row.lhs() = val;
+                     row.rhs() = SPxLP::infinity;
+                  }
+                  else 
+                  {
+                     assert(sense == '=');
+                  
+                     row.lhs() = val;
+                     row.rhs() = val;
+                  }
+                  rset.add(row);
+                  vec.clear();
+                  sense = 0;
+                  pos   = 0;
+                  // next line
+                  continue;
+               }         
+            }
+            if (isColName(pos))
+            {
+               colidx = readColName(pos, cnames, cset, emptycol);
+
+               if (val != 0.0)
+                  vec.add(colidx, val);
+            }
+            if (isSense(pos))
+               sense = readSense(pos);
+            break;
+         case BOUNDS :
+            sense = 0;
+            
+            if (isValue(pos))
+            {
+               val = readValue(pos);
+               
+               if (!isSense(pos))
+                  syntaxError(lineno);
+               else
+                  sense = readSense(pos);
+            }
+            if (!isColName(pos))
+               syntaxError(lineno);
+            
+            colidx = readColName(pos, cnames, cset, emptycol);
+            
+            if (sense)
+            {
+               if (sense == '<') 
+                  cset.lower(colidx) = val;
+               else if (sense == '>')
+                  cset.upper(colidx) = val;
+               else
+               {
+                  assert(sense == '=');
+                  cset.lower(colidx) = val;
+                  cset.upper(colidx) = val;
+               }
+            }
+            if (isSense(pos))
+            {
+               sense = readSense(pos);
+               
+               if (!isValue(pos))
+                  syntaxError(lineno);
+               
+               val = readValue(pos);
+               
+               if (sense == '<') 
+                  cset.upper(colidx) = val;
+               else if (sense == '>')
+                  cset.lower(colidx) = val;
+               else
+               {
+                  assert(sense == '=');
+                  cset.lower(colidx) = val;
+                  cset.upper(colidx) = val;
+               }
+            }
+            break;
+         case BINARYS :
+            pos = 0;
+            continue; // read next line
+            
+            //if ((intVars != 0) && (colIdx >= 0))
+            //   intVars->addIdx(colIdx);
+            break;
+         case INTEGERS :
+            pos = 0;
+            continue; // read next line 
+         default :
+            abort();
+         }
+      }
+   }
+   //--------------------------------------------------------------------------
+
+   assert(isConsistent());
+
+   addCols(cset);
+   assert(isConsistent());
+   addRows(rset); 
+   assert(isConsistent());
+
+   if (p_cnames == 0)
+      delete cnames;
+   if (p_rnames == 0)
+      delete rnames;
+
+   std::cout << *this;
 }
-
-
-
 } // namespace soplex
+
+
+
+
+
+
+

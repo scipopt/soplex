@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.5 2001/11/16 20:12:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.6 2001/11/19 22:08:09 bzfkocht Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -833,7 +833,7 @@ int SPxFastRT::selectLeave(double& val)
          if (max == val)
             return -1;
 
-         if (!maxShortLeave(sel, leave, max, maxabs));
+         if (!maxShortLeave(sel, leave, max, maxabs))
          {
             // phase 2:
             double stab, bestDelta;
@@ -861,8 +861,8 @@ int SPxFastRT::selectLeave(double& val)
          if (max == val)
             return -1;
 
-         /**@todo Hier stand ein ; hinter dem if. Ich glaube damit
-          *       lief es besser. testen, und ggf. das if wegnehmen.
+         /**@todo Hier steht ein ; oben steht keines.
+          *       Bei ersten Versuchen lief es mit dem ; besser.
           *       minShortLeave veraendert sel. Ausserdem gucken was
           *       passiert, wenn man dann oben auch noch das if 
           *       wegnimmt.
