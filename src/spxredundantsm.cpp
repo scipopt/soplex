@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.18 2002/05/15 13:38:44 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.19 2002/05/28 10:25:44 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -147,7 +147,6 @@ int SPxRedundantSM::treat_rows()
    int               j;
    int               k;
    Real              x;
-   Real              y;
 
    for( int i = 0; i < lp->nRows(); ++i )
    {
@@ -205,6 +204,7 @@ int SPxRedundantSM::treat_rows()
 #if 0
          else
          {
+            Real              y;
             /*
                 if (LE(lp->lhs(i), lo) && locnt <= 0)
                     lp->changeLhs(i, -infinity);

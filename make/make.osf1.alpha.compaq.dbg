@@ -1,8 +1,8 @@
-#--- $Id: make.osf1.alpha.compaq.dbg,v 1.4 2002/01/04 17:52:05 bzfkocht Exp $
+#--- $Id: make.osf1.alpha.compaq.dbg,v 1.5 2002/05/28 10:25:40 bzfkocht Exp $
 CXX	=	cxx
 CPPFLAGS=	-Isrc 
-CXXFLAGS=	-O0 -w0 -std strict_ansi -gall -verbose -check \
+CXXFLAGS=	-O0 -w0 -std strict_ansi -tweak -gall -verbose -check -trapuv \
 		-msg_disable basclsnondto,boolexprconst,constrlitnondep 
 # -ieee
-LDFLAGS	=	-lm
+LDFLAGS	=	-pthread -lm
 ARFLAGS	=	crs
