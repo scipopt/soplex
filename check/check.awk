@@ -1,4 +1,4 @@
-# $Id: check.awk,v 1.3 2001/11/08 08:47:18 bzfkocht Exp $
+# $Id: check.awk,v 1.4 2001/11/10 22:05:55 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: check.awk                                                     *
@@ -12,6 +12,32 @@ function abs(x)
     return x < 0 ? -x : x;
 }
 BEGIN {
+    sol["baxter"]       = 5.6007255672e+07;
+    sol["dano3mip"]     = 5.7623162027e+02;
+    sol["dbir2"]        = -6.1169165000e+06;
+    sol["fome12"]       = 0; # NAME in der RHS Sec fehlt
+    sol["gen4"]         = 2.8533467713e-06;
+    sol["ken-18"]       = -5.2217025287e+10;
+    sol["l30"]          = 9.5266141472e-01;
+    sol["lp22"]         =  4.5894459411e+02;
+    sol["mod2"]         = 4.3647834777e+07;
+    sol["nsct2"]        = -3.7175082000e+07;
+    sol["nug15"]        = 1.0409940410e+03;
+    sol["nw04"]         = 1.6310666667e+04;
+    sol["nw14"]         = 0; # fehlt
+    sol["osa-60"]       = 4.0440725032e+06;
+    sol["pds-40"]       = 1.8855198824e+10;
+    sol["pds-100"]      = 0; # fehlt
+    sol["rlfprim"]      = 1.0000000000e+00;
+    sol["route"]        = 5.9416502767e+03;
+    sol["self"]         = 0.0000000000e+00;
+    sol["seymour"]      = 4.0384647413e+02;
+    sol["sgpf5y6"]      = -6.4844655954e+03;
+    sol["stormG2-125"]  = 0; # read error
+    sol["stormG2-1000"] = 0; # nicht gerechnet
+    sol["watson_1"]     = -1.7871977857e+03;
+    sol["world.mps"]    = 6.9133045823e+07;
+
     sol["25fv45"] =     5.5018458883E+03;
     sol["80bau3b"] =    9.8723216072E+05;
     sol["adlittle"] =   2.2549496316E+05;
