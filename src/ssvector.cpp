@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.30 2005/01/09 16:52:10 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.31 2005/01/09 17:32:26 bzfkocht Exp $"
 
 #undef NDEBUG
 #include <iostream>
@@ -864,10 +864,13 @@ SSVector& SSVector::assign(const SVector& rhs)
       int  k = rhs.index(i);
       Real v = rhs.value(i);
 
-      val[k] = v;
-
-      if (isNotZero(v, epsilon))
+      if (isZero(v, epsilon))
+         val[k] = REAL(0.0);
+      else
+      {
+         val[k]     = v;
          idx[num++] = k;
+      }
    }
    setupStatus = true;
 
