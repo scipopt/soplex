@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.cpp,v 1.13 2002/01/05 19:24:10 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.cpp,v 1.14 2002/01/19 16:05:25 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -279,7 +279,7 @@ void SVSet::memPack()
    SVSetBase::reSize(used);
 }
 
-int SVSet::isConsistent() const
+bool SVSet::isConsistent() const
 {
    DLPSV* ps;
    DLPSV* next;
@@ -294,7 +294,8 @@ int SVSet::isConsistent() const
          return MSGinconsistent("SVSet");
       }
    }
-   return DataArray < SVector::Element > ::isConsistent() && set.isConsistent() && list.isConsistent();
+   return DataArray < SVector::Element > ::isConsistent() 
+      && set.isConsistent() && list.isConsistent();
 }
 
 SVSet& SVSet::operator=(const SVSet& rhs)

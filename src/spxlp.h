@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.16 2002/01/18 10:48:23 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.17 2002/01/19 16:05:25 bzfkocht Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -790,7 +790,7 @@ public:
    /**@name Miscellaneous */
    //@{
    /// consistency check.
-   int isConsistent() const;
+   bool isConsistent() const;
    //@}
 
 protected:

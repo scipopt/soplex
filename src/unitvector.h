@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: unitvector.h,v 1.4 2001/11/26 12:28:44 bzfbleya Exp $"
+#pragma ident "@(#) $Id: unitvector.h,v 1.5 2002/01/19 16:05:26 bzfkocht Exp $"
 
 /**@file  unitvector.h
  * @brief Sparse vector \f$e_i\f$.
@@ -80,7 +80,7 @@ public:
    }
 
    /// consitency check
-   int isConsistent() const;
+   bool isConsistent() const;
 };
 
 

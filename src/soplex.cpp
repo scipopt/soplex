@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.35 2002/01/19 13:54:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.36 2002/01/19 16:05:25 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -760,7 +760,7 @@ SoPlex::SoPlex(Type p_type, Representation p_rep,
    , maxIters (-1)
    , maxTime (infinity)
    , maxValue(infinity)
-   , m_abortReason(REGULAR)
+   , m_status(REGULAR)
    , theShift (0)
    , m_maxCycle(100)
    , m_numCycle(0)
@@ -872,65 +872,60 @@ SoPlex& SoPlex::operator=(const SoPlex& old)
 }
 #endif // no copy constructor and assignment operator
 
-#define Inconsistent(file, line) \
-{                                                                             \
-   std::cout << file << "(" << line << ") ERROR: Inconsistency SoPlex\n";     \
-   return 0;                                                                  \
-}
-
-int SoPlex::isConsistent() const
+bool SoPlex::isConsistent() const
 {
    if (epsilon() < 0)
-      Inconsistent(__FILE__,__LINE__)
+      return MSGinconsistent("SoPlex");
 
    if (primVec.delta().epsilon != dualVec.delta().epsilon)
-      Inconsistent(__FILE__,__LINE__)
+      return MSGinconsistent("SoPlex");
+
    if (dualVec.delta().epsilon != addVec.delta().epsilon)
-      Inconsistent(__FILE__,__LINE__)
+      return MSGinconsistent("SoPlex");
 
    if (unitVecs.size() < ((rep() == ROW) ? SPxLP::nCols() : SPxLP::nRows()))
-      Inconsistent(__FILE__,__LINE__)
+      return MSGinconsistent("SoPlex");
 
    if (initialized)
    {
       if (theFrhs->dim() != dim())
-         Inconsistent(__FILE__,__LINE__)
+         return MSGinconsistent("SoPlex");
       if (theFvec->dim() != dim())
-         Inconsistent(__FILE__,__LINE__)
+         return MSGinconsistent("SoPlex");
 
       if (theCoPrhs->dim() != dim())
-         Inconsistent(__FILE__,__LINE__)
+         return MSGinconsistent("SoPlex");
       if (thePvec->dim() != coDim())
-         Inconsistent(__FILE__,__LINE__)
+         return MSGinconsistent("SoPlex");
       if (theCoPvec->dim() != dim())
-         Inconsistent(__FILE__,__LINE__)
+         return MSGinconsistent("SoPlex");
 
       if (theTest.dim() != coDim())
-         Inconsistent(__FILE__,__LINE__)
+         return MSGinconsistent("SoPlex");
       if (theCoTest.dim() != dim())
-         Inconsistent(__FILE__,__LINE__)
+         return MSGinconsistent("SoPlex");
 
       if (theURbound.dim() != SPxLP::nRows())
-         Inconsistent(__FILE__,__LINE__)
+         return MSGinconsistent("SoPlex");
       if (theLRbound.dim() != SPxLP::nRows())
-         Inconsistent(__FILE__,__LINE__)
+         return MSGinconsistent("SoPlex");
       if (theUCbound.dim() != SPxLP::nCols())
-         Inconsistent(__FILE__,__LINE__)
+         return MSGinconsistent("SoPlex");
       if (theLCbound.dim() != SPxLP::nCols())
-         Inconsistent(__FILE__,__LINE__)
+         return MSGinconsistent("SoPlex");
       if (theUBbound.dim() != dim())
-         Inconsistent(__FILE__,__LINE__)
+         return MSGinconsistent("SoPlex");
       if (theLBbound.dim() != dim())
-         Inconsistent(__FILE__,__LINE__)
+         return MSGinconsistent("SoPlex");
    }
 
    if (rep() == COLUMN)
    {
-      if
-      (
-         thecovectors != reinterpret_cast<const SVSet*>(static_cast<const LPRowSet*>(this)) ||
-         thevectors != reinterpret_cast<const SVSet*>(static_cast<const LPColSet*>(this)) ||
-         theFrhs != &primRhs ||
+      if(thecovectors != 
+         reinterpret_cast<const SVSet*>(static_cast<const LPRowSet*>(this)) 
+         || thevectors != 
+         reinterpret_cast<const SVSet*>(static_cast<const LPColSet*>(this)) 
+         || theFrhs != &primRhs ||
          theFvec != &primVec ||
          theCoPrhs != &dualRhs ||
          theCoPvec != &dualVec ||
@@ -940,9 +935,8 @@ int SoPlex::isConsistent() const
          theUbound != &theUCbound ||
          theLbound != &theLCbound ||
          theCoUbound != &theURbound ||
-         theCoLbound != &theLRbound
-     )
-         Inconsistent(__FILE__,__LINE__)
+         theCoLbound != &theLRbound)
+         return MSGinconsistent("SoPlex");
    }
    else
    {
@@ -960,9 +954,8 @@ int SoPlex::isConsistent() const
          theUbound != &theURbound ||
          theLbound != &theLRbound ||
          theCoUbound != &theUCbound ||
-         theCoLbound != &theLCbound
-     )
-         Inconsistent(__FILE__,__LINE__)
+         theCoLbound != &theLCbound)
+         return MSGinconsistent("SoPlex");
    }
 
    return SPxLP::isConsistent()
@@ -1044,78 +1037,102 @@ const
 SoPlex::VarStatus
 SoPlex::basisStatusToVarStatus( SPxBasis::Desc::Status stat ) const
 {
+   VarStatus vstat;
+
    switch( stat )
    {
    case SPxBasis::Desc::P_ON_LOWER:
-      return SoPlex::ON_LOWER;
+      vstat = ON_LOWER;
+      break;
    case SPxBasis::Desc::P_ON_UPPER:
-      return SoPlex::ON_UPPER;
+      vstat = ON_UPPER;
+      break;
    case SPxBasis::Desc::P_FIXED:
-      return SoPlex::FIXED;
+      vstat = FIXED;
+      break;
    case SPxBasis::Desc::P_FREE:
-      return SoPlex::ZERO;
+      vstat = ZERO;
+      break;
    case SPxBasis::Desc::D_ON_UPPER:
    case SPxBasis::Desc::D_ON_LOWER:
    case SPxBasis::Desc::D_ON_BOTH:
    case SPxBasis::Desc::D_UNDEFINED:
    case SPxBasis::Desc::D_FREE:
-      return SoPlex::BASIC;
+      vstat = BASIC;
+      break;
    default:
       std::cout << "ERROR: unknown basis status (" << stat << ")" << std::endl;
       abort();
    }
+   return vstat;
 }
 
 SPxBasis::Desc::Status
 SoPlex::varStatusToBasisStatusRow( int row, SoPlex::VarStatus stat ) const
 {
+   SPxBasis::Desc::Status rstat;
+
    switch( stat )
    {
-   case SoPlex::FIXED :
+   case FIXED :
       assert(rhs(row) == lhs(row));
-      return SPxBasis::Desc::P_FIXED;
-   case SoPlex::ON_UPPER :
+      rstat = SPxBasis::Desc::P_FIXED;
+      break;
+   case ON_UPPER :
       assert(rhs(row) < SPxLP::infinity);
-      return SPxBasis::Desc::P_ON_UPPER;
-   case SoPlex::ON_LOWER :
+      rstat = SPxBasis::Desc::P_ON_UPPER;
+      break;
+   case ON_LOWER :
       assert(lhs(row) > -SPxLP::infinity);
-      return SPxBasis::Desc::P_ON_LOWER;
-   case SoPlex::ZERO :
+      rstat = SPxBasis::Desc::P_ON_LOWER;
+      break;
+   case ZERO :
       assert(lhs(row) <= -SPxLP::infinity && rhs(row) >= SPxLP::infinity);
-      return SPxBasis::Desc::P_FREE;
-   case SoPlex::BASIC :
-      return dualRowStatus(row);
+      rstat = SPxBasis::Desc::P_FREE;
+      break;
+   case BASIC :
+      rstat = dualRowStatus(row);
+      break;
    default:
       std::cout << "ERROR: unknown VarStatus (" << int(stat)
                 << ")" << std::endl;
       abort();
    }
+   return rstat;
 }
 
 SPxBasis::Desc::Status 
 SoPlex::varStatusToBasisStatusCol( int col, SoPlex::VarStatus stat ) const
 {
+   SPxBasis::Desc::Status cstat;
+
    switch( stat )
    {
    case FIXED :
       assert(upper(col) == lower(col));
-      return SPxBasis::Desc::P_FIXED;
+      cstat = SPxBasis::Desc::P_FIXED;
+      break;
    case ON_UPPER :
       assert(upper(col) < SPxLP::infinity);
-      return SPxBasis::Desc::P_ON_UPPER;
+      cstat = SPxBasis::Desc::P_ON_UPPER;
+      break;
    case ON_LOWER :
       assert(lower(col) > -SPxLP::infinity);
-      return SPxBasis::Desc::P_ON_LOWER;
+      cstat = SPxBasis::Desc::P_ON_LOWER;
+      break;
    case ZERO :
       assert(lower(col) <= -SPxLP::infinity && upper(col) >= SPxLP::infinity);
-      return SPxBasis::Desc::P_FREE;
+      cstat = SPxBasis::Desc::P_FREE;
+      break;
    case BASIC :
-      return dualColStatus(col);
+      cstat = dualColStatus(col);
+      break;
    default:
       std::cout << "ERROR: unknown VarStatus (" << int(stat)
                 << ")" << std::endl;
       abort();
    }
+   return cstat;
 }
 
 SoPlex::VarStatus SoPlex::getBasisRowStatus( int row ) const

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: unitvector.cpp,v 1.4 2001/12/26 12:58:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: unitvector.cpp,v 1.5 2002/01/19 16:05:26 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -23,7 +23,7 @@
 namespace soplex
 {
 
-int UnitVector::isConsistent() const
+bool UnitVector::isConsistent() const
 {
    if (mem() != &themem)
       return MSGinconsistent("UnitVector");

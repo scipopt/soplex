@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.h,v 1.4 2002/01/03 21:01:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightst.h,v 1.5 2002/01/19 16:05:25 bzfkocht Exp $"
 
 
 /**@file  spxweightst.h
@@ -85,7 +85,7 @@ public:
    void generate(SoPlex& base);
 
    /// consistency check.
-   int isConsistent() const;
+   bool isConsistent() const;
 
    /// default constructor.
    SPxWeightST()

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.cpp,v 1.7 2002/01/04 17:31:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightst.cpp,v 1.8 2002/01/19 16:05:25 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -30,7 +30,7 @@ namespace soplex
 #define EPS     1e-6
 #define STABLE  1e-3
 
-int SPxWeightST::isConsistent() const
+bool SPxWeightST::isConsistent() const
 {
    return rowWeight.isConsistent()
           && colWeight.isConsistent()

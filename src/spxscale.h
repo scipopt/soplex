@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscale.h,v 1.5 2002/01/05 09:59:43 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscale.h,v 1.6 2002/01/19 16:05:25 bzfkocht Exp $"
 
 /**@file  spxscale.h
  * @brief LP row/column scaling.
@@ -51,7 +51,7 @@ public:
    virtual void unsimplify();
 
    /// consistency check.
-   int isConsistent() const
+   bool isConsistent() const
    {
       return colscale.isConsistent() && rowscale.isConsistent();
    }

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdesc.cpp,v 1.3 2002/01/03 22:09:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdesc.cpp,v 1.4 2002/01/19 16:05:25 bzfkocht Exp $"
 
 #include <iostream>
 #include "spxbasis.h"
@@ -46,7 +46,7 @@ void SPxBasis::Desc::dump() const
    std::cout << std::endl;
 }
 
-int SPxBasis::Desc::isConsistent() const
+bool SPxBasis::Desc::isConsistent() const
 {
    return rowstat.isConsistent() && colstat.isConsistent();
 }

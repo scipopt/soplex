@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: updatevector.h,v 1.5 2001/11/26 12:28:44 bzfbleya Exp $"
+#pragma ident "@(#) $Id: updatevector.h,v 1.6 2002/01/19 16:05:26 bzfkocht Exp $"
 
 /**@file  updatevector.h
  * @brief Dense vector with semi-sparse vector for updates
@@ -127,13 +127,13 @@ public:
 
    /// default constructor.
    UpdateVector(int p_dim /*=0*/, double p_eps /*=1e-16*/)
-      : DVector (p_dim),
-         theval (0),
-         thedelta(p_dim, p_eps)
-   { }
+      : DVector (p_dim)
+      , theval (0)
+      , thedelta(p_dim, p_eps)
+   {}
 
    /// 
-   int isConsistent() const;
+   bool isConsistent() const;
 };
 
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxstarter.h,v 1.3 2001/11/29 14:43:46 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxstarter.h,v 1.4 2002/01/19 16:05:25 bzfkocht Exp $"
 
 
 /**@file  spxstarter.h
@@ -51,7 +51,7 @@ public:
    { }
 
    /// checks consistency.
-   virtual int isConsistent() const;
+   virtual bool isConsistent() const;
 };
 
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.h,v 1.12 2002/01/15 16:52:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.h,v 1.13 2002/01/19 16:05:25 bzfkocht Exp $"
 
 /**@file  svset.h
  * @brief Set of sparse vectors.
@@ -437,7 +437,7 @@ public:
    void reMax(int newmax = 0);
 
    /// consistency check.
-   int isConsistent() const;
+   bool isConsistent() const;
 
    /// assignment operator.
    SVSet& operator=(const SVSet& rhs);

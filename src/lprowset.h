@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.h,v 1.11 2002/01/05 19:24:09 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprowset.h,v 1.12 2002/01/19 16:05:25 bzfkocht Exp $"
 
 /**@file  lprowset.h
  * @brief Set of LP columns.
@@ -369,12 +369,8 @@ public:
    }
    //@}
 
-
-   /**@name Miscellaneous */
-   //@{
    /// check consistency.
-   int isConsistent() const;
-   //@}
+   bool isConsistent() const;
 
    /**@name Constructors / Destructors */
    //@{

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcolset.h,v 1.9 2002/01/05 19:24:09 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpcolset.h,v 1.10 2002/01/19 16:05:25 bzfkocht Exp $"
 
 /**@file  lpcolset.h
  * @brief Set of LP columns.
@@ -352,7 +352,7 @@ public:
    /**@name Miscellaneous */
    //@{
    ///
-   int isConsistent() const;
+   bool isConsistent() const;
    //@}
 
    /**@name Constructors / Destructors */

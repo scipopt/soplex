@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.cpp,v 1.10 2002/01/15 16:52:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.cpp,v 1.11 2002/01/19 16:05:25 bzfkocht Exp $"
 
 #include <stdio.h>
 
@@ -687,7 +687,7 @@ void SPxLP::changeElement(int i, int j, double val)
    assert(isConsistent());
 }
 
-int SPxLP::isConsistent() const
+bool SPxLP::isConsistent() const
 {
    int i, j, n;
 

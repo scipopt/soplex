@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.20 2002/01/19 13:54:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.21 2002/01/19 16:05:25 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -108,8 +108,11 @@ SoPlex::Status SoPlex::solve()
 
    if (SPxBasis::status() == SPxBasis::OPTIMAL)
       setStatus(SPxBasis::REGULAR);
-   bool stop = terminate();
+
+   m_status   = RUNNING;
+   bool stop  = terminate();
    leaveCount = enterCount = 0;
+
    while (!stop)
    {
       if (type() == ENTER)
@@ -157,6 +160,7 @@ SoPlex::Status SoPlex::solve()
                if (maxInfeas() + shift() <= delta())
                {
                   setStatus(SPxBasis::OPTIMAL);
+                  m_status = OPTIMAL;
                   break;
                }
             }
@@ -208,6 +212,7 @@ SoPlex::Status SoPlex::solve()
                if (maxInfeas() + shift() <= delta())
                {
                   setStatus(SPxBasis::OPTIMAL);
+                  m_status = OPTIMAL;
                   break;
                }
             }
@@ -216,6 +221,10 @@ SoPlex::Status SoPlex::solve()
       }
    }
    theTime.stop();
+
+   if (m_status == RUNNING)
+      m_status = REGULAR;
+
    return status();
 }
 
@@ -327,7 +336,7 @@ bool SoPlex::terminate()
                 << ") reached" << std::endl;
 #endif // !NDEBUG
 
-      m_abortReason = ABORT_ITER;
+      m_status = ABORT_ITER;
       return true;
    }
    if ( maxTime >= 0 && maxTime < infinity && time() >= maxTime )
@@ -336,18 +345,16 @@ bool SoPlex::terminate()
       std::cout << "Timelimit (" << maxTime << ") reached" << std::endl;
 #endif // !NDEBUG
 
-      m_abortReason = ABORT_TIME;
+      m_status = ABORT_TIME;
       return true;   
    }
    if (maxValue < infinity)
    {
       /**@todo This code is *NOT* tested. */
-      int sign = 1;
 
-      if( spxSense() == SPxLP::MAXIMIZE )
-         sign *= -1;
-      if( simplexType() == PRIMAL )
-         sign *= -1;
+      // SPxSense::MINIMIZE == -1, so we have sign = 1 on minimizing
+      // rep() * type() > 0 == DUAL, -1 == PRIMAL.
+      int sign = -1 * spxSense() * rep() * type();
 
       if( sign * (value() - maxValue) >= 0.0 )
       {
@@ -357,7 +364,7 @@ bool SoPlex::terminate()
                    << ", limit: " << maxValue << ")" << std::endl;
 #endif // !NDEBUG
          
-         m_abortReason = ABORT_VALUE;
+         m_status = ABORT_VALUE;
          return true;
       }
    }
@@ -365,10 +372,9 @@ bool SoPlex::terminate()
    if( SPxBasis::status() >= SPxBasis::OPTIMAL  ||
        SPxBasis::status() <= SPxBasis::SINGULAR )
    {
-      m_abortReason = OPTIMAL;
+      m_status = OPTIMAL;
       return true;
    }
-   m_abortReason = REGULAR;
    return false;
 }
 
@@ -532,7 +538,7 @@ SoPlex::Status SoPlex::getSlacks (Vector& p_vector) const
 
 SoPlex::Status SoPlex::status() const
 {
-   switch( m_abortReason )
+   switch( m_status )
    {
    case REGULAR:      
    case OPTIMAL:
@@ -555,10 +561,12 @@ SoPlex::Status SoPlex::status() const
       default:
          return ERROR;
       }
-   case ABORT_TIME:
-   case ABORT_ITER:
-   case ABORT_VALUE:
-      return m_abortReason;
+   case ABORT_TIME :
+   case ABORT_ITER :
+   case ABORT_VALUE :
+   case RUNNING :
+   case CHANGED :
+      return m_status;
    default:
       return ERROR;
    }

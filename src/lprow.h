@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprow.h,v 1.5 2001/12/28 14:55:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprow.h,v 1.6 2002/01/19 16:05:25 bzfkocht Exp $"
 
 /**@file  lprow.h
  * @brief (In)equality for LPs.
@@ -147,7 +147,7 @@ public:
    LPRow(const SVector& rowVector, Type type, double value);
 
    /// check consistency.
-   int isConsistent() const
+   bool isConsistent() const
    {
       return vec.isConsistent();
    }

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dvector.h,v 1.6 2001/12/04 19:28:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dvector.h,v 1.7 2002/01/19 16:05:25 bzfkocht Exp $"
 
 /**@file  dvector.h
  * @brief Dymnamic vectors.
@@ -134,7 +134,7 @@ public:
    }
 
    /// consistency check.
-   int isConsistent() const;
+   bool isConsistent() const;
 
    /// default constructor. \p dim is the initial dimension.
    DVector(int dim = 0);

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.15 2002/01/05 19:24:10 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.16 2002/01/19 16:05:25 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -436,7 +436,7 @@ Vector& SPxBasis::multBaseWith(Vector& x) const
    return x;
 }
 
-int SPxBasis::isConsistent() const
+bool SPxBasis::isConsistent() const
 {
    int primals = 0;
    int i;

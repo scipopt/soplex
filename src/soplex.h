@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.26 2002/01/19 13:54:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.27 2002/01/19 16:05:25 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -131,17 +131,6 @@ public:
       LEAVE = 1
    };
 
-   /// Simplex Algorithm Type.
-   /** This enumeration type is only needed for the information
-       method #simplexType(). It distinguishes between \em primal
-       and \em dual simplex algorithm.
-   */
-   enum SimplexType
-   {
-      PRIMAL  = -1,      ///< Primal Simplex Algorithm.
-      DUAL    =  1       ///< Dual Simplex Algorithm.
-   };
-
    /// Pricing type.
    /** In case of the #ENTER%ing Simplex algorithm, for performance
     *  reasons it may be advisable not to compute and maintain up to
@@ -183,16 +172,18 @@ public:
 
    enum Status
    {
-      ABORT_TIME  = -6,  ///< #solve() aborted due to time limit.
-      ABORT_ITER  = -5,  ///< #solve() aborted due to iteration limit.
-      ABORT_VALUE = -4,  ///< #solve() aborted due to objective limit.
-      ERROR       = -3,  ///< an error occured.
+      ABORT_TIME  = -7,  ///< #solve() aborted due to time limit.
+      ABORT_ITER  = -6,  ///< #solve() aborted due to iteration limit.
+      ABORT_VALUE = -5,  ///< #solve() aborted due to objective limit.
+      ERROR       = -4,  ///< an error occured.
+      RUNNING     = -3,  ///< algorithm is running
       NO_PROBLEM  = -2,  ///< No Problem has been loaded.
       SINGULAR    = -1,  ///< Basis is singular, numerical troubles?
       REGULAR     = 0,   ///< nothing known on loaded problem.
       OPTIMAL     = 1,   ///< LP has been solved to optimality.
       UNBOUNDED   = 2,   ///< LP has been proven to be unbounded.
       INFEASIBLE  = 3,   ///< LP has been proven to be infeasible.
+      CHANGED     = 4,   ///< LP has been changed.
    };
    //@}
 
@@ -204,7 +195,7 @@ private:
    int            maxIters;    ///< maximum allowed iterations.
    double         maxTime;     ///< maximum allowed time.
    double         maxValue;    ///< maximum allowed objective value.
-   Status         m_abortReason; ///< reason, why algorithm has been aborted.
+   Status         m_status;    ///< status of algorithm.
 
    double         thedelta;
    double         theShift;    ///< shift of r/lhs or objective.
@@ -294,12 +285,6 @@ public:
    Type type() const
    {
       return theType;
-   }
-
-   /// return simplex type, calculated from representation() and type().
-   SimplexType simplexType() const
-   {
-      return (rep() * type() > 0) ? DUAL : PRIMAL;
    }
 
    /// return current #Pricing.
@@ -1620,7 +1605,7 @@ public:
         );
 
    /// check consistency.
-   int isConsistent() const;
+   bool isConsistent() const;
 
 private:
    /// assignment operator is not implemented.
