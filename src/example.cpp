@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.18 2002/01/12 23:01:08 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.19 2002/01/13 10:12:57 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -102,8 +102,8 @@ int main(int argc, char **argv)
    " -r       select row wise representation (default is column)\n"
    " -i       select Eta-update (default is Forest-Tomlin)\n"
    " -lSec    set timlimit to Sec seconds\n"
-   " -dDelta  set maximal allowed bound violation to Delta\n"
-   " -zZero   set zero tolerance to Zero\n\n"
+   " -dDelta  set maximal allowed bound violation to Delta (1e-6)\n"
+   " -zZero   set zero tolerance to Zero (1e-16)\n\n"
    "Simplifier:         Starter:        Pricer:           Ratiotester:\n"
    " -s0  none           -c0  none*      -p0  Textbook     -t0  Textbook\n" 
    " -s1  General        -c1  Weight     -p1  ParMult      -t1  Harris\n"
@@ -121,12 +121,14 @@ int main(int argc, char **argv)
    SPxStarter*            starter        = 0;
    SPxPricer*             pricer         = 0;
    SPxRatioTester*        ratiotester    = 0;
+   NameSet                rownames;
+   NameSet                colnames;
    int                    starting       = 0;
    int                    pricing        = 4;
    int                    ratiotest      = 2;
    int                    simplifing     = 3;
    double                 timelimit      = -1.0;
-   double                 delta          = 5e-7;
+   double                 delta          = 1e-6;
    double                 epsilon        = 1e-16;
    int                    optind;
 
@@ -313,7 +315,7 @@ int main(int argc, char **argv)
    Timer timer;
    std::cout << "loading LP file " << filename << std::endl;
 
-   if (!work.readFile(filename))
+   if (!work.readFile(filename, &rownames, &colnames))
    {
       std::cout << "error while reading file" << std::endl;
       exit(1);

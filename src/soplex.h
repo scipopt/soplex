@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.19 2002/01/12 11:41:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.20 2002/01/13 10:12:57 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -337,7 +337,8 @@ public:
    virtual void reLoad();
 
    /// load LP from \p filename in MPS or LPF format.
-   bool readFile(const char* filename);
+   bool readFile(
+      const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0);
 
    /// dump loaded LP to \p filename in LPF format.
    void dumpFile(const char* filename) const;

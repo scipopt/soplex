@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvecs.cpp,v 1.7 2002/01/10 13:34:49 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxvecs.cpp,v 1.8 2002/01/13 10:12:57 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -153,11 +153,9 @@ void SoPlex::computeFrhsXtra()
     specified by the |Status| of all nonbasic variables. The values of $x_N$ or
     $\pi_N$ are taken from the passed arrays.
  */
-void SoPlex::computeFrhs1
-(
-   const Vector& ufb,     // upper feasibility bound for variables
-   const Vector& lfb     // lower feasibility bound for variables
-)
+void SoPlex::computeFrhs1(
+   const Vector& ufb,    ///< upper feasibility bound for variables
+   const Vector& lfb)    ///< lower feasibility bound for variables
 {
    double x;
    int i;
@@ -208,11 +206,9 @@ void SoPlex::computeFrhs1
     specified by the |Status| of all nonbasic variables. The values of $x_N$ or
     $\pi_N$ are taken from the passed arrays.
  */
-void SoPlex::computeFrhs2
-(
-   const Vector& coufb,   // upper feasibility bound for covariables
-   const Vector& colfb   // lower feasibility bound for covariables
-)
+void SoPlex::computeFrhs2(
+   const Vector& coufb,   ///< upper feasibility bound for covariables
+   const Vector& colfb)   ///< lower feasibility bound for covariables
 {
    double x;
    int i;
@@ -255,7 +251,6 @@ void SoPlex::computeFrhs2
       }
    }
 }
-
 
 /*
     Computing the right hand side vector for |theCoPvec| depends on

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.27 2002/01/12 11:41:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.28 2002/01/13 10:12:57 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -430,14 +430,15 @@ void SoPlex::reDim()
    }
 }
 
-bool SoPlex::readFile(const char* filename)
+bool SoPlex::readFile(
+   const char* filename, NameSet* rowNames, NameSet* colNames)
 {
    std::ifstream file(filename);
 
    if (!file)
       return false;
    else
-      return  read(file);
+      return read(file, rowNames, colNames);
 }
 
 void SoPlex::dumpFile(const char* filename) const
@@ -564,11 +565,11 @@ void SoPlex::factorize()
 double SoPlex::maxInfeas() const
 {
    int i;
-   double inf = 0;
+   double inf = 0.0;
 
    if (type() == ENTER)
    {
-      for (i = dim() - 1; i >= 0; --i)
+      for(i = 0; i < dim(); i++)
       {
          if ((*theFvec)[i] > theUBbound[i])
             inf = MAXIMUM(inf, (*theFvec)[i] - theUBbound[i]);
@@ -579,14 +580,15 @@ double SoPlex::maxInfeas() const
    else
    {
       assert(type() == LEAVE);
-      for (i = dim() - 1; i >= 0; --i)
+
+      for(i = 0; i < dim(); i++)
       {
          if ((*theCoPvec)[i] > (*theCoUbound)[i])
             inf = MAXIMUM(inf, (*theCoPvec)[i] - (*theCoUbound)[i]);
          if ((*theCoLbound)[i] > (*theCoPvec)[i])
             inf = MAXIMUM(inf, (*theCoLbound)[i] - (*theCoPvec)[i]);
       }
-      for (i = coDim() - 1; i >= 0; --i)
+      for(i = 0; i < coDim(); i++)
       {
          if ((*thePvec)[i] > (*theUbound)[i])
             inf = MAXIMUM(inf, (*thePvec)[i] - (*theUbound)[i]);
@@ -597,7 +599,44 @@ double SoPlex::maxInfeas() const
 
    return inf;
 }
+#if 0
+double SoPlex::sumInfeas() const
+{
+   int i;
+   double sum = 0.0;
 
+   if (type() == ENTER)
+   {
+      for(i = 0; i < dim(); i++)
+      {
+         if ((*theFvec)[i] > theUBbound[i])
+            sum += *theFvec)[i] - theUBbound[i];
+         if (theLBbound[i] > (*theFvec)[i])
+            sum += theLBbound[i] - (*theFvec)[i];
+      }
+   }
+   else
+   {
+      assert(type() == LEAVE);
+
+      for(i = 0; i < dim(); i++)
+      {
+         if ((*theCoPvec)[i] > (*theCoUbound)[i])
+            sum += (*theCoPvec)[i] - (*theCoUbound)[i];
+         if ((*theCoLbound)[i] > (*theCoPvec)[i])
+            sum += (*theCoLbound)[i] - (*theCoPvec)[i]);
+      }
+      for(i = 0; i < coDim(); i++)
+      {
+         if ((*thePvec)[i] > (*theUbound)[i])
+            sum += (*thePvec)[i] - (*theUbound)[i]);
+         else if ((*thePvec)[i] < (*theLbound)[i])
+            sum += (*theLbound)[i] - (*thePvec)[i]);
+      }
+   }
+   return inf;
+}
+#endif
 double SoPlex::nonbasicValue() const
 {
 
@@ -715,8 +754,9 @@ double SoPlex::value() const
 {
    double x;
 
+   /**@todo patch suggests returning SPxLP::infinity instead of initializing 
+    */
    if (!isInitialized())      
-      /**@todo patch suggests returning SPxLP::infinity instead of initializing */
       (const_cast<SoPlex*>(this))->init();
 
    if (rep() == ROW)
@@ -731,6 +771,7 @@ double SoPlex::value() const
 
    if (thesimplifier)
       return thesimplifier->value(x);
+
    return x;
 }
 
