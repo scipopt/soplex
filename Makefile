@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.45 2002/10/22 15:31:05 bzfkocht Exp $
+# $Id: Makefile,v 1.46 2002/11/23 08:05:54 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -70,14 +70,14 @@ REPOSIT		=	# template repository, explicitly empty
 #--- NOTHING TO CHANGE FROM HERE ON -------------------------------------------
 #------------------------------------------------------------------------------
 
-GCCWARN		=	-Wall -W -Wpointer-arith -Wbad-function-cast \
+GCCWARN		=	-Wall -W -Wpointer-arith -Wno-unknown-pragmas \
 			-Wcast-align -Wwrite-strings -Wconversion \
 			-Wstrict-prototypes -Wmissing-prototypes \
-			-Wmissing-declarations -Wno-unknown-pragmas \
 			-Wctor-dtor-privacy -Wnon-virtual-dtor -Wreorder \
 			-Woverloaded-virtual -Wsign-promo -Wsynth -Wundef \
 			-Wcast-qual -Wold-style-cast -Wshadow 
 #			-Weffc++ -Wredundant-decls    
+# gcc 2.xx -Wmissing-declarations -Wbad-function-cast 
 
 #GCCWARN =
 #-----------------------------------------------------------------------------

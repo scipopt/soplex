@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector.h,v 1.12 2002/10/03 14:54:33 bzfwessa Exp $"
+#pragma ident "@(#) $Id: vector.h,v 1.13 2002/11/23 08:06:00 bzfkocht Exp $"
 
 /**@file  vector.h
  * @brief Dense vector for linear algebra.
@@ -25,8 +25,6 @@
 #include <string.h>
 #include <math.h>
 #include <iostream>
-
-#pragma warning ( disable : 4274 )
 
 namespace soplex
 {
