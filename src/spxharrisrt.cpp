@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.5 2001/11/25 14:58:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.6 2001/12/14 09:32:25 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -338,7 +338,7 @@ SoPlex::Id SPxHarrisRT::selectEnter(double& val)
    SoPlex::Id enterId;
    double stab, x, y;
    double max;
-   double sel;
+   double sel = 0.0;
    double lastshift;
    double cuseeps;
    double ruseeps;
@@ -371,6 +371,7 @@ SoPlex::Id SPxHarrisRT::selectEnter(double& val)
    solver()->pVec().delta().setup();
 
    if (val > epsilon)
+   {
       for(;;)
       {
          pnr = -1;
@@ -571,8 +572,9 @@ SoPlex::Id SPxHarrisRT::selectEnter(double& val)
             break;
          }
       }
-
+   }
    else if (val < -epsilon)
+   {
       for(;;)
       {
          pnr = -1;
@@ -770,7 +772,7 @@ SoPlex::Id SPxHarrisRT::selectEnter(double& val)
             break;
          }
       }
-
+   }
    assert(max * val >= 0);
    assert(enterId.type() != SoPlex::Id::NONE);
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.9 2001/12/10 15:46:49 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.10 2001/12/14 09:32:25 bzfkocht Exp $"
 
 
 
@@ -543,12 +543,12 @@ int SPxBasis::isConsistent() const
 
 SPxBasis::SPxBasis()
    : theLP (0)
-   , thestatus (NO_PROBLEM)
    , matrixIsSetup (false)
    , factor (0)
    , maxUpdates (1000)
    , nonzeroFactor (10)
    , nzCount (1)
+   , thestatus (NO_PROBLEM)
 {}
 } // namespace soplex
 

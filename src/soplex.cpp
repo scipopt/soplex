@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.13 2001/12/11 09:09:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.14 2001/12/14 09:32:25 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -735,6 +735,10 @@ SoPlex::SoPlex(Type p_type, Representation p_rep,
    , theShift (0)
    , m_maxCycle(100)
    , m_numCycle(0)
+   , initialized (false)
+   , solveVector2 (0)
+   , coSolveVector2(0)
+   , cacheProductFactor(4.0)
    , unitVecs (0)
    , primVec (0, 1e-16)
    , dualVec (0, 1e-16)
@@ -743,10 +747,6 @@ SoPlex::SoPlex(Type p_type, Representation p_rep,
    , theratiotester(rt)
    , thestarter (start)
    , thesimplifier (simple)
-   , solveVector2 (0)
-   , coSolveVector2(0)
-   , initialized (false)
-   , cacheProductFactor(4.0)
 {
    setRep (p_rep);
    setDelta (1e-6);
@@ -766,6 +766,10 @@ SoPlex::SoPlex(const SoPlex& old)
    , theShift (old.theShift)
    , m_maxCycle (old.m_maxCycle)
    , m_numCycle (old.m_numCycle)
+   , initialized (old.initialized)
+   , solveVector2 (0)
+   , coSolveVector2 (0)
+   , cacheProductFactor(old.cacheProductFactor)
    , unitVecs (old.unitVecs)
    , primRhs (old.primRhs)
    , primVec (old.primVec)
@@ -784,10 +788,6 @@ SoPlex::SoPlex(const SoPlex& old)
    , theratiotester (old.theratiotester)
    , thestarter (old.thestarter)
    , thesimplifier (old.thesimplifier)
-   , solveVector2 (0)
-   , coSolveVector2 (0)
-   , initialized (old.initialized)
-   , cacheProductFactor(old.cacheProductFactor)
 {
    setRep (old.rep());
    setDelta(old.thedelta);

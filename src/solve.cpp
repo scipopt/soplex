@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: solve.cpp,v 1.7 2001/12/04 19:28:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: solve.cpp,v 1.8 2001/12/14 09:32:25 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -36,8 +36,6 @@ void CLUFactor::solveUright(double* wrk, double* vec)
 
    int *idx;
    double *val;
-   double *work;
-   work = wrk;
 
    rorig = row.orig;
    corig = col.orig;
@@ -51,7 +49,7 @@ void CLUFactor::solveUright(double* wrk, double* vec)
    {
       r = rorig[i];
       c = corig[i];
-      work[c] = x = diag[r] * vec[r];
+      wrk[c] = x = diag[r] * vec[r];
       vec[r] = 0;
       if (x != 0.0)
       {
@@ -74,8 +72,6 @@ int CLUFactor::solveUrightEps(double* vec, int* nonz, double eps, double* rhs)
 
    int *idx;
    double *val;
-   double *work;
-   work = vec;
 
    rorig = row.orig;
    corig = col.orig;
@@ -95,7 +91,7 @@ int CLUFactor::solveUrightEps(double* vec, int* nonz, double eps, double* rhs)
       if (x > eps || x < meps)
       {
          c = corig[i];
-         work[c] = x;
+         vec[c] = x;
          nonz[n++] = c;
          val = &cval[cbeg[c]];
          idx = &cidx[cbeg[c]];
@@ -109,7 +105,7 @@ int CLUFactor::solveUrightEps(double* vec, int* nonz, double eps, double* rhs)
 }
 
 void CLUFactor::solveUright2(
-   double* work1, double* vec1, double* work2, double* vec2)
+   double* p_work1, double* vec1, double* p_work2, double* vec2)
 {
    int i, j, r, c;
    int *rorig, *corig;
@@ -132,8 +128,8 @@ void CLUFactor::solveUright2(
    {
       r = rorig[i];
       c = corig[i];
-      work1[c] = x1 = diag[r] * vec1[r];
-      work2[c] = x2 = diag[r] * vec2[r];
+      p_work1[c] = x1 = diag[r] * vec1[r];
+      p_work2[c] = x2 = diag[r] * vec2[r];
       vec1[r] = vec2[r] = 0;
       if (x1 != 0.0 && x2 != 0.0)
       {
@@ -166,7 +162,7 @@ void CLUFactor::solveUright2(
 }
 
 int CLUFactor::solveUright2eps(
-   double* work1, double* vec1, double* work2, double* vec2,
+   double* p_work1, double* vec1, double* p_work2, double* vec2,
    int* nonz, double eps)
 {
    int i, j, r, c, n;
@@ -195,8 +191,8 @@ int CLUFactor::solveUright2eps(
    {
       c = corig[i];
       r = rorig[i];
-      work1[c] = x1 = diag[r] * vec1[r];
-      work2[c] = x2 = diag[r] * vec2[r];
+      p_work1[c] = x1 = diag[r] * vec1[r];
+      p_work2[c] = x2 = diag[r] * vec2[r];
       vec1[r] = vec2[r] = 0;
       notzero1 = (x1 < meps || x1 > eps);
       notzero2 = (x2 < meps || x2 > eps);
@@ -215,7 +211,7 @@ int CLUFactor::solveUright2eps(
       }
       else if (notzero1)
       {
-         work2[c] = 0;
+         p_work2[c] = 0;
          *nonz++ = c;
          n++;
          val = &cval[cbeg[c]];
@@ -226,7 +222,7 @@ int CLUFactor::solveUright2eps(
       }
       else if (notzero2)
       {
-         work1[c] = 0;
+         p_work1[c] = 0;
          val = &cval[cbeg[c]];
          idx = &cidx[cbeg[c]];
          j = clen[c];
@@ -235,11 +231,10 @@ int CLUFactor::solveUright2eps(
       }
       else
       {
-         work1[c] = 0;
-         work2[c] = 0;
+         p_work1[c] = 0;
+         p_work2[c] = 0;
       }
    }
-
    return n;
 }
 
@@ -533,11 +528,10 @@ void CLUFactor::solveRight2(
 
 /*****************************************************************************/
 
-void CLUFactor::solveUleft(double* work, double* vec)
+void CLUFactor::solveUleft(double* p_work, double* vec)
 {
    double x;
-   int i, k, l, r, c;
-   int end;
+   int i, k, r, c;
    int *rorig, *corig;
    int *ridx, *rlen, *rbeg, *idx;
    double *rval, *val;
@@ -550,34 +544,31 @@ void CLUFactor::solveUleft(double* work, double* vec)
    rlen = u.row.len;
    rbeg = u.row.start;
 
-   end = thedim;
-
-   for (i = 0; i < end; ++i)
+   for (i = 0; i < thedim; ++i)
    {
       c = corig[i];
       r = rorig[i];
       x = vec[c];
       vec[c] = 0;
-      if (x)
+      if (x != 0.0)
       {
          x *= diag[r];
-         work[r] = x;
+         p_work[r] = x;
          k = rbeg[r];
          idx = &ridx[k];
          val = &rval[k];
-         for (l = rlen[r]; l; --l)
+         for (int m = rlen[r]; m != 0; --m)
             vec[*idx++] -= x * (*val++);
       }
    }
 }
 
 void CLUFactor::solveUleft2(
-   double* work1, double* vec1, double* work2, double* vec2)
+   double* p_work1, double* vec1, double* p_work2, double* vec2)
 {
    double x1;
    double x2;
-   int i, k, l, r, c;
-   int end;
+   int i, k, r, c;
    int *rorig, *corig;
    int *ridx, *rlen, *rbeg, *idx;
    double *rval, *val;
@@ -590,46 +581,46 @@ void CLUFactor::solveUleft2(
    rlen = u.row.len;
    rbeg = u.row.start;
 
-   end = thedim;
-   for (i = 0; i < end; ++i)
+   for (i = 0; i < thedim; ++i)
    {
       c = corig[i];
       r = rorig[i];
       x1 = vec1[c];
       x2 = vec2[c];
-      if (x1 && x2)
+      if ((x1 != 0.0) && (x2 != 0.0))
       {
          x1 *= diag[r];
          x2 *= diag[r];
-         work1[r] = x1;
-         work2[r] = x2;
+         p_work1[r] = x1;
+         p_work2[r] = x2;
          k = rbeg[r];
          idx = &ridx[k];
          val = &rval[k];
-         for (l = rlen[r]; l; --l)
+         for (int m = rlen[r]; m != 0; --m)
          {
             vec1[*idx] -= x1 * (*val);
-            vec2[*idx++] -= x2 * (*val++);
+            vec2[*idx] -= x2 * (*val++);
+            idx++;
          }
       }
-      else if (x1)
+      else if (x1 != 0.0)
       {
          x1 *= diag[r];
-         work1[r] = x1;
+         p_work1[r] = x1;
          k = rbeg[r];
          idx = &ridx[k];
          val = &rval[k];
-         for (l = rlen[r]; l; --l)
+         for (int m = rlen[r]; m != 0; --m)
             vec1[*idx++] -= x1 * (*val++);
       }
-      else if (x2)
+      else if (x2 != 0.0)
       {
          x2 *= diag[r];
-         work2[r] = x2;
+         p_work2[r] = x2;
          k = rbeg[r];
          idx = &ridx[k];
          val = &rval[k];
-         for (l = rlen[r]; l; --l)
+         for (int m = rlen[r]; m != 0; --m)
             vec2[*idx++] -= x2 * (*val++);
       }
    }

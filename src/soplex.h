@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.9 2001/12/12 10:26:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.10 2001/12/14 09:32:25 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -176,6 +176,8 @@ private:
    SSVector*      solveVector2rhs;   ///< when 2 systems are to solve at a time
    Vector*        coSolveVector2;    ///< when 2 systems are to solve at a time
    SSVector*      coSolveVector2rhs; ///< when 2 systems are to solve at a time
+
+   double         cacheProductFactor;
 
 protected:
    Array < UnitVector > unitVecs; ///< array of unit vectors
@@ -1927,7 +1929,6 @@ public:
 private:
    void testVecs();
 
-   double cacheProductFactor;
 };
 
 } // namespace soplex
