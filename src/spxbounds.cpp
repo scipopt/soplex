@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbounds.cpp,v 1.12 2002/04/05 16:13:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbounds.cpp,v 1.13 2002/07/26 08:14:29 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -77,12 +77,12 @@ void SoPlex::setPrimalBounds()
         \end{tabular}
     }
  
-    The case $l = -\infty$, $u = \infty$ occurs for unbounded primal variables.
-    Such must be treated differently from the general case.
+   The case $l = -\infty$, $u = \infty$ occurs for unbounded primal variables.
+   Such must be treated differently from the general case.
  
-    Given possible upper and lower bounds to a dual variable with |Status stat|,
-    this function clears the bounds according to |stat| by setting them to
-    $\infty$ or $-\infty$, respectively.
+   Given possible upper and lower bounds to a dual variable with |Status stat|,
+   this function clears the bounds according to |stat| by setting them to
+   $\infty$ or $-\infty$, respectively.
  */
 void SoPlex::clearDualBounds
 (

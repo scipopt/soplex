@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultrt.h,v 1.10 2002/03/21 16:06:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefaultrt.h,v 1.11 2002/07/26 08:14:29 bzfkocht Exp $"
 
 /**@file  spxdefaultrt.h
  * @brief Textbook ratio test for #SoPlex.
@@ -43,13 +43,6 @@ namespace soplex
 */
 class SPxDefaultRT : public SPxRatioTester
 {
-private:
-   ///
-   int selectLeaveX(Real& val, int start, int incr);
-   ///
-   SPxId selectEnterX(Real& val, 
-      int start1, int incr1, int start2, int incr2);
-
 public:
    ///
    virtual int selectLeave(Real& val);

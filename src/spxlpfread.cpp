@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.30 2002/07/02 14:45:45 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.31 2002/07/26 08:14:29 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -91,7 +91,7 @@ static Real readValue(char*& pos)
    char        tmp[MAX_LINE_LEN];
    const char* s = pos;
    char*       t;
-   Real      value = 1.0;
+   Real        value = 1.0;
    bool        has_digits = false;
 
    // 1. sign 
@@ -352,10 +352,11 @@ bool SPxLP::readLPF(
    char      buf [MAX_LINE_LEN];
    char      tmp [MAX_LINE_LEN];
    char      line[MAX_LINE_LEN];
-   int       lineno = 0;
-   bool      unnamed  = true;
-   bool      finished = false;
+   int       lineno     = 0;
+   bool      unnamed    = true;
+   bool      finished   = false;
    bool      other;
+   bool      have_value = true;
    int       i;
    int       k;
    char*     s;
@@ -394,9 +395,8 @@ bool SPxLP::readLPF(
          break;
       }
       lineno++;
-      i = 0;
+      i   = 0;
       pos = buf;
-      val = 1.0;
 
       DEBUG({ std::cout << "Reading line " << lineno
 			<< " (pos=" << pos << ")" << std::endl; });
@@ -429,8 +429,9 @@ bool SPxLP::readLPF(
             for(int j = vec.size() - 1; j >= 0; --j)
                cset.obj(vec.index(j)) = vec.value(j);
             vec.clear();
-
-            section = CONSTRAINTS;
+            have_value = true;
+            val        = 1.0;
+            section    = CONSTRAINTS;
          }
       }
       else
@@ -510,18 +511,22 @@ bool SPxLP::readLPF(
          {
          case OBJECTIVE :
             if (isValue(pos))
-               val = readValue(pos);
-            
-            if (isColName(pos))
             {
-               colidx = readColName(pos, cnames, cset, &emptycol);
-               vec.add(colidx, val);
+               have_value = true;
+               val        = readValue(pos);
             }
+            if (!have_value || !isColName(pos))
+               goto syntax_error;
+            
+            have_value = false;
+            colidx     = readColName(pos, cnames, cset, &emptycol);
+            vec.add(colidx, val);
             break;
          case CONSTRAINTS :
             if (isValue(pos))
             {
-               val = readValue(pos);
+               have_value = true;
+               val        = readValue(pos);
                
                if (sense != 0)
                {
@@ -554,19 +559,24 @@ bool SPxLP::readLPF(
                      sprintf(name, "C%d_", rset.num());
                      rnames->add(name);
                   }
-                  sense = 0;
-                  pos   = 0;
+                  have_value = true;
+                  val        = 1.0;
+                  sense      = 0;
+                  pos        = 0;
                   // next line
                   continue;
                }         
             }
-            if (isColName(pos))
-            {
-               colidx = readColName(pos, cnames, cset, &emptycol);
+            if (!have_value || !isColName(pos))
+               goto syntax_error;
 
-               if (val != 0.0)
-                  vec.add(colidx, val);
-            }
+            colidx = readColName(pos, cnames, cset, &emptycol);
+
+            if (val != 0.0)
+               vec.add(colidx, val);
+
+            have_value = false;
+
             if (isSense(pos))
                sense = readSense(pos);
             break;

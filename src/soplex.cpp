@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.59 2002/05/15 13:38:43 bzfpfend Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.60 2002/07/26 08:14:29 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -52,9 +52,6 @@ bool SoPlex::read(std::istream& in, NameSet* rowNames,
       return false;
 
    SPxBasis::load(this);
-
-   int tmp = coDim() / (20 * dim()) + 1;
-   coVecDim = coDim() / tmp + 1;
 
    return true;
 }
@@ -220,7 +217,7 @@ void SoPlex::setRep(Representation p_rep)
       theCoUbound = &theUCbound;
       theCoLbound = &theLCbound;
    }
-   therep = p_rep;
+   theRep = p_rep;
    unInit();
    reDim();
 
@@ -334,12 +331,6 @@ void SoPlex::reDim()
 {
    METHOD( "SoPlex::reDim()" );
    int newdim = (rep() == ROW) ? SPxLP::nCols() : SPxLP::nRows();
-
-   if (dim() > 0 && coDim() > 0)
-   {
-      int tmp = coDim() / (20 * dim()) + 1;
-      coVecDim = coDim() / tmp + 1;
-   }
 
    if (newdim > unitVecs.size())
    {
@@ -700,7 +691,7 @@ Real SoPlex::value() const
 void SoPlex::setDelta(Real d)
 {
    METHOD( "SoPlex::setDelta()" );
-   thedelta = d;
+   theDelta = d;
 }
 
 SoPlex::SoPlex(
@@ -723,7 +714,6 @@ SoPlex::SoPlex(
    , initialized (false)
    , solveVector2 (0)
    , coSolveVector2(0)
-   , cacheProductFactor(4.0)
    , unitVecs (0)
    , primVec (0, Param::epsilon())
    , dualVec (0, Param::epsilon())
@@ -738,7 +728,6 @@ SoPlex::SoPlex(
    setRep (p_rep);
    setDelta (DEFAULT_BND_VIOL);
    theLP = this;
-   coVecDim = 400;
 }
 
 /* We forbid the copyconstructor and the assignment operator
@@ -751,7 +740,7 @@ SoPlex::SoPlex(const SoPlex& old)
    , SPxBasis (old)
    , theType (old.theType)
    , thePricing (old.thePricing)
-   , therep (old.therep)  /// ??? siehe unten
+   , theRep (old.theRep)  /// ??? siehe unten
    , maxIters (old.maxIters)
    , maxTime (old.maxTime)
    , maxValue(old.maxValue)
@@ -761,7 +750,6 @@ SoPlex::SoPlex(const SoPlex& old)
    , initialized (old.initialized)
    , solveVector2 (0)
    , coSolveVector2 (0)
-   , cacheProductFactor(old.cacheProductFactor)
    , unitVecs (old.unitVecs)
    , primRhs (old.primRhs)
    , primVec (old.primVec)
@@ -784,8 +772,7 @@ SoPlex::SoPlex(const SoPlex& old)
 {
    METHOD( "SoPlex::SoPlex()" );
    setRep (old.rep());
-   setDelta(old.thedelta);
-   coVecDim = 400;
+   setDelta(old.theDelta);
    theLP = this;
 }
 
@@ -795,7 +782,7 @@ SoPlex& SoPlex::operator=(const SoPlex& old)
    *(static_cast<SPxLP*>(this)) = old;
    *(static_cast<SPxBasis*>(this)) = old;
 
-   therep = old.therep;
+   theRep = old.theRep;
    unitVecs = old.unitVecs;
    theCoTest = old.theCoTest;
    theTest = old.theTest;
@@ -816,7 +803,6 @@ SoPlex& SoPlex::operator=(const SoPlex& old)
    m_numCycle = old.m_numCycle;
    theShift = old.theShift;
    initialized = old.initialized;
-   cacheProductFactor = old.cacheProductFactor;
    thepricer = old.thepricer;
    theratiotester = old.theratiotester;
    thestarter = old.thestarter;
@@ -826,7 +812,7 @@ SoPlex& SoPlex::operator=(const SoPlex& old)
    coSolveVector2 = 0;
 
    setRep (old.rep());
-   setDelta(old.thedelta);
+   setDelta(old.theDelta);
 
    theLP = this;
    return *this;

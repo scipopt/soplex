@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.18 2002/05/15 13:38:43 bzfpfend Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.19 2002/07/26 08:14:29 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -30,25 +30,29 @@ namespace soplex
 
 /*
 In the entering simplex algorithms (i.e. iteratively a vector is selected to
-{\em enter} the simplex basis as in the dual rowwise and primal columnwise case)
+\em enter the simplex basis as in the dual rowwise and primal columnwise case)
 let $A$ denote the current basis, $x$ and entering vector and $f$ the
-feasibility vector. For a feasible basis $l \le f \le u$ holds.  For the rowwise
-case $f$ is obtained by solving $f^T = c^T A^{-1}$, wherease in columnwisecase
-$f = A^{-1} b$.
+feasibility vector. For a feasible basis $l \le f \le u$ holds.  
+For the rowwise case $f$ is obtained by solving $f^T = c^T A^{-1}$, 
+wherease in columnwisecase $f = A^{-1} b$.
  
 Let us further consider the rowwise case. Exchanging $x$ with the $i$-th
 vector of $A$ yields
+
 \begin{equation}\label{update.eq}
     A^{(i)} = E_i A \hbox{, with } E_i = I + e_i (x^T A^{-1} - e_i^T).
 \end{equation}
-With $E_i^{-1} = I + e_i \frac{e_i^T - \delta^T}{\delta}$, $\delta^T = x^T A^{-1}$ one
-gets the new feasibility vector
+
+With $E_i^{-1} = I + e_i \frac{e_i^T - \delta^T}{\delta}$, 
+$\delta^T = x^T A^{-1}$ one gets the new feasibility vector
+
 \begin{eqnarray*}
         (f^{(i)})^T
     &=& c^T (A^{(i)})^{-1}      \\
     &=& c^T A^{-1} + c^T A^{-1} e_i \frac{e_i^T - \delta^T}{\delta_i} \\
-    &=& f^T + \frac{f_i}{\delta_i} e_i^T - \frac{f_i}{\delta_i} \delta^T.       \\
+    &=& f^T + \frac{f_i}{\delta_i} e_i^T - \frac{f_i}{\delta_i} \delta^T. \\
 \end{eqnarray*}
+
 The selection of the leaving vector $i^*$ for the basis must ensure, that for
 all $j \ne i^*$ $f^{(i^*)}_j$ remains within its bounds $l_j$ and $u_j$.
  */

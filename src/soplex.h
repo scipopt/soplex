@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.49 2002/05/01 08:18:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.50 2002/07/26 08:14:29 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -193,15 +193,15 @@ public:
 private:
    Type           theType;     ///< entering or leaving algortihm.
    Pricing        thePricing;  ///< full or partial pricing.
-   Representation therep;      ///< row or column representation.
+   Representation theRep;      ///< row or column representation.
    Timer          theTime;
    int            maxIters;    ///< maximum allowed iterations.
    Real           maxTime;     ///< maximum allowed time.
    Real           maxValue;    ///< maximum allowed objective value.
    Status         m_status;    ///< status of algorithm.
 
-   Real           thedelta;    ///< maximum allowed bound violation
-   Real           theShift;    ///< shift of r/lhs or objective.
+   Real           theDelta;    ///< maximum allowed bound violation.
+   Real           theShift;    ///< sum of all shifts applied to any bound.
    Real           lastShift;   ///< for forcing feasibility.
    int            m_maxCycle;  ///< maximum steps before cycling is detected.
    int            m_numCycle;  ///< actual number of degenerate steps so far.
@@ -212,21 +212,16 @@ private:
    Vector*        coSolveVector2;    ///< when 2 systems are to solve at a time
    SSVector*      coSolveVector2rhs; ///< when 2 systems are to solve at a time
 
-   Real           cacheProductFactor;
-
 protected:
    Array < UnitVector > unitVecs; ///< array of unit vectors
-   const SVSet*   thevectors;
-   const SVSet*   thecovectors;
-
-   int            nNZEs;          ///< number of nonzero elements
-   int            coVecDim;
+   const SVSet*   thevectors;   ///< the LP vectors according to represenation
+   const SVSet*   thecovectors; ///< the LP coVectors according to rep
 
    DVector        primRhs;     ///< rhs vector for computing the primal vector
    UpdateVector   primVec;     ///< primal vector
    DVector        dualRhs;     ///< rhs vector for computing the dual vector
    UpdateVector   dualVec;     ///< dual vector
-   UpdateVector   addVec;      ///< additional vector
+   UpdateVector   addVec;      ///< storage for thePvec = &addVec
 
    DVector        theURbound;  ///< Upper Row    Feasibility bound
    DVector        theLRbound;  ///< Lower Row    Feasibility bound
@@ -282,7 +277,7 @@ public:
    /// return the current basis representation.
    Representation rep() const
    {
-      return therep;
+      return theRep;
    }
 
    /// return current #Type.
@@ -493,7 +488,7 @@ public:
     */
    Real delta() const
    {
-      return thedelta;
+      return theDelta;
    }
    /// set parameter \p delta.
    void setDelta(Real d);
@@ -700,7 +695,7 @@ public:
     */
    int isId(SPxId p_id) const
    {
-      return p_id.info * therep > 0;
+      return p_id.info * theRep > 0;
    }
 
    /// Is \p p_id a CoId.
@@ -709,7 +704,7 @@ public:
     */
    int isCoId(SPxId p_id) const
    {
-      return p_id.info * therep < 0;
+      return p_id.info * theRep < 0;
    }
    //@}
 
@@ -729,16 +724,16 @@ public:
    {
       assert(rid.isValid());
       return (rep() == ROW)
-             ? (*thevectors)[number(rid)]
-          : static_cast<const SVector&>(unitVecs[number(rid)]);
+         ? (*thevectors)[number(rid)]
+         : static_cast<const SVector&>(unitVecs[number(rid)]);
    }
    ///
    const SVector& vector(const SPxColId& cid) const
    {
       assert(cid.isValid());
       return (rep() == COLUMN)
-             ? (*thevectors)[number(cid)]
-          : static_cast<const SVector&>(unitVecs[number(cid)]);
+         ? (*thevectors)[number(cid)]
+         : static_cast<const SVector&>(unitVecs[number(cid)]);
    }
 
    /// vector associated to \p p_id.
@@ -772,16 +767,16 @@ public:
    {
       assert(rid.isValid());
       return (rep() == COLUMN)
-             ? (*thecovectors)[number(rid)]
-          : static_cast<const SVector&>(unitVecs[number(rid)]);
+         ? (*thecovectors)[number(rid)]
+         : static_cast<const SVector&>(unitVecs[number(rid)]);
    }
    ///
    const SVector& coVector(const SPxColId& cid) const
    {
       assert(cid.isValid());
       return (rep() == ROW)
-             ? (*thecovectors)[number(cid)]
-          : static_cast<const SVector&>(unitVecs[number(cid)]);
+         ? (*thecovectors)[number(cid)]
+         : static_cast<const SVector&>(unitVecs[number(cid)]);
    }
    /// coVector associated to \p p_id.
    /**@return a reference to the covector of the loaded LP
@@ -794,8 +789,8 @@ public:
    {
       assert(p_id.isValid());
       return p_id.isSPxRowId()
-             ? coVector(SPxRowId(p_id))
-          : coVector(SPxColId(p_id));
+         ? coVector(SPxRowId(p_id))
+         : coVector(SPxColId(p_id));
    }
    /// return \p i 'th unit vector.
    const SVector& unitVector(int i) const
@@ -889,8 +884,8 @@ public:
    }
    /// right-hand side vector for #fVec.
    /** The feasibility vector is computed by solving a linear system with the
-    *  basis matrix. The right-hand side vector of this system is refferd to as
-    *  \em feasibility \em, right-hand \em side \em vector #fRhs().
+    *  basis matrix. The right-hand side vector of this system is referred 
+    *  to as \em feasibility \em, right-hand \em side \em vector #fRhs().
     *
     *  For a row basis, #fRhs() is the objective vector (ignoring shifts).
     *  For a column basis, it is the sum of all nonbasic vectors scaled by
