@@ -1,4 +1,4 @@
-$(OBJDIR)/lpconv.o: extra/lpconv.cpp src/spxdefines.h src/spxlp.h src/datakey.h \
+$(OBJDIR)/lpstat.o: extra/lpstat.cpp src/spxdefines.h src/spxlp.h src/datakey.h \
   src/spxid.h src/dvector.h src/vector.h src/svector.h src/svset.h \
   src/dataset.h src/dataarray.h src/spxalloc.h src/message.h src/idlist.h \
   src/islist.h src/lprow.h src/dsvector.h src/ssvector.h src/didxset.h \

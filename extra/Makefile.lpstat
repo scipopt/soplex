@@ -1,4 +1,4 @@
-# $Id: Makefile.lpconv,v 1.2 2002/12/16 09:25:56 bzfkocht Exp $
+# $Id: Makefile.lpstat,v 1.1 2002/12/16 09:25:56 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -34,9 +34,9 @@ DFLAGS		=	-MM
 SRCDIR		=	extra
 BINDIR		=	bin
 LIBDIR		=	lib
-NAME		=	lpconv
+NAME		=	lpstat
 FLAGS		=       #
-OBJECT		=	lpconv.o
+OBJECT		=	lpstat.o
 
 #------------------------------------------------------------------------------
 #--- NOTHING TO CHANGE FROM HERE ON -------------------------------------------
@@ -55,7 +55,7 @@ BASE            =       $(OSTYPE).$(ARCH).$(COMP).$(OPT)
 TARGET		=	$(NAME).$(BASE)
 LIBNAME		=	soplex.$(BASE)
 BINARY		=	$(BINDIR)/$(TARGET)
-DEPEND		=	extra/lpconv.dep
+DEPEND		=	extra/lpstat.dep
 
 OBJDIR		=	obj/O.$(OSTYPE).$(ARCH).$(COMP).$(OPT)
 OBJXXX		=	$(addprefix $(OBJDIR)/,$(OBJECT))
