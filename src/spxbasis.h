@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.9 2001/12/28 14:55:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.10 2002/01/03 22:09:42 bzfkocht Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -178,9 +178,10 @@ public:
          D_ON_BOTH   = D_ON_LOWER + D_ON_UPPER,
          D_UNDEFINED = 8    ///< primal or dual variable has no status
       };
+      friend class SPxBasis;
+      friend std::ostream& operator<<(std::ostream& os, const Status& stat);
 
 private:
-      friend class SPxBasis;
       DataArray < Status > rowstat;   ///< status of rows.
       DataArray < Status > colstat;   ///< status of columns.
       DataArray < Status > * stat;    ///< basis' status.
@@ -280,6 +281,9 @@ public:
 
       /// resets dimensions.
       void reSize(int rowDim, int colDim);
+
+      /// Prints out status.
+      void dump() const;
 
       /// consistency check.
       int isConsistent() const;
@@ -396,8 +400,8 @@ public:
    Desc::Status dualStatus(const SPxLP::Id& id) const
    {
       return id.isSPxRowId()
-             ? dualStatus(SPxLP::SPxRowId(id))
-          : dualStatus(SPxLP::SPxRowId(id));
+         ? dualStatus(SPxLP::SPxRowId(id))
+         : dualStatus(SPxLP::SPxRowId(id));
    }
    //@}
 

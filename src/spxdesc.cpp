@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdesc.cpp,v 1.2 2001/11/06 23:31:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdesc.cpp,v 1.3 2002/01/03 22:09:42 bzfkocht Exp $"
 
 #include <iostream>
 #include "spxbasis.h"
@@ -21,21 +21,77 @@
 namespace soplex
 {
 
-//@ -----------------------------------------------------------------------------
-/*      \Section{Complex Method Implementations}
-        \SubSection{Descriptor}
- */
-
 void SPxBasis::Desc::reSize(int rowDim, int colDim)
 {
    rowstat.reSize(rowDim);
    colstat.reSize(colDim);
 }
 
+void SPxBasis::Desc::dump() const
+{
+   int i;
+
+   std::cout << "Basis description" << std::endl;
+
+   for(i = 0; i < nRows(); i++)
+      std::cout << rowStatus(i); 
+   
+   std::cout << std::endl 
+             << "------------------------------------------" 
+             << std::endl;
+
+   for(i = 0; i < nCols(); i++)
+      std::cout << colStatus(i);
+
+   std::cout << std::endl;
+}
+
 int SPxBasis::Desc::isConsistent() const
 {
    return rowstat.isConsistent() && colstat.isConsistent();
 }
+
+std::ostream& operator<<(std::ostream& os, const SPxBasis::Desc::Status& stat)
+{
+   char text;
+   
+   switch(stat)
+   {
+   case SPxBasis::Desc::P_ON_LOWER :
+      text = 'L';
+      break;
+   case SPxBasis::Desc::P_ON_UPPER :
+      text = 'U';
+      break;
+   case SPxBasis::Desc::P_FREE :
+      text = 'F';
+      break;
+   case SPxBasis::Desc::P_FIXED :
+      text = 'X';
+      break;
+   case SPxBasis::Desc::D_FREE :
+      text = 'f';
+      break;
+   case SPxBasis::Desc::D_ON_UPPER :
+      text = 'u';
+      break;
+   case SPxBasis::Desc::D_ON_LOWER :
+      text = 'l';
+      break;
+   case SPxBasis::Desc::D_ON_BOTH :
+      text = 'x';
+      break;
+   case SPxBasis::Desc::D_UNDEFINED :
+      text = '.';
+      break;
+   default :
+      abort();
+   }
+   os << text;
+
+   return os;
+}
+
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

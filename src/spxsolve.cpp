@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.11 2002/01/03 15:25:49 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.12 2002/01/03 22:09:42 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -72,7 +72,7 @@ SoPlex::Status SoPlex::solve()
       if(SPxBasis::status() <= NO_PROBLEM)
           SPxBasis::load(this);
        */
-      if (thestarter)                            // no basis and no starter.
+      if (thestarter != 0)                         // no basis and no starter.
          thestarter->generate(*this);              // generate start basis.
       init();
    }

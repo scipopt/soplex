@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.9 2001/12/28 14:55:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.10 2002/01/03 22:09:42 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -239,19 +239,23 @@ int main(int argc, char **argv)
 
    switch(starter)
    {
-   case 2 :
+   case 3 :
       work.load(new SPxVectorST);
       std::cout << "Vector";
       break;
-   case 1 :
+   case 2 :
       work.load(new SPxSumST);
       std::cout << "Sum";
+      break;
+   case 1 :
+      work.load(new SPxWeightST);
+      std::cout << "Weight";
       break;
    case 0 :
       /*FALLTHROUGH*/
    default :
-      work.load(new SPxWeightST);
-      std::cout << "Weight";
+      work.load(static_cast<SPxStarter*>(0));
+      std::cout << "Default";
       break;
    }
 
