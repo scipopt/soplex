@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.46 2002/04/06 13:05:02 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.47 2002/04/09 07:07:48 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -201,7 +201,6 @@ private:
    Status         m_status;    ///< status of algorithm.
 
    Real           thedelta;    ///< maximum allowed bound violation
-   //Real           thegamma;    ///< maximum allowed optimality violation
    Real           theShift;    ///< shift of r/lhs or objective.
    Real           lastShift;   ///< for forcing feasibility.
    int            m_maxCycle;  ///< maximum steps before cycling is detected.

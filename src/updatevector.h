@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: updatevector.h,v 1.9 2002/03/03 13:50:36 bzfkocht Exp $"
+#pragma ident "@(#) $Id: updatevector.h,v 1.10 2002/04/09 07:07:48 bzfkocht Exp $"
 
 /**@file  updatevector.h
  * @brief Dense vector with semi-sparse vector for updates
@@ -35,23 +35,26 @@ namespace soplex
 /**@brief   Dense vector with semi-sparse vector for updates
    @ingroup Algebra
 
-    In many algorithms vectors are updated in every iteration, by adding a
-    multiple of another vector to it, i.e., given a vector \c x, a scalar
-    \f$\alpha\f$ and another vector \f$\delta\f$, the update to \c x constists of
-    substituting it by \f$x \leftarrow x + \alpha\cdot\delta\f$.
+    In many algorithms vectors are updated in every iteration, by
+    adding a multiple of another vector to it, i.e., given a vector \c
+    x, a scalar \f$\alpha\f$ and another vector \f$\delta\f$, the
+    update to \c x constists of substituting it by \f$x \leftarrow x +
+    \alpha\cdot\delta\f$.
  
-    While the update itself can easily be expressed with methods of the class Vector,
-    it is often desirable to save the last update vector \f$\delta\f$ and value
-    \f$\alpha\f$. This is provided by class UpdateVector.
+    While the update itself can easily be expressed with methods of
+    the class Vector, it is often desirable to save the last update
+    vector \f$\delta\f$ and value \f$\alpha\f$. This is provided by
+    class UpdateVector.
  
-    UpdateVector%s are derived from DVector and provide additional methods
-    for saving and setting the multiplicator \f$\alpha\f$ and the update vector
-    \f$\delta\f$. Further, it allows for efficient sparse updates, by providing an
-    IdxSet idx() containing the nonzero indeces of \f$\delta\f$.
+    UpdateVector%s are derived from DVector and provide additional
+    methods for saving and setting the multiplicator \f$\alpha\f$ and
+    the update vector \f$\delta\f$. Further, it allows for efficient
+    sparse updates, by providing an IdxSet idx() containing the
+    nonzero indeces of \f$\delta\f$.  
 */
 class UpdateVector : public DVector
 {
-   Real theval;        ///< update multiplicator 
+   Real     theval;      ///< update multiplicator 
    SSVector thedelta;    ///< update vector
 
 public:
