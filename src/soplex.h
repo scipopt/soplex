@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.23 2002/01/16 16:52:23 bzfpfend Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.24 2002/01/17 14:51:41 bzfpfend Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -345,8 +345,8 @@ public:
     */
    //@{
    /// read LP from input stream.
-   virtual bool read(std::istream& in, 
-      NameSet* rowNames = 0, NameSet* colNames = 0);
+   virtual bool read(std::istream& in, NameSet* rowNames = 0,
+                     NameSet* colNames = 0, DIdxSet* intVars = 0);
 
    /// copy LP.
    virtual void loadLP(const SPxLP& LP);
@@ -374,8 +374,8 @@ public:
    virtual void reLoad();
 
    /// load LP from \p filename in MPS or LPF format.
-   bool readFile(
-      const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0);
+   bool readFile( const char* filename, NameSet* rowNames = 0,
+                  NameSet* colNames = 0, DIdxSet* intVars = 0);
 
    /// dump loaded LP to \p filename in LPF format.
    void dumpFile(const char* filename) const;
@@ -452,7 +452,7 @@ public:
     */
    Status getDual (Vector& vector) const;
 
-   /// get current solution vector for dual variables.
+   /// get vector of reduced costs.
    /** This method returns the \Ref{Status} of the basis.
     *  If it is #REGULAR or better,
     *  the vector of reduced costs of the current basis will be copied

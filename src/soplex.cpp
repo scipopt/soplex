@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.30 2002/01/16 16:52:23 bzfpfend Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.31 2002/01/17 14:51:41 bzfpfend Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -29,7 +29,8 @@ namespace soplex
 {
 #define MAXIMUM(x,y)        ((x)>(y) ? (x) : (y))
 
-bool SoPlex::read(std::istream& in, NameSet* rowNames, NameSet* colNames)
+bool SoPlex::read(std::istream& in, NameSet* rowNames, 
+                  NameSet* colNames, DIdxSet* intVars)
 {
    clear();
    unInit();
@@ -41,7 +42,7 @@ bool SoPlex::read(std::istream& in, NameSet* rowNames, NameSet* colNames)
    if (theratiotester)
       theratiotester->clear();
 
-   if (!SPxLP::read(in, rowNames, colNames))
+   if (!SPxLP::read(in, rowNames, colNames, intVars))
       return false;
 
    SPxBasis::load(this);
@@ -430,15 +431,15 @@ void SoPlex::reDim()
    }
 }
 
-bool SoPlex::readFile(
-   const char* filename, NameSet* rowNames, NameSet* colNames)
+bool SoPlex::readFile( const char* filename, NameSet* rowNames,
+                       NameSet* colNames, DIdxSet* intVars)
 {
    std::ifstream file(filename);
 
    if (!file)
       return false;
    else
-      return read(file, rowNames, colNames);
+      return read(file, rowNames, colNames, intVars);
 }
 
 void SoPlex::dumpFile(const char* filename) const
