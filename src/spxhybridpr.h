@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.h,v 1.7 2002/01/12 11:41:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.h,v 1.8 2002/01/12 15:51:18 bzfkocht Exp $"
 
 /**@file  spxhybridpr.h
  * @brief Hybrid pricer.
@@ -76,7 +76,7 @@ public:
    SPxHybridPR() 
       : SPxPricer("Hybrid")
       , thepricer(0)
-      , hybridFactor(0.9)
+      , hybridFactor(3.0) // we want the ParMult pricer
    {}
 };
 

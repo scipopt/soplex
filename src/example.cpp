@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.15 2002/01/12 11:41:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.16 2002/01/12 15:51:18 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -76,19 +76,56 @@ public:
 };
 
 /**@todo Flag to print the solution variables with names. */
-/**@todo Flag to set epsilon and delta */
 int main(int argc, char **argv)
 {
-   const char* usage = "[-eri][-bn][-ltime][-pn][-sn][-tn] mpsfile";
+   const char* banner =
+   "************************************************************************\n"
+   "*                                                                      *\n"
+   "*       SoPlex --- the Sequential object-oriented simPlex.             *\n"
+   "*                  Release 1.2.0                                       *\n"
+   "*    Copyright (C) 1997-1999 Roland Wunderling                         *\n"
+   "*                  1997-2001 Konrad-Zuse-Zentrum                       *\n"
+   "*                            fuer Informationstechnik Berlin           *\n"
+   "*                                                                      *\n"
+   "*  SoPlex is distributed under the terms of the ZIB Academic Licence.  *\n"
+   "*  You should have received a copy of the ZIB Academic License         *\n"
+   "*  along with SoPlex; If not email to soplex@zib.de.                   *\n"
+   "*                                                                      *\n"
+   "************************************************************************\n"
+   ;
+
+   const char* usage =
+   "[options] file\n\n"
+   "          file can be either in MPS or LPF format\n\n"
+   "options: (*) indicates default\n"
+   " -e       select entering algorithm (default is leaving)\n"
+   " -r       select row wise representation (default is column)\n"
+   " -i       select Eta-update (default is Forest-Tomlin)\n"
+   " -lSec    set timlimit to Sec seconds\n"
+   " -dDelta  set maximal allowed bound violation to Delta\n"
+   " -zZero   set zero tolerance to Zero\n\n"
+   "Simplifier:         Starter:        Pricer:           Ratiotester:\n"
+   " -s0  none           -c0  none*      -p0  Textbook     -t0  Textbook\n" 
+   " -s1  General        -c1  Weight     -p1  ParMult      -t1  Harris\n"
+   " -s2  Aggregate      -c2  Sum        -p2  Devex        -t2  Fast*\n"
+   " -s3  Remove-1*      -c3  vector     -p3  Hybrid*\n"
+   " -s4  Redundant                      -p4  Steep\n"
+   " -s5  Scale                          -p5  Weight\n" 
+   ;
+
    const char*            filename;
    SoPlex::Type           type           = SoPlex::LEAVE;
    SoPlex::Representation representation = SoPlex::COLUMN;
    SLUFactor::UpdateType  update         = SLUFactor::FOREST_TOMLIN;
-   int                    starter        = 0;
+   SPxStarter*            starter        = 0;
+   SPxPricer*             pricer         = 0;
+   int                    starting        = 0;
    int                    pricing        = 3;
    int                    ratiotest      = 2;
-   int                    simplifier     = 3;
+   int                    simplifing     = 3;
    double                 timelimit      = -1.0;
+   double                 delta          = 1e-7;
+   double                 epsilon        = 1e-15;
    int                    optind;
 
    for(optind = 1; optind < argc; optind++)
@@ -99,7 +136,10 @@ int main(int argc, char **argv)
       switch(argv[optind][1])
       {
       case 'c' :
-         starter = atoi(&argv[optind][2]);
+         starting = atoi(&argv[optind][2]);
+         break;
+      case 'd' :
+         delta = atof(&argv[optind][2]);
          break;
       case 'e':
          type = SoPlex::ENTER;
@@ -117,13 +157,20 @@ int main(int argc, char **argv)
          representation = SoPlex::ROW;
          break;
       case 's' :
-         simplifier = atoi(&argv[optind][2]);
+         simplifing = atoi(&argv[optind][2]);
          break;
       case 't' :
          ratiotest = atoi(&argv[optind][2]);
          break;
+      case 'v' :
+         std::cout << banner << std::endl;
+         exit(0);
+      case 'z' :
+         epsilon = atof(&argv[optind][2]);
+         break;
+      case 'h' :
       case '?' :
-         std::cerr << "usage: " << argv[0] << ":" << usage << std::endl;
+         std::cerr << "usage: " << argv[0] << " " << usage << std::endl;
          exit(0);
       default :
          abort();
@@ -142,6 +189,8 @@ int main(int argc, char **argv)
 
    work.setUtype(update);
    work.setTermination(timelimit);
+   work.setDelta(delta);
+   work.setEpsilon(epsilon);
 
    assert(work.isConsistent());
 
@@ -154,8 +203,6 @@ int main(int argc, char **argv)
              << (update == SLUFactor::ETA ? "Eta" : "Forest-Tomlin")
              << " update"
              << std::endl;
-
-   SPxPricer* pricer;
 
    switch (pricing)
    {
@@ -205,7 +252,7 @@ int main(int argc, char **argv)
    std::cout << " ratiotest" << std::endl;
    assert(work.isConsistent());
 
-   switch(simplifier)
+   switch(simplifing)
    {
    case 5 :
       work.setSimplifier(new SPxScale);
@@ -236,7 +283,7 @@ int main(int argc, char **argv)
 
    assert(work.isConsistent());
 
-   switch(starter)
+   switch(starting)
    {
    case 3 :
       work.setStarter(new SPxVectorST);
