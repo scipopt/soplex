@@ -1,0 +1,6 @@
+#--- $Id: make.aix.pwr4.ibm.opt,v 1.1 2002/03/15 11:24:20 bzfkocht Exp $
+CXX	=	xlC
+CPPFLAGS=	-Isrc -DNDEBUG
+CXXFLAGS=	-O3 -qmaxmem=-1
+LDFLAGS	=	-lm
+ARFLAGS	=	crs

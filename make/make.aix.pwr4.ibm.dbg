@@ -1,0 +1,6 @@
+#--- $Id: make.aix.pwr4.ibm.dbg,v 1.1 2002/03/15 11:24:20 bzfkocht Exp $
+CXX	=	xlC
+CPPFLAGS=	-Isrc 
+CXXFLAGS=	-g -qextchk -qinfo=all qcheck=all -qflttrap
+LDFLAGS	=	-lm
+ARFLAGS	=	crs

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.38 2002/03/11 11:41:55 bzfkocht Exp $
+# $Id: Makefile,v 1.39 2002/03/15 11:24:20 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -16,7 +16,8 @@ ARCH            :=      $(shell uname -m | \
 			-e s/sun../sparc/ \
 			-e s/i.86/x86/ \
 			-e s/IP../mips/ \
-			-e s/9000..../hppa/)
+			-e s/9000..../hppa/ \
+			-e s/00........../pwr4/)
 OSTYPE		:=	$(shell uname -s | tr A-Z a-z)
 
 OPT		=	opt
