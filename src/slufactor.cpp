@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.22 2002/02/14 17:25:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.23 2002/02/21 14:46:34 bzfkocht Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -282,7 +282,6 @@ void SLUFactor::solveLeft (SSVector& x,
 }
 
 
-//@ ----------------------------------------------------------------------------
 Real SLUFactor::stability() const
 {
    if (status() != OK)
@@ -345,8 +344,6 @@ SLUFactor::Status SLUFactor::change(
    
    return status();
 }
-
-//@ ----------------------------------------------------------------------------
 
 void SLUFactor::clear()
 {
@@ -576,26 +573,31 @@ SLUFactor::SLUFactor()
    , forest (1)
 {
 #ifndef NDEBUG
-   row.perm = 0;
-   row.orig = 0;
-   col.perm = 0;
-   col.orig = 0;
-   diag = 0;
-   u.row.elem = 0;
-   u.row.val = 0;
-   u.row.idx = 0;
+   row.perm    = 0;
+   row.orig    = 0;
+   col.perm    = 0;
+   col.orig    = 0;
+   diag        = 0;
+   u.row.elem  = 0;
+   u.row.val   = 0;
+   u.row.idx   = 0;
    u.row.start = 0;
-   u.row.len = 0;
-   u.row.max = 0;
-   u.col.elem = 0;
-   u.col.idx = 0;
+   u.row.len   = 0;
+   u.row.max   = 0;
+   u.col.elem  = 0;
+   u.col.idx   = 0;
    u.col.start = 0;
-   u.col.len = 0;
-   u.col.max = 0;
-   l.val = 0;
-   l.idx = 0;
-   l.start = 0;
-   l.row = 0;
+   u.col.len   = 0;
+   u.col.max   = 0;
+   l.val       = 0;
+   l.idx       = 0;
+   l.start     = 0;
+   l.row       = 0;
+   l.rval      = 0;
+   l.ridx      = 0;
+   l.rbeg      = 0;
+   l.rorig     = 0;
+   l.rperm     = 0;
 #endif
 
    nzCnt = 0;
