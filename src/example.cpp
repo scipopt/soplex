@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.63 2004/03/22 11:35:24 bzfpfend Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.64 2005/01/06 17:12:09 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -394,12 +394,12 @@ int main(int argc, const char* const argv[])
    {
    case 2 :
       prescaler  = new SPxEquiliSC(representation == SPxSolver::COLUMN, false);
-      postscaler = new SPxGeometSC(representation == SPxSolver::COLUMN, false);
+      postscaler = new SPxGeometSC(representation == SPxSolver::COLUMN);
       break;
    case 1 :
       prescaler  = new SPxEquiliSC(representation == SPxSolver::COLUMN, true);
-      postscaler = new SPxGeometSC(representation == SPxSolver::COLUMN, true);
-      break;
+      postscaler = new SPxGeometSC(representation == SPxSolver::COLUMN);
+      break; 
    case 0 : 
       /*FALLTHROUGH*/
    default :

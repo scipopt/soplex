@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.cpp,v 1.19 2003/01/20 16:46:13 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightst.cpp,v 1.20 2005/01/06 17:12:10 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 //#define TEST 1
@@ -268,7 +268,7 @@ void SPxWeightST::generate(SPxSolver& base)
             if (forbidden[idx] < 2)
             {
                sel  = idx;
-               dim += (forbidden[idx] > 0);
+               dim += (forbidden[idx] > 0) ? 1 : 0;
             }
          }
          else
@@ -355,7 +355,7 @@ void SPxWeightST::generate(SPxSolver& base)
          {
             int n, m;
             for (n = 0, m = forbidden.size(); n < forbidden.size(); ++n)
-               m -= (forbidden[n] != 0);
+               m -= (forbidden[n] != 0) ? 1 : 0;
             assert(m == dim);
          }
 #endif  // NDEBUG

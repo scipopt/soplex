@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: solve.cpp,v 1.27 2003/01/22 14:50:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: solve.cpp,v 1.28 2005/01/06 17:12:09 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -472,15 +472,13 @@ int CLUFactor::solveRight4update(Real* vec, int* nonz, Real eps,
 
    if (forest)
    {
-      Real* r = rhs;
       int n = 0;
-      int i = 0;
-      int e = thedim;
-      int* idx = forestIdx;
-      for (; i < e;)
+
+      for(int i = 0; i < thedim; i++)
       {
-         idx[n] = i++;
-         n += ((*forest++ = *r++) != 0);
+         forestIdx[n] = i;
+         forest[i]    = rhs[i];
+         n           += rhs[i] != 0.0 ? 1 : 0;
       }
       *forestNum = n;
    }
@@ -519,15 +517,13 @@ int CLUFactor::solveRight2update(Real* vec1,
 
    if (forest)
    {
-      Real* r = rhs1;
       int n = 0;
-      int i = 0;
-      int e = thedim;
-      int* idx = forestIdx;
-      for (; i < e;)
+      
+      for(int i = 0; i < thedim; i++)
       {
-         idx[n] = i++;
-         n += ((*forest++ = *r++) != 0);
+         forestIdx[n] = i;
+         forest[i]    = rhs1[i];
+         n           += rhs1[i] != 0.0 ? 1 : 0;
       }
       *forestNum = n;
    }

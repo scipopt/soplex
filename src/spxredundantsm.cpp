@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.24 2005/01/03 14:46:48 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.25 2005/01/06 17:12:09 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -1044,8 +1044,8 @@ SPxSimplifier::Result SPxRedundantSM::simplify(SPxLP& lp, Real eps, Real delta)
 
    Result ret = OKAY;
    bool   again;
-   bool   rcagain;
-   bool   rragain;
+   bool   rcagain = false;
+   bool   rragain = false;
    int    i;
    
    m_timeUsed.reset();
@@ -1078,7 +1078,7 @@ SPxSimplifier::Result SPxRedundantSM::simplify(SPxLP& lp, Real eps, Real delta)
       if (ret == OKAY)
          ret = simpleCols(lp, again);
 
-      assert(ret == OKAY || again == false);
+      assert(ret == OKAY || !again);
 
       //std::cout << lp << std::endl;
    }
@@ -1106,7 +1106,7 @@ SPxSimplifier::Result SPxRedundantSM::simplify(SPxLP& lp, Real eps, Real delta)
       if (ret == OKAY)
          ret = simpleCols(lp, again);
 
-      assert(ret == OKAY || again == false);
+      assert(ret == OKAY || !again);
    }
 #endif
    VERBOSE1({ std::cout << "IREDSM25 redundant simplifier removed "
@@ -1148,7 +1148,7 @@ const Vector& SPxRedundantSM::unsimplifiedDual(const Vector& pi)
 {
    std::cout << "SPxRedundantSM::getDual() not implemented\n";
 
-   abort();
+   assert(false);
 
    return pi;
 }

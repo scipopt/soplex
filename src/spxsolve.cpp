@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.74 2005/01/04 19:50:57 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.75 2005/01/06 17:12:10 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -164,10 +164,11 @@ SPxSolver::Status SPxSolver::solve()
 
             if (!enterId.isValid())
             {
-               // we are not infeasible
-               if (  SPxBasis::status() == SPxBasis::REGULAR 
-                  || SPxBasis::status() == SPxBasis::DUAL 
-                  || SPxBasis::status() == SPxBasis::PRIMAL)
+               // we are not infeasible and have no shift
+               if (  shift() <= epsilon()
+                  && ( SPxBasis::status() == SPxBasis::REGULAR 
+                     || SPxBasis::status() == SPxBasis::DUAL 
+                     || SPxBasis::status() == SPxBasis::PRIMAL))
                {
                   // is the solution good enough ?
                   // max three times reduced
@@ -269,10 +270,11 @@ SPxSolver::Status SPxSolver::solve()
 
             if (leaveNum < 0)
             {
-               // we are not infeasible
-               if (  SPxBasis::status() == SPxBasis::REGULAR 
-                  || SPxBasis::status() == SPxBasis::DUAL 
-                  || SPxBasis::status() == SPxBasis::PRIMAL)
+               // we are not infeasible and have no shift
+               if (  shift() <= epsilon()
+                  && (  SPxBasis::status() == SPxBasis::REGULAR 
+                     || SPxBasis::status() == SPxBasis::DUAL 
+                     || SPxBasis::status() == SPxBasis::PRIMAL))
                {
                   // is the solution good enough ?
                   // max three times reduced

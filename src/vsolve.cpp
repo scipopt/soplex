@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vsolve.cpp,v 1.19 2002/12/08 11:09:23 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vsolve.cpp,v 1.20 2005/01/06 17:12:10 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -210,9 +210,9 @@ int CLUFactor::vSolveLright(Real* vec, int* ridx, int rn, Real eps)
          for (j = lbeg[i + 1]; j > k; --j)
          {
             ridx[rn] = n = *idx++;
-            rn += (vec[n] == 0);
+            rn += (vec[n] == 0) ? 1 : 0;
             vec[n] -= x * (*val++);
-            vec[n] += MARKER * (vec[n] == 0);
+            vec[n] += (vec[n] == 0) ? MARKER : 0;
          }
       }
    }
@@ -229,9 +229,9 @@ int CLUFactor::vSolveLright(Real* vec, int* ridx, int rn, Real eps)
          for (j = lbeg[i + 1]; j > k; --j)
             x += vec[*idx++] * (*val++);
          ridx[rn] = j = lrow[i];
-         rn += (vec[j] == 0);
+         rn += (vec[j] == 0) ? 1 : 0;
          vec[j] -= x;
-         vec[j] += MARKER * (vec[j] == 0);
+         vec[j] += (vec[j] == 0) ? MARKER : 0;
       }
    }
    return rn;
@@ -277,12 +277,12 @@ void CLUFactor::vSolveLright2(
                ridx[rn] = ridx2[rn2] = n = *idx++;
                y = vec[n];
                y2 = vec2[n];
-               rn += (y == 0);
-               rn2 += (y2 == 0);
+               rn += (y == 0) ? 1 : 0;
+               rn2 += (y2 == 0) ? 1 : 0;
                y -= x * (*val);
                y2 -= x2 * (*val++);
-               vec[n] = y + MARKER * (y == 0);
-               vec2[n] = y2 + MARKER * (y2 == 0);
+               vec[n] = y + (y == 0 ? MARKER : 0);
+               vec2[n] = y2 + (y2 == 0 ? MARKER : 0);
             }
          }
          else
@@ -291,9 +291,9 @@ void CLUFactor::vSolveLright2(
             {
                ridx[rn] = n = *idx++;
                y = vec[n];
-               rn += (y == 0);
+               rn += (y == 0) ? 1 : 0;
                y -= x * (*val++);
-               vec[n] = y + MARKER * (y == 0);
+               vec[n] = y + (y == 0 ? MARKER : 0);
             }
          }
       }
@@ -306,9 +306,9 @@ void CLUFactor::vSolveLright2(
          {
             ridx2[rn2] = n = *idx++;
             y2 = vec2[n];
-            rn2 += (y2 == 0);
+            rn2 += (y2 == 0) ? 1 : 0;
             y2 -= x2 * (*val++);
-            vec2[n] = y2 + MARKER * (y2 == 0);
+            vec2[n] = y2 + (y2 == 0 ? MARKER : 0);
          }
       }
    }
@@ -328,12 +328,12 @@ void CLUFactor::vSolveLright2(
             x2 += vec2[*idx++] * (*val++);
          }
          ridx[rn] = ridx2[rn2] = j = lrow[i];
-         rn += (vec[j] == 0);
-         rn2 += (vec2[j] == 0);
+         rn += (vec[j] == 0) ? 1 : 0;
+         rn2 += (vec2[j] == 0) ? 1 : 0;
          vec[j] -= x;
          vec2[j] -= x2;
-         vec[j] += MARKER * (vec[j] == 0);
-         vec2[j] += MARKER * (vec2[j] == 0);
+         vec[j] += (vec[j] == 0) ? MARKER : 0;
+         vec2[j] += (vec2[j] == 0) ? MARKER : 0;
       }
    }
 
@@ -400,7 +400,7 @@ int CLUFactor::vSolveUright(Real* vec, int* vidx,
             else
             {
                y -= x * (*val++);
-               y += MARKER * (y == 0);
+               y += (y == 0) ? MARKER : 0;
                rhs[k] = y;
             }
          }
@@ -509,7 +509,7 @@ void CLUFactor::vSolveUrightNoNZ(Real* vec,
             else
             {
                y -= x * (*val++);
-               y += MARKER * (y == 0);
+               y += (y == 0) ? MARKER : 0;
                rhs[k] = y;
             }
          }
@@ -595,7 +595,7 @@ int CLUFactor::vSolveUright2(
                else
                {
                   y2 -= x2 * (*val);
-                  rhs2[k] = y2 + MARKER * (y2 == 0);
+                  rhs2[k] = (y2 != 0) ? y2 : MARKER;
                }
                y = rhs[k];
                if (y == 0)
@@ -610,7 +610,7 @@ int CLUFactor::vSolveUright2(
                else
                {
                   y -= x * (*val++);
-                  y += MARKER * (y == 0);
+                  y += (y == 0) ? MARKER : 0;
                   rhs[k] = y;
                }
             }
@@ -633,7 +633,7 @@ int CLUFactor::vSolveUright2(
                else
                {
                   y -= x * (*val++);
-                  y += MARKER * (y == 0);
+                  y += (y == 0) ? MARKER : 0;
                   rhs[k] = y;
                }
             }
@@ -662,7 +662,7 @@ int CLUFactor::vSolveUright2(
             else
             {
                y2 -= x2 * (*val++);
-               rhs2[k] = y2 + MARKER * (y2 == 0);
+               rhs2[k] = (y2 != 0) ? y2 : MARKER;
             }
          }
       }
@@ -752,9 +752,9 @@ int CLUFactor::vSolveUpdateRight(Real* vec, int* ridx, int n, Real eps)
          {
             int m = ridx[n] = *idx++;
             y = vec[m];
-            n += (y == 0);
+            n += (y == 0) ? 1 : 0;
             y = y - x * (*val++);
-            vec[m] = y + (y == 0) * MARKER;
+            vec[m] = (y != 0) ? y : MARKER;
          }
       }
    }
@@ -1067,7 +1067,7 @@ int CLUFactor::solveUleft(Real eps,
             else
             {
                y -= x * (*val++);
-               rhs[j] = y + MARKER * (y == 0);
+               rhs[j] = (y != 0) ? y : MARKER;
             }
          }
       }
@@ -1132,7 +1132,7 @@ void CLUFactor::solveUleftNoNZ(Real eps, Real* vec,
             else
             {
                y -= x * (*val++);
-               rhs[j] = y + MARKER * (y == 0);
+               rhs[j] = (y != 0) ? y : MARKER;
             }
          }
       }
@@ -1177,7 +1177,7 @@ int CLUFactor::solveLleftForest(Real eps, Real* vec, int* nonz, int n)
             else
             {
                y -= x * (*val++);
-               vec[m] = y + MARKER * (y == 0);
+               vec[m] = (y != 0) ? y : MARKER;
             }
          }
       }
@@ -1289,7 +1289,7 @@ int CLUFactor::solveLleft(Real eps, Real* vec, int* nonz, int rn)
             else
             {
                y -= x * *val++;
-               vec[m] = y + MARKER * (y == 0);
+               vec[m] = (y != 0) ? y : MARKER;
             }
          }
       }
@@ -1399,7 +1399,7 @@ int CLUFactor::solveUpdateLeft(Real eps, Real* vec, int* nonz, int n)
       else
       {
          y -= x;
-         vec[k] = y + MARKER * (y == 0);
+         vec[k] = (y != 0) ? y : MARKER;
       }
    }
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxstarter.h,v 1.7 2003/01/15 17:26:08 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxstarter.h,v 1.8 2005/01/06 17:12:10 bzfkocht Exp $"
 
 
 /**@file  spxstarter.h
@@ -52,7 +52,9 @@ public:
    {}
    /// destructor.
    virtual ~SPxStarter()
-   {}
+   {
+      m_name = 0;
+   }
    /// get name of starter.
    virtual const char* getName() const
    {

@@ -1,4 +1,4 @@
-// $Id: soplex.lnt,v 1.11 2003/01/13 19:04:41 bzfkocht Exp $
+// $Id: soplex.lnt,v 1.12 2005/01/06 17:12:09 bzfkocht Exp $
 -passes(1)
 +cpp(.h,.cpp)
 // esoteric size settings to find erros.
@@ -63,9 +63,7 @@
 -esym(1401,Timer::rTicks) // no need to be initialised
 
 // datakey.h
--esym(1529,DataKey::operator=) // no need to check
--esym(1539,DataKey::info) // is assigned
--esym(1539,DataKey::idx)  // is assigned
+-esym(1529,soplex::DataKey::operator=) // no need to check
 
 // didxset.h 
 -esym(1526,IdxSet::IdxSet)       // correctly not implemented
@@ -97,11 +95,11 @@
 -esym(1762,SPxLP::colset) // Member function could be made const
 
 // spxbasis.h
--esym(1540, SPxBasis::factor) // no need to free.
--esym(1554, SPxBasis::theLP)  // Direct pointer copy of member within copy constructor
--esym(1554, SPxBasis::factor) // Direct pointer copy of member within copy constructor
--esym(1555, SPxBasis::theLP)  // Direct pointer copy of member within copy assignment operator
--esym(1555, SPxBasis::factor) // Direct pointer copy of member within copy assignment operator
+-esym(1540, soplex::SPxBasis::factor) // no need to free.
+-esym(1554, soplex::SPxBasis::theLP)  // Direct pointer copy of member within copy constructor
+-esym(1554, soplex::SPxBasis::factor) // Direct pointer copy of member within copy constructor
+-esym(1555, soplex::SPxBasis::theLP)  // Direct pointer copy of member within copy assignment operator
+-esym(1555, soplex::SPxBasis::factor) // Direct pointer copy of member within copy assignment operator
 
 // spxhybridpr.h
 -esym(1540, SPxHybridPR::thepricer) // no need to free.
@@ -119,16 +117,16 @@
 -esym(1704,DataHashTable*::DataHashTable) // is private 
 
 // nameset.h
--esym(1554,Name::name) // direct pointer copy ok
--esym(1526,NameSet::operator=)    // correctly not implemented
--esym(1526,NameSet::NameSet)      // correctly not implemented
--esym(1704,NameSet::NameSet)      // is private 
+-esym(1554,soplex::NameSet::Name::name) // direct pointer copy ok
+//-esym(1526,NameSet::operator=)    // correctly not implemented
+//-esym(1526,NameSet::NameSet)      // correctly not implemented
+//-esym(1704,NameSet::NameSet)      // is private 
 
 // spxscaler.h
--esym(1526,SPxScaler::operator=)    // correctly not implemented
--esym(1526,SPxScaler::SPxScaler)    // correctly not implemented
--esym(1554,SPxScaler::m_name)       // Direct pointer copy of member
--esym(1555,SPxScaler::m_name)       // Direct pointer copy of member
+//-esym(1526,SPxScaler::operator=)    // correctly not implemented
+//-esym(1526,SPxScaler::SPxScaler)    // correctly not implemented
+-esym(1554,soplex::SPxScaler::m_name)       // Direct pointer copy of member
+-esym(1555,soplex::SPxScaler::m_name)       // Direct pointer copy of member
 
 // idxset.h
 -esym(1704,IdxSet::IdxSet)) // Vector has no (private) default constructor

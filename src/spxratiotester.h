@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxratiotester.h,v 1.10 2003/01/15 17:26:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxratiotester.h,v 1.11 2005/01/06 17:12:09 bzfkocht Exp $"
 
 /**@file  spxratiotester.h
  * @brief Abstract ratio test base class.
@@ -125,6 +125,7 @@ public:
    virtual ~SPxRatioTester()
    {
       thesolver = 0;
+      m_name    = 0;
    }
 
 };

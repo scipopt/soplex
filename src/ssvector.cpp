@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.25 2003/04/22 08:04:32 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.26 2005/01/06 17:12:10 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -833,35 +833,40 @@ SSVector& SSVector::assign2productShort(const SVSet& A, const SSVector& x)
 {
    assert(x.isSetup());
 
-   int i, j;
-   const Real* vl = x.val;
-   const int* xi = x.idx;
-
+   int i;
+   int j;
    Real y;
-   int* ii = idx;
-   SVector* svec = const_cast<SVector*>( & A[*xi] );
-   const SVector::Element* e = &(svec->element(0));
+   int* ii                      = idx;
+   const Real* vl               = x.val;
+   const int*  xi               = x.idx;
+   SVector* svec                = const_cast<SVector*>( & A[*xi] );
+   const SVector::Element* e    = &(svec->element(0));
    const SVector::Element* last = e + (num = svec->size());
-   Real* v = val;
-   Real xx = vl[*xi++];
+   Real* v                      = val;
+   Real xx                      = vl[*xi++];
+
    for (; e < last; ++e)
    {
-      v[ *ii = e->idx ] = y = xx * e->val;
-      ii += (y != 0);
+      y      = xx * e->val;
+      *ii    = e->idx;
+      v[*ii] = y;
+      ii    += (y != 0) ? 1 : 0;
    }
 
-   int k;
    for (i = x.size(); --i > 0;)
    {
       xx = vl[*xi];
       svec = const_cast<SVector*>( & A[*xi++] );
       e = &(svec->element(0));
-      for (k = svec->size(); --k >= 0;)
+      for (int k = svec->size(); --k >= 0;)
       {
-         *ii = j = e->idx;
-         ii += ((y = v[j]) == 0);
-         y += xx * e++->val;
-         v[j] = y + (y == 0) * MARKER;
+         j   = e->idx;
+         *ii = j;
+         y   = v[j];
+         ii  += (y == 0) ? 1 : 0;
+         y   += xx * e->val;
+         e++;
+         v[j] = (y != 0) ? y : MARKER;
       }
    }
 

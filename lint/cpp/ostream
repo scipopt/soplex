@@ -20,6 +20,7 @@ public:
    ostream& operator<<(double);
    ostream& operator<<(long double);
    ostream& operator<<(const void*);
+   ostream& operator<<(const char*);
    ostream& operator<<(ostream& (*f)(ostream&));
 };
 

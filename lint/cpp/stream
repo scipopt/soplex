@@ -26,7 +26,7 @@ protected:
 class ios
 {
 public:
-   enum fmtflags { scientific = 1, showpoint = 2 };
+   enum fmtflags { scientific = 1, showpoint = 2, skipws = 4, left = 8, right = 16, fixed = 32 };
    enum openmode { ate = 1, app = 2, in = 4, out = 8 };
    enum iostate  { badbit = 1, eofbit = 2, failbit = 4, goodbit = 8};
    bool good() const;

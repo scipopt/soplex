@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.h,v 1.12 2003/01/15 17:26:08 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightst.h,v 1.13 2005/01/06 17:12:10 bzfkocht Exp $"
 
 
 /**@file  spxweightst.h
@@ -90,7 +90,10 @@ public:
    {}
    /// destructor.
    virtual ~SPxWeightST()
-   {}  
+   { 
+      weight   = 0; 
+      coWeight = 0; 
+   }  
    /// generates start basis for loaded basis.
    void generate(SPxSolver& base);
    /// consistency check.

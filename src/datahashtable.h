@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datahashtable.h,v 1.17 2002/04/03 11:22:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: datahashtable.h,v 1.18 2005/01/06 17:12:09 bzfkocht Exp $"
 
 /**@file  datahashtable.h
  * @brief Generic hash table for data objects.
@@ -82,7 +82,7 @@ private:
    public:
       ElemHashItem    item;
       ElemInfo        info;
-      enum 
+      enum states
       {
          FREE,            ///< element has never been used
          RELEASED,        ///< element had been used, but released

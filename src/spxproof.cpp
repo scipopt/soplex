@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxproof.cpp,v 1.4 2004/10/13 13:16:41 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxproof.cpp,v 1.5 2005/01/06 17:12:09 bzfkocht Exp $"
 
 /**@file  spxproof.cpp
  * @brief provable bounds
@@ -21,7 +21,12 @@
 
 #ifdef WITH_EASYVAL
 
+#include <assert.h>
+#include <iostream>
+
 #include "Easyval.hh"
+
+#include "spxdefines.h"
 #include "spxsolver.h"
 
 //#undef DEBUG
@@ -135,4 +140,4 @@ bool SPxSolver::isProvenInfeasible() const
 
 }
 
-#endif
+#endif // WITH_EASYVAL
