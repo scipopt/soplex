@@ -13,16 +13,16 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.2 2002/03/11 17:43:57 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.3 2002/03/12 12:18:29 bzfpfend Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
  *
  * In optimized code with \c NDEBUG defined, only #VERBOSE1, #VERBOSE2
  * and #VERBOSE3 are set.
- * If \c NDEBUG is not defined, also #ABORT and #TRACE do something.
- * If \c DEBUGGING is defined, the code within #DEBUG is used.
- * If \c TRACE_METHOD is defined, the mathod tracing with #METHOD is
+ * If \c NDEBUG is not defined, the code within #TRACE is used.
+ * If \c DEBUGGING is defined, the code within #DEBUG is also used.
+ * If \c TRACE_METHOD is defined, the method tracing with #METHOD is
  * activated.
  *
  * If \c WITH_LONG_DOUBLE is defined, all #Real numbers are of type 
@@ -51,7 +51,7 @@ namespace soplex
 #define TRACE(x) {x}
 #else
 #define TRACE(x) /**/
-#endif //!ABORT
+#endif //!NDEBUG
 
 #if defined(DEBUGGING)
 #define DEBUG(x) {x}
@@ -93,7 +93,7 @@ public:
 
 #else
 #define METHOD(x) /**/
-#endif // !DEBUGGING
+#endif // !TRACE_METHOD
 
 /*-----------------------------------------------------------------------------
  * Long double support, Parameters and Epsilons

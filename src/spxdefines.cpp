@@ -13,10 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.cpp,v 1.1 2002/03/03 13:50:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefines.cpp,v 1.2 2002/03/12 12:18:29 bzfpfend Exp $"
 
-/**@file  real.cpp
- * @brief Floating point type definition.
+/**@file  spxdefines.cpp
+ * @brief Debugging, floating point type and parameter definitions.
  */
 #include "spxdefines.h"
 
