@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.10 2001/12/26 12:58:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.11 2001/12/28 14:55:13 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -299,21 +299,18 @@ double SSVector::maxAbs() const
 {
    if (isSetup())
    {
-      double x;
       int* i = idx;
       int* end = idx + num;
       double* v = val;
-      double abs = 0;
+      double absval = 0.0;
 
       for (; i < end; ++i)
       {
-         x = v[*i];
-         if (x > abs)
-            abs = x;
-         else if (-x > abs)
-            abs = -x;
+         double x = v[*i];
+         if (fabs(x) > absval)
+            absval = fabs(x);
       }
-      return abs;
+      return absval;
    }
    else
       return Vector::maxAbs();
@@ -563,64 +560,66 @@ SSVector& SSVector::multAdd(double x, const Vector& vec)
 
 SSVector& SSVector::operator=(const SSVector& rhs)
 {
-   clear();
-
-   DIdxSet::setMax(rhs.max());
-   DIdxSet::operator=(rhs);
-   DVector::reDim(rhs.dim());
-
-   if (rhs.isSetup())
+   if (this != &rhs)
    {
-      int i, j;
-      for (i = size() - 1; i >= 0; --i)
-      {
-         j = index(i);
-         val[j] = rhs.val[j];
-      }
-   }
-   else
-   {
-      int* ii = idx;
-      double* v = val;
-      double* rv = static_cast<double*>(rhs.val);
-      double* last = rv + rhs.dim() - 1;
-      double x = *last;
-      const double eps = epsilon;
-      const double meps = -eps;
+      clear();
 
-      *last = 1e-100;
-      for(;;)
+      DIdxSet::setMax(rhs.max());
+      DIdxSet::operator=(rhs);
+      DVector::reDim(rhs.dim());
+
+      if (rhs.isSetup())
       {
-         while (!*rv)
+         for (int i = size() - 1; i >= 0; --i)
          {
-            ++rv;
-            ++v;
+            int j = index(i);
+            val[j] = rhs.val[j];
          }
-         if (*rv < meps || *rv > eps)
+      }
+      else
+      {
+         int* ii = idx;
+         double* v = val;
+         double* rv = static_cast<double*>(rhs.val);
+         double* last = rv + rhs.dim() - 1;
+         double x = *last;
+         const double eps = epsilon;
+         const double meps = -eps;
+         
+         *last = 1e-100;
+         for(;;)
+         {
+            while (!*rv)
+            {
+               ++rv;
+               ++v;
+            }
+            if (*rv < meps || *rv > eps)
+            {
+               *ii++ = int(v - val);
+               *v++ = *rv++;
+            }
+            else if (rv == last)
+               break;
+            else
+            {
+               v++;
+               rv++;
+            }
+         }
+         *rv = x;
+         
+         if (x < meps || x > eps)
          {
             *ii++ = int(v - val);
-            *v++ = *rv++;
+            *v++ = x;
          }
-         else if (rv == last)
-            break;
-         else
-         {
-            v++;
-            rv++;
-         }
+         num = int(ii - idx);
       }
-      *rv = x;
-
-      if (x < meps || x > eps)
-      {
-         *ii++ = int(v - val);
-         *v++ = x;
-      }
-      num = int(ii - idx);
+      setupStatus = 1;
    }
-   setupStatus = 1;
-
    assert(isConsistent());
+
    return *this;
 }
 

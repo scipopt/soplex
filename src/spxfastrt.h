@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.h,v 1.5 2001/12/25 14:25:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfastrt.h,v 1.6 2001/12/28 14:55:13 bzfkocht Exp $"
 
 /**@file  spxfastrt.h
  * @brief Fast shifting ratio test.
@@ -70,7 +70,7 @@ protected:
        loops are started at \p start and incremented by \p incr.
     */
    int maxDelta(double& val,
-                double& abs,
+                double& p_abs,
                 UpdateVector& upd,
                 Vector& low,
                 Vector& up,
@@ -79,12 +79,12 @@ protected:
 
    ///
    virtual int maxDelta(double& val,
-                        double& abs);
+                        double& p_abs);
 
    ///
    virtual SoPlex::Id maxDelta(int& nr,
                                double& val,
-                               double& abs);
+                               double& p_abs);
 
    /// Min phase 1 value.
    /** Computes the minimum value \p val that could be used for updating \p upd
@@ -95,7 +95,7 @@ protected:
        loops are started at \p start and incremented by \p incr.
    */
    int minDelta(double& val,
-                double& abs,
+                double& p_abs,
                 UpdateVector& upd,
                 Vector& low,
                 Vector& up,
@@ -104,22 +104,22 @@ protected:
 
    ///
    virtual int minDelta(double& val,
-                         double& abs,
+                         double& p_abs,
                          UpdateVector& upd,
                          Vector& low,
                          Vector& up)
    {
-      return minDelta(val, abs, upd, low, up, 0, 1);
+      return minDelta(val, p_abs, upd, low, up, 0, 1);
    }
 
    ///
    virtual int minDelta(double& val,
-                        double& abs);
+                        double& p_abs);
 
    ///
    virtual SoPlex::Id minDelta(int& nr,
                                double& val,
-                               double& abs);
+                               double& p_abs);
    
    /// selects stable index for maximizing ratio test.
    /** Selects form all update values \p val < \p max the one with the largest
@@ -189,13 +189,13 @@ protected:
    int maxReleave(double& sel, int leave, double maxabs);
 
    ///
-   int minShortLeave(double& sel, int leave, double /*max*/, double abs);
+   int minShortLeave(double& sel, int leave, double /*max*/, double p_abs);
    /// tests for stop after phase 1.
    /** Tests whether a shortcut after phase 1 is feasible for the 
        selected leave
        pivot. In this case return the update value in \p sel.
    */
-   int maxShortLeave(double& sel, int leave, double /*max*/, double abs);
+   int maxShortLeave(double& sel, int leave, double /*max*/, double p_abs);
 
    ///
    virtual int minReenter(double& sel, double /*max*/, double maxabs,

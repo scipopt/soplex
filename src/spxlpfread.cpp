@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.10 2001/12/25 17:00:09 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.11 2001/12/28 14:55:13 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -316,7 +316,7 @@ void SPxLP::readLPF(
    LPColSet  cset;                  ///< the set of columns read.
    LPRow     row;                   ///< last assembled row.
    LPRowSet  rset;                  ///< the set of rows read.
-   DSVector& vec = row.rowVector(); ///< last assembled vector (from row).
+   DSVector  vec;                   ///< last assembled vector (from row).
    double    val = 1.0;
    int       colidx;
    int       sense = 0;
@@ -481,21 +481,22 @@ void SPxLP::readLPF(
                {
                   if (sense == '<')
                   { 
-                     row.lhs() = -SPxLP::infinity; 
-                     row.rhs() = val;
+                     row.setLhs(-SPxLP::infinity); 
+                     row.setRhs(val);
                   }
                   else if (sense == '>')
                   {
-                     row.lhs() = val;
-                     row.rhs() = SPxLP::infinity;
+                     row.setLhs(val);
+                     row.setRhs(SPxLP::infinity);
                   }
                   else 
                   {
                      assert(sense == '=');
                   
-                     row.lhs() = val;
-                     row.rhs() = val;
+                     row.setLhs(val);
+                     row.setRhs(val);
                   }
+                  row.setRowVector(vec);
                   rset.add(row);
                   vec.clear();
                   sense = 0;

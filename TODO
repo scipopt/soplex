@@ -61,6 +61,12 @@ maros-r7 EC
 pilot87  EC *
 pilot87  LR *
 
+osf1.alpha.compaq LC 1 525
+d2q06c   ER
+greenbeb ER
+maros-r7 EC
+pilot    LC *
+
 linux.x86.gnu LC 1 598
 bnl1     LR
 greenbea ER

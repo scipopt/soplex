@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.cpp,v 1.3 2001/11/11 20:27:34 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightst.cpp,v 1.4 2001/12/28 14:55:13 bzfkocht Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -33,7 +33,6 @@ namespace soplex
 {
 #define EPS     1e-6
 #define STABLE  1e-3
-#define ABS(x)  (((x) < 0) ? (x) : -(x))
 
 //@ ----------------------------------------------------------------------------
 int SPxWeightST::isConsistent() const

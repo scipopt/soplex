@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: updatevector.cpp,v 1.4 2001/12/26 12:58:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: updatevector.cpp,v 1.5 2001/12/28 14:55:13 bzfkocht Exp $"
 
 #include "updatevector.h"
 #include "message.h"
@@ -23,9 +23,12 @@ namespace soplex
 
 UpdateVector& UpdateVector::operator=(const UpdateVector& rhs)
 {
-   theval = rhs.theval;
-   thedelta = rhs.thedelta;
-   DVector::operator=(rhs);
+   if (this != &rhs)
+   {
+      theval   = rhs.theval;
+      thedelta = rhs.thedelta;
+      DVector::operator=(rhs);
+   }
    return *this;
 }
 

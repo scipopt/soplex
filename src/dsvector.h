@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dsvector.h,v 1.3 2001/11/16 20:12:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dsvector.h,v 1.4 2001/12/28 14:55:12 bzfkocht Exp $"
 
 /**@file  dsvector.h
  * @brief Dynamic sparse vectors.
@@ -79,10 +79,13 @@ public:
    /// assignment operator.
    DSVector& operator=(const DSVector& sv)
    {
-      int n = sv.size();
-      clear();
-      makeMem(n);
-      SVector::operator=(sv);
+      if (this != &sv)
+      {
+         int n = sv.size();
+         clear();
+         makeMem(n);
+         SVector::operator=(sv);
+      }
       return *this;
    }
    /// assignment operator from vector.
@@ -124,6 +127,9 @@ public:
    explicit DSVector(const Vector& vec);
    /// copy constructor from sparse vector.
    explicit DSVector(const SVector& old);
+   /// copy constructor from semi sparse vector.
+   explicit DSVector(const SSVector& old);
+
    /// copy constructor.
    DSVector(const DSVector& old);
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector.cpp,v 1.4 2001/12/04 19:28:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vector.cpp,v 1.5 2001/12/28 14:55:13 bzfkocht Exp $"
 
 #include <iostream>
 
@@ -26,8 +26,11 @@ namespace soplex
 {
 Vector& Vector::operator=(const Vector& vec)
 {
-   assert(dim() == vec.dim());
-   memcpy(val, vec.val, dimen*sizeof(double));
+   if (this != &vec)
+   {
+      assert(dim() == vec.dim());
+      memcpy(val, vec.val, dimen*sizeof(double));
+   }
    return *this;
 }
 

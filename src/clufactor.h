@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clufactor.h,v 1.8 2001/12/25 14:32:37 bzfkocht Exp $"
+#pragma ident "@(#) $Id: clufactor.h,v 1.9 2001/12/28 14:55:12 bzfkocht Exp $"
 
 #ifndef _CLUFACTOR_H_
 #define _CLUFACTOR_H_
@@ -53,7 +53,7 @@ public:
       int   pos;            ///< position of pivot column in row 
       int   mkwtz;          ///< markowitz number of pivot 
 
-      Pring() : next(NULL), prev(NULL) 
+      Pring() : next(0), prev(0) 
       {}      
 
    private:

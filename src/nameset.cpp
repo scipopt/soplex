@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.cpp,v 1.10 2001/12/25 17:00:08 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.cpp,v 1.11 2001/12/28 14:55:12 bzfkocht Exp $"
 
 #include <string.h>
 #include "nameset.h"
@@ -212,32 +212,34 @@ static int hashFunction (const NameSet_Name* str)
 
 NameSet& NameSet::operator=(const NameSet& rhs)
 {
-   if (max() < rhs.size())
-      reMax(rhs.size());
-   if (memMax() < rhs.memSize())
-      memRemax(rhs.memSize());
-
-   set = rhs.set;
-
-   list.clear();
-   hashtab.clear();
-   for (int i = 0; i < set.num(); ++i)
+   if (this != &rhs)
    {
-      list.append(&(set[i]));
-      NameSet_Name iname(set[i].name);
-      Key ikey = Key(set.key(i));
-      hashtab.add(iname, ikey);
-   }
-   memPack();
+      if (max() < rhs.size())
+         reMax(rhs.size());
+      if (memMax() < rhs.memSize())
+         memRemax(rhs.memSize());
 
+      set = rhs.set;
+
+      list.clear();
+      hashtab.clear();
+      for (int i = 0; i < set.num(); ++i)
+      {
+         list.append(&(set[i]));
+         NameSet_Name iname(set[i].name);
+         Key ikey = Key(set.key(i));
+         hashtab.add(iname, ikey);
+      }
+      memPack();
+   }
    return *this;
 }
 
 NameSet::NameSet(const NameSet& org)
    : set(org.set)
-      , hashtab(org.hashtab)
-      , factor(org.factor)
-      , memFactor(org.memFactor)
+   , hashtab(org.hashtab)
+   , factor(org.factor)
+   , memFactor(org.memFactor)
 {
    memused = 0;
    memmax = org.memSize();
@@ -257,9 +259,9 @@ NameSet::NameSet(const NameSet& org)
 
 NameSet::NameSet(int p_max, int mmax, double fac, double memFac)
    : set(p_max)
-      , hashtab(hashFunction, set.max(), 0, fac)
-      , factor(fac)
-      , memFactor(memFac)
+   , hashtab(hashFunction, set.max(), 0, fac)
+   , factor(fac)
+   , memFactor(memFac)
 {
    memused = 0;
    memmax = (mmax < 1) ? (8 * set.max() + 1) : mmax;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.cpp,v 1.8 2001/12/26 12:58:58 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.cpp,v 1.9 2001/12/28 14:55:13 bzfkocht Exp $"
 
 #include <stdio.h>
 
@@ -26,33 +26,31 @@ const double SPxLP::infinity = 1e+100;
 
 void SPxLP::getRow(int i, LPRow& row) const
 {
-   row.lhs() = lhs(i);
-   row.rhs() = rhs(i);
-   row.rowVector() = rowVector(i);
+   row.setLhs(lhs(i));
+   row.setRhs(rhs(i));
+   row.setRowVector(DSVector(rowVector(i)));
 }
 
 void SPxLP::getRows(int start, int end, LPRowSet& p_set) const
 {
-   int i;
    p_set.clear();
-   for (i = 0; start <= end; ++i, ++start)
-      p_set.add(lhs(start), rowVector(start), rhs(start));
+   for(int i = start; i <= end; i++)
+      p_set.add(lhs(i), rowVector(i), rhs(i));
 }
 
 void SPxLP::getCol(int i, LPCol& col) const
 {
-   col.upper() = upper(i);
-   col.lower() = lower(i);
-   col.obj() = spxSense() * obj(i);
-   col.colVector() = colVector(i);
+   col.setUpper(upper(i));
+   col.setLower(lower(i));
+   col.setObj(spxSense() * obj(i));
+   col.setColVector(colVector(i));
 }
 
 void SPxLP::getCols(int start, int end, LPColSet& p_set) const
 {
-   int i;
    p_set.clear();
-   for (i = 0; start <= end; ++i, ++start)
-      p_set.add(obj(start), lower(start), colVector(start), upper(start));
+   for(int i = start; i <= end; i++)
+      p_set.add(obj(i), lower(i), colVector(i), upper(i));
 }
 
 void SPxLP::getObj(Vector& p_obj) const
@@ -150,9 +148,9 @@ void SPxLP::added2Set(SVSet& p_set, const SVSet& p_add, int n)
       const SVector& vec = p_add[i];
       for (j = vec.size() - 1; j >= 0; --j)
       {
-         int n = vec.index(j);
-         int m = more[n] ++;
-         SVector& l_xtend = p_set[n];
+         int k = vec.index(j);
+         int m = more[k]++;
+         SVector& l_xtend = p_set[k];
          l_xtend.index(m) = i;
          l_xtend.value(m) = vec.value(j);
       }

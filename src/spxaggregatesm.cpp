@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.7 2001/12/04 19:28:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.8 2001/12/28 14:55:12 bzfkocht Exp $"
 
 #include <iostream>
 
@@ -293,10 +293,10 @@ int SPxAggregateSM::simplify()
                      k = prow.index(j);
                      tmp = lp->colVector(k);
                      tmp.multAdd(-(x / a), pcol);
-                     newCol.colVector() = tmp;
-                     newCol.upper() = lp->upper(k);
-                     newCol.lower() = lp->lower(k);
-                     newCol.obj() = lp->obj(k) - x / a * obj;
+                     newCol.setColVector(DSVector(tmp));
+                     newCol.setUpper(lp->upper(k));
+                     newCol.setLower(lp->lower(k));
+                     newCol.setObj(lp->obj(k) - x / a * obj);
                      lp->changeCol(k, newCol);
                   }
                   rhs.multAdd(-(b / a), pcol);

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datahashtable.h,v 1.8 2001/12/04 19:28:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: datahashtable.h,v 1.9 2001/12/28 14:55:12 bzfkocht Exp $"
 
 /**@file  datahashtable.h
  * @brief Generic hash table for data objects.
@@ -249,14 +249,14 @@ public:
    {
       assert(!has(h));
       int i;
+
       if (thenum >= element.size())
          reMax(int(factor * thenum) + 1);
-      for
-      (
+
+      for(
          i = (*hashval)(&h) % element.size();
          element[i].status == Element < HashItem, Info > ::USED;
-         i = (i + hashsize) % element.size()
-     )
+         i = (i + hashsize) % element.size())
         ;
       element[i].status = Element < HashItem, Info > ::USED;
       memcpy(&(element[i].info), &x, sizeof(Info));

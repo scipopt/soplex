@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.h,v 1.9 2001/11/25 14:58:28 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprowset.h,v 1.10 2001/12/28 14:55:12 bzfkocht Exp $"
 
 /**@file  lprowset.h
  * @brief Set of LP columns.
@@ -395,9 +395,12 @@ public:
    /// assignment operator.
    LPRowSet& operator=(const LPRowSet& rs)
    {
-      SVSet::operator=(rs);
-      left = rs.left;
-      right = rs.right;
+      if (this != &rs)
+      {
+         SVSet::operator=(rs);
+         left  = rs.left;
+         right = rs.right;
+      }
       return *this;
    }
    //@}

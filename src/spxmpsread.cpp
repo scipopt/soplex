@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.7 2001/12/25 17:00:09 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.8 2001/12/28 14:55:13 bzfkocht Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read MPS format files.
@@ -73,6 +73,9 @@ public:
       , m_has_error(false)
       , m_is_integer(false)
    {
+      m_f0 = m_f1 = m_f2 = m_f3 = m_f4 = m_f5 = 0;
+
+      m_buf     [0] = '\0';
       m_probname[0] = '\0';
       m_objname [0] = '\0';
    }
@@ -442,16 +445,16 @@ static void readRows(
          switch(*mps.field1())
          {
          case 'G' :
-            row.lhs() = 0.0;
-            row.rhs() = SPxLP::infinity;
+            row.setLhs(0.0);
+            row.setRhs(SPxLP::infinity);
             break;
          case 'E' :
-            row.lhs() = 0.0;
-            row.rhs() = 0.0;
+            row.setLhs(0.0);
+            row.setRhs(0.0);
             break;
          case 'L' :
-            row.lhs() = -SPxLP::infinity;
-            row.rhs() = 0.0;
+            row.setLhs(-SPxLP::infinity);
+            row.setRhs(0.0);
             break;
          default :
             mps.syntaxError();
@@ -474,15 +477,16 @@ static void readCols(
    NameSet&  cnames,
    DIdxSet*  intvars)
 {
-   double val;
-   int    idx;
-   char   colname[MAX_LINE_LEN] = { '\0' };
-   LPCol  col(rset.num());
+   double   val;
+   int      idx;
+   char     colname[MAX_LINE_LEN] = { '\0' };
+   LPCol    col(rset.num());
+   DSVector vec;
 
-   col.obj()   = 0.0;
-   col.lower() = 0.0;
-   col.upper() = SPxLP::infinity;
-   col.colVector().clear();
+   col.setObj(0.0);
+   col.setLower(0.0);
+   col.setUpper(SPxLP::infinity);
+   vec.clear();
 
    while(mps.readLine())
    {
@@ -492,8 +496,10 @@ static void readCols(
             break;
 
          if (colname[0] != '\0')
+         {
+            col.setColVector(vec);
             cset.add(col);
-
+         }
          mps.setSection(MPSInput::RHS);
          return;
       }
@@ -505,12 +511,14 @@ static void readCols(
       {
          // first column?
          if (colname[0] != '\0')
+         {
+            col.setColVector(vec);
             cset.add(col);
-
+         }
          strcpy(colname, mps.field1());
          cnames.add(colname);
-         col.colVector().clear();
-         col.obj() = 0.0;
+         vec.clear();
+         col.setObj(0.0);
 
          if (mps.isInteger())
          {
@@ -523,14 +531,14 @@ static void readCols(
       val = atof(mps.field3());
 
       if (!strcmp(mps.field2(), mps.objName()))
-         col.obj() = val;
+         col.setObj(val);
       else 
       {
          if ((idx = rnames.number(mps.field2())) < 0)
             mps.entryIgnored("Column", mps.field1(), mps.field2());
          else
             if (val != 0.0)
-               col.colVector().add(idx, val);
+               vec.add(idx, val);
       }
       if (mps.field5() != 0)
       {
@@ -539,14 +547,14 @@ static void readCols(
          val = atof(mps.field5());
 
          if (!strcmp(mps.field4(), mps.objName()))
-            col.obj() = val;
+            col.setObj(val);
          else 
          {
             if ((idx = rnames.number(mps.field4())) < 0)
                mps.entryIgnored("Column", mps.field1(), mps.field4());
             else
                if (val != 0.0)
-                  col.colVector().add(idx, val);
+                  vec.add(idx, val);
          }
       }
    }
@@ -893,6 +901,10 @@ void SPxLP::readMPS(
       addedCols(cset.num());
       assert(isConsistent());
    }
+   if (p_cnames != 0) 
+      delete cnames;
+   if (p_rnames != 0)
+      delete rnames;
 }
 
 } // namespace soplex

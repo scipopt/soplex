@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcolset.h,v 1.7 2001/11/23 13:35:56 bzfpfend Exp $"
+#pragma ident "@(#) $Id: lpcolset.h,v 1.8 2001/12/28 14:55:12 bzfkocht Exp $"
 
 /**@file  lpcolset.h
  * @brief Set of LP columns.
@@ -374,10 +374,13 @@ public:
    /// assignment operator.
    LPColSet& operator=(const LPColSet& rs)
    {
-      SVSet::operator=(rs);
-      low = rs.low;
-      up = rs.up;
-      object = rs.object;
+      if (this != &rs)
+      {
+         SVSet::operator=(rs);
+         low = rs.low;
+         up = rs.up;
+         object = rs.object;
+      }
       return *this;
    }
    //@}

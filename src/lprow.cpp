@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprow.cpp,v 1.6 2001/12/05 15:05:32 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprow.cpp,v 1.7 2001/12/28 14:55:12 bzfkocht Exp $"
 
 #include <stdlib.h>
 #include <math.h>
@@ -43,16 +43,16 @@ void LPRow::setType(
    switch (p_type)
    {
    case LESS_EQUAL:
-      lhs() = -infinity;
+      left = -infinity;
       break;
    case EQUAL:
       if (lhs() > -infinity)
-         rhs() = lhs();
+         right = lhs();
       else
-         lhs() = rhs();
+         left = rhs();
       break;
    case GREATER_EQUAL:
-      rhs() = infinity;
+      right = infinity;
       break;
    case RANGE :
       std::cerr << __FILE__ << __LINE__
@@ -70,10 +70,7 @@ double LPRow::value() const
    return (rhs() < infinity) ? rhs() : lhs();
 }
 
-LPRow::LPRow(
-   const SVector& p_rowVector,
-   LPRow::Type p_type,
-   double p_value)
+LPRow::LPRow(const SVector& p_rowVector, LPRow::Type p_type, double p_value)
    : vec(p_rowVector)
 {
    switch (p_type)

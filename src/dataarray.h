@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataarray.h,v 1.11 2001/12/04 19:28:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataarray.h,v 1.12 2001/12/28 14:55:12 bzfkocht Exp $"
 
 /**@file  dataarray.h
  * @brief Save arrays of data objects.
@@ -257,8 +257,11 @@ public:
    /// assignment operator
    DataArray& operator=(const DataArray& rhs)
    {
-      reSize(rhs.size());
-      memcpy(data, rhs.data, size() * sizeof(T));
+      if (this != &rhs)
+      {
+         reSize(rhs.size());
+         memcpy(data, rhs.data, size() * sizeof(T));
+      }
       return *this;
    }
 

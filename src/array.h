@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: array.h,v 1.11 2001/12/04 19:28:19 bzfkocht Exp $"
+#pragma ident "@(#) $Id: array.h,v 1.12 2001/12/28 14:55:11 bzfkocht Exp $"
 
 /**@file  array.h
  * @brief Save arrays of arbitrary types.
@@ -187,9 +187,12 @@ public:
     */
    Array<T>& operator=(const Array<T>& rhs)
    {
-      reSize(rhs.size());
-      for (int i = 0; i < size(); ++i)
-         data[i] = rhs.data[i];
+      if (this != &rhs)
+      {
+         reSize(rhs.size());
+         for (int i = 0; i < size(); ++i)
+            data[i] = rhs.data[i];
+      }
       return *this;
    }
 

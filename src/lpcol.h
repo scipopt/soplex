@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcol.h,v 1.4 2001/11/17 22:15:58 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpcol.h,v 1.5 2001/12/28 14:55:12 bzfkocht Exp $"
 
 /**@file  lpcol.h
  * @brief LP column.
@@ -59,9 +59,9 @@ public:
       return object;
    }
    /// access objective value.
-   double& obj()
+   void setObj(double p_object)
    {
-      return object;
+      object = p_object;
    }
 
    /// get upper bound.
@@ -70,9 +70,9 @@ public:
       return up;
    }
    /// access upper bound.
-   double& upper()
+   void setUpper(double p_up)
    {
-      return up;
+      up = p_up;
    }
 
    /// get lower bound.
@@ -81,9 +81,9 @@ public:
       return low;
    }
    /// access lower bound.
-   double& lower()
+   void setLower(double p_low)
    {
-      return low;
+      low = p_low;
    }
 
    /// get constraint column vector.
@@ -91,10 +91,11 @@ public:
    {
       return vec;
    }
+
    /// access constraint column vector.
-   DSVector& colVector()
+   void setColVector(const SVector& p_vec)
    {
-      return vec;
+      vec = p_vec;
    }
 
    /// copy constructor.
@@ -105,6 +106,7 @@ public:
    /// default constructor.
    /** Construct LPCol with a column vector ready for taking \p defDim
     *  nonzeros.
+    * @todo 1e300 seems wrong. This should be the symbolic constant infinity.
     */
    explicit LPCol(int defDim = 0)
       : up(1e+300), low(0), object(0), vec(defDim)

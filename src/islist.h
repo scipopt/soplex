@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: islist.h,v 1.7 2001/11/23 12:46:49 bzfpfend Exp $"
+#pragma ident "@(#) $Id: islist.h,v 1.8 2001/12/28 14:55:12 bzfkocht Exp $"
 
 
 /**@file  islist.h
@@ -326,12 +326,12 @@ public:
       if (start)
       {
          assert(find(start));
-         part.the_first = /*(T *)*/start;
+         part.the_first = const_cast<T*>(start);
       }
       if (end)
       {
          assert(part.find(end));
-         part.the_last = /*(T *)*/end;
+         part.the_last = const_cast<T*>(end);
       }
       return part;
    }

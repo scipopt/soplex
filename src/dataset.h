@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.14 2001/12/04 19:28:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.15 2001/12/28 14:55:12 bzfkocht Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -578,29 +578,31 @@ public:
     */
    DataSet < DATA > & operator=(const DataSet < DATA > & rhs)
    {
-      int i;
-      if (rhs.size() > max())
-         reMax(rhs.size());
-      clear();
-      for (i = 0; i < rhs.size(); ++i)
-         memcpy(&(theitem[i]), &(rhs.theitem[i]), sizeof(Item));
-      for (i = 0; i < rhs.num(); ++i)
-         thekey[i] = rhs.thekey[i];
-
-      if (rhs.firstfree == -rhs.themax - 1)
-         firstfree = -themax - 1;
-      else
+      if (this != &rhs)
       {
-         firstfree = rhs.firstfree;
-         i = rhs.firstfree;
+         int i;
+         if (rhs.size() > max())
+            reMax(rhs.size());
+         clear();
+         for (i = 0; i < rhs.size(); ++i)
+            memcpy(&(theitem[i]), &(rhs.theitem[i]), sizeof(Item));
+         for (i = 0; i < rhs.num(); ++i)
+            thekey[i] = rhs.thekey[i];
 
-         while (rhs.theitem[ -i - 1].info != -rhs.themax - 1)
-            i = rhs.theitem[ -i - 1].info;
-         theitem[ -i - 1].info = -themax - 1;
+         if (rhs.firstfree == -rhs.themax - 1)
+            firstfree = -themax - 1;
+         else
+         {
+            firstfree = rhs.firstfree;
+            i = rhs.firstfree;
+
+            while (rhs.theitem[ -i - 1].info != -rhs.themax - 1)
+               i = rhs.theitem[ -i - 1].info;
+            theitem[ -i - 1].info = -themax - 1;
+         }
+         thenum = rhs.thenum;
+         thesize = rhs.thesize;
       }
-      thenum = rhs.thenum;
-      thesize = rhs.thesize;
-
       return *this;
    }
 

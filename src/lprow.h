@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprow.h,v 1.4 2001/11/17 22:15:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprow.h,v 1.5 2001/12/28 14:55:12 bzfkocht Exp $"
 
 /**@file  lprow.h
  * @brief (In)equality for LPs.
@@ -96,10 +96,11 @@ public:
    {
       return left;
    }
+
    /// access left hand side value.
-   double& lhs()
+   void setLhs(double p_left)
    {
-      return left;
+      left = p_left;
    }
 
    /// get right hand side value.
@@ -107,10 +108,11 @@ public:
    {
       return right;
    }
+
    /// access right hand side value.
-   double& rhs()
+   void setRhs(double p_right)
    {
-      return right;
+      right = p_right;
    }
 
    /// get aconstraint row %vector
@@ -118,10 +120,11 @@ public:
    {
       return vec;
    }
+
    /// access constraint row %vector.
-   DSVector& rowVector()
+   void setRowVector(const DSVector& p_vec)
    {
-      return vec;
+      vec = p_vec;
    }
 
    /// Construct LPRow with a vector ready to hold \p defDim nonzeros

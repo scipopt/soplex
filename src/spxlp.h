@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.10 2001/12/12 10:26:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.11 2001/12/28 14:55:13 bzfkocht Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -842,10 +842,6 @@ protected:
 
 
 private:
-   /// reads a line of an MPS file.
-   static int readLine(std::istream& is,
-      char*& f1, char*& f2, char*& f3, char*& f4, char*& f5, char*& f6);
-
    SVector& colVector_w(int i)
    {
       return LPColSet::colVector_w(i);
@@ -867,12 +863,25 @@ public:
    /// default constructor.
    SPxLP()
    {
-      clear();
+      SPxLP::clear(); // clear is virtual.
    }
 
    /// destructor.
    virtual ~SPxLP()
    {}
+
+   /// assignment operator
+   SPxLP& operator=(const SPxLP& old)
+   {
+      if (this != &old)
+      {
+         LPRowSet::operator=(old);
+         LPColSet::operator=(old);
+         thesense = old.thesense;
+      }
+      return *this;
+   }
+
    //@}
 
 };

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.24 2001/12/25 09:16:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.25 2001/12/28 14:55:12 bzfkocht Exp $"
 
 #include <iostream>
 #include <assert.h>
@@ -494,7 +494,6 @@ void CLUFactor::initFactorMatrix(SVector** vec,
          sing[temp.stage++] = i;
       }
    }
-
    u.col.used = m;
 }
 

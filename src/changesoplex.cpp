@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: changesoplex.cpp,v 1.6 2001/12/26 12:49:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: changesoplex.cpp,v 1.7 2001/12/28 14:55:12 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -207,6 +207,7 @@ void SoPlex::localAddCols(int start)
             {
             case SPxBasis::Desc::P_ON_LOWER + SPxBasis::Desc::P_ON_UPPER :
                assert(SPxLP::lower(i) == SPxLP::upper(i));
+               /*FALLTHROUGH*/
             case SPxBasis::Desc::P_ON_UPPER :
                x = SPxLP::upper(i);
                break;
@@ -306,6 +307,7 @@ void SoPlex::localAddCols(int start)
             {
             case SPxBasis::Desc::P_ON_LOWER + SPxBasis::Desc::P_ON_UPPER :
                assert(SPxLP::lower(i) == SPxLP::upper(i));
+               /*FALLTHROUGH*/
             case SPxBasis::Desc::P_ON_UPPER :
                x = SPxLP::upper(i);
                break;
@@ -668,8 +670,8 @@ static void changeUpperStatus
    case SPxBasis::Desc::P_ON_UPPER:
       if (newUpper >= SPxLP::infinity)
          stat = (lower <= -SPxLP::infinity)
-                ? SPxBasis::Desc::P_FREE
-             : SPxBasis::Desc::P_ON_LOWER;
+            ? SPxBasis::Desc::P_FREE
+            : SPxBasis::Desc::P_ON_LOWER;
       else if (newUpper == lower)
          stat = SPxBasis::Desc::P_FIXED;
       break;

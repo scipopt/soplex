@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.h,v 1.8 2001/11/27 10:31:30 bzfbleya Exp $"
+#pragma ident "@(#) $Id: svset.h,v 1.9 2001/12/28 14:55:13 bzfkocht Exp $"
 
 /**@file  svset.h
  * @brief Set of sparse vectors.
@@ -114,7 +114,7 @@ private:
       /// access to SVector
       SVector& svector()
       {
-         return static_cast<SVector&>(*this);
+         return *this; // static_cast<SVector&>
       }
       /// default constructor.
       DLPSV()

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.13 2001/12/25 14:25:55 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.14 2001/12/28 14:55:12 bzfkocht Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -27,10 +27,6 @@
 
 namespace soplex
 {
-extern double verySparseFactor4right;
-extern double verySparseFactor4left;
-
-
 #define MINSTABILITY    1e-2
 
 void SLUFactor::solve2right(Vector& x, Vector& b) //const
@@ -620,7 +616,7 @@ SLUFactor::SLUFactor()
    l.rval = 0;
    l.ridx = 0;
    l.rbeg = 0;
-   clear();
+   SLUFactor::clear(); // clear() is virtual
 
    assert
    (

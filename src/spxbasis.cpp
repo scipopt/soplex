@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.13 2001/12/26 12:58:58 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.14 2001/12/28 14:55:12 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -169,7 +169,7 @@ void SPxBasis::load(const Desc& ds)
 
    matrixIsSetup = true;
    factorized = false;
-   if (factor)
+   if (factor != 0)
       factor->clear();
 }
 
@@ -339,9 +339,12 @@ void SPxBasis::change
    const SSVector* eta
 )
 {
+   assert(!id.isValid() || (enterVec != 0));
+
    assert(factor != 0);
    lastidx = i;
    lastin = id;
+
 
    if (id.isValid() && i >= 0)
    {
@@ -361,6 +364,8 @@ void SPxBasis::change
           std::cerr << theLP->number(id) << "\n";
    }
        */
+      assert(enterVec != 0);
+
       nzCount = nzCount - matrix[i]->size() + enterVec->size();
       matrix[i] = enterVec;
       lastout = theBaseId[i];

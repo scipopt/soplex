@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.7 2001/12/25 14:25:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.8 2001/12/28 14:55:13 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -153,6 +153,12 @@ int SPxHarrisRT::selectLeave(double& val)
    double infinity = solver()->SPxLP::infinity;
    double epsilon = solver()->epsilon();
    double delta = solver()->delta();
+
+   /**@todo numCycle and maxCycle are integers. So degeneps will be 
+    *       exactly delta until numCycle >= maxCycle. Then it will be
+    *       0 until numCycle >= 2 * maxCycle, after wich it becomes
+    *       negative. This does not look ok.
+    */
    double degeneps = delta * (1 - solver()->numCycle() / solver()->maxCycle());
 
    SSVector& upd = solver()->fVec().delta();
@@ -329,7 +335,7 @@ SoPlex::Id SPxHarrisRT::selectEnter(double& val)
    int i, j;
    SoPlex::Id enterId;
    double stab, x, y;
-   double max;
+   double max = 0.0;
    double sel = 0.0;
    double lastshift;
    double cuseeps;
@@ -758,7 +764,6 @@ SoPlex::Id SPxHarrisRT::selectEnter(double& val)
                enterId.inValidate();
                return enterId;
             }
-
             if (sel < max)             // instability detected => recompute
                continue;               // ratio test with corrected value
             break;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: subsvector.h,v 1.4 2001/11/29 14:43:46 bzfpfend Exp $"
+#pragma ident "@(#) $Id: subsvector.h,v 1.5 2001/12/28 14:55:13 bzfkocht Exp $"
 
 
 /**@file  subsvector.h
@@ -66,12 +66,6 @@ public:
    {
       return num;
    }
-   /// returns number of used indeces.
-   int& size()
-   {
-      return num;
-   }
-
    /// returns the maximal index.
    int dim() const;
 

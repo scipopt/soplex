@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.7 2001/12/11 09:09:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.8 2001/12/28 14:55:12 bzfkocht Exp $"
 
 /* Updating the Basis for Leaving Variables
  */
@@ -531,7 +531,7 @@ int SoPlex::leave(int leaveIdx)
 
       /*
           No variable could be selected to enter the basis and even the leaving
-          variable is unbounded --- this is a failiour.
+          variable is unbounded --- this is a failure.
        */
       if (!enterId.isValid())
       {

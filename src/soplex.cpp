@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.18 2001/12/26 12:49:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.19 2001/12/28 14:55:12 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -64,7 +64,7 @@ void SoPlex::load(const SPxLP& lp)
    clear();
    unInit();
    unLoad();
-   this->SPxLP::operator=(lp);
+   SPxLP::operator=(lp);
    reDim();
    SPxBasis::load(this);
 }
@@ -301,6 +301,9 @@ void SoPlex::setPricing(Pricing pr)
 
 void SoPlex::splitLP(int pe, int nPes)
 {
+   assert(pe   >= 0);
+   assert(nPes > 0);
+
    int i, j, n;
    int start;
    int nnes = 0;
@@ -311,6 +314,7 @@ void SoPlex::splitLP(int pe, int nPes)
    {
       subcovectors[n].reSize(dim());
       start = nnes = 0;
+      assert(nVecs > 0);
       for (j = (n * nNZEs) / nVecs; start < coDim(); ++start)
       {
          if (nnes >= j)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: timer.cpp,v 1.5 2001/12/13 21:53:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: timer.cpp,v 1.6 2001/12/28 14:55:13 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -23,8 +23,9 @@
 
 #else   // !_WIN32 
 
+#include <sys/types.h>
 #include <sys/times.h>
-#include <sys/param.h>
+//#include <sys/param.h>
 #include <limits.h>
 #include <unistd.h>
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.9 2001/12/25 17:00:09 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.10 2001/12/28 14:55:13 bzfkocht Exp $"
 
 #include <assert.h>
 #include <stdio.h>
@@ -84,7 +84,7 @@ static double minStability(double minStab, double maxabs)
 
 int SPxFastRT::maxDelta(
    double& val,
-   double& abs,
+   double& p_abs,
    UpdateVector& update,
    Vector& lowBound,
    Vector& upBound,
@@ -99,7 +99,7 @@ int SPxFastRT::maxDelta(
    // double           delta01 = 0.5*l_delta;
    double delta01 = 0;
    double inf = SPxLP::infinity;
-   double mabs = abs;
+   double mabs = p_abs;
 
    double* up = upBound.get_ptr();
    double* low = lowBound.get_ptr();
@@ -210,14 +210,14 @@ int SPxFastRT::maxDelta(
    }
 
    val = max;
-   abs = mabs;
+   p_abs = mabs;
 
    return sel;
 }
 
 int SPxFastRT::minDelta(
    double& val,
-   double& abs,
+   double& p_abs,
    UpdateVector& update,
    Vector& lowBound,
    Vector& upBound,
@@ -232,7 +232,7 @@ int SPxFastRT::minDelta(
    // double           delta01 = 0.5*l_delta;
    double delta01 = 0;
    double inf = SPxLP::infinity;
-   double mabs = abs;
+   double mabs = p_abs;
 
    double* up = upBound.get_ptr();
    double* low = lowBound.get_ptr();
@@ -339,25 +339,25 @@ int SPxFastRT::minDelta(
    }
 
    val = max;
-   abs = mabs;
+   p_abs = mabs;
 
    return sel;
 }
 
 int SPxFastRT::maxDelta(
    double& val,
-   double& abs)
+   double& p_abs)
 {
-   return maxDelta(val, abs,
+   return maxDelta(val, p_abs,
                     thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(),
                     0, 1);
 }
 
 int SPxFastRT::minDelta(
    double& val,
-   double& abs)
+   double& p_abs)
 {
-   return minDelta(val, abs,
+   return minDelta(val, p_abs,
                     thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(),
                     0, 1);
 }
@@ -688,11 +688,11 @@ SoPlex::Id SPxFastRT::minSelect(
  *       in selectLeave()
  */
 int SPxFastRT::maxShortLeave(double& sel, int leave, 
-   double /*max*/, double abs)
+   double /*max*/, double p_abs)
 {
    assert(leave >= 0);
    sel = thesolver->fVec().delta()[leave];
-   if (sel > abs*SHORT || -sel > abs*SHORT)
+   if (sel > p_abs*SHORT || -sel > p_abs*SHORT)
    {
       if (sel > 0)
          sel = (thesolver->ubBound()[leave] - thesolver->fVec()[leave]) / sel;
@@ -708,11 +708,11 @@ int SPxFastRT::maxShortLeave(double& sel, int leave,
  *       in selectLeave()
  */
 int SPxFastRT::minShortLeave(double& sel, int leave, 
-   double /*max*/, double abs)
+   double /*max*/, double p_abs)
 {
    assert(leave >= 0);
    sel = thesolver->fVec().delta()[leave];
-   if (sel > abs*SHORT || -sel > abs*SHORT)
+   if (sel > p_abs*SHORT || -sel > p_abs*SHORT)
    {
       if (sel > 0)
          sel = (thesolver->lbBound()[leave] - thesolver->fVec()[leave]) / sel;
@@ -1123,7 +1123,7 @@ SoPlex::Id SPxFastRT::selectEnter(double& val)
 {
    SoPlex::Id enterId;
    double max, sel;
-   double maxabs;
+   double maxabs = 0.0;
    int nr;
    int cnt = 0;
 
@@ -1134,13 +1134,13 @@ SoPlex::Id SPxFastRT::selectEnter(double& val)
    {
       do
       {
-         maxabs = 0;
+         maxabs = 0.0;
          max = val;
 
          enterId = maxDelta(nr, max, maxabs);
          if (!enterId.isValid())
             return enterId;
-         assert(max >= 0);
+         assert(max >= 0.0);
 
          if (!shortEnter(enterId, nr, max, maxabs))
          {
@@ -1163,17 +1163,16 @@ SoPlex::Id SPxFastRT::selectEnter(double& val)
       }
       while (cnt < TRIES);
    }
-
    else if (val < -epsilon)
    {
       do
       {
-         maxabs = 0;
+         maxabs = 0.0;
          max = val;
          enterId = minDelta(nr, max, maxabs);
          if (!enterId.isValid())
             return enterId;
-         assert(max <= 0);
+         assert(max <= 0.0);
 
          if (!shortEnter(enterId, nr, max, maxabs))
          {

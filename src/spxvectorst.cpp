@@ -13,28 +13,16 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvectorst.cpp,v 1.3 2001/11/09 13:25:27 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxvectorst.cpp,v 1.4 2001/12/28 14:55:13 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <assert.h>
 #include <iostream>
 
-
-/*  and class header files
- */
 #include "spxvectorst.h"
 
 namespace soplex
 {
 
-#define ABS(x)          ((x)<0   ? -(x) : (x))
-#define MIN(x,y)        ((x)<(y) ? (x) : (y))
-
-//@ ----------------------------------------------------------------------------
 void SPxVectorST::setupWeights(SoPlex& base)
 {
    if (state == PVEC)
@@ -103,7 +91,7 @@ void SPxVectorST::setupWeights(SoPlex& base)
       double x, y, len;
       int i, j;
       for (i = base.nRows(); i--;)
-         rowWeight[i] += ABS(vec[i]);
+         rowWeight[i] += fabs(vec[i]);
 
       for (i = base.nCols(); i--;)
       {
@@ -115,7 +103,7 @@ void SPxVectorST::setupWeights(SoPlex& base)
             len += x * x;
          }
          if (len > 0)
-            colWeight[i] += ABS(y / len - base.maxObj(i));
+            colWeight[i] += fabs(y / len - base.maxObj(i));
       }
    }
    else

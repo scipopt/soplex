@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.8 2001/12/26 12:49:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.9 2001/12/28 14:55:12 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -261,67 +261,68 @@ int main(int argc, char **argv)
 
    std::ifstream* file = new std::ifstream(filename);
 
-   if (*file)
+   if ((file == 0) || (*file == 0))
    {
-      SPxLP lp;
-      Timer timer;
-      std::cout << "loading LP file " << filename << std::endl;
-
-      *file >> lp;
-      std::cout << "LP has " 
-                << lp.nRows() 
-                << "\trows and"
-                << std::endl
-                << "       " 
-                << lp.nCols() 
-                << "\tcolumns" 
-                << std::endl;
-
-      assert(lp.isConsistent());
-
-      work.load(lp);
-      assert(work.isConsistent());
-
-      timer.start();
-      std::cout << "solving LP" 
-                << std::endl;
-
-      work.solve();
-
-      timer.stop();
-      std::cout << "solution time  is: " 
-                << timer.userTime() 
-                << std::endl
-                << "iterations    : " 
-                << work.basis().iteration() 
-                << std::endl;
-      
-      SoPlex::Status stat = work.status();
-
-      switch (stat)
-      {
-      case SoPlex::SOLVED:
-         std::cout << "solution value is: "
-                   << std::setprecision(10)
-                   << work.value()
-                   << std::endl;
-         break;
-      case SoPlex::UNBOUNDED:
-         std::cout << "LP is unbounded" 
-                   << std::endl;
-         break;
-      case SoPlex::INFEASIBLE:
-         std::cout << "LP is infeasible" 
-                   << std::endl;
-         break;
-      default:
-         std::cout << "An error occurred during the solution process" 
-                   << std::endl;
-         break;
-      }
-   }
-   else
       std::cerr << "could not open LP file " << filename << std::endl;
+      exit(1);
+   }
+
+   SPxLP lp;
+   Timer timer;
+   std::cout << "loading LP file " << filename << std::endl;
+
+   *file >> lp;
+
+   delete file;
+
+   std::cout << "LP has " 
+             << lp.nRows() 
+             << "\trows and"
+             << std::endl
+             << "       " 
+             << lp.nCols() 
+             << "\tcolumns" 
+             << std::endl;
+
+   assert(lp.isConsistent());
+
+   work.load(lp);
+   assert(work.isConsistent());
+
+   timer.start();
+   std::cout << "solving LP" 
+             << std::endl;
+
+   work.solve();
+
+   timer.stop();
+   std::cout << "solution time  is: " 
+             << timer.userTime() 
+             << std::endl
+             << "iterations    : " 
+             << work.basis().iteration() 
+             << std::endl;
+   
+   SoPlex::Status stat = work.status();
+
+   switch (stat)
+   {
+   case SoPlex::SOLVED:
+      std::cout << "solution value is: "
+                << std::setprecision(10)
+                << work.value();
+      break;
+   case SoPlex::UNBOUNDED:
+      std::cout << "LP is unbounded";
+      break;
+   case SoPlex::INFEASIBLE:
+      std::cout << "LP is infeasible";
+      break;
+   default:
+      std::cout << "An error occurred during the solution process";
+      break;
+   }
+   std::cout << std::endl;
 
    return 0;
 }

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idxset.cpp,v 1.6 2001/12/26 12:58:58 bzfkocht Exp $"
+#pragma ident "@(#) $Id: idxset.cpp,v 1.7 2001/12/28 14:55:12 bzfkocht Exp $"
 
 #include "idxset.h"
 #include "message.h"
@@ -78,9 +78,12 @@ void IdxSet::remove(int n, int m)
 
 IdxSet& IdxSet::operator=(const IdxSet& set)
 {
-   assert(max() >= set.size());
-   for (num = 0; num < set.size(); ++num)
-      idx[num] = set.idx[num];
+   if (this != &set)
+   {
+      assert(max() >= set.size());
+      for (num = 0; num < set.size(); ++num)
+         idx[num] = set.idx[num];
+   }
    return *this;
 }
 

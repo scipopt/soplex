@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.cpp,v 1.7 2001/12/26 12:58:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svector.cpp,v 1.8 2001/12/28 14:55:13 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -223,13 +223,16 @@ SVector& SVector::assign(const Vector& vec, double eps)
 
 SVector& SVector::operator=(const SVector& sv)
 {
-   assert(max() >= sv.size());
-   int i = sv.size();
-   Element       *e = m_elem;
-   const Element *s = sv.m_elem;
-   while (i--)
-      *e++ = *s++;
-   set_size( sv.size() );
+   if (this != &sv)
+   {
+      assert(max() >= sv.size());
+      int i = sv.size();
+      Element       *e = m_elem;
+      const Element *s = sv.m_elem;
+      while (i--)
+         *e++ = *s++;
+      set_size( sv.size() );
+   }
    return *this;
 }
 

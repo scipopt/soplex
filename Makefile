@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.19 2001/12/26 12:58:58 bzfkocht Exp $
+# $Id: Makefile,v 1.20 2001/12/28 14:55:11 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -19,7 +19,7 @@ OPT		=	dbg
 COMP		=	gnu
 CXX		=	g++
 DCXX		=	g++
-LINT		=	lintgcc
+LINT		=	flexelint
 AR		=	ar
 RANLIB		=	ranlib
 DOXY		=	doxygen
@@ -95,7 +95,7 @@ $(LIBRARY):	$(LIBDIR) $(LIBXXX)
 		$(RANLIB) $@
 
 lint:		$(OBJSRC) $(LIBSRC)
-		$(LINT) src/project.lnt -os\(lint.out\) \
+		$(LINT) soplex.lnt -os\(lint.out\) \
 		$(CPPFLAGS) -UNDEBUG $^
 
 doc:		

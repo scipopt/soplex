@@ -13,11 +13,8 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: didxset.cpp,v 1.4 2001/11/13 21:55:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: didxset.cpp,v 1.5 2001/12/28 14:55:12 bzfkocht Exp $"
 
-
-/*      \Section{Complex Members}
- */
 #include <iostream>
 #include "didxset.h"
 #include "spxalloc.h"

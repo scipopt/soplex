@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: forest.cpp,v 1.9 2001/12/12 09:30:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: forest.cpp,v 1.10 2001/12/28 14:55:12 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -450,10 +450,15 @@ void CLUFactor::forestUpdate(int p_col, double* p_work, int num, int *nonz)
          ll = makeLvec(r - c, rowno);
          lval = l.val;
          lidx = l.idx;
+
+         assert((num == 0) || (nonz != 0));
+
          /* for(i = c; i < r; ++i)       */
          while (num)
          {
 #ifndef NDEBUG
+            assert(nonz != 0);
+
             // The numbers seem to be often 1e-100, is this ok ?
             for (i = 0; i < num; ++i)
                if (p_work[corig[nonz[i]]] == 0.0)
