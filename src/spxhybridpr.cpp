@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.3 2001/11/12 16:42:05 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.4 2001/11/20 16:43:31 bzfpfend Exp $"
 
 /*  \Section{Complex Methods}
  */
@@ -129,83 +129,85 @@ void SPxHybridPR::entered4(SoPlex::Id id, int n)
    thepricer->entered4(id, n);
 }
 
-void SPxHybridPR::addedVecs (int n)
+/**@todo What is the reason for these empty methods?
+ */
+void SPxHybridPR::addedVecs (int /*n*/)
 {}
 
 
-void SPxHybridPR::addedCoVecs(int n)
+void SPxHybridPR::addedCoVecs(int /*n*/)
 {}
 
 
-void SPxHybridPR::removedVec(int i)
+void SPxHybridPR::removedVec(int /*i*/)
 {}
 
 
-void SPxHybridPR::removedVecs(const int perm[])
+void SPxHybridPR::removedVecs(const int */*perm[]*/)
 {}
 
 
-void SPxHybridPR::removedCoVec(int i)
+void SPxHybridPR::removedCoVec(int /*i*/)
 {}
 
 
-void SPxHybridPR::removedCoVecs(const int perm[])
+void SPxHybridPR::removedCoVecs(const int */*perm[]*/)
 {}
 
 
-void SPxHybridPR::changeObj(const Vector& newObj)
+void SPxHybridPR::changeObj(const Vector& /*newObj*/)
 {}
 
 
-void SPxHybridPR::changeObj(int i, double newVal)
+void SPxHybridPR::changeObj(int /*i*/, double /*newVal*/)
 {}
 
 
-void SPxHybridPR::changeLower(const Vector& newLower)
+void SPxHybridPR::changeLower(const Vector& /*newLower*/)
 {}
 
 
-void SPxHybridPR::changeLower(int i, double newLower)
+void SPxHybridPR::changeLower(int /*i*/, double /*newLower*/)
 {}
 
 
-void SPxHybridPR::changeUpper(const Vector& newUpper)
+void SPxHybridPR::changeUpper(const Vector& /*newUpper*/)
 {}
 
 
-void SPxHybridPR::changeUpper(int i, double newUpper)
+void SPxHybridPR::changeUpper(int /*i*/, double /*newUpper*/)
 {}
 
 
-void SPxHybridPR::changeLhs(const Vector& newLhs)
+void SPxHybridPR::changeLhs(const Vector& /*newLhs*/)
 {}
 
 
-void SPxHybridPR::changeLhs(int i, double newLhs)
+void SPxHybridPR::changeLhs(int /*i*/, double /*newLhs*/)
 {}
 
 
-void SPxHybridPR::changeRhs(const Vector& newRhs)
+void SPxHybridPR::changeRhs(const Vector& /*newRhs*/)
 {}
 
 
-void SPxHybridPR::changeRhs(int i, double newRhs)
+void SPxHybridPR::changeRhs(int /*i*/, double /*newRhs*/)
 {}
 
 
-void SPxHybridPR::changeRow(int i, const LPRow& newRow)
+void SPxHybridPR::changeRow(int /*i*/, const LPRow& /*newRow*/)
 {}
 
 
-void SPxHybridPR::changeCol(int i, const LPCol& newCol)
+void SPxHybridPR::changeCol(int /*i*/, const LPCol& /*newCol*/)
 {}
 
 
-void SPxHybridPR::changeElement(int i, int j, double val)
+void SPxHybridPR::changeElement(int /*i*/, int /*j*/, double /*val*/)
 {}
 
 
-void SPxHybridPR::changeSense(SoPlex::Sense sns)
+void SPxHybridPR::changeSense(SoPlex::Sense /*sns*/)
 {}
 } // namespace soplex
 

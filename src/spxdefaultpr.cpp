@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultpr.cpp,v 1.3 2001/11/13 21:01:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefaultpr.cpp,v 1.4 2001/11/20 16:43:29 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -67,6 +67,8 @@ int SPxDefaultPR::selectLeave()
 }
 
 
+/**@todo suspicious: first loop consists of start1 and incr2, second loop consists of start2 and incr2. Why is incr1 not used in the first loop?
+ */
 SoPlex::Id SPxDefaultPR::selectEnter(double& best, int start1, int incr1,
                                      int start2, int incr2)
 {
@@ -78,7 +80,7 @@ SoPlex::Id SPxDefaultPR::selectEnter(double& best, int start1, int incr1,
    assert(thesolver != 0);
    best = -theeps;
 
-   for (i = thesolver->dim() - start1 - 1; i >= 0; i -= incr2)
+   for (i = thesolver->dim() - start1 - 1; i >= 0; i -= incr2)  // ??? really use incr2 instead of incr1 ?
    {
       x = thesolver->coTest()[i];
       if (x < -theeps)

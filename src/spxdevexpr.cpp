@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.2 2001/11/06 23:31:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.3 2001/11/20 16:43:29 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -74,6 +74,8 @@ void SPxDevexPR::setType(SoPlex::Type tp)
    assert(isConsistent());
 }
 
+/**@todo suspicious: Shouldn't the relation between dim, coDim, Vecs, and CoVecs be influenced by the representation ?
+ */
 void SPxDevexPR::setRep(SoPlex::Representation rep)
 {
    if (thesolver)
@@ -230,7 +232,10 @@ void SPxDevexPR::entered4(SoPlex::Id id, int n)
    entered4(id, n, 0, 1, 0, 1);
 }
 
-void SPxDevexPR::entered4(SoPlex::Id id, int n,
+/**@todo suspicious: the pricer should be informed, that variable id has entered the basis at position n, but the id is not used here (this is true
+                     for all pricers)
+*/
+void SPxDevexPR::entered4(SoPlex::Id /*id*/, int n,
                           int start1, int incr1, int start2, int incr2)
 {
    if (n >= 0 && n < thesolver->dim())
@@ -289,19 +294,19 @@ void SPxDevexPR::addedCoVecs(int n)
       coPenalty[i] = init;
 }
 
-void SPxDevexPR::removedVec(int i)
+void SPxDevexPR::removedVec(int /*i*/)
 {}
 
 
-void SPxDevexPR::removedCoVec(int i)
+void SPxDevexPR::removedCoVec(int /*i*/)
 {}
 
 
-void SPxDevexPR::removedCoVecs(const int perm[])
+void SPxDevexPR::removedCoVecs(const int */*perm[]*/)
 {}
 
 
-void SPxDevexPR::removedVecs(const int perm[])
+void SPxDevexPR::removedVecs(const int */*perm[]*/)
 {}
 } // namespace soplex
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.6 2001/11/19 22:08:09 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.7 2001/11/20 16:43:30 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -698,6 +698,8 @@ SoPlex::Id SPxFastRT::minSelect(
     allways yield an improvement. In that case, we shift the variable toward
     infeasibility and retry. This avoids cycling in the shifted LP.
  */
+/**@todo suspicious: max is not used, but it looks like a used parameter in selectLeave()
+ */
 int SPxFastRT::maxShortLeave(double& sel, int leave, double max, double abs)
 {
    assert(leave >= 0);
@@ -714,6 +716,8 @@ int SPxFastRT::maxShortLeave(double& sel, int leave, double max, double abs)
    return 0;
 }
 
+/**@todo suspicious: max is not used, but it looks like a used parameter in selectLeave()
+ */
 int SPxFastRT::minShortLeave(double& sel, int leave, double max, double abs)
 {
    assert(leave >= 0);
@@ -909,6 +913,8 @@ int SPxFastRT::selectLeave(double& val)
 }
 
 //@ ----------------------------------------------------------------------------
+/**@todo suspicious: max is not used, but it looks like a used parameter in selectEnter()
+ */
 int SPxFastRT::maxReenter(double& sel, double max, double maxabs,
                            SoPlex::Id id, int nr)
 {
@@ -999,6 +1005,8 @@ int SPxFastRT::maxReenter(double& sel, double max, double maxabs,
    return 0;
 }
 
+/**@todo suspicious: max is not used, but it looks like a used parameter in selectEnter()
+ */
 int SPxFastRT::minReenter(double& sel, double max, double maxabs,
                            SoPlex::Id id, int nr)
 {
@@ -1229,6 +1237,8 @@ void SPxFastRT::clear()
    thesolver = 0;
 }
 
+/**@todo suspicious: Why is the type never used? This holds for all implementations of SPxRatioTester!
+ */
 void SPxFastRT::setType(SoPlex::Type tp)
 {
    minStab = MINSTAB;

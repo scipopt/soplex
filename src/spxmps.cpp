@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmps.cpp,v 1.6 2001/11/16 20:12:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmps.cpp,v 1.7 2001/11/20 16:43:32 bzfpfend Exp $"
 
 
 #include <iostream>
@@ -216,12 +216,15 @@ inline int SPxLP__readLine
    return SPxLP::readLine(is, f1, f2, f3, f4, f5, f6);
 }
 
+/**@todo suspicious: readRows only finds the keyword ROWS, readObj reads all rows
+                     (which should be done by readRows?)
+*/
 static MPS_Section readRows(
    std::istream& is,
-   LPRowSet& rowSet,
-   NameSet& rowNames,
-   LPColSet& colSet,
-   NameSet& colNames
+   LPRowSet& /*rowSet*/,
+   NameSet& /*rowNames*/,
+   LPColSet& /*colSet*/,
+   NameSet& /*colNames*/
 )
 {
    char* f1;
@@ -255,8 +258,8 @@ static MPS_Section readObj(
    std::istream& is,
    LPRowSet& rowSet,
    NameSet& rowNames,
-   LPColSet& colSet,
-   NameSet& colNames
+   LPColSet& /*colSet*/,
+   NameSet& /*colNames*/
 )
 {
    char* f1;
@@ -265,7 +268,7 @@ static MPS_Section readObj(
    char* f4;
    char* f5;
    char* f6;
-   MPS_Section next;
+   MPS_Section next = ENDDATA;
 
    objName[0] = 0;
    LPRow row;
@@ -341,7 +344,7 @@ static MPS_Section readCols(
    char* f4;
    char* f5;
    char* f6;
-   MPS_Section next;
+   MPS_Section next = ENDDATA;
 
    double val;
    int idx;
@@ -409,8 +412,8 @@ static MPS_Section readRhs(
    std::istream& is,
    LPRowSet& rowSet,
    NameSet& rowNames,
-   LPColSet& colSet,
-   NameSet& colNames
+   LPColSet& /*colSet*/,
+   NameSet& /*colNames*/
 )
 {
    char* f1;
@@ -489,8 +492,8 @@ static MPS_Section readRanges(
    std::istream& is,
    LPRowSet& rowSet,
    NameSet& rowNames,
-   LPColSet& colSet,
-   NameSet& colNames
+   LPColSet& /*colSet*/,
+   NameSet& /*colNames*/
 )
 {
    char* f1;
@@ -499,7 +502,7 @@ static MPS_Section readRanges(
    char* f4;
    char* f5;
    char* f6;
-   MPS_Section next;
+   MPS_Section next = ENDDATA;
 
    char rngStr[LINE];
    int rngSet;
@@ -581,8 +584,8 @@ static MPS_Section readRanges(
 
 static MPS_Section readBounds(
    std::istream& is,
-   LPRowSet& rowSet,
-   NameSet& rowNames,
+   LPRowSet& /*rowSet*/,
+   NameSet& /*rowNames*/,
    LPColSet& colSet,
    NameSet& colNames
 )

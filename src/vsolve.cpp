@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vsolve.cpp,v 1.3 2001/11/08 14:27:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vsolve.cpp,v 1.4 2001/11/20 16:43:33 bzfpfend Exp $"
 
 
 #include <string.h>
@@ -816,7 +816,7 @@ int vSolveUpdateRight(CLUFactor* fac, double* vec, int* ridx, int n, double eps)
 
 
 static
-void vSolveUpdateRightNoNZ(CLUFactor* fac, double* vec, double eps)
+void vSolveUpdateRightNoNZ(CLUFactor* fac, double* vec, double /*eps*/)
 {
    int i, j, k;
    int end;

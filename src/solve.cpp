@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: solve.cpp,v 1.3 2001/11/20 09:08:44 bzfkocht Exp $"
+#pragma ident "@(#) $Id: solve.cpp,v 1.4 2001/11/20 16:43:27 bzfpfend Exp $"
 
 #include <string.h>
 #include <stdio.h>
@@ -679,9 +679,9 @@ static void solveUleft2
 static int solveLleft2forest
 (
    double* vec1,
-   int* nonz,
+   int* /* nonz */,
    double* vec2,
-   double eps,
+   double /* eps */,
    CLUFactor* fac
 )
 {
@@ -744,9 +744,9 @@ static int solveLleft2forest
 static void solveLleft2
 (
    double* vec1,
-   int* nonz,
+   int* /* nonz */,
    double* vec2,
-   double eps,
+   double /* eps */,
    CLUFactor* fac
 )
 {
@@ -835,7 +835,7 @@ for (i = fac->thedim; i--;)
 #endif
 }
 
-static int solveLleftForest(double* vec, int* nonz, double eps, CLUFactor* fac)
+static int solveLleftForest(double* vec, int* /* nonz */, double /* eps */, CLUFactor* fac)
 {
    int i, j, k, end;
    double x;

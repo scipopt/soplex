@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxparmultpr.cpp,v 1.4 2001/11/13 21:01:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxparmultpr.cpp,v 1.5 2001/11/20 16:43:32 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -195,7 +195,7 @@ SPxLP::Id SPxParMultPR::selectEnter()
    }
 }
 
-void SPxParMultPR::entered4(SoPlex::Id id, int n)
+void SPxParMultPR::entered4(SoPlex::Id /*id*/, int /*n*/)
 {}
 
 

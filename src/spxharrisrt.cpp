@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.3 2001/11/11 20:27:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.4 2001/11/20 16:43:30 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -36,6 +36,9 @@ namespace soplex
 /*
     Here are some helper functions
  */
+/**@todo suspicious: *max is not set, but it is used (with the default setting *max=1)
+                     in selectLeave and selectEnter
+*/
 int SPxHarrisRT::maxDelta
 (
    double* max,             /* max abs value in upd */
@@ -87,6 +90,9 @@ int SPxHarrisRT::maxDelta
    return sel;
 }
 
+/**@todo suspicious: *max is not set, but it is used (with the default setting *max=1)
+                     in selectLeave and selectEnter
+*/
 int SPxHarrisRT::minDelta
 (
    double* max,             /* max abs value in upd */

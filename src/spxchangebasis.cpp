@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.3 2001/11/13 21:01:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.4 2001/11/20 16:43:28 bzfpfend Exp $"
 
 
 //@ -----------------------------------------------------------------------------
@@ -316,18 +316,23 @@ void SPxBasis::removedCols(int perm[])
    reDim();
 }
 
-
-void SPxBasis::changedRow(int row)
+/**@todo is this correctly implemented?
+ */
+void SPxBasis::changedRow(int /*row*/)
 {
    factorized = matrixIsSetup = 0;
 }
 
-void SPxBasis::changedCol(int col)
+/**@todo is this correctly implemented?
+ */
+void SPxBasis::changedCol(int /*col*/)
 {
    factorized = matrixIsSetup = 0;
 }
 
-void SPxBasis::changedElement(int row, int col)
+/**@todo is this correctly implemented?
+ */
+void SPxBasis::changedElement(int /*row*/, int /*col*/)
 {
    factorized = matrixIsSetup = 0;
 }
