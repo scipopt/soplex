@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.11 2001/11/21 20:15:41 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.12 2001/11/26 12:19:13 bzfpfend Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -351,10 +351,10 @@ public:
     * When accessing elements from a #DataSet with one of the index
     * operators, it must be ensured, that the index is valid for the
     * #DataSet. If this is not known afore, it is the programmers
-    *  responsability to ensure this using the inquiry methods below.
+    * responsability to ensure this using the inquiry methods below.
     */
    //@{
-   /// ???
+   ///
    DATA& operator[](int n)
    {
       return theitem[thekey[n].idx].data;
@@ -365,7 +365,7 @@ public:
       return theitem[thekey[n].idx].data;
    }
 
-   /// ???
+   ///
    DATA& operator[](const Key& k)
    {
       return theitem[k.idx].data;

@@ -66,8 +66,8 @@ cring.h
 *lprow.h
 *lprowset.h
 *lpsolver.h
-nameset.h
-random.h
+*nameset.h
+*random.h
 slinsolver.h
 slufactor.h
 +soplex.h // in Arbeit ;-)
