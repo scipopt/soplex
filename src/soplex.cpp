@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.46 2002/01/31 16:30:46 bzfpfend Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.47 2002/02/01 08:24:23 bzfkocht Exp $"
 
 //#define DEBUG 1
 
@@ -384,6 +384,7 @@ void SoPlex::splitLP(int pe, int nPes)
 void SoPlex::splitLP()
 {
    subcovectors.reSize(coDim() / coVecDim + 1);
+
    if (subcovectors.size() > 1)
    {
       nNZEs = sortLP (0, 1);

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.h,v 1.19 2002/01/31 08:19:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svector.h,v 1.20 2002/02/01 08:24:24 bzfkocht Exp $"
 
 /**@file  svector.h
  * @brief Sparse vectors.
@@ -107,7 +107,7 @@ public:
    struct Element
    {
       Real val;     ///< Value of nonzero element
-      int    idx;     ///< Index of nonzero element
+      int  idx;     ///< Index of nonzero element
    };
 
 private:

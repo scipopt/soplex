@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: subsvector.h,v 1.9 2002/01/31 08:19:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: subsvector.h,v 1.10 2002/02/01 08:24:23 bzfkocht Exp $"
 
 
 /**@file  subsvector.h
@@ -112,13 +112,22 @@ public:
    bool isConsistent() const;
 
    /// direct assignment.
-   void assign(const SVector* sv, int first , int len)
+   void assign(const SVector* sv, int first, int len)
    {
       assert(sv          != 0);
+      assert(sv->isConsistent());
       assert(first       >= 0);
-      assert(first + len < sv->max());
+      assert(first + len <= sv->max());
 
-      elem = &sv->element(first);
+      /**@todo This should be correct, BUT ist seems not to be a good
+       *       idea to have subsvectors with length 0. So we maybe 
+       *       should change this to a assert(len > 0);
+       */
+      if (len > 0)
+         elem = &sv->element(first);
+      else
+         elem = 0;
+
       num  = len;
 #ifndef NDEBUG
       svec = sv;
