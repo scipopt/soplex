@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.20 2002/01/13 10:12:57 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.21 2002/01/16 11:32:46 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -31,6 +31,8 @@
 #include "unitvector.h"
 #include "updatevector.h"
 #include "subsvector.h"
+
+#define SOPLEX_VERSION   120
 
 namespace soplex
 {
