@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.3 2001/11/07 17:31:20 bzfbleya Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.4 2001/11/08 14:27:27 bzfkocht Exp $"
 
 
 
@@ -41,7 +41,7 @@ extern double verySparseFactor4left;
 
 void SLUFactor::solve2right(Vector& x, Vector& b) //const
 {
-   soplex::solveRight( static_cast<CLUFactor*>(this), x.get_ptr(), b.get_ptr());
+   soplex::solveRight(static_cast<CLUFactor*>(this), x.get_ptr(), b.get_ptr());
 }
 
 void SLUFactor::solve2right(Vector& x, SSVector& b) //const
@@ -143,8 +143,6 @@ void SLUFactor::solve2right4update(SSVector& x,
                                     SSVector& rhs)
 {
    int m, n, f;
-
-   Vector& svec = static_cast<Vector&>(ssvec);
    int* sidx = ssvec.altIndexMem();
    int rsize = rhs.size();
    int* ridx = rhs.altIndexMem();
@@ -157,7 +155,7 @@ void SLUFactor::solve2right4update(SSVector& x,
    {
       n = b.size();
       m = vSolveRight4update2(this, x.epsilon,
-                               x.altValues(), x.altIndexMem(), svec.get_ptr(),
+                               x.altValues(), x.altIndexMem(), ssvec.get_ptr(),
                                sidx, n, y.get_ptr(),
                                rhs.epsilon, rhs.altValues(), ridx, rsize,
                                0, 0, 0);
@@ -171,7 +169,7 @@ void SLUFactor::solve2right4update(SSVector& x,
       forest.clear();
       n = ssvec.size();
       m = vSolveRight4update2(this, x.epsilon,
-                               x.altValues(), x.altIndexMem(), svec.get_ptr(),
+                               x.altValues(), x.altIndexMem(), ssvec.get_ptr(),
                                sidx, n, y.get_ptr(),
                                rhs.epsilon, rhs.altValues(), ridx, rsize,
                                forest.altValues(), &f, forest.altIndexMem());

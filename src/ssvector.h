@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.h,v 1.3 2001/11/07 17:31:24 bzfbleya Exp $"
+#pragma ident "@(#) $Id: ssvector.h,v 1.4 2001/11/08 14:27:28 bzfkocht Exp $"
 
 
 #ifndef _SSVECTOR_H_
@@ -95,6 +95,12 @@ public:
        \end{description}
     */
    //@{
+
+   /// only used in slufactor.cpp
+   double* get_ptr()
+   {
+      return DVector::get_ptr();
+   }
    /// return setup status.
    int isSetup() const
    {

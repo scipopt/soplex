@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vsolve.cpp,v 1.2 2001/11/06 23:31:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vsolve.cpp,v 1.3 2001/11/08 14:27:29 bzfkocht Exp $"
 
 
 #include <string.h>
@@ -906,10 +906,10 @@ int vSolveRight4update(CLUFactor* fac, double eps,
 }
 
 int vSolveRight4update2(CLUFactor* fac, double eps,
-                         double* vec, int* idx,                      /* result1 */
-                         double* rhs, int* ridx, int rn,             /* rhs1    */
-                         double* vec2, double eps2,                  /* result2 */
-                         double* rhs2, int* ridx2, int rn2,          /* rhs2    */
+                         double* vec, int* idx,                  /* result1 */
+                         double* rhs, int* ridx, int rn,         /* rhs1    */
+                         double* vec2, double eps2,              /* result2 */
+                         double* rhs2, int* ridx2, int rn2,      /* rhs2    */
                          double* forest, int* forestNum, int* forestIdx)
 {
    /*

@@ -1,5 +1,6 @@
 *.out
 *.err
 *.result
+*.res
 LP
 tca.*
