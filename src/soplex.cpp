@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.28 2002/01/13 10:12:57 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.29 2002/01/13 13:37:33 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -519,7 +519,8 @@ void SoPlex::factorize()
          multBaseWith(ftmp);
          ftmp -= fRhs();
          if (ftmp.length() > delta())
-            std::cerr << iteration() << ": fVec error = " << ftmp.length() << std::endl;
+            std::cerr << iteration() << ": fVec error = " 
+                      << ftmp.length() << std::endl;
       }
       if (ctmp.length() > delta())
       {
@@ -531,7 +532,8 @@ void SoPlex::factorize()
          multWithBase(ctmp);
          ctmp -= coPrhs();
          if (ctmp.length() > delta())
-            std::cerr << iteration() << ": coPvec error = " << ctmp.length() << std::endl;
+            std::cerr << iteration() << ": coPvec error = " 
+                      << ctmp.length() << std::endl;
       }
       if (ptmp.length() > delta())
       {
@@ -599,44 +601,7 @@ double SoPlex::maxInfeas() const
 
    return inf;
 }
-#if 0
-double SoPlex::sumInfeas() const
-{
-   int i;
-   double sum = 0.0;
 
-   if (type() == ENTER)
-   {
-      for(i = 0; i < dim(); i++)
-      {
-         if ((*theFvec)[i] > theUBbound[i])
-            sum += *theFvec)[i] - theUBbound[i];
-         if (theLBbound[i] > (*theFvec)[i])
-            sum += theLBbound[i] - (*theFvec)[i];
-      }
-   }
-   else
-   {
-      assert(type() == LEAVE);
-
-      for(i = 0; i < dim(); i++)
-      {
-         if ((*theCoPvec)[i] > (*theCoUbound)[i])
-            sum += (*theCoPvec)[i] - (*theCoUbound)[i];
-         if ((*theCoLbound)[i] > (*theCoPvec)[i])
-            sum += (*theCoLbound)[i] - (*theCoPvec)[i]);
-      }
-      for(i = 0; i < coDim(); i++)
-      {
-         if ((*thePvec)[i] > (*theUbound)[i])
-            sum += (*thePvec)[i] - (*theUbound)[i]);
-         else if ((*thePvec)[i] < (*theLbound)[i])
-            sum += (*theLbound)[i] - (*thePvec)[i]);
-      }
-   }
-   return inf;
-}
-#endif
 double SoPlex::nonbasicValue() const
 {
 

@@ -13,9 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.19 2002/01/13 10:12:57 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.20 2002/01/13 13:37:33 bzfkocht Exp $"
 
 #include <assert.h>
+#include <math.h>
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -75,7 +76,6 @@ public:
    }
 };
 
-/**@todo Flag to print the solution variables with names. */
 int main(int argc, char **argv)
 {
    const char* banner =
@@ -101,6 +101,7 @@ int main(int argc, char **argv)
    " -e       select entering algorithm (default is leaving)\n"
    " -r       select row wise representation (default is column)\n"
    " -i       select Eta-update (default is Forest-Tomlin)\n"
+   " -x       output solution vector (works only together with -s0)\n"
    " -lSec    set timlimit to Sec seconds\n"
    " -dDelta  set maximal allowed bound violation to Delta (1e-6)\n"
    " -zZero   set zero tolerance to Zero (1e-16)\n\n"
@@ -130,6 +131,8 @@ int main(int argc, char **argv)
    double                 timelimit      = -1.0;
    double                 delta          = 1e-6;
    double                 epsilon        = 1e-16;
+   bool                   print_solution = false;
+   int                    precision;
    int                    optind;
 
    for(optind = 1; optind < argc; optind++)
@@ -169,15 +172,19 @@ int main(int argc, char **argv)
       case 'v' :
          std::cout << banner << std::endl;
          exit(0);
+      case 'x' :
+         print_solution = true;
+         break;
       case 'z' :
          epsilon = atof(&argv[optind][2]);
          break;
       case 'h' :
       case '?' :
+         std::cout << banner << std::endl;
+         /*FALLTHROUGH*/
+      default :
          std::cerr << "usage: " << argv[0] << " " << usage << std::endl;
          exit(0);
-      default :
-         abort();
       }
    }
    if ((argc - optind) < 1)
@@ -185,7 +192,8 @@ int main(int argc, char **argv)
       std::cerr << argv[0] << ":" << usage << std::endl;
       exit(0);
    }
-   filename = argv[optind];
+   filename  = argv[optind];
+   precision = int(-log10(delta)) + 1;
 
    std::cout.setf(std::ios::scientific | std::ios::showpoint);
 
@@ -339,7 +347,7 @@ int main(int argc, char **argv)
    std::cout << "solution time  is: " 
              << timer.userTime() 
              << std::endl
-             << "iterations    : " 
+             << "iterations       : " 
              << work.basis().iteration() 
              << std::endl;
    
@@ -349,8 +357,34 @@ int main(int argc, char **argv)
    {
    case SoPlex::SOLVED:
       std::cout << "solution value is: "
-                << std::setprecision(10)
-                << work.value();
+                << std::setprecision(precision)
+                << work.value()
+                << std::endl;
+
+      if (print_solution)
+      {
+         if (simplifier != 0)
+         {
+            std::cerr 
+               << "Output of solution vector with simplifier not implemented"
+               << " (use -s0 switch)."
+               << std::endl;
+         }      
+         else
+         {
+            DVector objx(work.nCols());
+            
+            work.getPrimal(objx);
+            
+            for(int i = 0; i < work.nCols(); i++)
+               if (objx[i] >= epsilon)
+                  std::cout << colnames[work.cId(i)] << "\t" 
+                            << std::setw(16)
+                            << std::setprecision(precision)
+                            << objx[i] << std::endl;
+            std::cout << "All other variable are zero." << std::endl;
+         }
+      }
       break;
    case SoPlex::UNBOUNDED:
       std::cout << "LP is unbounded";

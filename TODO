@@ -1,6 +1,10 @@
-$Id: TODO,v 1.46 2002/01/11 21:05:30 bzfkocht Exp $
+$Id: TODO,v 1.47 2002/01/13 13:37:33 bzfkocht Exp $
 
-Diesen Kram mal als TODO's schreiben ;-)
+Diesen Kram mal als @todo's schreiben ;-)
+
+Wir bräuchten ein Programm, das ein LP ließt, eine Liste mit den 
+Variablenwerten der Lösung von SoPlex und dann guckt ob die Bounds
+stimmen usw. und so sagt ob die Lösung zulässig ist.
 
 SVSet::memPack, vermutlichen bug in flexelint melden. this-> ist überflüssig.
 
