@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.14 2002/01/31 16:30:46 bzfpfend Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.15 2002/02/04 15:34:08 bzfpfend Exp $"
 
 //#define DEBUG 1
 
@@ -560,8 +560,8 @@ int SoPlex::leave(int leaveIdx)
 
 
       /*
-          If an entering variable has been found, a regular basis update is to be
-          performed.
+          If an entering variable has been found, a regular basis update is to
+          be performed.
        */
       else if (enterId != baseId(leaveIdx))
       {

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.35 2002/02/01 11:22:37 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.36 2002/02/04 15:34:09 bzfpfend Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -189,8 +189,8 @@ public:
       RUNNING     = -1,  ///< algorithm is running
       UNKNOWN     =  0,  ///< nothing known on loaded problem.
       OPTIMAL     =  1,  ///< LP has been solved to optimality.
-      UNBOUNDED   =  2,  ///< LP has been proven to be unbounded.
-      INFEASIBLE  =  3   ///< LP has been proven to be infeasible.
+      UNBOUNDED   =  2,  ///< LP has been proven to be primal unbounded.
+      INFEASIBLE  =  3   ///< LP has been proven to be primal infeasible.
    };
    //@}
 
@@ -362,18 +362,19 @@ public:
    virtual void reLoad();
 
    /// load LP from \p filename in MPS or LPF format.
-   bool readFile(const char* filename, NameSet* rowNames = 0,
-      NameSet* colNames = 0, DIdxSet* intVars = 0);
+   virtual bool readFile(const char* filename, NameSet* rowNames = 0,
+                         NameSet* colNames = 0, DIdxSet* intVars = 0);
 
    /// dump loaded LP to \p filename in LPF format.
-   void dumpFile(const char* filename) const;
+   virtual void dumpFile(const char* filename) const;
 
    /// clear all data in solver.
-   void clear();
+   virtual void clear();
 
    /// load basis from \p filename in MPS format.
    virtual bool readBasisFile(const char* filename, 
-      const NameSet& rowNames, const NameSet& colNames);
+                              const NameSet& rowNames,
+                              const NameSet& colNames);
 
    //@}
 
@@ -384,10 +385,10 @@ public:
     *  the termination criteria is fullfilled (see #terminate()). 
     *  The #SPxStatus of the solver will indicate the reason for termination.
     */
-   Status solve();
+   virtual Status solve();
 
    /// #Status of basis.
-   Status status() const;
+   virtual Status status() const;
 
    /// current objective value.
    /**@return Objective value of the current solution vector 
@@ -402,7 +403,7 @@ public:
     *  to the argument \p vector. Hence, \p vector must be of dimension
     *  #nCols().
     */
-   Status getPrimal (Vector& vector) const;
+   virtual Status getPrimal (Vector& vector) const;
 
    /// get vector of slack variables.
    /** This method returns the #Status of the basis.
@@ -417,7 +418,7 @@ public:
     *     matrix. Then the vector of slack variables is defined as
     *     \f$s = Ax\f$.
     */
-   Status getSlacks (Vector& vector) const;
+   virtual Status getSlacks (Vector& vector) const;
 
    /// get current solution vector for dual variables.
    /** This method returns the #Status of the basis.
@@ -443,7 +444,7 @@ public:
     *       constraint is given with the standard definition, while
     *       the other constraint is implicitely set to 0.
     */
-   Status getDual (Vector& vector) const;
+   virtual Status getDual (Vector& vector) const;
 
    /// get vector of reduced costs.
    /** This method returns the \Ref{Status} of the basis.
@@ -456,7 +457,7 @@ public:
     *  and \i A the LPs constraint matrix. Then the reduced cost vector
     *  \i r is defined as \f$r^T = c^T - d^TA\f$.
     */
-   Status getRdCost (Vector& vector) const;
+   virtual Status getRdCost (Vector& vector) const;
 
    /// Termination criterion.
    /** This method is called in each Simplex iteration to determine, if

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsimplifier.h,v 1.7 2002/01/31 08:19:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsimplifier.h,v 1.8 2002/02/04 15:34:09 bzfpfend Exp $"
 
 /**@file  spxsimplifier.h
  * @brief LP simplification base class.
@@ -70,8 +70,8 @@ public:
     * @return 
     *  <TABLE>
     *  <TR><TD> 0 </TD><TD>if this could be done,</TD></TR>
-    *  <TR><TD> 1 </TD><TD>if the LP was detected to be unbounded or</TD></TR>
-    *  <TR><TD>-1 </TD><TD>if the LP was detected to be infeasible.</TD></TR>
+    *  <TR><TD> 1 </TD><TD>if primal unboundedness was detected or</TD></TR>
+    *  <TR><TD>-1 </TD><TD>if primal infeasibility was detected.</TD></TR>
     *  </TABLE>
     */
    virtual int simplify() = 0;

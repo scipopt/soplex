@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.29 2002/02/01 11:22:37 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.30 2002/02/04 15:34:08 bzfpfend Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -118,7 +118,7 @@ int main(int argc, char **argv)
    ;
 
    const char*            filename;
-   const char*            basisname      = 0;
+   char*                  basisname      = 0;
    SoPlex::Type           type           = SoPlex::LEAVE;
    SoPlex::Representation representation = SoPlex::COLUMN;
    SLUFactor::UpdateType  update         = SLUFactor::FOREST_TOMLIN;

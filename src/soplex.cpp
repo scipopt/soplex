@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.48 2002/02/01 11:22:37 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.49 2002/02/04 15:34:09 bzfpfend Exp $"
 
 //#define DEBUG 1
 
@@ -162,8 +162,7 @@ void SoPlex::setType(Type tp)
    TRACE({ std::cerr << "switching to " 
                      << static_cast<const char*>((tp == LEAVE)
                                                  ? "leaving" : "entering")
-                     << " algorithm" 
-                     << std::endl; });
+                     << " algorithm" << std::endl; });
 }
 
 void SoPlex::setRep(Representation p_rep)
@@ -546,7 +545,6 @@ void SoPlex::factorize()
       }
       if (ctmp.length() > delta())
       {
-         std::cerr << std::endl;
          TRACE( std::cerr << "coPvec: " << ctmp.length() << std::endl; );
          ctmp = coPvec();
          multWithBase(ctmp);

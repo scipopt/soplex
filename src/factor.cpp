@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.29 2002/01/31 16:30:46 bzfpfend Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.30 2002/02/04 15:34:08 bzfpfend Exp $"
 
 //#define DEBUG 1
 
@@ -454,7 +454,7 @@ void CLUFactor::initFactorMatrix(SVector** vec,
          for (j = lll = 0; j < ll; ++j)
          {
             x = psv->value(j);
-            if (isNonZero(x, eps))
+            if (isNotZero(x, eps))
             {
                k = psv->index(j);
                kk = u.row.start[k] + (u.row.len[k]++);
@@ -1177,7 +1177,7 @@ int CLUFactor::updateRow   (int r,
       if (temp.s_mark[c])
       {
          x = - work[c] * lx;
-         if (isNonZero(x, eps))
+         if (isNotZero(x, eps))
          {
             /* produce fill element in row r
              */
@@ -1389,7 +1389,7 @@ int CLUFactor::setupColVals()
    {
       int     k   = u.row.start[i];
       int*    idx = &u.row.idx[k];
-      Real* val = &u.row.val[k];
+      Real*   val = &u.row.val[k];
       int     len = u.row.len[i];
 
       n += len;
@@ -1424,17 +1424,17 @@ int CLUFactor::setupColVals()
 #ifdef WITH_L_ROWS
 void CLUFactor::setupRowVals()
 {
-   int i, j, k, m;
-   int l_dim, vecs, mem;
-   int* l_row;
-   int* idx;
+   int   i, j, k, m;
+   int   l_dim, vecs, mem;
+   int*  l_row;
+   int*  idx;
    Real* val;
-   int* beg;
-   int* l_ridx;
+   int*  beg;
+   int*  l_ridx;
    Real* l_rval;
-   int* l_rbeg;
-   int *rorig, *rrorig;
-   int *rperm, *rrperm;
+   int*  l_rbeg;
+   int   *rorig, *rrorig;
+   int   *rperm, *rrperm;
 
    l_dim = thedim;
    vecs  = l.firstUpdate;

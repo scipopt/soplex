@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: real.cpp,v 1.6 2002/02/01 08:24:23 bzfkocht Exp $"
+#pragma ident "@(#) $Id: real.cpp,v 1.7 2002/02/04 15:34:09 bzfpfend Exp $"
 
 /**@file  real.cpp
  * @brief Floating point type definition.
@@ -26,7 +26,7 @@ namespace soplex
 const Real infinity = DEFAULT_INFINITY;
 
 Real Param::s_epsilon = DEFAULT_EPS_ZERO;
-int  Param::s_verbose = 2;
+int  Param::s_verbose = 1;
    
 void Param::setEpsilon(Real eps)
 {

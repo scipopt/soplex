@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: cring.h,v 1.3 2002/01/31 08:19:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: cring.h,v 1.4 2002/02/04 15:34:08 bzfpfend Exp $"
 
 #ifndef _CRING_H_
 #define _CRING_H_
@@ -21,9 +21,6 @@
 /***************************************************************
                     Double linked ring
  ***************************************************************/
-
-#define isZero(val, eps)        ((val)<(eps) && -(val)<(eps))
-#define isNonZero(val, eps)     ((val)>(eps) || -(val)>(eps))
 
 #define initDR(ring)    ((ring).prev = (ring).next = &(ring))
 

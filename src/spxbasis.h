@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.18 2002/01/31 14:04:14 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.19 2002/02/04 15:34:09 bzfpfend Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -82,8 +82,8 @@ public:
       DUAL       = 1,   ///< Basis is dual feasible.
       PRIMAL     = 2,   ///< Basis is primal feasible.
       OPTIMAL    = 3,   ///< Basis is optimal, i.e. dual and primal feasible.
-      UNBOUNDED  = 4,   ///< LP has been proven to be unbounded.
-      INFEASIBLE = 5    ///< LP has been proven to be infeasible.
+      UNBOUNDED  = 4,   ///< LP has been proven to be primal unbounded.
+      INFEASIBLE = 5    ///< LP has been proven to be primal infeasible.
    };
 
 

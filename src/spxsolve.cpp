@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.37 2002/02/01 11:22:37 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.38 2002/02/04 15:34:09 bzfpfend Exp $"
 
 //#define DEBUG 1
 
@@ -87,10 +87,12 @@ SoPlex::Status SoPlex::solve()
    thepricer->setEpsilon(delta());
    setType(type());
 
+   VERBOSE3({
+      std::cerr << "starting value = " << value() << std::endl;
+      std::cerr << "starting shift = " << shift() << std::endl;
+   });
    TRACE({
       int i;      
-      std::cerr << "starting value = " << value() << '\n';
-      std::cerr << "starting shift = " << shift() << '\n';      
       std::cerr << "column status:\t";      
       for (i = 0; i < desc().nCols(); ++i)
          std::cerr << desc().colStatus(i);     
@@ -119,7 +121,7 @@ SoPlex::Status SoPlex::solve()
    {
       if (type() == ENTER)
       {
-         TRACE({
+         VERBOSE3({
             std::cerr << "Enter iteration: " << iteration()
                       << "\tValue = " << value()
                       << "\tShift = " << shift() << std::endl;
@@ -140,7 +142,7 @@ SoPlex::Status SoPlex::solve()
          }
          while (!stop);
 
-         TRACE({
+         VERBOSE3({
             std::cerr << "Enter finished. iteration: " << iteration() 
                       << " value: " << value()
                       << " shift: " << shift()
@@ -157,7 +159,7 @@ SoPlex::Status SoPlex::solve()
                factorize();
                unShift();
 
-               TRACE({
+               VERBOSE3({
                   std::cerr << "maxInfeas: " << maxInfeas()
                             << " shift: " << shift()
                             << " delta: " << delta() << std::endl;
@@ -177,7 +179,7 @@ SoPlex::Status SoPlex::solve()
       {
          assert(type() == LEAVE);
 
-         TRACE({
+         VERBOSE3({
             std::cerr << "Leave Iteration: " << iteration()
                       << "\tValue = " << value()
                       << "\tShift = " << shift() << std::endl;
@@ -198,7 +200,7 @@ SoPlex::Status SoPlex::solve()
          }
          while (!stop);
 
-         TRACE({
+         VERBOSE3({
             std::cerr << "Leave finished. iteration: " << iteration() 
                       << " value: " << value()
                       << " shift: " << shift()
@@ -215,7 +217,7 @@ SoPlex::Status SoPlex::solve()
                factorize();
                unShift();
 
-               TRACE({
+               VERBOSE3({
                   std::cerr << "maxInfeas: " << maxInfeas()
                             << " shift: " << shift()
                             << " delta: " << delta() << std::endl;
@@ -274,7 +276,7 @@ void SoPlex::testVecs()
    if (tmp.length() > delta())
    {
       VERBOSE3({ std::cout << iteration() << ":\tcoP error = "
-                              << tmp.length(); });
+                           << tmp.length(); });
       tmp.clear();
       SPxBasis::coSolve(tmp, *theCoPrhs);
       multWithBase(tmp);
