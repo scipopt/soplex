@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.36 2002/12/08 11:09:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.37 2003/01/09 16:34:38 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -239,11 +239,13 @@ static bool hasKeyword(char*& pos, const char* keyword)
             break;
       }
    }
-   if (keyword[i] == '\0')
+   // we have to be at the end of the keyword and the word 
+   // found on the line also has to end here.
+   if (keyword[i] == '\0' && (pos[k] == '\0' || isSpace(pos[k])))
    {
       pos += k;
 
-      DEBUG( std::cout << "hasKeyowrd: " << keyword << std::endl; );
+      DEBUG( std::cout << "hasKeyword: " << keyword << std::endl; );
       return true;
    }
    return false;
@@ -443,7 +445,7 @@ bool SPxLP::readLPF(
             ;
          else if (hasKeyword(pos, "bound[s]"))
             section = BOUNDS;
-         else if (hasKeyword(pos, "bin[arys]"))
+         else if (hasKeyword(pos, "bin[ary]"))
             section = BINARYS;
          else if (hasKeyword(pos, "bin[aries]"))
             section = BINARYS;
