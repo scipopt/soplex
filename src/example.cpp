@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.37 2002/04/04 19:36:50 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.38 2002/04/05 16:13:15 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -159,10 +159,10 @@ int main(int argc, char **argv)
    " -h        show this help\n"
    "Simplifier:     Scaler:         Starter:     Pricer:        Ratiotester:\n"
    " -s0 none       -g0 none         -c0 none*   -p0 Textbook  -t0 Textbook\n"
-   " -s1 General    -g1 CR-Equi*     -c1 Weight  -p1 ParMult   -t1 Harris\n"
-   " -s2 Aggregate  -g2 RC-Equi      -c2 Sum     -p2 Devex     -t2 Fast*\n"
-   " -s3 Remove-1*  -g3 C-Equi       -c3 Vector  -p3 Hybrid\n"
-   " -s4 Redundant  -g4 R-Equi                   -p4 Steep*\n"
+   " -s1 General    -g1 Bi-Equi*     -c1 Weight  -p1 ParMult   -t1 Harris\n"
+   " -s2 Aggregate  -g2 Uni-Equi     -c2 Sum     -p2 Devex     -t2 Fast*\n"
+   " -s3 Remove-1*                   -c3 Vector  -p3 Hybrid\n"
+   " -s4 Redundant                               -p4 Steep*\n"
    "                                             -p5 Weight\n" 
    ;
 
@@ -181,11 +181,11 @@ int main(int argc, char **argv)
    int                    starting       = 0;
    int                    pricing        = 4;
    int                    ratiotest      = 2;
-   int                    scaling        = 1;
+   int                    scaling        = 2;
    int                    simplifing     = 3;
    Real                   timelimit      = -1.0;
-   Real                   delta          = 1e-7; //DEFAULT_BND_VIOL;
-   Real                   epsilon        = 1e-13; //DEFAULT_EPS_ZERO;
+   Real                   delta          = DEFAULT_BND_VIOL;
+   Real                   epsilon        = 1e-15; //DEFAULT_EPS_ZERO;
    int                    verbose        = 1;
    bool                   print_solution = false;
    bool                   print_quality  = false;
@@ -343,17 +343,11 @@ int main(int argc, char **argv)
 
    switch(scaling)
    {
-   case 4 :
-      scaler = new SPxEquili(false, false);
-      break;
-   case 3 :
-      scaler = new SPxEquili(true, false);
-      break;
    case 2 :
-      scaler = new SPxEquili(false, true);
+      scaler = new SPxEquili(representation == SoPlex::COLUMN, false);
       break;
    case 1 :
-      scaler = new SPxEquili(true, true);
+      scaler = new SPxEquili(representation == SoPlex::COLUMN, true);
       break;
    case 0 : 
       /*FALLTHROUGH*/

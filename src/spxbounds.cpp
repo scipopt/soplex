@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbounds.cpp,v 1.11 2002/03/21 16:06:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbounds.cpp,v 1.12 2002/04/05 16:13:16 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -319,7 +319,7 @@ void SoPlex::testBounds() const
 
    if (type() == ENTER)
    {
-      for (i = dim(); i-- > 0;)
+      for( i = 0; i < dim(); ++i )
       {
          if ((*theFvec)[i] > theUBbound[i] + l_max
               //@ &&  theUBbound[i] != theLBbound[i])
@@ -333,7 +333,7 @@ void SoPlex::testBounds() const
    }
    else
    {
-      for (i = dim(); i-- > 0;)
+      for( i = 0; i < dim(); ++i )
       {
          if ((*theCoPvec)[i] > (*theCoUbound)[i] + l_max
               //@ &&  (*theCoUbound)[i] != (*theCoLbound)[i])
@@ -344,7 +344,7 @@ void SoPlex::testBounds() const
            )
             std::cerr << i << ": invalid lower cobound found ...\n";
       }
-      for (i = coDim(); i-- > 0;)
+      for( i = 0; i < coDim(); ++i )
       {
          if ((*thePvec)[i] > (*theUbound)[i] + l_max
               //@ &&  (*theUbound)[i] != (*theLbound)[i])
