@@ -71,8 +71,8 @@ cring.h
 *didxset.h
 *dsvector.h
 *dvector.h
-idlist.h
-idxset.h
+*idlist.h
+*idxset.h
 islist.h
 *lpcol.h
 lpcolset.h
