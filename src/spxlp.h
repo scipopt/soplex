@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.15 2002/01/17 12:08:59 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.16 2002/01/18 10:48:23 bzfpfend Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -345,15 +345,15 @@ public:
    }
 
    /// returns the inequality type of the \p i'th LPRow.
-   LPRow::Type type(int i) const
+   LPRow::Type rowType(int i) const
    {
       return LPRowSet::type(i);
    }
 
-   /// returns the inequality type of the row with DataKey \p k.
-   LPRow::Type type(const DataKey &k) const
+   /// returns the inequality type of the row with identifier \p key.
+   LPRow::Type rowType(const SPxRowId& id) const
    {
-      return LPRowSet::type(k);
+      return LPRowSet::type(id);
    }
 
    /// gets \p i 'th column.
