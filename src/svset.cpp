@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.cpp,v 1.15 2002/01/19 18:59:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.cpp,v 1.16 2002/01/21 11:50:09 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -304,25 +304,34 @@ SVSet& SVSet::operator=(const SVSet& rhs)
    if (this != &rhs)
    {
       clear();
-      DataArray < SVector::Element > ::operator=(rhs);
-      set = rhs.set;
 
-      DLPSV* ps;
-      DLPSV* newps;
-      void* delta0 = &(*(static_cast<SVSetBase*>(this)))[0];
-      void* delta1 = &(*(static_cast<SVSetBase*>(const_cast<SVSet*>(&rhs))))[0];
-      ptrdiff_t delta = reinterpret_cast<char*>(delta0) - reinterpret_cast<char*>(delta1);
-
-      for (ps = rhs.list.first(); ps; ps = rhs.list.next(ps))
+      if (rhs.size() > 0)
       {
-         newps = & set[ rhs.number(ps) ];
-         list.append(newps);
-         newps->setMem(ps->max() + 1, reinterpret_cast<SVector::Element*>(reinterpret_cast<char*>(ps->mem()) + delta));
-         newps->set_size( ps->size() );
+         DataArray < SVector::Element > ::operator=(rhs);
+         set = rhs.set;
+
+         DLPSV* ps;
+         DLPSV* newps;
+
+         void* delta0 = &(*(static_cast<SVSetBase*>(this)))[0];
+         void* delta1 = &(*(static_cast<SVSetBase*>(
+            const_cast<SVSet*>(&rhs))))[0];
+         ptrdiff_t delta = reinterpret_cast<char*>(
+            delta0) - reinterpret_cast<char*>(delta1);
+
+         for (ps = rhs.list.first(); ps; ps = rhs.list.next(ps))
+         {
+            newps = & set[ rhs.number(ps) ];
+            list.append(newps);
+            newps->setMem(ps->max() + 1, 
+               reinterpret_cast<SVector::Element*>(
+                  reinterpret_cast<char*>(ps->mem()) + delta));
+            newps->set_size( ps->size() );
+         }
       }
-      
-      assert(isConsistent());
    }
+   assert(isConsistent());
+
    return *this;
 }
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.23 2002/01/21 11:28:14 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.24 2002/01/21 11:50:09 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -566,7 +566,7 @@ SoPlex::Status SoPlex::status() const
    case ABORT_ITER :
    case ABORT_VALUE :
    case RUNNING :
-   case CHANGED :
+   case REGULAR :
    case ERROR :
       return m_status;
    default:
