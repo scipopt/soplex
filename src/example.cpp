@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.53 2003/01/13 10:38:47 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.54 2003/01/13 19:04:42 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -41,7 +41,7 @@
 #include "spxsimplifier.h"
 #include "spxintervalsm.h"
 #include "spxaggregatesm.h"
-#include "spxrem1sm.h"
+#include "spxredundantsm.h"
 #include "spxgeneralsm.h"
 #include "spxscaler.h"
 #include "spxequilisc.h"
@@ -77,51 +77,51 @@ public:
 
    void displayStats() const
    {
-      std::cout << "Factorizations   : " << getFactorCount() << std::endl;
-      std::cout << "    Time spend   : " << getFactorTime() << std::endl;
-      std::cout << "Solves           : " << getSolveCount() << std::endl;
-      std::cout << "    Time spend   : " << getSolveTime() << std::endl;
+      std::cout << "IEXAMP01 Factorizations   : " << getFactorCount() << std::endl;
+      std::cout << "IEXAMO02     Time spend   : " << getFactorTime() << std::endl;
+      std::cout << "IEXAMP03 Solves           : " << getSolveCount() << std::endl;
+      std::cout << "IEXAMP04     Time spend   : " << getSolveTime() << std::endl;
    }
    void displayQuality() const
    {
       Real maxviol;
       Real sumviol;
 
-      std::cout << "Violations (max/sum)" << std::endl;
+      std::cout << "IEXAMP05 Violations (max/sum)" << std::endl;
                 
       m_solver.qualConstraintViolation(maxviol, sumviol);
 
-      std::cout << "Constraints      :" 
+      std::cout << "IEXAMP06 Constraints      :" 
                 << std::setw(16) << maxviol << "  " 
                 << std::setw(16) << sumviol << std::endl;
 
       qualConstraintViolation(maxviol, sumviol);
 
-      std::cout << "      (unscaled) :" 
+      std::cout << "IEXAMP07       (unscaled) :" 
                 << std::setw(16) << maxviol << "  " 
                 << std::setw(16) << sumviol << std::endl;
 
       m_solver.qualBoundViolation(maxviol, sumviol);
 
-      std::cout << "Bounds           :" 
+      std::cout << "IEXAMP08 Bounds           :" 
                 << std::setw(16) << maxviol << "  " 
                 << std::setw(16) << sumviol << std::endl;
 
       qualBoundViolation(maxviol, sumviol);
 
-      std::cout << "      (unscaled) :" 
+      std::cout << "IEXAMP09       (unscaled) :" 
                 << std::setw(16) << maxviol << "  " 
                 << std::setw(16) << sumviol << std::endl;
 
       m_solver.qualSlackViolation(maxviol, sumviol);
 
-      std::cout << "Slacks           :" 
+      std::cout << "IEXAMP10 Slacks           :" 
                 << std::setw(16) << maxviol << "  " 
                 << std::setw(16) << sumviol << std::endl;
 
       m_solver.qualRdCostViolation(maxviol, sumviol);
 
-      std::cout << "Reduced costs    :" 
+      std::cout << "IEXAMP11 Reduced costs    :" 
                 << std::setw(16) << maxviol << "  " 
                 << std::setw(16) << sumviol << std::endl;
    }
@@ -164,10 +164,10 @@ int main(int argc, const char* const argv[])
    " -h        show this help\n"
    "Simplifier:     Scaler:         Starter:     Pricer:        Ratiotester:\n"
    " -s0 none       -g0 none         -c0 none*   -p0 Textbook  -t0 Textbook\n"
-   " -s1 General    -g1 Bi-Equi*     -c1 Weight  -p1 ParMult   -t1 Harris\n"
+   " -s1 General*   -g1 Bi-Equi*     -c1 Weight  -p1 ParMult   -t1 Harris\n"
    " -s2 Aggregate  -g2 Uni-Equi     -c2 Sum     -p2 Devex     -t2 Fast*\n"
-   " -s3 Remove-1*                   -c3 Vector  -p3 Hybrid\n"
-   " -s4 Redundant                               -p4 Steep*\n"
+   " -s3 Redundant                   -c3 Vector  -p3 Hybrid\n"
+   " -s4 Interval                                -p4 Steep*\n"
    "                                             -p5 Weight\n" 
    ;
 
@@ -293,18 +293,21 @@ int main(int argc, const char* const argv[])
    work.setTerminationTime(timelimit);
    work.setDelta(delta);
 
-   std::cout << "Delta   = " << std::setw(16) << delta << std::endl
-             << "Epsilon = " << std::setw(16) 
+   std::cout << "IEXAMP12 Delta   = " << std::setw(16) << delta << std::endl
+             << "IEXAMP13 Epsilon = " << std::setw(16) 
              << Param::epsilon() << std::endl;
 
    assert(work.isConsistent());
 
-   std::cout << (type == SPxSolver::ENTER ? "Entering" : "Leaving")
+   std::cout << "IEXAMP14 "
+             << (type == SPxSolver::ENTER ? "Entering" : "Leaving")
              << " algorithm" 
              << std::endl
+             << "IEXAMP15 "
              << (representation == SPxSolver::ROW ? "Row" : "Column")
              << " representation" 
              << std::endl
+             << "IEXAMP16 "
              << (update == SLUFactor::ETA ? "Eta" : "Forest-Tomlin")
              << " update"
              << std::endl;
@@ -334,9 +337,10 @@ int main(int argc, const char* const argv[])
    }
    work.setPricer(pricer);
 
-   std::cout << pricer->getName() << " pricing" << std::endl;
+   std::cout << "IEXAMP17 " << pricer->getName() << " pricing" << std::endl;
    assert(work.isConsistent());
 
+   std::cout << "IEXAMP18 ";
    switch(ratiotest)
    {
    case 2 :
@@ -379,7 +383,8 @@ int main(int argc, const char* const argv[])
    work.setPreScaler(prescaler);
    work.setPostScaler(postscaler);
 
-   std::cout << ((prescaler != 0) ? prescaler->getName() : "No ") 
+   std::cout << "IEXAMP19 "
+             << ((prescaler != 0) ? prescaler->getName() : "no ") 
              << " / "
              << ((postscaler != 0) ? postscaler->getName() : "no ")
              << " scaling" << std::endl;
@@ -392,7 +397,7 @@ int main(int argc, const char* const argv[])
       simplifier = new SPxIntervalSM;
       break;
    case 3 : 
-      simplifier = new SPxRem1SM;
+      simplifier = new SPxRedundantSM;
       break;
    case 2 :
       simplifier = new SPxAggregateSM;
@@ -406,9 +411,12 @@ int main(int argc, const char* const argv[])
       break;
    }
    work.setSimplifier(simplifier);
-   std::cout << ((simplifier == 0) ? "No" : simplifier->getName()) 
+   std::cout << "IEXAMP20 "
+             << ((simplifier == 0) ? "no" : simplifier->getName()) 
              << " simplifier" << std::endl;
    assert(work.isConsistent());
+
+   std::cout << "IEXAMP21 ";
 
    switch(starting)
    {
@@ -427,7 +435,7 @@ int main(int argc, const char* const argv[])
    case 0 :
       /*FALLTHROUGH*/
    default :
-      std::cout << "No";
+      std::cout << "no";
       break;
    }
    std::cout << " starter" << std::endl;
@@ -435,20 +443,20 @@ int main(int argc, const char* const argv[])
    assert(work.isConsistent());
 
    Timer timer;
-   std::cout << "loading LP file " << filename << std::endl;
+   std::cout << "IEXAMP22 loading LP file " << filename << std::endl;
 
    if (!work.readFile(filename, &rownames, &colnames))
    {
-      std::cerr << "error while reading file \"" 
+      std::cerr << "EEXAMP23 error while reading file \"" 
                 << filename << "\"" << std::endl;
       exit(1);
    }
    assert(work.isConsistent());
 
-   std::cout << "LP has\t" 
-             << work.nRows() << "\trows\n\t"
-             << work.nCols() << "\tcolumns\n\t" 
-             << work.nNzos() << "\tnonzeros"
+   std::cout << "IEXAMP24 LP has " 
+             << work.nRows() << " rows "
+             << work.nCols() << " columns " 
+             << work.nNzos() << " nonzeros"
              << std::endl;
 
    // Should we read a basis ?
@@ -457,15 +465,14 @@ int main(int argc, const char* const argv[])
 #if 0
       if (!work.readBasisFile(basisname, rownames, colnames))
       {
-         std::cerr << "error while reading file \"" 
+         std::cerr << "EEXAMP25 error while reading file \"" 
                    << basisname << "\"" << std::endl;
          exit(1);
       }
 #endif
    }
    timer.start();
-   std::cout << "solving LP" 
-             << std::endl;
+   std::cout << "IEXAMP26 solving LP" << std::endl;
 
    work.solve();
 
@@ -473,10 +480,10 @@ int main(int argc, const char* const argv[])
 
    work.displayStats();
 
-   std::cout << "solution time  is: " 
+   std::cout << "IEXAMP27 solution time  is: " 
              << timer.userTime() 
              << std::endl
-             << "iterations       : " 
+             << "IEXAMP28 iterations       : " 
              << work.iteration() 
              << std::endl;
    
@@ -485,7 +492,7 @@ int main(int argc, const char* const argv[])
    switch (stat)
    {
    case SPxSolver::OPTIMAL:
-      std::cout << "solution value is: "
+      std::cout << "IEXAMP29 solution value is: "
                 << std::setprecision(precision)
                 << work.objValue()
                 << std::endl;
@@ -511,27 +518,27 @@ int main(int argc, const char* const argv[])
 #if 0
       if (write_basis)
          if (!work.writeBasisFile(basisname, rownames, colnames))
-            std::cerr << "error while writing file \"" 
+            std::cerr << "EEXAMP30 error while writing file \"" 
                       << basisname << "\"" << std::endl;
 #endif
       break;
    case SPxSolver::UNBOUNDED:
-      std::cout << "LP is unbounded";
+      std::cout << "IEXAMP31 LP is unbounded";
       break;
    case SPxSolver::INFEASIBLE:
-      std::cout << "LP is infeasible";
+      std::cout << "IEXAMP32 LP is infeasible";
       break;
    case SPxSolver::ABORT_TIME:
-      std::cout << "aborted due to time limit";
+      std::cout << "IEXAMP33 aborted due to time limit";
       break;
    case SPxSolver::ABORT_ITER:
-      std::cout << "aborted due to iteration limit";
+      std::cout << "IEXAMP34 aborted due to iteration limit";
       break;
    case SPxSolver::ABORT_VALUE:
-      std::cout << "aborted due to objective value limit";
+      std::cout << "IEXAMP35 aborted due to objective value limit";
       break;
    default:
-      std::cerr << "An error occurred during the solution process";
+      std::cerr << "EEXAMP36 An error occurred during the solution process";
       break;
    }
    std::cout << std::endl;

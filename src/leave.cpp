@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.27 2003/01/12 13:09:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.28 2003/01/13 19:04:42 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -714,13 +714,12 @@ int SPxSolver::leave(int leaveIdx)
          theCoTest[leaveIdx] *= -1;
       }
 
-      if ((leaveMax > delta() && enterVal <= delta())
-           || (leaveMax < -delta() && enterVal >= -delta()))
+      if ((leaveMax > delta() && enterVal <= delta()) || (leaveMax < -delta() && enterVal >= -delta()))
       {
-         m_numCycle += ((theUBbound[leaveIdx] < infinity ||
-                        theLBbound[leaveIdx] > -infinity)
-                        && leaveStat != SPxBasis::Desc::P_FREE
-                        && leaveStat != SPxBasis::Desc::D_FREE);
+         if ((theUBbound[leaveIdx] < infinity || theLBbound[leaveIdx] > -infinity)
+            && leaveStat != SPxBasis::Desc::P_FREE
+            && leaveStat != SPxBasis::Desc::D_FREE)
+            m_numCycle++;
       }
       else
          m_numCycle /= 2;

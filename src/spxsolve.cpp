@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.60 2003/01/13 10:38:47 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.61 2003/01/13 19:04:42 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -165,7 +165,8 @@ SPxSolver::Status SPxSolver::solve()
             thepricer->entered4(lastEntered(), lastIndex());
             stop = terminate();
             clearUpdateVecs();
-            enterCount += (lastIndex() >= 0);
+            if (lastIndex() >= 0)
+               enterCount++;
             //@ assert(isConsistent());
          }
          while (!stop);

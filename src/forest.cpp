@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: forest.cpp,v 1.20 2002/11/25 16:51:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: forest.cpp,v 1.21 2003/01/13 19:04:42 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -482,7 +482,7 @@ void CLUFactor::forestUpdate(int p_col, Real* p_work, int num, int *nonz)
                if (y == 0)
                   enQueueMin(nonz, &num, cperm[jj]);
                y -= x * rval[j];
-               p_work[jj] = y + (y == 0) * MARKER;
+               p_work[jj] = y + ((y == 0) ? MARKER : 0.0);
             }
          }
          if (lbeg[l.firstUnused - 1] == ll)
@@ -610,7 +610,9 @@ void CLUFactor::forestUpdate(int p_col, Real* p_work, int num, int *nonz)
           */
          n = 0;
          for (i = r + 1; i < dim; ++i)
-            n += (p_work[corig[i]] != 0.0);
+            if (p_work[corig[i]] != 0.0)
+               n++;
+
          if (rmax[rowno] < n)
          {
             rlen[rowno] = 0;

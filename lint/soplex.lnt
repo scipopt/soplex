@@ -1,4 +1,4 @@
-// $Id: soplex.lnt,v 1.10 2003/01/05 19:03:15 bzfkocht Exp $
+// $Id: soplex.lnt,v 1.11 2003/01/13 19:04:41 bzfkocht Exp $
 -passes(1)
 +cpp(.h,.cpp)
 // esoteric size settings to find erros.
@@ -98,13 +98,19 @@
 
 // spxbasis.h
 -esym(1540, SPxBasis::factor) // no need to free.
+-esym(1554, SPxBasis::theLP)  // Direct pointer copy of member within copy constructor
+-esym(1554, SPxBasis::factor) // Direct pointer copy of member within copy constructor
+-esym(1555, SPxBasis::theLP)  // Direct pointer copy of member within copy assignment operator
+-esym(1555, SPxBasis::factor) // Direct pointer copy of member within copy assignment operator
 
 // spxhybridpr.h
 -esym(1540, SPxHybridPR::thepricer) // no need to free.
 -esym(1540, SPxHybridPR::thesolver) // no need to free.
 
 // factor.cpp
--esym(666,isZero)
+//-esym(666,isZero)
+-esym(818,vec) // Pointer parameter 'vec' could be declared as pointing to const
+               // correct, but this causes warnings by several compilers.
 
 // datahashtable.h
 -efunc(414,DataHashTable*::add)   // no possible zero division
@@ -121,10 +127,8 @@
 // spxscaler.h
 -esym(1526,SPxScaler::operator=)    // correctly not implemented
 -esym(1526,SPxScaler::SPxScaler)    // correctly not implemented
-
-// subsvector.h
--esym(1554,SubSVector::elem) // Direct pointer copy of member
--esym(1554,SubSVector::svec) // Direct pointer copy of member
+-esym(1554,SPxScaler::m_name)       // Direct pointer copy of member
+-esym(1555,SPxScaler::m_name)       // Direct pointer copy of member
 
 // idxset.h
 -esym(1704,IdxSet::IdxSet)) // Vector has no (private) default constructor
@@ -136,7 +140,6 @@
 -esym(818,after)  // Pointer parameter could be declared as pointing to const
 
 // Temporary
-//-w2    // Only warnings and Errors
 -e777  // Testing floats for equality
 -e1704 // Constructor has private access specification
 -e1714 // Member function not referenced
@@ -147,7 +150,7 @@
 -e641  // Converting enum to int
 -e656  // Arithmetic operation uses (compatible) enum's
 -e655  // bit-wise operation uses (compatible) enum's
--e514  // Unusual use of a Boolean
+//-e514  // Unusual use of a Boolean
 -e1401 // Member not initialized by constructor
 -e1541 // Member possibly not initialized by constructor
 -e1539 // member not assigned by assignment operator
@@ -156,13 +159,21 @@
 -e679  // Suspicious Truncation in arithmetic expression combining with pointer
 -esym(1502,compare) // defined object 'compare' has no nonstatic data members
 -esym(631,soplex::Compare) // defined differently 
--e1536 // Exposing low access member
-
 -e740  // Unusual pointer cast (incompatible indirect types)
 -e763  // Redundant declaration for symbol
 -e826  // Suspicious pointer-to-pointer conversion (area too small)
 -e1712 // default constructor not defined for class 
 -e1725 // class member is a reference
+// the next two result from the same problem
+-e1536 // Exposing low access member
 -e1763 // Member function marked as const indirectly modifies class
+
+
+
+
+
+
+
+
 
 

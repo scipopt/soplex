@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.24 2003/01/12 13:09:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.25 2003/01/13 19:04:42 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -841,8 +841,11 @@ bool SPxSolver::enter(SPxId& enterId)
    if (leaveIdx >= 0)
    {
       if (fabs(leaveVal) < delta())
-         m_numCycle += 
-            (theUBbound[leaveIdx] != theLBbound[leaveIdx]) && (enterStat != Desc::P_FREE) && (enterStat != Desc::D_FREE);
+      {
+         if (theUBbound[leaveIdx] != theLBbound[leaveIdx] 
+            && enterStat != Desc::P_FREE && enterStat != Desc::D_FREE) 
+            m_numCycle++;
+      }
       else
          m_numCycle /= 2;
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeometsc.cpp,v 1.4 2003/01/12 13:09:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeometsc.cpp,v 1.5 2003/01/13 19:04:42 bzfkocht Exp $"
 
 /**@file  spxgeometsc.cpp
  * @brief Geometric mean row/column scaling.
@@ -54,8 +54,8 @@ void SPxGeometSC::scale(SPxLP& lp)
    VERBOSE1({ std::cout << "Geometric scaling LP" << std::endl; });   
 
    Real pstart = 0.0;
-   Real p0;
-   Real p1;
+   Real p0     = 0.0;
+   Real p1     = 0.0;
 
    setup(lp);
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeneralsm.cpp,v 1.18 2003/01/13 14:30:54 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeneralsm.cpp,v 1.19 2003/01/13 19:04:42 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -38,7 +38,7 @@ SPxSimplifier::Result SPxGeneralSM::simplify(SPxLP& lp, Real eps, Real delta)
 
    if ((ret = m_inter.simplify(lp, eps, delta)) != OKAY)
       return ret;
-   if ((ret = m_rem1.simplify(lp, eps, delta)) != OKAY) 
+   if ((ret = m_redun.simplify(lp, eps, delta)) != OKAY) 
       return ret;
 #if 0
 
@@ -46,7 +46,7 @@ SPxSimplifier::Result SPxGeneralSM::simplify(SPxLP& lp, Real eps, Real delta)
    {
       cnt = lp.nRows() + lp.nCols();
 
-      if ((ret = m_rem1.simplify()) != 0) 
+      if ((ret = m_redu.simplify()) != 0) 
          return ret;
 
       if (cnt == lp.nRows() + lp.nCols())
@@ -55,7 +55,7 @@ SPxSimplifier::Result SPxGeneralSM::simplify(SPxLP& lp, Real eps, Real delta)
       // if ((ret = m_aggr.simplify()) != 0) 
       //   return ret;
 
-      if ((ret = m_redu.simplify()) != 0) 
+      if ((ret = m_redun.simplify()) != 0) 
          return ret;
    }
 #endif
@@ -66,17 +66,17 @@ SPxSimplifier::Result SPxGeneralSM::simplify(SPxLP& lp, Real eps, Real delta)
 
 Real SPxGeneralSM::timeUsed() const
 {
-   return m_inter.timeUsed() + m_rem1.timeUsed();
+   return m_inter.timeUsed() + m_redun.timeUsed();
 }
 
 const Vector& SPxGeneralSM::unsimplifiedPrimal(const Vector& x)
 {
-   return m_inter.unsimplifiedPrimal(m_rem1.unsimplifiedPrimal(x));
+   return m_inter.unsimplifiedPrimal(m_redun.unsimplifiedPrimal(x));
 }
 
 const Vector& SPxGeneralSM::unsimplifiedDual(const Vector& pi)
 {
-   return m_inter.unsimplifiedDual(m_rem1.unsimplifiedDual(pi));
+   return m_inter.unsimplifiedDual(m_redun.unsimplifiedDual(pi));
 }
 
 } // namespace soplex

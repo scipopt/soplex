@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.20 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.21 2003/01/13 19:04:42 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -22,18 +22,542 @@
 #include "spxdefines.h"
 #include "spxredundantsm.h"
 #include "dataarray.h"
+#include "sorter.h"
+
+#define DISPERSE(x) (1664525U * (x) + 1013904223U)
 
 namespace soplex
 {
+static Real maxAbs(Real a, Real b)
+{
+   return fabs(a) > fabs(b) ? fabs(a) : fabs(b);
+}
 
-SPxSimplifier::Result SPxRedundantSM::treat_cols(SPxLP& lp)
+void SPxRedundantSM::fixColumn(SPxLP& lp, int i)
+{
+   METHOD( "SPxRedundantSM::fixColumn" );
+
+   assert(EQ(lp.lower(i), lp.upper(i), deltaBnd()));
+
+   Real x = lp.lower(i);
+
+   VERBOSE3({ std::cout << "IREDSM01 fixed col " << i 
+                        << " lower= " << std::setprecision(16) << lp.lower(i)
+                        << " upper= " << std::setprecision(16) << lp.upper(i)
+                        << std::endl; });
+
+   m_pval.add(m_cperm[i], x);
+   
+   if (isNotZero(x, epsZero()))
+   {
+      const SVector& col = lp.colVector(i);
+
+      for(int j = 0; j < col.size(); ++j)
+      {
+         int k = col.index(j);
+         
+         if (lp.rhs(k) < infinity)
+         {
+            Real y     = x * col.value(j);
+            Real scale = maxAbs(lp.rhs(k), y);
+            Real rhs   = (lp.rhs(k) / scale) - (y / scale);
+                  
+            if (isZero(rhs, epsZero()))
+               rhs = 0.0;
+            else
+               rhs *= scale;
+
+            VERBOSE3({ std::cout << "IREDSM02 \trhs " << k 
+                                 << " r= " << std::setprecision(16) << rhs 
+                                 << " rhs= " << std::setprecision(16) << lp.rhs(k) 
+                                 << " x= " << std::setprecision(16) << col.value(j) 
+                                 << std::endl; });
+
+            lp.changeRhs(k, rhs);
+         }
+         if (lp.lhs(k) > -infinity)
+         {
+            Real y     = x * col.value(j);
+            Real scale = maxAbs(lp.lhs(k), y);
+            Real lhs   = (lp.lhs(k) / scale) - (y / scale);
+
+            if (isZero(lhs, epsZero()))
+               lhs = 0.0;
+            else
+               lhs *= scale;
+                  
+            VERBOSE3({ std::cout << "IREDSM03 \tlhs " << k 
+                                 << " l= " << std::setprecision(16) << lhs 
+                                 << " lhs= " << std::setprecision(16) << lp.lhs(k) 
+                                 << " x= " << std::setprecision(16) << col.value(j) 
+                                 << std::endl; });
+
+            lp.changeLhs(k, lhs);
+         }
+      }
+   }
+}
+
+SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
+{
+   DataArray<int>     rem(lp.nRows());
+   DataArray<RowHash> rowhash(lp.nRows());
+   int                remRows = 0;
+   int                remNzos = 0;
+   int                chgLRhs = 0;
+   int                chgBnds = 0;
+   int                i;
+
+   for(i = 0; i < lp.nRows(); ++i )
+   {
+      //      std::cout << "row " << i << std::endl;
+
+      const SVector& row    = lp.rowVector(i);       
+      Real           upbnd  = 0.0;
+      Real           lobnd  = 0.0;
+      int            upcnt  = 0;
+      int            locnt  = 0;
+
+      rowhash[i].row = i;
+      rowhash[i].hid = DISPERSE(row.size());
+      rem[i]         = 0;
+
+      for(int j = 0; j < row.size(); ++j )
+      {
+         Real x = row.value(j);
+         int  k = row.index(j);
+
+         rowhash[i].hid *= k; // += DISPERSE(k) ?
+         
+         // std::cout << "\t\tx= " << x << " lower= " << lp.lower(k) 
+         // << " upper= " << lp.upper(k) << std::endl;
+
+         assert(isNotZero(x, epsZero()));
+
+         if (x > 0.0)
+         {
+            if (lp.upper(k) >= infinity)
+               upcnt++;
+            else
+               upbnd += lp.upper(k) * x;
+
+            if (lp.lower(k) <= -infinity)
+               locnt++;
+            else
+               lobnd += lp.lower(k) * x;
+         }
+         else if (x < 0.0)
+         {
+            if (lp.upper(k) >= infinity)
+               locnt++;
+            else
+               lobnd += lp.upper(k) * x;
+
+            if (lp.lower(k) <= -infinity)
+               upcnt++;
+            else
+               upbnd += lp.lower(k) * x;
+         }
+      }
+      // infeasible ?
+      if (  (LT(lp.rhs(i), lobnd, deltaBnd()) && locnt == 0) 
+         || (GT(lp.lhs(i), upbnd, deltaBnd()) && upcnt == 0))
+      {
+         VERBOSE3({ std::cout << "IREDSM04 infeasible row " << i 
+                              << " lo= " << lobnd
+                              << " up= " << upbnd 
+                              << " lhs= " << lp.lhs(i) 
+                              << " rhs= " << lp.rhs(i)
+                              << std::endl; });
+         return INFEASIBLE;
+      }
+      // forcing equality constraint ?
+      if (EQ(lp.lhs(i), lp.rhs(i), deltaBnd()))
+      {
+         // all fixed on upper bound ?
+         if (upcnt == 0 && EQ(lp.rhs(i), upbnd, deltaBnd()))
+         {
+            VERBOSE3({ std::cout << "IREDSM05 rhs fixed on upbnd row " << i
+                                 << " rhs= " << lp.rhs(i)
+                                 << " up= " << upbnd 
+                                 << std::endl; });
+
+            for(int j = 0; j < row.size(); ++j )
+            {
+               Real x = row.value(j);
+               int  k = row.index(j);
+
+               assert(isNotZero(x, epsZero()));
+               assert(GE(lp.lower(k), 0.0) || LE(lp.upper(k), 0.0));
+
+               if (x > 0.0 && GE(lp.lower(k), 0.0))
+                  lp.changeLower(k, lp.upper(k));
+               else
+                  lp.changeUpper(k, lp.lower(k));               
+            }
+            rem[i]         = -1;
+            rowhash[i].row = -1;
+            rowhash[i].hid = 0;
+            remRows++;
+            remNzos += row.size();
+            continue;
+         }
+         // all fixed on lower bound ?
+         if (locnt == 0 && EQ(lp.lhs(i), lobnd, deltaBnd()))
+         {
+            VERBOSE3({ std::cout << "IREDSM06 rhs fixed on lowbnd row " << i
+                                 << " lhs= " << lp.lhs(i)
+                                 << " lo= " << lobnd 
+                                 << std::endl; });
+
+            for(int j = 0; j < row.size(); ++j )
+            {
+               Real x = row.value(j);
+               int  k = row.index(j);
+
+               assert(isNotZero(x, epsZero()));
+               assert(GE(lp.lower(k), 0.0) || LE(lp.upper(k), 0.0));
+
+               if (x > 0.0 && GE(lp.lower(k), 0.0))
+                  lp.changeUpper(k, lp.lower(k));
+               else
+                  lp.changeLower(k, lp.upper(k));
+            }
+            rem[i]         = -1;
+            rowhash[i].row = -1;
+            rowhash[i].hid = 0;
+            remRows++;
+            remNzos += row.size();
+            continue;
+         }
+      }
+
+      // redundant rhs ?
+      if (lp.rhs(i) <  infinity && upcnt == 0 && GE(lp.rhs(i), upbnd, deltaBnd()))
+      {
+         VERBOSE3({ std::cout << "IREDSM07 redundant rhs row " << i
+                              << " rhs= " << lp.rhs(i)
+                              << " up= " << upbnd 
+                              << std::endl; });
+
+         lp.changeRhs(i, infinity);
+         chgLRhs++;
+      }
+      // redundant lhs ?
+      if (lp.lhs(i) > -infinity && locnt == 0 && LE(lp.lhs(i), lobnd, deltaBnd()))
+      {
+         VERBOSE3({ std::cout << "IREDSM08 redundant lhs row " << i
+                              << " lhs= " << lp.lhs(i)
+                              << " lo= " << lobnd 
+                              << std::endl; });
+
+         lp.changeLhs(i, -infinity);
+         chgLRhs++;
+      }
+      // unconstraint constraints are also handled by simpleRows
+      // but since they might come up here we do it again.
+      if (lp.rhs(i) >= infinity && lp.lhs(i) <= -infinity)
+      {
+         VERBOSE3({ std::cout << "IREDSM09 unconstraint row " << i 
+                              << " removed" << std::endl; });
+
+         rem[i]         = -1;
+         rowhash[i].row = -1;
+         rowhash[i].hid = 0;
+         remRows++;
+         remNzos += row.size();
+         continue;
+      }
+      if (upcnt <= 1 || locnt <= 1)
+      {
+         for(int j = 0; j < row.size(); ++j )
+         {
+            Real x = row.value(j);
+            int  k = row.index(j);
+
+            assert(isNotZero(x));
+
+            if (x > 0.0)
+            {
+               if (lp.lhs(i) > -infinity && lp.lower(k) > -infinity && upcnt <= 1 && NE(lp.lhs(i), upbnd))
+               {
+                  Real y     = -infinity;
+                  Real scale = maxAbs(lp.lhs(i), upbnd);
+                  Real z     = (lp.lhs(i) / scale) - (upbnd / scale);
+
+                  assert(upcnt > 0 || lp.upper(k) < infinity);
+                  
+                  if (upcnt == 0)
+                     y = lp.upper(k) + z * scale / x;
+                  else if (lp.upper(k) >= infinity)
+                     y = z * scale / x;
+
+                  if (isZero(y, deltaBnd()))
+                     y = 0.0;
+
+                  if (GE(y, lp.lower(k)))
+                  {
+                     VERBOSE3({ std::cout << "IREDSM10 dominated bound row " << i
+                                          << " col " << k
+                                          << " removed y= " << y
+                                          << " lower= " << lp.lower(k)
+                                          << std::endl; });
+
+                     locnt++;
+                     lobnd -= lp.lower(k) * x;
+                     lp.changeLower(k, -infinity);
+                     chgBnds++;
+                  }
+               }
+               if (lp.rhs(i) < infinity && lp.upper(k) < infinity && locnt <= 1 && NE(lp.rhs(i), lobnd))
+               {
+                  Real y = infinity;
+                  Real scale = maxAbs(lp.rhs(i), lobnd);
+                  Real z     = (lp.rhs(i) / scale) - (lobnd / scale);
+                  
+                  assert(locnt > 0 || lp.lower(k) > -infinity);
+
+                  if (locnt == 0)
+                     y = lp.lower(k) + z * scale / x;
+                  else if (lp.lower(k) <= -infinity)
+                     y = z * scale / x;
+                  
+                  if (isZero(y, deltaBnd()))
+                     y = 0.0;
+
+                  if (LE(y, lp.upper(k)))
+                  {
+                     VERBOSE3({ std::cout << "IREDSM11 dominated bound row " << i
+                                          << " col " << k
+                                          << " removed y= " << y
+                                          << " lower= " << lp.lower(k)
+                                          << std::endl; });
+
+                     upcnt++;
+                     upbnd -= lp.upper(k) * x;
+                     lp.changeUpper(k, infinity);
+                     chgBnds++;
+                  }
+               }
+            }
+            else if (x < 0.0)
+            {
+               if (lp.lhs(i) >= -infinity && lp.upper(k) < infinity && upcnt <= 1 && NE(lp.lhs(i), upbnd))
+               {
+                  Real y = infinity;
+                  Real scale = maxAbs(lp.lhs(i), upbnd);
+                  Real z     = (lp.lhs(i) / scale) - (upbnd / scale);
+                  
+                  assert(upcnt > 0 || lp.lower(k) > -infinity);
+
+                  if (upcnt == 0)
+                     y = lp.lower(k) + z * scale / x;
+                  else if (lp.lower(k) <= -infinity)
+                     y = z * scale / x;
+                  
+                  if (isZero(y, deltaBnd()))
+                     y = 0.0;
+
+                  if (LE(y, lp.upper(k)))
+                  {
+                     VERBOSE3({ std::cout << "IREDSM12 dominated bound row " << i
+                                          << " col " << k
+                                          << " removed y= " << y
+                                          << " lower= " << lp.lower(k)
+                                          << std::endl; });
+
+                     locnt++;
+                     lobnd -= lp.upper(k) * x;
+                     lp.changeUpper(k, infinity);
+                     chgBnds++;
+                  }
+               }
+               if (lp.rhs(i) <= infinity && lp.lower(k) > -infinity && locnt <= 1 && NE(lp.rhs(i), lobnd))
+               {
+                  Real y = -infinity;
+                  Real scale = maxAbs(lp.rhs(i), lobnd);
+                  Real z     = (lp.rhs(i) / scale) - (lobnd / scale);
+
+                  assert(locnt > 0 || lp.upper(k) < infinity);
+
+                  if (locnt == 0)
+                     y = lp.upper(k) + z * scale / x;
+                  else if (lp.upper(k) >= infinity)
+                     y = z * scale / x;
+                  
+                  if (isZero(y, deltaBnd()))
+                     y = 0.0;
+
+                  if (GE(y, lp.lower(k)))
+                  {
+                     VERBOSE3({ std::cout << "IREDSM13 dominated bound row " << i
+                                          << " col " << k
+                                          << " removed y= " << y
+                                          << " lower= " << lp.lower(k)
+                                          << std::endl; });
+
+                     upcnt++;
+                     upbnd -= lp.lower(k) * x;
+                     lp.changeLower(k, -infinity);
+                     chgBnds++;
+                  }
+               }
+            }
+         }
+      }
+   }
+   // --- Check for dublicate rows ------------------------------------------------------
+   RowHash compare;
+
+   sorter_qsort(rowhash.get_ptr(), rowhash.size(), compare);
+
+   for(i = 0; i < lp.nRows() - 1; ++i)
+   {
+      if (rowhash[i].row < 0 || rowhash[i].hid != rowhash[i + 1].hid)
+         continue;
+
+      int ri1 = rowhash[i    ].row;
+      int ri2 = rowhash[i + 1].row;
+
+      assert(ri1 >= 0);
+      assert(ri1 < lp.nRows());
+      // This has to be true, because if case of the sorting.
+      assert(ri2 >= 0);
+      assert(ri2 < lp.nRows());
+      assert(rowhash[i].hid == rowhash[i + 1].hid);
+
+      if (lp.rowVector(ri1).size() != lp.rowVector(ri2).size())
+         continue;
+
+      SVector row1(lp.rowVector(ri1));       
+      SVector row2(lp.rowVector(ri2));       
+         
+      row1.sort();
+      row2.sort();
+      
+      if (row1.index(0) != row2.index(0))
+         break;
+
+      Real x1 = row1.value(0);
+      Real x2 = row2.value(0);
+      Real alpha;
+
+      if (isZero(x1, epsZero()))
+         alpha = 1.0;
+      else if (isZero(x2, epsZero()))
+         alpha = 1.0;
+      else
+         alpha = x1 / x2;
+
+      assert(isNotZero(alpha));
+
+      int j;
+
+      for(j = 0; j < row1.size(); ++j)
+      {
+         int  k1 = row1.index(j);
+         int  k2 = row2.index(j);
+
+         if (k1 != k2)
+            break;
+
+         x1 = row1.value(j);
+         x2 = row2.value(j);
+
+         if (NE(x1, x2 * alpha))
+            break;
+      }
+      if (j < row1.size())
+         continue;
+      
+      // ok, now row[i] = alpha * row[i+1]
+
+      Real maxlhs;
+      Real minrhs;
+
+      if (alpha > 0.0)
+      {
+         // compute maxlhs    
+         if (lp.lhs(ri1) <= -infinity)
+            maxlhs = lp.lhs(ri2);
+         else if (lp.lhs(ri2) <= -infinity)
+            maxlhs = lp.lhs(ri1);
+         else
+            maxlhs = (lp.lhs(ri1) / alpha >= lp.lhs(ri2)) ? lp.lhs(ri1) / alpha : lp.lhs(ri2);
+         
+         // compute minrhs
+         if (lp.rhs(ri1) >= infinity)
+            minrhs = lp.rhs(ri2);
+         else if (lp.rhs(ri2) >= infinity)
+            minrhs = lp.rhs(ri1);
+         else
+            minrhs = (lp.rhs(ri1) / alpha <= lp.rhs(ri2)) ? lp.rhs(ri1) / alpha : lp.rhs(ri2);
+      }
+      else
+      {
+         assert(alpha < 0.0);
+
+         // compute maxlhs    
+         if (lp.rhs(ri1) >= infinity)
+            maxlhs = lp.lhs(ri2);
+         else if (lp.lhs(ri2) <= -infinity)
+            maxlhs = -lp.rhs(ri1);
+         else
+            maxlhs = (lp.rhs(ri1) / alpha >= lp.lhs(ri2)) ? lp.rhs(ri1) / alpha : lp.lhs(ri2);
+
+         // compute minrhs
+         if (lp.lhs(ri1) <= -infinity)
+            minrhs = lp.rhs(ri2);
+         else if (lp.rhs(ri2) >= infinity)
+            minrhs = -lp.lhs(ri1);
+         else
+            minrhs = (lp.lhs(ri1) / alpha <= lp.rhs(ri2)) ? lp.lhs(ri1) / alpha : lp.rhs(ri2);
+      }
+      VERBOSE3({ std::cout << "IREDSM14 duplicate rows " << ri1 << "/" << ri2
+                           << " alpha= " << alpha
+                           << " lhs= " << lp.lhs(ri1)
+                           << " rhs= " << lp.rhs(ri1)
+                           << " lhs= " << lp.lhs(ri2)
+                           << " rhs= " << lp.rhs(ri2)
+                           << " maxlhs= " << maxlhs
+                           << " minrhs= " << minrhs
+                           << std::endl; });
+
+      lp.changeLhs(ri2, maxlhs);
+      lp.changeRhs(ri2, minrhs);
+
+      rem[ri1] = -1;
+      remRows++;
+      remNzos += row1.size();
+   }
+   if (remRows > 0)
+      removeRows(lp, rem, remRows);
+
+   if (remRows + remNzos + chgLRhs + chgBnds > 0)
+   {
+      again      = true;
+      m_remRows += remRows;
+      m_remNzos += remNzos;
+      m_chgLRhs += chgLRhs;
+      m_chgBnds += chgBnds;
+
+      VERBOSE2({ std::cout << "IREDSM15 redundant row simplifier removed "
+                           << remRows << " rows, "
+                           << remNzos << " nzos, changed "
+                           << chgBnds << " col bounds, " 
+                           << chgLRhs << " row bounds"
+                           << std::endl; });
+   }
+   return OKAY;
+}
+
+SPxSimplifier::Result SPxRedundantSM::redundantCols(SPxLP& lp, bool& again)
 {
    DataArray<int> rem(lp.nCols());
    DataArray<int> tmp(lp.nCols());
-   int            num = 0;
-   int            j;
-   int            k;
-   Real           x;
+   int            remCols = 0;
+   int            remNzos = 0;
+   int            chgBnds = 0;
 
    for( int i = 0; i < lp.nCols(); ++i )
    {
@@ -41,19 +565,19 @@ SPxSimplifier::Result SPxRedundantSM::treat_cols(SPxLP& lp)
 
       const SVector& col = lp.colVector(i);
 
-      if (lp.upper(i) != lp.lower(i))
+      if (NE(lp.upper(i), lp.lower(i), deltaBnd()))
       {
          // test if all coefficents are going in one direction
          int upcnt = 0;
          int locnt = 0;
          
-         for( j = 0; j < col.size(); ++j )
+         for(int j = 0; j < col.size(); ++j )
          {            
             if (upcnt > 0 && locnt > 0)
                break;
 
-            x = col.value(j);
-            k = col.index(j);
+            Real x = col.value(j);
+            int  k = col.index(j);
 
             assert(isNotZero(x));
 
@@ -68,28 +592,33 @@ SPxSimplifier::Result SPxRedundantSM::treat_cols(SPxLP& lp)
                upcnt += (lp.lhs(k) > -infinity) ? 1 : 0;
             }
          }
-         x = lp.maxObj(i);
+         Real maxobj = lp.maxObj(i);
 
          // max -3 x
          // s.t. 5 x <= 8
-         if (locnt == 0 && x < 0.0)
+         if (locnt == 0 && LT(maxobj, 0.0, epsZero()))
          {
             if (lp.lower(i) <= -infinity)
                return UNBOUNDED;           // LP is unbounded
 
+            // fix column to lower bound
             lp.changeUpper(i, lp.lower(i));
          }
          // max  3 x
          // s.t. 5 x >= 8
-         else if (upcnt == 0 && x > 0.0)
+         else if (upcnt == 0 && GT(maxobj, 0.0, epsZero()))
          {
             if (lp.upper(i) >= infinity)
                return UNBOUNDED;           // LP is unbounded
 
+            // fix column to upper bound
             lp.changeLower(i, lp.upper(i));
          }
-         else if (x == 0.0)
+         else if (isZero(maxobj, epsZero()))
          {
+            //TODO free variable with zero objective can be removed, or?
+            //see simpleCols
+
             upcnt += (lp.upper(i) <  infinity) ? 1 : 0;
             locnt += (lp.lower(i) > -infinity) ? 1 : 0;
 
@@ -97,268 +626,526 @@ SPxSimplifier::Result SPxRedundantSM::treat_cols(SPxLP& lp)
             {
                // make variable free
                lp.changeUpper(i, infinity);
-
-               for( j = 0; j < col.size(); ++j )
+               chgBnds++;
+#ifndef NDEBUG
+               for(int j = 0; j < col.size(); ++j )
                {
                   if (col.value(j) < 0.0)
-                     assert(lp.rhs(col.index(j)) >= infinity);
-                  //                     lp.changeRhs(col.index(j), infinity);
+                     assert(lp.rhs(col.index(j)) >= infinity); // lp.changeRhs(col.index(j), infinity);
                   else
-                     assert(lp.lhs(col.index(j)) <= -infinity);
-                  //                     lp.changeLhs(col.index(j), -infinity);
+                     assert(lp.lhs(col.index(j)) <= -infinity); // lp.changeLhs(col.index(j), -infinity);
                }
+#endif // NDEBUG
             }
             if (upcnt == 0)
             {
                // make variable free
                lp.changeLower(i, -infinity);
-
-               for( j = 0; j < col.size(); ++j )
+               chgBnds++;
+#ifndef NDEBUG
+               for(int j = 0; j < col.size(); ++j )
                {
                   if (col.value(j) > 0.0)
-                     assert(lp.rhs(col.index(j)) >= infinity);
-                  //                     lp.changeRhs(col.index(j), infinity);
+                     assert(lp.rhs(col.index(j)) >= infinity); // lp.changeRhs(col.index(j), infinity);
                   else
-                     assert(lp.lhs(col.index(j)) <= -infinity);
-                  //                     lp.changeLhs(col.index(j), -infinity);
+                     assert(lp.lhs(col.index(j)) <= -infinity); // lp.changeLhs(col.index(j), -infinity);
                }
+#endif // NDEBUG
             }
          }
       }
       // remove fixed variables
-      if (lp.upper(i) == lp.lower(i))
+      if (EQ(lp.lower(i), lp.upper(i), deltaBnd()))
       {
-         x      = lp.upper(i);
+         fixColumn(lp, i);
+
          rem[i] = -1;
-         num++;
-
-         if (x != 0.0)
-         {
-            for( j = 0; j < col.size(); ++j )
-            {
-               k = col.index(j);
-
-               if (lp.rhs(k) <  infinity)
-                  lp.changeRhs(k, lp.rhs(k) - x * col.value(j));
-               if (lp.lhs(k) > -infinity)
-                  lp.changeLhs(k, lp.lhs(k) - x * col.value(j));
-            }
-            // Zielfunktiondelta delta += x * lp.obj(i);
-         }
+         remCols++;
+         remNzos += col.size();
       }
    }
-   if (num > 0)
-   {
-      lp.removeCols(rem.get_ptr());
-      assert(lp.isConsistent());
+   if (remCols > 0)
+      removeCols(lp, rem, remCols);
 
-      VERBOSE1({ std::cout << "SPxRedundantSM: removed " << num
-                           << " column(s)" << std::endl; });
+   if (remCols + remNzos + chgBnds > 0)
+   {
+      again      = true;
+      m_remCols += remCols;
+      m_remNzos += remNzos;
+      m_chgBnds += chgBnds;
+
+      VERBOSE2({ std::cout << "IREDSM16 redundant col simplifier removed "
+                           << remCols << " cols, "
+                           << remNzos << " nzos, changed "
+                           << chgBnds << " col bounds" 
+                           << std::endl; });
    }
    return OKAY;
 }
 
-
-SPxSimplifier::Result SPxRedundantSM::treat_rows(SPxLP& lp)
+/* Handle rows -------------------------------------------------------
+ */
+SPxSimplifier::Result SPxRedundantSM::simpleRows(SPxLP& lp, bool& again)
 {
-   DataArray < int > rem(lp.nRows());
-   int               num = 0;
-   int               j;
-   int               k;
-   Real              x;
+   DataArray<int> rem(lp.nRows());
+   DataArray<int> tmp(lp.nRows());
+   int            remRows = 0;
+   int            remNzos = 0;
 
-   for( int i = 0; i < lp.nRows(); ++i )
+   for(int i = 0; i < lp.nRows(); ++i)
    {
-      // unconstraint constraints and infeasible constraints are
-      // also handled by rem1
+      const SVector& row = lp.rowVector(i);
+      rem[i]             = 0;
+
+      // infeasible range row
+      if (LT(lp.rhs(i), lp.lhs(i), deltaBnd()))
+      {
+         VERBOSE3({ std::cout << "IREDSM17 infeasible row " << i 
+                              <<"  lhs= " << lp.lhs(i) 
+                              << " rhs= " << lp.rhs(i) 
+                              << std::endl; });
+         return INFEASIBLE;
+      }
+      // empty row ?
+      if (row.size() == 0)
+      {
+         VERBOSE3({ std::cout << "IREDSM18 empty row " << i; });
+
+         if (LT(lp.rhs(i), 0.0, deltaBnd()) || GT(lp.lhs(i), 0.0, deltaBnd()))
+         {
+            VERBOSE3({ std::cout << " infeasible lhs= " << lp.lhs(i) 
+                                 << " rhs= " << lp.rhs(i) << std::endl; });
+            return INFEASIBLE;
+         }         
+         VERBOSE3({ std::cout << " removed" << std::endl; });
+
+         rem[i] = -1;
+         remRows++;
+         continue;
+      }
+      // unconstraint constraint ?
       if (lp.rhs(i) >= infinity && lp.lhs(i) <= -infinity)
       {
+         VERBOSE3({ std::cout << "IREDSM19 unconstraint row " << i 
+                              << " removed" << std::endl; });
+
          rem[i] = -1;
-         num++;
+         remRows++;
+         remNzos += row.size();
          continue;
       }
-      if (LT(lp.rhs(i), lp.lhs(i)))
+      // row singleton
+      if (row.size() == 1)
       {
+         Real x = row.value(0);
+         int  j = row.index(0);
+         Real up;
+         Real lo;
+
+         VERBOSE3({ std::cout << "IREDSM20 row singleton " << i 
+                              << " x= " << x 
+                              << " lhs= " << lp.lhs(i) 
+                              << " rhs= " << lp.rhs(i); });
+
+         if (GT(x, 0.0, epsZero()))           // x > 0
+         {
+            up = (lp.rhs(i) >=  infinity) ?  infinity : (lp.rhs(i) / x);
+            lo = (lp.lhs(i) <= -infinity) ? -infinity : (lp.lhs(i) / x);
+         }
+         else if (LT(x, 0.0, epsZero()))      // x < 0
+         {
+            lo = (lp.rhs(i) >=  infinity) ? -infinity : (lp.rhs(i) / x);
+            up = (lp.lhs(i) <= -infinity) ?  infinity : (lp.lhs(i) / x);
+         }
+         else if (LT(lp.rhs(i), 0.0, deltaBnd()) || GT(lp.lhs(i), 0.0, deltaBnd()))  
+         {
+            // x == 0 rhs/lhs != 0
+            VERBOSE3({ std::cout << " infeasible" << std::endl; });
+
+            return INFEASIBLE;
+         }
+         else                     // x == 0
+         {
+            lo = lp.lower(j);
+            up = lp.upper(j);
+         }
          rem[i] = -1;
-         num++;
+         remRows++;
+         remNzos++;
+         
+         if (isZero(lo, epsZero()))
+            lo = 0.0;
+         if (isZero(up, epsZero()))
+            up = 0.0;
+         
+         assert(LE(lp.lower(j), lp.upper(j)));
+
+         VERBOSE3({ std::cout << " removed lo= " << lo
+                              << " up= " << up
+                              << " lower= " << lp.lower(j)
+                              << " upper= " << lp.upper(j)
+                              << std::endl; });
+
+         if (LT(up, lp.upper(j), epsZero()))
+            lp.changeUpper(j, up);
+         if (GT(lo, lp.lower(j), epsZero()))
+            lp.changeLower(j, lo);
+
+         assert(LE(lp.lower(j), lp.upper(j), epsZero()));
+      }
+   }
+   assert(remRows != 0 || remNzos == 0);
+
+   if (remRows > 0)
+   {
+      removeRows(lp, rem, remRows);
+
+      again      = true;
+      m_remRows += remRows;
+      m_remNzos += remNzos;
+
+      VERBOSE2({ std::cout << "IREDSM21 simple row simplifier removed "
+                           << remRows << " rows, "
+                           << remNzos << " nzos"
+                           << std::endl; });
+   }
+   return OKAY;
+}
+
+/* Handle columns -----------------------------------------------------
+ */
+SPxSimplifier::Result SPxRedundantSM::simpleCols(SPxLP& lp, bool& again)
+{
+   DataArray<int> rem(lp.nCols());
+   DataArray<int> tmp(lp.nCols());
+   int            remCols = 0;
+   int            remNzos = 0;
+
+   for(int i = 0; i < lp.nCols(); ++i)
+   {
+      const SVector& col = lp.colVector(i);
+      rem[i]             = 0;
+
+      // Empty column ? 
+      if (col.size() == 0)
+      {
+         VERBOSE3({ std::cout << "IREDSM22 empty column " << i 
+                              << " maxObj= " << lp.maxObj(i)
+                              << " lower= " << lp.lower(i)
+                              << " upper= " << lp.upper(i); });
+
+         if (GT(lp.maxObj(i), 0.0, epsZero()))
+         {
+            if (lp.upper(i) >= infinity)
+            {
+               VERBOSE3({ std::cout << " unbounded" << std::endl; });
+
+               return UNBOUNDED;
+            }
+            m_pval.add(m_cperm[i], lp.upper(i));
+         }
+         else if (LT(lp.maxObj(i), 0.0, epsZero()))
+         {
+            if (lp.lower(i) <= -infinity)
+            {
+               VERBOSE3({ std::cout << " unbounded" << std::endl; });
+
+               return UNBOUNDED;
+            }
+            m_pval.add(m_cperm[i], lp.lower(i));
+         }
+         else 
+         {
+            assert(isZero(lp.maxObj(i), epsZero()));
+            // any value within the bounds is ok
+            if (lp.lower(i) > -infinity)
+               m_pval.add(m_cperm[i], lp.lower(i));
+            else if (lp.upper(i) < infinity)
+               m_pval.add(m_cperm[i], lp.upper(i));
+            else
+               m_pval.add(m_cperm[i], 0.0);
+         }
+         VERBOSE3({ std::cout << " removed" << std::endl; });
+
+         rem[i] = -1;
+         remCols++;
          continue;
       }
-      rem[i] = 0;
 
-      const SVector& row   = lp.rowVector(i);       
-      Real           upbnd  = 0.0;
-      Real           lobnd = 0.0;
-      int            upcnt = 0;
-      int            locnt = 0;
-
-      for( j = 0; j < row.size(); ++j )
+      // infeasible bounds ?
+      if (GT(lp.lower(i), lp.upper(i), deltaBnd()))
       {
-         x = row.value(j);
-         k = row.index(j);
+         VERBOSE3({ std::cout << "IREDSM23 infeasible bounds column " << i 
+                              << " lower= " << lp.lower(i)
+                              << " upper= " << lp.upper(i)
+                              << std::endl; });
+         return INFEASIBLE;
+      }
+      // Fixed column ?
+      if (EQ(lp.lower(i), lp.upper(i), deltaBnd()))
+      {
+         fixColumn(lp, i);
+
+         rem[i] = -1;
+         remCols++;
+         remNzos += col.size();
+      }
+      // a lot of this is also done in redundantRows.
+      else if (col.size() == 1)
+      {
+         Real x = col.value(0);
+         int  j = col.index(0);
          
          assert(isNotZero(x));
 
-         if (x > 0)
+         if (x > 0.0)
          {
-            if (lp.upper(k) >= infinity)
-               upcnt++;
-            else
-               upbnd += lp.upper(k) * x;
-            
-            if (lp.lower(k) <= -infinity)
-               locnt++;
-            else
-               lobnd += lp.lower(k) * x;
-         }
-         else if (x < 0)
-         {
-            if (lp.upper(k) >= infinity)
-               locnt++;
-            else
-               lobnd += lp.upper(k) * x;
-            
-            if (lp.lower(k) <= -infinity)
-               upcnt++;
-            else
-               upbnd += lp.lower(k) * x;
-         }
-      }
-      // infeasible ?
-      if ((LT(lp.rhs(i), lobnd) && locnt == 0) || (GT(lp.lhs(i), upbnd) && upcnt == 0))
-         return INFEASIBLE;
-
-      // redundant rhs ?
-      if (lp.rhs(i) <=  infinity && upcnt == 0 && GE(lp.rhs(i), upbnd))
-         lp.changeRhs(i, infinity);
-
-      // redundant lhs ?
-      if (lp.lhs(i) >= -infinity && locnt == 0 && LE(lp.lhs(i), lobnd))
-         lp.changeLhs(i, -infinity);
-
-      // redundant constraint ?
-      if (lp.rhs(i) >= infinity && lp.lhs(i) <= -infinity)
-      {
-         rem[i] = -1;
-         num++;
-         continue;
-      }
-#if 0
-
-      {
-
-            Real              y;
-
-            if (upcnt < 2 || locnt < 2)
+            // max -3 x
+            // s.t. 5 x <= 8
+            // l <= x
+            if (lp.lhs(j) <= -infinity && lp.rhs(j) < infinity && LE(lp.maxObj(i), 0.0, epsZero()) 
+               && lp.lower(i) > -infinity)
             {
-               for( j = 0; j < row.size(); ++j )
-               {
-                  x = row.value(j);
-                  k = row.index(j);
-
-                  if (x > 0.0)
-                  {
-                     if (lp.lhs(i) > -infinity && lp.lower(k) > -infinity && upcnt < 2)
-                     {
-                        y = -infinity;
-                        if (lp.upper(k) < infinity && upcnt < 1)
-                           y = lp.upper(k) + (lp.lhs(i) - up) / x;
-                        else if (lp.upper(k) >= infinity)
-                           y = lp.lhs(i) - up;
-
-                        if (y >= lp.lower(k))
-                        {
-                           lp.changeLower(k, -infinity);
-                           break;
-                        }
-                     }
-                     if (lp.rhs(i) < infinity && lp.upper(k) < infinity && locnt < 2)
-                     {
-                        y = infinity;
-
-                        if (lp.lower(k) > -infinity && locnt < 1)
-                           y = lp.lower(k) + (lp.rhs(i) - lo) / x;
-                        else if (lp.lower(k) <= -infinity)
-                           y = lp.rhs(i) - lo;
-
-                        if (y <= lp.upper(k))
-                        {
-                           lp.changeUpper(k, infinity);
-                           break;
-                        }
-                     }
-                  }
-                  else if (x < 0.0)
-                  {
-                     if (lp.lhs(i) >= -infinity && lp.upper(k) < infinity && upcnt < 2)
-                     {
-                        y = infinity;
-
-                        if (lp.lower(k) > -infinity && upcnt < 1)
-                           y = lp.lower(k) + (lp.lhs(i) - up) / x;
-                        else if (lp.lower(k) <= -infinity)
-                           y = -(lp.lhs(i) - up);
-
-                        if (y <= lp.upper(k))
-                        {
-                           lp.changeUpper(k, infinity);
-                           break;
-                        }
-                     }
-                     if (lp.rhs(i) <= infinity && lp.lower(k) > -infinity
-                        && locnt < 2)
-                     {
-                        y = -infinity;
-
-                        if (lp.upper(k) < infinity && locnt < 1)
-                           y = lp.upper(k) + (lp.rhs(i) - lo) / x;
-                        else if (lp.upper(k) >= infinity)
-                           y = -(lp.rhs(i) - lo);
-
-                        if (y >= lp.lower(k))
-                        {
-                           lp.changeLower(k, -infinity);
-                           break;
-                        }
-                     }
-                  }
-               }
+               lp.changeUpper(i, lp.lower(i));
+               fixColumn(lp, i);
+               rem[i] = -1;
+               remCols++;
+               remNzos++;
+               continue;
+            }
+            // max  3 x
+            // s.t. 5 x >= 8
+            // x <= u
+            if (lp.lhs(j) > -infinity && lp.rhs(j) >= infinity && GE(lp.maxObj(i), 0.0, epsZero()) 
+               && lp.upper(i) < infinity)
+            {
+               lp.changeLower(i, lp.upper(i));
+               fixColumn(lp, i);
+               rem[i] = -1;
+               remCols++;
+               remNzos++;
+               continue;
             }
          }
-#endif
-   }
-   if (num > 0)
-   {
-      lp.removeRows(rem.get_ptr());
-      assert(lp.isConsistent());
+      }
+#if 0 // a lot of this is allready done in redundantRows.
 
-      VERBOSE1({ std::cout << "SPxRedundantSM:\tremoved " << num
-                           << " row(s)" << std::endl; });
+      // Column singleton without objective
+      else if (col.size() == 1 && isZero(lp.maxObj(i), epsilonSimplifier()))
+      {
+         Real x = col.value(0);
+         int  j = col.index(0);
+         
+         Real           up;
+         Real           lo;
+
+
+         if (GT(x, 0.0, epsilonSimplifier()))
+         {
+            if (lp.lower(i) > -infinity)
+               // TODO here should be checked if rhs < infinity
+               up = lp.rhs(j) - lp.lower(i) * x;
+            else
+               up = infinity;
+            
+            if (lp.upper(i) < infinity)
+               lo = lp.lhs(j) - lp.upper(i) * x;
+            else
+               lo = -infinity;
+         }
+         else if (LT(x, 0.0, epsilonSimplifier()))
+         {
+            if (lp.lower(i) > -infinity)
+               lo = lp.lhs(j) - lp.lower(i) * x;
+            else
+               lo = -infinity;
+            
+            if (lp.upper(i) < infinity)
+               up = lp.rhs(j) - lp.upper(i) * x;
+            else
+               up = infinity;
+         }
+         else
+         {
+            up = lp.rhs(j);
+            lo = lp.lhs(j);
+         }
+         
+         if (isZero(lo, epsilonSimplifier()))
+            lo = 0.0;
+         if (isZero(up, epsilonSimplifier()))
+            up = 0.0;
+         
+         lp.changeRange(j, lo, up);
+         rem[i] = -1;
+         num++;
+      }
+#endif // 0
+   }
+   assert(remCols != 0 || remNzos == 0);
+
+   if (remCols > 0)
+   {
+      removeCols(lp, rem, remCols);
+
+      again      = true;
+      m_remCols += remCols;
+      m_remNzos += remNzos;
+
+      VERBOSE2({ std::cout << "IREDSM24 simple col simplifier removed "
+                           << remCols << " cols, "
+                           << remNzos << " nzos"
+                           << std::endl; });
    }
    return OKAY;
 }
 
-SPxSimplifier::Result SPxRedundantSM::simplify(SPxLP& lp)
+void SPxRedundantSM::removeRows(SPxLP& lp, DataArray<int>& rem, int num) 
 {
+   int i;
+
+   assert(rem.size() == lp.nRows());
+
+   lp.removeRows(rem.get_ptr());
+
+   DataArray<int> tmp(m_rperm);
+      
+   for(i = 0; i < rem.size(); ++i)
+      if (rem[i] >= 0)
+         m_rperm[rem[i]] = tmp[i];
+   
+   for(i = lp.nRows(); i < lp.nRows() + num; ++i)
+      m_rperm[i] = -1;
+   
+   assert(lp.isConsistent());
+}
+
+void SPxRedundantSM::removeCols(SPxLP& lp, DataArray<int>& rem, int num) 
+{
+   int i;
+
+   assert(rem.size() == lp.nCols());
+
+   lp.removeCols(rem.get_ptr());
+      
+   DataArray<int> tmp(m_cperm);
+      
+   for(i = 0; i < rem.size(); ++i)
+      if (rem[i] >= 0)
+         m_cperm[rem[i]] = tmp[i];
+   
+   for(i = lp.nCols(); i < lp.nCols() + num; ++i)
+      m_cperm[i] = -1;
+#if 0
+     for(i = 0; i < cperm.size(); ++i)
+      std::cout << i << " -> " << cperm[i] << " " << tmp[i] << " " << rem[i] << "\n";
+#endif
+   assert(lp.isConsistent());
+}
+
+SPxSimplifier::Result SPxRedundantSM::simplify(SPxLP& lp, Real eps, Real delta)
+{
+   METHOD("SPxRedundantSM::simplify()");
+
    Result ret;
+   bool   again;
+   bool   rcagain;
+   bool   rragain;
+   int    i;
+   
+   m_timeUsed.reset();
+   m_timeUsed.start();
 
-   if( (ret = treat_cols(lp)) == OKAY)
-      ret = treat_rows(lp);
+   m_epsilon = eps;
+   m_delta   = delta;
 
-   return ret;
+   m_prim.reDim(lp.nCols());
+   m_dual.reDim(lp.nRows());
+
+   m_cperm.reSize(lp.nCols());
+   m_rperm.reSize(lp.nRows());
+
+   for(i = 0; i < lp.nRows(); ++i)
+      m_rperm[i] = i;
+
+   for(i = 0; i < lp.nCols(); ++i)
+      m_cperm[i] = i;
+
+   //std::cout << lp << std::endl;
+
+   do
+   {
+      again = false;
+ 
+      if( (ret = simpleRows(lp, again)) != OKAY)
+         return ret;
+
+      // std::cout << lp << std::endl;
+
+      if( (ret = simpleCols(lp, again)) != OKAY)
+         return ret;
+
+      //std::cout << lp << std::endl;
+      //abort();
+   }
+   while(again);
+
+   //std::cout << lp << std::endl;
+#if 1
+   if( (ret = redundantCols(lp, rcagain)) != OKAY)
+      return ret;
+
+   if( (ret = redundantRows(lp, rragain)) != OKAY)
+      return ret;
+
+   again = rcagain || rragain;
+
+   // This has to be a loop, otherwise we could end up with
+   // empty rows.
+   while(again)
+   {
+      again = false;
+
+      if( (ret = simpleRows(lp, again)) != OKAY)
+         return ret;
+
+      if( (ret = simpleCols(lp, again)) != OKAY)
+         return ret;
+   }
+#endif
+   VERBOSE1({ std::cout << "IREDSM25 redundant simplifier removed "
+                        << m_remRows << " rows, "
+                        << m_remNzos << " nzos, changed "
+                        << m_chgBnds << " col bounds " 
+                        << m_chgLRhs << " row bounds,"
+                        << std::endl; });
+
+   m_timeUsed.stop();
+
+   return OKAY;
 }
 
 const Vector& SPxRedundantSM::unsimplifiedPrimal(const Vector& x)
 {
-   std::cout << "SPxRedundantSM::unsimplifiedPrimal() not implemented\n";
+   assert(x.dim()                 <= m_cperm.size());
+   assert(x.dim() + m_pval.size() == m_prim.dim());
 
-   abort();
+   int i;
 
-   return x;
+   for(i = 0; i < x.dim(); ++i)
+      m_prim[m_cperm[i]] = x[i];
+
+   assert(m_cperm.size() == x.dim() || m_cperm[i] < 0);
+
+   for(i = 0; i < m_pval.size(); ++i)
+      m_prim[m_pval.index(i)] = m_pval.value(i);
+
+   return m_prim;
 }
 
 const Vector& SPxRedundantSM::unsimplifiedDual(const Vector& pi)
 {
-   std::cout << "SPxRedundantSM::unsimplifiedDual() not implemented\n";
+   std::cout << "SPxRedundantSM::getDual() not implemented\n";
 
    abort();
 

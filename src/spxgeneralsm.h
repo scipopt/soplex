@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeneralsm.h,v 1.12 2003/01/13 14:30:55 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeneralsm.h,v 1.13 2003/01/13 19:04:42 bzfkocht Exp $"
 
 /**@file  spxgeneralsm.h
  * @brief General LP preprocessing.
@@ -25,8 +25,8 @@
 
 #include "spxdefines.h"
 #include "spxintervalsm.h"
-#include "spxaggregatesm.h"
-#include "spxrem1sm.h"
+#include "spxredundantsm.h"
+//#include "spxaggregatesm.h"
 
 namespace soplex
 {
@@ -40,8 +40,8 @@ class SPxGeneralSM : public SPxSimplifier
 {
 private:
    SPxIntervalSM  m_inter;    ///< remove too small values.
-   SPxRem1SM      m_rem1;     ///< remove row/column singletons.
-   SPxAggregateSM m_aggr;     ///< do variable aggregation.
+   SPxRedundantSM m_redun;    ///< remove redundant rows/columns.
+   //   SPxAggregateSM m_aggr;     ///< do variable aggregation.
    Real           m_repth;    ///< repetition threshold.
 
 public:

@@ -13,10 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.h,v 1.12 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.h,v 1.13 2003/01/13 19:04:42 bzfkocht Exp $"
 
 /**@file  spxredundantsm.h
- * @brief Remove redundant row and columns.
+ * @brief Remove singletons from LP.
  */
 #ifndef _SPXREDUNDANTSM_H_
 #define _SPXREDUNDANTSM_H_
@@ -28,34 +28,82 @@
 
 namespace soplex
 {
-/**@brief   Remove redundant row and columns.
+/**@brief   LP simplifier for removing uneccessary row/columns
    @ingroup Algo
 
-   This #SPxSimplifier tries to eliminate redundant rows and columns from
-   its loaded #SPxLP.
- */
+   This #SPxSimplifier removes redundant rows and columns and bounds.
+   For example those who containing one nonzero value only. 
+   Also empty rows and columns are removed.   
+   
+*/
 class SPxRedundantSM : public SPxSimplifier
 {
 private:
-   DVector        prim;   ///< unsimplified primal solution vector.
-   DVector        dual;   ///< unsimplified dual solution vector.
-   DataArray<int> cperm;  ///< column permutation vector.
-   DataArray<int> rperm;  ///< row permutation vector.
+   struct RowHash
+   {
+      int          row;  ///< row no.
+      unsigned int hid;  ///< hash id
+
+      int operator()(const RowHash& rh1, const RowHash& rh2) const
+      {
+         // rh1.hid - rh2.hid is a bas idea, because they are unsigned
+
+         if (rh1.hid < rh2.hid)
+            return -1;
+         if (rh1.hid > rh2.hid)
+            return  1;
+
+         assert(rh1.hid == rh2.hid);
+
+         return rh1.row - rh2.row;
+      }
+   };
 
 private:
-   Result treat_cols(SPxLP& lp);
-   Result treat_rows(SPxLP& lp);
+   DVector        m_prim;       ///< unsimplified primal solution vector.
+   DVector        m_dual;       ///< unsimplified dual solution vector.
+   DataArray<int> m_cperm;      ///< column permutation vector.
+   DataArray<int> m_rperm;      ///< row permutation vector.
+   DSVector       m_pval;       ///< fixed variable values.
+   Real           m_epsilon;    ///< epsilon zero
+   Real           m_delta;      ///< maximum bound violation
+
+private:
+   ///
+   void fixColumn(SPxLP& lp, int i);
+   ///
+   void removeRows(SPxLP& lp, DataArray<int>& rem, int num);
+   ///
+   void removeCols(SPxLP& lp, DataArray<int>& rem, int num);
+   ///
+   Result redundantRows(SPxLP& lp, bool& again);
+   ///
+   Result redundantCols(SPxLP& lp, bool& again);
+   ///
+   Result simpleRows(SPxLP& lp, bool& again);
+   ///
+   Result simpleCols(SPxLP& lp, bool& again);
+   ///
+   Real epsZero() const
+   {
+      return m_epsilon;
+   }
+   ///
+   Real deltaBnd() const
+   {
+      return m_delta;
+   }
 
 public:
-   // default constructor
+   /// default constructor
    SPxRedundantSM() 
-      : SPxSimplifier("Redundant")
+      : SPxSimplifier("Rem1")
    {}   
    /// destructor.
    virtual ~SPxRedundantSM()
    {}  
-   /// Remove redundant rows and columns.
-   virtual Result simplify(SPxLP& lp);
+   /// Remove singletons from the LP.
+   virtual Result simplify(SPxLP& lp, Real eps, Real delta);
    /// returns a reference to the unsimplified primal solution.
    virtual const Vector& unsimplifiedPrimal(const Vector& x);
    /// returns a reference to the unsimplified dual solution. 

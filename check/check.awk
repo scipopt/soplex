@@ -1,4 +1,4 @@
-# $Id: check.awk,v 1.16 2002/04/05 16:12:54 bzfkocht Exp $
+# $Id: check.awk,v 1.17 2003/01/13 19:04:41 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: check.awk                                                     *
@@ -12,20 +12,19 @@ function abs(x)
     return x < 0 ? -x : x;
 }
 BEGIN {
-    print "$Id: check.awk,v 1.16 2002/04/05 16:12:54 bzfkocht Exp $";
+    print "$Id: check.awk,v 1.17 2003/01/13 19:04:41 bzfkocht Exp $";
     print "";
 }
 /=opt=/          { sol[$2] = $3; }
 /=type=/         { type = $2; }
-/loading/        { file = $4; }
-/rows/           { rows = $3; }
-/columns/        { cols = $1; } 
-/solution time/  { time = $4; } 
-/iterations/     { iter = $3; }
-/value/          { obj  = $4; }
-/infeasible/     { infeas = 1; } 
-/unbounded/      { infeas = 1; }
-/time limit/     { timeout = 1; }
+/IEXAMP22/       { file = $5; }
+/IEXAMP24/       { rows = $4; cols = $6; }
+/IEXAMP27/       { time = $5; } 
+/IEXAMP28/       { iter = $4; }
+/IEXAMP29/       { obj  = $5; }
+/IEXAMP31/       { infeas = 1; }
+/IEXAMP32/       { infeas = 1; } 
+/IEXAMP33/       { timeout = 1; }
 /=start=/        {
    type = "";
    for(i = 2; i <= NF; i++)

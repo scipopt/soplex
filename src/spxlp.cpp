@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.cpp,v 1.22 2003/01/10 12:46:14 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.cpp,v 1.23 2003/01/13 19:04:42 bzfkocht Exp $"
 
 #include <stdio.h>
 
@@ -173,12 +173,16 @@ void SPxLP::doAddCol(const LPCol& col)
 void SPxLP::added2Set(SVSet& p_set, const SVSet& p_add, int n)
 {
    METHOD( "SPxLP::added2Set()" );
+
    if( n == 0 )
       return;
 
-   int i, j, end, tot;
-   DataArray < int > moreArray(p_set.num());
-   int* more = moreArray.get_ptr();
+   int i;
+   int j;
+   int end;
+   int tot;
+   DataArray<int> moreArray(p_set.num());
+   int*           more = moreArray.get_ptr();
 
    for (i = p_set.num() - 1; i >= 0; --i)
       more[i] = 0;
