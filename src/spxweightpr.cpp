@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.8 2002/01/04 17:31:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.9 2002/01/04 17:50:14 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -245,7 +245,7 @@ void SPxWeightPR::addedCoVecs(int)
 
 void SPxWeightPR::removedVec(int i)
 {
-   assert(solver());
+   assert(solver() != 0);
 
    if (solver()->rep() == SoPlex::ROW)
    {
@@ -261,7 +261,7 @@ void SPxWeightPR::removedVec(int i)
 
 void SPxWeightPR::removedVecs(const int perm[])
 {
-   assert(solver());
+   assert(solver() != 0);
 
    if (solver()->rep() == SoPlex::ROW)
    {
@@ -287,7 +287,7 @@ void SPxWeightPR::removedVecs(const int perm[])
 
 void SPxWeightPR::removedCoVec(int i)
 {
-   assert(solver());
+   assert(solver() != 0);
 
    if (solver()->rep() == SoPlex::COLUMN)
    {
@@ -303,7 +303,7 @@ void SPxWeightPR::removedCoVec(int i)
 
 void SPxWeightPR::removedCoVecs(const int perm[])
 {
-   assert(solver());
+   assert(solver() != 0);
 
    if (solver()->rep() == SoPlex::COLUMN)
    {
