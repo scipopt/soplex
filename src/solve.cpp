@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: solve.cpp,v 1.23 2003/01/20 19:18:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: solve.cpp,v 1.24 2003/01/20 19:35:09 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -606,19 +606,27 @@ void CLUFactor::solveUleft(Real* p_work, Real* vec)
       int  c  = col.orig[i];
       int  r  = row.orig[i];
       Real x  = vec[c];
-      vec[c]  = 0.0;
 
       assert(fabs(x) < infinity);
+      assert(fabs(vec[c]) < infinity);
+
+      vec[c]  = 0.0;
 
       if (x != 0.0)
       {
+         assert(fabs(diag[r]) < infinity);
+
          x        *= diag[r];
          p_work[r] = x;
+
+         assert(fabs(x) < infinity);
 
          int end = u.row.start[r] + u.row.len[r];
 
          for(int m = u.row.start[r]; m < end; m++)
          {
+            assert(fabs(u.row.val[m]) < infinity);
+            assert(fabs(vec[u.row.idx[m]]) < infinity);
             vec[u.row.idx[m]] -= x * u.row.val[m];
             assert(fabs(vec[u.row.idx[m]]) < infinity);
          }
