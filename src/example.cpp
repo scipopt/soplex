@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.64 2005/01/06 17:12:09 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.65 2005/01/06 18:23:52 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -138,9 +138,9 @@ int main(int argc, const char* const argv[])
    "************************************************************************\n"
    "*                                                                      *\n"
    "*       SoPlex --- the Sequential object-oriented simPlex.             *\n"
-   "*                  Release 1.2.1                                       *\n"
+   "*                  Release 1.2.2                                       *\n"
    "*    Copyright (C) 1997-1999 Roland Wunderling                         *\n"
-   "*                  1997-2002 Konrad-Zuse-Zentrum                       *\n"
+   "*                  1997-2005 Konrad-Zuse-Zentrum                       *\n"
    "*                            fuer Informationstechnik Berlin           *\n"
    "*                                                                      *\n"
    "*  SoPlex is distributed under the terms of the ZIB Academic Licence.  *\n"
@@ -171,10 +171,10 @@ int main(int argc, const char* const argv[])
    " -h        show this help\n"
    "Simplifier:     Scaler:         Starter:     Pricer:        Ratiotester:\n"
    " -s0 none       -g0 none         -c0 none*   -p0 Textbook  -t0 Textbook\n"
-   " -s1 General*   -g1 Bi-Equi*     -c1 Weight  -p1 ParMult   -t1 Harris\n"
-   " -s2 Aggregate  -g2 Uni-Equi     -c2 Sum     -p2 Devex     -t2 Fast*\n"
-   " -s3 Redundant                   -c3 Vector  -p3 Hybrid\n"
-   " -s4 Interval                                -p4 Steep*\n"
+   " -s1 General*   -g1 C-uni-Equi   -c1 Weight  -p1 ParMult   -t1 Harris\n"
+   " -s2 Aggregate  -g2 R-uni-Equi   -c2 Sum     -p2 Devex     -t2 Fast*\n"
+   " -s3 Redundant  -g3 bi-Equi*     -c3 Vector  -p3 Hybrid\n"
+   " -s4 Interval   -g4 bi-Equi+Geom             -p4 Steep*\n"
    "                                             -p5 Weight\n" 
    ;
 
@@ -194,7 +194,7 @@ int main(int argc, const char* const argv[])
    int                       starting       = 0;
    int                       pricing        = 4;
    int                       ratiotest      = 2;
-   int                       scaling        = 1;
+   int                       scaling        = 3;
    int                       simplifing     = 1;
    Real                      timelimit      = -1.0;
    Real                      delta          = DEFAULT_BND_VIOL;
@@ -392,13 +392,21 @@ int main(int argc, const char* const argv[])
 
    switch(scaling)
    {
-   case 2 :
-      prescaler  = new SPxEquiliSC(representation == SPxSolver::COLUMN, false);
-      postscaler = new SPxGeometSC(representation == SPxSolver::COLUMN);
-      break;
-   case 1 :
+   case 4:
       prescaler  = new SPxEquiliSC(representation == SPxSolver::COLUMN, true);
       postscaler = new SPxGeometSC(representation == SPxSolver::COLUMN);
+      break; 
+   case 3 :
+      prescaler  = new SPxEquiliSC(representation == SPxSolver::COLUMN, true);
+      postscaler = 0;
+      break; 
+   case 2 :
+      prescaler  = new SPxEquiliSC(representation == SPxSolver::ROW, false);
+      postscaler = 0;
+      break; 
+   case 1 :
+      prescaler  = new SPxEquiliSC(representation == SPxSolver::COLUMN, false);
+      postscaler = 0;
       break; 
    case 0 : 
       /*FALLTHROUGH*/

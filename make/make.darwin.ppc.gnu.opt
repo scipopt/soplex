@@ -1,0 +1,7 @@
+#--- $Id: make.darwin.ppc.gnu.opt,v 1.1 2005/01/06 18:23:52 bzfkocht Exp $
+CXX	=	g++
+CPPFLAGS=	-Isrc -DWITH_ZLIB -DNDEBUG
+CXXFLAGS=	-O3 -fno-exceptions \
+		-ffast-math -fforce-addr -funroll-loops #-march=
+LDFLAGS	=	-lz -lm
+ARFLAGS	=	crs
