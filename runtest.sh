@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: runtest.sh,v 1.3 2002/01/12 21:49:00 bzfkocht Exp $
+# $Id: runtest.sh,v 1.4 2002/01/12 22:00:46 bzfkocht Exp $
 ARCH=`uname -m | sed -e s/sun../sparc/ -e s/i.86/x86/ -e s/IP../mips/ -e s/9000..../hppa/`
 OSTYPE=`uname -s | tr A-Z a-z`
 case $OSTYPE in
@@ -23,6 +23,7 @@ linux)
    esac
    ;;
 osf1)
+   PATH=$PATH:/client/bin
    cd /optimi/kombadon/bzfkocht/soplex
    gmake COMP=compaq OPT=opt clean 
    gmake COMP=compaq OPT=opt
@@ -40,14 +41,18 @@ sunos)
 #   gmake COMP=gnu    OPT=opt
 #   gmake COMP=gnu    OPT=opt check >/dev/null 2>&1 &
    ;;
-hp-ux)
+hp-ux)   
+   PATH=$PATH:/usr/local/bin:/client/bin
    cd $HOME/soplex
+   cvs update
    gmake COMP=sun    OPT=opt clean 
    gmake COMP=sun    OPT=opt
    gmake COMP=sun    OPT=opt check >/dev/null 2>&1 &
    ;;
 irix)
+   PATH=$PATH:/usr/local/bin:/client/bin
    cd $HOME/soplex
+   cvs update
    gmake COMP=sgi    OPT=std clean 
    gmake COMP=sgi    OPT=std
    gmake COMP=sgi    OPT=std check >/dev/null 2>&1 &
