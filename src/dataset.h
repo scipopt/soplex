@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.19 2002/01/10 13:34:49 bzfpfend Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.20 2002/01/15 16:52:39 bzfkocht Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -80,7 +80,7 @@ namespace soplex
 
    @warning malloc/realloc and memcpy are use to handle the members 
       of the set. If you use #DataSet with something that is not
-      a \ref DataObject "Data Object" you will be in severe trouble.
+      a \ref DataObjects "Data Object" you will be in severe trouble.
 */
 template<class DATA>
 class DataSet

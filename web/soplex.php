@@ -1,8 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
 "http://www.w3.org/TR/REC-html40/loose.dtd">
-<!-- $Id: soplex.php,v 1.1 2002/01/08 22:52:53 bzfkocht Exp $ -->
+<!-- $Id: soplex.php,v 1.2 2002/01/15 16:52:39 bzfkocht Exp $ -->
 <?php
-$counter = "counter/counter.dat";  # the data storage file
+$counter = "cgi/counter.dat";  # the data storage file
 
 if (file_exists($counter)) {
 	$fp = fopen($counter, 'r');
@@ -23,7 +23,7 @@ fclose($fp);
 <meta name="author" content="Thorsten Koch">
 <meta name="description" content="SoPlex Homepage">
 <meta name="keywords" content="SoPlex, Simplex, Solver, LP, Linear Programming, Mathematical Programming, Optimization">
-<meta name="date" content="$Date: 2002/01/08 22:52:53 $">
+<meta name="date" content="$Date: 2002/01/15 16:52:39 $">
 <meta name="robots" content="index|follow">
 <meta http-equiv="content-type" content="text/html;charset=iso-8859-1">
 <title>SoPlex</title> 
@@ -51,8 +51,9 @@ class library</big>
 <h3>News</h3>
 <table>
 <tr>
+ <td><img src="images/newest.gif" alt="New" border=0></td>
  <td>14. Jan 2002</td>
- <td>Version 1.2.0 is released.</td>
+ <td>Version 1.2.0 is released. <a href="notes-120.txt">Release Notes</a></td>
 </tr>
 </table>
 </p>
@@ -61,7 +62,7 @@ class library</big>
 <p>
 SoPlex is an implementation of the revised simplex algorithm.
 It features primal and dual solving routines for linear programs and 
-is implemented as a C++ class library that can easily be used with other 
+is implemented as a C++ class library that can be used with other 
 programs. An example program to solve standalone linear programs 
 given in 
 <a href="http://www6.software.ibm.com/sos/features/featur11.htm">MPS</a>
@@ -97,9 +98,17 @@ You are allowed to retreive SoPlex only for research purpose
 as a member of a <em>noncommercial</em> and <em>academic</em> institution.
 </p>
 <p>
+<b>Any publication for which SoPlex is used must include an
+aknowledgement and a reference to the Ph.D. thesis:
+Roland Wunderling, 
+<em>Paralleler und Objektorientierter Simplex-Algorithmus</em>,
+<a href="http://www.zib.de/PaperWeb/abstracts/TR-96-09">
+ZIB technical report TR 96-09</a>, Berlin 1996</b>
+</p>
+<p>
 If you are not applicable for the academic license, 
 here are some notes on 
-<a href="commercial.txt">commercial licening</a>.
+<a href="commercial.html">commercial licening</a>.
 </p>
 <p>
 <hr noshade>
@@ -107,7 +116,7 @@ here are some notes on
 <p>
 The latest Version is 1.2.0. Register and 
 download the complete source code and documentation
-<a href="register.php">here</a>. 
+<a href="register.html">here</a>. 
 </p>
 <p>
 Here are the 
@@ -123,10 +132,17 @@ send a description together with a data file that shows the
 problem or even better a working fix to 
 <a href="mailto://koch@zib.de">me.</a>
 </p>
+<h3>Mailinglist</h3>
+<p>
+<a href="mailto:soplex@zib.de">soplex@zib.de</a>.
+To subscribe send "subscribe soplex" in the body to 
+<a href="mailto:majordomo@zib.de">majordomo@zib.de</a>.
+</p>
 <h3>Documentation</h3>
 <p>
 You can browse the complete (that means this is all we have) 
-<a href="html/index.html">documentation</a>.
+<a href="html/index.html">documentation</a>. There you will find
+information how to compile, install, use and modify SoPlex.
 </p>
 <hr noshade>
 <h3>Links</h3>
@@ -167,9 +183,10 @@ border="0" width="88" height="36" align="bottom"></a>
 <img src="images/valid-html40.png" alt="Valid HTML 4.0!"
 border="0" height="31" width="88" align="bottom"></a>
 <hr noshade><address><font size=-1>
-Last Update $Date: 2002/01/08 22:52:53 $ by
+Last Update $Date: 2002/01/15 16:52:39 $ by
 <a href="/personal/personal.pl?name=koch">Thorsten Koch</a>
-<br>&copy; 2002 by Thorsten Koch
+<br>&copy; 2002 by Konrad-Zuse-Zentrum für Informationstechnik Berlin (ZIB)<br>
+http://www.zib.de/Optimization/Software/Soplex/soplex.php</a>
 </font>
 </address>
 </body>

@@ -1,0 +1,25 @@
+Notes for SoPlex Release 1.2.0
+
+What's new
+----------
+ - Big code cleanup (no more warnings, mostly ;-) 
+ - All code should now be ANSI C++ (whatever this exactly means) 
+   and should compile on most compilers
+ - No more TCL, lex, yacc and C
+ - New MPS and LPF format loading routines 
+ - Everything is contained in the namespace "soplex"
+ - Extended HTML documentation now generated with doxygen
+ - Extended example (commandline solver) program
+ - Testscripts to run the Netlib up and down
+ 
+
+Remarks
+-------
+We have tested this version heavily, but not against 1.1.
+This means, we know neither if it is slower or faster nor 
+if it is more or less stable then 1.1. 
+
+As you can see if you look at the TODO section of the documentation,
+there are a lot of things left to do. For this reason and because 
+we changed a lot of code we regard this version BETA.
+

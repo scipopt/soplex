@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.h,v 1.11 2002/01/05 19:24:11 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.h,v 1.12 2002/01/15 16:52:39 bzfkocht Exp $"
 
 /**@file  svset.h
  * @brief Set of sparse vectors.
@@ -54,13 +54,13 @@ typedef DataArray < SVector::Element > SVSetBase;
    SVector%s will remain unchanged.
  
    For providing a uniform access to SVector%s in a %set even if others
-   are removed or added, SVSet assigns a \ref Key to each SVector in the
-   %set. Such a \ref Key remains unchanged as long as the corresponding
+   are removed or added, SVSet assigns a #DataKey to each SVector in the
+   %set. Such a #DataKey remains unchanged as long as the corresponding
    SVector is in the SVSet, no matter what other SVector%s are added
    to or removed from the SVSet. Methods are provided for getting the
-   \ref Key to a SVector or its number and vice versa.  Further, each add()
+   #DataKey to a SVector or its number and vice versa.  Further, each add()
    method for enlarging an SVSet is provided with two signatures. One
-   of them returns the \ref Key%s assigned to the SVector%s added to the
+   of them returns the #DataKey%s assigned to the SVector%s added to the
    SVSet.
 */
 class SVSet : protected SVSetBase

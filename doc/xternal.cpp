@@ -22,15 +22,11 @@
 
    - \ref RUN      "Where does it run"
 
-   - \ref DOWNLOAD "Download"
-
    - \ref INST     "Installation"
 
    - \ref FAQ      "Frequently asked questions"
 
    - \ref PROG     "Programming with SoPlex"
-
-   - \ref License  "ZIB Academic License"
 */
 //-----------------------------------------------------------------------------
 /**@namespace soplex
@@ -114,7 +110,82 @@
    Compilers had internal erros, crashed or generated invalid code:
    KAI, Gnu, Compaq, HP, Intel (The others were only seldom used). 
 
-   Remeber, your milage may vary.
+   Remember, your milage may vary.
+ */
+//-----------------------------------------------------------------------------
+/**@page INST Installation
+ 
+ \section Prequisites Prequisites 
+ You need the following programs to compile SoPlex:
+
+  - C++ compiler (e.g. http://www.gnu.org/software/gcc)
+  - gnu make http://www.gnu.org/software/make/make.html
+  - doxygen http://www.doxygen.org (if you want to generate the documentation)
+
+ After receiving SoPlex you have to uncompress it 
+ (http://www.gnu.org/software/gzip) and 
+ unpack it with and unpacked it (http://www.gnu.org/software/tar)
+ into a directory. Then change to that directory.
+
+ \section Tested Linux/x86, Linux/AXP, Tru64, Solaris, IRIX, HP-UX
+ If you are working under one those OSes you should try the following:
+ 
+ \c gmake \c COMP=xxx \c OPT=yyy
+
+ with \c xxx being one of \c gnu, \c intel, \c sun, \c hp, \c sgi or \c compaq
+ and \c yyy one of \c dbg (if you want the debug version) or \c opt 
+ (if you want the optimized version).
+
+ This should generate a binary in the \c bin subdirectory. 
+
+ \section Others If the previous section was not for you
+ At first the Makefile tries to find out the OS and the 
+ architecture by using the \c uname command. 
+ If your OS or architecture is missing, please update the 
+ Makefile and submit the change to me.
+
+ Then a submakefile from \c make/make.OS.ARCH.COMP.OPT is included in
+ the main Makefile. You should adapt the compiler flags as needed.
+ Be especially carefull with the \c AR setting since some C++ compilers do
+ not like using the standard \c ar program together with code that uses
+ templates.
+
+ If this all does not work, change to the \c src directory and type
+
+ \c CC \c *.cpp 
+
+ This should to the trick. Adding \c -DNDEBUG gives you a non debugging 
+ version. Add flags as needed. 
+
+ \section Testing Testing the Binary
+ After you compiled the binary you could say 
+
+ \c gmake \c COMP=xxx \c OPT=dbg \c quick
+
+ \c gmake \c COMP=xxx \c OPT=opt \c quick
+
+ \c gmake \c COMP=xxx \c OPT=opt \c check
+
+ Use the check target together with \c OPT=dbg only if you have really 
+ a lot of time. \c quick should run in a few minutes and \c check will 
+ need between less than one hour and a day depending on your machine.
+
+ \c quick should report no fails at all. \c check should report no fails in the
+ \c LC and \c EC columns and in the \c LR and \c ER columns only with 
+ the instances greenbea, greenbeb, pilot-ja or pilot87. 
+ One or two fails is normal, above four is probably a problem with the 
+ compiler. Try again with less optimization.
+
+ \section Documentation  Generating the documentation
+ If you have \c doygen (and \c dot) installed, you just can say 
+
+ \c gmake \c doc
+
+ After that the documentation should be in doc/html.
+
+ \section Installation Installation
+ The binary is in the \c bin directory, the library in \c lib and all
+ headers are in \c src. Feel free to install at a suitable place.
  */
 //-----------------------------------------------------------------------------
 /**@page FAQ Frequently Asked Questions
@@ -153,27 +224,13 @@
 
    <li> Is there a Windows version ?
 
-      The code is tested to compile under some version of Visual C.
+      The code is tested to compile under some version of Visual C++.
       We do \b not provide any make or project files for VC++.
-
-   <li> What is the academic license ?
-
-      Essentially, you can do what you want, except: Give SoPlex to 
-      anybody else. Do anything with SoPlex that makes money (this 
-      includes saving your money on any commercial activity).
-      See the license for details http://pengpuffblub.html
-
-   <li> What is the commercial license ?
-  
-      If you want to make or save money with SoPlex you need one. 
-      We give the license,
-      you pay for it. The amount is completely negotiable depending on
-      what you want to do with SoPlex, which rights you want and what
-      you are willing to tell us.
 
    <li> I want a primal and a dual simplex, where are they ?
 
-      That is quite easy. You can set ENTERing and LEAVEing algorithm and
+      That is nearly easy. You can set SoPlex to use the  
+      ENTERing and LEAVEing algorithm and
       COLUMN and ROW representation.
 
       <TABLE>
@@ -187,16 +244,28 @@
       In ROW oriented representation, we have in principle the
       explicit dual and then the algorithms reverse.
 
+      The only problem is that SoPlex is a composite simplex algorithm.
+      That means it switches between entering and leaving algorithm
+      as it needs. So all you can choose is which algorithm is used first,
+      but then an arbitrary number of switches may occur. (Even so, often
+      no switch at all happens.)
+
    <li> SoPlex means \em Sequential Simplex. Is there a parallel version
         available? 
  
-        No. There was done research in this direction. You can find most of 
-        the results in http://www.zib.de/PaperWeb/abstracts/TR-96-09 and 
-        http://www.zib.de/PaperWeb/abstracts/SC-95-45 .
+      No. There was done research in this direction. You can find most of 
+      the results in http://www.zib.de/PaperWeb/abstracts/TR-96-09 and 
+      http://www.zib.de/PaperWeb/abstracts/SC-95-45 .
 
    <li> Is there a wrapper class/library to use SoPlex instead of CPLEX ? 
 
-        No. 
+      No. 
+
+   <li> Is there an interface for COIN ?
+
+      Yes, have a look at 
+      http://oss.software.ibm.com/developerworks/opensource/coin/COIN
+
    </ol>
 */           
 //-----------------------------------------------------------------------------
@@ -316,117 +385,6 @@
    #theLRbound, #theUCbound, #theLCbound.) 
 */
 //-----------------------------------------------------------------------------
-/**@page License ZIB ACADEMIC LICENSE
-
-This license for ZIB software is designed to guarantee freedom to share and 
-change software for academic use, but restricting commercial firms
-from exploiting your knowhow for their benefit. The precise terms and 
-conditions for using, copying, distribution, and modification follow. 
-
-Terms and Conditions for Using, Copying, Distribution, and Modification
-
-The "Program" below refers to source, object and executable code, and a 
-"work based on the Program" means either the Program or any
-derivative work under copyright law: that is a work containing the Program 
-or a portion of it, either verbatim or with modifications and/or translated
-into another language. Each licensee is addressed as "you". 
-
-<ol>
-<li> This license applies to you only if you are a member of a noncommercial 
-     and academic institution, e.g., a university. The license expires as
-     soon as you are no longer a member of this institution. 
-<li> Every publication and presentation for which work based on the Program 
-     or its output has been used must contain an appropriate citation
-     and aknowledgement of the author(s) of the Program. 
-<li> You may copy and distribute the Program or work based on the Program 
-     in source, object, or executable form provided that you also meet
-     all of the following conditions: 
-
- <ol>
- <li> You must cause any work that you distribute or publish, that in whole 
-      or in part contains or is derived from the Program or any
-      part thereof, to be licensed as a whole at no charge under the terms of
-      this License. You must accompany it with this unmodified license text. 
-
-      These requirements apply to the Program or work based on the Program 
-      as a whole. If identifiable sections of that work are
-      not derived from the Program, and can be reasonably considered 
-      independent and separate works in themselves, this License
-      does not apply to those sections when you distribute them as 
-      separate works. But when you distribute the same sections as
-      part of a whole which is a work based on the Program, the distribution 
-      of the whole must be on the terms of this License,
-      whose permissions for other licensees extend to the entire whole and, 
-      thus, to each and every part regardless of who wrote it. 
-
- <li> You must cause the modified files to carry prominent notices stating 
-      that you changed the files and the date of any change. 
- <li> You must keep track of access to the Program (e.g., similar to the 
-      registration procedure at ZIB). 
- <li> You must accompany it with the complete corresponding machine-readable 
-      source code. 
-
-      The source code for a work means the preferred form of the work for 
-      making modifications to it. For an executable work,
-      complete source code means all the source code for all modules it 
-      contains, plus any associated interface definition files, plus
-      the scripts used to control compilation and installation of the 
-      executable. However, as a special exception, the source code
-      distributed need not include anything that is normally distributed 
-      (in either source or binary form) with the major components
-      (compiler, kernel, and so on) of the operating system on which the 
-      executable runs, unless that component itself accompanies 
-      the executable. 
- </ol>
-
-<li> You may not copy, modify, sublicense, or distribute the Program except as 
-     expressly provided under this License. Any attempt otherwise to
-     copy, modify, sublicense, or distribute the Program is void and will 
-     automatically terminate your rights under this License. However, parties
-     who have received copies or rights from you under this License will 
-     not have their licenses terminated so long as such parties remain in full
-     compliance. 
-<li> You are not required to accept this License, since you have not signed 
-     it. However, nothing else grants you permission to use, modify, or
-     distribute the Program or its derivative works. These actions are 
-     prohibited by law if you do not accept this License. Therefore, by using,
-     modifying or distributing the Program (or any work based on the Program), 
-     you indicate your acceptance of this License to do so and all its
-     terms and conditions for copying, distributing or modifying the Program 
-     or works based on it. 
-<li> Each time you redistribute the Program (or any work based on the Program),
-     the recipient automatically receives a license from the original
-     licensor to copy, distribute or modify the Program subject to these terms 
-     and conditions. You may not impose any further restrictions on the
-     recipient's exercise of the rights granted herein. You are not 
-     responsible for enforcing compliance by third parties to this License. 
-<li> If, as a consequence of a court judgment or allegation of patent 
-     infringement or for any other reason (not limited to patent issues), 
-     conditions are imposed on you (whether by court order, agreement, or 
-     otherwise) that contradict the conditions of this License, they do not 
-     excuse you from the conditions of this License. 
-<li> If you wish to incorporate parts of the Program into other programs whose 
-     distribution conditions are different, write to ZIB to ask for 
-     permission. 
-
-<li> Because the program is licensed free of charge, there is no warranty for 
-     the program to the extent permitted by applicable law. The
-     copyright holders provide the program "as is" without warranty of any 
-     kind, either expressed or implied, including, but not limited to, the
-     implied warranties of merchantability and fitness for a particular 
-     purpose. The entire risk as to the quality and performance of the 
-     program is with you. Should the program prove defective, you assume the 
-     cost of all necessary servicing, repair, or correction. 
-<li> In no event will any copyright holder, or any other party who may modify 
-     and/or redistribute the program as permitted above, be liable to
-     you for damages, including any general, special, incidental or 
-     consequential damages arising out of the use or inability to use the 
-     program (including but not limited to loss of data or data being rendered 
-     inaccurate or losses sustained by you or third parties or a failure of the
-     program to operate with any other programs), even if such holder or other 
-     party has been advised of the possibility of such damages. 
-</ol>
-*/
 
 
 

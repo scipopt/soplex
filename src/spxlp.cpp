@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.cpp,v 1.9 2001/12/28 14:55:13 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.cpp,v 1.10 2002/01/15 16:52:39 bzfkocht Exp $"
 
 #include <stdio.h>
 
@@ -438,7 +438,7 @@ void SPxLP::removeRows(int nums[], int n, int perm[])
    removeRows(perm);
 }
 
-void SPxLP::removeRowRange(int start, int end, int* perm)
+void SPxLP::removeRowRange(int start, int end, int perm[])
 {
    if (perm == 0)
    {
@@ -489,7 +489,7 @@ void SPxLP::removeCols(int nums[], int n, int perm[])
    removeCols(perm);
 }
 
-void SPxLP::removeColRange(int start, int end, int* perm)
+void SPxLP::removeColRange(int start, int end, int perm[])
 {
    if (perm == 0)
    {
