@@ -1,4 +1,4 @@
-# $Id: check.awk,v 1.14 2002/02/20 16:30:35 bzfkocht Exp $
+# $Id: check.awk,v 1.15 2002/02/21 12:53:49 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: check.awk                                                     *
@@ -12,7 +12,7 @@ function abs(x)
     return x < 0 ? -x : x;
 }
 BEGIN {
-    print "$Id: check.awk,v 1.14 2002/02/20 16:30:35 bzfkocht Exp $";
+    print "$Id: check.awk,v 1.15 2002/02/21 12:53:49 bzfkocht Exp $";
     print "";
 }
 /=opt=/          { sol[$2] = $3; }
@@ -64,12 +64,12 @@ BEGIN {
             {
                 abserr = abs(sol[name] - obj);
 
-                if (sol[name] != 0.0)
+                if (abs(sol[name]) >= 1e-5)
                     relerr = abserr / abs(sol[name]) * 1000.0
                 else
                     relerr = 0.0;
 
-    	        if ((abserr < 1e-6) || (relerr < 0.01))
+    	        if ((abserr < 1e-5) || (relerr < 0.01))
 		{
 		   printf("ok\n");
 		   pass[type]++;
