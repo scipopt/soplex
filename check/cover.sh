@@ -1,4 +1,4 @@
-# $Id: cover.sh,v 1.3 2001/11/08 08:47:18 bzfkocht Exp $
+# $Id: cover.sh,v 1.4 2001/11/12 08:12:47 bzfkocht Exp $
 BINNAME=`basename $2`
 TSTNAME=`basename $1 .test`
 OUTFILE=cover.$TSTNAME.$BINNAME.out
@@ -10,7 +10,7 @@ for i in `cat $1`
 do
     for algo in "" "-e" "-r" "-i" "-e -r" "-e -i" "-i -r" "-e -i -r" 
     do
-	for starter in "-c0" "-c1" "-c2" " 
+	for starter in "-c0" "-c1" "-c2"  
 	do
 	    for simpl in "-s0" "-s1" "-s2" "-s3" "-s4" "-s5"
 	    do
