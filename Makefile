@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.54 2005/01/06 18:23:52 bzfkocht Exp $
+# $Id: Makefile,v 1.55 2005/02/10 10:44:54 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -35,12 +35,15 @@ LINT		=	flexelint
 AR		=	ar
 RANLIB		=	ranlib
 DOXY		=	doxygen
+VALGRIND	=	valgrind
 
 CPPFLAGS	=	-Isrc
 CXXFLAGS	=	-O
 LDFLAGS		=	-lm
 ARFLAGS		=	cr
 DFLAGS		=	-MM
+VFLAGS		=	--tool=memcheck --leak-check=yes \
+			--show-reachable=yes 
 
 SRCDIR		=	src
 BINDIR		=	bin
@@ -118,6 +121,11 @@ lib:		$(LIBRARY)
 
 check:		
 		cd check; ./check.sh $(TEST).test ../$(BINARY) '$(ALGO)' $(LIMIT)
+
+valgrind:
+		cd check; \
+		./check.sh $(TEST).test "$(VALGRIND) $(VFLAGS) \
+		../$(BINARY)" '$(ALGO)' $(LIMIT)
 
 clean:
 		-rm -rf $(OBJDIR)/* $(LIBRARY) $(BINARY)

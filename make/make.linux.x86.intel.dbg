@@ -1,6 +1,8 @@
-#--- $Id: make.linux.x86.intel.dbg,v 1.7 2003/01/16 09:17:33 bzfkocht Exp $
+#--- $Id: make.linux.x86.intel.dbg,v 1.8 2005/02/10 10:44:59 bzfkocht Exp $
 CXX	=	icc
 CPPFLAGS=	-Isrc -DWITH_ZLIB
-CXXFLAGS=	-g -mp -Xc -w2 -wd279,383,444,810,981 -par_report0 -vec_report0 
+CXXFLAGS=	-g -ansi -cxxlib-icc -fp_port -fpstkchk -mp -w2 \
+		-wd279,383,444,810,981,1572 -par_report0 -vec_report0 
 LDFLAGS	=	-lz -lm
 ARFLAGS	=	crs
+RANLIB	=	true

@@ -24,4 +24,4 @@
 =opt= lp_26		7.8676477169e+06  # cplex nicht opt
 =opt= lp_33		0.15879367275e7
 =opt= witten03		0.39536990859059966756122808315965e7
-
+=opt= vanished		3.0e1
