@@ -23,3 +23,32 @@ As you can see if you look at the TODO section of the documentation,
 there are a lot of things left to do. For this reason and because 
 we changed a lot of code we regard this version BETA.
 
+
+Performance Baseline
+--------------------
+Here are some timing/error results for the check target. 
+These are not verified and should only be considered a hint what to expect.
+All runs where with the OPT=opt version, everything on default, times
+in the LC/EC column are in seconds.
+-------------------------------------------------------------------------------
+CPU          OS      COMP           LC   EC Fails 
+-------------------------------------------------------------------------------
+P4/1.7       Linux   GNU 2.95.3    594  550 greenbea(ER)
+AMD XP1800+  Linux   GNU 3.03      643  624 greenbea(ER),pilot(ER)
+AMD 1000     Linux   Intel 5.0.1   937  913 greenbea(ER)
+EV67/833/4   Linux   Compaq 6.3    543  507 greenbea(ER),greenbeb(LR) 
+EV67/833/4   Linux   GNU 2.96      570  652 greenbea(LR),pilot-ja(LR) 
+EV67/750/8   Tru64   Compaq 6.4    523  510 greenbeb(ER),pilot87(ER),pilot(LR)
+EV67/750/8   Tru64   GNU 2.95.2    547  629 greenbea(LR),pilot-ja(LR)
+PA8600/550/1 HP-UX   HP A.03.27    756  891 greenbea(LR),pilot-ja(LR)
+US-IIi/300   Solaris SUN 6U2 5.3  2495 2499 greenbea(ER),greenbeb(ER)
+R5000/180    IRIX    SGI 7.3.1.1  6224 7024 greenbea(LR),pilot-ja(LR)
+-------------------------------------------------------------------------------
+The fails on pilot where only regarding accuracy, probably the result
+is within the selected delta (1e-6) per variable, but accumulates. 
+
+
+
+
+
+
