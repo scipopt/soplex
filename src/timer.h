@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: timer.h,v 1.6 2001/11/26 15:38:29 bzfbleya Exp $"
+#pragma ident "@(#) $Id: timer.h,v 1.7 2001/12/13 21:53:01 bzfkocht Exp $"
 
 /**@file  timer.h
  * @brief Timer class.
@@ -22,36 +22,30 @@
 #ifndef _TIMER_H_
 #define _TIMER_H_
 
-/* import system include files */
-
-/* import user include files */
-#include "ctimer.h"
-
-/* import system include files */
-
 namespace soplex
 {
-   /**@name    Timer
-      @ingroup Elementary
+/**@name    Timer
+   @ingroup Elementary
 
-    In C or C++ programs, the usual way to measure time intervalls, e.g.
-    running times of some complex computations, is to call one of the provided
-    system functions like %clock(), %time(), %times(), %gettimeofday(), %getrusage() etc.  
-    By these functions one can gather
-    information about the process' user and system time and the system clock
-    (real time).
+    In C or C++ programs, the usual way to measure time intervalls,
+    e.g.  running times of some complex computations, is to call one
+    of the provided system functions like %clock(), %time(), %times(),
+    %gettimeofday(), %getrusage() etc.  By these functions one can
+    gather information about the process' user and system time and the
+    system clock (real time).
  
-    Unfortunately, these functions are rather clumsy.  The programmer determines
-    computation times by querying a (virtual) clock value at the beginning and
-    another one at the end of some computation and converting the difference of
-    these values into seconds.  Some functions impose some restrictions, for
-    instance, the values of the ANSI C function %clock() are of high
-    resolution but will wrap around after about 36 minutes (cpu time).  Most
-    timing functions take some data structure as argument that has to be
-    allocated before the call and from which the user has to pick up the
-    information of interest after the call.  Problems can arise, when porting
-    programs to other operating systems that do not support standards like POSIX
-    etc.
+    Unfortunately, these functions are rather clumsy.  The programmer
+    determines computation times by querying a (virtual) clock value
+    at the beginning and another one at the end of some computation
+    and converting the difference of these values into seconds.  Some
+    functions impose some restrictions, for instance, the values of
+    the ANSI C function %clock() are of high resolution but will wrap
+    around after about 36 minutes (cpu time).  Most timing functions
+    take some data structure as argument that has to be allocated
+    before the call and from which the user has to pick up the
+    information of interest after the call.  Problems can arise, when
+    porting programs to other operating systems that do not support
+    standards like POSIX etc.
  
     In order to simplify measuring computation times and to hide the
     system-dependencies involved, a concept of \em timers accounting the
@@ -90,26 +84,62 @@ namespace soplex
     is resolved by the underlying system function: res = 1/Timer_resolution().
 
 
-    The process' user and system times are accessed by calling function %times(),
-    which is declared in \c <sys/times.h>.  If OS supports POSIX
-    compatibility through providing \c <sys/unistd.h>, set
-    \c -DHAVE_UNISTD_H when compiling \c timer.c.  Ignore compiler
+    The process' user and system times are accessed by calling
+    function %times(), which is declared in \c <sys/times.h>.  If OS
+    supports POSIX compatibility through providing \c <sys/unistd.h>,
+    set \c -DHAVE_UNISTD_H when compiling \c timer.c.  Ignore compiler
     warnings about missing prototypes of functions.
-
-    @todo  AB: remove ctimer.h, make Timer platform independent.
- */
+*/
 class Timer
 {
-public:
+private:
+   static const long ticks_per_sec;  ///< ticks per secound, should be constant
 
+   enum  
+   {
+      RESET,                   ///< reset
+      STOPPED,                 ///< stopped
+      RUNNING                  ///< running
+   } status;                   ///< timer status
+
+   long         uAccount;      ///< user time
+   long         sAccount;      ///< system time
+   long         rAccount;      ///< real time
+   mutable long uTicks;        ///< user ticks 
+   mutable long sTicks;        ///< system ticks
+   mutable long rTicks;        ///< real ticks 
+
+   /// convert ticks to secounds.
+   double ticks2sec(long ticks) const
+   {
+      return (double(ticks) * 1000.0 / ticks_per_sec) / 1000.0;
+   }
+
+   /// get actual user, system and real ticks from the system.
+   void updateTicks() const;
+ 
+public:
+   /// default constructor
+   Timer() : status(RESET), uAccount(0), sAccount(0), rAccount(0)
+   {
+      assert(ticks_per_sec > 0);
+   }
    /// initialize timer, set timing accounts to zero.
-   void reset();
+   void reset()
+   {
+      status   = RESET;
+      uAccount = rAccount = sAccount = 0;
+   }
 
    /// start timer, resume accounting user, system and real time.
    void start();
 
    /// stop timer, return accounted user time.
    double stop();
+
+   /// get accounted user, system or real time.
+   void getTimes(
+      double* userTime, double* systemTime, double* realTime) const;
 
    /// return accounted user time.
    double userTime() const;
@@ -120,90 +150,9 @@ public:
    /// return accounted real time.
    double realTime() const;
 
-   /// get accounted user, system or real time.
-   void getTimes(double *userTime = 0,
-                 double *systemTime = 0,
-                 double *realTime = 0) const;
-
    /// return resolution of timer as 1/seconds.
-   static long resolution();
-
-   // Constructors and Destructor:
-
-   ///
-   Timer();
-
-protected:
-   // relay on C implementation of timer
-   Timer_t timer;
+   long resolution() const { return ticks_per_sec; }
 };
-
-
-// initialize timer, set time accounts to zero
-inline void Timer::reset()
-{
-   Timer_reset(&timer);
-}
-
-
-// start timer, resume accounting user, system and real time
-inline void Timer::start()
-{
-   Timer_start(&timer);
-}
-
-
-// stop timer, return accounted user time
-inline double Timer::stop()
-{
-   return Timer_stop(&timer);
-}
-
-
-// return accounted user time
-inline double Timer::userTime() const
-{
-   return Timer_userTime(&timer);
-}
-
-
-// return accounted system time
-inline double Timer::systemTime() const
-{
-   return Timer_systemTime(&timer);
-}
-
-
-// return accounted real time
-inline double Timer::realTime() const
-{
-   return Timer_realTime(&timer);
-}
-
-
-// get accounted user, system or real time
-inline void Timer::getTimes(double *puserTime,
-                            double *psystemTime,
-                            double *prealTime) const
-{
-   Timer_getTimes(&timer, puserTime, psystemTime, prealTime);
-}
-
-
-// return resolution of timer as 1/seconds
-inline long Timer::resolution()
-{
-   return Timer_resolution();
-}
-
-
-// default constructor (initializing timer)
-inline Timer::Timer()
-{
-   Timer_reset(&timer);
-}
-
-
 } // namespace soplex
 #endif // _TIMER_H_
 
@@ -215,3 +164,8 @@ inline Timer::Timer()
 //Emacs indent-tabs-mode:nil
 //Emacs End:
 //-----------------------------------------------------------------------------
+
+
+
+
+
