@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.12 2001/11/30 13:45:07 bzfkocht Exp $
+# $Id: Makefile,v 1.13 2001/12/03 15:07:13 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -11,7 +11,7 @@
 .PHONY:		depend clean lint doc check quick cover
 
 ARCH            :=      $(shell uname -m | \
-                        sed -e s/sun../sparc/ -e s/i.86/x86/)
+                        sed -e s/sun../sparc/ -e s/i.86/x86/ -e s/IP../mips/)
 OSTYPE		:=	$(shell uname -s | tr A-Z a-z)
 
 OPT		=	dbg
@@ -26,6 +26,7 @@ DOXY		=	doxygen
 
 CPPFLAGS	=	-Isrc
 CXXFLAGS	=	-O
+LDFLAGS		=	-lm
 ARFLAGS		=	cr
 DFLAGS		=	-MM
 

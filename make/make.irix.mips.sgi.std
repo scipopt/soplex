@@ -1,0 +1,5 @@
+#--- $Id: make.irix.mips.sgi.std,v 1.1 2001/12/03 15:07:19 bzfkocht Exp $
+CXX	=	CC
+CXXFLAGS=	-O2 -DNDEBUG
+AR	=	CC
+ARFLAGS	=	-ar
