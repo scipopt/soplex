@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.29 2002/05/15 13:38:44 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.30 2002/07/02 14:45:45 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -660,6 +660,9 @@ bool SPxLP::readLPF(
             while(isSpace(*pos))
                pos++;
             break;
+         case START :
+            std::cerr << "This seems to be no LP format file" << std::endl;
+            goto syntax_error;
          default :
             abort();
          }
