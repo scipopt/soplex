@@ -1,0 +1,114 @@
+// $Id: soplex.lnt,v 1.1 2001/12/28 16:24:18 bzfkocht Exp $
+-passes(1)
++cpp(.h,.cpp)
+// esoteric size settings to find erros.
+-si4    // int's are 4 bytes
+-sl6    // long's are 6 bytes
+-sp8    // ptr's are 8 bytes
+
+-fdc       // do not Distinguish plain Char as a unique type.
+           // i.e. char is either signed char or unsigned char
+           
+            // while processing library headers
+-wlib(1)    // sets the warning level within library headers to 1
+            // (no warnings, just syntax errors).  Comment out if you
+            // are actually linting library headers.  This
+            // option makes obsolete options of the form -elib(axxx) where
+            // xxx >= 400 which may be retained for historical reasons.
+
+-i./lint/posix
+-i./lint/cpp
+
+//  The following functions exhibit variable return modes.
+//  That is, they may equally-usefully be called for a value
+//  as called just for their effects.  Accordingly we inhibit
+//  Warning 534 for these functions.
+//  Feel free to add to or subtract from this list.
+
+-esym(534,close,creat,fclose,fprintf,fputc)
+-esym(534,fputs,fscanf,fseek,fwrite,lseek,memcpy,memmove,memset)
+-esym(534,printf,puts,scanf,sprintf,sscanf,strcat,strcpy)
+-esym(534,strncat,strncpy,unlink,write)
+
+-function(exit,__assertfail)
+
+-e506 // Constant value Boolean
+-e534 // Ignoring return value of function
+-e537 // Repeated include file
+-e737 // Loss of sign in promotion from int to unsigned int
+-e713 // loss of precision
+-e788 // enum constant not used within defaulted switch
+-e801 // keine Warnungen wegen goto
+-e834 // Operator followed by operator ist confusing -- unsinn
+-e1511 // Member hides non-virtual member
+-e1550 // exception thrown by function is not on throw-list of function
+-e1551 // Function may throw exception in destructor
+
+-esym(1704,Vector::Vector) // Vector has no (private) default constructor
+-esym(1526,Vector::Vector) // correctly not implemented
+-esym(1510,Vector) // Vector has no destructor, this is ok
+-esym(1509,DVector) // base class destructor for class 'DVector' is not virtual
+
+// timer.h
+-esym(1401,Timer::uTicks) // no need to be initialised
+-esym(1401,Timer::sTicks) // no need to be initialised
+-esym(1401,Timer::rTicks) // no need to be initialised
+
+// datakey.h
+-esym(1529,DataKey::operator=) // no need to check
+-esym(1539,DataKey::info) // is assigned
+-esym(1539,DataKey::idx)  // is assigned
+
+// didxset.h 
+-esym(1526,DIdxSet::operator=)   // correctly not implemented
+-esym(1526,DIdxSet::DIdxSet)     // correctly not implemented
+
+// cflufactor.h
+-esym(1401,CLUFactor::*)         // no initialisation
+-esym(1526,Pring::operator=)     // correctly not implemented
+-esym(1526,Pring::Pring)         // correctly not implemented
+-esym(1526,Temp::operator=)      // correctly not implemented
+-esym(1526,Temp::Temp)           // correctly not implemented
+-esym(1526,CLUFactor::operator=) // correctly not implemented
+-esym(1526,CLUFactor::CLUFactor) // correctly not implemented
+
+// slufactor.h
+-esym(1526,SLUFactor::operator=) // correctly not implemented
+-esym(1526,SLUFactor::SLUFactor) // correctly not implemented
+
+// soplex.h
+-esym(1526,SoPlex::operator=)    // correctly not implemented
+-esym(1526,SoPlex::SoPlex)       // correctly not implemented
+
+// spxlpfread.cpp
+-esym(429,colnames);
+-esym(429,rownames);
+
+// spxlp.h
+-esym(219, Id::operator=) // no need to check.
+
+// spxbasis.h
+-esym(1540, SPxBasis::factor) // no need to free.
+
+// spxhybridpr.h
+-esym(1540, SPxHybridPR::thepricer) // no need to free.
+-esym(1540, SPxHybridPR::thesolver) // no need to free.
+
+// factor.cpp
+-esym(666,isZero)
+
+// Temporary
+-w2    // Only warnings and Errors
+-e1509 // base class destructor for class is not virtual
+-e1510 // base class has no destructor
+-e641  // Converting enum to int
+-e656  // Arithmetic operation uses (compatible) enum's
+-e655  // bit-wise operation uses (compatible) enum's
+-e1411 // Member with different signature hides virtual member 
+-e514  // Unusual use of a Boolean
+-e1401 // Member not initialized by constructor
+-e1541 // Member possibly not initialized by constructor
+-e1539 // member not assigned by assignment operator
+-e1516 // Data member hides inherited member 
+-e613  // Possible use of null pointer in left argument to operator '->'
+-e679  // Suspicious Truncation in arithmetic expression combining with pointer

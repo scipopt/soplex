@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.20 2001/12/28 14:55:11 bzfkocht Exp $
+# $Id: Makefile,v 1.21 2001/12/28 16:24:18 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -8,7 +8,7 @@
 #*                                                                           *
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-.PHONY:		depend clean lint doc check quick cover
+.PHONY:		depend clean distclean lint doc check quick cover
 
 ARCH            :=      $(shell uname -m | \
                         sed -e s/sun../sparc/ -e s/i.86/x86/ -e s/IP../mips/)
@@ -95,7 +95,7 @@ $(LIBRARY):	$(LIBDIR) $(LIBXXX)
 		$(RANLIB) $@
 
 lint:		$(OBJSRC) $(LIBSRC)
-		$(LINT) soplex.lnt -os\(lint.out\) \
+		$(LINT) lint/soplex.lnt -os\(lint.out\) \
 		$(CPPFLAGS) -UNDEBUG $^
 
 doc:		
@@ -112,6 +112,9 @@ cover:
 
 clean:
 		-rm -rf $(OBJDIR)/* $(LIBRARY) $(BINARY)
+
+distclean:
+		-rm -rf obj/* lib/libsoplex.* bin/soplex.* 
 
 $(OBJDIR):	
 		-mkdir -p $(OBJDIR)
