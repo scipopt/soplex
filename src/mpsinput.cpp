@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: mpsinput.cpp,v 1.1 2002/01/05 19:25:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: mpsinput.cpp,v 1.2 2002/01/22 10:17:49 bzfkocht Exp $"
 
 /**@file  mpsinput.cpp
  * @brief Read MPS format files.
@@ -159,7 +159,7 @@ bool MPSInput::readLine()
             break;      
          }
          if (is_marker)
-            if (!strcmp(m_f3, "'INTBEG'"))
+            if (!strcmp(m_f3, "'INTORG'"))
                m_is_integer = true;
             else if (!strcmp(m_f3, "'INTEND'"))
                m_is_integer = false;
@@ -175,7 +175,7 @@ bool MPSInput::readLine()
             break;      
          }
          if (is_marker)
-            if (!strcmp(m_f4, "'INTBEG'"))
+            if (!strcmp(m_f4, "'INTORG'"))
                m_is_integer = true;
             else if (!strcmp(m_f4, "'INTEND'"))
                m_is_integer = false;
