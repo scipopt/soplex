@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.17 2002/03/21 16:06:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.18 2002/05/15 13:38:43 bzfpfend Exp $"
 
 //#define DEBUGGING 1
 
@@ -453,7 +453,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val)
             }
             else
             {
-               DEBUG( std::cerr << "removing value " << pupd[i] << std::endl; );
+               DEBUG( std::cout << "removing value " << pupd[i] << std::endl; );
                pupd.clearNum(j);
             }
          }
@@ -497,7 +497,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val)
             }
             else
             {
-               DEBUG( std::cerr << "removing value " << cupd[i] << std::endl; );
+               DEBUG( std::cout << "removing value " << cupd[i] << std::endl; );
                cupd.clearNum(j);
             }
          }
@@ -649,7 +649,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val)
             }
             else
             {
-               DEBUG( std::cerr << "removing value " << pupd[i] << std::endl; );
+               DEBUG( std::cout << "removing value " << pupd[i] << std::endl; );
                pupd.clearNum(j);
             }
          }
@@ -693,7 +693,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val)
             }
             else
             {
-               DEBUG( std::cerr << "removing value " << x << std::endl; );
+               DEBUG( std::cout << "removing value " << x << std::endl; );
                cupd.clearNum(j);
             }
          }

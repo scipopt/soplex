@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.18 2002/03/21 16:06:19 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.19 2002/05/15 13:38:44 bzfpfend Exp $"
 
 //#define DEBUGGING 1
 
@@ -318,7 +318,7 @@ int SPxSteepPR::selectLeaveX(Real& best, int start, int incr)
 
    /*
        if(selIdx >= 0)
-           std::cerr << fTest[selIdx] << std::endl;
+           std::cout << fTest[selIdx] << std::endl;
     */ 
    return selIdx;
 }
@@ -341,8 +341,8 @@ int SPxSteepPR::selectLeave()
    /*
        if(thesolver->basis().iteration() < 10)
        {
-           std::cerr.precision(16);
-           std::cerr << lastIdx
+           std::cout.precision(16);
+           std::cout << lastIdx
                 << '\t' << thesolver->fTest()[lastIdx]
                 << '\t' << leavePref[lastIdx]
                 << '\t' << coPenalty[lastIdx]
@@ -429,7 +429,7 @@ SPxId SPxSteepPR::selectEnterX(
    Real& best, int start1, int incr1, int start2, int incr2)
 {
    /*
-       std::cerr << "selectEnter " << start1 << '(' << incr1 << ")\t"
+       std::cout << "selectEnter " << start1 << '(' << incr1 << ")\t"
                               << start2 << '(' << incr2 << ")\n";
     */
    const Real* p = pref.get_const_ptr();

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.58 2002/05/01 08:18:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.59 2002/05/15 13:38:43 bzfpfend Exp $"
 
 //#define DEBUGGING 1
 
@@ -177,7 +177,7 @@ void SoPlex::setType(Type tp)
    if ((theratiotester != 0) && (theratiotester->solver() == this))
       theratiotester->setType(tp);
 
-   DEBUG({ std::cerr << "switching to " 
+   DEBUG({ std::cout << "switching to " 
                      << static_cast<const char*>((tp == LEAVE)
                                                  ? "leaving" : "entering")
                      << " algorithm" << std::endl; });
@@ -474,7 +474,7 @@ void SoPlex::factorize()
       ctmp -= coPvec();
       if (ftmp.length() > delta())
       {
-         DEBUG( std::cerr << "fVec:   " << ftmp.length() << std::endl; );
+         DEBUG( std::cout << "fVec:   " << ftmp.length() << std::endl; );
          ftmp = fVec();
          multBaseWith(ftmp);
          ftmp -= fRhs();
@@ -484,7 +484,7 @@ void SoPlex::factorize()
       }
       if (ctmp.length() > delta())
       {
-         DEBUG( std::cerr << "coPvec: " << ctmp.length() << std::endl; );
+         DEBUG( std::cout << "coPvec: " << ctmp.length() << std::endl; );
          ctmp = coPvec();
          multWithBase(ctmp);
          ctmp -= coPrhs();
@@ -494,7 +494,7 @@ void SoPlex::factorize()
       }
       if (ptmp.length() > delta())
       {
-         DEBUG( std::cerr << "pVec:   " << ptmp.length() << std::endl; );
+         DEBUG( std::cout << "pVec:   " << ptmp.length() << std::endl; );
       }
 #endif  // NDEBUG
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.41 2002/05/01 08:18:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.42 2002/05/15 13:38:43 bzfpfend Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -253,13 +253,13 @@ int main(int argc, char **argv)
          std::cout << banner << std::endl;
          /*FALLTHROUGH*/
       default :
-         std::cerr << "usage: " << argv[0] << " " << usage << std::endl;
+         std::cout << "usage: " << argv[0] << " " << usage << std::endl;
          exit(0);
       }
    }
    if ((argc - optidx) < 1)
    {
-      std::cerr << "usage: " << argv[0] << " " << usage << std::endl;
+      std::cout << "usage: " << argv[0] << " " << usage << std::endl;
       exit(0);
    }
    filename  = argv[optidx];
@@ -420,7 +420,7 @@ int main(int argc, char **argv)
 
    if (!work.readFile(filename, &rownames, &colnames))
    {
-      std::cout << "error while reading file \"" 
+      std::cerr << "error while reading file \"" 
                 << filename << "\"" << std::endl;
       exit(1);
    }
@@ -437,7 +437,7 @@ int main(int argc, char **argv)
    {
       if (!work.readBasisFile(basisname, rownames, colnames))
       {
-         std::cout << "error while reading file \"" 
+         std::cerr << "error while reading file \"" 
                    << basisname << "\"" << std::endl;
          exit(1);
       }
@@ -510,7 +510,7 @@ int main(int argc, char **argv)
       std::cout << "aborted due to objective value limit";
       break;
    default:
-      std::cout << "An error occurred during the solution process";
+      std::cerr << "An error occurred during the solution process";
       break;
    }
    std::cout << std::endl;

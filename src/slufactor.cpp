@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.27 2002/05/01 08:18:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.28 2002/05/15 13:38:43 bzfpfend Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -364,7 +364,7 @@ SLUFactor::Status SLUFactor::change(
    }
    usetup = 0;
 
-   DEBUG({ std::cerr << "\tupdated\t\tstability = " << stability()
+   DEBUG({ std::cout << "\tupdated\t\tstability = " << stability()
                      << std::endl; });
    
    return status();
@@ -842,13 +842,13 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
       minStability /= 2;
    }
 
-   DEBUG({ std::cerr << "threshold = " << lastThreshold
+   DEBUG({ std::cout << "threshold = " << lastThreshold
                      << "\tstability = " << stability()
                      << "\tminStability = " << minStability << std::endl; });
    DEBUG({
       int i;
       FILE* fl = fopen("dump.lp", "w");
-      std::cerr << "Basis:\n";
+      std::cout << "Basis:\n";
       int j = 0;
       for (i = 0; i < dim(); ++i)
          j += matrix[i]->size();
@@ -859,10 +859,10 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
                     i + 1, matrix[i]->index(j) + 1, matrix[i]->value(j));
       }
       fclose(fl);
-      std::cerr << "LU-Factors:" << std::endl;
+      std::cout << "LU-Factors:" << std::endl;
       dump();
       
-      std::cerr << "threshold = " << lastThreshold 
+      std::cout << "threshold = " << lastThreshold 
                 << "\tstability = " << stability() << std::endl;
    });
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.8 2002/05/01 08:18:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.9 2002/05/15 13:38:43 bzfpfend Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
@@ -75,16 +75,16 @@ public:
    {
       int i;
  
-      std::cerr << "\t";
+      std::cout << "\t";
       
       for(i = 0; i < s_indent; i++)
-         std::cerr << ".";      
+         std::cout << ".";      
       
-      std::cerr << s;
+      std::cout << s;
       
       for(i = strlen(s) + s_indent; i < FILE_NAME_COL; i++)
-         std::cerr << "_";             
-      std::cerr << "[" << file << ":" << line << "]" << std::endl; 
+         std::cout << "_";             
+      std::cout << "[" << file << ":" << line << "]" << std::endl; 
       s_indent++;
    }
    virtual ~TraceMethod()

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.14 2002/03/21 16:06:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.15 2002/05/15 13:38:43 bzfpfend Exp $"
 
 //#define DEBUGGING 1
 
@@ -125,7 +125,7 @@ void SPxBasis::removedRow(int i)
       {
          setStatus(NO_PROBLEM);
          factorized = false;
-         DEBUG( std::cerr << "Are you sure, you wanna do that?\n"; );
+         DEBUG( std::cout << "Are you sure, you wanna do that?\n"; );
       }
 
    }
@@ -136,7 +136,7 @@ void SPxBasis::removedRow(int i)
       if (!theLP->isBasic(thedesc.rowStatus(i)))
       {
          setStatus(NO_PROBLEM);
-         DEBUG( std::cerr << "Are you sure, you wanna do that?\n"; );
+         DEBUG( std::cout << "Are you sure, you wanna do that?\n"; );
       }
 
       else if (status() > NO_PROBLEM && matrixIsSetup)
@@ -181,7 +181,7 @@ void SPxBasis::removedRows(int perm[])
                {
                   setStatus(NO_PROBLEM);
                   factorized = matrixIsSetup = false;
-                  DEBUG( std::cerr << "Are you sure, you wanna do that?\n"; );
+                  DEBUG( std::cout << "Are you sure, you wanna do that?\n"; );
                }
 
             }

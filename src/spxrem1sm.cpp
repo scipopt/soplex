@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxrem1sm.cpp,v 1.12 2002/03/03 13:50:34 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxrem1sm.cpp,v 1.13 2002/05/15 13:38:44 bzfpfend Exp $"
 
 //#define DEBUGGING 1
 
@@ -184,7 +184,7 @@ int SPxRem1SM::simplify()
 
 void SPxRem1SM::unsimplify()
 {
-   std::cerr << "SPxRem1SM::unsimplify() not implemented\n";
+   std::cout << "SPxRem1SM::unsimplify() not implemented\n";
 }
 } // namespace soplex
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: mpsinput.cpp,v 1.6 2002/04/09 19:00:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: mpsinput.cpp,v 1.7 2002/05/15 13:38:43 bzfpfend Exp $"
 
 /**@file  mpsinput.cpp
  * @brief Read MPS format files.
@@ -74,7 +74,7 @@ bool MPSInput::readLine()
             return false;
         m_lineno++;
 
-        DEBUG({ std::cerr << "Line " << m_lineno
+        DEBUG({ std::cout << "Line " << m_lineno
                           << " " << m_buf << std::endl; });        
       } 
       while(*m_buf == '*');
@@ -189,7 +189,7 @@ bool MPSInput::readLine()
    while(is_marker);
 
    DEBUG({
-      std::cerr << "-----------------------------------------------" 
+      std::cout << "-----------------------------------------------" 
                 << std::endl
                 << "f0=" << ((m_f0 == 0) ? "nil" : m_f0) << std::endl
                 << "f1=" << ((m_f1 == 0) ? "nil" : m_f1) << std::endl

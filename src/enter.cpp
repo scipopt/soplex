@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.17 2002/04/10 14:36:30 bzfpfend Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.18 2002/05/15 13:38:43 bzfpfend Exp $"
 
 // #define DEBUGGING 1
 
@@ -796,7 +796,7 @@ int SoPlex::enter(SPxId& enterId)
    {
       rejectEnter(enterId, enterTest, enterStat);
       change(-1, enterId, enterVec);
-      DEBUG( std::cerr << "rejecting false enter pivot" << std::endl; );
+      DEBUG( std::cout << "rejecting false enter pivot" << std::endl; );
       return 1;
    }
 

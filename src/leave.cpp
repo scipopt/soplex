@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.20 2002/04/10 14:36:31 bzfpfend Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.21 2002/05/15 13:38:43 bzfpfend Exp $"
 
 // #define DEBUGGING 1
 
@@ -567,7 +567,7 @@ int SoPlex::leave(int leaveIdx)
          rejectLeave(leaveNum, leaveId, leaveStat);
          if (enterVal != leaveMax)
          {
-            DEBUG( std::cerr << "rejecting leave" << std::endl; );
+            DEBUG( std::cout << "rejecting leave" << std::endl; );
             theCoTest[leaveIdx] *= 0.01;            // #== fTest()#
             theCoTest[leaveIdx] -= 2 * delta();     // #== fTest()#
             return 1;
@@ -612,7 +612,7 @@ int SoPlex::leave(int leaveIdx)
             change(leaveIdx, none, 0);
             theFvec->delta().clear();
             rejectLeave(leaveNum, leaveId, leaveStat, &newVector);
-            DEBUG( std::cerr << "rejecting leave" << std::endl; );
+            DEBUG( std::cout << "rejecting leave" << std::endl; );
             // factorize();
             theCoTest[leaveIdx] *= 0.01;            // #== fTest()#
             return 1;
@@ -741,7 +741,7 @@ int SoPlex::leave(int leaveIdx)
          if (tmp.length() > delta())
          {
             std::cerr << '\t' << basis().iteration()
-            << ": fVec error = " << tmp.length();
+                      << ": fVec error = " << tmp.length();
             SPxBasis::solve(tmp, fRhs());
             tmp -= fVec();
             std::cerr << "\t(" << tmp.length() << ")\n";

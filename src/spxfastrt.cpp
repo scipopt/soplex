@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.20 2002/03/21 16:06:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.21 2002/05/15 13:38:43 bzfpfend Exp $"
 
 //#define DEBUGGING 1
 
@@ -42,9 +42,9 @@ void SPxFastRT::resetTols()
    /*
        if(thesolver->basis().stability() < 1e-4)
            epsilon *= 1e-4 / thesolver->basis().stability();
-       std::cerr << "epsilon = " << epsilon << '\t';
-       std::cerr << "delta   = " << delta   << '\t';
-       std::cerr << "minStab = " << minStab << std::endl;
+       std::cout << "epsilon = " << epsilon << '\t';
+       std::cout << "delta   = " << delta   << '\t';
+       std::cout << "minStab = " << minStab << std::endl;
     */
 }
 
@@ -75,7 +75,7 @@ void SPxFastRT::relax()
    minStab *= 0.95;
    delta += 3 * DELTA_SHIFT;
    // delta   += 2 * (thesolver->theShift > delta) * DELTA_SHIFT;
-   //@ std::cerr << '\t' << minStab << '\t' << delta << std::endl;
+   //@ std::cout << '\t' << minStab << '\t' << delta << std::endl;
 }
 
 
@@ -840,7 +840,7 @@ int SPxFastRT::selectLeave(Real& val)
    else
       return -1;
 
-   VERBOSE3({
+   DEBUG({
       if (leave >= 0)
          std::cout 
             << thesolver->basis().iteration() << "("
@@ -1151,7 +1151,7 @@ SPxId SPxFastRT::selectEnter(Real& val)
       while (cnt < TRIES);
    }
 
-   VERBOSE3({
+   DEBUG({
       if (enterId.isValid())
          {
             Real x;
@@ -1193,9 +1193,9 @@ void SPxFastRT::setType(SoPlex::Type)
 
    /*
        resetTols();
-       std::cerr << "epsilon = " << epsilon << '\t';
-       std::cerr << "delta   = " << delta   << '\t';
-       std::cerr << "minStab = " << minStab << std::endl;
+       std::cout << "epsilon = " << epsilon << '\t';
+       std::cout << "delta   = " << delta   << '\t';
+       std::cout << "minStab = " << minStab << std::endl;
     */
 
    if (delta > 1e-4)

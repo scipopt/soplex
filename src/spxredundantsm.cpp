@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.17 2002/04/14 15:03:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.18 2002/05/15 13:38:44 bzfpfend Exp $"
 
 //#define DEBUGGING 1
 
@@ -319,7 +319,7 @@ int SPxRedundantSM::simplify()
 
 void SPxRedundantSM::unsimplify()
 {
-   std::cerr << "SPxRedundantSM::unsimplify() not implemented\n";
+   std::cout << "SPxRedundantSM::unsimplify() not implemented\n";
 }
 } // namespace soplex
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.28 2002/04/03 10:15:45 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.29 2002/05/15 13:38:44 bzfpfend Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -144,7 +144,7 @@ static Real readValue(char*& pos)
 
    assert(pos == s);
 
-   DEBUG( std::cerr << "readValue = " << value << std::endl; );
+   DEBUG( std::cout << "readValue = " << value << std::endl; );
 
    return value;
 }
@@ -186,7 +186,7 @@ static int readColName(
          colset.add(*emptycol);
       }
    }
-   DEBUG({ std::cerr << "readColName [" << name << "] = "
+   DEBUG({ std::cout << "readColName [" << name << "] = "
 		     << colidx << std::endl; });
 
    return colidx;
@@ -204,7 +204,7 @@ static int readSense(char*& pos)
    else if (*pos == '=')
       pos++;
 
-   DEBUG({ std::cerr << "readSense = " << static_cast<char>(sense)
+   DEBUG({ std::cout << "readSense = " << static_cast<char>(sense)
 		     << std::endl; });
 
    return sense;
@@ -247,7 +247,7 @@ static bool hasKeyword(char*& pos, const char* keyword)
    {
       pos += k;
 
-      DEBUG( std::cerr << "hasKeyowrd: " << keyword << std::endl; );
+      DEBUG( std::cout << "hasKeyowrd: " << keyword << std::endl; );
       return true;
    }
    return false;
@@ -398,7 +398,7 @@ bool SPxLP::readLPF(
       pos = buf;
       val = 1.0;
 
-      DEBUG({ std::cerr << "Reading line " << lineno
+      DEBUG({ std::cout << "Reading line " << lineno
 			<< " (pos=" << pos << ")" << std::endl; });
 
       // 1. Remove comments.
@@ -500,7 +500,7 @@ bool SPxLP::readLPF(
       //-----------------------------------------------------------------------
       pos = line;
       
-      DEBUG( std::cerr << "pos=" << pos << std::endl; );
+      DEBUG( std::cout << "pos=" << pos << std::endl; );
 
       // 7. We have something left to process. 
       while((pos != 0) && (*pos != '\0'))
@@ -689,7 +689,7 @@ syntax_error:
    if (p_rnames == 0)
       delete rnames;
 
-   DEBUG( std::cerr << *this; );
+   DEBUG( std::cout << *this; );
 
    return finished;
 }

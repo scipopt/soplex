@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsumst.cpp,v 1.6 2002/03/03 13:50:35 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsumst.cpp,v 1.7 2002/05/15 13:38:44 bzfpfend Exp $"
 
 #include <iostream>
 
@@ -61,7 +61,7 @@ void SPxSumST::setupWeights(SoPlex& base)
             wrk[i] = low[i];
       }
 
-      //      std::cerr << -(work * base.maxObj()) << std::endl;
+      //      std::cout << -(work * base.maxObj()) << std::endl;
       if (count >= 12)
          break;
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.cpp,v 1.14 2002/03/21 16:06:19 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightst.cpp,v 1.15 2002/05/15 13:38:44 bzfpfend Exp $"
 
 //#define DEBUGGING 1
 //#define TEST 1
@@ -274,9 +274,9 @@ void SPxWeightST::generate(SoPlex& base)
          {
             DEBUG({
                if (pref[i].type() == SPxId::ROW_ID)
-                  std::cerr << " r" << base.number(pref[i]);
+                  std::cout << " r" << base.number(pref[i]);
                else
-                  std::cerr << " c" << base.number(pref[i]);
+                  std::cout << " c" << base.number(pref[i]);
             });
 
             forbidden[sel] = 2;
@@ -618,12 +618,12 @@ void SPxWeightST::setupWeights(SoPlex& bse)
    }
    DEBUG({
       for(i = 0; i < bse.nCols(); i++)
-         std::cerr << "C i= " << i 
+         std::cout << "C i= " << i 
                    << " up= " << colUp[i]
                    << " w= " << colWeight[i]
                    << std::endl;
       for(i = 0; i < bse.nRows(); i++)
-         std::cerr << "R i= " << i 
+         std::cout << "R i= " << i 
                    << " rr= " << rowRight[i]
                    << " w= " << rowWeight[i]
                    << std::endl;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.50 2002/04/10 14:36:31 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.51 2002/05/15 13:38:44 bzfpfend Exp $"
 
 //#define DEBUGGING 1
 
@@ -96,8 +96,8 @@ SoPlex::Status SoPlex::solve()
    setType(type());
 
    VERBOSE3({
-      std::cerr << "starting value = " << value() << std::endl;
-      std::cerr << "starting shift = " << shift() << std::endl;
+      std::cout << "starting value = " << value() << std::endl;
+      std::cout << "starting shift = " << shift() << std::endl;
    });
    DEBUG( desc().dump(); );
 
@@ -113,14 +113,15 @@ SoPlex::Status SoPlex::solve()
    {
       if (type() == ENTER)
       {
-         VERBOSE3({
-            std::cerr << "Enter iteration: " << iteration()
-                      << ", Value = " << value()
-                      << ", Shift = " << shift() << std::endl;
-         });
-
          do
          {
+            VERBOSE3({
+               if( iteration() % 100 == 0 )
+                  std::cout << "Enter iteration: " << iteration()
+                            << ", Value = " << value()
+                            << ", Shift = " << shift() << std::endl;
+            });
+
             enterId = thepricer->selectEnter();
             if (!enterId.isValid())
             {
@@ -140,7 +141,7 @@ SoPlex::Status SoPlex::solve()
          while (!stop);
 
          VERBOSE3({
-            std::cerr << "Enter finished. iteration: " << iteration() 
+            std::cout << "Enter finished. iteration: " << iteration() 
                       << ", value: " << value()
                       << ", shift: " << shift()
                       << ", epsilon: " << epsilon()
@@ -157,7 +158,7 @@ SoPlex::Status SoPlex::solve()
                unShift();
 
                VERBOSE3({
-                  std::cerr << "maxInfeas: " << maxInfeas()
+                  std::cout << "maxInfeas: " << maxInfeas()
                             << ", shift: " << shift()
                             << ", delta: " << delta() << std::endl;
                });
@@ -176,14 +177,15 @@ SoPlex::Status SoPlex::solve()
       {
          assert(type() == LEAVE);
 
-         VERBOSE3({
-            std::cerr << "Leave Iteration: " << iteration()
-                      << ", Value = " << value()
-                      << ", Shift = " << shift() << std::endl;
-         });
-
          do
          {
+            VERBOSE3({
+               if( iteration() % 100 == 0 )
+                  std::cout << "Leave Iteration: " << iteration()
+                            << ", Value = " << value()
+                            << ", Shift = " << shift() << std::endl;
+            });
+            
             leaveNum = thepricer->selectLeave();
             if (leaveNum < 0)
             {
@@ -203,7 +205,7 @@ SoPlex::Status SoPlex::solve()
          while (!stop);
 
          VERBOSE3({
-            std::cerr << "Leave finished. iteration: " << iteration() 
+            std::cout << "Leave finished. iteration: " << iteration() 
                       << ", value: " << value()
                       << ", shift: " << shift()
                       << ", epsilon: " << epsilon()
@@ -220,7 +222,7 @@ SoPlex::Status SoPlex::solve()
                unShift();
 
                VERBOSE3({
-                  std::cerr << "maxInfeas: " << maxInfeas()
+                  std::cout << "maxInfeas: " << maxInfeas()
                             << ", shift: " << shift()
                             << ", delta: " << delta() << std::endl;
                });
@@ -477,7 +479,7 @@ bool SoPlex::terminate()
             VERBOSE2({ std::cout << "Objective value limit (" << maxValue
                                  << ") reached" << std::endl; });
             DEBUG({
-               std::cerr << "Objective value limit reached" << std::endl
+               std::cout << "Objective value limit reached" << std::endl
                          << " (value: " << value()
                          << ", limit: " << maxValue << ")" << std::endl
                          << " (spxSense: " << int(spxSense())

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.29 2002/03/21 16:06:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.30 2002/05/15 13:38:43 bzfpfend Exp $"
 
 // #define DEBUGGING 1
 
@@ -418,7 +418,7 @@ void SPxBasis::change
          if (factor->status() != SLinSolver::OK
               || factor->stability() < EPS)
          {
-            // std::cerr << s << " -> " << factor->stability() << '\t';
+            // std::cout << s << " -> " << factor->stability() << '\t';
             factorize();
          }
          else

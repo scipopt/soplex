@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.11 2002/04/14 12:41:54 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.12 2002/05/15 13:38:43 bzfpfend Exp $"
 
 //#define DEBUGGING 1
 
@@ -309,7 +309,7 @@ SPxId SPxDefaultRT::selectEnterX(
 
    if (enterId.isValid() && solver()->isBasic(enterId))
    {
-      DEBUG({ std::cerr << "isValid() && isBasic(): max=" << max
+      DEBUG({ std::cout << "isValid() && isBasic(): max=" << max
                         << std::endl; });
       if (cnum >= 0)
          solver()->coPvec().delta().clearNum(cnum);
@@ -320,7 +320,7 @@ SPxId SPxDefaultRT::selectEnterX(
 
    DEBUG({
       if( !enterId.isValid() )
-         std::cerr << "!isValid(): max=" << max << ", x=" << x << std::endl;
+         std::cout << "!isValid(): max=" << max << ", x=" << x << std::endl;
    });
 
    max = val;
