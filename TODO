@@ -1,6 +1,10 @@
-$Id: TODO,v 1.54 2002/02/03 14:02:25 bzfkocht Exp $
+$Id: TODO,v 1.55 2002/02/14 17:25:17 bzfkocht Exp $
 
 Diesen Kram mal als @todo's schreiben ;-)
+
+in ssvector/solve/vsolve etc. die vergleiche mit eps richtig.
+
+stdio.h/printf die letzten erlegen.
 
 tester/simplifier usw. auch wie pricer mit namen versehen.
 

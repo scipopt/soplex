@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.21 2002/02/13 16:56:06 bzfpfend Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.22 2002/02/14 17:25:20 bzfkocht Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -176,8 +176,6 @@ void SLUFactor::solve2right4update(SSVector& x,
       forest.forceSetup();
    }
 }
-
-//@ ----------------------------------------------------------------------------
 
 void SLUFactor::solve2left (Vector& x, Vector& b) //const
 {
@@ -813,7 +811,7 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
 
    TRACE({ std::cerr << "threshold = " << lastThreshold
                      << "\tstability = " << stability()
-                     << "\tminStability = " << minStability << std::endl; });   
+                     << "\tminStability = " << minStability << std::endl; });
    TRACE({
       int i;
       FILE* fl = fopen("dump.lp", "w");
