@@ -13,12 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.39 2004/05/15 09:28:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.40 2004/05/21 14:55:42 bzfpfend Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
  */
-#define DEBUGGING 1
+/*#define DEBUGGING 1*/
 
 #include <assert.h>
 #include <stdio.h>
