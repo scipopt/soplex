@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.13 2002/01/10 13:34:49 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.14 2002/01/10 23:07:15 bzfkocht Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -23,6 +23,7 @@
 
 #include <assert.h>
 #include <iostream>
+#include <iomanip>
 
 #include "dvector.h"
 #include "svset.h"
@@ -70,12 +71,6 @@ class SPxLP : protected LPRowSet, protected LPColSet
    friend int getmarsz (SoPlex*);
    friend int getmartz (SoPlex*);
 
-   /// input operator.
-   friend std::istream& operator>>(std::istream& is, SPxLP& lp)
-   {
-      lp.read(is);
-      return is;
-   }
    /// output operator.
    friend std::ostream& operator<<(std::ostream& os, const SPxLP& lp);
 
@@ -219,19 +214,15 @@ public:
          return *this;
       }
       ///
-      /**@todo patch suggest "const SPxColId& cid" */
-      Id& operator=(const SPxColId cid)
+      Id& operator=(const SPxColId& cid)
       {
-         //*(int*)this = *(int*) & cid;
          DataKey::operator= ( cid );
          info = COLID * (cid.info + 1);
          return *this;
       }
       /// assignment operator.
-      /**@todo patch suggest "const SPxRowId& cid" */
-      Id& operator=(const SPxRowId rid)
+      Id& operator=(const SPxRowId& rid)
       {
-         //*(int*)this = *(int*) & rid;
          DataKey::operator= ( rid );
          info = ROWID * (rid.info + 1);
          return *this;
@@ -239,34 +230,19 @@ public:
 
       /// default constructor. Constructs an invalid id.
       Id()
-      {
-         info = NONE;
-         idx  = -1;
-      }
+         : DataKey(NONE, -1)
+      {}
 
       /// constructs an id out of a column identifier \p cid.
       explicit Id(const SPxColId& cid)
-      {
-         info = COLID * (cid.info + 1);
-         idx = cid.idx;
-      }
+         : DataKey(COLID * (cid.info + 1), cid.idx)
+      {}
 
       /// constructs an id out of a row identifier \p rid.
       explicit Id(const SPxRowId& rid)
-      {
-         info = ROWID * (rid.info + 1);
-         idx = rid.idx;
-      }
+         : DataKey(ROWID * (rid.info + 1), rid.idx) 
+      {}
    };
-
-
-   // typedef SPxLP_SPxRowId SPxRowId;
-   // typedef SPxLP_SPxColId SPxColId;
-   /* Generic Identifier for LP rows and columns.
-      All #Id# classes should better be local classes of #SPxLP#. However,
-      AT\&T's cfront compiler won't allow to do do so. :-(
-   */
-   // typedef SPxLP_Id Id;
 
    /// optimization sense.
    enum SPxSense
@@ -657,15 +633,15 @@ public:
    /**@name IO */
    //@{
    /// reads a file from input stream \p in.
-   virtual void read (std::istream& in, 
+   virtual bool read (std::istream& in, 
       NameSet* rowNames = 0, NameSet* colNames = 0);
 
    /// reads a file in LP format from \p in.
-   virtual void readLPF (std::istream& in, 
+   virtual bool readLPF (std::istream& in, 
       NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
 
    /// reads a file in MPS format from \p in.
-   virtual void readMPS(std::istream& in, 
+   virtual bool readMPS(std::istream& in, 
       NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
    //@}
 

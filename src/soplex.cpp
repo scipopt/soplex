@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.25 2002/01/10 13:34:49 bzfpfend Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.26 2002/01/10 23:07:15 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -29,19 +29,27 @@ namespace soplex
 {
 #define MAXIMUM(x,y)        ((x)>(y) ? (x) : (y))
 
-void SoPlex::read(std::istream& in, NameSet* rowNames, NameSet* colNames)
+bool SoPlex::read(std::istream& in, NameSet* rowNames, NameSet* colNames)
 {
    clear();
    unInit();
    unLoad();
+
    if (thepricer)
       thepricer->clear();
+
    if (theratiotester)
       theratiotester->clear();
-   SPxLP::read(in, rowNames, colNames);
+
+   if (!SPxLP::read(in, rowNames, colNames))
+      return false;
+
    SPxBasis::load(this);
+
    int tmp = coDim() / (20 * dim()) + 1;
    coVecDim = coDim() / tmp + 1;
+
+   return true;
 }
 
 void SoPlex::reLoad()
@@ -57,13 +65,13 @@ void SoPlex::reLoad()
 
 void SoPlex::loadLP(const SPxLP& lp)
 {
+   clear();
+   unInit();
+   unLoad();
    if (thepricer)
       thepricer->clear();
    if (theratiotester)
       theratiotester->clear();
-   clear();
-   unInit();
-   unLoad();
    SPxLP::operator=(lp);
    reDim();
    SPxBasis::load(this);
@@ -415,19 +423,21 @@ void SoPlex::reDim()
       theLBbound.reDim(dim());
    }
 }
-void SoPlex::readFile(char* filename)
+
+bool SoPlex::readFile(const char* filename)
 {
    std::ifstream file(filename);
-   if (file.good())
-   {
-      file >> *this;
-      SPxBasis::load(this);
-   }
+
+   if (!file)
+      return false;
+   else
+      return  read(file);
 }
 
-void SoPlex::dumpFile(char* filename) const
+void SoPlex::dumpFile(const char* filename) const
 {
    std::ofstream file(filename);
+
    if (file.good())
       file << *this;
 }

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.17 2002/01/06 21:16:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.18 2002/01/10 23:07:15 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -304,14 +304,8 @@ public:
     *  #clear() removes the LP from the solver.
     */
    //@{
-   /// read LP from input stream using operator syntax.
-   friend std::istream& operator>>(std::istream& is, SoPlex& lp)
-   {
-      lp.read(is);
-      return is;
-   }
    /// read LP from input stream.
-   virtual void read(std::istream& in, 
+   virtual bool read(std::istream& in, 
       NameSet* rowNames = 0, NameSet* colNames = 0);
 
    /// copy LP.
@@ -340,10 +334,10 @@ public:
    virtual void reLoad();
 
    /// load LP from \p filename in MPS or LPF format.
-   void readFile(char* filename);
+   bool readFile(const char* filename);
 
    /// dump loaded LP to \p filename in LPF format.
-   void dumpFile(char* filename) const;
+   void dumpFile(const char* filename) const;
 
    /// clear all data in solver.
    void clear();
@@ -1550,7 +1544,6 @@ public:
       return cId(i);
    }
 
-   /// assignment operator.
    /// default constructor.
    SoPlex(Type type = LEAVE, Representation rep = ROW,
            SPxPricer* pric = 0, SPxRatioTester* rt = 0,

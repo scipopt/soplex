@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.11 2001/12/28 14:55:13 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.12 2002/01/10 23:07:15 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -24,12 +24,12 @@
 
 #include "spxlp.h"
 
-#define MAX_LINE_LEN  256         ///< maximum length of a line
+#define MAX_LINE_LEN  257       ///< maximum length of a line (255 + \n + \0)
 
-#define INIT_COLS     10000       ///< initialy allocated columns.
-#define INIT_ROWS     10000       ///< initialy allocated rows.
-#define INIT_NZOS     100000      ///< initialy allocated non zeros.
-#define INIT_NAME_MEM 100000      ///< initialy memory for names.
+#define INIT_COLS     10000     ///< initialy allocated columns.
+#define INIT_ROWS     10000     ///< initialy allocated rows.
+#define INIT_NZOS     100000    ///< initialy allocated non zeros.
+#define INIT_NAME_MEM 100000    ///< initialy memory for names.
 
 namespace soplex
 {
@@ -297,8 +297,10 @@ static double readInfinity(char*& pos)
  *  This routine should read (most?) valid LP format files. 
  *  What it will not do, is find all cases where a file is ill formed. 
  *  If this happens it may complain and read nothing or read "something".
+ *
+ *  @return true if the file was read correctly
  */  
-void SPxLP::readLPF(
+bool SPxLP::readLPF(
    std::istream& p_input, 
    NameSet*      p_rnames,               ///< row names.
    NameSet*      p_cnames,               ///< column names.
@@ -349,10 +351,18 @@ void SPxLP::readLPF(
    for(;;)
    {      
       // 0. Read a line from the file.
-      if (p_input.getline(buf, sizeof(buf)) == 0)
+      if (!p_input.getline(buf, sizeof(buf)))
       {
-         std::cerr << "No 'End' marker found" << std::endl;
-         finished = true;
+         if (strlen(buf) == MAX_LINE_LEN - 1)
+         {
+            std::cerr << "Line exceeds " << MAX_LINE_LEN - 2 
+                      << " characters" << std::endl;
+         }
+         else
+         {
+            std::cerr << "No 'End' marker found" << std::endl;
+            finished = true;
+         }
          break;
       }
       lineno++;
@@ -360,8 +370,8 @@ void SPxLP::readLPF(
       pos = buf;
       val = 1.0;
 
-      // cout << "Reading line " << lineno << std::endl;
-      // cout << pos << std::endl;
+      // std::cout << "Reading line " << lineno << std::endl;
+      // std::cout << pos << std::endl;
 
       // 1. Remove comments.
       if (0 != (s = strchr(buf, '\\')))
@@ -454,7 +464,7 @@ void SPxLP::readLPF(
       //-----------------------------------------------------------------------
       pos = line;
       
-      // cout << "we have [" << pos << "]" << std::endl;
+      // std::cout << "we have [" << pos << "]" << std::endl;
 
       // 7. We have something left to process. 
       while((pos != 0) && (*pos != '\0'))
@@ -613,6 +623,7 @@ void SPxLP::readLPF(
       delete rnames;
 
    // std::cout << *this;
+   return finished;
 }
 } // namespace soplex
 

@@ -1,15 +1,15 @@
+$Id: TODO,v 1.45 2002/01/10 23:07:15 bzfkocht Exp $
+
+Diesen Kram mal als TODO's schreiben ;-)
+
 SVSet::memPack, vermutlichen bug in flexelint melden. this-> ist überflüssig.
 
 die constructoren auf einparametriege durchsehen (explicit)
 
 in dataarray.h:reSize(int newsize) steht in der docxygen docu immer int n ???
 
-spxfastrt.cpp(865) Testen ob das ; korrekt ist.
-
 Was macht SPxSolver in example. Warum können wir nicht einfach SoPlex 
 benutzen?
-
-Warum kann ich in DataKey.h nicht den expliziten CopyConstruktor einführen?
 
 BUG in spxscalesm.cc value() wird nicht descaliert. 
 Entsprechender Aufruf fehlt auch in spxgeneralsm.cc
@@ -45,7 +45,7 @@ greenbea ER
 pilot    EC *
 
 linux.x86.gnu LC 0 593
-greenbea LR
+greenbea LR  (der Fehler passiert in ER) =infeasible=
 
 hp-ux.hppa.hp LC 0 699
 greenbeb LR

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.9 2002/01/05 19:24:10 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.10 2002/01/10 23:07:15 bzfkocht Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.
@@ -545,8 +545,10 @@ static void readBounds(
  *  This routine should read all valid MPS format files. 
  *  What it will not do, is find all cases where a file is ill formed. 
  *  If this happens it may complain and read nothing or read "something".
+ *
+ *  @return true if an error has occurred.
  */  
-void SPxLP::readMPS(
+bool SPxLP::readMPS(
    std::istream& p_input, 
    NameSet*      p_rnames,          ///< row names.
    NameSet*      p_cnames,          ///< column names.
@@ -623,6 +625,8 @@ void SPxLP::readMPS(
       delete cnames;
    if (p_rnames != 0)
       delete rnames;
+
+   return !mps.hasError();
 }
 
 } // namespace soplex

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datakey.h,v 1.4 2001/11/21 20:15:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: datakey.h,v 1.5 2002/01/10 23:07:15 bzfkocht Exp $"
 
 /**@file  datakey.h
  * @brief Entry identifier class for items of a #DataSet.
@@ -87,6 +87,13 @@ public:
    DataKey() 
       : info(0), idx(-1) 
    {}
+
+   // Constructor
+   DataKey(int p_info, int p_idx)
+      : info(p_info)
+      , idx(p_idx)
+   {}
+
    /// Assignment operator.
    DataKey& operator=(const DataKey& rhs)
    {
@@ -96,13 +103,11 @@ public:
 
       return *this;
    }
-#if 0
    /// Copy constructor.
-   explicit DataKey(const DataKey& old) 
+   DataKey(const DataKey& old) 
       : info(old.info) 
       , idx(old.idx)
    {}
-#endif
 };
 
 } // namespace soplex

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.12 2002/01/06 21:16:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.13 2002/01/10 23:07:15 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -263,35 +263,22 @@ int main(int argc, char **argv)
 
    assert(work.isConsistent());
 
-   std::ifstream* file = new std::ifstream(filename);
-
-   if ((file == 0) || (*file == 0))
-   {
-      std::cerr << "could not open LP file " << filename << std::endl;
-      exit(1);
-   }
-
-   SPxLP lp;
    Timer timer;
    std::cout << "loading LP file " << filename << std::endl;
 
-   *file >> lp;
-
-   delete file;
+   if (!work.readFile(filename))
+   {
+      std::cout << "error while reading file" << std::endl;
+      exit(1);
+   }
+   assert(work.isConsistent());
 
    std::cout << "LP has " 
-             << lp.nRows() 
-             << "\trows and"
-             << std::endl
-             << "       " 
-             << lp.nCols() 
+             << work.nRows() 
+             << "\trows and\n       "
+             << work.nCols() 
              << "\tcolumns" 
              << std::endl;
-
-   assert(lp.isConsistent());
-
-   work.loadLP(lp);
-   assert(work.isConsistent());
 
    timer.start();
    std::cout << "solving LP" 
@@ -323,7 +310,9 @@ int main(int argc, char **argv)
       std::cout << "LP is infeasible";
       break;
    default:
-      std::cout << "An error occurred during the solution process";
+      std::cout << "An error occurred during the solution process ("
+                << stat 
+                << ")";
       break;
    }
    std::cout << std::endl;

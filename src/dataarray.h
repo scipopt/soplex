@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataarray.h,v 1.15 2002/01/10 13:34:49 bzfpfend Exp $"
+#pragma ident "@(#) $Id: dataarray.h,v 1.16 2002/01/10 23:07:15 bzfkocht Exp $"
 
 /**@file  dataarray.h
  * @brief Save arrays of data objects.
@@ -269,11 +269,11 @@ public:
    /// consistency check
    bool isConsistent() const
    {
-      if (data == 0        ||
-          themax < 1       ||
-          themax < thesize ||
-          thesize < 0      ||
-          memFactor < 1.0 )
+      if (  (data == 0)
+         || (themax < 1)
+         || (themax < thesize)
+         || (thesize < 0)
+         || (memFactor < 1.0))
          return MSGinconsistent("DataArray");
 
       return true;
