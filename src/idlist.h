@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idlist.h,v 1.13 2002/01/19 18:59:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: idlist.h,v 1.14 2002/01/21 09:02:11 bzfkocht Exp $"
 
 /**@file  idlist.h
  * @brief Generic Real linked list.
@@ -283,7 +283,8 @@ public:
          IsList<T>::move(delta);
          for (elem = last(); elem; elem = prev(elem))
             if (elem != first())
-               elem->prev() = reinterpret_cast<T*>(reinterpret_cast<char*>(elem->prev()) + delta);
+               elem->prev() = reinterpret_cast<T*>(
+                  reinterpret_cast<char*>(elem->prev()) + delta);
       }
    }
 
@@ -313,27 +314,6 @@ public:
       : IsList<T>(pfirst, plast)
    {}
 
-   /// constructs sublist form \p start to \p end.
-   /** When constructing sublists, special care is required, since a
-       sublist really is a sublist: No new elements are created! Hence, if
-       the sublist is modified, this also modifies the original list
-       itself.
-    */
-   IdList<T>sublist(const T* start = 0, const T* end = 0) const
-   {
-      IdList<T>part = *this;
-      if (start)
-      {
-         assert(find(start));
-         part.the_first = static_cast<T*>(start);
-      }
-      if (end)
-      {
-         assert(part.find(end));
-         part.the_last = static_cast<T*>(end);
-      }
-      return part;
-   }
    //@}
 };
 

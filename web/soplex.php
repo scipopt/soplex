@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
 "http://www.w3.org/TR/REC-html40/loose.dtd">
-<!-- $Id: soplex.php,v 1.6 2002/01/16 15:38:46 bzfkocht Exp $ -->
+<!-- $Id: soplex.php,v 1.7 2002/01/21 09:02:11 bzfkocht Exp $ -->
 <?php
 $counter = "cgi/counter.dat";  # the data storage file
 
@@ -23,7 +23,7 @@ fclose($fp);
 <meta name="author" content="Thorsten Koch">
 <meta name="description" content="SoPlex Homepage">
 <meta name="keywords" content="SoPlex, Simplex, Solver, LP, Linear Programming, Mathematical Programming, Optimization">
-<meta name="date" content="$Date: 2002/01/16 15:38:46 $">
+<meta name="date" content="$Date: 2002/01/21 09:02:11 $">
 <meta name="robots" content="index|follow">
 <meta http-equiv="content-type" content="text/html;charset=iso-8859-1">
 <title>SoPlex</title> 
@@ -158,6 +158,8 @@ information on how to compile, install, use, and modify SoPlex.
     Mathematical Programming Glossary© by Harvey J. Greenberg</a></dt>
 <dt><a href="http://www.informs.org/Resources">
    INFORMS OR/MS Resource Collection</a></dt>
+<dt><a href="http://www.cise.ufl.edu/~davis/sparse">
+   University of Florida Sparse Matrix Collection</a></dt>
 </dl>
 <p>
 <hr noshade>
@@ -182,7 +184,7 @@ border="0" width="88" height="36" align="bottom"></a>
 <img src="images/valid-html40.png" alt="Valid HTML 4.0!"
 border="0" height="31" width="88" align="bottom"></a>
 <hr noshade><address><font size=-1>
-Last Update $Date: 2002/01/16 15:38:46 $ by
+Last Update $Date: 2002/01/21 09:02:11 $ by
 <a href="/personal/personal.pl?name=koch">Thorsten Koch</a>
 <br>&copy; 2002 by Konrad-Zuse-Zentrum für Informationstechnik Berlin (ZIB)<br>
 http://www.zib.de/Optimization/Software/Soplex/soplex.php

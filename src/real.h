@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: real.h,v 1.1 2002/01/19 18:59:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: real.h,v 1.2 2002/01/21 09:02:11 bzfkocht Exp $"
 
 /**@file  real.h
  * @brief Floating point type definition.
@@ -22,9 +22,29 @@
 #define _REAL_H_
 
 #ifdef WITH_LONG_DOUBLE
+
 typedef long double Real;
+
+#define EPS_ZERO  1e-16  // additive zero. 1.0 + EPS_ZERO == 1.0
+
 #else
+
 typedef double Real;
-#endif
+
+#define EPS_ZERO  1e-32  // additive zero. 1.0 + EPS_ZERO == 1.0
+
+#endif // !WITH_LONG_DOUBLE
+
+/* Hi Fortran !
+ */
+#define EQ(a, b)   (fabs((a) - (b)) <= EPS_ZERO)
+#define NE(a, b)   (fabs((a) - (b)) >  EPS_ZERO)
+#define LT(a, b)   (((a) - (b))     < -EPS_ZERO)
+#define LE(a, b)   (((a) - (b))     <  EPS_ZERO)
+#define GT(a, b)   (((a) - (b))     >  EPS_ZERO)
+#define GE(a, b)   (((a) - (b))     > -EPS_ZERO)
 
 #endif // _REAL_H_
+
+
+
