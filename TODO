@@ -1,4 +1,4 @@
-$Id: TODO,v 1.47 2002/01/13 13:37:33 bzfkocht Exp $
+$Id: TODO,v 1.48 2002/01/14 09:32:08 bzfkocht Exp $
 
 Diesen Kram mal als @todo's schreiben ;-)
 
@@ -38,33 +38,37 @@ clufactor.h
 sunos.sparc.sun LC 0 2417
 greenbea LR   =infeasible=  /-p1 hilft
 
-linux.alpha.compaq LC 0 501
+linux.alpha.compaq LC 0 542 3142
 greenbea ER   =infeasible=
 greenbeb LR   =infeasible=
-maros    LR   =infeasible=
-pilot87  EC *
 
-osf1.alpha.compaq LC 0 499
-greenbea ER   =infeasible=
-pilot    EC *
+linux.alpha.gnu LC 0 569 3399
+greenbea LR
+pilot-ja LR
 
-linux.x86.gnu LC 0 593
-greenbea LR  =infeasible= (der Fehler passiert in devex?) /-p1 hilft
+osf1.alpha.compaq LC 0 522 2819
+greenbeb ER
+pilot    LR *
+pilot87  ER
 
-hp-ux.hppa.hp LC 0 699
-greenbeb LR   = infeasible (der Fehler passiert in devex?) /-p1 hilft
-pilot-ja ER   = infeasible /-p1 hilft
-pilot87  EC *
+osf1.alpha.gnu LC 0 546 3286
+greenbea LR 
+pilot-ja LR
+
+linux.x86.gnu LC 0 593 3209
+greenbea ER 
+
+hp-ux.hppa.hp LC 0 755 4626
+greenbea LR
+pilot-ja LR
 
 irix.mips.sgi LC 0 5962
 greenbeb LR
 pilot-ja ER
 
-linux.x86.intel LC 0 923
-pilot-ja ER vermutlich erledigt.
-pilot87  EC *
-pilot87  LR *
-pilot87  ER *
+linux.x86.intel LC 0 936 5121
+greenbea ER
+
 
 
 
