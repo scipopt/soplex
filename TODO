@@ -21,6 +21,9 @@ reinterpret_cast durchsehen
 // lprow.cpp:double LPRow::infinity = 1e+100;
 // spxlp.cpp:const double SPxLP::infinity = 1e+100;
 
+Soplex1.1-Patch: keepBasis einfuehren fuer schnelles Reoptimieren
+(siehe soplex-patch.txt)
+
 Dokumentation: (alle * sind bereits fertig)
 
 cring.h
