@@ -13,10 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: updatevector.h,v 1.4 2001/11/23 14:34:55 bzfbleya Exp $"
+#pragma ident "@(#) $Id: updatevector.h,v 1.5 2001/11/26 12:28:44 bzfbleya Exp $"
 
-/**@file  vector.h
- * @brief Dense vector for linear algebra.
+/**@file  updatevector.h
+ * @brief Dense vector with semi-sparse vector for updates
  */
 
 #ifndef _UPDATEVECTOR_H_
@@ -31,69 +31,60 @@
 namespace soplex
 {
 
+/**@brief   Dense vector with semi-sparse vector for updates
+   @ingroup Algebra
 
-
-
-
-
-/*  \Section{Class Declaration}
-    The datastructur of #UpdateVector# is straightforward. It adds to the
-    baseclass #DVector# another #SSVector thedelta# for the update vector
-    $\delta$ and a #double theval# for the update value $\alpha$.
- */
-
-/** vector with updates.
     In many algorithms vectors are updated in every iteration, by adding a
-    multiple of another vector to it, i.e., given a vector $x$, a scalar
-    $\alpha$ and another vector $\delta$, the update to $x$ constists of
-    substituting it by $x \leftarrow x + \alpha\cdot\delta$.
+    multiple of another vector to it, i.e., given a vector \c x, a scalar
+    \f$\alpha\f$ and another vector \f$\delta\f$, the update to \c x constists of
+    substituting it by \f$x \leftarrow x + \alpha\cdot\delta\f$.
  
-    While the update itself can easily be expressed with methods of #Vector#,
-    it is often desirable to save the last update vector $\delta$ and value
-    $\alpha$. This is provided by class #UpdateVector#.
+    While the update itself can easily be expressed with methods of the class Vector,
+    it is often desirable to save the last update vector \f$\delta\f$ and value
+    \f$\alpha\f$. This is provided by class UpdateVector.
  
-    #UpdateVector#s are derived from #DVector# and provide additional methods
-    for saving and setting the multiplicator $\alpha$ and the update vector
-    $\delta$. Further, it allows for efficient sparse updates, by providing an
-    #IdxSet# idx containing the nonzero indeces of $\delta$.
- */
+    UpdateVector%s are derived from DVector and provide additional methods
+    for saving and setting the multiplicator \f$\alpha\f$ and the update vector
+    \f$\delta\f$. Further, it allows for efficient sparse updates, by providing an
+    IdxSet idx() containing the nonzero indeces of \f$\delta\f$.
+*/
 class UpdateVector : public DVector
 {
-   double theval;
-   SSVector thedelta;
+   double theval;        ///< update multiplicator 
+   SSVector thedelta;    ///< update vector
 
 public:
-   ///
+   /// update multiplicator \f$\alpha\f$, writeable
    double& value()
    {
       return theval;
    }
-   /// update multiplicator $\alpha$.
+   /// update multiplicator \f$\alpha\f$
    double value() const
    {
       return theval;
    }
 
-   ///
+   /// update vector \f$\delta\f$, writeable
    SSVector& delta()
    {
       return thedelta;
    }
-   /// update vector $\delta$.
+   /// update vector \f$\delta\f$
    const SSVector& delta() const
    {
       return thedelta;
    }
 
-   /// nonzero indeces of $\delta$.
+   /// nonzero indeces of update vector \f$\delta\f$
    const IdxSet& idx() const
    {
       return thedelta.indices();
    }
 
-   /** Update vector with $\alpha \cdot \delta$.
-    *  Add #value() * delta()# to the #UpdateVector#. Only the indeces set
-    *  in #idx()# are affected. For all other indeces, #delta()# is asumed
+   /// Perform the update
+   /**  Add \c value() * \c delta() to the UpdateVector. Only the indeces 
+    *  in idx() are affected. For all other indeces, delta() is asumed
     *  to be 0.
     */
    void update()
@@ -101,14 +92,14 @@ public:
       multAdd(theval, thedelta);
    }
 
-   /// clear vector and update vector.
+   /// clear vector and update vector
    void clear()
    {
       DVector::clear();
       clearUpdate();
    }
 
-   /// clear $\delta$, $\alpha$ and #idx()# using #idx()#.
+   /// clear \f$\delta\f$, \f$\alpha\f$
    void clearUpdate()
    {
       thedelta.clear();
@@ -116,21 +107,22 @@ public:
    }
 
 
-   /// reset dimension.
+   /// reset dimension
    void reDim(int newdim)
    {
       DVector::reDim(newdim);
       thedelta.reDim(newdim);
    }
 
-   ///
+   /// assignment from DVector
    UpdateVector& operator=(const DVector& rhs)
    {
-      DVector::operator=(rhs);
+      if ( this != & rhs )
+         DVector::operator=(rhs);
       return *this;
    }
 
-   ///
+   /// assignment
    UpdateVector& operator=(const UpdateVector& rhs);
 
    /// default constructor.
@@ -140,8 +132,7 @@ public:
          thedelta(p_dim, p_eps)
    { }
 
-   ///
-
+   /// 
    int isConsistent() const;
 };
 

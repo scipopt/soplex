@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.h,v 1.9 2001/11/25 14:58:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svector.h,v 1.10 2001/11/26 12:28:44 bzfbleya Exp $"
 
 /**@file  svector.h
  * @brief Sparse vectors.
@@ -304,7 +304,7 @@ public:
    /** The constructor expects one memory block where to store the nonzero
     *  elements. This must passed to the constructor, where the \em number
     *  of Element%s needs that fit into the memory must be given and a
-    *  pointer to the begining of the memory block. Once this memory has
+    *  pointer to the beginning of the memory block. Once this memory has
     *  been passed, it shall not be modified until the SVector is no
     *  longer used. Note, that when a memory block for \p n, say, Element%s
     *  has been passed, only \p n-1 are available for actually storing

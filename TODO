@@ -102,8 +102,8 @@ subsvector.h
 *svector.h
 svset.h
 timer.h
-unitvector.h
-updatevector.h
+*unitvector.h
+*updatevector.h
 *vector.h
 *vector_c.h
 

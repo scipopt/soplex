@@ -13,48 +13,43 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: unitvector.h,v 1.3 2001/11/07 17:31:26 bzfbleya Exp $"
+#pragma ident "@(#) $Id: unitvector.h,v 1.4 2001/11/26 12:28:44 bzfbleya Exp $"
 
+/**@file  unitvector.h
+ * @brief Sparse vector \f$e_i\f$.
+ */
 
 #ifndef _UNITVECTOR_H_
 #define _UNITVECTOR_H_
 
-//@ ----------------------------------------------------------------------------
-/*      \Section{Imports}
-    Import required system include files
- */
 #include <assert.h>
-
-
-/*  and class header files
- */
-
 #include "svector.h"
 
 namespace soplex
 {
 
 
+/**@brief   Sparse vector \f$e_i\f$.
+   @ingroup Algebra
 
+   A UnitVector is an SVector that can take only one nonzero value with
+   value 1 but arbitrary index.
 
+   \todo Several SVector modification methods are still accessible for UnitVector. 
+   They might be used to change the vector.
 
-
-//@ ----------------------------------------------------------------------------
-/*      \Section{Class Declaration}
- */
-
-/** sparse unit vector.
-    A #UnitVector# is an #SVector# that can take only one nonzero value with
-    value 1 but arbitrary index.
- */
+   \todo UnitVector memory management must be changed when SVector is redesigned.
+*/
 class UnitVector : public SVector
 {
 private:
-   Element themem;
-   Element themem1;
+   Element themem;  ///< memory for 1st sparse vector entry (size)
+   Element themem1; ///< memory for 2nd sparse vector entry (idx,1.0)
 
 public:
-   ///
+   /// returns value = 1
+   /**\pre \c n must be 0.
+    */
    /* ARGSUSED n */
    double value(int n) const
    {
@@ -62,29 +57,29 @@ public:
       return 1;
    }
 
-   /// construct #i#-th unit vector.
+   /// construct \c i 'th unit vector.
    UnitVector(int i = 0)
       : SVector(2, &themem)
    {
       add(i, 1.0);
    }
 
-   ///
+   ///  copy constructor
    UnitVector(const UnitVector& rhs)
       : SVector(2, &themem)
-         , themem (rhs.themem)
-         , themem1(rhs.themem1)
+      , themem (rhs.themem)
+      , themem1(rhs.themem1)
    {}
 
-   ///
-
+   /// assignment
    UnitVector& operator=(const UnitVector& rhs)
    {
-      themem1 = rhs.themem1;
+      if ( this != &rhs )
+         themem1 = rhs.themem1;
       return *this;
    }
 
-   ///
+   /// consitency check
    int isConsistent() const;
 };
 
