@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.h,v 1.15 2002/03/03 13:50:32 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.h,v 1.16 2002/03/06 10:28:52 bzfkocht Exp $"
 
 /**@file  nameset.h
  * @brief Set of strings.
@@ -289,6 +289,8 @@ public:
    //@{
    /// consistency check.
    bool isConsistent() const;
+
+   void dump() const;
    //@}
 
    /**@name Constructors / Destructors */

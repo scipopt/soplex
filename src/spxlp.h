@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.23 2002/03/03 13:50:34 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.24 2002/03/06 10:28:52 bzfkocht Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -654,6 +654,11 @@ public:
    /// reads a file in MPS format from \p in.
    virtual bool readMPS(std::istream& in, 
       NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
+
+   virtual void writeMPS(std::ostream& out, 
+      const NameSet* rowNames, const NameSet* colNames, 
+      const DIdxSet* /*p_intvars*/ = 0) const;
+
    //@}
 
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.cpp,v 1.18 2002/03/03 13:50:32 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.cpp,v 1.19 2002/03/06 10:28:52 bzfkocht Exp $"
 
 #include <string.h>
 #include "spxdefines.h"
@@ -275,6 +275,18 @@ NameSet::NameSet(int p_max, int mmax, Real fac, Real memFac)
 NameSet::~NameSet()
 {
    spx_free(mem);
+}
+
+void NameSet::dump() const
+{
+   for(int i = 0; i < num(); i++)
+   {
+      std::cout << i << " " 
+                << key(i).info << " "
+                << key(i).idx << " "
+                << operator[](i) 
+                << std::endl;
+   }
 }
 
 bool NameSet::isConsistent() const

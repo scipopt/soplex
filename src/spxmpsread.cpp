@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.21 2002/03/03 13:50:34 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.22 2002/03/06 10:28:52 bzfkocht Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.
@@ -145,7 +145,7 @@ static void readRows(
       if (mps.field0() != 0)
       {
          VERBOSE2({ std::cout << "Objective name : " << mps.objName()
-                                 << std::endl; });
+                              << std::endl; });
 
          if (strcmp(mps.field0(), "COLUMNS"))
             break;
