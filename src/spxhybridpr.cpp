@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.18 2002/03/03 13:50:34 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.19 2002/03/21 16:06:18 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -107,17 +107,17 @@ int SPxHybridPR::selectLeave()
    return thepricer->selectLeave();
 }
 
-void SPxHybridPR::left4(int n, SoPlex::Id id)
+void SPxHybridPR::left4(int n, SPxId id)
 {
    thepricer->left4(n, id);
 }
 
-SoPlex::Id SPxHybridPR::selectEnter()
+SPxId SPxHybridPR::selectEnter()
 {
    return thepricer->selectEnter();
 }
 
-void SPxHybridPR::entered4(SoPlex::Id id, int n)
+void SPxHybridPR::entered4(SPxId id, int n)
 {
    thepricer->entered4(id, n);
 }

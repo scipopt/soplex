@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.h,v 1.12 2002/03/03 13:50:34 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.h,v 1.13 2002/03/21 16:06:18 bzfkocht Exp $"
 
 /**@file  spxharrisrt.h
  * @brief Harris pricing with shifting.
@@ -70,7 +70,7 @@ public:
    ///
    virtual int selectLeave(Real& val);
    ///
-   virtual SoPlex::Id selectEnter(Real& val);
+   virtual SPxId selectEnter(Real& val);
    /// default constructor
    SPxHarrisRT() 
       : SPxRatioTester()

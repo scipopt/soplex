@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultpr.cpp,v 1.10 2002/03/03 13:50:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefaultpr.cpp,v 1.11 2002/03/21 16:06:18 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -57,14 +57,14 @@ int SPxDefaultPR::selectLeave()
    return selectLeaveX(0, 1);
 }
 
-SoPlex::Id SPxDefaultPR::selectEnterX(int start1, int incr1,
+SPxId SPxDefaultPR::selectEnterX(int start1, int incr1,
                                      int start2, int incr2)
 {
    assert(thesolver != 0);
 
    // const SPxBasis::Desc&    ds   = thesolver->basis().desc();
 
-   SoPlex::Id id;
+   SPxId id;
    int        i;
    Real     best = -theeps;
 
@@ -102,7 +102,7 @@ SoPlex::Id SPxDefaultPR::selectEnterX(int start1, int incr1,
    return id;
 }
 
-SoPlex::Id SPxDefaultPR::selectEnter()
+SPxId SPxDefaultPR::selectEnter()
 {
    return selectEnterX(0, 1, 0, 1);
 }

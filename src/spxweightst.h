@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.h,v 1.8 2002/03/03 13:50:35 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightst.h,v 1.9 2002/03/21 16:06:19 bzfkocht Exp $"
 
 
 /**@file  spxweightst.h
@@ -61,7 +61,7 @@ class SPxWeightST : public SPxStarter
 
    DataArray < Real > * weight;
    DataArray < Real > * coWeight;
-   void setPrimalStatus(SPxBasis::Desc&, const SoPlex&, const SoPlex::Id&);
+   void setPrimalStatus(SPxBasis::Desc&, const SoPlex&, const SPxId&);
 
 protected:
    /// weight value for LP rows.

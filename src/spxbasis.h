@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.23 2002/03/04 16:50:50 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.24 2002/03/21 16:06:18 bzfkocht Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -302,7 +302,7 @@ protected:
    */
 
    /// #Id%s of basic vectors.
-   DataArray < SPxLP::Id > theBaseId;
+   DataArray < SPxId > theBaseId;
 
    /// pointers to the vectors of the basis matrix.
    DataArray < const SVector* > matrix;
@@ -342,8 +342,8 @@ protected:
    Real nzFac;      ///< current nzFactor
    Real lastFill;   ///< fill occured during last factorization
 
-   SPxLP::Id lastin;  ///< #lastEntered(): variable entered the base last
-   SPxLP::Id lastout; ///< #lastLeft(): variable left the base last
+   SPxId lastin;  ///< #lastEntered(): variable entered the base last
+   SPxId lastout; ///< #lastLeft(): variable left the base last
    int lastidx;       ///< #lastIndex(): basis index where last update was done
 
 private:
@@ -386,24 +386,24 @@ public:
    Desc::Status dualColStatus(int i) const;
 
    /// dual #Status for the column variable with ID \p id of the loaded LP.
-   Desc::Status dualStatus(const SPxLP::SPxColId& id) const;
+   Desc::Status dualStatus(const SPxColId& id) const;
 
    /// dual #Status for the \p i 'th row variable of the loaded LP.
    Desc::Status dualRowStatus(int i) const;
 
    /// dual #Status for the row variable with ID \p id of the loaded LP.
-   Desc::Status dualStatus(const SPxLP::SPxRowId& id) const;
+   Desc::Status dualStatus(const SPxRowId& id) const;
 
    /// dual #Status for the variable with ID \p id of the loaded LP.
    /** It is automatically detected, whether the \p id is one of a 
        row or a column variable, and the correct row or column status
        is returned.
    */
-   Desc::Status dualStatus(const SPxLP::Id& id) const
+   Desc::Status dualStatus(const SPxId& id) const
    {
       return id.isSPxRowId()
-         ? dualStatus(SPxLP::SPxRowId(id))
-         : dualStatus(SPxLP::SPxColId(id));
+         ? dualStatus(SPxRowId(id))
+         : dualStatus(SPxColId(id));
    }
    //@}
 
@@ -411,12 +411,12 @@ public:
    /**@name Inquiry Methods */
    //@{
    /// 
-   SPxLP::Id& baseId(int i)
+   SPxId& baseId(int i)
    {
       return theBaseId[i];
    }
    /// returns the #Id of the \p i 'th basis vector.
-   SPxLP::Id baseId(int i) const
+   SPxId baseId(int i) const
    {
       return theBaseId[i];
    }
@@ -429,13 +429,13 @@ public:
    }
 
    /// returns #Id of last vector included to the basis.
-   SPxLP::Id lastEntered() const
+   SPxId lastEntered() const
    {
       return lastin;
    }
 
    /// returns #Id of last vector that left the basis.
-   SPxLP::Id lastLeft() const
+   SPxId lastLeft() const
    {
       return lastout;
    }
@@ -718,7 +718,7 @@ public:
        implementation is hidden behind #FAST updates, depends on the
        #SLinSolver implementation class.
     */
-   virtual void change(int i, SPxLP::Id& id,
+   virtual void change(int i, SPxId& id,
                         const SVector* enterVec, const SSVector* eta = 0);
 
    /// reads a file in MPS basis format from \p in.

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxshift.cpp,v 1.12 2002/03/03 13:50:35 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxshift.cpp,v 1.13 2002/03/21 16:06:19 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -472,16 +472,16 @@ void SoPlex::unShift(void)
          {
             for (i = dim(); i-- > 0;)
             {
-               Id l_id = baseId(i);
+               SPxId l_id = baseId(i);
                int l_num = number(l_id);
-               if (l_id.type() == Id::ROWID)
+               if (l_id.type() == SPxId::ROW_ID)
                {
                   t_up = -lhs(l_num);
                   t_low = -rhs(l_num);
                }
                else
                {
-                  assert(l_id.type() == Id::COLID);
+                  assert(l_id.type() == SPxId::COL_ID);
                   t_up = upper(l_num);
                   t_low = lower(l_num);
                }
@@ -534,10 +534,10 @@ void SoPlex::unShift(void)
             assert(rep() == ROW);
             for (i = dim(); i-- > 0;)
             {
-               Id l_id = baseId(i);
+               SPxId l_id = baseId(i);
                int l_num = number(l_id);
                t_up = t_low = 0;
-               if (l_id.type() == Id::ROWID)
+               if (l_id.type() == SPxId::ROW_ID)
                   clearDualBounds(ds.rowStatus(l_num), t_up, t_low);
                else
                   clearDualBounds(ds.colStatus(l_num), t_up, t_low);

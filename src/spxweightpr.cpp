@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.15 2002/03/11 17:43:57 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.16 2002/03/21 16:06:19 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -53,8 +53,8 @@ void SPxWeightPR::computeLeavePenalty(int start, int end)
 
    for (int i = start; i < end; ++i)
    {
-      SoPlex::Id id = basis.baseId(i);
-      if (id.type() == SPxLP::Id::ROWID)
+      SPxId id = basis.baseId(i);
+      if (id.type() == SPxId::ROW_ID)
          leavePenalty[i] = rPenalty[ thesolver->number(id) ];
       else
          leavePenalty[i] = cPenalty[ thesolver->number(id) ];
@@ -155,7 +155,7 @@ int SPxWeightPR::selectLeave()
 }
 #endif
 
-SoPlex::Id SPxWeightPR::selectEnter()
+SPxId SPxWeightPR::selectEnter()
 {
    const Vector& rTest = (solver()->rep() == SoPlex::ROW)
                          ? solver()->test() : solver()->coTest();
@@ -163,7 +163,7 @@ SoPlex::Id SPxWeightPR::selectEnter()
                          ? solver()->coTest() : solver()->test();
    const SPxBasis::Desc& ds = solver()->basis().desc();
    Real best = infinity;
-   SoPlex::Id lastId;
+   SPxId lastId;
    Real x;
    int i;
 
@@ -185,7 +185,7 @@ SoPlex::Id SPxWeightPR::selectEnter()
             break;
          case SPxBasis::Desc::P_FREE :
          case SPxBasis::Desc::D_FREE :
-            return SoPlex::Id(solver()->rId(i));
+            return SPxId(solver()->rId(i));
          case SPxBasis::Desc::D_ON_BOTH :
             if (solver()->pVec()[i] > solver()->upBound()[i])
                x *= 1 + rPenalty[i];
@@ -223,7 +223,7 @@ SoPlex::Id SPxWeightPR::selectEnter()
             break;
          case SPxBasis::Desc::P_FREE :
          case SPxBasis::Desc::D_FREE :
-            return SoPlex::Id(solver()->cId(i));
+            return SPxId(solver()->cId(i));
          case SPxBasis::Desc::D_ON_BOTH :
             if (solver()->coPvec()[i] > solver()->ucBound()[i])
                x *= 1 + cPenalty[i];

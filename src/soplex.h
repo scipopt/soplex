@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.39 2002/03/03 13:50:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.40 2002/03/21 16:06:18 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -556,7 +556,7 @@ public:
    ///
    virtual void changeObj(int i, Real newVal);
    ///
-   virtual void changeObj(SPxLP::SPxColId p_id, Real p_newVal)
+   virtual void changeObj(SPxColId p_id, Real p_newVal)
    {
       changeObj(number(p_id), p_newVal);
    }
@@ -565,7 +565,7 @@ public:
    ///
    virtual void changeLower(int i, Real newLower);
    ///
-   virtual void changeLower(SPxLP::SPxColId p_id, Real p_newLower)
+   virtual void changeLower(SPxColId p_id, Real p_newLower)
    {
       changeLower(number(p_id), p_newLower);
    }
@@ -574,7 +574,7 @@ public:
    ///
    virtual void changeUpper(int i, Real newUpper);
    ///
-   virtual void changeUpper(SPxLP::SPxColId p_id, Real p_newUpper)
+   virtual void changeUpper(SPxColId p_id, Real p_newUpper)
    {
       changeUpper(number(p_id), p_newUpper);
    }
@@ -584,7 +584,7 @@ public:
    virtual void changeBounds(int i, Real newLower, Real newUpper);
    ///
    virtual void changeBounds(
-      SPxLP::SPxColId p_id, Real p_newLower, Real p_newUpper)
+      SPxColId p_id, Real p_newLower, Real p_newUpper)
    {
       changeBounds(number(p_id), p_newLower, p_newUpper);
    }
@@ -593,7 +593,7 @@ public:
    ///
    virtual void changeLhs(int i, Real newLhs);
    ///
-   virtual void changeLhs(SPxLP::SPxRowId p_id, Real p_newLhs)
+   virtual void changeLhs(SPxRowId p_id, Real p_newLhs)
    {
       changeLhs(number(p_id), p_newLhs);
    }
@@ -602,7 +602,7 @@ public:
    ///
    virtual void changeRhs(int i, Real newRhs);
    ///
-   virtual void changeRhs(SPxLP::SPxRowId p_id, Real p_newRhs)
+   virtual void changeRhs(SPxRowId p_id, Real p_newRhs)
    {
       changeRhs(number(p_id), p_newRhs);
    }
@@ -612,21 +612,21 @@ public:
    virtual void changeRange(int i, Real newLhs, Real newRhs);
    ///
    virtual void changeRange(
-      SPxLP::SPxRowId p_id, Real p_newLhs, Real p_newRhs)
+      SPxRowId p_id, Real p_newLhs, Real p_newRhs)
    {
       changeRange(number(p_id), p_newLhs, p_newRhs);
    }
    ///
    virtual void changeRow(int i, const LPRow& newRow);
    ///
-   virtual void changeRow(SPxLP::SPxRowId p_id, const LPRow& p_newRow)
+   virtual void changeRow(SPxRowId p_id, const LPRow& p_newRow)
    {
       changeRow(number(p_id), p_newRow);
    }
    ///
    virtual void changeCol(int i, const LPCol& newCol);
    ///
-   virtual void changeCol(SPxLP::SPxColId p_id, const LPCol& p_newCol)
+   virtual void changeCol(SPxColId p_id, const LPCol& p_newCol)
    {
       changeCol(number(p_id), p_newCol);
    }
@@ -634,7 +634,7 @@ public:
    virtual void changeElement(int i, int j, Real val);
    ///
    virtual void changeElement(
-      SPxLP::SPxRowId rid, SPxLP::SPxColId cid, Real val)
+      SPxRowId rid, SPxColId cid, Real val)
    {
       changeElement(number(rid), number(cid), val);
    }
@@ -664,17 +664,17 @@ public:
     *  \p i 'th #SPxColId for a columnwise basis represenation. Hence,
     *  0 <= i < #coDim().
     */
-   Id id(int i) const
+   SPxId id(int i) const
    {
       if (rep() == ROW)
       {
-         SPxLP::SPxRowId rid = SPxLP::rId(i);
-         return Id(rid);
+         SPxRowId rid = SPxLP::rId(i);
+         return SPxId(rid);
       }
       else
       {
-         SPxLP::SPxColId cid = SPxLP::cId(i);
-         return Id(cid);
+         SPxColId cid = SPxLP::cId(i);
+         return SPxId(cid);
       }
    }
 
@@ -683,25 +683,25 @@ public:
     *  \p i 'th #SPxRowId for a columnwise basis represenation. Hence,
     *  0 <= i < #dim().
     */
-   Id coId(int i) const
+   SPxId coId(int i) const
    {
       if (rep() == ROW)
       {
-         SPxLP::SPxColId cid = SPxLP::cId(i);
-         return Id(cid);
+         SPxColId cid = SPxLP::cId(i);
+         return SPxId(cid);
       }
       else
       {
-         SPxLP::SPxRowId rid = SPxLP::rId(i);
-         return Id(rid);
+         SPxRowId rid = SPxLP::rId(i);
+         return SPxId(rid);
       }
    }
 
-   /// Is \p p_id an Id ?
+   /// Is \p p_id an SPxId ?
    /** This method returns wheather or not \p p_id identifies a vector
     *  with respect to the chosen representation.
     */
-   int isId(SPxLP::Id p_id) const
+   int isId(SPxId p_id) const
    {
       return p_id.info * therep > 0;
    }
@@ -710,7 +710,7 @@ public:
    /** This method returns wheather or not \p p_id identifies a coVector
     *  with respect to the chosen representation.
     */
-   int isCoId(SPxLP::Id p_id) const
+   int isCoId(SPxId p_id) const
    {
       return p_id.info * therep < 0;
    }
@@ -740,7 +740,7 @@ public:
    }
 
    ///
-   const SVector& vector(const SPxLP::SPxRowId& rid) const
+   const SVector& vector(const SPxRowId& rid) const
    {
       assert(rid.isValid());
       return (rep() == ROW)
@@ -748,7 +748,7 @@ public:
           : static_cast<const SVector&>(unitVecs[number(rid)]);
    }
    ///
-   const SVector& vector(const SPxLP::SPxColId& cid) const
+   const SVector& vector(const SPxColId& cid) const
    {
       assert(cid.isValid());
       return (rep() == COLUMN)
@@ -765,13 +765,13 @@ public:
     *  @todo The implementation does not exactly look like it will do
     *        what is promised in the describtion.
     */
-   const SVector& vector(const Id& p_id) const
+   const SVector& vector(const SPxId& p_id) const
    {
       assert(p_id.isValid());
 
       return p_id.isSPxRowId()
-         ? vector(SPxLP::SPxRowId(p_id))
-         : vector(SPxLP::SPxColId(p_id));
+         ? vector(SPxRowId(p_id))
+         : vector(SPxColId(p_id));
    }
 
    /// \p i 'th covector of LP.
@@ -783,7 +783,7 @@ public:
       return (*thecovectors)[i];
    }
    ///
-   const SVector& coVector(const SPxLP::SPxRowId& rid) const
+   const SVector& coVector(const SPxRowId& rid) const
    {
       assert(rid.isValid());
       return (rep() == COLUMN)
@@ -791,7 +791,7 @@ public:
           : static_cast<const SVector&>(unitVecs[number(rid)]);
    }
    ///
-   const SVector& coVector(const SPxLP::SPxColId& cid) const
+   const SVector& coVector(const SPxColId& cid) const
    {
       assert(cid.isValid());
       return (rep() == ROW)
@@ -805,12 +805,12 @@ public:
     *  matrix is returned, otherwise the corresponding unit vector is
     *  returned.
     */
-   const SVector& coVector(const Id& p_id) const
+   const SVector& coVector(const SPxId& p_id) const
    {
       assert(p_id.isValid());
       return p_id.isSPxRowId()
-             ? coVector(SPxLP::SPxRowId(p_id))
-          : coVector(SPxLP::SPxColId(p_id));
+             ? coVector(SPxRowId(p_id))
+          : coVector(SPxColId(p_id));
    }
    /// return \p i 'th unit vector.
    const SVector& unitVector(int i) const
@@ -844,22 +844,22 @@ public:
    }
 
    /// is the \p p_id 'th vector basic ?
-   int isBasic(SPxLP::Id p_id) const
+   int isBasic(SPxId p_id) const
    {
       assert(p_id.isValid());
       return p_id.isSPxRowId()
-         ? isBasic(SPxLP::SPxRowId(p_id))
-         : isBasic(SPxLP::SPxColId(p_id));
+         ? isBasic(SPxRowId(p_id))
+         : isBasic(SPxColId(p_id));
    }
 
    /// is the \p rid 'th vector basic ?
-   int isBasic(SPxLP::SPxRowId rid) const
+   int isBasic(SPxRowId rid) const
    {
       return isBasic(desc().rowStatus(number(rid)));
    }
 
    /// is the \p cid 'th vector basic ?
-   int isBasic(SPxLP::SPxColId cid) const
+   int isBasic(SPxColId cid) const
    {
       return isBasic(desc().colStatus(number(cid)));
    }
@@ -1323,7 +1323,7 @@ protected:
 
 private:
    int leave(int i);
-   int enter(Id& id);
+   int enter(SPxId& id);
 
    /// test coVector #i# with status #stat#.
    Real coTest(int, SPxBasis::Desc::Status) const;
@@ -1416,7 +1416,7 @@ protected:
    Real nonbasicValue() const;
 
    /// Get pointer to the \p id 'th vector
-   virtual const SVector* enterVector(const Id& p_id)
+   virtual const SVector* enterVector(const SPxId& p_id)
    {
       assert(p_id.isValid());
       return p_id.isSPxRowId() 
@@ -1424,27 +1424,27 @@ protected:
    }
    ///
    virtual void getLeaveVals(int i,
-      SPxBasis::Desc::Status& leaveStat, Id& leaveId,
+      SPxBasis::Desc::Status& leaveStat, SPxId& leaveId,
       Real& leaveMax, Real& leavebound, int& leaveNum);
    ///
-   virtual void getLeaveVals2(Real leaveMax, Id enterId,
+   virtual void getLeaveVals2(Real leaveMax, SPxId enterId,
       Real& enterBound, Real& newUBbound,
       Real& newLBbound, Real& newCoPrhs);
    ///
-   virtual void getEnterVals(Id id, Real& enterTest,
+   virtual void getEnterVals(SPxId id, Real& enterTest,
       Real& enterUB, Real& enterLB, Real& enterVal, Real& enterMax,
       Real& enterPric, SPxBasis::Desc::Status& enterStat, Real& enterRO);
    ///
    virtual void getEnterVals2(int leaveIdx, 
       Real enterMax, Real& leaveBound);
    ///
-   virtual void ungetEnterVal(Id enterId, SPxBasis::Desc::Status enterStat,
+   virtual void ungetEnterVal(SPxId enterId, SPxBasis::Desc::Status enterStat,
       Real leaveVal, const SVector& vec);
    ///
-   virtual void rejectEnter(Id enterId,
+   virtual void rejectEnter(SPxId enterId,
       Real enterTest, SPxBasis::Desc::Status enterStat);
    ///
-   virtual void rejectLeave(int leaveNum, Id leaveId,
+   virtual void rejectLeave(int leaveNum, SPxId leaveId,
       SPxBasis::Desc::Status leaveStat, const SVector* newVec = 0);
    ///
    virtual void setupPupdate(void);

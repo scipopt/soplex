@@ -13,53 +13,41 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultpr.h,v 1.10 2002/03/21 16:06:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxid.cpp,v 1.1 2002/03/21 16:06:18 bzfkocht Exp $"
 
-/**@file  spxdefaultpr.h
- * @brief Default pricer.
- */
-#ifndef _SPXDEFAULTPR_H_
-#define _SPXDEFAULTPR_H_
-
-#include <assert.h>
-
-#include "spxpricer.h"
+#include "spxid.h"
 
 namespace soplex
 {
-
-/**@brief   Default pricer.
-   @ingroup Algo
-
-   Class #SPxDefaultPR is an implementation class for #SPxPricer implementing
-   Dantzig's the default pricing strategy, i.e. maximal/minimal reduced cost or
-   maximal violated constraint.
-
-   See #SPxPricer for a class documentation.
-
-   @todo This should be renamed to something like Danzig or Textbook pricing.
-*/
-class SPxDefaultPR : public SPxPricer
+SPxColId::SPxColId(const DataKey& p_key) 
+   : DataKey(p_key)
 {
-private:
-   ///
-   int selectLeaveX(int start, int incr);
-   ///
-   SPxId selectEnterX(int start1, int incr1, int start2, int incr2);
+   info = SPxId::COL_ID;
+}
 
-public:
-   ///
-   virtual int selectLeave();
-   ///
-   virtual SPxId selectEnter();
+SPxColId::SPxColId(const SPxId& p_key) 
+   : DataKey(p_key)
+{
+   assert(!p_key.isSPxRowId());
 
-   /// default constructor
-   SPxDefaultPR() 
-      : SPxPricer("Danzig")
-   {}   
-};
+   info = SPxId::COL_ID;
+}
+
+SPxRowId::SPxRowId(const DataKey& p_key) 
+   : DataKey(p_key)
+{
+   info = SPxId::ROW_ID;
+}
+
+SPxRowId::SPxRowId(const SPxId& p_key) 
+   : DataKey(p_key)
+{
+   assert(!p_key.isSPxColId());
+
+   info = SPxId::ROW_ID;
+}
+
 } // namespace soplex
-#endif // _SPXDEFAULTPRR_H_
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:
@@ -69,3 +57,7 @@ public:
 //Emacs indent-tabs-mode:nil
 //Emacs End:
 //-----------------------------------------------------------------------------
+
+
+
+

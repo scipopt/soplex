@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxparmultpr.h,v 1.10 2002/03/03 13:50:34 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxparmultpr.h,v 1.11 2002/03/21 16:06:19 bzfkocht Exp $"
 
 /**@file  spxparmultpr.h
  * @brief Partial multiple pricing.
@@ -34,7 +34,7 @@ namespace soplex
 
 struct SPxParMultPr_Tmp
 {
-   SoPlex::Id id;
+   SPxId id;
    Real test;
 };
 
@@ -74,7 +74,7 @@ public:
    ///
    virtual int selectLeave();
    ///
-   virtual SPxLP::Id selectEnter();
+   virtual SPxId selectEnter();
    /// default constructor
    SPxParMultPR() 
       : SPxPricer("ParMult")

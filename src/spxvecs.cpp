@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvecs.cpp,v 1.17 2002/03/11 17:43:57 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxvecs.cpp,v 1.18 2002/03/21 16:06:19 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -363,7 +363,7 @@ void SoPlex::computeEnterCoPrhs()
 
    for (int i = dim() - 1; i >= 0; --i)
    {
-      Id l_id = baseId(i);
+      SPxId l_id = baseId(i);
       if (l_id.isSPxRowId())
          computeEnterCoPrhs4Row(i, number(SPxRowId(l_id)));
       else
@@ -439,7 +439,7 @@ void SoPlex::computeLeaveCoPrhs()
 
    for (int i = dim() - 1; i >= 0; --i)
    {
-      Id l_id = baseId(i);
+      SPxId l_id = baseId(i);
       if (l_id.isSPxRowId())
          computeLeaveCoPrhs4Row(i, number(SPxRowId(l_id)));
       else

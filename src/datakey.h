@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datakey.h,v 1.6 2002/01/31 08:19:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: datakey.h,v 1.7 2002/03/21 16:06:17 bzfkocht Exp $"
 
 /**@file  datakey.h
  * @brief Entry identifier class for items of a #DataSet.
@@ -47,25 +47,16 @@ namespace soplex
 */
 class DataKey
 {
+protected:
 public:
    signed int info: 8;                        ///< user information (8 bit)
    signed int idx : (8 * sizeof(int) - 8);    ///< (locally) unique key index
 
 public:
-   /// gets the user information (#info) attached to the #Key.
-   inline int getInfo() const
-   {
-      return info;
-   }
    /// gets the index number (#idx) of the #Key.
    inline int getIdx() const
    {
       return idx;
-   }
-   /// sets the user information (#info) attached to the #Key.
-   inline void setInfo(int p_info) 
-   {
-      info = p_info;
    }
    /// sets the index number (#idx) of the #Key.
    inline void setIdx(int p_idx) 
@@ -80,7 +71,7 @@ public:
    /// makes the #Key invalid and clears the #info field.
    inline void inValidate()
    {
-      idx = -1;
+      idx  = -1;
       info = 0;
    }
    /// Default constructor. Constructs an invalid #Key.
@@ -97,10 +88,9 @@ public:
    /// Assignment operator.
    DataKey& operator=(const DataKey& rhs)
    {
-      assert(sizeof(*this) == sizeof(int));
-      // dirty implementation of the week.
-      *reinterpret_cast<int*>(this) = *reinterpret_cast<const int*>(&rhs);
-
+      info = rhs.info;
+      idx  = rhs.idx;
+      
       return *this;
    }
    /// Copy constructor.
@@ -121,3 +111,17 @@ public:
 //Emacs indent-tabs-mode:nil
 //Emacs End:
 //-----------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+

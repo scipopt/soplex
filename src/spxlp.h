@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.26 2002/03/11 17:43:57 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.27 2002/03/21 16:06:19 bzfkocht Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -26,6 +26,8 @@
 #include <iomanip>
 
 #include "spxdefines.h"
+#include "datakey.h"
+#include "spxid.h"
 #include "dvector.h"
 #include "svset.h"
 #include "dataarray.h"
@@ -82,177 +84,12 @@ class SPxLP : protected LPRowSet, protected LPColSet
       is redundant but eases the access.
    */
 public:
-   /**@name Datatypes */
-   //@{
-   ///
-   class Id;
-
-   /// Ids for LP columns.
-   /** Class #SPxColId provides #DataSet::Key%s for the column indices of an
-       #SPxLP.
-   */
-   class SPxColId : public DataKey
-   {
-   private:
-      friend class SPxLP;
-
-      explicit SPxColId(const DataKey& p_key) : DataKey(p_key) {}
-   public:
-      /// default constructor.
-      SPxColId() {}
-
-      ///
-      explicit SPxColId(const Id& p_key) : DataKey(p_key)
-      {
-         assert(!p_key.isSPxRowId());
-         info = info * Id::COLID - 1;
-      }
-   };
-
-   /// Ids for LP rows.
-   /** Class #SPxRowId provides #DataSet::Key%s for the row indices of an
-       #SPxLP.
-   */
-   class SPxRowId : public DataKey
-   {
-   private:
-      friend class SPxLP;
-
-      explicit SPxRowId(const DataKey& p_key) : DataKey(p_key) {}
-   public:
-      /// default constructor.
-      SPxRowId() {}
-
-      ///
-      explicit SPxRowId(const Id& p_key) : DataKey(p_key)
-      {
-         assert(!p_key.isSPxColId());
-         info = info * Id::ROWID - 1;
-      }
-   };
-
-   /*
-     \SubSubSection{SPxLP\_Ids}
-     Ids use the 2 msb of an #int# to store the id's #Type#,
-     #SPX_MAX_PE_LOG# for storing the PE number
-     and the remaining for the index.
-   */
-
-   /// Generic Ids for LP rows or columns.
-   /** Both, #SPxColId%s and #SPxRowId%s may be treated uniformly as
-       #Id%s:
- 
-       Rows and columns are numbered from 0 to #num()-1 and 0 to #dim()-1
-       respectively.  These numbers may be used to select individual rows or
-       columns. However, these numbers may change if other rows or columns are
-       added or removed.
- 
-       Further, each row or column of the problem matrix is assigned a
-       #SPxRowId or #SPxColId, respectively. They are be used to select
-       individual rows or columns just like numbers. In contrast to row and 
-       column numbers, ids remain unchanged for the time a row or column 
-       belongs to a #SPxLP, no matter what other rows or columns are added 
-       to it or removed from it.
-   */
-   class Id : public DataKey
-   {
-   public:
-      /// type of the id.
-      enum Type
-      {
-         ROWID = -1,   ///< row identifier.
-         NONE  = 0,    ///< invalid id.
-         COLID = 1     ///< column identifier.
-      };
-
-      /// returns the type of the id.
-      Type type() const
-      {
-         return info ? (info < 0 ? ROWID : COLID) : NONE;
-      }
-
-      /// returns TRUE iff the id is a valid column or row identifier.
-      int isValid() const
-      {
-         return info != 0;
-      }
-
-      /// makes the id invalid.
-      void inValidate()
-      {
-         info = 0;
-      }
-
-      /// is id a row id?
-      int isSPxRowId() const
-      {
-         return info < 0;
-      }
-
-      /// is id a column id?
-      int isSPxColId() const
-      {
-         return info > 0;
-      }
-
-      /// equality operator.
-      int operator==(const Id& id)
-      {
-         return (this == &id);//(*(int*)this == *(int*)&id);
-      }
-
-      /// inequality operator.
-      int operator!=(const Id& id)
-      {
-         return (this != &id); //(*(int*)this != *(int*)&id);
-      }
-
-      ///
-      Id& operator=(const Id& id)
-      {
-         if (this != &id)
-            DataKey::operator= ( id );
-         return *this;
-      }
-      ///
-      Id& operator=(const SPxColId& cid)
-      {
-         DataKey::operator= ( cid );
-         info = COLID * (cid.info + 1);
-         return *this;
-      }
-      /// assignment operator.
-      Id& operator=(const SPxRowId& rid)
-      {
-         DataKey::operator= ( rid );
-         info = ROWID * (rid.info + 1);
-         return *this;
-      }
-
-      /// default constructor. Constructs an invalid id.
-      Id()
-         : DataKey(NONE, -1)
-      {}
-
-      /// constructs an id out of a column identifier \p cid.
-      explicit Id(const SPxColId& cid)
-         : DataKey(COLID * (cid.info + 1), cid.idx)
-      {}
-
-      /// constructs an id out of a row identifier \p rid.
-      explicit Id(const SPxRowId& rid)
-         : DataKey(ROWID * (rid.info + 1), rid.idx) 
-      {}
-   };
-
    /// optimization sense.
    enum SPxSense
    {
       MAXIMIZE = 1,
       MINIMIZE = -1
    };
-   //@}
-
 private:
    SPxSense thesense;   ///< optimization sense.
 
@@ -487,11 +324,11 @@ public:
    }
 
    /// returns the row or column number for identifier \p id.
-   int number(const Id& id) const
+   int number(const SPxId& id) const
    {
-      return (id.type() == Id::COLID)
-             ? LPColSet::number(id)
-          : LPRowSet::number(id);
+      return (id.type() == SPxId::COL_ID)
+         ? LPColSet::number(id)
+         : LPRowSet::number(id);
    }
 
    /// returns the row identifier for row \p n.

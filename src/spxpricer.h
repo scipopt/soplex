@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxpricer.h,v 1.9 2002/03/03 13:50:34 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxpricer.h,v 1.10 2002/03/21 16:06:19 bzfkocht Exp $"
 
 
 /**@file  spxpricer.h
@@ -133,11 +133,11 @@ public:
        the one returned by the #SPxPricer at the previous call to
        #selectLeave(). However, one can not rely on this.
     */
-   virtual void left4(int /*n*/, SoPlex::Id /*id*/)
+   virtual void left4(int /*n*/, SPxId /*id*/)
    {}
 
    /// selects Id to enter basis.
-   /** Selects the #SoPlex::Id of a vector to enter the basis. The selected
+   /** Selects the #SPxId of a vector to enter the basis. The selected
        id, must not represent a basic index (i.e. #solver()->isBasic(id) must
        be false). However, the corresponding test value needs not to be less
        than #-epsilon(). If not, #SoPlex will discard the pivot.
@@ -148,7 +148,7 @@ public:
        the elements of #test() are so depends on the #SoPlex::Pricing
        type.
     */
-   virtual SoPlex::Id selectEnter() = 0;
+   virtual SPxId selectEnter() = 0;
 
    /// performs entering pivot.
    /** Method #entered4() is called after each simplex iteration in #ENTER
@@ -160,7 +160,7 @@ public:
        #SPxPricer at the previous call to #selectEnter(). However, one
        can not rely on this.
     */
-   virtual void entered4(SoPlex::Id /*id*/, int /*n*/)
+   virtual void entered4(SPxId /*id*/, int /*n*/)
    {}
    //@}
 

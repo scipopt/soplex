@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.14 2002/03/03 13:50:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.15 2002/03/21 16:06:18 bzfkocht Exp $"
 
 #include "spxdefines.h"
 #include "spxdevexpr.h"
@@ -103,12 +103,12 @@ int SPxDevexPR::selectLeaveX(Real& best, int start, int incr)
    return bstI;
 }
 
-void SPxDevexPR::left4(int n, SoPlex::Id id)
+void SPxDevexPR::left4(int n, SPxId id)
 {
    left4X(n, id, 0, 1);
 }
 
-void SPxDevexPR::left4X(int n, SoPlex::Id id, int start, int incr)
+void SPxDevexPR::left4X(int n, SPxId id, int start, int incr)
 {
    if (id.isValid())
    {
@@ -136,13 +136,13 @@ void SPxDevexPR::left4X(int n, SoPlex::Id id, int start, int incr)
    }
 }
 
-SoPlex::Id SPxDevexPR::selectEnter()
+SPxId SPxDevexPR::selectEnter()
 {
    Real val;
    return selectEnterX(val);
 }
 
-SoPlex::Id SPxDevexPR::selectEnterX(
+SPxId SPxDevexPR::selectEnterX(
    Real& best,
    int start1,
    int incr1,
@@ -205,11 +205,11 @@ SoPlex::Id SPxDevexPR::selectEnterX(
       return thesolver->coId(bstI1);
    }
 
-   SoPlex::Id none;
+   SPxId none;
    return none;
 }
 
-void SPxDevexPR::entered4(SoPlex::Id id, int n)
+void SPxDevexPR::entered4(SPxId id, int n)
 {
    entered4X(id, n, 0, 1, 0, 1);
 }
@@ -218,7 +218,7 @@ void SPxDevexPR::entered4(SoPlex::Id id, int n)
     has entered the basis at position n, but the id is not used here 
     (this is true for all pricers)
 */
-void SPxDevexPR::entered4X(SoPlex::Id /*id*/, int n,
+void SPxDevexPR::entered4X(SPxId /*id*/, int n,
    int start1, int incr1, int start2, int incr2)
 {
    if (n >= 0 && n < thesolver->dim())

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.h,v 1.10 2002/03/03 13:50:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfastrt.h,v 1.11 2002/03/21 16:06:18 bzfkocht Exp $"
 
 /**@file  spxfastrt.h
  * @brief Fast shifting ratio test.
@@ -72,7 +72,7 @@ private:
    ///
    int maxDelta(Real& val, Real& p_abs);
    ///
-   SoPlex::Id maxDelta(int& nr, Real& val, Real& p_abs);
+   SPxId maxDelta(int& nr, Real& val, Real& p_abs);
 
    /// Min phase 1 value.
    /** Computes the minimum value \p val that could be used for updating \p upd
@@ -94,7 +94,7 @@ private:
    ///
    int minDelta(Real& val, Real& p_abs);
    ///
-   SoPlex::Id minDelta(int& nr, Real& val, Real& p_abs);
+   SPxId minDelta(int& nr, Real& val, Real& p_abs);
    
    /// selects stable index for maximizing ratio test.
    /** Selects form all update values \p val < \p max the one with the largest
@@ -109,7 +109,7 @@ private:
    ///
    int maxSelect(Real& val, Real& stab, Real& bestDelta, Real max);
    ///
-   SoPlex::Id maxSelect(int& nr, Real& val, Real& stab,
+   SPxId maxSelect(int& nr, Real& val, Real& stab,
       Real& bestDelta, Real max);
 
    /// selects stable index for minimizing ratio test.
@@ -126,7 +126,7 @@ private:
    int minSelect(Real& val, Real& stab,
       Real& bestDelta, Real max);
 
-   SoPlex::Id minSelect(int& nr, Real& val, Real& stab,
+   SPxId minSelect(int& nr, Real& val, Real& stab,
       Real& bestDelta, Real max);
 
    ///
@@ -148,13 +148,13 @@ private:
 
    ///
    int minReenter(Real& sel, Real /*max*/, Real maxabs,
-                          SoPlex::Id id, int nr);
+                          SPxId id, int nr);
    /// numerical stability check.
    /** Tests whether the selected enter \p id needs to be discarded (and do so)
        and the ratio test is to be recomputed.
    */
    int maxReenter(Real& sel, Real /*max*/, Real maxabs,
-                          SoPlex::Id id, int nr);
+                          SPxId id, int nr);
 
    /**@todo the documentation seems to be incorrect. 
             No parameter \p sel exists.
@@ -164,7 +164,7 @@ private:
        the selected enter
        pivot. In this case return the update value in \p sel.
    */
-   int shortEnter(SoPlex::Id& enterId, int nr, Real max, Real maxabs);
+   int shortEnter(SPxId& enterId, int nr, Real max, Real maxabs);
 
 public:
    ///
@@ -172,7 +172,7 @@ public:
    ///
    virtual int selectLeave(Real& val);
    ///
-   virtual SoPlex::Id selectEnter(Real& val);
+   virtual SPxId selectEnter(Real& val);
    ///
    virtual void setType(SoPlex::Type);
    /// default constructor

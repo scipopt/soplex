@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.28 2002/03/11 17:43:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.29 2002/03/21 16:06:18 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -36,14 +36,14 @@ static Real minStab;
 //#define       EPS     1e-6
 
 SPxBasis::Desc::Status
-SPxBasis::dualStatus(const SPxLP::SPxColId& id) const
+SPxBasis::dualStatus(const SPxColId& id) const
 {
    METHOD( "SPxBasis::dualStatus()" );
    return dualColStatus(static_cast<SPxLP*>(theLP)->number(id));
 }
 
 SPxBasis::Desc::Status
-SPxBasis::dualStatus(const SPxLP::SPxRowId& id) const
+SPxBasis::dualStatus(const SPxRowId& id) const
 {
    METHOD( "SPxBasis::dualStatus()" );
    return dualRowStatus((static_cast<SPxLP*>(theLP))->number(id));
@@ -130,7 +130,7 @@ void SPxBasis::loadDesc(const Desc& ds)
    assert(ds.nRows() == theLP->nRows());
    assert(ds.nCols() == theLP->nCols());
 
-   SPxLP::Id none;
+   SPxId none;
    int i, j;
 
    lastin = none;
@@ -154,7 +154,7 @@ void SPxBasis::loadDesc(const Desc& ds)
    {
       if (theLP->isBasic(thedesc.rowStatus(i)))
       {
-         SPxLP::SPxRowId id = theLP->SPxLP::rId(i);
+         SPxRowId id = theLP->SPxLP::rId(i);
          theBaseId[j] = id;
          matrix[j] = &theLP->vector(id);
          nzCount += matrix[j++]->size();
@@ -165,7 +165,7 @@ void SPxBasis::loadDesc(const Desc& ds)
    {
       if (theLP->isBasic(thedesc.colStatus(i)))
       {
-         SPxLP::SPxColId id = theLP->SPxLP::cId(i);
+         SPxColId id = theLP->SPxLP::cId(i);
          theBaseId[j] = id;
          matrix[j] = &theLP->vector(id);
          nzCount += matrix[j++]->size();      
@@ -383,7 +383,7 @@ int SPxBasis::doFactorize()
 void SPxBasis::change
 (
    int i,
-   SPxLP::Id& id,
+   SPxId& id,
    const SVector* enterVec,
    const SSVector* eta
 )
@@ -527,7 +527,7 @@ void SPxBasis::dump()
    {
       if (theLP->isBasic(thedesc.rowStatus(i)))
       {
-         SPxLP::SPxRowId id = theLP->SPxLP::rId(i);
+         SPxRowId id = theLP->SPxLP::rId(i);
          std::cout << "\tR" << theLP->number(id);
          basesize++;
          if(basesize % 8 == 0)
@@ -539,7 +539,7 @@ void SPxBasis::dump()
    {
       if (theLP->isBasic(thedesc.colStatus(i)))
       {
-         SPxLP::SPxColId id = theLP->SPxLP::cId(i);
+         SPxColId id = theLP->SPxLP::cId(i);
          std::cout << "\tC" << theLP->number(id);
          basesize++;
          if(basesize % 8 == 0)

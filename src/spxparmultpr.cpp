@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxparmultpr.cpp,v 1.10 2002/03/03 13:50:34 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxparmultpr.cpp,v 1.11 2002/03/21 16:06:19 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -51,9 +51,9 @@ void SPxParMultPR::load(SoPlex* p_solver)
    pricSet.reSize(10 * partialSize);
 }
 
-SPxLP::Id SPxParMultPR::selectEnter()
+SPxId SPxParMultPR::selectEnter()
 {
-   SoPlex::Id id;
+   SPxId id;
    Real x;
    int i;
    int best = -1;

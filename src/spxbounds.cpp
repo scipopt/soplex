@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbounds.cpp,v 1.10 2002/03/03 13:50:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbounds.cpp,v 1.11 2002/03/21 16:06:18 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -220,7 +220,7 @@ void SoPlex::setEnterBounds()
 
    for (i = dim() - 1; i >= 0; --i)
    {
-      SPxLP::Id l_id = baseId(i);
+      SPxId l_id = baseId(i);
       if (l_id.isSPxRowId())
          setEnterBound4Row(i, number(SPxRowId(l_id)));
       else
@@ -303,7 +303,7 @@ void SoPlex::setLeaveBounds()
 
    for (i = dim() - 1; i >= 0; --i)
    {
-      SPxLP::Id l_id = baseId(i);
+      SPxId l_id = baseId(i);
       if (l_id.isSPxRowId())
          setLeaveBound4Row(i, number(SPxRowId(l_id)));
       else

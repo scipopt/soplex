@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.13 2002/03/11 17:43:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.14 2002/03/21 16:06:18 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -143,9 +143,9 @@ void SPxBasis::removedRow(int i)
       {
          for (int j = theLP->dim(); j >= 0; --j)
          {
-            SoPlex::Id id = baseId(j);
+            SPxId id = baseId(j);
             if (id.isSPxRowId()
-                 && theLP->number(SPxLP::SPxRowId(id)) < 0)
+                 && theLP->number(SPxRowId(id)) < 0)
             {
                baseId(j) = baseId(theLP->dim());
                if (j < theLP->dim())
@@ -326,9 +326,9 @@ void SPxBasis::removedCol(int i)
          assert( matrixIsSetup );
          for (int j = theLP->dim(); j >= 0; --j)
          {
-            SoPlex::Id id = baseId(j);
+            SPxId id = baseId(j);
             if (id.isSPxColId()
-                 && theLP->number(SPxLP::SPxColId(id)) < 0)
+                 && theLP->number(SPxColId(id)) < 0)
             {
                baseId(j) = baseId(theLP->dim());
                if (j < theLP->dim())

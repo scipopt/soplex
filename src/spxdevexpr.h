@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.h,v 1.12 2002/03/03 13:50:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.h,v 1.13 2002/03/21 16:06:18 bzfkocht Exp $"
 
 /**@file  spxdevexpr.h
  * @brief Devex pricer.
@@ -52,12 +52,12 @@ private:
    ///
    int selectLeaveX(Real& best, int start = 0, int incr = 1);
    ///
-   void left4X(int n, SoPlex::Id id, int start, int incr);
+   void left4X(int n, SPxId id, int start, int incr);
    ///
-   SoPlex::Id selectEnterX(Real& best, 
+   SPxId selectEnterX(Real& best, 
       int start1 = 0, int incr1 = 1, int start2 = 0, int incr2 = 1);
    ///
-   void entered4X(SoPlex::Id id, int n, 
+   void entered4X(SPxId id, int n, 
       int start1, int incr1, int start2, int incr2);
 
 public:
@@ -70,11 +70,11 @@ public:
    ///
    virtual int selectLeave();
    ///
-   virtual void left4(int n, SoPlex::Id id);
+   virtual void left4(int n, SPxId id);
    ///
-   virtual SoPlex::Id selectEnter();
+   virtual SPxId selectEnter();
    ///
-   virtual void entered4(SoPlex::Id id, int n);
+   virtual void entered4(SPxId id, int n);
    /// \p n vectors have been added to loaded LP.
    virtual void addedVecs (int n);
    /// \p n covectors have been added to loaded LP.

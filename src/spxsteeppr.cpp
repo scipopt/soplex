@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.17 2002/03/03 13:50:35 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.18 2002/03/21 16:06:19 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -85,7 +85,7 @@ void SPxSteepPR::setType(SoPlex::Type type)
          for (i = thesolver->dim() - 1; i >= 0; --i)
          {
             // coPenalty[i] = 1;
-            SoPlex::Id id = thesolver->basis().baseId(i);
+            SPxId id = thesolver->basis().baseId(i);
             int n = thesolver->number(id);
             if (thesolver->isId(id))
                leavePref[i] = pref[n];
@@ -218,7 +218,7 @@ void SPxSteepPR::setRep(SoPlex::Representation)
    }
 }
 
-void SPxSteepPR::left4X(int n, SoPlex::Id id, int start, int incr)
+void SPxSteepPR::left4X(int n, SPxId id, int start, int incr)
 {
    assert(thesolver->type() == SoPlex::LEAVE);
 
@@ -259,7 +259,7 @@ void SPxSteepPR::left4X(int n, SoPlex::Id id, int start, int incr)
 
 }
 
-void SPxSteepPR::left4(int n, SoPlex::Id id)
+void SPxSteepPR::left4(int n, SPxId id)
 {
    //  Update preference multiplier in #leavePref#
    if (thesolver->isId(id))
@@ -357,7 +357,7 @@ int SPxSteepPR::selectLeave()
 /* Entering Simplex
  */
 void SPxSteepPR::entered4X(
-   SoPlex::Id, int n, int start2, int incr2, int start1, int incr1)
+   SPxId, int n, int start2, int incr2, int start1, int incr1)
 {
    assert(thesolver->type() == SoPlex::ENTER);
 
@@ -420,12 +420,12 @@ void SPxSteepPR::entered4X(
    */
 }
 
-void SPxSteepPR::entered4(SoPlex::Id id, int n)
+void SPxSteepPR::entered4(SPxId id, int n)
 {
    entered4X(id, n, 0, 1, 0, 1);
 }
 
-SoPlex::Id SPxSteepPR::selectEnterX(
+SPxId SPxSteepPR::selectEnterX(
    Real& best, int start1, int incr1, int start2, int incr2)
 {
    /*
@@ -441,7 +441,7 @@ SoPlex::Id SPxSteepPR::selectEnterX(
    Real x;
    int i, end;
 
-   SoPlex::Id selId;
+   SPxId selId;
    best = -infinity;
 
    for (end = thesolver->coDim(), i = start2; i < end; i += incr2)
@@ -481,7 +481,7 @@ SoPlex::Id SPxSteepPR::selectEnterX(
    return selId;
 }
 
-SoPlex::Id SPxSteepPR::selectEnter()
+SPxId SPxSteepPR::selectEnter()
 {
    Real best;
    lastId = SPxSteepPR::selectEnterX(best);

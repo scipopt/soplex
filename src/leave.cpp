@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.18 2002/03/11 17:43:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.19 2002/03/21 16:06:17 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -78,7 +78,7 @@ void SoPlex::getLeaveVals
 (
    int leaveIdx,
    SPxBasis::Desc::Status& leaveStat,
-   Id& leaveId,
+   SPxId& leaveId,
    Real& leaveMax,
    Real& leavebound,
    int& leaveNum
@@ -247,7 +247,7 @@ void SoPlex::getLeaveVals
 
 void SoPlex::getLeaveVals2(
    Real leaveMax,
-   Id enterId,
+   SPxId enterId,
    Real& enterBound,
    Real& newUBbound,
    Real& newLBbound,
@@ -460,7 +460,7 @@ void SoPlex::getLeaveVals2(
 
 void SoPlex::rejectLeave(
    int leaveNum,
-   Id leaveId,
+   SPxId leaveId,
    SPxBasis::Desc::Status leaveStat,
    const SVector* //newVec
 )
@@ -532,7 +532,7 @@ int SoPlex::leave(int leaveIdx)
    assert(theCoPvec->isConsistent());
 
    SPxBasis::Desc::Status leaveStat;      // status of leaving var
-   Id   leaveId;        // id of leaving var
+   SPxId leaveId;        // id of leaving var
    Real leaveMax;       // maximium lambda of leaving var
    Real leavebound;     // current fVec value of leaving var
    int  leaveNum;       // number of leaveId in bounds
@@ -551,7 +551,7 @@ int SoPlex::leave(int leaveIdx)
    for(;;)
    {
       Real enterVal = leaveMax;
-      Id enterId = theratiotester->selectEnter(enterVal);
+      SPxId enterId = theratiotester->selectEnter(enterVal);
 
       /*
           No variable could be selected to enter the basis and even the leaving
@@ -559,7 +559,7 @@ int SoPlex::leave(int leaveIdx)
        */
       if (!enterId.isValid())
       {
-         Id none;
+         SPxId none;
          change(leaveIdx, none, 0);
          /* the following line originally was below in "rejecting leave" case;
             we need it in the unbounded/infeasible case, too, to have the 
@@ -608,7 +608,7 @@ int SoPlex::leave(int leaveIdx)
 
          if (fabs(theFvec->delta()[leaveIdx]) < reject_leave_tol)
          {
-            Id none;
+            SPxId none;
             change(leaveIdx, none, 0);
             theFvec->delta().clear();
             rejectLeave(leaveNum, leaveId, leaveStat, &newVector);
@@ -674,7 +674,7 @@ int SoPlex::leave(int leaveIdx)
          SPxBasis::Desc& ds = desc();
 
 
-         Id none;
+         SPxId none;
          change(leaveIdx, none, 0);
 
          if (leaveStat == SPxBasis::Desc::P_ON_UPPER)

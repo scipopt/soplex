@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.15 2002/03/11 17:43:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.16 2002/03/21 16:06:17 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -238,7 +238,7 @@ void SoPlex::updateCoTest()
  */
 void SoPlex::getEnterVals
 (
-   Id enterId,
+   SPxId enterId,
    Real& enterTest,
    Real& enterUB,
    Real& enterLB,
@@ -530,7 +530,7 @@ void SoPlex::getEnterVals2
    METHOD( "SoPlex::getEnterVals2()" );
    int idx;
    SPxBasis::Desc& ds = desc();
-   Id leftId = baseId(leaveIdx);
+   SPxId leftId = baseId(leaveIdx);
 
    if (leftId.isSPxRowId())
    {
@@ -717,7 +717,7 @@ void SoPlex::getEnterVals2
 
 void
 SoPlex::ungetEnterVal(
-   Id enterId,
+   SPxId enterId,
    SPxBasis::Desc::Status enterStat,
    Real leaveVal,
    const SVector& vec
@@ -753,7 +753,7 @@ SoPlex::ungetEnterVal(
 }
 
 void SoPlex::rejectEnter(
-   Id enterId,
+   SPxId enterId,
    Real enterTest,
    SPxBasis::Desc::Status enterStat
 )
@@ -772,7 +772,7 @@ void SoPlex::rejectEnter(
    }
 }
 
-int SoPlex::enter(Id& enterId)
+int SoPlex::enter(SPxId& enterId)
 {
    METHOD( "SoPlex::enter()" );
    assert(enterId.isValid());
@@ -940,7 +940,7 @@ int SoPlex::enter(Id& enterId)
          return enter(enterId);
       }
 
-      Id none;
+      SPxId none;
       change(-1, none, 0);
       if (rep() != COLUMN)
          setStatus(SPxBasis::INFEASIBLE);

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.44 2002/03/11 17:43:57 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.45 2002/03/21 16:06:19 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -36,7 +36,7 @@ namespace soplex
 SoPlex::Status SoPlex::solve()
 {
    METHOD( "SoPlex::solve()" );
-   Id enterId;
+   SPxId enterId;
    int leaveNum;
 
    if (dim() <= 0 && coDim() <= 0)          // no problem loaded

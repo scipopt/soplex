@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.cpp,v 1.13 2002/03/03 13:50:35 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightst.cpp,v 1.14 2002/03/21 16:06:19 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 //#define TEST 1
@@ -61,11 +61,11 @@ bool SPxWeightST::isConsistent() const
 void SPxWeightST::setPrimalStatus(
    SPxBasis::Desc& desc, 
    const SoPlex& base, 
-   const SoPlex::Id& id)
+   const SPxId& id)
 {
    if (id.isSPxRowId())
    {
-      int n = base.number(SoPlex::SPxRowId(id));
+      int n = base.number(SPxRowId(id));
 
       if (base.rhs(n) >= infinity)
       {
@@ -88,7 +88,7 @@ void SPxWeightST::setPrimalStatus(
    }
    else
    {
-      int n = base.number(SoPlex::SPxColId(id));
+      int n = base.number(SPxColId(id));
       if (base.SPxLP::upper(n) >= infinity)
       {
          if (base.SPxLP::lower(n) <= -infinity)
@@ -113,23 +113,23 @@ void SPxWeightST::setPrimalStatus(
 static void setDualStatus(
    SPxBasis::Desc& desc, 
    const SoPlex& base, 
-   const SoPlex::Id& id)
+   const SPxId& id)
 {
    if (id.isSPxRowId())
    {
-      int n = base.number(SoPlex::SPxRowId(id));
+      int n = base.number(SPxRowId(id));
       desc.rowStatus(n) = base.basis().dualRowStatus(n);
    }
    else
    {
-      int n = base.number(SoPlex::SPxColId(id));
+      int n = base.number(SPxColId(id));
       desc.colStatus(n) = base.basis().dualColStatus(n);
    }
 }
 
 /*
    The following method initializes |pref| such that it contains the set of
-   |SoPlex::Id|s ordered following |rowWeight| and |colWeight|. For the sorting
+   |SPxId|s ordered following |rowWeight| and |colWeight|. For the sorting
    we take the following approach: first we sort the rows, then the columns.
    Finally we perform a mergesort of both.
  */
@@ -143,7 +143,7 @@ struct Compare
    }
 };
 
-static void initPrefs(DataArray < SoPlex::Id > & pref,
+static void initPrefs(DataArray < SPxId > & pref,
                        const SoPlex& base,
                        const DataArray < Real > & rowWeight,
                        const DataArray < Real > & colWeight
@@ -191,7 +191,7 @@ static void initPrefs(DataArray < SoPlex::Id > & pref,
 
 void SPxWeightST::generate(SoPlex& base)
 {
-   SoPlex::Id tmpId;
+   SPxId tmpId;
 
    forbidden.reSize(base.dim());
    rowWeight.reSize(base.nRows());
@@ -217,7 +217,7 @@ void SPxWeightST::generate(SoPlex& base)
    SPxBasis::Desc desc;
    desc.reSize(base.nRows(), base.nCols());
 
-   DataArray < SoPlex::Id > pref(base.nRows() + base.nCols());
+   DataArray < SPxId > pref(base.nRows() + base.nCols());
    initPrefs(pref, base, rowWeight, colWeight);
 
    int i, deltai, j, sel;
@@ -273,7 +273,7 @@ void SPxWeightST::generate(SoPlex& base)
          if (sel >= 0)
          {
             DEBUG({
-               if (pref[i].type() == SPxLP::Id::ROWID)
+               if (pref[i].type() == SPxId::ROW_ID)
                   std::cerr << " r" << base.number(pref[i]);
                else
                   std::cerr << " c" << base.number(pref[i]);

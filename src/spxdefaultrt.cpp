@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.9 2002/03/03 13:50:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.10 2002/03/21 16:06:18 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -130,7 +130,7 @@ int SPxDefaultRT::selectLeaveX(Real& val, int start, int incr)
    return leave;
 }
 
-SoPlex::Id SPxDefaultRT::selectEnter(Real& val)
+SPxId SPxDefaultRT::selectEnter(Real& val)
 {
    solver()->coPvec().delta().setup();
    solver()->pVec().delta().setup();
@@ -141,7 +141,7 @@ SoPlex::Id SPxDefaultRT::selectEnter(Real& val)
     Here comes the ratio test. It is assumed, that #theCoPvec.delta()# and
     #theCoPvec.idx()# have been setup correctly!
  */
-SoPlex::Id SPxDefaultRT::selectEnterX(
+SPxId SPxDefaultRT::selectEnterX(
    Real& max, int start1, int incr1, int start2, int incr2)
 {
    const Real* pvec = solver()->pVec().get_const_ptr();
@@ -164,7 +164,7 @@ SoPlex::Id SPxDefaultRT::selectEnterX(
 
    int i, j;
    Real x;
-   SoPlex::Id enterId;
+   SPxId enterId;
 
    if (val > 0)
    {

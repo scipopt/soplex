@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.19 2002/03/03 13:50:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.20 2002/03/21 16:06:18 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -364,7 +364,7 @@ int SPxFastRT::minDelta(
       thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(), 0, 1);
 }
 
-SoPlex::Id SPxFastRT::maxDelta(
+SPxId SPxFastRT::maxDelta(
    int& nr,
    Real& max,
    Real& maxabs)
@@ -385,10 +385,10 @@ SoPlex::Id SPxFastRT::maxDelta(
       return thesolver->coId(indc);
    }
    nr = -1;
-   return SoPlex::Id();
+   return SPxId();
 }
 
-SoPlex::Id SPxFastRT::minDelta(
+SPxId SPxFastRT::minDelta(
    int& nr,
    Real& max,
    Real& maxabs)
@@ -409,7 +409,7 @@ SoPlex::Id SPxFastRT::minDelta(
       return thesolver->coId(indc);
    }
    nr = -1;
-   return SoPlex::Id();
+   return SPxId();
 }
 
 
@@ -565,7 +565,7 @@ int SPxFastRT::maxSelect(
       thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(),  0, 1);
 }
 
-SoPlex::Id SPxFastRT::maxSelect(
+SPxId SPxFastRT::maxSelect(
    int& nr,
    Real& val,
    Real& stab,
@@ -592,7 +592,7 @@ SoPlex::Id SPxFastRT::maxSelect(
       return thesolver->coId(indc);
    }
    nr = -1;
-   return SoPlex::Id();
+   return SPxId();
 }
 
 int SPxFastRT::minSelect(
@@ -607,7 +607,7 @@ int SPxFastRT::minSelect(
       thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(), 0, 1);
 }
 
-SoPlex::Id SPxFastRT::minSelect(
+SPxId SPxFastRT::minSelect(
    int& nr,
    Real& val,
    Real& stab,
@@ -632,7 +632,7 @@ SoPlex::Id SPxFastRT::minSelect(
       return thesolver->coId(indc);
    }
    nr = -1;
-   return SoPlex::Id();
+   return SPxId();
 }
 
 /*
@@ -871,7 +871,7 @@ int SPxFastRT::selectLeave(Real& val)
  *       but it looks like a used parameter in selectEnter()
  */
 int SPxFastRT::maxReenter(Real& sel, Real /*max*/, Real maxabs,
-                           SoPlex::Id id, int nr)
+                           SPxId id, int nr)
 {
    Real x, d;
    Vector* up;
@@ -964,7 +964,7 @@ int SPxFastRT::maxReenter(Real& sel, Real /*max*/, Real maxabs,
  *       like a used parameter in selectEnter()
  */
 int SPxFastRT::minReenter(Real& sel, Real /*max*/, Real maxabs,
-                           SoPlex::Id id, int nr)
+                           SPxId id, int nr)
 {
    Real x, d;
    Vector* up;
@@ -1051,7 +1051,7 @@ int SPxFastRT::minReenter(Real& sel, Real /*max*/, Real maxabs,
 }
 
 int SPxFastRT::shortEnter(
-   SoPlex::Id& enterId,
+   SPxId& enterId,
    int nr,
    Real max,
    Real maxabs
@@ -1082,9 +1082,9 @@ int SPxFastRT::shortEnter(
    return 0;
 }
 
-SoPlex::Id SPxFastRT::selectEnter(Real& val)
+SPxId SPxFastRT::selectEnter(Real& val)
 {
-   SoPlex::Id enterId;
+   SPxId enterId;
    Real max, sel;
    Real maxabs = 0.0;
    int nr;
