@@ -1,5 +1,5 @@
 #!/softis/bin/perl
-# $Id: sendsoplex.pl,v 1.4 2002/01/17 17:57:14 bzfkocht Exp $
+# $Id: sendsoplex.pl,v 1.5 2002/04/10 06:48:56 bzfkocht Exp $
 
 # einige Vereinbarungen, fuer die Lage von Dateien
 # Arbeitsverzeichnis, ggf. aendern
@@ -131,9 +131,9 @@ open (DATA, ">>".$DATAFILE);
 foreach $elem (@FORMFIELDS) { print DATA $cgi->{$elem},$FSEPARATOR; }
 
 # der Counter wird ans Ende gehaengt
-print DATA &ctime(time),$FSEPARATOR;
-print DATA $counter;
-print DATA "\n";
+print DATA $counter,$FSEPARATOR;
+print DATA &ctime(time);
+#print DATA "\n";
 close (DATA);
 
 MailSoPlex($cgi->{"email"});

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
 "http://www.w3.org/TR/REC-html40/loose.dtd">
-<!-- $Id: soplex.php,v 1.7 2002/01/21 09:02:11 bzfkocht Exp $ -->
+<!-- $Id: soplex.php,v 1.8 2002/04/10 06:48:56 bzfkocht Exp $ -->
 <?php
 $counter = "cgi/counter.dat";  # the data storage file
 
@@ -23,7 +23,7 @@ fclose($fp);
 <meta name="author" content="Thorsten Koch">
 <meta name="description" content="SoPlex Homepage">
 <meta name="keywords" content="SoPlex, Simplex, Solver, LP, Linear Programming, Mathematical Programming, Optimization">
-<meta name="date" content="$Date: 2002/01/21 09:02:11 $">
+<meta name="date" content="$Date: 2002/04/10 06:48:56 $">
 <meta name="robots" content="index|follow">
 <meta http-equiv="content-type" content="text/html;charset=iso-8859-1">
 <title>SoPlex</title> 
@@ -52,6 +52,11 @@ class library</big>
 <table>
 <tr>
  <td><img src="images/newest.gif" alt="New" border=0></td>
+ <td>09. Apr 2002</td>
+ <td>Version 1.2.1 is released. <a href="notes-121.txt">Release Notes</a></td>
+</tr>
+<tr>
+ <td>&nbsp;</td>
  <td>14. Jan 2002</td>
  <td>Version 1.2.0 is released. <a href="notes-120.txt">Release Notes</a></td>
 </tr>
@@ -65,7 +70,7 @@ is implemented as a C++ class library that can be used with other
 programs. An example program to solve standalone linear programs 
 given in 
 <a href="http://www6.software.ibm.com/sos/features/featur11.htm">MPS</a>
-or LPF files is also included.</p>
+or LP-Format files is also included.</p>
 <p>
 SoPlex has been implemented as a part of Roland Wunderling's 
 Ph.D. thesis 
@@ -87,7 +92,9 @@ We have tested SoPlex with compilers from
 href="http://support.intel.com/support/performancetools/c/v5/linux/index.htm">Intel</a>,
 <a href="http://www.sun.com/forte/cplusplus">SUN</a>, 
 <a href="http://h21007.www2.hp.com/dspp/tech/tech_TechSoftwareDetailPage_IDX/1,1703,1740,00.html">HP</a>,
-<a href="http://www.sgi.com/developers/devtools/languages/mipspro.html">SGI</a>, and even M$.
+<a href="http://www.sgi.com/developers/devtools/languages/mipspro.html">SGI</a>,
+<a href="http://www-4.ibm.com/software/ad/vacpp">IBM</a>, 
+and even M$.
 </p>
 <h3>What are the license terms?</h3>
 <p>
@@ -113,7 +120,7 @@ here are some notes on
 <hr noshade>
 <h3>Download</h3>
 <p>
-The latest Version is 1.2.0. Register and 
+The latest Version is 1.2.1. Register and 
 <a href="register.html">download</a> the complete source 
 code and documentation.
 </p>
@@ -122,7 +129,8 @@ Here are the
 <a href="http://elib.zib.de/pub/Packages/mp-testdata/lp/netlib-lp">Netlib</a>
 LP files, already decompressed and assembled as an archive 
 <a href="netlib.tar.gz">netlib.tar.gz</a>. These instances are used by the
-<em>check</em> target in the Makefile.
+<em>check</em> target in the Makefile. For comparison here is a directory 
+with the log files of our <a href="results">results</a>.
 </p>
 <h3>Bugs</h3>
 <p>
@@ -184,7 +192,7 @@ border="0" width="88" height="36" align="bottom"></a>
 <img src="images/valid-html40.png" alt="Valid HTML 4.0!"
 border="0" height="31" width="88" align="bottom"></a>
 <hr noshade><address><font size=-1>
-Last Update $Date: 2002/01/21 09:02:11 $ by
+Last Update $Date: 2002/04/10 06:48:56 $ by
 <a href="/personal/personal.pl?name=koch">Thorsten Koch</a>
 <br>&copy; 2002 by Konrad-Zuse-Zentrum für Informationstechnik Berlin (ZIB)<br>
 http://www.zib.de/Optimization/Software/Soplex/soplex.php
