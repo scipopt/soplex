@@ -1,4 +1,4 @@
-# $Id: check.sh,v 1.12 2002/02/14 15:07:42 bzfkocht Exp $
+# $Id: check.sh,v 1.13 2002/02/20 16:03:55 bzfkocht Exp $
 BINNAME=`basename $2`
 TSTNAME=`basename $1 .test`
 OUTFILE=check.$TSTNAME.$BINNAME.out
@@ -7,7 +7,7 @@ RESFILE=check.$TSTNAME.$BINNAME.res
 date >$OUTFILE
 date >$ERRFILE
 case $TSTNAME in
-mittelmann|zib) timelimit="-l10000" 
+mittelmann|zib|bornd?) timelimit="-l10000" 
             algorithm="1 2" ;;
 *)          timelimit="" 
             algorithm="1 2 3 4 5 6" ;;
