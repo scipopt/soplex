@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.31 2002/02/07 15:46:30 bzfbleya Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.32 2002/02/07 18:09:07 bzfbleya Exp $"
 
 //#define DEBUG 1
 
@@ -41,12 +41,15 @@ CLUFactor::Temp::Temp()
 
 void CLUFactor::Temp::init(int p_dim)
 {
-   spx_alloc(s_max, p_dim);
-   spx_alloc(s_cact, p_dim);
-   spx_alloc(s_mark, p_dim);
+   if ( s_max == 0 )  spx_alloc(s_max, p_dim);
+   else               spx_realloc(s_max, p_dim);
+   if ( s_cact == 0 ) spx_alloc(s_cact, p_dim);
+   else               spx_realloc(s_cact, p_dim);
+   if ( s_mark == 0 ) spx_alloc(s_mark, p_dim);
+   else               spx_realloc(s_mark, p_dim);
    stage = 0;
 }
-   
+
 void CLUFactor::Temp::clear()
 {
    if (s_mark != 0)   
@@ -1551,7 +1554,7 @@ void CLUFactor::factor(
       nzCnt = setupColVals();
    }
 
-   temp.clear();
+   /* temp.clear(); */
    /* assert(dump()); */
 }
 
