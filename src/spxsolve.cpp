@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.63 2003/01/15 17:26:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.64 2003/01/15 19:38:24 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -141,8 +141,9 @@ SPxSolver::Status SPxSolver::solve()
                   qualConstraintViolation(maxViolConst, sumViolConst);
 
                   // is the solution good enough ?
-                  if (sumViolRedCost > delta() || sumViolBounds > delta() || sumViolConst > delta()) // no
-                  {
+                  if ((delta() / thepricer->epsilon() < 50) // max three times reduced
+                     && (sumViolRedCost > delta() || sumViolBounds > delta() || sumViolConst > delta())) 
+                  {  // no!
                      // we reduce delta(). Note that if the pricer does not find a candiate
                      // with the reduced delta, we quit, regardless of the violations.
                      thepricer->setEpsilon(thepricer->epsilon() * 0.1);
@@ -257,8 +258,9 @@ SPxSolver::Status SPxSolver::solve()
                   qualConstraintViolation(maxViolConst, sumViolConst);
 
                   // is the solution good enough ?
-                  if (sumViolRedCost > delta() || sumViolBounds > delta() || sumViolConst > delta()) // no
-                  {
+                  if ((delta() / thepricer->epsilon() < 50) // max three times reduced
+                     && (sumViolRedCost > delta() || sumViolBounds > delta() || sumViolConst > delta())) 
+                  {  // no
                      // we reduce delta(). Note that if the pricer does not find a candiate
                      // with the reduced delta, we quit, regardless of the violations.
                      thepricer->setEpsilon(thepricer->epsilon() * 0.1);

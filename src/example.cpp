@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.55 2003/01/15 17:26:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.56 2003/01/15 19:38:24 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -231,7 +231,8 @@ int main(int argc, const char* const argv[])
          ratiotest = atoi(&argv[optidx][2]);
          break;
       case 'v' :
-         verbose = atoi(&argv[optidx][2]);
+         if (argv[optidx][2] >= '0' && argv[optidx][2] <= '9')
+            verbose = argv[optidx][2] - '0';
          break;
       case 'V' :
          std::cout << banner << std::endl;
