@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.68 2003/01/15 17:26:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.69 2003/03/03 08:30:07 bzfkocht Exp $"
 
 #include <iostream>
 
@@ -213,6 +213,15 @@ void SoPlex::qualBoundViolation(
 
       sumviol += viol;
    }
+}
+
+bool SoPlex::writeBasisFile(
+   const char* filename, 
+   const NameSet& rowNames, 
+   const NameSet& colNames)
+{
+   std::cout << "Warning! Not fully implemented" << std::endl;
+   return m_solver.writeBasisFile(filename, rowNames, colNames);
 }
 
 } // namespace soplex

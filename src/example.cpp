@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.56 2003/01/15 19:38:24 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.57 2003/03/03 08:30:07 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -504,12 +504,10 @@ int main(int argc, const char* const argv[])
                          << objx[i] << std::endl;
          std::cout << "All other variable are zero." << std::endl;
       }
-#if 0
       if (write_basis)
          if (!work.writeBasisFile(basisname, rownames, colnames))
             std::cerr << "EEXAMP30 error while writing file \"" 
                       << basisname << "\"" << std::endl;
-#endif
       break;
    case SPxSolver::UNBOUNDED:
       std::cout << "IEXAMP31 LP is unbounded";
