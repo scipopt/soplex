@@ -13,12 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.40 2003/01/20 16:46:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.41 2003/03/04 10:25:28 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
 #include <assert.h>
 #include <iostream>
+#include <iomanip>
 
 #include "spxdefines.h"
 #include "spxbasis.h"
@@ -325,25 +326,33 @@ void SPxBasis::writeBasis(
    METHOD( "SPxBasis::writeBasis()" );
    assert(theLP != 0);
 
-   int col = 0;
-   int row = 0;
+   int col   = 0;
+   int row   = 0;
 
+   os.setf(std::ios::left);
    os << "NAME  soplex.bas\n";     
+
+   if (theLP->rep() == SPxSolver::ROW)
+   {
+      std::cout << "writing basis for row representation not yet implemented!" << std::endl;
+      return;
+   }
+   assert(theLP->rep() == SPxSolver::COLUMN);
 
    for(; col < theLP->nCols(); col++)
    {
-      os << " ";
-
       if( theLP->isBasic( thedesc.colStatus( col ))) 
       {
+         /* Find non basic row
+          */
          for(; row < theLP->nRows(); row++)
             if( !theLP->isBasic( thedesc.rowStatus( row )))
                break;
 
          assert( row != theLP->nRows() );
 
-         os << ( thedesc.rowStatus( row ) == Desc::D_ON_UPPER ? "XU " : "XL " )
-            << colnames[theLP->SPxLP::cId( col )]
+         os << ( thedesc.rowStatus( row ) == Desc::P_ON_UPPER ? " XU " : " XL " )
+            << std::setw(8) << colnames[theLP->SPxLP::cId( col )]
             << "       " 
             << rownames[theLP->SPxLP::rId( row )]
             << std::endl;
@@ -352,23 +361,31 @@ void SPxBasis::writeBasis(
       }
       else
       {
-         if( thedesc.colStatus( col ) == Desc::P_ON_UPPER)
+         if( thedesc.colStatus( col ) == Desc::P_ON_UPPER )
          {
-            os << "UL "
-               << colnames[theLP->SPxLP::cId( col )]
-               << std::endl;
-         }
-         else if( thedesc.colStatus( col ) == Desc::P_ON_LOWER)
-         {
-            os << "LL "
+            os << " UL "
                << colnames[theLP->SPxLP::cId( col )]
                << std::endl;
          }
          else
-            abort();
+         {
+            /* Default is all Slacks basic, all variables on lower bound,
+             * nothing to do in this case.
+             * Non basic free variable should better not accure.
+             */
+            assert(thedesc.colStatus( col ) == Desc::P_ON_LOWER
+               || thedesc.colStatus( col ) == Desc::P_FIXED);
+         }
       }
    }
 #ifndef NDEBUG
+   for(; row < theLP->nRows(); row++)
+      if( !theLP->isBasic( thedesc.rowStatus( row )))
+         break;
+   
+   assert( row == theLP->nRows() );
+
+
    thedesc.dump();
 
    for(; row < theLP->nRows(); row++)
