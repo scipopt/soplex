@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxintervalsm.cpp,v 1.2 2003/01/10 12:46:14 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxintervalsm.cpp,v 1.3 2003/01/13 14:30:55 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -28,6 +28,9 @@ namespace soplex
 SPxSimplifier::Result SPxIntervalSM::simplify(SPxLP& lp, Real eps, Real delta)
 {
    METHOD("SPxIntervalSM::simplify()");
+
+   m_timeUsed.reset();
+   m_timeUsed.start();
 
    //std::cout << lp << std::endl;
 
@@ -201,6 +204,8 @@ SPxSimplifier::Result SPxIntervalSM::simplify(SPxLP& lp, Real eps, Real delta)
                            << " objective function coefficents" << std::endl; });
    }
    assert(lp.isConsistent());
+
+   m_timeUsed.stop();
 
    //std::cout << lp << std::endl;
    

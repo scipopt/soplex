@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxrem1sm.h,v 1.10 2003/01/10 12:46:14 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxrem1sm.h,v 1.11 2003/01/13 14:30:55 bzfkocht Exp $"
 
 /**@file  spxrem1sm.h
  * @brief Remove singletons from LP.
@@ -38,6 +38,27 @@ namespace soplex
 class SPxRem1SM : public SPxSimplifier
 {
 private:
+   struct RowHash
+   {
+      int          row;  ///< row no.
+      unsigned int hid;  ///< hash id
+
+      int operator()(const RowHash& rh1, const RowHash& rh2) const
+      {
+         // rh1.hid - rh2.hid is a bas idea, because they are unsigned
+
+         if (rh1.hid < rh2.hid)
+            return -1;
+         if (rh1.hid > rh2.hid)
+            return  1;
+
+         assert(rh1.hid == rh2.hid);
+
+         return rh1.row - rh2.row;
+      }
+   };
+
+private:
    DVector        m_prim;       ///< unsimplified primal solution vector.
    DVector        m_dual;       ///< unsimplified dual solution vector.
    DataArray<int> m_cperm;      ///< column permutation vector.
@@ -45,6 +66,7 @@ private:
    DSVector       m_pval;       ///< fixed variable values.
    Real           m_epsilon;    ///< epsilon zero
    Real           m_delta;      ///< maximum bound violation
+
 private:
    ///
    void fixColumn(SPxLP& lp, int i);

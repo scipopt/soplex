@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxrem1sm.cpp,v 1.19 2003/01/12 20:09:48 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxrem1sm.cpp,v 1.20 2003/01/13 14:30:55 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -22,6 +22,9 @@
 #include "spxdefines.h"
 #include "spxrem1sm.h"
 #include "dataarray.h"
+#include "sorter.h"
+
+#define DISPERSE(x) (1664525U * (x) + 1013904223U)
 
 namespace soplex
 {
@@ -97,10 +100,12 @@ void SPxRem1SM::fixColumn(SPxLP& lp, int i)
 
 SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
 {
-   DataArray<int> rem(lp.nRows());
-   int            num = 0;
+   DataArray<int>     rem(lp.nRows());
+   DataArray<RowHash> rowhash(lp.nRows());
+   int                num = 0;
+   int                i;
 
-   for( int i = 0; i < lp.nRows(); ++i )
+   for(i = 0; i < lp.nRows(); ++i )
    {
       //      std::cout << "row " << i << std::endl;
 
@@ -110,12 +115,16 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
       int            upcnt  = 0;
       int            locnt  = 0;
 
-      rem[i] = 0;
+      rowhash[i].row = i;
+      rowhash[i].hid = DISPERSE(row.size());
+      rem[i]         = 0;
 
       for(int j = 0; j < row.size(); ++j )
       {
          Real x = row.value(j);
          int  k = row.index(j);
+
+         rowhash[i].hid *= k; // += DISPERSE(k) ?
          
          // std::cout << "\t\tx= " << x << " lower= " << lp.lower(k) 
          // << " upper= " << lp.upper(k) << std::endl;
@@ -183,7 +192,9 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
                else
                   lp.changeUpper(k, lp.lower(k));
             }
-            rem[i] = -1;
+            rem[i]         = -1;
+            rowhash[i].row = -1;
+            rowhash[i].hid = 0;
             num++;
             continue;
          }
@@ -208,7 +219,9 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
                else
                   lp.changeLower(k, lp.upper(k));
             }
-            rem[i] = -1;
+            rem[i]         = -1;
+            rowhash[i].row = -1;
+            rowhash[i].hid = 0;
             num++;
             continue;
          }
@@ -240,11 +253,12 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
       {
          VERBOSE3({ std::cout << "Unconstraint row " << i << " removed" << std::endl; });
 
-         rem[i] = -1;
+         rem[i]         = -1;
+         rowhash[i].row = -1;
+         rowhash[i].hid = 0;
          num++;
          continue;
       }
-#if 1
       if (upcnt <= 1 || locnt <= 1)
       {
          for(int j = 0; j < row.size(); ++j )
@@ -378,90 +392,129 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
             }
          }
       }
-#endif
-#if 0 // org
+   }
+   // --- Check for dublicate rows ------------------------------------------------------
+   RowHash compare;
 
+   sorter_qsort(rowhash.get_ptr(), rowhash.size(), compare);
+
+   for(i = 0; i < lp.nRows() - 1; ++i)
+   {
+      if (rowhash[i].row < 0 || rowhash[i].hid != rowhash[i + 1].hid)
+         continue;
+
+      int ri1 = rowhash[i    ].row;
+      int ri2 = rowhash[i + 1].row;
+
+      assert(ri1 >= 0);
+      assert(ri1 < lp.nRows());
+      // This has to be true, because if case of the sorting.
+      assert(ri2 >= 0);
+      assert(ri2 < lp.nRows());
+      assert(rowhash[i].hid == rowhash[i + 1].hid);
+
+      if (lp.rowVector(ri1).size() != lp.rowVector(ri2).size())
+         continue;
+
+      SVector row1(lp.rowVector(ri1));       
+      SVector row2(lp.rowVector(ri2));       
+         
+      row1.sort();
+      row2.sort();
+      
+      if (row1.index(0) != row2.index(0))
+         break;
+
+      Real x1 = row1.value(0);
+      Real x2 = row2.value(0);
+      Real alpha;
+
+      if (isZero(x1, epsZero()))
+         alpha = 1.0;
+      else if (isZero(x2, epsZero()))
+         alpha = 1.0;
+      else
+         alpha = x1 / x2;
+
+      assert(isNotZero(alpha));
+
+      int j;
+
+      for(j = 0; j < row1.size(); ++j)
       {
+         int  k1 = row1.index(j);
+         int  k2 = row2.index(j);
 
-            Real              y;
+         if (k1 != k2)
+            break;
 
-            if (upcnt < 2 || locnt < 2)
-            {
-               for( j = 0; j < row.size(); ++j )
-               {
-                  x = row.value(j);
-                  k = row.index(j);
+         x1 = row1.value(j);
+         x2 = row2.value(j);
 
-                  if (x > 0.0)
-                  {
-                     if (lp.lhs(i) > -infinity && lp.lower(k) > -infinity && upcnt < 2)
-                     {
-                        y = -infinity;
-                        if (lp.upper(k) < infinity && upcnt == 0)
-                           y = lp.upper(k) + (lp.lhs(i) - up) / x;
-                        else if (lp.upper(k) >= infinity)
-                           y = lp.lhs(i) - up;
+         if (NE(x1, x2 * alpha))
+            break;
+      }
+      if (j < row1.size())
+         continue;
+      
+      // ok, now row[i] = alpha * row[i+1]
 
-                        if (y >= lp.lower(k))
-                        {
-                           lp.changeLower(k, -infinity);
-                           break;
-                        }
-                     }
-                     if (lp.rhs(i) < infinity && lp.upper(k) < infinity && locnt < 2)
-                     {
-                        y = infinity;
+      Real maxlhs;
+      Real minrhs;
 
-                        if (lp.lower(k) > -infinity && locnt == 0)
-                           y = lp.lower(k) + (lp.rhs(i) - lo) / x;
-                        else if (lp.lower(k) <= -infinity)
-                           y = lp.rhs(i) - lo;
+      if (alpha > 0.0)
+      {
+         // compute maxlhs    
+         if (lp.lhs(ri1) <= -infinity)
+            maxlhs = lp.lhs(ri2);
+         else if (lp.lhs(ri2) <= -infinity)
+            maxlhs = lp.lhs(ri1);
+         else
+            maxlhs = (lp.lhs(ri1) / alpha >= lp.lhs(ri2)) ? lp.lhs(ri1) / alpha : lp.lhs(ri2);
+         
+         // compute minrhs
+         if (lp.rhs(ri1) >= infinity)
+            minrhs = lp.rhs(ri2);
+         else if (lp.rhs(ri2) >= infinity)
+            minrhs = lp.rhs(ri1);
+         else
+            minrhs = (lp.rhs(ri1) / alpha <= lp.rhs(ri2)) ? lp.rhs(ri1) / alpha : lp.rhs(ri2);
+      }
+      else
+      {
+         assert(alpha < 0.0);
 
-                        if (y <= lp.upper(k))
-                        {
-                           lp.changeUpper(k, infinity);
-                           break;
-                        }
-                     }
-                  }
-                  else if (x < 0.0)
-                  {
-                     if (lp.lhs(i) >= -infinity && lp.upper(k) < infinity && upcnt < 2)
-                     {
-                        y = infinity;
+         // compute maxlhs    
+         if (lp.rhs(ri1) >= infinity)
+            maxlhs = lp.lhs(ri2);
+         else if (lp.lhs(ri2) <= -infinity)
+            maxlhs = -lp.rhs(ri1);
+         else
+            maxlhs = (lp.rhs(ri1) / alpha >= lp.lhs(ri2)) ? lp.rhs(ri1) / alpha : lp.lhs(ri2);
 
-                        if (lp.lower(k) > -infinity && upcnt < 1)
-                           y = lp.lower(k) + (lp.lhs(i) - up) / x;
-                        else if (lp.lower(k) <= -infinity)
-                           y = -(lp.lhs(i) - up);
+         // compute minrhs
+         if (lp.lhs(ri1) <= -infinity)
+            minrhs = lp.rhs(ri2);
+         else if (lp.rhs(ri2) >= infinity)
+            minrhs = -lp.lhs(ri1);
+         else
+            minrhs = (lp.lhs(ri1) / alpha <= lp.rhs(ri2)) ? lp.lhs(ri1) / alpha : lp.rhs(ri2);
+      }
+      VERBOSE3({ std::cout << "Duplicate rows " << ri1 << "/" << ri2
+                           << " alpha= " << alpha
+                           << " lhs= " << lp.lhs(ri1)
+                           << " rhs= " << lp.rhs(ri1)
+                           << " lhs= " << lp.lhs(ri2)
+                           << " rhs= " << lp.rhs(ri2)
+                           << " maxlhs= " << maxlhs
+                           << " minrhs= " << minrhs
+                           << std::endl; });
 
-                        if (y <= lp.upper(k))
-                        {
-                           lp.changeUpper(k, infinity);
-                           break;
-                        }
-                     }
-                     if (lp.rhs(i) <= infinity && lp.lower(k) > -infinity
-                        && locnt < 2)
-                     {
-                        y = -infinity;
+      lp.changeLhs(ri2, maxlhs);
+      lp.changeRhs(ri2, minrhs);
 
-                        if (lp.upper(k) < infinity && locnt < 1)
-                           y = lp.upper(k) + (lp.rhs(i) - lo) / x;
-                        else if (lp.upper(k) >= infinity)
-                           y = -(lp.rhs(i) - lo);
-
-                        if (y >= lp.lower(k))
-                        {
-                           lp.changeLower(k, -infinity);
-                           break;
-                        }
-                     }
-                  }
-               }
-            }
-         }
-#endif
+      rem[ri1] = -1;
+      num++;
    }
    again = removeRows(lp, rem, num, "redundantRows");
 
@@ -926,11 +979,16 @@ bool SPxRem1SM::removeCols(SPxLP& lp, DataArray<int>& rem, int num, const char* 
 
 SPxSimplifier::Result SPxRem1SM::simplify(SPxLP& lp, Real eps, Real delta)
 {
+   METHOD("SPxRem1SM::simplify()");
+
    Result ret;
    bool   again;
    bool   rcagain;
    bool   rragain;
    int    i;
+   
+   m_timeUsed.reset();
+   m_timeUsed.start();
 
    m_epsilon = eps;
    m_delta   = delta;
@@ -989,6 +1047,8 @@ SPxSimplifier::Result SPxRem1SM::simplify(SPxLP& lp, Real eps, Real delta)
          return ret;
    }
 #endif
+   m_timeUsed.stop();
+
    return OKAY;
 }
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsimplifier.h,v 1.11 2003/01/10 12:46:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsimplifier.h,v 1.12 2003/01/13 14:30:55 bzfkocht Exp $"
 
 /**@file  spxsimplifier.h
  * @brief LP simplification base class.
@@ -24,6 +24,7 @@
 #include <assert.h>
 
 #include "spxdefines.h"
+#include "timer.h"
 #include "spxlp.h"
 
 namespace soplex
@@ -42,6 +43,7 @@ class SPxSimplifier
 {
 protected:
    const char* m_name;
+   Timer       m_timeUsed;
 
 public:
    enum Result
@@ -64,6 +66,10 @@ public:
    virtual const char* getName() const
    {
       return m_name;
+   }
+   virtual Real timeUsed() const
+   {
+      return m_timeUsed.userTime();
    }
    /// simplify #SPxLP \p lp. 
    /**

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeneralsm.cpp,v 1.17 2003/01/10 12:46:14 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeneralsm.cpp,v 1.18 2003/01/13 14:30:54 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -62,6 +62,11 @@ SPxSimplifier::Result SPxGeneralSM::simplify(SPxLP& lp, Real eps, Real delta)
    assert(lp.isConsistent());
 
    return OKAY;
+}
+
+Real SPxGeneralSM::timeUsed() const
+{
+   return m_inter.timeUsed() + m_rem1.timeUsed();
 }
 
 const Vector& SPxGeneralSM::unsimplifiedPrimal(const Vector& x)
