@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.21 2001/12/15 11:33:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.22 2001/12/15 11:36:52 bzfkocht Exp $"
 
 #include <iostream>
 #include <assert.h>
@@ -1384,7 +1384,7 @@ int CLUFactor::setupColVals()
       int     k   = u.row.start[i];
       int*    idx = &u.row.idx[k];
       double* val = &u.row.val[k];
-      int     len = u.row.len[i]
+      int     len = u.row.len[i];
 
       n += len;
 
