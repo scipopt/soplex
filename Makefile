@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.13 2001/12/03 15:07:13 bzfkocht Exp $
+# $Id: Makefile,v 1.14 2001/12/04 19:28:19 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -122,7 +122,7 @@ $(LIBDIR):
 $(BINDIR):
 		-mkdir $(BINDIR)
 
-$(DEPEND):
+depend:
 		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
 		$(OBJSRC:.o=.cpp) $(LIBSRC:.o=.cpp) \
 		>$(DEPEND)'

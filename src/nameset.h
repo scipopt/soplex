@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.h,v 1.8 2001/11/30 22:14:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.h,v 1.9 2001/12/04 19:28:20 bzfkocht Exp $"
 
 /**@file  nameset.h
  * @brief Set of strings.
@@ -22,8 +22,6 @@
 #define _NAMESET_H_
 
 #include <assert.h>
-#include <sys/types.h>
-#include <stdlib.h>
 
 #include "dataset.h"
 #include "datahashtable.h"

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: didxset.h,v 1.4 2001/11/21 20:15:41 bzfkocht Exp $"
+#pragma ident "@(#) $Id: didxset.h,v 1.5 2001/12/04 19:28:20 bzfkocht Exp $"
 
 /**@file  didxset.h
  * @brief Dymnamic index set.
@@ -22,7 +22,6 @@
 #define _DIDXSET_H_
 
 #include <assert.h>
-#include <stdlib.h>
 
 #include "idxset.h"
 

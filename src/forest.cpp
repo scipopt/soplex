@@ -13,13 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: forest.cpp,v 1.7 2001/12/04 18:25:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: forest.cpp,v 1.8 2001/12/04 19:28:20 bzfkocht Exp $"
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <assert.h>
 
-#include "clumembers.h"
+#include "clufactor.h"
 #include "cring.h"
 #include "spxalloc.h"
 
@@ -58,8 +56,7 @@ void enQueueMin(int* heap, int* size, int elem)
 #ifdef  DEBUG
    for (i = 1; i < *size; ++i)
       for (j = 0; j < i; ++j)
-         if (heap[i] == heap[j])
-            printf("ERROR\n");
+         assert(heap[i] != heap[j]);
 #endif  /* DEBUG */
 }
 
@@ -433,7 +430,6 @@ void CLUFactor::forestUpdate(int p_col, double* p_work, int num, int *nonz)
       if (i < verySparseFactor*(dim - c))      /* few nonzeros to be eliminated        */
       {
          /*  move row r from U to p_work
-         fprintf(stderr, ".");
           */
          num = 0;
          for (i += j - 1; i >= j; --i)
@@ -560,7 +556,6 @@ void CLUFactor::forestUpdate(int p_col, double* p_work, int num, int *nonz)
       else            /* few nonzeros to be eliminated        */
       {
          /*  move row r from U to p_work
-         fprintf(stderr, " ");
           */
          for (i += j - 1; i >= j; --i)
          {

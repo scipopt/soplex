@@ -13,13 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.14 2001/12/04 18:25:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.15 2001/12/04 19:28:20 bzfkocht Exp $"
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <iostream>
 #include <assert.h>
 
-#include "clumembers.h"
+#include "clufactor.h"
 #include "cring.h"
 #include "spxalloc.h"
 
@@ -73,20 +72,20 @@ void CLUFactor::initPerm()
    
 void CLUFactor::setPivot(int p_stage, int p_col, int p_row, double val)
 {
-   /*@
-     assert(printf("%5d:   (%3d, %3d) = %g\n", p_stage, p_row, p_col, val) || 1);
-      */
+   // std::cout << p_stage << ": (" << p_row ", " 
+   //           << p_col << ") = " << val << std::endl;
+
    assert(row.perm[p_row] < 0);
    assert(col.perm[p_col] < 0);
+
    row.orig[p_stage] = p_row;
    col.orig[p_stage] = p_col;
-   row.perm[p_row] = p_stage;
-   col.perm[p_col] = p_stage;
-   diag[p_row] = 1 / val;
-   if (diag[p_row] > maxabs)
-      maxabs = diag[p_row];
-   else if (-diag[p_row] > maxabs)
-      maxabs = -diag[p_row];
+   row.perm[p_row]   = p_stage;
+   col.perm[p_col]   = p_stage;
+   diag[p_row]       = 1.0 / val;
+
+   if (fabs(diag[p_row]) > maxabs)
+      maxabs = fabs(diag[p_row]);
 }
 
 /*****************************************************************************/
@@ -111,9 +110,6 @@ void CLUFactor::packRows()
       l_row = ring->idx;
       if (l_rbeg[l_row] != n)
       {
-         /*@
-           fprintf(stderr, "packing rows ...\n");
-         */
          do
          {
             l_row = ring->idx;
@@ -143,8 +139,8 @@ void CLUFactor::packRows()
 }
 
 /*
-    *      Make row of fac large enough to hold len nonzeros.
-    */
+ *      Make row of fac large enough to hold len nonzeros.
+ */
 void CLUFactor::remaxRow(int p_row, int len)
 {
    assert(u.row.max[p_row] < len);
@@ -219,10 +215,6 @@ void CLUFactor::packColumns()
    int *l_clen = u.col.len;
    int *l_cmax = u.col.max;
    int *l_cbeg = u.col.start;
-      
-   /*@
-     fprintf(stderr, "packing columns ...\n");
-   */
       
    n = 0;
    list = &(u.col.list);
@@ -1563,16 +1555,13 @@ void CLUFactor::dump() const
    for (i = 0; i < thedim; ++i)
    {
       if (row.perm[i] >= 0)
-         printf("diag[%2d]: [%2d] = %g\n",
-            i, col.orig[row.perm[i]], diag[i]);
+         std::cout << "diag[" << i << "]: [" << col.orig[row.perm[i]] 
+                   << "] = " << diag[i] << std::endl;
+
       for (j = 0; j < u.row.len[i]; ++j)
-         printf
-            (
-               "   u[%2d]:  [%2d] = %g\n",
-               i,
-               u.row.idx[u.row.start[i] + j],
-               u.row.val[u.row.start[i] + j]
-               );
+         std::cout << "   u[" << i << "]: [" 
+                   << u.row.idx[u.row.start[i] + j] << "] = "
+                   << u.row.val[u.row.start[i] + j] << std::endl;
    }
 
    /*  Dump L:
@@ -1582,19 +1571,15 @@ void CLUFactor::dump() const
       for (j = 0; j < l.firstUnused; ++j)
          if (col.orig[row.perm[l.row[j]]] == i)
          {
-            printf("l[%2d]:\n", i);
+            std::cout << "l[" << i << "]" << std::endl;
+
             for (k = l.start[j]; k < l.start[j + 1]; ++k)
-               printf
-                  (
-                     "   l[%2d]:  [%2d] = %g\n",
-                     k - l.start[j],
-                     l.idx[k],
-                     l.val[k]
-                     );
+               std::cout << "   l[" << k - l.start[j]
+                         << "]:  [" << l.idx[k]
+                         << "] = " << l.val[k] << std::endl;
             break;
          }
    }
-
    return;
 }
 

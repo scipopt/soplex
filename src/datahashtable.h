@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datahashtable.h,v 1.7 2001/11/21 20:15:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: datahashtable.h,v 1.8 2001/12/04 19:28:20 bzfkocht Exp $"
 
 /**@file  datahashtable.h
  * @brief Generic hash table for data objects.
@@ -22,7 +22,6 @@
 #define _DATAHAHSTABLE_H_
 
 #include <iostream>
-#include <stdlib.h>
 #include <assert.h>
 
 namespace soplex

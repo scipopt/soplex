@@ -13,21 +13,15 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.11 2001/12/04 18:25:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.12 2001/12/04 19:28:20 bzfkocht Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
  *       This should be properly integrated and demangled.
  */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stddef.h>
 #include <assert.h>
 
 #include "slufactor.h"
-
-#include "cluprotos.h"
 #include "cring.h"
 #include "spxalloc.h"
 

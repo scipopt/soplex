@@ -13,17 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vsolve.cpp,v 1.6 2001/11/30 22:14:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vsolve.cpp,v 1.7 2001/12/04 19:28:20 bzfkocht Exp $"
 
-
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <assert.h>
 
-#include "clutypes.h"
-#include "clumembers.h"
-#include "cluprotos.h"
+#include "clufactor.h"
 #include "cring.h"
 
 namespace soplex
@@ -56,8 +50,7 @@ static void enQueueMax(int* heap, int* size, int elem)
 #ifdef  DEBUG
    for (i = 1; i < *size; ++i)
       for (j = 0; j < i; ++j)
-         if (heap[i] == heap[j])
-            printf("ERROR\n");
+         assert(heap[i] != heap[j]);
 #endif  /* DEBUG */
 }
 
@@ -133,8 +126,7 @@ static void enQueueMin(int* heap, int* size, int elem)
 #ifdef  DEBUG
    for (i = 1; i < *size; ++i)
       for (j = 0; j < i; ++j)
-         if (heap[i] == heap[j])
-            printf("ERROR\n");
+         assert(heap[i] != heap[j])
 #endif  /* DEBUG */
 }
 

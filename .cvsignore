@@ -1,6 +1,6 @@
 .inslog*
 .nfs*
-O.*
+obj
 TODO.Tobi
 bin
 cxx_repository

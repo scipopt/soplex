@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: array.h,v 1.10 2001/11/30 22:14:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: array.h,v 1.11 2001/12/04 19:28:19 bzfkocht Exp $"
 
 /**@file  array.h
  * @brief Save arrays of arbitrary types.
@@ -21,7 +21,6 @@
 #ifndef _ARRAY_H_
 #define _ARRAY_H_
 
-#include <stdlib.h>
 #include <assert.h>
 
 namespace soplex

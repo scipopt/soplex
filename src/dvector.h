@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dvector.h,v 1.5 2001/11/23 13:35:56 bzfpfend Exp $"
+#pragma ident "@(#) $Id: dvector.h,v 1.6 2001/12/04 19:28:20 bzfkocht Exp $"
 
 /**@file  dvector.h
  * @brief Dymnamic vectors.
@@ -22,7 +22,6 @@
 #define _DVECTOR_H_
 
 #include <iostream>
-#include <stdlib.h>
 #include <assert.h>
 
 #include "vector.h"

@@ -13,10 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clumembers.h,v 1.9 2001/12/04 18:25:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: clufactor.h,v 1.1 2001/12/04 19:28:19 bzfkocht Exp $"
 
-#ifndef _CLUMEMBERS_H_
-#define _CLUMEMBERS_H_
+#ifndef _CLUFACTOR_H_
+#define _CLUFACTOR_H_
 
 #include "slinsolver.h"
 #include "svector.h"
@@ -415,7 +415,7 @@ public:  // public only until forest.cpp is changed
 };
 
 } // namespace soplex
-#endif // _CLUMEMBERS_H_
+#endif // _CLUFACTOR_H_
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:

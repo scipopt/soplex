@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.h,v 1.6 2001/12/01 18:21:16 bzfbleya Exp $"
+#pragma ident "@(#) $Id: slufactor.h,v 1.7 2001/12/04 19:28:20 bzfkocht Exp $"
 
 /**@file  slufactor.h
  * @brief Sparse LU factorization.
@@ -25,9 +25,7 @@
 
 #include "dvector.h"
 #include "slinsolver.h"
-
-#include "clutypes.h"
-#include "clumembers.h"
+#include "clufactor.h"
 
 namespace soplex
 {

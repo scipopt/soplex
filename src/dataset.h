@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.13 2001/12/04 18:25:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.14 2001/12/04 19:28:20 bzfkocht Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -22,8 +22,7 @@
 #define _DATASET_H_
 
 
-#include <stdlib.h>
-// #include <memory.h>
+#include <string.h>
 #include <assert.h>
 
 #include "dataarray.h"

@@ -13,27 +13,15 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.5 2001/11/27 10:31:30 bzfbleya Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.6 2001/12/04 19:28:20 bzfkocht Exp $"
 
-/*  \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
-#include <stdlib.h>
 #include <iostream>
 
-
-/*  and class header files
- */
 #include "spxhybridpr.h"
 
 namespace soplex
 {
 
-//@ ----------------------------------------------------------------------------
-/*  \Section{Miscellanous Methods}
- */
 int SPxHybridPR::isConsistent() const
 {
    if (thesolver != 0 &&

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: random.h,v 1.4 2001/11/26 12:19:13 bzfpfend Exp $"
+#pragma ident "@(#) $Id: random.h,v 1.5 2001/12/04 19:28:20 bzfkocht Exp $"
 
 /**@file  random.h
  * @brief Random numbers.
@@ -22,7 +22,6 @@
 #define _RANDOM_H_
 
 #include <assert.h>
-#include <stdlib.h>
 
 namespace soplex
 {

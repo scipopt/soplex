@@ -13,9 +13,8 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.4 2001/11/25 14:58:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.5 2001/12/04 19:28:20 bzfkocht Exp $"
 
-#include <stdlib.h>
 #include <iostream>
 
 #include "spxsolver.h"

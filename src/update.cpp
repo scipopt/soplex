@@ -13,16 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: update.cpp,v 1.4 2001/12/04 18:25:57 bzfkocht Exp $"
+#pragma ident "@(#) $Id: update.cpp,v 1.5 2001/12/04 19:28:20 bzfkocht Exp $"
 
-
-#include <stdio.h>
-#include <stdlib.h>
 #include <assert.h>
 
-#include "clutypes.h"
-#include "clumembers.h"
-#include "cluprotos.h"
+#include "clufactor.h"
 #include "cring.h"
 
 namespace soplex

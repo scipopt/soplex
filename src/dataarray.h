@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataarray.h,v 1.10 2001/11/21 16:25:34 bzfpfend Exp $"
+#pragma ident "@(#) $Id: dataarray.h,v 1.11 2001/12/04 19:28:20 bzfkocht Exp $"
 
 /**@file  dataarray.h
  * @brief Save arrays of data objects.
@@ -22,9 +22,8 @@
 #define _DATAARRAY_H_
 
 #include <assert.h>
-#include <stdlib.h>
-#include <memory.h>
 #include <stddef.h>
+#include <string.h>
 #include <iostream>
 
 #include "spxalloc.h"

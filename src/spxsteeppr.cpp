@@ -13,39 +13,19 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.5 2001/11/13 21:01:27 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.6 2001/12/04 19:28:20 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
-#include <stdio.h>
-#include <stdlib.h>
 #include <assert.h>
 #include <iostream>
 
-
-/*  and class header files
- */
 #include "spxsteeppr.h"
-
-
 #include "random.h"
 
 namespace soplex
 {
 
-
-
-
-
 #define EQ_PREF 1000
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{General}
- */
 void SPxSteepPR::clear()
 {
    thesolver = 0;
