@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clufactor.h,v 1.7 2001/12/25 14:25:55 bzfkocht Exp $"
+#pragma ident "@(#) $Id: clufactor.h,v 1.8 2001/12/25 14:32:37 bzfkocht Exp $"
 
 #ifndef _CLUFACTOR_H_
 #define _CLUFACTOR_H_
@@ -32,7 +32,7 @@ namespace soplex
  */
 class CLUFactor
 {
-protected:
+public:
    /** Double linked ring structure for garbage collection of column or
     *  row file in working matrix.
     */
@@ -60,7 +60,7 @@ protected:
       Pring(const Pring&);
       Pring& operator= (const Pring&);
    };
-
+protected:
    /// Temporary data structures.
    class Temp 
    {
