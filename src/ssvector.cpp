@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.28 2005/01/09 16:01:08 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.29 2005/01/09 16:21:50 bzfkocht Exp $"
 
 #undef NDEBUG
 #include <assert.h>
@@ -249,7 +249,7 @@ SSVector& SSVector::operator+=(const SVector& vec)
    return *this;
 }
 
-#if 0 // USE_OLD // old version
+#if USE_OLD // old version
 SSVector& SSVector::operator+=(const SSVector& vec)
 {
    for (int i = vec.size() - 1; i >= 0; --i)
@@ -301,7 +301,7 @@ SSVector& SSVector::operator-=(const SVector& vec)
    return *this;
 }
 
-#if 0 // USE_OLD // old version
+#if USE_OLD // old version
 SSVector& SSVector::operator-=(const SSVector& vec)
 {
    if (vec.isSetup())
@@ -343,7 +343,7 @@ SSVector& SSVector::operator-=(const SSVector& vec)
 }
 #endif
 
-#if 0 // USE_OLD // old version
+#if USE_OLD // old version
 SSVector& SSVector::operator*=(Real x)
 {
    assert(isSetup());
@@ -977,8 +977,6 @@ SSVector& SSVector::assign2productFull(const SVSet& A, const SSVector& x)
       for (; elem < last; ++elem)
          v[elem->idx] += y * elem->val;
    }
-   assert(isConsistent());
-
    return *this;
 }
 
