@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.56 2002/12/16 07:29:47 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.57 2002/12/16 07:50:55 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -315,8 +315,8 @@ SoPlex::Status SoPlex::solve()
    /* check, if solution is really feasible */
    if( status() == OPTIMAL )
    {
-      int    c;
-      double val;
+      int     c;
+      Real    val;
       DVector sol( nCols() );
 
       getPrimal( sol );

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxquality.cpp,v 1.2 2002/04/04 19:36:51 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxquality.cpp,v 1.3 2002/12/16 07:50:55 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -25,7 +25,7 @@
 namespace soplex
 {
 
-void SoPlex::qualConstraintViolation(double& maxviol, double& sumviol) const
+void SoPlex::qualConstraintViolation(Real& maxviol, Real& sumviol) const
 {
    maxviol = 0.0;
    sumviol = 0.0;
@@ -38,12 +38,12 @@ void SoPlex::qualConstraintViolation(double& maxviol, double& sumviol) const
    {
       const SVector& rowvec = rowVector( row );
 
-      double val = 0.0;         
+      Real val = 0.0;         
 
       for( int col = 0; col < rowvec.size(); ++col )
          val += rowvec.value( col ) * solu[rowvec.index( col )];
 
-      double viol = 0.0;
+      Real viol = 0.0;
 
       assert(lhs( row ) <= rhs( row ));
 
@@ -61,7 +61,7 @@ void SoPlex::qualConstraintViolation(double& maxviol, double& sumviol) const
 }
 
 void SoPlex::qualConstraintViolationUnscaled(
-   double& maxviol, double& sumviol) const
+   Real& maxviol, Real& sumviol) const
 {
    maxviol = 0.0;
    sumviol = 0.0;
@@ -85,12 +85,12 @@ void SoPlex::qualConstraintViolationUnscaled(
 
       thescaler->unscaledRowVector( row, urowvec );
 
-      double val = 0.0;         
+      Real val = 0.0;         
 
       for( int col = 0; col < urowvec.size(); ++col )
          val += urowvec.value( col ) * usol[urowvec.index( col )];
 
-      double viol = 0.0;
+      Real viol = 0.0;
 
       assert( ulhs[row] <= urhs[row] );
 
@@ -108,7 +108,7 @@ void SoPlex::qualConstraintViolationUnscaled(
 }
 
 void SoPlex::qualBoundViolation(
-   double& maxviol, double& sumviol) const
+   Real& maxviol, Real& sumviol) const
 {
    maxviol = 0.0;
    sumviol = 0.0;
@@ -121,7 +121,7 @@ void SoPlex::qualBoundViolation(
    {
       assert( lower( col ) <= upper( col ));
 
-      double viol = 0.0;
+      Real viol = 0.0;
 
       if (solu[col] < lower( col ))
          viol = fabs( solu[col] - lower( col ));
@@ -137,7 +137,7 @@ void SoPlex::qualBoundViolation(
 }
 
 void SoPlex::qualBoundViolationUnscaled(
-   double& maxviol, double& sumviol) const
+   Real& maxviol, Real& sumviol) const
 {
    maxviol = 0.0;
    sumviol = 0.0;
@@ -159,7 +159,7 @@ void SoPlex::qualBoundViolationUnscaled(
    {
       assert( ulower[col] <= uupper[col] );
 
-      double viol = 0.0;
+      Real viol = 0.0;
 
       if (usol[col] < ulower[col])
          viol = fabs( usol[col] - ulower[col]);
@@ -174,7 +174,7 @@ void SoPlex::qualBoundViolationUnscaled(
    }
 }
 
-void SoPlex::qualSlackViolation(double& maxviol, double& sumviol) const
+void SoPlex::qualSlackViolation(Real& maxviol, Real& sumviol) const
 {
    maxviol = 0.0;
    sumviol = 0.0;
@@ -189,12 +189,12 @@ void SoPlex::qualSlackViolation(double& maxviol, double& sumviol) const
    {
       const SVector& rowvec = rowVector( row );
 
-      double val = 0.0;         
+      Real val = 0.0;         
 
       for( int col = 0; col < rowvec.size(); ++col )
          val += rowvec.value( col ) * solu[rowvec.index( col )];
 
-      double viol = fabs(val - slacks[row]);
+      Real viol = fabs(val - slacks[row]);
 
       if (viol > maxviol)
          maxviol = viol;
@@ -204,7 +204,7 @@ void SoPlex::qualSlackViolation(double& maxviol, double& sumviol) const
 }
 
 // This should be computed freshly.
-void SoPlex::qualRdCostViolation(double& maxviol, double& sumviol) const
+void SoPlex::qualRdCostViolation(Real& maxviol, Real& sumviol) const
 {
    maxviol = 0.0;
    sumviol = 0.0;
@@ -219,7 +219,7 @@ void SoPlex::qualRdCostViolation(double& maxviol, double& sumviol) const
 
    for( int col = 0; col < nCols(); ++col)
    {
-      double viol = 0.0;
+      Real viol = 0.0;
 
       if (spxSense() == SPxLP::MINIMIZE)
       {

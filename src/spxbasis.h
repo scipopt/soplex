@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.29 2002/12/12 09:48:53 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.30 2002/12/16 07:50:55 bzfkocht Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -385,7 +385,7 @@ protected:
    SPxId  lastin;        ///< #lastEntered(): variable entered the base last
    SPxId  lastout;       ///< #lastLeft(): variable left the base last
    int    lastidx;       ///< #lastIndex(): basis index where last update was done
-   double minStab;       ///< minimum stability
+   Real   minStab;       ///< minimum stability
 
 private:
    SPxStatus thestatus;      ///< current status of the basis.

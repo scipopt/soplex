@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.56 2002/12/16 07:29:47 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.57 2002/12/16 07:50:55 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -1189,28 +1189,18 @@ public:
    }
    /// remove shift as much as possible.
    virtual void unShift(void);
-
    /// get violation of constraints.
-   virtual void qualConstraintViolation(
-      double& maxviol, double& sumviol) const;
-
+   virtual void qualConstraintViolation(Real& maxviol, Real& sumviol) const;
    /// get unscaled violation of constraints
-   virtual void qualConstraintViolationUnscaled(
-      double& maxviol, double& sumviol) const;
-
+   virtual void qualConstraintViolationUnscaled(Real& maxviol, Real& sumviol) const;
    /// get violations of bounds.
-   virtual void qualBoundViolation(
-      double& maxviol, double& sumviol) const;
-
+   virtual void qualBoundViolation(Real& maxviol, Real& sumviol) const;
    /// get unscaled violations of bounds.
-   virtual void qualBoundViolationUnscaled(
-      double& maxviol, double& sumviol) const;
-
+   virtual void qualBoundViolationUnscaled(Real& maxviol, Real& sumviol) const;
    /// get the residuum |Ax-b|.
-   virtual void qualSlackViolation(double& maxviol, double& sumviol) const;
-
+   virtual void qualSlackViolation(Real& maxviol, Real& sumviol) const;
    /// get violation of optimality criterion.
-   virtual void qualRdCostViolation(double& maxviol, double& sumviol) const;
+   virtual void qualRdCostViolation(Real& maxviol, Real& sumviol) const;
 
 private:
    ///

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscaler.cpp,v 1.3 2002/05/01 08:18:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscaler.cpp,v 1.4 2002/12/16 07:50:55 bzfkocht Exp $"
 
 /**@file  spxscaler.cpp
  * @brief LP scaling base class.
@@ -116,7 +116,7 @@ void SPxScaler::unscale()
       for( j = 0; j < vec.size(); ++j )
          vec.value(j) /= m_colscale[vec.index(j)];
 
-      double y = 1.0 / m_rowscale[i];
+      Real y = 1.0 / m_rowscale[i];
 
       vec *= y;
 
