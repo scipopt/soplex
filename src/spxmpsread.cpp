@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.27 2002/12/08 11:09:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.28 2003/04/16 12:41:33 bzfkocht Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.
@@ -56,7 +56,7 @@ static void readName(MPSInput& mps)
 
       if (!strcmp(mps.field0(), "ROWS"))
          mps.setSection(MPSInput::ROWS);
-      else if (!strcmp(mps.field0(), "OBJSEN"))
+      else if (!strncmp(mps.field0(), "OBJSEN", 6))
          mps.setSection(MPSInput::OBJSEN);
       else if (!strcmp(mps.field0(), "OBJNAME"))
          mps.setSection(MPSInput::OBJNAME);
@@ -79,9 +79,9 @@ static void readObjsen(MPSInput& mps)
       if (!mps.readLine() || (mps.field1() == 0))
          break;
 
-      if (strcmp(mps.field1(), "MIN"))
+      if (!strcmp(mps.field1(), "MIN"))
          mps.setObjSense(SPxLP::MINIMIZE);
-      else if (strcmp(mps.field1(), "MAX"))
+      else if (!strcmp(mps.field1(), "MAX"))
          mps.setObjSense(SPxLP::MAXIMIZE);
       else
          break;

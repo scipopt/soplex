@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: mpsinput.cpp,v 1.7 2002/05/15 13:38:43 bzfpfend Exp $"
+#pragma ident "@(#) $Id: mpsinput.cpp,v 1.8 2003/04/16 12:41:33 bzfkocht Exp $"
 
 /**@file  mpsinput.cpp
  * @brief Read MPS format files.
@@ -119,14 +119,28 @@ bool MPSInput::readLine()
          | m_buf[36] | m_buf[37] | m_buf[38]
          | m_buf[47] | m_buf[48] 
          | m_buf[61] | m_buf[62] | m_buf[63];
-      
+
       if (space == BLANK)
       {
-         /* We assume fixed format, so we patch possible embedded spaces.
+         /* Now we have space at the right positions.
+          * But are there also the non space where they
+          * should be ?
           */
-         patch_field(m_buf,  4, 12);
-         patch_field(m_buf, 14, 22);
-         patch_field(m_buf, 39, 47);
+         bool number = isdigit(m_buf[24]) || isdigit(m_buf[25]) 
+            || isdigit(m_buf[26]) || isdigit(m_buf[27]) 
+            || isdigit(m_buf[28]) || isdigit(m_buf[29]) 
+            || isdigit(m_buf[30]) || isdigit(m_buf[31]) 
+            || isdigit(m_buf[32]) || isdigit(m_buf[33]) 
+            || isdigit(m_buf[34]) || isdigit(m_buf[35]); 
+
+         if (number)
+         {
+            /* Now we assume fixed format, so we patch possible embedded spaces.
+             */
+            patch_field(m_buf,  4, 12);
+            patch_field(m_buf, 14, 22);
+            patch_field(m_buf, 39, 47);
+         }
       }
       s = &m_buf[1];
       
