@@ -4,3 +4,4 @@ lib
 .inslog*
 tca.*
 .nfs*
+cxx_repository

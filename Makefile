@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.3 2001/11/06 23:30:51 bzfkocht Exp $
+# $Id: Makefile,v 1.4 2001/11/07 13:47:51 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -29,6 +29,9 @@ CXXFLAGS	=	-O
 ARFLAGS		=	cr
 DFLAGS		=	-MM
 
+SRCDIR		=	src
+BINDIR		=	bin
+LIBDIR		=	lib
 NAME		=	soplex
 FLAGS		=       #
 LIBOBJ		= 	cachelpsolver.o changesoplex.o didxset.o \
@@ -66,21 +69,20 @@ GCCWARN		=	-Wall -W -Wpointer-arith -Wbad-function-cast \
 include make/make.$(OSTYPE).$(ARCH).$(COMP).$(OPT)
 #-----------------------------------------------------------------------------
 
-TARGET		=	bin/$(NAME).$(OSTYPE).$(ARCH).$(COMP).$(OPT)
-LIBRARY		=	lib/lib$(NAME).$(OSTYPE).$(ARCH).$(COMP).$(OPT).a
+TARGET		=	$(NAME).$(OSTYPE).$(ARCH).$(COMP).$(OPT)
+LIBRARY		=	$(LIBDIR)/lib$(NAME).$(OSTYPE).$(ARCH).$(COMP).$(OPT).a
+BINARY		=	$(BINDIR)/$(TARGET)
 DEPEND		=	src/depend
 
 OBJDIR		=	O.$(OSTYPE).$(ARCH).$(COMP).$(OPT)
-SRCDIR		=	src
-BINDIR		=	bin
-LIBDIR		=	lib
 OBJXXX		=	$(addprefix $(OBJDIR)/,$(OBJECT))
 LIBXXX		=	$(addprefix $(OBJDIR)/,$(LIBOBJ))
 OBJSRC		=	$(addprefix $(SRCDIR)/,$(OBJECT:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
 
-$(TARGET):	$(OBJDIR) $(BINDIR) $(OBJXXX) $(LIBRARY) 
-		$(CXX) $(CXXFLAGS) $(OBJXXX) $(LIBRARY) $(LDFLAGS) -o $@
+$(BINARY):	$(OBJDIR) $(BINDIR) $(OBJXXX) $(LIBRARY) 
+		$(CXX) $(CXXFLAGS) $(OBJXXX) \
+		-L$(LIBDIR) -l$(TARGET) $(LDFLAGS) -o $@
 
 $(LIBRARY):	$(LIBDIR) $(LIBXXX) 
 		-rm $(LIBRARY)
@@ -97,16 +99,16 @@ lint:		$(OBJSRC) $(LIBSRC)
 #		-@mkdir $(HTMLDIR)
 #		$(DOCXX) -d $(HTMLDIR) $(DOCSRC)
 check:		
-		cd check; ./check.sh normal.test $(TARGET)
+		cd check; ./check.sh normal.test $(BINARY)
 
 quick:		
-		cd check; ./check.sh quick.test $(TARGET)
+		cd check; ./check.sh quick.test $(BINARY)
 
 cover:
-		cd check; ./cover.sh cover.test $(TARGET)
+		cd check; ./cover.sh cover.test $(BINARY)
 
 clean:
-		-rm -rf $(OBJDIR)/* $(LIBRARY) $(TARGET)
+		-rm -rf $(OBJDIR)/* $(LIBRARY) $(BINARY)
 
 $(OBJDIR):	
 		-mkdir $(OBJDIR)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxshift.cpp,v 1.2 2001/11/06 23:31:05 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxshift.cpp,v 1.3 2001/11/07 13:48:13 bzfkocht Exp $"
 
 /*      \SubSection{Shifting bounds}
  */
@@ -143,15 +143,15 @@ void SoPlex::shiftPvec()
 void SoPlex::perturbMin
 (
    const UpdateVector& uvec,
-   Vector& low,
-   Vector& up,
+   Vector& p_low,
+   Vector& p_up,
    double eps,
    int start,
    int incr
 )
 {
-   assert(uvec.dim() == low.dim());
-   assert(uvec.dim() == up.dim());
+   assert(uvec.dim() == p_low.dim());
+   assert(uvec.dim() == p_up.dim());
 
    const double* vec = uvec.get_const_ptr();
    const double* upd = uvec.delta().values();
@@ -165,17 +165,17 @@ void SoPlex::perturbMin
    eps = delta();
    for (i = uvec.dim() - start - 1; i >= 0; i -= incr)
    {
-      u = up[i];
-      l = low[i];
-      if (up[i] <= vec[i] + eps)
+      u = p_up[i];
+      l = p_low[i];
+      if (p_up[i] <= vec[i] + eps)
       {
-         up[i] = vec[i] + (double)mult;
-         theShift += up[i] - u;
+         p_up[i] = vec[i] + (double)mult;
+         theShift += p_up[i] - u;
       }
-      if (low[i] >= vec[i] - eps)
+      if (p_low[i] >= vec[i] - eps)
       {
-         low[i] = vec[i] - (double)mult;
-         theShift -= low[i] - l;
+         p_low[i] = vec[i] - (double)mult;
+         theShift -= p_low[i] - l;
       }
    }
 
@@ -184,22 +184,22 @@ for (j = uvec.delta().size() - start - 1; j >= 0; j -= incr)
    {
       i = idx.index(j);
       x = upd[i];
-      u = up[i];
-      l = low[i];
+      u = p_up[i];
+      l = p_low[i];
       if (x < epsilon())
       {
          if (u != l && vec[i] >= u - eps)
          {
-            up[i] = vec[i] + (double)mult;
-            theShift += up[i] - u;
+            p_up[i] = vec[i] + (double)mult;
+            theShift += p_up[i] - u;
          }
       }
       else if (x > epsilon())
       {
          if (u != l && vec[i] <= l + eps)
          {
-            low[i] = vec[i] - (double)mult;
-            theShift -= low[i] - l;
+            p_low[i] = vec[i] - (double)mult;
+            theShift -= p_low[i] - l;
          }
       }
    }
@@ -209,15 +209,15 @@ for (j = uvec.delta().size() - start - 1; j >= 0; j -= incr)
 void SoPlex::perturbMax
 (
    const UpdateVector& uvec,
-   Vector& low,
-   Vector& up,
+   Vector& p_low,
+   Vector& p_up,
    double eps,
    int start,
    int incr
 )
 {
-   assert(uvec.dim() == low.dim());
-   assert(uvec.dim() == up.dim());
+   assert(uvec.dim() == p_low.dim());
+   assert(uvec.dim() == p_up.dim());
 
    const double* vec = uvec.get_const_ptr();
    const double* upd = uvec.delta().values();
@@ -230,17 +230,17 @@ void SoPlex::perturbMax
    eps = delta();
    for (i = uvec.dim() - start - 1; i >= 0; i -= incr)
    {
-      u = up[i];
-      l = low[i];
-      if (up[i] <= vec[i] + eps)
+      u = p_up[i];
+      l = p_low[i];
+      if (p_up[i] <= vec[i] + eps)
       {
-         up[i] = vec[i] + (double)mult;
-         theShift += up[i] - u;
+         p_up[i] = vec[i] + (double)mult;
+         theShift += p_up[i] - u;
       }
-      if (low[i] >= vec[i] - eps)
+      if (p_low[i] >= vec[i] - eps)
       {
-         low[i] = vec[i] - (double)mult;
-         theShift -= low[i] - l;
+         p_low[i] = vec[i] - (double)mult;
+         theShift -= p_low[i] - l;
       }
    }
 
@@ -249,22 +249,22 @@ void SoPlex::perturbMax
    {
       i = idx.index(j);
       x = upd[i];
-      u = up[i];
-      l = low[i];
+      u = p_up[i];
+      l = p_low[i];
       if (x > epsilon())
       {
          if (u != l && vec[i] >= u - eps)
          {
-            up[i] = vec[i] + (double)mult;
-            theShift += up[i] - u;
+            p_up[i] = vec[i] + (double)mult;
+            theShift += p_up[i] - u;
          }
       }
       else if (x < epsilon())
       {
          if (u != l && vec[i] <= l + eps)
          {
-            low[i] = vec[i] - (double)mult;
-            theShift -= low[i] - l;
+            p_low[i] = vec[i] - (double)mult;
+            theShift -= p_low[i] - l;
          }
       }
    }
@@ -292,8 +292,8 @@ void SoPlex::perturbMaxEnter(void)
 double SoPlex::perturbMin
 (
    const UpdateVector& uvec,
-   Vector& low,
-   Vector& up,
+   Vector& p_low,
+   Vector& p_up,
    double eps,
    double delta,
    const SPxBasis::Desc::Status* stat,
@@ -301,8 +301,8 @@ double SoPlex::perturbMin
    int incr
 )
 {
-   assert(uvec.dim() == low.dim());
-   assert(uvec.dim() == up.dim());
+   assert(uvec.dim() == p_low.dim());
+   assert(uvec.dim() == p_up.dim());
 
    const double* vec = uvec.get_const_ptr();
    const double* upd = uvec.delta().values();
@@ -316,17 +316,17 @@ double SoPlex::perturbMin
    eps = delta;
    for (i = uvec.dim() - start - 1; i >= 0; i -= incr)
    {
-      u = up[i];
-      l = low[i];
-      if (up[i] <= vec[i] + eps && rep()*stat[i] < 0)
+      u = p_up[i];
+      l = p_low[i];
+      if (p_up[i] <= vec[i] + eps && rep()*stat[i] < 0)
       {
-         up[i] = vec[i] + (double)mult;
-         theShift += up[i] - u;
+         p_up[i] = vec[i] + (double)mult;
+         theShift += p_up[i] - u;
       }
-      if (low[i] >= vec[i] - eps && rep()*stat[i] < 0)
+      if (p_low[i] >= vec[i] - eps && rep()*stat[i] < 0)
       {
-         low[i] = vec[i] - (double)mult;
-         theShift -= low[i] - l;
+         p_low[i] = vec[i] - (double)mult;
+         theShift -= p_low[i] - l;
       }
    }
 
@@ -335,22 +335,22 @@ double SoPlex::perturbMin
    {
       i = idx.index(j);
       x = upd[i];
-      u = up[i];
-      l = low[i];
+      u = p_up[i];
+      l = p_low[i];
       if (x < eps)
       {
          if (u != l && vec[i] >= u - eps && rep()*stat[i] < 0)
          {
-            up[i] = vec[i] + (double)mult;
-            theShift += up[i] - u;
+            p_up[i] = vec[i] + (double)mult;
+            theShift += p_up[i] - u;
          }
       }
       else if (x > eps)
       {
          if (u != l && vec[i] <= l + eps && rep()*stat[i] < 0)
          {
-            low[i] = vec[i] - (double)mult;
-            theShift -= low[i] - l;
+            p_low[i] = vec[i] - (double)mult;
+            theShift -= p_low[i] - l;
          }
       }
    }
@@ -361,8 +361,8 @@ double SoPlex::perturbMin
 double SoPlex::perturbMax
 (
    const UpdateVector& uvec,
-   Vector& low,
-   Vector& up,
+   Vector& p_low,
+   Vector& p_up,
    double eps,
    double delta,
    const SPxBasis::Desc::Status* stat,
@@ -370,8 +370,8 @@ double SoPlex::perturbMax
    int incr
 )
 {
-   assert(uvec.dim() == low.dim());
-   assert(uvec.dim() == up.dim());
+   assert(uvec.dim() == p_low.dim());
+   assert(uvec.dim() == p_up.dim());
 
    const double* vec = uvec.get_const_ptr();
    const double* upd = uvec.delta().values();
@@ -385,17 +385,17 @@ double SoPlex::perturbMax
    eps = delta;
    for (i = uvec.dim() - start - 1; i >= 0; i -= incr)
    {
-      u = up[i];
-      l = low[i];
-      if (up[i] <= vec[i] + eps && rep()*stat[i] < 0)
+      u = p_up[i];
+      l = p_low[i];
+      if (p_up[i] <= vec[i] + eps && rep()*stat[i] < 0)
       {
-         up[i] = vec[i] + (double)mult;
-         theShift += up[i] - u;
+         p_up[i] = vec[i] + (double)mult;
+         theShift += p_up[i] - u;
       }
-      if (low[i] >= vec[i] - eps && rep()*stat[i] < 0)
+      if (p_low[i] >= vec[i] - eps && rep()*stat[i] < 0)
       {
-         low[i] = vec[i] - (double)mult;
-         theShift -= low[i] - l;
+         p_low[i] = vec[i] - (double)mult;
+         theShift -= p_low[i] - l;
       }
    }
 
@@ -404,22 +404,22 @@ double SoPlex::perturbMax
    {
       i = idx.index(j);
       x = upd[i];
-      u = up[i];
-      l = low[i];
+      u = p_up[i];
+      l = p_low[i];
       if (x > eps)
       {
          if (u != l && vec[i] >= u - eps && rep()*stat[i] < 0)
          {
-            up[i] = vec[i] + (double)mult;
-            theShift += up[i] - u;
+            p_up[i] = vec[i] + (double)mult;
+            theShift += p_up[i] - u;
          }
       }
       else if (x < eps)
       {
          if (u != l && vec[i] <= l + eps && rep()*stat[i] < 0)
          {
-            low[i] = vec[i] - (double)mult;
-            theShift -= low[i] - l;
+            p_low[i] = vec[i] - (double)mult;
+            theShift -= p_low[i] - l;
          }
       }
    }
@@ -460,7 +460,7 @@ void SoPlex::unShift(void)
    if (isInitialized())
    {
       int i;
-      double up, low;
+      double t_up, t_low;
       double eps = delta();
       const SPxBasis::Desc& ds = desc();
 
@@ -475,56 +475,56 @@ void SoPlex::unShift(void)
                int num = number(id);
                if (id.type() == Id::ROWID)
                {
-                  up = -lhs(num);
-                  low = -rhs(num);
+                  t_up = -lhs(num);
+                  t_low = -rhs(num);
                }
                else
                {
                   assert(id.type() == Id::COLID);
-                  up = upper(num);
-                  low = lower(num);
+                  t_up = upper(num);
+                  t_low = lower(num);
                }
-               if (up != low)
+               if (t_up != t_low)
                {
-                  if ((*theFvec)[i] < up - eps)
-                     theUBbound[i] = up;
-                  else if ((*theFvec)[i] > up)
-                     theShift += theUBbound[i] - up;
-                  if ((*theFvec)[i] > low + eps)
-                     theLBbound[i] = low;
-                  else if ((*theFvec)[i] < low)
-                     theShift -= theLBbound[i] - low;
+                  if ((*theFvec)[i] < t_up - eps)
+                     theUBbound[i] = t_up;
+                  else if ((*theFvec)[i] > t_up)
+                     theShift += theUBbound[i] - t_up;
+                  if ((*theFvec)[i] > t_low + eps)
+                     theLBbound[i] = t_low;
+                  else if ((*theFvec)[i] < t_low)
+                     theShift -= theLBbound[i] - t_low;
                }
                else
                {
-                  if (theUBbound[i] > up)
-                     theShift += theUBbound[i] - up;
-                  else if (theLBbound[i] < low)
-                     theShift += low - theLBbound[i];
+                  if (theUBbound[i] > t_up)
+                     theShift += theUBbound[i] - t_up;
+                  else if (theLBbound[i] < t_low)
+                     theShift += t_low - theLBbound[i];
                }
             }
             for (i = nRows(); i-- > 0;)
             {
                if (!isBasic(ds.rowStatus(i)))
                {
-                  up = -lhs(i);
-                  low = -rhs(i);
-                  if (theURbound[i] > up)
-                     theShift += theURbound[i] - up;
-                  if (low > theLRbound[i])
-                     theShift += low - theLRbound[i];
+                  t_up = -lhs(i);
+                  t_low = -rhs(i);
+                  if (theURbound[i] > t_up)
+                     theShift += theURbound[i] - t_up;
+                  if (t_low > theLRbound[i])
+                     theShift += t_low - theLRbound[i];
                }
             }
             for (i = nCols(); i-- > 0;)
             {
                if (!isBasic(ds.colStatus(i)))
                {
-                  up = upper(i);
-                  low = lower(i);
-                  if (theUCbound[i] > up)
-                     theShift += theUCbound[i] - up;
-                  if (low > theLCbound[i])
-                     theShift += low - theLCbound[i];
+                  t_up = upper(i);
+                  t_low = lower(i);
+                  if (theUCbound[i] > t_up)
+                     theShift += theUCbound[i] - t_up;
+                  if (t_low > theLCbound[i])
+                     theShift += t_low - theLCbound[i];
                }
             }
          }
@@ -535,54 +535,54 @@ void SoPlex::unShift(void)
             {
                Id id = baseId(i);
                int num = number(id);
-               up = low = 0;
+               t_up = t_low = 0;
                if (id.type() == Id::ROWID)
-                  clearDualBounds(ds.rowStatus(num), up, low);
+                  clearDualBounds(ds.rowStatus(num), t_up, t_low);
                else
-                  clearDualBounds(ds.colStatus(num), up, low);
+                  clearDualBounds(ds.colStatus(num), t_up, t_low);
                if (theUBbound[i] != theLBbound[i])
                {
-                  if (theUBbound[i] > up)
-                     theShift += theUBbound[i] - up;
+                  if (theUBbound[i] > t_up)
+                     theShift += theUBbound[i] - t_up;
                   else
-                     theShift -= theUBbound[i] - up;
+                     theShift -= theUBbound[i] - t_up;
                }
                else
                {
-                  assert(theUBbound[i] >= up);
-                  if ((*theFvec)[i] < up - eps)
-                     theUBbound[i] = up;
-                  else if ((*theFvec)[i] > up)
-                     theShift += theUBbound[i] - up;
-                  assert(theLBbound[i] <= low);
-                  if ((*theFvec)[i] > low + eps)
-                     theLBbound[i] = low;
-                  else if ((*theFvec)[i] < low)
-                     theShift -= theLBbound[i] - low;
+                  assert(theUBbound[i] >= t_up);
+                  if ((*theFvec)[i] < t_up - eps)
+                     theUBbound[i] = t_up;
+                  else if ((*theFvec)[i] > t_up)
+                     theShift += theUBbound[i] - t_up;
+                  assert(theLBbound[i] <= t_low);
+                  if ((*theFvec)[i] > t_low + eps)
+                     theLBbound[i] = t_low;
+                  else if ((*theFvec)[i] < t_low)
+                     theShift -= theLBbound[i] - t_low;
                }
             }
             for (i = nRows(); i-- > 0;)
             {
                if (!isBasic(ds.rowStatus(i)))
                {
-                  up = low = 0;
-                  clearDualBounds(ds.rowStatus(i), up, low);
-                  if (theURbound[i] > up)
-                     theShift += theURbound[i] - up;
-                  if (low > theLRbound[i])
-                     theShift += low - theLRbound[i];
+                  t_up = t_low = 0;
+                  clearDualBounds(ds.rowStatus(i), t_up, t_low);
+                  if (theURbound[i] > t_up)
+                     theShift += theURbound[i] - t_up;
+                  if (t_low > theLRbound[i])
+                     theShift += t_low - theLRbound[i];
                }
             }
             for (i = nCols(); i-- > 0;)
             {
                if (!isBasic(ds.colStatus(i)))
                {
-                  up = low = 0;
-                  clearDualBounds(ds.colStatus(i), up, low);
-                  if (theUCbound[i] > up)
-                     theShift += theUCbound[i] - up;
-                  if (low > theLCbound[i])
-                     theShift += low - theLCbound[i];
+                  t_up = t_low = 0;
+                  clearDualBounds(ds.colStatus(i), t_up, t_low);
+                  if (theUCbound[i] > t_up)
+                     theShift += theUCbound[i] - t_up;
+                  if (t_low > theLCbound[i])
+                     theShift += t_low - theLCbound[i];
                }
             }
          }
@@ -594,43 +594,43 @@ void SoPlex::unShift(void)
          {
             for (i = nRows(); i-- > 0;)
             {
-               up = low = 0;
-               clearDualBounds(ds.rowStatus(i), up, low);
+               t_up = t_low = 0;
+               clearDualBounds(ds.rowStatus(i), t_up, t_low);
                if (!isBasic(ds.rowStatus(i)))
                {
-                  if ((*theCoPvec)[i] < up - eps)
-                     theURbound[i] = up;
+                  if ((*theCoPvec)[i] < t_up - eps)
+                     theURbound[i] = t_up;
                   else
-                     theShift += theURbound[i] - up;
-                  if ((*theCoPvec)[i] > low + eps)
-                     theLRbound[i] = low;
+                     theShift += theURbound[i] - t_up;
+                  if ((*theCoPvec)[i] > t_low + eps)
+                     theLRbound[i] = t_low;
                   else
-                     theShift += low - theLRbound[i];
+                     theShift += t_low - theLRbound[i];
                }
-               else if (theURbound[i] > up)
-                  theShift += theURbound[i] - up;
-               else if (theLRbound[i] < low)
-                  theShift += low - theLRbound[i];
+               else if (theURbound[i] > t_up)
+                  theShift += theURbound[i] - t_up;
+               else if (theLRbound[i] < t_low)
+                  theShift += t_low - theLRbound[i];
             }
             for (i = nCols(); i-- > 0;)
             {
-               up = low = -maxObj(i);
-               clearDualBounds(ds.colStatus(i), low, up);
+               t_up = t_low = -maxObj(i);
+               clearDualBounds(ds.colStatus(i), t_low, t_up);
                if (!isBasic(ds.colStatus(i)))
                {
-                  if ((*thePvec)[i] < -up - eps)
-                     theUCbound[i] = -up;
+                  if ((*thePvec)[i] < -t_up - eps)
+                     theUCbound[i] = -t_up;
                   else
-                     theShift += theUCbound[i] - (-up);
-                  if ((*thePvec)[i] > -low + eps)
-                     theLCbound[i] = -low;
+                     theShift += theUCbound[i] - (-t_up);
+                  if ((*thePvec)[i] > -t_low + eps)
+                     theLCbound[i] = -t_low;
                   else
-                     theShift += (-low) - theLCbound[i];
+                     theShift += (-t_low) - theLCbound[i];
                }
-               else if (theUCbound[i] > -up)
-                  theShift += theUCbound[i] - (-up);
-               else if (theLCbound[i] < -low)
-                  theShift += (-low) - theLCbound[i];
+               else if (theUCbound[i] > -t_up)
+                  theShift += theUCbound[i] - (-t_up);
+               else if (theLCbound[i] < -t_low)
+                  theShift += (-t_low) - theLCbound[i];
             }
          }
          else
@@ -638,59 +638,59 @@ void SoPlex::unShift(void)
             assert(rep() == ROW);
             for (i = nRows(); i-- > 0;)
             {
-               up = rhs(i);
-               low = lhs(i);
-               if (up == low)
+               t_up = rhs(i);
+               t_low = lhs(i);
+               if (t_up == t_low)
                {
-                  if (theURbound[i] > up)
-                     theShift += theURbound[i] - up;
+                  if (theURbound[i] > t_up)
+                     theShift += theURbound[i] - t_up;
                   else
-                     theShift += low - theLRbound[i];
+                     theShift += t_low - theLRbound[i];
                }
                else
                   if (!isBasic(ds.rowStatus(i)))
                   {
-                     if ((*thePvec)[i] < up - eps)
-                        theURbound[i] = up;
+                     if ((*thePvec)[i] < t_up - eps)
+                        theURbound[i] = t_up;
                      else
-                        theShift += theURbound[i] - up;
-                     if ((*thePvec)[i] > low + eps)
-                        theLRbound[i] = low;
+                        theShift += theURbound[i] - t_up;
+                     if ((*thePvec)[i] > t_low + eps)
+                        theLRbound[i] = t_low;
                      else
-                        theShift += low - theLRbound[i];
+                        theShift += t_low - theLRbound[i];
                   }
-                  else if (theURbound[i] > up)
-                     theShift += theURbound[i] - up;
-                  else if (theLRbound[i] < low)
-                     theShift += low - theLRbound[i];
+                  else if (theURbound[i] > t_up)
+                     theShift += theURbound[i] - t_up;
+                  else if (theLRbound[i] < t_low)
+                     theShift += t_low - theLRbound[i];
             }
             for (i = nCols(); i-- > 0;)
             {
-               up = upper(i);
-               low = lower(i);
-               if (up == low)
+               t_up = upper(i);
+               t_low = lower(i);
+               if (t_up == t_low)
                {
-                  if (theUCbound[i] > up)
-                     theShift += theUCbound[i] - up;
+                  if (theUCbound[i] > t_up)
+                     theShift += theUCbound[i] - t_up;
                   else
-                     theShift += low - theLCbound[i];
+                     theShift += t_low - theLCbound[i];
                }
                else
                   if (!isBasic(ds.colStatus(i)))
                   {
-                     if ((*theCoPvec)[i] < up - eps)
-                        theUCbound[i] = up;
+                     if ((*theCoPvec)[i] < t_up - eps)
+                        theUCbound[i] = t_up;
                      else
-                        theShift += theUCbound[i] - up;
-                     if ((*theCoPvec)[i] > low + eps)
-                        theLCbound[i] = low;
+                        theShift += theUCbound[i] - t_up;
+                     if ((*theCoPvec)[i] > t_low + eps)
+                        theLCbound[i] = t_low;
                      else
-                        theShift += low - theLCbound[i];
+                        theShift += t_low - theLCbound[i];
                   }
-                  else if (theUCbound[i] > up)
-                     theShift += theUCbound[i] - up;
-                  else if (theLCbound[i] < low)
-                     theShift += low - theLCbound[i];
+                  else if (theUCbound[i] > t_up)
+                     theShift += theUCbound[i] - t_up;
+                  else if (theLCbound[i] < t_low)
+                     theShift += t_low - theLCbound[i];
             }
          }
       }
