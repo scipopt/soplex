@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.23 2002/01/06 21:16:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.24 2002/01/08 09:32:49 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -27,7 +27,7 @@
 
 namespace soplex
 {
-#define MAX(x,y)        ((x)>(y) ? (x) : (y))
+#define MAXIMUM(x,y)        ((x)>(y) ? (x) : (y))
 
 void SoPlex::read(std::istream& in, NameSet* rowNames, NameSet* colNames)
 {
@@ -555,9 +555,9 @@ double SoPlex::maxInfeas() const
       for (i = dim() - 1; i >= 0; --i)
       {
          if ((*theFvec)[i] > theUBbound[i])
-            inf = MAX(inf, (*theFvec)[i] - theUBbound[i]);
+            inf = MAXIMUM(inf, (*theFvec)[i] - theUBbound[i]);
          if (theLBbound[i] > (*theFvec)[i])
-            inf = MAX(inf, theLBbound[i] - (*theFvec)[i]);
+            inf = MAXIMUM(inf, theLBbound[i] - (*theFvec)[i]);
       }
    }
    else
@@ -566,16 +566,16 @@ double SoPlex::maxInfeas() const
       for (i = dim() - 1; i >= 0; --i)
       {
          if ((*theCoPvec)[i] > (*theCoUbound)[i])
-            inf = MAX(inf, (*theCoPvec)[i] - (*theCoUbound)[i]);
+            inf = MAXIMUM(inf, (*theCoPvec)[i] - (*theCoUbound)[i]);
          if ((*theCoLbound)[i] > (*theCoPvec)[i])
-            inf = MAX(inf, (*theCoLbound)[i] - (*theCoPvec)[i]);
+            inf = MAXIMUM(inf, (*theCoLbound)[i] - (*theCoPvec)[i]);
       }
       for (i = coDim() - 1; i >= 0; --i)
       {
          if ((*thePvec)[i] > (*theUbound)[i])
-            inf = MAX(inf, (*thePvec)[i] - (*theUbound)[i]);
+            inf = MAXIMUM(inf, (*thePvec)[i] - (*theUbound)[i]);
          else if ((*thePvec)[i] < (*theLbound)[i])
-            inf = MAX(inf, (*theLbound)[i] - (*thePvec)[i]);
+            inf = MAXIMUM(inf, (*theLbound)[i] - (*thePvec)[i]);
       }
    }
 
