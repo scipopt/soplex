@@ -1,4 +1,4 @@
-# $Id: cover.sh,v 1.4 2001/11/12 08:12:47 bzfkocht Exp $
+# $Id: cover.sh,v 1.5 2001/11/15 08:26:59 bzfkocht Exp $
 BINNAME=`basename $2`
 TSTNAME=`basename $1 .test`
 OUTFILE=cover.$TSTNAME.$BINNAME.out
@@ -23,7 +23,7 @@ do
 			echo @01 $i ===========
 			echo @01 $i =========== >>$ERRFILE
 			echo =start= $opt 
-			../$2 $opt $i 2>>$ERRFILE
+			../$2 $opt -l60 $i 2>>$ERRFILE
 			echo =ready=
 		    done
 		done

@@ -1,4 +1,4 @@
-# $Id: check.awk,v 1.5 2001/11/12 08:13:59 bzfkocht Exp $
+# $Id: check.awk,v 1.6 2001/11/15 08:26:58 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: check.awk                                                     *
@@ -135,6 +135,9 @@ BEGIN {
     sol["vtp"] =        1.2983146246E+05;
     sol["wood1p"] =     1.4429024116E+00;
     sol["woodw"] =      1.3044763331E+00;
+
+    print "$Id: check.awk,v 1.6 2001/11/15 08:26:58 bzfkocht Exp $";
+    print "";
 }
 /=type=/      { type = $2; }
 /loading/     { file = $4; }
