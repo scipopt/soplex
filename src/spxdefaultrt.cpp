@@ -13,9 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.15 2003/01/20 16:46:13 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.16 2004/11/05 20:11:56 bzfkocht Exp $"
 
-//#define DEBUGGING 1
+#define DEBUGGING 1
 
 #include <assert.h>
 #include <iostream>

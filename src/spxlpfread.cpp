@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.41 2004/10/13 13:16:41 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.42 2004/11/05 20:11:56 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -48,9 +48,13 @@ static bool isValue(const char* s)
       || (*s == '+') || (*s == '-') || (*s == '.');
 }
 
-/// Is there a posiible column name at the beginning of \p s ?
+/// Is there a possible column name at the beginning of \p s ?
 static bool isColName(const char* s)
 {
+   // strchr() gives a true for the null char.
+   if (*s == '\0')
+      return false;
+
    return ((*s >= 'A') && (*s <= 'Z'))
       || ((*s >= 'a') && (*s <= 'z'))
       || (strchr("!\"#$%&()/,;?@_'`{}|~", *s) != 0);
@@ -145,6 +149,9 @@ static Real readValue(char*& pos)
 
    DEBUG( std::cout << "readValue = " << value << std::endl; );
 
+   if (isSpace(*pos))
+      pos++;
+
    return value;
 }
 
@@ -188,6 +195,9 @@ static int readColName(
    DEBUG({ std::cout << "readColName [" << name << "] = "
 		     << colidx << std::endl; });
 
+   if (isSpace(*pos))
+      pos++;
+
    return colidx;
 }
 
@@ -205,6 +215,9 @@ static int readSense(char*& pos)
 
    DEBUG({ std::cout << "readSense = " << static_cast<char>(sense)
 		     << std::endl; });
+
+   if (isSpace(*pos))
+      pos++;
 
    return sense;
 }
@@ -472,24 +485,16 @@ bool SPxLP::readLPF(
          if (hasRowName(pos, rnames))
             unnamed = false;
 
-      // 4. Remove spaces.
-      if ((section == BINARYS) || (section == INTEGERS) || (section == BOUNDS))
-      {
-         // only inital spaces
-         while(isSpace(*pos))
-            pos++;
+      // 4a. Remove initial spaces.
+      while(isSpace(pos[i]))
+         i++;
 
-         strcpy(tmp, pos);
-      }
-      else
-      {
-         // all spaces
-         for(k = 0; pos[i] != '\0'; i++)
-            if (!isSpace(pos[i]))
-               tmp[k++] = pos[i];
+      // 4b. remove spaces if they do not appear before the name of a vaiable.
+      for(k = 0; pos[i] != '\0'; i++)
+         if (!isSpace(pos[i]) || isColName(&pos[i + 1]))
+            tmp[k++] = pos[i];
 
-         tmp[k] = '\0';
-      }
+      tmp[k] = '\0';
 
       // 5. Is this a empty line ?
       if (tmp[0] == '\0')
@@ -524,9 +529,26 @@ bool SPxLP::readLPF(
          case OBJECTIVE :
             if (isValue(pos))
             {
+               Real pre_sign = 1.0;
+
+               /* Allready having here a value could only result from
+                * being the first number in a constraint, or a sign
+                * '+' or '-' as last token on the previous line.
+                */
+               if (have_value)
+               {
+                  if (NE(fabs(val), 1.0))
+                     goto syntax_error;
+               
+                  if (EQ(val, -1.0))
+                     pre_sign = val;
+               }
                have_value = true;
-               val        = readValue(pos);
+               val        = readValue(pos) * pre_sign;
             }
+            if (*pos == '\0')
+               continue;
+
             if (!have_value || !isColName(pos))
                goto syntax_error;
             
@@ -594,6 +616,9 @@ bool SPxLP::readLPF(
                   continue;
                }         
             }
+            if (*pos == '\0')
+               continue;
+
             if (have_value)
             {
                if (!isColName(pos)) /* implies !isSense(pos) */
@@ -637,8 +662,6 @@ bool SPxLP::readLPF(
                sense = readSense(pos);
             break;
          case BOUNDS :
-            /**@todo the fixed case (e.g. "x = 17") is missing */
-            /* we cannot remove all spaces in the bounds section, because of e.g. "x free" (see above) */
             other = false;
             sense = 0;
 
@@ -646,20 +669,12 @@ bool SPxLP::readLPF(
             {
                val = isInfinity(pos) ? readInfinity(pos) : readValue(pos);
 
-               while(isSpace(*pos))
-                  pos++;
-
                if (!isSense(pos))
                   goto syntax_error;
 
                sense = readSense(pos);
                other = true;
             }
-
-	    // before reading the column name remove spaces
-	    while(isSpace(*pos))
-	       pos++;
-
             if (!isColName(pos))
                goto syntax_error;
 
@@ -669,11 +684,6 @@ bool SPxLP::readLPF(
                          << " ignored" << std::endl;
                continue;
             }
-
-	    // after reading the column names remove spaces
-	    while(isSpace(*pos))
-	       pos++;
-
             if (sense)
             {
                if (sense == '<') 
@@ -687,7 +697,6 @@ bool SPxLP::readLPF(
                   cset.upper(colidx) = val;
                }
             }
-
             if (isFree(pos))
             {
                cset.lower(colidx) = -infinity;
@@ -699,9 +708,6 @@ bool SPxLP::readLPF(
             {
                sense = readSense(pos);
                other = true;
-
-               while(isSpace(*pos))
-                  pos++;
 
                if (!isValue(pos))
                   goto syntax_error;
@@ -719,9 +725,6 @@ bool SPxLP::readLPF(
                   cset.upper(colidx) = val;
                }
             }
-            while(isSpace(*pos)) // remove spaces (hopefully) to end of line
-               pos++;
-
             /* Do we have only a single column name in the input line?
              * We could ignore this savely, but it is probably a sign 
              * of some other error.
@@ -746,8 +749,6 @@ bool SPxLP::readLPF(
                if (p_intvars != 0)
                   p_intvars->addIdx(colidx);
             }
-            while(isSpace(*pos))
-               pos++;
             break;
          case START :
             std::cerr << "This seems to be no LP format file" << std::endl;

@@ -13,9 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.31 2004/03/16 14:57:37 bzfpfend Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.32 2004/11/05 20:11:56 bzfkocht Exp $"
 
-// #define DEBUGGING 1
+#define DEBUGGING 1
 
 /* Updating the Basis for Leaving Variables
  */
@@ -562,11 +562,12 @@ bool SPxSolver::leave(int leaveIdx)
          /* the following line originally was below in "rejecting leave" case;
             we need it in the unbounded/infeasible case, too, to have the 
             correct basis size */
-         rejectLeave(leaveNum, leaveId, leaveStat);
 
+         rejectLeave(leaveNum, leaveId, leaveStat);
+            
          if (enterVal != leaveMax)
          {
-            DEBUG( std::cout << "rejecting leave" << std::endl; );
+            DEBUG( std::cout << "rejecting leave A " << std::endl; );
             theCoTest[leaveIdx] *= 0.01;            // #== fTest()#
             theCoTest[leaveIdx] -= 2 * delta();     // #== fTest()#
             return true;
@@ -628,7 +629,7 @@ bool SPxSolver::leave(int leaveIdx)
             change(leaveIdx, none, 0);
             theFvec->delta().clear();
             rejectLeave(leaveNum, leaveId, leaveStat, &newVector);
-            DEBUG( std::cout << "rejecting leave" << std::endl; );
+            DEBUG( std::cout << "rejecting leave B" << std::endl; );
             // factorize();
             theCoTest[leaveIdx] *= 0.01;            // #== fTest()#
             return true;

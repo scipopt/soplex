@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.71 2004/03/17 09:20:01 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.72 2004/11/05 20:11:56 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -294,7 +294,7 @@ SPxSolver::Status SPxSolver::solve()
                      VERBOSE2({ std::cout << "Setting delta= " << thepricer->epsilon() 
                                           << std::endl; });
                   }
-                  // solution seems good, no check we are precide enough
+                  // solution seems good, no check we are precise enough
                   else if (lastUpdate() == 0)
                      break;
                   // We have a iterationlimit and everything look good? Then stop!
