@@ -1,4 +1,4 @@
-g++ -Wall -W -Wpointer-arith -Wbad-function-cast \
+g++ -g -Wall -W -Wpointer-arith -Wbad-function-cast \
                         -Wcast-align -Wwrite-strings -Wconversion \
                         -Wstrict-prototypes -Wmissing-prototypes \
                         -Wmissing-declarations -Wno-unknown-pragmas \
@@ -6,7 +6,7 @@ g++ -Wall -W -Wpointer-arith -Wbad-function-cast \
                         -Woverloaded-virtual -Wsign-promo -Wsynth -Wundef \
                         -Wcast-qual -Wold-style-cast -Wshadow \
 -I ../src -I ../../sip/src -c siplp.cpp
-g++ -Wall -W -Wpointer-arith -Wbad-function-cast \
+g++ -g -Wall -W -Wpointer-arith -Wbad-function-cast \
                         -Wcast-align -Wwrite-strings -Wconversion \
                         -Wstrict-prototypes -Wmissing-prototypes \
                         -Wmissing-declarations -Wno-unknown-pragmas \

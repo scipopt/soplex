@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: sipinput.cpp,v 1.2 2002/01/23 17:47:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: sipinput.cpp,v 1.3 2002/01/27 09:32:53 bzfkocht Exp $"
 
 #include <fstream>
 #include <stdio.h>
@@ -34,29 +34,29 @@ using namespace soplex;
 
 /*ARGSUSED*/
 extern "C" int SIPinput(
-   FILE*         ferr, 
-   SIPInfaIO     /*infaIO*/, 
-   const char*   filename,
-   int*          ncol, 
-   int*          nrow, 
-   int*          objsen,
-   double**      obj, 
-   double**      rhs, 
-   char**        sen, 
-   int**         beg, 
-   int**         cnt, 
-   int**         ind, 
-   double**      val, 
-   double**      lb, 
-   double**      ub, 
-   double**      rng,
-   char***       cname, 
-   char**        cstore, 
-   char***       rname, 
-   char**        rstore,
-   unsigned int* cstoresz, 
-   unsigned int* rstoresz, 
-   char**        ctype)
+   FILE*       ferr, 
+   SIPInfaIO   /*infaIO*/, 
+   const char* filename,
+   int*        ncol, 
+   int*        nrow, 
+   int*        objsen,
+   double**    obj, 
+   double**    rhs, 
+   char**      sen, 
+   int**       beg, 
+   int**       cnt, 
+   int**       ind, 
+   double**    val, 
+   double**    lb, 
+   double**    ub, 
+   double**    rng,
+   char***     cname, 
+   char**      cstore, 
+   char***     rname, 
+   char**      rstore,
+   int*        cstoresz, 
+   int*        rstoresz, 
+   char**      ctype)
 {
    assert(ferr     != 0);
    assert(filename != 0);
@@ -145,9 +145,9 @@ extern "C" int SIPinput(
          abort();
       }
    }   
-   
-   if (  (0 != (*beg = static_cast<int*>(malloc(*ncol * sizeof(**beg)))))
-      && (0 != (*cnt = static_cast<int*>(malloc(*ncol * sizeof(**cnt))))))
+
+   if (  (0 == (*beg = static_cast<int*>(malloc(*ncol * sizeof(**beg)))))
+      || (0 == (*cnt = static_cast<int*>(malloc(*ncol * sizeof(**cnt))))))
       return SIP_NOMEMORY;
 
    int nzo = 0;
@@ -156,8 +156,8 @@ extern "C" int SIPinput(
    for(i = 0; i < *ncol; i++)
       nzo += lp.colVector(i).size();
 
-   if (  (0 != (*ind = static_cast<int*>(malloc(nzo * sizeof(**ind))))
-      && (0 != (*val = static_cast<double*>(malloc(nzo * sizeof(**val)))))))
+   if (  (0 == (*ind = static_cast<int*>(malloc(nzo * sizeof(**ind))))
+      || (0 == (*val = static_cast<double*>(malloc(nzo * sizeof(**val)))))))
       return SIP_NOMEMORY;
 
    for(i = 0; i < *ncol; i++)
@@ -166,21 +166,25 @@ extern "C" int SIPinput(
       
       (*beg)[i] = k;
       (*cnt)[i] = col.size();            
-      (*ind)[k] = col.index(i);
-      (*val)[k] = col.value(i);
-      k++;
+
+      for(int j = 0; j < col.size(); j++)
+      {
+         (*ind)[k] = col.index(j);
+         (*val)[k] = col.value(j);
+         k++;
+      }
    }
    assert(k == nzo);
 
    if (0 == (*lb = static_cast<double*>(malloc(*ncol * sizeof(**lb)))))
       return SIP_NOMEMORY;
 
-   memcpy(lb, lp.lower().get_const_ptr(), *ncol);
+   memcpy(*lb, lp.lower().get_const_ptr(), *ncol);
 
    if (0 == (*ub = static_cast<double*>(malloc(*ncol * sizeof(**ub)))))
       return SIP_NOMEMORY;
 
-   memcpy(ub, lp.upper().get_const_ptr(), *ncol);
+   memcpy(*ub, lp.upper().get_const_ptr(), *ncol);
 
    assert(colnames.num() == *ncol);
 
@@ -200,7 +204,7 @@ extern "C" int SIPinput(
       (*cname)[i] = &((*cstore)[k]);
       strcpy((*cname)[i], colnames[i]);
       k += strlen(colnames[i]) + 1;
-      assert(static_cast<unsigned int>(k) < *cstoresz);
+      assert(k <= *cstoresz);
    }
 
    assert(rownames.num() == *nrow);
@@ -221,7 +225,7 @@ extern "C" int SIPinput(
       (*rname)[i] = &((*rstore)[k]);
       strcpy((*rname)[i], rownames[i]);
       k += strlen(rownames[i]) + 1;
-      assert(static_cast<unsigned int>(k) < *rstoresz);
+      assert(k <= *rstoresz);
    }
 
    if (0 == (*ctype = static_cast<char*>(malloc(*ncol * sizeof(**ctype)))))

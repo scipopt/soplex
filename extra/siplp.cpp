@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: siplp.cpp,v 1.1 2002/01/23 17:47:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: siplp.cpp,v 1.2 2002/01/27 09:32:53 bzfkocht Exp $"
 
 #include <stdio.h>
 #include <string.h>
@@ -26,6 +26,14 @@
 #include "spxfastrt.h"
 #include "nameset.h"
 #include "didxset.h"
+
+#define DEBUG  1
+
+#ifdef DEBUG
+#define TRACE(x) fprintf(stderr, "%s\n", x)
+#else
+#define TRACE(x) /**/
+#endif
 
 extern "C" 
 {
@@ -127,6 +135,8 @@ extern "C" int SIPopenInfa(
    SIPInfaIO* infaIO,
    SIPInfaLP  /*parinfaLP*/)
 {
+   TRACE("SIPopenInfa");
+
    assert(infaLP != 0);
 
    *infaLP = reinterpret_cast<SIPInfaLP>(new SPxSIP);
@@ -143,6 +153,8 @@ extern "C" int SIPfreeInfa(
    SIPInfaIO* /*infaIO*/,
    SIPInfaLP  /*parinfaLP*/)
 {
+   TRACE("SIPfreeInfa");
+
    assert(infaLP  != 0);
    assert(*infaLP != 0);
 
@@ -160,6 +172,8 @@ extern "C" int SIPcloneinface(
    SIPInfaLP  /*old*/, 
    SIPInfaLP* newinface)
 {
+   TRACE("SIPcloneinface");
+
    assert(newinface != 0);
 
    *newinface = reinterpret_cast<SIPInfaLP>(new SPxSIP);
@@ -175,6 +189,8 @@ extern "C" int SIPopenLP(
    SIPLP*    lptr, 
    char*     name)
 {
+   TRACE("SIPopenLP");
+
    assert(infaLP != 0);
    assert(lptr   != 0);
 
@@ -195,6 +211,8 @@ extern "C" int SIPfreeLP(
    SIPInfaLP infaLP, 
    SIPLP*    lptr)
 {
+   TRACE("SIPfreeLP");
+
    assert(infaLP != 0);
    assert(lptr   != 0);
    
@@ -225,6 +243,8 @@ extern "C" int SIPcopyLP(
    char**    cname, 
    char**    rname)
 {
+   TRACE("SIPcopyLP");
+
    assert(ferr   != 0);
    assert(infaLP != 0);
    assert(lptr   != 0);
@@ -310,6 +330,8 @@ extern "C" int SIPsetbase(
    int*      rstat, 
    int       /*pricing*/)
 {
+   TRACE("SIPsetbase");
+
    assert(infaLP != 0);
    assert(lptr   != 0);
    assert(cstat  != 0);
@@ -400,6 +422,8 @@ extern "C" int SIPgetsol(
    double*   slck, 
    double*   redcost)
 {
+   TRACE("SIPgetsol");
+
    assert(infaLP != 0);
    assert(lptr   != 0);
     
@@ -457,6 +481,8 @@ extern "C" int SIPgetbase(
    int*      cstat, 
    int*      rstat)
 {
+   TRACE("SIPgetbase");
+
    assert(infaLP != 0);
    assert(lptr   != 0);
     
@@ -526,6 +552,8 @@ extern "C" int SIPsetintparLP(
    int       type, 
    int       ival)
 {
+   TRACE("SIPsetintparLP");
+
    assert(infaLP != 0);
     
    SPxSIP* spx = reinterpret_cast<SPxSIP*>(infaLP);
@@ -559,6 +587,8 @@ extern "C" int SIPsetdblparLP(
    int       type, 
    double    dval)
 {
+   TRACE("SIPsetdblparLP");
+
    assert(infaLP != 0);
     
    SPxSIP* spx = reinterpret_cast<SPxSIP*>(infaLP);
@@ -592,6 +622,8 @@ extern "C" int SIPgetintparLP(
    SIPLP     /*lptr*/,
    int*      ival)
 {
+   TRACE("SIPgetintparLP");
+
    assert(infaLP != 0);
    assert(ival   != 0);
 
@@ -627,6 +659,8 @@ extern "C" int SIPgetdblparLP(
    SIPLP     /*lptr*/,
    double*   dval)
 {
+   TRACE("SIPgetdblparLP");
+
    assert(infaLP != 0);
    assert(dval   != 0);
 
@@ -650,15 +684,16 @@ extern "C" int SIPgetdblparLP(
 /*ARGSUSED*/
 extern "C" int SIPisStable(int solstat)
 {
+   TRACE("SIPisStable");
+
    return (solstat != SoPlex::SINGULAR) && (solstat != SoPlex::ERROR);
 }
-
-
 
 /* returns TRUE iff LP has been solved by presolve */ 
 /*ARGSUSED*/
 extern "C" int SIPisPresolved(int /*status*/)
 {
+   TRACE("SIPisPresolved");
    // There is no presolve in SoPlex
    return 0; 
 }
@@ -667,14 +702,17 @@ extern "C" int SIPisPresolved(int /*status*/)
 /*ARGSUSED*/
 extern "C" int SIPisInfeas(int status)
 {
+   TRACE("SIPisInfeas");
+
    return (status == SoPlex::INFEASIBLE) || (status == SoPlex::UNBOUNDED); 
 }
-
 
 /* returns TRUE iff LP is solved to optimality */
 /*ARGSUSED*/
 extern "C" int SIPisOptimal(int status)
 {
+   TRACE("SIPisOptimal");
+
    return status == SoPlex::OPTIMAL;
 }
 
@@ -683,6 +721,8 @@ extern "C" int SIPisOptimal(int status)
 /*ARGSUSED*/
 extern "C" int SIPisValidBound(int status)
 {
+   TRACE("SIPisValidBound");
+
    return (status == SoPlex::OPTIMAL)
       ||  (status == SoPlex::ABORT_TIME)
       ||  (status == SoPlex::ABORT_ITER)
@@ -693,15 +733,18 @@ extern "C" int SIPisValidBound(int status)
 /*ARGSUSED*/
 extern "C" int SIPexObjlim(int status)
 {
+   TRACE("SIPexObjlim");
+
    return (status == SoPlex::UNBOUNDED)
       ||  (status == SoPlex::ABORT_VALUE);
-
 }
 
 /* returns TRUE iff error occured during LP solve */ 
 /*ARGSUSED*/
 extern "C" int SIPerrorLP(int status)
 {
+   TRACE("SIPerrorLP");
+
    return ( status < 0 );
 }
 
@@ -709,8 +752,9 @@ extern "C" int SIPerrorLP(int status)
 /*ARGSUSED*/
 extern "C" int SIPiterlim(int status)
 {
+   TRACE("SIPiterlim");
+
    return (status == SoPlex::ABORT_VALUE);
-   
 }
 
 /*ARGSUSED*/
@@ -720,6 +764,8 @@ extern "C" int SIPwriteLP(
    SIPLP     lptr, 
    char*     fname)
 {
+   TRACE("SIPwriteLP");
+
    assert(ferr   != 0);
    assert(infaLP != 0);
    assert(lptr   != 0);
@@ -747,6 +793,8 @@ extern "C" int SIPwriteB(
    SIPLP     lptr, 
    char*     fname)
 {
+   TRACE("SIPwriteB");
+
    assert(ferr   != 0);
    assert(infaLP != 0);
    assert(lptr   != 0);
@@ -777,6 +825,8 @@ extern "C" int SIPgetlb(
    int       beg, 
    int       end)
 {
+   TRACE("SIPgetlb");
+
    assert(infaLP != 0);
    assert(lptr   != 0);
    assert(lb     != 0);
@@ -802,6 +852,8 @@ extern "C" int SIPgetub(
    int       beg, 
    int       end)
 {
+   TRACE("SIPgetub");
+
    assert(infaLP != 0);
    assert(lptr   != 0);
    assert(ub     != 0);
@@ -828,6 +880,8 @@ extern "C" int SIPchgbds(
    char*     lu, 
    double*   bd)
 {
+   TRACE("SIPchgbds");
+
    assert(infaLP != 0);
    assert(lptr   != 0);
    assert(cnt    >  0);
@@ -868,6 +922,8 @@ extern "C" void SIPchgobjsen(
    SIPLP     lptr, 
    int       objsen)
 {
+   TRACE("SIPchgobjsen");
+
    assert(infaLP != 0);
    assert(lptr   != 0);
    assert(objsen != 0);
@@ -884,6 +940,8 @@ extern "C" int SIPdelrows(
    SIPLP     lptr, 
    int*      dstat)
 {
+   TRACE("SIPdelrows");
+
    assert(infaLP != 0);
    assert(lptr   != 0);
    assert(dstat  != 0);
@@ -907,6 +965,26 @@ extern "C" int SIPdelrows(
    return SIP_OKAY;
 }
 
+/*ARGSUSED*/         
+extern "C" int SIPgetBind(
+   FILE*     ferr, 
+   SIPInfaLP /*infaLP*/, 
+   SIPLP     /*lptr*/,
+   int*      /*head*/, 
+   double*   /*x*/)
+{
+   TRACE("SIPgetBind");
+
+   fprintf(ferr, "SIPgetBind not implemented\n");
+
+#if 0
+   restat = CPXgetbhead ((CPXENVptr) infaLP, (CPXLPptr) lptr, head, x);
+#endif
+
+   return SIP_LPERROR;
+   
+}/* END GETBIND */
+
 /* returns a row of some matrix:
    SIP_ABm1:  *val contains the ith row of A_B^-1 (non-sparse)
               *ind, *nnonz are not used
@@ -927,6 +1005,8 @@ extern "C" int SIPgetrow(
    int*      ind, 
    int*      nnonz)
 {
+   TRACE("SIPgetrow");
+
    assert(ferr   != 0);
    assert(infaLP != 0);
    assert(lptr   != 0);
@@ -993,6 +1073,8 @@ extern "C" int SIPoptLP(
    SIPInfaLP infaLP, 
    SIPLP     lptr)
 {
+   TRACE("SIPoptLP");
+
    assert(infaLP != 0);
    assert(lptr   != 0);
 
@@ -1015,6 +1097,8 @@ extern "C" int SIPstrongbranch(
    double*   up, 
    int       itlim)
 {
+   TRACE("SIPstrongbranch");
+
    assert(ferr   != 0);
    assert(infaLP != 0);
    assert(lptr   != 0);
@@ -1056,6 +1140,8 @@ extern "C" int SIPaddrow(
    double*   val,
    char**    /*name*/)    // we don't use the names yet.
 {
+   TRACE("SIPaddrow");
+
    assert(ferr   != 0);
    assert(infaLP != 0);
    assert(lptr   != 0);
@@ -1110,4 +1196,3 @@ extern "C" int SIPaddrow(
 //Emacs indent-tabs-mode:nil
 //Emacs End:
 //-----------------------------------------------------------------------------
-
