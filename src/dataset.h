@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.31 2003/01/05 19:03:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.32 2005/01/12 12:00:03 bzfkocht Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -172,8 +172,7 @@ public:
     */
    DATA* create(DataKey& newkey)
    {
-      if (num() >= max())
-         abort();
+      assert(num() < max());
 
       if (firstfree != -themax - 1)
       {

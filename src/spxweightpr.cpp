@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.18 2005/01/06 17:12:10 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.19 2005/01/12 12:00:03 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -195,7 +195,7 @@ SPxId SPxWeightPR::selectEnter()
          case SPxBasis::Desc::D_UNDEFINED :
          case SPxBasis::Desc::P_FIXED :
          default:
-            abort();
+            assert(false);
          }
          if (x < best)
          {
@@ -233,7 +233,7 @@ SPxId SPxWeightPR::selectEnter()
          case SPxBasis::Desc::P_FIXED :
          case SPxBasis::Desc::D_UNDEFINED :
          default:
-            abort();
+            assert(false);
          }
          if (x < best)
          {

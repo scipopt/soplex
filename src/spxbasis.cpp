@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.41 2003/03/04 10:25:28 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.42 2005/01/12 12:00:03 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -515,7 +515,7 @@ void SPxBasis::factorize()
       break;
    default :
       std::cerr << "EBASIS08 error: unknown status of factorization.\n";
-      abort();
+      assert(false);
       // factorized = false;
    }
    assert(nzCount > 0);

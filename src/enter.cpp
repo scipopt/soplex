@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.27 2003/03/04 19:30:44 bzfkocht Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.28 2005/01/12 12:00:03 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -382,7 +382,7 @@ void SPxSolver::getEnterVals
          }
          break;
       default:
-         abort();
+         assert(false);
       }
       DEBUG({ std::cout << "SPxSolver::getEnterVals() : col " << enterIdx
                         << ": " << enterStat
@@ -447,7 +447,7 @@ void SPxSolver::getEnterVals
       case SPxBasis::Desc::P_FREE :
          assert( rep() == COLUMN );
 #if 1
-         abort();
+         assert(false);
 #else
          std::cerr << __FILE__ << __LINE__ << "ERROR: not yet debugged!\n";
          enterPric = (*theCoPvec)[enterIdx];
@@ -514,7 +514,7 @@ void SPxSolver::getEnterVals
          break;
 
       default:
-         abort();
+         assert(false);
       }
       DEBUG({ std::cout << "SPxSolver::getEnterVals() : row " << enterIdx
                         << ": " << enterStat
@@ -546,7 +546,8 @@ void SPxSolver::getEnterVals2
       {
       case SPxBasis::Desc::P_FIXED :
          assert(rep() == ROW);
-         abort();
+         assert(false);
+         break;
       case SPxBasis::Desc::P_ON_UPPER :
          assert(rep() == ROW);
          leavebound = theLBbound[leaveIdx];
@@ -562,7 +563,7 @@ void SPxSolver::getEnterVals2
       case SPxBasis::Desc::P_FREE :
          assert(rep() == ROW);
 #if 1
-         abort();
+         assert(false);
 #else
          std::cerr << __FILE__ << __LINE__ << "ERROR: not yet debugged!\n";
          if ((*theCoPvec)[leaveIdx] - theLBbound[leaveIdx] <
@@ -577,13 +578,13 @@ void SPxSolver::getEnterVals2
             theURbound[idx] = leavebound;
          }
          ds.rowStatus(idx) = SPxBasis::Desc::D_UNDEFINED;
-         break;
 #endif
-
+         break;
          // primal/columnwise cases:
       case SPxBasis::Desc::D_UNDEFINED :
          assert(rep() == COLUMN);
-         abort();
+         assert(false);
+         break;
       case SPxBasis::Desc::D_FREE :
          assert(rep() == COLUMN);
          if (theFvec->delta()[leaveIdx] * enterMax < 0)
@@ -623,7 +624,7 @@ void SPxSolver::getEnterVals2
          break;
 
       default:
-         abort();
+         assert(false);
       }
       DEBUG({ std::cout << "SPxSolver::getEnterVals2(): row " << idx
                         << ": " << leaveStat
@@ -667,8 +668,8 @@ void SPxSolver::getEnterVals2
          break;
       case SPxBasis::Desc::P_FIXED:
          assert(rep() == ROW);
-         abort();
-
+         assert(false);
+         break;
          // primal/columnwise cases:
       case SPxBasis::Desc::D_FREE :
          assert(rep() == COLUMN);
@@ -710,7 +711,7 @@ void SPxSolver::getEnterVals2
          break;
 
       default:
-         abort();
+         assert(false);
       }
       DEBUG({ std::cout << "SPxSolver::getEnterVals2(): col " << idx
                         << ": " << leaveStat

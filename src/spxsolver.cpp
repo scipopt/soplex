@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.12 2003/01/16 09:17:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.13 2005/01/12 12:00:03 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -983,7 +983,7 @@ SPxSolver::basisStatusToVarStatus( SPxBasis::Desc::Status stat ) const
       break;
    default:
       std::cerr << "ERROR: unknown basis status (" << stat << ")" << std::endl;
-      abort();
+      assert(false);
    }
    return vstat;
 }
@@ -1022,7 +1022,7 @@ SPxSolver::varStatusToBasisStatusRow( int row, SPxSolver::VarStatus stat ) const
    default:
       std::cerr << "ERROR: unknown VarStatus (" << int(stat)
                 << ")" << std::endl;
-      abort();
+      assert(false);
    }
    return rstat;
 }
@@ -1061,7 +1061,7 @@ SPxSolver::varStatusToBasisStatusCol( int col, SPxSolver::VarStatus stat ) const
    default:
       std::cerr << "ERROR: unknown VarStatus (" << int(stat)
                 << ")" << std::endl;
-      abort();
+      assert(false);
    }
    return cstat;
 }

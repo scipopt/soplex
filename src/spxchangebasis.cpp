@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.19 2003/01/16 09:17:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.20 2005/01/12 12:00:03 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -111,7 +111,7 @@ void SPxBasis::addedRows(int n)
          break;
       default:
          std::cerr << "Unknown basis status!" << std::endl;
-         abort();
+         assert(false);
       }
    }
 }
@@ -303,7 +303,7 @@ void SPxBasis::addedCols(int n)
          break;
       default:
          std::cerr << "Unknown basis status!" << std::endl;
-         abort();
+         assert(false);
       }
    }
 }

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.20 2005/01/06 19:51:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.21 2005/01/12 12:00:03 bzfkocht Exp $"
 
 #include "spxdefines.h"
 #include "spxdevexpr.h"
@@ -258,7 +258,7 @@ void SPxDevexPR::entered4X(SPxId /*id*/, int n,
    }
 }
 
-#if USE_OLD
+#ifdef USE_OLD
 /**@todo remove this code */
 // ??? This is the old (buggy?) code
 void SPxDevexPR::addedVecs (int n)

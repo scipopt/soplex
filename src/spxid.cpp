@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxid.cpp,v 1.3 2003/01/13 10:38:47 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxid.cpp,v 1.4 2005/01/12 12:00:03 bzfkocht Exp $"
 
 #include <stdlib.h>
 #include <assert.h>
@@ -64,7 +64,7 @@ std::ostream& operator<<(std::ostream& os, const SPxId& id)
       os << "Invalid ";
       break;
    default :
-      abort();
+      assert(false);
    }
    os << id.idx << " (" << id.info << ")";
 

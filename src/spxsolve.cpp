@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.75 2005/01/06 17:12:10 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.76 2005/01/12 12:00:03 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -661,7 +661,7 @@ SPxSolver::Status SPxSolver::getPrimal (Vector& p_vector) const
          case SPxBasis::Desc::D_UNDEFINED :
             break;
          default:
-            abort();
+            assert(false);
          }
       }
       for (int j = 0; j < dim(); ++j)
@@ -791,7 +791,7 @@ SPxSolver::Status SPxSolver::getSlacks (Vector& p_vector) const
          case SPxBasis::Desc::D_UNDEFINED :
             break;
          default:
-            abort();
+            assert(false);
          }
       }
       for (i = dim() - 1; i >= 0; --i)

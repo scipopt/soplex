@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.70 2003/04/20 08:32:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.71 2005/01/12 12:00:03 bzfkocht Exp $"
 
 #include <iostream>
 
@@ -99,7 +99,7 @@ SPxSolver::Status SoPlex::solve()
          case SPxSimplifier::OKAY:
             break;
          default:
-            abort();
+            assert(false);
          }
       }
       // should the LP be scaled after simplifing?

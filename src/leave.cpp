@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.34 2005/01/04 19:50:57 bzfkocht Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.35 2005/01/12 12:00:03 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -107,7 +107,8 @@ void SPxSolver::getLeaveVals(
          break;
       case SPxBasis::Desc::P_FREE :
          assert( rep() == ROW );
-         abort();
+         assert(false);
+         break;
       case SPxBasis::Desc::D_FREE :
          assert( rep() == COLUMN );
          ds.rowStatus(leaveNum) = SPxBasis::Desc::P_FIXED;
@@ -149,7 +150,7 @@ void SPxSolver::getLeaveVals(
          break;
 
       default:
-         abort();
+         assert(false);
       }
       DEBUG({ std::cout << "SPxSolver::getLeaveVals() : row " << leaveNum
                         << ": " << leaveStat
@@ -233,7 +234,7 @@ void SPxSolver::getLeaveVals(
          }
          break;
       default:
-         abort();
+         assert(false);
       }
       DEBUG({ std::cout << "SPxSolver::getLeaveVals() : col " << leaveNum
                         << ": " << leaveStat
@@ -327,7 +328,7 @@ void SPxSolver::getLeaveVals2(
       case SPxBasis::Desc::P_FREE :
          assert(rep() == COLUMN);
 #if 1
-         abort();
+         assert(false);
 #else
          std::cerr << __FILE__ << __LINE__ << "ERROR: not yet debugged!\n";
          ds.rowStatus(idx) = dualRowStatus(idx);
@@ -345,10 +346,10 @@ void SPxSolver::getLeaveVals2(
          std::cerr << "SPxSolver::getLeaveVals2(): idx=" << idx
                    << ", lhs=" << lhs(idx)
                    << ", rhs=" << rhs(idx) << std::endl;
-         abort();
+         assert(false);
 
       default:
-         abort();
+         assert(false);
       }
       DEBUG({ std::cout << "SPxSolver::getLeaveVals2(): row " << idx
                         << ": " << enterStat
@@ -442,10 +443,10 @@ void SPxSolver::getLeaveVals2(
          std::cerr << "SPxSolver::getLeaveVals2(): idx=" << idx
                    << ", lower=" << lower(idx)
                    << ", upper=" << upper(idx) << std::endl;
-         abort();
+         assert(false);
 
       default:
-         abort();
+         assert(false);
       }
       DEBUG({ std::cout << "SPxSolver::getLeaveVals2(): col " << idx
                         << ": " << enterStat

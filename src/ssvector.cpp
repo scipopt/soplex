@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.32 2005/01/09 20:10:41 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.33 2005/01/12 12:00:03 bzfkocht Exp $"
 
 #include <iostream>
 #include <iomanip>
@@ -101,7 +101,7 @@ void SSVector::setValue(int i, Real x)
    assert(isConsistent());
 }
 
-#if 0 // USE_OLD // old version
+#ifdef USE_OLD // old version
 void SSVector::setup()
 {
    if (!isSetup())
@@ -250,7 +250,7 @@ SSVector& SSVector::operator+=(const SVector& vec)
    return *this;
 }
 
-#if 0 // USE_OLD // old version
+#ifdef USE_OLD // old version
 SSVector& SSVector::operator+=(const SSVector& vec)
 {
    for (int i = vec.size() - 1; i >= 0; --i)
@@ -302,7 +302,7 @@ SSVector& SSVector::operator-=(const SVector& vec)
    return *this;
 }
 
-#if 0 // USE_OLD // old version
+#ifdef USE_OLD // old version
 SSVector& SSVector::operator-=(const SSVector& vec)
 {
    if (vec.isSetup())
@@ -344,7 +344,7 @@ SSVector& SSVector::operator-=(const SSVector& vec)
 }
 #endif
 
-#if 0 // USE_OLD // old version
+#ifdef USE_OLD // old version
 SSVector& SSVector::operator*=(Real x)
 {
    assert(isSetup());
@@ -368,7 +368,7 @@ SSVector& SSVector::operator*=(Real x)
 }
 #endif
 
-#if 0 // USE_OLD // old
+#ifdef USE_OLD // old
 Real SSVector::maxAbs() const
 {
    if (isSetup())
@@ -480,7 +480,7 @@ SSVector& SSVector::multAdd(Real xx, const SSVector& svec)
        *       Fortunately the whole function seems not to be called
        *       at all. 
        */
-      abort();
+      assert(false);
 
       Real y;
       int* ii = idx;
@@ -597,7 +597,7 @@ SSVector& SSVector::multAdd(Real x, const Vector& vec)
    return *this;
 }
 
-#if 0 // USE_OLD // old version
+#ifdef USE_OLD // old version
 SSVector& SSVector::operator=(const SSVector& rhs)
 {
    assert(rhs.isConsistent());
@@ -706,7 +706,7 @@ SSVector& SSVector::operator=(const SSVector& rhs)
 }
 #endif // 0
 
-#if 0 // USE_OLD // old version
+#ifdef USE_OLD // old version
 void SSVector::setup_and_assign(SSVector& rhs)
 {
    assert(rhs.isConsistent());
@@ -830,7 +830,7 @@ SSVector& SSVector::operator=(const SVector& rhs)
    return assign(rhs);
 }
 
-#if 0 // USE_OLD // old version
+#ifdef USE_OLD // old version (buggy or optimization dependend)
 SSVector& SSVector::assign(const SVector& rhs)
 {
    assert(rhs.dim() <= Vector::dim());

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxequilisc.h,v 1.4 2003/01/12 13:09:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxequilisc.h,v 1.5 2005/01/12 12:00:03 bzfkocht Exp $"
 
 /**@file  spxequilisc.h
  * @brief LP euilibrium scaling.
@@ -37,7 +37,8 @@ namespace soplex
 class SPxEquiliSC : public SPxScaler
 {
 protected:
-   ///@return maxi
+   /**@return maxi
+    */
    virtual Real computeScale(Real /*mini*/, Real maxi) const;
 
 public:
