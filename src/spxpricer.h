@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxpricer.h,v 1.6 2002/01/12 11:41:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxpricer.h,v 1.7 2002/01/19 18:59:17 bzfkocht Exp $"
 
 
 /**@file  spxpricer.h
@@ -24,6 +24,7 @@
 
 #include <assert.h>
 
+#include "real.h"
 #include "soplex.h"
 
 
@@ -51,7 +52,7 @@ class SPxPricer
 protected:
    const char* m_name;
    SoPlex*     thesolver;
-   double      theeps;
+   Real      theeps;
 
 public:
    /**@name Initialization */
@@ -83,7 +84,7 @@ public:
    }
 
    /// returns violation bound #epsilon.
-   virtual double epsilon() const
+   virtual Real epsilon() const
    {
       return theeps;
    }
@@ -91,7 +92,7 @@ public:
    /// sets violation bound.
    /** Inequality violations are accepted, if their size is less than \p eps.
     */
-   virtual void setEpsilon(double eps)
+   virtual void setEpsilon(Real eps)
    {
       assert(eps >= 0.0);
 

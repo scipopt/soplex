@@ -13,10 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vsolve.cpp,v 1.9 2001/12/25 16:03:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vsolve.cpp,v 1.10 2002/01/19 18:59:18 bzfkocht Exp $"
 
 #include <assert.h>
 
+#include "real.h"
 #include "clufactor.h"
 #include "cring.h"
 
@@ -25,8 +26,8 @@ namespace soplex
 
 #define ZERO    1e-100
 
-static const double verySparseFactor4right = 0.2;
-static const double verySparseFactor4left  = 0.1;
+static const Real verySparseFactor4right = 0.2;
+static const Real verySparseFactor4left  = 0.1;
 
 /**@todo The same queueing code is in vsolve.cpp. This should be unified. 
  */
@@ -183,13 +184,13 @@ static int deQueueMin(int* heap, int* size)
 }
 
 
-int CLUFactor::vSolveLright(double* vec, int* ridx, int rn, double eps)
+int CLUFactor::vSolveLright(Real* vec, int* ridx, int rn, Real eps)
 {
    int i, j, k, n;
    int end;
-   double x;
-   double meps;
-   double *lval, *val;
+   Real x;
+   Real meps;
+   Real *lval, *val;
    int *lrow, *lidx, *idx;
    int *lbeg;
 
@@ -240,15 +241,15 @@ int CLUFactor::vSolveLright(double* vec, int* ridx, int rn, double eps)
 
 
 void CLUFactor::vSolveLright2(
-   double* vec, int* ridx, int* rnptr, double eps,
-   double* vec2, int* ridx2, int* rn2ptr, double eps2)
+   Real* vec, int* ridx, int* rnptr, Real eps,
+   Real* vec2, int* ridx2, int* rn2ptr, Real eps2)
 {
    int i, j, k, n;
    int end;
-   double x, y;
-   double x2, y2;
-   double meps2, meps;
-   double *lval, *val;
+   Real x, y;
+   Real x2, y2;
+   Real meps2, meps;
+   Real *lval, *val;
    int *lrow, *lidx, *idx;
    int *lbeg;
 
@@ -345,18 +346,18 @@ void CLUFactor::vSolveLright2(
 }
 
 
-int CLUFactor::vSolveUright(double* vec, int* vidx,
-   double* rhs, int* ridx, int rn, double eps)
+int CLUFactor::vSolveUright(Real* vec, int* vidx,
+   Real* rhs, int* ridx, int rn, Real eps)
 {
    int i, j, k, r, c, n;
    int *rorig, *corig;
    int *rperm;
    int *cidx, *clen, *cbeg;
-   double *cval;
-   double x, y, meps;
+   Real *cval;
+   Real x, y, meps;
 
    int *idx;
-   double *val;
+   Real *val;
 
    rorig = row.orig;
    corig = col.orig;
@@ -436,18 +437,18 @@ int CLUFactor::vSolveUright(double* vec, int* vidx,
 }
 
 
-void CLUFactor::vSolveUrightNoNZ(double* vec,
-   double* rhs, int* ridx, int rn, double eps)
+void CLUFactor::vSolveUrightNoNZ(Real* vec,
+   Real* rhs, int* ridx, int rn, Real eps)
 {
    int i, j, k, r, c;
    int *rorig, *corig;
    int *rperm;
    int *cidx, *clen, *cbeg;
-   double *cval;
-   double x, y, meps;
+   Real *cval;
+   Real x, y, meps;
 
    int *idx;
-   double *val;
+   Real *val;
 
    rorig = row.orig;
    corig = col.orig;
@@ -522,19 +523,19 @@ void CLUFactor::vSolveUrightNoNZ(double* vec,
 
 
 int CLUFactor::vSolveUright2(
-   double* vec, int* vidx, double* rhs, int* ridx, int rn, double eps,
-   double* vec2, double* rhs2, int* ridx2, int rn2, double eps2)
+   Real* vec, int* vidx, Real* rhs, int* ridx, int rn, Real eps,
+   Real* vec2, Real* rhs2, int* ridx2, int rn2, Real eps2)
 {
    int i, j, k, r, c, n;
    int *rorig, *corig;
    int *rperm;
    int *cidx, *clen, *cbeg;
-   double *cval;
-   double x, y, meps;
-   double x2, y2, meps2;
+   Real *cval;
+   Real x, y, meps;
+   Real x2, y2, meps2;
 
    int *idx;
-   double *val;
+   Real *val;
 
    rorig = row.orig;
    corig = col.orig;
@@ -726,12 +727,12 @@ int CLUFactor::vSolveUright2(
    return n;
 }
 
-int CLUFactor::vSolveUpdateRight(double* vec, int* ridx, int n, double eps)
+int CLUFactor::vSolveUpdateRight(Real* vec, int* ridx, int n, Real eps)
 {
    int i, j, k;
    int end;
-   double meps, x, y;
-   double *lval, *val;
+   Real meps, x, y;
+   Real *lval, *val;
    int *lrow, *lidx, *idx;
    int *lbeg;
 
@@ -765,12 +766,12 @@ int CLUFactor::vSolveUpdateRight(double* vec, int* ridx, int n, double eps)
    return n;
 }
 
-void CLUFactor::vSolveUpdateRightNoNZ(double* vec, double /*eps*/)
+void CLUFactor::vSolveUpdateRightNoNZ(Real* vec, Real /*eps*/)
 {
    int i, j, k;
    int end;
-   double x;
-   double *lval, *val;
+   Real x;
+   Real *lval, *val;
    int *lrow, *lidx, *idx;
    int *lbeg;
 
@@ -796,10 +797,10 @@ void CLUFactor::vSolveUpdateRightNoNZ(double* vec, double /*eps*/)
 }
 
 
-int CLUFactor::vSolveRight4update(double eps,
-   double* vec, int* idx,                       /* result */
-   double* rhs, int* ridx, int rn,              /* rhs    */
-   double* forest, int* forestNum, int* forestIdx)
+int CLUFactor::vSolveRight4update(Real eps,
+   Real* vec, int* idx,                       /* result */
+   Real* rhs, int* ridx, int rn,              /* rhs    */
+   Real* forest, int* forestNum, int* forestIdx)
 {
    rn = vSolveLright(rhs, ridx, rn, eps);
 
@@ -807,7 +808,7 @@ int CLUFactor::vSolveRight4update(double eps,
     */
    if (forest)
    {
-      double meps, x;
+      Real meps, x;
       int i, j, k;
       int* rperm;
       int* it = forestIdx;
@@ -830,7 +831,7 @@ int CLUFactor::vSolveRight4update(double eps,
    }
    else
    {
-      double meps, x;
+      Real meps, x;
       int i, j, k;
       int* rperm;
 
@@ -854,12 +855,12 @@ int CLUFactor::vSolveRight4update(double eps,
    return rn;
 }
 
-int CLUFactor::vSolveRight4update2(double eps,
-   double* vec, int* idx,                  /* result1 */
-   double* rhs, int* ridx, int rn,         /* rhs1    */
-   double* vec2, double eps2,              /* result2 */
-   double* rhs2, int* ridx2, int rn2,      /* rhs2    */
-   double* forest, int* forestNum, int* forestIdx)
+int CLUFactor::vSolveRight4update2(Real eps,
+   Real* vec, int* idx,                  /* result1 */
+   Real* rhs, int* ridx, int rn,         /* rhs1    */
+   Real* vec2, Real eps2,              /* result2 */
+   Real* rhs2, int* ridx2, int rn2,      /* rhs2    */
+   Real* forest, int* forestNum, int* forestIdx)
 {
    /*
    rn  = vSolveLright(rhs,  ridx,  rn,  eps);
@@ -871,8 +872,8 @@ int CLUFactor::vSolveRight4update2(double eps,
     */
    if (forest)
    {
-      double meps = -eps;
-      double x;
+      Real meps = -eps;
+      Real x;
       int i, j, k;
       int* rperm;
       int* it = forestIdx;
@@ -894,8 +895,8 @@ int CLUFactor::vSolveRight4update2(double eps,
    }
    else
    {
-      double meps = -eps;
-      double x;
+      Real meps = -eps;
+      Real x;
       int i, j, k;
       int* rperm;
 
@@ -918,11 +919,11 @@ int CLUFactor::vSolveRight4update2(double eps,
    }
    else
    {
-      double x;
-      /*      double  maxabs; */
+      Real x;
+      /*      Real  maxabs; */
       int i, j, k;
       int* rperm;
-      double meps = -eps2;
+      Real meps = -eps2;
 
       /*      maxabs = 1;    */
       rperm = row.perm;
@@ -964,8 +965,8 @@ int CLUFactor::vSolveRight4update2(double eps,
 }
 
 void CLUFactor::vSolveRightNoNZ(
-   double* vec2, double eps2,              /* result2 */
-   double* rhs2, int* ridx2, int rn2)    /* rhs2    */
+   Real* vec2, Real eps2,              /* result2 */
+   Real* rhs2, int* ridx2, int rn2)    /* rhs2    */
 {
    rn2 = vSolveLright(rhs2, ridx2, rn2, eps2);
 
@@ -975,11 +976,11 @@ void CLUFactor::vSolveRightNoNZ(
    }
    else
    {
-      double x;
-      /*      double  maxabs; */
+      Real x;
+      /*      Real  maxabs; */
       int i, j, k;
       int* rperm;
-      double meps = -eps2;
+      Real meps = -eps2;
 
       /*      maxabs = 1;    */
       rperm = row.perm;
@@ -1013,15 +1014,15 @@ void CLUFactor::vSolveRightNoNZ(
 
 /*****************************************************************************/
 
-int CLUFactor::solveUleft(double eps,
-                double* vec, int* vecidx,
-                double* rhs, int* rhsidx, int rhsn)
+int CLUFactor::solveUleft(Real eps,
+                Real* vec, int* vecidx,
+                Real* rhs, int* rhsidx, int rhsn)
 {
-   double x, y, meps;
+   Real x, y, meps;
    int i, j, k, n, r, c;
    int *rorig, *corig, *cperm;
    int *ridx, *rlen, *rbeg, *idx;
-   double *rval, *val;
+   Real *rval, *val;
 
    rorig = row.orig;
    corig = col.orig;
@@ -1081,14 +1082,14 @@ int CLUFactor::solveUleft(double eps,
 }
 
 
-void CLUFactor::solveUleftNoNZ(double eps, double* vec,
-   double* rhs, int* rhsidx, int rhsn)
+void CLUFactor::solveUleftNoNZ(Real eps, Real* vec,
+   Real* rhs, int* rhsidx, int rhsn)
 {
-   double x, y, meps;
+   Real x, y, meps;
    int i, j, k, r, c;
    int *rorig, *corig, *cperm;
    int *ridx, *rlen, *rbeg, *idx;
-   double *rval, *val;
+   Real *rval, *val;
 
    rorig = row.orig;
    corig = col.orig;
@@ -1144,11 +1145,11 @@ void CLUFactor::solveUleftNoNZ(double eps, double* vec,
 }
 
 
-int CLUFactor::solveLleftForest(double eps, double* vec, int* nonz, int n)
+int CLUFactor::solveLleftForest(Real eps, Real* vec, int* nonz, int n)
 {
    int i, j, k, end;
-   double x, y, meps;
-   double *val, *lval;
+   Real x, y, meps;
+   Real *val, *lval;
    int *idx, *lidx, *lrow, *lbeg;
 
    meps = -eps;
@@ -1191,11 +1192,11 @@ int CLUFactor::solveLleftForest(double eps, double* vec, int* nonz, int n)
 }
 
 
-void CLUFactor::solveLleftForestNoNZ(double* vec)
+void CLUFactor::solveLleftForestNoNZ(Real* vec)
 {
    int i, j, k, end;
-   double x;
-   double *val, *lval;
+   Real x;
+   Real *val, *lval;
    int *idx, *lidx, *lrow, *lbeg;
 
    lval = l.val;
@@ -1218,12 +1219,12 @@ void CLUFactor::solveLleftForestNoNZ(double* vec)
 }
 
 
-int CLUFactor::solveLleft(double eps, double* vec, int* nonz, int rn)
+int CLUFactor::solveLleft(Real eps, Real* vec, int* nonz, int rn)
 {
    int i, j, k, n;
    int r;
-   double x, y, meps;
-   double *rval, *val;
+   Real x, y, meps;
+   Real *rval, *val;
    int *ridx, *idx;
    int *rbeg;
    int *rorig, *rperm;
@@ -1240,7 +1241,7 @@ int CLUFactor::solveLleft(double eps, double* vec, int* nonz, int rn)
    i = l.firstUpdate - 1;
 #ifndef WITH_L_ROWS
 #error Not yet implemented, define WITH_L_LOOPS
-   double* lval = l.val;
+   Real* lval = l.val;
    int*    lidx = l.idx;
    int*    lrow = l.row;
    int*    lbeg = l.start;
@@ -1308,12 +1309,12 @@ int CLUFactor::solveLleft(double eps, double* vec, int* nonz, int rn)
 }
 
 
-void CLUFactor::solveLleftNoNZ(double* vec)
+void CLUFactor::solveLleftNoNZ(Real* vec)
 {
    int i, j, k;
    int r;
-   double x;
-   double *rval, *val;
+   Real x;
+   Real *rval, *val;
    int *ridx, *idx;
    int *rbeg;
    int* rorig;
@@ -1324,7 +1325,7 @@ void CLUFactor::solveLleftNoNZ(double* vec)
    rorig = l.rorig;
 
 #ifndef WITH_L_ROWS
-   double* lval = l.val;
+   Real* lval = l.val;
    int*    lidx = l.idx;
    int*    lrow = l.row;
    int*    lbeg = l.start;
@@ -1362,11 +1363,11 @@ void CLUFactor::solveLleftNoNZ(double* vec)
 }
 
 
-int CLUFactor::solveUpdateLeft(double eps, double* vec, int* nonz, int n)
+int CLUFactor::solveUpdateLeft(Real eps, Real* vec, int* nonz, int n)
 {
    int i, j, k, end;
-   double x, y, meps;
-   double *lval, *val;
+   Real x, y, meps;
+   Real *lval, *val;
    int *lrow, *lidx, *idx;
    int *lbeg;
 
@@ -1408,9 +1409,9 @@ int CLUFactor::solveUpdateLeft(double eps, double* vec, int* nonz, int n)
    return n;
 }
 
-int CLUFactor::vSolveLeft(double eps,
-   double* vec, int* idx,                       /* result */
-   double* rhs, int* ridx, int rn)            /* rhs    */
+int CLUFactor::vSolveLeft(Real eps,
+   Real* vec, int* idx,                       /* result */
+   Real* rhs, int* ridx, int rn)            /* rhs    */
 {
    if (!l.updateType)            /* no Forest-Tomlin Updates */
    {
@@ -1431,11 +1432,11 @@ int CLUFactor::vSolveLeft(double eps,
       return solveLleft(eps, vec, idx, rn);
 }
 
-int CLUFactor::vSolveLeft2(double eps,
-   double* vec, int* idx,                      /* result */
-   double* rhs, int* ridx, int rn,             /* rhs    */
-   double* vec2,                               /* result2 */
-   double* rhs2, int* ridx2, int rn2)        /* rhs2    */
+int CLUFactor::vSolveLeft2(Real eps,
+   Real* vec, int* idx,                      /* result */
+   Real* rhs, int* ridx, int rn,             /* rhs    */
+   Real* vec2,                               /* result2 */
+   Real* rhs2, int* ridx2, int rn2)        /* rhs2    */
 {
    if (!l.updateType)            /* no Forest-Tomlin Updates */
    {
@@ -1457,9 +1458,9 @@ int CLUFactor::vSolveLeft2(double eps,
    return rn;
 }
 
-void CLUFactor::vSolveLeftNoNZ(double eps,
-   double* vec2,                            /* result2 */
-   double* rhs2, int* ridx2, int rn2)     /* rhs2    */
+void CLUFactor::vSolveLeftNoNZ(Real eps,
+   Real* vec2,                            /* result2 */
+   Real* rhs2, int* ridx2, int rn2)     /* rhs2    */
 {
    if (!l.updateType)            /* no Forest-Tomlin Updates */
    {

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.h,v 1.9 2002/01/04 17:31:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.h,v 1.10 2002/01/19 18:59:16 bzfkocht Exp $"
 
 /**@file  slufactor.h
  * @brief Sparse LU factorization.
@@ -23,6 +23,7 @@
 
 #include <assert.h>
 
+#include "real.h"
 #include "dvector.h"
 #include "slinsolver.h"
 #include "clufactor.h"
@@ -63,7 +64,7 @@ protected:
    UpdateType uptype;        ///< the current #UpdateType.
    SSVector   eta;           ///< 
    SSVector   forest;        ///<
-   double     lastThreshold; ///<
+   Real     lastThreshold; ///<
 
 public:
    typedef SLinSolver::Status Status;
@@ -71,13 +72,13 @@ public:
    /**@name Control Parameters */
    //@{
    /// minimum threshold to use.
-   double minThreshold;
+   Real minThreshold;
 
    /// |x| < epsililon is considered to be 0.
-   double epsilon;
+   Real epsilon;
 
    /// minimum stability to achieve by setting threshold.
-   double minStability;
+   Real minStability;
 
    /// returns the current update type #uptype.
    UpdateType utype()
@@ -119,7 +120,7 @@ public:
       return Status(stat);
    }
    ///
-   double stability() const;
+   Real stability() const;
 
    ///
    Status load(const SVector* vec[], int dim);

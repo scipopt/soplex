@@ -13,11 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.21 2002/01/19 16:05:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.22 2002/01/19 18:59:17 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
+#include "real.h"
 #include "soplex.h"
 #include "spxpricer.h"
 #include "spxratiotester.h"
@@ -573,7 +574,7 @@ SoPlex::Status SoPlex::status() const
 }
 
 SoPlex::Status SoPlex::getResult(
-   double* p_value,
+   Real* p_value,
    Vector* p_primal,
    Vector* p_slacks,
    Vector* p_dual,

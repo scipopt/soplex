@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.h,v 1.8 2002/01/19 13:06:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.h,v 1.9 2002/01/19 18:59:18 bzfkocht Exp $"
 
 
 /**@file  ssvector.h
@@ -24,6 +24,7 @@
 
 #include <assert.h>
 
+#include "real.h"
 #include "dvector.h"
 #include "subsvector.h"
 #include "svector.h"
@@ -60,7 +61,7 @@ private:
 public:
    /**@todo member variable epsilon should be private. */
    /// a value x with |x| < epsilon is considered zero.
-   double epsilon;
+   Real epsilon;
 
    /**@name Status of an #SSVector
       An #SSVector can be set up or not. In case it is set up, its #IdxSet
@@ -81,7 +82,7 @@ public:
    */
    //@{
    /// only used in slufactor.cpp
-   double* get_ptr()
+   Real* get_ptr()
    {
       return DVector::get_ptr();
    }
@@ -122,7 +123,7 @@ public:
    }
 
    /// returns value of the \p n 'th nonzero element.
-   double value(int n) const
+   Real value(int n) const
    {
       assert(isSetup());
       assert(n >= 0 && n < size());
@@ -146,7 +147,7 @@ public:
    /// adds nonzero (\p i, \p x) to #SSVector.
    /** No nonzero with index \p i must exist in the #SSVector.
     */
-   void add(int i, double x)
+   void add(int i, Real x)
    {
       assert(val[i] == 0);
       assert(number(i) < 0);
@@ -155,7 +156,7 @@ public:
    }
 
    /// sets \p i 'th element to \p x.
-   void setValue(int i, double x);
+   void setValue(int i, Real x);
 
    /// clears element \p i.
    void clearIdx(int i)
@@ -183,7 +184,7 @@ public:
    /**@name Methods independend of the Status */
    //@{
    /// returns \p i 'th value.
-   double operator[](int i) const
+   Real operator[](int i) const
    {
       return val[i];
    }
@@ -195,7 +196,7 @@ public:
    }
 
    /// returns array values.
-   const double* values() const
+   const Real* values() const
    {
       return val;
    }
@@ -214,7 +215,7 @@ public:
    }
 
    /// returns array values.
-   double* altValues()
+   Real* altValues()
    {
       unSetup();
       return val;
@@ -250,16 +251,16 @@ public:
    SSVector& operator-=(const SSVector& vec);
 
    /// vector scaling.
-   SSVector& operator*=(double x);
+   SSVector& operator*=(Real x);
 
    ///
-   SSVector& multAdd(double x, const SSVector& vec);
+   SSVector& multAdd(Real x, const SSVector& vec);
    ///
-   SSVector& multAdd(double x, const SVector& vec);
+   SSVector& multAdd(Real x, const SVector& vec);
    ///
-   SSVector& multAdd(double x, const SubSVector& vec);
+   SSVector& multAdd(Real x, const SubSVector& vec);
    /// adds scaled vector (+= \p x * \p vec).
-   SSVector& multAdd(double x, const Vector& vec);
+   SSVector& multAdd(Real x, const Vector& vec);
 
    /// assigns #SSVector to \f$x^T \cdot A\f$.
    SSVector& assign2product(const SSVector& x, const SVSet& A);
@@ -271,11 +272,11 @@ public:
    SSVector& assign2productAndSetup(const SVSet& A, SSVector& x);
 
    /// returns infinity norm of a Vector.
-   double maxAbs() const;
+   Real maxAbs() const;
    /// returns euclidian norm of a Vector.
-   double length() const;
+   Real length() const;
    /// returns squared norm of a Vector.
-   double length2() const;
+   Real length2() const;
    //@}
 
 
@@ -313,7 +314,7 @@ public:
    /**@name Constructors / Destructors */
    //@{
    /// default constructor.
-   explicit SSVector(int pdim = 0, double peps = 1e-16)
+   explicit SSVector(int pdim = 0, Real peps = 1e-16)
       : DVector (pdim)
       , IdxSet  ()
       , setupStatus(true)
@@ -338,7 +339,7 @@ public:
    }
 
    /// constructs nonsetup copy of \p vec.
-   explicit SSVector(const Vector& vec, double eps = 1e-16)
+   explicit SSVector(const Vector& vec, Real eps = 1e-16)
       : DVector (vec)
       , IdxSet ()
       , setupStatus(false)
@@ -377,7 +378,7 @@ private:
 
 // ----------------------------------------------------------------------------
 
-inline Vector& Vector::multAdd(double x, const SSVector& svec)
+inline Vector& Vector::multAdd(Real x, const SSVector& svec)
 {
    assert(svec.dim() <= dim());
 
@@ -433,14 +434,14 @@ inline Vector& Vector::operator=(const SSVector& vec)
    return *this;
 }
 
-inline double Vector::operator*(const SSVector& v) const
+inline Real Vector::operator*(const SSVector& v) const
 {
    assert(dim() == v.dim());
 
    if (v.isSetup())
    {
       const int* idx = v.indexMem();
-      double     x   = 0;
+      Real     x   = 0;
 
       for(int i = v.size(); i > 0; i--)
       {

@@ -13,18 +13,19 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprow.cpp,v 1.7 2001/12/28 14:55:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprow.cpp,v 1.8 2002/01/19 18:59:16 bzfkocht Exp $"
 
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
 #include <iostream>
 
+#include "real.h"
 #include "lprow.h"
 
 namespace soplex
 {
-double LPRow::infinity = 1e+100;
+Real LPRow::infinity = 1e+100;
 
 LPRow::Type LPRow::type() const
 {
@@ -63,14 +64,14 @@ void LPRow::setType(
    }
 }
 
-double LPRow::value() const
+Real LPRow::value() const
 {
    assert(type() != RANGE);
 
    return (rhs() < infinity) ? rhs() : lhs();
 }
 
-LPRow::LPRow(const SVector& p_rowVector, LPRow::Type p_type, double p_value)
+LPRow::LPRow(const SVector& p_rowVector, LPRow::Type p_type, Real p_value)
    : vec(p_rowVector)
 {
    switch (p_type)

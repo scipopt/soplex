@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: timer.h,v 1.7 2001/12/13 21:53:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: timer.h,v 1.8 2002/01/19 18:59:18 bzfkocht Exp $"
 
 /**@file  timer.h
  * @brief Timer class.
@@ -67,7 +67,7 @@ namespace soplex
     at any time by the methods shown in this code section:
  
     \verbatim
-       double utime, stime, rtime;
+       Real utime, stime, rtime;
          
        utime = timer.userTime();
        stime = timer.systemTime();
@@ -110,9 +110,9 @@ private:
    mutable long rTicks;        ///< real ticks 
 
    /// convert ticks to secounds.
-   double ticks2sec(long ticks) const
+   Real ticks2sec(long ticks) const
    {
-      return (double(ticks) * 1000.0 / ticks_per_sec) / 1000.0;
+      return (Real(ticks) * 1000.0 / ticks_per_sec) / 1000.0;
    }
 
    /// get actual user, system and real ticks from the system.
@@ -135,20 +135,20 @@ public:
    void start();
 
    /// stop timer, return accounted user time.
-   double stop();
+   Real stop();
 
    /// get accounted user, system or real time.
    void getTimes(
-      double* userTime, double* systemTime, double* realTime) const;
+      Real* userTime, Real* systemTime, Real* realTime) const;
 
    /// return accounted user time.
-   double userTime() const;
+   Real userTime() const;
 
    /// return accounted system time.
-   double systemTime() const;
+   Real systemTime() const;
 
    /// return accounted real time.
-   double realTime() const;
+   Real realTime() const;
 
    /// return resolution of timer as 1/seconds.
    long resolution() const { return ticks_per_sec; }

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: unitvector.h,v 1.5 2002/01/19 16:05:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: unitvector.h,v 1.6 2002/01/19 18:59:18 bzfkocht Exp $"
 
 /**@file  unitvector.h
  * @brief Sparse vector \f$e_i\f$.
@@ -23,6 +23,7 @@
 #define _UNITVECTOR_H_
 
 #include <assert.h>
+#include "real.h"
 #include "svector.h"
 
 namespace soplex
@@ -51,7 +52,7 @@ public:
    /**\pre \c n must be 0.
     */
    /* ARGSUSED n */
-   double value(int n) const
+   Real value(int n) const
    {
       assert( n == 0 );
       return 1;

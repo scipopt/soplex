@@ -13,16 +13,17 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscale.cpp,v 1.7 2001/11/29 22:52:54 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscale.cpp,v 1.8 2002/01/19 18:59:17 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
+#include "real.h"
 #include "spxscale.h"
 
 namespace soplex
 {
-static const double MinScale = 1e-4;
+static const Real MinScale = 1e-4;
 
 /** This routine looks for a suitabel scaling factor.
  *  First the maximum value is scaled to 1.0.
@@ -30,12 +31,12 @@ static const double MinScale = 1e-4;
  *  The new mimium is scaled up to #min_scale.
  *  The scaling factor returned is the combination of both factors.
  */
-static double find_scale(double vmin, double vmax)
+static Real find_scale(Real vmin, Real vmax)
 {
    assert(vmin <= vmax);
 
-   double fmax  = 1.0 / vmax;
-   double fmin  = 1.0;
+   Real fmax  = 1.0 / vmax;
+   Real fmin  = 1.0;
 
    if (vmin > 1e-16)
    { 
@@ -52,10 +53,10 @@ int SPxScale::simplify()
    assert(lp != 0);
    assert(lp->isConsistent());
 
-   double w;
-   double x;
-   double y;
-   double z;
+   Real w;
+   Real x;
+   Real y;
+   Real z;
    int    i; 
    int    j;
 

@@ -13,12 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.9 2001/12/30 11:30:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.10 2002/01/19 18:59:15 bzfkocht Exp $"
 
 /* Updating the Basis for Leaving Variables
  */
 #include        <assert.h>
 #include        <stdio.h>
+#include "real.h"
 #include        "soplex.h"
 
 
@@ -26,7 +27,7 @@
 
 namespace soplex
 {
-static const double reject_leave_tol = 1e-8;
+static const Real reject_leave_tol = 1e-8;
 
 /*
     Vector |fTest| gives the feasibility test of all basic variables. For its
@@ -75,8 +76,8 @@ void SoPlex::getLeaveVals
    int leaveIdx,
    SPxBasis::Desc::Status& leaveStat,
    Id& leaveId,
-   double& leaveMax,
-   double& leavebound,
+   Real& leaveMax,
+   Real& leavebound,
    int& leaveNum
 )
 {
@@ -235,12 +236,12 @@ void SoPlex::getLeaveVals
 }
 
 void SoPlex::getLeaveVals2(
-   double leaveMax,
+   Real leaveMax,
    Id enterId,
-   double& enterBound,
-   double& newUBbound,
-   double& newLBbound,
-   double& newCoPrhs
+   Real& enterBound,
+   Real& newUBbound,
+   Real& newLBbound,
+   Real& newCoPrhs
 )
 {
    SPxBasis::Desc& ds = desc();
@@ -509,8 +510,8 @@ int SoPlex::leave(int leaveIdx)
 
    SPxBasis::Desc::Status leaveStat;      // status of leaving var
    Id leaveId;        // id of leaving var
-   double leaveMax;       // maximium lambda of leaving var
-   double leavebound;     // current fVec value of leaving var
+   Real leaveMax;       // maximium lambda of leaving var
+   Real leavebound;     // current fVec value of leaving var
    int leaveNum;       // number of leaveId in bounds
    getLeaveVals(leaveIdx, leaveStat, leaveId, leaveMax, leavebound, leaveNum);
 
@@ -527,7 +528,7 @@ int SoPlex::leave(int leaveIdx)
 
    for(;;)
    {
-      double enterVal = leaveMax;
+      Real enterVal = leaveMax;
       Id enterId = theratiotester->selectEnter(enterVal);
 
       /*
@@ -600,10 +601,10 @@ int SoPlex::leave(int leaveIdx)
 
 
          //      process entering variable
-         double enterBound;
-         double newUBbound;
-         double newLBbound;
-         double newCoPrhs;
+         Real enterBound;
+         Real newUBbound;
+         Real newLBbound;
+         Real newCoPrhs;
 
          getLeaveVals2(leaveMax, enterId,
                         enterBound, newUBbound, newLBbound, newCoPrhs);

@@ -13,10 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.8 2001/12/28 14:55:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.9 2002/01/19 18:59:16 bzfkocht Exp $"
 
 #include <iostream>
 
+#include "real.h"
 #include "spxaggregatesm.h"
 #include "dataarray.h"
 #include "ssvector.h"
@@ -40,17 +41,17 @@ struct Compare
    }
 };
 
-int SPxAggregateSM::eliminate(const SVector& row, double b)
+int SPxAggregateSM::eliminate(const SVector& row, Real b)
 {
-   double x, y;
+   Real x, y;
    int j, k;
    int best = -1;
-   double up = 0;
-   double lo = 0;
+   Real up = 0;
+   Real lo = 0;
 
    if (row.size() == 2)
    {
-      double xabs, yabs;
+      Real xabs, yabs;
       j = row.index(0);
       x = row.value(0);
       k = row.index(1);
@@ -100,7 +101,7 @@ int SPxAggregateSM::eliminate(const SVector& row, double b)
    else
    {
       int okLow, okUp;
-      double maxabs = 0;
+      Real maxabs = 0;
       int locnt = 0;
       int upcnt = 0;
 
@@ -218,7 +219,7 @@ int SPxAggregateSM::simplify()
 {
    int best;
    int stage, last, num, j, i, k;
-   double x, b;
+   Real x, b;
    DataArray < int > remCol(lp->nCols());
    DataArray < int > remRow(lp->nRows());
    LPCol newCol;
@@ -273,9 +274,9 @@ int SPxAggregateSM::simplify()
                best = eliminate(row, b);
                if (best >= 0)
                {
-                  double a = row.value(best);
+                  Real a = row.value(best);
                   int idx = row.index(best);
-                  double obj = lp->obj(idx);
+                  Real obj = lp->obj(idx);
 
                   pcol = lp->colVector(idx);
                   pcol.remove(pcol.number(i));

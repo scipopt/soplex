@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprow.h,v 1.6 2002/01/19 16:05:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprow.h,v 1.7 2002/01/19 18:59:16 bzfkocht Exp $"
 
 /**@file  lprow.h
  * @brief (In)equality for LPs.
@@ -23,6 +23,7 @@
 
 #include <assert.h>
 
+#include "real.h"
 #include "dsvector.h"
 
 namespace soplex
@@ -58,13 +59,13 @@ namespace soplex
 class LPRow
 {
 private:
-   double   left;
-   double   right;
+   Real   left;
+   Real   right;
    DSVector vec;
 
 public:
    /// values >= infinity are treated as \f$\infty\f$.
-   static double infinity;
+   static Real infinity;
 
    /// (In)Equality of an LP row.
    /** LPRow%s may be of one of the above Types. This datatype may be
@@ -89,28 +90,28 @@ public:
     *  However, value() may only be called for LPRow%s with
     *  type() != \c RANGE.
     */
-   double value() const;
+   Real value() const;
 
    /// get left hand side of value.
-   double lhs() const
+   Real lhs() const
    {
       return left;
    }
 
    /// access left hand side value.
-   void setLhs(double p_left)
+   void setLhs(Real p_left)
    {
       left = p_left;
    }
 
    /// get right hand side value.
-   double rhs() const
+   Real rhs() const
    {
       return right;
    }
 
    /// access right hand side value.
-   void setRhs(double p_right)
+   void setRhs(Real p_right)
    {
       right = p_right;
    }
@@ -139,12 +140,12 @@ public:
 
    /// Construct LPRow with the given left-hand side, right-hand side
    /// and rowVector.
-   LPRow(double plhs, const SVector& prowVector, double prhs)
+   LPRow(Real plhs, const SVector& prowVector, Real prhs)
       : left(plhs), right(prhs), vec(prowVector)
    {}
 
    /// Construct LPRow from passed \p rowVector, \p type and \p value
-   LPRow(const SVector& rowVector, Type type, double value);
+   LPRow(const SVector& rowVector, Type type, Real value);
 
    /// check consistency.
    bool isConsistent() const

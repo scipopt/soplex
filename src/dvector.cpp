@@ -13,9 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dvector.cpp,v 1.9 2002/01/19 16:05:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dvector.cpp,v 1.10 2002/01/19 18:59:15 bzfkocht Exp $"
 
 
+#include "real.h"
 #include "dvector.h"
 #include "message.h"
 #include "spxalloc.h"
@@ -70,7 +71,7 @@ DVector operator-(const SVector& v, const Vector& w)
    return res;
 }
 
-DVector operator*(const Vector& v, double x)
+DVector operator*(const Vector& v, Real x)
 {
    DVector res(v.dim());
    for (int i = 0; i < res.dim(); ++i)
@@ -112,7 +113,7 @@ void DVector::reDim(int newdim)
 std::istream& operator>>(std::istream& s, DVector& vec)
 {
    char c;
-   double val;
+   Real val;
    int i = 0;
 
    while (s.get(c).good())

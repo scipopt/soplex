@@ -13,21 +13,22 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: update.cpp,v 1.6 2002/01/19 13:06:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: update.cpp,v 1.7 2002/01/19 18:59:18 bzfkocht Exp $"
 
 #include <assert.h>
 
+#include "real.h"
 #include "clufactor.h"
 #include "cring.h"
 
 namespace soplex
 {
-void CLUFactor::update(int p_col, double* p_work, const int* p_idx, int num)
+void CLUFactor::update(int p_col, Real* p_work, const int* p_idx, int num)
 {
    int ll, i, j;
    int* lidx;
-   double* lval;
-   double x, rezi;
+   Real* lval;
+   Real x, rezi;
 
    assert(p_work[p_col] != 0);
    rezi = 1 / p_work[p_col];
@@ -66,14 +67,14 @@ void CLUFactor::update(int p_col, double* p_work, const int* p_idx, int num)
 
 void CLUFactor::updateNoClear(
    int p_col, 
-   const double* p_work, 
+   const Real* p_work, 
    const int* p_idx,
    int num)
 {
    int ll, i, j;
    int* lidx;
-   double* lval;
-   double x, rezi;
+   Real* lval;
+   Real x, rezi;
 
    assert(p_work[p_col] != 0);
    rezi = 1 / p_work[p_col];

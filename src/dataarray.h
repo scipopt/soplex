@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataarray.h,v 1.16 2002/01/10 23:07:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataarray.h,v 1.17 2002/01/19 18:59:15 bzfkocht Exp $"
 
 /**@file  dataarray.h
  * @brief Save arrays of data objects.
@@ -26,6 +26,7 @@
 #include <string.h>
 #include <iostream>
 
+#include "real.h"
 #include "spxalloc.h"
 #include "message.h"
 
@@ -76,7 +77,7 @@ protected:
        where a DataArray is extended often by a small number of elements
        only.
     */
-   double memFactor;     ///< memory extension factor.
+   Real memFactor;     ///< memory extension factor.
 
 public:
 
@@ -302,7 +303,7 @@ public:
        @param p_max  maximum number of elements the array can hold.
        @param p_fax  value for memFactor.
     */
-   explicit DataArray(int p_size = 0, int p_max = 0, double p_fac = 1.2)
+   explicit DataArray(int p_size = 0, int p_max = 0, Real p_fac = 1.2)
       : memFactor(p_fac)
    {
       thesize = (p_size < 0) ? 0 : p_size;

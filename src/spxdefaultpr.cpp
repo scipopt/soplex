@@ -13,13 +13,14 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultpr.cpp,v 1.6 2002/01/12 11:41:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefaultpr.cpp,v 1.7 2002/01/19 18:59:16 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
 #define EQ_PREF 1000
 
+#include "real.h"
 #include "spxdefaultpr.h"
 
 namespace soplex
@@ -28,15 +29,15 @@ int SPxDefaultPR::selectLeaveX(int start, int incr)
 {
    assert(thesolver != 0);
 
-   //    const double* up  = thesolver->ubBound();
-   //    const double* low = thesolver->lbBound();
+   //    const Real* up  = thesolver->ubBound();
+   //    const Real* low = thesolver->lbBound();
 
-   double best = -theeps;
+   Real best = -theeps;
    int    n    = -1;
 
    for(int i = thesolver->dim() - start - 1; i >= 0; i -= incr)
    {
-      double x = thesolver->fTest()[i];
+      Real x = thesolver->fTest()[i];
 
       if (x < -theeps)
       {
@@ -65,11 +66,11 @@ SoPlex::Id SPxDefaultPR::selectEnterX(int start1, int incr1,
 
    SoPlex::Id id;
    int        i;
-   double     best = -theeps;
+   Real     best = -theeps;
 
    for (i = thesolver->dim() - start1 - 1; i >= 0; i -= incr1) 
    {
-      double x = thesolver->coTest()[i];
+      Real x = thesolver->coTest()[i];
 
       if (x < -theeps)
       {
@@ -85,7 +86,7 @@ SoPlex::Id SPxDefaultPR::selectEnterX(int start1, int incr1,
 
    for (i = thesolver->coDim() - start2 - 1; i >= 0; i -= incr2)
    {
-      double x = thesolver->test()[i];
+      Real x = thesolver->test()[i];
 
       if (x < -theeps)
       {

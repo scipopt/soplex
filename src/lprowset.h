@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.h,v 1.12 2002/01/19 16:05:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprowset.h,v 1.13 2002/01/19 18:59:16 bzfkocht Exp $"
 
 /**@file  lprowset.h
  * @brief Set of LP columns.
@@ -24,6 +24,7 @@
 
 #include <assert.h>
 
+#include "real.h"
 #include "lprow.h"
 #include "dvector.h"
 #include "svset.h"
@@ -79,23 +80,23 @@ public:
    }
 
    ///
-   double lhs(int i) const
+   Real lhs(int i) const
    {
       return left[i];
    }
    /// returns the #lhs of the \p i 'th #LPRow.
-   double& lhs(int i)
+   Real& lhs(int i)
    {
       return left[i];
    }
 
    ///
-   double lhs(const DataKey& k) const
+   Real lhs(const DataKey& k) const
    {
       return left[number(k)];
    }
    /// returns the #lhs of the #LPRow with #DataKey \k in #LPRowSet.
-   double& lhs(const DataKey& k)
+   Real& lhs(const DataKey& k)
    {
       return left[number(k)];
    }
@@ -112,23 +113,23 @@ public:
    }
 
    ///
-   double rhs(int i) const
+   Real rhs(int i) const
    {
       return right[i];
    }
    /// returns the #rhs of the \p i 'th #LPRow.
-   double& rhs(int i)
+   Real& rhs(int i)
    {
       return right[i];
    }
 
    ///
-   double rhs(const DataKey& k) const
+   Real rhs(const DataKey& k) const
    {
       return right[number(k)];
    }
    /// returns the #rhs of the #LPRow with #DataKey \k in #LPRowSet.
-   double& rhs(const DataKey& k)
+   Real& rhs(const DataKey& k)
    {
       return right[number(k)];
    }
@@ -179,7 +180,7 @@ public:
    void setType(int i, LPRow::Type type);
 
    /// returns the value of the \p i'th #LPRow.
-   double value(int i) const
+   Real value(int i) const
    {
       if (rhs(i) < LPRow::infinity)
          return rhs(i);
@@ -195,7 +196,7 @@ public:
        type "greater or equal", the value is the #lhs of the row. Otherwise,
        the value is the #rhs.
    */
-   double value(const DataKey& k) const
+   Real value(const DataKey& k) const
    {
       return value(number(k));
    }
@@ -240,13 +241,13 @@ public:
    }
 
    ///
-   void add(double plhs, const SVector& prowVector, double prhs)
+   void add(Real plhs, const SVector& prowVector, Real prhs)
    {
       DataKey k;
       add(k, plhs, prowVector, prhs);
    }
    /// adds #LPRow consisting of left hand side \p lhs, row vector \p rowVector, and right hand side \p rhs to #LPRowSet.
-   void add(DataKey& key, double lhs, const SVector& rowVector, double rhs);
+   void add(DataKey& key, Real lhs, const SVector& rowVector, Real rhs);
 
    ///
    void add(const LPRowSet& set);
@@ -266,25 +267,25 @@ public:
    }
 
    /// adds \p n nonzero (\p idx, \p val)-pairs to #rowVector with #DataKey \p k.
-   void add2(const DataKey& k, int n, int idx[], double val[])
+   void add2(const DataKey& k, int n, int idx[], Real val[])
    {
       SVSet::add2(rowVector_w(k), n, idx, val);
    }
 
    /// adds \p n nonzero (\p idx, \p val)-pairs to \p i 'th #rowVector.
-   void add2(int i, int n, int idx[], double val[])
+   void add2(int i, int n, int idx[], Real val[])
    {
       SVSet::add2(rowVector_w(i), n, idx, val);
    }
 
    ///
-   SVector& create(int pnonzeros = 0, double plhs = 0, double prhs = 1)
+   SVector& create(int pnonzeros = 0, Real plhs = 0, Real prhs = 1)
    {
       DataKey k;
       return create(k, pnonzeros, plhs, prhs);
    }
    /// creates new #LPRow with specified parameters and returns a reference to its row vector.
-   SVector& create(DataKey& nkey, int nonzeros = 0, double lhs = 0, double rhs = 1);
+   SVector& create(DataKey& nkey, int nonzeros = 0, Real lhs = 0, Real rhs = 1);
    //@}
 
 

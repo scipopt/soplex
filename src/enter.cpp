@@ -13,11 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.8 2001/12/11 09:09:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.9 2002/01/19 18:59:15 bzfkocht Exp $"
 
 /*      \SubSection{Updating the Basis for Entering Variables}
  */
 #include        <assert.h>
+#include "real.h"
 #include        "soplex.h"
 
 #include "spxratiotester.h"
@@ -55,12 +56,12 @@ all $j \ne i^*$ $f^{(i^*)}_j$ remains within its bounds $l_j$ and $u_j$.
     Testing all values of |pVec| against its bounds. If $i$, say, is violated
     the violation is saved as negative value in |theTest[i]|.
  */
-double SoPlex::test(int i, SPxBasis::Desc::Status stat) const
+Real SoPlex::test(int i, SPxBasis::Desc::Status stat) const
 {
    assert(type() == ENTER);
    assert(!isBasic(stat));
 
-   double x;
+   Real x;
 
    switch (stat)
    {
@@ -108,12 +109,12 @@ void SoPlex::computeTest()
    }
 }
 
-double SoPlex::computePvec(int i)
+Real SoPlex::computePvec(int i)
 {
    return (*thePvec)[i] = vector(i) * (*theCoPvec);
 }
 
-double SoPlex::computeTest(int i)
+Real SoPlex::computeTest(int i)
 {
    SPxBasis::Desc::Status stat = desc().status(i);
    if (isBasic(stat))
@@ -126,12 +127,12 @@ double SoPlex::computeTest(int i)
     Testing all values of #coPvec# against its bounds. If $i$, say, is violated
     the violation is saved as negative value in |theCoTest[i]|.
  */
-double SoPlex::coTest(int i, SPxBasis::Desc::Status stat) const
+Real SoPlex::coTest(int i, SPxBasis::Desc::Status stat) const
 {
    assert(type() == ENTER);
    assert(!isBasic(stat));
 
-   double x;
+   Real x;
 
    switch (stat)
    {
@@ -228,14 +229,14 @@ void SoPlex::updateCoTest()
 void SoPlex::getEnterVals
 (
    Id enterId,
-   double& enterTest,
-   double& enterUB,
-   double& enterLB,
-   double& enterVal,
-   double& enterMax,
-   double& enterPric,
+   Real& enterTest,
+   Real& enterUB,
+   Real& enterLB,
+   Real& enterVal,
+   Real& enterMax,
+   Real& enterPric,
    SPxBasis::Desc::Status& enterStat,
-   double& enterRO
+   Real& enterRO
 )
 {
    int enterIdx;
@@ -482,8 +483,8 @@ void SoPlex::getEnterVals
 void SoPlex::getEnterVals2
 (
    int leaveIdx,
-   double enterMax,
-   double& leavebound
+   Real enterMax,
+   Real& leavebound
 )
 {
    int idx;
@@ -653,7 +654,7 @@ void
 SoPlex::ungetEnterVal(
    Id enterId,
    SPxBasis::Desc::Status enterStat,
-   double leaveVal,
+   Real leaveVal,
    const SVector& vec
 )
 {
@@ -687,7 +688,7 @@ SoPlex::ungetEnterVal(
 
 void SoPlex::rejectEnter(
    Id enterId,
-   double enterTest,
+   Real enterTest,
    SPxBasis::Desc::Status enterStat
 )
 {
@@ -710,14 +711,14 @@ int SoPlex::enter(Id& enterId)
    assert(type() == ENTER);
    assert(initialized);
 
-   double enterTest;      // correct test value of entering var
-   double enterUB;        // upper bound of entering variable
-   double enterLB;        // lower bound of entering variable
-   double enterVal;       // current value of entering variable
-   double enterMax;       // maximum value for entering shift
-   double enterPric;      // priced value of entering variable
+   Real enterTest;      // correct test value of entering var
+   Real enterUB;        // upper bound of entering variable
+   Real enterLB;        // lower bound of entering variable
+   Real enterVal;       // current value of entering variable
+   Real enterMax;       // maximum value for entering shift
+   Real enterPric;      // priced value of entering variable
    SPxBasis::Desc::Status enterStat;      // status of entering variable
-   double enterRO;        // rhs/obj of entering variable
+   Real enterRO;        // rhs/obj of entering variable
    const SVector* enterVec = enterVector(enterId);
 
    getEnterVals(enterId, enterTest, enterUB, enterLB,
@@ -756,7 +757,7 @@ int SoPlex::enter(Id& enterId)
          perturbMinEnter();
    }
 
-   double leaveVal = -enterMax;
+   Real leaveVal = -enterMax;
    int leaveIdx = theratiotester->selectLeave(leaveVal);
 
 
@@ -796,7 +797,7 @@ int SoPlex::enter(Id& enterId)
       assert(thePvec->isConsistent());
       assert(theCoPvec->isConsistent());
 
-      double leavebound;             // bound on which leaving variable moves
+      Real leavebound;             // bound on which leaving variable moves
       getEnterVals2(leaveIdx, enterMax, leavebound);
 
       //  process entering variable

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.28 2002/01/19 16:10:19 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.29 2002/01/19 18:59:16 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -23,6 +23,7 @@
 
 #include <assert.h>
 
+#include "real.h"
 #include "timer.h"
 #include "spxlp.h"
 #include "spxbasis.h"
@@ -193,13 +194,13 @@ private:
    Representation therep;      ///< row or column representation.
    Timer          theTime;
    int            maxIters;    ///< maximum allowed iterations.
-   double         maxTime;     ///< maximum allowed time.
-   double         maxValue;    ///< maximum allowed objective value.
+   Real         maxTime;     ///< maximum allowed time.
+   Real         maxValue;    ///< maximum allowed objective value.
    Status         m_status;    ///< status of algorithm.
 
-   double         thedelta;
-   double         theShift;    ///< shift of r/lhs or objective.
-   double         lastShift;   ///< for forcing feasibility.
+   Real         thedelta;
+   Real         theShift;    ///< shift of r/lhs or objective.
+   Real         lastShift;   ///< for forcing feasibility.
    int            m_maxCycle;  ///< maximum steps before cycling is detected.
    int            m_numCycle;  ///< actual number of degenerate steps so far.
    bool           initialized; ///< true, if all vectors are setup.
@@ -209,7 +210,7 @@ private:
    Vector*        coSolveVector2;    ///< when 2 systems are to solve at a time
    SSVector*      coSolveVector2rhs; ///< when 2 systems are to solve at a time
 
-   double         cacheProductFactor;
+   Real         cacheProductFactor;
 
 protected:
    Array < UnitVector > unitVecs; ///< array of unit vectors
@@ -375,7 +376,7 @@ public:
    /**@return Objective value of the current solution vector 
     *         (see #getPrimal()).
     */
-   virtual double value() const;
+   virtual Real value() const;
 
    /// get solution vector for primal variables.
    /** This method returns the #Status of the basis.
@@ -463,23 +464,23 @@ public:
    //@{
 
    /// values \f$|x| < \epsilon\f$ are considered to be 0.
-   double epsilon() const
+   Real epsilon() const
    {
       return primVec.delta().epsilon;
    }
    /// set parameter \p epsilon.
-   void setEpsilon(double eps);
+   void setEpsilon(Real eps);
 
    /// allowed bound violation for optimal Solution.
    /** When all vectors do not violate their bounds by more than \f$\delta\f$,
     *  the basis is considered optimal.
     */
-   double delta() const
+   Real delta() const
    {
       return thedelta;
    }
    /// set parameter \p delta.
-   void setDelta(double d);
+   void setDelta(Real d);
 
    /** #SoPlex consideres a Simplex step as degenerate, if the
     *  steplength does not exceed #epsilon. Cycling occurs, if only
@@ -534,65 +535,65 @@ public:
    ///
    virtual void changeObj(const Vector& newObj);
    ///
-   virtual void changeObj(int i, double newVal);
+   virtual void changeObj(int i, Real newVal);
    ///
-   virtual void changeObj(SPxLP::SPxColId p_id, double p_newVal)
+   virtual void changeObj(SPxLP::SPxColId p_id, Real p_newVal)
    {
       changeObj(number(p_id), p_newVal);
    }
    ///
    virtual void changeLower(const Vector& newLower);
    ///
-   virtual void changeLower(int i, double newLower);
+   virtual void changeLower(int i, Real newLower);
    ///
-   virtual void changeLower(SPxLP::SPxColId p_id, double p_newLower)
+   virtual void changeLower(SPxLP::SPxColId p_id, Real p_newLower)
    {
       changeLower(number(p_id), p_newLower);
    }
    ///
    virtual void changeUpper(const Vector& newUpper);
    ///
-   virtual void changeUpper(int i, double newUpper);
+   virtual void changeUpper(int i, Real newUpper);
    ///
-   virtual void changeUpper(SPxLP::SPxColId p_id, double p_newUpper)
+   virtual void changeUpper(SPxLP::SPxColId p_id, Real p_newUpper)
    {
       changeUpper(number(p_id), p_newUpper);
    }
    ///
    virtual void changeBounds(const Vector& newLower, const Vector& newUpper);
    ///
-   virtual void changeBounds(int i, double newLower, double newUpper);
+   virtual void changeBounds(int i, Real newLower, Real newUpper);
    ///
    virtual void changeBounds(
-      SPxLP::SPxColId p_id, double p_newLower, double p_newUpper)
+      SPxLP::SPxColId p_id, Real p_newLower, Real p_newUpper)
    {
       changeBounds(number(p_id), p_newLower, p_newUpper);
    }
    ///
    virtual void changeLhs(const Vector& newLhs);
    ///
-   virtual void changeLhs(int i, double newLhs);
+   virtual void changeLhs(int i, Real newLhs);
    ///
-   virtual void changeLhs(SPxLP::SPxRowId p_id, double p_newLhs)
+   virtual void changeLhs(SPxLP::SPxRowId p_id, Real p_newLhs)
    {
       changeLhs(number(p_id), p_newLhs);
    }
    ///
    virtual void changeRhs(const Vector& newRhs);
    ///
-   virtual void changeRhs(int i, double newRhs);
+   virtual void changeRhs(int i, Real newRhs);
    ///
-   virtual void changeRhs(SPxLP::SPxRowId p_id, double p_newRhs)
+   virtual void changeRhs(SPxLP::SPxRowId p_id, Real p_newRhs)
    {
       changeRhs(number(p_id), p_newRhs);
    }
    ///
    virtual void changeRange(const Vector& newLhs, const Vector& newRhs);
    ///
-   virtual void changeRange(int i, double newLhs, double newRhs);
+   virtual void changeRange(int i, Real newLhs, Real newRhs);
    ///
    virtual void changeRange(
-      SPxLP::SPxRowId p_id, double p_newLhs, double p_newRhs)
+      SPxLP::SPxRowId p_id, Real p_newLhs, Real p_newRhs)
    {
       changeRange(number(p_id), p_newLhs, p_newRhs);
    }
@@ -611,10 +612,10 @@ public:
       changeCol(number(p_id), p_newCol);
    }
    ///
-   virtual void changeElement(int i, int j, double val);
+   virtual void changeElement(int i, int j, Real val);
    ///
    virtual void changeElement(
-      SPxLP::SPxRowId rid, SPxLP::SPxColId cid, double val)
+      SPxLP::SPxRowId rid, SPxLP::SPxColId cid, Real val)
    {
       changeElement(number(rid), number(cid), val);
    }
@@ -1091,11 +1092,11 @@ public:
    }
 
    /// compute and return #pVec(i).
-   double computePvec(int i);
+   Real computePvec(int i);
    /// compute entire #pVec().
    void computePvec();
    /// compute and return #test(i) in #ENTER%ing Simplex.
-   double computeTest(int i);
+   Real computeTest(int i);
    /// compute test vector in #ENTER%ing Simplex.
    void computeTest();
 
@@ -1128,42 +1129,42 @@ public:
    void shiftPvec();
 
    /// shift \p i 'th #ubBound to \p to.
-   void shiftUBbound(int i, double to)
+   void shiftUBbound(int i, Real to)
    {
       assert(theType == ENTER);
       theShift += to - theUBbound[i];
       theUBbound[i] = to;
    }
    /// shift \p i 'th #lbBound to \p to.
-   void shiftLBbound(int i, double to)
+   void shiftLBbound(int i, Real to)
    {
       assert(theType == ENTER);
       theShift += theLBbound[i] - to;
       theLBbound[i] = to;
    }
    /// shift \p i 'th #upBound to \p to.
-   void shiftUPbound(int i, double to)
+   void shiftUPbound(int i, Real to)
    {
       assert(theType == LEAVE);
       theShift += to - (*theUbound)[i];
       (*theUbound)[i] = to;
    }
    /// shift \p i 'th #lpBound# to \p to.
-   void shiftLPbound(int i, double to)
+   void shiftLPbound(int i, Real to)
    {
       assert(theType == LEAVE);
       theShift += (*theLbound)[i] - to;
       (*theLbound)[i] = to;
    }
    /// shift \p i 'th #ucBound# to \p to.
-   void shiftUCbound(int i, double to)
+   void shiftUCbound(int i, Real to)
    {
       assert(theType == LEAVE);
       theShift += to - (*theCoUbound)[i];
       (*theCoUbound)[i] = to;
    }
    /// shift \p i 'th #lcBound# to \p to.
-   void shiftLCbound(int i, double to)
+   void shiftLCbound(int i, Real to)
    {
       assert(theType == LEAVE);
       theShift += (*theCoLbound)[i] - to;
@@ -1173,7 +1174,7 @@ public:
    void testBounds() const;
 
    /// total current shift amount.
-   virtual double shift() const
+   virtual Real shift() const
    {
       return theShift;
    }
@@ -1183,19 +1184,19 @@ public:
 private:
    ///
    void perturbMin(
-      const UpdateVector& vec, Vector& low, Vector& up, double eps,
+      const UpdateVector& vec, Vector& low, Vector& up, Real eps,
       int start = 0, int incr = 1);
    ///
    void perturbMax(
-      const UpdateVector& vec, Vector& low, Vector& up, double eps,
+      const UpdateVector& vec, Vector& low, Vector& up, Real eps,
       int start = 0, int incr = 1);
    ///
-   double perturbMin(const UpdateVector& uvec,
-      Vector& low, Vector& up, double eps, double delta,
+   Real perturbMin(const UpdateVector& uvec,
+      Vector& low, Vector& up, Real eps, Real delta,
       const SPxBasis::Desc::Status* stat, int start, int incr);
    ///
-   double perturbMax(const UpdateVector& uvec,
-      Vector& low, Vector& up, double eps, double delta,
+   Real perturbMax(const UpdateVector& uvec,
+      Vector& low, Vector& up, Real eps, Real delta,
       const SPxBasis::Desc::Status* stat, int start, int incr);
    //@}
 
@@ -1252,7 +1253,7 @@ public:
     *  basis, this must be checked before terminating with an optimal
     *  solution.
     */
-   virtual double maxInfeas() const;
+   virtual Real maxInfeas() const;
 
    /// Return current basis.
    /**@note The basis can be used to solve linear systems or use
@@ -1304,14 +1305,14 @@ private:
    int enter(Id& id);
 
    /// test coVector #i# with status #stat#.
-   double coTest(int, SPxBasis::Desc::Status) const;
+   Real coTest(int, SPxBasis::Desc::Status) const;
    /// compute coTest vector.
    void computeCoTest();
    /// recompute coTest vector.
    void updateCoTest();
 
    /// test vector #i# with status #stat#.
-   double test(int i, SPxBasis::Desc::Status stat) const;
+   Real test(int i, SPxBasis::Desc::Status stat) const;
    /// recompute test vector.
    void updateTest();
 
@@ -1391,7 +1392,7 @@ protected:
     *  the objective value resulting form nonbasic variables for #COLUMN
     *  #Representation.
     */
-   double nonbasicValue() const;
+   Real nonbasicValue() const;
 
    /// Get pointer to the \p id 'th vector
    virtual const SVector* enterVector(const Id& p_id)
@@ -1403,24 +1404,24 @@ protected:
    ///
    virtual void getLeaveVals(int i,
       SPxBasis::Desc::Status& leaveStat, Id& leaveId,
-      double& leaveMax, double& leavebound, int& leaveNum);
+      Real& leaveMax, Real& leavebound, int& leaveNum);
    ///
-   virtual void getLeaveVals2(double leaveMax, Id enterId,
-      double& enterBound, double& newUBbound,
-      double& newLBbound, double& newCoPrhs);
+   virtual void getLeaveVals2(Real leaveMax, Id enterId,
+      Real& enterBound, Real& newUBbound,
+      Real& newLBbound, Real& newCoPrhs);
    ///
-   virtual void getEnterVals(Id id, double& enterTest,
-      double& enterUB, double& enterLB, double& enterVal, double& enterMax,
-      double& enterPric, SPxBasis::Desc::Status& enterStat, double& enterRO);
+   virtual void getEnterVals(Id id, Real& enterTest,
+      Real& enterUB, Real& enterLB, Real& enterVal, Real& enterMax,
+      Real& enterPric, SPxBasis::Desc::Status& enterStat, Real& enterRO);
    ///
    virtual void getEnterVals2(int leaveIdx, 
-      double enterMax, double& leaveBound);
+      Real enterMax, Real& leaveBound);
    ///
    virtual void ungetEnterVal(Id enterId, SPxBasis::Desc::Status enterStat,
-      double leaveVal, const SVector& vec);
+      Real leaveVal, const SVector& vec);
    ///
    virtual void rejectEnter(Id enterId,
-      double enterTest, SPxBasis::Desc::Status enterStat);
+      Real enterTest, SPxBasis::Desc::Status enterStat);
    ///
    virtual void rejectLeave(int leaveNum, Id leaveId,
       SPxBasis::Desc::Status leaveStat, const SVector* newVec = 0);
@@ -1444,7 +1445,7 @@ protected:
     *  primal Simplex algorithm of entering or leaving type.
     */
    //@{
-   void clearDualBounds(SPxBasis::Desc::Status, double&, double&);
+   void clearDualBounds(SPxBasis::Desc::Status, Real&, Real&);
 
    void setDualColBounds();
    void setDualRowBounds();
@@ -1461,10 +1462,10 @@ protected:
 
 public:
    /// set time limit.
-   virtual void setTerminationTime(double time = infinity);
+   virtual void setTerminationTime(Real time = infinity);
 
    /// return time limit.
-   virtual double terminationTime() const;
+   virtual Real terminationTime() const;
 
    /// set iteration limit.
    virtual void setTerminationIter(int iteration = -1);
@@ -1473,27 +1474,27 @@ public:
    virtual int terminationIter() const;
 
    /// set objective limit.
-   virtual void setTerminationValue(double value = infinity);
+   virtual void setTerminationValue(Real value = infinity);
 
    /// return objective limit.
-   virtual double terminationValue() const;
+   virtual Real terminationValue() const;
    
    /// adjust conditions for termination.
-   virtual void setTermination(double time = infinity, int iteration = -1, 
-      double value = infinity);
+   virtual void setTermination(Real time = infinity, int iteration = -1, 
+      Real value = infinity);
 
    /// get adjusted conditions for termination.
-   virtual void getTermination(double* time = 0, int* iteration = 0, 
-      double* value = 0) const;
+   virtual void getTermination(Real* time = 0, int* iteration = 0, 
+      Real* value = 0) const;
 
    /// get objective value of current solution.
-   virtual double objValue() const
+   virtual Real objValue() const
    {
       return value();
    }
 
    /// get all results of last solve.
-   Status getResult(double* value = 0, Vector* primal = 0,
+   Status getResult(Real* value = 0, Vector* primal = 0,
       Vector* slacks = 0, Vector* dual = 0, Vector* reduCost = 0) const;
 
 protected:
@@ -1529,7 +1530,7 @@ public:
    }
 
    /// time spent in last call to method #solve().
-   double time() const
+   Real time() const
    {
       return theTime.userTime();
    }

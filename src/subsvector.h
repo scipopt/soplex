@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: subsvector.h,v 1.7 2002/01/05 20:31:11 bzfkocht Exp $"
+#pragma ident "@(#) $Id: subsvector.h,v 1.8 2002/01/19 18:59:18 bzfkocht Exp $"
 
 
 /**@file  subsvector.h
@@ -24,6 +24,7 @@
 
 #include <assert.h>
 
+#include "real.h"
 #include "svector.h"
 
 namespace soplex
@@ -43,7 +44,7 @@ private:
    /// output operator.
    friend std::ostream& operator<<(std::ostream& os, const SubSVector& v);
 
-   friend Vector& Vector::multAdd(double x, const SubSVector& vec);
+   friend Vector& Vector::multAdd(Real x, const SubSVector& vec);
 
    const SVector::Element* elem;   ///< element array.
    int                     num;    ///< number of nonzero elements.
@@ -69,7 +70,7 @@ public:
    int number(int i) const;
 
    /// gets value to index \p i.
-   double operator[](int i) const
+   Real operator[](int i) const
    {
       int n = number(i);
       if (n >= 0)
@@ -89,23 +90,23 @@ public:
       return elem[n].idx;
    }
    /// returns the value of the \p n 'th nonzero.
-   double value(int n) const
+   Real value(int n) const
    {
       assert(n >= 0 && n < size());
       return elem[n].val;
    }
 
    /// returns eucledian norm.
-   double length() const
+   Real length() const
    {
       return sqrt(length2());
    }
 
    /// returns squared eucledian norm.
-   double length2() const;
+   Real length2() const;
 
    /// returns inner product with \p w.
-   double operator*(const Vector& w) const;
+   Real operator*(const Vector& w) const;
 
    /// consistency check.
    bool isConsistent() const;
@@ -147,7 +148,7 @@ public:
    }
 };
 
-inline Vector& Vector::multAdd(double x, const SubSVector& vec)
+inline Vector& Vector::multAdd(Real x, const SubSVector& vec)
 {
    assert(vec.dim() <= dim());
 

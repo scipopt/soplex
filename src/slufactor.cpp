@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.15 2002/01/12 11:41:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.16 2002/01/19 18:59:16 bzfkocht Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -21,6 +21,7 @@
  */
 #include <assert.h>
 
+#include "real.h"
 #include "slufactor.h"
 #include "cring.h"
 #include "spxalloc.h"
@@ -254,7 +255,7 @@ void SLUFactor::solveLeft (SSVector& x,
                            SSVector& rhs2) //const
 {
    int n;
-   double* svec = ssvec.altValues();
+   Real* svec = ssvec.altValues();
    int* sidx = ssvec.altIndexMem();
    int rn = rhs2.size();
    int* ridx = rhs2.altIndexMem();
@@ -279,7 +280,7 @@ void SLUFactor::solveLeft (SSVector& x,
 
 
 //@ ----------------------------------------------------------------------------
-double SLUFactor::stability() const
+Real SLUFactor::stability() const
 {
    if (status() != OK)
       return 0;
@@ -420,7 +421,7 @@ void SLUFactor::assign(const SLUFactor& old)
    memcpy(row.orig, old.row.orig, thedim * sizeof(int));
    memcpy(col.perm, old.col.perm, thedim * sizeof(int));
    memcpy(col.orig, old.col.orig, thedim * sizeof(int));
-   memcpy(diag, old.diag, thedim * sizeof(double));
+   memcpy(diag, old.diag, thedim * sizeof(Real));
 
    work = vec.get_ptr();
 
@@ -434,7 +435,7 @@ void SLUFactor::assign(const SLUFactor& old)
    spx_alloc(u.row.max, (thedim + 1));
 
    memcpy(u.row.elem , old.u.row.elem, thedim * sizeof(Dring));
-   memcpy(u.row.val , old.u.row.val, u.row.size * sizeof(double));
+   memcpy(u.row.val , old.u.row.val, u.row.size * sizeof(Real));
    memcpy(u.row.idx , old.u.row.idx, u.row.size * sizeof(int));
    memcpy(u.row.start , old.u.row.start, (thedim + 1) * sizeof(int));
    memcpy(u.row.len , old.u.row.len, (thedim + 1) * sizeof(int));
@@ -465,7 +466,7 @@ void SLUFactor::assign(const SLUFactor& old)
    if (old.u.col.val)
    {
       spx_alloc(u.col.val, u.col.size);
-      memcpy(u.col.val, old.u.col.val, u.col.size * sizeof(double));
+      memcpy(u.col.val, old.u.col.val, u.col.size * sizeof(Real));
    }
    else
       u.col.val = 0;
@@ -507,7 +508,7 @@ void SLUFactor::assign(const SLUFactor& old)
       spx_alloc(l.rval, l.firstUpdate);
       spx_alloc(l.ridx, l.firstUpdate);
       spx_alloc(l.rbeg, (thedim + 1));
-      memcpy(l.rval, old.l.rval, l.firstUpdate * sizeof(double));
+      memcpy(l.rval, old.l.rval, l.firstUpdate * sizeof(Real));
       memcpy(l.ridx, old.l.ridx, l.firstUpdate * sizeof(int));
       memcpy(l.rbeg, old.l.rbeg, (thedim + 1) * sizeof(int));
    }
@@ -518,7 +519,7 @@ void SLUFactor::assign(const SLUFactor& old)
       l.rbeg = 0;
    }
 
-   memcpy(l.val , old.l.val , l.size * sizeof(double));
+   memcpy(l.val , old.l.val , l.size * sizeof(Real));
    memcpy(l.idx , old.l.idx , l.size * sizeof(int));
    memcpy(l.start , old.l.start , l.startSize * sizeof(int));
    memcpy(l.row , old.l.row , l.startSize * sizeof(int));
@@ -686,7 +687,7 @@ SLUFactor::~SLUFactor()
    freeAll();
 }
 
-static double betterThreshold(double th)
+static Real betterThreshold(Real th)
 {
    if (th < 0.1)
       th *= 10;
@@ -701,7 +702,7 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
 {
    assert(dm > 0);
    assert(matrix != 0);
-   double lastStability = stability();
+   Real lastStability = stability();
 
    initDR(u.row.list);
    initDR(u.col.list);
@@ -744,8 +745,8 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
    }
    else if (lastStability > 2*minStability)
    {
-      double last = minThreshold;
-      double better = betterThreshold(last);
+      Real last = minThreshold;
+      Real better = betterThreshold(last);
       while (better < lastThreshold)
       {
          last = better;
@@ -771,7 +772,7 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
       factor(const_cast<SVector**>(matrix), lastThreshold, epsilon);
       if (stability() >= minStability)
          break;
-      double x = lastThreshold;
+      Real x = lastThreshold;
       lastThreshold = betterThreshold(lastThreshold);
       if (x == lastThreshold)
          break;

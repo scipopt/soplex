@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.h,v 1.8 2002/01/12 15:51:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.h,v 1.9 2002/01/19 18:59:17 bzfkocht Exp $"
 
 /**@file  spxhybridpr.h
  * @brief Hybrid pricer.
@@ -23,6 +23,7 @@
 
 #include <assert.h>
 
+#include "real.h"
 #include "spxpricer.h"
 #include "spxdevexpr.h"
 #include "spxparmultpr.h"
@@ -49,11 +50,11 @@ class SPxHybridPR : public SPxPricer
 
    SPxPricer*   thepricer;
 
-   double hybridFactor; 
+   Real hybridFactor; 
 
 public:
    ///
-   virtual void setEpsilon(double eps);
+   virtual void setEpsilon(Real eps);
    ///
    virtual void load(SoPlex* solver);
    ///

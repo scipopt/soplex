@@ -21,6 +21,7 @@ public:
    istream& operator>>(long&);
    istream& operator>>(float&);
    istream& operator>>(double&);
+   istream& operator>>(long double&);
 
 };
 

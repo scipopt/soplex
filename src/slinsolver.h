@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slinsolver.h,v 1.5 2001/12/01 18:21:16 bzfbleya Exp $"
+#pragma ident "@(#) $Id: slinsolver.h,v 1.6 2002/01/19 18:59:16 bzfkocht Exp $"
 
 /**@file  slinsolver.h
  * @brief Sparse Linear Solver virtual base class.
@@ -24,6 +24,7 @@
 
 #include <assert.h>
 
+#include "real.h"
 #include "svector.h"
 #include "ssvector.h"
 #include "dsvector.h"
@@ -84,7 +85,7 @@ public:
    /** Returns a stability parameter between 0 and 1, where 0 indicates
        singularity, while 1 indicates perfect stability.
    */
-   virtual double stability() const = 0;
+   virtual Real stability() const = 0;
 
    /// Substitute column \p idx with \p subst.
    /** The #change method is used to modify the loaded matrix by substituting

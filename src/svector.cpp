@@ -13,18 +13,19 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.cpp,v 1.10 2002/01/19 13:06:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svector.cpp,v 1.11 2002/01/19 18:59:18 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
+#include "real.h"
 #include "svector.h"
 #include "ssvector.h"
 #include "message.h"
 
 namespace soplex
 {
-void SVector::add(int n, const int i[], const double v[])
+void SVector::add(int n, const int i[], const Real v[])
 {
    assert(n + size() <= max());
    Element* e = m_elem + size();
@@ -101,9 +102,9 @@ void SVector::sort()
    }
 }
 
-double SVector::length2() const
+Real SVector::length2() const
 {
-   double x = 0;
+   Real x = 0;
    int n = size();
    const Element* e = m_elem;
    while (n--)
@@ -114,9 +115,9 @@ double SVector::length2() const
    return x;
 }
 
-double SVector::maxAbs() const
+Real SVector::maxAbs() const
 {
-   double x = 0;
+   Real x = 0;
    int n = size();
    const Element* e = m_elem;
    while (n--)
@@ -127,9 +128,9 @@ double SVector::maxAbs() const
    return x;
 }
 
-double SVector::minAbs() const
+Real SVector::minAbs() const
 {
-   double         x = 1e100;
+   Real         x = 1e100;
    int            n = size();
    const Element* e = m_elem;
 
@@ -141,7 +142,7 @@ double SVector::minAbs() const
    return x;
 }
 
-SVector& SVector::operator*=(double x)
+SVector& SVector::operator*=(Real x)
 {
    int n = size();
    Element* e = m_elem;
@@ -190,11 +191,11 @@ SVector& SVector::operator=(const Vector& vec)
    return *this;
 }
 
-SVector& SVector::assign(const Vector& vec, double eps)
+SVector& SVector::assign(const Vector& vec, Real eps)
 {
    int n = 0;
    int i = vec.dim();
-   double x;
+   Real x;
    Element* e = m_elem;
    clear();
    while (i--)

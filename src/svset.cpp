@@ -13,10 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.cpp,v 1.14 2002/01/19 16:05:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.cpp,v 1.15 2002/01/19 18:59:18 bzfkocht Exp $"
 
 #include <assert.h>
 
+#include "real.h"
 #include "svset.h"
 #include "message.h"
 
@@ -152,13 +153,13 @@ void SVSet::xtend(SVector& svec, int newmax)
    }
 }
 
-void SVSet::add2(SVector &svec, int idx, double val)
+void SVSet::add2(SVector &svec, int idx, Real val)
 {
    xtend(svec, svec.size() + 1);
    svec.add(idx, val);
 }
 
-void SVSet::add2(SVector &svec, int n, const int idx[], const double val[])
+void SVSet::add2(SVector &svec, int n, const int idx[], const Real val[])
 {
    xtend(svec, svec.size() + n);
    svec.add(n, idx, val);

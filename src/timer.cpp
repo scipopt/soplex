@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: timer.cpp,v 1.6 2001/12/28 14:55:13 bzfkocht Exp $"
+#pragma ident "@(#) $Id: timer.cpp,v 1.7 2002/01/19 18:59:18 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -31,6 +31,7 @@
 
 #endif  // !_WIN32 
 
+#include "real.h"
 #include "timer.h"
 
 namespace soplex
@@ -89,7 +90,7 @@ void Timer::start()
 }
 
 // stop timer, return accounted user time.
-double Timer::stop()
+Real Timer::stop()
 {
    // status remains unchanged if timer is not running 
    if (status == RUNNING)
@@ -106,9 +107,9 @@ double Timer::stop()
 
 // get accounted user, system or real time.
 void Timer::getTimes(
-   double* uTime,
-   double* sTime,
-   double* rTime) const
+   Real* uTime,
+   Real* sTime,
+   Real* rTime) const
 {
    if (status != RUNNING)
    {
@@ -136,9 +137,9 @@ void Timer::getTimes(
 }
 
 // return user time accounted by timer
-double Timer::userTime() const
+Real Timer::userTime() const
 {
-   double uTime;
+   Real uTime;
 
    getTimes(&uTime, 0, 0);
 
@@ -146,9 +147,9 @@ double Timer::userTime() const
 }
 
 // return system time accounted by timer
-double Timer::systemTime() const
+Real Timer::systemTime() const
 {
-   double sTime;
+   Real sTime;
 
    getTimes(0, &sTime, 0);
 
@@ -156,9 +157,9 @@ double Timer::systemTime() const
 }
 
 // return real time accounted by timer
-double Timer::realTime() const
+Real Timer::realTime() const
 {
-   double rTime;
+   Real rTime;
 
    getTimes(0, 0, &rTime);
    

@@ -13,11 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: subsvector.cpp,v 1.5 2002/01/05 19:24:10 bzfkocht Exp $"
+#pragma ident "@(#) $Id: subsvector.cpp,v 1.6 2002/01/19 18:59:18 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
+#include "real.h"
 #include "subsvector.h"
 #include "message.h"
 
@@ -49,9 +50,9 @@ int SubSVector::number(int i) const
    return -1;
 }
 
-double SubSVector::length2() const
+Real SubSVector::length2() const
 {
-   double x = 0;
+   Real x = 0;
    int n = size();
    const SVector::Element* e = elem;
    while (n--)
@@ -62,9 +63,9 @@ double SubSVector::length2() const
    return x;
 }
 
-double SubSVector::operator*(const Vector& w) const
+Real SubSVector::operator*(const Vector& w) const
 {
-   double x = 0;
+   Real x = 0;
    int n = size();
    const SVector::Element* e = elem;
    while (n--)

@@ -13,18 +13,19 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.cpp,v 1.8 2002/01/19 16:05:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprowset.cpp,v 1.9 2002/01/19 18:59:16 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
+#include "real.h"
 #include "lprowset.h"
 #include "message.h"
 
 namespace soplex
 {
 
-void LPRowSet::add(DataKey& p_key, double p_lhs, const SVector& vector, double p_rhs)
+void LPRowSet::add(DataKey& p_key, Real p_lhs, const SVector& vector, Real p_rhs)
 {
    SVSet::add(p_key, vector);
    if (num() > left.dim())
@@ -63,7 +64,7 @@ void LPRowSet::add(DataKey nkey[], const LPRowSet& p_set)
       nkey[j] = key(i);
 }
 
-SVector& LPRowSet::create(DataKey& nkey, int nonzeros, double p_lhs, double p_rhs)
+SVector& LPRowSet::create(DataKey& nkey, int nonzeros, Real p_lhs, Real p_rhs)
 {
    if (num() + 1 > left.dim())
    {

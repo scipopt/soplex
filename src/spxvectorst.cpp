@@ -13,11 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvectorst.cpp,v 1.4 2001/12/28 14:55:13 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxvectorst.cpp,v 1.5 2002/01/19 18:59:18 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
+#include "real.h"
 #include "spxvectorst.h"
 
 namespace soplex
@@ -34,9 +35,9 @@ void SPxVectorST::setupWeights(SoPlex& base)
       }
 
       const Vector& obj = base.maxObj();
-      double eps = base.epsilon();
-      double bias = 10000 * eps;
-      double x, y;
+      Real eps = base.epsilon();
+      Real bias = 10000 * eps;
+      Real x, y;
       int i;
 
       for (i = base.nCols(); i--;)
@@ -88,7 +89,7 @@ void SPxVectorST::setupWeights(SoPlex& base)
          return;
       }
 
-      double x, y, len;
+      Real x, y, len;
       int i, j;
       for (i = base.nRows(); i--;)
          rowWeight[i] += fabs(vec[i]);

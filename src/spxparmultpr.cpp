@@ -13,11 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxparmultpr.cpp,v 1.6 2002/01/04 17:31:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxparmultpr.cpp,v 1.7 2002/01/19 18:59:17 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
+#include "real.h"
 #include "spxparmultpr.h"
 
 namespace soplex
@@ -53,7 +54,7 @@ void SPxParMultPR::load(SoPlex* p_solver)
 SPxLP::Id SPxParMultPR::selectEnter()
 {
    SoPlex::Id id;
-   double x;
+   Real x;
    int i;
    int best = -1;
    //    const SPxBasis::Desc& ds   = thesolver->basis().desc();
@@ -63,8 +64,8 @@ SPxLP::Id SPxParMultPR::selectEnter()
 
    if (thesolver->pricing() == SoPlex::PARTIAL)
    {
-      double val;
-      double eps = -theeps;
+      Real val;
+      Real eps = -theeps;
       lastlast = last;
       count = 0;
 
@@ -149,7 +150,7 @@ SPxLP::Id SPxParMultPR::selectEnter()
    {
       // std::cerr << '.';
       assert(thesolver->pricing() == SoPlex::FULL);
-      double bestx = -theeps;
+      Real bestx = -theeps;
       for (i = thesolver->dim() - 1; i >= 0; --i)
       {
          x = thesolver->coTest()[i];
@@ -181,10 +182,10 @@ SPxLP::Id SPxParMultPR::selectEnter()
 int SPxParMultPR::selectLeave()
 {
    int i, n;
-   double x;
-   double best = -theeps;
-   //    const double* up  = thesolver->ubBound();
-   //    const double* low = thesolver->lbBound();
+   Real x;
+   Real best = -theeps;
+   //    const Real* up  = thesolver->ubBound();
+   //    const Real* low = thesolver->lbBound();
 
    assert(thesolver != 0);
    n = -1;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dvector.h,v 1.7 2002/01/19 16:05:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dvector.h,v 1.8 2002/01/19 18:59:15 bzfkocht Exp $"
 
 /**@file  dvector.h
  * @brief Dymnamic vectors.
@@ -24,6 +24,7 @@
 #include <iostream>
 #include <assert.h>
 
+#include "real.h"
 #include "vector.h"
 #include "svector.h"
 
@@ -52,7 +53,7 @@ namespace soplex
 class DVector : public Vector
 {
    int     memsize;        ///< length of array of values #mem
-   double* mem;            ///< value array to be used
+   Real* mem;            ///< value array to be used
 
 public:
    /// adding vectors.
@@ -75,9 +76,9 @@ public:
    friend DVector operator-(const SVector& vec);
 
    /// scaling vectors with a real number.
-   friend DVector operator*(const Vector& v, double x);
+   friend DVector operator*(const Vector& v, Real x);
    /// scaling vectors with a real number.
-   friend DVector operator*(double x, const Vector& v);
+   friend DVector operator*(Real x, const Vector& v);
 
    /// output operator.
    friend std::istream& operator>>(std::istream& s, DVector& vec);
@@ -112,7 +113,7 @@ public:
    }
 
    /// scales vector with factor \p x
-   DVector& operator*=(double x)
+   DVector& operator*=(Real x)
    {
       Vector::operator*=(x);
       return *this;

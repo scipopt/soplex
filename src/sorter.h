@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: sorter.h,v 1.3 2001/11/26 15:55:39 bzfpfend Exp $"
+#pragma ident "@(#) $Id: sorter.h,v 1.4 2002/01/19 18:59:16 bzfkocht Exp $"
 
 
 /**@file  sorter.h
@@ -39,7 +39,7 @@ template < class T, class COMPARATOR >
 void sorter_qsort(T* t, int end, COMPARATOR& compare, int start = 0)
 {
    int i0, i1, j;
-   double c;
+   Real c;
 
    T work, mid, tmp;
 

@@ -13,15 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvectorst.h,v 1.3 2001/11/29 14:43:46 bzfpfend Exp $"
-
+#pragma ident "@(#) $Id: spxvectorst.h,v 1.4 2002/01/19 18:59:18 bzfkocht Exp $"
 
 /**@file  spxvectorst.h
  * @brief Solution vector based start basis.
  */
 #ifndef _SPXVECTORST_H_
 #define _SPXVECTORST_H_
-
 
 #include <assert.h>
 

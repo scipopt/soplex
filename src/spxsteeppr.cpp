@@ -13,11 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.11 2002/01/04 17:31:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.12 2002/01/19 18:59:17 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
+#include "real.h"
 #include "message.h"
 #include "spxsteeppr.h"
 #include "random.h"
@@ -89,7 +90,7 @@ void SPxSteepPR::setType(SoPlex::Type type)
             else
                leavePref[i] = coPref[n];
             coPenalty[i] = 1 + thesolver->basis().baseVec(i).size()
-                           / double(thesolver->dim());
+                           / Real(thesolver->dim());
          }
       }
    }
@@ -114,7 +115,7 @@ void SPxSteepPR::setType(SoPlex::Type type)
          for (i = thesolver->dim() - 1; i >= 0; --i)
          {
             coPenalty[i] = 1 + thesolver->basis().baseVec(i).size()
-                           / double(thesolver->dim());
+                           / Real(thesolver->dim());
          }
       }
    }
@@ -123,15 +124,15 @@ void SPxSteepPR::setType(SoPlex::Type type)
    workRhs.clear();
 }
 
-void SPxSteepPR::setupPrefs(double mult, double /*tie*/, double /*cotie*/,
-                             double shift, double coshift,
+void SPxSteepPR::setupPrefs(Real mult, Real /*tie*/, Real /*cotie*/,
+                             Real shift, Real coshift,
                              int rs, int cs, int re, int ce)
 {
-   double *p;
-   double *cp;
-   double *end;
-   // double rtie, ctie;
-   double rshift, cshift;
+   Real *p;
+   Real *cp;
+   Real *end;
+   // Real rtie, ctie;
+   Real rshift, cshift;
    int i;
 
    if (thesolver->rep() == SoPlex::COLUMN)
@@ -158,7 +159,7 @@ void SPxSteepPR::setupPrefs(double mult, double /*tie*/, double /*cotie*/,
    for (i = re; --i >= rs;)
    {
       p[i] = rshift;
-      //      p[i] += rtie * thesolver->rowVector(i).size() / double(thesolver->nCols());
+      //      p[i] += rtie * thesolver->rowVector(i).size() / Real(thesolver->nCols());
       //      p[i] += EQ_PREF * (thesolver->rhs(i) == thesolver->lhs(i));
       //      p[i] += EQ_PREF * (thesolver->rhs(i) >=  SPxLP::infinity
       //                     &&  thesolver->lhs(i) <= -SPxLP::infinity);
@@ -169,7 +170,7 @@ void SPxSteepPR::setupPrefs(double mult, double /*tie*/, double /*cotie*/,
    for (i = ce; --i >= cs;)
    {
       cp[i] = cshift;
-      //      cp[i] += ctie * thesolver->colVector(i).size() / double(thesolver->nRows());
+      //      cp[i] += ctie * thesolver->colVector(i).size() / Real(thesolver->nRows());
       //      cp[i] += EQ_PREF * (thesolver->upper(i) == thesolver->lower(i));
       //      cp[i] += EQ_PREF * (thesolver->upper(i) >=  SPxLP::infinity
       //                      &&  thesolver->lower(i) <= -SPxLP::infinity);
@@ -193,7 +194,7 @@ void SPxSteepPR::setupPrefs(SoPlex::Type tp)
 {
    if (tp != prefSetup)
    {
-      double mult = 1e-8 / double(1 + thesolver->dim() + thesolver->coDim());
+      Real mult = 1e-8 / Real(1 + thesolver->dim() + thesolver->coDim());
       if (tp == SoPlex::ENTER)
          setupPrefs(-mult, -1e-5, -1e-5, 1, 1);
       else
@@ -222,14 +223,14 @@ void SPxSteepPR::left4X(int n, SoPlex::Id id, int start, int incr)
    if (id.isValid())
    {
       int i, j;
-      double x;
-      // double               delta         = 0.1;   // thesolver->epsilon();
-      double delta = 0.1 + 1.0 / thesolver->basis().iteration();
-      double* coPenalty_ptr = coPenalty.get_ptr();
-      const double* workVec_ptr = workVec.get_const_ptr();
-      const double* rhoVec = thesolver->fVec().delta().values();
-      double rhov_1 = 1 / rhoVec[n];
-      double beta_q = thesolver->coPvec().delta().length2()
+      Real x;
+      // Real               delta         = 0.1;   // thesolver->epsilon();
+      Real delta = 0.1 + 1.0 / thesolver->basis().iteration();
+      Real* coPenalty_ptr = coPenalty.get_ptr();
+      const Real* workVec_ptr = workVec.get_const_ptr();
+      const Real* rhoVec = thesolver->fVec().delta().values();
+      Real rhov_1 = 1 / rhoVec[n];
+      Real beta_q = thesolver->coPvec().delta().length2()
                       * rhov_1 * rhov_1;
 
       assert(rhoVec[n] >= theeps || -rhoVec[n] >= theeps);
@@ -267,15 +268,15 @@ void SPxSteepPR::left4(int n, SoPlex::Id id)
    left4X(n, id, 0, 1);
 }
 
-int SPxSteepPR::selectLeaveX(double& best, int start, int incr)
+int SPxSteepPR::selectLeaveX(Real& best, int start, int incr)
 {
-   const double* coPenalty_ptr = coPenalty.get_const_ptr();
-   const double* fTest = thesolver->fTest().get_const_ptr();
-   //    const double* low   = thesolver->lbBound();
-   //    const double* up    = thesolver->ubBound();
-   const double* p = leavePref.get_const_ptr();
+   const Real* coPenalty_ptr = coPenalty.get_const_ptr();
+   const Real* fTest = thesolver->fTest().get_const_ptr();
+   //    const Real* low   = thesolver->lbBound();
+   //    const Real* up    = thesolver->ubBound();
+   const Real* p = leavePref.get_const_ptr();
 
-   double x;
+   Real x;
    int selIdx;
 
    best = -thesolver->SPxLP::infinity;
@@ -309,7 +310,7 @@ int SPxSteepPR::selectLeaveX(double& best, int start, int incr)
 int SPxSteepPR::selectLeave()
 {
    assert(isConsistent());
-   double best;
+   Real best;
 
    lastIdx = selectLeaveX(best);
    if (lastIdx >= 0)
@@ -346,17 +347,17 @@ void SPxSteepPR::entered4X(
 
    if (n >= 0 && n < thesolver->dim())
    {
-      double delta = 2 + 1.0 / thesolver->basis().iteration();
-      double* coPenalty_ptr = coPenalty.get_ptr();
-      double* penalty_ptr = penalty.get_ptr();
-      const double* workVec_ptr = workVec.get_const_ptr();
-      const double* pVec = thesolver->pVec().delta().values();
+      Real delta = 2 + 1.0 / thesolver->basis().iteration();
+      Real* coPenalty_ptr = coPenalty.get_ptr();
+      Real* penalty_ptr = penalty.get_ptr();
+      const Real* workVec_ptr = workVec.get_const_ptr();
+      const Real* pVec = thesolver->pVec().delta().values();
       const IdxSet& pIdx = thesolver->pVec().idx();
-      const double* coPvec = thesolver->coPvec().delta().values();
+      const Real* coPvec = thesolver->coPvec().delta().values();
       const IdxSet& coPidx = thesolver->coPvec().idx();
-      double xi_p = 1 / thesolver->fVec().delta()[n];
+      Real xi_p = 1 / thesolver->fVec().delta()[n];
       int i, j;
-      double xi_ip, x;
+      Real xi_ip, x;
 
       assert(thesolver->fVec().delta()[n] > thesolver->epsilon()
               || thesolver->fVec().delta()[n] < -thesolver->epsilon());
@@ -409,19 +410,19 @@ void SPxSteepPR::entered4(SoPlex::Id id, int n)
 }
 
 SoPlex::Id SPxSteepPR::selectEnterX(
-   double& best, int start1, int incr1, int start2, int incr2)
+   Real& best, int start1, int incr1, int start2, int incr2)
 {
    /*
        std::cerr << "selectEnter " << start1 << '(' << incr1 << ")\t"
                               << start2 << '(' << incr2 << ")\n";
     */
-   const double* p = pref.get_const_ptr();
-   const double* cp = coPref.get_const_ptr();
-   const double* test = thesolver->test().get_const_ptr();
-   const double* coTest = thesolver->coTest().get_const_ptr();
-   const double* penalty_ptr = penalty.get_const_ptr();
-   const double* coPenalty_ptr = coPenalty.get_const_ptr();
-   double x;
+   const Real* p = pref.get_const_ptr();
+   const Real* cp = coPref.get_const_ptr();
+   const Real* test = thesolver->test().get_const_ptr();
+   const Real* coTest = thesolver->coTest().get_const_ptr();
+   const Real* penalty_ptr = penalty.get_const_ptr();
+   const Real* coPenalty_ptr = coPenalty.get_const_ptr();
+   Real x;
    int i, end;
 
    SoPlex::Id selId;
@@ -466,7 +467,7 @@ SoPlex::Id SPxSteepPR::selectEnterX(
 
 SoPlex::Id SPxSteepPR::selectEnter()
 {
-   double best;
+   Real best;
    lastId = SPxSteepPR::selectEnterX(best);
 
    if (lastId.isValid())
@@ -565,7 +566,7 @@ bool SPxSteepPR::isConsistent() const
    {
       int i;
       SSVector tmp(thesolver->dim(), thesolver->epsilon());
-      double x;
+      Real x;
       for (i = thesolver->dim() - 1; i >= 0; --i)
       {
          thesolver->basis().coSolve(tmp, thesolver->unitVector(i));

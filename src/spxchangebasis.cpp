@@ -13,29 +13,17 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.5 2001/11/29 14:00:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.6 2002/01/19 18:59:16 bzfkocht Exp $"
 
-
-//@ -----------------------------------------------------------------------------
-/*      \SubSection{Manipulation Methods}
- */
 #include <iostream>
 #include <math.h>
 
 #include "spxbasis.h"
-
-
-
 #include "soplex.h"
 
 namespace soplex
 {
 
-
-
-
-
-//@ -----------------------------------------------------------------------------
 void SPxBasis::reDim()
 {
    assert(theLP != 0);

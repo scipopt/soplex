@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.h,v 1.8 2002/01/12 11:41:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.h,v 1.9 2002/01/19 18:59:17 bzfkocht Exp $"
 
 
 /**@file  spxsteeppr.h
@@ -25,6 +25,7 @@
 
 #include <assert.h>
 
+#include "real.h"
 #include "spxpricer.h"
 #include "random.h"
 
@@ -61,27 +62,27 @@ private:
 
    int lastIdx;
    SoPlex::Id lastId;
-   double pi_p;
+   Real pi_p;
 
 
    int prefSetup;
-   DataArray < double > coPref; // preference multiplier for selecting as pivot
-   DataArray < double > pref;   // preference multiplier for selecting as pivot
-   DataArray < double > leavePref;
+   DataArray < Real > coPref; // preference multiplier for selecting as pivot
+   DataArray < Real > pref;   // preference multiplier for selecting as pivot
+   DataArray < Real > leavePref;
 
    ///
-   void setupPrefs(double mult,
-      double /*tie*/, double /*cotie*/,
-      double shift, double coshift,
+   void setupPrefs(Real mult,
+      Real /*tie*/, Real /*cotie*/,
+      Real shift, Real coshift,
       int rstart = 0, int cstart = 0,
       int rend = -1, int cend = -1);
 
    ///
    void setupPrefs(SoPlex::Type);
    ///
-   int selectLeaveX(double& best, int start = 0, int incr = 1);
+   int selectLeaveX(Real& best, int start = 0, int incr = 1);
    ///
-   SoPlex::Id selectEnterX(double& best, 
+   SoPlex::Id selectEnterX(Real& best, 
       int start1 = 0, int incr1 = 1, int start2 = 0, int incr2 = 1);
    ///
    void left4X(int n, SoPlex::Id id, int start, int incr);
@@ -94,7 +95,7 @@ public:
    Setup setup;
 
    /// accuracy for computing steepest directions.
-   double accuracy;
+   Real accuracy;
 
    ///
    virtual void load(SoPlex* base);

@@ -1,0 +1,6 @@
+#--- $Id: make.linux.x86.intel.opt-p4,v 1.1 2002/01/19 18:59:15 bzfkocht Exp $
+CXX	=	icc
+CPPFLAGS=	-Isrc -DNDEBUG
+CXXFLAGS=	-O3 -tpp7 -xW #-ip => error on pilot-ja(ER) ?
+LDFLAGS	=	-lm
+ARFLAGS	=	crs

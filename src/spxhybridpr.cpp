@@ -13,10 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.12 2002/01/12 11:41:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.13 2002/01/19 18:59:17 bzfkocht Exp $"
 
 #include <iostream>
 
+#include "real.h"
 #include "spxhybridpr.h"
 #include "message.h"
 
@@ -53,7 +54,7 @@ void SPxHybridPR::clear()
    thesolver = 0;
 }
 
-void SPxHybridPR::setEpsilon(double eps)
+void SPxHybridPR::setEpsilon(Real eps)
 {
    steep.setEpsilon(eps);
    devex.setEpsilon(eps);

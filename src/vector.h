@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector.h,v 1.8 2002/01/19 13:06:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vector.h,v 1.9 2002/01/19 18:59:18 bzfkocht Exp $"
 
 /**@file  vector.h
  * @brief Dense vector for linear algebra.
@@ -39,21 +39,21 @@ class SubSVector;
    Class Vector provides dense linear algebra vectors. It does not
    provide memory management for the %array of values. Instead, the
    constructor requires a pointer to a memory block large enough to
-   fit the desired dimension of double values.
+   fit the desired dimension of Real values.
  
    After construction, the values of a Vector can be accessed with
    the subscript operator[]() .  Safety is provided by
    - checking of array bound when accessing elements with the
      subscript operator[]() (only when compiled without \c -DNDEBUG).
  
-   A Vector is distinguished from a simple %array of double%s, by
+   A Vector is distinguished from a simple %array of Real%s, by
    providing a set of mathematical operations. Since Vector does
    not provide any memory management features, no operations are
    available that would require allocation of temporary memory
    space.
 
    The following mathematical operations are provided by class Vector
-   (Vector \p a, \p b; double \p x): 
+   (Vector \p a, \p b; Real \p x): 
  
    <TABLE>
    <TR><TD>Operation</TD><TD>Description   </TD><TD></TD>&nbsp;</TR>
@@ -90,9 +90,9 @@ protected:
 
    /// values of a vector
    /** The memory block pointed to by val must at least have size
-    *  dimen * sizeof(double).  
+    *  dimen * sizeof(Real).  
     */
-   double* val;
+   Real* val;
 
 public:
    /**@name Construction and assignment */
@@ -101,9 +101,9 @@ public:
    /** There is no default constructor since the storage for a 
     *  Vector must be provided externally.
     *  Storage must be passed as a memory block val at construction. It
-    *  must be large enough to fit at least dimen double values.
+    *  must be large enough to fit at least dimen Real values.
     */
-   Vector(int p_dimen, double *p_val)
+   Vector(int p_dimen, Real *p_val)
       : dimen(p_dimen)
       , val(p_val)
    {
@@ -147,14 +147,14 @@ public:
       return dimen;
    }
    /// return \p n 'th value by reference
-   double& operator[](int n)
+   Real& operator[](int n)
    {
       assert(n >= 0 && n < dim());
       return val[n];
    }
 
    /// return \p n 'th value
-   double operator[](int n) const
+   Real operator[](int n) const
    {
       assert(n >= 0 && n < dim());
       return val[n];
@@ -182,39 +182,39 @@ public:
    Vector& operator-=(const SSVector& vec);
 
    /// scaling
-   Vector& operator*=(double x);
+   Vector& operator*=(Real x);
 
    /// inner product.
-   double operator*(const SSVector& v) const;
+   Real operator*(const SSVector& v) const;
    /// inner product.
-   double operator*(const SVector& v) const;
+   Real operator*(const SVector& v) const;
    /// inner product.
-   double operator*(const SubSVector& v) const;
+   Real operator*(const SubSVector& v) const;
    /// inner product.
-   double operator*(const Vector& v) const
+   Real operator*(const Vector& v) const
    {
       assert(v.dim() == dim());
-      double x = 0;
+      Real x = 0;
       for(int i = 0; i < dimen; i++)
          x += val[i] * v.val[i];
       return x;
    }
 
    /// infinity norm.
-   double maxAbs() const;
+   Real maxAbs() const;
    /// euclidian norm.
-   double length() const;
+   Real length() const;
    /// squared norm.
-   double length2() const;
+   Real length2() const;
 
    /// addition of scaled vector
-   Vector& multAdd(double x, const SVector& vec);
+   Vector& multAdd(Real x, const SVector& vec);
    /// addition of scaled vector
-   Vector& multAdd(double x, const SubSVector& vec);
+   Vector& multAdd(Real x, const SubSVector& vec);
    /// addition of scaled vector
-   Vector& multAdd(double x, const SSVector& svec);
+   Vector& multAdd(Real x, const SSVector& svec);
    ///  addition of scaled vector
-   Vector& multAdd(double x, const Vector& vec)
+   Vector& multAdd(Real x, const Vector& vec)
    {
       assert(vec.dim() == dim());
 
@@ -233,7 +233,7 @@ public:
     * 
     *  @todo check whether this non-const c-style acces should indeed be public
     */   
-   double* get_ptr()
+   Real* get_ptr()
    {
       return val;
    }
@@ -241,7 +241,7 @@ public:
    /** This function serves for using a Vector in an C-style
     *  function. It returns a pointer to the first value of the array.
     */
-   const double* get_const_ptr() const
+   const Real* get_const_ptr() const
    {
       return val;
    }
@@ -255,7 +255,7 @@ public:
    void clear()
    {
       if (dimen)
-         memset(val, 0, dimen*sizeof(double));
+         memset(val, 0, dimen*sizeof(Real));
    }
    //@}
 private:

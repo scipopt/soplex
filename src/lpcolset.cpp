@@ -13,10 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcolset.cpp,v 1.7 2002/01/19 16:05:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpcolset.cpp,v 1.8 2002/01/19 18:59:15 bzfkocht Exp $"
 
 #include <assert.h>
 
+#include "real.h"
 #include "lpcolset.h"
 #include "message.h"
 
@@ -26,10 +27,10 @@ namespace soplex
 void LPColSet::add
 (
    DataKey& p_key,
-   double p_obj,
-   double p_lower,
+   Real p_obj,
+   Real p_lower,
    const SVector& p_colVector,
-   double p_upper
+   Real p_upper
 )
 {
    SVSet::add(p_key, p_colVector);
@@ -73,7 +74,7 @@ void LPColSet::add(DataKey nkey[], const LPColSet& p_set)
       nkey[j] = key(i);
 }
 
-SVector& LPColSet::create(DataKey& nkey, int nonzeros, double p_obj, double lhs, double rhs)
+SVector& LPColSet::create(DataKey& nkey, int nonzeros, Real p_obj, Real lhs, Real rhs)
 {
    if (num() + 1 > low.dim())
    {

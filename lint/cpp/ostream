@@ -18,6 +18,7 @@ public:
    ostream& operator<<(long);
    ostream& operator<<(float);
    ostream& operator<<(double);
+   ostream& operator<<(long double);
    ostream& operator<<(const void*);
    ostream& operator<<(ostream& (*f)(ostream&));
 };

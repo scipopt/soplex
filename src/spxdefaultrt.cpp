@@ -13,11 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.4 2002/01/16 16:52:24 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.5 2002/01/19 18:59:16 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
+#include "real.h"
 #include "spxdefaultrt.h"
 
 namespace soplex
@@ -38,19 +39,19 @@ namespace soplex
    basis selected to leave the basis. -1 indicates that no variable could be
    selected. Otherwise, parameter #val# contains the chosen #fVec.value()#.
  */
-int SPxDefaultRT::selectLeaveX(double& val, int start, int incr)
+int SPxDefaultRT::selectLeaveX(Real& val, int start, int incr)
 {
-   const double* vec = solver()->fVec().get_const_ptr();
-   const double* upd = solver()->fVec().delta().values();
+   const Real* vec = solver()->fVec().get_const_ptr();
+   const Real* upd = solver()->fVec().delta().values();
    const IdxSet& idx = solver()->fVec().idx();
-   const double* ub = solver()->ubBound().get_const_ptr();
-   const double* lb = solver()->lbBound().get_const_ptr();
+   const Real* ub = solver()->ubBound().get_const_ptr();
+   const Real* lb = solver()->lbBound().get_const_ptr();
 
-   double delta = solver()->delta();
-   double epsilon = solver()->epsilon();
+   Real delta = solver()->delta();
+   Real epsilon = solver()->epsilon();
    int leave = -1;
 
-   double x;
+   Real x;
    int i, j;
 
    if (val > 0)
@@ -127,7 +128,7 @@ int SPxDefaultRT::selectLeaveX(double& val, int start, int incr)
    return leave;
 }
 
-SoPlex::Id SPxDefaultRT::selectEnter(double& val)
+SoPlex::Id SPxDefaultRT::selectEnter(Real& val)
 {
    solver()->coPvec().delta().setup();
    solver()->pVec().delta().setup();
@@ -139,28 +140,28 @@ SoPlex::Id SPxDefaultRT::selectEnter(double& val)
     #theCoPvec.idx()# have been setup correctly!
  */
 SoPlex::Id SPxDefaultRT::selectEnterX(
-   double& max, int start1, int incr1, int start2, int incr2)
+   Real& max, int start1, int incr1, int start2, int incr2)
 {
-   const double* pvec = solver()->pVec().get_const_ptr();
-   const double* pupd = solver()->pVec().delta().values();
+   const Real* pvec = solver()->pVec().get_const_ptr();
+   const Real* pupd = solver()->pVec().delta().values();
    const IdxSet& pidx = solver()->pVec().idx();
-   const double* lpb = solver()->lpBound().get_const_ptr();
-   const double* upb = solver()->upBound().get_const_ptr();
+   const Real* lpb = solver()->lpBound().get_const_ptr();
+   const Real* upb = solver()->upBound().get_const_ptr();
 
-   const double* cvec = solver()->coPvec().get_const_ptr();
-   const double* cupd = solver()->coPvec().delta().values();
+   const Real* cvec = solver()->coPvec().get_const_ptr();
+   const Real* cupd = solver()->coPvec().delta().values();
    const IdxSet& cidx = solver()->coPvec().idx();
-   const double* lcb = solver()->lcBound().get_const_ptr();
-   const double* ucb = solver()->ucBound().get_const_ptr();
+   const Real* lcb = solver()->lcBound().get_const_ptr();
+   const Real* ucb = solver()->ucBound().get_const_ptr();
 
-   double epsilon = solver()->epsilon();
-   double delta = solver()->delta();
-   double val = max;
+   Real epsilon = solver()->epsilon();
+   Real delta = solver()->delta();
+   Real val = max;
    int pnum = -1;
    int cnum = -1;
 
    int i, j;
-   double x;
+   Real x;
    SoPlex::Id enterId;
 
    if (val > 0)
@@ -323,7 +324,7 @@ SoPlex::Id SPxDefaultRT::selectEnterX(
    return enterId;
 }
 
-int SPxDefaultRT::selectLeave(double& val)
+int SPxDefaultRT::selectLeave(Real& val)
 {
    solver()->fVec().delta().setup();
    return selectLeaveX(val, 0, 1);

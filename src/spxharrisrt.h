@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.h,v 1.7 2002/01/04 17:31:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.h,v 1.8 2002/01/19 18:59:17 bzfkocht Exp $"
 
 /**@file  spxharrisrt.h
  * @brief Harris pricing with shifting.
@@ -23,6 +23,7 @@
 
 #include <assert.h>
 
+#include "real.h"
 #include "spxratiotester.h"
 
 namespace soplex
@@ -41,36 +42,36 @@ class SPxHarrisRT : public SPxRatioTester
 {
 private:
    int maxDelta(
-      double* /*max*/,       ///< max abs value in upd
-      double* val,           ///< initial and chosen value
+      Real* /*max*/,       ///< max abs value in upd
+      Real* val,           ///< initial and chosen value
       int num,               ///< # of indices in idx
       const int* idx,        ///< nonzero indices in upd
-      const double* upd,     ///< update vector for vec
-      const double* vec,     ///< current vector
-      const double* low,     ///< lower bounds for vec
-      const double* up,      ///< upper bounds for vec
-      double delta,          ///< allowed bound violation
-      double epsilon,        ///< what is 0?
-      double infinity);      ///< what is $\infty$?
+      const Real* upd,     ///< update vector for vec
+      const Real* vec,     ///< current vector
+      const Real* low,     ///< lower bounds for vec
+      const Real* up,      ///< upper bounds for vec
+      Real delta,          ///< allowed bound violation
+      Real epsilon,        ///< what is 0?
+      Real infinity);      ///< what is $\infty$?
 
    int minDelta(
-      double* /*max*/,       ///< max abs value in upd
-      double* val,           ///< initial and chosen value
+      Real* /*max*/,       ///< max abs value in upd
+      Real* val,           ///< initial and chosen value
       int num,               ///< of indices in idx
       const int* idx,        ///< nonzero indices in upd
-      const double* upd,     ///< update vector for vec
-      const double* vec,     ///< current vector
-      const double* low,     ///< lower bounds for vec
-      const double* up,      ///< upper bounds for vec
-      double delta,          ///< allowed bound violation
-      double epsilon,        ///< what is 0?
-      double infinity);      ///< what is $\infty$?
+      const Real* upd,     ///< update vector for vec
+      const Real* vec,     ///< current vector
+      const Real* low,     ///< lower bounds for vec
+      const Real* up,      ///< upper bounds for vec
+      Real delta,          ///< allowed bound violation
+      Real epsilon,        ///< what is 0?
+      Real infinity);      ///< what is $\infty$?
 
 public:
    ///
-   virtual int selectLeave(double& val);
+   virtual int selectLeave(Real& val);
    ///
-   virtual SoPlex::Id selectEnter(double& val);
+   virtual SoPlex::Id selectEnter(Real& val);
    /// default constructor
    SPxHarrisRT() 
       : SPxRatioTester()

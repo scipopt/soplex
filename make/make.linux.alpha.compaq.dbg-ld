@@ -1,0 +1,7 @@
+#--- $Id: make.linux.alpha.compaq.dbg-ld,v 1.1 2002/01/19 18:59:15 bzfkocht Exp $
+CXX	=	cxx
+CPPFLAGS=	-Isrc -DWITH_LONG_DOUBLE
+CXXFLAGS=	-O0 -w0 -std strict_ansi -gall -verbose -check \
+		-msg_disable basclsnondto,boolexprconst # -ieee
+LDFLAGS	=	-lm
+ARFLAGS	=	crs

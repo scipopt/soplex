@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcol.h,v 1.6 2002/01/19 16:05:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpcol.h,v 1.7 2002/01/19 18:59:15 bzfkocht Exp $"
 
 /**@file  lpcol.h
  * @brief LP column.
@@ -23,6 +23,7 @@
 
 #include <assert.h>
 
+#include "real.h"
 #include "dsvector.h"
 
 namespace soplex
@@ -47,41 +48,41 @@ namespace soplex
 class LPCol
 {
 private:
-   double   up;
-   double   low;
-   double   object;
+   Real   up;
+   Real   low;
+   Real   object;
    DSVector vec;
 
 public:
    /// get objective value.
-   double obj() const
+   Real obj() const
    {
       return object;
    }
    /// access objective value.
-   void setObj(double p_object)
+   void setObj(Real p_object)
    {
       object = p_object;
    }
 
    /// get upper bound.
-   double upper() const
+   Real upper() const
    {
       return up;
    }
    /// access upper bound.
-   void setUpper(double p_up)
+   void setUpper(Real p_up)
    {
       up = p_up;
    }
 
    /// get lower bound.
-   double lower() const
+   Real lower() const
    {
       return low;
    }
    /// access lower bound.
-   void setLower(double p_low)
+   void setLower(Real p_low)
    {
       low = p_low;
    }
@@ -116,7 +117,7 @@ public:
    /*  Construct LPCol with the given objective value \p obj, a column
     *  %vector \p vec, upper bound \p upper and lower bound \p lower.
     */
-   LPCol(double pobj, const SVector& pvector, double pupper, double plower)
+   LPCol(Real pobj, const SVector& pvector, Real pupper, Real plower)
       : up(pupper), low(plower), object(pobj), vec(pvector)
    {}
 

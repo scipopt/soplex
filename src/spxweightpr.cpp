@@ -13,10 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.9 2002/01/04 17:50:14 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.10 2002/01/19 18:59:18 bzfkocht Exp $"
 
 #include <assert.h>
 
+#include "real.h"
 #include "spxweightpr.h"
 #include "message.h"
 
@@ -96,11 +97,11 @@ void SPxWeightPR::load(SoPlex* base)
 
 int SPxWeightPR::selectLeave()
 {
-   const double* test = thesolver->fTest().get_const_ptr();
-   double type = 1 - 2 * (thesolver->rep() == SoPlex::COLUMN);
-   double best = type * SPxLP::infinity;
+   const Real* test = thesolver->fTest().get_const_ptr();
+   Real type = 1 - 2 * (thesolver->rep() == SoPlex::COLUMN);
+   Real best = type * SPxLP::infinity;
    int lastIdx = -1;
-   double x;
+   Real x;
    int i;
 
    for (i = solver()->dim() - 1; i >= 0; --i)
@@ -127,9 +128,9 @@ SoPlex::Id SPxWeightPR::selectEnter()
    const Vector& cTest = (solver()->rep() == SoPlex::ROW)
                          ? solver()->coTest() : solver()->test();
    const SPxBasis::Desc& ds = solver()->basis().desc();
-   double best = SPxLP::infinity;
+   Real best = SPxLP::infinity;
    SoPlex::Id lastId;
-   double x;
+   Real x;
    int i;
 
    for (i = solver()->nRows() - 1; i >= 0; --i)

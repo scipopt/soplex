@@ -13,13 +13,14 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxio.cpp,v 1.7 2002/01/17 12:08:59 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxio.cpp,v 1.8 2002/01/19 18:59:17 bzfkocht Exp $"
 
 
 #include <iostream>
 #include <stdio.h>
 #include <assert.h>
 
+#include "real.h"
 #include "spxlp.h"
 
 #include "dvector.h"
@@ -67,8 +68,8 @@ static void dumpRows(std::ostream& s, const SPxLP& lp)
    for (i = 0; i < lp.nRows(); ++i)
    {
       s << "  C" << i << ": ";
-      double low;
-      double up;
+      Real low;
+      Real up;
       low = lp.lhs(i);
       up = lp.rhs(i);
       if (low > -SPxLP::infinity && up < SPxLP::infinity && low != up)
@@ -91,8 +92,8 @@ static void dumpBounds(std::ostream& s, const SPxLP& lp)
    s << "Bounds\n";
    for (i = 0; i < lp.nCols(); ++i)
    {
-      double up;
-      double low;
+      Real up;
+      Real low;
       up = lp.upper(i);
       low = lp.lower(i);
       if (low == up)
@@ -122,7 +123,7 @@ std::ostream& operator<<(std::ostream& s, const SPxLP& lp)
    s << "  obj: ";
    for (i = j = 0; i < lp.nCols(); ++i)
    {
-      double obj = lp.obj(i);
+      Real obj = lp.obj(i);
       if (obj != 0)
       {
          if (j)

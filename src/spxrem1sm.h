@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxrem1sm.h,v 1.4 2001/11/22 16:30:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxrem1sm.h,v 1.5 2002/01/19 18:59:17 bzfkocht Exp $"
 
 /**@file  spxrem1sm.h
  * @brief Remove singletons from LP.
@@ -23,6 +23,7 @@
 
 #include <assert.h>
 
+#include "real.h"
 #include "spxsimplifier.h"
 
 namespace soplex
@@ -46,7 +47,7 @@ public:
    /**@todo This is different implementet then the others. 
     *       Why? Is this ok?
     */
-   double value(double x)
+   Real value(Real x)
    {
       return x - lp->spxSense() * delta;
    }

@@ -13,12 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.36 2002/01/19 16:05:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.37 2002/01/19 18:59:16 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 #include <fstream>
 
+#include "real.h"
 #include "soplex.h"
 #include "spxpricer.h"
 #include "spxratiotester.h"
@@ -564,10 +565,10 @@ void SoPlex::factorize()
    }
 }
 
-double SoPlex::maxInfeas() const
+Real SoPlex::maxInfeas() const
 {
    int i;
-   double inf = 0.0;
+   Real inf = 0.0;
 
    if (type() == ENTER)
    {
@@ -602,11 +603,11 @@ double SoPlex::maxInfeas() const
    return inf;
 }
 
-double SoPlex::nonbasicValue() const
+Real SoPlex::nonbasicValue() const
 {
 
    int i;
-   double val = 0;
+   Real val = 0;
    const SPxBasis::Desc& ds = desc();
 
    if (rep() == COLUMN)
@@ -715,9 +716,9 @@ double SoPlex::nonbasicValue() const
    return val;
 }
 
-double SoPlex::value() const
+Real SoPlex::value() const
 {
-   double x;
+   Real x;
 
    /**@todo patch suggests returning SPxLP::infinity instead of initializing 
     */
@@ -740,12 +741,12 @@ double SoPlex::value() const
    return x;
 }
 
-void SoPlex::setDelta(double d)
+void SoPlex::setDelta(Real d)
 {
    thedelta = d;
 }
 
-void SoPlex::setEpsilon(double eps)
+void SoPlex::setEpsilon(Real eps)
 {
    primVec.delta().epsilon = eps;
    dualVec.delta().epsilon = eps;
@@ -982,14 +983,14 @@ int SoPlex::nofNZEs() const
    return n;
 }
 
-void SoPlex::setTerminationTime(double p_time)
+void SoPlex::setTerminationTime(Real p_time)
 {
    if( p_time < 0.0 )
       p_time = infinity;
    maxTime = p_time;
 }
 
-double SoPlex::terminationTime() const
+Real SoPlex::terminationTime() const
 {
    return maxTime;
 }
@@ -1006,24 +1007,24 @@ int SoPlex::terminationIter() const
    return maxIters;
 }
 
-void SoPlex::setTerminationValue(double p_value)
+void SoPlex::setTerminationValue(Real p_value)
 {
    maxValue = p_value;
 }
 
-double SoPlex::terminationValue() const
+Real SoPlex::terminationValue() const
 {
    return maxValue;
 }
    
-void SoPlex::setTermination(double p_time, int p_iteration, double p_value)
+void SoPlex::setTermination(Real p_time, int p_iteration, Real p_value)
 {
    setTerminationTime( p_time );
    setTerminationIter( p_iteration );
    setTerminationValue( p_value );
 }
 
-void SoPlex::getTermination(double* p_time, int* p_iteration, double* p_value)
+void SoPlex::getTermination(Real* p_time, int* p_iteration, Real* p_value)
 const
 {
    if (p_time != 0)

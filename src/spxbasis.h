@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.14 2002/01/19 16:05:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.15 2002/01/19 18:59:16 bzfkocht Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -23,6 +23,7 @@
 
 #include <assert.h>
 
+#include "real.h"
 #include "spxlp.h"
 #include "svector.h"
 #include "ssvector.h"
@@ -329,7 +330,7 @@ protected:
        #nonzeroFactor times the number of nonzeros of a fresh one, the
        basis matrix is refactorized.
    */
-   double nonzeroFactor;
+   Real nonzeroFactor;
 
    /* Rank-1-updates to the basis may be performed via method #change(). In
       this case, the factorization is updated, and the following members are
@@ -338,8 +339,8 @@ protected:
    int iterCount;     ///< number of calls to #change() since last manipulation
    int updateCount;   ///< number of calls to #change() since last #factorize()
    int nzCount;       ///< number of nonzeros in basis matrix
-   double nzFac;      ///< current nzFactor
-   double lastFill;   ///< fill occured during last factorization
+   Real nzFac;      ///< current nzFactor
+   Real lastFill;   ///< fill occured during last factorization
 
    SPxLP::Id lastin;  ///< #lastEntered(): variable entered the base last
    SPxLP::Id lastout; ///< #lastLeft(): variable left the base last
@@ -483,7 +484,7 @@ public:
    Vector& multWithBase(Vector& x) const;
 
    /// returns the stability of the basis matrix.
-   double stability() const
+   Real stability() const
    {
       return factor->stability();
    }

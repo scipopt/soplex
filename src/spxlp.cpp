@@ -13,16 +13,17 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.cpp,v 1.11 2002/01/19 16:05:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.cpp,v 1.12 2002/01/19 18:59:17 bzfkocht Exp $"
 
 #include <stdio.h>
 
+#include "real.h"
 #include "spxlp.h"
 #include "message.h"
 
 namespace soplex
 {
-const double SPxLP::infinity = 1e+100;
+const Real SPxLP::infinity = 1e+100;
 
 void SPxLP::getRow(int i, LPRow& row) const
 {
@@ -70,7 +71,7 @@ void SPxLP::doAddRow(const LPRow& row)
    // now insert nonzeros to column file also
    for (int j = vec.size() - 1; j >= 0; --j)
    {
-      double val = vec.value(j);
+      Real val = vec.value(j);
       int i = vec.index(j);
       if (i >= nCols())      // create new columns if required
       {
@@ -98,7 +99,7 @@ void SPxLP::doAddCol(const LPCol& col)
    // now insert nonzeros to row file also
    for (int j = vec.size() - 1; j >= 0; --j)
    {
-      double val = vec.value(j);
+      Real val = vec.value(j);
       int i = vec.index(j);
       if (i >= nRows())              // create new rows if required
       {
@@ -162,7 +163,7 @@ void SPxLP::doAddRows(const LPRowSet& p_set)
    int i, j, k, ii, idx;
    SVector* col;
    DataArray < int > newCols(nCols());
-   DataArray < double > newColVals(nCols());
+   DataArray < Real > newColVals(nCols());
    int oldRowNumber = nRows();
 
    if (&p_set != this)
@@ -233,7 +234,7 @@ void SPxLP::doAddCols(const LPColSet& p_set)
    int i, j;
    int oldColNumber = nCols();
    DataArray < int > newRows(nRows());
-   DataArray < double > newRowVals(nRows());
+   DataArray < Real > newRowVals(nRows());
 
    if (&p_set != this)
       LPColSet::add(p_set);
@@ -525,7 +526,7 @@ void SPxLP::changeObj(const Vector& newObj)
    assert(isConsistent());
 }
 
-void SPxLP::changeObj(int i, double newVal)
+void SPxLP::changeObj(int i, Real newVal)
 {
    LPColSet::obj(i) = spxSense() * newVal;
    assert(isConsistent());
@@ -538,7 +539,7 @@ void SPxLP::changeLower(const Vector& newLower)
    assert(isConsistent());
 }
 
-void SPxLP::changeLower(int i, double newLower)
+void SPxLP::changeLower(int i, Real newLower)
 {
    LPColSet::lower(i) = newLower;
    assert(isConsistent());
@@ -551,7 +552,7 @@ void SPxLP::changeUpper(const Vector& newUpper)
    assert(isConsistent());
 }
 
-void SPxLP::changeUpper(int i, double newUpper)
+void SPxLP::changeUpper(int i, Real newUpper)
 {
    LPColSet::upper(i) = newUpper;
    assert(isConsistent());
@@ -571,14 +572,14 @@ void SPxLP::changeBounds(const Vector& newLower, const Vector& newUpper)
    assert(isConsistent());
 }
 
-void SPxLP::changeBounds(int i, double newLower, double newUpper)
+void SPxLP::changeBounds(int i, Real newLower, Real newUpper)
 {
    changeLower(i, newLower);
    changeUpper(i, newUpper);
    assert(isConsistent());
 }
 
-void SPxLP::changeLhs(int i, double newLhs)
+void SPxLP::changeLhs(int i, Real newLhs)
 {
    LPRowSet::lhs(i) = newLhs;
    assert(isConsistent());
@@ -591,7 +592,7 @@ void SPxLP::changeRhs(const Vector& newRhs)
    assert(isConsistent());
 }
 
-void SPxLP::changeRhs(int i, double newRhs)
+void SPxLP::changeRhs(int i, Real newRhs)
 {
    LPRowSet::rhs(i) = newRhs;
    assert(isConsistent());
@@ -604,7 +605,7 @@ void SPxLP::changeRange(const Vector& newLhs, const Vector& newRhs)
    assert(isConsistent());
 }
 
-void SPxLP::changeRange(int i, double newLhs, double newRhs)
+void SPxLP::changeRange(int i, Real newLhs, Real newRhs)
 {
    changeLhs(i, newLhs);
    changeRhs(i, newRhs);
@@ -629,7 +630,7 @@ void SPxLP::changeRow(int n, const LPRow& newRow)
    for (j = newrow.size() - 1; j >= 0; --j)
    {
       int idx = newrow.index(j);
-      double val = newrow.value(j);
+      Real val = newrow.value(j);
       LPRowSet::add2(n, 1, &idx, &val);
       LPColSet::add2(idx, 1, &n, &val);
    }
@@ -654,14 +655,14 @@ void SPxLP::changeCol(int n, const LPCol& newCol)
    for (j = newcol.size() - 1; j >= 0; --j)
    {
       int idx = newcol.index(j);
-      double val = newcol.value(j);
+      Real val = newcol.value(j);
       LPColSet::add2(n, 1, &idx, &val);
       LPRowSet::add2(idx, 1, &n, &val);
    }
    assert(isConsistent());
 }
 
-void SPxLP::changeElement(int i, int j, double val)
+void SPxLP::changeElement(int i, int j, Real val)
 {
    SVector& row = rowVector_w(i);
    SVector& col = colVector_w(j);

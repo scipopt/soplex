@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbounds.cpp,v 1.4 2001/12/30 11:30:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbounds.cpp,v 1.5 2002/01/19 18:59:16 bzfkocht Exp $"
 
 
 /*  Import system include files
@@ -23,6 +23,7 @@
 
 /*  and class header files
  */
+#include "real.h"
 #include "soplex.h"
 
 namespace soplex
@@ -83,8 +84,8 @@ void SoPlex::setPrimalBounds()
 void SoPlex::clearDualBounds
 (
    SPxBasis::Desc::Status stat,
-   double& upp,
-   double& lw
+   Real& upp,
+   Real& lw
 )
 {
    switch (stat)
@@ -300,7 +301,7 @@ void SoPlex::setLeaveBounds()
 
 void SoPlex::testBounds() const
 {
-   double l_max = (1 + iterCount) * delta();
+   Real l_max = (1 + iterCount) * delta();
    int i;
 
    if (type() == ENTER)

@@ -13,11 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvecs.cpp,v 1.8 2002/01/13 10:12:57 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxvecs.cpp,v 1.9 2002/01/19 18:59:18 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
+#include "real.h"
 #include "soplex.h"
 
 namespace soplex
@@ -51,7 +52,7 @@ void SoPlex::computeFrhs()
 
          for(int i = 0; i < nRows(); i++)
          {
-            double x;
+            Real x;
 
             SPxBasis::Desc::Status stat = desc().rowStatus(i);
 
@@ -109,7 +110,7 @@ void SoPlex::computeFrhsXtra()
 {
    assert(rep() == COLUMN);
    assert(type() == LEAVE);
-   double x;
+   Real x;
    int i;
 
    for (i = nCols() - 1; i >= 0; --i)
@@ -157,7 +158,7 @@ void SoPlex::computeFrhs1(
    const Vector& ufb,    ///< upper feasibility bound for variables
    const Vector& lfb)    ///< lower feasibility bound for variables
 {
-   double x;
+   Real x;
    int i;
    const SPxBasis::Desc& ds = desc();
 
@@ -210,7 +211,7 @@ void SoPlex::computeFrhs2(
    const Vector& coufb,   ///< upper feasibility bound for covariables
    const Vector& colfb)   ///< lower feasibility bound for covariables
 {
-   double x;
+   Real x;
    int i;
    const SPxBasis::Desc& ds = desc();
 
@@ -452,7 +453,7 @@ void SoPlex::setupPupdate(void)
    {
       if (c.size() < 0.95 * theCoPvec->dim())
       {
-         if (double(c.size()) * thecovectors->memSize()
+         if (Real(c.size()) * thecovectors->memSize()
               >= cacheProductFactor * coDim() * thecovectors->num()
               && subcovectors.size() > 1)
          {

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.h,v 1.12 2002/01/05 20:53:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.h,v 1.13 2002/01/19 18:59:16 bzfkocht Exp $"
 
 /**@file  nameset.h
  * @brief Set of strings.
@@ -23,6 +23,7 @@
 
 #include <assert.h>
 
+#include "real.h"
 #include "dataset.h"
 #include "datahashtable.h"
 #include "islist.h"
@@ -273,7 +274,7 @@ public:
        #factor is the factor by which the element memory is extended to do
        so.
     */
-   double factor;
+   Real factor;
 
    /// memory extension factor for names.
    /** When the names added to a #NameSet do no longer fit into the name
@@ -281,7 +282,7 @@ public:
        resized to fit the additional names. Parameter #memFactor is the
        factor by which this memory is extended to do so.
     */
-   double memFactor;
+   Real memFactor;
    //@}
 
    /**@name Miscellaneous */
@@ -300,8 +301,8 @@ public:
     */
    NameSet(int max = 8,
            int mmax = -1,
-           double fac = 2,
-           double memFac = 2);
+           Real fac = 2,
+           Real memFac = 2);
 
    /// copy constructor.
    NameSet(const NameSet& old);

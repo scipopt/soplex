@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.17 2002/01/19 16:05:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.18 2002/01/19 18:59:17 bzfkocht Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -25,6 +25,7 @@
 #include <iostream>
 #include <iomanip>
 
+#include "real.h"
 #include "dvector.h"
 #include "svset.h"
 #include "dataarray.h"
@@ -257,7 +258,7 @@ private:
 
 public:
    /**@todo member variable infinity should be private. */
-   static const double infinity;      ///< value used as \f$\infty\f$.
+   static const Real infinity;      ///< value used as \f$\infty\f$.
 
 
    /**@name Inquiry */
@@ -305,18 +306,18 @@ public:
    }
 
    ///
-   double rhs(int i) const
+   Real rhs(int i) const
    {
       return LPRowSet::rhs(i);
    }
    /// returns right hand side of row \p i.
-   double& rhs(int i)
+   Real& rhs(int i)
    {
       return LPRowSet::rhs(i);
    }
 
    /// returns right hand side of row with identifier \p id.
-   double rhs(SPxRowId& id) const
+   Real rhs(SPxRowId& id) const
    {
       return LPRowSet::rhs(id);
    }
@@ -328,18 +329,18 @@ public:
    }
 
    ///
-   double lhs(int i) const
+   Real lhs(int i) const
    {
       return LPRowSet::lhs(i);
    }
    /// returns left hand side of row \p i.
-   double& lhs(int i)
+   Real& lhs(int i)
    {
       return LPRowSet::lhs(i);
    }
 
    /// returns left hand side of row with identifier \p id.
-   double lhs(SPxRowId& id) const
+   Real lhs(SPxRowId& id) const
    {
       return LPRowSet::lhs(id);
    }
@@ -390,13 +391,13 @@ public:
    }
 
    /// returns objective value of column \p i.
-   double obj(int i) const
+   Real obj(int i) const
    {
       return spxSense() * maxObj(i);
    }
 
    /// returns objective value of column with identifier \p id.
-   double obj(SPxColId& id) const
+   Real obj(SPxColId& id) const
    {
       return spxSense() * maxObj(id);
    }
@@ -413,18 +414,18 @@ public:
    }
 
    /// 
-   double maxObj(int i) const
+   Real maxObj(int i) const
    {
       return LPColSet::obj(i);
    }
    /// returns objective value of column \p i for maximization problem.
-   double& maxObj(int i)
+   Real& maxObj(int i)
    {
       return LPColSet::obj(i);
    }
 
    /// returns objective value of column with identifier \p id for maximization problem.
-   double maxObj(SPxColId& id) const
+   Real maxObj(SPxColId& id) const
    {
       return LPColSet::obj(id);
    }
@@ -436,18 +437,18 @@ public:
    }
 
    ///
-   double upper(int i) const
+   Real upper(int i) const
    {
       return LPColSet::upper(i);
    }
    /// returns upper bound of column \p i.
-   double& upper(int i)
+   Real& upper(int i)
    {
       return LPColSet::upper(i);
    }
 
    /// returns upper bound of column with identifier \p id.
-   double upper(SPxColId& id) const
+   Real upper(SPxColId& id) const
    {
       return LPColSet::upper(id);
    }
@@ -459,18 +460,18 @@ public:
    }
 
    ///
-   double lower(int i) const
+   Real lower(int i) const
    {
       return LPColSet::lower(i);
    }
    /// returns lower bound of column \p i.
-   double& lower(int i)
+   Real& lower(int i)
    {
       return LPColSet::lower(i);
    }
 
    /// returns lower bound of column with identifier \p id.
-   double lower(SPxColId& id) const
+   Real lower(SPxColId& id) const
    {
       return LPColSet::lower(id);
    }
@@ -670,10 +671,10 @@ public:
    virtual void changeObj(const Vector& newObj);
 
    /// changes \p i 'th objective vector element to \p newVal.
-   virtual void changeObj(int i, double newVal);
+   virtual void changeObj(int i, Real newVal);
 
    /// change objective value of column with identifier \p id to \p newVal.
-   virtual void changeObj(SPxColId id, double newVal)
+   virtual void changeObj(SPxColId id, Real newVal)
    {
       changeObj(number(id), newVal);
    }
@@ -682,10 +683,10 @@ public:
    virtual void changeLower(const Vector& newLower);
 
    /// changes \p i 'th lower bound to \p newLower.
-   virtual void changeLower(int i, double newLower);
+   virtual void changeLower(int i, Real newLower);
 
    /// changes lower bound of column with identifier \p id to \p newLower.
-   virtual void changeLower(SPxColId id, double newLower)
+   virtual void changeLower(SPxColId id, Real newLower)
    {
       changeLower(number(id), newLower);
    }
@@ -694,10 +695,10 @@ public:
    virtual void changeUpper(const Vector& newUpper);
 
    /// changes \p i 'th upper bound to \p newUpper.
-   virtual void changeUpper(int i, double newUpper);
+   virtual void changeUpper(int i, Real newUpper);
 
    /// changes upper bound of column with identifier \p id to \p newLower.
-   virtual void changeUpper(SPxColId id, double newUpper)
+   virtual void changeUpper(SPxColId id, Real newUpper)
    {
       changeUpper(number(id), newUpper);
    }
@@ -706,10 +707,10 @@ public:
    virtual void changeBounds(const Vector& newLower, const Vector& newUpper);
 
    /// changes bounds of column \p i to \p newLower and \p newUpper.
-   virtual void changeBounds(int i, double newLower, double newUpper);
+   virtual void changeBounds(int i, Real newLower, Real newUpper);
 
    /// changes bounds of column with identifier \p id.
-   virtual void changeBounds(SPxColId id, double newLower, double newUpper)
+   virtual void changeBounds(SPxColId id, Real newLower, Real newUpper)
    {
       changeBounds(number(id), newLower, newUpper);
    }
@@ -718,10 +719,10 @@ public:
    virtual void changeLhs(const Vector& newLhs);
 
    /// changes \p i 'th left hand side value to \p newLhs.
-   virtual void changeLhs(int i, double newLhs);
+   virtual void changeLhs(int i, Real newLhs);
 
    /// changes left hand side value for row with identifier \p id.
-   virtual void changeLhs(SPxRowId id, double newLhs)
+   virtual void changeLhs(SPxRowId id, Real newLhs)
    {
       changeLhs(number(id), newLhs);
    }
@@ -730,10 +731,10 @@ public:
    virtual void changeRhs(const Vector& newRhs);
 
    /// changes \p i 'th right hand side value to \p newRhs.
-   virtual void changeRhs(int i, double newRhs);
+   virtual void changeRhs(int i, Real newRhs);
 
    /// changes right hand side value for row with identifier \p id.
-   virtual void changeRhs(SPxRowId id, double newRhs)
+   virtual void changeRhs(SPxRowId id, Real newRhs)
    {
       changeRhs(number(id), newRhs);
    }
@@ -742,10 +743,10 @@ public:
    virtual void changeRange(const Vector& newLhs, const Vector& newRhs);
 
    /// changes left and right hand side of row \p i.
-   virtual void changeRange(int i, double newLhs, double newRhs);
+   virtual void changeRange(int i, Real newLhs, Real newRhs);
 
    /// changes left and right hand side of row with identifier \p id.
-   virtual void changeRange(SPxRowId id, double newLhs, double newRhs)
+   virtual void changeRange(SPxRowId id, Real newLhs, Real newRhs)
    {
       changeRange(number(id), newLhs, newRhs);
    }
@@ -769,10 +770,10 @@ public:
    }
 
    /// changes LP element (\p i, \p j) to \p val.
-   virtual void changeElement(int i, int j, double val);
+   virtual void changeElement(int i, int j, Real val);
 
    /// changes LP element identified by (\p rid, \p cid) to \p val.
-   virtual void changeElement(SPxRowId rid, SPxColId cid, double val)
+   virtual void changeElement(SPxRowId rid, SPxColId cid, Real val)
    {
       changeElement(number(rid), number(cid), val);
    }

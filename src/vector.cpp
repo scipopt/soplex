@@ -13,10 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector.cpp,v 1.6 2002/01/19 13:06:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vector.cpp,v 1.7 2002/01/19 18:59:18 bzfkocht Exp $"
 
 #include <iostream>
 
+#include "real.h"
 #include "vector.h"
 #include "ssvector.h"
 #include "subsvector.h"
@@ -30,7 +31,7 @@ Vector& Vector::operator=(const Vector& vec)
    if (this != &vec)
    {
       assert(dim() == vec.dim());
-      memcpy(val, vec.val, dimen*sizeof(double));
+      memcpy(val, vec.val, dimen*sizeof(Real));
    }
    return *this;
 }
@@ -109,28 +110,28 @@ Vector& Vector::operator-=(const SubSVector& vec)
    return *this;
 }
 
-Vector& Vector::operator*=(double x)
+Vector& Vector::operator*=(Real x)
 {
    for (int i = 0; i < dim(); ++i)
       val[i] *= x;
    return *this;
 }
 
-double Vector::length() const
+Real Vector::length() const
 {
    return sqrt(length2());
 }
 
-double Vector::length2() const
+Real Vector::length2() const
 {
    return *this * *this;
 }
 
-double Vector::maxAbs() const
+Real Vector::maxAbs() const
 {
-   double x = 0;
+   Real x = 0;
    int n = dim();
-   double* v = val;
+   Real* v = val;
    while (n--)
    {
       x = (*v > x) ? *v : ((-*v > x) ? -*v : x);
@@ -149,21 +150,21 @@ std::ostream& operator<<(std::ostream& s, const Vector& vec)
    return s;
 }
 
-double Vector::operator*(const SVector& v) const
+Real Vector::operator*(const SVector& v) const
 {
    assert(dim() >= v.dim());
    int i;
-   double x = 0;
+   Real x = 0;
    for (i = v.size(); i-- > 0;)
       x += val[v.index(i)] * v.value(i);
    return x;
 }
 
-double Vector::operator*(const SubSVector& v) const
+Real Vector::operator*(const SubSVector& v) const
 {
    assert(dim() >= v.dim());
    int i;
-   double x = 0;
+   Real x = 0;
    for (i = v.size(); i-- > 0;)
       x += val[v.index(i)] * v.value(i);
    return x;

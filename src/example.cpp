@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.21 2002/01/16 16:52:23 bzfpfend Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.22 2002/01/19 18:59:15 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -21,6 +21,7 @@
 #include <iomanip>
 #include <fstream>
 
+#include "real.h"
 #include "spxsolver.h"
 
 #include "timer.h"
@@ -128,9 +129,9 @@ int main(int argc, char **argv)
    int                    pricing        = 4;
    int                    ratiotest      = 2;
    int                    simplifing     = 3;
-   double                 timelimit      = -1.0;
-   double                 delta          = 1e-6;
-   double                 epsilon        = 1e-16;
+   Real                 timelimit      = -1.0;
+   Real                 delta          = 1e-6;
+   Real                 epsilon        = 1e-16;
    bool                   print_solution = false;
    int                    precision;
    int                    optind;

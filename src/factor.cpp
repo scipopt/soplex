@@ -13,11 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.25 2001/12/28 14:55:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.26 2002/01/19 18:59:15 bzfkocht Exp $"
 
 #include <iostream>
 #include <assert.h>
 
+#include "real.h"
 #include "clufactor.h"
 #include "cring.h"
 #include "spxalloc.h"
@@ -79,7 +80,7 @@ void CLUFactor::initPerm()
 void CLUFactor::setPivot(const int p_stage,
                          const int p_col, 
                          const int p_row, 
-                         const double val)
+                         const Real val)
 {
    // std::cout << p_stage << ": (" << p_row ", " 
    //           << p_col << ") = " << val << std::endl;
@@ -107,7 +108,7 @@ void CLUFactor::packRows()
    Dring *ring, *list;
 
    int *l_ridx = u.row.idx;
-   double *l_rval = u.row.val;
+   Real *l_rval = u.row.val;
    int *l_rlen = u.row.len;
    int *l_rmax = u.row.max;
    int *l_rbeg = u.row.start;
@@ -175,7 +176,7 @@ void CLUFactor::remaxRow(int p_row, int len)
    {
       int i, j, k;
       int *idx;
-      double *val;
+      Real *val;
       Dring *ring;
 
       if (len > u.row.size - u.row.used)
@@ -342,9 +343,9 @@ void CLUFactor::remaxCol(int p_col, int len)
   *      mark column singletons.
   */
 void CLUFactor::initFactorMatrix(SVector** vec, 
-                                 const double eps )
+                                 const Real eps )
 {
-   double x;
+   Real x;
    int i, j, ll, k, m;
    int tot;
    Dring *rring, *lastrring;
@@ -591,7 +592,7 @@ void CLUFactor::colSingletons()
  */
 void CLUFactor::rowSingletons()
 {
-   double pval;
+   Real pval;
    int i, j, k, ll, r;
    int p_row, p_col, len, rs, lk;
    int *idx;
@@ -739,7 +740,7 @@ void CLUFactor::eliminateRowSingletons()
    int i, j, k, ll, r;
    int len, lk;
    int pcol, prow;
-   double pval;
+   Real pval;
    int *idx;
    CLUFactor::Pring *sing;
 
@@ -896,7 +897,7 @@ void CLUFactor::eliminateColSingletons()
 /*
  * No singletons available: Select pivot elements.
  */
-void CLUFactor::selectPivots(double threshold)
+void CLUFactor::selectPivots(Real threshold)
 {
    int ii;
    int i;
@@ -911,8 +912,8 @@ void CLUFactor::selectPivots(double threshold)
    int cl = -1; // This value should never be used.
    int len;
    int beg;
-   double l_maxabs;
-   double x = 0.0; // This value should never be used.
+   Real l_maxabs;
+   Real x = 0.0; // This value should never be used.
    int mkwtz;
    int candidates;
 
@@ -1097,11 +1098,11 @@ int CLUFactor::updateRow   (int r,
    int lv,
    int prow,
    int pcol,
-   double pval,
-   double eps )
+   Real pval,
+   Real eps )
 {
    int fill;
-   double x, lx;
+   Real x, lx;
    int c, i, j, k, ll, m, n;
 
    n = u.row.start[r];
@@ -1208,12 +1209,12 @@ int CLUFactor::updateRow   (int r,
 /*
  *      Eliminate pivot element
  */
-void CLUFactor::eliminatePivot(int prow, int pos, double eps)
+void CLUFactor::eliminatePivot(int prow, int pos, Real eps)
 {
    int i, j, k, m = -1;
    int lv = -1;  // This value should never be used.
    int pcol;
-   double pval;
+   Real pval;
    int pbeg = u.row.start[prow];
    int plen = --(u.row.len[prow]);
    int pend = pbeg + plen;
@@ -1298,8 +1299,8 @@ void CLUFactor::eliminatePivot(int prow, int pos, double eps)
 /*
  *      Factorize nucleus.
  */
-void CLUFactor::eliminateNucleus( const double eps, 
-                                  const double threshold)
+void CLUFactor::eliminateNucleus( const Real eps, 
+                                  const Real threshold)
 {
    int r, c;
    CLUFactor::Pring *pivot;
@@ -1381,7 +1382,7 @@ int CLUFactor::setupColVals()
    {
       int     k   = u.row.start[i];
       int*    idx = &u.row.idx[k];
-      double* val = &u.row.val[k];
+      Real* val = &u.row.val[k];
       int     len = u.row.len[i];
 
       n += len;
@@ -1420,10 +1421,10 @@ void CLUFactor::setupRowVals()
    int l_dim, vecs, mem;
    int* l_row;
    int* idx;
-   double* val;
+   Real* val;
    int* beg;
    int* l_ridx;
-   double* l_rval;
+   Real* l_rval;
    int* l_rbeg;
    int *rorig, *rrorig;
    int *rperm, *rrperm;
@@ -1500,8 +1501,8 @@ void CLUFactor::setupRowVals()
 
 void CLUFactor::factor( 
    SVector** vec,           ///< Array of column vector pointers   
-   double    threshold,     ///< pivoting threshold                
-   double    eps)           ///< epsilon for zero detection        
+   Real    threshold,     ///< pivoting threshold                
+   Real    eps)           ///< epsilon for zero detection        
 {
    stat = SLinSolver::OK;
 

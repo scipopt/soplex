@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.13 2002/01/11 21:05:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.14 2002/01/19 18:59:17 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -22,6 +22,7 @@
 #include <ctype.h>
 #include <iostream>
 
+#include "real.h"
 #include "spxlp.h"
 
 #define MAX_LINE_LEN  257       ///< maximum length of a line (255 + \n + \0)
@@ -81,14 +82,14 @@ static bool isFree(const char* s)
  *  be \c sign * 1.0. 
  * This routine will not catch malformatted numbers like .e10 !
  */
-static double readValue(char*& pos)
+static Real readValue(char*& pos)
 {
    assert(isValue(pos));
 
    char        tmp[MAX_LINE_LEN];
    const char* s = pos;
    char*       t;
-   double      value = 1.0;
+   Real      value = 1.0;
    bool        has_digits = false;
 
    // 1. sign 
@@ -284,11 +285,11 @@ static int hasRowName(char*& pos, NameSet* rownames)
    return true;
 }
 
-static double readInfinity(char*& pos)
+static Real readInfinity(char*& pos)
 {
    assert(isInfinity(pos));
 
-   double sense = (*pos == '-') ? -1.0 : 1.0;
+   Real sense = (*pos == '-') ? -1.0 : 1.0;
 
    hasKeyword(pos, "inf[inity]");
 
@@ -328,7 +329,7 @@ bool SPxLP::readLPF(
    LPRow     row;                   ///< last assembled row.
    LPRowSet  rset;                  ///< the set of rows read.
    DSVector  vec;                   ///< last assembled vector (from row).
-   double    val = 1.0;
+   Real    val = 1.0;
    int       colidx;
    int       sense = 0;
 

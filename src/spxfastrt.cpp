@@ -13,13 +13,14 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.13 2002/01/15 18:50:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.14 2002/01/19 18:59:17 bzfkocht Exp $"
 
 #include <assert.h>
 #include <stdio.h>
 #include <iostream>
 #include <iomanip>
 
+#include "real.h"
 #include "spxfastrt.h"
 
 namespace soplex
@@ -76,7 +77,7 @@ void SPxFastRT::relax()
 }
 
 
-static double minStability(double minStab, double maxabs)
+static Real minStability(Real minStab, Real maxabs)
 {
    if (maxabs < 1000.0)
       return minStab;
@@ -84,8 +85,8 @@ static double minStability(double minStab, double maxabs)
 }
 
 int SPxFastRT::maxDelta(
-   double& val,
-   double& p_abs,
+   Real& val,
+   Real& p_abs,
    UpdateVector& update,
    Vector& lowBound,
    Vector& upBound,
@@ -93,19 +94,19 @@ int SPxFastRT::maxDelta(
    int incr)
 {
    int i, sel;
-   double x, y, max;
-   double u, l;
+   Real x, y, max;
+   Real u, l;
 
-   double l_delta = this->delta;
-   // double           delta01 = 0.5*l_delta;
-   double delta01 = 0;
-   double inf = SPxLP::infinity;
-   double mabs = p_abs;
+   Real l_delta = this->delta;
+   // Real           delta01 = 0.5*l_delta;
+   Real delta01 = 0;
+   Real inf = SPxLP::infinity;
+   Real mabs = p_abs;
 
-   double* up = upBound.get_ptr();
-   double* low = lowBound.get_ptr();
-   const double* vec = update.get_const_ptr();
-   const double* upd = update.delta().values();
+   Real* up = upBound.get_ptr();
+   Real* low = lowBound.get_ptr();
+   const Real* vec = update.get_const_ptr();
+   const Real* upd = update.delta().values();
    const int* idx = update.delta().indexMem();
 
    sel = -1;
@@ -155,8 +156,8 @@ int SPxFastRT::maxDelta(
    else
    {
       int* l_idx = update.delta().altIndexMem();
-      double* uval = update.delta().altValues();
-      const double* uend = uval + update.dim();
+      Real* uval = update.delta().altValues();
+      const Real* uend = uval + update.dim();
 
       for (; uval < uend; ++uval)
       {
@@ -217,8 +218,8 @@ int SPxFastRT::maxDelta(
 }
 
 int SPxFastRT::minDelta(
-   double& val,
-   double& p_abs,
+   Real& val,
+   Real& p_abs,
    UpdateVector& update,
    Vector& lowBound,
    Vector& upBound,
@@ -226,19 +227,19 @@ int SPxFastRT::minDelta(
    int incr)
 {
    int i, sel;
-   double x, y, max;
-   double u, l;
+   Real x, y, max;
+   Real u, l;
 
-   double l_delta = this->delta;
-   // double           delta01 = 0.5*l_delta;
-   double delta01 = 0;
-   double inf = SPxLP::infinity;
-   double mabs = p_abs;
+   Real l_delta = this->delta;
+   // Real           delta01 = 0.5*l_delta;
+   Real delta01 = 0;
+   Real inf = SPxLP::infinity;
+   Real mabs = p_abs;
 
-   double* up = upBound.get_ptr();
-   double* low = lowBound.get_ptr();
-   const double* vec = update.get_const_ptr();
-   const double* upd = update.delta().values();
+   Real* up = upBound.get_ptr();
+   Real* low = lowBound.get_ptr();
+   const Real* vec = update.get_const_ptr();
+   const Real* upd = update.delta().values();
    const int* idx = update.delta().indexMem();
 
    sel = -1;
@@ -288,8 +289,8 @@ int SPxFastRT::minDelta(
    else
    {
       int* l_idx = update.delta().altIndexMem();
-      double* uval = update.delta().altValues();
-      const double* uend = uval + update.dim();
+      Real* uval = update.delta().altValues();
+      const Real* uend = uval + update.dim();
 
       for (; uval < uend; ++uval)
       {
@@ -346,16 +347,16 @@ int SPxFastRT::minDelta(
 }
 
 int SPxFastRT::maxDelta(
-   double& val,
-   double& p_abs)
+   Real& val,
+   Real& p_abs)
 {
    return maxDelta(val, p_abs,
       thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(), 0, 1);
 }
 
 int SPxFastRT::minDelta(
-   double& val,
-   double& p_abs)
+   Real& val,
+   Real& p_abs)
 {
    return minDelta(val, p_abs,
       thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(), 0, 1);
@@ -363,8 +364,8 @@ int SPxFastRT::minDelta(
 
 SoPlex::Id SPxFastRT::maxDelta(
    int& nr,
-   double& max,
-   double& maxabs)
+   Real& max,
+   Real& maxabs)
 {
    int indc = maxDelta(max, maxabs,
       thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
@@ -387,8 +388,8 @@ SoPlex::Id SPxFastRT::maxDelta(
 
 SoPlex::Id SPxFastRT::minDelta(
    int& nr,
-   double& max,
-   double& maxabs)
+   Real& max,
+   Real& maxabs)
 {
    int indc = minDelta(max, maxabs,
       thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
@@ -411,11 +412,11 @@ SoPlex::Id SPxFastRT::minDelta(
 
 
 int SPxFastRT::minSelect(
-   double& val,
-   double& stab,
-   double& best,
-   double& bestDelta,
-   double max,
+   Real& val,
+   Real& stab,
+   Real& best,
+   Real& bestDelta,
+   Real max,
    const UpdateVector& update,
    const Vector& lowBound,
    const Vector& upBound,
@@ -423,12 +424,12 @@ int SPxFastRT::minSelect(
    int incr)
 {
    int i;
-   double x, y;
+   Real x, y;
 
-   const double* up = upBound.get_const_ptr();
-   const double* low = lowBound.get_const_ptr();
-   const double* vec = update.get_const_ptr();
-   const double* upd = update.delta().values();
+   const Real* up = upBound.get_const_ptr();
+   const Real* low = lowBound.get_const_ptr();
+   const Real* vec = update.get_const_ptr();
+   const Real* upd = update.delta().values();
    const int* idx = update.delta().indexMem();
    const int* last = idx + update.delta().size();
 
@@ -482,11 +483,11 @@ int SPxFastRT::minSelect(
 }
 
 int SPxFastRT::maxSelect(
-   double& val,
-   double& stab,
-   double& best,
-   double& bestDelta,
-   double max,
+   Real& val,
+   Real& stab,
+   Real& best,
+   Real& bestDelta,
+   Real max,
    const UpdateVector& update,
    const Vector& lowBound,
    const Vector& upBound,
@@ -494,12 +495,12 @@ int SPxFastRT::maxSelect(
    int incr)
 {
    int i;
-   double x, y;
+   Real x, y;
 
-   const double* up = upBound.get_const_ptr();
-   const double* low = lowBound.get_const_ptr();
-   const double* vec = update.get_const_ptr();
-   const double* upd = update.delta().values();
+   const Real* up = upBound.get_const_ptr();
+   const Real* low = lowBound.get_const_ptr();
+   const Real* vec = update.get_const_ptr();
+   const Real* upd = update.delta().values();
    const int* idx = update.delta().indexMem();
    const int* last = idx + update.delta().size();
 
@@ -551,12 +552,12 @@ int SPxFastRT::maxSelect(
 
 
 int SPxFastRT::maxSelect(
-   double& val,
-   double& stab,
-   double& bestDelta,
-   double max)
+   Real& val,
+   Real& stab,
+   Real& bestDelta,
+   Real max)
 {
-   double best = -SPxLP::infinity;
+   Real best = -SPxLP::infinity;
    bestDelta = 0;
    return maxSelect(val, stab, best, bestDelta, max,
       thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(),  0, 1);
@@ -564,14 +565,14 @@ int SPxFastRT::maxSelect(
 
 SoPlex::Id SPxFastRT::maxSelect(
    int& nr,
-   double& val,
-   double& stab,
-   double& bestDelta,
-   double max
+   Real& val,
+   Real& stab,
+   Real& bestDelta,
+   Real max
 )
 {
    int indp, indc;
-   double best = -SPxLP::infinity;
+   Real best = -SPxLP::infinity;
    bestDelta = 0;
    indc = maxSelect(val, stab, best, bestDelta, max,
       thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
@@ -593,12 +594,12 @@ SoPlex::Id SPxFastRT::maxSelect(
 }
 
 int SPxFastRT::minSelect(
-   double& val,
-   double& stab,
-   double& bestDelta,
-   double max)
+   Real& val,
+   Real& stab,
+   Real& bestDelta,
+   Real max)
 {
-   double best = SPxLP::infinity;
+   Real best = SPxLP::infinity;
    bestDelta = 0;
    return minSelect(val, stab, best, bestDelta, max,
       thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(), 0, 1);
@@ -606,12 +607,12 @@ int SPxFastRT::minSelect(
 
 SoPlex::Id SPxFastRT::minSelect(
    int& nr,
-   double& val,
-   double& stab,
-   double& bestDelta,
-   double max)
+   Real& val,
+   Real& stab,
+   Real& bestDelta,
+   Real max)
 {
-   double best = SPxLP::infinity;
+   Real best = SPxLP::infinity;
    bestDelta = 0;
    int indc = minSelect(val, stab, best, bestDelta, max,
       thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
@@ -649,8 +650,8 @@ SoPlex::Id SPxFastRT::minSelect(
 /**@todo suspicious: max is not used, but it looks like a used parameter 
  *       in selectLeave()
  */
-int SPxFastRT::maxShortLeave(double& sel, int leave, 
-   double /*max*/, double p_abs)
+int SPxFastRT::maxShortLeave(Real& sel, int leave, 
+   Real /*max*/, Real p_abs)
 {
    assert(leave >= 0);
    sel = thesolver->fVec().delta()[leave];
@@ -669,8 +670,8 @@ int SPxFastRT::maxShortLeave(double& sel, int leave,
 /**@todo suspicious: max is not used, but it looks like a used parameter 
  *       in selectLeave()
  */
-int SPxFastRT::minShortLeave(double& sel, int leave, 
-   double /*max*/, double p_abs)
+int SPxFastRT::minShortLeave(Real& sel, int leave, 
+   Real /*max*/, Real p_abs)
 {
    assert(leave >= 0);
    sel = thesolver->fVec().delta()[leave];
@@ -686,7 +687,7 @@ int SPxFastRT::minShortLeave(double& sel, int leave,
    return 0;
 }
 
-int SPxFastRT::maxReleave(double& sel, int leave, double maxabs)
+int SPxFastRT::maxReleave(Real& sel, int leave, Real maxabs)
 {
    UpdateVector& vec = thesolver->fVec();
    Vector& low = thesolver->lbBound();
@@ -698,7 +699,7 @@ int SPxFastRT::maxReleave(double& sel, int leave, double maxabs)
    {
       if (up[leave] > low[leave])
       {
-         double x = vec.delta()[leave];
+         Real x = vec.delta()[leave];
 
          if (sel < -delta / maxabs)
          {
@@ -722,7 +723,7 @@ int SPxFastRT::maxReleave(double& sel, int leave, double maxabs)
    return 0;
 }
 
-int SPxFastRT::minReleave(double& sel, int leave, double maxabs)
+int SPxFastRT::minReleave(Real& sel, int leave, Real maxabs)
 {
    UpdateVector& vec = thesolver->fVec();
    Vector& low = thesolver->lbBound();
@@ -734,7 +735,7 @@ int SPxFastRT::minReleave(double& sel, int leave, double maxabs)
    {
       if (up[leave] > low[leave])
       {
-         double x = vec.delta()[leave];
+         Real x = vec.delta()[leave];
 
          if (sel > delta / maxabs)
          {
@@ -770,9 +771,9 @@ int SPxFastRT::minReleave(double& sel, int leave, double maxabs)
    return 0;
 }
 
-int SPxFastRT::selectLeave(double& val)
+int SPxFastRT::selectLeave(Real& val)
 {
-   double maxabs, max, sel;
+   Real maxabs, max, sel;
    int leave = -1;
    int cnt = 0;
 
@@ -792,7 +793,7 @@ int SPxFastRT::selectLeave(double& val)
          if (!maxShortLeave(sel, leave, max, maxabs))
          {
             // phase 2:
-            double stab, bestDelta;
+            Real stab, bestDelta;
             stab = 100 * minStability(minStab, maxabs);
             // std::cerr << '\t' << stab << '\t' << maxabs << std::endl;
             leave = maxSelect(sel, stab, bestDelta, max);
@@ -827,7 +828,7 @@ int SPxFastRT::selectLeave(double& val)
          // );
          {
             // phase 2:
-            double stab, bestDelta;
+            Real stab, bestDelta;
             stab = 100 * minStability(minStab, maxabs);
             // std::cerr << '\t' << stab << '\t' << maxabs << std::endl;
             leave = minSelect(sel, stab, bestDelta, max);
@@ -876,10 +877,10 @@ int SPxFastRT::selectLeave(double& val)
 /**@todo suspicious: max is not used, 
  *       but it looks like a used parameter in selectEnter()
  */
-int SPxFastRT::maxReenter(double& sel, double /*max*/, double maxabs,
+int SPxFastRT::maxReenter(Real& sel, Real /*max*/, Real maxabs,
                            SoPlex::Id id, int nr)
 {
-   double x, d;
+   Real x, d;
    Vector* up;
    Vector* low;
 
@@ -969,10 +970,10 @@ int SPxFastRT::maxReenter(double& sel, double /*max*/, double maxabs,
 /**@todo suspicious: max is not used, but it looks 
  *       like a used parameter in selectEnter()
  */
-int SPxFastRT::minReenter(double& sel, double /*max*/, double maxabs,
+int SPxFastRT::minReenter(Real& sel, Real /*max*/, Real maxabs,
                            SoPlex::Id id, int nr)
 {
-   double x, d;
+   Real x, d;
    Vector* up;
    Vector* low;
 
@@ -1059,15 +1060,15 @@ int SPxFastRT::minReenter(double& sel, double /*max*/, double maxabs,
 int SPxFastRT::shortEnter(
    SoPlex::Id& enterId,
    int nr,
-   double max,
-   double maxabs
+   Real max,
+   Real maxabs
 )
 {
    if (thesolver->isCoId(enterId))
    {
       if (max != 0)
       {
-         double x = thesolver->coPvec().delta()[nr];
+         Real x = thesolver->coPvec().delta()[nr];
          if (x < maxabs * SHORT && -x < maxabs * SHORT)
             return 0;
       }
@@ -1078,7 +1079,7 @@ int SPxFastRT::shortEnter(
    {
       if (max != 0)
       {
-         double x = thesolver->pVec().delta()[nr];
+         Real x = thesolver->pVec().delta()[nr];
          // std::cerr << x << ' ';
          if (x < maxabs * SHORT && -x < maxabs * SHORT)
             return 0;
@@ -1089,11 +1090,11 @@ int SPxFastRT::shortEnter(
    return 0;
 }
 
-SoPlex::Id SPxFastRT::selectEnter(double& val)
+SoPlex::Id SPxFastRT::selectEnter(Real& val)
 {
    SoPlex::Id enterId;
-   double max, sel;
-   double maxabs = 0.0;
+   Real max, sel;
+   Real maxabs = 0.0;
    int nr;
    int cnt = 0;
 
@@ -1114,7 +1115,7 @@ SoPlex::Id SPxFastRT::selectEnter(double& val)
 
          if (!shortEnter(enterId, nr, max, maxabs))
          {
-            double bestDelta, stab;
+            Real bestDelta, stab;
             // stab = minStab;
             stab = minStability(minStab, maxabs);
             enterId = maxSelect(nr, sel, stab, bestDelta, max);
@@ -1146,7 +1147,7 @@ SoPlex::Id SPxFastRT::selectEnter(double& val)
 
          if (!shortEnter(enterId, nr, max, maxabs))
          {
-            double bestDelta, stab;
+            Real bestDelta, stab;
             // stab = minStab;
             stab = minStability(minStab, maxabs);
             enterId = minSelect(nr, sel, stab, bestDelta, max);
@@ -1165,7 +1166,7 @@ SoPlex::Id SPxFastRT::selectEnter(double& val)
 #ifndef NDEBUG
    if (enterId.isValid())
    {
-      double x;
+      Real x;
       if (thesolver->isCoId(enterId))
          x = thesolver->coPvec().delta()[ thesolver->number(enterId) ];
       else

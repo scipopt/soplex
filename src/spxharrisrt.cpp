@@ -13,11 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.10 2002/01/10 13:34:49 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.11 2002/01/19 18:59:17 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
+#include "real.h"
 #include "spxharrisrt.h"
 
 namespace soplex
@@ -27,22 +28,22 @@ namespace soplex
          The question might be if max shouldn't be updated with themax?
 */
 int SPxHarrisRT::maxDelta(
-   double* /*max*/,             /* max abs value in upd */
-   double* val,             /* initial and chosen value */
+   Real* /*max*/,             /* max abs value in upd */
+   Real* val,             /* initial and chosen value */
    int num,             /* # of indices in idx */
    const int* idx,             /* nonzero indices in upd */
-   const double* upd,             /* update vector for vec */
-   const double* vec,             /* current vector */
-   const double* low,             /* lower bounds for vec */
-   const double* up,              /* upper bounds for vec */
-   double delta,           /* allowed bound violation */
-   double epsilon,         /* what is 0? */
-   double infinity)        /* what is $\infty$? */
+   const Real* upd,             /* update vector for vec */
+   const Real* vec,             /* current vector */
+   const Real* low,             /* lower bounds for vec */
+   const Real* up,              /* upper bounds for vec */
+   Real delta,           /* allowed bound violation */
+   Real epsilon,         /* what is 0? */
+   Real infinity)        /* what is $\infty$? */
 {
-   double x;
-   double theval;
+   Real x;
+   Real theval;
    /**@todo patch suggests using *max instead of themax */
-   double themax;
+   Real themax;
    int sel;
    int i;
 
@@ -80,22 +81,22 @@ int SPxHarrisRT::maxDelta(
     in selectLeave and selectEnter
 */
 int SPxHarrisRT::minDelta(
-   double* /*max*/,             /* max abs value in upd */
-   double* val,             /* initial and chosen value */
+   Real* /*max*/,             /* max abs value in upd */
+   Real* val,             /* initial and chosen value */
    int num,             /* # of indices in idx */
    const int* idx,             /* nonzero indices in upd */
-   const double* upd,             /* update vector for vec */
-   const double* vec,             /* current vector */
-   const double* low,             /* lower bounds for vec */
-   const double* up,              /* upper bounds for vec */
-   double delta,           /* allowed bound violation */
-   double epsilon,         /* what is 0? */
-   double infinity)       /* what is $\infty$? */
+   const Real* upd,             /* update vector for vec */
+   const Real* vec,             /* current vector */
+   const Real* low,             /* lower bounds for vec */
+   const Real* up,              /* upper bounds for vec */
+   Real delta,           /* allowed bound violation */
+   Real epsilon,         /* what is 0? */
+   Real infinity)       /* what is $\infty$? */
 {
-   double x;
-   double theval;
+   Real x;
+   Real theval;
    /**@todo patch suggests using *max instead of themax */
-   double themax;
+   Real themax;
    int sel;
    int i;
 
@@ -140,27 +141,27 @@ int SPxHarrisRT::minDelta(
     allways yield an improvement. In that case, we shift the variable toward
     infeasibility and retry. This avoids cycling in the shifted LP.
  */
-int SPxHarrisRT::selectLeave(double& val)
+int SPxHarrisRT::selectLeave(Real& val)
 {
    int i, j;
-   double stab, x, y;
-   double max;
-   double sel;
-   double lastshift;
-   double useeps;
+   Real stab, x, y;
+   Real max;
+   Real sel;
+   Real lastshift;
+   Real useeps;
    int leave = -1;
-   double maxabs = 1;
+   Real maxabs = 1;
 
-   double infinity = solver()->SPxLP::infinity;
-   double epsilon = solver()->epsilon();
-   double delta = solver()->delta();
+   Real infinity = solver()->SPxLP::infinity;
+   Real epsilon = solver()->epsilon();
+   Real delta = solver()->delta();
 
    /**@todo numCycle and maxCycle are integers. So degeneps will be 
     *       exactly delta until numCycle >= maxCycle. Then it will be
     *       0 until numCycle >= 2 * maxCycle, after wich it becomes
     *       negative. This does not look ok.
     */
-   double degeneps = delta * (1 - solver()->numCycle() / solver()->maxCycle());
+   Real degeneps = delta * (1 - solver()->numCycle() / solver()->maxCycle());
 
    SSVector& upd = solver()->fVec().delta();
    Vector& vec = solver()->fVec();
@@ -331,25 +332,25 @@ int SPxHarrisRT::selectLeave(double& val)
 }
 
 
-SoPlex::Id SPxHarrisRT::selectEnter(double& val)
+SoPlex::Id SPxHarrisRT::selectEnter(Real& val)
 {
    int i, j;
    SoPlex::Id enterId;
-   double stab, x, y;
-   double max = 0.0;
-   double sel = 0.0;
-   double lastshift;
-   double cuseeps;
-   double ruseeps;
-   double cmaxabs = 1;
-   double rmaxabs = 1;
+   Real stab, x, y;
+   Real max = 0.0;
+   Real sel = 0.0;
+   Real lastshift;
+   Real cuseeps;
+   Real ruseeps;
+   Real cmaxabs = 1;
+   Real rmaxabs = 1;
    int pnr, cnr;
 
-   double minStability = 0.0001;
-   double infinity = solver()->SPxLP::infinity;
-   double epsilon = solver()->epsilon();
-   double delta = solver()->delta();
-   double degeneps = delta * (1 - solver()->numCycle() / solver()->maxCycle());
+   Real minStability = 0.0001;
+   Real infinity = solver()->SPxLP::infinity;
+   Real epsilon = solver()->epsilon();
+   Real delta = solver()->delta();
+   Real degeneps = delta * (1 - solver()->numCycle() / solver()->maxCycle());
 
    Vector& pvec = solver()->pVec();
    SSVector& pupd = solver()->pVec().delta();

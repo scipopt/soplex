@@ -13,10 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeneralsm.cpp,v 1.8 2002/01/06 21:16:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeneralsm.cpp,v 1.9 2002/01/19 18:59:17 bzfkocht Exp $"
 
 #include <iostream>
 
+#include "real.h"
 #include "spxgeneralsm.h"
 
 namespace soplex
@@ -86,7 +87,7 @@ void SPxGeneralSM::unsimplify()
    scale.unsimplify();
 }
 
-double SPxGeneralSM::value(double x)
+Real SPxGeneralSM::value(Real x)
 {
    return rem1.value(aggr.value(redu.value(scale.value(x))));
 }

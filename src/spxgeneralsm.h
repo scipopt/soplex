@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeneralsm.h,v 1.4 2001/11/22 16:30:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeneralsm.h,v 1.5 2002/01/19 18:59:17 bzfkocht Exp $"
 
 /**@file  spxgeneralsm.h
  * @brief General LP preprocessing.
@@ -23,6 +23,7 @@
 
 #include <assert.h>
 
+#include "real.h"
 #include "spxredundantsm.h"
 #include "spxaggregatesm.h"
 #include "spxrem1sm.h"
@@ -58,7 +59,7 @@ public:
    virtual void unsimplify();
 
    /// objective value for unsimplified LP.
-   virtual double value(double x);
+   virtual Real value(Real x);
 
    /// default constructor.
    SPxGeneralSM()

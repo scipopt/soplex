@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.h,v 1.6 2001/11/25 14:58:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.h,v 1.7 2002/01/19 18:59:17 bzfkocht Exp $"
 
 /**@file  spxredundantsm.h
  * @brief Remove redundant row and columns.
@@ -23,6 +23,7 @@
 
 #include <assert.h>
 
+#include "real.h"
 #include "spxsimplifier.h"
 
 namespace soplex
@@ -43,7 +44,7 @@ public:
    void unsimplify();
 
    /// objective value for unsimplified LP.
-   double value(double x)
+   Real value(Real x)
    {
       return x + lp->spxSense() * delta;
    }

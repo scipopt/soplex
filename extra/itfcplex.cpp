@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: itfcplex.cpp,v 1.3 2001/12/06 19:55:55 bzfkocht Exp $"
+#pragma ident "@(#) $Id: itfcplex.cpp,v 1.4 2002/01/19 18:59:15 bzfkocht Exp $"
 
 #include <iostream>
 #include <fstream>
@@ -28,6 +28,8 @@
 #include "spxsteeppr.h"
 #include "spxfastrt.h"
 #include "spxweightst.h"
+#include "nameset.h"
+#include "didxset.h"
 
 using namespace soplex;
 
@@ -39,6 +41,9 @@ class SPxCPlex : public SoPlex
    SPxWeightST  m_start;
    bool         m_verbose;
    char*        m_probname;
+   NameSet      m_colnames;
+   NameSet      m_rownames;
+   DIdxSet      m_intvars;
 
 public:
     void factorize( )

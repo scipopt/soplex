@@ -13,11 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxshift.cpp,v 1.6 2002/01/06 21:16:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxshift.cpp,v 1.7 2002/01/19 18:59:17 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
+#include "real.h"
 #include "soplex.h"
 
 namespace soplex
@@ -26,7 +27,7 @@ void SoPlex::shiftFvec()
 {
    // Random   mult(delta(), 100*delta());
    Random mult(10*delta(), 100*delta());
-   double allow = delta() - epsilon();
+   Real allow = delta() - epsilon();
 
    assert(type() == ENTER);
    assert(allow > 0);
@@ -35,7 +36,7 @@ void SoPlex::shiftFvec()
       if (theUBbound[i] + allow < (*theFvec)[i])
       {
          if (theUBbound[i] != theLBbound[i])
-            shiftUBbound(i, (*theFvec)[i] + double(mult));
+            shiftUBbound(i, (*theFvec)[i] + Real(mult));
          else
          {
             shiftUBbound(i, (*theFvec)[i]);
@@ -45,7 +46,7 @@ void SoPlex::shiftFvec()
       else if ((*theFvec)[i] < theLBbound[i] - allow)
       {
          if (theUBbound[i] != theLBbound[i])
-            shiftLBbound(i, (*theFvec)[i] - double(mult));
+            shiftLBbound(i, (*theFvec)[i] - Real(mult));
          else
          {
             shiftLBbound(i, (*theFvec)[i]);
@@ -70,7 +71,7 @@ void SoPlex::shiftPvec()
    int i, tmp;
    // Random   mult(delta(), 100*delta());
    Random mult(10*delta(), 100*delta());
-   double allow = delta() - epsilon();
+   Real allow = delta() - epsilon();
 
    assert(type() == LEAVE);
    for (i = dim() - 1; i >= 0; --i)
@@ -79,7 +80,7 @@ void SoPlex::shiftPvec()
       if ((*theCoUbound)[i] + allow <= (*theCoPvec)[i] && tmp)
       {
          if ((*theCoUbound)[i] != (*theCoLbound)[i])
-            shiftUCbound(i, (*theCoPvec)[i] + double(mult));
+            shiftUCbound(i, (*theCoPvec)[i] + Real(mult));
          else
          {
             shiftUCbound(i, (*theCoPvec)[i]);
@@ -89,7 +90,7 @@ void SoPlex::shiftPvec()
       else if ((*theCoLbound)[i] - allow >= (*theCoPvec)[i] && tmp)
       {
          if ((*theCoUbound)[i] != (*theCoLbound)[i])
-            shiftLCbound(i, (*theCoPvec)[i] - double(mult));
+            shiftLCbound(i, (*theCoPvec)[i] - Real(mult));
          else
          {
             shiftLCbound(i, (*theCoPvec)[i]);
@@ -104,7 +105,7 @@ void SoPlex::shiftPvec()
       if ((*theUbound)[i] + allow <= (*thePvec)[i] && tmp)
       {
          if ((*theUbound)[i] != (*theLbound)[i])
-            shiftUPbound(i, (*thePvec)[i] + double(mult));
+            shiftUPbound(i, (*thePvec)[i] + Real(mult));
          else
          {
             shiftUPbound(i, (*thePvec)[i]);
@@ -114,7 +115,7 @@ void SoPlex::shiftPvec()
       else if ((*theLbound)[i] - allow >= (*thePvec)[i] && tmp)
       {
          if ((*theUbound)[i] != (*theLbound)[i])
-            shiftLPbound(i, (*thePvec)[i] - double(mult));
+            shiftLPbound(i, (*thePvec)[i] - Real(mult));
          else
          {
             shiftLPbound(i, (*thePvec)[i]);
@@ -134,7 +135,7 @@ void SoPlex::perturbMin
    const UpdateVector& uvec,
    Vector& p_low,
    Vector& p_up,
-   double eps,
+   Real eps,
    int start,
    int incr
 )
@@ -142,12 +143,12 @@ void SoPlex::perturbMin
    assert(uvec.dim() == p_low.dim());
    assert(uvec.dim() == p_up.dim());
 
-   const double* vec = uvec.get_const_ptr();
-   const double* upd = uvec.delta().values();
+   const Real* vec = uvec.get_const_ptr();
+   const Real* upd = uvec.delta().values();
    const IdxSet& idx = uvec.delta().indices();
    // Random           mult(1*delta(), 100*delta());
    Random mult(10*delta(), 100*delta());
-   double x, l, u;
+   Real x, l, u;
    int i, j;
 
 #ifdef  FULL_SHIFT
@@ -160,12 +161,12 @@ void SoPlex::perturbMin
 
       if (p_up[i] <= vec[i] + eps)
       {
-         p_up[i] = vec[i] + double(mult);
+         p_up[i] = vec[i] + Real(mult);
          theShift += p_up[i] - u;
       }
       if (p_low[i] >= vec[i] - eps)
       {
-         p_low[i] = vec[i] - double(mult);
+         p_low[i] = vec[i] - Real(mult);
          theShift -= p_low[i] - l;
       }
    }
@@ -182,7 +183,7 @@ void SoPlex::perturbMin
       {
          if (u != l && vec[i] >= u - eps)
          {
-            p_up[i] = vec[i] + double(mult);
+            p_up[i] = vec[i] + Real(mult);
             theShift += p_up[i] - u;
          }
       }
@@ -190,7 +191,7 @@ void SoPlex::perturbMin
       {
          if (u != l && vec[i] <= l + eps)
          {
-            p_low[i] = vec[i] - double(mult);
+            p_low[i] = vec[i] - Real(mult);
             theShift -= p_low[i] - l;
          }
       }
@@ -202,18 +203,18 @@ void SoPlex::perturbMax(
    const UpdateVector& uvec,
    Vector& p_low,
    Vector& p_up,
-   double eps,
+   Real eps,
    int start,
    int incr)
 {
    assert(uvec.dim() == p_low.dim());
    assert(uvec.dim() == p_up.dim());
 
-   const double* vec = uvec.get_const_ptr();
-   const double* upd = uvec.delta().values();
+   const Real* vec = uvec.get_const_ptr();
+   const Real* upd = uvec.delta().values();
    const IdxSet& idx = uvec.delta().indices();
    Random mult(10*delta(), 100*delta());
-   double x, l, u;
+   Real x, l, u;
    int i, j;
 
 #ifdef  FULL_SHIFT
@@ -224,12 +225,12 @@ void SoPlex::perturbMax(
       l = p_low[i];
       if (p_up[i] <= vec[i] + eps)
       {
-         p_up[i] = vec[i] + double(mult);
+         p_up[i] = vec[i] + Real(mult);
          theShift += p_up[i] - u;
       }
       if (p_low[i] >= vec[i] - eps)
       {
-         p_low[i] = vec[i] - double(mult);
+         p_low[i] = vec[i] - Real(mult);
          theShift -= p_low[i] - l;
       }
    }
@@ -245,7 +246,7 @@ void SoPlex::perturbMax(
       {
          if (u != l && vec[i] >= u - eps)
          {
-            p_up[i] = vec[i] + double(mult);
+            p_up[i] = vec[i] + Real(mult);
             theShift += p_up[i] - u;
          }
       }
@@ -253,7 +254,7 @@ void SoPlex::perturbMax(
       {
          if (u != l && vec[i] <= l + eps)
          {
-            p_low[i] = vec[i] - double(mult);
+            p_low[i] = vec[i] - Real(mult);
             theShift -= p_low[i] - l;
          }
       }
@@ -279,12 +280,12 @@ void SoPlex::perturbMaxEnter(void)
 }
 
 
-double SoPlex::perturbMin(
+Real SoPlex::perturbMin(
    const UpdateVector& uvec,
    Vector& p_low,
    Vector& p_up,
-   double eps,
-   double p_delta,
+   Real eps,
+   Real p_delta,
    const SPxBasis::Desc::Status* stat,
    int start,
    int incr)
@@ -292,13 +293,13 @@ double SoPlex::perturbMin(
    assert(uvec.dim() == p_low.dim());
    assert(uvec.dim() == p_up.dim());
 
-   const double* vec = uvec.get_const_ptr();
-   const double* upd = uvec.delta().values();
+   const Real* vec = uvec.get_const_ptr();
+   const Real* upd = uvec.delta().values();
    const IdxSet& idx = uvec.delta().indices();
    Random mult(10*p_delta, 100*p_delta);
-   double x, l, u;
+   Real x, l, u;
    int i, j;
-   double l_theShift = 0;
+   Real l_theShift = 0;
 
 #ifdef  FULL_SHIFT
    eps = p_delta;
@@ -308,12 +309,12 @@ double SoPlex::perturbMin(
       l = p_low[i];
       if (p_up[i] <= vec[i] + eps && rep()*stat[i] < 0)
       {
-         p_up[i] = vec[i] + double(mult);
+         p_up[i] = vec[i] + Real(mult);
          l_theShift += p_up[i] - u;
       }
       if (p_low[i] >= vec[i] - eps && rep()*stat[i] < 0)
       {
-         p_low[i] = vec[i] - double(mult);
+         p_low[i] = vec[i] - Real(mult);
          l_theShift -= p_low[i] - l;
       }
    }
@@ -329,7 +330,7 @@ double SoPlex::perturbMin(
       {
          if (u != l && vec[i] >= u - eps && rep()*stat[i] < 0)
          {
-            p_up[i] = vec[i] + double(mult);
+            p_up[i] = vec[i] + Real(mult);
             l_theShift += p_up[i] - u;
          }
       }
@@ -337,7 +338,7 @@ double SoPlex::perturbMin(
       {
          if (u != l && vec[i] <= l + eps && rep()*stat[i] < 0)
          {
-            p_low[i] = vec[i] - double(mult);
+            p_low[i] = vec[i] - Real(mult);
             l_theShift -= p_low[i] - l;
          }
       }
@@ -346,12 +347,12 @@ double SoPlex::perturbMin(
    return l_theShift;
 }
 
-double SoPlex::perturbMax(
+Real SoPlex::perturbMax(
    const UpdateVector& uvec,
    Vector& p_low,
    Vector& p_up,
-   double eps,
-   double p_delta,
+   Real eps,
+   Real p_delta,
    const SPxBasis::Desc::Status* stat,
    int start,
    int incr)
@@ -359,13 +360,13 @@ double SoPlex::perturbMax(
    assert(uvec.dim() == p_low.dim());
    assert(uvec.dim() == p_up.dim());
 
-   const double* vec = uvec.get_const_ptr();
-   const double* upd = uvec.delta().values();
+   const Real* vec = uvec.get_const_ptr();
+   const Real* upd = uvec.delta().values();
    const IdxSet& idx = uvec.delta().indices();
    Random mult(10*p_delta, 100*p_delta);
-   double x, l, u;
+   Real x, l, u;
    int i, j;
-   double l_theShift = 0;
+   Real l_theShift = 0;
 
 #ifdef  FULL_SHIFT
    eps = p_delta;
@@ -375,12 +376,12 @@ double SoPlex::perturbMax(
       l = p_low[i];
       if (p_up[i] <= vec[i] + eps && rep()*stat[i] < 0)
       {
-         p_up[i] = vec[i] + double(mult);
+         p_up[i] = vec[i] + Real(mult);
          l_theShift += p_up[i] - u;
       }
       if (p_low[i] >= vec[i] - eps && rep()*stat[i] < 0)
       {
-         p_low[i] = vec[i] - double(mult);
+         p_low[i] = vec[i] - Real(mult);
          l_theShift -= p_low[i] - l;
       }
    }
@@ -396,7 +397,7 @@ double SoPlex::perturbMax(
       {
          if (u != l && vec[i] >= u - eps && rep()*stat[i] < 0)
          {
-            p_up[i] = vec[i] + double(mult);
+            p_up[i] = vec[i] + Real(mult);
             l_theShift += p_up[i] - u;
          }
       }
@@ -404,7 +405,7 @@ double SoPlex::perturbMax(
       {
          if (u != l && vec[i] <= l + eps && rep()*stat[i] < 0)
          {
-            p_low[i] = vec[i] - double(mult);
+            p_low[i] = vec[i] - Real(mult);
             l_theShift -= p_low[i] - l;
          }
       }
@@ -449,8 +450,8 @@ void SoPlex::unShift(void)
    if (isInitialized())
    {
       int i;
-      double t_up, t_low;
-      double eps = delta();
+      Real t_up, t_low;
+      Real eps = delta();
       const SPxBasis::Desc& ds = desc();
 
       theShift = 0;

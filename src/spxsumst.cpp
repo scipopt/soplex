@@ -13,10 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsumst.cpp,v 1.3 2001/12/04 19:28:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsumst.cpp,v 1.4 2002/01/19 18:59:17 bzfkocht Exp $"
 
 #include <iostream>
 
+#include "real.h"
 #include "spxsumst.h"
 #include "vector.h"
 
@@ -27,18 +28,18 @@ void SPxSumST::setupWeights(SoPlex& base)
 {
    int count;
    int i;
-   double x;
+   Real x;
    DVector work, delta, rowLen;
 
    rowLen.reDim(base.nCols());
    work.reDim (base.nCols());
    delta.reDim (base.nCols());
 
-   double* wrk = work.get_ptr();
-   const double* lhs = base.lhs().get_const_ptr();
-   const double* rhs = base.rhs().get_const_ptr();
-   const double* up = base.upper().get_const_ptr();
-   const double* low = base.lower().get_const_ptr();
+   Real* wrk = work.get_ptr();
+   const Real* lhs = base.lhs().get_const_ptr();
+   const Real* rhs = base.rhs().get_const_ptr();
+   const Real* up = base.upper().get_const_ptr();
+   const Real* low = base.lower().get_const_ptr();
 
    for (i = base.nRows(); --i >= 0;)
    {

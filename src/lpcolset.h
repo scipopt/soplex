@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcolset.h,v 1.10 2002/01/19 16:05:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpcolset.h,v 1.11 2002/01/19 18:59:16 bzfkocht Exp $"
 
 /**@file  lpcolset.h
  * @brief Set of LP columns.
@@ -23,6 +23,7 @@
 
 #include <assert.h>
 
+#include "real.h"
 #include "lpcol.h"
 #include "dvector.h"
 #include "svset.h"
@@ -79,23 +80,23 @@ public:
    }
 
    ///
-   double obj(int i) const
+   Real obj(int i) const
    {
       return object[i];
    }
    /// returns #obj%jective value of \p i 'th #LPCol in #LPColSet.
-   double& obj(int i)
+   Real& obj(int i)
    {
       return object[i];
    }
 
    ///
-   double obj(const DataKey& k) const
+   Real obj(const DataKey& k) const
    {
       return object[number(k)];
    }
    /// returns #obj%jective value of #LPCol with #DataKey \p k in #LPColSet.
-   double& obj(const DataKey& k)
+   Real& obj(const DataKey& k)
    {
       return object[number(k)];
    }
@@ -112,23 +113,23 @@ public:
    }
 
    ///
-   double lower(int i) const
+   Real lower(int i) const
    {
       return low[i];
    }
    /// returns #lower bound of \p i 'th #LPCol in #LPColSet.
-   double& lower(int i)
+   Real& lower(int i)
    {
       return low[i];
    }
 
    ///
-   double lower(const DataKey& k) const
+   Real lower(const DataKey& k) const
    {
       return low[number(k)];
    }
    /// returns #lower bound of #LPCol# with #DataKey \p k in #LPColSet.
-   double& lower(const DataKey& k)
+   Real& lower(const DataKey& k)
    {
       return low[number(k)];
    }
@@ -145,23 +146,23 @@ public:
    }
 
    ///
-   double upper(int i) const
+   Real upper(int i) const
    {
       return up[i];
    }
    /// returns #upper bound of \p i 'th #LPCol in #LPColSet.
-   double& upper(int i)
+   Real& upper(int i)
    {
       return up[i];
    }
 
    ///
-   double upper(const DataKey& k) const
+   Real upper(const DataKey& k) const
    {
       return up[number(k)];
    }
    /// returns #upper bound of #LPCol with #DataKey \p k in #LPColSet.
-   double& upper(const DataKey& k)
+   Real& upper(const DataKey& k)
    {
       return up[number(k)];
    }
@@ -230,17 +231,17 @@ public:
    }
 
    ///
-   void add(double pobj, double plower, const SVector& pcolVector, double pupper)
+   void add(Real pobj, Real plower, const SVector& pcolVector, Real pupper)
    {
       DataKey k;
       add(k, pobj, plower, pcolVector, pupper);
    }
    /// adds #LPCol consisting of objective value \p obj, lower bound \p lower, column vector \p colVector and upper bound \p upper to #LPColSet.
    void add (DataKey& key,
-             double obj,
-             double lower,
+             Real obj,
+             Real lower,
              const SVector& colVector,
-             double upper);
+             Real upper);
 
    ///
    void add(const LPColSet& set);
@@ -248,24 +249,24 @@ public:
    void add(DataKey key[], const LPColSet& set);
 
    ///
-   void add2(const DataKey& k, int n, int idx[], double val[])
+   void add2(const DataKey& k, int n, int idx[], Real val[])
    {
       SVSet::add2(colVector_w(k), n, idx, val);
    }
    /// adds \p n nonzero (\p idx, \p val)-pairs to \p i 'th #colVector.
-   void add2(int i, int n, int idx[], double val[])
+   void add2(int i, int n, int idx[], Real val[])
    {
       SVSet::add2(colVector_w(i), n, idx, val);
    }
 
    ///
-   SVector& create(int pnonzeros = 0, double pobj = 1, double plw = 0, double pupp = 1)
+   SVector& create(int pnonzeros = 0, Real pobj = 1, Real plw = 0, Real pupp = 1)
    {
       DataKey k;
       return create(k, pnonzeros, pobj, plw, pupp);
    }
    /// creates new #LPCol with specified arguments and returns a reference to its column vector.
-   SVector& create(DataKey& nkey, int nonzeros = 0, double obj = 1, double low = 0, double up = 1);
+   SVector& create(DataKey& nkey, int nonzeros = 0, Real obj = 1, Real low = 0, Real up = 1);
    //@}
 
 

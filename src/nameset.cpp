@@ -13,9 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.cpp,v 1.13 2002/01/05 19:24:09 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.cpp,v 1.14 2002/01/19 18:59:16 bzfkocht Exp $"
 
 #include <string.h>
+#include "real.h"
 #include "nameset.h"
 #include "spxalloc.h"
 
@@ -257,7 +258,7 @@ NameSet::NameSet(const NameSet& org)
    memPack();
 }
 
-NameSet::NameSet(int p_max, int mmax, double fac, double memFac)
+NameSet::NameSet(int p_max, int mmax, Real fac, Real memFac)
    : set(p_max)
    , hashtab(NameSetNameHashFunction, set.max(), 0, fac)
    , factor(fac)

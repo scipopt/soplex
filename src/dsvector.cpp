@@ -13,11 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dsvector.cpp,v 1.10 2002/01/19 13:06:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dsvector.cpp,v 1.11 2002/01/19 18:59:15 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
+#include "real.h"
 #include "dsvector.h"
 #include "spxalloc.h"
 #include "message.h"
@@ -48,7 +49,7 @@ DSVector& DSVector::operator=(const Vector& vec)
    return *this;
 }
 
-DSVector& DSVector::assign(const Vector& vec, double eps)
+DSVector& DSVector::assign(const Vector& vec, Real eps)
 {
    clear();
    setMax(vec.dim());

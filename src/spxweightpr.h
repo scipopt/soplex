@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightpr.h,v 1.7 2002/01/12 11:41:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightpr.h,v 1.8 2002/01/19 18:59:18 bzfkocht Exp $"
 
 /**@file  spxweightpr.h
  * @brief Weighted pricing.
@@ -21,6 +21,7 @@
 #ifndef _SPXWEIGHTPR_H_
 #define _SPXWEIGHTPR_H_
 
+#include "real.h"
 #include "spxpricer.h"
 
 namespace soplex
@@ -46,10 +47,10 @@ private:
    DVector rPenalty;               // row    penalties
    DVector leavePenalty;           // penalties for leaveing alg
 
-   const double* coPenalty;
-   const double* penalty;
+   const Real* coPenalty;
+   const Real* penalty;
 
-   double objlength;              // length of objective vector.
+   Real objlength;              // length of objective vector.
 
    /// compute weights for columns.
    void computeCP(int start, int end);

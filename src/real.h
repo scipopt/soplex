@@ -13,56 +13,18 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxaggregatesm.h,v 1.7 2002/01/19 18:59:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: real.h,v 1.1 2002/01/19 18:59:16 bzfkocht Exp $"
 
-/**@file  spxaggregatesm.h
- * @brief LP variable aggregation.
+/**@file  real.h
+ * @brief Floating point type definition.
  */
-#ifndef _SPXAGGREGATESM_H_
-#define _SPXAGGREGATESM_H_
+#ifndef _REAL_H_
+#define _REAL_H_
 
-#include <assert.h>
+#ifdef WITH_LONG_DOUBLE
+typedef long double Real;
+#else
+typedef double Real;
+#endif
 
-#include "real.h"
-#include "spxsimplifier.h"
-
-namespace soplex
-{
-/** @brief
-    @ingroup Algo
-
-    This #SPxSimplifier does variable aggregation.
- */
-class SPxAggregateSM : public SPxSimplifier
-{
-private:
-   Real stability;   ///< stability factor, e.g. 0.01.   
-   Real maxFill;     ///< ???  
-
-   /// ???
-   int eliminate(const SVector& row, Real b);
-
-public:
-   /// Aggregate variable.
-   int simplify();
-
-   /// Undo #simplify().
-   void unsimplify();
-
-   /// objective value for unsimplified LP.
-   Real value(Real x)
-   {
-      return x + lp->spxSense()*delta;
-   }
-};
-} // namespace soplex
-#endif // _SPXAGGREGATESM_H_
-
-//-----------------------------------------------------------------------------
-//Emacs Local Variables:
-//Emacs mode:c++
-//Emacs c-basic-offset:3
-//Emacs tab-width:8
-//Emacs indent-tabs-mode:nil
-//Emacs End:
-//-----------------------------------------------------------------------------
+#endif // _REAL_H_

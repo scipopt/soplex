@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsimplifier.h,v 1.5 2002/01/19 16:05:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsimplifier.h,v 1.6 2002/01/19 18:59:17 bzfkocht Exp $"
 
 /**@file  spxsimplifier.h
  * @brief LP simplification base class.
@@ -23,6 +23,7 @@
 
 #include <assert.h>
 
+#include "real.h"
 #include "spxlp.h"
 
 namespace soplex
@@ -40,7 +41,7 @@ class SPxSimplifier
 {
 protected:
    SPxLP* lp;     ///< LP to work on.
-   double delta;  ///< Offset for the objective function.
+   Real delta;  ///< Offset for the objective function.
 
 public:
    SPxSimplifier() 
@@ -84,7 +85,7 @@ public:
     *  This method returns the value for the original LP, for a
     *  value \p x of the simplified LP.
     */
-   virtual double value(double x)
+   virtual Real value(Real x)
    {
       return x + delta;
    }

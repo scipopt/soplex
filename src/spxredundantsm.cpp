@@ -13,16 +13,17 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.8 2001/12/04 19:28:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.9 2002/01/19 18:59:17 bzfkocht Exp $"
 
 #include <iostream>
 
+#include "real.h"
 #include "spxredundantsm.h"
 #include "dataarray.h"
 
 namespace soplex
 {
-static const double eps = 1e-10;    ///< epslion for what is regarded equal.
+static const Real eps = 1e-10;    ///< epslion for what is regarded equal.
 
 int SPxRedundantSM::simplify()
 {
@@ -32,10 +33,10 @@ int SPxRedundantSM::simplify()
    int    k;
    int    upcnt;
    int    locnt;
-   double up;
-   double lo;
-   double x;
-   double y;
+   Real up;
+   Real lo;
+   Real x;
+   Real y;
    DataArray < int > rem(lp->nRows());
 
    num = 0;

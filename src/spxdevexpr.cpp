@@ -13,8 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.10 2002/01/06 21:16:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.11 2002/01/19 18:59:16 bzfkocht Exp $"
 
+#include "real.h"
 #include "spxdevexpr.h"
 #include "message.h"
 
@@ -71,17 +72,17 @@ void SPxDevexPR::setRep(SoPlex::Representation)
 
 int SPxDevexPR::selectLeave()
 {
-   double val;
+   Real val;
    return selectLeaveX(val);
 }
 
-int SPxDevexPR::selectLeaveX(double& best, int start, int incr)
+int SPxDevexPR::selectLeaveX(Real& best, int start, int incr)
 {
-   double x;
+   Real x;
 
-   const double* fTest = thesolver->fTest().get_const_ptr();
-   const double* cpen = coPenalty.get_const_ptr();
-   double bstX = 0;
+   const Real* fTest = thesolver->fTest().get_const_ptr();
+   const Real* cpen = coPenalty.get_const_ptr();
+   Real bstX = 0;
    int bstI = -1;
    int end = coPenalty.dim();
 
@@ -112,10 +113,10 @@ void SPxDevexPR::left4X(int n, SoPlex::Id id, int start, int incr)
    if (id.isValid())
    {
       int i, j;
-      double x;
-      const double* rhoVec = thesolver->fVec().delta().values();
-      double rhov_1 = 1 / rhoVec[n];
-      double beta_q = thesolver->coPvec().delta().length2()
+      Real x;
+      const Real* rhoVec = thesolver->fVec().delta().values();
+      Real rhov_1 = 1 / rhoVec[n];
+      Real beta_q = thesolver->coPvec().delta().length2()
                       * rhov_1 * rhov_1;
 
       assert(rhoVec[n] >= theeps || -rhoVec[n] >= theeps);
@@ -137,25 +138,25 @@ void SPxDevexPR::left4X(int n, SoPlex::Id id, int start, int incr)
 
 SoPlex::Id SPxDevexPR::selectEnter()
 {
-   double val;
+   Real val;
    return selectEnterX(val);
 }
 
 SoPlex::Id SPxDevexPR::selectEnterX(
-   double& best,
+   Real& best,
    int start1,
    int incr1,
    int start2,
    int incr2)
 {
-   double x;
+   Real x;
 
-   const double* test = thesolver->test().get_const_ptr();
-   const double* cTest = thesolver->coTest().get_const_ptr();
-   const double* cpen = coPenalty.get_const_ptr();
-   const double* pen = penalty.get_const_ptr();
-   double bstX1 = 0;
-   double bstX2 = 0;
+   const Real* test = thesolver->test().get_const_ptr();
+   const Real* cTest = thesolver->coTest().get_const_ptr();
+   const Real* cpen = coPenalty.get_const_ptr();
+   const Real* pen = penalty.get_const_ptr();
+   Real bstX1 = 0;
+   Real bstX2 = 0;
    int bstI1 = -1;
    int bstI2 = -1;
    int end1 = coPenalty.dim();
@@ -222,11 +223,11 @@ void SPxDevexPR::entered4X(SoPlex::Id /*id*/, int n,
 {
    if (n >= 0 && n < thesolver->dim())
    {
-      const double* pVec = thesolver->pVec().delta().values();
+      const Real* pVec = thesolver->pVec().delta().values();
       const IdxSet& pIdx = thesolver->pVec().idx();
-      const double* coPvec = thesolver->coPvec().delta().values();
+      const Real* coPvec = thesolver->coPvec().delta().values();
       const IdxSet& coPidx = thesolver->coPvec().idx();
-      double xi_p = 1 / thesolver->fVec().delta()[n];
+      Real xi_p = 1 / thesolver->fVec().delta()[n];
       int i, j;
 
       assert(thesolver->fVec().delta()[n] > thesolver->epsilon()

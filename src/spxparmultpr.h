@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxparmultpr.h,v 1.7 2002/01/12 11:41:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxparmultpr.h,v 1.8 2002/01/19 18:59:17 bzfkocht Exp $"
 
 /**@file  spxparmultpr.h
  * @brief Partial multiple pricing.
@@ -23,6 +23,7 @@
 
 #include <assert.h>
 
+#include "real.h"
 #include "spxpricer.h"
 #include "dataarray.h"
 #include "array.h"
@@ -34,7 +35,7 @@ namespace soplex
 struct SPxParMultPr_Tmp
 {
    SoPlex::Id id;
-   double test;
+   Real test;
 };
 
 /**@brief   Partial multiple pricing.

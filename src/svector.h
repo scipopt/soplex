@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.h,v 1.15 2002/01/19 13:06:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svector.h,v 1.16 2002/01/19 18:59:18 bzfkocht Exp $"
 
 /**@file  svector.h
  * @brief Sparse vectors.
@@ -25,6 +25,7 @@
 #include <assert.h>
 #include <math.h>
 
+#include "real.h"
 #include "vector.h"
 
 namespace soplex
@@ -50,7 +51,7 @@ namespace soplex
    affected.
  
    The following mathematical operations are provided by class SVector
-   (SVector \p a, \p b, \p c; double \p x): 
+   (SVector \p a, \p b, \p c; Real \p x): 
 
    <TABLE>
    <TR><TD>Operation</TD><TD>Description   </TD><TD></TD>&nbsp;</TR>
@@ -88,7 +89,7 @@ namespace soplex
          in m_elem[-1] is ugly. 
          Also there maybe a lot of memory lost due to padding the Element
          structure. A better idea seems to be 
-         class SVector { int size; int used; int* idx; double* val; };
+         class SVector { int size; int used; int* idx; Real* val; };
          which for several reason could be faster or slower.
          If SVector is changed, also DSVector and SVSet have to be modified.
 */
@@ -105,7 +106,7 @@ public:
     */
    struct Element
    {
-      double val;     ///< Value of nonzero element
+      Real val;     ///< Value of nonzero element
       int    idx;     ///< Index of nonzero element
    };
 
@@ -121,7 +122,7 @@ public:
    //@{
 
    /// append one nonzero \p (i,v).
-   void add(int i, double v)
+   void add(int i, Real v)
    {
       int n = size();
       m_elem[n].idx = i;
@@ -137,7 +138,7 @@ public:
    }
 
    /// append \p n nonzeros.
-   void add(int n, const int i[], const double v[]);
+   void add(int n, const int i[], const Real v[]);
 
    /// append \p n nonzeros.
    void add(int n, const Element e[]);
@@ -198,7 +199,7 @@ public:
    }
 
    /// get value to index \p i.
-   double operator[](int i) const
+   Real operator[](int i) const
    {
       int n = number(i);
       if (n >= 0)
@@ -235,14 +236,14 @@ public:
    }
 
    /// get reference to value of \p n 'th nonzero.
-   double& value(int n)
+   Real& value(int n)
    {
       assert(n >= 0 && n < size());
       return m_elem[n].val;
    }
 
    /// get value of \p n 'th nonzero.
-   double value(int n) const
+   Real value(int n) const
    {
       assert(n >= 0 && n < size());
       return m_elem[n].val;
@@ -253,27 +254,27 @@ public:
    /**@name Mathematical Operations */
    //@{
    /// infinity norm.
-   double maxAbs() const;
+   Real maxAbs() const;
 
    /// the absolut smalest element in the vector.
-   double minAbs() const;
+   Real minAbs() const;
 
    /// eucledian norm.
-   double length() const
+   Real length() const
    {
       return sqrt(length2());
    }
 
    /// squared eucledian norm.
-   double length2() const;
+   Real length2() const;
 
    /// scale with \p x.
-   SVector& operator*=(double x);
+   SVector& operator*=(Real x);
 
    /// inner product.
-   double operator*(const Vector& w) const
+   Real operator*(const Vector& w) const
    {
-      double x = 0;
+      Real x = 0;
       int n = size();
       Element* e = m_elem;
 
@@ -295,7 +296,7 @@ public:
    /// assignment operator from vector.
    SVector& operator=(const Vector& sv);
    /// assignment from Vector with chooseable epsilon.
-   SVector& assign(const Vector& vec, double eps = 1e-12);
+   SVector& assign(const Vector& vec, Real eps = 1e-12);
 
    /// consistency check.
    bool isConsistent() const;
@@ -355,7 +356,7 @@ public:
  *  the cross dependencys of Vector and SVector.
  * @todo Can we move this function to a better place?
  */
-inline Vector& Vector::multAdd(double x, const SVector& vec)
+inline Vector& Vector::multAdd(Real x, const SVector& vec)
 {
    assert(vec.dim() <= dim());
 

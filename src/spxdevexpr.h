@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.h,v 1.9 2002/01/12 11:41:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.h,v 1.10 2002/01/19 18:59:17 bzfkocht Exp $"
 
 /**@file  spxdevexpr.h
  * @brief Devex pricer.
@@ -23,6 +23,7 @@
 
 #include <assert.h>
 
+#include "real.h"
 #include "spxpricer.h"
 
 namespace soplex
@@ -44,16 +45,16 @@ namespace soplex
 class SPxDevexPR : public SPxPricer
 {
 private:
-   double  last;           ///< penalty, selected at last iteration.
+   Real  last;           ///< penalty, selected at last iteration.
    DVector penalty;        ///< vector of pricing penalties.
    DVector coPenalty;      ///< vector of pricing penalties.
 
    ///
-   int selectLeaveX(double& best, int start = 0, int incr = 1);
+   int selectLeaveX(Real& best, int start = 0, int incr = 1);
    ///
    void left4X(int n, SoPlex::Id id, int start, int incr);
    ///
-   SoPlex::Id selectEnterX(double& best, 
+   SoPlex::Id selectEnterX(Real& best, 
       int start1 = 0, int incr1 = 1, int start2 = 0, int incr2 = 1);
    ///
    void entered4X(SoPlex::Id id, int n, 

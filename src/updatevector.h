@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: updatevector.h,v 1.6 2002/01/19 16:05:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: updatevector.h,v 1.7 2002/01/19 18:59:18 bzfkocht Exp $"
 
 /**@file  updatevector.h
  * @brief Dense vector with semi-sparse vector for updates
@@ -25,6 +25,7 @@
 #include <assert.h>
 
 
+#include "real.h"
 #include "dvector.h"
 #include "ssvector.h"
 
@@ -50,17 +51,17 @@ namespace soplex
 */
 class UpdateVector : public DVector
 {
-   double theval;        ///< update multiplicator 
+   Real theval;        ///< update multiplicator 
    SSVector thedelta;    ///< update vector
 
 public:
    /// update multiplicator \f$\alpha\f$, writeable
-   double& value()
+   Real& value()
    {
       return theval;
    }
    /// update multiplicator \f$\alpha\f$
-   double value() const
+   Real value() const
    {
       return theval;
    }
@@ -126,7 +127,7 @@ public:
    UpdateVector& operator=(const UpdateVector& rhs);
 
    /// default constructor.
-   UpdateVector(int p_dim /*=0*/, double p_eps /*=1e-16*/)
+   UpdateVector(int p_dim /*=0*/, Real p_eps /*=1e-16*/)
       : DVector (p_dim)
       , theval (0)
       , thedelta(p_dim, p_eps)

@@ -13,16 +13,17 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idlist.h,v 1.12 2002/01/10 13:34:49 bzfpfend Exp $"
+#pragma ident "@(#) $Id: idlist.h,v 1.13 2002/01/19 18:59:15 bzfkocht Exp $"
 
 /**@file  idlist.h
- * @brief Generic double linked list.
+ * @brief Generic Real linked list.
  */
 #ifndef _IDLIST_H_
 #define _IDLIST_H_
 
 #include <assert.h>
 
+#include "real.h"
 #include "islist.h"
 
 namespace soplex
@@ -90,10 +91,10 @@ public:
 };
 
 
-/**@brief   Generic double linked list.
+/**@brief   Generic Real linked list.
    @ingroup Elementary
 
-   Class #IdList implements an intrusive double linked list as a #template
+   Class #IdList implements an intrusive Real linked list as a #template
    class.  As such, the list elements must provide the links themselfs. For
    conveniance, we also provide class #IdElement that adds both links to an
    arbitrary class as #template parameter.

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.h,v 1.13 2002/01/19 16:05:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.h,v 1.14 2002/01/19 18:59:18 bzfkocht Exp $"
 
 /**@file  svset.h
  * @brief Set of sparse vectors.
@@ -24,6 +24,7 @@
 
 #include <assert.h>
 
+#include "real.h"
 #include "svector.h"
 #include "dataset.h"
 #include "dataarray.h"
@@ -72,7 +73,7 @@ private:
       SVectors is implemented by by a DataSet<DLPSV>, the keys used
       externally are DataKey%s.
 
-      The management of nonzeros is done by a double linked list
+      The management of nonzeros is done by a Real linked list
       IdList<DLPSV>, where the SVector%s are kept in the order their
       indices occurr in the DataArray. The SVector%s are kept without
       holes: If one is removed or moved to the end, the SVector
@@ -149,14 +150,14 @@ public:
    /** If the SVSet runs out of vector memory, it is enlareged by
        \p factor.
     */
-   double factor;
+   Real factor;
 
    /// Nonzero element memory enlargment factor.
    /** If the SVSet runs out of nonzero memory it is enlareged by a
        memFactor.
-       @todo Should memFactor really be a double& instead of a plain double in svset?
+       @todo Should memFactor really be a Real& instead of a plain Real in svset?
     */
-   double& memFactor;
+   Real& memFactor;
    //@}
    
 
@@ -238,7 +239,7 @@ public:
     *  automatically enlarged within the %set.
     * @pre \p svec must be an SVector of the SVSet. 
     */
-   void add2(SVector &svec, int idx, double val);
+   void add2(SVector &svec, int idx, Real val);
 
    /// Add \p n nonzeros to \p svec of this SVSet.
    /**  Adds \p n nonzeros to SVector \p svec in the SVSet. If \p svec is not large
@@ -246,7 +247,7 @@ public:
     *  enlarged within the %set.
     * @pre \p svec must be an SVector of the SVSet. 
     */
-   void add2(SVector &svec, int n, const int idx[], const double val[]);
+   void add2(SVector &svec, int n, const int idx[], const Real val[]);
    //@}
 
 
@@ -448,8 +449,8 @@ public:
    /// default constructor.
    SVSet(int pmax = -1,
          int pmemmax = -1,
-         double pfac = 1.1,
-         double pmemFac = 1.2)
+         Real pfac = 1.1,
+         Real pmemFac = 1.2)
       : DataArray < SVector::Element >
          (0, (pmemmax > 0) ? pmemmax : 8 * ((pmax > 0) ? pmax : 8), pmemFac)
          , set ((pmax > 0) ? pmax : 8)

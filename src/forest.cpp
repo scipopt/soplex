@@ -13,10 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: forest.cpp,v 1.10 2001/12/28 14:55:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: forest.cpp,v 1.11 2002/01/19 18:59:15 bzfkocht Exp $"
 
 #include <assert.h>
 
+#include "real.h"
 #include "clufactor.h"
 #include "cring.h"
 #include "spxalloc.h"
@@ -37,7 +38,7 @@ namespace soplex
  */
 #define TOOSMALL 1e-12
 
-static const double verySparseFactor = 0.001;
+static const Real verySparseFactor = 0.001;
 
 /*****************************************************************************/
 static void enQueueMin(int* heap, int* size, int elem)
@@ -125,7 +126,7 @@ void CLUFactor::forestPackColumns()
    int n, i, j, colno;
    Dring *ring, *list;
 
-   double *cval = u.col.val;
+   Real *cval = u.col.val;
    int *cidx = u.col.idx;
    int *clen = u.col.len;
    int *cmax = u.col.max;
@@ -207,7 +208,7 @@ void CLUFactor::forestReMaxCol(int p_col, int len)
    {
       int i, j, k;
       int *idx;
-      double *val;
+      Real *val;
       Dring *ring;
 
       if (len > u.col.size - u.col.used)
@@ -244,23 +245,23 @@ void CLUFactor::forestReMaxCol(int p_col, int len)
 /*****************************************************************************/
 
 
-void CLUFactor::forestUpdate(int p_col, double* p_work, int num, int *nonz)
+void CLUFactor::forestUpdate(int p_col, Real* p_work, int num, int *nonz)
 {
    int i, j, k, h, m, n;
    int ll, c, r, rowno;
-   double x;
+   Real x;
 
-   double *lval;
+   Real *lval;
    int *lidx;
    int *lbeg = l.start;
 
-   double *cval = u.col.val;
+   Real *cval = u.col.val;
    int *cidx = u.col.idx;
    int *cmax = u.col.max;
    int *clen = u.col.len;
    int *cbeg = u.col.start;
 
-   double *rval = u.row.val;
+   Real *rval = u.row.val;
    int *ridx = u.row.idx;
    int *rmax = u.row.max;
    int *rlen = u.row.len;
@@ -271,7 +272,7 @@ void CLUFactor::forestUpdate(int p_col, double* p_work, int num, int *nonz)
    int *cperm = col.perm;
    int *corig = col.orig;
 
-   double l_maxabs = maxabs;
+   Real l_maxabs = maxabs;
    int dim = thedim;
 
    /*  Remove column col form U
@@ -486,7 +487,7 @@ void CLUFactor::forestUpdate(int p_col, double* p_work, int num, int *nonz)
             for (; j < m; ++j)
             {
                int jj = ridx[j];
-               double y = p_work[jj];
+               Real y = p_work[jj];
                if (y == 0)
                   enQueueMin(nonz, &num, cperm[jj]);
                y -= x * rval[j];

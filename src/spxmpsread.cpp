@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.11 2002/01/13 13:37:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.12 2002/01/19 18:59:17 bzfkocht Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.
@@ -22,6 +22,7 @@
 #include <string.h>
 #include <iostream>
 
+#include "real.h"
 #include "spxlp.h"
 #include "mpsinput.h"
 
@@ -195,7 +196,7 @@ static void readCols(
    NameSet&  cnames,
    DIdxSet*  intvars)
 {
-   double   val;
+   Real   val;
    int      idx;
    char     colname[MPSInput::MAX_LINE_LEN] = { '\0' };
    LPCol    col(rset.num());
@@ -287,7 +288,7 @@ static void readRhs(
 {
    char   rhsname[MPSInput::MAX_LINE_LEN] = { '\0' };
    int    idx;
-   double val;
+   Real val;
 
    while(mps.readLine())
    {
@@ -356,7 +357,7 @@ static void readRanges(
 {
    char   rngname[MPSInput::MAX_LINE_LEN] = { '\0' };
    int    idx;
-   double val;
+   Real val;
 
    while(mps.readLine())
    {
@@ -440,7 +441,7 @@ static void readBounds(
 {
    char   bndname[MPSInput::MAX_LINE_LEN] = { '\0' };
    int    idx;
-   double val;
+   Real val;
 
    while(mps.readLine())
    {

@@ -13,12 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.16 2002/01/19 16:05:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.17 2002/01/19 18:59:16 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 #include <math.h>
 
+#include "real.h"
 #include "spxbasis.h"
 #include "didxset.h"
 #include "dvector.h"
@@ -28,7 +29,7 @@
 
 namespace soplex
 {
-static double minStab;
+static Real minStab;
 #define EPS     minStab
 //#define       EPS     1e-6
 
@@ -294,9 +295,9 @@ int SPxBasis::doFactorize()
    if (nonzeroFactor < 0)
       return (updateCount >= -nonzeroFactor);
 
-   double newFac = nzFac + factor->memory();
-   double neu = (newFac + lastFill * nzCount) / (updateCount + 1);
-   double alt = (nzFac + lastFill * nzCount) / updateCount;
+   Real newFac = nzFac + factor->memory();
+   Real neu = (newFac + lastFill * nzCount) / (updateCount + 1);
+   Real alt = (nzFac + lastFill * nzCount) / updateCount;
 
    return (updateCount >= maxUpdates || neu > alt);
 }
@@ -343,12 +344,12 @@ void SPxBasis::change
 
       ++iterCount;
       ++updateCount;
-      double newFac = nzFac + factor->memory();
+      Real newFac = nzFac + factor->memory();
       if (doFactorize())
          factorize();
       else
       {
-         // double    s = factor->stability();
+         // Real    s = factor->stability();
          factor->change(i, *enterVec, eta);
          if (factor->status() != SLinSolver::OK
               || factor->stability() < EPS)
@@ -394,7 +395,7 @@ void SPxBasis::factorize()
       abort();
       // factorized = false;
    }
-   lastFill = double(factor->memory()) * nonzeroFactor / double(nzCount);
+   lastFill = Real(factor->memory()) * nonzeroFactor / Real(nzCount);
    nzFac = 0;
 }
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datahashtable.h,v 1.11 2002/01/05 19:24:09 bzfkocht Exp $"
+#pragma ident "@(#) $Id: datahashtable.h,v 1.12 2002/01/19 18:59:15 bzfkocht Exp $"
 
 /**@file  datahashtable.h
  * @brief Generic hash table for data objects.
@@ -24,6 +24,7 @@
 #include <iostream>
 #include <assert.h>
 
+#include "real.h"
 #include "message.h"
 
 namespace soplex
@@ -102,7 +103,7 @@ private:
    int (*hashval) (const HashItem*);  
 
    /// memory is #reMax()%ed by this factor, if a new element does't fit
-   double factor;  
+   Real factor;  
 
    mutable int theCurrent; ///< index for iterator
    
@@ -414,7 +415,7 @@ public:
     *  @param incr         factor for increasing data block.
     */
    DataHashTable(int (*f)(const HashItem*), 
-      int nel = 256, int hashsze = 0, double incr = 2.0)
+      int nel = 256, int hashsze = 0, Real incr = 2.0)
       : element(nel)
       , hashval(f)
       , factor (incr)

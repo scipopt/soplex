@@ -13,10 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxrem1sm.cpp,v 1.6 2001/12/04 19:28:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxrem1sm.cpp,v 1.7 2002/01/19 18:59:17 bzfkocht Exp $"
 
 #include <iostream>
 
+#include "real.h"
 #include "spxrem1sm.h"
 #include "dataarray.h"
 
@@ -25,7 +26,7 @@ namespace soplex
 int SPxRem1SM::simplify()
 {
    int cont, num, j, i;
-   double up, lo, x;
+   Real up, lo, x;
    DataArray < int > rem;
 
    do
