@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.32 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.33 2003/01/10 12:46:14 bzfkocht Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -72,6 +72,7 @@ class SPxLP : protected LPRowSet, protected LPColSet
    friend class SPxBasis;
    friend class SPxScaler;
    friend class SPxEquiliSC;
+   friend class SPxGeometSC;
    friend class SPxIntervalSM;
 
    /// output operator.

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxrem1sm.cpp,v 1.15 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxrem1sm.cpp,v 1.16 2003/01/10 12:46:14 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -25,27 +25,27 @@
 
 namespace soplex
 {
-Real SPxRem1SM::epsilonSimplifier() const
+static Real maxAbs(Real a, Real b)
 {
-   return 1e-14;
+   return fabs(a) > fabs(b) ? fabs(a) : fabs(b);
 }
 
 void SPxRem1SM::fixColumn(SPxLP& lp, int i)
 {
    METHOD( "SPxRem1SM::fixColumn" );
 
-   assert(EQ(lp.lower(i), lp.upper(i), epsilonSimplifier()));
+   assert(EQ(lp.lower(i), lp.upper(i), deltaBnd()));
 
-   Real x = lp.upper(i);
+   Real x = lp.lower(i);
 
    VERBOSE3({ std::cout << "Fixed column " << i 
                         << " lower= " << std::setprecision(16) << lp.lower(i)
                         << " upper= " << std::setprecision(16) << lp.upper(i)
                         << std::endl; });
 
-   pval.add(cperm[i], x);
+   m_pval.add(m_cperm[i], x);
    
-   if (isNotZero(x, epsilonSimplifier()))
+   if (isNotZero(x, epsZero()))
    {
       const SVector& col = lp.colVector(i);
 
@@ -56,10 +56,10 @@ void SPxRem1SM::fixColumn(SPxLP& lp, int i)
          if (lp.rhs(k) < infinity)
          {
             Real y     = x * col.value(j);
-            Real scale = fabs(lp.rhs(k)) > fabs(y) ? fabs(lp.rhs(k)) : fabs(y);
+            Real scale = maxAbs(lp.rhs(k), y);
             Real rhs   = (lp.rhs(k) / scale) - (y / scale);
                   
-            if (isZero(rhs, epsilonSimplifier()))
+            if (isZero(rhs, epsZero()))
                rhs = 0.0;
             else
                rhs *= scale;
@@ -75,10 +75,10 @@ void SPxRem1SM::fixColumn(SPxLP& lp, int i)
          if (lp.lhs(k) > -infinity)
          {
             Real y     = x * col.value(j);
-            Real scale = fabs(lp.lhs(k)) > fabs(y) ? fabs(lp.lhs(k)) : fabs(y);
+            Real scale = maxAbs(lp.lhs(k), y);
             Real lhs   = (lp.lhs(k) / scale) - (y / scale);
 
-            if (isZero(lhs, epsilonSimplifier()))
+            if (isZero(lhs, epsZero()))
                lhs = 0.0;
             else
                lhs *= scale;
@@ -119,7 +119,7 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
          
          // std::cout << "\t\tx= " << x << " lower= " << lp.lower(k) << " upper= " << lp.upper(k) << std::endl;
 
-         assert(isNotZero(x, epsilonSimplifier()));
+         assert(isNotZero(x, epsZero()));
 
          if (x > 0.0)
          {
@@ -147,8 +147,8 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
          }
       }
       // infeasible ?
-      if (  (LT(lp.rhs(i), lobnd, epsilonSimplifier()) && locnt == 0) 
-         || (GT(lp.lhs(i), upbnd, epsilonSimplifier()) && upcnt == 0))
+      if (  (LT(lp.rhs(i), lobnd, deltaBnd()) && locnt == 0) 
+         || (GT(lp.lhs(i), upbnd, deltaBnd()) && upcnt == 0))
       {
          VERBOSE3({ std::cout << "infeasible row " << i 
                               << " lo= " << lobnd
@@ -159,10 +159,10 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
          return INFEASIBLE;
       }
       // forcing equality constraint ?
-      if (EQ(lp.lhs(i), lp.rhs(i), epsilonSimplifier()))
+      if (EQ(lp.lhs(i), lp.rhs(i), deltaBnd()))
       {
          // all fixed on upper bound ?
-         if (upcnt == 0 && EQ(lp.rhs(i), upbnd, epsilonSimplifier()))
+         if (upcnt == 0 && EQ(lp.rhs(i), upbnd, deltaBnd()))
          {
             VERBOSE3({ std::cout << "\trhs fixed on upbnd row " << i
                                  << " rhs= " << lp.rhs(i)
@@ -174,7 +174,7 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
                Real x = row.value(j);
                int  k = row.index(j);
 
-               assert(isNotZero(x, epsilonSimplifier()));
+               assert(isNotZero(x, epsZero()));
                assert(GE(lp.lower(k), 0.0) || LE(lp.upper(k), 0.0));
 
                if (x > 0.0 && GE(lp.lower(k), 0.0))
@@ -187,7 +187,7 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
             continue;
          }
          // all fixed on lower bound ?
-         if (locnt == 0 && EQ(lp.lhs(i), lobnd, epsilonSimplifier()))
+         if (locnt == 0 && EQ(lp.lhs(i), lobnd, deltaBnd()))
          {
             VERBOSE3({ std::cout << "\trhs fixed on lowbnd row " << i
                                  << " lhs= " << lp.lhs(i)
@@ -199,7 +199,7 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
                Real x = row.value(j);
                int  k = row.index(j);
 
-               assert(isNotZero(x, epsilonSimplifier()));
+               assert(isNotZero(x, epsZero()));
                assert(GE(lp.lower(k), 0.0) || LE(lp.upper(k), 0.0));
 
                if (x > 0.0 && GE(lp.lower(k), 0.0))
@@ -214,7 +214,7 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
       }
 
       // redundant rhs ?
-      if (lp.rhs(i) <=  infinity && upcnt == 0 && GE(lp.rhs(i), upbnd, epsilonSimplifier()))
+      if (lp.rhs(i) <=  infinity && upcnt == 0 && GE(lp.rhs(i), upbnd, deltaBnd()))
       {
          VERBOSE3({ std::cout << "\tredundant rhs row " << i
                               << " rhs= " << lp.rhs(i)
@@ -224,7 +224,7 @@ SPxSimplifier::Result SPxRem1SM::redundantRows(SPxLP& lp, bool& again)
          lp.changeRhs(i, infinity);
       }
       // redundant lhs ?
-      if (lp.lhs(i) >= -infinity && locnt == 0 && LE(lp.lhs(i), lobnd, epsilonSimplifier()))
+      if (lp.lhs(i) >= -infinity && locnt == 0 && LE(lp.lhs(i), lobnd, deltaBnd()))
       {
          VERBOSE3({ std::cout << "\tredundant lhs row " << i
                               << " lhs= " << lp.lhs(i)
@@ -462,7 +462,7 @@ SPxSimplifier::Result SPxRem1SM::redundantCols(SPxLP& lp, bool& again)
 
       const SVector& col = lp.colVector(i);
 
-      if (NE(lp.upper(i), lp.lower(i), epsilonSimplifier()))
+      if (NE(lp.upper(i), lp.lower(i), deltaBnd()))
       {
          // test if all coefficents are going in one direction
          int upcnt = 0;
@@ -476,7 +476,7 @@ SPxSimplifier::Result SPxRem1SM::redundantCols(SPxLP& lp, bool& again)
             x = col.value(j);
             k = col.index(j);
 
-            assert(isNotZero(x, epsilonSimplifier()));
+            assert(isNotZero(x));
 
             if (x > 0.0)
             {
@@ -493,7 +493,7 @@ SPxSimplifier::Result SPxRem1SM::redundantCols(SPxLP& lp, bool& again)
 
          // max -3 x
          // s.t. 5 x <= 8
-         if (locnt == 0 && LT(x, 0.0, epsilonSimplifier()))
+         if (locnt == 0 && LT(x, 0.0, epsZero()))
          {
             if (lp.lower(i) <= -infinity)
                return UNBOUNDED;           // LP is unbounded
@@ -502,14 +502,14 @@ SPxSimplifier::Result SPxRem1SM::redundantCols(SPxLP& lp, bool& again)
          }
          // max  3 x
          // s.t. 5 x >= 8
-         else if (upcnt == 0 && GT(x, 0.0, epsilonSimplifier()))
+         else if (upcnt == 0 && GT(x, 0.0, epsZero()))
          {
             if (lp.upper(i) >= infinity)
                return UNBOUNDED;           // LP is unbounded
 
             lp.changeLower(i, lp.upper(i));
          }
-         else if (isZero(x, epsilonSimplifier()))
+         else if (isZero(x, epsZero()))
          {
             //TODO free variable with zero objective can be removed, or?
             //see simpleCols
@@ -550,7 +550,7 @@ SPxSimplifier::Result SPxRem1SM::redundantCols(SPxLP& lp, bool& again)
          }
       }
       // remove fixed variables
-      if (EQ(lp.lower(i), lp.upper(i), epsilonSimplifier()))
+      if (EQ(lp.lower(i), lp.upper(i), deltaBnd()))
       {
          fixColumn(lp, i);
          rem[i] = -1;
@@ -577,7 +577,7 @@ SPxSimplifier::Result SPxRem1SM::simpleRows(SPxLP& lp, bool& again)
       rem[i]             = 0;
 
       // infeasible range row
-      if (LT(lp.rhs(i), lp.lhs(i), epsilonSimplifier()))
+      if (LT(lp.rhs(i), lp.lhs(i), deltaBnd()))
       {
          VERBOSE3({ std::cout << "Infeasible row " << i 
                               <<"  lhs= " << lp.lhs(i) 
@@ -590,7 +590,7 @@ SPxSimplifier::Result SPxRem1SM::simpleRows(SPxLP& lp, bool& again)
       {
          VERBOSE3({ std::cout << "Empty row " << i; });
 
-         if (LT(lp.rhs(i), 0.0, epsilonSimplifier()) || GT(lp.lhs(i), 0.0, epsilonSimplifier()))
+         if (LT(lp.rhs(i), 0.0, deltaBnd()) || GT(lp.lhs(i), 0.0, deltaBnd()))
          {
             VERBOSE3({ std::cout << " infeasible lhs= " << lp.lhs(i) 
                                  << " rhs= " << lp.rhs(i) << std::endl; });
@@ -624,17 +624,17 @@ SPxSimplifier::Result SPxRem1SM::simpleRows(SPxLP& lp, bool& again)
                               << " lhs= " << lp.lhs(i) 
                               << " rhs= " << lp.rhs(i); });
 
-         if (GT(x, 0.0, epsilonSimplifier()))           // x > 0
+         if (GT(x, 0.0, epsZero()))           // x > 0
          {
             up = (lp.rhs(i) >=  infinity) ?  infinity : (lp.rhs(i) / x);
             lo = (lp.lhs(i) <= -infinity) ? -infinity : (lp.lhs(i) / x);
          }
-         else if (LT(x, 0.0, epsilonSimplifier()))      // x < 0
+         else if (LT(x, 0.0, epsZero()))      // x < 0
          {
             lo = (lp.rhs(i) >=  infinity) ? -infinity : (lp.rhs(i) / x);
             up = (lp.lhs(i) <= -infinity) ?  infinity : (lp.lhs(i) / x);
          }
-         else if (LT(lp.rhs(i), 0.0, epsilonSimplifier()) || GT(lp.lhs(i), 0.0, epsilonSimplifier()))  
+         else if (LT(lp.rhs(i), 0.0, deltaBnd()) || GT(lp.lhs(i), 0.0, deltaBnd()))  
          {
             // x == 0 rhs/lhs != 0
             VERBOSE3({ std::cout << " infeasible" << std::endl; });
@@ -649,9 +649,9 @@ SPxSimplifier::Result SPxRem1SM::simpleRows(SPxLP& lp, bool& again)
          rem[i] = -1;
          num++;
          
-         if (isZero(lo, epsilonSimplifier()))
+         if (isZero(lo, epsZero()))
             lo = 0.0;
-         if (isZero(up, epsilonSimplifier()))
+         if (isZero(up, epsZero()))
             up = 0.0;
          
          assert(LE(lp.lower(j), lp.upper(j)));
@@ -662,12 +662,12 @@ SPxSimplifier::Result SPxRem1SM::simpleRows(SPxLP& lp, bool& again)
                               << " upper= " << lp.upper(j)
                               << std::endl; });
 
-         if (LT(up, lp.upper(j), epsilonSimplifier()))
+         if (LT(up, lp.upper(j), epsZero()))
             lp.changeUpper(j, up);
-         if (GT(lo, lp.lower(j), epsilonSimplifier()))
+         if (GT(lo, lp.lower(j), epsZero()))
             lp.changeLower(j, lo);
 
-         assert(LE(lp.lower(j), lp.upper(j), epsilonSimplifier()));
+         assert(LE(lp.lower(j), lp.upper(j), epsZero()));
       }
    }
    again = removeRows(lp, rem, num, "simpleRows");
@@ -697,7 +697,7 @@ SPxSimplifier::Result SPxRem1SM::simpleCols(SPxLP& lp, bool& again)
                               << " lower= " << lp.lower(i)
                               << " upper= " << lp.upper(i); });
 
-         if (GT(lp.maxObj(i), 0.0, epsilonSimplifier()))
+         if (GT(lp.maxObj(i), 0.0, epsZero()))
          {
             if (lp.upper(i) >= infinity)
             {
@@ -705,9 +705,9 @@ SPxSimplifier::Result SPxRem1SM::simpleCols(SPxLP& lp, bool& again)
 
                return UNBOUNDED;
             }
-            pval.add(cperm[i], lp.upper(i));
+            m_pval.add(m_cperm[i], lp.upper(i));
          }
-         else if (LT(lp.maxObj(i), 0.0, epsilonSimplifier()))
+         else if (LT(lp.maxObj(i), 0.0, epsZero()))
          {
             if (lp.lower(i) <= -infinity)
             {
@@ -715,18 +715,18 @@ SPxSimplifier::Result SPxRem1SM::simpleCols(SPxLP& lp, bool& again)
 
                return UNBOUNDED;
             }
-            pval.add(cperm[i], lp.lower(i));
+            m_pval.add(m_cperm[i], lp.lower(i));
          }
          else 
          {
-            assert(isZero(lp.maxObj(i), epsilonSimplifier()));
+            assert(isZero(lp.maxObj(i), epsZero()));
             // any value within the bounds is ok
             if (lp.lower(i) > -infinity)
-               pval.add(cperm[i], lp.lower(i));
+               m_pval.add(m_cperm[i], lp.lower(i));
             else if (lp.upper(i) < infinity)
-               pval.add(cperm[i], lp.upper(i));
+               m_pval.add(m_cperm[i], lp.upper(i));
             else
-               pval.add(cperm[i], 0.0);
+               m_pval.add(m_cperm[i], 0.0);
          }
          VERBOSE3({ std::cout << " removed" << std::endl; });
 
@@ -736,7 +736,7 @@ SPxSimplifier::Result SPxRem1SM::simpleCols(SPxLP& lp, bool& again)
       }
 
       // infeasible bounds ?
-      if (GT(lp.lower(i), lp.upper(i), epsilonSimplifier()))
+      if (GT(lp.lower(i), lp.upper(i), deltaBnd()))
       {
          VERBOSE3({ std::cout << "Infeasible bounds column " << i 
                               << " lower= " << lp.lower(i)
@@ -745,7 +745,7 @@ SPxSimplifier::Result SPxRem1SM::simpleCols(SPxLP& lp, bool& again)
          return INFEASIBLE;
       }
       // Fixed column ?
-      if (EQ(lp.lower(i), lp.upper(i), epsilonSimplifier()))
+      if (EQ(lp.lower(i), lp.upper(i), deltaBnd()))
       {
          fixColumn(lp, i);
          rem[i] = -1;
@@ -764,7 +764,8 @@ SPxSimplifier::Result SPxRem1SM::simpleCols(SPxLP& lp, bool& again)
             // max -3 x
             // s.t. 5 x <= 8
             // l <= x
-            if (lp.lhs(j) <= -infinity && lp.rhs(j) < infinity && LE(lp.maxObj(i), 0.0) && lp.lower(i) > -infinity)
+            if (lp.lhs(j) <= -infinity && lp.rhs(j) < infinity && LE(lp.maxObj(i), 0.0, epsZero()) 
+               && lp.lower(i) > -infinity)
             {
                lp.changeUpper(i, lp.lower(i));
                fixColumn(lp, i);
@@ -775,7 +776,8 @@ SPxSimplifier::Result SPxRem1SM::simpleCols(SPxLP& lp, bool& again)
             // max  3 x
             // s.t. 5 x >= 8
             // x <= u
-            if (lp.lhs(j) > -infinity && lp.rhs(j) >= infinity && GE(lp.maxObj(i), 0.0) && lp.upper(i) < infinity)
+            if (lp.lhs(j) > -infinity && lp.rhs(j) >= infinity && GE(lp.maxObj(i), 0.0, epsZero()) 
+               && lp.upper(i) < infinity)
             {
                lp.changeLower(i, lp.upper(i));
                fixColumn(lp, i);
@@ -855,14 +857,14 @@ bool SPxRem1SM::removeRows(SPxLP& lp, DataArray<int>& rem, int num, const char* 
 
    lp.removeRows(rem.get_ptr());
 
-   DataArray<int> tmp(rperm);
+   DataArray<int> tmp(m_rperm);
       
    for(i = 0; i < rem.size(); ++i)
       if (rem[i] >= 0)
-         rperm[rem[i]] = tmp[i];
+         m_rperm[rem[i]] = tmp[i];
    
    for(i = lp.nRows(); i < lp.nRows() + num; ++i)
-      rperm[i] = -1;
+      m_rperm[i] = -1;
    
    assert(lp.isConsistent());
    
@@ -882,14 +884,14 @@ bool SPxRem1SM::removeCols(SPxLP& lp, DataArray<int>& rem, int num, const char* 
 
    lp.removeCols(rem.get_ptr());
       
-   DataArray<int> tmp(cperm);
+   DataArray<int> tmp(m_cperm);
       
    for(i = 0; i < rem.size(); ++i)
       if (rem[i] >= 0)
-         cperm[rem[i]] = tmp[i];
+         m_cperm[rem[i]] = tmp[i];
    
    for(i = lp.nCols(); i < lp.nCols() + num; ++i)
-      cperm[i] = -1;
+      m_cperm[i] = -1;
 #if 0
      for(i = 0; i < cperm.size(); ++i)
       std::cout << i << " -> " << cperm[i] << " " << tmp[i] << " " << rem[i] << "\n";
@@ -901,7 +903,7 @@ bool SPxRem1SM::removeCols(SPxLP& lp, DataArray<int>& rem, int num, const char* 
    return true;
 }
 
-SPxSimplifier::Result SPxRem1SM::simplify(SPxLP& lp)
+SPxSimplifier::Result SPxRem1SM::simplify(SPxLP& lp, Real eps, Real delta)
 {
    Result ret;
    bool   again;
@@ -909,17 +911,20 @@ SPxSimplifier::Result SPxRem1SM::simplify(SPxLP& lp)
    bool   rragain;
    int    i;
 
-   prim.reDim(lp.nCols());
-   dual.reDim(lp.nRows());
+   m_epsilon = eps;
+   m_delta   = delta;
 
-   cperm.reSize(lp.nCols());
-   rperm.reSize(lp.nRows());
+   m_prim.reDim(lp.nCols());
+   m_dual.reDim(lp.nRows());
+
+   m_cperm.reSize(lp.nCols());
+   m_rperm.reSize(lp.nRows());
 
    for(i = 0; i < lp.nRows(); ++i)
-      rperm[i] = i;
+      m_rperm[i] = i;
 
    for(i = 0; i < lp.nCols(); ++i)
-      cperm[i] = i;
+      m_cperm[i] = i;
 
    //std::cout << lp << std::endl;
 
@@ -962,20 +967,20 @@ SPxSimplifier::Result SPxRem1SM::simplify(SPxLP& lp)
 
 const Vector& SPxRem1SM::unsimplifiedPrimal(const Vector& x)
 {
-   assert(x.dim()               <= cperm.size());
-   assert(x.dim() + pval.size() == prim.dim());
+   assert(x.dim()                 <= m_cperm.size());
+   assert(x.dim() + m_pval.size() == m_prim.dim());
 
    int i;
 
    for(i = 0; i < x.dim(); ++i)
-      prim[cperm[i]] = x[i];
+      m_prim[m_cperm[i]] = x[i];
 
-   assert(cperm.size() == x.dim() || cperm[i] < 0);
+   assert(m_cperm.size() == x.dim() || m_cperm[i] < 0);
 
-   for(i = 0; i < pval.size(); ++i)
-      prim[pval.index(i)] = pval.value(i);
+   for(i = 0; i < m_pval.size(); ++i)
+      m_prim[m_pval.index(i)] = m_pval.value(i);
 
-   return prim;
+   return m_prim;
 }
 
 const Vector& SPxRem1SM::unsimplifiedDual(const Vector& pi)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.cpp,v 1.17 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightst.cpp,v 1.18 2003/01/10 12:46:15 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 //#define TEST 1
@@ -136,7 +136,7 @@ static void setDualStatus(
 struct Compare
 {
    const SPxSolver* base;
-   const Real* weight;
+   const Real*      weight;
 
    Real operator()(int i1, int i2) const
    {
@@ -144,36 +144,45 @@ struct Compare
    }
 };
 
-static void initPrefs(DataArray < SPxId > & pref,
-                       const SPxSolver& base,
-                       const DataArray < Real > & rowWeight,
-                       const DataArray < Real > & colWeight
-                    )
+static void initPrefs(
+   DataArray<SPxId>&      pref,
+   const SPxSolver&       base,
+   const DataArray<Real>& rowWeight,
+   const DataArray<Real>& colWeight)
 {
-   int i, j, k;
-   DataArray < int > row(base.nRows());
-   DataArray < int > col(base.nCols());
+   DataArray<int> row(base.nRows());
+   DataArray<int> col(base.nCols());
+   int i;
+   int j;
+   int k;
 
    Compare compare;
    compare.base = &base;
 
-   for (i = base.nRows(); i--;)
+   for(i = 0; i < base.nRows(); ++i)
       row[i] = i;
+
    compare.weight = rowWeight.get_const_ptr();
 
    sorter_qsort(row.get_ptr(), row.size(), compare); // Sort rows
 
-   for (i = base.nCols(); i--;)
+   for(i = 0; i < base.nCols(); ++i)
       col[i] = i;
+
    compare.weight = colWeight.get_const_ptr();
 
    sorter_qsort(col.get_ptr(), col.size(), compare); // Sort column
 
-   for (i = j = k = 0; k < pref.size();)            // merge sort
+   i = 0;
+   j = 0;
+   k = 0;
+
+   while(k < pref.size())            // merge sort
    {
       if (rowWeight[row[i]] < colWeight[col[j]])
       {
          pref[k++] = base.rId(row[i++]);
+
          if (i >= base.nRows())
             while (k < pref.size())
                pref[k++] = base.cId(col[j++]);
@@ -181,6 +190,7 @@ static void initPrefs(DataArray < SPxId > & pref,
       else
       {
          pref[k++] = base.cId(col[j++]);
+
          if (j >= base.nCols())
             while (k < pref.size())
                pref[k++] = base.rId(row[i++]);
@@ -221,35 +231,43 @@ void SPxWeightST::generate(SPxSolver& base)
    DataArray < SPxId > pref(base.nRows() + base.nCols());
    initPrefs(pref, base, rowWeight, colWeight);
 
-   int i, deltai, j, sel;
-   for (i = forbidden.size(); --i >= 0;)
+   int i;
+   int deltai;
+   int j;
+   int sel;
+
+   for(i = 0; i < forbidden.size(); ++i)
       forbidden[i] = 0;
 
    if (base.rep() == SPxSolver::COLUMN)
    {
-      i = 0;
+      i      = 0;
       deltai = 1;
    }
    else
    {
-      i = pref.size() - 1;
+      i      = pref.size() - 1;
       deltai = -1;
    }
+
    {
-      int dim = base.dim();
+      int  dim = base.dim();
       Real max = 0;
 
       for (; i >= 0 && i < pref.size(); i += deltai)
       {
-         tmpId = pref[i];
+         tmpId               = pref[i];
          const SVector& bVec = base.vector(tmpId);
-         sel = -1;
+         sel                 = -1;
+
+         // column or row singleton ?
          if (bVec.size() == 1)
          {
             int idx = bVec.index(0);
+
             if (forbidden[idx] < 2)
             {
-               sel = idx;
+               sel  = idx;
                dim += (forbidden[idx] > 0);
             }
          }
@@ -258,15 +276,17 @@ void SPxWeightST::generate(SPxSolver& base)
             max = bVec.maxAbs();
 
             int best = base.nRows();
+
             for (j = bVec.size(); --j >= 0;)
             {
                Real x = bVec.value(j);
-               int k = bVec.index(j);
-               int l = base.coVector(k).size();
+               int  k = bVec.index(j);
+               int  l = base.coVector(k).size();
+
                if (!forbidden[k] && (fabs(x) > STABLE * max) && (l < best))
                {
                   best = l;
-                  sel = k;
+                  sel  = k;
                }
             }
          }
@@ -281,6 +301,7 @@ void SPxWeightST::generate(SPxSolver& base)
             });
 
             forbidden[sel] = 2;
+
             if (base.rep() == SPxSolver::COLUMN)
                setDualStatus(desc, base, pref[i]);
             else
@@ -289,8 +310,9 @@ void SPxWeightST::generate(SPxSolver& base)
             for (j = bVec.size(); --j >= 0;)
             {
                Real x = bVec.value(j);
-               int k = bVec.index(j);
-               if (!forbidden[k] && (x > EPS*max || -x > EPS*max))
+               int  k = bVec.index(j);
+
+               if (!forbidden[k] && (x > EPS * max || -x > EPS * max))
                {
                   forbidden[k] = 1;
                   --dim;
@@ -304,6 +326,7 @@ void SPxWeightST::generate(SPxSolver& base)
                {
                   for (i += deltai; i >= 0 && i < pref.size(); i += deltai)
                      setPrimalStatus(desc, base, pref[i]);
+
                   for (i = forbidden.size(); --i >= 0;)
                   {
                      if (forbidden[i] < 2)
@@ -314,6 +337,7 @@ void SPxWeightST::generate(SPxSolver& base)
                {
                   for (i += deltai; i >= 0 && i < pref.size(); i += deltai)
                      setDualStatus(desc, base, pref[i]);
+
                   for (i = forbidden.size(); --i >= 0;)
                   {
                      if (forbidden[i] < 2)
@@ -348,15 +372,13 @@ void SPxWeightST::generate(SPxSolver& base)
    for (i = pvec.dim() - 1; i >= 0; --i)
    {
       if (desc.colStatus(i) == SPxBasis::Desc::P_ON_UPPER
-           && base.lower(i) > -infinity
-           && pvec[i] > base.maxObj(i))
+         && base.lower(i) > -infinity && pvec[i] > base.maxObj(i))
       {
          changed = 1;
          desc.colStatus(i) = SPxBasis::Desc::P_ON_LOWER;
       }
       else if (desc.colStatus(i) == SPxBasis::Desc::P_ON_LOWER
-                && base.upper(i) < infinity
-                && pvec[i] < base.maxObj(i))
+         && base.upper(i) < infinity && pvec[i] < base.maxObj(i))
       {
          changed = 1;
          desc.colStatus(i) = SPxBasis::Desc::P_ON_UPPER;
@@ -417,8 +439,8 @@ void SPxWeightST::setupWeights(SPxSolver& bse)
     */
    if (bse.rep() * bse.type() > 0)            // primal simplex
    {
-      const Real bx            = 1.0 / maxabs;
       const Real ax            = 1e-3 / obj.maxAbs();
+      const Real bx            = 1.0 / maxabs;
       const Real nne           = ax / lhs.dim();  // 1e-4 * ax;
       const Real c_fixed       = 1e+5;
       const Real r_fixed       = 0; // TK20010103: was 1e+4 (maros-r7)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeometsc.h,v 1.1 2003/01/05 19:03:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeometsc.h,v 1.2 2003/01/10 12:46:14 bzfkocht Exp $"
 
 /**@file  spxgeometsc.h
  * @brief LP geometric mean scaling.
@@ -41,6 +41,9 @@ protected:
    virtual Real computeColscale(const SVector& col) const;
    ///
    virtual Real computeRowscale(const SVector& row) const;
+
+   virtual Real doRow(const SPxLP& lp);
+   virtual Real doCol(const SPxLP& lp);
 
 public:
    /// Scale the loaded #SPxLP.

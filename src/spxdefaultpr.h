@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultpr.h,v 1.11 2002/12/08 11:09:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefaultpr.h,v 1.12 2003/01/10 12:46:14 bzfkocht Exp $"
 
 /**@file  spxdefaultpr.h
  * @brief Default pricer.
@@ -41,12 +41,6 @@ namespace soplex
 */
 class SPxDefaultPR : public SPxPricer
 {
-private:
-   ///
-   int selectLeaveX(int start, int incr) const;
-   ///
-   SPxId selectEnterX(int start1, int incr1, int start2, int incr2) const;
-
 public:
    ///
    virtual int selectLeave();

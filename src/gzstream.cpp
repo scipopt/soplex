@@ -18,8 +18,8 @@
 // ============================================================================
 //
 // File          : gzstream.C
-// Revision      : $Revision: 1.2 $
-// Revision_date : $Date: 2002/12/12 09:48:53 $
+// Revision      : $Revision: 1.3 $
+// Revision_date : $Date: 2003/01/10 12:46:14 $
 // Author(s)     : Deepak Bandyopadhyay, Lutz Kettner
 // 
 // Standard streambuf implementation following Nicolai Josuttis, "The 
@@ -82,7 +82,7 @@ int gzstreambuf::underflow() { // used for input buffer only
     if ( ! (mode & std::ios::in) || ! opened)
         return EOF;
     // Josuttis' implementation of inbuf
-    int n_putback = gptr() - eback();
+    ptrdiff_t n_putback = gptr() - eback();
     if ( n_putback > 4)
         n_putback = 4;
     memcpy( buffer + (4 - n_putback), gptr() - n_putback, static_cast<size_t>(n_putback));
@@ -103,7 +103,7 @@ int gzstreambuf::underflow() { // used for input buffer only
 int gzstreambuf::flush_buffer() {
     // Separate the writing of the buffer from overflow() and
     // sync() operation.
-    int w = pptr() - pbase();
+    ptrdiff_t w = pptr() - pbase();
     if ( gzwrite( file, pbase(), static_cast<size_t>(w))) {
         setp( pbase(), epptr() - 1);
         return w;

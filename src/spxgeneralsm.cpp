@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeneralsm.cpp,v 1.16 2003/01/05 19:03:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeneralsm.cpp,v 1.17 2003/01/10 12:46:14 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -24,7 +24,7 @@
 
 namespace soplex
 {
-SPxSimplifier::Result SPxGeneralSM::simplify(SPxLP& lp)
+SPxSimplifier::Result SPxGeneralSM::simplify(SPxLP& lp, Real eps, Real delta)
 {
    Result ret;
 #if 0
@@ -32,9 +32,13 @@ SPxSimplifier::Result SPxGeneralSM::simplify(SPxLP& lp)
    int    cols = lp.nCols();
    int    cnt  = rows + cols;
 #endif
-   if ((ret = m_inter.simplify(lp)) != OKAY)
+
+   eps   *= 100.0;  // 1e-14 -> 1e-12
+   delta *= 0.001;  // 1e-6  -> 1e-9
+
+   if ((ret = m_inter.simplify(lp, eps, delta)) != OKAY)
       return ret;
-   if ((ret = m_rem1.simplify(lp)) != OKAY) 
+   if ((ret = m_rem1.simplify(lp, eps, delta)) != OKAY) 
       return ret;
 #if 0
 

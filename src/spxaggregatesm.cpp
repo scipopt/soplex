@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.17 2003/01/05 19:03:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.18 2003/01/10 12:46:14 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -217,7 +217,7 @@ int SPxAggregateSM::eliminate(SPxLP& lp, const SVector& row, Real b)
    return best;
 }
 
-SPxSimplifier::Result SPxAggregateSM::simplify(SPxLP& lp)
+SPxSimplifier::Result SPxAggregateSM::simplify(SPxLP& lp, Real /*eps*/, Real /*delta*/)
 {
    int best;
    int stage, last, num, j, i, k;

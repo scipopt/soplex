@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscaler.h,v 1.3 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscaler.h,v 1.4 2003/01/10 12:46:14 bzfkocht Exp $"
 
 /**@file  spxscaler.h
  * @brief LP scaling base class.
@@ -58,7 +58,7 @@ public:
    friend std::ostream& operator<<(std::ostream& s, const SPxScaler& sc);
 
    /// constructor
-   explicit SPxScaler(const char* name, bool colFirst = true, bool doBoth = true);
+   explicit SPxScaler(const char* name, bool colFirst = false, bool doBoth = true);
    /// copy constructor
    SPxScaler(const SPxScaler& old);
    /// destructor.
@@ -88,6 +88,10 @@ public:
    virtual Real minAbsRowscale() const;
    /// absolute biggest row scaling factor
    virtual Real maxAbsRowscale() const;
+   /// maximum ratio between absolute biggest and smallest element in any column.
+   virtual Real maxColRatio(const SPxLP& lp) const;
+   /// maximum ratio between absolute biggest and smallest element in any row.
+   virtual Real maxRowRatio(const SPxLP& lp) const;
 
    /// consistency check
    virtual bool isConsistent() const;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.66 2003/01/05 19:03:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.67 2003/01/10 12:46:14 bzfkocht Exp $"
 
 #include <iostream>
 
@@ -84,7 +84,7 @@ SPxSolver::Status SoPlex::solve()
       // should the LP be simplified ?
       if (m_simplifier != 0)
       {
-         switch(m_simplifier->simplify(work))
+         switch(m_simplifier->simplify(work, m_solver.epsilon(), m_solver.delta()))
          {
          case SPxSimplifier::UNBOUNDED :
             m_solver.setBasisStatus(SPxBasis::UNBOUNDED);

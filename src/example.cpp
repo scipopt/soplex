@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.51 2003/01/06 14:36:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.52 2003/01/10 12:46:14 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -377,7 +377,7 @@ int main(int argc, const char* const argv[])
       break;
    }
    work.setPreScaler(prescaler);
-   //work.setPostScaler(postscaler);
+   work.setPostScaler(postscaler);
 
    std::cout << ((prescaler != 0) ? prescaler->getName() : "No ") 
              << " / "

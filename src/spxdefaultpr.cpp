@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultpr.cpp,v 1.12 2002/12/08 11:09:21 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefaultpr.cpp,v 1.13 2003/01/10 12:46:14 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -25,7 +25,8 @@
 
 namespace soplex
 {
-int SPxDefaultPR::selectLeaveX(int start, int incr) const
+
+int SPxDefaultPR::selectLeave()
 {
    assert(thesolver != 0);
 
@@ -35,7 +36,7 @@ int SPxDefaultPR::selectLeaveX(int start, int incr) const
    Real best = -theeps;
    int  n    = -1;
 
-   for(int i = thesolver->dim() - start - 1; i >= 0; i -= incr)
+   for(int i = thesolver->dim() - 1; i >= 0; --i)
    {
       Real x = thesolver->fTest()[i];
 
@@ -44,7 +45,7 @@ int SPxDefaultPR::selectLeaveX(int start, int incr) const
          // x *= EQ_PREF * (1 + (up[i] == low[i]));
          if (x < best)
          {
-            n = i;
+            n    = i;
             best = x;
          }
       }
@@ -52,22 +53,17 @@ int SPxDefaultPR::selectLeaveX(int start, int incr) const
    return n;
 }
 
-int SPxDefaultPR::selectLeave()
-{
-   return selectLeaveX(0, 1);
-}
-
-SPxId SPxDefaultPR::selectEnterX(int start1, int incr1, int start2, int incr2) const
+SPxId SPxDefaultPR::selectEnter()
 {
    assert(thesolver != 0);
 
    // const SPxBasis::Desc&    ds   = thesolver->basis().desc();
 
    SPxId id;
-   int        i;
-   Real     best = -theeps;
+   int   i;
+   Real  best = -theeps;
 
-   for (i = thesolver->dim() - start1 - 1; i >= 0; i -= incr1) 
+   for (i = thesolver->dim() - 1; i >= 0; --i) 
    {
       Real x = thesolver->coTest()[i];
 
@@ -77,13 +73,12 @@ SPxId SPxDefaultPR::selectEnterX(int start1, int incr1, int start2, int incr2) c
          //                || ds.coStatus(i) == SPxBasis::Desc::D_FREE));
          if (x < best)
          {
-            id = thesolver->coId(i);
+            id   = thesolver->coId(i);
             best = x;
          }
       }
    }
-
-   for (i = thesolver->coDim() - start2 - 1; i >= 0; i -= incr2)
+   for (i = thesolver->coDim() - 1; i >= 0; --i)
    {
       Real x = thesolver->test()[i];
 
@@ -93,17 +88,12 @@ SPxId SPxDefaultPR::selectEnterX(int start1, int incr1, int start2, int incr2) c
          //                || ds.status(i) == SPxBasis::Desc::D_FREE));
          if (x < best)
          {
-            id = thesolver->id(i);
+            id   = thesolver->id(i);
             best = x;
          }
       }
    }
    return id;
-}
-
-SPxId SPxDefaultPR::selectEnter()
-{
-   return selectEnterX(0, 1, 0, 1);
 }
 } // namespace soplex
 
@@ -115,3 +105,6 @@ SPxId SPxDefaultPR::selectEnter()
 //Emacs indent-tabs-mode:nil
 //Emacs End:
 //-----------------------------------------------------------------------------
+
+
+

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsimplifier.h,v 1.10 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsimplifier.h,v 1.11 2003/01/10 12:46:15 bzfkocht Exp $"
 
 /**@file  spxsimplifier.h
  * @brief LP simplification base class.
@@ -74,7 +74,7 @@ public:
     *  <TR><TD>#INFEASIBLE</TD><TD>if primal infeasibility was detected.</TD></TR>
     *  </TABLE>
     */
-   virtual Result simplify(SPxLP& lp) = 0;
+   virtual Result simplify(SPxLP& lp, Real eps, Real delta) = 0;
 
    /// returns a reference to the unsimplified primal solution.
    virtual const Vector& unsimplifiedPrimal(const Vector& x)

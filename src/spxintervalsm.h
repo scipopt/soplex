@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxintervalsm.h,v 1.1 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxintervalsm.h,v 1.2 2003/01/10 12:46:14 bzfkocht Exp $"
 
 /**@file  spxintervalsm.h
  * @brief Remove all values outside the interval [#epsilon()..#infinity] 
@@ -42,7 +42,7 @@ public:
       : SPxSimplifier("Interval")
    {}   
    /// just do it!
-   Result simplify(SPxLP& lp);
+   Result simplify(SPxLP& lp, Real eps, Real delta);
 };
 } // namespace soplex
 #endif // _SPXINTERVALSM_H_

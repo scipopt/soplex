@@ -13,11 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscaler.cpp,v 1.5 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscaler.cpp,v 1.6 2003/01/10 12:46:14 bzfkocht Exp $"
 
 /**@file  spxscaler.cpp
  * @brief LP scaling base class.
  */
+#include <iostream>
 #include <assert.h>
 
 #include "spxscaler.h"
@@ -295,6 +296,68 @@ Real SPxScaler::maxAbsRowscale() const
          maxi = fabs(m_rowscale[i]);
 
    return maxi;
+}
+
+/** \f$\max_{j\in\mbox{ cols}}
+ *   \(\frac{\max_{i\in\mbox{ rows}}|a_ij|}
+ *          {\min_{i\in\mbox{ rows}}|a_ij|\)\f$
+ */
+Real SPxScaler::maxColRatio(const SPxLP& lp) const
+{
+   Real pmax = 0.0;
+
+   for(int i = 0; i < lp.nCols(); ++i )
+   {
+      const SVector& vec  = lp.colVector(i);
+      Real           mini = infinity;
+      Real           maxi = 0.0;
+
+      for(int j = 0; j < vec.size(); ++j)
+      {
+         Real x = fabs(vec.value(j));
+
+         if (x < mini)
+            mini = x;
+         if (x > maxi)
+            maxi = x;
+      }
+      Real p = maxi / mini;
+
+      if (p > pmax)
+         pmax = p;
+   }   
+   return pmax;
+}
+
+/** \f$\max_{i\in\mbox{ rows}}
+ *   \(\frac{\max_{j\in\mbox{ cols}}|a_ij|}
+ *          {\min_{j\in\mbox{ cols}}|a_ij|\)\f$
+ */
+Real SPxScaler::maxRowRatio(const SPxLP& lp) const
+{
+   Real pmax = 0.0;
+
+   for(int i = 0; i < lp.nRows(); ++i )
+   {
+      const SVector& vec  = lp.rowVector(i);
+      Real           mini = infinity;
+      Real           maxi = 0.0;
+
+      for(int j = 0; j < vec.size(); ++j)
+      {
+         Real x = fabs(vec.value(j));
+
+         if (x < mini)
+            mini = x;
+         if (x > maxi)
+            maxi = x;
+      }
+      Real p = maxi / mini;
+
+      if (p > pmax)
+         pmax = p;
+   }   
+   return pmax;
 }
 
 bool SPxScaler::isConsistent() const

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.cpp,v 1.21 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.cpp,v 1.22 2003/01/10 12:46:14 bzfkocht Exp $"
 
 #include <stdio.h>
 
@@ -762,7 +762,7 @@ void SPxLP::changeElement(int i, int j, Real val)
    SVector& row = rowVector_w(i);
    SVector& col = colVector_w(j);
 
-   if (val != 0)
+   if (val != 0.0)
    {
       if (row.number(j) >= 0)
       {

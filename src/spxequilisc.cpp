@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxequilisc.cpp,v 1.4 2003/01/05 19:03:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxequilisc.cpp,v 1.5 2003/01/10 12:46:14 bzfkocht Exp $"
 
 /**@file  spxequilisc.cpp
  * @brief Equilibrium row/column scaling.
@@ -55,10 +55,13 @@ void SPxEquiliSC::scale(SPxLP& lp)
 {
    VERBOSE2({ std::cout << "Equilibrium scaling LP" << std::endl; });   
 
-   VERBOSE3({ std::cout << "\tNon zero min= " << lp.minAbsNzo()
+   VERBOSE3({ std::cout << "LP scaling statistics:" 
+                        << " min= " << lp.minAbsNzo()
                         << " max= " << lp.maxAbsNzo()
+                        << " col-ratio= " << maxColRatio(lp) 
+                        << " row-ratio= " << maxRowRatio(lp) 
                         << std::endl; });
-   
+
    SPxScaler::scale(lp);
 
    VERBOSE3({ std::cout << "\tRow scaling min= " << minAbsRowscale()
@@ -66,9 +69,13 @@ void SPxEquiliSC::scale(SPxLP& lp)
                         << std::endl
                         << "\tCol scaling min= " << minAbsColscale()
                         << " max= " << maxAbsColscale()
-                        << std::endl
-                        << "\tNon zero min= " << lp.minAbsNzo()
+                        << std::endl; });
+
+   VERBOSE3({ std::cout << "LP scaling statistics:" 
+                        << " min= " << lp.minAbsNzo()
                         << " max= " << lp.maxAbsNzo()
+                        << " col-ratio= " << maxColRatio(lp) 
+                        << " row-ratio= " << maxRowRatio(lp) 
                         << std::endl; });
 }
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.22 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.23 2003/01/10 12:46:15 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -202,45 +202,6 @@ void SPxSteepPR::setRep(SPxSolver::Representation)
    }
 }
 
-void SPxSteepPR::left4X(int n, const SPxId& id, int start, int incr)
-{
-#if 0
-   assert(thesolver->type() == SPxSolver::LEAVE);
-
-   if (id.isValid())
-   {
-      // Real               delta         = 0.1;   // thesolver->epsilon();
-      Real        delta         = 0.1 + 1.0 / thesolver->basis().iteration();
-      Real*       coPenalty_ptr = coPenalty.get_ptr();
-      const Real* workVec_ptr   = workVec.get_const_ptr();
-      const Real* rhoVec        = thesolver->fVec().delta().values();
-      Real        rhov_1        = 1.0 / rhoVec[n];
-      Real        beta_q        = thesolver->coPvec().delta().length2() * rhov_1 * rhov_1;
-
-      assert(fabs(rhoVec[n]) >= theeps);
-
-      //  Update #coPenalty# vector
-      const IdxSet& rhoIdx = thesolver->fVec().idx();
-      int           len    = thesolver->fVec().idx().size();
-
-      for(int i = 0; i < len; ++i)
-      {
-         int  j = rhoIdx.index(i);
-         
-         coPenalty_ptr[j] += rhoVec[j] * (beta_q * rhoVec[j] - 2.0 * rhov_1 * workVec_ptr[j]);
-
-         if (coPenalty_ptr[j] < delta)
-            coPenalty_ptr[j] = delta; // coPenalty_ptr[j] = delta / (1+delta-x);
-         else if (coPenalty_ptr[j] >= infinity)
-            coPenalty_ptr[j] = 1.0 / theeps;
-      }
-      coPenalty_ptr[n] = beta_q;
-      //@ coPenalty_ptr[n] = 0.999*beta_q;
-      //@ coPenalty_ptr[n] = 1.001*beta_q;
-   }
-#endif
-}
-
 void SPxSteepPR::left4(int n, SPxId id)
 {
    assert(thesolver->type() == SPxSolver::LEAVE);
@@ -413,8 +374,7 @@ void SPxSteepPR::entered4X(
       {
          i = pIdx.index(j);
          xi_ip = xi_p * pVec[i];
-         x = penalty_ptr[i] += xi_ip * (xi_ip * pi_p
-            - 2 * (thesolver->vector(i) * workVec));
+         x = penalty_ptr[i] += xi_ip * (xi_ip * pi_p - 2.0 * (thesolver->vector(i) * workVec));
          /*
          if(x < 1)
              penalty_ptr[i] = 1 / (2-x);
@@ -423,7 +383,7 @@ void SPxSteepPR::entered4X(
             penalty_ptr[i] = delta;
          // penalty_ptr[i] = 1;
          else if (x > infinity)
-            penalty_ptr[i] = 1 / thesolver->epsilon();
+            penalty_ptr[i] = 1.0 / thesolver->epsilon();
       }
    }
 
@@ -440,8 +400,7 @@ void SPxSteepPR::entered4(SPxId id, int n)
    entered4X(id, n, 0, 1, 0, 1);
 }
 
-SPxId SPxSteepPR::selectEnterX(
-   Real& best, int start1, int incr1, int start2, int incr2) const
+SPxId SPxSteepPR::selectEnterX(Real& best, int start1, int incr1, int start2, int incr2) const
 {
    /*
        std::cout << "selectEnter " << start1 << '(' << incr1 << ")\t"

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.14 2003/01/06 14:36:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.15 2003/01/10 12:46:14 bzfkocht Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
@@ -125,16 +125,16 @@ typedef long double Real;
 typedef double Real;
 
 #ifndef DEFAULT_BND_VIOL
-#define DEFAULT_BND_VIOL   1e-7
+#define DEFAULT_BND_VIOL   1e-6
 #endif
 #ifndef DEFAULT_EPS_ZERO
-#define DEFAULT_EPS_ZERO   1e-15  // ~ additive zero. 1.0 + EPS_ZERO == 1.0
+#define DEFAULT_EPS_ZERO   1e-14  // ~ additive zero. 1.0 + EPS_ZERO == 1.0
 #endif
 #ifndef DEFAULT_EPS_FACTOR
-#define DEFAULT_EPS_FACTOR 1e-22
+#define DEFAULT_EPS_FACTOR 1e-20
 #endif
 #ifndef DEFAULT_EPS_UPDATE
-#define DEFAULT_EPS_UPDATE 1e-15
+#define DEFAULT_EPS_UPDATE 1e-16
 #endif
 #define DEFAULT_INFINITY   1e100
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.h,v 1.15 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.h,v 1.16 2003/01/10 12:46:15 bzfkocht Exp $"
 
 
 /**@file  spxsteeppr.h
@@ -79,8 +79,6 @@ private:
    ///
    SPxId selectEnterX(Real& best, 
       int start1 = 0, int incr1 = 1, int start2 = 0, int incr2 = 1) const;
-   ///
-   void left4X(int n, const SPxId& id, int start, int incr);
    ///
    void entered4X(SPxId id, int n, 
       int start1, int incr1, int start2, int incr2);

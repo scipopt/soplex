@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxrem1sm.h,v 1.9 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxrem1sm.h,v 1.10 2003/01/10 12:46:14 bzfkocht Exp $"
 
 /**@file  spxrem1sm.h
  * @brief Remove singletons from LP.
@@ -38,12 +38,13 @@ namespace soplex
 class SPxRem1SM : public SPxSimplifier
 {
 private:
-   DVector        prim;   ///< unsimplified primal solution vector.
-   DVector        dual;   ///< unsimplified dual solution vector.
-   DataArray<int> cperm;  ///< column permutation vector.
-   DataArray<int> rperm;  ///< row permutation vector.
-   DSVector       pval;   ///< fixed variable values.
-
+   DVector        m_prim;       ///< unsimplified primal solution vector.
+   DVector        m_dual;       ///< unsimplified dual solution vector.
+   DataArray<int> m_cperm;      ///< column permutation vector.
+   DataArray<int> m_rperm;      ///< row permutation vector.
+   DSVector       m_pval;       ///< fixed variable values.
+   Real           m_epsilon;    ///< epsilon zero
+   Real           m_delta;      ///< maximum bound violation
 private:
    ///
    void fixColumn(SPxLP& lp, int i);
@@ -60,7 +61,15 @@ private:
    ///
    Result simpleCols(SPxLP& lp, bool& again);
    ///
-   Real epsilonSimplifier() const;
+   Real epsZero() const
+   {
+      return m_epsilon;
+   }
+   ///
+   Real deltaBnd() const
+   {
+      return m_delta;
+   }
 
 public:
    /// default constructor
@@ -71,7 +80,7 @@ public:
    virtual ~SPxRem1SM()
    {}  
    /// Remove singletons from the LP.
-   virtual Result simplify(SPxLP& lp);
+   virtual Result simplify(SPxLP& lp, Real eps, Real delta);
    /// returns a reference to the unsimplified primal solution.
    virtual const Vector& unsimplifiedPrimal(const Vector& x);
    /// returns a reference to the unsimplified dual solution. 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.31 2003/01/05 19:03:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.32 2003/01/10 12:46:14 bzfkocht Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -569,8 +569,7 @@ public:
       factor->solveRight4update(x, rhs);
    }
    /// solves two systems in one call.
-   void solve4update(SSVector& x, Vector& y,
-                     const SVector& rhsx, SSVector& rhsy)
+   void solve4update(SSVector& x, Vector& y, const SVector& rhsx, SSVector& rhsy)
    {
       METHOD( "SPxBasis::solve4update()" );
       if (!factorized) 

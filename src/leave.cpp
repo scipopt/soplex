@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.25 2003/01/05 19:03:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.26 2003/01/10 12:46:14 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -73,15 +73,13 @@ void SPxSolver::updateFtest()
    Compute a set of statistical values on the variable selected for leaving the
    basis.
  */
-void SPxSolver::getLeaveVals
-(
+void SPxSolver::getLeaveVals(
    int leaveIdx,
    SPxBasis::Desc::Status& leaveStat,
    SPxId& leaveId,
    Real& leaveMax,
    Real& leavebound,
-   int& leaveNum
-)
+   int& leaveNum)
 {
    METHOD( "SPxSolver::getLeaveVals()" );
    SPxBasis::Desc& ds = desc();

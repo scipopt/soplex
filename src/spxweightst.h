@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.h,v 1.10 2003/01/05 19:03:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightst.h,v 1.11 2003/01/10 12:46:15 bzfkocht Exp $"
 
 
 /**@file  spxweightst.h
@@ -57,10 +57,12 @@ namespace soplex
 */
 class SPxWeightST : public SPxStarter
 {
+private:
    DataArray < int > forbidden;
 
    DataArray < Real > * weight;
    DataArray < Real > * coWeight;
+
    void setPrimalStatus(SPxBasis::Desc&, const SPxSolver&, const SPxId&);
 
 protected:

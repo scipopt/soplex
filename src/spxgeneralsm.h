@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeneralsm.h,v 1.10 2003/01/05 19:03:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeneralsm.h,v 1.11 2003/01/10 12:46:14 bzfkocht Exp $"
 
 /**@file  spxgeneralsm.h
  * @brief General LP preprocessing.
@@ -54,7 +54,7 @@ public:
    virtual ~SPxGeneralSM()
    {}  
    /// Simplify #SPxLP.
-   virtual Result simplify(SPxLP& lp);
+   virtual Result simplify(SPxLP& lp, Real eps, Real delta);
    /// returns a reference to the unsimplified primal solution.
    virtual const Vector& unsimplifiedPrimal(const Vector& x);
    /// returns a reference to the unsimplified dual solution. 
