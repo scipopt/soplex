@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.29 2002/01/13 13:37:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.30 2002/01/16 16:52:23 bzfpfend Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -221,7 +221,7 @@ void SoPlex::init()
    {
       initialized = true;
       reDim();
-      if (SPxBasis::status() <= NO_PROBLEM || solver() != this)
+      if (SPxBasis::status() <= SPxBasis::NO_PROBLEM || solver() != this)
          SPxBasis::load(this);
       initialized = false;
    }
@@ -468,7 +468,7 @@ void SoPlex::clear()
       thesimplifier->unload();
 
    unInit();
-   setStatus(NO_PROBLEM);
+   setStatus(SPxBasis::NO_PROBLEM);
    SPxLP::clear();
 }
 
@@ -489,7 +489,7 @@ void SoPlex::factorize()
 {
    SPxBasis::factorize();
 
-   if (SPxBasis::status() >= REGULAR)
+   if (SPxBasis::status() >= SPxBasis::REGULAR)
    {
       // #undef       NDEBUG
 #ifndef NDEBUG
@@ -758,8 +758,9 @@ SoPlex::SoPlex(Type p_type, Representation p_rep,
    : theType (p_type)
    , thePricing(FULL)
    , maxIters (-1)
-   , maxTime (-1)
+   , maxTime (infinity)
    , maxValue(infinity)
+   , m_abortType(RUNNING)
    , theShift (0)
    , m_maxCycle(100)
    , m_numCycle(0)
@@ -988,93 +989,166 @@ int SoPlex::nofNZEs() const
    return n;
 }
 
+void SoPlex::setTerminationTime(double p_time)
+{
+   if( p_time < 0.0 )
+      p_time = infinity;
+   maxTime = p_time;
+}
+
+double SoPlex::terminationTime() const
+{
+   return maxTime;
+}
+
+void SoPlex::setTerminationIter(int p_iteration)
+{
+   if( p_iteration < 0 )
+      p_iteration = -1;
+   maxIters = p_iteration;
+}
+
+int SoPlex::terminationIter() const
+{
+   return maxIters;
+}
+
+void SoPlex::setTerminationValue(double p_value)
+{
+   maxValue = p_value;
+}
+
+double SoPlex::terminationValue() const
+{
+   return maxValue;
+}
+   
 void SoPlex::setTermination(double p_time, int p_iteration, double p_value)
 {
-   maxTime  = p_time;
-   maxIters = p_iteration;
-   maxValue = p_value;
+   setTerminationTime( p_time );
+   setTerminationIter( p_iteration );
+   setTerminationValue( p_value );
 }
 
 void SoPlex::getTermination(double* p_time, int* p_iteration, double* p_value)
 const
 {
    if (p_time != 0)
-      *p_time = maxTime;
+      *p_time = terminationTime();
    if (p_iteration != 0)
-      *p_iteration = maxIters;
+      *p_iteration = terminationIter();
    if (p_value != 0)
-      *p_value = maxValue;
+      *p_value = terminationValue();
 }
 
-SoPlex::Status SoPlex::getBasis(signed char row[], signed char col[]) const
+SoPlex::VarStatus SoPlex::basisStatusToVarStatus( SPxBasis::Desc::Status stat )
+const
+{
+   switch( stat )
+   {
+   case SPxBasis::Desc::P_ON_LOWER:
+      return SoPlex::ON_LOWER;
+   case SPxBasis::Desc::P_ON_UPPER:
+      return SoPlex::ON_UPPER;
+   case SPxBasis::Desc::P_FIXED:
+      return SoPlex::FIXED;
+   case SPxBasis::Desc::P_FREE:
+      return SoPlex::ZERO;
+   case SPxBasis::Desc::D_ON_UPPER:
+   case SPxBasis::Desc::D_ON_LOWER:
+   case SPxBasis::Desc::D_ON_BOTH:
+   case SPxBasis::Desc::D_UNDEFINED:
+   case SPxBasis::Desc::D_FREE:
+      return SoPlex::BASIC;
+   default:
+      std::cout << "ERROR: unknown basis status (" << stat << ")" << std::endl;
+      abort();
+   }
+}
+
+SPxBasis::Desc::Status SoPlex::varStatusToBasisStatusRow( int row,
+                                                          SoPlex::VarStatus stat )
+const
+{
+   switch( stat )
+   {
+   case SoPlex::FIXED :
+      assert(rhs(row) == lhs(row));
+      return SPxBasis::Desc::P_FIXED;
+   case SoPlex::ON_UPPER :
+      assert(rhs(row) < SPxLP::infinity);
+      return SPxBasis::Desc::P_ON_UPPER;
+   case SoPlex::ON_LOWER :
+      assert(lhs(row) > -SPxLP::infinity);
+      return SPxBasis::Desc::P_ON_LOWER;
+   case SoPlex::ZERO :
+      assert(lhs(row) <= -SPxLP::infinity && rhs(row) >= SPxLP::infinity);
+      return SPxBasis::Desc::P_FREE;
+      break;
+   case SoPlex::BASIC :
+      return dualRowStatus(row);
+      break;
+   default:
+      std::cout << "ERROR: unknown VarStatus (" << int(stat) << ")" << std::endl;
+      abort();
+   }
+}
+
+SPxBasis::Desc::Status SoPlex::varStatusToBasisStatusCol( int col,
+                                                          SoPlex::VarStatus stat )
+const
+{
+   switch( stat )
+   {
+   case FIXED :
+      assert(upper(col) == lower(col));
+      return SPxBasis::Desc::P_FIXED;
+   case ON_UPPER :
+      assert(upper(col) < SPxLP::infinity);
+      return SPxBasis::Desc::P_ON_UPPER;
+   case ON_LOWER :
+      assert(lower(col) > -SPxLP::infinity);
+      return SPxBasis::Desc::P_ON_LOWER;
+   case ZERO :
+      assert(lower(col) <= -SPxLP::infinity && upper(col) >= SPxLP::infinity);
+      return SPxBasis::Desc::P_FREE;
+   case BASIC :
+      return dualColStatus(col);
+   default:
+      std::cout << "ERROR: unknown VarStatus (" << int(stat) << ")" << std::endl;
+      abort();
+   }
+}
+
+SoPlex::VarStatus SoPlex::getBasisRowStatus( int row ) const
+{
+   assert( 0 <= row && row < nRows() );
+   return basisStatusToVarStatus( desc().rowStatus( row ) );
+}
+
+SoPlex::VarStatus SoPlex::getBasisColStatus( int col ) const
+{
+   assert( 0 <= col && col < nCols() );
+   return basisStatusToVarStatus( desc().colStatus( col ) );
+}
+
+SoPlex::Status SoPlex::getBasis(VarStatus row[], VarStatus col[]) const
 {
    const SPxBasis::Desc& d = desc();
    int i;
+
    if (col)
-   {
       for (i = nCols() - 1; i >= 0; --i)
-         switch (d.colStatus(i))
-         {
-         case SPxBasis::Desc::P_ON_LOWER:
-            col[i] = ON_LOWER;
-            break;
-         case SPxBasis::Desc::P_ON_UPPER:
-            col[i] = ON_UPPER;
-            break;
-         case SPxBasis::Desc::P_FIXED:
-            col[i] = FIXED;
-            break;
-         case SPxBasis::Desc::P_FREE:
-            col[i] = ZERO;
-            break;
-         case SPxBasis::Desc::D_ON_UPPER:
-         case SPxBasis::Desc::D_ON_LOWER:
-         case SPxBasis::Desc::D_ON_BOTH:
-         case SPxBasis::Desc::D_UNDEFINED:
-         case SPxBasis::Desc::D_FREE:
-            col[i] = BASIC;
-            break;
-         default:
-            std::cout << std::endl << "ERROR: "
-            << __FILE__ << ":" << __LINE__ << std::endl << std::endl;
-            break;
-         }
-   }
+         col[i] = basisStatusToVarStatus( d.colStatus(i) );
 
    if (row)
-   {
       for (i = nRows() - 1; i >= 0; --i)
-         switch (d.rowStatus(i))
-         {
-         case SPxBasis::Desc::P_ON_LOWER:
-            row[i] = ON_LOWER;
-            break;
-         case SPxBasis::Desc::P_ON_UPPER:
-            row[i] = ON_UPPER;
-            break;
-         case SPxBasis::Desc::P_FIXED:
-            row[i] = FIXED;
-            break;
-         case SPxBasis::Desc::P_FREE:
-            row[i] = ZERO;
-            break;
-         case SPxBasis::Desc::D_ON_UPPER:
-         case SPxBasis::Desc::D_ON_LOWER:
-         case SPxBasis::Desc::D_ON_BOTH:
-         case SPxBasis::Desc::D_UNDEFINED:
-         case SPxBasis::Desc::D_FREE:
-            row[i] = BASIC;
-            break;
-         default:
-            std::cout << std::endl << "ERROR: "
-            << __FILE__ << ":" << __LINE__ << std::endl << std::endl;
-            break;
-         }
-   }
+         row[i] = basisStatusToVarStatus( d.rowStatus(i) );
+
    return status();
 }
 
-void SoPlex::setBasis(const signed char p_rows[], const signed char p_cols[])
+void SoPlex::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
 {
    if (SPxBasis::status() == SPxBasis::NO_PROBLEM)
       SPxBasis::load(this);
@@ -1083,62 +1157,11 @@ void SoPlex::setBasis(const signed char p_rows[], const signed char p_cols[])
    int i;
 
    for (i = nRows() - 1; i >= 0; i--)
-   {
-      switch (p_rows[i])
-      {
-      case FIXED :
-         assert(rhs(i) == lhs(i));
-         ds.rowStatus(i) = SPxBasis::Desc::P_FIXED;
-         break;
-      case ON_UPPER :
-         assert(rhs(i) < SPxLP::infinity);
-         ds.rowStatus(i) = SPxBasis::Desc::P_ON_UPPER;
-         break;
-      case ON_LOWER :
-         assert(lhs(i) > -SPxLP::infinity);
-         ds.rowStatus(i) = SPxBasis::Desc::P_ON_LOWER;
-         break;
-      case ZERO :
-         assert(lhs(i) <= -SPxLP::infinity && rhs(i) >= SPxLP::infinity);
-         ds.rowStatus(i) = SPxBasis::Desc::P_FREE;
-         break;
-      case BASIC :
-         ds.rowStatus(i) = dualRowStatus(i);
-         break;
-      default:
-         std::cout << std::endl << "ERROR: " << __FILE__ << ":" << __LINE__
-         << std::endl << std::endl;
-      }
-   }
+      ds.rowStatus(i) = varStatusToBasisStatusRow( i, p_rows[i] );
 
    for (i = nCols() - 1; i >= 0; i--)
-   {
-      switch (p_cols[i])
-      {
-      case FIXED :
-         assert(upper(i) == lower(i));
-         ds.colStatus(i) = SPxBasis::Desc::P_FIXED;
-         break;
-      case ON_UPPER :
-         assert(upper(i) < SPxLP::infinity);
-         ds.colStatus(i) = SPxBasis::Desc::P_ON_UPPER;
-         break;
-      case ON_LOWER :
-         assert(lower(i) > -SPxLP::infinity);
-         ds.colStatus(i) = SPxBasis::Desc::P_ON_LOWER;
-         break;
-      case ZERO :
-         assert(lower(i) <= -SPxLP::infinity && upper(i) >= SPxLP::infinity);
-         ds.colStatus(i) = SPxBasis::Desc::P_FREE;
-         break;
-      case BASIC :
-         ds.colStatus(i) = dualColStatus(i);
-         break;
-      default:
-         std::cout << std::endl << "ERROR: " << __FILE__ << ":" << __LINE__
-         << std::endl << std::endl;
-      }
-   }
+      ds.colStatus(i) = varStatusToBasisStatusCol( i, p_cols[i] );
+
    loadBasis(ds);
 }
 } // namespace soplex

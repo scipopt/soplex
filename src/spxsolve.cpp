@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.18 2002/01/12 11:42:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.19 2002/01/16 16:52:24 bzfpfend Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -320,40 +320,57 @@ bool SoPlex::terminate()
          unShift();
    }
 
-   if (maxIters >= 0 && iterations() >= maxIters)
+   if ( maxIters >= 0 && iterations() >= maxIters )
    {
 #ifndef NDEBUG
-      std::cout << "Maximum number of iterations reached" << std::endl;
+      std::cout << "Maximum number of iterations (" << maxIters
+                << ") reached" << std::endl;
 #endif // !NDEBUG
 
+      m_abortType = ITERATION;
       return true;
    }
-   if (maxTime >= 0 && time() >= maxTime)
+   if ( maxTime >= 0 && maxTime < infinity && time() >= maxTime )
    {
 #ifndef NDEBUG
-      std::cout << "Timelimit reached" << std::endl;
+      std::cout << "Timelimit (" << maxTime << ") reached" << std::endl;
 #endif // !NDEBUG
 
+      m_abortType = TIME;
       return true;   
    }
-   if (maxValue < SPxLP::infinity)
+   if (maxValue < infinity)
    {
-      // This code is *NOT* tested.
+      /**@todo This code is *NOT* tested. */
+      int sign = 1;
 
-      double objective = value();
+      if( spxSense() == SPxLP::MAXIMIZE )
+         sign *= -1;
+      if( simplexType() == PRIMAL_SIMPLEX )
+         sign *= -1;
 
-      if (  ((spxSense() == SPxLP::MAXIMIZE) && (objective > maxValue))
-         || ((spxSense() == SPxLP::MINIMIZE) && (objective < maxValue)))
+      if( sign * (value() - maxValue) >= 0.0 )
       {
 #ifndef NDEBUG
          std::cout << "Objective value limit reached" << std::endl;
+         std::cout << " (value: " << value()
+                   << ", limit: " << maxValue << ")" << std::endl;
 #endif // !NDEBUG
-
+         
+         m_abortType = VALUE;
          return true;
       }
    }
-   return SPxBasis::status() >= SPxBasis::OPTIMAL
-      || SPxBasis::status() <= SPxBasis::SINGULAR;
+
+   if( SPxBasis::status() >= SPxBasis::OPTIMAL  ||
+       SPxBasis::status() <= SPxBasis::SINGULAR )
+   {
+      m_abortType = FINISHED;
+      return true;
+   }
+
+   m_abortType = RUNNING;
+   return false;
 }
 
 SoPlex::Status SoPlex::getPrimal (Vector& p_vector) const
@@ -516,24 +533,37 @@ SoPlex::Status SoPlex::getSlacks (Vector& p_vector) const
 
 SoPlex::Status SoPlex::status() const
 {
-   switch (SPxBasis::status())
+   switch( m_abortType )
    {
-   case SPxBasis::NO_PROBLEM :
-      return UNKNOWN;
-   case SPxBasis::SINGULAR :
-      return ERROR;
-   case SPxBasis::REGULAR :
-      return UNKNOWN;
-   case SPxBasis::DUAL :
-      return DUAL;
-   case SPxBasis::PRIMAL :
-      return PRIMAL;
-   case SPxBasis::OPTIMAL :
-      return SOLVED;
-   case SPxBasis::UNBOUNDED :
-      return UNBOUNDED;
-   case SPxBasis::INFEASIBLE :
-      return INFEASIBLE;
+   case RUNNING:      
+   case FINISHED:
+      switch (SPxBasis::status())
+      {
+      case SPxBasis::NO_PROBLEM :
+         return NO_PROBLEM;
+      case SPxBasis::SINGULAR :
+         return SINGULAR;
+      case SPxBasis::REGULAR :
+         return REGULAR;
+      case SPxBasis::DUAL :
+         return DUAL;
+      case SPxBasis::PRIMAL :
+         return PRIMAL;
+      case SPxBasis::OPTIMAL :
+         return OPTIMAL;
+      case SPxBasis::UNBOUNDED :
+         return UNBOUNDED;
+      case SPxBasis::INFEASIBLE :
+         return INFEASIBLE;
+      default:
+         return ERROR;
+      }
+   case TIME:
+      return ABORT_TIME;
+   case ITERATION:
+      return ABORT_ITER;
+   case VALUE:
+      return ABORT_VALUE;
    default:
       return ERROR;
    }

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: changesoplex.cpp,v 1.7 2001/12/28 14:55:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: changesoplex.cpp,v 1.8 2002/01/16 16:52:23 bzfpfend Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -172,7 +172,7 @@ void SoPlex::addedRows(int n)
       {
       case SPxBasis::PRIMAL:
       case SPxBasis::UNBOUNDED:
-         setStatus(REGULAR);
+         setStatus(SPxBasis::REGULAR);
          break;
       case OPTIMAL:
       case SPxBasis::INFEASIBLE:
@@ -355,7 +355,7 @@ void SoPlex::addedCols(int n)
       {
       case SPxBasis::DUAL:
       case SPxBasis::INFEASIBLE:
-         setStatus(REGULAR);
+         setStatus(SPxBasis::REGULAR);
          break;
       case OPTIMAL:
       case SPxBasis::UNBOUNDED:
@@ -372,7 +372,7 @@ void SoPlex::doRemoveRow(int i)
 {
    SPxLP::doRemoveRow(i);
 
-   if (SPxBasis::status() > NO_PROBLEM)
+   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       removedRow(i);
       unInit();
@@ -401,7 +401,7 @@ void SoPlex::doRemoveRow(int i)
       {
       case SPxBasis::DUAL:
       case SPxBasis::INFEASIBLE:
-         setStatus(REGULAR);
+         setStatus(SPxBasis::REGULAR);
          break;
       case OPTIMAL:
          setStatus(SPxBasis::PRIMAL);
@@ -417,7 +417,7 @@ void SoPlex::doRemoveRows(int perm[])
    int n = SPxLP::nRows();
    SPxLP::doRemoveRows(perm);
 
-   if (SPxBasis::status() > NO_PROBLEM)
+   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       removedRows(perm);
       unInit();
@@ -460,7 +460,7 @@ void SoPlex::doRemoveRows(int perm[])
       {
       case SPxBasis::DUAL:
       case SPxBasis::INFEASIBLE:
-         setStatus(REGULAR);
+         setStatus(SPxBasis::REGULAR);
          break;
       case OPTIMAL:
          setStatus(SPxBasis::PRIMAL);
@@ -475,7 +475,7 @@ void SoPlex::doRemoveCol(int i)
 {
    SPxLP::doRemoveCol(i);
 
-   if (SPxBasis::status() > NO_PROBLEM)
+   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       removedCol(i);
       unInit();
@@ -504,7 +504,7 @@ void SoPlex::doRemoveCol(int i)
       {
       case SPxBasis::PRIMAL:
       case SPxBasis::UNBOUNDED:
-         setStatus(REGULAR);
+         setStatus(SPxBasis::REGULAR);
          break;
       case OPTIMAL:
          setStatus(SPxBasis::DUAL);
@@ -520,7 +520,7 @@ void SoPlex::doRemoveCols(int perm[])
    int n = SPxLP::nCols();
    SPxLP::doRemoveCols(perm);
 
-   if (SPxBasis::status() > NO_PROBLEM)
+   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       removedCols(perm);
       unInit();
@@ -563,7 +563,7 @@ void SoPlex::doRemoveCols(int perm[])
       {
       case SPxBasis::PRIMAL:
       case SPxBasis::UNBOUNDED:
-         setStatus(REGULAR);
+         setStatus(SPxBasis::REGULAR);
          break;
       case OPTIMAL:
          setStatus(SPxBasis::DUAL);
@@ -632,7 +632,7 @@ static void changeLowerStatus
 void SoPlex::changeLower(const Vector& newLower)
 {
    SPxLP::changeLower(newLower);
-   if (SPxBasis::status() > NO_PROBLEM)
+   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       for (int i = newLower.dim() - 1; i >= 0; --i)
          changeLowerStatus(
@@ -644,7 +644,7 @@ void SoPlex::changeLower(const Vector& newLower)
 void SoPlex::changeLower(int i, double newLower)
 {
    SPxLP::changeLower(i, newLower);
-   if (SPxBasis::status() > NO_PROBLEM)
+   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       changeLowerStatus(
          desc().colStatus(i), newLower, SPxLP::upper(i), *this, i);
@@ -698,7 +698,7 @@ static void changeUpperStatus
 void SoPlex::changeUpper(const Vector& newUpper)
 {
    SPxLP::changeUpper(newUpper);
-   if (SPxBasis::status() > NO_PROBLEM)
+   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       for (int i = newUpper.dim() - 1; i >= 0; --i)
          changeUpperStatus(
@@ -710,7 +710,7 @@ void SoPlex::changeUpper(const Vector& newUpper)
 void SoPlex::changeUpper(int i, double newUpper)
 {
    SPxLP::changeUpper(i, newUpper);
-   if (SPxBasis::status() > NO_PROBLEM)
+   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       changeUpperStatus(
          desc().colStatus(i), newUpper, SPxLP::lower(i), *this, i);
@@ -722,7 +722,7 @@ void SoPlex::changeBounds(const Vector& newLower, const Vector& newUpper)
 {
    SPxLP::changeLower(newLower);
    SPxLP::changeUpper(newUpper);
-   if (SPxBasis::status() > NO_PROBLEM)
+   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       for (int i = newUpper.dim() - 1; i >= 0; --i)
       {
@@ -739,7 +739,7 @@ void SoPlex::changeBounds(int i, double newLower, double newUpper)
 {
    SPxLP::changeLower(i, newLower);
    SPxLP::changeUpper(i, newUpper);
-   if (SPxBasis::status() > NO_PROBLEM)
+   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       changeUpperStatus(
          desc().colStatus(i), newUpper, SPxLP::lower(i), *this, i);
@@ -795,7 +795,7 @@ static void changeLhsStatus
 void SoPlex::changeLhs(const Vector& newLhs)
 {
    SPxLP::changeLhs(newLhs);
-   if (SPxBasis::status() > NO_PROBLEM)
+   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       for (int i = nRows() - 1; i >= 0; --i)
          changeLhsStatus(desc().rowStatus(i), newLhs[i], rhs(i), *this, i);
@@ -806,7 +806,7 @@ void SoPlex::changeLhs(const Vector& newLhs)
 void SoPlex::changeLhs(int i, double newLhs)
 {
    SPxLP::changeLhs(i, newLhs);
-   if (SPxBasis::status() > NO_PROBLEM)
+   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       changeLhsStatus(desc().rowStatus(i), newLhs, rhs(i), *this, i);
       unInit();
@@ -860,7 +860,7 @@ static void changeRhsStatus
 void SoPlex::changeRhs(const Vector& newRhs)
 {
    SPxLP::changeRhs(newRhs);
-   if (SPxBasis::status() > NO_PROBLEM)
+   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       for (int i = nRows() - 1; i >= 0; --i)
          changeRhsStatus(desc().rowStatus(i), newRhs[i], lhs(i), *this, i);
@@ -871,7 +871,7 @@ void SoPlex::changeRhs(const Vector& newRhs)
 void SoPlex::changeRhs(int i, double newRhs)
 {
    SPxLP::changeRhs(i, newRhs);
-   if (SPxBasis::status() > NO_PROBLEM)
+   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       changeRhsStatus(desc().rowStatus(i), newRhs, lhs(i), *this, i);
       unInit();
@@ -882,7 +882,7 @@ void SoPlex::changeRange(const Vector& newLhs, const Vector& newRhs)
 {
    SPxLP::changeLhs(newLhs);
    SPxLP::changeRhs(newRhs);
-   if (SPxBasis::status() > NO_PROBLEM)
+   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       for (int i = nRows() - 1; i >= 0; --i)
       {
@@ -897,7 +897,7 @@ void SoPlex::changeRange(int i, double newLhs, double newRhs)
 {
    SPxLP::changeLhs(i, newLhs);
    SPxLP::changeRhs(i, newRhs);
-   if (SPxBasis::status() > NO_PROBLEM)
+   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       changeLhsStatus(desc().rowStatus(i), newLhs, rhs(i), *this, i);
       changeRhsStatus(desc().rowStatus(i), newRhs, lhs(i), *this, i);

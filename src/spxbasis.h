@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.12 2002/01/05 19:24:10 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.13 2002/01/16 16:52:24 bzfpfend Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -77,7 +77,7 @@ public:
    {
       NO_PROBLEM = -2,  ///< No Problem has been loaded to the basis.
       SINGULAR   = -1,  ///< Basis is singular.
-      REGULAR    = 0,   ///< Basis is not know to be dual nor primal feasible.
+      REGULAR    = 0,   ///< Basis is not known to be dual nor primal feasible.
       DUAL       = 1,   ///< Basis is dual feasible.
       PRIMAL     = 2,   ///< Basis is primal feasible.
       OPTIMAL    = 3,   ///< Basis is optimal, i.e. dual and primal feasible.

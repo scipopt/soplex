@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.20 2002/01/13 13:37:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.21 2002/01/16 16:52:23 bzfpfend Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -102,7 +102,7 @@ int main(int argc, char **argv)
    " -r       select row wise representation (default is column)\n"
    " -i       select Eta-update (default is Forest-Tomlin)\n"
    " -x       output solution vector (works only together with -s0)\n"
-   " -lSec    set timlimit to Sec seconds\n"
+   " -lSec    set timelimit to Sec seconds\n"
    " -dDelta  set maximal allowed bound violation to Delta (1e-6)\n"
    " -zZero   set zero tolerance to Zero (1e-16)\n\n"
    "Simplifier:         Starter:        Pricer:           Ratiotester:\n"
@@ -355,7 +355,7 @@ int main(int argc, char **argv)
 
    switch (stat)
    {
-   case SoPlex::SOLVED:
+   case SoPlex::OPTIMAL:
       std::cout << "solution value is: "
                 << std::setprecision(precision)
                 << work.value()
@@ -391,6 +391,15 @@ int main(int argc, char **argv)
       break;
    case SoPlex::INFEASIBLE:
       std::cout << "LP is infeasible";
+      break;
+   case SoPlex::ABORT_TIME:
+      std::cout << "aborted due to time limit";
+      break;
+   case SoPlex::ABORT_ITER:
+      std::cout << "aborted due to iteration limit";
+      break;
+   case SoPlex::ABORT_VALUE:
+      std::cout << "aborted due to objective value limit";
       break;
    default:
       std::cout << "An error occurred during the solution process";

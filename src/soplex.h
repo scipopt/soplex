@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.22 2002/01/16 15:56:42 bzfbleya Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.23 2002/01/16 16:52:23 bzfpfend Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -131,6 +131,17 @@ public:
       LEAVE = 1
    };
 
+   /// Simplex Algorithm Type.
+   /** This enumeration type is only needed for the information
+       method #simplexType(). It distinguishes between \em primal
+       and \em dual simplex algorithm.
+   */
+   enum SimplexType
+   {
+      PRIMAL_SIMPLEX = -1,      ///< Primal Simplex Algorithm.
+      DUAL_SIMPLEX   = +1       ///< Dual Simplex Algorithm.
+   };
+
    /// Pricing type.
    /** In case of the #ENTER%ing Simplex algorithm, for performance
     *  reasons it may be advisable not to compute and maintain up to
@@ -160,7 +171,7 @@ public:
        */
       PARTIAL  
    };
-   ///@todo in setBasis/getBasis signature: signed char[]
+
    enum VarStatus
    {
       ON_UPPER,      ///< variable set to its upper bound.
@@ -172,18 +183,31 @@ public:
 
    enum Status
    {
-      UNKNOWN = 0,   ///< nothing known on loaded problem.
-      UNBOUNDED,     ///< loaded problem is unbounded.
-      INFEASIBLE,    ///< loaded problem is infeasible.
-      PRIMAL,        ///< primal (not yet optimal) solution available.
-      DUAL,          ///< dual (not yet optimal) solution available.
-      SOLVED,        ///< loaded problem has been solved.
-      ERROR          ///< an error occurred.
+      ERROR       = -3,  ///< an error occured.
+      NO_PROBLEM  = -2,  ///< No Problem has been loaded.
+      SINGULAR    = -1,  ///< Basis is singular, numerical troubles?
+      REGULAR     = 0,   ///< nothing known on loaded problem.
+      DUAL        = 1,   ///< dual (not yet optimal) solution available.
+      PRIMAL      = 2,   ///< primal (not yet optimal) solution available.
+      OPTIMAL     = 3,   ///< LP has been solved to optimality.
+      UNBOUNDED   = 4,   ///< LP has been proven to be unbounded.
+      INFEASIBLE  = 5,   ///< LP has been proven to be infeasible.
+      ABORT_TIME  = 6,   ///< algorithm has beed aborted due to time limit.
+      ABORT_ITER  = 7,   ///< algorithm has beed aborted due to iteration limit.
+      ABORT_VALUE = 8    ///< algorithm has beed aborted due to objective limit.
    };
-
    //@}
 
 private:
+   enum AbortType
+   {
+      RUNNING     = 0,   ///< not finished yet or unknown reason.
+      FINISHED    = 1,   ///< regular termination (e.g. with proof of optimality).
+      TIME        = 2,   ///< aborted due to time limit.
+      ITERATION   = 3,   ///< aborted due to iteration limit.
+      VALUE       = 4    ///< aborted due to objective limit.
+   };
+
    Type           theType;     ///< entering or leaving algortihm.
    Pricing        thePricing;  ///< full or partial pricing.
    Representation therep;      ///< row or column representation.
@@ -191,6 +215,7 @@ private:
    int            maxIters;    ///< maximum allowed iterations.
    double         maxTime;     ///< maximum allowed time.
    double         maxValue;    ///< maximum allowed objective value.
+   AbortType      m_abortType; ///< reason, why algorithm has been aborted.
 
    double         thedelta;
    double         theShift;    ///< shift of r/lhs or objective.
@@ -275,6 +300,16 @@ public:
    Type type() const
    {
       return theType;
+   }
+
+   /// return simplex type, which is calculated from representation() and type().
+   SimplexType simplexType() const
+   {
+      if( (rep() == ROW    && type() == ENTER) ||
+          (rep() == COLUMN && type() == LEAVE) )
+         return DUAL_SIMPLEX;
+      else
+         return PRIMAL_SIMPLEX;
    }
 
    /// return current #Pricing.
@@ -1450,8 +1485,26 @@ protected:
    //@}
 
 public:
+   /// set time limit.
+   virtual void setTerminationTime(double time = infinity);
+
+   /// return time limit.
+   virtual double terminationTime() const;
+
+   /// set iteration limit.
+   virtual void setTerminationIter(int iteration = -1);
+
+   /// return iteration limit.
+   virtual int terminationIter() const;
+
+   /// set objective limit.
+   virtual void setTerminationValue(double value = infinity);
+
+   /// return objective limit.
+   virtual double terminationValue() const;
+   
    /// adjust conditions for termination.
-   virtual void setTermination(double time = -1, int iteration = -1, 
+   virtual void setTermination(double time = infinity, int iteration = -1, 
       double value = infinity);
 
    /// get adjusted conditions for termination.
@@ -1468,11 +1521,31 @@ public:
    Status getResult(double* value = 0, Vector* primal = 0,
       Vector* slacks = 0, Vector* dual = 0, Vector* reduCost = 0) const;
 
-   /// set #LPSolver#s basis.
-   void setBasis(const signed char rows[], const signed char cols[]);
+protected:
+   /**@todo put the following basis methods near the variable status methods!*/
+   /// converts basis status to VarStatus
+   VarStatus basisStatusToVarStatus( SPxBasis::Desc::Status stat ) const;
 
-   /// get current basis.
-   Status getBasis(signed char rows[], signed char cols[]) const;
+   /// converts VarStatus to basis status for rows
+   SPxBasis::Desc::Status varStatusToBasisStatusRow( int row, VarStatus stat )
+      const;
+
+   /// converts VarStatus to basis status for columns
+   SPxBasis::Desc::Status varStatusToBasisStatusCol( int col, VarStatus stat )
+      const;
+
+public:
+   /// gets basis status for a single row
+   VarStatus getBasisRowStatus( int row ) const;
+
+   /// gets basis status for a single column
+   VarStatus getBasisColStatus( int col ) const;
+
+   /// get current basis, and return solver status.
+   Status getBasis(VarStatus rows[], VarStatus cols[]) const;
+
+   /// set #LPSolver's basis.
+   void setBasis(const VarStatus rows[], const VarStatus cols[]);
 
    /// get number of iterations of current solution.
    int iterations() const
