@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.16 2003/03/04 19:30:45 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.17 2003/03/30 09:02:17 bzfkocht Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
@@ -174,7 +174,7 @@ public:
    ///
    inline static Real epsilonUpdate()
    {
-      return s_epsilon_factorization;
+      return s_epsilon_update;
    }
    ///
    static void setEpsilonUpdate(Real eps);
