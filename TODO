@@ -1,3 +1,5 @@
+SVSet::memPack, vermutlichen bug in flexelint melden. this-> ist überflüssig.
+
 die constructoren auf einparametriege durchsehen (explicit)
 
 in dataarray.h:reSize(int newsize) steht in der docxygen docu immer int n ???
@@ -8,8 +10,6 @@ Was macht SPxSolver in example. Warum können wir nicht einfach SoPlex
 benutzen?
 
 Warum kann ich in DataKey.h nicht den expliziten CopyConstruktor einführen?
-
-in idlist.h die subclassen einsetzen.
 
 BUG in spxscalesm.cc value() wird nicht descaliert. 
 Entsprechender Aufruf fehlt auch in spxgeneralsm.cc

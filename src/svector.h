@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.h,v 1.12 2001/12/04 19:28:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svector.h,v 1.13 2002/01/05 19:24:10 bzfkocht Exp $"
 
 /**@file  svector.h
  * @brief Sparse vectors.
@@ -216,7 +216,7 @@ public:
    }
 
    /// get \p n 'th nonzero element.
-   Element element(int n) const
+   const Element& element(int n) const
    {
       assert(n >= 0 && n < size());
       return m_elem[n];

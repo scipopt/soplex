@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.cpp,v 1.12 2002/01/04 17:31:38 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.cpp,v 1.13 2002/01/05 19:24:09 bzfkocht Exp $"
 
 #include <string.h>
 #include "nameset.h"
@@ -21,18 +21,17 @@
 
 namespace soplex
 {
-
-char NameSet_Name::deflt = '\0';
+const char NameSet::Name::deflt = '\0';
 
 void NameSet::add(const char* str)
 {
-   Key k;
+   DataKey k;
    add(k, str);
 }
 
-void NameSet::add(Key& p_key, const char* str)
+void NameSet::add(DataKey& p_key, const char* str)
 {
-   const NameSet_Name nstr (str);
+   const Name nstr (str);
    if (!hashtab.has(nstr))
    {
       if (size() + 1 > max())
@@ -56,10 +55,10 @@ void NameSet::add(Key& p_key, const char* str)
       memused += int(strlen(str)) + 1;
       strcpy(tmp, str);
 
-      NameSet_CharPtr* name = set.create(p_key);
+      CharPtr* name = set.create(p_key);
       name->name = tmp;
       list.append(name);
-      NameSet_Name memname(name->name);
+      Name memname(name->name);
       hashtab.add(memname, p_key);
    }
 }
@@ -68,17 +67,17 @@ void NameSet::add(const NameSet& p_set)
 {
    for (int i = 0; i < p_set.num(); ++i)
    {
-      NameSet_Name iname(p_set[i]);
+      Name iname(p_set[i]);
       if (!hashtab.has(iname))
          add(p_set[i]);
    }
 }
 
-void NameSet::add(Key p_key[], const NameSet& p_set)
+void NameSet::add(DataKey p_key[], const NameSet& p_set)
 {
    for (int i = 0; i < p_set.num(); ++i)
    {
-      NameSet_Name iname = p_set[i];
+      Name iname = Name(p_set[i]);
       if (!hashtab.has(iname))
          add(p_key[i], p_set[i]);
    }
@@ -87,7 +86,7 @@ void NameSet::add(Key p_key[], const NameSet& p_set)
 
 void NameSet::remove(const char *str)
 {
-   const NameSet_Name nam(str);
+   const Name nam(str);
    if (hashtab.has (nam))
    {
       DataKey* hkey = hashtab.get(nam);
@@ -97,16 +96,16 @@ void NameSet::remove(const char *str)
    }
 }
 
-void NameSet::remove(Key p_key)
+void NameSet::remove(DataKey p_key)
 {
    assert(has(p_key));
-   const NameSet_Name nam = set[p_key].name;
+   const Name nam = set[p_key].name;
    hashtab.remove (nam);
    list.remove(&(set[p_key]));
    set.remove(p_key);
 }
 
-void NameSet::remove(Key keys[], int n)
+void NameSet::remove(DataKey keys[], int n)
 {
    for (int i = 0; i < n; ++i)
       remove(keys[i]);
@@ -133,20 +132,20 @@ void NameSet::reMax(int newmax)
    hashtab.reMax (newmax);
 
    ptrdiff_t delta = set.reMax(newmax);
-   NameSet_CharPtr* first = list.first();
+   CharPtr* first = list.first();
 
    if (delta != 0 && first != 0)
    {
-      NameSet_CharPtr* last = ( reinterpret_cast<NameSet_CharPtr*>
+      CharPtr* last = ( reinterpret_cast<CharPtr*>
                                 (reinterpret_cast<char*>(list.last()) + delta) );
-      NameSet_CharPtr* name = ( reinterpret_cast<NameSet_CharPtr*>
+      CharPtr* name = ( reinterpret_cast<CharPtr*>
                                 (reinterpret_cast<char*>(first) + delta) );
       first = name;
       for (; name != last; name = name->next())
-         name->next() = reinterpret_cast<NameSet_CharPtr*>
+         name->next() = reinterpret_cast<CharPtr*>
             (reinterpret_cast<char*>(name->next()) + delta);
 
-      list = IsList < NameSet_CharPtr > (first, last);
+      list = IsList < CharPtr > (first, last);
    }
 }
 
@@ -163,12 +162,12 @@ void NameSet::memRemax(int newmax)
    hashtab.clear ();
 
    /* update pointers to new targets */
-   for (NameSet_CharPtr* name = list.first(); name; name = list.next(name))
+   for (CharPtr* name = list.first(); name; name = list.next(name))
       name->name += delta;
 
    for (int i = num() - 1; i >= 0; --i)
    {
-      NameSet_Name nam(set[key(i)].name);
+      Name nam(set[key(i)].name);
       hashtab.add(nam, key(i));
    }
 }
@@ -179,7 +178,7 @@ void NameSet::memPack()
 
    hashtab.clear ();
 
-   NameSet_CharPtr* name = list.first();
+   CharPtr* name = list.first();
    for (memused = 0; name != 0; name = list.next(name))
    {
       for (i = 0; (mem[memused + i] = name->name[i]) != 0; ++i)
@@ -191,17 +190,18 @@ void NameSet::memPack()
 
    for (i = num() - 1; i >= 0; --i)
    {
-      NameSet_Name nam(set[key(i)].name);
+      Name nam(set[key(i)].name);
       hashtab.add(nam, key(i));
    }
 }
 
-static int hashFunction (const NameSet_Name* str)
+/// returns the hash value of the name.
+int NameSetNameHashFunction(const NameSet::Name* str)
 {
    unsigned int res = 0;
    const char* sptr = str->name;
 
-   while (*sptr)
+   while(*sptr != '\0')
    {
       res *= 65;
       res += *sptr++ - int('0');
@@ -226,8 +226,8 @@ NameSet& NameSet::operator=(const NameSet& rhs)
       for (int i = 0; i < set.num(); ++i)
       {
          list.append(&(set[i]));
-         NameSet_Name iname(set[i].name);
-         Key ikey = Key(set.key(i));
+         Name iname(set[i].name);
+         DataKey ikey = DataKey(set.key(i));
          hashtab.add(iname, ikey);
       }
       memPack();
@@ -250,8 +250,8 @@ NameSet::NameSet(const NameSet& org)
    for (int i = 0; i < set.num(); ++i)
    {
       list.append(&(set[i]));
-      NameSet_Name iname = set[i];
-      Key k = Key(set.key(i));
+      Name iname = set[i];
+      DataKey k = DataKey(set.key(i));
       hashtab.add(iname, k);
    }
    memPack();
@@ -259,7 +259,7 @@ NameSet::NameSet(const NameSet& org)
 
 NameSet::NameSet(int p_max, int mmax, double fac, double memFac)
    : set(p_max)
-   , hashtab(hashFunction, set.max(), 0, fac)
+   , hashtab(NameSetNameHashFunction, set.max(), 0, fac)
    , factor(fac)
    , memFactor(memFac)
 {
@@ -278,9 +278,9 @@ bool NameSet::isConsistent() const
    if (memused > memmax)
       return MSGinconsistent("NameSet");
 
-   NameSet_CharPtr* next;
+   CharPtr* next;
 
-   for (NameSet_CharPtr *name = list.first(); name; name = next)
+   for (CharPtr *name = list.first(); name; name = next)
    {
       int len = int(strlen(name->name)) + 1;
 

@@ -1,4 +1,4 @@
-// $Id: soplex.lnt,v 1.2 2002/01/04 17:31:38 bzfkocht Exp $
+// $Id: soplex.lnt,v 1.3 2002/01/05 19:24:08 bzfkocht Exp $
 -passes(1)
 +cpp(.h,.cpp)
 // esoteric size settings to find erros.
@@ -102,6 +102,9 @@
 -efunc(414,DataHashTable*::add)   // no possible zero division
 -efunc(414,DataHashTable*::index) // no possible zero division
 
+// nameset.h
+-esym(1554,Name::name) // direct pointer copy ok
+
 // Temporary
 -w2    // Only warnings and Errors
 -e1509 // base class destructor for class is not virtual
@@ -116,8 +119,9 @@
 -e1516 // Data member hides inherited member 
 -e613  // Possible use of null pointer in left argument to operator '->'
 -e679  // Suspicious Truncation in arithmetic expression combining with pointer
-
-
+-esym(1502,compare) // defined object 'compare' has no nonstatic data members
+-esym(631,soplex::Compare) // defined differently 
+-e1536 // Exposing low access member
 
 
 

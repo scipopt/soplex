@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.cpp,v 1.6 2001/12/26 12:58:58 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprowset.cpp,v 1.7 2002/01/05 19:24:09 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -24,7 +24,7 @@
 namespace soplex
 {
 
-void LPRowSet::add(Key& p_key, double p_lhs, const SVector& vector, double p_rhs)
+void LPRowSet::add(DataKey& p_key, double p_lhs, const SVector& vector, double p_rhs)
 {
    SVSet::add(p_key, vector);
    if (num() > left.dim())
@@ -54,7 +54,7 @@ void LPRowSet::add(const LPRowSet& p_set)
    }
 }
 
-void LPRowSet::add(Key nkey[], const LPRowSet& p_set)
+void LPRowSet::add(DataKey nkey[], const LPRowSet& p_set)
 {
    int i = num();
    add(p_set);
@@ -63,7 +63,7 @@ void LPRowSet::add(Key nkey[], const LPRowSet& p_set)
       nkey[j] = key(i);
 }
 
-SVector& LPRowSet::create(Key& nkey, int nonzeros, double p_lhs, double p_rhs)
+SVector& LPRowSet::create(DataKey& nkey, int nonzeros, double p_lhs, double p_rhs)
 {
    if (num() + 1 > left.dim())
    {

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcolset.h,v 1.8 2001/12/28 14:55:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpcolset.h,v 1.9 2002/01/05 19:24:09 bzfkocht Exp $"
 
 /**@file  lpcolset.h
  * @brief Set of LP columns.
@@ -47,9 +47,6 @@ namespace soplex
 class LPColSet : protected SVSet
 {
 private:
-   /**@todo  get rid of this typedef! */
-   typedef DataKey Key;
-
    DVector low;     ///< vector of lower bounds.
    DVector up;      ///< vector of upper bounds.
    DVector object;  ///< vector of objective coefficients.
@@ -93,12 +90,12 @@ public:
    }
 
    ///
-   double obj(const Key& k) const
+   double obj(const DataKey& k) const
    {
       return object[number(k)];
    }
-   /// returns #obj%jective value of #LPCol with #Key \p k in #LPColSet.
-   double& obj(const Key& k)
+   /// returns #obj%jective value of #LPCol with #DataKey \p k in #LPColSet.
+   double& obj(const DataKey& k)
    {
       return object[number(k)];
    }
@@ -126,12 +123,12 @@ public:
    }
 
    ///
-   double lower(const Key& k) const
+   double lower(const DataKey& k) const
    {
       return low[number(k)];
    }
-   /// returns #lower bound of #LPCol# with #Key \p k in #LPColSet.
-   double& lower(const Key& k)
+   /// returns #lower bound of #LPCol# with #DataKey \p k in #LPColSet.
+   double& lower(const DataKey& k)
    {
       return low[number(k)];
    }
@@ -159,12 +156,12 @@ public:
    }
 
    ///
-   double upper(const Key& k) const
+   double upper(const DataKey& k) const
    {
       return up[number(k)];
    }
-   /// returns #upper bound of #LPCol with #Key \p k in #LPColSet.
-   double& upper(const Key& k)
+   /// returns #upper bound of #LPCol with #DataKey \p k in #LPColSet.
+   double& upper(const DataKey& k)
    {
       return up[number(k)];
    }
@@ -180,32 +177,32 @@ public:
       return operator[](i);
    }
 
-   /// returns writeable #colVector of #LPCol with #Key \p k in #LPColSet.
-   SVector& colVector_w(const Key& k)
+   /// returns writeable #colVector of #LPCol with #DataKey \p k in #LPColSet.
+   SVector& colVector_w(const DataKey& k)
    {
       return operator[](k);
    }
 
-   /// returns #colVector of #LPCol with #Key \p k in #LPColSet.
-   const SVector& colVector(const Key& k) const
+   /// returns #colVector of #LPCol with #DataKey \p k in #LPColSet.
+   const SVector& colVector(const DataKey& k) const
    {
       return operator[](k);
    }
 
-   /// returns #Key of \p i 'th #LPCol in #LPColSet.
-   Key key(int i) const
+   /// returns #DataKey of \p i 'th #LPCol in #LPColSet.
+   DataKey key(int i) const
    {
       return SVSet::key(i);
    }
 
-   /// returns number of #LPCol# with #Key \p k in #LPColSet.
-   int number(const Key& k) const
+   /// returns number of #LPCol# with #DataKey \p k in #LPColSet.
+   int number(const DataKey& k) const
    {
       return SVSet::number(k);
    }
 
-   /// does #Key \p k belong to #LPColSet ?
-   int has(const Key& k) const
+   /// does #DataKey \p k belong to #LPColSet ?
+   int has(const DataKey& k) const
    {
       return SVSet::has(k);
    }
@@ -214,7 +211,7 @@ public:
 
    /**@name Extension
       All extension methods come with two signatures, one of which providing a
-      parameter to return the assigned #Key%(s). See #DataSet for a more
+      parameter to return the assigned #DataKey%(s). See #DataSet for a more
       detailed description. All extension methods are designed to
       automatically reallocate memory if required.
    */
@@ -222,11 +219,11 @@ public:
    ///
    void add(const LPCol& pcol)
    {
-      Key k;
+      DataKey k;
       add(k, pcol);
    }
    /// adds p pcol to #LPColSet.
-   void add(Key& pkey, const LPCol& pcol)
+   void add(DataKey& pkey, const LPCol& pcol)
    {
       add(pkey, pcol.obj(), pcol.lower(),
            pcol.colVector(), pcol.upper());
@@ -235,11 +232,11 @@ public:
    ///
    void add(double pobj, double plower, const SVector& pcolVector, double pupper)
    {
-      Key k;
+      DataKey k;
       add(k, pobj, plower, pcolVector, pupper);
    }
    /// adds #LPCol consisting of objective value \p obj, lower bound \p lower, column vector \p colVector and upper bound \p upper to #LPColSet.
-   void add (Key& key,
+   void add (DataKey& key,
              double obj,
              double lower,
              const SVector& colVector,
@@ -248,10 +245,10 @@ public:
    ///
    void add(const LPColSet& set);
    /// adds all #LPCol%s of \p set to #LPColSet.
-   void add(Key key[], const LPColSet& set);
+   void add(DataKey key[], const LPColSet& set);
 
    ///
-   void add2(const Key& k, int n, int idx[], double val[])
+   void add2(const DataKey& k, int n, int idx[], double val[])
    {
       SVSet::add2(colVector_w(k), n, idx, val);
    }
@@ -264,11 +261,11 @@ public:
    ///
    SVector& create(int pnonzeros = 0, double pobj = 1, double plw = 0, double pupp = 1)
    {
-      Key k;
+      DataKey k;
       return create(k, pnonzeros, pobj, plw, pupp);
    }
    /// creates new #LPCol with specified arguments and returns a reference to its column vector.
-   SVector& create(Key& nkey, int nonzeros = 0, double obj = 1, double low = 0, double up = 1);
+   SVector& create(DataKey& nkey, int nonzeros = 0, double obj = 1, double low = 0, double up = 1);
    //@}
 
 
@@ -280,8 +277,8 @@ public:
    /// removes \p i 'th #LPCol.
    void remove(int i);
 
-   /// removes #LPCol with #Key \p k.
-   void remove(const Key& k)
+   /// removes #LPCol with #DataKey \p k.
+   void remove(const DataKey& k)
    {
       remove(number(k));
    }
@@ -289,8 +286,8 @@ public:
    /// removes multiple elements.
    void remove(int perm[]);
 
-   /// removes all #LPCol%s associated to the \p n #Key%s \p keys.
-   void remove(Key keys[], int n)
+   /// removes all #LPCol%s associated to the \p n #DataKey%s \p keys.
+   void remove(DataKey keys[], int n)
    {
       DataArray < int > perm(num());
       remove(keys, n, perm.get_ptr());
@@ -303,8 +300,8 @@ public:
       remove(nums, n, perm.get_ptr());
    }
 
-   /// removes all #LPCol%s associated to the \p n #Key%s \p keys, and stores the index permutation in array \p perm.
-   void remove(Key keys[], int n, int* perm);
+   /// removes all #LPCol%s associated to the \p n #DataKey%s \p keys, and stores the index permutation in array \p perm.
+   void remove(DataKey keys[], int n, int* perm);
 
    /// removes #LPCol%s with numbers \p nums, where \p n is the length of the array \p nums, and stores the index permutation in array \p perm.
    void remove(int nums[], int n, int* perm);

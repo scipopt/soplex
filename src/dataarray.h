@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataarray.h,v 1.12 2001/12/28 14:55:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataarray.h,v 1.13 2002/01/05 19:24:09 bzfkocht Exp $"
 
 /**@file  dataarray.h
  * @brief Save arrays of data objects.
@@ -27,6 +27,7 @@
 #include <iostream>
 
 #include "spxalloc.h"
+#include "message.h"
 
 namespace soplex
 {
@@ -266,16 +267,12 @@ public:
    }
 
    /// consistency check
-   int isConsistent() const
+   bool isConsistent() const
    {
-      if (data == 0
-           || themax < 1
-           || themax < thesize)
-      {
-         std::cout << "Inconsistency detected in class DataArray\n";
-         return 0;
-      }
-      return 1;
+      if (data == 0 || themax < 1 || themax < thesize)
+         return MSGinconsistent("DataArray");
+
+      return true;
    }
 
    /// copy constructor

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.11 2002/01/04 17:31:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.12 2002/01/05 19:24:10 bzfkocht Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -387,9 +387,6 @@ public:
    /// dual #Status for the row variable with ID \p id of the loaded LP.
    Desc::Status dualStatus(const SPxLP::SPxRowId& id) const;
 
-   /**@todo suspicious: In both cases, a row status is returned! 
-      The "if ? then : else"-clause makes no sense here.
-   */
    /// dual #Status for the variable with ID \p id of the loaded LP.
    /** It is automatically detected, whether the \p id is one of a 
        row or a column variable, and the correct row or column status
@@ -399,7 +396,7 @@ public:
    {
       return id.isSPxRowId()
          ? dualStatus(SPxLP::SPxRowId(id))
-         : dualStatus(SPxLP::SPxRowId(id));
+         : dualStatus(SPxLP::SPxColId(id));
    }
    //@}
 

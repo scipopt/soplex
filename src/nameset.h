@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.h,v 1.10 2002/01/04 17:31:38 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.h,v 1.11 2002/01/05 19:24:10 bzfkocht Exp $"
 
 /**@file  nameset.h
  * @brief Set of strings.
@@ -30,102 +30,6 @@
 
 namespace soplex
 {
-/**@todo NameSet_Name should be a local class of NameSet. */
-   
-/**@brief   Handles of names in a #NameSet.
-   @ingroup Elementary
-
-   Class #NameSet_Name provides the handles (i.e. #char*%s) of names in a
-   #NameSet.
-*/
-class NameSet_Name
-{
-protected:
-   friend class NameSet;
-   static char deflt;     ///< default zero string.
-
-public:
-   const char *name;      ///< pointer to the name string.
-
-   /// equality operator.
-   friend int operator==(const NameSet_Name& n1, const NameSet_Name& n2)
-   {
-      return (strcmp (n1.name, n2.name) == 0);
-   }
-
-   /// output operator.
-   friend std::ostream& operator<<(std::ostream& out, const NameSet_Name& n)
-   {
-      return out << n.name;
-   }
-
-   /// returns the hash value of the name.
-   friend int hashFunction (const NameSet_Name&);
-
-   /// consistency check.
-   bool isConsistent () const
-   {
-      return (name != 0);
-   }
-
-   /// default constructor.
-   NameSet_Name ()
-   {
-      name = &deflt;
-   }
-
-   /// copy constructor.
-   /** Only the pointer to the name is copied, but not the name itself.
-    */
-   NameSet_Name (const NameSet_Name& str)
-   {
-      name = str.name;
-   }
-
-   /// constructs a #NameSet_Name out of a C style character string.
-   NameSet_Name (const char* str)
-   {
-      name = str;
-   }
-};
-
-/**@todo NameSet_CharPtr should be a local class of NameSet. */
-   
-/**@brief   Single linked list of #NameSet_Name%s.
-   @ingroup Elementary
-
-   Since, #typedef IsElement<Name> CharPtr doesn't seem to work, derive
-   CharPtr explicitly.
-*/
-class NameSet_CharPtr : public NameSet_Name
-{
-protected:
-   NameSet_CharPtr *the_next;   ///< pointer to next name table entry.
-public:
-   ///
-   NameSet_CharPtr*& next()
-   {
-      return the_next;
-   }
-   /// returns the next name table entry.
-   NameSet_CharPtr*const& next() const
-   {
-      return the_next;
-   }
-
-   /// default constructor.
-   NameSet_CharPtr()
-      : NameSet_Name(), the_next(0)
-   {}
-
-   /// copy constructor.
-   NameSet_CharPtr(const NameSet_CharPtr& org)
-      : NameSet_Name(org), the_next(0)
-   { }
-
-};
-
-
 /**@brief   Set of strings.
    @ingroup Elementary
 
@@ -152,20 +56,68 @@ public:
 class NameSet
 {
 private:
-   /// Identifier for set entries.
+   /**@brief   Handles of names in a #NameSet.
+    * @ingroup Elementary
+    *
+    *  Class #Name provides the handles (i.e. #char*%s) of names in a
+    *  #NameSet.
+    */
+   class Name
+   {
+   private:
+      static const char deflt;     ///< default zero string.
+
+   public:
+      const char *name;      ///< pointer to the name string.
+
+      /// equality operator.
+      friend int operator==(const Name& n1, const Name& n2)
+      {
+         return (strcmp (n1.name, n2.name) == 0);
+      }
+      /// output operator.
+      friend std::ostream& operator<<(std::ostream& out, const Name& n)
+      {
+         return out << n.name;
+      }
+      /// consistency check.
+      bool isConsistent () const
+      {
+         return (name != 0);
+      }
+      /// default constructor.
+      Name() 
+         : name(&deflt)
+      {}
+      /// copy constructor.
+      /** Only the pointer to the name is copied, but not the name itself.
+       */
+      Name (const Name& str) 
+         : name(str.name)
+      {}
+      /// constructs a #Name out of a C style character string.
+      Name (const char* str) 
+         : name(str)
+      {}
+   };
+   /// returns the hash value of the name.
+   friend int NameSetNameHashFunction (const Name*);
+
+   /// Single linked list of #Name%s.
+   typedef IsElement<Name> CharPtr;
+
+private:
+   IsList < CharPtr > list;  ///< sorted name list.
+   DataSet < CharPtr > set;  ///< name set.
+   char* mem;                        ///< string memory
+   int memmax;                       ///< size of string memory
+   int memused;                      ///< size of used string memory
+
    /** Every name in a #NameSet is assigned a #Key by which it can be
        accessed (see #NameSet::operator[]()). See #DataSet::Key for a more
        detailed description of the concept of Keys.
    */
-   typedef DataKey Key; 
-
-protected:
-   IsList < NameSet_CharPtr > list;  ///< sorted name list.
-   DataSet < NameSet_CharPtr > set;  ///< name set.
-   char* mem;                        ///< string memory
-   int memmax;                       ///< size of string memory
-   int memused;                      ///< size of used string memory
-   DataHashTable < NameSet_Name, Key > hashtab;  ///< hashtable for names
+   DataHashTable < Name, DataKey > hashtab;  ///< hashtable for names
 
 public:
    /**@name Inquiry */
@@ -176,8 +128,8 @@ public:
       return set[pnum].name;
    }
 
-   /// returns name for #Key \p pkey of #NameSet.
-   const char* operator[](Key pkey) const
+   /// returns name for #DataKey \p pkey of #NameSet.
+   const char* operator[](DataKey pkey) const
    {
       return set[pkey].name;
    }
@@ -194,7 +146,7 @@ public:
       return set.max();
    }
 
-   /// returns maximum #Key::idx used in #NameSet.
+   /// returns maximum #DataKey::idx used in #NameSet.
    int size() const
    {
       return set.size();
@@ -212,23 +164,23 @@ public:
       return memused;
    }
 
-   /// returns #Key of the \p pnum 'th name in #NameSet.
-   Key key(int pnum) const
+   /// returns #DataKey of the \p pnum 'th name in #NameSet.
+   DataKey key(int pnum) const
    {
       return set.key(pnum);
    }
 
    /**@todo suspicious: hashtab.get(nam) could return a NULL pointer if nam
       is not in the table, which would core dump (?) the *hashtab.get() */
-   /// returns #Key of name \p str in #NameSet.
-   Key key(const char* str) const
+   /// returns #DataKey of name \p str in #NameSet.
+   DataKey key(const char* str) const
    {
-      const NameSet_Name nam(str);
+      const Name nam(str);
       return (*hashtab.get(nam));
    }
 
-   /// returns number of name with #Key \p pkey in #NameSet.
-   int number(Key pkey) const
+   /// returns number of name with #DataKey \p pkey in #NameSet.
+   int number(DataKey pkey) const
    {
       return set.number(pkey);
    }
@@ -236,7 +188,7 @@ public:
    /// returns number of name \p str in #NameSet.
    int number(const char *str) const
    {
-      const NameSet_Name nam(str);
+      const Name nam(str);
       if (hashtab.has(nam))
          return number(*hashtab.get(nam));
       else
@@ -252,12 +204,12 @@ public:
    /// does #NameSet has a name \p str ?
    int has(const char* str) const
    {
-      const NameSet_Name nam(str);
+      const Name nam(str);
       return hashtab.has(nam);
    }
 
-   /// does #NameSet has a name with #Key \p pkey ?
-   int has(Key pkey) const
+   /// does #NameSet has a name with #DataKey \p pkey ?
+   int has(DataKey pkey) const
    {
       return set.has(pkey);
    }
@@ -268,19 +220,19 @@ public:
    ///
    void add(const char* str);
    /// adds name \p str to #NameSet.
-   void add(Key& key, const char* str);
+   void add(DataKey& key, const char* str);
 
    ///
    void add(const NameSet& set);
    /// adds all names in \p set to #NameSet.
-   void add(Key key[], const NameSet& set);
+   void add(DataKey key[], const NameSet& set);
    //@}
 
 
    /**@name Shrinking */
    //@{
-   /// removes name with #Key \p key from #NameSet.
-   void remove(Key key);
+   /// removes name with #DataKey \p key from #NameSet.
+   void remove(DataKey key);
 
    /// removes \p pnum 'th name from #NameSet.
    void remove(int pnum)
@@ -291,8 +243,8 @@ public:
    /// removes name \p str from #NameSet.
    void remove(const char* str);
 
-   /// removes \p n names with #Key%s \p keys from #NameSet.
-   void remove(Key keys[], int n);
+   /// removes \p n names with #DataKey%s \p keys from #NameSet.
+   void remove(DataKey keys[], int n);
 
    /// removes \p n names with numbers \p nums from #NameSet.
    void remove(int nums[], int n);

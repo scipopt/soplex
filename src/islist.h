@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: islist.h,v 1.9 2002/01/04 17:31:38 bzfkocht Exp $"
+#pragma ident "@(#) $Id: islist.h,v 1.10 2002/01/05 19:24:09 bzfkocht Exp $"
 
 /**@file  islist.h
  * @brief Generic single linked list.
@@ -70,7 +70,7 @@ public:
    */
    IsElement(const IsElement<T>& old)
       : T(old)
-         , the_next(0)
+      , the_next(0)
    {}
 
 };

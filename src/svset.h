@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.h,v 1.10 2002/01/05 09:59:43 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.h,v 1.11 2002/01/05 19:24:11 bzfkocht Exp $"
 
 /**@file  svset.h
  * @brief Set of sparse vectors.
@@ -123,7 +123,6 @@ private:
       DLPSV(const DLPSV& copy) : SVector(copy)
       {}
    };
-   typedef DataKey Key;    ///< keys inherited from the DataSet   
    DataSet < DLPSV > set;  ///< %set of SVectors
    IdList < DLPSV > list;  ///< doubly linked list for non-zero management
    
@@ -180,10 +179,10 @@ public:
     *  to the sets nonzero memory and creating an additional SVector
     *  entry in vector memory. If neccessary, the memory blocks are
     *  enlarged appropriately. 
-    *  @return \p nkey contains the Key, that
+    *  @return \p nkey contains the DataKey, that
     *  the SVSet has assosicated to the new SVector.
     */
-   void add(Key& nkey, const SVector& svec)
+   void add(DataKey& nkey, const SVector& svec)
    {
       ensurePSVec(1);
       SVector* new_svec = create(nkey, svec.size());
@@ -197,24 +196,24 @@ public:
 
    /// Add n SVector%s to SVSet.
    /**  Adds all \p n SVector%s in the array \p svec to the %set.  
-    * @return \p nkey contains the Key%s, that the SVSet has assosicated to the
+    * @return \p nkey contains the DataKey%s, that the SVSet has assosicated to the
     *  new SVector%s. 
     * @pre \p nkey must be large enough to fit \p n
-    *  Key%s.
+    *  DataKey%s.
     */
-   void add(Key nkey[], const SVector svec[], int n);
+   void add(DataKey nkey[], const SVector svec[], int n);
 
    /// Add all SVector%s in \p pset to an SVSet.
    void add(const SVSet& pset);
 
    /// Add all SVector%s of \p pset to SVSet.
    /**  Adds all \p n SVector%s in the \p pset to an SVSet. 
-    * @return \p nkey contains the Key%s, that the SVSet has assosicated to the
+    * @return \p nkey contains the DataKey%s, that the SVSet has assosicated to the
     *  new SVector%s. 
     * @pre \p nkey must be large enough to fit
-    *  \p pset.num() Key%s.
+    *  \p pset.num() DataKey%s.
     */
-   void add(Key nkey[], const SVSet& pset);
+   void add(DataKey nkey[], const SVSet& pset);
 
    /// Creates new SVector in %set.
    /**  The new SVector will be ready to fit at least \p idxmax nonzeros.
@@ -223,10 +222,10 @@ public:
 
    /// Creates new SVector in %set.
    /**  The new SVector will be ready to fit at least \p idxmax nonzeros.
-    * @return \p nkey contains the Key associated to the new
+    * @return \p nkey contains the DataKey associated to the new
     *  SVector.
     */
-   SVector* create(Key& nkey, int idxmax = -1);
+   SVector* create(DataKey& nkey, int idxmax = -1);
 
    /// Extend \p svec to fit \p newmax nonzeros.
    /** @pre \p svec must be an SVector of the SVSet.
@@ -255,7 +254,7 @@ public:
    //@{
    /// removes the vector with key \p removekey from the %set
    /** @pre \p removekey must be a key from SVSet */
-   void remove(Key removekey);
+   void remove(DataKey removekey);
 
    /// removes the vector with number \p removenum from the %set
    /** @pre \p removenum must be a valid vector number from SVSet */
@@ -285,7 +284,7 @@ public:
    /** 
     * @pre  \p keys must be at least of size \p n and valid keys
     */
-   void remove(Key keys[], int n)
+   void remove(DataKey keys[], int n)
    {
       DataArray < int > perm(num());
       remove(keys, n, perm.get_ptr());
@@ -302,7 +301,7 @@ public:
    }
 
    ///
-   void remove(Key keys[], int n, int* perm);
+   void remove(DataKey keys[], int n, int* perm);
 
    /// Remove \p n SVector%s from %set.
    /** 
@@ -339,14 +338,14 @@ public:
       return set[n];
    }
 
-   ///get SVector by Key, writeable
-   SVector& operator[](const Key& k)
+   ///get SVector by DataKey, writeable
+   SVector& operator[](const DataKey& k)
    {
       return set[k];
    }
 
-   ///get SVector by Key
-   const SVector& operator[](const Key& k) const
+   ///get SVector by DataKey
+   const SVector& operator[](const DataKey& k) const
    {
       return set[k];
    }
@@ -367,20 +366,20 @@ public:
       return set.max();
    }
 
-   /// get Key of vector number
-   Key key(int n) const
+   /// get DataKey of vector number
+   DataKey key(int n) const
    {
       return set.key(n);
    }
 
-   ///get Key of SVector
-   Key key(const SVector* svec) const
+   ///get DataKey of SVector
+   DataKey key(const SVector* svec) const
    {
       return set.key(static_cast<const DLPSV*>(svec));
    }
 
-   ///get vector number of Key
-   int number(const Key& k) const
+   ///get vector number of DataKey
+   int number(const DataKey& k) const
    {
       return set.number(k);
    }
@@ -391,9 +390,8 @@ public:
       return set.number(static_cast<const DLPSV*>(svec));
    }
 
-
-   /// true iff SVSet contains a SVector for Key \p k
-   int has(const Key& k) const
+   /// true iff SVSet contains a SVector for DataKey \p k
+   int has(const DataKey& k) const
    {
       return set.has(k);
    }
@@ -410,7 +408,6 @@ public:
       return set.has(static_cast<const DLPSV*>(svec));
    }
    //@}
-
 
    /**@name Memory Management */
    //@{

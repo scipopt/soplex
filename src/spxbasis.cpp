@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.14 2001/12/28 14:55:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.15 2002/01/05 19:24:10 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -23,6 +23,7 @@
 #include "didxset.h"
 #include "dvector.h"
 #include "soplex.h"
+#include "mpsinput.h"
 #include "message.h"
 
 namespace soplex
@@ -214,109 +215,78 @@ void SPxBasis::load(SLinSolver* p_solver)
    factor->clear();
 }
 
-/**@todo Reimplement with new MPS Reader.
+/**@todo This routine is untested.
  */
 void SPxBasis::readBasis(std::istream& is, NameSet& rn, NameSet& cn)
 {
-   std::cout << "Not implemented yet!" << std::endl;
-#if 0
-   int i, r, c;
-   char* f1;
-   char* f2;
-   char* f3;
-   char* f4;
-   char* f5;
-   char* f6;
-   Desc l_desc(thedesc);
-
    assert(theLP != 0);
 
-   for (i = theLP->nRows() - 1; i >= 0; --i)
+   int  i;
+   Desc l_desc(thedesc);
+
+   for(i = 0; i < theLP->nRows(); i++)
       l_desc.rowstat[i] = dualRowStatus(i);
 
-   for (i = theLP->nCols() - 1; i >= 0; --i)
+   for(i = 0; i < theLP->nCols(); i++)
       l_desc.colstat[i] = Desc::P_ON_LOWER;
 
-   if (!SPxLP::readLine(is, f1, f2, f3, f4, f5, f6))
-   {
-      std::cerr << "ERROR: incorrect basis file format\n";
-      return;
-   }
-   if (strncmp(f1, "NAME", 4) != 0)
-   {
-      std::cerr << "ERROR: incorrect basis file format\n";
-      return;
-   }
+   MPSInput mps(is);
 
-   do
+   if (mps.readLine() && (mps.field0() != 0) && !strcmp(mps.field0(), "NAME"))
    {
-      if (SPxLP::readLine(is, f1, f2, f3, f4, f5, f6))
+      while(mps.readLine())
       {
-         if (strncmp(f1, "ENDATA", 6) == 0)
+         int c = -1;
+         int r = -1;
+
+         if (!strcmp(mps.field0(), "ENDATA"))
+         {
+            mps.setSection(MPSInput::ENDATA);
             break;
-         std::cerr << "ERROR: incorrect basis file format\n";
-         return;
-      }
-
-      if (f2 == 0)
-      {
-         std::cerr << "ERROR: incorrect basis file format\n";
-         return;
-      }
-
-      c = cn.number(f2);
-      if (c < 0)
-      {
-         std::cerr << "ERROR: incorrect basis file format\n";
-         return;
-      }
-
-      if (strncmp(f1, "XU", 2))
-      {
-         r = rn.number(f3);
-         if (r < 0)
-         {
-            std::cerr << "ERROR: incorrect basis file format\n";
-            return;
          }
-         l_desc.colstat[c] = dualColStatus(c);
-         l_desc.rowstat[r] = Desc::P_ON_UPPER;
-      }
-      else if (strncmp(f1, "XL", 2))
-      {
-         r = rn.number(f3);
-         if (r < 0)
+         if ((mps.field1() == 0) || (mps.field2() == 0))
+            break;
+
+         if ((c = cn.number(mps.field2())) < 0)
+            break;
+
+         if (*mps.field1() == 'X')
+            if ((mps.field3() == 0) || ((r = rn.number(mps.field3())) < 0))
+               break;
+
+         if (!strcmp(mps.field1(), "XU"))
          {
-            std::cerr << "ERROR: incorrect basis file format\n";
-            return;
+            l_desc.colstat[c] = dualColStatus(c);
+            l_desc.rowstat[r] = Desc::P_ON_UPPER;
          }
-         l_desc.colstat[c] = dualColStatus(c);
-         l_desc.rowstat[r] = Desc::P_ON_LOWER;
+         else if (!strcmp(mps.field1(), "XL"))
+         {
+            l_desc.colstat[c] = dualColStatus(c);
+            l_desc.rowstat[r] = Desc::P_ON_LOWER;
+         }
+         else if (!strcmp(mps.field1(), "UL"))
+         {
+            l_desc.colstat[c] = Desc::P_ON_UPPER;
+         }
+         else if (!strcmp(mps.field1(), "LL"))
+         {
+            l_desc.colstat[c] = Desc::P_ON_LOWER;
+         }
+         else
+         {
+            break;
+         }
       }
-      else if (strncmp(f1, "UL", 2))
-      {
-         l_desc.colstat[c] = Desc::P_ON_UPPER;
-      }
-      else if (strncmp(f1, "LL", 2))
-      {
-         l_desc.colstat[c] = Desc::P_ON_LOWER;
-      }
-      else
-      {
-         std::cerr << "ERROR: incorrect basis file format\n";
-         return;
-      }
-      //      std::cerr << f1 << '\t' << f2 << '\t' << f3 << std::endl;
    }
-
-   while (is.good());
-
-   load(l_desc);
-   return;
-#endif
+   if (!mps.hasError())
+   {
+      if (mps.section() == MPSInput::ENDATA)
+         load(l_desc);
+      else
+         mps.syntaxError();
+   }
 }
 
-//@ -----------------------------------------------------------------------------
 /*      \SubSection{Pivoting Methods}
  */
 int SPxBasis::doFactorize()

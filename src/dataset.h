@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.17 2002/01/05 09:59:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.18 2002/01/05 19:24:09 bzfkocht Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -85,10 +85,6 @@ namespace soplex
 template<class DATA>
 class DataSet
 {
-private:
-   /**@todo replace all "Key"s with "DataKey" and get rid of this typedef */
-   typedef DataKey Key;
-
 protected:
    struct Item
    {
@@ -97,7 +93,7 @@ protected:
                        ///< iff element is used
    }* theitem;         ///< array of elements in the #DataSet
 
-   Key* thekey;        ///< #Key::idx%s of elements
+   DataKey* thekey;        ///< #DataKey::idx%s of elements
 
    int themax;         ///< length of arrays #theitem and #thekey
    int thesize;        ///< highest used element in #theitem
@@ -107,15 +103,15 @@ protected:
 public:
    /**@name Extension
     *  Whenever a new element is added to a #DataSet, the latter assigns it a
-    *  #Key. For this all methods that extend a #DataSet by one ore more
+    *  #DataKey. For this all methods that extend a #DataSet by one ore more
     *  elements are provided with two signatures, one of them having a
-    *  parameter for returning the assigned #Key(s).
+    *  parameter for returning the assigned #DataKey(s).
     */
    //@{
    /// adds an element.
    /**@return 0 on success and non-zero, if an error occured.
     */
-   int add(Key& newkey, const DATA& item)
+   int add(DataKey& newkey, const DATA& item)
    {
       DATA* data = create(newkey);
       if (data == 0)
@@ -142,7 +138,7 @@ public:
     *       of the standard add-methods; they should return a non-zero, 
     *       if one of the add's failed! 
     */
-   int add(Key newkey[], const DATA* item, int n)
+   int add(DataKey newkey[], const DATA* item, int n)
    {
       assert(n >= 0);
       if (num() + n > max())
@@ -166,7 +162,7 @@ public:
    }
 
    /// adds several new items.
-   int add(Key newkey[], const DataSet < DATA > & set)
+   int add(DataKey newkey[], const DataSet < DATA > & set)
    {
       if (num() + set.num() > max())
          return 1;
@@ -190,7 +186,7 @@ public:
    /// creates new data element in #DataSet.
    /**@return Pointer to the newly created element.
     */
-   DATA* create(Key& newkey)
+   DATA* create(DataKey& newkey)
    {
       if (num() >= max())
          return 0;
@@ -214,7 +210,7 @@ public:
     */
    DATA* create()
    {
-      Key tmp;
+      DataKey tmp;
       return create(tmp);
    }
    //@}
@@ -259,7 +255,7 @@ public:
    }
 
    /// removes element with key \p removekey.
-   void remove(const Key& removekey)
+   void remove(const DataKey& removekey)
    {
       remove(number(removekey));
    }
@@ -309,7 +305,7 @@ public:
    }
 
    /// ???
-   void remove(Key *keys, int n, int* perm)
+   void remove(DataKey *keys, int n, int* perm)
    {
       assert(perm != 0);
       for (int i = num() - 1; i >= 0; --i)
@@ -319,7 +315,7 @@ public:
       remove(perm);
    }
    /// remove \p n elements given by \p keys.
-   void remove(Key *keys, int n)
+   void remove(DataKey *keys, int n)
    {
       DataArray<int> perm(num());
       remove(keys, n, perm.get_ptr());
@@ -370,12 +366,12 @@ public:
    }
 
    ///
-   DATA& operator[](const Key& k)
+   DATA& operator[](const DataKey& k)
    {
       return theitem[k.idx].data;
    }
-   /// returns element with #Key \p k.
-   const DATA& operator[](const Key& k) const
+   /// returns element with #DataKey \p k.
+   const DATA& operator[](const DataKey& k) const
    {
       return theitem[k.idx].data;
    }
@@ -395,29 +391,29 @@ public:
       return thenum;
    }
 
-   /// returns the maximum #Key::idx currently in #DataSet.
+   /// returns the maximum #DataKey::idx currently in #DataSet.
    int size() const
    {
       return thesize;
    }
 
-   /// returns #Key of \p n 'th element in #DataSet.
-   Key key(int n) const
+   /// returns #DataKey of \p n 'th element in #DataSet.
+   DataKey key(int n) const
    {
       assert(n >= 0 && n < num());
       return thekey[n];
    }
 
-   /// returns #Key of element \p item in #DataSet.
-   Key key(const DATA* item) const
+   /// returns #DataKey of element \p item in #DataSet.
+   DataKey key(const DATA* item) const
    {
       assert(number(item) >= 0);
       return thekey[number(item)];
    }
 
-   /// returns the number of the element with #Key \p k in #DataSet or -1, 
+   /// returns the number of the element with #DataKey \p k in #DataSet or -1, 
    /// if it doesn't exist.
-   int number(const Key& k) const
+   int number(const DataKey& k) const
    {
       return (k.idx < 0 || k.idx >= size()) ? -1
           : theitem[k.idx].info;
@@ -447,8 +443,8 @@ public:
       return theitem[idx].info;
    }
 
-   /// Is \p k a valid #Key of an element in #DataSet?
-   int has(const Key& k) const
+   /// Is \p k a valid #DataKey of an element in #DataSet?
+   int has(const DataKey& k) const
    {
       return theitem[k.idx].info >= 0;
    }
@@ -554,7 +550,7 @@ public:
    /// assignment operator.
    /** The assignment operator involves #reMax()%ing the lvalue #DataSet
     *  to the size needed for copying all elements of the rvalue. After the
-    *  assignment all #Key%s from the lvalue are valid for the rvalue as
+    *  assignment all #DataKey%s from the lvalue are valid for the rvalue as
     *  well. They refer to a copy of the corresponding data elements.
     */
    DataSet < DATA > & operator=(const DataSet < DATA > & rhs)

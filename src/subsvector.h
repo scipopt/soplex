@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: subsvector.h,v 1.5 2001/12/28 14:55:13 bzfkocht Exp $"
+#pragma ident "@(#) $Id: subsvector.h,v 1.6 2002/01/05 19:24:10 bzfkocht Exp $"
 
 
 /**@file  subsvector.h
@@ -40,27 +40,18 @@ namespace soplex
 class SubSVector
 {
 private:
+   /// output operator.
+   friend std::ostream& operator<<(std::ostream& os, const SubSVector& v);
+
    friend Vector& Vector::multAdd(double x, const SubSVector& vec);
 
-   SVector::Element* elem;   ///< element array.
-   int               num;    ///< number of nonzero elements.
+   const SVector::Element* elem;   ///< element array.
+   const int               num;    ///< number of nonzero elements.
 #ifndef NDEBUG
-   SVector*          svec;   ///< pointer to underlying #SVector.
+   const SVector*          svec;   ///< pointer to underlying #SVector.
 #endif
 
 public:
-   /**@name Modification */
-   //@{
-   /// switches \p n 'th with 0'th nonzero.
-   void toFront(int n);
-
-   /// sorts nonzeros to increasing indices.
-   void sort();
-   //@}
-
-
-   /**@name Inquiry */
-   //@{
    ///
    int size() const
    {
@@ -70,7 +61,8 @@ public:
    int dim() const;
 
    /// returns number of index \p i.
-   /** Returns the number of the first index \p i. If no index \p i is available
+   /** Returns the number of the first index \p i. 
+       If no index \p i is available
        in the #IdxSet, -1 is returned. Otherwise, #index(number(i)) == i
        holds.
     */
@@ -84,25 +76,11 @@ public:
          return elem[n].val;
       return 0;
    }
-
-   ///
-   SVector::Element& element(int n)
-   {
-      assert(n >= 0 && n < size());
-      return elem[n];
-   }
    /// returns the \p n 'th nonzero index/value-pair.
-   SVector::Element element(int n) const
+   const SVector::Element& element(int n) const
    {
       assert(n >= 0 && n < size());
       return elem[n];
-   }
-
-   ///
-   int& index(int n)
-   {
-      assert(n >= 0 && n < size());
-      return elem[n].idx;
    }
    /// returns the index of the \p n 'th nonzero.
    int index(int n) const
@@ -110,24 +88,13 @@ public:
       assert(n >= 0 && n < size());
       return elem[n].idx;
    }
-
-   ///
-   double& value(int n)
-   {
-      assert(n >= 0 && n < size());
-      return elem[n].val;
-   }
    /// returns the value of the \p n 'th nonzero.
    double value(int n) const
    {
       assert(n >= 0 && n < size());
       return elem[n].val;
    }
-   //@}
 
-
-   /**@name Mathematical Operations */
-   //@{
    /// returns eucledian norm.
    double length() const
    {
@@ -137,23 +104,12 @@ public:
    /// returns squared eucledian norm.
    double length2() const;
 
-   /// scales vector with \p x.
-   SubSVector& operator*=(double x);
-
    /// returns inner product with \p w.
    double operator*(const Vector& w) const;
-   //@}
 
-
-   /**@name Miscellaneous */
-   //@{
    /// consistency check.
-   int isConsistent() const;
-   //@}
-
+   bool isConsistent() const;
    
-   /**@name Constructors / Destructors */
-   //@{
    /// default constructor.
    SubSVector(SVector* sv = 0, int first = 0, int len = 0)
       : elem((sv && first < sv->max()) ? &sv->element(first) : 0)
@@ -161,7 +117,9 @@ public:
 #ifndef NDEBUG
       , svec(sv)
 #endif
-   { assert(isConsistent()); }
+   { 
+      assert(isConsistent()); 
+   }
 
    /// copy constructor.
    SubSVector(const SubSVector& old)
@@ -173,10 +131,6 @@ public:
    {
       assert(isConsistent());
    }
-   //@}
-
-   /// output operator.
-   friend std::ostream& operator<<(std::ostream& os, const SubSVector& v);
 };
 
 inline Vector& Vector::multAdd(double x, const SubSVector& vec)

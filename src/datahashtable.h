@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datahashtable.h,v 1.10 2002/01/04 17:31:38 bzfkocht Exp $"
+#pragma ident "@(#) $Id: datahashtable.h,v 1.11 2002/01/05 19:24:09 bzfkocht Exp $"
 
 /**@file  datahashtable.h
  * @brief Generic hash table for data objects.
@@ -23,6 +23,8 @@
 
 #include <iostream>
 #include <assert.h>
+
+#include "message.h"
 
 namespace soplex
 {
@@ -308,42 +310,24 @@ public:
    /**@name Miscellaneous */
    //@{
    /// checks, whether #DataHashTable is consistent
-   int isConsistent () const
+   bool isConsistent () const
    {
       int i, tot;
 
       for (i = element.size() - 1, tot = 0; i >= 0; --i)
-         if (element[i].status
-              == Element < HashItem, Info > ::USED)
+      {
+         if (element[i].status == Element < HashItem, Info > ::USED)
          {
             ++tot;
             if (!has(element[i].item))
-            {
-               std::cout << "Inconsistency detected in class DataHashTable\n";
-               return 0;
-            }
+               return MSGinconsistent("DataHashTable");
          }
-
-      if (tot != thenum)
-      {
-         std::cout << "Inconsistency detected in class DataHashTable\n";
-         return 0;
       }
+      if (tot != thenum)
+         return MSGinconsistent("DataHashTable");
+
       return element.isConsistent();
    }
-
-#ifdef DEFINE_OUTPUT_OPERATOR
-   /// Output operator. Displays all elements contained in hash table.
-   /**@todo Is there any reason not to define this operator? */
-   friend std::ostream& operator<<(std::ostream& out,
-      const DataHashTable < HashItem, Info > & h)
-   {
-      const HashItem* item;
-      for (item = h.first(); item; item = h.next())
-         out << "    " << *item << "\t\t" << h[*item] << std::endl;
-      return out;
-   }
-#endif
    //@}
 
 private:
@@ -429,15 +413,11 @@ public:
     *  @param hashsze      hash size.
     *  @param incr         factor for increasing data block.
     */
-   DataHashTable
-   (int (*f)(const HashItem*),
-     int nel = 256 ,
-     int hashsze = 0 ,
-     double incr = 2.0
-  )
+   DataHashTable(int (*f)(const HashItem*), 
+      int nel = 256, int hashsze = 0, double incr = 2.0)
       : element(nel)
-         , hashval(f)
-         , factor (incr)
+      , hashval(f)
+      , factor (incr)
    {
       clear();
       if (hashsze < 1)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.h,v 1.10 2001/12/28 14:55:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprowset.h,v 1.11 2002/01/05 19:24:09 bzfkocht Exp $"
 
 /**@file  lprowset.h
  * @brief Set of LP columns.
@@ -48,9 +48,6 @@ namespace soplex
 class LPRowSet : protected SVSet
 {
 private:
-   /**@todo  get rid of this typedef! */
-   typedef DataKey Key;
-
    DVector left;  ///< vector of left hand sides (lower bounds) of #LPRow%s.
    DVector right; ///< vector of right hand sides (upper bounds) of #LPRow%s.
 
@@ -93,12 +90,12 @@ public:
    }
 
    ///
-   double lhs(const Key& k) const
+   double lhs(const DataKey& k) const
    {
       return left[number(k)];
    }
-   /// returns the #lhs of the #LPRow with #Key \k in #LPRowSet.
-   double& lhs(const Key& k)
+   /// returns the #lhs of the #LPRow with #DataKey \k in #LPRowSet.
+   double& lhs(const DataKey& k)
    {
       return left[number(k)];
    }
@@ -126,12 +123,12 @@ public:
    }
 
    ///
-   double rhs(const Key& k) const
+   double rhs(const DataKey& k) const
    {
       return right[number(k)];
    }
-   /// returns the #rhs of the #LPRow with #Key \k in #LPRowSet.
-   double& rhs(const Key& k)
+   /// returns the #rhs of the #LPRow with #DataKey \k in #LPRowSet.
+   double& rhs(const DataKey& k)
    {
       return right[number(k)];
    }
@@ -148,14 +145,14 @@ public:
       return operator[](i);
    }
 
-   /// returns a writable #rowVector of the #LPRow# with #Key \p k.
-   SVector& rowVector_w(const Key& k)
+   /// returns a writable #rowVector of the #LPRow# with #DataKey \p k.
+   SVector& rowVector_w(const DataKey& k)
    {
       return operator[](k);
    }
 
-   /// returns the #rowVector of the #LPRow# with #Key \p k.
-   const SVector& rowVector(const Key& k) const
+   /// returns the #rowVector of the #LPRow# with #DataKey \p k.
+   const SVector& rowVector(const DataKey& k) const
    {
       return operator[](k);
    }
@@ -172,8 +169,8 @@ public:
       return LPRow::RANGE;
    }
 
-   /// returns the inequality type of the #LPRow with #Key \p k.
-   LPRow::Type type(const Key& k) const
+   /// returns the inequality type of the #LPRow with #DataKey \p k.
+   LPRow::Type type(const DataKey& k) const
    {
       return type(number(k));
    }
@@ -193,30 +190,30 @@ public:
       }
    }
 
-   /// returns the value of the #LPRow with #Key \p k.
+   /// returns the value of the #LPRow with #DataKey \p k.
    /** The \em value of a row depends on its type: if the inequality is of
        type "greater or equal", the value is the #lhs of the row. Otherwise,
        the value is the #rhs.
    */
-   double value(const Key& k) const
+   double value(const DataKey& k) const
    {
       return value(number(k));
    }
 
-   /// returns the #Key of the \p i 'th #LPRow in #LPRowSet.
-   Key key(int i) const
+   /// returns the #DataKey of the \p i 'th #LPRow in #LPRowSet.
+   DataKey key(int i) const
    {
       return SVSet::key(i);
    }
 
-   /// returns the number of the #LPRow# with #Key \p k in #LPRowSet.
-   int number(const Key& k) const
+   /// returns the number of the #LPRow# with #DataKey \p k in #LPRowSet.
+   int number(const DataKey& k) const
    {
       return SVSet::number(k);
    }
 
-   /// does #Key \p k belong to #LPRowSet ?
-   int has(const Key& k) const
+   /// does #DataKey \p k belong to #LPRowSet ?
+   int has(const DataKey& k) const
    {
       return SVSet::has(k);
    }
@@ -225,7 +222,7 @@ public:
 
    /**@name Extension
       Extension methods come with two signatures, one of them providing a
-      parameter to return the assigned #Key(s). See #DataSet for a more
+      parameter to return the assigned #DataKey(s). See #DataSet for a more
       detailed description. All extension methods will automatically rearrange
       or allocate more memory if required.
    */
@@ -233,11 +230,11 @@ public:
    ///
    void add(const LPRow& row)
    {
-      Key k;
+      DataKey k;
       add(k, row);
    }
    /// adds \p row to #LPRowSet.
-   void add(Key& pkey, const LPRow& prow)
+   void add(DataKey& pkey, const LPRow& prow)
    {
       add(pkey, prow.lhs(), prow.rowVector(), prow.rhs());
    }
@@ -245,16 +242,16 @@ public:
    ///
    void add(double plhs, const SVector& prowVector, double prhs)
    {
-      Key k;
+      DataKey k;
       add(k, plhs, prowVector, prhs);
    }
    /// adds #LPRow consisting of left hand side \p lhs, row vector \p rowVector, and right hand side \p rhs to #LPRowSet.
-   void add(Key& key, double lhs, const SVector& rowVector, double rhs);
+   void add(DataKey& key, double lhs, const SVector& rowVector, double rhs);
 
    ///
    void add(const LPRowSet& set);
    /// adds all #LPRow%s of \p set to #LPRowSet.
-   void add(Key key[], const LPRowSet& set);
+   void add(DataKey key[], const LPRowSet& set);
 
    /// extends row \p n to fit \p newmax nonzeros.
    void xtend(int n, int newmax)
@@ -262,14 +259,14 @@ public:
       SVSet::xtend(rowVector_w(n), newmax);
    }
 
-   /// extend row with #Key \p key to fit \p newmax nonzeros.
-   void xtend(const Key& pkey, int pnewmax)
+   /// extend row with #DataKey \p key to fit \p newmax nonzeros.
+   void xtend(const DataKey& pkey, int pnewmax)
    {
       SVSet::xtend(rowVector_w(pkey), pnewmax);
    }
 
-   /// adds \p n nonzero (\p idx, \p val)-pairs to #rowVector with #Key \p k.
-   void add2(const Key& k, int n, int idx[], double val[])
+   /// adds \p n nonzero (\p idx, \p val)-pairs to #rowVector with #DataKey \p k.
+   void add2(const DataKey& k, int n, int idx[], double val[])
    {
       SVSet::add2(rowVector_w(k), n, idx, val);
    }
@@ -283,11 +280,11 @@ public:
    ///
    SVector& create(int pnonzeros = 0, double plhs = 0, double prhs = 1)
    {
-      Key k;
+      DataKey k;
       return create(k, pnonzeros, plhs, prhs);
    }
    /// creates new #LPRow with specified parameters and returns a reference to its row vector.
-   SVector& create(Key& nkey, int nonzeros = 0, double lhs = 0, double rhs = 1);
+   SVector& create(DataKey& nkey, int nonzeros = 0, double lhs = 0, double rhs = 1);
    //@}
 
 
@@ -298,8 +295,8 @@ public:
    //@{
    /// removes \p i 'th #LPRow.
    void remove(int i);
-   /// removes #LPRow with #Key \p k.
-   void remove(const Key& k)
+   /// removes #LPRow with #DataKey \p k.
+   void remove(const DataKey& k)
    {
       remove(number(k));
    }
@@ -308,8 +305,8 @@ public:
    /// removes multiple #LPRow%s.
    void remove(int perm[]);
 
-   /// removes \p n #LPRow%s with #Key%s \p keys.
-   void remove(Key keys[], int n)
+   /// removes \p n #LPRow%s with #DataKey%s \p keys.
+   void remove(DataKey keys[], int n)
    {
       DataArray<int> perm(num());
       remove(keys, n, perm.get_ptr());
@@ -322,8 +319,8 @@ public:
       remove(nums, n, perm.get_ptr());
    }
 
-   /// removes \p n #LPRow%s with #Key%s \p keys, and stores permutation of row indices in \p perm.
-   void remove(Key keys[], int n, int* perm);
+   /// removes \p n #LPRow%s with #DataKey%s \p keys, and stores permutation of row indices in \p perm.
+   void remove(DataKey keys[], int n, int* perm);
 
    /// removes \p n #LPRow%s with row numbers given by \p nums, and stores permutation of row indices in \p perm.
    void remove(int nums[], int n, int* perm);

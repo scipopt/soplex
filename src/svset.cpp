@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.cpp,v 1.12 2002/01/05 09:59:43 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.cpp,v 1.13 2002/01/05 19:24:10 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -44,7 +44,7 @@ void SVSet::add(const SVector svec[], int n)
       *create(svec[i].size()) = svec[i];
 }
 
-void SVSet::add(Key nkey[], const SVector svec[], int n)
+void SVSet::add(DataKey nkey[], const SVector svec[], int n)
 {
    add(svec, n);
    for (int i = num() - 1; --n; --i)
@@ -65,7 +65,7 @@ void SVSet::add(const SVSet& pset)
       *create(pset[i].size()) = pset[i];
 }
 
-void SVSet::add(Key nkey[], const SVSet& pset)
+void SVSet::add(DataKey nkey[], const SVSet& pset)
 {
    int i, n;
    add(pset);
@@ -104,7 +104,7 @@ SVector* SVSet::create(int idxmax)
    return ps;
 }
 
-SVector* SVSet::create(Key& nkey, int idxmax)
+SVector* SVSet::create(DataKey& nkey, int idxmax)
 {
    SVector* ps = create(idxmax);
    nkey = key(num() - 1);
@@ -164,7 +164,7 @@ void SVSet::add2(SVector &svec, int n, const int idx[], const double val[])
    svec.add(n, idx, val);
 }
 
-void SVSet::remove(Key removekey)
+void SVSet::remove(DataKey removekey)
 {
    DLPSV* ps = &set[removekey];
 
@@ -211,7 +211,7 @@ void SVSet::remove(int perm[])
    set.remove(perm);
 }
 
-void SVSet::remove(Key keys[], int n, int* perm)
+void SVSet::remove(DataKey keys[], int n, int* perm)
 {
    for (int i = num() - 1; i >= 0; --i)
       perm[i] = i;
@@ -230,8 +230,6 @@ void SVSet::remove(int nums[], int n, int* perm)
 }
 
 
-
-//@ ----------------------------------------------------------------------------
 /*      \SubSection{Memory Management}
  */
 void SVSet::reMax(int newmax)
@@ -268,11 +266,11 @@ void SVSet::memPack()
       const DLPSV * cps = ps;
       const int sz = cps->size();
 
-      if (ps->mem() != &SVSetBase::operator[](used))
+      if (ps->mem() != &this->SVSetBase::operator[](used))
       {
          for (j = 0; j <= sz; ++j)
-            SVSetBase::operator[](used + j) = ps->mem()[j];
-         ps->setMem(sz + 1, &(SVSetBase::operator[](used)));
+            this->SVSetBase::operator[](used + j) = ps->mem()[j];
+         ps->setMem(sz + 1, &this->SVSetBase::operator[](used));
          ps->set_size(sz);
 
       }
