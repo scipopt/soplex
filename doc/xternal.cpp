@@ -99,12 +99,13 @@
    <TR><TD>Sun   </TD><TD>WS6U2 5.3</TD><TD>Solaris 7         </TD></TR>
    <TR><TD>SGI   </TD><TD>7.3.1.1m </TD><TD>IRIX 6.5          </TD></TR>
    <TR><TD>HP    </TD><TD>A.03.27  </TD><TD>HP-UX 11.00       </TD></TR>
+   <TR><TD>IBM   </TD><TD>5        </TD><TD>AIX 5.1           </TD></TR>
    </TABLE>
 
    The CPU's used where Intel Pentium-III/800, Pentium-4/1.7, 
    AMD Athlon/1000, AMD AthlonXP/1800+, 
    Compaq Alpha 21264A/750/8, Compaq Alpha 21264A/833/4,
-   UltraSparc-IIi/299, HPPA-8600/550/1, MIPS R8000.
+   UltraSparc-IIi/299, HPPA-8600/550/1, MIPS R8000 and Power4.
 
    At some time during development, some versions of the following 
    Compilers had internal erros, crashed or generated invalid code:
