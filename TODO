@@ -1,6 +1,8 @@
-$Id: TODO,v 1.50 2002/01/16 21:58:31 bzfkocht Exp $
+$Id: TODO,v 1.51 2002/01/23 17:47:00 bzfkocht Exp $
 
 Diesen Kram mal als @todo's schreiben ;-)
+
+sed   Copyright 1997-2001 Zib ersetzen durch -2002
 
 real.h
 #ifdef WITH_LONG_DOUBLE

@@ -3,8 +3,8 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1997-1999 Roland Wunderling                              */
-/*                  1997-2001 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 2001-2002 Thorsten Koch                                  */
+/*                  2001-2002 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -13,10 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: sipinput.cpp,v 1.1 2002/01/22 16:48:31 bzfkocht Exp $"
+#pragma ident "@(#) $Id: sipinput.cpp,v 1.2 2002/01/23 17:47:01 bzfkocht Exp $"
 
-#include <iostream>
 #include <fstream>
+#include <stdio.h>
 #include <string.h>
 #include <assert.h>
 
@@ -24,12 +24,19 @@
 #include "nameset.h"
 #include "didxset.h"
 
+extern "C"
+{
+#include "s_def.h"
+#include "s_io.h"
+}
+
 using namespace soplex;
 
+/*ARGSUSED*/
 extern "C" int SIPinput(
    FILE*         ferr, 
-   SIPInfaIO     infaIO, 
-   char*         filename,
+   SIPInfaIO     /*infaIO*/, 
+   const char*   filename,
    int*          ncol, 
    int*          nrow, 
    int*          objsen,
@@ -51,6 +58,29 @@ extern "C" int SIPinput(
    unsigned int* rstoresz, 
    char**        ctype)
 {
+   assert(ferr     != 0);
+   assert(filename != 0);
+   assert(ncol     != 0);
+   assert(nrow     != 0);
+   assert(objsen   != 0);
+   assert(obj      != 0);
+   assert(rhs      != 0);
+   assert(sen      != 0);
+   assert(beg      != 0);
+   assert(cnt      != 0);
+   assert(ind      != 0);
+   assert(val      != 0);
+   assert(lb       != 0);
+   assert(ub       != 0);
+   assert(rng      != 0);
+   assert(cname    != 0);
+   assert(cstore   != 0);
+   assert(rname    != 0);
+   assert(rstore   != 0);
+   assert(cstoresz != 0);
+   assert(rstoresz != 0);
+   assert(ctype    != 0);
+
    std::ifstream file(filename);
    SPxLP         lp;
    NameSet       colnames;
@@ -58,9 +88,9 @@ extern "C" int SIPinput(
    DIdxSet       intvars;
    int           i;
 
-   if (!file || !lp.read(file, rownames, colnames, intvars))
+   if (!file || !lp.read(file, &rownames, &colnames, &intvars))
    {
-      fprintf (ferr, "Could not read file %s\n", filename);
+      fprintf(ferr, "Could not read file %s\n", filename);
       return SIP_NOFILE;
    }
    rownames.memPack();
@@ -68,44 +98,45 @@ extern "C" int SIPinput(
 
    *ncol   = lp.nCols();
    *nrow   = lp.nRows();
-   *objsen = lp.spxSense() == MAXIMIZE ? -1 : 1;  
+   *objsen = lp.spxSense() == SPxLP::MAXIMIZE ? -1 : 1;  
 
-   if (0 == (*obj = malloc(*ncol * sizeof(**obj))))
+   if (0 == (*obj = static_cast<double*>(malloc(*ncol * sizeof(**obj)))))
       return SIP_NOMEMORY;
    else
    {
-      Vector tmpobj(*ncol, *obj) = lp.maxObj() * lp.spxSense();
+      Vector tmpobj(*ncol, *obj);
+      tmpobj = lp.maxObj() * lp.spxSense();
    }
 
-   if (0 == (*rhs = malloc(*nrow * sizeof(**rhs))))
+   if (0 == (*rhs = static_cast<double*>(malloc(*nrow * sizeof(**rhs)))))
       return SIP_NOMEMORY;
 
-   if (0 == (*rng = malloc(*nrow * sizeof(**rng))))
+   if (0 == (*rng = static_cast<double*>(malloc(*nrow * sizeof(**rng)))))
       return SIP_NOMEMORY;
 
-   if (0 == (*sen = malloc(*nrow * sizeof(**sen))))
+   if (0 == (*sen = static_cast<char*>(malloc(*nrow * sizeof(**sen)))))
       return SIP_NOMEMORY;
 
    for(i = 0; i < *nrow; i++)
    {
       switch(lp.rowType(i))
       {
-      case LESS_EQUAL :
+      case LPRow::LESS_EQUAL :
          (*sen)[i] = 'L';
          (*rhs)[i] = lp.rhs(i);
          (*rng)[i] = 0.0;
          break; 
-      case EQUAL :
+      case LPRow::EQUAL :
          (*sen)[i] = 'E';
          (*rhs)[i] = lp.rhs(i);
          (*rng)[i] = 0.0;
          break; 
-      case GREATER_EQUAL :
+      case LPRow::GREATER_EQUAL :
          (*sen)[i] = 'G';
          (*rhs)[i] = lp.lhs(i);
          (*rng)[i] = 0.0;
          break; 
-      case RANGE :
+      case LPRow::RANGE :
          (*sen)[i] = 'R';
          (*rhs)[i] = lp.rhs(i);
          (*rng)[i] = lp.rhs(i) - lp.lhs(i);
@@ -115,88 +146,85 @@ extern "C" int SIPinput(
       }
    }   
    
-   if (  (0 != (*beg = malloc(*ncol * sizeof(**beg))))
-      && (0 != (*cnt = malloc(*ncol * sizeof(**cnt)))))
+   if (  (0 != (*beg = static_cast<int*>(malloc(*ncol * sizeof(**beg)))))
+      && (0 != (*cnt = static_cast<int*>(malloc(*ncol * sizeof(**cnt))))))
       return SIP_NOMEMORY;
 
    int nzo = 0;
-   int cnt = 0;
-   int i;
+   int k   = 0;
 
    for(i = 0; i < *ncol; i++)
       nzo += lp.colVector(i).size();
 
-   if (  (0 != (*ind = malloc(nzo * sizeof(**ind))))
-      && (0 != (*val = malloc(nzo * sizeof(**val)))))
+   if (  (0 != (*ind = static_cast<int*>(malloc(nzo * sizeof(**ind))))
+      && (0 != (*val = static_cast<double*>(malloc(nzo * sizeof(**val)))))))
       return SIP_NOMEMORY;
 
    for(i = 0; i < *ncol; i++)
    {
       SVector col = lp.colVector(i);
       
-      (*beg)[i]   = cnt;
-      (*cnt)[i]   = col.size();            
-      (*ind)[cnt] = col.index(i);
-      (*val)[cnt] = col.value(i);
-      cnt++;
+      (*beg)[i] = k;
+      (*cnt)[i] = col.size();            
+      (*ind)[k] = col.index(i);
+      (*val)[k] = col.value(i);
+      k++;
    }
-   assert(cnt == nzo);
+   assert(k == nzo);
 
-   if (0 == (*lb = malloc(*ncol * sizeof(**lb))))
+   if (0 == (*lb = static_cast<double*>(malloc(*ncol * sizeof(**lb)))))
       return SIP_NOMEMORY;
-   else
-   {
-      Vector tmplb(*ncol, *lb) = lp.lower();
-   }
 
-   if (0 == (*ub = malloc(*ncol * sizeof(**ub))))
+   memcpy(lb, lp.lower().get_const_ptr(), *ncol);
+
+   if (0 == (*ub = static_cast<double*>(malloc(*ncol * sizeof(**ub)))))
       return SIP_NOMEMORY;
-   else
-   {
-      Vector tmpub(*ncol, *ub) = lp.upper();
-   }
+
+   memcpy(ub, lp.upper().get_const_ptr(), *ncol);
 
    assert(colnames.num() == *ncol);
 
    *cstoresz = colnames.memSize();
 
-   if (0 == (*cstore = malloc(*cstoresz * sizeof(**cstore))))
+   if (0 == (*cstore = 
+      static_cast<char*>(malloc(*cstoresz * sizeof(**cstore)))))
       return SIP_NOMEMORY;
 
-   if (0 == (*cname = malloc(*ncol * sizeof(**cname))))
+   if (0 == (*cname = static_cast<char**>(malloc(*ncol * sizeof(**cname)))))
       return SIP_NOMEMORY;
    
-   cnt = 0;
+   k = 0;
 
    for(i = 0; i < *ncol; i++)
    {
-      (*cname)[i] = &((*cstore)[cnt]);
+      (*cname)[i] = &((*cstore)[k]);
       strcpy((*cname)[i], colnames[i]);
-      cnt += strlen(colnames[i]) + 1;
-      assert(cnt < *cstoresz);
+      k += strlen(colnames[i]) + 1;
+      assert(static_cast<unsigned int>(k) < *cstoresz);
    }
 
    assert(rownames.num() == *nrow);
 
    *rstoresz = rownames.memSize();
 
-   if (0 == (*rstore = malloc(*rstoresz * sizeof(**rstore))))
+   if (0 == (*rstore = 
+      static_cast<char*>(malloc(*rstoresz * sizeof(**rstore)))))
       return SIP_NOMEMORY;
 
-   if (0 == (*rname = malloc(*nrow * sizeof(**rname))))
+   if (0 == (*rname = static_cast<char**>(malloc(*nrow * sizeof(**rname)))))
       return SIP_NOMEMORY;
    
-   cnt = 0;
+   k = 0;
 
    for(i = 0; i < *nrow; i++)
    {
-      (*rname)[i] = &((*rstore)[cnt]);
+      (*rname)[i] = &((*rstore)[k]);
       strcpy((*rname)[i], rownames[i]);
-      cnt += strlen(rownames[i]) + 1;
-      assert(cnt < *rstoresz);
+      k += strlen(rownames[i]) + 1;
+      assert(static_cast<unsigned int>(k) < *rstoresz);
    }
 
-   if (0 == (*ctype = malloc(*ncol * sizeof(**ctype))))
+   if (0 == (*ctype = static_cast<char*>(malloc(*ncol * sizeof(**ctype)))))
       return SIP_NOMEMORY;
 
    for(i = 0; i < *ncol; i++)
@@ -204,7 +232,7 @@ extern "C" int SIPinput(
 
    for(i = 0; i < intvars.size(); i++)
    {
-      int idx = intvars.index[i];
+      int idx = intvars.index(i);
 
       (*ctype)[i] = 
          (lp.lower(idx) == 0.0 && lp.upper(idx) == 1.0) ? 'B' : 'I';

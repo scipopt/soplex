@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: itfcplex.cpp,v 1.4 2002/01/19 18:59:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: itfcplex.cpp,v 1.5 2002/01/23 17:47:00 bzfkocht Exp $"
 
 #include <iostream>
 #include <fstream>
@@ -38,7 +38,6 @@ class SPxCPlex : public SoPlex
    SLUFactor    m_slu;
    SPxSteepPR   m_price;
    SPxFastRT    m_ratio;
-   SPxWeightST  m_start;
    bool         m_verbose;
    char*        m_probname;
    NameSet      m_colnames;
@@ -72,10 +71,10 @@ public:
       , m_verbose(true)
       , m_probname(0)
    {
-      load(&m_slu );
-      load(&m_ratio);
-      load(&m_price);
-      load(&m_start);
+      loadSolver(&m_slu );
+      loadTester(&m_ratio);
+      loadPricer(&m_price);
+      loadStarter(0);
    }
    ~SPxCPlex()
    {

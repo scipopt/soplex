@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.27 2002/01/21 16:27:25 bzfkocht Exp $
+# $Id: Makefile,v 1.28 2002/01/23 17:47:00 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -123,10 +123,10 @@ $(OBJDIR):
 		-mkdir -p $(OBJDIR)
 
 $(LIBDIR):
-		-mkdir $(LIBDIR)
+		-mkdir -p $(LIBDIR)
 
 $(BINDIR):
-		-mkdir $(BINDIR)
+		-mkdir -p $(BINDIR)
 
 depend:
 		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
