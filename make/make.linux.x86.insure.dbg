@@ -1,0 +1,8 @@
+#--- Linux.x86.insure.dbg settings --------------------------------------------
+CXX	=	insure g++
+DCXX	=	g++
+CPPFLAGS=	-Isrc 
+CXXFLAGS=	-g -DNDEBUG
+DFLAGS	=	-MM
+LDFLAGS	=	-lm
+ARFLAGS	=	crs

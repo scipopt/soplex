@@ -1,0 +1,7 @@
+#--- Linux.x86.gnu.dbg settings -----------------------------------------------
+CXX	=	KCC
+CPPFLAGS=	-Isrc 
+CXXFLAGS=	-g --lint #--strict 
+LDFLAGS	=	--static_libKCC -lm
+AR	=	KCC
+ARFLAGS	=	-o

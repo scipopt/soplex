@@ -1,0 +1,7 @@
+#--- Sunos.sparc.sun.dbg settings ---------------------------------------------
+CXX	=	CC
+CPPFLAGS=	-Isrc 
+CXXFLAGS=	-g -native #+w2
+LDFLAGS	=	-lm
+AR	=	CC
+ARFLAGS	=	-xar -o

@@ -1,0 +1,9 @@
+#--- Linux.alpha.compaq.dbg settings ------------------------------------------
+CXX	=	cxx
+DCXX	=	cxx
+CPPFLAGS=	-Isrc 
+CXXFLAGS=	-O0 -w0 -std strict_ansi -gall -verbose -check 
+# -ieee -msg_disable
+DFLAGS	=	-M
+LDFLAGS	=	-lm
+ARFLAGS	=	crs

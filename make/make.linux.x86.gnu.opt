@@ -1,0 +1,9 @@
+#--- Linux.x86.gnu.opt settings -----------------------------------------------
+CXX	=	g++
+DCXX	=	g++
+CPPFLAGS=	-Isrc -DNDEBUG
+CXXFLAGS=	-O3 -march=pentiumpro -fno-exceptions \
+		-ffast-math -fforce-addr -funroll-loops
+DFLAGS	=	-MM
+LDFLAGS	=	-lm
+ARFLAGS	=	crs

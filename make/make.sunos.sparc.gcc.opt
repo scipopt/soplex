@@ -1,0 +1,6 @@
+#--- Sun Solaris gcc settings optimized ---------------------------------------
+PREP.sunos.sparc.gcc.opt=   	-Isrc -DNDEBUG
+WARN.sunos.sparc.gcc.opt=   	$(GCCWARN)
+OPTI.sunos.sparc.gcc.opt=	-O4 -ffast-math -mcpu=ultrasparc
+DEPD.sunos.sparc.gcc.opt=	-MM
+LINK.sunos.sparc.gcc.opt=	-L/kombinat/usr/lib -lcplex -lnsl -lsocket -lm

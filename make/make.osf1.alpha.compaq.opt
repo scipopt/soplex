@@ -1,0 +1,6 @@
+#--- Linux.alpha.compaq.opt settings ------------------------------------------
+CXX	=	cxx
+CPPFLAGS=	-Isrc -DNDEBUG
+CXXFLAGS=	-std strict_ansi -O4 -fast -noexceptions  
+LDFLAGS	=	-lm
+ARFLAGS	=	crs

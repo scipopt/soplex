@@ -1,0 +1,6 @@
+#--- Linux.x86.intel.dbg settings ---------------------------------------------
+CXX	=	icc
+CPPFLAGS=	-Isrc 
+CXXFLAGS=	-g -mp # -Xc
+LDFLAGS	=	-lm
+ARFLAGS	=	crs

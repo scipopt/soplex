@@ -1,0 +1,6 @@
+#--- Linux.x86.intel.opt settings ---------------------------------------------
+CXX	=	icc
+CPPFLAGS=	-Isrc -DNDEBUG
+CXXFLAGS=	-O3 -tpp6 -xi
+LDFLAGS	=	-lm
+ARFLAGS	=	crs

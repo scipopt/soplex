@@ -1,0 +1,8 @@
+#--- Linux.x86.gnu.dbg settings -----------------------------------------------
+CXX	=	g++
+DCXX	=	g++
+CPPFLAGS=	-Isrc 
+CXXFLAGS=	-O -g $(GCCWARN)
+DFLAGS	=	-MM
+LDFLAGS	=	-lm
+ARFLAGS	=	crs

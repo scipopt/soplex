@@ -1,0 +1,7 @@
+#--- Linux.x86.gnu.dbg settings -----------------------------------------------
+CXX	=	KCC
+CPPFLAGS=	-Isrc -DNDEBUG
+CXXFLAGS=	+K3 --abstract_float --abstract_pointer --no_exceptions --inline_keyword_space_time=20.0
+LDFLAGS	=	--static_libKCC -lm
+AR	=	KCC
+ARFLAGS	=	$(CPPFLAGS) $(CXXFLAGS) -o
