@@ -1,95 +1,49 @@
 
 	SoPlex --- the Sequential Object-oriented simPlex
 
-1.	Compiling
+1.	All the documentation is available online at 
 
-	Look through the 'Makefile' and change the flags as neccessary for
-	your environment. Some samples are given. Please note that
-	setting '-DNDEBUG' greatly enhanced the speed of the program, but
-	nearly all internal checks are turned off. So if you compile 
-	SoPlex for the first time, you should compile without '-DNDEBUG'
-	and test if the output is correct.
+        http://www.zib.de/Optimization/Software/Soplex/html/index.html
 
-	The executable can only be built, if TCL has been installed to
-	your system. There may occur some problems with your version of
-	TCL, that should be solved via the defines 'LONG_TCL_MAIN',
-	'TCL_MAIN' and 'RC_FILE_IS_TCL_VARIABLE'. Set 'CPPFLAGS' to 
-	'-DTCL_MAIN', if your TCL library contains the function 'main'
-	(an appropriate error message will be issued by the linker). If
-	an error message occurs for function Tcl_Main, try compiling with
-	'-DLONG_TCL_MAIN'. If the compiler complains about the variable
-	'tcl_RcFileName' use '-DRC_FILE_IS_TCL_VARIABLE'.
-	You may have to include the path to the TCL include files with
-	a '-I/usr/include/tcl' or similiar in 'CPPFLAGS'.
-	Also the name of the TCL library in 'LDFLAGS' may vary.
+	you can also generate it, if you have doxgen installed by 
+        typing 'gmake doc'. It will then be in doc/html/index.html
 
-2.	Installation
+2.	Compiling
 
-	Installation of SoPlex consists of installing:
-	  - the binary
-	  - the library
-	  - the includes
-	  - the html documentation
-	  - the hardcopy documentation
-	In principle, you may copy all the files where you like, since
-	SoPlex does not require any structure. However, the following
-	directory is suggested, where ... is an arbitrary path:
+	Read the documentation!
 
-	.../soplex            copy '.spxrc' there
-	.../soplex/bin        copy 'soplex' there
-	.../soplex/lib        copy 'libsoplex.a' there
-	.../soplex/include    copy '*.{h,hh}' there
-	.../soplex/doc        copy 'doc/*' there
-	.../soplex/html       copy 'html/*' there
+        For the impatient:
 
-	Don't forget to set the permissions as desired. If you need to
-	keep binaries and libraries for different plattforms and compilers
-	(note, name mangling differs between C++ compilers so that different
-	libraries will be needed for different compilers!), you should
-	use something like .../soplex/bin-<plattform-compiler> and
-	.../soplex/lib-<plattform-compiler> instead.
+	On systems with GNU g++   :  gmake COMP=gnu OPT=opt
+	Linux/x86 with Intel C++  :  gmake COMP=intel OPT=opt
+        Linux/AXP with Compaq C++ :  gmake COMP=compaq OPT=opt
+        Solaris with SUN Forte C++:  gmake COMP=sun OPT=opt
+        IRIX with SGI Mips Pro C++:  gmake COMP=sgi OPT=opt
+	HP-UX with HP aCC         :  gmake COMP=hp OPT=opt
 
+        Then get and install the Netlib testset from 
+        http://www.zib.de/Optimization/Software/Soplex/netlib.tgz
+        and say gmake COMP=<as before> OPT=<as before> quick
+        This should report no fails.
 
-3.	Usage
+        Now read the documentation!
 
 3.1	Using soplex
 
-	Starting soplex is as simple as typing 'soplex' provided it will
-	be found in your path. This will take you to 'SPxTCL' the TCL
-	shell provided for SoPlex. 'help' will get you a descriptions
-	on the commands available.
-
-	The TCL shell for SoPlex reads the file '.spxrc' before starting.
-	It looks for it in (1) the current directory (2) the users home
-	director and (3) at the PATH specified by the SPXHOME environment
-	variable.
+	Start one of the binaries in the bin directory with the -h flag.
 
 3.2	Using the library
 
     	An example on how to use the soplex library is provided in the
-	file 'example.cc'. It shows how to use the command line parser
-	class CmdLine and how to read and solve LPs with SoPlex. 
+	file 'src/example.cpp'. It shows how to read and solve LPs 
+        with SoPlex. 
 
-
-4.	Documentation
-
-	Documentation for the binary 'soplex' is provided online via
-	the 'help' command. Documentation for the class graph of SoPlex
-	is provided for both, hardcopy output and online reading. The
-	online version can be viewed with a WWW-browser, preferably
-	Netscape 2.0 or greater. The hardcopy versions are provided as
-	LaTeX, DVI and postscript files (be warned: They sum up to 238
-	pages). Both versions can automatically be extracted using DOC++
-	from the include files for SoPlex.
-
-
-5.	Bug report
+4.	Bug report
 
 	If you find any bugs, or LP-files were SoPlex fails to find the
-	optimal solution, please report to soplex@zib.de.
+	optimal solution, please report to koch@zib.de.
 
-
-6.	Publications
+5.	Publications
 
 	Any publication for which SoPlex has been used must include an
 	aknowledge ment and a reference to the Ph.D. thesis:
@@ -100,5 +54,7 @@
 
 	A copy of the thesis can be retreived from
 	www.zib.de/PaperWeb/abstracts/TR-96-09/
+
+
 
 
