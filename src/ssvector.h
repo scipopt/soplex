@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.h,v 1.12 2002/01/31 08:19:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.h,v 1.13 2002/02/07 15:47:00 bzfbleya Exp $"
 
 
 /**@file  ssvector.h
@@ -364,6 +364,12 @@ public:
       unSetup();
       Vector::operator=(rhs);
       return *this;
+   }
+
+   ~SSVector()
+   {
+      if ( idx )
+         spx_free(idx);
    }
 
    //@}
