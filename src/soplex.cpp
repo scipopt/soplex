@@ -13,23 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.9 2001/11/20 16:43:28 bzfpfend Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.10 2001/11/25 14:58:28 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <assert.h>
 #include <iostream>
 #include <fstream>
 
-/*  and class header files
- */
 #include "soplex.h"
-
-
-
 #include "spxpricer.h"
 #include "spxratiotester.h"
 #include "spxstarter.h"
@@ -37,15 +27,10 @@
 
 namespace soplex
 {
-
-
 const double LPSolver::infinity = SPxLP::infinity;
 
 #define MAX(x,y)        ((x)>(y) ? (x) : (y))
 
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Setup}
- */
 void SoPlex::read(std::istream& in, NameSet* rowNames,
                    NameSet* colNames, DIdxSet* intVars)
 {
@@ -156,7 +141,7 @@ void SoPlex::setType(Type tp)
          SPxBasis::load(desc());
       }
       factorized = 0;
-      numCycle = 0;
+      m_numCycle = 0;
    }
    if (thepricer && thepricer->solver() == this)
       thepricer->setType(tp);
@@ -215,9 +200,6 @@ void SoPlex::setRep(int rp)
       thepricer->setRep(l_rep);
 }
 
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Initialization}
- */
 void SoPlex::init()
 {
    assert(thepricer != 0);
@@ -234,7 +216,7 @@ void SoPlex::init()
    if (!matrixIsSetup)
       SPxBasis::load(desc());
    factorized = 0;
-   numCycle = 0;
+   m_numCycle = 0;
 
    if (type() == ENTER)
    {
@@ -479,7 +461,6 @@ void SoPlex::clearUpdateVecs(void)
    coSolveVector2 = 0;
 }
 
-//@ ----------------------------------------------------------------------------
 /*
     When the basis matrix factorization is recomputed from scratch, we also
     recompute the vectors.
@@ -733,10 +714,6 @@ double SoPlex::value() const
    return x;
 }
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Allocation}
- */
 void SoPlex::setDelta(double d)
 {
    thedelta = d;
@@ -754,13 +731,15 @@ SoPlex::SoPlex(Type p_type, Representation p_rep,
                 SPxStarter* start, SPxSimplifier* simple)
    : theType (p_type)
    , thePricing(FULL)
-   , maxCycle (100)
-   , numCycle (0)
+   , maxIters (-1)
+   , maxTime (-1)
+   , theShift (0)
+   , m_maxCycle(100)
+   , m_numCycle(0)
    , unitVecs (0)
    , primVec (0, 1e-16)
    , dualVec (0, 1e-16)
    , addVec (0, 1e-16)
-   , theShift (0)
    , thepricer (pric)
    , theratiotester(rt)
    , thestarter (start)
@@ -768,8 +747,6 @@ SoPlex::SoPlex(Type p_type, Representation p_rep,
    , solveVector2 (0)
    , coSolveVector2(0)
    , initialized (0)
-   , maxIters (-1)
-   , maxTime (-1)
    , cacheProductFactor(4.0)
 {
    setRep (p_rep);
@@ -782,11 +759,14 @@ SoPlex::SoPlex(Type p_type, Representation p_rep,
 SoPlex::SoPlex(const SoPlex& old)
    : SPxLP (old)
    , SPxBasis (old)
-   , therep (old.therep)
    , theType (old.theType)
    , thePricing (old.thePricing)
-   , maxCycle (old.maxCycle)
-   , numCycle (old.numCycle)
+   , therep (old.therep)  /// ??? siehe unten
+   , maxIters (old.maxIters)
+   , maxTime (old.maxTime)
+   , theShift (old.theShift)
+   , m_maxCycle (old.m_maxCycle)
+   , m_numCycle (old.m_numCycle)
    , unitVecs (old.unitVecs)
    , primRhs (old.primRhs)
    , primVec (old.primVec)
@@ -801,7 +781,6 @@ SoPlex::SoPlex(const SoPlex& old)
    , theLBbound (old.theLBbound)
    , theCoTest (old.theCoTest)
    , theTest (old.theTest)
-   , theShift (old.theShift)
    , thepricer (old.thepricer)
    , theratiotester (old.theratiotester)
    , thestarter (old.thestarter)
@@ -809,8 +788,6 @@ SoPlex::SoPlex(const SoPlex& old)
    , solveVector2 (0)
    , coSolveVector2 (0)
    , initialized (old.initialized)
-   , maxIters (old.maxIters)
-   , maxTime (old.maxTime)
    , cacheProductFactor(old.cacheProductFactor)
 {
    setRep (old.rep());
@@ -841,8 +818,8 @@ SoPlex& SoPlex::operator=(const SoPlex& old)
    theLCbound = old.theLCbound;
    theUBbound = old.theUBbound;
    theLBbound = old.theLBbound;
-   maxCycle = old.maxCycle;
-   numCycle = old.numCycle;
+   m_maxCycle = old.m_maxCycle;
+   m_numCycle = old.m_numCycle;
    theShift = old.theShift;
    initialized = old.initialized;
    cacheProductFactor = old.cacheProductFactor;
@@ -860,10 +837,6 @@ SoPlex& SoPlex::operator=(const SoPlex& old)
    return *this;
 }
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Consistency}
- */
 #define inconsistent                                                    \
 do {                                                                    \
 std::cout << "ERROR: Inconsistency detected in class SoPlex\n";  \

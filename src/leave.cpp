@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.5 2001/11/13 21:01:24 bzfkocht Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.6 2001/11/25 14:58:28 bzfkocht Exp $"
 
 
 /*      \SubSection{Updating the Basis for Leaving Variables}
@@ -519,13 +519,13 @@ int SoPlex::leave(int leaveIdx)
    int leaveNum;       // number of leaveId in bounds
    getLeaveVals(leaveIdx, leaveStat, leaveId, leaveMax, leavebound, leaveNum);
 
-   if (numCycle > maxCycle)
+   if (m_numCycle > m_maxCycle)
    {
       if (leaveMax > 0)
          perturbMaxLeave();
       else
          perturbMinLeave();
-      //@ numCycle /= 2;
+      //@ m_numCycle /= 2;
    }
    //@ testBounds();
 
@@ -705,13 +705,13 @@ int SoPlex::leave(int leaveIdx)
       if ((leaveMax > delta() && enterVal <= delta())
            || (leaveMax < -delta() && enterVal >= -delta()))
       {
-         numCycle += ((theUBbound[leaveIdx] < SPxLP::infinity ||
+         m_numCycle += ((theUBbound[leaveIdx] < SPxLP::infinity ||
                         theLBbound[leaveIdx] > -SPxLP::infinity)
-                       && leaveStat != SPxBasis::Desc::P_FREE
-                       && leaveStat != SPxBasis::Desc::D_FREE);
+                        && leaveStat != SPxBasis::Desc::P_FREE
+                        && leaveStat != SPxBasis::Desc::D_FREE);
       }
       else
-         numCycle /= 2;
+         m_numCycle /= 2;
 
 #ifndef NDEBUG
       {

@@ -13,22 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.h,v 1.5 2001/11/15 16:54:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.h,v 1.6 2001/11/25 14:58:29 bzfkocht Exp $"
 
 
 #ifndef _SSVECTOR_H_
 #define _SSVECTOR_H_
 
-//@ ----------------------------------------------------------------------------
-/*      \Section{Imports}
-    Import required system include files
- */
 #include <assert.h>
-
-
-
-/*  and class header files
- */
 
 #include "dvector.h"
 #include "subsvector.h"
@@ -37,17 +28,7 @@
 
 namespace soplex
 {
-
-
-
-
 class SVSet;
-
-
-
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
 
 /** semi sparse vector.
     This class implements {\bf S}emi {\bf S}parse {\bf Vector}s. Such are
@@ -320,7 +301,6 @@ public:
    ///
    SSVector& operator=(const SVector& rhs);
    ///
-
    SSVector& operator=(const Vector& rhs)
    {
       unSetup();
@@ -334,29 +314,27 @@ public:
    /// construct nonsetup copy of #vec#.
    SSVector(const Vector& vec, double eps = 1e-16)
       : DVector (vec)
-         , DIdxSet (vec.dim() + 1)
-         , setupStatus(0)
-         , epsilon (eps)
+      , DIdxSet (vec.dim() + 1)
+      , setupStatus(0)
+      , epsilon (eps)
    { }
 
    ///
-
    SSVector(int pdim = 0, double peps = 1e-16)
       : DVector (pdim)
-         , DIdxSet (pdim + 1)
-         , setupStatus(1)
-         , epsilon (peps)
+      , DIdxSet (pdim + 1)
+      , setupStatus(1)
+      , epsilon (peps)
    {
       Vector::clear();
    }
 
    ///
-
    SSVector(const SSVector& vec)
       : DVector (vec)
-         , DIdxSet (vec.dim() + 1)
-         , setupStatus(vec.setupStatus)
-         , epsilon (vec.epsilon)
+      , DIdxSet (vec.dim() + 1)
+      , setupStatus(vec.setupStatus)
+      , epsilon (vec.epsilon)
    {
       DIdxSet::operator= ( vec );
       //*((DIdxSet*)this) = vec;
@@ -373,23 +351,43 @@ public:
 inline Vector& Vector::multAdd(double x, const SSVector& svec)
 {
    assert(svec.dim() <= dim());
+
    if (svec.isSetup())
-      Vector_MultAddSSVector(val, x,
-                              svec.size(),
-                              svec.indexMem(),
-                              svec.val);
+   {
+      const int* idx = svec.indexMem();
+
+      for(int i = 0; i < svec.size(); i++)
+         val[idx[i]] += x * svec[idx[i]];
+   }
    else
-      multAdd(x, static_cast<const Vector&>(svec));
+   {
+      assert(svec.dim() == dim());
+
+      for(int i = 0; i < dim(); i++)
+         val[i] += x * svec.val[i];
+   }
+   //multAdd(x, static_cast<const Vector&>(svec));
+
    return *this;
 }
 
 inline Vector& Vector::assign(const SSVector& svec)
 {
    assert(svec.dim() <= dim());
+
    if (svec.isSetup())
-      Vector_Set0toSSVector(val, svec.size(), svec.indexMem(), svec.val);
+   {
+      const int* idx = svec.indexMem();
+
+      for(int i = svec.size(); i > 0; i--)
+      {
+         val[*idx] = svec.val[*idx];
+         idx++;
+      }
+   }
    else
       operator= (static_cast<const Vector&>(svec));
+
    return *this;
 }
 
@@ -402,18 +400,29 @@ inline Vector& Vector::operator=(const SSVector& vec)
    }
    else
       operator= (static_cast<const Vector&>(vec));
+
    return *this;
 }
 
 inline double Vector::operator*(const SSVector& v) const
 {
    assert(dim() == v.dim());
+
    if (v.isSetup())
-      return MultiplyVectorSSVector(val, v.size(), v.indexMem(), v.val);
+   {
+      const int* idx = v.indexMem();
+      double     x   = 0;
+
+      for(int i = v.size(); i > 0; i--)
+      {
+         x += val[*idx] * v.val[*idx];
+         idx++;
+      }
+      return x;
+   }
    else
       return operator*(static_cast<const Vector&>(v));
 }
-
 } // namespace soplex
 #endif // _SSVECTOR_H_
 

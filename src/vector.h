@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector.h,v 1.3 2001/11/23 14:34:55 bzfbleya Exp $"
+#pragma ident "@(#) $Id: vector.h,v 1.4 2001/11/25 14:58:29 bzfkocht Exp $"
 
 /**@file  vector.h
  * @brief Dense vector for linear algebra.
@@ -26,11 +26,8 @@
 #include <math.h>
 #include <iostream>
 
-#include "vector_c.h"
-
 namespace soplex
 {
-
 class SLUFactor;
 class SVector;
 class SSVector;
@@ -40,21 +37,21 @@ class IdxSet;
 /**@brief   Dense vector
    @ingroup Algebra
  
-    Class Vector provides dense linear algebra vectors. It does not
-    provide memory management for the %array of values. Instead, the
-    constructor requires a pointer to a memory block large enough to
-    fit the desired dimension of double values.
+   Class Vector provides dense linear algebra vectors. It does not
+   provide memory management for the %array of values. Instead, the
+   constructor requires a pointer to a memory block large enough to
+   fit the desired dimension of double values.
  
-    After construction, the values of a Vector can be accessed with
-    the subscript operator[]() .  Safety is provided by
-    - checking of array bound when accessing elements with the
-      subscript operator[]() (only when compiled without \c -DNDEBUG).
+   After construction, the values of a Vector can be accessed with
+   the subscript operator[]() .  Safety is provided by
+   - checking of array bound when accessing elements with the
+     subscript operator[]() (only when compiled without \c -DNDEBUG).
  
-    A Vector is distinguished from a simple %array of double%s, by
-    providing a set of mathematical operations. Since Vector does
-    not provide any memory management features, no operations are
-    available that would require allocation of temporary memory
-    space.
+   A Vector is distinguished from a simple %array of double%s, by
+   providing a set of mathematical operations. Since Vector does
+   not provide any memory management features, no operations are
+   available that would require allocation of temporary memory
+   space.
 
    The following mathematical operations are provided by class Vector
    (Vector \p a, \p b; double \p x): 
@@ -76,12 +73,11 @@ class IdxSet;
    <TR><TD>multAdd(\c x,\c b)</TD><TD>add scaled vector</TD>
        <TD> \c a +=  \c x * \c b </TD></TR>
    </TABLE>
-
  
-    When using any of these operations, the vectors involved must be of
-    the same dimension. For \c b also SVector \c b are allowed, if it
-    does not contain nonzeros with index greater than the dimension of
-    \c a.
+   When using any of these operations, the vectors involved must be of
+   the same dimension. For \c b also SVector \c b are allowed, if it
+   does not contain nonzeros with index greater than the dimension of
+   \c a.
 */
 class Vector
 {
@@ -108,21 +104,22 @@ public:
     *  Storage must be passed as a memory block val at construction. It
     *  must be large enough to fit at least dimen double values.
     */
-   //lint -e1712
    Vector(int p_dimen, double *p_val)
       : dimen(p_dimen)
-         , val(p_val)
+      , val(p_val)
    {
       assert(dimen >= 0);
    }
    /// Assignment operator.
    Vector& operator=(const Vector& vec);
+
    /// Assignment operator.
    /** Assigning a SVector to a Vector using operator=()
     *  will set all values to 0 except the nonzeros of \p vec. 
     *  This is diffent in method assign().
     */
    Vector& operator=(const SVector& vec);
+
    /// Assignment operator.
    /** Assigning a SSVector to a Vector using operator=()
     *  will set all values to 0 except the nonzeros of \p vec. 
@@ -135,6 +132,7 @@ public:
     *  All other values remain unchanged.
    */
    Vector& assign(const SVector& sv);
+
    /// Assign values of \p sv.
    /** Assigns all nonzeros of \p sv to the vector. 
     *  All other values remain unchanged.
@@ -163,6 +161,7 @@ public:
       return val[n];
    }
    //@}
+
    /**@name Algebraic methods */
    //@{   
    /// vector addition
@@ -196,7 +195,10 @@ public:
    double operator*(const Vector& v) const
    {
       assert(v.dim() == dim());
-      return MultiplyVectorVector(val, dimen, v.val);
+      double x = 0;
+      for(int i = 0; i < dimen; i++)
+         x += val[i] * v.val[i];
+      return x;
    }
 
    /// infinity norm.
@@ -216,10 +218,14 @@ public:
    Vector& multAdd(double x, const Vector& vec)
    {
       assert(vec.dim() == dim());
-      Vector_MultAddVector(x, dim(), this->get_ptr(), vec.get_const_ptr());
+
+      for(int i = 0; i < dim(); i++)
+         val[i] += x * vec.val[i];
+
       return *this;
    }
    //@}
+
    /**@name Utilities */
    //@{
    /// Conversion to C-style pointer.
@@ -256,10 +262,7 @@ public:
    /// set values given by \p idx to 0
    Vector& clear(const IdxSet& idx);
    //@}
-
-
 };
-
 } // namespace soplex
 #endif // _VECTOR_H_
 

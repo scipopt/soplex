@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.9 2001/11/21 09:30:10 bzfkocht Exp $
+# $Id: Makefile,v 1.10 2001/11/25 14:58:28 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -35,7 +35,7 @@ LIBDIR		=	lib
 NAME		=	soplex
 FLAGS		=       #
 LIBOBJ		= 	cachelpsolver.o changesoplex.o didxset.o \
-			docupdate.o dsvector.o dvector.o enter.o factor.o \
+			dsvector.o dvector.o enter.o factor.o \
 			forest.o idxset.o leave.o lpcolset.o lprowset.o \
 			lprow.o nameset.o slufactor.o solve.o soplex.o \
 			spxaggregatesm.o spxbasis.o spxbounds.o \
@@ -49,7 +49,7 @@ LIBOBJ		= 	cachelpsolver.o changesoplex.o didxset.o \
 			spxvectorst.o spxweightpr.o spxweightst.o \
 			ssvector.o subsvector.o svector.o \
 			svset.o timer.o unitvector.o update.o updatevector.o \
-			vector.o vector_c.o vsolve.o
+			vector.o vsolve.o
 
 OBJECT		=	example.o
 

@@ -13,9 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.h,v 1.8 2001/11/23 14:48:40 bzfpfend Exp $"
+#pragma ident "@(#) $Id: lprowset.h,v 1.9 2001/11/25 14:58:28 bzfkocht Exp $"
 
-/**@file  lpcolset.h
+/**@file  lprowset.h
  * @brief Set of LP columns.
  */
 #ifndef _LPROWSET_H_

@@ -28,7 +28,7 @@
   http://www.zib.de/PaperWeb/abstracts/TR-96-09
 
   SoPlex is implememted in C++. The code should be compliend with the 
-  ANSI standard. Exception, RunTime-Type-Information and STL are not 
+  ANSI standard. Exceptions, RTTI and STL are not 
   used in the code. Everything is in one namespace \em soplex.
 
   Note, that you are allowed to retreive SoPlex only for research purpose as a

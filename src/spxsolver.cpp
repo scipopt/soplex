@@ -13,28 +13,16 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.3 2001/11/12 16:42:11 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.4 2001/11/25 14:58:29 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <stdlib.h>
 #include <iostream>
 
-
-/*  and class header files
- */
 #include "spxsolver.h"
 
 namespace soplex
 {
-
-//@ ----------------------------------------------------------------------------
-/*  \Section{Miscellanous Methods}
- */
-SPxSolver::SPxSolver (Type p_type, SoPlex::Representation p_rep)
+SPxSolver::SPxSolver(Type p_type, SoPlex::Representation p_rep)
    : SoPlex(p_type, p_rep)
 {
    load(&rt);

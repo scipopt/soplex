@@ -26,19 +26,6 @@ documentieren  doc++
 
 reinterpret_cast durchsehen
 
-svector neu implementieren. Den [-1] Zugriff erstetzen durch
-class SVector
-{
-   int     size;
-   int     used;
-   int*    idx;
-   double* val;
-};
-Es wird viel Platz verschwendet durch das zusammensetzen von
-Element { int, double } (padding),
-Ist vermutlich dann auch schneller.
-Es muessen dann aber auch DSVector und SVSet überarbeitet werden.
-
 // lprow.cpp:double LPRow::infinity = 1e+100;
 // spxlp.cpp:const double SPxLP::infinity = 1e+100;
 
@@ -83,7 +70,7 @@ nameset.h
 random.h
 slinsolver.h
 slufactor.h
-soplex.h
++soplex.h // in Arbeit ;-)
 sorter.h
 *spxaggregatesm.h
 *spxalloc.h
@@ -103,7 +90,7 @@ spxratiotester.h
 *spxrem1sm.h
 *spxscale.h
 *spxsimplifier.h
-spxsolver.h
+*spxsolver.h
 spxstarter.h
 spxsteeppr.h
 spxsumst.h
@@ -117,6 +104,7 @@ svset.h
 timer.h
 unitvector.h
 updatevector.h
-vector.h
+*vector.h
 *vector_c.h
+
 

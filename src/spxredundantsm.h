@@ -13,9 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.h,v 1.5 2001/11/22 16:59:10 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.h,v 1.6 2001/11/25 14:58:29 bzfkocht Exp $"
 
-/**@file  spxredundant.h
+/**@file  spxredundantsm.h
  * @brief Remove redundant row and columns.
  */
 #ifndef _SPXREDUNDANTSM_H_

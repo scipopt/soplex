@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.h,v 1.8 2001/11/16 20:12:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svector.h,v 1.9 2001/11/25 14:58:29 bzfkocht Exp $"
 
 /**@file  svector.h
  * @brief Sparse vectors.
@@ -358,7 +358,10 @@ public:
 inline Vector& Vector::multAdd(double x, const SVector& vec)
 {
    assert(vec.dim() <= dim());
-   Vector_MultAddSVector(val, x, vec.size(), vec.m_elem);
+
+   for(int i = 0; i < vec.size(); i++)
+      val[vec.m_elem[i].idx] += x * vec.m_elem[i].val;
+
    return *this;
 }
 

@@ -13,37 +13,23 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: subsvector.h,v 1.2 2001/11/06 23:31:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: subsvector.h,v 1.3 2001/11/25 14:58:29 bzfkocht Exp $"
 
 
 #ifndef _SUBSVECTOR_H_
 #define _SUBSVECTOR_H_
 
-//@ ----------------------------------------------------------------------------
-/*      \Section{Imports}
-    Import required system include files
- */
 #include <assert.h>
-
-
-/*  and class header files
- */
 
 #include "svector.h"
 
 namespace soplex
 {
-
-
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
-
-/** Part of an #SVector#.
-    Class #SubSVector# provides a means to references a subset of nonzeros of an
-    existing #SVector# and have it appear similar to an #SVector# of its own
+/** Part of an #SVector.
+    Class #SubSVector provides a means to references a subset of nonzeros of an
+    existing #SVector and have it appear similar to an #SVector of its own
     right. However, the user is responsible for avoiding any problems. Most
-    notably, if an #SVector# changes, this may corrupt any #SubSVector#
+    notably, if an #SVector changes, this may corrupt any #SubSVector
     referencing to it.
  */
 class SubSVector
@@ -195,7 +181,10 @@ public:
 inline Vector& Vector::multAdd(double x, const SubSVector& vec)
 {
    assert(vec.dim() <= dim());
-   Vector_MultAddSVector(val, x, vec.size(), vec.elem);
+
+   for(int i = 0; i < vec.size(); i++)
+      val[vec.elem[i].idx] += x * vec.elem[i].val;
+
    return *this;
 }
 

@@ -13,8 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idxset.h,v 1.4 2001/11/23 12:26:53 bzfpfend Exp $"
-
+#pragma ident "@(#) $Id: idxset.h,v 1.5 2001/11/25 14:58:28 bzfkocht Exp $"
 
 /**@file  idxset.h
  * @brief Set of indices.
@@ -83,7 +82,7 @@ public:
       return num;
    }
 
-   /// returns the maximal number of indices which can be stored in the #IdxSet.
+   /// returns the maximal number of indices which can be stored in #IdxSet.
    int max() const
    {
       return len;

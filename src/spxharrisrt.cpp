@@ -13,31 +13,17 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.4 2001/11/20 16:43:30 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.5 2001/11/25 14:58:29 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <assert.h>
 #include <iostream>
 
-
-/*  and class header files
- */
 #include "spxharrisrt.h"
 
 namespace soplex
 {
-
-
-//@ ----------------------------------------------------------------------------
-/*
-    Here are some helper functions
- */
-/**@todo suspicious: *max is not set, but it is used (with the default setting *max=1)
-                     in selectLeave and selectEnter
+/**@todo suspicious: *max is not set, but it is used 
+         (with the default setting *max=1) in selectLeave and selectEnter
 */
 int SPxHarrisRT::maxDelta
 (
@@ -171,7 +157,7 @@ int SPxHarrisRT::selectLeave(double& val)
    double infinity = solver()->SPxLP::infinity;
    double epsilon = solver()->epsilon();
    double delta = solver()->delta();
-   double degeneps = delta * (1 - solver()->numCycle / solver()->maxCycle);
+   double degeneps = delta * (1 - solver()->numCycle() / solver()->maxCycle());
 
    SSVector& upd = solver()->fVec().delta();
    Vector& vec = solver()->fVec();
@@ -181,7 +167,7 @@ int SPxHarrisRT::selectLeave(double& val)
 
    assert(delta > epsilon);
    assert(epsilon > 0);
-   assert(solver()->maxCycle > 0);
+   assert(solver()->maxCycle() > 0);
 
    max = val;
    lastshift = solver()->shift();
@@ -364,7 +350,7 @@ SoPlex::Id SPxHarrisRT::selectEnter(double& val)
    double infinity = solver()->SPxLP::infinity;
    double epsilon = solver()->epsilon();
    double delta = solver()->delta();
-   double degeneps = delta * (1 - solver()->numCycle / solver()->maxCycle);
+   double degeneps = delta * (1 - solver()->numCycle() / solver()->maxCycle());
 
    Vector& pvec = solver()->pVec();
    SSVector& pupd = solver()->pVec().delta();
@@ -379,7 +365,7 @@ SoPlex::Id SPxHarrisRT::selectEnter(double& val)
 
    assert(delta > epsilon);
    assert(epsilon > 0);
-   assert(solver()->maxCycle > 0);
+   assert(solver()->maxCycle() > 0);
 
    solver()->coPvec().delta().setup();
    solver()->pVec().delta().setup();

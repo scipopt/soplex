@@ -13,22 +13,17 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.6 2001/11/13 21:01:23 bzfkocht Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.7 2001/11/25 14:58:28 bzfkocht Exp $"
 
 /*      \SubSection{Updating the Basis for Entering Variables}
  */
 #include        <assert.h>
 #include        "soplex.h"
 
-
 #include "spxratiotester.h"
 
 namespace soplex
 {
-
-
-
-
 
 /*
 In the entering simplex algorithms (i.e. iteratively a vector is selected to
@@ -753,7 +748,7 @@ int SoPlex::enter(Id& enterId)
    }
 #endif  // NDEBUG
 
-   if (numCycle > maxCycle)
+   if (m_numCycle > m_maxCycle)
    {
       if (-enterMax > 0)
          perturbMaxEnter();
@@ -772,11 +767,11 @@ int SoPlex::enter(Id& enterId)
    if (leaveIdx >= 0)
    {
       if (leaveVal < delta() && leaveVal > -delta())
-         numCycle += (theUBbound[leaveIdx] != theLBbound[leaveIdx])
-                     && (enterStat != Desc::P_FREE)
-                     && (enterStat != Desc::D_FREE);
+         m_numCycle += (theUBbound[leaveIdx] != theLBbound[leaveIdx])
+                       && (enterStat != Desc::P_FREE)
+                       && (enterStat != Desc::D_FREE);
       else
-         numCycle /= 2;
+         m_numCycle /= 2;
 
       // setup for updating the copricing vector
       if (coSolveVector2)

@@ -13,21 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.6 2001/11/22 16:30:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.7 2001/11/25 14:58:29 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <assert.h>
 #include <iostream>
 
-/*  and class header files
- */
 #include "soplex.h"
-
-
 #include "spxpricer.h"
 #include "spxratiotester.h"
 #include "spxstarter.h"
@@ -35,14 +26,6 @@
 
 namespace soplex
 {
-
-
-
-
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{The Simplex loop}
- */
 LPSolver::Status SoPlex::solve()
 {
    Id enterId;
@@ -51,7 +34,7 @@ LPSolver::Status SoPlex::solve()
    if (dim() <= 0 && coDim() <= 0)          // no problem loaded
       return LPSolver::ERROR;
 
-   if (slinSolver() == 0)                     // linear system solver is required.
+   if (slinSolver() == 0)             // linear system solver is required.
       return LPSolver::ERROR;
 
    if (thesimplifier)
@@ -77,7 +60,7 @@ LPSolver::Status SoPlex::solve()
    theTime.reset();
    theTime.start();
 
-   numCycle = 0;
+   m_numCycle = 0;
 
    splitLP();
 
@@ -87,7 +70,7 @@ LPSolver::Status SoPlex::solve()
       if(SPxBasis::status() <= NO_PROBLEM)
           SPxBasis::load(this);
        */
-      if (thestarter)                                // no basis and no starter.
+      if (thestarter)                            // no basis and no starter.
          thestarter->generate(*this);              // generate start basis.
       init();
    }

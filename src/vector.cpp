@@ -13,16 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector.cpp,v 1.2 2001/11/06 23:31:07 bzfkocht Exp $"
-
-
-/*  \Section{Complex Methods}
- */
+#pragma ident "@(#) $Id: vector.cpp,v 1.3 2001/11/25 14:58:29 bzfkocht Exp $"
 
 #include <stdlib.h>
 #include <iostream>
 #include "vector.h"
-
 
 #include "ssvector.h"
 #include "subsvector.h"
@@ -30,12 +25,6 @@
 
 namespace soplex
 {
-
-
-
-
-/* \SubSection{Assignment Operators}
- */
 Vector& Vector::operator=(const Vector& vec)
 {
    assert(dim() == vec.dim());
@@ -124,9 +113,6 @@ Vector& Vector::operator*=(double x)
    return *this;
 }
 
-
-/* \SubSection{Products}
- */
 double Vector::length() const
 {
    return sqrt(length2());
@@ -150,9 +136,6 @@ double Vector::maxAbs() const
    return x;
 }
 
-
-/* \SubSection{Miscellaneous}
- */
 std::ostream& operator<<(std::ostream& s, const Vector& vec)
 {
    int i;

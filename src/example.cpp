@@ -13,18 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.2 2001/11/06 23:31:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.3 2001/11/25 14:58:28 bzfkocht Exp $"
 
-
-/*  Import system include files
- */
 #include <assert.h>
 #include <iostream>
 #include <iomanip>
 #include <fstream>
 
-/*  and class header files
- */
 #include "spxsolver.h"
 
 #include "timer.h"
@@ -52,9 +47,8 @@
 
 using namespace soplex;
 
-//@ ----------------------------------------------------------------------------
-/*  Here comes a simple derived class from #SoPlex#, which uses #terminate()# as
-    callback method for outputting statistics.
+/** Here comes a simple derived class from #SoPlex, which uses #terminate() as
+ *  callback method for outputting statistics.
  */
 class MySoPlex : public SPxSolver
 {
@@ -62,7 +56,7 @@ private:
    SLUFactor m_slu;
 
 public:
-   //@ManMemo:     default constructor
+   /// default constructor
    MySoPlex(Type p_type = LEAVE, Representation p_rep = COLUMN)
       : SPxSolver(p_type, p_rep)
    {}
@@ -81,7 +75,7 @@ public:
    }
 };
 
-//@ ----------------------------------------------------------------------------
+/**@todo flag to print the solution variables. */
 int main(int argc, char **argv)
 {
    const char* usage = "[-eri][-bn][-ltime][-pn][-sn][-tn] mpsfile";
@@ -92,7 +86,7 @@ int main(int argc, char **argv)
    int                    starter        = 0;
    int                    pricing        = 3;
    int                    ratiotest      = 2;
-   int                    simplifier     = 0;
+   int                    simplifier     = 3;
    double                 timelimit      = -1.0;
    int                    optind;
 

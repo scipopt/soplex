@@ -13,21 +13,15 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.2 2001/11/06 23:31:05 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.3 2001/11/25 14:58:29 bzfkocht Exp $"
 
-
+/**@file  spxsolver.h
+ * @brief preconfigured #SoPlex LP-solver.
+ */
 #ifndef _SPXSOLVER_H_
 #define _SPXSOLVER_H_
 
-//@ ----------------------------------------------------------------------------
-/*  \Section{Imports}
-    Import required system include files ...
- */
 #include <assert.h>
-
-
-/*  ... and class header files
- */
 
 #include "spxsteeppr.h"
 #include "spxfastrt.h"
@@ -36,24 +30,22 @@
 
 namespace soplex
 {
-
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
-
-/// preconfigured \Ref{SoPlex} LP-solver.
+/**@brief   Preconfigured #SoPlex LP-solver.
+   @ingroup Algo
+*/
 class SPxSolver : public SoPlex
 {
 private:
-   SPxFastRT rt;
-   SPxSteepPR pr;
-   SPxWeightST st;
-   SLUFactor slu;
+   SPxFastRT   rt;  ///< fast ratio test
+   SPxSteepPR  pr;  ///< steepest edge pricing
+   SPxWeightST st;  ///< weight starter
+   SLUFactor   slu; ///< LU Factorisation
 
 public:
-   SPxSolver (Type type = LEAVE, SoPlex::Representation rep = SoPlex::ROW);
+   /// default construtor.
+   explicit SPxSolver(
+      Type type = LEAVE, SoPlex::Representation rep = SoPlex::ROW);
 };
-
 } // namespace soplex
 #endif // _SPXSOLVER_H_
 

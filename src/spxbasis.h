@@ -13,18 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.4 2001/11/21 09:30:14 bzfkocht Exp $"
-
-
+#pragma ident "@(#) $Id: spxbasis.h,v 1.5 2001/11/25 14:58:29 bzfkocht Exp $"
 
 #ifndef _SPXBASIS_H_
 #define _SPXBASIS_H_
 
-
-/*      \Section{Imports}
- */
 #include <assert.h>
-
 
 #include "spxlp.h"
 #include "svector.h"
@@ -35,16 +29,7 @@
 
 namespace soplex
 {
-
-
-
-
-
 class SoPlex;
-
-//@ -----------------------------------------------------------------------------
-/*      \Section{Class SPxBasis}
- */
 
 /** simplex basis.
     Consider the linear program as provided from class #SPxLP#
@@ -74,8 +59,6 @@ class SoPlex;
     Instead, a #SLinSolver# object must be #load#ed to a #SPxBasis# which will
     be called for solving linear systems.
 */
-/*      \Section{Class Declaration}
- */
 class SPxBasis
 {
 protected:
