@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.26 2003/01/16 09:17:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.27 2003/03/04 19:30:44 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -902,7 +902,7 @@ bool SPxSolver::enter(SPxId& enterId)
     */
    else if (leaveVal != -enterMax)
    {
-      rejectEnter(enterId, 0.01*enterTest - 2*delta(), enterStat);
+      rejectEnter(enterId, REAL(0.01) * enterTest - REAL(2.0) * delta(), enterStat);
       change(-1, enterId, enterVec);
    }
    /*  No leaving vector has been selected from the basis. However, if the

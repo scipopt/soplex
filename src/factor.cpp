@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.40 2003/03/04 12:32:28 bzfkocht Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.41 2003/03/04 19:30:45 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -93,7 +93,7 @@ void CLUFactor::setPivot(const int p_stage,
    col.orig[p_stage] = p_col;
    row.perm[p_row]   = p_stage;
    col.perm[p_col]   = p_stage;
-   diag[p_row]       = 1.0 / val;
+   diag[p_row]       = REAL(1.0) / val;
 
    if (fabs(diag[p_row]) > maxabs)
       maxabs = fabs(diag[p_row]);
@@ -922,7 +922,7 @@ void CLUFactor::selectPivots(Real threshold)
    int len;
    int beg;
    Real l_maxabs;
-   Real x = 0.0; // This value should never be used.
+   Real x = REAL(0.0); // This value should never be used.
    int mkwtz;
    int candidates;
 
@@ -1396,7 +1396,7 @@ int CLUFactor::setupColVals()
    for(i = 0; i < thedim; i++)
       u.col.len[i] = 0;
 
-   maxabs = 0.0;
+   maxabs = REAL(0.0);
 
    for(i = 0; i < thedim; i++)
    {

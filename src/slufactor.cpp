@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.36 2003/03/04 15:59:31 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.37 2003/03/04 19:30:45 bzfkocht Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -24,8 +24,6 @@
  */
 //#define DEBUGGING 1
 
-#include <iostream>
-#include <iomanip>
 #include <assert.h>
 
 #include "spxdefines.h"
@@ -39,7 +37,7 @@
 
 namespace soplex
 {
-#define MINSTABILITY    1e-2
+#define MINSTABILITY    REAL(1e-2)
  
 void SLUFactor::solveRight(Vector& x, const Vector& b) //const
 {
@@ -332,7 +330,7 @@ void SLUFactor::clear()
    usetup        = false;
    maxabs        = 1;
    initMaxabs    = 1;
-   minThreshold  = 0.01;
+   minThreshold  = REAL(0.01);
    lastThreshold = minThreshold;
    minStability  = MINSTABILITY;
    stat          = UNLOADED;
@@ -810,22 +808,16 @@ SLUFactor::~SLUFactor()
 
 static Real betterThreshold(Real th)
 {
-   assert(th < 1.0);
+   assert(th < REAL(1.0));
 
-   std::cout << "betterThreashold in: " 
-             << std::setw(32) << std::setprecision(32) << th << std::endl;
+   if (LT(th, REAL(0.1)))
+      th *= REAL(10.0);
+   else if (LT(th, REAL(0.9)))
+      th = (th + REAL(1.0)) / REAL(2.0);
+   else if (LT(th, REAL(0.999)))
+      th = REAL(0.99999);
 
-   if (LT(th, 0.1))
-      th *= 10.0;
-   else if (LT(th, 0.9))
-      th = (th + 1.0) / 2.0;
-   else if (LT(th, 0.999))
-      th = 0.99999;
-
-   std::cout << "                out: " 
-             << std::setw(32) << std::setprecision(32) << th << std::endl;
-
-   assert(th < 1.0);
+   assert(th < REAL(1.0));
 
    return th;
 }
@@ -906,9 +898,6 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
    {
       stat = OK;
 
-      std::cout << "lastThreshold: " 
-                << std::setw(32) << std::setprecision(32) << lastThreshold << std::endl;
-
       factor(matrix, lastThreshold, epsilon);
 
       if (stability() >= minStability)
@@ -923,10 +912,6 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
 
       minStability /= 2.0;
    }
-   { std::cout << "threshold = " << lastThreshold
-                     << "\tstability = " << stability()
-                     << "\tminStability = " << minStability << std::endl; }
-
    DEBUG({ std::cout << "threshold = " << lastThreshold
                      << "\tstability = " << stability()
                      << "\tminStability = " << minStability << std::endl; });
