@@ -45,67 +45,9 @@ SORTIERUNG
 
 Dokumentation: (alle * sind bereits fertig)
 
-*array.h
-*cachelpsolver.h
-clumembers.h
-cluprotos.h
-clutypes.h
 cring.h
-*ctimer.h
-*dataarray.h
-*datahashtable.h
-*datakey.h
-*dataset.h
-*didxset.h
-*dsvector.h
-*dvector.h
-*idlist.h
-*idxset.h
-*islist.h
-*lpcol.h
-*lpcolset.h
-*lprow.h
-*lprowset.h
-*lpsolver.h
-*nameset.h
-*random.h
-*slinsolver.h
+clufactor.h
 +slufactor.h  // hier fehlen noch ein paar Sachen  -> Thorsten!
 +soplex.h // in Arbeit ;-)
-*sorter.h
-*spxaggregatesm.h
-*spxalloc.h
-*spxbasis.h
-*spxdefaultpr.h
-*spxdefaultrt.h
-*spxdevexpr.h
-*spxfastrt.h
-*spxgeneralsm.h
-*spxharrisrt.h
-*spxhybridpr.h
-*spxlp.h
-*spxparmultpr.h
-*spxpricer.h
-*spxratiotester.h
-*spxredundantsm.h
-*spxrem1sm.h
-*spxscale.h
-*spxsimplifier.h
-*spxsolver.h
-*spxstarter.h
-*spxsteeppr.h
-*spxsumst.h
-*spxvectorst.h
-*spxweightpr.h
-*spxweightst.h
-*ssvector.h
-*subsvector.h
-*svector.h
-*svset.h
-*timer.h
-*unitvector.h
-*updatevector.h
-*vector.h
-*vector_c.h
 
 

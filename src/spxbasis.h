@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.7 2001/11/29 14:00:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.8 2001/12/06 19:55:56 bzfkocht Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -89,7 +89,7 @@ public:
    /// Basis descriptor.
    class Desc
    {
-public:
+   public:
       /// Status of a variable.
       /** A basis is described by assigning a #Status to all of the LPs
           variables and covariables. This assignment is maintained by the

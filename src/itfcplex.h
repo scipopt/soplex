@@ -13,27 +13,18 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: itfcplex.h,v 1.2 2001/11/30 22:14:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: itfcplex.h,v 1.3 2001/12/06 19:55:56 bzfkocht Exp $"
 
 /**@file  itfcplex.h
- * @brief CPlex Interface to SoPlex
+ * @brief Simple CPLEX Interface to SoPlex
+ *
+ *  Some of the CPLEX interface functions are provided by this module. This
+ *  makes it possible to use SoPlex as a replacement for CPLEX, when only a
+ *  subset of its API is used. 
  */
 #ifndef _ITFCPLEX_H_
 #define _ITFCPLEX_H_
 
-#include <stdio.h>
-
-// Idee: CPlex Ptr ist pointer auf SoPlex object ???
-
-/**@name       Simple CPLEX interface
- *  Some of the CPLEX interface functions are provided by this module.  This
- *  makes it possible to use SoPlex as a replacement for CPLEX, when only a
- *  subset of its API is used.
- */
-/*@{*/
-
-/* Defines
- */
     /** what to use as $\infty$ */
 #define INFBOUND 1e+100 /* SoPlex::infinity ; */
 

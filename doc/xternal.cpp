@@ -89,12 +89,29 @@
     DataArray or Array.  
 */
 //-----------------------------------------------------------------------------
+/**@page Where is SoPlex running?
+   We have tested SoPlex at least to compile with the following 
+   Compilers:
+   <TABLE>
+   <TR><TD>Vendor</TD><TD>Version  </TD><TD>OS                </TD></TR>
+   <TR><TD>Gnu   </TD><TD>2.95.3   </TD><TD>SuSE 7.3/x86 Linux</TD></TR>
+   <TR><TD>Gnu   </TD><TD>2.96     </TD><TD>SuSE 7.1/AXP Linux</TD></TR>
+   <TR><TD>Intel </TD><TD>5.0.1    </TD><TD>SuSE 7.3/x86 Linux</TD></TR>
+   <TR><TD>Compaq</TD><TD>6.2-024  </TD><TD>Tru64 5.0         </TD></TR>
+   <TR><TD>Compaq</TD><TD>6.3-010  </TD><TD>SuSE 7.1/AXP Linux</TD></TR>
+   <TR><TD>Sun   </TD><TD>WS6U2 5.3</TD><TD>Solaris 7         </TD></TR>
+   <TR><TD>SGI   </TD><TD>7.3.1.1m </TD><TD>IRIX 6.5          </TD></TR>
+   <TR><TD></TD><TD></TD><TD></TD></TR>
+   <TR><TD></TD><TD></TD><TD></TD></TR>
+   </TABLE>
+ */
+//-----------------------------------------------------------------------------
 /**@page FAQ Frequently Asked Questions
 
    Here are some answers that can not be answered from the code alone:
 
    -# Why is <iostream> used but <assert.h> and not <cassert>
-      
+     
       The reason is twofold. From the theoretical point we were not
       able to exactly find out in TC++PL in what namespace cassert 
       should load it's declarations. Shurely in std. But since this are
@@ -139,6 +156,22 @@
       you pay for it. The amount is completely negotiable depending on
       what you want to do with SoPlex, which rights you want and what
       you are willing to tell us.
+
+   -# I want I primal and a dual simplex, where are they ?
+
+      That is quite easy. You can set ENTERing and LEAVEing algorithm and
+      COLUMN and ROW representation.
+
+      <TABLE>
+      <TR><TD>&nbsp;</TD><TD>ENTER </TD><TD>LEAVE </TD></TR>
+      <TR><TD>COLUMN</TD><TD>Primal</TD><TD>Primal</TD></TR>
+      <TR><TD>ROW   </TD><TD>Dual  </TD><TD>Dual  </TD></TR>
+      </TABLE>
+
+      COLUMN oriented is the "usual" representation.
+      then   Entering is the Primal and Leaving is the Dual algorithm.
+      In ROW oriented representation, we have in principle the
+      explicit dual and then the algorithms reverse.
 
 */      
       
