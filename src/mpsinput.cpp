@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: mpsinput.cpp,v 1.9 2003/04/20 08:32:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: mpsinput.cpp,v 1.10 2004/11/01 14:17:39 bzfkocht Exp $"
 
 /**@file  mpsinput.cpp
  * @brief Read MPS format files.
@@ -134,7 +134,7 @@ bool MPSInput::readLine()
             || isdigit(m_buf[32]) || isdigit(m_buf[33]) 
             || isdigit(m_buf[34]) || isdigit(m_buf[35]); 
 
-         if (number)
+         if (number || len < 13)
          {
             /* Now we assume fixed format, so we patch possible embedded spaces.
              */
