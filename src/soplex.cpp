@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.15 2001/12/25 14:25:55 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.16 2001/12/25 14:57:43 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -845,56 +845,56 @@ SoPlex& SoPlex::operator=(const SoPlex& old)
 }
 #endif // no copy constructor and assignment operator
 
-#define inconsistent                                                    \
-do {                                                                    \
-std::cout << "ERROR: Inconsistency detected in class SoPlex\n";  \
-return 0;                                                          \
-} while(false)
+#define Inconsistent(file, line) \
+{                                                                             \
+   std::cout << file << "(" << line << ") ERROR: Inconsistency SoPlex\n";     \
+   return 0;                                                                  \
+}
 
 int SoPlex::isConsistent() const
 {
    if (epsilon() < 0)
-      inconsistent;
+      Inconsistent(__FILE__,__LINE__)
 
    if (primVec.delta().epsilon != dualVec.delta().epsilon)
-      inconsistent;
+      Inconsistent(__FILE__,__LINE__)
    if (dualVec.delta().epsilon != addVec.delta().epsilon)
-      inconsistent;
+      Inconsistent(__FILE__,__LINE__)
 
    if (unitVecs.size() < ((rep() == ROW) ? SPxLP::nCols() : SPxLP::nRows()))
-      inconsistent;
+      Inconsistent(__FILE__,__LINE__)
 
    if (initialized)
    {
       if (theFrhs->dim() != dim())
-         inconsistent;
+         Inconsistent(__FILE__,__LINE__)
       if (theFvec->dim() != dim())
-         inconsistent;
+         Inconsistent(__FILE__,__LINE__)
 
       if (theCoPrhs->dim() != dim())
-         inconsistent;
+         Inconsistent(__FILE__,__LINE__)
       if (thePvec->dim() != coDim())
-         inconsistent;
+         Inconsistent(__FILE__,__LINE__)
       if (theCoPvec->dim() != dim())
-         inconsistent;
+         Inconsistent(__FILE__,__LINE__)
 
       if (theTest.dim() != coDim())
-         inconsistent;
+         Inconsistent(__FILE__,__LINE__)
       if (theCoTest.dim() != dim())
-         inconsistent;
+         Inconsistent(__FILE__,__LINE__)
 
       if (theURbound.dim() != SPxLP::nRows())
-         inconsistent;
+         Inconsistent(__FILE__,__LINE__)
       if (theLRbound.dim() != SPxLP::nRows())
-         inconsistent;
+         Inconsistent(__FILE__,__LINE__)
       if (theUCbound.dim() != SPxLP::nCols())
-         inconsistent;
+         Inconsistent(__FILE__,__LINE__)
       if (theLCbound.dim() != SPxLP::nCols())
-         inconsistent;
+         Inconsistent(__FILE__,__LINE__)
       if (theUBbound.dim() != dim())
-         inconsistent;
+         Inconsistent(__FILE__,__LINE__)
       if (theLBbound.dim() != dim())
-         inconsistent;
+         Inconsistent(__FILE__,__LINE__)
    }
 
    if (rep() == COLUMN)
@@ -915,15 +915,15 @@ int SoPlex::isConsistent() const
          theCoUbound != &theURbound ||
          theCoLbound != &theLRbound
      )
-         inconsistent;
+         Inconsistent(__FILE__,__LINE__)
    }
    else
    {
-      if
-      (
-         thecovectors != reinterpret_cast<const SVSet*>(static_cast<const LPColSet*>(this)) ||
-         thevectors != reinterpret_cast<const SVSet*>(static_cast<const LPRowSet*>(this)) ||
-         theFrhs != &dualRhs ||
+      if (thecovectors 
+         != reinterpret_cast<const SVSet*>(static_cast<const LPColSet*>(this))
+         || thevectors 
+         != reinterpret_cast<const SVSet*>(static_cast<const LPRowSet*>(this))
+         || theFrhs != &dualRhs ||
          theFvec != &dualVec ||
          theCoPrhs != &primRhs ||
          theCoPvec != &primVec ||
@@ -935,7 +935,7 @@ int SoPlex::isConsistent() const
          theCoUbound != &theUCbound ||
          theCoLbound != &theLCbound
      )
-         inconsistent;
+         Inconsistent(__FILE__,__LINE__)
    }
 
    return SPxLP::isConsistent()

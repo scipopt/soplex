@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: solve.cpp,v 1.8 2001/12/14 09:32:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: solve.cpp,v 1.9 2001/12/25 14:57:43 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -22,9 +22,6 @@
 
 namespace soplex
 {
-
-
-/*****************************************************************************/
 
 void CLUFactor::solveUright(double* wrk, double* vec)
 {
@@ -640,9 +637,7 @@ int CLUFactor::solveLleft2forest(
    double *lval, *val;
    int *lidx, *idx, *lrow;
    int *lbeg;
-   int *rorig;
 
-   rorig = row.orig;
    lval = l.val;
    lidx = l.idx;
    lrow = l.row;
@@ -698,21 +693,22 @@ void CLUFactor::solveLleft2(
    int x1not0, x2not0;
    double x1, x2;
 
-   double *rval, *lval, *val;
-   int *ridx, *lidx, *idx, *lrow;
-   int *rbeg, *lbeg;
+   double *rval, *val;
+   int *ridx, *idx;
+   int *rbeg;
    int *rorig;
 
-   lval  = l.val;
-   lidx  = l.idx;
-   lrow  = l.row;
-   lbeg  = l.start;
    ridx  = l.ridx;
    rval  = l.rval;
    rbeg  = l.rbeg;
    rorig = l.rorig;
 
 #ifndef WITH_L_ROWS
+   double* lval  = l.val;
+   int*    lidx  = l.idx;
+   int*    lrow  = l.row;
+   int*    lbeg  = l.start;
+
    i = l.firstUpdate - 1;
    for (; i >= 0; --i)
    {
@@ -812,21 +808,22 @@ void CLUFactor::solveLleft(double* vec)
    int i, j, k;
    int r;
    double x;
-   double *rval, *lval, *val;
-   int *ridx, *lidx, *idx, *lrow;
-   int *rbeg, *lbeg;
+   double *rval, *val;
+   int *ridx, *idx;
+   int *rbeg;
    int* rorig;
 
-   lval  = l.val;
-   lidx  = l.idx;
-   lrow  = l.row;
-   lbeg  = l.start;
    ridx  = l.ridx;
    rval  = l.rval;
    rbeg  = l.rbeg;
    rorig = l.rorig;
 
 #ifndef WITH_L_ROWS
+   double* lval  = l.val;
+   int*    lidx  = l.idx;
+   int*    lrow  = l.row;
+   int*    lbeg  = l.start;
+
    i = l.firstUpdate - 1;
    for (; i >= 0; --i)
    {
@@ -864,24 +861,24 @@ int CLUFactor::solveLleftEps(double* vec, int* nonz, double eps)
    int i, j, k, n;
    int r;
    double x, meps;
-   double *rval, *lval, *val;
-   int *ridx, *lidx, *idx, *lrow;
-   int *rbeg, *lbeg;
+   double *rval, *val;
+   int *ridx, *idx;
+   int *rbeg;
    int* rorig;
 
-   lval = l.val;
-   lidx = l.idx;
-   lrow = l.row;
-   lbeg = l.start;
    ridx = l.ridx;
    rval = l.rval;
    rbeg = l.rbeg;
    rorig = l.rorig;
    meps = -eps;
    n = 0;
-
    i = l.firstUpdate - 1;
 #ifndef WITH_L_ROWS
+   double* lval = l.val;
+   int*    lidx = l.idx;
+   int*    lrow = l.row;
+   int*    lbeg = l.start;
+
    for (; i >= 0; --i)
    {
       k = lbeg[i];
