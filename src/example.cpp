@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.57 2003/03/03 08:30:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.58 2003/03/30 08:58:15 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -142,7 +142,9 @@ int main(int argc, const char* const argv[])
    " -bw       write file with optimal basis to Basfile\n"
    " -lSec     set timelimit to Sec seconds\n"
    " -dDelta   set maximal allowed bound violation to Delta\n"
-   " -zZero    set zero tolerance to Zero\n\n"
+   " -zzEps    set general zero tolerance to Eps\n\n"
+   " -zfEps    set factorization zero tolerance to Eps\n\n"
+   " -zuEps    set update zero tolerance to Eps\n\n"
    " -vLevel   set verbosity Level [0-3], default 1\n"
    " -V        show program version\n"
    " -h        show this help\n"
@@ -155,34 +157,36 @@ int main(int argc, const char* const argv[])
    "                                             -p5 Weight\n" 
    ;
 
-   const char*            filename;
-   char*                  basisname      = 0;
+   const char*               filename;
+   char*                     basisname      = 0;
    SPxSolver::Type           type           = SPxSolver::LEAVE;
    SPxSolver::Representation representation = SPxSolver::COLUMN;
-   SLUFactor::UpdateType  update         = SLUFactor::FOREST_TOMLIN;
-   SPxSimplifier*         simplifier     = 0;
-   SPxStarter*            starter        = 0;
-   SPxPricer*             pricer         = 0;
-   SPxRatioTester*        ratiotester    = 0;
-   SPxScaler*             prescaler      = 0;
-   SPxScaler*             postscaler     = 0;
-   NameSet                rownames;
-   NameSet                colnames;
-   int                    starting       = 0;
-   int                    pricing        = 4;
-   int                    ratiotest      = 2;
-   int                    scaling        = 1;
-   int                    simplifing     = 1;
-   Real                   timelimit      = -1.0;
-   Real                   delta          = DEFAULT_BND_VIOL;
-   Real                   epsilon        = DEFAULT_EPS_ZERO;
-   int                    verbose        = 1;
-   bool                   print_solution = false;
-   bool                   print_quality  = false;
-   bool                   read_basis     = false;
-   bool                   write_basis    = false;
-   int                    precision;
-   int                    optidx;
+   SLUFactor::UpdateType     update         = SLUFactor::FOREST_TOMLIN;
+   SPxSimplifier*            simplifier     = 0;
+   SPxStarter*               starter        = 0;
+   SPxPricer*                pricer         = 0;
+   SPxRatioTester*           ratiotester    = 0;
+   SPxScaler*                prescaler      = 0;
+   SPxScaler*                postscaler     = 0;
+   NameSet                   rownames;
+   NameSet                   colnames;
+   int                       starting       = 0;
+   int                       pricing        = 4;
+   int                       ratiotest      = 2;
+   int                       scaling        = 1;
+   int                       simplifing     = 1;
+   Real                      timelimit      = -1.0;
+   Real                      delta          = DEFAULT_BND_VIOL;
+   Real                      epsilon        = DEFAULT_EPS_ZERO;
+   Real                      epsilon_factor = DEFAULT_EPS_FACTOR;
+   Real                      epsilon_update = DEFAULT_EPS_UPDATE;
+   int                       verbose        = 1;
+   bool                      print_solution = false;
+   bool                      print_quality  = false;
+   bool                      read_basis     = false;
+   bool                      write_basis    = false;
+   int                       precision;
+   int                       optidx;
 
    for(optidx = 1; optidx < argc; optidx++)
    {
@@ -241,7 +245,21 @@ int main(int argc, const char* const argv[])
          print_solution = true;
          break;
       case 'z' :
-         epsilon = atof(&argv[optidx][2]);
+         switch(argv[optidx][2])
+         {
+         case 'z' :
+            epsilon = atof(&argv[optidx][3]);
+            break;
+         case 'f' :
+            epsilon_factor = atof(&argv[optidx][3]);
+            break;
+         case 'u' :
+            epsilon_update = atof(&argv[optidx][3]);
+            break;
+         default :
+            std::cout << "usage: " << argv[0] << " " << usage << std::endl;
+            exit(0);
+         }
          break;
       case 'h' :
       case '?' :
@@ -268,6 +286,8 @@ int main(int argc, const char* const argv[])
    precision = int(-log10(delta)) + 1;
 
    Param::setEpsilon(epsilon);
+   Param::setEpsilonFactorization(epsilon_factor);
+   Param::setEpsilonUpdate(epsilon_update);
    Param::setVerbose(verbose);
 
    std::cout.setf(std::ios::scientific | std::ios::showpoint);
@@ -278,9 +298,10 @@ int main(int argc, const char* const argv[])
    work.setTerminationTime(timelimit);
    work.setDelta(delta);
 
-   std::cout << "IEXAMP12 Delta   = " << std::setw(16) << delta << std::endl
-             << "IEXAMP13 Epsilon = " << std::setw(16) 
-             << Param::epsilon() << std::endl;
+   std::cout << "IEXAMP12 Delta          = " << std::setw(16) << delta << std::endl
+             << "IEXAMP13 Epsilon Zero   = " << std::setw(16) << Param::epsilon() << std::endl
+             << "IEXAMP37 Epsilon Factor = " << std::setw(16) << Param::epsilonFactorization() << std::endl
+             << "IEXAMP38 Epsilon Update = " << std::setw(16) << Param::epsilonUpdate() << std::endl;
 
    assert(work.isConsistent());
 
