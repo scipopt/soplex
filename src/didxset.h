@@ -13,14 +13,14 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: didxset.h,v 1.2 2001/11/06 23:31:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: didxset.h,v 1.3 2001/11/21 16:25:35 bzfpfend Exp $"
 
 
+/**@file  didxset.h
+ * @brief Dymnamic index set.
+ */
 #ifndef _DIDXSET_H_
 #define _DIDXSET_H_
-
-/*      \Section{DIdxSet}
-*/
 
 #include <assert.h>
 #include <stdlib.h>
@@ -30,29 +30,26 @@
 namespace soplex
 {
 
-/** dynamic index set.
-    Class #DIdxSet# provids dynamic \Ref{IdxSet} in the sense, that no
-    restrictions are posed on the use of methods #add()#. However, method
-    #indexMem()# has been moved to the #private# members. This is because
-    #DIdxSet# adds it own memory managment to class #IdxSet# and the user must
-    not interfer with it.
- 
-    Upon construction of an #DIdxSet#, memory is allocated automatically. The
-    memory consumption can be controlled with methods #max()# and #setMax()#.
-    Finally, the destructor will release all allocated memory.
+/**@brief   Dynamic index set.
+   @ingroup Elementary
+
+   Class #DIdxSet provides dynamic #IdxSet in the sense, that no
+   restrictions are posed on the use of methods #add(). However, method
+   #indexMem() has been moved to the private members. This is because
+   #DIdxSet adds its own memory management to class #IdxSet and the user must
+   not interfer with it.
+   
+   Upon construction of an #DIdxSet, memory is allocated automatically. The
+   memory consumption can be controlled with methods #max() and #setMax().
+   Finally, the destructor will release all allocated memory.
 */
 class DIdxSet : public IdxSet
 {
 private:
-   int*& indexMem();
+   int*& indexMem();  ///< points to the allocated memory
 
 public:
-   /*
-       Die Implementierung st\"utzt sich voll auf die Datenstrukturen der
-       Basisklasse #IdxSet#. Lediglich die Methoden, bei denen Dynamizit\"at
-       hinzugef\"ugt wird, m\"ussen \"uberlagert werden.
-   */
-   /// assignment operator.
+   ///
    DIdxSet& operator=(const IdxSet& sv)
    {
       int n = sv.size();
@@ -61,14 +58,13 @@ public:
       IdxSet::operator=(sv);
       return *this;
    }
-
    /// assignment operator.
    DIdxSet& operator=(const DIdxSet& sv)
    {
       return operator=(IdxSet(sv));
    }
 
-   /// add #n# uninitialized indices.
+   /// adds \p n uninitialized indices.
    void add(int n)
    {
       if (max() - size() < n)
@@ -76,7 +72,7 @@ public:
       IdxSet::add(n);
    }
 
-   /// add all indices from #sv#.
+   /// adds all indices from \p sv.
    void add(const IdxSet& sv)
    {
       int n = sv.size();
@@ -85,7 +81,7 @@ public:
       IdxSet::add(sv);
    }
 
-   /// add #n# indices from #i#.
+   /// adds \p n indices from \p i.
    void add(int n, const int *i)
    {
       if (max() - size() < n)
@@ -93,26 +89,28 @@ public:
       IdxSet::add(n, i);
    }
 
-   /** set maximum number of indices.
-       This methods resets the memory consumption of the #DIdxSet# to
-       #newmax#. However, if #newmax < size()#, it is reset to #size()#
-       only.
-    */
-   void setMax(int newmax = 1);
-
+   /// adds index \p i to the index set
    void addIdx(int i)
    {
       if (max() <= size())
          setMax(size() + 1);
       IdxSet::addIdx(i);
    }
+
+   /// sets the maximum number of indices.
+   /** This methods resets the memory consumption of the #DIdxSet to
+       \p newmax. However, if \p newmax < #size(), it is reset to #size()
+       only.
+    */
+   void setMax(int newmax = 1);
+
    ///
    DIdxSet(const IdxSet& old);
-   ///
+   /// copy constructor.
    DIdxSet(const DIdxSet& old);
-   ///
+   /// default constructor. \p n gives the initial size of the index space.
    DIdxSet(int n = 8);
-   ///
+   /// destructor.
    ~DIdxSet();
 };
 

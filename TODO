@@ -55,6 +55,9 @@ SORTIERUNG
    destructor
    initialisierung
 
+
+Dokumentation: (alle * sind bereits fertig)
+
 *array.h
 *cachelpsolver.h
 clumembers.h
@@ -62,10 +65,10 @@ cluprotos.h
 clutypes.h
 cring.h
 *dataarray.h
-datahashtable.h
-datakey.h
-dataset.h
-didxset.h
+*datahashtable.h
+*datakey.h
+*dataset.h
+*didxset.h
 *dsvector.h
 dvector.h
 idlist.h

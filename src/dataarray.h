@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataarray.h,v 1.9 2001/11/17 22:15:58 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataarray.h,v 1.10 2001/11/21 16:25:34 bzfpfend Exp $"
 
 /**@file  dataarray.h
  * @brief Save arrays of data objects.
@@ -222,7 +222,7 @@ public:
 
    /// reset maximum number of elements.
    /** The value of max() is reset to \p newMax thereby setting size()
-       to \p newSize. However, if \p newSize has a value \c < \ c0 (as the
+       to \p newSize. However, if \p newSize has a value \c < \c 0 (as the
        default argument does) size() remains unchanged and max() is set
        to MIN(size(), newMax). Hence, calling reMax() without the
        default arguments, will reduce the memory consumption to a minimum.
