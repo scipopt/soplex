@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.h,v 1.5 2001/11/12 17:10:02 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.h,v 1.6 2001/11/21 09:30:14 bzfkocht Exp $"
 
 #ifndef _NAMESET_H_
 #define _NAMESET_H_
@@ -335,10 +335,7 @@ public:
    ///
    ~NameSet();
    //@}
-}
-;
-
-
+};
 } // namespace soplex
 #endif
 

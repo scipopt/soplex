@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clutypes.h,v 1.2 2001/11/06 23:31:00 bzfkocht Exp $"
+#pragma ident "@(#) $Id: clutypes.h,v 1.3 2001/11/21 09:30:13 bzfkocht Exp $"
 
 #ifndef _CLUTYPES_H_
 #define _CLUTYPES_H_
@@ -85,8 +85,7 @@ typedef struct
                                          start[i] + max[i] == start[elem[i].next->idx] 
                                          len[i] <= max[i].
                                        */
-   }
-   col;
+   } col;
    int lastColSing;            /* stage of last eliminated column singleton */
    int lastRowSing;            /* stage of last eliminated row singleton */
 } U;

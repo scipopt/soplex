@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.h,v 1.5 2001/11/12 17:09:57 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprowset.h,v 1.6 2001/11/21 09:30:13 bzfkocht Exp $"
 
 #ifndef _LPROWSET_H_
 #define _LPROWSET_H_
@@ -385,10 +385,7 @@ public:
 
    int isConsistent() const;
    //@}
-}
-;
-
-
+};
 } // namespace soplex
 #endif // _LPROWSET_H_
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clumembers.h,v 1.2 2001/11/06 23:31:00 bzfkocht Exp $"
+#pragma ident "@(#) $Id: clumembers.h,v 1.3 2001/11/21 09:30:12 bzfkocht Exp $"
 
 #ifndef _CLUMEMBERS_H_
 #define _CLUMEMBERS_H_
@@ -44,8 +44,7 @@ typedef struct CLUFactor
 
    double *work;          /* Working array: must always be left as 0! */
    double *work2;         /* Working array: must always be left as 0! */
-}
-CLUFactor;
+} CLUFactor;
 
 } // namespace soplex
 #endif // _CLUMEMBERS_H_

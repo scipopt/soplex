@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datahashtable.h,v 1.4 2001/11/11 20:27:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: datahashtable.h,v 1.5 2001/11/21 09:30:13 bzfkocht Exp $"
 
 #ifndef _DATAHAHSTABLE_H_
 #define _DATAHAHSTABLE_H_
@@ -414,9 +414,7 @@ public:
       assert(factor > 1);
    }
    //@}
-}
-;
-
+};
 } // namespace soplex
 #endif   // _DATAHAHSTABLE_H_
 

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.8 2001/11/20 15:46:48 bzfkocht Exp $
+# $Id: Makefile,v 1.9 2001/11/21 09:30:10 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -92,7 +92,7 @@ $(LIBRARY):	$(LIBDIR) $(LIBXXX)
 		$(RANLIB) $@
 
 lint:		$(OBJSRC) $(LIBSRC)
-		$(LINT) src/project.lnt -os\(src/lint.out\) \
+		$(LINT) src/project.lnt -os\(lint.out\) \
 		$(CPPFLAGS) -UNDEBUG $^
 
 doc:		

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpsolver.h,v 1.2 2001/11/06 23:31:02 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpsolver.h,v 1.3 2001/11/21 09:30:13 bzfkocht Exp $"
 
 
 #ifndef _LPSOLVER_H_
@@ -607,9 +607,7 @@ public:
    virtual ~LPSolver()
    {}
    //@}
-}
-;
-
+};
 } // namespace soplex
 #endif // _LPSOLVER_H_
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.3 2001/11/07 17:31:21 bzfbleya Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.4 2001/11/21 09:30:14 bzfkocht Exp $"
 
 
 
@@ -769,8 +769,7 @@ public:
    virtual ~SPxBasis()
    {}
    //@}
-}
-;
+};
 
 } // namespace soplex
 #endif // _SPXBASIS_H_

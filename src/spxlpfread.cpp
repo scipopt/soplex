@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.4 2001/11/20 15:47:27 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.5 2001/11/21 09:30:15 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -58,6 +58,16 @@ static bool isColName(const char* s)
 static bool isSense(const char* s)
 {
    return (*s == '<') || (*s == '>') || (*s == '=');
+}
+
+static bool isInfinity(const char* s)
+{
+   if ((*s == '-') || (*s == '+'))
+      s++;
+
+   return (tolower(s[0]) == 'i') 
+      && ( tolower(s[1]) == 'n') 
+      && ( tolower(s[2]) == 'f');
 }
 
 /// Read the next number and advance \p pos.
@@ -262,6 +272,22 @@ static int hasRowName(char*& pos, NameSet* rownames)
    return true;
 }
 
+static double readInfinity(char*& pos)
+{
+   assert(isInfinity(pos));
+
+   double sense;
+
+   if ((*pos == '-') || (*pos == '+'))
+   {
+      sense = (*pos == '-') ? -1.0 : 1.0;
+      pos++;
+   }
+   hasKeyword(pos, "inf[inity]");
+
+   return sense;
+}
+
 /// Read LP in "CPLEX LP File Format".
 /** 
  *  The specification is taken from the
@@ -270,6 +296,12 @@ static int hasRowName(char*& pos, NameSet* rownames)
  *  This routine should read (most?) valid LP format files. 
  *  What it will not do, is find all cases where a file is ill formed. 
  *  If this happens it may complain and read nothing or read "something".
+ *
+ *  @todo Keyword \c free in BOUNDS section is not implemented.
+ *  @todo Keyword \c Infinity in BOUNDS section is not implemented.
+ *        Problem is that inf is a valid variable name in the format.
+ *        readColName should be changed with a parameter to select, if 
+ *        new names should be atomatically added to the column set.
  */  
 void SPxLP::readLP(
    istream& p_input, 
@@ -489,7 +521,7 @@ void SPxLP::readLP(
             break;
          case BOUNDS :
             sense = 0;
-            
+
             if (isValue(pos))
             {
                val = readValue(pos);

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmps.cpp,v 1.7 2001/11/20 16:43:32 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxmps.cpp,v 1.8 2001/11/21 09:30:15 bzfkocht Exp $"
 
 
 #include <iostream>
@@ -216,8 +216,8 @@ inline int SPxLP__readLine
    return SPxLP::readLine(is, f1, f2, f3, f4, f5, f6);
 }
 
-/**@todo suspicious: readRows only finds the keyword ROWS, readObj reads all rows
-                     (which should be done by readRows?)
+/**@todo suspicious: readRows only finds the keyword ROWS, 
+         readObj reads all rows (which should be done by readRows?)
 */
 static MPS_Section readRows(
    std::istream& is,
@@ -268,7 +268,7 @@ static MPS_Section readObj(
    char* f4;
    char* f5;
    char* f6;
-   MPS_Section next = ENDDATA;
+   MPS_Section next = ENDATA;
 
    objName[0] = 0;
    LPRow row;
@@ -344,7 +344,7 @@ static MPS_Section readCols(
    char* f4;
    char* f5;
    char* f6;
-   MPS_Section next = ENDDATA;
+   MPS_Section next = ENDATA;
 
    double val;
    int idx;
@@ -502,7 +502,7 @@ static MPS_Section readRanges(
    char* f4;
    char* f5;
    char* f6;
-   MPS_Section next = ENDDATA;
+   MPS_Section next = ENDATA;
 
    char rngStr[LINE];
    int rngSet;
@@ -661,8 +661,8 @@ static MPS_Section readBounds(
 
 void SPxLP::readMPS(std::istream& is, NameSet* rn, NameSet* cn)
 {
-   LPRowSet& rowSet = *(static_cast<LPRowSet*>(this));
-   LPColSet& colSet = *(static_cast<LPColSet*>(this));
+   LPRowSet& rowSet = *this; //(static_cast<LPRowSet*>(this));
+   LPColSet& colSet = *this; //(static_cast<LPColSet*>(this));
    NameSet* rowNames = rn;
    NameSet* colNames = cn;
    NameSet _rowNames(1000, 10000);
