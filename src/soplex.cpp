@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.3 2001/11/09 13:25:17 bzfpfend Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.4 2001/11/09 13:38:43 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -920,8 +920,8 @@ int SoPlex::isConsistent() const
    {
       if
       (
-         thecovectors != static_cast<SVSet*>(static_cast<LPRowSet*>(const_cast<SoPlex*>(this))) ||
-         thevectors != static_cast<SVSet*>(static_cast<LPColSet*>(const_cast<SoPlex*>(this))) ||
+         thecovectors != static_cast<const SVSet*>(static_cast<const LPRowSet*>(this)) ||
+         thevectors != static_cast<const SVSet*>(static_cast<const LPColSet*>(this)) ||
          theFrhs != &primRhs ||
          theFvec != &primVec ||
          theCoPrhs != &dualRhs ||
@@ -940,8 +940,8 @@ int SoPlex::isConsistent() const
    {
       if
       (
-         thecovectors != static_cast<SVSet*>(static_cast<LPColSet*>(const_cast<SoPlex*>(this))) ||
-         thevectors != static_cast<SVSet*>(static_cast<LPRowSet*>(const_cast<SoPlex*>(this))) ||
+         thecovectors != static_cast<const SVSet*>(static_cast<const LPColSet*>(this)) ||
+         thevectors != static_cast<const SVSet*>(static_cast<const LPRowSet*>(this)) ||
          theFrhs != &dualRhs ||
          theFvec != &dualVec ||
          theCoPrhs != &primRhs ||
