@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.60 2003/04/20 08:32:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.61 2004/03/17 09:20:01 bzfpfend Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -110,6 +110,11 @@ public:
          std::cout << "IEXAMP11 Reduced costs    :" 
                    << std::setw(16) << maxviol << "  " 
                    << std::setw(16) << sumviol << std::endl;
+
+         std::cout << "IEXAMP12 Proven dual bound:" 
+                   << std::setw(20)
+                   << std::setprecision(20)
+                   << m_solver.provedDualbound() << std::endl;
       }
    }
 };

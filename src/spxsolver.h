@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.13 2004/03/16 14:57:38 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.14 2004/03/17 09:20:01 bzfpfend Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -387,6 +387,12 @@ public:
     *         (see #getPrimal()).
     */
    virtual Real value() const;
+
+   /// proved dual bound for objective value.
+   virtual Real provedDualbound() const;
+
+   /// returns whether an infeasible LP is proven to be infeasible.
+   virtual bool isProvenInfeasible() const;
 
    /// get solution vector for primal variables.
    /** This method returns the #Status of the basis.

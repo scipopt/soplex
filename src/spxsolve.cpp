@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.70 2004/03/16 14:57:37 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.71 2004/03/17 09:20:01 bzfpfend Exp $"
 
 //#define DEBUGGING 1
 
@@ -751,6 +751,8 @@ SPxSolver::Status SPxSolver::getDualfarkas (Vector& p_vector) const
    assert(SPxBasis::status() == SPxBasis::INFEASIBLE);
    p_vector.clear();
    p_vector = dualFarkas;
+
+   return status();
 }
 
 SPxSolver::Status SPxSolver::getSlacks (Vector& p_vector) const

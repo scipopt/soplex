@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.50 2003/01/13 19:04:41 bzfkocht Exp $
+# $Id: Makefile,v 1.51 2004/03/17 09:20:01 bzfpfend Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -21,6 +21,7 @@ OSTYPE		:=	$(shell uname -s | \
 			tr A-Z a-z | \
 			sed \
 			-e s/irix../irix/ )
+HOSTNAME        :=      $(shell uname -n | tr A-Z a-z)
 OPT		=	opt
 TEST		=	quick
 ALGO		=	1 2 3 4 5 6
@@ -56,7 +57,7 @@ LIBOBJ		= 	changesoplex.o didxset.o \
 			spxfastrt.o spxfileio.o spxgeneralsm.o spxgeometsc.o \
 			spxharrisrt.o spxhybridpr.o spxid.o spxintervalsm.o spxio.o \
 			spxlp.o spxlpfread.o spxmpsread.o spxmpswrite.o \
-			spxparmultpr.o spxquality.o spxredundantsm.o \
+			spxparmultpr.o spxproof.o spxquality.o spxredundantsm.o \
 			spxscaler.o spxshift.o spxsolver.o spxsolve.o \
 			spxstarter.o spxsteeppr.o spxsumst.o spxvecs.o \
 			spxvectorst.o spxweightpr.o spxweightst.o \
@@ -83,6 +84,7 @@ GCCWARN		=	-Wall -W -Wpointer-arith -Wno-unknown-pragmas \
 #GCCWARN =
 #-----------------------------------------------------------------------------
 include make/make.$(OSTYPE).$(ARCH).$(COMP).$(OPT)
+-include make/local/make.$(HOSTNAME)
 #-----------------------------------------------------------------------------
 
 TARGET		=	$(NAME).$(OSTYPE).$(ARCH).$(COMP).$(OPT)
