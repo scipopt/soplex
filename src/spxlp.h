@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.22 2002/02/13 16:56:07 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.23 2002/03/03 13:50:34 bzfkocht Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -25,7 +25,7 @@
 #include <iostream>
 #include <iomanip>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "dvector.h"
 #include "svset.h"
 #include "dataarray.h"

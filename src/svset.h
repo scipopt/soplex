@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.h,v 1.16 2002/01/31 08:19:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.h,v 1.17 2002/03/03 13:50:36 bzfkocht Exp $"
 
 /**@file  svset.h
  * @brief Set of sparse vectors.
@@ -24,7 +24,7 @@
 
 #include <assert.h>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "svector.h"
 #include "dataset.h"
 #include "dataarray.h"

@@ -13,14 +13,14 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.33 2002/03/01 13:15:30 bzfpfend Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.34 2002/03/03 13:50:31 bzfkocht Exp $"
 
-//#define DEBUG 1
+//#define DEBUGGING 1
 
 #include <iostream>
 #include <assert.h>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "clufactor.h"
 #include "cring.h"
 #include "spxalloc.h"
@@ -76,7 +76,7 @@ CLUFactor::Temp::~Temp()
 /************************************************************/   
 void CLUFactor::initPerm()
 {
-   TRACE_METHOD( "CLUFactor::initPerm()" );
+   METHOD( "CLUFactor::initPerm()" );
    for (int i = 0; i < thedim; ++i)
       row.orig[i] = row.perm[i] = col.orig[i] = col.perm[i] = -1;
 }
@@ -88,7 +88,7 @@ void CLUFactor::setPivot(const int p_stage,
                          const int p_row, 
                          const Real val)
 {
-   TRACE_METHOD( "CLUFactor::setPivot()" );
+   METHOD( "CLUFactor::setPivot()" );
    assert(row.perm[p_row] < 0);
    assert(col.perm[p_col] < 0);
 
@@ -108,7 +108,7 @@ void CLUFactor::setPivot(const int p_stage,
  */
 void CLUFactor::packRows()
 {
-   TRACE_METHOD( "CLUFactor::packRows()" );
+   METHOD( "CLUFactor::packRows()" );
    int n, i, j, l_row;
    Dring *ring, *list;
 
@@ -158,7 +158,7 @@ void CLUFactor::packRows()
  */
 void CLUFactor::remaxRow(int p_row, int len)
 {
-   TRACE_METHOD( "CLUFactor::remaxRow()" );
+   METHOD( "CLUFactor::remaxRow()" );
    assert(u.row.max[p_row] < len);
 
    if (u.row.elem[p_row].next == &(u.row.list)) /* last in row file */
@@ -226,7 +226,7 @@ void CLUFactor::remaxRow(int p_row, int len)
  */
 void CLUFactor::packColumns()
 {
-   TRACE_METHOD( "CLUFactor::packColumns()" );
+   METHOD( "CLUFactor::packColumns()" );
    int n, i, j, l_col;
    Dring *ring, *list;
       
@@ -271,7 +271,7 @@ void CLUFactor::packColumns()
  */
 void CLUFactor::remaxCol(int p_col, int len)
 {
-   TRACE_METHOD( "CLUFactor::remaxCol()" );
+   METHOD( "CLUFactor::remaxCol()" );
    assert(u.col.max[p_col] < len);
       
    if (u.col.elem[p_col].next == &(u.col.list)) /* last in column file */
@@ -356,7 +356,7 @@ void CLUFactor::remaxCol(int p_col, int len)
 void CLUFactor::initFactorMatrix(SVector** vec, 
                                  const Real eps )
 {
-   TRACE_METHOD( "CLUFactor::initFactorMatrix()" );
+   METHOD( "CLUFactor::initFactorMatrix()" );
    Real x;
    int i, j, ll, k, m;
    int tot;
@@ -519,7 +519,7 @@ void CLUFactor::initFactorMatrix(SVector** vec,
 
 void CLUFactor::colSingletons()
 {
-   TRACE_METHOD( "CLUFactor::colSingletons()" );
+   METHOD( "CLUFactor::colSingletons()" );
    int i, j, k, n;
    int len;
    int p_col, p_row, newrow;
@@ -605,7 +605,7 @@ void CLUFactor::colSingletons()
  */
 void CLUFactor::rowSingletons()
 {
-   TRACE_METHOD( "CLUFactor::rowSingletons()" );
+   METHOD( "CLUFactor::rowSingletons()" );
    Real pval;
    int i, j, k, ll, r;
    int p_row, p_col, len, rs, lk;
@@ -695,7 +695,7 @@ void CLUFactor::rowSingletons()
 
 void CLUFactor::initFactorRings()
 {
-   TRACE_METHOD( "CLUFactor::initFactorRings()" );
+   METHOD( "CLUFactor::initFactorRings()" );
    int i;
    int *rperm = row.perm;
    int *cperm = col.perm;
@@ -735,7 +735,7 @@ void CLUFactor::initFactorRings()
 
 void CLUFactor::freeFactorRings(void)
 {
-   TRACE_METHOD( "CLUFactor::freeFactorRings()" );
+   METHOD( "CLUFactor::freeFactorRings()" );
    if ( temp.pivot_col )
       spx_free(temp.pivot_col);
    if( temp.pivot_colNZ )
@@ -753,7 +753,7 @@ void CLUFactor::freeFactorRings(void)
  */
 void CLUFactor::eliminateRowSingletons()
 {
-   TRACE_METHOD( "CLUFactor::eliminateRowSingletons()" );
+   METHOD( "CLUFactor::eliminateRowSingletons()" );
    int i, j, k, ll, r;
    int len, lk;
    int pcol, prow;
@@ -857,7 +857,7 @@ void CLUFactor::eliminateRowSingletons()
  */
 void CLUFactor::eliminateColSingletons()
 {
-   TRACE_METHOD( "CLUFactor::eliminateColSingletons()" );
+   METHOD( "CLUFactor::eliminateColSingletons()" );
    int i, j, k, m, c;
    int pcol, prow;
    CLUFactor::Pring *sing;
@@ -917,7 +917,7 @@ void CLUFactor::eliminateColSingletons()
  */
 void CLUFactor::selectPivots(Real threshold)
 {
-   TRACE_METHOD( "CLUFactor::selectPivots()" );
+   METHOD( "CLUFactor::selectPivots()" );
    int ii;
    int i;
    int j;
@@ -1120,7 +1120,7 @@ int CLUFactor::updateRow   (int r,
    Real pval,
    Real eps )
 {
-   TRACE_METHOD( "CLUFactor::updateRow()" );
+   METHOD( "CLUFactor::updateRow()" );
    int fill;
    Real x, lx;
    int c, i, j, k, ll, m, n;
@@ -1231,7 +1231,7 @@ int CLUFactor::updateRow   (int r,
  */
 void CLUFactor::eliminatePivot(int prow, int pos, Real eps)
 {
-   TRACE_METHOD( "CLUFactor::eliminatePivot()" );
+   METHOD( "CLUFactor::eliminatePivot()" );
    int i, j, k, m = -1;
    int lv = -1;  // This value should never be used.
    int pcol;
@@ -1323,7 +1323,7 @@ void CLUFactor::eliminatePivot(int prow, int pos, Real eps)
 void CLUFactor::eliminateNucleus( const Real eps, 
                                   const Real threshold)
 {
-   TRACE_METHOD( "CLUFactor::eliminateNucleus()" );
+   METHOD( "CLUFactor::eliminateNucleus()" );
    int r, c;
    CLUFactor::Pring *pivot;
 
@@ -1391,7 +1391,7 @@ void CLUFactor::eliminateNucleus( const Real eps,
 
 int CLUFactor::setupColVals()
 {
-   TRACE_METHOD( "CLUFactor::setupColVals()" );
+   METHOD( "CLUFactor::setupColVals()" );
    int i;
    int n = thedim;
 
@@ -1445,7 +1445,7 @@ int CLUFactor::setupColVals()
 #ifdef WITH_L_ROWS
 void CLUFactor::setupRowVals()
 {
-   TRACE_METHOD( "CLUFactor::setupRowVals()" );
+   METHOD( "CLUFactor::setupRowVals()" );
    int   i, j, k, m;
    int   l_dim, vecs, mem;
    int*  l_row;
@@ -1533,7 +1533,7 @@ void CLUFactor::factor(
    Real    threshold,     ///< pivoting threshold                
    Real    eps)           ///< epsilon for zero detection        
 {
-   TRACE_METHOD( "CLUFactor::factor()" );
+   METHOD( "CLUFactor::factor()" );
    stat = SLinSolver::OK;
 
    l.start[0] = 0;
@@ -1580,7 +1580,7 @@ void CLUFactor::factor(
 
 void CLUFactor::dump() const
 {
-   TRACE_METHOD( "CLUFactor::dump()" );
+   METHOD( "CLUFactor::dump()" );
    int i, j, k;
 
    /*  Dump U:
@@ -1622,7 +1622,7 @@ void CLUFactor::dump() const
     */
 void CLUFactor::minRowMem(int size)
 {
-   TRACE_METHOD( "CLUFactor::minRowMem()" );
+   METHOD( "CLUFactor::minRowMem()" );
    if (u.row.size < size)
    {
       u.row.size = size;
@@ -1637,7 +1637,7 @@ void CLUFactor::minRowMem(int size)
     */
 void CLUFactor::minColMem(int size)
 {
-   TRACE_METHOD( "CLUFactor::minColMem()" );
+   METHOD( "CLUFactor::minColMem()" );
    if (u.col.size < size)
    {
       u.col.size = size;
@@ -1647,7 +1647,7 @@ void CLUFactor::minColMem(int size)
 
 void CLUFactor::minLMem(int size)
 {
-   TRACE_METHOD( "CLUFactor::minLMem()" );
+   METHOD( "CLUFactor::minLMem()" );
    if (size > l.size)
    {
       l.size = int(0.2 * l.size + size);
@@ -1658,7 +1658,7 @@ void CLUFactor::minLMem(int size)
 
 int CLUFactor::makeLvec(int p_len, int p_row)
 {
-   TRACE_METHOD( "CLUFactor::makeLvec()" );
+   METHOD( "CLUFactor::makeLvec()" );
    int* p_lrow = l.row;
    int* p_lbeg = l.start;
    int first   = p_lbeg[l.firstUnused];
@@ -1687,7 +1687,7 @@ int CLUFactor::makeLvec(int p_len, int p_row)
 
 bool CLUFactor::isConsistent() const
 {
-   TRACE_METHOD( "CLUFactor::isConsistent()" );
+   METHOD( "CLUFactor::isConsistent()" );
    int              i, j, k, ll;
    Dring            *ring;
    CLUFactor::Pring *pring;

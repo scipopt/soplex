@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightpr.h,v 1.10 2002/03/01 13:15:32 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxweightpr.h,v 1.11 2002/03/03 13:50:35 bzfkocht Exp $"
 
 /**@file  spxweightpr.h
  * @brief Weighted pricing.
@@ -21,7 +21,7 @@
 #ifndef _SPXWEIGHTPR_H_
 #define _SPXWEIGHTPR_H_
 
-#include "real.h"
+#include "spxdefines.h"
 #include "spxpricer.h"
 
 namespace soplex

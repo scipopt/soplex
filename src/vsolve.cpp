@@ -13,11 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vsolve.cpp,v 1.15 2002/03/01 13:15:33 bzfpfend Exp $"
+#pragma ident "@(#) $Id: vsolve.cpp,v 1.16 2002/03/03 13:50:36 bzfkocht Exp $"
 
 #include <assert.h>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "clufactor.h"
 #include "cring.h"
 
@@ -49,11 +49,11 @@ static void enQueueMax(int* heap, int* size, int elem)
    }
    heap[j] = elem;
 
-#ifdef  DEBUG
+#ifdef  DEBUGGING
    for (i = 1; i < *size; ++i)
       for (j = 0; j < i; ++j)
          assert(heap[i] != heap[j]);
-#endif  /* DEBUG */
+#endif  /* DEBUGGING */
 }
 
 static int deQueueMax(int* heap, int* size)
@@ -125,11 +125,11 @@ static void enQueueMin(int* heap, int* size, int elem)
    }
    heap[j] = elem;
 
-#ifdef  DEBUG
+#ifdef  DEBUGGING
    for (i = 1; i < *size; ++i)
       for (j = 0; j < i; ++j)
          assert(heap[i] != heap[j]);
-#endif  /* DEBUG */
+#endif  /* DEBUGGING */
 }
 
 static int deQueueMin(int* heap, int* size)
@@ -186,7 +186,7 @@ static int deQueueMin(int* heap, int* size)
 
 int CLUFactor::vSolveLright(Real* vec, int* ridx, int rn, Real eps)
 {
-   TRACE_METHOD( "CLUFactor::vSolveLright()" );
+   METHOD( "CLUFactor::vSolveLright()" );
    int i, j, k, n;
    int end;
    Real x;
@@ -245,7 +245,7 @@ void CLUFactor::vSolveLright2(
    Real* vec, int* ridx, int* rnptr, Real eps,
    Real* vec2, int* ridx2, int* rn2ptr, Real eps2)
 {
-   TRACE_METHOD( "CLUFactor::vSolveLright2()" );
+   METHOD( "CLUFactor::vSolveLright2()" );
    int i, j, k, n;
    int end;
    Real x, y;
@@ -351,7 +351,7 @@ void CLUFactor::vSolveLright2(
 int CLUFactor::vSolveUright(Real* vec, int* vidx,
    Real* rhs, int* ridx, int rn, Real eps)
 {
-   TRACE_METHOD( "CLUFactor::vSolveUright()" );
+   METHOD( "CLUFactor::vSolveUright()" );
    int i, j, k, r, c, n;
    int *rorig, *corig;
    int *rperm;
@@ -443,7 +443,7 @@ int CLUFactor::vSolveUright(Real* vec, int* vidx,
 void CLUFactor::vSolveUrightNoNZ(Real* vec,
    Real* rhs, int* ridx, int rn, Real eps)
 {
-   TRACE_METHOD( "CLUFactor::vSolveUrightNoNZ()" );
+   METHOD( "CLUFactor::vSolveUrightNoNZ()" );
    int i, j, k, r, c;
    int *rorig, *corig;
    int *rperm;
@@ -530,7 +530,7 @@ int CLUFactor::vSolveUright2(
    Real* vec, int* vidx, Real* rhs, int* ridx, int rn, Real eps,
    Real* vec2, Real* rhs2, int* ridx2, int rn2, Real eps2)
 {
-   TRACE_METHOD( "CLUFactor::vSolveUright2()" );
+   METHOD( "CLUFactor::vSolveUright2()" );
    int i, j, k, r, c, n;
    int *rorig, *corig;
    int *rperm;
@@ -734,7 +734,7 @@ int CLUFactor::vSolveUright2(
 
 int CLUFactor::vSolveUpdateRight(Real* vec, int* ridx, int n, Real eps)
 {
-   TRACE_METHOD( "CLUFactor::vSolveUpdateRight()" );
+   METHOD( "CLUFactor::vSolveUpdateRight()" );
    int i, j, k;
    int end;
    Real meps, x, y;
@@ -774,7 +774,7 @@ int CLUFactor::vSolveUpdateRight(Real* vec, int* ridx, int n, Real eps)
 
 void CLUFactor::vSolveUpdateRightNoNZ(Real* vec, Real /*eps*/)
 {
-   TRACE_METHOD( "CLUFactor::vSolveUpdateRightNoNZ()" );
+   METHOD( "CLUFactor::vSolveUpdateRightNoNZ()" );
    int i, j, k;
    int end;
    Real x;
@@ -809,7 +809,7 @@ int CLUFactor::vSolveRight4update(Real eps,
    Real* rhs, int* ridx, int rn,              /* rhs    */
    Real* forest, int* forestNum, int* forestIdx)
 {
-   TRACE_METHOD( "CLUFactor::vSolveRight4update()" );
+   METHOD( "CLUFactor::vSolveRight4update()" );
    rn = vSolveLright(rhs, ridx, rn, eps);
 
    /*  turn index list into a heap
@@ -870,7 +870,7 @@ int CLUFactor::vSolveRight4update2(Real eps,
    Real* rhs2, int* ridx2, int rn2,      /* rhs2    */
    Real* forest, int* forestNum, int* forestIdx)
 {
-   TRACE_METHOD( "CLUFactor::vSolveRight4update2()" );
+   METHOD( "CLUFactor::vSolveRight4update2()" );
    /*
    rn  = vSolveLright(rhs,  ridx,  rn,  eps);
    rn2 = vSolveLright(rhs2, ridx2, rn2, eps2);
@@ -977,7 +977,7 @@ void CLUFactor::vSolveRightNoNZ(
    Real* vec2, Real eps2,              /* result2 */
    Real* rhs2, int* ridx2, int rn2)    /* rhs2    */
 {
-   TRACE_METHOD( "CLUFactor::vSolveRightNoNZ()" );
+   METHOD( "CLUFactor::vSolveRightNoNZ()" );
    rn2 = vSolveLright(rhs2, ridx2, rn2, eps2);
 
    if (rn2 > thedim*verySparseFactor4right)
@@ -1028,7 +1028,7 @@ int CLUFactor::solveUleft(Real eps,
                 Real* vec, int* vecidx,
                 Real* rhs, int* rhsidx, int rhsn)
 {
-   TRACE_METHOD( "CLUFactor::solveUleft()" );
+   METHOD( "CLUFactor::solveUleft()" );
    Real x, y, meps;
    int i, j, k, n, r, c;
    int *rorig, *corig, *cperm;
@@ -1096,7 +1096,7 @@ int CLUFactor::solveUleft(Real eps,
 void CLUFactor::solveUleftNoNZ(Real eps, Real* vec,
    Real* rhs, int* rhsidx, int rhsn)
 {
-   TRACE_METHOD( "CLUFactor::solveUleftNoNZ()" );
+   METHOD( "CLUFactor::solveUleftNoNZ()" );
    Real x, y, meps;
    int i, j, k, r, c;
    int *rorig, *corig, *cperm;
@@ -1159,7 +1159,7 @@ void CLUFactor::solveUleftNoNZ(Real eps, Real* vec,
 
 int CLUFactor::solveLleftForest(Real eps, Real* vec, int* nonz, int n)
 {
-   TRACE_METHOD( "CLUFactor::solveLleftForest()" );
+   METHOD( "CLUFactor::solveLleftForest()" );
    int i, j, k, end;
    Real x, y, meps;
    Real *val, *lval;
@@ -1207,7 +1207,7 @@ int CLUFactor::solveLleftForest(Real eps, Real* vec, int* nonz, int n)
 
 void CLUFactor::solveLleftForestNoNZ(Real* vec)
 {
-   TRACE_METHOD( "CLUFactor::solveLleftForestNoNZ()" );
+   METHOD( "CLUFactor::solveLleftForestNoNZ()" );
    int i, j, k, end;
    Real x;
    Real *val, *lval;
@@ -1235,7 +1235,7 @@ void CLUFactor::solveLleftForestNoNZ(Real* vec)
 
 int CLUFactor::solveLleft(Real eps, Real* vec, int* nonz, int rn)
 {
-   TRACE_METHOD( "CLUFactor::solveLleft()" );
+   METHOD( "CLUFactor::solveLleft()" );
    int i, j, k, n;
    int r;
    Real x, y, meps;
@@ -1326,7 +1326,7 @@ int CLUFactor::solveLleft(Real eps, Real* vec, int* nonz, int rn)
 
 void CLUFactor::solveLleftNoNZ(Real* vec)
 {
-   TRACE_METHOD( "CLUFactor::solveLleftNoNZ()" );
+   METHOD( "CLUFactor::solveLleftNoNZ()" );
    int i, j, k;
    int r;
    Real x;
@@ -1381,7 +1381,7 @@ void CLUFactor::solveLleftNoNZ(Real* vec)
 
 int CLUFactor::solveUpdateLeft(Real eps, Real* vec, int* nonz, int n)
 {
-   TRACE_METHOD( "CLUFactor::solveUpdateLeft()" );
+   METHOD( "CLUFactor::solveUpdateLeft()" );
    int i, j, k, end;
    Real x, y, meps;
    Real *lval, *val;
@@ -1430,7 +1430,7 @@ int CLUFactor::vSolveLeft(Real eps,
    Real* vec, int* idx,                       /* result */
    Real* rhs, int* ridx, int rn)            /* rhs    */
 {
-   TRACE_METHOD( "CLUFactor::vSolveLeft()" );
+   METHOD( "CLUFactor::vSolveLeft()" );
    if (!l.updateType)            /* no Forest-Tomlin Updates */
    {
       rn = solveUpdateLeft(eps, rhs, ridx, rn);
@@ -1456,7 +1456,7 @@ int CLUFactor::vSolveLeft2(Real eps,
    Real* vec2,                               /* result2 */
    Real* rhs2, int* ridx2, int rn2)        /* rhs2    */
 {
-   TRACE_METHOD( "CLUFactor::vSolveLeft2()" );
+   METHOD( "CLUFactor::vSolveLeft2()" );
    if (!l.updateType)            /* no Forest-Tomlin Updates */
    {
       rn = solveUpdateLeft(eps, rhs, ridx, rn);
@@ -1481,7 +1481,7 @@ void CLUFactor::vSolveLeftNoNZ(Real eps,
    Real* vec2,                            /* result2 */
    Real* rhs2, int* ridx2, int rn2)     /* rhs2    */
 {
-   TRACE_METHOD( "CLUFactor::vSolveLeftNoNZ()" );
+   METHOD( "CLUFactor::vSolveLeftNoNZ()" );
    if (!l.updateType)            /* no Forest-Tomlin Updates */
    {
       rn2 = solveUpdateLeft(eps, rhs2, ridx2, rn2);

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeneralsm.h,v 1.6 2002/01/31 08:19:28 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeneralsm.h,v 1.7 2002/03/03 13:50:34 bzfkocht Exp $"
 
 /**@file  spxgeneralsm.h
  * @brief General LP preprocessing.
@@ -23,7 +23,7 @@
 
 #include <assert.h>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "spxredundantsm.h"
 #include "spxaggregatesm.h"
 #include "spxrem1sm.h"

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.h,v 1.11 2002/01/31 08:19:28 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.h,v 1.12 2002/03/03 13:50:33 bzfkocht Exp $"
 
 /**@file  spxdevexpr.h
  * @brief Devex pricer.
@@ -23,7 +23,7 @@
 
 #include <assert.h>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "spxpricer.h"
 
 namespace soplex

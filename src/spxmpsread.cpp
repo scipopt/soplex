@@ -13,18 +13,18 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.20 2002/02/07 17:39:48 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.21 2002/03/03 13:50:34 bzfkocht Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.
  */
-//#define DEBUG 1
+//#define DEBUGGING 1
 
 #include <assert.h>
 #include <string.h>
 #include <iostream>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "spxlp.h"
 #include "mpsinput.h"
 

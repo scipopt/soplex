@@ -13,9 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbounds.cpp,v 1.9 2002/03/01 13:15:31 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxbounds.cpp,v 1.10 2002/03/03 13:50:33 bzfkocht Exp $"
 
-//#define DEBUG 1
+//#define DEBUGGING 1
 
 
 /*  Import system include files
@@ -25,7 +25,7 @@
 
 /*  and class header files
  */
-#include "real.h"
+#include "spxdefines.h"
 #include "soplex.h"
 
 namespace soplex
@@ -41,7 +41,7 @@ namespace soplex
  */
 void SoPlex::setPrimalBounds()
 {
-   TRACE_METHOD( "SoPlex::setPrimalBounds()" );
+   METHOD( "SoPlex::setPrimalBounds()" );
    theUCbound = SPxLP::upper();
    theLCbound = SPxLP::lower();
    if (rep() == ROW)
@@ -91,7 +91,7 @@ void SoPlex::clearDualBounds
    Real& lw
 )
 {
-   TRACE_METHOD( "SoPlex::clearDualBounds()" );
+   METHOD( "SoPlex::clearDualBounds()" );
    switch (stat)
    {
    case SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER :
@@ -115,7 +115,7 @@ void SoPlex::clearDualBounds
 
 void SoPlex::setDualColBounds()
 {
-   TRACE_METHOD( "SoPlex::setDualColBounds()" );
+   METHOD( "SoPlex::setDualColBounds()" );
    assert(rep() == COLUMN);
    int i;
    const SPxBasis::Desc& ds = desc();
@@ -140,7 +140,7 @@ void SoPlex::setDualColBounds()
 
 void SoPlex::setDualRowBounds()
 {
-   TRACE_METHOD( "SoPlex::setDualRowBounds()" );
+   METHOD( "SoPlex::setDualRowBounds()" );
    assert(rep() == ROW);
 
    int i;
@@ -169,7 +169,7 @@ void SoPlex::setDualRowBounds()
  */
 void SoPlex::setEnterBound4Row(int i, int n)
 {
-   TRACE_METHOD( "SoPlex::setEnterBound4Row()" );
+   METHOD( "SoPlex::setEnterBound4Row()" );
    assert(baseId(i).isSPxRowId());
    assert(number(SPxRowId(baseId(i))) == n);
    switch (desc().rowStatus(n))
@@ -192,7 +192,7 @@ void SoPlex::setEnterBound4Row(int i, int n)
 
 void SoPlex::setEnterBound4Col(int i, int n)
 {
-   TRACE_METHOD( "SoPlex::setEnterBound4Col()" );
+   METHOD( "SoPlex::setEnterBound4Col()" );
    assert(baseId(i).isSPxColId());
    assert(number(SPxColId(baseId(i))) == n);
    switch (desc().colStatus(n))
@@ -215,7 +215,7 @@ void SoPlex::setEnterBound4Col(int i, int n)
 
 void SoPlex::setEnterBounds()
 {
-   TRACE_METHOD( "SoPlex::setEnterBounds()" );
+   METHOD( "SoPlex::setEnterBounds()" );
    int i;
 
    for (i = dim() - 1; i >= 0; --i)
@@ -237,7 +237,7 @@ void SoPlex::setEnterBounds()
  */
 void SoPlex::setLeaveBound4Row(int i, int n)
 {
-   TRACE_METHOD( "SoPlex::setLeaveBound4Row()" );
+   METHOD( "SoPlex::setLeaveBound4Row()" );
    assert(baseId(i).isSPxRowId());
    assert(number(SPxRowId(baseId(i))) == n);
    switch (desc().rowStatus(n))
@@ -268,7 +268,7 @@ void SoPlex::setLeaveBound4Row(int i, int n)
 
 void SoPlex::setLeaveBound4Col(int i, int n)
 {
-   TRACE_METHOD( "SoPlex::setLeaveBound4Col()" );
+   METHOD( "SoPlex::setLeaveBound4Col()" );
    assert(baseId(i).isSPxColId());
    assert(number(SPxColId(baseId(i))) == n);
    switch (desc().colStatus(n))
@@ -298,7 +298,7 @@ void SoPlex::setLeaveBound4Col(int i, int n)
 
 void SoPlex::setLeaveBounds()
 {
-   TRACE_METHOD( "SoPlex::setLeaveBounds()" );
+   METHOD( "SoPlex::setLeaveBounds()" );
    int i;
 
    for (i = dim() - 1; i >= 0; --i)
@@ -313,7 +313,7 @@ void SoPlex::setLeaveBounds()
 
 void SoPlex::testBounds() const
 {
-   TRACE_METHOD( "SoPlex::testBounds()" );
+   METHOD( "SoPlex::testBounds()" );
    Real l_max = (1 + iterCount) * delta();
    int i;
 

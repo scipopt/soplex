@@ -13,10 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dvector.cpp,v 1.12 2002/02/11 15:32:52 bzfpfend Exp $"
+#pragma ident "@(#) $Id: dvector.cpp,v 1.13 2002/03/03 13:50:31 bzfkocht Exp $"
 
 
-#include "real.h"
+#include "spxdefines.h"
 #include "dvector.h"
 #include "message.h"
 #include "spxalloc.h"

@@ -13,14 +13,14 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.16 2002/01/31 16:30:48 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.17 2002/03/03 13:50:35 bzfkocht Exp $"
 
-//#define DEBUG 1
+//#define DEBUGGING 1
 
 #include <assert.h>
 #include <iostream>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "message.h"
 #include "spxsteeppr.h"
 #include "random.h"

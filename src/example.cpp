@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.31 2002/03/01 13:15:30 bzfpfend Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.32 2002/03/03 13:50:31 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -22,7 +22,7 @@
 #include <iomanip>
 #include <fstream>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "spxsolver.h"
 
 #include "timer.h"

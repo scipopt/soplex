@@ -13,66 +13,98 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: real.h,v 1.12 2002/03/01 13:15:30 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.1 2002/03/03 13:50:33 bzfkocht Exp $"
 
-/**@file  real.h
- * @brief Floating point type definition.
+/**@file  spxdefines.h
+ * @brief Debugging, floating point type and parameter definitions.
+ *
+ * In optimized code with \c NDEBUG defined, only #VERBOSE1, #VERBOSE2
+ * and #VERBOSE3 are set.
+ * If \c NDEBUG is not defined, also #ABORT and #TRACE do something.
+ * If \c DEBUGGING is defined, the code within #DEBUG is used.
+ * If \c TRACE_METHOD is defined, the mathod tracing with #METHOD is
+ * activated.
+ *
+ * If \c WITH_LONG_DOUBLE is defined, all #Real numbers are of type 
+ * long double instead of just double.
  */
-#ifndef _REAL_H_
-#define _REAL_H_
+#ifndef _SPXDEFINES_H_
+#define _SPXDEFINES_H_
 
 #include <math.h>
+
+#if !defined(NDEBUG) || defined(TRACE_METHOD) || defined(DEBUGGING)
 #include <iostream>
+#endif
 
 namespace soplex
 {
-
-#define ABORT() { std::cerr << "Abort in " << __FILE__ << ":"     \
-                            << __LINE__ << std::endl;             \
-                  abort(); }
-
-#if defined(DEBUG)
-#define TRACE(x) {x}
-#else
-#define TRACE(x) /**/
-#endif
-
-#if defined(DEBUG_METHOD)
-
-class TraceMethodIndent
-{
-private:
-   static int indent;
-
-public:
-   TraceMethodIndent()
-   {
-      int i;
-      for( i = 0; i < indent; ++i )
-         std::cerr << ".";
-      indent++;
-   }
-   virtual ~TraceMethodIndent()
-   {
-      indent--;
-   }
-};
-
-#define TRACE_METHOD(x) \
-  std::cerr << "\t\t\t\t\t";                        \
-  TraceMethodIndent __INDENT;                       \
-  std::cerr << x                                    \
-            << " [" << __FILE__                     \
-            << ":" << __LINE__ << "]" << std::endl;
-#else
-#define TRACE_METHOD(x) /**/
-#endif
-
+/*-----------------------------------------------------------------------------
+ * Debugging Macros etc.
+ *-----------------------------------------------------------------------------
+ */
 #define VERBOSE1(x) { if(Param::verbose() >= 1) {x} }
 #define VERBOSE2(x) { if(Param::verbose() >= 2) {x} }
 #define VERBOSE3(x) { if(Param::verbose() >= 3) {x} }
 
+#ifndef NDEBUG
+#define TRACE(x) {x}
+#define ABORT()  {                                      \
+   std::cerr << "Abort in " << __FILE__ << ":"         \
+                            << __LINE__ << std::endl;  \
+   abort();                                            \
+}
+#else
+#define ABORT()  abort()
+#define TRACE(x) /**/
+#endif //!ABORT
 
+#if defined(DEBUGGING)
+#define DEBUG(x) {x}
+#else
+#define DEBUG(x) /**/
+#endif //!DEBUGGING
+
+#if defined(TRACE_METHOD)
+
+#define FILE_NAME_COL  60
+
+class TraceMethod
+{
+private:
+   static int s_indent;
+
+public:
+   TraceMethod()
+   {
+      int i;
+ 
+      for(i = 0; i < s_indent; i++)
+         std::cerr << ".";      
+
+      std::cerr << s;
+
+      for(i = strlen(s) + s_indent; i < FILE_NAME_COL; i++)
+         std::cerr << "_";             
+      std::cerr << "[" << file << ":" << line << "]" << std::endl; 
+
+      s_indent++;
+   }
+   virtual ~TraceMethod()
+   {
+      s_indent--;
+   }
+};
+#define METHOD(x) TraceMethod _trace_method_(x, __FILE__, __LINE__)
+
+#else
+#define METHOD(x) /**/
+#endif // !DEBUGGING
+
+/*-----------------------------------------------------------------------------
+ * Long double support, Parameters and Epsilons
+ *-----------------------------------------------------------------------------
+ */
 #ifdef WITH_LONG_DOUBLE
 
 typedef long double Real;
@@ -162,7 +194,7 @@ inline bool isNotZero(Real a, Real eps = Param::epsilon())
 }
 
 } // namespace soplex
-#endif // _REAL_H_
+#endif // _SPXDEFINES_H_
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:

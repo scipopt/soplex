@@ -13,17 +13,17 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: mpsinput.cpp,v 1.4 2002/01/31 16:30:46 bzfpfend Exp $"
+#pragma ident "@(#) $Id: mpsinput.cpp,v 1.5 2002/03/03 13:50:32 bzfkocht Exp $"
 
 /**@file  mpsinput.cpp
  * @brief Read MPS format files.
  */
-//#define DEBUG 1                   // Setting this generates a lot of output
+//#define DEBUGGING 1                   // Setting this generates a lot of output
 
 #include <assert.h>
 #include <string.h>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "mpsinput.h"
 
 #define PATCH_CHAR    '_'
@@ -76,7 +76,7 @@ bool MPSInput::readLine()
             return false;
         m_lineno++;
 
-        TRACE({ std::cerr << "Line " << m_lineno
+        DEBUG({ std::cerr << "Line " << m_lineno
                           << " " << m_buf << std::endl; });        
       } 
       while(*m_buf == '*');
@@ -190,7 +190,7 @@ bool MPSInput::readLine()
    }
    while(is_marker);
 
-   TRACE({
+   DEBUG({
       std::cerr << "-----------------------------------------------" 
                 << std::endl
                 << "f0=" << ((m_f0 == 0) ? "nil" : m_f0) << std::endl

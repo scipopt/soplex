@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.38 2002/02/27 20:03:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.39 2002/03/03 13:50:33 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -23,7 +23,7 @@
 
 #include <assert.h>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "timer.h"
 #include "spxlp.h"
 #include "spxbasis.h"

@@ -13,12 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxparmultpr.cpp,v 1.9 2002/01/31 16:30:48 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxparmultpr.cpp,v 1.10 2002/03/03 13:50:34 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "spxparmultpr.h"
 
 namespace soplex

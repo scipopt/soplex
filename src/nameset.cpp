@@ -13,10 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.cpp,v 1.17 2002/02/11 15:32:53 bzfpfend Exp $"
+#pragma ident "@(#) $Id: nameset.cpp,v 1.18 2002/03/03 13:50:32 bzfkocht Exp $"
 
 #include <string.h>
-#include "real.h"
+#include "spxdefines.h"
 #include "nameset.h"
 #include "spxalloc.h"
 

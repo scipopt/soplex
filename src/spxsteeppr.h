@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.h,v 1.10 2002/01/31 08:19:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.h,v 1.11 2002/03/03 13:50:35 bzfkocht Exp $"
 
 
 /**@file  spxsteeppr.h
@@ -25,7 +25,7 @@
 
 #include <assert.h>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "spxpricer.h"
 #include "random.h"
 

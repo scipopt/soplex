@@ -13,12 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clufactor.h,v 1.12 2002/02/11 15:32:52 bzfpfend Exp $"
+#pragma ident "@(#) $Id: clufactor.h,v 1.13 2002/03/03 13:50:31 bzfkocht Exp $"
 
 #ifndef _CLUFACTOR_H_
 #define _CLUFACTOR_H_
 
-#include "real.h"
+#include "spxdefines.h"
 #include "slinsolver.h"
 #include "svector.h"
 

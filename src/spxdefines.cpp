@@ -13,21 +13,23 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: real.cpp,v 1.8 2002/03/01 13:15:30 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxdefines.cpp,v 1.1 2002/03/03 13:50:33 bzfkocht Exp $"
 
 /**@file  real.cpp
  * @brief Floating point type definition.
  */
-#include "real.h"
+#include "spxdefines.h"
 
 namespace soplex
 {
 
-#if defined(DEBUG_METHOD)
-int TraceMethodIndent::indent = 0;
-#endif
+#if defined(TRACE_METHOD)
 
-const Real infinity = DEFAULT_INFINITY;
+int TraceMethod::s_indent = 0;
+
+#endif //TRACE_METHOD
+
+const Real infinity   = DEFAULT_INFINITY;
 
 Real Param::s_epsilon = DEFAULT_EPS_ZERO;
 int  Param::s_verbose = 1;

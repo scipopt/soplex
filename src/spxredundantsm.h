@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.h,v 1.8 2002/01/31 08:19:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.h,v 1.9 2002/03/03 13:50:34 bzfkocht Exp $"
 
 /**@file  spxredundantsm.h
  * @brief Remove redundant row and columns.
@@ -23,7 +23,7 @@
 
 #include <assert.h>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "spxsimplifier.h"
 
 namespace soplex

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.h,v 1.15 2002/01/31 08:19:27 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprowset.h,v 1.16 2002/03/03 13:50:32 bzfkocht Exp $"
 
 /**@file  lprowset.h
  * @brief Set of LP columns.
@@ -24,7 +24,7 @@
 
 #include <assert.h>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "lprow.h"
 #include "dvector.h"
 #include "svset.h"

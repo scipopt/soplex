@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.h,v 1.20 2002/02/01 08:24:24 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svector.h,v 1.21 2002/03/03 13:50:35 bzfkocht Exp $"
 
 /**@file  svector.h
  * @brief Sparse vectors.
@@ -25,7 +25,7 @@
 #include <assert.h>
 #include <math.h>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "vector.h"
 
 namespace soplex

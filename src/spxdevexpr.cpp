@@ -13,9 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.13 2002/03/01 13:15:32 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.14 2002/03/03 13:50:33 bzfkocht Exp $"
 
-#include "real.h"
+#include "spxdefines.h"
 #include "spxdevexpr.h"
 #include "message.h"
 

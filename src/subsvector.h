@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: subsvector.h,v 1.10 2002/02/01 08:24:23 bzfkocht Exp $"
+#pragma ident "@(#) $Id: subsvector.h,v 1.11 2002/03/03 13:50:35 bzfkocht Exp $"
 
 
 /**@file  subsvector.h
@@ -24,7 +24,7 @@
 
 #include <assert.h>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "svector.h"
 
 namespace soplex

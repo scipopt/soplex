@@ -13,19 +13,19 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.23 2002/03/01 13:15:32 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.24 2002/03/03 13:50:34 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
  */
-//#define DEBUG 1
+//#define DEBUGGING 1
 
 #include <assert.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <iostream>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "spxlp.h"
 
 #define MAX_LINE_LEN  257       ///< maximum length of a line (255 + \n + \0)
@@ -145,7 +145,7 @@ static Real readValue(char*& pos)
 
    assert(pos == s);
 
-   TRACE( std::cerr << "readValue = " << value << std::endl; );
+   DEBUG( std::cerr << "readValue = " << value << std::endl; );
 
    return value;
 }
@@ -187,7 +187,7 @@ static int readColName(
          colset.add(*emptycol);
       }
    }
-   TRACE({ std::cerr << "readColName [" << name << "] = "
+   DEBUG({ std::cerr << "readColName [" << name << "] = "
 		     << colidx << std::endl; });
 
    return colidx;
@@ -205,7 +205,7 @@ static int readSense(char*& pos)
    else if (*pos == '=')
       pos++;
 
-   TRACE({ std::cerr << "readSense = " << static_cast<char>(sense)
+   DEBUG({ std::cerr << "readSense = " << static_cast<char>(sense)
 		     << std::endl; });
 
    return sense;
@@ -248,7 +248,7 @@ static bool hasKeyword(char*& pos, const char* keyword)
    {
       pos += k;
 
-      TRACE( std::cerr << "hasKeyowrd: " << keyword << std::endl; );
+      DEBUG( std::cerr << "hasKeyowrd: " << keyword << std::endl; );
       return true;
    }
    return false;
@@ -399,7 +399,7 @@ bool SPxLP::readLPF(
       pos = buf;
       val = 1.0;
 
-      TRACE({ std::cerr << "Reading line " << lineno
+      DEBUG({ std::cerr << "Reading line " << lineno
 			<< " (pos=" << pos << ")" << std::endl; });
 
       // 1. Remove comments.
@@ -501,7 +501,7 @@ bool SPxLP::readLPF(
       //-----------------------------------------------------------------------
       pos = line;
       
-      TRACE( std::cerr << "pos=" << pos << std::endl; );
+      DEBUG( std::cerr << "pos=" << pos << std::endl; );
 
       // 7. We have something left to process. 
       while((pos != 0) && (*pos != '\0'))
@@ -690,7 +690,7 @@ bool SPxLP::readLPF(
    if (p_rnames == 0)
       delete rnames;
 
-   TRACE( std::cerr << *this; );
+   DEBUG( std::cerr << *this; );
 
    return finished;
 }

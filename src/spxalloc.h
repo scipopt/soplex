@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxalloc.h,v 1.7 2002/03/01 13:15:31 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxalloc.h,v 1.8 2002/03/03 13:50:33 bzfkocht Exp $"
 
 /**@file  spxalloc.h
  * @brief Memory allocation routines.
@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "real.h"
+#include "spxdefines.h"
 
 namespace soplex
 {

@@ -13,13 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdesc.cpp,v 1.8 2002/03/01 13:15:31 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxdesc.cpp,v 1.9 2002/03/03 13:50:33 bzfkocht Exp $"
 
-//#define DEBUG 1
+//#define DEBUGGING 1
 
 #include <iostream>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "spxbasis.h"
 
 namespace soplex
@@ -27,14 +27,14 @@ namespace soplex
 
 void SPxBasis::Desc::reSize(int rowDim, int colDim)
 {
-   TRACE_METHOD( "SPxBasis::Desc::reSize()" );
+   METHOD( "SPxBasis::Desc::reSize()" );
    rowstat.reSize(rowDim);
    colstat.reSize(colDim);
 }
 
 void SPxBasis::Desc::dump() const
 {
-   TRACE_METHOD( "SPxBasis::Desc::dump()" );
+   METHOD( "SPxBasis::Desc::dump()" );
    int i;
 
    std::cout << "column status: ";
@@ -50,7 +50,7 @@ void SPxBasis::Desc::dump() const
 
 bool SPxBasis::Desc::isConsistent() const
 {
-   TRACE_METHOD( "SPxBasis::Desc::isConsistent()" );
+   METHOD( "SPxBasis::Desc::isConsistent()" );
    return rowstat.isConsistent() && colstat.isConsistent();
 }
 

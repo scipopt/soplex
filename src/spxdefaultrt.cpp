@@ -13,14 +13,14 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.8 2002/03/01 13:15:31 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.9 2002/03/03 13:50:33 bzfkocht Exp $"
 
-//#define DEBUG 1
+//#define DEBUGGING 1
 
 #include <assert.h>
 #include <iostream>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "spxdefaultrt.h"
 
 namespace soplex
@@ -311,7 +311,7 @@ SoPlex::Id SPxDefaultRT::selectEnterX(
 
    if (enterId.isValid() && solver()->isBasic(enterId))
    {
-      TRACE({ std::cerr << "isValid() && isBasic(): max=" << max
+      DEBUG({ std::cerr << "isValid() && isBasic(): max=" << max
                         << std::endl; });
       if (cnum >= 0)
          solver()->coPvec().delta().clearNum(cnum);
@@ -320,7 +320,7 @@ SoPlex::Id SPxDefaultRT::selectEnterX(
       return SPxDefaultRT::selectEnter(max);
    }
 
-   TRACE({
+   DEBUG({
       if( !enterId.isValid() )
          std::cerr << "!isValid(): max=" << max << ", x=" << x << std::endl;
    });

@@ -13,16 +13,16 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprow.cpp,v 1.12 2002/03/01 13:15:30 bzfpfend Exp $"
+#pragma ident "@(#) $Id: lprow.cpp,v 1.13 2002/03/03 13:50:32 bzfkocht Exp $"
 
-//#define DEBUG 1
+//#define DEBUGGING 1
 
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
 #include <iostream>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "lprow.h"
 
 namespace soplex

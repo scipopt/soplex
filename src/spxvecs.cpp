@@ -13,12 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvecs.cpp,v 1.15 2002/03/01 13:15:32 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxvecs.cpp,v 1.16 2002/03/03 13:50:35 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "soplex.h"
 
 namespace soplex
@@ -42,7 +42,7 @@ namespace soplex
  */
 void SoPlex::computeFrhs()
 {
-   TRACE_METHOD( "SoPlex::computeFrhs()" );
+   METHOD( "SoPlex::computeFrhs()" );
    if (rep() == COLUMN)
    {
       theFrhs->clear();
@@ -110,7 +110,7 @@ void SoPlex::computeFrhs()
 
 void SoPlex::computeFrhsXtra()
 {
-   TRACE_METHOD( "SoPlex::computeFrhsXtra()" );
+   METHOD( "SoPlex::computeFrhsXtra()" );
    assert(rep() == COLUMN);
    assert(type() == LEAVE);
    Real x;
@@ -161,7 +161,7 @@ void SoPlex::computeFrhs1(
    const Vector& ufb,    ///< upper feasibility bound for variables
    const Vector& lfb)    ///< lower feasibility bound for variables
 {
-   TRACE_METHOD( "SoPlex::computeFrhs1()" );
+   METHOD( "SoPlex::computeFrhs1()" );
    Real x;
    int i;
    const SPxBasis::Desc& ds = desc();
@@ -215,7 +215,7 @@ void SoPlex::computeFrhs2(
    const Vector& coufb,   ///< upper feasibility bound for covariables
    const Vector& colfb)   ///< lower feasibility bound for covariables
 {
-   TRACE_METHOD( "SoPlex::computeFrhs2()" );
+   METHOD( "SoPlex::computeFrhs2()" );
    Real x;
    int i;
    const SPxBasis::Desc& ds = desc();
@@ -287,7 +287,7 @@ void SoPlex::computeFrhs2(
 */
 void SoPlex::computeEnterCoPrhs4Row(int i, int n)
 {
-   TRACE_METHOD( "SoPlex::computeEnterCoPrhs4Row()" );
+   METHOD( "SoPlex::computeEnterCoPrhs4Row()" );
    assert(baseId(i).isSPxRowId());
    assert(number(SPxRowId(baseId(i))) == n);
 
@@ -319,7 +319,7 @@ void SoPlex::computeEnterCoPrhs4Row(int i, int n)
 
 void SoPlex::computeEnterCoPrhs4Col(int i, int n)
 {
-   TRACE_METHOD( "SoPlex::computeEnterCoPrhs4Col()" );
+   METHOD( "SoPlex::computeEnterCoPrhs4Col()" );
    assert(baseId(i).isSPxColId());
    assert(number(SPxColId(baseId(i))) == n);
    switch (desc().colStatus(n))
@@ -358,7 +358,7 @@ void SoPlex::computeEnterCoPrhs4Col(int i, int n)
 
 void SoPlex::computeEnterCoPrhs()
 {
-   TRACE_METHOD( "SoPlex::computeEnterCoPrhs()" );
+   METHOD( "SoPlex::computeEnterCoPrhs()" );
    assert(type() == ENTER);
 
    for (int i = dim() - 1; i >= 0; --i)
@@ -373,7 +373,7 @@ void SoPlex::computeEnterCoPrhs()
 
 void SoPlex::computeLeaveCoPrhs4Row(int i, int n)
 {
-   TRACE_METHOD( "SoPlex::computeLeaveCoPrhs4Row()" );
+   METHOD( "SoPlex::computeLeaveCoPrhs4Row()" );
    assert(baseId(i).isSPxRowId());
    assert(number(SPxRowId(baseId(i))) == n);
    switch (desc().rowStatus(n))
@@ -403,7 +403,7 @@ void SoPlex::computeLeaveCoPrhs4Row(int i, int n)
 
 void SoPlex::computeLeaveCoPrhs4Col(int i, int n)
 {
-   TRACE_METHOD( "SoPlex::computeLeaveCoPrhs4Col()" );
+   METHOD( "SoPlex::computeLeaveCoPrhs4Col()" );
    assert(baseId(i).isSPxColId());
    assert(number(SPxColId(baseId(i))) == n);
    switch (desc().colStatus(n))
@@ -434,7 +434,7 @@ void SoPlex::computeLeaveCoPrhs4Col(int i, int n)
 
 void SoPlex::computeLeaveCoPrhs()
 {
-   TRACE_METHOD( "SoPlex::computeLeaveCoPrhs()" );
+   METHOD( "SoPlex::computeLeaveCoPrhs()" );
    assert(type() == LEAVE);
 
    for (int i = dim() - 1; i >= 0; --i)
@@ -456,7 +456,7 @@ void SoPlex::computeLeaveCoPrhs()
  */
 void SoPlex::computePvec()
 {
-   TRACE_METHOD( "SoPlex::computePvec()" );
+   METHOD( "SoPlex::computePvec()" );
    int i;
 
    for (i = coDim() - 1; i >= 0; --i)
@@ -465,7 +465,7 @@ void SoPlex::computePvec()
 
 void SoPlex::setupPupdate(void)
 {
-   TRACE_METHOD( "SoPlex::setupPupdate()" );
+   METHOD( "SoPlex::setupPupdate()" );
    SSVector& p = thePvec->delta();
    SSVector& c = theCoPvec->delta();
 
@@ -503,7 +503,7 @@ void SoPlex::setupPupdate(void)
 
 void SoPlex::doPupdate(void)
 {
-   TRACE_METHOD( "SoPlex::doPupdate()" );
+   METHOD( "SoPlex::doPupdate()" );
    theCoPvec->update();
    if (pricing() == FULL)
    {

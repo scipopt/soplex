@@ -13,11 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.13 2002/03/01 13:15:32 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.14 2002/03/03 13:50:35 bzfkocht Exp $"
 
 #include <assert.h>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "spxweightpr.h"
 #include "message.h"
 

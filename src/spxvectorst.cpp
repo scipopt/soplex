@@ -13,14 +13,14 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvectorst.cpp,v 1.8 2002/02/13 16:56:07 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxvectorst.cpp,v 1.9 2002/03/03 13:50:35 bzfkocht Exp $"
 
-//#define DEBUG 1
+//#define DEBUGGING 1
 
 #include <assert.h>
 #include <iostream>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "spxvectorst.h"
 
 namespace soplex
@@ -42,7 +42,7 @@ void SPxVectorST::setupWeights(SoPlex& base)
       Real x, y;
       int i;
 
-      TRACE( std::cerr << "colWeight[]: "; );
+      DEBUG( std::cerr << "colWeight[]: "; );
       for (i = base.nCols(); i--;)
       {
          x = vec[i] - base.SPxLP::lower(i);
@@ -57,11 +57,11 @@ void SPxVectorST::setupWeights(SoPlex& base)
             colWeight[i] = -y + bias * obj[i];
             colUp[i] = 1;
          }
-         TRACE( std::cerr << colWeight[i] << " "; );
+         DEBUG( std::cerr << colWeight[i] << " "; );
       }
-      TRACE( std::cerr << std::endl << std::endl; );
+      DEBUG( std::cerr << std::endl << std::endl; );
 
-      TRACE( std::cerr << "rowWeight[]: "; );
+      DEBUG( std::cerr << "rowWeight[]: "; );
       for (i = base.nRows(); i--;)
       {
          const SVector& row = (const_cast<const SoPlex&>(base)).rowVector(i);
@@ -78,9 +78,9 @@ void SPxVectorST::setupWeights(SoPlex& base)
             rowWeight[i] = -y - eps * row.size() + bias * (obj * row);
             rowRight[i] = 1;
          }
-         TRACE( std::cerr << rowWeight[i] << " "; );
+         DEBUG( std::cerr << rowWeight[i] << " "; );
       }
-      TRACE( std::cerr << std::endl; );
+      DEBUG( std::cerr << std::endl; );
    }
 
    else if (state == DVEC)

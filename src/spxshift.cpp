@@ -13,21 +13,21 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxshift.cpp,v 1.11 2002/03/01 13:15:32 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxshift.cpp,v 1.12 2002/03/03 13:50:35 bzfkocht Exp $"
 
-//#define DEBUG 1
+//#define DEBUGGING 1
 
 #include <assert.h>
 #include <iostream>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "soplex.h"
 
 namespace soplex
 {
 void SoPlex::shiftFvec()
 {
-   TRACE_METHOD( "SoPlex::shiftFvec()" );
+   METHOD( "SoPlex::shiftFvec()" );
    // Random   mult(delta(), 100*delta());
    Random mult(10*delta(), 100*delta());
    Real allow = delta() - epsilon();
@@ -60,7 +60,7 @@ void SoPlex::shiftFvec()
 
 #ifndef NDEBUG
    testBounds();
-   TRACE( std::cerr << "shiftFvec: OK" << std::endl; );
+   DEBUG( std::cerr << "shiftFvec: OK" << std::endl; );
 #endif
 }
 
@@ -71,7 +71,7 @@ void SoPlex::shiftFvec()
  */
 void SoPlex::shiftPvec()
 {
-   TRACE_METHOD( "SoPlex::shiftPvec()" );
+   METHOD( "SoPlex::shiftPvec()" );
    int i, tmp;
    // Random   mult(delta(), 100*delta());
    Random mult(10*delta(), 100*delta());
@@ -130,7 +130,7 @@ void SoPlex::shiftPvec()
 
 #ifndef NDEBUG
    testBounds();
-   TRACE( std::cerr << "shiftPvec: OK" << std::endl; );
+   DEBUG( std::cerr << "shiftPvec: OK" << std::endl; );
 #endif
 }
 
@@ -144,7 +144,7 @@ void SoPlex::perturbMin
    int incr
 )
 {
-   TRACE_METHOD( "SoPlex::perturbMin()" );
+   METHOD( "SoPlex::perturbMin()" );
    assert(uvec.dim() == p_low.dim());
    assert(uvec.dim() == p_up.dim());
 
@@ -212,7 +212,7 @@ void SoPlex::perturbMax(
    int start,
    int incr)
 {
-   TRACE_METHOD( "SoPlex::perturbMax()" );
+   METHOD( "SoPlex::perturbMax()" );
    assert(uvec.dim() == p_low.dim());
    assert(uvec.dim() == p_up.dim());
 
@@ -270,21 +270,21 @@ void SoPlex::perturbMax(
 
 void SoPlex::perturbMinEnter(void)
 {
-   TRACE_METHOD( "SoPlex::perturbMinEnter()" );
-   TRACE( std::cerr << iteration() << ": perturbing " << shift(); );
+   METHOD( "SoPlex::perturbMinEnter()" );
+   DEBUG( std::cerr << iteration() << ": perturbing " << shift(); );
    fVec().delta().setup();
    perturbMin(fVec(), lbBound(), ubBound(), epsilon());
-   TRACE( std::cerr << "\t->" << shift() << std::endl; );
+   DEBUG( std::cerr << "\t->" << shift() << std::endl; );
 }
 
 
 void SoPlex::perturbMaxEnter(void)
 {
-   TRACE_METHOD( "SoPlex::perturbMaxEnter()" );
-   TRACE( std::cerr << iteration() << ": perturbing " << shift(); );
+   METHOD( "SoPlex::perturbMaxEnter()" );
+   DEBUG( std::cerr << iteration() << ": perturbing " << shift(); );
    fVec().delta().setup();
    perturbMax(fVec(), lbBound(), ubBound(), epsilon());
-   TRACE( std::cerr << "\t->" << shift() << std::endl; );
+   DEBUG( std::cerr << "\t->" << shift() << std::endl; );
 }
 
 
@@ -298,7 +298,7 @@ Real SoPlex::perturbMin(
    int start,
    int incr)
 {
-   TRACE_METHOD( "SoPlex::perturbMin()" );
+   METHOD( "SoPlex::perturbMin()" );
    assert(uvec.dim() == p_low.dim());
    assert(uvec.dim() == p_up.dim());
 
@@ -366,7 +366,7 @@ Real SoPlex::perturbMax(
    int start,
    int incr)
 {
-   TRACE_METHOD( "SoPlex::perturbMax()" );
+   METHOD( "SoPlex::perturbMax()" );
    assert(uvec.dim() == p_low.dim());
    assert(uvec.dim() == p_up.dim());
 
@@ -427,35 +427,35 @@ Real SoPlex::perturbMax(
 
 void SoPlex::perturbMinLeave(void)
 {
-   TRACE_METHOD( "SoPlex::perturbMinLeave()" );
-   TRACE( std::cerr << iteration() << ": perturbing " << shift(); );
+   METHOD( "SoPlex::perturbMinLeave()" );
+   DEBUG( std::cerr << iteration() << ": perturbing " << shift(); );
    pVec().delta().setup();
    coPvec().delta().setup();
    theShift += perturbMin(pVec(), lpBound(), upBound(), epsilon(), delta(),
       desc().status(), 0, 1);
    theShift += perturbMin(coPvec(), lcBound(), ucBound(), epsilon(), delta(),
       desc().coStatus(), 0, 1);
-   TRACE( std::cerr << "\t->" << shift() << std::endl; );
+   DEBUG( std::cerr << "\t->" << shift() << std::endl; );
 }
 
 
 void SoPlex::perturbMaxLeave(void)
 {
-   TRACE_METHOD( "SoPlex::perturbMaxLeave()" );
-   TRACE( std::cerr << iteration() << ": perturbing " << shift(); );
+   METHOD( "SoPlex::perturbMaxLeave()" );
+   DEBUG( std::cerr << iteration() << ": perturbing " << shift(); );
    pVec().delta().setup();
    coPvec().delta().setup();
    theShift += perturbMax(pVec(), lpBound(), upBound(), epsilon(), delta(),
       desc().status(), 0, 1);
    theShift += perturbMax(coPvec(), lcBound(), ucBound(), epsilon(), delta(),
       desc().coStatus(), 0, 1);
-   TRACE( std::cerr << "\t->" << shift() << std::endl; );
+   DEBUG( std::cerr << "\t->" << shift() << std::endl; );
 }
 
 
 void SoPlex::unShift(void)
 {
-   TRACE_METHOD( "SoPlex::unShift()" );
+   METHOD( "SoPlex::unShift()" );
    VERBOSE3( std::cout << "unshifting ..." << std::endl; );
 
    if (isInitialized())

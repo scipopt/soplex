@@ -13,15 +13,15 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.13 2002/03/01 13:15:30 bzfpfend Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.14 2002/03/03 13:50:31 bzfkocht Exp $"
 
-// #define DEBUG 1
+// #define DEBUGGING 1
 
 /*      \SubSection{Updating the Basis for Entering Variables}
  */
 #include <assert.h>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "soplex.h"
 #include "spxratiotester.h"
 
@@ -60,7 +60,7 @@ all $j \ne i^*$ $f^{(i^*)}_j$ remains within its bounds $l_j$ and $u_j$.
  */
 Real SoPlex::test(int i, SPxBasis::Desc::Status stat) const
 {
-   TRACE_METHOD( "SoPlex::test()" );
+   METHOD( "SoPlex::test()" );
    assert(type() == ENTER);
    assert(!isBasic(stat));
 
@@ -99,7 +99,7 @@ Real SoPlex::test(int i, SPxBasis::Desc::Status stat) const
 
 void SoPlex::computeTest()
 {
-   TRACE_METHOD( "SoPlex::computeTest()" );
+   METHOD( "SoPlex::computeTest()" );
    int i;
    const SPxBasis::Desc& ds = desc();
 
@@ -115,13 +115,13 @@ void SoPlex::computeTest()
 
 Real SoPlex::computePvec(int i)
 {
-   TRACE_METHOD( "SoPlex::computePvec()" );
+   METHOD( "SoPlex::computePvec()" );
    return (*thePvec)[i] = vector(i) * (*theCoPvec);
 }
 
 Real SoPlex::computeTest(int i)
 {
-   TRACE_METHOD( "SoPlex::computeTest()" );
+   METHOD( "SoPlex::computeTest()" );
    SPxBasis::Desc::Status stat = desc().status(i);
    if (isBasic(stat))
       return theTest[i] = 0;
@@ -135,7 +135,7 @@ Real SoPlex::computeTest(int i)
  */
 Real SoPlex::coTest(int i, SPxBasis::Desc::Status stat) const
 {
-   TRACE_METHOD( "SoPlex::coTest()" );
+   METHOD( "SoPlex::coTest()" );
    assert(type() == ENTER);
    assert(!isBasic(stat));
 
@@ -171,7 +171,7 @@ Real SoPlex::coTest(int i, SPxBasis::Desc::Status stat) const
 
 void SoPlex::computeCoTest()
 {
-   TRACE_METHOD( "SoPlex::computeCoTest()" );
+   METHOD( "SoPlex::computeCoTest()" );
    int i;
    const SPxBasis::Desc& ds = desc();
 
@@ -192,7 +192,7 @@ void SoPlex::computeCoTest()
  */
 void SoPlex::updateTest()
 {
-   TRACE_METHOD( "SoPlex::updateTest()" );
+   METHOD( "SoPlex::updateTest()" );
    thePvec->delta().setup();
 
    const IdxSet& idx = thePvec->idx();
@@ -212,7 +212,7 @@ void SoPlex::updateTest()
 
 void SoPlex::updateCoTest()
 {
-   TRACE_METHOD( "SoPlex::updateCoTest()" );
+   METHOD( "SoPlex::updateCoTest()" );
    theCoPvec->delta().setup();
 
    const IdxSet& idx = theCoPvec->idx();
@@ -249,7 +249,7 @@ void SoPlex::getEnterVals
    Real& enterRO
 )
 {
-   TRACE_METHOD( "SoPlex::getEnterVals()" );
+   METHOD( "SoPlex::getEnterVals()" );
    int enterIdx;
    SPxBasis::Desc& ds = desc();
 
@@ -380,7 +380,7 @@ void SoPlex::getEnterVals
       default:
          ABORT();
       }
-      TRACE({ std::cout << "SoPlex::getEnterVals() : col " << enterIdx
+      DEBUG({ std::cout << "SoPlex::getEnterVals() : col " << enterIdx
                         << ": " << enterStat
                         << " -> " << ds.colStatus(enterIdx)
                         << std::endl; });
@@ -512,7 +512,7 @@ void SoPlex::getEnterVals
       default:
          ABORT();
       }
-      TRACE({ std::cout << "SoPlex::getEnterVals() : row " << enterIdx
+      DEBUG({ std::cout << "SoPlex::getEnterVals() : row " << enterIdx
                         << ": " << enterStat
                         << " -> " << ds.rowStatus(enterIdx)
                         << std::endl; });
@@ -528,7 +528,7 @@ void SoPlex::getEnterVals2
    Real& leavebound
 )
 {
-   TRACE_METHOD( "SoPlex::getEnterVals2()" );
+   METHOD( "SoPlex::getEnterVals2()" );
    int idx;
    SPxBasis::Desc& ds = desc();
    Id leftId = baseId(leaveIdx);
@@ -621,7 +621,7 @@ void SoPlex::getEnterVals2
       default:
          ABORT();
       }
-      TRACE({ std::cout << "SoPlex::getEnterVals2(): row " << idx
+      DEBUG({ std::cout << "SoPlex::getEnterVals2(): row " << idx
                         << ": " << leaveStat
                         << " -> " << ds.rowStatus(idx)
                         << std::endl; });
@@ -708,7 +708,7 @@ void SoPlex::getEnterVals2
       default:
          ABORT();
       }
-      TRACE({ std::cout << "SoPlex::getEnterVals2(): col " << idx
+      DEBUG({ std::cout << "SoPlex::getEnterVals2(): col " << idx
                         << ": " << leaveStat
                         << " -> " << ds.colStatus(idx)
                         << std::endl; });
@@ -724,7 +724,7 @@ SoPlex::ungetEnterVal(
    const SVector& vec
 )
 {
-   TRACE_METHOD( "SoPlex::ungetEnterVal()" );
+   METHOD( "SoPlex::ungetEnterVal()" );
    int enterIdx;
    SPxBasis::Desc& ds = desc();
 
@@ -759,7 +759,7 @@ void SoPlex::rejectEnter(
    SPxBasis::Desc::Status enterStat
 )
 {
-   TRACE_METHOD( "SoPlex::rejectEnter()" );
+   METHOD( "SoPlex::rejectEnter()" );
    int enterIdx = number(enterId);
    if (isId(enterId))
    {
@@ -775,7 +775,7 @@ void SoPlex::rejectEnter(
 
 int SoPlex::enter(Id& enterId)
 {
-   TRACE_METHOD( "SoPlex::enter()" );
+   METHOD( "SoPlex::enter()" );
    assert(enterId.isValid());
    assert(type() == ENTER);
    assert(initialized);
@@ -797,7 +797,7 @@ int SoPlex::enter(Id& enterId)
    {
       rejectEnter(enterId, enterTest, enterStat);
       change(-1, enterId, enterVec);
-      TRACE( std::cerr << "rejecting false enter pivot" << std::endl; );
+      DEBUG( std::cerr << "rejecting false enter pivot" << std::endl; );
       return 1;
    }
 

@@ -13,11 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: solve.cpp,v 1.14 2002/03/01 13:15:31 bzfpfend Exp $"
+#pragma ident "@(#) $Id: solve.cpp,v 1.15 2002/03/03 13:50:32 bzfkocht Exp $"
 
 #include <assert.h>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "clufactor.h"
 #include "cring.h"
 
@@ -26,7 +26,7 @@ namespace soplex
 #if 0
 void CLUFactor::solveUright(Real* wrk, Real* vec)
 {
-   TRACE_METHOD( "CLUFactor::solveUright()" );
+   METHOD( "CLUFactor::solveUright()" );
    int i, j, r, c;
    int *rorig, *corig;
    int *cidx, *clen, *cbeg;
@@ -67,7 +67,7 @@ void CLUFactor::solveUright(Real* wrk, Real* vec)
 
 void CLUFactor::solveUright(Real* wrk, Real* vec)
 {
-   TRACE_METHOD( "CLUFactor::solveUright()" );
+   METHOD( "CLUFactor::solveUright()" );
    for(int i = thedim - 1; i >= 0; i--)
    {
       int    r = row.orig[i];
@@ -88,7 +88,7 @@ void CLUFactor::solveUright(Real* wrk, Real* vec)
 
 int CLUFactor::solveUrightEps(Real* vec, int* nonz, Real eps, Real* rhs)
 {
-   TRACE_METHOD( "CLUFactor::solveUrightEps()" );
+   METHOD( "CLUFactor::solveUrightEps()" );
    int i, j, r, c, n;
    int *rorig, *corig;
    int *cidx, *clen, *cbeg;
@@ -132,7 +132,7 @@ int CLUFactor::solveUrightEps(Real* vec, int* nonz, Real eps, Real* rhs)
 void CLUFactor::solveUright2(
    Real* p_work1, Real* vec1, Real* p_work2, Real* vec2)
 {
-   TRACE_METHOD( "CLUFactor::solveUright2()" );
+   METHOD( "CLUFactor::solveUright2()" );
    int i, j, r, c;
    int *rorig, *corig;
    int *cidx, *clen, *cbeg;
@@ -191,7 +191,7 @@ int CLUFactor::solveUright2eps(
    Real* p_work1, Real* vec1, Real* p_work2, Real* vec2,
    int* nonz, Real eps)
 {
-   TRACE_METHOD( "CLUFactor::solveUright2eps()" );
+   METHOD( "CLUFactor::solveUright2eps()" );
    int i, j, r, c, n;
    int *rorig, *corig;
    int *cidx, *clen, *cbeg;
@@ -267,7 +267,7 @@ int CLUFactor::solveUright2eps(
 
 void CLUFactor::solveLright(Real* vec)
 {
-   TRACE_METHOD( "CLUFactor::solveLright()" );
+   METHOD( "CLUFactor::solveLright()" );
    int i, j, k;
    int end;
    Real x;
@@ -311,7 +311,7 @@ void CLUFactor::solveLright(Real* vec)
 
 void CLUFactor::solveLright2(Real* vec1, Real* vec2)
 {
-   TRACE_METHOD( "CLUFactor::solveLright2()" );
+   METHOD( "CLUFactor::solveLright2()" );
    int i, j, k;
    int end;
    Real x2;
@@ -382,7 +382,7 @@ void CLUFactor::solveLright2(Real* vec1, Real* vec2)
 
 void CLUFactor::solveUpdateRight(Real* vec)
 {
-   TRACE_METHOD( "CLUFactor::solveUpdateRight()" );
+   METHOD( "CLUFactor::solveUpdateRight()" );
    int i, j, k;
    int end;
    Real x;
@@ -413,7 +413,7 @@ void CLUFactor::solveUpdateRight(Real* vec)
 
 void CLUFactor::solveUpdateRight2(Real* vec1, Real* vec2)
 {
-   TRACE_METHOD( "CLUFactor::solveUpdateRight2()" );
+   METHOD( "CLUFactor::solveUpdateRight2()" );
    int i, j, k;
    int end;
    Real x1, x2;
@@ -469,7 +469,7 @@ void CLUFactor::solveUpdateRight2(Real* vec1, Real* vec2)
 int CLUFactor::solveRight4update(Real* vec, int* nonz, Real eps, 
    Real* rhs, Real* forest, int* forestNum, int* forestIdx)
 {
-   TRACE_METHOD( "CLUFactor::solveRight4update()" );
+   METHOD( "CLUFactor::solveRight4update()" );
    solveLright(rhs);
 
    if (forest)
@@ -499,7 +499,7 @@ int CLUFactor::solveRight4update(Real* vec, int* nonz, Real eps,
 
 void CLUFactor::solveRight(Real* vec, Real* rhs)
 {
-   TRACE_METHOD( "CLUFactor::solveRight()" );
+   METHOD( "CLUFactor::solveRight()" );
    solveLright(rhs);
    solveUright(vec, rhs);
    if (!l.updateType)            /* no Forest-Tomlin Updates */
@@ -516,7 +516,7 @@ int CLUFactor::solveRight2update(Real* vec1,
                        int* forestNum,
                        int* forestIdx)
 {
-   TRACE_METHOD( "CLUFactor::solveRight2update()" );
+   METHOD( "CLUFactor::solveRight2update()" );
    solveLright2(rhs1, rhs2);
 
    if (forest)
@@ -550,7 +550,7 @@ void CLUFactor::solveRight2(
    Real* rhs1,
    Real* rhs2)
 {
-   TRACE_METHOD( "CLUFactor::solveRight2()" );
+   METHOD( "CLUFactor::solveRight2()" );
    solveLright2(rhs1, rhs2);
    if (l.updateType)             /* Forest-Tomlin Updates */
       solveUright2(vec1, rhs1, vec2, rhs2);
@@ -565,7 +565,7 @@ void CLUFactor::solveRight2(
 
 void CLUFactor::solveUleft(Real* p_work, Real* vec)
 {
-   TRACE_METHOD( "CLUFactor::solveUleft()" );
+   METHOD( "CLUFactor::solveUleft()" );
    Real x;
    int i, k, r, c;
    int *rorig, *corig;
@@ -602,7 +602,7 @@ void CLUFactor::solveUleft(Real* p_work, Real* vec)
 void CLUFactor::solveUleft2(
    Real* p_work1, Real* vec1, Real* p_work2, Real* vec2)
 {
-   TRACE_METHOD( "CLUFactor::solveUleft2()" );
+   METHOD( "CLUFactor::solveUleft2()" );
    Real x1;
    Real x2;
    int i, k, r, c;
@@ -669,7 +669,7 @@ int CLUFactor::solveLleft2forest(
    Real* vec2,
    Real /* eps */)
 {
-   TRACE_METHOD( "CLUFactor::solveLleft2forest()" );
+   METHOD( "CLUFactor::solveLleft2forest()" );
    int i;
    int j;
    int k;
@@ -730,7 +730,7 @@ void CLUFactor::solveLleft2(
    Real* vec2,
    Real /* eps */)
 {
-   TRACE_METHOD( "CLUFactor::solveLleft2()" );
+   METHOD( "CLUFactor::solveLleft2()" );
    int i, j, k, r;
    int x1not0, x2not0;
    Real x1, x2;
@@ -819,7 +819,7 @@ void CLUFactor::solveLleft2(
 
 int CLUFactor::solveLleftForest(Real* vec, int* /* nonz */, Real /* eps */)
 {
-   TRACE_METHOD( "CLUFactor::solveLleftForest()" );
+   METHOD( "CLUFactor::solveLleftForest()" );
    int i, j, k, end;
    Real x;
    Real *val, *lval;
@@ -848,7 +848,7 @@ int CLUFactor::solveLleftForest(Real* vec, int* /* nonz */, Real /* eps */)
 
 void CLUFactor::solveLleft(Real* vec)
 {
-   TRACE_METHOD( "CLUFactor::solveLleft()" );
+   METHOD( "CLUFactor::solveLleft()" );
    int i, j, k;
    int r;
    Real x;
@@ -902,7 +902,7 @@ void CLUFactor::solveLleft(Real* vec)
 
 int CLUFactor::solveLleftEps(Real* vec, int* nonz, Real eps)
 {
-   TRACE_METHOD( "CLUFactor::solveLleftEps()" );
+   METHOD( "CLUFactor::solveLleftEps()" );
    int i, j, k, n;
    int r;
    Real x, meps;
@@ -963,7 +963,7 @@ int CLUFactor::solveLleftEps(Real* vec, int* nonz, Real eps)
 
 void CLUFactor::solveUpdateLeft(Real* vec)
 {
-   TRACE_METHOD( "CLUFactor::solveUpdateLeft()" );
+   METHOD( "CLUFactor::solveUpdateLeft()" );
    int i, j, k, end;
    Real x;
    Real *lval, *val;
@@ -992,7 +992,7 @@ void CLUFactor::solveUpdateLeft(Real* vec)
 
 void CLUFactor::solveUpdateLeft2(Real* vec1, Real* vec2)
 {
-   TRACE_METHOD( "CLUFactor::solveUpdateLeft2()" );
+   METHOD( "CLUFactor::solveUpdateLeft2()" );
    int i, j, k, end;
    Real x1, x2;
    Real *lval, *val;
@@ -1026,7 +1026,7 @@ void CLUFactor::solveUpdateLeft2(Real* vec1, Real* vec2)
 
 void CLUFactor::solveLeft(Real* vec, Real* rhs)
 {
-   TRACE_METHOD( "CLUFactor::solveLeft()" );
+   METHOD( "CLUFactor::solveLeft()" );
    if (!l.updateType)            /* no Forest-Tomlin Updates */
    {
       solveUpdateLeft(rhs);
@@ -1043,7 +1043,7 @@ void CLUFactor::solveLeft(Real* vec, Real* rhs)
 
 int CLUFactor::solveLeftEps(Real* vec, Real* rhs, int* nonz, Real eps)
 {
-   TRACE_METHOD( "CLUFactor::solveLeftEps()" );
+   METHOD( "CLUFactor::solveLeftEps()" );
    if (!l.updateType)            /* no Forest-Tomlin Updates */
    {
       solveUpdateLeft(rhs);
@@ -1066,7 +1066,7 @@ int CLUFactor::solveLeft2(
    Real* rhs1,
    Real* rhs2)
 {
-   TRACE_METHOD( "CLUFactor::solveLeft2()" );
+   METHOD( "CLUFactor::solveLeft2()" );
    if (!l.updateType)            /* no Forest-Tomlin Updates */
    {
       solveUpdateLeft2(rhs1, rhs2);

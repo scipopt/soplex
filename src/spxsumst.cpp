@@ -13,11 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsumst.cpp,v 1.5 2002/01/31 08:19:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsumst.cpp,v 1.6 2002/03/03 13:50:35 bzfkocht Exp $"
 
 #include <iostream>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "spxsumst.h"
 #include "vector.h"
 

@@ -13,15 +13,15 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.51 2002/03/01 13:15:31 bzfpfend Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.52 2002/03/03 13:50:32 bzfkocht Exp $"
 
-//#define DEBUG 1
+//#define DEBUGGING 1
 
 #include <assert.h>
 #include <iostream>
 #include <fstream>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "soplex.h"
 #include "spxpricer.h"
 #include "spxratiotester.h"
@@ -36,7 +36,7 @@ namespace soplex
 bool SoPlex::read(std::istream& in, NameSet* rowNames, 
                   NameSet* colNames, DIdxSet* intVars)
 {
-   TRACE_METHOD( "SoPlex::read()" );
+   METHOD( "SoPlex::read()" );
    clear();
    unInit();
    unLoad();
@@ -60,7 +60,7 @@ bool SoPlex::read(std::istream& in, NameSet* rowNames,
 
 void SoPlex::reLoad()
 {
-   TRACE_METHOD( "SoPlex::reLoad()" );
+   METHOD( "SoPlex::reLoad()" );
    unInit();
    unLoad();
    theLP = this;
@@ -72,7 +72,7 @@ void SoPlex::reLoad()
 
 void SoPlex::loadLP(const SPxLP& lp)
 {
-   TRACE_METHOD( "SoPlex::loadLP()" );
+   METHOD( "SoPlex::loadLP()" );
    clear();
    unInit();
    unLoad();
@@ -87,13 +87,13 @@ void SoPlex::loadLP(const SPxLP& lp)
 
 void SoPlex::setSolver(SLinSolver* slu)
 {
-   TRACE_METHOD( "SoPlex::setSolver()" );
+   METHOD( "SoPlex::setSolver()" );
    SPxBasis::load(slu);
 }
 
 void SoPlex::loadBasis(const SPxBasis::Desc& p_desc)
 {
-   TRACE_METHOD( "SoPlex::loadBasis()" );
+   METHOD( "SoPlex::loadBasis()" );
    unInit();
    if (SPxBasis::status() == SPxBasis::NO_PROBLEM)
       SPxBasis::load(this);
@@ -102,7 +102,7 @@ void SoPlex::loadBasis(const SPxBasis::Desc& p_desc)
 
 void SoPlex::setPricer(SPxPricer* x)
 {
-   TRACE_METHOD( "SoPlex::setPricer()" );
+   METHOD( "SoPlex::setPricer()" );
    if (x != 0)
    {
       setPricing(FULL);
@@ -118,7 +118,7 @@ void SoPlex::setPricer(SPxPricer* x)
 
 void SoPlex::setTester(SPxRatioTester* x)
 {
-   TRACE_METHOD( "SoPlex::setTester()" );
+   METHOD( "SoPlex::setTester()" );
    if (x)
    {
       if (isInitialized() && x != theratiotester)
@@ -133,20 +133,20 @@ void SoPlex::setTester(SPxRatioTester* x)
 
 void SoPlex::setStarter(SPxStarter* x)
 {
-   TRACE_METHOD( "SoPlex::setStarter()" );
+   METHOD( "SoPlex::setStarter()" );
    thestarter = x;
 }
 
 void SoPlex::setSimplifier(SPxSimplifier* x)
 {
-   TRACE_METHOD( "SoPlex::setSimplifier()" );
+   METHOD( "SoPlex::setSimplifier()" );
    thesimplifier = x;
 }
 
 
 void SoPlex::setType(Type tp)
 {
-   TRACE_METHOD( "SoPlex::setType()" );
+   METHOD( "SoPlex::setType()" );
    if (isInitialized() && theType != tp)
    {
       theType = tp;
@@ -170,7 +170,7 @@ void SoPlex::setType(Type tp)
    if ((theratiotester != 0) && (theratiotester->solver() == this))
       theratiotester->setType(tp);
 
-   TRACE({ std::cerr << "switching to " 
+   DEBUG({ std::cerr << "switching to " 
                      << static_cast<const char*>((tp == LEAVE)
                                                  ? "leaving" : "entering")
                      << " algorithm" << std::endl; });
@@ -178,7 +178,7 @@ void SoPlex::setType(Type tp)
 
 void SoPlex::setRep(Representation p_rep)
 {
-   TRACE_METHOD( "SoPlex::setRep()" );
+   METHOD( "SoPlex::setRep()" );
    if (p_rep == COLUMN)
    {
       thevectors = colset();
@@ -229,7 +229,7 @@ void SoPlex::setRep(Representation p_rep)
 
 void SoPlex::init()
 {
-   TRACE_METHOD( "SoPlex::init()" );
+   METHOD( "SoPlex::init()" );
    assert(thepricer != 0);
    assert(theratiotester != 0);
 
@@ -310,7 +310,7 @@ void SoPlex::init()
 #ifdef USE_SUBCOVECTORS
 int SoPlex::sortLP(int pe, int nPes)
 {
-   TRACE_METHOD( "SoPlex::sortLP()" );
+   METHOD( "SoPlex::sortLP()" );
    int n = 0;
    int i;
    for (i = pe; i < thecovectors->num(); i += nPes)
@@ -324,7 +324,7 @@ int SoPlex::sortLP(int pe, int nPes)
 
 void SoPlex::setPricing(Pricing pr)
 {
-   TRACE_METHOD( "SoPlex::setPricing()" );
+   METHOD( "SoPlex::setPricing()" );
    thePricing = pr;
    if (initialized && type() == ENTER)
    {
@@ -338,7 +338,7 @@ void SoPlex::setPricing(Pricing pr)
 
 void SoPlex::splitLP(int pe, int nPes)
 {
-   TRACE_METHOD( "SoPlex::splitLP()" );
+   METHOD( "SoPlex::splitLP()" );
    assert(pe   >= 0);
    assert(nPes > 0);
 
@@ -402,7 +402,7 @@ void SoPlex::splitLP(int pe, int nPes)
 
 void SoPlex::splitLP()
 {
-   TRACE_METHOD( "SoPlex::splitLP()" );
+   METHOD( "SoPlex::splitLP()" );
    subcovectors.reSize(coDim() / coVecDim + 1);
 
    if (subcovectors.size() > 1)
@@ -419,7 +419,7 @@ void SoPlex::splitLP()
  */
 void SoPlex::reDim()
 {
-   TRACE_METHOD( "SoPlex::reDim()" );
+   METHOD( "SoPlex::reDim()" );
    int newdim = (rep() == ROW) ? SPxLP::nCols() : SPxLP::nRows();
 
    if (dim() > 0 && coDim() > 0)
@@ -461,7 +461,7 @@ bool SoPlex::readBasisFile(
    const NameSet& rowNames,
    const NameSet& colNames)
 {
-   TRACE_METHOD( "SoPlex::readBasisFile()" );
+   METHOD( "SoPlex::readBasisFile()" );
    std::ifstream file(filename);
 
    if (!file)
@@ -476,7 +476,7 @@ bool SoPlex::readFile(
    NameSet*    colNames, 
    DIdxSet*    intVars)
 {
-   TRACE_METHOD( "SoPlex::readFile()" );
+   METHOD( "SoPlex::readFile()" );
    std::ifstream file(filename);
 
    if (!file)
@@ -487,7 +487,7 @@ bool SoPlex::readFile(
 
 void SoPlex::dumpFile(const char* filename) const
 {
-   TRACE_METHOD( "SoPlex::dumpFile()" );
+   METHOD( "SoPlex::dumpFile()" );
    std::ofstream file(filename);
 
    if (file.good())
@@ -496,7 +496,7 @@ void SoPlex::dumpFile(const char* filename) const
 
 void SoPlex::clear()
 {
-   TRACE_METHOD( "SoPlex::clear()" );
+   METHOD( "SoPlex::clear()" );
    unitVecs.reSize(0);
 
    dualRhs.clear();
@@ -521,7 +521,7 @@ void SoPlex::clear()
 
 void SoPlex::clearUpdateVecs(void)
 {
-   TRACE_METHOD( "SoPlex::clearUpdateVecs()" );
+   METHOD( "SoPlex::clearUpdateVecs()" );
    theFvec->clearUpdate();
    thePvec->clearUpdate();
    theCoPvec->clearUpdate();
@@ -535,7 +535,7 @@ void SoPlex::clearUpdateVecs(void)
  */
 void SoPlex::factorize()
 {
-   TRACE_METHOD( "SoPlex::factorize()" );
+   METHOD( "SoPlex::factorize()" );
    SPxBasis::factorize();
 
    if (SPxBasis::status() >= SPxBasis::REGULAR)
@@ -560,7 +560,7 @@ void SoPlex::factorize()
       ctmp -= coPvec();
       if (ftmp.length() > delta())
       {
-         TRACE( std::cerr << "fVec:   " << ftmp.length() << std::endl; );
+         DEBUG( std::cerr << "fVec:   " << ftmp.length() << std::endl; );
          ftmp = fVec();
          multBaseWith(ftmp);
          ftmp -= fRhs();
@@ -570,7 +570,7 @@ void SoPlex::factorize()
       }
       if (ctmp.length() > delta())
       {
-         TRACE( std::cerr << "coPvec: " << ctmp.length() << std::endl; );
+         DEBUG( std::cerr << "coPvec: " << ctmp.length() << std::endl; );
          ctmp = coPvec();
          multWithBase(ctmp);
          ctmp -= coPrhs();
@@ -580,7 +580,7 @@ void SoPlex::factorize()
       }
       if (ptmp.length() > delta())
       {
-         TRACE( std::cerr << "pVec:   " << ptmp.length() << std::endl; );
+         DEBUG( std::cerr << "pVec:   " << ptmp.length() << std::endl; );
       }
 #endif  // NDEBUG
 
@@ -606,7 +606,7 @@ void SoPlex::factorize()
 
 Real SoPlex::maxInfeas() const
 {
-   TRACE_METHOD( "SoPlex::maxInfeas()" );
+   METHOD( "SoPlex::maxInfeas()" );
    int i;
    Real inf = 0.0;
 
@@ -645,7 +645,7 @@ Real SoPlex::maxInfeas() const
 
 Real SoPlex::nonbasicValue() const
 {
-   TRACE_METHOD( "SoPlex::nonbasicValue()" );
+   METHOD( "SoPlex::nonbasicValue()" );
 
    int i;
    Real val = 0;
@@ -759,7 +759,7 @@ Real SoPlex::nonbasicValue() const
 
 Real SoPlex::value() const
 {
-   TRACE_METHOD( "SoPlex::value()" );
+   METHOD( "SoPlex::value()" );
    Real x;
 
    /**@todo patch suggests returning infinity instead of initializing 
@@ -785,7 +785,7 @@ Real SoPlex::value() const
 
 void SoPlex::setDelta(Real d)
 {
-   TRACE_METHOD( "SoPlex::setDelta()" );
+   METHOD( "SoPlex::setDelta()" );
    thedelta = d;
 }
 
@@ -814,7 +814,7 @@ SoPlex::SoPlex(Type p_type, Representation p_rep,
    , thestarter (start)
    , thesimplifier (simple)
 {
-   TRACE_METHOD( "SoPlex::SoPlex()" );
+   METHOD( "SoPlex::SoPlex()" );
    setRep (p_rep);
    setDelta (DEFAULT_BND_VIOL);
    theLP = this;
@@ -861,7 +861,7 @@ SoPlex::SoPlex(const SoPlex& old)
    , thestarter (old.thestarter)
    , thesimplifier (old.thesimplifier)
 {
-   TRACE_METHOD( "SoPlex::SoPlex()" );
+   METHOD( "SoPlex::SoPlex()" );
    setRep (old.rep());
    setDelta(old.thedelta);
    coVecDim = 400;
@@ -870,7 +870,7 @@ SoPlex::SoPlex(const SoPlex& old)
 
 SoPlex& SoPlex::operator=(const SoPlex& old)
 {
-   TRACE_METHOD( "SoPlex::operator=()" );
+   METHOD( "SoPlex::operator=()" );
    *(static_cast<SPxLP*>(this)) = old;
    *(static_cast<SPxBasis*>(this)) = old;
 
@@ -913,7 +913,7 @@ SoPlex& SoPlex::operator=(const SoPlex& old)
 
 bool SoPlex::isConsistent() const
 {
-   TRACE_METHOD( "SoPlex::isConsistent()" );
+   METHOD( "SoPlex::isConsistent()" );
    if (epsilon() < 0)
       return MSGinconsistent("SoPlex");
 
@@ -1016,7 +1016,7 @@ bool SoPlex::isConsistent() const
 
 int SoPlex::nofNZEs() const
 {
-   TRACE_METHOD( "SoPlex::nofNZEs()" );
+   METHOD( "SoPlex::nofNZEs()" );
    int n = 0;
    for (int i = nCols(); --i >= 0;)
       n += colVector(i).size();
@@ -1025,7 +1025,7 @@ int SoPlex::nofNZEs() const
 
 void SoPlex::setTerminationTime(Real p_time)
 {
-   TRACE_METHOD( "SoPlex::setTerminationTime()" );
+   METHOD( "SoPlex::setTerminationTime()" );
    if( p_time < 0.0 )
       p_time = infinity;
    maxTime = p_time;
@@ -1033,13 +1033,13 @@ void SoPlex::setTerminationTime(Real p_time)
 
 Real SoPlex::terminationTime() const
 {
-   TRACE_METHOD( "SoPlex::terminationTime()" );
+   METHOD( "SoPlex::terminationTime()" );
    return maxTime;
 }
 
 void SoPlex::setTerminationIter(int p_iteration)
 {
-   TRACE_METHOD( "SoPlex::setTerminationIter()" );
+   METHOD( "SoPlex::setTerminationIter()" );
    if( p_iteration < 0 )
       p_iteration = -1;
    maxIters = p_iteration;
@@ -1047,7 +1047,7 @@ void SoPlex::setTerminationIter(int p_iteration)
 
 int SoPlex::terminationIter() const
 {
-   TRACE_METHOD( "SoPlex::terminationIter()" );
+   METHOD( "SoPlex::terminationIter()" );
    return maxIters;
 }
 
@@ -1057,21 +1057,21 @@ int SoPlex::terminationIter() const
  */
 void SoPlex::setTerminationValue(Real /*p_value*/)
 {
-   TRACE_METHOD( "SoPlex::setTerminationValue()" );
+   METHOD( "SoPlex::setTerminationValue()" );
    std::cerr << "setTerminationValue not yet implemented" << std::endl;
    //maxValue = p_value;
 }
 
 Real SoPlex::terminationValue() const
 {
-   TRACE_METHOD( "SoPlex::terminationValue()" );
+   METHOD( "SoPlex::terminationValue()" );
    return maxValue;
 }
    
 SoPlex::VarStatus
 SoPlex::basisStatusToVarStatus( SPxBasis::Desc::Status stat ) const
 {
-   TRACE_METHOD( "SoPlex::VarStatus()" );
+   METHOD( "SoPlex::VarStatus()" );
    VarStatus vstat;
 
    switch( stat )
@@ -1105,7 +1105,7 @@ SoPlex::basisStatusToVarStatus( SPxBasis::Desc::Status stat ) const
 SPxBasis::Desc::Status
 SoPlex::varStatusToBasisStatusRow( int row, SoPlex::VarStatus stat ) const
 {
-   TRACE_METHOD( "SoPlex::varStatusToBasisStatusRow()" );
+   METHOD( "SoPlex::varStatusToBasisStatusRow()" );
    SPxBasis::Desc::Status rstat;
 
    switch( stat )
@@ -1144,7 +1144,7 @@ SoPlex::varStatusToBasisStatusRow( int row, SoPlex::VarStatus stat ) const
 SPxBasis::Desc::Status 
 SoPlex::varStatusToBasisStatusCol( int col, SoPlex::VarStatus stat ) const
 {
-   TRACE_METHOD( "SoPlex::varStatusToBasisStatusCol()" );
+   METHOD( "SoPlex::varStatusToBasisStatusCol()" );
    SPxBasis::Desc::Status cstat;
 
    switch( stat )
@@ -1182,21 +1182,21 @@ SoPlex::varStatusToBasisStatusCol( int col, SoPlex::VarStatus stat ) const
 
 SoPlex::VarStatus SoPlex::getBasisRowStatus( int row ) const
 {
-   TRACE_METHOD( "SoPlex::VarStatus()" );
+   METHOD( "SoPlex::VarStatus()" );
    assert( 0 <= row && row < nRows() );
    return basisStatusToVarStatus( desc().rowStatus( row ) );
 }
 
 SoPlex::VarStatus SoPlex::getBasisColStatus( int col ) const
 {
-   TRACE_METHOD( "SoPlex::VarStatus()" );
+   METHOD( "SoPlex::VarStatus()" );
    assert( 0 <= col && col < nCols() );
    return basisStatusToVarStatus( desc().colStatus( col ) );
 }
 
 SoPlex::Status SoPlex::getBasis(VarStatus row[], VarStatus col[]) const
 {
-   TRACE_METHOD( "SoPlex::Status()" );
+   METHOD( "SoPlex::Status()" );
    const SPxBasis::Desc& d = desc();
    int i;
 
@@ -1213,7 +1213,7 @@ SoPlex::Status SoPlex::getBasis(VarStatus row[], VarStatus col[]) const
 
 void SoPlex::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
 {
-   TRACE_METHOD( "SoPlex::setBasis()" );
+   METHOD( "SoPlex::setBasis()" );
    if (SPxBasis::status() == SPxBasis::NO_PROBLEM)
       SPxBasis::load(this);
 

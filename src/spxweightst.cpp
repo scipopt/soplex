@@ -13,15 +13,15 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.cpp,v 1.12 2002/01/31 16:30:48 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxweightst.cpp,v 1.13 2002/03/03 13:50:35 bzfkocht Exp $"
 
-//#define DEBUG 1
+//#define DEBUGGING 1
 //#define TEST 1
 
 #include <assert.h>
 #include <iostream>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "spxweightst.h"
 #include "svset.h"
 #include "sorter.h"
@@ -272,7 +272,7 @@ void SPxWeightST::generate(SoPlex& base)
 
          if (sel >= 0)
          {
-            TRACE({
+            DEBUG({
                if (pref[i].type() == SPxLP::Id::ROWID)
                   std::cerr << " r" << base.number(pref[i]);
                else
@@ -616,7 +616,7 @@ void SPxWeightST::setupWeights(SoPlex& bse)
          }
       }
    }
-   TRACE({
+   DEBUG({
       for(i = 0; i < bse.nCols(); i++)
          std::cerr << "C i= " << i 
                    << " up= " << colUp[i]

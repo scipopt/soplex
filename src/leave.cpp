@@ -13,16 +13,16 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.16 2002/03/01 13:15:30 bzfpfend Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.17 2002/03/03 13:50:31 bzfkocht Exp $"
 
-// #define DEBUG 1
+// #define DEBUGGING 1
 
 /* Updating the Basis for Leaving Variables
  */
 #include <assert.h>
 #include <stdio.h>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "soplex.h"
 #include "spxratiotester.h"
 
@@ -38,7 +38,7 @@ static const Real reject_leave_tol = 1e-8;
  */
 void SoPlex::computeFtest()
 {
-   TRACE_METHOD( "SoPlex::computeFtest()" );
+   METHOD( "SoPlex::computeFtest()" );
    assert(type() == LEAVE);
    Vector& ftest = theCoTest;                  // |== fTest()|
    assert(&ftest == &fTest());
@@ -53,7 +53,7 @@ void SoPlex::computeFtest()
 
 void SoPlex::updateFtest()
 {
-   TRACE_METHOD( "SoPlex::updateFtest()" );
+   METHOD( "SoPlex::updateFtest()" );
    const IdxSet& idx = theFvec->idx();
    Vector& ftest = theCoTest;      // |== fTest()|
    assert(&ftest == &fTest());
@@ -84,7 +84,7 @@ void SoPlex::getLeaveVals
    int& leaveNum
 )
 {
-   TRACE_METHOD( "SoPlex::getLeaveVals()" );
+   METHOD( "SoPlex::getLeaveVals()" );
    SPxBasis::Desc& ds = desc();
    leaveId = baseId(leaveIdx);
 
@@ -155,7 +155,7 @@ void SoPlex::getLeaveVals
       default:
          ABORT();
       }
-      TRACE({ std::cout << "SoPlex::getLeaveVals() : row " << leaveNum
+      DEBUG({ std::cout << "SoPlex::getLeaveVals() : row " << leaveNum
                         << ": " << leaveStat
                         << " -> " << ds.rowStatus(leaveNum)
                         << std::endl; });
@@ -240,7 +240,7 @@ void SoPlex::getLeaveVals
       default:
          ABORT();
       }
-      TRACE({ std::cout << "SoPlex::getLeaveVals() : col " << leaveNum
+      DEBUG({ std::cout << "SoPlex::getLeaveVals() : col " << leaveNum
                         << ": " << leaveStat
                         << " -> " << ds.colStatus(leaveNum)
                         << std::endl; });
@@ -256,7 +256,7 @@ void SoPlex::getLeaveVals2(
    Real& newCoPrhs
 )
 {
-   TRACE_METHOD( "SoPlex::getLeaveVals2()" );
+   METHOD( "SoPlex::getLeaveVals2()" );
    SPxBasis::Desc& ds = desc();
 
    enterBound = 0;
@@ -355,7 +355,7 @@ void SoPlex::getLeaveVals2(
       default:
          ABORT();
       }
-      TRACE({ std::cout << "SoPlex::getLeaveVals2(): row " << idx
+      DEBUG({ std::cout << "SoPlex::getLeaveVals2(): row " << idx
                         << ": " << enterStat
                         << " -> " << ds.rowStatus(idx)
                         << std::endl; });
@@ -452,7 +452,7 @@ void SoPlex::getLeaveVals2(
       default:
          ABORT();
       }
-      TRACE({ std::cout << "SoPlex::getLeaveVals2(): col " << idx
+      DEBUG({ std::cout << "SoPlex::getLeaveVals2(): col " << idx
                         << ": " << enterStat
                         << " -> " << ds.colStatus(idx)
                         << std::endl; });
@@ -467,11 +467,11 @@ void SoPlex::rejectLeave(
    const SVector* //newVec
 )
 {
-   TRACE_METHOD( "SoPlex::rejectLeave()" );
+   METHOD( "SoPlex::rejectLeave()" );
    SPxBasis::Desc& ds = desc();
    if (leaveId.isSPxRowId())
    {
-      TRACE({ std::cout << "SoPlex::rejectLeave()  : row " << leaveNum
+      DEBUG({ std::cout << "SoPlex::rejectLeave()  : row " << leaveNum
                         << ": " << ds.rowStatus(leaveNum)
                         << " -> " << leaveStat << std::endl; });
       if (leaveStat == SPxBasis::Desc::D_ON_BOTH)
@@ -485,7 +485,7 @@ void SoPlex::rejectLeave(
    }
    else
    {
-      TRACE({ std::cout << "SoPlex::rejectLeave()  : col " << leaveNum
+      DEBUG({ std::cout << "SoPlex::rejectLeave()  : col " << leaveNum
                         << ": " << ds.colStatus(leaveNum)
                         << " -> " << leaveStat << std::endl; });
       if (leaveStat == SPxBasis::Desc::D_ON_BOTH)
@@ -502,7 +502,7 @@ void SoPlex::rejectLeave(
 
 int SoPlex::leave(int leaveIdx)
 {
-   TRACE_METHOD( "SoPlex::leave()" );
+   METHOD( "SoPlex::leave()" );
    assert(leaveIdx < dim() && leaveIdx >= 0);
    assert(type() == LEAVE);
    assert(initialized);
@@ -569,7 +569,7 @@ int SoPlex::leave(int leaveIdx)
          rejectLeave(leaveNum, leaveId, leaveStat);
          if (enterVal != leaveMax)
          {
-            TRACE( std::cerr << "rejecting leave" << std::endl; );
+            DEBUG( std::cerr << "rejecting leave" << std::endl; );
             theCoTest[leaveIdx] *= 0.01;            // #== fTest()#
             theCoTest[leaveIdx] -= 2 * delta();     // #== fTest()#
             return 1;
@@ -614,7 +614,7 @@ int SoPlex::leave(int leaveIdx)
             change(leaveIdx, none, 0);
             theFvec->delta().clear();
             rejectLeave(leaveNum, leaveId, leaveStat, &newVector);
-            TRACE( std::cerr << "rejecting leave" << std::endl; );
+            DEBUG( std::cerr << "rejecting leave" << std::endl; );
             // factorize();
             theCoTest[leaveIdx] *= 0.01;            // #== fTest()#
             return 1;

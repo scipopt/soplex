@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: updatevector.h,v 1.8 2002/01/31 08:19:31 bzfkocht Exp $"
+#pragma ident "@(#) $Id: updatevector.h,v 1.9 2002/03/03 13:50:36 bzfkocht Exp $"
 
 /**@file  updatevector.h
  * @brief Dense vector with semi-sparse vector for updates
@@ -25,7 +25,7 @@
 #include <assert.h>
 
 
-#include "real.h"
+#include "spxdefines.h"
 #include "dvector.h"
 #include "ssvector.h"
 

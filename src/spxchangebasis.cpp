@@ -13,14 +13,14 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.11 2002/03/01 13:15:31 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.12 2002/03/03 13:50:33 bzfkocht Exp $"
 
-//#define DEBUG 1
+//#define DEBUGGING 1
 
 #include <iostream>
 #include <math.h>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "spxbasis.h"
 #include "soplex.h"
 
@@ -29,10 +29,10 @@ namespace soplex
 
 void SPxBasis::reDim()
 {
-   TRACE_METHOD( "SPxBasis::reDim()" );
+   METHOD( "SPxBasis::reDim()" );
    assert(theLP != 0);
 
-   TRACE({ std::cout << "SPxBasis::reDim():"
+   DEBUG({ std::cout << "SPxBasis::reDim():"
                      << " matrixIsSetup=" << matrixIsSetup
                      << " fatorized=" << factorized
                      << std::endl; });
@@ -47,7 +47,7 @@ void SPxBasis::reDim()
       factorized = false;
    }
 
-   TRACE({ std::cout << "SPxBasis::reDim(): -->"
+   DEBUG({ std::cout << "SPxBasis::reDim(): -->"
                      << " matrixIsSetup=" << matrixIsSetup
                      << " fatorized=" << factorized
                      << std::endl; });
@@ -58,7 +58,7 @@ void SPxBasis::reDim()
 
 void SPxBasis::addedRows(int n)
 {
-   TRACE_METHOD( "SPxBasis::addedRows()" );
+   METHOD( "SPxBasis::addedRows()" );
    assert(theLP != 0);
 
    if( n > 0 )
@@ -114,7 +114,7 @@ void SPxBasis::addedRows(int n)
 
 void SPxBasis::removedRow(int i)
 {
-   TRACE_METHOD( "SPxBasis::removedRow()" );
+   METHOD( "SPxBasis::removedRow()" );
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
 
@@ -124,7 +124,7 @@ void SPxBasis::removedRow(int i)
       {
          setStatus(NO_PROBLEM);
          factorized = false;
-         TRACE( std::cerr << "Are you sure, you wanna do that?\n"; );
+         DEBUG( std::cerr << "Are you sure, you wanna do that?\n"; );
       }
 
    }
@@ -135,7 +135,7 @@ void SPxBasis::removedRow(int i)
       if (!theLP->isBasic(thedesc.rowStatus(i)))
       {
          setStatus(NO_PROBLEM);
-         TRACE( std::cerr << "Are you sure, you wanna do that?\n"; );
+         DEBUG( std::cerr << "Are you sure, you wanna do that?\n"; );
       }
 
       else if (status() > NO_PROBLEM && matrixIsSetup)
@@ -161,7 +161,7 @@ void SPxBasis::removedRow(int i)
 
 void SPxBasis::removedRows(int perm[])
 {
-   TRACE_METHOD( "SPxBasis::removedRows()" );
+   METHOD( "SPxBasis::removedRows()" );
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
 
@@ -180,7 +180,7 @@ void SPxBasis::removedRows(int perm[])
                {
                   setStatus(NO_PROBLEM);
                   factorized = matrixIsSetup = false;
-                  TRACE( std::cerr << "Are you sure, you wanna do that?\n"; );
+                  DEBUG( std::cerr << "Are you sure, you wanna do that?\n"; );
                }
 
             }
@@ -250,7 +250,7 @@ primalColStatus(int i, const SPxLP* theLP)
 
 void SPxBasis::addedCols(int n)
 {
-   TRACE_METHOD( "SPxBasis::addedCols()" );
+   METHOD( "SPxBasis::addedCols()" );
    assert(theLP != 0);
 
    if( n > 0 )
@@ -305,7 +305,7 @@ void SPxBasis::addedCols(int n)
 
 void SPxBasis::removedCol(int i)
 {
-   TRACE_METHOD( "SPxBasis::removedCol()" );
+   METHOD( "SPxBasis::removedCol()" );
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
 
@@ -344,7 +344,7 @@ void SPxBasis::removedCol(int i)
 
 void SPxBasis::removedCols(int perm[])
 {
-   TRACE_METHOD( "SPxBasis::removedCols()" );
+   METHOD( "SPxBasis::removedCols()" );
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
 
@@ -391,7 +391,7 @@ void SPxBasis::removedCols(int perm[])
  */
 void SPxBasis::invalidate()
 {
-   TRACE_METHOD( "SPxBasis::invalidate()" );
+   METHOD( "SPxBasis::invalidate()" );
    factorized = matrixIsSetup = false;
 }
 
@@ -399,7 +399,7 @@ void SPxBasis::invalidate()
  */
 void SPxBasis::changedRow(int /*row*/)
 {
-   TRACE_METHOD( "SPxBasis::changedRow()" );
+   METHOD( "SPxBasis::changedRow()" );
    invalidate();
 }
 
@@ -407,7 +407,7 @@ void SPxBasis::changedRow(int /*row*/)
  */
 void SPxBasis::changedCol(int /*col*/)
 {
-   TRACE_METHOD( "SPxBasis::changedCol()" );
+   METHOD( "SPxBasis::changedCol()" );
    invalidate();
 }
 
@@ -415,7 +415,7 @@ void SPxBasis::changedCol(int /*col*/)
  */
 void SPxBasis::changedElement(int /*row*/, int /*col*/)
 {
-   TRACE_METHOD( "SPxBasis::changedElement()" );
+   METHOD( "SPxBasis::changedElement()" );
    invalidate();
 }
 } // namespace soplex

@@ -13,14 +13,14 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultpr.cpp,v 1.9 2002/03/01 13:15:31 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxdefaultpr.cpp,v 1.10 2002/03/03 13:50:33 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
 #define EQ_PREF 1000
 
-#include "real.h"
+#include "spxdefines.h"
 #include "spxdefaultpr.h"
 
 namespace soplex

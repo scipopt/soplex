@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.34 2002/03/01 13:15:29 bzfpfend Exp $
+# $Id: Makefile,v 1.35 2002/03/03 13:50:31 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -43,10 +43,11 @@ FLAGS		=       #
 LIBOBJ		= 	changesoplex.o didxset.o \
 			dsvector.o dvector.o enter.o factor.o \
 			forest.o idxset.o leave.o lpcolset.o lprowset.o \
-			lprow.o message.o mpsinput.o nameset.o real.o \
+			lprow.o message.o mpsinput.o nameset.o \
 			slufactor.o solve.o soplex.o spxaggregatesm.o \
 			spxbasis.o spxbounds.o spxchangebasis.o \
-			spxdefaultpr.o spxdefaultrt.o spxdesc.o spxdevexpr.o \
+			spxdefaultpr.o spxdefaultrt.o spxdefines.o \
+			spxdesc.o spxdevexpr.o \
 			spxfastrt.o spxgeneralsm.o \
 			spxharrisrt.o spxhybridpr.o spxio.o spxlp.o \
 			spxlpfread.o spxmpsread.o \

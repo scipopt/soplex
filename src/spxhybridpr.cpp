@@ -13,13 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.17 2002/03/01 13:15:32 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.18 2002/03/03 13:50:34 bzfkocht Exp $"
 
-//#define DEBUG 1
+//#define DEBUGGING 1
 
 #include <iostream>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "spxhybridpr.h"
 #include "message.h"
 

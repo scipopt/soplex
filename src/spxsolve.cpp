@@ -13,14 +13,14 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.42 2002/03/01 13:15:32 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.43 2002/03/03 13:50:35 bzfkocht Exp $"
 
-//#define DEBUG 1
+//#define DEBUGGING 1
 
 #include <assert.h>
 #include <iostream>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "soplex.h"
 #include "spxpricer.h"
 #include "spxratiotester.h"
@@ -35,7 +35,7 @@ namespace soplex
  */
 SoPlex::Status SoPlex::solve()
 {
-   TRACE_METHOD( "SoPlex::solve()" );
+   METHOD( "SoPlex::solve()" );
    Id enterId;
    int leaveNum;
 
@@ -99,7 +99,7 @@ SoPlex::Status SoPlex::solve()
       std::cerr << "starting value = " << value() << std::endl;
       std::cerr << "starting shift = " << shift() << std::endl;
    });
-   TRACE( desc().dump(); );
+   DEBUG( desc().dump(); );
 
    if (SPxBasis::status() == SPxBasis::OPTIMAL)
       setStatus(SPxBasis::REGULAR);
@@ -321,7 +321,7 @@ SoPlex::Status SoPlex::solve()
 
 void SoPlex::testVecs()
 {
-   TRACE_METHOD( "SoPlex::testVecs()" );
+   METHOD( "SoPlex::testVecs()" );
    int i;
    DVector tmp(dim());
 
@@ -391,7 +391,7 @@ void SoPlex::testVecs()
 
 bool SoPlex::terminate()
 {
-   TRACE_METHOD( "SoPlex::terminate()" );
+   METHOD( "SoPlex::terminate()" );
 #ifndef NDEBUG
    testVecs();
 #endif  // NDEBUG
@@ -470,7 +470,7 @@ bool SoPlex::terminate()
          {
             VERBOSE2({ std::cout << "Objective value limit (" << maxValue
                                     << ") reached" << std::endl; });
-            TRACE({
+            DEBUG({
                std::cerr << "Objective value limit reached" << std::endl
                          << " (value: " << value()
                          << ", limit: " << maxValue << ")" << std::endl
@@ -496,7 +496,7 @@ bool SoPlex::terminate()
 
 SoPlex::Status SoPlex::getPrimal (Vector& p_vector) const
 {
-   TRACE_METHOD( "SoPlex::getPrimal()" );
+   METHOD( "SoPlex::getPrimal()" );
    if (!isInitialized())
       /**@todo patch suggests returning ERROR instead of initializing */
       const_cast<SoPlex*>(this)->init();
@@ -544,7 +544,7 @@ SoPlex::Status SoPlex::getPrimal (Vector& p_vector) const
 
 SoPlex::Status SoPlex::getDual (Vector& p_vector) const
 {
-   TRACE_METHOD( "SoPlex::getDual()" );
+   METHOD( "SoPlex::getDual()" );
    if (!isInitialized())
       /**@todo patch suggests returning ERROR instead of initializing */
       const_cast<SoPlex*>(this)->init();
@@ -570,7 +570,7 @@ SoPlex::Status SoPlex::getDual (Vector& p_vector) const
 
 SoPlex::Status SoPlex::getRdCost (Vector& p_vector) const
 {
-   TRACE_METHOD( "SoPlex::getRdCost()" );
+   METHOD( "SoPlex::getRdCost()" );
    if (!isInitialized())
       /**@todo patch suggests returning ERROR instead of initializing */
       const_cast<SoPlex*>(this)->init();
@@ -610,7 +610,7 @@ SoPlex::Status SoPlex::getRdCost (Vector& p_vector) const
 
 SoPlex::Status SoPlex::getSlacks (Vector& p_vector) const
 {
-   TRACE_METHOD( "SoPlex::getSlacks()" );
+   METHOD( "SoPlex::getSlacks()" );
    if (!isInitialized())
       /**@todo patch suggests returning ERROR instead of initializing */
       const_cast<SoPlex*>(this)->init();
@@ -658,7 +658,7 @@ SoPlex::Status SoPlex::getSlacks (Vector& p_vector) const
 
 SoPlex::Status SoPlex::status() const
 {
-   TRACE_METHOD( "SoPlex::status()" );
+   METHOD( "SoPlex::status()" );
    switch( m_status )
    {
    case UNKNOWN:      
@@ -703,7 +703,7 @@ SoPlex::Status SoPlex::getResult(
    Vector* p_dual,
    Vector* reduCosts) const
 {
-   TRACE_METHOD( "SoPlex::getResult()" );
+   METHOD( "SoPlex::getResult()" );
    if (p_value)
       *p_value = this->value();
    if (p_primal)

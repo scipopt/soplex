@@ -13,15 +13,15 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.24 2002/03/01 13:15:31 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.25 2002/03/03 13:50:33 bzfkocht Exp $"
 
-// #define DEBUG 1
+// #define DEBUGGING 1
 
 #include <assert.h>
 #include <iostream>
 #include <math.h>
 
-#include "real.h"
+#include "spxdefines.h"
 #include "spxbasis.h"
 #include "didxset.h"
 #include "dvector.h"
@@ -38,21 +38,21 @@ static Real minStab;
 SPxBasis::Desc::Status
 SPxBasis::dualStatus(const SPxLP::SPxColId& id) const
 {
-   TRACE_METHOD( "SPxBasis::dualStatus()" );
+   METHOD( "SPxBasis::dualStatus()" );
    return dualColStatus(static_cast<SPxLP*>(theLP)->number(id));
 }
 
 SPxBasis::Desc::Status
 SPxBasis::dualStatus(const SPxLP::SPxRowId& id) const
 {
-   TRACE_METHOD( "SPxBasis::dualStatus()" );
+   METHOD( "SPxBasis::dualStatus()" );
    return dualRowStatus((static_cast<SPxLP*>(theLP))->number(id));
 }
 
 SPxBasis::Desc::Status
 SPxBasis::dualRowStatus(int i) const
 {
-   TRACE_METHOD( "SPxBasis::dualRowStatus()" );
+   METHOD( "SPxBasis::dualRowStatus()" );
    assert(theLP != 0);
 
    if (theLP->rhs(i) < infinity)
@@ -76,7 +76,7 @@ SPxBasis::dualRowStatus(int i) const
 SPxBasis::Desc::Status
 SPxBasis::dualColStatus(int i) const
 {
-   TRACE_METHOD( "SPxBasis::dualColStatus()" );
+   METHOD( "SPxBasis::dualColStatus()" );
    assert(theLP != 0);
 
    if (theLP->SPxLP::upper(i) < infinity)
@@ -99,7 +99,7 @@ SPxBasis::dualColStatus(int i) const
 
 void SPxBasis::loadMatrixVecs()
 {
-   TRACE_METHOD( "SPxBasis::loadMatrixVecs()" );
+   METHOD( "SPxBasis::loadMatrixVecs()" );
    assert(theLP != 0);
    assert(theLP->dim() == matrix.size());
 
@@ -124,7 +124,7 @@ void SPxBasis::loadMatrixVecs()
  */
 void SPxBasis::load(const Desc& ds)
 {
-   TRACE_METHOD( "SPxBasis::load()" );
+   METHOD( "SPxBasis::load()" );
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
    assert(ds.nRows() == theLP->nRows());
@@ -147,7 +147,7 @@ void SPxBasis::load(const Desc& ds)
 
    assert(theLP->dim() == matrix.size());
 
-   TRACE( dump(); );
+   DEBUG( dump(); );
 
    nzCount = 0;
    for (j = i = 0; i < theLP->nRows(); ++i)
@@ -182,7 +182,7 @@ void SPxBasis::load(const Desc& ds)
 
 void SPxBasis::setRep()
 {
-   TRACE_METHOD( "SPxBasis::setRep()" );
+   METHOD( "SPxBasis::setRep()" );
    assert(theLP != 0);
 
    reDim();
@@ -202,7 +202,7 @@ void SPxBasis::setRep()
 
 void SPxBasis::load(SoPlex* lp)
 {
-   TRACE_METHOD( "SPxBasis::load()" );
+   METHOD( "SPxBasis::load()" );
    assert(lp != 0);
    theLP = lp;
 
@@ -218,7 +218,7 @@ void SPxBasis::load(SoPlex* lp)
 
 void SPxBasis::load(SLinSolver* p_solver)
 {
-   TRACE_METHOD( "SPxBasis::load()" );
+   METHOD( "SPxBasis::load()" );
    factor = p_solver;
    factorized = false;
    factor->clear();
@@ -241,7 +241,7 @@ bool SPxBasis::readBasis(
    const NameSet& rownames, 
    const NameSet& colnames)
 {
-   TRACE_METHOD( "SPxBasis::readBasis()" );
+   METHOD( "SPxBasis::readBasis()" );
    assert(theLP != 0);
 
    int  i;
@@ -317,7 +317,7 @@ void SPxBasis::writeBasis(
    const NameSet& /*rownames*/, 
    const NameSet& /*colnames*/)
 {
-   TRACE_METHOD( "SPxBasis::writeBasis()" );
+   METHOD( "SPxBasis::writeBasis()" );
    assert(theLP != 0);
 
    os << "NAME  soplex.bas\n";     
@@ -329,7 +329,7 @@ void SPxBasis::writeBasis(
  */
 int SPxBasis::doFactorize()
 {
-   TRACE_METHOD( "SPxBasis::doFactorize()" );
+   METHOD( "SPxBasis::doFactorize()" );
    if (!factorized)
       return true;
 
@@ -351,7 +351,7 @@ void SPxBasis::change
    const SSVector* eta
 )
 {
-   TRACE_METHOD( "SPxBasis::change()" );
+   METHOD( "SPxBasis::change()" );
    assert(matrixIsSetup);
    assert(!id.isValid() || (enterVec != 0));
 
@@ -394,7 +394,7 @@ void SPxBasis::change
 
 void SPxBasis::factorize()
 {
-   TRACE_METHOD( "SPxBasis::factorize()" );
+   METHOD( "SPxBasis::factorize()" );
    assert(factor != 0);
 
    if (!matrixIsSetup)
@@ -431,7 +431,7 @@ void SPxBasis::factorize()
 
 Vector& SPxBasis::multWithBase(Vector& x) const
 {
-   TRACE_METHOD( "SPxBasis::multWithBase()" );
+   METHOD( "SPxBasis::multWithBase()" );
    assert(status() > SINGULAR);
    assert(theLP->dim() == x.dim());
 
@@ -451,7 +451,7 @@ Vector& SPxBasis::multWithBase(Vector& x) const
 
 Vector& SPxBasis::multBaseWith(Vector& x) const
 {
-   TRACE_METHOD( "SPxBasis::multBaseWith()" );
+   METHOD( "SPxBasis::multBaseWith()" );
    assert(status() > SINGULAR);
    assert(theLP->dim() == x.dim());
 
@@ -475,7 +475,7 @@ Vector& SPxBasis::multBaseWith(Vector& x) const
 
 void SPxBasis::dump()
 {
-   TRACE_METHOD( "SPxBasis::dump()" );
+   METHOD( "SPxBasis::dump()" );
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
    assert(thedesc.nRows() == theLP->nRows());
@@ -516,7 +516,7 @@ void SPxBasis::dump()
 
 bool SPxBasis::isConsistent() const
 {
-   TRACE_METHOD( "SPxBasis::isConsistent()" );
+   METHOD( "SPxBasis::isConsistent()" );
    int primals = 0;
    int i;
 
@@ -572,7 +572,7 @@ SPxBasis::SPxBasis()
    , nzCount (1)
    , thestatus (NO_PROBLEM)
 {
-   TRACE_METHOD( "SPxBasis::SPxBasis()" );
+   METHOD( "SPxBasis::SPxBasis()" );
 }
 } // namespace soplex
 
