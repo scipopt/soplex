@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvecs.cpp,v 1.13 2002/02/27 20:03:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxvecs.cpp,v 1.14 2002/03/01 07:53:00 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -242,7 +242,7 @@ void SoPlex::computeFrhs2(
             if (colfb[i] != coufb[i])
             {
                std::cerr << "Frhs2: " << stat << " " 
-                        << colfb[i] << " " << coufb[i] << 
+                        << colfb[i] << " " << coufb[i] 
                         << " shouln't be" << std::endl;
             }
             //assert(colfb[i] == coufb[i]);

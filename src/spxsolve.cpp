@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.40 2002/02/13 16:56:07 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.41 2002/03/01 07:52:59 bzfkocht Exp $"
 
 //#define DEBUG 1
 
@@ -132,7 +132,14 @@ SoPlex::Status SoPlex::solve()
          {
             enterId = thepricer->selectEnter();
             if (!enterId.isValid())
-               break;
+            {
+               factorize();
+
+               enterId = thepricer->selectEnter();
+
+               if (!enterId.isValid())
+                  break;
+            }
             enter(enterId);
             assert((testBounds(), 1));
             thepricer->entered4(lastEntered(), lastIndex());
@@ -157,7 +164,6 @@ SoPlex::Status SoPlex::solve()
          {
             if (shift() <= epsilon())
             {
-               factorize();
                unShift();
 
                VERBOSE3({
@@ -190,7 +196,14 @@ SoPlex::Status SoPlex::solve()
          {
             leaveNum = thepricer->selectLeave();
             if (leaveNum < 0)
-               break;
+            {
+               factorize();
+
+               leaveNum = thepricer->selectLeave();
+
+               if (leaveNum < 0)
+                  break;
+            }
             leave(leaveNum);
             assert((testBounds(), 1));
             thepricer->left4(lastIndex(), lastLeft());
@@ -215,7 +228,6 @@ SoPlex::Status SoPlex::solve()
          {
             if (shift() <= epsilon())
             {
-               factorize();
                unShift();
 
                VERBOSE3({

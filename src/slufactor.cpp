@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.23 2002/02/21 14:46:34 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.24 2002/03/01 07:52:59 bzfkocht Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -185,9 +185,10 @@ void SLUFactor::solve2left (Vector& x, Vector& b) //const
 
 void SLUFactor::solve2left(Vector& x, SSVector& b) //const
 {
+   int bs = b.size();
    x.clear();
    vSolveLeftNoNZ(b.epsilon, x.get_ptr(),
-                   b.altValues(), b.altIndexMem(), b.size());
+      b.altValues(), b.altIndexMem(), bs);
 }
 
 void SLUFactor::solve2left(SSVector& x, Vector& b) //const
@@ -195,7 +196,8 @@ void SLUFactor::solve2left(SSVector& x, Vector& b) //const
    int n;
    x.clear();
    n = CLUFactor::solveLeftEps (x.altValues(), 
-                             b.get_ptr(), x.altIndexMem(), x.epsilon);
+      b.get_ptr(), x.altIndexMem(), x.epsilon);
+
    if (n)
    {
       x.setSize(n);
@@ -210,7 +212,7 @@ void SLUFactor::solve2left(SSVector& x, SSVector& b) //const
    x.clear();
 
    n = vSolveLeft(x.epsilon, x.altValues(), x.altIndexMem(),
-                   b.altValues(), b.altIndexMem(), bs);
+      b.altValues(), b.altIndexMem(), bs);
 
    if (n > 0)
    {
