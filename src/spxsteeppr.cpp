@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.9 2001/12/26 12:58:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.10 2001/12/30 11:30:42 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -75,7 +75,6 @@ void SPxSteepPR::setType(SoPlex::Type type)
             penalty[i] = 1;
          // penalty[i] = 1 + thesolver->vector(i).size() / thesolver->dim();
       }
-
       else
       {
          assert(type == SoPlex::LEAVE);
@@ -214,10 +213,6 @@ void SPxSteepPR::setRep(SoPlex::Representation)
    }
 }
 
-
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Leaving Simplex}
- */
 void SPxSteepPR::left4(int n, SoPlex::Id id, int start, int incr)
 {
    assert(thesolver->type() == SoPlex::LEAVE);
@@ -243,7 +238,7 @@ void SPxSteepPR::left4(int n, SoPlex::Id id, int start, int incr)
       {
          j = rhoIdx.index(i);
          x = coPenalty_ptr[j] += rhoVec[j]
-                                 * (beta_q * rhoVec[j] - 2 * rhov_1 * workVec_ptr[j]);
+            * (beta_q * rhoVec[j] - 2 * rhov_1 * workVec_ptr[j]);
          if (x < delta)
             // coPenalty_ptr[j] = delta / (1+delta-x);
             coPenalty_ptr[j] = delta;
@@ -278,12 +273,14 @@ int SPxSteepPR::selectLeave(double& best, int start, int incr)
    const double* p = leavePref.get_const_ptr();
 
    double x;
-   int i, selIdx;
+   int selIdx;
 
    best = -thesolver->SPxLP::infinity;
    selIdx = -1;
 
-   for (i = thesolver->dim() - 1 - start; i >= 0; i -= incr)
+   //for(int i = 0; i < thesolver->dim() - start; i += incr)
+ 
+   for (int i = thesolver->dim() - 1 - start; i >= 0; i -= incr)
    {
       x = fTest[i];
 

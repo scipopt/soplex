@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsumst.h,v 1.3 2001/11/29 14:43:46 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsumst.h,v 1.4 2001/12/30 11:30:42 bzfkocht Exp $"
 
 
 /**@file  spxsumst.h
@@ -60,3 +60,5 @@ public:
 //Emacs indent-tabs-mode:nil
 //Emacs End:
 //-----------------------------------------------------------------------------
+
+

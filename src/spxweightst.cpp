@@ -13,18 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.cpp,v 1.4 2001/12/28 14:55:13 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightst.cpp,v 1.5 2001/12/30 11:30:42 bzfkocht Exp $"
 
-/*      \Section{Complex Methods}
- */
-
-/*  Import system include files
- */
 #include <assert.h>
 #include <iostream>
 
-/*  and class header files
- */
 #include "spxweightst.h"
 #include "svset.h"
 #include "sorter.h"
@@ -34,7 +27,6 @@ namespace soplex
 #define EPS     1e-6
 #define STABLE  1e-3
 
-//@ ----------------------------------------------------------------------------
 int SPxWeightST::isConsistent() const
 {
    return rowWeight.isConsistent()
@@ -44,30 +36,33 @@ int SPxWeightST::isConsistent() const
           && SPxStarter::isConsistent();
 }
 
-//@ ----------------------------------------------------------------------------
-/* \SubSection{Generating the Starting Basis}
-    The generation of a starting basis works as follows: After setting up the
-    preference arrays #weight# and #coWeight#, #Id#s are selected to be dual in
-    a greedy manner.  Initially, the first #Id# is taken. Then the next #Id# is
-    checked wheter its vector is linearly dependend of the vectors of the #Id#s
-    allready selected.  If not, it is added to them. This is iterated until a
-    full matrix has been constructed.
+/* Generating the Starting Basis
+   The generation of a starting basis works as follows: After setting up the
+   preference arrays #weight# and #coWeight#, #Id#s are selected to be dual in
+   a greedy manner.  Initially, the first #Id# is taken. Then the next #Id# is
+   checked wheter its vector is linearly dependend of the vectors of the #Id#s
+   allready selected.  If not, it is added to them. This is iterated until a
+   full matrix has been constructed.
  
-    Testing for linear independence is done very much along the lines of LU
-    factorization. A vector is taken, and updated with all previous L-vectors.
-    Then the maximal absolut element is selected as pivot element for computing
-    the L-vector. This is stored for further processing.
+   Testing for linear independence is done very much along the lines of LU
+   factorization. A vector is taken, and updated with all previous L-vectors.
+   Then the maximal absolut element is selected as pivot element for computing
+   the L-vector. This is stored for further processing.
  */
 
 /*
     The following two functions set the status of |id| to primal or dual,
     respectively.
  */
-void SPxWeightST::setPrimalStatus(SPxBasis::Desc& desc, const SoPlex& base, const SoPlex::Id& id)
+void SPxWeightST::setPrimalStatus(
+   SPxBasis::Desc& desc, 
+   const SoPlex& base, 
+   const SoPlex::Id& id)
 {
    if (id.isSPxRowId())
    {
       int n = base.number(SoPlex::SPxRowId(id));
+
       if (base.rhs(n) >= SPxLP::infinity)
       {
          if (base.lhs(n) <= -SPxLP::infinity)
@@ -111,7 +106,10 @@ void SPxWeightST::setPrimalStatus(SPxBasis::Desc& desc, const SoPlex& base, cons
    }
 }
 
-static void setDualStatus(SPxBasis::Desc& desc, const SoPlex& base, const SoPlex::Id& id)
+static void setDualStatus(
+   SPxBasis::Desc& desc, 
+   const SoPlex& base, 
+   const SoPlex::Id& id)
 {
    if (id.isSPxRowId())
    {
@@ -126,10 +124,10 @@ static void setDualStatus(SPxBasis::Desc& desc, const SoPlex& base, const SoPlex
 }
 
 /*
-    The following method initializes |pref| such that it contains the set of
-    |SoPlex::Id|s ordered following |rowWeight| and |colWeight|. For the sorting
-    we take the following approach: first we sort the rows, then the columns.
-    Finally we perform a mergesort of both.
+   The following method initializes |pref| such that it contains the set of
+   |SoPlex::Id|s ordered following |rowWeight| and |colWeight|. For the sorting
+   we take the following approach: first we sort the rows, then the columns.
+   Finally we perform a mergesort of both.
  */
 struct Compare
 {
@@ -196,17 +194,18 @@ void SPxWeightST::generate(SoPlex& base)
    colWeight.reSize(base.nCols());
    rowRight.reSize (base.nRows());
    colUp.reSize (base.nCols());
+
    if (base.rep() == SoPlex::COLUMN)
    {
-      weight = &colWeight;
+      weight   = &colWeight;
       coWeight = &rowWeight;
    }
    else
    {
-      weight = &rowWeight;
+      weight   = &rowWeight;
       coWeight = &colWeight;
    }
-   assert(weight->size() == base.coDim());
+   assert(weight->size()   == base.coDim());
    assert(coWeight->size() == base.dim());
 
    setupWeights(base);
@@ -370,8 +369,7 @@ void SPxWeightST::generate(SoPlex& base)
 }
 
 
-//@ ----------------------------------------------------------------------------
-/* \SubSection{Computation of Weights}
+/* Computation of Weights
  */
 void SPxWeightST::setupWeights(SoPlex& bse)
 {
@@ -448,12 +446,14 @@ void SPxWeightST::setupWeights(SoPlex& bse)
          if (up[i] < SPxLP::infinity)
          {
             if (low[i] > up[i] - base.epsilon())
-               colWeight[i] = c_fixed + n + (x > 0) ? x : -x;
+               colWeight[i] = c_fixed + n + fabs(x);
             else if (low[i] > -SPxLP::infinity)
             {
                colWeight[i] = c_dbl_bounded + l - u + n;
-               l = (l < 0) ? -l : l;
-               u = (u < 0) ? -u : u;
+
+               l = fabs(l);
+               u = fabs(u);
+
                if (u < l)
                {
                   colUp[i] = 1;
@@ -494,8 +494,8 @@ void SPxWeightST::setupWeights(SoPlex& bse)
                u = bx * rhs[i];
                l = bx * lhs[i];
                rowWeight[i] = r_dbl_bounded + l - u;
-               l = (l < 0) ? -l : l;
-               u = (u < 0) ? -u : u;
+               l = fabs(l);
+               u = fabs(u);
                rowRight[i] = (u < l);
             }
             else
@@ -542,7 +542,7 @@ void SPxWeightST::setupWeights(SoPlex& bse)
          if (up[i] < SPxLP::infinity)
          {
             if (low[i] > up[i] - base.epsilon())
-               colWeight[i] = c_fixed + n + (x > 0) ? x : -x;
+               colWeight[i] = c_fixed + n + fabs(x);
             else if (low[i] > -SPxLP::infinity)
             {
                if (x > 0)
@@ -570,7 +570,7 @@ void SPxWeightST::setupWeights(SoPlex& bse)
                colUp[i] = 0;
             }
             else
-               colWeight[i] = c_free + n - (x > 0) ? x : -x;
+               colWeight[i] = c_free + n - fabs(x);
          }
       }
 
@@ -585,7 +585,7 @@ void SPxWeightST::setupWeights(SoPlex& bse)
          if (rhs[i] < SPxLP::infinity)
          {
             if (lhs[i] > rhs[i] - base.epsilon())
-               rowWeight[i] = r_fixed + n + (x > 0) ? x : -x;
+               rowWeight[i] = r_fixed + n + fabs(x);
             else if (lhs[i] > -SPxLP::infinity)
             {
                if (x > 0)
@@ -613,7 +613,7 @@ void SPxWeightST::setupWeights(SoPlex& bse)
                rowRight[i] = 0;
             }
             else
-               rowWeight[i] = r_free + n - (x > 0) ? x : -x;
+               rowWeight[i] = r_free + n - fabs(x);
          }
       }
    }

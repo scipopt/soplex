@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbounds.cpp,v 1.3 2001/11/12 16:42:01 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxbounds.cpp,v 1.4 2001/12/30 11:30:42 bzfkocht Exp $"
 
 
 /*  Import system include files
@@ -27,9 +27,6 @@
 
 namespace soplex
 {
-
-
-//@ ----------------------------------------------------------------------------
 /*      \SubSection{Bounds}
  
     Setting up the feasiblity bound for normal primal variables is
@@ -155,7 +152,6 @@ void SoPlex::setDualRowBounds()
 }
 
 
-//@ ----------------------------------------------------------------------------
 /*
     This sets up the bounds for basic variables for entering simplex algorithms.
     It requires, that all upper lower feasibility bounds have allready been

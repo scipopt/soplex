@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.8 2001/12/28 14:55:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.9 2001/12/30 11:30:42 bzfkocht Exp $"
 
 /* Updating the Basis for Leaving Variables
  */
@@ -26,6 +26,8 @@
 
 namespace soplex
 {
+static const double reject_leave_tol = 1e-8;
+
 /*
     Vector |fTest| gives the feasibility test of all basic variables. For its
     compution |fVec|, |theUBbound| and |theLBbound| must be setup correctly.
@@ -40,10 +42,9 @@ void SoPlex::computeFtest()
 
    for (int i = dim() - 1; i >= 0; --i)
    {
-      if ((*theFvec)[i] > theUBbound[i])
-         ftest[i] = theUBbound[i] - (*theFvec)[i];
-      else
-         ftest[i] = (*theFvec)[i] - theLBbound[i];
+      ftest[i] = ((*theFvec)[i] > theUBbound[i])
+         ? theUBbound[i] - (*theFvec)[i]
+         : (*theFvec)[i] - theLBbound[i];
    }
 }
 
@@ -57,17 +58,17 @@ void SoPlex::updateFtest()
    for (int j = idx.size() - 1; j >= 0; --j)
    {
       int i = idx.index(j);
-      if ((*theFvec)[i] > theUBbound[i])
-         ftest[i] = theUBbound[i] - (*theFvec)[i];
-      else
-         ftest[i] = (*theFvec)[i] - theLBbound[i];
+
+      ftest[i] = ((*theFvec)[i] > theUBbound[i])
+         ? theUBbound[i] - (*theFvec)[i]
+         : (*theFvec)[i] - theLBbound[i];
    }
 }
 
 
-/*  \SubSection{ compute statistics on leaveing variable }
-    Compute a set of statistical values on the variable selected for leaving the
-    basis.
+/* compute statistics on leaveing variable 
+   Compute a set of statistical values on the variable selected for leaving the
+   basis.
  */
 void SoPlex::getLeaveVals
 (
@@ -580,8 +581,7 @@ int SoPlex::leave(int leaveIdx)
 #endif  // NDEBUG
 
 
-         if (theFvec->delta()[leaveIdx] < 1e-8
-              && -theFvec->delta()[leaveIdx] < 1e-8)
+         if (fabs(theFvec->delta()[leaveIdx]) < reject_leave_tol)
          {
             Id none;
             change(leaveIdx, none, 0);

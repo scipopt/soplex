@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: solve.cpp,v 1.9 2001/12/25 14:57:43 bzfkocht Exp $"
+#pragma ident "@(#) $Id: solve.cpp,v 1.10 2001/12/30 11:30:42 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -22,7 +22,7 @@
 
 namespace soplex
 {
-
+#if 0
 void CLUFactor::solveUright(double* wrk, double* vec)
 {
    int i, j, r, c;
@@ -46,18 +46,42 @@ void CLUFactor::solveUright(double* wrk, double* vec)
    {
       r = rorig[i];
       c = corig[i];
+
       wrk[c] = x = diag[r] * vec[r];
       vec[r] = 0;
+
       if (x != 0.0)
       {
          val = &cval[cbeg[c]];
          idx = &cidx[cbeg[c]];
-         j = clen[c];
+         j   = clen[c];
+
          while (j-- > 0)
             vec[*idx++] -= x * (*val++);
       }
    }
 }
+#else
+
+void CLUFactor::solveUright(double* wrk, double* vec)
+{
+   for(int i = thedim - 1; i >= 0; i--)
+   {
+      int    r = row.orig[i];
+      int    c = col.orig[i];
+      double x = wrk[c] = diag[r] * vec[r];
+
+      vec[r] = 0.0;
+
+      // if (x != 0.0)
+      if (fabs(x) > 1e-20)
+      {
+         for(int j = u.col.start[c]; j < u.col.start[c] + u.col.len[c]; j++)
+            vec[u.col.idx[j]] -= x * u.col.val[j];
+      }
+   }
+}
+#endif
 
 int CLUFactor::solveUrightEps(double* vec, int* nonz, double eps, double* rhs)
 {

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvecs.cpp,v 1.5 2001/12/28 14:55:13 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxvecs.cpp,v 1.6 2001/12/30 11:30:42 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -44,15 +44,17 @@ void SoPlex::computeFrhs()
    if (rep() == COLUMN)
    {
       theFrhs->clear();
+
       if (type() == LEAVE)
       {
          computeFrhsXtra();
 
-         double x;
-         int i;
-         for (i = nRows() - 1; i >= 0; --i)
+         for(int i = 0; i < nRows(); i++)
          {
+            double x;
+
             SPxBasis::Desc::Status stat = desc().rowStatus(i);
+
             if (!isBasic(stat))
             {
                switch (stat)
@@ -80,7 +82,6 @@ void SoPlex::computeFrhs()
                assert(x > -SPxLP::infinity);
                (*theFrhs)[i] += x;                         // slack !
             }
-
          }
       }
       else
@@ -114,6 +115,7 @@ void SoPlex::computeFrhsXtra()
    for (i = nCols() - 1; i >= 0; --i)
    {
       SPxBasis::Desc::Status stat = desc().colStatus(i);
+
       if (!isBasic(stat))
       {
          switch (stat)
@@ -139,7 +141,7 @@ void SoPlex::computeFrhsXtra()
          }
          assert(x < SPxLP::infinity);
          assert(x > -SPxLP::infinity);
-         if (x)
+         if (x != 0.0)
             theFrhs->multAdd(-x, vector(i));
       }
    }
