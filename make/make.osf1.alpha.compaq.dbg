@@ -1,8 +1,10 @@
-#--- $Id: make.osf1.alpha.compaq.dbg,v 1.5 2002/05/28 10:25:40 bzfkocht Exp $
+#--- $Id: make.osf1.alpha.compaq.dbg,v 1.6 2002/10/22 15:31:10 bzfkocht Exp $
 CXX	=	cxx
 CPPFLAGS=	-Isrc 
-CXXFLAGS=	-O0 -w0 -std strict_ansi -tweak -gall -verbose -check -trapuv \
+CXXFLAGS=	-O0 -w0 -std strict_ansi -ptr $(OBJDIR)/cxx_repository \
+		-gall -verbose -check -trapuv \
 		-msg_disable basclsnondto,boolexprconst,constrlitnondep 
+REPOSIT	=	$(OBJDIR)/cxx_repository/*.o
 # -ieee
 LDFLAGS	=	-pthread -lm
 ARFLAGS	=	crs

@@ -308,7 +308,7 @@
    <li> Is there an interface for COIN ?
 
       Yes, have a look at 
-      http://oss.software.ibm.com/developerworks/opensource/coin/COIN
+      http://oss.software.ibm.com/developerworks/opensource/coin
 
    <li> If I add rows or columns to an LP, are they checked for reduncy ?
 

@@ -1,4 +1,6 @@
-$Id: TODO,v 1.64 2002/05/01 08:16:37 bzfkocht Exp $
+$Id: TODO,v 1.65 2002/10/22 15:31:06 bzfkocht Exp $
+
+neos4, neos5werden fälschlicherweise als infeasible gemeldet.
 
 spxdefines kommentieren.
 

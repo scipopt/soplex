@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.44 2002/07/02 14:45:27 bzfkocht Exp $
+# $Id: Makefile,v 1.45 2002/10/22 15:31:05 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -64,6 +64,7 @@ LIBOBJ		= 	changesoplex.o didxset.o \
 			vector.o vsolve.o
 
 OBJECT		=	example.o
+REPOSIT		=	# template repository, explicitly empty
 
 #------------------------------------------------------------------------------
 #--- NOTHING TO CHANGE FROM HERE ON -------------------------------------------
@@ -100,7 +101,7 @@ $(BINARY):	_$(OBJDIR) _$(BINDIR) $(OBJXXX) $(LIBRARY)
 
 $(LIBRARY):	_$(LIBDIR) $(LIBXXX) 
 		-rm -f $(LIBRARY)
-		$(AR) $(ARFLAGS) $@ $(LIBXXX) 
+		$(AR) $(ARFLAGS) $@ $(LIBXXX) $(REPOSIT)
 		$(RANLIB) $@
 
 lint:		$(OBJSRC) $(LIBSRC)
