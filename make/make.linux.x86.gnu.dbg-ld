@@ -1,0 +1,7 @@
+#--- $Id: make.linux.x86.gnu.dbg-ld,v 1.1 2002/02/24 16:17:14 bzfkocht Exp $
+CXX	=	g++
+CPPFLAGS=	-Isrc -DWITH_LONG_DOUBLE \
+		-DDEFAULT_BND_VIOL=1e-8 -DDEFAULT_EPS_ZERO=1e-22
+CXXFLAGS=	-O0 -g -ansi $(GCCWARN)
+LDFLAGS	=	-lm
+ARFLAGS	=	crs

@@ -1,6 +1,42 @@
-$Id: TODO,v 1.55 2002/02/14 17:25:17 bzfkocht Exp $
+$Id: TODO,v 1.56 2002/02/24 16:17:14 bzfkocht Exp $
 
 Diesen Kram mal als @todo's schreiben ;-)
+
+-----------------------------------------------------------------------------
+
+bin/soplex.linux.x86.gnu.dbg-ld  -e -r check/LP/netlib/etamacro.mps
+
+soplex.linux.x86.gnu.dbg-ld: src/spxvecs.cpp:240: void soplex::SoPlex::computeFrhs2(const soplex::Vector &, const soplex::Vector &): Assertion `colfb[i] == coufb[i]' failed.
+
+240                 assert(colfb[i] == coufb[i]);
+Current language:  auto; currently c++
+(gdb) print i
+$1 = 368
+(gdb) print colfb[i]
+$2 = 0
+(gdb) print coufb[i]
+$3 = -nan(0xc000000000000000)
+
+kommt auch bei check.netlib.linux.x86.gnu.dbg
+
+-----------------------------------------------------------------------------
+
+nug12
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  ms/call  ms/call  name    
+ 41.26    400.98   400.98 41390449     0.01     0.01  soplex::CLUFactor::updateRow(int, int, int, int, double, double)
+ 10.33    501.40   100.42    45964     2.18     2.18  soplex::CLUFactor::vSolveLright2(double *, int *, int *, double, double *, int *, int
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls   s/call   s/call  name    
+ 34.29   4791.24  4791.24 634306343     0.00     0.00  soplex::CLUFactor::updateRow(int, int, int, int, double, double)
+ 11.91   6455.54  1664.30   709664     0.00     0.00  soplex::CLUFactor::vSolveLright2(double *, int *, int *, double, double *, int *, int
+
+-----------------------------------------------------------------------------
+
 
 in ssvector/solve/vsolve etc. die vergleiche mit eps richtig.
 

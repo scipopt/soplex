@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: real.h,v 1.10 2002/01/31 22:36:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: real.h,v 1.11 2002/02/24 16:17:14 bzfkocht Exp $"
 
 /**@file  real.h
  * @brief Floating point type definition.
@@ -42,16 +42,24 @@ namespace soplex
 
 typedef long double Real;
 
+#ifndef DEFAULT_BND_VIOL
 #define DEFAULT_BND_VIOL  1e-12
+#endif
+#ifndef DEFAULT_EPS_ZERO
 #define DEFAULT_EPS_ZERO  1e-32  // ~ additive zero. 1.0 + EPS_ZERO == 1.0
+#endif
 #define DEFAULT_INFINITY  1e100
 
 #else
 
 typedef double Real;
 
+#ifndef DEFAULT_BND_VIOL
 #define DEFAULT_BND_VIOL  1e-6
+#endif
+#ifndef DEFAULT_EPS_ZERO
 #define DEFAULT_EPS_ZERO  1e-18  // ~ additive zero. 1.0 + EPS_ZERO == 1.0
+#endif
 #define DEFAULT_INFINITY  1e100
 
 #endif // !WITH_LONG_DOUBLE

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vsolve.cpp,v 1.13 2002/02/13 16:56:07 bzfpfend Exp $"
+#pragma ident "@(#) $Id: vsolve.cpp,v 1.14 2002/02/24 16:17:14 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -29,7 +29,7 @@ namespace soplex
 static const Real verySparseFactor4right = 0.2;
 static const Real verySparseFactor4left  = 0.1;
 
-/**@todo The same queueing code is in vsolve.cpp. This should be unified. 
+/**@todo The same queueing code is in forest.cpp. This should be unified. 
  */
 static void enQueueMax(int* heap, int* size, int elem)
 {
