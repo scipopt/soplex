@@ -1,4 +1,4 @@
-# $Id: check.sh,v 1.6 2001/11/22 16:30:00 bzfkocht Exp $
+# $Id: check.sh,v 1.7 2001/11/28 17:13:27 bzfkocht Exp $
 BINNAME=`basename $2`
 TSTNAME=`basename $1 .test`
 OUTFILE=check.$TSTNAME.$BINNAME.out
@@ -26,7 +26,7 @@ do
 	4)  echo =type= ER
             opt="-e -r" ;;
         esac
-        ../$2 $opt -s3 $timelimit $i 2>>$ERRFILE
+        ../$2 $opt $timelimit $i 2>>$ERRFILE
         echo =ready=
     done
 done | tee -a $OUTFILE
