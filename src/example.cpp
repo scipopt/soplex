@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.13 2002/01/10 23:07:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.14 2002/01/11 21:05:30 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -75,7 +75,8 @@ public:
    }
 };
 
-/**@todo flag to print the solution variables. */
+/**@todo Flag to print the solution variables with names. */
+/**@todo Flag to set epsilon and delta */
 int main(int argc, char **argv)
 {
    const char* usage = "[-eri][-bn][-ltime][-pn][-sn][-tn] mpsfile";
@@ -84,7 +85,7 @@ int main(int argc, char **argv)
    SoPlex::Representation representation = SoPlex::COLUMN;
    SLUFactor::UpdateType  update         = SLUFactor::FOREST_TOMLIN;
    int                    starter        = 0;
-   int                    pricing        = 3;
+   int                    pricing        = 4;
    int                    ratiotest      = 2;
    int                    simplifier     = 3;
    double                 timelimit      = -1.0;
@@ -310,9 +311,7 @@ int main(int argc, char **argv)
       std::cout << "LP is infeasible";
       break;
    default:
-      std::cout << "An error occurred during the solution process ("
-                << stat 
-                << ")";
+      std::cout << "An error occurred during the solution process";
       break;
    }
    std::cout << std::endl;

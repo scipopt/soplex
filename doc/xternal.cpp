@@ -112,7 +112,7 @@
 
    At some time during development, some versions of the following 
    Compilers had internal erros, crashed or generated invalid code:
-   KAI, Gnu, Compaq, HP (The others were only seldom used). 
+   KAI, Gnu, Compaq, HP, Intel (The others were only seldom used). 
 
    Remeber, your milage may vary.
  */

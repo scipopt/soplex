@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.h,v 1.7 2002/01/04 17:31:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.h,v 1.8 2002/01/11 21:05:30 bzfkocht Exp $"
 
 /**@file  spxdevexpr.h
  * @brief Devex pricer.
@@ -36,6 +36,10 @@ namespace soplex
    products.
 
    See #SPxPricer for a class documentation.
+
+   @todo There seem to be problems with this pricer especially on the 
+         greenbe[ab] problems with the entering algorithm 
+         (row representation?).
 */
 class SPxDevexPR : public SPxPricer
 {

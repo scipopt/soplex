@@ -1,4 +1,4 @@
-# $Id: check.awk,v 1.10 2002/01/06 12:44:28 bzfkocht Exp $
+# $Id: check.awk,v 1.11 2002/01/11 21:05:30 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: check.awk                                                     *
@@ -90,7 +90,7 @@ BEGIN {
     sol["pilot-ja"] =  -6.1131344111E+03;
     sol["pilot-we"] =  -2.7201027439E+06;
     sol["pilot4"] =    -2.5811392641E+03;
-    sol["pilot87"] =    3.0171034734E+02
+    sol["pilot87"] =    3.0171034734E+02;
     sol["pilotnov"] =  -4.4972761882E+03;
     sol["qap8"] =       2.0350000000E+02;
     sol["qap12"] =      5.2289435056E+02;
@@ -136,7 +136,7 @@ BEGIN {
     sol["wood1p"] =     1.4429024116E+00;
     sol["woodw"] =      1.3044763331E+00;
 
-    print "$Id: check.awk,v 1.10 2002/01/06 12:44:28 bzfkocht Exp $";
+    print "$Id: check.awk,v 1.11 2002/01/11 21:05:30 bzfkocht Exp $";
     print "";
 }
 /=type=/      { type = $2; }

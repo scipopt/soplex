@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.12 2002/01/10 23:07:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.13 2002/01/11 21:05:30 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -152,7 +152,7 @@ static double readValue(char*& pos)
  *  @return The Index of the named column.
  */
 static int readColName(
-   char*& pos, NameSet* colnames, LPColSet& colset, LPCol& emptycol)
+   char*& pos, NameSet* colnames, LPColSet& colset, LPCol* emptycol)
 {
    assert(isColName(pos));
    assert(colnames != 0);
@@ -173,9 +173,15 @@ static int readColName(
 
    if ((colidx = colnames->number(name)) < 0)
    {
-      colidx = colnames->num();
-      colnames->add(name);
-      colset.add(emptycol);
+      // We only add the name if we got an empty column.
+      if (emptycol == 0)
+         std::cerr << "Unknown variable \"" << name << "\" ";
+      else
+      {
+         colidx = colnames->num();
+         colnames->add(name);
+         colset.add(*emptycol);
+      }
    }
    // std::cout << "readColName [" << name << "] = " << colidx << std::endl;
 
@@ -297,6 +303,9 @@ static double readInfinity(char*& pos)
  *  This routine should read (most?) valid LP format files. 
  *  What it will not do, is find all cases where a file is ill formed. 
  *  If this happens it may complain and read nothing or read "something".
+ * 
+ *  The reader will accept the keyword INT[egers] as a synonym for 
+ *  GEN[erals] which is an undocumented feature in CPLEX.
  *
  *  @return true if the file was read correctly
  */  
@@ -328,6 +337,7 @@ bool SPxLP::readLPF(
    char      line[MAX_LINE_LEN];
    int       lineno = 0;
    bool      finished = false;
+   bool      other;
    int       i;
    int       k;
    char*     s;
@@ -412,6 +422,8 @@ bool SPxLP::readLPF(
             section = BINARYS;
          else if (hasKeyword(pos, "gen[erals]"))
             section = INTEGERS;
+         else if (hasKeyword(pos, "int[tegers]")) // this is undocumented
+            section = INTEGERS;
          else if (hasKeyword(pos, "end"))
          {
             finished = true;
@@ -464,7 +476,7 @@ bool SPxLP::readLPF(
       //-----------------------------------------------------------------------
       pos = line;
       
-      // std::cout << "we have [" << pos << "]" << std::endl;
+      //std::cout << "we have [" << pos << "]" << std::endl;
 
       // 7. We have something left to process. 
       while((pos != 0) && (*pos != '\0'))
@@ -478,7 +490,7 @@ bool SPxLP::readLPF(
             
             if (isColName(pos))
             {
-               colidx = readColName(pos, cnames, cset, emptycol);
+               colidx = readColName(pos, cnames, cset, &emptycol);
                vec.add(colidx, val);
             }
             break;
@@ -517,7 +529,7 @@ bool SPxLP::readLPF(
             }
             if (isColName(pos))
             {
-               colidx = readColName(pos, cnames, cset, emptycol);
+               colidx = readColName(pos, cnames, cset, &emptycol);
 
                if (val != 0.0)
                   vec.add(colidx, val);
@@ -526,6 +538,7 @@ bool SPxLP::readLPF(
                sense = readSense(pos);
             break;
          case BOUNDS :
+            other = false;
             sense = 0;
 
             if (isValue(pos))
@@ -536,12 +549,17 @@ bool SPxLP::readLPF(
                   goto syntax_error;
 
                sense = readSense(pos);
+               other = true;
             }
             if (!isColName(pos))
                goto syntax_error;
             
-            colidx = readColName(pos, cnames, cset, emptycol);
-            
+            if ((colidx = readColName(pos, cnames, cset, 0)) < 0)
+            {
+               std::cerr << "in Bounds section line " << lineno 
+                         << " ignored" << std::endl;
+               continue;
+            }
             if (sense)
             {
                if (sense == '<') 
@@ -559,11 +577,13 @@ bool SPxLP::readLPF(
             {
                cset.lower(colidx) = -SPxLP::infinity;
                cset.upper(colidx) =  SPxLP::infinity;
+               other              = true;
             }
             else if (isSense(pos))
             {
                sense = readSense(pos);
-               
+               other = true;
+
                if (!isValue(pos))
                   goto syntax_error;
                
@@ -580,19 +600,30 @@ bool SPxLP::readLPF(
                   cset.upper(colidx) = val;
                }
             }
+            /* Do we have only a single column name in the input line?
+             * We could ignore this savely, but it is probably a sign 
+             * of some other error.
+             */
+            if (!other)
+               goto syntax_error;
             break;
          case BINARYS  :
          case INTEGERS :
-            colidx = readColName(pos, cnames, cset, emptycol);
-
-            if (section == BINARYS)
+            if ((colidx = readColName(pos, cnames, cset, 0)) < 0)
             {
-               cset.lower(colidx) = 0.0;
-               cset.upper(colidx) = 1.0;
+               std::cerr << "in Binary/General section line " << lineno 
+                         << " ignored" << std::endl;
             }
-            if (p_intvars != 0)
-               p_intvars->addIdx(colidx);
-
+            else
+            {
+               if (section == BINARYS)
+               {
+                  cset.lower(colidx) = 0.0;
+                  cset.upper(colidx) = 1.0;
+               }
+               if (p_intvars != 0)
+                  p_intvars->addIdx(colidx);
+            }
             while(isSpace(*pos))
                pos++;
             break;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxio.cpp,v 1.5 2002/01/10 23:07:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxio.cpp,v 1.6 2002/01/11 21:05:30 bzfkocht Exp $"
 
 
 #include <iostream>
@@ -37,6 +37,7 @@ bool SPxLP::read(
    NameSet* rowNames,
    NameSet* colNames)
 {
+   bool ok;
    char c;
 
    is.get(c);
@@ -48,10 +49,13 @@ bool SPxLP::read(
     * the keyword "MAX" or "MIN" in upper or lower case.
     * There is no possible valid LPF file starting with a '*' or 'N'.
     */
-   if ((c == '*') || (c == 'N'))
-      return readMPS(is, rowNames, colNames);
-   else
-      return readLPF(is, rowNames, colNames);
+   ok = ((c == '*') || (c == 'N'))
+      ? readMPS(is, rowNames, colNames)
+      : readLPF(is, rowNames, colNames);
+
+   //   std::cout << *this;
+
+   return ok;
 }
 
 static void dumpRows(std::ostream& s, const SPxLP& lp)
