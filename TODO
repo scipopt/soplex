@@ -1,3 +1,7 @@
+in MPS/LPF noch Integer auswertung
+
+LPSolver zusammenstutzen oder ganz entfernen.
+
 in dataarray.h:reSize(int newsize) steht in der docxygen docu immer int n ???
 
 spxfastrt.cpp(865) Testen ob das ; korrekt ist.
@@ -12,17 +16,9 @@ in idlist.h die subclassen einsetzen.
 BUG in spxscalesm.cc value() wird nicht descaliert. 
 Entsprechender Aufruf fehlt auch in spxgeneralsm.cc
 
-In slufactor.cpp sind lauter cast auf CLUFactor* drin, die
-man wohl wennehmen könnte, wenn man in solve.c und vsolve.c überall
-const hinschreibt.
-
 for();    -> for()
                 ;
 explicit einfuegen.
-
-vector_c.cpp in vector.cpp einbauen (this)
-
-documentieren  doc++
 
 reinterpret_cast durchsehen
 
