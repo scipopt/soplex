@@ -13,19 +13,21 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfileio.cpp,v 1.1 2002/12/08 11:09:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfileio.cpp,v 1.2 2002/12/14 07:48:30 bzfkocht Exp $"
 
 //#define DEBUGGING 1
+#define USE_GZSTREAM  1
 
 #include <assert.h>
 #include <iostream>
 #include <fstream>
 
+#if USE_GZSTREAM
 #include "gzstream.h"
+#endif // USE_GZSTREAM
+
 #include "spxdefines.h"
 #include "soplex.h"
-
-#define USE_GZSTREAM  1
 
 namespace soplex
 {

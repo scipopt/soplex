@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.21 2002/12/12 09:48:54 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.22 2002/12/14 07:48:30 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -632,6 +632,31 @@ SSVector& SSVector::assign(const SVector& rhs)
    assert(isConsistent());
    return *this;
 }
+
+#if 0 // neuer versuch noch testen
+SSVector& SSVector::assign(const SVector& rhs)
+{
+   assert(rhs.dim() <= Vector::dim());
+
+   num = 0;
+
+   for(int i = 0; i < rhs.size(); ++i)
+   {
+      int  k = rhs.index[i];
+      Real v = rhs.value[i];
+
+      val[k] = v;
+
+      if (isNotZero(v))
+         idx[num++] = k;
+   }
+   setupStatus = true;
+
+   assert(isConsistent());
+
+   return *this;
+}
+#endif
 
 SSVector& SSVector::assign2product1(const SVSet& A, const SSVector& x)
 {

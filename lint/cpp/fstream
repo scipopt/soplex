@@ -2,6 +2,7 @@
 #define _FSTREAM_
 
 #include <istream>
+#include <ostream>
 
 namespace std
 {
