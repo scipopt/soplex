@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.24 2002/01/21 11:50:09 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.25 2002/01/22 09:52:44 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -86,6 +86,9 @@ SoPlex::Status SoPlex::solve()
    }
    thepricer->setEpsilon(delta());
    setType(type());
+
+   // save type because we might switch
+   Type save_type = type();
 
 #ifdef DEBUG
    std::cout << "starting value = " << value() << '\n';
@@ -225,6 +228,9 @@ SoPlex::Status SoPlex::solve()
 
    if (m_status == RUNNING)
       m_status = ERROR;
+
+   // restore type to user setting
+   setType(save_type);
 
    return status();
 }

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.3 2001/11/25 14:58:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.4 2002/01/22 09:52:44 bzfkocht Exp $"
 
 /**@file  spxsolver.h
  * @brief preconfigured #SoPlex LP-solver.
@@ -44,7 +44,7 @@ private:
 public:
    /// default construtor.
    explicit SPxSolver(
-      Type type = LEAVE, SoPlex::Representation rep = SoPlex::ROW);
+      Type type = LEAVE, SoPlex::Representation rep = SoPlex::COLUMN);
 };
 } // namespace soplex
 #endif // _SPXSOLVER_H_
