@@ -1,24 +1,23 @@
 example.o: src/example.cpp src/spxsolver.h src/spxsteeppr.h \
- src/spxpricer.h src/soplex.h src/lpsolver.h src/svector.h \
- src/vector.h src/lpcolset.h src/lpcol.h src/dsvector.h src/ssvector.h \
- src/dvector.h src/subsvector.h src/didxset.h src/idxset.h src/svset.h \
+ src/spxpricer.h src/soplex.h src/timer.h src/spxlp.h src/dvector.h \
+ src/vector.h src/svector.h src/svset.h src/dataset.h src/dataarray.h \
+ src/spxalloc.h src/datakey.h src/idlist.h src/islist.h src/lprow.h \
+ src/dsvector.h src/ssvector.h src/subsvector.h src/didxset.h \
+ src/idxset.h src/lpcol.h src/lprowset.h src/lpcolset.h src/nameset.h \
+ src/datahashtable.h src/spxbasis.h src/slinsolver.h src/array.h \
+ src/random.h src/unitvector.h src/updatevector.h src/spxfastrt.h \
+ src/spxratiotester.h src/spxweightst.h src/spxstarter.h \
+ src/slufactor.h src/clufactor.h src/spxdefaultpr.h src/spxparmultpr.h \
+ src/spxdevexpr.h src/spxhybridpr.h src/spxweightpr.h \
+ src/spxharrisrt.h src/spxdefaultrt.h src/spxsimplifier.h \
+ src/spxaggregatesm.h src/spxredundantsm.h src/spxrem1sm.h \
+ src/spxscale.h src/spxgeneralsm.h src/spxsumst.h src/spxvectorst.h
+changesoplex.o: src/changesoplex.cpp src/soplex.h src/timer.h \
+ src/spxlp.h src/dvector.h src/vector.h src/svector.h src/svset.h \
  src/dataset.h src/dataarray.h src/spxalloc.h src/datakey.h \
- src/idlist.h src/islist.h src/lprowset.h src/lprow.h src/timer.h \
- src/spxlp.h src/nameset.h src/datahashtable.h src/spxbasis.h \
- src/slinsolver.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/spxfastrt.h src/spxratiotester.h \
- src/spxweightst.h src/spxstarter.h src/slufactor.h src/clufactor.h \
- src/spxdefaultpr.h src/spxparmultpr.h src/spxdevexpr.h \
- src/spxhybridpr.h src/spxweightpr.h src/spxharrisrt.h \
- src/spxdefaultrt.h src/spxsimplifier.h src/spxaggregatesm.h \
- src/spxredundantsm.h src/spxrem1sm.h src/spxscale.h \
- src/spxgeneralsm.h src/spxsumst.h src/spxvectorst.h
-changesoplex.o: src/changesoplex.cpp src/soplex.h src/lpsolver.h \
- src/svector.h src/vector.h src/lpcolset.h src/lpcol.h src/dsvector.h \
- src/ssvector.h src/dvector.h src/subsvector.h src/didxset.h \
- src/idxset.h src/svset.h src/dataset.h src/dataarray.h src/spxalloc.h \
- src/datakey.h src/idlist.h src/islist.h src/lprowset.h src/lprow.h \
- src/timer.h src/spxlp.h src/nameset.h src/datahashtable.h \
+ src/idlist.h src/islist.h src/lprow.h src/dsvector.h src/ssvector.h \
+ src/subsvector.h src/didxset.h src/idxset.h src/lpcol.h \
+ src/lprowset.h src/lpcolset.h src/nameset.h src/datahashtable.h \
  src/spxbasis.h src/slinsolver.h src/array.h src/random.h \
  src/unitvector.h src/updatevector.h src/spxpricer.h \
  src/spxratiotester.h
@@ -27,15 +26,15 @@ dsvector.o: src/dsvector.cpp src/dsvector.h src/svector.h src/vector.h \
  src/ssvector.h src/dvector.h src/subsvector.h src/didxset.h \
  src/idxset.h src/spxalloc.h
 dvector.o: src/dvector.cpp src/dvector.h src/vector.h src/svector.h \
- src/spxmessage.h src/spxalloc.h
-enter.o: src/enter.cpp src/soplex.h src/lpsolver.h src/svector.h \
- src/vector.h src/lpcolset.h src/lpcol.h src/dsvector.h src/ssvector.h \
- src/dvector.h src/subsvector.h src/didxset.h src/idxset.h src/svset.h \
- src/dataset.h src/dataarray.h src/spxalloc.h src/datakey.h \
- src/idlist.h src/islist.h src/lprowset.h src/lprow.h src/timer.h \
- src/spxlp.h src/nameset.h src/datahashtable.h src/spxbasis.h \
- src/slinsolver.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/spxratiotester.h
+ src/message.h src/spxalloc.h
+enter.o: src/enter.cpp src/soplex.h src/timer.h src/spxlp.h \
+ src/dvector.h src/vector.h src/svector.h src/svset.h src/dataset.h \
+ src/dataarray.h src/spxalloc.h src/datakey.h src/idlist.h \
+ src/islist.h src/lprow.h src/dsvector.h src/ssvector.h \
+ src/subsvector.h src/didxset.h src/idxset.h src/lpcol.h \
+ src/lprowset.h src/lpcolset.h src/nameset.h src/datahashtable.h \
+ src/spxbasis.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/spxratiotester.h
 factor.o: src/factor.cpp src/clufactor.h src/slinsolver.h \
  src/svector.h src/vector.h src/ssvector.h src/dvector.h \
  src/subsvector.h src/didxset.h src/idxset.h src/dsvector.h \
@@ -44,28 +43,29 @@ forest.o: src/forest.cpp src/clufactor.h src/slinsolver.h \
  src/svector.h src/vector.h src/ssvector.h src/dvector.h \
  src/subsvector.h src/didxset.h src/idxset.h src/dsvector.h \
  src/cring.h src/spxalloc.h
-idxset.o: src/idxset.cpp src/idxset.h src/spxmessage.h
-leave.o: src/leave.cpp src/soplex.h src/lpsolver.h src/svector.h \
- src/vector.h src/lpcolset.h src/lpcol.h src/dsvector.h src/ssvector.h \
- src/dvector.h src/subsvector.h src/didxset.h src/idxset.h src/svset.h \
- src/dataset.h src/dataarray.h src/spxalloc.h src/datakey.h \
- src/idlist.h src/islist.h src/lprowset.h src/lprow.h src/timer.h \
- src/spxlp.h src/nameset.h src/datahashtable.h src/spxbasis.h \
- src/slinsolver.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/spxratiotester.h
+idxset.o: src/idxset.cpp src/idxset.h src/message.h
+leave.o: src/leave.cpp src/soplex.h src/timer.h src/spxlp.h \
+ src/dvector.h src/vector.h src/svector.h src/svset.h src/dataset.h \
+ src/dataarray.h src/spxalloc.h src/datakey.h src/idlist.h \
+ src/islist.h src/lprow.h src/dsvector.h src/ssvector.h \
+ src/subsvector.h src/didxset.h src/idxset.h src/lpcol.h \
+ src/lprowset.h src/lpcolset.h src/nameset.h src/datahashtable.h \
+ src/spxbasis.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/spxratiotester.h
 lpcolset.o: src/lpcolset.cpp src/lpcolset.h src/lpcol.h src/dsvector.h \
  src/svector.h src/vector.h src/ssvector.h src/dvector.h \
  src/subsvector.h src/didxset.h src/idxset.h src/svset.h src/dataset.h \
  src/dataarray.h src/spxalloc.h src/datakey.h src/idlist.h \
- src/islist.h src/spxmessage.h
+ src/islist.h src/message.h
 lprowset.o: src/lprowset.cpp src/lprowset.h src/lprow.h src/dsvector.h \
  src/svector.h src/vector.h src/ssvector.h src/dvector.h \
  src/subsvector.h src/didxset.h src/idxset.h src/svset.h src/dataset.h \
  src/dataarray.h src/spxalloc.h src/datakey.h src/idlist.h \
- src/islist.h src/spxmessage.h
+ src/islist.h src/message.h
 lprow.o: src/lprow.cpp src/lprow.h src/dsvector.h src/svector.h \
  src/vector.h src/ssvector.h src/dvector.h src/subsvector.h \
  src/didxset.h src/idxset.h
+message.o: src/message.cpp
 nameset.o: src/nameset.cpp src/nameset.h src/dataset.h src/dataarray.h \
  src/spxalloc.h src/datakey.h src/datahashtable.h src/islist.h
 slufactor.o: src/slufactor.cpp src/slufactor.h src/dvector.h \
@@ -75,15 +75,15 @@ slufactor.o: src/slufactor.cpp src/slufactor.h src/dvector.h \
 solve.o: src/solve.cpp src/clufactor.h src/slinsolver.h src/svector.h \
  src/vector.h src/ssvector.h src/dvector.h src/subsvector.h \
  src/didxset.h src/idxset.h src/dsvector.h src/cring.h
-soplex.o: src/soplex.cpp src/soplex.h src/lpsolver.h src/svector.h \
- src/vector.h src/lpcolset.h src/lpcol.h src/dsvector.h src/ssvector.h \
- src/dvector.h src/subsvector.h src/didxset.h src/idxset.h src/svset.h \
- src/dataset.h src/dataarray.h src/spxalloc.h src/datakey.h \
- src/idlist.h src/islist.h src/lprowset.h src/lprow.h src/timer.h \
- src/spxlp.h src/nameset.h src/datahashtable.h src/spxbasis.h \
- src/slinsolver.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/spxpricer.h src/spxratiotester.h \
- src/spxstarter.h src/spxsimplifier.h
+soplex.o: src/soplex.cpp src/soplex.h src/timer.h src/spxlp.h \
+ src/dvector.h src/vector.h src/svector.h src/svset.h src/dataset.h \
+ src/dataarray.h src/spxalloc.h src/datakey.h src/idlist.h \
+ src/islist.h src/lprow.h src/dsvector.h src/ssvector.h \
+ src/subsvector.h src/didxset.h src/idxset.h src/lpcol.h \
+ src/lprowset.h src/lpcolset.h src/nameset.h src/datahashtable.h \
+ src/spxbasis.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/spxpricer.h \
+ src/spxratiotester.h src/spxstarter.h src/spxsimplifier.h
 spxaggregatesm.o: src/spxaggregatesm.cpp src/spxaggregatesm.h \
  src/spxsimplifier.h src/spxlp.h src/dvector.h src/vector.h \
  src/svector.h src/svset.h src/dataset.h src/dataarray.h \
@@ -96,15 +96,15 @@ spxbasis.o: src/spxbasis.cpp src/spxbasis.h src/spxlp.h src/dvector.h \
  src/spxalloc.h src/datakey.h src/idlist.h src/islist.h src/lprow.h \
  src/dsvector.h src/ssvector.h src/subsvector.h src/didxset.h \
  src/idxset.h src/lpcol.h src/lprowset.h src/lpcolset.h src/nameset.h \
- src/datahashtable.h src/slinsolver.h src/soplex.h src/lpsolver.h \
- src/timer.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/spxmessage.h
-spxbounds.o: src/spxbounds.cpp src/soplex.h src/lpsolver.h \
- src/svector.h src/vector.h src/lpcolset.h src/lpcol.h src/dsvector.h \
- src/ssvector.h src/dvector.h src/subsvector.h src/didxset.h \
- src/idxset.h src/svset.h src/dataset.h src/dataarray.h src/spxalloc.h \
- src/datakey.h src/idlist.h src/islist.h src/lprowset.h src/lprow.h \
- src/timer.h src/spxlp.h src/nameset.h src/datahashtable.h \
+ src/datahashtable.h src/slinsolver.h src/soplex.h src/timer.h \
+ src/array.h src/random.h src/unitvector.h src/updatevector.h \
+ src/message.h
+spxbounds.o: src/spxbounds.cpp src/soplex.h src/timer.h src/spxlp.h \
+ src/dvector.h src/vector.h src/svector.h src/svset.h src/dataset.h \
+ src/dataarray.h src/spxalloc.h src/datakey.h src/idlist.h \
+ src/islist.h src/lprow.h src/dsvector.h src/ssvector.h \
+ src/subsvector.h src/didxset.h src/idxset.h src/lpcol.h \
+ src/lprowset.h src/lpcolset.h src/nameset.h src/datahashtable.h \
  src/spxbasis.h src/slinsolver.h src/array.h src/random.h \
  src/unitvector.h src/updatevector.h
 spxchangebasis.o: src/spxchangebasis.cpp src/spxbasis.h src/spxlp.h \
@@ -113,26 +113,25 @@ spxchangebasis.o: src/spxchangebasis.cpp src/spxbasis.h src/spxlp.h \
  src/islist.h src/lprow.h src/dsvector.h src/ssvector.h \
  src/subsvector.h src/didxset.h src/idxset.h src/lpcol.h \
  src/lprowset.h src/lpcolset.h src/nameset.h src/datahashtable.h \
- src/slinsolver.h src/soplex.h src/lpsolver.h src/timer.h src/array.h \
- src/random.h src/unitvector.h src/updatevector.h
+ src/slinsolver.h src/soplex.h src/timer.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h
 spxdefaultpr.o: src/spxdefaultpr.cpp src/spxdefaultpr.h \
- src/spxpricer.h src/soplex.h src/lpsolver.h src/svector.h \
- src/vector.h src/lpcolset.h src/lpcol.h src/dsvector.h src/ssvector.h \
- src/dvector.h src/subsvector.h src/didxset.h src/idxset.h src/svset.h \
- src/dataset.h src/dataarray.h src/spxalloc.h src/datakey.h \
- src/idlist.h src/islist.h src/lprowset.h src/lprow.h src/timer.h \
- src/spxlp.h src/nameset.h src/datahashtable.h src/spxbasis.h \
- src/slinsolver.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h
+ src/spxpricer.h src/soplex.h src/timer.h src/spxlp.h src/dvector.h \
+ src/vector.h src/svector.h src/svset.h src/dataset.h src/dataarray.h \
+ src/spxalloc.h src/datakey.h src/idlist.h src/islist.h src/lprow.h \
+ src/dsvector.h src/ssvector.h src/subsvector.h src/didxset.h \
+ src/idxset.h src/lpcol.h src/lprowset.h src/lpcolset.h src/nameset.h \
+ src/datahashtable.h src/spxbasis.h src/slinsolver.h src/array.h \
+ src/random.h src/unitvector.h src/updatevector.h
 spxdefaultrt.o: src/spxdefaultrt.cpp src/spxdefaultrt.h \
- src/spxratiotester.h src/soplex.h src/lpsolver.h src/svector.h \
- src/vector.h src/lpcolset.h src/lpcol.h src/dsvector.h src/ssvector.h \
- src/dvector.h src/subsvector.h src/didxset.h src/idxset.h src/svset.h \
- src/dataset.h src/dataarray.h src/spxalloc.h src/datakey.h \
- src/idlist.h src/islist.h src/lprowset.h src/lprow.h src/timer.h \
- src/spxlp.h src/nameset.h src/datahashtable.h src/spxbasis.h \
- src/slinsolver.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h
+ src/spxratiotester.h src/soplex.h src/timer.h src/spxlp.h \
+ src/dvector.h src/vector.h src/svector.h src/svset.h src/dataset.h \
+ src/dataarray.h src/spxalloc.h src/datakey.h src/idlist.h \
+ src/islist.h src/lprow.h src/dsvector.h src/ssvector.h \
+ src/subsvector.h src/didxset.h src/idxset.h src/lpcol.h \
+ src/lprowset.h src/lpcolset.h src/nameset.h src/datahashtable.h \
+ src/spxbasis.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h
 spxdesc.o: src/spxdesc.cpp src/spxbasis.h src/spxlp.h src/dvector.h \
  src/vector.h src/svector.h src/svset.h src/dataset.h src/dataarray.h \
  src/spxalloc.h src/datakey.h src/idlist.h src/islist.h src/lprow.h \
@@ -140,22 +139,21 @@ spxdesc.o: src/spxdesc.cpp src/spxbasis.h src/spxlp.h src/dvector.h \
  src/idxset.h src/lpcol.h src/lprowset.h src/lpcolset.h src/nameset.h \
  src/datahashtable.h src/slinsolver.h
 spxdevexpr.o: src/spxdevexpr.cpp src/spxdevexpr.h src/spxpricer.h \
- src/soplex.h src/lpsolver.h src/svector.h src/vector.h src/lpcolset.h \
- src/lpcol.h src/dsvector.h src/ssvector.h src/dvector.h \
- src/subsvector.h src/didxset.h src/idxset.h src/svset.h src/dataset.h \
- src/dataarray.h src/spxalloc.h src/datakey.h src/idlist.h \
- src/islist.h src/lprowset.h src/lprow.h src/timer.h src/spxlp.h \
- src/nameset.h src/datahashtable.h src/spxbasis.h src/slinsolver.h \
- src/array.h src/random.h src/unitvector.h src/updatevector.h \
- src/spxmessage.h
+ src/soplex.h src/timer.h src/spxlp.h src/dvector.h src/vector.h \
+ src/svector.h src/svset.h src/dataset.h src/dataarray.h \
+ src/spxalloc.h src/datakey.h src/idlist.h src/islist.h src/lprow.h \
+ src/dsvector.h src/ssvector.h src/subsvector.h src/didxset.h \
+ src/idxset.h src/lpcol.h src/lprowset.h src/lpcolset.h src/nameset.h \
+ src/datahashtable.h src/spxbasis.h src/slinsolver.h src/array.h \
+ src/random.h src/unitvector.h src/updatevector.h src/message.h
 spxfastrt.o: src/spxfastrt.cpp src/spxfastrt.h src/spxratiotester.h \
- src/soplex.h src/lpsolver.h src/svector.h src/vector.h src/lpcolset.h \
- src/lpcol.h src/dsvector.h src/ssvector.h src/dvector.h \
- src/subsvector.h src/didxset.h src/idxset.h src/svset.h src/dataset.h \
- src/dataarray.h src/spxalloc.h src/datakey.h src/idlist.h \
- src/islist.h src/lprowset.h src/lprow.h src/timer.h src/spxlp.h \
- src/nameset.h src/datahashtable.h src/spxbasis.h src/slinsolver.h \
- src/array.h src/random.h src/unitvector.h src/updatevector.h
+ src/soplex.h src/timer.h src/spxlp.h src/dvector.h src/vector.h \
+ src/svector.h src/svset.h src/dataset.h src/dataarray.h \
+ src/spxalloc.h src/datakey.h src/idlist.h src/islist.h src/lprow.h \
+ src/dsvector.h src/ssvector.h src/subsvector.h src/didxset.h \
+ src/idxset.h src/lpcol.h src/lprowset.h src/lpcolset.h src/nameset.h \
+ src/datahashtable.h src/spxbasis.h src/slinsolver.h src/array.h \
+ src/random.h src/unitvector.h src/updatevector.h
 spxgeneralsm.o: src/spxgeneralsm.cpp src/spxgeneralsm.h \
  src/spxredundantsm.h src/spxsimplifier.h src/spxlp.h src/dvector.h \
  src/vector.h src/svector.h src/svset.h src/dataset.h src/dataarray.h \
@@ -165,23 +163,23 @@ spxgeneralsm.o: src/spxgeneralsm.cpp src/spxgeneralsm.h \
  src/datahashtable.h src/spxaggregatesm.h src/spxrem1sm.h \
  src/spxscale.h
 spxharrisrt.o: src/spxharrisrt.cpp src/spxharrisrt.h \
- src/spxratiotester.h src/soplex.h src/lpsolver.h src/svector.h \
- src/vector.h src/lpcolset.h src/lpcol.h src/dsvector.h src/ssvector.h \
- src/dvector.h src/subsvector.h src/didxset.h src/idxset.h src/svset.h \
- src/dataset.h src/dataarray.h src/spxalloc.h src/datakey.h \
- src/idlist.h src/islist.h src/lprowset.h src/lprow.h src/timer.h \
- src/spxlp.h src/nameset.h src/datahashtable.h src/spxbasis.h \
- src/slinsolver.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h
-spxhybridpr.o: src/spxhybridpr.cpp src/spxhybridpr.h src/spxpricer.h \
- src/soplex.h src/lpsolver.h src/svector.h src/vector.h src/lpcolset.h \
- src/lpcol.h src/dsvector.h src/ssvector.h src/dvector.h \
- src/subsvector.h src/didxset.h src/idxset.h src/svset.h src/dataset.h \
+ src/spxratiotester.h src/soplex.h src/timer.h src/spxlp.h \
+ src/dvector.h src/vector.h src/svector.h src/svset.h src/dataset.h \
  src/dataarray.h src/spxalloc.h src/datakey.h src/idlist.h \
- src/islist.h src/lprowset.h src/lprow.h src/timer.h src/spxlp.h \
- src/nameset.h src/datahashtable.h src/spxbasis.h src/slinsolver.h \
- src/array.h src/random.h src/unitvector.h src/updatevector.h \
- src/spxdevexpr.h src/spxparmultpr.h src/spxsteeppr.h src/spxmessage.h
+ src/islist.h src/lprow.h src/dsvector.h src/ssvector.h \
+ src/subsvector.h src/didxset.h src/idxset.h src/lpcol.h \
+ src/lprowset.h src/lpcolset.h src/nameset.h src/datahashtable.h \
+ src/spxbasis.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h
+spxhybridpr.o: src/spxhybridpr.cpp src/spxhybridpr.h src/spxpricer.h \
+ src/soplex.h src/timer.h src/spxlp.h src/dvector.h src/vector.h \
+ src/svector.h src/svset.h src/dataset.h src/dataarray.h \
+ src/spxalloc.h src/datakey.h src/idlist.h src/islist.h src/lprow.h \
+ src/dsvector.h src/ssvector.h src/subsvector.h src/didxset.h \
+ src/idxset.h src/lpcol.h src/lprowset.h src/lpcolset.h src/nameset.h \
+ src/datahashtable.h src/spxbasis.h src/slinsolver.h src/array.h \
+ src/random.h src/unitvector.h src/updatevector.h src/spxdevexpr.h \
+ src/spxparmultpr.h src/spxsteeppr.h src/message.h
 spxio.o: src/spxio.cpp src/spxlp.h src/dvector.h src/vector.h \
  src/svector.h src/svset.h src/dataset.h src/dataarray.h \
  src/spxalloc.h src/datakey.h src/idlist.h src/islist.h src/lprow.h \
@@ -193,14 +191,13 @@ spxlp.o: src/spxlp.cpp src/spxlp.h src/dvector.h src/vector.h \
  src/spxalloc.h src/datakey.h src/idlist.h src/islist.h src/lprow.h \
  src/dsvector.h src/ssvector.h src/subsvector.h src/didxset.h \
  src/idxset.h src/lpcol.h src/lprowset.h src/lpcolset.h src/nameset.h \
- src/datahashtable.h src/spxmessage.h
+ src/datahashtable.h src/message.h
 spxlpfread.o: src/spxlpfread.cpp src/spxlp.h src/dvector.h \
  src/vector.h src/svector.h src/svset.h src/dataset.h src/dataarray.h \
  src/spxalloc.h src/datakey.h src/idlist.h src/islist.h src/lprow.h \
  src/dsvector.h src/ssvector.h src/subsvector.h src/didxset.h \
  src/idxset.h src/lpcol.h src/lprowset.h src/lpcolset.h src/nameset.h \
  src/datahashtable.h
-spxmessage.o: src/spxmessage.cpp
 spxmpsread.o: src/spxmpsread.cpp src/spxlp.h src/dvector.h \
  src/vector.h src/svector.h src/svset.h src/dataset.h src/dataarray.h \
  src/spxalloc.h src/datakey.h src/idlist.h src/islist.h src/lprow.h \
@@ -208,14 +205,13 @@ spxmpsread.o: src/spxmpsread.cpp src/spxlp.h src/dvector.h \
  src/idxset.h src/lpcol.h src/lprowset.h src/lpcolset.h src/nameset.h \
  src/datahashtable.h
 spxparmultpr.o: src/spxparmultpr.cpp src/spxparmultpr.h \
- src/spxpricer.h src/soplex.h src/lpsolver.h src/svector.h \
- src/vector.h src/lpcolset.h src/lpcol.h src/dsvector.h src/ssvector.h \
- src/dvector.h src/subsvector.h src/didxset.h src/idxset.h src/svset.h \
- src/dataset.h src/dataarray.h src/spxalloc.h src/datakey.h \
- src/idlist.h src/islist.h src/lprowset.h src/lprow.h src/timer.h \
- src/spxlp.h src/nameset.h src/datahashtable.h src/spxbasis.h \
- src/slinsolver.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h
+ src/spxpricer.h src/soplex.h src/timer.h src/spxlp.h src/dvector.h \
+ src/vector.h src/svector.h src/svset.h src/dataset.h src/dataarray.h \
+ src/spxalloc.h src/datakey.h src/idlist.h src/islist.h src/lprow.h \
+ src/dsvector.h src/ssvector.h src/subsvector.h src/didxset.h \
+ src/idxset.h src/lpcol.h src/lprowset.h src/lpcolset.h src/nameset.h \
+ src/datahashtable.h src/spxbasis.h src/slinsolver.h src/array.h \
+ src/random.h src/unitvector.h src/updatevector.h
 spxredundantsm.o: src/spxredundantsm.cpp src/spxredundantsm.h \
  src/spxsimplifier.h src/spxlp.h src/dvector.h src/vector.h \
  src/svector.h src/svset.h src/dataset.h src/dataarray.h \
@@ -235,116 +231,112 @@ spxscale.o: src/spxscale.cpp src/spxscale.h src/spxsimplifier.h \
  src/idlist.h src/islist.h src/lprow.h src/dsvector.h src/ssvector.h \
  src/subsvector.h src/didxset.h src/idxset.h src/lpcol.h \
  src/lprowset.h src/lpcolset.h src/nameset.h src/datahashtable.h
-spxshift.o: src/spxshift.cpp src/soplex.h src/lpsolver.h src/svector.h \
- src/vector.h src/lpcolset.h src/lpcol.h src/dsvector.h src/ssvector.h \
- src/dvector.h src/subsvector.h src/didxset.h src/idxset.h src/svset.h \
- src/dataset.h src/dataarray.h src/spxalloc.h src/datakey.h \
- src/idlist.h src/islist.h src/lprowset.h src/lprow.h src/timer.h \
- src/spxlp.h src/nameset.h src/datahashtable.h src/spxbasis.h \
- src/slinsolver.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h
+spxshift.o: src/spxshift.cpp src/soplex.h src/timer.h src/spxlp.h \
+ src/dvector.h src/vector.h src/svector.h src/svset.h src/dataset.h \
+ src/dataarray.h src/spxalloc.h src/datakey.h src/idlist.h \
+ src/islist.h src/lprow.h src/dsvector.h src/ssvector.h \
+ src/subsvector.h src/didxset.h src/idxset.h src/lpcol.h \
+ src/lprowset.h src/lpcolset.h src/nameset.h src/datahashtable.h \
+ src/spxbasis.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h
 spxsolver.o: src/spxsolver.cpp src/spxsolver.h src/spxsteeppr.h \
- src/spxpricer.h src/soplex.h src/lpsolver.h src/svector.h \
- src/vector.h src/lpcolset.h src/lpcol.h src/dsvector.h src/ssvector.h \
- src/dvector.h src/subsvector.h src/didxset.h src/idxset.h src/svset.h \
- src/dataset.h src/dataarray.h src/spxalloc.h src/datakey.h \
- src/idlist.h src/islist.h src/lprowset.h src/lprow.h src/timer.h \
- src/spxlp.h src/nameset.h src/datahashtable.h src/spxbasis.h \
- src/slinsolver.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/spxfastrt.h src/spxratiotester.h \
- src/spxweightst.h src/spxstarter.h src/slufactor.h src/clufactor.h
-spxsolve.o: src/spxsolve.cpp src/soplex.h src/lpsolver.h src/svector.h \
- src/vector.h src/lpcolset.h src/lpcol.h src/dsvector.h src/ssvector.h \
- src/dvector.h src/subsvector.h src/didxset.h src/idxset.h src/svset.h \
- src/dataset.h src/dataarray.h src/spxalloc.h src/datakey.h \
- src/idlist.h src/islist.h src/lprowset.h src/lprow.h src/timer.h \
- src/spxlp.h src/nameset.h src/datahashtable.h src/spxbasis.h \
- src/slinsolver.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/spxpricer.h src/spxratiotester.h \
- src/spxstarter.h src/spxsimplifier.h
+ src/spxpricer.h src/soplex.h src/timer.h src/spxlp.h src/dvector.h \
+ src/vector.h src/svector.h src/svset.h src/dataset.h src/dataarray.h \
+ src/spxalloc.h src/datakey.h src/idlist.h src/islist.h src/lprow.h \
+ src/dsvector.h src/ssvector.h src/subsvector.h src/didxset.h \
+ src/idxset.h src/lpcol.h src/lprowset.h src/lpcolset.h src/nameset.h \
+ src/datahashtable.h src/spxbasis.h src/slinsolver.h src/array.h \
+ src/random.h src/unitvector.h src/updatevector.h src/spxfastrt.h \
+ src/spxratiotester.h src/spxweightst.h src/spxstarter.h \
+ src/slufactor.h src/clufactor.h
+spxsolve.o: src/spxsolve.cpp src/soplex.h src/timer.h src/spxlp.h \
+ src/dvector.h src/vector.h src/svector.h src/svset.h src/dataset.h \
+ src/dataarray.h src/spxalloc.h src/datakey.h src/idlist.h \
+ src/islist.h src/lprow.h src/dsvector.h src/ssvector.h \
+ src/subsvector.h src/didxset.h src/idxset.h src/lpcol.h \
+ src/lprowset.h src/lpcolset.h src/nameset.h src/datahashtable.h \
+ src/spxbasis.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/spxpricer.h \
+ src/spxratiotester.h src/spxstarter.h src/spxsimplifier.h
 spxstarter.o: src/spxstarter.cpp src/spxstarter.h src/soplex.h \
- src/lpsolver.h src/svector.h src/vector.h src/lpcolset.h src/lpcol.h \
- src/dsvector.h src/ssvector.h src/dvector.h src/subsvector.h \
- src/didxset.h src/idxset.h src/svset.h src/dataset.h src/dataarray.h \
- src/spxalloc.h src/datakey.h src/idlist.h src/islist.h src/lprowset.h \
- src/lprow.h src/timer.h src/spxlp.h src/nameset.h src/datahashtable.h \
- src/spxbasis.h src/slinsolver.h src/array.h src/random.h \
- src/unitvector.h src/updatevector.h
-spxsteeppr.o: src/spxsteeppr.cpp src/spxmessage.h src/spxsteeppr.h \
- src/spxpricer.h src/soplex.h src/lpsolver.h src/svector.h \
- src/vector.h src/lpcolset.h src/lpcol.h src/dsvector.h src/ssvector.h \
- src/dvector.h src/subsvector.h src/didxset.h src/idxset.h src/svset.h \
- src/dataset.h src/dataarray.h src/spxalloc.h src/datakey.h \
- src/idlist.h src/islist.h src/lprowset.h src/lprow.h src/timer.h \
- src/spxlp.h src/nameset.h src/datahashtable.h src/spxbasis.h \
- src/slinsolver.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h
+ src/timer.h src/spxlp.h src/dvector.h src/vector.h src/svector.h \
+ src/svset.h src/dataset.h src/dataarray.h src/spxalloc.h \
+ src/datakey.h src/idlist.h src/islist.h src/lprow.h src/dsvector.h \
+ src/ssvector.h src/subsvector.h src/didxset.h src/idxset.h \
+ src/lpcol.h src/lprowset.h src/lpcolset.h src/nameset.h \
+ src/datahashtable.h src/spxbasis.h src/slinsolver.h src/array.h \
+ src/random.h src/unitvector.h src/updatevector.h
+spxsteeppr.o: src/spxsteeppr.cpp src/message.h src/spxsteeppr.h \
+ src/spxpricer.h src/soplex.h src/timer.h src/spxlp.h src/dvector.h \
+ src/vector.h src/svector.h src/svset.h src/dataset.h src/dataarray.h \
+ src/spxalloc.h src/datakey.h src/idlist.h src/islist.h src/lprow.h \
+ src/dsvector.h src/ssvector.h src/subsvector.h src/didxset.h \
+ src/idxset.h src/lpcol.h src/lprowset.h src/lpcolset.h src/nameset.h \
+ src/datahashtable.h src/spxbasis.h src/slinsolver.h src/array.h \
+ src/random.h src/unitvector.h src/updatevector.h
 spxsumst.o: src/spxsumst.cpp src/spxsumst.h src/spxvectorst.h \
- src/spxweightst.h src/spxstarter.h src/soplex.h src/lpsolver.h \
- src/svector.h src/vector.h src/lpcolset.h src/lpcol.h src/dsvector.h \
- src/ssvector.h src/dvector.h src/subsvector.h src/didxset.h \
- src/idxset.h src/svset.h src/dataset.h src/dataarray.h src/spxalloc.h \
- src/datakey.h src/idlist.h src/islist.h src/lprowset.h src/lprow.h \
- src/timer.h src/spxlp.h src/nameset.h src/datahashtable.h \
+ src/spxweightst.h src/spxstarter.h src/soplex.h src/timer.h \
+ src/spxlp.h src/dvector.h src/vector.h src/svector.h src/svset.h \
+ src/dataset.h src/dataarray.h src/spxalloc.h src/datakey.h \
+ src/idlist.h src/islist.h src/lprow.h src/dsvector.h src/ssvector.h \
+ src/subsvector.h src/didxset.h src/idxset.h src/lpcol.h \
+ src/lprowset.h src/lpcolset.h src/nameset.h src/datahashtable.h \
  src/spxbasis.h src/slinsolver.h src/array.h src/random.h \
  src/unitvector.h src/updatevector.h
-spxvecs.o: src/spxvecs.cpp src/soplex.h src/lpsolver.h src/svector.h \
- src/vector.h src/lpcolset.h src/lpcol.h src/dsvector.h src/ssvector.h \
- src/dvector.h src/subsvector.h src/didxset.h src/idxset.h src/svset.h \
- src/dataset.h src/dataarray.h src/spxalloc.h src/datakey.h \
- src/idlist.h src/islist.h src/lprowset.h src/lprow.h src/timer.h \
- src/spxlp.h src/nameset.h src/datahashtable.h src/spxbasis.h \
- src/slinsolver.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h
+spxvecs.o: src/spxvecs.cpp src/soplex.h src/timer.h src/spxlp.h \
+ src/dvector.h src/vector.h src/svector.h src/svset.h src/dataset.h \
+ src/dataarray.h src/spxalloc.h src/datakey.h src/idlist.h \
+ src/islist.h src/lprow.h src/dsvector.h src/ssvector.h \
+ src/subsvector.h src/didxset.h src/idxset.h src/lpcol.h \
+ src/lprowset.h src/lpcolset.h src/nameset.h src/datahashtable.h \
+ src/spxbasis.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h
 spxvectorst.o: src/spxvectorst.cpp src/spxvectorst.h src/spxweightst.h \
- src/spxstarter.h src/soplex.h src/lpsolver.h src/svector.h \
- src/vector.h src/lpcolset.h src/lpcol.h src/dsvector.h src/ssvector.h \
- src/dvector.h src/subsvector.h src/didxset.h src/idxset.h src/svset.h \
- src/dataset.h src/dataarray.h src/spxalloc.h src/datakey.h \
- src/idlist.h src/islist.h src/lprowset.h src/lprow.h src/timer.h \
- src/spxlp.h src/nameset.h src/datahashtable.h src/spxbasis.h \
- src/slinsolver.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h
+ src/spxstarter.h src/soplex.h src/timer.h src/spxlp.h src/dvector.h \
+ src/vector.h src/svector.h src/svset.h src/dataset.h src/dataarray.h \
+ src/spxalloc.h src/datakey.h src/idlist.h src/islist.h src/lprow.h \
+ src/dsvector.h src/ssvector.h src/subsvector.h src/didxset.h \
+ src/idxset.h src/lpcol.h src/lprowset.h src/lpcolset.h src/nameset.h \
+ src/datahashtable.h src/spxbasis.h src/slinsolver.h src/array.h \
+ src/random.h src/unitvector.h src/updatevector.h
 spxweightpr.o: src/spxweightpr.cpp src/spxweightpr.h src/spxpricer.h \
- src/soplex.h src/lpsolver.h src/svector.h src/vector.h src/lpcolset.h \
- src/lpcol.h src/dsvector.h src/ssvector.h src/dvector.h \
- src/subsvector.h src/didxset.h src/idxset.h src/svset.h src/dataset.h \
- src/dataarray.h src/spxalloc.h src/datakey.h src/idlist.h \
- src/islist.h src/lprowset.h src/lprow.h src/timer.h src/spxlp.h \
- src/nameset.h src/datahashtable.h src/spxbasis.h src/slinsolver.h \
- src/array.h src/random.h src/unitvector.h src/updatevector.h \
- src/spxmessage.h
+ src/soplex.h src/timer.h src/spxlp.h src/dvector.h src/vector.h \
+ src/svector.h src/svset.h src/dataset.h src/dataarray.h \
+ src/spxalloc.h src/datakey.h src/idlist.h src/islist.h src/lprow.h \
+ src/dsvector.h src/ssvector.h src/subsvector.h src/didxset.h \
+ src/idxset.h src/lpcol.h src/lprowset.h src/lpcolset.h src/nameset.h \
+ src/datahashtable.h src/spxbasis.h src/slinsolver.h src/array.h \
+ src/random.h src/unitvector.h src/updatevector.h src/message.h
 spxweightst.o: src/spxweightst.cpp src/spxweightst.h src/spxstarter.h \
- src/soplex.h src/lpsolver.h src/svector.h src/vector.h src/lpcolset.h \
- src/lpcol.h src/dsvector.h src/ssvector.h src/dvector.h \
- src/subsvector.h src/didxset.h src/idxset.h src/svset.h src/dataset.h \
- src/dataarray.h src/spxalloc.h src/datakey.h src/idlist.h \
- src/islist.h src/lprowset.h src/lprow.h src/timer.h src/spxlp.h \
- src/nameset.h src/datahashtable.h src/spxbasis.h src/slinsolver.h \
- src/array.h src/random.h src/unitvector.h src/updatevector.h \
- src/sorter.h
+ src/soplex.h src/timer.h src/spxlp.h src/dvector.h src/vector.h \
+ src/svector.h src/svset.h src/dataset.h src/dataarray.h \
+ src/spxalloc.h src/datakey.h src/idlist.h src/islist.h src/lprow.h \
+ src/dsvector.h src/ssvector.h src/subsvector.h src/didxset.h \
+ src/idxset.h src/lpcol.h src/lprowset.h src/lpcolset.h src/nameset.h \
+ src/datahashtable.h src/spxbasis.h src/slinsolver.h src/array.h \
+ src/random.h src/unitvector.h src/updatevector.h src/sorter.h
 ssvector.o: src/ssvector.cpp src/ssvector.h src/dvector.h src/vector.h \
  src/svector.h src/subsvector.h src/didxset.h src/idxset.h src/svset.h \
  src/dataset.h src/dataarray.h src/spxalloc.h src/datakey.h \
- src/idlist.h src/islist.h src/spxmessage.h
+ src/idlist.h src/islist.h src/message.h
 subsvector.o: src/subsvector.cpp src/subsvector.h src/svector.h \
- src/vector.h src/spxmessage.h
+ src/vector.h src/message.h
 svector.o: src/svector.cpp src/svector.h src/vector.h src/ssvector.h \
  src/dvector.h src/subsvector.h src/didxset.h src/idxset.h \
- src/spxmessage.h
+ src/message.h
 svset.o: src/svset.cpp src/svset.h src/svector.h src/vector.h \
  src/dataset.h src/dataarray.h src/spxalloc.h src/datakey.h \
- src/idlist.h src/islist.h src/spxmessage.h
+ src/idlist.h src/islist.h src/message.h
 timer.o: src/timer.cpp src/timer.h
 unitvector.o: src/unitvector.cpp src/unitvector.h src/svector.h \
- src/vector.h src/spxmessage.h
+ src/vector.h src/message.h
 update.o: src/update.cpp src/clufactor.h src/slinsolver.h \
  src/svector.h src/vector.h src/ssvector.h src/dvector.h \
  src/subsvector.h src/didxset.h src/idxset.h src/dsvector.h \
  src/cring.h
 updatevector.o: src/updatevector.cpp src/updatevector.h src/dvector.h \
  src/vector.h src/svector.h src/ssvector.h src/subsvector.h \
- src/didxset.h src/idxset.h src/spxmessage.h
+ src/didxset.h src/idxset.h src/message.h
 vector.o: src/vector.cpp src/vector.h src/ssvector.h src/dvector.h \
  src/svector.h src/subsvector.h src/didxset.h src/idxset.h
 vsolve.o: src/vsolve.cpp src/clufactor.h src/slinsolver.h \

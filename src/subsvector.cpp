@@ -13,13 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: subsvector.cpp,v 1.3 2001/12/25 16:03:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: subsvector.cpp,v 1.4 2001/12/26 12:58:59 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
 #include "subsvector.h"
-#include "spxmessage.h"
+#include "message.h"
 
 namespace soplex
 {
@@ -139,14 +139,14 @@ int SubSVector::isConsistent() const
    {
 #ifndef NDEBUG
       if (elem < &svec->element(0))
-         return SPXinconsistent("SubSVector");
+         return MSGinconsistent("SubSVector");
       if (elem + num > (&svec->element(0)) + svec->size())
-         return SPXinconsistent("SubSVector");
+         return MSGinconsistent("SubSVector");
       return svec->isConsistent();
 #endif
    }
    else if (num)
-      return SPXinconsistent("SubSVector");
+      return MSGinconsistent("SubSVector");
    return 1;
 }
 } // namespace soplex

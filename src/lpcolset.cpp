@@ -13,12 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcolset.cpp,v 1.4 2001/12/25 16:03:24 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpcolset.cpp,v 1.5 2001/12/26 12:58:58 bzfkocht Exp $"
 
 #include <assert.h>
 
 #include "lpcolset.h"
-#include "spxmessage.h"
+#include "message.h"
 
 namespace soplex
 {
@@ -151,11 +151,11 @@ void LPColSet::clear()
 int LPColSet::isConsistent() const
 {
    if (low.dim() != object.dim())
-      return SPXinconsistent("LPColSet");
+      return MSGinconsistent("LPColSet");
    if (low.dim() != up.dim())
-      return SPXinconsistent("LPColSet");
+      return MSGinconsistent("LPColSet");
    if (low.dim() != num())
-      return SPXinconsistent("LPColSet");
+      return MSGinconsistent("LPColSet");
 
    return low.isConsistent() && up.isConsistent() && SVSet::isConsistent();
 }

@@ -13,13 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.cpp,v 1.5 2001/12/25 16:03:24 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprowset.cpp,v 1.6 2001/12/26 12:58:58 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
 #include "lprowset.h"
-#include "spxmessage.h"
+#include "message.h"
 
 namespace soplex
 {
@@ -160,9 +160,9 @@ void LPRowSet::setType(
 int LPRowSet::isConsistent() const
 {
    if (left.dim() != right.dim())
-      return SPXinconsistent("LPRowSet");
+      return MSGinconsistent("LPRowSet");
    if (left.dim() != num())
-      return SPXinconsistent("LPRowSet");
+      return MSGinconsistent("LPRowSet");
 
    return left.isConsistent() && right.isConsistent() && SVSet::isConsistent();
 }

@@ -13,12 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.cpp,v 1.10 2001/12/25 16:03:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.cpp,v 1.11 2001/12/26 12:58:59 bzfkocht Exp $"
 
 #include <assert.h>
 
 #include "svset.h"
-#include "spxmessage.h"
+#include "message.h"
 
 namespace soplex
 {
@@ -291,12 +291,12 @@ int SVSet::isConsistent() const
    for (ps = list.first(); ps; ps = next)
    {
       if (!ps->isConsistent())
-         return SPXinconsistent("SVSet");
+         return MSGinconsistent("SVSet");
       if (ps->mem() > &last())
-         return SPXinconsistent("SVSet");
+         return MSGinconsistent("SVSet");
       next = list.next(ps);
       if (next && ps->mem() + ps->max() + 1 != next->mem()) {
-         return SPXinconsistent("SVSet");
+         return MSGinconsistent("SVSet");
       }
    }
    return DataArray < SVector::Element > ::isConsistent() && set.isConsistent() && list.isConsistent();

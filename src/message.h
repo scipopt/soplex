@@ -13,14 +13,14 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmessage.h,v 1.1 2001/12/25 16:11:38 bzfkocht Exp $"
+#pragma ident "@(#) $Id: message.h,v 1.1 2001/12/26 12:58:58 bzfkocht Exp $"
 
 namespace soplex
 {
 
-extern int spxinconsistent(const char* name, const char* file, int line);
+extern int msginconsistent(const char* name, const char* file, int line);
 
-#define SPXinconsistent(name) spxinconsistent(name, __FILE__, __LINE__)
+#define MSGinconsistent(name) msginconsistent(name, __FILE__, __LINE__)
  
 } // namespace soplex
 

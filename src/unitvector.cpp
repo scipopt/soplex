@@ -13,12 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: unitvector.cpp,v 1.3 2001/12/25 16:03:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: unitvector.cpp,v 1.4 2001/12/26 12:58:59 bzfkocht Exp $"
 
 #include <assert.h>
 
 #include "unitvector.h"
-#include "spxmessage.h"
+#include "message.h"
 
 namespace soplex
 {
@@ -26,13 +26,13 @@ namespace soplex
 int UnitVector::isConsistent() const
 {
    if (mem() != &themem)
-      return SPXinconsistent("UnitVector");
+      return MSGinconsistent("UnitVector");
    if (mem() + 1 != &themem1)
-      return SPXinconsistent("UnitVector");
+      return MSGinconsistent("UnitVector");
    if (size() != 1)
-      return SPXinconsistent("UnitVector");
+      return MSGinconsistent("UnitVector");
    if (max() != 1)
-      return SPXinconsistent("UnitVector");
+      return MSGinconsistent("UnitVector");
 
    return SVector::isConsistent();
 }

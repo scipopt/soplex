@@ -13,13 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.9 2001/12/25 18:03:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.10 2001/12/26 12:58:59 bzfkocht Exp $"
 
 #include <assert.h>
 
 #include "ssvector.h"
 #include "svset.h"
-#include "spxmessage.h"
+#include "message.h"
 
 /**@file ssvector.cpp
  * @todo There is a lot pointer arithmetic done here. It is not clear if
@@ -933,15 +933,15 @@ SSVector& SSVector::assign2productAndSetup(const SVSet& A, SSVector& x)
 int SSVector::isConsistent() const
 {
    if (Vector::dim() > DIdxSet::max())
-      return SPXinconsistent("SSVector");
+      return MSGinconsistent("SSVector");
    if (Vector::dim() < DIdxSet::dim())
-      return SPXinconsistent("SSVector");
+      return MSGinconsistent("SSVector");
 
    if (isSetup())
    {
       for (int i = Vector::dim() - 1; i >= 0; --i)
          if (val[i] != 0 && number(i) < 0)
-            return SPXinconsistent("SSVector");
+            return MSGinconsistent("SSVector");
    }
 
    return DVector::isConsistent() && DIdxSet::isConsistent();

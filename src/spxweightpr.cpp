@@ -13,12 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.6 2001/12/25 16:03:24 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.7 2001/12/26 12:58:59 bzfkocht Exp $"
 
 #include <assert.h>
 
 #include "spxweightpr.h"
-#include "spxmessage.h"
+#include "message.h"
 
 namespace soplex
 {
@@ -333,9 +333,9 @@ int SPxWeightPR::isConsistent() const
    if (solver() != 0)
    {
       if (rPenalty.dim() != solver()->nRows())
-         return SPXinconsistent("SPxWeightPR");
+         return MSGinconsistent("SPxWeightPR");
       if (cPenalty.dim() != solver()->nCols())
-         return SPXinconsistent("SPxWeightPR");
+         return MSGinconsistent("SPxWeightPR");
    }
    return 1;
 }

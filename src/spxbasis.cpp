@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.12 2001/12/25 16:03:24 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.13 2001/12/26 12:58:58 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -23,7 +23,7 @@
 #include "didxset.h"
 #include "dvector.h"
 #include "soplex.h"
-#include "spxmessage.h"
+#include "message.h"
 
 namespace soplex
 {
@@ -469,21 +469,21 @@ int SPxBasis::isConsistent() const
    if (status() > NO_PROBLEM)
    {
       if (theLP == 0)
-         return SPXinconsistent("SPxBasis");
+         return MSGinconsistent("SPxBasis");
 
       if (theBaseId.size() != theLP->dim() || matrix.size() != theLP->dim())
-         return SPXinconsistent("SPxBasis");
+         return MSGinconsistent("SPxBasis");
 
       if (thedesc.nCols() != theLP->nCols() 
          || thedesc.nRows() != theLP->nRows())
-         return SPXinconsistent("SPxBasis");
+         return MSGinconsistent("SPxBasis");
 
       for (i = thedesc.nRows() - 1; i >= 0; --i)
       {
          if (thedesc.rowStatus(i) >= 0)
          {
             if (thedesc.rowStatus(i) != dualRowStatus(i))
-               return SPXinconsistent("SPxBasis");
+               return MSGinconsistent("SPxBasis");
          }
          else
             ++primals;
@@ -494,13 +494,13 @@ int SPxBasis::isConsistent() const
          if (thedesc.colStatus(i) >= 0)
          {
             if (thedesc.colStatus(i) != dualColStatus(i))
-               return SPXinconsistent("SPxBasis");
+               return MSGinconsistent("SPxBasis");
          }
          else
             ++primals;
       }
       if (primals != thedesc.nCols())
-         return SPXinconsistent("SPxBasis");
+         return MSGinconsistent("SPxBasis");
    }
    return thedesc.isConsistent()
           && theBaseId.isConsistent()

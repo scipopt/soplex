@@ -13,12 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.8 2001/12/25 16:03:24 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.9 2001/12/26 12:58:59 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
-#include "spxmessage.h"
+#include "message.h"
 #include "spxsteeppr.h"
 #include "random.h"
 
@@ -590,11 +590,11 @@ int SPxSteepPR::isConsistent() const
       int i;
       for (i = thesolver->dim() - 1; i >= 0; --i)
          if (coPenalty[i] < thesolver->epsilon())
-            return SPXinconsistent("SPxSteepPR");
+            return MSGinconsistent("SPxSteepPR");
 
       for (i = thesolver->coDim() - 1; i >= 0; --i)
          if (penalty[i] < thesolver->epsilon())
-            return SPXinconsistent("SPxSteepPR");
+            return MSGinconsistent("SPxSteepPR");
    }
    return 1;
 }

@@ -13,12 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.8 2001/12/26 12:49:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.9 2001/12/26 12:58:58 bzfkocht Exp $"
 
 #include <iostream>
 
 #include "spxhybridpr.h"
-#include "spxmessage.h"
+#include "message.h"
 
 namespace soplex
 {
@@ -29,7 +29,7 @@ int SPxHybridPR::isConsistent() const
       (thesolver != steep.solver() ||
          thesolver != devex.solver() ||
          thesolver != parmult.solver()))
-      return SPXinconsistent("SPxHybridPR");
+      return MSGinconsistent("SPxHybridPR");
 
    return steep.isConsistent()
           && devex.isConsistent()

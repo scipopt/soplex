@@ -13,10 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.7 2001/12/25 16:03:24 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.8 2001/12/26 12:58:58 bzfkocht Exp $"
 
 #include "spxdevexpr.h"
-#include "spxmessage.h"
+#include "message.h"
 
 namespace soplex
 {
@@ -33,7 +33,7 @@ int SPxDevexPR::isConsistent() const
    if (thesolver != 0)
       if (penalty.dim() != thesolver->coDim()
            || coPenalty.dim() != thesolver->dim())
-         return SPXinconsistent("SPxDevexPR");
+         return MSGinconsistent("SPxDevexPR");
 
    return 1;
 }

@@ -13,11 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dvector.cpp,v 1.7 2001/12/25 16:03:24 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dvector.cpp,v 1.8 2001/12/26 12:58:58 bzfkocht Exp $"
 
 
 #include "dvector.h"
-#include "spxmessage.h"
+#include "message.h"
 #include "spxalloc.h"
 
 namespace soplex
@@ -188,7 +188,7 @@ DVector::~DVector()
 int DVector::isConsistent() const
 {
    if (val != mem || dimen > memsize || dimen < 0)
-      return SPXinconsistent("DVector");
+      return MSGinconsistent("DVector");
 
    return Vector::isConsistent();
 }

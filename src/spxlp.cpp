@@ -13,12 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.cpp,v 1.7 2001/12/25 16:03:24 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.cpp,v 1.8 2001/12/26 12:58:58 bzfkocht Exp $"
 
 #include <stdio.h>
 
 #include "spxlp.h"
-#include "spxmessage.h"
+#include "message.h"
 
 namespace soplex
 {
@@ -701,9 +701,9 @@ int SPxLP::isConsistent() const
          const SVector& w = rowVector(v.index(j));
          n = w.number(i);
          if (n < 0)
-            return SPXinconsistent("SPxLP");
+            return MSGinconsistent("SPxLP");
          if (v.value(j) != w.value(n))
-            return SPXinconsistent("SPxLP");
+            return MSGinconsistent("SPxLP");
       }
    }
 
@@ -715,9 +715,9 @@ int SPxLP::isConsistent() const
          const SVector& w = colVector(v.index(j));
          n = w.number(i);
          if (n < 0)
-            return SPXinconsistent("SPxLP");
+            return MSGinconsistent("SPxLP");
          if (v.value(j) != w.value(n))
-            return SPXinconsistent("SPxLP");
+            return MSGinconsistent("SPxLP");
       }
    }
    return LPRowSet::isConsistent() && LPColSet::isConsistent();

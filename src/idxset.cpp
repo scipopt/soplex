@@ -13,10 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idxset.cpp,v 1.5 2001/12/25 16:03:24 bzfkocht Exp $"
+#pragma ident "@(#) $Id: idxset.cpp,v 1.6 2001/12/26 12:58:58 bzfkocht Exp $"
 
 #include "idxset.h"
-#include "spxmessage.h"
+#include "message.h"
 
 namespace soplex
 {
@@ -89,16 +89,16 @@ int IdxSet::isConsistent() const
    int i, j;
 
    if (len > 0 && idx == 0)
-      return SPXinconsistent("IdxSet");
+      return MSGinconsistent("IdxSet");
 
    for (i = 0; i < size(); ++i)
    {
       if (index(i) < 0)
-         return SPXinconsistent("IdxSet");
+         return MSGinconsistent("IdxSet");
 
       for (j = 0; j < i; ++j)
          if (index(i) == index(j))
-            return SPXinconsistent("IdxSet");
+            return MSGinconsistent("IdxSet");
    }
    return 1;
 }

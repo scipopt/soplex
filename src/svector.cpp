@@ -13,14 +13,14 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.cpp,v 1.6 2001/12/25 16:03:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svector.cpp,v 1.7 2001/12/26 12:58:59 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
 #include "svector.h"
 #include "ssvector.h"
-#include "spxmessage.h"
+#include "message.h"
 
 namespace soplex
 {
@@ -260,7 +260,7 @@ int SVector::isConsistent() const
    if (m_elem != 0)
    {
       if (size() > max()){
-         return SPXinconsistent("SVector");
+         return MSGinconsistent("SVector");
       }
       for (int i = 1; i < size(); ++i)
       {
@@ -268,7 +268,7 @@ int SVector::isConsistent() const
          {
             if (m_elem[i].idx == m_elem[j].idx &&
                 m_elem[i].idx != 0 ) { // allow trailing zeros
-               return SPXinconsistent("SVector");
+               return MSGinconsistent("SVector");
             }
          }
       }
