@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultpr.cpp,v 1.14 2004/11/05 20:11:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefaultpr.cpp,v 1.15 2004/11/09 17:10:44 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -42,7 +42,7 @@ int SPxDefaultPR::selectLeave()
 
       if (x < -theeps)
       {
-         cout << i << " " << x << "  " <<-theeps << std::endl;
+         //???wegstd::cout << i << " " << x << "  " <<-theeps << std::endl;
 
          // x *= EQ_PREF * (1 + (up[i] == low[i]));
          if (x < best)

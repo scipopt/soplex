@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfileio.cpp,v 1.4 2003/01/15 17:26:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfileio.cpp,v 1.5 2004/11/09 17:10:44 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -56,23 +56,6 @@ bool SPxSolver::writeBasisFile(
    return true;
 }
 
-
-bool SPxSolver::readFile( 
-   const char* filename, 
-   NameSet*    rowNames,
-   NameSet*    colNames, 
-   DIdxSet*    intVars)
-{
-   METHOD( "SPxSolver::readFile()" );
-
-   spxifstream file(filename);
-
-   if (!file)
-      return false;
-
-   return read(file, rowNames, colNames, intVars);
-}
-
 bool SPxLP::readFile( 
    const char* filename, 
    NameSet*    rowNames,
@@ -89,12 +72,13 @@ bool SPxLP::readFile(
    return read(file, rowNames, colNames, intVars);
 }
 
-void SPxSolver::dumpFile(const char* filename) const
+//@todo This should be named writeLPF ans have a similar signatur as writeMPS.
+void SPxLP::dumpFile(const char* filename) const
 {
-   METHOD( "SPxSolver::dumpFile()" );
+   METHOD( "SPxLP::dumpFile()" );
    std::ofstream file(filename);
 
-   if (file.good())
+   if (file)
       file << *this;
 }
 

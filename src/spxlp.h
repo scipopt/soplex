@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.34 2003/01/12 13:09:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.35 2004/11/09 17:10:44 bzfkocht Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -483,6 +483,8 @@ public:
       const NameSet* rowNames, const NameSet* colNames, 
       const DIdxSet* p_intvars = 0) const;
 
+   /// dump loaded LP to \p filename in LPF format.
+   virtual void dumpFile(const char* filename) const;
    //@}
 
 

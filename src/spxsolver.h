@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.16 2004/03/22 11:35:24 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.17 2004/11/09 17:10:44 bzfkocht Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -348,13 +348,6 @@ public:
 
    /// reload LP.
    virtual void reLoad();
-
-   /// load LP from \p filename in MPS or LPF format.
-   virtual bool readFile(const char* filename, NameSet* rowNames = 0,
-      NameSet* colNames = 0, DIdxSet* intVars = 0);
-
-   /// dump loaded LP to \p filename in LPF format.
-   virtual void dumpFile(const char* filename) const;
 
    /// clear all data in solver.
    virtual void clear();
