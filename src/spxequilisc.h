@@ -13,19 +13,18 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxequilisc.h,v 1.2 2002/04/10 07:13:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxequilisc.h,v 1.3 2003/01/05 19:03:16 bzfkocht Exp $"
 
 /**@file  spxequilisc.h
  * @brief LP euilibrium scaling.
  */
-#ifndef _SPXEQUILI_H_
-#define _SPXEQUILI_H_
+#ifndef _SPXEQUILISC_H_
+#define _SPXEQUILISC_H_
 
 #include <assert.h>
 
 #include "spxdefines.h"
 #include "spxscaler.h"
-#include "dataarray.h"
 
 namespace soplex
 {
@@ -34,21 +33,24 @@ namespace soplex
 
    This #SPxScaler implementation performs equilibrium scaling of the 
    LPs rows and columns.
-
-   @todo The type of scaling (row/column) is hard coded. This should
-         be selectable.
 */
-class SPxEquili : public SPxScaler
+class SPxEquiliSC : public SPxScaler
 {
+protected:
+   ///
+   virtual Real computeColscale(const SVector& col) const;
+   ///
+   virtual Real computeRowscale(const SVector& row) const;
+
 public:
    /// Scale the loaded #SPxLP.
-   virtual void scale();
+   virtual void scale(SPxLP& lp);
 
    /// default constructor.
-   explicit SPxEquili(bool colFirst = true, bool doBoth = true);
+   explicit SPxEquiliSC(bool colFirst = true, bool doBoth = true);
 };
 } // namespace soplex
-#endif // _SPXEQUILI_H_
+#endif // _SPXEQUILISC_H_
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:

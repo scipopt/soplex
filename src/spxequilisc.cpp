@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxequilisc.cpp,v 1.3 2002/05/01 08:18:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxequilisc.cpp,v 1.4 2003/01/05 19:03:16 bzfkocht Exp $"
 
 /**@file  spxequilisc.cpp
  * @brief Equilibrium row/column scaling.
@@ -36,52 +36,101 @@ static const char* makename(bool colFirst, bool doBoth)
    return name;
 }
 
-SPxEquili::SPxEquili(bool colFirst, bool doBoth)
+SPxEquiliSC::SPxEquiliSC(bool colFirst, bool doBoth)
    : SPxScaler(makename(colFirst, doBoth), colFirst, doBoth)
 {}
 
-void SPxEquili::scale() 
+
+Real SPxEquiliSC::computeColscale(const SVector& col) const
 {
-   assert(m_lp != 0);
-   assert(m_lp->isConsistent());
+   return col.maxAbs();
+}
+
+Real SPxEquiliSC::computeRowscale(const SVector& row) const
+{
+   return row.maxAbs();
+}
+
+void SPxEquiliSC::scale(SPxLP& lp) 
+{
+   VERBOSE2({ std::cout << "Equilibrium scaling LP" << std::endl; });   
+
+   VERBOSE3({ std::cout << "\tNon zero min= " << lp.minAbsNzo()
+                        << " max= " << lp.maxAbsNzo()
+                        << std::endl; });
+   
+   SPxScaler::scale(lp);
+
+   VERBOSE3({ std::cout << "\tRow scaling min= " << minAbsRowscale()
+                        << " max= " << maxAbsRowscale()
+                        << std::endl
+                        << "\tCol scaling min= " << minAbsColscale()
+                        << " max= " << maxAbsColscale()
+                        << std::endl
+                        << "\tNon zero min= " << lp.minAbsNzo()
+                        << " max= " << lp.maxAbsNzo()
+                        << std::endl; });
+}
+
+#if 0
+void SPxEquiliSC::scale(SPxLP& lp) 
+{
+   VERBOSE2({ std::cout << "Equilibrium scaling LP" << std::endl; });   
+
+   VERBOSE3({ std::cout << "\tNon zero min= " << lp.minAbsNzo()
+                        << " max= " << lp.maxAbsNzo()
+                        << std::endl; });
+   int i;
+
+   setup(lp);
 
    if (m_colFirst)
    {
-      int i;
-
-      for( i = 0; i < m_lp->nCols(); ++i )
+      for(i = 0; i < lp.nCols(); ++i )
       {
-         SVector& vec = m_lp->colVector_w(i);
+         SVector& vec = lp.colVector_w(i);
          Real     x   = vec.maxAbs();
 
          if (isZero(x))
             m_colscale[i] = 1.0;
          else
          {
-            Real y             = 1.0 / x;
-            m_colscale[i]      = y;
-            vec               *= y;
-            m_lp->maxObj_w(i) *= y;
+            Real y          = 1.0 / x;
+            m_colscale[i]   = y;
+            vec            *= y;
+            lp.maxObj_w(i) *= y;
 
-            if (m_lp->upper(i) < infinity)
-               m_lp->upper_w(i) *= x;
-            if (m_lp->lower(i) > -infinity)
-               m_lp->lower_w(i) *= x;
+            if (lp.upper(i) < infinity)
+               lp.upper_w(i) *= x;
+            if (lp.lower(i) > -infinity)
+               lp.lower_w(i) *= x;
          }
       }
       
-      for( i = 0; i < m_lp->nRows(); ++i )
+      for(i = 0; i < lp.nRows(); ++i )
       {
-         SVector& vec = m_lp->rowVector_w(i);
+         SVector& vec = lp.rowVector_w(i);
          Real     x   = 0.0;
          Real     y;
 
-         for( int j = 0; j < vec.size(); ++j )
+         for(int j = 0; j < vec.size(); ++j )
          {
             vec.value(j) *= m_colscale[vec.index(j)];
             y             = fabs(vec.value(j));
             x             = (x < y) ? y : x;
          }
+#if 0
+         if (lp.rhs(i) < infinity)
+         {
+            y = fabs(lp.rhs(i));
+            x = (x < y) ? y : x;
+         }
+         if (lp.lhs(i) > -infinity)
+         {
+            y = fabs(lp.lhs(i));
+            x = (x < y) ? y : x;
+         }
+#endif
          if (isZero(x) || !m_doBoth)
             m_rowscale[i] = 1.0;
          else
@@ -89,51 +138,60 @@ void SPxEquili::scale()
             y              = 1.0 / x;
             m_rowscale[i]  = y;
             vec           *= y;
-
-            if (m_lp->rhs(i) < infinity)
-               m_lp->rhs_w(i) *= y;
-            if (m_lp->lhs(i) > -infinity)
-               m_lp->lhs_w(i) *= y;
+            
+            if (lp.rhs(i) < infinity)
+               lp.rhs_w(i) *= y;
+            if (lp.lhs(i) > -infinity)
+               lp.lhs_w(i) *= y;
          }
       }
       if (m_doBoth)
       {
-         for( i = 0; i < m_lp->nCols(); ++i )
+         for(i = 0; i < lp.nCols(); ++i )
          {
-            SVector& vec = m_lp->colVector_w(i);
+            SVector& vec = lp.colVector_w(i);
             
-            for( int j = 0; j < vec.size(); ++j)
+            for(int j = 0; j < vec.size(); ++j)
                vec.value(j) *= m_rowscale[vec.index(j)];
          }
       }
    }
    else
    {
-      int i; 
-
-      for( i = 0; i < m_lp->nRows(); ++i )
+      for(i = 0; i < lp.nRows(); ++i )
       {
-         SVector& vec = m_lp->rowVector_w(i);
+         SVector& vec = lp.rowVector_w(i);
          Real     x   = vec.maxAbs();
-
+         Real     y;
+#if 0
+         if (lp.rhs(i) < infinity)
+         {
+            y = fabs(lp.rhs(i));
+            x = (x < y) ? y : x;
+         }
+         if (lp.lhs(i) > -infinity)
+         {
+            y = fabs(lp.lhs(i));
+            x = (x < y) ? y : x;
+         }
+#endif
          if (isZero(x))
             m_rowscale[i] = 1.0;
          else
          {
-            Real y        = 1.0 / x;
+            y             = 1.0 / x;
             m_rowscale[i] = y;
             vec          *= y;
 
-            if (m_lp->rhs(i) < infinity)
-               m_lp->rhs_w(i) *= y;
-            if (m_lp->lhs(i) > -infinity)
-               m_lp->lhs_w(i) *= y;
+            if (lp.rhs(i) < infinity)
+               lp.rhs_w(i) *= y;
+            if (lp.lhs(i) > -infinity)
+               lp.lhs_w(i) *= y;
          }
       }
-
-      for( i = 0; i < m_lp->nCols(); ++i )
+      for(i = 0; i < lp.nCols(); ++i )
       {
-         SVector& vec = m_lp->colVector_w(i);
+         SVector& vec = lp.colVector_w(i);
          Real     x   = 0;
          Real     y;
 
@@ -147,30 +205,42 @@ void SPxEquili::scale()
             m_colscale[i] = 1.0;
          else
          {
-            y                  = 1.0 / x;
-            m_colscale[i]      = y;
-            vec               *= y;
-            m_lp->maxObj_w(i) *= y;
+            y               = 1.0 / x;
+            m_colscale[i]   = y;
+            vec            *= y;
+            lp.maxObj_w(i) *= y;
 
-            if (m_lp->upper(i) < infinity)
-               m_lp->upper_w(i) *= x;
-            if (m_lp->lower(i) > -infinity)
-               m_lp->lower_w(i) *= x;
+            if (lp.upper(i) < infinity)
+               lp.upper_w(i) *= x;
+            if (lp.lower(i) > -infinity)
+               lp.lower_w(i) *= x;
          }
       }
       if (m_doBoth)
       {
-         for( i = 0; i < m_lp->nRows(); ++i )
+         for( i = 0; i < lp.nRows(); ++i )
          {
-            SVector& vec = m_lp->rowVector_w(i);
+            SVector& vec = lp.rowVector_w(i);
             
             for( int j = 0; j < vec.size(); ++j)
                vec.value(j) *= m_colscale[vec.index(j)];
          }
       }
    }
-   assert(m_lp->isConsistent());
+   assert(lp.isConsistent());
+
+   VERBOSE3({ std::cout << "\tRow scaling min= " << minAbsRowscale()
+                        << " max= " << maxAbsRowscale()
+                        << std::endl
+                        << "\tCol scaling min= " << minAbsColscale()
+                        << " max= " << maxAbsColscale()
+                        << std::endl
+                        << "\tNon zero min= " << lp.minAbsNzo()
+                        << " max= " << lp.maxAbsNzo()
+                        << std::endl; });
 }
+#endif
+
 } // namespace soplex
 
 //-----------------------------------------------------------------------------
@@ -181,3 +251,6 @@ void SPxEquili::scale()
 //Emacs indent-tabs-mode:nil
 //Emacs End:
 //-----------------------------------------------------------------------------
+
+
+

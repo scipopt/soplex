@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxparmultpr.cpp,v 1.12 2002/12/08 11:09:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxparmultpr.cpp,v 1.13 2003/01/05 19:03:17 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -27,16 +27,16 @@ namespace soplex
 
 int SPxParMultPR::partialSize = 17;
 
-void SPxParMultPR::setType(SoPlex::Type tp)
+void SPxParMultPR::setType(SPxSolver::Type tp)
 {
-   if (tp == SoPlex::ENTER)
+   if (tp == SPxSolver::ENTER)
    {
       used = 0;
-      thesolver->setPricing(SoPlex::PARTIAL);
+      thesolver->setPricing(SPxSolver::PARTIAL);
    }
    else
    {
-      thesolver->setPricing(SoPlex::FULL);
+      thesolver->setPricing(SPxSolver::FULL);
    }
 
    last = 0;
@@ -44,7 +44,7 @@ void SPxParMultPR::setType(SoPlex::Type tp)
    min = partialSize / 2;
 }
 
-void SPxParMultPR::load(SoPlex* p_solver)
+void SPxParMultPR::load(SPxSolver* p_solver)
 {
    thesolver = p_solver;
    multiParts = (thesolver->dim() + thesolver->coDim()) / partialSize + 1;
@@ -62,7 +62,7 @@ SPxId SPxParMultPR::selectEnter()
    assert(thesolver != 0);
    int lastlast = -1;
 
-   if (thesolver->pricing() == SoPlex::PARTIAL)
+   if (thesolver->pricing() == SPxSolver::PARTIAL)
    {
       Real val;
       Real eps = -theeps;
@@ -146,7 +146,7 @@ SPxId SPxParMultPR::selectEnter()
 
    else
    {
-      assert(thesolver->pricing() == SoPlex::FULL);
+      assert(thesolver->pricing() == SPxSolver::FULL);
       Real bestx = -theeps;
       for (i = thesolver->dim() - 1; i >= 0; --i)
       {

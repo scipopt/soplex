@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.cpp,v 1.20 2002/12/08 11:09:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.cpp,v 1.21 2003/01/05 19:03:18 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -179,11 +179,9 @@ void SVSet::remove(const DataKey& removekey)
    {
       SVector* prev = ps->prev();
       int sz = prev->size();
-      prev->setMem (prev->max()
-                     + ps->max() + 2, prev->mem());
+      prev->setMem (prev->max() + ps->max() + 2, prev->mem());
       prev->set_size(sz);
    }
-
    list.remove(ps);
    set.remove(removekey);
 }
@@ -191,6 +189,7 @@ void SVSet::remove(const DataKey& removekey)
 void SVSet::remove(int perm[])
 {
    int j = num();
+
    for (int i = 0; i < j; ++i)
    {
       if (perm[i] < 0)
@@ -207,11 +206,9 @@ void SVSet::remove(int perm[])
             prev->setMem (prev->max() + ps->max() + 2, prev->mem());
             prev->set_size(sz);
          }
-
          list.remove(ps);
       }
    }
-
    set.remove(perm);
 }
 

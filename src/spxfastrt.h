@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.h,v 1.12 2002/12/08 11:09:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfastrt.h,v 1.13 2003/01/05 19:03:16 bzfkocht Exp $"
 
 /**@file  spxfastrt.h
  * @brief Fast shifting ratio test.
@@ -166,13 +166,13 @@ private:
 
 public:
    ///
-   virtual void load(SoPlex* solver);
+   virtual void load(SPxSolver* solver);
    ///
    virtual int selectLeave(Real& val);
    ///
    virtual SPxId selectEnter(Real& val);
    ///
-   virtual void setType(SoPlex::Type);
+   virtual void setType(SPxSolver::Type);
    /// default constructor
    SPxFastRT() 
       : SPxRatioTester()

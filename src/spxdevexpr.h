@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.h,v 1.14 2002/12/08 11:09:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.h,v 1.15 2003/01/05 19:03:16 bzfkocht Exp $"
 
 /**@file  spxdevexpr.h
  * @brief Devex pricer.
@@ -61,11 +61,11 @@ private:
 
 public:
    ///
-   virtual void load(SoPlex* base);
+   virtual void load(SPxSolver* base);
    ///
-   virtual void setType(SoPlex::Type);
+   virtual void setType(SPxSolver::Type);
    ///
-   virtual void setRep(SoPlex::Representation);
+   virtual void setRep(SPxSolver::Representation);
    ///
    virtual int selectLeave();
    ///

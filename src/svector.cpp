@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.cpp,v 1.17 2002/09/09 13:01:19 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svector.cpp,v 1.18 2003/01/05 19:03:18 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -120,6 +120,7 @@ Real SVector::length2() const
 
 Real SVector::maxAbs() const
 {
+#if 0 // old
    Real x = 0;
    int n = size();
    const Element* e = m_elem;
@@ -129,20 +130,43 @@ Real SVector::maxAbs() const
       e++;
    }
    return x;
+#else // new
+   Real maxi = 0.0;
+
+   for(int i = 0; i < size(); ++i)
+      if (fabs(m_elem[i].val) > maxi)
+         maxi = fabs(m_elem[i].val);
+
+   assert(maxi >= 0.0);
+
+   return maxi;
+#endif 
 }
 
 Real SVector::minAbs() const
 {
+#if 0 // old
    Real           x = infinity;
    int            n = size();
    const Element* e = m_elem;
 
    while (n--)
-   {
+   { //    vvvvvvvvvv bug
       x = (e->val < x) ? e->val : ((-e->val < x) ? -e->val : x);
       e++;
    }
    return x;
+#else // new
+   Real mini = infinity;
+
+   for(int i = 0; i < size(); ++i)
+      if (fabs(m_elem[i].val) < mini)
+         mini = fabs(m_elem[i].val);
+
+   assert(mini >= 0.0);
+
+   return mini;
+#endif
 }
 
 SVector& SVector::operator*=(Real x)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.22 2002/12/08 11:09:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.23 2003/01/05 19:03:16 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -1182,7 +1182,7 @@ SPxId SPxFastRT::selectEnter(Real& val)
    return enterId;
 }
 
-void SPxFastRT::load(SoPlex* spx)
+void SPxFastRT::load(SPxSolver* spx)
 {
    thesolver = spx;
    setType(spx->type());
@@ -1191,7 +1191,7 @@ void SPxFastRT::load(SoPlex* spx)
 /**@todo suspicious: Why is the type never used? 
  *       This holds for all implementations of SPxRatioTester!
  */
-void SPxFastRT::setType(SoPlex::Type)
+void SPxFastRT::setType(SPxSolver::Type)
 {
    minStab = MINSTAB;
    delta = thesolver->delta();

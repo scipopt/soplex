@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.17 2002/12/08 11:09:21 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.18 2003/01/05 19:03:16 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -21,7 +21,7 @@
 
 #include "spxdefines.h"
 #include "spxbasis.h"
-#include "soplex.h"
+#include "spxsolver.h"
 
 namespace soplex
 {
@@ -68,7 +68,7 @@ void SPxBasis::addedRows(int n)
    {
       reDim();
       
-      if (theLP->rep() == SoPlex::COLUMN)
+      if (theLP->rep() == SPxSolver::COLUMN)
       {
          /* I think, after adding rows in column representation,
             reDim should set these bools to false. */
@@ -87,7 +87,7 @@ void SPxBasis::addedRows(int n)
       }
       else
       {
-         assert(theLP->rep() == SoPlex::ROW);
+         assert(theLP->rep() == SPxSolver::ROW);
 
          for (int i = theLP->nRows() - n; i < theLP->nRows(); ++i)
             thedesc.rowStatus(i) = dualRowStatus(i);
@@ -125,7 +125,7 @@ void SPxBasis::removedRow(int i)
 
    std::cout << "== removedRow ==" << std::endl;
 
-   if (theLP->rep() == SoPlex::ROW)
+   if (theLP->rep() == SPxSolver::ROW)
    {
       if (theLP->isBasic(thedesc.rowStatus(i)))
       {
@@ -137,7 +137,7 @@ void SPxBasis::removedRow(int i)
    }
    else
    {
-      assert(theLP->rep() == SoPlex::COLUMN);
+      assert(theLP->rep() == SPxSolver::COLUMN);
       factorized = false;
       if (!theLP->isBasic(thedesc.rowStatus(i)))
       {
@@ -176,7 +176,7 @@ void SPxBasis::removedRows(const int perm[])
 
    std::cout << "== removedRows ==" << std::endl;
 
-   if (theLP->rep() == SoPlex::ROW)
+   if (theLP->rep() == SPxSolver::ROW)
    {
       for (i = 0; i < n; ++i)
       {
@@ -198,7 +198,7 @@ void SPxBasis::removedRows(const int perm[])
    }
    else
    {
-      assert(theLP->rep() == SoPlex::COLUMN);
+      assert(theLP->rep() == SPxSolver::COLUMN);
 
       factorized    = false;
       matrixIsSetup = false;
@@ -266,7 +266,7 @@ void SPxBasis::addedCols(int n)
    {
       reDim();
       
-      if (theLP->rep() == SoPlex::ROW)
+      if (theLP->rep() == SPxSolver::ROW)
       {
          /* I think, after adding columns in row representation,
             reDim should set these bools to false. */
@@ -285,7 +285,7 @@ void SPxBasis::addedCols(int n)
       }
       else
       {
-         assert(theLP->rep() == SoPlex::COLUMN);
+         assert(theLP->rep() == SPxSolver::COLUMN);
          for (int i = theLP->nCols() - n; i < theLP->nCols(); ++i)
             thedesc.colStatus(i) = primalColStatus(i, theLP);
       }
@@ -320,14 +320,14 @@ void SPxBasis::removedCol(int i)
 
    std::cout << "== removedCol ==" << std::endl;
 
-   if (theLP->rep() == SoPlex::COLUMN)
+   if (theLP->rep() == SPxSolver::COLUMN)
    {
       if (theLP->isBasic(thedesc.colStatus(i)))
          setStatus(NO_PROBLEM);
    }
    else
    {
-      assert(theLP->rep() == SoPlex::ROW);
+      assert(theLP->rep() == SPxSolver::ROW);
       factorized = false;
       if (!theLP->isBasic(thedesc.colStatus(i)))
          setStatus(NO_PROBLEM);
@@ -364,7 +364,7 @@ void SPxBasis::removedCols(const int perm[])
    int i;
    int n = thedesc.nCols();
 
-   if (theLP->rep() == SoPlex::COLUMN)
+   if (theLP->rep() == SPxSolver::COLUMN)
    {
       for (i = 0; i < n; ++i)
       {
@@ -379,7 +379,7 @@ void SPxBasis::removedCols(const int perm[])
    }
    else
    {
-      assert(theLP->rep() == SoPlex::ROW);
+      assert(theLP->rep() == SPxSolver::ROW);
       factorized = matrixIsSetup = false;
       for (i = 0; i < n; ++i)
       {

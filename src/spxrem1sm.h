@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxrem1sm.h,v 1.8 2002/04/14 12:41:54 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxrem1sm.h,v 1.9 2003/01/05 19:03:17 bzfkocht Exp $"
 
 /**@file  spxrem1sm.h
  * @brief Remove singletons from LP.
@@ -28,20 +28,54 @@
 
 namespace soplex
 {
-/**@brief   LP simplifier for removing row/column singletons.
+/**@brief   LP simplifier for removing uneccessary row/columns
    @ingroup Algo
 
-   This #SPxSimplifier removes rows and possibly columns containing one
-   nonzero value only. Also empty rows and columns are removed.
+   This #SPxSimplifier only removes rows and columns.
+   For example those who containing one nonzero value only. 
+   Also empty rows and columns are removed.   
 */
 class SPxRem1SM : public SPxSimplifier
 {
-public:
-   /// Remove singletons from the LP.
-   int simplify();
+private:
+   DVector        prim;   ///< unsimplified primal solution vector.
+   DVector        dual;   ///< unsimplified dual solution vector.
+   DataArray<int> cperm;  ///< column permutation vector.
+   DataArray<int> rperm;  ///< row permutation vector.
+   DSVector       pval;   ///< fixed variable values.
 
-   /// Reverse the doings of #simplify().
-   void unsimplify();
+private:
+   ///
+   void fixColumn(SPxLP& lp, int i);
+   ///
+   bool removeRows(SPxLP& lp, DataArray<int>& rem, int num, const char* msg);
+   ///
+   bool removeCols(SPxLP& lp, DataArray<int>& rem, int num, const char* msg);
+   ///
+   Result redundantRows(SPxLP& lp, bool& again);
+   ///
+   Result redundantCols(SPxLP& lp, bool& again);
+   ///
+   Result simpleRows(SPxLP& lp, bool& again);
+   ///
+   Result simpleCols(SPxLP& lp, bool& again);
+   ///
+   Real epsilonSimplifier() const;
+
+public:
+   /// default constructor
+   SPxRem1SM() 
+      : SPxSimplifier("Rem1")
+   {}   
+   /// destructor.
+   virtual ~SPxRem1SM()
+   {}  
+   /// Remove singletons from the LP.
+   virtual Result simplify(SPxLP& lp);
+   /// returns a reference to the unsimplified primal solution.
+   virtual const Vector& unsimplifiedPrimal(const Vector& x);
+   /// returns a reference to the unsimplified dual solution. 
+   virtual const Vector& unsimplifiedDual(const Vector& pi);
 };
 } // namespace soplex
 #endif // _SPXREM1SM_H_

@@ -13,10 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: message.cpp,v 1.5 2002/05/15 13:38:43 bzfpfend Exp $"
+#pragma ident "@(#) $Id: message.cpp,v 1.6 2003/01/05 19:03:16 bzfkocht Exp $"
 
 #include <iostream>
 #include <assert.h>
+
+#include "message.h"
 
 namespace soplex
 {

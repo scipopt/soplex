@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.31 2002/12/08 11:09:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.32 2003/01/05 19:03:17 bzfkocht Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -39,7 +39,7 @@
 
 namespace soplex
 {
-class SoPlex;
+class SPxSolver;
 
 /**@brief   Saving LPs in a form suitable for SoPlex.
    @ingroup Algo
@@ -71,7 +71,8 @@ class SPxLP : protected LPRowSet, protected LPColSet
 {  
    friend class SPxBasis;
    friend class SPxScaler;
-   friend class SPxEquili;
+   friend class SPxEquiliSC;
+   friend class SPxIntervalSM;
 
    /// output operator.
    friend std::ostream& operator<<(std::ostream& os, const SPxLP& lp);
@@ -110,6 +111,11 @@ public:
 
    /// number of nonzeros in LP.
    int nNzos() const;
+
+   /// absolute smallest non-zero element in LP. 
+   Real minAbsNzo() const;
+   /// absolute biggest non-zero element in LP.
+   Real maxAbsNzo() const;
 
    /// gets \p i 'th row.
    void getRow(int i, LPRow& row) const;
@@ -213,13 +219,13 @@ public:
    /// returns objective value of column \p i.
    Real obj(int i) const
    {
-      return spxSense() * maxObj(i);
+      return Real(spxSense()) * maxObj(i);
    }
 
    /// returns objective value of column with identifier \p id.
    Real obj(const SPxColId& id) const
    {
-      return spxSense() * maxObj(id);
+      return Real(spxSense()) * maxObj(id);
    }
 
    /// returns objective vector for maximization problem.
@@ -456,6 +462,10 @@ public:
 
    /**@name IO */
    //@{
+   /// reads a file from a file.
+   virtual bool readFile(const char* filename, NameSet* rowNames = 0, 
+      NameSet* colNames = 0, DIdxSet* intVars = 0);
+
    /// reads a file from input stream \p in.
    virtual bool read (std::istream& in, 
       NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);

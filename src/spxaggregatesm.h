@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxaggregatesm.h,v 1.9 2002/03/03 13:50:33 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxaggregatesm.h,v 1.10 2003/01/05 19:03:16 bzfkocht Exp $"
 
 /**@file  spxaggregatesm.h
  * @brief LP variable aggregation.
@@ -40,20 +40,22 @@ private:
    Real maxFill;     ///< ???  
 
    /// ???
-   int eliminate(const SVector& row, Real b);
+   int eliminate(SPxLP& lp, const SVector& row, Real b);
 
 public:
-   /// Aggregate variable.
-   int simplify();
-
-   /// Undo #simplify().
-   void unsimplify();
-
-   /// objective value for unsimplified LP.
-   Real value(Real x)
-   {
-      return x + lp->spxSense()*delta;
-   }
+   /// default constructor
+   SPxAggregateSM() 
+      : SPxSimplifier("Aggregate")
+   {}   
+   /// destructor.
+   virtual ~SPxAggregateSM()
+   {}  
+   /// Aggregate variables.
+   virtual Result simplify(SPxLP& lp);
+   /// returns a reference to the unsimplified primal solution.
+   virtual const Vector& unsimplifiedPrimal(const Vector& x);
+   /// returns a reference to the unsimplified dual solution. 
+   virtual const Vector& unsimplifiedDual(const Vector& pi);
 };
 } // namespace soplex
 #endif // _SPXAGGREGATESM_H_

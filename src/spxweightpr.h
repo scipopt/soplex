@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightpr.h,v 1.12 2002/03/21 16:06:19 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightpr.h,v 1.13 2003/01/05 19:03:17 bzfkocht Exp $"
 
 /**@file  spxweightpr.h
  * @brief Weighted pricing.
@@ -61,11 +61,11 @@ private:
 
 public:
    ///
-   virtual void load(SoPlex* base);
+   virtual void load(SPxSolver* base);
    ///
-   void setType(SoPlex::Type tp);
+   void setType(SPxSolver::Type tp);
    ///
-   void setRep(SoPlex::Representation rep);
+   void setRep(SPxSolver::Representation rep);
    ///
    virtual int selectLeave();
    ///

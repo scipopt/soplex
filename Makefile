@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.47 2002/12/08 11:09:20 bzfkocht Exp $
+# $Id: Makefile,v 1.48 2003/01/05 19:03:15 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -51,11 +51,11 @@ LIBOBJ		= 	changesoplex.o didxset.o \
 			spxbasis.o spxbounds.o spxchangebasis.o \
 			spxequilisc.o spxdefaultpr.o spxdefaultrt.o \
 			spxdefines.o spxdesc.o spxdevexpr.o \
-			spxfastrt.o spxfileio.o spxgeneralsm.o \
-			spxharrisrt.o spxhybridpr.o spxid.o spxio.o spxlp.o \
-			spxlpfread.o spxmpsread.o spxmpswrite.o \
-			spxparmultpr.o spxquality.o spxredundantsm.o \
-			spxrem1sm.o \
+			spxfastrt.o spxfileio.o spxgeneralsm.o spxgeometsc.o \
+			spxharrisrt.o spxhybridpr.o spxid.o spxintervalsm.o spxio.o \
+			spxlp.o spxlpfread.o spxmpsread.o spxmpswrite.o \
+			spxparmultpr.o spxquality.o \
+			spxredundantsm.o spxrem1sm.o \
 			spxscaler.o spxshift.o spxsolver.o spxsolve.o \
 			spxstarter.o spxsteeppr.o spxsumst.o spxvecs.o \
 			spxvectorst.o spxweightpr.o spxweightst.o \
@@ -63,7 +63,6 @@ LIBOBJ		= 	changesoplex.o didxset.o \
 			svset.o timer.o unitvector.o update.o updatevector.o \
 			vector.o vsolve.o \
 			gzstream.o
-
 OBJECT		=	example.o
 REPOSIT		=	# template repository, explicitly empty
 
@@ -152,7 +151,7 @@ depend:
 		| sed '\''s|^\([0-9A-z]\{1,\}\)\.o|$$\(OBJDIR\)/\1.o|g'\'' \
 		>$(DEPEND)'
 
-include		$(DEPEND)
+-include	$(DEPEND)
 
 $(OBJDIR)/%.o:	$(SRCDIR)/%.cpp
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@

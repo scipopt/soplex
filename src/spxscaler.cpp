@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscaler.cpp,v 1.4 2002/12/16 07:50:55 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscaler.cpp,v 1.5 2003/01/05 19:03:17 bzfkocht Exp $"
 
 /**@file  spxscaler.cpp
  * @brief LP scaling base class.
@@ -28,25 +28,17 @@ namespace soplex
 
 std::ostream& operator<<(std::ostream& s, const SPxScaler& sc)
 {
-   int i;
-
-   s << sc.getName() << " scaler:";
-
-   if (sc.m_lp == 0)
-      s << "not initialised" << std::endl;
-   else
-   {
-      s << std::endl;
-      s << "colscale = [ ";
-      for( i = 0; i < sc.m_lp->nCols(); i++ )
-         s << sc.m_colscale[i] << " ";
-      s << "]" << std::endl;
+   s << sc.getName() << " scaler:" << std::endl;
+   s << "colscale = [ ";
+   for(int i = 0; i < sc.m_colscale.size(); ++i )
+      s << sc.m_colscale[i] << " ";
+   s << "]" << std::endl;
       
-      s << "rowscale = [ ";
-      for( i = 0; i < sc.m_lp->nRows(); i++ )
-         s << sc.m_rowscale[i] << " ";
-      s << "]" << std::endl;
-   }
+   s << "rowscale = [ ";
+   for(int i = 0; i < sc.m_rowscale.size(); ++i )
+      s << sc.m_rowscale[i] << " ";
+   s << "]" << std::endl;
+
    return s;
 }
 
@@ -55,16 +47,41 @@ SPxScaler::SPxScaler(
    bool        colFirst, 
    bool        doBoth) 
    : m_name(name)
-   , m_lp(0)
    , m_colFirst(colFirst)
    , m_doBoth(doBoth)
-{}
+{
+   assert(SPxScaler::isConsistent());
+}
+
+SPxScaler::SPxScaler(const SPxScaler& old)
+   : m_name(old.m_name)
+   , m_colscale(old.m_colscale)
+   , m_rowscale(old.m_rowscale)
+   , m_colFirst(old.m_colFirst)
+   , m_doBoth(old.m_doBoth)
+{
+   assert(SPxScaler::isConsistent());
+}
 
 SPxScaler::~SPxScaler()
 {
    m_name = 0;
-   m_lp   = 0;
 }   
+
+SPxScaler& SPxScaler::operator=(const SPxScaler& rhs)
+{
+   if (this != &rhs)
+   {
+      m_name     = rhs.m_name;
+      m_colscale = rhs.m_colscale;
+      m_rowscale = rhs.m_rowscale;
+      m_colFirst = rhs.m_colFirst;
+      m_doBoth   = rhs.m_doBoth;
+
+      assert(SPxScaler::isConsistent());
+   }
+   return *this;
+}
 
 const char* SPxScaler::getName() const
 {
@@ -81,171 +98,203 @@ void SPxScaler::setBoth(bool both)
    m_doBoth = both;
 }
 
-void SPxScaler::setLP(SPxLP* lp)
+void SPxScaler::setup(SPxLP& lp)
 {
-   assert(lp != 0);
+   assert(lp.isConsistent());
 
-   if (m_lp != lp)
-   {
-      m_lp = lp;
+   m_colscale.reSize(lp.nCols());
+   m_rowscale.reSize(lp.nRows());
 
-      m_colscale.reSize(m_lp->nCols());
-      m_rowscale.reSize(m_lp->nRows());
-   }
    int i;
 
-   for( i = 0; i < m_lp->nCols(); i++ )
+   for(i = 0; i < lp.nCols(); ++i )
       m_colscale[i] = 1.0;
 
-   for( i = 0; i < m_lp->nRows(); i++ )
+   for(i = 0; i < lp.nRows(); ++i )
       m_rowscale[i] = 1.0;
 }
 
-void SPxScaler::unscale()
+void SPxScaler::scale(SPxLP& lp) 
 {
-   assert(m_lp != 0);
-   assert(m_lp->isConsistent());
-
    int i;
-   int j;
 
-   for( i = 0; i < m_lp->nRows(); ++i )
+   setup(lp);
+
+   if (m_colFirst)
    {
-      SVector& vec = m_lp->rowVector_w(i);
+      for(i = 0; i < lp.nCols(); ++i )
+      {
+         SVector& vec = lp.colVector_w(i);
+         Real     x   = computeColscale(vec); 
 
-      for( j = 0; j < vec.size(); ++j )
-         vec.value(j) /= m_colscale[vec.index(j)];
+         if (isZero(x))
+            m_colscale[i] = 1.0;
+         else
+         {
+            Real y          = 1.0 / x;
+            m_colscale[i]   = y;
+            vec            *= y;
+            lp.maxObj_w(i) *= y;
 
-      Real y = 1.0 / m_rowscale[i];
-
-      vec *= y;
-
-      if (m_lp->rhs(i) < infinity)
-         m_lp->rhs_w(i) *= y;
-
-      if (m_lp->lhs(i) > -infinity)
-         m_lp->lhs_w(i) *= y;
-   }
-   for( i = 0; i < m_lp->nCols(); ++i )
-   {
-      SVector& vec = m_lp->colVector_w(i);
-
-      vec *= 1.0 / m_colscale[i];
-
-      for( j = 0; j < vec.size(); ++j )
-         vec.value(j) /= m_rowscale[vec.index(j)];
-
-      m_lp->maxObj_w(i) /= m_colscale[i];
-
-      if (m_lp->upper(i) < infinity)
-         m_lp->upper_w(i) *= m_colscale[i];
-
-      if (m_lp->lower(i) > -infinity)
-         m_lp->lower_w(i) *= m_colscale[i];
-   }
-   assert(m_lp->isConsistent());
-}
-
-void SPxScaler::unscaleSolution(Vector& usol) const
-{
-   assert(m_lp       != 0);
-   assert(usol.dim() == m_lp->nCols());
-
-   for( int i = 0; i < m_lp->nCols(); ++i )
-      usol[i] *= m_colscale[i];
-}
-
-void SPxScaler::unscaledMaxObj(Vector& uobj) const
-{
-   assert(m_lp       != 0);
-   assert(uobj.dim() == m_lp->nCols());
-
-   uobj = m_lp->maxObj();
-
-   for( int i = 0; i < m_lp->nCols(); ++i )
-      uobj[i] *= 1.0 / m_colscale[i];   
-}
-
-void SPxScaler::unscaledLower(Vector& ulower) const
-{
-   assert(m_lp         != 0);
-   assert(ulower.dim() == m_lp->nCols());
-
-   ulower = m_lp->lower();
-
-   for( int i = 0; i < m_lp->nCols(); ++i )
-      if (ulower[i] > -infinity)
-         ulower[i] *= m_colscale[i];   
-}
-
-void SPxScaler::unscaledUpper(Vector& uupper) const
-{
-   assert(m_lp         != 0);
-   assert(uupper.dim() == m_lp->nCols());
-
-   uupper = m_lp->upper();
-
-   for( int i = 0; i < m_lp->nCols(); ++i )
-      if (uupper[i] < infinity)
-         uupper[i] *= m_colscale[i];   
-}
-
-void SPxScaler::unscaledLhs(Vector& ulhs) const
-{ 
-   assert(m_lp       != 0);
-   assert(ulhs.dim() == m_lp->nRows());
-
-   ulhs = m_lp->lhs();
-
-   for( int i = 0; i < m_lp->nRows(); ++i )
-      if (ulhs[i] > -infinity)
-         ulhs[i] *= 1.0 / m_rowscale[i];   
-}
-
-void SPxScaler::unscaledRhs(Vector& urhs) const
-{
-   assert(m_lp       != 0);
-   assert(urhs.dim() == m_lp->nRows());
-
-   urhs = m_lp->rhs();
-
-   for( int i = 0; i < m_lp->nRows(); ++i )
-      if (urhs[i] < infinity)
-         urhs[i] *= 1.0 / m_rowscale[i];   
-}
-
-void SPxScaler::unscaledRowVector(int row, DSVector& uvec) const
-{
-   assert(m_lp != 0);
-   assert(row  >= 0);
-   assert(row  <  m_lp->nRows());
-
-   uvec  = m_lp->rowVector( row );
-   uvec *= 1.0 / m_rowscale[row];
-   
-   for( int i = 0; i < uvec.size(); ++i )
-   {
-      assert(uvec.index(i) < m_lp->nCols());
+            if (lp.upper(i) < infinity)
+               lp.upper_w(i) *= x;
+            if (lp.lower(i) > -infinity)
+               lp.lower_w(i) *= x;
+         }
+      }
       
-      uvec.value(i) *= 1.0 / m_colscale[uvec.index(i)];   
+      for(i = 0; i < lp.nRows(); ++i )
+      {
+         SVector& vec = lp.rowVector_w(i);
+
+         for(int j = 0; j < vec.size(); ++j )
+            vec.value(j) *= m_colscale[vec.index(j)];
+
+         Real x = computeRowscale(vec);
+
+         if (isZero(x) || !m_doBoth)
+            m_rowscale[i] = 1.0;
+         else
+         {
+            Real y         = 1.0 / x;
+            m_rowscale[i]  = y;
+            vec           *= y;
+            
+            if (lp.rhs(i) < infinity)
+               lp.rhs_w(i) *= y;
+            if (lp.lhs(i) > -infinity)
+               lp.lhs_w(i) *= y;
+         }
+      }
+      if (m_doBoth)
+      {
+         for(i = 0; i < lp.nCols(); ++i )
+         {
+            SVector& vec = lp.colVector_w(i);
+            
+            for(int j = 0; j < vec.size(); ++j)
+               vec.value(j) *= m_rowscale[vec.index(j)];
+         }
+      }
    }
+   else
+   {
+      for(i = 0; i < lp.nRows(); ++i )
+      {
+         SVector& vec = lp.rowVector_w(i);
+         Real     x   = computeRowscale(vec); // vec.maxAbs();
+
+         if (isZero(x))
+            m_rowscale[i] = 1.0;
+         else
+         {
+            Real y        = 1.0 / x;
+            m_rowscale[i] = y;
+            vec          *= y;
+
+            if (lp.rhs(i) < infinity)
+               lp.rhs_w(i) *= y;
+            if (lp.lhs(i) > -infinity)
+               lp.lhs_w(i) *= y;
+         }
+      }
+      for(i = 0; i < lp.nCols(); ++i )
+      {
+         SVector& vec = lp.colVector_w(i);
+
+         for( int j = 0; j < vec.size(); ++j)
+            vec.value(j) *= m_rowscale[vec.index(j)];
+
+         Real x = computeColscale(vec);
+
+         if (isZero(x) || !m_doBoth)
+            m_colscale[i] = 1.0;
+         else
+         {
+            Real y          = 1.0 / x;
+            m_colscale[i]   = y;
+            vec            *= y;
+            lp.maxObj_w(i) *= y;
+
+            if (lp.upper(i) < infinity)
+               lp.upper_w(i) *= x;
+            if (lp.lower(i) > -infinity)
+               lp.lower_w(i) *= x;
+         }
+      }
+      if (m_doBoth)
+      {
+         for( i = 0; i < lp.nRows(); ++i )
+         {
+            SVector& vec = lp.rowVector_w(i);
+            
+            for( int j = 0; j < vec.size(); ++j)
+               vec.value(j) *= m_colscale[vec.index(j)];
+         }
+      }
+   }
+   assert(lp.isConsistent());
 }
 
-void SPxScaler::unscaledColVector(int col, DSVector& uvec) const
+void SPxScaler::unscalePrimal(Vector& x) const
 {
-   assert(m_lp != 0);
-   assert(col  >= 0);
-   assert(col  <  m_lp->nCols());
+   assert(x.dim() == m_colscale.size());
 
-   uvec  = m_lp->colVector( col );
-   uvec *= 1.0 / m_colscale[col];
+   for(int i = 0; i < x.dim(); ++i )
+      x[i] *= m_colscale[i];
+}
 
-   for( int i = 0; i < uvec.size(); ++i )
-   {
-      assert(uvec.index(i) < m_lp->nRows());
-      
-      uvec.value(i) *= 1.0 / m_rowscale[uvec.index(i)];   
-   }
+void SPxScaler::unscaleDual(Vector& pi) const
+{
+   assert(pi.dim() == m_rowscale.size());
+
+   ///@todo is this correct ?
+   for(int i = 0; i < pi.dim(); ++i )
+      pi[i] *= m_rowscale[i];
+}
+
+Real SPxScaler::minAbsColscale() const
+{
+   Real mini = infinity;
+
+   for(int i = 0; i < m_colscale.size(); ++i)
+      if (fabs(m_colscale[i]) < mini)
+         mini = fabs(m_colscale[i]);
+
+   return mini;
+}
+
+Real SPxScaler::maxAbsColscale() const
+{
+   Real maxi = 0.0;
+
+   for(int i = 0; i < m_colscale.size(); ++i)
+      if (fabs(m_colscale[i]) > maxi)
+         maxi = fabs(m_colscale[i]);
+
+   return maxi;
+}
+
+Real SPxScaler::minAbsRowscale() const
+{
+   Real mini = infinity;
+
+   for(int i = 0; i < m_rowscale.size(); ++i)
+      if (fabs(m_rowscale[i]) < mini)
+         mini = fabs(m_rowscale[i]);
+
+   return mini;
+}
+
+Real SPxScaler::maxAbsRowscale() const
+{
+   Real maxi = 0.0;
+
+   for(int i = 0; i < m_rowscale.size(); ++i)
+      if (fabs(m_rowscale[i]) > maxi)
+         maxi = fabs(m_rowscale[i]);
+
+   return maxi;
 }
 
 bool SPxScaler::isConsistent() const

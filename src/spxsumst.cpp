@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsumst.cpp,v 1.7 2002/05/15 13:38:44 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsumst.cpp,v 1.8 2003/01/05 19:03:17 bzfkocht Exp $"
 
 #include <iostream>
 
@@ -24,7 +24,7 @@
 namespace soplex
 {
 
-void SPxSumST::setupWeights(SoPlex& base)
+void SPxSumST::setupWeights(SPxSolver& base)
 {
    int count;
    int i;

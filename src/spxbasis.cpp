@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.36 2002/12/12 09:48:53 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.37 2003/01/05 19:03:16 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -24,7 +24,7 @@
 #include "spxbasis.h"
 #include "didxset.h"
 #include "dvector.h"
-#include "soplex.h"
+#include "spxsolver.h"
 #include "mpsinput.h"
 #include "message.h"
 
@@ -188,7 +188,7 @@ void SPxBasis::setRep()
    reDim();
    minStab = 0.0;
 
-   if (theLP->rep() == SoPlex::ROW)
+   if (theLP->rep() == SPxSolver::ROW)
    {
       thedesc.stat   = &thedesc.rowstat;
       thedesc.costat = &thedesc.colstat;
@@ -200,7 +200,7 @@ void SPxBasis::setRep()
    }
 }
 
-void SPxBasis::load(SoPlex* lp)
+void SPxBasis::load(SPxSolver* lp)
 {
    METHOD( "SPxBasis::load()" );
    assert(lp != 0);

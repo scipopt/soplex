@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxpricer.h,v 1.11 2002/04/04 14:59:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxpricer.h,v 1.12 2003/01/05 19:03:17 bzfkocht Exp $"
 
 
 /**@file  spxpricer.h
@@ -25,7 +25,7 @@
 #include <assert.h>
 
 #include "spxdefines.h"
-#include "soplex.h"
+#include "spxsolver.h"
 
 
 namespace soplex
@@ -41,17 +41,17 @@ namespace soplex
    enter or leave the simplex basis, depending on the chosen simplex type.
    
    An #SPxPricer is first #load%ed the #SoPlex object for which pricing is to
-   be performed for. Then depending of the #SoPlex::Type, methods
+   be performed for. Then depending of the #SPxSolver::Type, methods
    #selectEnter() and #entered4() (for #ENTER%ing Simplex) or #selectLeave()
    and #left4() (for #LEAVE%ing Simplex) are called by #SoPlex. The #SPxPricer
-   object is informed of a change of the #SoPlex::Type by calling method
+   object is informed of a change of the #SPxSolver::Type by calling method
    #setType.
 */
 class SPxPricer
 {
 protected:
    const char* m_name;
-   SoPlex*     thesolver;
+   SPxSolver*  thesolver;
    Real        theeps;
 
 public:
@@ -66,7 +66,7 @@ public:
    /// loads LP.
    /** Loads the solver and LP for which pricing steps are to be performed.
     */
-   virtual void load(SoPlex* p_solver)
+   virtual void load(SPxSolver* p_solver)
    {
       thesolver = p_solver;
    }
@@ -77,8 +77,8 @@ public:
       thesolver = 0;
    }
 
-   /// returns loaded #SoPlex object.
-   virtual SoPlex* solver() const
+   /// returns loaded #SPxSolver object.
+   virtual SPxSolver* solver() const
    {
       return thesolver;
    }
@@ -103,14 +103,14 @@ public:
    /** Informs pricer about (a change of) the loaded #SoPlex's #Type. In
        the sequel, only the corresponding select methods may be called.
     */
-   virtual void setType(SoPlex::Type)
+   virtual void setType(SPxSolver::Type)
    {}
 
    /// sets basis representation.
    /** Informs pricer about (a change of) the loaded #SoPlex's
        #Representation.
    */
-   virtual void setRep(SoPlex::Representation)
+   virtual void setRep(SPxSolver::Representation)
    {}
    //@}
 
@@ -145,7 +145,7 @@ public:
        Note:
        When method #selectEnter() is called by the loaded #SoPlex
        object, all values from #coTest() are up to date. However, whether
-       the elements of #test() are so depends on the #SoPlex::Pricing
+       the elements of #test() are so depends on the #SPxSolver::Pricing
        type.
     */
    virtual SPxId selectEnter() = 0;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxshift.cpp,v 1.15 2002/12/08 11:09:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxshift.cpp,v 1.16 2003/01/05 19:03:17 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -21,13 +21,13 @@
 #include <iostream>
 
 #include "spxdefines.h"
-#include "soplex.h"
+#include "spxsolver.h"
 
 namespace soplex
 {
-void SoPlex::shiftFvec()
+void SPxSolver::shiftFvec()
 {
-   METHOD( "SoPlex::shiftFvec()" );
+   METHOD( "SPxSolver::shiftFvec()" );
    // Random   mult(delta(), 100*delta());
    Random mult(10*delta(), 100*delta());
    Real allow = delta() - epsilon();
@@ -69,9 +69,9 @@ void SoPlex::shiftFvec()
     vectors for leaving simplex. Then it checks all values of |pVec| and
     |coPvec| to obey these bounds and enlarges them if neccessary.
  */
-void SoPlex::shiftPvec()
+void SPxSolver::shiftPvec()
 {
-   METHOD( "SoPlex::shiftPvec()" );
+   METHOD( "SPxSolver::shiftPvec()" );
    int i, tmp;
    // Random   mult(delta(), 100*delta());
    Random mult(10*delta(), 100*delta());
@@ -134,7 +134,7 @@ void SoPlex::shiftPvec()
 #endif
 }
 
-void SoPlex::perturbMin(
+void SPxSolver::perturbMin(
    const UpdateVector& uvec,
    Vector& p_low,
    Vector& p_up,
@@ -142,7 +142,7 @@ void SoPlex::perturbMin(
    int start,
    int incr)
 {
-   METHOD( "SoPlex::perturbMin()" );
+   METHOD( "SPxSolver::perturbMin()" );
    assert(uvec.dim() == p_low.dim());
    assert(uvec.dim() == p_up.dim());
 
@@ -202,7 +202,7 @@ void SoPlex::perturbMin(
 #endif  // !FULL_SHIFT
 }
 
-void SoPlex::perturbMax(
+void SPxSolver::perturbMax(
    const UpdateVector& uvec,
    Vector& p_low,
    Vector& p_up,
@@ -210,7 +210,7 @@ void SoPlex::perturbMax(
    int start,
    int incr) 
 {
-   METHOD( "SoPlex::perturbMax()" );
+   METHOD( "SPxSolver::perturbMax()" );
    assert(uvec.dim() == p_low.dim());
    assert(uvec.dim() == p_up.dim());
 
@@ -266,9 +266,9 @@ void SoPlex::perturbMax(
 #endif  // !FULL_SHIFT
 }
 
-void SoPlex::perturbMinEnter(void)
+void SPxSolver::perturbMinEnter(void)
 {
-   METHOD( "SoPlex::perturbMinEnter()" );
+   METHOD( "SPxSolver::perturbMinEnter()" );
    DEBUG( std::cout << iteration() << ": perturbing " << shift(); );
    fVec().delta().setup();
    perturbMin(fVec(), lbBound(), ubBound(), epsilon());
@@ -276,9 +276,9 @@ void SoPlex::perturbMinEnter(void)
 }
 
 
-void SoPlex::perturbMaxEnter(void)
+void SPxSolver::perturbMaxEnter(void)
 {
-   METHOD( "SoPlex::perturbMaxEnter()" );
+   METHOD( "SPxSolver::perturbMaxEnter()" );
    DEBUG( std::cout << iteration() << ": perturbing " << shift(); );
    fVec().delta().setup();
    perturbMax(fVec(), lbBound(), ubBound(), epsilon());
@@ -286,7 +286,7 @@ void SoPlex::perturbMaxEnter(void)
 }
 
 
-Real SoPlex::perturbMin(
+Real SPxSolver::perturbMin(
    const UpdateVector& uvec,
    Vector& p_low,
    Vector& p_up,
@@ -296,7 +296,7 @@ Real SoPlex::perturbMin(
    int start,
    int incr) const
 {
-   METHOD( "SoPlex::perturbMin()" );
+   METHOD( "SPxSolver::perturbMin()" );
    assert(uvec.dim() == p_low.dim());
    assert(uvec.dim() == p_up.dim());
 
@@ -354,7 +354,7 @@ Real SoPlex::perturbMin(
    return l_theShift;
 }
 
-Real SoPlex::perturbMax(
+Real SPxSolver::perturbMax(
    const UpdateVector& uvec,
    Vector& p_low,
    Vector& p_up,
@@ -364,7 +364,7 @@ Real SoPlex::perturbMax(
    int start,
    int incr) const
 {
-   METHOD( "SoPlex::perturbMax()" );
+   METHOD( "SPxSolver::perturbMax()" );
    assert(uvec.dim() == p_low.dim());
    assert(uvec.dim() == p_up.dim());
 
@@ -423,9 +423,9 @@ Real SoPlex::perturbMax(
 }
 
 
-void SoPlex::perturbMinLeave(void)
+void SPxSolver::perturbMinLeave(void)
 {
-   METHOD( "SoPlex::perturbMinLeave()" );
+   METHOD( "SPxSolver::perturbMinLeave()" );
    DEBUG( std::cout << iteration() << ": perturbing " << shift(); );
    pVec().delta().setup();
    coPvec().delta().setup();
@@ -437,9 +437,9 @@ void SoPlex::perturbMinLeave(void)
 }
 
 
-void SoPlex::perturbMaxLeave(void)
+void SPxSolver::perturbMaxLeave(void)
 {
-   METHOD( "SoPlex::perturbMaxLeave()" );
+   METHOD( "SPxSolver::perturbMaxLeave()" );
    DEBUG( std::cout << iteration() << ": perturbing " << shift(); );
    pVec().delta().setup();
    coPvec().delta().setup();
@@ -451,9 +451,9 @@ void SoPlex::perturbMaxLeave(void)
 }
 
 
-void SoPlex::unShift(void)
+void SPxSolver::unShift(void)
 {
-   METHOD( "SoPlex::unShift()" );
+   METHOD( "SPxSolver::unShift()" );
    VERBOSE3( std::cout << "unshifting ..." << std::endl; );
 
    if (isInitialized())

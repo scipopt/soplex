@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.16 2002/03/21 16:06:19 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.17 2003/01/05 19:03:17 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -24,9 +24,9 @@
 namespace soplex
 {
 
-void SPxWeightPR::setRep(SoPlex::Representation rep)
+void SPxWeightPR::setRep(SPxSolver::Representation rep)
 {
-   if (rep == SoPlex::ROW)
+   if (rep == SPxSolver::ROW)
    {
       penalty = rPenalty.get_const_ptr();
       coPenalty = cPenalty.get_const_ptr();
@@ -38,9 +38,9 @@ void SPxWeightPR::setRep(SoPlex::Representation rep)
    }
 }
 
-void SPxWeightPR::setType(SoPlex::Type tp)
+void SPxWeightPR::setType(SPxSolver::Type tp)
 {
-   if (thesolver && tp == SoPlex::LEAVE)
+   if (thesolver && tp == SPxSolver::LEAVE)
    {
       leavePenalty.reDim( thesolver->dim() );
       computeLeavePenalty( 0, thesolver->dim() );
@@ -87,7 +87,7 @@ void SPxWeightPR::computeCP(int start, int end)
    }
 }
 
-void SPxWeightPR::load(SoPlex* base)
+void SPxWeightPR::load(SPxSolver* base)
 {
    thesolver = base;
 
@@ -102,7 +102,7 @@ void SPxWeightPR::load(SoPlex* base)
 int SPxWeightPR::selectLeave()
 {
    const Real* test = thesolver->fTest().get_const_ptr();
-   Real type = 1 - 2 * (thesolver->rep() == SoPlex::COLUMN);
+   Real type = 1 - 2 * (thesolver->rep() == SPxSolver::COLUMN);
    Real best = type * infinity;
    int lastIdx = -1;
    Real x;
@@ -131,7 +131,7 @@ int SPxWeightPR::selectLeave()
 int SPxWeightPR::selectLeave()
 {
    const Real* test = thesolver->fTest().get_const_ptr();
-   Real type = 1 - 2 * (thesolver->rep() == SoPlex::COLUMN);
+   Real type = 1 - 2 * (thesolver->rep() == SPxSolver::COLUMN);
    Real best = type * infinity;
    int lastIdx = -1;
    Real x;
@@ -157,9 +157,9 @@ int SPxWeightPR::selectLeave()
 
 SPxId SPxWeightPR::selectEnter()
 {
-   const Vector& rTest = (solver()->rep() == SoPlex::ROW)
+   const Vector& rTest = (solver()->rep() == SPxSolver::ROW)
                          ? solver()->test() : solver()->coTest();
-   const Vector& cTest = (solver()->rep() == SoPlex::ROW)
+   const Vector& cTest = (solver()->rep() == SPxSolver::ROW)
                          ? solver()->coTest() : solver()->test();
    const SPxBasis::Desc& ds = solver()->basis().desc();
    Real best = infinity;
@@ -248,7 +248,7 @@ SPxId SPxWeightPR::selectEnter()
 
 void SPxWeightPR::addedVecs(int)
 {
-   if (solver()->rep() == SoPlex::ROW)
+   if (solver()->rep() == SPxSolver::ROW)
    {
       int start = rPenalty.dim();
       rPenalty.reDim(solver()->nRows());
@@ -260,7 +260,7 @@ void SPxWeightPR::addedVecs(int)
       cPenalty.reDim(solver()->nCols());
       computeCP(start, solver()->nCols());
    }
-   if (solver()->type() == SoPlex::LEAVE)
+   if (solver()->type() == SPxSolver::LEAVE)
    {
       int start = leavePenalty.dim();
       leavePenalty.reDim( solver()->dim() );
@@ -270,7 +270,7 @@ void SPxWeightPR::addedVecs(int)
 
 void SPxWeightPR::addedCoVecs(int)
 {
-   if (solver()->rep() == SoPlex::COLUMN)
+   if (solver()->rep() == SPxSolver::COLUMN)
    {
       int start = rPenalty.dim();
       rPenalty.reDim(solver()->nRows());
@@ -282,7 +282,7 @@ void SPxWeightPR::addedCoVecs(int)
       cPenalty.reDim(solver()->nCols());
       computeCP(start, solver()->nCols());
    }
-   if (solver()->type() == SoPlex::LEAVE)
+   if (solver()->type() == SPxSolver::LEAVE)
    {
       int start = leavePenalty.dim();
       leavePenalty.reDim( solver()->dim() );
@@ -294,7 +294,7 @@ void SPxWeightPR::removedVec(int i)
 {
    assert(solver() != 0);
 
-   if (solver()->rep() == SoPlex::ROW)
+   if (solver()->rep() == SPxSolver::ROW)
    {
       rPenalty[i] = rPenalty[rPenalty.dim()];
       rPenalty.reDim(solver()->nRows());
@@ -310,7 +310,7 @@ void SPxWeightPR::removedVecs(const int perm[])
 {
    assert(solver() != 0);
 
-   if (solver()->rep() == SoPlex::ROW)
+   if (solver()->rep() == SPxSolver::ROW)
    {
       int j = rPenalty.dim();
       for (int i = 0; i < j; ++i)
@@ -336,7 +336,7 @@ void SPxWeightPR::removedCoVec(int i)
 {
    assert(solver() != 0);
 
-   if (solver()->rep() == SoPlex::COLUMN)
+   if (solver()->rep() == SPxSolver::COLUMN)
    {
       rPenalty[i] = rPenalty[rPenalty.dim()];
       rPenalty.reDim(solver()->nRows());
@@ -352,7 +352,7 @@ void SPxWeightPR::removedCoVecs(const int perm[])
 {
    assert(solver() != 0);
 
-   if (solver()->rep() == SoPlex::COLUMN)
+   if (solver()->rep() == SPxSolver::COLUMN)
    {
       int j = rPenalty.dim();
       for (int i = 0; i < j; ++i)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.h,v 1.11 2002/08/27 07:20:38 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.h,v 1.12 2003/01/05 19:03:17 bzfkocht Exp $"
 
 /**@file  spxredundantsm.h
  * @brief Remove redundant row and columns.
@@ -37,15 +37,29 @@ namespace soplex
 class SPxRedundantSM : public SPxSimplifier
 {
 private:
-   int treat_cols();
-   int treat_rows();
+   DVector        prim;   ///< unsimplified primal solution vector.
+   DVector        dual;   ///< unsimplified dual solution vector.
+   DataArray<int> cperm;  ///< column permutation vector.
+   DataArray<int> rperm;  ///< row permutation vector.
+
+private:
+   Result treat_cols(SPxLP& lp);
+   Result treat_rows(SPxLP& lp);
 
 public:
+   // default constructor
+   SPxRedundantSM() 
+      : SPxSimplifier("Redundant")
+   {}   
+   /// destructor.
+   virtual ~SPxRedundantSM()
+   {}  
    /// Remove redundant rows and columns.
-   int simplify();
-
-   /// Reverse the doings of #simplify().
-   void unsimplify();
+   virtual Result simplify(SPxLP& lp);
+   /// returns a reference to the unsimplified primal solution.
+   virtual const Vector& unsimplifiedPrimal(const Vector& x);
+   /// returns a reference to the unsimplified dual solution. 
+   virtual const Vector& unsimplifiedDual(const Vector& pi);
 };
 } // namespace soplex
 #endif // _SPXREDUNDANTSM_H_

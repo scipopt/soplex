@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsimplifier.h,v 1.9 2002/03/03 13:50:35 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsimplifier.h,v 1.10 2003/01/05 19:03:17 bzfkocht Exp $"
 
 /**@file  spxsimplifier.h
  * @brief LP simplification base class.
@@ -32,66 +32,62 @@ namespace soplex
    @ingroup Algo
 
    Instances of classes derived from #SPxSimplifier may be loaded to #SoPlex in
-   order to simplify LPs before solving them. #SoPlex# will #load()# itself to
-   the #SPxSimplifier and then call #simplify(). Generally any #SPxLP can be
-   loaded to a #SPxSimplifier for #simplify()%ing it. The simplification can
-   be undone by calling #unsimplify().
+   order to simplify LPs before solving them. #SoPlex# will call #simplify()
+   on its self. Generally any #SPxLP can be given to 
+   a #SPxSimplifier for #simplify()%ing it. The simplification can not be undone,
+   but given an primal/dual solution for the simplified #SPxLP, the simplifier
+   can reconstruct the primal/dual solution of the unsimplified LP.
 */
 class SPxSimplifier
 {
 protected:
-   SPxLP* lp;     ///< LP to work on.
-   Real delta;  ///< Offset for the objective function.
+   const char* m_name;
 
 public:
-   SPxSimplifier() 
-      : lp(0), delta(0)
+   enum Result
+   {
+      OKAY       =  0,
+      INFEASIBLE =  1,
+      UNBOUNDED  =  2,
+      VANISHED   =  3
+   };
+   /// constructor
+   explicit SPxSimplifier(const char* p_name)
+      : m_name(p_name)
    {}
-
-   /// Load the #SPxLP to be simplified.
-   virtual void load(SPxLP* p_lp)
+   /// destructor.
+   virtual ~SPxSimplifier()
    {
-      assert(p_lp != 0);
-
-      if (lp != p_lp)
-      {
-         lp    = p_lp;
-         delta = 0;
-      }
+      m_name = 0;
    }
-   /// Unload the #SPxLP.
-   virtual void unload()
+   /// get name of simplifier.
+   virtual const char* getName() const
    {
-      lp = 0;
+      return m_name;
    }
-
-   /// Simplify loaded #SPxLP. 
+   /// simplify #SPxLP \p lp. 
    /**
     * @return 
     *  <TABLE>
-    *  <TR><TD> 0 </TD><TD>if this could be done,</TD></TR>
-    *  <TR><TD> 1 </TD><TD>if primal unboundedness was detected or</TD></TR>
-    *  <TR><TD>-1 </TD><TD>if primal infeasibility was detected.</TD></TR>
+    *  <TR><TD>#OKAY      </TD><TD>if this could be done,</TD></TR>
+    *  <TR><TD>#UNBOUNDED </TD><TD>if primal unboundedness was detected or</TD></TR>
+    *  <TR><TD>#INFEASIBLE</TD><TD>if primal infeasibility was detected.</TD></TR>
     *  </TABLE>
     */
-   virtual int simplify() = 0;
+   virtual Result simplify(SPxLP& lp) = 0;
 
-   /// Unsimplify the loaded #SPxLP.
-   virtual void unsimplify() = 0;
-
-   /// objective value for unsimplified LP.
-   /** The simplifyed LP may show other objective values than the
-    *  original, if a constant part has been removed from the LP.
-    *  This method returns the value for the original LP, for a
-    *  value \p x of the simplified LP.
-    */
-   virtual Real value(Real x)
+   /// returns a reference to the unsimplified primal solution.
+   virtual const Vector& unsimplifiedPrimal(const Vector& x)
    {
-      return x + delta;
+      return x;
    }
-
+   /// returns a reference to the unsimplified dual solution. 
+   virtual const Vector& unsimplifiedDual(const Vector& pi)
+   {
+      return pi;
+   }
    /// consistency check
-   bool isConsistent() const
+   virtual bool isConsistent() const
    {
       return true;
    }

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.20 2002/04/04 14:59:04 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.21 2003/01/05 19:03:16 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -39,7 +39,7 @@ bool SPxHybridPR::isConsistent() const
           && parmult.isConsistent();
 }
 
-void SPxHybridPR::load(SoPlex* p_solver)
+void SPxHybridPR::load(SPxSolver* p_solver)
 {
    steep.load(p_solver);
    devex.load(p_solver);
@@ -63,12 +63,12 @@ void SPxHybridPR::setEpsilon(Real eps)
    parmult.setEpsilon(eps);
 }
 
-void SPxHybridPR::setType(SoPlex::Type tp)
+void SPxHybridPR::setType(SPxSolver::Type tp)
 {
-   if (tp == SoPlex::LEAVE)
+   if (tp == SPxSolver::LEAVE)
    {
       thepricer = &steep;
-      thesolver->setPricing(SoPlex::FULL);
+      thesolver->setPricing(SPxSolver::FULL);
    }
    else
    {
@@ -80,12 +80,12 @@ void SPxHybridPR::setType(SoPlex::Type tp)
           */
          // thepricer = &devex;
          thepricer = &steep;
-         thesolver->setPricing(SoPlex::FULL);
+         thesolver->setPricing(SPxSolver::FULL);
       }
       else
       {
          thepricer = &parmult;
-         thesolver->setPricing(SoPlex::PARTIAL);
+         thesolver->setPricing(SPxSolver::PARTIAL);
       }
    }
    
@@ -95,7 +95,7 @@ void SPxHybridPR::setType(SoPlex::Type tp)
    thepricer->setType(tp);
 }
 
-void SPxHybridPR::setRep(SoPlex::Representation rep)
+void SPxHybridPR::setRep(SPxSolver::Representation rep)
 {
    steep.setRep(rep);
    devex.setRep(rep);

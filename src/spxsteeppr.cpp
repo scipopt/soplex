@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.21 2002/12/16 07:29:47 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.22 2003/01/05 19:03:17 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -36,7 +36,7 @@ void SPxSteepPR::clear()
    prefSetup = 0;
 }
 
-void SPxSteepPR::load(SoPlex* base)
+void SPxSteepPR::load(SPxSolver* base)
 {
    thesolver = base;
 
@@ -54,7 +54,7 @@ void SPxSteepPR::load(SoPlex* base)
    }
 }
 
-void SPxSteepPR::setType(SoPlex::Type type)
+void SPxSteepPR::setType(SPxSolver::Type type)
 {
    int i;
 
@@ -66,7 +66,7 @@ void SPxSteepPR::setType(SoPlex::Type type)
 
    if (setup == DEFAULT)
    {
-      if (type == SoPlex::ENTER)
+      if (type == SPxSolver::ENTER)
       {
          coPenalty.reDim(thesolver->dim());
          for (i = thesolver->dim() - 1; i >= 0; --i)
@@ -80,7 +80,7 @@ void SPxSteepPR::setType(SoPlex::Type type)
       }
       else
       {
-         assert(type == SoPlex::LEAVE);
+         assert(type == SPxSolver::LEAVE);
          coPenalty.reDim(thesolver->dim());
          for (i = thesolver->dim() - 1; i >= 0; --i)
          {
@@ -96,7 +96,7 @@ void SPxSteepPR::setType(SoPlex::Type type)
    {
       std::cerr << "sorry, no exact setup for steepest edge multipliers implemented\n";
 
-      if (type == SoPlex::ENTER)
+      if (type == SPxSolver::ENTER)
       {
          coPenalty.reDim(thesolver->dim());
          for (i = thesolver->dim() - 1; i >= 0; --i)
@@ -107,7 +107,7 @@ void SPxSteepPR::setType(SoPlex::Type type)
       }
       else
       {
-         assert(type == SoPlex::LEAVE);
+         assert(type == SPxSolver::LEAVE);
          coPenalty.reDim(thesolver->dim());
          for (i = thesolver->dim() - 1; i >= 0; --i)
          {
@@ -134,7 +134,7 @@ void SPxSteepPR::setupPrefsX(
    Real rshift;
    Real cshift;
 
-   if (thesolver->rep() == SoPlex::COLUMN)
+   if (thesolver->rep() == SPxSolver::COLUMN)
    {
       cp = &pref;
       p  = &coPref;
@@ -174,13 +174,13 @@ void SPxSteepPR::setupPrefsX(
       pref[i] *= 1.0 + mult * i;
 }
 
-void SPxSteepPR::setupPrefs(SoPlex::Type tp)
+void SPxSteepPR::setupPrefs(SPxSolver::Type tp)
 {
    if (tp != prefSetup)
    {
       Real mult = 1e-8 / Real(1 + thesolver->dim() + thesolver->coDim());
 
-      if (tp == SoPlex::ENTER)
+      if (tp == SPxSolver::ENTER)
          setupPrefsX(-mult, -1e-5, -1e-5, 1.0, 1.0);
       else
          setupPrefsX(mult, 1e-5, 1e-5, 1.0, 1.0);
@@ -189,7 +189,7 @@ void SPxSteepPR::setupPrefs(SoPlex::Type tp)
    }
 }
 
-void SPxSteepPR::setRep(SoPlex::Representation)
+void SPxSteepPR::setRep(SPxSolver::Representation)
 {
    if (workVec.dim() != thesolver->dim())
    {
@@ -205,7 +205,7 @@ void SPxSteepPR::setRep(SoPlex::Representation)
 void SPxSteepPR::left4X(int n, const SPxId& id, int start, int incr)
 {
 #if 0
-   assert(thesolver->type() == SoPlex::LEAVE);
+   assert(thesolver->type() == SPxSolver::LEAVE);
 
    if (id.isValid())
    {
@@ -243,7 +243,7 @@ void SPxSteepPR::left4X(int n, const SPxId& id, int start, int incr)
 
 void SPxSteepPR::left4(int n, SPxId id)
 {
-   assert(thesolver->type() == SoPlex::LEAVE);
+   assert(thesolver->type() == SPxSolver::LEAVE);
 
    //  Update preference multiplier in #leavePref#
    if (thesolver->isId(id))
@@ -374,7 +374,7 @@ int SPxSteepPR::selectLeave()
 void SPxSteepPR::entered4X(
    SPxId, int n, int start2, int incr2, int start1, int incr1)
 {
-   assert(thesolver->type() == SoPlex::ENTER);
+   assert(thesolver->type() == SPxSolver::ENTER);
 
    if (n >= 0 && n < thesolver->dim())
    {
@@ -524,7 +524,7 @@ void SPxSteepPR::addedVecs(int n)
    pref.reSize (thesolver->coDim());
    penalty.reDim(thesolver->coDim());
 
-   if (thesolver->type() == SoPlex::ENTER)
+   if (thesolver->type() == SPxSolver::ENTER)
    {
       setupPrefs(thesolver->type());
       for (; n < penalty.dim(); ++n)
@@ -559,7 +559,7 @@ void SPxSteepPR::removedVec(int i)
 void SPxSteepPR::removedVecs(const int perm[])
 {
    assert(thesolver != 0);
-   if (thesolver->type() == SoPlex::ENTER)
+   if (thesolver->type() == SPxSolver::ENTER)
    {
       int i;
       int j = penalty.dim();
@@ -593,7 +593,7 @@ void SPxSteepPR::removedCoVecs(const int perm[])
 
 bool SPxSteepPR::isConsistent() const
 {
-   if (thesolver != 0 && thesolver->type() == SoPlex::LEAVE && setup == EXACT)
+   if (thesolver != 0 && thesolver->type() == SPxSolver::LEAVE && setup == EXACT)
    {
       int i;
       SSVector tmp(thesolver->dim(), thesolver->epsilon());
@@ -609,7 +609,7 @@ bool SPxSteepPR::isConsistent() const
       }
    }
 
-   if (thesolver != 0 && thesolver->type() == SoPlex::ENTER)
+   if (thesolver != 0 && thesolver->type() == SPxSolver::ENTER)
    {
       int i;
       for (i = thesolver->dim() - 1; i >= 0; --i)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.17 2002/12/16 07:29:47 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.18 2003/01/05 19:03:16 bzfkocht Exp $"
 
 #include "spxdefines.h"
 #include "spxdevexpr.h"
@@ -22,7 +22,7 @@
 namespace soplex
 {
 
-void SPxDevexPR::load(SoPlex* base)
+void SPxDevexPR::load(SPxSolver* base)
 {
    thesolver = base;
    setRep(base->rep());
@@ -39,10 +39,10 @@ bool SPxDevexPR::isConsistent() const
    return true;
 }
 
-void SPxDevexPR::setType(SoPlex::Type tp)
+void SPxDevexPR::setType(SPxSolver::Type tp)
 {
    int i;
-   if (tp == SoPlex::ENTER)
+   if (tp == SPxSolver::ENTER)
    {
       for (i = penalty.dim(); --i >= 0;)
          penalty[i] = 2;
@@ -60,7 +60,7 @@ void SPxDevexPR::setType(SoPlex::Type tp)
 /**@todo suspicious: Shouldn't the relation between dim, coDim, Vecs, 
  *       and CoVecs be influenced by the representation ?
  */
-void SPxDevexPR::setRep(SoPlex::Representation)
+void SPxDevexPR::setRep(SPxSolver::Representation)
 {
    if (thesolver != 0)
    {
@@ -240,7 +240,7 @@ void SPxDevexPR::entered4X(SPxId /*id*/, int n,
          coPenalty[i] += xi_p * coPvec[i] * coPvec[i];
          if (coPenalty[i] <= 1 || coPenalty[i] > 1e+6)
          {
-            setType(SoPlex::ENTER);
+            setType(SPxSolver::ENTER);
             return;
          }
       }
@@ -251,7 +251,7 @@ void SPxDevexPR::entered4X(SPxId /*id*/, int n,
          penalty[i] += xi_p * pVec[i] * pVec[i];
          if (penalty[i] <= 1 || penalty[i] > 1e+6)
          {
-            setType(SoPlex::ENTER);
+            setType(SPxSolver::ENTER);
             return;
          }
       }
@@ -260,7 +260,7 @@ void SPxDevexPR::entered4X(SPxId /*id*/, int n,
 
 void SPxDevexPR::addedVecs (int n)
 {
-   int init = (thesolver->type() == SoPlex::ENTER) + 1;
+   int init = (thesolver->type() == SPxSolver::ENTER) + 1;
    n = penalty.dim();
    penalty.reDim (thesolver->coDim());
    for (int i = penalty.dim()-1; i >= n; --i )
@@ -269,7 +269,7 @@ void SPxDevexPR::addedVecs (int n)
 
 void SPxDevexPR::addedCoVecs(int n)
 {
-   int init = (thesolver->type() == SoPlex::ENTER) + 1;
+   int init = (thesolver->type() == SPxSolver::ENTER) + 1;
    n = coPenalty.dim();
    coPenalty.reDim(thesolver->dim());
    for (int i = coPenalty.dim()-1; i >= n; --i)
@@ -281,7 +281,7 @@ void SPxDevexPR::addedCoVecs(int n)
 // ??? This is the old (buggy?) code
 void SPxDevexPR::addedVecs (int n)
 {
-   int init = (thesolver->type() == SoPlex::ENTER) + 1;
+   int init = (thesolver->type() == SPxSolver::ENTER) + 1;
    penalty.reDim (thesolver->coDim());
    n -= penalty.dim();
    for (int i = penalty.dim(); --i >= n;)
@@ -290,7 +290,7 @@ void SPxDevexPR::addedVecs (int n)
 
 void SPxDevexPR::addedCoVecs(int n)
 {
-   int init = (thesolver->type() == SoPlex::ENTER) + 1;
+   int init = (thesolver->type() == SPxSolver::ENTER) + 1;
    coPenalty.reDim(thesolver->dim());
    n -= coPenalty.dim();
    for (int i = coPenalty.dim(); --i >= n;)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.24 2002/12/16 07:29:47 bzfkocht Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.25 2003/01/05 19:03:16 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -23,7 +23,7 @@
 #include <stdio.h>
 
 #include "spxdefines.h"
-#include "soplex.h"
+#include "spxsolver.h"
 #include "spxratiotester.h"
 
 namespace soplex
@@ -36,9 +36,9 @@ static const Real reject_leave_tol = 1e-8;
     Values of |fTest| $<0$ represent infeasible variables, which are eligable
     for leaving the basis in the simplex loop.
  */
-void SoPlex::computeFtest()
+void SPxSolver::computeFtest()
 {
-   METHOD( "SoPlex::computeFtest()" );
+   METHOD( "SPxSolver::computeFtest()" );
 
    assert(type() == LEAVE);
 
@@ -50,9 +50,9 @@ void SoPlex::computeFtest()
    }
 }
 
-void SoPlex::updateFtest()
+void SPxSolver::updateFtest()
 {
-   METHOD( "SoPlex::updateFtest()" );
+   METHOD( "SPxSolver::updateFtest()" );
    const IdxSet& idx = theFvec->idx();
    Vector& ftest = theCoTest;      // |== fTest()|
    assert(&ftest == &fTest());
@@ -73,7 +73,7 @@ void SoPlex::updateFtest()
    Compute a set of statistical values on the variable selected for leaving the
    basis.
  */
-void SoPlex::getLeaveVals
+void SPxSolver::getLeaveVals
 (
    int leaveIdx,
    SPxBasis::Desc::Status& leaveStat,
@@ -83,7 +83,7 @@ void SoPlex::getLeaveVals
    int& leaveNum
 )
 {
-   METHOD( "SoPlex::getLeaveVals()" );
+   METHOD( "SPxSolver::getLeaveVals()" );
    SPxBasis::Desc& ds = desc();
    leaveId = baseId(leaveIdx);
 
@@ -153,7 +153,7 @@ void SoPlex::getLeaveVals
       default:
          abort();
       }
-      DEBUG({ std::cout << "SoPlex::getLeaveVals() : row " << leaveNum
+      DEBUG({ std::cout << "SPxSolver::getLeaveVals() : row " << leaveNum
                         << ": " << leaveStat
                         << " -> " << ds.rowStatus(leaveNum)
                         << std::endl; });
@@ -237,14 +237,14 @@ void SoPlex::getLeaveVals
       default:
          abort();
       }
-      DEBUG({ std::cout << "SoPlex::getLeaveVals() : col " << leaveNum
+      DEBUG({ std::cout << "SPxSolver::getLeaveVals() : col " << leaveNum
                         << ": " << leaveStat
                         << " -> " << ds.colStatus(leaveNum)
                         << std::endl; });
    }
 }
 
-void SoPlex::getLeaveVals2(
+void SPxSolver::getLeaveVals2(
    Real leaveMax,
    SPxId enterId,
    Real& enterBound,
@@ -253,7 +253,7 @@ void SoPlex::getLeaveVals2(
    Real& newCoPrhs
 )
 {
-   METHOD( "SoPlex::getLeaveVals2()" );
+   METHOD( "SPxSolver::getLeaveVals2()" );
    SPxBasis::Desc& ds = desc();
 
    enterBound = 0;
@@ -341,10 +341,10 @@ void SoPlex::getLeaveVals2(
          break;
       case SPxBasis::Desc::P_FIXED :
          assert(rep() == COLUMN);
-         std::cerr << "SoPlex::getLeaveVals2(): "
+         std::cerr << "SPxSolver::getLeaveVals2(): "
                    << "ERROR! Tried to put a fixed row variable into the basis."
                    << std::endl;
-         std::cerr << "SoPlex::getLeaveVals2(): idx=" << idx
+         std::cerr << "SPxSolver::getLeaveVals2(): idx=" << idx
                    << ", lhs=" << lhs(idx)
                    << ", rhs=" << rhs(idx) << std::endl;
          abort();
@@ -352,7 +352,7 @@ void SoPlex::getLeaveVals2(
       default:
          abort();
       }
-      DEBUG({ std::cout << "SoPlex::getLeaveVals2(): row " << idx
+      DEBUG({ std::cout << "SPxSolver::getLeaveVals2(): row " << idx
                         << ": " << enterStat
                         << " -> " << ds.rowStatus(idx)
                         << std::endl; });
@@ -438,10 +438,10 @@ void SoPlex::getLeaveVals2(
          break;
       case SPxBasis::Desc::P_FIXED :
          assert(rep() == COLUMN);
-         std::cerr << "SoPlex::getLeaveVals2(): "
+         std::cerr << "SPxSolver::getLeaveVals2(): "
                    << "ERROR! Tried to put a fixed column variable into the basis."
                    << std::endl;
-         std::cerr << "SoPlex::getLeaveVals2(): idx=" << idx
+         std::cerr << "SPxSolver::getLeaveVals2(): idx=" << idx
                    << ", lower=" << lower(idx)
                    << ", upper=" << upper(idx) << std::endl;
          abort();
@@ -449,7 +449,7 @@ void SoPlex::getLeaveVals2(
       default:
          abort();
       }
-      DEBUG({ std::cout << "SoPlex::getLeaveVals2(): col " << idx
+      DEBUG({ std::cout << "SPxSolver::getLeaveVals2(): col " << idx
                         << ": " << enterStat
                         << " -> " << ds.colStatus(idx)
                         << std::endl; });
@@ -457,18 +457,18 @@ void SoPlex::getLeaveVals2(
 
 }
 
-void SoPlex::rejectLeave(
+void SPxSolver::rejectLeave(
    int leaveNum,
    SPxId leaveId,
    SPxBasis::Desc::Status leaveStat,
    const SVector* //newVec
 )
 {
-   METHOD( "SoPlex::rejectLeave()" );
+   METHOD( "SPxSolver::rejectLeave()" );
    SPxBasis::Desc& ds = desc();
    if (leaveId.isSPxRowId())
    {
-      DEBUG({ std::cout << "SoPlex::rejectLeave()  : row " << leaveNum
+      DEBUG({ std::cout << "SPxSolver::rejectLeave()  : row " << leaveNum
                         << ": " << ds.rowStatus(leaveNum)
                         << " -> " << leaveStat << std::endl; });
       if (leaveStat == SPxBasis::Desc::D_ON_BOTH)
@@ -482,7 +482,7 @@ void SoPlex::rejectLeave(
    }
    else
    {
-      DEBUG({ std::cout << "SoPlex::rejectLeave()  : col " << leaveNum
+      DEBUG({ std::cout << "SPxSolver::rejectLeave()  : col " << leaveNum
                         << ": " << ds.colStatus(leaveNum)
                         << " -> " << leaveStat << std::endl; });
       if (leaveStat == SPxBasis::Desc::D_ON_BOTH)
@@ -497,9 +497,9 @@ void SoPlex::rejectLeave(
 }
 
 
-int SoPlex::leave(int leaveIdx)
+int SPxSolver::leave(int leaveIdx)
 {
-   METHOD( "SoPlex::leave()" );
+   METHOD( "SPxSolver::leave()" );
    assert(leaveIdx < dim() && leaveIdx >= 0);
    assert(type() == LEAVE);
    assert(initialized);

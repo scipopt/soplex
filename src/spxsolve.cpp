@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.57 2002/12/16 07:50:55 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.58 2003/01/05 19:03:17 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -21,21 +21,22 @@
 #include <iostream>
 
 #include "spxdefines.h"
-#include "soplex.h"
+#include "spxsolver.h"
 #include "spxpricer.h"
 #include "spxratiotester.h"
 #include "spxstarter.h"
-#include "spxscaler.h"
-#include "spxsimplifier.h"
 
 namespace soplex
 {
 /**@todo After solve() returned, the algorithm type may have changed.
  *       This may be a problem if solve() is called again.
+ * @todo The errors at the beginnin do not set m_status. On the other
+ *       hand none of the routines that change for example the pricer
+ *       changes the status.
  */
-SoPlex::Status SoPlex::solve()
+SPxSolver::Status SPxSolver::solve()
 {
-   METHOD( "SoPlex::solve()" );
+   METHOD( "SPxSolver::solve()" );
 
    SPxId enterId;
    int   leaveNum;
@@ -52,29 +53,6 @@ SoPlex::Status SoPlex::solve()
    if (theratiotester == 0) // ratiotester is required.
       return NO_RATIOTESTER;
 
-   // should the LP be simplified ?
-   if (thesimplifier != 0)
-   {
-      thesimplifier->load(this);
-
-      switch (thesimplifier->simplify())
-      {
-      case 1:
-         setBasisStatus(SPxBasis::UNBOUNDED);
-         return UNBOUNDED;
-      case - 1:
-         setBasisStatus(SPxBasis::INFEASIBLE);
-         return INFEASIBLE;
-      default:
-         break;
-      }
-   }
-   // should the LP be scaled
-   if (thescaler != 0)
-   {
-      thescaler->setLP(this);
-      thescaler->scale();
-   }
    theTime.reset();
    theTime.start();
 
@@ -385,9 +363,9 @@ SoPlex::Status SoPlex::solve()
    return status();
 }
 
-void SoPlex::testVecs()
+void SPxSolver::testVecs()
 {
-   METHOD( "SoPlex::testVecs()" );
+   METHOD( "SPxSolver::testVecs()" );
    int i;
    DVector tmp(dim());
 
@@ -455,9 +433,9 @@ void SoPlex::testVecs()
 #endif
 }
 
-bool SoPlex::terminate()
+bool SPxSolver::terminate()
 {
-   METHOD( "SoPlex::terminate()" );
+   METHOD( "SPxSolver::terminate()" );
 #ifndef NDEBUG
    testVecs();
 #endif  // NDEBUG
@@ -562,11 +540,9 @@ bool SoPlex::terminate()
    return false;
 }
 
-SoPlex::Status SoPlex::getPrimal (Vector& p_vector) const
+SPxSolver::Status SPxSolver::getPrimal (Vector& p_vector) const
 {
-   METHOD( "SoPlex::getPrimal()" );
-
-   assert(isInitialized());
+   METHOD( "SPxSolver::getPrimal()" );
 
    if (!isInitialized())
       return NOT_INIT;
@@ -575,9 +551,9 @@ SoPlex::Status SoPlex::getPrimal (Vector& p_vector) const
       p_vector = coPvec();
    else
    {
-      int i;
       const SPxBasis::Desc& ds = desc();
-      for (i = nCols() - 1; i >= 0; --i)
+
+      for (int i = 0; i < nCols(); ++i)
       {
          switch (ds.colStatus(i))
          {
@@ -601,7 +577,7 @@ SoPlex::Status SoPlex::getPrimal (Vector& p_vector) const
             abort();
          }
       }
-      for (i = dim() - 1; i >= 0; --i)
+      for (int i = 0; i < dim(); ++i)
       {
          if (baseId(i).isSPxColId())
             p_vector[ number(SPxColId(baseId(i))) ] = fVec()[i];
@@ -610,21 +586,9 @@ SoPlex::Status SoPlex::getPrimal (Vector& p_vector) const
    return status();
 }
 
-SoPlex::Status SoPlex::getPrimalUnscaled (Vector& p_vector) const
+SPxSolver::Status SPxSolver::getDual (Vector& p_vector) const
 {
-   METHOD( "SoPlex::getPrimalUnscaled()" );
-
-   Status stat = getPrimal( p_vector );
-
-   if (thescaler != 0)
-      thescaler->unscaleSolution( p_vector );
-
-   return stat;
-}
-
-SoPlex::Status SoPlex::getDual (Vector& p_vector) const
-{
-   METHOD( "SoPlex::getDual()" );
+   METHOD( "SPxSolver::getDual()" );
 
    assert(isInitialized());
 
@@ -649,9 +613,9 @@ SoPlex::Status SoPlex::getDual (Vector& p_vector) const
    return status();
 }
 
-SoPlex::Status SoPlex::getRdCost (Vector& p_vector) const
+SPxSolver::Status SPxSolver::getRdCost (Vector& p_vector) const
 {
-   METHOD( "SoPlex::getRdCost()" );
+   METHOD( "SPxSolver::getRdCost()" );
 
    assert(isInitialized());
 
@@ -690,9 +654,9 @@ SoPlex::Status SoPlex::getRdCost (Vector& p_vector) const
    return status();
 }
 
-SoPlex::Status SoPlex::getSlacks (Vector& p_vector) const
+SPxSolver::Status SPxSolver::getSlacks (Vector& p_vector) const
 {
-   METHOD( "SoPlex::getSlacks()" );
+   METHOD( "SPxSolver::getSlacks()" );
 
    assert(isInitialized());
 
@@ -739,9 +703,9 @@ SoPlex::Status SoPlex::getSlacks (Vector& p_vector) const
    return status();
 }
 
-SoPlex::Status SoPlex::status() const
+SPxSolver::Status SPxSolver::status() const
 {
-   METHOD( "SoPlex::status()" );
+   METHOD( "SPxSolver::status()" );
 
    switch( m_status )
    {
@@ -784,14 +748,14 @@ SoPlex::Status SoPlex::status() const
    }
 }
 
-SoPlex::Status SoPlex::getResult(
+SPxSolver::Status SPxSolver::getResult(
    Real* p_value,
    Vector* p_primal,
    Vector* p_slacks,
    Vector* p_dual,
    Vector* reduCosts) const
 {
-   METHOD( "SoPlex::getResult()" );
+   METHOD( "SPxSolver::getResult()" );
    if (p_value)
       *p_value = this->value();
    if (p_primal)

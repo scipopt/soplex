@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscaler.h,v 1.2 2002/04/04 19:36:51 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscaler.h,v 1.3 2003/01/05 19:03:17 bzfkocht Exp $"
 
 /**@file  spxscaler.h
  * @brief LP scaling base class.
@@ -42,60 +42,58 @@ class SPxScaler
 {
 protected:
    const char*        m_name;      ///< Name of the scaler
-   SPxLP*             m_lp;        ///< LP to work on.
    DataArray < Real > m_colscale;  ///< column scaleing factors
    DataArray < Real > m_rowscale;  ///< row scaleing factors
-   bool               m_colFirst;  ///< do column (not row) scaleing last 
+   bool               m_colFirst;  ///< do column scaling first 
    bool               m_doBoth;    ///< do columns and rows
+
+   /// setup scale array for the LP.
+   virtual void setup(SPxLP& lp);
+   ///
+   virtual Real computeColscale(const SVector& col) const = 0;
+   ///
+   virtual Real computeRowscale(const SVector& row) const = 0;
 
 public:
    friend std::ostream& operator<<(std::ostream& s, const SPxScaler& sc);
 
    /// constructor
-   explicit SPxScaler(const char* name, 
-      bool colFirst = true, bool doBoth = true);
+   explicit SPxScaler(const char* name, bool colFirst = true, bool doBoth = true);
+   /// copy constructor
+   SPxScaler(const SPxScaler& old);
    /// destructor.
    virtual ~SPxScaler();
+   /// assignment operator
+   SPxScaler& operator=(const SPxScaler& rhs);
+
    /// get name of scaler.
    virtual const char* getName() const;
    /// set scaling order.
    virtual void setOrder(bool colFirst); 
    /// set wether column and row scaling should be performed.
    virtual void setBoth(bool both); 
-   /// Load the #SPxLP to be simplified.
-   virtual void setLP(SPxLP* lp);
-   /// Scale loaded #SPxLP. 
-   virtual void scale() = 0;
-   /// Unscale the loaded #SPxLP.
-   virtual void unscale();
-   /// Unscale dense solution vector given in \p usol. 
-   virtual void unscaleSolution(Vector& usol) const;
-   /// Get unscaled maximization objective in \p uobj. 
-   virtual void unscaledMaxObj(Vector& uobj) const;
-   /// Get unscaled lower bounds vector in \p ulower. 
-   virtual void unscaledLower(Vector& ulower) const;
-   /// Get unscaled upper bounds vector in \p uupper. 
-   virtual void unscaledUpper(Vector& uupper) const;
-   /// Get unscaled LHS vector in \p ulhs. 
-   virtual void unscaledLhs(Vector& ulhs) const;
-   /// Get unscaled RHS vector in \p urhs. 
-   virtual void unscaledRhs(Vector& urhs) const;
-   /// Get unscaled row vector number \p row in \p uvec. 
-   virtual void unscaledRowVector(int row, DSVector& uvec) const;
-   /// Get unscaled col vector number \p col in \p uvec. 
-   virtual void unscaledColVector(int col, DSVector& uvec) const;
+
+   /// Scale #SPxLP. 
+   virtual void scale(SPxLP& lp);
+   /// Unscale dense primal solution vector given in \p x. 
+   virtual void unscalePrimal(Vector& x) const;
+   /// Unscale dense dual solution vector given in \p pi. 
+   virtual void unscaleDual(Vector& pi) const;
+
+   /// absolute smallest column scaling factor
+   virtual Real minAbsColscale() const;
+   /// absolute biggest column scaling factor
+   virtual Real maxAbsColscale() const;
+   /// absolute smallest row scaling factor
+   virtual Real minAbsRowscale() const;
+   /// absolute biggest row scaling factor
+   virtual Real maxAbsRowscale() const;
+
    /// consistency check
    virtual bool isConsistent() const;
-   
-private:
-   /// assignment operator is not implemented.
-   SPxScaler& operator=(const SPxScaler& base);
-
-   /// copy constructor is not implemented.
-   SPxScaler(const SPxScaler& base);
 };
 } // namespace soplex
-#endif // _SPXSIMPLIFIER_H_
+#endif // _SPXSCALER_H_
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:

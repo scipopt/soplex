@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxratiotester.h,v 1.8 2002/03/21 16:06:19 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxratiotester.h,v 1.9 2003/01/05 19:03:17 bzfkocht Exp $"
 
 /**@file  spxratiotester.h
  * @brief Abstract ratio test base class.
@@ -25,7 +25,7 @@
 #include <assert.h>
 
 #include "spxdefines.h"
-#include "soplex.h"
+#include "spxsolver.h"
 
 namespace soplex
 {
@@ -42,13 +42,13 @@ namespace soplex
 class SPxRatioTester
 {
 protected:
-   SoPlex* thesolver;
+   SPxSolver* thesolver;
 
 public:
    /// loads LP.
    /** Load the solver and LP for which pricing steps are to be performed.
     */
-   virtual void load(SoPlex* p_solver)
+   virtual void load(SPxSolver* p_solver)
    {
       thesolver = p_solver;
    }
@@ -60,7 +60,7 @@ public:
    }
 
    /// returns loaded LP solver.
-   virtual SoPlex* solver() const
+   virtual SPxSolver* solver() const
    {
       return thesolver;
    }
@@ -108,7 +108,7 @@ public:
    /** Informs pricer about (a change of) the loaded #SoPlex's #Type. In
        the sequel, only the corresponding select methods may be called.
    */
-   virtual void setType(SoPlex::Type)
+   virtual void setType(SPxSolver::Type)
    {}
    /// default constructor
    SPxRatioTester()

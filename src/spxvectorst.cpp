@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvectorst.cpp,v 1.10 2002/05/15 13:38:44 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxvectorst.cpp,v 1.11 2003/01/05 19:03:17 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -26,7 +26,7 @@
 namespace soplex
 {
 
-void SPxVectorST::setupWeights(SoPlex& base)
+void SPxVectorST::setupWeights(SPxSolver& base)
 {
    if (state == PVEC)
    {
@@ -64,7 +64,7 @@ void SPxVectorST::setupWeights(SoPlex& base)
       DEBUG( std::cout << "rowWeight[]: "; );
       for (i = base.nRows(); i--;)
       {
-         const SVector& row = (const_cast<const SoPlex&>(base)).rowVector(i);
+         const SVector& row = base.rowVector(i);
          y = vec * row;
          x = (y - base.lhs(i));
          y = (base.rhs(i) - y);
@@ -98,7 +98,7 @@ void SPxVectorST::setupWeights(SoPlex& base)
 
       for (i = base.nCols(); i--;)
       {
-         const SVector& col = (const_cast<const SoPlex&>(base)).colVector(i);
+         const SVector& col = base.colVector(i);
          for (y = len = 0, j = col.size(); j--;)
          {
             x = col.value(j);

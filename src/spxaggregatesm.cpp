@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.16 2002/12/08 11:09:21 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.17 2003/01/05 19:03:16 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -43,7 +43,7 @@ struct Compare
    }
 };
 
-int SPxAggregateSM::eliminate(const SVector& row, Real b)
+int SPxAggregateSM::eliminate(SPxLP& lp, const SVector& row, Real b)
 {
    Real x, y;
    int j, k;
@@ -73,31 +73,31 @@ int SPxAggregateSM::eliminate(const SVector& row, Real b)
 
       if (y / x > 0)
       {
-         if (lp->lower(k) <= -infinity)
+         if (lp.lower(k) <= -infinity)
             up = infinity;
          else
-            up = b / x - y / x * lp->lower(k);
-         if (lp->upper(k) >= infinity)
+            up = b / x - y / x * lp.lower(k);
+         if (lp.upper(k) >= infinity)
             lo = -infinity;
          else
-            lo = b / x - y / x * lp->upper(k);
+            lo = b / x - y / x * lp.upper(k);
       }
       else
       {
-         if (lp->upper(k) <= -infinity)
+         if (lp.upper(k) <= -infinity)
             up = infinity;
          else
-            up = b / x - y / x * lp->upper(k);
-         if (lp->lower(k) >= infinity)
+            up = b / x - y / x * lp.upper(k);
+         if (lp.lower(k) >= infinity)
             lo = -infinity;
          else
-            lo = b / x - y / x * lp->lower(k);
+            lo = b / x - y / x * lp.lower(k);
       }
 
-      if (lo > lp->lower(j))
-         lp->changeLower(j, lo);
-      if (up < lp->upper(j))
-         lp->changeUpper(j, up);
+      if (lo > lp.lower(j))
+         lp.changeLower(j, lo);
+      if (up < lp.upper(j))
+         lp.changeUpper(j, up);
    }
 
    else
@@ -115,31 +115,31 @@ int SPxAggregateSM::eliminate(const SVector& row, Real b)
          {
             if (x > maxabs)
                maxabs = x;
-            if (lp->upper(k) >= infinity)
+            if (lp.upper(k) >= infinity)
                upcnt++;
             else
-               up += lp->upper(k) * x;
-            if (lp->lower(k) <= -infinity)
+               up += lp.upper(k) * x;
+            if (lp.lower(k) <= -infinity)
                locnt++;
             else
-               lo += lp->lower(k) * x;
+               lo += lp.lower(k) * x;
          }
          else if (x < 0)
          {
             if (-x > maxabs)
                maxabs = -x;
-            if (lp->upper(k) >= infinity)
+            if (lp.upper(k) >= infinity)
                locnt++;
             else
-               lo += lp->upper(k) * x;
-            if (lp->lower(k) <= -infinity)
+               lo += lp.upper(k) * x;
+            if (lp.lower(k) <= -infinity)
                upcnt++;
             else
-               up += lp->lower(k) * x;
+               up += lp.lower(k) * x;
          }
       }
 
-      int fill = lp->nCols() + 1;
+      int fill = lp.nCols() + 1;
       maxabs *= stability;
       for (j = row.size() - 1; j >= 0; --j)
       {
@@ -147,30 +147,30 @@ int SPxAggregateSM::eliminate(const SVector& row, Real b)
          if (x > maxabs || -x > maxabs)
          {
             k = row.index(j);
-            okLow = (lp->lower(k) <= -infinity);
-            okUp = (lp->upper(k) >= infinity);
+            okLow = (lp.lower(k) <= -infinity);
+            okUp = (lp.upper(k) >= infinity);
 
             if (!okLow)
             {
                if (x > 0)
                {
                   if (upcnt == 0)
-                     y = (b - up) / x + lp->upper(k);
+                     y = (b - up) / x + lp.upper(k);
                   else if (okUp && upcnt == 1)
                      y = (b - up) / x;
                   else
                      continue;
-                  okLow = (y >= lp->lower(k));
+                  okLow = (y >= lp.lower(k));
                }
                else if (x < 0)
                {
                   if (locnt == 0)
-                     y = (b - lo) / x + lp->upper(k);
+                     y = (b - lo) / x + lp.upper(k);
                   else if (okUp && locnt == 1)
                      y = (b - lo) / x;
                   else
                      continue;
-                  okLow = (y >= lp->lower(k));
+                  okLow = (y >= lp.lower(k));
                }
             }
 
@@ -179,30 +179,30 @@ int SPxAggregateSM::eliminate(const SVector& row, Real b)
                if (x > 0)
                {
                   if (locnt == 0)
-                     y = (b - lo) / x + lp->lower(k);
+                     y = (b - lo) / x + lp.lower(k);
                   else if (locnt == 1
-                            && lp->lower(k) <= -infinity)
+                            && lp.lower(k) <= -infinity)
                      y = (b - lo) / x;
                   else
                      continue;
-                  okUp = (y <= lp->upper(k));
+                  okUp = (y <= lp.upper(k));
                }
                else if (x < 0)
                {
                   if (upcnt == 0)
-                     y = (b - up) / x + lp->lower(k);
+                     y = (b - up) / x + lp.lower(k);
                   else if (upcnt == 1
-                            && lp->lower(k) <= -infinity)
+                            && lp.lower(k) <= -infinity)
                      y = (b - up) / x;
                   else
                      continue;
-                  okUp = (y <= lp->upper(k));
+                  okUp = (y <= lp.upper(k));
                }
             }
 
             if (okLow && okUp)
             {
-               int f = lp->colVector(k).size();
+               int f = lp.colVector(k).size();
                if (f < fill)
                {
                   best = j;
@@ -217,23 +217,23 @@ int SPxAggregateSM::eliminate(const SVector& row, Real b)
    return best;
 }
 
-int SPxAggregateSM::simplify()
+SPxSimplifier::Result SPxAggregateSM::simplify(SPxLP& lp)
 {
    int best;
    int stage, last, num, j, i, k;
    Real x, b;
-   DataArray < int > remCol(lp->nCols());
-   DataArray < int > remRow(lp->nRows());
+   DataArray < int > remCol(lp.nCols());
+   DataArray < int > remRow(lp.nRows());
    LPCol newCol;
    LPCol emptyCol;
    LPRow emptyRow;
-   DVector lhs(lp->lhs());
-   DVector rhs(lp->rhs());
-   SSVector tmp(lp->nRows());
-   DSVector pcol(lp->nRows());
-   DSVector prow(lp->nCols());
+   DVector lhs(lp.lhs());
+   DVector rhs(lp.rhs());
+   SSVector tmp(lp.nRows());
+   DSVector pcol(lp.nRows());
+   DSVector prow(lp.nCols());
 
-   DataArray < RowCnt > rowcnt(lp->nRows());
+   DataArray < RowCnt > rowcnt(lp.nRows());
    Compare compare;
 
    stability = 0.01;
@@ -242,9 +242,9 @@ int SPxAggregateSM::simplify()
    stage = 0;
    last = 0;
    num = 0;
-   for (i = lp->nCols() - 1; i >= 0; --i)
+   for (i = lp.nCols() - 1; i >= 0; --i)
       remCol[i] = 0;
-   for (i = lp->nRows() - 1; i >= 0; --i)
+   for (i = lp.nRows() - 1; i >= 0; --i)
       remRow[i] = 0;
 
    do
@@ -257,10 +257,10 @@ int SPxAggregateSM::simplify()
       }
       last = num;
 
-      for (i = lp->nRows() - 1; i >= 0; --i)
+      for (i = lp.nRows() - 1; i >= 0; --i)
       {
          rowcnt[i].row = i;
-         rowcnt[i].size = lp->rowVector(i).size();
+         rowcnt[i].size = lp.rowVector(i).size();
       }
       sorter_qsort(rowcnt.get_ptr(), rowcnt.size(), compare);
 
@@ -272,19 +272,19 @@ int SPxAggregateSM::simplify()
             b = lhs[i];
             if (b == rhs[i])
             {
-               const SVector& row = lp->rowVector(i);
-               best = eliminate(row, b);
+               const SVector& row = lp.rowVector(i);
+               best = eliminate(lp, row, b);
                if (best >= 0)
                {
                   Real a = row.value(best);
                   int idx = row.index(best);
-                  Real obj = lp->obj(idx);
+                  Real obj = lp.obj(idx);
 
-                  pcol = lp->colVector(idx);
+                  pcol = lp.colVector(idx);
                   pcol.remove(pcol.number(i));
-                  lp->changeCol(idx, emptyCol);
+                  lp.changeCol(idx, emptyCol);
                   prow = row;
-                  lp->changeRow(i, emptyRow);
+                  lp.changeRow(i, emptyRow);
 
                   if (prow.size() > 1)
                      for (j = pcol.size() - 1; j >= 0; --j)
@@ -294,17 +294,17 @@ int SPxAggregateSM::simplify()
                   {
                      x = prow.value(j);
                      k = prow.index(j);
-                     tmp = lp->colVector(k);
+                     tmp = lp.colVector(k);
                      tmp.multAdd(-(x / a), pcol);
                      newCol.setColVector(DSVector(tmp));
-                     newCol.setUpper(lp->upper(k));
-                     newCol.setLower(lp->lower(k));
-                     newCol.setObj(lp->obj(k) - x / a * obj);
-                     lp->changeCol(k, newCol);
+                     newCol.setUpper(lp.upper(k));
+                     newCol.setLower(lp.lower(k));
+                     newCol.setObj(lp.obj(k) - x / a * obj);
+                     lp.changeCol(k, newCol);
                   }
                   rhs.multAdd(-(b / a), pcol);
                   lhs.multAdd(-(b / a), pcol);
-                  delta -= b / a * obj;
+                  //Zielfunktionsdelta                  delta -= b / a * obj;
                   remRow[i] = -1;
                   remCol[idx] = -1;
                   ++num;
@@ -314,26 +314,41 @@ int SPxAggregateSM::simplify()
       }
    }
    while (last < num);
-   if (num)
+
+   if (num > 0)
    {
-      lp->changeRange(lhs, rhs);
-      lp->removeRows (remRow.get_ptr());
-      assert(lp->isConsistent());
-      lp->removeCols (remCol.get_ptr());
-      assert(lp->isConsistent());
+      lp.changeRange(lhs, rhs);
+      lp.removeRows (remRow.get_ptr());
+      assert(lp.isConsistent());
+      lp.removeCols (remCol.get_ptr());
+      assert(lp.isConsistent());
       VERBOSE1({ std::cout << "SPxAggregateSM:\tremoved " << num
                            << " row(s) and column(s)" << std::endl
-                           << "SPxAggregateSM:\tdelta = " << delta
+                    //                           << "SPxAggregateSM:\tdelta = " << delta
                            << std::endl; });
    }
 
-   return 0;
+   return OKAY;
 }
 
-void SPxAggregateSM::unsimplify()
+const Vector& SPxAggregateSM::unsimplifiedPrimal(const Vector& x)
 {
-   std::cerr << "SPxAggregateSM::unsimplify() not implemented\n";
+   std::cout << "SPxAggregateSM::unsimplifiedPrimal() not implemented\n";
+
+   abort();
+
+   return x;
 }
+
+const Vector& SPxAggregateSM::unsimplifiedDual(const Vector& pi)
+{
+   std::cout << "SPxAggregateSM::unsimplifiedDual() not implemented\n";
+
+   abort();
+
+   return pi;
+}
+
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

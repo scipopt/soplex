@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.cpp,v 1.20 2002/12/16 07:29:47 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.cpp,v 1.21 2003/01/05 19:03:17 bzfkocht Exp $"
 
 #include <stdio.h>
 
@@ -25,11 +25,47 @@ namespace soplex
 {
 int SPxLP::nNzos() const
 {
-   METHOD( "SoPlex::nNzos()" );
+   METHOD( "SPxLP::nNzos()" );
    int n = 0;
    for( int i = 0; i < nCols(); ++i )
       n += colVector(i).size();
    return n;
+}
+
+Real SPxLP::minAbsNzo() const
+{
+   METHOD( "SPxLP::minAbsNzo()" );
+
+   Real mini = infinity;
+
+   for( int i = 0; i < nCols(); ++i )
+   {
+      Real m = colVector(i).minAbs();
+
+      if (m < mini)
+         mini = m;
+   }
+   assert(mini >= 0.0);
+
+   return mini;
+}
+
+Real SPxLP::maxAbsNzo() const
+{
+   METHOD( "SPxLP::maxAbsNzo()" );
+
+   Real maxi = 0.0;
+
+   for( int i = 0; i < nCols(); ++i )
+   {
+      Real m = colVector(i).maxAbs();
+
+      if (m > maxi)
+         maxi = m;
+   }
+   assert(maxi >= 0.0);
+
+   return maxi;
 }
 
 void SPxLP::getRow(int i, LPRow& row) const

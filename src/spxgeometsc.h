@@ -13,50 +13,44 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxstarter.h,v 1.6 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeometsc.h,v 1.1 2003/01/05 19:03:16 bzfkocht Exp $"
 
-
-/**@file  spxstarter.h
- * @brief #SoPlex start basis generation base class.
+/**@file  spxgeometsc.h
+ * @brief LP geometric mean scaling.
  */
-#ifndef _SPXDSTARTER_H_
-#define _SPXDSTARTER_H_
+#ifndef _SPXGEOMETSC_H_
+#define _SPXGEOMETSC_H_
 
 #include <assert.h>
 
 #include "spxdefines.h"
-#include "spxsolver.h"
+#include "spxscaler.h"
 
 namespace soplex
 {
-
-/**@brief   #SoPlex start basis generation base class.
+/**@brief Geometric mean row/column scaling.
    @ingroup Algo
-   
-   #SPxStarter is the virtual base class for classes generating a starter basis
-   for the Simplex solver #SoPlex. When a #SPxStarter object has been loaded
-   to a #SoPlex solver, the latter will call method #generate() in order to
-   have a start basis generated. Implementations of method #generate() must
-   terminate by #SPxSolver::load()%ing the generated basis to #SoPlex. Loaded
-   basises must be nonsingular.
+
+   This #SPxScaler implementation performs geometric mean scaling of the 
+   LPs rows and columns.
 */
-class SPxStarter
+class SPxGeometSC : public SPxScaler
 {
+protected:
+   ///
+   virtual Real computeColscale(const SVector& col) const;
+   ///
+   virtual Real computeRowscale(const SVector& row) const;
+
 public:
-   /// generates start basis for loaded basis.
-   virtual void generate(SPxSolver& base) = 0;
+   /// Scale the loaded #SPxLP.
+   virtual void scale(SPxLP& lp);
 
-   /// destructor.
-   virtual ~SPxStarter()
-   { }
-
-   /// checks consistency.
-   virtual bool isConsistent() const;
+   /// default constructor.
+   explicit SPxGeometSC(bool colFirst = true, bool doBoth = true);
 };
-
-
 } // namespace soplex
-#endif // _SPXDSTARTER_H_
+#endif // _SPXGEOMETSC_H_
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.49 2002/12/16 07:50:55 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.50 2003/01/05 19:03:16 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -23,6 +23,7 @@
 #include <fstream>
 
 #include "spxdefines.h"
+#include "soplex.h"
 #include "spxsolver.h"
 
 #include "timer.h"
@@ -38,12 +39,13 @@
 #include "spxdefaultrt.h"
 #include "spxfastrt.h"
 #include "spxsimplifier.h"
+#include "spxintervalsm.h"
 #include "spxaggregatesm.h"
-#include "spxredundantsm.h"
 #include "spxrem1sm.h"
 #include "spxgeneralsm.h"
 #include "spxscaler.h"
 #include "spxequilisc.h"
+#include "spxgeometsc.h"
 #include "spxsumst.h"
 #include "spxweightst.h"
 #include "spxvectorst.h"
@@ -56,35 +58,29 @@ using namespace soplex;
  */
 class MySoPlex : public SoPlex
 {
-private:
-   SLUFactor m_slu;
-
 public:
    /// default constructor
-   MySoPlex(Type p_type = LEAVE, Representation p_rep = COLUMN)
+   MySoPlex(
+      SPxSolver::Type p_type = SPxSolver::LEAVE, 
+      SPxSolver::Representation p_rep = SPxSolver::COLUMN)
       : SoPlex(p_type, p_rep)
    {
-      SoPlex::setSolver(&m_slu); // virtual function call in constructor
    }
 
    virtual bool terminate()
    {
-      if (iteration() % 100 == 0)
-         std::cout << iteration() << ":\t" << value() << std::endl;
+      if (m_solver.basis().iteration() % 100 == 0)
+         std::cout << m_solver.basis().iteration() << ":\t" << m_solver.value() << std::endl;
 
       return SoPlex::terminate();
    }
 
-   void setUtype(SLUFactor::UpdateType tp)
-   {
-      m_slu.setUtype(tp);
-   }
    void displayStats() const
    {
-      std::cout << "Factorizations   : " << m_slu.getFactorCount() << std::endl;
-      std::cout << "    Time spend   : " << m_slu.getFactorTime() << std::endl;
-      std::cout << "Solves           : " << m_slu.getSolveCount() << std::endl;
-      std::cout << "    Time spend   : " << m_slu.getSolveTime() << std::endl;
+      std::cout << "Factorizations   : " << getFactorCount() << std::endl;
+      std::cout << "    Time spend   : " << getFactorTime() << std::endl;
+      std::cout << "Solves           : " << getSolveCount() << std::endl;
+      std::cout << "    Time spend   : " << getSolveTime() << std::endl;
    }
    void displayQuality() const
    {
@@ -93,31 +89,31 @@ public:
 
       std::cout << "Violations (max/sum)" << std::endl;
                 
-      qualConstraintViolation(maxviol, sumviol);
+      m_solver.qualConstraintViolation(maxviol, sumviol);
 
       std::cout << "Constraints      :" 
                 << std::setw(16) << maxviol << "  " 
                 << std::setw(16) << sumviol << std::endl;
 
-      qualConstraintViolationUnscaled(maxviol, sumviol);
+      qualConstraintViolation(maxviol, sumviol);
 
       std::cout << "      (unscaled) :" 
                 << std::setw(16) << maxviol << "  " 
                 << std::setw(16) << sumviol << std::endl;
 
-      qualBoundViolation(maxviol, sumviol);
+      m_solver.qualBoundViolation(maxviol, sumviol);
 
       std::cout << "Bounds           :" 
                 << std::setw(16) << maxviol << "  " 
                 << std::setw(16) << sumviol << std::endl;
 
-      qualBoundViolationUnscaled(maxviol, sumviol);
+      qualBoundViolation(maxviol, sumviol);
 
       std::cout << "      (unscaled) :" 
                 << std::setw(16) << maxviol << "  " 
                 << std::setw(16) << sumviol << std::endl;
 
-      qualSlackViolation(maxviol, sumviol);
+      m_solver.qualSlackViolation(maxviol, sumviol);
 
       std::cout << "Slacks           :" 
                 << std::setw(16) << maxviol << "  " 
@@ -177,20 +173,21 @@ int main(int argc, const char* const argv[])
 
    const char*            filename;
    char*                  basisname      = 0;
-   SoPlex::Type           type           = SoPlex::LEAVE;
-   SoPlex::Representation representation = SoPlex::COLUMN;
+   SPxSolver::Type           type           = SPxSolver::LEAVE;
+   SPxSolver::Representation representation = SPxSolver::COLUMN;
    SLUFactor::UpdateType  update         = SLUFactor::FOREST_TOMLIN;
    SPxSimplifier*         simplifier     = 0;
    SPxStarter*            starter        = 0;
    SPxPricer*             pricer         = 0;
    SPxRatioTester*        ratiotester    = 0;
-   SPxScaler*             scaler         = 0;
+   SPxScaler*             prescaler      = 0;
+   SPxScaler*             postscaler     = 0;
    NameSet                rownames;
    NameSet                colnames;
    int                    starting       = 0;
    int                    pricing        = 4;
    int                    ratiotest      = 2;
-   int                    scaling        = 2;
+   int                    scaling        = 1;
    int                    simplifing     = 1;
    Real                   timelimit      = -1.0;
    Real                   delta          = DEFAULT_BND_VIOL;
@@ -223,7 +220,7 @@ int main(int argc, const char* const argv[])
          delta = atof(&argv[optidx][2]);
          break;
       case 'e':
-         type = SoPlex::ENTER;
+         type = SPxSolver::ENTER;
          break;
       case 'g' :
          scaling = atoi(&argv[optidx][2]);
@@ -241,7 +238,7 @@ int main(int argc, const char* const argv[])
          print_quality = true;
          break;
       case 'r' :
-         representation = SoPlex::ROW;
+         representation = SPxSolver::ROW;
          break;
       case 's' :
          simplifing = atoi(&argv[optidx][2]);
@@ -302,10 +299,10 @@ int main(int argc, const char* const argv[])
 
    assert(work.isConsistent());
 
-   std::cout << (type == SoPlex::ENTER ? "Entering" : "Leaving")
+   std::cout << (type == SPxSolver::ENTER ? "Entering" : "Leaving")
              << " algorithm" 
              << std::endl
-             << (representation == SoPlex::ROW ? "Row" : "Column")
+             << (representation == SPxSolver::ROW ? "Row" : "Column")
              << " representation" 
              << std::endl
              << (update == SLUFactor::ETA ? "Eta" : "Forest-Tomlin")
@@ -364,51 +361,53 @@ int main(int argc, const char* const argv[])
    switch(scaling)
    {
    case 2 :
-      scaler = new SPxEquili(representation == SoPlex::COLUMN, false);
+      prescaler  = new SPxEquiliSC(representation == SPxSolver::COLUMN, false);
+      postscaler = new SPxGeometSC(representation == SPxSolver::COLUMN, false);
       break;
    case 1 :
-      scaler = new SPxEquili(representation == SoPlex::COLUMN, true);
+      prescaler  = new SPxEquiliSC(representation == SPxSolver::COLUMN, true);
+      postscaler = new SPxGeometSC(representation == SPxSolver::COLUMN, true);
       break;
    case 0 : 
       /*FALLTHROUGH*/
    default :
-      scaler = 0;
+      prescaler  = 0;
+      postscaler = 0;
       std::cout << "No";
       break;
    }
-   work.setScaler(scaler);
+   work.setPreScaler(prescaler);
+   work.setPostScaler(postscaler);
 
-   if (scaler != 0) 
-      std::cout << scaler->getName();
+   std::cout << ((prescaler != 0) ? prescaler->getName() : "No ") 
+             << " / "
+             << ((postscaler != 0) ? postscaler->getName() : "no ")
+             << " scaling" << std::endl;
 
-   std::cout << " scaling" << std::endl;
    assert(work.isConsistent());
 
    switch(simplifing)
    {
-   case 4 : 
-      simplifier = new SPxRedundantSM;
-      std::cout << "Redundant";
+   case 4 :
+      simplifier = new SPxIntervalSM;
       break;
    case 3 : 
       simplifier = new SPxRem1SM;
-      std::cout << "Remove 1";
       break;
    case 2 :
       simplifier = new SPxAggregateSM;
-      std::cout << "Aggregate";
       break;
    case 1 :
       simplifier = new SPxGeneralSM;
-      std::cout << "General";
       break;
    case 0  :
       /*FALLTHROUGH*/
    default :
-      std::cout << "No";
+      break;
    }
-   std::cout << " simplifier" << std::endl;
    work.setSimplifier(simplifier);
+   std::cout << ((simplifier == 0) ? "No" : simplifier->getName()) 
+             << " simplifier" << std::endl;
    assert(work.isConsistent());
 
    switch(starting)
@@ -455,12 +454,14 @@ int main(int argc, const char* const argv[])
    // Should we read a basis ?
    if (read_basis)
    {
+#if 0
       if (!work.readBasisFile(basisname, rownames, colnames))
       {
          std::cerr << "error while reading file \"" 
                    << basisname << "\"" << std::endl;
          exit(1);
       }
+#endif
    }
    timer.start();
    std::cout << "solving LP" 
@@ -476,17 +477,17 @@ int main(int argc, const char* const argv[])
              << timer.userTime() 
              << std::endl
              << "iterations       : " 
-             << work.basis().iteration() 
+             << work.iteration() 
              << std::endl;
    
-   SoPlex::Status stat = work.status();
+   SPxSolver::Status stat = work.status();
 
    switch (stat)
    {
-   case SoPlex::OPTIMAL:
+   case SPxSolver::OPTIMAL:
       std::cout << "solution value is: "
                 << std::setprecision(precision)
-                << work.value()
+                << work.objValue()
                 << std::endl;
 
       if (print_quality)
@@ -494,47 +495,39 @@ int main(int argc, const char* const argv[])
 
       if (print_solution)
       {
-         if (simplifier != 0)
-         {
-            std::cerr 
-               << "Output of solution vector with simplifier not implemented"
-               << " (use -s0 switch)."
-               << std::endl;
-         }      
-         else
-         {
-            DVector objx(work.nCols());
+         DVector objx(work.nCols());
             
-            work.getPrimalUnscaled(objx);
+         work.getPrimal(objx);
             
-            for(int i = 0; i < work.nCols(); i++)
-               if (isNotZero(objx[i], epsilon))
-                  std::cout << colnames[work.cId(i)] << "\t" 
-                            << std::setw(16)
-                            << std::setprecision(precision)
-                            << objx[i] << std::endl;
-            std::cout << "All other variable are zero." << std::endl;
-         }
+         for(int i = 0; i < work.nCols(); i++)
+            if (isNotZero(objx[i], epsilon))
+               std::cout << colnames[work.cId(i)] << "\t" 
+                         << i << "\t"
+                         << std::setw(16)
+                         << std::setprecision(precision)
+                         << objx[i] << std::endl;
+         std::cout << "All other variable are zero." << std::endl;
       }
-
+#if 0
       if (write_basis)
          if (!work.writeBasisFile(basisname, rownames, colnames))
             std::cerr << "error while writing file \"" 
                       << basisname << "\"" << std::endl;
+#endif
       break;
-   case SoPlex::UNBOUNDED:
+   case SPxSolver::UNBOUNDED:
       std::cout << "LP is unbounded";
       break;
-   case SoPlex::INFEASIBLE:
+   case SPxSolver::INFEASIBLE:
       std::cout << "LP is infeasible";
       break;
-   case SoPlex::ABORT_TIME:
+   case SPxSolver::ABORT_TIME:
       std::cout << "aborted due to time limit";
       break;
-   case SoPlex::ABORT_ITER:
+   case SPxSolver::ABORT_ITER:
       std::cout << "aborted due to iteration limit";
       break;
-   case SoPlex::ABORT_VALUE:
+   case SPxSolver::ABORT_VALUE:
       std::cout << "aborted due to objective value limit";
       break;
    default:
@@ -543,8 +536,10 @@ int main(int argc, const char* const argv[])
    }
    std::cout << std::endl;
 
-   if (scaler != 0)
-      delete scaler;
+   if (prescaler != 0)
+      delete prescaler;
+   if (postscaler != 0)
+      delete postscaler;
    if (simplifier != 0)
       delete simplifier;
    if (starter != 0)

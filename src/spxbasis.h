@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.30 2002/12/16 07:50:55 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.31 2003/01/05 19:03:16 bzfkocht Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -33,7 +33,7 @@
 
 namespace soplex
 {
-class SoPlex;
+class SPxSolver;
 
 /**@brief   Simplex basis.
    @ingroup Algo
@@ -326,7 +326,7 @@ public:
    };
 
 protected:
-   SoPlex* theLP;
+   SPxSolver* theLP;
    
    /* For storing the basis matrix we keep two arrays: Array #theBaseId
       contains the #Id%s of the basis vectors, and #matrix the pointers to
@@ -500,7 +500,7 @@ public:
    }
    /// returns loaded solver.
    ///@todo Name should be changed, or loadSolver should be renamed.
-   SoPlex* solver() const
+   SPxSolver* solver() const
    {
       return theLP;
    }
@@ -696,7 +696,7 @@ public:
    /** This involves resetting all counters to 0 and setting up a regular
        default basis consisting of slacks, artificial variables or bounds.
    */
-   virtual void load(SoPlex* lp);
+   virtual void load(SPxSolver* lp);
 
    /// unloads the LP from the basis.
    virtual void unLoad()

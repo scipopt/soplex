@@ -13,13 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvecs.cpp,v 1.21 2002/12/12 09:48:54 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxvecs.cpp,v 1.22 2003/01/05 19:03:17 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
 #include "spxdefines.h"
-#include "soplex.h"
+#include "spxsolver.h"
 
 namespace soplex
 {
@@ -40,9 +40,9 @@ namespace soplex
     variables are altered. In entering type algorithm they are changed and,
     hence, retreived from the column or row upper or lower bound vectors.
  */
-void SoPlex::computeFrhs()
+void SPxSolver::computeFrhs()
 {
-   METHOD( "SoPlex::computeFrhs()" );
+   METHOD( "SPxSolver::computeFrhs()" );
 
    if (rep() == COLUMN)
    {
@@ -109,9 +109,9 @@ void SoPlex::computeFrhs()
    }
 }
 
-void SoPlex::computeFrhsXtra()
+void SPxSolver::computeFrhsXtra()
 {
-   METHOD( "SoPlex::computeFrhsXtra()" );
+   METHOD( "SPxSolver::computeFrhsXtra()" );
 
    assert(rep()  == COLUMN);
    assert(type() == LEAVE);
@@ -159,11 +159,11 @@ void SoPlex::computeFrhsXtra()
     specified by the |Status| of all nonbasic variables. The values of \f$x_N\f$ or
     \f$\pi_N\f$ are taken from the passed arrays.
  */
-void SoPlex::computeFrhs1(
+void SPxSolver::computeFrhs1(
    const Vector& ufb,    ///< upper feasibility bound for variables
    const Vector& lfb)    ///< lower feasibility bound for variables
 {
-   METHOD( "SoPlex::computeFrhs1()" );
+   METHOD( "SPxSolver::computeFrhs1()" );
 
    const SPxBasis::Desc& ds = desc();
 
@@ -215,11 +215,11 @@ void SoPlex::computeFrhs1(
     specified by the |Status| of all nonbasic variables. The values of \f$x_N\f$ or
     \f$\pi_N\f$ are taken from the passed arrays.
  */
-void SoPlex::computeFrhs2(
+void SPxSolver::computeFrhs2(
    const Vector& coufb,   ///< upper feasibility bound for covariables
    const Vector& colfb)   ///< lower feasibility bound for covariables
 {
-   METHOD( "SoPlex::computeFrhs2()" );
+   METHOD( "SPxSolver::computeFrhs2()" );
    const SPxBasis::Desc& ds = desc();
 
    for(int i = 0; i < dim(); ++i)
@@ -290,9 +290,9 @@ void SoPlex::computeFrhs2(
     |...4Col(i,n)|, respectively. They do their job for the |i|-th basis
     variable, being the |n|-th row or column.  
 */
-void SoPlex::computeEnterCoPrhs4Row(int i, int n)
+void SPxSolver::computeEnterCoPrhs4Row(int i, int n)
 {
-   METHOD( "SoPlex::computeEnterCoPrhs4Row()" );
+   METHOD( "SPxSolver::computeEnterCoPrhs4Row()" );
    assert(baseId(i).isSPxRowId());
    assert(number(SPxRowId(baseId(i))) == n);
 
@@ -322,9 +322,9 @@ void SoPlex::computeEnterCoPrhs4Row(int i, int n)
    }
 }
 
-void SoPlex::computeEnterCoPrhs4Col(int i, int n)
+void SPxSolver::computeEnterCoPrhs4Col(int i, int n)
 {
-   METHOD( "SoPlex::computeEnterCoPrhs4Col()" );
+   METHOD( "SPxSolver::computeEnterCoPrhs4Col()" );
    assert(baseId(i).isSPxColId());
    assert(number(SPxColId(baseId(i))) == n);
    switch (desc().colStatus(n))
@@ -361,9 +361,9 @@ void SoPlex::computeEnterCoPrhs4Col(int i, int n)
    }
 }
 
-void SoPlex::computeEnterCoPrhs()
+void SPxSolver::computeEnterCoPrhs()
 {
-   METHOD( "SoPlex::computeEnterCoPrhs()" );
+   METHOD( "SPxSolver::computeEnterCoPrhs()" );
    assert(type() == ENTER);
 
    for (int i = dim() - 1; i >= 0; --i)
@@ -376,9 +376,9 @@ void SoPlex::computeEnterCoPrhs()
    }
 }
 
-void SoPlex::computeLeaveCoPrhs4Row(int i, int n)
+void SPxSolver::computeLeaveCoPrhs4Row(int i, int n)
 {
-   METHOD( "SoPlex::computeLeaveCoPrhs4Row()" );
+   METHOD( "SPxSolver::computeLeaveCoPrhs4Row()" );
    assert(baseId(i).isSPxRowId());
    assert(number(SPxRowId(baseId(i))) == n);
    switch (desc().rowStatus(n))
@@ -406,9 +406,9 @@ void SoPlex::computeLeaveCoPrhs4Row(int i, int n)
    }
 }
 
-void SoPlex::computeLeaveCoPrhs4Col(int i, int n)
+void SPxSolver::computeLeaveCoPrhs4Col(int i, int n)
 {
-   METHOD( "SoPlex::computeLeaveCoPrhs4Col()" );
+   METHOD( "SPxSolver::computeLeaveCoPrhs4Col()" );
    assert(baseId(i).isSPxColId());
    assert(number(SPxColId(baseId(i))) == n);
    switch (desc().colStatus(n))
@@ -437,9 +437,9 @@ void SoPlex::computeLeaveCoPrhs4Col(int i, int n)
    }
 }
 
-void SoPlex::computeLeaveCoPrhs()
+void SPxSolver::computeLeaveCoPrhs()
 {
-   METHOD( "SoPlex::computeLeaveCoPrhs()" );
+   METHOD( "SPxSolver::computeLeaveCoPrhs()" );
    assert(type() == LEAVE);
 
    for (int i = dim() - 1; i >= 0; --i)
@@ -458,18 +458,18 @@ void SoPlex::computeLeaveCoPrhs()
     computing all scalar products of the pricing vector with the vectors of the
     LPs constraint matrix.
  */
-void SoPlex::computePvec()
+void SPxSolver::computePvec()
 {
-   METHOD( "SoPlex::computePvec()" );
+   METHOD( "SPxSolver::computePvec()" );
    int i;
 
    for (i = coDim() - 1; i >= 0; --i)
       (*thePvec)[i] = vector(i) * (*theCoPvec);
 }
 
-void SoPlex::setupPupdate(void)
+void SPxSolver::setupPupdate(void)
 {
-   METHOD( "SoPlex::setupPupdate()" );
+   METHOD( "SPxSolver::setupPupdate()" );
    SSVector& p = thePvec->delta();
    SSVector& c = theCoPvec->delta();
 
@@ -488,9 +488,9 @@ void SoPlex::setupPupdate(void)
    p.setup();
 }
 
-void SoPlex::doPupdate(void)
+void SPxSolver::doPupdate(void)
 {
-   METHOD( "SoPlex::doPupdate()" );
+   METHOD( "SPxSolver::doPupdate()" );
    theCoPvec->update();
    if (pricing() == FULL)
    {

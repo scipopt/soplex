@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxio.cpp,v 1.16 2002/12/08 11:09:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxio.cpp,v 1.17 2003/01/05 19:03:17 bzfkocht Exp $"
 
 
 //#define DEBUGGING 1
@@ -104,21 +104,20 @@ static void dumpBounds(std::ostream& s, const SPxLP& lp)
    int i;
 
    s << "Bounds\n";
+
    for (i = 0; i < lp.nCols(); ++i)
    {
-      Real up;
-      Real low;
-      up = lp.upper(i);
-      low = lp.lower(i);
+      Real up  = lp.upper(i);
+      Real low = lp.lower(i);
+
       if (low == up)
          s << "  x" << i << " = " << up << '\n';
       else if (low > -infinity)
       {
          if (up < infinity)
-            s << "  " << low << " <= x" << i
-            << " <= " << up << '\n';
+            s << "  " << low << " <= x" << i << " <= " << up << '\n';
          else if (low != 0)
-            s << "  x" << i <<">= " << low << '\n';
+            s << "  x" << i <<" >= " << low << '\n';
       }
       else if (up < infinity)
          s << "  x" << i << " <= " << up << '\n';

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: changesoplex.cpp,v 1.20 2002/12/12 09:48:53 bzfkocht Exp $"
+#pragma ident "@(#) $Id: changesoplex.cpp,v 1.21 2003/01/05 19:03:15 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -22,7 +22,7 @@
 #include <iostream>
 
 #include "spxdefines.h"
-#include "soplex.h"
+#include "spxsolver.h"
 #include "spxpricer.h"
 #include "spxratiotester.h"
 
@@ -30,9 +30,9 @@ namespace soplex
 {
 
 #if 0
-void SoPlex::localAddRows(int start)
+void SPxSolver::localAddRows(int start)
 {
-   METHOD( "SoPlex::localAddRows()" );
+   METHOD( "SPxSolver::localAddRows()" );
    assert( start <= SPxLP::nRows() );
 
    /**@todo This method seems to be called, to update
@@ -61,7 +61,7 @@ void SoPlex::localAddRows(int start)
             computeEnterCoPrhs4Row(i, i);
             // init #theFrhs[i]#:
             Real& v_rhs = (*theFrhs)[i];
-            const SVector& row = rowVector(i); // ((const SoPlex*)this)->rowVector(i);
+            const SVector& row = rowVector(i); 
             v_rhs = 0;
             for (int j = row.size() - 1; j >= 0; --j)
             {
@@ -135,7 +135,7 @@ void SoPlex::localAddRows(int start)
             computeLeaveCoPrhs4Row(i, i);
             // init #theFrhs[i]#
             Real& v_rhs = (*theFrhs)[i];
-            const SVector& row = rowVector(i); //((const SoPlex*)this)->rowVector(i);
+            const SVector& row = rowVector(i); 
             v_rhs = 0;
             for (int j = row.size() - 1; j >= 0; --j)
             {
@@ -167,9 +167,9 @@ void SoPlex::localAddRows(int start)
    }
 }
 
-void SoPlex::addedRows(int n)
+void SPxSolver::addedRows(int n)
 {
-   METHOD( "SoPlex::addedRows()" );
+   METHOD( "SPxSolver::addedRows()" );
 
    SPxLP::addedRows(n);
 
@@ -198,9 +198,9 @@ void SoPlex::addedRows(int n)
 }
 #endif //0
 
-void SoPlex::addedRows(int n)
+void SPxSolver::addedRows(int n)
 {
-   METHOD( "SoPlex::addedRows()" );
+   METHOD( "SPxSolver::addedRows()" );
 
    if( n > 0 )
    {
@@ -216,9 +216,9 @@ void SoPlex::addedRows(int n)
 }
 
 #if 0
-void SoPlex::localAddCols(int start)
+void SPxSolver::localAddCols(int start)
 {
-   METHOD( "SoPlex::localAddCols()" );
+   METHOD( "SPxSolver::localAddCols()" );
    assert( start <= SPxLP::nCols() );
 
    /**@todo This method seems to be called, to update
@@ -374,9 +374,9 @@ void SoPlex::localAddCols(int start)
    }
 }
 
-void SoPlex::addedCols(int n)
+void SPxSolver::addedCols(int n)
 {
-   METHOD( "SoPlex::addedCols()" );
+   METHOD( "SPxSolver::addedCols()" );
    SPxLP::addedCols(n);
 
    if( n > 0 )
@@ -401,9 +401,9 @@ void SoPlex::addedCols(int n)
 }
 #endif //0
 
-void SoPlex::addedCols(int n)
+void SPxSolver::addedCols(int n)
 {
-   METHOD( "SoPlex::addedCols()" );
+   METHOD( "SPxSolver::addedCols()" );
 
    if( n > 0 )
    {
@@ -418,9 +418,9 @@ void SoPlex::addedCols(int n)
    assert(isConsistent());
 }
    
-void SoPlex::doRemoveRow(int i)
+void SPxSolver::doRemoveRow(int i)
 {
-   METHOD( "SoPlex::doRemoveRow()" );
+   METHOD( "SPxSolver::doRemoveRow()" );
 
    SPxLP::doRemoveRow(i);
 
@@ -469,9 +469,9 @@ void SoPlex::doRemoveRow(int i)
    }
 }
 
-void SoPlex::doRemoveRows(int perm[])
+void SPxSolver::doRemoveRows(int perm[])
 {
-   METHOD( "SoPlex::doRemoveRows()" );
+   METHOD( "SPxSolver::doRemoveRows()" );
 
    SPxLP::doRemoveRows(perm);
 
@@ -533,9 +533,9 @@ void SoPlex::doRemoveRows(int perm[])
    }
 }
 
-void SoPlex::doRemoveCol(int i)
+void SPxSolver::doRemoveCol(int i)
 {
-   METHOD( "SoPlex::doRemoveCol()" );
+   METHOD( "SPxSolver::doRemoveCol()" );
 
    SPxLP::doRemoveCol(i);
 
@@ -582,9 +582,9 @@ void SoPlex::doRemoveCol(int i)
    }
 }
 
-void SoPlex::doRemoveCols(int perm[])
+void SPxSolver::doRemoveCols(int perm[])
 {
-   METHOD( "SoPlex::doRemoveCols()" );
+   METHOD( "SPxSolver::doRemoveCols()" );
 
    SPxLP::doRemoveCols(perm);
 
@@ -647,9 +647,9 @@ void SoPlex::doRemoveCols(int perm[])
    }
 }
 
-void SoPlex::changeObj(const Vector& newObj)
+void SPxSolver::changeObj(const Vector& newObj)
 {
-   METHOD( "SoPlex::changeObj()" );
+   METHOD( "SPxSolver::changeObj()" );
 
    SPxLP::changeObj(newObj);
 
@@ -659,9 +659,9 @@ void SoPlex::changeObj(const Vector& newObj)
    unInit();
 }
 
-void SoPlex::changeObj(int i, Real newVal)
+void SPxSolver::changeObj(int i, Real newVal)
 {
-   METHOD( "SoPlex::changeObj()" );
+   METHOD( "SPxSolver::changeObj()" );
 
    SPxLP::changeObj(i, newVal);
 
@@ -717,9 +717,9 @@ static void changeLowerStatus(
    //std::cout << " -> " << stat << std::endl; 
 }
 
-void SoPlex::changeLower(const Vector& newLower)
+void SPxSolver::changeLower(const Vector& newLower)
 {
-   METHOD( "SoPlex::changeLower()" );
+   METHOD( "SPxSolver::changeLower()" );
 
    SPxLP::changeLower(newLower);
 
@@ -732,9 +732,9 @@ void SoPlex::changeLower(const Vector& newLower)
    }
 }
 
-void SoPlex::changeLower(int i, Real newLower)
+void SPxSolver::changeLower(int i, Real newLower)
 {
-   METHOD( "SoPlex::changeLower()" );
+   METHOD( "SPxSolver::changeLower()" );
 
    if (NE(newLower, lower(i)))
    {
@@ -796,9 +796,9 @@ static void changeUpperStatus(
    //std::cout << " -> " << stat << std::endl;
 }
 
-void SoPlex::changeUpper(const Vector& newUpper)
+void SPxSolver::changeUpper(const Vector& newUpper)
 {
-   METHOD( "SoPlex::changeUpper()" );
+   METHOD( "SPxSolver::changeUpper()" );
 
    SPxLP::changeUpper(newUpper);
 
@@ -811,9 +811,9 @@ void SoPlex::changeUpper(const Vector& newUpper)
    }
 }
 
-void SoPlex::changeUpper(int i, Real newUpper)
+void SPxSolver::changeUpper(int i, Real newUpper)
 {
-   METHOD( "SoPlex::changeUpper()" );
+   METHOD( "SPxSolver::changeUpper()" );
 
    if (NE(newUpper, upper(i)))
    {
@@ -827,17 +827,17 @@ void SoPlex::changeUpper(int i, Real newUpper)
    }
 }
 
-void SoPlex::changeBounds(const Vector& newLower, const Vector& newUpper)
+void SPxSolver::changeBounds(const Vector& newLower, const Vector& newUpper)
 {
-   METHOD( "SoPlex::changeBounds()" );
+   METHOD( "SPxSolver::changeBounds()" );
 
    changeLower(newLower);
    changeUpper(newUpper);
 }
 
-void SoPlex::changeBounds(int i, Real newLower, Real newUpper)
+void SPxSolver::changeBounds(int i, Real newLower, Real newUpper)
 {
-   METHOD( "SoPlex::changeBounds()" );
+   METHOD( "SPxSolver::changeBounds()" );
 
    changeLower(i, newLower);
    changeUpper(i, newUpper);
@@ -887,9 +887,9 @@ static void changeLhsStatus(
    DEBUG( std::cout << " -> " << stat << std::endl; );
 }
 
-void SoPlex::changeLhs(const Vector& newLhs)
+void SPxSolver::changeLhs(const Vector& newLhs)
 {
-   METHOD( "SoPlex::changeLhs()" );
+   METHOD( "SPxSolver::changeLhs()" );
 
    SPxLP::changeLhs(newLhs);
 
@@ -902,9 +902,9 @@ void SoPlex::changeLhs(const Vector& newLhs)
    }
 }
 
-void SoPlex::changeLhs(int i, Real newLhs)
+void SPxSolver::changeLhs(int i, Real newLhs)
 {
-   METHOD( "SoPlex::changeLhs()" );
+   METHOD( "SPxSolver::changeLhs()" );
 
    SPxLP::changeLhs(i, newLhs);
 
@@ -958,9 +958,9 @@ static void changeRhsStatus(
 }
 
 
-void SoPlex::changeRhs(const Vector& newRhs)
+void SPxSolver::changeRhs(const Vector& newRhs)
 {
-   METHOD( "SoPlex::changeRhs()" );
+   METHOD( "SPxSolver::changeRhs()" );
 
    SPxLP::changeRhs(newRhs);
 
@@ -972,9 +972,9 @@ void SoPlex::changeRhs(const Vector& newRhs)
    }
 }
 
-void SoPlex::changeRhs(int i, Real newRhs)
+void SPxSolver::changeRhs(int i, Real newRhs)
 {
-   METHOD( "SoPlex::changeRhs()" );
+   METHOD( "SPxSolver::changeRhs()" );
 
    SPxLP::changeRhs(i, newRhs);
 
@@ -985,9 +985,9 @@ void SoPlex::changeRhs(int i, Real newRhs)
    }
 }
 
-void SoPlex::changeRange(const Vector& newLhs, const Vector& newRhs)
+void SPxSolver::changeRange(const Vector& newLhs, const Vector& newRhs)
 {
-   METHOD( "SoPlex::changeRange()" );
+   METHOD( "SPxSolver::changeRange()" );
    SPxLP::changeLhs(newLhs);
    SPxLP::changeRhs(newRhs);
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
@@ -1001,9 +1001,9 @@ void SoPlex::changeRange(const Vector& newLhs, const Vector& newRhs)
    }
 }
 
-void SoPlex::changeRange(int i, Real newLhs, Real newRhs)
+void SPxSolver::changeRange(int i, Real newLhs, Real newRhs)
 {
-   METHOD( "SoPlex::changeRange()" );
+   METHOD( "SPxSolver::changeRange()" );
 
    SPxLP::changeLhs(i, newLhs);
    SPxLP::changeRhs(i, newRhs);
@@ -1016,33 +1016,33 @@ void SoPlex::changeRange(int i, Real newLhs, Real newRhs)
    }
 }
 
-void SoPlex::changeRow(int i, const LPRow& newRow)
+void SPxSolver::changeRow(int i, const LPRow& newRow)
 {
-   METHOD( "SoPlex::changeRow()" );
+   METHOD( "SPxSolver::changeRow()" );
 
    SPxLP::changeRow(i, newRow);
    unInit();
 }
 
-void SoPlex::changeCol(int i, const LPCol& newCol)
+void SPxSolver::changeCol(int i, const LPCol& newCol)
 {
-   METHOD( "SoPlex::changeCol()" );
+   METHOD( "SPxSolver::changeCol()" );
 
    SPxLP::changeCol(i, newCol);
    unInit();
 }
 
-void SoPlex::changeElement(int i, int j, Real val)
+void SPxSolver::changeElement(int i, int j, Real val)
 {
-   METHOD( "SoPlex::changeElement()" );
+   METHOD( "SPxSolver::changeElement()" );
 
    SPxLP::changeElement(i, j, val);
    unInit();
 }
 
-void SoPlex::changeSense(SPxSense sns)
+void SPxSolver::changeSense(SPxSense sns)
 {
-   METHOD( "SoPlex::changeSense()" );
+   METHOD( "SPxSolver::changeSense()" );
 
    SPxLP::changeSense(sns);
    unInit();

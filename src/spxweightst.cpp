@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.cpp,v 1.16 2002/12/08 11:09:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightst.cpp,v 1.17 2003/01/05 19:03:17 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 //#define TEST 1
@@ -60,7 +60,7 @@ bool SPxWeightST::isConsistent() const
  */
 void SPxWeightST::setPrimalStatus(
    SPxBasis::Desc& desc, 
-   const SoPlex& base, 
+   const SPxSolver& base, 
    const SPxId& id)
 {
    if (id.isSPxRowId())
@@ -112,7 +112,7 @@ void SPxWeightST::setPrimalStatus(
 
 static void setDualStatus(
    SPxBasis::Desc& desc, 
-   const SoPlex& base, 
+   const SPxSolver& base, 
    const SPxId& id)
 {
    if (id.isSPxRowId())
@@ -135,7 +135,7 @@ static void setDualStatus(
  */
 struct Compare
 {
-   const SoPlex* base;
+   const SPxSolver* base;
    const Real* weight;
 
    Real operator()(int i1, int i2) const
@@ -145,7 +145,7 @@ struct Compare
 };
 
 static void initPrefs(DataArray < SPxId > & pref,
-                       const SoPlex& base,
+                       const SPxSolver& base,
                        const DataArray < Real > & rowWeight,
                        const DataArray < Real > & colWeight
                     )
@@ -190,7 +190,7 @@ static void initPrefs(DataArray < SPxId > & pref,
    assert(j == base.nCols());
 }
 
-void SPxWeightST::generate(SoPlex& base)
+void SPxWeightST::generate(SPxSolver& base)
 {
    SPxId tmpId;
 
@@ -200,7 +200,7 @@ void SPxWeightST::generate(SoPlex& base)
    rowRight.reSize (base.nRows());
    colUp.reSize (base.nCols());
 
-   if (base.rep() == SoPlex::COLUMN)
+   if (base.rep() == SPxSolver::COLUMN)
    {
       weight   = &colWeight;
       coWeight = &rowWeight;
@@ -225,7 +225,7 @@ void SPxWeightST::generate(SoPlex& base)
    for (i = forbidden.size(); --i >= 0;)
       forbidden[i] = 0;
 
-   if (base.rep() == SoPlex::COLUMN)
+   if (base.rep() == SPxSolver::COLUMN)
    {
       i = 0;
       deltai = 1;
@@ -281,7 +281,7 @@ void SPxWeightST::generate(SoPlex& base)
             });
 
             forbidden[sel] = 2;
-            if (base.rep() == SoPlex::COLUMN)
+            if (base.rep() == SPxSolver::COLUMN)
                setDualStatus(desc, base, pref[i]);
             else
                setPrimalStatus(desc, base, pref[i]);
@@ -300,7 +300,7 @@ void SPxWeightST::generate(SoPlex& base)
             if (--dim == 0)
             {
                //@ for(++i; i < pref.size(); ++i)
-               if (base.rep() == SoPlex::COLUMN)
+               if (base.rep() == SPxSolver::COLUMN)
                {
                   for (i += deltai; i >= 0 && i < pref.size(); i += deltai)
                      setPrimalStatus(desc, base, pref[i]);
@@ -323,7 +323,7 @@ void SPxWeightST::generate(SoPlex& base)
                break;
             }
          }
-         else if (base.rep() == SoPlex::COLUMN)
+         else if (base.rep() == SPxSolver::COLUMN)
             setPrimalStatus(desc, base, pref[i]);
          else
             setDualStatus(desc, base, pref[i]);
@@ -376,9 +376,9 @@ void SPxWeightST::generate(SoPlex& base)
 
 /* Computation of Weights
  */
-void SPxWeightST::setupWeights(SoPlex& bse)
+void SPxWeightST::setupWeights(SPxSolver& bse)
 {
-   const SoPlex& base = bse;
+   const SPxSolver& base = bse;
    const Vector& obj  = bse.maxObj();
    const Vector& low  = bse.SPxLP::lower();
    const Vector& up   = bse.SPxLP::upper();

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvectorst.h,v 1.5 2002/01/31 08:19:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxvectorst.h,v 1.6 2003/01/05 19:03:17 bzfkocht Exp $"
 
 /**@file  spxvectorst.h
  * @brief Solution vector based start basis.
@@ -50,7 +50,7 @@ class SPxVectorST : public SPxWeightST
 
 protected:
    /// sets up variable weights.
-   void setupWeights(SoPlex& base);
+   void setupWeights(SPxSolver& base);
 
 public:
    /// sets up primal solution vector.

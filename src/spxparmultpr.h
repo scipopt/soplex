@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxparmultpr.h,v 1.11 2002/03/21 16:06:19 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxparmultpr.h,v 1.12 2003/01/05 19:03:17 bzfkocht Exp $"
 
 /**@file  spxparmultpr.h
  * @brief Partial multiple pricing.
@@ -68,9 +68,9 @@ public:
    static int partialSize;
 
    ///
-   virtual void load(SoPlex* solver);
+   virtual void load(SPxSolver* solver);
    ///
-   virtual void setType(SoPlex::Type tp);
+   virtual void setType(SPxSolver::Type tp);
    ///
    virtual int selectLeave();
    ///

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.22 2002/12/12 09:48:53 bzfkocht Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.23 2003/01/05 19:03:16 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -62,9 +62,9 @@ all $j \ne i^*$ $f^{(i^*)}_j$ remains within its bounds $l_j$ and $u_j$.
     Testing all values of |pVec| against its bounds. If $i$, say, is violated
     the violation is saved as negative value in |theTest[i]|.
  */
-Real SoPlex::test(int i, SPxBasis::Desc::Status stat) const
+Real SPxSolver::test(int i, SPxBasis::Desc::Status stat) const
 {
-   METHOD( "SoPlex::test()" );
+   METHOD( "SPxSolver::test()" );
    assert(type() == ENTER);
    assert(!isBasic(stat));
 
@@ -102,9 +102,9 @@ Real SoPlex::test(int i, SPxBasis::Desc::Status stat) const
    }
 }
 
-void SoPlex::computeTest()
+void SPxSolver::computeTest()
 {
-   METHOD( "SoPlex::computeTest()" );
+   METHOD( "SPxSolver::computeTest()" );
 
    const SPxBasis::Desc& ds = desc();
 
@@ -116,16 +116,16 @@ void SoPlex::computeTest()
    }
 }
 
-Real SoPlex::computePvec(int i)
+Real SPxSolver::computePvec(int i)
 {
-   METHOD( "SoPlex::computePvec()" );
+   METHOD( "SPxSolver::computePvec()" );
 
    return (*thePvec)[i] = vector(i) * (*theCoPvec);
 }
 
-Real SoPlex::computeTest(int i)
+Real SPxSolver::computeTest(int i)
 {
-   METHOD( "SoPlex::computeTest()" );
+   METHOD( "SPxSolver::computeTest()" );
    SPxBasis::Desc::Status stat = desc().status(i);
    if (isBasic(stat))
       return theTest[i] = 0;
@@ -137,9 +137,9 @@ Real SoPlex::computeTest(int i)
     Testing all values of #coPvec# against its bounds. If $i$, say, is violated
     the violation is saved as negative value in |theCoTest[i]|.
  */
-Real SoPlex::coTest(int i, SPxBasis::Desc::Status stat) const
+Real SPxSolver::coTest(int i, SPxBasis::Desc::Status stat) const
 {
-   METHOD( "SoPlex::coTest()" );
+   METHOD( "SPxSolver::coTest()" );
    assert(type() == ENTER);
    assert(!isBasic(stat));
 
@@ -174,9 +174,9 @@ Real SoPlex::coTest(int i, SPxBasis::Desc::Status stat) const
    }
 }
 
-void SoPlex::computeCoTest()
+void SPxSolver::computeCoTest()
 {
-   METHOD( "SoPlex::computeCoTest()" );
+   METHOD( "SPxSolver::computeCoTest()" );
    int i;
    const SPxBasis::Desc& ds = desc();
 
@@ -195,9 +195,9 @@ void SoPlex::computeCoTest()
     The following methods require propersy initialized vectors |fVec| and
     #coPvec#.
  */
-void SoPlex::updateTest()
+void SPxSolver::updateTest()
 {
-   METHOD( "SoPlex::updateTest()" );
+   METHOD( "SPxSolver::updateTest()" );
    thePvec->delta().setup();
 
    const IdxSet& idx = thePvec->idx();
@@ -215,9 +215,9 @@ void SoPlex::updateTest()
    }
 }
 
-void SoPlex::updateCoTest()
+void SPxSolver::updateCoTest()
 {
-   METHOD( "SoPlex::updateCoTest()" );
+   METHOD( "SPxSolver::updateCoTest()" );
    theCoPvec->delta().setup();
 
    const IdxSet& idx = theCoPvec->idx();
@@ -241,7 +241,7 @@ void SoPlex::updateCoTest()
     Here is a list of variables relevant when including |Id| to the basis.
     They are computed by |computeEnterStats()|.
  */
-void SoPlex::getEnterVals
+void SPxSolver::getEnterVals
 (
    SPxId enterId,
    Real& enterTest,
@@ -254,7 +254,7 @@ void SoPlex::getEnterVals
    Real& enterRO
 )
 {
-   METHOD( "SoPlex::getEnterVals()" );
+   METHOD( "SPxSolver::getEnterVals()" );
    int enterIdx;
    SPxBasis::Desc& ds = desc();
 
@@ -384,7 +384,7 @@ void SoPlex::getEnterVals
       default:
          abort();
       }
-      DEBUG({ std::cout << "SoPlex::getEnterVals() : col " << enterIdx
+      DEBUG({ std::cout << "SPxSolver::getEnterVals() : col " << enterIdx
                         << ": " << enterStat
                         << " -> " << ds.colStatus(enterIdx)
                         << std::endl; });
@@ -516,7 +516,7 @@ void SoPlex::getEnterVals
       default:
          abort();
       }
-      DEBUG({ std::cout << "SoPlex::getEnterVals() : row " << enterIdx
+      DEBUG({ std::cout << "SPxSolver::getEnterVals() : row " << enterIdx
                         << ": " << enterStat
                         << " -> " << ds.rowStatus(enterIdx)
                         << std::endl; });
@@ -525,14 +525,14 @@ void SoPlex::getEnterVals
 
 /*      process leaving variable
  */
-void SoPlex::getEnterVals2
+void SPxSolver::getEnterVals2
 (
    int leaveIdx,
    Real enterMax,
    Real& leavebound
 )
 {
-   METHOD( "SoPlex::getEnterVals2()" );
+   METHOD( "SPxSolver::getEnterVals2()" );
    int idx;
    SPxBasis::Desc& ds = desc();
    SPxId leftId = baseId(leaveIdx);
@@ -625,7 +625,7 @@ void SoPlex::getEnterVals2
       default:
          abort();
       }
-      DEBUG({ std::cout << "SoPlex::getEnterVals2(): row " << idx
+      DEBUG({ std::cout << "SPxSolver::getEnterVals2(): row " << idx
                         << ": " << leaveStat
                         << " -> " << ds.rowStatus(idx)
                         << std::endl; });
@@ -712,7 +712,7 @@ void SoPlex::getEnterVals2
       default:
          abort();
       }
-      DEBUG({ std::cout << "SoPlex::getEnterVals2(): col " << idx
+      DEBUG({ std::cout << "SPxSolver::getEnterVals2(): col " << idx
                         << ": " << leaveStat
                         << " -> " << ds.colStatus(idx)
                         << std::endl; });
@@ -721,14 +721,14 @@ void SoPlex::getEnterVals2
 
 
 void
-SoPlex::ungetEnterVal(
+SPxSolver::ungetEnterVal(
    SPxId enterId,
    SPxBasis::Desc::Status enterStat,
    Real leaveVal,
    const SVector& vec
 )
 {
-   METHOD( "SoPlex::ungetEnterVal()" );
+   METHOD( "SPxSolver::ungetEnterVal()" );
    int enterIdx;
    SPxBasis::Desc& ds = desc();
 
@@ -757,13 +757,13 @@ SoPlex::ungetEnterVal(
       theCoTest[enterIdx] = 0;
 }
 
-void SoPlex::rejectEnter(
+void SPxSolver::rejectEnter(
    SPxId enterId,
    Real enterTest,
    SPxBasis::Desc::Status enterStat
 )
 {
-   METHOD( "SoPlex::rejectEnter()" );
+   METHOD( "SPxSolver::rejectEnter()" );
    int enterIdx = number(enterId);
    if (isId(enterId))
    {
@@ -777,9 +777,9 @@ void SoPlex::rejectEnter(
    }
 }
 
-int SoPlex::enter(SPxId& enterId)
+int SPxSolver::enter(SPxId& enterId)
 {
-   METHOD( "SoPlex::enter()" );
+   METHOD( "SPxSolver::enter()" );
    assert(enterId.isValid());
    assert(type() == ENTER);
    assert(initialized);
@@ -831,8 +831,8 @@ int SoPlex::enter(SPxId& enterId)
    }
 
    Real leaveVal = -enterMax;
-   int leaveIdx = theratiotester->selectLeave(leaveVal);
 
+   int leaveIdx = theratiotester->selectLeave(leaveVal);
 
    /*
        We now tried to find a variable to leave the basis. If one has been
@@ -840,23 +840,20 @@ int SoPlex::enter(SPxId& enterId)
     */
    if (leaveIdx >= 0)
    {
-      if (leaveVal < delta() && leaveVal > -delta())
-         m_numCycle += (theUBbound[leaveIdx] != theLBbound[leaveIdx])
-                       && (enterStat != Desc::P_FREE)
-                       && (enterStat != Desc::D_FREE);
+      if (fabs(leaveVal) < delta())
+         m_numCycle += 
+            (theUBbound[leaveIdx] != theLBbound[leaveIdx]) && (enterStat != Desc::P_FREE) && (enterStat != Desc::D_FREE);
       else
          m_numCycle /= 2;
 
       // setup for updating the copricing vector
       if (coSolveVector2)
-         SPxBasis::coSolve(theCoPvec->delta(), *coSolveVector2,
-                            unitVecs[leaveIdx], *coSolveVector2rhs);
+         SPxBasis::coSolve(theCoPvec->delta(), *coSolveVector2, unitVecs[leaveIdx], *coSolveVector2rhs);
       else
          SPxBasis::coSolve(theCoPvec->delta(), unitVecs[leaveIdx]);
 
       (*theCoPrhs)[leaveIdx] = enterRO;
-      theCoPvec->value() = (enterRO - enterPric)
-                           / theFvec->delta()[leaveIdx];
+      theCoPvec->value() = (enterRO - enterPric) / theFvec->delta()[leaveIdx];
 
       if (theCoPvec->value() > epsilon() || theCoPvec->value() < -epsilon())
       {

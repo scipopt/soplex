@@ -13,20 +13,15 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbounds.cpp,v 1.17 2002/12/16 07:29:47 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbounds.cpp,v 1.18 2003/01/05 19:03:16 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
-
-/*  Import system include files
- */
 #include <assert.h>
 #include <iostream>
 
-/*  and class header files
- */
 #include "spxdefines.h"
-#include "soplex.h"
+#include "spxsolver.h"
 
 namespace soplex
 {
@@ -38,9 +33,9 @@ namespace soplex
     -l_i\f$. Hence, with this definition of slack variables \f$s_i\f$, we
     can directly use vectors \f$l\f$ and \f$u\f$ as feasibility bounds.  
  */
-void SoPlex::setPrimalBounds()
+void SPxSolver::setPrimalBounds()
 {
-   METHOD( "SoPlex::setPrimalBounds()" );
+   METHOD( "SPxSolver::setPrimalBounds()" );
 
    theUCbound = SPxLP::upper();
    theLCbound = SPxLP::lower();
@@ -83,12 +78,12 @@ void SoPlex::setPrimalBounds()
    this function clears the bounds according to |stat| by setting them to
    \f$\infty\f$ or \$-\infty\f$, respectively.
  */
-void SoPlex::clearDualBounds(
+void SPxSolver::clearDualBounds(
    SPxBasis::Desc::Status stat,
    Real&                  upp,
    Real&                  lw) const
 {
-   METHOD( "SoPlex::clearDualBounds()" );
+   METHOD( "SPxSolver::clearDualBounds()" );
 
    switch (stat)
    {
@@ -111,9 +106,9 @@ void SoPlex::clearDualBounds(
    }
 }
 
-void SoPlex::setDualColBounds()
+void SPxSolver::setDualColBounds()
 {
-   METHOD( "SoPlex::setDualColBounds()" );
+   METHOD( "SPxSolver::setDualColBounds()" );
 
    assert(rep() == COLUMN);
 
@@ -140,9 +135,9 @@ void SoPlex::setDualColBounds()
    }
 }
 
-void SoPlex::setDualRowBounds()
+void SPxSolver::setDualRowBounds()
 {
-   METHOD( "SoPlex::setDualRowBounds()" );
+   METHOD( "SPxSolver::setDualRowBounds()" );
 
    assert(rep() == ROW);
 
@@ -171,9 +166,9 @@ void SoPlex::setDualRowBounds()
     |setEnterBound4Col(i, n)| does so for the |i|-th basis variable being
     column index |n|.
  */
-void SoPlex::setEnterBound4Row(int i, int n)
+void SPxSolver::setEnterBound4Row(int i, int n)
 {
-   METHOD( "SoPlex::setEnterBound4Row()" );
+   METHOD( "SPxSolver::setEnterBound4Row()" );
    assert(baseId(i).isSPxRowId());
    assert(number(SPxRowId(baseId(i))) == n);
    switch (desc().rowStatus(n))
@@ -194,9 +189,9 @@ void SoPlex::setEnterBound4Row(int i, int n)
    }
 }
 
-void SoPlex::setEnterBound4Col(int i, int n)
+void SPxSolver::setEnterBound4Col(int i, int n)
 {
-   METHOD( "SoPlex::setEnterBound4Col()" );
+   METHOD( "SPxSolver::setEnterBound4Col()" );
    assert(baseId(i).isSPxColId());
    assert(number(SPxColId(baseId(i))) == n);
    switch (desc().colStatus(n))
@@ -217,9 +212,9 @@ void SoPlex::setEnterBound4Col(int i, int n)
    }
 }
 
-void SoPlex::setEnterBounds()
+void SPxSolver::setEnterBounds()
 {
-   METHOD( "SoPlex::setEnterBounds()" );
+   METHOD( "SPxSolver::setEnterBounds()" );
 
    for (int i = 0; i < dim(); ++i)
    {
@@ -238,9 +233,9 @@ void SoPlex::setEnterBounds()
     being the |n|-th row, |setLeaveBound4Col(i,n)| does so for the |i|-th basic
     variable being the |n|-th column.
  */
-void SoPlex::setLeaveBound4Row(int i, int n)
+void SPxSolver::setLeaveBound4Row(int i, int n)
 {
-   METHOD( "SoPlex::setLeaveBound4Row()" );
+   METHOD( "SPxSolver::setLeaveBound4Row()" );
    assert(baseId(i).isSPxRowId());
    assert(number(SPxRowId(baseId(i))) == n);
    switch (desc().rowStatus(n))
@@ -270,9 +265,9 @@ void SoPlex::setLeaveBound4Row(int i, int n)
    }
 }
 
-void SoPlex::setLeaveBound4Col(int i, int n)
+void SPxSolver::setLeaveBound4Col(int i, int n)
 {
-   METHOD( "SoPlex::setLeaveBound4Col()" );
+   METHOD( "SPxSolver::setLeaveBound4Col()" );
 
    assert(baseId(i).isSPxColId());
    assert(number(SPxColId(baseId(i))) == n);
@@ -302,9 +297,9 @@ void SoPlex::setLeaveBound4Col(int i, int n)
    }
 }
 
-void SoPlex::setLeaveBounds()
+void SPxSolver::setLeaveBounds()
 {
-   METHOD( "SoPlex::setLeaveBounds()" );
+   METHOD( "SPxSolver::setLeaveBounds()" );
 
    for (int i = 0; i < dim(); ++i)
    {
@@ -317,9 +312,9 @@ void SoPlex::setLeaveBounds()
    }
 }
 
-void SoPlex::testBounds() const
+void SPxSolver::testBounds() const
 {
-   METHOD( "SoPlex::testBounds()" );
+   METHOD( "SPxSolver::testBounds()" );
 
    Real viol_max = (1 + iterCount) * delta();
 

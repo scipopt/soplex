@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector.h,v 1.14 2002/12/12 09:48:54 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vector.h,v 1.15 2003/01/05 19:03:18 bzfkocht Exp $"
 
 /**@file  vector.h
  * @brief Dense vector for linear algebra.
@@ -63,6 +63,8 @@ class SSVector;
    <TR><TD>\c *=    </TD><TD>scaling       </TD><TD>\c a \c *= \c x </TD></TR>
    <TR><TD>maxAbs() </TD><TD>infinity norm </TD>
        <TD>\c a.maxAbs() == \f$\|a\|_{\infty}\f$ </TD></TR>
+   <TR><TD>minAbs() </TD><TD> </TD>
+       <TD>\c a.minAbs() == \f$\min \|a_i\|\f$ </TD></TR>
 
    <TR><TD>length() </TD><TD>eucledian norm</TD>
        <TD>\c a.length() == \f$\sqrt{a^2}\f$ </TD></TR>
@@ -79,10 +81,6 @@ class SSVector;
 */
 class Vector
 {
-   friend class LP;
-   friend Vector& Usolve(Vector&, const SLUFactor&);
-   friend Vector& Usolve2(Vector&, Vector&, const SLUFactor&);
-
 protected:
    /// dimension of vector
    int dimen;
@@ -193,8 +191,10 @@ public:
       return x;
    }
 
-   /// infinity norm.
+   /// absolute biggest element (infinity norm). 
    Real maxAbs() const;
+   /// absolute smallest element.
+   Real minAbs() const;
    /// euclidian norm.
    Real length() const;
    /// squared norm.

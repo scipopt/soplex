@@ -13,50 +13,39 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxstarter.h,v 1.6 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxintervalsm.h,v 1.1 2003/01/05 19:03:17 bzfkocht Exp $"
 
-
-/**@file  spxstarter.h
- * @brief #SoPlex start basis generation base class.
+/**@file  spxintervalsm.h
+ * @brief Remove all values outside the interval [#epsilon()..#infinity] 
+ *        from the LP.
  */
-#ifndef _SPXDSTARTER_H_
-#define _SPXDSTARTER_H_
-
-#include <assert.h>
+#ifndef _SPXINTERVALSM_H_
+#define _SPXINTERVALSM_H_
 
 #include "spxdefines.h"
-#include "spxsolver.h"
+#include "spxsimplifier.h"
 
 namespace soplex
 {
-
-/**@brief   #SoPlex start basis generation base class.
-   @ingroup Algo
-   
-   #SPxStarter is the virtual base class for classes generating a starter basis
-   for the Simplex solver #SoPlex. When a #SPxStarter object has been loaded
-   to a #SoPlex solver, the latter will call method #generate() in order to
-   have a start basis generated. Implementations of method #generate() must
-   terminate by #SPxSolver::load()%ing the generated basis to #SoPlex. Loaded
-   basises must be nonsingular.
-*/
-class SPxStarter
+/**@brief   Simplifier for forcing the LP values into a [#epsilon()..#infinity] interval.
+ * @ingroup Algo
+ *
+ * This simplifier sets all values smaller than #epsilon() to zero and all values
+ * bigger then infinity/5 to infinity.
+ * 
+ */
+class SPxIntervalSM : public SPxSimplifier
 {
 public:
-   /// generates start basis for loaded basis.
-   virtual void generate(SPxSolver& base) = 0;
-
-   /// destructor.
-   virtual ~SPxStarter()
-   { }
-
-   /// checks consistency.
-   virtual bool isConsistent() const;
+   /// default constructor
+   SPxIntervalSM() 
+      : SPxSimplifier("Interval")
+   {}   
+   /// just do it!
+   Result simplify(SPxLP& lp);
 };
-
-
 } // namespace soplex
-#endif // _SPXDSTARTER_H_
+#endif // _SPXINTERVALSM_H_
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:

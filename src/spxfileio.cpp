@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfileio.cpp,v 1.2 2002/12/14 07:48:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfileio.cpp,v 1.3 2003/01/05 19:03:16 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 #define USE_GZSTREAM  1
@@ -27,17 +27,17 @@
 #endif // USE_GZSTREAM
 
 #include "spxdefines.h"
-#include "soplex.h"
+#include "spxsolver.h"
 
 namespace soplex
 {
 
-bool SoPlex::readBasisFile(
+bool SPxSolver::readBasisFile(
    const char*    filename, 
    const NameSet& rowNames,
    const NameSet& colNames)
 {
-   METHOD( "SoPlex::readBasisFile()" );
+   METHOD( "SPxSolver::readBasisFile()" );
 
 #if USE_GZSTREAM
    gzstream::igzstream file(filename);
@@ -51,12 +51,12 @@ bool SoPlex::readBasisFile(
    return readBasis(file, rowNames, colNames);
 }
 
-bool SoPlex::writeBasisFile(
+bool SPxSolver::writeBasisFile(
    const char*    filename, 
    const NameSet& rowNames,
    const NameSet& colNames)
 {
-   METHOD( "SoPlex::writeBasisFile()" );
+   METHOD( "SPxSolver::writeBasisFile()" );
    std::ofstream file(filename);
 
    if (!file)
@@ -68,13 +68,13 @@ bool SoPlex::writeBasisFile(
 }
 
 
-bool SoPlex::readFile( 
+bool SPxSolver::readFile( 
    const char* filename, 
    NameSet*    rowNames,
    NameSet*    colNames, 
    DIdxSet*    intVars)
 {
-   METHOD( "SoPlex::readFile()" );
+   METHOD( "SPxSolver::readFile()" );
 
 #if USE_GZSTREAM
    gzstream::igzstream file(filename);
@@ -88,9 +88,29 @@ bool SoPlex::readFile(
    return read(file, rowNames, colNames, intVars);
 }
 
-void SoPlex::dumpFile(const char* filename) const
+bool SPxLP::readFile( 
+   const char* filename, 
+   NameSet*    rowNames,
+   NameSet*    colNames, 
+   DIdxSet*    intVars)
 {
-   METHOD( "SoPlex::dumpFile()" );
+   METHOD( "SPxLP::readFile()" );
+
+#if USE_GZSTREAM
+   gzstream::igzstream file(filename);
+#else
+   std::ifstream file(filename);
+#endif // USE_GZSTREAM
+
+   if (!file)
+      return false;
+
+   return read(file, rowNames, colNames, intVars);
+}
+
+void SPxSolver::dumpFile(const char* filename) const
+{
+   METHOD( "SPxSolver::dumpFile()" );
    std::ofstream file(filename);
 
    if (file.good())

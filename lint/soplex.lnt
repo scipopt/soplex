@@ -1,4 +1,4 @@
-// $Id: soplex.lnt,v 1.9 2002/12/16 07:29:47 bzfkocht Exp $
+// $Id: soplex.lnt,v 1.10 2003/01/05 19:03:15 bzfkocht Exp $
 -passes(1)
 +cpp(.h,.cpp)
 // esoteric size settings to find erros.
@@ -84,10 +84,8 @@
 -esym(1526,CLUFactor::operator=) // correctly not implemented
 -esym(1526,CLUFactor::CLUFactor) // correctly not implemented
 
-// soplex.h
--esym(1526,SoPlex::operator=)    // correctly not implemented
--esym(1526,SoPlex::SoPlex)       // correctly not implemented
--esym(1762,SoPlex::basis)        // Member function could be made const
+// spxsolver.h
+-esym(1762,SPxSolver::basis)        // Member function could be made const
 
 // spxlpfread.cpp
 -esym(429,colnames);

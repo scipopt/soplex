@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.30 2002/10/23 10:40:38 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.31 2003/01/05 19:03:15 bzfkocht Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -208,7 +208,7 @@ public:
     * numbered i prior to the removal operation has been removed from the
     * set. Otherwise, #perm[i] = j >= 0 means, that the element with number
     * i prior to the removal operation has been renumberd to j.
-    * Removing a single elements from a #DataSet yields a simple
+    * Removing a single element from a #DataSet yields a simple
     * renumbering of the elements: The last element in the set (i.e.
     * element #num()-1) is moved to the index of the removed element.
     */

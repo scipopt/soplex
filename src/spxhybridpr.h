@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.h,v 1.13 2002/03/21 16:06:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.h,v 1.14 2003/01/05 19:03:16 bzfkocht Exp $"
 
 /**@file  spxhybridpr.h
  * @brief Hybrid pricer.
@@ -56,13 +56,13 @@ public:
    ///
    virtual void setEpsilon(Real eps);
    ///
-   virtual void load(SoPlex* solver);
+   virtual void load(SPxSolver* solver);
    ///
    virtual void clear();
    ///
-   virtual void setType(SoPlex::Type tp);
+   virtual void setType(SPxSolver::Type tp);
    ///
-   virtual void setRep(SoPlex::Representation rep);
+   virtual void setRep(SPxSolver::Representation rep);
    ///
    virtual int selectLeave();
    ///

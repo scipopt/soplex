@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeneralsm.cpp,v 1.15 2002/04/14 12:41:54 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeneralsm.cpp,v 1.16 2003/01/05 19:03:16 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -24,41 +24,28 @@
 
 namespace soplex
 {
-void SPxGeneralSM::load(SPxLP* p_lp)
+SPxSimplifier::Result SPxGeneralSM::simplify(SPxLP& lp)
 {
-   lp         = p_lp;
-   m_rem1.load (p_lp);
-   m_redu.load (p_lp);
-   m_aggr.load (p_lp);
-}
-
-void SPxGeneralSM::unload()
-{
-   m_rem1.unload ();
-   m_redu.unload ();
-   m_aggr.unload ();
-}
-
-int SPxGeneralSM::simplify()
-{
-   int ret;
-   int rows = lp->nRows();
-   int cols = lp->nCols();
-   int cnt  = rows + cols;
-
-   if ((ret = m_rem1.simplify()) != 0) 
+   Result ret;
+#if 0
+   int    rows = lp.nRows();
+   int    cols = lp.nCols();
+   int    cnt  = rows + cols;
+#endif
+   if ((ret = m_inter.simplify(lp)) != OKAY)
       return ret;
-   if ((ret = m_redu.simplify()) != 0) 
+   if ((ret = m_rem1.simplify(lp)) != OKAY) 
       return ret;
+#if 0
 
-   while(m_repth * cnt > lp->nRows() + lp->nCols())
+   while(m_repth * cnt > lp.nRows() + lp.nCols())
    {
-      cnt = lp->nRows() + lp->nCols();
+      cnt = lp.nRows() + lp.nCols();
 
       if ((ret = m_rem1.simplify()) != 0) 
          return ret;
 
-      if (cnt == lp->nRows() + lp->nCols())
+      if (cnt == lp.nRows() + lp.nCols())
          break;
 
       // if ((ret = m_aggr.simplify()) != 0) 
@@ -67,29 +54,22 @@ int SPxGeneralSM::simplify()
       if ((ret = m_redu.simplify()) != 0) 
          return ret;
    }
-   assert(lp->isConsistent());
+#endif
+   assert(lp.isConsistent());
 
-   return 0;
+   return OKAY;
 }
 
-/**@todo This is not correctly implented, since the simplifiers may be
- *      called several times one after the others, this sequence has
- *      to be tracked to make the calls of unsimplify in exactly the
- *      reverse order.
- *      At the moment this is irrelevant because all the unsimplifiers
- *      are not implemented anyway.
- */
-void SPxGeneralSM::unsimplify()
+const Vector& SPxGeneralSM::unsimplifiedPrimal(const Vector& x)
 {
-   //m_rem1.unsimplify ();
-   //m_aggr.unsimplify ();
-   //m_redu.unsimplify ();
+   return m_inter.unsimplifiedPrimal(m_rem1.unsimplifiedPrimal(x));
 }
 
-Real SPxGeneralSM::value(Real x)
+const Vector& SPxGeneralSM::unsimplifiedDual(const Vector& pi)
 {
-   return m_rem1.value(m_aggr.value(m_redu.value(x)));
+   return m_inter.unsimplifiedDual(m_rem1.unsimplifiedDual(pi));
 }
+
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

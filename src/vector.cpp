@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector.cpp,v 1.11 2002/04/06 13:05:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vector.cpp,v 1.12 2003/01/05 19:03:18 bzfkocht Exp $"
 
 #include <iostream>
 
@@ -93,6 +93,7 @@ Vector& Vector::operator*=(Real x)
 {
    for (int i = 0; i < dim(); ++i)
       val[i] *= x;
+
    return *this;
 }
 
@@ -108,15 +109,28 @@ Real Vector::length2() const
 
 Real Vector::maxAbs() const
 {
-   Real x = 0;
-   int n = dim();
-   Real* v = val;
-   while (n--)
-   {
-      x = (*v > x) ? *v : ((-*v > x) ? -*v : x);
-      v++;
-   }
-   return x;
+   Real maxi = 0.0;
+
+   for(int i = 0; i < dim(); ++i)
+      if (fabs(val[i]) > maxi)
+         maxi = fabs(val[i]);
+
+   assert(maxi >= 0.0);
+
+   return maxi;
+}
+
+Real Vector::minAbs() const
+{
+   Real mini = infinity;
+
+   for(int i = 0; i < dim(); ++i)
+      if (fabs(val[i]) < mini)
+         mini = fabs(val[i]);
+
+   assert(mini >= 0.0);
+
+   return mini;
 }
 
 std::ostream& operator<<(std::ostream& s, const Vector& vec)

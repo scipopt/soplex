@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.h,v 1.14 2002/12/16 07:29:47 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.h,v 1.15 2003/01/05 19:03:17 bzfkocht Exp $"
 
 
 /**@file  spxsteeppr.h
@@ -73,7 +73,7 @@ private:
    ///
    void setupPrefsX(Real mult, Real /*tie*/, Real /*cotie*/, Real shift, Real coshift);
    ///
-   void setupPrefs(SoPlex::Type);
+   void setupPrefs(SPxSolver::Type);
    ///
    int selectLeaveX(Real& best, int start = 0, int incr = 1);
    ///
@@ -93,13 +93,13 @@ public:
    Real accuracy;
 
    ///
-   virtual void load(SoPlex* base);
+   virtual void load(SPxSolver* base);
    ///
    virtual void clear();
    ///
-   virtual void setType(SoPlex::Type);
+   virtual void setType(SPxSolver::Type);
    ///
-   virtual void setRep(SoPlex::Representation rep);
+   virtual void setRep(SPxSolver::Representation rep);
    ///
    virtual int selectLeave();
    ///
