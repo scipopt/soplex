@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscale.cpp,v 1.5 2001/11/22 16:30:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscale.cpp,v 1.6 2001/11/28 17:15:52 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -22,13 +22,40 @@
 
 namespace soplex
 {
+static const double MinScale = 1e-4;
+
+/** This routine looks for a suitabel scaling factor.
+ *  First the maximum value is scaled to 1.0.
+ *  If this results in the minimum to drop below #min_scale
+ *  The new mimium is scaled up to #min_scale.
+ *  The scaling factor returned is the combination of both factors.
+ */
+static double find_scale(double vmin, double vmax)
+{
+   assert(vmin <= vmax);
+
+   double fmax  = 1.0 / vmax;
+   double fmin  = 1.0;
+
+   if (vmin > 1e-16)
+   { 
+      vmin *= fmax;
+
+      if (vmin < MinScale)
+         fmin = MinScale / vmin;
+   }
+   return fmax * fmin;  
+}
+
 int SPxScale::simplify()
 {
    assert(lp != 0);
    assert(lp->isConsistent());
 
+   double w;
    double x;
    double y;
+   double z;
    int    i; 
    int    j;
 
@@ -45,7 +72,8 @@ int SPxScale::simplify()
 
          if (x > 0)
          {
-            y = 1 / x;
+            y = find_scale(vec.minAbs(), x);
+            //y = 1 / x;
             colscale[i] = y;
             vec *= y;
             lp->maxObj(i) *= y;
@@ -62,17 +90,19 @@ int SPxScale::simplify()
       {
          SVector& vec = lp->rowVector_w(i);
          x = 0;
+         z = 1e100;
+
          for (j = vec.size(); j--;)
          {
             y = vec.value(j) *= colscale[vec.index(j)];
-            if (x < y)
-               x = y;
-            else if (x < -y)
-               x = -y;
+            w = fabs(y);            
+            x = (x < w) ? w : x;
+            z = (z > w) ? w : z;
          }
          if (x > 0)
          {
-            y = 1 / x;
+            y = find_scale(z, x);
+            //y = 1 / x;
             rowscale[i] = y;
             vec *= y;
             if (lp->rhs(i) < SPxLP::infinity)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clumembers.h,v 1.3 2001/11/21 09:30:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: clumembers.h,v 1.4 2001/11/28 17:15:51 bzfkocht Exp $"
 
 #ifndef _CLUMEMBERS_H_
 #define _CLUMEMBERS_H_
@@ -23,7 +23,7 @@
 namespace soplex
 {
 
-typedef struct CLUFactor
+struct CLUFactor
 {
    int thedim;                 /* dimension of factorized matrix   */
    int stat;                   /* Status indicator. */
@@ -44,7 +44,7 @@ typedef struct CLUFactor
 
    double *work;          /* Working array: must always be left as 0! */
    double *work2;         /* Working array: must always be left as 0! */
-} CLUFactor;
+};
 
 } // namespace soplex
 #endif // _CLUMEMBERS_H_

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.8 2001/11/20 09:08:43 bzfkocht Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.9 2001/11/28 17:15:51 bzfkocht Exp $"
 
 
 #include <stdio.h>
@@ -85,15 +85,14 @@ static int*    s_cact;          /* lengths of columns of active submatrix */
         the active submatrix.
  */
 
-typedef struct _pring   /* Pivot ring */
+struct Pring   /* Pivot ring */
 {
-   struct _pring *next;
-   struct _pring *prev;
+   Pring *next;
+   Pring *prev;
    int idx;            /* index of pivot row */
    int pos;            /* position of pivot column in row */
    int mkwtz;          /* markowitz number of pivot */
-}
-Pring;
+};
 
 static Pring pivots;         /* ring of selected pivot rows */
 static Pring *col,            /* column index handlers for double linked list */

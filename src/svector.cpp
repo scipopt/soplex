@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.cpp,v 1.4 2001/11/17 22:15:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svector.cpp,v 1.5 2001/11/28 17:15:52 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -129,6 +129,20 @@ double SVector::maxAbs() const
    while (n--)
    {
       x = (e->val > x) ? e->val : ((-e->val > x) ? -e->val : x);
+      e++;
+   }
+   return x;
+}
+
+double SVector::minAbs() const
+{
+   double         x = 1e100;
+   int            n = size();
+   const Element* e = m_elem;
+
+   while (n--)
+   {
+      x = (e->val < x) ? e->val : ((-e->val < x) ? -e->val : x);
       e++;
    }
    return x;

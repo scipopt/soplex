@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.h,v 1.10 2001/11/26 12:28:44 bzfbleya Exp $"
+#pragma ident "@(#) $Id: svector.h,v 1.11 2001/11/28 17:15:52 bzfkocht Exp $"
 
 /**@file  svector.h
  * @brief Sparse vectors.
@@ -257,6 +257,9 @@ public:
    //@{
    /// infinity norm.
    double maxAbs() const;
+
+   /// the absolut smalest element in the vector.
+   double minAbs() const;
 
    /// eucledian norm.
    double length() const

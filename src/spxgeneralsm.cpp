@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeneralsm.cpp,v 1.5 2001/11/22 16:30:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeneralsm.cpp,v 1.6 2001/11/28 17:15:52 bzfkocht Exp $"
 
 #include <stdlib.h>
 #include <iostream>
@@ -26,16 +26,16 @@ void SPxGeneralSM::load(SPxLP* p_lp)
 {
    lp       = p_lp;
    rem1.load (p_lp);
-   redu.load (p_lp);
-   aggr.load (p_lp);
+   // redu.load (p_lp);
+   // aggr.load (p_lp);
    scale.load(p_lp);
 }
 
 void SPxGeneralSM::unload()
 {
    rem1.unload ();
-   redu.unload ();
-   aggr.unload ();
+   // redu.unload ();
+   // aggr.unload ();
    scale.unload();
 }
 
@@ -51,10 +51,10 @@ int SPxGeneralSM::simplify()
 
       if ((i = rem1.simplify()) != 0) 
          return i;
-      if ((i = aggr.simplify()) != 0) 
-         return i;
-      if ((i = redu.simplify()) != 0) 
-         return i;
+      // if ((i = aggr.simplify()) != 0) 
+      //    return i;
+      // if ((i = redu.simplify()) != 0) 
+      //    return i;
    }
    while (0.99*cnt > lp->nRows() + lp->nCols());
 
@@ -89,7 +89,8 @@ void SPxGeneralSM::unsimplify()
 
 double SPxGeneralSM::value(double x)
 {
-   return rem1.value(aggr.value(redu.value(scale.value(x))));
+   // return rem1.value(aggr.value(redu.value(scale.value(x))));
+   return rem1.value(scale.value(x));
 }
 } // namespace soplex
 

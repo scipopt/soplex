@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clutypes.h,v 1.3 2001/11/21 09:30:13 bzfkocht Exp $"
+#pragma ident "@(#) $Id: clutypes.h,v 1.4 2001/11/28 17:15:51 bzfkocht Exp $"
 
 #ifndef _CLUTYPES_H_
 #define _CLUTYPES_H_
@@ -28,26 +28,26 @@ namespace soplex
 
 /*      Data structures for saving the row and column permutations.
  */
-typedef struct
+struct Perm
 {
    int *orig;          /* orig[p] original index from p */
    int *perm;          /* perm[i] permuted index from i */
-} Perm;
+};
 
 
 /*      Double linked ring structure for garbage collection of column or
  *      row file in working matrix.
  */
-typedef struct _dr_
+struct Dring
 {
-   struct _dr_ *next;
-   struct _dr_ *prev;
+   Dring *next;
+   Dring *prev;
    int idx;
-} Dring;
+};
 
 /*      Data structures for saving the working matrix and U factor.
  */
-typedef struct
+struct U
 {
    struct Row
    {
@@ -88,12 +88,12 @@ typedef struct
    } col;
    int lastColSing;            /* stage of last eliminated column singleton */
    int lastRowSing;            /* stage of last eliminated row singleton */
-} U;
+};
 
 
 /*      Data structures for saving the working matrix and U factor.
  */
-typedef struct
+struct L
 {
    int size;           /* size of arrays val and idx        */
    double *val;           /* values of L vectors               */
@@ -114,7 +114,7 @@ typedef struct
    int *rbeg;          /* start of rows in rval and ridx    */
    int *rorig;         /* original row permutation          */
    int *rperm;         /* original row permutation          */
-} L;
+};
 
 
 } // namespace soplex
