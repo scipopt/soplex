@@ -1,7 +1,9 @@
-O.*
-bin
-lib
 .inslog*
-tca.*
 .nfs*
+O.*
+TODO.Tobi
+bin
 cxx_repository
+lib
+o.tmp
+tca.*

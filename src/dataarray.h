@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataarray.h,v 1.5 2001/11/13 21:55:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataarray.h,v 1.6 2001/11/15 16:54:14 bzfpfend Exp $"
 
 #ifndef _DATAARRAY_H_
 #define _DATAARRAY_H_
@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <iostream>
+#include <malloc.h>
 
 #include "spxalloc.h"
 
@@ -139,53 +140,48 @@ public:
    //                   operator const T* ()                    { return data; }
 
    /// append element #t#.
-   long append(const T& t)
+   void append(const T& t)
    {
-      return insert(thesize, 1, &t);
+      insert(thesize, 1, &t);
    }
    /// append #n# elements from #t#.
-   long append(int n, const T t[])
+   void append(int n, const T t[])
    {
-      return insert(thesize, n, t);
+      insert(thesize, n, t);
    }
    /// append all elements from #t#.
-   long append(const DataArray<T>& t)
+   void append(const DataArray<T>& t)
    {
-      return insert(thesize, t);
+      insert(thesize, t);
    }
 
    /// insert #n# uninitialized elements before #i#-th element.
-   long insert(int i, int n)
+   void insert(int i, int n)
    {
-      long j = size();
-      long delta = reSize(thesize + n);
+      int j = size();
+      reSize(thesize + n);
       while (i < j--)
          data[j + n] = data[j];
-      return delta;
    }
 
    /// insert #n# elements from #t# before #i#-the element.
-   long insert(int i, int n, const T t[])
+   void insert(int i, int n, const T t[])
    {
       if (n > 0)
       {
-         long delta = insert(i, n);
+         insert(i, n);
          memcpy(&(data[i]), t, n*sizeof(T));
-         return delta;
       }
-      return 0;
    }
 
    /// insert all elements from #t# before #i#-the element.
-   long insert(int i, const DataArray<T>& t)
+   void insert(int i, const DataArray<T>& t)
    {
       if (t.size())
       {
-         long delta = insert(i, t.size());
+         insert(i, t.size());
          memcpy(&(data[i]), t.data, t.size()*sizeof(T));
-         return delta;
       }
-      return 0;
    }
 
    /// remove #m# elements starting at #n#.
@@ -222,16 +218,15 @@ public:
        adding uninitialized elements (similar to #append#). If neccessary,
        also memory will be reallocated.
     */
-   long reSize(int newsize)
+   void reSize(int newsize)
    {
       assert(memFactor >= 1);
       if (newsize > themax)
-         return reMax(int(memFactor * newsize), newsize);
+         reMax(int(memFactor * newsize), newsize);
       else if (newsize < 0)
          thesize = 0;
       else
          thesize = newsize;
-      return 0;
    }
 
    /** return maximum nr. of elements.
@@ -252,9 +247,14 @@ public:
        default arguments, will reduce the memory consumption to a minimum.
        In no instance #max()# will be set to a value less than 1 (even if
        specified).
+       #reMax# returns the difference in bytes of the new and the old
+       memory block, which can be used to update pointers pointing to
+       elements of the memory block.
     */
-   long reMax(int newMax = 1, int newSize = -1)
+   ptrdiff_t reMax(int newMax = 1, int newSize = -1)
    {
+      ptrdiff_t diff;
+
       if (newSize >= 0)
          thesize = newSize;
       if (newMax < newSize)
@@ -264,7 +264,7 @@ public:
       if (newMax == themax)
          return 0;
       themax = newMax;
-      long olddata = long(data);
+      T* olddata = data;
       if (thesize <= 0)
       {
          spx_free(data);
@@ -272,8 +272,8 @@ public:
       }
       else
          spx_realloc(data, themax);
-
-      return long(data) - olddata;
+      diff = reinterpret_cast<char*>(data) - reinterpret_cast<char*>(olddata);
+      return diff;
    }
    /** memory extension factor.
        When a #DataArray# is #reSize()#d to more than #max()# elements, the

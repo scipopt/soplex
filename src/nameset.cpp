@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.cpp,v 1.8 2001/11/13 21:55:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.cpp,v 1.9 2001/11/15 16:54:16 bzfpfend Exp $"
 
 #include <string.h>
 #include "nameset.h"
@@ -132,7 +132,7 @@ void NameSet::reMax(int newmax)
 {
    hashtab.reMax (newmax);
 
-   long delta = set.reMax(newmax);
+   ptrdiff_t delta = set.reMax(newmax);
    NameSet_CharPtr* first = list.first();
 
    if (delta != 0 && first != 0)
@@ -153,7 +153,7 @@ void NameSet::reMax(int newmax)
 void NameSet::memRemax(int newmax)
 {
    char* old = mem;
-   long delta;
+   ptrdiff_t delta;
 
    memmax = (newmax < memSize()) ? memSize() : newmax;
    spx_realloc(mem, memmax);
@@ -162,8 +162,9 @@ void NameSet::memRemax(int newmax)
 
    hashtab.clear ();
 
+   /* update pointers to new targets */
    for (NameSet_CharPtr* name = list.first(); name; name = list.next(name))
-      name->name = &(name->name[delta]);
+      name->name += delta;
 
    for (int i = num() - 1; i >= 0; --i)
    {

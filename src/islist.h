@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: islist.h,v 1.5 2001/11/13 21:01:24 bzfkocht Exp $"
+#pragma ident "@(#) $Id: islist.h,v 1.6 2001/11/15 16:54:15 bzfpfend Exp $"
 
 
 #ifndef _ISLIST_H_
@@ -355,16 +355,16 @@ public:
        Then #move(delta)# may be called, which adjusts the #next()#
        pointers of all elements in the list.
     */
-   void move(long delta)
+   void move(ptrdiff_t delta)
    {
       if (the_first)
       {
          T* elem;
-         the_last  = reinterpret_cast<T*>(delta + long(the_last));
-         the_first = reinterpret_cast<T*>(delta + long(the_first));
+         the_last  = reinterpret_cast<T*>(reinterpret_cast<char*>(the_last) + delta);
+         the_first = reinterpret_cast<T*>(reinterpret_cast<char*>(the_first) + delta);
          for (elem = first(); elem; elem = next(elem))
             if (elem != last())
-               elem->next() = reinterpret_cast<T*>(delta + long(elem->next()));
+               elem->next() = reinterpret_cast<T*>(reinterpret_cast<char*>(elem->next()) + delta);
       }
    }
 

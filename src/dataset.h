@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.8 2001/11/13 21:55:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.9 2001/11/15 16:54:14 bzfpfend Exp $"
 
 #ifndef _DATASET_H_
 #define _DATASET_H_
@@ -419,15 +419,20 @@ public:
 
    /// return number of element #item# in #DataSet#.
    int number(const DATA* item) const
-   {
-      if ((reinterpret_cast<unsigned long>(item) < 
-           reinterpret_cast<unsigned long>(theitem) )
-           || 
-          ( reinterpret_cast<unsigned long>(item) >= 
-            reinterpret_cast<unsigned long>(&(theitem[size()]))))
+   {      
+      ptrdiff_t idx = reinterpret_cast<const struct Item *>(item) - theitem;
+      if( idx < 0 || idx >= size() )
          return -1;
-      long idx = ((reinterpret_cast<long>(item)) - (reinterpret_cast<long>(theitem))) 
-         / sizeof(Item);
+      /* ??? old code:
+         if ((reinterpret_cast<unsigned long>(item) < 
+              reinterpret_cast<unsigned long>(theitem) )
+             || 
+             ( reinterpret_cast<unsigned long>(item) >= 
+               reinterpret_cast<unsigned long>(&(theitem[size()]))))
+            return -1;
+         long idx = ((reinterpret_cast<long>(item)) - (reinterpret_cast<long>(theitem))) 
+                    / sizeof(Item);
+      */
       return theitem[idx].info;
    }
 
@@ -460,9 +465,9 @@ public:
        moved. Note, that this is identical for all elements in the
        #DataSet#.
     */
-   long reMax(int newmax = 0)
+   ptrdiff_t reMax(int newmax = 0)
    {
-      long delta = long(theitem);
+      struct Item * old_theitem = theitem;
       newmax = (newmax < size()) ? size() : newmax;
 
       int* lastfree = &firstfree;
@@ -475,7 +480,7 @@ public:
       spx_realloc(theitem, themax);
       spx_realloc(thekey,  themax);
 
-      return long(theitem) - delta;
+      return reinterpret_cast<char*>(theitem) - reinterpret_cast<char*>(old_theitem);
    }
 
    /** Assignment operator.

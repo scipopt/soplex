@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.cpp,v 1.6 2001/11/13 17:04:19 bzfbleya Exp $"
+#pragma ident "@(#) $Id: svset.cpp,v 1.7 2001/11/15 16:54:16 bzfpfend Exp $"
 
 /*      \Section{Complex Methods}
  */
@@ -256,13 +256,13 @@ void SVSet::reMax(int newmax)
 
 void SVSet::memRemax(int newmax)
 {
-   long delta = DataArray < SVector::Element > ::reMax(newmax);
+   ptrdiff_t delta = DataArray < SVector::Element > ::reMax(newmax);
 
-   if (delta)
+   if (delta != 0)
    {
       for (DLPSV* ps = list.first(); ps; ps = list.next(ps))
       {
-         SVector::Element * info = reinterpret_cast<SVector::Element*>(delta + long(ps->mem()));
+         SVector::Element * info = reinterpret_cast<SVector::Element*>(reinterpret_cast<char*>(ps->mem()) + delta);
          int sz = info->idx;
          int l_max = int( info->val );
          assert(l_max >= sz );
@@ -334,13 +334,13 @@ SVSet& SVSet::operator=(const SVSet& rhs)
    DLPSV* newps;
    void* delta0 = &(*(static_cast<SVSet_Base*>(this)))[0];
    void* delta1 = &(*(static_cast<SVSet_Base*>(const_cast<SVSet*>(&rhs))))[0];
-   long delta = long(delta0) - long(delta1);
+   ptrdiff_t delta = reinterpret_cast<char*>(delta0) - reinterpret_cast<char*>(delta1);
 
    for (ps = rhs.list.first(); ps; ps = rhs.list.next(ps))
    {
       newps = & set[ rhs.number(ps) ];
       list.append(newps);
-      newps->setMem(ps->max() + 1, reinterpret_cast<SVector::Element*>(long(ps->mem()) + delta));
+      newps->setMem(ps->max() + 1, reinterpret_cast<SVector::Element*>(reinterpret_cast<char*>(ps->mem()) + delta));
       newps->set_size( ps->size() );
    }
 

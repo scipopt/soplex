@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idlist.h,v 1.4 2001/11/09 21:23:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: idlist.h,v 1.5 2001/11/15 16:54:15 bzfpfend Exp $"
 
 
 #ifndef _IDLIST_H_
@@ -272,7 +272,7 @@ public:
        reallocation), with a fixed offeset #delta#, the list will be reset
        to the new adresses.
     */
-   void move(long delta)
+   void move(ptrdiff_t delta)
    {
       if (the_first)
       {
@@ -280,7 +280,7 @@ public:
          IsList<T>::move(delta);
          for (elem = last(); elem; elem = prev(elem))
             if (elem != first())
-               elem->prev() = reinterpret_cast<T*>(delta + long(elem->prev()));
+               elem->prev() = reinterpret_cast<T*>(reinterpret_cast<char*>(elem->prev()) + delta);
       }
    }
 

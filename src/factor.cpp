@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.6 2001/11/13 21:55:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.7 2001/11/15 16:54:14 bzfpfend Exp $"
 
 
 #include <stdio.h>
@@ -791,7 +791,7 @@ static void selectPivots(void)
    int count, num, rw, cl;
    int len, beg;
    double maxabs, x;
-   long mkwtz;
+   int mkwtz;
    int candidates;
 
    candidates = dim - stage - 1;
@@ -939,7 +939,7 @@ static void selectPivots(void)
           */
          Pring *pr;
          row[rw].pos = ii - rbeg[rw];
-         row[rw].mkwtz = mkwtz = (mkwtz - 1) * (count - 1);
+         row[rw].mkwtz = mkwtz = (mkwtz - 1) * (count - 1);  // ??? mkwtz originally was long, maybe to avoid an overflow in this instruction?
          for (pr = pivots.next; pr->idx >= 0; pr = pr->next)
          {
             if (pr->idx == rw || pr->mkwtz >= mkwtz)
