@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.34 2002/03/11 11:41:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.35 2002/04/03 19:16:11 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -76,6 +76,38 @@ public:
    {
       m_slu.setUtype(tp);
    }
+
+   void displayQuality()
+   {
+      double maxviol;
+      double sumviol;
+
+      qualConstraintViolation(maxviol, sumviol);
+
+      std::cout << "Violations (max/sum)" << std::endl;
+                
+      std::cout << "Constraints      :" 
+                << std::setw(16) << maxviol << "  " 
+                << std::setw(16) << sumviol << std::endl;
+
+      qualBoundViolation(maxviol, sumviol);
+
+      std::cout << "Bounds           :" 
+                << std::setw(16) << maxviol << "  " 
+                << std::setw(16) << sumviol << std::endl;
+
+      qualSlackViolation(maxviol, sumviol);
+
+      std::cout << "Slacks           :" 
+                << std::setw(16) << maxviol << "  " 
+                << std::setw(16) << sumviol << std::endl;
+
+      // qualRdCostViolation(maxviol, sumviol);
+
+      //std::cout << "Reduced costs    :" 
+      //          << std::setw(16) << maxviol << "  " 
+      //          << std::setw(16) << sumviol << std::endl;
+   }
 };
 
 int main(int argc, char **argv)
@@ -104,6 +136,7 @@ int main(int argc, char **argv)
    " -r        select row wise representation (default is column)\n"
    " -i        select Eta-update (default is Forest-Tomlin)\n"
    " -x        output solution vector (works only together with -s0)\n"
+   " -q        display solution quality\n"
    " -bBasfile read file with starting basis\n"
    " -lSec     set timelimit to Sec seconds\n"
    " -dDelta   set maximal allowed bound violation to Delta\n"
@@ -140,6 +173,7 @@ int main(int argc, char **argv)
    Real                   epsilon        = DEFAULT_EPS_ZERO;
    int                    verbose        = 1;
    bool                   print_solution = false;
+   bool                   print_quality  = false;
    int                    precision;
    int                    optidx;
 
@@ -171,6 +205,9 @@ int main(int argc, char **argv)
          break;
       case 'p' :
          pricing = atoi(&argv[optidx][2]);
+         break;
+      case 'q' :
+         print_quality = true;
          break;
       case 'r' :
          representation = SoPlex::ROW;
@@ -392,6 +429,9 @@ int main(int argc, char **argv)
                 << std::setprecision(precision)
                 << work.value()
                 << std::endl;
+
+      if (print_quality)
+         work.displayQuality();
 
       if (print_solution)
       {

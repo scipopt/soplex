@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.45 2002/03/21 16:06:19 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.46 2002/04/03 19:16:11 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -255,12 +255,13 @@ SoPlex::Status SoPlex::solve()
    /* check, if solution is really feasible */
    if( status() == OPTIMAL )
    {
-      int row, col, c;
+      int    c;
       double val;
       DVector sol( nCols() );
 
       getPrimal( sol );
-      for( row = 0; row < nRows(); ++row )
+
+      for(int row = 0; row < nRows(); ++row )
       {
          const SVector& rowvec = rowVector( row );
          val = 0.0;         
@@ -274,14 +275,17 @@ SoPlex::Status SoPlex::solve()
             std::cerr << "   lhs:" << lhs( row )
                       << " <= val:" << val
                       << " <= rhs:" << rhs( row ) << std::endl;
+
             if( type() == LEAVE && isRowBasic( row ) )
             {
-               for( c = 0; c < nRows() && 
-                       ( basis().baseId( c ).isSPxColId()     ||
-                         number( basis().baseId( c ) ) != row );
-                    ++c )
-                  {}
+               // find basis variable
+               for( c = 0; c < nRows(); ++c )
+                  if (basis().baseId(c).isSPxRowId()     
+                     && (number(basis().baseId(c)) == row))
+                     break;
+
                assert( c < nRows() );
+
                std::cerr << "   basis idx:" << c
                          << " fVec:" << fVec()[c]
                          << " fRhs:" << fRhs()[c]
@@ -289,7 +293,7 @@ SoPlex::Status SoPlex::solve()
             }
          }
       }
-      for( col = 0; col < nCols(); ++col )
+      for(int col = 0; col < nCols(); ++col )
       {
          if( LT( sol[col], lower( col ), delta() ) ||
              GT( sol[col], upper( col ), delta() ) )

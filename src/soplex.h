@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.40 2002/03/21 16:06:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.41 2002/04/03 19:16:11 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -1201,6 +1201,20 @@ public:
    }
    /// remove shift as much as possible.
    virtual void unShift(void);
+
+   /// get violation of constraints.
+   virtual void qualConstraintViolation(
+      double& maxviol, double& sumviol) const;
+
+   /// get violations of bounds.
+   virtual void qualBoundViolation(
+      double& maxviol, double& sumviol) const;
+
+   /// get the residuum |Ax-b|.
+   virtual void qualSlackViolation(double& maxviol, double& sumviol) const;
+
+   /// get violation of optimality criterion.
+   virtual void qualRdCostViolation(double& maxviol, double& sumviol) const;
 
 private:
    ///
