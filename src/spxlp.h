@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.21 2002/01/31 08:19:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.22 2002/02/13 16:56:07 bzfpfend Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -636,7 +636,7 @@ public:
    void removeColRange(int start, int end, int perm[] = 0);
 
    /// clears the LP.
-   virtual void clear();
+   void clear();
 
    //@}
 

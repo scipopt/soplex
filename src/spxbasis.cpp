@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.22 2002/01/31 16:30:47 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.23 2002/02/13 16:56:06 bzfpfend Exp $"
 
 //#define DEBUG 1
 
@@ -96,6 +96,7 @@ SPxBasis::dualColStatus(int i) const
 void SPxBasis::loadMatrixVecs()
 {
    assert(theLP != 0);
+   assert(theLP->dim() == matrix.size());
 
    int i;
    nzCount = 0;
@@ -135,6 +136,8 @@ void SPxBasis::load(const Desc& ds)
       thedesc = ds;
       setRep();
    }
+
+   assert(theLP->dim() == matrix.size());
 
    nzCount = 0;
    for (j = i = 0; i < theLP->nRows(); ++i)
@@ -338,6 +341,7 @@ void SPxBasis::change
    const SSVector* eta
 )
 {
+   assert(matrixIsSetup);
    assert(!id.isValid() || (enterVec != 0));
 
    assert(factor != 0);

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvectorst.cpp,v 1.7 2002/01/31 16:30:48 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxvectorst.cpp,v 1.8 2002/02/13 16:56:07 bzfpfend Exp $"
 
 //#define DEBUG 1
 
@@ -42,7 +42,7 @@ void SPxVectorST::setupWeights(SoPlex& base)
       Real x, y;
       int i;
 
-      TRACE( std::cerr << "colWeight[]: " );
+      TRACE( std::cerr << "colWeight[]: "; );
       for (i = base.nCols(); i--;)
       {
          x = vec[i] - base.SPxLP::lower(i);
@@ -61,7 +61,7 @@ void SPxVectorST::setupWeights(SoPlex& base)
       }
       TRACE( std::cerr << std::endl << std::endl; );
 
-      TRACE( std::cerr << "rowWeight[]: " );
+      TRACE( std::cerr << "rowWeight[]: "; );
       for (i = base.nRows(); i--;)
       {
          const SVector& row = (const_cast<const SoPlex&>(base)).rowVector(i);

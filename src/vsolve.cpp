@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vsolve.cpp,v 1.12 2002/01/31 08:19:31 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vsolve.cpp,v 1.13 2002/02/13 16:56:07 bzfpfend Exp $"
 
 #include <assert.h>
 
@@ -128,7 +128,7 @@ static void enQueueMin(int* heap, int* size, int elem)
 #ifdef  DEBUG
    for (i = 1; i < *size; ++i)
       for (j = 0; j < i; ++j)
-         assert(heap[i] != heap[j])
+         assert(heap[i] != heap[j]);
 #endif  /* DEBUG */
 }
 

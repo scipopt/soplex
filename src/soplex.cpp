@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.49 2002/02/04 15:34:09 bzfpfend Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.50 2002/02/13 16:56:06 bzfpfend Exp $"
 
 //#define DEBUG 1
 
@@ -492,8 +492,9 @@ void SoPlex::clear()
       thesimplifier->unload();
 
    unInit();
-   setStatus(SPxBasis::NO_PROBLEM);
    SPxLP::clear();
+   setStatus(SPxBasis::NO_PROBLEM);
+   SPxBasis::reDim();
 }
 
 void SoPlex::clearUpdateVecs(void)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.9 2002/01/31 16:30:47 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.10 2002/02/13 16:56:07 bzfpfend Exp $"
 
 //#define DEBUG 1
 
@@ -245,6 +245,7 @@ void SPxBasis::removedCol(int i)
          setStatus(NO_PROBLEM);
       else if (status() > NO_PROBLEM)
       {
+         assert( matrixIsSetup );
          for (int j = theLP->dim(); j >= 0; --j)
          {
             SoPlex::Id id = baseId(j);
@@ -307,25 +308,33 @@ void SPxBasis::removedCols(int perm[])
    reDim();
 }
 
+
+/**@todo is this correctly implemented?
+ */
+void SPxBasis::invalidate()
+{
+   factorized = matrixIsSetup = false;
+}
+
 /**@todo is this correctly implemented?
  */
 void SPxBasis::changedRow(int /*row*/)
 {
-   factorized = matrixIsSetup = false;
+   invalidate();
 }
 
 /**@todo is this correctly implemented?
  */
 void SPxBasis::changedCol(int /*col*/)
 {
-   factorized = matrixIsSetup = false;
+   invalidate();
 }
 
 /**@todo is this correctly implemented?
  */
 void SPxBasis::changedElement(int /*row*/, int /*col*/)
 {
-   factorized = matrixIsSetup = false;
+   invalidate();
 }
 } // namespace soplex
 

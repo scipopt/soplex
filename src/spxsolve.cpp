@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.39 2002/02/07 17:39:48 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.40 2002/02/13 16:56:07 bzfpfend Exp $"
 
 //#define DEBUG 1
 
@@ -110,8 +110,9 @@ SoPlex::Status SoPlex::solve()
    leaveCount = 0;
    enterCount = 0;
 
-#if 1
-   // ??? remember old basis
+#if 0
+   /**@todo Delete this #if 0 case, if the #else case below is tested and
+      works */
    VarStatus *oldbasis_rows = new VarStatus[nRows()];
    VarStatus *oldbasis_cols = new VarStatus[nCols()];
    getBasis( oldbasis_rows, oldbasis_cols );
@@ -249,10 +250,8 @@ SoPlex::Status SoPlex::solve()
       std::cout << ")" << std::endl;
    });
 
-#if 1
-   /**@todo Here we should invalidate the basis, because it is
-      destroyed if the problem was infeasible */
-   // ??? restore old basis
+#if 0
+   /**@todo Delete this #if 0 case, if the #else case is tested and works */
    if( status() != OPTIMAL )
    {
 #ifndef NDEBUG
@@ -262,6 +261,10 @@ SoPlex::Status SoPlex::solve()
    }
    delete[] oldbasis_rows;
    delete[] oldbasis_cols;
+#else
+   if( status() == UNBOUNDED  ||
+       status() == INFEASIBLE )
+      SPxBasis::invalidate();   // infeasible/unbounded basis is unusable
 #endif
 
    return status();

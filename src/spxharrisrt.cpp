@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.14 2002/01/31 16:30:47 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.15 2002/02/13 16:56:07 bzfpfend Exp $"
 
 //#define DEBUG 1
 
@@ -339,6 +339,11 @@ SoPlex::Id SPxHarrisRT::selectEnter(Real& val)
    Real minStability = 0.0001;
    Real epsilon = solver()->epsilon();
    Real delta = solver()->delta();
+   /**@todo numCycle and maxCycle are integers. So degeneps will be 
+    *       exactly delta until numCycle >= maxCycle. Then it will be
+    *       0 until numCycle >= 2 * maxCycle, after wich it becomes
+    *       negative. This does not look ok.
+    */
    Real degeneps = delta * (1 - solver()->numCycle() / solver()->maxCycle());
 
    Vector& pvec = solver()->pVec();

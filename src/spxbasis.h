@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.19 2002/02/04 15:34:09 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.20 2002/02/13 16:56:06 bzfpfend Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -418,6 +418,7 @@ public:
    /// returns the \p i 'th basic vector.
    const SVector& baseVec(int i) const
    {
+      assert( matrixIsSetup );
       return *matrix[i];
    }
 
@@ -726,6 +727,12 @@ public:
       theLP = 0;
       setStatus(NO_PROBLEM);
    }
+
+   /// invalidates actual basis.
+   /** This method makes the basis matrix and vectors invalid. The basis will
+       be reinitialized if needed.
+   */
+   void invalidate();
 
    /// consistency check.
    bool isConsistent() const;
