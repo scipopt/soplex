@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.18 2003/03/30 13:23:31 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.19 2004/03/22 11:35:24 bzfpfend Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
@@ -33,9 +33,10 @@
 
 #include <math.h>
 
-#if !defined(NDEBUG) || defined(TRACE_METHOD) || defined(DEBUGGING)
-#include <iostream>
+#ifdef TRACE_METHOD
+#include "tracemethod.h"
 #endif
+
 
 namespace soplex
 {
@@ -62,38 +63,7 @@ namespace soplex
 #endif //!DEBUGGING
 
 #if defined(TRACE_METHOD)
-
-#define FILE_NAME_COL  60
-
-class TraceMethod
-{
-private:
-   static int s_indent;
-
-public:
-   TraceMethod(const char* s, const char* file, int line )
-   {
-      int i;
- 
-      std::cout << "\t";
-      
-      for(i = 0; i < s_indent; i++)
-         std::cout << ".";      
-      
-      std::cout << s;
-      
-      for(i = strlen(s) + s_indent; i < FILE_NAME_COL - 8; i++)
-         std::cout << "_";             
-      std::cout << "[" << file << ":" << line << "]" << std::endl; 
-      s_indent++;
-   }
-   virtual ~TraceMethod()
-   {
-      s_indent--;
-   }
-};
-#define METHOD(x) TraceMethod _trace_method_(x, __FILE__, __LINE__)
-
+#define METHOD(x) soplex::TraceMethod _trace_method_(x, __FILE__, __LINE__)
 #else
 #define METHOD(x) /**/
 #endif // !TRACE_METHOD

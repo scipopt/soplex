@@ -1,9 +1,9 @@
-#--- $Id: make.linux.x86.gnu.opt-ld,v 1.2 2004/03/17 12:33:12 bzfpfend Exp $
+#--- $Id: make.linux.x86.gnu.opt-ld,v 1.3 2004/03/22 11:35:24 bzfpfend Exp $
 CXX	=	g++
 CPPFLAGS=	-Isrc -DNDEBUG -DWITH_ZLIB -DWITH_LONG_DOUBLE \
                 -DDEFAULT_BND_VIOL=1e-8 -DDEFAULT_EPS_ZERO=1e-22 \
                 -I/optimi/kombadon/bzfkocht/easyval/include
 CXXFLAGS=	-g -O -march=pentium4 -fno-exceptions \
 		-m128bit-long-double #-ffast-math
-LDFLAGS	=	-lz -lm -static -L/optimi/kombadon/bzfkocht/easyval/lib -lEasyval # -static
+LDFLAGS	=	-lz -lm # -static -L/optimi/kombadon/bzfkocht/easyval/lib -lEasyval
 ARFLAGS	=	crs

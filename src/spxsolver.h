@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.15 2004/03/17 12:33:12 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.16 2004/03/22 11:35:24 bzfpfend Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -388,6 +388,7 @@ public:
     */
    virtual Real value() const;
 
+#if 0
    /// returns dualsol^T b + min{(objvec^T - dualsol^T A) x} calculated in interval arithmetics
    Real provedBound(Vector& dualsol, const Vector& objvec) const;
 
@@ -396,6 +397,7 @@ public:
 
    /// returns whether an infeasible LP is proven to be infeasible.
    virtual bool isProvenInfeasible() const;
+#endif
 
    /// get solution vector for primal variables.
    /** This method returns the #Status of the basis.

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.62 2004/03/17 12:33:12 bzfpfend Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.63 2004/03/22 11:35:24 bzfpfend Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -110,11 +110,12 @@ public:
          std::cout << "IEXAMP11 Reduced costs    :" 
                    << std::setw(16) << maxviol << "  " 
                    << std::setw(16) << sumviol << std::endl;
-
+#if 0
          std::cout << "IEXAMP12 Proven dual bound:" 
                    << std::setw(20)
                    << std::setprecision(20)
                    << m_solver.provedDualbound() << std::endl;
+#endif
       }
    }
 
@@ -122,10 +123,12 @@ public:
    {
       assert(m_solver.status() == SPxSolver::INFEASIBLE);
 
+#if 0
       if( m_solver.isProvenInfeasible() )
          std::cout << "IEXAMP13 Infeasibility is proven." << std::endl;
       else
          std::cout << "IEXAMP13 Infeasibility could not be proven!" << std::endl;
+#endif
    }
 };
 

@@ -13,14 +13,19 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxproof.cpp,v 1.2 2004/03/17 12:33:12 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxproof.cpp,v 1.3 2004/03/22 11:35:24 bzfpfend Exp $"
 
 /**@file  spxproof.cpp
  * @brief provable bounds
  */
 
+#if 0
+
 #include "Easyval.hh"
 #include "spxsolver.h"
+
+//#undef DEBUG
+//#define DEBUG(x) {x}
 
 namespace soplex
 {
@@ -29,7 +34,7 @@ Real SPxSolver::provedBound(Vector& dualsol, const Vector& objvec) const
 {
    DVector lhsvec(dim());
    DVector rhsvec(dim());
-   Real eps = epsilon();
+   Real eps = delta();
    Easyval ytb;
    Easyval scalprod;
    int sen = (spxSense() == MINIMIZE ? +1 : -1);
@@ -59,7 +64,9 @@ Real SPxSolver::provedBound(Vector& dualsol, const Vector& objvec) const
       Easyval y(dualsol[i]);
 
       ytb += y*b;
-      DEBUG( std::cout << "y[" << i << "] = " << dualsol[i] << ", b[" << i << "] = " << rhsvec[i]
+      DEBUG( std::cout << "y[" << i << "] = " << dualsol[i]
+         << ", lhs[" << i << "] = " << lhsvec[i]
+         << ", rhs[" << i << "] = " << rhsvec[i]
          << " -> ytb = " << ytb << std::endl; );
    }
 
@@ -127,3 +134,5 @@ bool SPxSolver::isProvenInfeasible() const
 }
 
 }
+
+#endif
