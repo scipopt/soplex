@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.h,v 1.4 2001/11/29 12:11:42 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.h,v 1.5 2001/11/29 14:43:46 bzfpfend Exp $"
 
 /**@file  spxharrisrt.h
  * @brief Harris pricing with shifting.
@@ -29,7 +29,7 @@
 namespace soplex
 {
 
-/**@brief Harris pricing with shifting.
+/**@brief   Harris pricing with shifting.
    @ingroup Algo
    
    Class #SPxHarrisRT is a stable implementation of a #SPxRatioTester class

@@ -13,9 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.h,v 1.6 2001/11/25 14:58:29 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.h,v 1.7 2001/11/29 14:43:46 bzfpfend Exp $"
 
 
+/**@file  ssvector.h
+ * @brief Semi sparse vector.
+ */
 #ifndef _SSVECTOR_H_
 #define _SSVECTOR_H_
 
@@ -30,22 +33,21 @@ namespace soplex
 {
 class SVSet;
 
-/** semi sparse vector.
-    This class implements {\bf S}emi {\bf S}parse {\bf Vector}s. Such are
-    #DVector#s where the indices of its nonzero elements can be stored in an
-    extra #IdxSet#. Only elements with absolute value #> epsilon# are considered
-    to be nonzero. Since really storing the nonzeros is not allways convenient,
-    an #SSVector# provides two different statuses: setup and not setup.
-    An #SSVector# being setup means that the nonzero indices are available,
-    otherwise an #SSVector# is just an ordinary #Vector# with an empty #IdxSet#.
- */
+/**@brief   Semi sparse vector.
+   @ingroup Algebra
+
+   This class implements Semi Sparse Vectors. Such are
+   #DVector%s where the indices of its nonzero elements can be stored in an
+   extra #IdxSet. Only elements with absolute value > #epsilon are considered
+   to be nonzero. Since really storing the nonzeros is not allways convenient,
+   an #SSVector provides two different statuses: setup and not setup.
+   An #SSVector being setup means that the nonzero indices are available,
+   otherwise an #SSVector is just an ordinary #Vector with an empty #IdxSet.
+*/
 class SSVector : protected DVector, protected DIdxSet
 {
-   SSVector& assign2product1(const SVSet& A, const SSVector& x);
-   SSVector& assign2productShort(const SVSet& A, const SSVector& x);
-   SSVector& assign2productFull(const SVSet& A, const SSVector& x);
-
-   int setupStatus;
+private:
+   int setupStatus;        ///< is the #SSVector set up?
 
    friend class DVector;
    friend class Vector;
@@ -53,69 +55,70 @@ class SSVector : protected DVector, protected DIdxSet
    friend class SMoPlex;
 
 public:
-   ///
+   /**@todo member variable epsilon should be private. */
+   /// a value x with |x| < epsilon is considered zero.
    double epsilon;
 
-   /**@name Status of an #SSVector#
-       An #SSVector# can be setup or not. In case it is setup, its #IdxSet#
-       correctly contains all indices of nonzero elements of the #SSVector#.
-       Otherwise, it does not contain any usefull data. Wheter or not an
-       #SSVector# is setup can be determined with method #isSetup()#.
-
-       There are three method for directly affecting the setup status of an
-       #SSVector#
-       \begin{description}
-       \item[unSetup]          This method sets the status to ``not setup''.
-       \item[setup]            This method initializes the #IdxSet# to the
-                               #SSVector#s nonzero indices and sets the status
-                               to ``setup''.
-       \item[forceSetup]       This method sets the status to ``setup'' without
-                               verifying, that the #IdxSet# correctly contains
-                               all nonzero indices. It may be used when the
-                               nonzero indices have been computed externally.
-       \end{description}
-    */
+   /**@name Status of an #SSVector
+      An #SSVector can be set up or not. In case it is set up, its #IdxSet
+      correctly contains all indices of nonzero elements of the #SSVector.
+      Otherwise, it does not contain any usefull data. Wheter or not an
+      #SSVector is setup can be determined with method #isSetup().
+      
+      There are three method for directly affecting the setup status of an
+      #SSVector:
+      - unSetup():     This method sets the status to ``not setup''.
+      - setup():       This method initializes the #IdxSet# to the
+                       #SSVector#s nonzero indices and sets the status
+                       to ``setup''.
+      - forceSetup():  This method sets the status to ``setup'' without
+                       verifying, that the #IdxSet correctly contains
+                       all nonzero indices. It may be used when the
+                       nonzero indices have been computed externally.
+   */
    //@{
-
    /// only used in slufactor.cpp
    double* get_ptr()
    {
       return DVector::get_ptr();
    }
-   /// return setup status.
+
+   /// returns setup status.
    int isSetup() const
    {
       return setupStatus;
    }
 
-   /// make #SSVector# not setup.
+   /// makes #SSVector not setup.
    void unSetup()
    {
       setupStatus = 0;
    }
 
-   /*/ initialize nonzero indices for all elements with absolute values
-       #> eps# and set all other elements to 0.
-    */
+   /// initializes nonzero indices
+   /** Initializes nonzero indices for all elements with absolute values
+       greater than #epsilon and sets all other elements to 0.
+   */
    void setup();
-
-   /// force setup status.
+   
+   /// forces setup status.
    void forceSetup()
    {
       setupStatus = 1;
    }
    //@}
 
-   /**@name Methods for a setup #SSVectors# */
+
+   /**@name Methods for setup SSVectors */
    //@{
-   /// return #n#-th index.
+   /// returns index of the \p n 'th nonzero element.
    int index(int n) const
    {
       assert(isSetup());
       return IdxSet::index(n);
    }
 
-   /// return value to #n#-th index.
+   /// returns value of the \p n 'th nonzero element.
    double value(int n) const
    {
       assert(isSetup());
@@ -123,22 +126,22 @@ public:
       return val[idx[n]];
    }
 
-   /// find number of index #i# (or -1).
+   /// returns the position number of index \p i, or -1 if \p i doesn't exist.
    int number(int i) const
    {
       assert(isSetup());
       return IdxSet::number(i);
    }
 
-   /// number of nonzeros.
+   /// returns the number of nonzeros.
    int size() const
    {
       assert(isSetup());
       return IdxSet::size();
    }
 
-   /*/ add nonzero #(i,x)# to #SSVector#
-       (no nonzero with index #i# must exist!)
+   /// adds nonzero (\p i, \p x) to #SSVector.
+   /** No nonzero with index \p i must exist in the #SSVector.
     */
    void add(int i, double x)
    {
@@ -148,10 +151,10 @@ public:
       val[i] = x;
    }
 
-   /// set #i#-t element to x.
+   /// sets \p i 'th element to \p x.
    void setValue(int i, double x);
 
-   /// clear element #i#.
+   /// clears element \p i.
    void clearIdx(int i)
    {
       if (isSetup())
@@ -163,7 +166,7 @@ public:
       val[i] = 0;
    }
 
-   /// set #n#-th nonzero element to 0 (must exist!).
+   /// sets \p n 'th nonzero element to 0 (index \p n must exist!).
    void clearNum(int n)
    {
       assert(isSetup());
@@ -174,47 +177,47 @@ public:
    //@}
 
 
-   /**@name Methods independend on the Status */
+   /**@name Methods independend of the Status */
    //@{
-   /// return #i#-th value.
+   /// returns \p i 'th value.
    double operator[](int i) const
    {
       return val[i];
    }
 
-   /// return array indices.
+   /// returns array indices.
    const int* indexMem() const
    {
       return IdxSet::indexMem();
    }
 
-   /// return array values.
+   /// returns array values.
    const double* values() const
    {
       return val;
    }
 
-   /// return indices.
+   /// returns indices.
    const IdxSet& indices() const
    {
       return *this;
    }
 
-   /// return array indices.
+   /// returns array indices.
    int* altIndexMem()
    {
       unSetup();
       return IdxSet::indexMem();
    }
 
-   /// return array values.
+   /// returns array values.
    double* altValues()
    {
       unSetup();
       return val;
    }
 
-   /// return indices.
+   /// returns indices.
    IdxSet& altIndices()
    {
       unSetup();
@@ -231,7 +234,7 @@ public:
    SSVector& operator+=(const SVector& vec);
    ///
    SSVector& operator+=(const SubSVector& vec);
-   ///
+   /// vector summation.
    SSVector& operator+=(const SSVector& vec);
 
    ///
@@ -240,86 +243,71 @@ public:
    SSVector& operator-=(const SVector& vec);
    ///
    SSVector& operator-=(const SubSVector& vec);
-   ///
+   /// vector subtraction.
    SSVector& operator-=(const SSVector& vec);
 
-   ///
+   /// vector scaling.
    SSVector& operator*=(double x);
 
-   /// add scaled vector (#+= x*vec#).
+   ///
    SSVector& multAdd(double x, const SSVector& vec);
    ///
    SSVector& multAdd(double x, const SVector& vec);
    ///
    SSVector& multAdd(double x, const SubSVector& vec);
-   ///
+   /// adds scaled vector (+= \p x * \p vec).
    SSVector& multAdd(double x, const Vector& vec);
 
-   /// assign #SSVector# to $x^T \cdot A$.
+   /// assigns #SSVector to \f$x^T \cdot A\f$.
    SSVector& assign2product(const SSVector& x, const SVSet& A);
-   /// assign #SSVector# to $A \cdot x$.
+   /// assigns #SSVector to \f$A \cdot x\f$.
    SSVector& assign2product(const SVSet& A, const SSVector& x);
-   /// assign #SSVector# to $A \cdot x$ for a setup #x#.
+   /// assigns #SSVector to \f$A \cdot x\f$ for a setup \p x.
    SSVector& assign2product4setup(const SVSet& A, const SSVector& x);
-   /// assign #SSVector# to $A \cdot x$ thereby setting up #x#.
+   /// assigns #SSVector to \f$A \cdot x\f$ thereby setting up \p x.
    SSVector& assign2productAndSetup(const SVSet& A, SSVector& x);
 
-   /// infinity norm of a Vector.
+   /// returns infinity norm of a Vector.
    double maxAbs() const;
-   /// euclidian norm of a Vector.
+   /// returns euclidian norm of a Vector.
    double length() const;
-   /// squared norm of a Vector.
+   /// returns squared norm of a Vector.
    double length2() const;
    //@}
 
+
    /**@name Miscellaneous */
    //@{
-   ///
+   /// returns dimension of Vector.
    int dim() const
    {
       return dimen;
    }
-   /// reset dimension.
+
+   /// resets dimension to \p newdim.
    void reDim (int newdim);
-   /// set number of nonzeros (thereby unSetup SSVector).
+
+   /// sets number of nonzeros (thereby unSetup SSVector).
    void setSize(int n)
    {
       unSetup();
       IdxSet::setSize(n);
    }
-   /// reset memory consumption.
+
+   /// resets memory consumption to \p newsize.
    void reMem(int newsize);
-   /// set to 0.
+
+   /// clears vector.
    void clear ();
 
-   ///
-   SSVector& operator=(const SSVector& rhs);
+   /// consistency check.
+   int isConsistent() const;
+   //@}
 
- public:
-   /// setup #rhs# vector, if it is not allready.
-   void setup_and_assign(SSVector& rhs);
-   ///
-   SSVector& operator=(const SVector& rhs);
-   ///
-   SSVector& operator=(const Vector& rhs)
-   {
-      unSetup();
-      Vector::operator=(rhs);
-      return *this;
-   }
 
-   /// assign only the elements of #rhs#.
-   SSVector& assign(const SVector& rhs);
-
-   /// construct nonsetup copy of #vec#.
-   SSVector(const Vector& vec, double eps = 1e-16)
-      : DVector (vec)
-      , DIdxSet (vec.dim() + 1)
-      , setupStatus(0)
-      , epsilon (eps)
-   { }
-
-   ///
+   /**@name Constructors / Destructors */
+   //@{
+   /// default constructor.
    SSVector(int pdim = 0, double peps = 1e-16)
       : DVector (pdim)
       , DIdxSet (pdim + 1)
@@ -329,7 +317,7 @@ public:
       Vector::clear();
    }
 
-   ///
+   /// copy constructor.
    SSVector(const SSVector& vec)
       : DVector (vec)
       , DIdxSet (vec.dim() + 1)
@@ -340,13 +328,42 @@ public:
       //*((DIdxSet*)this) = vec;
    }
 
+   /// constructs nonsetup copy of \p vec.
+   SSVector(const Vector& vec, double eps = 1e-16)
+      : DVector (vec)
+      , DIdxSet (vec.dim() + 1)
+      , setupStatus(0)
+      , epsilon (eps)
+   { }
+
+   /// sets up \p rhs vector, and assigns it.
+   void setup_and_assign(SSVector& rhs);
+
+   /// assign only the elements of \p rhs.
+   SSVector& assign(const SVector& rhs);
+
    ///
-   int isConsistent() const;
+   SSVector& operator=(const SSVector& rhs);
+   ///
+   SSVector& operator=(const SVector& rhs);
+   /// assignment operator.
+   SSVector& operator=(const Vector& rhs)
+   {
+      unSetup();
+      Vector::operator=(rhs);
+      return *this;
+   }
+
    //@}
+
+private:
+   SSVector& assign2product1(const SVSet& A, const SSVector& x);
+   SSVector& assign2productShort(const SVSet& A, const SSVector& x);
+   SSVector& assign2productFull(const SVSet& A, const SSVector& x);
 };
 
 
-//@ ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 inline Vector& Vector::multAdd(double x, const SSVector& svec)
 {

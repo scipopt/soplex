@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.h,v 1.3 2001/11/29 12:11:42 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxfastrt.h,v 1.4 2001/11/29 14:43:46 bzfpfend Exp $"
 
 /**@file  spxfastrt.h
  * @brief Fast shifting ratio test.
@@ -29,7 +29,7 @@
 namespace soplex
 {
 
-/**@brief Fast shifting ratio test.
+/**@brief   Fast shifting ratio test.
    @ingroup Algo
    
    Class #SPxFastRT is an implementation class of #SPxRatioTester providing

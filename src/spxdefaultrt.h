@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultrt.h,v 1.4 2001/11/29 12:11:42 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxdefaultrt.h,v 1.5 2001/11/29 14:43:46 bzfpfend Exp $"
 
 /**@file  spxdefaultrt.h
  * @brief Textbook ratio test for #SoPlex.
@@ -29,7 +29,7 @@
 namespace soplex
 {
 
-/**@brief Textbook ratio test for #SoPlex.
+/**@brief   Textbook ratio test for #SoPlex.
    @ingroup Algo
    
    Class #SPxDefaultRT provides an implementation of the textbook ratio test

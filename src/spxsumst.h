@@ -13,46 +13,37 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsumst.h,v 1.2 2001/11/06 23:31:05 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsumst.h,v 1.3 2001/11/29 14:43:46 bzfpfend Exp $"
 
 
+/**@file  spxsumst.h
+ * @brief Simple heuristic #SPxStarter.
+ */
 #ifndef _SPXSUMST_H_
 #define _SPXSUMST_H_
 
-//@ ----------------------------------------------------------------------------
-/*  \Section{Imports}
-    Import required system include files ...
- */
+
 #include <assert.h>
-
-
-/*  ... and class header files
- */
 
 #include "spxvectorst.h"
 
 namespace soplex
 {
 
+/**@brief   Simple heuristic #SPxStarter.
+   @ingroup Algo
 
-
-
-
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
-
-/** Simple heuristic #SPxStarter#.
-    Testing version of an #SPxVectorST# using a very simplistic heuristic to
-    build up an approximated solution vector.
- */
+   Testing version of an #SPxVectorST using a very simplistic heuristic to
+   build up an approximated solution vector.
+*/
 class SPxSumST : public SPxVectorST
 {
-private:
 protected:
+   /// sets up variable weights.
    void setupWeights(SoPlex& base);
+
 public:
-   ///
+   /// default constructor.
    SPxSumST()
    {}
 

@@ -13,56 +13,44 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxstarter.h,v 1.2 2001/11/06 23:31:05 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxstarter.h,v 1.3 2001/11/29 14:43:46 bzfpfend Exp $"
 
 
+/**@file  spxstarter.h
+ * @brief #SoPlex start basis generation base class.
+ */
 #ifndef _SPXDSTARTER_H_
 #define _SPXDSTARTER_H_
 
-//@ ----------------------------------------------------------------------------
-/*      \Section{Imports}
-    Import required system include files
- */
+
 #include <assert.h>
-
-
-/*  and class header files
- */
 
 #include "soplex.h"
 
 namespace soplex
 {
 
-
-
-
-
-
-//@ ----------------------------------------------------------------------------
-/* \Section{Class Declaration}
- */
-
-/** #SoPlex# start basis generation base class.
-    #SPxStarter# is the virtual base class for classes generating a starter basis
-    for the Simplex solver #SoPlex#. When a #SPxStarter# object has been loaded
-    to a #SoPlex# solver, the latter will call method #generate()# in order to
-    have a start basis generated. Implementations of method #generate()# must
-    terminate by #SoPlex::load()#ing the generated basis to #SoPlex#. Loaded
-    basises must be nonsingular.
- */
+/**@brief   #SoPlex start basis generation base class.
+   @ingroup Algo
+   
+   #SPxStarter is the virtual base class for classes generating a starter basis
+   for the Simplex solver #SoPlex. When a #SPxStarter object has been loaded
+   to a #SoPlex solver, the latter will call method #generate() in order to
+   have a start basis generated. Implementations of method #generate() must
+   terminate by #SoPlex::load()%ing the generated basis to #SoPlex. Loaded
+   basises must be nonsingular.
+*/
 class SPxStarter
 {
 public:
-   /// generate start basis for loaded basis.
+   /// generates start basis for loaded basis.
    virtual void generate(SoPlex& base) = 0;
 
    /// destructor.
    virtual ~SPxStarter()
    { }
 
-   /// check consistency.
-
+   /// checks consistency.
    virtual int isConsistent() const;
 };
 
