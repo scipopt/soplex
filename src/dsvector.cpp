@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dsvector.cpp,v 1.8 2001/12/28 14:55:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dsvector.cpp,v 1.9 2002/01/10 13:34:49 bzfpfend Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -67,8 +67,8 @@ DSVector::DSVector(const SSVector& old)
    SVector::operator= ( old );
 }
 
-DSVector::DSVector(const DSVector& old):
-   SVector()
+DSVector::DSVector(const DSVector& old)
+   : SVector()
 {
    allocMem(old.size() + 1);
    SVector::operator= ( old );

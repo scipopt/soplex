@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvecs.cpp,v 1.6 2001/12/30 11:30:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxvecs.cpp,v 1.7 2002/01/10 13:34:49 bzfpfend Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -197,7 +197,7 @@ void SoPlex::computeFrhs1
          }
          assert(x < SPxLP::infinity);
          assert(x > -SPxLP::infinity);
-         if (x)
+         if (x != 0.0)
             theFrhs->multAdd(-x, vector(i));
       }
    }

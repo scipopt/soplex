@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.9 2002/01/04 17:31:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.10 2002/01/10 13:34:49 bzfpfend Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -41,6 +41,7 @@ int SPxHarrisRT::maxDelta(
 {
    double x;
    double theval;
+   /**@todo patch suggests using *max instead of themax */
    double themax;
    int sel;
    int i;
@@ -93,6 +94,7 @@ int SPxHarrisRT::minDelta(
 {
    double x;
    double theval;
+   /**@todo patch suggests using *max instead of themax */
    double themax;
    int sel;
    int i;

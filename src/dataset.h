@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.18 2002/01/05 19:24:09 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.19 2002/01/10 13:34:49 bzfpfend Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -116,6 +116,7 @@ public:
       DATA* data = create(newkey);
       if (data == 0)
          return 1;
+      /**@todo patch suggests: (*data) = item */
       memcpy(data, &item, sizeof(*data));
       return 0;
    }
@@ -514,27 +515,28 @@ public:
    }
    //@}
 
-
+   
    /**@name Constructors / Destructors */
    //@{
    /// default constructor.
    DataSet(int pmax = 8)
+      : themax ( pmax < 1 ? 8 : pmax )
+      , thesize( 0 ) 
+      , thenum ( 0 )
+      
    {
-      themax    = (pmax < 1) ? 8 : pmax;
-      thesize   = thenum = 0;
       firstfree = -themax - 1;
 
       spx_alloc(theitem, themax);
       spx_alloc(thekey, themax);
    }
-
+   
    /// copy constructor.
    DataSet(const DataSet& old)
+      : themax ( old.themax )
+      , thesize( old.thesize )
+      , thenum ( old.thenum )
    {
-      themax  = old.themax;
-      thesize = old.thesize;
-      thenum  = old.thenum;
-
       if (old.firstfree == -old.themax - 1)
          firstfree = -themax - 1;
       else

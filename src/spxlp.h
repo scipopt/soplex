@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.12 2002/01/04 17:31:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.13 2002/01/10 13:34:49 bzfpfend Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -219,6 +219,7 @@ public:
          return *this;
       }
       ///
+      /**@todo patch suggest "const SPxColId& cid" */
       Id& operator=(const SPxColId cid)
       {
          //*(int*)this = *(int*) & cid;
@@ -227,6 +228,7 @@ public:
          return *this;
       }
       /// assignment operator.
+      /**@todo patch suggest "const SPxRowId& cid" */
       Id& operator=(const SPxRowId rid)
       {
          //*(int*)this = *(int*) & rid;

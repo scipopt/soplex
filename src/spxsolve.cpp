@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.15 2002/01/06 21:16:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.16 2002/01/10 13:34:49 bzfpfend Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -357,6 +357,7 @@ bool SoPlex::terminate()
 SoPlex::Status SoPlex::getPrimal (Vector& p_vector) const
 {
    if (!isInitialized())
+      /**@todo patch suggests returning ERROR instead of initializing */
       const_cast<SoPlex*>(this)->init();
 
    if (rep() == ROW)
@@ -403,6 +404,7 @@ SoPlex::Status SoPlex::getPrimal (Vector& p_vector) const
 SoPlex::Status SoPlex::getDual (Vector& p_vector) const
 {
    if (!isInitialized())
+      /**@todo patch suggests returning ERROR instead of initializing */
       const_cast<SoPlex*>(this)->init();
 
    if (rep() == ROW)
@@ -427,6 +429,7 @@ SoPlex::Status SoPlex::getDual (Vector& p_vector) const
 SoPlex::Status SoPlex::getRdCost (Vector& p_vector) const
 {
    if (!isInitialized())
+      /**@todo patch suggests returning ERROR instead of initializing */
       const_cast<SoPlex*>(this)->init();
 
    if (rep() == ROW)
@@ -465,6 +468,7 @@ SoPlex::Status SoPlex::getRdCost (Vector& p_vector) const
 SoPlex::Status SoPlex::getSlacks (Vector& p_vector) const
 {
    if (!isInitialized())
+      /**@todo patch suggests returning ERROR instead of initializing */
       const_cast<SoPlex*>(this)->init();
 
    if (rep() == COLUMN)

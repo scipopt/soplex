@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.24 2002/01/08 09:32:49 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.25 2002/01/10 13:34:49 bzfpfend Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -699,7 +699,8 @@ double SoPlex::value() const
 {
    double x;
 
-   if (!isInitialized())
+   if (!isInitialized())      
+      /**@todo patch suggests returning SPxLP::infinity instead of initializing */
       (const_cast<SoPlex*>(this))->init();
 
    if (rep() == ROW)

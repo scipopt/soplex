@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idlist.h,v 1.11 2002/01/08 09:29:57 bzfkocht Exp $"
+#pragma ident "@(#) $Id: idlist.h,v 1.12 2002/01/10 13:34:49 bzfpfend Exp $"
 
 /**@file  idlist.h
  * @brief Generic double linked list.
@@ -75,7 +75,7 @@ public:
    /// default constructor.
    IdElement()
       : theprev(0)
-         , thenext(0)
+      , thenext(0)
    {}
 
    /// copy constructor.
@@ -84,8 +84,8 @@ public:
    */
    IdElement(const T& old)
       : T(old)
-         , theprev(0)
-         , thenext(0)
+      , theprev(0)
+      , thenext(0)
    {}
 };
 
