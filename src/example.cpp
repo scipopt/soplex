@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.61 2004/03/17 09:20:01 bzfpfend Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.62 2004/03/17 12:33:12 bzfpfend Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -116,6 +116,16 @@ public:
                    << std::setprecision(20)
                    << m_solver.provedDualbound() << std::endl;
       }
+   }
+
+   void displayInfeasibility() const
+   {
+      assert(m_solver.status() == SPxSolver::INFEASIBLE);
+
+      if( m_solver.isProvenInfeasible() )
+         std::cout << "IEXAMP13 Infeasibility is proven." << std::endl;
+      else
+         std::cout << "IEXAMP13 Infeasibility could not be proven!" << std::endl;
    }
 };
 
@@ -539,25 +549,27 @@ int main(int argc, const char* const argv[])
                       << basisname << "\"" << std::endl;
       break;
    case SPxSolver::UNBOUNDED:
-      std::cout << "IEXAMP31 LP is unbounded";
+      std::cout << "IEXAMP31 LP is unbounded" << std::endl;
       break;
    case SPxSolver::INFEASIBLE:
-      std::cout << "IEXAMP32 LP is infeasible";
+      std::cout << "IEXAMP32 LP is infeasible" << std::endl;
+      if (print_quality)
+         work.displayInfeasibility();
       break;
    case SPxSolver::ABORT_TIME:
-      std::cout << "IEXAMP33 aborted due to time limit";
+      std::cout << "IEXAMP33 aborted due to time limit" << std::endl;
       break;
    case SPxSolver::ABORT_ITER:
-      std::cout << "IEXAMP34 aborted due to iteration limit";
+      std::cout << "IEXAMP34 aborted due to iteration limit" << std::endl;
       break;
    case SPxSolver::ABORT_VALUE:
-      std::cout << "IEXAMP35 aborted due to objective value limit";
+      std::cout << "IEXAMP35 aborted due to objective value limit" << std::endl;
       break;
    case SPxSolver::SINGULAR:
-      std::cerr << "EEXAMP39 basis is singular";
+      std::cerr << "EEXAMP39 basis is singular" << std::endl;
       break;
    default:
-      std::cerr << "EEXAMP36 An error occurred during the solution process";
+      std::cerr << "EEXAMP36 An error occurred during the solution process" << std::endl;
       break;
    }
    std::cout << std::endl;

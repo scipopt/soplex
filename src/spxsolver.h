@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.14 2004/03/17 09:20:01 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.15 2004/03/17 12:33:12 bzfpfend Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -387,6 +387,9 @@ public:
     *         (see #getPrimal()).
     */
    virtual Real value() const;
+
+   /// returns dualsol^T b + min{(objvec^T - dualsol^T A) x} calculated in interval arithmetics
+   Real provedBound(Vector& dualsol, const Vector& objvec) const;
 
    /// proved dual bound for objective value.
    virtual Real provedDualbound() const;

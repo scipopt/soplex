@@ -154,7 +154,9 @@ $(OBJDIR)/spxdesc.o: src/spxdesc.cpp src/spxdefines.h src/spxbasis.h src/spxlp.h
   src/svset.h src/dataset.h src/dataarray.h src/spxalloc.h src/message.h \
   src/idlist.h src/islist.h src/lprow.h src/dsvector.h src/ssvector.h \
   src/didxset.h src/idxset.h src/lpcol.h src/lprowset.h src/lpcolset.h \
-  src/nameset.h src/datahashtable.h src/slinsolver.h
+  src/nameset.h src/datahashtable.h src/slinsolver.h src/spxsolver.h \
+  src/timer.h src/array.h src/random.h src/unitvector.h \
+  src/updatevector.h
 $(OBJDIR)/spxdevexpr.o: src/spxdevexpr.cpp src/spxdefines.h src/spxdevexpr.h \
   src/spxpricer.h src/spxsolver.h src/timer.h src/spxlp.h src/datakey.h \
   src/spxid.h src/dvector.h src/vector.h src/svector.h src/svset.h \
@@ -254,6 +256,16 @@ $(OBJDIR)/spxparmultpr.o: src/spxparmultpr.cpp src/spxdefines.h src/spxparmultpr
   src/dataset.h src/dataarray.h src/spxalloc.h src/message.h src/idlist.h \
   src/islist.h src/lprow.h src/dsvector.h src/ssvector.h src/didxset.h \
   src/idxset.h src/lpcol.h src/lprowset.h src/lpcolset.h src/nameset.h \
+  src/datahashtable.h src/spxbasis.h src/slinsolver.h src/array.h \
+  src/random.h src/unitvector.h src/updatevector.h
+$(OBJDIR)/spxproof.o: src/spxproof.cpp \
+  /optimi/kombadon/bzfkocht/easyval/include/Easyval.hh \
+  /optimi/kombadon/bzfkocht/easyval/include/Easyval.icc src/spxsolver.h \
+  src/spxdefines.h src/timer.h src/spxlp.h src/datakey.h src/spxid.h \
+  src/dvector.h src/vector.h src/svector.h src/svset.h src/dataset.h \
+  src/dataarray.h src/spxalloc.h src/message.h src/idlist.h src/islist.h \
+  src/lprow.h src/dsvector.h src/ssvector.h src/didxset.h src/idxset.h \
+  src/lpcol.h src/lprowset.h src/lpcolset.h src/nameset.h \
   src/datahashtable.h src/spxbasis.h src/slinsolver.h src/array.h \
   src/random.h src/unitvector.h src/updatevector.h
 $(OBJDIR)/spxquality.o: src/spxquality.cpp src/spxdefines.h src/spxsolver.h \
@@ -390,4 +402,4 @@ $(OBJDIR)/vsolve.o: src/vsolve.cpp src/spxdefines.h src/clufactor.h \
   src/slinsolver.h src/svector.h src/vector.h src/ssvector.h \
   src/dvector.h src/didxset.h src/idxset.h src/spxalloc.h src/dsvector.h \
   src/timer.h
-$(OBJDIR)/gzstream.o: src/gzstream.cpp
+$(OBJDIR)/gzstream.o: src/gzstream.cpp src/gzstream.h

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxproof.cpp,v 1.1 2004/03/17 09:20:01 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxproof.cpp,v 1.2 2004/03/17 12:33:12 bzfpfend Exp $"
 
 /**@file  spxproof.cpp
  * @brief provable bounds
@@ -25,12 +25,10 @@
 namespace soplex
 {
 
-Real SPxSolver::provedDualbound() const
+Real SPxSolver::provedBound(Vector& dualsol, const Vector& objvec) const
 {
-   DVector dualsol(dim());
    DVector lhsvec(dim());
    DVector rhsvec(dim());
-   DVector objvec(coDim());
    Real eps = epsilon();
    Easyval ytb;
    Easyval scalprod;
@@ -42,10 +40,8 @@ Real SPxSolver::provedDualbound() const
     * for maximazation problems: calculate y^Tb + max{(c^T - y^TA)x | l <= x <= u}
     */
 
-   getDual(dualsol);
    getLhs(lhsvec);
    getRhs(rhsvec);
-   getObj(objvec);
 
    /* 1. calculate y^Tb */
    ytb = 0;
@@ -63,8 +59,8 @@ Real SPxSolver::provedDualbound() const
       Easyval y(dualsol[i]);
 
       ytb += y*b;
-      std::cout << "y[" << i << "] = " << dualsol[i] << ", b[" << i << "] = " << rhsvec[i]
-                << " -> ytb = " << ytb << std::endl;
+      DEBUG( std::cout << "y[" << i << "] = " << dualsol[i] << ", b[" << i << "] = " << rhsvec[i]
+         << " -> ytb = " << ytb << std::endl; );
    }
 
    /* 2. calculate min/max{(c^T - y^TA)x} */
@@ -77,28 +73,29 @@ Real SPxSolver::provedDualbound() const
       getCol(j, col);
       SVector colvec = col.colVector();  /* make this faster !!! */
       Easyval diff = objvec[j];
-      std::cout << "obj[" << j << "] = " << objvec[j]
-                << " -> diff = " << diff << std::endl;
+      DEBUG( std::cout << "obj[" << j << "] = " << objvec[j]
+         << " -> diff = " << diff << std::endl; );
 
       for( int i = 0; i < colvec.size(); ++i )
       {
          Easyval y(dualsol[colvec.index(i)]);
          Easyval a(colvec.value(i));
          diff -= y*a;
-         std::cout << "y[" << i << "] = " << dualsol[colvec.index(i)] << ", a[" << colvec.index(i) << "] = "
-                   << colvec.value(i)
-                   << " -> diff = " << diff << std::endl;
+         DEBUG( std::cout << "y[" << colvec.index(i) << "] = " << dualsol[colvec.index(i)]
+            << ", a[" << colvec.index(i) << "] = "
+            << colvec.value(i)
+            << " -> diff = " << diff << std::endl; );
       }
 
       diff *= x;
       scalprod += diff;
-      std::cout << "x[" << j << "] = " << x << " -> diff = " << diff << std::endl;
-      std::cout << "   ------------> scalprod = " << scalprod << std::endl;
+      DEBUG( std::cout << "x[" << j << "] = " << x << " -> diff = " << diff << std::endl
+         << "   ------------> scalprod = " << scalprod << std::endl; );
    }
 
    /* add y^Tb */
    scalprod += ytb;
-   std::cout << "   ------------> scalprod + ytb = " << scalprod << std::endl;
+   VERBOSE1( std::cout << "proved bound = " << scalprod << std::endl; );
 
    /* depending on the objective sense, choose min or max */
    if( spxSense() == MINIMIZE )
@@ -107,9 +104,26 @@ Real SPxSolver::provedDualbound() const
       return scalprod.getSup();
 }
 
+Real SPxSolver::provedDualbound() const
+{
+   DVector dualsol(dim());
+   DVector objvec(coDim());
+
+   getDual(dualsol);
+   getObj(objvec);
+
+   return provedBound(dualsol, objvec);
+}
+
 bool SPxSolver::isProvenInfeasible() const
 {
-   return false;
+   DVector dualfarkas(dim());
+   DVector zerovec(coDim());
+
+   getDualfarkas(dualfarkas);
+   zerovec.clear();
+
+   return (provedBound(dualfarkas, zerovec) > 0.0);
 }
 
 }
