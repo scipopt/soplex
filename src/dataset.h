@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.16 2002/01/04 17:31:38 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.17 2002/01/05 09:59:42 bzfkocht Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -35,7 +35,7 @@ namespace soplex
 /**@brief   Set of data objects.
    @ingroup Elementary
 
-   Class #DataSet manages of sets of \Ref DataObjects "Data Objects" of a
+   Class #DataSet manages of sets of \ref DataObjects "Data Objects" of a
    template type #DATA. For constructing a #DataSet the maximum number 
    of entries must be given. The current maximum number may be inquired 
    with method #max().
@@ -78,9 +78,9 @@ namespace soplex
    free element in the list is marked by #info == -themax-1. Finally all
    elements in #theitem with index >= #thesize are unused as well.  
 
-   @todo We use here malloc/realloc for objects of type Item/DATA.
-         I am not sure that this is a good idea. Maybe we should switch
-         do new/delete here.
+   @warning malloc/realloc and memcpy are use to handle the members 
+      of the set. If you use #DataSet with something that is not
+      a \ref DataObject "Data Object" you will be in severe trouble.
 */
 template<class DATA>
 class DataSet
@@ -120,7 +120,7 @@ public:
       DATA* data = create(newkey);
       if (data == 0)
          return 1;
-      memcpy(data, &item, sizeof(DATA));
+      memcpy(data, &item, sizeof(*data));
       return 0;
    }
    /// adds element \p item.
@@ -131,7 +131,7 @@ public:
       DATA* data = create();
       if (data == 0)
          return 1;
-      memcpy(data, &item, sizeof(DATA));
+      memcpy(data, &item, sizeof(*data));
       return 0;
    }
 
@@ -524,8 +524,8 @@ public:
    /// default constructor.
    DataSet(int pmax = 8)
    {
-      themax = (pmax < 1) ? 8 : pmax;
-      thesize = thenum = 0;
+      themax    = (pmax < 1) ? 8 : pmax;
+      thesize   = thenum = 0;
       firstfree = -themax - 1;
 
       spx_alloc(theitem, themax);
@@ -535,9 +535,10 @@ public:
    /// copy constructor.
    DataSet(const DataSet& old)
    {
-      themax = old.themax;
+      themax  = old.themax;
       thesize = old.thesize;
-      thenum = old.thenum;
+      thenum  = old.thenum;
+
       if (old.firstfree == -old.themax - 1)
          firstfree = -themax - 1;
       else
@@ -546,8 +547,8 @@ public:
       spx_alloc(theitem, themax);
       spx_alloc(thekey, themax);
 
-      memcpy(theitem, old.theitem, themax * sizeof(Item));
-      memcpy(thekey, old.thekey, themax * sizeof(Key));
+      memcpy(theitem, old.theitem, themax * sizeof(*theitem));
+      memcpy(thekey,  old.thekey,  themax * sizeof(*thekey));
    }
 
    /// assignment operator.
@@ -561,11 +562,15 @@ public:
       if (this != &rhs)
       {
          int i;
+
          if (rhs.size() > max())
             reMax(rhs.size());
+
          clear();
+
          for (i = 0; i < rhs.size(); ++i)
-            memcpy(&(theitem[i]), &(rhs.theitem[i]), sizeof(Item));
+            memcpy(&theitem[i], &rhs.theitem[i], sizeof(*theitem));
+
          for (i = 0; i < rhs.num(); ++i)
             thekey[i] = rhs.thekey[i];
 

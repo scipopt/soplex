@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.11 2002/01/04 17:31:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.12 2002/01/05 09:59:43 bzfkocht Exp $"
 
 #include <assert.h>
 #include <stdio.h>
@@ -817,11 +817,10 @@ int SPxFastRT::selectLeave(double& val)
          if (max == val)
             return -1;
 
-         /**@todo Hier steht ein ; oben steht keines.
-          *       Bei ersten Versuchen lief es mit dem ; besser.
-          *       minShortLeave veraendert sel. Ausserdem gucken was
-          *       passiert, wenn man dann oben auch noch das if 
-          *       wegnimmt.
+         /**@todo Here is a ; above is none.
+          *       In a first try the version with the ; runs better.
+          *       minShortLeave changes sel. Have a look what happens
+          *       if we drop the if above also.
           */
          if (!minShortLeave(sel, leave, max, maxabs));
          {

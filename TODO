@@ -1,7 +1,3 @@
-SPXinconsistent in MSGinconsistent und spxmessage in message umbenennen.
-
-die assignment operatoren auf if (this == rhs) durchsehen)
-
 die constructoren auf einparametriege durchsehen (explicit)
 
 in dataarray.h:reSize(int newsize) steht in der docxygen docu immer int n ???
@@ -18,29 +14,12 @@ in idlist.h die subclassen einsetzen.
 BUG in spxscalesm.cc value() wird nicht descaliert. 
 Entsprechender Aufruf fehlt auch in spxgeneralsm.cc
 
-for();    -> for()
-                ;
-
 explicit einfuegen.
 
 reinterpret_cast durchsehen
 
 // lprow.cpp:double LPRow::infinity = 1e+100;
 // spxlp.cpp:const double SPxLP::infinity = 1e+100;
-
-SORTIERUNG 
-
-   daten
-   public daten werden ersetzt.
-   -------
-   public
-   protected
-   private
-
-   constructor/assignment operator (alle typen)
-   destructor
-   initialisierung
-
 
 Dokumentation: (alle * sind bereits fertig)
 
@@ -49,31 +28,23 @@ clufactor.h
 +slufactor.h  // hier fehlen noch ein paar Sachen  -> Thorsten!
 +soplex.h // in Arbeit ;-)
 
+sunos.sparc.sun LC 0 2417
+greenbea LR
 
-sunos.sparc.sun LC 0 3046
-fit2p    LR 
-maros    LR
-pilot-ja LR
-pilot87  EC *
-
-linux.alpha.compaq LC 0 526
-maros-r7 EC
-pilot87  EC *
-pilot87  LR *
-
-osf1.alpha.compaq LC 1 525
-d2q06c   ER
-greenbeb ER
-maros-r7 EC
-pilot    LC *
-
-linux.x86.gnu LC 1 598
-bnl1     LR
+linux.alpha.compaq LC 0 501
 greenbea ER
-maros-r7 LC
-maros    ER
+greenbeb LR
+maros    LR
 pilot87  EC *
 
+osf1.alpha.compaq LC 0 499
+greenbea ER
+pilot    EC *
+
+linux.x86.gnu LC 0 593
+greenbea LR
+
+OLD {
 linux.x86.intel LC 1 977
 greenbea ER
 maros-r7 LC
@@ -86,4 +57,7 @@ maros    ER
 pilot-ja ER
 pilot87  LC *
 pilot87  LR * 
+}
+
+
 

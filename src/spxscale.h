@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscale.h,v 1.4 2001/11/22 16:30:01 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscale.h,v 1.5 2002/01/05 09:59:43 bzfkocht Exp $"
 
 /**@file  spxscale.h
  * @brief LP row/column scaling.
@@ -34,8 +34,8 @@ namespace soplex
    This #SPxSimplifier implementation performs simple scaling of the 
    LPs rows and columns.
 
-   @todo The type of scaling (row/column) can is hard coded. This should
-         br selectable.
+   @todo The type of scaling (row/column) is hard coded. This should
+         be selectable.
 */
 class SPxScale : public SPxSimplifier
 {

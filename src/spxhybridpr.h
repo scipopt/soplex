@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.h,v 1.5 2002/01/04 17:31:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.h,v 1.6 2002/01/05 09:59:43 bzfkocht Exp $"
 
 /**@file  spxhybridpr.h
  * @brief Hybrid pricer.
@@ -73,7 +73,7 @@ public:
    ///
    virtual bool isConsistent() const;
    ///
-      /**@todo TK20011102 I have no idea what is a reasonable value 
+      /**@todo TK02NOV2001 I have no idea what is a reasonable value 
        *       for hybridFactor.
        */
    SPxHybridPR() 

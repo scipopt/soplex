@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.20 2002/01/04 17:31:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.21 2002/01/05 09:59:42 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -963,8 +963,6 @@ int SoPlex::nofNZEs() const
    return n;
 }
 
-/**@todo p_value should implement an objective value termination criterion!
- */
 void SoPlex::setTermination(double p_time, int p_iteration, double p_value)
 {
    maxTime  = p_time;

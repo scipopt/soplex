@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.cpp,v 1.11 2001/12/26 12:58:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.cpp,v 1.12 2002/01/05 09:59:43 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -164,9 +164,6 @@ void SVSet::add2(SVector &svec, int n, const int idx[], const double val[])
    svec.add(n, idx, val);
 }
 
-//@ ----------------------------------------------------------------------------
-/*      \SubSection{Shrinking}
- */
 void SVSet::remove(Key removekey)
 {
    DLPSV* ps = &set[removekey];
@@ -271,17 +268,17 @@ void SVSet::memPack()
       const DLPSV * cps = ps;
       const int sz = cps->size();
 
-      if (ps->mem() != &SVSet_Base::operator[](used))
+      if (ps->mem() != &SVSetBase::operator[](used))
       {
          for (j = 0; j <= sz; ++j)
-            SVSet_Base::operator[](used + j) = ps->mem()[j];
-         ps->setMem(sz + 1, &(SVSet_Base::operator[](used)));
+            SVSetBase::operator[](used + j) = ps->mem()[j];
+         ps->setMem(sz + 1, &(SVSetBase::operator[](used)));
          ps->set_size(sz);
 
       }
       used += sz + 1;
    }
-   SVSet_Base::reSize(used);
+   SVSetBase::reSize(used);
 }
 
 int SVSet::isConsistent() const
@@ -312,8 +309,8 @@ SVSet& SVSet::operator=(const SVSet& rhs)
 
       DLPSV* ps;
       DLPSV* newps;
-      void* delta0 = &(*(static_cast<SVSet_Base*>(this)))[0];
-      void* delta1 = &(*(static_cast<SVSet_Base*>(const_cast<SVSet*>(&rhs))))[0];
+      void* delta0 = &(*(static_cast<SVSetBase*>(this)))[0];
+      void* delta1 = &(*(static_cast<SVSetBase*>(const_cast<SVSet*>(&rhs))))[0];
       ptrdiff_t delta = reinterpret_cast<char*>(delta0) - reinterpret_cast<char*>(delta1);
 
       for (ps = rhs.list.first(); ps; ps = rhs.list.next(ps))

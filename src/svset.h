@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.h,v 1.9 2001/12/28 14:55:13 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.h,v 1.10 2002/01/05 09:59:43 bzfkocht Exp $"
 
 /**@file  svset.h
  * @brief Set of sparse vectors.
@@ -32,7 +32,7 @@
 
 namespace soplex
 {
-typedef DataArray < SVector::Element > SVSet_Base;
+typedef DataArray < SVector::Element > SVSetBase;
 
 /**@brief   sparse vector %set.
    @ingroup Algebra
@@ -63,22 +63,22 @@ typedef DataArray < SVector::Element > SVSet_Base;
    of them returns the \ref Key%s assigned to the SVector%s added to the
    SVSet.
 */
-class SVSet : protected SVSet_Base
+class SVSet : protected SVSetBase
 {
 private:
 
-
-   /**@name Memory management implementation
-      The management of the SVectors is implemented by by a DataSet<DLPSV>, the keys used 
+   /**@name Memory management implementation 
+      The management of the
+      SVectors is implemented by by a DataSet<DLPSV>, the keys used
       externally are DataKey%s.
 
-      The management of nonzeros is done by a
-      double linked list IdList<DLPSV>, where the SVector%s are kept in the
-      order their indices occurr in the DataArray. The
-      SVector%s are kept without holes: If one is removed or moved to the end, the
-      SVector preceeding it obtains all the nonzeros that previously belonged to
-      the (re-)moved one.  However, the nonzeros in use are uneffected by
-      this.
+      The management of nonzeros is done by a double linked list
+      IdList<DLPSV>, where the SVector%s are kept in the order their
+      indices occurr in the DataArray. The SVector%s are kept without
+      holes: If one is removed or moved to the end, the SVector
+      preceeding it obtains all the nonzeros that previously belonged
+      to the (re-)moved one.  However, the nonzeros in use are
+      uneffected by this.  
    */
    //@{
    /**@brief SVector with prev/next pointers
@@ -114,7 +114,7 @@ private:
       /// access to SVector
       SVector& svector()
       {
-         return *this; // static_cast<SVector&>
+         return *this; 
       }
       /// default constructor.
       DLPSV()

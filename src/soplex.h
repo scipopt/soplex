@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.15 2002/01/04 17:31:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.16 2002/01/05 09:59:43 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -730,7 +730,7 @@ public:
     *  an id, a vector of the constraint matrix is returned, otherwise
     *  the corresponding unit vector (of the slack variable or bound
     *  inequality) is returned.
-    *  @todo The implementation does not exactly look exactly it will do
+    *  @todo The implementation does not exactly look like it will do
     *        what is promised in the describtion.
     */
    const SVector& vector(const Id& p_id) const
