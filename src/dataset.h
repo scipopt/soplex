@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.22 2002/01/31 08:19:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.23 2002/02/11 15:32:52 bzfpfend Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -524,7 +524,9 @@ public:
    //@{
    /// default constructor.
    DataSet(int pmax = 8)
-      : themax ( pmax < 1 ? 8 : pmax )
+      : theitem( 0 )
+      , thekey ( 0 )
+      , themax ( pmax < 1 ? 8 : pmax )
       , thesize( 0 ) 
       , thenum ( 0 )
       
@@ -537,7 +539,9 @@ public:
    
    /// copy constructor.
    DataSet(const DataSet& old)
-      : themax ( old.themax )
+      : theitem( 0 )
+      , thekey ( 0 )
+      , themax ( old.themax )
       , thesize( old.thesize )
       , thenum ( old.thenum )
    {

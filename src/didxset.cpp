@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: didxset.cpp,v 1.9 2002/01/31 08:19:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: didxset.cpp,v 1.10 2002/02/11 15:32:52 bzfpfend Exp $"
 
 #include "didxset.h"
 #include "spxalloc.h"
@@ -35,7 +35,7 @@ void DIdxSet::setMax(int newmax)
 }
 
 DIdxSet::DIdxSet(const IdxSet& old)
-   : IdxSet(0, 0)
+   : IdxSet()
 {
    len = old.size();
    len = (len < 1) ? 1 : len;
@@ -45,7 +45,7 @@ DIdxSet::DIdxSet(const IdxSet& old)
 }
 
 DIdxSet::DIdxSet(const DIdxSet& old)
-   : IdxSet(0, 0)
+   : IdxSet()
 {
    len = old.size();
    len = (len < 1) ? 1 : len;

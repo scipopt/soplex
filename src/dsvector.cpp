@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dsvector.cpp,v 1.13 2002/01/31 08:19:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dsvector.cpp,v 1.14 2002/02/11 15:32:52 bzfpfend Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -50,12 +50,14 @@ DSVector& DSVector::operator=(const Vector& vec)
 }
 
 DSVector::DSVector(const SVector& old)
+   : theelem( 0 )
 {
    allocMem(old.size() + 1);
    SVector::operator= ( old );
 }
 
 DSVector::DSVector(const SSVector& old)
+   : theelem( 0 )
 {
    allocMem(old.size() + 1);
    SVector::operator= ( old );
@@ -63,17 +65,20 @@ DSVector::DSVector(const SSVector& old)
 
 DSVector::DSVector(const DSVector& old)
    : SVector()
+   , theelem( 0 )
 {
    allocMem(old.size() + 1);
    SVector::operator= ( old );
 }
 
 DSVector::DSVector(int n)
+   : theelem( 0 )
 {
    allocMem((n < 1) ? 2 : n + 1);
 }
 
 DSVector::DSVector(const Vector& vec)
+   : theelem( 0 )
 {
    allocMem((vec.dim() < 1) ? 2 : vec.dim() + 1);
    *this = vec;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataarray.h,v 1.18 2002/01/31 08:19:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataarray.h,v 1.19 2002/02/11 15:32:52 bzfpfend Exp $"
 
 /**@file  dataarray.h
  * @brief Save arrays of data objects.
@@ -284,6 +284,7 @@ public:
    DataArray(const DataArray& old)
       : thesize(old.thesize)
       , themax (old.themax)
+      , data (0)
       , memFactor (old.memFactor)
    {
       spx_alloc(data, max());
@@ -304,7 +305,8 @@ public:
        @param p_fax  value for memFactor.
     */
    explicit DataArray(int p_size = 0, int p_max = 0, Real p_fac = 1.2)
-      : memFactor(p_fac)
+      : data (0)
+      , memFactor(p_fac)
    {
       thesize = (p_size < 0) ? 0 : p_size;
       if (p_max > thesize)

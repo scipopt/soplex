@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dvector.cpp,v 1.11 2002/01/31 08:19:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dvector.cpp,v 1.12 2002/02/11 15:32:52 bzfpfend Exp $"
 
 
 #include "real.h"
@@ -150,6 +150,7 @@ std::istream& operator>>(std::istream& s, DVector& vec)
 
 DVector::DVector(const Vector& old)
    : Vector(0, 0)
+   , mem( 0 )
 {
    dimen = old.dim();
    memsize = dimen;
@@ -160,6 +161,7 @@ DVector::DVector(const Vector& old)
 
 DVector::DVector(const DVector& old)
    : Vector(0, 0)
+   , mem( 0 )
 {
    dimen = old.dim();
    memsize = old.memsize;
@@ -170,6 +172,7 @@ DVector::DVector(const DVector& old)
 
 DVector::DVector(int p_dim)
    : Vector(0, 0)
+   , mem( 0 )
 {
    memsize = (p_dim > 0) ? p_dim : 4;
    spx_alloc(mem, memsize);

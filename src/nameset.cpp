@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.cpp,v 1.16 2002/01/31 08:19:27 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.cpp,v 1.17 2002/02/11 15:32:53 bzfpfend Exp $"
 
 #include <string.h>
 #include "real.h"
@@ -239,6 +239,7 @@ NameSet& NameSet::operator=(const NameSet& rhs)
 
 NameSet::NameSet(const NameSet& org)
    : set(org.set)
+   , mem(0)
    , hashtab(org.hashtab)
    , factor(org.factor)
    , memFactor(org.memFactor)
@@ -261,6 +262,7 @@ NameSet::NameSet(const NameSet& org)
 
 NameSet::NameSet(int p_max, int mmax, Real fac, Real memFac)
    : set(p_max)
+   , mem(0)
    , hashtab(NameSetNameHashFunction, set.max(), 0, fac)
    , factor(fac)
    , memFactor(memFac)

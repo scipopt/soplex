@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.h,v 1.11 2002/01/31 08:19:27 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.h,v 1.12 2002/02/11 15:32:53 bzfpfend Exp $"
 
 /**@file  slufactor.h
  * @brief Sparse LU factorization.
@@ -64,7 +64,7 @@ protected:
    UpdateType uptype;        ///< the current #UpdateType.
    SSVector   eta;           ///< 
    SSVector   forest;        ///<
-   Real     lastThreshold; ///<
+   Real       lastThreshold; ///<
 
 public:
    typedef SLinSolver::Status Status;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxalloc.h,v 1.5 2002/01/31 08:19:28 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxalloc.h,v 1.6 2002/02/11 15:32:53 bzfpfend Exp $"
 
 /**@file  spxalloc.h
  * @brief Memory allocation routines.
@@ -43,6 +43,7 @@ namespace soplex
 template <class T>
 inline void spx_alloc(T& p, int n)
 {
+   assert(p == 0);
    assert(n >= 0);
 
    if (n == 0)

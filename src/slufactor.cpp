@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.19 2002/01/31 16:30:46 bzfpfend Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.20 2002/02/11 15:32:53 bzfpfend Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -533,25 +533,25 @@ void SLUFactor::assign(const SLUFactor& old)
    assert
    (
       row.perm != 0
-      || row.orig != 0
-      || col.perm != 0
-      || col.orig != 0
-      || diag != 0
-      || u.row.elem != 0
-      || u.row.val != 0
-      || u.row.idx != 0
-      || u.row.start != 0
-      || u.row.len != 0
-      || u.row.max != 0
-      || u.col.elem != 0
-      || u.col.idx != 0
-      || u.col.start != 0
-      || u.col.len != 0
-      || u.col.max != 0
-      || l.val != 0
-      || l.idx != 0
-      || l.start != 0
-      || l.row != 0
+      && row.orig != 0
+      && col.perm != 0
+      && col.orig != 0
+      && diag != 0
+      && u.row.elem != 0
+      && u.row.val != 0
+      && u.row.idx != 0
+      && u.row.start != 0
+      && u.row.len != 0
+      && u.row.max != 0
+      && u.col.elem != 0
+      && u.col.idx != 0
+      && u.col.start != 0
+      && u.col.len != 0
+      && u.col.max != 0
+      && l.val != 0
+      && l.idx != 0
+      && l.start != 0
+      && l.row != 0
   );
 }
 
@@ -574,6 +574,29 @@ SLUFactor::SLUFactor()
    , eta (1)
    , forest (1)
 {
+#ifndef NDEBUG
+   row.perm = 0;
+   row.orig = 0;
+   col.perm = 0;
+   col.orig = 0;
+   diag = 0;
+   u.row.elem = 0;
+   u.row.val = 0;
+   u.row.idx = 0;
+   u.row.start = 0;
+   u.row.len = 0;
+   u.row.max = 0;
+   u.col.elem = 0;
+   u.col.idx = 0;
+   u.col.start = 0;
+   u.col.len = 0;
+   u.col.max = 0;
+   l.val = 0;
+   l.idx = 0;
+   l.start = 0;
+   l.row = 0;
+#endif
+
    nzCnt = 0;
    thedim = 1;
 
@@ -630,25 +653,25 @@ SLUFactor::SLUFactor()
    assert
    (
       row.perm != 0
-      || row.orig != 0
-      || col.perm != 0
-      || col.orig != 0
-      || diag != 0
-      || u.row.elem != 0
-      || u.row.val != 0
-      || u.row.idx != 0
-      || u.row.start != 0
-      || u.row.len != 0
-      || u.row.max != 0
-      || u.col.elem != 0
-      || u.col.idx != 0
-      || u.col.start != 0
-      || u.col.len != 0
-      || u.col.max != 0
-      || l.val != 0
-      || l.idx != 0
-      || l.start != 0
-      || l.row != 0
+      && row.orig != 0
+      && col.perm != 0
+      && col.orig != 0
+      && diag != 0
+      && u.row.elem != 0
+      && u.row.val != 0
+      && u.row.idx != 0
+      && u.row.start != 0
+      && u.row.len != 0
+      && u.row.max != 0
+      && u.col.elem != 0
+      && u.col.idx != 0
+      && u.col.start != 0
+      && u.col.len != 0
+      && u.col.max != 0
+      && l.val != 0
+      && l.idx != 0
+      && l.start != 0
+      && l.row != 0
   );
 }
 
