@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.61 2003/01/13 19:04:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.62 2003/01/15 07:17:59 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -73,7 +73,7 @@ SPxSolver::Status SPxSolver::solve()
 
       init();
    }
-   thepricer->setEpsilon(delta() * 10.0);
+   thepricer->setEpsilon(delta());
 
    //setType(type());
 
