@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.12 2004/02/24 10:54:55 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.13 2004/03/16 14:57:38 bzfpfend Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -261,6 +261,8 @@ protected:
    DVector        theCoTest;
    DVector        theTest;
 
+   DSVector       dualFarkas;     ///< stores dual farkas proof in case of infeasibility
+
    int             leaveCount;    ///< number of LEAVE iterations
    int             enterCount;    ///< number of ENTER iterations
 
@@ -448,6 +450,9 @@ public:
     *  \i r is defined as \f$r^T = c^T - d^TA\f$.
     */
    virtual Status getRedCost (Vector& vector) const;
+
+   /// get dual farkas proof of infeasibility.
+   virtual Status getDualfarkas (Vector& vector) const;
 
    /// Termination criterion.
    /** This method is called in each Simplex iteration to determine, if

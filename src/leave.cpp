@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.30 2003/01/19 20:58:11 bzfkocht Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.31 2004/03/16 14:57:37 bzfpfend Exp $"
 
 // #define DEBUGGING 1
 
@@ -582,7 +582,18 @@ bool SPxSolver::leave(int leaveIdx)
          if (rep() != COLUMN)
             setBasisStatus(SPxBasis::UNBOUNDED);
          else
+         {
+            int sign;
+            int i;
+
+            dualFarkas.clear();
+            dualFarkas.setMax(coPvec().delta().size());
+            sign = (enterVal > 0 ? -1 : +1);
+            for( i = 0; i < coPvec().delta().size(); ++i )
+               dualFarkas.add(coPvec().delta().index(i), sign * coPvec().delta().value(i));
+
             setBasisStatus(SPxBasis::INFEASIBLE);
+         }
          return false;
       }
       /*
