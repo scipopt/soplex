@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.6 2001/11/19 09:30:46 bzfkocht Exp $
+# $Id: Makefile,v 1.7 2001/11/20 15:34:05 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -34,14 +34,15 @@ BINDIR		=	bin
 LIBDIR		=	lib
 NAME		=	soplex
 FLAGS		=       #
-LIBOBJ		= 	spxlpfread.o cachelpsolver.o changesoplex.o didxset.o \
+LIBOBJ		= 	cachelpsolver.o changesoplex.o didxset.o \
 			docupdate.o dsvector.o dvector.o enter.o factor.o \
 			forest.o idxset.o leave.o lpcolset.o lprowset.o \
 			lprow.o nameset.o slufactor.o solve.o soplex.o \
 			spxaggregatesm.o spxbasis.o spxbounds.o \
 			spxchangebasis.o spxdefaultpr.o spxdefaultrt.o \
 			spxdesc.o spxdevexpr.o spxfastrt.o spxgeneralsm.o \
-			spxharrisrt.o spxhybridpr.o spxio.o spxlp.o spxmps.o \
+			spxharrisrt.o spxhybridpr.o spxio.o spxlp.o \
+			spxlpfread.o spxmps.o \
 			spxparmultpr.o spxredundantsm.o spxrem1sm.o \
 			spxscale.o spxshift.o spxsolver.o spxsolve.o \
 			spxstarter.o spxsteeppr.o spxsumst.o spxvecs.o \
