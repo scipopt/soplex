@@ -1,4 +1,4 @@
-# $Id: check.awk,v 1.12 2002/01/21 16:27:31 bzfkocht Exp $
+# $Id: check.awk,v 1.13 2002/02/14 15:07:42 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: check.awk                                                     *
@@ -12,7 +12,7 @@ function abs(x)
     return x < 0 ? -x : x;
 }
 BEGIN {
-    print "$Id: check.awk,v 1.12 2002/01/21 16:27:31 bzfkocht Exp $";
+    print "$Id: check.awk,v 1.13 2002/02/14 15:07:42 bzfkocht Exp $";
     print "";
 }
 /=opt=/       { sol[$2] = $3; }
@@ -46,7 +46,7 @@ BEGIN {
             printf("-----------------------------------------------------------------------------\n");
 	    printf("%-10s %6d %6d ", name, rows, cols);
         }
-	printf("%s %7d %8.2f ", type, iter, time);
+	printf("%-3s %7d %8.2f ", type, iter, time);
 
         if (infeas)
 	   printf("%-14s", "infeasible");

@@ -1,4 +1,4 @@
-# $Id: check.sh,v 1.11 2002/02/03 16:10:05 bzfkocht Exp $
+# $Id: check.sh,v 1.12 2002/02/14 15:07:42 bzfkocht Exp $
 BINNAME=`basename $2`
 TSTNAME=`basename $1 .test`
 OUTFILE=check.$TSTNAME.$BINNAME.out
@@ -10,7 +10,7 @@ case $TSTNAME in
 mittelmann|zib) timelimit="-l10000" 
             algorithm="1 2" ;;
 *)          timelimit="" 
-            algorithm="1 2 3 4" ;;
+            algorithm="1 2 3 4 5 6" ;;
 esac
 for i in `cat $1`
 do
@@ -27,6 +27,10 @@ do
 	    opt="-r" ;;
 	4)  echo =type= ER
             opt="-e -r" ;;
+	5)  echo =type= LCi
+	    opt="-i" ;;
+	6)  echo =type= ECi
+            opt="-e -i" ;;
         esac
         ../$2 $opt $timelimit $i 2>>$ERRFILE
         echo =ready=
