@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: mpsinput.h,v 1.4 2002/04/09 19:00:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: mpsinput.h,v 1.5 2005/01/08 15:24:12 bzfkocht Exp $"
 
 /**@file  mpsinput.h
  * @brief Read MPS format files.
@@ -51,6 +51,7 @@ private:
    char            m_probname[MAX_LINE_LEN];
    char            m_objname [MAX_LINE_LEN];
    bool            m_is_integer;
+   bool            m_is_new_format;
 
 public:
    MPSInput(std::istream& p_input)
@@ -60,6 +61,7 @@ public:
       , m_objsense(SPxLP::MINIMIZE)
       , m_has_error(false)
       , m_is_integer(false)
+      , m_is_new_format(false)
    {
       m_f0 = m_f1 = m_f2 = m_f3 = m_f4 = m_f5 = 0;
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.25 2005/01/06 17:12:09 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.26 2005/01/08 15:24:12 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -123,7 +123,7 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
          Real x = row.value(j);
          int  k = row.index(j);
 
-         rowhash[i].hid *= k; // += DISPERSE(k) ?
+         rowhash[i].hid = rowhash[i].hid * 31 + k; 
          
          // std::cout << "\t\tx= " << x << " lower= " << lp.lower(k) 
          // << " upper= " << lp.upper(k) << std::endl;
@@ -168,7 +168,7 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
          return INFEASIBLE;
       }
       // forcing equality constraint ?
-      if (EQrel(lp.lhs(i), lp.rhs(i), deltaBnd()))
+      if (EQ(lp.lhs(i), lp.rhs(i), deltaBnd()))
       {
          // all fixed on upper bound ?
          if (upcnt == 0 && EQrel(lp.rhs(i), upbnd, deltaBnd()))

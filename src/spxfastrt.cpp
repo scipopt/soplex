@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.24 2003/01/13 19:04:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.25 2005/01/08 15:24:12 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -129,7 +129,7 @@ int SPxFastRT::maxDelta(
             {
                y = u - vec[i];
                // x = ((1 - (y<=0)) * y + l_delta) / x;
-#if 0
+#if USE_OLD
                x = (y - (y <= 0) * (y + delta01) + l_delta) / x;
 #else
                if (y <= 0)

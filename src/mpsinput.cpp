@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: mpsinput.cpp,v 1.11 2004/11/05 20:11:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: mpsinput.cpp,v 1.12 2005/01/08 15:24:12 bzfkocht Exp $"
 
 /**@file  mpsinput.cpp
  * @brief Read MPS format files.
@@ -106,44 +106,57 @@ bool MPSInput::readLine()
          return true;
       }
 
-      /* Test for fixed format comments
-       */
-      if ((m_buf[14] == '$') && (m_buf[13] == ' '))
-         clear_from(m_buf, 14);
-      else if ((m_buf[39] == '$') && (m_buf[38] == ' '))
-         clear_from(m_buf, 39);
-
-      /* Test for fixed format
-       */
-      space = m_buf[12] | m_buf[13] 
-         | m_buf[22] | m_buf[23] 
-         | m_buf[36] | m_buf[37] | m_buf[38]
-         | m_buf[47] | m_buf[48] 
-         | m_buf[61] | m_buf[62] | m_buf[63];
-
-      if (space == BLANK)
+      if (!m_is_new_format)
       {
-         /* Now we have space at the right positions.
-          * But are there also the non space where they
-          * should be ?
+         /* Test for fixed format comments
           */
-         bool number = isdigit(m_buf[24]) || isdigit(m_buf[25]) 
-            || isdigit(m_buf[26]) || isdigit(m_buf[27]) 
-            || isdigit(m_buf[28]) || isdigit(m_buf[29]) 
-            || isdigit(m_buf[30]) || isdigit(m_buf[31]) 
-            || isdigit(m_buf[32]) || isdigit(m_buf[33]) 
-            || isdigit(m_buf[34]) || isdigit(m_buf[35]); 
+         if ((m_buf[14] == '$') && (m_buf[13] == ' '))
+            clear_from(m_buf, 14);
+         else if ((m_buf[39] == '$') && (m_buf[38] == ' '))
+            clear_from(m_buf, 39);
 
-         /* len < 13 is handle ROW lines with embedded spaces 
-          * in the names correctly
+         /* Test for fixed format
           */
-         if (number || len < 13)
+         space = m_buf[12] | m_buf[13] 
+            | m_buf[22] | m_buf[23] 
+            | m_buf[36] | m_buf[37] | m_buf[38]
+            | m_buf[47] | m_buf[48] 
+            | m_buf[61] | m_buf[62] | m_buf[63];
+
+         if (space == BLANK || len < 13)
          {
-            /* Now we assume fixed format, so we patch possible embedded spaces.
+            /* Now we have space at the right positions.
+             * But are there also the non space where they
+             * should be ?
              */
-            patch_field(m_buf,  4, 12);
-            patch_field(m_buf, 14, 22);
-            patch_field(m_buf, 39, 47);
+            bool number = isdigit(m_buf[24]) || isdigit(m_buf[25]) 
+               || isdigit(m_buf[26]) || isdigit(m_buf[27]) 
+               || isdigit(m_buf[28]) || isdigit(m_buf[29]) 
+               || isdigit(m_buf[30]) || isdigit(m_buf[31]) 
+               || isdigit(m_buf[32]) || isdigit(m_buf[33]) 
+               || isdigit(m_buf[34]) || isdigit(m_buf[35]); 
+            
+            /* len < 13 is handle ROW lines with embedded spaces 
+             * in the names correctly
+             */
+            if (number || len < 13)
+            {
+               /* Now we assume fixed format, so we patch possible embedded spaces.
+                */
+               patch_field(m_buf,  4, 12);
+               patch_field(m_buf, 14, 22);
+               patch_field(m_buf, 39, 47);
+            }
+            else
+            {
+               if (  m_section == COLUMNS || m_section == RHS
+                  || m_section == RANGES  || m_section == BOUNDS)
+                  m_is_new_format = true;
+            }
+         }
+         else
+         {
+            m_is_new_format = true;
          }
       }
       s = &m_buf[1];

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.29 2003/11/23 08:58:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.30 2005/01/08 15:24:12 bzfkocht Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.
@@ -292,6 +292,7 @@ static void readRhs(
    const NameSet&  rnames)
 {
    char   rhsname[MPSInput::MAX_LINE_LEN] = { '\0' };
+   char   addname[MPSInput::MAX_LINE_LEN] = { '\0' };
    int    idx;
    Real val;
 
@@ -323,7 +324,16 @@ static void readRhs(
       if (*rhsname == '\0')
          strcpy(rhsname, mps.field1());
       
-      if (!strcmp(rhsname, mps.field1()))
+      if (strcmp(rhsname, mps.field1()))
+      {
+         if (strcmp(addname, mps.field1()))
+         {
+            strcpy(addname, mps.field1());
+            VERBOSE3({ std::cout << "RHS ignored    : " << addname 
+                                 << std::endl; });
+         }
+      }
+      else
       {
          if ((idx = rnames.number(mps.field2())) < 0)
             mps.entryIgnored("RHS", mps.field1(), "row", mps.field2());
@@ -338,21 +348,21 @@ static void readRhs(
             if (rset.lhs(idx) > -infinity)
                rset.lhs(idx) = val;
          }
-      }
-      if (mps.field5() != 0)
-      {
-         if ((idx = rnames.number(mps.field4())) < 0)
-            mps.entryIgnored("RHS", mps.field1(), "row", mps.field4());
-         else
+         if (mps.field5() != 0)
          {
-            val = atof(mps.field5());
-         
-            // LE or EQ
-            if (rset.rhs(idx) < infinity)
-               rset.rhs(idx) = val;
-            // GE or EQ
-            if (rset.lhs(idx) > -infinity)
-               rset.lhs(idx) = val;
+            if ((idx = rnames.number(mps.field4())) < 0)
+               mps.entryIgnored("RHS", mps.field1(), "row", mps.field4());
+            else
+            {
+               val = atof(mps.field5());
+               
+               // LE or EQ
+               if (rset.rhs(idx) < infinity)
+                  rset.rhs(idx) = val;
+               // GE or EQ
+               if (rset.lhs(idx) > -infinity)
+                  rset.lhs(idx) = val;
+            }
          }
       }
    }
