@@ -13,12 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.38 2003/01/10 12:46:14 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.39 2004/05/15 09:28:56 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
  */
-//#define DEBUGGING 1
+#define DEBUGGING 1
 
 #include <assert.h>
 #include <stdio.h>
@@ -115,25 +115,25 @@ static Real readValue(char*& pos)
          s++;
       }
    }
-   // 5. Exponent
-   if (tolower(*s) == 'e')
-   {
-      s++;
-
-      // 6. Exponent sign 
-      if ((*s == '+') || (*s == '-'))
-         s++;
-
-      // 7. Exponent digits
-      while((*s >= '0') && (*s <= '9'))
-         s++;      
-   }
-   assert(s != pos);
-   
    if (!has_digits)
       value = (*pos == '-') ? -1.0 : 1.0;
    else
    {
+      // 5. Exponent
+      if (tolower(*s) == 'e')
+      {
+         s++;
+
+         // 6. Exponent sign 
+         if ((*s == '+') || (*s == '-'))
+            s++;
+
+         // 7. Exponent digits
+         while((*s >= '0') && (*s <= '9'))
+            s++;      
+      }
+      assert(s != pos);
+
       for(t = tmp; pos != s; pos++)
          *t++ = *pos;   
       *t = '\0';
