@@ -13,8 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.7 2001/11/29 14:00:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.8 2001/11/29 22:52:54 bzfkocht Exp $"
 
+/**@file slufactor.cpp
+ * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
+ *       This should be properly integrated and demangled.
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -37,7 +41,7 @@ extern double verySparseFactor4left;
 
 void SLUFactor::solve2right(Vector& x, Vector& b) //const
 {
-   soplex::solveRight(static_cast<CLUFactor*>(this), x.get_ptr(), b.get_ptr());
+   CLUFactor::solveRight(x.get_ptr(), b.get_ptr());
 }
 
 void SLUFactor::solve2right(Vector& x, SSVector& b) //const
@@ -49,7 +53,7 @@ void SLUFactor::solve2right(Vector& x, SSVector& b) //const
 void SLUFactor::solve2right(SSVector& x, Vector& b) //const
 {
    x.clear();
-   soplex::solveRight(static_cast<CLUFactor*>(this), x.altValues(), b.get_ptr());
+   CLUFactor::solveRight(x.altValues(), b.get_ptr());
 }
 
 void SLUFactor::solve2right(SSVector& x, SSVector& b) //const
@@ -181,7 +185,7 @@ void SLUFactor::solve2right4update(SSVector& x,
 void SLUFactor::solve2left (Vector& x, Vector& b) //const
 {
    x.clear();
-   soplex::solveLeft(x.get_ptr(), static_cast<CLUFactor*>(this), b.get_ptr());
+   CLUFactor::solveLeft(x.get_ptr(), b.get_ptr());
 }
 
 void SLUFactor::solve2left(Vector& x, SSVector& b) //const
@@ -195,8 +199,7 @@ void SLUFactor::solve2left(SSVector& x, Vector& b) //const
 {
    int n;
    x.clear();
-   n = soplex::solveLeftEps (x.altValues(), 
-                             static_cast<CLUFactor*>(this),
+   n = CLUFactor::solveLeftEps (x.altValues(), 
                              b.get_ptr(), x.altIndexMem(), x.epsilon);
    if (n)
    {
@@ -330,7 +333,7 @@ SLUFactor::Status SLUFactor::change(
    else if (l.updateType)                     /// Forest-Tomlin updates
    {
       forest = subst;
-      solveLright(this, forest.altValues());
+      CLUFactor::solveLright(forest.altValues());
       stat = forestUpdateCLUFactor(this, idx, forest.altValues(), 0, 0);
       forest.setSize(0);
       forest.forceSetup();

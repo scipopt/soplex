@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: solve.cpp,v 1.5 2001/11/29 14:00:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: solve.cpp,v 1.6 2001/11/29 22:52:54 bzfkocht Exp $"
 
 #include <string.h>
 #include <stdio.h>
@@ -31,12 +31,12 @@ namespace soplex
 
 /*****************************************************************************/
 
-static void solveUright(double* wrk, CLUFactor* fac, double* vec)
+void CLUFactor::solveUright(double* wrk, double* vec)
 {
    int i, j, r, c;
    int *rorig, *corig;
    int *cidx, *clen, *cbeg;
-   double *cval, *diag;
+   double *cval;
    double x;
 
    int *idx;
@@ -44,17 +44,15 @@ static void solveUright(double* wrk, CLUFactor* fac, double* vec)
    double *work;
    work = wrk;
 
-   rorig = fac->row.orig;
-   corig = fac->col.orig;
+   rorig = row.orig;
+   corig = col.orig;
 
-   cidx = fac->u.col.idx;
-   cval = fac->u.col.val;
-   clen = fac->u.col.len;
-   cbeg = fac->u.col.start;
+   cidx = u.col.idx;
+   cval = u.col.val;
+   clen = u.col.len;
+   cbeg = u.col.start;
 
-   diag = fac->diag;
-
-   for (i = fac->thedim - 1; i >= 0; --i)
+   for (i = thedim - 1; i >= 0; --i)
    {
       r = rorig[i];
       c = corig[i];
@@ -71,13 +69,12 @@ static void solveUright(double* wrk, CLUFactor* fac, double* vec)
    }
 }
 
-static int solveUrightEps(CLUFactor* fac, double* vec,
-                           int* nonz, double eps, double* rhs)
+int CLUFactor::solveUrightEps(double* vec, int* nonz, double eps, double* rhs)
 {
    int i, j, r, c, n;
    int *rorig, *corig;
    int *cidx, *clen, *cbeg;
-   double *cval, *diag;
+   double *cval;
    double x, meps;
 
    int *idx;
@@ -85,19 +82,18 @@ static int solveUrightEps(CLUFactor* fac, double* vec,
    double *work;
    work = vec;
 
-   rorig = fac->row.orig;
-   corig = fac->col.orig;
+   rorig = row.orig;
+   corig = col.orig;
 
-   cidx = fac->u.col.idx;
-   cval = fac->u.col.val;
-   clen = fac->u.col.len;
-   cbeg = fac->u.col.start;
+   cidx = u.col.idx;
+   cval = u.col.val;
+   clen = u.col.len;
+   cbeg = u.col.start;
 
-   diag = fac->diag;
    meps = -eps;
    n = 0;
 
-   for (i = fac->thedim - 1; i >= 0; --i)
+   for (i = thedim - 1; i >= 0; --i)
    {
       r = rorig[i];
       x = diag[r] * rhs[r];
@@ -117,35 +113,27 @@ static int solveUrightEps(CLUFactor* fac, double* vec,
    return n;
 }
 
-static void solveUright2
-(
-   CLUFactor* fac,
-   double* work1,
-   double* vec1,
-   double* work2,
-   double* vec2
-)
+void CLUFactor::solveUright2(
+   double* work1, double* vec1, double* work2, double* vec2)
 {
    int i, j, r, c;
    int *rorig, *corig;
    int *cidx, *clen, *cbeg;
-   double *cval, *diag;
+   double *cval;
    double x1, x2;
 
    int* idx;
    double* val;
 
-   rorig = fac->row.orig;
-   corig = fac->col.orig;
+   rorig = row.orig;
+   corig = col.orig;
 
-   cidx = fac->u.col.idx;
-   cval = fac->u.col.val;
-   clen = fac->u.col.len;
-   cbeg = fac->u.col.start;
+   cidx = u.col.idx;
+   cval = u.col.val;
+   clen = u.col.len;
+   cbeg = u.col.start;
 
-   diag = fac->diag;
-
-   for (i = fac->thedim - 1; i >= 0; --i)
+   for (i = thedim - 1; i >= 0; --i)
    {
       r = rorig[i];
       c = corig[i];
@@ -182,41 +170,33 @@ static void solveUright2
    }
 }
 
-static int solveUright2eps
-(
-   CLUFactor* fac,
-   double* work1,
-   double* vec1,
-   double* work2,
-   double* vec2,
-   int* nonz,
-   double eps
-)
+int CLUFactor::solveUright2eps(
+   double* work1, double* vec1, double* work2, double* vec2,
+   int* nonz, double eps)
 {
    int i, j, r, c, n;
    int *rorig, *corig;
    int *cidx, *clen, *cbeg;
    int notzero1, notzero2;
-   double *cval, *diag;
+   double *cval;
    double x1, x2;
    double meps;
 
    int* idx;
    double* val;
 
-   rorig = fac->row.orig;
-   corig = fac->col.orig;
+   rorig = row.orig;
+   corig = col.orig;
 
-   cidx = fac->u.col.idx;
-   cval = fac->u.col.val;
-   clen = fac->u.col.len;
-   cbeg = fac->u.col.start;
+   cidx = u.col.idx;
+   cval = u.col.val;
+   clen = u.col.len;
+   cbeg = u.col.start;
 
-   diag = fac->diag;
    meps = -eps;
    n = 0;
 
-   for (i = fac->thedim - 1; i >= 0; --i)
+   for (i = thedim - 1; i >= 0; --i)
    {
       c = corig[i];
       r = rorig[i];
@@ -268,7 +248,7 @@ static int solveUright2eps
    return n;
 }
 
-void solveLright(CLUFactor* fac, double* vec)
+void CLUFactor::solveLright(double* vec)
 {
    int i, j, k;
    int end;
@@ -277,12 +257,12 @@ void solveLright(CLUFactor* fac, double* vec)
    int *lrow, *lidx, *idx;
    int *lbeg;
 
-   lval = fac->l.val;
-   lidx = fac->l.idx;
-   lrow = fac->l.row;
-   lbeg = fac->l.start;
+   lval = l.val;
+   lidx = l.idx;
+   lrow = l.row;
+   lbeg = l.start;
 
-   end = fac->l.firstUpdate;
+   end = l.firstUpdate;
    for (i = 0; i < end; ++i)
    {
       if ((x = vec[lrow[i]]) != 0.0)
@@ -295,9 +275,9 @@ void solveLright(CLUFactor* fac, double* vec)
       }
    }
 
-   if (fac->l.updateType)                     /* Forest-Tomlin Updates */
+   if (l.updateType)                     /* Forest-Tomlin Updates */
    {
-      end = fac->l.firstUnused;
+      end = l.firstUnused;
       for (; i < end; ++i)
       {
          x = 0;
@@ -311,7 +291,7 @@ void solveLright(CLUFactor* fac, double* vec)
    }
 }
 
-static void solveLright2(CLUFactor* fac, double* vec1, double* vec2)
+void CLUFactor::solveLright2(double* vec1, double* vec2)
 {
    int i, j, k;
    int end;
@@ -321,12 +301,12 @@ static void solveLright2(CLUFactor* fac, double* vec1, double* vec2)
    int *lrow, *lidx, *idx;
    int *lbeg;
 
-   lval = fac->l.val;
-   lidx = fac->l.idx;
-   lrow = fac->l.row;
-   lbeg = fac->l.start;
+   lval = l.val;
+   lidx = l.idx;
+   lrow = l.row;
+   lbeg = l.start;
 
-   end = fac->l.firstUpdate;
+   end = l.firstUpdate;
    for (i = 0; i < end; ++i)
    {
       x1 = vec1[lrow[i]];
@@ -360,9 +340,9 @@ static void solveLright2(CLUFactor* fac, double* vec1, double* vec2)
       }
    }
 
-   if (fac->l.updateType)                     /* Forest-Tomlin Updates */
+   if (l.updateType)                     /* Forest-Tomlin Updates */
    {
-      end = fac->l.firstUnused;
+      end = l.firstUnused;
       for (; i < end; ++i)
       {
          x1 = 0;
@@ -381,7 +361,7 @@ static void solveLright2(CLUFactor* fac, double* vec1, double* vec2)
    }
 }
 
-static void solveUpdateRight(CLUFactor* fac, double* vec)
+void CLUFactor::solveUpdateRight(double* vec)
 {
    int i, j, k;
    int end;
@@ -390,15 +370,15 @@ static void solveUpdateRight(CLUFactor* fac, double* vec)
    int *lrow, *lidx, *idx;
    int *lbeg;
 
-   assert(!fac->l.updateType);               /* no Forest-Tomlin Updates */
+   assert(!l.updateType);               /* no Forest-Tomlin Updates */
 
-   lval = fac->l.val;
-   lidx = fac->l.idx;
-   lrow = fac->l.row;
-   lbeg = fac->l.start;
+   lval = l.val;
+   lidx = l.idx;
+   lrow = l.row;
+   lbeg = l.start;
 
-   end = fac->l.firstUnused;
-   for (i = fac->l.firstUpdate; i < end; ++i)
+   end = l.firstUnused;
+   for (i = l.firstUpdate; i < end; ++i)
    {
       if ((x = vec[lrow[i]]) != 0.0)
       {
@@ -411,7 +391,7 @@ static void solveUpdateRight(CLUFactor* fac, double* vec)
    }
 }
 
-static void solveUpdateRight2(CLUFactor* fac, double* vec1, double* vec2)
+void CLUFactor::solveUpdateRight2(double* vec1, double* vec2)
 {
    int i, j, k;
    int end;
@@ -423,15 +403,15 @@ static void solveUpdateRight2(CLUFactor* fac, double* vec1, double* vec2)
    int* idx;
    double* val;
 
-   assert(!fac->l.updateType);               /* no Forest-Tomlin Updates */
+   assert(!l.updateType);               /* no Forest-Tomlin Updates */
 
-   lval = fac->l.val;
-   lidx = fac->l.idx;
-   lrow = fac->l.row;
-   lbeg = fac->l.start;
+   lval = l.val;
+   lidx = l.idx;
+   lrow = l.row;
+   lbeg = l.start;
 
-   end = fac->l.firstUnused;
-   for (i = fac->l.firstUpdate; i < end; ++i)
+   end = l.firstUnused;
+   for (i = l.firstUpdate; i < end; ++i)
    {
       x1 = vec1[lrow[i]];
       x2 = vec2[lrow[i]];
@@ -465,18 +445,17 @@ static void solveUpdateRight2(CLUFactor* fac, double* vec1, double* vec2)
    }
 }
 
-int solveRight4update(CLUFactor* fac, double* vec, int* nonz, double eps,
-                       double* rhs,
-                       double* forest, int* forestNum, int* forestIdx)
+int CLUFactor::solveRight4update(double* vec, int* nonz, double eps, 
+   double* rhs, double* forest, int* forestNum, int* forestIdx)
 {
-   solveLright(fac, rhs);
+   solveLright(rhs);
 
    if (forest)
    {
       double* r = rhs;
       int n = 0;
       int i = 0;
-      int e = fac->thedim;
+      int e = thedim;
       int* idx = forestIdx;
       for (; i < e;)
       {
@@ -486,27 +465,25 @@ int solveRight4update(CLUFactor* fac, double* vec, int* nonz, double eps,
       *forestNum = n;
    }
 
-   if (!fac->l.updateType)            /* no Forest-Tomlin Updates */
+   if (!l.updateType)            /* no Forest-Tomlin Updates */
    {
-      solveUright(vec, fac, rhs);
-      solveUpdateRight(fac, vec);
+      solveUright(vec, rhs);
+      solveUpdateRight(vec);
       return 0;
    }
    else
-      return solveUrightEps(fac, vec, nonz, eps, rhs);
+      return solveUrightEps(vec, nonz, eps, rhs);
 }
 
-void solveRight(CLUFactor* fac, double* vec, double* rhs)
+void CLUFactor::solveRight(double* vec, double* rhs)
 {
-   solveLright(fac, rhs);
-   solveUright(vec, fac, rhs);
-   if (!fac->l.updateType)            /* no Forest-Tomlin Updates */
-      solveUpdateRight(fac, vec);
+   solveLright(rhs);
+   solveUright(vec, rhs);
+   if (!l.updateType)            /* no Forest-Tomlin Updates */
+      solveUpdateRight(vec);
 }
 
-
-int solveRight2update(CLUFactor* fac,
-                       double* vec1,
+int CLUFactor::solveRight2update(double* vec1,
                        double* vec2,
                        double* rhs1,
                        double* rhs2,
@@ -516,14 +493,14 @@ int solveRight2update(CLUFactor* fac,
                        int* forestNum,
                        int* forestIdx)
 {
-   solveLright2(fac, rhs1, rhs2);
+   solveLright2(rhs1, rhs2);
 
    if (forest)
    {
       double* r = rhs1;
       int n = 0;
       int i = 0;
-      int e = fac->thedim;
+      int e = thedim;
       int* idx = forestIdx;
       for (; i < e;)
       {
@@ -533,57 +510,53 @@ int solveRight2update(CLUFactor* fac,
       *forestNum = n;
    }
 
-   if (! fac->l.updateType)           /* no Forest-Tomlin Updates */
+   if (!l.updateType)           /* no Forest-Tomlin Updates */
    {
-      solveUright2(fac, vec1, rhs1, vec2, rhs2);
-      solveUpdateRight2(fac, vec1, vec2);
+      solveUright2(vec1, rhs1, vec2, rhs2);
+      solveUpdateRight2(vec1, vec2);
       return 0;
    }
    else
-      return solveUright2eps(fac, vec1, rhs1, vec2, rhs2, nonz, eps);
+      return solveUright2eps(vec1, rhs1, vec2, rhs2, nonz, eps);
 }
 
-void solveRight2
-(
-   CLUFactor* fac,
+void CLUFactor::solveRight2(
    double* vec1,
    double* vec2,
    double* rhs1,
-   double* rhs2
-)
+   double* rhs2)
 {
-   solveLright2(fac, rhs1, rhs2);
-   if (fac->l.updateType)             /* Forest-Tomlin Updates */
-      solveUright2(fac, vec1, rhs1, vec2, rhs2);
+   solveLright2(rhs1, rhs2);
+   if (l.updateType)             /* Forest-Tomlin Updates */
+      solveUright2(vec1, rhs1, vec2, rhs2);
    else
    {
-      solveUright2(fac, vec1, rhs1, vec2, rhs2);
-      solveUpdateRight2(fac, vec1, vec2);
+      solveUright2(vec1, rhs1, vec2, rhs2);
+      solveUpdateRight2(vec1, vec2);
    }
 }
 
 /*****************************************************************************/
 
-static void solveUleft(double* work, double* vec, CLUFactor* fac)
+void CLUFactor::solveUleft(double* work, double* vec)
 {
    double x;
    int i, k, l, r, c;
    int end;
    int *rorig, *corig;
    int *ridx, *rlen, *rbeg, *idx;
-   double *rval, *diag, *val;
+   double *rval, *val;
 
-   rorig = fac->row.orig;
-   corig = fac->col.orig;
+   rorig = row.orig;
+   corig = col.orig;
 
-   ridx = fac->u.row.idx;
-   rval = fac->u.row.val;
-   rlen = fac->u.row.len;
-   rbeg = fac->u.row.start;
+   ridx = u.row.idx;
+   rval = u.row.val;
+   rlen = u.row.len;
+   rbeg = u.row.start;
 
-   diag = fac->diag;
+   end = thedim;
 
-   end = fac->thedim;
    for (i = 0; i < end; ++i)
    {
       c = corig[i];
@@ -603,15 +576,8 @@ static void solveUleft(double* work, double* vec, CLUFactor* fac)
    }
 }
 
-
-static void solveUleft2
-(
-   double* work1,
-   double* vec1,
-   double* work2,
-   double* vec2,
-   CLUFactor* fac
-)
+void CLUFactor::solveUleft2(
+   double* work1, double* vec1, double* work2, double* vec2)
 {
    double x1;
    double x2;
@@ -619,19 +585,17 @@ static void solveUleft2
    int end;
    int *rorig, *corig;
    int *ridx, *rlen, *rbeg, *idx;
-   double *rval, *diag, *val;
+   double *rval, *val;
 
-   rorig = fac->row.orig;
-   corig = fac->col.orig;
+   rorig = row.orig;
+   corig = col.orig;
 
-   ridx = fac->u.row.idx;
-   rval = fac->u.row.val;
-   rlen = fac->u.row.len;
-   rbeg = fac->u.row.start;
+   ridx = u.row.idx;
+   rval = u.row.val;
+   rlen = u.row.len;
+   rbeg = u.row.start;
 
-   diag = fac->diag;
-
-   end = fac->thedim;
+   end = thedim;
    for (i = 0; i < end; ++i)
    {
       c = corig[i];
@@ -676,14 +640,11 @@ static void solveUleft2
    }
 }
 
-static int solveLleft2forest
-(
+int CLUFactor::solveLleft2forest(
    double* vec1,
    int* /* nonz */,
    double* vec2,
-   double /* eps */,
-   CLUFactor* fac
-)
+   double /* eps */)
 {
    int i;
    int j;
@@ -695,14 +656,14 @@ static int solveLleft2forest
    int *lbeg;
    int *rorig;
 
-   rorig = fac->row.orig;
-   lval = fac->l.val;
-   lidx = fac->l.idx;
-   lrow = fac->l.row;
-   lbeg = fac->l.start;
+   rorig = row.orig;
+   lval = l.val;
+   lidx = l.idx;
+   lrow = l.row;
+   lbeg = l.start;
 
-   end = fac->l.firstUpdate;
-   for (i = fac->l.firstUnused - 1; i >= end; --i)
+   end = l.firstUpdate;
+   for (i = l.firstUnused - 1; i >= end; --i)
    {
       j = lrow[i];
       x1 = vec1[j];
@@ -741,14 +702,11 @@ static int solveLleft2forest
    return 0;
 }
 
-static void solveLleft2
-(
+void CLUFactor::solveLleft2(
    double* vec1,
    int* /* nonz */,
    double* vec2,
-   double /* eps */,
-   CLUFactor* fac
-)
+   double /* eps */)
 {
    int i, j, k, r;
    int x1not0, x2not0;
@@ -759,17 +717,17 @@ static void solveLleft2
    int *rbeg, *lbeg;
    int *rorig;
 
-   lval = fac->l.val;
-   lidx = fac->l.idx;
-   lrow = fac->l.row;
-   lbeg = fac->l.start;
-   ridx = fac->l.ridx;
-   rval = fac->l.rval;
-   rbeg = fac->l.rbeg;
-   rorig = fac->l.rorig;
+   lval  = l.val;
+   lidx  = l.idx;
+   lrow  = l.row;
+   lbeg  = l.start;
+   ridx  = l.ridx;
+   rval  = l.rval;
+   rbeg  = l.rbeg;
+   rorig = l.rorig;
 
 #ifndef WITH_L_ROWS
-   i = fac->l.firstUpdate - 1;
+   i = l.firstUpdate - 1;
    for (; i >= 0; --i)
    {
       k = lbeg[i];
@@ -786,7 +744,7 @@ static void solveLleft2
       vec2[lrow[i]] -= x2;
    }
 #else
-   for (i = fac->thedim; i--;)
+   for (i = thedim; i--;)
    {
       r = rorig[i];
       x1 = vec1[r];
@@ -802,7 +760,7 @@ static void solveLleft2
          idx = &ridx[k];
          while (j-- > 0)
          {
-            assert(fac->row.perm[*idx] < i);
+            assert(row.perm[*idx] < i);
             vec1[*idx] -= x1 * *val;
             vec2[*idx++] -= x2 * *val++;
          }
@@ -815,7 +773,7 @@ static void solveLleft2
          idx = &ridx[k];
          while (j-- > 0)
          {
-            assert(fac->row.perm[*idx] < i);
+            assert(row.perm[*idx] < i);
             vec1[*idx++] -= x1 * *val++;
          }
       }
@@ -827,7 +785,7 @@ static void solveLleft2
          idx = &ridx[k];
          while (j-- > 0)
          {
-            assert(fac->row.perm[*idx] < i);
+            assert(row.perm[*idx] < i);
             vec2[*idx++] -= x2 * *val++;
          }
       }
@@ -835,20 +793,20 @@ static void solveLleft2
 #endif
 }
 
-static int solveLleftForest(double* vec, int* /* nonz */, double /* eps */, CLUFactor* fac)
+int CLUFactor::solveLleftForest(double* vec, int* /* nonz */, double /* eps */)
 {
    int i, j, k, end;
    double x;
    double *val, *lval;
    int *idx, *lidx, *lrow, *lbeg;
 
-   lval = fac->l.val;
-   lidx = fac->l.idx;
-   lrow = fac->l.row;
-   lbeg = fac->l.start;
+   lval = l.val;
+   lidx = l.idx;
+   lrow = l.row;
+   lbeg = l.start;
 
-   end = fac->l.firstUpdate;
-   for (i = fac->l.firstUnused - 1; i >= end; --i)
+   end = l.firstUpdate;
+   for (i = l.firstUnused - 1; i >= end; --i)
    {
       if ((x = vec[lrow[i]]) != 0.0)
       {
@@ -863,7 +821,7 @@ static int solveLleftForest(double* vec, int* /* nonz */, double /* eps */, CLUF
    return 0;
 }
 
-static void solveLleft(double* vec, CLUFactor* fac)
+void CLUFactor::solveLleft(double* vec)
 {
    int i, j, k;
    int r;
@@ -873,17 +831,17 @@ static void solveLleft(double* vec, CLUFactor* fac)
    int *rbeg, *lbeg;
    int* rorig;
 
-   lval = fac->l.val;
-   lidx = fac->l.idx;
-   lrow = fac->l.row;
-   lbeg = fac->l.start;
-   ridx = fac->l.ridx;
-   rval = fac->l.rval;
-   rbeg = fac->l.rbeg;
-   rorig = fac->l.rorig;
+   lval  = l.val;
+   lidx  = l.idx;
+   lrow  = l.row;
+   lbeg  = l.start;
+   ridx  = l.ridx;
+   rval  = l.rval;
+   rbeg  = l.rbeg;
+   rorig = l.rorig;
 
 #ifndef WITH_L_ROWS
-   i = fac->l.firstUpdate - 1;
+   i = l.firstUpdate - 1;
    for (; i >= 0; --i)
    {
       k = lbeg[i];
@@ -895,7 +853,7 @@ static void solveLleft(double* vec, CLUFactor* fac)
       vec[lrow[i]] -= x;
    }
 #else
-   for (i = fac->thedim; i--;)
+   for (i = thedim; i--;)
    {
       r = rorig[i];
       x = vec[r];
@@ -907,7 +865,7 @@ static void solveLleft(double* vec, CLUFactor* fac)
          idx = &ridx[k];
          while (j-- > 0)
          {
-            assert(fac->l.rperm[*idx] < i);
+            assert(l.rperm[*idx] < i);
             vec[*idx++] -= x * *val++;
          }
       }
@@ -915,7 +873,7 @@ static void solveLleft(double* vec, CLUFactor* fac)
 #endif
 }
 
-static int solveLleftEps(double* vec, CLUFactor* fac, int* nonz, double eps)
+int CLUFactor::solveLleftEps(double* vec, int* nonz, double eps)
 {
    int i, j, k, n;
    int r;
@@ -925,18 +883,18 @@ static int solveLleftEps(double* vec, CLUFactor* fac, int* nonz, double eps)
    int *rbeg, *lbeg;
    int* rorig;
 
-   lval = fac->l.val;
-   lidx = fac->l.idx;
-   lrow = fac->l.row;
-   lbeg = fac->l.start;
-   ridx = fac->l.ridx;
-   rval = fac->l.rval;
-   rbeg = fac->l.rbeg;
-   rorig = fac->l.rorig;
+   lval = l.val;
+   lidx = l.idx;
+   lrow = l.row;
+   lbeg = l.start;
+   ridx = l.ridx;
+   rval = l.rval;
+   rbeg = l.rbeg;
+   rorig = l.rorig;
    meps = -eps;
    n = 0;
 
-   i = fac->l.firstUpdate - 1;
+   i = l.firstUpdate - 1;
 #ifndef WITH_L_ROWS
    for (; i >= 0; --i)
    {
@@ -949,7 +907,7 @@ static int solveLleftEps(double* vec, CLUFactor* fac, int* nonz, double eps)
       vec[lrow[i]] -= x;
    }
 #else
-   for (i = fac->thedim; i--;)
+   for (i = thedim; i--;)
    {
       r = rorig[i];
       x = vec[r];
@@ -963,7 +921,7 @@ static int solveLleftEps(double* vec, CLUFactor* fac, int* nonz, double eps)
          idx = &ridx[k];
          while (j-- > 0)
          {
-            assert(fac->row.perm[*idx] < i);
+            assert(row.perm[*idx] < i);
             vec[*idx++] -= x * *val++;
          }
       }
@@ -975,7 +933,7 @@ static int solveLleftEps(double* vec, CLUFactor* fac, int* nonz, double eps)
    return n;
 }
 
-static void solveUpdateLeft(double* vec, CLUFactor* fac)
+void CLUFactor::solveUpdateLeft(double* vec)
 {
    int i, j, k, end;
    double x;
@@ -983,15 +941,15 @@ static void solveUpdateLeft(double* vec, CLUFactor* fac)
    int *lrow, *lidx, *idx;
    int *lbeg;
 
-   lval = fac->l.val;
-   lidx = fac->l.idx;
-   lrow = fac->l.row;
-   lbeg = fac->l.start;
+   lval = l.val;
+   lidx = l.idx;
+   lrow = l.row;
+   lbeg = l.start;
 
-   assert(!fac->l.updateType);               /* Forest-Tomlin Updates */
+   assert(!l.updateType);               /* Forest-Tomlin Updates */
 
-   end = fac->l.firstUpdate;
-   for (i = fac->l.firstUnused - 1; i >= end; --i)
+   end = l.firstUpdate;
+   for (i = l.firstUnused - 1; i >= end; --i)
    {
       k = lbeg[i];
       val = &lval[k];
@@ -1003,7 +961,7 @@ static void solveUpdateLeft(double* vec, CLUFactor* fac)
    }
 }
 
-static void solveUpdateLeft2(double* vec1, double* vec2, CLUFactor* fac)
+void CLUFactor::solveUpdateLeft2(double* vec1, double* vec2)
 {
    int i, j, k, end;
    double x1, x2;
@@ -1011,15 +969,15 @@ static void solveUpdateLeft2(double* vec1, double* vec2, CLUFactor* fac)
    int *lrow, *lidx, *idx;
    int *lbeg;
 
-   lval = fac->l.val;
-   lidx = fac->l.idx;
-   lrow = fac->l.row;
-   lbeg = fac->l.start;
+   lval = l.val;
+   lidx = l.idx;
+   lrow = l.row;
+   lbeg = l.start;
 
-   assert(!fac->l.updateType);               /* Forest-Tomlin Updates */
+   assert(!l.updateType);               /* Forest-Tomlin Updates */
 
-   end = fac->l.firstUpdate;
-   for (i = fac->l.firstUnused - 1; i >= end; --i)
+   end = l.firstUpdate;
+   for (i = l.firstUnused - 1; i >= end; --i)
    {
       k = lbeg[i];
       val = &lval[k];
@@ -1036,61 +994,58 @@ static void solveUpdateLeft2(double* vec1, double* vec2, CLUFactor* fac)
    }
 }
 
-void solveLeft(double* vec, CLUFactor* fac, double* rhs)
+void CLUFactor::solveLeft(double* vec, double* rhs)
 {
-   if (!fac->l.updateType)            /* no Forest-Tomlin Updates */
+   if (!l.updateType)            /* no Forest-Tomlin Updates */
    {
-      solveUpdateLeft(rhs, fac);
-      solveUleft(vec, rhs, fac);
-      solveLleft(vec, fac);
+      solveUpdateLeft(rhs);
+      solveUleft(vec, rhs);
+      solveLleft(vec);
    }
    else
    {
-      solveUleft(vec, rhs, fac);
-      solveLleftForest(vec, 0, 0, fac);
-      solveLleft(vec, fac);
+      solveUleft(vec, rhs);
+      solveLleftForest(vec, 0, 0);
+      solveLleft(vec);
    }
 }
 
-int solveLeftEps(double* vec, CLUFactor* fac, double* rhs, int* nonz, double eps)
+int CLUFactor::solveLeftEps(double* vec, double* rhs, int* nonz, double eps)
 {
-   if (!fac->l.updateType)            /* no Forest-Tomlin Updates */
+   if (!l.updateType)            /* no Forest-Tomlin Updates */
    {
-      solveUpdateLeft(rhs, fac);
-      solveUleft(vec, rhs, fac);
-      return solveLleftEps(vec, fac, nonz, eps);
+      solveUpdateLeft(rhs);
+      solveUleft(vec, rhs);
+      return solveLleftEps(vec, nonz, eps);
    }
    else
    {
-      solveUleft(vec, rhs, fac);
-      solveLleftForest(vec, nonz, eps, fac);
-      return solveLleftEps(vec, fac, nonz, eps);
+      solveUleft(vec, rhs);
+      solveLleftForest(vec, nonz, eps);
+      return solveLleftEps(vec, nonz, eps);
    }
 }
 
-int solveLeft2
-(
-   CLUFactor* fac,
+int CLUFactor::solveLeft2(
    double* vec1,
    int* nonz,
    double* vec2,
    double eps,
    double* rhs1,
-   double* rhs2
-)
+   double* rhs2)
 {
-   if (!fac->l.updateType)            /* no Forest-Tomlin Updates */
+   if (!l.updateType)            /* no Forest-Tomlin Updates */
    {
-      solveUpdateLeft2(rhs1, rhs2, fac);
-      solveUleft2(vec1, rhs1, vec2, rhs2, fac);
-      solveLleft2(vec1, nonz, vec2, eps, fac);
+      solveUpdateLeft2(rhs1, rhs2);
+      solveUleft2(vec1, rhs1, vec2, rhs2);
+      solveLleft2(vec1, nonz, vec2, eps);
       return 0;
    }
    else
    {
-      solveUleft2(vec1, rhs1, vec2, rhs2, fac);
-      solveLleft2forest(vec1, nonz, vec2, eps, fac);
-      solveLleft2(vec1, nonz, vec2, eps, fac);
+      solveUleft2(vec1, rhs1, vec2, rhs2);
+      solveLleft2forest(vec1, nonz, vec2, eps);
+      solveLleft2(vec1, nonz, vec2, eps);
       return 0;
    }
 }

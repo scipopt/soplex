@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscale.cpp,v 1.6 2001/11/28 17:15:52 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscale.cpp,v 1.7 2001/11/29 22:52:54 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -188,6 +188,9 @@ int SPxScale::simplify()
    return 0;
 }
 
+/**@todo We are not unscaling the solution variable values.
+ *       these will be reported scaled.
+ */
 void SPxScale::unsimplify()
 {
    assert(lp != 0);

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: cluprotos.h,v 1.5 2001/11/29 14:00:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: cluprotos.h,v 1.6 2001/11/29 22:52:54 bzfkocht Exp $"
 
 
 #ifndef _CLUPROTOS_H_
@@ -38,7 +38,7 @@ int factor(CLUFactor*,
             double,          /* pivoting threshold                */
             double           /* epsilon for zero detection        */
          );
-
+#if 0
 void solveRight (CLUFactor*, double*, double*);
 int solveRight4update (CLUFactor*, double*, int*, double,
                         double*, double*, int*, int*);
@@ -70,21 +70,25 @@ int solveLeft2(CLUFactor* fac,
                 double eps,
                 double* rhs1,
                 double* rhs2);
+#endif
 
 int updateCLUFactor (CLUFactor*, int, double*, const int*, int);
 int updateCLUFactorNoClear(CLUFactor*, int, const double*, const int*, int);
 int forestUpdateCLUFactor (CLUFactor* fac, int col, double* work, int n, int *nonz);
 int CLUFactorIsConsistent (const CLUFactor*);
 
+#if 0
 void solveLright(CLUFactor* fac, double* vec);
-
+#endif
 /********************************************************************************
         very sparse solution methods
 */
+
 int vSolveRight4update(CLUFactor* fac, double eps,
                         double* vec, int* idx,               /* result       */
                         double* rhs, int* ridx, int rn,      /* rhs & Forest */
                         double* forest, int* forestNum, int* forestIdx);
+
 int vSolveRight4update2(CLUFactor* fac, double eps,
                          double* vec, int* idx,                      /* result1 */
                          double* rhs, int* ridx, int rn,             /* rhs1    */
