@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: forest.cpp,v 1.5 2001/11/13 21:55:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: forest.cpp,v 1.6 2001/12/01 18:21:16 bzfbleya Exp $"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -327,7 +327,7 @@ int forestUpdateCLUFactor(CLUFactor* fac, int col, double* work, int num, int *n
             /* insert to row file */
             if (rmax[i] <= rlen[i])
             {
-               remaxRow(fac, i, rlen[i] + 1);
+               fac->remaxRow(i, rlen[i] + 1);
                rval = fac->u.row.val;
                ridx = fac->u.row.idx;
             }
@@ -383,7 +383,7 @@ int forestUpdateCLUFactor(CLUFactor* fac, int col, double* work, int num, int *n
             /* insert to row file */
             if (rmax[i] <= rlen[i])
             {
-               remaxRow(fac, i, rlen[i] + 1);
+               fac->remaxRow(i, rlen[i] + 1);
                rval = fac->u.row.val;
                ridx = fac->u.row.idx;
             }
@@ -456,7 +456,7 @@ int forestUpdateCLUFactor(CLUFactor* fac, int col, double* work, int num, int *n
 
          /*  Eliminate row r from U to L file
           */
-         ll = makeLvec(fac, r - c, row);
+         ll = fac->makeLvec(r - c, row);
          lval = fac->l.val;
          lidx = fac->l.idx;
          /* for(i = c; i < r; ++i)       */
@@ -521,7 +521,7 @@ int forestUpdateCLUFactor(CLUFactor* fac, int col, double* work, int num, int *n
          if (rmax[row] < num)
          {
             rlen[row] = 0;
-            remaxRow(fac, row, num);
+            fac->remaxRow(row, num);
             rval = fac->u.row.val;
             ridx = fac->u.row.idx;
          }
@@ -578,7 +578,7 @@ int forestUpdateCLUFactor(CLUFactor* fac, int col, double* work, int num, int *n
 
          /*  Eliminate row r from U to L file
           */
-         ll = makeLvec(fac, r - c, row);
+         ll = fac->makeLvec(r - c, row);
          lval = fac->l.val;
          lidx = fac->l.idx;
          for (i = c; i < r; ++i)
@@ -629,7 +629,7 @@ int forestUpdateCLUFactor(CLUFactor* fac, int col, double* work, int num, int *n
          if (rmax[row] < n)
          {
             rlen[row] = 0;
-            remaxRow(fac, row, n);
+            fac->remaxRow(row, n);
             rval = fac->u.row.val;
             ridx = fac->u.row.idx;
          }
@@ -686,8 +686,7 @@ int forestUpdateCLUFactor(CLUFactor* fac, int col, double* work, int num, int *n
       return fac->stat = CLU_SINGULAR;
 
    fac->maxabs = maxabs;
-
-   assert(CLUFactorIsConsistent(fac));
+   assert( fac->isConsistent());
    return stat;
 }
 } // namespace soplex

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: update.cpp,v 1.2 2001/11/06 23:31:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: update.cpp,v 1.3 2001/12/01 18:21:16 bzfbleya Exp $"
 
 
 #include <stdio.h>
@@ -50,7 +50,8 @@ int updateCLUFactor
    div = 1 / work[col];
    work[col] = 0;
 
-   ll = makeLvec(fac, num, col);
+   ll = fac->makeLvec(num, col);
+   //   ll = fac->makeLvec(num, col);
    lval = fac->l.val;
    lidx = fac->l.idx;
    maxabs = fac->maxabs;
@@ -101,7 +102,8 @@ int updateCLUFactorNoClear
 
    assert(work[col] != 0);
    div = 1 / work[col];
-   ll = makeLvec(fac, num, col);
+   ll = fac->makeLvec(num, col);
+   //ll = fac->makeLvec(num, col);
    lval = fac->l.val;
    lidx = fac->l.idx;
    maxabs = fac->maxabs;

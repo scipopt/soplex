@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: cluprotos.h,v 1.7 2001/11/30 22:14:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: cluprotos.h,v 1.8 2001/12/01 18:21:16 bzfbleya Exp $"
 
 
 #ifndef _CLUPROTOS_H_
@@ -33,27 +33,25 @@
 namespace soplex
 {
 
+
+int updateCLUFactor (CLUFactor*, int, double*, const int*, int);
+int updateCLUFactorNoClear(CLUFactor*, int, const double*, const int*, int);
+int forestUpdateCLUFactor (CLUFactor* fac, int col, double* work, int n, int *nonz);
+
+#if 0
 int factor(CLUFactor*,
             SVector**,       /* Array of column vector pointers   */
             double,          /* pivoting threshold                */
             double           /* epsilon for zero detection        */
          );
-
-int updateCLUFactor (CLUFactor*, int, double*, const int*, int);
-int updateCLUFactorNoClear(CLUFactor*, int, const double*, const int*, int);
-int forestUpdateCLUFactor (CLUFactor* fac, int col, double* work, int n, int *nonz);
-int CLUFactorIsConsistent (const CLUFactor*);
-
-#if 0
 void solveLright(CLUFactor* fac, double* vec);
-#endif
-
 void remaxRow(CLUFactor*, int, int);
 void remaxCol(CLUFactor*, int, int);
-int makeLvec(CLUFactor*, int, int);
 void packRows(CLUFactor* fac);
-
+int CLUFactorIsConsistent (const CLUFactor*);
+int makeLvec(CLUFactor*, int, int);
 void dumpCLUFactor(const CLUFactor* fac);
+#endif
 
 } // namespace soplex
 #endif // _CLUPROTOS_H_

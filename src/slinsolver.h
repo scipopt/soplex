@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slinsolver.h,v 1.4 2001/11/26 15:55:39 bzfpfend Exp $"
+#pragma ident "@(#) $Id: slinsolver.h,v 1.5 2001/12/01 18:21:16 bzfbleya Exp $"
 
 /**@file  slinsolver.h
  * @brief Sparse Linear Solver virtual base class.
@@ -96,7 +96,7 @@ public:
                          const SSVector* eta = 0) = 0;
 
    /// consistency check.
-   virtual int isConsistent() const = 0;
+   virtual bool isConsistent() const = 0;
    //@}
 
 

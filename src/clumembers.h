@@ -13,12 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clumembers.h,v 1.7 2001/11/30 22:14:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: clumembers.h,v 1.8 2001/12/01 18:21:16 bzfbleya Exp $"
 
 #ifndef _CLUMEMBERS_H_
 #define _CLUMEMBERS_H_
 
 #include "clutypes.h"
+#include "svector.h"
 
 namespace soplex
 {
@@ -175,10 +176,9 @@ public:
       double* vec2,                                       /* result2 */
       double* rhs2, int* ridx2, int rn2);               /* rhs2    */
 
-#warning MAKE Pring and Temp private when factor.cpp is finished
 private:
-public: 
-   class Pring   /* Pivot ring */
+   /// Pivot ring
+   class Pring
    {
    public:
       Pring(): next(NULL), prev(NULL){}      
@@ -191,11 +191,14 @@ public:
       Pring(const Pring&);
       Pring& operator= (const Pring&);
    };
-   class Temp  /* Temporary data structures. */
+   /// Temporary data structures.
+   class Temp 
    {
    public: 
-      Temp(int p_dim);
+      Temp();
       ~Temp();
+      void init(const int p_dim);
+      void clear();
       int*    s_mark;
       double* s_max;           /* maximum absolute value per row (or -1) */
       int*    s_cact;          /* lengths of columns of active submatrix */
@@ -203,6 +206,99 @@ public:
       Temp( const Temp& );
       Temp& operator= ( const Temp& );
    };
+   ///
+   Temp temp;
+   ///
+   class Pivots {
+   public:
+      Pring pivots;                /* ring of selected pivot rows */
+      Pring *pivot_col;            /* column index handlers for double linked list */
+      Pring *pivot_colNZ;          /* lists for columns to number of nonzeros      */
+      Pring *pivot_row;            /* same for rows */
+      Pring *pivot_rowNZ;          /* same for rows */
+   };
+   /**@todo Why must pivot datastructures be static in CLU for factor.cpp? */
+   static Pivots pivots;
+
+private:
+   ///
+   void initPerm();
+   ///
+   void initFactorMatrix(SVector** vec, 
+                         const double eps, 
+                         int& stage );
+   ///
+   void minLMem(int size);
+   ///
+   void setPivot(int p_stage, 
+                 int p_col, 
+                 int p_row, 
+                 double val);
+
+   ///
+   void colSingletons(int& stage);
+   ///
+   void rowSingletons(int& stage);
+
+   ///
+   void initFactorRings(const int stage);
+   ///
+   void freeFactorRings();
+      
+   ///
+   int setupColVals( CLUFactor* fac );
+
+   ///
+   void eliminateRowSingletons(int& stage );
+   ///
+   void eliminateColSingletons(int& stage);
+   ///
+   void selectPivots(double threshold, const int stage);
+   ///
+   int updateRow   (int r,
+                    int lv,
+                    int prow,
+                    int pcol,
+                    double pval,
+                    double eps );
+
+   ///
+   void eliminatePivot(int prow, int pos, double eps, int& stage );
+   ///
+   void eliminateNucleus(const double eps, 
+                         const double threshold, 
+                         int& stage);
+   ///
+   void minRowMem(int size);
+   ///
+   void minColMem(int size);
+   ///
+   void remaxCol(int p_col, int len);
+   ///
+   void packRows();
+   ///
+   void packColumns();
+
+public:
+   ///
+   int factor( SVector** vec,       /* Array of column vector pointers   */
+               double threshold,    /* pivoting threshold                */
+               double eps           /* epsilon for zero detection        */
+               );
+
+   ///
+   void dump() const;
+   ///
+   bool isConsistent() const;
+
+private:
+public:  // public only until forest.cpp is changed
+   ///
+   void remaxRow(int p_row, int len);
+   ///
+   int makeLvec(int p_len, 
+                int p_row);
+
 };
 
 } // namespace soplex

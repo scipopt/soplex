@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.h,v 1.5 2001/11/28 17:15:52 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.h,v 1.6 2001/12/01 18:21:16 bzfbleya Exp $"
 
 /**@file  slufactor.h
  * @brief Sparse LU factorization.
@@ -207,7 +207,7 @@ public:
    void dump() const;
 
    /// consistency check.
-   int isConsistent() const;
+   bool isConsistent() const;
    //@}
 
    /**@name Constructors / Destructors */
