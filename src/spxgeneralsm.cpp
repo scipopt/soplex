@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeneralsm.cpp,v 1.7 2001/12/04 19:28:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeneralsm.cpp,v 1.8 2002/01/06 21:16:18 bzfkocht Exp $"
 
 #include <iostream>
 
@@ -25,16 +25,16 @@ void SPxGeneralSM::load(SPxLP* p_lp)
 {
    lp       = p_lp;
    rem1.load (p_lp);
-   // redu.load (p_lp);
-   // aggr.load (p_lp);
+   redu.load (p_lp);
+   aggr.load (p_lp);
    scale.load(p_lp);
 }
 
 void SPxGeneralSM::unload()
 {
    rem1.unload ();
-   // redu.unload ();
-   // aggr.unload ();
+   redu.unload ();
+   aggr.unload ();
    scale.unload();
 }
 
@@ -50,12 +50,12 @@ int SPxGeneralSM::simplify()
 
       if ((i = rem1.simplify()) != 0) 
          return i;
-      // if ((i = aggr.simplify()) != 0) 
-      //    return i;
-      // if ((i = redu.simplify()) != 0) 
-      //    return i;
+      if ((i = aggr.simplify()) != 0) 
+         return i;
+      if ((i = redu.simplify()) != 0) 
+         return i;
    }
-   while (0.99*cnt > lp->nRows() + lp->nCols());
+   while (0.99 * cnt > lp->nRows() + lp->nCols());
 
    if ((i = scale.simplify()) != 0) 
       return i;
@@ -71,7 +71,7 @@ int SPxGeneralSM::simplify()
    return 0;
 }
 
-/**bugs This is not correctly implented, since the simplifiers may be
+/**@todo This is not correctly implented, since the simplifiers may be
  *      called several times one after the others, this sequence has
  *      to be tracked to make the calls of unsimplify in exactly the
  *      reverse order.
@@ -88,8 +88,7 @@ void SPxGeneralSM::unsimplify()
 
 double SPxGeneralSM::value(double x)
 {
-   // return rem1.value(aggr.value(redu.value(scale.value(x))));
-   return rem1.value(scale.value(x));
+   return rem1.value(aggr.value(redu.value(scale.value(x))));
 }
 } // namespace soplex
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.9 2002/01/04 17:31:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.10 2002/01/06 21:16:18 bzfkocht Exp $"
 
 #include "spxdevexpr.h"
 #include "message.h"
@@ -213,8 +213,9 @@ void SPxDevexPR::entered4(SoPlex::Id id, int n)
    entered4X(id, n, 0, 1, 0, 1);
 }
 
-/**@todo suspicious: the pricer should be informed, that variable id has entered the basis at position n, but the id is not used here (this is true
-                     for all pricers)
+/**@todo suspicious: the pricer should be informed, that variable id 
+    has entered the basis at position n, but the id is not used here 
+    (this is true for all pricers)
 */
 void SPxDevexPR::entered4X(SoPlex::Id /*id*/, int n,
    int start1, int incr1, int start2, int incr2)

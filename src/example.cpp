@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.11 2002/01/04 17:31:38 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.12 2002/01/06 21:16:18 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -61,7 +61,7 @@ public:
       : SPxSolver(p_type, p_rep)
    {}
 
-   int terminate()
+   virtual bool terminate()
    {
       if (iteration() % 100 == 0)
          std::cout << iteration() << ":\t" << value() << std::endl;

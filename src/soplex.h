@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.16 2002/01/05 09:59:43 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.17 2002/01/06 21:16:18 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -446,7 +446,7 @@ public:
     *  returns 0, if the LP has been solved to optimality (i.e. no
     *  further pricing succeeds and no shift is present).
     */
-   virtual int terminate ();
+   virtual bool terminate ();
    //@}
 
    /**@name Control Parameters */

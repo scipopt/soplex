@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.22 2002/01/05 19:24:08 bzfkocht Exp $
+# $Id: Makefile,v 1.23 2002/01/06 21:16:17 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -84,8 +84,6 @@ LIBXXX		=	$(addprefix $(OBJDIR)/,$(LIBOBJ))
 OBJSRC		=	$(addprefix $(SRCDIR)/,$(OBJECT:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
 
-vpath		%.o	$(OBJDIR)
-
 $(BINARY):	$(OBJDIR) $(BINDIR) $(OBJXXX) $(LIBRARY) 
 		$(CXX) $(CXXFLAGS) $(OBJXXX) \
 		-L$(LIBDIR) -l$(TARGET) $(LDFLAGS) -o $@
@@ -129,9 +127,8 @@ $(BINDIR):
 depend:
 		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
 		$(OBJSRC:.o=.cpp) $(LIBSRC:.o=.cpp) \
+		| sed '\''s|^\([0-9A-z]\{1,\}\)\.o|$$\(OBJDIR\)/\1.o|g'\'' \
 		>$(DEPEND)'
-
-#		| sed '\''s|^\([0-9A-z]\{1,\}\)\.o|$(OBJDIR)/\1.o|g'\'' \
 
 include		$(DEPEND)
 
@@ -139,3 +136,5 @@ $(OBJDIR)/%.o:	$(SRCDIR)/%.cpp
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 # --- EOF ---------------------------------------------------------------------
+
+

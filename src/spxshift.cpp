@@ -13,26 +13,15 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxshift.cpp,v 1.5 2001/11/12 16:42:09 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxshift.cpp,v 1.6 2002/01/06 21:16:18 bzfkocht Exp $"
 
-/*      \SubSection{Shifting bounds}
- */
-
-/*  Import system include files
- */
 #include <assert.h>
 #include <iostream>
 
-
-/*  and class header files
- */
 #include "soplex.h"
 
 namespace soplex
 {
-
-
-//@ ----------------------------------------------------------------------------
 void SoPlex::shiftFvec()
 {
    // Random   mult(delta(), 100*delta());
@@ -67,7 +56,7 @@ void SoPlex::shiftFvec()
 
 #ifndef NDEBUG
    testBounds();
-   std::cerr << "OK\n\n";
+   std::cout << "shiftFvec: OK" << std::endl;
 #endif
 }
 
@@ -136,7 +125,7 @@ void SoPlex::shiftPvec()
 
 #ifndef NDEBUG
    testBounds();
-   std::cerr << "OK\n\n";
+   std::cout << "shiftPvec: OK" << std::endl;
 #endif
 }
 
@@ -163,34 +152,37 @@ void SoPlex::perturbMin
 
 #ifdef  FULL_SHIFT
    eps = delta();
+
    for (i = uvec.dim() - start - 1; i >= 0; i -= incr)
    {
       u = p_up[i];
       l = p_low[i];
+
       if (p_up[i] <= vec[i] + eps)
       {
-         p_up[i] = vec[i] + static_cast<double>(mult);
+         p_up[i] = vec[i] + double(mult);
          theShift += p_up[i] - u;
       }
       if (p_low[i] >= vec[i] - eps)
       {
-         p_low[i] = vec[i] - static_cast<double>(mult);
+         p_low[i] = vec[i] - double(mult);
          theShift -= p_low[i] - l;
       }
    }
 
 #else   // !FULL_SHIFT
-for (j = uvec.delta().size() - start - 1; j >= 0; j -= incr)
+   for (j = uvec.delta().size() - start - 1; j >= 0; j -= incr)
    {
       i = idx.index(j);
       x = upd[i];
       u = p_up[i];
       l = p_low[i];
+
       if (x < epsilon())
       {
          if (u != l && vec[i] >= u - eps)
          {
-            p_up[i] = vec[i] + static_cast<double>(mult);
+            p_up[i] = vec[i] + double(mult);
             theShift += p_up[i] - u;
          }
       }
@@ -198,7 +190,7 @@ for (j = uvec.delta().size() - start - 1; j >= 0; j -= incr)
       {
          if (u != l && vec[i] <= l + eps)
          {
-            p_low[i] = vec[i] - static_cast<double>(mult);
+            p_low[i] = vec[i] - double(mult);
             theShift -= p_low[i] - l;
          }
       }
@@ -206,15 +198,13 @@ for (j = uvec.delta().size() - start - 1; j >= 0; j -= incr)
 #endif  // !FULL_SHIFT
 }
 
-void SoPlex::perturbMax
-(
+void SoPlex::perturbMax(
    const UpdateVector& uvec,
    Vector& p_low,
    Vector& p_up,
    double eps,
    int start,
-   int incr
-)
+   int incr)
 {
    assert(uvec.dim() == p_low.dim());
    assert(uvec.dim() == p_up.dim());
@@ -234,12 +224,12 @@ void SoPlex::perturbMax
       l = p_low[i];
       if (p_up[i] <= vec[i] + eps)
       {
-         p_up[i] = vec[i] + static_cast<double>(mult);
+         p_up[i] = vec[i] + double(mult);
          theShift += p_up[i] - u;
       }
       if (p_low[i] >= vec[i] - eps)
       {
-         p_low[i] = vec[i] - static_cast<double>(mult);
+         p_low[i] = vec[i] - double(mult);
          theShift -= p_low[i] - l;
       }
    }
@@ -255,7 +245,7 @@ void SoPlex::perturbMax
       {
          if (u != l && vec[i] >= u - eps)
          {
-            p_up[i] = vec[i] + static_cast<double>(mult);
+            p_up[i] = vec[i] + double(mult);
             theShift += p_up[i] - u;
          }
       }
@@ -263,7 +253,7 @@ void SoPlex::perturbMax
       {
          if (u != l && vec[i] <= l + eps)
          {
-            p_low[i] = vec[i] - static_cast<double>(mult);
+            p_low[i] = vec[i] - double(mult);
             theShift -= p_low[i] - l;
          }
       }
@@ -289,8 +279,7 @@ void SoPlex::perturbMaxEnter(void)
 }
 
 
-double SoPlex::perturbMin
-(
+double SoPlex::perturbMin(
    const UpdateVector& uvec,
    Vector& p_low,
    Vector& p_up,
@@ -298,8 +287,7 @@ double SoPlex::perturbMin
    double p_delta,
    const SPxBasis::Desc::Status* stat,
    int start,
-   int incr
-)
+   int incr)
 {
    assert(uvec.dim() == p_low.dim());
    assert(uvec.dim() == p_up.dim());
@@ -320,12 +308,12 @@ double SoPlex::perturbMin
       l = p_low[i];
       if (p_up[i] <= vec[i] + eps && rep()*stat[i] < 0)
       {
-         p_up[i] = vec[i] + static_cast<double>(mult);
+         p_up[i] = vec[i] + double(mult);
          l_theShift += p_up[i] - u;
       }
       if (p_low[i] >= vec[i] - eps && rep()*stat[i] < 0)
       {
-         p_low[i] = vec[i] - static_cast<double>(mult);
+         p_low[i] = vec[i] - double(mult);
          l_theShift -= p_low[i] - l;
       }
    }
@@ -341,7 +329,7 @@ double SoPlex::perturbMin
       {
          if (u != l && vec[i] >= u - eps && rep()*stat[i] < 0)
          {
-            p_up[i] = vec[i] + static_cast<double>(mult);
+            p_up[i] = vec[i] + double(mult);
             l_theShift += p_up[i] - u;
          }
       }
@@ -349,7 +337,7 @@ double SoPlex::perturbMin
       {
          if (u != l && vec[i] <= l + eps && rep()*stat[i] < 0)
          {
-            p_low[i] = vec[i] - static_cast<double>(mult);
+            p_low[i] = vec[i] - double(mult);
             l_theShift -= p_low[i] - l;
          }
       }
@@ -358,8 +346,7 @@ double SoPlex::perturbMin
    return l_theShift;
 }
 
-double SoPlex::perturbMax
-(
+double SoPlex::perturbMax(
    const UpdateVector& uvec,
    Vector& p_low,
    Vector& p_up,
@@ -367,8 +354,7 @@ double SoPlex::perturbMax
    double p_delta,
    const SPxBasis::Desc::Status* stat,
    int start,
-   int incr
-)
+   int incr)
 {
    assert(uvec.dim() == p_low.dim());
    assert(uvec.dim() == p_up.dim());
@@ -389,12 +375,12 @@ double SoPlex::perturbMax
       l = p_low[i];
       if (p_up[i] <= vec[i] + eps && rep()*stat[i] < 0)
       {
-         p_up[i] = vec[i] + static_cast<double>(mult);
+         p_up[i] = vec[i] + double(mult);
          l_theShift += p_up[i] - u;
       }
       if (p_low[i] >= vec[i] - eps && rep()*stat[i] < 0)
       {
-         p_low[i] = vec[i] - static_cast<double>(mult);
+         p_low[i] = vec[i] - double(mult);
          l_theShift -= p_low[i] - l;
       }
    }
@@ -410,7 +396,7 @@ double SoPlex::perturbMax
       {
          if (u != l && vec[i] >= u - eps && rep()*stat[i] < 0)
          {
-            p_up[i] = vec[i] + static_cast<double>(mult);
+            p_up[i] = vec[i] + double(mult);
             l_theShift += p_up[i] - u;
          }
       }
@@ -418,7 +404,7 @@ double SoPlex::perturbMax
       {
          if (u != l && vec[i] <= l + eps && rep()*stat[i] < 0)
          {
-            p_low[i] = vec[i] - static_cast<double>(mult);
+            p_low[i] = vec[i] - double(mult);
             l_theShift -= p_low[i] - l;
          }
       }
@@ -434,9 +420,9 @@ void SoPlex::perturbMinLeave(void)
    pVec().delta().setup();
    coPvec().delta().setup();
    theShift += perturbMin(pVec(), lpBound(), upBound(), epsilon(), delta(),
-                           desc().status(), 0, 1);
+      desc().status(), 0, 1);
    theShift += perturbMin(coPvec(), lcBound(), ucBound(), epsilon(), delta(),
-                           desc().coStatus(), 0, 1);
+      desc().coStatus(), 0, 1);
    //@ std::cerr << "\t->" << shift() << std::endl;
 }
 
@@ -447,16 +433,19 @@ void SoPlex::perturbMaxLeave(void)
    pVec().delta().setup();
    coPvec().delta().setup();
    theShift += perturbMax(pVec(), lpBound(), upBound(), epsilon(), delta(),
-                           desc().status(), 0, 1);
+      desc().status(), 0, 1);
    theShift += perturbMax(coPvec(), lcBound(), ucBound(), epsilon(), delta(),
-                           desc().coStatus(), 0, 1);
+      desc().coStatus(), 0, 1);
    //@ std::cerr << "\t->" << shift() << std::endl;
 }
 
 
 void SoPlex::unShift(void)
 {
-   //@ std::cerr << "unshifting ...\n";
+#ifndef NDEBUG
+   std::cout << "unshifting ..." << std::endl;
+#endif // !NDEBUG
+
    if (isInitialized())
    {
       int i;

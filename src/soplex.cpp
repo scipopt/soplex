@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.22 2002/01/05 20:31:11 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.23 2002/01/06 21:16:18 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -132,6 +132,7 @@ void SoPlex::setType(Type tp)
    else
    {
       theType = tp;
+
       if (!matrixIsSetup)
       {
          SPxBasis::load(this);
@@ -140,9 +141,9 @@ void SoPlex::setType(Type tp)
       factorized = false;
       m_numCycle = 0;
    }
-   if (thepricer && thepricer->solver() == this)
+   if ((thepricer != 0) && (thepricer->solver() == this))
       thepricer->setType(tp);
-   if (theratiotester && theratiotester->solver() == this)
+   if ((theratiotester != 0) && (theratiotester->solver() == this))
       theratiotester->setType(tp);
 }
 
