@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.19 2002/05/15 13:38:44 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.20 2002/12/08 11:09:22 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -28,7 +28,7 @@
 namespace soplex
 {
 
-#define EQ_PREF 1000
+// #define EQ_PREF 1000
 
 void SPxSteepPR::clear()
 {
@@ -198,9 +198,9 @@ void SPxSteepPR::setupPrefs(SoPlex::Type tp)
    {
       Real mult = 1e-8 / Real(1 + thesolver->dim() + thesolver->coDim());
       if (tp == SoPlex::ENTER)
-         setupPrefs(-mult, -1e-5, -1e-5, 1, 1);
+         setupPrefs(-mult, -1e-5, -1e-5, 1.0, 1.0);
       else
-         setupPrefs(mult, 1e-5, 1e-5, 1, 1);
+         setupPrefs(mult, 1e-5, 1e-5, 1.0, 1.0);
       prefSetup = tp;
    }
 }
@@ -218,7 +218,7 @@ void SPxSteepPR::setRep(SoPlex::Representation)
    }
 }
 
-void SPxSteepPR::left4X(int n, SPxId id, int start, int incr)
+void SPxSteepPR::left4X(int n, const SPxId& id, int start, int incr)
 {
    assert(thesolver->type() == SoPlex::LEAVE);
 
@@ -426,7 +426,7 @@ void SPxSteepPR::entered4(SPxId id, int n)
 }
 
 SPxId SPxSteepPR::selectEnterX(
-   Real& best, int start1, int incr1, int start2, int incr2)
+   Real& best, int start1, int incr1, int start2, int incr2) const
 {
    /*
        std::cout << "selectEnter " << start1 << '(' << incr1 << ")\t"

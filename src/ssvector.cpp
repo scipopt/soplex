@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.19 2002/04/06 13:05:02 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.20 2002/12/08 11:09:22 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -160,24 +160,23 @@ void SSVector::setup()
          if (isNotZero(*v, epsilon))
             *ii++ = 0;
          else
-            *v = 0;
+            *v = 0.0;
 
          for(;;)
          {
-            while (!*++v);
+            while (*++v == 0.0)
+               ;
             if (isNotZero(*v, epsilon))
             {
                *ii++ = int(v - val);
             }
             else
             {
-               *v = 0;
+               *v = 0.0;
                if (v == end)
                   break;
             }
-
          }
-
          /* fange weissen Elefanten wieder ein */
          if (isNotZero(last, epsilon))
          {

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: cring.h,v 1.4 2002/02/04 15:34:08 bzfpfend Exp $"
+#pragma ident "@(#) $Id: cring.h,v 1.5 2002/12/08 11:09:20 bzfkocht Exp $"
 
 #ifndef _CRING_H_
 #define _CRING_H_
@@ -38,6 +38,7 @@
 (ring).prev->next = (ring).next;                           \
 }
 
+#if 0 // not used
 #define mergeDR(ring1, ring2)                                   \
 {                                                               \
 Dring       *tmp;                                          \
@@ -47,6 +48,7 @@ tmp = (ring1).next;                                        \
 (ring1).next->prev = &(ring1);                             \
 (ring2).next->prev = &(ring2);                             \
 }
+#endif
 
 #endif // _CRING_H_
 

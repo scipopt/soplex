@@ -13,12 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.16 2002/11/26 14:03:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.17 2002/12/08 11:09:21 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
 #include <iostream>
-#include <math.h>
 
 #include "spxdefines.h"
 #include "spxbasis.h"
@@ -42,6 +41,8 @@ void SPxBasis::reDim()
 
    if (theLP->dim() != matrix.size())
    {
+      std::cout << "== reDim ==" << std::endl;
+
       matrix.reSize (theLP->dim());
       theBaseId.reSize(theLP->dim());
       matrixIsSetup = false;
@@ -122,6 +123,8 @@ void SPxBasis::removedRow(int i)
    assert(status() >  NO_PROBLEM);
    assert(theLP    != 0);
 
+   std::cout << "== removedRow ==" << std::endl;
+
    if (theLP->rep() == SoPlex::ROW)
    {
       if (theLP->isBasic(thedesc.rowStatus(i)))
@@ -162,7 +165,7 @@ void SPxBasis::removedRow(int i)
    reDim();
 }
 
-void SPxBasis::removedRows(int perm[])
+void SPxBasis::removedRows(const int perm[])
 {
    METHOD( "SPxBasis::removedRows()" );
    assert(status() > NO_PROBLEM);
@@ -170,6 +173,8 @@ void SPxBasis::removedRows(int perm[])
 
    int i;
    int n = thedesc.nRows();
+
+   std::cout << "== removedRows ==" << std::endl;
 
    if (theLP->rep() == SoPlex::ROW)
    {
@@ -313,6 +318,8 @@ void SPxBasis::removedCol(int i)
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
 
+   std::cout << "== removedCol ==" << std::endl;
+
    if (theLP->rep() == SoPlex::COLUMN)
    {
       if (theLP->isBasic(thedesc.colStatus(i)))
@@ -346,11 +353,13 @@ void SPxBasis::removedCol(int i)
    reDim();
 }
 
-void SPxBasis::removedCols(int perm[])
+void SPxBasis::removedCols(const int perm[])
 {
    METHOD( "SPxBasis::removedCols()" );
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
+
+   std::cout << "== removedCols ==" << std::endl;
 
    int i;
    int n = thedesc.nCols();
@@ -396,7 +405,11 @@ void SPxBasis::removedCols(int perm[])
 void SPxBasis::invalidate()
 {
    METHOD( "SPxBasis::invalidate()" );
-   factorized = matrixIsSetup = false;
+
+   std::cout << "== invalidate ==" << std::endl;
+
+   factorized    = false;
+   matrixIsSetup = false;
 }
 
 /**@todo is this correctly implemented?
@@ -432,3 +445,4 @@ void SPxBasis::changedElement(int /*row*/, int /*col*/)
 //Emacs indent-tabs-mode:nil
 //Emacs End:
 //-----------------------------------------------------------------------------
+

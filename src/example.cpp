@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.45 2002/11/26 14:03:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.46 2002/12/08 11:09:21 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -79,8 +79,14 @@ public:
    {
       m_slu.setUtype(tp);
    }
-
-   void displayQuality()
+   void displayStats() const
+   {
+      std::cout << "Factorizations   : " << m_slu.getFactorCount() << std::endl;
+      std::cout << "    Time spend   : " << m_slu.getFactorTime() << std::endl;
+      std::cout << "Solves           : " << m_slu.getSolveCount() << std::endl;
+      std::cout << "    Time spend   : " << m_slu.getSolveTime() << std::endl;
+   }
+   void displayQuality() const
    {
       double maxviol;
       double sumviol;
@@ -125,7 +131,7 @@ public:
    }
 };
 
-int main(int argc, char **argv)
+int main(int argc, const char **argv)
 {
    const char* banner =
    "************************************************************************\n"
@@ -463,6 +469,9 @@ int main(int argc, char **argv)
    work.solve();
 
    timer.stop();
+
+   work.displayStats();
+
    std::cout << "solution time  is: " 
              << timer.userTime() 
              << std::endl

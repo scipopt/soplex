@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.35 2002/11/25 16:51:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.36 2002/12/08 11:09:22 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -29,10 +29,6 @@
 #include "spxlp.h"
 
 #define MAX_LINE_LEN  257       ///< maximum length of a line (255 + \n + \0)
-
-#define INIT_COLS     10000     ///< initialy allocated columns.
-#define INIT_ROWS     10000     ///< initialy allocated rows.
-#define INIT_NZOS     100000    ///< initialy allocated non zeros.
 
 namespace soplex
 {
@@ -155,7 +151,7 @@ static Real readValue(char*& pos)
  *  @return The Index of the named column.
  */
 static int readColName(
-   char*& pos, NameSet* colnames, LPColSet& colset, LPCol* emptycol)
+   char*& pos, NameSet* colnames, LPColSet& colset, const LPCol* emptycol)
 {
    assert(isColName(pos));
    assert(colnames != 0);

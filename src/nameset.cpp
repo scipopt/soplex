@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.cpp,v 1.24 2002/11/25 16:51:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.cpp,v 1.25 2002/12/08 11:09:21 bzfkocht Exp $"
 
 #include <string.h>
 #include "spxdefines.h"
@@ -94,7 +94,7 @@ void NameSet::remove(const char *str)
    }
 }
 
-void NameSet::remove(DataKey p_key)
+void NameSet::remove(const DataKey& p_key)
 {
    assert(has(p_key));
 
@@ -102,13 +102,13 @@ void NameSet::remove(DataKey p_key)
    set.remove(p_key);
 }
 
-void NameSet::remove(DataKey keys[], int n)
+void NameSet::remove(const DataKey keys[], int n)
 {
    for (int i = 0; i < n; ++i)
       remove(keys[i]);
 }
 
-void NameSet::remove(int nums[], int n)
+void NameSet::remove(const int nums[], int n)
 {
    for (int i = 0; i < n; ++i)
       remove(nums[i]);

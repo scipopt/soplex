@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.20 2002/10/23 10:40:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.21 2002/12/08 11:09:20 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -79,6 +79,7 @@ Real SoPlex::test(int i, SPxBasis::Desc::Status stat) const
       if (x < 0)
          return x;
       // no break: next is else case
+      //lint -fallthrough
    case SPxBasis::Desc::D_ON_LOWER:
       assert(rep() == ROW);
       return rhs(i) - (*thePvec)[i];
@@ -941,6 +942,7 @@ int SoPlex::enter(SPxId& enterId)
       rejectEnter(enterId, enterTest, enterStat);
       if (lastUpdate() > 1)
       {
+         std::cout << "== enter == " << std::endl;
          factorize();
          return enter(enterId);
       }

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.h,v 1.15 2002/11/25 16:51:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.h,v 1.16 2002/12/08 11:09:21 bzfkocht Exp $"
 
 /**@file  slufactor.h
  * @brief Implementation of Sparse Linear Solver.
@@ -70,6 +70,9 @@ protected:
    /// |x| < epsililon is considered to be 0.
    Real epsilon;
 
+   Timer   solveTime;         ///< Time spend in solves
+   int     solveCount;        ///< Number of solves
+
 protected:
    /**@todo document these protected methods and attributes */
    ///
@@ -82,7 +85,7 @@ public:
    typedef SLinSolver::Status Status;
 
    /// returns the current update type #uptype.
-   UpdateType utype()
+   UpdateType utype() const
    {
       return uptype;
    }
@@ -147,6 +150,26 @@ public:
 
    /**@name Miscellaneous */
    //@{
+   /// time spent in factorizations
+   Real getFactorTime() const
+   {
+      return factorTime.userTime();
+   }
+   /// number of factorizations performed
+   int getFactorCount() const
+   {
+      return factorCount;
+   }
+   /// time spent in factorizations
+   Real getSolveTime() const
+   {
+      return solveTime.userTime();
+   }
+   /// number of factorizations performed
+   int getSolveCount() const
+   {
+      return solveCount;
+   }
    /// prints the LU factorization to stdout.
    void dump() const;
 
@@ -161,16 +184,7 @@ public:
    /// assignment operator.
    SLUFactor& operator=(const SLUFactor& old);
    /// copy constructor.
-   SLUFactor(const SLUFactor& old)
-      : SLinSolver( old )
-      , CLUFactor()
-      , vec (old.vec)
-      , ssvec (old.ssvec)
-      , eta (old.eta)
-      , forest(old.forest)
-   {
-      assign(old);
-   }
+   SLUFactor(const SLUFactor& old);
    /// destructor.
    virtual ~SLUFactor();
 

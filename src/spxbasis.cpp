@@ -13,13 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.34 2002/11/26 14:03:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.35 2002/12/08 11:09:21 bzfkocht Exp $"
 
-// #define DEBUGGING 1
+//#define DEBUGGING 1
 
 #include <assert.h>
 #include <iostream>
-#include <math.h>
 
 #include "spxdefines.h"
 #include "spxbasis.h"
@@ -103,6 +102,8 @@ void SPxBasis::loadMatrixVecs()
    assert(theLP != 0);
    assert(theLP->dim() == matrix.size());
 
+   std::cout << "== loadMatrixVecs == " << std::endl;
+
    int i;
    nzCount = 0;
    for (i = theLP->dim() - 1; i >= 0; --i)
@@ -131,12 +132,15 @@ void SPxBasis::loadDesc(const Desc& ds)
    assert(ds.nCols() == theLP->nCols());
 
    SPxId none;
-   int i, j;
+   int   i;
+   int   j;
 
-   lastin = none;
-   lastout = none;
-   lastidx = -1;
-   iterCount = 0;
+   std::cout << "== loadDesc == " << std::endl;
+
+   lastin      = none;
+   lastout     = none;
+   lastidx     = -1;
+   iterCount   = 0;
    updateCount = 0;
 
    if (&ds != &thedesc)
@@ -219,6 +223,9 @@ void SPxBasis::load(SoPlex* lp)
 void SPxBasis::loadSolver(SLinSolver* p_solver)
 {
    METHOD( "SPxBasis::load()" );
+
+   std::cout << "== loadSolver == " << std::endl;
+
    factor = p_solver;
    factorized = false;
    factor->clear();
@@ -381,9 +388,10 @@ void SPxBasis::writeBasis(
 
 /*      \SubSection{Pivoting Methods}
  */
-int SPxBasis::doFactorize()
+#if 0
+int SPxBasis::needFactorize() const
 {
-   METHOD( "SPxBasis::doFactorize()" );
+   METHOD( "SPxBasis::needFactorize()" );
 
    if (!factorized)
       return true;
@@ -393,12 +401,49 @@ int SPxBasis::doFactorize()
 
    assert(updateCount > 0);
 
-   Real newFac = nzFac + factor->memory();
-   Real neu    = (newFac + lastFill * nzCount) / (updateCount + 1);
-   Real alt    = (nzFac + lastFill * nzCount) / updateCount;
+   Real neu    = (nzFac + factor->memory() + lastFill * nzCount) / (updateCount + 1);
+   Real alt    = (nzFac                    + lastFill * nzCount) /  updateCount;
 
+#if 0
+   if (updateCount >= maxUpdates || neu > alt)
+      std::cout << "== neccessary == " 
+                << " nzFac= " << nzFac
+                << " memory= " << factor->memory()
+                << " lastFill= " << lastFill
+                << " nzCount= " << nzCount
+                << " updateCount= " << updateCount
+                << " neu= " << neu
+                << " alt= " << alt
+                << std::endl;
+#endif
    return (updateCount >= maxUpdates || neu > alt);
 }
+#else
+
+int SPxBasis::needFactorize() const
+{
+   METHOD( "SPxBasis::needFactorize()" );
+
+   if (!factorized)
+      return true;
+
+   assert(nonzeroFactor > 0);
+   assert(updateCount > 0);
+
+#if 0
+   std::cout << "== neccessary == " 
+             << " nonzeroFactor= " << nonzeroFactor
+             << " memory= " << factor->memory()
+             << " nzCount= " << nzCount
+             << " updateCount= " << updateCount
+             << std::endl;
+#endif
+   if (factor->memory() > 5 * nzCount) // nonzeroFactor
+      return true;
+
+   return updateCount >= 100; //maxUpdates;
+}
+#endif
 
 void SPxBasis::change(
    int i,
@@ -414,7 +459,6 @@ void SPxBasis::change(
    lastidx = i;
    lastin = id;
 
-
    if (id.isValid() && i >= 0)
    {
       assert(enterVec != 0);
@@ -427,16 +471,16 @@ void SPxBasis::change(
       ++iterCount;
       ++updateCount;
       Real newFac = nzFac + factor->memory();
-      if (doFactorize())
+      if (needFactorize())
          factorize();
       else
       {
          // Real    s = factor->stability();
          factor->change(i, *enterVec, eta);
-         if (factor->status() != SLinSolver::OK
-              || factor->stability() < EPS)
+         if (factor->status() != SLinSolver::OK || factor->stability() < EPS)
          {
             // std::cout << s << " -> " << factor->stability() << '\t';
+            std::cout << "== change == " << std::endl;
             factorize();
          }
          else
@@ -450,6 +494,9 @@ void SPxBasis::change(
 void SPxBasis::factorize()
 {
    METHOD( "SPxBasis::factorize()" );
+
+   std::cout << "** factoring ** " << factorized << " " << updateCount << std::endl;
+
    assert(factor != 0);
 
    if (!matrixIsSetup)
@@ -459,7 +506,7 @@ void SPxBasis::factorize()
 
    updateCount = 0;
 
-   switch (factor->load(matrix.get_ptr(), matrix.size()))
+   switch(factor->load(matrix.get_ptr(), matrix.size()))
    {
    case SLinSolver::OK :
       if (status() == SINGULAR)

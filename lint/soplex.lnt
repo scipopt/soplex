@@ -1,4 +1,4 @@
-// $Id: soplex.lnt,v 1.7 2002/10/23 10:40:38 bzfkocht Exp $
+// $Id: soplex.lnt,v 1.8 2002/12/08 11:09:20 bzfkocht Exp $
 -passes(1)
 +cpp(.h,.cpp)
 // esoteric size settings to find erros.
@@ -18,6 +18,7 @@
 
 -i./lint/posix
 -i./lint/cpp
+-i./lib/include
 
 //  The following functions exhibit variable return modes.
 //  That is, they may equally-usefully be called for a value
@@ -31,7 +32,8 @@
 -esym(534,strncat,strncpy,unlink,write)
 
 -function(exit,__assertfail)
-
+-efile(766,./lint/posix/assert.h)
+-efile(766,spxdefines.h)
 -e506 // Constant value Boolean
 -e534 // Ignoring return value of function
 -e537 // Repeated include file
@@ -81,13 +83,10 @@
 -esym(1526,CLUFactor::operator=) // correctly not implemented
 -esym(1526,CLUFactor::CLUFactor) // correctly not implemented
 
-// slufactor.h
--esym(1526,SLUFactor::operator=) // correctly not implemented
--esym(1526,SLUFactor::SLUFactor) // correctly not implemented
-
 // soplex.h
 -esym(1526,SoPlex::operator=)    // correctly not implemented
 -esym(1526,SoPlex::SoPlex)       // correctly not implemented
+-esym(1762,SoPlex::basis)        // Member function could be made const
 
 // spxlpfread.cpp
 -esym(429,colnames);
@@ -95,6 +94,8 @@
 
 // spxlp.h
 -esym(219, Id::operator=) // no need to check.
+-esym(1762,SPxLP::rowset) // Member function could be made const
+-esym(1762,SPxLP::colset) // Member function could be made const
 
 // spxbasis.h
 -esym(1540, SPxBasis::factor) // no need to free.
@@ -109,11 +110,14 @@
 // datahashtable.h
 -efunc(414,DataHashTable*::add)   // no possible zero division
 -efunc(414,DataHashTable*::index) // no possible zero division
+-esym(1704,DataHashTable*::operator=)     // is private
+-esym(1704,DataHashTable*::DataHashTable) // is private 
 
 // nameset.h
 -esym(1554,Name::name) // direct pointer copy ok
 -esym(1526,NameSet::operator=)    // correctly not implemented
 -esym(1526,NameSet::NameSet)      // correctly not implemented
+-esym(1704,NameSet::NameSet)      // is private 
 
 // spxscaler.h
 -esym(1526,SPxScaler::operator=)    // correctly not implemented
@@ -126,8 +130,19 @@
 // idxset.h
 -esym(1704,IdxSet::IdxSet)) // Vector has no (private) default constructor
 
+// islist.h
+-esym(1764,list)  // Reference parameter could be declared const ref
+
+// idlist.h
+-esym(818,after)  // Pointer parameter could be declared as pointing to const
+
 // Temporary
 //-w2    // Only warnings and Errors
+-e777  // Testing floats for equality
+-e1704 // Constructor has private access specification
+-e1714 // Member function not referenced
+-e1716 // virtual member function not referenced
+-e1738 // non copy constructor used to initialize copy constructor
 -e1509 // base class destructor for class is not virtual
 -e1510 // base class has no destructor
 -e641  // Converting enum to int

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.53 2002/11/01 08:19:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.54 2002/12/08 11:09:21 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -175,21 +175,22 @@ public:
    enum Status
    {
 
-      ERROR       = -11, ///< an error occured.
-      NO_PRICER   = -10, ///< No pricer loaded
-      NO_SOLVER   = -9,  ///< No linear solver loaded
-      NOT_INIT    = -8,  ///< not initialised error
-      ABORT_TIME  = -7,  ///< #solve() aborted due to time limit.
-      ABORT_ITER  = -6,  ///< #solve() aborted due to iteration limit.
-      ABORT_VALUE = -5,  ///< #solve() aborted due to objective limit.
-      SINGULAR    = -4,  ///< Basis is singular, numerical troubles?
-      NO_PROBLEM  = -3,  ///< No Problem has been loaded.
-      REGULAR     = -2,  ///< LP has a usable Basis (maybe LP is changed).
-      RUNNING     = -1,  ///< algorithm is running
-      UNKNOWN     =  0,  ///< nothing known on loaded problem.
-      OPTIMAL     =  1,  ///< LP has been solved to optimality.
-      UNBOUNDED   =  2,  ///< LP has been proven to be primal unbounded.
-      INFEASIBLE  =  3   ///< LP has been proven to be primal infeasible.
+      ERROR          = -12, ///< an error occured.
+      NO_RATIOTESTER = -11, ///< No ratiotester loaded
+      NO_PRICER      = -10, ///< No pricer loaded
+      NO_SOLVER      = -9,  ///< No linear solver loaded
+      NOT_INIT       = -8,  ///< not initialised error
+      ABORT_TIME     = -7,  ///< #solve() aborted due to time limit.
+      ABORT_ITER     = -6,  ///< #solve() aborted due to iteration limit.
+      ABORT_VALUE    = -5,  ///< #solve() aborted due to objective limit.
+      SINGULAR       = -4,  ///< Basis is singular, numerical troubles?
+      NO_PROBLEM     = -3,  ///< No Problem has been loaded.
+      REGULAR        = -2,  ///< LP has a usable Basis (maybe LP is changed).
+      RUNNING        = -1,  ///< algorithm is running
+      UNKNOWN        =  0,  ///< nothing known on loaded problem.
+      OPTIMAL        =  1,  ///< LP has been solved to optimality.
+      UNBOUNDED      =  2,  ///< LP has been proven to be primal unbounded.
+      INFEASIBLE     =  3   ///< LP has been proven to be primal infeasible.
    };
    //@}
 
@@ -354,7 +355,7 @@ public:
 
    /// load LP from \p filename in MPS or LPF format.
    virtual bool readFile(const char* filename, NameSet* rowNames = 0,
-                         NameSet* colNames = 0, DIdxSet* intVars = 0);
+      NameSet* colNames = 0, DIdxSet* intVars = 0);
 
    /// dump loaded LP to \p filename in LPF format.
    virtual void dumpFile(const char* filename) const;
@@ -1223,11 +1224,11 @@ private:
    ///
    Real perturbMin(const UpdateVector& uvec,
       Vector& low, Vector& up, Real eps, Real delta,
-      const SPxBasis::Desc::Status* stat, int start, int incr);
+      const SPxBasis::Desc::Status* stat, int start, int incr) const;
    ///
    Real perturbMax(const UpdateVector& uvec,
       Vector& low, Vector& up, Real eps, Real delta,
-      const SPxBasis::Desc::Status* stat, int start, int incr);
+      const SPxBasis::Desc::Status* stat, int start, int incr) const;
    //@}
 
    /**@name The Simplex Loop
@@ -1475,7 +1476,7 @@ protected:
     *  primal Simplex algorithm of entering or leaving type.
     */
    //@{
-   void clearDualBounds(SPxBasis::Desc::Status, Real&, Real&);
+   void clearDualBounds(SPxBasis::Desc::Status, Real&, Real&) const;
 
    void setDualColBounds();
    void setDualRowBounds();

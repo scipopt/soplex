@@ -13,13 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxio.cpp,v 1.15 2002/05/15 13:38:44 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxio.cpp,v 1.16 2002/12/08 11:09:22 bzfkocht Exp $"
 
 
 //#define DEBUGGING 1
 
 #include <iostream>
-#include <stdio.h>
 #include <assert.h>
 
 #include "spxdefines.h"

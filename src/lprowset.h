@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.h,v 1.18 2002/10/23 10:40:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprowset.h,v 1.19 2002/12/08 11:09:21 bzfkocht Exp $"
 
 /**@file  lprowset.h
  * @brief Set of LP columns.
@@ -307,14 +307,14 @@ public:
    void remove(int perm[]);
 
    /// removes \p n #LPRow%s with row numbers given by \p nums.
-   void remove(int nums[], int n)
+   void remove(const int nums[], int n)
    {
       DataArray<int> perm(num());
       remove(nums, n, perm.get_ptr());
    }
    /// removes \p n #LPRow%s with row numbers given by \p nums, 
    /// and stores permutation of row indices in \p perm.
-   void remove(int nums[], int n, int* perm);
+   void remove(const int nums[], int n, int* perm);
 
    /// removes all #LPRow%s.
    void clear();

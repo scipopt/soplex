@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.26 2002/04/09 19:00:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.27 2002/12/08 11:09:22 bzfkocht Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.
@@ -191,12 +191,12 @@ static void readRows(
 
 /// Process COLUMNS section. 
 static void readCols(
-   MPSInput& mps,
-   LPRowSet& rset,
-   NameSet&  rnames,
-   LPColSet& cset,
-   NameSet&  cnames,
-   DIdxSet*  intvars)
+   MPSInput&       mps,
+   const LPRowSet& rset,
+   const NameSet&  rnames,
+   LPColSet&       cset,
+   NameSet&        cnames,
+   DIdxSet*        intvars)
 {
    Real     val;
    int      idx;
@@ -287,9 +287,9 @@ static void readCols(
 
 /// Process RHS section. 
 static void readRhs(
-   MPSInput& mps,
-   LPRowSet& rset,
-   NameSet&  rnames)
+   MPSInput&       mps,
+   LPRowSet&       rset,
+   const NameSet&  rnames)
 {
    char   rhsname[MPSInput::MAX_LINE_LEN] = { '\0' };
    int    idx;
@@ -361,9 +361,9 @@ static void readRhs(
 
 /// Process RANGES section. 
 static void readRanges(
-   MPSInput& mps,
-   LPRowSet& rset,
-   NameSet&  rnames)
+   MPSInput&       mps,
+   LPRowSet&       rset,
+   const NameSet&  rnames)
 {
    char   rngname[MPSInput::MAX_LINE_LEN] = { '\0' };
    int    idx;
@@ -468,10 +468,10 @@ static void readRanges(
 
 /// Process BOUNDS section. 
 static void readBounds(
-   MPSInput& mps,
-   LPColSet& cset,
-   NameSet&  cnames,
-   DIdxSet*  intvars)
+   MPSInput&       mps,
+   LPColSet&       cset,
+   const NameSet&  cnames,
+   DIdxSet*        intvars)
 {
    char   bndname[MPSInput::MAX_LINE_LEN] = { '\0' };
    int    idx;

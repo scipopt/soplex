@@ -13,53 +13,89 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultpr.h,v 1.11 2002/12/08 11:09:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfileio.cpp,v 1.1 2002/12/08 11:09:22 bzfkocht Exp $"
 
-/**@file  spxdefaultpr.h
- * @brief Default pricer.
- */
-#ifndef _SPXDEFAULTPR_H_
-#define _SPXDEFAULTPR_H_
+//#define DEBUGGING 1
 
 #include <assert.h>
+#include <iostream>
+#include <fstream>
 
-#include "spxpricer.h"
+#include "gzstream.h"
+#include "spxdefines.h"
+#include "soplex.h"
+
+#define USE_GZSTREAM  1
 
 namespace soplex
 {
 
-/**@brief   Default pricer.
-   @ingroup Algo
-
-   Class #SPxDefaultPR is an implementation class for #SPxPricer implementing
-   Dantzig's the default pricing strategy, i.e. maximal/minimal reduced cost or
-   maximal violated constraint.
-
-   See #SPxPricer for a class documentation.
-
-   @todo This should be renamed to something like Danzig or Textbook pricing.
-*/
-class SPxDefaultPR : public SPxPricer
+bool SoPlex::readBasisFile(
+   const char*    filename, 
+   const NameSet& rowNames,
+   const NameSet& colNames)
 {
-private:
-   ///
-   int selectLeaveX(int start, int incr) const;
-   ///
-   SPxId selectEnterX(int start1, int incr1, int start2, int incr2) const;
+   METHOD( "SoPlex::readBasisFile()" );
 
-public:
-   ///
-   virtual int selectLeave();
-   ///
-   virtual SPxId selectEnter();
+#if USE_GZSTREAM
+   gzstream::igzstream file(filename);
+#else
+   std::ifstream file(filename);
+#endif // USE_GZSTREAM
 
-   /// default constructor
-   SPxDefaultPR() 
-      : SPxPricer("Danzig")
-   {}   
-};
+   if (!file)
+      return false;
+ 
+   return readBasis(file, rowNames, colNames);
+}
+
+bool SoPlex::writeBasisFile(
+   const char*    filename, 
+   const NameSet& rowNames,
+   const NameSet& colNames)
+{
+   METHOD( "SoPlex::writeBasisFile()" );
+   std::ofstream file(filename);
+
+   if (!file)
+      return false;
+ 
+   writeBasis(file, rowNames, colNames);
+
+   return true;
+}
+
+
+bool SoPlex::readFile( 
+   const char* filename, 
+   NameSet*    rowNames,
+   NameSet*    colNames, 
+   DIdxSet*    intVars)
+{
+   METHOD( "SoPlex::readFile()" );
+
+#if USE_GZSTREAM
+   gzstream::igzstream file(filename);
+#else
+   std::ifstream file(filename);
+#endif // USE_GZSTREAM
+
+   if (!file)
+      return false;
+
+   return read(file, rowNames, colNames, intVars);
+}
+
+void SoPlex::dumpFile(const char* filename) const
+{
+   METHOD( "SoPlex::dumpFile()" );
+   std::ofstream file(filename);
+
+   if (file.good())
+      file << *this;
+}
+
 } // namespace soplex
-#endif // _SPXDEFAULTPRR_H_
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:

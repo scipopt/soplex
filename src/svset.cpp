@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.cpp,v 1.19 2002/03/11 11:41:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.cpp,v 1.20 2002/12/08 11:09:22 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -168,7 +168,7 @@ void SVSet::add2(SVector &svec, int n, const int idx[], const Real val[])
    svec.add(n, idx, val);
 }
 
-void SVSet::remove(DataKey removekey)
+void SVSet::remove(const DataKey& removekey)
 {
    DLPSV* ps = &set[removekey];
 
@@ -215,7 +215,7 @@ void SVSet::remove(int perm[])
    set.remove(perm);
 }
 
-void SVSet::remove(DataKey keys[], int n, int* perm)
+void SVSet::remove(const DataKey keys[], int n, int* perm)
 {
    for (int i = num() - 1; i >= 0; --i)
       perm[i] = i;
@@ -224,7 +224,7 @@ void SVSet::remove(DataKey keys[], int n, int* perm)
    remove(perm);
 }
 
-void SVSet::remove(int nums[], int n, int* perm)
+void SVSet::remove(const int nums[], int n, int* perm)
 {
    for (int i = num() - 1; i >= 0; --i)
       perm[i] = i;

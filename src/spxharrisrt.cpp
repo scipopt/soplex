@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.20 2002/10/23 10:40:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.21 2002/12/08 11:09:22 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -35,7 +35,7 @@ namespace soplex
   *       0 until numCycle >= 2 * maxCycle, after wich it becomes
   *       negative. This does not look ok.
   */
-Real SPxHarrisRT::degenerateEps()
+Real SPxHarrisRT::degenerateEps() const
 {
    return solver()->delta() 
       * (1.0 - solver()->numCycle() / solver()->maxCycle());
@@ -51,7 +51,7 @@ int SPxHarrisRT::maxDelta(
    const Real* low,             /* lower bounds for vec */
    const Real* up,              /* upper bounds for vec */
    Real delta,           /* allowed bound violation */
-   Real epsilon)         /* what is 0? */
+   Real epsilon)  const       /* what is 0? */
 {
    Real x;
    Real theval;
@@ -103,7 +103,7 @@ int SPxHarrisRT::minDelta(
    const Real* low,             /* lower bounds for vec */
    const Real* up,              /* upper bounds for vec */
    Real delta,           /* allowed bound violation */
-   Real epsilon)         /* what is 0? */
+   Real epsilon) const         /* what is 0? */
 {
    Real x;
    Real theval;
@@ -520,7 +520,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val)
                pvec[pnr] = solver()->vector(pnr) * cvec;
                if (solver()->isBasic(enterId))
                {
-                  pupd.setValue(pnr, 0);
+                  pupd.setValue(pnr, 0.0);
                   continue;
                }
                else

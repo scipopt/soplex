@@ -13,12 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprow.cpp,v 1.14 2002/03/11 17:43:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprow.cpp,v 1.15 2002/12/08 11:09:21 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
 #include <stdlib.h>
-#include <math.h>
 #include <assert.h>
 #include <iostream>
 

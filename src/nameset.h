@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.h,v 1.20 2002/10/23 10:40:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.h,v 1.21 2002/12/08 11:09:21 bzfkocht Exp $"
 
 /**@file  nameset.h
  * @brief Set of strings.
@@ -208,7 +208,7 @@ public:
    }
 
    /// does #NameSet has a name with #DataKey \p pkey ?
-   int has(DataKey pkey) const
+   int has(const DataKey& pkey) const
    {
       return set.has(pkey);
    }
@@ -231,7 +231,7 @@ public:
    /**@name Shrinking */
    //@{
    /// removes name with #DataKey \p key from #NameSet.
-   void remove(DataKey key);
+   void remove(const DataKey& key);
 
    /// removes \p pnum 'th name from #NameSet.
    void remove(int pnum)
@@ -243,10 +243,10 @@ public:
    void remove(const char* str);
 
    /// removes \p n names with #DataKey%s \p keys from #NameSet.
-   void remove(DataKey keys[], int n);
+   void remove(const DataKey keys[], int n);
 
    /// removes \p n names with numbers \p nums from #NameSet.
-   void remove(int nums[], int n);
+   void remove(const int nums[], int n);
 
    /// remove all entries where \p dstat is less than zero.
    void remove(int dstat[]);

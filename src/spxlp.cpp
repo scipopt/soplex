@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.cpp,v 1.18 2002/05/01 08:18:20 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.cpp,v 1.19 2002/12/08 11:09:22 bzfkocht Exp $"
 
 #include <stdio.h>
 
@@ -70,7 +70,7 @@ void SPxLP::getObj(Vector& p_obj) const
    METHOD( "SPxLP::getObj()" );
    p_obj = LPColSet::obj();
    if (spxSense() == MINIMIZE)
-      p_obj *= -1;
+      p_obj *= -1.0;
 }
 
 void SPxLP::doAddRow(const LPRow& row)
@@ -565,7 +565,7 @@ void SPxLP::changeObj(const Vector& newObj)
    METHOD( "SPxLP::changeObj()" );
    assert(maxObj().dim() == newObj.dim());
    LPColSet::obj() = newObj;
-   LPColSet::obj() *= spxSense();
+   LPColSet::obj() *= (double)spxSense();
    assert(isConsistent());
 }
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxshift.cpp,v 1.14 2002/05/15 13:38:44 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxshift.cpp,v 1.15 2002/12/08 11:09:22 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -134,15 +134,13 @@ void SoPlex::shiftPvec()
 #endif
 }
 
-void SoPlex::perturbMin
-(
+void SoPlex::perturbMin(
    const UpdateVector& uvec,
    Vector& p_low,
    Vector& p_up,
    Real eps,
    int start,
-   int incr
-)
+   int incr)
 {
    METHOD( "SoPlex::perturbMin()" );
    assert(uvec.dim() == p_low.dim());
@@ -210,7 +208,7 @@ void SoPlex::perturbMax(
    Vector& p_up,
    Real eps,
    int start,
-   int incr)
+   int incr) 
 {
    METHOD( "SoPlex::perturbMax()" );
    assert(uvec.dim() == p_low.dim());
@@ -296,7 +294,7 @@ Real SoPlex::perturbMin(
    Real p_delta,
    const SPxBasis::Desc::Status* stat,
    int start,
-   int incr)
+   int incr) const
 {
    METHOD( "SoPlex::perturbMin()" );
    assert(uvec.dim() == p_low.dim());
@@ -364,7 +362,7 @@ Real SoPlex::perturbMax(
    Real p_delta,
    const SPxBasis::Desc::Status* stat,
    int start,
-   int incr)
+   int incr) const
 {
    METHOD( "SoPlex::perturbMax()" );
    assert(uvec.dim() == p_low.dim());

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.cpp,v 1.16 2002/03/11 17:43:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprowset.cpp,v 1.17 2002/12/08 11:09:21 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -109,7 +109,7 @@ void LPRowSet::remove(int perm[])
    right.reDim(num());
 }
 
-void LPRowSet::remove(int nums[], int n, int* perm)
+void LPRowSet::remove(const int nums[], int n, int* perm)
 {
    SVSet::remove(nums, n, perm);
    int i;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.15 2002/04/14 12:41:54 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.16 2002/12/08 11:09:21 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -37,7 +37,7 @@ struct RowCnt
 /**todo Should be moved inside SPxAggregateSM. */
 struct Compare
 {
-   int operator()(RowCnt i1, RowCnt i2)
+   int operator()(const RowCnt& i1, const RowCnt& i2) const
    {
       return i1.size - i2.size;
    }

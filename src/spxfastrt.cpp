@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.21 2002/05/15 13:38:43 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.22 2002/12/08 11:09:22 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -93,7 +93,7 @@ int SPxFastRT::maxDelta(
    Vector& lowBound,
    Vector& upBound,
    int start,
-   int incr)
+   int incr) const
 {
    int i, sel;
    Real x, y, max;
@@ -226,7 +226,7 @@ int SPxFastRT::minDelta(
    Vector& lowBound,
    Vector& upBound,
    int start,
-   int incr)
+   int incr) const
 {
    int i, sel;
    Real x, y, max;
@@ -423,7 +423,7 @@ int SPxFastRT::minSelect(
    const Vector& lowBound,
    const Vector& upBound,
    int start,
-   int incr)
+   int incr) const
 {
    int i;
    Real x, y;
@@ -494,7 +494,7 @@ int SPxFastRT::maxSelect(
    const Vector& lowBound,
    const Vector& upBound,
    int start,
-   int incr)
+   int incr) const
 {
    int i;
    Real x, y;
@@ -870,8 +870,12 @@ int SPxFastRT::selectLeave(Real& val)
 /**@todo suspicious: max is not used, 
  *       but it looks like a used parameter in selectEnter()
  */
-int SPxFastRT::maxReenter(Real& sel, Real /*max*/, Real maxabs,
-                           SPxId id, int nr)
+int SPxFastRT::maxReenter(
+   Real& sel, 
+   Real /*max*/, 
+   Real maxabs,
+   const SPxId& id, 
+   int nr)
 {
    Real x, d;
    Vector* up;
@@ -963,8 +967,11 @@ int SPxFastRT::maxReenter(Real& sel, Real /*max*/, Real maxabs,
 /**@todo suspicious: max is not used, but it looks 
  *       like a used parameter in selectEnter()
  */
-int SPxFastRT::minReenter(Real& sel, Real /*max*/, Real maxabs,
-                           SPxId id, int nr)
+int SPxFastRT::minReenter(
+   Real& sel, Real /*max*/, 
+   Real maxabs,
+   const SPxId& id, 
+   int nr)
 {
    Real x, d;
    Vector* up;
@@ -1051,11 +1058,10 @@ int SPxFastRT::minReenter(Real& sel, Real /*max*/, Real maxabs,
 }
 
 int SPxFastRT::shortEnter(
-   SPxId& enterId,
+   const SPxId& enterId,
    int nr,
    Real max,
-   Real maxabs
-)
+   Real maxabs) const
 {
    if (thesolver->isCoId(enterId))
    {
@@ -1067,7 +1073,6 @@ int SPxFastRT::shortEnter(
       }
       return 1;
    }
-
    else if (thesolver->isId(enterId))
    {
       if (max != 0)

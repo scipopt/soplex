@@ -13,19 +13,19 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultpr.cpp,v 1.11 2002/03/21 16:06:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefaultpr.cpp,v 1.12 2002/12/08 11:09:21 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
 
-#define EQ_PREF 1000
+// #define EQ_PREF 1000 
 
 #include "spxdefines.h"
 #include "spxdefaultpr.h"
 
 namespace soplex
 {
-int SPxDefaultPR::selectLeaveX(int start, int incr)
+int SPxDefaultPR::selectLeaveX(int start, int incr) const
 {
    assert(thesolver != 0);
 
@@ -57,8 +57,7 @@ int SPxDefaultPR::selectLeave()
    return selectLeaveX(0, 1);
 }
 
-SPxId SPxDefaultPR::selectEnterX(int start1, int incr1,
-                                     int start2, int incr2)
+SPxId SPxDefaultPR::selectEnterX(int start1, int incr1, int start2, int incr2) const
 {
    assert(thesolver != 0);
 

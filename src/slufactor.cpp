@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.30 2002/11/25 16:51:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.31 2002/12/08 11:09:21 bzfkocht Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -42,22 +42,39 @@ namespace soplex
 void SLUFactor::solveRight(Vector& x, const Vector& b) //const
 {
    METHOD( "SLUFactor::solveRight()" );
+
+   solveTime.start();
+
    vec = b;
    CLUFactor::solveRight(x.get_ptr(), vec.get_ptr());
+
+   solveCount++;
+   solveTime.stop();
 }
 
 void SLUFactor::solveRight(SSVector& x, const SVector& b) //const
 {
    METHOD( "SLUFactor::solveRight()" );
+
+   solveTime.start();
+
    vec.assign(b);
    x.clear();
    CLUFactor::solveRight(x.altValues(), vec.get_ptr());
+
+   solveCount++;
+   solveTime.stop();
 }
 
 void SLUFactor::solveRight4update(SSVector& x, const SVector& b)
 {
    METHOD( "SLUFactor::solveRight4update()" );
-   int m, n, f;
+
+   solveTime.start();
+
+   int m;
+   int n;
+   int f;
 
    x.clear();
    ssvec = b;
@@ -82,6 +99,9 @@ void SLUFactor::solveRight4update(SSVector& x, const SVector& b)
       x.forceSetup();
    }
    usetup = true;
+
+   solveCount++;
+   solveTime.stop();
 }
 
 void SLUFactor::solve2right4update(
@@ -91,6 +111,8 @@ void SLUFactor::solve2right4update(
    SSVector&      rhs)
 {
    METHOD( "SLUFactor::solve2right4update()" );
+
+   solveTime.start();
 
    int  m;
    int  n;
@@ -127,21 +149,30 @@ void SLUFactor::solve2right4update(
       forest.setSize(f);
       forest.forceSetup();
    }
+   solveCount++;
+   solveTime.stop();
 }
 
 void SLUFactor::solveLeft(Vector& x, const Vector& b) //const
 {
    METHOD( "SLUFactor::solveLeft()" );
+
+   solveTime.start();
+
    vec = b;
    ///@todo Why is x.clear() here used and not with solveRight() ?
    x.clear();
    CLUFactor::solveLeft(x.get_ptr(), vec.get_ptr());
 
+   solveCount++;
+   solveTime.stop();
 }
 
 void SLUFactor::solveLeft(SSVector& x, const SVector& b) //const
 {
    METHOD( "SLUFactor::solveLeft()" );
+
+   solveTime.start();
 
    ssvec.assign(b);
 
@@ -160,6 +191,9 @@ void SLUFactor::solveLeft(SSVector& x, const SVector& b) //const
 
    ssvec.setSize(0);
    ssvec.forceSetup();
+
+   solveCount++;
+   solveTime.stop();
 }
 
 void SLUFactor::solveLeft(
@@ -169,6 +203,8 @@ void SLUFactor::solveLeft(
    SSVector&      rhs2) //const
 {
    METHOD( "SLUFactor::solveLeft()" );
+
+   solveTime.start();
 
    int   n;
    Real* svec = ssvec.altValues();
@@ -194,6 +230,9 @@ void SLUFactor::solveLeft(
    rhs2.forceSetup();
    ssvec.setSize(0);
    ssvec.forceSetup();
+
+   solveCount++;
+   solveTime.stop();
 }
 
 
@@ -624,6 +663,9 @@ SLUFactor::SLUFactor()
 
    SLUFactor::clear(); // clear() is virtual
 
+   factorCount = 0;
+   solveCount  = 0;
+
    assert(row.perm != 0);
    assert(row.orig != 0);
    assert(col.perm != 0);
@@ -647,6 +689,45 @@ SLUFactor::SLUFactor()
    assert(l.idx   != 0);
    assert(l.start != 0);
    assert(l.row   != 0);
+}
+
+SLUFactor::SLUFactor(const SLUFactor& old)
+   : SLinSolver( old )
+   , CLUFactor()
+   , vec (old.vec)
+   , ssvec (old.ssvec)
+   , eta (old.eta)
+   , forest(old.forest)
+{
+#ifndef NDEBUG
+   row.perm    = 0;
+   row.orig    = 0;
+   col.perm    = 0;
+   col.orig    = 0;
+   diag        = 0;
+   u.row.elem  = 0;
+   u.row.val   = 0;
+   u.row.idx   = 0;
+   u.row.start = 0;
+   u.row.len   = 0;
+   u.row.max   = 0;
+   u.col.elem  = 0;
+   u.col.idx   = 0;
+   u.col.start = 0;
+   u.col.len   = 0;
+   u.col.max   = 0;
+   l.val       = 0;
+   l.idx       = 0;
+   l.start     = 0;
+   l.row       = 0;
+   l.rval      = 0;
+   l.ridx      = 0;
+   l.rbeg      = 0;
+   l.rorig     = 0;
+   l.rperm     = 0;
+#endif
+
+   assign(old);
 }
 
 void SLUFactor::freeAll()

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.53 2002/11/26 14:03:08 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.54 2002/12/08 11:09:22 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -36,8 +36,9 @@ namespace soplex
 SoPlex::Status SoPlex::solve()
 {
    METHOD( "SoPlex::solve()" );
+
    SPxId enterId;
-   int leaveNum;
+   int   leaveNum;
 
    if (dim() <= 0 && coDim() <= 0) // no problem loaded
       return NO_PROBLEM;
@@ -45,6 +46,13 @@ SoPlex::Status SoPlex::solve()
    if (slinSolver() == 0) // linear system solver is required.
       return NO_SOLVER;
 
+   if (thepricer == 0) // pricer is required.
+      return NO_PRICER;
+
+   if (theratiotester == 0) // ratiotester is required.
+      return NO_RATIOTESTER;
+
+   // should the LP be simplified ?
    if (thesimplifier != 0)
    {
       thesimplifier->load(this);
@@ -61,14 +69,12 @@ SoPlex::Status SoPlex::solve()
          break;
       }
    }
+   // should the LP be scaled
    if (thescaler != 0)
    {
       thescaler->setLP(this);
       thescaler->scale();
    }
-   if (thepricer == 0) // pricer is required.
-      return NO_PRICER;
-
    theTime.reset();
    theTime.start();
 
@@ -90,7 +96,23 @@ SoPlex::Status SoPlex::solve()
       init();
    }
    thepricer->setEpsilon(delta());
-   setType(type());
+
+   //setType(type());
+
+   if (!matrixIsSetup)
+   {
+      std::cout << "== hallo!!!!!!!!!!!!!!!!!" << std::endl;
+      SPxBasis::load(this);
+   }
+   //std::cout << "== solveX ==" << std::endl;
+   //factorized = false;
+
+   assert(thepricer->solver()      == this);
+   assert(theratiotester->solver() == this);
+
+   // maybe this should be done in init() ?
+   thepricer->setType(type());
+   theratiotester->setType(type());
 
    VERBOSE3({
       std::cout << "starting value = " << value() << std::endl;
@@ -122,6 +144,7 @@ SoPlex::Status SoPlex::solve()
             enterId = thepricer->selectEnter();
             if (!enterId.isValid())
             {
+               std::cout << "== in solve ==" << std::endl;
                factorize();
                enterId = thepricer->selectEnter();
                if (!enterId.isValid())
@@ -168,6 +191,9 @@ SoPlex::Status SoPlex::solve()
                }
             }
             setType(LEAVE);
+            init();
+            thepricer->setType(type());
+            theratiotester->setType(type());
          }
       }
       else
@@ -186,6 +212,7 @@ SoPlex::Status SoPlex::solve()
             leaveNum = thepricer->selectLeave();
             if (leaveNum < 0)
             {
+               std::cout << "== in solve ==" << std::endl;
                factorize();
                leaveNum = thepricer->selectLeave();
                if (leaveNum < 0)
@@ -232,6 +259,9 @@ SoPlex::Status SoPlex::solve()
                }
             }
             setType(ENTER);
+            init();
+            thepricer->setType(type());
+            theratiotester->setType(type());
          }
       }
    }
@@ -432,8 +462,10 @@ bool SoPlex::terminate()
 #endif  // !NDEBUG
 
       if (updateCount > 1)
+      {
+         std::cout << "== terminate == " << std::endl;
          factorize();
-
+      }
       SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
       SPxBasis::solve (*theFvec, *theFrhs);
 
@@ -581,7 +613,7 @@ SoPlex::Status SoPlex::getDual (Vector& p_vector) const
    else
       p_vector = coPvec();
 
-   p_vector *= spxSense();
+   p_vector *= static_cast<double>(spxSense());
 
    return status();
 }
@@ -621,7 +653,7 @@ SoPlex::Status SoPlex::getRdCost (Vector& p_vector) const
       p_vector = maxObj();
       p_vector -= pVec();
       if (spxSense() == SPxLP::MINIMIZE)
-         p_vector *= -1;
+         p_vector *= -1.0;
    }
 
    return status();
@@ -682,7 +714,7 @@ SoPlex::Status SoPlex::status() const
 
    switch( m_status )
    {
-   case UNKNOWN:      
+   case UNKNOWN :      
       switch (SPxBasis::status())
       {
       case SPxBasis::NO_PROBLEM :
@@ -702,17 +734,18 @@ SoPlex::Status SoPlex::status() const
       default:
          return ERROR;
       }
-   case OPTIMAL:
+   case OPTIMAL :
       assert( SPxBasis::status() == SPxBasis::OPTIMAL );
       /*lint -fallthrough*/
-   case ABORT_TIME:
-   case ABORT_ITER:
-   case ABORT_VALUE:
-   case RUNNING:
-   case REGULAR:
-   case NOT_INIT:
-   case NO_SOLVER:
-   case NO_PRICER:
+   case ABORT_TIME :
+   case ABORT_ITER :
+   case ABORT_VALUE :
+   case RUNNING :
+   case REGULAR :
+   case NOT_INIT :
+   case NO_SOLVER :
+   case NO_PRICER :
+   case NO_RATIOTESTER :
    case ERROR:
       return m_status;
    default:

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clufactor.h,v 1.15 2002/11/25 16:51:58 bzfkocht Exp $"
+#pragma ident "@(#) $Id: clufactor.h,v 1.16 2002/12/08 11:09:20 bzfkocht Exp $"
 
 /**@file  clufactor.h
  * @brief Implementation of sparse LU factorization.
@@ -23,6 +23,7 @@
 
 #include "spxdefines.h"
 #include "slinsolver.h"
+#include "timer.h"
 #include "svector.h"
 
 #define WITH_L_ROWS 1
@@ -181,12 +182,16 @@ protected:
 
    Real*   work;              ///< Working array: must always be left as 0! 
 
+   Timer   factorTime;        ///< Time spend in factorizations
+   int     factorCount;       ///< Number of factorizations
+
 private:
    Temp    temp;              ///< Temporary storage
 
+
    // From solve.cpp
    ///
-   void solveUright(Real* wrk, Real* vec);
+   void solveUright(Real* wrk, Real* vec) const;
    ///
    int  solveUrightEps(Real* vec, int* nonz, Real eps, Real* rhs);
    ///
@@ -319,9 +324,8 @@ protected:
    /** Since there is no sense in constructing a CLUFactor object
     *  per se, this is protected.
     */
-   CLUFactor() {}
-
-public:
+   CLUFactor()
+   {}
    // From solve.cpp 
    ///
    void solveLright(Real* vec);

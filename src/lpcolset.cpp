@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcolset.cpp,v 1.11 2002/10/23 10:40:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpcolset.cpp,v 1.12 2002/12/08 11:09:21 bzfkocht Exp $"
 
 #include <assert.h>
 
@@ -120,7 +120,7 @@ void LPColSet::remove(int perm[])
    object.reDim(num());
 }
 
-void LPColSet::remove(int nums[], int n, int* perm)
+void LPColSet::remove(const int nums[], int n, int* perm)
 {
    SVSet::remove(nums, n, perm);
    int i;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.h,v 1.18 2002/10/23 10:40:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.h,v 1.19 2002/12/08 11:09:22 bzfkocht Exp $"
 
 /**@file  svset.h
  * @brief Set of sparse vectors.
@@ -111,11 +111,6 @@ private:
       DLPSV*& prev()
       {
          return theprev;
-      }
-      /// access to SVector
-      SVector& svector()
-      {
-         return *this; 
       }
       /// default constructor.
       DLPSV() : SVector()
@@ -255,7 +250,7 @@ public:
    //@{
    /// removes the vector with key \p removekey from the %set
    /** @pre \p removekey must be a key from SVSet */
-   void remove(DataKey removekey);
+   void remove(const DataKey& removekey);
 
    /// removes the vector with number \p removenum from the %set
    /** @pre \p removenum must be a valid vector number from SVSet */
@@ -266,7 +261,7 @@ public:
 
    /// remove one SVector from %set.
    /** @pre \p svec must be from SVSet */
-   void remove(SVector *svec)
+   void remove(const SVector *svec)
    {
       remove(key(svec));
    }
@@ -285,7 +280,7 @@ public:
    /** 
     * @pre  \p keys must be at least of size \p n and valid keys
     */
-   void remove(DataKey keys[], int n)
+   void remove(const DataKey keys[], int n)
    {
       DataArray < int > perm(num());
       remove(keys, n, perm.get_ptr());
@@ -295,14 +290,14 @@ public:
    /** 
     * @pre  \p nums must be at least of size \p n and valid vector numbers
     */
-   void remove(int nums[], int n)
+   void remove(const int nums[], int n)
    {
       DataArray < int > perm(num());
       remove(nums, n, perm.get_ptr());
    }
 
    ///
-   void remove(DataKey keys[], int n, int* perm);
+   void remove(const DataKey keys[], int n, int* perm);
 
    /// Remove \p n SVector%s from %set.
    /** 
@@ -312,7 +307,7 @@ public:
     * indicates, that the element to index \c i has been removed. Otherwise, \p perm[i]
     *  is the new index of the element with index \c i before the removal.
     */
-   void remove(int nums[], int n, int* perm);
+   void remove(const int nums[], int n, int* perm);
 
    /// remove all SVector%s from %set.
    void clear()

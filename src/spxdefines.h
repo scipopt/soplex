@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.11 2002/10/13 16:06:00 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.12 2002/12/08 11:09:22 bzfkocht Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
@@ -82,7 +82,7 @@ public:
       
       std::cout << s;
       
-      for(i = strlen(s) + s_indent; i < FILE_NAME_COL; i++)
+      for(i = strlen(s) + s_indent; i < FILE_NAME_COL - 8; i++)
          std::cout << "_";             
       std::cout << "[" << file << ":" << line << "]" << std::endl; 
       s_indent++;

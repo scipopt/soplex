@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.46 2002/11/23 08:05:54 bzfkocht Exp $
+# $Id: Makefile,v 1.47 2002/12/08 11:09:20 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -51,7 +51,7 @@ LIBOBJ		= 	changesoplex.o didxset.o \
 			spxbasis.o spxbounds.o spxchangebasis.o \
 			spxequilisc.o spxdefaultpr.o spxdefaultrt.o \
 			spxdefines.o spxdesc.o spxdevexpr.o \
-			spxfastrt.o spxgeneralsm.o \
+			spxfastrt.o spxfileio.o spxgeneralsm.o \
 			spxharrisrt.o spxhybridpr.o spxid.o spxio.o spxlp.o \
 			spxlpfread.o spxmpsread.o spxmpswrite.o \
 			spxparmultpr.o spxquality.o spxredundantsm.o \
@@ -61,7 +61,8 @@ LIBOBJ		= 	changesoplex.o didxset.o \
 			spxvectorst.o spxweightpr.o spxweightst.o \
 			ssvector.o svector.o \
 			svset.o timer.o unitvector.o update.o updatevector.o \
-			vector.o vsolve.o
+			vector.o vsolve.o \
+			gzstream.o
 
 OBJECT		=	example.o
 REPOSIT		=	# template repository, explicitly empty

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.h,v 1.14 2002/08/27 07:20:37 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.h,v 1.15 2002/12/08 11:09:22 bzfkocht Exp $"
 
 /**@file  spxharrisrt.h
  * @brief Harris pricing with shifting.
@@ -42,31 +42,31 @@ namespace soplex
 class SPxHarrisRT : public SPxRatioTester
 {
 private:
-   Real degenerateEps();
+   Real degenerateEps() const;
 
    int maxDelta(
-      Real* /*max*/,       ///< max abs value in upd
-      Real* val,           ///< initial and chosen value
-      int num,               ///< # of indices in idx
-      const int* idx,        ///< nonzero indices in upd
-      const Real* upd,     ///< update vector for vec
-      const Real* vec,     ///< current vector
-      const Real* low,     ///< lower bounds for vec
-      const Real* up,      ///< upper bounds for vec
-      Real delta,          ///< allowed bound violation
-      Real epsilon);       ///< what is 0?
+      Real* /*max*/,        ///< max abs value in upd
+      Real* val,            ///< initial and chosen value
+      int num,              ///< # of indices in idx
+      const int* idx,       ///< nonzero indices in upd
+      const Real* upd,      ///< update vector for vec
+      const Real* vec,      ///< current vector
+      const Real* low,      ///< lower bounds for vec
+      const Real* up,       ///< upper bounds for vec
+      Real delta,           ///< allowed bound violation
+      Real epsilon) const;  ///< what is 0?
 
    int minDelta(
-      Real* /*max*/,       ///< max abs value in upd
-      Real* val,           ///< initial and chosen value
-      int num,               ///< of indices in idx
-      const int* idx,        ///< nonzero indices in upd
-      const Real* upd,     ///< update vector for vec
-      const Real* vec,     ///< current vector
-      const Real* low,     ///< lower bounds for vec
-      const Real* up,      ///< upper bounds for vec
-      Real delta,          ///< allowed bound violation
-      Real epsilon);        ///< what is 0?
+      Real* /*max*/,        ///< max abs value in upd
+      Real* val,            ///< initial and chosen value
+      int num,              ///< of indices in idx
+      const int* idx,       ///< nonzero indices in upd
+      const Real* upd,      ///< update vector for vec
+      const Real* vec,      ///< current vector
+      const Real* low,      ///< lower bounds for vec
+      const Real* up,       ///< upper bounds for vec
+      Real delta,           ///< allowed bound violation
+      Real epsilon) const;  ///< what is 0?
 
 public:
    ///

@@ -1,5 +1,5 @@
-#--- $Id: make.linux.x86.intel.dbg,v 1.4 2002/02/01 17:33:52 bzfkocht Exp $
+#--- $Id: make.linux.x86.intel.dbg,v 1.5 2002/12/08 11:09:20 bzfkocht Exp $
 CXX	=	icc
 CXXFLAGS=	-g -mp -Xc -w2 -wd279,383,444,810,981
-LDFLAGS	=	-lm
+LDFLAGS	=	-lz -lm
 ARFLAGS	=	crs

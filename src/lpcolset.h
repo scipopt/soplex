@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcolset.h,v 1.16 2002/10/23 10:40:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpcolset.h,v 1.17 2002/12/08 11:09:21 bzfkocht Exp $"
 
 /**@file  lpcolset.h
  * @brief Set of LP columns.
@@ -300,13 +300,13 @@ public:
    void remove(int perm[]);
 
    /// removes #LPCol%s with numbers \p nums, where \p n is the length of the array \p nums
-   void remove(int nums[], int n)
+   void remove(const int nums[], int n)
    {
       DataArray < int > perm(num());
       remove(nums, n, perm.get_ptr());
    }
    /// removes #LPCol%s with numbers \p nums, where \p n is the length of the array \p nums, and stores the index permutation in array \p perm.
-   void remove(int nums[], int n, int* perm);
+   void remove(const int nums[], int n, int* perm);
 
    /// removes all #LPCol%s from the set.
    void clear();

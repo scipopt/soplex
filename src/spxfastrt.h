@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.h,v 1.11 2002/03/21 16:06:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfastrt.h,v 1.12 2002/12/08 11:09:22 bzfkocht Exp $"
 
 /**@file  spxfastrt.h
  * @brief Fast shifting ratio test.
@@ -68,7 +68,7 @@ private:
        loops are started at \p start and incremented by \p incr.
     */
    int maxDelta(Real& val, Real& p_abs, UpdateVector& upd,
-      Vector& low, Vector& up, int start, int incr);
+      Vector& low, Vector& up, int start, int incr) const;
    ///
    int maxDelta(Real& val, Real& p_abs);
    ///
@@ -83,11 +83,11 @@ private:
        loops are started at \p start and incremented by \p incr.
    */
    int minDelta(Real& val, Real& p_abs, UpdateVector& upd,
-      Vector& low, Vector& up, int start, int incr);
+      Vector& low, Vector& up, int start, int incr) const;
    
    ///
    int minDelta(Real& val, Real& p_abs,
-      UpdateVector& upd, Vector& low, Vector& up)
+      UpdateVector& upd, Vector& low, Vector& up) const
    {
       return minDelta(val, p_abs, upd, low, up, 0, 1);
    }
@@ -105,7 +105,7 @@ private:
    */
    int maxSelect(Real& val, Real& stab, Real& best, Real& bestDelta, 
       Real max, const UpdateVector& upd, const Vector& low, 
-      const Vector& up, int start = 0, int incr = 1);
+      const Vector& up, int start = 0, int incr = 1) const;
    ///
    int maxSelect(Real& val, Real& stab, Real& bestDelta, Real max);
    ///
@@ -121,7 +121,7 @@ private:
    */
    int minSelect(Real& val, Real& stab, Real& best, Real& bestDelta,
       Real max, const UpdateVector& upd, const Vector& low,
-      const Vector& up, int start = 0, int incr = 1);
+      const Vector& up, int start = 0, int incr = 1) const;
 
    int minSelect(Real& val, Real& stab,
       Real& bestDelta, Real max);
@@ -147,14 +147,12 @@ private:
    int maxShortLeave(Real& sel, int leave, Real /*max*/, Real p_abs);
 
    ///
-   int minReenter(Real& sel, Real /*max*/, Real maxabs,
-                          SPxId id, int nr);
+   int minReenter(Real& sel, Real /*max*/, Real maxabs, const SPxId& id, int nr);
    /// numerical stability check.
    /** Tests whether the selected enter \p id needs to be discarded (and do so)
        and the ratio test is to be recomputed.
    */
-   int maxReenter(Real& sel, Real /*max*/, Real maxabs,
-                          SPxId id, int nr);
+   int maxReenter(Real& sel, Real /*max*/, Real maxabs, const SPxId& id, int nr);
 
    /**@todo the documentation seems to be incorrect. 
             No parameter \p sel exists.
@@ -164,7 +162,7 @@ private:
        the selected enter
        pivot. In this case return the update value in \p sel.
    */
-   int shortEnter(SPxId& enterId, int nr, Real max, Real maxabs);
+   int shortEnter(const SPxId& enterId, int nr, Real max, Real maxabs) const;
 
 public:
    ///

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpswrite.cpp,v 1.5 2002/03/11 17:43:57 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpswrite.cpp,v 1.6 2002/12/08 11:09:22 bzfkocht Exp $"
 
 /**@file  spxmpswrite.cpp
  * @brief Write LP as MPS format file.
@@ -218,8 +218,8 @@ void SPxLP::writeMPS(
    i = 0;
    while(i < nRows())
    {
-      Real rhsval1;
-      Real rhsval2;
+      Real rhsval1 = 0.0;
+      Real rhsval2 = 0.0;
 
       for(; i < nRows(); i++)
          if ((rhsval1 = getRHS(lhs(i), rhs(i))) != 0.0)

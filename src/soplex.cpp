@@ -13,13 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.62 2002/11/26 14:03:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.63 2002/12/08 11:09:21 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
 #include <assert.h>
 #include <iostream>
-#include <fstream>
+//#include <fstream>
 
 #include "spxdefines.h"
 #include "soplex.h"
@@ -151,33 +151,30 @@ void SoPlex::setSimplifier(SPxSimplifier* x)
 void SoPlex::setType(Type tp)
 {
    METHOD( "SoPlex::setType()" );
-   if (isInitialized() && theType != tp)
-   {
-      theType = tp;
-      init();
-   }
-   else
+
+   if (theType != tp)
    {
       theType = tp;
 
+      unInit();
+#if 0
+      else
+      {
       if (!matrixIsSetup)
       {
          SPxBasis::load(this);
          // SPxBasis::load(desc());
          // not needed, because load(this) allready loads descriptor
       }
+      std::cout << "== settype == " << std::endl;
       factorized = false;
       m_numCycle = 0;
+#endif
+      DEBUG({ std::cout << "switching to " 
+                        << static_cast<const char*>((tp == LEAVE)
+                           ? "leaving" : "entering")
+                        << " algorithm" << std::endl; });
    }
-   if ((thepricer != 0) && (thepricer->solver() == this))
-      thepricer->setType(tp);
-   if ((theratiotester != 0) && (theratiotester->solver() == this))
-      theratiotester->setType(tp);
-
-   DEBUG({ std::cout << "switching to " 
-                     << static_cast<const char*>((tp == LEAVE)
-                                                 ? "leaving" : "entering")
-                     << " algorithm" << std::endl; });
 }
 
 void SoPlex::setRep(Representation p_rep)
@@ -364,6 +361,7 @@ void SoPlex::reDim()
    }
 }
 
+#if 0
 bool SoPlex::readBasisFile(
    const char*    filename, 
    const NameSet& rowNames,
@@ -418,6 +416,7 @@ void SoPlex::dumpFile(const char* filename) const
    if (file.good())
       file << *this;
 }
+#endif
 
 void SoPlex::clear()
 {
@@ -462,6 +461,7 @@ void SoPlex::clearUpdateVecs(void)
 void SoPlex::factorize()
 {
    METHOD( "SoPlex::factorize()" );
+
    SPxBasis::factorize();
 
    if (SPxBasis::status() >= SPxBasis::REGULAR)

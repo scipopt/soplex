@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxparmultpr.cpp,v 1.11 2002/03/21 16:06:19 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxparmultpr.cpp,v 1.12 2002/12/08 11:09:22 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -23,7 +23,7 @@
 
 namespace soplex
 {
-#define EQ_PREF 1000
+// #define EQ_PREF 1000
 
 int SPxParMultPR::partialSize = 17;
 

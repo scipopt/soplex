@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.37 2002/11/26 14:03:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.38 2002/12/08 11:09:21 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -1526,7 +1526,7 @@ void CLUFactor::factor(
 {
    METHOD( "CLUFactor::factor()" );
 
-   std::cout << "== factoring == " << std::endl;
+   factorTime.start();
 
    stat = SLinSolver::OK;
 
@@ -1567,6 +1567,8 @@ void CLUFactor::factor(
 #endif
       nzCnt = setupColVals();
    }
+   factorTime.stop();
+   factorCount++;
 
    /* temp.clear(); */
    /* assert(dump()); */

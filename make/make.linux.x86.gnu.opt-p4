@@ -1,0 +1,6 @@
+#--- $Id: make.linux.x86.gnu.opt-p4,v 1.1 2002/12/08 11:09:20 bzfkocht Exp $
+CXX	=	g++
+CPPFLAGS=	-Isrc -DNDEBUG
+CXXFLAGS=	-O3 -march=pentium4 -fno-exceptions -ffast-math
+LDFLAGS	=	-lz -lm # -static
+ARFLAGS	=	crs

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: changesoplex.cpp,v 1.18 2002/11/26 14:03:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: changesoplex.cpp,v 1.19 2002/12/08 11:09:20 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -670,8 +670,6 @@ void SoPlex::changeObj(int i, Real newVal)
     */
    unInit();
 }
-
-#define DEBUGGING 1
 
 static void changeLowerStatus(
    SPxBasis::Desc::Status& stat,

@@ -13,13 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vsolve.cpp,v 1.18 2002/11/25 16:51:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vsolve.cpp,v 1.19 2002/12/08 11:09:23 bzfkocht Exp $"
 
 #include <assert.h>
 
 #include "spxdefines.h"
 #include "clufactor.h"
-#include "cring.h"
 
 namespace soplex
 {

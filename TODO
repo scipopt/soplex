@@ -1,6 +1,10 @@
-$Id: TODO,v 1.66 2002/10/23 10:40:38 bzfkocht Exp $
+$Id: TODO,v 1.67 2002/12/08 11:09:20 bzfkocht Exp $
 
-neos4, neos5werden fälschlicherweise als infeasible gemeldet.
+simplifier sollten nicht unsimplify machen, sondern
+uncrush_x und uncrush_pi, das LP kann man sich auch merken.
+
+
+neos4, neos5 werden fälschlicherweise als infeasible gemeldet.
 
 spxdefines kommentieren.
 

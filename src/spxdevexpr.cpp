@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.15 2002/03/21 16:06:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.16 2002/12/08 11:09:22 bzfkocht Exp $"
 
 #include "spxdefines.h"
 #include "spxdevexpr.h"
@@ -108,7 +108,7 @@ void SPxDevexPR::left4(int n, SPxId id)
    left4X(n, id, 0, 1);
 }
 
-void SPxDevexPR::left4X(int n, SPxId id, int start, int incr)
+void SPxDevexPR::left4X(int n, const SPxId& id, int start, int incr)
 {
    if (id.isValid())
    {

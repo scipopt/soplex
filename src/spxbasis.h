@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.27 2002/11/25 16:51:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.28 2002/12/08 11:09:21 bzfkocht Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -282,9 +282,22 @@ public:
       Desc(const Desc& old)
          : rowstat(old.rowstat)
          , colstat(old.colstat)
-         , stat(old.stat)
-         , costat(old.costat)
-      {}
+      {
+         if (old.stat == &old.rowstat)
+         {
+            assert(old.costat == &old.colstat);
+
+            stat   = &rowstat;
+            costat = &colstat;
+         }
+         else
+         {
+            assert(old.costat == &old.rowstat);
+
+            stat   = &colstat;
+            costat = &rowstat;
+         }
+      }
       /// assignment operator
       Desc& operator=(const Desc& rhs)
       {
@@ -292,8 +305,21 @@ public:
          {
             rowstat = rhs.rowstat;
             colstat = rhs.colstat;
-            stat    = rhs.stat;
-            costat  = rhs.costat;
+
+            if (rhs.stat == &rhs.rowstat)
+            {
+               assert(rhs.costat == &rhs.colstat);
+
+               stat   = &rowstat;
+               costat = &colstat;
+            }
+            else
+            {
+               assert(rhs.costat == &rhs.rowstat);
+               
+               stat   = &colstat;
+               costat = &rowstat;
+            }
          }
          return *this;
       }
@@ -592,14 +618,14 @@ public:
    void removedRow(int i);
    /**@todo is this description correct? */
    /// inform #SPxBasis, that rows in \p perm with negative entry were removed.
-   void removedRows(int perm[]);
+   void removedRows(const int perm[]);
    /// inform #SPxBasis, that \p n new columns had been added.
    void addedCols(int n);
    /// inform #SPxBasis, that column \p i had been removed.
    void removedCol(int i);
    /**@todo is this description correct? */
    /// inform #SPxBasis, that columns in \p perm with negative entry were removed.
-   void removedCols(int perm[]);
+   void removedCols(const int perm[]);
    /// inform #SPxBasis, that a row had been changed.
    void changedRow(int);
    /// inform #SPxBasis, that a column had been changed.
@@ -718,7 +744,7 @@ protected:
    void reDim();
 
    /// refactorize basis instead of updating the factorization?
-   virtual int doFactorize();
+   virtual int needFactorize() const; 
 
    /// factorizes the basis matrix.
    virtual void factorize();

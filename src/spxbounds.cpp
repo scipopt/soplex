@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbounds.cpp,v 1.14 2002/10/23 10:40:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbounds.cpp,v 1.15 2002/12/08 11:09:21 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -84,12 +84,10 @@ void SoPlex::setPrimalBounds()
    this function clears the bounds according to |stat| by setting them to
    $\infty$ or $-\infty$, respectively.
  */
-void SoPlex::clearDualBounds
-(
+void SoPlex::clearDualBounds(
    SPxBasis::Desc::Status stat,
    Real& upp,
-   Real& lw
-)
+   Real& lw) const
 {
    METHOD( "SoPlex::clearDualBounds()" );
    switch (stat)

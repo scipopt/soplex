@@ -13,13 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: solve.cpp,v 1.18 2002/11/25 16:51:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: solve.cpp,v 1.19 2002/12/08 11:09:21 bzfkocht Exp $"
 
 #include <assert.h>
 
 #include "spxdefines.h"
 #include "clufactor.h"
-#include "cring.h"
 
 namespace soplex
 {
@@ -65,7 +64,7 @@ void CLUFactor::solveUright(Real* wrk, Real* vec)
 }
 #else
 
-void CLUFactor::solveUright(Real* wrk, Real* vec)
+void CLUFactor::solveUright(Real* wrk, Real* vec) const
 {
    METHOD( "CLUFactor::solveUright()" );
 
@@ -866,9 +865,8 @@ void CLUFactor::solveLleft(Real* vec)
    int*    lidx  = l.idx;
    int*    lrow  = l.row;
    int*    lbeg  = l.start;
-
-   i = l.firstUpdate - 1;
-   for (; i >= 0; --i)
+   
+   for (i = l.firstUpdate - 1; i >= 0; --i)
    {
       k = lbeg[i];
       val = &lval[k];
@@ -1035,7 +1033,8 @@ void CLUFactor::solveLeft(Real* vec, Real* rhs)
    else
    {
       solveUleft(vec, rhs);
-      solveLleftForest(vec, 0, 0);
+      //@todo is 0.0 the right value for eps here ?
+      solveLleftForest(vec, 0, 0.0);
       solveLleft(vec);
    }
 }
