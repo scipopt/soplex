@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.25 2002/04/03 10:15:45 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.26 2002/04/09 19:00:15 bzfkocht Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.
@@ -259,7 +259,7 @@ static void readCols(
       else 
       {
          if ((idx = rnames.number(mps.field2())) < 0)
-            mps.entryIgnored("Column", mps.field1(), mps.field2());
+            mps.entryIgnored("Column", mps.field1(), "row", mps.field2());
          else
             if (val != 0.0)
                vec.add(idx, val);
@@ -275,7 +275,7 @@ static void readCols(
          else 
          {
             if ((idx = rnames.number(mps.field4())) < 0)
-               mps.entryIgnored("Column", mps.field1(), mps.field4());
+               mps.entryIgnored("Column", mps.field1(), "row", mps.field4());
             else
                if (val != 0.0)
                   vec.add(idx, val);
@@ -326,7 +326,7 @@ static void readRhs(
       if (!strcmp(rhsname, mps.field1()))
       {
          if ((idx = rnames.number(mps.field2())) < 0)
-            mps.entryIgnored("RHS", mps.field1(), mps.field2());
+            mps.entryIgnored("RHS", mps.field1(), "row", mps.field2());
          else
          {
             val = atof(mps.field3());
@@ -342,7 +342,7 @@ static void readRhs(
       if (mps.field5() != 0)
       {
          if ((idx = rnames.number(mps.field4())) < 0)
-            mps.entryIgnored("RHS", mps.field1(), mps.field4());
+            mps.entryIgnored("RHS", mps.field1(), "row", mps.field4());
          else
          {
             val = atof(mps.field5());
@@ -407,7 +407,7 @@ static void readRanges(
       if (!strcmp(rngname, mps.field1()))
       {
          if ((idx = rnames.number(mps.field2())) < 0)
-            mps.entryIgnored("Range", mps.field1(), mps.field2());
+            mps.entryIgnored("Range", mps.field1(), "row", mps.field2());
          else
          {
             val = atof(mps.field3());
@@ -435,7 +435,7 @@ static void readRanges(
          if (mps.field5() != 0)
          {
             if ((idx = rnames.number(mps.field4())) < 0)
-               mps.entryIgnored("Range", mps.field1(), mps.field4());
+               mps.entryIgnored("Range", mps.field1(), "row", mps.field4());
             else
             {
                val = atof(mps.field5());
@@ -511,55 +511,60 @@ static void readBounds(
       if (*bndname == '\0')
          strcpy(bndname, mps.field2());
       
+      // Only read the first Bound in section
       if (!strcmp(bndname, mps.field2()))
       {
-         idx = cnames.number(mps.field3());         
-         val = (mps.field4() == 0) ? 0.0 : atof(mps.field4());
-
-         switch(*mps.field1())
+         if ((idx = cnames.number(mps.field3())) < 0)
+            mps.entryIgnored("column", mps.field3(), "bound", bndname);
+         else
          {
-         case 'L':
-            cset.lower(idx) = val;
+            val = (mps.field4() == 0) ? 0.0 : atof(mps.field4());
 
-            // ILOG extension (Integer Lower Bound)
-            if ((intvars != 0) && (mps.field1()[1] == 'I'))
-               intvars->addIdx(idx);
-            break;
-         case 'U':
-            cset.upper(idx) = val;
-
-            // ILOG extension (Integer Upper Bound)
-            if ((intvars != 0) && (mps.field1()[1] == 'I'))
-               intvars->addIdx(idx);
-            break;
-         case 'F':
-            if (mps.field1()[1] == 'X')
+            switch(*mps.field1())
             {
+            case 'L':
                cset.lower(idx) = val;
+               
+               // ILOG extension (Integer Lower Bound)
+               if ((intvars != 0) && (mps.field1()[1] == 'I'))
+                  intvars->addIdx(idx);
+               break;
+            case 'U':
                cset.upper(idx) = val;
-            }
-            else
-            {
+               
+               // ILOG extension (Integer Upper Bound)
+               if ((intvars != 0) && (mps.field1()[1] == 'I'))
+                  intvars->addIdx(idx);
+               break;
+            case 'F':
+               if (mps.field1()[1] == 'X')
+               {
+                  cset.lower(idx) = val;
+                  cset.upper(idx) = val;
+               }
+               else
+               {
+                  cset.lower(idx) = -infinity;
+                  cset.upper(idx) = infinity;
+               }
+               break;
+            case 'M':
                cset.lower(idx) = -infinity;
+               break;
+            case 'P':
                cset.upper(idx) = infinity;
+               break;
+            case 'B' : // Ilog extension (Binary)
+               cset.lower(idx) = 0.0;
+               cset.upper(idx) = 1.0;
+               
+               if (intvars != 0)
+                  intvars->addIdx(idx);
+               break;
+            default:
+               mps.syntaxError();
+               return;
             }
-            break;
-         case 'M':
-            cset.lower(idx) = -infinity;
-            break;
-         case 'P':
-            cset.upper(idx) = infinity;
-            break;
-         case 'B' : // Ilog extension (Binary)
-            cset.lower(idx) = 0.0;
-            cset.upper(idx) = 1.0;
-
-            if (intvars != 0)
-               intvars->addIdx(idx);
-            break;
-         default:
-            mps.syntaxError();
-            return;
          }
       }
    }

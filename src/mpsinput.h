@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: mpsinput.h,v 1.3 2002/01/31 16:30:46 bzfpfend Exp $"
+#pragma ident "@(#) $Id: mpsinput.h,v 1.4 2002/04/09 19:00:15 bzfkocht Exp $"
 
 /**@file  mpsinput.h
  * @brief Read MPS format files.
@@ -105,12 +105,12 @@ public:
    }
    void entryIgnored(
       const char* what, const char* what_name, 
-      const char* row_name)
+      const char* entity, const char* entity_name)
    {
       std::cerr << "Warning line " << m_lineno << ": "
                 << what << " \"" << what_name << "\"" 
-                << " for row \"" 
-                << row_name << "\" ignored" << std::endl;
+                << " for " << entity << " \"" 
+                << entity_name << "\" ignored" << std::endl;
    }
    bool readLine();
    void insertName(const char* name, bool second = false);

@@ -13,12 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: mpsinput.cpp,v 1.5 2002/03/03 13:50:32 bzfkocht Exp $"
+#pragma ident "@(#) $Id: mpsinput.cpp,v 1.6 2002/04/09 19:00:15 bzfkocht Exp $"
 
 /**@file  mpsinput.cpp
  * @brief Read MPS format files.
  */
-//#define DEBUGGING 1                   // Setting this generates a lot of output
+//#define DEBUGGING 1             // Setting this generates a lot of output
 
 #include <assert.h>
 #include <string.h>
@@ -28,8 +28,6 @@
 
 #define PATCH_CHAR    '_'
 #define BLANK         ' '
-
-
 
 namespace soplex
 { 
