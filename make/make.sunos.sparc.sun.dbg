@@ -1,7 +1,7 @@
-#--- $Id: make.sunos.sparc.sun.dbg,v 1.7 2003/01/15 17:26:05 bzfkocht Exp $
+#--- $Id: make.sunos.sparc.sun.dbg,v 1.8 2003/03/04 10:25:17 bzfkocht Exp $
 CXX	=	CC
 CPPFLAGS=	-Isrc -I/client/include -DWITH_ZLIB
-CXXFLAGS=	-g #+w
+CXXFLAGS=	-g +w2 -xcheck=stkovf
 LDFLAGS	=	-L/client/lib -lz -lm
 RANLIB	=	true
 AR	=	CC
