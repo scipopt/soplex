@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.cpp,v 1.4 2001/11/13 17:04:16 bzfbleya Exp $"
+#pragma ident "@(#) $Id: spxlp.cpp,v 1.5 2001/11/19 09:30:47 bzfkocht Exp $"
 
 
 /* \Section{Complex Methods}
@@ -28,13 +28,13 @@ namespace soplex
 
 const double SPxLP::infinity = 1e+100;
 
-
+#if 0
 void SPxLP::readLP(std::istream& in, NameSet* rowNames,
    NameSet* colNames, DIdxSet* intVars)
 {
    std::cout << "not yet implementet, sorry!" << std::endl; 
 }
-
+#endif
 //@ -----------------------------------------------------------------------------
 /*      \SubSection{Access}
  */
