@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.64 2003/01/15 19:38:24 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.65 2003/01/16 09:17:33 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -65,7 +65,7 @@ SPxSolver::Status SPxSolver::solve()
       if(SPxBasis::status() <= NO_PROBLEM)
           SPxBasis::load(this);
        */
-      /*@todo != REGULAR is not enough. Also OPTIMAL/DUAL/PRIMAL should
+      /**@todo != REGULAR is not enough. Also OPTIMAL/DUAL/PRIMAL should
        * be tested and acted accordingly.
        */
       if (thestarter != 0 && status() != REGULAR)  // no basis and no starter.
@@ -78,11 +78,8 @@ SPxSolver::Status SPxSolver::solve()
    //setType(type());
 
    if (!matrixIsSetup)
-   {
-      std::cout << "== hallo!!!!!!!!!!!!!!!!!" << std::endl;
       SPxBasis::load(this);
-   }
-   //std::cout << "== solveX ==" << std::endl;
+
    //factorized = false;
 
    assert(thepricer->solver()      == this);
@@ -165,7 +162,7 @@ SPxSolver::Status SPxSolver::solve()
                   else if (maxIters > 0 && lastUpdate() < 6)
                      break;
                }
-               std::cout << "== in solve == " << maxIters << " " << int(SPxBasis::status()) << std::endl;
+               VERBOSE3({ std::cout << "solve(enter) triggers refactorization" << std::endl; });
 
                // We better refactor to make sure the solution is ok.
                factorize();
@@ -282,7 +279,7 @@ SPxSolver::Status SPxSolver::solve()
                   else if (maxIters > 0 && lastUpdate() < 6)
                      break;
                }
-               std::cout << "== in solve == " << maxIters << " " << int(SPxBasis::status()) << std::endl;
+               VERBOSE3({ std::cout << "solve(leave) triggers refactorization" << std::endl; });
 
                // We better refactor to make sure the solution is ok.
                factorize();
@@ -537,7 +534,7 @@ bool SPxSolver::terminate()
 
       if (updateCount > 1)
       {
-         std::cout << "== terminate == " << std::endl;
+         VERBOSE3({ std::cout << "terminate triggers refactorization" << std::endl; });
          factorize();
       }
       SPxBasis::coSolve(*theCoPvec, *theCoPrhs);

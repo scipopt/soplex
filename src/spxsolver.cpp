@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.11 2003/01/15 17:26:08 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.12 2003/01/16 09:17:33 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -150,7 +150,6 @@ void SPxSolver::setType(Type tp)
          // SPxBasis::load(desc());
          // not needed, because load(this) allready loads descriptor
       }
-      std::cout << "== settype == " << std::endl;
       factorized = false;
       m_numCycle = 0;
 #endif
@@ -436,7 +435,7 @@ void SPxSolver::factorize()
    VERBOSE1({ std::cout << "ISOLVE01 " 
                         << std::setw(8) << basis().iteration() 
                         << std::setw(4) << basis().lastUpdate()
-                        << " " << value() 
+                        << " " << (isInitialized() ? value() : 0.0) 
                         << std::endl; });
 
    SPxBasis::factorize();

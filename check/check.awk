@@ -1,4 +1,4 @@
-# $Id: check.awk,v 1.18 2003/01/15 17:26:03 bzfkocht Exp $
+# $Id: check.awk,v 1.19 2003/01/16 09:17:32 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: check.awk                                                     *
@@ -23,11 +23,11 @@ function printviol(x)
       printf(" %.2e", abs(x));
 }
 BEGIN {
-    print "$Id: check.awk,v 1.18 2003/01/15 17:26:03 bzfkocht Exp $";
+    print "$Id: check.awk,v 1.19 2003/01/16 09:17:32 bzfkocht Exp $";
     print "";
-    line = "--------------------------------------------------------------------------------------------------------------------------------\n";
+    line = "-----------------------------------------------------------------------------------------------------------------------------\n";
     printf(line);
-    printf("Name         Rows   Cols Type   Iter     Time Objective                    maxVCons sumVCons maxVBoun sumVBoun maxVRedc sumVRedc\n");
+    printf("Name         Rows   Cols Type   Iter     Time Objective        relErr   maxVCons sumVCons maxVBoun sumVBoun maxVRedc sumVRedc\n");
 }
 /=opt=/          { sol[$2] = $3; }
 /=type=/         { type = $2; }
@@ -81,19 +81,20 @@ BEGIN {
                 abserr = abs(sol[name] - obj);
 
                 if (abs(sol[name]) >= 1e-5)
-                    relerr = abserr / abs(sol[name]) * 1000.0
+                    relerr = abserr / abs(sol[name]);
                 else
-                    relerr = 0.0;
+                    relerr = abserr;
 
-    	        if ((abserr < 1e-4) || (relerr < 0.01))
+    	        if ((abserr < 1e-4) || (relerr < 1e-5))
 		{
-		   printf("ok            ");
+		   printf("ok %.2e", relerr);
 		   pass[type]++;
+                   relerrsum[type] += relerr;
 		   passes++;
 		}
 		else
 		{
-		   printf("error %.2e", abserr);
+		   printf("XX %.2e", abserr);
 		   fail[type]++;
 		   fails++;
 		}
@@ -116,9 +117,9 @@ BEGIN {
 	       else
 	       {
 		  if (infeas && sol[name] != "infeasible")
-		     printf("error %e\n", abs(sol[name]));
+		     printf("XX %.2e\n", abs(sol[name]));
 		  else
-		     printf("error infeasible\n");
+		     printf("XX infeasible\n");
 		  
 		  fail[type]++;
 		  fails++;
@@ -142,12 +143,13 @@ BEGIN {
 END {
     print "";
     printf(line);
-    printf("Alg            Cnt  Pass  Fail       Time                                  maxVCons sumVCons maxVBoun sumVBoun maxVRedc sumVRedc\n");
+    printf("Alg            Cnt  Pass  Fail       Time                      relErr   maxVCons sumVCons maxVBoun sumVBoun maxVRedc sumVRedc\n");
     printf(line);
     for(i in sum)
     {
-        printf("%-12s %5d %5d %5d %10.2f                                 ",
+        printf("%-12s %5d %5d %5d %10.2f                     ",
 	   i, cnt[i], pass[i], fail[i], sum[i]);
+        printviol(relerrsum[i]);
 	printviol(cvmax[i]);
 	printviol(cvsum[i]);
 	printviol(bvmax[i]);
@@ -156,6 +158,7 @@ END {
 	printviol(rcsum[i]);
 	print "";
 
+	relerrsumsum += relerrsum[i];
 	cvmaxsum += cvmax[i];
 	cvsumsum += cvsum[i];
 	bvmaxsum += bvmax[i];
@@ -164,9 +167,10 @@ END {
 	rcsumsum += rcsum[i];
     }
     printf(line);
-    printf("%-12s %5d %5d %5d %10.2f                                 ",
+    printf("%-12s %5d %5d %5d %10.2f                     ",
        "Sum", counts, passes, fails, times);
 
+    printviol(relerrsumsum);
     printviol(cvmaxsum);
     printviol(cvsumsum);
     printviol(bvmaxsum);

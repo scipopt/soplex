@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.25 2003/01/13 19:04:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.26 2003/01/16 09:17:33 bzfkocht Exp $"
 
 // #define DEBUGGING 1
 
@@ -937,13 +937,15 @@ bool SPxSolver::enter(SPxId& enterId)
 
       if (lastUpdate() > 1)
       {
-         std::cout << "== enter == " << std::endl;
+         VERBOSE3({ std::cout << "IENTER01 factorization triggered in enter() for feasibility test" << std::endl; });
          factorize();
          return enter(enterId);
       }
 
       SPxId none;
       change(-1, none, 0);
+
+      VERBOSE3({ std::cout << "IENTER02 unboundness/infeasiblity found in enter()" << std::endl; });
 
       if (rep() != COLUMN)
          setBasisStatus(SPxBasis::INFEASIBLE);

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.18 2003/01/05 19:03:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.19 2003/01/16 09:17:33 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -41,7 +41,7 @@ void SPxBasis::reDim()
 
    if (theLP->dim() != matrix.size())
    {
-      std::cout << "== reDim ==" << std::endl;
+      VERBOSE3({ std::cout << "basis redimensioning invalidates factorization" << std::endl; });
 
       matrix.reSize (theLP->dim());
       theBaseId.reSize(theLP->dim());
@@ -123,8 +123,6 @@ void SPxBasis::removedRow(int i)
    assert(status() >  NO_PROBLEM);
    assert(theLP    != 0);
 
-   std::cout << "== removedRow ==" << std::endl;
-
    if (theLP->rep() == SPxSolver::ROW)
    {
       if (theLP->isBasic(thedesc.rowStatus(i)))
@@ -173,8 +171,6 @@ void SPxBasis::removedRows(const int perm[])
 
    int i;
    int n = thedesc.nRows();
-
-   std::cout << "== removedRows ==" << std::endl;
 
    if (theLP->rep() == SPxSolver::ROW)
    {
@@ -318,8 +314,6 @@ void SPxBasis::removedCol(int i)
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
 
-   std::cout << "== removedCol ==" << std::endl;
-
    if (theLP->rep() == SPxSolver::COLUMN)
    {
       if (theLP->isBasic(thedesc.colStatus(i)))
@@ -358,8 +352,6 @@ void SPxBasis::removedCols(const int perm[])
    METHOD( "SPxBasis::removedCols()" );
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
-
-   std::cout << "== removedCols ==" << std::endl;
 
    int i;
    int n = thedesc.nCols();
@@ -406,7 +398,7 @@ void SPxBasis::invalidate()
 {
    METHOD( "SPxBasis::invalidate()" );
 
-   std::cout << "== invalidate ==" << std::endl;
+   VERBOSE3({ std::cout << "explicit invalidation of factorization" << std::endl; });
 
    factorized    = false;
    matrixIsSetup = false;
