@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.22 2002/01/19 18:59:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.23 2002/01/21 11:28:14 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -80,7 +80,7 @@ SoPlex::Status SoPlex::solve()
       if(SPxBasis::status() <= NO_PROBLEM)
           SPxBasis::load(this);
        */
-      if (thestarter != 0)                         // no basis and no starter.
+      if (thestarter != 0 && status() != REGULAR)  // no basis and no starter.
          thestarter->generate(*this);              // generate start basis.
       init();
    }
@@ -224,7 +224,7 @@ SoPlex::Status SoPlex::solve()
    theTime.stop();
 
    if (m_status == RUNNING)
-      m_status = REGULAR;
+      m_status = ERROR;
 
    return status();
 }
@@ -541,7 +541,7 @@ SoPlex::Status SoPlex::status() const
 {
    switch( m_status )
    {
-   case REGULAR:      
+   case UNKNOWN:      
    case OPTIMAL:
       switch (SPxBasis::status())
       {
@@ -552,7 +552,7 @@ SoPlex::Status SoPlex::status() const
       case SPxBasis::REGULAR :
       case SPxBasis::DUAL :
       case SPxBasis::PRIMAL :
-         return REGULAR;
+         return UNKNOWN;
       case SPxBasis::OPTIMAL :
          return OPTIMAL;
       case SPxBasis::UNBOUNDED :
@@ -567,6 +567,7 @@ SoPlex::Status SoPlex::status() const
    case ABORT_VALUE :
    case RUNNING :
    case CHANGED :
+   case ERROR :
       return m_status;
    default:
       return ERROR;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.37 2002/01/19 18:59:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.38 2002/01/21 11:28:13 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -761,7 +761,7 @@ SoPlex::SoPlex(Type p_type, Representation p_rep,
    , maxIters (-1)
    , maxTime (infinity)
    , maxValue(infinity)
-   , m_status(REGULAR)
+   , m_status(UNKNOWN)
    , theShift (0)
    , m_maxCycle(100)
    , m_numCycle(0)

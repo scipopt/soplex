@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.29 2002/01/19 18:59:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.30 2002/01/21 11:28:13 bzfkocht Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -171,20 +171,23 @@ public:
       BASIC          ///< variable is basic.
    };
 
+   /**@todo In spxchange and at loadbasis, change the status to
+            if (m_status > 0) m_status = REGULAR;
+     */
    enum Status
    {
+      ERROR       = -8,  ///< an error occured.
       ABORT_TIME  = -7,  ///< #solve() aborted due to time limit.
       ABORT_ITER  = -6,  ///< #solve() aborted due to iteration limit.
       ABORT_VALUE = -5,  ///< #solve() aborted due to objective limit.
-      ERROR       = -4,  ///< an error occured.
-      RUNNING     = -3,  ///< algorithm is running
-      NO_PROBLEM  = -2,  ///< No Problem has been loaded.
-      SINGULAR    = -1,  ///< Basis is singular, numerical troubles?
-      REGULAR     = 0,   ///< nothing known on loaded problem.
-      OPTIMAL     = 1,   ///< LP has been solved to optimality.
-      UNBOUNDED   = 2,   ///< LP has been proven to be unbounded.
-      INFEASIBLE  = 3,   ///< LP has been proven to be infeasible.
-      CHANGED     = 4    ///< LP has been changed.
+      SINGULAR    = -4,  ///< Basis is singular, numerical troubles?
+      NO_PROBLEM  = -3,  ///< No Problem has been loaded.
+      REGULAR     = -2,  ///< LP has a usable Basis (maybe LP is changed).
+      RUNNING     = -1,  ///< algorithm is running
+      UNKNOWN     =  0,  ///< nothing known on loaded problem.
+      OPTIMAL     =  1,  ///< LP has been solved to optimality.
+      UNBOUNDED   =  2,  ///< LP has been proven to be unbounded.
+      INFEASIBLE  =  3   ///< LP has been proven to be infeasible.
    };
    //@}
 
@@ -194,13 +197,13 @@ private:
    Representation therep;      ///< row or column representation.
    Timer          theTime;
    int            maxIters;    ///< maximum allowed iterations.
-   Real         maxTime;     ///< maximum allowed time.
-   Real         maxValue;    ///< maximum allowed objective value.
+   Real           maxTime;     ///< maximum allowed time.
+   Real           maxValue;    ///< maximum allowed objective value.
    Status         m_status;    ///< status of algorithm.
 
-   Real         thedelta;
-   Real         theShift;    ///< shift of r/lhs or objective.
-   Real         lastShift;   ///< for forcing feasibility.
+   Real           thedelta;
+   Real           theShift;    ///< shift of r/lhs or objective.
+   Real           lastShift;   ///< for forcing feasibility.
    int            m_maxCycle;  ///< maximum steps before cycling is detected.
    int            m_numCycle;  ///< actual number of degenerate steps so far.
    bool           initialized; ///< true, if all vectors are setup.
@@ -210,7 +213,7 @@ private:
    Vector*        coSolveVector2;    ///< when 2 systems are to solve at a time
    SSVector*      coSolveVector2rhs; ///< when 2 systems are to solve at a time
 
-   Real         cacheProductFactor;
+   Real           cacheProductFactor;
 
 protected:
    Array < UnitVector > unitVecs; ///< array of unit vectors
@@ -262,8 +265,8 @@ protected:
    DVector        theCoTest;
    DVector        theTest;
 
-   int            leaveCount;     ///< number of LEAVE iterations
-   int            enterCount;     ///< number of ENTER iterations
+   int             leaveCount;    ///< number of LEAVE iterations
+   int             enterCount;    ///< number of ENTER iterations
 
    SPxPricer*      thepricer;
    SPxRatioTester* theratiotester;
