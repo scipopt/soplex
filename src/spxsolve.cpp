@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.38 2002/02/04 15:34:09 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.39 2002/02/07 17:39:48 bzfpfend Exp $"
 
 //#define DEBUG 1
 
@@ -123,8 +123,8 @@ SoPlex::Status SoPlex::solve()
       {
          VERBOSE3({
             std::cerr << "Enter iteration: " << iteration()
-                      << "\tValue = " << value()
-                      << "\tShift = " << shift() << std::endl;
+                      << ", Value = " << value()
+                      << ", Shift = " << shift() << std::endl;
          });
 
          do
@@ -144,12 +144,12 @@ SoPlex::Status SoPlex::solve()
 
          VERBOSE3({
             std::cerr << "Enter finished. iteration: " << iteration() 
-                      << " value: " << value()
-                      << " shift: " << shift()
-                      << " epsilon: " << epsilon()
-                      << " stop: " << stop
-                      << " basis status: " << int(SPxBasis::status())
-                      << " solver status: " << int(m_status) << std::endl;
+                      << ", value: " << value()
+                      << ", shift: " << shift()
+                      << ", epsilon: " << epsilon()
+                      << ", stop: " << stop
+                      << ", basis status: " << int(SPxBasis::status())
+                      << ", solver status: " << int(m_status) << std::endl;
          });
 
          if (!stop)
@@ -161,8 +161,8 @@ SoPlex::Status SoPlex::solve()
 
                VERBOSE3({
                   std::cerr << "maxInfeas: " << maxInfeas()
-                            << " shift: " << shift()
-                            << " delta: " << delta() << std::endl;
+                            << ", shift: " << shift()
+                            << ", delta: " << delta() << std::endl;
                });
 
                if (maxInfeas() + shift() <= delta())
@@ -181,8 +181,8 @@ SoPlex::Status SoPlex::solve()
 
          VERBOSE3({
             std::cerr << "Leave Iteration: " << iteration()
-                      << "\tValue = " << value()
-                      << "\tShift = " << shift() << std::endl;
+                      << ", Value = " << value()
+                      << ", Shift = " << shift() << std::endl;
          });
 
          do
@@ -202,12 +202,12 @@ SoPlex::Status SoPlex::solve()
 
          VERBOSE3({
             std::cerr << "Leave finished. iteration: " << iteration() 
-                      << " value: " << value()
-                      << " shift: " << shift()
-                      << " epsilon: " << epsilon()
-                      << " stop: " << stop
-                      << " basis status: " << int(SPxBasis::status())
-                      << " solver status: " << int(m_status) << std::endl;
+                      << ", value: " << value()
+                      << ", shift: " << shift()
+                      << ", epsilon: " << epsilon()
+                      << ", stop: " << stop
+                      << ", basis status: " << int(SPxBasis::status())
+                      << ", solver status: " << int(m_status) << std::endl;
          });
 
          if (!stop)
@@ -219,8 +219,8 @@ SoPlex::Status SoPlex::solve()
 
                VERBOSE3({
                   std::cerr << "maxInfeas: " << maxInfeas()
-                            << " shift: " << shift()
-                            << " delta: " << delta() << std::endl;
+                            << ", shift: " << shift()
+                            << ", delta: " << delta() << std::endl;
                });
 
                if (maxInfeas() + shift() <= delta())
@@ -241,11 +241,11 @@ SoPlex::Status SoPlex::solve()
 
    VERBOSE1({
       std::cout << "Finished solving (status=" << int(status());
-      std::cout << " Iters=" << iterCount
-                << " leave=" << leaveCount
-                << " enter=" << enterCount;
+      std::cout << ", iters=" << iterCount
+                << ", leave=" << leaveCount
+                << ", enter=" << enterCount;
       if( status() == OPTIMAL )
-         std::cout << " objValue=" << value();
+         std::cout << ", objValue=" << value();
       std::cout << ")" << std::endl;
    });
 
@@ -255,7 +255,9 @@ SoPlex::Status SoPlex::solve()
    // ??? restore old basis
    if( status() != OPTIMAL )
    {
+#ifndef NDEBUG
       std::cout << "SoPlex::solve(): Restoring old basis (TODO!)" << std::endl;
+#endif
       setBasis( oldbasis_rows, oldbasis_cols );
    }
    delete[] oldbasis_rows;
@@ -623,12 +625,12 @@ SoPlex::Status SoPlex::status() const
    case OPTIMAL:
       assert( SPxBasis::status() == SPxBasis::OPTIMAL );
       /*lint -fallthrough*/
-   case ABORT_TIME :
-   case ABORT_ITER :
-   case ABORT_VALUE :
-   case RUNNING :
-   case REGULAR :
-   case ERROR :
+   case ABORT_TIME:
+   case ABORT_ITER:
+   case ABORT_VALUE:
+   case RUNNING:
+   case REGULAR:
+   case ERROR:
       return m_status;
    default:
       return ERROR;

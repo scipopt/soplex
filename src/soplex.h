@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.36 2002/02/04 15:34:09 bzfpfend Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.37 2002/02/07 17:39:47 bzfpfend Exp $"
 
 /**@file  soplex.h
  * @brief Sequential Objectoriented simPlex
@@ -387,8 +387,8 @@ public:
     */
    virtual Status solve();
 
-   /// #Status of basis.
-   virtual Status status() const;
+   /// #Status of solution process.
+   Status status() const;
 
    /// current objective value.
    /**@return Objective value of the current solution vector 
@@ -825,13 +825,13 @@ public:
     */
    //@{
    /// #Status of \p i 'th variable.
-   SPxBasis::Desc::Status status(int i) const
+   SPxBasis::Desc::Status varStatus(int i) const
    {
       return desc().status(i);
    }
 
    /// #Status of \p i 'th covariable.
-   SPxBasis::Desc::Status coStatus(int i) const
+   SPxBasis::Desc::Status covarStatus(int i) const
    {
       return desc().coStatus(i);
    }

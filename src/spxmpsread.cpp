@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.19 2002/01/31 22:36:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.20 2002/02/07 17:39:48 bzfpfend Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.
@@ -525,14 +525,14 @@ static void readBounds(
 
             // ILOG extension (Integer Lower Bound)
             if ((intvars != 0) && (mps.field1()[1] == 'I'))
-               intvars->add(idx);
+               intvars->addIdx(idx);
             break;
          case 'U':
             cset.upper(idx) = val;
 
             // ILOG extension (Integer Upper Bound)
             if ((intvars != 0) && (mps.field1()[1] == 'I'))
-               intvars->add(idx);
+               intvars->addIdx(idx);
             break;
          case 'F':
             if (mps.field1()[1] == 'X')
@@ -557,7 +557,7 @@ static void readBounds(
             cset.upper(idx) = 1.0;
 
             if (intvars != 0)
-               intvars->add(idx);
+               intvars->addIdx(idx);
             break;
          default:
             mps.syntaxError();
