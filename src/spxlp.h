@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.18 2002/01/19 18:59:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.19 2002/01/22 16:48:38 bzfkocht Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -384,12 +384,6 @@ public:
    /// gets objective vector.
    void getObj(Vector& obj) const;
 
-   /// returns objective vector.
-   const Vector& obj() const
-   {
-      return LPColSet::obj();
-   }
-
    /// returns objective value of column \p i.
    Real obj(int i) const
    {
@@ -424,7 +418,8 @@ public:
       return LPColSet::obj(i);
    }
 
-   /// returns objective value of column with identifier \p id for maximization problem.
+   /// returns objective value of column with identifier \p id 
+   /// for maximization problem.
    Real maxObj(SPxColId& id) const
    {
       return LPColSet::obj(id);
@@ -854,6 +849,14 @@ private:
    void doAddCol (const LPCol& col);
    void doAddCols(const LPColSet& set);
 
+   /// This should return spxSense() * maxObj;
+   /// returns objective vector.
+   const Vector& obj() const;
+#if 0
+   {
+      return LPColSet::obj();
+   }
+#endif
 
 public:
    /**@name Constructors / Destructors */

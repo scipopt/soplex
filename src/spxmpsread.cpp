@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.14 2002/01/22 14:20:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.15 2002/01/22 16:48:39 bzfkocht Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.
@@ -246,8 +246,7 @@ static void readCols(
             if (intvars != 0)
                intvars->addIdx(cnames.number(colname));
 
-            // For Integer variable the default bounds are 0/1 according
-            // to the ILOG documentation. 
+            // For Integer variable the default bounds are 0/1 
             col.setUpper(1.0);
          }
       }
@@ -329,8 +328,10 @@ static void readRhs(
          {
             val = atof(mps.field3());
 
+            // LE or EQ
             if (rset.rhs(idx) < SPxLP::infinity)
                rset.rhs(idx) = val;
+            // GE or EQ
             if (rset.lhs(idx) > -SPxLP::infinity)
                rset.lhs(idx) = val;
          }
@@ -343,8 +344,10 @@ static void readRhs(
          {
             val = atof(mps.field5());
          
+            // LE or EQ
             if (rset.rhs(idx) < SPxLP::infinity)
                rset.rhs(idx) = val;
+            // GE or EQ
             if (rset.lhs(idx) > -SPxLP::infinity)
                rset.lhs(idx) = val;
          }
@@ -387,7 +390,16 @@ static void readRanges(
 
       if (*rngname == '\0')
          strcpy(rngname, mps.field1());
-      
+
+      /* The rules are:
+       * Row Sign   LHS             RHS
+       * ----------------------------------------
+       *  G   +/-   rhs             rhs + |range|
+       *  L   +/-   rhs - |range|   rhs
+       *  E   +     rhs             rhs + range
+       *  E   -     rhs + range     rhs 
+       * ----------------------------------------
+       */  
       if (!strcmp(rngname, mps.field1()))
       {
          if ((idx = rnames.number(mps.field2())) < 0)
@@ -396,17 +408,24 @@ static void readRanges(
          {
             val = atof(mps.field3());
 
-            if (val >= 0)
+            // EQ
+            if (  (rset.lhs(idx) > -SPxLP::infinity) 
+               && (rset.rhs(idx) <  SPxLP::infinity))
             {
-               if (rset.lhs(idx) > -SPxLP::infinity)
-                  rset.rhs(idx) = rset.lhs(idx) + val;
+               assert(rset.lhs(idx) == rset.rhs(idx));
+
+               if (val >= 0)
+                  rset.rhs(idx) += val;
                else
-                  rset.lhs(idx) = rset.rhs(idx) - val;
+                  rset.lhs(idx) += val;
             }
             else
             {
-               assert(rset.rhs(idx) == rset.lhs(idx));
-               rset.lhs(idx) += val;
+               // GE 
+               if (rset.lhs(idx) > -SPxLP::infinity)
+                  rset.rhs(idx)  = rset.lhs(idx) + fabs(val);
+               else // LE
+                  rset.lhs(idx)  = rset.rhs(idx) - fabs(val);
             }
          }
          if (mps.field5() != 0)
@@ -417,17 +436,24 @@ static void readRanges(
             {
                val = atof(mps.field5());
 
-               if (val >= 0)
+               // EQ
+               if (  (rset.lhs(idx) > -SPxLP::infinity) 
+                  && (rset.rhs(idx) <  SPxLP::infinity))
                {
-                  if (rset.lhs(idx) > -SPxLP::infinity)
-                     rset.rhs(idx) = rset.lhs(idx) + val;
+                  assert(rset.lhs(idx) == rset.rhs(idx));
+
+                  if (val >= 0)
+                     rset.rhs(idx) += val;
                   else
-                     rset.lhs(idx) = rset.rhs(idx) - val;
+                     rset.lhs(idx) += val;
                }
                else
                {
-                  assert(rset.rhs(idx) == rset.lhs(idx));
-                  rset.lhs(idx) += val;
+                  // GE 
+                  if (rset.lhs(idx) > -SPxLP::infinity)
+                     rset.rhs(idx)  = rset.lhs(idx) + fabs(val);
+                  else // LE
+                     rset.lhs(idx)  = rset.rhs(idx) - fabs(val);
                }
             }
          }
