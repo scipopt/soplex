@@ -7,7 +7,9 @@
         http://www.zib.de/Optimization/Software/Soplex/html/index.html
 
 	you can also generate it, if you have doxgen installed by 
-        typing 'gmake doc'. It will then be in doc/html/index.html
+        typing 'make doc'. It will then be in doc/html/index.html.
+        On some systems, it might be necessary to use 'gmake' instead
+        of 'make'.
 
 2.	Compiling
 
@@ -15,17 +17,17 @@
 
         For the impatient:
 
-	On systems with GNU g++   :  gmake COMP=gnu OPT=opt
-	Linux/x86 with Intel C++  :  gmake COMP=intel OPT=opt
-        Linux/AXP with Compaq C++ :  gmake COMP=compaq OPT=opt
-        Solaris with SUN Forte C++:  gmake COMP=sun OPT=opt
-        IRIX with SGI Mips Pro C++:  gmake COMP=sgi OPT=opt
-	HP-UX with HP aCC         :  gmake COMP=hp OPT=opt
-        AIX with VisualAge C++    :  gmake COMP=ibm OPT=opt
+	On systems with GNU g++   :  make COMP=gnu OPT=opt
+	Linux/x86 with Intel C++  :  make COMP=intel OPT=opt
+        Linux/AXP with Compaq C++ :  make COMP=compaq OPT=opt
+        Solaris with SUN Forte C++:  make COMP=sun OPT=opt
+        IRIX with SGI Mips Pro C++:  make COMP=sgi OPT=opt
+	HP-UX with HP aCC         :  make COMP=hp OPT=opt
+        AIX with VisualAge C++    :  make COMP=ibm OPT=opt
 
         Then get and unpack in the check directory the Netlib testset from 
         http://www.zib.de/Optimization/Software/Soplex/netlib.tgz
-        and say gmake COMP=<as before> OPT=<as before> quick
+        and say make COMP=<as before> OPT=<as before> check
         This should report no fails.
 
         Now read the documentation!
