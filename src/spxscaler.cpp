@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscaler.cpp,v 1.8 2003/01/15 17:26:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscaler.cpp,v 1.9 2005/06/21 12:45:13 bzfhille Exp $"
 
 /**@file  spxscaler.cpp
  * @brief LP scaling base class.
@@ -288,8 +288,8 @@ Real SPxScaler::maxAbsRowscale() const
 }
 
 /** \f$\max_{j\in\mbox{ cols}}
- *   \(\frac{\max_{i\in\mbox{ rows}}|a_ij|}
- *          {\min_{i\in\mbox{ rows}}|a_ij|\)\f$
+ *   \left(\frac{\max_{i\in\mbox{ rows}}|a_ij|}
+ *              {\min_{i\in\mbox{ rows}}|a_ij|}\right)\f$
  */
 Real SPxScaler::maxColRatio(const SPxLP& lp) const
 {
@@ -321,8 +321,8 @@ Real SPxScaler::maxColRatio(const SPxLP& lp) const
 }
 
 /** \f$\max_{i\in\mbox{ rows}}
- *   \(\frac{\max_{j\in\mbox{ cols}}|a_ij|}
- *          {\min_{j\in\mbox{ cols}}|a_ij|\)\f$
+ *   \left(\frac{\max_{j\in\mbox{ cols}}|a_ij|}
+ *              {\min_{j\in\mbox{ cols}}|a_ij|}\right)\f$
  */
 Real SPxScaler::maxRowRatio(const SPxLP& lp) const
 {
