@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeometsc.cpp,v 1.8 2005/01/06 19:51:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeometsc.cpp,v 1.9 2005/07/12 13:41:18 bzfkocht Exp $"
 
 /**@file  spxgeometsc.cpp
  * @brief Geometric mean row/column scaling.
@@ -29,7 +29,8 @@ static const char* makename(bool colFirst)
    return colFirst ? "CR-Geometric" : "RC-Geometric";
 }
 
-/**@param maxIters   arbitrary small number, we choose 8
+/**@param colFirst   first scale columns or rows?
+   @param maxIters   arbitrary small number, we choose 8
    @param minImpr    Bixby said Fourer said in MP 23, 274 ff. that 0.9 is a good value.
    @param goodEnough if the max/min ratio is allready less then 1000/1 we do not scale.
 */ 

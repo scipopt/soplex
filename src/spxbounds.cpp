@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbounds.cpp,v 1.19 2003/01/15 17:26:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbounds.cpp,v 1.20 2005/07/12 13:41:17 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 
@@ -76,7 +76,7 @@ void SPxSolver::setPrimalBounds()
  
    Given possible upper and lower bounds to a dual variable with |Status stat|,
    this function clears the bounds according to |stat| by setting them to
-   \f$\infty\f$ or \$-\infty\f$, respectively.
+   \f$\infty\f$ or \f$-\infty\f$, respectively.
  */
 void SPxSolver::clearDualBounds(
    SPxBasis::Desc::Status stat,

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.46 2005/01/12 12:00:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.47 2005/07/12 13:41:18 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -31,7 +31,7 @@
 /* The manual says the maximum allowed line length is 255 characters,
  * but CPLEX does not complain, if the lines are longer.
  */
-#define MAX_LINE_LEN  8192       ///< maximum length of a line (8190 + \n + \0)
+#define MAX_LINE_LEN  8192       ///< maximum length of a line (8190 + \\n + \\0)
 
 namespace soplex
 {

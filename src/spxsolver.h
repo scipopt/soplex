@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.18 2005/03/11 11:43:34 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.19 2005/07/12 13:41:18 bzfkocht Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -44,7 +44,7 @@ class SPxStarter;
    #SPxSolver is an LP solver class using the revised Simplex algorithm. It
    provids two basis representations, namely a column basis and a row basis
    (see #Representation). For both representations, a primal and
-   dual algorithm is available (see \Ref{Type}).
+   dual algorithm is available (see \ref #Type).
  
    In addition, #SPxSolver can be custumized with various respects:
    - pricing algorithms using #SPxPricer
@@ -411,7 +411,7 @@ public:
     *
     *  @warning Because #SPxSolver supports range constraints as its
     *     default, slack variables are defined in a nonstandard way:
-    *     Let \i x be the current solution vector and \i A the constraint
+    *     Let \em x be the current solution vector and \em A the constraint
     *     matrix. Then the vector of slack variables is defined as
     *     \f$s = Ax\f$.
     */
@@ -444,15 +444,15 @@ public:
    virtual Status getDual (Vector& vector) const;
 
    /// get vector of reduced costs.
-   /** This method returns the \Ref{Status} of the basis.
+   /** This method returns the \ref #Status of the basis.
     *  If it is #REGULAR or better,
     *  the vector of reduced costs of the current basis will be copied
     *  to the argument \p vector. Hence, \p vector must be of dimension
     *  #nCols().
     *
-    *  Let \i d denote the vector of dual variables, as defined above,
-    *  and \i A the LPs constraint matrix. Then the reduced cost vector
-    *  \i r is defined as \f$r^T = c^T - d^TA\f$.
+    *  Let \em d denote the vector of dual variables, as defined above,
+    *  and \em A the LPs constraint matrix. Then the reduced cost vector
+    *  \em r is defined as \f$r^T = c^T - d^TA\f$.
     */
    virtual Status getRedCost (Vector& vector) const;
 
@@ -892,7 +892,7 @@ public:
    /// right-hand side vector for #fVec.
    /** The feasibility vector is computed by solving a linear system with the
     *  basis matrix. The right-hand side vector of this system is referred 
-    *  to as \em feasibility \em, right-hand \em side \em vector #fRhs().
+    *  to as \em feasibility, \em right-hand \em side \em vector #fRhs().
     *
     *  For a row basis, #fRhs() is the objective vector (ignoring shifts).
     *  For a column basis, it is the sum of all nonbasic vectors scaled by

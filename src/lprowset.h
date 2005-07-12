@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.h,v 1.20 2003/01/12 13:09:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprowset.h,v 1.21 2005/07/12 13:41:17 bzfkocht Exp $"
 
 /**@file  lprowset.h
  * @brief Set of LP columns.
@@ -102,7 +102,7 @@ public:
    {
       return left[number(k)];
    }
-   /// returns the #lhs of the #LPRow with #DataKey \k in #LPRowSet.
+   /// returns the #lhs of the #LPRow with #DataKey \p k in #LPRowSet.
    Real& lhs(const DataKey& k)
    {
       return left[number(k)];
@@ -135,7 +135,7 @@ public:
    {
       return right[number(k)];
    }
-   /// returns the #rhs of the #LPRow with #DataKey \k in #LPRowSet.
+   /// returns the #rhs of the #LPRow with #DataKey \p k in #LPRowSet.
    Real& rhs(const DataKey& k)
    {
       return right[number(k)];
@@ -297,7 +297,7 @@ public:
 
 
    /**@name Shrinking
-       See \Ref{DataSet} for a description of the renumbering of the remaining
+       See \ref #DataSet for a description of the renumbering of the remaining
        #LPRow#s in a #LPRowSet# after the call of a removal method.
     */
    //@{
@@ -334,7 +334,7 @@ public:
        #LPRowSet.
     */
    //@{
-   /// reallocates memory to be able to store \newmax #LPRow%s.
+   /// reallocates memory to be able to store \p newmax #LPRow%s.
    void reMax(int newmax = 0)
    {
       SVSet::reMax(newmax);
@@ -354,7 +354,7 @@ public:
       return SVSet::memMax();
    }
 
-   /// reallocates memory to be able to store \newmax nonzeros.
+   /// reallocates memory to be able to store \p newmax nonzeros.
    void memRemax(int newmax)
    {
       SVSet::memRemax(newmax);

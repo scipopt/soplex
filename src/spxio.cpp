@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxio.cpp,v 1.18 2003/11/23 08:58:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxio.cpp,v 1.19 2005/07/12 13:41:18 bzfkocht Exp $"
 
 
 //#define DEBUGGING 1
@@ -34,7 +34,8 @@
 
 namespace soplex
 {
-/**@param rowNames contains after the call the names of the constraints 
+/**@param is       input stream. 
+ * @param rowNames contains after the call the names of the constraints 
  *                 (rows) in the same order as the rows in the LP.
  *                 Constraints without a name (only possible with LPF 
  *                 files) are automatically assigned a name.

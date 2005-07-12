@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataarray.h,v 1.20 2002/03/03 13:50:31 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataarray.h,v 1.21 2005/07/12 13:41:17 bzfkocht Exp $"
 
 /**@file  dataarray.h
  * @brief Save arrays of data objects.
@@ -302,7 +302,7 @@ public:
 
        @param p_size number of unitialised elements.
        @param p_max  maximum number of elements the array can hold.
-       @param p_fax  value for memFactor.
+       @param p_fac  value for memFactor.
     */
    explicit DataArray(int p_size = 0, int p_max = 0, Real p_fac = 1.2)
       : data (0)
