@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxout.h,v 1.1 2005/07/13 14:18:50 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxout.h,v 1.2 2005/07/13 19:04:15 bzforlow Exp $"
 
 /**@file  spxout.h
  * @brief Wrapper for different output streams and verbosity levels.
@@ -75,9 +75,9 @@ public:
       // If you change this, change the implementation as well.
       ERROR    = 0, 
       WARNING  = 1,
-      INFO1    = 2,
-      INFO2    = 3,
-      INFO3    = 4,
+      VERBOSE1 = 2,
+      VERBOSE2 = 3,
+      VERBOSE3 = 4,
       DEBUG    = 5
    } 
    Verbosity;
@@ -99,7 +99,7 @@ public:
       , m_streams( new std::ostream*[ DEBUG+1 ] )
    {
       m_streams[ ERROR ] = m_streams[ WARNING ] = &std::cerr;
-      for ( int i = INFO1; i <= DEBUG; ++i )
+      for ( int i = VERBOSE1; i <= DEBUG; ++i )
          m_streams[ i ] = &std::cout;
    }
    /// destructor
