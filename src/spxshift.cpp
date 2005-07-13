@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxshift.cpp,v 1.16 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxshift.cpp,v 1.17 2005/07/13 19:05:33 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -22,6 +22,7 @@
 
 #include "spxdefines.h"
 #include "spxsolver.h"
+#include "spxout.h"
 
 namespace soplex
 {
@@ -60,7 +61,7 @@ void SPxSolver::shiftFvec()
 
 #ifndef NDEBUG
    testBounds();
-   DEBUG( std::cout << "shiftFvec: OK" << std::endl; );
+   DEBUG( s_spxout << "shiftFvec: OK" << std::endl; );
 #endif
 }
 
@@ -130,7 +131,7 @@ void SPxSolver::shiftPvec()
 
 #ifndef NDEBUG
    testBounds();
-   DEBUG( std::cout << "shiftPvec: OK" << std::endl; );
+   DEBUG( s_spxout << "shiftPvec: OK" << std::endl; );
 #endif
 }
 
@@ -269,20 +270,20 @@ void SPxSolver::perturbMax(
 void SPxSolver::perturbMinEnter(void)
 {
    METHOD( "SPxSolver::perturbMinEnter()" );
-   DEBUG( std::cout << iteration() << ": perturbing " << shift(); );
+   DEBUG( s_spxout << iteration() << ": perturbing " << shift(); );
    fVec().delta().setup();
    perturbMin(fVec(), lbBound(), ubBound(), epsilon());
-   DEBUG( std::cout << "\t->" << shift() << std::endl; );
+   DEBUG( s_spxout << "\t->" << shift() << std::endl; );
 }
 
 
 void SPxSolver::perturbMaxEnter(void)
 {
    METHOD( "SPxSolver::perturbMaxEnter()" );
-   DEBUG( std::cout << iteration() << ": perturbing " << shift(); );
+   DEBUG( s_spxout << iteration() << ": perturbing " << shift(); );
    fVec().delta().setup();
    perturbMax(fVec(), lbBound(), ubBound(), epsilon());
-   DEBUG( std::cout << "\t->" << shift() << std::endl; );
+   DEBUG( s_spxout << "\t->" << shift() << std::endl; );
 }
 
 
@@ -426,35 +427,35 @@ Real SPxSolver::perturbMax(
 void SPxSolver::perturbMinLeave(void)
 {
    METHOD( "SPxSolver::perturbMinLeave()" );
-   DEBUG( std::cout << iteration() << ": perturbing " << shift(); );
+   DEBUG( s_spxout << iteration() << ": perturbing " << shift(); );
    pVec().delta().setup();
    coPvec().delta().setup();
    theShift += perturbMin(pVec(), lpBound(), upBound(), epsilon(), delta(),
       desc().status(), 0, 1);
    theShift += perturbMin(coPvec(), lcBound(), ucBound(), epsilon(), delta(),
       desc().coStatus(), 0, 1);
-   DEBUG( std::cout << "\t->" << shift() << std::endl; );
+   DEBUG( s_spxout << "\t->" << shift() << std::endl; );
 }
 
 
 void SPxSolver::perturbMaxLeave(void)
 {
    METHOD( "SPxSolver::perturbMaxLeave()" );
-   DEBUG( std::cout << iteration() << ": perturbing " << shift(); );
+   DEBUG( s_spxout << iteration() << ": perturbing " << shift(); );
    pVec().delta().setup();
    coPvec().delta().setup();
    theShift += perturbMax(pVec(), lpBound(), upBound(), epsilon(), delta(),
       desc().status(), 0, 1);
    theShift += perturbMax(coPvec(), lcBound(), ucBound(), epsilon(), delta(),
       desc().coStatus(), 0, 1);
-   DEBUG( std::cout << "\t->" << shift() << std::endl; );
+   DEBUG( s_spxout << "\t->" << shift() << std::endl; );
 }
 
 
 void SPxSolver::unShift(void)
 {
    METHOD( "SPxSolver::unShift()" );
-   VERBOSE3( std::cout << "unshifting ..." << std::endl; );
+   VERBOSE3( s_spxout << "unshifting ..." << std::endl; );
 
    if (isInitialized())
    {

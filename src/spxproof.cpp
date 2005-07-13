@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxproof.cpp,v 1.5 2005/01/06 17:12:09 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxproof.cpp,v 1.6 2005/07/13 19:05:33 bzforlow Exp $"
 
 /**@file  spxproof.cpp
  * @brief provable bounds
@@ -69,10 +69,10 @@ Real SPxSolver::provedBound(Vector& dualsol, const Vector& objvec) const
       Easyval y(dualsol[i]);
 
       ytb += y*b;
-      DEBUG( std::cout << "y[" << i << "] = " << dualsol[i]
-         << ", lhs[" << i << "] = " << lhsvec[i]
-         << ", rhs[" << i << "] = " << rhsvec[i]
-         << " -> ytb = " << ytb << std::endl; );
+      DEBUG( s_spxout << "y[" << i << "] = " << dualsol[i]
+                      << ", lhs[" << i << "] = " << lhsvec[i]
+                      << ", rhs[" << i << "] = " << rhsvec[i]
+                      << " -> ytb = " << ytb << std::endl; );
    }
 
    /* 2. calculate min/max{(c^T - y^TA)x} */
@@ -85,7 +85,7 @@ Real SPxSolver::provedBound(Vector& dualsol, const Vector& objvec) const
       getCol(j, col);
       SVector colvec = col.colVector();  /* make this faster !!! */
       Easyval diff = objvec[j];
-      DEBUG( std::cout << "obj[" << j << "] = " << objvec[j]
+      DEBUG( s_spxout << "obj[" << j << "] = " << objvec[j]
          << " -> diff = " << diff << std::endl; );
 
       for( int i = 0; i < colvec.size(); ++i )
@@ -93,21 +93,24 @@ Real SPxSolver::provedBound(Vector& dualsol, const Vector& objvec) const
          Easyval y(dualsol[colvec.index(i)]);
          Easyval a(colvec.value(i));
          diff -= y*a;
-         DEBUG( std::cout << "y[" << colvec.index(i) << "] = " << dualsol[colvec.index(i)]
-            << ", a[" << colvec.index(i) << "] = "
-            << colvec.value(i)
-            << " -> diff = " << diff << std::endl; );
+         DEBUG( s_spxout << "y[" << colvec.index(i) << "] = " 
+                         << dualsol[colvec.index(i)]
+                         << ", a[" << colvec.index(i) << "] = "
+                         << colvec.value(i)
+                         << " -> diff = " << diff << std::endl; );
       }
 
       diff *= x;
       scalprod += diff;
-      DEBUG( std::cout << "x[" << j << "] = " << x << " -> diff = " << diff << std::endl
-         << "   ------------> scalprod = " << scalprod << std::endl; );
+      DEBUG( s_spxout << "x[" << j << "] = " << x 
+                      << " -> diff = " << diff << std::endl
+                      << "   ------------> scalprod = " 
+                      << scalprod << std::endl; );
    }
 
    /* add y^Tb */
    scalprod += ytb;
-   VERBOSE1( std::cout << "proved bound = " << scalprod << std::endl; );
+   VERBOSE1( s_spxout << "proved bound = " << scalprod << std::endl; );
 
    /* depending on the objective sense, choose min or max */
    if( spxSense() == MINIMIZE )

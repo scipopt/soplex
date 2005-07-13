@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.38 2005/03/11 11:43:33 bzfpfend Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.39 2005/07/13 19:05:31 bzforlow Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -30,6 +30,7 @@
 #include "slufactor.h"
 #include "cring.h"
 #include "spxalloc.h"
+#include "spxout.h"
 
 #ifdef DEBUGGING
 #include <stdio.h>
@@ -308,8 +309,8 @@ SLUFactor::Status SLUFactor::change(
    }
    usetup = false;
 
-   DEBUG({ std::cout << "\tupdated\t\tstability = " << stability()
-                     << std::endl; });
+   DEBUG({ s_spxout << "\tupdated\t\tstability = " << stability()
+                    << std::endl; });
    
    return status();
 }
@@ -912,13 +913,13 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
 
       minStability /= 2.0;
    }
-   DEBUG({ std::cout << "threshold = " << lastThreshold
-                     << "\tstability = " << stability()
-                     << "\tminStability = " << minStability << std::endl; });
+   DEBUG({ s_spxout << "threshold = " << lastThreshold
+                    << "\tstability = " << stability()
+                    << "\tminStability = " << minStability << std::endl; });
    DEBUG({
       int i;
       FILE* fl = fopen("dump.lp", "w");
-      std::cout << "Basis:\n";
+      s_spxout << "Basis:\n";
       int j = 0;
       for (i = 0; i < dim(); ++i)
          j += matrix[i]->size();
@@ -929,11 +930,11 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
                     i + 1, matrix[i]->index(j) + 1, matrix[i]->value(j));
       }
       fclose(fl);
-      std::cout << "LU-Factors:" << std::endl;
+      s_spxout << "LU-Factors:" << std::endl;
       dump();
       
-      std::cout << "threshold = " << lastThreshold 
-                << "\tstability = " << stability() << std::endl;
+      s_spxout << "threshold = " << lastThreshold 
+               << "\tstability = " << stability() << std::endl;
    });
 
    assert(isConsistent());

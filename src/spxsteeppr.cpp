@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.25 2003/01/15 17:26:08 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.26 2005/07/13 19:05:33 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -273,12 +273,12 @@ int SPxSteepPR::selectLeave()
 #ifndef NDEBUG
          if( coPenalty_ptr[i] < theeps )
          {
-            std::cerr << "SPxSteepPR::selectLeaveX(): This shall not be!"
-                      << std::endl;
-            std::cerr << "i=" << i
-                      << " x=" << x
-                      << " coPenalty_ptr[i]=" << coPenalty_ptr[i]
-                      << " theeps=" << theeps << std::endl;
+            ERROR( s_spxout << "SPxSteepPR::selectLeaveX(): This shall not be!"
+                            << std::endl
+                            << "i=" << i
+                            << " x=" << x
+                            << " coPenalty_ptr[i]=" << coPenalty_ptr[i]
+                            << " theeps=" << theeps << std::endl; )
             x = x * x / theeps * p[i];
          }
          else
@@ -538,7 +538,7 @@ bool SPxSteepPR::isConsistent() const
          x = coPenalty[i] - tmp.length2();
          if (x > thesolver->delta() || -x > thesolver->delta())
          {
-            std::cerr << "x[" << i << "] = " << x << std::endl;
+            ERROR( s_spxout << "x[" << i << "] = " << x << std::endl; )
          }
       }
    }

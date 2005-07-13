@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.77 2005/03/11 11:43:34 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.78 2005/07/13 19:05:33 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -25,6 +25,7 @@
 #include "spxpricer.h"
 #include "spxratiotester.h"
 #include "spxstarter.h"
+#include "spxout.h"
 
 #define MAXCYCLES 100
 
@@ -51,17 +52,18 @@ bool SPxSolver::precisionReached(Real& newDelta) const
    {
       newDelta = thepricer->epsilon() / 10.0;
 
-      VERBOSE3({ std::cout << "Precision not reached: Pricer delta= " << thepricer->epsilon() 
-                           << " new delta= " << newDelta
-                           << std::endl
-                           << " maxViolRedCost= " << maxViolRedCost
-                           << " maxViolBounds= " << maxViolBounds
-                           << " maxViolConst= " << maxViolConst
-                           << std::endl
-                           << " sumViolRedCost= " << sumViolRedCost
-                           << " sumViolBounds= " << sumViolBounds
-                           << " sumViolConst= " << sumViolConst
-                           << std::endl; });
+      VERBOSE3({ s_spxout << "Precision not reached: Pricer delta= " 
+                          << thepricer->epsilon() 
+                          << " new delta= " << newDelta
+                          << std::endl
+                          << " maxViolRedCost= " << maxViolRedCost
+                          << " maxViolBounds= " << maxViolBounds
+                          << " maxViolConst= " << maxViolConst
+                          << std::endl
+                          << " sumViolRedCost= " << sumViolRedCost
+                          << " sumViolBounds= " << sumViolBounds
+                          << " sumViolConst= " << sumViolConst
+                          << std::endl; });
    }
    return reached;
 }
@@ -137,8 +139,8 @@ SPxSolver::Status SPxSolver::solve()
    theratiotester->setType(type());
 
    VERBOSE3({
-      std::cout << "starting value = " << value() << std::endl;
-      std::cout << "starting shift = " << shift() << std::endl;
+      s_spxout << "starting value = " << value() << std::endl;
+      s_spxout << "starting shift = " << shift() << std::endl;
    });
    DEBUG( desc().dump(); );
 
@@ -160,9 +162,9 @@ SPxSolver::Status SPxSolver::solve()
          {
             VERBOSE3({
                if( iteration() % 100 == 0 )
-                  std::cout << "Enter iteration: " << iteration()
-                            << ", Value = " << value()
-                            << ", Shift = " << shift() << std::endl;
+                  s_spxout << "Enter iteration: " << iteration()
+                           << ", Value = " << value()
+                           << ", Shift = " << shift() << std::endl;
             });
             enterId = thepricer->selectEnter();
 
@@ -185,8 +187,8 @@ SPxSolver::Status SPxSolver::solve()
 
                      thepricer->setEpsilon(newDelta);
 
-                     VERBOSE2({ std::cout << "Setting delta= " << thepricer->epsilon() 
-                                          << std::endl; });
+                     VERBOSE2({ s_spxout << "Setting delta= " << thepricer->epsilon() 
+                                         << std::endl; });
                   }
                   // solution seems good, no check we are precice enough
                   else if (lastUpdate() == 0)
@@ -196,7 +198,7 @@ SPxSolver::Status SPxSolver::solve()
                   else if (maxIters > 0 && lastUpdate() < 6)
                      break;
                }
-               VERBOSE3({ std::cout << "solve(enter) triggers refactorization" << std::endl; });
+               VERBOSE3({ s_spxout << "solve(enter) triggers refactorization" << std::endl; });
 
                // We better refactor to make sure the solution is ok.
                factorize();
@@ -218,15 +220,15 @@ SPxSolver::Status SPxSolver::solve()
          while (!stop);
 
          VERBOSE3({
-            std::cout << "Enter finished. iteration: " << iteration() 
-                      << ", value: " << value()
-                      << ", shift: " << shift()
-                      << ", epsilon: " << epsilon()
-                      << ", delta: " << delta()
-                      << std::endl
-                      << "\tstop: " << stop
-                      << ", basis status: " << int(SPxBasis::status())
-                      << ", solver status: " << int(m_status) << std::endl;
+            s_spxout << "Enter finished. iteration: " << iteration() 
+                     << ", value: " << value()
+                     << ", shift: " << shift()
+                     << ", epsilon: " << epsilon()
+                     << ", delta: " << delta()
+                     << std::endl
+                     << "\tstop: " << stop
+                     << ", basis status: " << int(SPxBasis::status())
+                     << ", solver status: " << int(m_status) << std::endl;
          });
 
          if (!stop)
@@ -237,9 +239,9 @@ SPxSolver::Status SPxSolver::solve()
                unShift();
 
                VERBOSE3({
-                  std::cout << "maxInfeas: " << maxInfeas()
-                            << ", shift: " << shift()
-                            << ", delta: " << delta() << std::endl;
+                  s_spxout << "maxInfeas: " << maxInfeas()
+                           << ", shift: " << shift()
+                           << ", delta: " << delta() << std::endl;
                });
 
                if (maxInfeas() + shift() <= delta())
@@ -265,9 +267,9 @@ SPxSolver::Status SPxSolver::solve()
          {
             VERBOSE3({
                if( iteration() % 100 == 0 )
-                  std::cout << "Leave Iteration: " << iteration()
-                            << ", Value = " << value()
-                            << ", Shift = " << shift() << std::endl;
+                  s_spxout << "Leave Iteration: " << iteration()
+                           << ", Value = " << value()
+                           << ", Shift = " << shift() << std::endl;
             });
             
             leaveNum = thepricer->selectLeave();
@@ -291,8 +293,8 @@ SPxSolver::Status SPxSolver::solve()
 
                      thepricer->setEpsilon(newDelta);
 
-                     VERBOSE2({ std::cout << "Setting delta= " << thepricer->epsilon() 
-                                          << std::endl; });
+                     VERBOSE2({ s_spxout << "Setting delta= " << thepricer->epsilon() 
+                                         << std::endl; });
                   }
                   // solution seems good, no check we are precise enough
                   else if (lastUpdate() == 0)
@@ -302,7 +304,7 @@ SPxSolver::Status SPxSolver::solve()
                   else if (maxIters > 0 && lastUpdate() < 6)
                      break;
                }
-               VERBOSE3({ std::cout << "solve(leave) triggers refactorization" << std::endl; });
+               VERBOSE3({ s_spxout << "solve(leave) triggers refactorization" << std::endl; });
 
                // We better refactor to make sure the solution is ok.
                factorize();
@@ -323,15 +325,15 @@ SPxSolver::Status SPxSolver::solve()
          while (!stop);
 
          VERBOSE3({
-            std::cout << "Leave finished. iteration: " << iteration() 
-                      << ", value: " << value()
-                      << ", shift: " << shift()
-                      << ", epsilon: " << epsilon()
-                      << ", delta: " << delta()
-                      << std::endl
-                      << "\tstop: " << stop
-                      << ", basis status: " << int(SPxBasis::status())
-                      << ", solver status: " << int(m_status) << std::endl;
+            s_spxout << "Leave finished. iteration: " << iteration() 
+                     << ", value: " << value()
+                     << ", shift: " << shift()
+                     << ", epsilon: " << epsilon()
+                     << ", delta: " << delta()
+                     << std::endl
+                     << "\tstop: " << stop
+                     << ", basis status: " << int(SPxBasis::status())
+                     << ", solver status: " << int(m_status) << std::endl;
          });
 
          if (!stop)
@@ -350,10 +352,10 @@ SPxSolver::Status SPxSolver::solve()
                   stop = true;
                }
                VERBOSE3({
-                  std::cout << "maxInfeas: " << maxInfeas()
-                            << ", shift: " << shift()
-                            << ", delta: " << delta()
-                            << ", cycle count: " << cycleCount << std::endl;
+                  s_spxout << "maxInfeas: " << maxInfeas()
+                           << ", shift: " << shift()
+                           << ", delta: " << delta()
+                           << ", cycle count: " << cycleCount << std::endl;
                });
             }
 
@@ -364,9 +366,9 @@ SPxSolver::Status SPxSolver::solve()
                unShift();
 
                VERBOSE3({
-                  std::cout << "maxInfeas: " << maxInfeas()
-                            << ", shift: " << shift()
-                            << ", delta: " << delta() << std::endl;
+                  s_spxout << "maxInfeas: " << maxInfeas()
+                           << ", shift: " << shift()
+                           << ", delta: " << delta() << std::endl;
                });
 
                // We stop if we are indeed optimal, or if we have already been
@@ -393,17 +395,17 @@ SPxSolver::Status SPxSolver::solve()
       m_status = ERROR;
 
    VERBOSE1({
-      std::cout << "ISOLVE02 Finished solving (status=" << int(status());
-      std::cout << ", iters=" << iterCount
-                << ", leave=" << leaveCount
-                << ", enter=" << enterCount;
+      s_spxout << "ISOLVE02 Finished solving (status=" << int(status());
+      s_spxout << ", iters=" << iterCount
+               << ", leave=" << leaveCount
+               << ", enter=" << enterCount;
       if( status() == OPTIMAL )
-         std::cout << ", objValue=" << value();
-      std::cout << ")" << std::endl;
+         s_spxout << ", objValue=" << value();
+      s_spxout << ")" << std::endl;
    });
 
 #ifndef NDEBUG
-   /* check, if solution is really feasible */
+   /* check if solution is really feasible */
    if( status() == OPTIMAL )
    {
       int     c;
@@ -422,11 +424,11 @@ SPxSolver::Status SPxSolver::solve()
          if( LT( val, lhs( row ), delta() ) ||
              GT( val, rhs( row ), delta() ) )
          {
-            std::cerr << "Warning! Constraint " << row
-                      << " is violated by solution" << std::endl;
-            std::cerr << "   lhs:" << lhs( row )
-                      << " <= val:" << val
-                      << " <= rhs:" << rhs( row ) << std::endl;
+            WARNING( s_spxout << "Warning! Constraint " << row
+                              << " is violated by solution" << std::endl
+                              << "   lhs:" << lhs( row )
+                              << " <= val:" << val
+                              << " <= rhs:" << rhs( row ) << std::endl; )
 
             if( type() == LEAVE && isRowBasic( row ) )
             {
@@ -438,10 +440,10 @@ SPxSolver::Status SPxSolver::solve()
 
                assert( c < nRows() );
 
-               std::cerr << "   basis idx:" << c
-                         << " fVec:" << fVec()[c]
-                         << " fRhs:" << fRhs()[c]
-                         << " fTest:" << fTest()[c] << std::endl;
+               WARNING( s_spxout << "   basis idx:" << c
+                                 << " fVec:" << fVec()[c]
+                                 << " fRhs:" << fRhs()[c]
+                                 << " fTest:" << fTest()[c] << std::endl; )
             }
          }
       }
@@ -450,11 +452,11 @@ SPxSolver::Status SPxSolver::solve()
          if( LT( sol[col], lower( col ), delta() ) ||
              GT( sol[col], upper( col ), delta() ) )
          {
-            std::cerr << "Warning! Bound for column " << col
-                      << " is violated by solution" << std::endl;
-            std::cerr << "   lower:" << lower( col )
-                      << " <= val:" << sol[col]
-                      << " <= upper:" << upper( col ) << std::endl;
+            WARNING( s_spxout << "Warning! Bound for column " << col
+                              << " is violated by solution" << std::endl
+                              << "   lower:" << lower( col )
+                              << " <= val:" << sol[col]
+                              << " <= upper:" << upper( col ) << std::endl; )
 
             if( type() == LEAVE && isColBasic( col ) )
             {
@@ -464,10 +466,10 @@ SPxSolver::Status SPxSolver::solve()
                      break;
 
                assert( c < nRows() );
-               std::cerr << "   basis idx:" << c
-                         << " fVec:" << fVec()[c]
-                         << " fRhs:" << fRhs()[c]
-                         << " fTest:" << fTest()[c] << std::endl;
+               WARNING( s_spxout << "   basis idx:" << c
+                                 << " fVec:" << fVec()[c]
+                                 << " fRhs:" << fRhs()[c]
+                                 << " fTest:" << fTest()[c] << std::endl; )
             }
          }
       }
@@ -487,20 +489,20 @@ void SPxSolver::testVecs()
    tmp -= *theCoPrhs;
    if (tmp.length() > delta())
    {
-      VERBOSE3({ std::cout << iteration() << ":\tcoP error = \t"
-                           << tmp.length() << std::endl; });
+      VERBOSE3({ s_spxout << iteration() << ":\tcoP error = \t"
+                          << tmp.length() << std::endl; });
       tmp.clear();
       SPxBasis::coSolve(tmp, *theCoPrhs);
       multWithBase(tmp);
       tmp -= *theCoPrhs;
 
-      VERBOSE3( std::cout << "\t\t\t" << tmp.length() << std::endl; );
+      VERBOSE3( s_spxout << "\t\t\t" << tmp.length() << std::endl; );
 
       tmp.clear();
       SPxBasis::coSolve(tmp, *theCoPrhs);
       tmp -= *theCoPvec;
       
-      VERBOSE3( std::cout << "\t\t\t" << tmp.length() << std::endl; );
+      VERBOSE3( s_spxout << "\t\t\t" << tmp.length() << std::endl; );
    }
 
    tmp = *theFvec;
@@ -508,13 +510,13 @@ void SPxSolver::testVecs()
    tmp -= *theFrhs;
    if (tmp.length() > delta())
    {
-      VERBOSE3({ std::cout << iteration() << ":\t  F error = \t"
+      VERBOSE3({ s_spxout << iteration() << ":\t  F error = \t"
                            << tmp.length() << std::endl; });
       tmp.clear();
       SPxBasis::solve(tmp, *theFrhs);
       tmp -= *theFvec;
 
-      VERBOSE3( std::cout << "\t\t\t" << tmp.length() << std::endl; );
+      VERBOSE3( s_spxout << "\t\t\t" << tmp.length() << std::endl; );
    }
 
 #ifndef NDEBUG
@@ -524,22 +526,24 @@ void SPxSolver::testVecs()
       {
          if (theCoTest[i] < -delta() && isCoBasic(i))
          {
-            std::cerr << "testVecs: theCoTest: this shalt not be!"
-                      << std::endl
-                      << "  i=" << i 
-                      << ", theCoTest[i]=" << theCoTest[i]
-                      << ", delta()=" << delta() << std::endl;
+            // TODO: If this shalt not be, shalt this be an assert?
+            ERROR( s_spxout << "testVecs: theCoTest: this shalt not be!"
+                            << std::endl
+                            << "  i=" << i 
+                            << ", theCoTest[i]=" << theCoTest[i]
+                            << ", delta()=" << delta() << std::endl; )
          }
       }
       for (i = 0; i < coDim(); ++i)
       {
          if (theTest[i] < -delta() && isBasic(i))
          {
-            std::cerr << "testVecs: theTest: this shalt not be!"
-                      << std::endl
-                      << "  i=" << i 
-                      << ", theTest[i]=" << theTest[i]
-                      << ", delta()=" << delta() << std::endl;
+            // TODO: If this shalt not be, shalt this be an assert?
+            ERROR( s_spxout << "testVecs: theTest: this shalt not be!"
+                            << std::endl
+                            << "  i=" << i 
+                            << ", theTest[i]=" << theTest[i]
+                            << ", delta()=" << delta() << std::endl; )
          }
       }
    }
@@ -576,16 +580,17 @@ bool SPxSolver::terminate()
       cr -= *theCoPrhs;
       fr -= *theFrhs;
       if (cr.length() > delta())
-         std::cerr << "unexpected change of coPrhs " 
-                   << cr.length() << std::endl;
+         WARNING( s_spxout << "unexpected change of coPrhs " 
+                           << cr.length() << std::endl; )
       if (fr.length() > delta())
-         std::cerr << "unexpected change of   Frhs " 
-                   << fr.length() << std::endl;
+         WARNING( s_spxout << "unexpected change of   Frhs " 
+                           << fr.length() << std::endl; )
 #endif  // !NDEBUG
 
       if (updateCount > 1)
       {
-         VERBOSE3({ std::cout << "terminate triggers refactorization" << std::endl; });
+         VERBOSE3({ s_spxout << "terminate triggers refactorization" 
+                             << std::endl; });
          factorize();
       }
       SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
@@ -603,14 +608,14 @@ bool SPxSolver::terminate()
 
    if ( maxIters >= 0 && iterations() >= maxIters )
    {
-      VERBOSE2({ std::cout << "Maximum number of iterations (" << maxIters
+      VERBOSE2({ s_spxout << "Maximum number of iterations (" << maxIters
                            << ") reached" << std::endl; });
       m_status = ABORT_ITER;
       return true;
    }
    if ( maxTime >= 0 && maxTime < infinity && time() >= maxTime )
    {
-      VERBOSE2({ std::cout << "Timelimit (" << maxTime
+      VERBOSE2({ s_spxout << "Timelimit (" << maxTime
                            << ") reached" << std::endl; });
       m_status = ABORT_TIME;
       return true;   
@@ -627,10 +632,10 @@ bool SPxSolver::terminate()
          
          if( sign * (value() - maxValue) >= 0.0 )
          {
-            VERBOSE2({ std::cout << "Objective value limit (" << maxValue
-                                 << ") reached" << std::endl; });
+            VERBOSE2({ s_spxout << "Objective value limit (" << maxValue
+                                << ") reached" << std::endl; });
             DEBUG({
-               std::cout << "Objective value limit reached" << std::endl
+               s_spxout << "Objective value limit reached" << std::endl
                          << " (value: " << value()
                          << ", limit: " << maxValue << ")" << std::endl
                          << " (spxSense: " << int(spxSense())

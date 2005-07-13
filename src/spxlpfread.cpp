@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.47 2005/07/12 13:41:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.48 2005/07/13 19:05:33 bzforlow Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -27,11 +27,12 @@
 
 #include "spxdefines.h"
 #include "spxlp.h"
+#include "spxout.h"
 
 /* The manual says the maximum allowed line length is 255 characters,
- * but CPLEX does not complain, if the lines are longer.
+ * but CPLEX does not complain if the lines are longer.
  */
-#define MAX_LINE_LEN  8192       ///< maximum length of a line (8190 + \\n + \\0)
+#define MAX_LINE_LEN  8192     ///< maximum length of a line (8190 + \\n + \\0)
 
 namespace soplex
 {
@@ -147,7 +148,7 @@ static Real readValue(char*& pos)
 
    assert(pos == s);
 
-   DEBUG( std::cout << "readValue = " << value << std::endl; );
+   DEBUG( s_spxout << "readValue = " << value << std::endl; );
 
    if (isSpace(*pos))
       pos++;
@@ -184,7 +185,7 @@ static int readColName(
    {
       // We only add the name if we got an empty column.
       if (emptycol == 0)
-         std::cerr << "Unknown variable \"" << name << "\" ";
+         WARNING( s_spxout << "Unknown variable \"" << name << "\" "; )
       else
       {
          colidx = colnames->num();
@@ -192,8 +193,8 @@ static int readColName(
          colset.add(*emptycol);
       }
    }
-   DEBUG({ std::cout << "readColName [" << name << "] = "
-		     << colidx << std::endl; });
+   DEBUG({ s_spxout << "readColName [" << name << "] = "
+                    << colidx << std::endl; });
 
    if (isSpace(*pos))
       pos++;
@@ -213,8 +214,8 @@ static int readSense(char*& pos)
    else if (*pos == '=')
       pos++;
 
-   DEBUG({ std::cout << "readSense = " << static_cast<char>(sense)
-		     << std::endl; });
+   DEBUG({ s_spxout << "readSense = " << static_cast<char>(sense)
+                    << std::endl; });
 
    if (isSpace(*pos))
       pos++;
@@ -263,7 +264,7 @@ static bool hasKeyword(char*& pos, const char* keyword)
    {
       pos += k;
 
-      DEBUG( std::cout << "hasKeyword: " << keyword << std::endl; );
+      DEBUG( s_spxout << "hasKeyword: " << keyword << std::endl; );
       return true;
    }
    return false;
@@ -406,12 +407,12 @@ bool SPxLP::readLPF(
       {
          if (strlen(buf) == MAX_LINE_LEN - 1)
          {
-            std::cerr << "Line exceeds " << MAX_LINE_LEN - 2 
-                      << " characters" << std::endl;
+            ERROR( s_spxout << "Line exceeds " << MAX_LINE_LEN - 2 
+                            << " characters" << std::endl; )
          }
          else
          {
-            std::cerr << "No 'End' marker found" << std::endl;
+            ERROR( s_spxout << "No 'End' marker found" << std::endl; )
             finished = true;
          }
          break;
@@ -420,8 +421,8 @@ bool SPxLP::readLPF(
       i   = 0;
       pos = buf;
 
-      DEBUG({ std::cout << "Reading line " << lineno
-			<< " (pos=" << pos << ")" << std::endl; });
+      DEBUG({ s_spxout << "Reading line " << lineno
+                       << " (pos=" << pos << ")" << std::endl; });
 
       // 1. Remove comments.
       if (0 != (s = strchr(buf, '\\')))
@@ -520,7 +521,7 @@ bool SPxLP::readLPF(
       //-----------------------------------------------------------------------
       pos = line;
       
-      DEBUG( std::cout << "pos=" << pos << std::endl; );
+      DEBUG( s_spxout << "pos=" << pos << std::endl; );
 
       // 7. We have something left to process. 
       while((pos != 0) && (*pos != '\0'))
@@ -651,16 +652,18 @@ bool SPxLP::readLPF(
 
                         assert(cnames->has(colidx));
 
-                        std::cerr << "Doublicate index " << (*cnames)[colidx] 
-                                  << " in line " << lineno << std::endl;
+                        WARNING( s_spxout << "Duplicate index " 
+                                          << (*cnames)[colidx] 
+                                          << " in line " << lineno 
+                                          << std::endl; )
                      }
                   }
                   have_value = false;
                }
                else
                {
-                  /* This means we have a row like c1: <= 5 with no variables in it.
-                   * We can not handle 10 <= 5. In this case we issue an syntax error.
+                  /* We have a row like c1: <= 5 with no variables in it.
+                   * We can not handle 10 <= 5; issue a syntax error.
                    */
                   if (val != 1.0)
                      goto syntax_error;
@@ -696,8 +699,8 @@ bool SPxLP::readLPF(
 
             if ((colidx = readColName(pos, cnames, cset, 0)) < 0)
             {
-               std::cerr << "in Bounds section line " << lineno 
-                         << " ignored" << std::endl;
+               WARNING( s_spxout << "in Bounds section line " << lineno 
+                                 << " ignored" << std::endl; )
                continue;
             }
             if (sense)
@@ -718,7 +721,7 @@ bool SPxLP::readLPF(
                cset.lower(colidx) = -infinity;
                cset.upper(colidx) =  infinity;
                other              = true;
-	       pos += 4;  // set position after the word "free"
+               pos += 4;  // set position after the word "free"
             }
             else if (isSense(pos))
             {
@@ -752,8 +755,8 @@ bool SPxLP::readLPF(
          case INTEGERS :
             if ((colidx = readColName(pos, cnames, cset, 0)) < 0)
             {
-               std::cerr << "in Binary/General section line " << lineno 
-                         << " ignored" << std::endl;
+               WARNING( s_spxout << "in Binary/General section line " << lineno
+                                 << " ignored" << std::endl; )
             }
             else
             {
@@ -767,7 +770,8 @@ bool SPxLP::readLPF(
             }
             break;
          case START :
-            std::cerr << "This seems to be no LP format file" << std::endl;
+            ERROR( s_spxout << "This seems to be no LP format file" 
+                            << std::endl; )
             goto syntax_error;
          default :
             assert(false);
@@ -787,18 +791,18 @@ bool SPxLP::readLPF(
 syntax_error:
    if (finished)
    {
-      VERBOSE2({ std::cout << "Finished reading " << lineno
-                           << " lines" << std::endl; });
+      VERBOSE2({ s_spxout << "Finished reading " << lineno
+                          << " lines" << std::endl; });
    }
    else
-      std::cerr << "Syntax error in line " << lineno << std::endl;
+      ERROR( s_spxout << "Syntax error in line " << lineno << std::endl; )
 
    if (p_cnames == 0)
       delete cnames;
    if (p_rnames == 0)
       delete rnames;
 
-   DEBUG( std::cout << *this; );
+   DEBUG( s_spxout << *this; );
 
    return finished;
 }

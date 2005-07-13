@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.35 2005/01/12 12:00:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.36 2005/07/13 19:05:31 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -25,6 +25,7 @@
 #include "spxdefines.h"
 #include "spxsolver.h"
 #include "spxratiotester.h"
+#include "spxout.h"
 
 namespace soplex
 {
@@ -152,10 +153,10 @@ void SPxSolver::getLeaveVals(
       default:
          assert(false);
       }
-      DEBUG({ std::cout << "SPxSolver::getLeaveVals() : row " << leaveNum
-                        << ": " << leaveStat
-                        << " -> " << ds.rowStatus(leaveNum)
-                        << std::endl; });
+      DEBUG({ s_spxout << "SPxSolver::getLeaveVals() : row " << leaveNum
+                       << ": " << leaveStat
+                       << " -> " << ds.rowStatus(leaveNum)
+                       << std::endl; });
    }
 
    else
@@ -236,10 +237,10 @@ void SPxSolver::getLeaveVals(
       default:
          assert(false);
       }
-      DEBUG({ std::cout << "SPxSolver::getLeaveVals() : col " << leaveNum
-                        << ": " << leaveStat
-                        << " -> " << ds.colStatus(leaveNum)
-                        << std::endl; });
+      DEBUG({ s_spxout << "SPxSolver::getLeaveVals() : col " << leaveNum
+                       << ": " << leaveStat
+                       << " -> " << ds.colStatus(leaveNum)
+                       << std::endl; });
    }
 }
 
@@ -340,21 +341,21 @@ void SPxSolver::getLeaveVals2(
          break;
       case SPxBasis::Desc::P_FIXED :
          assert(rep() == COLUMN);
-         std::cerr << "SPxSolver::getLeaveVals2(): "
-                   << "ERROR! Tried to put a fixed row variable into the basis."
-                   << std::endl;
-         std::cerr << "SPxSolver::getLeaveVals2(): idx=" << idx
-                   << ", lhs=" << lhs(idx)
-                   << ", rhs=" << rhs(idx) << std::endl;
+         ERROR( s_spxout << "SPxSolver::getLeaveVals2(): "
+                         << "ERROR! Tried to put a fixed row variable into the basis."
+                         << std::endl
+                         << "SPxSolver::getLeaveVals2(): idx=" << idx
+                         << ", lhs=" << lhs(idx)
+                         << ", rhs=" << rhs(idx) << std::endl; )
          assert(false);
 
       default:
          assert(false);
       }
-      DEBUG({ std::cout << "SPxSolver::getLeaveVals2(): row " << idx
-                        << ": " << enterStat
-                        << " -> " << ds.rowStatus(idx)
-                        << std::endl; });
+      DEBUG({ s_spxout << "SPxSolver::getLeaveVals2(): row " << idx
+                       << ": " << enterStat
+                       << " -> " << ds.rowStatus(idx)
+                       << std::endl; });
    }
 
    else
@@ -437,21 +438,21 @@ void SPxSolver::getLeaveVals2(
          break;
       case SPxBasis::Desc::P_FIXED :
          assert(rep() == COLUMN);
-         std::cerr << "SPxSolver::getLeaveVals2(): "
-                   << "ERROR! Tried to put a fixed column variable into the basis."
-                   << std::endl;
-         std::cerr << "SPxSolver::getLeaveVals2(): idx=" << idx
-                   << ", lower=" << lower(idx)
-                   << ", upper=" << upper(idx) << std::endl;
+         ERROR( s_spxout << "SPxSolver::getLeaveVals2(): "
+                         << "ERROR! Tried to put a fixed column variable into the basis."
+                         << std::endl
+                         << "SPxSolver::getLeaveVals2(): idx=" << idx
+                         << ", lower=" << lower(idx)
+                         << ", upper=" << upper(idx) << std::endl; )
          assert(false);
 
       default:
          assert(false);
       }
-      DEBUG({ std::cout << "SPxSolver::getLeaveVals2(): col " << idx
-                        << ": " << enterStat
-                        << " -> " << ds.colStatus(idx)
-                        << std::endl; });
+      DEBUG({ s_spxout << "SPxSolver::getLeaveVals2(): col " << idx
+                       << ": " << enterStat
+                       << " -> " << ds.colStatus(idx)
+                       << std::endl; });
    }
 
 }
@@ -467,9 +468,9 @@ void SPxSolver::rejectLeave(
    SPxBasis::Desc& ds = desc();
    if (leaveId.isSPxRowId())
    {
-      DEBUG({ std::cout << "SPxSolver::rejectLeave()  : row " << leaveNum
-                        << ": " << ds.rowStatus(leaveNum)
-                        << " -> " << leaveStat << std::endl; });
+      DEBUG({ s_spxout << "SPxSolver::rejectLeave()  : row " << leaveNum
+                       << ": " << ds.rowStatus(leaveNum)
+                       << " -> " << leaveStat << std::endl; });
       if (leaveStat == SPxBasis::Desc::D_ON_BOTH)
       {
          if (ds.rowStatus(leaveNum) == SPxBasis::Desc::P_ON_LOWER)
@@ -481,9 +482,9 @@ void SPxSolver::rejectLeave(
    }
    else
    {
-      DEBUG({ std::cout << "SPxSolver::rejectLeave()  : col " << leaveNum
-                        << ": " << ds.colStatus(leaveNum)
-                        << " -> " << leaveStat << std::endl; });
+      DEBUG({ s_spxout << "SPxSolver::rejectLeave()  : col " << leaveNum
+                       << ": " << ds.colStatus(leaveNum)
+                       << " -> " << leaveStat << std::endl; });
       if (leaveStat == SPxBasis::Desc::D_ON_BOTH)
       {
          if (ds.colStatus(leaveNum) == SPxBasis::Desc::P_ON_UPPER)
@@ -519,8 +520,8 @@ bool SPxSolver::leave(int leaveIdx)
       coSolve(tmp, unitVecs[leaveIdx]);
       tmp -= theCoPvec->delta();
       if (tmp.length() > delta())
-         std::cerr << basis().iteration() << ": coPvec.delta error = "
-                   << tmp.length() << std::endl;
+         WARNING( s_spxout << basis().iteration() << ": coPvec.delta error = "
+                           << tmp.length() << std::endl; )
    }
 #endif  // NDEBUG
 
@@ -569,7 +570,7 @@ bool SPxSolver::leave(int leaveIdx)
             
          if (enterVal != leaveMax)
          {
-            DEBUG( std::cout << "rejecting leave A " << std::endl; );
+            DEBUG( s_spxout << "rejecting leave A " << std::endl; );
 
             // Problem: These changes do not survive a refactorization
             theCoTest[leaveIdx] *= 0.01;            // #== fTest()#
@@ -579,11 +580,11 @@ bool SPxSolver::leave(int leaveIdx)
          }
          if (lastUpdate() > 1)
          {
-            VERBOSE3({ std::cout << "ILEAVE01 factorization triggered in leave() for feasibility test" << std::endl; });
+            VERBOSE3({ s_spxout << "ILEAVE01 factorization triggered in leave() for feasibility test" << std::endl; });
             factorize();
             return leave(leaveIdx);
          }
-         VERBOSE3({ std::cout << "ILEAVE02 unboundness/infeasiblity found in leave()" << std::endl; });
+         VERBOSE3({ s_spxout << "ILEAVE02 unboundness/infeasiblity found in leave()" << std::endl; });
 
          if (rep() != COLUMN)
             setBasisStatus(SPxBasis::UNBOUNDED);
@@ -623,7 +624,7 @@ bool SPxSolver::leave(int leaveIdx)
             SPxBasis::solve(tmp, newVector);
             tmp -= fVec().delta();
             if (tmp.length() > delta())
-               std::cerr << "\t(" << tmp.length() << ")\n";
+               WARNING( s_spxout << "\t(" << tmp.length() << ")\n"; )
          }
 #endif  // NDEBUG
 
@@ -634,7 +635,7 @@ bool SPxSolver::leave(int leaveIdx)
             change(leaveIdx, none, 0);
             theFvec->delta().clear();
             rejectLeave(leaveNum, leaveId, leaveStat, &newVector);
-            DEBUG( std::cout << "rejecting leave B" << std::endl; );
+            DEBUG( s_spxout << "rejecting leave B" << std::endl; );
             // factorize();
             theCoTest[leaveIdx] *= 0.01;            // #== fTest()#
             return true;
@@ -753,11 +754,11 @@ bool SPxSolver::leave(int leaveIdx)
          tmp -= fRhs();
          if (tmp.length() > delta())
          {
-            std::cerr << '\t' << basis().iteration()
-                      << ": fVec error = " << tmp.length();
+            WARNING( s_spxout << '\t' << basis().iteration()
+                              << ": fVec error = " << tmp.length(); )
             SPxBasis::solve(tmp, fRhs());
             tmp -= fVec();
-            std::cerr << "\t(" << tmp.length() << ")\n";
+            WARNING( s_spxout << "\t(" << tmp.length() << ")\n"; )
          }
       }
 #endif  // NDEBUG

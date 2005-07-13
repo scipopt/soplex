@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.27 2005/01/12 12:00:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.28 2005/07/13 19:05:32 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -850,19 +850,19 @@ int SPxFastRT::selectLeave(Real& val)
 
    DEBUG({
       if (leave >= 0)
-         std::cout 
-            << thesolver->basis().iteration() << "("
-            << std::setprecision(6) << thesolver->value() << ","
-            << std::setprecision(2) << thesolver->basis().stability() << "):"
-            << leave << "\t"
-            << std::setprecision(4) << sel << " "
-            << std::setprecision(4) << thesolver->fVec().delta()[leave] << " "
-            << std::setprecision(6) << maxabs 
-            << std::endl;
+         s_spxout 
+           << thesolver->basis().iteration() << "("
+           << std::setprecision(6) << thesolver->value() << ","
+           << std::setprecision(2) << thesolver->basis().stability() << "):"
+           << leave << "\t"
+           << std::setprecision(4) << sel << " "
+           << std::setprecision(4) << thesolver->fVec().delta()[leave] << " "
+           << std::setprecision(6) << maxabs 
+           << std::endl;
       else
-         std::cout << thesolver->basis().iteration() 
-                   << ": skipping instable pivot"
-                   << std::endl;
+         s_spxout << thesolver->basis().iteration() 
+                  << ": skipping instable pivot"
+                  << std::endl;
    });
 
    if (leave >= 0 || minStab > 2*solver()->epsilon())
@@ -1172,12 +1172,12 @@ SPxId SPxFastRT::selectEnter(Real& val)
                x = thesolver->coPvec().delta()[ thesolver->number(enterId) ];
             else
                x = thesolver->pVec().delta()[ thesolver->number(enterId) ];
-            std::cout << thesolver->basis().iteration() << ": " << sel
-                      << '\t' << x << " (" << maxabs << ")" << std::endl;
+            s_spxout << thesolver->basis().iteration() << ": " << sel
+                     << '\t' << x << " (" << maxabs << ")" << std::endl;
          }
       else
-         std::cout << thesolver->basis().iteration() 
-                   << ": skipping instable pivot" << std::endl;
+         s_spxout << thesolver->basis().iteration() 
+                  << ": skipping instable pivot" << std::endl;
    });
 
    if (enterId.isValid() || minStab > 2*epsilon)

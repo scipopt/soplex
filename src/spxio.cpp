@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxio.cpp,v 1.19 2005/07/12 13:41:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxio.cpp,v 1.20 2005/07/13 19:05:33 bzforlow Exp $"
 
 
 //#define DEBUGGING 1
@@ -31,6 +31,7 @@
 #include "lprowset.h"
 #include "lpcolset.h"
 #include "nameset.h"
+#include "spxout.h"
 
 namespace soplex
 {
@@ -70,7 +71,7 @@ bool SPxLP::read(
       ? readMPS(is, rowNames, colNames, intVars)
       : readLPF(is, rowNames, colNames, intVars);
 
-   DEBUG( std::cout << *this; );
+   DEBUG( s_spxout << *this; );
 
    return ok;
 }

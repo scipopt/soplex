@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.13 2005/01/12 12:00:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.14 2005/07/13 19:05:33 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -26,6 +26,7 @@
 #include "spxpricer.h"
 #include "spxratiotester.h"
 #include "spxstarter.h"
+#include "spxout.h"
 
 namespace soplex
 {
@@ -153,10 +154,10 @@ void SPxSolver::setType(Type tp)
       factorized = false;
       m_numCycle = 0;
 #endif
-      DEBUG({ std::cout << "switching to " 
-                        << static_cast<const char*>((tp == LEAVE)
-                           ? "leaving" : "entering")
-                        << " algorithm" << std::endl; });
+      DEBUG({ s_spxout << "switching to " 
+                       << static_cast<const char*>((tp == LEAVE)
+                          ? "leaving" : "entering")
+                       << " algorithm" << std::endl; });
    }
 }
 
@@ -432,11 +433,12 @@ void SPxSolver::factorize()
 {
    METHOD( "SPxSolver::factorize()" );
 
-   VERBOSE1({ std::cout << "ISOLVE01 " 
-                        << std::setw(8) << basis().iteration() 
-                        << std::setw(4) << basis().lastUpdate()
-                        << " " << (isInitialized() ? value() : 0.0) 
-                        << std::endl; });
+   VERBOSE1({ s_spxout << "ISOLVE01 " 
+                       << std::setw(8) << basis().iteration() 
+                       << std::setw(4) << basis().lastUpdate()
+                       << " " << (isInitialized() ? value() : 0.0) 
+                       << std::endl; });
+
 
    SPxBasis::factorize();
 
@@ -462,27 +464,27 @@ void SPxSolver::factorize()
       ctmp -= coPvec();
       if (ftmp.length() > delta())
       {
-         DEBUG( std::cout << "fVec:   " << ftmp.length() << std::endl; );
+         DEBUG( s_spxout << "fVec:   " << ftmp.length() << std::endl; );
          ftmp = fVec();
          multBaseWith(ftmp);
          ftmp -= fRhs();
          if (ftmp.length() > delta())
-            std::cerr << iteration() << ": fVec error = " 
-                      << ftmp.length() << std::endl;
+            ERROR( s_spxout << iteration() << ": fVec error = " 
+                            << ftmp.length() << std::endl; )
       }
       if (ctmp.length() > delta())
       {
-         DEBUG( std::cout << "coPvec: " << ctmp.length() << std::endl; );
+         DEBUG( s_spxout << "coPvec: " << ctmp.length() << std::endl; );
          ctmp = coPvec();
          multWithBase(ctmp);
          ctmp -= coPrhs();
          if (ctmp.length() > delta())
-            std::cerr << iteration() << ": coPvec error = " 
-                      << ctmp.length() << std::endl;
+            ERROR( s_spxout << iteration() << ": coPvec error = " 
+                            << ctmp.length() << std::endl; )
       }
       if (ptmp.length() > delta())
       {
-         DEBUG( std::cout << "pVec:   " << ptmp.length() << std::endl; );
+         DEBUG( s_spxout << "pVec:   " << ptmp.length() << std::endl; );
       }
 #endif  // NDEBUG
 
@@ -982,7 +984,8 @@ SPxSolver::basisStatusToVarStatus( SPxBasis::Desc::Status stat ) const
       vstat = BASIC;
       break;
    default:
-      std::cerr << "ERROR: unknown basis status (" << stat << ")" << std::endl;
+      ERROR( s_spxout << "ERROR: unknown basis status (" << stat << ")" 
+                      << std::endl; )
       assert(false);
    }
    return vstat;
@@ -1020,8 +1023,8 @@ SPxSolver::varStatusToBasisStatusRow( int row, SPxSolver::VarStatus stat ) const
       rstat = dualRowStatus(row);
       break;
    default:
-      std::cerr << "ERROR: unknown VarStatus (" << int(stat)
-                << ")" << std::endl;
+      ERROR( s_spxout << "ERROR: unknown VarStatus (" << int(stat) << ")" 
+                      << std::endl; )
       assert(false);
    }
    return rstat;
@@ -1059,8 +1062,8 @@ SPxSolver::varStatusToBasisStatusCol( int col, SPxSolver::VarStatus stat ) const
       cstat = dualColStatus(col);
       break;
    default:
-      std::cerr << "ERROR: unknown VarStatus (" << int(stat)
-                << ")" << std::endl;
+      ERROR( s_spxout << "ERROR: unknown VarStatus (" << int(stat) << ")" 
+                      << std::endl; )
       assert(false);
    }
    return cstat;

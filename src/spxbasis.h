@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.33 2003/01/20 16:46:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.34 2005/07/13 19:05:32 bzforlow Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -30,6 +30,7 @@
 #include "dataarray.h"
 #include "slinsolver.h"
 #include "nameset.h"
+#include "spxout.h"
 
 namespace soplex
 {
@@ -412,9 +413,9 @@ public:
    void setStatus(SPxStatus stat)
    {
       METHOD( "SPxBasis::setStatus()" );
-      DEBUG({ std::cout << "SPxBasis::setStatus(): status: "
-                        << int(thestatus) << " -> "
-                        << int(stat) << std::endl; });
+      DEBUG({ s_spxout << "SPxBasis::setStatus(): status: "
+                       << int(thestatus) << " -> "
+                       << int(stat) << std::endl; });
       thestatus = stat;
       if( stat == NO_PROBLEM )
          invalidate();

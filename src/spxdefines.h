@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.20 2005/01/03 14:46:48 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.21 2005/07/13 19:05:32 bzforlow Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
@@ -46,24 +46,42 @@ namespace soplex
  * Debugging Macros etc.
  *-----------------------------------------------------------------------------
  */
-#define VERBOSE1(x) { if(Param::verbose() >= 1) {x} }
-#define VERBOSE2(x) { if(Param::verbose() >= 2) {x} }
-#define VERBOSE3(x) { if(Param::verbose() >= 3) {x} }
+
+// store the old verbosity of s_spxout, do something, reset verbosity
+#define DO_WITH_TMP_VERBOSITY( verbosity, do_something ) \
+   { const SPxOut::Verbosity tmp_verbosity = s_spxout.get_verbosity(); \
+     s_spxout.set_verbosity( verbosity ); \
+     do_something \
+     s_spxout.set_verbosity( tmp_verbosity ); }
+
+//#define VERBOSE1(x) { if(Param::verbose() >= 1) {x} }
+//#define VERBOSE2(x) { if(Param::verbose() >= 2) {x} }
+//#define VERBOSE3(x) { if(Param::verbose() >= 3) {x} }
+#define ERROR(x)    { DO_WITH_TMP_VERBOSITY( SPxOut::ERROR,    x ) }
+#define WARNING(x)  { DO_WITH_TMP_VERBOSITY( SPxOut::WARNING,  x ) }
+#define VERBOSE1(x) { DO_WITH_TMP_VERBOSITY( SPxOut::VERBOSE1, x ) }
+#define VERBOSE2(x) { DO_WITH_TMP_VERBOSITY( SPxOut::VERBOSE2, x ) }
+#define VERBOSE3(x) { DO_WITH_TMP_VERBOSITY( SPxOut::VERBOSE3, x ) }
+
 
 #ifndef NDEBUG
-#define TRACE(x) {x}
+// print output in any case, regardless of Param::verbose():
+#define TRACE(x) { DO_WITH_TMP_VERBOSITY( SPxOut::ERROR, x ) }
 #else
 #define TRACE(x) /**/
 #endif //!NDEBUG
 
 #if defined(DEBUGGING)
-#define DEBUG(x) {x}
+// print output in any case, regardless of Param::verbose():
+#define DEBUG(x) { DO_WITH_TMP_VERBOSITY( SPxOut::ERROR, x ) }
 #else
 #define DEBUG(x) /**/
 #endif //!DEBUGGING
 
 #if defined(TRACE_METHOD)
-#define METHOD(x) soplex::TraceMethod _trace_method_(x, __FILE__, __LINE__)
+// print output in any case, regardless of Param::verbose():
+#define METHOD(x) { DO_WITH_TMP_VERBOSITY( SPxOut::ERROR, \
+                    soplex::TraceMethod _trace_method_(x, __FILE__, __LINE__))}
 #else
 #define METHOD(x) /**/
 #endif // !TRACE_METHOD
@@ -72,6 +90,7 @@ namespace soplex
  * Long double support, Parameters and Epsilons
  *-----------------------------------------------------------------------------
  */
+
 #ifdef WITH_LONG_DOUBLE
 
 typedef long double Real;

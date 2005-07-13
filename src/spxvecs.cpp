@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvecs.cpp,v 1.23 2005/01/12 12:00:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxvecs.cpp,v 1.24 2005/07/13 19:05:33 bzforlow Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -77,8 +77,9 @@ void SPxSolver::computeFrhs()
                   break;
 
                default:
-                  std::cerr << __FILE__ << __LINE__ 
-                            << " ERROR: inconsistent basis must not happen!\n";
+                  ERROR( s_spxout << __FILE__ << __LINE__ << " ERROR: "
+                                  << "inconsistent basis must not happen!" 
+                                  << std::endl; )
                   assert(false);
                }
                assert(x < infinity);
@@ -141,8 +142,9 @@ void SPxSolver::computeFrhsXtra()
             break;
 
          default:
-            std::cerr << __FILE__ << __LINE__ 
-                      << " ERROR: inconsistent basis must not happen!\n";
+            ERROR( s_spxout << __FILE__ << __LINE__ << " ERROR: "
+                            << "inconsistent basis must not happen!" 
+                            << std::endl; )
             assert(false);
          }
          assert(x < infinity);
@@ -198,8 +200,9 @@ void SPxSolver::computeFrhs1(
             break;
 
          default:
-            std::cerr << __FILE__ << __LINE__ 
-                      << "ERROR: inconsistent basis must not happen!\n";
+            ERROR( s_spxout << __FILE__ << __LINE__ << " ERROR: "
+                            << "inconsistent basis must not happen!" 
+                            << std::endl; )
             assert(false);
          }
          assert(x < infinity);
@@ -212,8 +215,8 @@ void SPxSolver::computeFrhs1(
 }
 
 /** This methods subtracts \f$A_N x_N\f$ or \f$\pi_N^T A_N\f$ from |theFrhs| as
-    specified by the |Status| of all nonbasic variables. The values of \f$x_N\f$ or
-    \f$\pi_N\f$ are taken from the passed arrays.
+    specified by the |Status| of all nonbasic variables. The values of 
+    \f$x_N\f$ or \f$\pi_N\f$ are taken from the passed arrays.
  */
 void SPxSolver::computeFrhs2(
    const Vector& coufb,   ///< upper feasibility bound for covariables
@@ -250,17 +253,18 @@ void SPxSolver::computeFrhs2(
 
             if (colfb[i] != coufb[i])
             {
-               std::cerr << "Frhs2: " << stat << " " 
-                         << colfb[i] << " " << coufb[i]
-                         << " shouln't be" << std::endl;
+               ERROR( s_spxout << "Frhs2: " << stat << " " 
+                               << colfb[i] << " " << coufb[i]
+                               << " shouldn't be" << std::endl; )
             }
             //assert(colfb[i] == coufb[i]);
             x = colfb[i];
             break;
 
          default:
-            std::cerr << __FILE__ << __LINE__ 
-                      << "ERROR: inconsistent basis must not happen!\n";
+            ERROR( s_spxout << __FILE__ << __LINE__ << " ERROR: "
+                            << "inconsistent basis must not happen!" 
+                            << std::endl; )
             assert(false);
          }
          assert(x < infinity);

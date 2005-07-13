@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.cpp,v 1.20 2005/01/06 17:12:10 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightst.cpp,v 1.21 2005/07/13 19:05:34 bzforlow Exp $"
 
 //#define DEBUGGING 1
 //#define TEST 1
@@ -295,9 +295,9 @@ void SPxWeightST::generate(SPxSolver& base)
          {
             DEBUG({
                if (pref[i].type() == SPxId::ROW_ID)
-                  std::cout << " r" << base.number(pref[i]);
+                  s_spxout << " r" << base.number(pref[i]);
                else
-                  std::cout << " c" << base.number(pref[i]);
+                  s_spxout << " c" << base.number(pref[i]);
             });
 
             forbidden[sel] = 2;
@@ -641,15 +641,15 @@ void SPxWeightST::setupWeights(SPxSolver& bse)
    }
    DEBUG({
       for(i = 0; i < bse.nCols(); i++)
-         std::cout << "C i= " << i 
-                   << " up= " << colUp[i]
-                   << " w= " << colWeight[i]
-                   << std::endl;
+         s_spxout << "C i= " << i 
+                  << " up= " << colUp[i]
+                  << " w= " << colWeight[i]
+                  << std::endl;
       for(i = 0; i < bse.nRows(); i++)
-         std::cout << "R i= " << i 
-                   << " rr= " << rowRight[i]
-                   << " w= " << rowWeight[i]
-                   << std::endl;
+         s_spxout << "R i= " << i 
+                  << " rr= " << rowRight[i]
+                  << " w= " << rowWeight[i]
+                  << std::endl;
    });
 }
 } // namespace soplex

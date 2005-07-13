@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.28 2005/01/12 12:00:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.29 2005/07/13 19:05:31 bzforlow Exp $"
 
 // #define DEBUGGING 1
 
@@ -24,6 +24,7 @@
 #include "spxdefines.h"
 #include "soplex.h"
 #include "spxratiotester.h"
+#include "spxout.h"
 
 namespace soplex
 {
@@ -384,10 +385,10 @@ void SPxSolver::getEnterVals
       default:
          assert(false);
       }
-      DEBUG({ std::cout << "SPxSolver::getEnterVals() : col " << enterIdx
-                        << ": " << enterStat
-                        << " -> " << ds.colStatus(enterIdx)
-                        << std::endl; });
+      DEBUG({ s_spxout << "SPxSolver::getEnterVals() : col " << enterIdx
+                       << ": " << enterStat
+                       << " -> " << ds.colStatus(enterIdx)
+                       << std::endl; });
    }
 
    else
@@ -516,10 +517,10 @@ void SPxSolver::getEnterVals
       default:
          assert(false);
       }
-      DEBUG({ std::cout << "SPxSolver::getEnterVals() : row " << enterIdx
-                        << ": " << enterStat
-                        << " -> " << ds.rowStatus(enterIdx)
-                        << std::endl; });
+      DEBUG({ s_spxout << "SPxSolver::getEnterVals() : row " << enterIdx
+                       << ": " << enterStat
+                       << " -> " << ds.rowStatus(enterIdx)
+                       << std::endl; });
    }
 }
 
@@ -626,10 +627,10 @@ void SPxSolver::getEnterVals2
       default:
          assert(false);
       }
-      DEBUG({ std::cout << "SPxSolver::getEnterVals2(): row " << idx
-                        << ": " << leaveStat
-                        << " -> " << ds.rowStatus(idx)
-                        << std::endl; });
+      DEBUG({ s_spxout << "SPxSolver::getEnterVals2(): row " << idx
+                       << ": " << leaveStat
+                       << " -> " << ds.rowStatus(idx)
+                       << std::endl; });
    }
 
    else
@@ -713,10 +714,10 @@ void SPxSolver::getEnterVals2
       default:
          assert(false);
       }
-      DEBUG({ std::cout << "SPxSolver::getEnterVals2(): col " << idx
-                        << ": " << leaveStat
-                        << " -> " << ds.colStatus(idx)
-                        << std::endl; });
+      DEBUG({ s_spxout << "SPxSolver::getEnterVals2(): col " << idx
+                       << ": " << leaveStat
+                       << " -> " << ds.colStatus(idx)
+                       << std::endl; });
    }
 }
 
@@ -802,7 +803,7 @@ bool SPxSolver::enter(SPxId& enterId)
    {
       rejectEnter(enterId, enterTest, enterStat);
       change(-1, enterId, enterVec);
-      DEBUG( std::cout << "rejecting false enter pivot" << std::endl; );
+      DEBUG( s_spxout << "rejecting false enter pivot" << std::endl; );
       return true;
    }
 
@@ -819,7 +820,7 @@ bool SPxSolver::enter(SPxId& enterId)
       multBaseWith(tmp);
       tmp -= *enterVec;
       if (tmp.length() > delta())
-         std::cerr << "fVec updated error = " << tmp.length() << std::endl;
+         ERROR( s_spxout << "fVec updated error = " << tmp.length() << std::endl; )
    }
 #endif  // NDEBUG
 
@@ -938,7 +939,7 @@ bool SPxSolver::enter(SPxId& enterId)
 
       if (lastUpdate() > 1)
       {
-         VERBOSE3({ std::cout << "IENTER01 factorization triggered in enter() for feasibility test" << std::endl; });
+         VERBOSE3({ s_spxout << "IENTER01 factorization triggered in enter() for feasibility test" << std::endl; });
          factorize();
          return enter(enterId);
       }
@@ -946,7 +947,7 @@ bool SPxSolver::enter(SPxId& enterId)
       SPxId none;
       change(-1, none, 0);
 
-      VERBOSE3({ std::cout << "IENTER02 unboundness/infeasiblity found in enter()" << std::endl; });
+      VERBOSE3({ s_spxout << "IENTER02 unboundness/infeasiblity found in enter()" << std::endl; });
 
       if (rep() != COLUMN)
          setBasisStatus(SPxBasis::INFEASIBLE);

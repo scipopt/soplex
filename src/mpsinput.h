@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: mpsinput.h,v 1.5 2005/01/08 15:24:12 bzfkocht Exp $"
+#pragma ident "@(#) $Id: mpsinput.h,v 1.6 2005/07/13 19:05:31 bzforlow Exp $"
 
 /**@file  mpsinput.h
  * @brief Read MPS format files.
@@ -101,7 +101,7 @@ public:
    }
    void syntaxError() 
    {
-      std::cerr << "Syntax error in line " << m_lineno << std::endl;
+      ERROR( s_spxout << "Syntax error in line " << m_lineno << std::endl; )
       m_section = ENDATA;
       m_has_error = true;
    }
@@ -109,10 +109,10 @@ public:
       const char* what, const char* what_name, 
       const char* entity, const char* entity_name)
    {
-      std::cerr << "Warning line " << m_lineno << ": "
-                << what << " \"" << what_name << "\"" 
-                << " for " << entity << " \"" 
-                << entity_name << "\" ignored" << std::endl;
+      WARNING( s_spxout << "Warning: line " << m_lineno << ": "
+                        << what << " \"" << what_name << "\"" 
+                        << " for " << entity << " \"" 
+                        << entity_name << "\" ignored" << std::endl; )
    }
    bool readLine();
    void insertName(const char* name, bool second = false);

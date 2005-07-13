@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeometsc.cpp,v 1.9 2005/07/12 13:41:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeometsc.cpp,v 1.10 2005/07/13 19:05:32 bzforlow Exp $"
 
 /**@file  spxgeometsc.cpp
  * @brief Geometric mean row/column scaling.
@@ -21,6 +21,7 @@
 #include <assert.h>
 
 #include "spxgeometsc.h"
+#include "spxout.h"
 
 namespace soplex
 {
@@ -52,7 +53,7 @@ void SPxGeometSC::scale(SPxLP& lp)
 {
    METHOD( "SPxGeometSC::scale()" );
 
-   VERBOSE1({ std::cout << "IGEOSC01 Geometric scaling LP" << std::endl; });   
+   VERBOSE1({ s_spxout << "IGEOSC01 Geometric scaling LP" << std::endl; });   
 
    Real pstart = 0.0;
    Real p0     = 0.0;
@@ -68,12 +69,12 @@ void SPxGeometSC::scale(SPxLP& lp)
 
    m_colFirst = colratio < rowratio;
 
-   VERBOSE2({ std::cout << "IGEOSC02 LP scaling statistics:" 
-                        << " min= " << lp.minAbsNzo()
-                        << " max= " << lp.maxAbsNzo()
-                        << " col-ratio= " << colratio
-                        << " row-ratio= " << rowratio
-                        << std::endl; });
+   VERBOSE2({ s_spxout << "IGEOSC02 LP scaling statistics:" 
+                       << " min= " << lp.minAbsNzo()
+                       << " max= " << lp.maxAbsNzo()
+                       << " col-ratio= " << colratio
+                       << " row-ratio= " << rowratio
+                       << std::endl; });
 
    // We make at most m_maxIterations. 
    for(int count = 0; count < m_maxIterations; count++)
@@ -88,10 +89,10 @@ void SPxGeometSC::scale(SPxLP& lp)
          p0 = computeScalingVecs(lp.rowSet(), m_colscale, m_rowscale);
          p1 = computeScalingVecs(lp.colSet(), m_rowscale, m_colscale);
       }
-      VERBOSE3({ std::cout << "IGEOSC03 Geometric scaling round " << count
-                           << " col-ratio= " << (m_colFirst ? p0 : p1)
-                           << " row-ratio= " << (m_colFirst ? p1 : p0)
-                           << std::endl; });
+      VERBOSE3({ s_spxout << "IGEOSC03 Geometric scaling round " << count
+                          << " col-ratio= " << (m_colFirst ? p0 : p1)
+                          << " row-ratio= " << (m_colFirst ? p1 : p0)
+                          << std::endl; });
 
       // record start value, this is done with m_col/rowscale = 1.0, so it is the
       // value frome the "original" (as passed to the scaler) LP.
@@ -115,25 +116,25 @@ void SPxGeometSC::scale(SPxLP& lp)
       // reset m_colscale/m_rowscale to 1.0
       setup(lp);
 
-      VERBOSE2({ std::cout << "IGEOSC04 No scaling done." << std::endl; });
+      VERBOSE2({ s_spxout << "IGEOSC04 No scaling done." << std::endl; });
    }
    else
    {
       applyScaling(lp);
 
-      VERBOSE3({ std::cout << "IGEOSC05 Row scaling min= " << minAbsRowscale()
-                           << " max= " << maxAbsRowscale()
-                           << std::endl
-                           << "IGEOSC06 Col scaling min= " << minAbsColscale()
-                           << " max= " << maxAbsColscale()
-                           << std::endl; });
+      VERBOSE3({ s_spxout << "IGEOSC05 Row scaling min= " << minAbsRowscale()
+                          << " max= " << maxAbsRowscale()
+                          << std::endl
+                          << "IGEOSC06 Col scaling min= " << minAbsColscale()
+                          << " max= " << maxAbsColscale()
+                          << std::endl; });
 
-      VERBOSE2({ std::cout << "IGEOSC07 LP scaling statistics:" 
-                           << " min= " << lp.minAbsNzo()
-                           << " max= " << lp.maxAbsNzo()
-                           << " col-ratio= " << maxColRatio(lp) 
-                           << " row-ratio= " << maxRowRatio(lp) 
-                           << std::endl; });
+      VERBOSE2({ s_spxout << "IGEOSC07 LP scaling statistics:" 
+                          << " min= " << lp.minAbsNzo()
+                          << " max= " << lp.maxAbsNzo()
+                          << " col-ratio= " << maxColRatio(lp) 
+                          << " row-ratio= " << maxRowRatio(lp) 
+                          << std::endl; });
    }
 }
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.17 2004/11/09 17:10:44 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.18 2005/07/13 19:05:32 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -27,7 +27,7 @@ namespace soplex
 {
 /**
  * Here comes the ratio test for selecting a variable to leave the basis. 
- * it is assumed, that #Vec.delta() and #fVec.idx() have been setup
+ * It is assumed that #Vec.delta() and #fVec.idx() have been setup
  * correctly!
  *
  * The leaving variable is selected such that the update of #fVec() (using
@@ -148,7 +148,7 @@ int SPxDefaultRT::selectLeave(Real& val)
 }
 
 /**
- Here comes the ratio test. It is assumed, that #theCoPvec.delta() and
+ Here comes the ratio test. It is assumed that #theCoPvec.delta() and
  #theCoPvec.idx() have been setup correctly!
  */
 SPxId SPxDefaultRT::selectEnter(Real& max)
@@ -353,8 +353,8 @@ SPxId SPxDefaultRT::selectEnter(Real& max)
 
    if (enterId.isValid() && solver()->isBasic(enterId))
    {
-      DEBUG({ std::cerr << "isValid() && isBasic(): max=" << max
-                        << std::endl; });
+      DEBUG({ s_spxout << "isValid() && isBasic(): max=" << max
+                       << std::endl; });
       if (cnum >= 0)
          solver()->coPvec().delta().clearNum(cnum);
       else
@@ -365,7 +365,7 @@ SPxId SPxDefaultRT::selectEnter(Real& max)
 
    DEBUG({
       if( !enterId.isValid() )
-         std::cerr << "!isValid(): max=" << max << ", x=" << x << std::endl;
+         s_spxout << "!isValid(): max=" << max << ", x=" << x << std::endl;
    });
    max = val;
 

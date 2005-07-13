@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.19 2005/01/06 17:12:09 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.20 2005/07/13 19:05:32 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -24,6 +24,7 @@
 #include "dataarray.h"
 #include "ssvector.h"
 #include "sorter.h"
+#include "spxout.h"
 
 namespace soplex
 {
@@ -252,7 +253,7 @@ SPxSimplifier::Result SPxAggregateSM::simplify(SPxLP& lp, Real /*eps*/, Real /*d
       ++stage;
       if (last)
       {
-         VERBOSE3( std::cout << "looping ..." << std::endl; );
+         VERBOSE3( s_spxout << "looping ..." << std::endl; );
          maxFill = (maxFill + 20) / 2;
       }
       last = num;
@@ -322,10 +323,10 @@ SPxSimplifier::Result SPxAggregateSM::simplify(SPxLP& lp, Real /*eps*/, Real /*d
       assert(lp.isConsistent());
       lp.removeCols (remCol.get_ptr());
       assert(lp.isConsistent());
-      VERBOSE1({ std::cout << "SPxAggregateSM:\tremoved " << num
-                           << " row(s) and column(s)" << std::endl
+      VERBOSE1({ s_spxout << "SPxAggregateSM:\tremoved " << num
+                          << " row(s) and column(s)" << std::endl
                     //                           << "SPxAggregateSM:\tdelta = " << delta
-                           << std::endl; });
+                          << std::endl; });
    }
 
    return OKAY;
