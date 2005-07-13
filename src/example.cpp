@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.67 2005/03/11 11:43:33 bzfpfend Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.68 2005/07/13 14:18:04 bzforlow Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -53,8 +53,11 @@
 
 using namespace soplex;
 
-/** Here comes a simple derived class from #SoPlex, which uses #terminate() as
- *  callback method for outputting statistics.
+//------------------------------------------------------------------------
+//    class MySoPlex
+//------------------------------------------------------------------------
+
+/** Here comes a simple derived class from #SoPlex.
  */
 class MySoPlex : public SoPlex
 {
@@ -64,8 +67,12 @@ public:
       SPxSolver::Type p_type = SPxSolver::LEAVE, 
       SPxSolver::Representation p_rep = SPxSolver::COLUMN)
       : SoPlex(p_type, p_rep)
-   {
-   }
+   {}
+   //------------------------------------------------------------------------
+   /// virtual destructor
+   virtual ~MySoPlex()
+   {}
+   //------------------------------------------------------------------------
    void displayQuality() const
    {
       Real maxviol;
@@ -118,7 +125,7 @@ public:
 #endif
       }
    }
-
+   //------------------------------------------------------------------------
    void displayInfeasibility() const
    {
       assert(m_solver.status() == SPxSolver::INFEASIBLE);
@@ -131,6 +138,10 @@ public:
 #endif
    }
 };
+
+//------------------------------------------------------------------------
+//    main program
+//------------------------------------------------------------------------
 
 int main(int argc, const char* const argv[])
 {
@@ -312,6 +323,7 @@ int main(int argc, const char* const argv[])
    Param::setVerbose(verbose);
 
    std::cout.setf(std::ios::scientific | std::ios::showpoint);
+   std::cerr.setf(std::ios::scientific | std::ios::showpoint);
 
    MySoPlex work(type, representation);
 
@@ -519,7 +531,7 @@ int main(int argc, const char* const argv[])
    timer.stop();
 
    std::cout << "IEXAMP01 Factorizations   : " << work.getFactorCount() << std::endl;
-   std::cout << "IEXAMO02     Time spent   : " << work.getFactorTime() << std::endl;
+   std::cout << "IEXAMP02     Time spent   : " << work.getFactorTime() << std::endl;
    std::cout << "IEXAMP03 Solves           : " << work.getSolveCount() << std::endl;
    std::cout << "IEXAMP04     Time spent   : " << work.getSolveTime() << std::endl;
 
