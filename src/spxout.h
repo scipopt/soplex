@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxout.h,v 1.3 2005/07/14 13:37:52 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxout.h,v 1.4 2005/07/14 17:38:38 bzforlow Exp $"
 
 /**@file  spxout.h
  * @brief Wrapper for different output streams and verbosity levels.
@@ -261,7 +261,7 @@ private:
    //    static SPxOut instance
    // ---------------------------------------------------------
 
-   static soplex::SPxOut s_spxout;
+   static soplex::SPxOut spxout;
 
 }      // namespace soplex
 

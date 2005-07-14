@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.15 2005/07/14 13:37:53 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.16 2005/07/14 17:38:39 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -154,7 +154,7 @@ void SPxSolver::setType(Type tp)
       factorized = false;
       m_numCycle = 0;
 #endif
-      DEBUG({ s_spxout << "switching to " 
+      DEBUG({ spxout << "switching to " 
                        << static_cast<const char*>((tp == LEAVE)
                           ? "leaving" : "entering")
                        << " algorithm" << std::endl; });
@@ -433,7 +433,7 @@ void SPxSolver::factorize()
 {
    METHOD( "SPxSolver::factorize()" );
 
-   VERBOSE1({ s_spxout << "ISOLVE01 " 
+   VERBOSE1({ spxout << "ISOLVE01 " 
                        << std::setw(8) << basis().iteration() 
                        << std::setw(4) << basis().lastUpdate()
                        << " " << (isInitialized() ? value() : 0.0) 
@@ -464,27 +464,27 @@ void SPxSolver::factorize()
       ctmp -= coPvec();
       if (ftmp.length() > delta())
       {
-         DEBUG( s_spxout << "fVec:   " << ftmp.length() << std::endl; );
+         DEBUG( spxout << "fVec:   " << ftmp.length() << std::endl; );
          ftmp = fVec();
          multBaseWith(ftmp);
          ftmp -= fRhs();
          if (ftmp.length() > delta())
-            ERROR( s_spxout << iteration() << ": fVec error = " 
+            ERROR( spxout << iteration() << ": fVec error = " 
                             << ftmp.length() << std::endl; )
       }
       if (ctmp.length() > delta())
       {
-         DEBUG( s_spxout << "coPvec: " << ctmp.length() << std::endl; );
+         DEBUG( spxout << "coPvec: " << ctmp.length() << std::endl; );
          ctmp = coPvec();
          multWithBase(ctmp);
          ctmp -= coPrhs();
          if (ctmp.length() > delta())
-            ERROR( s_spxout << iteration() << ": coPvec error = " 
+            ERROR( spxout << iteration() << ": coPvec error = " 
                             << ctmp.length() << std::endl; )
       }
       if (ptmp.length() > delta())
       {
-         DEBUG( s_spxout << "pVec:   " << ptmp.length() << std::endl; );
+         DEBUG( spxout << "pVec:   " << ptmp.length() << std::endl; );
       }
 #endif  // NDEBUG
 
@@ -946,7 +946,7 @@ int SPxSolver::terminationIter() const
 void SPxSolver::setTerminationValue(Real /*p_value*/)
 {
    METHOD( "SPxSolver::setTerminationValue()" );
-   ERROR( s_spxout << "setTerminationValue not yet implemented" << std::endl; )
+   ERROR( spxout << "setTerminationValue not yet implemented" << std::endl; )
    //maxValue = p_value;
 }
 
@@ -984,7 +984,7 @@ SPxSolver::basisStatusToVarStatus( SPxBasis::Desc::Status stat ) const
       vstat = BASIC;
       break;
    default:
-      ERROR( s_spxout << "ERROR: unknown basis status (" << stat << ")" 
+      ERROR( spxout << "ERROR: unknown basis status (" << stat << ")" 
                       << std::endl; )
       assert(false);
    }
@@ -1023,7 +1023,7 @@ SPxSolver::varStatusToBasisStatusRow( int row, SPxSolver::VarStatus stat ) const
       rstat = dualRowStatus(row);
       break;
    default:
-      ERROR( s_spxout << "ERROR: unknown VarStatus (" << int(stat) << ")" 
+      ERROR( spxout << "ERROR: unknown VarStatus (" << int(stat) << ")" 
                       << std::endl; )
       assert(false);
    }
@@ -1062,7 +1062,7 @@ SPxSolver::varStatusToBasisStatusCol( int col, SPxSolver::VarStatus stat ) const
       cstat = dualColStatus(col);
       break;
    default:
-      ERROR( s_spxout << "ERROR: unknown VarStatus (" << int(stat) << ")" 
+      ERROR( spxout << "ERROR: unknown VarStatus (" << int(stat) << ")" 
                       << std::endl; )
       assert(false);
    }

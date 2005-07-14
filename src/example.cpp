@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.69 2005/07/14 13:37:52 bzforlow Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.70 2005/07/14 17:38:35 bzforlow Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -327,7 +327,7 @@ int main(int argc, const char* const argv[])
 
    // Send errors to a file (similarly for the other verbosity levels):
    // std::ofstream my_error_stream( "errors.txt" );
-   // s_spxout.setStream( SPxOut::ERROR, my_error_stream );
+   // spxout.setStream( SPxOut::ERROR, my_error_stream );
 
    MySoPlex work(type, representation);
 
@@ -503,7 +503,7 @@ int main(int argc, const char* const argv[])
 
    if (!work.readFile(filename, &rownames, &colnames))
    {
-      ERROR( s_spxout << "EEXAMP23 error while reading file \"" 
+      ERROR( spxout << "EEXAMP23 error while reading file \"" 
                       << filename << "\"" << std::endl; )
       exit(1);
    }
@@ -521,7 +521,7 @@ int main(int argc, const char* const argv[])
 #if 0
       if (!work.readBasisFile(basisname, rownames, colnames))
       {
-         ERROR( s_spxout << "EEXAMP25 error while reading file \"" 
+         ERROR( spxout << "EEXAMP25 error while reading file \"" 
                          << basisname << "\"" << std::endl; )
          exit(1);
       }
@@ -576,7 +576,7 @@ int main(int argc, const char* const argv[])
       }
       if (write_basis)
          if (!work.writeBasisFile(basisname, rownames, colnames))
-            ERROR( s_spxout << "EEXAMP30 error while writing file \"" 
+            ERROR( spxout << "EEXAMP30 error while writing file \"" 
                             << basisname << "\"" << std::endl; )
       break;
    case SPxSolver::UNBOUNDED:
@@ -600,10 +600,10 @@ int main(int argc, const char* const argv[])
       std::cout << "IEXAMP35 aborted due to objective value limit" << std::endl;
       break;
    case SPxSolver::SINGULAR:
-      ERROR( s_spxout << "EEXAMP39 basis is singular" << std::endl; )
+      ERROR( spxout << "EEXAMP39 basis is singular" << std::endl; )
       break;
    default:
-      ERROR( s_spxout << "EEXAMP36 An error occurred during "
+      ERROR( spxout << "EEXAMP36 An error occurred during "
                       << "the solution process" << std::endl; )
       break;
    }

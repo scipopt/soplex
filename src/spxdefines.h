@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.22 2005/07/14 13:37:52 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.23 2005/07/14 17:38:36 bzforlow Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
@@ -47,12 +47,12 @@ namespace soplex
  *-----------------------------------------------------------------------------
  */
 
-// store the old verbosity of s_spxout, do something, reset verbosity
+// store the old verbosity of spxout, do something, reset verbosity
 #define DO_WITH_TMP_VERBOSITY( verbosity, do_something ) \
-   { const SPxOut::Verbosity tmp_verbosity = s_spxout.getVerbosity(); \
-     s_spxout.setVerbosity( verbosity ); \
+   { const SPxOut::Verbosity tmp_verbosity = spxout.getVerbosity(); \
+     spxout.setVerbosity( verbosity ); \
      do_something \
-     s_spxout.setVerbosity( tmp_verbosity ); }
+     spxout.setVerbosity( tmp_verbosity ); }
 
 //#define VERBOSE1(x) { if(Param::verbose() >= 1) {x} }
 //#define VERBOSE2(x) { if(Param::verbose() >= 2) {x} }

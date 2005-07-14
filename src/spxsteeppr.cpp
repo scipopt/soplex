@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.27 2005/07/14 13:37:53 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.28 2005/07/14 17:38:39 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -94,7 +94,7 @@ void SPxSteepPR::setType(SPxSolver::Type type)
    }
    else
    {
-      ERROR( s_spxout << "sorry, no exact setup for steepest "
+      ERROR( spxout << "sorry, no exact setup for steepest "
                       << "edge multipliers implemented" << std::endl; )
 
       if (type == SPxSolver::ENTER)
@@ -274,7 +274,7 @@ int SPxSteepPR::selectLeave()
 #ifndef NDEBUG
          if( coPenalty_ptr[i] < theeps )
          {
-            ERROR( s_spxout << "SPxSteepPR::selectLeaveX(): This shall not be!"
+            ERROR( spxout << "SPxSteepPR::selectLeaveX(): This shall not be!"
                             << std::endl
                             << "i=" << i
                             << " x=" << x
@@ -539,7 +539,7 @@ bool SPxSteepPR::isConsistent() const
          x = coPenalty[i] - tmp.length2();
          if (x > thesolver->delta() || -x > thesolver->delta())
          {
-            ERROR( s_spxout << "x[" << i << "] = " << x << std::endl; )
+            ERROR( spxout << "x[" << i << "] = " << x << std::endl; )
          }
       }
    }

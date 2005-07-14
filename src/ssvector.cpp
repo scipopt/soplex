@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.34 2005/07/13 19:05:34 bzforlow Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.35 2005/07/14 17:38:39 bzforlow Exp $"
 
 #include <iostream>
 #include <iomanip>
@@ -1116,7 +1116,7 @@ bool SSVector::isConsistent() const
 
          if (j < 0 && fabs(val[i]) > 0.0) 
          {
-            ERROR( s_spxout << "i= " << i 
+            ERROR( spxout << "i= " << i 
                             << "\tidx= " << j 
                             << "\tval= " << std::setprecision(16) << val[i] 
                             << std::endl; )

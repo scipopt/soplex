@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.45 2005/07/14 13:37:52 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.46 2005/07/14 17:38:36 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -100,7 +100,7 @@ void SPxBasis::loadMatrixVecs()
    assert(theLP != 0);
    assert(theLP->dim() == matrix.size());
 
-   VERBOSE3({ s_spxout << "IBASIS01 loadMatrixVecs() invalidates factorization" << std::endl; });
+   VERBOSE3({ spxout << "IBASIS01 loadMatrixVecs() invalidates factorization" << std::endl; });
 
    int i;
    nzCount = 0;
@@ -133,7 +133,7 @@ void SPxBasis::loadDesc(const Desc& ds)
    int   i;
    int   j;
 
-   VERBOSE3({ s_spxout << "IBASIS02 loading of Basis invalidates factorization" << std::endl; });
+   VERBOSE3({ spxout << "IBASIS02 loading of Basis invalidates factorization" << std::endl; });
 
    lastin      = none;
    lastout     = none;
@@ -222,7 +222,7 @@ void SPxBasis::loadSolver(SLinSolver* p_solver)
 {
    METHOD( "SPxBasis::load()" );
 
-   VERBOSE3({ s_spxout << "IBASIS03 loading of Solver invalidates factorization" << std::endl; });
+   VERBOSE3({ spxout << "IBASIS03 loading of Solver invalidates factorization" << std::endl; });
 
    factor = p_solver;
    factorized = false;
@@ -335,7 +335,7 @@ void SPxBasis::writeBasis(
 
    if (theLP->rep() == SPxSolver::ROW)
    {
-      ERROR( s_spxout << "writing basis for row representation not yet "
+      ERROR( spxout << "writing basis for row representation not yet "
                          " implemented!" << std::endl; )
       return;
    }
@@ -435,7 +435,7 @@ void SPxBasis::change(
       // relative fill too high ?
       else if (Real(factor->memory()) > lastFill * Real(lastMem))
       {
-         VERBOSE3({ s_spxout << "IBASIS04 fill factor triggers refactorization"
+         VERBOSE3({ spxout << "IBASIS04 fill factor triggers refactorization"
                              << " memory= " << factor->memory()
                              << " lastMem= " << lastMem
                              << " lastFill= " << lastFill
@@ -446,7 +446,7 @@ void SPxBasis::change(
       // absolute fill too high ?
       else if (Real(factor->memory()) > nonzeroFactor * Real(nzCount))
       {
-         VERBOSE3({ s_spxout << "IBASIS05 nonzero factor triggers refactorization"
+         VERBOSE3({ spxout << "IBASIS05 nonzero factor triggers refactorization"
                              << " memory= " << factor->memory()
                              << " nzCount= " << nzCount
                              << " nonzeroFactor= " << nonzeroFactor
@@ -456,7 +456,7 @@ void SPxBasis::change(
       // too many updates ?
       else if (updateCount >= maxUpdates)
       {
-         VERBOSE3({ s_spxout << "IBASIS06 update count triggers refactorization"
+         VERBOSE3({ spxout << "IBASIS06 update count triggers refactorization"
                              << " updateCount= " << updateCount
                              << " maxUpdates= " << maxUpdates
                              << std::endl; });
@@ -470,8 +470,8 @@ void SPxBasis::change(
 
          if (factor->status() != SLinSolver::OK || factor->stability() < minStab)
          {
-            // VERBOSE3( s_spxout << s << " -> " << factor->stability() << '\t'; )
-            VERBOSE3({ s_spxout << "IBASIS07 stability triggers refactorization"
+            // VERBOSE3( spxout << s << " -> " << factor->stability() << '\t'; )
+            VERBOSE3({ spxout << "IBASIS07 stability triggers refactorization"
                                 << " stability= " << factor->stability()
                                 << " minStab= " << minStab
                                 << std::endl; });
@@ -516,7 +516,7 @@ void SPxBasis::factorize()
       setStatus(SINGULAR);
       break;
    default :
-      ERROR( s_spxout << "EBASIS08 error: unknown status of factorization.\n"; )
+      ERROR( spxout << "EBASIS08 error: unknown status of factorization.\n"; )
       assert(false);
       // factorized = false;
    }
@@ -582,20 +582,20 @@ void SPxBasis::dump()
    int i, basesize;
 
    // Dump regardless of the verbosity level if this method is called.
-   const SPxOut::Verbosity tmp_verbosity = s_spxout.getVerbosity();
-   s_spxout.setVerbosity( SPxOut::ERROR );
+   const SPxOut::Verbosity tmp_verbosity = spxout.getVerbosity();
+   spxout.setVerbosity( SPxOut::ERROR );
 
-   s_spxout << "Basis entries:" << std::endl;
+   spxout << "Basis entries:" << std::endl;
    basesize = 0;
    for (i = 0; i < theLP->nRows(); ++i)
    {
       if (theLP->isBasic(thedesc.rowStatus(i)))
       {
          SPxRowId id = theLP->SPxLP::rId(i);
-         s_spxout << "\tR" << theLP->number(id);
+         spxout << "\tR" << theLP->number(id);
          basesize++;
          if(basesize % 8 == 0)
-            s_spxout << std::endl;
+            spxout << std::endl;
       }
    }
 
@@ -604,16 +604,16 @@ void SPxBasis::dump()
       if (theLP->isBasic(thedesc.colStatus(i)))
       {
          SPxColId id = theLP->SPxLP::cId(i);
-         s_spxout << "\tC" << theLP->number(id);
+         spxout << "\tC" << theLP->number(id);
          basesize++;
          if(basesize % 8 == 0)
-            s_spxout << std::endl;
+            spxout << std::endl;
       }
    }
-   s_spxout << std::endl;
+   spxout << std::endl;
 
    assert(basesize == matrix.size());
-   s_spxout.setVerbosity( tmp_verbosity );
+   spxout.setVerbosity( tmp_verbosity );
 }
 
 bool SPxBasis::isConsistent() const

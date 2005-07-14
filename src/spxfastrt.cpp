@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.28 2005/07/13 19:05:32 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.29 2005/07/14 17:38:36 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -850,7 +850,7 @@ int SPxFastRT::selectLeave(Real& val)
 
    DEBUG({
       if (leave >= 0)
-         s_spxout 
+         spxout 
            << thesolver->basis().iteration() << "("
            << std::setprecision(6) << thesolver->value() << ","
            << std::setprecision(2) << thesolver->basis().stability() << "):"
@@ -860,7 +860,7 @@ int SPxFastRT::selectLeave(Real& val)
            << std::setprecision(6) << maxabs 
            << std::endl;
       else
-         s_spxout << thesolver->basis().iteration() 
+         spxout << thesolver->basis().iteration() 
                   << ": skipping instable pivot"
                   << std::endl;
    });
@@ -1172,11 +1172,11 @@ SPxId SPxFastRT::selectEnter(Real& val)
                x = thesolver->coPvec().delta()[ thesolver->number(enterId) ];
             else
                x = thesolver->pVec().delta()[ thesolver->number(enterId) ];
-            s_spxout << thesolver->basis().iteration() << ": " << sel
+            spxout << thesolver->basis().iteration() << ": " << sel
                      << '\t' << x << " (" << maxabs << ")" << std::endl;
          }
       else
-         s_spxout << thesolver->basis().iteration() 
+         spxout << thesolver->basis().iteration() 
                   << ": skipping instable pivot" << std::endl;
    });
 

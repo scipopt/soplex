@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvectorst.cpp,v 1.12 2005/07/13 19:05:34 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxvectorst.cpp,v 1.13 2005/07/14 17:38:39 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -42,7 +42,7 @@ void SPxVectorST::setupWeights(SPxSolver& base)
       Real x, y;
       int i;
 
-      DEBUG( s_spxout << "colWeight[]: "; );
+      DEBUG( spxout << "colWeight[]: "; );
       for (i = base.nCols(); i--;)
       {
          x = vec[i] - base.SPxLP::lower(i);
@@ -57,11 +57,11 @@ void SPxVectorST::setupWeights(SPxSolver& base)
             colWeight[i] = -y + bias * obj[i];
             colUp[i] = 1;
          }
-         DEBUG( s_spxout << colWeight[i] << " "; );
+         DEBUG( spxout << colWeight[i] << " "; );
       }
-      DEBUG( s_spxout << std::endl << std::endl; );
+      DEBUG( spxout << std::endl << std::endl; );
 
-      DEBUG( s_spxout << "rowWeight[]: "; );
+      DEBUG( spxout << "rowWeight[]: "; );
       for (i = base.nRows(); i--;)
       {
          const SVector& row = base.rowVector(i);
@@ -78,9 +78,9 @@ void SPxVectorST::setupWeights(SPxSolver& base)
             rowWeight[i] = -y - eps * row.size() + bias * (obj * row);
             rowRight[i] = 1;
          }
-         DEBUG( s_spxout << rowWeight[i] << " "; );
+         DEBUG( spxout << rowWeight[i] << " "; );
       }
-      DEBUG( s_spxout << std::endl; );
+      DEBUG( spxout << std::endl; );
    }
 
    else if (state == DVEC)

@@ -20,16 +20,16 @@ public:
    {
       int i;
  
-      s_spxout << "\t";
+      spxout << "\t";
       
       for(i = 0; i < s_indent; i++)
-         s_spxout << ".";      
+         spxout << ".";      
       
-      s_spxout << s;
+      spxout << s;
       
       for(i = strlen(s) + s_indent; i < FILE_NAME_COL - 8; i++)
-         s_spxout << "_";             
-      s_spxout << "[" << file << ":" << line << "]" << std::endl; 
+         spxout << "_";             
+      spxout << "[" << file << ":" << line << "]" << std::endl; 
       s_indent++;
    }
    virtual ~TraceMethod()

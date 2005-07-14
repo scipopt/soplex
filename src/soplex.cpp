@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.74 2005/07/14 13:37:52 bzforlow Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.75 2005/07/14 17:38:35 bzforlow Exp $"
 
 #include <iostream>
 
@@ -151,7 +151,7 @@ SPxSolver::Status SoPlex::getSlacks(Vector& s) const
    /// Does not work yet with presolve
    if (has_simplifier())
    {
-      ERROR( s_spxout << "Not yet implemented" << std::endl; )
+      ERROR( spxout << "Not yet implemented" << std::endl; )
       return SPxSolver::ERROR;
    }
    SPxSolver::Status stat = m_solver.getSlacks(s);
@@ -170,7 +170,7 @@ SPxSolver::Status SoPlex::getDual(Vector& pi) const
    /// Does not work yet with presolve
    if (has_simplifier())
    {
-      ERROR( s_spxout << "Not yet implemented" << std::endl; )
+      ERROR( spxout << "Not yet implemented" << std::endl; )
       return SPxSolver::ERROR;
    }
    SPxSolver::Status stat = m_solver.getDual(pi);
@@ -189,7 +189,7 @@ SPxSolver::Status SoPlex::getRedCost(Vector& rdcost) const
    /// Does not work yet with presolve
    if (has_simplifier())
    {
-      ERROR( s_spxout << "Not yet implemented" << std::endl; )
+      ERROR( spxout << "Not yet implemented" << std::endl; )
       return SPxSolver::ERROR;
    }
    SPxSolver::Status stat = m_solver.getRedCost(rdcost);
@@ -275,7 +275,7 @@ bool SoPlex::writeBasisFile(
    const NameSet& rowNames, 
    const NameSet& colNames)
 {
-   ERROR( s_spxout << "Warning! Not fully implemented" << std::endl; )
+   ERROR( spxout << "Warning! Not fully implemented" << std::endl; )
    return m_solver.writeBasisFile(filename, rowNames, colNames);
 }
 

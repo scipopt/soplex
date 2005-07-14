@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdesc.cpp,v 1.13 2005/07/14 13:37:52 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxdesc.cpp,v 1.14 2005/07/14 17:38:36 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -103,19 +103,19 @@ void SPxBasis::Desc::dump() const
    int i;
 
    // Dump regardless of the verbosity level if this method is called.
-   const SPxOut::Verbosity tmp_verbosity = s_spxout.getVerbosity();
-   s_spxout.setVerbosity( SPxOut::ERROR );
+   const SPxOut::Verbosity tmp_verbosity = spxout.getVerbosity();
+   spxout.setVerbosity( SPxOut::ERROR );
 
-   s_spxout << "column status: ";
+   spxout << "column status: ";
    for(i = 0; i < nCols(); i++)
-      s_spxout << colStatus(i);
-   s_spxout << std::endl;
+      spxout << colStatus(i);
+   spxout << std::endl;
 
-   s_spxout << "row status:    ";
+   spxout << "row status:    ";
    for(i = 0; i < nRows(); i++)
-      s_spxout << rowStatus(i); 
-   s_spxout << std::endl;
-   s_spxout.setVerbosity( tmp_verbosity );
+      spxout << rowStatus(i); 
+   spxout << std::endl;
+   spxout.setVerbosity( tmp_verbosity );
 }
 
 bool SPxBasis::Desc::isConsistent() const

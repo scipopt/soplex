@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.42 2005/07/14 13:37:52 bzforlow Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.43 2005/07/14 17:38:35 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -1583,19 +1583,19 @@ void CLUFactor::dump() const
 
    // Dump regardless of the verbosity level if this method is called;
    // store the old level and restore it at the end of the method.
-   const SPxOut::Verbosity tmp_verbosity = s_spxout.getVerbosity();
-   s_spxout.setVerbosity( SPxOut::ERROR );
+   const SPxOut::Verbosity tmp_verbosity = spxout.getVerbosity();
+   spxout.setVerbosity( SPxOut::ERROR );
 
    /*  Dump U:
     */
    for (i = 0; i < thedim; ++i)
    {
       if (row.perm[i] >= 0)
-         s_spxout << "diag[" << i << "]: [" << col.orig[row.perm[i]] 
+         spxout << "diag[" << i << "]: [" << col.orig[row.perm[i]] 
                   << "] = " << diag[i] << std::endl;
 
       for (j = 0; j < u.row.len[i]; ++j)
-         s_spxout << "   u[" << i << "]: [" 
+         spxout << "   u[" << i << "]: [" 
                   << u.row.idx[u.row.start[i] + j] << "] = "
                   << u.row.val[u.row.start[i] + j] << std::endl;
    }
@@ -1607,16 +1607,16 @@ void CLUFactor::dump() const
       for (j = 0; j < l.firstUnused; ++j)
          if (col.orig[row.perm[l.row[j]]] == i)
          {
-            s_spxout << "l[" << i << "]" << std::endl;
+            spxout << "l[" << i << "]" << std::endl;
 
             for (k = l.start[j]; k < l.start[j + 1]; ++k)
-               s_spxout << "   l[" << k - l.start[j]
+               spxout << "   l[" << k - l.start[j]
                         << "]:  [" << l.idx[k]
                         << "] = " << l.val[k] << std::endl;
             break;
          }
    }
-   s_spxout.setVerbosity( tmp_verbosity );
+   spxout.setVerbosity( tmp_verbosity );
    return;
 }
 

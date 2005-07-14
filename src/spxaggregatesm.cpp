@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.21 2005/07/14 13:37:52 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.22 2005/07/14 17:38:36 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -253,7 +253,7 @@ SPxSimplifier::Result SPxAggregateSM::simplify(SPxLP& lp, Real /*eps*/, Real /*d
       ++stage;
       if (last)
       {
-         VERBOSE3( s_spxout << "looping ..." << std::endl; );
+         VERBOSE3( spxout << "looping ..." << std::endl; );
          maxFill = (maxFill + 20) / 2;
       }
       last = num;
@@ -323,7 +323,7 @@ SPxSimplifier::Result SPxAggregateSM::simplify(SPxLP& lp, Real /*eps*/, Real /*d
       assert(lp.isConsistent());
       lp.removeCols (remCol.get_ptr());
       assert(lp.isConsistent());
-      VERBOSE1({ s_spxout << "SPxAggregateSM:\tremoved " << num
+      VERBOSE1({ spxout << "SPxAggregateSM:\tremoved " << num
                           << " row(s) and column(s)" << std::endl
                     //                           << "SPxAggregateSM:\tdelta = " << delta
                           << std::endl; });
@@ -334,7 +334,7 @@ SPxSimplifier::Result SPxAggregateSM::simplify(SPxLP& lp, Real /*eps*/, Real /*d
 
 const Vector& SPxAggregateSM::unsimplifiedPrimal(const Vector& x)
 {
-   ERROR( s_spxout << "SPxAggregateSM::unsimplifiedPrimal() not implemented\n";)
+   ERROR( spxout << "SPxAggregateSM::unsimplifiedPrimal() not implemented\n";)
 
    assert(false);
 
@@ -343,7 +343,7 @@ const Vector& SPxAggregateSM::unsimplifiedPrimal(const Vector& x)
 
 const Vector& SPxAggregateSM::unsimplifiedDual(const Vector& pi)
 {
-   ERROR( s_spxout << "SPxAggregateSM::unsimplifiedDual() not implemented\n"; )
+   ERROR( spxout << "SPxAggregateSM::unsimplifiedDual() not implemented\n"; )
 
    assert(false);
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvecs.cpp,v 1.24 2005/07/13 19:05:33 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxvecs.cpp,v 1.25 2005/07/14 17:38:39 bzforlow Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -77,7 +77,7 @@ void SPxSolver::computeFrhs()
                   break;
 
                default:
-                  ERROR( s_spxout << __FILE__ << __LINE__ << " ERROR: "
+                  ERROR( spxout << __FILE__ << __LINE__ << " ERROR: "
                                   << "inconsistent basis must not happen!" 
                                   << std::endl; )
                   assert(false);
@@ -142,7 +142,7 @@ void SPxSolver::computeFrhsXtra()
             break;
 
          default:
-            ERROR( s_spxout << __FILE__ << __LINE__ << " ERROR: "
+            ERROR( spxout << __FILE__ << __LINE__ << " ERROR: "
                             << "inconsistent basis must not happen!" 
                             << std::endl; )
             assert(false);
@@ -200,7 +200,7 @@ void SPxSolver::computeFrhs1(
             break;
 
          default:
-            ERROR( s_spxout << __FILE__ << __LINE__ << " ERROR: "
+            ERROR( spxout << __FILE__ << __LINE__ << " ERROR: "
                             << "inconsistent basis must not happen!" 
                             << std::endl; )
             assert(false);
@@ -253,7 +253,7 @@ void SPxSolver::computeFrhs2(
 
             if (colfb[i] != coufb[i])
             {
-               ERROR( s_spxout << "Frhs2: " << stat << " " 
+               ERROR( spxout << "Frhs2: " << stat << " " 
                                << colfb[i] << " " << coufb[i]
                                << " shouldn't be" << std::endl; )
             }
@@ -262,7 +262,7 @@ void SPxSolver::computeFrhs2(
             break;
 
          default:
-            ERROR( s_spxout << __FILE__ << __LINE__ << " ERROR: "
+            ERROR( spxout << __FILE__ << __LINE__ << " ERROR: "
                             << "inconsistent basis must not happen!" 
                             << std::endl; )
             assert(false);
