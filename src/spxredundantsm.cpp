@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.27 2005/07/13 19:05:33 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.28 2005/07/14 13:37:52 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -1147,7 +1147,7 @@ const Vector& SPxRedundantSM::unsimplifiedPrimal(const Vector& x)
 
 const Vector& SPxRedundantSM::unsimplifiedDual(const Vector& pi)
 {
-   std::cout << "SPxRedundantSM::getDual() not implemented\n";
+   ERROR( s_spxout << "SPxRedundantSM::getDual() not implemented\n"; )
 
    assert(false);
 

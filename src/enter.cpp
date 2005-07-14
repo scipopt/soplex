@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.29 2005/07/13 19:05:31 bzforlow Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.30 2005/07/14 13:37:52 bzforlow Exp $"
 
 // #define DEBUGGING 1
 
@@ -450,7 +450,8 @@ void SPxSolver::getEnterVals
 #if 1
          assert(false);
 #else
-         std::cerr << __FILE__ << __LINE__ << "ERROR: not yet debugged!\n";
+         ERROR( s_spxout << __FILE__ << __LINE__ 
+                         << "ERROR: not yet debugged!" << std::endl; )
          enterPric = (*theCoPvec)[enterIdx];
          enterRO = 0;
          ds.rowStatus(enterIdx) = SPxBasis::Desc::D_UNDEFINED;
@@ -566,7 +567,8 @@ void SPxSolver::getEnterVals2
 #if 1
          assert(false);
 #else
-         std::cerr << __FILE__ << __LINE__ << "ERROR: not yet debugged!\n";
+         ERROR( s_spxout << __FILE__ << __LINE__ 
+                         << "ERROR: not yet debugged!" << std::endl; )
          if ((*theCoPvec)[leaveIdx] - theLBbound[leaveIdx] <
               theUBbound[leaveIdx] - (*theCoPvec)[leaveIdx])
          {

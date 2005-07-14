@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.26 2005/07/13 19:05:33 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.27 2005/07/14 13:37:53 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -94,7 +94,8 @@ void SPxSteepPR::setType(SPxSolver::Type type)
    }
    else
    {
-      std::cerr << "sorry, no exact setup for steepest edge multipliers implemented\n";
+      ERROR( s_spxout << "sorry, no exact setup for steepest "
+                      << "edge multipliers implemented" << std::endl; )
 
       if (type == SPxSolver::ENTER)
       {

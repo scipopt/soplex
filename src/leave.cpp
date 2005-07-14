@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.36 2005/07/13 19:05:31 bzforlow Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.37 2005/07/14 13:37:52 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -331,7 +331,8 @@ void SPxSolver::getLeaveVals2(
 #if 1
          assert(false);
 #else
-         std::cerr << __FILE__ << __LINE__ << "ERROR: not yet debugged!\n";
+         ERROR( s_spxout << __FILE__ << __LINE__ 
+                         << "ERROR: not yet debugged!" << std::endl; )
          ds.rowStatus(idx) = dualRowStatus(idx);
          newCoPrhs = theURbound[idx];        // slack !!
          newUBbound = infinity;

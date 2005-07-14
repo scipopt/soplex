@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxout.h,v 1.2 2005/07/13 19:04:15 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxout.h,v 1.3 2005/07/14 13:37:52 bzforlow Exp $"
 
 /**@file  spxout.h
  * @brief Wrapper for different output streams and verbosity levels.
@@ -50,7 +50,7 @@ namespace soplex
    @endcode
    or 
    @code
-      spxout.set_verbosity( SPxOut::WARNING );
+      spxout.setVerbosity( SPxOut::WARNING );
       spxout << std::setw( 15 ) << 42 << std::endl;
    @endcode
    instead of
@@ -114,13 +114,13 @@ public:
    //@{
    ///
    virtual void 
-   set_verbosity( const Verbosity v )
+   setVerbosity( const Verbosity v )
    {
       m_verbosity = v;
    }
    ///
    inline Verbosity
-   get_verbosity()
+   getVerbosity()
       const
    {
       return m_verbosity;
@@ -133,12 +133,12 @@ public:
    ///
    inline bool good() const
    {
-      return get_current_stream().good();
+      return getCurrentStream().good();
    }
    ///
    inline bool operator ! () 
    {
-      return ! get_current_stream();
+      return ! getCurrentStream();
    }
    //@}
 
@@ -147,24 +147,24 @@ public:
    //@{
    /// Sets the stream for the specified verbosity level.
    virtual void
-   set_stream( const Verbosity verbosity,
+   setStream( const Verbosity verbosity,
                std::ostream&   stream )
    {
       m_streams[ verbosity ] = &stream;
    }
    /// Returns the stream for the specified verbosity level.
    inline std::ostream&
-   get_stream( const Verbosity verbosity )
+   getStream( const Verbosity verbosity )
       const
    {
       return *(m_streams[ verbosity ]);
    }
    /// Returns the stream for the current verbosity.
    inline std::ostream&
-   get_current_stream()
+   getCurrentStream()
       const
    {
-      return get_stream( get_verbosity() );
+      return getStream( getVerbosity() );
    }
    //@}
 
@@ -207,7 +207,7 @@ private:
    /// @endcode
    /// passes such a struct to the output operator defined below, which
    /// extracts the verbosity level from the struct and passes it to the 
-   /// member function SPxOut::set_verbosity(). 
+   /// member function SPxOut::setVerbosity(). 
 
    /// manipulator to be used in an output statement
    inline SPxOut::struct_Verbosity
@@ -223,7 +223,7 @@ private:
    operator<< ( SPxOut& stream, 
                 const SPxOut::struct_Verbosity verb )
    {
-      stream.set_verbosity( verb.v_ );
+      stream.setVerbosity( verb.v_ );
       return stream;
    }
    //@}
@@ -232,8 +232,8 @@ private:
    /**@name Standard manipulators and output of other types */
    //@{
 #define SEND_TO_CURRENT_STREAM( spxout, v ) \
-   if ( spxout.get_verbosity() <= Param::verbose() )\
-      spxout.get_current_stream() << v; \
+   if ( spxout.getVerbosity() <= Param::verbose() )\
+      spxout.getCurrentStream() << v; \
    return spxout;
 
    /// Passes standard manipulators without arguments, like @c std::endl, 

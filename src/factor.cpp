@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.41 2003/03/04 19:30:45 bzfkocht Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.42 2005/07/14 13:37:52 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -1581,18 +1581,23 @@ void CLUFactor::dump() const
    METHOD( "CLUFactor::dump()" );
    int i, j, k;
 
+   // Dump regardless of the verbosity level if this method is called;
+   // store the old level and restore it at the end of the method.
+   const SPxOut::Verbosity tmp_verbosity = s_spxout.getVerbosity();
+   s_spxout.setVerbosity( SPxOut::ERROR );
+
    /*  Dump U:
     */
    for (i = 0; i < thedim; ++i)
    {
       if (row.perm[i] >= 0)
-         std::cout << "diag[" << i << "]: [" << col.orig[row.perm[i]] 
-                   << "] = " << diag[i] << std::endl;
+         s_spxout << "diag[" << i << "]: [" << col.orig[row.perm[i]] 
+                  << "] = " << diag[i] << std::endl;
 
       for (j = 0; j < u.row.len[i]; ++j)
-         std::cout << "   u[" << i << "]: [" 
-                   << u.row.idx[u.row.start[i] + j] << "] = "
-                   << u.row.val[u.row.start[i] + j] << std::endl;
+         s_spxout << "   u[" << i << "]: [" 
+                  << u.row.idx[u.row.start[i] + j] << "] = "
+                  << u.row.val[u.row.start[i] + j] << std::endl;
    }
 
    /*  Dump L:
@@ -1602,15 +1607,16 @@ void CLUFactor::dump() const
       for (j = 0; j < l.firstUnused; ++j)
          if (col.orig[row.perm[l.row[j]]] == i)
          {
-            std::cout << "l[" << i << "]" << std::endl;
+            s_spxout << "l[" << i << "]" << std::endl;
 
             for (k = l.start[j]; k < l.start[j + 1]; ++k)
-               std::cout << "   l[" << k - l.start[j]
-                         << "]:  [" << l.idx[k]
-                         << "] = " << l.val[k] << std::endl;
+               s_spxout << "   l[" << k - l.start[j]
+                        << "]:  [" << l.idx[k]
+                        << "] = " << l.val[k] << std::endl;
             break;
          }
    }
+   s_spxout.setVerbosity( tmp_verbosity );
    return;
 }
 

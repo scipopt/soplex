@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxstarter.cpp,v 1.9 2002/03/03 13:50:35 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxstarter.cpp,v 1.10 2005/07/14 13:37:53 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -28,7 +28,7 @@ namespace soplex
 
 bool SPxStarter::isConsistent() const
 {
-   std::cerr << "Not yet implemented" << std::endl;
+   ERROR( s_spxout << "Not yet implemented" << std::endl; )
 
    return true;
 }

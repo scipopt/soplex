@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.44 2005/07/13 19:05:32 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.45 2005/07/14 13:37:52 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -335,7 +335,8 @@ void SPxBasis::writeBasis(
 
    if (theLP->rep() == SPxSolver::ROW)
    {
-      std::cout << "writing basis for row representation not yet implemented!" << std::endl;
+      ERROR( s_spxout << "writing basis for row representation not yet "
+                         " implemented!" << std::endl; )
       return;
    }
    assert(theLP->rep() == SPxSolver::COLUMN);
@@ -469,7 +470,7 @@ void SPxBasis::change(
 
          if (factor->status() != SLinSolver::OK || factor->stability() < minStab)
          {
-            // std::cout << s << " -> " << factor->stability() << '\t';
+            // VERBOSE3( s_spxout << s << " -> " << factor->stability() << '\t'; )
             VERBOSE3({ s_spxout << "IBASIS07 stability triggers refactorization"
                                 << " stability= " << factor->stability()
                                 << " minStab= " << minStab
@@ -580,17 +581,21 @@ void SPxBasis::dump()
 
    int i, basesize;
 
-   std::cout << "Basis entries:" << std::endl;
+   // Dump regardless of the verbosity level if this method is called.
+   const SPxOut::Verbosity tmp_verbosity = s_spxout.getVerbosity();
+   s_spxout.setVerbosity( SPxOut::ERROR );
+
+   s_spxout << "Basis entries:" << std::endl;
    basesize = 0;
    for (i = 0; i < theLP->nRows(); ++i)
    {
       if (theLP->isBasic(thedesc.rowStatus(i)))
       {
          SPxRowId id = theLP->SPxLP::rId(i);
-         std::cout << "\tR" << theLP->number(id);
+         s_spxout << "\tR" << theLP->number(id);
          basesize++;
          if(basesize % 8 == 0)
-            std::cout << std::endl;
+            s_spxout << std::endl;
       }
    }
 
@@ -599,15 +604,16 @@ void SPxBasis::dump()
       if (theLP->isBasic(thedesc.colStatus(i)))
       {
          SPxColId id = theLP->SPxLP::cId(i);
-         std::cout << "\tC" << theLP->number(id);
+         s_spxout << "\tC" << theLP->number(id);
          basesize++;
          if(basesize % 8 == 0)
-            std::cout << std::endl;
+            s_spxout << std::endl;
       }
    }
-   std::cout << std::endl;
+   s_spxout << std::endl;
 
    assert(basesize == matrix.size());
+   s_spxout.setVerbosity( tmp_verbosity );
 }
 
 bool SPxBasis::isConsistent() const

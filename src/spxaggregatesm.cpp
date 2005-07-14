@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.20 2005/07/13 19:05:32 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.21 2005/07/14 13:37:52 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -334,7 +334,7 @@ SPxSimplifier::Result SPxAggregateSM::simplify(SPxLP& lp, Real /*eps*/, Real /*d
 
 const Vector& SPxAggregateSM::unsimplifiedPrimal(const Vector& x)
 {
-   std::cout << "SPxAggregateSM::unsimplifiedPrimal() not implemented\n";
+   ERROR( s_spxout << "SPxAggregateSM::unsimplifiedPrimal() not implemented\n";)
 
    assert(false);
 
@@ -343,7 +343,7 @@ const Vector& SPxAggregateSM::unsimplifiedPrimal(const Vector& x)
 
 const Vector& SPxAggregateSM::unsimplifiedDual(const Vector& pi)
 {
-   std::cout << "SPxAggregateSM::unsimplifiedDual() not implemented\n";
+   ERROR( s_spxout << "SPxAggregateSM::unsimplifiedDual() not implemented\n"; )
 
    assert(false);
 
