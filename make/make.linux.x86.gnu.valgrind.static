@@ -1,0 +1,6 @@
+#--- $Id: make.linux.x86.gnu.valgrind.static,v 1.1 2005/07/15 16:26:52 bzfpfend Exp $
+CXX	=	g++
+CPPFLAGS=	-Isrc -DWITH_ZLIB -I/optimi/kombadon/bzfkocht/easyval/include
+CXXFLAGS=	-O -g -ansi $(GCCWARN)
+LDFLAGS	=	-lz -lm # -L/optimi/kombadon/bzfkocht/easyval/lib -lEasyval
+ARFLAGS	=	crs

@@ -1,7 +1,0 @@
-#--- $Id: make.linux.ppc.gnu.opt,v 1.2 2003/01/15 17:26:04 bzfkocht Exp $
-CXX	=	g++
-CPPFLAGS=	-Isrc -DWITH_ZLIB -DNDEBUG
-CXXFLAGS=	-O3 -fno-exceptions \
-		-ffast-math -fforce-addr -funroll-loops #-march=
-LDFLAGS	=	-lz -lm
-ARFLAGS	=	crs

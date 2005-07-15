@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.55 2005/02/10 10:44:54 bzfkocht Exp $
+# $Id: Makefile,v 1.56 2005/07/15 16:26:46 bzfpfend Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -23,7 +23,11 @@ OSTYPE		:=	$(shell uname -s | \
 			sed \
 			-e s/irix../irix/ )
 HOSTNAME        :=      $(shell uname -n | tr A-Z a-z)
+
+VERBOSE		=	false
 OPT		=	opt
+LINK		=	static
+LIBEXT		=	a
 TEST		=	quick
 ALGO		=	1 2 3 4 5 6
 LIMIT		=	#
@@ -35,15 +39,14 @@ LINT		=	flexelint
 AR		=	ar
 RANLIB		=	ranlib
 DOXY		=	doxygen
-VALGRIND	=	valgrind
 
 CPPFLAGS	=	-Isrc
 CXXFLAGS	=	-O
+BINOFLAGS	=	
+LIBOFLAGS	=	
 LDFLAGS		=	-lm
 ARFLAGS		=	cr
 DFLAGS		=	-MM
-VFLAGS		=	--tool=memcheck --leak-check=yes \
-			--show-reachable=yes 
 
 SRCDIR		=	src
 BINDIR		=	bin
@@ -69,7 +72,7 @@ LIBOBJ		= 	changesoplex.o didxset.o \
 			svset.o timer.o unitvector.o update.o updatevector.o \
 			vector.o vsolve.o \
 			gzstream.o
-OBJECT		=	example.o
+BINOBJ		=	example.o
 REPOSIT		=	# template repository, explicitly empty  #spxproof.o 
 
 #------------------------------------------------------------------------------
@@ -86,73 +89,105 @@ GCCWARN		=	-Wall -W -Wpointer-arith -Wno-unknown-pragmas \
 
 #GCCWARN =
 #-----------------------------------------------------------------------------
-include make/make.$(OSTYPE).$(ARCH).$(COMP).$(OPT)
+include make/make.$(OSTYPE).$(ARCH).$(COMP).$(OPT).$(LINK)
 -include make/local/make.$(HOSTNAME)
 #-----------------------------------------------------------------------------
 
-TARGET		=	$(NAME).$(OSTYPE).$(ARCH).$(COMP).$(OPT)
-LIBRARY		=	$(LIBDIR)/lib$(NAME).$(OSTYPE).$(ARCH).$(COMP).$(OPT).a
-BINARY		=	$(BINDIR)/$(TARGET)
+BINNAME		=	$(NAME).$(OSTYPE).$(ARCH).$(COMP).$(OPT).$(LINK)
+LIBNAME		=	$(NAME).$(OSTYPE).$(ARCH).$(COMP).$(OPT).$(LINK)
+BINFILE		=	$(BINDIR)/$(BINNAME)
+LIBFILE		=	$(LIBDIR)/lib$(LIBNAME).$(LIBEXT)
 DEPEND		=	src/depend
 
-OBJDIR		=	obj/O.$(OSTYPE).$(ARCH).$(COMP).$(OPT)
-OBJXXX		=	$(addprefix $(OBJDIR)/,$(OBJECT))
-LIBXXX		=	$(addprefix $(OBJDIR)/,$(LIBOBJ))
-OBJSRC		=	$(addprefix $(SRCDIR)/,$(OBJECT:.o=.cpp))
+OBJDIR		=	obj/O.$(OSTYPE).$(ARCH).$(COMP).$(OPT).$(LINK)
+BINOBJDIR	=	$(OBJDIR)/bin
+LIBOBJDIR	=	$(OBJDIR)/lib
+BINOBJFILES	=	$(addprefix $(BINOBJDIR)/,$(BINOBJ))
+LIBOBJFILES	=	$(addprefix $(LIBOBJDIR)/,$(LIBOBJ))
+BINSRC		=	$(addprefix $(SRCDIR)/,$(BINOBJ:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
 
-$(BINARY):	_$(OBJDIR) _$(BINDIR) $(OBJXXX) $(LIBRARY) 
-		$(CXX) $(CXXFLAGS) $(OBJXXX) \
-		-L$(LIBDIR) -l$(TARGET) $(LDFLAGS) -o $@
+$(BINFILE):	_$(BINDIR) _$(BINOBJDIR) $(LIBFILE) $(BINOBJFILES)
+		@echo "-> linking $@"
+ifeq ($(VERBOSE), true)
+		$(CXX) $(CXXFLAGS) $(BINOBJFILES) \
+		-L$(LIBDIR) -l$(BINNAME) $(LDFLAGS) -o $@
+else
+		@$(CXX) $(CXXFLAGS) $(BINOBJFILES) \
+		-L$(LIBDIR) -l$(BINNAME) $(LDFLAGS) -o $@
+endif
 
-$(LIBRARY):	_$(LIBDIR) $(LIBXXX) 
-		-rm -f $(LIBRARY)
-		$(AR) $(ARFLAGS) $@ $(LIBXXX) $(REPOSIT)
+$(LIBFILE):	_$(LIBDIR) _$(LIBOBJDIR) $(LIBOBJFILES) 
+		@echo "-> generating library $@"
+ifeq ($(VERBOSE), true)
+		-rm -f $(LIBFILE)
+		$(AR) $(ARFLAGS) $@ $(LIBOBJFILES) $(REPOSIT)
 		$(RANLIB) $@
+else
+		@-rm -f $(LIBFILE)
+		@$(AR) $(ARFLAGS) $@ $(LIBOBJFILES) $(REPOSIT)
+		@$(RANLIB) $@
+endif
 
-lint:		$(OBJSRC) $(LIBSRC)
+lint:		$(BINSRC) $(LIBSRC)
 		$(LINT) lint/soplex.lnt -os\(lint.out\) \
 		$(CPPFLAGS) -UNDEBUG $^
 
 doc:		
 		cd doc; $(DOXY) soplex.dxy
 
-lib:		$(LIBRARY)
+lib:		$(LIBFILE)
 
 check:		
-		cd check; ./check.sh $(TEST).test ../$(BINARY) '$(ALGO)' $(LIMIT)
-
-valgrind:
-		cd check; \
-		./check.sh $(TEST).test "$(VALGRIND) $(VFLAGS) \
-		../$(BINARY)" '$(ALGO)' $(LIMIT)
+		cd check; ./check.sh $(TEST).test ../$(BINFILE) '$(ALGO)' $(LIMIT)
 
 clean:
-		-rm -rf $(OBJDIR)/* $(LIBRARY) $(BINARY)
+		-rm -rf $(OBJDIR)/* $(BINFILE) $(LIBFILE)
 
 distclean:
 		-rm -rf obj/* lib/libsoplex.* bin/soplex.* 
 
 _$(OBJDIR):	
-		-mkdir -p $(OBJDIR)
+		@-mkdir -p $(OBJDIR)
 
-_$(LIBDIR):
-		-mkdir -p $(LIBDIR)
+_$(BINOBJDIR):	_$(OBJDIR)
+		@-mkdir -p $(BINOBJDIR)
+
+_$(LIBOBJDIR):	_$(OBJDIR)
+		@-mkdir -p $(LIBOBJDIR)
 
 _$(BINDIR):
-		-mkdir -p $(BINDIR)
+		@-mkdir -p $(BINDIR)
+
+_$(LIBDIR):
+		@-mkdir -p $(LIBDIR)
 
 depend:
 		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
-		$(OBJSRC:.o=.cpp) $(LIBSRC:.o=.cpp) \
-		| sed '\''s|^\([0-9A-z]\{1,\}\)\.o|$$\(OBJDIR\)/\1.o|g'\'' \
+		$(BINSRC:.o=.cpp) \
+		| sed '\''s|^\([0-9A-z]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g'\'' \
 		>$(DEPEND)'
+		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
+		$(LIBSRC:.o=.cpp) \
+		| sed '\''s|^\([0-9A-z]\{1,\}\)\.o|$$\(LIBOBJDIR\)/\1.o|g'\'' \
+		>>$(DEPEND)'
 
 -include	$(DEPEND)
 
-$(OBJDIR)/%.o:	$(SRCDIR)/%.cpp
-		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+$(BINOBJDIR)/%.o:	$(SRCDIR)/%.cpp
+		@echo "-> compiling $@"
+ifeq ($(VERBOSE), true)
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) -c $< -o $@
+else
+		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) -c $< -o $@
+endif
+
+$(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp
+		@echo "-> compiling $@"
+ifeq ($(VERBOSE), true)
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LIBOFLAGS) -c $< -o $@
+else
+		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LIBOFLAGS) -c $< -o $@
+endif
 
 # --- EOF ---------------------------------------------------------------------
-
-

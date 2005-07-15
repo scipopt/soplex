@@ -1,9 +1,0 @@
-#--- $Id: make.sunos.sparc.sun.dbg,v 1.9 2004/03/16 14:57:37 bzfpfend Exp $
-CXX	=	CC
-CPPFLAGS=	-Isrc -I/client/include
-# -DWITH_ZLIB
-CXXFLAGS=	-g +w2
-LDFLAGS	=	-L/client/lib -lz -lm
-RANLIB	=	true
-AR	=	CC
-ARFLAGS	=	$(CPPFLAGS) $(CXXFLAGS) -xar -o

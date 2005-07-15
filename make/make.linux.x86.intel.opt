@@ -1,6 +1,0 @@
-#--- $Id: make.linux.x86.intel.opt,v 1.12 2005/07/12 13:41:16 bzfkocht Exp $
-CXX	=	icc
-CPPFLAGS=	-Isrc -DNDEBUG -DWITH_ZLIB
-CXXFLAGS=	-O3 -tpp6 -ax -Xc -w1 -fno-rtti -par_report0 -vec_report0 #-ip => error on pilot-ja(ER)
-LDFLAGS	=	-lpthread -lz -lm #-static
-ARFLAGS	=	crs

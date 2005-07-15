@@ -1,0 +1,7 @@
+#--- $Id: make.sunos.sparc.gnu.opt.static,v 1.1 2005/07/15 16:26:56 bzfpfend Exp $
+CXX	=	g++
+CPPFLAGS=	-Isrc -I/client/include -DNDEBUG -DWITH_ZLIB
+CXXFLAGS=	-O3 -mcpu=v8 -fno-exceptions \
+		-ffast-math -fforce-addr -funroll-loops
+LDFLAGS	=	-L/client/lib -lz -lm
+ARFLAGS	=	crs

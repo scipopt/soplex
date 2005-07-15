@@ -1,7 +1,0 @@
-#--- $Id: make.cygwin_nt-5.1.x86.gnu.opt,v 1.1 2005/06/20 16:19:51 bzfpfend Exp $
-CXX	=	g++
-CPPFLAGS=	-Isrc -DNDEBUG
-CXXFLAGS=	-O3 -march=pentiumpro -fno-exceptions \
-		-ffast-math -fforce-addr -funroll-loops
-LDFLAGS	=	-lm # -static
-ARFLAGS	=	crs

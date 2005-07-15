@@ -1,9 +1,0 @@
-#--- $Id: make.irix.mips.sgi.dbg,v 1.4 2002/01/15 08:28:01 bzfkocht Exp $
-CXX	=	CC
-CXXFLAGS=	-fullwarn -g -LANG:std:ansi-for-init-scope=on
-AR	=	CC
-ARFLAGS	=	$(CXXFLAGS) -ar -o
-RANLIB	=	true
-LDFLAGS	=	-lCio -lm
-
-

@@ -1,6 +1,0 @@
-#--- $Id: make.darwin.ppc.gnu.dbg,v 1.1 2005/01/06 18:23:52 bzfkocht Exp $
-CXX	=	g++
-CPPFLAGS=	-Isrc -DWITH_ZLIB
-CXXFLAGS=	-O0 -g -ansi $(GCCWARN)
-LDFLAGS	=	-lz -lm
-ARFLAGS	=	crs

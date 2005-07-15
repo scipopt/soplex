@@ -1,0 +1,7 @@
+#--- $Id: make.linux.x86.gnu.prf.static,v 1.1 2005/07/15 16:26:52 bzfpfend Exp $
+CXX	=	g++
+CPPFLAGS=	-Isrc -DNDEBUG -DWITH_ZLIB
+CXXFLAGS=	-O2 -g -pg -march=pentiumpro -fno-exceptions \
+		-ffast-math -fforce-addr -funroll-loops
+LDFLAGS	=	-lz -lm
+ARFLAGS	=	crs

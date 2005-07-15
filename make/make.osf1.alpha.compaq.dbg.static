@@ -1,0 +1,10 @@
+#--- $Id: make.osf1.alpha.compaq.dbg.static,v 1.1 2005/07/15 16:26:55 bzfpfend Exp $
+CXX	=	cxx
+CPPFLAGS=	-Isrc -I/usr/local/include -DWITH_ZLIB
+CXXFLAGS=	-O0 -w0 -std strict_ansi -ptr $(OBJDIR)/cxx_repository \
+		-gall -verbose -check -trapuv \
+		-msg_disable basclsnondto,boolexprconst,constrlitnondep 
+REPOSIT	=	$(OBJDIR)/cxx_repository/*.o
+# -ieee
+LDFLAGS	=	-L/usr/local/lib -lz -lm
+ARFLAGS	=	crs

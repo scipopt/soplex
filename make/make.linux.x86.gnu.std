@@ -1,6 +1,0 @@
-#--- $Id: make.linux.x86.gnu.std,v 1.4 2005/02/10 10:44:59 bzfkocht Exp $
-CXX	=	g++
-CPPFLAGS=	-Isrc -DNDEBUG -DWITH_ZLIB
-CXXFLAGS=	-O -g -march=pentiumpro
-LDFLAGS	=	-lz -lm
-ARFLAGS	=	crs

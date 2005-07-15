@@ -1,7 +1,0 @@
-#--- $Id: make.osf1.alpha.gnu.opt,v 1.2 2003/01/15 17:26:05 bzfkocht Exp $
-CXX	=	g++
-CPPFLAGS=	-Isrc -DNDEBUG -DWITH_ZLIB
-CXXFLAGS=	-O3 -mcpu=ev6 -fno-exceptions \
-		-ffast-math -fforce-addr -funroll-loops
-LDFLAGS	=	-lz -lm
-ARFLAGS	=	crs

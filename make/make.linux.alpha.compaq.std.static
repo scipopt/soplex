@@ -1,0 +1,7 @@
+#--- $Id: make.linux.alpha.compaq.std.static,v 1.1 2005/07/15 16:26:50 bzfpfend Exp $
+CXX	=	cxx
+CPPFLAGS=	-Isrc -DNDEBUG -DWITH_ZLIB
+CXXFLAGS=	-std strict_ansi -O2 -arch host -noexceptions -nortti \
+		-ansi_alias -inline speed -assume accuracy_sensitive #-ieee
+LDFLAGS	=	-lz -lcpml -lm
+ARFLAGS	=	crs

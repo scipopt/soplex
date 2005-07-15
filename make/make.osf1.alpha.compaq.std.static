@@ -1,0 +1,9 @@
+#--- $Id: make.osf1.alpha.compaq.std.static,v 1.1 2005/07/15 16:26:56 bzfpfend Exp $
+CXX	=	cxx
+CPPFLAGS=	-Isrc -DNDEBUG -DWITH_ZLIB
+CXXFLAGS=	-std strict_ansi -O2 -arch host -nortti \
+		-ansi_alias -inline speed -assume accuracy_sensitive -ieee -g \
+		-ptr $(OBJDIR)/cxx_repository   
+REPOSIT	=	$(OBJDIR)/cxx_repository/*.o
+LDFLAGS	=	-non_shared -L/usr/local/lib -lz -lm
+ARFLAGS	=	crs

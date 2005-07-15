@@ -1,0 +1,8 @@
+#--- $Id: make.aix.pwr4.ibm.dbg.static,v 1.1 2005/07/15 16:26:47 bzfpfend Exp $
+CXX	=	xlC_r
+CPPFLAGS=	-Isrc -DWITH_ZLIB
+CXXFLAGS=	-g -q32 -bnoquiet \
+		-qsuppress=1540-1405:1540-5314 
+# -qheapdebug -qflttrap -qcheck=all -qinfo=all -qwarn64 -extchk
+LDFLAGS	=	-lz -lm
+ARFLAGS	=	crs

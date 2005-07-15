@@ -1,0 +1,9 @@
+#--- $Id: make.sunos.sparc.sun.opt.static,v 1.1 2005/07/15 16:26:57 bzfpfend Exp $
+CXX	=	CC
+CPPFLAGS=	-Isrc -I/client/include -DNDEBUG
+# -DWITH_ZLIB
+CXXFLAGS=	-fast -xprefetch=auto -xipo=2
+LDFLAGS	=	-L/client/lib -lz -lm
+RANLIB	=	true
+AR	=	CC
+ARFLAGS	=	$(CXXFLAGS) -xar -o
