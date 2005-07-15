@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.79 2005/07/14 17:38:39 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.80 2005/07/15 16:46:40 bzfpfend Exp $"
 
 //#define DEBUGGING 1
 
@@ -156,6 +156,8 @@ SPxSolver::Status SPxSolver::solve()
    {
       if (type() == ENTER)
       {
+         int enterCycleCount = 0;
+
          thepricer->setEpsilon(maxDelta);
 
          do
@@ -214,7 +216,20 @@ SPxSolver::Status SPxSolver::solve()
             stop = terminate();
             clearUpdateVecs();
             if (lastIndex() >= 0)
+            {
                enterCount++;
+               enterCycleCount = 0;
+            }
+            else
+            {
+               enterCycleCount++;
+               if( enterCycleCount > MAXCYCLES )
+               {
+                  VERBOSE2({ std::cout << "Abort solving due to cycling in entering algorithm" << std::endl; });
+                  m_status = ABORT_CYCLING;
+                  stop = true;
+               }
+            }
             //@ assert(isConsistent());
          }
          while (!stop);
@@ -259,6 +274,8 @@ SPxSolver::Status SPxSolver::solve()
       }
       else
       {
+         int leaveCycleCount = 0;
+
          assert(type() == LEAVE);
          
          thepricer->setEpsilon(maxDelta);
@@ -319,7 +336,21 @@ SPxSolver::Status SPxSolver::solve()
             thepricer->left4(lastIndex(), lastLeft());
             stop = terminate();
             clearUpdateVecs();
-            leaveCount += lastEntered().isValid();
+            if( lastEntered().isValid() )
+            {
+               leaveCount++;
+               leaveCycleCount = 0;
+            }
+            else
+            {
+               leaveCycleCount++;
+               if( leaveCycleCount > MAXCYCLES )
+               {
+                  VERBOSE2({ std::cout << "Abort solving due to cycling in leaving algorithm" << std::endl; });
+                  m_status = ABORT_CYCLING;
+                  stop = true;
+               }
+            }
             //@ assert(isConsistent());
          }
          while (!stop);
@@ -348,6 +379,7 @@ SPxSolver::Status SPxSolver::solve()
                cycleCount++;
                if( cycleCount > MAXCYCLES )
                {
+                  VERBOSE2({ std::cout << "Abort solving due to cycling" << std::endl; });
                   m_status = ABORT_CYCLING;
                   stop = true;
                }

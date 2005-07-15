@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.38 2005/07/14 17:38:35 bzforlow Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.39 2005/07/15 16:46:40 bzfpfend Exp $"
 
 //#define DEBUGGING 1
 
@@ -571,7 +571,8 @@ bool SPxSolver::leave(int leaveIdx)
             
          if (enterVal != leaveMax)
          {
-            DEBUG( spxout << "rejecting leave A " << std::endl; );
+            DEBUG( std::cout << "rejecting leave A (leaveIdx=" << leaveIdx
+               << ", theCoTest=" << theCoTest[leaveIdx] << ")" << std::endl; );
 
             // Problem: These changes do not survive a refactorization
             theCoTest[leaveIdx] *= 0.01;            // #== fTest()#
@@ -636,7 +637,8 @@ bool SPxSolver::leave(int leaveIdx)
             change(leaveIdx, none, 0);
             theFvec->delta().clear();
             rejectLeave(leaveNum, leaveId, leaveStat, &newVector);
-            DEBUG( spxout << "rejecting leave B" << std::endl; );
+            DEBUG( std::cout << "rejecting leave B (leaveIdx=" << leaveIdx
+               << ", theCoTest=" << theCoTest[leaveIdx] << ")" << std::endl; );
             // factorize();
             theCoTest[leaveIdx] *= 0.01;            // #== fTest()#
             return true;

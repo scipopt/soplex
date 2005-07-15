@@ -1,3 +1,5 @@
+#ifdef WITH_ZLIB
+
 // ============================================================================
 // gzstream, C++ iostream classes wrapping the zlib compression library.
 // Copyright (C) 2001  Deepak Bandyopadhyay, Lutz Kettner
@@ -18,8 +20,8 @@
 // ============================================================================
 //
 // File          : gzstream.C
-// Revision      : $Revision: 1.5 $
-// Revision_date : $Date: 2004/11/09 17:10:44 $
+// Revision      : $Revision: 1.6 $
+// Revision_date : $Date: 2005/07/15 16:46:39 $
 // Author(s)     : Deepak Bandyopadhyay, Lutz Kettner
 // 
 // Standard streambuf implementation following Nicolai Josuttis, "The 
@@ -165,3 +167,5 @@ void gzstreambase::close() {
 
 // ============================================================================
 // EOF //
+
+#endif
