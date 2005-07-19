@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.80 2005/07/15 16:46:40 bzfpfend Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.81 2005/07/19 14:30:02 bzfpfend Exp $"
 
 //#define DEBUGGING 1
 
@@ -225,7 +225,7 @@ SPxSolver::Status SPxSolver::solve()
                enterCycleCount++;
                if( enterCycleCount > MAXCYCLES )
                {
-                  VERBOSE2({ std::cout << "Abort solving due to cycling in entering algorithm" << std::endl; });
+                  VERBOSE2({ spxout << "Abort solving due to cycling in entering algorithm" << std::endl; });
                   m_status = ABORT_CYCLING;
                   stop = true;
                }
@@ -346,7 +346,7 @@ SPxSolver::Status SPxSolver::solve()
                leaveCycleCount++;
                if( leaveCycleCount > MAXCYCLES )
                {
-                  VERBOSE2({ std::cout << "Abort solving due to cycling in leaving algorithm" << std::endl; });
+                  VERBOSE2({ spxout << "Abort solving due to cycling in leaving algorithm" << std::endl; });
                   m_status = ABORT_CYCLING;
                   stop = true;
                }
@@ -379,7 +379,7 @@ SPxSolver::Status SPxSolver::solve()
                cycleCount++;
                if( cycleCount > MAXCYCLES )
                {
-                  VERBOSE2({ std::cout << "Abort solving due to cycling" << std::endl; });
+                  VERBOSE2({ spxout << "Abort solving due to cycling" << std::endl; });
                   m_status = ABORT_CYCLING;
                   stop = true;
                }
