@@ -1,4 +1,4 @@
-# $Id: check.sh,v 1.21 2005/01/08 15:32:49 bzfkocht Exp $
+# $Id: check.sh,v 1.22 2005/07/21 08:18:34 bzfhille Exp $
 # Parameters
 # $1 Name of the test, e.g. netlib (needs netlib.test, netlib.solu)
 # $2 Path/Name of the binary, e.g. ../bin/soplex.linux.x86.gnu.opt
@@ -43,6 +43,17 @@ do
 	    opt="-p1" ;;
 	12) echo =type= ECm
 	    opt="-e -p1" ;;
+	#
+	# These settings are used for coverage testing and are therefore unusual.
+	# They are chosen such that in cimbination with the above settings every
+        # pricer and ratio tester is exercised at least once.
+        #
+	13) echo =type= CV1
+	    opt="-r -i -p0 -t0" ;;
+	14) echo =type= CV2
+	    opt="-e -r -i -p3 -t1" ;;
+	15) echo =type= CV3
+	    opt="-r -i -p5 -t0" ;;
         esac
         $2 $opt -q $4 $i 2>>$ERRFILE
         echo =ready=
