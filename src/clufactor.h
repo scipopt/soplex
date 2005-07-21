@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clufactor.h,v 1.18 2005/03/11 11:43:33 bzfpfend Exp $"
+#pragma ident "@(#) $Id: clufactor.h,v 1.19 2005/07/21 14:58:13 bzfhille Exp $"
 
 /**@file  clufactor.h
  * @brief Implementation of sparse LU factorization.
@@ -103,63 +103,63 @@ protected:
    {
       struct Row
       {
-         Dring list;         /* Double linked ringlist of vector
-                                indices in the order they appear
-                                in the row file */
-         Dring* elem;        /* Array of ring elements.            */
-         int    size;        /* size of arrays val and idx         */
-         int    used;        /* used entries of arrays idx and val */
-         Real*  val;         /* hold nonzero values                */
-         int*   idx;         /* hold nonzero indices               */
-         int*   start;       /* starting positions in val and idx  */
-         int*   len;         /* used nonzeros per row vectors      */
-         int*   max;         /* maximum available nonzeros per row:
-                                start[i] + max[i] == start[elem[i].next->idx] 
-                                len[i] <= max[i]. */
+         Dring list;         /*!< \brief Double linked ringlist of vector 
+                               indices in the order they appear
+                               in the row file                      */
+         Dring* elem;        ///< %Array of ring elements.
+         int    size;        ///< size of arrays val and idx
+         int    used;        ///< used entries of arrays idx and val
+         Real*  val;         ///< hold nonzero values
+         int*   idx;         ///< hold nonzero indices
+         int*   start;       ///< starting positions in val and idx
+         int*   len;         ///< used nonzeros per row vectors
+         int*   max;         /*!< \brief maximum available nonzeros per row:
+                               start[i] + max[i] == start[elem[i].next->idx] 
+                               len[i] <= max[i].                    */
       } row;
       struct Col
       {
-         Dring list;         /* Double linked ringlist of vector
+         Dring list;         /*!< \brief Double linked ringlist of vector
                                 indices in the order they appear
-                                in the column file */
-         Dring *elem;        /* Array of ring elements.            */
-         int size;           /* size of array idx                  */
-         int used;           /* used entries of array idx          */
-         int *idx;           /* hold nonzero indices               */
-         Real *val;          /* hold nonzero values: this is only initialized
+                                in the column file                  */
+         Dring *elem;        ///< %Array of ring elements.
+         int size;           ///< size of array idx
+         int used;           ///< used entries of array idx
+         int *idx;           ///< hold nonzero indices
+         Real *val;          /*!< \brief hold nonzero values: this is only initialized
                                 in the end of the factorization with DEFAULT
-                                updates. */
-         int *start;         /* starting positions in val and idx  */
-         int *len;           /* used nonzeros per column vector    */
-         int *max;           /* maximum available nonzeros per colunn:
-                                start[i] + max[i] == start[elem[i].next->idx] 
-                                len[i] <= max[i]. */
+                                updates.                            */
+         int *start;         ///< starting positions in val and idx
+         int *len;           ///< used nonzeros per column vector
+         int *max;           /*!< \brief maximum available nonzeros per colunn:
+                               start[i] + max[i] == start[elem[i].next->idx] 
+                               len[i] <= max[i].                    */
       } col;
    };
 
 
-   /// Data structures for saving the working matrix and U factor.
+   /// Data structures for saving the working matrix and L factor.
    struct L
    {
-      int  size;           /* size of arrays val and idx        */
-      Real *val;           /* values of L vectors               */
-      int  *idx;           /* indices of L vectors              */
-      int  startSize;      /* size of array start               */
-      int  firstUpdate;    /* number of first update L vector   */
-      int  firstUnused;    /* number of first unused L vector   */
-      int  *start;         /* starting positions in val and idx */
-      int  *row;           /* column indices of L vectors       */
-      int  updateType;     /* type of updates to be used.       */
+      int  size;           ///< size of arrays val and idx
+      Real *val;           ///< values of L vectors
+      int  *idx;           ///< indices of L vectors
+      int  startSize;      ///< size of array start
+      int  firstUpdate;    ///< number of first update L vector
+      int  firstUnused;    ///< number of first unused L vector
+      int  *start;         ///< starting positions in val and idx
+      int  *row;           ///< column indices of L vectors
+      int  updateType;     ///< type of updates to be used.
 
       /* The following arrays have length |firstUpdate|, since they keep
        * rows of the L-vectors occuring during the factorization (without
        * updates), only:
        */
-      Real *rval;          /* values of rows of L               */
-      int  *ridx;          /* indices of rows of L              */
-      int  *rbeg;          /* start of rows in rval and ridx    */
-      int  *rorig;         /* original row permutation          */
-      int  *rperm;         /* original row permutation          */
+      Real *rval;          ///< values of rows of L
+      int  *ridx;          ///< indices of rows of L
+      int  *rbeg;          ///< start of rows in rval and ridx
+      int  *rorig;         ///< original row permutation
+      int  *rperm;         ///< original row permutation
    };
 
    SLinSolver::Status stat;   ///< Status indicator.
