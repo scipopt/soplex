@@ -1,0 +1,11 @@
+#
+# Suppression file for use with valgrind.
+#
+
+# Conditional jump or move depends on uninitialised value(s)
+#    at 0x1B8F661F: index (in /lib/ld-2.3.4.so)
+{
+   lib/ld-2.3.4.so/index
+   Memcheck:Cond
+   fun:index
+}

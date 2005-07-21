@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.56 2005/07/15 16:26:46 bzfpfend Exp $
+# $Id: Makefile,v 1.57 2005/07/21 12:28:41 bzfhille Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -39,6 +39,7 @@ LINT		=	flexelint
 AR		=	ar
 RANLIB		=	ranlib
 DOXY		=	doxygen
+VALGRIND	=	valgrind
 
 CPPFLAGS	=	-Isrc
 CXXFLAGS	=	-O
@@ -47,6 +48,7 @@ LIBOFLAGS	=
 LDFLAGS		=	-lm
 ARFLAGS		=	cr
 DFLAGS		=	-MM
+VFLAGS		=	--tool=memcheck --leak-check=yes --show-reachable=yes
 
 SRCDIR		=	src
 BINDIR		=	bin
@@ -99,6 +101,9 @@ BINFILE		=	$(BINDIR)/$(BINNAME)
 LIBFILE		=	$(LIBDIR)/lib$(LIBNAME).$(LIBEXT)
 DEPEND		=	src/depend
 
+# potential valgrind suppression file name
+VSUPPNAME	= 	$(OSTYPE).$(ARCH).$(COMP).supp
+
 OBJDIR		=	obj/O.$(OSTYPE).$(ARCH).$(COMP).$(OPT).$(LINK)
 BINOBJDIR	=	$(OBJDIR)/bin
 LIBOBJDIR	=	$(OBJDIR)/lib
@@ -138,8 +143,13 @@ doc:
 
 lib:		$(LIBFILE)
 
-check:		
+check:		$(BINFILE)
 		cd check; ./check.sh $(TEST).test ../$(BINFILE) '$(ALGO)' $(LIMIT)
+
+valgrind-check:	$(BINFILE)
+		cd check; \
+		./valgrind.sh $(TEST).test ../$(BINFILE) '$(ALGO)' '$(LIMIT)' \
+		"$(VALGRIND) $(VFLAGS)" $(VSUPPNAME)
 
 clean:
 		-rm -rf $(OBJDIR)/* $(BINFILE) $(LIBFILE)
