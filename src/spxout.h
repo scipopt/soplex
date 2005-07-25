@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxout.h,v 1.4 2005/07/14 17:38:38 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxout.h,v 1.5 2005/07/25 15:22:11 bzforlow Exp $"
 
 /**@file  spxout.h
  * @brief Wrapper for different output streams and verbosity levels.
@@ -65,7 +65,7 @@ public:
 
 
    //-----------------------------------
-   /** Output control types */
+   /**@name Output control types */
    //@{
    /// Verbosity level
    typedef enum 
@@ -79,8 +79,7 @@ public:
       VERBOSE2 = 3,
       VERBOSE3 = 4,
       DEBUG    = 5
-   } 
-   Verbosity;
+   } Verbosity;
 
    /// helper struct for the output operator
    struct struct_Verbosity 
@@ -94,19 +93,9 @@ public:
    /**@name Construction / destruction */
    //@{
    /// constructor
-   SPxOut()
-      : m_verbosity( ERROR )
-      , m_streams( new std::ostream*[ DEBUG+1 ] )
-   {
-      m_streams[ ERROR ] = m_streams[ WARNING ] = &std::cerr;
-      for ( int i = VERBOSE1; i <= DEBUG; ++i )
-         m_streams[ i ] = &std::cout;
-   }
+   SPxOut();
    /// destructor
-   virtual ~SPxOut()
-   {
-      delete [] m_streams;
-   }
+   virtual ~SPxOut();
    //@}
 
    //-----------------------------------
@@ -114,7 +103,7 @@ public:
    //@{
    ///
    virtual void 
-   setVerbosity( const Verbosity v )
+   setVerbosity( const Verbosity& v )
    {
       m_verbosity = v;
    }
@@ -136,7 +125,7 @@ public:
       return getCurrentStream().good();
    }
    ///
-   inline bool operator ! () 
+   inline bool operator ! () const
    {
       return ! getCurrentStream();
    }
@@ -147,14 +136,14 @@ public:
    //@{
    /// Sets the stream for the specified verbosity level.
    virtual void
-   setStream( const Verbosity verbosity,
+   setStream( const Verbosity& verbosity,
                std::ostream&   stream )
    {
       m_streams[ verbosity ] = &stream;
    }
    /// Returns the stream for the specified verbosity level.
    inline std::ostream&
-   getStream( const Verbosity verbosity )
+   getStream( const Verbosity& verbosity )
       const
    {
       return *(m_streams[ verbosity ]);
@@ -211,19 +200,19 @@ private:
 
    /// manipulator to be used in an output statement
    inline SPxOut::struct_Verbosity
-   verb( SPxOut::Verbosity v )
+   verb( const SPxOut::Verbosity&  v )
    {
-      SPxOut::struct_Verbosity verb;
-      verb.v_ = v;
-      return verb;
+      SPxOut::struct_Verbosity verbosity;
+      verbosity.v_ = v;
+      return verbosity;
    }
 
    /// output operator with verbosity level struct
    inline SPxOut& 
    operator<< ( SPxOut& stream, 
-                const SPxOut::struct_Verbosity verb )
+                const SPxOut::struct_Verbosity&  verbosity )
    {
-      stream.setVerbosity( verb.v_ );
+      stream.setVerbosity( verbosity.v_ );
       return stream;
    }
    //@}
@@ -231,18 +220,15 @@ private:
    //--------------------------------------------------------
    /**@name Standard manipulators and output of other types */
    //@{
-#define SEND_TO_CURRENT_STREAM( spxout, v ) \
-   if ( spxout.getVerbosity() <= Param::verbose() )\
-      spxout.getCurrentStream() << v; \
-   return spxout;
-
    /// Passes standard manipulators without arguments, like @c std::endl, 
    /// @c std::flush, or @c std::ios::right, to the current stream.
    inline SPxOut&
-   operator<< ( SPxOut&       spxout, 
+   operator<< ( SPxOut&       _spxout, 
                 std::ostream& (*manip)( std::ostream& ) )
    {
-      SEND_TO_CURRENT_STREAM( spxout, manip );
+      if ( _spxout.getVerbosity() <= Param::verbose() )
+         _spxout.getCurrentStream() << manip;
+      return _spxout;
    }
 
    /// Passes everything else to the current stream. This includes 
@@ -251,17 +237,24 @@ private:
    /// for the setw() manipulator.
    template< typename T >
    inline SPxOut&
-   operator<< ( SPxOut& spxout, T v )
+   operator<< ( SPxOut& _spxout, const T&  v )
    {
-      SEND_TO_CURRENT_STREAM( spxout, v );
+      if ( _spxout.getVerbosity() <= Param::verbose() )
+         _spxout.getCurrentStream() << v;
+      return _spxout;
    }
    //@}
 
    // ---------------------------------------------------------
-   //    static SPxOut instance
+   //    declare global SPxOut instance
    // ---------------------------------------------------------
 
-   static soplex::SPxOut spxout;
+   //-----------------------------------
+   /**@name Global instance */
+   //@{
+   ///
+   extern SPxOut spxout;
+   //@}
 
 }      // namespace soplex
 
