@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.22 2005/07/14 17:38:36 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.23 2005/07/25 15:24:36 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -33,16 +33,17 @@ void SPxBasis::reDim()
 
    assert(theLP != 0);
 
-   DEBUG({ spxout << "SPxBasis::reDim():"
-                    << " matrixIsSetup=" << matrixIsSetup
-                    << " fatorized=" << factorized
-                    << std::endl; });
+   MSG_DEBUG( spxout << "SPxBasis::reDim():"
+                     << " matrixIsSetup=" << matrixIsSetup
+                     << " fatorized=" << factorized
+                     << std::endl; )
 
    thedesc.reSize (theLP->nRows(), theLP->nCols());
 
    if (theLP->dim() != matrix.size())
    {
-      VERBOSE3({ spxout << "basis redimensioning invalidates factorization" << std::endl; });
+      MSG_VERBOSE3( spxout << "basis redimensioning invalidates factorization" 
+                           << std::endl; )
 
       matrix.reSize (theLP->dim());
       theBaseId.reSize(theLP->dim());
@@ -50,10 +51,10 @@ void SPxBasis::reDim()
       factorized    = false;
    }
 
-   DEBUG({ spxout << "SPxBasis::reDim(): -->"
-                    << " matrixIsSetup=" << matrixIsSetup
-                    << " fatorized=" << factorized
-                    << std::endl; });
+   MSG_DEBUG( spxout << "SPxBasis::reDim(): -->"
+                     << " matrixIsSetup=" << matrixIsSetup
+                     << " fatorized=" << factorized
+                     << std::endl; )
 
    assert( matrix.size()    >= theLP->dim() );
    assert( theBaseId.size() >= theLP->dim() );
@@ -111,7 +112,7 @@ void SPxBasis::addedRows(int n)
       case DUAL:
          break;
       default:
-         ERROR( spxout << "Unknown basis status!" << std::endl; )
+         MSG_ERROR( spxout << "Unknown basis status!" << std::endl; )
          assert(false);
       }
    }
@@ -131,7 +132,7 @@ void SPxBasis::removedRow(int i)
          setStatus(NO_PROBLEM);
          factorized = false;
 
-         DEBUG( spxout << "Are you sure, you wanna do that?\n"; );
+         MSG_DEBUG( spxout << "Are you sure, you wanna do that?\n"; )
       }
    }
    else
@@ -141,7 +142,7 @@ void SPxBasis::removedRow(int i)
       if (!theLP->isBasic(thedesc.rowStatus(i)))
       {
          setStatus(NO_PROBLEM);
-         DEBUG( spxout << "Are you sure, you wanna do that?\n"; );
+         MSG_DEBUG( spxout << "Are you sure, you wanna do that?\n"; )
       }
       else if (status() > NO_PROBLEM && matrixIsSetup)
       {
@@ -185,7 +186,7 @@ void SPxBasis::removedRows(const int perm[])
                {
                   setStatus(NO_PROBLEM);
                   factorized = matrixIsSetup = false;
-                  DEBUG( spxout << "Are you sure, you wanna do that?\n"; );
+                  MSG_DEBUG( spxout << "Are you sure, you wanna do that?\n"; )
                }
             }
             else                            // row was moved
@@ -303,7 +304,7 @@ void SPxBasis::addedCols(int n)
       case PRIMAL:
          break;
       default:
-         ERROR( spxout << "Unknown basis status!" << std::endl; )
+         MSG_ERROR( spxout << "Unknown basis status!" << std::endl; )
          assert(false);
       }
    }
@@ -399,7 +400,7 @@ void SPxBasis::invalidate()
 {
    METHOD( "SPxBasis::invalidate()" );
 
-   VERBOSE3({ spxout << "explicit invalidation of factorization" << std::endl; });
+   MSG_VERBOSE3({ spxout << "explicit invalidation of factorization" << std::endl; });
 
    factorized    = false;
    matrixIsSetup = false;

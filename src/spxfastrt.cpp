@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.29 2005/07/14 17:38:36 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.30 2005/07/25 15:24:36 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -128,8 +128,8 @@ int SPxFastRT::maxDelta(
             if (u < inf)
             {
                y = u - vec[i];
-               // x = ((1 - (y<=0)) * y + l_delta) / x;
 #ifdef USE_OLD
+               // x = ((1 - (y<=0)) * y + l_delta) / x;
                x = (y - (y <= 0) * (y + delta01) + l_delta) / x;
 #else
                if (y <= 0)
@@ -152,8 +152,16 @@ int SPxFastRT::maxDelta(
             if (l > -inf)
             {
                y = l - vec[i];
+#ifdef USE_OLD
                // x = ((1 - (y>=0)) * y - l_delta) / x;
                x = (y - (y >= 0) * (y - delta01) - l_delta) / x;
+#else
+               if ( y >= 0 )
+                  x = ( delta01 - l_delta ) / x;
+               else
+                  x = ( y - l_delta ) / x;
+#endif
+
                if (x < max)
                {
                   max = x;
@@ -187,8 +195,16 @@ int SPxFastRT::maxDelta(
                if (u < inf)
                {
                   y = u - vec[i];
+#ifdef USE_OLD
                   // x = ((1 - (y<=0)) * y + l_delta) / x;
                   x = (y - (y <= 0) * (y + delta01) + l_delta) / x;
+#else
+                  if (y <= 0)
+                     x = (l_delta - delta01) / x;
+                  else
+                     x = (y + l_delta) / x;
+#endif
+
                   if (x < max)
                   {
                      max = x;
@@ -204,8 +220,16 @@ int SPxFastRT::maxDelta(
                if (l > -inf)
                {
                   y = l - vec[i];
+#ifdef USE_OLD
                   // x = ((1 - (y>=0)) * y - l_delta) / x;
                   x = (y - (y >= 0) * (y - delta01) - l_delta) / x;
+#else
+                  if ( y >= 0 )
+                     x = ( delta01 - l_delta ) / x;
+                  else
+                     x = ( y - l_delta ) / x;
+#endif
+
                   if (x < max)
                   {
                      max = x;
@@ -269,8 +293,16 @@ int SPxFastRT::minDelta(
             if (l > -inf)
             {
                y = l - vec[i];
+#ifdef USE_OLD
                // x = ((1 - (y>=0)) * y - l_delta) / x;
                x = (y - (y >= 0) * (y - delta01) - l_delta) / x;
+#else
+               if ( y >= 0 )
+                  x = ( delta01 - l_delta ) / x;
+               else
+                  x = ( y - l_delta ) / x;
+#endif
+
                if (x > max)
                {
                   max = x;
@@ -285,8 +317,16 @@ int SPxFastRT::minDelta(
             if (u < inf)
             {
                y = u - vec[i];
+#ifdef USE_OLD
                // x = ((1 - (y<=0)) * y + l_delta) / x;
                x = (y - (y <= 0) * (y + delta01) + l_delta) / x;
+#else
+               if (y <= 0)
+                  x = (l_delta - delta01) / x;
+               else
+                  x = (y + l_delta) / x;
+#endif
+
                if (x > max)
                {
                   max = x;
@@ -316,8 +356,16 @@ int SPxFastRT::minDelta(
                if (l > -inf)
                {
                   y = l - vec[i];
+#ifdef USE_OLD
                   // x = ((1 - (y>=0)) * y - l_delta) / x;
                   x = (y - (y >= 0) * (y - delta01) - l_delta) / x;
+#else
+                  if ( y >= 0 )
+                     x = ( delta01 - l_delta ) / x;
+                  else
+                     x = ( y - l_delta ) / x;
+#endif
+
                   if (x > max)
                   {
                      max = x;
@@ -333,8 +381,16 @@ int SPxFastRT::minDelta(
                if (u < inf)
                {
                   y = u - vec[i];
+#ifdef USE_OLD
                   // x = ((1 - (y<=0)) * y + l_delta) / x;
                   x = (y - (y <= 0) * (y + delta01) + l_delta) / x;
+#else
+                  if (y <= 0)
+                     x = (l_delta - delta01) / x;
+                  else
+                     x = (y + l_delta) / x;
+#endif
+
                   if (x > max)
                   {
                      max = x;
@@ -848,7 +904,7 @@ int SPxFastRT::selectLeave(Real& val)
    else
       return -1;
 
-   DEBUG({
+   MSG_DEBUG(
       if (leave >= 0)
          spxout 
            << thesolver->basis().iteration() << "("
@@ -863,7 +919,7 @@ int SPxFastRT::selectLeave(Real& val)
          spxout << thesolver->basis().iteration() 
                   << ": skipping instable pivot"
                   << std::endl;
-   });
+   );
 
    if (leave >= 0 || minStab > 2*solver()->epsilon())
    {
@@ -1164,7 +1220,7 @@ SPxId SPxFastRT::selectEnter(Real& val)
       while (cnt < TRIES);
    }
 
-   DEBUG({
+   MSG_DEBUG(
       if (enterId.isValid())
          {
             Real x;
@@ -1178,7 +1234,7 @@ SPxId SPxFastRT::selectEnter(Real& val)
       else
          spxout << thesolver->basis().iteration() 
                   << ": skipping instable pivot" << std::endl;
-   });
+   )
 
    if (enterId.isValid() || minStab > 2*epsilon)
    {

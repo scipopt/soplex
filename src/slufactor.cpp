@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.40 2005/07/14 17:38:35 bzforlow Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.41 2005/07/25 15:24:35 bzforlow Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -309,8 +309,8 @@ SLUFactor::Status SLUFactor::change(
    }
    usetup = false;
 
-   DEBUG({ spxout << "\tupdated\t\tstability = " << stability()
-                    << std::endl; });
+   MSG_DEBUG( spxout << "\tupdated\t\tstability = " << stability()
+                     << std::endl; )
    
    return status();
 }
@@ -913,10 +913,10 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
 
       minStability /= 2.0;
    }
-   DEBUG({ spxout << "threshold = " << lastThreshold
-                    << "\tstability = " << stability()
-                    << "\tminStability = " << minStability << std::endl; });
-   DEBUG({
+   MSG_DEBUG( spxout << "threshold = " << lastThreshold
+                     << "\tstability = " << stability()
+                     << "\tminStability = " << minStability << std::endl; )
+   MSG_DEBUG(
       int i;
       FILE* fl = fopen("dump.lp", "w");
       spxout << "Basis:\n";
@@ -935,7 +935,7 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
       
       spxout << "threshold = " << lastThreshold 
                << "\tstability = " << stability() << std::endl;
-   });
+   )
 
    assert(isConsistent());
    return Status(stat);

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datakey.h,v 1.7 2002/03/21 16:06:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: datakey.h,v 1.8 2005/07/25 15:24:35 bzforlow Exp $"
 
 /**@file  datakey.h
  * @brief Entry identifier class for items of a #DataSet.
@@ -88,8 +88,10 @@ public:
    /// Assignment operator.
    DataKey& operator=(const DataKey& rhs)
    {
-      info = rhs.info;
-      idx  = rhs.idx;
+      if ( this != &rhs ) {
+         info = rhs.info;
+         idx  = rhs.idx;
+      }
       
       return *this;
    }

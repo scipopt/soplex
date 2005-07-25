@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxintervalsm.cpp,v 1.6 2005/07/14 17:38:37 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxintervalsm.cpp,v 1.7 2005/07/25 15:24:36 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -151,7 +151,7 @@ SPxSimplifier::Result SPxIntervalSM::simplify(SPxLP& lp, Real eps, Real delta)
                row.remove(row.number(i));
                col.remove(j);           
 
-               VERBOSE3({ spxout << "removed element x=" << x 
+               MSG_VERBOSE3({ spxout << "removed element x=" << x 
                                    << " absbnd= " << absbnd 
                                    << std::endl; });
                nzcnt++;
@@ -159,7 +159,7 @@ SPxSimplifier::Result SPxIntervalSM::simplify(SPxLP& lp, Real eps, Real delta)
             else
             {
                if (x > maxval)
-                  WARNING( spxout << "Warning! Big value " << x << std::endl; )
+                  MSG_WARNING( spxout << "Warning! Big value " << x << std::endl; )
 
                j++;
             }
@@ -187,22 +187,22 @@ SPxSimplifier::Result SPxIntervalSM::simplify(SPxLP& lp, Real eps, Real delta)
    }
    if (nzcnt > 0)
    {
-      VERBOSE1({ spxout << "SPxIntervalSM:\tremoved " << nzcnt
+      MSG_VERBOSE1({ spxout << "SPxIntervalSM:\tremoved " << nzcnt
                           << " non-zeros" << std::endl; });
    }
    if (lrcnt > 0)
    {
-      VERBOSE1({ spxout << "SPxIntervalSM:\tcorrected " << lrcnt
+      MSG_VERBOSE1({ spxout << "SPxIntervalSM:\tcorrected " << lrcnt
                           << " LHS/RHS" << std::endl; });
    }
    if (bdcnt > 0)
    {
-      VERBOSE1({ spxout << "SPxIntervalSM:\tcorrected " << bdcnt
+      MSG_VERBOSE1({ spxout << "SPxIntervalSM:\tcorrected " << bdcnt
                           << " bounds" << std::endl; });
    }
    if (ojcnt > 0)
    {
-      VERBOSE1({ spxout << "SPxIntervalSM:\tcorrected " << ojcnt
+      MSG_VERBOSE1({ spxout << "SPxIntervalSM:\tcorrected " << ojcnt
                           << " objective function coefficents" << std::endl; });
    }
    assert(lp.isConsistent());

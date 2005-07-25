@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: mpsinput.h,v 1.7 2005/07/14 17:38:35 bzforlow Exp $"
+#pragma ident "@(#) $Id: mpsinput.h,v 1.8 2005/07/25 15:24:35 bzforlow Exp $"
 
 /**@file  mpsinput.h
  * @brief Read MPS format files.
@@ -101,7 +101,7 @@ public:
    }
    void syntaxError() 
    {
-      ERROR( spxout << "Syntax error in line " << m_lineno << std::endl; )
+      MSG_ERROR( spxout << "Syntax error in line " << m_lineno << std::endl; )
       m_section = ENDATA;
       m_has_error = true;
    }
@@ -109,7 +109,7 @@ public:
       const char* what, const char* what_name, 
       const char* entity, const char* entity_name)
    {
-      WARNING( spxout << "Warning: line " << m_lineno << ": "
+      MSG_WARNING( spxout << "Warning: line " << m_lineno << ": "
                         << what << " \"" << what_name << "\"" 
                         << " for " << entity << " \"" 
                         << entity_name << "\" ignored" << std::endl; )

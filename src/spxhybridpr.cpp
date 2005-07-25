@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.23 2005/07/14 17:38:37 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.24 2005/07/25 15:24:36 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -90,7 +90,7 @@ void SPxHybridPR::setType(SPxSolver::Type tp)
       }
    }
    
-   VERBOSE1({ spxout << "switching to "
+   MSG_VERBOSE1({ spxout << "switching to "
                        << thepricer->getName() << std::endl; });
 
    thepricer->setType(tp);

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.cpp,v 1.22 2005/07/14 17:38:39 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxweightst.cpp,v 1.23 2005/07/25 15:24:37 bzforlow Exp $"
 
 //#define DEBUGGING 1
 //#define TEST 1
@@ -293,12 +293,12 @@ void SPxWeightST::generate(SPxSolver& base)
 
          if (sel >= 0)
          {
-            DEBUG({
+            MSG_DEBUG(
                if (pref[i].type() == SPxId::ROW_ID)
                   spxout << " r" << base.number(pref[i]);
                else
                   spxout << " c" << base.number(pref[i]);
-            });
+            )
 
             forbidden[sel] = 2;
 
@@ -639,7 +639,8 @@ void SPxWeightST::setupWeights(SPxSolver& bse)
          }
       }
    }
-   DEBUG({
+
+   MSG_DEBUG({
       for(i = 0; i < bse.nCols(); i++)
          spxout << "C i= " << i 
                   << " up= " << colUp[i]
@@ -650,7 +651,7 @@ void SPxWeightST::setupWeights(SPxSolver& bse)
                   << " rr= " << rowRight[i]
                   << " w= " << rowWeight[i]
                   << std::endl;
-   });
+   })
 }
 } // namespace soplex
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.31 2005/07/14 17:38:35 bzforlow Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.32 2005/07/25 15:24:35 bzforlow Exp $"
 
 // #define DEBUGGING 1
 
@@ -385,10 +385,10 @@ void SPxSolver::getEnterVals
       default:
          assert(false);
       }
-      DEBUG({ spxout << "SPxSolver::getEnterVals() : col " << enterIdx
-                       << ": " << enterStat
-                       << " -> " << ds.colStatus(enterIdx)
-                       << std::endl; });
+      MSG_DEBUG( spxout << "SPxSolver::getEnterVals() : col " << enterIdx
+                        << ": " << enterStat
+                        << " -> " << ds.colStatus(enterIdx)
+                        << std::endl; )
    }
 
    else
@@ -450,7 +450,7 @@ void SPxSolver::getEnterVals
 #if 1
          assert(false);
 #else
-         ERROR( spxout << __FILE__ << __LINE__ 
+         MSG_ERROR( spxout << __FILE__ << __LINE__ 
                          << "ERROR: not yet debugged!" << std::endl; )
          enterPric = (*theCoPvec)[enterIdx];
          enterRO = 0;
@@ -518,10 +518,10 @@ void SPxSolver::getEnterVals
       default:
          assert(false);
       }
-      DEBUG({ spxout << "SPxSolver::getEnterVals() : row " << enterIdx
-                       << ": " << enterStat
-                       << " -> " << ds.rowStatus(enterIdx)
-                       << std::endl; });
+      MSG_DEBUG( spxout << "SPxSolver::getEnterVals() : row " << enterIdx
+                        << ": " << enterStat
+                        << " -> " << ds.rowStatus(enterIdx)
+                        << std::endl; )
    }
 }
 
@@ -567,7 +567,7 @@ void SPxSolver::getEnterVals2
 #if 1
          assert(false);
 #else
-         ERROR( spxout << __FILE__ << __LINE__ 
+         MSG_ERROR( spxout << __FILE__ << __LINE__ 
                          << "ERROR: not yet debugged!" << std::endl; )
          if ((*theCoPvec)[leaveIdx] - theLBbound[leaveIdx] <
               theUBbound[leaveIdx] - (*theCoPvec)[leaveIdx])
@@ -629,10 +629,10 @@ void SPxSolver::getEnterVals2
       default:
          assert(false);
       }
-      DEBUG({ spxout << "SPxSolver::getEnterVals2(): row " << idx
-                       << ": " << leaveStat
-                       << " -> " << ds.rowStatus(idx)
-                       << std::endl; });
+      MSG_DEBUG( spxout << "SPxSolver::getEnterVals2(): row " << idx
+                        << ": " << leaveStat
+                        << " -> " << ds.rowStatus(idx)
+                        << std::endl; )
    }
 
    else
@@ -716,10 +716,10 @@ void SPxSolver::getEnterVals2
       default:
          assert(false);
       }
-      DEBUG({ spxout << "SPxSolver::getEnterVals2(): col " << idx
-                       << ": " << leaveStat
-                       << " -> " << ds.colStatus(idx)
-                       << std::endl; });
+      MSG_DEBUG( spxout << "SPxSolver::getEnterVals2(): col " << idx
+                        << ": " << leaveStat
+                        << " -> " << ds.colStatus(idx)
+                        << std::endl; )
    }
 }
 
@@ -805,7 +805,7 @@ bool SPxSolver::enter(SPxId& enterId)
    {
       rejectEnter(enterId, enterTest, enterStat);
       change(-1, enterId, enterVec);
-      DEBUG( spxout << "rejecting false enter pivot" << std::endl; );
+      MSG_DEBUG( spxout << "rejecting false enter pivot" << std::endl; )
       return true;
    }
 
@@ -822,7 +822,7 @@ bool SPxSolver::enter(SPxId& enterId)
       multBaseWith(tmp);
       tmp -= *enterVec;
       if (tmp.length() > delta())
-         ERROR( spxout << "fVec updated error = " << tmp.length() << std::endl; )
+         MSG_ERROR( spxout << "fVec updated error = " << tmp.length() << std::endl; )
    }
 #endif  // NDEBUG
 
@@ -941,7 +941,7 @@ bool SPxSolver::enter(SPxId& enterId)
 
       if (lastUpdate() > 1)
       {
-         VERBOSE3({ spxout << "IENTER01 factorization triggered in enter() for feasibility test" << std::endl; });
+         MSG_VERBOSE3({ spxout << "IENTER01 factorization triggered in enter() for feasibility test" << std::endl; });
          factorize();
          return enter(enterId);
       }
@@ -949,7 +949,7 @@ bool SPxSolver::enter(SPxId& enterId)
       SPxId none;
       change(-1, none, 0);
 
-      VERBOSE3({ spxout << "IENTER02 unboundness/infeasiblity found in enter()" << std::endl; });
+      MSG_VERBOSE3({ spxout << "IENTER02 unboundness/infeasiblity found in enter()" << std::endl; });
 
       if (rep() != COLUMN)
          setBasisStatus(SPxBasis::INFEASIBLE);

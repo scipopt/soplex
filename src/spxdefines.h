@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.23 2005/07/14 17:38:36 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.24 2005/07/25 15:24:36 bzforlow Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
@@ -49,19 +49,16 @@ namespace soplex
 
 // store the old verbosity of spxout, do something, reset verbosity
 #define DO_WITH_TMP_VERBOSITY( verbosity, do_something ) \
-   { const SPxOut::Verbosity tmp_verbosity = spxout.getVerbosity(); \
+   { const SPxOut::Verbosity  old_verbosity = spxout.getVerbosity(); \
      spxout.setVerbosity( verbosity ); \
      do_something \
-     spxout.setVerbosity( tmp_verbosity ); }
+     spxout.setVerbosity( old_verbosity ); }
 
-//#define VERBOSE1(x) { if(Param::verbose() >= 1) {x} }
-//#define VERBOSE2(x) { if(Param::verbose() >= 2) {x} }
-//#define VERBOSE3(x) { if(Param::verbose() >= 3) {x} }
-#define ERROR(x)    { DO_WITH_TMP_VERBOSITY( SPxOut::ERROR,    x ) }
-#define WARNING(x)  { DO_WITH_TMP_VERBOSITY( SPxOut::WARNING,  x ) }
-#define VERBOSE1(x) { DO_WITH_TMP_VERBOSITY( SPxOut::VERBOSE1, x ) }
-#define VERBOSE2(x) { DO_WITH_TMP_VERBOSITY( SPxOut::VERBOSE2, x ) }
-#define VERBOSE3(x) { DO_WITH_TMP_VERBOSITY( SPxOut::VERBOSE3, x ) }
+#define MSG_ERROR(x)    { DO_WITH_TMP_VERBOSITY( SPxOut::ERROR,    x ) }
+#define MSG_WARNING(x)  { DO_WITH_TMP_VERBOSITY( SPxOut::WARNING,  x ) }
+#define MSG_VERBOSE1(x) { DO_WITH_TMP_VERBOSITY( SPxOut::VERBOSE1, x ) }
+#define MSG_VERBOSE2(x) { DO_WITH_TMP_VERBOSITY( SPxOut::VERBOSE2, x ) }
+#define MSG_VERBOSE3(x) { DO_WITH_TMP_VERBOSITY( SPxOut::VERBOSE3, x ) }
 
 
 #ifndef NDEBUG
@@ -73,9 +70,9 @@ namespace soplex
 
 #if defined(DEBUGGING)
 // print output in any case, regardless of Param::verbose():
-#define DEBUG(x) { DO_WITH_TMP_VERBOSITY( SPxOut::ERROR, x ) }
+#define MSG_DEBUG(x) { DO_WITH_TMP_VERBOSITY( SPxOut::ERROR, x ) }
 #else
-#define DEBUG(x) /**/
+#define MSG_DEBUG(x) /**/
 #endif //!DEBUGGING
 
 #if defined(TRACE_METHOD)
