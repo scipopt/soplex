@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.75 2005/07/14 17:38:35 bzforlow Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.76 2005/07/25 15:23:40 bzforlow Exp $"
 
 #include <iostream>
 
@@ -35,6 +35,9 @@ SoPlex::SoPlex(SPxSolver::Type p_type, SPxSolver::Representation p_rep)
 
    assert(SoPlex::isConsistent());
 }
+
+SoPlex::~SoPlex()
+{}
 
 void SoPlex::setPreScaler(SPxScaler* x)
 {
@@ -151,7 +154,7 @@ SPxSolver::Status SoPlex::getSlacks(Vector& s) const
    /// Does not work yet with presolve
    if (has_simplifier())
    {
-      ERROR( spxout << "Not yet implemented" << std::endl; )
+      MSG_ERROR( spxout << "Not yet implemented" << std::endl; )
       return SPxSolver::ERROR;
    }
    SPxSolver::Status stat = m_solver.getSlacks(s);
@@ -170,7 +173,7 @@ SPxSolver::Status SoPlex::getDual(Vector& pi) const
    /// Does not work yet with presolve
    if (has_simplifier())
    {
-      ERROR( spxout << "Not yet implemented" << std::endl; )
+      MSG_ERROR( spxout << "Not yet implemented" << std::endl; )
       return SPxSolver::ERROR;
    }
    SPxSolver::Status stat = m_solver.getDual(pi);
@@ -189,7 +192,7 @@ SPxSolver::Status SoPlex::getRedCost(Vector& rdcost) const
    /// Does not work yet with presolve
    if (has_simplifier())
    {
-      ERROR( spxout << "Not yet implemented" << std::endl; )
+      MSG_ERROR( spxout << "Not yet implemented" << std::endl; )
       return SPxSolver::ERROR;
    }
    SPxSolver::Status stat = m_solver.getRedCost(rdcost);
@@ -275,7 +278,7 @@ bool SoPlex::writeBasisFile(
    const NameSet& rowNames, 
    const NameSet& colNames)
 {
-   ERROR( spxout << "Warning! Not fully implemented" << std::endl; )
+   MSG_ERROR( spxout << "Warning! Not fully implemented" << std::endl; )
    return m_solver.writeBasisFile(filename, rowNames, colNames);
 }
 

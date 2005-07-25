@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.63 2005/02/10 10:32:48 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.64 2005/07/25 15:23:40 bzforlow Exp $"
 
 /**@file  soplex.h
  * @brief preconfigured #SoPlex LP-solver.
@@ -33,12 +33,17 @@
 
 namespace soplex
 {
+
 /**@brief   Preconfigured #SoPlex LP-solver.
    @ingroup Algo
 */
 class SoPlex : public SPxLP
 {
 protected:
+
+   //-------------------------
+   //**@name Protected data */
+   //@{
    SPxFastRT       m_fastRT;    ///< fast ratio test
    SPxSteepPR      m_steepPR;   ///< steepest edge pricing
    //   SPxWeightST st;  ///< weight starter
@@ -48,12 +53,23 @@ protected:
    SPxScaler*      m_postScaler;
    SPxSimplifier*  m_simplifier;
    bool            m_vanished;  ///< did the presolver solve the problem ?
+   //@}
 
 public:
+
+   //---------------------------------------
+   //**@name Construction / destruction */
+   //@{
    /// default construtor.
    explicit SoPlex(
       SPxSolver::Type           type = SPxSolver::LEAVE, 
-      SPxSolver::Representation rep  = SPxSolver::COLUMN);
+      SPxSolver::Representation rep  = SPxSolver::COLUMN );
+   virtual ~SoPlex();
+   //@}
+
+   //---------------------------------------
+   //**@name Access / modification */
+   //@{
    /// set update type for factorization.
    void setUtype(SLUFactor::UpdateType tp)
    {
@@ -100,57 +116,6 @@ public:
    {
       return m_postScaler != 0;
    }
-   ///
-   virtual SPxSolver::Status solve();
-   ///
-   virtual Real objValue() const;
-   ///
-   virtual SPxSolver::Status getPrimal(Vector& vector) const;
-   ///
-   virtual SPxSolver::Status getSlacks(Vector& vector) const;
-   ///
-   virtual SPxSolver::Status getDual(Vector& vector) const;
-   ///
-   virtual SPxSolver::Status getRedCost(Vector& vector) const;
-
-   /// get violation of constraints.
-   virtual void qualConstraintViolation(Real& maxviol, Real& sumviol) const;
-   /// get violations of bounds.
-   virtual void qualBoundViolation(Real& maxviol, Real& sumviol) const;
-#if 0
-   /// get the residuum |Ax-b|.
-   virtual void qualSlackViolation(Real& maxviol, Real& sumviol) const;
-   /// get violation of optimality criterion.
-   virtual void qualRedCostViolation(Real& maxviol, Real& sumviol) const;
-#endif
-   /// time spent in factorizations
-   virtual Real getFactorTime() const
-   {
-      return m_vanished ? REAL(0.0) : m_slu.getFactorTime();
-   }
-   /// number of factorizations performed
-   virtual int getFactorCount() const
-   {
-      return m_vanished ? 0 : m_slu.getFactorCount();
-   }
-   /// time spent in factorizations
-   virtual Real getSolveTime() const
-   {
-      return m_vanished ? REAL(0.0) : m_slu.getSolveTime();
-   }
-   /// number of factorizations performed
-   virtual int getSolveCount() const
-   {
-      return m_vanished ? 0 : m_slu.getSolveCount();
-   }
-   virtual int iteration() const
-   {      
-      return m_vanished ? 0 : m_solver.basis().iteration();
-   }
-   virtual bool terminate() 
-   {
-      return m_solver.terminate();
-   }
    /// setup pricer to use.
    virtual void setPricer(SPxPricer* pricer)
    {
@@ -196,8 +161,8 @@ public:
    {
       return m_solver.terminationValue();
    }
-   /// allowed bound violation for optimal Solution.
-   /** When all vectors do not violate their bounds by more than \f$\delta\f$,
+   /// allowed bound violation for optimal solution.
+   /** When no vector violates its bound by more than \f$\delta\f$,
     *  the basis is considered optimal.
     */
    virtual Real delta() const
@@ -209,23 +174,93 @@ public:
    {
       m_solver.setDelta(d);
    }
-   virtual SPxSolver::Status status()
+   //@}
+
+   //---------------------------------------
+   //**@name Solving and solution query */
+   //@{
+   ///
+   virtual SPxSolver::Status solve();
+   ///
+   virtual Real objValue() const;
+   ///
+   virtual SPxSolver::Status getPrimal(Vector& vector) const;
+   ///
+   virtual SPxSolver::Status getSlacks(Vector& vector) const;
+   ///
+   virtual SPxSolver::Status getDual(Vector& vector) const;
+   ///
+   virtual SPxSolver::Status getRedCost(Vector& vector) const;
+
+   /// get violation of constraints.
+   virtual void qualConstraintViolation(Real& maxviol, Real& sumviol) const;
+   /// get violations of bounds.
+   virtual void qualBoundViolation(Real& maxviol, Real& sumviol) const;
+#if 0
+   /// get the residuum |Ax-b|.
+   virtual void qualSlackViolation(Real& maxviol, Real& sumviol) const;
+   /// get violation of optimality criterion.
+   virtual void qualRedCostViolation(Real& maxviol, Real& sumviol) const;
+#endif
+   /// time spent in factorizations
+   virtual Real getFactorTime() const
+   {
+      return m_vanished ? REAL(0.0) : m_slu.getFactorTime();
+   }
+   /// number of factorizations performed
+   virtual int getFactorCount() const
+   {
+      return m_vanished ? 0 : m_slu.getFactorCount();
+   }
+   /// time spent in factorizations
+   virtual Real getSolveTime() const
+   {
+      return m_vanished ? REAL(0.0) : m_slu.getSolveTime();
+   }
+   /// number of factorizations performed
+   virtual int getSolveCount() const
+   {
+      return m_vanished ? 0 : m_slu.getSolveCount();
+   }
+   ///
+   virtual int iteration() const
+   {      
+      return m_vanished ? 0 : m_solver.basis().iteration();
+   }
+   ///
+   virtual bool terminate() 
+   {
+      return m_solver.terminate();
+   }
+   /// returns the current status
+   virtual SPxSolver::Status status() const
    {
       if (m_vanished)
          return SPxSolver::OPTIMAL;
 
       return m_solver.status();
    }
+   //@}
+
+   //---------------------------------------
+   //**@name I/O */
+   //@{
    /// write basis to \p filename in MPS format.
-   virtual bool writeBasisFile(const char* filename, 
-      const NameSet& rowNames, const NameSet& colNames);
+   virtual bool writeBasisFile ( const char*    filename, 
+                                 const NameSet& rowNames, 
+                                 const NameSet& colNames );
+   //@}
 
 private:
+
+   //---------------------------------------
+   //**@name Blocked */
+   //@{
    /// assignment operator is not implemented.
    SoPlex& operator=(const SoPlex& rhs);
-
    /// copy constructor is not implemented.
    SoPlex(const SoPlex&);
+   //@}
 };
 } // namespace soplex
 #endif // _SOPLEX_H_
