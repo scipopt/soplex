@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxintervalsm.cpp,v 1.7 2005/07/25 15:24:36 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxintervalsm.cpp,v 1.8 2005/07/26 17:03:45 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -32,8 +32,6 @@ SPxSimplifier::Result SPxIntervalSM::simplify(SPxLP& lp, Real eps, Real delta)
 
    m_timeUsed.reset();
    m_timeUsed.start();
-
-   //std::cout << lp << std::endl;
 
    Real maxval = infinity / 5.0;
    int  nzcnt  = 0;
@@ -208,8 +206,6 @@ SPxSimplifier::Result SPxIntervalSM::simplify(SPxLP& lp, Real eps, Real delta)
    assert(lp.isConsistent());
 
    m_timeUsed.stop();
-
-   //std::cout << lp << std::endl;
    
    return OKAY;
 }

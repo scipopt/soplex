@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: solve.cpp,v 1.31 2005/01/12 12:00:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: solve.cpp,v 1.32 2005/07/26 17:02:52 bzforlow Exp $"
 
 #include <assert.h>
 
@@ -937,7 +937,6 @@ void CLUFactor::solveLleft(Real* vec) const
          idx = &ridx[k];
          while (j-- > 0)
          {
-            //            std::cout << "i=" << i << " r=" << r << " idx=" << *idx << std::endl;
             assert(l.rperm[*idx] < i);
             vec[*idx++] -= x * *val++;
          }
