@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.71 2005/07/25 15:24:35 bzforlow Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.72 2005/07/26 17:04:53 bzforlow Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -50,6 +50,7 @@
 #include "spxweightst.h"
 #include "spxvectorst.h"
 #include "slufactor.h"
+#include "spxout.h"
 
 using namespace soplex;
 
@@ -78,50 +79,50 @@ public:
       Real maxviol;
       Real sumviol;
 
-      std::cout << "IEXAMP05 Violations (max/sum)" << std::endl;
+      MSG_VERBOSE3( spxout << "IEXAMP05 Violations (max/sum)" << std::endl; )
                 
       m_solver.qualConstraintViolation(maxviol, sumviol);
 
-      std::cout << "IEXAMP06 Constraints      :" 
-                << std::setw(16) << maxviol << "  " 
-                << std::setw(16) << sumviol << std::endl;
+      MSG_VERBOSE3( spxout << "IEXAMP06 Constraints      :" 
+                           << std::setw(16) << maxviol << "  " 
+                           << std::setw(16) << sumviol << std::endl; )
 
       qualConstraintViolation(maxviol, sumviol);
 
-      std::cout << "IEXAMP07       (unscaled) :" 
-                << std::setw(16) << maxviol << "  " 
-                << std::setw(16) << sumviol << std::endl;
+      MSG_VERBOSE3( spxout << "IEXAMP07       (unscaled) :" 
+                           << std::setw(16) << maxviol << "  " 
+                           << std::setw(16) << sumviol << std::endl; )
 
       m_solver.qualBoundViolation(maxviol, sumviol);
 
-      std::cout << "IEXAMP08 Bounds           :" 
-                << std::setw(16) << maxviol << "  " 
-                << std::setw(16) << sumviol << std::endl;
+      MSG_VERBOSE3( spxout << "IEXAMP08 Bounds           :" 
+                           << std::setw(16) << maxviol << "  " 
+                           << std::setw(16) << sumviol << std::endl; )
 
       qualBoundViolation(maxviol, sumviol);
 
-      std::cout << "IEXAMP09       (unscaled) :" 
-                << std::setw(16) << maxviol << "  " 
-                << std::setw(16) << sumviol << std::endl;
+      MSG_VERBOSE3( spxout << "IEXAMP09       (unscaled) :" 
+                           << std::setw(16) << maxviol << "  " 
+                           << std::setw(16) << sumviol << std::endl; )
 
       if (!m_vanished)
       {
          m_solver.qualSlackViolation(maxviol, sumviol);
 
-         std::cout << "IEXAMP10 Slacks           :" 
-                   << std::setw(16) << maxviol << "  " 
-                   << std::setw(16) << sumviol << std::endl;
+         MSG_VERBOSE3( spxout << "IEXAMP10 Slacks           :" 
+                              << std::setw(16) << maxviol << "  " 
+                              << std::setw(16) << sumviol << std::endl; )
 
          m_solver.qualRedCostViolation(maxviol, sumviol);
 
-         std::cout << "IEXAMP11 Reduced costs    :" 
-                   << std::setw(16) << maxviol << "  " 
-                   << std::setw(16) << sumviol << std::endl;
+         MSG_VERBOSE3( spxout << "IEXAMP11 Reduced costs    :" 
+                              << std::setw(16) << maxviol << "  " 
+                              << std::setw(16) << sumviol << std::endl; )
 #if 0
-         std::cout << "IEXAMP12 Proven dual bound:" 
-                   << std::setw(20)
-                   << std::setprecision(20)
-                   << m_solver.provedDualbound() << std::endl;
+         MSG_VERBOSE3( spxout << "IEXAMP12 Proven dual bound:" 
+                              << std::setw(20)
+                              << std::setprecision(20)
+                              << m_solver.provedDualbound() << std::endl; )
 #endif
       }
    }
@@ -132,9 +133,11 @@ public:
 
 #if 0
       if( m_solver.isProvenInfeasible() )
-         std::cout << "IEXAMP13 Infeasibility is proven." << std::endl;
+         MSG_VERBOSE3( spxout << "IEXAMP13 Infeasibility is proven." 
+                              << std::endl; )
       else
-         std::cout << "IEXAMP13 Infeasibility could not be proven!" << std::endl;
+         MSG_VERBOSE3( spxout << "IEXAMP13 Infeasibility could not be proven!"
+                              << std::endl; )
 #endif
    }
 };
@@ -302,6 +305,7 @@ int main(int argc, const char* const argv[])
          exit(0);
       }
    }
+
    if ((argc - optidx) < 1 + (read_basis ? 1 : 0) + (write_basis ? 1 : 0))
    {
       std::cout << "usage: " << argv[0] << " " << usage << std::endl;
@@ -309,53 +313,67 @@ int main(int argc, const char* const argv[])
    }
    filename  = argv[optidx];
 
-   optidx++;
+   ++optidx;
 
-   if (read_basis || write_basis)
-      basisname = strcpy(
-         new char[strlen(argv[optidx]) + 1], argv[optidx]); 
+   if ( read_basis || write_basis )
+      basisname = strcpy( new char[strlen(argv[optidx]) + 1], argv[optidx] ); 
 
    precision = int(-log10(delta)) + 1;
 
-   Param::setEpsilon(epsilon);
-   Param::setEpsilonFactorization(epsilon_factor);
-   Param::setEpsilonUpdate(epsilon_update);
-   Param::setVerbose(verbose);
+   Param::setEpsilon             ( epsilon );
+   Param::setEpsilonFactorization( epsilon_factor );
+   Param::setEpsilonUpdate       ( epsilon_update );
+   Param::setVerbose             ( verbose );
 
-   std::cout.setf(std::ios::scientific | std::ios::showpoint);
-   std::cerr.setf(std::ios::scientific | std::ios::showpoint);
+   std::cout.setf( std::ios::scientific | std::ios::showpoint );
+   std::cerr.setf( std::ios::scientific | std::ios::showpoint );
 
-   // Send verbose output to a file (similarly for the other verbosity levels):
-   //std::ofstream verbose_stream( "verbose.txt" );
-   //soplex::spxout.setStream( SPxOut::VERBOSE1, verbose_stream );
-   //soplex::spxout.setStream( SPxOut::VERBOSE2, verbose_stream );
-   //soplex::spxout.setStream( SPxOut::VERBOSE3, verbose_stream );
+//#define SEND_ALL_OUTPUT_TO_FILE
+#ifdef  SEND_ALL_OUTPUT_TO_FILE
+   // Redirect all output (default: cout/cerr)
+   std::ofstream  myoutstream( "myoutput.txt" );
+   myoutstream.setf( std::ios::scientific | std::ios::showpoint );
+   spxout.setStream( SPxOut::ERROR,    myoutstream );
+   spxout.setStream( SPxOut::WARNING,  myoutstream );
+   spxout.setStream( SPxOut::VERBOSE1, myoutstream );
+   spxout.setStream( SPxOut::VERBOSE2, myoutstream );
+   spxout.setStream( SPxOut::VERBOSE3, myoutstream );
+   spxout.setStream( SPxOut::DEBUG,    myoutstream );
+#endif
 
-   MySoPlex work(type, representation);
+   MySoPlex work( type, representation );
 
-   work.setUtype(update);
-   work.setTerminationTime(timelimit);
-   work.setDelta(delta);
+   work.setUtype          ( update );
+   work.setDelta          ( delta  );
+   work.setTerminationTime( timelimit );
+   assert( work.isConsistent() );
 
-   std::cout << "IEXAMP12 Delta          = " << std::setw(16) << delta << std::endl
-             << "IEXAMP13 Epsilon Zero   = " << std::setw(16) << Param::epsilon() << std::endl
-             << "IEXAMP37 Epsilon Factor = " << std::setw(16) << Param::epsilonFactorization() << std::endl
-             << "IEXAMP38 Epsilon Update = " << std::setw(16) << Param::epsilonUpdate() << std::endl;
 
-   assert(work.isConsistent());
-
-   std::cout << "IEXAMP14 "
+   // Example for using spxout for output. For the sake of this example 
+   // program, temporarily change the verbosity level to ensure that the 
+   // message is printed, no matter what is specified with -v on the 
+   // command line; usually you will want to use setVerbose() only once.
+   Param::setVerbose( SPxOut::VERBOSE3 );
+   MSG_VERBOSE3( 
+      spxout << "IEXAMP12 Delta          = " 
+             << std::setw(16) << delta << std::endl
+             << "IEXAMP13 Epsilon Zero   = " 
+             << std::setw(16) << Param::epsilon() << std::endl
+             << "IEXAMP37 Epsilon Factor = " 
+             << std::setw(16) << Param::epsilonFactorization() << std::endl
+             << "IEXAMP38 Epsilon Update = " 
+             << std::setw(16) << Param::epsilonUpdate() << std::endl
+             << "IEXAMP14 "
              << (type == SPxSolver::ENTER ? "Entering" : "Leaving")
-             << " algorithm" 
-             << std::endl
+             << " algorithm" << std::endl
              << "IEXAMP15 "
              << (representation == SPxSolver::ROW ? "Row" : "Column")
-             << " representation" 
-             << std::endl
+             << " representation" << std::endl
              << "IEXAMP16 "
              << (update == SLUFactor::ETA ? "Eta" : "Forest-Tomlin")
-             << " update"
-             << std::endl;
+             << " update" << std::endl;
+   )
+   Param::setVerbose( verbose );
 
    switch(pricing)
    {
@@ -382,8 +400,10 @@ int main(int argc, const char* const argv[])
    }
    work.setPricer(pricer);
 
-   std::cout << "IEXAMP17 " << pricer->getName() 
-             << " pricing" << std::endl;
+   Param::setVerbose( SPxOut::VERBOSE3 );
+   MSG_VERBOSE3( spxout << "IEXAMP17 " << pricer->getName() 
+                        << " pricing"  << std::endl; )
+   Param::setVerbose( verbose );
 
    assert(work.isConsistent());
 
@@ -403,8 +423,10 @@ int main(int argc, const char* const argv[])
    }
    work.setTester(ratiotester);
 
-   std::cout << "IEXAMP18 " << ratiotester->getName() 
-             << " ratiotest" << std::endl;
+   Param::setVerbose( SPxOut::VERBOSE3 );
+   MSG_VERBOSE3( spxout << "IEXAMP18 " << ratiotester->getName() 
+                        << " ratiotest" << std::endl; )
+   Param::setVerbose( verbose );
 
    assert(work.isConsistent());
 
@@ -435,17 +457,23 @@ int main(int argc, const char* const argv[])
    default :
       prescaler  = 0;
       postscaler = 0;
-      std::cout << "No";
+      Param::setVerbose( SPxOut::VERBOSE3 );
+      MSG_VERBOSE3( spxout << "No"; )
+      Param::setVerbose( verbose );
       break;
    }
    work.setPreScaler(prescaler);
    work.setPostScaler(postscaler);
 
-   std::cout << "IEXAMP19 "
-             << ((prescaler != 0) ? prescaler->getName() : "no ") 
-             << " / "
-             << ((postscaler != 0) ? postscaler->getName() : "no ")
-             << " scaling" << std::endl;
+   Param::setVerbose( SPxOut::VERBOSE3 );
+   MSG_VERBOSE3( 
+      spxout  << "IEXAMP19 "
+              << ((prescaler != 0) ? prescaler->getName() : "no ") 
+              << " / "
+              << ((postscaler != 0) ? postscaler->getName() : "no ")
+              << " scaling" << std::endl;
+   )
+   Param::setVerbose( verbose );
 
    assert(work.isConsistent());
 
@@ -470,9 +498,11 @@ int main(int argc, const char* const argv[])
    }
    work.setSimplifier(simplifier);
 
-   std::cout << "IEXAMP20 "
-             << ((simplifier == 0) ? "no" : simplifier->getName()) 
-             << " simplifier" << std::endl;
+   Param::setVerbose( SPxOut::VERBOSE3 );
+   MSG_VERBOSE3( spxout << "IEXAMP20 "
+                        << ((simplifier == 0) ? "no" : simplifier->getName()) 
+                        << " simplifier" << std::endl; )
+   Param::setVerbose( verbose );
 
    assert(work.isConsistent());
 
@@ -494,28 +524,34 @@ int main(int argc, const char* const argv[])
    }
    work.setStarter(starter);
 
-   std::cout << "IEXAMP21 "
-             << ((starter == 0) ? "no" : starter->getName())
-             << " starter" << std::endl;
+   Param::setVerbose( SPxOut::VERBOSE3 );
+   MSG_VERBOSE3( spxout << "IEXAMP21 "
+                        << ((starter == 0) ? "no" : starter->getName())
+                        << " starter" << std::endl; )
+   Param::setVerbose( verbose );
 
    assert(work.isConsistent());
 
    Timer timer;
-   std::cout << "IEXAMP22 loading LP file " << filename << std::endl;
+   Param::setVerbose( SPxOut::VERBOSE3 );
+   MSG_VERBOSE3( spxout << "IEXAMP22 loading LP file " << filename << std::endl; )
+   Param::setVerbose( verbose );
 
    if (!work.readFile(filename, &rownames, &colnames))
    {
-      MSG_ERROR( soplex::spxout << "EEXAMP23 error while reading file \"" 
-                                << filename << "\"" << std::endl; )
+      MSG_ERROR( spxout << "EEXAMP23 error while reading file \"" 
+                        << filename << "\"" << std::endl; )
       exit(1);
    }
    assert(work.isConsistent());
 
-   std::cout << "IEXAMP24 LP has " 
-             << work.nRows() << " rows "
-             << work.nCols() << " columns " 
-             << work.nNzos() << " nonzeros"
-             << std::endl;
+   Param::setVerbose( SPxOut::VERBOSE3 );
+   MSG_VERBOSE3( spxout << "IEXAMP24 LP has " 
+                        << work.nRows() << " rows "
+                        << work.nCols() << " columns " 
+                        << work.nNzos() << " nonzeros"
+                        << std::endl; )
+   Param::setVerbose( verbose );
 
    // Should we read a basis ?
    if (read_basis)
@@ -530,103 +566,107 @@ int main(int argc, const char* const argv[])
 #endif
    }
    timer.start();
-   std::cout << "IEXAMP26 solving LP" << std::endl;
+   Param::setVerbose( SPxOut::VERBOSE3 );
+   MSG_VERBOSE3( spxout << "IEXAMP26 solving LP" << std::endl; )
+   Param::setVerbose( verbose );
 
    work.solve();
 
    timer.stop();
 
-   std::cout << "IEXAMP01 Factorizations   : " << work.getFactorCount() << std::endl;
-   std::cout << "IEXAMP02     Time spent   : " << work.getFactorTime() << std::endl;
-   std::cout << "IEXAMP03 Solves           : " << work.getSolveCount() << std::endl;
-   std::cout << "IEXAMP04     Time spent   : " << work.getSolveTime() << std::endl;
-
-   std::cout << "IEXAMP27 solution time  is: " 
-             << timer.userTime() 
-             << std::endl
-             << "IEXAMP28 iterations       : " 
-             << work.iteration() 
-             << std::endl;
+   Param::setVerbose( SPxOut::VERBOSE3 );
+   MSG_VERBOSE3( 
+      spxout << "IEXAMP01 Factorizations   : " << work.getFactorCount() << std::endl
+             << "IEXAMP02     Time spent   : " << work.getFactorTime() << std::endl
+             << "IEXAMP03 Solves           : " << work.getSolveCount() << std::endl
+             << "IEXAMP04     Time spent   : " << work.getSolveTime() << std::endl
+             << "IEXAMP27 solution time  is: " << timer.userTime() << std::endl
+             << "IEXAMP28 iterations       : " << work.iteration() << std::endl;
+   )
+   Param::setVerbose( verbose );
    
    SPxSolver::Status stat = work.status();
 
+   Param::setVerbose( SPxOut::VERBOSE3 );
    switch (stat)
    {
    case SPxSolver::OPTIMAL:
-      std::cout << "IEXAMP29 solution value is: "
-                << std::setprecision(precision)
-                << work.objValue()
-                << std::endl;
+      MSG_VERBOSE3( spxout << "IEXAMP29 solution value is: "
+                           << std::setprecision( precision )
+                           << work.objValue() << std::endl; )
 
-      if (print_quality)
+      if ( print_quality )
          work.displayQuality();
 
-      if (print_solution)
+      if ( print_solution )
       {
          DVector objx(work.nCols());
             
          work.getPrimal(objx);
             
-         for(int i = 0; i < work.nCols(); i++)
-            if (isNotZero(objx[i], epsilon))
-               std::cout << colnames[work.cId(i)] << "\t" 
-                         << i << "\t"
-                         << std::setw(16)
-                         << std::setprecision(precision)
-                         << objx[i] << std::endl;
-         std::cout << "All other variable are zero." << std::endl;
+         for( int i = 0; i < work.nCols(); ++i ) 
+         {
+            if ( isNotZero( objx[i], epsilon ) )
+               MSG_VERBOSE3( spxout << colnames[ work.cId(i) ] << "\t" 
+                                    << i << "\t"
+                                    << std::setw(16)
+                                    << std::setprecision( precision )
+                                    << objx[i] << std::endl; )
+         }
+         MSG_VERBOSE3( spxout << "All other variable are zero." << std::endl; )
       }
-      if (write_basis)
-         if (!work.writeBasisFile(basisname, rownames, colnames))
-            MSG_ERROR( soplex::spxout << "EEXAMP30 error while writing file \"" 
-                                      << basisname << "\"" << std::endl; )
+      if ( write_basis )
+         if ( ! work.writeBasisFile( basisname, rownames, colnames ) )
+            MSG_ERROR( spxout << "EEXAMP30 error while writing file \"" 
+                              << basisname << "\"" << std::endl; )
       break;
    case SPxSolver::UNBOUNDED:
-      std::cout << "IEXAMP31 LP is unbounded" << std::endl;
+      MSG_VERBOSE3( spxout << "IEXAMP31 LP is unbounded" << std::endl; )
       break;
    case SPxSolver::INFEASIBLE:
-      std::cout << "IEXAMP32 LP is infeasible" << std::endl;
-      if (print_quality)
+      MSG_VERBOSE3( spxout << "IEXAMP32 LP is infeasible" << std::endl; )
+      if ( print_quality )
          work.displayInfeasibility();
       break;
    case SPxSolver::ABORT_CYCLING:
-      std::cout << "EEXAMP40 aborted due to cycling" << std::endl;
+      MSG_VERBOSE3( spxout << "EEXAMP40 aborted due to cycling" << std::endl; )
       break;
    case SPxSolver::ABORT_TIME:
-      std::cout << "IEXAMP33 aborted due to time limit" << std::endl;
+      MSG_VERBOSE3( spxout << "IEXAMP33 aborted due to time limit" << std::endl; )
       break;
    case SPxSolver::ABORT_ITER:
-      std::cout << "IEXAMP34 aborted due to iteration limit" << std::endl;
+      MSG_VERBOSE3( spxout << "IEXAMP34 aborted due to iteration limit" << std::endl; )
       break;
    case SPxSolver::ABORT_VALUE:
-      std::cout << "IEXAMP35 aborted due to objective value limit" << std::endl;
+      MSG_VERBOSE3( spxout << "IEXAMP35 aborted due to objective value limit" << std::endl; )
       break;
    case SPxSolver::SINGULAR:
-      MSG_ERROR( soplex::spxout << "EEXAMP39 basis is singular" << std::endl; )
+      MSG_ERROR( spxout << "EEXAMP39 basis is singular" << std::endl; )
       break;
    default:
-      MSG_ERROR( soplex::spxout << "EEXAMP36 An error occurred during "
-                                << "the solution process" << std::endl; )
+      MSG_ERROR( spxout << "EEXAMP36 An error occurred during "
+                        << "the solution process" << std::endl; )
       break;
    }
-   std::cout << std::endl;
+   spxout << std::endl;
+   Param::setVerbose( verbose );
 
-   if (prescaler != 0)
+   if ( prescaler != 0 )
       delete prescaler;
-   if (postscaler != 0)
+   if ( postscaler != 0 )
       delete postscaler;
-   if (simplifier != 0)
+   if ( simplifier != 0 )
       delete simplifier;
-   if (starter != 0)
+   if ( starter != 0 )
       delete starter;
 
-   assert(pricer != 0);
+   assert( pricer != 0 );
    delete pricer;
 
-   assert(ratiotester != 0);
+   assert( ratiotester != 0 );
    delete ratiotester;
 
-   if (basisname != 0)
+   if ( basisname != 0 )
       delete [] basisname;
 
    return 0;
