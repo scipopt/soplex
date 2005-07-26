@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.33 2005/07/25 15:24:37 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.34 2005/07/26 17:04:11 bzforlow Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.
@@ -48,8 +48,8 @@ static void readName(MPSInput& mps)
       // Sometimes the name is omitted.
       mps.setProbName((mps.field1() == 0) ? "_MPS_" : mps.field1());
 
-      MSG_VERBOSE2({ spxout << "Problem name   : " << mps.probName()
-                          << std::endl; });
+      MSG_VERBOSE2( spxout << "Problem name   : " << mps.probName()
+                           << std::endl; )
  
       // This hat to be a new section
       if (!mps.readLine() || (mps.field0() == 0))
@@ -143,8 +143,8 @@ static void readRows(
    {
       if (mps.field0() != 0)
       {
-         MSG_VERBOSE2({ spxout << "Objective name : " << mps.objName()
-                             << std::endl; });
+         MSG_VERBOSE2( spxout << "Objective name : " << mps.objName()
+                              << std::endl; )
 
          if (strcmp(mps.field0(), "COLUMNS"))
             break;
@@ -301,8 +301,8 @@ static void readRhs(
    {
       if (mps.field0() != 0)
       {
-         MSG_VERBOSE2({ spxout << "RHS name       : " << rhsname 
-                             << std::endl; });
+         MSG_VERBOSE2( spxout << "RHS name       : " << rhsname 
+                              << std::endl; );
 
          if (!strcmp(mps.field0(), "RANGES"))
             mps.setSection(MPSInput::RANGES);
@@ -330,8 +330,8 @@ static void readRhs(
          if (strcmp(addname, mps.field1()))
          {
             strcpy(addname, mps.field1());
-            MSG_VERBOSE3({ spxout << "RHS ignored    : " << addname 
-                                << std::endl; });
+            MSG_VERBOSE3( spxout << "RHS ignored    : " << addname 
+                                 << std::endl; );
          }
       }
       else
@@ -384,8 +384,8 @@ static void readRanges(
    {
       if (mps.field0() != 0)
       {
-         MSG_VERBOSE2({ spxout << "Range name     : " << rngname
-                             << std::endl; });
+         MSG_VERBOSE2( spxout << "Range name     : " << rngname
+                              << std::endl; );
 
          if (!strcmp(mps.field0(), "BOUNDS"))
             mps.setSection(MPSInput::BOUNDS);
@@ -492,8 +492,8 @@ static void readBounds(
    {
       if (mps.field0() != 0)
       {
-         MSG_VERBOSE2({ spxout << "Bound name     : " << bndname
-                             << std::endl; });
+         MSG_VERBOSE2( spxout << "Bound name     : " << bndname
+                              << std::endl; )
 
          if (strcmp(mps.field0(), "ENDATA"))
             break;
@@ -663,11 +663,11 @@ bool SPxLP::readMPS(
    {
       changeSense(mps.objSense());
 
-      MSG_VERBOSE2({
+      MSG_VERBOSE2(
          spxout << "Objective sense: " 
-                  << ((mps.objSense() == MINIMIZE) ? "Minimize" : "Maximize") 
-                  << std::endl;         
-      });
+                << ((mps.objSense() == MINIMIZE) ? "Minimize" : "Maximize") 
+                << std::endl;         
+      )
 
       added2Set(
          *(reinterpret_cast<SVSet*>(static_cast<LPRowSet*>(this))), 

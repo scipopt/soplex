@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.47 2005/07/25 15:24:36 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.48 2005/07/26 17:03:24 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -371,7 +371,7 @@ void SPxBasis::writeBasis(
          }
          else
          {
-            /* Default is all Slacks basic, all variables on lower bound,
+            /* Default is all slacks basic, all variables on lower bound,
              * nothing to do in this case.
              * Non basic free variable should better not accure.
              */
@@ -380,20 +380,22 @@ void SPxBasis::writeBasis(
          }
       }
    }
+
 #ifndef NDEBUG
-   for(; row < theLP->nRows(); row++)
-      if( !theLP->isBasic( thedesc.rowStatus( row )))
+   for( ; row < theLP->nRows(); row++)
+      if( ! theLP->isBasic( thedesc.rowStatus( row )))
          break;
    
    assert( row == theLP->nRows() );
 
-
    thedesc.dump();
 
-   for(; row < theLP->nRows(); row++)
-      if( !theLP->isBasic( thedesc.rowStatus( row )))
+   // Does this second for-loop make any sense?
+   for( ; row < theLP->nRows(); row++)
+      if( ! theLP->isBasic( thedesc.rowStatus( row )))
          break;
-   std::cout << row << " " << theLP->nRows() << std::endl;
+
+//   std::cout << row << " " << theLP->nRows() << std::endl;
 
    assert( row == theLP->nRows() );
 #endif // NDEBUG
