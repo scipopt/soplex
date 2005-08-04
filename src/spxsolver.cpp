@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.17 2005/07/25 15:24:37 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.18 2005/08/04 15:44:01 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -434,9 +434,9 @@ void SPxSolver::factorize()
    METHOD( "SPxSolver::factorize()" );
 
    MSG_VERBOSE1( spxout << "ISOLVE01 " 
-                        << std::setw(8) << basis().iteration() 
-                        << std::setw(4) << basis().lastUpdate()
-                        << " " << (isInitialized() ? value() : 0.0) 
+                        << "iteration = "    << std::setw(8) << basis().iteration() 
+                        << "\tlastUpdate = " << std::setw(4) << basis().lastUpdate()
+                        << "\tvalue = "      << (isInitialized() ? value() : 0.0) 
                         << std::endl; )
 
 
