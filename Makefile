@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.58 2005/07/25 15:22:10 bzforlow Exp $
+# $Id: Makefile,v 1.59 2005/08/04 15:42:35 bzforlow Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -156,6 +156,12 @@ clean:
 
 distclean:
 		-rm -rf obj/* lib/libsoplex.* bin/soplex.* 
+
+vimtags:
+		-ctags -o TAGS src/*.cpp src/*.h
+
+etags:
+		-ctags -e -o TAGS src/*.cpp src/*.h
 
 _$(OBJDIR):	
 		@-mkdir -p $(OBJDIR)
