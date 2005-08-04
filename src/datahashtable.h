@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datahashtable.h,v 1.18 2005/01/06 17:12:09 bzfkocht Exp $"
+#pragma ident "@(#) $Id: datahashtable.h,v 1.19 2005/08/04 15:42:53 bzforlow Exp $"
 
 /**@file  datahashtable.h
  * @brief Generic hash table for data objects.
@@ -34,18 +34,19 @@ namespace soplex
 
    Class DataHashTable provides a generic hash table for 
    \ref DataObjects "Data Objects",
-   i.e. a map that maps arguments called #HashItem%s to values called #Info%s.
-   #HashItem and #Info types are passed as template arguments. #HashItem%s
-   must provide a comparision #operator==().  Further both, the HashItem and
-   Info must be data objects in the sense, that the assignment operator is
-   equivalent to a #memcpy() of the structure and no destructor is required.
+   i.e., a map that maps arguments called \a HashItems to values called \a Infos.
+   HashItem and Info types are passed as template arguments. HashItems
+   must provide a comparison operator==().  Furthermore, both the HashItem and
+   Info must be data objects in the sense that the assignment operator is
+   equivalent to a <tt>memcpy()</tt> of the structure and no destructor is 
+   required.
    
    The construction of a #DataHashTable requires a \em hash \em function that
-   assigns every #HashItem to an integer value.  Provided this, pairs of a
-   #HashItem and a #Info can be added to the #DataHashTable. No more
-   than one #Info to the same #HashItem is possible at a time. The #Info
-   to a #HashItem can be accessed through the subscript #operator[]() with
-   #Info as subscript.
+   assigns an integer value to every HashItem.  Provided this, pairs of a
+   HashItem and a Info can be added to the #DataHashTable. No more
+   than one Info can be assigned to the same HashItem at a time. The Info
+   to a HashItem can be accessed through the subscript operator[]() with
+   the Info object as a subscript.
    
    The maximum number of elemens a #DataHashTable can hold can be
    specified upon construction and may be reset with #reMax() later on.
@@ -54,18 +55,18 @@ namespace soplex
    the maximum number of elements. If not specified explicitely, it
    is set automatically to a reasonable value. 
 
-   The implementation relies on an array of #DataHashTable::Element%s, from
+   The implementation relies on an array of DataHashTable::Elements, from
    now on referred to as elements. Upon construction, all elements are
-   marked #FREE in their member #status. When an entry is added
+   marked as \c FREE. When an entry is added
    to the #DataHashTable, the hash value is computed by calling #m_hashfun
-   for its #HashItem. If this array element is unused, it is
+   for its HashItem. If this array element is unused, it is
    taken right away. Otherwise, the array index is incremented by
-   the hash size (modulo the element array #size()%) until an unused element
+   the hash size (modulo the element array size()) until an unused element
    is found.
    
-   Removing elements is simply done by marking it as #RELEASED. Hence,
+   Removing elements is simply done by marking it as \c RELEASED. Hence,
    when searching for an element, the search loop may not stop, when a
-   #RELEASED element is encountered. However, such an element may be
+   \c RELEASED element is encountered. However, such an element may be
    reused when adding a new element to the #DataHashTable. 
    
    Further, memory management with resizing of the element array is
@@ -97,7 +98,7 @@ private:
    int m_hashsize;        ///< increment added to hash index, if allready used
    int m_used;            ///< current number of entries in the hash table
 
-   /// pointer to hash function (mapping: #HashItem -> int)
+   /// pointer to hash function (mapping: \a HashItem -> int)
    int (*m_hashfun) (const HashItem*);  
 
    /// memory is #reMax()%ed by this factor, if a new element does't fit
@@ -110,9 +111,9 @@ public:
       return index(h) >= 0;
    }
 
-   /// returns const pointer to #Info of #HashItem \p h or 0, 
+   /// returns const pointer to \a Info of \a HashItem \p h or 0, 
    /// if item is not found.
-   /** Returns a pointer to #Info component of hash element \p h or a zero
+   /** Returns a pointer to \a Info component of hash element \p h or a zero
     *  pointer if element \p h is not in the table.
     */
    const Info* get(const HashItem& h) const
@@ -121,9 +122,9 @@ public:
 
       return (i >= 0) ? &m_elem[i].info : 0;
    }
-   /// references #Info of #HashItem \p h.
-   /** Index operator for accessing the #Info associated to
-    *  #HashItem \p h. It is required, that \p h belongs to the
+   /// references \a Info of \a HashItem \p h.
+   /** Index operator for accessing the \a Info associated to
+    *  \a HashItem \p h. It is required that \p h belongs to the
     *  #DataHashTable, otherwise it core dumps. Methods #has() or
     *  #get() can be used for inquiring wheater \p h belongs to the
     *  #DataHashTable or not.
@@ -135,10 +136,10 @@ public:
       return m_elem[index(h)].info;
    }
    /// adds a new entry to the hash table.
-   /** Adds a new entry consisting of #HashItem \p h and #Info \p info to the
-    *  #DataHashTable. No entry with #HashItem \p h must yet be in the
+   /** Adds a new entry consisting of \a HashItem \p h and \a Info \p info to the
+    *  #DataHashTable. No entry with HashItem \p h must yet be in the
     *  #DataHashTable. After completion, \p info may be accessed via #get() or
-    *  #operator[]() with \p h as parameter. The #DataHashTable is #reMax()%ed
+    *  operator[]() with \p h as parameter. The #DataHashTable is #reMax()%ed
     *  if it becomes neccessary.
     */
    void add(const HashItem& h, const Info& info)
@@ -168,7 +169,7 @@ public:
       assert(has(h));
    }
 
-   /// remove #HashItem \p h from the #DataHashTable.
+   /// remove \a HashItem \p h from the #DataHashTable.
    void remove(const HashItem& h)
    {
       assert(has(h));
@@ -291,13 +292,13 @@ private:
       return hashsize;
    }
 
-   /// returns hash index of #HashItem \p h or -1, if \p h is not present.
+   /// returns hash index of \a HashItem \p h or -1, if \p h is not present.
    /** Using the hash function #m_hashfun, the hash value of \p h 
     *  is calculated.
-    *  Starting with this hash index, every #m_hashsize%-th #element is
-    *  compared with \p h until \p h is found or all #element%s are checked.
+    *  Starting with this hash index, every #m_hashsize%-th element is
+    *  compared with \p h until \p h is found or all elements have been checked.
     *
-    *  @param  h  #HashItem, for which the hash index should be calculated
+    *  @param  h  \a HashItem, for which the hash index should be calculated
     *  @return hash index of \p h or -1, 
     *          if \p h is not a member of the hash table
     */
