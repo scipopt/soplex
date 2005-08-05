@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.h,v 1.19 2005/01/09 20:10:41 bzfkocht Exp $"
+#pragma ident "@(#) $Id: ssvector.h,v 1.20 2005/08/05 16:32:44 bzforlow Exp $"
 
 
 /**@file  ssvector.h
@@ -41,8 +41,8 @@ class SVSet;
    #DVector%s where the indices of its nonzero elements can be stored in an
    extra #IdxSet. Only elements with absolute value > #epsilon are considered
    to be nonzero. 
-   Since really storing the nonzeros is not allways convenient,
-   an #SSVector provides two different statuses: setup and not setup.
+   Since really storing the nonzeros is not always convenient,
+   an #SSVector provides two different stati: setup and not setup.
    An #SSVector being setup means that the nonzero indices are available,
    otherwise an #SSVector is just an ordinary #Vector with an empty #IdxSet.
    Note that due to arithmetic operation, zeros can slip in, i.e. it is only
@@ -51,32 +51,41 @@ class SVSet;
 class SSVector : protected DVector, protected IdxSet
 {
 private:
-   bool setupStatus;        ///< is the #SSVector set up?
 
+   //--------------------------------------------
+   /**@name Data */
+   //@{
+   /// Is the #SSVector set up?
+   bool setupStatus;
+   ///
    friend class DVector;
+   ///
    friend class Vector;
+   ///
    friend class DSVector;
-
+   ///
    void setMax(int newmax);
-
    /// a value x with |x| < epsilon is considered zero.
    Real epsilon;
+   //@}
+
 public:
 
+   //--------------------------------------------
    /**@name Status of an #SSVector
       An #SSVector can be set up or not. In case it is set up, its #IdxSet
       correctly contains all indices of nonzero elements of the #SSVector.
-      Otherwise, it does not contain any usefull data. Wheter or not an
+      Otherwise, it does not contain any useful data. Wheter or not an
       #SSVector is setup can be determined with method #isSetup().
       
-      There are three method for directly affecting the setup status of an
+      There are three methods for directly affecting the setup status of an
       #SSVector:
       - unSetup():     This method sets the status to ``not setup''.
       - setup():       This method initializes the #IdxSet# to the
                        #SSVector#s nonzero indices and sets the status
                        to ``setup''.
       - forceSetup():  This method sets the status to ``setup'' without
-                       verifying, that the #IdxSet correctly contains
+                       verifying that the #IdxSet correctly contains
                        all nonzero indices. It may be used when the
                        nonzero indices have been computed externally.
    */
@@ -125,6 +134,7 @@ public:
    //@}
 
 
+   //--------------------------------------------
    /**@name Methods for setup SSVectors */
    //@{
    /// returns index of the \p n 'th nonzero element.
@@ -197,7 +207,8 @@ public:
    //@}
 
 
-   /**@name Methods independend of the Status */
+   //--------------------------------------------
+   /**@name Methods independent of the Status */
    //@{
    /// returns \p i 'th value.
    Real operator[](int i) const
@@ -246,6 +257,7 @@ public:
    //@}
 
 
+   //------------------------------------
    /**@name Mathematical operations */
    //@{
    ///
@@ -275,7 +287,9 @@ public:
    SSVector& assign2product(const SSVector& x, const SVSet& A);
    /// assigns #SSVector to \f$A \cdot x\f$ for a setup \p x.
    SSVector& assign2product4setup(const SVSet& A, const SSVector& x);
+
 public:
+
    /// assigns #SSVector to \f$A \cdot x\f$ thereby setting up \p x.
    SSVector& assign2productAndSetup(const SVSet& A, SSVector& x);
 
@@ -288,6 +302,7 @@ public:
    //@}
 
 
+   //------------------------------------
    /**@name Miscellaneous */
    //@{
    /// returns dimension of Vector.
@@ -319,6 +334,7 @@ public:
    //@}
 
 
+   //------------------------------------
    /**@name Constructors / Destructors */
    //@{
    /// constructor.
@@ -359,6 +375,7 @@ public:
    { 
       len = (vec.dim() < 1) ? 1 : vec.dim();
       spx_alloc(idx, len);
+      /// TODO: @todo Is there an IdxSet::operator=( vec ) missing here?
 
       assert(isConsistent());
    }
@@ -368,12 +385,11 @@ public:
 
    /// assign only the elements of \p rhs.
    SSVector& assign(const SVector& rhs);
-
-   ///
+   /// assignment operator
    SSVector& operator=(const SSVector& rhs);
-   ///
+   /// assignment operator
    SSVector& operator=(const SVector& rhs);
-   /// assignment operator.
+   /// assignment operator
    SSVector& operator=(const Vector& rhs)
    {
       unSetup();
@@ -382,19 +398,26 @@ public:
       assert(isConsistent());
       return *this;
    }
-
+   /// destructor
    ~SSVector()
    {
       if ( idx )
          spx_free(idx);
    }
-
    //@}
 
 private:
+
+   //----------------------------
+   /**@name Private helpers */
+   //@{
+   ///
    SSVector& assign2product1(const SVSet& A, const SSVector& x);
+   ///
    SSVector& assign2productShort(const SVSet& A, const SSVector& x);
+   ///
    SSVector& assign2productFull(const SVSet& A, const SSVector& x);
+   //@}
 };
 
 

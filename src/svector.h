@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.h,v 1.21 2002/03/03 13:50:35 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svector.h,v 1.22 2005/08/05 16:33:06 bzforlow Exp $"
 
 /**@file  svector.h
  * @brief Sparse vectors.
@@ -74,12 +74,12 @@ namespace soplex
    applies to the scalar product \c *.
  
    There are two numberings of the nonzeros of an SVector. First, an SVector
-   is supposed to act like a linear algebra Vector. An \em index reffers to
-   this view of an SVector: operator[]() is provided which return the value of
-   the vector to the given index, i.e. 0 for all indeces not in the set of
-   nonzeros.  The other view of SVector%s is that of a set of nonzeros. The
-   nonzeros are numbered from 0 to size()-1. 
-   Methods index(int n) and value(int n)
+   is supposed to act like a linear algebra Vector. An \em index refers to
+   this view of an SVector: operator[]() is provided which returns the value
+   at the given index of the vector, i.e. 0 for all indices which are not in 
+   the set of nonzeros.  The other view of SVector%s is that of a set of 
+   nonzeros. The nonzeros are numbered from 0 to size()-1. 
+   The methods index(int n) and value(int n)
    allow to access the index and value of the \p n 'th nonzero. 
    \p n is referred to as the \em number of a nonzero.
 
@@ -90,7 +90,7 @@ namespace soplex
          Also there maybe a lot of memory lost due to padding the Element
          structure. A better idea seems to be 
          class SVector { int size; int used; int* idx; Real* val; };
-         which for several reason could be faster or slower.
+         which for several reasons could be faster or slower.
          If SVector is changed, also DSVector and SVSet have to be modified.
 */
 class SVector
@@ -100,6 +100,10 @@ class SVector
    friend std::ostream& operator<<(std::ostream& os, const SVector& v);
 
 public:
+
+   //-------------------------------------------
+   /**@name Types */
+   //@{
    /// Sparse vector nonzero element.
    /** SVector keep their nonzeros in an array of Element%s providing
     *  members for saving the nonzero's index and value.
@@ -109,18 +113,25 @@ public:
       Real val;     ///< Value of nonzero element
       int  idx;     ///< Index of nonzero element
    };
+   //@}
 
 private:
+
+   //-------------------------------------------
+   /**@name Data */
+   //@{
    /** An SVector keeps its data in an array of Element%s. The size and 
     *  maximum number of elements allowed is stored in the -1st Element 
     *  in its members #idx and #val respectively.
     */
    Element *m_elem;   ///< Array of Element%s.
+   //@}
 
 public:
+
+   //-------------------------------------------
    /**@name Modification */
    //@{
-
    /// append one nonzero \p (i,v).
    void add(int i, Real v)
    {
@@ -164,9 +175,10 @@ public:
    //@}
 
 
-   /**@name Inquiery */
+   //-------------------------------------------
+   /**@name Inquiry */
    //@{
-   /// number of used indeces.
+   /// number of used indices.
    int size() const
    {
       if( m_elem != 0 )
@@ -175,7 +187,7 @@ public:
          return 0;
    }
 
-   /// maximal number indeces.
+   /// maximal number indices.
    int max() const
    {
       if( m_elem != 0 )
@@ -261,6 +273,7 @@ public:
    //@}
 
 
+   //-------------------------------------------
    /**@name Mathematical Operations */
    //@{
    /// infinity norm.
@@ -297,6 +310,7 @@ public:
    }
    //@}
 
+   //-------------------------------------------
    /**@name Miscellaneous*/
    //@{
    /// assignment operator from semi sparse vector.
@@ -311,11 +325,11 @@ public:
 
    /// default constructor.
    /** The constructor expects one memory block where to store the nonzero
-    *  elements. This must passed to the constructor, where the \em number
+    *  elements. This must be passed to the constructor, where the \em number
     *  of Element%s needs that fit into the memory must be given and a
     *  pointer to the beginning of the memory block. Once this memory has
     *  been passed, it shall not be modified until the SVector is no
-    *  longer used. Note, that when a memory block for \p n, say, Element%s
+    *  longer used. Note that when a memory block for \p n, say, Element%s
     *  has been passed, only \p n-1 are available for actually storing
     *  nonzeros. The remaining one is used for bookkeeping purposes.
     */
@@ -361,7 +375,7 @@ public:
 
 /// multiply Vector with \p and add a SVector. 
 /** This is located in svector.h because it should be inlined and 
- *  the cross dependencys of Vector and SVector.
+ *  because of the cross dependencies of Vector and SVector.
  * @todo Can we move this function to a better place?
  */
 inline Vector& Vector::multAdd(Real x, const SVector& vec)

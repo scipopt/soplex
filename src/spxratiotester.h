@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxratiotester.h,v 1.11 2005/01/06 17:12:09 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxratiotester.h,v 1.12 2005/08/05 16:32:16 bzforlow Exp $"
 
 /**@file  spxratiotester.h
  * @brief Abstract ratio test base class.
@@ -78,7 +78,7 @@ public:
        When beeing called, #fVec() fullfills the basic bounds #lbBound()
        and #ubBound() within #delta. #fVec().delta() is the vector by
        which #fVec() will be updated in this simplex step. Its nonzero
-       indeces are stored in sorted order in #fVec().idx().
+       indices are stored in sorted order in #fVec().idx().
        
        If \p val > 0, \p val is the maximum allowed update value for #fVec(),
        otherwise the minimum. Method #selectLeave() must chose \p val of the
@@ -97,7 +97,7 @@ public:
        #upBound() and #coPvec() bounds #lcBound() and #ucBound() within
        #delta, respectively. #pVec().delta() and #coPvec().delta() are
        the vectors by which #pVec() and #coPvec() will be updated in this
-       simplex step. Their nonzero indeces are stored in sorted order in
+       simplex step. Their nonzero indices are stored in sorted order in
        #pVec().idx() and #coPvec().idx().
        
        If \p val > 0, \p val is the maximum allowed update value for #pVec()

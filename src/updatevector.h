@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: updatevector.h,v 1.10 2002/04/09 07:07:48 bzfkocht Exp $"
+#pragma ident "@(#) $Id: updatevector.h,v 1.11 2005/08/05 16:33:13 bzforlow Exp $"
 
 /**@file  updatevector.h
  * @brief Dense vector with semi-sparse vector for updates
@@ -50,7 +50,7 @@ namespace soplex
     methods for saving and setting the multiplicator \f$\alpha\f$ and
     the update vector \f$\delta\f$. Further, it allows for efficient
     sparse updates, by providing an IdxSet idx() containing the
-    nonzero indeces of \f$\delta\f$.  
+    nonzero indices of \f$\delta\f$.  
 */
 class UpdateVector : public DVector
 {
@@ -80,15 +80,15 @@ public:
       return thedelta;
    }
 
-   /// nonzero indeces of update vector \f$\delta\f$
+   /// nonzero indices of update vector \f$\delta\f$
    const IdxSet& idx() const
    {
       return thedelta.indices();
    }
 
    /// Perform the update
-   /**  Add \c value() * \c delta() to the UpdateVector. Only the indeces 
-    *  in idx() are affected. For all other indeces, delta() is asumed
+   /**  Add \c value() * \c delta() to the UpdateVector. Only the indices 
+    *  in idx() are affected. For all other indices, delta() is asumed
     *  to be 0.
     */
    void update()

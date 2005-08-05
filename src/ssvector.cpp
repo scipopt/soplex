@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.36 2005/07/25 15:24:37 bzforlow Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.37 2005/08/05 16:32:29 bzforlow Exp $"
 
 #include <iostream>
 #include <iomanip>
@@ -198,7 +198,7 @@ void SSVector::setup()
       assert(isConsistent());
    }
 }
-#else // new version, not yet fully testet
+#else // new version, not yet fully tested
 void SSVector::setup()
 {
    if (!isSetup())
@@ -830,7 +830,7 @@ SSVector& SSVector::operator=(const SVector& rhs)
    return assign(rhs);
 }
 
-#ifdef USE_OLD // old version (buggy or optimization dependend)
+#ifdef USE_OLD // old version (buggy or optimization dependent)
 SSVector& SSVector::assign(const SVector& rhs)
 {
    assert(rhs.dim() <= Vector::dim());
@@ -851,7 +851,7 @@ SSVector& SSVector::assign(const SVector& rhs)
    return *this;
 }
 
-#else // new version not yet fully testet, could be put into operator=()
+#else // new version not yet fully tested, could be put into operator=()
 SSVector& SSVector::assign(const SVector& rhs)
 {
    assert(rhs.dim() <= Vector::dim());
