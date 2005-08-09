@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.h,v 1.22 2005/08/05 16:33:06 bzforlow Exp $"
+#pragma ident "@(#) $Id: svector.h,v 1.23 2005/08/09 19:32:13 bzforlow Exp $"
 
 /**@file  svector.h
  * @brief Sparse vectors.
@@ -311,7 +311,7 @@ public:
    //@}
 
    //-------------------------------------------
-   /**@name Miscellaneous*/
+   /**@name Constructors / destructors */
    //@{
    /// assignment operator from semi sparse vector.
    SVector& operator=(const SSVector& sv);
@@ -319,10 +319,8 @@ public:
    SVector& operator=(const SVector& sv);
    /// assignment operator from vector.
    SVector& operator=(const Vector& sv);
-
    /// consistency check.
    bool isConsistent() const;
-
    /// default constructor.
    /** The constructor expects one memory block where to store the nonzero
     *  elements. This must be passed to the constructor, where the \em number
@@ -333,10 +331,19 @@ public:
     *  has been passed, only \p n-1 are available for actually storing
     *  nonzeros. The remaining one is used for bookkeeping purposes.
     */
+   explicit
    SVector(int n = 0, Element* p_mem = 0)
    {
       setMem(n, p_mem);
    }
+   /// destructor
+   ~SVector() 
+   {}
+   //@}
+
+   //-------------------------------------------
+   /**@name Miscellaneous*/
+   //@{
    /// get pointer to internal memory.
    Element* mem() const
    {

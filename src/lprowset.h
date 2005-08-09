@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.h,v 1.21 2005/07/12 13:41:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprowset.h,v 1.22 2005/08/09 19:32:10 bzforlow Exp $"
 
 /**@file  lprowset.h
  * @brief Set of LP columns.
@@ -49,18 +49,29 @@ namespace soplex
 class LPRowSet : protected SVSet
 {
 private:
+
+   //-----------------------------------
+   /**@name Data */
+   //@{
    DVector left;  ///< vector of left hand sides (lower bounds) of #LPRow%s.
    DVector right; ///< vector of right hand sides (upper bounds) of #LPRow%s.
+   //@}
 
 protected:
+
+   //-----------------------------------
+   /**@name Helpers */
+   //@{
    /// return the complete #SVSet.
    const SVSet* rowSet() const 
    {
       return this;
    }
+   //@}
 
 public:
 
+   //-----------------------------------
    /**@name Inquiry */
    //@{
    /// returns the number of #LPRow%s in #LPRowSet.
@@ -228,6 +239,7 @@ public:
    //@}
 
 
+   //-----------------------------------
    /**@name Extension
       Extension methods come with two signatures, one of them providing a
       parameter to return the assigned #DataKey(s). See #DataSet for a more
@@ -296,6 +308,7 @@ public:
    //@}
 
 
+   //-----------------------------------
    /**@name Shrinking
        See \ref #DataSet for a description of the renumbering of the remaining
        #LPRow#s in a #LPRowSet# after the call of a removal method.
@@ -328,6 +341,7 @@ public:
    //@}
 
 
+   //-----------------------------------
    /**@name Memory Management
        For a description of the memory management methods, see the
        documentation of #SVSet, which has been used for implementating
@@ -370,7 +384,8 @@ public:
    /// check consistency.
    bool isConsistent() const;
 
-   /**@name Constructors / Destructors */
+   //-----------------------------------
+   /**@name Construction / Destruction */
    //@{
    /// default constructor.
    /** The user can specify the initial maximum number of rows \p max
@@ -379,6 +394,7 @@ public:
        an arbitrary number of rows to the #LPRowSet, which may result in
        automated memory realllocation.
    */
+   explicit
    LPRowSet(int pmax = -1, int pmemmax = -1)
       : SVSet(pmax, pmemmax), left(0), right(0)
    { }

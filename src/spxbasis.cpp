@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.48 2005/07/26 17:03:24 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.49 2005/08/09 19:32:11 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -100,7 +100,8 @@ void SPxBasis::loadMatrixVecs()
    assert(theLP != 0);
    assert(theLP->dim() == matrix.size());
 
-   MSG_VERBOSE3({ spxout << "IBASIS01 loadMatrixVecs() invalidates factorization" << std::endl; });
+   MSG_VERBOSE3( spxout << "IBASIS01 loadMatrixVecs() invalidates factorization" 
+                        << std::endl; )
 
    int i;
    nzCount = 0;
@@ -133,7 +134,8 @@ void SPxBasis::loadDesc(const Desc& ds)
    int   i;
    int   j;
 
-   MSG_VERBOSE3({ spxout << "IBASIS02 loading of Basis invalidates factorization" << std::endl; });
+   MSG_VERBOSE3( spxout << "IBASIS02 loading of Basis invalidates factorization" 
+                        << std::endl; )
 
    lastin      = none;
    lastout     = none;
@@ -222,7 +224,8 @@ void SPxBasis::loadSolver(SLinSolver* p_solver)
 {
    METHOD( "SPxBasis::load()" );
 
-   MSG_VERBOSE3({ spxout << "IBASIS03 loading of Solver invalidates factorization" << std::endl; });
+   MSG_VERBOSE3( spxout << "IBASIS03 loading of Solver invalidates factorization" 
+                        << std::endl; )
 
    factor = p_solver;
    factorized = false;
@@ -335,8 +338,8 @@ void SPxBasis::writeBasis(
 
    if (theLP->rep() == SPxSolver::ROW)
    {
-      MSG_ERROR( spxout << "writing basis for row representation not yet "
-                         " implemented!" << std::endl; )
+      MSG_ERROR( spxout << "EBASIS09 writing basis for row representation "
+                        << "not yet implemented!" << std::endl; )
       return;
    }
    assert(theLP->rep() == SPxSolver::COLUMN);
@@ -437,31 +440,31 @@ void SPxBasis::change(
       // relative fill too high ?
       else if (Real(factor->memory()) > lastFill * Real(lastMem))
       {
-         MSG_VERBOSE3({ spxout << "IBASIS04 fill factor triggers refactorization"
-                             << " memory= " << factor->memory()
-                             << " lastMem= " << lastMem
-                             << " lastFill= " << lastFill
-                             << std::endl; });
+         MSG_VERBOSE3( spxout << "IBASIS04 fill factor triggers refactorization"
+                              << " memory= " << factor->memory()
+                              << " lastMem= " << lastMem
+                              << " lastFill= " << lastFill
+                              << std::endl; )
 
          factorize();
       }
       // absolute fill too high ?
       else if (Real(factor->memory()) > nonzeroFactor * Real(nzCount))
       {
-         MSG_VERBOSE3({ spxout << "IBASIS05 nonzero factor triggers refactorization"
-                             << " memory= " << factor->memory()
-                             << " nzCount= " << nzCount
-                             << " nonzeroFactor= " << nonzeroFactor
-                             << std::endl; });
+         MSG_VERBOSE3( spxout << "IBASIS05 nonzero factor triggers refactorization"
+                              << " memory= " << factor->memory()
+                              << " nzCount= " << nzCount
+                              << " nonzeroFactor= " << nonzeroFactor
+                              << std::endl; )
          factorize();
       }
       // too many updates ?
       else if (updateCount >= maxUpdates)
       {
-         MSG_VERBOSE3({ spxout << "IBASIS06 update count triggers refactorization"
-                             << " updateCount= " << updateCount
-                             << " maxUpdates= " << maxUpdates
-                             << std::endl; });
+         MSG_VERBOSE3( spxout << "IBASIS06 update count triggers refactorization"
+                              << " updateCount= " << updateCount
+                              << " maxUpdates= " << maxUpdates
+                              << std::endl; )
          factorize();
       }
       else
@@ -472,11 +475,10 @@ void SPxBasis::change(
 
          if (factor->status() != SLinSolver::OK || factor->stability() < minStab)
          {
-            // MSG_VERBOSE3( spxout << s << " -> " << factor->stability() << '\t'; )
-            MSG_VERBOSE3({ spxout << "IBASIS07 stability triggers refactorization"
-                                << " stability= " << factor->stability()
-                                << " minStab= " << minStab
-                                << std::endl; });
+            MSG_VERBOSE3( spxout << "IBASIS07 stability triggers refactorization"
+                                 << " stability= " << factor->stability()
+                                 << " minStab= " << minStab
+                                 << std::endl; )
             factorize();
          }
       }
@@ -587,14 +589,14 @@ void SPxBasis::dump()
    const SPxOut::Verbosity tmp_verbosity = spxout.getVerbosity();
    spxout.setVerbosity( SPxOut::ERROR );
 
-   spxout << "Basis entries:" << std::endl;
+   spxout << "DBASIS09 Basis entries:" << std::endl;
    basesize = 0;
    for (i = 0; i < theLP->nRows(); ++i)
    {
       if (theLP->isBasic(thedesc.rowStatus(i)))
       {
          SPxRowId id = theLP->SPxLP::rId(i);
-         spxout << "\tR" << theLP->number(id);
+         spxout << "DBASIS10 \tR" << theLP->number(id);
          basesize++;
          if(basesize % 8 == 0)
             spxout << std::endl;
@@ -606,7 +608,7 @@ void SPxBasis::dump()
       if (theLP->isBasic(thedesc.colStatus(i)))
       {
          SPxColId id = theLP->SPxLP::cId(i);
-         spxout << "\tC" << theLP->number(id);
+         spxout << "DBASIS11 \tC" << theLP->number(id);
          basesize++;
          if(basesize % 8 == 0)
             spxout << std::endl;

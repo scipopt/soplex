@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idlist.h,v 1.16 2002/03/03 13:50:31 bzfkocht Exp $"
+#pragma ident "@(#) $Id: idlist.h,v 1.17 2005/08/09 19:32:10 bzforlow Exp $"
 
 /**@file  idlist.h
  * @brief Generic Real linked list.
@@ -28,6 +28,10 @@
 
 namespace soplex
 {
+//---------------------------------------------------------------------
+//  class IdElement<T>
+//---------------------------------------------------------------------
+
 /**@brief   Elements for #IdList%s.
    @ingroup Elementary
 
@@ -48,9 +52,18 @@ namespace soplex
 template < class T >
 class IdElement : public T
 {
+   //--------------------------
+   /**@name Data */
+   //@{
    IdElement<T>* theprev;   ///< pointer to previous element in the #IdList
    IdElement<T>* thenext;   ///< pointer to next element in the #IdList
+   //@}
+
 public:
+
+   //---------------------------------------
+   /**@name Successors and predecessors */
+   //@{
    ///
    IdElement<T>*& next()
    {
@@ -72,7 +85,11 @@ public:
    {
       return theprev;
    }
+   //@}
 
+   //---------------------------------------
+   /**@name Construction / destruction */
+   //@{
    /// default constructor.
    IdElement()
       : theprev(0)
@@ -90,6 +107,10 @@ public:
    {}
 };
 
+//---------------------------------------------------------------------
+//  class IdList<T>
+//---------------------------------------------------------------------
+
 
 /**@brief   Generic Real linked list.
    @ingroup Elementary
@@ -104,6 +125,7 @@ class IdList : public IsList<T>
 {
 public:
 
+   //---------------------------------------
    /**@name Access */
    //@{
    /// returns first element in list.
@@ -132,6 +154,7 @@ public:
    //@}
 
 
+   //---------------------------------------
    /**@name Extension */
    //@{
    /// appends \p elem to end of list.
@@ -211,6 +234,7 @@ public:
    }
    //@}
 
+   //---------------------------------------
    /**@name Removal */
    //@{
    /// removes element following \p after.
@@ -267,7 +291,7 @@ public:
    }
    //@}
 
-
+   //---------------------------------------
    /**@name Miscellaneous */
    //@{
    /// adjusts list pointers to a new memory address.
@@ -303,6 +327,7 @@ public:
    }
    //@}
 
+   //---------------------------------------
    /**@name Constructors / Destructors */
    //@{
    /// default constructor.
@@ -310,6 +335,7 @@ public:
        providing a \p first and a \p last element. Element \p last must be a
        successor of \p first.
     */
+   explicit
    IdList(T* pfirst = 0, T* plast = 0)
       : IsList<T>(pfirst, plast)
    {}

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: message.cpp,v 1.9 2005/07/25 15:24:35 bzforlow Exp $"
+#pragma ident "@(#) $Id: message.cpp,v 1.10 2005/08/09 19:32:10 bzforlow Exp $"
 
 #include <iostream>
 #include <assert.h>
@@ -31,7 +31,7 @@ bool msginconsistent(const char* name, const char* file, int line)
    assert(line >= 0);
 
    MSG_ERROR( spxout << file << "(" << line << ") "
-                   << "Inconsistency detected in " << name << std::endl; )
+                     << "Inconsistency detected in " << name << std::endl; )
 
    return 0;
 }

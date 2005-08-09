@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: sorter.h,v 1.5 2002/01/31 08:19:27 bzfkocht Exp $"
+#pragma ident "@(#) $Id: sorter.h,v 1.6 2005/08/09 19:32:11 bzforlow Exp $"
 
 
 /**@file  sorter.h
@@ -28,8 +28,8 @@ namespace soplex
 {
 /// Generic QuickSort implementation.
 /** This template function sorts an array \p t holding \p n elements of
-    type #T using \p compare for comparisions. Class #COMPARATOR must provide
-    an overloaded #operator()(const T& t1,const T& t2), that returns
+    type #T using \p compare for comparisons. Class #COMPARATOR must provide
+    an overloaded #operator()(const T& t1,const T& t2) which returns
     - < 0, if \p t1 is to appear before \p t2,
     - = 0, if \p t1 and \p t2 can appear in any order, or
     - > 0, if \p t1 is to appear after \p t2.

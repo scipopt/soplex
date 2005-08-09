@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clufactor.h,v 1.19 2005/07/21 14:58:13 bzfhille Exp $"
+#pragma ident "@(#) $Id: clufactor.h,v 1.20 2005/08/09 19:32:09 bzforlow Exp $"
 
 /**@file  clufactor.h
  * @brief Implementation of sparse LU factorization.
@@ -39,7 +39,11 @@ namespace soplex
 class CLUFactor
 {
 public:
-   /** Double linked ring structure for garbage collection of column or
+
+   //----------------------------------------
+   /**@name Public types */
+   //@{
+   /** Doubly linked ring structure for garbage collection of column or
     *  row file in working matrix.
     */
    struct Dring
@@ -66,7 +70,13 @@ public:
       Pring(const Pring&);
       Pring& operator= (const Pring&);
    };
+   //@}
+
 protected:
+
+   //----------------------------------------
+   /**@name Protected types */
+   //@{
    /// Temporary data structures.
    class Temp 
    {
@@ -161,7 +171,11 @@ protected:
       int  *rorig;         ///< original row permutation
       int  *rperm;         ///< original row permutation
    };
+   //@}
 
+   //----------------------------------------
+   /**@name Protected data */
+   //@{
    SLinSolver::Status stat;   ///< Status indicator.
 
    int     thedim;            ///< dimension of factorized matrix   
@@ -184,11 +198,19 @@ protected:
 
    Timer   factorTime;        ///< Time spent in factorizations
    int     factorCount;       ///< Number of factorizations
+   //@}
 
 private:
+
+   //----------------------------------------
+   /**@name Private data */
+   //@{
    Temp    temp;              ///< Temporary storage
+   //@}
 
-
+   //----------------------------------------
+   /**@name Solving */
+   //@{
    // From solve.cpp
    ///
    void solveUright(Real* wrk, Real* vec) const;
@@ -313,19 +335,33 @@ private:
    void remaxRow(int p_row, int len);
    ///
    int makeLvec(int p_len, int p_row);
+   //@}
 
-   /// no copy construtor.
+   //----------------------------------------
+   /**@name Blocked */
+   //@{
+   /// copy construtor.
    CLUFactor(const CLUFactor&);
-   /// no assignment operator.
+   /// assignment operator.
    CLUFactor& operator=(const CLUFactor&);
+   //@}
 
 protected:
+
+   //----------------------------------------
+   /**@name Construction / destruction */
+   //@{
    /// default construtor. 
    /** Since there is no sense in constructing a CLUFactor object
     *  per se, this is protected.
     */
    CLUFactor()
    {}
+   //@}
+
+   //----------------------------------------
+   /**@name Solver methods */
+   //@{
    // From solve.cpp 
    ///
    void solveLright(Real* vec);
@@ -390,11 +426,16 @@ protected:
    void factor(const SVector** vec,   ///< Array of column vector pointers  
                Real threshold,    ///< pivoting threshold                
                Real eps);         ///< epsilon for zero detection        
+   //@}
 
+   //----------------------------------------
+   /**@name Debugging */
+   //@{
    ///
    void dump() const;
    ///
    bool isConsistent() const;
+   //@}
 };
 
 } // namespace soplex

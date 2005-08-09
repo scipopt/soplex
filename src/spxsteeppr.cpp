@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.29 2005/07/25 15:24:37 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.30 2005/08/09 19:32:13 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -94,8 +94,8 @@ void SPxSteepPR::setType(SPxSolver::Type type)
    }
    else
    {
-      MSG_ERROR( spxout << "sorry, no exact setup for steepest "
-                      << "edge multipliers implemented" << std::endl; )
+      MSG_ERROR( spxout << "ESTEEP01 sorry, no exact setup for steepest "
+                        << "edge multipliers implemented" << std::endl; )
 
       if (type == SPxSolver::ENTER)
       {
@@ -274,12 +274,12 @@ int SPxSteepPR::selectLeave()
 #ifndef NDEBUG
          if( coPenalty_ptr[i] < theeps )
          {
-            MSG_ERROR( spxout << "SPxSteepPR::selectLeaveX(): This shall not be!"
-                            << std::endl
-                            << "i=" << i
-                            << " x=" << x
-                            << " coPenalty_ptr[i]=" << coPenalty_ptr[i]
-                            << " theeps=" << theeps << std::endl; )
+            MSG_ERROR( spxout << "ESTEEP02 SPxSteepPR::selectLeaveX(): This shall not be!"
+                              << std::endl
+                              << "i=" << i
+                              << " x=" << x
+                              << " coPenalty_ptr[i]=" << coPenalty_ptr[i]
+                              << " theeps=" << theeps << std::endl; )
             x = x * x / theeps * p[i];
          }
          else
@@ -539,7 +539,7 @@ bool SPxSteepPR::isConsistent() const
          x = coPenalty[i] - tmp.length2();
          if (x > thesolver->delta() || -x > thesolver->delta())
          {
-            MSG_ERROR( spxout << "x[" << i << "] = " << x << std::endl; )
+            MSG_ERROR( spxout << "ESTEEP03 x[" << i << "] = " << x << std::endl; )
          }
       }
    }

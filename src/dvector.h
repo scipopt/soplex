@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dvector.h,v 1.10 2002/03/03 13:50:31 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dvector.h,v 1.11 2005/08/09 19:32:09 bzforlow Exp $"
 
 /**@file  dvector.h
  * @brief Dymnamic vectors.
@@ -52,10 +52,18 @@ namespace soplex
 */
 class DVector : public Vector
 {
+   //-----------------------------------
+   /**@name Data */
+   //@{
    int     memsize;        ///< length of array of values #mem
    Real* mem;            ///< value array to be used
+   //@}
 
 public:
+
+   //-----------------------------------------
+   /**@name Arithmetic operations (friends) */
+   //@{
    /// adding vectors.
    friend DVector operator+(const Vector& v, const Vector& w);
    /// adding vectors.
@@ -79,10 +87,18 @@ public:
    friend DVector operator*(const Vector& v, Real x);
    /// scaling vectors with a real number.
    friend DVector operator*(Real x, const Vector& v);
+   //@}
 
+   //-----------------------------------
+   /**@name I/O */
+   //@{
    /// output operator.
    friend std::istream& operator>>(std::istream& s, DVector& vec);
+   //@}
 
+   //--------------------------------------------------
+   /**@name Arithmetic operations (member functions) */
+   //@{
    /**@todo Do we really have to reimplement the following operators 
     *       (inheritance from Vector?)  
     */
@@ -118,7 +134,11 @@ public:
       Vector::operator*=(x);
       return *this;
    }
+   //@}
 
+   //--------------------------------------------------
+   /**@name Access */
+   //@{
    /// resets #DVector%s dimension to \p newdim.
    void reDim(int newdim);
 
@@ -133,18 +153,20 @@ public:
    {
       return memsize;
    }
-
    /// consistency check.
    bool isConsistent() const;
+   //@}
 
+   //--------------------------------------------------
+   /**@name Construction / destruction */
+   //@{
    /// default constructor. \p dim is the initial dimension.
+   explicit
    DVector(int dim = 0);
-
    /// copy constructor.
    explicit DVector(const Vector& old);
    /// copy constructor.
    DVector(const DVector& old);
-
    /// assignment operator.
    DVector& operator=(const Vector& vec)
    {

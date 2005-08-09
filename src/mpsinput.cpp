@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: mpsinput.cpp,v 1.15 2005/07/25 15:24:35 bzforlow Exp $"
+#pragma ident "@(#) $Id: mpsinput.cpp,v 1.16 2005/08/09 19:32:10 bzforlow Exp $"
 
 /**@file  mpsinput.cpp
  * @brief Read MPS format files.
@@ -76,7 +76,7 @@ bool MPSInput::readLine()
             return false;
         m_lineno++;
 
-        MSG_DEBUG( spxout << "Line " << m_lineno
+        MSG_DEBUG( spxout << "DMPSIN01 Line " << m_lineno
                           << " " << m_buf << std::endl; )
       } 
       while(*m_buf == '*');
@@ -221,16 +221,16 @@ bool MPSInput::readLine()
    while(is_marker);
 
    MSG_DEBUG(
-      spxout << "-----------------------------------------------" 
-               << std::endl
-               << "f0=" << ((m_f0 == 0) ? "nil" : m_f0) << std::endl
-               << "f1=" << ((m_f1 == 0) ? "nil" : m_f1) << std::endl
-               << "f2=" << ((m_f2 == 0) ? "nil" : m_f2) << std::endl
-               << "f3=" << ((m_f3 == 0) ? "nil" : m_f3) << std::endl
-               << "f4=" << ((m_f4 == 0) ? "nil" : m_f4) << std::endl
-               << "f5=" << ((m_f5 == 0) ? "nil" : m_f5) << std::endl
-               << "-----------------------------------------------" 
-               << std::endl;
+      spxout << "DMPSIN02 -----------------------------------------------" 
+             << std::endl
+             << "DMPSIN03 f0=" << ((m_f0 == 0) ? "nil" : m_f0) << std::endl
+             << "DMPSIN04 f1=" << ((m_f1 == 0) ? "nil" : m_f1) << std::endl
+             << "DMPSIN05 f2=" << ((m_f2 == 0) ? "nil" : m_f2) << std::endl
+             << "DMPSIN06 f3=" << ((m_f3 == 0) ? "nil" : m_f3) << std::endl
+             << "DMPSIN07 f4=" << ((m_f4 == 0) ? "nil" : m_f4) << std::endl
+             << "DMPSIN08 f5=" << ((m_f5 == 0) ? "nil" : m_f5) << std::endl
+             << "DMPSIN09 -----------------------------------------------" 
+             << std::endl;
    )
 
    return true;

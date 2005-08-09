@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.30 2005/07/25 15:24:37 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.31 2005/08/09 19:32:12 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -37,10 +37,10 @@ void SPxRedundantSM::fixColumn(SPxLP& lp, int i)
 
    Real x = lp.lower(i);
 
-   MSG_VERBOSE3({ spxout << "IREDSM01 fixed col " << i 
-                       << " lower= " << std::setprecision(16) << lp.lower(i)
-                       << " upper= " << std::setprecision(16) << lp.upper(i)
-                       << std::endl; });
+   MSG_VERBOSE3( spxout << "IREDSM01 fixed col " << i 
+                        << " lower= " << std::setprecision(16) << lp.lower(i)
+                        << " upper= " << std::setprecision(16) << lp.upper(i)
+                        << std::endl; )
 
    m_pval.add(m_cperm[i], x);
    
@@ -63,11 +63,11 @@ void SPxRedundantSM::fixColumn(SPxLP& lp, int i)
             else
                rhs *= scale;
 
-            MSG_VERBOSE3({ spxout << "IREDSM02 \trhs " << k 
-                                << " r= " << std::setprecision(16) << rhs 
-                                << " rhs= " << std::setprecision(16) << lp.rhs(k) 
-                                << " x= " << std::setprecision(16) << col.value(j) 
-                                << std::endl; });
+            MSG_VERBOSE3( spxout << "IREDSM02 \trhs " << k 
+                                 << " r= "   << std::setprecision(16) << rhs 
+                                 << " rhs= " << std::setprecision(16) << lp.rhs(k) 
+                                 << " x= "   << std::setprecision(16) << col.value(j) 
+                                 << std::endl; )
 
             lp.changeRhs(k, rhs);
          }
@@ -82,11 +82,11 @@ void SPxRedundantSM::fixColumn(SPxLP& lp, int i)
             else
                lhs *= scale;
                   
-            MSG_VERBOSE3({ spxout << "IREDSM03 \tlhs " << k 
-                                << " l= " << std::setprecision(16) << lhs 
-                                << " lhs= " << std::setprecision(16) << lp.lhs(k) 
-                                << " x= " << std::setprecision(16) << col.value(j) 
-                                << std::endl; });
+            MSG_VERBOSE3( spxout << "IREDSM03 \tlhs " << k 
+                                 << " l= "   << std::setprecision(16) << lhs 
+                                 << " lhs= " << std::setprecision(16) << lp.lhs(k) 
+                                 << " x= "   << std::setprecision(16) << col.value(j) 
+                                 << std::endl; )
 
             lp.changeLhs(k, lhs);
          }
@@ -160,12 +160,12 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
       if (  (LTrel(lp.rhs(i), lobnd, deltaBnd()) && locnt == 0) 
          || (GTrel(lp.lhs(i), upbnd, deltaBnd()) && upcnt == 0))
       {
-         MSG_VERBOSE3({ spxout << "IREDSM04 infeasible row " << i 
-                             << " lo= " << lobnd
-                             << " up= " << upbnd 
-                             << " lhs= " << lp.lhs(i) 
-                             << " rhs= " << lp.rhs(i)
-                             << std::endl; });
+         MSG_VERBOSE3( spxout << "IREDSM04 infeasible row " << i 
+                              << " lo= " << lobnd
+                              << " up= " << upbnd 
+                              << " lhs= " << lp.lhs(i) 
+                              << " rhs= " << lp.rhs(i)
+                              << std::endl; )
          return INFEASIBLE;
       }
       // forcing equality constraint ?
@@ -174,10 +174,10 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
          // all fixed on upper bound ?
          if (upcnt == 0 && EQrel(lp.rhs(i), upbnd, deltaBnd()))
          {
-            MSG_VERBOSE3({ spxout << "IREDSM05 rhs fixed on upbnd row " << i
-                                << " rhs= " << lp.rhs(i)
-                                << " up= " << upbnd 
-                                << std::endl; });
+            MSG_VERBOSE3( spxout << "IREDSM05 rhs fixed on upbnd row " << i
+                                 << " rhs= " << lp.rhs(i)
+                                 << " up= " << upbnd 
+                                 << std::endl; )
 
             for(j = 0; j < row.size(); ++j )
             {
@@ -202,10 +202,10 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
          // all fixed on lower bound ?
          if (locnt == 0 && EQrel(lp.lhs(i), lobnd, deltaBnd()))
          {
-            MSG_VERBOSE3({ spxout << "IREDSM06 rhs fixed on lowbnd row " << i
-                                << " lhs= " << lp.lhs(i)
-                                << " lo= " << lobnd 
-                                << std::endl; });
+            MSG_VERBOSE3( spxout << "IREDSM06 rhs fixed on lowbnd row " << i
+                                 << " lhs= " << lp.lhs(i)
+                                 << " lo= " << lobnd 
+                                 << std::endl; )
 
             for(j = 0; j < row.size(); ++j )
             {
@@ -232,10 +232,10 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
       // redundant rhs ?
       if (lp.rhs(i) <  infinity && upcnt == 0 && GErel(lp.rhs(i), upbnd, deltaBnd()))
       {
-         MSG_VERBOSE3({ spxout << "IREDSM07 redundant rhs row " << i
-                             << " rhs= " << lp.rhs(i)
-                             << " up= " << upbnd 
-                             << std::endl; });
+         MSG_VERBOSE3( spxout << "IREDSM07 redundant rhs row " << i
+                              << " rhs= " << lp.rhs(i)
+                              << " up= "  << upbnd 
+                              << std::endl; )
 
          lp.changeRhs(i, infinity);
          chgLRhs++;
@@ -243,10 +243,10 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
       // redundant lhs ?
       if (lp.lhs(i) > -infinity && locnt == 0 && LErel(lp.lhs(i), lobnd, deltaBnd()))
       {
-         MSG_VERBOSE3({ spxout << "IREDSM08 redundant lhs row " << i
-                             << " lhs= " << lp.lhs(i)
-                             << " lo= " << lobnd 
-                             << std::endl; });
+         MSG_VERBOSE3( spxout << "IREDSM08 redundant lhs row " << i
+                              << " lhs= " << lp.lhs(i)
+                              << " lo= "  << lobnd 
+                              << std::endl; )
 
          lp.changeLhs(i, -infinity);
          chgLRhs++;
@@ -255,8 +255,8 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
       // but since they might come up here we do it again.
       if (lp.rhs(i) >= infinity && lp.lhs(i) <= -infinity)
       {
-         MSG_VERBOSE3({ spxout << "IREDSM09 unconstraint row " << i 
-                             << " removed" << std::endl; });
+         MSG_VERBOSE3( spxout << "IREDSM09 unconstraint row " << i 
+                              << " removed" << std::endl; )
 
          rem[i]         = -1;
          rowhash[i].row = -1;
@@ -294,11 +294,11 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
 
                   if (GE(y, lp.lower(k)))
                   {
-                     MSG_VERBOSE3({ spxout << "IREDSM10 dominated bound row " << i
-                                         << " col " << k
-                                         << " removed y= " << y
-                                         << " lower= " << lp.lower(k)
-                                         << std::endl; });
+                     MSG_VERBOSE3( spxout << "IREDSM10 dominated bound row " << i
+                                          << " col " << k
+                                          << " removed y= " << y
+                                          << " lower= " << lp.lower(k)
+                                          << std::endl; )
 
                      locnt++;
                      lobnd -= lp.lower(k) * x;
@@ -324,11 +324,11 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
 
                   if (LE(y, lp.upper(k)))
                   {
-                     MSG_VERBOSE3({ spxout << "IREDSM11 dominated bound row " << i
-                                         << " col " << k
-                                         << " removed y= " << y
-                                         << " lower= " << lp.lower(k)
-                                         << std::endl; });
+                     MSG_VERBOSE3( spxout << "IREDSM11 dominated bound row " << i
+                                          << " col " << k
+                                          << " removed y= " << y
+                                          << " lower= " << lp.lower(k)
+                                          << std::endl; )
 
                      upcnt++;
                      upbnd -= lp.upper(k) * x;
@@ -357,11 +357,11 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
 
                   if (LE(y, lp.upper(k)))
                   {
-                     MSG_VERBOSE3({ spxout << "IREDSM12 dominated bound row " << i
-                                         << " col " << k
-                                         << " removed y= " << y
-                                         << " lower= " << lp.lower(k)
-                                         << std::endl; });
+                     MSG_VERBOSE3( spxout << "IREDSM12 dominated bound row " << i
+                                          << " col " << k
+                                          << " removed y= " << y
+                                          << " lower= " << lp.lower(k)
+                                          << std::endl; )
 
                      locnt++;
                      lobnd -= lp.upper(k) * x;
@@ -387,11 +387,11 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
 
                   if (GE(y, lp.lower(k)))
                   {
-                     MSG_VERBOSE3({ spxout << "IREDSM13 dominated bound row " << i
-                                         << " col " << k
-                                         << " removed y= " << y
-                                         << " lower= " << lp.lower(k)
-                                         << std::endl; });
+                     MSG_VERBOSE3( spxout << "IREDSM13 dominated bound row " << i
+                                          << " col " << k
+                                          << " removed y= " << y
+                                          << " lower= " << lp.lower(k)
+                                          << std::endl; )
 
                      upcnt++;
                      upbnd -= lp.lower(k) * x;
@@ -508,15 +508,15 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
          else
             minrhs = (lp.lhs(ri1) / alpha <= lp.rhs(ri2)) ? lp.lhs(ri1) / alpha : lp.rhs(ri2);
       }
-      MSG_VERBOSE3({ spxout << "IREDSM14 duplicate rows " << ri1 << "/" << ri2
-                          << " alpha= " << alpha
-                          << " lhs= " << lp.lhs(ri1)
-                          << " rhs= " << lp.rhs(ri1)
-                          << " lhs= " << lp.lhs(ri2)
-                          << " rhs= " << lp.rhs(ri2)
-                          << " maxlhs= " << maxlhs
-                          << " minrhs= " << minrhs
-                          << std::endl; });
+      MSG_VERBOSE3( spxout << "IREDSM14 duplicate rows " << ri1 << "/" << ri2
+                           << " alpha= " << alpha
+                           << " lhs= " << lp.lhs(ri1)
+                           << " rhs= " << lp.rhs(ri1)
+                           << " lhs= " << lp.lhs(ri2)
+                           << " rhs= " << lp.rhs(ri2)
+                           << " maxlhs= " << maxlhs
+                           << " minrhs= " << minrhs
+                           << std::endl; )
 
       lp.changeLhs(ri2, maxlhs);
       lp.changeRhs(ri2, minrhs);
@@ -536,12 +536,12 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
       m_chgLRhs += chgLRhs;
       m_chgBnds += chgBnds;
 
-      MSG_VERBOSE2({ spxout << "IREDSM15 redundant row simplifier removed "
-                          << remRows << " rows, "
-                          << remNzos << " nzos, changed "
-                          << chgBnds << " col bounds, " 
-                          << chgLRhs << " row bounds"
-                          << std::endl; });
+      MSG_VERBOSE2( spxout << "IREDSM15 redundant row simplifier removed "
+                           << remRows << " rows, "
+                           << remNzos << " nzos, changed "
+                           << chgBnds << " col bounds, " 
+                           << chgLRhs << " row bounds"
+                           << std::endl; )
    }
    return OKAY;
 }
@@ -670,11 +670,11 @@ SPxSimplifier::Result SPxRedundantSM::redundantCols(SPxLP& lp, bool& again)
       m_remNzos += remNzos;
       m_chgBnds += chgBnds;
 
-      MSG_VERBOSE2({ spxout << "IREDSM16 redundant col simplifier removed "
-                          << remCols << " cols, "
-                          << remNzos << " nzos, changed "
-                          << chgBnds << " col bounds" 
-                          << std::endl; });
+      MSG_VERBOSE2( spxout << "IREDSM16 redundant col simplifier removed "
+                           << remCols << " cols, "
+                           << remNzos << " nzos, changed "
+                           << chgBnds << " col bounds" 
+                           << std::endl; )
    }
    return OKAY;
 }
@@ -696,24 +696,24 @@ SPxSimplifier::Result SPxRedundantSM::simpleRows(SPxLP& lp, bool& again)
       // infeasible range row
       if (LTrel(lp.rhs(i), lp.lhs(i), deltaBnd()))
       {
-         MSG_VERBOSE3({ spxout << "IREDSM17 infeasible row " << i 
-                             <<"  lhs= " << lp.lhs(i) 
-                             << " rhs= " << lp.rhs(i) 
-                             << std::endl; });
+         MSG_VERBOSE3( spxout << "IREDSM17 infeasible row " << i 
+                              <<"  lhs= " << lp.lhs(i) 
+                              << " rhs= " << lp.rhs(i) 
+                              << std::endl; )
          return INFEASIBLE;
       }
       // empty row ?
       if (row.size() == 0)
       {
-         MSG_VERBOSE3({ spxout << "IREDSM18 empty row " << i; });
+         MSG_VERBOSE3( spxout << "IREDSM18 empty row " << i; )
 
          if (LT(lp.rhs(i), 0.0, deltaBnd()) || GT(lp.lhs(i), 0.0, deltaBnd()))
          {
-            MSG_VERBOSE3({ spxout << " infeasible lhs= " << lp.lhs(i) 
-                                << " rhs= " << lp.rhs(i) << std::endl; });
+            MSG_VERBOSE3( spxout << " infeasible lhs= " << lp.lhs(i) 
+                                 << " rhs= " << lp.rhs(i) << std::endl; )
             return INFEASIBLE;
          }         
-         MSG_VERBOSE3({ spxout << " removed" << std::endl; });
+         MSG_VERBOSE3( spxout << " removed" << std::endl; )
 
          rem[i] = -1;
          remRows++;
@@ -722,8 +722,8 @@ SPxSimplifier::Result SPxRedundantSM::simpleRows(SPxLP& lp, bool& again)
       // unconstraint constraint ?
       if (lp.rhs(i) >= infinity && lp.lhs(i) <= -infinity)
       {
-         MSG_VERBOSE3({ spxout << "IREDSM19 unconstraint row " << i 
-                             << " removed" << std::endl; });
+         MSG_VERBOSE3( spxout << "IREDSM19 unconstraint row " << i 
+                              << " removed" << std::endl; )
 
          rem[i] = -1;
          remRows++;
@@ -738,10 +738,10 @@ SPxSimplifier::Result SPxRedundantSM::simpleRows(SPxLP& lp, bool& again)
          Real up;
          Real lo;
 
-         MSG_VERBOSE3({ spxout << "IREDSM20 row singleton " << i 
-                             << " x= " << x 
-                             << " lhs= " << lp.lhs(i) 
-                             << " rhs= " << lp.rhs(i); });
+         MSG_VERBOSE3( spxout << "IREDSM20 row singleton " << i 
+                              << " x= " << x 
+                              << " lhs= " << lp.lhs(i) 
+                              << " rhs= " << lp.rhs(i); )
 
          if (GT(x, 0.0, epsZero()))           // x > 0
          {
@@ -756,7 +756,7 @@ SPxSimplifier::Result SPxRedundantSM::simpleRows(SPxLP& lp, bool& again)
          else if (LT(lp.rhs(i), 0.0, deltaBnd()) || GT(lp.lhs(i), 0.0, deltaBnd()))  
          {
             // x == 0 rhs/lhs != 0
-            MSG_VERBOSE3({ spxout << " infeasible" << std::endl; });
+            MSG_VERBOSE3( spxout << " infeasible" << std::endl; )
 
             return INFEASIBLE;
          }
@@ -776,11 +776,11 @@ SPxSimplifier::Result SPxRedundantSM::simpleRows(SPxLP& lp, bool& again)
          
          assert(LErel(lp.lower(j), lp.upper(j)));
 
-         MSG_VERBOSE3({ spxout << " removed lo= " << lo
-                             << " up= " << up
-                             << " lower= " << lp.lower(j)
-                             << " upper= " << lp.upper(j)
-                             << std::endl; });
+         MSG_VERBOSE3( spxout << " removed lo= " << lo
+                              << " up= " << up
+                              << " lower= " << lp.lower(j)
+                              << " upper= " << lp.upper(j)
+                              << std::endl; )
 
          if (LT(up, lp.upper(j), epsZero()))
             lp.changeUpper(j, up);
@@ -800,10 +800,10 @@ SPxSimplifier::Result SPxRedundantSM::simpleRows(SPxLP& lp, bool& again)
       m_remRows += remRows;
       m_remNzos += remNzos;
 
-      MSG_VERBOSE2({ spxout << "IREDSM21 simple row simplifier removed "
-                          << remRows << " rows, "
-                          << remNzos << " nzos"
-                          << std::endl; });
+      MSG_VERBOSE2( spxout << "IREDSM21 simple row simplifier removed "
+                           << remRows << " rows, "
+                           << remNzos << " nzos"
+                           << std::endl; )
    }
    return OKAY;
 }
@@ -825,16 +825,16 @@ SPxSimplifier::Result SPxRedundantSM::simpleCols(SPxLP& lp, bool& again)
       // Empty column ? 
       if (col.size() == 0)
       {
-         MSG_VERBOSE3({ spxout << "IREDSM22 empty column " << i 
-                             << " maxObj= " << lp.maxObj(i)
-                             << " lower= " << lp.lower(i)
-                             << " upper= " << lp.upper(i); });
+         MSG_VERBOSE3( spxout << "IREDSM22 empty column " << i 
+                              << " maxObj= " << lp.maxObj(i)
+                              << " lower= " << lp.lower(i)
+                              << " upper= " << lp.upper(i); )
 
          if (GT(lp.maxObj(i), 0.0, epsZero()))
          {
             if (lp.upper(i) >= infinity)
             {
-               MSG_VERBOSE3({ spxout << " unbounded" << std::endl; });
+               MSG_VERBOSE3( spxout << " unbounded" << std::endl; )
 
                return UNBOUNDED;
             }
@@ -844,7 +844,7 @@ SPxSimplifier::Result SPxRedundantSM::simpleCols(SPxLP& lp, bool& again)
          {
             if (lp.lower(i) <= -infinity)
             {
-               MSG_VERBOSE3({ spxout << " unbounded" << std::endl; });
+               MSG_VERBOSE3( spxout << " unbounded" << std::endl; )
 
                return UNBOUNDED;
             }
@@ -861,7 +861,7 @@ SPxSimplifier::Result SPxRedundantSM::simpleCols(SPxLP& lp, bool& again)
             else
                m_pval.add(m_cperm[i], 0.0);
          }
-         MSG_VERBOSE3({ spxout << " removed" << std::endl; });
+         MSG_VERBOSE3( spxout << " removed" << std::endl; )
 
          rem[i] = -1;
          remCols++;
@@ -871,10 +871,10 @@ SPxSimplifier::Result SPxRedundantSM::simpleCols(SPxLP& lp, bool& again)
       // infeasible bounds ?
       if (GTrel(lp.lower(i), lp.upper(i), deltaBnd()))
       {
-         MSG_VERBOSE3({ spxout << "IREDSM23 infeasible bounds column " << i 
-                             << " lower= " << lp.lower(i)
-                             << " upper= " << lp.upper(i)
-                             << std::endl; });
+         MSG_VERBOSE3( spxout << "IREDSM23 infeasible bounds column " << i 
+                              << " lower= " << lp.lower(i)
+                              << " upper= " << lp.upper(i)
+                              << std::endl; )
          return INFEASIBLE;
       }
       // Fixed column ?
@@ -988,10 +988,10 @@ SPxSimplifier::Result SPxRedundantSM::simpleCols(SPxLP& lp, bool& again)
       m_remCols += remCols;
       m_remNzos += remNzos;
 
-      MSG_VERBOSE2({ spxout << "IREDSM24 simple col simplifier removed "
-                          << remCols << " cols, "
-                          << remNzos << " nzos"
-                          << std::endl; });
+      MSG_VERBOSE2( spxout << "IREDSM24 simple col simplifier removed "
+                           << remCols << " cols, "
+                           << remNzos << " nzos"
+                           << std::endl; )
    }
    return OKAY;
 }
@@ -1110,16 +1110,16 @@ SPxSimplifier::Result SPxRedundantSM::simplify(SPxLP& lp, Real eps, Real delta)
       assert(ret == OKAY || !again);
    }
 #endif
-   MSG_VERBOSE1({ spxout << "IREDSM25 redundant simplifier removed "
-                       << m_remRows << " rows, "
-                       << m_remNzos << " nzos, changed "
-                       << m_chgBnds << " col bounds " 
-                       << m_chgLRhs << " row bounds,"
-                       << std::endl; });
+   MSG_VERBOSE1( spxout << "IREDSM25 redundant simplifier removed "
+                        << m_remRows << " rows, "
+                        << m_remNzos << " nzos, changed "
+                        << m_chgBnds << " col bounds " 
+                        << m_chgLRhs << " row bounds,"
+                        << std::endl; )
 
    if (lp.nCols() == 0 && lp.nRows() == 0)
    {
-      MSG_VERBOSE1({ spxout << "IREDSM26 simplifier removed all rows and columns" << std::endl; });
+      MSG_VERBOSE1( spxout << "IREDSM26 simplifier removed all rows and columns" << std::endl; )
       ret = VANISHED;
    }
    m_timeUsed.stop();
@@ -1147,7 +1147,7 @@ const Vector& SPxRedundantSM::unsimplifiedPrimal(const Vector& x)
 
 const Vector& SPxRedundantSM::unsimplifiedDual(const Vector& pi)
 {
-   MSG_ERROR( spxout << "SPxRedundantSM::getDual() not implemented\n"; )
+   MSG_ERROR( spxout << "EREDSM27 SPxRedundantSM::unsimplifiedDual() not implemented\n"; )
 
    assert(false);
 

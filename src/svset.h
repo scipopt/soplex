@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.h,v 1.19 2002/12/08 11:09:22 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.h,v 1.20 2005/08/09 19:32:14 bzforlow Exp $"
 
 /**@file  svset.h
  * @brief Set of sparse vectors.
@@ -88,10 +88,19 @@ private:
    class DLPSV : public SVector
    {
    private:
+
+      //------------------------------------
+      /**@name Data */
+      //@{
       DLPSV *thenext; ///< previous SVector
       DLPSV *theprev; ///< next SVector
+      //@}
 
    public:
+
+      //------------------------------------
+      /**@name Successor / predecessor */
+      //@{
       /// next SVector
       DLPSV*& next()
       {
@@ -118,10 +127,19 @@ private:
       /// copy constructor.
       DLPSV(const DLPSV& copy) : SVector(copy)
       {}
+      //@}
    };
+
+   //------------------------------------
+   /**@name Data */
+   //@{
    DataSet < DLPSV > set;  ///< %set of SVectors
    IdList < DLPSV > list;  ///< doubly linked list for non-zero management
+   //@}
    
+   //------------------------------------
+   /**@name Helpers */
+   //@{
    /// provides enough vector memory for \p n more SVector%s.
    void ensurePSVec(int n)
    {
@@ -131,12 +149,13 @@ private:
          reMax(int(factor*max()) + 8 + n);
       }
    }
-
    ///  provides enough nonzero memory for \p n more Elements%s.
    void ensureMem(int n);
    //@}
 
 public:
+
+   //------------------------------------
    /**@name Control Parameters 
       @todo Should factor amd memFactor really be public variables in svset?
    */
@@ -156,6 +175,7 @@ public:
    //@}
    
 
+   //------------------------------------
    /**@name Extension */
    //@{
    /// Add \p svec to the %set.
@@ -246,6 +266,7 @@ public:
    //@}
 
 
+   //------------------------------------
    /**@name Shrinking */
    //@{
    /// removes the vector with key \p removekey from the %set
@@ -320,6 +341,7 @@ public:
    //@}
 
 
+   //------------------------------------
    /**@name Access */
    //@{
    /// get SVector by number, writeable
@@ -348,6 +370,7 @@ public:
    //@}
 
 
+   //------------------------------------
    /**@name Inquiry */
    //@{
    /// current number of SVector%s.
@@ -405,6 +428,7 @@ public:
    }
    //@}
 
+   //------------------------------------
    /**@name Memory Management */
    //@{
    /// used nonzero memory.
@@ -427,31 +451,37 @@ public:
    //@}
 
 
+   //------------------------------------
    /**@name Miscellaneous */
    //@{
    /// reset maximum number of SVector%s.
    void reMax(int newmax = 0);
-
    /// consistency check.
    bool isConsistent() const;
+   //@}
 
-   /// assignment operator.
-   SVSet& operator=(const SVSet& rhs);
-
-   /// copy constructor.
-   SVSet(const SVSet& old);
-
+   //------------------------------------
+   /**@name Constructors / destructors */
+   //@{
    /// default constructor.
-   SVSet(int pmax = -1,
-         int pmemmax = -1,
-         Real pfac = 1.1,
-         Real pmemFac = 1.2)
+   explicit
+   SVSet( int pmax     = -1,
+          int pmemmax  = -1,
+          Real pfac    = 1.1,
+          Real pmemFac = 1.2 )
       : DataArray < SVector::Element >
          (0, (pmemmax > 0) ? pmemmax : 8 * ((pmax > 0) ? pmax : 8), pmemFac)
          , set ((pmax > 0) ? pmax : 8)
          , factor (pfac)
          , memFactor (DataArray < SVector::Element > ::memFactor)
-   { }
+   {}
+   /// destructor
+   ~SVSet()
+   {}
+   /// assignment operator.
+   SVSet& operator=(const SVSet& rhs);
+   /// copy constructor.
+   SVSet(const SVSet& old);
    //@}
 };
 

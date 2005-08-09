@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbounds.cpp,v 1.23 2005/07/25 15:24:36 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxbounds.cpp,v 1.24 2005/08/09 19:32:11 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -328,14 +328,14 @@ void SPxSolver::testBounds() const
       {
          if ((*theFvec)[i] > theUBbound[i] + viol_max)  //@ &&  theUBbound[i] != theLBbound[i])
          {
-            MSG_ERROR( spxout << "Invalid upper enter bound " << i 
+            MSG_ERROR( spxout << "EBOUND01 Invalid upper enter bound " << i 
                             << " viol_max: " << viol_max
                             << " Fvec: " << (*theFvec)[i] 
                             << " UBbound: "<< theUBbound[i] << std::endl; )
          }
          if ((*theFvec)[i] < theLBbound[i] - viol_max)  //@ &&  theUBbound[i] != theLBbound[i])
          {
-            MSG_ERROR( spxout << "Invalid lower enter bound " << i 
+            MSG_ERROR( spxout << "EBOUND02 Invalid lower enter bound " << i 
                             << " viol_max: " << viol_max
                             << " Fvec: " << (*theFvec)[i] 
                             << " LBbound: "<< theLBbound[i] << std::endl; )
@@ -350,14 +350,14 @@ void SPxSolver::testBounds() const
       {
          if ((*theCoPvec)[i] > (*theCoUbound)[i] + viol_max) // && (*theCoUbound)[i] != (*theCoLbound)[i])
          {
-            MSG_ERROR( spxout << "Invalid upper cobound " << i
+            MSG_ERROR( spxout << "EBOUND03 Invalid upper cobound " << i
                             << " viol_max: " << viol_max
                             << " CoPvec: " << (*theCoPvec)[i]
                             << " CoUbound: "<< (*theCoUbound)[i] << std::endl; )
          }
          if ((*theCoPvec)[i] < (*theCoLbound)[i] - viol_max) // && (*theCoUbound)[i] != (*theCoLbound)[i])
          {
-            MSG_ERROR( spxout << "Invalid lower cobound " << i 
+            MSG_ERROR( spxout << "EBOUND04 Invalid lower cobound " << i 
                             << " viol_max: " << viol_max
                             << " CoPvec: " << (*theCoPvec )[i]
                             << " CoLbound: " << (*theCoLbound)[i] 
@@ -368,14 +368,14 @@ void SPxSolver::testBounds() const
       {
          if ((*thePvec)[i] > (*theUbound)[i] + viol_max)  // &&  (*theUbound)[i] != (*theLbound)[i])
          {
-            MSG_ERROR( spxout << "Invalid upper bound " << i 
+            MSG_ERROR( spxout << "EBOUND05 Invalid upper bound " << i 
                             << " viol_max: " << viol_max
                             << " Pvec: " << (*thePvec)[i]
                             << " Ubound: " << (*theUbound)[i] << std::endl; )
          }
          if ((*thePvec)[i] < (*theLbound)[i] - viol_max)  // &&  (*theUbound)[i] != (*theLbound)[i])
          {
-            MSG_ERROR( spxout << "Invalid lower bound " << i 
+            MSG_ERROR( spxout << "EBOUND06 Invalid lower bound " << i 
                             << " viol_max: " << viol_max
                             << " Pvec: " << (*thePvec)[i]
                             << " Lbound: " << (*theLbound)[i] << std::endl; )

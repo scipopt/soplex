@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.83 2005/08/04 15:43:35 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.84 2005/08/09 19:32:13 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -244,7 +244,7 @@ SPxSolver::Status SPxSolver::solve()
                    << ", epsilon: " << epsilon()
                    << ", delta: " << delta()
                    << std::endl
-                   << "\tstop: " << stop
+                   << "ISOLVE56 stop: " << stop
                    << ", basis status: " << int(SPxBasis::status())
                    << ", solver status: " << int(m_status) << std::endl;
          )
@@ -366,7 +366,7 @@ SPxSolver::Status SPxSolver::solve()
                    << ", epsilon: " << epsilon()
                    << ", delta: " << delta()
                    << std::endl
-                   << "\tstop: " << stop
+                   << "ISOLVE57 stop: " << stop
                    << ", basis status: " << int(SPxBasis::status())
                    << ", solver status: " << int(m_status) << std::endl;
          )

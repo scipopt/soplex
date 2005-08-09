@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: random.h,v 1.8 2002/01/31 08:19:27 bzfkocht Exp $"
+#pragma ident "@(#) $Id: random.h,v 1.9 2005/08/09 19:32:10 bzforlow Exp $"
 
 /**@file  random.h
  * @brief Random numbers.
@@ -40,11 +40,18 @@ namespace soplex
 class Random
 {
 private:
-   Real themin;         ///< minimum random number to be returned
-   Real themax;         ///< maximum random number to be returned
 
+   //--------------------------------------
+   /**@name Data */
+   //@{
+   Real themin;           ///< minimum random number to be returned
+   Real themax;           ///< maximum random number to be returned
    unsigned long next;    ///< random seed.
+   //@}
 
+   //--------------------------------------
+   /**@name Helpers */
+   //@{
    /// increases rand seed and returns a pseudo random Real value in [0,1).
    Real next_random ()
    {
@@ -58,8 +65,13 @@ private:
       Real i = int ((next / RDIVIDE) % RMULT);
       return ( i / RMULT );
    }
+   //@}
 
 public:
+
+   //--------------------------------------
+   /**@name Access */
+   //@{
    /// returns lower bound of random numbers.
    Real min() const
    {
@@ -86,7 +98,11 @@ public:
    {
       return (themin + (themax - themin) * last_random());
    }
+   //@}
 
+   //--------------------------------------
+   /**@name Modification */
+   //@{
    /// resets lower bound for random numbers.
    void setMin(Real p_min)
    {
@@ -105,18 +121,27 @@ public:
       seed = (seed - themin) / (themax - themin);
       next = static_cast<unsigned int>(seed * RMULT * RDIVIDE);
    }
+   //@}
 
+   //--------------------------------------
+   /**@name Debugging */
+   //@{
    /// consistency check.
    bool isConsistent() const
    {
       return themin <= themax;
    }
+   //@}
 
+   //--------------------------------------
+   /**@name Constructors / destructors */
+   //@{
    /// default constructor.
    /** Constructs a new (pseudo) #Random variable returning values between
        \p p_min and \p p_max and using \p p_seed as seed for the random
        variable's sequence.
    */
+   explicit
    Random(Real p_min = 0, Real p_max = 1, Real p_seed = 0.5)
       : themin(p_min), themax(p_max)
    {
@@ -124,6 +149,10 @@ public:
          p_seed = (p_min + p_max) / 2;
       setSeed(p_seed);
    }
+   /// destructor
+   ~Random() 
+   {}
+   //@}
 };
 
 } // namespace soplex

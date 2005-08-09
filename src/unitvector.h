@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: unitvector.h,v 1.8 2002/03/03 13:50:36 bzfkocht Exp $"
+#pragma ident "@(#) $Id: unitvector.h,v 1.9 2005/08/09 19:32:14 bzforlow Exp $"
 
 /**@file  unitvector.h
  * @brief Sparse vector \f$e_i\f$.
@@ -44,10 +44,19 @@ namespace soplex
 class UnitVector : public SVector
 {
 private:
+
+   //------------------------------------
+   /**@name Data */
+   //@{
    Element themem;  ///< memory for 1st sparse vector entry (size)
    Element themem1; ///< memory for 2nd sparse vector entry (idx,1.0)
+   //@}
 
 public:
+
+   //------------------------------------
+   /**@name Access */
+   //@{
    /// returns value = 1
    /**\pre \c n must be 0.
     */
@@ -57,21 +66,24 @@ public:
       assert( n == 0 );
       return 1;
    }
+   //@}
 
+   //------------------------------------
+   /**@name Constructors / destructors */
+   //@{
    /// construct \c i 'th unit vector.
+   explicit
    UnitVector(int i = 0)
       : SVector(2, &themem)
    {
       add(i, 1.0);
    }
-
    ///  copy constructor
    UnitVector(const UnitVector& rhs)
       : SVector(2, &themem)
       , themem (rhs.themem)
       , themem1(rhs.themem1)
    {}
-
    /// assignment
    UnitVector& operator=(const UnitVector& rhs)
    {
@@ -79,9 +91,17 @@ public:
          themem1 = rhs.themem1;
       return *this;
    }
+   /// destructor
+   ~UnitVector()
+   {}
+   //@}
 
-   /// consitency check
+   //------------------------------------
+   /**@name Miscellaneous */
+   //@{
+   /// consistency check
    bool isConsistent() const;
+   //@}
 };
 
 

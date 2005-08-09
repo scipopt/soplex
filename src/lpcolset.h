@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcolset.h,v 1.18 2003/01/12 13:09:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpcolset.h,v 1.19 2005/08/09 19:32:10 bzforlow Exp $"
 
 /**@file  lpcolset.h
  * @brief Set of LP columns.
@@ -48,19 +48,30 @@ namespace soplex
 class LPColSet : protected SVSet
 {
 private:
+
+   //------------------------------------
+   /**@name Data */
+   //@{
    DVector low;     ///< vector of lower bounds.
    DVector up;      ///< vector of upper bounds.
    DVector object;  ///< vector of objective coefficients.
+   //@}
 
 protected:
+
+   //------------------------------------
+   /**@name Protecte helpers */
+   //@{
    /// return the complete #SVSet.
    const SVSet* colSet() const 
    {
       return this;
    }
+   //@}
 
 public:
 
+   //------------------------------------
    /**@name Inquiry */
    //@{
    /// returns the number of #LPCol%s currently in #LPColSet.
@@ -217,6 +228,7 @@ public:
    //@}
 
 
+   //------------------------------------
    /**@name Extension
       All extension methods come with two signatures, one of which providing a
       parameter to return the assigned #DataKey%(s). See #DataSet for a more
@@ -289,6 +301,7 @@ public:
    //@}
 
 
+   //------------------------------------
    /**@name Shrinking
       See #DataSet for a description of the renumbering of the remaining
       #LPCol%s in a #LPColSet after the call of a removal method.
@@ -320,6 +333,7 @@ public:
    //@}
 
 
+   //------------------------------------
    /**@name Memory Management
       See #SVSet for a description of the memory management methods.
    */
@@ -358,12 +372,14 @@ public:
    }
    //@}
 
+   //------------------------------------
    /**@name Miscellaneous */
    //@{
    ///
    bool isConsistent() const;
    //@}
 
+   //------------------------------------
    /**@name Constructors / Destructors */
    //@{
    /// default constructor.
@@ -373,6 +389,7 @@ public:
        an arbitrary number of columns to the #LPColSet, which may result in
        automated memory realllocation.
    */
+   explicit
    LPColSet(int pmax = -1, int pmemmax = -1)
       : SVSet(pmax, pmemmax), low(0), up(0), object(0)
    { }

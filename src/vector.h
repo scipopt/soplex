@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector.h,v 1.15 2003/01/05 19:03:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vector.h,v 1.16 2005/08/09 19:32:14 bzforlow Exp $"
 
 /**@file  vector.h
  * @brief Dense vector for linear algebra.
@@ -82,16 +82,22 @@ class SSVector;
 class Vector
 {
 protected:
+
+   //------------------------------------
+   /**@name Data */
+   //@{
    /// dimension of vector
    int dimen;
-
    /// values of a vector
    /** The memory block pointed to by val must at least have size
     *  dimen * sizeof(Real).  
     */
    Real* val;
+   //@}
 
 public:
+
+   //------------------------------------
    /**@name Construction and assignment */
    //@{
    /// construction
@@ -136,6 +142,7 @@ public:
    Vector& assign(const SSVector& sv);
    //@}
    
+   //------------------------------------
    /**@name Access */
    //@{
    /// dimension of vector
@@ -158,6 +165,7 @@ public:
    }
    //@}
 
+   //------------------------------------
    /**@name Algebraic methods */
    //@{   
    /// vector addition
@@ -216,6 +224,7 @@ public:
    }
    //@}
 
+   //------------------------------------
    /**@name Utilities */
    //@{
    /// Conversion to C-style pointer.
@@ -249,9 +258,15 @@ public:
          memset(val, 0, dimen * sizeof(Real));
    }
    //@}
+
 private:
+
+   //------------------------------------
+   /**@name Blocked */
+   //@{
    /// we have no default constructor.
    Vector();
+   //@}
 };
 } // namespace soplex
 #endif // _VECTOR_H_

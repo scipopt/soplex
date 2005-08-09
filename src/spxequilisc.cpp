@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxequilisc.cpp,v 1.11 2005/07/25 15:24:36 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxequilisc.cpp,v 1.12 2005/08/09 19:32:12 bzforlow Exp $"
 
 /**@file  spxequilisc.cpp
  * @brief Equilibrium row/column scaling.
@@ -52,7 +52,7 @@ void SPxEquiliSC::scale(SPxLP& lp)
 {
    METHOD( "SPxEquiliSC::scale()" );
 
-   MSG_VERBOSE1({ spxout << "IEQUSC01 Equilibrium scaling LP" << std::endl; });   
+   MSG_VERBOSE1( spxout << "IEQUSC01 Equilibrium scaling LP" << std::endl; )
 
    setup(lp);
 
@@ -77,12 +77,12 @@ void SPxEquiliSC::scale(SPxLP& lp)
 
    m_colFirst = colratio < rowratio;
 
-   MSG_VERBOSE2({ spxout << "IEQUSC02 LP scaling statistics:" 
-                       << " min= " << lp.minAbsNzo()
-                       << " max= " << lp.maxAbsNzo()
-                       << " col-ratio= " << colratio 
-                       << " row-ratio= " << rowratio
-                       << std::endl; });
+   MSG_VERBOSE2( spxout << "IEQUSC02 LP scaling statistics:" 
+                        << " min= " << lp.minAbsNzo()
+                        << " max= " << lp.maxAbsNzo()
+                        << " col-ratio= " << colratio 
+                        << " row-ratio= " << rowratio
+                        << std::endl; )
    if (m_colFirst)
    {
       computeScalingVecs(lp.colSet(), m_rowscale, m_colscale);
@@ -99,19 +99,19 @@ void SPxEquiliSC::scale(SPxLP& lp)
    }
    applyScaling(lp);
 
-   MSG_VERBOSE3({ spxout << "IEQUSC03 \tRow scaling min= " << minAbsRowscale()
-                       << " max= " << maxAbsRowscale()
-                       << std::endl
-                       << "\tCol scaling min= " << minAbsColscale()
-                       << " max= " << maxAbsColscale()
-                       << std::endl; });
+   MSG_VERBOSE3( spxout << "IEQUSC03 \tRow scaling min= " << minAbsRowscale()
+                        << " max= " << maxAbsRowscale()
+                        << std::endl
+                        << "\tCol scaling min= " << minAbsColscale()
+                        << " max= " << maxAbsColscale()
+                        << std::endl; )
 
-   MSG_VERBOSE2({ spxout << "IEQUSC04 LP scaling statistics:" 
-                       << " min= " << lp.minAbsNzo()
-                       << " max= " << lp.maxAbsNzo()
-                       << " col-ratio= " << maxColRatio(lp) 
-                       << " row-ratio= " << maxRowRatio(lp) 
-                       << std::endl; });
+   MSG_VERBOSE2( spxout << "IEQUSC04 LP scaling statistics:" 
+                        << " min= " << lp.minAbsNzo()
+                        << " max= " << lp.maxAbsNzo()
+                        << " col-ratio= " << maxColRatio(lp) 
+                        << " row-ratio= " << maxRowRatio(lp) 
+                        << std::endl; )
 }
 
 } // namespace soplex

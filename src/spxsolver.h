@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.19 2005/07/12 13:41:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.20 2005/08/09 19:32:13 bzforlow Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -75,6 +75,8 @@ class SPxSolver : public SPxLP, protected SPxBasis
    friend class SPxFastRT;
 
 public:
+
+   //-----------------------------
    /**@name Data Types */
    //@{
    /// LP basis representation.
@@ -194,6 +196,10 @@ public:
    //@}
 
 private:
+
+   //-----------------------------
+   /**@name Private data */
+   //@{
    Type           theType;     ///< entering or leaving algortihm.
    Pricing        thePricing;  ///< full or partial pricing.
    Representation theRep;      ///< row or column representation.
@@ -214,8 +220,13 @@ private:
    SSVector*      solveVector2rhs;   ///< when 2 systems are to solve at a time
    Vector*        coSolveVector2;    ///< when 2 systems are to solve at a time
    SSVector*      coSolveVector2rhs; ///< when 2 systems are to solve at a time
+   //@}
 
 protected:
+
+   //-----------------------------
+   /**@name Protected data */
+   //@{
    Array < UnitVector > unitVecs; ///< array of unit vectors
    const SVSet*   thevectors;   ///< the LP vectors according to represenation
    const SVSet*   thecovectors; ///< the LP coVectors according to rep
@@ -270,11 +281,20 @@ protected:
    SPxPricer*      thepricer;
    SPxRatioTester* theratiotester;
    SPxStarter*     thestarter;
+   //@}
 
+   //-----------------------------
+   /**@name Precision */
+   //@{
    /// is the solution precise enough, or should we increase delta() ? 
    virtual bool precisionReached(Real& newDelta) const;
+   //@}
 
 public:
+
+   //-----------------------------
+   /**@name Access */
+   //@{
    /// return the version of SPxSolver as number like 123 for 1.2.3
    int version() const
    {
@@ -297,7 +317,9 @@ public:
    {
       return thePricing;
    }
+   //@}
 
+   //-----------------------------
    /**@name Setup
     *  Before solving an LP with an instance of #SPxSolver, 
     *  the following steps must be performed:
@@ -478,9 +500,9 @@ public:
    virtual bool terminate ();
    //@}
 
+   //-----------------------------
    /**@name Control Parameters */
    //@{
-
    /// values \f$|x| < \epsilon\f$ are considered to be 0.
    /** if you want another value for epsilon, use #Param::setEpsilon().
     */
@@ -488,7 +510,6 @@ public:
    {
       return primVec.delta().getEpsilon();
    }
-
    /// allowed bound violation for optimal Solution.
    /** When all vectors do not violate their bounds by more than \f$\delta\f$,
     *  the basis is considered optimal.
@@ -522,6 +543,7 @@ public:
    }
    //@}
 
+   //-----------------------------
    /**@name LP Modification
     *  These methods are the overridden counterparts of the base class
     *  #SPxLP. See there for a more detailed documentation of these
@@ -529,17 +551,25 @@ public:
     */
    //@{
 private:
+
+   //-----------------------------
+   /**@name Private helpers */
+   //@{
    ///
    void localAddRows(int start);
    ///
    void localAddCols(int start);
+   //@}
 
 protected:
+
+   //-----------------------------
+   /**@name Protected helpers */
+   //@{
    ///
    virtual void addedRows(int n);
    ///
    virtual void addedCols(int n);
-
    ///
    virtual void doRemoveRow(int i);
    ///
@@ -548,8 +578,13 @@ protected:
    virtual void doRemoveCol(int i);
    ///
    virtual void doRemoveCols(int perm[]);
+   //@}
 
 public:
+
+   //-----------------------------
+   /**@name Modification */
+   //@{
    ///
    virtual void changeObj(const Vector& newObj);
    ///
@@ -641,6 +676,9 @@ public:
    virtual void changeSense(SPxSense sns);
    //@}
 
+   //------------------------------------
+   /**@name Dimension and codimension */
+   //@{
    /// dimension of basis matrix.
    int dim() const
    {
@@ -651,7 +689,9 @@ public:
    {
       return thevectors->num();
    }
+   //@}
 
+   //------------------------------------
    /**@name Variables and Covariables
     *  Class #SPxLP introduces #Id%s to identify row or column data of
     *  an LP. #SPxSolver uses this concept to access data with respect to the
@@ -715,6 +755,7 @@ public:
    }
    //@}
 
+   //------------------------------------
    /**@name Vectors and Covectors */
    //@{
    /// \p i 'th vector.
@@ -806,6 +847,7 @@ public:
    }
    //@}
 
+   //------------------------------------
    /**@name Variable status
     *  The Simplex basis assigns a #SPxBasis::Desc::Status to each
     *  variable and covariable. Depending on the representation, the status
@@ -1108,6 +1150,7 @@ public:
    /// compute test vector in #ENTER%ing Simplex.
    void computeTest();
 
+   //------------------------------------
    /**@name Shifting
     *  The task of the ratio test (implemented in #SPxRatioTester classes)
     *  is to select a variable for the basis update, such that the basis
@@ -1197,8 +1240,13 @@ public:
    virtual void qualSlackViolation(Real& maxviol, Real& sumviol) const;
    /// get violation of optimality criterion.
    virtual void qualRedCostViolation(Real& maxviol, Real& sumviol) const;
+   //@}
 
 private:
+
+   //------------------------------------
+   /**@name Perturbation */
+   //@{
    ///
    void perturbMin(
       const UpdateVector& vec, Vector& low, Vector& up, Real eps,
@@ -1217,6 +1265,7 @@ private:
       const SPxBasis::Desc::Status* stat, int start, int incr) const;
    //@}
 
+   //------------------------------------
    /**@name The Simplex Loop
     *  We now present a set of methods that may be usefull when implementing
     *  own #SPxPricer or #SPxRatioTester classes. Here is, how
@@ -1333,6 +1382,7 @@ private:
    void updateFtest();
    //@}
 
+   //------------------------------------
    /**@name Parallelization
     *  In this section we present the methods, that are provided in order to
     *  allow a parallel version to be implemented as a derived class, thereby
@@ -1343,18 +1393,6 @@ private:
     *  loop, that where described in the previous sectios.
     */
    //@{
-protected:
-   /// has the internal data been initialized?
-   /** As long as an instance of #SPxSolver is not #initialized, no member
-    *  contains setup data. Initialization is performed via method
-    *  #init().  Afterwards all data structures are kept up to date (even
-    *  for all manipulation methods), until #unInit() is called. However,
-    *  some manipulation methods call #unInit()# themselfs.
-    */
-   bool isInitialized() const
-   {
-      return initialized;
-   }
 public:
    /// intialize data structures.
    /** If #SPxSolver is not #isInitialized(), method solve calls
@@ -1369,6 +1407,18 @@ public:
    virtual void init();
 
 protected:
+
+   /// has the internal data been initialized?
+   /** As long as an instance of #SPxSolver is not #initialized, no member
+    *  contains setup data. Initialization is performed via method
+    *  #init().  Afterwards all data structures are kept up to date (even
+    *  for all manipulation methods), until #unInit() is called. However,
+    *  some manipulation methods call #unInit()# themselfs.
+    */
+   bool isInitialized() const
+   {
+      return initialized;
+   }
    /// unintialize data structures.
    virtual void unInit()
    {
@@ -1451,58 +1501,65 @@ protected:
    virtual void perturbMinLeave(void);
    /// perturb nonbasic bounds.
    virtual void perturbMaxLeave(void);
-
    //@}
-   /*  The following methods serve for initializing the bounds for dual or
+
+   //------------------------------------
+   /** The following methods serve for initializing the bounds for dual or
     *  primal Simplex algorithm of entering or leaving type.
     */
    //@{
+   ///
    void clearDualBounds(SPxBasis::Desc::Status, Real&, Real&) const;
-
+   ///
    void setDualColBounds();
+   ///
    void setDualRowBounds();
    /// setup feasibility bounds for entering algorithm
    void setPrimalBounds();
-
+   ///
    void setEnterBound4Col(int, int);
+   ///
    void setEnterBound4Row(int, int);
+   ///
    virtual void setEnterBounds();
-
+   ///
    void setLeaveBound4Row(int i, int n);
+   ///
    void setLeaveBound4Col(int i, int n);
+   ///
    virtual void setLeaveBounds();
    //@}
 
 public:
+
+   //------------------------------------
+   /** Limits and status inquiry */
+   //@{
    /// set time limit.
    virtual void setTerminationTime(Real time = infinity);
-
    /// return time limit.
    virtual Real terminationTime() const;
-
    /// set iteration limit.
    virtual void setTerminationIter(int iteration = -1);
-
    /// return iteration limit.
    virtual int terminationIter() const;
-
    /// set objective limit.
    virtual void setTerminationValue(Real value = infinity);
-
    /// return objective limit.
    virtual Real terminationValue() const;
-   
    /// get objective value of current solution.
    virtual Real objValue() const
    {
       return value();
    }
-
    /// get all results of last solve.
-   Status getResult(Real* value = 0, Vector* primal = 0,
-      Vector* slacks = 0, Vector* dual = 0, Vector* reduCost = 0) const;
+   Status 
+   getResult( Real* value = 0, Vector* primal = 0,
+              Vector* slacks = 0, Vector* dual = 0, 
+              Vector* reduCost = 0) const;
 
 protected:
+
    /**@todo put the following basis methods near the variable status methods!*/
    /// converts basis status to VarStatus
    VarStatus basisStatusToVarStatus( SPxBasis::Desc::Status stat ) const;
@@ -1516,6 +1573,7 @@ protected:
       const;
 
 public:
+
    /// gets basis status for a single row
    VarStatus getBasisRowStatus( int row ) const;
 
@@ -1587,7 +1645,11 @@ public:
    {
       return spxSense();
    }
+   //@}
 
+   //------------------------------------
+   /** Mapping between numbers and Ids */
+   //@{
    /// #RowId# of \p i 'th inequality.
    SPxRowId rowId(int i) const
    {
@@ -1598,20 +1660,40 @@ public:
    {
       return cId(i);
    }
+   //@}
 
+   //------------------------------------
+   /** Constructors / destructors */
+   //@{
    /// default constructor.
-   SPxSolver(Type type = LEAVE, Representation rep = ROW, 
-      SPxPricer* pric = 0, SPxRatioTester* rt = 0, SPxStarter* start = 0);
+   explicit
+   SPxSolver( Type            type  = LEAVE, 
+              Representation  rep   = ROW, 
+              SPxPricer*      pric  = 0, 
+              SPxRatioTester* rt    = 0, 
+              SPxStarter*     start = 0 );
+   // virtual destructor
+   virtual ~SPxSolver()
+   {}
+   //@}
 
+   //------------------------------------
+   /** Miscellaneous */
+   //@{
    /// check consistency.
    bool isConsistent() const;
+   //@}
 
 private:
+
+   //------------------------------------
+   /** Blocked */
+   //@{
    /// assignment operator is not implemented.
    SPxSolver& operator=(const SPxSolver& base);
-
    /// copy constructor is not implemented.
    SPxSolver(const SPxSolver& base);
+   //@}
 
    void testVecs();
 };

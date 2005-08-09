@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.h,v 1.13 2005/01/06 17:12:10 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightst.h,v 1.14 2005/08/09 19:32:13 bzforlow Exp $"
 
 
 /**@file  spxweightst.h
@@ -58,32 +58,56 @@ namespace soplex
 class SPxWeightST : public SPxStarter
 {
 private:
+
+   //-----------------------------------
+   /**@name Private data */
+   //@{
+   ///
    DataArray < int > forbidden;
-
+   ///
    DataArray < Real > * weight;
+   ///
    DataArray < Real > * coWeight;
+   //@}
 
+   //-----------------------------------
+   /**@name Private helpers */
+   //@{
+   ///
    void setPrimalStatus(SPxBasis::Desc&, const SPxSolver&, const SPxId&);
+   //@}
 
 protected:
+
+   //-----------------------------------
+   /**@name Protected data */
+   //@{
    /// weight value for LP rows.
    DataArray < Real > rowWeight;
    /// weight value for LP columns.
    DataArray < Real > colWeight;
-
    /// set variable to rhs?.
    DataArray < bool > rowRight;
    /// set primal variable to upper bound.
    DataArray < bool > colUp;
+   //@}
 
+   //-----------------------------------
+   /**@name Protected helpers */
+   //@{
    /// sets up variable weights.
    /** This method is called in order to setup the weights for all
        variables. It has been declared #virtual in order to allow for
        derived classes to compute other weight values.
    */
    virtual void setupWeights(SPxSolver& base);
+   //@}
 
 public:
+
+   //-----------------------------------
+   /**@name Construction / destruction */
+   //@{
    /// default constructor.
    SPxWeightST()
       : SPxStarter("Weight")
@@ -94,10 +118,21 @@ public:
       weight   = 0; 
       coWeight = 0; 
    }  
+   //@}
+
+   //-----------------------------------
+   /**@name Generation of a start basis */
+   //@{
    /// generates start basis for loaded basis.
    void generate(SPxSolver& base);
+   //@}
+
+   //-----------------------------------
+   /**@name Debugging */
+   //@{
    /// consistency check.
    bool isConsistent() const;
+   //@}
 };
 
 } // namespace soplex

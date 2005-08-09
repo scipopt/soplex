@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.32 2005/01/12 12:00:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.33 2005/08/09 19:32:09 bzforlow Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -86,21 +86,32 @@ template<class DATA>
 class DataSet
 {
 protected:
+
+   //-----------------------------------
+   /**@name Types */
+   //@{
+   ///
    struct Item
    {
       DATA data;       ///< data element
       int  info;       ///< element number. info \f$\in\f$ [0,thesize-1] 
                        ///< iff element is used
    }* theitem;         ///< array of elements in the #DataSet
+   //@}
 
+   //-----------------------------------
+   /**@name Data */
+   //@{
    DataKey* thekey;    ///< #DataKey::idx%s of elements
-
    int themax;         ///< length of arrays #theitem and #thekey
    int thesize;        ///< highest used element in #theitem
    int thenum;         ///< number of elements in #DataSet
    int firstfree;      ///< first unused element in #theitem
+   //@}
 
 public:
+
+   //-----------------------------------
    /**@name Extension
     *  Whenever a new element is added to a #DataSet, the latter assigns it a
     *  #DataKey. For this all methods that extend a #DataSet by one ore more
@@ -323,6 +334,7 @@ public:
    }
    //@}
 
+   //-----------------------------------
    /**@name Access   
     * When accessing elements from a #DataSet with one of the index
     * operators, it must be ensured, that the index is valid for the
@@ -357,6 +369,7 @@ public:
    }
    //@}
 
+   //-----------------------------------
    /**@name Inquiry */
    //@{
    /// returns maximum number of elements that would fit into #DataSet.
@@ -442,6 +455,7 @@ public:
    }
    //@}
 
+   //-----------------------------------
    /**@name Miscellaneous */
    //@{
    /// resets #max() to \p newmax.
@@ -471,7 +485,7 @@ public:
          - reinterpret_cast<char*>(old_theitem);
    }
 
-   /// consistencty check.
+   /// consistency check.
    bool isConsistent() const
    {
       if (theitem == 0 || thekey == 0)
@@ -494,10 +508,11 @@ public:
    }
    //@}
 
-   
+   //-----------------------------------
    /**@name Constructors / Destructors */
    //@{
    /// default constructor.
+   explicit
    DataSet(int pmax = 8)
       : theitem( 0 )
       , thekey ( 0 )

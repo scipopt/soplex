@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdesc.cpp,v 1.14 2005/07/14 17:38:36 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxdesc.cpp,v 1.15 2005/08/09 19:32:12 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -106,12 +106,12 @@ void SPxBasis::Desc::dump() const
    const SPxOut::Verbosity tmp_verbosity = spxout.getVerbosity();
    spxout.setVerbosity( SPxOut::ERROR );
 
-   spxout << "column status: ";
+   spxout << "DBDESC01 column status: ";
    for(i = 0; i < nCols(); i++)
       spxout << colStatus(i);
    spxout << std::endl;
 
-   spxout << "row status:    ";
+   spxout << "DBDESC02 row status:    ";
    for(i = 0; i < nRows(); i++)
       spxout << rowStatus(i); 
    spxout << std::endl;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: array.h,v 1.15 2002/01/31 08:19:25 bzfkocht Exp $"
+#pragma ident "@(#) $Id: array.h,v 1.16 2005/08/09 19:32:09 bzforlow Exp $"
 
 /**@file  array.h
  * @brief Save arrays of arbitrary types.
@@ -27,7 +27,7 @@
 
 namespace soplex
 {
-/**@brief   Save arrays of arbitrary types.
+/**@brief   Safe arrays of arbitrary types.
    @ingroup Elementary
 
    Class Array provides safe arrays of arbitrary type. Array elements are
@@ -39,21 +39,21 @@ namespace soplex
     - checking of array bound when accessing elements with the
       indexing operator[]() (only when compiled without \c -DNDEBUG).
  
-    Moreover, Array%s may easily be extended by #insert%ing or
+    Moreover, #Array%s may easily be extended by #insert%ing or
     #append%ing elements to the Array or shrunken by #remove%ing
-    elements. Method #reSize(int n) resets the Array%s length to \p n
+    elements. Method #reSize(int n) resets the Array's length to \p n,
     thereby appending elements or truncating the Array to the
     required size.
  
-    An Array is implemented in a C++ complient way with respect to
-    how memory is managemed: Only operators ::new and ::delete are
+    An Array is implemented in a C++-compliant way with respect to
+    how memory is managed: Only operators ::new and ::delete are
     used for allocating memory. This involves some overhead for all
-    methods effecting the length of an Array, i.e. all methods
+    methods effecting the length of an Array, i.e., all methods
     #insert, #append, #remove and #reSize. This involves
     allocating a new C++ array of the new size and copying all
     elements with the template parameters operator=().
  
-    For this reason, it is not convenient to use class Array, if its elements
+    For this reason, it is not convenient to use class Array if its elements
     are \ref DataObjects "Data Objects". In this case use class DataArray 
     instead.
  
@@ -63,10 +63,19 @@ template < class T >
 class Array
 {
 protected:
+
+   //----------------------------------------
+   /**@name Data */
+   //@{
    int num;     ///< the length of array #data 
    T*  data;    ///< the array of elements
+   //@}
 
 public:
+
+   //----------------------------------------
+   /**@name Access / modification */
+   //@{
    /// reference \p n 'th element.
    T& operator[](int n)
    {
@@ -181,7 +190,11 @@ public:
       else if (newsize > size())
          append(newsize - size());
    }
+   //@}
 
+   //----------------------------------------
+   /**@name Construction / destruction */
+   //@{
    /// assignment operator.
    /** Assigning an rvalue Array to an lvalue Array involves resizing
     *  the lvalue to the rvalues size() and copying all elements via
@@ -201,6 +214,7 @@ public:
    /// default constructor.
    /** The constructor allocates an Array of \p n uninitialized elements.
     */
+   explicit
    Array(int n = 0) 
       : data(0)
    {
@@ -240,6 +254,7 @@ public:
 
       return true;
    }
+   //@}
 };
 } // namespace soplex
 #endif // _ARRAY_H_

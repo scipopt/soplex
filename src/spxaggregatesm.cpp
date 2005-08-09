@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.23 2005/07/25 15:24:35 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.24 2005/08/09 19:32:11 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -28,22 +28,6 @@
 
 namespace soplex
 {
-/**todo Should be moved inside SPxAggregateSM. */
-struct RowCnt
-{
-   int row;
-   int size;
-};
-
-/**todo Should be moved inside SPxAggregateSM. */
-struct Compare
-{
-   int operator()(const RowCnt& i1, const RowCnt& i2) const
-   {
-      return i1.size - i2.size;
-   }
-};
-
 int SPxAggregateSM::eliminate(SPxLP& lp, const SVector& row, Real b)
 {
    Real x, y;
@@ -253,7 +237,7 @@ SPxSimplifier::Result SPxAggregateSM::simplify(SPxLP& lp, Real /*eps*/, Real /*d
       ++stage;
       if (last)
       {
-         MSG_VERBOSE3( spxout << "looping ..." << std::endl; );
+         MSG_VERBOSE3( spxout << "IAGGSM01 looping ..." << std::endl; );
          maxFill = (maxFill + 20) / 2;
       }
       last = num;
@@ -323,18 +307,19 @@ SPxSimplifier::Result SPxAggregateSM::simplify(SPxLP& lp, Real /*eps*/, Real /*d
       assert(lp.isConsistent());
       lp.removeCols (remCol.get_ptr());
       assert(lp.isConsistent());
-      MSG_VERBOSE1( spxout << "SPxAggregateSM:\tremoved " << num
-                           << " row(s) and column(s)" << std::endl
-//                           << "SPxAggregateSM:\tdelta = " << delta
-                           << std::endl; )
+      MSG_VERBOSE1( spxout << "IAGGSM02 \tremoved " << num
+                           << " row(s) and column(s)" << std::endl; )
    }
 
    return OKAY;
 }
 
+///@todo Calling SPxAggregateSM::unsimplifiedPrimal() should be prevented
+/// by making it private, not by an assert(false). The same holds for 
+/// SPxAggregateSM::unsimplifiedDual() and SPxRedundantSM::unsimplifiedDual(). 
 const Vector& SPxAggregateSM::unsimplifiedPrimal(const Vector& x)
 {
-   MSG_ERROR( spxout << "SPxAggregateSM::unsimplifiedPrimal() not implemented\n";)
+   MSG_ERROR( spxout << "EAGGSM03 SPxAggregateSM::unsimplifiedPrimal() not implemented\n";)
 
    assert(false);
 
@@ -343,7 +328,7 @@ const Vector& SPxAggregateSM::unsimplifiedPrimal(const Vector& x)
 
 const Vector& SPxAggregateSM::unsimplifiedDual(const Vector& pi)
 {
-   MSG_ERROR( spxout << "SPxAggregateSM::unsimplifiedDual() not implemented\n"; )
+   MSG_ERROR( spxout << "EAGGSM04 SPxAggregateSM::unsimplifiedDual() not implemented\n"; )
 
    assert(false);
 

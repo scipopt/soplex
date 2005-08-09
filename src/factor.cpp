@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.43 2005/07/14 17:38:35 bzforlow Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.44 2005/08/09 19:32:10 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -1591,13 +1591,13 @@ void CLUFactor::dump() const
    for (i = 0; i < thedim; ++i)
    {
       if (row.perm[i] >= 0)
-         spxout << "diag[" << i << "]: [" << col.orig[row.perm[i]] 
-                  << "] = " << diag[i] << std::endl;
+         spxout << "DCLUFA01 diag[" << i << "]: [" << col.orig[row.perm[i]] 
+                << "] = " << diag[i] << std::endl;
 
       for (j = 0; j < u.row.len[i]; ++j)
-         spxout << "   u[" << i << "]: [" 
-                  << u.row.idx[u.row.start[i] + j] << "] = "
-                  << u.row.val[u.row.start[i] + j] << std::endl;
+         spxout << "DCLUFA02   u[" << i << "]: [" 
+                << u.row.idx[u.row.start[i] + j] << "] = "
+                << u.row.val[u.row.start[i] + j] << std::endl;
    }
 
    /*  Dump L:
@@ -1607,12 +1607,12 @@ void CLUFactor::dump() const
       for (j = 0; j < l.firstUnused; ++j)
          if (col.orig[row.perm[l.row[j]]] == i)
          {
-            spxout << "l[" << i << "]" << std::endl;
+            spxout << "DCLUFA03 l[" << i << "]" << std::endl;
 
             for (k = l.start[j]; k < l.start[j + 1]; ++k)
-               spxout << "   l[" << k - l.start[j]
-                        << "]:  [" << l.idx[k]
-                        << "] = " << l.val[k] << std::endl;
+               spxout << "DCLUFA04   l[" << k - l.start[j]
+                      << "]:  [" << l.idx[k]
+                      << "] = "  << l.val[k] << std::endl;
             break;
          }
    }

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: didxset.h,v 1.11 2002/01/31 08:19:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: didxset.h,v 1.12 2005/08/09 19:32:09 bzforlow Exp $"
 
 /**@file  didxset.h
  * @brief Dymnamic index set.
@@ -44,6 +44,10 @@ namespace soplex
 class DIdxSet : public IdxSet
 {
 public:
+
+   //-----------------------------------
+   /**@name Adding */
+   //@{
    /// adds \p n uninitialized indices.
    void add(int n)
    {
@@ -83,7 +87,11 @@ public:
     *  only.
     */
    void setMax(int newmax = 1);
+   //@}
 
+   //-----------------------------------
+   /**@name Construction / destruction */
+   //@{
    /// default constructor. \p n gives the initial size of the index space.
    explicit DIdxSet(int n = 8);
 
@@ -114,6 +122,7 @@ public:
    }
    /// destructor.
    ~DIdxSet();
+   //@}
 };
 
 } // namespace soplex

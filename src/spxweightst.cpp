@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.cpp,v 1.23 2005/07/25 15:24:37 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxweightst.cpp,v 1.24 2005/08/09 19:32:13 bzforlow Exp $"
 
 //#define DEBUGGING 1
 //#define TEST 1
@@ -110,6 +110,7 @@ void SPxWeightST::setPrimalStatus(
    }
 }
 
+// ----------------------------------------------------------------
 static void setDualStatus(
    SPxBasis::Desc& desc, 
    const SPxSolver& base, 
@@ -126,12 +127,10 @@ static void setDualStatus(
       desc.colStatus(n) = base.basis().dualColStatus(n);
    }
 }
+// ----------------------------------------------------------------
 
-/*
-   The following method initializes |pref| such that it contains the set of
-   |SPxId|s ordered following |rowWeight| and |colWeight|. For the sorting
-   we take the following approach: first we sort the rows, then the columns.
-   Finally we perform a mergesort of both.
+/**
+   Compare class for row weights.
  */
 struct Compare
 {
@@ -144,6 +143,13 @@ struct Compare
    }
 };
 
+// ----------------------------------------------------------------
+/**
+   The following method initializes \p pref such that it contains the set of
+   #SPxId%s ordered following \p rowWeight and \p colWeight. For the sorting
+   we take the following approach: first we sort the rows, then the columns.
+   Finally we perform a mergesort of both.
+ */
 static void initPrefs(
    DataArray<SPxId>&      pref,
    const SPxSolver&       base,
@@ -200,6 +206,7 @@ static void initPrefs(
    assert(j == base.nCols());
 }
 
+// ----------------------------------------------------------------
 void SPxWeightST::generate(SPxSolver& base)
 {
    SPxId tmpId;
@@ -295,9 +302,9 @@ void SPxWeightST::generate(SPxSolver& base)
          {
             MSG_DEBUG(
                if (pref[i].type() == SPxId::ROW_ID)
-                  spxout << " r" << base.number(pref[i]);
+                  spxout << "DWEIST01 r" << base.number(pref[i]);
                else
-                  spxout << " c" << base.number(pref[i]);
+                  spxout << "DWEIST02 c" << base.number(pref[i]);
             )
 
             forbidden[sel] = 2;
@@ -395,6 +402,7 @@ void SPxWeightST::generate(SPxSolver& base)
 #endif  // TEST
 }
 
+// ----------------------------------------------------------------
 
 /* Computation of Weights
  */
@@ -433,7 +441,7 @@ void SPxWeightST::setupWeights(SPxSolver& bse)
     *       Also the values are nearly the same for both cases.
     *       Should this be ? Changed the values for
     *       r_fixed to 0 because of maros-r7. It is not clear why
-    *       this makes a difference because all inequalites in that
+    *       this makes a difference because all constraints in that
     *       instance are of equality type.
     *       Why is rowRight sometimes not set?
     */

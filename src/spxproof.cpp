@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxproof.cpp,v 1.8 2005/07/25 15:24:37 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxproof.cpp,v 1.9 2005/08/09 19:32:12 bzforlow Exp $"
 
 /**@file  spxproof.cpp
  * @brief provable bounds
@@ -46,8 +46,8 @@ Real SPxSolver::provedBound(Vector& dualsol, const Vector& objvec) const
 
    assert(rep() == COLUMN);
 
-   /* for minimazation problems: calculate y^Tb + min{(c^T - y^TA)x | l <= x <= u}
-    * for maximazation problems: calculate y^Tb + max{(c^T - y^TA)x | l <= x <= u}
+   /* for minimization problems: calculate y^Tb + min{(c^T - y^TA)x | l <= x <= u}
+    * for maximization problems: calculate y^Tb + max{(c^T - y^TA)x | l <= x <= u}
     */
 
    getLhs(lhsvec);
@@ -69,7 +69,7 @@ Real SPxSolver::provedBound(Vector& dualsol, const Vector& objvec) const
       Easyval y(dualsol[i]);
 
       ytb += y*b;
-      MSG_DEBUG( spxout << "y[" << i << "] = " << dualsol[i]
+      MSG_DEBUG( spxout << "DPROOF02 y[" << i << "] = " << dualsol[i]
                         << ", lhs[" << i << "] = " << lhsvec[i]
                         << ", rhs[" << i << "] = " << rhsvec[i]
                         << " -> ytb = " << ytb << std::endl; )
@@ -85,7 +85,7 @@ Real SPxSolver::provedBound(Vector& dualsol, const Vector& objvec) const
       getCol(j, col);
       SVector colvec = col.colVector();  /* make this faster !!! */
       Easyval diff = objvec[j];
-      MSG_DEBUG( spxout << "obj[" << j << "] = " << objvec[j]
+      MSG_DEBUG( spxout << "DPROOF03 obj[" << j << "] = " << objvec[j]
                         << " -> diff = " << diff << std::endl; )
 
       for( int i = 0; i < colvec.size(); ++i )
@@ -93,7 +93,7 @@ Real SPxSolver::provedBound(Vector& dualsol, const Vector& objvec) const
          Easyval y(dualsol[colvec.index(i)]);
          Easyval a(colvec.value(i));
          diff -= y*a;
-         MSG_DEBUG( spxout << "y[" << colvec.index(i) << "] = " 
+         MSG_DEBUG( spxout << "DPROOF04 y[" << colvec.index(i) << "] = " 
                            << dualsol[colvec.index(i)]
                            << ", a[" << colvec.index(i) << "] = "
                            << colvec.value(i)
@@ -102,7 +102,7 @@ Real SPxSolver::provedBound(Vector& dualsol, const Vector& objvec) const
 
       diff *= x;
       scalprod += diff;
-      MSG_DEBUG( spxout << "x[" << j << "] = " << x 
+      MSG_DEBUG( spxout << "DPROOF05 x[" << j << "] = " << x 
                         << " -> diff = " << diff << std::endl
                         << "   ------------> scalprod = " 
                         << scalprod << std::endl; )
@@ -110,7 +110,7 @@ Real SPxSolver::provedBound(Vector& dualsol, const Vector& objvec) const
 
    /* add y^Tb */
    scalprod += ytb;
-   MSG_VERBOSE1( spxout << "proved bound = " << scalprod << std::endl; );
+   MSG_VERBOSE1( spxout << "IPROOF01 proved bound = " << scalprod << std::endl; );
 
    /* depending on the objective sense, choose min or max */
    if( spxSense() == MINIMIZE )

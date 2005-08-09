@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: changesoplex.cpp,v 1.25 2005/07/25 15:24:35 bzforlow Exp $"
+#pragma ident "@(#) $Id: changesoplex.cpp,v 1.26 2005/08/09 19:32:09 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -678,10 +678,8 @@ static void changeLowerStatus(
    const SPxBasis&         basis,
    int                     i)
 {
-   MSG_DEBUG({ spxout << "changeLowerStatus(): col " << i
-                      << "[" << newLower << ":" << upper << "] " << stat; });
-   //spxout << "changeLowerStatus(): col " << i
-   //         << "[" << newLower << ":" << upper << "] " << stat;
+   MSG_DEBUG( spxout << "DCHANG01 changeLowerStatus(): col " << i
+                     << "[" << newLower << ":" << upper << "] " << stat; )
 
    switch (stat)
    {
@@ -713,8 +711,7 @@ static void changeLowerStatus(
    default:
       assert(false);
    }
-   MSG_DEBUG( spxout << " -> " << stat << std::endl; );
-   //spxout << " -> " << stat << std::endl; 
+   MSG_DEBUG( spxout << " -> " << stat << std::endl; )
 }
 
 void SPxSolver::changeLower(const Vector& newLower)
@@ -757,10 +754,8 @@ static void changeUpperStatus(
    const SPxBasis&         basis,
    int                     i)
 {
-   MSG_DEBUG( spxout << "changeUpperStatus(): col " << i
-                      << "[" << lower << ":" << newUpper << "] " << stat; );
-   //   spxout << "changeUpperStatus(): col " << i
-   //        << "[" << lower << ":" << newUpper << "] " << stat;
+   MSG_DEBUG( spxout << "DCHANG02 changeUpperStatus(): col " << i
+                     << "[" << lower << ":" << newUpper << "] " << stat; )
 
    switch (stat)
    {
@@ -793,7 +788,6 @@ static void changeUpperStatus(
       assert(false);
    }
    MSG_DEBUG( spxout << " -> " << stat << std::endl; );
-   //spxout << " -> " << stat << std::endl;
 }
 
 void SPxSolver::changeUpper(const Vector& newUpper)
@@ -852,8 +846,8 @@ static void changeLhsStatus(
    const SPxBasis& basis,
    int i)
 {
-   MSG_DEBUG( spxout << "changeLhsStatus()  : row " << i
-                     << ": " << stat; );
+   MSG_DEBUG( spxout << "DCHANG03 changeLhsStatus()  : row " << i
+                     << ": " << stat; )
    switch (stat)
    {
    case SPxBasis::Desc::P_ON_LOWER:
@@ -884,7 +878,7 @@ static void changeLhsStatus(
    default:
       assert(false);
    }
-   MSG_DEBUG( spxout << " -> " << stat << std::endl; );
+   MSG_DEBUG( spxout << " -> " << stat << std::endl; )
 }
 
 void SPxSolver::changeLhs(const Vector& newLhs)
@@ -922,8 +916,8 @@ static void changeRhsStatus(
    const SPxBasis& basis,
    int i)
 {
-   MSG_DEBUG( spxout << "changeRhsStatus()  : row " << i
-                     << ": " << stat; );
+   MSG_DEBUG( spxout << "DCHANG04 changeRhsStatus()  : row " << i
+                     << ": " << stat; )
    switch (stat)
    {
    case SPxBasis::Desc::P_ON_UPPER:
@@ -954,7 +948,7 @@ static void changeRhsStatus(
    default:
       assert(false);
    }
-   MSG_DEBUG( spxout << " -> " << stat << std::endl; );
+   MSG_DEBUG( spxout << " -> " << stat << std::endl; )
 }
 
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datahashtable.h,v 1.19 2005/08/04 15:42:53 bzforlow Exp $"
+#pragma ident "@(#) $Id: datahashtable.h,v 1.20 2005/08/09 19:32:09 bzforlow Exp $"
 
 /**@file  datahashtable.h
  * @brief Generic hash table for data objects.
@@ -76,6 +76,10 @@ template < class HashItem, class Info >
 class DataHashTable
 {
 private:
+
+   //-----------------------------------
+   /**@name Types */
+   //@{
    /// template class for elements stored in the hash table
    template < class ElemHashItem, class ElemInfo >
    class Element
@@ -91,20 +95,28 @@ private:
       } stat;
    };
    typedef Element< HashItem, Info > Elem;
+   //@}
 
+   //-----------------------------------
+   /**@name Data */
+   //@{
    /// stores all elements of the hash table
    DataArray < Elem > m_elem;   
-
-   int m_hashsize;        ///< increment added to hash index, if allready used
-   int m_used;            ///< current number of entries in the hash table
-
+   /// increment added to hash index, if allready used
+   int m_hashsize;        
+   /// current number of entries in the hash table
+   int m_used;            
    /// pointer to hash function (mapping: \a HashItem -> int)
    int (*m_hashfun) (const HashItem*);  
-
    /// memory is #reMax()%ed by this factor, if a new element does't fit
    Real m_memfactor;  
+   //@}
 
 public:
+
+   //-----------------------------------
+   /**@name Access / modification */
+   //@{
    /// Is item \p h present in #DataHashTable ?
    bool has(const HashItem& h) const
    {
@@ -205,7 +217,12 @@ public:
          if (save[i].stat == Elem::USED)
             add(save[i].item, save[i].info);
    }
-   /// checks, whether #DataHashTable is consistent
+   //@}
+
+   //-----------------------------------
+   /**@name Debugging */
+   //@{
+   /// checks whether #DataHashTable is consistent
    bool isConsistent() const
    {
       int total = 0;
@@ -224,6 +241,11 @@ public:
 
       return m_elem.isConsistent();
    }
+   //@}
+
+   //-----------------------------------
+   /**@name Construction / destruction */
+   //@{
    /// default constructor.
    /** Allocates a #DataHashTable for \p maxsize entries using \p hashfun
     *  as hash function. If \p hashsize > 0, #m_hashsize is set to the 
@@ -252,8 +274,13 @@ public:
 
       assert(m_memfactor > 1.0);
    }
+   //@}
 
 private:
+
+   //-----------------------------------
+   /**@name Helpers */
+   //@{
    /// automatically computes a good #m_hashsize.
    /** Computes a good #m_hashsize as the product of all prime numbers 
     *  not divisors of the number of elements that are <= 
@@ -325,11 +352,16 @@ private:
       }
       return -1;
    }
+   //@}
+
+   //-----------------------------------
+   /**@name Blocked */
+   //@{
    /// assignment operator is not implemented.
    DataHashTable& operator=(const DataHashTable& base);
-
    /// copy constructor is not implemented.
    DataHashTable(const DataHashTable& base);
+   //@}
 };
 } // namespace soplex
 #endif   // _DATAHAHSTABLE_H_

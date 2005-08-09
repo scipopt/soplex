@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxaggregatesm.h,v 1.11 2003/01/10 12:46:14 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxaggregatesm.h,v 1.12 2005/08/09 19:32:11 bzforlow Exp $"
 
 /**@file  spxaggregatesm.h
  * @brief LP variable aggregation.
@@ -35,14 +35,44 @@ namespace soplex
  */
 class SPxAggregateSM : public SPxSimplifier
 {
+public:
+
+   //------------------------------------
+   //**@name Types */
+   //@{
+   /// 
+   struct RowCnt
+   {
+      int row;
+      int size;
+   };
+   /// Compares two #RowCnt%s.
+   struct Compare
+   {
+      inline
+      int operator()( const RowCnt& i1, const RowCnt& i2) const
+      {
+         return i1.size - i2.size;
+      }
+   };
+   //@}
+
 private:
+
+   //------------------------------------
+   //**@name Data */
+   //@{
    Real stability;   ///< stability factor, e.g. 0.01.   
    Real maxFill;     ///< ???  
-
    /// ???
    int eliminate(SPxLP& lp, const SVector& row, Real b);
+   //@}
 
 public:
+
+   //------------------------------------
+   //**@name Construction / destruction */
+   //@{
    /// default constructor
    SPxAggregateSM() 
       : SPxSimplifier("Aggregate")
@@ -50,12 +80,18 @@ public:
    /// destructor.
    virtual ~SPxAggregateSM()
    {}  
+   //@}
+
+   //------------------------------------
+   //**@name Aggregation */
+   //@{
    /// Aggregate variables.
    virtual Result simplify(SPxLP& lp, Real /*eps*/, Real /*delta*/);
    /// returns a reference to the unsimplified primal solution.
    virtual const Vector& unsimplifiedPrimal(const Vector& x);
    /// returns a reference to the unsimplified dual solution. 
    virtual const Vector& unsimplifiedDual(const Vector& pi);
+   //@}
 };
 } // namespace soplex
 #endif // _SPXAGGREGATESM_H_

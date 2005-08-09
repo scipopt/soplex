@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: islist.h,v 1.13 2002/10/23 10:40:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: islist.h,v 1.14 2005/08/09 19:32:10 bzforlow Exp $"
 
 /**@file  islist.h
  * @brief Generic single linked list.
@@ -28,6 +28,11 @@
 
 namespace soplex
 {
+
+//---------------------------------------------------------------------
+//  class IsElement<T>
+//---------------------------------------------------------------------
+
 /**@brief   Elements for #IsList%s.
    @ingroup Elementary
 
@@ -41,9 +46,18 @@ template < class T >
 class IsElement : public T
 {
 protected:
+
+   //--------------------------
+   /**@name Data */
+   //@{
    IsElement<T>* the_next;       ///< pointer to next element in the #IsList.
+   //@}
 
 public:
+
+   //---------------------------------
+   /**@name Successor */
+   //@{
    ///
    IsElement<T>*& next()
    {
@@ -54,12 +68,16 @@ public:
    {
       return the_next;
    }
+   //@}
 
+   //------------------------------------
+   /**@name Constructors / destructors */
+   //@{
    /// default constructor.
    IsElement()
    {}
-
    ///
+   explicit
    IsElement(const T& old)
       : T(old)
          , the_next(0)
@@ -74,6 +92,10 @@ public:
    {}
 
 };
+
+//---------------------------------------------------------------------
+// class IsList<T>
+//---------------------------------------------------------------------
 
 /**@brief   Generic single linked list.
    @ingroup Elementary
@@ -96,6 +118,7 @@ protected:
 public:
    typedef IsElement<T> Element;
 
+   //--------------------------
    /**@name Extension */
    //@{
    /// appends \p elem to #IsList.
@@ -183,6 +206,7 @@ public:
    }
    //@}
 
+   //--------------------------
    /**@name Removal */
    //@{
    /// removes the successor of \p after from an #IsList.
@@ -260,6 +284,7 @@ public:
    }
    //@}
 
+   //--------------------------
    /**@name Access */
    //@{
    /// returns the #IsList's first element.
@@ -339,6 +364,7 @@ public:
    }
    //@}
 
+   //--------------------------
    /**@name Miscellaneous */
    //@{
    /// adjusts list pointers to a new memory address.
@@ -379,6 +405,7 @@ public:
    }
    //@}
 
+   //------------------------------------
    /**@name Constructors / Destructors */
    //@{
    /// default constructor.
@@ -386,6 +413,7 @@ public:
        specifying a \p first and \p last element. Then \p last must be a
        successor of \p first.
    */
+   explicit
    IsList(T* pfirst = 0, T* plast = 0)
       : the_first(pfirst), the_last(plast)
    {

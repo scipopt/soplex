@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeometsc.cpp,v 1.12 2005/07/25 15:24:36 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxgeometsc.cpp,v 1.13 2005/08/09 19:32:12 bzforlow Exp $"
 
 /**@file  spxgeometsc.cpp
  * @brief Geometric mean row/column scaling.
@@ -53,7 +53,7 @@ void SPxGeometSC::scale(SPxLP& lp)
 {
    METHOD( "SPxGeometSC::scale()" );
 
-   MSG_VERBOSE1({ spxout << "IGEOSC01 Geometric scaling LP" << std::endl; });   
+   MSG_VERBOSE1( spxout << "IGEOSC01 Geometric scaling LP" << std::endl; )
 
    Real pstart = 0.0;
    Real p0     = 0.0;
@@ -69,12 +69,12 @@ void SPxGeometSC::scale(SPxLP& lp)
 
    m_colFirst = colratio < rowratio;
 
-   MSG_VERBOSE2({ spxout << "IGEOSC02 LP scaling statistics:" 
-                       << " min= " << lp.minAbsNzo()
-                       << " max= " << lp.maxAbsNzo()
-                       << " col-ratio= " << colratio
-                       << " row-ratio= " << rowratio
-                       << std::endl; });
+   MSG_VERBOSE2( spxout << "IGEOSC02 LP scaling statistics:" 
+                        << " min= " << lp.minAbsNzo()
+                        << " max= " << lp.maxAbsNzo()
+                        << " col-ratio= " << colratio
+                        << " row-ratio= " << rowratio
+                        << std::endl; )
 
    // We make at most m_maxIterations. 
    for(int count = 0; count < m_maxIterations; count++)
@@ -89,10 +89,10 @@ void SPxGeometSC::scale(SPxLP& lp)
          p0 = computeScalingVecs(lp.rowSet(), m_colscale, m_rowscale);
          p1 = computeScalingVecs(lp.colSet(), m_rowscale, m_colscale);
       }
-      MSG_VERBOSE3({ spxout << "IGEOSC03 Geometric scaling round " << count
-                          << " col-ratio= " << (m_colFirst ? p0 : p1)
-                          << " row-ratio= " << (m_colFirst ? p1 : p0)
-                          << std::endl; });
+      MSG_VERBOSE3( spxout << "IGEOSC03 Geometric scaling round " << count
+                           << " col-ratio= " << (m_colFirst ? p0 : p1)
+                           << " row-ratio= " << (m_colFirst ? p1 : p0)
+                           << std::endl; )
 
       // record start value, this is done with m_col/rowscale = 1.0, so it is the
       // value frome the "original" (as passed to the scaler) LP.
@@ -116,25 +116,25 @@ void SPxGeometSC::scale(SPxLP& lp)
       // reset m_colscale/m_rowscale to 1.0
       setup(lp);
 
-      MSG_VERBOSE2({ spxout << "IGEOSC04 No scaling done." << std::endl; });
+      MSG_VERBOSE2( spxout << "IGEOSC04 No scaling done." << std::endl; )
    }
    else
    {
       applyScaling(lp);
 
-      MSG_VERBOSE3({ spxout << "IGEOSC05 Row scaling min= " << minAbsRowscale()
-                          << " max= " << maxAbsRowscale()
-                          << std::endl
-                          << "IGEOSC06 Col scaling min= " << minAbsColscale()
-                          << " max= " << maxAbsColscale()
-                          << std::endl; });
+      MSG_VERBOSE3( spxout << "IGEOSC05 Row scaling min= " << minAbsRowscale()
+                           << " max= " << maxAbsRowscale()
+                           << std::endl
+                           << "IGEOSC06 Col scaling min= " << minAbsColscale()
+                           << " max= " << maxAbsColscale()
+                           << std::endl; )
 
-      MSG_VERBOSE2({ spxout << "IGEOSC07 LP scaling statistics:" 
-                          << " min= " << lp.minAbsNzo()
-                          << " max= " << lp.maxAbsNzo()
-                          << " col-ratio= " << maxColRatio(lp) 
-                          << " row-ratio= " << maxRowRatio(lp) 
-                          << std::endl; });
+      MSG_VERBOSE2( spxout << "IGEOSC07 LP scaling statistics:" 
+                           << " min= " << lp.minAbsNzo()
+                           << " max= " << lp.maxAbsNzo()
+                           << " col-ratio= " << maxColRatio(lp) 
+                           << " row-ratio= " << maxRowRatio(lp) 
+                           << std::endl; )
    }
 }
 

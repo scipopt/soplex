@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.h,v 1.21 2002/12/08 11:09:21 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.h,v 1.22 2005/08/09 19:32:10 bzforlow Exp $"
 
 /**@file  nameset.h
  * @brief Set of strings.
@@ -61,6 +61,7 @@ namespace soplex
 class NameSet
 {
 public:
+
    /**@brief   Handles of names in a #NameSet.
     * @ingroup Elementary
     *
@@ -70,11 +71,24 @@ public:
    class Name
    {
    private:
+
+      //------------------------------
+      /**@name Private Data */
+      //@{
       static const char deflt;     ///< default zero string.
+      //@}
 
    public:
-      const char *name;      ///< pointer to the name string.
 
+      //------------------------------
+      /**@name Public Data */
+      //@{
+      const char *name;      ///< pointer to the name string.
+      //@}
+
+      //------------------------------
+      /**@name Friends */
+      //@{
       /// equality operator.
       friend int operator==(const Name& n1, const Name& n2)
       {
@@ -85,11 +99,21 @@ public:
       {
          return out << n.name;
       }
+      //@}
+
+      //------------------------------
+      /**@name Debugging */
+      //@{
       /// consistency check.
       bool isConsistent () const
       {
          return (name != 0);
       }
+      //@}
+
+      //------------------------------------
+      /**@name Constructors / destructors */
+      //@{
       /// default constructor.
       Name() 
          : name(&deflt)
@@ -100,25 +124,32 @@ public:
       Name (const Name& str) 
          : name(str.name)
       {}
-      /// constructs a #Name out of a C style character string.
+      /// implictly constructs a #Name out of a C style character string.
       Name (const char* str) 
          : name(str)
       {}
+      //@}
    };
 
 private:
+
+   //------------------------------
+   /**@name Data */
+   //@{
    DataSet < int > set;  ///< name set.
    char* mem;            ///< string memory
    int memmax;           ///< size of string memory
    int memused;          ///< size of used string memory
-
    /** Every name in a #NameSet is assigned a #Key by which it can be
        accessed (see #NameSet::operator[]()). See #DataSet::Key for a more
        detailed description of the concept of Keys.
    */
    DataHashTable < Name, DataKey > hashtab;  ///< hashtable for names
+   //@}
 
 public:
+
+   //------------------------------
    /**@name Inquiry */
    //@{
    /// returns \p num 'th name of #NameSet.
@@ -214,6 +245,7 @@ public:
    }
    //@}
 
+   //----------------------------
    /**@name Extension */
    //@{
    ///
@@ -228,6 +260,7 @@ public:
    //@}
 
 
+   //----------------------------
    /**@name Shrinking */
    //@{
    /// removes name with #DataKey \p key from #NameSet.
@@ -256,6 +289,7 @@ public:
    //@}
 
 
+   //----------------------------
    /**@name Memory Control */
    //@{
    /// resets #max() to \p newmax.
@@ -269,6 +303,7 @@ public:
    //@}
 
 
+   //----------------------------
    /**@name Control Parameters */
    //@{
    /// memory extension factor for entries.
@@ -288,6 +323,7 @@ public:
    Real memFactor;
    //@}
 
+   //----------------------------
    /**@name Miscellaneous */
    //@{
    /// consistency check.
@@ -295,6 +331,7 @@ public:
 
    //@}
 
+   //--------------------------------------
    /**@name Constructors / Destructors */
    //@{
    /// default constructor.
@@ -303,6 +340,7 @@ public:
     *  @param      fac     start value for #factor
     *  @param      memFac  start value for #memFactor
     */
+   explicit
    NameSet(int max = 10000,
            int mmax = -1,
            Real fac = 2,
@@ -310,14 +348,18 @@ public:
 
    /// destructor.
    ~NameSet();
+   //@}
 
 private:
+
+   //--------------------------------------
+   /**@name Blocked */
+   //@{
    /// copy constructor.
    NameSet(const NameSet& old);
 
    /// assignment operator.
    NameSet& operator=(const NameSet& rhs);
-
    //@}
 };
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvectorst.cpp,v 1.14 2005/07/25 15:24:37 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxvectorst.cpp,v 1.15 2005/08/09 19:32:13 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -42,7 +42,7 @@ void SPxVectorST::setupWeights(SPxSolver& base)
       Real x, y;
       int i;
 
-      MSG_DEBUG( spxout << "colWeight[]: "; )
+      MSG_DEBUG( spxout << "DVECST01 colWeight[]: "; )
       for (i = base.nCols(); i--;)
       {
          x = vec[i] - base.SPxLP::lower(i);
@@ -61,7 +61,7 @@ void SPxVectorST::setupWeights(SPxSolver& base)
       }
       MSG_DEBUG( spxout << std::endl << std::endl; )
 
-      MSG_DEBUG( spxout << "rowWeight[]: "; )
+      MSG_DEBUG( spxout << "DVECST02 rowWeight[]: "; )
       for (i = base.nRows(); i--;)
       {
          const SVector& row = base.rowVector(i);

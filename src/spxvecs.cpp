@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvecs.cpp,v 1.26 2005/07/25 15:24:37 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxvecs.cpp,v 1.27 2005/08/09 19:32:13 bzforlow Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -77,14 +77,14 @@ void SPxSolver::computeFrhs()
                   break;
 
                default:
-                  MSG_ERROR( spxout << __FILE__ << __LINE__ << " ERROR: "
-                                  << "inconsistent basis must not happen!" 
-                                  << std::endl; )
+                  MSG_ERROR( spxout << "ESVECS01 ERROR: "
+                                    << "inconsistent basis must not happen!" 
+                                    << std::endl; )
                   assert(false);
                }
                assert(x < infinity);
                assert(x > -infinity);
-               (*theFrhs)[i] += x;                         // slack !
+               (*theFrhs)[i] += x;     // slack !
             }
          }
       }
@@ -142,9 +142,9 @@ void SPxSolver::computeFrhsXtra()
             break;
 
          default:
-            MSG_ERROR( spxout << __FILE__ << __LINE__ << " ERROR: "
-                            << "inconsistent basis must not happen!" 
-                            << std::endl; )
+            MSG_ERROR( spxout << "ESVECS02 ERROR: "
+                              << "inconsistent basis must not happen!" 
+                              << std::endl; )
             assert(false);
          }
          assert(x < infinity);
@@ -200,9 +200,9 @@ void SPxSolver::computeFrhs1(
             break;
 
          default:
-            MSG_ERROR( spxout << __FILE__ << __LINE__ << " ERROR: "
-                            << "inconsistent basis must not happen!" 
-                            << std::endl; )
+            MSG_ERROR( spxout << "ESVECS03 ERROR: "
+                              << "inconsistent basis must not happen!" 
+                              << std::endl; )
             assert(false);
          }
          assert(x < infinity);
@@ -253,18 +253,18 @@ void SPxSolver::computeFrhs2(
 
             if (colfb[i] != coufb[i])
             {
-               MSG_ERROR( spxout << "Frhs2: " << stat << " " 
-                               << colfb[i] << " " << coufb[i]
-                               << " shouldn't be" << std::endl; )
+               MSG_ERROR( spxout << "ESVECS04 Frhs2: " << stat << " " 
+                                 << colfb[i] << " " << coufb[i]
+                                 << " shouldn't be" << std::endl; )
             }
             //assert(colfb[i] == coufb[i]);
             x = colfb[i];
             break;
 
          default:
-            MSG_ERROR( spxout << __FILE__ << __LINE__ << " ERROR: "
-                            << "inconsistent basis must not happen!" 
-                            << std::endl; )
+            MSG_ERROR( spxout << "ESVECS05 ERROR: "
+                              << "inconsistent basis must not happen!" 
+                              << std::endl; )
             assert(false);
          }
          assert(x < infinity);

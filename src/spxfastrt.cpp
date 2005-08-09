@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.30 2005/07/25 15:24:36 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.31 2005/08/09 19:32:12 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -907,6 +907,7 @@ int SPxFastRT::selectLeave(Real& val)
    MSG_DEBUG(
       if (leave >= 0)
          spxout 
+           << "DFSTRT01 "
            << thesolver->basis().iteration() << "("
            << std::setprecision(6) << thesolver->value() << ","
            << std::setprecision(2) << thesolver->basis().stability() << "):"
@@ -916,10 +917,9 @@ int SPxFastRT::selectLeave(Real& val)
            << std::setprecision(6) << maxabs 
            << std::endl;
       else
-         spxout << thesolver->basis().iteration() 
-                  << ": skipping instable pivot"
-                  << std::endl;
-   );
+         spxout << "DFSTRT02 " << thesolver->basis().iteration() 
+                << ": skipping instable pivot" << std::endl;
+   )
 
    if (leave >= 0 || minStab > 2*solver()->epsilon())
    {
@@ -1228,12 +1228,12 @@ SPxId SPxFastRT::selectEnter(Real& val)
                x = thesolver->coPvec().delta()[ thesolver->number(enterId) ];
             else
                x = thesolver->pVec().delta()[ thesolver->number(enterId) ];
-            spxout << thesolver->basis().iteration() << ": " << sel
-                     << '\t' << x << " (" << maxabs << ")" << std::endl;
+            spxout << "DFSTRT03 " << thesolver->basis().iteration() << ": " 
+                   << sel << '\t' << x << " (" << maxabs << ")" << std::endl;
          }
       else
-         spxout << thesolver->basis().iteration() 
-                  << ": skipping instable pivot" << std::endl;
+         spxout << "DFSTRT04 " << thesolver->basis().iteration() 
+                << ": skipping instable pivot" << std::endl;
    )
 
    if (enterId.isValid() || minStab > 2*epsilon)

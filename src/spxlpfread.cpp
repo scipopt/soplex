@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.50 2005/07/25 15:24:37 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.51 2005/08/09 19:32:12 bzforlow Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -148,7 +148,7 @@ static Real readValue(char*& pos)
 
    assert(pos == s);
 
-   MSG_DEBUG( spxout << "readValue = " << value << std::endl; )
+   MSG_DEBUG( spxout << "DLPFRD01 readValue = " << value << std::endl; )
 
    if (isSpace(*pos))
       pos++;
@@ -185,7 +185,7 @@ static int readColName(
    {
       // We only add the name if we got an empty column.
       if (emptycol == 0)
-         MSG_WARNING( spxout << "Unknown variable \"" << name << "\" "; )
+         MSG_WARNING( spxout << "WLPFRD02 Unknown variable \"" << name << "\" "; )
       else
       {
          colidx = colnames->num();
@@ -193,7 +193,7 @@ static int readColName(
          colset.add(*emptycol);
       }
    }
-   MSG_DEBUG( spxout << "readColName [" << name << "] = "
+   MSG_DEBUG( spxout << "DLPFRD03 readColName [" << name << "] = "
                      << colidx << std::endl; )
 
    if (isSpace(*pos))
@@ -214,7 +214,7 @@ static int readSense(char*& pos)
    else if (*pos == '=')
       pos++;
 
-   MSG_DEBUG( spxout << "readSense = " << static_cast<char>(sense)
+   MSG_DEBUG( spxout << "DLPFRD04 readSense = " << static_cast<char>(sense)
                      << std::endl; )
 
    if (isSpace(*pos))
@@ -264,7 +264,7 @@ static bool hasKeyword(char*& pos, const char* keyword)
    {
       pos += k;
 
-      MSG_DEBUG( spxout << "hasKeyword: " << keyword << std::endl; )
+      MSG_DEBUG( spxout << "DLPFRD05 hasKeyword: " << keyword << std::endl; )
       return true;
    }
    return false;
@@ -407,12 +407,12 @@ bool SPxLP::readLPF(
       {
          if (strlen(buf) == MAX_LINE_LEN - 1)
          {
-            MSG_ERROR( spxout << "Line exceeds " << MAX_LINE_LEN - 2 
+            MSG_ERROR( spxout << "ELPFRD06 Line exceeds " << MAX_LINE_LEN - 2 
                             << " characters" << std::endl; )
          }
          else
          {
-            MSG_ERROR( spxout << "No 'End' marker found" << std::endl; )
+            MSG_ERROR( spxout << "ELPFRD07 No 'End' marker found" << std::endl; )
             finished = true;
          }
          break;
@@ -421,7 +421,7 @@ bool SPxLP::readLPF(
       i   = 0;
       pos = buf;
 
-      MSG_DEBUG( spxout << "Reading line " << lineno
+      MSG_DEBUG( spxout << "DLPFRD08 Reading line " << lineno
                         << " (pos=" << pos << ")" << std::endl; )
 
       // 1. Remove comments.
@@ -521,7 +521,7 @@ bool SPxLP::readLPF(
       //-----------------------------------------------------------------------
       pos = line;
       
-      MSG_DEBUG( spxout << "pos=" << pos << std::endl; )
+      MSG_DEBUG( spxout << "DLPFRD09 pos=" << pos << std::endl; )
 
       // 7. We have something left to process. 
       while((pos != 0) && (*pos != '\0'))
@@ -652,10 +652,10 @@ bool SPxLP::readLPF(
 
                         assert(cnames->has(colidx));
 
-                        MSG_WARNING( spxout << "Duplicate index " 
-                                          << (*cnames)[colidx] 
-                                          << " in line " << lineno 
-                                          << std::endl; )
+                        MSG_WARNING( spxout << "WLPFRD10 Duplicate index " 
+                                            << (*cnames)[colidx] 
+                                            << " in line " << lineno 
+                                            << std::endl; )
                      }
                   }
                   have_value = false;
@@ -699,7 +699,7 @@ bool SPxLP::readLPF(
 
             if ((colidx = readColName(pos, cnames, cset, 0)) < 0)
             {
-               MSG_WARNING( spxout << "in Bounds section line " 
+               MSG_WARNING( spxout << "WLPFRD11 in Bounds section line " 
                                    << lineno << " ignored" << std::endl; )
                continue;
             }
@@ -755,7 +755,7 @@ bool SPxLP::readLPF(
          case INTEGERS :
             if ((colidx = readColName(pos, cnames, cset, 0)) < 0)
             {
-               MSG_WARNING( spxout << "in Binary/General section line " 
+               MSG_WARNING( spxout << "WLPFRD12 in Binary/General section line " 
                                    << lineno << " ignored" << std::endl; )
             }
             else
@@ -770,7 +770,7 @@ bool SPxLP::readLPF(
             }
             break;
          case START :
-            MSG_ERROR( spxout << "This seems to be no LP format file" 
+            MSG_ERROR( spxout << "ELPFRD13 This seems to be no LP format file" 
                             << std::endl; )
             goto syntax_error;
          default :
@@ -791,18 +791,18 @@ bool SPxLP::readLPF(
 syntax_error:
    if (finished)
    {
-      MSG_VERBOSE2( spxout << "Finished reading " << lineno
+      MSG_VERBOSE2( spxout << "ILPFRD14 Finished reading " << lineno
                            << " lines" << std::endl; )
    }
    else
-      MSG_ERROR( spxout << "Syntax error in line " << lineno << std::endl; )
+      MSG_ERROR( spxout << "ELPFRD15 Syntax error in line " << lineno << std::endl; )
 
    if (p_cnames == 0)
       delete cnames;
    if (p_rnames == 0)
       delete rnames;
 
-   MSG_DEBUG( spxout << *this; )
+   MSG_DEBUG( spxout << "DLPFRD16\n" << *this; )
 
    return finished;
 }
