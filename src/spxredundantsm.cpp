@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.31 2005/08/09 19:32:12 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.cpp,v 1.32 2005/08/18 16:14:28 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -129,7 +129,8 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
          // std::cout << "\t\tx= " << x << " lower= " << lp.lower(k) 
          // << " upper= " << lp.upper(k) << std::endl;
 
-         assert(isNotZero(x, epsZero()));
+         // warn since this unhandled case may slip through unnoticed otherwise
+         ASSERT_WARN( "WREDSM28", isNotZero(x, epsZero()) );
 
          if (x > 0.0)
          {
@@ -184,8 +185,8 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
                Real x = row.value(j);
                int  k = row.index(j);
 
-               assert(isNotZero(x, epsZero()));
-               assert(GE(lp.lower(k), 0.0) || LE(lp.upper(k), 0.0));
+               ASSERT_WARN( "WREDSM29", isNotZero(x, epsZero()) );
+               ASSERT_WARN( "WREDSM30", GE(lp.lower(k), 0.0) || LE(lp.upper(k), 0.0) );
 
                if (x > 0.0 && GE(lp.lower(k), 0.0))
                   lp.changeLower(k, lp.upper(k));
@@ -212,8 +213,8 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
                Real x = row.value(j);
                int  k = row.index(j);
 
-               assert(isNotZero(x, epsZero()));
-               assert(GE(lp.lower(k), 0.0) || LE(lp.upper(k), 0.0));
+               ASSERT_WARN( "WREDSM31", isNotZero(x, epsZero()) );
+               ASSERT_WARN( "WREDSM32", GE(lp.lower(k), 0.0) || LE(lp.upper(k), 0.0) );
 
                if (x > 0.0 && GE(lp.lower(k), 0.0))
                   lp.changeUpper(k, lp.lower(k));
@@ -272,7 +273,8 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
             Real x = row.value(j);
             int  k = row.index(j);
 
-            assert(isNotZero(x));
+            // warn since this unhandled case may slip through unnoticed otherwise
+            ASSERT_WARN( "WREDSM33", isNotZero(x) );
 
             if (x > 0.0)
             {
@@ -446,7 +448,7 @@ SPxSimplifier::Result SPxRedundantSM::redundantRows(SPxLP& lp, bool& again)
       else
          alpha = x1 / x2;
 
-      assert(isNotZero(alpha));
+      ASSERT_WARN( "WREDSM34", isNotZero(alpha) );
 
       for(j = 0; j < row1.size(); ++j)
       {
@@ -575,7 +577,8 @@ SPxSimplifier::Result SPxRedundantSM::redundantCols(SPxLP& lp, bool& again)
             Real x = col.value(j);
             int  k = col.index(j);
 
-            assert(isNotZero(x));
+            // warn since this unhandled case may slip through unnoticed otherwise
+            ASSERT_WARN( "WREDSM35", isNotZero(x) );
 
             if (x > 0.0)
             {
@@ -774,7 +777,7 @@ SPxSimplifier::Result SPxRedundantSM::simpleRows(SPxLP& lp, bool& again)
          if (isZero(up, epsZero()))
             up = 0.0;
          
-         assert(LErel(lp.lower(j), lp.upper(j)));
+         ASSERT_WARN( "WREDSM36", LErel(lp.lower(j), lp.upper(j)) );
 
          MSG_VERBOSE3( spxout << " removed lo= " << lo
                               << " up= " << up
@@ -892,7 +895,7 @@ SPxSimplifier::Result SPxRedundantSM::simpleCols(SPxLP& lp, bool& again)
          Real x = col.value(0);
          int  j = col.index(0);
          
-         assert(isNotZero(x));
+         ASSERT_WARN( "WREDSM37", isNotZero(x) );
 
          if (x > 0.0)
          {

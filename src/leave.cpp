@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.41 2005/08/09 19:32:10 bzforlow Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.42 2005/08/18 16:14:28 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -513,7 +513,7 @@ bool SPxSolver::leave(int leaveIdx)
    {
       coSolve(theCoPvec->delta(), unitVecs[leaveIdx]);
    }
-#ifndef NDEBUG
+#ifndef ENABLE_ADDITIONAL_CHECKS
    else
    {
       SSVector tmp(dim(), epsilon());
@@ -525,7 +525,7 @@ bool SPxSolver::leave(int leaveIdx)
                              << ": coPvec.delta error = " << tmp.length() 
                              << std::endl; )
    }
-#endif  // NDEBUG
+#endif  // ENABLE_ADDITIONAL_CHECKS
 
    setupPupdate();
 
@@ -624,7 +624,7 @@ bool SPxSolver::leave(int leaveIdx)
          else
             SPxBasis::solve4update (theFvec->delta(), newVector);
 
-#ifndef NDEBUG
+#ifndef ENABLE_ADDITIONAL_CHECKS
          {
             SSVector tmp(dim(), epsilon());
             SPxBasis::solve(tmp, newVector);
@@ -632,7 +632,7 @@ bool SPxSolver::leave(int leaveIdx)
             if (tmp.length() > delta())
                MSG_WARNING( spxout << "WLEAVE62\t(" << tmp.length() << ")\n"; )
          }
-#endif  // NDEBUG
+#endif  // ENABLE_ADDITIONAL_CHECKS
 
 
          if (fabs(theFvec->delta()[leaveIdx]) < reject_leave_tol)
@@ -756,7 +756,7 @@ bool SPxSolver::leave(int leaveIdx)
       else
          m_numCycle /= 2;
 
-#ifndef NDEBUG
+#ifndef ENABLE_ADDITIONAL_CHECKS
       {
          DVector tmp = fVec();
          multBaseWith(tmp);
@@ -770,7 +770,7 @@ bool SPxSolver::leave(int leaveIdx)
             MSG_WARNING( spxout << "WLEAVE65\t(" << tmp.length() << ")\n"; )
          }
       }
-#endif  // NDEBUG
+#endif  // ENABLE_ADDITIONAL_CHECKS
 
       return true;
    }

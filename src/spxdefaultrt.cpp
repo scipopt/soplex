@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.21 2005/08/09 19:32:11 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.22 2005/08/18 16:14:28 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -100,7 +100,7 @@ int SPxDefaultRT::selectLeave(Real& val)
          val = (x > epsilon) ? ub[leave] : lb[leave];
          val = (val - vec[leave]) / x;
       }
-      assert(val > -epsilon);
+      ASSERT_WARN( "WDEFRT01", val > -epsilon );
    }
    else
    {
@@ -142,7 +142,7 @@ int SPxDefaultRT::selectLeave(Real& val)
          val = (x < epsilon) ? ub[leave] : lb[leave];
          val = (val - vec[leave]) / x;
       }
-      assert(val < epsilon);
+      ASSERT_WARN( "WDEFRT02", val < epsilon );
    }
    return leave;
 }

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: solve.cpp,v 1.32 2005/07/26 17:02:52 bzforlow Exp $"
+#pragma ident "@(#) $Id: solve.cpp,v 1.33 2005/08/18 16:14:28 bzfhille Exp $"
 
 #include <assert.h>
 
@@ -615,8 +615,8 @@ void CLUFactor::solveUleft(Real* p_work, Real* vec)
       int  r  = row.orig[i];
       Real x  = vec[c];
 
-      assert(fabs(x) < 1e40);
-      assert(fabs(vec[c]) < 1e40);
+      ASSERT_WARN( "WSOLVE01", fabs(x) < 1e40 );
+      ASSERT_WARN( "WSOLVE02", fabs(vec[c]) < 1e40 );
 
       Real y = vec[c];
 
@@ -624,24 +624,24 @@ void CLUFactor::solveUleft(Real* p_work, Real* vec)
 
       if (x != 0.0)
       {
-         assert(fabs(diag[r]) < 1e40);
+         ASSERT_WARN( "WSOLVE03", fabs(diag[r]) < 1e40 );
 
          x        *= diag[r];
          p_work[r] = x;
 
-         assert(fabs(x) < 1e40);
+         ASSERT_WARN( "WSOLVE04", fabs(x) < 1e40 );
 
          int end = u.row.start[r] + u.row.len[r];
 
          for(int m = u.row.start[r]; m < end; m++)
          {
-            assert(fabs(u.row.val[m]) < 1e40);
-            assert(fabs(vec[u.row.idx[m]]) < infinity);
+            ASSERT_WARN( "WSOLVE05", fabs(u.row.val[m]) < 1e40 );
+            ASSERT_WARN( "WSOLVE06", fabs(vec[u.row.idx[m]]) < infinity );
             vec[u.row.idx[m]] -= x * u.row.val[m];
-            assert(fabs(vec[u.row.idx[m]]) < 1e40);
+            ASSERT_WARN( "WSOLVE07", fabs(vec[u.row.idx[m]]) < 1e40 );
          }
       }
-      assert(fabs(y) < 1e40);
+      ASSERT_WARN( "WSOLVE08", fabs(y) < 1e40 );
    }
 }
 #endif

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.19 2005/01/12 12:00:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.20 2005/08/18 16:14:29 bzfhille Exp $"
 
 #include <assert.h>
 
@@ -74,7 +74,7 @@ void SPxWeightPR::computeRP(int start, int end)
 
       rPenalty[i] = (solver()->rowVector(i) * solver()->maxObj()) * objlength
                     / solver()->rowVector(i).length2();
-      assert(rPenalty[i] > -1 - solver()->epsilon());
+      ASSERT_WARN( "WWGTPR01", rPenalty[i] > -1 - solver()->epsilon() );
    }
 }
 
@@ -83,7 +83,7 @@ void SPxWeightPR::computeCP(int start, int end)
    for (int i = start; i < end; ++i)
    {
       cPenalty[i] = solver()->maxObj(i) * objlength;
-      assert(cPenalty[i] > -1 - solver()->epsilon());
+      ASSERT_WARN( "WWGTPR02", cPenalty[i] > -1 - solver()->epsilon() );
    }
 }
 

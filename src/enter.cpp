@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.33 2005/08/09 19:32:10 bzforlow Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.34 2005/08/18 16:14:28 bzfhille Exp $"
 
 // #define DEBUGGING 1
 
@@ -812,7 +812,7 @@ bool SPxSolver::enter(SPxId& enterId)
     */
    if (theFvec->delta().isSetup() && theFvec->delta().size() == 0)
       SPxBasis::solve4update(theFvec->delta(), *enterVec);
-#ifndef NDEBUG
+#if ENABLE_ADDITIONAL_CHECKS
    else
    {
       DVector tmp(dim());
@@ -823,7 +823,7 @@ bool SPxSolver::enter(SPxId& enterId)
          MSG_ERROR( spxout << "EENTER09 fVec updated error = " 
                            << tmp.length() << std::endl; )
    }
-#endif  // NDEBUG
+#endif  // ENABLE_ADDITIONAL_CHECKS
 
    if (m_numCycle > m_maxCycle)
    {

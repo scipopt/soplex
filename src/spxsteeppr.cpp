@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.30 2005/08/09 19:32:13 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.31 2005/08/18 16:14:29 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -225,7 +225,7 @@ void SPxSteepPR::left4(int n, SPxId id)
       Real        beta_q        = thesolver->coPvec().delta().length2() * rhov_1 * rhov_1;
 
       //TK: I gave the 0.5 extra, because I am not sure how hard this assert is.
-      assert(fabs(rhoVec[n]) >= theeps * 0.5);
+      ASSERT_WARN( "WSTEEP04", fabs(rhoVec[n]) >= theeps * 0.5 );
 
       //  Update #coPenalty# vector
       const IdxSet& rhoIdx = thesolver->fVec().idx();
@@ -271,7 +271,7 @@ int SPxSteepPR::selectLeave()
       {         
          /**@todo this was an assert! is an assertion correct?*/
          // assert(coPenalty_ptr[i] >= theeps);
-#ifndef NDEBUG
+#ifndef ENABLE_ADDITIONAL_CHECKS
          if( coPenalty_ptr[i] < theeps )
          {
             MSG_ERROR( spxout << "ESTEEP02 SPxSteepPR::selectLeaveX(): This shall not be!"

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.21 2005/01/12 12:00:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.22 2005/08/18 16:14:28 bzfhille Exp $"
 
 #include "spxdefines.h"
 #include "spxdevexpr.h"
@@ -118,7 +118,7 @@ void SPxDevexPR::left4X(int n, const SPxId& id, int start, int incr)
       Real rhov_1 = 1 / rhoVec[n];
       Real beta_q = thesolver->coPvec().delta().length2() * rhov_1 * rhov_1;
 
-      assert(fabs(rhoVec[n]) >= theeps);
+      ASSERT_WARN( "WDEVEX01", fabs(rhoVec[n]) >= theeps );
 
       //  Update #coPenalty# vector
       const IdxSet& rhoIdx = thesolver->fVec().idx();

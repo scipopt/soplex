@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.24 2005/07/25 15:24:36 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.25 2005/08/18 16:14:28 bzfhille Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
@@ -41,6 +41,51 @@
 namespace soplex
 {
 #define SOPLEX_VERSION   122
+
+/*-----------------------------------------------------------------------------
+ * Assertion Macros etc.
+ *-----------------------------------------------------------------------------
+ */
+
+/**
+   \brief Macro for assertion which can be turned into warnings.
+
+   If both \c NDEBUG and \c WITH_WARNINGS are defined the failed 
+   assertion is converted to a warning. In all other cases this macro is 
+   equivalent to assert.
+
+   @param  prefix  Short string for grepping in source code.
+   @param  expr    Expression that must be satisfied.
+*/
+#if defined (NDEBUG) && defined (WITH_WARNINGS)
+#define ASSERT_WARN( prefix, expr )              \
+   if ( !( expr ) )                                                     \
+      {                                                                 \
+         MSG_WARNING( spxout                                            \
+                      << prefix                                         \
+                      << " failed assertion on line " << __LINE__       \
+                      << " in file " << __FILE__ << ": "                \
+                      << #expr                                          \
+                      << std::endl; );                                  \
+      }
+#else // just a normal assert
+#define ASSERT_WARN( prefix, expr ) ( assert( expr ) )
+#endif
+
+
+/**
+   \brief This macro evaluates to true if additional checks for warnings shall be
+          included.
+
+   It will be used to conditionally include larger blocks of code doing additional
+   checking. Depending on this block's code there may be a warning or an assert.
+*/
+#if !defined (NDEBUG) || defined (WITH_WARNINGS)
+#define ENABLE_ADDITIONAL_CHECKS 1
+#else
+#define ENABLE_ADDITIONAL_CHECKS 0
+#endif
+
 
 /*-----------------------------------------------------------------------------
  * Debugging Macros etc.
