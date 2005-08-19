@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxaggregatesm.h,v 1.12 2005/08/09 19:32:11 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxaggregatesm.h,v 1.13 2005/08/19 13:58:49 bzforlow Exp $"
 
 /**@file  spxaggregatesm.h
  * @brief LP variable aggregation.
@@ -49,6 +49,9 @@ public:
    /// Compares two #RowCnt%s.
    struct Compare
    {
+   public:
+      Compare() {}
+
       inline
       int operator()( const RowCnt& i1, const RowCnt& i2) const
       {
