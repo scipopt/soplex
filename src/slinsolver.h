@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slinsolver.h,v 1.10 2002/11/25 16:51:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: slinsolver.h,v 1.11 2005/08/19 13:58:28 bzforlow Exp $"
 
 /**@file  slinsolver.h
  * @brief Sparse Linear Solver virtual base class.
@@ -44,6 +44,10 @@ namespace soplex
 class SLinSolver
 {
 public:
+
+   //---------------------------------------
+   /**@name Types */
+   //@{
    /// status flags of the #SLinSolver class.
    enum Status
    {
@@ -60,7 +64,9 @@ public:
       /// An error has occurred.
       ERROR    = 8
    };
+   //@}
 
+   //---------------------------------------
    /**@name Miscellaneous */
    //@{
    /// returns the #Status of the #SLinSolver.
@@ -148,8 +154,12 @@ public:
    //@}
 
 
+   //---------------------------------------
    /**@name Constructors / Destructors */
    //@{
+   /// destructor.
+   SLinSolver()
+   {}
    /// destructor.
    virtual ~SLinSolver()
    {}
