@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.85 2005/08/18 16:14:28 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.86 2005/08/19 13:59:28 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -517,7 +517,6 @@ SPxSolver::Status SPxSolver::solve()
 void SPxSolver::testVecs()
 {
    METHOD( "SPxSolver::testVecs()" );
-   int i;
    DVector tmp(dim());
 
    tmp = *theCoPvec;
@@ -558,7 +557,7 @@ void SPxSolver::testVecs()
 #ifndef ENABLE_ADDITIONAL_CHECKS
    if (type() == ENTER)
    {
-      for (i = 0; i < dim(); ++i)
+      for (int i = 0; i < dim(); ++i)
       {
          if (theCoTest[i] < -delta() && isCoBasic(i))
          {
@@ -571,7 +570,8 @@ void SPxSolver::testVecs()
                               << ", delta()=" << delta() << std::endl; )
          }
       }
-      for (i = 0; i < coDim(); ++i)
+
+      for (int i = 0; i < coDim(); ++i)
       {
          if (theTest[i] < -delta() && isBasic(i))
          {
