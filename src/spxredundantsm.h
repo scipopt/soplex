@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.h,v 1.14 2003/01/15 17:26:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.h,v 1.15 2005/08/19 13:59:04 bzforlow Exp $"
 
 /**@file  spxredundantsm.h
  * @brief Remove singletons from LP.
@@ -49,12 +49,20 @@ namespace soplex
 class SPxRedundantSM : public SPxSimplifier
 {
 private:
+
+   //------------------------------------
+   //**@name Types */
+   //@{
+   /// 
    struct RowHash
    {
+   public: 
+      RowHash() {}       ///< constructor
+
       int          row;  ///< row no.
       unsigned int hid;  ///< hash id
 
-      int operator()(const RowHash& rh1, const RowHash& rh2) const
+      int operator() (const RowHash& rh1, const RowHash& rh2) const
       {
          // rh1.hid - rh2.hid is a bas idea, because they are unsigned
 
@@ -68,8 +76,14 @@ private:
          return rh1.row - rh2.row;
       }
    };
+   //@}
 
 private:
+
+   //------------------------------------
+   //**@name Data */
+   //@{
+   /// 
    DVector        m_prim;       ///< unsimplified primal solution vector.
    DVector        m_dual;       ///< unsimplified dual solution vector.
    DataArray<int> m_cperm;      ///< column permutation vector.
@@ -77,8 +91,13 @@ private:
    DSVector       m_pval;       ///< fixed variable values.
    Real           m_epsilon;    ///< epsilon zero
    Real           m_delta;      ///< maximum bound violation
+   //@}
 
 private:
+
+   //------------------------------------
+   //**@name Private helpers */
+   //@{
    ///
    void fixColumn(SPxLP& lp, int i);
    ///
@@ -103,8 +122,13 @@ private:
    {
       return m_delta;
    }
+   //@}
 
 public:
+
+   //------------------------------------
+   //**@name Constructors / destructors */
+   //@{
    /// default constructor
    SPxRedundantSM() 
       : SPxSimplifier("Redundant")
@@ -112,12 +136,18 @@ public:
    /// destructor.
    virtual ~SPxRedundantSM()
    {}  
+   //@}
+
+   //------------------------------------
+   //**@name LP simplification */
+   //@{
    /// Remove singletons from the LP.
    virtual Result simplify(SPxLP& lp, Real eps, Real delta);
    /// returns a reference to the unsimplified primal solution.
    virtual const Vector& unsimplifiedPrimal(const Vector& x);
    /// returns a reference to the unsimplified dual solution. 
    virtual const Vector& unsimplifiedDual(const Vector& pi);
+   //@}
 };
 } // namespace soplex
 #endif // _SPXREDUNDANTSM_H_
