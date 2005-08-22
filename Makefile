@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.59 2005/08/04 15:42:35 bzforlow Exp $
+# $Id: Makefile,v 1.60 2005/08/22 18:17:13 bzfpfend Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -18,11 +18,8 @@ ARCH            :=      $(shell uname -m | \
 			-e s/9000..../hppa/ \
 			-e s/Power\ Macintosh/ppc/ \
 			-e s/00........../pwr4/)
-OSTYPE		:=	$(shell uname -s | \
-			tr A-Z a-z | \
-			sed \
-			-e s/irix../irix/ )
-HOSTNAME        :=      $(shell uname -n | tr A-Z a-z)
+OSTYPE		:=	$(shell uname -s | tr '[:upper:]' '[:lower:]' | sed -e s/irix../irix/ )
+HOSTNAME	:=	$(shell uname -n | tr '[:upper:]' '[:lower:]')
 
 VERBOSE		=	false
 OPT		=	opt
