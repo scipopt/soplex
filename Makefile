@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.60 2005/08/22 18:17:13 bzfpfend Exp $
+# $Id: Makefile,v 1.61 2005/08/25 06:50:44 bzfhille Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -112,10 +112,10 @@ LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
 $(BINFILE):	_$(BINDIR) _$(BINOBJDIR) $(LIBFILE) $(BINOBJFILES)
 		@echo "-> linking $@"
 ifeq ($(VERBOSE), true)
-		$(CXX) $(CXXFLAGS) $(BINOBJFILES) \
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOBJFILES) \
 		-L$(LIBDIR) -l$(BINNAME) $(LDFLAGS) -o $@
 else
-		@$(CXX) $(CXXFLAGS) $(BINOBJFILES) \
+		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOBJFILES) \
 		-L$(LIBDIR) -l$(BINNAME) $(LDFLAGS) -o $@
 endif
 
