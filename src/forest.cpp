@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: forest.cpp,v 1.21 2003/01/13 19:04:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: forest.cpp,v 1.22 2005/08/25 09:17:18 bzfhille Exp $"
 
 #include <assert.h>
 
@@ -239,6 +239,33 @@ void CLUFactor::forestReMaxCol(int p_col, int len)
 
 /*****************************************************************************/
 
+/**
+   \brief Performs the Forrest-Tomlin update of the LU factorization.
+
+   BH: I suppose this is implemented as described in UH Suhl, LM Suhl: A fast LU
+       update for linear programming, Annals of OR 43, p. 33-47, 1993.
+
+   @param  p_col      Index of basis column to replace.
+   @param  p_work     Dense vector to substitute in the basis.
+   @param  num        Number of nonzeros in vector represented by p_work.
+   @param  nonz       Indices of nonzero elements in vector p_work.
+
+   The parameters num and nonz are used for the following optimization: If both
+   are nonzero, indices of the nonzero elements provided in nonz (num giving
+   their number) allow to access only those nonzero entries.  Otherwise we have
+   to go through the entire dense vector element by element.
+
+   After copying p_work into U, p_work is used to expand the row r, which is
+   needed to restore the triangular structure of U. 
+
+   Also num and nonz are used to maintain a heap if there are only very few 
+   nonzeros to be eliminated. This is plainly wrong if the method is called with
+   nonz==0, see todo at the corresponding place below.
+
+   @todo Use an extra member variable as a buffer for working with the dense 
+         row instead of misusing p_work. I think that should be as efficient and
+         much cleaner.
+*/
 
 void CLUFactor::forestUpdate(int p_col, Real* p_work, int num, int *nonz)
 {
@@ -288,11 +315,17 @@ void CLUFactor::forestUpdate(int p_col, Real* p_work, int num, int *nonz)
       rval[k] = rval[h];
    }
 
-   /*  Insert new vector column p_col
-    *  thereby determining the highest permuted row index r.
-    */
+   /*  Insert new vector column p_col thereby determining the highest permuted
+       row index r.
+
+       Distinguish between optimized call (num > 0, nonz != 0) and 
+       non-optimized one.
+   */
    if (num)
    {
+      // Optimized call.
+      assert( nonz != 0 );
+
       clen[p_col] = 0;
       if (num > cmax[p_col])
          forestReMaxCol(p_col, num);
@@ -336,6 +369,9 @@ void CLUFactor::forestUpdate(int p_col, Real* p_work, int num, int *nonz)
    }
    else
    {
+      // Non-optimized call: We have to access all elements of p_work.
+      assert( nonz == 0 );
+
       /*
       clen[col] = 0;
       reMaxCol(fac, col, dim);
@@ -422,6 +458,15 @@ void CLUFactor::forestUpdate(int p_col, Real* p_work, int num, int *nonz)
 
       if (i < verySparseFactor * (dim - c)) // few nonzeros to be eliminated
       {
+         /** 
+          The following assert is obviously violated if this method is called
+          with nonzero==0.
+
+          @todo Use an extra member variable as a buffer for the heap instead of
+                misusing nonz.
+       */
+         assert(nonz != 0);
+
          /*  move row r from U to p_work
           */
          num = 0;
@@ -450,13 +495,12 @@ void CLUFactor::forestUpdate(int p_col, Real* p_work, int num, int *nonz)
          while (num)
          {
 #ifndef NDEBUG
-            assert(nonz != 0);
-
-            // The numbers seem to be often 1e-100, is this ok ?
+          // The numbers seem to be often 1e-100, is this ok ?
             for (i = 0; i < num; ++i)
                assert(p_work[corig[nonz[i]]] != 0.0);
 #endif // NDEBUG
             i = deQueueMin(nonz, &num);
+
             if (i == r)
                break;
             k = corig[i];
@@ -522,7 +566,13 @@ void CLUFactor::forestUpdate(int p_col, Real* p_work, int num, int *nonz)
          {
             j = corig[nonz[i]];
             x = p_work[j];
-            assert(x != 0.0);
+
+            // BH 2005-08-24: This if is very important. It may well happen that
+            // during the elimination of row r a nonzero elements cancels out 
+            // and becomes zero. This would lead to an infinite loop in the 
+            // above elimination code, since the corresponding column index would
+            // be enqueued for further elimination again and agian.
+            if ( x != 0.0 )
             {
                if (fabs(x) > l_maxabs)
                   l_maxabs = fabs(x);
