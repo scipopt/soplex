@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.42 2005/08/09 19:32:11 bzforlow Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.43 2005/08/25 09:17:50 bzfhille Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -269,10 +269,20 @@ SLUFactor::Status SLUFactor::change(
 {
    METHOD( "SLUFactor::Status()" );
 
+   // BH 2005-08-23: The boolean usetup indicates that an "update
+   // vector" has been set up. I suppose that SSVector forest is this
+   // update vector, which is set up by solveRight4update() and
+   // solve2right4update() in order to optimize the basis update.
+
    if (usetup)
    {
       if (l.updateType == FOREST_TOMLIN)              // FOREST_TOMLIN updates
       {
+         // BH 2005-08-19: The size of a SSVector is the size of the
+         // index set, i.e.  the number of nonzeros which is only
+         // defined if the SSVector is set up.  Since
+         // SSVector::altValues() calls unSetup() the size needs to be
+         // stored before the following call.
          int fsize = forest.size(); // see altValues()
          forestUpdate(idx, forest.altValues(), fsize, forest.altIndexMem());
          forest.setSize(0);

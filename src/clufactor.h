@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clufactor.h,v 1.20 2005/08/09 19:32:09 bzforlow Exp $"
+#pragma ident "@(#) $Id: clufactor.h,v 1.21 2005/08/25 09:17:50 bzfhille Exp $"
 
 /**@file  clufactor.h
  * @brief Implementation of sparse LU factorization.
@@ -120,7 +120,7 @@ protected:
          int    size;        ///< size of arrays val and idx
          int    used;        ///< used entries of arrays idx and val
          Real*  val;         ///< hold nonzero values
-         int*   idx;         ///< hold nonzero indices
+         int*   idx;         ///< hold column indices of nonzeros 
          int*   start;       ///< starting positions in val and idx
          int*   len;         ///< used nonzeros per row vectors
          int*   max;         /*!< \brief maximum available nonzeros per row:
@@ -135,7 +135,7 @@ protected:
          Dring *elem;        ///< %Array of ring elements.
          int size;           ///< size of array idx
          int used;           ///< used entries of array idx
-         int *idx;           ///< hold nonzero indices
+         int *idx;           ///< hold row indices of nonzeros
          Real *val;          /*!< \brief hold nonzero values: this is only initialized
                                 in the end of the factorization with DEFAULT
                                 updates.                            */

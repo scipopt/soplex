@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.h,v 1.17 2005/03/11 11:43:33 bzfpfend Exp $"
+#pragma ident "@(#) $Id: slufactor.h,v 1.18 2005/08/25 09:17:50 bzfhille Exp $"
 
 /**@file  slufactor.h
  * @brief Implementation of Sparse Linear Solver.
@@ -58,7 +58,7 @@ protected:
    bool       usetup;        ///< TRUE iff update vector has been setup
    UpdateType uptype;        ///< the current #UpdateType.
    SSVector   eta;           ///< 
-   SSVector   forest;        ///<
+   SSVector   forest;        ///< ? Update vector set up by solveRight4update() and solve2right4update()
    Real       lastThreshold; ///< pivoting threshold of last factorization
 
    /**@name Control Parameters */
