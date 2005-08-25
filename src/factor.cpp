@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.44 2005/08/09 19:32:10 bzforlow Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.45 2005/08/25 07:04:15 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -1660,19 +1660,20 @@ void CLUFactor::minLMem(int size)
    }
 }
 
+
 int CLUFactor::makeLvec(int p_len, int p_row)
 {
    METHOD( "CLUFactor::makeLvec()" );
-   int* p_lrow = l.row;
-   int* p_lbeg = l.start;
-   int first   = p_lbeg[l.firstUnused];
 
    if (l.firstUnused >= l.startSize)
    {
       l.startSize += 100;
       spx_realloc(l.start, l.startSize);
-      p_lbeg = l.start;
    }
+
+   int* p_lrow = l.row;
+   int* p_lbeg = l.start;
+   int first   = p_lbeg[l.firstUnused];
 
    assert(p_len > 0 && "ERROR: no empty columns allowed in L vectors");
 
