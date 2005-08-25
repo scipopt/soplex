@@ -1,6 +1,6 @@
-#--- $Id: make.linux.x86.gnu.gcov.static,v 1.1 2005/07/21 11:03:01 bzfhille Exp $
+#--- $Id: make.linux.x86.gnu.gcov.static,v 1.2 2005/08/25 06:56:00 bzfhille Exp $
 CXX	=	g++
 CPPFLAGS=	-Isrc -DNDEBUG -DWITH_ZLIB
 CXXFLAGS=	-O0 -g -fprofile-arcs -ftest-coverage
-LDFLAGS	=	-lz -lm
+LDFLAGS	=	-lz -lm -static
 ARFLAGS	=	crs
