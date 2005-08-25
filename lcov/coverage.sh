@@ -66,7 +66,7 @@ rm -f $OBJ_DIR/*.gcda
 
 # Compile soplex with LCOV support and create coverage data by running the test suite.
 cd ..
-make COMP=gnu OPT=gcov TEST=$TEST_SUITE ALGO="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15" check
+make COMP=gnu OPT=gcov TEST=$TEST_SUITE ALGO="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15" LIMIT="-l7200" check
 cd lcov
 
 # We need to ensure that there is a link to "src" in $OBJ_DIR, otherwise
