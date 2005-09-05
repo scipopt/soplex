@@ -1,4 +1,4 @@
-#--- $Id: make.cygwin.0.x86.gnu.opt.static,v 1.1 2005/09/05 13:52:22 bzfpfend Exp $
+#--- $Id: make.cygwin.x86.gnu.opt.static,v 1.1 2005/09/05 14:10:18 bzfpfend Exp $
 CXX	=	g++
 CPPFLAGS=	-Isrc -DNDEBUG
 CXXFLAGS=	-O3 -march=pentiumpro -fno-exceptions \
