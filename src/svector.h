@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.h,v 1.23 2005/08/09 19:32:13 bzforlow Exp $"
+#pragma ident "@(#) $Id: svector.h,v 1.24 2005/09/16 12:42:39 bzfhille Exp $"
 
 /**@file  svector.h
  * @brief Sparse vectors.
@@ -319,8 +319,10 @@ public:
    SVector& operator=(const SVector& sv);
    /// assignment operator from vector.
    SVector& operator=(const Vector& sv);
+#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check.
    bool isConsistent() const;
+#endif
    /// default constructor.
    /** The constructor expects one memory block where to store the nonzero
     *  elements. This must be passed to the constructor, where the \em number

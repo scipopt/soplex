@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcol.h,v 1.10 2002/03/03 13:50:32 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpcol.h,v 1.11 2005/09/16 12:42:31 bzfhille Exp $"
 
 /**@file  lpcol.h
  * @brief LP column.
@@ -120,11 +120,13 @@ public:
       : up(p_upper), low(p_lower), object(p_obj), vec(p_vector)
    {}
 
+#ifndef NO_CONSISTENCY_CHECKS
    /// check consistency.
    bool isConsistent() const
    {
       return vec.isConsistent();
    }
+#endif
 };
 } // namespace soplex
 #endif // _LPCOL_H_

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: array.h,v 1.16 2005/08/09 19:32:09 bzforlow Exp $"
+#pragma ident "@(#) $Id: array.h,v 1.17 2005/09/16 12:42:28 bzfhille Exp $"
 
 /**@file  array.h
  * @brief Save arrays of arbitrary types.
@@ -246,6 +246,7 @@ public:
          delete[] data;
    }
 
+#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check
    bool isConsistent() const
    {
@@ -254,6 +255,7 @@ public:
 
       return true;
    }
+#endif
    //@}
 };
 } // namespace soplex

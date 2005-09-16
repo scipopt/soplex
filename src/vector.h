@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector.h,v 1.16 2005/08/09 19:32:14 bzforlow Exp $"
+#pragma ident "@(#) $Id: vector.h,v 1.17 2005/09/16 12:42:40 bzfhille Exp $"
 
 /**@file  vector.h
  * @brief Dense vector for linear algebra.
@@ -248,8 +248,10 @@ public:
    /// output operator.
    friend std::ostream& operator<<(std::ostream& s, const Vector& vec);
 
+#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check.
    bool isConsistent() const;
+#endif
 
    /// set vector to 0.
    void clear()

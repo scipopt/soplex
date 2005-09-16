@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.38 2005/08/09 19:32:13 bzforlow Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.39 2005/09/16 12:42:38 bzfhille Exp $"
 
 #include <iostream>
 #include <iomanip>
@@ -1100,6 +1100,8 @@ SSVector& SSVector::assign2productAndSetup(const SVSet& A, SSVector& x)
    return *this;
 }
 
+
+#ifndef NO_CONSISTENCY_CHECKS
 bool SSVector::isConsistent() const
 {
    if (Vector::dim() > IdxSet::max())
@@ -1126,6 +1128,7 @@ bool SSVector::isConsistent() const
    }
    return DVector::isConsistent() && IdxSet::isConsistent();
 }
+#endif
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

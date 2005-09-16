@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.19 2005/08/09 19:32:13 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.20 2005/09/16 12:42:36 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -808,6 +808,7 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& old)
 }
 #endif // no copy constructor and assignment operator
 
+#ifndef NO_CONSISTENCY_CHECKS
 bool SPxSolver::isConsistent() const
 {
    METHOD( "SPxSolver::isConsistent()" );
@@ -910,6 +911,8 @@ bool SPxSolver::isConsistent() const
           && SPxBasis::isConsistent()
          ;
 }
+#endif
+
 
 void SPxSolver::setTerminationTime(Real p_time)
 {

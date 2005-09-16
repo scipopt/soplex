@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcolset.cpp,v 1.12 2002/12/08 11:09:21 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpcolset.cpp,v 1.13 2005/09/16 12:42:31 bzfhille Exp $"
 
 #include <assert.h>
 
@@ -147,6 +147,7 @@ void LPColSet::clear()
    object.reDim(num());
 }
 
+#ifndef NO_CONSISTENCY_CHECKS
 bool LPColSet::isConsistent() const
 {
    if (low.dim() != object.dim())
@@ -158,6 +159,7 @@ bool LPColSet::isConsistent() const
 
    return low.isConsistent() && up.isConsistent() && SVSet::isConsistent();
 }
+#endif
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

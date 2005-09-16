@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector.cpp,v 1.12 2003/01/05 19:03:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: vector.cpp,v 1.13 2005/09/16 12:42:40 bzfhille Exp $"
 
 #include <iostream>
 
@@ -153,6 +153,7 @@ Real Vector::operator*(const SVector& v) const
    return x;
 }
 
+#ifndef NO_CONSISTENCY_CHECKS
 bool Vector::isConsistent() const
 {
    if (dim() > 0 && val == 0)
@@ -160,6 +161,7 @@ bool Vector::isConsistent() const
 
    return true;
 }
+#endif
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: updatevector.h,v 1.11 2005/08/05 16:33:13 bzforlow Exp $"
+#pragma ident "@(#) $Id: updatevector.h,v 1.12 2005/09/16 12:42:40 bzfhille Exp $"
 
 /**@file  updatevector.h
  * @brief Dense vector with semi-sparse vector for updates
@@ -136,8 +136,10 @@ public:
       , thedelta(p_dim, p_eps)
    {}
 
+#ifndef NO_CONSISTENCY_CHECKS
    /// 
    bool isConsistent() const;
+#endif
 };
 
 

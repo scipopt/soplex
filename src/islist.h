@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: islist.h,v 1.14 2005/08/09 19:32:10 bzforlow Exp $"
+#pragma ident "@(#) $Id: islist.h,v 1.15 2005/09/16 12:42:31 bzfhille Exp $"
 
 /**@file  islist.h
  * @brief Generic single linked list.
@@ -389,6 +389,7 @@ public:
       }
    }
 
+#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check.
    bool isConsistent() const
    {
@@ -403,6 +404,7 @@ public:
 
       return true;
    }
+#endif
    //@}
 
    //------------------------------------

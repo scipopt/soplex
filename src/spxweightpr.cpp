@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.20 2005/08/18 16:14:29 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.21 2005/09/16 12:42:37 bzfhille Exp $"
 
 #include <assert.h>
 
@@ -374,6 +374,7 @@ void SPxWeightPR::removedCoVecs(const int perm[])
    }
 }
 
+#ifndef NO_CONSISTENCY_CHECKS
 bool SPxWeightPR::isConsistent() const
 {
    if (solver() != 0)
@@ -385,6 +386,7 @@ bool SPxWeightPR::isConsistent() const
    }
    return true;
 }
+#endif
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

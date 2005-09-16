@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscaler.cpp,v 1.9 2005/06/21 12:45:13 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxscaler.cpp,v 1.10 2005/09/16 12:42:36 bzfhille Exp $"
 
 /**@file  spxscaler.cpp
  * @brief LP scaling base class.
@@ -353,12 +353,14 @@ Real SPxScaler::maxRowRatio(const SPxLP& lp) const
    return pmax;
 }
 
+#ifndef NO_CONSISTENCY_CHECKS
 bool SPxScaler::isConsistent() const
 {
    METHOD( "SPxScaler::isConsistent()" );
 
    return m_colscale.isConsistent() && m_rowscale.isConsistent();
 }
+#endif
 
 } // namespace soplex
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.25 2005/08/09 19:32:12 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.cpp,v 1.26 2005/09/16 12:42:35 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -27,6 +27,7 @@
 namespace soplex
 {
 
+#ifndef NO_CONSISTENCY_CHECKS
 bool SPxHybridPR::isConsistent() const
 {
    if (thesolver != 0 &&
@@ -39,6 +40,7 @@ bool SPxHybridPR::isConsistent() const
           && devex.isConsistent()
           && parmult.isConsistent();
 }
+#endif
 
 void SPxHybridPR::load(SPxSolver* p_solver)
 {

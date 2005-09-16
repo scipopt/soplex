@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datahashtable.h,v 1.20 2005/08/09 19:32:09 bzforlow Exp $"
+#pragma ident "@(#) $Id: datahashtable.h,v 1.21 2005/09/16 12:42:29 bzfhille Exp $"
 
 /**@file  datahashtable.h
  * @brief Generic hash table for data objects.
@@ -222,6 +222,7 @@ public:
    //-----------------------------------
    /**@name Debugging */
    //@{
+#ifndef NO_CONSISTENCY_CHECKS
    /// checks whether #DataHashTable is consistent
    bool isConsistent() const
    {
@@ -241,6 +242,7 @@ public:
 
       return m_elem.isConsistent();
    }
+#endif
    //@}
 
    //-----------------------------------

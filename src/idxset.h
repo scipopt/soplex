@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idxset.h,v 1.7 2002/01/31 08:19:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: idxset.h,v 1.8 2005/09/16 12:42:31 bzfhille Exp $"
 
 /**@file  idxset.h
  * @brief Set of indices.
@@ -21,6 +21,7 @@
 #ifndef _IDXSET_H_
 #define _IDXSET_H_
 
+#include "spxdefines.h"
 #include <assert.h>
 
 namespace soplex
@@ -157,8 +158,10 @@ public:
     */
    IdxSet& operator=(const IdxSet& set);
 
+#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check.
    bool isConsistent() const;
+#endif
 
 private:
    /// no copy constructor.

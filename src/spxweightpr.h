@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightpr.h,v 1.13 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxweightpr.h,v 1.14 2005/09/16 12:42:37 bzfhille Exp $"
 
 /**@file  spxweightpr.h
  * @brief Weighted pricing.
@@ -82,8 +82,10 @@ public:
    virtual void removedVecs(const int perm[]);
    ///
    virtual void removedCoVec(int i);
+#ifndef NO_CONSISTENCY_CHECKS
    ///
    virtual bool isConsistent() const;
+#endif
 
    /// default constructor
    SPxWeightPR() 

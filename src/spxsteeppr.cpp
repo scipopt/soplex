@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.31 2005/08/18 16:14:29 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.32 2005/09/16 12:42:37 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -526,6 +526,7 @@ void SPxSteepPR::removedCoVecs(const int perm[])
    prefSetup = 0;
 }
 
+#ifndef NO_CONSISTENCY_CHECKS
 bool SPxSteepPR::isConsistent() const
 {
    if (thesolver != 0 && thesolver->type() == SPxSolver::LEAVE && setup == EXACT)
@@ -557,6 +558,7 @@ bool SPxSteepPR::isConsistent() const
    }
    return true;
 }
+#endif
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

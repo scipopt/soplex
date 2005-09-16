@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.h,v 1.18 2005/08/25 09:17:50 bzfhille Exp $"
+#pragma ident "@(#) $Id: slufactor.h,v 1.19 2005/09/16 12:42:34 bzfhille Exp $"
 
 /**@file  slufactor.h
  * @brief Implementation of Sparse Linear Solver.
@@ -173,8 +173,10 @@ public:
    /// prints the LU factorization to stdout.
    void dump() const;
 
+#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check.
    bool isConsistent() const;
+#endif
    //@}
 
    /**@name Constructors / Destructors */

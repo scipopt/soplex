@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.cpp,v 1.24 2005/08/09 19:32:13 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxweightst.cpp,v 1.25 2005/09/16 12:42:38 bzfhille Exp $"
 
 //#define DEBUGGING 1
 //#define TEST 1
@@ -31,6 +31,7 @@ namespace soplex
 #define EPS     1e-6
 #define STABLE  1e-3
 
+#ifndef NO_CONSISTENCY_CHECKS
 bool SPxWeightST::isConsistent() const
 {
    return rowWeight.isConsistent()
@@ -39,6 +40,7 @@ bool SPxWeightST::isConsistent() const
           && colUp.isConsistent()
           && SPxStarter::isConsistent();
 }
+#endif
 
 /* Generating the Starting Basis
    The generation of a starting basis works as follows: After setting up the

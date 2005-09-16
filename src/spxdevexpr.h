@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.h,v 1.15 2003/01/05 19:03:16 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.h,v 1.16 2005/09/16 12:42:35 bzfhille Exp $"
 
 /**@file  spxdevexpr.h
  * @brief Devex pricer.
@@ -78,8 +78,10 @@ public:
    virtual void addedVecs (int n);
    /// \p n covectors have been added to loaded LP.
    virtual void addedCoVecs(int n);
+#ifndef NO_CONSISTENCY_CHECKS
    ///
    virtual bool isConsistent() const;
+#endif
    /// default constructor
    SPxDevexPR() 
       : SPxPricer("Devex")

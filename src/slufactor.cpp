@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.43 2005/08/25 09:17:50 bzfhille Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.44 2005/09/16 12:42:34 bzfhille Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -952,11 +952,13 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
 }
 
 
+#ifndef NO_CONSISTENCY_CHECKS
 bool SLUFactor::isConsistent() const
 {
    METHOD( "SLUFactor::isConsistent()" );
    return CLUFactor::isConsistent();
 }
+#endif
 
 void SLUFactor::dump() const
 {

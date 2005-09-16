@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprow.h,v 1.11 2002/03/11 11:41:56 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lprow.h,v 1.12 2005/09/16 12:42:31 bzfhille Exp $"
 
 /**@file  lprow.h
  * @brief (In)equality for LPs.
@@ -144,11 +144,13 @@ public:
    /// Construct LPRow from passed \p rowVector, \p type and \p value
    LPRow(const SVector& rowVector, Type type, Real value);
 
+#ifndef NO_CONSISTENCY_CHECKS
    /// check consistency.
    bool isConsistent() const
    {
       return vec.isConsistent();
    }
+#endif
 };
 
 } // namespace soplex

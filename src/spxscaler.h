@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscaler.h,v 1.5 2003/01/12 13:09:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxscaler.h,v 1.6 2005/09/16 12:42:36 bzfhille Exp $"
 
 /**@file  spxscaler.h
  * @brief LP scaling base class.
@@ -98,8 +98,10 @@ public:
    /// maximum ratio between absolute biggest and smallest element in any row.
    virtual Real maxRowRatio(const SPxLP& lp) const;
 
+#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check
    virtual bool isConsistent() const;
+#endif
 };
 } // namespace soplex
 #endif // _SPXSCALER_H_

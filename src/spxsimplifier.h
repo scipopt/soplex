@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsimplifier.h,v 1.13 2003/01/13 19:04:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsimplifier.h,v 1.14 2005/09/16 12:42:36 bzfhille Exp $"
 
 /**@file  spxsimplifier.h
  * @brief LP simplification base class.
@@ -102,11 +102,13 @@ public:
    {
       return pi;
    }
+#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check
    virtual bool isConsistent() const
    {
       return true;
    }
+#endif
 };
 } // namespace soplex
 #endif // _SPXSIMPLIFIER_H_

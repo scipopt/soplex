@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.cpp,v 1.23 2003/01/13 19:04:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlp.cpp,v 1.24 2005/09/16 12:42:35 bzfhille Exp $"
 
 #include <stdio.h>
 
@@ -787,6 +787,7 @@ void SPxLP::changeElement(int i, int j, Real val)
    assert(isConsistent());
 }
 
+#ifndef NO_CONSISTENCY_CHECKS
 bool SPxLP::isConsistent() const
 {
    METHOD( "SPxLP::isConsistent()" );
@@ -821,6 +822,7 @@ bool SPxLP::isConsistent() const
    }
    return LPRowSet::isConsistent() && LPColSet::isConsistent();
 }
+#endif
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

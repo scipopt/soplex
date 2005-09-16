@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: updatevector.cpp,v 1.7 2002/01/31 08:19:31 bzfkocht Exp $"
+#pragma ident "@(#) $Id: updatevector.cpp,v 1.8 2005/09/16 12:42:39 bzfhille Exp $"
 
 #include "updatevector.h"
 #include "message.h"
@@ -32,6 +32,7 @@ UpdateVector& UpdateVector::operator=(const UpdateVector& rhs)
    return *this;
 }
 
+#ifndef NO_CONSISTENCY_CHECKS
 bool UpdateVector::isConsistent() const
 {
    if (dim() != thedelta.dim())
@@ -39,6 +40,7 @@ bool UpdateVector::isConsistent() const
 
    return DVector::isConsistent() && thedelta.isConsistent();
 }
+#endif
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

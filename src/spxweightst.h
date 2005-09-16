@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.h,v 1.14 2005/08/09 19:32:13 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxweightst.h,v 1.15 2005/09/16 12:42:38 bzfhille Exp $"
 
 
 /**@file  spxweightst.h
@@ -130,8 +130,10 @@ public:
    //-----------------------------------
    /**@name Debugging */
    //@{
+#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check.
    bool isConsistent() const;
+#endif
    //@}
 };
 

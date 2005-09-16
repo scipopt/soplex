@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.49 2005/08/09 19:32:11 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.50 2005/09/16 12:42:34 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -620,6 +620,8 @@ void SPxBasis::dump()
    spxout.setVerbosity( tmp_verbosity );
 }
 
+
+#ifndef NO_CONSISTENCY_CHECKS
 bool SPxBasis::isConsistent() const
 {
    METHOD( "SPxBasis::isConsistent()" );
@@ -664,6 +666,7 @@ bool SPxBasis::isConsistent() const
    return thedesc.isConsistent() && theBaseId.isConsistent() 
       && matrix.isConsistent() && factor->isConsistent();
 }
+#endif // CONSISTENCY_CHECKS
 
 SPxBasis::SPxBasis()
    : theLP (0)

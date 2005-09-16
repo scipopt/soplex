@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdesc.cpp,v 1.15 2005/08/09 19:32:12 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxdesc.cpp,v 1.16 2005/09/16 12:42:34 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -118,11 +118,13 @@ void SPxBasis::Desc::dump() const
    spxout.setVerbosity( tmp_verbosity );
 }
 
+#ifndef NO_CONSISTENCY_CHECKS
 bool SPxBasis::Desc::isConsistent() const
 {
    METHOD( "SPxBasis::Desc::isConsistent()" );
    return rowstat.isConsistent() && colstat.isConsistent();
 }
+#endif
 
 std::ostream& operator<<(std::ostream& os, const SPxBasis::Desc::Status& stat)
 {

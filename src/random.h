@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: random.h,v 1.9 2005/08/09 19:32:10 bzforlow Exp $"
+#pragma ident "@(#) $Id: random.h,v 1.10 2005/09/16 12:42:32 bzfhille Exp $"
 
 /**@file  random.h
  * @brief Random numbers.
@@ -126,11 +126,13 @@ public:
    //--------------------------------------
    /**@name Debugging */
    //@{
+#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check.
    bool isConsistent() const
    {
       return themin <= themax;
    }
+#endif
    //@}
 
    //--------------------------------------

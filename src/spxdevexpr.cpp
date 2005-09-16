@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.22 2005/08/18 16:14:28 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.23 2005/09/16 12:42:34 bzfhille Exp $"
 
 #include "spxdefines.h"
 #include "spxdevexpr.h"
@@ -29,6 +29,7 @@ void SPxDevexPR::load(SPxSolver* base)
    assert(isConsistent());
 }
 
+#ifndef NO_CONSISTENCY_CHECKS
 bool SPxDevexPR::isConsistent() const
 {
    if (thesolver != 0)
@@ -38,6 +39,7 @@ bool SPxDevexPR::isConsistent() const
 
    return true;
 }
+#endif
 
 void SPxDevexPR::setType(SPxSolver::Type tp)
 {

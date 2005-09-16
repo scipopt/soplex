@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxstarter.cpp,v 1.13 2005/08/09 19:32:13 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxstarter.cpp,v 1.14 2005/09/16 12:42:36 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -26,12 +26,14 @@
 namespace soplex
 {
 
+#ifndef NO_CONSISTENCY_CHECKS
 bool SPxStarter::isConsistent() const
 {
    MSG_ERROR( spxout << "ESTART95 Not yet implemented" << std::endl; )
 
    return true;
 }
+#endif
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

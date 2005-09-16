@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dsvector.cpp,v 1.15 2002/03/03 13:50:31 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dsvector.cpp,v 1.16 2005/09/16 12:42:29 bzfhille Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -89,6 +89,7 @@ DSVector::~DSVector()
    spx_free(theelem);
 }
 
+#ifndef NO_CONSISTENCY_CHECKS
 bool DSVector::isConsistent() const
 {
    if ((theelem != 0) && (mem() != theelem))
@@ -96,6 +97,7 @@ bool DSVector::isConsistent() const
 
    return true;
 }
+#endif
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

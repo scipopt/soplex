@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxstarter.h,v 1.8 2005/01/06 17:12:10 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxstarter.h,v 1.9 2005/09/16 12:42:36 bzfhille Exp $"
 
 
 /**@file  spxstarter.h
@@ -62,8 +62,10 @@ public:
    }
    /// generates start basis for loaded basis.
    virtual void generate(SPxSolver& base) = 0;
+#ifndef NO_CONSISTENCY_CHECKS
    /// checks consistency.
    virtual bool isConsistent() const;
+#endif
 };
 
 

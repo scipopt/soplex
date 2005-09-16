@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.45 2005/08/25 07:04:15 bzfhille Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.46 2005/09/16 12:42:30 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -1687,7 +1687,7 @@ int CLUFactor::makeLvec(int p_len, int p_row)
 }
 
 
-
+#ifndef NO_CONSISTENCY_CHECKS
 /*****************************************************************************/
 
 bool CLUFactor::isConsistent() const
@@ -1827,6 +1827,7 @@ bool CLUFactor::isConsistent() const
 #endif
    return true;
 }
+#endif // CONSISTENCY_CHECKS
 
 } // namespace soplex
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.cpp,v 1.18 2003/01/05 19:03:18 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svector.cpp,v 1.19 2005/09/16 12:42:39 bzfhille Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -255,6 +255,7 @@ std::ostream& operator<<(std::ostream& os, const SVector& v)
    return os;
 }
 
+#ifndef NO_CONSISTENCY_CHECKS
 bool SVector::isConsistent() const
 {
    if (m_elem != 0)
@@ -276,6 +277,7 @@ bool SVector::isConsistent() const
    }
    return true;
 }
+#endif
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dvector.h,v 1.11 2005/08/09 19:32:09 bzforlow Exp $"
+#pragma ident "@(#) $Id: dvector.h,v 1.12 2005/09/16 12:42:30 bzfhille Exp $"
 
 /**@file  dvector.h
  * @brief Dymnamic vectors.
@@ -153,8 +153,11 @@ public:
    {
       return memsize;
    }
+
+#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check.
    bool isConsistent() const;
+#endif
    //@}
 
    //--------------------------------------------------

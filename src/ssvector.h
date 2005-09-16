@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.h,v 1.20 2005/08/05 16:32:44 bzforlow Exp $"
+#pragma ident "@(#) $Id: ssvector.h,v 1.21 2005/09/16 12:42:38 bzfhille Exp $"
 
 
 /**@file  ssvector.h
@@ -329,8 +329,10 @@ public:
    /// clears vector.
    void clear ();
 
+#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check.
    bool isConsistent() const;
+#endif
    //@}
 
 

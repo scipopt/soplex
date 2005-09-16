@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.20 2005/08/09 19:32:13 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.21 2005/09/16 12:42:36 bzfhille Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -1680,8 +1680,10 @@ public:
    //------------------------------------
    /** Miscellaneous */
    //@{
+#ifndef NO_CONSISTENCY_CHECKS
    /// check consistency.
    bool isConsistent() const;
+#endif
    //@}
 
 private:

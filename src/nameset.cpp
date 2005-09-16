@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.cpp,v 1.26 2002/12/12 09:48:53 bzfkocht Exp $"
+#pragma ident "@(#) $Id: nameset.cpp,v 1.27 2005/09/16 12:42:32 bzfhille Exp $"
 
 #include <string.h>
 #include "spxdefines.h"
@@ -261,6 +261,7 @@ NameSet::~NameSet()
    spx_free(mem);
 }
 
+#ifndef NO_CONSISTENCY_CHECKS
 bool NameSet::isConsistent() const
 {
    if (memused > memmax)
@@ -280,6 +281,7 @@ bool NameSet::isConsistent() const
    }
    return set.isConsistent() && hashtab.isConsistent();
 }
+#endif
 
 std::ostream& operator<<(std::ostream& s, const NameSet& nset)
 {

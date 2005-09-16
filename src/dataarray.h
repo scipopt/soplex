@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataarray.h,v 1.21 2005/07/12 13:41:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dataarray.h,v 1.22 2005/09/16 12:42:29 bzfhille Exp $"
 
 /**@file  dataarray.h
  * @brief Save arrays of data objects.
@@ -267,6 +267,7 @@ public:
       return *this;
    }
 
+#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check
    bool isConsistent() const
    {
@@ -279,6 +280,7 @@ public:
 
       return true;
    }
+#endif
 
    /// copy constructor
    DataArray(const DataArray& old)

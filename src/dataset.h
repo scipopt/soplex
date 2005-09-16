@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.33 2005/08/09 19:32:09 bzforlow Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.34 2005/09/16 12:42:29 bzfhille Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -485,6 +485,7 @@ public:
          - reinterpret_cast<char*>(old_theitem);
    }
 
+#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check.
    bool isConsistent() const
    {
@@ -506,6 +507,7 @@ public:
 
       return true;
    }
+#endif
    //@}
 
    //-----------------------------------

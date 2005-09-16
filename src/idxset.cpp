@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idxset.cpp,v 1.9 2002/01/31 08:19:26 bzfkocht Exp $"
+#pragma ident "@(#) $Id: idxset.cpp,v 1.10 2005/09/16 12:42:31 bzfhille Exp $"
 
 #include "idxset.h"
 #include "message.h"
@@ -83,6 +83,7 @@ IdxSet& IdxSet::operator=(const IdxSet& rhs)
    return *this;
 }
 
+#ifndef NO_CONSISTENCY_CHECKS
 bool IdxSet::isConsistent() const
 {
    int i, j;
@@ -101,6 +102,7 @@ bool IdxSet::isConsistent() const
    }
    return true;
 }
+#endif
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

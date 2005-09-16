@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clufactor.h,v 1.21 2005/08/25 09:17:50 bzfhille Exp $"
+#pragma ident "@(#) $Id: clufactor.h,v 1.22 2005/09/16 12:42:28 bzfhille Exp $"
 
 /**@file  clufactor.h
  * @brief Implementation of sparse LU factorization.
@@ -433,8 +433,11 @@ protected:
    //@{
    ///
    void dump() const;
+
+#ifndef NO_CONSISTENCY_CHECKS
    ///
    bool isConsistent() const;
+#endif
    //@}
 };
 

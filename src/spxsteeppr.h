@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.h,v 1.17 2003/01/12 13:09:40 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.h,v 1.18 2005/09/16 12:42:37 bzfhille Exp $"
 
 
 /**@file  spxsteeppr.h
@@ -108,8 +108,10 @@ public:
    virtual void removedVecs(const int perm[]);
    ///
    virtual void removedCoVec(int i);
+#ifndef NO_CONSISTENCY_CHECKS
    ///
    virtual bool isConsistent() const;
+#endif
 
    ///
    SPxSteepPR()

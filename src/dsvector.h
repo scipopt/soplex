@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dsvector.h,v 1.9 2002/03/03 13:50:31 bzfkocht Exp $"
+#pragma ident "@(#) $Id: dsvector.h,v 1.10 2005/09/16 12:42:30 bzfhille Exp $"
 
 /**@file  dsvector.h
  * @brief Dynamic sparse vectors.
@@ -141,8 +141,10 @@ public:
    /// destructor.
    ~DSVector();
 
+#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check.
    bool isConsistent() const;
+#endif
 };
 } // namespace soplex
 #endif // _DSVECTOR_H_
