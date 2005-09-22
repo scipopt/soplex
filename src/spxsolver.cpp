@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.20 2005/09/16 12:42:36 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.21 2005/09/22 12:02:27 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -469,7 +469,7 @@ void SPxSolver::factorize()
          multBaseWith(ftmp);
          ftmp -= fRhs();
          if (ftmp.length() > delta())
-            MSG_ERROR( spxout << iteration() << ": fVec error = " 
+            MSG_ERROR( spxout << "ESOLVE29" << iteration() << ": fVec error = " 
                             << ftmp.length() << std::endl; )
       }
       if (ctmp.length() > delta())
@@ -479,7 +479,7 @@ void SPxSolver::factorize()
          multWithBase(ctmp);
          ctmp -= coPrhs();
          if (ctmp.length() > delta())
-            MSG_ERROR( spxout << iteration() << ": coPvec error = " 
+            MSG_ERROR( spxout << "ESOLVE30" << iteration() << ": coPvec error = " 
                             << ctmp.length() << std::endl; )
       }
       if (ptmp.length() > delta())
