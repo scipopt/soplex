@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.62 2005/09/05 11:36:53 bzfpfend Exp $
+# $Id: Makefile,v 1.63 2005/09/26 08:55:15 bzfpfend Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -178,11 +178,11 @@ _$(LIBDIR):
 depend:
 		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
 		$(BINSRC:.o=.cpp) \
-		| sed '\''s|^\([0-9A-z]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g'\'' \
+		| sed '\''s|^\([0-9A-Za-z]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g'\'' \
 		>$(DEPEND)'
 		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
 		$(LIBSRC:.o=.cpp) \
-		| sed '\''s|^\([0-9A-z]\{1,\}\)\.o|$$\(LIBOBJDIR\)/\1.o|g'\'' \
+		| sed '\''s|^\([0-9A-Za-z]\{1,\}\)\.o|$$\(LIBOBJDIR\)/\1.o|g'\'' \
 		>>$(DEPEND)'
 
 -include	$(DEPEND)
