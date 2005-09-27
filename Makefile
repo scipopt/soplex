@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.63 2005/09/26 08:55:15 bzfpfend Exp $
+# $Id: Makefile,v 1.64 2005/09/27 13:31:15 bzfhille Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -72,6 +72,7 @@ LIBOBJ		= 	changesoplex.o didxset.o \
 			vector.o vsolve.o \
 			gzstream.o
 BINOBJ		=	example.o
+CHANGEBINOBJ	=	exercise_LP_changes.o
 REPOSIT		=	# template repository, explicitly empty  #spxproof.o 
 
 #------------------------------------------------------------------------------
@@ -95,6 +96,7 @@ include make/make.$(OSTYPE).$(ARCH).$(COMP).$(OPT).$(LINK)
 BINNAME		=	$(NAME).$(OSTYPE).$(ARCH).$(COMP).$(OPT).$(LINK)
 LIBNAME		=	$(NAME).$(OSTYPE).$(ARCH).$(COMP).$(OPT).$(LINK)
 BINFILE		=	$(BINDIR)/$(BINNAME)
+CHANGEBINFILE   =	$(BINDIR)/exercise_LP_changes.$(OSTYPE).$(ARCH).$(COMP).$(OPT).$(LINK)
 LIBFILE		=	$(LIBDIR)/lib$(LIBNAME).$(LIBEXT)
 DEPEND		=	src/depend
 
@@ -105,6 +107,7 @@ OBJDIR		=	obj/O.$(OSTYPE).$(ARCH).$(COMP).$(OPT).$(LINK)
 BINOBJDIR	=	$(OBJDIR)/bin
 LIBOBJDIR	=	$(OBJDIR)/lib
 BINOBJFILES	=	$(addprefix $(BINOBJDIR)/,$(BINOBJ))
+CHANGEBINOBJFILES =	$(addprefix $(BINOBJDIR)/,$(CHANGEBINOBJ))
 LIBOBJFILES	=	$(addprefix $(LIBOBJDIR)/,$(LIBOBJ))
 BINSRC		=	$(addprefix $(SRCDIR)/,$(BINOBJ:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
@@ -113,10 +116,10 @@ $(BINFILE):	_$(BINDIR) _$(BINOBJDIR) $(LIBFILE) $(BINOBJFILES)
 		@echo "-> linking $@"
 ifeq ($(VERBOSE), true)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOBJFILES) \
-		-L$(LIBDIR) -l$(BINNAME) $(LDFLAGS) -o $@
+		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
 else
 		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOBJFILES) \
-		-L$(LIBDIR) -l$(BINNAME) $(LDFLAGS) -o $@
+		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
 endif
 
 $(LIBFILE):	_$(LIBDIR) _$(LIBOBJDIR) $(LIBOBJFILES) 
@@ -131,6 +134,16 @@ else
 		@$(RANLIB) $@
 endif
 
+$(CHANGEBINFILE): _$(BINDIR) _$(BINOBJDIR) $(LIBFILE) $(CHANGEBINOBJFILES)
+		@echo "-> linking $@"
+ifeq ($(VERBOSE), true)
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(CHANGEBINOBJFILES) \
+		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+else
+		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(CHANGEBINOBJFILES) \
+		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+endif
+
 lint:		$(BINSRC) $(LIBSRC)
 		$(LINT) lint/soplex.lnt -os\(lint.out\) \
 		$(CPPFLAGS) -UNDEBUG $^
@@ -139,6 +152,8 @@ doc:
 		cd doc; $(DOXY) soplex.dxy
 
 lib:		$(LIBFILE)
+
+change_exerciser: $(CHANGEBINFILE)
 
 check:		$(BINFILE)
 		cd check; ./check.sh $(TEST).test ../$(BINFILE) '$(ALGO)' $(LIMIT)
