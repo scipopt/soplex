@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.39 2005/09/16 12:42:38 bzfhille Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.40 2005/09/28 11:53:11 bzforlow Exp $"
 
 #include <iostream>
 #include <iomanip>
@@ -28,7 +28,7 @@
  * @todo There is a lot pointer arithmetic done here. It is not clear if
  *       this is an advantage at all. See all the function int() casts.
  * @todo Several operations like maxAbs could setup the vector while
- *       computing there result.
+ *       computing the result.
  */
 namespace soplex
 {
@@ -65,7 +65,7 @@ void SSVector::reMem(int newsize)
    setMax(DVector::memSize() + 1);
 }
 
-void SSVector::clear ()
+void SSVector::clear()
 {
    if (isSetup())
    {
@@ -526,7 +526,7 @@ SSVector& SSVector::multAdd(Real xx, const SSVector& svec)
 }
 #endif // 0
 
-/* @todo This function does not look good. MARKER is set but never really used.
+/* @todo This function does not look good. MARKER is set but never used.
  */
 SSVector& SSVector::multAdd(Real xx, const SVector& svec)
 {
@@ -882,7 +882,9 @@ SSVector& SSVector::assign(const SVector& rhs)
 SSVector& SSVector::assign2product1(const SVSet& A, const SSVector& x)
 {
    assert(x.isSetup());
+   assert(x.size() == 1);
 
+#if 0    // unreadable and buggy (missing test for 'svec.size() == 0' and 'x.size() == 0')
    const Real* vl = x.val;
    const int* xi = x.idx;
 
@@ -895,9 +897,29 @@ SSVector& SSVector::assign2product1(const SVSet& A, const SSVector& x)
 
    for (; e < last; ++e)
       v[ *ii++ = e->idx ] = y * e->val;
+#else
+
+   // get the nonzero value of x and the corresponding vector in A:
+   const int      nzidx = x.idx[0];
+   const Real     nzval = x.val[nzidx];
+   const SVector& Ai    = A    [nzidx];
+
+   // compute A[nzidx] * nzval:
+   if ( isZero(nzval, epsilon) || Ai.size() == 0 )
+      clear();    // this := zero vector
+   else 
+   {
+      num = Ai.size();
+      for ( register int j = 0; j < num; j++ )
+      {
+         const SVector::Element& Aij = Ai.element(j);
+         idx[j]       = Aij.idx;
+         val[Aij.idx] = nzval * Aij.val;
+      }
+   }
+#endif
 
    assert(isConsistent());
-
    return *this;
 }
 
@@ -905,56 +927,148 @@ SSVector& SSVector::assign2productShort(const SVSet& A, const SSVector& x)
 {
    assert(x.isSetup());
 
-   int i;
-   int j;
-   Real y;
-   int* ii                      = idx;
-   const Real* vl               = x.val;
-   const int*  xi               = x.idx;
-   SVector* svec                = const_cast<SVector*>( & A[*xi] );
+#if 0    // unreadable and buggy (missing test for 'svec.size() == 0' and 'x.size() == 0')
+   // first entry of x
+   Real           xx            = x.val[x.idx[0]];
+   const SVector* svec          = & A[x.idx[0]];
+   num                          = svec->size();
    const SVector::Element* e    = &(svec->element(0));
-   const SVector::Element* last = e + (num = svec->size());
-   Real* v                      = val;
-   Real xx                      = vl[*xi++];
+   const SVector::Element* last = e + num;
 
-   for (; e < last; ++e)
+   int*           ii            = idx;
+   const int*     xi            = x.idx;
+   ++xi;
+
+   for ( ; e < last; ++e )
    {
-      y      = xx * e->val;
+      Real y = xx * e->val;
       *ii    = e->idx;
-      v[*ii] = y;
-      ii    += (y != 0) ? 1 : 0;
+      val[*ii] = y;
+      if ( y != 0 )
+         ii++;
    }
 
-   for (i = x.size(); --i > 0;)
+   // second to last entries of x
+   for ( int i = x.size(); --i > 0; )
    {
-      xx = vl[*xi];
-      svec = const_cast<SVector*>( & A[*xi++] );
+      xx   = x.val[*xi];
+      svec = & A[*xi++];
       e = &(svec->element(0));
-      for (int k = svec->size(); --k >= 0;)
+      for ( int k = svec->size(); --k >= 0; )
       {
-         j   = e->idx;
-         *ii = j;
-         y   = v[j];
-         ii  += (y == 0) ? 1 : 0;
+         *ii = e->idx;
+         Real y = val[e->idx];
+         if ( y == 0 )
+            ii++; 
          y   += xx * e->val;
+         val[e->idx] = (y != 0) ? y : MARKER;
          e++;
-         v[j] = (y != 0) ? y : MARKER;
       }
    }
 
+   // clean up
    int* is = idx;
    int* it = idx;
    for (; is < ii; ++is)
    {
-      if (isNotZero(v[*is], epsilon))
+      if (isNotZero(val[*is], epsilon))
          *it++ = *is;
       else
-         v[*is] = 0;
+         val[*is] = 0;
    }
    num = int(it - idx);
 
-   assert(isConsistent());
+#else
 
+   if (x.size() == 0) // x can be setup but have size 0 => this := zero vector
+   {
+      clear();
+      return *this;
+   }
+
+   // compute x[0] * A[0]
+   int            curidx = x.idx[0];
+   const Real     x0     = x.val[curidx];
+   const SVector& A0     = A    [curidx];
+   int            nonzero_idx = 0;
+
+   num = A0.size();
+   if ( isZero(x0, epsilon) || num == 0 )
+   {
+      // A[0] == 0 or x[0] == 0 => this := zero vector
+      clear();
+   }
+   else 
+   {
+      for ( register int j = 0; j < num; ++j )
+      {
+         const SVector::Element& elt     = A0.element(j);
+         const Real              product = x0 * elt.val;
+
+         idx[ nonzero_idx ] = elt.idx;
+         val[ elt.idx ]     = product; // store the value in any case
+         if ( product != 0 )           // not 'isNotZero(product, epsilon)'
+            ++nonzero_idx;             // count only non-zero values
+      }
+   }
+
+   // Compute the other x[i] * A[i] and add them to the existing vector.
+   for ( register int i = 1; i < x.size(); ++i )
+   {
+      curidx                = x.idx[i];
+      const Real     xi     = x.val[curidx];
+      const SVector& Ai     = A    [curidx];
+
+      // If A[i] == 0 or x[i] == 0, do nothing.
+      if ( isNotZero(xi, epsilon) || Ai.size() == 0 )
+      {
+         // Compute x[i] * A[i] and add it to the existing vector.
+         for ( register int j = 0; j < Ai.size(); ++j )
+         {
+            const SVector::Element& elt  = Ai.element(j);
+            idx[ nonzero_idx ]           = elt.idx;
+            Real                 oldval  = val[elt.idx];
+
+            // An old value of exactly 0 means the position is still unused.
+            // It will be used now (either by a new nonzero or by a MARKER), 
+            // so increase the counter. If oldval != 0, we just 
+            // change an existing NZ-element, so don't increase the counter.
+            if ( oldval == 0 )
+               ++nonzero_idx;
+
+            // Add the current product x[i] * A[i][j]; if oldval was
+            // MARKER before, it does not hurt because MARKER is really small.
+            oldval += xi * elt.val;
+
+            // If the new value is exactly 0, mark the index as used
+            // by setting a value which is nearly 0; otherwise, store 
+            // the value. Values below epsilon will be removed later.
+            if ( oldval == 0 )
+               val[ elt.idx ] = MARKER;
+            else
+               val[ elt.idx ] = oldval;
+         }
+      }
+   }
+
+   // Clean up by shifting all nonzeros (w.r.t. epsilon) to the front of idx, 
+   // zeroing all values which are nearly 0, and setting #num# appropriately.
+   int nz_counter = 0;
+   for ( register int i = 0; i < nonzero_idx; ++i )
+   {
+      curidx = idx[i];
+      if ( isZero( val[curidx], epsilon ) )
+         val[curidx] = 0;
+      else
+      {  
+         idx[nz_counter] = curidx;
+         ++nz_counter;
+      }
+      num = nz_counter;
+   }
+#endif
+
+   assert(isConsistent());
    return *this;
 }
 
@@ -962,34 +1076,53 @@ SSVector& SSVector::assign2productFull(const SVSet& A, const SSVector& x)
 {
    assert(x.isSetup());
 
-   int i;
-   const Real* vl = x.val;
+#if 0   // buggy (missing test for 'svec.size() == 0' and 'x.size() == 0' )
    const int* xi = x.idx;
-
-   SVector* svec;
-   const SVector::Element* elem;
-   const SVector::Element* last;
-   Real y;
-   Real* v = val;
-
-   for (i = x.size(); i-- > 0; ++xi)
+   for (int i = x.size(); i-- > 0; ++xi)
    {
-      svec = const_cast<SVector*>( & A[*xi] );
-      elem = &(svec->element(0));
-      last = elem + svec->size();
-      y = vl[*xi];
+      const SVector& svec = A[*xi];
+      const SVector::Element* elem = &(svec.element(0));
+      const SVector::Element* last = elem + svec.size();
+      const Real y = x.val[*xi];
       for (; elem < last; ++elem)
-         v[elem->idx] += y * elem->val;
+         val[elem->idx] += y * elem->val;
    }
+#else
+
+   if (x.size() == 0) // x can be setup but have size 0 => this := zero vector
+   {
+      clear();
+      return *this;
+   }
+
+   bool A_is_zero = true;
+   for ( int i = 0; i < x.size(); ++i )
+   {
+      const int      curidx = x.idx[i];
+      const Real     xi     = x.val[curidx];
+      const SVector& Ai     = A    [curidx];
+
+      if ( A_is_zero && Ai.size() > 0 )
+         A_is_zero = false;
+
+      for ( register int j = 0; j < Ai.size(); ++j )
+      {
+         const SVector::Element& elt  = Ai.element(j);
+         val[ elt.idx ] += xi * elt.val;
+      }
+   }
+
+   if ( A_is_zero )
+      clear();       // case x != 0 but A == 0
+#endif
+
    return *this;
 }
 
 SSVector& SSVector::assign2product4setup(const SVSet& A, const SSVector& x)
 {
    assert(A.num() == x.dim());
-
    assert(x.isSetup());
-
    clear();
 
    if (x.size() == 1)
@@ -998,7 +1131,7 @@ SSVector& SSVector::assign2product4setup(const SVSet& A, const SSVector& x)
       setupStatus = true;
    }
 
-   else if (Real(x.size())*A.memSize() <= shortProductFactor*dim()*A.num()
+   else if (Real(x.size()) * A.memSize() <= shortProductFactor * dim() * A.num()
              && isSetup())
    {
       assign2productShort(A, x);
@@ -1043,13 +1176,9 @@ SSVector& SSVector::assign2productAndSetup(const SVSet& A, SSVector& x)
    if (x.isSetup())
       return assign2product4setup(A, x);
 
-   SVector* svec;
-   const SVector::Element* elem;
-   const SVector::Element* last;
-   Real y;
-   Real* v = val;
-   int* xi = x.idx;
-   Real* xv = x.val;
+#if 0   // buggy (missing test for 'svec.size() == 0' and 'x.dim() == 0' )
+   int*  xi  = x.idx;
+   Real* xv  = x.val;
    Real* end = xv + x.dim() - 1;
 
    /* setze weissen Elefanten */
@@ -1062,12 +1191,11 @@ SSVector& SSVector::assign2productAndSetup(const SVSet& A, SSVector& x)
          ++xv;
       if (isNotZero(*xv, epsilon))
       {
-         y = *xv;
-         svec = const_cast<SVector*>( & A[ *xi++ = int(xv - x.val) ] );
-         elem = &(svec->element(0));
-         last = elem + svec->size();
+         const SVector& svec = A[ *xi++ = int(xv - x.val) ];
+         const SVector::Element* elem = &(svec.element(0));
+         const SVector::Element* last = elem + svec.size();
          for (; elem < last; ++elem)
-            v[elem->idx] += y * elem->val;
+            val[elem->idx] += *xv * elem->val;
       }
       else
       {
@@ -1081,20 +1209,59 @@ SSVector& SSVector::assign2productAndSetup(const SVSet& A, SSVector& x)
    /* fange weissen Elefanten wieder ein */
    if (isNotZero(lastval, epsilon))
    {
-      y = *xv = lastval;
-      svec = const_cast<SVector*>( & A[ *xi++ = int(xv - x.val) ] );
-      elem = &(svec->element(0));
-      last = elem + svec->size();
+      *xv = lastval;
+      const SVector& svec = A[ *xi++ = int(xv - x.val) ];
+      const SVector::Element* elem = &(svec.element(0));
+      const SVector::Element* last = elem + svec.size();
       for (; elem < last; ++elem)
-         v[elem->idx] += y * elem->val;
+         val[elem->idx] += *xv * elem->val;
    }
    else
       *xv = 0;
 
    x.num = int(xi - x.idx);
-   x.setupStatus = true;
-   setupStatus = false;
 
+#else
+
+   if (x.dim() == 0) // x == 0 => this := zero vector
+      clear();
+
+   // x is not setup, so walk through its value vector
+   int nzcount = 0;
+   for ( register int i = 0; i < x.dim(); ++i )
+   {
+      // advance to the next element != 0
+      Real& xi = x.val[i];
+      if (xi == 0)
+         continue;
+
+      // If x[i] is really nonzero, compute A[i] * x[i] and adapt x.idx,
+      // otherwise set x[i] to 0.
+      if (isNotZero(xi, epsilon))
+      {
+         x.idx[ nzcount++ ]    = i;
+         const SVector& Ai     = A[i];
+         const int      Aisize = Ai.size();
+         if ( Aisize > 0 ) // otherwise: Ai == 0 => do nothing
+         {
+            for ( register int j = 0; j < Aisize; ++j )
+            {
+               const SVector::Element& elt = Ai.element(j);
+               val[elt.idx] += xi * elt.val;
+            }
+         }
+      }
+      else
+      {
+         xi = 0;
+      }
+   }
+   x.num = nzcount;
+
+#endif
+
+   x.setupStatus = true;
+   setupStatus   = false;
    assert(isConsistent());
 
    return *this;
@@ -1118,9 +1285,9 @@ bool SSVector::isConsistent() const
 
          if (j < 0 && fabs(val[i]) > 0.0) 
          {
-            MSG_ERROR( spxout << "ESSVEC01 i= " << i 
-                              << "\tidx= " << j 
-                              << "\tval= " << std::setprecision(16) << val[i] 
+            MSG_ERROR( spxout << "ESSVEC01 i = " << i 
+                              << "\tidx = " << j 
+                              << "\tval = " << std::setprecision(16) << val[i] 
                               << std::endl; )
             return MSGinconsistent("SSVector");
          }
