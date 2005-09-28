@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: exercise_LP_changes.cpp,v 1.1 2005/09/27 13:28:08 bzfhille Exp $"
+#pragma ident "@(#) $Id: exercise_LP_changes.cpp,v 1.2 2005/09/28 12:30:34 bzfhille Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -21,6 +21,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <sstream>
 
 #include "spxdefines.h"
 #include "soplex.h"
@@ -176,6 +177,9 @@ public:
    //@{ Test methods     
 public:
    void test_add_delete_row();
+   void test_add_delete_rows();
+   void test_add_delete_col();
+   void test_add_delete_cols();
 
    /// Reset test statistics.
    void reset()
@@ -189,12 +193,22 @@ public:
 
    //@{ Testing support 
 private:
-   void _assert_EQrel( const std::string& description, const Real a, const Real b )
+   void _assert( const std::string& description, const bool condition )
    {
-      if ( !EQrel( a, b, epsilon_solution_equal ) )
+      if ( !condition )
          {
             ++_asserts_failed;
             std::cout << "check '" << description << "' failed" << std::endl;
+         }
+   }
+
+   void _assert_EQrel( const std::string& description, const Real ref, const Real val )
+   {
+      if ( !EQrel( ref, val, epsilon_solution_equal ) )
+         {
+            ++_asserts_failed;
+            std::cout << "check '" << description << "' failed: expected " 
+                      << ref << ", got " << val << std::endl;
          }
    }
 
@@ -251,6 +265,8 @@ int main( int argc,
    //
    // Do the actual work.
    //
+   long total_asserts_failed = 0;
+
    while ( test_suite )
       {
          std::string filename;
@@ -272,9 +288,15 @@ int main( int argc,
          // Do testing.
          ChangeExerciser tester( filename );
          tester.test_add_delete_row();
+         tester.test_add_delete_rows();
+         tester.test_add_delete_col();
+         tester.test_add_delete_cols();
 
          std::cout << tester.asserts_failed() << " asserts failed.\n" << std::endl;
+         total_asserts_failed += tester.asserts_failed();
       }
+
+   std::cout << "Total number of failed asserts: " << total_asserts_failed << std::endl;
 
    return 0;
 }
@@ -301,22 +323,25 @@ void ChangeExerciser::test_add_delete_row()
          if ( row_idx % 2 == 0 )
             {
                work_ptr->getRow( row_idx, current_row );
+               work_ptr->removeRow( row_idx );
+               work_ptr->solve();
+               work_ptr->addRow( current_row );
             }
          else
             {
                const SPxRowId& row_ID = work_ptr->rId( row_idx );
                work_ptr->getRow( row_ID, current_row );               
+               work_ptr->removeRow( row_ID );
+               work_ptr->solve();
+
+               SPxRowId new_row_ID;
+               work_ptr->addRow( new_row_ID, current_row );
             }
-         
-         work_ptr->removeRow( row_idx );
-         work_ptr->solve();
-         
-         work_ptr->addRow( current_row );
          work_ptr->solve();
 
-         char description[ 20 ];
-         sprintf( description, "remove+add row %i", row_idx );
-         _assert_EQrel( description, original_obj, work_ptr->objValue() );
+         std::ostringstream description;
+         description << "remove+add row " << row_idx;
+         _assert_EQrel( description.str(), original_obj, work_ptr->objValue() );
       }
 
    delete work_ptr;
@@ -326,8 +351,302 @@ void ChangeExerciser::test_add_delete_row()
 /**
    Deletes and re-adds sets of rows.
 */
+void ChangeExerciser::test_add_delete_rows()
+{
+   TestSolver* work_ptr = _prepare_Solver();
+   work_ptr->solve();
+   const int orig_rows = work_ptr->nRows();
+   const Real original_obj = work_ptr->objValue();
+
+   // First test: Remove the middle third of the rows and reinsert it again.
+   LPRowSet row_set;
+   const int start = work_ptr->nRows() / 3;
+   const int end = ( 2 * work_ptr->nRows() ) / 3;
+
+   work_ptr->getRows( start, end, row_set );
+
+   work_ptr->removeRowRange( start, end );
+   work_ptr->solve();
+
+   // Use addRows()-version returning row IDs.
+   SPxRowId* row_IDs = new SPxRowId[ row_set.num() ];
+   work_ptr->addRows( row_IDs, row_set );
+   work_ptr->solve();
+   delete row_IDs; row_IDs = 0;
+
+   _assert( "remove+add rows: row number matches", orig_rows == work_ptr->nRows() );
+
+   std::ostringstream description;
+   description << "remove+add range of rows " << start << " to " << end;
+   _assert_EQrel( description.str(), original_obj, work_ptr->objValue() );
+
+   delete work_ptr; work_ptr = 0;
+
+   // Second test: Remove a (more or less) random third of the rows and reinsert it.
+   //      Removal is done once based on the absolute indices of the rows.
+   work_ptr = _prepare_Solver();
+   srand( 42 );
+
+   int nr_deleted_rows = work_ptr->nRows() / 3;
+   int* nums = new int[ nr_deleted_rows ];
+
+   // We need to record used rows to avoid duplicates in row_set below.
+   bool* used = new bool[ work_ptr->nRows() ];
+   for ( int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx )
+      {
+         used[ row_idx ] = false;
+      }
+
+   // Mark rows for deletion and remember them.
+   row_set.clear();
+   for ( int i = 0; i < nr_deleted_rows; ++i )
+      {
+         int random_row_idx = rand() % work_ptr->nRows();
+         while ( used[ random_row_idx ] )
+            {
+               random_row_idx = rand() % work_ptr->nRows();
+            }
+
+         nums[ i ] = random_row_idx;
+         used[ random_row_idx ] = true;
+
+         LPRow current_row( work_ptr->rowVector( random_row_idx ).size() );
+         work_ptr->getRow( random_row_idx, current_row );
+         row_set.add( current_row );
+      }
+   delete used; used = 0;
+
+   work_ptr->removeRows( nums, nr_deleted_rows );
+   work_ptr->solve();
+
+   work_ptr->addRows( row_set );
+   work_ptr->solve();
+
+   _assert( "remove+add rows (idx): row number matches", orig_rows == work_ptr->nRows() );
+   _assert_EQrel( "remove+add (idx) random set of rows", original_obj, work_ptr->objValue() );
+
+   delete nums; nums = 0;
+   delete work_ptr; work_ptr = 0;
+
+   // Third test: As before, but removal based based on SPxRowIds.
+   work_ptr = _prepare_Solver();
+   nr_deleted_rows = work_ptr->nRows() / 3;
+   SPxRowId* IDs = new SPxRowId[ nr_deleted_rows ];
+
+   used = new bool[ work_ptr->nRows() ];
+   for ( int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx )
+      {
+         used[ row_idx ] = false;
+      }
+
+   // Mark rows for deletion and remember them.
+   row_set.clear();
+   for ( int i = 0; i < nr_deleted_rows; ++i )
+      {
+         int random_row_idx = rand() % work_ptr->nRows();
+         while ( used[ random_row_idx ] )
+            {
+               random_row_idx = rand() % work_ptr->nRows();
+            }
+
+         IDs[ i ] = work_ptr->rId( random_row_idx );
+         used[ random_row_idx ] = true;
+
+         LPRow current_row( work_ptr->rowVector( random_row_idx ).size() );
+         work_ptr->getRow( random_row_idx, current_row );
+         row_set.add( current_row );
+      }
+   delete used; used = 0;
+
+   work_ptr->removeRows( IDs, nr_deleted_rows );
+   work_ptr->solve();
+
+   work_ptr->addRows( row_set );
+   work_ptr->solve();
+
+   _assert( "remove+add rows (ID): row number matches", orig_rows == work_ptr->nRows() );
+   _assert_EQrel( "remove+add (ID) random set of rows", original_obj, work_ptr->objValue() );
+
+   delete IDs; IDs = 0;
+   delete work_ptr; work_ptr = 0;
+}
 
 
+//
+// The following two routines are the analogue of the above for columns.
+// In fact they have been obtained by a replace and it is a good idea to keep 
+// them in sync.
+//
+
+/**
+   Deletes and re-adds a single col.
+*/
+void ChangeExerciser::test_add_delete_col()
+{
+   TestSolver* work_ptr = _prepare_Solver();
+
+   work_ptr->solve();
+   const Real original_obj = work_ptr->objValue();
+
+   for( int col_idx = 0; col_idx != work_ptr->nCols(); ++col_idx )
+      {
+         const SVector& col_vector = work_ptr->colVector( col_idx );
+         const int non_zeroes = col_vector.size();
+  
+         LPCol current_col( non_zeroes );
+
+         // Access cols alternatingly by index and ID.
+         if ( col_idx % 2 == 0 )
+            {
+               work_ptr->getCol( col_idx, current_col );
+               work_ptr->removeCol( col_idx );
+               work_ptr->solve();
+               work_ptr->addCol( current_col );
+            }
+         else
+            {
+               const SPxColId& col_ID = work_ptr->cId( col_idx );
+               work_ptr->getCol( col_ID, current_col );
+
+               work_ptr->removeCol( col_ID );
+               work_ptr->solve();
+
+               SPxColId new_col_ID;
+               work_ptr->addCol( new_col_ID, current_col );
+            }
+         work_ptr->solve();
+
+         std::ostringstream description;
+         description << "remove+add col " << col_idx;
+         _assert_EQrel( description.str(), original_obj, work_ptr->objValue() );
+      }
+
+   delete work_ptr;
+}
+
+
+/**
+   Deletes and re-adds sets of cols.
+*/
+void ChangeExerciser::test_add_delete_cols()
+{
+   TestSolver* work_ptr = _prepare_Solver();
+   work_ptr->solve();
+   const int orig_cols = work_ptr->nCols();
+   const Real original_obj = work_ptr->objValue();
+
+   // First test: Remove the middle third of the cols and reinsert it again.
+   LPColSet col_set;
+   const int start = work_ptr->nCols() / 3;
+   const int end = ( 2 * work_ptr->nCols() ) / 3;
+
+   work_ptr->getCols( start, end, col_set );
+
+   work_ptr->removeColRange( start, end );
+   work_ptr->solve();
+
+   // Use addCols()-version returning col IDs.
+   SPxColId* col_IDs = new SPxColId[ col_set.num() ];
+   work_ptr->addCols( col_IDs, col_set );
+   work_ptr->solve();
+   delete col_IDs; col_IDs = 0;
+
+   _assert( "remove+add cols: col number matches", orig_cols == work_ptr->nCols() );
+
+   std::ostringstream description;
+   description << "remove+add range of cols " << start << " to " << end;
+   _assert_EQrel( description.str(), original_obj, work_ptr->objValue() );
+
+   delete work_ptr; work_ptr = 0;
+
+   // Second test: Remove a (more or less) random third of the cols and reinsert it.
+   //      Removal is done once based on the absolute indices of the cols.
+   work_ptr = _prepare_Solver();
+   srand( 42 );
+
+   int nr_deleted_cols = work_ptr->nCols() / 3;
+   int* nums = new int[ nr_deleted_cols ];
+
+   // We need to record used cols to avoid duplicates in col_set below.
+   bool* used = new bool[ work_ptr->nCols() ];
+   for ( int col_idx = 0; col_idx < work_ptr->nCols(); ++col_idx )
+      {
+         used[ col_idx ] = false;
+      }
+
+   // Mark cols for deletion and remember them.
+   col_set.clear();
+   for ( int i = 0; i < nr_deleted_cols; ++i )
+      {
+         int random_col_idx = rand() % work_ptr->nCols();
+         while ( used[ random_col_idx ] )
+            {
+               random_col_idx = rand() % work_ptr->nCols();
+            }
+
+         nums[ i ] = random_col_idx;
+         used[ random_col_idx ] = true;
+
+         LPCol current_col( work_ptr->colVector( random_col_idx ).size() );
+         work_ptr->getCol( random_col_idx, current_col );
+         col_set.add( current_col );
+      }
+   delete used; used = 0;
+
+   work_ptr->removeCols( nums, nr_deleted_cols );
+   work_ptr->solve();
+
+   work_ptr->addCols( col_set );
+   work_ptr->solve();
+
+   _assert( "remove+add cols (idx): col number matches", orig_cols == work_ptr->nCols() );
+   _assert_EQrel( "remove+add (idx) random set of cols", original_obj, work_ptr->objValue() );
+
+   delete nums; nums = 0;
+   delete work_ptr; work_ptr = 0;
+
+   // Third test: As before, but removal based based on SPxColIds.
+   work_ptr = _prepare_Solver();
+   nr_deleted_cols = work_ptr->nCols() / 3;
+   SPxColId* IDs = new SPxColId[ nr_deleted_cols ];
+
+   used = new bool[ work_ptr->nCols() ];
+   for ( int col_idx = 0; col_idx < work_ptr->nCols(); ++col_idx )
+      {
+         used[ col_idx ] = false;
+      }
+
+   // Mark cols for deletion and remember them.
+   col_set.clear();
+   for ( int i = 0; i < nr_deleted_cols; ++i )
+      {
+         int random_col_idx = rand() % work_ptr->nCols();
+         while ( used[ random_col_idx ] )
+            {
+               random_col_idx = rand() % work_ptr->nCols();
+            }
+
+         IDs[ i ] = work_ptr->cId( random_col_idx );
+         used[ random_col_idx ] = true;
+
+         LPCol current_col( work_ptr->colVector( random_col_idx ).size() );
+         work_ptr->getCol( random_col_idx, current_col );
+         col_set.add( current_col );
+      }
+   delete used; used = 0;
+
+   work_ptr->removeCols( IDs, nr_deleted_cols );
+   work_ptr->solve();
+
+   work_ptr->addCols( col_set );
+   work_ptr->solve();
+
+   _assert( "remove+add cols (ID): col number matches", orig_cols == work_ptr->nCols() );
+   _assert_EQrel( "remove+add (ID) random set of cols", original_obj, work_ptr->objValue() );
+
+   delete IDs; IDs = 0;
+   delete work_ptr; work_ptr = 0;
+}
 
 
 //-----------------------------------------------------------------------------
