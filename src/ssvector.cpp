@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.40 2005/09/28 11:53:11 bzforlow Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.41 2005/09/28 12:27:04 bzforlow Exp $"
 
 #include <iostream>
 #include <iomanip>
@@ -526,8 +526,7 @@ SSVector& SSVector::multAdd(Real xx, const SSVector& svec)
 }
 #endif // 0
 
-/* @todo This function does not look good. MARKER is set but never used.
- */
+///@todo SSVector::multAdd() should be rewritten without pointer arithmetic.
 SSVector& SSVector::multAdd(Real xx, const SVector& svec)
 {
    if (isSetup())
