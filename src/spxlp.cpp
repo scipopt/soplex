@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.cpp,v 1.24 2005/09/16 12:42:35 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxlp.cpp,v 1.25 2005/09/28 12:24:36 bzfhille Exp $"
 
 #include <stdio.h>
 
@@ -89,7 +89,7 @@ void SPxLP::getCol(int i, LPCol& col) const
    METHOD( "SPxLP::getCol()" );
    col.setUpper(upper(i));
    col.setLower(lower(i));
-   col.setObj(spxSense() * obj(i));
+   col.setObj( obj(i) );
    col.setColVector(colVector(i));
 }
 
