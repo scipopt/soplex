@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector.h,v 1.17 2005/09/16 12:42:40 bzfhille Exp $"
+#pragma ident "@(#) $Id: vector.h,v 1.18 2005/09/28 11:53:00 bzforlow Exp $"
 
 /**@file  vector.h
  * @brief Dense vector for linear algebra.
@@ -58,7 +58,7 @@ class SSVector;
    <TR><TD>Operation</TD><TD>Description   </TD><TD></TD>&nbsp;</TR>
    <TR><TD>\c -=    </TD><TD>subtraction   </TD><TD>\c a \c -= \c b </TD></TR>
    <TR><TD>\c +=    </TD><TD>addition      </TD><TD>\c a \c += \c b </TD></TR>
-   <TR><TD>\c *     </TD><TD>skalar product</TD>
+   <TR><TD>\c *     </TD><TD>scalar product</TD>
        <TD>\c x = \c a \c * \c b </TD></TR>
    <TR><TD>\c *=    </TD><TD>scaling       </TD><TD>\c a \c *= \c x </TD></TR>
    <TR><TD>maxAbs() </TD><TD>infinity norm </TD>
@@ -66,7 +66,7 @@ class SSVector;
    <TR><TD>minAbs() </TD><TD> </TD>
        <TD>\c a.minAbs() == \f$\min \|a_i\|\f$ </TD></TR>
 
-   <TR><TD>length() </TD><TD>eucledian norm</TD>
+   <TR><TD>length() </TD><TD>euclidian norm</TD>
        <TD>\c a.length() == \f$\sqrt{a^2}\f$ </TD></TR>
    <TR><TD>length2()</TD><TD>square norm   </TD>
        <TD>\c a.length2() == \f$a^2\f$ </TD></TR>
