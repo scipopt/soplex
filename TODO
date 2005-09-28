@@ -1,4 +1,4 @@
-$Id: TODO,v 1.71 2005/08/09 19:32:09 bzforlow Exp $
+$Id: TODO,v 1.72 2005/09/28 12:28:46 bzforlow Exp $
 
 es wird infreasible/unboundes gemeldet je nach dem welcher algo 
 gerade am laufen war.
@@ -9,7 +9,7 @@ Vermutlich sind die meisten solve() methoden in
 CLUFactor::solve.cpp const. Müßten von den Pointern
 befreit werden
 
-SSVector sollte von den pointern befreit werden.
+SSVector::multAdd() sollte von den pointern befreit werden.
 
 simplifier sollten nicht unsimplify machen, sondern
 uncrush_x und uncrush_pi, das LP kann man sich auch merken.
@@ -22,8 +22,8 @@ spxdefines kommentieren.
 Diesen Kram mal als @todo's schreiben ;-)
 
 Genau gucken, was spxredundantsm eigendlich macht. Das scheint mir
-mehr ein bounds strengtehning zu sein.
-Ich habe nicht den eindruck, das der doppelte zeilen/spaltebn finden
+mehr ein bound strengthening zu sein.
+Ich habe nicht den eindruck, das der doppelte Zeilen/Spalten finden
 würde.
 
 Einzel remove so implementieren, dass alles weitergeschoben wird.
@@ -107,8 +107,6 @@ stimmen usw. und so sagt ob die Lösung zulässig ist. Am besten mit
 rationaler Arithmetik.
 
 SVSet::memPack, vermutlichen bug in flexelint melden. this-> ist überflüssig.
-
-in dataarray.h:reSize(int newsize) steht in der docxygen docu immer int n ???
 
 BUG in spxscalesm.cc value() wird nicht descaliert. 
 Entsprechender Aufruf fehlt auch in spxgeneralsm.cc
