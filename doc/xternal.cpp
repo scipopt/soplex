@@ -3,8 +3,11 @@
    @version  1.2.2
    @author   Roland Wunderling
    @author   Andreas Bley
-   @author   Tobias Pfender
+   @author   Tobias Achterberg
    @author   Thorsten Koch
+   @author   Benjamin Hiller
+   @author   Sebastian Orlowski
+   @author   Andreas Tuchscherer
 
    @section The Sequential object-oriented simplex class library.
 
@@ -13,8 +16,8 @@
    which can be found at http://www.zib.de/PaperWeb/abstracts/TR-96-09
    (in German).
 
-   SoPlex is implememted in C++. The code should be compliend with the 
-   actual ANSI standard. Exceptions, RTTI and STL (other then iostream) 
+   SoPlex is implememted in C++. The code should be compliant with the 
+   current ANSI standard. Exceptions, RTTI and STL (other then iostream) 
    are not used. Everything is in one namespace \em soplex.
 
    Note, that you are allowed to retreive SoPlex only for research purpose 
@@ -43,7 +46,7 @@
    @brief    General purpose classes.
    
    Elementary classes are provided for general purpose use in
-   projects way bejond the scope of numerical software or linear
+   projects way beyond the scope of numerical software or linear
    programming.
 */
 //-----------------------------------------------------------------------------
@@ -71,16 +74,16 @@
     makes them behave just like ordinary C structures, in that both,
     the copy constructor and assignment operator are equivalent to a
     memcopy of the memory taken by the object. Examples for data
-    objects are all builtin types such as #int or #double or
-    \e simple classes such as #complex.
+    objects are all builtin types such as \c int or \c double or
+    \e simple classes such as \c complex.
  
     We distinguish \em data \em objects from general C++ objects that
-    may include some allocation of resources. (Note, that for general
+    may include some allocation of resources. (Note that for general
     C++ objects that do allocate resources, this must be respected by
     providing apropriate copy constructor and assignment operators.)
     An example for a general C++ class is class DataArray.
  
-    The distingtion between data and general C++ objects becomes
+    The distinction between data and general C++ objects becomes
     relevant when using such objects in container classes such as
     DataArray or Array.  
 */
@@ -104,7 +107,7 @@
    <TR><TD>IBM   </TD><TD>VisualAge 5</TD><TD>AIX 5.1           </TD></TR>
    </TABLE>
 
-   The CPU's used where Intel Pentium-III/800, Pentium-4/1.7, 
+   The CPUs used were Intel Pentium-III/800, Pentium-4/1.7, 
    AMD Athlon/1000, AMD AthlonXP/1800+, 
    Compaq Alpha 21264A/750/8, Compaq Alpha 21264A/833/4,
    UltraSparc-IIi/299, HPPA-8600/550/1, MIPS R8000 and Power4.
@@ -113,7 +116,7 @@
    Compilers had internal erros, crashed or generated invalid code:
    KAI, Gnu, Compaq, HP, Intel (The others were only seldom used). 
 
-   Remember, your milage may vary.
+   Remember, your mileage may vary.
  */
 //-----------------------------------------------------------------------------
 /**@page INST Installation
@@ -123,12 +126,12 @@
 
   - C++ compiler (e.g. http://www.gnu.org/software/gcc)
   - gnu make http://www.gnu.org/software/make
-  - gnu awk http://www.gnu.org/software/gawk (if you want the check target)
+  - gnu awk http://www.gnu.org/software/gawk (if you want the \c check target)
   - doxygen http://www.doxygen.org (if you want to generate the documentation)
 
- After receiving SoPlex you have to uncompress it 
+ After receiving SoPlex you have to uncompress it with \c gzip 
  (http://www.gnu.org/software/gzip) and 
- unpack it with and unpacked it (http://www.gnu.org/software/tar)
+ unpack it with \c tar (http://www.gnu.org/software/tar)
  into a directory. Then change to that directory.
 
  \section Tested Linux/x86, Linux/AXP, Tru64, Solaris, IRIX, HP-UX
@@ -144,15 +147,15 @@
  This should generate a binary in the \c bin subdirectory. 
 
  \section Others If the previous section was not for you
- At first the Makefile tries to find out the OS and the 
+ First the Makefile tries to find out the OS and the 
  architecture by using the \c uname command. 
  If your OS or architecture is missing, please update the 
  Makefile and submit the change to me.
 
  Then a submakefile from \c make/make.OS.ARCH.COMP.OPT is included in
  the main Makefile. You should adapt the compiler flags as needed.
- Be especially carefull with the \c AR setting since some C++ compilers do
- not like using the standard \c ar program together with code that uses
+ Be especially careful with the \c AR setting since some C++ compilers do
+ not like using the standard \c \c ar program together with code that uses
  templates.
 
  If this all does not work, change to the \c src directory and type
@@ -164,7 +167,7 @@
 
  \section Testing Testing the Binary
  After you compiled the binary you should get the Netlib LP files at
- http://www.zib.de/Optimization/Software/Soplex/netlib.tgz and
+ http://www.zib.de/Optimization/Software/Soplex/netlib.tar.gz and
  unpack them in the \c check directory. Then you can try
 
  \c gmake \c COMP=xxx \c OPT=dbg \c quick
@@ -173,9 +176,9 @@
 
  \c gmake \c COMP=xxx \c OPT=opt \c check
 
- Use the check target together with \c OPT=dbg only if you have really 
+ Use the \c check target together with \c OPT=dbg only if you have really 
  a lot of time. \c quick should run in a few minutes and \c check will 
- need between less than one hour and a day depending on your machine.
+ need between less than one hour and a day, depending on your machine.
 
  \c quick should report no fails at all. \c check should report no fails in the
  \c LC and \c EC columns and in the \c LR and \c ER columns only with 
@@ -195,18 +198,18 @@
 
  \section Installation Installation
  The binary is in the \c bin directory, the library in \c lib and all
- headers are in \c src. Feel free to install at a suitable place.
+ headers are in \c src. Feel free to install them at a suitable place.
 
  \section Naming Naming of the OPT Variable
 
   - dbg (debugging) -DNDEBUG is \b not set. Optimization is mostly off
-    and debugging info is generated
+    and debugging info is generated.
 
-  - std (standard) -DNDEBUG is set. All optimizations may be switch on,
-    which do \b not \b alter the floating point behaviour or may 
-    otherwise by result in wrong code 
+  - std (standard) -DNDEBUG is set. All optimizations may be switched on
+    that do \b not \b alter the floating point behaviour or may 
+    otherwise by result in wrong code.
 
-  - opt (optimized) -DNDEBUG is set. All optimizations may be switch on,
+  - opt (optimized) -DNDEBUG is set. All optimizations may be switched on,
     as long as the code seems to run correctly. The code should run
     on the relevant architectures. Best is something like -fast that
     uses the right optimizations for the architecture that is used.
@@ -221,23 +224,23 @@
 //-----------------------------------------------------------------------------
 /**@page FAQ Frequently Asked Questions
 
-   Here are some answers that can not be answered from the code alone:
+   Here are some answers that cannot be answered from the code alone:
 
    <ol>
    <li> Why is \<iostream\> used but \<assert.h\> and not \<cassert\> ?
      
       The reason is twofold. From the theoretical point we were not
       able to exactly find out in TC++PL in what namespace cassert 
-      should load it's declarations. Shurely in std. But since this are
-      normally functions with C linkage this won't work.
-      The some, like assert are macros, which have no namespace.
-      The practical point is, that the compiler vendors seem to be 
-      unsure also. Most put everything in both namespaces std and global.
-      So there is no advantage in using \<cassert\>. Compaq even left them
-      off because it seemed unclear to them.
+      should load its declarations. Surely in std. But since these are
+      normally functions with C linkage, this won't work.
+      Then some of them, like assert, are macros which have no namespace.
+      The practical point is that the compiler vendors seem to be 
+      unsure as well. Most of them put everything in both namespaces std 
+      and global. So there is no advantage in using \<cassert\>. Compaq 
+      even left them off because it seemed unclear to them.
       So our reasoning was: If it is a C++ header we use the correct form
       without the .h and in std. If it is a C header, according to the
-      standard the .h header has to be there and uses global namespace.
+      standard the .h header has to be there and uses the global namespace.
       That seems acceptable to us, especially for C functions.
       
    <li> Why is malloc/free sometimes used and not new/delete ?
@@ -245,8 +248,8 @@
       Because there is no realloc with new/delete. Because malloc
       is faster. And we only use it for builtin types or so called 
       \ref DataObjects "Data Objects" .
-      If you do not like this descision, it's quite easy to change 
-      spxalloc.h to use new/delete.
+      If you do not like this desision, it is quite easy to change 
+      spxalloc.h such as to use new/delete.
 
    <li> Can SoPlex solve Integer Programs (IP's) ?
       
@@ -256,7 +259,7 @@
    <li> Is there a Windows version ?
 
       The code is tested to compile under some version of Visual C++.
-      We do \b not provide any make or project files for VC++.
+      We do \b not provide any Makefiles or project files for VC++.
 
    <li> I want a primal and a dual simplex, where are they ?
 
@@ -273,7 +276,7 @@
       COLUMN oriented is the "usual" representation.
       Then Entering is the Primal and Leaving is the Dual algorithm.
       In ROW oriented representation, we have in principle the
-      explicit dual and then the algorithms reverse.
+      explicit dual and then the algorithms are reversed.
 
       The only problem is that SoPlex is a composite simplex algorithm.
       That means it switches between entering and leaving algorithm
@@ -281,13 +284,13 @@
       but then an arbitrary number of switches may occur. (Even so, often
       no switch at all happens.)
 
-   <li> I got an segment violation or a signal 11
+   <li> I got an segment violation or a signal 11.
 
-      If all the testcases from Netlib work, but your LP gives
+      If all the test instances from Netlib work, but your LP gives
       this problem, mail your LP in as an gzip'ed MPS of LPF file
       and we will check.
 
-      If you have this problem also with the testcases, 
+      If you have this problem also with the test instances, 
       check your stack space: \c ulimit \c -s will report the actual
       size in kilobytes. Try a higher value. 
 
@@ -310,7 +313,7 @@
       Yes, have a look at 
       http://oss.software.ibm.com/developerworks/opensource/coin
 
-   <li> If I add rows or columns to an LP, are they checked for reduncy ?
+   <li> If I add rows or columns to an LP, are they checked for redundancy ?
 
       No. You have to do it yourself.
 
@@ -321,7 +324,7 @@
 
    Here are some tips on which flags to use with the example program:
 
-   If yout have more constrains (rows) than variables (cols) it is 
+   If you have more constraints (rows) than variables (cols) it is 
    a good idea to try the \c -r flag.
 
    Setting \c -z to a smaller value like 1e-18 or 1e-20 might improve
@@ -344,38 +347,38 @@
    three different types:
 
    - Elementary classes are provided for general purpose use in
-     projects way bejond the scope of numerical software or linear
+     projects way beyond the scope of numerical software or linear
      programming.
    - Linear algebra classes provide basic data types for (sparse)
      linear algebra computations. However, their functionality is
      restricted to simple operations such as addition and scaling.
      For complex tasks, such as solving linear systems of equations,
      algorithmic classes are provided instead.
-   - Algorithmic classes serve for implementing maybe a variaty of
+   - Algorithmic classes serve for implementing maybe a variety of
      algorithms for solving numerical (sub-)problems.
 
-   The following sections are dedicated to users, that want to
+   The following sections are dedicated to users who want to
    provide own pricers, ratio test, start basis generation codes or
-   LP simplifiers to use with #SoPlex or that want to derive own
+   LP simplifiers to use with SoPlex or who want to derive own
    implementations (e.g. parallel versions) using SoPlex.
 
    @section Virtualizing the Representation
    The primal Simplex on the columnwise representation is
-   structurely equivalent to the dual Simplex on the rowwise
+   structurally equivalent to the dual Simplex on the rowwise
    representation and vice versa (see above). Hence, it is
    desirable to treat both cases in a very similar manner. This
-   is supported by the programmers interface of #Soplex, that
+   is supported by the programmer's interface of Soplex which
    provides access methods for all internal data in two ways: one
    is relative to the "physical" representation of the LP in
    rows and columns, while the other is relative to the chosen
-   basis #Representation. If e.g. a #SPxPricer is
+   basis representation. If e.g. a soplex::SPxPricer is
    written using the second type of methods only (which will
    generally be the case), the same code can be used for running
-   SoPlex's the Simplex algorithm for both
-   #Representation%s. We will now give two examples for this
-   virtualization from the chosen representation.
+   SoPlex's simplex algorithm for both representations. 
+   We will now give two examples for this
+   abstraction from the chosen representation.
 
-   Methods #vector will return a column or a row vector,
+   Methods \c vector() will return a column or a row vector,
    corresponding to the chosen basis representation. 
    The other "vectors" will be referred to as \em covectors:
      
@@ -385,76 +388,74 @@
    <TR><TD>coVector</TD><TD>colVector</TD><TD>rowVector</TD></TR>
    </TABLE>
     
-   Weather the #SPxBasis::Desc::Status of a variable indicates that the
-   corresponding #vector is in the basis matrix or not also depends on the
-   chosen representation. Hence, methods #isBasic() are provided to get the
+   Weather the soplex::SPxBasis::Desc::Status of a variable indicates that the
+   corresponding vector is in the basis matrix or not also depends on the
+   chosen representation. Hence, methods \c isBasic() are provided to get the
    correct answer for both representations.  
    
    @section Simplex Vectors and Bounds
-   The Simplex algorithms keeps three vectors, that are defined to a basis.
-   Two of them are required for the pricing, while the other is needed for
+   The Simplex algorithms keeps three vectors which are associated to each basis.
+   Two of them are required for the pricing, while the third one is needed for
    detecting feasibility of the basis. For all three vectors, bounds are
    defined. The Simplex alogrithm changes the basis until all three vectors
-   satisfy their bounds. In this case the optimal solution is found.
+   satisfy their bounds, which means that the optimal solution has been found.
     
    Whith each update of the basis, also the three vectors need to be
-   updated. This is best supported by the use of #UpdateVector%s.
+   updated. This is best supported by the use of UpdateVectors.
     
    @subsection Variables
    The Simplex algorithm works with two types of variables, primals and
-   duals.  The primal variables are the ones associated to each column of
-   an LP, whereas the dual variables are the ones associated to each row.
-   However, to each row a slack variable must be added to the set of
+   duals.  The primal variables are associated with each column of
+   an LP, whereas the dual variables are associated with each row.
+   However, for each row a slack variable must be added to the set of
    primals (to represent inequalities), and a reduced cost variable must be
    added for each column (to represent upper or lower bounds). Note, that
-   mathematically, on dual variable for each bound (upper and lower) should
+   mathematically, one dual variable for each bound (upper and lower) should
    be added. However, this variable would always yield the same value and
    can, hence, be implemented as one.
     
    To summarize, we have a primal variable for each LP column and row
-   (i.e. its slack) as well as a dual variable for each LP row and column
-   (i.e. its bounds). However, not all these values need to be stored and
+   (i.e., its slack) as well as a dual variable for each LP row and column
+   (i.e., its bounds). However, not all these values need to be stored and
    computed, since the structure of the Simplex algorithms allow to
-   implicitely keep them.
+   keep them implicitly.
       
-   If the #SPxBasis's #Status of a row or column is one of #P_ON_LOWER,
-   #P_ON_UPPER, #P_FIXED or #P_FREE the value of the corresponding
+   If the SPxBasis's Status of a row or column is one of \c P_ON_LOWER,
+   \c P_ON_UPPER, \c P_FIXED or \c P_FREE, the value of the corresponding
    primal variable is the lower, upper or both bound(s) or 0, respectively.
    The corresponding dual variable needs to be computed. Equivalently, for
-   a #Status of #D_FREE, #D_ON_UPPER, #D_ON_LOWER, #D_ON_BOTH or
-   #D_UNDEFINED the corresponding dual variable is 0, whereas the primal 
+   a Status of \c D_FREE, \c D_ON_UPPER, \c D_ON_LOWER, \c D_ON_BOTH or
+   \c D_UNDEFINED, the corresponding dual variable is 0, whereas the primal 
    one needs to be computed.
 
-   We declare the following vectors for holding the values to be computed.
-   Primal variables (dimension #nCols()): #primRhs, #primVec.
-   Dual variables (dimension #nRows()): #dualRhs, #dualVec.
-   Additional variables depending on representation (dimension coDim()):
-   #addvec.
+   The following vectors are declared for holding the values to be computed:
+   \c primRhs, \c primVec (with dimension \c nCols()) for the primal
+   variables, and \c dualRhs, \c dualVec (with dimension \c nRows()) for the 
+   dual variables. The additional variable \c addvec (with dimension \c coDim() 
+   depends on the representation.
 
    @subsection Bounds 
-   Dual and primal variables are bounded (including \f$\pm\infty\f$ as
+   Primal and dual variables are bounded (including \f$\pm\infty\f$ as
    bounds).  If all primal variables are within their bounds, the
    Simplex basis is said to be primal feasible. Analogously, if all
    dual variables are within their bounds, its is called dual
    feasible.  If a basis is both, primal and dual feasible, the
-   optimal solution is been found.
+   optimal solution has been found.
 
-   In the dual Simplex, the basis is maintained to be dual, while
+   In the dual Simplex, the basis is maintained dual feasible, while
    primal feasibility is improved via basis updates. However, for
-   numerical reasons dual feasibility must from time to time be
-   relaxed.  Equivalently, primal feasibility will be relaxed to
+   numerical reasons dual feasibility must be relaxed from time to time.
+   Equivalently, primal feasibility will be relaxed to
    retain numerical stability in the primal Simplex algorithm.
 
-   Relaxation of (dual or primal) feasibility is acchieved by
-   enlarging the bounds to primal or dual variables. However, for each
+   Relaxation of (dual or primal) feasibility is achieved by
+   relaxing the bounds of primal or dual variables. However, for each
    type of Simplex only the corresponding bounds need to be
-   enlarged. Hence, we define only one vector of upper and lower bound
+   relaxed. Hence, we define only one vector of upper and lower bound
    for each row and column and initialize it with primal or dual
-   bound, depending on the Simplex type.  (see #theURbound,
-   #theLRbound, #theUCbound, #theLCbound.) 
+   bound, depending on the Simplex type (see \c theURbound,
+   \c theLRbound, \c theUCbound, \c theLCbound). 
 */
 //-----------------------------------------------------------------------------
-
-
 
 
