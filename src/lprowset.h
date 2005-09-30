@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.h,v 1.23 2005/09/16 12:42:32 bzfhille Exp $"
+#pragma ident "@(#) $Id: lprowset.h,v 1.24 2005/09/30 18:04:11 bzforlow Exp $"
 
 /**@file  lprowset.h
  * @brief Set of LP columns.
@@ -35,14 +35,14 @@ namespace soplex
 /**@brief   Set of LP rows.
    @ingroup Algebra
    
-   Class #LPRowSet implements a set of #LPRow%s. Unless for memory
-   limitations, any number of #LPRow%s may be #add%ed to an #LPRowSet. Single
-   or multiple #LPRow%s may be #add%ed to an #LPRowSet, where each method
-   #add() comes with two different signatures. One with and one without a
-   parameter, used for returning the #Key%s assigned to the new #LPRow%s
-   by the set. See #DataSet::Key for a more detailed description of the
-   concept of #Key%s. For the concept of renumbering #LPRow%s within an
-   #LPRowSet after removal of some #LPRow%s see #DataSet.
+   Class LPRowSet implements a set of LPRows. Unless for memory
+   limitations, any number of LPRows may be #add%ed to an LPRowSet. Single
+   or multiple LPRows may be #add%ed to an LPRowSet, where each method
+   add() comes with two different signatures. One with and one without a
+   parameter, used for returning the Keys assigned to the new LPRows
+   by the set. See DataSet::Key for a more detailed description of the
+   concept of Keys. For the concept of renumbering LPRows within an
+   LPRowSet after removal of some LPRows see DataSet.
    
    @see        DataSet, DataSet::Key
 */
