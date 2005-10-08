@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.77 2005/08/09 19:32:11 bzforlow Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.78 2005/10/08 14:06:31 bzfpfend Exp $"
 
 #include <iostream>
 
@@ -206,6 +206,25 @@ SPxSolver::Status SoPlex::getRedCost(Vector& rdcost) const
    return stat;
 }
 
+SPxSolver::Status SoPlex::getDualfarkas(Vector& dualfarkas) const
+{
+   /// Does not work yet with presolve
+   if (has_simplifier())
+   {
+      MSG_ERROR( spxout << "ESOLVR02 Not yet implemented" << std::endl; )
+      return SPxSolver::ERROR;
+   }
+   SPxSolver::Status stat = m_solver.getDualfarkas(dualfarkas);
+
+   if (m_postScaler != 0)
+      m_postScaler->unscaleDual(dualfarkas);
+
+   if (m_preScaler != 0)
+      m_preScaler->unscaleDual(dualfarkas);
+   
+   return stat;
+}
+  
 void SoPlex::qualConstraintViolation(
    Real& maxviol, 
    Real& sumviol) const

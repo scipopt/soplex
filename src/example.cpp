@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.72 2005/07/26 17:04:53 bzforlow Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.73 2005/10/08 14:06:31 bzfpfend Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -602,18 +602,19 @@ int main(int argc, const char* const argv[])
       {
          DVector objx(work.nCols());
             
-         work.getPrimal(objx);
-            
-         for( int i = 0; i < work.nCols(); ++i ) 
+         if( work.getPrimal(objx) != SPxSolver::ERROR )
          {
-            if ( isNotZero( objx[i], epsilon ) )
-               MSG_VERBOSE3( spxout << colnames[ work.cId(i) ] << "\t" 
-                                    << i << "\t"
-                                    << std::setw(16)
-                                    << std::setprecision( precision )
-                                    << objx[i] << std::endl; )
+            for( int i = 0; i < work.nCols(); ++i ) 
+            {
+               if ( isNotZero( objx[i], epsilon ) )
+                  MSG_VERBOSE3( spxout << colnames[ work.cId(i) ] << "\t" 
+                     << i << "\t"
+                     << std::setw(16)
+                     << std::setprecision( precision )
+                     << objx[i] << std::endl; );
+            }
+            MSG_VERBOSE3( spxout << "All other variable are zero." << std::endl; );
          }
-         MSG_VERBOSE3( spxout << "All other variable are zero." << std::endl; )
       }
       if ( write_basis )
          if ( ! work.writeBasisFile( basisname, rownames, colnames ) )
@@ -625,6 +626,73 @@ int main(int argc, const char* const argv[])
       break;
    case SPxSolver::INFEASIBLE:
       MSG_VERBOSE3( spxout << "IEXAMP32 LP is infeasible" << std::endl; )
+      if ( print_solution )
+      {
+         DVector farkasx(work.nRows());
+            
+         if( work.getDualfarkas(farkasx) != SPxSolver::ERROR )
+         {
+            DVector proofvec(work.nCols());
+            double lhs;
+            double rhs;
+
+            lhs = 0.0;
+            rhs = 0.0;
+            for( int i = 0; i < work.nRows(); ++i ) 
+            {
+               if ( isNotZero( farkasx[i], epsilon ) )
+               {
+                  MSG_VERBOSE3( spxout << rownames[ work.rId(i) ] << "\t" 
+                     << i << "\t"
+                     << std::setw(16)
+                     << std::setprecision( precision )
+                     << farkasx[i] << std::endl; );
+                  LPRow row;
+                  work.getRow(i, row);
+                  if( row.lhs() > -infinity )
+                  {
+                     MSG_VERBOSE3( spxout << row.lhs() << " <= "; );
+                  }
+                  MSG_VERBOSE3( spxout << row.rowVector(); );
+                  if( row.rhs() < infinity )
+                  {
+                     MSG_VERBOSE3( spxout << " <= " << row.rhs(); );
+                  }
+                  MSG_VERBOSE3( spxout << std::endl; );
+                  if( farkasx[i] > 0.0 )
+                  {
+                     lhs += farkasx[i] * row.lhs();
+                     rhs += farkasx[i] * row.rhs();
+                  }
+                  else
+                  {
+                     lhs += farkasx[i] * row.rhs();
+                     rhs += farkasx[i] * row.lhs();
+                  }
+                  SVector vec(row.rowVector());
+                  vec *= farkasx[i];
+                  proofvec += vec;
+               }
+            }
+            MSG_VERBOSE3( spxout << "All other row multipliers are zero." << std::endl; );
+            MSG_VERBOSE3( spxout << "farkas infeasibility proof: " << std::endl; );
+            MSG_VERBOSE3( spxout << lhs << " <= "; );
+            bool nonzerofound = false;
+            for( int i = 0; i < work.nCols(); ++i )
+            {
+               if ( isNotZero( proofvec[i], epsilon ) )
+               {
+                  if( proofvec[i] > 0 )
+                     MSG_VERBOSE3( spxout << "+"; );
+                  MSG_VERBOSE3( spxout << proofvec[i] << " " << colnames[ work.cId(i) ] << " "; );
+                  nonzerofound = true;
+               }
+            }
+            if( !nonzerofound )
+               MSG_VERBOSE3( spxout << "0 "; );
+            MSG_VERBOSE3( spxout << "<= " << rhs << std::endl; );
+         }
+      }
       if ( print_quality )
          work.displayInfeasibility();
       break;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.64 2005/07/25 15:23:40 bzforlow Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.65 2005/10/08 14:06:31 bzfpfend Exp $"
 
 /**@file  soplex.h
  * @brief preconfigured #SoPlex LP-solver.
@@ -191,6 +191,9 @@ public:
    virtual SPxSolver::Status getDual(Vector& vector) const;
    ///
    virtual SPxSolver::Status getRedCost(Vector& vector) const;
+
+   ///
+   virtual SPxSolver::Status getDualfarkas(Vector& vector) const;
 
    /// get violation of constraints.
    virtual void qualConstraintViolation(Real& maxviol, Real& sumviol) const;
