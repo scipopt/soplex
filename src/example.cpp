@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.73 2005/10/08 14:06:31 bzfpfend Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.74 2005/10/10 10:11:43 bzfpfend Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -638,6 +638,7 @@ int main(int argc, const char* const argv[])
 
             lhs = 0.0;
             rhs = 0.0;
+            proofvec.clear();
             for( int i = 0; i < work.nRows(); ++i ) 
             {
                if ( isNotZero( farkasx[i], epsilon ) )
@@ -646,17 +647,23 @@ int main(int argc, const char* const argv[])
                      << i << "\t"
                      << std::setw(16)
                      << std::setprecision( precision )
-                     << farkasx[i] << std::endl; );
+                     << farkasx[i] << "\t"; );
                   LPRow row;
                   work.getRow(i, row);
                   if( row.lhs() > -infinity )
                   {
                      MSG_VERBOSE3( spxout << row.lhs() << " <= "; );
                   }
-                  MSG_VERBOSE3( spxout << row.rowVector(); );
+                  for( int j = 0; j < row.rowVector().size(); ++j )
+                  {
+                     if( row.rowVector().value(j) > 0 )
+                        MSG_VERBOSE3( spxout << "+"; );
+                     MSG_VERBOSE3( spxout << row.rowVector().value(j) << " "
+                        << colnames[ work.cId(row.rowVector().index(j)) ] << " "; );
+                  }
                   if( row.rhs() < infinity )
                   {
-                     MSG_VERBOSE3( spxout << " <= " << row.rhs(); );
+                     MSG_VERBOSE3( spxout << "<= " << row.rhs(); );
                   }
                   MSG_VERBOSE3( spxout << std::endl; );
                   if( farkasx[i] > 0.0 )
@@ -675,7 +682,7 @@ int main(int argc, const char* const argv[])
                }
             }
             MSG_VERBOSE3( spxout << "All other row multipliers are zero." << std::endl; );
-            MSG_VERBOSE3( spxout << "farkas infeasibility proof: " << std::endl; );
+            MSG_VERBOSE3( spxout << "farkas infeasibility proof: \t"; );
             MSG_VERBOSE3( spxout << lhs << " <= "; );
             bool nonzerofound = false;
             for( int i = 0; i < work.nCols(); ++i )
