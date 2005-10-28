@@ -1,9 +1,11 @@
-$Id: TODO,v 1.72 2005/09/28 12:28:46 bzforlow Exp $
+$Id: TODO,v 1.73 2005/10/28 17:24:17 bzforlow Exp $
 
-es wird infreasible/unboundes gemeldet je nach dem welcher algo 
-gerade am laufen war.
+- spxdefines: DEFAULT_EPS_FACTOR, DEFAULT_EPS_UPDATE und Param dokumentieren
 
-der col_first parameter bei scale wird nicht mehr benutzt.
+- Es wird infeasible/unbounded gemeldet je nach dem welcher algo 
+  gerade am Laufen war.
+
+- der col_first parameter bei scale wird nicht mehr benutzt.
 
 Vermutlich sind die meisten solve() methoden in 
 CLUFactor::solve.cpp const. Müßten von den Pointern
@@ -14,10 +16,7 @@ SSVector::multAdd() sollte von den pointern befreit werden.
 simplifier sollten nicht unsimplify machen, sondern
 uncrush_x und uncrush_pi, das LP kann man sich auch merken.
 
-
 neos4, neos5 werden fälschlicherweise als infeasible gemeldet.
-
-spxdefines kommentieren.
 
 Diesen Kram mal als @todo's schreiben ;-)
 
