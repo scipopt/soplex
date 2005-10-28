@@ -91,9 +91,11 @@
 /**@page RUN On which Platforms is SoPlex running
 
    We tested SoPlex to compile with the following Compilers:
+   <b>XXX: TO UPDATE!</b>
 
    <TABLE>
    <TR><TD>Vendor</TD><TD>Version    </TD><TD>OS                </TD></TR>
+<!--
    <TR><TD>Gnu   </TD><TD>2.95.1     </TD><TD>Solaris 7         </TD></TR>
    <TR><TD>Gnu   </TD><TD>2.95.3     </TD><TD>SuSE 7.3/x86 Linux</TD></TR>
    <TR><TD>Gnu   </TD><TD>2.96       </TD><TD>SuSE 7.1/AXP Linux</TD></TR>
@@ -105,6 +107,7 @@
    <TR><TD>SGI   </TD><TD>7.3.1.1m   </TD><TD>IRIX 6.5          </TD></TR>
    <TR><TD>HP    </TD><TD>A.03.27    </TD><TD>HP-UX 11.00       </TD></TR>
    <TR><TD>IBM   </TD><TD>VisualAge 5</TD><TD>AIX 5.1           </TD></TR>
+-->
    </TABLE>
 
    The CPUs used were Intel Pentium-III/800, Pentium-4/1.7, 
@@ -242,6 +245,7 @@
       without the .h and in std. If it is a C header, according to the
       standard the .h header has to be there and uses the global namespace.
       That seems acceptable to us, especially for C functions.
+   </li>
       
    <li> Why is malloc/free sometimes used and not new/delete ?
       
@@ -250,16 +254,24 @@
       \ref DataObjects "Data Objects" .
       If you do not like this desision, it is quite easy to change 
       spxalloc.h such as to use new/delete.
+   </li>
 
-   <li> Can SoPlex solve Integer Programs (IP's) ?
+   <li> Can SoPlex solve Integer Programs (IPs) ?
       
       No. You need an IP-Solver for this. Most IP-Solver use LP-Solvers
-      as a subroutine and do some kind of Branch-and-Bound.
+      as a subroutine and do some kind of Branch-and-Bound. For
+      instance, you can use \c SCIP (Solving Constraint Integer Programs) 
+      together with SoPlex to solve IPs. \c SCIP can be obtained at 
+      http://scip.zib.de/ and is distributed under the ZIB academic
+      license, like SoPlex.
+   </li>
 
    <li> Is there a Windows version ?
 
+      <b>XXX: TO UPDATE!</b>
       The code is tested to compile under some version of Visual C++.
       We do \b not provide any Makefiles or project files for VC++.
+   </li>
 
    <li> I want a primal and a dual simplex, where are they ?
 
@@ -283,6 +295,7 @@
       as it needs. So all you can choose is which algorithm is used first,
       but then an arbitrary number of switches may occur. (Even so, often
       no switch at all happens.)
+   </li>
 
    <li> I got an segment violation or a signal 11.
 
@@ -296,6 +309,7 @@
 
       If this doesn't help, maybe your compiler is broken. Try compiling
       without optimization. 
+   </li>
        
    <li> SoPlex means \em Sequential Simplex. Is there a parallel version
         available? 
@@ -303,19 +317,36 @@
       No. There was done research in this direction. You can find most of 
       the results in http://www.zib.de/PaperWeb/abstracts/TR-96-09 and 
       http://www.zib.de/PaperWeb/abstracts/SC-95-45 .
+   </li>
 
    <li> Is there a wrapper class/library to use SoPlex instead of CPLEX ? 
 
       No. 
+   </li>
 
    <li> Is there an interface for COIN ?
 
       Yes, have a look at 
-      http://oss.software.ibm.com/developerworks/opensource/coin
+      http://www.coin-or.org/documentation.html#OSI
+      <!--
+         http://oss.software.ibm.com/developerworks/opensource/coin
+      -->
+   </li>
+
+   <li> How can I make LP generation easier?
+   
+      You can use \c ZIMPL, available at http://www.zib.de/koch/zimpl/
+      under the ZIB academic license. It takes a (human readable) model file 
+      and a data file as input and generates LPs or MIPs in LP- or
+      MPS-format.
+
+   </li>
 
    <li> If I add rows or columns to an LP, are they checked for redundancy ?
 
+      <b> XXX: TO UPDATE! How about preprocessing?</b>
       No. You have to do it yourself.
+   </li>
 
    </ol>
 */           
@@ -325,8 +356,10 @@
    Here are some tips on which flags to use with the example program:
 
    If you have more constraints (rows) than variables (cols) it is 
-   a good idea to try the \c -r flag.
+   a good idea to try the \c -r flag to choose a row-wise representation
+   of the basis.
 
+   <b>XXX: TO UPDATE!</b>
    Setting \c -z to a smaller value like 1e-18 or 1e-20 might improve
    the quality of the solution, but may also slow down the
    program. Setting \c -z to bigger values may speed up the algorithm,
