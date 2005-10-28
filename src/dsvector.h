@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dsvector.h,v 1.10 2005/09/16 12:42:30 bzfhille Exp $"
+#pragma ident "@(#) $Id: dsvector.h,v 1.11 2005/10/28 17:25:33 bzforlow Exp $"
 
 /**@file  dsvector.h
  * @brief Dynamic sparse vectors.
@@ -32,33 +32,63 @@ namespace soplex
 /**@brief   Dynamic sparse vectors.
    @ingroup Algebra
 
-   Class DSVector implements dynamic sparse vectors, i.e. SVector%s
+   Class DSVector implements dynamic sparse vectors, i.e. #SVector%s
    with an automatic memory management. This allows the user to freely add()
    as many nonzeros to a DSVector as desired, without any precautions.
    For saving memory method setMax() allows to reduce memory consumption to
    the amount really required.
 
    @todo Both DSVector and SVector have a member variable that points to
-         allocated memory. This seems not to make too much sense.
+         allocated memory. This does not seem to make too much sense.
+         Why doesn't DSVector use the element of its base class?
  */
 class DSVector : public SVector
 {
    friend class SLinSolver;
 
 private:
-   Element* theelem;       ///< here is where the memory is
 
+   //-----------------------------------
+   /**@name Data */
+   //@{
+   Element* theelem;       ///< here is where the memory is
+   //@}
+
+   //-----------------------------------
+   /**@name Private memory helpers */
+   //@{
    /// allocate memory for \p n nonzeros. 
    void allocMem(int n);
-
    /// make sure there is room for \p n new nonzeros.
    void makeMem(int n)
    {
       if (max() - size() < ++n)
          setMax(size() + n);
    }
+   //@}
 
 public:
+
+   //-----------------------------------
+   /**@name Construction / destruction */
+   //@{
+   /// default constructor.
+   /** Creates a DSVector ready to hold \p n nonzeros. However, the memory is
+    *  automatically enlarged, if more nonzeros are added to the DSVector.
+    */
+   explicit DSVector(int n = 8);
+
+   /// destructor.
+   ~DSVector();
+   /// copy constructor from vector.
+   explicit DSVector(const Vector& vec);
+   /// copy constructor from sparse vector.
+   explicit DSVector(const SVector& old);
+   /// copy constructor from semi sparse vector.
+   explicit DSVector(const SSVector& old);
+   /// copy constructor from DSVector.
+   DSVector(const DSVector& old);
+
    /// assignment operator from semi sparse vector.
    DSVector& operator=(const SSVector& sv)
    {
@@ -91,7 +121,11 @@ public:
    }
    /// assignment operator from vector.
    DSVector& operator=(const Vector& vec);
+   //@}
 
+   //-----------------------------------
+   /**@name Adding nonzeros */
+   //@{
    /// append nonzeros of \p sv.
    void add(const SVector& sv)
    {
@@ -121,29 +155,15 @@ public:
     *  only.
     */
    void setMax(int newmax = 1);
-
-   /// copy constructor from vector.
-   explicit DSVector(const Vector& vec);
-   /// copy constructor from sparse vector.
-   explicit DSVector(const SVector& old);
-   /// copy constructor from semi sparse vector.
-   explicit DSVector(const SSVector& old);
-
-   /// copy constructor.
-   DSVector(const DSVector& old);
-
-   /// default constructor.
-   /** Creates a DSVector ready to hold \p n nonzeros. However, the memory is
-    *  automatically enlarged, if more nonzeros are added to the DSVector.
-    */
-   explicit DSVector(int n = 8);
-
-   /// destructor.
-   ~DSVector();
+   //@}
 
 #ifndef NO_CONSISTENCY_CHECKS
+   //-----------------------------------
+   /**@name Consistency check */
+   //@{
    /// consistency check.
    bool isConsistent() const;
+   //@}
 #endif
 };
 } // namespace soplex

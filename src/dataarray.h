@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataarray.h,v 1.22 2005/09/16 12:42:29 bzfhille Exp $"
+#pragma ident "@(#) $Id: dataarray.h,v 1.23 2005/10/28 17:25:33 bzforlow Exp $"
 
 /**@file  dataarray.h
  * @brief Save arrays of data objects.
@@ -36,7 +36,7 @@ namespace soplex
    @ingroup Elementary
 
    Class DataArray provides safe arrays of \ref DataObjects. For general
-   C++ objects (i.e. no data objects) class Array is provided which
+   C++ objects (in contrast to data objects) class Array is provided which
    manages memory in a C++ compliant way.
  
    The elements of an instance of DataArray can be accessed just like
@@ -48,12 +48,12 @@ namespace soplex
     - checking of array bounds when accessing elements with the
       indexing operator[]() (only when compiled without \c -DNDEBUG).
  
-   Moreover, DataArray%s may easily be extended by #insert%ing or #append%ing
-   elements to the DataArray or shrunken by #remove%ing elements. Method
-   #reSize(int n) resets the DataArray%s length to \p n thereby possibly
+   Moreover, #DataArray%s may easily be extended by #insert%ing or #append%ing
+   elements to the DataArray or shrunken by \ref remove() "removing" elements. 
+   Method reSize(int n) resets the DataArray%s length to \p n thereby possibly
    appending elements or truncating the DataArray to the required size.
  
-   A DataArray%s may be used as arguments for standard C functions requiring
+   A DataArray may be used as arguments for standard C functions requiring
    pointers through the use of get_ptr() and get_const_ptr().
  
    Internally, a DataArray object allocates a block of memory that fits up
@@ -66,8 +66,8 @@ template < class T >
 class DataArray
 {
 private:
-   int thesize;           ///< number of used elements in array #data
-   int themax;            ///< the length of array #data and
+   int thesize;           ///< number of used elements in array data
+   int themax;            ///< the length of array data and
    T*  data;              ///< the array of elements
 
 protected:
@@ -196,7 +196,7 @@ public:
    /// reset size to \p newsize.
    /** Resizing a DataArray to less than the previous size, involves
        discarding its last elements. Resizing to a larger value involves
-       adding uninitialized elements (similar to #append). If neccessary,
+       adding uninitialized elements (similar to append()). If neccessary,
        also memory will be reallocated.
        @param newsize the new number of elements the array can hold.
     */

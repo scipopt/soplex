@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: islist.h,v 1.15 2005/09/16 12:42:31 bzfhille Exp $"
+#pragma ident "@(#) $Id: islist.h,v 1.16 2005/10/28 17:25:34 bzforlow Exp $"
 
 /**@file  islist.h
  * @brief Generic single linked list.
@@ -33,14 +33,14 @@ namespace soplex
 //  class IsElement<T>
 //---------------------------------------------------------------------
 
-/**@brief   Elements for #IsList%s.
+/**@brief   Elements for \ref IsList "IsLists".
    @ingroup Elementary
 
-   Class #IsElement allows to easily construct list elements for an intrusive
-   single linked list #IsList out of a template class #T. It adds a #next
-   pointer to each element. An instance of #IdElement<T> a can be used just
-   like an instance of #T itself, except for that method #next() has been
-   added (thereby overriding any method #next() defined in #T).
+   Class IsElement allows to easily construct list elements for an intrusive
+   single linked list IsList out of a template class T. It adds a next
+   pointer to each element. An instance of IdElement<T> a can be used just
+   like an instance of T itself, except that method next() has been
+   added (thereby overriding any method next() defined in T).
  */
 template < class T >
 class IsElement : public T
@@ -50,7 +50,7 @@ protected:
    //--------------------------
    /**@name Data */
    //@{
-   IsElement<T>* the_next;       ///< pointer to next element in the #IsList.
+   IsElement<T>* the_next;       ///< pointer to next element in the IsList.
    //@}
 
 public:
@@ -63,7 +63,7 @@ public:
    {
       return the_next;
    }
-   /// returns the next element in the #IsList.
+   /// returns the next element in the IsList.
    IsElement<T>* next() const
    {
       return the_next;
@@ -100,20 +100,20 @@ public:
 /**@brief   Generic single linked list.
    @ingroup Elementary
 
-   Class #IsList implements an intrusive single linked list of elements of a
-   template class #T. As an \em instrusive list, the objects of type #T
-   must provide methods #next() for setting and inquiring a pointer to the
+   Class IsList implements an intrusive single linked list of elements of a
+   template class T. As an \em intrusive list, the objects of type T
+   must provide methods next() for setting and inquiring a pointer to the
    next element in a list. The user is responsible for not modifying the
-   #next() pointer of elements currently residing in a list, which may destroy
-   the lists integrity. For this, class #IsList provides enough methods for
+   next() pointer of elements currently residing in a list, which may destroy
+   the lists integrity. For this, class IsList provides enough methods for
    modifying a list in a save way. See the method list for a description.
  */
 template < class T >
 class IsList
 {
 protected:
-   T* the_first;   ///< the first element in the #IsList.
-   T* the_last;    ///< the last element in the #IsList.
+   T* the_first;   ///< the first element in the IsList.
+   T* the_last;    ///< the last element in the IsList.
 
 public:
    typedef IsElement<T> Element;
@@ -121,7 +121,7 @@ public:
    //--------------------------
    /**@name Extension */
    //@{
-   /// appends \p elem to #IsList.
+   /// appends \p elem to IsList.
    void append(T* elem)
    {
       if (the_last)
@@ -131,7 +131,7 @@ public:
       the_last = elem;
    }
 
-   /// prepends \p elem to #IsList.
+   /// prepends \p elem to IsList.
    void prepend(T* elem)
    {
       if (the_first)
@@ -141,7 +141,7 @@ public:
       the_first = elem;
    }
 
-   /// inserts \p elem to #IsList after its element \p after.
+   /// inserts \p elem to IsList after its element \p after.
    void insert(T* elem, T* after)
    {
       assert(find(after));
@@ -154,9 +154,9 @@ public:
       }
    }
 
-   /// appends all elements of \p list to #IsList.
+   /// appends all elements of \p list to IsList.
    /** Appending one list to another keeps the appended \p list. Instead,
-       #list remains an own #IsList which is then part of the
+       \p list remains an own IsList which is then part of the
        concatenated list. This means that modifying \p list will modify the
        concateneted list as well and vice versa. The programmer is
        responsible for such changes not to yield inconsistent lists.
@@ -170,9 +170,9 @@ public:
       }
    }
 
-   /// prepends all elements of \p list to #IsList.
+   /// prepends all elements of \p list to IsList.
    /** Appending one list to another keeps the appended \p list.  Instead,
-       \p list remains an own #IsList which is then part of the
+       \p list remains an own IsList which is then part of the
        concatenated list. This means that modifying \p list will modify the
        concateneted list as well and vice versa. The programmer is
        responsible for such changes not to yield inconsistent lists.
@@ -186,9 +186,9 @@ public:
       }
    }
 
-   /// inserts all elements of \p list after element \p after of an #IsList.
+   /// inserts all elements of \p list after element \p after of an IsList.
    /** Inserting one list into another keeps the appended \p list. Instead,
-       \p list remains an own #IsList which is then part of the
+       \p list remains an own IsList which is then part of the
        concatenated list. This means that modifying \p list will modify the
        concateneted list as well and vice versa. The programmer is
        responsible for such changes not to yield inconsistent lists.
@@ -209,7 +209,7 @@ public:
    //--------------------------
    /**@name Removal */
    //@{
-   /// removes the successor of \p after from an #IsList.
+   /// removes the successor of \p after from an IsList.
    void remove_next(T *after)
    {
       assert(find(after));
@@ -221,7 +221,7 @@ public:
       }
    }
 
-   /// removes element \p elem from an #IsList.
+   /// removes element \p elem from an IsList.
    void remove(const T *elem)
    {
       if (the_first)
@@ -245,11 +245,11 @@ public:
       }
    }
 
-   /// removes all elements of \p list from an #IsList.
-   /** Removing \p list from an #IsList requires \p list to be part of the
-       #IsList. Such a situation can be acchieved by previously adding
-       (i.e.  #append%ing, #insert%ing or #prepend%ing) a list or
-       explicitely constructing a sublist with method #sublist().
+   /// removes all elements of \p list from an IsList.
+   /** Removing \p list from an IsList requires \p list to be part of the
+       IsList. Such a situation can be achieved by previously adding
+       (i.e., #append%ing, #insert%ing or #prepend%ing) a list or
+       explicitely constructing a sublist with method sublist().
    */
    void remove(IsList<T>& list)
    {
@@ -277,7 +277,7 @@ public:
       }
    }
 
-   /// removes all elements from an #IsList.
+   /// removes all elements from an IsList.
    void clear()
    {
       the_first = the_last = 0;
@@ -287,33 +287,33 @@ public:
    //--------------------------
    /**@name Access */
    //@{
-   /// returns the #IsList's first element.
+   /// returns the IsList's first element.
    T* first() const
    {
       return the_first;
    }
 
-   /// returns the #IsList's last element.
+   /// returns the IsList's last element.
    T* last() const
    {
       return the_last;
    }
 
-   /// returns successor of \p elem in an #IsList.
+   /// returns successor of \p elem in an IsList.
    /** The successor of \p elem in a list generally corresponds to the
-       element returned by #elem->next(). However, if \p elem is the last
-       element in an #IsList, this method will return 0, whereas
-       #elem->next() may yield an arbitrary value. For example, if the
-       current list is actually a sublist of another, larger #IsList,
-       #elem->next() returns the successor of \p elem in this larger
-       #IsList.
+       element returned by elem->next(). However, if \p elem is the last
+       element in an IsList, this method will return 0, whereas
+       elem->next() may yield an arbitrary value. For example, if the
+       current list is actually a sublist of another, larger IsList,
+       elem->next() returns the successor of \p elem in this larger
+       IsList.
     */
    T* next(const T *elem) const
    {
       return (elem == the_last) ? 0 : elem->next();
    }
 
-   /// returns the number of elements in #IsList.
+   /// returns the number of elements in IsList.
    int length() const
    {
       int num;
@@ -327,7 +327,7 @@ public:
       return 0;
    }
 
-   /// returns the position of element \p elem within #IsList.
+   /// returns the position of element \p elem within IsList.
    int find(const T* elem) const
    {
       const T* test;
@@ -341,10 +341,10 @@ public:
       return 0;
    }
 
-   /// constructs sublist of an #IsList.
-   /** Returns a new #IsList containing a sublist of an #IsList starting
+   /// constructs sublist of an IsList.
+   /** Returns a new IsList containing a sublist of an IsList starting
        with element \p start and reaching up to element \p end. Both must be
-       members of the #IsList or 0, in which case the first and last
+       members of the IsList or 0, in which case the first and last
        element are used, respectively.
     */
    IsList<T>sublist(const T* start = 0, const T* end = 0) const
@@ -371,9 +371,9 @@ public:
    /** This method is of a rather technical nature. If all list elements
        are taken form one array of elements, in certain circumstances the
        user may be forced to realloc this array. As a consequence all
-       #next() pointers of the list elements would become invalid.
+       next() pointers of the list elements would become invalid.
        However, all addresses will be changed by a constant offset \p delta.
-       Then #move(delta) may be called, which adjusts the #next()
+       Then move( \p delta ) may be called, which adjusts the next()
        pointers of all elements in the list.
    */
    void move(ptrdiff_t delta)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.34 2005/09/16 12:42:29 bzfhille Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.35 2005/10/28 17:25:33 bzforlow Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -35,51 +35,52 @@ namespace soplex
 /**@brief   Set of data objects.
    @ingroup Elementary
 
-   Class #DataSet manages of sets of \ref DataObjects "Data Objects" of a
-   template type #DATA. For constructing a #DataSet the maximum number 
+   Class DataSet manages of sets of \ref DataObjects "Data Objects" of a
+   template type DATA. For constructing a DataSet the maximum number 
    of entries must be given. The current maximum number may be inquired 
-   with method #max().
+   with method max().
 
-   Adding more then #max() elements to a #DataSet will core dump. However,
-   method #reMax() allows to reset #max() without loss of elements currently
-   in the #DataSet. The current number of elements in a #DataSet is returned
-   by method #num().
+   Adding more then max() elements to a DataSet will core dump. However,
+   method reMax() allows to reset max() without loss of elements currently
+   in the DataSet. The current number of elements in a DataSet is returned
+   by method num().
    
-   Adding elements to a #DataSet is done via methods #add() or #create(),
-   while #remove() removes elements from a #DataSet. When adding an element
-   to a #DataSet the new element is assigned a #Key. #Key%s serve to
-   access #DATA elements in a set via a version of the subscript
-   #operator[](#Key).
+   Adding elements to a DataSet is done via methods add() or create(),
+   while remove() removes elements from a DataSet. When adding an element
+   to a DataSet the new element is assigned a DataKey. #DataKey%s serve to
+   access DATA elements in a set via a version of the subscript
+   operator[](DataKey).
    
-   For convenience all elements in a #DataSet are implicitely numbered
-   from 0 through #num()-1 and can be accessed with these numbers
-   using a 2nd subscript #operator[](int). The reason for providing
-   #Key%s to access elements of a #DataSet is that the #Key of an
+   For convenience all elements in a DataSet are implicitely numbered
+   from 0 through num()-1 and can be accessed with these numbers
+   using a 2nd subscript operator[](int). The reason for providing
+   #DataKey%s to access elements of a DataSet is that the Key of an
    element remains unchanged as long as the element is a member of the
-   #DataSet, while the numbers will change in an undefined way, if
-   other elements are added to or removed from the #DataSet.
+   DataSet, while the numbers will change in an undefined way, if
+   other elements are added to or removed from the DataSet.
 
-   The elements in a #DataSet and their #Key%s are stored in two arrays:
-   - #theitem keeps the elements #data along with their number stored in #item.
-   - #thekey  keeps the #Key::idx's of the elements in a #DataSet.
+   The elements in a DataSet and their #DataKey%s are stored in two arrays:
+   - theitem keeps the elements data along with their number stored in item.
+   - thekey  keeps the DataKey::idx's of the elements in a DataSet.
 
-   Both arrays have size #themax.
+   Both arrays have size themax.
 
-   In #thekey only elements 0 thru #thenum-1 contain #Key::idx%'s of
-   valid elements, i.e. elements currently in the #DataSet.
-   The current number of elements in the #DataSet is counted in #thenum.
+   In thekey only elements 0 thru thenum-1 contain DataKey::idx%'s of
+   valid elements, i.e. elements currently in the DataSet.
+   The current number of elements in the DataSet is counted in thenum.
    
-   In #theitem only elements 0 thru #thesize-1 are used, but only some of
-   them actually contain real data elements of the #DataSet. They are
-   recognized by having #info >= 0, which gives the number of that
-   element. Otherwise #info < 0 indicates an unused element. Unused
+   In theitem only elements 0 thru thesize-1 are used, but only some of
+   them actually contain real data elements of the DataSet. They are
+   recognized by having info >= 0, which gives the number of that
+   element. Otherwise info < 0 indicates an unused element. Unused
    elements are linked in a single linked list: starting with element
-   #-firstfree-1, the next free element is given by #-info-1. The last
-   free element in the list is marked by #info == -themax-1. Finally all
-   elements in #theitem with index >= #thesize are unused as well.  
+   <tt>-firstfree-1</tt>, the next free element is given by
+   <tt>-info-1.</tt> The last free element in the list is marked by 
+   <tt>info == -themax-1.</tt> Finally all elements in theitem with 
+   <tt>index >= thesize</tt> are unused as well.  
 
-   @warning malloc/realloc and memcpy are use to handle the members 
-      of the set. If you use #DataSet with something that is not
+   @warning malloc/realloc and memcpy are used to handle the members 
+      of the set. If you use DataSet with something that is not
       a \ref DataObjects "Data Object" you will be in severe trouble.
 */
 template<class DATA>
@@ -96,27 +97,27 @@ protected:
       DATA data;       ///< data element
       int  info;       ///< element number. info \f$\in\f$ [0,thesize-1] 
                        ///< iff element is used
-   }* theitem;         ///< array of elements in the #DataSet
+   }* theitem;         ///< array of elements in the DataSet
    //@}
 
    //-----------------------------------
    /**@name Data */
    //@{
-   DataKey* thekey;    ///< #DataKey::idx%s of elements
-   int themax;         ///< length of arrays #theitem and #thekey
-   int thesize;        ///< highest used element in #theitem
-   int thenum;         ///< number of elements in #DataSet
-   int firstfree;      ///< first unused element in #theitem
+   DataKey* thekey;    ///< DataKey::idx's of elements
+   int themax;         ///< length of arrays theitem and thekey
+   int thesize;        ///< highest used element in theitem
+   int thenum;         ///< number of elements in DataSet
+   int firstfree;      ///< first unused element in theitem
    //@}
 
 public:
 
    //-----------------------------------
    /**@name Extension
-    *  Whenever a new element is added to a #DataSet, the latter assigns it a
-    *  #DataKey. For this all methods that extend a #DataSet by one ore more
+    *  Whenever a new element is added to a DataSet, the latter assigns it a
+    *  DataKey. For this all methods that extend a DataSet by one ore more
     *  elements are provided with two signatures, one of them having a
-    *  parameter for returning the assigned #DataKey(s).
+    *  parameter for returning the assigned #DataKey%(s).
     */
    //@{
    /// adds an element.
@@ -178,7 +179,7 @@ public:
          add(set[i]);
    }
 
-   /// creates new data element in #DataSet.
+   /// creates new data element in DataSet.
    /**@return Pointer to the newly created element.
     */
    DATA* create(DataKey& newkey)
@@ -199,7 +200,7 @@ public:
 
       return &(theitem[newkey.idx].data);
    }
-   /// creates new (uninitialized) data element in #DataSet.
+   /// creates new (uninitialized) data element in DataSet.
    /**@return Pointer to the newly created element.
     */
    DATA* create()
@@ -209,18 +210,20 @@ public:
    }
    //@}
 
+   //-----------------------------------
    /**@name Shrinkage
-    * When elements are removed from a #DataSet, the remaining ones are
-    * renumbered from 0 through the new #size()-1. How this renumbering is
+    * When elements are removed from a DataSet, the remaining ones are
+    * renumbered from 0 through the new size()-1. How this renumbering is
     * performed will not be revealed, since it might be target of future
-    * changes. However, some methods provide a parameter int* #perm, which
-    * returns the new order after the removal: If #perm[i] < 0, the element
-    * numbered i prior to the removal operation has been removed from the
-    * set. Otherwise, #perm[i] = j >= 0 means, that the element with number
-    * i prior to the removal operation has been renumberd to j.
-    * Removing a single element from a #DataSet yields a simple
-    * renumbering of the elements: The last element in the set (i.e.
-    * element #num()-1) is moved to the index of the removed element.
+    * changes. However, some methods provide a parameter 
+    * <tt>int* perm</tt>, which
+    * returns the new order after the removal: If <tt>perm[i] < 0</tt>, 
+    * the element numbered i prior to the removal operation has been removed 
+    * from the set. Otherwise, <tt>perm[i] = j >= 0</tt> means that the 
+    * element with number i prior to the removal operation has been
+    * renumbered to j. Removing a single element from a DataSet yields a 
+    * simple renumbering of the elements: The last element in the set
+    * (i.e., element num()-1) is moved to the index of the removed element.
     */
    //@{
    /// removes the \p removenum 'th element.
@@ -255,8 +258,8 @@ public:
    }
 
    /// remove multiple elements.
-   /** This method removes all elements for the #DataSet with an
-    *  index i such that #perm[i] < 0. Upon completion, #perm contains
+   /** This method removes all elements for the DataSet with an
+    *  index i such that \p perm[i] < 0. Upon completion, \p perm contains
     *  the new numbering of elements.
     */
    void remove(int perm[])
@@ -265,7 +268,7 @@ public:
       // setup permutation and remove items
       for (k = j = 0; k < num(); ++k)
       {
-         if (perm[k] >= 0)      // #j# has not been removed ...
+         if (perm[k] >= 0)      // j has not been removed ...
             perm[k] = j++;
          else
          {
@@ -336,9 +339,9 @@ public:
 
    //-----------------------------------
    /**@name Access   
-    * When accessing elements from a #DataSet with one of the index
-    * operators, it must be ensured, that the index is valid for the
-    * #DataSet. If this is not known afore, it is the programmers
+    * When accessing elements from a DataSet with one of the index
+    * operators, it must be ensured that the index is valid for the
+    * DataSet. If this is not known afore, it is the programmers
     * responsability to ensure this using the inquiry methods below.
     */
    //@{
@@ -361,7 +364,7 @@ public:
       assert( k.idx < thesize );
       return theitem[k.idx].data;
    }
-   /// returns element with #DataKey \p k.
+   /// returns element with DataKey \p k.
    const DATA& operator[](const DataKey& k) const
    {
       assert( k.idx < thesize );
@@ -372,39 +375,39 @@ public:
    //-----------------------------------
    /**@name Inquiry */
    //@{
-   /// returns maximum number of elements that would fit into #DataSet.
+   /// returns maximum number of elements that would fit into DataSet.
    int max() const
    {
       return themax;
    }
 
-   /// returns number of elements currently in #DataSet.
+   /// returns number of elements currently in DataSet.
    int num() const
    {
       return thenum;
    }
 
-   /// returns the maximum #DataKey::idx currently in #DataSet.
+   /// returns the maximum DataKey::idx currently in DataSet.
    int size() const
    {
       return thesize;
    }
 
-   /// returns #DataKey of \p n 'th element in #DataSet.
+   /// returns DataKey of \p n 'th element in DataSet.
    DataKey key(int n) const
    {
       assert(n >= 0 && n < num());
       return thekey[n];
    }
 
-   /// returns #DataKey of element \p item in #DataSet.
+   /// returns DataKey of element \p item in DataSet.
    DataKey key(const DATA* item) const
    {
       assert(number(item) >= 0);
       return thekey[number(item)];
    }
 
-   /// returns the number of the element with #DataKey \p k in #DataSet or -1, 
+   /// returns the number of the element with DataKey \p k in DataSet or -1, 
    /// if it doesn't exist.
    int number(const DataKey& k) const
    {
@@ -413,7 +416,7 @@ public:
    }
 
    /**@todo Please check, whether this is correctly implemented! */
-   /// returns the number of element \p item in #DataSet or -1, 
+   /// returns the number of element \p item in DataSet or -1, 
    /// if it doesn't exist.
    int number(const DATA* item) const
    {      
@@ -436,19 +439,19 @@ public:
       return theitem[idx].info;
    }
 
-   /// Is \p k a valid #DataKey of an element in #DataSet?
+   /// Is \p k a valid DataKey of an element in DataSet?
    int has(const DataKey& k) const
    {
       return theitem[k.idx].info >= 0;
    }
 
-   /// Is \p n a valid number of an element in #DataSet?
+   /// Is \p n a valid number of an element in DataSet?
    int has(int n) const
    {
       return (n >= 0 && n < num());
    }
 
-   /// Does \p item belong to #DataSet?
+   /// Does \p item belong to DataSet?
    int has(const DATA* item) const
    {
       return number(item) >= 0;
@@ -458,13 +461,13 @@ public:
    //-----------------------------------
    /**@name Miscellaneous */
    //@{
-   /// resets #max() to \p newmax.
-   /** This method will not succeed if \p newmax < #size(), in which case
-    *  \p newmax == #size() will be taken. As generally this method involves
-    *  copying the #DataSet%s elements in memory, #reMax() returns the
-    *  number of bytes the addresses of elements in the #DataSet have been
+   /// resets max() to \p newmax.
+   /** This method will not succeed if \p newmax < size(), in which case
+    *  \p newmax == size() will be taken. As generally this method involves
+    *  copying the #DataSet%s elements in memory, reMax() returns the
+    *  number of bytes the addresses of elements in the DataSet have been
     *  moved. Note, that this is identical for all elements in the
-    *  #DataSet.
+    *  DataSet.
     */
    ptrdiff_t reMax(int newmax = 0)
    {
@@ -549,7 +552,7 @@ public:
    }
 
    /// assignment operator.
-   /** The assignment operator involves #reMax()%ing the lvalue #DataSet
+   /** The assignment operator involves #reMax()%ing the lvalue DataSet
     *  to the size needed for copying all elements of the rvalue. After the
     *  assignment all #DataKey%s from the lvalue are valid for the rvalue as
     *  well. They refer to a copy of the corresponding data elements.

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idxset.h,v 1.8 2005/09/16 12:42:31 bzfhille Exp $"
+#pragma ident "@(#) $Id: idxset.h,v 1.9 2005/10/28 17:25:34 bzforlow Exp $"
 
 /**@file  idxset.h
  * @brief Set of indices.
@@ -29,105 +29,48 @@ namespace soplex
 /**@brief   Set of indices.
    @ingroup Elementary
 
-   Class #IdxSet provides a set of indices. At construction it must be given
-   an array of #int where to store the indice and its length. The array will
-   from then on be managed by the #IdxSet.
+   Class IdxSet provides a set of indices. At construction it must be given
+   an array of int where to store the indice and its length. The array will
+   from then on be managed by the IdxSet.
    
-   Indices are implicitely numbered from 0 thru #size()-1. They can be
-   accessed (and altered) via method #index() with the desired index number as
+   Indices are implicitely numbered from 0 thru size()-1. They can be
+   accessed (and altered) via method index() with the desired index number as
    argument.  Range checking is performed in the debug version.
    
-   Indices may be added or removed from the set, by calling #add() or
-   #remove() methods, respectively. However, no #IdxSet can hold more then
-   #max() indices, i.e. the number given at the constructor.
+   Indices may be added or removed from the set, by calling add() or
+   remove() methods, respectively. However, no IdxSet can hold more then
+   max() indices, i.e. the number given at the constructor.
    
    When removing indices, the remaining ones are renumbered. However, all
    indices before the first removed index keep their number unchanged.
 
-   The internal structure of an #IdxSet consists of an array #idx storing the
-   indices, its length #len, and the actually used number of indices #num.
-   The class #IdxSet doesn't allocate memory for the #idx array. Instead, the
+   The internal structure of an IdxSet consists of an array #idx storing the
+   indices, its length len, and the actually used number of indices #num.
+   The class IdxSet doesn't allocate memory for the #idx array. Instead, the
    user has to provide an adequate buffer to the constructor.
 
-   An #IdxSet cannot be extended to fit more than #max() elements. If
-   neccessary, the user must explicitely provide the #IdxSet with a
-   suitable memory. Alternatively, one can use #DIdxSet%s which provide
-   the required memory managemant.
+   An IdxSet cannot be extended to fit more than max() elements. If
+   neccessary, the user must explicitely provide the IdxSet with a
+   suitable memory. Alternatively, one can use \ref DIdxSet "DIdxSets" 
+   which provide the required memory managemant.
 */
 class IdxSet
 {
 protected:
+
+   //---------------------------------------
+   /**@name Data */
+   //@{
    int  num;           ///< number of used indices
    int  len;           ///< length of array #idx
    int* idx;           ///< array of indices
+   //@}
 
 public:
-   /// access \p n 'th index.
-   int index(int n) const
-   {
-      assert(n >= 0 && n < size());
-      return idx[n];
-   }
-   /// returns the number of used indices.
-   int size() const
-   {
-      return num;
-   }
-   /// returns the maximal number of indices which can be stored in #IdxSet.
-   int max() const
-   {
-      return len;
-   }
 
-   /// returns the maximal index.
-   int dim() const;
-
-   /// returns the position number of index \p i.
-   /** Returns the number of the first index \p i. If no index \p i is
-       available in the #IdxSet, -1 is returned. Otherwise,
-       #index(number(i)) == \p i holds.
-    */
-   int number(int i) const;
-
-   /// appends \p n uninitialized indices.
-   void add(int n)
-   {
-      assert(n >= 0 && n + size() <= max());
-      num += n;
-   }
-
-   /// appends all indices of \p set.
-   void add(const IdxSet& set)
-   {
-      add(set.size(), set.idx);
-   }
-
-   /// appends \p n indices in \p i.
-   void add(int n, const int i[]);
-
-   /// appends index \p i.
-   void addIdx(int i)
-   {
-      assert(size() < max());
-      idx[num++] = i;
-   }
-   /// removes indices at position numbers \p n through \p m.
-   void remove(int n, int m);
-
-   /// removes \p n 'th index.
-   void remove(int n)
-   {
-      /**@todo Shouldn't this be an assert instead of an if (see add()) */
-      if (n < size() && n >= 0)
-         idx[n] = idx[--num];
-   }
-
-   /// removes all indices.
-   void clear()
-   {
-      num = 0;
-   }
-
+   //---------------------------------------
+   /**@name Construction / destruction */
+   //@{
    /// constructor.
    /** The constructur receives the index memory \p imem to use for saving
        its indices. This must be large enough to fit \p n indices. \p l can
@@ -157,15 +100,103 @@ public:
        enough index memory.
     */
    IdxSet& operator=(const IdxSet& set);
+   //@}
+
+   //---------------------------------------
+   /**@name Access */
+   //@{
+   /// access \p n 'th index.
+   int index(int n) const
+   {
+      assert(n >= 0 && n < size());
+      return idx[n];
+   }
+   /// returns the number of used indices.
+   int size() const
+   {
+      return num;
+   }
+   /// returns the maximal number of indices which can be stored in #IdxSet.
+   int max() const
+   {
+      return len;
+   }
+
+   /// returns the maximal index.
+   int dim() const;
+
+   /// returns the position number of index \p i.
+   /** Returns the number of the first index \p i. If no index \p i is
+       available in the #IdxSet, -1 is returned. Otherwise,
+       #index(number(i)) == \p i holds.
+    */
+   int number(int i) const;
+   //@}
+
+   //---------------------------------------
+   /**@name Modification */
+   //@{
+   /// appends \p n uninitialized indices.
+   void add(int n)
+   {
+      assert(n >= 0 && n + size() <= max());
+      num += n;
+   }
+
+   /// appends all indices of \p set.
+   void add(const IdxSet& set)
+   {
+      add(set.size(), set.idx);
+   }
+
+   /// appends \p n indices in \p i.
+   void add(int n, const int i[]);
+
+   /// appends index \p i.
+   void addIdx(int i)
+   {
+      assert(size() < max());
+      idx[num++] = i;
+   }
+   /// removes indices at position numbers \p n through \p m.
+   void remove(int n, int m);
+
+   /// removes \p n 'th index.
+   void remove(int n)
+   {
+//      /**@todo Shouldn't this be an assert instead of an if (see add()) */
+//      if (n < size() && n >= 0)
+//         idx[n] = idx[--num];
+      assert(n >= 0 && n < size()); 
+      idx[n] = idx[--num];
+   }
+
+   /// removes all indices.
+   void clear()
+   {
+      num = 0;
+   }
+   //@}
 
 #ifndef NO_CONSISTENCY_CHECKS
+
+   //---------------------------------------
+   /**@name Consistency check */
+   //@{
    /// consistency check.
    bool isConsistent() const;
+   //@}
+
 #endif
 
 private:
-   /// no copy constructor.
+
+   //---------------------------------------
+   /**@name Blocked */
+   //@{
+   /// blocked copy constructor.
    IdxSet(const IdxSet&);
+   //@}
 };
 
 } // namespace soplex

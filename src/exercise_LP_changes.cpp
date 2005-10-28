@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: exercise_LP_changes.cpp,v 1.2 2005/09/28 12:30:34 bzfhille Exp $"
+#pragma ident "@(#) $Id: exercise_LP_changes.cpp,v 1.3 2005/10/28 17:25:33 bzforlow Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -64,12 +64,15 @@ using namespace soplex;
  */
 class TestSolver : public SoPlex
 {
-   /**
+public:
+
+   //------------------------------------
+   /**@name Default parameter values
       Parameters used for LP solving. They mainly correspond to the defaults of
       the main binary, except for the ones indicated by "// *".
-      Part of the default settings are also realized in the ctor below.
+      Parts of the default settings are also realized in the constructor below.
    */
-public:
+   //@{
    static const SLUFactor::UpdateType update = SLUFactor::FOREST_TOMLIN;
    static const Real delta = DEFAULT_BND_VIOL;
    static const Real timelimit = -1.0;
@@ -78,17 +81,28 @@ public:
    static const Real epsilon_update = DEFAULT_EPS_UPDATE;
    static const int verbose = 1;
    static const int precision = 12;
+   //@}
 
 private:
+
+   //------------------------------------
+   /**@name Data */
+   //@{
    SPxPricer* _pricer;
    SPxRatioTester* _ratiotester;
    SPxScaler* _prescaler;
    SPxScaler* _postscaler;
    SPxSimplifier* _simplifier;
    SPxStarter* _starter;
+   //@}
 
 public:
+
+   //------------------------------------
+   /**@name Construction / destruction */
+   //@{
    /// Default constructor.
+   explicit
    TestSolver( const SPxSolver::Type type_ = SPxSolver::LEAVE, 
                const SPxSolver::Representation representation_ = SPxSolver::COLUMN )
       : SoPlex( type_, representation_ )
@@ -137,6 +151,7 @@ public:
       delete _simplifier;
       delete _starter;
    }
+   //@}
 };
 
 //
@@ -168,14 +183,23 @@ class ChangeExerciser
    static const Real epsilon_solution_equal = 1e-9;
 
 public:
+
+   //------------------------------------
+   /**@name Construction / destruction */
+   //@{
    /// Default constructor.
+   explicit
    ChangeExerciser( const std::string& instance_name )
       : _asserts_failed( 0 )
       , _instance_name( instance_name )
    {}
+   //@}
 
-   //@{ Test methods     
 public:
+
+   //------------------------------------
+   /**@name Test methods */
+   //@{
    void test_add_delete_row();
    void test_add_delete_rows();
    void test_add_delete_col();
@@ -191,8 +215,12 @@ public:
    long asserts_failed() const { return _asserts_failed; }
    //@}
 
-   //@{ Testing support 
 private:
+
+   //------------------------------------
+   /**@name Testing support */
+   //@{
+   ///
    void _assert( const std::string& description, const bool condition )
    {
       if ( !condition )
@@ -201,7 +229,7 @@ private:
             std::cout << "check '" << description << "' failed" << std::endl;
          }
    }
-
+   ///
    void _assert_EQrel( const std::string& description, const Real ref, const Real val )
    {
       if ( !EQrel( ref, val, epsilon_solution_equal ) )
@@ -212,6 +240,7 @@ private:
          }
    }
 
+   ///
    TestSolver* _prepare_Solver() const 
    {
       TestSolver* work_ptr = new TestSolver;
@@ -219,7 +248,9 @@ private:
       return work_ptr;
    }
 
+   ///
    long _asserts_failed;
+   ///
    std::string _instance_name;
    //@}   
 };

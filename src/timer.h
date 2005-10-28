@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: timer.h,v 1.9 2002/01/31 08:19:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: timer.h,v 1.10 2005/10/28 17:25:34 bzforlow Exp $"
 
 /**@file  timer.h
  * @brief Timer class.
@@ -24,11 +24,13 @@
 
 namespace soplex
 {
-/**@name    Timer
+/**@class   Timer
    @ingroup Elementary
 
-    In C or C++ programs, the usual way to measure time intervalls,
-    e.g.  running times of some complex computations, is to call one
+   Wrapper for the system time query methods.
+
+    In C or C++ programs, the usual way to measure time intervals,
+    e.g., running times of some complex computations, is to call one
     of the provided system functions like %clock(), %time(), %times(),
     %gettimeofday(), %getrusage() etc.  By these functions one can
     gather information about the process' user and system time and the
@@ -38,12 +40,12 @@ namespace soplex
     determines computation times by querying a (virtual) clock value
     at the beginning and another one at the end of some computation
     and converting the difference of these values into seconds.  Some
-    functions impose some restrictions, for instance, the values of
+    functions impose restrictions; for instance, the values of
     the ANSI C function %clock() are of high resolution but will wrap
     around after about 36 minutes (cpu time).  Most timing functions
     take some data structure as argument that has to be allocated
     before the call and from which the user has to pick up the
-    information of interest after the call.  Problems can arise, when
+    information of interest after the call.  Problems can arise when
     porting programs to other operating systems that do not support
     standards like POSIX etc.
  
@@ -93,22 +95,39 @@ namespace soplex
 class Timer
 {
 private:
-   static const long ticks_per_sec;  ///< ticks per secound, should be constant
 
+   //------------------------------------
+   /**@name Types */
+   //@{
+   /// status of the timer
    enum  
    {
       RESET,                   ///< reset
       STOPPED,                 ///< stopped
       RUNNING                  ///< running
    } status;                   ///< timer status
+   //@}
 
+   //------------------------------------
+   /**@name number of ticks per second */
+   //@{
+   static const long ticks_per_sec;  ///< ticks per secound, should be constant
+   //@}
+
+   //------------------------------------
+   /**@name Data */
+   //@{
    long         uAccount;      ///< user time
    long         sAccount;      ///< system time
    long         rAccount;      ///< real time
    mutable long uTicks;        ///< user ticks 
    mutable long sTicks;        ///< system ticks
    mutable long rTicks;        ///< real ticks 
+   //@}
 
+   //------------------------------------
+   /**@name Internal helpers */
+   //@{
    /// convert ticks to secounds.
    Real ticks2sec(long ticks) const
    {
@@ -117,13 +136,24 @@ private:
 
    /// get actual user, system and real ticks from the system.
    void updateTicks() const;
+   //@}
  
 public:
+
+   //------------------------------------
+   /**@name Construction / destruction */
+   //@{
    /// default constructor
-   Timer() : status(RESET), uAccount(0), sAccount(0), rAccount(0)
+   Timer() 
+      : status(RESET), uAccount(0), sAccount(0), rAccount(0)
    {
       assert(ticks_per_sec > 0);
    }
+   //@}
+
+   //------------------------------------
+   /**@name Control */
+   //@{
    /// initialize timer, set timing accounts to zero.
    void reset()
    {
@@ -136,10 +166,13 @@ public:
 
    /// stop timer, return accounted user time.
    Real stop();
+   //@}
 
+   //------------------------------------
+   /**@name Access */
+   //@{
    /// get accounted user, system or real time.
-   void getTimes(
-      Real* userTime, Real* systemTime, Real* realTime) const;
+   void getTimes( Real* userTime, Real* systemTime, Real* realTime) const;
 
    /// return accounted user time.
    Real userTime() const;
@@ -152,6 +185,7 @@ public:
 
    /// return resolution of timer as 1/seconds.
    long resolution() const { return ticks_per_sec; }
+   //@}
 };
 } // namespace soplex
 #endif // _TIMER_H_

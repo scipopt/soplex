@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: random.h,v 1.10 2005/09/16 12:42:32 bzfhille Exp $"
+#pragma ident "@(#) $Id: random.h,v 1.11 2005/10/28 17:25:34 bzforlow Exp $"
 
 /**@file  random.h
  * @brief Random numbers.
@@ -33,9 +33,9 @@ namespace soplex
 /**@brief   Random numbers.
    @ingroup Elementary
 
-   Class #Random provides random Real variables, i.e. a value variable that
+   Class Random provides random Real variables, i.e. a value variable that
    gives another value each time it is accessed. It may be used just like an
-   ordinary Real by means of an overloaded cast #operator Real().
+   ordinary Real by means of an overloaded cast operator Real()%.
 */
 class Random
 {
@@ -84,7 +84,7 @@ public:
    }
 
    /// returns next random number.
-   /** When a #Random variable is used where a #Real value is
+   /** When a Random variable is used where a Real value is
        expected, a new random number within the range specified in the
        constructor is retured.
     */
@@ -139,7 +139,7 @@ public:
    /**@name Constructors / destructors */
    //@{
    /// default constructor.
-   /** Constructs a new (pseudo) #Random variable returning values between
+   /** Constructs a new (pseudo) Random variable returning values between
        \p p_min and \p p_max and using \p p_seed as seed for the random
        variable's sequence.
    */

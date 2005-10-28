@@ -20,8 +20,8 @@
 // ============================================================================
 //
 // File          : gzstream.C
-// Revision      : $Revision: 1.6 $
-// Revision_date : $Date: 2005/07/15 16:46:39 $
+// Revision      : $Revision: 1.7 $
+// Revision_date : $Date: 2005/10/28 17:25:34 $
 // Author(s)     : Deepak Bandyopadhyay, Lutz Kettner
 // 
 // Standard streambuf implementation following Nicolai Josuttis, "The 
@@ -44,10 +44,10 @@ namespace GZSTREAM_NAMESPACE {
 // class gzstreambuf:
 // --------------------------------------
 
-gzstreambuf* gzstreambuf::open( const char* name, int open_mode) {
+gzstreambuf* gzstreambuf::open( const char* _name, int _open_mode) {
     if ( is_open())
         return 0;
-    mode = open_mode;
+    mode = _open_mode;
     // no append nor read/write mode
     if ((mode & std::ios::ate) || (mode & std::ios::app)
         || ((mode & std::ios::in) && (mode & std::ios::out)))
@@ -60,7 +60,7 @@ gzstreambuf* gzstreambuf::open( const char* name, int open_mode) {
         *fmodeptr++ = 'w';
     *fmodeptr++ = 'b';
     *fmodeptr = '\0';
-    file = gzopen( name, fmode);
+    file = gzopen( _name, fmode);
     if (file == 0)
         return 0;
     opened = 1;
@@ -148,8 +148,8 @@ gzstreambase::~gzstreambase() {
     buf.close();
 }
 
-void gzstreambase::open( const char* name, int open_mode) {
-    if ( ! buf.open( name, open_mode))
+void gzstreambase::open( const char* _name, int _open_mode) {
+    if ( ! buf.open( _name, _open_mode))
         setstate(std::ios::badbit);
     // clear( rdstate() | std::ios::badbit);
 }

@@ -20,8 +20,8 @@
 // ============================================================================
 //
 // File          : gzstream.h
-// Revision      : $Revision: 1.6 $
-// Revision_date : $Date: 2005/07/15 16:46:40 $
+// Revision      : $Revision: 1.7 $
+// Revision_date : $Date: 2005/10/28 17:25:34 $
 // Author(s)     : Deepak Bandyopadhyay, Lutz Kettner
 // 
 // Standard streambuf implementation following Nicolai Josuttis, "The 
@@ -43,48 +43,136 @@ namespace GZSTREAM_NAMESPACE {
 #endif
 
 // ----------------------------------------------------------------------------
-// Internal classes to implement gzstream. See below for user classes.
+//    Internal classes to implement gzstream. See below for user classes.
 // ----------------------------------------------------------------------------
 
-class gzstreambuf : public std::streambuf {
+// ----------------------------------------------------------------------------
+//    class gzstreambuf
+// ----------------------------------------------------------------------------
+
+/**@class gzstreambuf
+   @brief Internal class to implement gzstream.
+*/
+class gzstreambuf 
+   : public std::streambuf 
+{
 private:
-    static const int bufferSize = 47+256;    // size of data buff
-    // totals 512 bytes under g++ for igzstream at the end.
 
-    gzFile           file;               // file handle for compressed file
-    char             buffer[bufferSize]; // data buffer
-    char             opened;             // open/close state of stream
-    int              mode;               // I/O mode
+   //------------------------------------
+   /**@name Types */
+   //@{
+   ///
+   static const int bufferSize = 47+256;   ///< size of data buff
+   // totals 512 bytes under g++ for igzstream at the end.
+   //@}
 
-    int flush_buffer();
+   //------------------------------------
+   /**@name Data */
+   //@{
+   gzFile           file;               ///< file handle for compressed file
+   char             buffer[bufferSize]; ///< data buffer
+   char             opened;             ///< open/close state of stream
+   int              mode;               ///< I/O mode
+   //@}
+
+   //------------------------------------
+   /**@name Internal helpers */
+   //@{
+   ///
+   int flush_buffer();
+   //@}
+
 public:
-    gzstreambuf() : opened(0) {
-        setp( buffer, buffer + (bufferSize-1));
-        setg( buffer + 4,     // beginning of putback area
-              buffer + 4,     // read position
-              buffer + 4);    // end position      
-        // ASSERT: both input & output capabilities will not be used together
-    }
-    int is_open() { return opened; }
-    gzstreambuf* open( const char* name, int open_mode);
-    gzstreambuf* close();
-    ~gzstreambuf() { close(); }
-    
-    virtual int     overflow( int c = EOF);
-    virtual int     underflow();
-    virtual int     sync();
+
+   //------------------------------------
+   /**@name Construction / destruction */
+   //@{
+   /// default constructor
+   gzstreambuf() 
+      : opened(0) 
+   {
+      setp( buffer, buffer + (bufferSize-1));
+      setg( buffer + 4,     // beginning of putback area
+            buffer + 4,     // read position
+            buffer + 4);    // end position      
+      // ASSERT: both input & output capabilities will not be used together
+   }
+   /// destructor
+   ~gzstreambuf() 
+   { 
+      close(); 
+   }
+   //@}
+
+   //------------------------------------
+   /**@name Interface */
+   //@{
+   ///
+   int is_open() 
+   { 
+      return opened; 
+   }
+   ///
+   gzstreambuf* open( const char* name, int open_mode );
+   ///
+   gzstreambuf* close();
+   ///
+   virtual int     overflow( int c = EOF );
+   ///
+   virtual int     underflow();
+   ///
+   virtual int     sync();
+   //@}
 };
 
-class gzstreambase : virtual public std::ios {
+// ----------------------------------------------------------------------------
+//    class gzstreambase
+// ----------------------------------------------------------------------------
+
+/**@class gzstreambase
+   @brief Internal class to implement gzstream.
+*/
+class gzstreambase 
+   : virtual public std::ios 
+{
 protected:
-    gzstreambuf buf;
+
+   //------------------------------------
+   /**@name Data */
+   //@{
+   ///
+   gzstreambuf buf;
+   //@}
+
 public:
-    gzstreambase() { init(&buf); }
-    gzstreambase( const char* name, int open_mode);
-    ~gzstreambase();
-    void open( const char* name, int open_mode);
-    void close();
-    gzstreambuf* rdbuf() { return &buf; }
+
+   //------------------------------------
+   /**@name Construction / destruction */
+   //@{
+   /// default constructor
+   gzstreambase() 
+   { 
+      init(&buf); 
+   }
+   /// full constructor
+   gzstreambase( const char* _name, int _open_mode );
+   /// destructor
+   ~gzstreambase();
+   //@}
+
+   //------------------------------------
+   /**@name Interface */
+   //@{
+   ///
+   void open( const char* _name, int _open_mode );
+   ///
+   void close();
+   ///
+   gzstreambuf* rdbuf() 
+   { 
+      return &buf; 
+   }
+   //@}
 };
 
 // ----------------------------------------------------------------------------
@@ -93,26 +181,94 @@ public:
 // function interface of the zlib. Files are compatible with gzip compression.
 // ----------------------------------------------------------------------------
 
-class igzstream : public std::istream, public gzstreambase {
+// ----------------------------------------------------------------------------
+//    class igzstream
+// ----------------------------------------------------------------------------
+
+/**@class igzstream
+   @brief Class to implement a gzip'd input stream.
+*/
+class igzstream 
+   : public std::istream
+   , public gzstreambase 
+{
 public:
-    igzstream() : std::istream( &buf) {} 
-    igzstream( const char* name, int open_mode = std::ios::in)
-        : std::istream( &buf), gzstreambase( name, open_mode)  {}  
-    gzstreambuf* rdbuf() { return gzstreambase::rdbuf(); }
-    void open( const char* name, int open_mode = std::ios::in) {
-        gzstreambase::open( name, open_mode);
-    }
+
+   //------------------------------------
+   /**@name Construction / destruction */
+   //@{
+   /// default constructor
+   igzstream() 
+      : std::istream( &buf) 
+   {} 
+   /// full constructor
+   igzstream( const char*  _name, 
+              int          _open_mode = std::ios::in )
+      : std::istream( &buf )
+      , gzstreambase( _name, _open_mode )
+   {}  
+   //@}
+
+   //------------------------------------
+   /**@name Interface */
+   //@{
+   ///
+   gzstreambuf* rdbuf() 
+   { 
+      return gzstreambase::rdbuf(); 
+   }
+   ///
+   void open( const char*  _name, 
+              int          _open_mode = std::ios::in )
+   {
+       gzstreambase::open( _name, _open_mode );
+   }
+   //@}
 };
 
-class ogzstream : public gzstreambase, public std::ostream {
+// ----------------------------------------------------------------------------
+//    class ogzstream
+// ----------------------------------------------------------------------------
+
+/**@class ogzstream
+   @brief Class to implement a gzip'd output stream.
+*/
+class ogzstream 
+   : public gzstreambase
+   , public std::ostream 
+{
 public:
-    ogzstream() : std::ostream( &buf) {}
-    ogzstream( const char* name, int mode = std::ios::out)
-        : gzstreambase( name, mode), std::ostream( &buf) {}  
-    gzstreambuf* rdbuf() { return gzstreambase::rdbuf(); }
-    void open( const char* name, int open_mode = std::ios::out) {
-        gzstreambase::open( name, open_mode);
-    }
+
+   //------------------------------------
+   /**@name Construction / destruction */
+   //@{
+   /// default constructor
+   ogzstream() 
+      : std::ostream( &buf) 
+   {}
+   /// full constructor
+   explicit
+   ogzstream( const char* _name, 
+              int         _open_mode = std::ios::out )
+      : gzstreambase( _name, _open_mode )
+      , std::ostream( &buf) 
+   {}  
+   //@}
+
+   //------------------------------------
+   /**@name Interface */
+   //@{
+   ///
+   gzstreambuf* rdbuf() 
+   { 
+      return gzstreambase::rdbuf(); 
+   }
+   ///
+   void open( const char*  _name, 
+              int          _open_mode = std::ios::out ) 
+   {
+      gzstreambase::open( _name, _open_mode );
+   }
 };
 
 #ifdef GZSTREAM_NAMESPACE

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.cpp,v 1.25 2005/09/16 12:42:38 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxweightst.cpp,v 1.26 2005/10/28 17:25:34 bzforlow Exp $"
 
 //#define DEBUGGING 1
 //#define TEST 1
@@ -131,14 +131,16 @@ static void setDualStatus(
 }
 // ----------------------------------------------------------------
 
-/**
-   Compare class for row weights.
- */
+/// Compare class for row weights, used for sorting.
 struct Compare
 {
-   const SPxSolver* base;
-   const Real*      weight;
+public:
+   /// constructor
+   Compare() : weight( NULL ) {}
+//   const SPxSolver* base;     ///< the solver
+   const Real*      weight;   ///< the weights to compare
 
+   /// compares the weights
    Real operator()(int i1, int i2) const
    {
       return weight[i1] - weight[i2];
@@ -165,7 +167,7 @@ static void initPrefs(
    int k;
 
    Compare compare;
-   compare.base = &base;
+//   compare.base = &base;
 
    for(i = 0; i < base.nRows(); ++i)
       row[i] = i;

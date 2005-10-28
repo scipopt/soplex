@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.21 2005/09/16 12:42:36 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.22 2005/10/28 17:25:34 bzforlow Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -1357,11 +1357,12 @@ protected:
    virtual void factorize();
 
 private:
-   /// let index \p i leave the basis and manage entering of another one.
-   ///@returns false if LP is unbounded/infeasible.
+
+   /** let index \p i leave the basis and manage entering of another one.
+      @returns \c false if LP is unbounded/infeasible. */
    bool leave(int i);
-   /// let id enter the basis and manage leaving of another one.
-   ///@returns false if LP is unbounded/infeasible.
+   /** let id enter the basis and manage leaving of another one.
+       @returns \c false if LP is unbounded/infeasible. */
    bool enter(SPxId& id);
 
    /// test coVector #i# with status #stat#.

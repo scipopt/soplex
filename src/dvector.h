@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dvector.h,v 1.12 2005/09/16 12:42:30 bzfhille Exp $"
+#pragma ident "@(#) $Id: dvector.h,v 1.13 2005/10/28 17:25:33 bzforlow Exp $"
 
 /**@file  dvector.h
  * @brief Dymnamic vectors.
@@ -33,22 +33,22 @@ namespace soplex
 /**@brief   Dynamic vectors.
    @ingroup Algebra
 
-   Class #DVector is a derived class of #Vector adding automatic
+   Class DVector is a derived class of Vector adding automatic
    memory management to such objects. This allows to implement maths
-   operations #operator+() and #operator-(). Further, it is possible
-   to reset the dimension of a #DVector via method #reDim(). However,
-   this may render all references to values of a #reDim()%ed #DVector
+   operations operator+() and operator-(). Further, it is possible
+   to reset the dimension of a DVector via method reDim(). However,
+   this may render all references to values of a #reDim()%ed DVector
    invalid.
    
-   For vectors that are often subject to #reDim() it may be
+   For vectors that are often subject to reDim() it may be
    unconvenient to reallocate the required memory every
-   time. Instead, an array of values of length #memSize() is kept,
-   where only the first #dim() elements are used.  Initially,
-   #memSize() == #dim(). However, if the dimension is increased,
-   #memSize() will be increased at least by a factor of 1.2 to be
+   time. Instead, an array of values of length memSize() is kept,
+   where only the first dim() elements are used.  Initially,
+   memSize() == dim(). However, if the dimension is increased,
+   memSize() will be increased at least by a factor of 1.2 to be
    prepared for future (small) #reDim()%s. Finally, one can explicitly
-   set #memSize() with method #reSize(), but not lower than
-   #dim().  
+   set memSize() with method reSize(), but not lower than
+   dim().  
 */
 class DVector : public Vector
 {
@@ -96,11 +96,13 @@ public:
    friend std::istream& operator>>(std::istream& s, DVector& vec);
    //@}
 
+#if 0
    //--------------------------------------------------
    /**@name Arithmetic operations (member functions) */
    //@{
    /**@todo Do we really have to reimplement the following operators 
-    *       (inheritance from Vector?)  
+    *       (inheritance from Vector?). All the more as these methods are
+    *       not virtual.
     */
    /// adds \p vec to %vector.
    DVector& operator+=(const Vector& vec)
@@ -135,20 +137,21 @@ public:
       return *this;
    }
    //@}
+#endif
 
    //--------------------------------------------------
    /**@name Access */
    //@{
-   /// resets #DVector%s dimension to \p newdim.
+   /// resets #DVector%'s dimension to \p newdim.
    void reDim(int newdim);
 
-   /// resets #DVector%s memory size to \p newsize.
+   /// resets #DVector%'s memory size to \p newsize.
    void reSize(int newsize);
 
-   /// resets #DVector%s memory size to \p newsize and dimension to \p newdim.
+   /// resets #DVector%'s memory size to \p newsize and dimension to \p newdim.
    void reSize(int newsize, int newdim);
 
-   /// returns #DVector%s memory size.
+   /// returns #DVector%'s memory size.
    int memSize() const
    {
       return memsize;

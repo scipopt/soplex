@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcol.h,v 1.11 2005/09/16 12:42:31 bzfhille Exp $"
+#pragma ident "@(#) $Id: lpcol.h,v 1.12 2005/10/28 17:25:34 bzforlow Exp $"
 
 /**@file  lpcol.h
  * @brief LP column.
@@ -48,12 +48,50 @@ namespace soplex
 class LPCol
 {
 private:
-   Real   up;
-   Real   low;
-   Real   object;
-   DSVector vec;
+
+   //------------------------------------
+   /**@name Data */
+   //@{
+   Real   up;           ///< upper bound
+   Real   low;          ///< lower bound
+   Real   object;       ///< objective value
+   DSVector vec;        ///< the column vector
+   //@}
 
 public:
+
+   //------------------------------------
+   /**@name Construction / destruction */
+   //@{
+   /// default constructor.
+   /** Construct LPCol with a column vector ready for taking \p defDim
+    *  nonzeros.
+    */
+   explicit LPCol(int defDim = 0)
+      : up(infinity), low(0), object(0), vec(defDim)
+   {}
+
+   /// initializing constructor.
+   /*  Construct LPCol with the given objective value \p obj, a column
+    *  %vector \p vec, upper bound \p upper and lower bound \p lower.
+    */
+   LPCol(Real p_obj, const SVector& p_vector, Real p_upper, Real p_lower)
+      : up(p_upper), low(p_lower), object(p_obj), vec(p_vector)
+   {}
+
+   /// copy constructor.
+   LPCol(const LPCol& old)
+      : up(old.up), low(old.low), object(old.object), vec(old.vec)
+   {}
+
+   /// destructor
+   ~LPCol()
+   {}
+   //@}
+
+   //------------------------------------
+   /**@name Access / modification */
+   //@{
    /// get objective value.
    Real obj() const
    {
@@ -98,34 +136,18 @@ public:
    {
       vec = p_vec;
    }
-
-   /// copy constructor.
-   LPCol(const LPCol& old)
-      : up(old.up), low(old.low), object(old.object), vec(old.vec)
-   {}
-
-   /// default constructor.
-   /** Construct LPCol with a column vector ready for taking \p defDim
-    *  nonzeros.
-    */
-   explicit LPCol(int defDim = 0)
-      : up(infinity), low(0), object(0), vec(defDim)
-   {}
-
-   /// initializing constructor.
-   /*  Construct LPCol with the given objective value \p obj, a column
-    *  %vector \p vec, upper bound \p upper and lower bound \p lower.
-    */
-   LPCol(Real p_obj, const SVector& p_vector, Real p_upper, Real p_lower)
-      : up(p_upper), low(p_lower), object(p_obj), vec(p_vector)
-   {}
+   //@}
 
 #ifndef NO_CONSISTENCY_CHECKS
+   //------------------------------------
+   /**@name Consistency check */
+   //@{
    /// check consistency.
    bool isConsistent() const
    {
       return vec.isConsistent();
    }
+   //@}
 #endif
 };
 } // namespace soplex

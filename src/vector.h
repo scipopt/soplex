@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector.h,v 1.18 2005/09/28 11:53:00 bzforlow Exp $"
+#pragma ident "@(#) $Id: vector.h,v 1.19 2005/10/28 17:25:34 bzforlow Exp $"
 
 /**@file  vector.h
  * @brief Dense vector for linear algebra.
@@ -45,7 +45,7 @@ class SSVector;
    - checking of array bound when accessing elements with the
      subscript operator[]() (only when compiled without \c -DNDEBUG).
  
-   A Vector is distinguished from a simple %array of Real%s, by
+   A Vector is distinguished from a simple array of #Real%s by
    providing a set of mathematical operations. Since Vector does
    not provide any memory management features, no operations are
    available that would require allocation of temporary memory
@@ -64,7 +64,7 @@ class SSVector;
    <TR><TD>maxAbs() </TD><TD>infinity norm </TD>
        <TD>\c a.maxAbs() == \f$\|a\|_{\infty}\f$ </TD></TR>
    <TR><TD>minAbs() </TD><TD> </TD>
-       <TD>\c a.minAbs() == \f$\min \|a_i\|\f$ </TD></TR>
+       <TD>\c a.minAbs() == \f$\min |a_i|\f$ </TD></TR>
 
    <TR><TD>length() </TD><TD>euclidian norm</TD>
        <TD>\c a.length() == \f$\sqrt{a^2}\f$ </TD></TR>
@@ -75,7 +75,7 @@ class SSVector;
    </TABLE>
  
    When using any of these operations, the vectors involved must be of
-   the same dimension. For \c b also SVector \c b are allowed, if it
+   the same dimension. Also an SVector \c b is allowed if it
    does not contain nonzeros with index greater than the dimension of
    \c a.
 */

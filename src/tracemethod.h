@@ -10,12 +10,28 @@
 namespace soplex
 {
 
+/**@class TraceMethod 
+
+   Prints out a message with the current filename and line to indicate
+   that some method has been called.
+*/
 class TraceMethod
 {
 private:
+
+   //------------------------------------
+   /**@name Data */
+   //@{
+   /// the current indentation
    static int s_indent;
+   //@}
 
 public:
+
+   //------------------------------------
+   /**@name Construction / destruction */
+   //@{
+   /// constructor
    TraceMethod(const char* s, const char* file, int line )
    {
       int i;
@@ -32,10 +48,12 @@ public:
       spxout << "[" << file << ":" << line << "]" << std::endl; 
       s_indent++;
    }
+   /// destructor
    virtual ~TraceMethod()
    {
       s_indent--;
    }
+   //@}
 };
 
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.74 2005/10/10 10:11:43 bzfpfend Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.75 2005/10/28 17:25:33 bzforlow Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -180,7 +180,7 @@ int main(int argc, const char* const argv[])
    " -zzEps    set general zero tolerance to Eps\n\n"
    " -zfEps    set factorization zero tolerance to Eps\n\n"
    " -zuEps    set update zero tolerance to Eps\n\n"
-   " -vLevel   set verbosity Level [0-3], default 1\n"
+   " -vLevel   set verbosity Level [0-5], default 1\n"
    " -V        show program version\n"
    " -h        show this help\n"
    "Simplifier:     Scaler:         Starter:     Pricer:        Ratiotester:\n"
@@ -349,7 +349,7 @@ int main(int argc, const char* const argv[])
    assert( work.isConsistent() );
 
 
-   // Example for using spxout for output. For the sake of this example 
+   // Example of using spxout for output. For the sake of this example 
    // program, temporarily change the verbosity level to ensure that the 
    // message is printed, no matter what is specified with -v on the 
    // command line; usually you will want to use setVerbose() only once.

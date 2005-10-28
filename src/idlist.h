@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idlist.h,v 1.18 2005/09/16 12:42:30 bzfhille Exp $"
+#pragma ident "@(#) $Id: idlist.h,v 1.19 2005/10/28 17:25:34 bzforlow Exp $"
 
 /**@file  idlist.h
  * @brief Generic Real linked list.
@@ -32,20 +32,20 @@ namespace soplex
 //  class IdElement<T>
 //---------------------------------------------------------------------
 
-/**@brief   Elements for #IdList%s.
+/**@brief   Elements for \ref IdList "IdLists".
    @ingroup Elementary
 
-   #IdElement%s are derived from the template parameter class #T and can hence
-   be used as such. The additional methods #next() and #prev() provid access
+   #IdElement%s are derived from the template parameter class T and can hence
+   be used as such. The additional methods next() and prev() provide access
    to the links for the list. They may freely be used by the programmer as long
-   as an #IdElement is not member of a #IdList. In this case, the #IdList
-   controls members #next() and #prev(). However, #IdList should provide
-   enough functionality for the user not to requirer any modification to these
+   as an IdElement is not member of a IdList. In this case, the IdList
+   controls members next() and prev(). However, IdList should provide
+   enough functionality for the user not to require any modification to these
    members.
  */
 /* The use of this->the_last and this->the_first instead of just the_last
  * and the_first is bcause the HP aCC Compiler claims that according to the
- * Standard these otherwise could not be seen. An since I ws not able to 
+ * Standard these otherwise could not be seen. And since I was not able to 
  * even identify a hint on this in the Draft Standard we just do it, so
  * the HP compiler is happy since it will not hurt the others.
  */
@@ -55,8 +55,8 @@ class IdElement : public T
    //--------------------------
    /**@name Data */
    //@{
-   IdElement<T>* theprev;   ///< pointer to previous element in the #IdList
-   IdElement<T>* thenext;   ///< pointer to next element in the #IdList
+   IdElement<T>* theprev;   ///< pointer to previous element in the IdList
+   IdElement<T>* thenext;   ///< pointer to next element in the IdList
    //@}
 
 public:
@@ -64,24 +64,24 @@ public:
    //---------------------------------------
    /**@name Successors and predecessors */
    //@{
-   ///
+   /// returns the next element in the IdList (writeable).
    IdElement<T>*& next()
    {
       return thenext;
    }
-   /// returns the next element in the #IdList.
-   IdElement<T>*const& next() const
+   /// returns the next element in the IdList.
+   IdElement<T>* const& next() const
    {
       return thenext;
    }
 
-   ///
+   /// returns the previous element in the IdList (writeable).
    IdElement<T>*& prev()
    {
       return theprev;
    }
-   /// returns the previous element in the #IdList.
-   IdElement<T>*const& prev() const
+   /// returns the previous element in the IdList.
+   IdElement<T>* const& prev() const
    {
       return theprev;
    }
@@ -115,10 +115,10 @@ public:
 /**@brief   Generic Real linked list.
    @ingroup Elementary
 
-   Class #IdList implements an intrusive Real linked list as a #template
+   Class IdList implements an intrusive Real linked list as a template
    class.  As such, the list elements must provide the links themselfs. For
-   conveniance, we also provide class #IdElement that adds both links to an
-   arbitrary class as #template parameter.
+   conveniance, we also provide class IdElement that adds both links to an
+   arbitrary class as template parameter.
  */
 template < class T >
 class IdList : public IsList<T>

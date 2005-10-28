@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.25 2005/08/18 16:14:28 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.26 2005/10/28 17:25:34 bzforlow Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
@@ -48,11 +48,11 @@ namespace soplex
  */
 
 /**
-   \brief Macro for assertion which can be turned into warnings.
+   \brief Macro to turn some assertions into warnings.
 
-   If both \c NDEBUG and \c WITH_WARNINGS are defined the failed 
+   If both \c NDEBUG and \c WITH_WARNINGS are defined then the failed 
    assertion is converted to a warning. In all other cases this macro is 
-   equivalent to assert.
+   equivalent to assert().
 
    @param  prefix  Short string for grepping in source code.
    @param  expr    Expression that must be satisfied.
@@ -92,17 +92,27 @@ namespace soplex
  *-----------------------------------------------------------------------------
  */
 
-// store the old verbosity of spxout, do something, reset verbosity
+/**
+   Executes \p do_something with verbosity level \p verbosity, resetting
+   the old verbosity level afterwards. 
+   Usually the parameter \p do_something prints something out.
+   This is an internal define used by MSG_ERROR, MSG_WARNING, etc.
+*/
 #define DO_WITH_TMP_VERBOSITY( verbosity, do_something ) \
    { const SPxOut::Verbosity  old_verbosity = spxout.getVerbosity(); \
      spxout.setVerbosity( verbosity ); \
      do_something \
      spxout.setVerbosity( old_verbosity ); }
 
+/// Prints out message \p x if the verbosity level is at least SPxOut::ERROR.
 #define MSG_ERROR(x)    { DO_WITH_TMP_VERBOSITY( SPxOut::ERROR,    x ) }
+/// Prints out message \p x if the verbosity level is at least SPxOut::WARNING.
 #define MSG_WARNING(x)  { DO_WITH_TMP_VERBOSITY( SPxOut::WARNING,  x ) }
+/// Prints out message \p x if the verbosity level is at least SPxOut::VERBOSE1.
 #define MSG_VERBOSE1(x) { DO_WITH_TMP_VERBOSITY( SPxOut::VERBOSE1, x ) }
+/// Prints out message \p x if the verbosity level is at least SPxOut::VERBOSE2.
 #define MSG_VERBOSE2(x) { DO_WITH_TMP_VERBOSITY( SPxOut::VERBOSE2, x ) }
+/// Prints out message \p x if the verbosity level is at least SPxOut::VERBOSE3.
 #define MSG_VERBOSE3(x) { DO_WITH_TMP_VERBOSITY( SPxOut::VERBOSE3, x ) }
 
 
@@ -140,11 +150,13 @@ typedef long double Real;
 #ifndef REAL
 #define REAL(x)  x##L
 #endif
+/// default allowed bound violation
 #ifndef DEFAULT_BND_VIOL
 #define DEFAULT_BND_VIOL   1e-12
 #endif
+/// default allowed additive zero: 1.0 + EPS_ZERO == 1.0
 #ifndef DEFAULT_EPS_ZERO
-#define DEFAULT_EPS_ZERO   1e-28  // ~ additive zero. 1.0 + EPS_ZERO == 1.0
+#define DEFAULT_EPS_ZERO   1e-28
 #endif
 #ifndef DEFAULT_EPS_FACTOR
 #define DEFAULT_EPS_FACTOR 1e-30
@@ -161,11 +173,13 @@ typedef double Real;
 #ifndef REAL
 #define REAL(x)  x
 #endif
+/// default allowed bound violation
 #ifndef DEFAULT_BND_VIOL
 #define DEFAULT_BND_VIOL   1e-6
 #endif
+/// default allowed additive zero: 1.0 + EPS_ZERO == 1.0
 #ifndef DEFAULT_EPS_ZERO
-#define DEFAULT_EPS_ZERO   1e-16  // ~ additive zero. 1.0 + EPS_ZERO == 1.0
+#define DEFAULT_EPS_ZERO   1e-16 
 #endif
 #ifndef DEFAULT_EPS_FACTOR
 #define DEFAULT_EPS_FACTOR 1e-20
@@ -182,10 +196,19 @@ extern const Real infinity;
 class Param
 {
 private:
+
+   //------------------------------------
+   /**@name Data */
+   //@{
+   ///
    static Real s_epsilon;
+   ///
    static Real s_epsilon_factorization;
+   ///
    static Real s_epsilon_update;
+   /// verbosity level
    static int  s_verbose;
+   //@}
 
 public:
    ///
@@ -209,21 +232,22 @@ public:
    }
    ///
    static void setEpsilonUpdate(Real eps);
-   ///
+   /// returns verbosity level
    inline static int verbose()
    {
       return s_verbose;
    }
+   /// sets verbosity level
    static void setVerbose(int p_verbose);
 };
 
-// (max(|a|,|b|)
+/// returns max(|a|,|b|)
 inline static Real maxAbs(Real a, Real b)
 {
    return fabs(a) > fabs(b) ? fabs(a) : fabs(b);
 }
 
-// (a-b)/max(|a|,|b|,1.0)
+/// returns (a-b) / max(|a|,|b|,1.0)
 inline static Real relDiff(Real a, Real b)
 {
    Real scale = 1.0 / maxAbs(maxAbs(a, b), 1.0);
@@ -231,71 +255,85 @@ inline static Real relDiff(Real a, Real b)
    return a * scale - b * scale;
 }
 
+/// returns \c true iff |a-b| <= eps
 inline bool EQ(Real a, Real b, Real eps = Param::epsilon())
 {
    return fabs(a - b) <= eps;
 }
 
+/// returns \c true iff |a-b| > eps
 inline bool NE(Real a, Real b, Real eps = Param::epsilon())
 {
    return fabs(a - b) > eps;
 }
 
+/// returns \c true iff a < b + eps
 inline bool LT(Real a, Real b, Real eps = Param::epsilon())
 {
    return (a - b) < -eps;
 }
 
+/// returns \c true iff a <= b + eps
 inline bool LE(Real a, Real b, Real eps = Param::epsilon())
 {
    return (a - b) < eps;
 }
 
+/// returns \c true iff a > b + eps
 inline bool GT(Real a, Real b, Real eps = Param::epsilon())
 {
    return (a - b) > eps;
 }
 
+/// returns \c true iff a >= b + eps
 inline bool GE(Real a, Real b, Real eps = Param::epsilon())
 {
    return (a - b) > -eps;
 }
 
+/// returns \c true iff |a|  eps
 inline bool isZero(Real a, Real eps = Param::epsilon())
 {
    return fabs(a) <= eps;
 }
 
+/// returns \c true iff |a| > eps
 inline bool isNotZero(Real a, Real eps = Param::epsilon())
 {
    return fabs(a) > eps;
 }
 
+/// returns \c true iff |relDiff(a,b)| <= eps
 inline bool EQrel(Real a, Real b, Real eps = Param::epsilon())
 {
    return fabs(relDiff(a, b)) <= eps;
 }
 
+/// returns \c true iff |relDiff(a,b)| > eps
 inline bool NErel(Real a, Real b, Real eps = Param::epsilon())
 {
    return fabs(relDiff(a, b)) > eps;
 }
 
+/// returns \c true iff relDiff(a,b) <= -eps
 inline bool LTrel(Real a, Real b, Real eps = Param::epsilon())
 {
-   return relDiff(a, b) < -eps;
+   return relDiff(a, b) <= -eps;
 }
 
+/// returns \c true iff relDiff(a,b) <= eps
 inline bool LErel(Real a, Real b, Real eps = Param::epsilon())
 {
-   return relDiff(a, b) < eps;
+   return relDiff(a, b) <= eps;
 }
 
+/// returns \c true iff relDiff(a,b) > eps
 inline bool GTrel(Real a, Real b, Real eps = Param::epsilon())
 {
    return relDiff(a, b) > eps;
 }
 
+/// returns \c true iff relDiff(a,b) > -eps
 inline bool GErel(Real a, Real b, Real eps = Param::epsilon())
 {
    return relDiff(a, b) > -eps;

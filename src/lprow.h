@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprow.h,v 1.12 2005/09/16 12:42:31 bzfhille Exp $"
+#pragma ident "@(#) $Id: lprow.h,v 1.13 2005/10/28 17:25:34 bzforlow Exp $"
 
 /**@file  lprow.h
  * @brief (In)equality for LPs.
@@ -43,7 +43,7 @@ namespace soplex
    This static member is predefined, but may be overridden to meet 
    the needs of the LP solver to be used.
  
-    LPRow%s allow to specify regular inequalities of the form 
+   LPRows allow to specify regular inequalities of the form 
    \f[
                            a^Tx \sim \alpha,
    \f]
@@ -51,22 +51,31 @@ namespace soplex
    of \f$\le, =, \ge\f$, by setting rhs and
    lhs to the same value or setting one of them to \f$\infty\f$.
 
-   Since constraints in the regular form occur often, LPRow%s offers methods
+   Since constraints in the regular form occur often, LPRows offers methods
    type() and value() for retreiving \f$\sim\f$ and \f$\alpha\f$ of 
    an LPRow in this form, respectively. Also, a constructor for 
-   LPRow%s given in regular form is provided.
+   LPRows given in regular form is provided.
 */
 class LPRow
 {
 private:
-   Real   left;
-   Real   right;
-   DSVector vec;
+
+   //------------------------------------
+   /**@name Data */
+   //@{
+   Real   left;      ///< left-hand side of the constraint
+   Real   right;     ///< right-hand side of the constraint
+   DSVector vec;     ///< the row vector
+   //@}
 
 public:
+
+   //------------------------------------
+   /**@name Types */
+   //@{
    /// (In)Equality of an LP row.
-   /** LPRow%s may be of one of the above Types. This datatype may be
-    *  used for constructing new LPRow%s in the regular form.
+   /** #LPRow%s may be of one of the above Types. This datatype may be
+    *  used for constructing new #LPRow%s in the regular form.
     */
    enum Type
    {                          
@@ -75,56 +84,11 @@ public:
       GREATER_EQUAL,       ///< \f$a^Tx \ge \alpha\f$.    
       RANGE                ///< \f$\lambda \le a^Tx \le \rho\f$.
    };
+   //@}
 
-   /// get type of row.
-   Type type() const;
-
-   /// set type of (in)equality
-   void setType(Type type);
-
-   /// Right hand side value of (in)equality.
-   /** This method returns \f$\alpha\f$ for a LPRow in regular form.
-    *  However, value() may only be called for LPRow%s with
-    *  type() != \c RANGE.
-    */
-   Real value() const;
-
-   /// get left hand side of value.
-   Real lhs() const
-   {
-      return left;
-   }
-
-   /// access left hand side value.
-   void setLhs(Real p_left)
-   {
-      left = p_left;
-   }
-
-   /// get right hand side value.
-   Real rhs() const
-   {
-      return right;
-   }
-
-   /// access right hand side value.
-   void setRhs(Real p_right)
-   {
-      right = p_right;
-   }
-
-   /// get aconstraint row %vector
-   const SVector& rowVector() const
-   {
-      return vec;
-   }
-
-   /// access constraint row %vector.
-   void setRowVector(const DSVector& p_vec)
-   {
-      vec = p_vec;
-   }
-
+   //------------------------------------
+   /**@name Construction / destruction */
+   //@{
    /// Construct LPRow with a vector ready to hold \p defDim nonzeros
    explicit LPRow(int defDim = 0) 
       : left(0), right(infinity), vec(defDim)
@@ -144,12 +108,74 @@ public:
    /// Construct LPRow from passed \p rowVector, \p type and \p value
    LPRow(const SVector& rowVector, Type type, Real value);
 
+   /// destructor
+   ~LPRow()
+   {}
+   //@}
+
+   //------------------------------------
+   /**@name Access / modification */
+   //@{
+   /// get type of row.
+   Type type() const;
+
+   /// set type of (in)equality
+   void setType(Type type);
+
+   /// Right hand side value of (in)equality.
+   /** This method returns \f$\alpha\f$ for a LPRow in regular form.
+    *  However, value() may only be called for LPRow%s with
+    *  type() != \c RANGE.
+    */
+   Real value() const;
+
+   /// get left-hand side value.
+   Real lhs() const
+   {
+      return left;
+   }
+
+   /// access left-hand side value.
+   void setLhs(Real p_left)
+   {
+      left = p_left;
+   }
+
+   /// get right-hand side value.
+   Real rhs() const
+   {
+      return right;
+   }
+
+   /// access right-hand side value.
+   void setRhs(Real p_right)
+   {
+      right = p_right;
+   }
+
+   /// get constraint row vector
+   const SVector& rowVector() const
+   {
+      return vec;
+   }
+
+   /// access constraint row vector.
+   void setRowVector(const DSVector& p_vec)
+   {
+      vec = p_vec;
+   }
+   //@}
+
 #ifndef NO_CONSISTENCY_CHECKS
+   //------------------------------------
+   /**@name Consistency check */
+   //@{
    /// check consistency.
    bool isConsistent() const
    {
       return vec.isConsistent();
    }
+   //@}
 #endif
 };
 

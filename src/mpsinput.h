@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: mpsinput.h,v 1.9 2005/07/26 17:02:21 bzforlow Exp $"
+#pragma ident "@(#) $Id: mpsinput.h,v 1.10 2005/10/28 17:25:34 bzforlow Exp $"
 
 /**@file  mpsinput.h
  * @brief Read MPS format files.
@@ -54,35 +54,35 @@ private:
    //@{
    ///
    Section         m_section;
-   ///
+   /// the input stream from which the file is read
    std::istream&   m_input;
-   ///
+   /// line number
    int             m_lineno;
-   ///
+   /// objctive sense (maximization or minimization)
    SPxLP::SPxSense m_objsense;
-   ///
+   /// is set to \c true upon a syntax error
    bool            m_has_error;
-   ///
+   /// the line buffer
    char            m_buf[MAX_LINE_LEN];
-   ///
+   /// first field in a line
    const char*     m_f0;
-   ///
+   /// second field in a line
    const char*     m_f1;
-   ///
+   /// third field in a line
    const char*     m_f2;
-   ///
+   /// fourth field in a line
    const char*     m_f3;
-   ///
+   /// fifth field in a line
    const char*     m_f4;
-   ///
+   /// sixth field in a line
    const char*     m_f5;
-   ///
+   /// problem name
    char            m_probname[MAX_LINE_LEN];
-   ///
+   /// objective name
    char            m_objname [MAX_LINE_LEN];
    ///
    bool            m_is_integer;
-   ///
+   /// new MPS format?
    bool            m_is_new_format;
    //@}
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datahashtable.h,v 1.21 2005/09/16 12:42:29 bzfhille Exp $"
+#pragma ident "@(#) $Id: datahashtable.h,v 1.22 2005/10/28 17:25:33 bzforlow Exp $"
 
 /**@file  datahashtable.h
  * @brief Generic hash table for data objects.
@@ -41,24 +41,24 @@ namespace soplex
    equivalent to a <tt>memcpy()</tt> of the structure and no destructor is 
    required.
    
-   The construction of a #DataHashTable requires a \em hash \em function that
+   The construction of a DataHashTable requires a \em hash \em function that
    assigns an integer value to every HashItem.  Provided this, pairs of a
-   HashItem and a Info can be added to the #DataHashTable. No more
+   HashItem and a Info can be added to the DataHashTable. No more
    than one Info can be assigned to the same HashItem at a time. The Info
    to a HashItem can be accessed through the subscript operator[]() with
    the Info object as a subscript.
    
-   The maximum number of elemens a #DataHashTable can hold can be
-   specified upon construction and may be reset with #reMax() later on.
+   The maximum number of elemens a DataHashTable can hold can be
+   specified upon construction and may be reset with reMax() later on.
    Further, a value hash size value is required. This value must be less then 
    the maximum number of elements and must not have a common dominator with 
    the maximum number of elements. If not specified explicitely, it
    is set automatically to a reasonable value. 
 
-   The implementation relies on an array of DataHashTable::Elements, from
+   The implementation relies on an array of DataHashTable::Element%s, from
    now on referred to as elements. Upon construction, all elements are
    marked as \c FREE. When an entry is added
-   to the #DataHashTable, the hash value is computed by calling #m_hashfun
+   to the DataHashTable, the hash value is computed by calling #m_hashfun
    for its HashItem. If this array element is unused, it is
    taken right away. Otherwise, the array index is incremented by
    the hash size (modulo the element array size()) until an unused element
@@ -67,7 +67,7 @@ namespace soplex
    Removing elements is simply done by marking it as \c RELEASED. Hence,
    when searching for an element, the search loop may not stop, when a
    \c RELEASED element is encountered. However, such an element may be
-   reused when adding a new element to the #DataHashTable. 
+   reused when adding a new element to the DataHashTable. 
    
    Further, memory management with resizing of the element array is
    straight forward.
@@ -85,8 +85,11 @@ private:
    class Element
    {
    public:
+      ///
       ElemHashItem    item;
+      ///
       ElemInfo        info;
+      /// States of an element
       enum states
       {
          FREE,            ///< element has never been used
@@ -108,7 +111,7 @@ private:
    int m_used;            
    /// pointer to hash function (mapping: \a HashItem -> int)
    int (*m_hashfun) (const HashItem*);  
-   /// memory is #reMax()%ed by this factor, if a new element does't fit
+   /// memory is #reMax()%ed by this factor if a new element does't fit
    Real m_memfactor;  
    //@}
 
@@ -117,7 +120,7 @@ public:
    //-----------------------------------
    /**@name Access / modification */
    //@{
-   /// Is item \p h present in #DataHashTable ?
+   /// Is item \p h present in DataHashTable?
    bool has(const HashItem& h) const
    {
       return index(h) >= 0;
@@ -137,9 +140,9 @@ public:
    /// references \a Info of \a HashItem \p h.
    /** Index operator for accessing the \a Info associated to
     *  \a HashItem \p h. It is required that \p h belongs to the
-    *  #DataHashTable, otherwise it core dumps. Methods #has() or
-    *  #get() can be used for inquiring wheater \p h belongs to the
-    *  #DataHashTable or not.
+    *  DataHashTable, otherwise it core dumps. Methods has() or
+    *  get() can be used for inquiring wheater \p h belongs to the
+    *  DataHashTable or not.
     */
    const Info& operator[](const HashItem& h) const
    {
@@ -149,9 +152,9 @@ public:
    }
    /// adds a new entry to the hash table.
    /** Adds a new entry consisting of \a HashItem \p h and \a Info \p info to the
-    *  #DataHashTable. No entry with HashItem \p h must yet be in the
-    *  #DataHashTable. After completion, \p info may be accessed via #get() or
-    *  operator[]() with \p h as parameter. The #DataHashTable is #reMax()%ed
+    *  DataHashTable. No entry with HashItem \p h must be in the
+    *  DataHashTable yet. After completion, \p info may be accessed via get() or
+    *  operator[]() with \p h as parameter. The DataHashTable is #reMax()%ed
     *  if it becomes neccessary.
     */
    void add(const HashItem& h, const Info& info)
@@ -181,7 +184,7 @@ public:
       assert(has(h));
    }
 
-   /// remove \a HashItem \p h from the #DataHashTable.
+   /// remove \a HashItem \p h from the DataHashTable.
    void remove(const HashItem& h)
    {
       assert(has(h));
@@ -190,15 +193,15 @@ public:
       assert(!has(h));
    }
 
-   /// remove all entries from #DataHashTable.
+   /// remove all entries from DataHashTable.
    void clear()
    {
       for(int i = 0; i < m_elem.size(); i++)
          m_elem[i].stat = Elem::FREE;
       m_used = 0;
    }
-   /// reset size of the #DataHashTable.
-   /** Reset the maximum number of elements of a #DataHashTable to \p newSize.
+   /// reset size of the DataHashTable.
+   /** Reset the maximum number of elements of a DataHashTable to \p newSize.
     *  However, if \p newSize < #m_used, it is resized to #m_used only. 
     *  If \p newHashSize < 1, a new hash size is computed automatically. 
     *  Otherwise, the specified value will be taken.
@@ -223,7 +226,7 @@ public:
    /**@name Debugging */
    //@{
 #ifndef NO_CONSISTENCY_CHECKS
-   /// checks whether #DataHashTable is consistent
+   /// checks whether DataHashTable is consistent
    bool isConsistent() const
    {
       int total = 0;
@@ -249,11 +252,11 @@ public:
    /**@name Construction / destruction */
    //@{
    /// default constructor.
-   /** Allocates a #DataHashTable for \p maxsize entries using \p hashfun
+   /** Allocates a DataHashTable for \p maxsize entries using \p hashfun
     *  as hash function. If \p hashsize > 0, #m_hashsize is set to the 
     *  specified value, otherwise a suitable hash size is computed 
     *  automatically. Parameter \p factor is used for memory management: 
-    *  If more than \p maxsize entries are added to the #DataHashTable, it 
+    *  If more than \p maxsize entries are added to the DataHashTable, it 
     *  will automatically be #reMax()%ed by a factor of \p factor.
     *
     *  @param hashfun      pointer to hash function.

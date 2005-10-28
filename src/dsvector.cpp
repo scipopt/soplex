@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dsvector.cpp,v 1.16 2005/09/16 12:42:29 bzfhille Exp $"
+#pragma ident "@(#) $Id: dsvector.cpp,v 1.17 2005/10/28 17:25:33 bzforlow Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -25,28 +25,27 @@
 
 namespace soplex
 {
-void DSVector::allocMem(int len)
+
+//-----------------------------------------------------------
+//   Construction / destruction
+//-----------------------------------------------------------
+
+DSVector::DSVector(int n)
+   : theelem( 0 )
 {
-   spx_alloc(theelem, len);
-   setMem(len, theelem);
+   allocMem((n < 1) ? 2 : n + 1);
 }
 
-void DSVector::setMax(int newmax)
+DSVector::~DSVector()
 {
-   int siz = size();
-   int len = ((newmax < siz) ? siz : newmax) + 1;
-
-   spx_realloc(theelem, len);
-   setMem (len, theelem);
-   set_size( siz );
+   spx_free(theelem);
 }
 
-DSVector& DSVector::operator=(const Vector& vec)
+DSVector::DSVector(const Vector& vec)
+   : theelem( 0 )
 {
-   clear();
-   setMax(vec.dim());
-   SVector::operator=(vec);
-   return *this;
+   allocMem((vec.dim() < 1) ? 2 : vec.dim() + 1);
+   *this = vec;
 }
 
 DSVector::DSVector(const SVector& old)
@@ -71,23 +70,37 @@ DSVector::DSVector(const DSVector& old)
    SVector::operator= ( old );
 }
 
-DSVector::DSVector(int n)
-   : theelem( 0 )
+DSVector& DSVector::operator=(const Vector& vec)
 {
-   allocMem((n < 1) ? 2 : n + 1);
+   clear();
+   setMax(vec.dim());
+   SVector::operator=(vec);
+   return *this;
 }
 
-DSVector::DSVector(const Vector& vec)
-   : theelem( 0 )
+//-----------------------------------------------------------
+//   memory stuff
+//-----------------------------------------------------------
+
+void DSVector::allocMem(int len)
 {
-   allocMem((vec.dim() < 1) ? 2 : vec.dim() + 1);
-   *this = vec;
+   spx_alloc(theelem, len);
+   setMem(len, theelem);
 }
 
-DSVector::~DSVector()
+void DSVector::setMax(int newmax)
 {
-   spx_free(theelem);
+   int siz = size();
+   int len = ((newmax < siz) ? siz : newmax) + 1;
+
+   spx_realloc(theelem, len);
+   setMem (len, theelem);
+   set_size( siz );
 }
+
+//-----------------------------------------------------------
+//   consistency check
+//-----------------------------------------------------------
 
 #ifndef NO_CONSISTENCY_CHECKS
 bool DSVector::isConsistent() const

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: array.h,v 1.17 2005/09/16 12:42:28 bzfhille Exp $"
+#pragma ident "@(#) $Id: array.h,v 1.18 2005/10/28 17:25:33 bzforlow Exp $"
 
 /**@file  array.h
  * @brief Save arrays of arbitrary types.
@@ -40,8 +40,9 @@ namespace soplex
       indexing operator[]() (only when compiled without \c -DNDEBUG).
  
     Moreover, #Array%s may easily be extended by #insert%ing or
-    #append%ing elements to the Array or shrunken by #remove%ing
-    elements. Method #reSize(int n) resets the Array's length to \p n,
+    #append%ing elements to the Array or shrunken by 
+    \ref remove() "removing"
+    elements. Method reSize(int n) resets the Array's length to \p n,
     thereby appending elements or truncating the Array to the
     required size.
  
@@ -49,7 +50,7 @@ namespace soplex
     how memory is managed: Only operators ::new and ::delete are
     used for allocating memory. This involves some overhead for all
     methods effecting the length of an Array, i.e., all methods
-    #insert, #append, #remove and #reSize. This involves
+    insert(), append(), remove() and reSize(). This involves
     allocating a new C++ array of the new size and copying all
     elements with the template parameters operator=().
  
@@ -67,7 +68,7 @@ protected:
    //----------------------------------------
    /**@name Data */
    //@{
-   int num;     ///< the length of array #data 
+   int num;     ///< the length of array data 
    T*  data;    ///< the array of elements
    //@}
 

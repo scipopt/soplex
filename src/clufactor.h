@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clufactor.h,v 1.22 2005/09/16 12:42:28 bzfhille Exp $"
+#pragma ident "@(#) $Id: clufactor.h,v 1.23 2005/10/28 17:25:33 bzforlow Exp $"
 
 /**@file  clufactor.h
  * @brief Implementation of sparse LU factorization.
@@ -111,6 +111,7 @@ protected:
    /// Data structures for saving the working matrix and U factor.
    struct U
    {
+      ///
       struct Row
       {
          Dring list;         /*!< \brief Double linked ringlist of vector 
@@ -127,6 +128,8 @@ protected:
                                start[i] + max[i] == start[elem[i].next->idx] 
                                len[i] <= max[i].                    */
       } row;
+
+      ///
       struct Col
       {
          Dring list;         /*!< \brief Double linked ringlist of vector

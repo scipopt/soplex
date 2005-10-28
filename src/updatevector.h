@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: updatevector.h,v 1.12 2005/09/16 12:42:40 bzfhille Exp $"
+#pragma ident "@(#) $Id: updatevector.h,v 1.13 2005/10/28 17:25:34 bzforlow Exp $"
 
 /**@file  updatevector.h
  * @brief Dense vector with semi-sparse vector for updates
@@ -46,7 +46,7 @@ namespace soplex
     vector \f$\delta\f$ and value \f$\alpha\f$. This is provided by
     class UpdateVector.
  
-    UpdateVector%s are derived from DVector and provide additional
+    UpdateVectors are derived from DVector and provide additional
     methods for saving and setting the multiplicator \f$\alpha\f$ and
     the update vector \f$\delta\f$. Further, it allows for efficient
     sparse updates, by providing an IdxSet idx() containing the
@@ -54,10 +54,44 @@ namespace soplex
 */
 class UpdateVector : public DVector
 {
+private:
+
+   //------------------------------------
+   /**@name Data */
+   //@{
    Real     theval;      ///< update multiplicator 
    SSVector thedelta;    ///< update vector
+   //@}
 
 public:
+
+   //------------------------------------
+   /**@name Constructors / destructors */
+   //@{
+   /// default constructor.
+   explicit
+   UpdateVector(int p_dim /*=0*/, Real p_eps /*=1e-16*/)
+      : DVector (p_dim)
+      , theval (0)
+      , thedelta(p_dim, p_eps)
+   {}
+   ///
+   ~UpdateVector()
+   {}
+   /// assignment from DVector
+   UpdateVector& operator=(const DVector& rhs)
+   {
+      if ( this != & rhs )
+         DVector::operator=(rhs);
+      return *this;
+   }
+   /// assignment
+   UpdateVector& operator=(const UpdateVector& rhs);
+   //@}
+
+   //------------------------------------
+   /**@name Access */
+   //@{
    /// update multiplicator \f$\alpha\f$, writeable
    Real& value()
    {
@@ -85,7 +119,11 @@ public:
    {
       return thedelta.indices();
    }
+   //@}
 
+   //------------------------------------
+   /**@name Modification */
+   //@{
    /// Perform the update
    /**  Add \c value() * \c delta() to the UpdateVector. Only the indices 
     *  in idx() are affected. For all other indices, delta() is asumed
@@ -110,36 +148,32 @@ public:
       theval = 0;
    }
 
-
    /// reset dimension
    void reDim(int newdim)
    {
       DVector::reDim(newdim);
       thedelta.reDim(newdim);
    }
-
-   /// assignment from DVector
-   UpdateVector& operator=(const DVector& rhs)
-   {
-      if ( this != & rhs )
-         DVector::operator=(rhs);
-      return *this;
-   }
-
-   /// assignment
-   UpdateVector& operator=(const UpdateVector& rhs);
-
-   /// default constructor.
-   UpdateVector(int p_dim /*=0*/, Real p_eps /*=1e-16*/)
-      : DVector (p_dim)
-      , theval (0)
-      , thedelta(p_dim, p_eps)
-   {}
+   //@}
 
 #ifndef NO_CONSISTENCY_CHECKS
+   //------------------------------------
+   /**@name Consistency check */
+   //@{
    /// 
    bool isConsistent() const;
+   //@}
 #endif
+
+private:
+
+   //------------------------------------
+   /**@name Blocked */
+   //@{
+   /// blocked copy constructor
+   UpdateVector( const UpdateVector& );
+   //@}
+
 };
 
 

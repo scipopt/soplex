@@ -13,10 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datakey.h,v 1.8 2005/07/25 15:24:35 bzforlow Exp $"
+#pragma ident "@(#) $Id: datakey.h,v 1.9 2005/10/28 17:25:33 bzforlow Exp $"
 
 /**@file  datakey.h
- * @brief Entry identifier class for items of a #DataSet.
+ * @brief Entry identifier class for items of a DataSet.
  */
 #ifndef _DATAKEY_H_
 #define _DATAKEY_H_
@@ -25,66 +25,51 @@
 
 namespace soplex
 {
-/**@brief   Entry identifier class for items of a #DataSet.
+/**@brief   Entry identifier class for items of a DataSet.
    @ingroup Elementary
 
-   Every item in a #DataSet is assigned a #Key by which it can be
-   accessed (using #DataSet::operator[]()). A #Key consists of an integer
-   member #idx, which is a positive number for any valid #Key. No
-   #Key::idx of an element in a #DataSet may exceed the sets #max().
+   Every item in a DataSet is assigned a DataKey by which it can be
+   accessed (using DataSet::operator[]()). A DataKey consists of an integer
+   member #idx, which is a positive number for any valid DataKey. No
+   #idx of an element in a DataSet may exceed the sets max().
    This property may be used to build arrays with additional information to
-   the elements of a #DataSet.
+   the elements of a DataSet.
 
-   In addition, #Key%s provides member #info, where the programmer is
-   free to store other information.
+   In addition, #DataKey%s provide a member #info which can be used to store 
+   further information.
    
-   Each #Key is unique for one #DataSet but different #DataSet%s may (and
-   generally will) manage the same #Key%s. When an element is removed from
-   a #DataSet its #Key may (and generally will) be reused for other
-   elements added to the #DataSet later on.
+   Each DataKey is unique for one DataSet but different DataSets may (and
+   generally will) manage the same #DataKey%s. When an element is removed from
+   a DataSet its DataKey may (and generally will) be reused for other
+   elements added to the DataSet later on.
 
    @todo data members should be private.
 */
 class DataKey
 {
-protected:
 public:
+
+   //-------------------------------------
+   /**@name Data */
+   //@{
    signed int info: 8;                        ///< user information (8 bit)
    signed int idx : (8 * sizeof(int) - 8);    ///< (locally) unique key index
+   //@}
 
 public:
-   /// gets the index number (#idx) of the #Key.
-   inline int getIdx() const
-   {
-      return idx;
-   }
-   /// sets the index number (#idx) of the #Key.
-   inline void setIdx(int p_idx) 
-   {
-      idx = p_idx;
-   }   
-   /// returns TRUE, iff the #Key is valid.
-   inline int isValid() const
-   {
-      return idx >= 0;
-   }
-   /// makes the #Key invalid and clears the #info field.
-   inline void inValidate()
-   {
-      idx  = -1;
-      info = 0;
-   }
-   /// Default constructor. Constructs an invalid #Key.
+
+   //-------------------------------------
+   /**@name Constructors / destructors */
+   //@{
+   /// Default constructor. Constructs an invalid DataKey.
    DataKey() 
       : info(0), idx(-1) 
    {}
-
-   // Constructor
+   // Full constructor
    DataKey(int p_info, int p_idx)
       : info(p_info)
       , idx(p_idx)
    {}
-
    /// Assignment operator.
    DataKey& operator=(const DataKey& rhs)
    {
@@ -100,6 +85,34 @@ public:
       : info(old.info) 
       , idx(old.idx)
    {}
+   //@}
+
+   //-------------------------------------
+   /**@name Access / modification */
+   //@{
+   /// gets the index number (#idx) of the DataKey.
+   inline int getIdx() const
+   {
+      return idx;
+   }
+   /// sets the index number (#idx) of the DataKey.
+   inline void setIdx(int p_idx) 
+   {
+      idx = p_idx;
+   }   
+   /// returns TRUE, iff the DataKey is valid.
+   inline int isValid() const
+   {
+      return idx >= 0;
+   }
+   /// makes the DataKey invalid and clears the #info field.
+   inline void inValidate()
+   {
+      idx  = -1;
+      info = 0;
+   }
+   //@}
+
 };
 
 } // namespace soplex

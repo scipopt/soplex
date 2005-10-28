@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: didxset.h,v 1.12 2005/08/09 19:32:09 bzforlow Exp $"
+#pragma ident "@(#) $Id: didxset.h,v 1.13 2005/10/28 17:25:33 bzforlow Exp $"
 
 /**@file  didxset.h
  * @brief Dymnamic index set.
@@ -31,14 +31,14 @@ namespace soplex
 /**@brief   Dynamic index set.
    @ingroup Elementary
 
-   Class #DIdxSet provides dynamic #IdxSet in the sense, that no
-   restrictions are posed on the use of methods #add(). However, method
-   #indexMem() has been moved to the private members. This is because
-   #DIdxSet adds its own memory management to class #IdxSet and the user must
-   not interfer with it.
+   Class DIdxSet provides dynamic IdxSet in the sense, that no
+   restrictions are posed on the use of methods add(). However, method
+   indexMem() has been moved to the private members. This is because
+   DIdxSet adds its own memory management to class IdxSet and the user must
+   not interfere with it.
    
-   Upon construction of an #DIdxSet, memory is allocated automatically. The
-   memory consumption can be controlled with methods #max() and #setMax().
+   Upon construction of an DIdxSet, memory is allocated automatically. The
+   memory consumption can be controlled with methods max() and setMax().
    Finally, the destructor will release all allocated memory.
 */
 class DIdxSet : public IdxSet
@@ -82,8 +82,8 @@ public:
    }
 
    /// sets the maximum number of indices.
-   /** This methods resets the memory consumption of the #DIdxSet to
-    *  \p newmax. However, if \p newmax < #size(), it is reset to #size()
+   /** This methods resets the memory consumption of the DIdxSet to
+    *  \p newmax. However, if \p newmax < size(), it is reset to size()
     *  only.
     */
    void setMax(int newmax = 1);
@@ -95,13 +95,13 @@ public:
    /// default constructor. \p n gives the initial size of the index space.
    explicit DIdxSet(int n = 8);
 
-   /// copy constructor from #IdxSet.
+   /// copy constructor from IdxSet.
    explicit DIdxSet(const IdxSet& old);
 
-   /// copy constructor from #DIdxSet.
+   /// copy constructor from DIdxSet.
    DIdxSet(const DIdxSet& old);
 
-   /// assignment operator
+   /// assignment operator from IdxSet
    DIdxSet& operator=(const IdxSet& sv)
    {
       if (this != &sv)
@@ -111,6 +111,7 @@ public:
       }
       return *this;
    }
+   /// assignment operator from DIdxSet
    DIdxSet& operator=(const DIdxSet& sv)
    {
       if (this != &sv)
