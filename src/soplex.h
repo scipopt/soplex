@@ -13,10 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.66 2005/11/01 15:35:40 bzforlow Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.67 2005/11/01 21:27:04 bzforlow Exp $"
 
 /**@file  soplex.h
- * @brief preconfigured #SoPlex LP-solver.
+ * @brief preconfigured \ref soplex::SoPlex "SoPlex" LP-solver.
  */
 #ifndef _SOPLEX_H_
 #define _SOPLEX_H_
@@ -34,7 +34,8 @@
 namespace soplex
 {
 
-/**@brief   Preconfigured #SoPlex LP-solver.
+/**@class SoPlex
+   @brief   Preconfigured #SoPlex LP-solver.
    @ingroup Algo
 */
 class SoPlex : public SPxLP

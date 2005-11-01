@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.h,v 1.20 2005/11/01 15:35:40 bzforlow Exp $"
+#pragma ident "@(#) $Id: slufactor.h,v 1.21 2005/11/01 21:27:04 bzforlow Exp $"
 
 /**@file  slufactor.h
  * @brief Implementation of Sparse Linear Solver.
@@ -105,7 +105,6 @@ protected:
 
 
 public:
-
 
    //--------------------------------
    /**@name Update type */

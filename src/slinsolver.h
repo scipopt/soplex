@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slinsolver.h,v 1.13 2005/11/01 15:35:40 bzforlow Exp $"
+#pragma ident "@(#) $Id: slinsolver.h,v 1.14 2005/11/01 21:27:04 bzforlow Exp $"
 
 /**@file  slinsolver.h
  * @brief Sparse Linear Solver virtual base class.
@@ -96,7 +96,7 @@ public:
    /// Substitute column \p idx with \p subst.
    /** The change method is used to modify the loaded matrix by substituting
        column \p idx with the new vector \p subst. One may also pass the
-       optional parameter \p eta to the solution of #solveRight(subst) if
+       optional parameter \p eta to the solution of #solveRight() if
        readily  availabble. This may improve on the performance of the update.
    */
    virtual Status change(int idx, const SVector& subst, const SSVector* eta = 0) = 0;

@@ -13,10 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultrt.h,v 1.12 2003/01/15 17:26:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefaultrt.h,v 1.13 2005/11/01 21:27:04 bzforlow Exp $"
 
 /**@file  spxdefaultrt.h
- * @brief Textbook ratio test for #SoPlex.
+ * @brief Textbook ratio test for SoPlex.
  */
 #ifndef _SPXDEFAULTRT_H_
 #define _SPXDEFAULTRT_H_
@@ -30,31 +30,40 @@
 namespace soplex
 {
 
-/**@brief   Textbook ratio test for #SoPlex.
+/**@brief   Textbook ratio test for SoPlex.
    @ingroup Algo
    
-   Class #SPxDefaultRT provides an implementation of the textbook ratio test
-   as a derived class of #SPxRatioTester. This class is not intended for
+   Class SPxDefaultRT provides an implementation of the textbook ratio test
+   as a derived class of SPxRatioTester. This class is not intended for
    reliably solving LPs (even though it does the job for ``numerically simple''
    LPs). Instead, it should serve as a demonstration of how to write ratio
    tester classes.
 
-   See #SPxRatioTester for a class documentation.
+   See SPxRatioTester for a class documentation.
 */
 class SPxDefaultRT : public SPxRatioTester
 {
 public:
-   ///
-   virtual int selectLeave(Real& val);
-   ///
-   virtual SPxId selectEnter(Real& val);
+
+   //-------------------------------------
+   /**@name Construction / destruction */
+   //@{
    /// default constructor
    SPxDefaultRT() 
       : SPxRatioTester("Default")
    {}
-   /// destructor.
+   /// destructor
    virtual ~SPxDefaultRT()
    {}
+   //@}
+
+   //-------------------------------------
+   /**@name Select enter/leave */
+   //@{
+   /// 
+   virtual int selectLeave(Real& val);
+   ///
+   virtual SPxId selectEnter(Real& val);
 };
 
 } // namespace soplex

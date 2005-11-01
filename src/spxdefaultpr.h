@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultpr.h,v 1.12 2003/01/10 12:46:14 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefaultpr.h,v 1.13 2005/11/01 21:27:04 bzforlow Exp $"
 
 /**@file  spxdefaultpr.h
  * @brief Default pricer.
@@ -31,26 +31,38 @@ namespace soplex
 /**@brief   Default pricer.
    @ingroup Algo
 
-   Class #SPxDefaultPR is an implementation class for #SPxPricer implementing
-   Dantzig's the default pricing strategy, i.e. maximal/minimal reduced cost or
-   maximal violated constraint.
+   Class SPxDefaultPR is an implementation class of an SPxPricer implementing
+   Dantzig's default pricing strategy, i.e., maximal/minimal reduced cost or
+   maximally violated constraint.
 
-   See #SPxPricer for a class documentation.
+   See SPxPricer for a class documentation.
 
    @todo This should be renamed to something like Danzig or Textbook pricing.
 */
 class SPxDefaultPR : public SPxPricer
 {
 public:
-   ///
-   virtual int selectLeave();
-   ///
-   virtual SPxId selectEnter();
 
+   //-------------------------------------
+   /**@name Constructors / destructors */
+   //@{
    /// default constructor
    SPxDefaultPR() 
       : SPxPricer("Danzig")
    {}   
+   /// destructor
+   virtual ~SPxDefaultPR()
+   {}
+   //@}
+
+   //-------------------------------------
+   /**@name Select enter/leave */
+   //@{
+   ///
+   virtual int selectLeave();
+   ///
+   virtual SPxId selectEnter();
+   //@}
 };
 } // namespace soplex
 #endif // _SPXDEFAULTPRR_H_

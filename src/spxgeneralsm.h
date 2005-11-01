@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeneralsm.h,v 1.13 2003/01/13 19:04:42 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxgeneralsm.h,v 1.14 2005/11/01 21:27:04 bzforlow Exp $"
 
 /**@file  spxgeneralsm.h
  * @brief General LP preprocessing.
@@ -33,34 +33,54 @@ namespace soplex
 /**@brief General LP preprocessing.
    @ingroup Algo
 
-   This #SPxSimplifier iterativly applies a number of preprocessors to its
-   loaded #SPxLP.
+   This SPxSimplifier iteratively applies a number of preprocessors to its
+   loaded SPxLP.
 */
 class SPxGeneralSM : public SPxSimplifier
 {
 private:
-   SPxIntervalSM  m_inter;    ///< remove too small values.
-   SPxRedundantSM m_redun;    ///< remove redundant rows/columns.
-   //   SPxAggregateSM m_aggr;     ///< do variable aggregation.
-   Real           m_repth;    ///< repetition threshold.
+
+   //-------------------------------------
+   /**@name Data */
+   //@{
+   SPxIntervalSM  m_inter;    ///< remove too small values
+   SPxRedundantSM m_redun;    ///< remove redundant rows/columns
+   //   SPxAggregateSM m_aggr;     ///< do variable aggregation
+   Real           m_repth;    ///< repetition threshold
+   //@}
 
 public:
+
+   //-------------------------------------
+   /**@name Construction / destruction */
+   //@{
    /// default constructor
    explicit SPxGeneralSM(Real repth = 0.95) 
       : SPxSimplifier("General")
       , m_repth(repth)
    {}   
-   /// destructor.
+   /// destructor
    virtual ~SPxGeneralSM()
    {}  
-   /// report CPU seconds used for simplifing.
-   virtual Real timeUsed() const;
-   /// Simplify #SPxLP.
+   //@}
+
+   //-------------------------------------
+   /**@name Simplifying / unsimplifying */
+   //@{
+   /// Simplify SPxLP.
    virtual Result simplify(SPxLP& lp, Real eps, Real delta);
    /// returns a reference to the unsimplified primal solution.
    virtual const Vector& unsimplifiedPrimal(const Vector& x);
    /// returns a reference to the unsimplified dual solution. 
    virtual const Vector& unsimplifiedDual(const Vector& pi);
+   //@}
+
+   //-------------------------------------
+   /**@name Misc */
+   //@{
+   /// report CPU seconds used for simplifying.
+   virtual Real timeUsed() const;
+   //@}
 };
 
 } // namespace soplex

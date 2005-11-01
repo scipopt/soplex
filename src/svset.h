@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.h,v 1.21 2005/09/16 12:42:39 bzfhille Exp $"
+#pragma ident "@(#) $Id: svset.h,v 1.22 2005/11/01 21:27:04 bzforlow Exp $"
 
 /**@file  svset.h
  * @brief Set of sparse vectors.
@@ -68,10 +68,12 @@ class SVSet : protected SVSetBase
 {
 private:
 
-   /**@name Memory management implementation 
-      The management of the
-      SVectors is implemented by by a DataSet<DLPSV>, the keys used
-      externally are DataKey%s.
+   /**@class DLPSV
+      @brief SVector with prev/next pointers
+      @todo Check whether SVSet::DLPSV can be implemented as IdElement<SVector>
+
+      The management of the SVectors is implemented by by a DataSet<DLPSV>,
+      the keys used externally are DataKey%s.
 
       The management of nonzeros is done by a Real linked list
       IdList<DLPSV>, where the SVector%s are kept in the order their
@@ -80,10 +82,6 @@ private:
       preceeding it obtains all the nonzeros that previously belonged
       to the (re-)moved one.  However, the nonzeros in use are
       uneffected by this.  
-   */
-   //@{
-   /**@brief SVector with prev/next pointers
-      @todo Check whether SVSet::DLPSV can be implemented as IdElement<SVector>
    */
    class DLPSV : public SVector
    {

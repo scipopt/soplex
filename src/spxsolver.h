@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.22 2005/10/28 17:25:34 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.23 2005/11/01 21:27:04 bzforlow Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -543,13 +543,6 @@ public:
    }
    //@}
 
-   //-----------------------------
-   /**@name LP Modification
-    *  These methods are the overridden counterparts of the base class
-    *  #SPxLP. See there for a more detailed documentation of these
-    *  methods.
-    */
-   //@{
 private:
 
    //-----------------------------

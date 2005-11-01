@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.h,v 1.15 2005/09/16 12:42:35 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.h,v 1.16 2005/11/01 21:27:04 bzforlow Exp $"
 
 /**@file  spxhybridpr.h
  * @brief Hybrid pricer.
@@ -37,54 +37,79 @@ namespace soplex
 
    The hybrid pricer for SoPlex tries to guess the best pricing strategy to
    use for pricing the loaded LP with the loaded algorithm type and basis
-   representation. Currently it does so by switching between #SPxSteepPR,
-   #SPxDevexPR and #SPxParMultPR.
+   representation. Currently it does so by switching between SPxSteepPR,
+   SPxDevexPR and SPxParMultPR.
 
-   See #SPxPricer for a class documentation.
+   See SPxPricer for a class documentation.
 */
 class SPxHybridPR : public SPxPricer
 {
+   //-------------------------------------
+   /**@name Data */
+   //@{
+   /// steepest edge pricer
    SPxSteepPR   steep;
+   /// partial multiple pricer
    SPxParMultPR parmult;
+   /// devex pricer
    SPxDevexPR   devex;
-
+   /// the currently used pricer
    SPxPricer*   thepricer;
-
+   /// factor between dim and coDim of the problem to decide about the pricer
    Real hybridFactor; 
+   //@}
 
 public:
-   ///
+
+   //-------------------------------------
+   /**@name Access / modification */
+   //@{
+   /// sets the epsilon
    virtual void setEpsilon(Real eps);
-   ///
+   /// sets the solver
    virtual void load(SPxSolver* solver);
-   ///
+   /// clears all pricers and unselects the current pricer
    virtual void clear();
-   ///
+   /// sets entering or leaving algorithm
    virtual void setType(SPxSolver::Type tp);
-   ///
+   /// sets row or column representation
    virtual void setRep(SPxSolver::Representation rep);
-   ///
+   /// selects the leaving algorithm
    virtual int selectLeave();
-   ///
-   virtual void left4(int n, SPxId id);
-   ///
+   /// selects the entering algorithm
    virtual SPxId selectEnter();
-   ///
+   /// calls left4 on the current pricer
+   virtual void left4(int n, SPxId id);
+   /// calls entered4 on the current pricer
    virtual void entered4(SPxId id, int n);
+   /// calls addedVecs(n) on all pricers
+   virtual void addedVecs (int n);
+   /// calls addedCoVecs(n) on all pricers
+   virtual void addedCoVecs (int n);
+   //@}
+
+   //-------------------------------------
+   /**@name Consistency check */
+   //@{
 #ifndef NO_CONSISTENCY_CHECKS
-   ///
+   /// consistency check
    virtual bool isConsistent() const;
 #endif
-   ///
-   virtual void addedVecs (int n);
-   ///
-   virtual void addedCoVecs (int n);
-   ///
+   //@}
+
+   //-------------------------------------
+   /**@name Construction / destruction */
+   //@{
+   /// default constructor
    SPxHybridPR() 
       : SPxPricer("Hybrid")
       , thepricer(0)
       , hybridFactor(3.0) // we want the ParMult pricer
    {}
+   /// destructor
+   virtual ~SPxHybridPR()
+   {}
+   //@}
 };
 
 } // namespace soplex

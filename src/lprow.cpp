@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprow.cpp,v 1.20 2005/08/09 19:32:10 bzforlow Exp $"
+#pragma ident "@(#) $Id: lprow.cpp,v 1.21 2005/11/01 21:27:04 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -37,8 +37,7 @@ LPRow::Type LPRow::type() const
    return RANGE;
 }
 
-void LPRow::setType(
-   LPRow::Type p_type)
+void LPRow::setType( LPRow::Type p_type )
 {
    switch (p_type)
    {

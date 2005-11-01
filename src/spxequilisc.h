@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxequilisc.h,v 1.5 2005/01/12 12:00:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxequilisc.h,v 1.6 2005/11/01 21:27:04 bzforlow Exp $"
 
 /**@file  spxequilisc.h
  * @brief LP euilibrium scaling.
@@ -31,22 +31,39 @@ namespace soplex
 /**@brief Equilibrium row/column scaling.
    @ingroup Algo
 
-   This #SPxScaler implementation performs equilibrium scaling of the 
+   This SPxScaler implementation performs equilibrium scaling of the 
    LPs rows and columns.
 */
 class SPxEquiliSC : public SPxScaler
 {
-protected:
-   /**@return maxi
-    */
-   virtual Real computeScale(Real /*mini*/, Real maxi) const;
-
 public:
-   /// Scale the loaded #SPxLP.
-   virtual void scale(SPxLP& lp);
 
+   //-------------------------------------
+   /**@name Construction / destruction */
+   //@{
    /// default constructor.
    explicit SPxEquiliSC(bool colFirst = true, bool doBoth = true);
+   /// destructor
+   virtual ~SPxEquiliSC()
+   {}
+   //@}
+
+   //-------------------------------------
+   /**@name Scaling */
+   //@{
+   /// Scale the loaded SPxLP.
+   virtual void scale(SPxLP& lp);
+   //@}
+
+protected:
+
+   //-------------------------------------
+   /**@name Protected helpers */
+   //@{
+   /// Does nothing but returning \p maxi.
+   virtual Real computeScale(Real /*mini*/, Real maxi) const;
+   //@}
+
 };
 } // namespace soplex
 #endif // _SPXEQUILISC_H_

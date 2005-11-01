@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.h,v 1.14 2003/01/15 17:26:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxfastrt.h,v 1.15 2005/11/01 21:27:04 bzforlow Exp $"
 
 /**@file  spxfastrt.h
  * @brief Fast shifting ratio test.
@@ -32,17 +32,21 @@ namespace soplex
 /**@brief   Fast shifting ratio test.
    @ingroup Algo
    
-   Class #SPxFastRT is an implementation class of #SPxRatioTester providing
+   Class SPxFastRT is an implementation class of SPxRatioTester providing
    fast and stable ratio test. Stability is achieved by allowing some
    infeasibility to ensure numerical stability such as the Harris procedure.
-   Performance is acchieved by skipping the second phase is the first phase
+   Performance is achieved by skipping the second phase is the first phase
    allready shows a stable enough pivot.
 
-   See #SPxRatioTester for a class documentation.
+   See SPxRatioTester for a class documentation.
 */
 class SPxFastRT : public SPxRatioTester
 {
 private:
+
+   //-------------------------------------
+   /**@name Data */
+   //@{
    /// minimum stability parameter for stopping after phase 1.
    Real minStab;
    /// |value| < epsilon is considered 0.
@@ -51,7 +55,11 @@ private:
    Real delta;
    /// initially allowed infeasibility.
    Real delta0;
+   //@}
 
+   //-------------------------------------
+   /**@name Private helpers */
+   //@{
    /// resets tolerances.
    void resetTols();
    /// relaxes stability requirements.
@@ -63,7 +71,7 @@ private:
    /** Computes the maximum value \p val that could be used for updating \p upd
        such that it would still fullfill the upper and lower bounds \p up and
        \p low, respectively, within #delta. Return value is the index where the
-       minimum value is encounterd. At the same time the maximum absolute value
+       minimum value is encountered. At the same time the maximum absolute value
        of \p upd.delta() is computed and returned in \p abs. Internally all
        loops are started at \p start and incremented by \p incr.
     */
@@ -78,7 +86,7 @@ private:
    /** Computes the minimum value \p val that could be used for updating \p upd
        such that it would still fullfill the upper and lower bounds \p up and
        \p low, respectively, within #delta. Return value is the index where the
-       minimum value is encounterd. At the same time the maximum absolute value
+       minimum value is encountered. At the same time the maximum absolute value
        of \p upd.delta() is computed and returned in \p abs. Internally all
        loops are started at \p start and incremented by \p incr.
    */
@@ -97,7 +105,7 @@ private:
    SPxId minDelta(int& nr, Real& val, Real& p_abs);
    
    /// selects stable index for maximizing ratio test.
-   /** Selects form all update values \p val < \p max the one with the largest
+   /** Selects from all update values \p val < \p max the one with the largest
        value of \p upd.delta() which must be greater than \p stab and is
        returned in \p stab. The index is returned as well as the corresponding
        update value \p val. Internally all loops are started at \p start and
@@ -113,7 +121,7 @@ private:
       Real& bestDelta, Real max);
 
    /// selects stable index for minimizing ratio test.
-   /** Select form all update values \p val > \p max the one with the largest
+   /** Select from all update values \p val > \p max the one with the largest
        value of \p upd.delta() which must be greater than \p stab and is
        returned in \p stab. The index is returned as well as the corresponding
        update value \p val. Internally all loops are started at \p start and
@@ -122,49 +130,60 @@ private:
    int minSelect(Real& val, Real& stab, Real& best, Real& bestDelta,
       Real max, const UpdateVector& upd, const Vector& low,
       const Vector& up, int start = 0, int incr = 1) const;
-
+   ///
    int minSelect(Real& val, Real& stab,
       Real& bestDelta, Real max);
-
+   ///
    SPxId minSelect(int& nr, Real& val, Real& stab,
       Real& bestDelta, Real max);
 
-   ///
-   int minReleave(Real& sel, int leave, Real maxabs);
    /// numerical stability tests.
    /** Tests whether the selected leave index needs to be discarded (and do so)
        and the ratio test is to be recomputed.
    */
+   int minReleave(Real& sel, int leave, Real maxabs);
+   ///
    int maxReleave(Real& sel, int leave, Real maxabs);
 
-   ///
-   int minShortLeave(Real& sel, int leave, Real /*max*/, Real p_abs);
    /// tests for stop after phase 1.
    /** Tests whether a shortcut after phase 1 is feasible for the 
        selected leave
        pivot. In this case return the update value in \p sel.
    */
+   int minShortLeave(Real& sel, int leave, Real /*max*/, Real p_abs);
+   ///
    int maxShortLeave(Real& sel, int leave, Real /*max*/, Real p_abs);
 
-   ///
-   int minReenter(Real& sel, Real /*max*/, Real maxabs, const SPxId& id, int nr);
    /// numerical stability check.
    /** Tests whether the selected enter \p id needs to be discarded (and do so)
        and the ratio test is to be recomputed.
    */
+   int minReenter(Real& sel, Real /*max*/, Real maxabs, const SPxId& id, int nr);
+   ///
    int maxReenter(Real& sel, Real /*max*/, Real maxabs, const SPxId& id, int nr);
 
-   /**@todo the documentation seems to be incorrect. 
-            No parameter \p sel exists.
-    */
-   /// tests for stop after phase 1.
-   /** Tests whether a shortcut after phase 1 is feasible for 
-       the selected enter
-       pivot. In this case return the update value in \p sel.
-   */
+   /// Tests and returns whether a shortcut after phase 1 is feasible for the 
+   /// selected enter pivot.
    int shortEnter(const SPxId& enterId, int nr, Real max, Real maxabs) const;
+   //@}
 
 public:
+
+   //-------------------------------------
+   /**@name Construction / destruction */
+   //@{
+   /// default constructor
+   SPxFastRT() 
+      : SPxRatioTester("Fast")
+   {}
+   /// destructor
+   virtual ~SPxFastRT()
+   {}
+   //@}
+
+   //-------------------------------------
+   /**@name Access / modification */
+   //@{
    ///
    virtual void load(SPxSolver* solver);
    ///
@@ -173,13 +192,7 @@ public:
    virtual SPxId selectEnter(Real& val);
    ///
    virtual void setType(SPxSolver::Type);
-   /// default constructor
-   SPxFastRT() 
-      : SPxRatioTester("Fast")
-   {}
-   /// destructor.
-   virtual ~SPxFastRT()
-   {}
+   //@}
 
 };
 } // namespace soplex

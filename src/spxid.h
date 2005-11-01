@@ -13,10 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxid.h,v 1.4 2003/01/13 10:38:47 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxid.h,v 1.5 2005/11/01 21:27:04 bzforlow Exp $"
 
 /**@file  spxid.h
- * @brief Row and columns Id's #SPxLP.
+ * @brief Row and columns Id's \ref soplex::SPxLP "SPxLP".
  */
 #ifndef _SPXID_H_
 #define _SPXID_H_
@@ -32,8 +32,8 @@ class SPxId;
 /**@brief   Ids for LP columns.
  * @ingroup Algo
  *
- *  Class #SPxColId provides #DataSet::Key%s for the column 
- *  indices of an #SPxLP.
+ *  Class SPxColId provides #DataKey%s for the 
+ *  column indices of an SPxLP.
  */
 class SPxColId : public DataKey
 {
@@ -41,17 +41,17 @@ public:
    /// default constructor.
    SPxColId() 
    {}
-   /// copy constructor from #DataKey.
+   /// copy constructor from DataKey.
    explicit SPxColId(const DataKey& p_key);
-   /// copy constructor from #SPxId.
+   /// copy constructor from SPxId.
    explicit SPxColId(const SPxId& p_key);
 };
 
 /**@brief   Ids for LP rows.
  * @ingroup Algo
  *
- *  Class #SPxRowId provides #DataSet::Key%s for the row 
- *  indices of an #SPxLP.
+ *  Class SPxRowId provides #DataKey%s for the row 
+ *  indices of an \ref soplex::SPxLP "SPxLP".
  */
 class SPxRowId : public DataKey
 {
@@ -59,35 +59,39 @@ public:
    /// default constructor.
    SPxRowId() 
    {}
-   /// copy constructor from #DataKey.
+   /// copy constructor from DataKey.
    explicit SPxRowId(const DataKey& p_key);
-   /// copy constructor from #SPxId.
+   /// copy constructor from SPxId.
    explicit SPxRowId(const SPxId& p_key);
 };
 
 /**@brief   Generic Ids for LP rows or columns.
  * @ingroup Algo
  *
- *  Both, #SPxColId%s and #SPxRowId%s may be treated uniformly as
- *  #SPxId%s:
+ *  Both \ref soplex::SPxColId "SPxColIds" and \ref soplex::SPxRowId
+ *  "SPxRowIds" may be treated uniformly as #SPxId%s:
  *  
- *  Rows and columns are numbered from 0 to #num()-1 and 0 to #dim()-1
+ *  Rows and columns are numbered from 0 to num()-1 and 0 to dim()-1
  *  respectively.  These numbers may be used to select individual rows or
  *  columns. However, these numbers may change if other rows or columns are
  *  added or removed.
  *  
- *  Further, each row or column of the problem matrix is assigned a
- *  #SPxRowId or #SPxColId, respectively. They are be used to select
- *  individual rows or columns just like numbers. In contrast to row and 
- *  column numbers, ids remain unchanged for the time a row or column 
- *  belongs to a #SPxLP, no matter what other rows or columns are added 
- *  to it or removed from it.
+ *  Further, each row or column of the problem matrix is assigned a \ref
+ *  soplex::SPxRowId "SPxRowId" or \ref soplex::SPxColId "SPxColId",
+ *  respectively. They are be used to select individual rows or columns just
+ *  like numbers. In contrast to row and column numbers, ids remain unchanged
+ *  for the time a row or column belongs to a SPxLP, no matter what other
+ *  rows or columns are added to it or removed from it.
  */
 class SPxId : public DataKey
 {
    friend std::ostream& operator<<(std::ostream& os, const SPxId& id);
 
 public:
+   
+   //--------------------------------
+   /**@name Types */
+   //@{
    /// type of the id.
    enum Type
    {
@@ -95,53 +99,11 @@ public:
       INVALID = 0,    ///< invalid id.
       COL_ID  = 1     ///< column identifier.
    };
+   //@}
 
-   /// returns the type of the id.
-   Type type() const
-   {
-      return info ? (info < 0 ? ROW_ID : COL_ID) : INVALID;
-   }
-   /// returns TRUE iff the id is a valid column or row identifier.
-   bool isValid() const
-   {
-      return info != 0;
-   }
-   /// makes the id invalid.
-   void inValidate()
-   {
-      info = 0;
-   }
-   /// is id a row id?
-   bool isSPxRowId() const
-   {
-      return info < 0;
-   }
-   /// is id a column id?
-   bool isSPxColId() const
-   {
-      return info > 0;
-   }
-   ///
-   SPxId& operator=(const SPxId& id)
-   {
-      if (this != &id)
-         DataKey::operator= ( id );
-      return *this;
-   }
-   ///
-   SPxId& operator=(const SPxColId& cid)
-   {
-      DataKey::operator= ( cid );
-      info = COL_ID;
-      return *this;
-   }
-   /// assignment operator.
-   SPxId& operator=(const SPxRowId& rid)
-   {
-      DataKey::operator= ( rid );
-      info = ROW_ID;
-      return *this;
-   }
+   //------------------------------------
+   /**@name Construction / destruction */
+   //@{
    /// default constructor. Constructs an invalid id.
    SPxId()
       : DataKey(INVALID, -1)
@@ -154,6 +116,62 @@ public:
    explicit SPxId(const SPxRowId& rid)
       : DataKey(ROW_ID, rid.idx) 
    {}
+   /// assignment operator
+   SPxId& operator=(const SPxId& id)
+   {
+      if (this != &id)
+         DataKey::operator= ( id );
+      return *this;
+   }
+   /// assignment operator
+   SPxId& operator=(const SPxColId& cid)
+   {
+      DataKey::operator= ( cid );
+      info = COL_ID;
+      return *this;
+   }
+   /// assignment operator
+   SPxId& operator=(const SPxRowId& rid)
+   {
+      DataKey::operator= ( rid );
+      info = ROW_ID;
+      return *this;
+   }
+   //@}
+
+   //--------------------------------
+   /**@name Access / modification */
+   //@{
+   /// returns the type of the id.
+   inline Type type() const
+   {
+      return info ? (info < 0 ? ROW_ID : COL_ID) : INVALID;
+   }
+   /// returns TRUE iff the id is a valid column or row identifier.
+   inline bool isValid() const
+   {
+      return info != 0;
+   }
+   /// makes the id invalid.
+   inline void inValidate()
+   {
+      info = 0;
+   }
+   /// is id a row id?
+   inline bool isSPxRowId() const
+   {
+      return info < 0;
+   }
+   /// is id a column id?
+   inline bool isSPxColId() const
+   {
+      return info > 0;
+   }
+   //@}
+
+   //------------------------------------
+   /**@name Comparison of Ids */
+   //@{
    /// equality operator.
    int operator==(const SPxId& id) const
    {
@@ -169,6 +187,7 @@ public:
    {
       return getIdx() < id.getIdx();
    }
+   //@}
 };
 
 

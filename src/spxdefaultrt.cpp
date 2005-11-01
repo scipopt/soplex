@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.22 2005/08/18 16:14:28 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.23 2005/11/01 21:27:04 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -27,19 +27,19 @@ namespace soplex
 {
 /**
  * Here comes the ratio test for selecting a variable to leave the basis. 
- * It is assumed that #Vec.delta() and #fVec.idx() have been setup
+ * It is assumed that Vec.delta() and fVec.idx() have been setup
  * correctly!
  *
- * The leaving variable is selected such that the update of #fVec() (using
- * #fVec.value() * fVec.delta()) keeps the basis feasible within
- * #solver()->delta(). Hence, #fVec.value() must be chosen such that one
- * updated value of #theFvec just reaches its bound and no other one exceeds
- * them by more than #solver()->delta()#. Further, #fVec.value() must have the
- * same sign as argument #val.
+ * The leaving variable is selected such that the update of fVec() (using
+ * fVec.value() * fVec.delta()) keeps the basis feasible within
+ * solver()->delta(). Hence, fVec.value() must be chosen such that one
+ * updated value of theFvec just reaches its bound and no other one exceeds
+ * them by more than solver()->delta(). Further, fVec.value() must have the
+ * same sign as argument \p val.
  *
- * The return value of #selectLeave() is the number of a variable in the
+ * The return value of selectLeave() is the number of a variable in the
  * basis selected to leave the basis. -1 indicates that no variable could be
- * selected. Otherwise, parameter #val contains the chosen #fVec.value().
+ * selected. Otherwise, parameter \p val contains the chosen fVec.value().
  */
 int SPxDefaultRT::selectLeave(Real& val)
 {
@@ -148,8 +148,8 @@ int SPxDefaultRT::selectLeave(Real& val)
 }
 
 /**
- Here comes the ratio test. It is assumed that #theCoPvec.delta() and
- #theCoPvec.idx() have been setup correctly!
+ Here comes the ratio test. It is assumed that theCoPvec.delta() and
+ theCoPvec.idx() have been setup correctly!
  */
 SPxId SPxDefaultRT::selectEnter(Real& max)
 {

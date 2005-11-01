@@ -1,4 +1,4 @@
-$Id: TODO,v 1.74 2005/11/01 15:35:40 bzforlow Exp $
+$Id: TODO,v 1.75 2005/11/01 21:27:04 bzforlow Exp $
 
 - Code documentation:
    * spxdefines.h: DEFAULT_EPS_FACTOR, DEFAULT_EPS_UPDATE und Param dokumentieren
@@ -7,12 +7,12 @@ $Id: TODO,v 1.74 2005/11/01 15:35:40 bzforlow Exp $
    * was ist DataKey für eine kranke Klasse?
    * solve2right4update (slinsolver.h/slufactor.cpp): solves Ax=b, Ay=d?
    * spxaggregatesm.h: ???
-   * spxbasis.h: 
-      - removedRows, removedCols: correct documentation?
-      - 
+   * spxbasis.h: removedRows, removedCols: correct documentation?
+   * spxdevexpr.h: ziemlich undokumentiert
+   * spxharrisrt.h: Was machen maxDelta() und minDelta()?
    
 - spxbasis.h::solver(): "@todo Name should be changed, or loadSolver should be renamed."  Warum?
-
+- spxdefaultpr.h: @todo This should be renamed to something like Danzig or Textbook pricing.
 
 - Es wird infeasible/unbounded gemeldet je nach dem welcher algo 
   gerade am Laufen war.

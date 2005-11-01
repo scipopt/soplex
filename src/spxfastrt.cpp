@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.31 2005/08/09 19:32:12 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.32 2005/11/01 21:27:04 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -457,9 +457,9 @@ SPxId SPxFastRT::minDelta(
    Real& max,
    Real& maxabs)
 {
-   int indc = minDelta(max, maxabs,
+   const int indc = minDelta(max, maxabs,
       thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
-   int indp = minDelta(max, maxabs,
+   const int indp = minDelta(max, maxabs,
       thesolver->pVec(), thesolver->lpBound(), thesolver->upBound(), 0, 1);
 
    if (indp >= 0)

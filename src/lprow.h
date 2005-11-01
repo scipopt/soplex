@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprow.h,v 1.13 2005/10/28 17:25:34 bzforlow Exp $"
+#pragma ident "@(#) $Id: lprow.h,v 1.14 2005/11/01 21:27:04 bzforlow Exp $"
 
 /**@file  lprow.h
  * @brief (In)equality for LPs.
@@ -106,7 +106,7 @@ public:
    {}
 
    /// Construct LPRow from passed \p rowVector, \p type and \p value
-   LPRow(const SVector& rowVector, Type type, Real value);
+   LPRow(const SVector& p_rowVector, Type p_type, Real p_value);
 
    /// destructor
    ~LPRow()
@@ -120,7 +120,7 @@ public:
    Type type() const;
 
    /// set type of (in)equality
-   void setType(Type type);
+   void setType(Type p_type);
 
    /// Right hand side value of (in)equality.
    /** This method returns \f$\alpha\f$ for a LPRow in regular form.

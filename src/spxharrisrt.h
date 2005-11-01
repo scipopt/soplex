@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.h,v 1.16 2003/01/15 17:26:07 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.h,v 1.17 2005/11/01 21:27:04 bzforlow Exp $"
 
 /**@file  spxharrisrt.h
  * @brief Harris pricing with shifting.
@@ -32,54 +32,75 @@ namespace soplex
 /**@brief   Harris pricing with shifting.
    @ingroup Algo
    
-   Class #SPxHarrisRT is a stable implementation of a #SPxRatioTester class
+   Class SPxHarrisRT is a stable implementation of a SPxRatioTester class
    along the lines of Harris' two phase algorithm. Additionally it uses
    shifting of bounds in order to avoid cycling.
 
-   See #SPxRatioTester for a class documentation.
+   See SPxRatioTester for a class documentation.
 */
 /**@todo HarrisRT leads to cycling in dcmulti.sub.lp */
 class SPxHarrisRT : public SPxRatioTester
 {
 private:
+
+   //-------------------------------------
+   /**@name Private helpers */
+   //@{
+   ///
    Real degenerateEps() const;
 
+   ///
    int maxDelta(
-      Real* /*max*/,        ///< max abs value in upd
+      Real* /*max*/,        ///< max abs value in \p upd
       Real* val,            ///< initial and chosen value
-      int num,              ///< # of indices in idx
-      const int* idx,       ///< nonzero indices in upd
-      const Real* upd,      ///< update vector for vec
+      int num,              ///< number of indices in \p idx
+      const int* idx,       ///< nonzero indices in \p upd
+      const Real* upd,      ///< update vector for \p vec
       const Real* vec,      ///< current vector
-      const Real* low,      ///< lower bounds for vec
-      const Real* up,       ///< upper bounds for vec
+      const Real* low,      ///< lower bounds for \p vec
+      const Real* up,       ///< upper bounds for \p vec
       Real delta,           ///< allowed bound violation
-      Real epsilon) const;  ///< what is 0?
+      Real epsilon          ///< what is 0?
+      ) const;
 
+   ///
    int minDelta(
-      Real* /*max*/,        ///< max abs value in upd
+      Real* /*max*/,        ///< max abs value in \p upd
       Real* val,            ///< initial and chosen value
-      int num,              ///< of indices in idx
-      const int* idx,       ///< nonzero indices in upd
-      const Real* upd,      ///< update vector for vec
+      int num,              ///< of indices in \p idx
+      const int* idx,       ///< nonzero indices in \p upd
+      const Real* upd,      ///< update vector for \p vec
       const Real* vec,      ///< current vector
-      const Real* low,      ///< lower bounds for vec
-      const Real* up,       ///< upper bounds for vec
+      const Real* low,      ///< lower bounds for \p vec
+      const Real* up,       ///< upper bounds for \p vec
       Real delta,           ///< allowed bound violation
-      Real epsilon) const;  ///< what is 0?
+      Real epsilon          ///< what is 0?
+      ) const;
+   //@}
 
 public:
-   ///
-   virtual int selectLeave(Real& val);
-   ///
-   virtual SPxId selectEnter(Real& val);
+
+   //-------------------------------------
+   /**@name Construction / destruction */
+   //@{
    /// default constructor
    SPxHarrisRT() 
       : SPxRatioTester("Harris")
    {}
-   /// destructor.
+   /// destructor
    virtual ~SPxHarrisRT()
    {}
+   //@}
+
+   //-------------------------------------
+   /**@name Leave / enter */
+   //@{
+   ///
+   virtual int selectLeave(Real& val);
+   ///
+   virtual SPxId selectEnter(Real& val);
+   //@}
+
 };
 
 } // namespace soplex

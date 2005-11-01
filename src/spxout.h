@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxout.h,v 1.5 2005/07/25 15:22:11 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxout.h,v 1.6 2005/11/01 21:27:04 bzforlow Exp $"
 
 /**@file  spxout.h
  * @brief Wrapper for different output streams and verbosity levels.
@@ -33,11 +33,13 @@ namespace soplex
 {
 
 /**@class SPxOut
+   @ingroup Elementary
 
-   This is a wrapper for several output streams, where a verbosity level is
-   used to decide which stream to use and whether to really print a given
-   message. Regardless of whether the verbosity level is set via a manipulator
-   or via the member function, it is persistent until a new value is set.
+   @brief Wrapper for several output streams. 
+   A verbosity level is used to decide which stream to use and whether to
+   really print a given message. Regardless of whether the verbosity level
+   is set via a manipulator or via the member function, it is persistent
+   until a new value is set.
 
    Most ostream member functions (e.g., @c precision()) are not provided here;
    use the corresponding stream manipulators (e.g., @c setprecision())
@@ -184,20 +186,20 @@ private:
 
 
    //-------------------------------------------
-   /**@name Verbosity manipulator */
+   /**@name Verbosity manipulator
+       This implementation is done similar to the one for setw(), setprecision(),
+       etc. in the standard file iomanip. For instance, the non-menber function
+       #verb(v) returns a struct struct_Severity which contains only the 
+       verbosity level. Calling 
+       @code
+            SPxOut spxout;
+            spxout << verb( SPxOut::ERROR ) << "This is an error!" << std::endl;
+       @endcode
+       passes such a struct to the output operator defined below, which
+       extracts the verbosity level from the struct and passes it to the 
+       member function SPxOut::setVerbosity(). 
+   */
    //@{
-   /// This implementation is done similar to the one for setw(), setprecision(),
-   /// etc. in the standard file iomanip. For instance, the non-menber function
-   /// verb( s ) returns a struct struct_Severity which contains only the 
-   /// verbosity level. Calling 
-   /// @code
-   ///      SPxOut spxout;
-   ///      spxout << verb( SPxOut::ERROR ) << "This is an error!" << std::endl;
-   /// @endcode
-   /// passes such a struct to the output operator defined below, which
-   /// extracts the verbosity level from the struct and passes it to the 
-   /// member function SPxOut::setVerbosity(). 
-
    /// manipulator to be used in an output statement
    inline SPxOut::struct_Verbosity
    verb( const SPxOut::Verbosity&  v )

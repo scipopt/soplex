@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.25 2005/08/09 19:32:12 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.26 2005/11/01 21:27:04 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -141,14 +141,14 @@ int SPxHarrisRT::minDelta(
    return sel;
 }
 
-/*
-    Here comes our implementation of the Haris procedure improved by shifting
-    bounds. The basic idea is to used the tollerated infeasibility within
-    #delta# for searching numerically stable pivots.
+/**
+    Here comes our implementation of the Harris procedure improved by shifting
+    bounds. The basic idea is to used the tolerated infeasibility within
+    delta for searching numerically stable pivots.
  
-    The algorithms operates in two phases. In a first phase, the maximum #val#
-    is determined, when in feasibility within #delta# is allowed. In the second
-    phase, between all variables with values #< val# the one is selected which
+    The algorithms operates in two phases. In a first phase, the maximum \p val
+    is determined, when in feasibility within delta is allowed. In the second
+    phase, between all variables with values < \p val the one is selected which
     gives the best step forward in the simplex iteration. However, this may not
     allways yield an improvement. In that case, we shift the variable toward
     infeasibility and retry. This avoids cycling in the shifted LP.
