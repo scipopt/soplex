@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slinsolver.h,v 1.12 2005/09/16 12:42:33 bzfhille Exp $"
+#pragma ident "@(#) $Id: slinsolver.h,v 1.13 2005/11/01 15:35:40 bzforlow Exp $"
 
 /**@file  slinsolver.h
  * @brief Sparse Linear Solver virtual base class.
@@ -36,10 +36,10 @@ namespace soplex
 /**@brief   Sparse Linear Solver virtual base class.
    @ingroup Algo
    
-   Class #SLinSolver provides a class for solving sparse linear systems with
+   Class SLinSolver provides a class for solving sparse linear systems with
    a matrix \f$A\f$ and arbitrary right-hand side vectors. For doing so, the
    matrix must be first #load%ed to an #SLinSolver object as an array of
-   pointers to the \em column #SVector%s of this matrix.
+   pointers to the \em column \ref SVector "SVectors" of this matrix.
 */
 class SLinSolver
 {
@@ -51,7 +51,7 @@ public:
    /// status flags of the #SLinSolver class.
    enum Status
    {
-      /** The #SLinSolver is ready for solving linear systems with the
+      /** The SLinSolver is ready for solving linear systems with the
           loaded matrix */
       OK       = 0,
       /** The loaded matrix allows only for instable solutions to be
@@ -69,7 +69,7 @@ public:
    //---------------------------------------
    /**@name Miscellaneous */
    //@{
-   /// returns the #Status of the #SLinSolver.
+   /// returns the Status of the SLinSolver.
    virtual Status status() const = 0;
 
    /// unloads any matrix.
@@ -82,7 +82,7 @@ public:
    virtual int dim() const = 0;
 
    /// loads \p dim column vectors \p vec into the solver.
-   /** Initializes #SLinSolver for the solution of linear systems
+   /** Initializes SLinSolver for the solution of linear systems
        with the matrix consisting of \p dim column vectors given in \p vec.
    */
    virtual Status load(const SVector* vec[], int dim) = 0;
@@ -94,7 +94,7 @@ public:
    virtual Real stability() const = 0;
 
    /// Substitute column \p idx with \p subst.
-   /** The #change method is used to modify the loaded matrix by substituting
+   /** The change method is used to modify the loaded matrix by substituting
        column \p idx with the new vector \p subst. One may also pass the
        optional parameter \p eta to the solution of #solveRight(subst) if
        readily  availabble. This may improve on the performance of the update.
@@ -109,44 +109,43 @@ public:
 
 
    /**@name Solving linear systems
-      For solving linear systems with an #SLinSolver object, it must
-      have previously been #load%ed with the matrix to use.
+      For solving linear systems with an SLinSolver object, it must
+      have previously been loaded with the matrix to use.
       
       Two types of systems can be solved \f$A x = b\f$ and \f$x^T A = b^T\f$.
-      Method names related to the first and second type are #solveRight() and
-      #solveLeft(), respectively.
+      Method names related to the first and second type are solveRight() and
+      solveLeft(), respectively.
       
       The methods receive their right hand-side vector \f$b\f$ as a
-      #const parameter, that will hence be unchanged after termination.
+      \c const parameter, that will hence be unchanged after termination.
       
       Some methods are available with two parameters for right hand-side
       vectors. Then two system are solved in one method invocation. This
       should generally be faster than solving two systems seperately.
       
       The result vector(s) are allways given as the first parameter(s). Two
-      types of result vectors are supported, #Vector and #SSVector.
+      types of result vectors are supported, Vector and SSVector.
    */
    //@{
-   ///
+   /// Solves \f$Ax=b\f$.
    virtual void solveRight (Vector& x, const Vector& b) /* const */ = 0;
-   /// solves \f$Ax=b\f$.
+   /// Solves \f$Ax=b\f$.
    virtual void solveRight (SSVector& x, const SVector& b) /* const */ = 0;
 
-   /// Solves \f$Ax=b\f$.
-   /** This method solves \f$Ax=b\f$ thereby (possibly) setting up internal 
-       data structures suitable for an optimized subsequent #change call with
-       \f$b\f$ as entering column.
+   /** @brief Solves \f$Ax=b\f$.
+       Possibly sets up internal data structures suitable for an optimized
+       subsequent change() call with \f$b\f$ as entering column.
    */
    virtual void solveRight4update(SSVector& x, const SVector& b) = 0;
    
-   ///
+   /// Solves \f$Ax=b\f$ and \f$Ay=d\f$.
    virtual void solve2right4update(SSVector& x,
-                                   Vector& two,
+                                   Vector& y,
                                    const SVector& b,
-                                   SSVector& rhs) = 0;
+                                   SSVector& d ) = 0;
    /// solves \f$x^TA=b^T\f$.
    virtual void solveLeft (Vector& x, const Vector& b) /* const */ = 0;
-   /// 
+   /// solves \f$x^TA=b^T\f$.
    virtual void solveLeft (SSVector& x, const SVector& b) /* const */ = 0;
    /// solves \f$x^TA=b^T\f$ and \f$x^TA=rhs2^T\f$ internally using \f$rhs2\f$.
    virtual void solveLeft (SSVector& x,
@@ -159,10 +158,10 @@ public:
    //---------------------------------------
    /**@name Constructors / Destructors */
    //@{
-   /// destructor.
+   /// default constructor
    SLinSolver()
    {}
-   /// destructor.
+   /// destructor
    virtual ~SLinSolver()
    {}
    //@}

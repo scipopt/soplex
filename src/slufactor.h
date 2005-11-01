@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.h,v 1.19 2005/09/16 12:42:34 bzfhille Exp $"
+#pragma ident "@(#) $Id: slufactor.h,v 1.20 2005/11/01 15:35:40 bzforlow Exp $"
 
 /**@file  slufactor.h
  * @brief Implementation of Sparse Linear Solver.
@@ -42,25 +42,42 @@ namespace soplex
 class SLUFactor : public SLinSolver, private CLUFactor
 {
 public:
-   /**@todo document the two change methods ETA and FOREST_TOMLIN */
-   /// how to perform #change method.
+
+   //--------------------------------
+   /**@name Types */
+   //@{
+   /// Specifies how to perform #change method.
    enum UpdateType
    {
-      ETA = 0,       ///< 
+      ETA = 0,       ///<
       FOREST_TOMLIN  ///<
    };
+   /// for convenience
+   typedef SLinSolver::Status Status;
+   //@}
 
 private:
+
+   //--------------------------------
+   /**@name Private data */
+   //@{
    DVector    vec;           ///< Temporary vector
    SSVector   ssvec;         ///< Temporary semi-sparse vector
+   //@}
 
 protected:
+
+   //--------------------------------
+   /**@name Protected data */
+   //@{
    bool       usetup;        ///< TRUE iff update vector has been setup
    UpdateType uptype;        ///< the current #UpdateType.
    SSVector   eta;           ///< 
    SSVector   forest;        ///< ? Update vector set up by solveRight4update() and solve2right4update()
    Real       lastThreshold; ///< pivoting threshold of last factorization
+   //@}
 
+   //--------------------------------
    /**@name Control Parameters */
    //@{
    /// minimum threshold to use.
@@ -69,30 +86,39 @@ protected:
    Real minStability;
    /// |x| < epsililon is considered to be 0.
    Real epsilon;
-
-   Timer   solveTime;         ///< Time spent in solves
-   int     solveCount;        ///< Number of solves
+   /// Time spent in solves
+   Timer   solveTime; 
+   /// Number of solves
+   int     solveCount;
+   //@}
 
 protected:
-   /**@todo document these protected methods and attributes */
+
+   //--------------------------------
+   /**@name Protected helpers */
+   //@{
    ///
    void freeAll();
    ///
    void changeEta(int idx, SSVector& eta);
+   //@}
 
 
 public:
-   typedef SLinSolver::Status Status;
 
-   /// returns the current update type #uptype.
+
+   //--------------------------------
+   /**@name Update type */
+   //@{
+   /// returns the current update type uptype.
    UpdateType utype() const
    {
       return uptype;
    }
 
    /// sets update type.
-   /** The new #UpdateType becomes valid only after the next call to
-       method #load().
+   /** The new UpdateType becomes valid only after the next call to
+       method load().
    */
    void setUtype(UpdateType tp)
    {
@@ -100,10 +126,10 @@ public:
    }
    //@}
 
-   /**@todo should we document reimplemented derived methods again? */
-   /**@name derived from SLinSolver
-      See documentation of #SLinSolver for a documentation of these
-      methods.
+   //--------------------------------
+   /**@name Derived from SLinSolver
+      See documentation of \ref soplex::SLinSolver "SLinSolver" for a 
+      documentation of these methods.
    */
    //@{
    ///
@@ -125,11 +151,15 @@ public:
    }
    ///
    Real stability() const;
-
    ///
    Status load(const SVector* vec[], int dim);
+   //@}
 
 public:
+
+   //--------------------------------
+   /**@name Solve */
+   //@{
    ///
    void solveRight (Vector& x, const Vector& b);
    ///
@@ -148,6 +178,7 @@ public:
    Status change(int idx, const SVector& subst, const SSVector* eta = 0);
    //@}
 
+   //--------------------------------
    /**@name Miscellaneous */
    //@{
    /// time spent in factorizations
@@ -179,6 +210,7 @@ public:
 #endif
    //@}
 
+   //------------------------------------
    /**@name Constructors / Destructors */
    //@{
    /// default constructor.
@@ -189,11 +221,15 @@ public:
    SLUFactor(const SLUFactor& old);
    /// destructor.
    virtual ~SLUFactor();
+   //@}
 
 private:
 
+   //------------------------------------
+   /**@name Private helpers */
+   //@{
+   /// used to implement the assignment operator
    void assign(const SLUFactor& old);
-
    //@}
 };
 

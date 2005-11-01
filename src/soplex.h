@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.65 2005/10/08 14:06:31 bzfpfend Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.66 2005/11/01 15:35:40 bzforlow Exp $"
 
 /**@file  soplex.h
  * @brief preconfigured #SoPlex LP-solver.
@@ -44,15 +44,15 @@ protected:
    //-------------------------
    //**@name Protected data */
    //@{
-   SPxFastRT       m_fastRT;    ///< fast ratio test
-   SPxSteepPR      m_steepPR;   ///< steepest edge pricing
+   SPxFastRT       m_fastRT;     ///< fast ratio test
+   SPxSteepPR      m_steepPR;    ///< steepest edge pricing
    //   SPxWeightST st;  ///< weight starter
-   SLUFactor       m_slu;       ///< LU Factorisation
-   SPxSolver       m_solver;
-   SPxScaler*      m_preScaler;
-   SPxScaler*      m_postScaler;
-   SPxSimplifier*  m_simplifier;
-   bool            m_vanished;  ///< did the presolver solve the problem ?
+   SLUFactor       m_slu;        ///< LU Factorisation
+   SPxSolver       m_solver;     ///< solver
+   SPxScaler*      m_preScaler;  ///< pre-scaler
+   SPxScaler*      m_postScaler; ///< post-scaler
+   SPxSimplifier*  m_simplifier; ///< simplifier
+   bool            m_vanished;   ///< did the presolver solve the problem ?
    //@}
 
 public:
@@ -71,26 +71,26 @@ public:
    //**@name Access / modification */
    //@{
    /// set update type for factorization.
-   void setUtype(SLUFactor::UpdateType tp)
+   virtual void setUtype(SLUFactor::UpdateType tp)
    {
       m_slu.setUtype(tp);
    }
-   /// return current #Pricing.
-   virtual SPxSolver::Pricing pricing() const
+   /// return current Pricing.
+   inline SPxSolver::Pricing pricing() const
    {
       return m_solver.pricing();
    }
-   /// set #FULL or #PARTIAL pricing.
+   /// set FULL or PARTIAL pricing.
    virtual void setPricing(SPxSolver::Pricing pr)
    {
       m_solver.setPricing(pr);
    }
-   /// return current #Type.
-   virtual SPxSolver::Type type() const
+   /// return current Type.
+   inline SPxSolver::Type type() const
    {
       return m_solver.type();
    }
-   /// set #LEAVE or #ENTER algorithm.
+   /// set LEAVE or ENTER algorithm.
    virtual void setType(SPxSolver::Type tp)
    {
       m_solver.setType(tp);
@@ -102,17 +102,17 @@ public:
    /// setup simplifier to use.
    virtual void setSimplifier(SPxSimplifier* simpli);
    /// has a simplifier been set?
-   virtual bool has_simplifier() const
+   inline bool has_simplifier() const
    {
       return m_simplifier != 0;
    }
    /// has a prescaler been set?
-   virtual bool has_prescaler() const
+   inline bool has_prescaler() const
    {
       return m_preScaler != 0;
    }
    /// has a postscaler been set?
-   virtual bool has_postscaler() const
+   inline bool has_postscaler() const
    {
       return m_postScaler != 0;
    }
@@ -137,7 +137,7 @@ public:
       m_solver.setTerminationTime(time);
    }
    /// return time limit.
-   virtual Real terminationTime() const
+   inline Real terminationTime() const
    {
       return m_solver.terminationTime();
    }
@@ -147,7 +147,7 @@ public:
       m_solver.setTerminationIter(iter);
    }
    /// return iteration limit.
-   virtual int terminationIter() const
+   inline int terminationIter() const
    {
       return m_solver.terminationIter();
    }
@@ -157,7 +157,7 @@ public:
       m_solver.setTerminationValue(val);
    }
    /// return objective limit.
-   virtual Real terminationValue() const
+   inline Real terminationValue() const
    {
       return m_solver.terminationValue();
    }

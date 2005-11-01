@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.44 2005/09/16 12:42:34 bzfhille Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.45 2005/11/01 15:35:40 bzforlow Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -592,7 +592,7 @@ SLUFactor& SLUFactor::operator=(const SLUFactor& old)
       vec.clear();
       ssvec.clear();
 #else
-      ///@todo Why does this not work ? (Gives isConsisten() failure in idxset)
+      ///@todo Why does this not work ? (Gives isConsistent() failure in idxset)
       vec    = old.vec;
       ssvec  = old.ssvec;
 #endif

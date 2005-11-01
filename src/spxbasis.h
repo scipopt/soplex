@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.38 2005/09/16 12:42:34 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.39 2005/11/01 15:35:40 bzforlow Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -39,7 +39,7 @@ class SPxSolver;
 /**@brief   Simplex basis.
    @ingroup Algo
 
-   Consider the linear program as provided from class #SPxLP
+   Consider the linear program as provided from class SPxLP:
    \f[
    \begin{array}{rl}
      \hbox{max}  & c^T x                 \\
@@ -58,13 +58,13 @@ class SPxSolver;
    whereas the number of vectors belonging to the LP is called the basis'
    \em codimension.
    
-   Class #SPxBasis is designed to represent a generic simplex basis, suitable
+   Class SPxBasis is designed to represent a generic simplex basis, suitable
    for both representations. At any time the representation can be changed by
-   calling method #setRep().
+   calling method setRep().
    
-   Class #SPxBasis provides methods for solving linear systems with the basis
-   matrix. However, #SPxBasis does not provide a linear solver by its own.
-   Instead, a #SLinSolver object must be #load%ed to a #SPxBasis which will
+   Class SPxBasis provides methods for solving linear systems with the basis
+   matrix. However, SPxBasis does not provide a linear solver by its own.
+   Instead, a SLinSolver object must be #load%ed to a SPxBasis which will
    be called for solving linear systems.
 */
 class SPxBasis
@@ -72,7 +72,7 @@ class SPxBasis
 public:
 
    /// basis status.
-   /** Each #SPxBasis is assigned a status flag, which can take on of the
+   /** Each SPxBasis is assigned a status flag, which can take on of the
        above values.
    */
    enum SPxStatus
@@ -92,19 +92,23 @@ public:
    class Desc
    {
    public:
+
+      //------------------------------------
+      //**@name Status */
+      //@{
       /// Status of a variable.
-      /** A basis is described by assigning a #Status to all of the LPs
+      /** A basis is described by assigning a Status to all of the LPs
           variables and covariables. This assignment is maintained by the
           basis #Desc%riptor.
           
-          Variables and covariables may have a primal or dual #Status. The
+          Variables and covariables may have a primal or dual Status. The
           first type specifies that a variable is set on a primal bound, while
           the later type indicates a dual variable to be set on a bound.
-          If a row variable has a primal status, #P_ON_UPPER say, this means
+          If a row variable has a primal status, say #P_ON_UPPER, this means
           that the upper bound of the inequality is set to be tight. Hence,
           in this case the upper bound must not be infinity.
 
-          Equivalently, if the status of a variable is dual, #D_ON_UPPER say,
+          Equivalently, if the status of a variable is dual, say #D_ON_UPPER,
           it means that the dual variable corresponding to the upper bound
           inequality of this variable is set to 0.
 
@@ -135,19 +139,19 @@ public:
           \end{array}
           \f]
 
-          Note that to determine if a variable with #Status stat is set to
+          Note that to determine if a variable with Status stat is set to
           its upper bound, one can compute the test (-stat | -#P_ON_UPPER).
-          This will yield true even if the variable is fixed, i.e. sitting on
+          This will yield true even if the variable is fixed, i.e., sitting on
           both bounds at the same time.
 
           \f$ \mbox{\bf Dual Variables} \f$
 
           In principle for implementing the Simplex algorithm it would suffice
-          to use only one dual #Status. However, for performance reasons it
-          is advisable to introduce various dual #Status types, reflecting
+          to use only one dual Status. However, for performance reasons it
+          is advisable to introduce various dual Status types, reflecting
           the structure of the bounds. Given an upper bound \f$u\f$ and a lower
           bound \f$l\f$ of a constraint or variable, the following table 
-          indicates the setting of the dual #Status of this variable.
+          indicates the setting of the dual Status of this variable.
 
           \f[
           \begin{array}{cl}
@@ -163,7 +167,7 @@ public:
 
           Note that unbounded primal variables are reflected by an #D_UNDEFINED
           dual variable, since no DUAL variables exist to them. To facilate
-          the assignment of dual #Status%es, class #SPxBasis provides methods
+          the assignment of dual #Status%es, class SPxBasis provides methods
           #dualStatus(), #dualColStatus() and #dualRowStatus)().
       */
       enum Status
@@ -180,16 +184,27 @@ public:
          D_ON_BOTH   = D_ON_LOWER + D_ON_UPPER,
          D_UNDEFINED = 8    ///< primal or dual variable has no status
       };
+      //@}
+
       friend class SPxBasis;
       friend std::ostream& operator<<(std::ostream& os, const Status& stat);
 
 private:
+
+      //------------------------------------
+      //**@name Data */
+      //@{
       DataArray < Status > rowstat;   ///< status of rows.
       DataArray < Status > colstat;   ///< status of columns.
       DataArray < Status > * stat;    ///< basis' status.
       DataArray < Status > * costat;  ///< cobasis' status.
+      //@}
 
 public:
+
+      //------------------------------------
+      //**@name Access / modification */
+      //@{
       /// returns number of columns.
       int nCols() const
       {
@@ -272,12 +287,22 @@ public:
       }
       /// resets dimensions.
       void reSize(int rowDim, int colDim);
+      //@}
+
+      //------------------------------------
+      //**@name Debugging */
+      //@{
       /// Prints out status.
       void dump() const;
 #ifndef NO_CONSISTENCY_CHECKS
       /// consistency check.
       bool isConsistent() const;
 #endif
+      //@}
+
+      //------------------------------------
+      //**@name Construction / destruction */
+      //@{
       /// default constructor
       Desc()
          : stat(0)
@@ -287,80 +312,40 @@ public:
 
       /// copy constructor
       Desc(const Desc& old);
-#if 0
-         : rowstat(old.rowstat)
-         , colstat(old.colstat)
-      {
-         if (old.stat == &old.rowstat)
-         {
-            assert(old.costat == &old.colstat);
-
-            stat   = &rowstat;
-            costat = &colstat;
-         }
-         else
-         {
-            assert(old.costat == &old.rowstat);
-
-            stat   = &colstat;
-            costat = &rowstat;
-         }
-      }
-#endif
       /// assignment operator
       Desc& operator=(const Desc& rhs);
-#if 0
-      {
-         if (this != &rhs)
-         {
-            rowstat = rhs.rowstat;
-            colstat = rhs.colstat;
-
-            if (rhs.stat == &rhs.rowstat)
-            {
-               assert(rhs.costat == &rhs.colstat);
-
-               stat   = &rowstat;
-               costat = &colstat;
-            }
-            else
-            {
-               assert(rhs.costat == &rhs.rowstat);
-               
-               stat   = &colstat;
-               costat = &rowstat;
-            }
-         }
-         return *this;
-      }
-#endif
+      //@}
    };
 
 protected:
-   SPxSolver* theLP;
-   
-   /* For storing the basis matrix we keep two arrays: Array #theBaseId
+
+   //------------------------------------
+   //**@name Protected data 
+   /**
+      For storing the basis matrix we keep two arrays: Array #theBaseId
       contains the #Id%s of the basis vectors, and #matrix the pointers to
       the vectors themselfes. Method #loadMatrixVecs() serves for loading
       #matrix according to the #Id%s stored in #theBaseId. This method must
-      be called whenever there is a chance, that the vector pointers may have
+      be called whenever the vector pointers may have
       changed due to manipulations of the LP.
    */
-
+   //@{
+   /// the LP
+   SPxSolver* theLP;
    /// #Id%s of basic vectors.
    DataArray < SPxId > theBaseId;
-
    /// pointers to the vectors of the basis matrix.
    DataArray < const SVector* > matrix;
-
-   /// is TRUE iff the pointers in #matrix are set up correctly.
+   /// \c true iff the pointers in #matrix are set up correctly.
    bool matrixIsSetup;
 
-   /* The factorization of the matrix is stored in #factor if #factorized != 0.
+   /* @brief LU factorization of basis matrix
+      The factorization of the matrix is stored in #factor if #factorized != 0.
       Otherwise #factor is undefined.
    */
-   SLinSolver* factor;    ///< LU factorization of basis matrix
-   bool factorized;        ///< TRUE iff #factor = matrix\f$^{-1}\f$.
+   SLinSolver* factor;
+   /// \c true iff #factor = matrix\f$^{-1}\f$.
+   bool factorized;
 
    /// number of updates before refactorization.
    /** When a vector of the basis matrix is exchanged by a call to method
@@ -397,21 +382,29 @@ protected:
    SPxId  lastout;       ///< #lastLeft(): variable left the base last
    int    lastidx;       ///< #lastIndex(): basis index where last update was done
    Real   minStab;       ///< minimum stability
+   //@}
 
 private:
+
+   //------------------------------------
+   //**@name Private data */
+   //@{
    SPxStatus thestatus;      ///< current status of the basis.
    Desc      thedesc;        ///< the basis' #Desc%riptor
+   //@}
 
 public:
+
+   //------------------------------------------------
    /**@name Status and Descriptor related Methods */
    //@{
-   /// returns current #SPxStatus.
+   /// returns current SPxStatus.
    SPxStatus status() const
    {
       return thestatus;
    }
 
-   /// sets basis #SPxStatus to #stat.
+   /// sets basis SPxStatus to \p stat.
    void setStatus(SPxStatus stat)
    {
       METHOD( "SPxBasis::setStatus()" );
@@ -434,19 +427,19 @@ public:
       return thedesc;
    }
 
-   /// dual #Status for the \p i 'th column variable of the loaded LP.
+   /// dual Status for the \p i'th column variable of the loaded LP.
    Desc::Status dualColStatus(int i) const;
 
-   /// dual #Status for the column variable with ID \p id of the loaded LP.
+   /// dual Status for the column variable with ID \p id of the loaded LP.
    Desc::Status dualStatus(const SPxColId& id) const;
 
-   /// dual #Status for the \p i 'th row variable of the loaded LP.
+   /// dual Status for the \p i'th row variable of the loaded LP.
    Desc::Status dualRowStatus(int i) const;
 
-   /// dual #Status for the row variable with ID \p id of the loaded LP.
+   /// dual Status for the row variable with ID \p id of the loaded LP.
    Desc::Status dualStatus(const SPxRowId& id) const;
 
-   /// dual #Status for the variable with ID \p id of the loaded LP.
+   /// dual Status for the variable with ID \p id of the loaded LP.
    /** It is automatically detected, whether the \p id is one of a 
        row or a column variable, and the correct row or column status
        is returned.
@@ -460,73 +453,74 @@ public:
    //@}
 
 
+   //-----------------------------------
    /**@name Inquiry Methods */
    //@{
    /// 
-   SPxId& baseId(int i)
+   inline SPxId& baseId(int i)
    {
       return theBaseId[i];
    }
-   /// returns the #Id of the \p i 'th basis vector.
-   SPxId baseId(int i) const
+   /// returns the Id of the \p i'th basis vector.
+   inline SPxId baseId(int i) const
    {
       return theBaseId[i];
    }
 
-   /// returns the \p i 'th basic vector.
+   /// returns the \p i'th basic vector.
    const SVector& baseVec(int i) const
    {
       assert( matrixIsSetup );
       return *matrix[i];
    }
 
-   /// returns #Id of last vector included to the basis.
-   SPxId lastEntered() const
+   /// returns Id of last vector included to the basis.
+   inline SPxId lastEntered() const
    {
       return lastin;
    }
 
-   /// returns #Id of last vector that left the basis.
-   SPxId lastLeft() const
+   /// returns Id of last vector that left the basis.
+   inline SPxId lastLeft() const
    {
       return lastout;
    }
 
    /// returns index in basis where last update was done.
-   int lastIndex() const
+   inline int lastIndex() const
    {
       return lastidx;
    }
 
    /// returns number of basis changes since last refactorization.
-   int lastUpdate() const
+   inline int lastUpdate() const
    {
       return updateCount;
    }
 
    /// returns number of basis changes since last #load().
-   int iteration() const
+   inline int iteration() const
    {
       return iterCount;
    }
    /// returns loaded solver.
-   ///@todo Name should be changed, or loadSolver should be renamed.
-   SPxSolver* solver() const
+   inline SPxSolver* solver() const
    {
       return theLP;
    }
    //@}
 
+   //-----------------------------------
    /**@name Linear Algebra */
    //@{
    /// Basis-vector product.
-   /** Depending on the representation, for a #SPxBasis B,
+   /** Depending on the representation, for an SPxBasis B,
        B.multBaseWith(x) computes
        - \f$x \leftarrow Bx\f$    in the columnwise case, and
        - \f$x \leftarrow x^TB\f$  in the rowwise case.
 
-       Both can be seen uniformly as multiplying the basis matrix #B with
-       a vector #x alligned the same way as the \em vectors of #B.
+       Both can be seen uniformly as multiplying the basis matrix \p B with
+       a vector \p x aligned the same way as the \em vectors of \p B.
     */
    Vector& multBaseWith(Vector& x) const;
 
@@ -536,8 +530,8 @@ public:
        - \f$x \leftarrow x^TB\f$  in the columnwise case and
        - \f$x \leftarrow Bx\f$    in the rowwise case.
 
-       Both can be seen uniformly as multiplying the basis matrix #B with
-       a vector #x alligned the same way as the \em covectors of #B.
+       Both can be seen uniformly as multiplying the basis matrix \p B with
+       a vector \p x aligned the same way as the \em covectors of \p B.
     */
    Vector& multWithBase(Vector& x) const;
 
@@ -563,14 +557,14 @@ public:
       factor->solveRight(x, rhs);
    }
    /// solves linear system with basis matrix.
-   /** Depending on the representation, for a #SPxBasis B,
+   /** Depending on the representation, for a SPxBasis B,
        B.solve(x) computes
        - \f$x \leftarrow B^{-1}rhs\f$       in the columnwise case and
        - \f$x \leftarrow rhs^TB^{-1}\f$     in the rowwise case.
 
        Both can be seen uniformly as solving a linear system with the basis
-       matrix #B and a right handside vector #x aligned the same way as
-       the \em vectors of #B.
+       matrix \p B and a right handside vector \p x aligned the same way as
+       the \em vectors of \p B.
     */
    void solve4update(SSVector& x, const SVector& rhs)
    {
@@ -589,14 +583,14 @@ public:
    }
 
    /// Cosolves linear system with basis matrix.
-   /** Depending on the representation, for a #SPxBasis B,
+   /** Depending on the representation, for a SPxBasis B,
        B.coSolve(x) computes
        - \f$x \leftarrow rhs^TB^{-1}\f$     in the columnwise case and
        - \f$x \leftarrow B^{-1}rhs\f$       in the rowwise case.
 
        Both can be seen uniformly as solving a linear system with the basis
-       matrix #B and a right handside vector #x alligned the same way as
-       the \em covectors of #B.
+       matrix \p B and a right handside vector \p x aligned the same way as
+       the \em covectors of \p B.
     */
    void coSolve(Vector& x, const Vector& rhs)
    {
@@ -624,33 +618,35 @@ public:
    //@}
 
 
+   //------------------------------------
    /**@name Modification notification.
-       These methods must be called, after the loaded LP has been modified.
+       These methods must be called after the loaded LP has been modified.
     */
    //@{
-   /// inform #SPxBasis, that \p n new rows had been added.
+   /// inform SPxBasis, that \p n new rows had been added.
    void addedRows(int n);
-   /// inform #SPxBasis, that row \p i had been removed.
+   /// inform SPxBasis that row \p i had been removed.
    void removedRow(int i);
    /**@todo is this description correct? */
-   /// inform #SPxBasis, that rows in \p perm with negative entry were removed.
+   /// inform SPxBasis that rows in \p perm with negative entry were removed.
    void removedRows(const int perm[]);
-   /// inform #SPxBasis, that \p n new columns had been added.
+   /// inform SPxBasis that \p n new columns had been added.
    void addedCols(int n);
-   /// inform #SPxBasis, that column \p i had been removed.
+   /// inform SPxBasis that column \p i had been removed.
    void removedCol(int i);
    /**@todo is this description correct? */
-   /// inform #SPxBasis, that columns in \p perm with negative entry were removed.
+   /// inform SPxBasis that columns in \p perm with negative entry were removed.
    void removedCols(const int perm[]);
-   /// inform #SPxBasis, that a row had been changed.
+   /// inform SPxBasis that a row had been changed.
    void changedRow(int);
-   /// inform #SPxBasis, that a column had been changed.
+   /// inform SPxBasis that a column had been changed.
    void changedCol(int);
-   /// inform #SPxBasis, that a matrix entry had been changed.
+   /// inform SPxBasis that a matrix entry had been changed.
    void changedElement(int, int);
    //@}
 
 
+   //--------------------------------
    /**@name Miscellaneous */
    //@{
    /**@todo I am not sure about the described parameters 'vec' and 'upd',
@@ -659,7 +655,7 @@ public:
    /** Changes the \p i 'th vector of the basis with the vector associated to
        \p id. This includes:
        - updating the factorization, or recomputing it from scratch by
-         calling #factorize(),
+         calling   #factorize(),
        - resetting #lastEntered(),
        - resetting #lastIndex(),
        - resetting #lastLeft(),
@@ -670,16 +666,16 @@ public:
        cannot know about how to set up the status of the involved variables
        correctly.
 
-       A vector \p vec may be passed for a fast #ETA update of the LU
+       A vector \p vec may be passed for a fast ETA update of the LU
        factorization associated to the basis. It must be initialized with
        the solution vector \f$x\f$ of the right linear system \f$Bx = b\f$
        with the entering vector as right hand side vetor \f$b\f$, where \f$B\f$
        denotes the basis matrix. This can be computed using method #solve(b).
-       When using #FAST updates, a vector \p upd may be passed for
+       When using FAST updates, a vector \p upd may be passed for
        improved performance. It must be initialized by a call to
-       #factor->solveRightUpdate() as described in #SLinSolver. What
-       implementation is hidden behind #FAST updates, depends on the
-       #SLinSolver implementation class.
+       factor->solveRightUpdate() as described in SLinSolver. What
+       implementation is hidden behind FAST updates, depends on the
+       SLinSolver implementation class.
     */
    virtual void change(int i, SPxId& id,
       const SVector* enterVec, const SSVector* eta = 0);
