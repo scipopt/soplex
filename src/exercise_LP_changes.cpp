@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: exercise_LP_changes.cpp,v 1.3 2005/10/28 17:25:33 bzforlow Exp $"
+#pragma ident "@(#) $Id: exercise_LP_changes.cpp,v 1.4 2005/11/03 17:13:18 bzfhille Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -60,9 +60,9 @@ using namespace soplex;
 //------------------------------------------------------------------------
 
 /** 
-    A simple derived class from #SoPlex, used as object under test.
+    A simple derived class from SpxSolver, used as object under test.
  */
-class TestSolver : public SoPlex
+class TestSolver : public SPxSolver
 {
 public:
 
@@ -84,16 +84,12 @@ public:
    //@}
 
 private:
-
    //------------------------------------
    /**@name Data */
    //@{
-   SPxPricer* _pricer;
-   SPxRatioTester* _ratiotester;
-   SPxScaler* _prescaler;
-   SPxScaler* _postscaler;
-   SPxSimplifier* _simplifier;
-   SPxStarter* _starter;
+   SLUFactor _solver;              ///< sparse LU factorization
+   SPxSteepPR _pricer;             ///< steepest edge pricer
+   SPxFastRT _ratiotester;         ///< Harris fast ratio tester
    //@}
 
 public:
@@ -105,15 +101,9 @@ public:
    explicit
    TestSolver( const SPxSolver::Type type_ = SPxSolver::LEAVE, 
                const SPxSolver::Representation representation_ = SPxSolver::COLUMN )
-      : SoPlex( type_, representation_ )
-      , _pricer( 0 )
-      , _ratiotester( 0 )
-      , _prescaler( 0 )
-      , _postscaler( 0 )
-      , _simplifier( 0 )
-      , _starter( 0 )
+      : SPxSolver( type_, 
+                   representation_ )
    {
-      setUtype( update );
       setDelta( delta  );
       setTerminationTime( timelimit );
 
@@ -122,34 +112,13 @@ public:
       Param::setEpsilonUpdate( epsilon_update );
       Param::setVerbose( verbose );
 
-      // Use default sub-algorithms as in main soplex binary.
-      _pricer = new SPxSteepPR;
-      _ratiotester = new SPxFastRT;
-      _prescaler = new SPxEquiliSC( representation_ == SPxSolver::COLUMN, true );
-      _postscaler = new SPxGeometSC( representation_ == SPxSolver::COLUMN, 1 );
-      _simplifier = 0; // * no simplifier
-      _starter = 0;
-
-      setPricer( _pricer );
-      setTester( _ratiotester );
-      setPreScaler( _prescaler );
-      setPostScaler( _postscaler );
-      setSimplifier( _simplifier );
-      setStarter( _starter );
+      setPricer( &_pricer );
+      setTester( &_ratiotester );
+      setSolver( &_solver );
+      _solver.setUtype( update );
+      // no starter, no simplifier, no scaler
 
       assert( isConsistent() );
-   }
-
-   //------------------------------------------------------------------------
-   /// virtual destructor
-   virtual ~TestSolver()
-   {
-      delete _pricer;
-      delete _ratiotester;
-      delete _prescaler;
-      delete _postscaler;
-      delete _simplifier;
-      delete _starter;
    }
    //@}
 };
@@ -204,6 +173,15 @@ public:
    void test_add_delete_rows();
    void test_add_delete_col();
    void test_add_delete_cols();
+
+   void test_change_obj();
+   void test_change_lower();
+   void test_change_upper();
+   void test_change_bounds();
+   void test_change_lhs();
+   void test_change_rhs();
+   void test_change_range();
+   void test_change_sense();
 
    /// Reset test statistics.
    void reset()
@@ -322,6 +300,15 @@ int main( int argc,
          tester.test_add_delete_rows();
          tester.test_add_delete_col();
          tester.test_add_delete_cols();
+
+         tester.test_change_obj();
+         tester.test_change_lower();
+         tester.test_change_upper();
+         tester.test_change_bounds();
+         tester.test_change_lhs();
+         tester.test_change_rhs();
+         tester.test_change_range();
+         tester.test_change_sense();
 
          std::cout << tester.asserts_failed() << " asserts failed.\n" << std::endl;
          total_asserts_failed += tester.asserts_failed();
@@ -679,6 +666,359 @@ void ChangeExerciser::test_add_delete_cols()
    delete work_ptr; work_ptr = 0;
 }
 
+
+/**
+   Changes objective function.
+*/
+void ChangeExerciser::test_change_obj()
+{
+   TestSolver* work_ptr = _prepare_Solver();
+   work_ptr->solve();
+   const Real original_obj = work_ptr->objValue();
+
+   // First test: Multiply every objective value by 2.0. using changeObj by index
+   for ( int col_idx = 0; col_idx != work_ptr->nCols(); ++col_idx )
+      {
+         Real coeff = work_ptr->obj( col_idx );
+         coeff *= 2.0;
+         // use changeObj(int, Real)
+         work_ptr->changeObj( col_idx, coeff );
+         _assert( "objective entry changed by index", work_ptr->obj( col_idx ) == coeff );        
+      }
+
+   work_ptr->solve();
+   _assert_EQrel( "change objective entry by index", 2.0 * original_obj, work_ptr->objValue() );
+
+   // Second test: Divide every objective value by 2.0, using changeObj by ID
+   for ( int col_idx = 0; col_idx != work_ptr->nCols(); ++col_idx )
+      {
+         const SPxColId& col_ID = work_ptr->cId( col_idx );
+
+         Real coeff = work_ptr->obj( col_ID );
+         coeff = coeff/2.0;
+
+         // use changeObj(int, Real)
+         work_ptr->changeObj( col_ID, coeff );
+         _assert( "objective entry changed by ID", work_ptr->obj( col_ID ) == coeff );        
+      }
+   
+   work_ptr->solve();
+   _assert_EQrel( "change objective entry by ID", original_obj, work_ptr->objValue() );
+
+   // Third test: Multiply every objective value by 2.0. using changeObj by Vector
+   Real* v = new Real[work_ptr->nCols()];
+   Vector original(work_ptr->nCols(), v);
+
+   work_ptr->getObj(original);
+
+   original*=2.0;
+
+   work_ptr->changeObj(original);
+
+   work_ptr->solve();
+   _assert_EQrel( "change objective entry by vector", 2.0 * original_obj, work_ptr->objValue() );
+
+   original*=0.5;
+   work_ptr->changeObj(original);
+   work_ptr->solve();   
+   _assert_EQrel( "change objective entry by vector", original_obj, work_ptr->objValue() );
+
+   delete v; v = 0;
+  
+   delete work_ptr; work_ptr = 0;
+}
+
+
+/**
+   Changes lower bounds
+*/
+void ChangeExerciser::test_change_lower()
+{
+   TestSolver* work_ptr = _prepare_Solver();
+   work_ptr->solve();
+   const Real original_obj = work_ptr->objValue();
+
+   // First test : Mupltiply lower vector by 1.0
+   Vector original_lower = work_ptr->lower();
+   
+   work_ptr->changeLower(original_lower*=1.0);
+
+   work_ptr->solve();
+   _assert_EQrel( "change lower by vector", original_obj, work_ptr->objValue() );
+
+   // Second test:  get solution vector and compute slacks
+   Real* val = new Real[work_ptr->nCols()];
+   Vector solution(work_ptr->nCols(), val);
+   work_ptr->getPrimal(solution);
+
+   for(int col_idx = 0; col_idx != work_ptr->nCols(); ++col_idx){
+      Real lower = work_ptr->lower(col_idx);
+      
+      // slack is positive
+      if(solution[col_idx] > lower){
+         // get ID
+         const SPxColId& col_ID = work_ptr->cId( col_idx );
+         work_ptr->changeLower(col_ID, solution[col_idx]);
+         _assert( "lower value changed", work_ptr->lower( col_idx ) == solution[col_idx] );
+      }
+   }
+
+   work_ptr->solve();
+   _assert_EQrel( "change lower", original_obj, work_ptr->objValue() );
+
+   delete val; val=0;
+   delete work_ptr; work_ptr = 0;
+}
+
+
+/**
+   Changes upper bounds
+*/
+void ChangeExerciser::test_change_upper()
+{
+   TestSolver* work_ptr = _prepare_Solver();
+   work_ptr->solve();
+   const Real original_obj = work_ptr->objValue();
+
+   // First test : Mupltiply lower vector by 1.0
+   Vector original_upper = work_ptr->upper();
+   
+   work_ptr->changeUpper(original_upper*=1.0);
+
+   work_ptr->solve();
+   _assert_EQrel( "change upper", original_obj, work_ptr->objValue() );
+
+   // Second test: get solution vector and compute slacks
+   Real* val = new Real[work_ptr->nCols()];
+   Vector solution(work_ptr->nCols(), val);
+   work_ptr->getPrimal(solution);
+
+   for(int col_idx = 0; col_idx != work_ptr->nCols(); ++col_idx){
+      Real upper = work_ptr->upper(col_idx);
+      
+      // slack is bigger than 0
+      if(upper > solution[col_idx]){
+         // get ID
+         const SPxColId& col_ID = work_ptr->cId( col_idx );
+         work_ptr->changeUpper(col_ID, solution[col_idx]);
+         _assert( "upper value changed", work_ptr->upper( col_idx ) == solution[col_idx] );
+      }
+   }
+
+   work_ptr->solve();
+   _assert_EQrel( "change upper", original_obj, work_ptr->objValue() );
+
+   delete work_ptr; work_ptr = 0;
+}
+
+
+/**
+   Changes bounds
+*/
+void ChangeExerciser::test_change_bounds()
+{
+   TestSolver* work_ptr = _prepare_Solver();
+   work_ptr->solve();
+   const Real original_obj = work_ptr->objValue();
+
+   // First test: multiply the bounds as vectors by 1.0
+   Vector original_lower = work_ptr->lower();
+   Vector original_upper = work_ptr->upper();
+   work_ptr->changeBounds(original_lower*=1.0, original_upper*=1.0);
+   work_ptr->solve();
+   _assert_EQrel( "change bounds by vector", original_obj, work_ptr->objValue() );
+
+   // Second test: use positive slacks to change the bounds (see test_change_upper, test_change_lower)
+   Real* val = new Real[work_ptr->nCols()];
+   Vector solution(work_ptr->nCols(), val);
+   work_ptr->getPrimal(solution);
+
+   for(int col_idx = 0; col_idx != work_ptr->nCols(); ++col_idx){
+      Real upper = work_ptr->upper(col_idx);
+      Real lower = work_ptr->lower(col_idx);
+  
+      // slack is bigger than 0
+      if(upper > solution[col_idx])
+         upper = solution[col_idx];
+      
+      if(solution[col_idx] > lower)
+         lower = solution[col_idx];
+      
+      // get ID
+      const SPxColId& col_ID = work_ptr->cId( col_idx );
+      work_ptr->changeBounds(col_ID, lower, upper);
+      _assert( "upper bound changed", work_ptr->upper( col_idx ) == upper );
+      _assert( "lower bound changed", work_ptr->lower( col_idx ) == lower );
+   }
+
+   work_ptr->solve();
+   _assert_EQrel( "change bounds", original_obj, work_ptr->objValue() );
+
+   delete val; val = 0;
+   delete work_ptr; work_ptr = 0;
+}
+
+
+/**
+   Changes left hand side vector
+*/
+void ChangeExerciser::test_change_lhs()
+{
+   TestSolver* work_ptr = _prepare_Solver();
+   work_ptr->solve();
+   const Real original_obj = work_ptr->objValue();    
+
+   // First test: change lhs by vector
+
+   // store lhs vector
+   Vector lhs = work_ptr->lhs();
+   
+   // change lhs to original
+   work_ptr->changeLhs(lhs);
+   work_ptr->solve();
+   _assert_EQrel("lhs changed by vector", original_obj, work_ptr->objValue());
+
+   // Second test: change lhs by indices
+   for(int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx){
+      if(row_idx%2==0.0){
+         Real lhs_val = work_ptr->lhs(row_idx);
+         // get ID
+         const SPxRowId& row_ID = work_ptr->rId( row_idx );
+         work_ptr->changeLhs(row_ID, lhs_val);
+      }      
+   }
+   work_ptr->solve();
+   _assert_EQrel("lhs changed by ID", original_obj, work_ptr->objValue());
+
+   delete work_ptr; work_ptr=0;  
+}
+
+
+/**
+   Changes right hand side vector
+*/
+void ChangeExerciser::test_change_rhs()
+{
+   TestSolver* work_ptr = _prepare_Solver();
+   work_ptr->solve();
+   const Real original_obj = work_ptr->objValue();    
+
+   // First test: change rhs by vector
+
+   // store rhs vector
+   Vector rhs = work_ptr->rhs();
+   
+   // change rhs to original
+   work_ptr->changeRhs(rhs);
+   work_ptr->solve();
+   _assert_EQrel("rhs changed by vector", original_obj, work_ptr->objValue());
+
+   // Second test: change lhs by indices
+   for(int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx){
+      if(row_idx%2==0.0){
+         // get ID
+         const SPxRowId& row_ID = work_ptr->rId( row_idx );
+         Real rhs_val = work_ptr->rhs(row_idx);
+         work_ptr->changeRhs(row_ID, rhs_val);
+      }      
+   }
+   work_ptr->solve();
+   _assert_EQrel("rhs changed", original_obj, work_ptr->objValue());
+
+   delete work_ptr; work_ptr=0;
+}
+
+
+/**
+   Changes range
+*/
+void ChangeExerciser::test_change_range()
+{
+   TestSolver* work_ptr = _prepare_Solver();
+   work_ptr->solve();
+   const Real original_obj = work_ptr->objValue();    
+
+   // First test: change range by vector
+   Vector rhs = work_ptr->rhs();
+   Vector lhs = work_ptr->lhs();
+   for(int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx){
+      rhs[row_idx]*=1.0;
+      lhs[row_idx]*=1.0;
+   }
+   work_ptr->changeRange(lhs, rhs);
+   
+   work_ptr->solve();
+   _assert_EQrel("range changed by vector", original_obj, work_ptr->objValue());
+
+   // Second test: change range by indices
+   for(int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx){
+      if(row_idx%2 == 0){
+         Real newr = lhs[row_idx]*(-1.0); 
+         Real newl = rhs[row_idx]*(-1.0);
+         // get ID
+         const SPxRowId& row_ID = work_ptr->rId( row_idx );
+         work_ptr->changeRange(row_ID, newl, newr);
+         _assert("range value changed", work_ptr->lhs(row_idx)==newl);
+         _assert("range value changed", work_ptr->rhs(row_idx)==newr);
+      }
+   }
+   work_ptr->solve();
+
+   // reverse the change
+   for(int row_idx=0; row_idx < work_ptr->nRows(); ++row_idx){
+      if(row_idx%2 == 0){
+         Real newr = lhs[row_idx]*(-1.0); 
+         Real newl = rhs[row_idx]*(-1.0);
+         // get ID
+         const SPxRowId& row_ID = work_ptr->rId( row_idx );
+         work_ptr->changeRange(row_ID, newl, newr);
+         _assert("range value changed", work_ptr->lhs(row_idx)==newl);
+         _assert("range value changed", work_ptr->rhs(row_idx)==newr);
+      }
+   }
+
+   work_ptr->solve();
+   _assert_EQrel("range changed", original_obj, work_ptr->objValue());
+
+   delete work_ptr; work_ptr=0;
+}
+
+
+/**
+   Changes sense
+*/
+void ChangeExerciser::test_change_sense()
+{
+   TestSolver* work_ptr = _prepare_Solver();
+   work_ptr->solve();
+   const Real original_obj = work_ptr->objValue();    
+   
+   // change the sense
+   if(work_ptr->sense()==SPxLP::MINIMIZE){    
+      SPxLP::SPxSense max = SPxLP::MAXIMIZE;
+      work_ptr->changeSense(max);
+   }
+   else if(work_ptr->sense()==SPxLP::MAXIMIZE){     
+      SPxLP::SPxSense min = SPxLP::MINIMIZE;
+      work_ptr->changeSense(min);
+   }
+   
+   // change objective function (multiply by -1) 
+   Real* v = new Real[work_ptr->nCols()];
+   Vector original(work_ptr->nCols(), v);
+
+   work_ptr->getObj(original);   
+   original*=-1.0;
+   work_ptr->changeObj(original);
+   
+   work_ptr->solve();
+   
+   // check failure
+   _assert_EQrel( "change sense", original_obj*-1.0, work_ptr->objValue() );
+   
+   delete work_ptr; work_ptr=0;
+   delete v; v=0;
+}
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:
