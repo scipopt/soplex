@@ -1,3 +1,13 @@
+- Revised doxygen documentation of the whole code.
+
+- Made one-argument constructors explicit, added virtual destructors,
+  blocked copy constructors and assignment operators.
+
+- Fixed a bug in SSVector where zero vectors were not handled properly.
+  Rewrote major parts of ssvector.cpp to avoid pointer arithmetic.
+
+- Added the spxout class to redirect output depending on the error level.
+
 - Improvement of the LPF and MPS readers.
 
 - Fixed a Bug in example.cpp which resulted in ignoring the
