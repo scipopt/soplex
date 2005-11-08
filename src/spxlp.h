@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.36 2005/09/16 12:42:35 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.37 2005/11/08 19:56:51 bzforlow Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -44,7 +44,7 @@ class SPxSolver;
 /**@brief   Saving LPs in a form suitable for SoPlex.
    @ingroup Algo
 
-   Class #SPxLP provides the data structures required for saving a 
+   Class SPxLP provides the data structures required for saving a 
    linear program in the form
    \f[
    \begin{array}{rl}
@@ -53,7 +53,7 @@ class SPxSolver;
                    & l_c \le x \le u_c
    \end{array}
    \f]
-   suitable for solving with #SoPlex. This includes:
+   suitable for solving with SoPlex. This includes:
    - SVSets for both, columns and rows
    - objective Vector
    - upper and lower bound Vectors for variables (\f$l_c\f$ and \f$u_c\f$)
@@ -66,6 +66,9 @@ class SPxSolver;
  
    Further, equality constraints are modelled by \f$l_r = u_r\f$. 
    Analogously, fixed variables have \f$l_c = u_c\f$.
+
+   #SPxLP%s are saved as an SVSet, both for the columns and rows. 
+   Note that this is redundant but eases the access.
 */
 class SPxLP : protected LPRowSet, protected LPColSet
 {  
@@ -78,24 +81,30 @@ class SPxLP : protected LPRowSet, protected LPColSet
    /// output operator.
    friend std::ostream& operator<<(std::ostream& os, const SPxLP& lp);
 
-   /*
-      \SubSection{Data structures and layout}
-      #SPxLP%s are saved as an #SVSet for both, 
-      the columns and rows. Note that this
-      is redundant but eases the access.
-   */
 public:
+
+   //---------------------------
+   /**@name Types */
+   //@{
    /// optimization sense.
    enum SPxSense
    {
       MAXIMIZE = 1,
       MINIMIZE = -1
    };
+   //@}
+
 private:
+
+   //---------------------------
+   /**@name Data */
+   //@{
    SPxSense thesense;   ///< optimization sense.
+   //@}
 
 public:
 
+   //---------------------------
    /**@name Inquiry */
    //@{
    /// returns number of rows in LP.
@@ -231,7 +240,7 @@ public:
 
    /// returns objective vector for maximization problem.
    /** Methods #maxObj() return the objective vector or its elements, after
-       transformation to a maximization problem. Since this is how #SPxLP
+       transformation to a maximization problem. Since this is how SPxLP
        internally stores any LP these methods are generally faster. The
        following condition holds: #obj() = #spxSense() * maxObj().
    */
@@ -328,6 +337,7 @@ public:
    //@}
 
 
+   //--------------------------
    /**@name Extension */
    //@{
    ///
@@ -335,7 +345,7 @@ public:
    {
       doAddRow(row);
    }
-   /// adds \p row to #LPRowSet.
+   /// adds \p row to LPRowSet.
    virtual void addRow(SPxRowId& id, const LPRow& row)
    {
       addRow(row);
@@ -347,7 +357,7 @@ public:
    {
       doAddRows(pset);
    }
-   /// adds all #LPRow%s of \p pset to #LPRowSet.
+   /// adds all LPRows of \p pset to LPRowSet.
    virtual void addRows(SPxRowId id[], const LPRowSet& set);
 
    ///
@@ -355,7 +365,7 @@ public:
    {
       doAddCol(col);
    }
-   /// adds \p col to #LPColSet.
+   /// adds \p col to LPColSet.
    virtual void addCol(SPxColId& id, const LPCol& col)
    {
       addCol(col);
@@ -367,12 +377,13 @@ public:
    {
       doAddCols(pset);
    }
-   /// adds all #LPCol%s of \p set to #LPColSet.
+   /// adds all LPCols of \p set to LPColSet.
    virtual void addCols(SPxColId id[], const LPColSet& set);
 
    //@}
 
 
+   //--------------------------
    /**@name Shrinking */
    //@{
    /// removes \p i 'th row.
@@ -388,11 +399,11 @@ public:
    }
 
    /// removes multiple rows.
-   /** This method removes all #LPRow%s from the #SPxLP with an
+   /** This method removes all LPRows from the SPxLP with an
        index \p i such that \p perm[i] < 0. Upon completion, \p perm[i] >= 0
-       indicates the new index where the \p i 'th #LPRow has been moved to
-       due to this removal. Note, that \p perm must point to an array of at
-       least #nRows() #int%s.
+       indicates the new index where the \p i'th LPRow has been moved to
+       due to this removal. Note that \p perm must point to an array of at
+       least #nRows() ints.
     */
    virtual void removeRows(int perm[])
    {
@@ -401,7 +412,7 @@ public:
 
    ///
    virtual void removeRows(SPxRowId id[], int n, int perm[] = 0);
-   /// removes \p n #LPRow%s.
+   /// removes \p n LPRows.
    /** Removing multiple rows with one method invocation is available in
        two flavours. An array \p perm can be passed as third argument or
        not. If given, \p perm must be an array at least of size #nRows(). It
@@ -428,11 +439,11 @@ public:
    }
 
    /// removes multiple columns.
-   /** This method removes all #LPCol%s from the #SPxLP with an
+   /** This method removes all LPCols from the SPxLP with an
        index \p i such that \p perm[i] < 0. Upon completion, \p perm[i] >= 0
-       indicates the new index where the \p i 'th #LPCol has been moved to
+       indicates the new index where the \p i 'th LPCol has been moved to
        due to this removal. Note, that \p perm must point to an array of at
-       least #nCols() #int%s.
+       least #nCols() ints.
     */
    virtual void removeCols(int perm[])
    {
@@ -441,7 +452,7 @@ public:
 
    ///
    virtual void removeCols(SPxColId id[], int n, int perm[] = 0);
-   /// removes \p n #LPCol%s.
+   /// removes \p n LPCols.
    /** Removing multiple columns with one method invocation is available in
        two flavours. An array \p perm can be passed as third argument or
        not. If given, \p perm must be an array at least of size #nCols(). It
@@ -461,6 +472,7 @@ public:
    //@}
 
 
+   //--------------------------
    /**@name IO */
    //@{
    /// reads a file from a file.
@@ -488,6 +500,7 @@ public:
    //@}
 
 
+   //--------------------------
    /**@name Manipulation */
    //@{
    /// changes objective vector to \p newObj.
@@ -610,7 +623,7 @@ public:
    }
    //@}
 
-
+   //--------------------------
    /**@name Miscellaneous */
    //@{
 #ifndef NO_CONSISTENCY_CHECKS
@@ -620,6 +633,10 @@ public:
    //@}
 
 protected:
+
+   //--------------------------------
+   /**@name Protected write access */
+   //@{
    /// returns right hand side of row \p i.
    Real& rhs_w(int i)
    {
@@ -645,26 +662,29 @@ protected:
    {
       return LPColSet::lower(i);
    }
-   /// returns the LP as a #LPRowSet.
+   //@}
+
+   //--------------------------------
+   /**@name Protected helpers */
+   //@{
+   /// returns the LP as an LPRowSet.
    const LPRowSet* lprowset() const
    {
       return static_cast<const LPRowSet*>(this);
    }
 
-   /// returns the LP as a #LPColSet.
+   /// returns the LP as an LPColSet.
    const LPColSet* lpcolset() const
    {
       return static_cast<const LPColSet*>(this);
    }
-
-   //@Memo: These  methods are use for implemementing the public remove methods
-   ///
+   /// internal helper method
    virtual void doRemoveRow(int i);
-   ///
+   /// internal helper method
    virtual void doRemoveCols(int perm[]);
-   ///
+   /// internal helper method
    virtual void doRemoveRows(int perm[]);
-   ///
+   /// internal helper method
    virtual void doRemoveCol(int i);
 
    /// called after the last \p n rows have just been added.
@@ -675,21 +695,31 @@ protected:
    {}
    ///
    void added2Set(SVSet& set, const SVSet& add, int n);
+   //@}
 
 
 private:
+
+   //--------------------------------
+   /**@name Private helpers */
+   //@{
+   /// returns the LP as an LPRowSet.
    SVector& colVector_w(int i)
    {
       return LPColSet::colVector_w(i);
    }
+   ///
    SVector& rowVector_w(int i)
    {
       return LPRowSet::rowVector_w(i);
    }
-
+   ///
    void doAddRow (const LPRow& row);
+   ///
    void doAddRows(const LPRowSet& set);
+   ///
    void doAddCol (const LPCol& col);
+   ///
    void doAddCols(const LPColSet& set);
 
    /// This should return spxSense() * maxObj;
@@ -700,8 +730,11 @@ private:
       return LPColSet::obj();
    }
 #endif
+   //@}
 
 public:
+
+   //---------------------------------------
    /**@name Constructors / Destructors */
    //@{
    /// default constructor.

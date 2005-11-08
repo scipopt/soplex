@@ -13,10 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxintervalsm.h,v 1.2 2003/01/10 12:46:14 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxintervalsm.h,v 1.3 2005/11/08 19:56:51 bzforlow Exp $"
 
 /**@file  spxintervalsm.h
- * @brief Remove all values outside the interval [#epsilon()..#infinity] 
+ * @brief Remove all values outside the interval [\p eps..#infinity] 
  *        from the LP.
  */
 #ifndef _SPXINTERVALSM_H_
@@ -27,10 +27,10 @@
 
 namespace soplex
 {
-/**@brief   Simplifier for forcing the LP values into a [#epsilon()..#infinity] interval.
+/**@brief   Simplifier for forcing the LP values into the interval [eps..#infinity].
  * @ingroup Algo
  *
- * This simplifier sets all values smaller than #epsilon() to zero and all values
+ * This simplifier sets all values smaller than \p eps to zero and all values
  * bigger then infinity/5 to infinity.
  * 
  */
@@ -41,6 +41,9 @@ public:
    SPxIntervalSM() 
       : SPxSimplifier("Interval")
    {}   
+   /// destructor
+   ~SPxIntervalSM()
+   {}
    /// just do it!
    Result simplify(SPxLP& lp, Real eps, Real delta);
 };

@@ -1,18 +1,29 @@
-$Id: TODO,v 1.75 2005/11/01 21:27:04 bzforlow Exp $
+$Id: TODO,v 1.76 2005/11/08 19:56:51 bzforlow Exp $
 
 - Code documentation:
    * spxdefines.h: DEFAULT_EPS_FACTOR, DEFAULT_EPS_UPDATE und Param dokumentieren
    * slufactor.h: document the two change methods ETA and FOREST_TOMLIN, uvam.
    * clufactor.h: ziemlich undokumentiert
-   * was ist DataKey für eine kranke Klasse?
    * solve2right4update (slinsolver.h/slufactor.cpp): solves Ax=b, Ay=d?
    * spxaggregatesm.h: ???
+   * spxdataset.h: mehrmals "???". Ziemlich kranke Klasse...
    * spxbasis.h: removedRows, removedCols: correct documentation?
    * spxdevexpr.h: ziemlich undokumentiert
    * spxharrisrt.h: Was machen maxDelta() und minDelta()?
+   * spxlp.h: obj(): This should return spxSense() * maxObj; returns objective
+     vector. Wo ist das implementiert?
+   * src/spxintervalsm.h: Da werden epsilon und delta für nicht-Null-Tests
+     verwendet. Delta ist nicht dokumentiert.
+   * src/spxparmultpr.h: nur mäßig dokumentiert.
+   * src/spxredundantsm.h: private helpers nicht dokumentiert
+   * src/spxscaler: Dokumentation fragwürdig: unscale() gibt es nicht (nur
+     unscalePrimal() und unscaleDual()), passendes load() gibt es auch nicht.
    
 - spxbasis.h::solver(): "@todo Name should be changed, or loadSolver should be renamed."  Warum?
 - spxdefaultpr.h: @todo This should be renamed to something like Danzig or Textbook pricing.
+- factor.cpp: "??? mkwtz originally was long, maybe to avoid an overflow in this instruction?"
+- spxchangebasis.cpp (2x): /* ??? I think, this cannot happen. */
+- diverse "#ifdef USE_OLD"-Stellen -> grep
 
 - Es wird infeasible/unbounded gemeldet je nach dem welcher algo 
   gerade am Laufen war.

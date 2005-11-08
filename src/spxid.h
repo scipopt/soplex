@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxid.h,v 1.5 2005/11/01 21:27:04 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxid.h,v 1.6 2005/11/08 19:56:51 bzforlow Exp $"
 
 /**@file  spxid.h
  * @brief Row and columns Id's \ref soplex::SPxLP "SPxLP".
@@ -47,11 +47,12 @@ public:
    explicit SPxColId(const SPxId& p_key);
 };
 
+
 /**@brief   Ids for LP rows.
  * @ingroup Algo
  *
  *  Class SPxRowId provides #DataKey%s for the row 
- *  indices of an \ref soplex::SPxLP "SPxLP".
+ *  indices of an SPxLP.
  */
 class SPxRowId : public DataKey
 {

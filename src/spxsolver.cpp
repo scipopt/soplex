@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.21 2005/09/22 12:02:27 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.22 2005/11/08 19:56:52 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -722,91 +722,6 @@ SPxSolver::SPxSolver(
    setDelta (DEFAULT_BND_VIOL);
    theLP = this;
 }
-
-/* We forbid the copyconstructor and the assignment operator
- * untill we are sure the work and we have an idea what exactly
- * they should be used to. Why would somebody copy an SoPlex Object?
- */
-#if 0 
-SPxSolver::SPxSolver(const SPxSolver& old)
-   : SPxLP (old)
-   , SPxBasis (old)
-   , theType (old.theType)
-   , thePricing (old.thePricing)
-   , theRep (old.theRep)  /// ??? siehe unten
-   , maxIters (old.maxIters)
-   , maxTime (old.maxTime)
-   , maxValue(old.maxValue)
-   , theShift (old.theShift)
-   , m_maxCycle (old.m_maxCycle)
-   , m_numCycle (old.m_numCycle)
-   , initialized (old.initialized)
-   , solveVector2 (0)
-   , coSolveVector2 (0)
-   , unitVecs (old.unitVecs)
-   , primRhs (old.primRhs)
-   , primVec (old.primVec)
-   , dualRhs (old.dualRhs)
-   , dualVec (old.dualVec)
-   , addVec (old.addVec)
-   , theURbound (old.theURbound)
-   , theLRbound (old.theLRbound)
-   , theUCbound (old.theUCbound)
-   , theLCbound (old.theLCbound)
-   , theUBbound (old.theUBbound)
-   , theLBbound (old.theLBbound)
-   , theCoTest (old.theCoTest)
-   , theTest (old.theTest)
-   , thepricer (old.thepricer)
-   , theratiotester (old.theratiotester)
-   , thestarter (old.thestarter)
-{
-   METHOD( "SPxSolver::SPxSolver()" );
-   setRep (old.rep());
-   setDelta(old.theDelta);
-   theLP = this;
-}
-
-SPxSolver& SPxSolver::operator=(const SPxSolver& old)
-{
-   METHOD( "SPxSolver::operator=()" );
-   SPxLP::operator=(old);
-   SPxBasis::operator=(old);
-
-   theRep         = old.theRep;
-   unitVecs       = old.unitVecs;
-   theCoTest      = old.theCoTest;
-   theTest        = old.theTest;
-   theType        = old.theType;
-   thePricing     = old.thePricing;
-   primRhs        = old.primRhs;
-   primVec        = old.primVec;
-   dualRhs        = old.dualRhs;
-   dualVec        = old.dualVec;
-   addVec         = old.addVec;
-   theURbound     = old.theURbound;
-   theLRbound     = old.theLRbound;
-   theUCbound     = old.theUCbound;
-   theLCbound     = old.theLCbound;
-   theUBbound     = old.theUBbound;
-   theLBbound     = old.theLBbound;
-   m_maxCycle     = old.m_maxCycle;
-   m_numCycle     = old.m_numCycle;
-   theShift       = old.theShift;
-   initialized    = old.initialized;
-   thepricer      = old.thepricer;
-   theratiotester = old.theratiotester;
-   thestarter     = old.thestarter;
-   solveVector2   = 0;
-   coSolveVector2 = 0;
-
-   setRep (old.rep());
-   setDelta(old.theDelta);
-
-   theLP = this;
-   return *this;
-}
-#endif // no copy constructor and assignment operator
 
 #ifndef NO_CONSISTENCY_CHECKS
 bool SPxSolver::isConsistent() const

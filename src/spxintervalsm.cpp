@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxintervalsm.cpp,v 1.9 2005/08/09 19:32:12 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxintervalsm.cpp,v 1.10 2005/11/08 19:56:51 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -126,7 +126,7 @@ SPxSimplifier::Result SPxIntervalSM::simplify(SPxLP& lp, Real eps, Real delta)
          lo = fabs(lo);
          up = fabs(up);
 
-         Real absbnd = lo > up ? lo : up;
+         Real absbnd = ( lo > up ? lo : up );
 
          // Anything bigger than delta is ok.
          if (absbnd < 1.0)

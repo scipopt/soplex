@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxredundantsm.h,v 1.15 2005/08/19 13:59:04 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxredundantsm.h,v 1.16 2005/11/08 19:56:52 bzforlow Exp $"
 
 /**@file  spxredundantsm.h
  * @brief Remove singletons from LP.
@@ -28,22 +28,22 @@
 
 namespace soplex
 {
-/**@brief   LP simplifier for removing uneccessary row/columns
+/**@brief   LP simplifier for removing unnecessary rows or columns
    @ingroup Algo
 
-   This #SPxSimplifier removes redundant rows and columns and bounds.
-   Also infeasibility/unboundness may be detected.
+   This SPxSimplifier removes redundant rows and columns and bounds.
+   Also infeasibility or unboundedness may be detected.
    Removed are:
-   - empty rows / columns
-   - unconstraint constraints
-   - row sigletons
+   - empty rows or columns
+   - unconstrained constraints
+   - row singletons
    - fixed columns
    - some columns singletons
    - rows with all fixed variables due to implied bounds
    - redundant rhs/lhs
    - redundant column bounds
-   - dublicate rows
-   - columns which are implicit fixed to a bound
+   - duplicate rows
+   - columns which are implicitly fixed to a bound
    - columns with redundant bounds
 */
 class SPxRedundantSM : public SPxSimplifier
@@ -53,18 +53,18 @@ private:
    //------------------------------------
    //**@name Types */
    //@{
-   /// 
-   struct RowHash
+   /// comparison operator for rows
+   class RowHash
    {
    public: 
-      RowHash() {}       ///< constructor
-
-      int          row;  ///< row no.
-      unsigned int hid;  ///< hash id
-
+      /// constructor
+      RowHash() {}
+      /// destructor
+      ~RowHash() {}
+      /// comparison operator
       int operator() (const RowHash& rh1, const RowHash& rh2) const
       {
-         // rh1.hid - rh2.hid is a bas idea, because they are unsigned
+         // rh1.hid - rh2.hid is a bad idea, because they are unsigned
 
          if (rh1.hid < rh2.hid)
             return -1;
@@ -75,6 +75,9 @@ private:
 
          return rh1.row - rh2.row;
       }
+
+      int          row;  ///< row no.
+      unsigned int hid;  ///< hash id
    };
    //@}
 
@@ -147,6 +150,15 @@ public:
    virtual const Vector& unsimplifiedPrimal(const Vector& x);
    /// returns a reference to the unsimplified dual solution. 
    virtual const Vector& unsimplifiedDual(const Vector& pi);
+   //@}
+
+   //------------------------------------
+   //**@name Blocked */
+   //@{
+   /// copy constructor
+   SPxRedundantSM( const SPxRedundantSM& );
+   /// assignment operator
+   SPxRedundantSM& operator=( const SPxRedundantSM& );
    //@}
 };
 } // namespace soplex

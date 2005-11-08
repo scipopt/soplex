@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsimplifier.h,v 1.14 2005/09/16 12:42:36 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxsimplifier.h,v 1.15 2005/11/08 19:56:52 bzforlow Exp $"
 
 /**@file  spxsimplifier.h
  * @brief LP simplification base class.
@@ -32,32 +32,54 @@ namespace soplex
 /**@brief   LP simplification abstract base class.
    @ingroup Algo
 
-   Instances of classes derived from #SPxSimplifier may be loaded to #SoPlex in
-   order to simplify LPs before solving them. #SoPlex# will call #simplify()
-   on its self. Generally any #SPxLP can be given to 
-   a #SPxSimplifier for #simplify()%ing it. The simplification can not be undone,
-   but given an primal/dual solution for the simplified #SPxLP, the simplifier
+   Instances of classes derived from SPxSimplifier may be loaded to SoPlex in
+   order to simplify LPs before solving them. SoPlex will call #simplify()
+   on itself. Generally any SPxLP can be given to 
+   a SPxSimplifier for #simplify()%ing it. The simplification cannot be undone,
+   but given an primal/dual solution for the simplified SPxLP, the simplifier
    can reconstruct the primal/dual solution of the unsimplified LP.
 */
 class SPxSimplifier
 {
 protected:
+
+   //-------------------------------------
+   /**@name Protected Data */
+   //@{
+   /// name of the simplifier
    const char* m_name;
+   /// user time used for simplification
    Timer       m_timeUsed;
+   /// number of removed rows
    int         m_remRows;
+   /// number of removed columns
    int         m_remCols;
+   /// number of removed nonzero coefficients
    int         m_remNzos;
+   /// number of changed bounds
    int         m_chgBnds;
+   /// number of change right-hand sides
    int         m_chgLRhs;
+   //@}
 
 public:
+
+   //-------------------------------------
+   /**@name Types */
+   //@{
+   /// Result of the simplification.
    enum Result
    {
-      OKAY       =  0,
-      INFEASIBLE =  1,
-      UNBOUNDED  =  2,
-      VANISHED   =  3
+      OKAY       =  0,  ///< simplification could be done
+      INFEASIBLE =  1,  ///< primal infeasibility was detected
+      UNBOUNDED  =  2,  ///< primal unboundedness was detected
+      VANISHED   =  3   ///< the problem was so much simplified that it vanished
    };
+   //@}
+
+   //-------------------------------------
+   /**@name Types */
+   //@{
    /// constructor
    explicit SPxSimplifier(const char* p_name)
       : m_name(p_name)
@@ -72,6 +94,11 @@ public:
    {
       m_name = 0;
    }
+   //@}
+
+   //-------------------------------------
+   /**@name Access / modfication */
+   //@{
    /// get name of simplifier.
    virtual const char* getName() const
    {
@@ -81,17 +108,13 @@ public:
    {
       return m_timeUsed.userTime();
    }
-   /// simplify #SPxLP \p lp. 
-   /**
-    * @return 
-    *  <TABLE>
-    *  <TR><TD>#OKAY      </TD><TD>if this could be done,</TD></TR>
-    *  <TR><TD>#UNBOUNDED </TD><TD>if primal unboundedness was detected or</TD></TR>
-    *  <TR><TD>#INFEASIBLE</TD><TD>if primal infeasibility was detected.</TD></TR>
-    *  </TABLE>
-    */
-   virtual Result simplify(SPxLP& lp, Real eps, Real delta) = 0;
+   //@}
 
+   //-------------------------------------
+   /**@name Simplifying / unsimplifying */
+   //@{
+   /// simplify SPxLP \p lp. 
+   virtual Result simplify(SPxLP& lp, Real eps, Real delta) = 0;
    /// returns a reference to the unsimplified primal solution.
    virtual const Vector& unsimplifiedPrimal(const Vector& x)
    {
@@ -102,13 +125,30 @@ public:
    {
       return pi;
    }
+   //@}
+
 #ifndef NO_CONSISTENCY_CHECKS
+   //-------------------------------------
+   /**@name Consistency check */
+   //@{
    /// consistency check
    virtual bool isConsistent() const
    {
       return true;
    }
+   //@}
 #endif
+
+private:
+
+   //-------------------------------------
+   /**@name Blocked */
+   //@{
+   /// copy constructor
+   SPxSimplifier( const SPxSimplifier& );
+   /// assignment operator
+   SPxSimplifier& operator=( const SPxSimplifier& );
+   //@}
 };
 } // namespace soplex
 #endif // _SPXSIMPLIFIER_H_

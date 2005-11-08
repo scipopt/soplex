@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxpricer.h,v 1.13 2005/09/16 12:42:35 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxpricer.h,v 1.14 2005/11/08 19:56:52 bzforlow Exp $"
 
 
 /**@file  spxpricer.h
@@ -36,25 +36,35 @@ namespace soplex
 /**@brief   Abstract pricer base class.
    @ingroup Algo
 
-   Class #SPxPricer is a pure virtual class defining the interface for pricer
-   classes to be used by #SoPlex. The pricers task is to select a vector to
+   Class SPxPricer is a pure virtual class defining the interface for pricer
+   classes to be used by SoPlex. The pricer's task is to select a vector to
    enter or leave the simplex basis, depending on the chosen simplex type.
    
-   An #SPxPricer is first #load%ed the #SoPlex object for which pricing is to
-   be performed for. Then depending of the #SPxSolver::Type, methods
-   #selectEnter() and #entered4() (for #ENTER%ing Simplex) or #selectLeave()
-   and #left4() (for #LEAVE%ing Simplex) are called by #SoPlex. The #SPxPricer
-   object is informed of a change of the #SPxSolver::Type by calling method
-   #setType.
+   An SPxPricer first #load%s the SoPlex object for which pricing is to
+   be performed. Then, depending of the SPxSolver::Type, methods
+   #selectEnter() and #entered4() (for entering Simplex) or #selectLeave()
+   and #left4() (for leaving Simplex) are called by SoPlex. The SPxPricer
+   object is informed of a change of the SPxSolver::Type by calling method
+   #setType().
 */
 class SPxPricer
 {
 protected:
+
+   //-------------------------------------
+   /**@name Data */
+   //@{
+   /// name of the pricer
    const char* m_name;
+   /// the solver
    SPxSolver*  thesolver;
+   /// violation bound
    Real        theeps;
+   //@}
 
 public:
+
+   //-------------------------------------
    /**@name Initialization */
    //@{
    /// get name of pricer.
@@ -77,13 +87,13 @@ public:
       thesolver = 0;
    }
 
-   /// returns loaded #SPxSolver object.
+   /// returns loaded SPxSolver object.
    virtual SPxSolver* solver() const
    {
       return thesolver;
    }
 
-   /// returns violation bound #epsilon.
+   /// returns violation bound #theeps.
    virtual Real epsilon() const
    {
       return theeps;
@@ -100,71 +110,75 @@ public:
    }
 
    /// sets pricing type.
-   /** Informs pricer about (a change of) the loaded #SoPlex's #Type. In
+   /** Informs pricer about (a change of) the loaded SoPlex's Type. In
        the sequel, only the corresponding select methods may be called.
     */
    virtual void setType(SPxSolver::Type)
    {}
 
    /// sets basis representation.
-   /** Informs pricer about (a change of) the loaded #SoPlex's
-       #Representation.
+   /** Informs pricer about (a change of) the loaded SoPlex's
+       Representation.
    */
    virtual void setRep(SPxSolver::Representation)
    {}
    //@}
 
+   //-------------------------------------
    /**@name Pivoting */
    //@{
    /// returns selected index to leave basis.
    /** Selects the index of a vector to leave the basis. The selected index
-       i, say, must be in the range 0 <= i < #solver()->dim() and its
-       tested value must fullfill #solver()->test()[i] < -#epsilon().
+       i, say, must be in the range 0 <= i < solver()->dim() and its
+       tested value must fullfill solver()->test()[i] < -#epsilon().
     */
    virtual int selectLeave() = 0;
 
    /// performs leaving pivot.
-   /** Method #left4() is called after each simplex iteration in #LEAVE
-       mode. It informs the #SPxPricer that the \p n 'th variable has left
-       the basis for \p id to come in at this position. When beeing called,
-       all vectors of #SoPlex involved in such an entering update are
+   /** Method #left4() is called after each simplex iteration in LEAVE
+       mode. It informs the SPxPricer that the \p n 'th variable has left
+       the basis for \p id to come in at this position. When being called,
+       all vectors of SoPlex involved in such an entering update are
        setup correctly and may be accessed via the corresponding methods
-       (i.e. #fVec(), #pVec(), etc.). In general, argument \p n will be
-       the one returned by the #SPxPricer at the previous call to
-       #selectLeave(). However, one can not rely on this.
+       (\ref SPxSolver::fVec() "fVec()", \ref SPxSolver::pVec() "pVec()", 
+       etc.). In general, argument \p n will be the one returned by the
+       SPxPricer at the previous call to #selectLeave(). However, one can not
+       rely on this.
     */
-   virtual void left4(int /*n*/, SPxId /*id*/)
-   {}
+   virtual void left4(int /*n*/, SPxId /*id*/) {}
 
    /// selects Id to enter basis.
-   /** Selects the #SPxId of a vector to enter the basis. The selected
-       id, must not represent a basic index (i.e. #solver()->isBasic(id) must
+   /** Selects the SPxId of a vector to enter the basis. The selected
+       id, must not represent a basic index (i.e. solver()->isBasic(id) must
        be false). However, the corresponding test value needs not to be less
-       than #-epsilon(). If not, #SoPlex will discard the pivot.
+       than -#epsilon(). If not, SoPlex will discard the pivot.
 
        Note:
-       When method #selectEnter() is called by the loaded #SoPlex
-       object, all values from #coTest() are up to date. However, whether
-       the elements of #test() are so depends on the #SPxSolver::Pricing
-       type.
+       When method #selectEnter() is called by the loaded SoPlex
+       object, all values from \ref SPxSolver::coTest() "coTest()" are 
+       up to date. However, whether the elements of 
+       \ref SPxSolver::test() "test()" are up to date depends on the 
+       SPxSolver::Pricing type.
     */
    virtual SPxId selectEnter() = 0;
 
    /// performs entering pivot.
-   /** Method #entered4() is called after each simplex iteration in #ENTER
-       mode. It informs the #SPxPricer that variable \p id has entered
-       at the \p n 'th position. When beeing called, all vectors of #SoPlex
+   /** Method #entered4() is called after each simplex iteration in ENTER
+       mode. It informs the SPxPricer that variable \p id has entered
+       at the \p n 'th position. When being called, all vectors of SoPlex
        involved in such an entering update are setup correctly and may be
-       accessed via the corresponding methods (i.e. #fVec(), #pVec(),
+       accessed via the corresponding methods 
+       (\ref SPxSolver::fVec() "fVec()", \ref SPxSolver::pVec() "pVec()",
        etc.). In general, argument \p id will be the one returned by the
-       #SPxPricer at the previous call to #selectEnter(). However, one
-       can not rely on this.
+       SPxPricer at the previous call to #selectEnter(). However, one can not
+       rely on this.
     */
-   virtual void entered4(SPxId /*id*/, int /*n*/)
+   virtual void entered4(SPxId /*id*/, int /*n*/) 
    {}
    //@}
 
 
+   //-------------------------------------
    /**@name Extension */
    //@{
    /// \p n vectors have been added to loaded LP.
@@ -175,6 +189,7 @@ public:
    {}
    //@}
 
+   //-------------------------------------
    /**@name Shrinking */
    //@{
    /// vector \p i was removed from loaded LP.
@@ -192,12 +207,17 @@ public:
    //@}
 
 #ifndef NO_CONSISTENCY_CHECKS
+   //-------------------------------------
+   /**@name Debugging */
+   //@{
    virtual bool isConsistent() const 
    {
       return thesolver != 0;
    }
+   //@}
 #endif
 
+   //-------------------------------------
    /**@name Constructors / Destructors */
    //@{
    /// constructor
@@ -213,6 +233,17 @@ public:
       m_name    = 0;
       thesolver = 0;
    }
+   //@}
+
+private:
+
+   //-------------------------------------
+   /**@name Blocked */
+   //@{
+   /// copy constructor
+   SPxPricer( const SPxPricer& );
+   /// assignment operator
+   SPxPricer& operator=( const SPxPricer& );
    //@}
 
 };
