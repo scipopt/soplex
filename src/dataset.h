@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.35 2005/10/28 17:25:33 bzforlow Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.36 2005/11/09 13:53:49 bzforlow Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -32,10 +32,11 @@
 
 namespace soplex
 {
-/**@brief   Set of data objects.
+/**@class DataSet
+   @brief   Set of data objects.
    @ingroup Elementary
 
-   Class DataSet manages of sets of \ref DataObjects "Data Objects" of a
+   Class DataSet manages of sets of data objects  of a
    template type DATA. For constructing a DataSet the maximum number 
    of entries must be given. The current maximum number may be inquired 
    with method max().
@@ -47,29 +48,29 @@ namespace soplex
    
    Adding elements to a DataSet is done via methods add() or create(),
    while remove() removes elements from a DataSet. When adding an element
-   to a DataSet the new element is assigned a DataKey. #DataKey%s serve to
+   to a DataSet the new element is assigned a DataKey. DataKeys serve to
    access DATA elements in a set via a version of the subscript
    operator[](DataKey).
    
    For convenience all elements in a DataSet are implicitely numbered
    from 0 through num()-1 and can be accessed with these numbers
    using a 2nd subscript operator[](int). The reason for providing
-   #DataKey%s to access elements of a DataSet is that the Key of an
+   DataKeys to access elements of a DataSet is that the Key of an
    element remains unchanged as long as the element is a member of the
    DataSet, while the numbers will change in an undefined way, if
    other elements are added to or removed from the DataSet.
 
-   The elements in a DataSet and their #DataKey%s are stored in two arrays:
+   The elements in a DataSet and their DataKeys are stored in two arrays:
    - theitem keeps the elements data along with their number stored in item.
    - thekey  keeps the DataKey::idx's of the elements in a DataSet.
 
    Both arrays have size themax.
 
-   In thekey only elements 0 thru thenum-1 contain DataKey::idx%'s of
-   valid elements, i.e. elements currently in the DataSet.
+   In #thekey only elements 0 thru thenum-1 contain DataKey::idx%'s of
+   valid elements, i.e., elements currently in the DataSet.
    The current number of elements in the DataSet is counted in thenum.
    
-   In theitem only elements 0 thru thesize-1 are used, but only some of
+   In #theitem only elements 0 thru thesize-1 are used, but only some of
    them actually contain real data elements of the DataSet. They are
    recognized by having info >= 0, which gives the number of that
    element. Otherwise info < 0 indicates an unused element. Unused
@@ -117,7 +118,7 @@ public:
     *  Whenever a new element is added to a DataSet, the latter assigns it a
     *  DataKey. For this all methods that extend a DataSet by one ore more
     *  elements are provided with two signatures, one of them having a
-    *  parameter for returning the assigned #DataKey%(s).
+    *  parameter for returning the assigned DataKey(s).
     */
    //@{
    /// adds an element.
@@ -554,7 +555,7 @@ public:
    /// assignment operator.
    /** The assignment operator involves #reMax()%ing the lvalue DataSet
     *  to the size needed for copying all elements of the rvalue. After the
-    *  assignment all #DataKey%s from the lvalue are valid for the rvalue as
+    *  assignment all DataKeys from the lvalue are valid for the rvalue as
     *  well. They refer to a copy of the corresponding data elements.
     */
    DataSet < DATA > & operator=(const DataSet < DATA > & rhs)

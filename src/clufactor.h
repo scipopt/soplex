@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clufactor.h,v 1.23 2005/10/28 17:25:33 bzforlow Exp $"
+#pragma ident "@(#) $Id: clufactor.h,v 1.24 2005/11/09 13:53:49 bzforlow Exp $"
 
 /**@file  clufactor.h
  * @brief Implementation of sparse LU factorization.
@@ -186,9 +186,9 @@ protected:
    Real    initMaxabs;        ///< maximum abs number in initail Matrix 
    Real    maxabs;            ///< maximum abs number in L and U        
 
-   Real    rowMemMult;        ///< factor of minimum Memory * #of nonzeros 
-   Real    colMemMult;        ///< factor of minimum Memory * #of nonzeros 
-   Real    lMemMult;          ///< factor of minimum Memory * #of nonzeros 
+   Real    rowMemMult;        ///< factor of minimum Memory * number of nonzeros 
+   Real    colMemMult;        ///< factor of minimum Memory * number of nonzeros 
+   Real    lMemMult;          ///< factor of minimum Memory * number of nonzeros 
 
    Perm    row;               ///< row permutation matrices 
    Perm    col;               ///< column permutation matrices 

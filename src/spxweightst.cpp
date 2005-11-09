@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.cpp,v 1.26 2005/10/28 17:25:34 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxweightst.cpp,v 1.27 2005/11/09 13:53:50 bzforlow Exp $"
 
 //#define DEBUGGING 1
 //#define TEST 1
@@ -149,10 +149,11 @@ public:
 
 // ----------------------------------------------------------------
 /**
-   The following method initializes \p pref such that it contains the set of
-   #SPxId%s ordered following \p rowWeight and \p colWeight. For the sorting
-   we take the following approach: first we sort the rows, then the columns.
-   Finally we perform a mergesort of both.
+   The following method initializes \p pref such that it contains the
+   set of \ref soplex::SPxId "SPxIds" ordered following \p rowWeight and
+   \p colWeight. For the sorting we take the following approach: first
+   we sort the rows, then the columns.  Finally we perform a mergesort
+   of both.
  */
 static void initPrefs(
    DataArray<SPxId>&      pref,

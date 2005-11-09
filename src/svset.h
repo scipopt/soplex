@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.h,v 1.22 2005/11/01 21:27:04 bzforlow Exp $"
+#pragma ident "@(#) $Id: svset.h,v 1.23 2005/11/09 13:53:51 bzforlow Exp $"
 
 /**@file  svset.h
  * @brief Set of sparse vectors.
@@ -35,16 +35,16 @@ namespace soplex
 {
 typedef DataArray < SVector::Element > SVSetBase;
 
-/**@brief   sparse vector %set.
+/**@brief   sparse vector set.
    @ingroup Algebra
 
-   Class SVSet provides a %set of sparse vectors SVector. All SVector%s
+   Class SVSet provides a set of sparse vectors SVector. All SVector%s
    in a SVSet share one big memory block for their nonzeros. This
    memory is reffered to as the \em nonzero \em memory. The SVector%s
    themselfs are saved in another memory block refered to as the 
    \em vector \em memory. Both memory blocks will grow automatically if
-   required, when adding more SVector%s to the %set or enlarging
-   SVector%s within the %set. For controlling memory consumption,
+   required, when adding more SVector%s to the set or enlarging
+   SVector%s within the set. For controlling memory consumption,
    methods are provided to inquire and reset the size of the memory
    blocks used for vectors and nonzeros.
  
@@ -55,13 +55,13 @@ typedef DataArray < SVector::Element > SVSetBase;
    SVector%s will remain unchanged.
  
    For providing a uniform access to SVector%s in a %set even if others
-   are removed or added, SVSet assigns a #DataKey to each SVector in the
-   %set. Such a #DataKey remains unchanged as long as the corresponding
+   are removed or added, SVSet assigns a DataKey to each SVector in the
+   %set. Such a DataKey remains unchanged as long as the corresponding
    SVector is in the SVSet, no matter what other SVector%s are added
    to or removed from the SVSet. Methods are provided for getting the
-   #DataKey to a SVector or its number and vice versa.  Further, each add()
+   DataKey to a SVector or its number and vice versa.  Further, each add()
    method for enlarging an SVSet is provided with two signatures. One
-   of them returns the #DataKey%s assigned to the SVector%s added to the
+   of them returns the DataKey%s assigned to the SVector%s added to the
    SVSet.
 */
 class SVSet : protected SVSetBase
@@ -97,6 +97,17 @@ private:
    public:
 
       //------------------------------------
+      /**@name Construction / destruction */
+      //@{
+      /// default constructor.
+      DLPSV() : SVector()
+      {}      
+      /// copy constructor.
+      DLPSV(const DLPSV& copy) : SVector(copy)
+      {}
+      //@}
+
+      //------------------------------------
       /**@name Successor / predecessor */
       //@{
       /// next SVector
@@ -105,12 +116,12 @@ private:
          return thenext;
       }
       /// next SVector
-      DLPSV*const& next() const
+      DLPSV* const& next() const
       {
          return thenext;
       }
       /// previous SVector
-      DLPSV*const& prev() const
+      DLPSV* const& prev() const
       {
          return theprev;
       }
@@ -119,12 +130,6 @@ private:
       {
          return theprev;
       }
-      /// default constructor.
-      DLPSV() : SVector()
-      {}      
-      /// copy constructor.
-      DLPSV(const DLPSV& copy) : SVector(copy)
-      {}
       //@}
    };
 

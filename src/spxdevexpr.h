@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.h,v 1.17 2005/11/01 21:27:04 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.h,v 1.18 2005/11/09 13:53:50 bzforlow Exp $"
 
 /**@file  spxdevexpr.h
  * @brief Devex pricer.
@@ -112,6 +112,17 @@ public:
    virtual bool isConsistent() const;
    //@}
 #endif
+
+private:
+
+   //-------------------------------------
+   /**@name Blocked */
+   //@{
+   /// copy constructor
+   SPxDevexPR( const SPxDevexPR& );
+   /// assignment operator
+   SPxDevexPR& operator=( const SPxDevexPR& );
+   //@}
 };
 
 } // namespace soplex

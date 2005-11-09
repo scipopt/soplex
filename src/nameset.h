@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.h,v 1.24 2005/10/28 17:25:34 bzforlow Exp $"
+#pragma ident "@(#) $Id: nameset.h,v 1.25 2005/11/09 13:53:50 bzforlow Exp $"
 
 /**@file  nameset.h
  * @brief Set of strings.
@@ -30,15 +30,17 @@
 
 namespace soplex
 {
-/**@brief   Set of strings.
+/**@class NameSet
+   @brief   Set of strings.
    @ingroup Elementary
 
    Class NameSet implements a symbol or name table. It allows to store or
-   remove names (i.e. char*), but does not provide means for manipulating
+   remove names (i.e., \c char*), but does not provide means for manipulating
    stored names.
    
-   Names in a NameSet may be accessed via numbers form 0 through num()-1
-   and #DataKey%s. See DataSet for a description of these concepts.
+   Names in a NameSet may be accessed via numbers from 0 through num()-1
+   and via \ref soplex::DataKey "DataKeys". See DataSet for a description of 
+   these concepts.
    
    At a time a NameSet can hold a maximum of max() entries. This can be
    reset with method reMax(). If more than max() names are added to a

@@ -13,10 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dvector.h,v 1.13 2005/10/28 17:25:33 bzforlow Exp $"
+#pragma ident "@(#) $Id: dvector.h,v 1.14 2005/11/09 13:53:49 bzforlow Exp $"
 
 /**@file  dvector.h
- * @brief Dymnamic vectors.
+ * @brief Dynamic vectors.
  */
 #ifndef _DVECTOR_H_
 #define _DVECTOR_H_

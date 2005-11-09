@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.50 2005/09/16 12:42:34 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.51 2005/11/09 13:53:50 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -683,7 +683,7 @@ SPxBasis::SPxBasis()
    METHOD( "SPxBasis::SPxBasis()" );
 }
 
-/**@warning Do not change the #LP or the #SLinSolver object.
+/**@warning Do not change the LP or the SLinSolver object.
  *  Only pointers to those objects are copied.
  */
 SPxBasis::SPxBasis(const SPxBasis& old)
@@ -709,7 +709,7 @@ SPxBasis::SPxBasis(const SPxBasis& old)
    METHOD( "SPxBasis::SPxBasis()" );
 }
 
-/**@warning Do not change the #LP or the #SLinSolver object.
+/**@warning Do not change the LP or the SLinSolver object.
  *  Only pointers to those objects are copied.
  */
 SPxBasis& SPxBasis::operator=(const SPxBasis& rhs)

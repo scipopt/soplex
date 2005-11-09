@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: timer.h,v 1.10 2005/10/28 17:25:34 bzforlow Exp $"
+#pragma ident "@(#) $Id: timer.h,v 1.11 2005/11/09 13:53:51 bzforlow Exp $"
 
 /**@file  timer.h
  * @brief Timer class.
@@ -27,7 +27,7 @@ namespace soplex
 /**@class   Timer
    @ingroup Elementary
 
-   Wrapper for the system time query methods.
+   @brief Wrapper for the system time query methods.
 
     In C or C++ programs, the usual way to measure time intervals,
     e.g., running times of some complex computations, is to call one

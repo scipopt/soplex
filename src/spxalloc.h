@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxalloc.h,v 1.16 2005/10/07 11:24:02 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxalloc.h,v 1.17 2005/11/09 13:53:50 bzforlow Exp $"
 
 /**@file  spxalloc.h
  * @brief Memory allocation routines.
@@ -41,7 +41,7 @@ namespace soplex
 //@{
 /**@brief Allocate memory.
  * @param p some pointer
- * @param n the number of elements #p will point to.
+ * @param n the number of elements \p p will point to.
  */
 template <class T>
 inline void spx_alloc(T& p, int n)

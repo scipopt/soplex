@@ -1,4 +1,4 @@
-- Revised doxygen documentation of the whole code.
+- Revised the whole documentation and made it doxygen-compatible.
 
 - Made one-argument constructors explicit, added virtual destructors,
   blocked copy constructors and assignment operators.
@@ -10,10 +10,10 @@
 
 - Improvement of the LPF and MPS readers.
 
-- Fixed a Bug in example.cpp which resulted in ignoring the
+- Fixed a bug in example.cpp which resulted in ignoring the
   Update type switch.
 
-- Droped all unsued functions from the LinSolver interface.
+- Dropped all unused functions from the SLinSolver interface.
 
 - methods rhs(), lhs(), upper(), lower(), maxObj() of SPxLP
   that returned a non const reference renamed in *_w and 

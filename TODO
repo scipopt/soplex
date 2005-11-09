@@ -1,4 +1,4 @@
-$Id: TODO,v 1.76 2005/11/08 19:56:51 bzforlow Exp $
+$Id: TODO,v 1.77 2005/11/09 13:53:49 bzforlow Exp $
 
 - Code documentation:
    * spxdefines.h: DEFAULT_EPS_FACTOR, DEFAULT_EPS_UPDATE und Param dokumentieren
@@ -18,6 +18,9 @@ $Id: TODO,v 1.76 2005/11/08 19:56:51 bzforlow Exp $
    * src/spxredundantsm.h: private helpers nicht dokumentiert
    * src/spxscaler: Dokumentation fragwürdig: unscale() gibt es nicht (nur
      unscalePrimal() und unscaleDual()), passendes load() gibt es auch nicht.
+   * spxsteeppr.h: Dokumentation der Daten unvollständig
+   * spxvectorst.h: irgeneine Testversion. Behalten oder löschen?
+   * spxvectorst.h: state == NONE means not working at all. Remove this state?
    
 - spxbasis.h::solver(): "@todo Name should be changed, or loadSolver should be renamed."  Warum?
 - spxdefaultpr.h: @todo This should be renamed to something like Danzig or Textbook pricing.

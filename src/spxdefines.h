@@ -13,15 +13,18 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.26 2005/10/28 17:25:34 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.27 2005/11/09 13:53:50 bzforlow Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
  *
- * In optimized code with \c NDEBUG defined, only #VERBOSE1, #VERBOSE2
- * and #VERBOSE3 are set.
+ * In optimized code with \c NDEBUG defined, only 
+ * \ref soplex::SPxOut::VERBOSE1 "VERBOSE1", 
+ * \ref soplex::SPxOut::VERBOSE2 "VERBOSE2", and 
+ * \ref soplex::SPxOut::VERBOSE3 "VERBOSE3" are set.
  * If \c NDEBUG is not defined, the code within #TRACE is used.
- * If \c DEBUGGING is defined, the code within #DEBUG is also used.
+ * If \c DEBUGGING is defined, the code within 
+ * \ref soplex::SPxOut::DEBUG "DEBUG" is also used.
  * If \c TRACE_METHOD is defined, the method tracing with #METHOD is
  * activated.
  *

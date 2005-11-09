@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.23 2005/11/01 21:27:04 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.24 2005/11/09 13:53:50 bzforlow Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -38,23 +38,23 @@ class SPxPricer;
 class SPxRatioTester;
 class SPxStarter;
 
-/**@brief   Sequential objectoriented simPlex.
+/**@brief   Sequential object-oriented SimPlex.
    @ingroup Algo
 
-   #SPxSolver is an LP solver class using the revised Simplex algorithm. It
+   SPxSolver is an LP solver class using the revised Simplex algorithm. It
    provids two basis representations, namely a column basis and a row basis
    (see #Representation). For both representations, a primal and
-   dual algorithm is available (see \ref #Type).
+   dual algorithm is available (see \ref Type).
  
-   In addition, #SPxSolver can be custumized with various respects:
-   - pricing algorithms using #SPxPricer
-   - ratio test using class #SPxRatioTester
-   - computation of a start basis using class #SPxStarter
-   - preprocessing of the LP using class #SPxSimplifier
+   In addition, SPxSolver can be custumized with various respects:
+   - pricing algorithms using SPxPricer
+   - ratio test using class SPxRatioTester
+   - computation of a start basis using class SPxStarter
+   - preprocessing of the LP using class SPxSimplifier
    - termination criteria by overriding 
  
-   #SPxSolver is derived from #SPxLP that is used to store the LP to be solved.
-   Hence, the LPs solved with #SPxSolver have the general format
+   SPxSolver is derived from SPxLP that is used to store the LP to be solved.
+   Hence, the LPs solved with SPxSolver have the general format
  
    \f[
    \begin{array}{rl}
@@ -64,11 +64,8 @@ class SPxStarter;
    \end{array}
    \f]
  
-   Also, #SPxLP provide all manipulation methods for the LP. They allow
-   #SPxSolver to be used within cutting plane algorithms. (@see Programming)
-
-   @todo We need a quiet or verbose variable to select the amount of
-         information messages we give.
+   Also, SPxLP provide all manipulation methods for the LP. They allow
+   SPxSolver to be used within cutting plane algorithms.
 */
 class SPxSolver : public SPxLP, protected SPxBasis
 {
@@ -86,7 +83,7 @@ public:
     *  the first case as the \em columnwise representation and the latter
     *  case will be called the \em rowwise representation.
     *
-    *  Type #Representation determines the representation of #SPxSolver, i.e.
+    *  Type Representation determines the representation of SPxSolver, i.e.
     *  a columnwise (#COLUMN == 1) or rowwise (#ROW == -1) one.
     */
    enum Representation  
@@ -96,7 +93,7 @@ public:
    };
 
    /// Algorithmic type.
-   /** #SPxSolver uses the reviesed Simplex algorithm to solve LPs.
+   /** SPxSolver uses the reviesed Simplex algorithm to solve LPs.
     *  Mathematically, one distinguishes the \em primal from the
     *  \em dual algorihm. Algorithmically, these relate to the two
     *  types #ENTER or #LEAVE. How they relate, depends on the chosen
@@ -134,28 +131,29 @@ public:
    /** In case of the #ENTER%ing Simplex algorithm, for performance
     *  reasons it may be advisable not to compute and maintain up to
     *  date vectors #pVec() and #test() and instead compute only some
-    *  of its elements explicitely. This is constroled by the #Pricing type.
+    *  of its elements explicitely. This is controled by the #Pricing type.
     */
    enum Pricing
    {
       /// Full pricing.
       /** If #FULL pricing in selected for the #ENTER%ing Simplex,
        *  vectors #pVec() and #test() are kept up to date by
-       *  #SPxSolver. An #SPxPricer only needs to select an #Id such
+       *  SPxSolver. An SPxPricer only needs to select an Id such
        *  that the #test() or #coTest() value is < 0.
        */
       FULL,
       /// Partial pricing.
       /** When #PARTIAL pricing in selected for the #ENTER%ing
        *  Simplex, vectors #pVec() and #test() are not set up and
-       *  updated by #SPxSolver. However, vectors #coPvec() and
-       *  #coTest() are still kept up to date by #SPxSolver.
-       *  An #SPxPricer object needs to compute the values for
+       *  updated by SPxSolver. However, vectors #coPvec() and
+       *  #coTest() are still kept up to date by SPxSolver.
+       *  An SPxPricer object needs to compute the values for
        *  #pVec() and #test() itself in order to select an
-       *  appropriate pivot with #test() < 0. Methods #computePvec(i)
-       *  and #computeTest(i) will assist the used to do so. Note,
-       *  that it may be feasable for a pricer to return an #Id with
-       *  #test() > 0; such will be rejected by #SPxSolver.
+       *  appropriate pivot with #test() < 0. Methods \ref computePvec(int)
+       *  "computePvec(i)" and \ref computeTest(int) "computeTest(i)"
+       *  will assist the used to do so. Note
+       *  that it may be feasible for a pricer to return an Id with
+       *  #test() > 0; such will be rejected by SPxSolver.
        */
       PARTIAL  
    };
@@ -228,8 +226,8 @@ protected:
    /**@name Protected data */
    //@{
    Array < UnitVector > unitVecs; ///< array of unit vectors
-   const SVSet*   thevectors;   ///< the LP vectors according to represenation
-   const SVSet*   thecovectors; ///< the LP coVectors according to rep
+   const SVSet*   thevectors;   ///< the LP vectors according to representation
+   const SVSet*   thecovectors; ///< the LP coVectors according to representation
 
    DVector        primRhs;     ///< rhs vector for computing the primal vector
    UpdateVector   primVec;     ///< primal vector
@@ -257,10 +255,8 @@ protected:
    UpdateVector*  theCoPvec;
    UpdateVector*  thePvec;
 
-   /** set on #theCoPvec or #thePvec */
    UpdateVector*  theRPvec;    ///< row pricing vector
-   /** set on #thePvec or #theCoPvec */
-   UpdateVector*  theCPvec;    /// column pricing vector
+   UpdateVector*  theCPvec;    ///< column pricing vector
 
    // The following vectors serve for the virtualization of shift bounds
    //@todo In prinziple this schould be references.
@@ -306,13 +302,13 @@ public:
       return theRep;
    }
 
-   /// return current #Type.
+   /// return current Type.
    Type type() const
    {
       return theType;
    }
 
-   /// return current #Pricing.
+   /// return current Pricing.
    Pricing pricing() const
    {
       return thePricing;
@@ -321,28 +317,34 @@ public:
 
    //-----------------------------
    /**@name Setup
-    *  Before solving an LP with an instance of #SPxSolver, 
+    *  Before solving an LP with an instance of SPxSolver, 
     *  the following steps must be performed:
     *
     *  -# Load the LP by copying an external LP or reading it from an
     *     input stream.
-    *  -# Setup the pricer to use by loading an #SPxPricer object
-    *     (only neccessary, if not done in a previous call).
-    *  -# Setup the ratio test method to use by loading an #SPxRatioTester 
-    *     object (only neccessary, if not done in a previous call).
+    *  -# Setup the pricer to use by loading an \ref soplex::SPxPricer 
+    *     "SPxPricer" object (if not already done in a previous call).
+    *  -# Setup the ratio test method to use by loading an 
+    *     \ref soplex::SPxRatioTester "SPxRatioTester" object 
+    *     (if not already done in a previous call).
     *  -# Setup the linear system solver to use by loading an
-    *     #SLinSolver object (only neccessary, if not done in a previous call).
+    *     \ref soplex::SLinSolver "SLinSolver" object
+    *     (if not already done in a previous call).
     *  -# Optionally setup an start basis generation method by loading an
-    *     SPxStarter object.
-    *  -# Optionally setup a start basis by loading a SPxBasis::Desc object.
-    *  -# Optionally switch to another basis Representation by calling
-    *     method #setRep().
-    *  -# Optionally switch to another algorithm #Type by calling
-    *     method #setType().
+    *     \ref soplex::SPxStarter "SPxStarter" object.
+    *  -# Optionally setup a start basis by loading a 
+    *     \ref soplex::SPxBasis::Desc "SPxBasis::Desc" object.
+    *  -# Optionally switch to another basis 
+    *     \ref soplex::SPxSolver::Representation "Representation" 
+    *     by calling method \ref soplex::SPxSolver::setRep() "setRep()".
+    *  -# Optionally switch to another algorithm 
+    *     \ref soplex::SPxSolver::Type "Type" 
+    *     by calling method \ref soplex::SPxSolver::setType() "setType()".
     *
     *  Now the solver is ready for execution. If the loaded LP is to be solved
-    *  again from scratch, this can be done with method #reLoad(). Finally,
-    *  #clear() removes the LP from the solver.
+    *  again from scratch, this can be done with method 
+    *  \ref soplex::SPxSolver::reLoad() "reLoad()". Finally,
+    *  \ref soplex::SPxSolver::clear() "clear()" removes the LP from the solver.
     */
    //@{
    /// read LP from input stream.
@@ -391,11 +393,11 @@ public:
    /// solve loaded LP.
    /** Solves the loaded LP by processing the Simplex iteration until
     *  the termination criteria is fullfilled (see #terminate()). 
-    *  The #SPxStatus of the solver will indicate the reason for termination.
+    *  The SPxStatus of the solver will indicate the reason for termination.
     */
    virtual Status solve();
 
-   /// #Status of solution process.
+   /// Status of solution process.
    Status status() const;
 
    /// current objective value.
@@ -416,7 +418,7 @@ public:
 #endif
 
    /// get solution vector for primal variables.
-   /** This method returns the #Status of the basis.
+   /** This method returns the Status of the basis.
     *  If it is #REGULAR or better,
     *  the primal solution vector of the current basis will be copied
     *  to the argument \p vector. Hence, \p vector must be of dimension
@@ -425,13 +427,13 @@ public:
    virtual Status getPrimal(Vector& vector) const;
 
    /// get vector of slack variables.
-   /** This method returns the #Status of the basis.
+   /** This method returns the Status of the basis.
     *  If it is #REGULAR or better,
     *  the slack variables of the current basis will be copied
     *  to the argument \p vector. Hence, \p vector must be of dimension
     *  #nRows().
     *
-    *  @warning Because #SPxSolver supports range constraints as its
+    *  @warning Because SPxSolver supports range constraints as its
     *     default, slack variables are defined in a nonstandard way:
     *     Let \em x be the current solution vector and \em A the constraint
     *     matrix. Then the vector of slack variables is defined as
@@ -440,7 +442,7 @@ public:
    virtual Status getSlacks (Vector& vector) const;
 
    /// get current solution vector for dual variables.
-   /** This method returns the #Status of the basis.
+   /** This method returns the Status of the basis.
     *  If it is #REGULAR or better,
     *  the vector of dual variables of the current basis will be copied
     *  to the argument \p vector. Hence, \p vector must be of dimension
@@ -466,7 +468,7 @@ public:
    virtual Status getDual (Vector& vector) const;
 
    /// get vector of reduced costs.
-   /** This method returns the \ref #Status of the basis.
+   /** This method returns the Status of the basis.
     *  If it is #REGULAR or better,
     *  the vector of reduced costs of the current basis will be copied
     *  to the argument \p vector. Hence, \p vector must be of dimension
@@ -490,7 +492,7 @@ public:
     *  other stopping criteria or using it as callback method within the
     *  Simplex loop, by overriding the method in a derived class.
     *  However, all implementations must terminate with the
-    *  statement \c return #SPxSolver::terminate(), if no own termination
+    *  statement \c return SPxSolver::#terminate(), if no own termination
     *  criteria is encountered.
     *
     *  Note, that the Simplex loop stopped even when #terminate()
@@ -504,7 +506,8 @@ public:
    /**@name Control Parameters */
    //@{
    /// values \f$|x| < \epsilon\f$ are considered to be 0.
-   /** if you want another value for epsilon, use #Param::setEpsilon().
+   /** if you want another value for epsilon, use 
+    * \ref soplex::Param::setEpsilon() "Param::setEpsilon()".
     */
    Real epsilon() const
    {
@@ -521,15 +524,15 @@ public:
    /// set parameter \p delta.
    void setDelta(Real d);
 
-   /** #SPxSolver consideres a Simplex step as degenerate, if the
-    *  steplength does not exceed #epsilon. Cycling occurs, if only
-    *  degenerate steps are taken. To prevent this situation, #SPxSolver
+   /** SPxSolver considers a Simplex step as degenerate if the
+    *  steplength does not exceed #epsilon(). Cycling occurs if only
+    *  degenerate steps are taken. To prevent this situation, SPxSolver
     *  perturbs the problem such that nondegenerate steps are ensured.
     *
-    *  maxCycle() controls, how agressive such perturbation is
-    *  performed, since no more than #maxCycle() degenerate steps are
-    *  accepted before perturbing the LP. The current number of consequtive
-    *  degenerate steps is counted in variable numCycle().
+    *  maxCycle() controls how agressive such perturbation is
+    *  performed, since no more than maxCycle() degenerate steps are
+    *  accepted before perturbing the LP. The current number of consecutive
+    *  degenerate steps is counted by numCycle().
     */
    /// maximum number of degenerate simplex steps before we detect cycling.
    int maxCycle() const 
@@ -686,14 +689,14 @@ public:
 
    //------------------------------------
    /**@name Variables and Covariables
-    *  Class #SPxLP introduces #Id%s to identify row or column data of
-    *  an LP. #SPxSolver uses this concept to access data with respect to the
-    *  chosen representation.
+    *  Class SPxLP introduces \ref soplex::SPxId "SPxIds" to identify
+    *  row or column data of an LP. SPxSolver uses this concept to
+    *  access data with respect to the chosen representation.
     */
    //@{
    /// id of \p i 'th vector.
-   /** The \p i 'th #id is the \p i 'th #SPxRowId for a rowwise and the
-    *  \p i 'th #SPxColId for a columnwise basis represenation. Hence,
+   /** The \p i 'th Id is the \p i 'th SPxRowId for a rowwise and the
+    *  \p i 'th SPxColId for a columnwise basis represenation. Hence,
     *  0 <= i < #coDim().
     */
    SPxId id(int i) const
@@ -711,8 +714,8 @@ public:
    }
 
    /// id of \p i 'th covector.
-   /** The \p i 'th #coId() is the \p i 'th #SPxColId for a rowwise and the
-    *  \p i 'th #SPxRowId for a columnwise basis represenation. Hence,
+   /** The \p i 'th #coId() is the \p i 'th SPxColId for a rowwise and the
+    *  \p i 'th SPxRowId for a columnwise basis represenation. Hence,
     *  0 <= i < #dim().
     */
    SPxId coId(int i) const
@@ -842,18 +845,19 @@ public:
 
    //------------------------------------
    /**@name Variable status
-    *  The Simplex basis assigns a #SPxBasis::Desc::Status to each
-    *  variable and covariable. Depending on the representation, the status
-    *  indicates that the corresponding vector is in the basis matrix or not.
+    *  The Simplex basis assigns a \ref soplex::SPxBasis::Desc::Status
+    *  "Status" to each variable and covariable. Depending on the
+    *  representation, the status indicates that the corresponding
+    *  vector is in the basis matrix or not.
     */
    //@{
-   /// #Status of \p i 'th variable.
+   /// Status of \p i 'th variable.
    SPxBasis::Desc::Status varStatus(int i) const
    {
       return desc().status(i);
    }
 
-   /// #Status of \p i 'th covariable.
+   /// Status of \p i 'th covariable.
    SPxBasis::Desc::Status covarStatus(int i) const
    {
       return desc().coStatus(i);
@@ -977,7 +981,7 @@ public:
    /// Violations of #fVec.
    /** For the leaving Simplex algorithm, pricing involves selecting a
     *  variable from #fVec that violates its bounds that is to leave
-    *  the basis. When a #SPxPricer is called to select such a
+    *  the basis. When a SPxPricer is called to select such a
     *  leaving variable, #fTest() contains the vector of violations:
     *  For #fTest()[i] < 0, the \c i 'th basic variable violates one of
     *  its bounds by the given value. Otherwise no bound is violated.
@@ -1057,10 +1061,10 @@ public:
 
    /// violations of #coPvec.
    /** In entering Simplex pricing selects checks vectors #coPvec()
-    *  and #pVec()# for violation of its bounds. #coTest() contains
+    *  and #pVec() for violation of its bounds. #coTest() contains
     *  the violations for #coPvec() which are indicated by a negative
-    *  value. I.e. if #coTest(i) < 0, the \p i 'th element of #coPvec()
-    *  is violated by #-coTest(i).
+    *  value. That is, if #coTest()[i] < 0, the \p i 'th element of #coPvec()
+    *  is violated by -#coTest()[i].
     */
    const Vector& coTest() const
    {
@@ -1124,8 +1128,8 @@ public:
    /// Violations of #pVec.
    /** In entering Simplex pricing selects checks vectors #coPvec()
     *  and #pVec() for violation of its bounds. Vector #test()
-    *  contains the violations for #pVec(), i.e.~if #test(i) < 0,
-    *  the i'th element of #pVec() is violated by #test(i).
+    *  contains the violations for #pVec(), i.e., if #test()[i] < 0,
+    *  the i'th element of #pVec() is violated by #test()[i].
     *  Vector #test() is only up to date for #FULL pricing.
     */
    const Vector& test() const
@@ -1134,18 +1138,18 @@ public:
       return theTest;
    }
 
-   /// compute and return #pVec(i).
+   /// compute and return #pVec()[i].
    Real computePvec(int i);
    /// compute entire #pVec().
    void computePvec();
-   /// compute and return #test(i) in #ENTER%ing Simplex.
+   /// compute and return #test()[i] in #ENTER%ing Simplex.
    Real computeTest(int i);
    /// compute test vector in #ENTER%ing Simplex.
    void computeTest();
 
    //------------------------------------
    /**@name Shifting
-    *  The task of the ratio test (implemented in #SPxRatioTester classes)
+    *  The task of the ratio test (implemented in SPxRatioTester classes)
     *  is to select a variable for the basis update, such that the basis
     *  remains priced (i.e. both, the pricing and copricing vectors satisfy
     *  their bounds) or feasible (i.e. the feasibility vector satisfies its
@@ -1161,10 +1165,10 @@ public:
     *  These methods serve for shifting feasibility bounds, either in order
     *  to maintain numerical stability or initially for computation of
     *  phase 1. The sum of all shifts applied to any bound is stored in
-    *  #theShift.
+    *  \ref soplex::SPxSolver::theShift "theShift".
     *
     *  The following methods are used to shift individual bounds. They are
-    *  mainly intended for stable implenentations of #SPxRatioTester.
+    *  mainly intended for stable implenentations of SPxRatioTester.
     */
    //@{
    /// Perform initial shifting to optain an feasible or pricable basis.
@@ -1193,21 +1197,21 @@ public:
       theShift += to - (*theUbound)[i];
       (*theUbound)[i] = to;
    }
-   /// shift \p i 'th #lpBound# to \p to.
+   /// shift \p i 'th #lpBound to \p to.
    void shiftLPbound(int i, Real to)
    {
       assert(theType == LEAVE);
       theShift += (*theLbound)[i] - to;
       (*theLbound)[i] = to;
    }
-   /// shift \p i 'th #ucBound# to \p to.
+   /// shift \p i 'th #ucBound to \p to.
    void shiftUCbound(int i, Real to)
    {
       assert(theType == LEAVE);
       theShift += to - (*theCoUbound)[i];
       (*theCoUbound)[i] = to;
    }
-   /// shift \p i 'th #lcBound# to \p to.
+   /// shift \p i 'th #lcBound to \p to.
    void shiftLCbound(int i, Real to)
    {
       assert(theType == LEAVE);
@@ -1261,26 +1265,26 @@ private:
    //------------------------------------
    /**@name The Simplex Loop
     *  We now present a set of methods that may be usefull when implementing
-    *  own #SPxPricer or #SPxRatioTester classes. Here is, how
-    *  #SPxSolver will call methods from its loaded #SPxPricer and
-    *  #SPxRatioTester.
+    *  own SPxPricer or SPxRatioTester classes. Here is, how
+    *  SPxSolver will call methods from its loaded SPxPricer and
+    *  SPxRatioTester.
     *  
     *  For the entering Simplex:
-    *    -# #SPxPricer::selectEnter()
-    *    -# #SPxRatioTester::selectLeave()
-    *    -# #SPxPricer::entered4()
+    *    -# \ref soplex::SPxPricer::selectEnter() "SPxPricer::selectEnter()"
+    *    -# \ref soplex::SPxRatioTester::selectLeave() "SPxRatioTester::selectLeave()"
+    *    -# \ref soplex::SPxPricer::entered4() "SPxPricer::entered4()"
     *  
     *  For the leaving Simplex:
-    *    -# #SPxPricer::selectLeave()
-    *    -# #SPxRatioTester::selectEnter()
-    *    -# #SPxPricer::left4()
+    *    -# \ref soplex::SPxPricer::selectLeave() "SPxPricer::selectLeave()"
+    *    -# \ref soplex::SPxRatioTester::selectEnter() "SPxRatioTester::selectEnter()"
+    *    -# \ref soplex::SPxPricer::left4() "SPxPricer::left4()"
     */
    //@{
 public:
    /// Setup vectors to be solved within Simplex loop.
    /** Load vector \p y to be #solve%d with the basis matrix during the
     *  #LEAVE Simplex. The system will be solved after #SPxSolver%'s call
-    *  to #SPxRatioTester.  The system will be solved along with
+    *  to SPxRatioTester.  The system will be solved along with
     *  another system. Solving two linear system at a time has
     *  performance advantages over solving the two linear systems
     *  seperately.
@@ -1292,9 +1296,9 @@ public:
       solveVector2rhs = p_rhs;
    }
    /// Setup vectors to be cosolved within Simplex loop.
-   /** Load vector \p y to be #coSolve%#d with the basis matrix during
+   /** Load vector \p y to be #coSolve%d with the basis matrix during
     *  the #ENTER Simplex. The system will be solved after #SPxSolver%'s
-    *  call to #SPxRatioTester.  The system will be solved along
+    *  call to SPxRatioTester.  The system will be solved along
     *  with another system. Solving two linear system at a time has
     *  performance advantages over solving the two linear systems
     *  seperately.
@@ -1308,7 +1312,7 @@ public:
    /// maximal infeasibility of basis
    /** This method is called for prooving optimality. Since it is
     *  possible, that some stable implementation of class
-    *  #SPxRatioTester yielded a slightly infeasible (or unpriced)
+    *  SPxRatioTester yielded a slightly infeasible (or unpriced)
     *  basis, this must be checked before terminating with an optimal
     *  solution.
     */
@@ -1329,17 +1333,17 @@ public:
    {
       return *this;
    }
-   /// return loaded #SPxPricer.
+   /// return loaded SPxPricer.
    const SPxPricer* pricer() const
    {
       return thepricer;
    }
-   /// return loaded #SLinSolver.
+   /// return loaded SLinSolver.
    const SLinSolver* slinSolver() const
    {
       return SPxBasis::factor;
    }
-   /// return loaded #SPxRatioTester.
+   /// return loaded SPxRatioTester.
    const SPxRatioTester* ratiotester() const
    {
       return theratiotester;
@@ -1358,14 +1362,14 @@ private:
        @returns \c false if LP is unbounded/infeasible. */
    bool enter(SPxId& id);
 
-   /// test coVector #i# with status #stat#.
-   Real coTest(int, SPxBasis::Desc::Status) const;
+   /// test coVector \p i with status \p stat.
+   Real coTest(int i, SPxBasis::Desc::Status stat) const;
    /// compute coTest vector.
    void computeCoTest();
    /// recompute coTest vector.
    void updateCoTest();
 
-   /// test vector #i# with status #stat#.
+   /// test vector \p i with status \p stat.
    Real test(int i, SPxBasis::Desc::Status stat) const;
    /// recompute test vector.
    void updateTest();
@@ -1380,7 +1384,7 @@ private:
    /**@name Parallelization
     *  In this section we present the methods, that are provided in order to
     *  allow a parallel version to be implemented as a derived class, thereby
-    *  inheriting most of the code of #SPxSolver#.
+    *  inheriting most of the code of SPxSolver.
     *
     *  @par Initialization
     *  These methods are used to setup all the vectors used in the Simplex
@@ -1389,25 +1393,24 @@ private:
    //@{
 public:
    /// intialize data structures.
-   /** If #SPxSolver is not #isInitialized(), method solve calls
-    *  #init() to setup all vectors and internal data structures.
-    *  Most of the other methods within this section are called by
-    *  #init().
+   /** If SPxSolver is not \ref isInitialized() "initialized", the method
+    *  #solve() calls #init() to setup all vectors and internal data structures.
+    *  Most of the other methods within this section are called by #init().
     *
     *  Derived classes should add the initialization of additional
     *  data structures by overriding this method. Don't forget,
-    *  however to call #SPxSolver::init().
+    *  however, to call SPxSolver::init().
     */
    virtual void init();
 
 protected:
 
    /// has the internal data been initialized?
-   /** As long as an instance of #SPxSolver is not #initialized, no member
+   /** As long as an instance of SPxSolver is not initialized, no member
     *  contains setup data. Initialization is performed via method
     *  #init().  Afterwards all data structures are kept up to date (even
     *  for all manipulation methods), until #unInit() is called. However,
-    *  some manipulation methods call #unInit()# themselfs.
+    *  some manipulation methods call #unInit() themselfs.
     */
    bool isInitialized() const
    {
@@ -1446,7 +1449,7 @@ protected:
    /// Compute part of objective value.
    /** This method is called from #value() in order to compute the part of
     *  the objective value resulting form nonbasic variables for #COLUMN
-    *  #Representation.
+    *  Representation.
     */
    Real nonbasicValue() const;
 
@@ -1577,10 +1580,10 @@ public:
    /// get current basis, and return solver status.
    Status getBasis(VarStatus rows[], VarStatus cols[]) const;
 
-   /// set #LPSolver's basis.
+   /// set the lp solver's basis.
    void setBasis(const VarStatus rows[], const VarStatus cols[]);
 
-   /// set #LPSolver's basis status.
+   /// set the lp solver's basis status.
    void setBasisStatus( SPxBasis::SPxStatus stat )
    {
       if( m_status == OPTIMAL )
@@ -1611,24 +1614,24 @@ public:
       return *lpcolset();
    }
 
-   /// copy lower bound vector to #low#.
-   void getLower(Vector& lw) const
+   /// copy lower bound vector to \p p_low.
+   void getLower(Vector& p_low) const
    {
-      lw = SPxLP::lower();
+      p_low = SPxLP::lower();
    }
-   /// copy upper bound vector to #up#.
-   void getUpper(Vector& upp) const
+   /// copy upper bound vector to \p p_up.
+   void getUpper(Vector& p_up) const
    {
-      upp = SPxLP::upper();
+      p_up = SPxLP::upper();
    }
 
-   /// copy lhs value vector to #lhs#.
+   /// copy lhs value vector to \p p_lhs.
    void getLhs(Vector& p_lhs) const
    {
       p_lhs = SPxLP::lhs();
    }
 
-   /// copy rhs value vector to #rhs#.
+   /// copy rhs value vector to \p p_rhs.
    void getRhs(Vector& p_rhs) const
    {
       p_rhs = SPxLP::rhs();
@@ -1644,12 +1647,12 @@ public:
    //------------------------------------
    /** Mapping between numbers and Ids */
    //@{
-   /// #RowId# of \p i 'th inequality.
+   /// RowId of \p i 'th inequality.
    SPxRowId rowId(int i) const
    {
       return rId(i);
    }
-   /// #ColId# of \p i 'th column.
+   /// ColId of \p i 'th column.
    SPxColId colId(int i) const
    {
       return cId(i);

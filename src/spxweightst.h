@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.h,v 1.15 2005/09/16 12:42:38 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxweightst.h,v 1.16 2005/11/09 13:53:50 bzforlow Exp $"
 
 
 /**@file  spxweightst.h
@@ -35,11 +35,11 @@ namespace soplex
 /**@brief   Weighted start basis.
    @ingroup Algo
 
-   Class #SPxWeightST is an implementation of a #SPxStarter for generating a
+   Class SPxWeightST is an implementation of a SPxStarter for generating a
    Simplex starting basis. Using method #setupWeights() it sets up arrays
    #weight and #coWeight, or equivalently #rowWeight and #colWeight.
    (#rowWeight and #colWeight are just pointers initialized to #weight and
-   #coWeight according to the representation of #SoPlex \p base passed to
+   #coWeight according to the representation of SoPlex \p base passed to
    method #generate().) 
    
    The weight values are then used to setup a starting basis for the LP:
@@ -97,7 +97,7 @@ protected:
    //@{
    /// sets up variable weights.
    /** This method is called in order to setup the weights for all
-       variables. It has been declared #virtual in order to allow for
+       variables. It has been declared \c virtual in order to allow for
        derived classes to compute other weight values.
    */
    virtual void setupWeights(SPxSolver& base);
@@ -134,6 +134,17 @@ public:
    /// consistency check.
    bool isConsistent() const;
 #endif
+   //@}
+
+private:
+
+   //-------------------------------------
+   /**@name Blocked */
+   //@{
+   /// copy constructor
+   SPxWeightST( const SPxWeightST& );
+   /// assignment operator
+   SPxWeightST& operator=( const SPxWeightST& );
    //@}
 };
 

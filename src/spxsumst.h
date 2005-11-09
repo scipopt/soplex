@@ -13,11 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsumst.h,v 1.7 2003/01/15 17:26:08 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsumst.h,v 1.8 2005/11/09 13:53:50 bzforlow Exp $"
 
 
 /**@file  spxsumst.h
- * @brief Simple heuristic #SPxStarter.
+ * @brief Simple heuristic SPxStarter.
  */
 #ifndef _SPXSUMST_H_
 #define _SPXSUMST_H_
@@ -30,19 +30,28 @@
 namespace soplex
 {
 
-/**@brief   Simple heuristic #SPxStarter.
+/**@brief   Simple heuristic SPxStarter.
    @ingroup Algo
 
-   Testing version of an #SPxVectorST using a very simplistic heuristic to
+   Testing version of an SPxVectorST using a very simplistic heuristic to
    build up an approximated solution vector.
 */
 class SPxSumST : public SPxVectorST
 {
 protected:
+
+   //-------------------------------------
+   /**@name Protected helpers */
+   //@{
    /// sets up variable weights.
    void setupWeights(SPxSolver& base);
+   //@}
 
 public:
+
+   //-------------------------------------
+   /**@name Construction / destruction */
+   //@{
    /// default constructor.
    SPxSumST()
    {
@@ -51,6 +60,18 @@ public:
    /// destructor.
    virtual ~SPxSumST()
    {}  
+   //@}
+
+private:
+
+   //-------------------------------------
+   /**@name Blocked */
+   //@{
+   /// copy constructor
+   SPxSumST( const SPxSumST& );
+   /// assignment operator
+   SPxSumST& operator=( const SPxSumST& );
+   //@}
 };
 
 } // namespace soplex

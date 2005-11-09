@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.h,v 1.21 2005/09/16 12:42:38 bzfhille Exp $"
+#pragma ident "@(#) $Id: ssvector.h,v 1.22 2005/11/09 13:53:51 bzforlow Exp $"
 
 
 /**@file  ssvector.h
@@ -39,53 +39,52 @@ class SVSet;
 
    This class implements Semi Sparse Vectors. Such are
    #DVector%s where the indices of its nonzero elements can be stored in an
-   extra #IdxSet. Only elements with absolute value > #epsilon are considered
+   extra IdxSet. Only elements with absolute value > #epsilon are considered
    to be nonzero. 
    Since really storing the nonzeros is not always convenient,
-   an #SSVector provides two different stati: setup and not setup.
-   An #SSVector being setup means that the nonzero indices are available,
-   otherwise an #SSVector is just an ordinary #Vector with an empty #IdxSet.
-   Note that due to arithmetic operation, zeros can slip in, i.e. it is only
-   guaranteed that at least every non-zero is in the #IdxSet.
+   an SSVector provides two different stati: setup and not setup.
+   An SSVector being setup means that the nonzero indices are available,
+   otherwise an SSVector is just an ordinary Vector with an empty IdxSet.
+   Note that due to arithmetic operation, zeros can slip in, i.e., it is only
+   guaranteed that at least every non-zero is in the IdxSet.
 */
 class SSVector : protected DVector, protected IdxSet
 {
 private:
 
+   friend class DVector;
+   friend class Vector;
+   friend class DSVector;
+
    //--------------------------------------------
    /**@name Data */
    //@{
-   /// Is the #SSVector set up?
+   /// Is the SSVector set up?
    bool setupStatus;
-   ///
-   friend class DVector;
-   ///
-   friend class Vector;
-   ///
-   friend class DSVector;
-   ///
+   /// Allocates enough space to accommodate \p newmax values.
    void setMax(int newmax);
-   /// a value x with |x| < epsilon is considered zero.
+   /// A value x with |x| < epsilon is considered zero.
    Real epsilon;
    //@}
 
 public:
 
    //--------------------------------------------
-   /**@name Status of an #SSVector
-      An #SSVector can be set up or not. In case it is set up, its #IdxSet
-      correctly contains all indices of nonzero elements of the #SSVector.
-      Otherwise, it does not contain any useful data. Wheter or not an
-      #SSVector is setup can be determined with method #isSetup().
+   /**@name Status of an SSVector
+      An SSVector can be set up or not. In case it is set up, its IdxSet
+      correctly contains all indices of nonzero elements of the SSVector.
+      Otherwise, it does not contain any useful data. Whether or not an
+      SSVector is setup can be determined with the method 
+      \ref soplex::SSVector::isSetup() "isSetup()".
       
       There are three methods for directly affecting the setup status of an
-      #SSVector:
+      SSVector:
       - unSetup():     This method sets the status to ``not setup''.
-      - setup():       This method initializes the #IdxSet# to the
-                       #SSVector#s nonzero indices and sets the status
+      - setup():       This method initializes the IdxSet to the
+                       SSVector's nonzero indices and sets the status
                        to ``setup''.
       - forceSetup():  This method sets the status to ``setup'' without
-                       verifying that the #IdxSet correctly contains
+                       verifying that the IdxSet correctly contains
                        all nonzero indices. It may be used when the
                        nonzero indices have been computed externally.
    */
@@ -114,7 +113,7 @@ public:
       return setupStatus;
    }
 
-   /// makes #SSVector not setup.
+   /// makes SSVector not setup.
    void unSetup()
    {
       setupStatus = false;
@@ -166,8 +165,8 @@ public:
       return IdxSet::size();
    }
 
-   /// adds nonzero (\p i, \p x) to #SSVector.
-   /** No nonzero with index \p i must exist in the #SSVector.
+   /// adds nonzero (\p i, \p x) to SSVector.
+   /** No nonzero with index \p i must exist in the SSVector.
     */
    void add(int i, Real x)
    {
@@ -283,14 +282,14 @@ public:
    SSVector& multAdd(Real x, const SVector& vec);
    /// adds scaled vector (+= \p x * \p vec).
    SSVector& multAdd(Real x, const Vector& vec);
-   /// assigns #SSVector to \f$x^T \cdot A\f$.
+   /// assigns SSVector to \f$x^T \cdot A\f$.
    SSVector& assign2product(const SSVector& x, const SVSet& A);
-   /// assigns #SSVector to \f$A \cdot x\f$ for a setup \p x.
+   /// assigns SSVector to \f$A \cdot x\f$ for a setup \p x.
    SSVector& assign2product4setup(const SVSet& A, const SSVector& x);
 
 public:
 
-   /// assigns #SSVector to \f$A \cdot x\f$ thereby setting up \p x.
+   /// assigns SSVector to \f$A \cdot x\f$ thereby setting up \p x.
    SSVector& assign2productAndSetup(const SVSet& A, SSVector& x);
 
    /// returns infinity norm of a Vector.
@@ -423,6 +422,8 @@ private:
 };
 
 
+// ----------------------------------------------------------------------------
+//   Vector operators involving SSVectors
 // ----------------------------------------------------------------------------
 
 inline Vector& Vector::multAdd(Real x, const SSVector& svec)

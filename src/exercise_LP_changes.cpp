@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: exercise_LP_changes.cpp,v 1.4 2005/11/03 17:13:18 bzfhille Exp $"
+#pragma ident "@(#) $Id: exercise_LP_changes.cpp,v 1.5 2005/11/09 13:53:49 bzforlow Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -59,8 +59,8 @@ using namespace soplex;
 //    class TestSolver
 //------------------------------------------------------------------------
 
-/** 
-    A simple derived class from SpxSolver, used as object under test.
+/**@class TestSolver
+    @brief A simple derived class from SpxSolver, used as object under test.
  */
 class TestSolver : public SPxSolver
 {

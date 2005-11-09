@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.h,v 1.18 2005/09/16 12:42:37 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.h,v 1.19 2005/11/09 13:53:50 bzforlow Exp $"
 
 
 /**@file  spxsteeppr.h
@@ -35,14 +35,18 @@ namespace soplex
 /**@brief   Steepest edge pricer.
    @ingroup Algo
       
-   Class #SPxSteepPR implements a steepest edge pricer to be used with
-   #SoPlex.
+   Class SPxSteepPR implements a steepest edge pricer to be used with
+   SoPlex.
    
-   See #SPxPricer for a class documentation.
+   See SPxPricer for a class documentation.
 */
 class SPxSteepPR : public SPxPricer
 {
 public:
+
+   //-------------------------------------
+   /**@name Types */
+   //@{
    /// How to setup the direction multipliers.
    /** Possible settings are #EXACT for starting with exactly computed
        values, or #DEFAULT for starting with multipliers set to 1. The
@@ -52,41 +56,73 @@ public:
       EXACT,   ///< starting with exactly computed values
       DEFAULT  ///< starting with multipliers set to 1
    };
+   //@}
 
 private:
-   DVector penalty;                // vector of pricing penalties
-   DVector coPenalty;              // vector of pricing penalties
 
-   DVector workVec;                // working vector
-   SSVector workRhs;               // working vector
-
+   //-------------------------------------
+   /**@name Data */
+   //@{
+   /// vector of pricing penalties
+   DVector penalty;
+   /// vector of pricing penalties
+   DVector coPenalty;
+   /// working vector
+   DVector workVec;
+   /// working vector
+   SSVector workRhs;
+   ///
    Real pi_p;
-
+   ///
    int prefSetup;
-   DataArray < Real > coPref; // preference multiplier for selecting as pivot
-   DataArray < Real > pref;   // preference multiplier for selecting as pivot
+   /// preference multiplier for selecting as pivot
+   DataArray < Real > coPref;
+   /// preference multiplier for selecting as pivot
+   DataArray < Real > pref;
+   ///
    DataArray < Real > leavePref;
+   /// setup type.
+   Setup setup;
+   /// accuracy for computing steepest directions.
+   Real accuracy;
+   //@}
 
+   //-------------------------------------
+   /**@name Preferences */
+   //@{
    ///
    void setupPrefsX(Real mult, Real /*tie*/, Real /*cotie*/, Real shift, Real coshift);
    ///
    void setupPrefs(SPxSolver::Type);
+   //@}
 
 public:
-   /**@todo make setup and accuracy private or protected */
-   /// setup type.
-   Setup setup;
 
-   /// accuracy for computing steepest directions.
-   Real accuracy;
-
+   //-------------------------------------
+   /**@name Construction / destruction */
+   //@{
    ///
+   SPxSteepPR()
+      : SPxPricer("Steep")
+      , workRhs (0, 1e-16)
+      , setup (DEFAULT)
+      , accuracy(1e-4)
+   {}
+   /// destructor
+   virtual ~SPxSteepPR()
+   {}
+   //@}
+
+   //-------------------------------------
+   /**@name Access / modification */
+   //@{
+   /// sets the solver
    virtual void load(SPxSolver* base);
-   ///
+   /// clear solver and preferences
    virtual void clear();
-   ///
+   /// set entering/leaving algorithm
    virtual void setType(SPxSolver::Type);
-   ///
+   /// set row/column representation
    virtual void setRep(SPxSolver::Representation rep);
    ///
    virtual int selectLeave();
@@ -96,30 +132,40 @@ public:
    virtual SPxId selectEnter();
    ///
    virtual void entered4(SPxId id, int n);
-   ///
+   /// \p n vectors have been added to loaded LP.
    virtual void addedVecs (int n);
-   ///
+   /// \p n covectors have been added to loaded LP.
    virtual void addedCoVecs(int n);
-   ///
+   /// \p the i'th vector has been removed from the loaded LP.
    virtual void removedVec(int i);
-   ///
-   virtual void removedCoVecs(const int perm[]);
-   ///
-   virtual void removedVecs(const int perm[]);
-   ///
+   /// \p the i'th covector has been removed from the loaded LP.
    virtual void removedCoVec(int i);
+   /// \p n vectors have been removed from loaded LP.
+   virtual void removedVecs(const int perm[]);
+   /// \p n covectors have been removed from loaded LP.
+   virtual void removedCoVecs(const int perm[]);
+   //@}
+
 #ifndef NO_CONSISTENCY_CHECKS
+   //-------------------------------------
+   /**@name Consistency check */
+   //@{
    ///
    virtual bool isConsistent() const;
+   //@}
 #endif
 
-   ///
-   SPxSteepPR()
-      : SPxPricer("Steep")
-      , workRhs (0, 1e-16)
-      , setup (DEFAULT)
-      , accuracy(1e-4)
-   {}
+private:
+
+   //-------------------------------------
+   /**@name Blocked */
+   //@{
+   /// copy constructor
+   SPxSteepPR( const SPxSteepPR& );
+   /// assignment operator
+   SPxSteepPR& operator=( const SPxSteepPR& );
+   //@}
+
 };
 
 } // namespace soplex

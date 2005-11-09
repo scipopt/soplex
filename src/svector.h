@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.h,v 1.24 2005/09/16 12:42:39 bzfhille Exp $"
+#pragma ident "@(#) $Id: svector.h,v 1.25 2005/11/09 13:53:51 bzforlow Exp $"
 
 /**@file  svector.h
  * @brief Sparse vectors.
@@ -44,7 +44,7 @@ namespace soplex
    if no more memory is available for saving them (see also DSVector).
  
    When nonzeros are added to an SVector, they are appended to the set of
-   nonzeros, i.e. they recieve numbers size(), size()+1 ... . An SVector
+   nonzeros, i.e., they recieve numbers size(), size()+1 ... . An SVector
    can hold atmost max() nonzeros, where max() is given in the constructor.
    When removing nonzeros, the remaining nonzeros are renumbered. However, 
    only the numbers greater than the number of the first removed nonzero are
@@ -76,7 +76,7 @@ namespace soplex
    There are two numberings of the nonzeros of an SVector. First, an SVector
    is supposed to act like a linear algebra Vector. An \em index refers to
    this view of an SVector: operator[]() is provided which returns the value
-   at the given index of the vector, i.e. 0 for all indices which are not in 
+   at the given index of the vector, i.e., 0 for all indices which are not in 
    the set of nonzeros.  The other view of SVector%s is that of a set of 
    nonzeros. The nonzeros are numbered from 0 to size()-1. 
    The methods index(int n) and value(int n)
@@ -122,7 +122,8 @@ private:
    //@{
    /** An SVector keeps its data in an array of Element%s. The size and 
     *  maximum number of elements allowed is stored in the -1st Element 
-    *  in its members #idx and #val respectively.
+    *  in its members \ref Element::idx "idx" and \ref Element::val
+    *  "val", respectively.
     */
    Element *m_elem;   ///< Array of Element%s.
    //@}
@@ -319,10 +320,6 @@ public:
    SVector& operator=(const SVector& sv);
    /// assignment operator from vector.
    SVector& operator=(const Vector& sv);
-#ifndef NO_CONSISTENCY_CHECKS
-   /// consistency check.
-   bool isConsistent() const;
-#endif
    /// default constructor.
    /** The constructor expects one memory block where to store the nonzero
     *  elements. This must be passed to the constructor, where the \em number
@@ -344,7 +341,7 @@ public:
    //@}
 
    //-------------------------------------------
-   /**@name Miscellaneous*/
+   /**@name Memory */
    //@{
    /// get pointer to internal memory.
    Element* mem() const
@@ -380,7 +377,20 @@ public:
          m_elem = 0;
    }
    //@}
+
+   //-------------------------------------------
+   /**@name Miscellaneous*/
+   //@{
+#ifndef NO_CONSISTENCY_CHECKS
+   /// consistency check.
+   bool isConsistent() const;
+#endif
+   //@}
 };
+
+//---------------------------------------------------------------------
+//  Vector methods involving SVectors
+//---------------------------------------------------------------------
 
 /// multiply Vector with \p and add a SVector. 
 /** This is located in svector.h because it should be inlined and 

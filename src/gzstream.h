@@ -20,14 +20,17 @@
 // ============================================================================
 //
 // File          : gzstream.h
-// Revision      : $Revision: 1.7 $
-// Revision_date : $Date: 2005/10/28 17:25:34 $
+// Revision      : $Revision: 1.8 $
+// Revision_date : $Date: 2005/11/09 13:53:50 $
 // Author(s)     : Deepak Bandyopadhyay, Lutz Kettner
 // 
 // Standard streambuf implementation following Nicolai Josuttis, "The 
 // Standard C++ Library".
 // ============================================================================
 
+/**@file gzstream.h
+ * @brief Utilities for handling gzipped input and output streams.
+ */
 #ifndef GZSTREAM_H
 #define GZSTREAM_H 1
 

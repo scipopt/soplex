@@ -13,11 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxstarter.h,v 1.9 2005/09/16 12:42:36 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxstarter.h,v 1.10 2005/11/09 13:53:50 bzforlow Exp $"
 
 
 /**@file  spxstarter.h
- * @brief #SoPlex start basis generation base class.
+ * @brief SoPlex start basis generation base class.
  */
 #ifndef _SPXDSTARTER_H_
 #define _SPXDSTARTER_H_
@@ -30,22 +30,32 @@
 namespace soplex
 {
 
-/**@brief   #SoPlex start basis generation base class.
+/**@brief   SoPlex start basis generation base class.
    @ingroup Algo
    
-   #SPxStarter is the virtual base class for classes generating a starter basis
-   for the Simplex solver #SoPlex. When a #SPxStarter object has been loaded
-   to a #SoPlex solver, the latter will call method #generate() in order to
+   SPxStarter is the virtual base class for classes generating a starter basis
+   for the Simplex solver SoPlex. When a SPxStarter object has been loaded
+   to a SoPlex solver, the latter will call method #generate() in order to
    have a start basis generated. Implementations of method #generate() must
-   terminate by #SPxSolver::load()%ing the generated basis to #SoPlex. Loaded
-   basises must be nonsingular.
+   terminate by \ref soplex::SPxSolver::load() "loading" the generated basis to 
+   SoPlex. Loaded bases must be nonsingular.
 */
 class SPxStarter
 {
 protected:
+
+   //-------------------------------------
+   /**@name Data */
+   //@{
+   /// name of the starter
    const char* m_name;
+   //@}
 
 public:
+
+   //-------------------------------------
+   /**@name Data */
+   //@{
    /// constructor
    explicit SPxStarter(const char* name)
       : m_name(name)
@@ -55,17 +65,44 @@ public:
    {
       m_name = 0;
    }
+   //@}
+
+   //-------------------------------------
+   /**@name Access */
+   //@{
    /// get name of starter.
    virtual const char* getName() const
    {
       return m_name;
    }
+   //@}
+
+   //-------------------------------------
+   /**@name Starting */
+   //@{
    /// generates start basis for loaded basis.
    virtual void generate(SPxSolver& base) = 0;
+   //@}
+
 #ifndef NO_CONSISTENCY_CHECKS
+   //-------------------------------------
+   /**@name Misc */
+   //@{
    /// checks consistency.
    virtual bool isConsistent() const;
+   //@}
 #endif
+
+   //-------------------------------------
+   /**@name Blocked */
+   //@{
+   /// empty constructor
+   SPxStarter();
+   /// copy constructor
+   SPxStarter( const SPxStarter& );
+   /// assignment operator
+   SPxStarter& operator=( const SPxStarter& );
+   //@}
 };
 
 

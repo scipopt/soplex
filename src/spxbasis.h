@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.39 2005/11/01 15:35:40 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.40 2005/11/09 13:53:50 bzforlow Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -99,7 +99,7 @@ public:
       /// Status of a variable.
       /** A basis is described by assigning a Status to all of the LPs
           variables and covariables. This assignment is maintained by the
-          basis #Desc%riptor.
+          basis Descriptor.
           
           Variables and covariables may have a primal or dual Status. The
           first type specifies that a variable is set on a primal bound, while
@@ -323,16 +323,16 @@ protected:
    //**@name Protected data 
    /**
       For storing the basis matrix we keep two arrays: Array #theBaseId
-      contains the #Id%s of the basis vectors, and #matrix the pointers to
+      contains the SPxId%s of the basis vectors, and #matrix the pointers to
       the vectors themselfes. Method #loadMatrixVecs() serves for loading
-      #matrix according to the #Id%s stored in #theBaseId. This method must
+      #matrix according to the SPxId%s stored in #theBaseId. This method must
       be called whenever the vector pointers may have
       changed due to manipulations of the LP.
    */
    //@{
    /// the LP
    SPxSolver* theLP;
-   /// #Id%s of basic vectors.
+   /// SPxId%s of basic vectors.
    DataArray < SPxId > theBaseId;
    /// pointers to the vectors of the basis matrix.
    DataArray < const SVector* > matrix;
@@ -390,7 +390,7 @@ private:
    //**@name Private data */
    //@{
    SPxStatus thestatus;      ///< current status of the basis.
-   Desc      thedesc;        ///< the basis' #Desc%riptor
+   Desc      thedesc;        ///< the basis' Descriptor
    //@}
 
 public:
@@ -421,7 +421,7 @@ public:
    {
       return thedesc;
    }
-   /// returns current basis #Desc%riptor.
+   /// returns current basis Descriptor.
    Desc& desc()
    {
       return thedesc;
@@ -474,13 +474,13 @@ public:
       return *matrix[i];
    }
 
-   /// returns Id of last vector included to the basis.
+   /// returns SPxId of last vector included to the basis.
    inline SPxId lastEntered() const
    {
       return lastin;
    }
 
-   /// returns Id of last vector that left the basis.
+   /// returns SPxId of last vector that left the basis.
    inline SPxId lastLeft() const
    {
       return lastout;
@@ -655,14 +655,14 @@ public:
    /** Changes the \p i 'th vector of the basis with the vector associated to
        \p id. This includes:
        - updating the factorization, or recomputing it from scratch by
-         calling   #factorize(),
-       - resetting #lastEntered(),
-       - resetting #lastIndex(),
-       - resetting #lastLeft(),
-       - resetting #lastUpdate(),
-       - resetting #iterations().
+         calling   \ref soplex::SPxSolver::factorize() "factorize()",
+       - resetting \ref soplex::SPxSolver::lastEntered() "lastEntered()",
+       - resetting \ref soplex::SPxSolver::lastIndex() "lastIndex()",
+       - resetting \ref soplex::SPxSolver::lastLeft() "lastLeft()",
+       - resetting \ref soplex::SPxSolver::lastUpdate() "lastUpdate()",
+       - resetting \ref soplex::SPxSolver::iterations() "iterations()"
 
-       The basis #Desc%riptor is \em not \em modified, since #factor()
+       The basis Descriptor is \em not \em modified, since #factor()
        cannot know about how to set up the status of the involved variables
        correctly.
 
@@ -670,7 +670,7 @@ public:
        factorization associated to the basis. It must be initialized with
        the solution vector \f$x\f$ of the right linear system \f$Bx = b\f$
        with the entering vector as right hand side vetor \f$b\f$, where \f$B\f$
-       denotes the basis matrix. This can be computed using method #solve(b).
+       denotes the basis matrix. This can be computed using method #solve().
        When using FAST updates, a vector \p upd may be passed for
        improved performance. It must be initialized by a call to
        factor->solveRightUpdate() as described in SLinSolver. What
@@ -689,8 +689,8 @@ public:
       const NameSet& rownames, const NameSet& colnames);
 
    /// sets up basis.
-   /** Loads a #Desc%riptor to the basis and sets up the basis matrix and
-       all vectors accordingly. The #Desc%riptor must have the same number of
+   /** Loads a Descriptor to the basis and sets up the basis matrix and
+       all vectors accordingly. The Descriptor must have the same number of
        rows and columns as the currently loaded LP.
    */
    virtual void loadDesc(const Desc&);
@@ -727,7 +727,7 @@ public:
 #endif
    //@}
 
-
+   //--------------------------------------
    /**@name Constructors / Destructors */
    //@{
    /// default constructor.
@@ -743,7 +743,11 @@ public:
    
 
 protected:
-   /// loads #matrix according to the #Id%s stored in #theBaseId.
+
+   //--------------------------------------
+   /**@name Protected helpers */
+   //@{
+   /// loads #matrix according to the SPxId%s stored in #theBaseId.
    /** This method must  be called whenever there is a chance, that the vector
        pointers may have changed due to manipulations of the LP.
     */
@@ -762,6 +766,7 @@ protected:
 
    /// sets descriptor representation according to loaded LP.
    void setRep();
+   //@}
 
 };
 

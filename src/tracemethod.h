@@ -11,6 +11,7 @@ namespace soplex
 {
 
 /**@class TraceMethod 
+   @brief Helper class to trace the calling of methods.
 
    Prints out a message with the current filename and line to indicate
    that some method has been called.

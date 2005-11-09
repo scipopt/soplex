@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxout.h,v 1.6 2005/11/01 21:27:04 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxout.h,v 1.7 2005/11/09 13:53:50 bzforlow Exp $"
 
 /**@file  spxout.h
  * @brief Wrapper for different output streams and verbosity levels.
@@ -189,8 +189,8 @@ private:
    /**@name Verbosity manipulator
        This implementation is done similar to the one for setw(), setprecision(),
        etc. in the standard file iomanip. For instance, the non-menber function
-       #verb(v) returns a struct struct_Severity which contains only the 
-       verbosity level. Calling 
+       \ref verb() "verb(v)" returns a struct 
+       struct_Severity which contains only the verbosity level. Calling 
        @code
             SPxOut spxout;
             spxout << verb( SPxOut::ERROR ) << "This is an error!" << std::endl;
