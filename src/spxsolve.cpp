@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.86 2005/08/19 13:59:28 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.87 2005/11/17 13:33:16 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -440,7 +440,7 @@ SPxSolver::Status SPxSolver::solve()
       spxout << ")" << std::endl;
    )
 
-#ifndef ENABLE_ADDITIONAL_CHECKS
+#if ENABLE_ADDITIONAL_CHECKS
    /* check if solution is really feasible */
    if( status() == OPTIMAL )
    {
@@ -510,7 +510,7 @@ SPxSolver::Status SPxSolver::solve()
          }
       }
    }
-#endif   
+#endif  // ENABLE_ADDITIONAL_CHECKS
    return status();
 }
 
@@ -554,7 +554,7 @@ void SPxSolver::testVecs()
       MSG_VERBOSE3( spxout << "ISOLVE97\t\t" << tmp.length() << std::endl; )
    }
 
-#ifndef ENABLE_ADDITIONAL_CHECKS
+#if ENABLE_ADDITIONAL_CHECKS
    if (type() == ENTER)
    {
       for (int i = 0; i < dim(); ++i)
@@ -583,13 +583,13 @@ void SPxSolver::testVecs()
          }
       }
    }
-#endif
+#endif // ENABLE_ADDITIONAL_CHECKS
 }
 
 bool SPxSolver::terminate()
 {
    METHOD( "SPxSolver::terminate()" );
-#ifndef ENABLE_ADDITIONAL_CHECKS
+#if ENABLE_ADDITIONAL_CHECKS
    testVecs();
 #endif
 
@@ -600,7 +600,7 @@ bool SPxSolver::terminate()
 
    if (iteration() > 10 && iteration() % redo == 0)
    {
-#ifndef ENABLE_ADDITIONAL_CHECKS
+#if ENABLE_ADDITIONAL_CHECKS
       DVector cr(*theCoPrhs);
       DVector fr(*theFrhs);
 #endif 
@@ -612,7 +612,7 @@ bool SPxSolver::terminate()
 
       computeFrhs();
 
-#ifndef ENABLE_ADDITIONAL_CHECKS
+#if ENABLE_ADDITIONAL_CHECKS
       cr -= *theCoPrhs;
       fr -= *theFrhs;
       if (cr.length() > delta())

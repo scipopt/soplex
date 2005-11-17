@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.42 2005/08/18 16:14:28 bzfhille Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.43 2005/11/17 13:33:16 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -513,7 +513,7 @@ bool SPxSolver::leave(int leaveIdx)
    {
       coSolve(theCoPvec->delta(), unitVecs[leaveIdx]);
    }
-#ifndef ENABLE_ADDITIONAL_CHECKS
+#if ENABLE_ADDITIONAL_CHECKS
    else
    {
       SSVector tmp(dim(), epsilon());
@@ -624,7 +624,7 @@ bool SPxSolver::leave(int leaveIdx)
          else
             SPxBasis::solve4update (theFvec->delta(), newVector);
 
-#ifndef ENABLE_ADDITIONAL_CHECKS
+#if ENABLE_ADDITIONAL_CHECKS
          {
             SSVector tmp(dim(), epsilon());
             SPxBasis::solve(tmp, newVector);
@@ -756,7 +756,7 @@ bool SPxSolver::leave(int leaveIdx)
       else
          m_numCycle /= 2;
 
-#ifndef ENABLE_ADDITIONAL_CHECKS
+#if ENABLE_ADDITIONAL_CHECKS
       {
          DVector tmp = fVec();
          multBaseWith(tmp);

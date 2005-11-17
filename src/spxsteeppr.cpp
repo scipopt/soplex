@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.32 2005/09/16 12:42:37 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.33 2005/11/17 13:33:16 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -271,7 +271,7 @@ int SPxSteepPR::selectLeave()
       {         
          /**@todo this was an assert! is an assertion correct?*/
          // assert(coPenalty_ptr[i] >= theeps);
-#ifndef ENABLE_ADDITIONAL_CHECKS
+#if ENABLE_ADDITIONAL_CHECKS
          if( coPenalty_ptr[i] < theeps )
          {
             MSG_ERROR( spxout << "ESTEEP02 SPxSteepPR::selectLeaveX(): This shall not be!"
