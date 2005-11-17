@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.64 2005/09/27 13:31:15 bzfhille Exp $
+# $Id: Makefile,v 1.65 2005/11/17 13:00:41 bzfhille Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -67,8 +67,8 @@ LIBOBJ		= 	changesoplex.o didxset.o \
 			spxscaler.o spxshift.o spxsolver.o spxsolve.o \
 			spxstarter.o spxsteeppr.o spxsumst.o spxvecs.o \
 			spxvectorst.o spxweightpr.o spxweightst.o \
-			ssvector.o svector.o \
-			svset.o timer.o unitvector.o update.o updatevector.o \
+			ssvector.o svector.o svset.o timer.o \
+			tracemethod.o unitvector.o update.o updatevector.o \
 			vector.o vsolve.o \
 			gzstream.o
 BINOBJ		=	example.o

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.27 2005/11/09 13:53:50 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.28 2005/11/17 13:00:41 bzfhille Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
@@ -136,7 +136,7 @@ namespace soplex
 #if defined(TRACE_METHOD)
 // print output in any case, regardless of Param::verbose():
 #define METHOD(x) { DO_WITH_TMP_VERBOSITY( SPxOut::ERROR, \
-                    soplex::TraceMethod _trace_method_(x, __FILE__, __LINE__))}
+                                           soplex::TraceMethod _trace_method_(x, __FILE__, __LINE__); )}
 #else
 #define METHOD(x) /**/
 #endif // !TRACE_METHOD
