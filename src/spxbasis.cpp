@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.51 2005/11/09 13:53:50 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.52 2005/11/18 12:47:16 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -124,7 +124,7 @@ void SPxBasis::loadMatrixVecs()
  */
 void SPxBasis::loadDesc(const Desc& ds)
 {
-   METHOD( "SPxBasis::load()" );
+   METHOD( "SPxBasis::loadDesc()" );
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
    assert(ds.nRows() == theLP->nRows());
@@ -222,7 +222,7 @@ void SPxBasis::load(SPxSolver* lp)
 
 void SPxBasis::loadSolver(SLinSolver* p_solver)
 {
-   METHOD( "SPxBasis::load()" );
+   METHOD( "SPxBasis::loadSolver()" );
 
    MSG_VERBOSE3( spxout << "IBASIS03 loading of Solver invalidates factorization" 
                         << std::endl; )
