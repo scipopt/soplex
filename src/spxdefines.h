@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.28 2005/11/17 13:00:41 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.29 2005/11/18 11:50:41 bzfhille Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
@@ -135,8 +135,14 @@ namespace soplex
 
 #if defined(TRACE_METHOD)
 // print output in any case, regardless of Param::verbose():
-#define METHOD(x) { DO_WITH_TMP_VERBOSITY( SPxOut::ERROR, \
-                                           soplex::TraceMethod _trace_method_(x, __FILE__, __LINE__); )}
+// NB: We cannot use DO_WITH_TMP_VERBOSITY since it wraps its argument in an
+//     own block to avoid name clashes. This, however, keeps the indentation
+//     at 0, destroying the call tree information.
+#define METHOD(x) \
+   const SPxOut::Verbosity  method_old_verbosity = spxout.getVerbosity();      \
+      spxout.setVerbosity( SPxOut::ERROR );                             \
+      soplex::TraceMethod _trace_method_(x, __FILE__, __LINE__);        \
+      spxout.setVerbosity( method_old_verbosity );
 #else
 #define METHOD(x) /**/
 #endif // !TRACE_METHOD

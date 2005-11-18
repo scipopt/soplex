@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.cpp,v 1.5 2002/10/13 16:06:00 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefines.cpp,v 1.6 2005/11/18 11:50:40 bzfhille Exp $"
 
 /**@file  spxdefines.cpp
  * @brief Debugging, floating point type and parameter definitions.
@@ -22,12 +22,6 @@
 
 namespace soplex
 {
-
-#if defined(TRACE_METHOD)
-
-int TraceMethod::s_indent = 0;
-
-#endif //TRACE_METHOD
 
 const Real infinity                 = DEFAULT_INFINITY;
 

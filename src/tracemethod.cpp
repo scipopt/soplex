@@ -6,6 +6,10 @@
 
 namespace soplex
 {
+#if defined(TRACE_METHOD)
+
+   int TraceMethod::s_indent = 0;
+
    /// constructor
    TraceMethod::TraceMethod(const char* s, const char* file, int line )
    {
@@ -23,4 +27,5 @@ namespace soplex
       spxout << "[" << file << ":" << line << "]" << std::endl; 
       s_indent++;
    }
+#endif //TRACE_METHOD
 }
