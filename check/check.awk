@@ -1,4 +1,4 @@
-# $Id: check.awk,v 1.19 2003/01/16 09:17:32 bzfkocht Exp $
+# $Id: check.awk,v 1.20 2005/11/18 08:13:24 bzfhille Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: check.awk                                                     *
@@ -23,11 +23,13 @@ function printviol(x)
       printf(" %.2e", abs(x));
 }
 BEGIN {
-    print "$Id: check.awk,v 1.19 2003/01/16 09:17:32 bzfkocht Exp $";
+    print "$Id: check.awk,v 1.20 2005/11/18 08:13:24 bzfhille Exp $";
     print "";
     line = "-----------------------------------------------------------------------------------------------------------------------------\n";
     printf(line);
     printf("Name         Rows   Cols Type   Iter     Time Objective        relErr   maxVCons sumVCons maxVBoun sumVBoun maxVRedc sumVRedc\n");
+
+    obj      = "error";
 }
 /=opt=/          { sol[$2] = $3; }
 /=type=/         { type = $2; }
@@ -39,6 +41,7 @@ BEGIN {
 /IEXAMP31/       { infeas = 1; }
 /IEXAMP32/       { infeas = 1; } 
 /IEXAMP33/       { timeout = 1; }
+/EEXAMP40/       { cycling = 1; }
 /IEXAMP07/       { cvm = $4; cvs = $5; if (cvm > cvmax[type]) cvmax[type] = cvm; cvsum[type] += cvs; }
 /IEXAMP09/       { bvm = $4; bvs = $5; if (bvm > bvmax[type]) bvmax[type] = bvm; bvsum[type] += bvs; }
 /IEXAMP11/       { rcm = $5; rcs = $6; if (rcm > rcmax[type]) rcmax[type] = rcm; rcsum[type] += rcs; }
@@ -69,11 +72,21 @@ BEGIN {
 	    printf("%-14s", "infeasible");
 	else if (timeout)
 	    printf("%-14s", "timeout");
+	else if (cycling)
+	    printf("%-14s", "cycling");
+	else if (obj == "error")
+	    printf("%-14s", "error");
 	else
 	    printf("%+e ", obj);
 
 	if (timeout)
 	   printf("\n");
+	else if ( obj == "error" && !infeas)
+	  {
+	    printf("XX\n");
+	    fail[type]++;
+	    fails++;
+	  }
 	else
 	{
             if (!infeas && sol[name] != "infeasible")
@@ -134,7 +147,8 @@ BEGIN {
     prevname = name;
     timeout  = 0;
     infeas   = 0;
-    obj      = 0;
+    cycling  = 0;
+    obj      = "error";
     iter     = 0;
     time     = 0;
     rows     = 0;
