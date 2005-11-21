@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: solve.cpp,v 1.33 2005/08/18 16:14:28 bzfhille Exp $"
+#pragma ident "@(#) $Id: solve.cpp,v 1.34 2005/11/21 15:28:10 bzfhille Exp $"
 
 #include <assert.h>
 
@@ -613,6 +613,10 @@ void CLUFactor::solveUleft(Real* p_work, Real* vec)
    {
       int  c  = col.orig[i];
       int  r  = row.orig[i];
+
+      assert(c >= 0);  // Inna/Tobi: otherwise, vec[c] would be strange...
+      assert(r >= 0);  // Inna/Tobi: otherwise, diag[r] would be strange...
+
       Real x  = vec[c];
 
       ASSERT_WARN( "WSOLVE01", fabs(x) < 1e40 );

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.40 2005/11/09 13:53:50 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.41 2005/11/21 15:28:10 bzfhille Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -769,6 +769,16 @@ protected:
    //@}
 
 };
+
+
+//
+// Auxiliary functions.
+//
+
+/// Pretty-printing of basis status.
+std::ostream& operator<<( std::ostream& os,
+                          const SPxBasis::SPxStatus& status );
+
 
 } // namespace soplex
 #endif // _SPXBASIS_H_

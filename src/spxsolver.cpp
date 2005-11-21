@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.22 2005/11/08 19:56:52 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.23 2005/11/21 15:28:10 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -276,6 +276,10 @@ void SPxSolver::init()
    }
    if (!matrixIsSetup)
       SPxBasis::loadDesc(desc());
+
+   // Inna/Tobi: don't "upgrade" a singular basis to a regular one
+   if( SPxBasis::status() == SPxBasis::SINGULAR )
+      return;
 
    //factorized = false;
    m_numCycle = 0;
@@ -1035,6 +1039,104 @@ void SPxSolver::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
 
    loadBasis(ds);
 }
+
+//
+// Auxiliary functions.
+//
+
+/// Pretty-printing of variable status.
+std::ostream& operator<<( std::ostream& os,
+                          const SPxSolver::VarStatus& status )
+{
+   switch( status )
+      {
+      case SPxSolver::BASIC:
+         os << "BASIC";
+         break;
+      case SPxSolver::FIXED:
+         os << "FIXED";
+         break;
+      case SPxSolver::ON_LOWER:
+         os << "ON_LOWER";
+         break;
+      case SPxSolver::ON_UPPER:
+         os << "ON_UPPER";
+         break;
+      case SPxSolver::ZERO:
+         os << "ZERO";
+         break;
+      default:
+         os << "?invalid?";
+         break;
+      }
+   return os;
+}
+
+
+/// Pretty-printing of solver status.
+std::ostream& operator<<( std::ostream& os,
+                          const SPxSolver::Status& status )
+{
+   switch ( status )
+      {
+      case SPxSolver::ERROR:
+         os << "ERROR";
+         break;
+      case SPxSolver::NO_RATIOTESTER:
+         os << "NO_RATIOTESTER";
+         break;
+      case SPxSolver::NO_PRICER:
+         os << "NO_PRICER";
+         break;
+      case SPxSolver::NO_SOLVER:
+         os << "NO_SOLVER";
+         break;
+      case SPxSolver::NOT_INIT:
+         os << "NOT_INIT";
+         break;
+      case SPxSolver::ABORT_CYCLING:
+         os << "ABORT_CYCLING";
+         break;
+      case SPxSolver::ABORT_TIME:
+         os << "ABORT_TIME";
+         break;
+      case SPxSolver::ABORT_ITER:
+         os << "ABORT_ITER";
+         break;
+      case SPxSolver::ABORT_VALUE:
+         os << "ABORT_VALUE";
+         break;
+      case SPxSolver::SINGULAR:
+         os << "SINGULAR";
+         break;
+      case SPxSolver::NO_PROBLEM:
+         os << "NO_PROBLEM";
+         break;
+      case SPxSolver::REGULAR:
+         os << "REGULAR";
+         break;
+      case SPxSolver::RUNNING:
+         os << "RUNNING";
+         break;
+      case SPxSolver::UNKNOWN:
+         os << "UNKNOWN";
+         break;
+      case SPxSolver::OPTIMAL:
+         os << "OPTIMAL";
+         break;
+      case SPxSolver::UNBOUNDED:
+         os << "UNBOUNDED";
+         break;
+      case SPxSolver::INFEASIBLE:
+         os << "INFEASIBLE";
+         break;
+      default:
+         os << "?other?";
+         break;
+      }
+   return os;
+}
+
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

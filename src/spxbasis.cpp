@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.52 2005/11/18 12:47:16 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.53 2005/11/21 15:28:10 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -739,6 +739,49 @@ SPxBasis& SPxBasis::operator=(const SPxBasis& rhs)
    }
    return *this;
 }
+
+
+//
+// Auxiliary functions.
+//
+
+/// Pretty-printing of basis status.
+std::ostream& operator<<( std::ostream& os,
+                          const SPxBasis::SPxStatus& status )
+{
+   switch ( status )
+      {
+      case SPxBasis::NO_PROBLEM:
+         os << "NO_PROBLEM";
+         break;
+      case SPxBasis::SINGULAR:
+         os << "SINGULAR";
+         break;
+      case SPxBasis::REGULAR:
+         os << "REGULAR";
+         break;
+      case SPxBasis::DUAL:
+         os << "DUAL";
+         break;
+      case SPxBasis::PRIMAL:
+         os << "PRIMAL";
+         break;
+      case SPxBasis::OPTIMAL:
+         os << "OPTIMAL";
+         break;
+      case SPxBasis::UNBOUNDED:
+         os << "UNBOUNDED";
+         break;
+      case SPxBasis::INFEASIBLE:
+         os << "INFEASIBLE";
+         break;
+      default:
+         os << "?other?";
+         break;
+      }
+   return os;
+}
+
 
 } // namespace soplex
 

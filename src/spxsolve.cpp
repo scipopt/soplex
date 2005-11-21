@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.87 2005/11/17 13:33:16 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.88 2005/11/21 15:28:10 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -119,6 +119,14 @@ SPxSolver::Status SPxSolver::solve()
          thestarter->generate(*this);              // generate start basis.
 
       init();
+
+      // Inna/Tobi: init might fail, if the basis is singular
+      if( !isInitialized() )
+      {
+         assert(SPxBasis::status() == SPxBasis::SINGULAR);
+         m_status = UNKNOWN;
+         return status();
+      }
    }
    maxDelta = 1e-6 > delta() ? 1e-6 : delta();
    minDelta = delta() * 1e-2;
@@ -206,6 +214,14 @@ SPxSolver::Status SPxSolver::solve()
 
                // We better refactor to make sure the solution is ok.
                factorize();
+
+               // Inna/Tobi: if the factorization was found out to be singular, we have to quit
+               if (SPxBasis::status() < SPxBasis::REGULAR)
+               {
+                  MSG_ERROR( spxout << "ESOLVE09 something wrong with factorization, Basis status: " << SPxBasis::status() << std::endl; )
+                  stop = true;
+                  break;
+               }
 
                enterId = thepricer->selectEnter();
 
@@ -329,6 +345,14 @@ SPxSolver::Status SPxSolver::solve()
 
                // We better refactor to make sure the solution is ok.
                factorize();
+
+               // Inna/Tobi: if the factorization was found out to be singular, we have to quit
+               if (SPxBasis::status() < SPxBasis::REGULAR)
+               {
+                  MSG_ERROR( spxout << "ESOLVE10 something wrong with factorization, Basis status: " << SPxBasis::status() << std::endl; )
+                  stop = true;
+                  break;
+               }
 
                leaveNum = thepricer->selectLeave();
 

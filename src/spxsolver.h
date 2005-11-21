@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.24 2005/11/09 13:53:50 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.25 2005/11/21 15:28:10 bzfhille Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -1696,6 +1696,19 @@ private:
 
    void testVecs();
 };
+
+//
+// Auxiliary functions.
+//
+
+/// Pretty-printing of variable status.
+std::ostream& operator<<( std::ostream& os,
+                          const SPxSolver::VarStatus& status );
+
+/// Pretty-printing of solver status.
+std::ostream& operator<<( std::ostream& os,
+                          const SPxSolver::Status& status );
+
 
 } // namespace soplex
 #endif // _SPXSOLVER_H_
