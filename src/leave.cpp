@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.43 2005/11/17 13:33:16 bzfhille Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.44 2005/11/21 13:57:09 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -764,7 +764,7 @@ bool SPxSolver::leave(int leaveIdx)
          if (tmp.length() > delta())
          {
             MSG_WARNING( spxout << "WLEAVE64\t" << basis().iteration()
-                              << ": fVec error = " << tmp.length(); )
+                         << ": fVec error = " << tmp.length() << std::endl; )
             SPxBasis::solve(tmp, fRhs());
             tmp -= fVec();
             MSG_WARNING( spxout << "WLEAVE65\t(" << tmp.length() << ")\n"; )
