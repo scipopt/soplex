@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: changesoplex.cpp,v 1.27 2005/11/09 13:53:49 bzforlow Exp $"
+#pragma ident "@(#) $Id: changesoplex.cpp,v 1.28 2005/11/21 18:23:57 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -1012,24 +1012,30 @@ void SPxSolver::changeRange(int i, Real newLhs, Real newRhs)
 void SPxSolver::changeRow(int i, const LPRow& newRow)
 {
    METHOD( "SPxSolver::changeRow()" );
+   assert( SPxBasis::status() > SPxBasis::NO_PROBLEM );
 
    SPxLP::changeRow(i, newRow);
+   SPxBasis::changedRow( i );
    unInit();
 }
 
 void SPxSolver::changeCol(int i, const LPCol& newCol)
 {
    METHOD( "SPxSolver::changeCol()" );
+   assert( SPxBasis::status() > SPxBasis::NO_PROBLEM );
 
    SPxLP::changeCol(i, newCol);
+   SPxBasis::changedCol( i );
    unInit();
 }
 
 void SPxSolver::changeElement(int i, int j, Real val)
 {
    METHOD( "SPxSolver::changeElement()" );
+   assert( SPxBasis::status() > SPxBasis::NO_PROBLEM );
 
    SPxLP::changeElement(i, j, val);
+   SPxBasis::changedElement( i, j );
    unInit();
 }
 

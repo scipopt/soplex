@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.24 2005/08/09 19:32:11 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.25 2005/11/21 18:23:57 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -407,12 +407,77 @@ void SPxBasis::invalidate()
    matrixIsSetup = false;
 }
 
+
+/** 
+    This code has been adapted from SPxBasis::addedRows() and 
+    SPxBasis::addedCols().
+*/
+void SPxBasis::restoreInitialBasis()
+{
+   METHOD( "SPxBasis::restoreInitialBasis()" );
+
+   assert( !matrixIsSetup && !factorized );
+
+   if (theLP->rep() == SPxSolver::COLUMN)
+      {
+         for (int i = 0; i < theLP->nRows(); ++i)
+         {
+            thedesc.rowStatus(i) = dualRowStatus(i);
+            baseId(i) = theLP->SPxLP::rId(i);
+         }
+
+         for (int i = 0; i < theLP->nCols(); ++i)
+            thedesc.colStatus(i) = primalColStatus(i, theLP);
+
+         /* ??? I think, this cannot happen. */
+         /* if matrix was set up, load new basis vectors to the matrix */
+         if (status() > NO_PROBLEM && matrixIsSetup)
+            loadMatrixVecs();
+      }
+   else
+      {
+         assert(theLP->rep() == SPxSolver::ROW);
+         
+         for (int i = 0; i < theLP->nRows(); ++i)
+            thedesc.rowStatus(i) = dualRowStatus(i);
+
+         for (int i = 0; i < theLP->nCols(); ++i)
+            {
+               thedesc.colStatus(i) = primalColStatus(i, theLP);
+               baseId(i) = theLP->SPxLP::cId(i);
+            }
+
+         /* ??? I think, this cannot happen. */
+         /* if matrix was set up, load new basis vectors to the matrix */
+         if (status() > NO_PROBLEM && matrixIsSetup)
+            loadMatrixVecs();
+      }
+
+   /* update basis status */
+   setStatus(REGULAR);
+}
+
+/**
+   @class SPxBasis
+
+   The following methods (changedRow(), changedCol(), changedElement()) radically
+   change the current basis to the original (slack) basis also present after 
+   loading the LP. The reason is that through the changes, the current basis may
+   become singular. Going back to the initial basis is quite inefficient, but 
+   correct.
+
+   @todo Implement changedRow(), changedCol(), changedElement() in a more clever
+   way. For instance, the basis won't be singular (but maybe infeasible) if the 
+   change doesn't affect the basis rows/columns.
+ */
+
 /**@todo is this correctly implemented?
  */
 void SPxBasis::changedRow(int /*row*/)
 {
    METHOD( "SPxBasis::changedRow()" );
    invalidate();
+   restoreInitialBasis();
 }
 
 /**@todo is this correctly implemented?
@@ -421,6 +486,7 @@ void SPxBasis::changedCol(int /*col*/)
 {
    METHOD( "SPxBasis::changedCol()" );
    invalidate();
+   restoreInitialBasis();
 }
 
 /**@todo is this correctly implemented?
@@ -429,6 +495,7 @@ void SPxBasis::changedElement(int /*row*/, int /*col*/)
 {
    METHOD( "SPxBasis::changedElement()" );
    invalidate();
+   restoreInitialBasis();
 }
 } // namespace soplex
 

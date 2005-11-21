@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.41 2005/11/21 15:28:10 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.42 2005/11/21 18:23:57 bzfhille Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -717,6 +717,13 @@ public:
        be reinitialized if needed.
    */
    void invalidate();
+
+   /// Restores initial basis.
+   /** This method changes the basis to that present just after loading the LP
+       (see addedRows() and addedCols()). This may be necessary if a row or a 
+       column is changed, since then the current basis may become singular.
+   */
+   void restoreInitialBasis();
 
    /// output basis entries.
    void dump();
