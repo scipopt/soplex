@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.25 2005/11/21 15:28:10 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.26 2005/11/22 11:49:50 bzfhille Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -1708,6 +1708,14 @@ std::ostream& operator<<( std::ostream& os,
 /// Pretty-printing of solver status.
 std::ostream& operator<<( std::ostream& os,
                           const SPxSolver::Status& status );
+
+/// Pretty-printing of algorithm.
+std::ostream& operator<<( std::ostream& os,
+                          const SPxSolver::Type& status );
+
+/// Pretty-printing of representation.
+std::ostream& operator<<( std::ostream& os,
+                          const SPxSolver::Representation& status );
 
 
 } // namespace soplex

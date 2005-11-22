@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.23 2005/11/21 15:28:10 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.24 2005/11/22 11:49:50 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -1072,7 +1072,6 @@ std::ostream& operator<<( std::ostream& os,
    return os;
 }
 
-
 /// Pretty-printing of solver status.
 std::ostream& operator<<( std::ostream& os,
                           const SPxSolver::Status& status )
@@ -1136,6 +1135,45 @@ std::ostream& operator<<( std::ostream& os,
       }
    return os;
 }
+
+/// Pretty-printing of algorithm.
+std::ostream& operator<<( std::ostream& os,
+                          const SPxSolver::Type& status )
+{
+   switch ( status )
+      {
+      case SPxSolver::ENTER:
+         os << "ENTER";
+         break;
+      case SPxSolver::LEAVE:
+         os << "LEAVE";
+         break;
+      default:
+         os << "?other?";
+         break;
+      }
+   return os;
+}
+
+/// Pretty-printing of representation.
+std::ostream& operator<<( std::ostream& os,
+                          const SPxSolver::Representation& status )
+{
+   switch ( status )
+      {
+      case SPxSolver::ROW:
+         os << "ROW";
+         break;
+      case SPxSolver::COLUMN:
+         os << "COLUMN";
+         break;
+      default:
+         os << "?other?";
+         break;
+      }
+   return os;
+}
+
 
 } // namespace soplex
 
