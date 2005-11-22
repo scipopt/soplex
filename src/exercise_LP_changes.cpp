@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: exercise_LP_changes.cpp,v 1.6 2005/11/21 18:47:01 bzfhille Exp $"
+#pragma ident "@(#) $Id: exercise_LP_changes.cpp,v 1.7 2005/11/22 11:51:09 bzfhille Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -99,8 +99,8 @@ public:
    //@{
    /// Default constructor.
    explicit
-   TestSolver( const SPxSolver::Type type_ = SPxSolver::LEAVE, 
-               const SPxSolver::Representation representation_ = SPxSolver::COLUMN )
+   TestSolver( const SPxSolver::Type type_, 
+               const SPxSolver::Representation representation_ )
       : SPxSolver( type_, 
                    representation_ )
    {
@@ -110,7 +110,6 @@ public:
       Param::setEpsilon( epsilon );
       Param::setEpsilonFactorization( epsilon_factor );
       Param::setEpsilonUpdate( epsilon_update );
-      Param::setVerbose( verbose );
 
       setPricer( &_pricer );
       setTester( &_ratiotester );
@@ -158,9 +157,13 @@ public:
    //@{
    /// Default constructor.
    explicit
-   ChangeExerciser( const std::string& instance_name )
+   ChangeExerciser( const std::string& instance_name,
+                    const SPxSolver::Type type,
+                    const SPxSolver::Representation representation )
       : _asserts_failed( 0 )
       , _instance_name( instance_name )
+      , _type( type )
+      , _representation( representation )
    {}
    //@}
 
@@ -224,7 +227,7 @@ private:
    ///
    TestSolver* _prepare_Solver() const 
    {
-      TestSolver* work_ptr = new TestSolver;
+      TestSolver* work_ptr = new TestSolver( _type, _representation );
       work_ptr->readFile( _instance_name.c_str(), 0, 0 );
       return work_ptr;
    }
@@ -233,6 +236,10 @@ private:
    long _asserts_failed;
    ///
    std::string _instance_name;
+   ///
+   const SPxSolver::Type _type;
+   ///
+   const SPxSolver::Representation _representation;
    //@}   
 };
 
@@ -242,38 +249,100 @@ private:
 const Real ChangeExerciser::epsilon_solution_equal;
 
 
-
 //------------------------------------------------------------------------
 //    main program
 //------------------------------------------------------------------------
+
+/// Global verbosity indicator.
+bool verbose = false;
+
+/// Prints message only if verbose mode is on.
+#define MSG( message ) { if ( verbose ) { message } }
+
+
+/**
+   Wrapper to run all tests for  fixed representation and algorithm.
+   Returns the number of failed asserts.
+*/
+long run_tests( const std::string& filename, 
+                const SPxSolver::Type type,
+                const SPxSolver::Representation representation )
+{
+   ChangeExerciser tester( filename,
+                           type,
+                           representation );
+
+   tester.test_add_delete_row();
+   tester.test_add_delete_rows();
+   tester.test_add_delete_col();
+   tester.test_add_delete_cols();
+   
+   tester.test_change_obj();
+   tester.test_change_lower();
+   tester.test_change_upper();
+   tester.test_change_bounds();
+   tester.test_change_lhs();
+   tester.test_change_rhs();
+   tester.test_change_range();
+   tester.test_change_row();
+   tester.test_change_col();
+   tester.test_change_element();
+   tester.test_change_sense();
+   
+   std::cout << representation << ", " << type << ": " << tester.asserts_failed() 
+             << " asserts failed." << std::endl;
+
+   return tester.asserts_failed();
+}
+
 
 int main( int argc, 
           const char* const argv[] )
 {
    const char* usage =
-   "<test_suite>\n\n"
-   "<test_suite> is supposed to be file containing names of LPs in either MPS or LPF format\n\n"
+      "[-vLevel] <test_suite>\n\n"
+      "<test_suite> is supposed to be file containing names of LPs in either MPS or LPF format\n\n"
+      "-v        activate verbose mode\n"
    ;
 
-   if ( argc != 2 )
+   // Cope with command line.
+   if ( argc < 2 || argc > 3 )
       {
          std::cout << "usage: " << argv[0] << " " << usage << std::endl;
          exit(0);
       }
 
-   const char* suite_name = argv[1];
+   int optidx = 1;
+   for (optidx = 1; optidx < argc; optidx++)
+   {
+      if (*argv[optidx] != '-')
+         break;
 
-   std::cout.setf( std::ios::scientific | std::ios::showpoint );
-   std::cerr.setf( std::ios::scientific | std::ios::showpoint );
+      switch(argv[optidx][1])
+      {
+      case 'v' :
+         verbose = true;
+         break;
+      default :
+         std::cout << "usage: " << argv[0] << " " << usage << std::endl;
+         exit(0);
+      }
+   }
+
+   const char* suite_name = argv[ optidx ];
 
    std::ifstream test_suite( suite_name );
    if ( !test_suite )
    {
-      MSG_ERROR( spxout << "error while reading test suite file \""
-                        << suite_name << "\"" << std::endl; )
+      std::cerr << "error while reading test suite file \""
+                << suite_name << "\"" << std::endl;
       exit(1);
    }
-   
+
+   // Setup.
+   std::cout.setf( std::ios::scientific | std::ios::showpoint );
+   std::cerr.setf( std::ios::scientific | std::ios::showpoint );
+
    //
    // Do the actual work.
    //
@@ -288,37 +357,22 @@ int main( int argc,
          std::cout << filename << ": " << std::endl;
 
          // Double-check that instance exists and is readable.
-         TestSolver work;
+         TestSolver work( SPxSolver::ENTER, SPxSolver::COLUMN );
 
          if ( !work.readFile( filename.c_str(), 0, 0 ) )
             {
-               MSG_ERROR( spxout << "error while reading file \"" 
-                                 << filename << "\"" << std::endl; )
+               std::cout << "error while reading file \"" 
+                         << filename << "\"" << std::endl;
                break;
             }
 
          // Do testing.
-         ChangeExerciser tester( filename );
+         total_asserts_failed += run_tests( filename, SPxSolver::LEAVE, SPxSolver::COLUMN );
+         total_asserts_failed += run_tests( filename, SPxSolver::LEAVE, SPxSolver::ROW );
+         total_asserts_failed += run_tests( filename, SPxSolver::ENTER, SPxSolver::COLUMN );
+         total_asserts_failed += run_tests( filename, SPxSolver::ENTER, SPxSolver::ROW );
 
-         tester.test_add_delete_row();
-         tester.test_add_delete_rows();
-         tester.test_add_delete_col();
-         tester.test_add_delete_cols();
-
-         tester.test_change_obj();
-         tester.test_change_lower();
-         tester.test_change_upper();
-         tester.test_change_bounds();
-         tester.test_change_lhs();
-         tester.test_change_rhs();
-         tester.test_change_range();
-         tester.test_change_row();
-         tester.test_change_col();
-         tester.test_change_element();
-         tester.test_change_sense();
-
-         std::cout << tester.asserts_failed() << " asserts failed.\n" << std::endl;
-         total_asserts_failed += tester.asserts_failed();
+         std::cout << std::endl;
       }
 
    std::cout << "Total number of failed asserts: " << total_asserts_failed << std::endl;
@@ -326,12 +380,17 @@ int main( int argc,
    return 0;
 }
 
+//------------------------------------------------------------------------
+//    ChangeExerciser class
+//------------------------------------------------------------------------
 
 /**
    Deletes and re-adds a single row.
 */
 void ChangeExerciser::test_add_delete_row()
 {
+   MSG( std::cout << "Testing addRow() / removeRow()" << std::endl; );
+
    TestSolver* work_ptr = _prepare_Solver();
 
    work_ptr->solve();
@@ -378,6 +437,8 @@ void ChangeExerciser::test_add_delete_row()
 */
 void ChangeExerciser::test_add_delete_rows()
 {
+   MSG( std::cout << "Testing addRows() / removeRows()" << std::endl; );
+
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
    const int orig_rows = work_ptr->nRows();
@@ -508,6 +569,8 @@ void ChangeExerciser::test_add_delete_rows()
 */
 void ChangeExerciser::test_add_delete_col()
 {
+   MSG( std::cout << "Testing addCol() / removeCol()" << std::endl; );
+
    TestSolver* work_ptr = _prepare_Solver();
 
    work_ptr->solve();
@@ -555,6 +618,8 @@ void ChangeExerciser::test_add_delete_col()
 */
 void ChangeExerciser::test_add_delete_cols()
 {
+   MSG( std::cout << "Testing addCols() / removeCols()" << std::endl; );
+
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
    const int orig_cols = work_ptr->nCols();
@@ -679,7 +744,7 @@ void ChangeExerciser::test_add_delete_cols()
 */
 void ChangeExerciser::test_change_obj()
 {
-   std::cout << "Testing change objective" << std::endl;
+   MSG( std::cout << "Testing changeObj()" << std::endl; );
    
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
@@ -742,7 +807,7 @@ void ChangeExerciser::test_change_obj()
 */
 void ChangeExerciser::test_change_lower()
 {
-   std::cout << "Testing change lower" << std::endl;
+   MSG( std::cout << "Testing changeLower()" << std::endl; );
 
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
@@ -786,7 +851,7 @@ void ChangeExerciser::test_change_lower()
 */
 void ChangeExerciser::test_change_upper()
 {
-   std::cout << "Testing change upper" << std::endl;
+   MSG( std::cout << "Testing changeUpper()" << std::endl; );
 
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
@@ -830,7 +895,7 @@ void ChangeExerciser::test_change_upper()
 */
 void ChangeExerciser::test_change_bounds()
 {
-   std::cout << "Testing change bounds" << std::endl;
+   MSG( std::cout << "Testing changeBounds()" << std::endl; );
 
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
@@ -879,7 +944,7 @@ void ChangeExerciser::test_change_bounds()
 */
 void ChangeExerciser::test_change_lhs()
 {
-   std::cout << "Testing change left hand side" << std::endl;
+   MSG( std::cout << "Testing changeLhs()" << std::endl; );
 
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
@@ -935,7 +1000,7 @@ void ChangeExerciser::test_change_lhs()
 */
 void ChangeExerciser::test_change_rhs()
 {
-   std::cout << "Testing change right hand side" << std::endl;
+   MSG( std::cout << "Testing changeRhs()" << std::endl; );
 
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
@@ -991,7 +1056,7 @@ void ChangeExerciser::test_change_rhs()
 */
 void ChangeExerciser::test_change_range()
 {
-   std::cout << "Testing change range" << std::endl;
+   MSG( std::cout << "Testing changeRange()" << std::endl; );
    
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
@@ -1072,7 +1137,7 @@ void ChangeExerciser::test_change_range()
 */
 void ChangeExerciser::test_change_row()
 {
-   std::cerr << "Testing change row" << std::endl;
+   MSG( std::cout << "Testing changeRow()" << std::endl; );
 
    //
    // First test: Change rows to non-trivial multiples.
@@ -1159,7 +1224,7 @@ void ChangeExerciser::test_change_row()
 */
 void ChangeExerciser::test_change_col()
 {
-   std::cout << "Testing change column" << std::endl;
+   MSG( std::cout << "Testing changeCol()" << std::endl; );
    
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
@@ -1242,7 +1307,7 @@ void ChangeExerciser::test_change_col()
 */
 void ChangeExerciser::test_change_element()
 { 
-   std::cout << "Testing change element" << std::endl;
+   MSG( std::cout << "Testing changeElement()" << std::endl; );
 
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
@@ -1298,7 +1363,7 @@ void ChangeExerciser::test_change_element()
 */
 void ChangeExerciser::test_change_sense()
 {
-   std::cout << "Testing change sense" << std::endl;
+   MSG( std::cout << "Testing changeSense()" << std::endl; );
 
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
