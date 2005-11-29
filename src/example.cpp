@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.75 2005/10/28 17:25:33 bzforlow Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.76 2005/11/29 12:09:07 bzfhille Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -457,9 +457,6 @@ int main(int argc, const char* const argv[])
    default :
       prescaler  = 0;
       postscaler = 0;
-      Param::setVerbose( SPxOut::VERBOSE3 );
-      MSG_VERBOSE3( spxout << "No"; )
-      Param::setVerbose( verbose );
       break;
    }
    work.setPreScaler(prescaler);
