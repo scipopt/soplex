@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.23 2005/11/01 21:27:04 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.24 2005/11/29 16:19:11 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -62,6 +62,7 @@ int SPxDefaultRT::selectLeave(Real& val)
    // PARALLEL the j loop could be parallelized
    if (val > 0)
    {
+      // Loop over NZEs of delta vector.
       for( j = 0; j < idx.size(); ++j)
       {
          i = idx.index(j);
@@ -100,7 +101,12 @@ int SPxDefaultRT::selectLeave(Real& val)
          val = (x > epsilon) ? ub[leave] : lb[leave];
          val = (val - vec[leave]) / x;
       }
-      ASSERT_WARN( "WDEFRT01", val > -epsilon );
+
+      // BH 2005-11-29: We have to compare against delta instead of the stronger
+      // epsilon, since it may well happen that the basis is degenerate and the
+      // selected leaving variable is delta beyond its bound.
+      // This happens for instance on LP/netlib/adlittle.mps with setting -r -t0.
+      ASSERT_WARN( "WDEFRT01", val > -delta );
    }
    else
    {
@@ -142,7 +148,8 @@ int SPxDefaultRT::selectLeave(Real& val)
          val = (x < epsilon) ? ub[leave] : lb[leave];
          val = (val - vec[leave]) / x;
       }
-      ASSERT_WARN( "WDEFRT02", val < epsilon );
+      // See comment above.
+      ASSERT_WARN( "WDEFRT02", val < delta );
    }
    return leave;
 }
