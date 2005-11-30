@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.24 2005/11/29 16:19:11 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.25 2005/11/30 14:24:46 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -98,15 +98,24 @@ int SPxDefaultRT::selectLeave(Real& val)
       if (leave >= 0)
       {
          x   = upd[leave];
-         val = (x > epsilon) ? ub[leave] : lb[leave];
-         val = (val - vec[leave]) / x;
+
+         // BH 2005-11-30: It may well happen that the basis is degenerate and the
+         // selected leaving variable is (at most delta) beyond its bound. (This
+         // happens for instance on LP/netlib/adlittle.mps with setting -r -t0.) 
+         // In that case we do a pivot step with length zero to avoid difficulties.
+         if ( ( x > epsilon  && vec[leave] >= ub[leave] ) ||
+              ( x < -epsilon && vec[leave] <= lb[leave] ) )
+         {
+            val = 0.0;
+         }
+         else 
+         {
+            val = (x > epsilon) ? ub[leave] : lb[leave];
+            val = (val - vec[leave]) / x;
+         }
       }
 
-      // BH 2005-11-29: We have to compare against delta instead of the stronger
-      // epsilon, since it may well happen that the basis is degenerate and the
-      // selected leaving variable is delta beyond its bound.
-      // This happens for instance on LP/netlib/adlittle.mps with setting -r -t0.
-      ASSERT_WARN( "WDEFRT01", val > -delta );
+      ASSERT_WARN( "WDEFRT01", val > -epsilon );
    }
    else
    {
@@ -145,11 +154,21 @@ int SPxDefaultRT::selectLeave(Real& val)
       if (leave >= 0)
       {
          x   = upd[leave];
-         val = (x < epsilon) ? ub[leave] : lb[leave];
-         val = (val - vec[leave]) / x;
+
+         // See comment above.
+         if ( ( x < -epsilon && vec[leave] >= ub[leave] ) || 
+              ( x > epsilon  && vec[leave] <= lb[leave] ) )
+         {
+            val = 0.0;
+         }
+         else 
+         {
+            val = (x < epsilon) ? ub[leave] : lb[leave];
+            val = (val - vec[leave]) / x;
+         }
       }
-      // See comment above.
-      ASSERT_WARN( "WDEFRT02", val < delta );
+
+      ASSERT_WARN( "WDEFRT02", val < epsilon );
    }
    return leave;
 }
