@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.88 2005/11/21 15:28:10 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.89 2005/11/30 14:36:42 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -31,6 +31,9 @@
 
 namespace soplex
 {
+/// Interval for displaying iteration information.
+long iterationInterval = 100;
+
 
 bool SPxSolver::precisionReached(Real& newDelta) const
 {
@@ -172,7 +175,7 @@ SPxSolver::Status SPxSolver::solve()
          do
          {
             MSG_VERBOSE3(
-               if( iteration() % 100 == 0 )
+               if( iteration() % iterationInterval == 0 )
                   spxout << "ISOLVE74 Enter iteration: " << iteration()
                          << ", Value = " << value()
                          << ", Shift = " << shift() << std::endl;
@@ -261,8 +264,8 @@ SPxSolver::Status SPxSolver::solve()
                    << ", delta: " << delta()
                    << std::endl
                    << "ISOLVE56 stop: " << stop
-                   << ", basis status: " << int(SPxBasis::status())
-                   << ", solver status: " << int(m_status) << std::endl;
+                   << ", basis status: " << SPxBasis::status() << " (" << int(SPxBasis::status()) << ")"
+                   << ", solver status: " << m_status << " (" << int(m_status) << ")" << std::endl;
          )
 
          if (!stop)
@@ -302,7 +305,7 @@ SPxSolver::Status SPxSolver::solve()
          do
          {
             MSG_VERBOSE3(
-               if( iteration() % 100 == 0 )
+               if( iteration() % iterationInterval == 0 )
                   spxout << "ISOLVE80 Leave Iteration: " << iteration()
                          << ", Value = " << value()
                          << ", Shift = " << shift() << std::endl;
@@ -391,8 +394,8 @@ SPxSolver::Status SPxSolver::solve()
                    << ", delta: " << delta()
                    << std::endl
                    << "ISOLVE57 stop: " << stop
-                   << ", basis status: " << int(SPxBasis::status())
-                   << ", solver status: " << int(m_status) << std::endl;
+                   << ", basis status: " << SPxBasis::status() << " (" << int(SPxBasis::status()) << ")"
+                   << ", solver status: " << m_status << " (" << int(m_status) << ")" << std::endl;
          )
 
          if (!stop)
