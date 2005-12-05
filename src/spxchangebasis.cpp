@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.25 2005/11/21 18:23:57 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.26 2005/12/05 10:36:29 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -458,8 +458,6 @@ void SPxBasis::restoreInitialBasis()
 }
 
 /**
-   @class SPxBasis
-
    The following methods (changedRow(), changedCol(), changedElement()) radically
    change the current basis to the original (slack) basis also present after 
    loading the LP. The reason is that through the changes, the current basis may

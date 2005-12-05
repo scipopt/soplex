@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.53 2005/11/21 15:28:10 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.54 2005/12/05 10:36:30 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -745,7 +745,7 @@ SPxBasis& SPxBasis::operator=(const SPxBasis& rhs)
 // Auxiliary functions.
 //
 
-/// Pretty-printing of basis status.
+// Pretty-printing of basis status.
 std::ostream& operator<<( std::ostream& os,
                           const SPxBasis::SPxStatus& status )
 {

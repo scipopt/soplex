@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.42 2005/11/21 18:23:57 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.43 2005/12/05 10:36:30 bzforlow Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -36,7 +36,8 @@ namespace soplex
 {
 class SPxSolver;
 
-/**@brief   Simplex basis.
+/**@class SPxBasis
+   @brief   Simplex basis.
    @ingroup Algo
 
    Consider the linear program as provided from class SPxLP:

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.24 2005/11/22 11:49:50 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.25 2005/12/05 10:36:29 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -1044,7 +1044,7 @@ void SPxSolver::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
 // Auxiliary functions.
 //
 
-/// Pretty-printing of variable status.
+// Pretty-printing of variable status.
 std::ostream& operator<<( std::ostream& os,
                           const SPxSolver::VarStatus& status )
 {
@@ -1072,7 +1072,7 @@ std::ostream& operator<<( std::ostream& os,
    return os;
 }
 
-/// Pretty-printing of solver status.
+// Pretty-printing of solver status.
 std::ostream& operator<<( std::ostream& os,
                           const SPxSolver::Status& status )
 {
@@ -1136,7 +1136,7 @@ std::ostream& operator<<( std::ostream& os,
    return os;
 }
 
-/// Pretty-printing of algorithm.
+// Pretty-printing of algorithm.
 std::ostream& operator<<( std::ostream& os,
                           const SPxSolver::Type& status )
 {
@@ -1155,7 +1155,7 @@ std::ostream& operator<<( std::ostream& os,
    return os;
 }
 
-/// Pretty-printing of representation.
+// Pretty-printing of representation.
 std::ostream& operator<<( std::ostream& os,
                           const SPxSolver::Representation& status )
 {
