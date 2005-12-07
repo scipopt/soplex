@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: exercise_LP_changes.cpp,v 1.7 2005/11/22 11:51:09 bzfhille Exp $"
+#pragma ident "@(#) $Id: exercise_LP_changes.cpp,v 1.8 2005/12/07 18:03:24 bzfhille Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -74,11 +74,11 @@ public:
    */
    //@{
    static const SLUFactor::UpdateType update = SLUFactor::FOREST_TOMLIN;
-   static const Real delta = DEFAULT_BND_VIOL;
-   static const Real timelimit = -1.0;
-   static const Real epsilon = DEFAULT_EPS_ZERO;
-   static const Real epsilon_factor = DEFAULT_EPS_FACTOR;
-   static const Real epsilon_update = DEFAULT_EPS_UPDATE;
+   static const Real delta;
+   static const Real timelimit;
+   static const Real epsilon;
+   static const Real epsilon_factor;
+   static const Real epsilon_update;
    static const int verbose = 1;
    static const int precision = 12;
    //@}
@@ -126,11 +126,11 @@ public:
 // Define static members of "TestSolver".
 //
 const SLUFactor::UpdateType TestSolver::update;
-const Real TestSolver::delta;
-const Real TestSolver::timelimit;
-const Real TestSolver::epsilon;
-const Real TestSolver::epsilon_factor;
-const Real TestSolver::epsilon_update;
+const Real TestSolver::delta = DEFAULT_BND_VIOL;
+const Real TestSolver::timelimit = -1.0;
+const Real TestSolver::epsilon = DEFAULT_EPS_ZERO;
+const Real TestSolver::epsilon_factor = DEFAULT_EPS_FACTOR;
+const Real TestSolver::epsilon_update = DEFAULT_EPS_UPDATE;
 const int TestSolver::verbose;
 const int TestSolver::precision;
 
@@ -148,7 +148,7 @@ class ChangeExerciser
       Precision used in (relative) equality checks for differing but logically 
       equivalent LP solutions.
    */
-   static const Real epsilon_solution_equal = 1e-9;
+   static const Real epsilon_solution_equal;
 
 public:
 
@@ -246,7 +246,7 @@ private:
 //
 // Define static members of "ChangeExerciser".
 //
-const Real ChangeExerciser::epsilon_solution_equal;
+const Real ChangeExerciser::epsilon_solution_equal = 1e-9;
 
 
 //------------------------------------------------------------------------

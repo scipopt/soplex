@@ -20,15 +20,15 @@
 // ============================================================================
 //
 // File          : gzstream.C
-// Revision      : $Revision: 1.7 $
-// Revision_date : $Date: 2005/10/28 17:25:34 $
+// Revision      : $Revision: 1.8 $
+// Revision_date : $Date: 2005/12/07 18:03:25 $
 // Author(s)     : Deepak Bandyopadhyay, Lutz Kettner
 // 
 // Standard streambuf implementation following Nicolai Josuttis, "The 
 // Standard C++ Library".
 // ============================================================================
 
-#include <gzstream.h>
+#include "gzstream.h"
 #include <iostream>
 #include <string.h>  // for memcpy
 
