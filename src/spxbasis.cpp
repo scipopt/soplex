@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.54 2005/12/05 10:36:30 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.55 2005/12/07 17:31:12 bzftuchs Exp $"
 
 //#define DEBUGGING 1
 
@@ -676,6 +676,7 @@ SPxBasis::SPxBasis()
    , maxUpdates (200) 
    , nonzeroFactor(10.0)
    , fillFactor(5.0)
+   , iterCount (0)
    , nzCount (1)
    , minStab(0.0)
    , thestatus (NO_PROBLEM)
