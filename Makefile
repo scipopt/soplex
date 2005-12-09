@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.65 2005/11/17 13:00:41 bzfhille Exp $
+# $Id: Makefile,v 1.66 2005/12/09 10:14:56 bzfhille Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -8,7 +8,7 @@
 #*                                                                           *
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-.PHONY:		depend clean distclean lint doc lib check
+.PHONY:		depend clean distclean lint doc lib check all
 
 ARCH            :=      $(shell uname -m | \
                         sed \
@@ -154,6 +154,8 @@ doc:
 lib:		$(LIBFILE)
 
 change_exerciser: $(CHANGEBINFILE)
+
+all:		$(BINFILE) $(CHANGEBINFILE)
 
 check:		$(BINFILE)
 		cd check; ./check.sh $(TEST).test ../$(BINFILE) '$(ALGO)' $(LIMIT)
