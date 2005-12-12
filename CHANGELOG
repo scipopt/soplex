@@ -6,8 +6,9 @@
 - Fixed a bug in SSVector where zero vectors were not handled properly.
   Rewrote major parts of ssvector.cpp to avoid pointer arithmetic.
 
-- Added the spxout class to redirect output depending on the error level.
-
+- Added the spxout class to redirect output depending on the error level, 
+  provided all messages with a unique code for finding it with grep.
+  
 - Improvement of the LPF and MPS readers.
 
 - Fixed a bug in example.cpp which resulted in ignoring the
