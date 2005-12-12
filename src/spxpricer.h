@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxpricer.h,v 1.14 2005/11/08 19:56:52 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxpricer.h,v 1.15 2005/12/12 19:20:00 bzforlow Exp $"
 
 
 /**@file  spxpricer.h
@@ -30,8 +30,6 @@
 
 namespace soplex
 {
-
-/**@todo document the member variables of derived classes of SPxPricer */
 
 /**@brief   Abstract pricer base class.
    @ingroup Algo
