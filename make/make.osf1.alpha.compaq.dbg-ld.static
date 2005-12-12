@@ -1,7 +1,7 @@
-#--- $Id: make.osf1.alpha.compaq.dbg-ld.static,v 1.1 2005/07/15 16:26:55 bzfpfend Exp $
+#--- $Id: make.osf1.alpha.compaq.dbg-ld.static,v 1.2 2005/12/12 16:15:28 bzfhille Exp $
 CXX	=	cxx
 CPPFLAGS=	-Isrc -I/usr/local/include -DWITH_LONG_DOUBLE -DWITH_ZLIB
-CXXFLAGS=	-O0 -w0 -std strict_ansi -ptr $(OBJDIR)/cxx_repository \
+CXXFLAGS=	-O0 -w0 -std strict_ansi -distinguish_nested_enums -ptr $(OBJDIR)/cxx_repository \
 		-gall -verbose -check -trapuv \
 		-msg_disable basclsnondto,boolexprconst,constrlitnondep 
 REPOSIT	=	$(OBJDIR)/cxx_repository/*.o
