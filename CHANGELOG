@@ -11,16 +11,23 @@
 - Improvement of the LPF and MPS readers.
 
 - Fixed a bug in example.cpp which resulted in ignoring the
-  Update type switch.
+  update type switch.
 
 - Dropped all unused functions from the SLinSolver interface.
 
-- methods rhs(), lhs(), upper(), lower(), maxObj() of SPxLP
-  that returned a non const reference renamed in *_w and 
+- Methods obj(), rhs(), lhs(), upper(), lower(), maxObj() of SPxLP
+  that returned a non const reference renamed to *_w and 
   made protected. Use changeXXX() methods outside the class.
 
-- methods nofCols(), nofRows(), nofNZEs() deleted.
-  use nCols(), nRows(), nNzos().
+- Methods nofCols(), nofRows(), nofNZEs() deleted.
+  Use nCols(), nRows(), nNzos() instead.
+
+- Methods obj(), rhs(), lhs(), upper(), lower(), maxObj() of LPColSet 
+  and LPRowSet that returned a non const reference renamed to *_w.
+
+- Renamed LPColSet::obj() to maxObj(), removed SPxLP::obj().
+
+- Renamed SPxDefaultPR to SPxDantzigPR.
 
 10.Apr 2002 Release 1.2.1
 
