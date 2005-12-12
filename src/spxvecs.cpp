@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvecs.cpp,v 1.27 2005/08/09 19:32:13 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxvecs.cpp,v 1.28 2005/12/12 19:43:16 bzforlow Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -253,9 +253,9 @@ void SPxSolver::computeFrhs2(
 
             if (colfb[i] != coufb[i])
             {
-               MSG_ERROR( spxout << "ESVECS04 Frhs2: " << stat << " " 
-                                 << colfb[i] << " " << coufb[i]
-                                 << " shouldn't be" << std::endl; )
+               MSG_WARNING( spxout << "WSVECS04 Frhs2: " << stat << " " 
+                                   << colfb[i] << " " << coufb[i]
+                                   << " shouldn't be" << std::endl; )
             }
             //assert(colfb[i] == coufb[i]);
             x = colfb[i];
