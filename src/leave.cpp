@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.44 2005/11/21 13:57:09 bzfhille Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.45 2005/12/12 19:41:37 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -520,10 +520,13 @@ bool SPxSolver::leave(int leaveIdx)
       tmp.clear();
       coSolve(tmp, unitVecs[leaveIdx]);
       tmp -= theCoPvec->delta();
-      if (tmp.length() > delta())
-         MSG_WARNING( spxout << "WLEAVE60 iteration=" << basis().iteration() 
-                             << ": coPvec.delta error = " << tmp.length() 
-                             << std::endl; )
+      if (tmp.length() > delta()) {
+         // This happens very frequently and does usually not hurt, so print
+         // these warnings only with verbose level VERBOSE2 and higher.
+         MSG_VERBOSE2( spxout << "WLEAVE60 iteration=" << basis().iteration() 
+                              << ": coPvec.delta error = " << tmp.length() 
+                              << std::endl; )
+      }
    }
 #endif  // ENABLE_ADDITIONAL_CHECKS
 
@@ -629,8 +632,11 @@ bool SPxSolver::leave(int leaveIdx)
             SSVector tmp(dim(), epsilon());
             SPxBasis::solve(tmp, newVector);
             tmp -= fVec().delta();
-            if (tmp.length() > delta())
-               MSG_WARNING( spxout << "WLEAVE62\t(" << tmp.length() << ")\n"; )
+            if (tmp.length() > delta()) {
+               // This happens very frequently and does usually not hurt, so print
+               // these warnings only with verbose level VERBOSE2 and higher.
+               MSG_VERBOSE2( spxout << "WLEAVE62\t(" << tmp.length() << ")\n"; )
+            }
          }
 #endif  // ENABLE_ADDITIONAL_CHECKS
 
@@ -763,11 +769,13 @@ bool SPxSolver::leave(int leaveIdx)
          tmp -= fRhs();
          if (tmp.length() > delta())
          {
-            MSG_WARNING( spxout << "WLEAVE64\t" << basis().iteration()
+            // This happens very frequently and does usually not hurt, so print
+            // these warnings only with verbose level VERBOSE2 and higher.
+            MSG_VERBOSE2( spxout << "WLEAVE64\t" << basis().iteration()
                          << ": fVec error = " << tmp.length() << std::endl; )
             SPxBasis::solve(tmp, fRhs());
             tmp -= fVec();
-            MSG_WARNING( spxout << "WLEAVE65\t(" << tmp.length() << ")\n"; )
+            MSG_VERBOSE2( spxout << "WLEAVE65\t(" << tmp.length() << ")\n"; )
          }
       }
 #endif  // ENABLE_ADDITIONAL_CHECKS
