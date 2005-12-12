@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: exercise_LP_changes.cpp,v 1.8 2005/12/07 18:03:24 bzfhille Exp $"
+#pragma ident "@(#) $Id: exercise_LP_changes.cpp,v 1.9 2005/12/12 16:09:57 bzfhille Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -79,7 +79,7 @@ public:
    static const Real epsilon;
    static const Real epsilon_factor;
    static const Real epsilon_update;
-   static const int verbose = 1;
+   static const int verbose = SPxOut::ERROR;
    static const int precision = 12;
    //@}
 
@@ -110,6 +110,7 @@ public:
       Param::setEpsilon( epsilon );
       Param::setEpsilonFactorization( epsilon_factor );
       Param::setEpsilonUpdate( epsilon_update );
+      Param::setVerbose( verbose );
 
       setPricer( &_pricer );
       setTester( &_ratiotester );
@@ -246,7 +247,7 @@ private:
 //
 // Define static members of "ChangeExerciser".
 //
-const Real ChangeExerciser::epsilon_solution_equal = 1e-9;
+const Real ChangeExerciser::epsilon_solution_equal = 1e-6;
 
 
 //------------------------------------------------------------------------
@@ -826,15 +827,15 @@ void ChangeExerciser::test_change_lower()
    Vector solution(work_ptr->nCols(), val);
    work_ptr->getPrimal(solution);
 
-   for(int col_idx = 0; col_idx != work_ptr->nCols(); ++col_idx){
-      Real lower = work_ptr->lower(col_idx);
-      
-      // slack is positive
-      if(solution[col_idx] > lower){
-         // get ID
+   for (int col_idx = 0; col_idx != work_ptr->nCols(); ++col_idx)
+   {
+      if ( work_ptr->lower( col_idx ) < solution[col_idx] )
+      {
+         const Real new_lower = std::min< Real >( solution[col_idx], work_ptr->upper( col_idx) );
+
          const SPxColId& col_ID = work_ptr->cId( col_idx );
-         work_ptr->changeLower(col_ID, solution[col_idx]);
-         _assert( "lower value changed", work_ptr->lower( col_idx ) == solution[col_idx] );
+         work_ptr->changeLower( col_ID, new_lower );
+         _assert( "lower value changed", EQ( work_ptr->lower( col_idx ), new_lower ) );
       }
    }
 
@@ -870,15 +871,15 @@ void ChangeExerciser::test_change_upper()
    Vector solution(work_ptr->nCols(), val);
    work_ptr->getPrimal(solution);
 
-   for(int col_idx = 0; col_idx != work_ptr->nCols(); ++col_idx){
-      Real upper = work_ptr->upper(col_idx);
+   for(int col_idx = 0; col_idx != work_ptr->nCols(); ++col_idx)
+   {
+      if( work_ptr->upper( col_idx ) > solution[col_idx] ) 
+      {
+         const Real new_upper = std::max< Real >( solution[col_idx], work_ptr->lower( col_idx ) );
       
-      // slack is bigger than 0
-      if(upper > solution[col_idx]){
-         // get ID
          const SPxColId& col_ID = work_ptr->cId( col_idx );
-         work_ptr->changeUpper(col_ID, solution[col_idx]);
-         _assert( "upper value changed", work_ptr->upper( col_idx ) == solution[col_idx] );
+         work_ptr->changeUpper( col_ID, new_upper );
+         _assert( "upper value changed", EQ( work_ptr->upper( col_idx ), new_upper ) );
       }
    }
 
@@ -913,22 +914,24 @@ void ChangeExerciser::test_change_bounds()
    Vector solution(work_ptr->nCols(), val);
    work_ptr->getPrimal(solution);
 
-   for(int col_idx = 0; col_idx != work_ptr->nCols(); ++col_idx){
+   for (int col_idx = 0; col_idx != work_ptr->nCols(); ++col_idx)
+   {
       Real upper = work_ptr->upper(col_idx);
       Real lower = work_ptr->lower(col_idx);
   
       // slack is bigger than 0
       if(upper > solution[col_idx])
-         upper = solution[col_idx];
+         upper = std::max< Real >( solution[col_idx], work_ptr->lower( col_idx ) );
       
       if(solution[col_idx] > lower)
-         lower = solution[col_idx];
+         lower = std::min< Real >( solution[col_idx], work_ptr->upper( col_idx) );
       
       // get ID
       const SPxColId& col_ID = work_ptr->cId( col_idx );
-      work_ptr->changeBounds(col_ID, lower, upper);
-      _assert( "upper bound changed", work_ptr->upper( col_idx ) == upper );
-      _assert( "lower bound changed", work_ptr->lower( col_idx ) == lower );
+      work_ptr->changeBounds( col_ID, lower, upper );
+
+      _assert( "upper bound changed", EQ( work_ptr->upper( col_idx ), upper ) );
+      _assert( "lower bound changed", EQ( work_ptr->lower( col_idx ), lower ) );
    }
 
    work_ptr->solve();
@@ -1063,29 +1066,48 @@ void ChangeExerciser::test_change_range()
    Real original_obj = work_ptr->objValue();    
 
    // First test: change range by vector
-   Vector rhs = work_ptr->rhs();
-   Vector lhs = work_ptr->lhs();
+   Real* val = new Real[ work_ptr->nCols() ];
+
+   Vector solution( work_ptr->nCols(), val );
+   work_ptr->getPrimal( solution );
+
+   Vector new_rhs = work_ptr->rhs();
+   Vector new_lhs = work_ptr->lhs();
+
    for (int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx) 
    {
-      rhs[ row_idx ] *= 2.0;
-      lhs[ row_idx ] *= 2.0;
+      const Real row_prod = solution * (work_ptr->rowVector( row_idx ) );
+
+      new_rhs[ row_idx ] = std::max< Real >( work_ptr->lhs( row_idx ), row_prod );
+      new_lhs[ row_idx ] = std::min< Real >( work_ptr->rhs( row_idx ), row_prod );
    }
-   work_ptr->changeRange( lhs, rhs );
+   work_ptr->changeRange( new_lhs, new_rhs );
+
+   for (int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx) 
+   {
+      _assert( "range changed by vector: lhs", EQ( new_lhs[ row_idx ], work_ptr->lhs( row_idx ) ) );
+      _assert( "range changed by vector: rhs", EQ( new_rhs[ row_idx ], work_ptr->rhs( row_idx ) ) );
+   }
    
    work_ptr->solve();
-   _assert_EQrel( "range changed by vector", 2.0 * original_obj, work_ptr->objValue() );
-   
-   delete work_ptr; work_ptr=0;
+   _assert_EQrel( "range changed by vector: objective", original_obj, work_ptr->objValue() );
+  
+   delete[] val; val = 0;
+   delete work_ptr; work_ptr = 0;
 
+#if 0
    // Second test: change range by indices
    work_ptr = _prepare_Solver();
    work_ptr->solve();
    original_obj = work_ptr->objValue();
 
+   Vector rhs = work_ptr->rhs();
+   Vector lhs = work_ptr->lhs();
+
    for (int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx) 
    {
-      const Real newl = -1.0 * rhs[row_idx];
-      const Real newr = -1.0 * lhs[row_idx]; 
+      const Real newl = 0.5 * lhs[ row_idx ];
+      const Real newr = 2.0 * rhs[ row_idx ];
 
       work_ptr->changeRange( work_ptr->rId( row_idx ), newl, newr );
       _assert( "lhs range value changed", work_ptr->lhs( row_idx ) == newl );
@@ -1096,36 +1118,37 @@ void ChangeExerciser::test_change_range()
    // reverse the change
    for (int row_idx=0; row_idx < work_ptr->nRows(); ++row_idx)
    {
-      const Real newl = -1.0 * rhs[row_idx];
-      const Real newr = -1.0 * lhs[row_idx]; 
+      const Real newl = lhs[ row_idx ];
+      const Real newr = rhs[ row_idx ];
 
       work_ptr->changeRange( work_ptr->rId( row_idx ), newl, newr );
       _assert( "lhs range value changed", work_ptr->lhs( row_idx ) == newl );
       _assert( "rhs range value changed", work_ptr->rhs( row_idx ) == newr );
    }
-
    work_ptr->solve();
-   _assert_EQrel( "range changed", original_obj, work_ptr->objValue() );
+
+   _assert_EQrel( "range changed and restored", original_obj, work_ptr->objValue() );
 
    delete work_ptr; work_ptr = 0;
+#endif
 
    // Third test: set both range values to solution*rowVector
    work_ptr = _prepare_Solver();
    work_ptr->solve();
    original_obj = work_ptr->objValue();
    
-   Real* val = new Real[ work_ptr->nCols() ];
-   Vector solution( work_ptr->nCols(), val );
-   work_ptr->getPrimal( solution );
+   val = new Real[ work_ptr->nCols() ];
+   Vector solution3( work_ptr->nCols(), val );
+   work_ptr->getPrimal( solution3 );
    
    for(int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx)
    {
       const SPxRowId& row_ID = work_ptr->rId( row_idx );
-      Real row_prod = solution * (work_ptr->rowVector( row_idx ) );
+      Real row_prod = solution3 * (work_ptr->rowVector( row_idx ) );
       work_ptr->changeRange( row_ID, row_prod, row_prod );
    }
    work_ptr->solve();
-   _assert_EQrel( "range changed", original_obj, work_ptr->objValue() );
+   _assert_EQrel( "range changed to optimal bounds", original_obj, work_ptr->objValue() );
 
    delete[] val; val = 0;
    delete work_ptr; work_ptr=0;
@@ -1210,10 +1233,16 @@ void ChangeExerciser::test_change_row()
       // Exchange rows and solve.
       work_ptr->changeRow( first_idx, s_row );
       work_ptr->changeRow( second_idx, f_row ); 
-      work_ptr->solve();
 
-      _assert_EQrel( "rows exchanged pairwise", original_obj, work_ptr->objValue() );
+      if ( pair_idx % 10 == 0 )
+      {
+         work_ptr->solve();
+         _assert_EQrel( "rows exchanged pairwise", original_obj, work_ptr->objValue() );
+      }
    }
+
+   work_ptr->solve();
+   _assert_EQrel( "final rows exchanged pairwise", original_obj, work_ptr->objValue() );
 
    delete work_ptr; work_ptr = 0;
 }
@@ -1293,10 +1322,16 @@ void ChangeExerciser::test_change_col()
 
       work_ptr->changeCol( first_idx, s_col );
       work_ptr->changeCol( second_idx, f_col );
-      work_ptr->solve();
 
-      _assert_EQrel( "cols changed by exchanging columns", original_obj, work_ptr->objValue() );
+      if ( pair_idx % 10 == 0 )
+      {
+         work_ptr->solve();
+         _assert_EQrel( "cols changed by exchanging columns", original_obj, work_ptr->objValue() );
+      }
    }
+
+   work_ptr->solve();
+   _assert_EQrel( "final cols changed by exchanging columns", original_obj, work_ptr->objValue() );
 
    delete work_ptr; work_ptr = 0;
 }
@@ -1349,10 +1384,16 @@ void ChangeExerciser::test_change_element()
       Real new_first_rhs = work_ptr->rhs(second_idx);
       work_ptr->changeRhs( second_idx, work_ptr->rhs(first_idx) );
       work_ptr->changeRhs( first_idx, new_first_rhs );
-      
-      work_ptr->solve();
-      _assert_EQrel( "elements changed", original_obj, work_ptr->objValue() );
+
+      if ( pair_idx % 10 == 0 )
+      {
+         work_ptr->solve();
+         _assert_EQrel( "elements changed", original_obj, work_ptr->objValue() );
+      }
    }
+
+   work_ptr->solve();
+   _assert_EQrel( "final elements changed", original_obj, work_ptr->objValue() );
 
    delete work_ptr; work_ptr = 0;
 }
