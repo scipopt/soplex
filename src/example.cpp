@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.78 2005/12/12 16:30:10 bzforlow Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.79 2005/12/12 19:17:57 bzforlow Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -28,7 +28,7 @@
 
 #include "timer.h"
 #include "spxpricer.h"
-#include "spxdefaultpr.h"
+#include "spxdantzigpr.h"
 #include "spxparmultpr.h"
 #include "spxdevexpr.h"
 #include "spxhybridpr.h"
@@ -398,7 +398,7 @@ int main(int argc, const char* const argv[])
    case 0 : 
       /*FALLTHROUGH*/
    default :
-      pricer = new SPxDefaultPR;
+      pricer = new SPxDantzigPR;
       break;
    }
    work.setPricer(pricer);

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultpr.cpp,v 1.16 2005/07/26 17:03:33 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxdantzigpr.cpp,v 1.1 2005/12/12 19:16:58 bzforlow Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -21,12 +21,12 @@
 // #define EQ_PREF 1000 
 
 #include "spxdefines.h"
-#include "spxdefaultpr.h"
+#include "spxdantzigpr.h"
 
 namespace soplex
 {
 
-int SPxDefaultPR::selectLeave()
+int SPxDantzigPR::selectLeave()
 {
    assert(thesolver != 0);
 
@@ -53,7 +53,7 @@ int SPxDefaultPR::selectLeave()
    return n;
 }
 
-SPxId SPxDefaultPR::selectEnter()
+SPxId SPxDantzigPR::selectEnter()
 {
    assert(thesolver != 0);
 

@@ -13,10 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultpr.h,v 1.13 2005/11/01 21:27:04 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxdantzigpr.h,v 1.1 2005/12/12 19:16:58 bzforlow Exp $"
 
-/**@file  spxdefaultpr.h
- * @brief Default pricer.
+/**@file  spxdantzig.h
+ * @brief Dantzig pricer.
  */
 #ifndef _SPXDEFAULTPR_H_
 #define _SPXDEFAULTPR_H_
@@ -28,18 +28,16 @@
 namespace soplex
 {
 
-/**@brief   Default pricer.
+/**@brief   Dantzig pricer.
    @ingroup Algo
 
-   Class SPxDefaultPR is an implementation class of an SPxPricer implementing
+   Class SPxDantzigPR is an implementation class of an SPxPricer implementing
    Dantzig's default pricing strategy, i.e., maximal/minimal reduced cost or
    maximally violated constraint.
 
    See SPxPricer for a class documentation.
-
-   @todo This should be renamed to something like Danzig or Textbook pricing.
 */
-class SPxDefaultPR : public SPxPricer
+class SPxDantzigPR : public SPxPricer
 {
 public:
 
@@ -47,11 +45,11 @@ public:
    /**@name Constructors / destructors */
    //@{
    /// default constructor
-   SPxDefaultPR() 
-      : SPxPricer("Danzig")
+   SPxDantzigPR() 
+      : SPxPricer("Dantzig")
    {}   
    /// destructor
-   virtual ~SPxDefaultPR()
+   virtual ~SPxDantzigPR()
    {}
    //@}
 
