@@ -44,7 +44,7 @@ public:
 };
 
 
-};
+}
 
 
 #endif
