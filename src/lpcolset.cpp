@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcolset.cpp,v 1.13 2005/09/16 12:42:31 bzfhille Exp $"
+#pragma ident "@(#) $Id: lpcolset.cpp,v 1.14 2005/12/12 19:18:14 bzforlow Exp $"
 
 #include <assert.h>
 
@@ -57,9 +57,9 @@ void LPColSet::add(const LPColSet& p_set)
 
    for (int j = 0; i < num(); ++i, ++j)
    {
-      low [i] = p_set.lower(j);
-      up [i] = p_set.upper(j);
-      object[i] = p_set.obj(j);
+      low [i]   = p_set.lower(j);
+      up [i]    = p_set.upper(j);
+      object[i] = p_set.maxObj(j);
    }
 }
 
