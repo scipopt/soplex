@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.90 2005/12/12 19:20:08 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.91 2005/12/12 19:42:56 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -487,11 +487,13 @@ SPxSolver::Status SPxSolver::solve()
          if( LT( val, lhs( row ), delta() ) ||
              GT( val, rhs( row ), delta() ) )
          {
-            MSG_WARNING( spxout << "WSOLVE88 Warning! Constraint " << row
-                                << " is violated by solution" << std::endl
-                                << "   lhs:" << lhs( row )
-                                << " <= val:" << val
-                                << " <= rhs:" << rhs( row ) << std::endl; )
+            // Minor rhs violations happen frequently, so print these
+            // warnings only with verbose level VERBOSE2 and higher.
+            MSG_VERBOSE2( spxout << "WSOLVE88 Warning! Constraint " << row
+                                 << " is violated by solution" << std::endl
+                                 << "   lhs:" << lhs( row )
+                                 << " <= val:" << val
+                                 << " <= rhs:" << rhs( row ) << std::endl; )
 
             if( type() == LEAVE && isRowBasic( row ) )
             {
@@ -515,11 +517,13 @@ SPxSolver::Status SPxSolver::solve()
          if( LT( sol[col], lower( col ), delta() ) ||
              GT( sol[col], upper( col ), delta() ) )
          {
-            MSG_WARNING( spxout << "WSOLVE91 Warning! Bound for column " << col
-                                << " is violated by solution" << std::endl
-                                << "   lower:" << lower( col )
-                                << " <= val:" << sol[col]
-                                << " <= upper:" << upper( col ) << std::endl; )
+            // Minor bound violations happen frequently, so print these
+            // warnings only with verbose level VERBOSE2 and higher.
+            MSG_VERBOSE2( spxout << "WSOLVE91 Warning! Bound for column " << col
+                                 << " is violated by solution" << std::endl
+                                 << "   lower:" << lower( col )
+                                 << " <= val:" << sol[col]
+                                 << " <= upper:" << upper( col ) << std::endl; )
 
             if( type() == LEAVE && isColBasic( col ) )
             {
