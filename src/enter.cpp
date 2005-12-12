@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.34 2005/08/18 16:14:28 bzfhille Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.35 2005/12/12 19:41:01 bzforlow Exp $"
 
 // #define DEBUGGING 1
 
@@ -819,9 +819,12 @@ bool SPxSolver::enter(SPxId& enterId)
       tmp = reinterpret_cast<DVector&>(theFvec->delta());
       multBaseWith(tmp);
       tmp -= *enterVec;
-      if (tmp.length() > delta())
-         MSG_ERROR( spxout << "EENTER09 fVec updated error = " 
-                           << tmp.length() << std::endl; )
+      if (tmp.length() > delta()) {
+         // This happens frequently and does usually not hurt, so print these
+         // warnings only with verbose level VERBOSE2 and higher.
+         MSG_VERBOSE2( spxout << "WENTER09 fVec updated error = " 
+                              << tmp.length() << std::endl; )
+      }
    }
 #endif  // ENABLE_ADDITIONAL_CHECKS
 
