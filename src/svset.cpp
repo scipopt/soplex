@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.cpp,v 1.22 2005/09/16 12:42:39 bzfhille Exp $"
+#pragma ident "@(#) $Id: svset.cpp,v 1.23 2005/12/12 09:02:50 bzfhille Exp $"
 
 #include <assert.h>
 
@@ -27,7 +27,7 @@ namespace soplex
 void SVSet::ensureMem(int n)
 {
    if (memSize() + n > memMax())
-      memRemax(memSize() + n);
+      memRemax( int( factor * memMax() ) );
 }
 
 void SVSet::add(const SVector svec[], int n)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.76 2005/11/29 12:09:07 bzfhille Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.77 2005/12/12 09:02:50 bzfhille Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -534,6 +534,8 @@ int main(int argc, const char* const argv[])
    MSG_VERBOSE3( spxout << "IEXAMP22 loading LP file " << filename << std::endl; )
    Param::setVerbose( verbose );
 
+   timer.start();
+
    if (!work.readFile(filename, &rownames, &colnames))
    {
       MSG_ERROR( spxout << "EEXAMP23 error while reading file \"" 
@@ -542,13 +544,17 @@ int main(int argc, const char* const argv[])
    }
    assert(work.isConsistent());
 
+   timer.stop();
+
    Param::setVerbose( SPxOut::VERBOSE3 );
    MSG_VERBOSE3( spxout << "IEXAMP24 LP has " 
                         << work.nRows() << " rows "
                         << work.nCols() << " columns " 
                         << work.nNzos() << " nonzeros"
                         << std::endl; )
+   MSG_VERBOSE3( spxout << "IEXAMP41 LP reading time: " << timer.userTime() << std::endl; )
    Param::setVerbose( verbose );
+   timer.reset();
 
    // Should we read a basis ?
    if (read_basis)
