@@ -61,8 +61,10 @@ fi
 # This command is supposed to do the job, but only removes .da files while
 # GCC >3.4 uses .gcda files
 # $LCOV --zerocounters --directory $OBJ_DIR
+cd ..
 echo Removing .gcda files
 rm -f $OBJ_DIR/*.gcda
+cd lcov
 
 # Compile soplex with LCOV support and create coverage data by running the test suite.
 cd ..
