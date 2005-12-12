@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxout.h,v 1.7 2005/11/09 13:53:50 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxout.h,v 1.8 2005/12/12 19:22:21 bzforlow Exp $"
 
 /**@file  spxout.h
  * @brief Wrapper for different output streams and verbosity levels.
@@ -181,16 +181,17 @@ private:
 };
 
    // ---------------------------------------------------------
-   //    manipulators
+   //    Manipulators
    // ---------------------------------------------------------
 
 
    //-------------------------------------------
    /**@name Verbosity manipulator
-       This implementation is done similar to the one for setw(), setprecision(),
-       etc. in the standard file iomanip. For instance, the non-menber function
-       \ref verb() "verb(v)" returns a struct 
-       struct_Severity which contains only the verbosity level. Calling 
+       Manipulators are implemented in a similar way as done for @c setw(), 
+       @c setprecision(), etc. in the standard library file iomanip. For 
+       instance, the non-member function \ref verb() "verb(v)" returns a 
+       struct struct_Severity which contains only the verbosity level. 
+       Calling 
        @code
             SPxOut spxout;
             spxout << verb( SPxOut::ERROR ) << "This is an error!" << std::endl;
@@ -222,8 +223,8 @@ private:
    //--------------------------------------------------------
    /**@name Standard manipulators and output of other types */
    //@{
-   /// Passes standard manipulators without arguments, like @c std::endl, 
-   /// @c std::flush, or @c std::ios::right, to the current stream.
+   /// Passes standard manipulators without arguments, like @c std::endl
+   /// or @c std::ios::right to the current stream.
    inline SPxOut&
    operator<< ( SPxOut&       _spxout, 
                 std::ostream& (*manip)( std::ostream& ) )
@@ -234,9 +235,9 @@ private:
    }
 
    /// Passes everything else to the current stream. This includes 
-   /// basic types (char, char*, long, int,...) as well as structs which
-   /// correspond to manipulators with arguments, such as the struct _Setw 
-   /// for the setw() manipulator.
+   /// basic types (@c char, @c char*, @c long, @c int,...) as well as 
+   /// structs corresponding to manipulators with arguments, such as 
+   /// the struct _Setw for the @c setw() manipulator.
    template< typename T >
    inline SPxOut&
    operator<< ( SPxOut& _spxout, const T&  v )
@@ -248,7 +249,7 @@ private:
    //@}
 
    // ---------------------------------------------------------
-   //    declare global SPxOut instance
+   //    Declare a global SPxOut instance
    // ---------------------------------------------------------
 
    //-----------------------------------
@@ -258,7 +259,7 @@ private:
    extern SPxOut spxout;
    //@}
 
-}      // namespace soplex
+}  // namespace soplex
 
 
 #endif // _SPXOUT_H_

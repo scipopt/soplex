@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.h,v 1.25 2005/10/28 17:25:34 bzforlow Exp $"
+#pragma ident "@(#) $Id: lprowset.h,v 1.26 2005/12/12 19:22:21 bzforlow Exp $"
 
 /**@file  lprowset.h
  * @brief Set of LP columns.
@@ -44,7 +44,6 @@ namespace soplex
    concept of keys. For the concept of renumbering LPRows within an
    LPRowSet after removal of some LPRows see DataSet.
    
-//   @see        \ref soplex::DataSet "DataSet", \ref soplex::DataKey "DataKey"
    @see        DataSet, DataKey
 */
 class LPRowSet : protected SVSet
@@ -80,97 +79,86 @@ public:
    {
       return SVSet::num();
    }
-
    /// returns the maximum number of LPRows that fit.
    int max() const
    {
       return SVSet::max();
    }
-
    /// returns the vector of lhs values.
    const Vector& lhs() const
    {
       return left;
    }
    /// returns the vector of lhs values.
-   Vector& lhs()
+   Vector& lhs_w()
    {
       return left;
    }
-
    /// returns the lhs of the \p i 'th LPRow.
    Real lhs(int i) const
    {
       return left[i];
    }
    /// returns the lhs of the \p i 'th LPRow.
-   Real& lhs(int i)
+   Real& lhs_w(int i)
    {
       return left[i];
    }
-
    /// returns the lhs of the LPRow with DataKey \p k in LPRowSet.
    Real lhs(const DataKey& k) const
    {
       return left[number(k)];
    }
    /// returns the lhs of the LPRow with DataKey \p k in LPRowSet.
-   Real& lhs(const DataKey& k)
+   Real& lhs_w(const DataKey& k)
    {
       return left[number(k)];
    }
-
    /// returns the vector of rhs values.
    const Vector& rhs() const
    {
       return right;
    }
    /// returns the vector of rhs values (writeable).
-   Vector& rhs()
+   Vector& rhs_w()
    {
       return right;
    }
-
    /// returns the rhs of the \p i 'th LPRow.
    Real rhs(int i) const
    {
       return right[i];
    }
    /// returns the rhs of the \p i 'th LPRow (writeable).
-   Real& rhs(int i)
+   Real& rhs_w(int i)
    {
       return right[i];
    }
-
    /// returns the rhs of the LPRow with DataKey \p k in LPRowSet.
    Real rhs(const DataKey& k) const
    {
       return right[number(k)];
    }
    /// returns the rhs of the LPRow with DataKey \p k in LPRowSet (writeable).
-   Real& rhs(const DataKey& k)
+   Real& rhs_w(const DataKey& k)
    {
       return right[number(k)];
    }
-
    /// returns a writable rowVector of the \p i 'th LPRow.
    SVector& rowVector_w(int i)
    {
       return operator[](i);
    }
-
    /// returns the rowVector of the \p i 'th LPRow.
    const SVector& rowVector(int i) const
    {
       return operator[](i);
    }
-
    /// returns a writable rowVector of the LPRow with DataKey \p k.
    SVector& rowVector_w(const DataKey& k)
    {
       return operator[](k);
    }
-
    /// returns the rowVector of the LPRow with DataKey \p k.
    const SVector& rowVector(const DataKey& k) const
    {

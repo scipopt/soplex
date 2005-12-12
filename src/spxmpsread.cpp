@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.35 2005/08/09 19:32:12 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.36 2005/12/12 19:22:21 bzforlow Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.
@@ -344,10 +344,10 @@ static void readRhs(
 
             // LE or EQ
             if (rset.rhs(idx) < infinity)
-               rset.rhs(idx) = val;
+               rset.rhs_w(idx) = val;
             // GE or EQ
             if (rset.lhs(idx) > -infinity)
-               rset.lhs(idx) = val;
+               rset.lhs_w(idx) = val;
          }
          if (mps.field5() != 0)
          {
@@ -359,10 +359,10 @@ static void readRhs(
                
                // LE or EQ
                if (rset.rhs(idx) < infinity)
-                  rset.rhs(idx) = val;
+                  rset.rhs_w(idx) = val;
                // GE or EQ
                if (rset.lhs(idx) > -infinity)
-                  rset.lhs(idx) = val;
+                  rset.lhs_w(idx) = val;
             }
          }
       }
@@ -425,22 +425,22 @@ static void readRanges(
 
             // EQ
             if (  (rset.lhs(idx) > -infinity) 
-               && (rset.rhs(idx) <  infinity))
+               && (rset.rhs_w(idx) <  infinity))
             {
                assert(rset.lhs(idx) == rset.rhs(idx));
 
                if (val >= 0)
-                  rset.rhs(idx) += val;
+                  rset.rhs_w(idx) += val;
                else
-                  rset.lhs(idx) += val;
+                  rset.lhs_w(idx) += val;
             }
             else
             {
                // GE 
                if (rset.lhs(idx) > -infinity)
-                  rset.rhs(idx)  = rset.lhs(idx) + fabs(val);
+                  rset.rhs_w(idx)  = rset.lhs(idx) + fabs(val);
                else // LE
-                  rset.lhs(idx)  = rset.rhs(idx) - fabs(val);
+                  rset.lhs_w(idx)  = rset.rhs(idx) - fabs(val);
             }
          }
          if (mps.field5() != 0)
@@ -458,17 +458,17 @@ static void readRanges(
                   assert(rset.lhs(idx) == rset.rhs(idx));
 
                   if (val >= 0)
-                     rset.rhs(idx) += val;
+                     rset.rhs_w(idx) += val;
                   else
-                     rset.lhs(idx) += val;
+                     rset.lhs_w(idx) += val;
                }
                else
                {
                   // GE 
                   if (rset.lhs(idx) > -infinity)
-                     rset.rhs(idx)  = rset.lhs(idx) + fabs(val);
+                     rset.rhs_w(idx)  = rset.lhs(idx) + fabs(val);
                   else // LE
-                     rset.lhs(idx)  = rset.rhs(idx) - fabs(val);
+                     rset.lhs_w(idx)  = rset.rhs(idx) - fabs(val);
                }
             }
          }
@@ -535,14 +535,14 @@ static void readBounds(
             switch(*mps.field1())
             {
             case 'L':
-               cset.lower(idx) = val;
+               cset.lower_w(idx) = val;
                
                // ILOG extension (Integer Lower Bound)
                if ((intvars != 0) && (mps.field1()[1] == 'I'))
                   intvars->addIdx(idx);
                break;
             case 'U':
-               cset.upper(idx) = val;
+               cset.upper_w(idx) = val;
                
                // ILOG extension (Integer Upper Bound)
                if ((intvars != 0) && (mps.field1()[1] == 'I'))
@@ -551,24 +551,24 @@ static void readBounds(
             case 'F':
                if (mps.field1()[1] == 'X')
                {
-                  cset.lower(idx) = val;
-                  cset.upper(idx) = val;
+                  cset.lower_w(idx) = val;
+                  cset.upper_w(idx) = val;
                }
                else
                {
-                  cset.lower(idx) = -infinity;
-                  cset.upper(idx) = infinity;
+                  cset.lower_w(idx) = -infinity;
+                  cset.upper_w(idx) = infinity;
                }
                break;
             case 'M':
-               cset.lower(idx) = -infinity;
+               cset.lower_w(idx) = -infinity;
                break;
             case 'P':
-               cset.upper(idx) = infinity;
+               cset.upper_w(idx) = infinity;
                break;
             case 'B' : // Ilog extension (Binary)
-               cset.lower(idx) = 0.0;
-               cset.upper(idx) = 1.0;
+               cset.lower_w(idx) = 0.0;
+               cset.upper_w(idx) = 1.0;
                
                if (intvars != 0)
                   intvars->addIdx(idx);

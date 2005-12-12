@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcolset.h,v 1.21 2005/10/28 17:25:34 bzforlow Exp $"
+#pragma ident "@(#) $Id: lpcolset.h,v 1.22 2005/12/12 19:22:21 bzforlow Exp $"
 
 /**@file  lpcolset.h
  * @brief Set of LP columns.
@@ -88,104 +88,95 @@ public:
    }
 
    ///
-   const Vector& obj() const
+   const Vector& maxObj() const
    {
       return object;
    }
-   /// returns vector of objective values.
-   Vector& obj()
+   /// returns vector of objective values w.r.t. maximization.
+   Vector& maxObj_w()
    {
       return object;
    }
-
    ///
-   Real obj(int i) const
+   Real maxObj(int i) const
    {
       return object[i];
    }
-   /// returns objective value of \p i 'th LPCol in LPColSet.
-   Real& obj(int i)
+   /// returns objective value (w.r.t. maximization) of \p i 'th LPCol in LPColSet.
+   Real& maxObj_w(int i)
    {
       return object[i];
    }
-
    ///
-   Real obj(const DataKey& k) const
+   Real maxObj(const DataKey& k) const
    {
       return object[number(k)];
    }
-   /// returns objective value of LPCol with DataKey \p k in LPColSet.
-   Real& obj(const DataKey& k)
+   /// returns objective value (w.r.t. maximization) of LPCol with DataKey \p k in LPColSet.
+   Real& maxObj_w(const DataKey& k)
    {
       return object[number(k)];
    }
-
    ///
    const Vector& lower() const
    {
       return low;
    }
    /// returns vector of lower bound values.
-   Vector& lower()
+   Vector& lower_w()
    {
       return low;
    }
-
    ///
    Real lower(int i) const
    {
       return low[i];
    }
    /// returns lower bound of \p i 'th LPCol in LPColSet.
-   Real& lower(int i)
+   Real& lower_w(int i)
    {
       return low[i];
    }
-
    ///
    Real lower(const DataKey& k) const
    {
       return low[number(k)];
    }
    /// returns lower bound of LPCol with DataKey \p k in LPColSet.
-   Real& lower(const DataKey& k)
+   Real& lower_w(const DataKey& k)
    {
       return low[number(k)];
    }
-
    ///
    const Vector& upper() const
    {
       return up;
    }
    /// returns vector of upper bound values.
-   Vector& upper()
+   Vector& upper_w()
    {
       return up;
    }
-
    ///
    Real upper(int i) const
    {
       return up[i];
    }
    /// returns upper bound of \p i 'th LPCol in LPColSet.
-   Real& upper(int i)
+   Real& upper_w(int i)
    {
       return up[i];
    }
-
    ///
    Real upper(const DataKey& k) const
    {
       return up[number(k)];
    }
    /// returns upper bound of LPCol with DataKey \p k in LPColSet.
-   Real& upper(const DataKey& k)
+   Real& upper_w(const DataKey& k)
    {
       return up[number(k)];
    }
-
    ///
    SVector& colVector_w(int i)
    {
@@ -196,13 +187,11 @@ public:
    {
       return operator[](i);
    }
-
    /// returns writeable colVector of LPCol with DataKey \p k in LPColSet.
    SVector& colVector_w(const DataKey& k)
    {
       return operator[](k);
    }
-
    /// returns colVector of LPCol with DataKey \p k in LPColSet.
    const SVector& colVector(const DataKey& k) const
    {

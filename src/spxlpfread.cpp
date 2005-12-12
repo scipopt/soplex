@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.51 2005/08/09 19:32:12 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.52 2005/12/12 19:22:21 bzforlow Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -451,7 +451,8 @@ bool SPxLP::readLPF(
          {
             // store objective vector            
             for(int j = vec.size() - 1; j >= 0; --j)
-               cset.obj(vec.index(j)) = vec.value(j);
+               cset.maxObj_w(vec.index(j)) = vec.value(j);
+            // multiplication with -1 for minimization is done below
             vec.clear();
             have_value = true;
             val        = 1.0;
@@ -706,20 +707,20 @@ bool SPxLP::readLPF(
             if (sense)
             {
                if (sense == '<') 
-                  cset.lower(colidx) = val;
+                  cset.lower_w(colidx) = val;
                else if (sense == '>')
-                  cset.upper(colidx) = val;
+                  cset.upper_w(colidx) = val;
                else
                {
                   assert(sense == '=');
-                  cset.lower(colidx) = val;
-                  cset.upper(colidx) = val;
+                  cset.lower_w(colidx) = val;
+                  cset.upper_w(colidx) = val;
                }
             }
             if (isFree(pos))
             {
-               cset.lower(colidx) = -infinity;
-               cset.upper(colidx) =  infinity;
+               cset.lower_w(colidx) = -infinity;
+               cset.upper_w(colidx) =  infinity;
                other              = true;
                pos += 4;  // set position after the word "free"
             }
@@ -734,14 +735,14 @@ bool SPxLP::readLPF(
                val = isInfinity(pos) ? readInfinity(pos) : readValue(pos);
 
                if (sense == '<') 
-                  cset.upper(colidx) = val;
+                  cset.upper_w(colidx) = val;
                else if (sense == '>')
-                  cset.lower(colidx) = val;
+                  cset.lower_w(colidx) = val;
                else
                {
                   assert(sense == '=');
-                  cset.lower(colidx) = val;
-                  cset.upper(colidx) = val;
+                  cset.lower_w(colidx) = val;
+                  cset.upper_w(colidx) = val;
                }
             }
             /* Do we have only a single column name in the input line?
@@ -762,8 +763,8 @@ bool SPxLP::readLPF(
             {
                if (section == BINARYS)
                {
-                  cset.lower(colidx) = 0.0;
-                  cset.upper(colidx) = 1.0;
+                  cset.lower_w(colidx) = 0.0;
+                  cset.upper_w(colidx) = 1.0;
                }
                if (p_intvars != 0)
                   p_intvars->addIdx(colidx);

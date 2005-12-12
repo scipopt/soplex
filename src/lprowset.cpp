@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.cpp,v 1.23 2005/09/16 12:42:32 bzfhille Exp $"
+#pragma ident "@(#) $Id: lprowset.cpp,v 1.24 2005/12/12 19:22:21 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -141,16 +141,16 @@ void LPRowSet::setType(
    switch (p_type)
    {
    case LPRow::LESS_EQUAL:
-      lhs(i) = -infinity;
+      lhs_w(i) = -infinity;
       break;
    case LPRow::EQUAL:
-      if (lhs(i) > -infinity)
-         rhs(i) = lhs(i);
+      if (lhs_w(i) > -infinity)
+         rhs_w(i) = lhs(i);
       else
-         lhs(i) = rhs(i);
+         lhs_w(i) = rhs(i);
       break;
    case LPRow::GREATER_EQUAL:
-      rhs(i) = infinity;
+      rhs_w(i) = infinity;
       break;
    case LPRow::RANGE :
       MSG_ERROR( spxout << "EROWST01 RANGE not supported in LPRowSet::setType()" 

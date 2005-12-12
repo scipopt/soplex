@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.cpp,v 1.25 2005/09/28 12:24:36 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxlp.cpp,v 1.26 2005/12/12 19:22:21 bzforlow Exp $"
 
 #include <stdio.h>
 
@@ -104,7 +104,7 @@ void SPxLP::getCols(int start, int end, LPColSet& p_set) const
 void SPxLP::getObj(Vector& p_obj) const
 {
    METHOD( "SPxLP::getObj()" );
-   p_obj = LPColSet::obj();
+   p_obj = LPColSet::maxObj();
    if (spxSense() == MINIMIZE)
       p_obj *= -1.0;
 }
@@ -147,7 +147,7 @@ void SPxLP::doAddCol(const LPCol& col)
    const SVector& vec = col.colVector();
 
    LPColSet::add(col);
-   LPColSet::obj(idx) *= thesense;
+   LPColSet::maxObj_w(idx) *= thesense;
 
    // now insert nonzeros to row file also
    for (int j = vec.size() - 1; j >= 0; --j)
@@ -348,7 +348,7 @@ void SPxLP::doAddCols(const LPColSet& p_set)
    // insert new elements to row file
    for (i = oldColNumber; i < nCols(); ++i)
    {
-      LPColSet::obj(i) *= thesense;
+      LPColSet::maxObj_w(i) *= thesense;
       const SVector& vec = colVector(i);
       for (j = vec.size() - 1; j >= 0; --j)
       {
@@ -604,15 +604,15 @@ void SPxLP::changeObj(const Vector& newObj)
 {
    METHOD( "SPxLP::changeObj()" );
    assert(maxObj().dim() == newObj.dim());
-   LPColSet::obj() = newObj;
-   LPColSet::obj() *= Real(spxSense());
+   LPColSet::maxObj_w() = newObj;
+   LPColSet::maxObj_w() *= Real(spxSense());
    assert(isConsistent());
 }
 
 void SPxLP::changeObj(int i, Real newVal)
 {
    METHOD( "SPxLP::changeObj()" );
-   LPColSet::obj(i) = Real(spxSense()) * newVal;
+   LPColSet::maxObj_w(i) = Real(spxSense()) * newVal;
    assert(isConsistent());
 }
 
@@ -620,14 +620,14 @@ void SPxLP::changeLower(const Vector& newLower)
 {
    METHOD( "SPxLP::changeLower()" );
    assert(lower().dim() == newLower.dim());
-   LPColSet::lower() = newLower;
+   LPColSet::lower_w() = newLower;
    assert(isConsistent());
 }
 
 void SPxLP::changeLower(int i, Real newLower)
 {
    METHOD( "SPxLP::changeLower()" );
-   LPColSet::lower(i) = newLower;
+   LPColSet::lower_w(i) = newLower;
    assert(isConsistent());
 }
 
@@ -635,14 +635,14 @@ void SPxLP::changeUpper(const Vector& newUpper)
 {
    METHOD( "SPxLP::changeUpper()" );
    assert(upper().dim() == newUpper.dim());
-   LPColSet::upper() = newUpper;
+   LPColSet::upper_w() = newUpper;
    assert(isConsistent());
 }
 
 void SPxLP::changeUpper(int i, Real newUpper)
 {
    METHOD( "SPxLP::changeUpper()" );
-   LPColSet::upper(i) = newUpper;
+   LPColSet::upper_w(i) = newUpper;
    assert(isConsistent());
 }
 
@@ -650,7 +650,7 @@ void SPxLP::changeLhs(const Vector& newLhs)
 {
    METHOD( "SPxLP::changeLhs()" );
    assert(lhs().dim() == newLhs.dim());
-   LPRowSet::lhs() = newLhs;
+   LPRowSet::lhs_w() = newLhs;
    assert(isConsistent());
 }
 
@@ -673,7 +673,7 @@ void SPxLP::changeBounds(int i, Real newLower, Real newUpper)
 void SPxLP::changeLhs(int i, Real newLhs)
 {
    METHOD( "SPxLP::changeLhs()" );
-   LPRowSet::lhs(i) = newLhs;
+   LPRowSet::lhs_w(i) = newLhs;
    assert(isConsistent());
 }
 
@@ -681,14 +681,14 @@ void SPxLP::changeRhs(const Vector& newRhs)
 {
    METHOD( "SPxLP::changeRhs()" );
    assert(rhs().dim() == newRhs.dim());
-   LPRowSet::rhs() = newRhs;
+   LPRowSet::rhs_w() = newRhs;
    assert(isConsistent());
 }
 
 void SPxLP::changeRhs(int i, Real newRhs)
 {
    METHOD( "SPxLP::changeRhs()" );
-   LPRowSet::rhs(i) = newRhs;
+   LPRowSet::rhs_w(i) = newRhs;
    assert(isConsistent());
 }
 

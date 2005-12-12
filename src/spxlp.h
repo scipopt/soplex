@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.37 2005/11/08 19:56:51 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.38 2005/12/12 19:22:21 bzforlow Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -246,20 +246,20 @@ public:
    */
    const Vector& maxObj() const
    {
-      return LPColSet::obj();
+      return LPColSet::maxObj();
    }
 
    /// returns objective value of column \p i for maximization problem.
    Real maxObj(int i) const
    {
-      return LPColSet::obj(i);
+      return LPColSet::maxObj(i);
    }
 
    /// returns objective value of column with identifier \p id 
    /// for maximization problem.
    Real maxObj(const SPxColId& id) const
    {
-      return LPColSet::obj(id);
+      return LPColSet::maxObj(id);
    }
 
    /// returns upper bound vector.
@@ -618,7 +618,7 @@ public:
    virtual void changeSense(SPxSense sns)
    {
       if (sns != thesense)
-         LPColSet::obj() *= -1.0;
+         LPColSet::maxObj_w() *= -1.0;
       thesense = sns;
    }
    //@}
@@ -640,27 +640,27 @@ protected:
    /// returns right hand side of row \p i.
    Real& rhs_w(int i)
    {
-      return LPRowSet::rhs(i);
+      return LPRowSet::rhs_w(i);
    }
    /// returns left hand side of row \p i.
    Real& lhs_w(int i)
    {
-      return LPRowSet::lhs(i);
+      return LPRowSet::lhs_w(i);
    }
    /// returns objective value of column \p i for maximization problem.
    Real& maxObj_w(int i)
    {
-      return LPColSet::obj(i);
+      return LPColSet::maxObj_w(i);
    }
    /// returns upper bound of column \p i.
    Real& upper_w(int i)
    {
-      return LPColSet::upper(i);
+      return LPColSet::upper_w(i);
    }
    /// returns lower bound of column \p i.
    Real& lower_w(int i)
    {
-      return LPColSet::lower(i);
+      return LPColSet::lower_w(i);
    }
    //@}
 
@@ -721,15 +721,6 @@ private:
    void doAddCol (const LPCol& col);
    ///
    void doAddCols(const LPColSet& set);
-
-   /// This should return spxSense() * maxObj;
-   /// returns objective vector.
-   const Vector& obj() const;
-#if 0
-   {
-      return LPColSet::obj();
-   }
-#endif
    //@}
 
 public:
@@ -758,9 +749,7 @@ public:
       }
       return *this;
    }
-
    //@}
-
 };
 
 
