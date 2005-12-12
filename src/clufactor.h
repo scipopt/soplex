@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clufactor.h,v 1.24 2005/11/09 13:53:49 bzforlow Exp $"
+#pragma ident "@(#) $Id: clufactor.h,v 1.25 2005/12/12 19:17:28 bzforlow Exp $"
 
 /**@file  clufactor.h
  * @brief Implementation of sparse LU factorization.
@@ -34,7 +34,7 @@ namespace soplex
  * @ingroup Algo
  * 
  * This class implements a sparse LU factorization with either
- * FOREST-TOMLIN or ETA updates.
+ * FOREST-TOMLIN or ETA updates, using dynamic Markowitz pivoting.
  */
 class CLUFactor
 {
@@ -84,21 +84,21 @@ protected:
       int*    s_mark;
       Real*   s_max;        ///< maximum absolute value per row (or -1) 
       int*    s_cact;       ///< lengths of columns of active submatrix 
-      int     stage;           
+      int     stage;        ///<
       Pring   pivots;       ///< ring of selected pivot rows 
       Pring*  pivot_col;    ///< column index handlers for Real linked list 
       Pring*  pivot_colNZ;  ///< lists for columns to number of nonzeros      
       Pring*  pivot_row;    ///< row index handlers for Real linked list 
       Pring*  pivot_rowNZ;  ///< lists for rows to number of nonzeros
 
-      Temp();
-      ~Temp();
-      void init(int p_dim);
-      void clear();
+      Temp();               ///< constructor
+      ~Temp();              ///< destructor
+      void init(int p_dim); ///<
+      void clear();         ///<
 
    private:
-      Temp( const Temp& );
-      Temp& operator= ( const Temp& );
+      Temp( const Temp& );             ///< blocked copy constructor
+      Temp& operator= ( const Temp& ); ///< blocked assignment operator
    };
 
    /// Data structures for saving the row and column permutations.
@@ -212,7 +212,14 @@ private:
    //@}
 
    //----------------------------------------
-   /**@name Solving */
+   /**@name Solving 
+      These helper methods are used during the factorization process. 
+      The solve*-methods solve lower and upper triangular systems from
+      the left or from the right, respectively  The methods with '2' in
+      the end solve two systems at the same time.  The methods with
+      "Eps" in the end consider elements smaller then the passed epsilon
+      as zero.
+   */
    //@{
    // From solve.cpp
    ///

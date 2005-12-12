@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.36 2005/11/09 13:53:49 bzforlow Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.37 2005/12/12 19:17:48 bzforlow Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -296,7 +296,7 @@ public:
       }
    }
 
-   /// ???
+   /// remove \p n elements given by \p keys and \p perm.
    void remove(const DataKey *keys, int n, int* perm)
    {
       assert(perm != 0);
@@ -312,7 +312,7 @@ public:
       DataArray<int> perm(num());
       remove(keys, n, perm.get_ptr());
    }
-   /// ???
+   /// remove \p n elements given by \p nums and \p perm.
    void remove(const int *nums, int n, int* perm)
    {
       assert(perm != 0);
@@ -416,7 +416,7 @@ public:
           : theitem[k.idx].info;
    }
 
-   /**@todo Please check, whether this is correctly implemented! */
+   /**@todo Please check whether this is correctly implemented! */
    /// returns the number of element \p item in DataSet or -1, 
    /// if it doesn't exist.
    int number(const DATA* item) const

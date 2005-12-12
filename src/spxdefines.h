@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.29 2005/11/18 11:50:41 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.30 2005/12/12 19:19:05 bzforlow Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
@@ -167,12 +167,15 @@ typedef long double Real;
 #ifndef DEFAULT_EPS_ZERO
 #define DEFAULT_EPS_ZERO   1e-28
 #endif
+/// epsilon for factorization
 #ifndef DEFAULT_EPS_FACTOR
 #define DEFAULT_EPS_FACTOR 1e-30
 #endif
+/// epsilon for factorization update
 #ifndef DEFAULT_EPS_UPDATE
 #define DEFAULT_EPS_UPDATE 1e-26
 #endif
+///
 #define DEFAULT_INFINITY   1e100
 
 #else
@@ -209,17 +212,21 @@ private:
    //------------------------------------
    /**@name Data */
    //@{
-   ///
+   /// default allowed additive zero: 1.0 + EPS_ZERO == 1.0
    static Real s_epsilon;
-   ///
+   /// epsilon for factorization
    static Real s_epsilon_factorization;
-   ///
+   /// epsilon for factorization update
    static Real s_epsilon_update;
    /// verbosity level
    static int  s_verbose;
    //@}
 
 public:
+
+   //------------------------------------
+   /**@name Access / modification */
+   //@{
    ///
    inline static Real epsilon() 
    {
@@ -248,6 +255,7 @@ public:
    }
    /// sets verbosity level
    static void setVerbose(int p_verbose);
+   //@}
 };
 
 /// returns max(|a|,|b|)
@@ -300,7 +308,7 @@ inline bool GE(Real a, Real b, Real eps = Param::epsilon())
    return (a - b) > -eps;
 }
 
-/// returns \c true iff |a|  eps
+/// returns \c true iff |a| <= eps
 inline bool isZero(Real a, Real eps = Param::epsilon())
 {
    return fabs(a) <= eps;

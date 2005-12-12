@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.h,v 1.18 2005/11/09 13:53:50 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.h,v 1.19 2005/12/12 19:19:12 bzforlow Exp $"
 
 /**@file  spxdevexpr.h
  * @brief Devex pricer.
@@ -57,13 +57,13 @@ private:
    //-------------------------------------
    /**@name Private helpers */
    //@{
-   ///
+   /// internal implementation of SPxPricer::selectLeave()
    int selectLeaveX(Real& best, int start = 0, int incr = 1);
-   ///
+   /// internal implementation of SPxPricer::left4()
    void left4X(int n, const SPxId& id, int start, int incr);
-   ///
+   /// internal implementation of SPxPricer::selectEnter()
    SPxId selectEnterX(Real& best, int start1 = 0, int incr1 = 1, int start2 = 0, int incr2 = 1);
-   ///
+   /// internal implementation of SPxPricer::entered4()
    void entered4X(SPxId id, int n, int start1, int incr1, int start2, int incr2);
    //@}
 

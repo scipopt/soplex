@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxparmultpr.h,v 1.13 2005/11/08 19:56:51 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxparmultpr.h,v 1.14 2005/12/12 19:19:28 bzforlow Exp $"
 
 /**@file  spxparmultpr.h
  * @brief Partial multiple pricing.
@@ -64,7 +64,7 @@ private:
    //@}
 
    //-------------------------------------
-   /**@name Data */
+   /**@name Helper data */
    //@{
    ///
    DataArray < SPxParMultPr_Tmp > pricSet;

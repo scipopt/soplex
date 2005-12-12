@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.h,v 1.21 2005/11/01 21:27:04 bzforlow Exp $"
+#pragma ident "@(#) $Id: slufactor.h,v 1.22 2005/12/12 19:18:53 bzforlow Exp $"
 
 /**@file  slufactor.h
  * @brief Implementation of Sparse Linear Solver.
@@ -159,20 +159,20 @@ public:
    //--------------------------------
    /**@name Solve */
    //@{
-   ///
+   /// Solves \f$Ax=b\f$.
    void solveRight (Vector& x, const Vector& b);
-   ///
+   /// Solves \f$Ax=b\f$.
    void solveRight (SSVector& x, const SVector& b);
-   ///
+   /// Solves \f$Ax=b\f$.
    void solveRight4update(SSVector& x, const SVector& b);
-   ///
-   void solve2right4update(SSVector& x, Vector& y, const SVector& b, SSVector& rhs);
-   ///
+   /// Solves \f$Ax=b\f$ and \f$Ay=d\f$.
+   void solve2right4update(SSVector& x, Vector& y, const SVector& b, SSVector& d);
+   /// Solves \f$Ax=b\f$.
    void solveLeft(Vector& x, const Vector& b);
-   ///
+   /// Solves \f$Ax=b\f$.
    void solveLeft(SSVector& x, const SVector& b);
-   ///
-   void solveLeft(SSVector& x, Vector& y, const SVector& rhs1, SSVector& rhs2);
+   /// Solves \f$Ax=b\f$ and \f$Ay=d\f$.
+   void solveLeft(SSVector& x, Vector& y, const SVector& b, SSVector& d);
    ///
    Status change(int idx, const SVector& subst, const SSVector* eta = 0);
    //@}
