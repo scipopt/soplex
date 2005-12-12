@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.45 2005/11/01 15:35:40 bzforlow Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.46 2005/12/12 19:18:40 bzforlow Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -269,8 +269,8 @@ SLUFactor::Status SLUFactor::change(
 {
    METHOD( "SLUFactor::Status()" );
 
-   // BH 2005-08-23: The boolean usetup indicates that an "update
-   // vector" has been set up. I suppose that SSVector forest is this
+   // BH 2005-08-23: The boolean usetup indicates that an "update vector" 
+   // has been set up. I suppose that SSVector forest is this
    // update vector, which is set up by solveRight4update() and
    // solve2right4update() in order to optimize the basis update.
 

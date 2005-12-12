@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.43 2005/12/05 10:36:30 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.44 2005/12/12 19:20:37 bzforlow Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -628,14 +628,12 @@ public:
    void addedRows(int n);
    /// inform SPxBasis that row \p i had been removed.
    void removedRow(int i);
-   /**@todo is this description correct? */
    /// inform SPxBasis that rows in \p perm with negative entry were removed.
    void removedRows(const int perm[]);
    /// inform SPxBasis that \p n new columns had been added.
    void addedCols(int n);
    /// inform SPxBasis that column \p i had been removed.
    void removedCol(int i);
-   /**@todo is this description correct? */
    /// inform SPxBasis that columns in \p perm with negative entry were removed.
    void removedCols(const int perm[]);
    /// inform SPxBasis that a row had been changed.
@@ -650,32 +648,30 @@ public:
    //--------------------------------
    /**@name Miscellaneous */
    //@{
-   /**@todo I am not sure about the described parameters 'vec' and 'upd',
-            which do not appear in the method's signature. */
    /// performs basis update.
    /** Changes the \p i 'th vector of the basis with the vector associated to
        \p id. This includes:
        - updating the factorization, or recomputing it from scratch by
-         calling   \ref soplex::SPxSolver::factorize() "factorize()",
+         calling   \ref soplex::SPxSolver::factorize()   "factorize()",
        - resetting \ref soplex::SPxSolver::lastEntered() "lastEntered()",
-       - resetting \ref soplex::SPxSolver::lastIndex() "lastIndex()",
-       - resetting \ref soplex::SPxSolver::lastLeft() "lastLeft()",
-       - resetting \ref soplex::SPxSolver::lastUpdate() "lastUpdate()",
-       - resetting \ref soplex::SPxSolver::iterations() "iterations()"
+       - resetting \ref soplex::SPxSolver::lastIndex()   "lastIndex()",
+       - resetting \ref soplex::SPxSolver::lastLeft()    "lastLeft()",
+       - resetting \ref soplex::SPxSolver::lastUpdate()  "lastUpdate()",
+       - resetting \ref soplex::SPxSolver::iterations()  "iterations()".
 
-       The basis Descriptor is \em not \em modified, since #factor()
+       The basis descriptor is \em not \em modified, since #factor()
        cannot know about how to set up the status of the involved variables
        correctly.
 
-       A vector \p vec may be passed for a fast ETA update of the LU
+       A vector \p enterVec may be passed for a fast ETA update of the LU
        factorization associated to the basis. It must be initialized with
        the solution vector \f$x\f$ of the right linear system \f$Bx = b\f$
-       with the entering vector as right hand side vetor \f$b\f$, where \f$B\f$
+       with the entering vector as right-hand side vector \f$b\f$, where \f$B\f$
        denotes the basis matrix. This can be computed using method #solve().
-       When using FAST updates, a vector \p upd may be passed for
+       When using FAST updates, a vector \p eta may be passed for
        improved performance. It must be initialized by a call to
-       factor->solveRightUpdate() as described in SLinSolver. What
-       implementation is hidden behind FAST updates, depends on the
+       factor->solveRightUpdate() as described in SLinSolver. The 
+       implementation hidden behind FAST updates depends on the
        SLinSolver implementation class.
     */
    virtual void change(int i, SPxId& id,

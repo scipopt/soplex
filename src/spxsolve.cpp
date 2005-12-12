@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.89 2005/11/30 14:36:42 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.90 2005/12/12 19:20:08 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -588,8 +588,7 @@ void SPxSolver::testVecs()
       {
          if (theCoTest[i] < -delta() && isCoBasic(i))
          {
-            /// @todo Error message "this shalt not be": shalt this be an
-            /// assert? See also below.
+            /// @todo Error message "this shalt not be": shalt this be an assert (also below)?
             MSG_ERROR( spxout << "ESOLVE98 testVecs: theCoTest: this shalt not be!"
                               << std::endl
                               << "  i=" << i 
