@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.26 2005/12/05 10:36:29 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.27 2005/12/12 20:22:50 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -42,7 +42,7 @@ void SPxBasis::reDim()
 
    if (theLP->dim() != matrix.size())
    {
-      MSG_VERBOSE3( spxout << "ICHBAS02 basis redimensioning invalidates factorization" 
+      MSG_INFO3( spxout << "ICHBAS02 basis redimensioning invalidates factorization" 
                            << std::endl; )
 
       matrix.reSize (theLP->dim());
@@ -400,7 +400,7 @@ void SPxBasis::invalidate()
 {
    METHOD( "SPxBasis::invalidate()" );
 
-   MSG_VERBOSE3( spxout << "ICHBAS09 explicit invalidation of factorization" 
+   MSG_INFO3( spxout << "ICHBAS09 explicit invalidation of factorization" 
                         << std::endl; )
 
    factorized    = false;

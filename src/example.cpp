@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.79 2005/12/12 19:17:57 bzforlow Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.80 2005/12/12 20:22:49 bzforlow Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -345,9 +345,9 @@ int main(int argc, const char* const argv[])
    myoutstream.setf( std::ios::scientific | std::ios::showpoint );
    spxout.setStream( SPxOut::ERROR,    myoutstream );
    spxout.setStream( SPxOut::WARNING,  myoutstream );
-   spxout.setStream( SPxOut::VERBOSE1, myoutstream );
-   spxout.setStream( SPxOut::VERBOSE2, myoutstream );
-   spxout.setStream( SPxOut::VERBOSE3, myoutstream );
+   spxout.setStream( SPxOut::INFO1, myoutstream );
+   spxout.setStream( SPxOut::INFO2, myoutstream );
+   spxout.setStream( SPxOut::INFO3, myoutstream );
    spxout.setStream( SPxOut::DEBUG,    myoutstream );
 #endif
 

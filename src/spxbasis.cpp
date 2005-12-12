@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.55 2005/12/07 17:31:12 bzftuchs Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.56 2005/12/12 20:22:49 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -100,7 +100,7 @@ void SPxBasis::loadMatrixVecs()
    assert(theLP != 0);
    assert(theLP->dim() == matrix.size());
 
-   MSG_VERBOSE3( spxout << "IBASIS01 loadMatrixVecs() invalidates factorization" 
+   MSG_INFO3( spxout << "IBASIS01 loadMatrixVecs() invalidates factorization" 
                         << std::endl; )
 
    int i;
@@ -134,7 +134,7 @@ void SPxBasis::loadDesc(const Desc& ds)
    int   i;
    int   j;
 
-   MSG_VERBOSE3( spxout << "IBASIS02 loading of Basis invalidates factorization" 
+   MSG_INFO3( spxout << "IBASIS02 loading of Basis invalidates factorization" 
                         << std::endl; )
 
    lastin      = none;
@@ -224,7 +224,7 @@ void SPxBasis::loadSolver(SLinSolver* p_solver)
 {
    METHOD( "SPxBasis::loadSolver()" );
 
-   MSG_VERBOSE3( spxout << "IBASIS03 loading of Solver invalidates factorization" 
+   MSG_INFO3( spxout << "IBASIS03 loading of Solver invalidates factorization" 
                         << std::endl; )
 
    factor = p_solver;
@@ -440,7 +440,7 @@ void SPxBasis::change(
       // relative fill too high ?
       else if (Real(factor->memory()) > lastFill * Real(lastMem))
       {
-         MSG_VERBOSE3( spxout << "IBASIS04 fill factor triggers refactorization"
+         MSG_INFO3( spxout << "IBASIS04 fill factor triggers refactorization"
                               << " memory= " << factor->memory()
                               << " lastMem= " << lastMem
                               << " lastFill= " << lastFill
@@ -451,7 +451,7 @@ void SPxBasis::change(
       // absolute fill too high ?
       else if (Real(factor->memory()) > nonzeroFactor * Real(nzCount))
       {
-         MSG_VERBOSE3( spxout << "IBASIS05 nonzero factor triggers refactorization"
+         MSG_INFO3( spxout << "IBASIS05 nonzero factor triggers refactorization"
                               << " memory= " << factor->memory()
                               << " nzCount= " << nzCount
                               << " nonzeroFactor= " << nonzeroFactor
@@ -461,7 +461,7 @@ void SPxBasis::change(
       // too many updates ?
       else if (updateCount >= maxUpdates)
       {
-         MSG_VERBOSE3( spxout << "IBASIS06 update count triggers refactorization"
+         MSG_INFO3( spxout << "IBASIS06 update count triggers refactorization"
                               << " updateCount= " << updateCount
                               << " maxUpdates= " << maxUpdates
                               << std::endl; )
@@ -475,7 +475,7 @@ void SPxBasis::change(
 
          if (factor->status() != SLinSolver::OK || factor->stability() < minStab)
          {
-            MSG_VERBOSE3( spxout << "IBASIS07 stability triggers refactorization"
+            MSG_INFO3( spxout << "IBASIS07 stability triggers refactorization"
                                  << " stability= " << factor->stability()
                                  << " minStab= " << minStab
                                  << std::endl; )

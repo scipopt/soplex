@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.35 2005/12/12 19:41:01 bzforlow Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.36 2005/12/12 20:22:49 bzforlow Exp $"
 
 // #define DEBUGGING 1
 
@@ -821,8 +821,8 @@ bool SPxSolver::enter(SPxId& enterId)
       tmp -= *enterVec;
       if (tmp.length() > delta()) {
          // This happens frequently and does usually not hurt, so print these
-         // warnings only with verbose level VERBOSE2 and higher.
-         MSG_VERBOSE2( spxout << "WENTER09 fVec updated error = " 
+         // warnings only with verbose level INFO2 and higher.
+         MSG_INFO2( spxout << "WENTER09 fVec updated error = " 
                               << tmp.length() << std::endl; )
       }
    }
@@ -943,7 +943,7 @@ bool SPxSolver::enter(SPxId& enterId)
 
       if (lastUpdate() > 1)
       {
-         MSG_VERBOSE3( spxout << "IENTER01 factorization triggered in "
+         MSG_INFO3( spxout << "IENTER01 factorization triggered in "
                               << "enter() for feasibility test" << std::endl; )
          factorize();
          return enter(enterId);
@@ -952,7 +952,7 @@ bool SPxSolver::enter(SPxId& enterId)
       SPxId none;
       change(-1, none, 0);
 
-      MSG_VERBOSE3( spxout << "IENTER02 unboundness/infeasiblity found in "
+      MSG_INFO3( spxout << "IENTER02 unboundness/infeasiblity found in "
                            << "enter()" << std::endl; )
 
       if (rep() != COLUMN)

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxintervalsm.cpp,v 1.10 2005/11/08 19:56:51 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxintervalsm.cpp,v 1.11 2005/12/12 20:22:50 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -149,7 +149,7 @@ SPxSimplifier::Result SPxIntervalSM::simplify(SPxLP& lp, Real eps, Real delta)
                row.remove(row.number(i));
                col.remove(j);           
 
-               MSG_VERBOSE3( spxout << "IINTVL01 removed element x=" << x 
+               MSG_INFO3( spxout << "IINTVL01 removed element x=" << x 
                                     << " absbnd= " << absbnd 
                                     << std::endl; )
                nzcnt++;
@@ -185,22 +185,22 @@ SPxSimplifier::Result SPxIntervalSM::simplify(SPxLP& lp, Real eps, Real delta)
    }
    if (nzcnt > 0)
    {
-      MSG_VERBOSE1( spxout << "IINTVL03 SPxIntervalSM:\tremoved " << nzcnt
+      MSG_INFO1( spxout << "IINTVL03 SPxIntervalSM:\tremoved " << nzcnt
                            << " non-zeros" << std::endl; )
    }
    if (lrcnt > 0)
    {
-      MSG_VERBOSE1( spxout << "IINTVL04 SPxIntervalSM:\tcorrected " << lrcnt
+      MSG_INFO1( spxout << "IINTVL04 SPxIntervalSM:\tcorrected " << lrcnt
                             << " LHS/RHS" << std::endl; )
    }
    if (bdcnt > 0)
    {
-      MSG_VERBOSE1( spxout << "IINTVL05 SPxIntervalSM:\tcorrected " << bdcnt
+      MSG_INFO1( spxout << "IINTVL05 SPxIntervalSM:\tcorrected " << bdcnt
                             << " bounds" << std::endl; )
    }
    if (ojcnt > 0)
    {
-      MSG_VERBOSE1( spxout << "IINTVL06 SPxIntervalSM:\tcorrected " << ojcnt
+      MSG_INFO1( spxout << "IINTVL06 SPxIntervalSM:\tcorrected " << ojcnt
                             << " objective function coefficents" << std::endl; )
    }
    assert(lp.isConsistent());

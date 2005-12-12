@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.24 2005/08/09 19:32:11 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxaggregatesm.cpp,v 1.25 2005/12/12 20:22:49 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -237,7 +237,7 @@ SPxSimplifier::Result SPxAggregateSM::simplify(SPxLP& lp, Real /*eps*/, Real /*d
       ++stage;
       if (last)
       {
-         MSG_VERBOSE3( spxout << "IAGGSM01 looping ..." << std::endl; );
+         MSG_INFO3( spxout << "IAGGSM01 looping ..." << std::endl; );
          maxFill = (maxFill + 20) / 2;
       }
       last = num;
@@ -307,7 +307,7 @@ SPxSimplifier::Result SPxAggregateSM::simplify(SPxLP& lp, Real /*eps*/, Real /*d
       assert(lp.isConsistent());
       lp.removeCols (remCol.get_ptr());
       assert(lp.isConsistent());
-      MSG_VERBOSE1( spxout << "IAGGSM02 \tremoved " << num
+      MSG_INFO1( spxout << "IAGGSM02 \tremoved " << num
                            << " row(s) and column(s)" << std::endl; )
    }
 

@@ -13,15 +13,15 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.30 2005/12/12 19:19:05 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.31 2005/12/12 20:22:50 bzforlow Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
  *
  * In optimized code with \c NDEBUG defined, only 
- * \ref soplex::SPxOut::VERBOSE1 "VERBOSE1", 
- * \ref soplex::SPxOut::VERBOSE2 "VERBOSE2", and 
- * \ref soplex::SPxOut::VERBOSE3 "VERBOSE3" are set.
+ * \ref soplex::SPxOut::INFO1 "INFO1", 
+ * \ref soplex::SPxOut::INFO2 "INFO2", and 
+ * \ref soplex::SPxOut::INFO3 "INFO3" are set.
  * If \c NDEBUG is not defined, the code within #TRACE is used.
  * If \c DEBUGGING is defined, the code within 
  * \ref soplex::SPxOut::DEBUG "DEBUG" is also used.
@@ -111,12 +111,12 @@ namespace soplex
 #define MSG_ERROR(x)    { DO_WITH_TMP_VERBOSITY( SPxOut::ERROR,    x ) }
 /// Prints out message \p x if the verbosity level is at least SPxOut::WARNING.
 #define MSG_WARNING(x)  { DO_WITH_TMP_VERBOSITY( SPxOut::WARNING,  x ) }
-/// Prints out message \p x if the verbosity level is at least SPxOut::VERBOSE1.
-#define MSG_VERBOSE1(x) { DO_WITH_TMP_VERBOSITY( SPxOut::VERBOSE1, x ) }
-/// Prints out message \p x if the verbosity level is at least SPxOut::VERBOSE2.
-#define MSG_VERBOSE2(x) { DO_WITH_TMP_VERBOSITY( SPxOut::VERBOSE2, x ) }
-/// Prints out message \p x if the verbosity level is at least SPxOut::VERBOSE3.
-#define MSG_VERBOSE3(x) { DO_WITH_TMP_VERBOSITY( SPxOut::VERBOSE3, x ) }
+/// Prints out message \p x if the verbosity level is at least SPxOut::INFO1.
+#define MSG_INFO1(x)    { DO_WITH_TMP_VERBOSITY( SPxOut::INFO1, x ) }
+/// Prints out message \p x if the verbosity level is at least SPxOut::INFO2.
+#define MSG_INFO2(x)    { DO_WITH_TMP_VERBOSITY( SPxOut::INFO2, x ) }
+/// Prints out message \p x if the verbosity level is at least SPxOut::INFO3.
+#define MSG_INFO3(x)    { DO_WITH_TMP_VERBOSITY( SPxOut::INFO3, x ) }
 
 
 #ifndef NDEBUG

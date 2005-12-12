@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.45 2005/12/12 19:41:37 bzforlow Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.46 2005/12/12 20:22:49 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -522,8 +522,8 @@ bool SPxSolver::leave(int leaveIdx)
       tmp -= theCoPvec->delta();
       if (tmp.length() > delta()) {
          // This happens very frequently and does usually not hurt, so print
-         // these warnings only with verbose level VERBOSE2 and higher.
-         MSG_VERBOSE2( spxout << "WLEAVE60 iteration=" << basis().iteration() 
+         // these warnings only with verbose level INFO2 and higher.
+         MSG_INFO2( spxout << "WLEAVE60 iteration=" << basis().iteration() 
                               << ": coPvec.delta error = " << tmp.length() 
                               << std::endl; )
       }
@@ -587,12 +587,12 @@ bool SPxSolver::leave(int leaveIdx)
          }
          if (lastUpdate() > 1)
          {
-            MSG_VERBOSE3( spxout << "ILEAVE01 factorization triggered in "
+            MSG_INFO3( spxout << "ILEAVE01 factorization triggered in "
                                  << "leave() for feasibility test" << std::endl; )
             factorize();
             return leave(leaveIdx);
          }
-         MSG_VERBOSE3( spxout << "ILEAVE02 unboundness/infeasiblity found "
+         MSG_INFO3( spxout << "ILEAVE02 unboundness/infeasiblity found "
                               << "in leave()" << std::endl; )
 
          if (rep() != COLUMN)
@@ -634,8 +634,8 @@ bool SPxSolver::leave(int leaveIdx)
             tmp -= fVec().delta();
             if (tmp.length() > delta()) {
                // This happens very frequently and does usually not hurt, so print
-               // these warnings only with verbose level VERBOSE2 and higher.
-               MSG_VERBOSE2( spxout << "WLEAVE62\t(" << tmp.length() << ")\n"; )
+               // these warnings only with verbose level INFO2 and higher.
+               MSG_INFO2( spxout << "WLEAVE62\t(" << tmp.length() << ")\n"; )
             }
          }
 #endif  // ENABLE_ADDITIONAL_CHECKS
@@ -770,12 +770,12 @@ bool SPxSolver::leave(int leaveIdx)
          if (tmp.length() > delta())
          {
             // This happens very frequently and does usually not hurt, so print
-            // these warnings only with verbose level VERBOSE2 and higher.
-            MSG_VERBOSE2( spxout << "WLEAVE64\t" << basis().iteration()
+            // these warnings only with verbose level INFO2 and higher.
+            MSG_INFO2( spxout << "WLEAVE64\t" << basis().iteration()
                          << ": fVec error = " << tmp.length() << std::endl; )
             SPxBasis::solve(tmp, fRhs());
             tmp -= fVec();
-            MSG_VERBOSE2( spxout << "WLEAVE65\t(" << tmp.length() << ")\n"; )
+            MSG_INFO2( spxout << "WLEAVE65\t(" << tmp.length() << ")\n"; )
          }
       }
 #endif  // ENABLE_ADDITIONAL_CHECKS

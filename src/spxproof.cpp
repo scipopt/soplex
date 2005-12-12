@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxproof.cpp,v 1.9 2005/08/09 19:32:12 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxproof.cpp,v 1.10 2005/12/12 20:22:50 bzforlow Exp $"
 
 /**@file  spxproof.cpp
  * @brief provable bounds
@@ -110,7 +110,7 @@ Real SPxSolver::provedBound(Vector& dualsol, const Vector& objvec) const
 
    /* add y^Tb */
    scalprod += ytb;
-   MSG_VERBOSE1( spxout << "IPROOF01 proved bound = " << scalprod << std::endl; );
+   MSG_INFO1( spxout << "IPROOF01 proved bound = " << scalprod << std::endl; );
 
    /* depending on the objective sense, choose min or max */
    if( spxSense() == MINIMIZE )

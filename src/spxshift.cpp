@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxshift.cpp,v 1.20 2005/08/09 19:32:13 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxshift.cpp,v 1.21 2005/12/12 20:22:50 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -457,7 +457,7 @@ void SPxSolver::perturbMaxLeave(void)
 void SPxSolver::unShift(void)
 {
    METHOD( "SPxSolver::unShift()" );
-   MSG_VERBOSE3( spxout << "DSHIFT07 = " << "unshifting ..." << std::endl; );
+   MSG_INFO3( spxout << "DSHIFT07 = " << "unshifting ..." << std::endl; );
 
    if (isInitialized())
    {

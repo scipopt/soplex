@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxout.h,v 1.8 2005/12/12 19:22:21 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxout.h,v 1.9 2005/12/12 20:22:50 bzforlow Exp $"
 
 /**@file  spxout.h
  * @brief Wrapper for different output streams and verbosity levels.
@@ -77,9 +77,9 @@ public:
       // If you change this, change the implementation as well.
       ERROR    = 0, 
       WARNING  = 1,
-      VERBOSE1 = 2,
-      VERBOSE2 = 3,
-      VERBOSE3 = 4,
+      INFO1    = 2,
+      INFO2    = 3,
+      INFO3    = 4,
       DEBUG    = 5
    } Verbosity;
 

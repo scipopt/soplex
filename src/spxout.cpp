@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxout.cpp,v 1.1 2005/07/25 15:22:10 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxout.cpp,v 1.2 2005/12/12 20:22:50 bzforlow Exp $"
 
 #include "spxout.h"
 
@@ -25,7 +25,7 @@ namespace soplex
       , m_streams( new std::ostream*[ DEBUG+1 ] )
    {
       m_streams[ ERROR ] = m_streams[ WARNING ] = &std::cerr;
-      for ( int i = VERBOSE1; i <= DEBUG; ++i )
+      for ( int i = INFO1; i <= DEBUG; ++i )
          m_streams[ i ] = &std::cout;
    }
 
