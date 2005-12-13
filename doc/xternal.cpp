@@ -299,16 +299,12 @@
 
    <li> I got an segment violation or a signal 11.
 
-      If all the test instances from Netlib work, but your LP gives
-      this problem, mail your LP in as an gzip'ed MPS of LPF file
-      and we will check.
-
-      If you have this problem also with the test instances, 
-      check your stack space: \c ulimit \c -s will report the actual
-      size in kilobytes. Try a higher value. 
-
-      If this doesn't help, maybe your compiler is broken. Try compiling
-      without optimization. 
+      If all of the test instances from Netlib work, but your LP gives this
+      problem, mail your LP in as an gzip'ed MPS of LPF file and we will
+      check. If you have this problem also with the test instances, check your
+      stack space: \c ulimit \c -s will report the current size in kilobytes.
+      Try a higher value. If this doesn't help, maybe your compiler is broken.
+      Try compiling without optimization. 
    </li>
        
    <li> SoPlex means \em Sequential Simplex. Is there a parallel version
@@ -336,9 +332,9 @@
    <li> How can I make LP generation easier?
    
       You can use \c ZIMPL, available at http://www.zib.de/koch/zimpl/
-      under the ZIB academic license. It takes a (human readable) model file 
-      and a data file as input and generates LPs or MIPs in LP- or
-      MPS-format.
+      under the ZIB academic license. It takes a (human readable) file
+      describing the linear program together with a data file as input and 
+      generates LPs or MIPs in LPF- or MPS-format.
 
    </li>
 
