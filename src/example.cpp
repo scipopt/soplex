@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.81 2005/12/14 16:47:06 bzforlow Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.82 2005/12/14 16:48:01 bzforlow Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -184,7 +184,7 @@ int main(int argc, const char* const argv[])
    " -zzEps    set general zero tolerance to Eps\n\n"
    " -zfEps    set factorization zero tolerance to Eps\n\n"
    " -zuEps    set update zero tolerance to Eps\n\n"
-   " -vLevel   set verbosity Level: from 0 (quiet) to 5 (debug), default 1\n"
+   " -vLevel   set verbosity Level: from 0 (quiet) to 5 (debug), default 2\n"
    " -V        show program version\n"
    " -h        show this help\n"
    "Simplifier:     Scaler:         Starter:     Pricer:        Ratiotester:\n"
