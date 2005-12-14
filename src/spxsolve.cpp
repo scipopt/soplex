@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.92 2005/12/12 20:22:50 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.93 2005/12/14 17:32:40 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -216,7 +216,8 @@ SPxSolver::Status SPxSolver::solve()
                MSG_INFO3( spxout << "ISOLVE76 solve(enter) triggers refactorization" << std::endl; )
 
                // We better refactor to make sure the solution is ok.
-               factorize();
+               if ( lastUpdate() > 0 )
+                  factorize();
 
                // Inna/Tobi: if the factorization was found out to be singular, we have to quit
                if (SPxBasis::status() < SPxBasis::REGULAR)
@@ -347,7 +348,8 @@ SPxSolver::Status SPxSolver::solve()
                MSG_INFO3( spxout << "ISOLVE82 solve(leave) triggers refactorization" << std::endl; )
 
                // We better refactor to make sure the solution is ok.
-               factorize();
+               if ( lastUpdate() > 0 )
+                  factorize();
 
                // Inna/Tobi: if the factorization was found out to be singular, we have to quit
                if (SPxBasis::status() < SPxBasis::REGULAR)
