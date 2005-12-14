@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.cpp,v 1.23 2005/12/12 09:02:50 bzfhille Exp $"
+#pragma ident "@(#) $Id: svset.cpp,v 1.24 2005/12/14 17:01:38 bzfhille Exp $"
 
 #include <assert.h>
 
@@ -27,7 +27,12 @@ namespace soplex
 void SVSet::ensureMem(int n)
 {
    if (memSize() + n > memMax())
-      memRemax( int( factor * memMax() ) );
+   {
+      int newMax = int( memFactor * memMax() );
+      if ( memSize() + n > newMax )
+         newMax  = memSize() + n;
+      memRemax( newMax );
+   }
 }
 
 void SVSet::add(const SVector svec[], int n)
@@ -100,7 +105,13 @@ SVector* SVSet::create(int idxmax)
    }
 
    ensurePSVec(1);
-
+   
+   // We must call ensureMem() before insert() below, since insert() doesn't
+   // know about the pointers into the NZE memory and therefore doesn't update
+   // them if a realloc is necessary.
+   ensureMem( memSize() + idxmax + 1 );
+   assert( memMax() >= memSize() + idxmax + 1 );
+   
    ps = set.create();
    list.append(ps);
    insert(memSize(), idxmax + 1);
@@ -246,6 +257,8 @@ void SVSet::memRemax(int newmax)
    {
       for (DLPSV* ps = list.first(); ps; ps = list.next(ps))
       {
+         // Extract the size and maximum capacity of the SVector, which for some reason is stored
+         // as the first element.
          SVector::Element * info = reinterpret_cast<SVector::Element*>(reinterpret_cast<char*>(ps->mem()) + delta);
          int sz = info->idx;
          int l_max = int( info->val );
