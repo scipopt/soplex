@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.80 2005/12/12 20:22:49 bzforlow Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.81 2005/12/14 16:47:06 bzforlow Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -219,7 +219,7 @@ int main(int argc, const char* const argv[])
    Real                      epsilon        = DEFAULT_EPS_ZERO;
    Real                      epsilon_factor = DEFAULT_EPS_FACTOR;
    Real                      epsilon_update = DEFAULT_EPS_UPDATE;
-   int                       verbose        = 1;
+   int                       verbose        = SPxOut::INFO1;
    bool                      print_solution = false;
    bool                      print_quality  = false;
    bool                      read_basis     = false;
