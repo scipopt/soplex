@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.93 2005/12/14 17:32:40 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.94 2005/12/15 13:56:34 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -27,7 +27,7 @@
 #include "spxstarter.h"
 #include "spxout.h"
 
-#define MAXCYCLES 100
+#define MAXCYCLES 400
 
 namespace soplex
 {
@@ -216,8 +216,9 @@ SPxSolver::Status SPxSolver::solve()
                MSG_INFO3( spxout << "ISOLVE76 solve(enter) triggers refactorization" << std::endl; )
 
                // We better refactor to make sure the solution is ok.
-               if ( lastUpdate() > 0 )
-                  factorize();
+               // BH 2005-12-15: For some reason we must do this even if lastUpdate() == 0,
+               // otherwise something goes wrong, e.g. in instances of the siemens test set.
+               factorize();
 
                // Inna/Tobi: if the factorization was found out to be singular, we have to quit
                if (SPxBasis::status() < SPxBasis::REGULAR)
@@ -348,8 +349,9 @@ SPxSolver::Status SPxSolver::solve()
                MSG_INFO3( spxout << "ISOLVE82 solve(leave) triggers refactorization" << std::endl; )
 
                // We better refactor to make sure the solution is ok.
-               if ( lastUpdate() > 0 )
-                  factorize();
+               // BH 2005-12-15: For some reason we must do this even if lastUpdate() == 0,
+               // otherwise something goes wrong, e.g. in instances of the siemens test set.
+               factorize();
 
                // Inna/Tobi: if the factorization was found out to be singular, we have to quit
                if (SPxBasis::status() < SPxBasis::REGULAR)
