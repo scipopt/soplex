@@ -1,4 +1,4 @@
-# $Id: check.sh,v 1.23 2005/12/12 17:59:31 bzfhille Exp $
+# $Id: check.sh,v 1.24 2005/12/15 16:27:38 bzfhille Exp $
 # Parameters
 # $1 Name of the test, e.g. netlib (needs netlib.test, netlib.solu)
 # $2 Path/Name of the binary, e.g. ../bin/soplex.linux.x86.gnu.opt
@@ -11,6 +11,15 @@ ERRFILE=check.$TSTNAME.$BINNAME.err
 RESFILE=check.$TSTNAME.$BINNAME.res
 date >$OUTFILE
 date >$ERRFILE
+
+# Determine awk program to use.
+AWK=awk
+OSTYPE=`uname -s | tr '[:upper:]' '[:lower:]' | sed -e s/cygwin.*/cygwin/ -e s/irix../irix/`
+
+case $OSTYPE in
+    osf1)  AWK=gawk ;;
+esac
+
 #
 for i in `cat $1`
 do
@@ -61,5 +70,5 @@ do
 done | tee -a $OUTFILE
 date >>$OUTFILE
 date >>$ERRFILE
-gawk -f check.awk $TSTNAME.solu $OUTFILE | tee $RESFILE
+$AWK -f check.awk $TSTNAME.solu $OUTFILE | tee $RESFILE
  
