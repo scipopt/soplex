@@ -13,9 +13,9 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdantzigpr.h,v 1.1 2005/12/12 19:16:58 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxdantzigpr.h,v 1.2 2005/12/18 16:51:21 bzforlow Exp $"
 
-/**@file  spxdantzig.h
+/**@file  spxdantzigpr.h
  * @brief Dantzig pricer.
  */
 #ifndef _SPXDEFAULTPR_H_
