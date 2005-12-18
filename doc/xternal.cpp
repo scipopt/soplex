@@ -91,31 +91,35 @@
 /**@page RUN On which Platforms is SoPlex running
 
    We tested SoPlex to compile with the following compilers:
-<!--   <b>XXX: TO UPDATE!</b>-->
-
    <TABLE>
    <TR><TD>Vendor</TD><TD>Version    </TD><TD>OS                 </TD></TR>
-   <TR><TD>Gnu   </TD><TD>4.0.2      </TD><TD>SuSE 10.0/x86 Linux</TD></TR>
-   <TR><TD>Gnu   </TD><TD>3.4        </TD><TD>Slackware 10.1/x86 Linux</TD></TR>
-<!--
+   <TR><TD>Intel </TD><TD>8.0        </TD><TD>SuSE 10.0/x86 Linux</TD></TR>
+   <TR><TD>Gnu   </TD><TD>4.0        </TD><TD>SuSE 10.0/x86 Linux</TD></TR>
+   <TR><TD>Gnu   </TD><TD>3.4, 4.0   </TD><TD>SuSE 9.0/x86_64 Linux</TD></TR>
+   <TR><TD>Gnu   </TD><TD>3.2        </TD><TD>Slackware 10.1/x86 Linux</TD></TR>
+   <TR><TD>Gnu   </TD><TD>4.0        </TD><TD>PowerPC/MacOS     </TD></TR>
+   <TR><TD>Gnu   </TD><TD>4.0        </TD><TD>Alpha/OSF         </TD></TR>
+   <TR><TD>Sun   </TD><TD>WS6U2 5.3  </TD><TD>Solaris 7         </TD></TR>
    <TR><TD>Gnu   </TD><TD>2.95.1     </TD><TD>Solaris 7         </TD></TR>
-   <TR><TD>Gnu   </TD><TD>2.95.3     </TD><TD>SuSE 7.3/x86 Linux</TD></TR>
-   <TR><TD>Gnu   </TD><TD>2.96       </TD><TD>SuSE 7.1/AXP Linux</TD></TR>
-   <TR><TD>Gnu   </TD><TD>3.0.3      </TD><TD>SuSE 7.3/x86 Linux</TD></TR>
-   <TR><TD>Intel </TD><TD>5.0.1      </TD><TD>SuSE 7.3/x86 Linux</TD></TR>
+<!-- TODO : TO UPDATE!
+   from soplex 1.2.1:
    <TR><TD>Compaq</TD><TD>T6.4-001   </TD><TD>Tru64 5.0         </TD></TR>
    <TR><TD>Compaq</TD><TD>6.3-007    </TD><TD>SuSE 7.1/AXP Linux</TD></TR>
-   <TR><TD>Sun   </TD><TD>WS6U2 5.3  </TD><TD>Solaris 7         </TD></TR>
    <TR><TD>SGI   </TD><TD>7.3.1.1m   </TD><TD>IRIX 6.5          </TD></TR>
    <TR><TD>HP    </TD><TD>A.03.27    </TD><TD>HP-UX 11.00       </TD></TR>
    <TR><TD>IBM   </TD><TD>VisualAge 5</TD><TD>AIX 5.1           </TD></TR>
 -->
    </TABLE>
 
+<!--
+   TODO : TO UPDATE!
+
+   from soplex 1.2.1:
    The CPUs used were Intel Pentium-III/800, Pentium-4/1.7, 
    AMD Athlon/1000, AMD AthlonXP/1800+, 
    Compaq Alpha 21264A/750/8, Compaq Alpha 21264A/833/4,
    UltraSparc-IIi/299, HPPA-8600/550/1, MIPS R8000 and Power4.
+-->
 
    At some time during development, some versions of the following 
    Compilers had internal erros, crashed or generated invalid code:
@@ -270,7 +274,7 @@
 
    <li> Is there a Windows version ?
 
-<!--      <b>XXX: TO UPDATE!</b>-->
+<!-- TODO : TO UPDATE! -->
       The code is tested to compile under some version of Visual C++.
       We do \b not provide any Makefiles or project files for VC++.
    </li>
@@ -342,7 +346,7 @@
 
    <li> If I add rows or columns to an LP, are they checked for redundancy ?
 
-<!--      <b> XXX: TO UPDATE! How about preprocessing?</b>-->
+<!-- TODO : TO UPDATE! -->
       No. You have to do it yourself.
    </li>
 
@@ -357,7 +361,7 @@
    a good idea to try the \c -r flag to choose a row-wise representation
    of the basis.
 
-<!--   <b>XXX: TO UPDATE!</b>-->
+<!-- TODO : TO UPDATE! -->
    Setting \c -z to a smaller value like 1e-18 or 1e-20 might improve
    the quality of the solution, but may also slow down the
    program. Setting \c -z to bigger values may speed up the algorithm,
