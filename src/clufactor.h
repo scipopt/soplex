@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clufactor.h,v 1.25 2005/12/12 19:17:28 bzforlow Exp $"
+#pragma ident "@(#) $Id: clufactor.h,v 1.26 2005/12/18 16:51:35 bzforlow Exp $"
 
 /**@file  clufactor.h
  * @brief Implementation of sparse LU factorization.
@@ -57,18 +57,18 @@ public:
    class Pring
    {
    public:
-      Pring* next;
-      Pring* prev;
-      int    idx;            ///< index of pivot row
-      int    pos;            ///< position of pivot column in row 
-      int    mkwtz;          ///< markowitz number of pivot 
+      Pring* next;                ///<
+      Pring* prev;                ///<
+      int    idx;                 ///< index of pivot row
+      int    pos;                 ///< position of pivot column in row 
+      int    mkwtz;               ///< markowitz number of pivot 
 
-      Pring() : next(0), prev(0) 
+      Pring() : next(0), prev(0)  ///< constructor
       {}      
 
    private:
-      Pring(const Pring&);
-      Pring& operator= (const Pring&);
+      Pring(const Pring&);             ///< blocked copy constructor
+      Pring& operator= (const Pring&); ///< blocked assignment operator
    };
    //@}
 
@@ -81,10 +81,10 @@ protected:
    class Temp 
    {
    public: 
-      int*    s_mark;
+      int*    s_mark;       ///< marker
       Real*   s_max;        ///< maximum absolute value per row (or -1) 
       int*    s_cact;       ///< lengths of columns of active submatrix 
-      int     stage;        ///<
+      int     stage;        ///< stage of the structure
       Pring   pivots;       ///< ring of selected pivot rows 
       Pring*  pivot_col;    ///< column index handlers for Real linked list 
       Pring*  pivot_colNZ;  ///< lists for columns to number of nonzeros      
@@ -93,8 +93,8 @@ protected:
 
       Temp();               ///< constructor
       ~Temp();              ///< destructor
-      void init(int p_dim); ///<
-      void clear();         ///<
+      void init(int p_dim); ///< initialization
+      void clear();         ///< clears the structure
 
    private:
       Temp( const Temp& );             ///< blocked copy constructor
