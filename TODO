@@ -1,6 +1,8 @@
-$Id: TODO,v 1.78 2005/12/12 19:22:56 bzforlow Exp $
+$Id: TODO,v 1.79 2005/12/18 17:23:00 bzforlow Exp $
 
-- einige errors/warnings umwidmen, siehe Zettel von Benjamin
+- Wieso ist das SPxLP protected from LPColSet und LPRowSet abgeleitet und
+  spiegelt dann mehrere von deren Methoden, um sie wieder public zugreifbar zu
+  machen? Betrifft lower(), upper(), usw.
 
 - factor.cpp: "??? mkwtz originally was long, maybe to avoid an overflow in this instruction?"
    -> später auf long ändern
