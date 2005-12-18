@@ -90,11 +90,13 @@
 //-----------------------------------------------------------------------------
 /**@page RUN On which Platforms is SoPlex running
 
-   We tested SoPlex to compile with the following Compilers:
-   <b>XXX: TO UPDATE!</b>
+   We tested SoPlex to compile with the following compilers:
+<!--   <b>XXX: TO UPDATE!</b>-->
 
    <TABLE>
-   <TR><TD>Vendor</TD><TD>Version    </TD><TD>OS                </TD></TR>
+   <TR><TD>Vendor</TD><TD>Version    </TD><TD>OS                 </TD></TR>
+   <TR><TD>Gnu   </TD><TD>4.0.2      </TD><TD>SuSE 10.0/x86 Linux</TD></TR>
+   <TR><TD>Gnu   </TD><TD>3.4        </TD><TD>Slackware 10.1/x86 Linux</TD></TR>
 <!--
    <TR><TD>Gnu   </TD><TD>2.95.1     </TD><TD>Solaris 7         </TD></TR>
    <TR><TD>Gnu   </TD><TD>2.95.3     </TD><TD>SuSE 7.3/x86 Linux</TD></TR>
@@ -268,7 +270,7 @@
 
    <li> Is there a Windows version ?
 
-      <b>XXX: TO UPDATE!</b>
+<!--      <b>XXX: TO UPDATE!</b>-->
       The code is tested to compile under some version of Visual C++.
       We do \b not provide any Makefiles or project files for VC++.
    </li>
@@ -340,7 +342,7 @@
 
    <li> If I add rows or columns to an LP, are they checked for redundancy ?
 
-      <b> XXX: TO UPDATE! How about preprocessing?</b>
+<!--      <b> XXX: TO UPDATE! How about preprocessing?</b>-->
       No. You have to do it yourself.
    </li>
 
@@ -355,7 +357,7 @@
    a good idea to try the \c -r flag to choose a row-wise representation
    of the basis.
 
-   <b>XXX: TO UPDATE!</b>
+<!--   <b>XXX: TO UPDATE!</b>-->
    Setting \c -z to a smaller value like 1e-18 or 1e-20 might improve
    the quality of the solution, but may also slow down the
    program. Setting \c -z to bigger values may speed up the algorithm,
