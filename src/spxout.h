@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxout.h,v 1.9 2005/12/12 20:22:50 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxout.h,v 1.10 2006/01/05 21:19:22 bzforlow Exp $"
 
 /**@file  spxout.h
  * @brief Wrapper for different output streams and verbosity levels.
@@ -221,31 +221,53 @@ private:
    //@}
 
    //--------------------------------------------------------
-   /**@name Standard manipulators and output of other types */
+   /**@name Output of standard manipulators and other types
+    *
+    * We have to define an output operator for many kinds of numeric
+    * types here because they can all be more or less casted into each
+    * other. When using only a template type, it is not clear what the
+    * compiler makes out of it (according to lint).
+    */
    //@{
+   ///
+#define PASS_TO_CURRENT_OSTREAM( t ) \
+      if ( _spxout.getVerbosity() <= Param::verbose() ) \
+         _spxout.getCurrentStream() << t; \
+      return _spxout;
+
+   /// Passes instances of type \p Type to the current stream. 
+#define DEFINE_OUTPUT_OPERATOR( Type ) \
+   inline SPxOut& \
+   operator<< ( SPxOut& _spxout, Type t ) \
+   { PASS_TO_CURRENT_OSTREAM( t ) } 
+
+   DEFINE_OUTPUT_OPERATOR( long );
+   DEFINE_OUTPUT_OPERATOR( unsigned long );
+   DEFINE_OUTPUT_OPERATOR( bool );
+   DEFINE_OUTPUT_OPERATOR( short );
+   DEFINE_OUTPUT_OPERATOR( unsigned short );
+   DEFINE_OUTPUT_OPERATOR( int );
+   DEFINE_OUTPUT_OPERATOR( unsigned int );
+   DEFINE_OUTPUT_OPERATOR( double );
+   DEFINE_OUTPUT_OPERATOR( float );
+   DEFINE_OUTPUT_OPERATOR( long double );
+   DEFINE_OUTPUT_OPERATOR( const void* );
+
    /// Passes standard manipulators without arguments, like @c std::endl
    /// or @c std::ios::right to the current stream.
    inline SPxOut&
    operator<< ( SPxOut&       _spxout, 
                 std::ostream& (*manip)( std::ostream& ) )
-   {
-      if ( _spxout.getVerbosity() <= Param::verbose() )
-         _spxout.getCurrentStream() << manip;
-      return _spxout;
-   }
+   { PASS_TO_CURRENT_OSTREAM( manip ) }
 
-   /// Passes everything else to the current stream. This includes 
-   /// basic types (@c char, @c char*, @c long, @c int,...) as well as 
-   /// structs corresponding to manipulators with arguments, such as 
-   /// the struct _Setw for the @c setw() manipulator.
+   //lint -e{818} (pointer could be made const; this is ok.)
+   /// Passes everything else to the current stream. In particular, 
+   /// this includes structs corresponding to manipulators with arguments, 
+   /// such as the struct @c _Setw for the @c setw() manipulator.
    template< typename T >
    inline SPxOut&
-   operator<< ( SPxOut& _spxout, const T&  v )
-   {
-      if ( _spxout.getVerbosity() <= Param::verbose() )
-         _spxout.getCurrentStream() << v;
-      return _spxout;
-   }
+   operator<< ( SPxOut& _spxout, T  t )
+   { PASS_TO_CURRENT_OSTREAM( t ) }
    //@}
 
    // ---------------------------------------------------------
