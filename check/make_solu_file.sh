@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: make_solu_file.sh,v 1.1 2005/11/18 09:49:01 bzfhille Exp $
+# $Id: make_solu_file.sh,v 1.2 2006/01/05 15:15:23 bzfhille Exp $
 
 #
 # Shell script for generating .solu file from a .test file using CPLEX and perplex.
@@ -17,6 +17,7 @@ fi
 
 INSTANCE_LIST=$1
 PERPLEX_LOG=$INSTANCE_LIST.perplex
+CPLEX_LOG=$INSTANCE_LIST.cplex
 BASIS_DIR=basis
 ERROR=0
 
@@ -49,7 +50,7 @@ fi
 # Main part.
 #
 
-rm -f $PERPLEX_LOG
+rm -f $PERPLEX_LOG $CPLEX_LOG
 mkdir -p basis
 
 # CPLEX and perplex loop
@@ -81,6 +82,7 @@ do
 
 	# Solve using CPLEX.
  	cplex <<-EOF
+	set logfile $CPLEX_LOG
  	set simplex tol feas 1e-9
  	set simplex tol opt 1e-9
  	r $file
@@ -123,6 +125,6 @@ done
 
 # Evaluate perplex log via awk script.
 base=`basename $INSTANCE_LIST .test`
-awk -f make_solu_file.awk $INSTANCE_LIST.perplex | tee $base.solu
+awk -f make_solu_file.awk $INSTANCE_LIST.cplex $INSTANCE_LIST.perplex | tee $base.solu
 
 exit
