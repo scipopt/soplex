@@ -14,8 +14,11 @@ public:
    ostream& operator<<(bool);
    ostream& operator<<(char);
    ostream& operator<<(short);
+   ostream& operator<<(unsigned short);
    ostream& operator<<(int);
+   ostream& operator<<(unsigned int);
    ostream& operator<<(long);
+   ostream& operator<<(unsigned long);
    ostream& operator<<(float);
    ostream& operator<<(double);
    ostream& operator<<(long double);
