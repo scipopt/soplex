@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: make_solu_file.sh,v 1.2 2006/01/05 15:15:23 bzfhille Exp $
+# $Id: make_solu_file.sh,v 1.3 2006/01/18 16:14:06 bzfhille Exp $
 
 #
 # Shell script for generating .solu file from a .test file using CPLEX and perplex.
@@ -86,6 +86,7 @@ do
  	set simplex tol feas 1e-9
  	set simplex tol opt 1e-9
  	r $file
+	change problem lp
  	opt
  	w work.bas
  	quit

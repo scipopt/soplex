@@ -1,4 +1,4 @@
-# $Id: make_solu_file.awk,v 1.2 2006/01/05 15:15:23 bzfhille Exp $
+# $Id: make_solu_file.awk,v 1.3 2006/01/18 16:14:06 bzfhille Exp $
 #
 # Takes two files:  <CPLEX log> <Perplex log> (order is critical!)
 #
@@ -27,7 +27,7 @@ BEGIN {
 }
 
 /Basis written/ {
-  printf( "%s: %s\n", file_cplex, obj_cplex );
+#  printf( "%s: %s\n", file_cplex, obj_cplex );
 
   sol_cplex[ file_cplex ] = obj_cplex;
   file_cplex = "";
