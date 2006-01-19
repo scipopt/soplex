@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.36 2005/12/12 20:22:49 bzforlow Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.37 2006/01/19 13:39:18 bzfhille Exp $"
 
 // #define DEBUGGING 1
 
@@ -810,12 +810,20 @@ bool SPxSolver::enter(SPxId& enterId)
    /*  Before performing the actual basis update, we must determine, how this
        is to be accomplished.
     */
+   // BH 2005-11-15: Obviously solve4update() is only called if theFvec.delta()
+   // is setup (i.e. the indices of the NZEs are stored within it) and there are
+   // 0 NZEs (???).
+   // In that case theFvec->delta() is set such that
+   //   Base * theFvec->delta() = enterVec 
    if (theFvec->delta().isSetup() && theFvec->delta().size() == 0)
       SPxBasis::solve4update(theFvec->delta(), *enterVec);
 #if ENABLE_ADDITIONAL_CHECKS
    else
    {
+      // BH 2005-11-29: This code block seems to check the assertion
+      //   || Base * theFvec->delta() - enterVec ||_2 <= delta()
       DVector tmp(dim());
+      // BH 2005-11-15: This cast is necessary since SSVector inherits protected from DVector.
       tmp = reinterpret_cast<DVector&>(theFvec->delta());
       multBaseWith(tmp);
       tmp -= *enterVec;
