@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: exercise_LP_changes.cpp,v 1.9 2005/12/12 16:09:57 bzfhille Exp $"
+#pragma ident "@(#) $Id: exercise_LP_changes.cpp,v 1.10 2006/01/20 09:42:51 bzfhille Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -29,7 +29,7 @@
 
 #include "timer.h"
 #include "spxpricer.h"
-#include "spxdefaultpr.h"
+#include "spxdantzigpr.h"
 #include "spxparmultpr.h"
 #include "spxdevexpr.h"
 #include "spxhybridpr.h"
@@ -142,6 +142,11 @@ const int TestSolver::precision;
 
 /** 
     Class implementing the tests for the LP-changing interface.
+
+    All tests are designed such that the number of calls to solve() does not
+    depend on the size of the LP. However, one can increase the "resolution"
+    of the tests at the cost of a higher running time by increasing 
+    \p calls_solve.
  */
 class ChangeExerciser
 {
@@ -150,6 +155,10 @@ class ChangeExerciser
       equivalent LP solutions.
    */
    static const Real epsilon_solution_equal;
+
+   /// Number of calls to solve() in a loop where something was changed.
+public:
+   static int calls_solve;
 
 public:
 
@@ -248,6 +257,7 @@ private:
 // Define static members of "ChangeExerciser".
 //
 const Real ChangeExerciser::epsilon_solution_equal = 1e-6;
+int ChangeExerciser::calls_solve = 10;
 
 
 //------------------------------------------------------------------------
@@ -289,7 +299,7 @@ long run_tests( const std::string& filename,
    tester.test_change_col();
    tester.test_change_element();
    tester.test_change_sense();
-   
+  
    std::cout << representation << ", " << type << ": " << tester.asserts_failed() 
              << " asserts failed." << std::endl;
 
@@ -301,13 +311,14 @@ int main( int argc,
           const char* const argv[] )
 {
    const char* usage =
-      "[-vLevel] <test_suite>\n\n"
+      "[-v] [-s Solves] <test_suite>\n\n"
       "<test_suite> is supposed to be file containing names of LPs in either MPS or LPF format\n\n"
       "-v        activate verbose mode\n"
+      "-sSolves  give number of calls to solve() per iteration (the more the slower and the more exhaustive testing), default: 10\n"
    ;
 
    // Cope with command line.
-   if ( argc < 2 || argc > 3 )
+   if ( argc < 2 || argc > 5 )
       {
          std::cout << "usage: " << argv[0] << " " << usage << std::endl;
          exit(0);
@@ -323,6 +334,23 @@ int main( int argc,
       {
       case 'v' :
          verbose = true;
+         break;
+      case 's' :
+         ++optidx;
+         if ( optidx < argc )
+         {
+            ChangeExerciser::calls_solve = atoi( argv[ optidx ] );
+            if ( ChangeExerciser::calls_solve <= 0 )
+            {
+               std::cout << "usage error: invalid parameter for -s" << std::endl;
+               exit( 1 );
+            }
+         }
+         else
+         {
+            std::cout << "usage error: -s needs parameter" << std::endl;
+            exit( 1 );
+         }
          break;
       default :
          std::cout << "usage: " << argv[0] << " " << usage << std::endl;
@@ -348,6 +376,9 @@ int main( int argc,
    // Do the actual work.
    //
    long total_asserts_failed = 0;
+
+   Timer timer;
+   timer.start();
 
    while ( test_suite )
       {
@@ -375,8 +406,11 @@ int main( int argc,
 
          std::cout << std::endl;
       }
+   timer.stop();
 
    std::cout << "Total number of failed asserts: " << total_asserts_failed << std::endl;
+   std::cout << "Total running time: " << timer.userTime() << std::endl;
+
 
    return 0;
 }
@@ -393,41 +427,84 @@ void ChangeExerciser::test_add_delete_row()
    MSG( std::cout << "Testing addRow() / removeRow()" << std::endl; );
 
    TestSolver* work_ptr = _prepare_Solver();
-
    work_ptr->solve();
-   const Real original_obj = work_ptr->objValue();
+   Real original_obj = work_ptr->objValue();
 
-   for( int row_idx = 0; row_idx != work_ptr->nRows(); ++row_idx )
+   // First test: Remove and readd single rows.
+   int solve_interval = std::max< int >( 1, work_ptr->nRows() / calls_solve );
+
+   for( int row_idx = 0; row_idx < work_ptr->nRows(); row_idx += solve_interval )
+   {
+      const SVector& row_vector = work_ptr->rowVector( row_idx );
+      LPRow current_row( row_vector.size() );
+
+      // Access rows alternatingly by index and ID.
+      if ( row_idx % 2 == 0 )
       {
-         const SVector& row_vector = work_ptr->rowVector( row_idx );
-         const int non_zeroes = row_vector.size();
-  
-         LPRow current_row( non_zeroes );
-
-         // Access rows alternatingly by index and ID.
-         if ( row_idx % 2 == 0 )
-            {
-               work_ptr->getRow( row_idx, current_row );
-               work_ptr->removeRow( row_idx );
-               work_ptr->solve();
-               work_ptr->addRow( current_row );
-            }
-         else
-            {
-               const SPxRowId& row_ID = work_ptr->rId( row_idx );
-               work_ptr->getRow( row_ID, current_row );               
-               work_ptr->removeRow( row_ID );
-               work_ptr->solve();
-
-               SPxRowId new_row_ID;
-               work_ptr->addRow( new_row_ID, current_row );
-            }
+         work_ptr->getRow( row_idx, current_row );
+         work_ptr->removeRow( row_idx );
+         work_ptr->solve();
+         work_ptr->addRow( current_row );
+      }
+      else
+      {
+         const SPxRowId& row_ID = work_ptr->rId( row_idx );
+         work_ptr->getRow( row_ID, current_row );               
+         work_ptr->removeRow( row_ID );
          work_ptr->solve();
 
-         std::ostringstream description;
-         description << "remove+add row " << row_idx;
-         _assert_EQrel( description.str(), original_obj, work_ptr->objValue() );
+         SPxRowId new_row_ID;
+         work_ptr->addRow( new_row_ID, current_row );
       }
+      work_ptr->solve();
+
+      std::ostringstream description;
+      description << "remove+add row " << row_idx;
+      _assert_EQrel( description.str(), original_obj, work_ptr->objValue() );
+   }
+
+   delete work_ptr; work_ptr = 0;
+
+   // Second test: Remove and readd blocks of rows.
+   work_ptr = _prepare_Solver();
+   work_ptr->solve();
+   original_obj = work_ptr->objValue();
+
+   Array< LPRow > rows( solve_interval );
+   Array< SPxRowId > row_IDs( work_ptr->nRows() );
+
+   // First remember row IDs in order to avoid confusion after rows have been deleted.
+   for( int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx )
+   {
+      row_IDs[ row_idx ] = work_ptr->rId( row_idx );
+   }
+
+   for ( int block = 0; block < calls_solve + 1; ++block )
+   {
+      int first_block_row_idx = block * solve_interval;
+      int last_block_row_idx = std::min( work_ptr->nRows() - 1, 
+                                         (block+1) * solve_interval - 1 );
+      
+      // Save-and-delete loop.
+      for( int row_idx = first_block_row_idx; row_idx <= last_block_row_idx; ++row_idx )
+      {
+         const SPxRowId& row_ID = row_IDs[ row_idx ];
+         work_ptr->getRow( row_ID, rows[ row_idx - first_block_row_idx ]  );
+         work_ptr->removeRow( row_ID );
+      }
+      work_ptr->solve();
+
+      // Add loop (in reverse order).
+      for( int row_idx = last_block_row_idx; row_idx >= first_block_row_idx; --row_idx )
+      {
+         work_ptr->addRow( rows[ row_idx - first_block_row_idx ]  );
+      }
+
+      work_ptr->solve();
+      std::ostringstream description;
+      description << "remove+add row block" << block;
+      _assert_EQrel( description.str(), original_obj, work_ptr->objValue() );
+   }
 
    delete work_ptr;
 }
@@ -565,52 +642,136 @@ void ChangeExerciser::test_add_delete_rows()
 // them in sync.
 //
 
+
 /**
-   Deletes and re-adds a single col.
+   Deletes and re-adds a single row.
 */
 void ChangeExerciser::test_add_delete_col()
 {
    MSG( std::cout << "Testing addCol() / removeCol()" << std::endl; );
 
    TestSolver* work_ptr = _prepare_Solver();
-
    work_ptr->solve();
-   const Real original_obj = work_ptr->objValue();
+   Real original_obj = work_ptr->objValue();
 
-   for( int col_idx = 0; col_idx != work_ptr->nCols(); ++col_idx )
+   // First test: Remove and readd single cols.
+   int solve_interval = std::max< int >( 1, work_ptr->nCols() / calls_solve );
+
+   for( int col_idx = 0; col_idx < work_ptr->nCols(); col_idx += solve_interval )
+   {
+      const SVector& col_vector = work_ptr->colVector( col_idx );
+      LPCol current_col( col_vector.size() );
+
+      // Access cols alternatingly by index and ID.
+      if ( col_idx % 2 == 0 )
+      {
+         work_ptr->getCol( col_idx, current_col );
+         work_ptr->removeCol( col_idx );
+         work_ptr->solve();
+         work_ptr->addCol( current_col );
+      }
+      else
+      {
+         const SPxColId& col_ID = work_ptr->cId( col_idx );
+         work_ptr->getCol( col_ID, current_col );               
+         work_ptr->removeCol( col_ID );
+         work_ptr->solve();
+
+         SPxColId new_col_ID;
+         work_ptr->addCol( new_col_ID, current_col );
+      }
+      work_ptr->solve();
+
+      std::ostringstream description;
+      description << "remove+add col " << col_idx;
+      _assert_EQrel( description.str(), original_obj, work_ptr->objValue() );
+   }
+
+   delete work_ptr; work_ptr = 0;
+
+   // Second test: Remove and readd blocks of cols.
+   work_ptr = _prepare_Solver();
+   work_ptr->solve();
+   original_obj = work_ptr->objValue();
+
+   Array< LPCol > cols( solve_interval );
+   Array< SPxColId > col_IDs( work_ptr->nCols() );
+
+   // First remember col IDs in order to avoid confusion after cols have been deleted.
+   for( int col_idx = 0; col_idx < work_ptr->nCols(); ++col_idx )
+   {
+      col_IDs[ col_idx ] = work_ptr->cId( col_idx );
+   }
+
+   for ( int block = 0; block < calls_solve + 1; ++block )
+   {
+      int first_block_col_idx = block * solve_interval;
+      int last_block_col_idx = std::min( work_ptr->nCols() - 1, 
+                                         (block+1) * solve_interval - 1 );
+      
+      // Save-and-delete loop.
+      for( int col_idx = first_block_col_idx; col_idx <= last_block_col_idx; ++col_idx )
+      {
+         const SPxColId& col_ID = col_IDs[ col_idx ];
+         work_ptr->getCol( col_ID, cols[ col_idx - first_block_col_idx ]  );
+         work_ptr->removeCol( col_ID );
+      }
+      work_ptr->solve();
+
+      // Add loop (in reverse order).
+      for( int col_idx = last_block_col_idx; col_idx >= first_block_col_idx; --col_idx )
+      {
+         work_ptr->addCol( cols[ col_idx - first_block_col_idx ]  );
+      }
+
+      work_ptr->solve();
+      std::ostringstream description;
+      description << "remove+add col block" << block;
+      _assert_EQrel( description.str(), original_obj, work_ptr->objValue() );
+   }
+
+   delete work_ptr; work_ptr = 0;
+
+   // Third test: Remove and add single columns. This is separate from the first test to reproduce
+   // a fail with netlib/scfxm1.mps.gz.
+   work_ptr = _prepare_Solver();
+   work_ptr->solve();
+   original_obj = work_ptr->objValue();
+
+   if ( work_ptr->nCols() >= 7 )
+   {
+      for( int col_idx = 0; col_idx < 8; ++col_idx )
       {
          const SVector& col_vector = work_ptr->colVector( col_idx );
-         const int non_zeroes = col_vector.size();
-  
-         LPCol current_col( non_zeroes );
+         LPCol current_col( col_vector.size() );
 
          // Access cols alternatingly by index and ID.
          if ( col_idx % 2 == 0 )
-            {
-               work_ptr->getCol( col_idx, current_col );
-               work_ptr->removeCol( col_idx );
-               work_ptr->solve();
-               work_ptr->addCol( current_col );
-            }
+         {
+            work_ptr->getCol( col_idx, current_col );
+            work_ptr->removeCol( col_idx );
+            work_ptr->solve();
+            work_ptr->addCol( current_col );
+         }
          else
-            {
-               const SPxColId& col_ID = work_ptr->cId( col_idx );
-               work_ptr->getCol( col_ID, current_col );
+         {
+            const SPxColId& col_ID = work_ptr->cId( col_idx );
+            work_ptr->getCol( col_ID, current_col );               
+            work_ptr->removeCol( col_ID );
+            work_ptr->solve();
 
-               work_ptr->removeCol( col_ID );
-               work_ptr->solve();
-
-               SPxColId new_col_ID;
-               work_ptr->addCol( new_col_ID, current_col );
-            }
+            SPxColId new_col_ID;
+            work_ptr->addCol( new_col_ID, current_col );
+         }
          work_ptr->solve();
 
          std::ostringstream description;
          description << "remove+add col " << col_idx;
          _assert_EQrel( description.str(), original_obj, work_ptr->objValue() );
       }
+   }
 
-   delete work_ptr;
+   delete work_ptr; work_ptr = 0;
 }
 
 
@@ -640,7 +801,7 @@ void ChangeExerciser::test_add_delete_cols()
    SPxColId* col_IDs = new SPxColId[ col_set.num() ];
    work_ptr->addCols( col_IDs, col_set );
    work_ptr->solve();
-   delete col_IDs; col_IDs = 0;
+   delete[] col_IDs; col_IDs = 0;
 
    _assert( "remove+add cols: col number matches", orig_cols == work_ptr->nCols() );
 
@@ -1168,6 +1329,8 @@ void ChangeExerciser::test_change_row()
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
    Real original_obj = work_ptr->objValue();    
+
+   int solve_interval = std::max< int >( 1, work_ptr->nRows() / calls_solve );
    
    for (int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx) {
       Real change_coeff = 1.0;
@@ -1204,7 +1367,11 @@ void ChangeExerciser::test_change_row()
       const SPxRowId& row_ID = work_ptr->rId( row_idx );
       work_ptr->changeRow( row_ID, row );
             
-      work_ptr->solve();
+      if ( row_idx % solve_interval == 0 )
+      {
+         work_ptr->solve();
+         _assert_EQrel( "rows changed", original_obj, work_ptr->objValue() );
+      }
    }
 
    work_ptr->solve();
@@ -1219,6 +1386,8 @@ void ChangeExerciser::test_change_row()
    original_obj = work_ptr->objValue();
 
    const int nPairs = work_ptr->nRows()/2;  
+   solve_interval = std::max< int >( 1, nPairs / calls_solve );
+
    for (int pair_idx = 0; pair_idx < nPairs; ++pair_idx) {
       const int first_idx = 2 * pair_idx; 
       const int second_idx = first_idx + 1;
@@ -1234,7 +1403,7 @@ void ChangeExerciser::test_change_row()
       work_ptr->changeRow( first_idx, s_row );
       work_ptr->changeRow( second_idx, f_row ); 
 
-      if ( pair_idx % 10 == 0 )
+      if ( pair_idx % solve_interval == 0 )
       {
          work_ptr->solve();
          _assert_EQrel( "rows exchanged pairwise", original_obj, work_ptr->objValue() );
@@ -1298,7 +1467,7 @@ void ChangeExerciser::test_change_col()
    work_ptr->solve();
    _assert_EQrel( "cols changed by changing bounds", original_obj, work_ptr->objValue() );
 
-   delete val; val = 0;
+   delete[] val; val = 0;
    delete work_ptr; work_ptr = 0;
 
    //
@@ -1309,6 +1478,8 @@ void ChangeExerciser::test_change_col()
    original_obj = work_ptr->objValue();
 
    const int nPairs = work_ptr->nCols()/2;  
+   int solve_interval = std::max< int >( 1, nPairs / calls_solve );
+
    for (int pair_idx = 0; pair_idx < nPairs; ++pair_idx)
    {
       const int first_idx = 2 * pair_idx; 
@@ -1323,7 +1494,7 @@ void ChangeExerciser::test_change_col()
       work_ptr->changeCol( first_idx, s_col );
       work_ptr->changeCol( second_idx, f_col );
 
-      if ( pair_idx % 10 == 0 )
+      if ( pair_idx % solve_interval == 0 )
       {
          work_ptr->solve();
          _assert_EQrel( "cols changed by exchanging columns", original_obj, work_ptr->objValue() );
@@ -1350,6 +1521,8 @@ void ChangeExerciser::test_change_element()
    
    // Test: Exchange each pair of rows elementwise
    int nPairs = work_ptr->nRows()/2;  
+   int solve_interval = std::max< int >( 1, nPairs / calls_solve );
+
    for (int pair_idx = 0; pair_idx < nPairs; ++pair_idx)
    {
       int first_idx = 2 * pair_idx; 
@@ -1385,7 +1558,7 @@ void ChangeExerciser::test_change_element()
       work_ptr->changeRhs( second_idx, work_ptr->rhs(first_idx) );
       work_ptr->changeRhs( first_idx, new_first_rhs );
 
-      if ( pair_idx % 10 == 0 )
+      if ( pair_idx % solve_interval == 0 )
       {
          work_ptr->solve();
          _assert_EQrel( "elements changed", original_obj, work_ptr->objValue() );
