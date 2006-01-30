@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsumst.cpp,v 1.8 2003/01/05 19:03:17 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxsumst.cpp,v 1.9 2006/01/30 15:56:53 bzfhille Exp $"
 
 #include <iostream>
 
@@ -31,7 +31,7 @@ void SPxSumST::setupWeights(SPxSolver& base)
    Real x;
    DVector work, delta, rowLen;
 
-   rowLen.reDim(base.nCols());
+   rowLen.reDim( base.nRows() );
    work.reDim (base.nCols());
    delta.reDim (base.nCols());
 
