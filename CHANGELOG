@@ -26,7 +26,12 @@
 - Methods obj(), rhs(), lhs(), upper(), lower(), maxObj() of LPColSet 
   and LPRowSet that returned a non const reference renamed to *_w.
 
-- Renamed LPColSet::obj() to maxObj(), removed SPxLP::obj().
+- LPColSet: renamed obj() methods to maxObj()/maxObj_w(), renamed writable
+  lower(), upper() methods to lower_w()/upper_w(), removed SPxLP::obj().
+
+- LPRowSet: renamed writable lhs()/rhs() methods to lhs_w()/rhs_w()
+
+- SPxSolver has got an additional NOT_INIT (not properly initialized) status.
 
 - Renamed SPxDefaultPR to SPxDantzigPR.
 
