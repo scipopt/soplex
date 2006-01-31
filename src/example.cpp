@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.83 2005/12/18 16:51:03 bzforlow Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.84 2006/01/31 08:35:20 bzfhille Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -153,6 +153,7 @@ void print_usage_and_exit( const char* const argv[] )
    "[options] LPfile [Basfile]\n\n"
    "          LPfile can be either in MPS or LPF format\n\n"
    "options:  (*) indicates default\n" 
+   "          (!) indicates experimental features which may give wrong results\n" 
    " -e        select entering algorithm (default is leaving)\n"
    " -r        select row wise representation (default is column)\n"
    " -i        select Eta-update (default is Forest-Tomlin)\n"
@@ -172,9 +173,9 @@ void print_usage_and_exit( const char* const argv[] )
    " -s0 none       -g0 none         -c0 none*   -p0 Textbook  -t0 Textbook\n"
    " -s1 General*   -g1 C-uni-Equi   -c1 Weight  -p1 ParMult   -t1 Harris\n"
    " -s2 Aggregate  -g2 R-uni-Equi   -c2 Sum     -p2 Devex     -t2 Fast*\n"
-   " -s3 Redundant  -g3 bi-Equi      -c3 Vector  -p3 Hybrid\n"
+   " -s3 Redundant  -g3 bi-Equi      -c3 Vector  -p3 Hybrid!\n"
    " -s4 Interval   -g4 bi-Equi+Geom1*           -p4 Steep*\n"
-   "                -g5 bi-Equi+Geom8            -p5 Weight\n" 
+   "                -g5 bi-Equi+Geom8            -p5 Weight!\n" 
    ;
 
    std::cerr << "usage: " << argv[0] << " " << usage << std::endl;
