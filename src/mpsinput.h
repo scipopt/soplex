@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: mpsinput.h,v 1.10 2005/10/28 17:25:34 bzforlow Exp $"
+#pragma ident "@(#) $Id: mpsinput.h,v 1.11 2006/01/31 09:28:40 bzfhille Exp $"
 
 /**@file  mpsinput.h
  * @brief Read MPS format files.
@@ -84,6 +84,10 @@ private:
    bool            m_is_integer;
    /// new MPS format?
    bool            m_is_new_format;
+   /// Number of already ignored entries.
+   int             m_ignored;
+   /// Maximal number of ignored entries for which a warning will be issued.
+   static const int m_max_ignore = 1000;
    //@}
 
 public:
@@ -101,6 +105,7 @@ public:
       , m_has_error     ( false )
       , m_is_integer    ( false )
       , m_is_new_format ( false )
+      , m_ignored       ( 0 )
    {
       m_f0 = m_f1 = m_f2 = m_f3 = m_f4 = m_f5 = 0;
 
@@ -185,10 +190,18 @@ public:
       const char* what, const char* what_name, 
       const char* entity, const char* entity_name)
    {
-      MSG_WARNING( spxout << "Warning: line " << m_lineno << ": "
-                          << what << " \"" << what_name << "\"" 
-                          << " for " << entity << " \"" 
-                          << entity_name << "\" ignored" << std::endl; )
+      if ( m_ignored < m_max_ignore )
+      {
+         MSG_WARNING( spxout << "Warning: line " << m_lineno << ": "
+                             << what << " \"" << what_name << "\"" 
+                             << " for " << entity << " \"" 
+                             << entity_name << "\" ignored" << std::endl; )
+         ++m_ignored;
+
+         if ( m_ignored == m_max_ignore )
+            MSG_WARNING( spxout << "Warning: This was the " << m_max_ignore << " ignored entry. No further warnings on "
+                                << "ignored entries will be given." << std::endl; )
+      }
    }
    //@}
 
