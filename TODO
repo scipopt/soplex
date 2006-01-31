@@ -1,4 +1,4 @@
-$Id: TODO,v 1.79 2005/12/18 17:23:00 bzforlow Exp $
+$Id: TODO,v 1.80 2006/01/31 19:29:42 bzforlow Exp $
 
 - Wieso ist das SPxLP protected from LPColSet und LPRowSet abgeleitet und
   spiegelt dann mehrere von deren Methoden, um sie wieder public zugreifbar zu
@@ -7,7 +7,7 @@ $Id: TODO,v 1.79 2005/12/18 17:23:00 bzforlow Exp $
 - factor.cpp: "??? mkwtz originally was long, maybe to avoid an overflow in this instruction?"
    -> später auf long ändern
 
-- diverse "#ifdef USE_OLD"-Stellen -> beim Release rauswerfen
+- diverse "#ifdef USE_OLD"-Stellen rauswerfen
 
 - Es wird infeasible/unbounded gemeldet je nach dem welcher algo 
   gerade am Laufen war.
