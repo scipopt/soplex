@@ -1,6 +1,6 @@
-#--- $Id: make.hp-ux.hppa.hp.opt.static,v 1.1 2005/07/15 16:26:48 bzfpfend Exp $
+#--- $Id: make.hp-ux.hppa.hp.opt.static,v 1.2 2006/02/01 16:26:30 bzfhille Exp $
 CXX	=	aCC
-CPPFLAGS=	-Isrc -DNDEBUG 
+CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS
 CXXFLAGS=	-AA +W67 -fast 
 LDFLAGS	=	-lstd_v2 -lCsup_v2 -lm
 RANLIB	=	true

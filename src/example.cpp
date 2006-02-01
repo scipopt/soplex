@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.84 2006/01/31 08:35:20 bzfhille Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.85 2006/02/01 16:26:31 bzfhille Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -149,6 +149,45 @@ public:
 
 void print_usage_and_exit( const char* const argv[] )
 {
+   /**
+      The following code block is just to test compilation parameters.
+   */
+#if 0
+   std::cout << "compiled with NDEBUG: "
+   #ifdef NDEBUG
+             << "yes"
+   #else
+             << "no"
+   #endif
+             << std::endl;
+
+   std::cout << "compiled with WITH_WARNINGS: "
+   #ifdef WITH_WARNINGS
+             << "yes"
+   #else
+             << "no"
+   #endif
+             << std::endl;
+
+   std::cout << "compiled with NO_ADDITIONAL_CHECKS: "
+   #ifdef NO_ADDITIONAL_CHECKS
+             << "yes (ENABLE_ADDITIONAL_CHECKS = " << ENABLE_ADDITIONAL_CHECKS << ")" 
+   #else
+             << "no (ENABLE_ADDITIONAL_CHECKS = " << ENABLE_ADDITIONAL_CHECKS << ")"
+   #endif
+             << std::endl;
+
+   std::cout << "compiled with NO_CONSISTENCY_CHECKS: "
+   #ifdef NO_CONSISTENCY_CHECKS
+             << "yes"
+   #else
+             << "no"
+   #endif
+             << std::endl;
+
+   std::cout << std::endl;
+#endif
+
    const char* usage =
    "[options] LPfile [Basfile]\n\n"
    "          LPfile can be either in MPS or LPF format\n\n"

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.31 2005/12/12 20:22:50 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.32 2006/02/01 16:26:31 bzfhille Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
@@ -81,9 +81,9 @@ namespace soplex
           included.
 
    It will be used to conditionally include larger blocks of code doing additional
-   checking. Depending on this block's code there may be a warning or an assert.
+   checking.
 */
-#if !defined (NDEBUG) || defined (WITH_WARNINGS)
+#if !defined (NO_ADDITIONAL_CHECKS)
 #define ENABLE_ADDITIONAL_CHECKS 1
 #else
 #define ENABLE_ADDITIONAL_CHECKS 0

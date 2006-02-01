@@ -1,6 +1,6 @@
-#--- $Id: make.linux.x86.gnu.opt-ld.static,v 1.1 2005/07/15 16:26:51 bzfpfend Exp $
+#--- $Id: make.linux.x86.gnu.opt-ld.static,v 1.2 2006/02/01 16:26:30 bzfhille Exp $
 CXX	=	g++
-CPPFLAGS=	-Isrc -DNDEBUG -DWITH_ZLIB -DWITH_LONG_DOUBLE \
+CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -DWITH_ZLIB -DWITH_LONG_DOUBLE \
                 -DDEFAULT_BND_VIOL=1e-8 -DDEFAULT_EPS_ZERO=1e-22 \
                 # -DWITH_EASYVAL -I/optimi/kombadon/bzfkocht/easyval/include
 CXXFLAGS=	-g -O -march=pentium4 -fno-exceptions \

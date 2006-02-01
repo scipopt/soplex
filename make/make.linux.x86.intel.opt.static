@@ -1,6 +1,6 @@
-#--- $Id: make.linux.x86.intel.opt.static,v 1.2 2005/12/12 15:03:42 bzfhille Exp $
+#--- $Id: make.linux.x86.intel.opt.static,v 1.3 2006/02/01 16:26:31 bzfhille Exp $
 CXX	=	icc
-CPPFLAGS=	-Isrc -DNDEBUG -DWITH_ZLIB
+CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -DWITH_ZLIB
 CXXFLAGS=	-O3 -tpp6 -axK -ansi -w1 -fno-rtti -par_report0 -vec_report0 #-ip => error on pilot-ja(ER)
 LDFLAGS	=	-lpthread -lz -lm -lstdc++ #-static
 ARFLAGS	=	crs

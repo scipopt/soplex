@@ -1,0 +1,6 @@
+#--- $Id: make.linux.x86.gnu.opt_warn.static,v 1.1 2006/02/01 16:26:31 bzfhille Exp $
+CXX	=	g++
+CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -DWITH_WARNINGS -DWITH_ZLIB # -DWITH_EASYVAL -I/optimi/kombadon/bzfkocht/easyval/include
+CXXFLAGS=	-g -O3 -march=pentiumpro -fno-exceptions -fomit-frame-pointer # -ffloat-store # -malign-double -ffast-math
+LDFLAGS	=	-lz -lm -static #-L/optimi/kombadon/bzfkocht/easyval/lib -lEasyval
+ARFLAGS	=	crs
