@@ -6,13 +6,19 @@ EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
+		Debug (fewer checks) = Debug (fewer checks)
 		Release = Release
+		Release (asserts to Warnings) = Release (asserts to Warnings)
 	EndGlobalSection
 	GlobalSection(ProjectConfiguration) = postSolution
 		{696D0629-EF7F-4905-BB80-4BC7C00787B1}.Debug.ActiveCfg = Debug|Win32
 		{696D0629-EF7F-4905-BB80-4BC7C00787B1}.Debug.Build.0 = Debug|Win32
+		{696D0629-EF7F-4905-BB80-4BC7C00787B1}.Debug (fewer checks).ActiveCfg = Debug (fewer checks)|Win32
+		{696D0629-EF7F-4905-BB80-4BC7C00787B1}.Debug (fewer checks).Build.0 = Debug (fewer checks)|Win32
 		{696D0629-EF7F-4905-BB80-4BC7C00787B1}.Release.ActiveCfg = Release|Win32
 		{696D0629-EF7F-4905-BB80-4BC7C00787B1}.Release.Build.0 = Release|Win32
+		{696D0629-EF7F-4905-BB80-4BC7C00787B1}.Release (asserts to Warnings).ActiveCfg = Release (asserts to Warnings)|Win32
+		{696D0629-EF7F-4905-BB80-4BC7C00787B1}.Release (asserts to Warnings).Build.0 = Release (asserts to Warnings)|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
