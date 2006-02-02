@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsimplifier.h,v 1.15 2005/11/08 19:56:52 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsimplifier.h,v 1.16 2006/02/02 18:37:55 bzftuchs Exp $"
 
 /**@file  spxsimplifier.h
  * @brief LP simplification base class.
@@ -26,6 +26,7 @@
 #include "spxdefines.h"
 #include "timer.h"
 #include "spxlp.h"
+#include "spxsolver.h"
 
 namespace soplex
 {
@@ -70,10 +71,11 @@ public:
    /// Result of the simplification.
    enum Result
    {
-      OKAY       =  0,  ///< simplification could be done
-      INFEASIBLE =  1,  ///< primal infeasibility was detected
-      UNBOUNDED  =  2,  ///< primal unboundedness was detected
-      VANISHED   =  3   ///< the problem was so much simplified that it vanished
+      OKAY            =  0,  ///< simplification could be done
+      INFEASIBLE      =  1,  ///< primal infeasibility was detected
+      DUAL_INFEASIBLE =  2,  ///< dual infeasibility was detected
+      UNBOUNDED       =  3,  ///< primal unboundedness was detected
+      VANISHED        =  4   ///< the problem was so much simplified that it vanished
    };
    //@}
 
@@ -115,15 +117,60 @@ public:
    //@{
    /// simplify SPxLP \p lp. 
    virtual Result simplify(SPxLP& lp, Real eps, Real delta) = 0;
-   /// returns a reference to the unsimplified primal solution.
-   virtual const Vector& unsimplifiedPrimal(const Vector& x)
+   /// reconstructs an optimal solution for the unsimplified LP.
+   virtual void unsimplify(const Vector&, const Vector&, const Vector&, const Vector&,
+                           const SPxSolver::VarStatus[], const SPxSolver::VarStatus[]) {}
+   /// specifies whether an optimal solution has already been unsimplified.
+   virtual bool isUnsimplified() const
    {
-      return x;
+      return false;
    }
-   /// returns a reference to the unsimplified dual solution. 
-   virtual const Vector& unsimplifiedDual(const Vector& pi)
+   /// returns a reference to the unsimplified primal solution.
+   virtual const Vector& unsimplifiedPrimal()
    {
-      return pi;
+      MSG_ERROR( spxout << "ESIM01 SPxSimplifier::unsimplifiedPrimal() not implemented\n";)
+         
+      return DVector();
+   };
+   /// returns a reference to the unsimplified dual solution.
+   virtual const Vector& unsimplifiedDual()
+   {
+      MSG_ERROR( spxout << "ESIM02 SPxSimplifier::unsimplifiedDual() not implemented\n";)
+         
+      return DVector();
+   }
+   /// returns a reference to the unsimplified slack values.
+   virtual const Vector& unsimplifiedSlacks()
+   {
+      MSG_ERROR( spxout << "ESIM03 SPxSimplifier::unsimplifiedSlack() not implemented\n";)
+         
+      return DVector();
+   }
+   /// returns a reference to the unsimplified reduced costs.
+   virtual const Vector& unsimplifiedRedCost()
+   {
+      MSG_ERROR( spxout << "ESIM04 SPxSimplifier::unsimplifiedRedCost() not implemented\n";)
+         
+      return DVector();
+   }
+   /// gets basis status for a single row.
+   virtual SPxSolver::VarStatus getBasisRowStatus(int) const
+   {
+      MSG_ERROR( spxout << "ESIM05 SPxSimplifier::getBasisRowStatus() not implemented\n";)
+         
+      return SPxSolver::ZERO;
+   }
+   /// gets basis status for a single column.
+   virtual SPxSolver::VarStatus getBasisColStatus(int) const
+   {
+      MSG_ERROR( spxout << "ESIM06 SPxSimplifier::getBasisColStatus() not implemented\n";)
+      
+      return SPxSolver::ZERO;
+   }
+   /// get optimal basis.
+   virtual void getBasis(const SPxSolver::VarStatus[], const SPxSolver::VarStatus[]) const
+   {
+      MSG_ERROR( spxout << "ESIM07 SPxSimplifier::getBasis() not implemented\n";)
    }
    //@}
 
