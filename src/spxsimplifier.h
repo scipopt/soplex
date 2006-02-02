@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsimplifier.h,v 1.16 2006/02/02 18:37:55 bzftuchs Exp $"
+#pragma ident "@(#) $Id: spxsimplifier.h,v 1.17 2006/02/02 19:42:29 bzftuchs Exp $"
 
 /**@file  spxsimplifier.h
  * @brief LP simplification base class.
@@ -126,52 +126,25 @@ public:
       return false;
    }
    /// returns a reference to the unsimplified primal solution.
-   virtual const Vector& unsimplifiedPrimal()
-   {
-      MSG_ERROR( spxout << "ESIM01 SPxSimplifier::unsimplifiedPrimal() not implemented\n";)
-         
-      return DVector();
-   };
+   virtual const Vector& unsimplifiedPrimal() = 0;
+
    /// returns a reference to the unsimplified dual solution.
-   virtual const Vector& unsimplifiedDual()
-   {
-      MSG_ERROR( spxout << "ESIM02 SPxSimplifier::unsimplifiedDual() not implemented\n";)
-         
-      return DVector();
-   }
+   virtual const Vector& unsimplifiedDual() = 0;
+
    /// returns a reference to the unsimplified slack values.
-   virtual const Vector& unsimplifiedSlacks()
-   {
-      MSG_ERROR( spxout << "ESIM03 SPxSimplifier::unsimplifiedSlack() not implemented\n";)
-         
-      return DVector();
-   }
+   virtual const Vector& unsimplifiedSlacks() = 0;
+
    /// returns a reference to the unsimplified reduced costs.
-   virtual const Vector& unsimplifiedRedCost()
-   {
-      MSG_ERROR( spxout << "ESIM04 SPxSimplifier::unsimplifiedRedCost() not implemented\n";)
-         
-      return DVector();
-   }
+   virtual const Vector& unsimplifiedRedCost() = 0;
+
    /// gets basis status for a single row.
-   virtual SPxSolver::VarStatus getBasisRowStatus(int) const
-   {
-      MSG_ERROR( spxout << "ESIM05 SPxSimplifier::getBasisRowStatus() not implemented\n";)
-         
-      return SPxSolver::ZERO;
-   }
+   virtual SPxSolver::VarStatus getBasisRowStatus(int) const = 0;
+
    /// gets basis status for a single column.
-   virtual SPxSolver::VarStatus getBasisColStatus(int) const
-   {
-      MSG_ERROR( spxout << "ESIM06 SPxSimplifier::getBasisColStatus() not implemented\n";)
-      
-      return SPxSolver::ZERO;
-   }
+   virtual SPxSolver::VarStatus getBasisColStatus(int) const = 0;
+
    /// get optimal basis.
-   virtual void getBasis(const SPxSolver::VarStatus[], const SPxSolver::VarStatus[]) const
-   {
-      MSG_ERROR( spxout << "ESIM07 SPxSimplifier::getBasis() not implemented\n";)
-   }
+   virtual void getBasis(const SPxSolver::VarStatus[], const SPxSolver::VarStatus[]) const = 0;
    //@}
 
 #ifndef NO_CONSISTENCY_CHECKS
