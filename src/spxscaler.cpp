@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscaler.cpp,v 1.11 2005/11/08 19:56:52 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxscaler.cpp,v 1.12 2006/02/02 18:38:30 bzftuchs Exp $"
 
 /**@file  spxscaler.cpp
  * @brief LP scaling base class.
@@ -224,8 +224,18 @@ void SPxScaler::unscalePrimal(Vector& x) const
 
    assert(x.dim() == m_colscale.size());
 
-   for(int i = 0; i < x.dim(); ++i )
-      x[i] *= m_colscale[i];
+   for(int j = 0; j < x.dim(); ++j)
+      x[j] *= m_colscale[j];
+}
+
+void SPxScaler::unscaleSlacks(Vector& s) const
+{
+   METHOD( "SPxScaler::unscaleSlacks()" );
+
+   assert(s.dim() == m_rowscale.size());
+
+   for(int i = 0; i < s.dim(); ++i)
+      s[i] /= m_rowscale[i];
 }
 
 void SPxScaler::unscaleDual(Vector& pi) const
@@ -234,9 +244,18 @@ void SPxScaler::unscaleDual(Vector& pi) const
 
    assert(pi.dim() == m_rowscale.size());
 
-   ///@todo is this correct ?
-   for(int i = 0; i < pi.dim(); ++i )
+   for(int i = 0; i < pi.dim(); ++i)
       pi[i] *= m_rowscale[i];
+}
+
+void SPxScaler::unscaleRedCost(Vector& r) const
+{
+   METHOD( "SPxScaler::unscaleRedCost()" );
+
+   assert(r.dim() == m_colscale.size());
+
+   for(int j = 0; j < r.dim(); ++j)
+      r[j] /= m_colscale[j];
 }
 
 Real SPxScaler::minAbsColscale() const

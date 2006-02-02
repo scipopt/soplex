@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscaler.h,v 1.7 2005/11/08 19:56:52 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxscaler.h,v 1.8 2006/02/02 18:38:34 bzftuchs Exp $"
 
 /**@file  spxscaler.h
  * @brief LP scaling base class.
@@ -46,8 +46,8 @@ protected:
    /**@name Data */
    //@{
    const char*        m_name;      ///< Name of the scaler
-   DataArray < Real > m_colscale;  ///< column scaleing factors
-   DataArray < Real > m_rowscale;  ///< row scaleing factors
+   DataArray < Real > m_colscale;  ///< column scaling factors
+   DataArray < Real > m_rowscale;  ///< row scaling factors
    bool               m_colFirst;  ///< do column scaling first 
    bool               m_doBoth;    ///< do columns and rows
    //@}
@@ -96,12 +96,16 @@ public:
    //-------------------------------------
    /**@name Scaling */
    //@{
-   /// Scale SPxLP. 
+   /// scale SPxLP. 
    virtual void scale(SPxLP& lp) = 0;
-   /// Unscale dense primal solution vector given in \p x. 
+   /// unscale dense primal solution vector given in \p x. 
    virtual void unscalePrimal(Vector& x) const;
-   /// Unscale dense dual solution vector given in \p pi. 
+   /// unscale dense slack vector given in \p s.
+   virtual void unscaleSlacks(Vector& s) const;
+   /// unscale dense dual solution vector given in \p pi. 
    virtual void unscaleDual(Vector& pi) const;
+   /// unscale dense reduced cost vector given in \p r.
+   virtual void unscaleRedCost(Vector& r) const;
 
    /// absolute smallest column scaling factor
    virtual Real minAbsColscale() const;
