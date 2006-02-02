@@ -1,3 +1,29 @@
+- The number of warnings issued for ignored entries in MPS files is now limited
+  to 1000 per file.
+
+- Fixed bug in SPxSumST.
+
+- Fixed bug in memory allocation of SVSet: now uses doubling strategy
+  correctly. The bug lead to serious performance degradation on large LPs
+  under Windows, which is now fixed.
+
+- Improved stability of textbook ratio tester. 
+
+- Status output is now human-readable.
+
+- Added reference solution files for further LP suites.
+
+- Some bug fixes in LP change interface.
+
+- Extensive testing: coverage analysis and valgrind. New binary 
+  "exercise_LP_changes" performs kind of unit tests for LP change
+  interface.
+
+- Fixed segmentation fault in Forest-Tomlin update.
+
+- Some assertions may be converted to generate warnings if NDEBUG is given.
+  Compile with "-DWITH_WARNINGS" to achieve this. 
+
 - Revised the whole documentation and made it doxygen-compatible.
 
 - Made one-argument constructors explicit, added virtual destructors,
