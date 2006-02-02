@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.78 2005/10/08 14:06:31 bzfpfend Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.79 2006/02/02 18:40:52 bzftuchs Exp $"
 
 #include <iostream>
 
@@ -120,30 +120,35 @@ SPxSolver::Status SoPlex::solve()
 SPxSolver::Status SoPlex::getPrimal(Vector& x) const
 {
    METHOD( "SoPlex::getPrimal()" );
-
-   DVector           psp_x(m_solver.nCols()); // prescaled simplified postscaled
-   SPxSolver::Status stat;
-
-   if (!m_vanished)
+   
+   if (has_simplifier())
    {
-      stat = m_solver.getPrimal(psp_x);
+      if (!m_simplifier->isUnsimplified())
+         unsimplify();
 
-      if (m_postScaler != 0)
-         m_postScaler->unscalePrimal(psp_x);
+      x = m_simplifier->unsimplifiedPrimal();
+         
+      // unscale prescaling
+      if (m_preScaler != 0)
+         m_preScaler->unscalePrimal(x);
+      
+      if (m_vanished)
+         return SPxSolver::OPTIMAL;
+      else
+         return m_solver.status();
    }
-   else
-   {
-      stat = SPxSolver::OPTIMAL;
-      psp_x.reDim(0);
-   }
-   if (m_simplifier != 0)
-      x = m_simplifier->unsimplifiedPrimal(psp_x);
-   else
-      x = psp_x;
-
+   
+   // else 
+   SPxSolver::Status stat = m_solver.getPrimal(x);
+            
+   // unscale postscaling
+   if (m_postScaler != 0)
+      m_postScaler->unscalePrimal(x);
+ 
+   // unscale prescaling
    if (m_preScaler != 0)
       m_preScaler->unscalePrimal(x);
-
+           
    return stat;
 }
 
@@ -151,59 +156,146 @@ SPxSolver::Status SoPlex::getSlacks(Vector& s) const
 {
    METHOD( "SoPlex::getSlacks()" );
 
-   /// Does not work yet with presolve
    if (has_simplifier())
    {
-      MSG_ERROR( spxout << "ESOLVR01 Not yet implemented" << std::endl; )
-      return SPxSolver::ERROR;
+      if (!m_simplifier->isUnsimplified())
+         unsimplify();
+
+      s = m_simplifier->unsimplifiedSlacks();
+         
+      // unscale prescaling
+      if (m_preScaler != 0)
+         m_preScaler->unscaleSlacks(s);
+      
+      if (m_vanished)
+         return SPxSolver::OPTIMAL;
+      else
+         return m_solver.status();
    }
+   
+   // else 
    SPxSolver::Status stat = m_solver.getSlacks(s);
-
+            
+   // unscale postscaling
    if (m_postScaler != 0)
-      m_postScaler->unscaleDual(s);
-
+      m_postScaler->unscaleSlacks(s);
+ 
+   // unscale prescaling
    if (m_preScaler != 0)
-      m_preScaler->unscaleDual(s);
-
+      m_preScaler->unscaleSlacks(s);
+           
    return stat;
 }
 
 SPxSolver::Status SoPlex::getDual(Vector& pi) const
 {
-   /// Does not work yet with presolve
+   METHOD( "SoPlex::getDual()" );
+   
    if (has_simplifier())
    {
-      MSG_ERROR( spxout << "ESOLVR02 Not yet implemented" << std::endl; )
-      return SPxSolver::ERROR;
-   }
-   SPxSolver::Status stat = m_solver.getDual(pi);
+      if (!m_simplifier->isUnsimplified())
+         unsimplify();
 
+      pi = m_simplifier->unsimplifiedDual();
+         
+      // unscale prescaling
+      if (m_preScaler != 0)
+         m_preScaler->unscaleDual(pi);
+      
+      if (m_vanished)
+         return SPxSolver::OPTIMAL;
+      else
+         return m_solver.status();
+   }
+   
+   // else 
+   SPxSolver::Status stat = m_solver.getDual(pi);
+            
+   // unscale postscaling
    if (m_postScaler != 0)
       m_postScaler->unscaleDual(pi);
-
+ 
+   // unscale prescaling
    if (m_preScaler != 0)
       m_preScaler->unscaleDual(pi);
-   
+           
    return stat;
 }
   
 SPxSolver::Status SoPlex::getRedCost(Vector& rdcost) const
 {
-   /// Does not work yet with presolve
+   METHOD( "SoPlex::getRedCost()" );
+   
    if (has_simplifier())
    {
-      MSG_ERROR( spxout << "ESOLVR03 Not yet implemented" << std::endl; )
-      return SPxSolver::ERROR;
+      if (!m_simplifier->isUnsimplified())
+         unsimplify();
+
+      rdcost = m_simplifier->unsimplifiedRedCost();
+         
+      // unscale prescaling
+      if (m_preScaler != 0)
+         m_preScaler->unscaleRedCost(rdcost);
+      
+      if (m_vanished)
+         return SPxSolver::OPTIMAL;
+      else
+         return m_solver.status();
    }
+   
+   // else 
    SPxSolver::Status stat = m_solver.getRedCost(rdcost);
-
+            
+   // unscale postscaling
    if (m_postScaler != 0)
-      m_postScaler->unscalePrimal(rdcost);
-
+      m_postScaler->unscaleRedCost(rdcost);
+ 
+   // unscale prescaling
    if (m_preScaler != 0)
-      m_preScaler->unscalePrimal(rdcost);
-
+      m_preScaler->unscaleRedCost(rdcost);
+           
    return stat;
+}
+
+SPxSolver::VarStatus SoPlex::getBasisRowStatus(int i) const
+{
+   if (has_simplifier())
+   {
+      if (!m_simplifier->isUnsimplified())
+         unsimplify();
+      
+      return m_simplifier->getBasisRowStatus(i);
+   }
+   else
+      return m_solver.getBasisRowStatus(i);
+}
+
+SPxSolver::VarStatus SoPlex::getBasisColStatus(int j) const
+{
+   if (has_simplifier())
+   {
+      if (!m_simplifier->isUnsimplified())
+         unsimplify();
+      
+      return m_simplifier->getBasisColStatus(j);
+   }
+   else
+      return m_solver.getBasisColStatus(j);
+}
+
+SPxSolver::Status SoPlex::getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const
+{
+   if (has_simplifier())
+   {
+      if (!m_simplifier->isUnsimplified())
+         unsimplify();
+      
+      m_simplifier->getBasis(rows, cols);
+      return m_solver.status();
+   }
+
+   else
+      return m_solver.getBasis(rows, cols);
 }
 
 SPxSolver::Status SoPlex::getDualfarkas(Vector& dualfarkas) const
@@ -299,6 +391,40 @@ bool SoPlex::writeBasisFile(
 {
    MSG_ERROR( spxout << "ESOLVR04 Warning! Not fully implemented" << std::endl; )
    return m_solver.writeBasisFile(filename, rowNames, colNames);
+}
+
+void SoPlex::unsimplify() const
+{
+   assert(has_simplifier());
+
+   if (m_simplifier->isUnsimplified())
+      return;
+
+   DVector psp_x(m_solver.nCols());  // primal solution (prescaled simplified postscaled)
+   DVector psp_y(m_solver.nRows());  // dual solution   (prescaled simplified postscaled) 
+   DVector psp_s(m_solver.nRows());  // slacks          (prescaled simplified postscaled)
+   DVector psp_r(m_solver.nCols());  // reduced costs   (prescaled simplified postscaled)
+    
+   m_solver.getPrimal(psp_x);
+   m_solver.getDual(psp_y);
+   m_solver.getSlacks(psp_s);
+   m_solver.getRedCost(psp_r);
+         
+   // unscale postscaling
+   if (m_postScaler != 0)
+   {
+      m_postScaler->unscalePrimal(psp_x);
+      m_postScaler->unscaleDual(psp_y);
+      m_postScaler->unscaleSlacks(psp_s);
+      m_postScaler->unscaleRedCost(psp_r);
+   }
+
+   // unsimplify
+   SPxSolver::VarStatus rows[m_solver.nRows()];
+   SPxSolver::VarStatus cols[m_solver.nCols()];
+   m_solver.getBasis(rows, cols);
+
+   m_simplifier->unsimplify(psp_x, psp_y, psp_s, psp_r, rows, cols);
 }
 
 } // namespace soplex

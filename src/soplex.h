@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.67 2005/11/01 21:27:04 bzforlow Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.68 2006/02/02 18:41:01 bzftuchs Exp $"
 
 /**@file  soplex.h
  * @brief preconfigured \ref soplex::SoPlex "SoPlex" LP-solver.
@@ -192,6 +192,15 @@ public:
    virtual SPxSolver::Status getDual(Vector& vector) const;
    ///
    virtual SPxSolver::Status getRedCost(Vector& vector) const;
+ 
+   /// gets basis status for a single row.
+   SPxSolver::VarStatus getBasisRowStatus(int row) const;
+
+   /// gets basis status for a single column.
+   SPxSolver::VarStatus getBasisColStatus(int col) const;
+
+   /// get current basis, and return solver status.
+   SPxSolver::Status getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const;
 
    ///
    virtual SPxSolver::Status getDualfarkas(Vector& vector) const;
@@ -264,6 +273,13 @@ private:
    SoPlex& operator=(const SoPlex& rhs);
    /// copy constructor is not implemented.
    SoPlex(const SoPlex&);
+   //@}
+
+   //------------------------------------
+   //**@name Private helpers */
+   //@{
+   /// undoes preprocessing such that the unsimplified solution values and basis is available
+   void unsimplify() const;
    //@}
 };
 } // namespace soplex
