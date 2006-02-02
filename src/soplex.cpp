@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.79 2006/02/02 18:40:52 bzftuchs Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.80 2006/02/02 19:41:55 bzftuchs Exp $"
 
 #include <iostream>
 
@@ -420,11 +420,14 @@ void SoPlex::unsimplify() const
    }
 
    // unsimplify
-   SPxSolver::VarStatus rows[m_solver.nRows()];
-   SPxSolver::VarStatus cols[m_solver.nCols()];
+   SPxSolver::VarStatus* rows = new SPxSolver::VarStatus[m_solver.nRows()];
+   SPxSolver::VarStatus* cols = new SPxSolver::VarStatus[m_solver.nCols()];
    m_solver.getBasis(rows, cols);
 
    m_simplifier->unsimplify(psp_x, psp_y, psp_s, psp_r, rows, cols);
+   
+   delete[] rows;
+   delete[] cols;
 }
 
 } // namespace soplex
