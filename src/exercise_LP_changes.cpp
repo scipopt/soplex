@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: exercise_LP_changes.cpp,v 1.10 2006/01/20 09:42:51 bzfhille Exp $"
+#pragma ident "@(#) $Id: exercise_LP_changes.cpp,v 1.11 2006/02/02 18:32:35 bzftuchs Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -40,10 +40,6 @@
 #include "spxdefaultrt.h"
 #include "spxfastrt.h"
 #include "spxsimplifier.h"
-#include "spxintervalsm.h"
-#include "spxaggregatesm.h"
-#include "spxredundantsm.h"
-#include "spxgeneralsm.h"
 #include "spxscaler.h"
 #include "spxequilisc.h"
 #include "spxgeometsc.h"

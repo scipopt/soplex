@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.85 2006/02/01 16:26:31 bzfhille Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.86 2006/02/02 18:32:19 bzftuchs Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -39,10 +39,7 @@
 #include "spxdefaultrt.h"
 #include "spxfastrt.h"
 #include "spxsimplifier.h"
-#include "spxintervalsm.h"
-#include "spxaggregatesm.h"
-#include "spxredundantsm.h"
-#include "spxgeneralsm.h"
+#include "spxmainsm.h"
 #include "spxscaler.h"
 #include "spxequilisc.h"
 #include "spxgeometsc.h"
@@ -210,11 +207,11 @@ void print_usage_and_exit( const char* const argv[] )
    " -h        show this help\n"
    "Simplifier:     Scaler:         Starter:     Pricer:        Ratiotester:\n"
    " -s0 none       -g0 none         -c0 none*   -p0 Textbook  -t0 Textbook\n"
-   " -s1 General*   -g1 C-uni-Equi   -c1 Weight  -p1 ParMult   -t1 Harris\n"
-   " -s2 Aggregate  -g2 R-uni-Equi   -c2 Sum     -p2 Devex     -t2 Fast*\n"
-   " -s3 Redundant  -g3 bi-Equi      -c3 Vector  -p3 Hybrid!\n"
-   " -s4 Interval   -g4 bi-Equi+Geom1*           -p4 Steep*\n"
-   "                -g5 bi-Equi+Geom8            -p5 Weight!\n" 
+   " -s1 Main*      -g1 C-uni-Equi   -c1 Weight  -p1 ParMult   -t1 Harris\n"
+   "                -g2 R-uni-Equi   -c2 Sum     -p2 Devex     -t2 Fast*\n"
+   "                -g3 bi-Equi      -c3 Vector  -p3 Hybrid!\n"
+   "                -g4 bi-Equi+Geom1*           -p4 Steep*\n"
+   "                -g5 bi-Equi+Geom8            -p5 Weight\n"
    ;
 
    std::cerr << "usage: " << argv[0] << " " << usage << std::endl;
@@ -279,6 +276,8 @@ int main(int argc, const char* const argv[])
    bool                      write_basis    = false;
    int                       precision;
    int                       optidx;
+
+   std::cout << "binary?" << std::endl;
 
    for(optidx = 1; optidx < argc; optidx++)
    {
@@ -530,17 +529,8 @@ int main(int argc, const char* const argv[])
 
    switch(simplifing)
    {
-   case 4 :
-      simplifier = new SPxIntervalSM;
-      break;
-   case 3 : 
-      simplifier = new SPxRedundantSM;
-      break;
-   case 2 :
-      simplifier = new SPxAggregateSM;
-      break;
    case 1 :
-      simplifier = new SPxGeneralSM;
+      simplifier = new SPxMainSM;
       break;
    case 0  :
       /*FALLTHROUGH*/

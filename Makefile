@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.67 2005/12/12 19:16:58 bzforlow Exp $
+# $Id: Makefile,v 1.68 2006/02/02 18:28:09 bzftuchs Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -56,14 +56,14 @@ LIBOBJ		= 	changesoplex.o didxset.o \
 			dsvector.o dvector.o enter.o factor.o \
 			forest.o idxset.o leave.o lpcolset.o lprowset.o \
 			lprow.o message.o mpsinput.o nameset.o \
-			slufactor.o solve.o soplex.o spxaggregatesm.o \
+			slufactor.o solve.o soplex.o \
 			spxbasis.o spxbounds.o spxchangebasis.o \
 			spxequilisc.o spxdantzigpr.o spxdefaultrt.o \
 			spxdefines.o spxdesc.o spxdevexpr.o \
-			spxfastrt.o spxfileio.o spxgeneralsm.o spxgeometsc.o \
-			spxharrisrt.o spxhybridpr.o spxid.o spxintervalsm.o spxio.o \
-			spxlp.o spxlpfread.o spxmpsread.o spxmpswrite.o \
-			spxout.o spxparmultpr.o spxquality.o spxredundantsm.o \
+			spxfastrt.o spxfileio.o spxgeometsc.o \
+			spxharrisrt.o spxhybridpr.o spxid.o spxio.o \
+			spxlp.o spxlpfread.o spxmainsm.o spxmpsread.o spxmpswrite.o \
+			spxout.o spxparmultpr.o spxquality.o \
 			spxscaler.o spxshift.o spxsolver.o spxsolve.o \
 			spxstarter.o spxsteeppr.o spxsumst.o spxvecs.o \
 			spxvectorst.o spxweightpr.o spxweightst.o \
