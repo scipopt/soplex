@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.86 2006/02/02 18:32:19 bzftuchs Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.87 2006/02/02 19:05:40 bzftuchs Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -276,8 +276,6 @@ int main(int argc, const char* const argv[])
    bool                      write_basis    = false;
    int                       precision;
    int                       optidx;
-
-   std::cout << "binary?" << std::endl;
 
    for(optidx = 1; optidx < argc; optidx++)
    {
