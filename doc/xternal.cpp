@@ -327,14 +327,14 @@
       In the default setting SoPlex presolves the given LP in order to
       simplify the problem as far as possible by removing rows,
       columns, and bounds. Moreover, infeasibility or unboundness may
-      be detected. The simplification cannot be undone, but given an
+      be detected. The simplification cannot be undone, but given a
       primal/dual solution for the simplified LP, the simplifier can
       reconstruct the primal/dual solution and basis of the
       unsimplified LP.
       
       Handled are:
       - empty rows / columns
-      - unconstraint rows
+      - unconstrained rows
       - row singletons
       - forcing rows
       - zero objective column singletons
@@ -347,7 +347,7 @@
       - (weakly) dominated columns
       - duplicate rows / columns
 
-      The preprocessing can switched off by using the option \c -s0.
+      The preprocessing can be switched off by using the option \c -s0.
    </li>
 
    </ol>
