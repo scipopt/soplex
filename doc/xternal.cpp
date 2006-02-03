@@ -93,22 +93,18 @@
    The current release of SoPlex was tested to compile with the following
    compilers / architectures:
    <TABLE>
-   <TR><TD>Architecture</TD><TD>CPU              </TD><TD>OS                            </TD><TD>Compiler    </TD></TR>
-   <TR><TD>x86         </TD><TD>Pentium 4 3.2 GHz</TD><TD>Suse Linux 10.0               </TD><TD>GCC 3.4, 4.0</TD></TR>
-   <TR><TD>x86         </TD><TD>Pentium 4 3.8 GHz</TD><TD>Suse Linux 10.0               </TD><TD>Intel 8.0   </TD></TR>
-   <TR><TD>x86         </TD><TD>Pentium 4 3.2 GHz</TD><TD>Windows XP                    </TD><TD>MS Visual Studio 2003</TD></TR>
-   <TR><TD>x86_64      </TD><TD>AMD Opteron 875  </TD><TD>Suse Linux Enterprise Server 9</TD><TD>GCC 3.3     </TD></TR>
-   <TR><TD>PowerPC     </TD><TD>G5 2.3           </TD><TD>MacOS Server 10.4             </TD><TD>GCC 4.0     </TD></TR>
-   <TR><TD>Alpha       </TD><TD>21264 667 MHz    </TD><TD>OSF1 V5.1                     </TD><TD>Compaq 6.5-39</TD></TR>
-   <TR><TD>Sparc       </TD><TD>Ultra 10 300 MHz </TD><TD>SunOS 5.7                     </TD><TD>Sun WorkShop 6 update 2 5.3</TD></TR>
+   <TR><TD>Architecture</TD><TD>CPU              </TD><TD>OS                </TD><TD>Compiler             </TD></TR>
+   <TR><TD>x86         </TD><TD>Pentium 4 3.2 GHz</TD><TD>Suse Linux 10.0   </TD><TD>GCC 4.0.2            </TD></TR>
+   <TR><TD>x86         </TD><TD>Pentium 4 3.8 GHz</TD><TD>Suse Linux 10.0   </TD><TD>Intel 9.0.026        </TD></TR>
+   <TR><TD>x86         </TD><TD>Pentium 4 3.2 GHz</TD><TD>Windows XP SP2    </TD><TD>MS Visual Studio 2003</TD></TR>
+   <TR><TD>x86_64      </TD><TD>AMD Opteron 875  </TD><TD>SLES 9            </TD><TD>GCC 4.0.2            </TD></TR>
+   <TR><TD>PowerPC     </TD><TD>G5 2.3           </TD><TD>MacOS-X 10.4.4    </TD><TD>GCC 4.0.0            </TD></TR>
+   <TR><TD>Power4      </TD><TD>Power4 1.7 GHz   </TD><TD>AIX 5.1           </TD><TD>VisualAge 6          </TD></TR>
+   <TR><TD>Alpha       </TD><TD>21264a 750 MHz   </TD><TD>OSF1 V5.1         </TD><TD>Compaq 6.5-39        </TD></TR>
+   <TR><TD>Sparc       </TD><TD>Ultra 60         </TD><TD>Solaris 9         </TD><TD>Sun Studio 11        </TD></TR>
    </TABLE>
 
    We expect SoPlex to be compilable using any sufficiently recent compiler.
-
-   At some time during development, some versions of the following 
-   compilers had internal erros, crashed or generated invalid code:
-   KAI, Gnu, Compaq, HP, Intel (The others were only seldom used). 
-
    Remember, your mileage may vary.
  */
 //-----------------------------------------------------------------------------
