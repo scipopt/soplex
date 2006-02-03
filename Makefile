@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.68 2006/02/02 18:28:09 bzftuchs Exp $
+# $Id: Makefile,v 1.69 2006/02/03 08:21:54 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -14,6 +14,7 @@ ARCH            :=      $(shell uname -m | \
                         sed \
 			-e s/sun../sparc/ \
 			-e s/i.86/x86/ \
+	                -e s/i86pc/x86/ \
 			-e s/IP../mips/ \
 			-e s/9000..../hppa/ \
 			-e s/Power\ Macintosh/ppc/ \
@@ -157,7 +158,7 @@ change_exerciser: $(CHANGEBINFILE)
 
 all:		$(BINFILE) $(CHANGEBINFILE)
 
-check:		$(BINFILE)
+check:		#$(BINFILE)
 		cd check; ./check.sh $(TEST).test ../$(BINFILE) '$(ALGO)' $(LIMIT)
 
 valgrind-check:	$(BINFILE)
