@@ -9,7 +9,7 @@ What's new
 
 Remarks
 -------
-Changes where made to the interfaces. Have a look at the changelog.
+Changes were made to the interfaces. Have a look at the changelog.
 
 We have a new architecture in the list: x86_64.
 
