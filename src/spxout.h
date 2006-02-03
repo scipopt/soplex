@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxout.h,v 1.10 2006/01/05 21:19:22 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxout.h,v 1.11 2006/02/03 08:22:17 bzfkocht Exp $"
 
 /**@file  spxout.h
  * @brief Wrapper for different output streams and verbosity levels.
@@ -241,17 +241,17 @@ private:
    operator<< ( SPxOut& _spxout, Type t ) \
    { PASS_TO_CURRENT_OSTREAM( t ) } 
 
-   DEFINE_OUTPUT_OPERATOR( long );
-   DEFINE_OUTPUT_OPERATOR( unsigned long );
-   DEFINE_OUTPUT_OPERATOR( bool );
-   DEFINE_OUTPUT_OPERATOR( short );
-   DEFINE_OUTPUT_OPERATOR( unsigned short );
-   DEFINE_OUTPUT_OPERATOR( int );
-   DEFINE_OUTPUT_OPERATOR( unsigned int );
-   DEFINE_OUTPUT_OPERATOR( double );
-   DEFINE_OUTPUT_OPERATOR( float );
-   DEFINE_OUTPUT_OPERATOR( long double );
-   DEFINE_OUTPUT_OPERATOR( const void* );
+   DEFINE_OUTPUT_OPERATOR( long )
+   DEFINE_OUTPUT_OPERATOR( unsigned long )
+   DEFINE_OUTPUT_OPERATOR( bool )
+   DEFINE_OUTPUT_OPERATOR( short )
+   DEFINE_OUTPUT_OPERATOR( unsigned short )
+   DEFINE_OUTPUT_OPERATOR( int )
+   DEFINE_OUTPUT_OPERATOR( unsigned int )
+   DEFINE_OUTPUT_OPERATOR( double )
+   DEFINE_OUTPUT_OPERATOR( float )
+   DEFINE_OUTPUT_OPERATOR( long double )
+   DEFINE_OUTPUT_OPERATOR( const void* )
 
    /// Passes standard manipulators without arguments, like @c std::endl
    /// or @c std::ios::right to the current stream.
