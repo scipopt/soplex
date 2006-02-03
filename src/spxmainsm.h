@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.h,v 1.4 2006/02/03 13:49:43 bzftuchs Exp $"
+#pragma ident "@(#) $Id: spxmainsm.h,v 1.5 2006/02/03 16:13:29 bzftuchs Exp $"
 
 /**@file  spxmainsm.h
  * @brief General methods in LP preprocessing.
@@ -40,26 +40,23 @@ namespace soplex
    linear programming" by E. Andersen and K. Andersen (Mathematical
    Programming, 1995).  It implements all proposed methods and some
    other preprocessing techniques for removing redundant rows and
-   columns and bounds.  As Andersen and Andersen solely consider LPs
-   with equality constraints, their methods have been slightly adapted
-   for arbitrary constraint ranges.  Also infeasibility and
-   unboundness may be detected.
+   columns and bounds.  Also infeasibility and unboundness may be
+   detected.
 
    Removed are:
    - empty rows / columns
    - unconstraint rows
    - row singletons
-   - forcing equality rows
+   - forcing rows
    - zero objective column singletons
    - (implied) free column singletons
    - doubleton equations combined with a column singleton
-   - (implicit) fixed columns
-   - rows with all fixed variables due to implied bounds
-   - redundant rhs / lhs
-   - redundant column bounds
+   - (implicitly) fixed columns
+   - redundant lhs / rhs
+   - redundant variable bounds
+   - variables that are free in one direction
    - (weakly) dominated columns
-   - columns with redundant bounds
-   - dublicate rows / columns
+   - duplicate rows / columns
 */
 class SPxMainSM : public SPxSimplifier
 {
@@ -99,6 +96,9 @@ private:
       }
    };
 
+   /**@brief   Postsolves unconstraint constraints.
+      @ingroup Algo
+   */
    class FreeConstraintPS : public PostStep
    {
    private:
@@ -121,6 +121,9 @@ private:
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
    };
 
+   /**@brief   Postsolves empty constraints.
+      @ingroup Algo
+   */
    class EmptyConstraintPS : public PostStep
    {
    private:
@@ -136,6 +139,9 @@ private:
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
    };
    
+   /**@brief   Postsolves row singletons.
+      @ingroup Algo
+   */
    class RowSingletonPS : public PostStep
    {
    private:
@@ -178,6 +184,9 @@ private:
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
    };
  
+   /**@brief   Postsolves forcing constraints.
+      @ingroup Algo
+   */
    class ForceConstraintPS : public PostStep
    {
    private:
@@ -223,6 +232,9 @@ private:
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
    };
    
+   /**@brief   Postsolves variable fixing.
+      @ingroup Algo
+   */
    class FixVariablePS : public PostStep
    {
    private:
@@ -249,6 +261,9 @@ private:
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
    };
 
+   /**@brief   Postsolves variable bound fixing.
+      @ingroup Algo
+   */
    class FixBoundsPS : public PostStep
    {
    private:
@@ -276,6 +291,10 @@ private:
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
    };
 
+   /**@brief Postsolves the case when constraints are removed due to a
+             variable with zero objective that is free in one direction.
+      @ingroup Algo
+   */
    class FreeZeroObjVariablePS : public PostStep
    {
    private:
@@ -324,6 +343,9 @@ private:
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
    };
 
+   /**@brief   Postsolves column singletons with zero objective.
+      @ingroup Algo
+   */
    class ZeroObjColSingletonPS : public PostStep
    {
    private:
@@ -356,6 +378,9 @@ private:
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
    };
    
+   /**@brief   Postsolves free column singletons.
+      @ingroup Algo
+   */
    class FreeColSingletonPS : public PostStep
    {
    private:
@@ -388,6 +413,9 @@ private:
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
    };
 
+   /**@brief   Postsolves doubleton equations combined with a column singleton.
+      @ingroup Algo
+   */
    class DoubletonEquationPS : public PostStep
    {
    private:
@@ -436,6 +464,9 @@ private:
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
    };
 
+   /**@brief   Postsolves duplicate rows.
+      @ingroup Algo
+   */
    class DuplicateRowsPS : public PostStep
    {
    private:
@@ -480,6 +511,9 @@ private:
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
    };
 
+   /**@brief   Postsolves duplicate columns.
+      @ingroup Algo
+   */
    class DuplicateColsPS : public PostStep
    {
    private:
@@ -523,7 +557,7 @@ private:
    //------------------------------------
    //**@name Types */
    //@{
-   /// 
+   /// Different simplification steps.
    enum SimpleStep
    {
       EMPTY_ROW            =  0,
