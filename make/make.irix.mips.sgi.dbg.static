@@ -1,9 +1,9 @@
-#--- $Id: make.irix.mips.sgi.dbg.static,v 1.1 2005/07/15 16:26:49 bzfpfend Exp $
+#--- $Id: make.irix.mips.sgi.dbg.static,v 1.2 2006/02/03 15:41:21 bzfkocht Exp $
 CXX	=	CC
-CXXFLAGS=	-fullwarn -g -LANG:std:ansi-for-init-scope=on
+CXXFLAGS=	-Isrc -DWITH_ZLIB -fullwarn -g -LANG:exceptions=off:libc_in_namespace_std=off
 AR	=	CC
 ARFLAGS	=	$(CXXFLAGS) -ar -o
 RANLIB	=	true
-LDFLAGS	=	-lCio -lm
+LDFLAGS	=	-lm -lz 
 
 

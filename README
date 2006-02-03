@@ -19,7 +19,7 @@
 
 	On systems with GNU g++   :  make COMP=gnu OPT=opt
 	Linux/x86 with Intel C++  :  make COMP=intel OPT=opt
-        Linux/AXP with Compaq C++ :  make COMP=compaq OPT=opt
+        Tru64 with Compaq C++     :  make COMP=compaq OPT=opt
         Solaris with SUN Forte C++:  make COMP=sun OPT=opt
         IRIX with SGI Mips Pro C++:  make COMP=sgi OPT=opt
 	HP-UX with HP aCC         :  make COMP=hp OPT=opt
