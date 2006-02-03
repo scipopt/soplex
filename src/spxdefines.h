@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.32 2006/02/01 16:26:31 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.33 2006/02/03 13:59:46 bzfkocht Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
@@ -43,7 +43,7 @@
 
 namespace soplex
 {
-#define SOPLEX_VERSION   122
+#define SOPLEX_VERSION   130
 
 /*-----------------------------------------------------------------------------
  * Assertion Macros etc.
