@@ -1,3 +1,9 @@
+03. Feb 2006 Release 1.3.0
+
+- A lot of stuff we have already forgotten about
+
+- New preprocessing
+
 - The number of warnings issued for ignored entries in MPS files is now limited
   to 1000 per file.
 
@@ -61,11 +67,11 @@
 
 - Renamed SPxDefaultPR to SPxDantzigPR.
 
-10.Apr 2002 Release 1.2.1
+10. Apr 2002 Release 1.2.1
 
 - Interface of SoPlex::terminate() changed
 - SoPlex::setRep(int) changed to SoPlex::setRep(Representation)
 
-16.Jan 2002 Release 1.2.0
+16. Jan 2002 Release 1.2.0
 
 

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
 "http://www.w3.org/TR/REC-html40/loose.dtd">
-<!-- $Id: soplex.php,v 1.16 2006/02/03 16:07:27 bzforlow Exp $ -->
+<!-- $Id: soplex.php,v 1.17 2006/02/03 17:03:35 bzfkocht Exp $ -->
 <?php
 $counter = "cgi/counter.dat";  # the data storage file
 
@@ -23,7 +23,7 @@ fclose($fp);
 <meta name="author" content="Thorsten Koch">
 <meta name="description" content="SoPlex Homepage">
 <meta name="keywords" content="SoPlex, Simplex, Solver, LP, Linear Programming, Mathematical Programming, Optimization">
-<meta name="date" content="$Date: 2006/02/03 16:07:27 $">
+<meta name="date" content="$Date: 2006/02/03 17:03:35 $">
 <meta name="robots" content="index|follow">
 <meta http-equiv="content-type" content="text/html;charset=iso-8859-1">
 <title>SoPlex</title> 
@@ -79,7 +79,7 @@ or LP-Format files is also included.</p>
 <p>
 SoPlex has been implemented as a part of Roland Wunderling's 
 Ph.D. thesis 
-<a href="http://www.zib.de/PaperWeb/abstracts/TR-96-09">
+<a href="http://www.zib.de/Publications/abstracts/TR-96-09">
 <em>Paralleler und Objektorientierter Simplex-Algorithmus</em></a>
 (in German).
 </p>
@@ -113,7 +113,7 @@ as a member of a <em>non-commercial</em> and <em>academic</em> institution.
 acknowledgment and a reference to the Ph.D. thesis:
 Roland Wunderling, 
 <em>Paralleler und Objektorientierter Simplex-Algorithmus</em>,
-<a href="http://www.zib.de/PaperWeb/abstracts/TR-96-09">
+<a href="http://www.zib.de/Publications/abstracts/TR-96-09">
 ZIB technical report TR 96-09</a>, Berlin 1996</b>
 </p>
 <p>
@@ -126,7 +126,7 @@ here are some notes on
 <h3>Download</h3>
 <p>
 Register and 
-<a href="register.html">download</a> the complete source 
+<a href="register.php">download</a> the complete source 
 code and documentation.
 </p>
 <p>
@@ -199,17 +199,17 @@ border="0" width="88" height="36" align="bottom"></a>
 <img src="images/valid-html40.png" alt="Valid HTML 4.0!"
 border="0" height="31" width="88" align="bottom"></a>
 <hr noshade><address><font size=-1>
-Last Update $Date: 2006/02/03 16:07:27 $ by
+Last Update $Date: 2006/02/03 17:03:35 $ by
 <a href="/mitarbeiter/mitarbeiter.pl?email=koch&amp;language=en">Thorsten Koch</a>
-<br>&copy; 2003 by Konrad-Zuse-Zentrum für Informationstechnik Berlin (ZIB)<br>
-<a href="/impressum.en.html">Imprint</a>
+<br>&copy; 2006 by Konrad-Zuse-Zentrum für Informationstechnik Berlin (ZIB)<br>
+<a href="/impressum/index.en.html">Imprint</a>
 </font>
 </address>
 </body>
 </html>
 <?php
 define("_BBC_PAGE_NAME", "SoPlex");
-define("_BBCLONE_DIR", "../../../koch/marsupilami/bbclone/");
+define("_BBCLONE_DIR", "../../../Personal/koch/marsupilami/bbclone/");
 define("COUNTER", _BBCLONE_DIR."mark_page.php");
 if (is_readable(COUNTER)) include_once(COUNTER);
 ?>
