@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.87 2006/02/02 19:05:40 bzftuchs Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.88 2006/02/03 13:55:20 bzfkocht Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -209,8 +209,8 @@ void print_usage_and_exit( const char* const argv[] )
    " -s0 none       -g0 none         -c0 none*   -p0 Textbook  -t0 Textbook\n"
    " -s1 Main*      -g1 C-uni-Equi   -c1 Weight  -p1 ParMult   -t1 Harris\n"
    "                -g2 R-uni-Equi   -c2 Sum     -p2 Devex     -t2 Fast*\n"
-   "                -g3 bi-Equi      -c3 Vector  -p3 Hybrid!\n"
-   "                -g4 bi-Equi+Geom1*           -p4 Steep*\n"
+   "                -g3 bi-Equi*     -c3 Vector  -p3 Hybrid!\n"
+   "                -g4 bi-Equi+Geom1            -p4 Steep*\n"
    "                -g5 bi-Equi+Geom8            -p5 Weight\n"
    ;
 
@@ -262,7 +262,7 @@ int main(int argc, const char* const argv[])
    int                       starting       = 0;
    int                       pricing        = 4;
    int                       ratiotest      = 2;
-   int                       scaling        = 4;
+   int                       scaling        = 3;
    int                       simplifing     = 1;
    Real                      timelimit      = -1.0;
    Real                      delta          = DEFAULT_BND_VIOL;
