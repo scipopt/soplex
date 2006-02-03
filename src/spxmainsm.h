@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.h,v 1.3 2006/02/03 12:49:16 bzftuchs Exp $"
+#pragma ident "@(#) $Id: spxmainsm.h,v 1.4 2006/02/03 13:49:43 bzftuchs Exp $"
 
 /**@file  spxmainsm.h
  * @brief General methods in LP preprocessing.
@@ -260,16 +260,16 @@ private:
       FixBoundsPS(const SPxLP& lp, const SPxMainSM& simplifier, int j, Real val)
          : m_j(simplifier.cIdx(lp, j))
       { 
-         if (EQrel(lp.lower(j), lp.upper(j)))
+         if (EQrel(lp.lower(j), lp.upper(j), eps()))
             m_status = SPxSolver::FIXED;
-         else if (EQrel(val, lp.lower(j)))
+         else if (EQrel(val, lp.lower(j), eps()))
             m_status = SPxSolver::ON_LOWER;
-         else if (EQrel(val, lp.upper(j)))
+         else if (EQrel(val, lp.upper(j), eps()))
             m_status = SPxSolver::ON_UPPER;
          else if (lp.lower(j) <= -infinity && lp.upper(j) >= infinity)
             m_status = SPxSolver::ZERO;
          else
-            abort();
+            assert(false);
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.1 2006/02/02 18:34:24 bzftuchs Exp $"
+#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.2 2006/02/03 13:49:43 bzftuchs Exp $"
 
 //#define DEBUGGING 1
 
@@ -1193,17 +1193,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                lhsBnd += aij * lp.upper(j);
          }
       }
-      
-      if (lhsBnd >= infinity)
-      {
-         std::cout << "lhsBnd for row " << i << " = " << lhsBnd << std::endl;
-      }
-     
-      if (rhsBnd <= -infinity)
-      {
-         std::cout << "rhsBnd for row " << i << " = " << rhsBnd << std::endl;
-      }  
-      
+    
 #ifdef FREE_BOUNDS
       // 1. detect implied free variables
       if (rhsCnt <= 1 || lhsCnt <= 1)
@@ -1702,12 +1692,12 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
 
          m_hist.append(new FixBoundsPS(lp, *this, j, val));  
          m_hist.append(new FixVariablePS(lp, *this, j, val));
-            
+           
          ++remCols;
          removeCol(lp, j);
 
          ++m_stat[EMPTY_COL];
-         
+
          continue;
 #endif
       }
@@ -1903,7 +1893,6 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
             }
             else
             {
-               std::cout << "CRITICAL CASE" << std::endl;
                lhs = lp.lhs(i);
                rhs = lp.rhs(i);
             }
