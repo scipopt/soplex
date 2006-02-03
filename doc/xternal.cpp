@@ -16,12 +16,12 @@
    which can be found at http://www.zib.de/PaperWeb/abstracts/TR-96-09
    (in German).
 
-   SoPlex is implememted in C++. The code should be compliant with the 
+   SoPlex is implemented in C++. The code should be compliant with the 
    current ANSI standard. Exceptions, RTTI and STL (other then iostream) 
    are not used. Everything is in one namespace \em soplex.
 
-   Note, that you are allowed to retreive SoPlex only for research purpose 
-   as a member of a \em noncommercial and \em academic institution.
+   Note, that you are allowed to retrieve SoPlex only for research purpose 
+   as a member of a \em non-commercial and \em academic institution.
 
    - \ref RUN      "Where does it run"
 
@@ -63,7 +63,7 @@
 /**@defgroup Algo Algorithmic Classes
    @brief Implementation of numerical algorithms.   
    
-   Algorithmic classes serve for implementing a variaty of
+   Algorithmic classes serve for implementing a variety of
    algorithms for solving numerical (sub-)problems.
 */
 //-----------------------------------------------------------------------------
@@ -80,7 +80,7 @@
     We distinguish \em data \em objects from general C++ objects that
     may include some allocation of resources. (Note that for general
     C++ objects that do allocate resources, this must be respected by
-    providing apropriate copy constructor and assignment operators.)
+    providing appropriate copy constructor and assignment operators.)
     An example for a general C++ class is class DataArray.
  
     The distinction between data and general C++ objects becomes
@@ -203,7 +203,7 @@
     on the relevant architectures. Best is something like -fast that
     uses the right optimizations for the architecture that is used.
 
-  - opt-XXX (optimizied for XXX) like opt-p4. This includes optimization
+  - opt-XXX (optimized for XXX) like opt-p4. This includes optimization
     for a specific processor. 
 
   - prf (profile) like opt, but generate profile data.
@@ -238,7 +238,7 @@
       Because there is no realloc with new/delete. Because malloc
       is faster. And we only use it for builtin types or so called 
       \ref DataObjects "Data Objects" .
-      If you do not like this desision, it is quite easy to change 
+      If you do not like this decision, it is quite easy to change 
       spxalloc.h such as to use new/delete.
    </li>
 
@@ -322,9 +322,32 @@
 
    </li>
 
-   <li> If I add rows or columns to an LP, are they checked for redundancy ?
+   <li> What kind of preprocessing is done?
 
-      No. You have to do it yourself.
+      In the default setting SoPlex presolves the given LP in order to
+      simplify the problem as far as possible by removing rows,
+      columns, and bounds. Moreover, infeasibility or unboundness may
+      be detected. The simplification cannot be undone, but given an
+      primal/dual solution for the simplified LP, the simplifier can
+      reconstruct the primal/dual solution and basis of the
+      unsimplified LP.
+      
+      Handled are:
+      - empty rows / columns
+      - unconstraint rows
+      - row singletons
+      - forcing rows
+      - zero objective column singletons
+      - (implied) free column singletons
+      - doubleton equations combined with a column singleton
+      - (implicitly) fixed columns
+      - redundant lhs / rhs
+      - redundant variable bounds
+      - variables that are free in one direction
+      - (weakly) dominated columns
+      - duplicate rows / columns
+
+      The preprocessing can switched off by using the option \c -s0.
    </li>
 
    </ol>
@@ -342,7 +365,7 @@
    (using \c -zz or \c -zu) might improve the quality of the
    solution, but may also slow down the program. Setting the epsilons to
    bigger values may speed up the algorithm, but values greater than 1e-12 
-   are definately a bad idea.
+   are definitely a bad idea.
 
    Setting \c -d to smaller values like 1e-7 or 1e-8 will improve the
    quality of the solution, but it will take longer. Values smaller
@@ -379,7 +402,7 @@
    structurally equivalent to the dual Simplex on the rowwise
    representation and vice versa (see above). Hence, it is
    desirable to treat both cases in a very similar manner. This
-   is supported by the programmer's interface of Soplex which
+   is supported by the programmer's interface of SoPlex which
    provides access methods for all internal data in two ways: one
    is relative to the "physical" representation of the LP in
    rows and columns, while the other is relative to the chosen
@@ -409,10 +432,10 @@
    The Simplex algorithms keeps three vectors which are associated to each basis.
    Two of them are required for the pricing, while the third one is needed for
    detecting feasibility of the basis. For all three vectors, bounds are
-   defined. The Simplex alogrithm changes the basis until all three vectors
+   defined. The Simplex algorithm changes the basis until all three vectors
    satisfy their bounds, which means that the optimal solution has been found.
     
-   Whith each update of the basis, also the three vectors need to be
+   With each update of the basis, also the three vectors need to be
    updated. This is best supported by the use of UpdateVectors.
     
    @subsection Variables
