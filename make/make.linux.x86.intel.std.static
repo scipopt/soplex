@@ -1,6 +1,6 @@
-#--- $Id: make.linux.x86.intel.std.static,v 1.2 2006/02/03 13:58:51 bzforlow Exp $
+#--- $Id: make.linux.x86.intel.std.static,v 1.3 2006/02/03 14:54:46 bzforlow Exp $
 CXX	=	icc
 CPPFLAGS=	-Isrc -DNDEBUG -DWITH_ZLIB
-CXXFLAGS=	-O -cxxlib-gcc=/opt/gcc-342 -wd1572
+CXXFLAGS=	-O -wd1572
 LDFLAGS	=	-lz -lm -lstdc++
 ARFLAGS	=	crs

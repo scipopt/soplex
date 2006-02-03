@@ -1,9 +1,10 @@
-#--- $Id: make.osf1.alpha.compaq.std.static,v 1.2 2005/12/12 16:15:28 bzfhille Exp $
+#--- $Id: make.osf1.alpha.compaq.std.static,v 1.3 2006/02/03 14:54:46 bzforlow Exp $
 CXX	=	cxx
 CPPFLAGS=	-Isrc -DNDEBUG -DWITH_ZLIB
 CXXFLAGS=	-std strict_ansi -distinguish_nested_enums -O2 -arch host -nortti \
 		-ansi_alias -inline speed -assume accuracy_sensitive -ieee -g \
 		-ptr $(OBJDIR)/cxx_repository   
 REPOSIT	=	$(OBJDIR)/cxx_repository/*.o
-LDFLAGS	=	-non_shared -L/usr/local/lib -lz -lm
+#LDFLAGS	=	-non_shared -L/usr/local/lib -lz -lm
+LDFLAGS	=	-non_shared -lz -lm
 ARFLAGS	=	crs

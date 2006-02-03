@@ -1,6 +1,6 @@
-#--- $Id: make.linux.x86_64.gnu.opt.static,v 1.1 2006/02/03 13:54:18 bzfkocht Exp $
+#--- $Id: make.linux.x86_64.gnu.opt.static,v 1.2 2006/02/03 14:54:46 bzforlow Exp $
 CXX	=	g++
-CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -DWITH_ZLIB # -DWITH_EASYVAL -I/optimi/kombadon/bzfkocht/easyval/include
+CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -DWITH_ZLIB
 CXXFLAGS=	-O3 -march=k8 -mtune=k8 -fno-exceptions -fomit-frame-pointer # -malign-double -ffast-math
-LDFLAGS	=	-lz -lm -static #-L/optimi/kombadon/bzfkocht/easyval/lib -lEasyval
+LDFLAGS	=	-lz -lm -static
 ARFLAGS	=	crs

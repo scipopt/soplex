@@ -1,6 +1,6 @@
-#--- $Id: make.linux.x86.gnu.valgrind-opt.static,v 1.5 2006/02/01 16:26:31 bzfhille Exp $
+#--- $Id: make.linux.x86.gnu.valgrind-opt.static,v 1.6 2006/02/03 14:54:46 bzforlow Exp $
 CXX	=	g++
-CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -DWITH_ZLIB # -DWITH_EASYVAL -I/optimi/kombadon/bzfkocht/easyval/include
+CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -DWITH_ZLIB
 CXXFLAGS=	-O3 -march=pentiumpro -fno-exceptions -g -ansi $(GCCWARN)
-LDFLAGS	=	-lz -lm #-L/optimi/kombadon/bzfkocht/easyval/lib -lEasyval
+LDFLAGS	=	-lz -lm
 ARFLAGS	=	crs

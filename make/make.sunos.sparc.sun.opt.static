@@ -1,8 +1,8 @@
-#--- $Id: make.sunos.sparc.sun.opt.static,v 1.4 2006/02/03 14:00:19 bzforlow Exp $
+#--- $Id: make.sunos.sparc.sun.opt.static,v 1.5 2006/02/03 14:54:47 bzforlow Exp $
 CXX	=	CC
-CPPFLAGS=	-Isrc -I/client/include -DNDEBUG -DWITH_ZLIB -DNO_ADDITIONAL_CHECKS
+CPPFLAGS=	-Isrc -DNDEBUG -DWITH_ZLIB -DNO_ADDITIONAL_CHECKS 
 CXXFLAGS=	-fast -xprefetch=auto -xipo=2
-LDFLAGS	=	-L/client/lib -lz -lm
+LDFLAGS	=	-lz -lm
 RANLIB	=	true
 AR	=	CC
 ARFLAGS	=	$(CXXFLAGS) -xar -o
