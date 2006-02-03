@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.h,v 1.1 2006/02/02 18:34:29 bzftuchs Exp $"
+#pragma ident "@(#) $Id: spxmainsm.h,v 1.2 2006/02/03 12:21:12 bzftuchs Exp $"
 
 /**@file  spxmainsm.h
  * @brief General methods in LP preprocessing.
@@ -48,11 +48,11 @@ namespace soplex
    Removed are:
    - empty rows / columns
    - unconstraint rows
-   - forcing equality rows
    - row singletons
+   - forcing equality rows
+   - zero objective column singletons
    - (implied) free column singletons
    - doubleton equations combined with a column singleton
-   - zero objective column singletons
    - (implicit) fixed columns
    - rows with all fixed variables due to implied bounds
    - redundant rhs / lhs
@@ -63,6 +63,191 @@ namespace soplex
 */
 class SPxMainSM : public SPxSimplifier
 {
+private:
+   //------------------------------------
+   //**@name Types */
+   //@{
+   /// 
+   enum SimpleStep
+   {
+      EMPTY_ROW            =  0,
+      FREE_ROW             =  1,
+      SINGLETON_ROW        =  2,
+      FORCE_ROW            =  3,
+      EMPTY_COL            =  4,
+      FIX_COL              =  5,
+      FREE_ZOBJ_COL        =  6,
+      ZOBJ_SINGLETON_COL   =  7,
+      DOUBLETON_ROW        =  8,
+      FREE_SINGLETON_COL   =  9,
+      DOMINATED_COL        = 10,
+      WEAKLY_DOMINATED_COL = 11,
+      DUPLICATE_ROW        = 12,
+      FIX_DUPLICATE_COL    = 13,
+      SUB_DUPLICATE_COL    = 14
+   };
+   //@}
+
+   class PostStep;
+   
+   //------------------------------------
+   //**@name Data */
+   //@{
+   ///
+   DVector                         m_prim;       ///< unsimplified primal solution vector.
+   DVector                         m_slack;      ///< unsimplified slack vector.
+   DVector                         m_dual;       ///< unsimplified dual solution vector.
+   DVector                         m_redCost;    ///< unsimplified reduced cost vector.   
+   DataArray<SPxSolver::VarStatus> m_cBasisStat; ///< basis status of columns.
+   DataArray<SPxSolver::VarStatus> m_rBasisStat; ///< basis status of rows.
+   DataArray<int>                  m_cIdx;       ///< removed column index vector in original LP.
+   DataArray<int>                  m_rIdx;       ///< removed row index vector in original LP.
+   DataArray<PostStep*>            m_hist;       ///< vector of presolve history.
+   bool                            m_postsolved; ///< status of postsolving.
+   Real                            m_epsilon;    ///< epsilon zero.
+   Real                            m_delta;      ///< maximum bound violation.
+   DataArray<int>                  m_stat;       ///< preprocessing history.
+   //@}
+     
+private:
+   //------------------------------------
+   //**@name Private helpers */
+   //@{
+   /// handles extreme values by setting them to zero or infinity.
+   void handleExtremes(SPxLP& lp);
+   
+   /// removed empty rows and empty constraints.
+   Result removeEmpty(SPxLP& lp);
+   
+   /// performs simplification steps on the rows of the LP.
+   Result simplifyRows(SPxLP& lp, bool& again);
+   
+   /// performs simplification steps on the columns of the LP.
+   Result simplifyCols(SPxLP& lp, bool& again);
+   
+   /// performs simplification steps on the LP based on dual concepts.
+   Result simplifyDual(SPxLP& lp, bool& again);
+   
+   /// removes duplicate rows.
+   Result duplicateRows(SPxLP& lp, bool& again);
+   
+   /// removes duplicate columns
+   Result duplicateCols(SPxLP& lp, bool& again);
+   
+   /// handles the fixing of a variable.
+   void fixColumn(SPxLP& lp, int i);
+   
+   /// removes a row in the LP.
+   void removeRow(SPxLP& lp, int i)
+   {
+      m_rIdx[i] = lp.rId(lp.nRows()-1).getIdx();
+      lp.removeRow(i);
+   }
+   /// removes a column in the LP.
+   void removeCol(SPxLP& lp, int j)
+   {
+      m_cIdx[j] = lp.cId(lp.nCols()-1).getIdx();
+      lp.removeCol(j);
+   }
+   /// returns for a given row index of the given (reduced) LP the corresponding row index in the unsimplified LP.
+   int rIdx(const SPxLP& lp, int i) const
+   {
+      return (m_rIdx[i] != -1) ? m_rIdx[i] : lp.rId(i).getIdx();
+   }
+   /// returns for a given column index of the given (reduced) LP the corresponding column index in the unsimplified LP.
+   int cIdx(const SPxLP& lp, int j) const
+   {
+      return (m_cIdx[j] != -1) ? m_cIdx[j] : lp.cId(j).getIdx();
+   }
+   ///
+   Real epsZero() const
+   {
+      return m_epsilon;
+   }
+   ///
+   Real deltaBnd() const
+   {
+      return m_delta;
+   }
+   //@}
+
+public:
+   //------------------------------------
+   //**@name Constructors / destructors */
+   //@{
+   /// default constructor.
+   SPxMainSM() 
+      : SPxSimplifier("MainSM")
+   {}   
+   /// destructor.
+   virtual ~SPxMainSM()
+   {}  
+   //@}
+
+   //------------------------------------
+   //**@name LP simplification */
+   //@{
+   /// simplifies LP. 
+   virtual Result simplify(SPxLP& lp, Real eps, Real delta);
+
+   /// reconstructs an optimal solution for the unsimplified LP.
+   virtual void unsimplify(const Vector& x, const Vector& y, const Vector& s, const Vector& r,
+                           const SPxSolver::VarStatus rows[], const SPxSolver::VarStatus cols[]);
+
+   /// specifies whether an optimal solution has already been unsimplified.
+   virtual bool isUnsimplified() const
+   {
+      return m_postsolved;
+   }
+   /// returns a reference to the unsimplified primal solution.
+   virtual const Vector& unsimplifiedPrimal()
+   {
+      assert(m_postsolved);
+      return m_prim;
+   }
+   /// returns a reference to the unsimplified dual solution.
+   virtual const Vector& unsimplifiedDual()
+   {
+      assert(m_postsolved);
+      return m_dual;
+   }
+   /// returns a reference to the unsimplified slack values.
+   virtual const Vector& unsimplifiedSlacks()
+   {
+      assert(m_postsolved);
+      return m_slack;
+   }
+   /// returns a reference to the unsimplified reduced costs.
+   virtual const Vector& unsimplifiedRedCost()
+   {
+      assert(m_postsolved);
+      return m_redCost;
+   }
+   /// gets basis status for a single row.
+   virtual SPxSolver::VarStatus getBasisRowStatus(int i) const
+   {
+      assert(m_postsolved);
+      return m_rBasisStat[i];
+   }
+   /// gets basis status for a single column.
+   virtual SPxSolver::VarStatus getBasisColStatus(int j) const
+   {
+      assert(m_postsolved);
+      return m_cBasisStat[j];
+   }
+   /// get optimal basis.
+   virtual void getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const
+   {
+      assert(m_postsolved);
+      
+      for(int i = 0; i < m_rBasisStat.size(); ++i)
+         rows[i] = m_rBasisStat[i];
+
+      for(int j = 0; j < m_rBasisStat.size(); ++j)
+         cols[j] = m_cBasisStat[j];
+   }   
+   //@}
+
 private:
    //---------------------------------------------------------------------
    //  class PostsolveStep
@@ -577,188 +762,8 @@ private:
       }
    };
    //@}
-   
-private:
-   //------------------------------------
-   //**@name Types */
-   //@{
-   /// 
-   enum SimpleStep
-   {
-      EMPTY_ROW            =  0,
-      FREE_ROW             =  1,
-      SINGLETON_ROW        =  2,
-      FORCE_ROW            =  3,
-      EMPTY_COL            =  4,
-      FIX_COL              =  5,
-      FREE_ZOBJ_COL        =  6,
-      ZOBJ_SINGLETON_COL   =  7,
-      DOUBLETON_ROW        =  8,
-      FREE_SINGLETON_COL   =  9,
-      DOMINATED_COL        = 10,
-      WEAKLY_DOMINATED_COL = 11,
-      DUPLICATE_ROW        = 12,
-      FIX_DUPLICATE_COL    = 13,
-      SUB_DUPLICATE_COL    = 14
-   };
-   //@}
-
-   //------------------------------------
-   //**@name Data */
-   //@{
-   ///
-   DVector                         m_prim;       ///< unsimplified primal solution vector.
-   DVector                         m_slack;      ///< unsimplified slack vector.
-   DVector                         m_dual;       ///< unsimplified dual solution vector.
-   DVector                         m_redCost;    ///< unsimplified reduced cost vector.   
-   DataArray<SPxSolver::VarStatus> m_cBasisStat; ///< basis status of columns.
-   DataArray<SPxSolver::VarStatus> m_rBasisStat; ///< basis status of rows.
-   DataArray<int>                  m_cIdx;       ///< removed column index vector in original LP.
-   DataArray<int>                  m_rIdx;       ///< removed row index vector in original LP.
-   DataArray<PostStep*>            m_hist;       ///< vector of presolve history.
-   bool                            m_postsolved; ///< status of postsolving.
-   Real                            m_epsilon;    ///< epsilon zero.
-   Real                            m_delta;      ///< maximum bound violation.
-   DataArray<int>                  m_stat;       ///< preprocessing history.
-   //@}
-     
-private:
-
-   //------------------------------------
-   //**@name Private helpers */
-   //@{
-   /// handles extreme values by setting them to zero or infinity.
-   void handleExtremes(SPxLP& lp);
-   
-   /// removed empty rows and empty constraints.
-   Result removeEmpty(SPxLP& lp);
-   
-   /// performs simplification steps on the rows of the LP.
-   Result simplifyRows(SPxLP& lp, bool& again);
-   
-   /// performs simplification steps on the columns of the LP.
-   Result simplifyCols(SPxLP& lp, bool& again);
-   
-   /// performs simplification steps on the LP based on dual concepts.
-   Result simplifyDual(SPxLP& lp, bool& again);
-   
-   /// removes duplicate rows.
-   Result duplicateRows(SPxLP& lp, bool& again);
-   
-   /// removes duplicate columns
-   Result duplicateCols(SPxLP& lp, bool& again);
-   
-   /// handles the fixing of a variable.
-   void fixColumn(SPxLP& lp, int i);
-   
-   /// removes a row in the LP.
-   void removeRow(SPxLP& lp, int i)
-   {
-      m_rIdx[i] = lp.rId(lp.nRows()-1).getIdx();
-      lp.removeRow(i);
-   }
-   /// removes a column in the LP.
-   void removeCol(SPxLP& lp, int j)
-   {
-      m_cIdx[j] = lp.cId(lp.nCols()-1).getIdx();
-      lp.removeCol(j);
-   }
-   /// returns for a given row index of the given (reduced) LP the corresponding row index in the unsimplified LP.
-   int rIdx(const SPxLP& lp, int i) const
-   {
-      return (m_rIdx[i] != -1) ? m_rIdx[i] : lp.rId(i).getIdx();
-   }
-   /// returns for a given column index of the given (reduced) LP the corresponding column index in the unsimplified LP.
-   int cIdx(const SPxLP& lp, int j) const
-   {
-      return (m_cIdx[j] != -1) ? m_cIdx[j] : lp.cId(j).getIdx();
-   }
-   ///
-   Real epsZero() const
-   {
-      return m_epsilon;
-   }
-   ///
-   Real deltaBnd() const
-   {
-      return m_delta;
-   }
-   //@}
-
-public:
-
-   //------------------------------------
-   //**@name Constructors / destructors */
-   //@{
-   /// default constructor.
-   SPxMainSM() 
-      : SPxSimplifier("MainSM")
-   {}   
-   /// destructor.
-   virtual ~SPxMainSM()
-   {}  
-   //@}
-
-   //------------------------------------
-   //**@name LP simplification */
-   //@{
-   /// simplifies LP. 
-   virtual Result simplify(SPxLP& lp, Real eps, Real delta);
-
-   /// reconstructs an optimal solution for the unsimplified LP.
-   virtual void unsimplify(const Vector& x, const Vector& y, const Vector& s, const Vector& r,
-                           const SPxSolver::VarStatus rows[], const SPxSolver::VarStatus cols[]);
-
-   /// specifies whether an optimal solution has already been unsimplified.
-   virtual bool isUnsimplified() const
-   {
-      return m_postsolved;
-   }
-   /// returns a reference to the unsimplified primal solution.
-   virtual const Vector& unsimplifiedPrimal()
-   {
-      assert(m_postsolved);
-      return m_prim;
-   }
-   /// returns a reference to the unsimplified dual solution.
-   virtual const Vector& unsimplifiedDual()
-   {
-      assert(m_postsolved);
-      return m_dual;
-   }
-   /// returns a reference to the unsimplified slack values.
-   virtual const Vector& unsimplifiedSlacks()
-   {
-      assert(m_postsolved);
-      return m_slack;
-   }
-   /// returns a reference to the unsimplified reduced costs.
-   virtual const Vector& unsimplifiedRedCost()
-   {
-      assert(m_postsolved);
-      return m_redCost;
-   }
-   /// gets basis status for a single row.
-   virtual SPxSolver::VarStatus getBasisRowStatus(int i) const
-   {
-      assert(m_postsolved);
-      return m_rBasisStat[i];
-   }
-   /// gets basis status for a single column.
-   virtual SPxSolver::VarStatus getBasisColStatus(int j) const
-   {
-      assert(m_postsolved);
-      return m_cBasisStat[j];
-   }
-   /// get optimal basis.
-   virtual void getBasis(const SPxSolver::VarStatus rows[], const SPxSolver::VarStatus cols[]) const
-   {
-      assert(m_postsolved);
-      rows = m_rBasisStat.get_const_ptr();
-      cols = m_cBasisStat.get_const_ptr();
-   }   
-   //@}
 };
+
 } // namespace soplex
 #endif // _SPXMAINSM_H_
 

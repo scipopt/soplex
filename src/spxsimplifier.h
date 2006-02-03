@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsimplifier.h,v 1.17 2006/02/02 19:42:29 bzftuchs Exp $"
+#pragma ident "@(#) $Id: spxsimplifier.h,v 1.18 2006/02/03 12:21:12 bzftuchs Exp $"
 
 /**@file  spxsimplifier.h
  * @brief LP simplification base class.
@@ -144,7 +144,7 @@ public:
    virtual SPxSolver::VarStatus getBasisColStatus(int) const = 0;
 
    /// get optimal basis.
-   virtual void getBasis(const SPxSolver::VarStatus[], const SPxSolver::VarStatus[]) const = 0;
+   virtual void getBasis(SPxSolver::VarStatus[], SPxSolver::VarStatus[]) const = 0;
    //@}
 
 #ifndef NO_CONSISTENCY_CHECKS
