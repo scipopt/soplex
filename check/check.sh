@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: check.sh,v 1.25 2005/12/16 08:06:07 bzfhille Exp $
+# $Id: check.sh,v 1.26 2006/02/03 13:52:49 bzfkocht Exp $
 # Parameters
 # $1 Name of the test, e.g. netlib (needs netlib.test, netlib.solu)
 # $2 Path/Name of the binary, e.g. ../bin/soplex.linux.x86.gnu.opt
@@ -20,6 +20,7 @@ OSTYPE=`uname -s | tr '[:upper:]' '[:lower:]' | sed -e s/cygwin.*/cygwin/ -e s/i
 case $OSTYPE in
     osf1)  AWK=gawk ;;
     sunos)  AWK=gawk ;;
+    aix)  AWK=gawk ;;
 esac
 
 #
