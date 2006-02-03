@@ -311,9 +311,6 @@
 
       Yes, have a look at 
       http://www.coin-or.org/documentation.html#OSI
-      <!--
-         http://oss.software.ibm.com/developerworks/opensource/coin
-      -->
    </li>
 
    <li> How can I make LP generation easier?
@@ -341,16 +338,16 @@
    a good idea to try the \c -r flag to choose a row-wise representation
    of the basis.
 
-<!-- TODO : TO UPDATE! -->
-   Setting \c -z to a smaller value like 1e-18 or 1e-20 might improve
-   the quality of the solution, but may also slow down the
-   program. Setting \c -z to bigger values may speed up the algorithm,
-   but values greater than 1e-12 are definately a bad idea.
+   Setting the different epsilons to a smaller value like 1e-18 or 1e-20
+   (using \c -zz or \c -zu) might improve the quality of the
+   solution, but may also slow down the program. Setting the epsilons to
+   bigger values may speed up the algorithm, but values greater than 1e-12 
+   are definately a bad idea.
 
    Setting \c -d to smaller values like 1e-7 or 1e-8 will improve the
    quality of the solution, but it will take longer. Values smaller
    then 1e-9 are not recommended. The \c -d value should be
-   substantial bigger then the \c -z value.
+   substantial bigger then the \c -z values.
 
    If the default settings are too slow, using \c -e eventually together 
    with \c -p1 might improve the running time.  
