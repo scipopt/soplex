@@ -1,4 +1,23 @@
-$Id: TODO,v 1.80 2006/01/31 19:29:42 bzforlow Exp $
+$Id: TODO,v 1.81 2006/02/03 17:09:39 bzfkocht Exp $
+
+- solu Dateien vervollständigen, insbesondere miplib.solu
+- alle Tests auf allen Maschinen durchlaufen lassen -> results
+- USE_OLD entfernen
+- extra Programme testen/integrieren
+- excercise_LP nach extra verlagern
+- COIN Interface update
+- flexelint
+- soplex.zib.de mit link besorgen
+- sendit.sh mit mutt ?
+- web auf CVS umstellen
+- soplex logo
+- MPS Link korrigieren
+- Mailingliste auf Stand bringen
+- @ in gif ändern
+- SCIP/SoPlex testen
+- sw installationen
+
+
 
 - Wieso ist das SPxLP protected from LPColSet und LPRowSet abgeleitet und
   spiegelt dann mehrere von deren Methoden, um sie wieder public zugreifbar zu
