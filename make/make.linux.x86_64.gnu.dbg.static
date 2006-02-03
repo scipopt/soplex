@@ -1,0 +1,6 @@
+#--- $Id: make.linux.x86_64.gnu.dbg.static,v 1.1 2006/02/03 13:54:18 bzfkocht Exp $
+CXX	=	g++
+CPPFLAGS=	-Isrc -DWITH_ZLIB # -DWITH_EASYVAL -I/optimi/kombadon/bzfkocht/easyval/include
+CXXFLAGS=	-O0 -g -ansi $(GCCWARN)
+LDFLAGS	=	-lz -lm -static # -L/optimi/kombadon/bzfkocht/easyval/lib -lEasyval
+ARFLAGS	=	crs
