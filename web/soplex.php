@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
 "http://www.w3.org/TR/REC-html40/loose.dtd">
-<!-- $Id: soplex.php,v 1.14 2006/02/02 13:57:12 bzforlow Exp $ -->
+<!-- $Id: soplex.php,v 1.15 2006/02/03 15:18:56 bzforlow Exp $ -->
 <?php
 $counter = "cgi/counter.dat";  # the data storage file
 
@@ -23,7 +23,7 @@ fclose($fp);
 <meta name="author" content="Thorsten Koch">
 <meta name="description" content="SoPlex Homepage">
 <meta name="keywords" content="SoPlex, Simplex, Solver, LP, Linear Programming, Mathematical Programming, Optimization">
-<meta name="date" content="$Date: 2006/02/02 13:57:12 $">
+<meta name="date" content="$Date: 2006/02/03 15:18:56 $">
 <meta name="robots" content="index|follow">
 <meta http-equiv="content-type" content="text/html;charset=iso-8859-1">
 <title>SoPlex</title> 
@@ -56,7 +56,7 @@ class library</big>
  <td>Version 1.3.0 is released. <a href="notes-130.txt">Release Notes</a></td>
 </tr>
 <tr>
- <td><img src="images/newest.gif" alt="New" border=0></td>
+ <td>&nbsp;</td>
  <td>10. Apr 2002</td>
  <td>Version 1.2.1 is released. <a href="notes-121.txt">Release Notes</a></td>
 </tr>
@@ -125,7 +125,7 @@ here are some notes on
 <hr noshade>
 <h3>Download</h3>
 <p>
-The latest Version is 1.3.0. Register and 
+Register and 
 <a href="register.html">download</a> the complete source 
 code and documentation.
 </p>
@@ -199,7 +199,7 @@ border="0" width="88" height="36" align="bottom"></a>
 <img src="images/valid-html40.png" alt="Valid HTML 4.0!"
 border="0" height="31" width="88" align="bottom"></a>
 <hr noshade><address><font size=-1>
-Last Update $Date: 2006/02/02 13:57:12 $ by
+Last Update $Date: 2006/02/03 15:18:56 $ by
 <a href="/mitarbeiter/mitarbeiter.pl?email=koch&amp;language=en">Thorsten Koch</a>
 <br>&copy; 2003 by Konrad-Zuse-Zentrum für Informationstechnik Berlin (ZIB)<br>
 <a href="/impressum.en.html">Imprint</a>
