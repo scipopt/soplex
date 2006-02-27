@@ -42,7 +42,7 @@
 =opt= lp_sh9           0.13900263971762253326366936756689e4    
 =opt= lp_st1           0.39999364058618682927685991070766e3    
 =opt= lp_st2           0.43596728053225143244133688324556e3    
-=opt= lp_st3           1.5690676029e+05                        
+=opt= lp_st3           infeasible                              
 =opt= prodplan1_relaxed -5.4578608731e+07                       
 =opt= prodplan2_relaxed -0.23939943514140729956357582791627e6   
 =opt= seq10_164_relaxed 0.114716e6                              

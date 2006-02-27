@@ -1,4 +1,4 @@
-# $Id: make_solu_file.awk,v 1.3 2006/01/18 16:14:06 bzfhille Exp $
+# $Id: make_solu_file.awk,v 1.4 2006/02/27 17:31:51 bzfhille Exp $
 #
 # Takes two files:  <CPLEX log> <Perplex log> (order is critical!)
 #
@@ -20,6 +20,12 @@ BEGIN {
   sub( /\.mps/, "", file_cplex );
   sub( /\.lp/, "", file_cplex );
   sub( /\.gz/, "", file_cplex );
+}
+
+# Must be before /Objective/ to ensure correct infeasibility detection (CPLEX may
+# give an objective value although it already found infeasibility). 
+/Infeasible/ {
+  obj_cplex = "infeasible";
 }
 
 /Objective =/ {
