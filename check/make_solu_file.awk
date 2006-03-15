@@ -1,4 +1,4 @@
-# $Id: make_solu_file.awk,v 1.4 2006/02/27 17:31:51 bzfhille Exp $
+# $Id: make_solu_file.awk,v 1.5 2006/03/15 15:39:44 bzfhille Exp $
 #
 # Takes two files:  <CPLEX log> <Perplex log> (order is critical!)
 #
@@ -46,7 +46,7 @@ BEGIN {
     if ( feasible && optimal )
       printf( "=opt= %-16s %-40s\n", file, obj );
     else
-      printf( "=opt= %-16s %-40s\n", file, sol_cplex[ file ] );
+      printf( "=opt= %-16s %-40s # CPLEX not optimal/feasible\n", file, sol_cplex[ file ] );
 
   first = 0;
   feasible = 0;
