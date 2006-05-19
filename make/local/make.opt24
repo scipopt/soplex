@@ -1,2 +1,0 @@
-#--- $Id: make.opt24,v 1.1 2006/02/03 14:54:47 bzforlow Exp $
-CXXFLAGS += -cxxlib-gcc=/opt/gcc-342 
