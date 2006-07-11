@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.89 2006/02/03 13:59:46 bzfkocht Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.90 2006/07/11 11:01:47 bzfhille Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -681,7 +681,7 @@ int main(int argc, const char* const argv[])
                                     << farkasx[i] << "\t"; )
                   LPRow row;
                   work.getRow(i, row);
-                  if( row.lhs() > -infinity )
+                  if( row.lhs() > -soplex::infinity )
                   {
                      MSG_INFO1( spxout << row.lhs() << " <= "; );
                   }
@@ -694,7 +694,7 @@ int main(int argc, const char* const argv[])
                         << colnames[ work.cId(row.rowVector().index(j)) ] 
                         << " "; );
                   }
-                  if( row.rhs() < infinity )
+                  if( row.rhs() < soplex::infinity )
                   {
                      MSG_INFO1( spxout << "<= " << row.rhs(); );
                   }
