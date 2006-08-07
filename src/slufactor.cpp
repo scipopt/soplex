@@ -13,13 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.46 2005/12/12 19:18:40 bzforlow Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.47 2006/08/07 15:25:06 bzforlow Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
  *       This should be properly integrated and demangled.
- * @todo Does is make sense, to call x.clear() when next x.altValues()
- *       is called.
+ * @todo Does it make sense to call x.clear() when next x.altValues()
+ *       is called?
  *       
  */
 //#define DEBUGGING 1
@@ -79,7 +79,7 @@ void SLUFactor::solveRight4update(SSVector& x, const SVector& b)
 
    x.clear();
    ssvec = b;
-   n = b.size();
+   n = ssvec.size(); // might be smaller than b.size() due to near-zeroes
    if (l.updateType == ETA)
    {
       m = vSolveRight4update(x.getEpsilon(), x.altValues(), x.altIndexMem(),
@@ -130,7 +130,7 @@ void SLUFactor::solve2right4update(
 
    if (l.updateType == ETA)
    {
-      n = b.size();
+      n = ssvec.size(); // might be smaller than b.size() due to near-zeroes
       m = vSolveRight4update2(x.getEpsilon(), x.altValues(), x.altIndexMem(), 
          ssvec.get_ptr(), sidx, n, y.get_ptr(),
          rhs.getEpsilon(), rhs.altValues(), ridx, rsize, 0, 0, 0);
@@ -163,7 +163,7 @@ void SLUFactor::solveLeft(Vector& x, const Vector& b) //const
    solveTime.start();
 
    vec = b;
-   ///@todo Why is x.clear() here used and not with solveRight() ?
+   ///@todo Why is x.clear() used here and not with solveRight() ?
    x.clear();
    CLUFactor::solveLeft(x.get_ptr(), vec.get_ptr());
 
