@@ -1,3 +1,6 @@
+- Bugfix in ssvector: use ssvec.size() instead of b.size() 
+  (the former may be smaller due to flattened near-zero values).
+
 03. Feb 2006 Release 1.3.0
 
 - A lot of stuff we have already forgotten about
@@ -10,7 +13,7 @@
 - Fixed bug in SPxSumST.
 
 - Fixed bug in memory allocation of SVSet: now uses doubling strategy
-  correctly. The bug lead to serious performance degradation on large LPs
+  correctly. The bug led to serious performance degradation on large LPs
   under Windows, which is now fixed.
 
 - Improved stability of textbook ratio tester. 
