@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.80 2006/02/02 19:41:55 bzftuchs Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.81 2006/08/10 11:29:25 bzftuchs Exp $"
 
 #include <iostream>
 
@@ -405,13 +405,23 @@ void SoPlex::unsimplify() const
    DVector psp_s(m_solver.nRows());  // slacks          (prescaled simplified postscaled)
    DVector psp_r(m_solver.nCols());  // reduced costs   (prescaled simplified postscaled)
     
-   m_solver.getPrimal(psp_x);
-   m_solver.getDual(psp_y);
-   m_solver.getSlacks(psp_s);
-   m_solver.getRedCost(psp_r);
-         
+   if (m_vanished)
+   {
+      psp_x.reDim(0);
+      psp_y.reDim(0);
+      psp_s.reDim(0);
+      psp_r.reDim(0);
+   }
+   else
+   {
+      m_solver.getPrimal(psp_x);
+      m_solver.getDual(psp_y);
+      m_solver.getSlacks(psp_s);
+      m_solver.getRedCost(psp_r);
+   }
+   
    // unscale postscaling
-   if (m_postScaler != 0)
+   if (!m_vanished && m_postScaler != 0)
    {
       m_postScaler->unscalePrimal(psp_x);
       m_postScaler->unscaleDual(psp_y);
