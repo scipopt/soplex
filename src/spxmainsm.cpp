@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.2 2006/02/03 13:49:43 bzftuchs Exp $"
+#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.3 2006/08/10 11:30:30 bzftuchs Exp $"
 
 //#define DEBUGGING 1
 
@@ -388,6 +388,9 @@ void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& 
    // primal & basis:
    Real aij = m_row[m_j];
 
+   if (isZero(s[m_i], 1e-6))
+      s[m_i] = 0.0;
+
    Real scale1 = maxAbs(m_lhs, s[m_i]);
    Real scale2 = maxAbs(m_rhs, s[m_i]);
    
@@ -413,6 +416,9 @@ void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& 
       up = 0.0;   
   
    assert(LErel(lo, up));
+   assert((LErel(m_lower, lo) && LErel(lo, m_upper)) ||
+          (LErel(m_lower, up) && LErel(up, m_upper)) ||
+          (LErel(lo, m_lower) && LErel(m_upper, up)));
    ASSERT_WARN( "WMAISM01", isNotZero(aij) );
    
    if (rStatus[m_i] == SPxSolver::ON_LOWER)
@@ -1054,7 +1060,7 @@ SPxSimplifier::Result SPxMainSM::removeEmpty(SPxLP& lp)
          }         
          MSG_INFO3( spxout << " removed" << std::endl; )
 
-         m_hist.append(new EmptyConstraintPS(rIdx(lp, i)));
+         m_hist.append(new EmptyConstraintPS(rIdx(i)));
          
          ++remRows;
          removeRow(lp, i);
@@ -1439,7 +1445,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
          }         
          MSG_INFO3( spxout << " removed" << std::endl; )
          
-         m_hist.append(new EmptyConstraintPS(rIdx(lp, i)));   
+         m_hist.append(new EmptyConstraintPS(rIdx(i)));   
         
          ++remRows;
          removeRow(lp, i);
@@ -3001,10 +3007,10 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real delta)
    m_delta   = delta;
    
    for(int i = 0; i < lp.nRows(); ++i)
-      m_rIdx[i] = -1;
+      m_rIdx[i] = i;
    
    for(int j = 0; j < lp.nCols(); ++j)
-      m_cIdx[j] = -1;
+      m_cIdx[j] = j;
    
    // round extreme values (set all values smaller than eps to zero and all values bigger than infinity/5 to infinity)
 #ifdef EXTREMES
@@ -3108,15 +3114,15 @@ void SPxMainSM::unsimplify(const Vector& x, const Vector& y, const Vector& s, co
    // assign values of variables in reduced LP
    for(int j = 0; j < x.dim(); ++j)
    {
-      m_prim[m_cIdx[j]]       = isZero(x[j], epsZero()) ? 0.0 : x[j];
-      m_redCost[m_cIdx[j]]    = isZero(r[j], epsZero()) ? 0.0 : r[j];
-      m_cBasisStat[m_cIdx[j]] = cols[j];
+      m_prim[cIdx(j)]       = isZero(x[j], epsZero()) ? 0.0 : x[j];
+      m_redCost[cIdx(j)]    = isZero(r[j], epsZero()) ? 0.0 : r[j];
+      m_cBasisStat[cIdx(j)] = cols[j];
    }
    for(int i = 0; i < y.dim(); ++i)
    {
-      m_dual[m_rIdx[i]]       = isZero(y[i], epsZero()) ? 0.0 : y[i];
-      m_slack[m_rIdx[i]]      = isZero(s[i], epsZero()) ? 0.0 : s[i];
-      m_rBasisStat[m_rIdx[i]] = rows[i];
+      m_dual[rIdx(i)]       = isZero(y[i], epsZero()) ? 0.0 : y[i];
+      m_slack[rIdx(i)]      = isZero(s[i], epsZero()) ? 0.0 : s[i];
+      m_rBasisStat[rIdx(i)] = rows[i];
    }
    
    // undo preprocessing

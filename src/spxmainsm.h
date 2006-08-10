@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.h,v 1.5 2006/02/03 16:13:29 bzftuchs Exp $"
+#pragma ident "@(#) $Id: spxmainsm.h,v 1.6 2006/08/10 11:30:35 bzftuchs Exp $"
 
 /**@file  spxmainsm.h
  * @brief General methods in LP preprocessing.
@@ -108,13 +108,13 @@ private:
    public:
       ///
       FreeConstraintPS(const SPxLP& lp, const SPxMainSM& simplifier, int i)
-         : m_i(simplifier.rIdx(lp, i))
+         : m_i(simplifier.rIdx(i))
          , m_row(lp.rowVector(i).size())
       {
          const SVector& row = lp.rowVector(i);
          
          for(int k = 0; k < row.size(); ++k)
-            m_row.add(simplifier.cIdx(lp, row.index(k)), row.value(k));
+            m_row.add(simplifier.cIdx(row.index(k)), row.value(k));
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
@@ -162,8 +162,8 @@ private:
       ///
       RowSingletonPS(const SPxLP& lp, const SPxMainSM& simplifier, int i, int j, bool strictLo, bool strictUp,
                      Real newLo, Real newUp, Real oldLo, Real oldUp)
-         : m_i(simplifier.rIdx(lp, i))
-         , m_j(simplifier.cIdx(lp, j))
+         : m_i(simplifier.rIdx(i))
+         , m_j(simplifier.cIdx(j))
          , m_strictLo(strictLo)
          , m_strictUp(strictUp)
          , m_maxSense(lp.spxSense() == SPxLP::MAXIMIZE)
@@ -177,7 +177,7 @@ private:
          const SVector& col = lp.colVector(j);
          
          for(int k = 0; k < col.size(); ++k)
-            m_col.add(simplifier.rIdx(lp, col.index(k)), col.value(k));
+            m_col.add(simplifier.rIdx(col.index(k)), col.value(k));
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
@@ -202,7 +202,7 @@ private:
    public:
       ///
       ForceConstraintPS(const SPxLP& lp, const SPxMainSM& simplifier, int i, bool lhsFixed)
-         : m_i(simplifier.rIdx(lp, i))
+         : m_i(simplifier.rIdx(i))
          , m_lRhs(lhsFixed ? lp.lhs(i) : lp.rhs(i))
          , m_row(lp.rowVector(i).size())
          , m_objs(lp.rowVector(i).size())
@@ -215,7 +215,7 @@ private:
          
          for(int k = 0; k < row.size(); ++k)
          {
-            int j = simplifier.cIdx(lp, row.index(k));
+            int j = simplifier.cIdx(row.index(k));
             m_row.add(j, row.value(k));
             m_objs.add(j, lp.obj(row.index(k)));
             m_fixed[k] = EQrel(lp.lower(row.index(k)), lp.upper(row.index(k)));
@@ -224,7 +224,7 @@ private:
             m_cols[k].setMax(col.size());
             
             for(int l = 0; l < col.size(); ++l)
-               m_cols[k].add(simplifier.rIdx(lp, col.index(l)), col.value(l));
+               m_cols[k].add(simplifier.rIdx(col.index(l)), col.value(l));
          }
       }
       ///
@@ -246,7 +246,7 @@ private:
    public:
       ///
       FixVariablePS(const SPxLP& lp, const SPxMainSM& simplifier, int j, const Real val)
-         : m_j(simplifier.cIdx(lp, j))
+         : m_j(simplifier.cIdx(j))
          , m_val(val)
          , m_obj(lp.obj(j))
          , m_col(lp.colVector(j).size())
@@ -254,7 +254,7 @@ private:
          const SVector& col = lp.colVector(j);
          
          for(int k = 0; k < col.size(); ++k)
-            m_col.add(simplifier.rIdx(lp, col.index(k)), col.value(k));
+            m_col.add(simplifier.rIdx(col.index(k)), col.value(k));
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
@@ -273,7 +273,7 @@ private:
    public:
       ///
       FixBoundsPS(const SPxLP& lp, const SPxMainSM& simplifier, int j, Real val)
-         : m_j(simplifier.cIdx(lp, j))
+         : m_j(simplifier.cIdx(j))
       { 
          if (EQrel(lp.lower(j), lp.upper(j), eps()))
             m_status = SPxSolver::FIXED;
@@ -308,7 +308,7 @@ private:
    public:
       ///
       FreeZeroObjVariablePS(const SPxLP& lp, const SPxMainSM& simplifier, int j, bool loFree)
-         : m_j(simplifier.cIdx(lp, j))
+         : m_j(simplifier.cIdx(j))
          , m_bnd(loFree ? lp.upper(j) : lp.lower(j))
          , m_col(lp.colVector(j).size())
          , m_lRhs(lp.colVector(j).size())
@@ -319,7 +319,7 @@ private:
          
          for(int k = 0; k < col.size(); ++k)
          {
-            int i = simplifier.rIdx(lp, col.index(k));
+            int i = simplifier.rIdx(col.index(k));
 
             m_col.add(i, col.value(k));
 
@@ -335,7 +335,7 @@ private:
             m_rows[k].setMax(row.size());
             
             for(int l = 0; l < row.size(); ++l)
-               m_rows[k].add(simplifier.cIdx(lp, row.index(l)), row.value(l));
+               m_rows[k].add(simplifier.cIdx(row.index(l)), row.value(l));
          }
       }
       ///
@@ -360,8 +360,8 @@ private:
     public:
       ///
       ZeroObjColSingletonPS(const SPxLP& lp, const SPxMainSM& simplifier, int j, int i)
-         : m_j(simplifier.cIdx(lp, j))
-         , m_i(simplifier.rIdx(lp, i))
+         : m_j(simplifier.cIdx(j))
+         , m_i(simplifier.rIdx(i))
          , m_lhs(lp.lhs(i))
          , m_rhs(lp.rhs(i))
          , m_lower(lp.lower(j))
@@ -371,7 +371,7 @@ private:
          const SVector& row = lp.rowVector(i);
       
          for(int k = 0; k < row.size(); ++k)
-            m_row.add(simplifier.cIdx(lp, row.index(k)), row.value(k));
+            m_row.add(simplifier.cIdx(row.index(k)), row.value(k));
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
@@ -395,8 +395,8 @@ private:
    public:
       ///
       FreeColSingletonPS(const SPxLP& lp, const SPxMainSM& simplifier, int j, int i, Real slackVal)
-         : m_j(simplifier.cIdx(lp, j))
-         , m_i(simplifier.rIdx(lp, i))
+         : m_j(simplifier.cIdx(j))
+         , m_i(simplifier.rIdx(i))
          , m_obj(lp.obj(j))
          , m_lRhs(slackVal)
          , m_onLhs(slackVal == lp.lhs(i))
@@ -406,7 +406,7 @@ private:
          const SVector& row = lp.rowVector(i);
       
          for(int k = 0; k < row.size(); ++k)
-            m_row.add(simplifier.cIdx(lp, row.index(k)), row.value(k));
+            m_row.add(simplifier.cIdx(row.index(k)), row.value(k));
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
@@ -438,9 +438,9 @@ private:
    public:
       ///
       DoubletonEquationPS(const SPxLP& lp, const SPxMainSM& simplifier, int j, int k, int i, Real oldLo, Real oldUp)
-         : m_j(simplifier.cIdx(lp, j))
-         , m_k(simplifier.cIdx(lp, k))
-         , m_i(simplifier.rIdx(lp, i))
+         : m_j(simplifier.cIdx(j))
+         , m_k(simplifier.cIdx(k))
+         , m_i(simplifier.rIdx(i))
          , m_maxSense(lp.spxSense() == SPxLP::MAXIMIZE)
          , m_jFixed(EQrel(lp.lower(j), lp.upper(j)))
          , m_jObj(lp.obj(j))
@@ -457,7 +457,7 @@ private:
          const SVector& col = lp.colVector(k);
          
          for(int l = 0; l < col.size(); ++l)
-            m_col.add(simplifier.rIdx(lp, col.index(l)), col.value(l));
+            m_col.add(simplifier.rIdx(col.index(l)), col.value(l));
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
@@ -481,9 +481,9 @@ private:
    public:
       DuplicateRowsPS(const SPxLP& lp, const SPxMainSM& simplifier, int i,
                       int maxLhsIdx, int minRhsIdx, const DSVector& dupRows, const DataArray<double> scale)
-         : m_i(simplifier.rIdx(lp, i))
-         , m_maxLhsIdx((maxLhsIdx == -1) ? -1 : simplifier.rIdx(lp, maxLhsIdx))
-         , m_minRhsIdx((minRhsIdx == -1) ? -1 : simplifier.rIdx(lp, minRhsIdx))
+         : m_i(simplifier.rIdx(i))
+         , m_maxLhsIdx((maxLhsIdx == -1) ? -1 : simplifier.rIdx(maxLhsIdx))
+         , m_minRhsIdx((minRhsIdx == -1) ? -1 : simplifier.rIdx(minRhsIdx))
          , m_maxSense(lp.spxSense() == SPxLP::MAXIMIZE)
          , m_scale(dupRows.size())
          , m_obj(lp.rowVector(i).size())
@@ -492,19 +492,19 @@ private:
          Real rowScale = scale[i];
          
          for(int k = 0; k < dupRows.size(); ++k)
-            m_scale.add(simplifier.rIdx(lp, dupRows.index(k)), rowScale / scale[dupRows.index(k)]);
+            m_scale.add(simplifier.rIdx(dupRows.index(k)), rowScale / scale[dupRows.index(k)]);
          
          const SVector& row = lp.rowVector(i);
          
          for(int k = 0; k < row.size(); ++k)
          {
-            m_obj.add(simplifier.cIdx(lp, row.index(k)), lp.obj(row.index(k)));
+            m_obj.add(simplifier.cIdx(row.index(k)), lp.obj(row.index(k)));
             
             const SVector& col = lp.colVector(row.index(k));
             m_cols[k].setMax(col.size());
             
             for(int l = 0; l < col.size(); ++l)
-               m_cols[k].add(simplifier.rIdx(lp, col.index(l)), col.value(l));
+               m_cols[k].add(simplifier.rIdx(col.index(l)), col.value(l));
          }         
       }
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
@@ -527,8 +527,8 @@ private:
       
    public:
       DuplicateColsPS(const SPxLP& lp, const SPxMainSM& simplifier, int j, int k, Real scale)
-         : m_j(simplifier.cIdx(lp, j))
-         , m_k(simplifier.cIdx(lp, k))
+         : m_j(simplifier.cIdx(j))
+         , m_k(simplifier.cIdx(k))
          , m_loJ(lp.lower(j))
          , m_upJ(lp.upper(j))
          , m_loK(lp.lower(k))
@@ -588,8 +588,8 @@ private:
    DVector                         m_redCost;    ///< unsimplified reduced cost vector.   
    DataArray<SPxSolver::VarStatus> m_cBasisStat; ///< basis status of columns.
    DataArray<SPxSolver::VarStatus> m_rBasisStat; ///< basis status of rows.
-   DataArray<int>                  m_cIdx;       ///< removed column index vector in original LP.
-   DataArray<int>                  m_rIdx;       ///< removed row index vector in original LP.
+   DataArray<int>                  m_cIdx;       ///< column index vector in original LP.
+   DataArray<int>                  m_rIdx;       ///< row index vector in original LP.
    DataArray<PostStep*>            m_hist;       ///< vector of presolve history.
    bool                            m_postsolved; ///< status of postsolving.
    Real                            m_epsilon;    ///< epsilon zero.
@@ -628,24 +628,24 @@ private:
    /// removes a row in the LP.
    void removeRow(SPxLP& lp, int i)
    {
-      m_rIdx[i] = lp.rId(lp.nRows()-1).getIdx();
+      m_rIdx[i] = m_rIdx[lp.nRows()-1];
       lp.removeRow(i);
    }
    /// removes a column in the LP.
    void removeCol(SPxLP& lp, int j)
    {
-      m_cIdx[j] = lp.cId(lp.nCols()-1).getIdx();
+      m_cIdx[j] = m_cIdx[lp.nCols()-1];
       lp.removeCol(j);
    }
-   /// returns for a given row index of the given (reduced) LP the corresponding row index in the unsimplified LP.
-   int rIdx(const SPxLP& lp, int i) const
+   /// returns for a given row index of the (reduced) LP the corresponding row index in the unsimplified LP.
+   int rIdx(int i) const
    {
-      return (m_rIdx[i] != -1) ? m_rIdx[i] : lp.rId(i).getIdx();
+      return m_rIdx[i];
    }
-   /// returns for a given column index of the given (reduced) LP the corresponding column index in the unsimplified LP.
-   int cIdx(const SPxLP& lp, int j) const
+   /// returns for a given column index of the (reduced) LP the corresponding column index in the unsimplified LP.
+   int cIdx(int j) const
    {
-      return (m_cIdx[j] != -1) ? m_cIdx[j] : lp.cId(j).getIdx();
+      return m_cIdx[j];
    }
    ///
    Real epsZero() const
