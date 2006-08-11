@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.3 2006/08/10 11:30:30 bzftuchs Exp $"
+#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.4 2006/08/11 15:19:41 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -983,7 +983,7 @@ void SPxMainSM::handleExtremes(SPxLP& lp)
                col.remove(i);           
 
                MSG_INFO3( spxout << "IMAISM04 aij=" << aij 
-                                 << "removed, absBnd=" << absBnd 
+                                 << " removed, absBnd=" << absBnd 
                                  << std::endl; )
                ++remNzos;
             }         
@@ -1416,7 +1416,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
       if (lp.lhs(i) <= -infinity && lp.rhs(i) >= infinity)
       {
          MSG_INFO3( spxout << "IMAISM20 row " << i 
-                           << ": unconstraint -> removed" << std::endl; )
+                           << ": unconstrained -> removed" << std::endl; )
 
          m_hist.append(new FreeConstraintPS(lp, *this, i));
          
