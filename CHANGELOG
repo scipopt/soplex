@@ -1,3 +1,6 @@
+- Added a small example in example.cpp of how to construct an LP using
+  the callable library methods.
+
 - Bugfix in ssvector: use ssvec.size() instead of b.size() 
   (the former may be smaller due to flattened near-zero values).
 

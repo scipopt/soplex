@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.90 2006/07/11 11:01:47 bzfhille Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.91 2006/08/23 19:51:30 bzforlow Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -572,12 +572,64 @@ int main(int argc, const char* const argv[])
 
    timer.start();
 
+//#define CONSTRUCT_EXAMPLE_LP_USING_CALLABLE_LIBRARY
+#ifdef CONSTRUCT_EXAMPLE_LP_USING_CALLABLE_LIBRARY
+   const int num_rows = 5;
+   const int num_cols = 5;
+
+   // for all rows 
+   for ( int i = 0; i < num_rows; ++i ) {
+
+      // create an empty sparse vector with the right size 
+      // (num_cols+1, where one entry is for bookkeeping purposes)
+      SVector::Element coeffs[ num_cols+1 ];
+      SVector svec( num_cols, coeffs );
+      svec.set_max( num_cols );
+
+      // for all columns, set the coefficient in the row
+      for ( int j = 0; j < num_cols; ++j ) {
+         const double mycoeff = (i+1) * (j+1);
+         svec.add( j, mycoeff );
+      }
+
+      // create a row and add it to the LP
+      const double myrhs = 10;
+      LPRow row( 0, svec, myrhs );  // 0 <= row <= myrhs
+      work.addRow( row );
+
+      // set a name to the row
+      char myrowname[ 20 ];
+      sprintf( myrowname, "row_%d", i );
+      rownames.add( "row_" + i );
+   }
+
+   // for all columns
+   for ( int j = 0; j < num_cols; ++j ) {
+
+      // set a name to the column
+      char mycolname[ 20 ];
+      sprintf( mycolname, "x%d", j );
+      colnames.add( mycolname );
+
+      // set the objective coefficient
+      // (soplex always maximizes; multiply by -1 for minimizing)
+      const double myobjcoeff = j+1;
+      work.changeObj( j, myobjcoeff );
+   }
+
+   // bound the first variable between 1 and 2
+   work.changeLower( 0, 1 );
+   work.changeUpper( 0, 2 );
+
+#else
+   // read the LP from an input file (.lp or .mps)
    if (!work.readFile(filename, &rownames, &colnames))
    {
       MSG_ERROR( spxout << "EEXAMP23 error while reading file \"" 
                         << filename << "\"" << std::endl; )
       exit(1);
    }
+#endif
    assert(work.isConsistent());
 
    timer.stop();
