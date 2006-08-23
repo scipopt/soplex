@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.h,v 1.26 2005/12/12 19:22:21 bzforlow Exp $"
+#pragma ident "@(#) $Id: lprowset.h,v 1.27 2006/08/23 20:00:58 bzforlow Exp $"
 
 /**@file  lprowset.h
  * @brief Set of LP columns.
@@ -384,11 +384,11 @@ public:
    /**@name Construction / Destruction */
    //@{
    /// default constructor.
-   /** The user can specify the initial maximum number of rows \p max
-       and the initial maximum number of nonzero entries \p memmax. If these
+   /** The user can specify the initial maximum number of rows \p pmax
+       and the initial maximum number of nonzero entries \p pmemmax. If these
        parameters are omitted, a default size is used. However, one can add
        an arbitrary number of rows to the LPRowSet, which may result in
-       automated memory realllocation.
+       automated memory reallocation.
    */
    explicit
    LPRowSet(int pmax = -1, int pmemmax = -1)

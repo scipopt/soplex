@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxio.cpp,v 1.23 2005/08/09 19:32:12 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxio.cpp,v 1.24 2006/08/23 20:01:07 bzforlow Exp $"
 
 
 //#define DEBUGGING 1
@@ -40,14 +40,14 @@ namespace soplex
  *                 (rows) in the same order as the rows in the LP.
  *                 Constraints without a name (only possible with LPF 
  *                 files) are automatically assigned a name.
- *                 Maybe 0 if the names are not needed.
+ *                 May be NULL if the names are not needed.
  * @param colNames contains after the call the names of the variables
  *                 (columns) in the same order as the columns in the LP.
- *                 Maybe 0 if the names are not needed.
+ *                 May be NULL if the names are not needed.
  * @param intVars  contains after the call the indices of those variables
- *                 that where marked as beeing integer in the file.
- *                 Maybe 0 if the information is not needed.
- * @todo  Make sure the Id's in the NameSet%s are the same as in the LP.
+ *                 that where marked as being integer in the file.
+ *                 May be NULL if the information is not needed.
+ * @todo  Make sure the Ids in the NameSet%s are the same as in the LP.
  */
 bool SPxLP::read(
    std::istream& is, 
