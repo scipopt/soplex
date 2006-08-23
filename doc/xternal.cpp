@@ -322,11 +322,22 @@
 
    </li>
 
+   <li> So, how do I start working with SoPlex?
+
+       To just read LPs from a file and solve them without modifying the LPs, 
+       compile SoPlex and use it on the command line. Calling the binary
+       without parameters gives you some usage information. To use SoPlex as a
+       callable library, see src/example.cpp (from which the SoPleX binary is
+       compiled) on how to construct an LP, solve it, and extract the
+       solution. For further details, you have to consult the doxygen
+       documentation of the code (or even the code itself).
+   </li>
+
    <li> What kind of preprocessing is done?
 
       In the default setting SoPlex presolves the given LP in order to
       simplify the problem as far as possible by removing rows,
-      columns, and bounds. Moreover, infeasibility or unboundness may
+      columns, and bounds. Moreover, infeasibility or unboundedness may
       be detected. The simplification cannot be undone, but given a
       primal/dual solution for the simplified LP, the simplifier can
       reconstruct the primal/dual solution and basis of the
