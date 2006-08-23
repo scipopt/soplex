@@ -1,4 +1,4 @@
-$Id: TODO,v 1.81 2006/02/03 17:09:39 bzfkocht Exp $
+$Id: TODO,v 1.82 2006/08/23 20:00:48 bzforlow Exp $
 
 - solu Dateien vervollständigen, insbesondere miplib.solu
 - alle Tests auf allen Maschinen durchlaufen lassen -> results
@@ -18,10 +18,13 @@ $Id: TODO,v 1.81 2006/02/03 17:09:39 bzfkocht Exp $
 - sw installationen
 
 
-
-- Wieso ist das SPxLP protected from LPColSet und LPRowSet abgeleitet und
-  spiegelt dann mehrere von deren Methoden, um sie wieder public zugreifbar zu
-  machen? Betrifft lower(), upper(), usw.
+- SPxLP::dumpFile() (const char* filename) ändern in
+   writeLPF(std::ostream& out, 
+      const NameSet* rowNames, const NameSet* colNames, 
+      const DIdxSet* p_intvars = 0).
+   Der Output sollte komplett in spxlpfwrite.cpp erfolgen (existiert
+   noch nicht). Im Moment werden beim LP-dump die Zeilen- und
+   Spaltennamen ignoriert. Koordinieren mit spxfileio.cpp und spxio.cpp.
 
 - factor.cpp: "??? mkwtz originally was long, maybe to avoid an overflow in this instruction?"
    -> später auf long ändern
