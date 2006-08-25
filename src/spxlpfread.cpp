@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.55 2006/08/25 13:05:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.56 2006/08/25 18:20:06 bzforlow Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -175,7 +175,7 @@ static int readColName(
    // dot "." may not be the first character of a colname  
    if (*s != '.')
    {
-      // This are the characters that are not allowed in a column name.
+      // These characters are not allowed in a column name.
       while((strchr("+-<>= ", *s) == 0) && (*s != '\0'))
          s++;
    }
@@ -338,19 +338,19 @@ static Real readInfinity(char*& pos)
  *  ILOG CPLEX 7.0 Reference Manual, Appendix E, Page 527.
  *
  *  This routine should read (most?) valid LP format files. 
- *  What it will not do, is find all cases where a file is ill formed. 
+ *  It will probably not find all cases where a file is ill-formed. 
  *  If this happens it may complain and read nothing or read "something".
  *
  *  Problem: A line ending in '+' or '-' followed by a line starting
- *  with a number, will be regarded as an error.
+ *  with a number will be regarded as an error.
  * 
  *  The reader will accept the keyword INT[egers] as a synonym for 
  *  GEN[erals] which is an undocumented feature in CPLEX.
  *
- *  A difference to the CPLEX reader, ist that no name for the objective 
- *  row is required.
+ *  Other than with the CPLEX reader, no name for the 
+ *  objective row is required.
  *
- *  @return true if the file was read correctly
+ *  @return true iff the file was read correctly
  */  
 bool SPxLP::readLPF(
    std::istream& p_input, 
@@ -360,7 +360,7 @@ bool SPxLP::readLPF(
 {
    enum 
    { 
-      START, OBJECTIVE, CONSTRAINTS, BOUNDS, INTEGERS, BINARYS 
+      START, OBJECTIVE, CONSTRAINTS, BOUNDS, INTEGERS, BINARIES 
    } section = START;
 
    NameSet*  rnames;                ///< row names.
@@ -469,9 +469,9 @@ bool SPxLP::readLPF(
          else if (hasKeyword(pos, "bound[s]"))
             section = BOUNDS;
          else if (hasKeyword(pos, "bin[ary]"))
-            section = BINARYS;
+            section = BINARIES;
          else if (hasKeyword(pos, "bin[aries]"))
-            section = BINARYS;
+            section = BINARIES;
          else if (hasKeyword(pos, "gen[erals]"))
             section = INTEGERS;
          else if (hasKeyword(pos, "int[egers]")) // this is undocumented
@@ -496,7 +496,7 @@ bool SPxLP::readLPF(
       while(isSpace(pos[i]))
          i++;
 
-      // 4b. remove spaces if they do not appear before the name of a vaiable.
+      // 4b. remove spaces if they do not appear before the name of a variable.
       for(k = 0; pos[i] != '\0'; i++)
          if (!isSpace(pos[i]) || isColName(&pos[i + 1]))
             tmp[k++] = pos[i];
@@ -538,7 +538,7 @@ bool SPxLP::readLPF(
             {
                Real pre_sign = 1.0;
 
-               /* Allready having here a value could only result from
+               /* Already having a value here could only result from
                 * being the first number in a constraint, or a sign
                 * '+' or '-' as last token on the previous line.
                 */
@@ -568,7 +568,7 @@ bool SPxLP::readLPF(
             {
                Real pre_sign = 1.0;
 
-               /* Allready having here a value could only result from
+               /* Already having a value here could only result from
                 * being the first number in a constraint, or a sign
                 * '+' or '-' as last token on the previous line.
                 */
@@ -612,7 +612,7 @@ bool SPxLP::readLPF(
                   else
                   {
                      char name[16];
-                     sprintf(name, "C%d_", rset.num());
+                     sprintf(name, "C%d", rset.num());
                      rnames->add(name);
                   }
                   have_value = true;
@@ -641,7 +641,7 @@ bool SPxLP::readLPF(
 
                   if (val != 0.0)
                   {
-                     // Do we have this index allready in the row ?
+                     // Do we have this index already in the row ?
                      int n = vec.number(colidx);
 
                      // No! So add it.
@@ -756,13 +756,13 @@ bool SPxLP::readLPF(
                }
             }
             /* Do we have only a single column name in the input line?
-             * We could ignore this savely, but it is probably a sign 
+             * We could ignore this safely, but it is probably a sign 
              * of some other error.
              */
             if (!other)
                goto syntax_error;
             break;
-         case BINARYS  :
+         case BINARIES :
          case INTEGERS :
             if ((colidx = readColName(pos, cnames, cset, 0)) < 0)
             {
@@ -771,7 +771,7 @@ bool SPxLP::readLPF(
             }
             else
             {
-               if (section == BINARYS)
+               if (section == BINARIES)
                {
                   cset.lower_w(colidx) = 0.0;
                   cset.upper_w(colidx) = 1.0;
