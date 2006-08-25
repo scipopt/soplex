@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataarray.h,v 1.23 2005/10/28 17:25:33 bzforlow Exp $"
+#pragma ident "@(#) $Id: dataarray.h,v 1.24 2006/08/25 18:18:36 bzforlow Exp $"
 
 /**@file  dataarray.h
  * @brief Save arrays of data objects.
@@ -187,7 +187,7 @@ public:
       thesize = 0;
    }
 
-   /// return nr. of elements.
+   /// return no. of elements.
    int size() const
    {
       return thesize;
@@ -298,9 +298,9 @@ public:
    }
 
    /// default constructor.
-   /** The constructor allocates an Array containing \p size uninitialized
-       elements. The internal array is allocated to have \p max nonzeros,
-       and the memory extension factor is set to \p fac.
+   /** The constructor allocates an Array containing \p p_size uninitialized
+       elements. The internal array is allocated to have \p p_max nonzeros,
+       and the memory extension factor is set to \p p_fac.
 
        @param p_size number of unitialised elements.
        @param p_max  maximum number of elements the array can hold.
