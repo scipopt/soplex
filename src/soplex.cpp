@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.81 2006/08/10 11:29:25 bzftuchs Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.82 2006/08/25 18:18:16 bzforlow Exp $"
 
 #include <iostream>
 
@@ -388,6 +388,7 @@ bool SoPlex::writeBasisFile(
    const char* filename, 
    const NameSet& rowNames, 
    const NameSet& colNames)
+   const
 {
    MSG_ERROR( spxout << "ESOLVR04 Warning! Not fully implemented" << std::endl; )
    return m_solver.writeBasisFile(filename, rowNames, colNames);

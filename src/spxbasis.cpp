@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.56 2005/12/12 20:22:49 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.57 2006/08/25 18:18:16 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -326,6 +326,7 @@ void SPxBasis::writeBasis(
    std::ostream&  os, 
    const NameSet& rownames, 
    const NameSet& colnames)
+   const
 {
    METHOD( "SPxBasis::writeBasis()" );
    assert(theLP != 0);
@@ -574,7 +575,7 @@ Vector& SPxBasis::multBaseWith(Vector& x) const
    return x;
 }
 
-void SPxBasis::dump()
+void SPxBasis::dump() const
 {
    METHOD( "SPxBasis::dump()" );
    assert(status() > NO_PROBLEM);

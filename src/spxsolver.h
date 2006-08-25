@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.26 2005/11/22 11:49:50 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.27 2006/08/25 18:18:17 bzforlow Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -384,7 +384,7 @@ public:
 
    /// write basis to \p filename in MPS format.
    virtual bool writeBasisFile(const char* filename, 
-      const NameSet& rowNames, const NameSet& colNames);
+      const NameSet& rowNames, const NameSet& colNames) const;
 
    //@}
 

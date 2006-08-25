@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.45 2006/01/31 08:36:16 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.46 2006/08/25 18:18:16 bzforlow Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -683,7 +683,7 @@ public:
 
    /// writes a file in MPS basis format to \p os.
    virtual void writeBasis(std::ostream& os, 
-      const NameSet& rownames, const NameSet& colnames);
+      const NameSet& rownames, const NameSet& colnames) const;
 
    /// sets up basis.
    /** Loads a Descriptor to the basis and sets up the basis matrix and
@@ -723,7 +723,7 @@ public:
    void restoreInitialBasis();
 
    /// output basis entries.
-   void dump();
+   void dump() const;
    
 #ifndef NO_CONSISTENCY_CHECKS
    /// consistency check.
