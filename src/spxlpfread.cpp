@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.53 2005/12/12 20:22:50 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.54 2006/08/25 11:37:35 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -172,10 +172,13 @@ static int readColName(
    int         i;
    int         colidx;
 
-   // This are the characters that are not allowed in a column name.
-   while((strchr("+-.<>= ", *s) == 0) && (*s != '\0'))
-      s++;
-
+   // dot "." may not be the first character of a colname  
+   if (*s != '.')
+   {
+      // This are the characters that are not allowed in a column name.
+      while((strchr("+-<>= ", *s) == 0) && (*s != '\0'))
+         s++;
+   }
    for(i = 0; pos != s; i++, pos++)
       name[i] = *pos;
 
