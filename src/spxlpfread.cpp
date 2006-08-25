@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.54 2006/08/25 11:37:35 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.55 2006/08/25 13:05:06 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -622,6 +622,13 @@ bool SPxLP::readLPF(
                   // next line
                   continue;
                }         
+            }
+            else
+            {
+               /* if we have no value, but already a sense, we are in trouble.
+                */
+               if (sense != 0)
+                  goto syntax_error;
             }
             if (*pos == '\0')
                continue;
