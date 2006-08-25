@@ -1,4 +1,4 @@
-$Id: TODO,v 1.82 2006/08/23 20:00:48 bzforlow Exp $
+$Id: TODO,v 1.83 2006/08/25 18:22:20 bzforlow Exp $
 
 - solu Dateien vervollständigen, insbesondere miplib.solu
 - alle Tests auf allen Maschinen durchlaufen lassen -> results
@@ -17,14 +17,7 @@ $Id: TODO,v 1.82 2006/08/23 20:00:48 bzforlow Exp $
 - SCIP/SoPlex testen
 - sw installationen
 
-
-- SPxLP::dumpFile() (const char* filename) ändern in
-   writeLPF(std::ostream& out, 
-      const NameSet* rowNames, const NameSet* colNames, 
-      const DIdxSet* p_intvars = 0).
-   Der Output sollte komplett in spxlpfwrite.cpp erfolgen (existiert
-   noch nicht). Im Moment werden beim LP-dump die Zeilen- und
-   Spaltennamen ignoriert. Koordinieren mit spxfileio.cpp und spxio.cpp.
+- nachgucken, ob die Fehlermeldung ESOLVR04 beim Rausschreiben einer Basis noch aktuell ist.
 
 - factor.cpp: "??? mkwtz originally was long, maybe to avoid an overflow in this instruction?"
    -> später auf long ändern
