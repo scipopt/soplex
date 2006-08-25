@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.70 2006/02/03 14:24:20 bzforlow Exp $
+# $Id: Makefile,v 1.71 2006/08/25 18:19:34 bzforlow Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -62,11 +62,11 @@ LIBOBJ		= 	changesoplex.o didxset.o \
 			spxdefines.o spxdesc.o spxdevexpr.o \
 			spxfastrt.o spxfileio.o spxgeometsc.o \
 			spxharrisrt.o spxhybridpr.o spxid.o spxio.o \
-			spxlp.o spxlpfread.o spxmainsm.o spxmpsread.o spxmpswrite.o \
-			spxout.o spxparmultpr.o spxquality.o \
-			spxscaler.o spxshift.o spxsolver.o spxsolve.o \
-			spxstarter.o spxsteeppr.o spxsumst.o spxvecs.o \
-			spxvectorst.o spxweightpr.o spxweightst.o \
+			spxlp.o spxlpfread.o spxlpfwrite.o spxmainsm.o \
+			spxmpsread.o spxmpswrite.o spxout.o spxparmultpr.o \
+			spxquality.o spxscaler.o spxshift.o spxsolver.o \
+			spxsolve.o spxstarter.o spxsteeppr.o spxsumst.o \
+			spxvecs.o spxvectorst.o spxweightpr.o spxweightst.o \
 			ssvector.o svector.o svset.o timer.o \
 			tracemethod.o unitvector.o update.o updatevector.o \
 			vector.o vsolve.o \
