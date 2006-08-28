@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.h,v 1.6 2006/08/10 11:30:35 bzftuchs Exp $"
+#pragma ident "@(#) $Id: spxmainsm.h,v 1.7 2006/08/28 13:10:34 bzftuchs Exp $"
 
 /**@file  spxmainsm.h
  * @brief General methods in LP preprocessing.
@@ -152,7 +152,6 @@ private:
       const bool m_maxSense;
       const Real m_obj;
       DSVector   m_col;
-      
       Real m_newLo;
       Real m_newUp;
       Real m_oldLo;
@@ -666,10 +665,18 @@ public:
    /// default constructor.
    SPxMainSM() 
       : SPxSimplifier("MainSM")
+      , m_stat(15)
    {}   
    /// destructor.
    virtual ~SPxMainSM()
-   {}  
+   {
+      // delete pointers in m_hist
+      for(int k = 0; k < m_hist.size(); ++k)
+      {
+         delete m_hist[k];
+         m_hist[k] = 0;
+      }
+   }  
    //@}
 
    //------------------------------------
