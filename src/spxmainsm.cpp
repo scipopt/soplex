@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.4 2006/08/11 15:19:41 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.5 2006/08/28 13:09:28 bzftuchs Exp $"
 
 //#define DEBUGGING 1
 
@@ -416,9 +416,9 @@ void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& 
       up = 0.0;   
   
    assert(LErel(lo, up));
-   assert((LErel(m_lower, lo) && LErel(lo, m_upper)) ||
-          (LErel(m_lower, up) && LErel(up, m_upper)) ||
-          (LErel(lo, m_lower) && LErel(m_upper, up)));
+   assert((LErel(m_lower, lo, 1e-12) && LErel(lo, m_upper, 1e-12)) ||
+          (LErel(m_lower, up, 1e-12) && LErel(up, m_upper, 1e-12)) ||
+          (LErel(lo, m_lower, 1e-12) && LErel(m_upper, up, 1e-12)));
    ASSERT_WARN( "WMAISM01", isNotZero(aij) );
    
    if (rStatus[m_i] == SPxSolver::ON_LOWER)
@@ -3011,17 +3011,15 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real delta)
    
    for(int j = 0; j < lp.nCols(); ++j)
       m_cIdx[j] = j;
+
+   for(int k = 0; k < m_stat.size(); ++k)
+      m_stat[k] = 0;
    
    // round extreme values (set all values smaller than eps to zero and all values bigger than infinity/5 to infinity)
 #ifdef EXTREMES
    handleExtremes(lp);
 #endif
-
-   m_stat.reSize(15);
    
-   for(int k = 0; k < 15; ++k)
-      m_stat[k] = 0;
-     
    // main presolving loop
    while(again) 
    {
