@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfwrite.cpp,v 1.1 2006/08/25 18:19:34 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxlpfwrite.cpp,v 1.2 2006/09/01 11:37:05 bzforlow Exp $"
 
 /**@file  spxlpfwrite.cpp
  * @brief Write LP as LPF format file.
@@ -127,9 +127,10 @@ namespace soplex
          p_output << ((sense == SPxLP::MINIMIZE) ? "Minimize\n" : "Maximize\n");
          p_output << "  obj: ";
 
-         const DVector&  obj  = p_lp.maxObj() * sense;
-         DSVector svec( obj.dim() );
-         svec.operator=( obj );
+         const Vector&  obj  = p_lp.maxObj();
+         DSVector svec(obj.dim());
+         svec.operator=(obj);
+         svec *= Real(sense);
          writeSVector(p_lp, p_output, p_cnames, svec);
          p_output << "\n";
       } 
