@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.92 2006/08/25 18:22:07 bzforlow Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.93 2006/11/27 10:23:07 bzforlow Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -672,7 +672,7 @@ int main(int argc, const char* const argv[])
    "************************************************************************\n"
    "*                                                                      *\n"
    "*       SoPlex --- the Sequential object-oriented simPlex.             *\n"
-   "*                  Release 1.3.0                                       *\n"
+   "*                  Release 1.3.1                                       *\n"
    "*    Copyright (C) 1997-1999 Roland Wunderling                         *\n"
    "*                  1997-2006 Konrad-Zuse-Zentrum                       *\n"
    "*                            fuer Informationstechnik Berlin           *\n"
