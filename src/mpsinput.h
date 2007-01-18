@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: mpsinput.h,v 1.11 2006/01/31 09:28:40 bzfhille Exp $"
+#pragma ident "@(#) $Id: mpsinput.h,v 1.12 2007/01/18 16:03:59 bzfkocht Exp $"
 
 /**@file  mpsinput.h
  * @brief Read MPS format files.
@@ -116,7 +116,11 @@ public:
    ///
    virtual 
    ~MPSInput()
-   {}
+   {
+      // only to signal to flexelint that the pointers do
+      // not point to anything that has to be freed.
+      m_f0 = m_f1 = m_f2 = m_f3 = m_f4 = m_f5 = 0;
+   }
    //@}
    
    //-----------------------------------

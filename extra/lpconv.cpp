@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpconv.cpp,v 1.4 2004/11/01 07:37:39 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpconv.cpp,v 1.5 2007/01/18 16:03:59 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -24,14 +24,150 @@
 
 using namespace soplex;
 
+// write constraint line in latte format
+//
+static void write_row(
+   const SVector& row, 
+   int            cols, 
+   double         rhs, 
+   double         dir, 
+   std::ofstream& ofile)
+{
+   int idx = 0;
+
+   ofile << rhs * dir;
+
+   //
+   for(int k = 0; k < row.size(); ++k)
+   {
+      for(; idx < row.index(k); idx++)
+         ofile << " 0";
+      assert(idx == row.index(k));
+      ofile << " " << -row.value(k) * dir;
+      idx++;
+   }
+   while(idx < cols)
+   {
+      ofile << " 0";
+      idx++;
+   }
+   ofile << std::endl;
+}
+
+// Write Latte format: http://www.math.ucdavis.edu/~latte/manual/node8.html
+//
+static void write_latte(const SPxLP& lp, std::ofstream& ofile)
+{
+   int lowers  = 0;
+   int uppers  = 0;
+   int nonnegs = 0;
+   int equals  = 0;
+   int ranges  = 0;
+
+   for(int i = 0; i < lp.nCols(); ++i)
+   {
+      if (isZero(lp.lower(i)))
+         ++nonnegs;
+      else if (lp.lower(i) > -infinity)
+         ++lowers;
+
+      if (lp.upper(i) < infinity)
+         ++uppers;
+   }
+   for(int i = 0; i < lp.nRows(); ++i)
+   {
+      switch(lp.rowType(i))
+      {
+      case LPRow::EQUAL :
+         equals++;
+         break;
+      case LPRow::RANGE :
+         ranges++;
+         break;
+      default :
+         break;
+      }
+   }
+   ofile << lp.nRows() + ranges + lowers + uppers << " " << lp.nCols() << std::endl;
+
+   for(int i = 0; i < lp.nRows(); ++i)
+   {
+      switch(lp.rowType(i))
+      {
+      case LPRow::EQUAL :
+         ++equals;
+         write_row(lp.rowVector(i), lp.nCols(), lp.rhs(i), 1, ofile);
+         break;
+      case LPRow::LESS_EQUAL :
+         write_row(lp.rowVector(i), lp.nCols(), lp.rhs(i), 1, ofile);
+         break;
+      case LPRow::GREATER_EQUAL :
+         write_row(lp.rowVector(i), lp.nCols(), lp.lhs(i), -1, ofile);
+         break;
+      case LPRow::RANGE :
+         write_row(lp.rowVector(i), lp.nCols(), lp.lhs(i), -1, ofile);
+         write_row(lp.rowVector(i), lp.nCols(), lp.rhs(i),  1, ofile);
+         break;
+      default:
+         abort();
+      }
+   }
+   for(int i = 0; i < lp.nCols(); i++)
+   {
+      if (isNotZero(lp.lower(i)) && lp.lower(i) > -infinity)
+      {
+         ofile << -lp.lower(i);
+
+         for(int k = 0; k < lp.nCols(); ++k)
+            ofile << " " << (k == i) ? 1 : 0;
+            
+         ofile << std::endl;
+      }
+
+      if (lp.upper(i) < infinity)
+      {
+         ofile << lp.upper(i);
+
+         for(int k = 0; k < lp.nCols(); ++k)
+            ofile << " " << (k == i) ? -1 : 0;
+            
+         ofile << std::endl;
+      }
+   }
+
+   // Write linearity line if neccessary
+   if (equals > 0)
+   {
+      ofile << "linearity " << equals;
+
+      for(int i = 0; i < lp.nRows(); ++i)
+         if (lp.rowType(i) == LPRow::EQUAL)
+            ofile << " " << i + 1;
+
+      ofile << std::endl;
+   }
+
+   // Write nonnegative line if neccessary
+   if (nonnegs > 0)
+   {
+      ofile << "nonnegative " << nonnegs;
+
+      for(int i = 0; i < lp.nCols(); ++i)
+         if (isZero(lp.lower(i)))
+            ofile << " " << i + 1;
+
+      ofile << std::endl;
+   }
+}
+
 int main(int argc, char **argv)
 {
    const char* banner =
    "************************************************************************\n"
    "*                                                                      *\n"
    "*       LPConv --- Convert LPF to MPS format.                          *\n"
-   "*                  Release 1.0.0                                       *\n"
-   "*    Copyright (C) 2002 Konrad-Zuse-Zentrum                            *\n"
+   "*                  Release 1.0.1                                       *\n"
+   "*    Copyright (C) 2007 Konrad-Zuse-Zentrum                            *\n"
    "*                       fuer Informationstechnik Berlin                *\n"
    "*                                                                      *\n"
    "*  LPConv is distributed under the terms of the ZIB Academic Licence.  *\n"
@@ -45,13 +181,16 @@ int main(int argc, char **argv)
    "[options] input-file output-file\n\n"
    "          input-file can be either in MPS or LPF format\n\n"
    "options:  (*) indicates default\n" 
+   " -l        Latte output format\n"
+   " -m        MPS output format\n"
    " -vLevel   set verbosity Level [0-3], default 1\n"
    " -V        show program version\n"
    " -h        show this help\n"
    ;
 
-   int verbose = 1;
-   int optidx;
+   enum { LPF, MPS, LATTE } output = LPF;
+   int  verbose = 1;
+   int  optidx;
 
    for(optidx = 1; optidx < argc; optidx++)
    {
@@ -60,6 +199,12 @@ int main(int argc, char **argv)
 
       switch(argv[optidx][1])
       {
+      case 'l' :
+         output = LATTE;
+         break;
+      case 'm' :
+         output = MPS;
+         break;
       case 'v' :
          verbose = atoi(&argv[optidx][2]);
          break;
@@ -110,9 +255,20 @@ int main(int argc, char **argv)
       std::cerr << "Can't open file: " << outfile << std::endl;
       exit(1);
    }
-   lp.writeMPS(ofile, &rownames, &colnames, &intvars);
-   //std::cout << lp;
-
+   switch(output)
+   {
+   case MPS :
+      lp.writeMPS(ofile, &rownames, &colnames, &intvars);
+      break;
+   case LPF : 
+      lp.writeLPF(ofile, &rownames, &colnames, &intvars);
+      break;
+   case LATTE :
+      write_latte(lp, ofile);
+      break;
+   default :
+      abort();
+   }
    return 0;
 }
 

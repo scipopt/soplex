@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.cpp,v 1.27 2005/11/09 13:53:50 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxweightst.cpp,v 1.28 2007/01/18 16:03:59 bzfkocht Exp $"
 
 //#define DEBUGGING 1
 //#define TEST 1
@@ -136,7 +136,7 @@ struct Compare
 {
 public:
    /// constructor
-   Compare() : weight( NULL ) {}
+   Compare() : weight( 0 ) {}
 //   const SPxSolver* base;     ///< the solver
    const Real*      weight;   ///< the weights to compare
 
