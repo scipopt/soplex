@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.83 2006/11/17 13:08:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.84 2007/01/19 13:07:01 bzforlow Exp $"
 
 #include <iostream>
 
@@ -406,28 +406,32 @@ void SoPlex::unsimplify() const
    DVector psp_s(m_solver.nRows());  // slacks          (prescaled simplified postscaled)
    DVector psp_r(m_solver.nCols());  // reduced costs   (prescaled simplified postscaled)
     
-   if (m_vanished)
+   // If there is no sensible solution, do nothing.
+   const SPxSolver::Status  stat = status();
+   if (stat != SPxSolver::OPTIMAL)
+      return;
+    
+   if (! m_vanished) {
+      m_solver.getPrimal(psp_x);
+      m_solver.getDual(psp_y);
+      m_solver.getSlacks(psp_s);
+      m_solver.getRedCost(psp_r);
+   
+      // unscale postscaling
+      if (m_postScaler != 0)
+      {
+         m_postScaler->unscalePrimal(psp_x);
+         m_postScaler->unscaleDual(psp_y);
+         m_postScaler->unscaleSlacks(psp_s);
+         m_postScaler->unscaleRedCost(psp_r);
+      }
+   }
+   else
    {
       psp_x.reDim(0);
       psp_y.reDim(0);
       psp_s.reDim(0);
       psp_r.reDim(0);
-   }
-   else
-   {
-      m_solver.getPrimal(psp_x);
-      m_solver.getDual(psp_y);
-      m_solver.getSlacks(psp_s);
-      m_solver.getRedCost(psp_r);
-   }
-   
-   // unscale postscaling
-   if (!m_vanished && m_postScaler != 0)
-   {
-      m_postScaler->unscalePrimal(psp_x);
-      m_postScaler->unscaleDual(psp_y);
-      m_postScaler->unscaleSlacks(psp_s);
-      m_postScaler->unscaleRedCost(psp_r);
    }
 
    // unsimplify
