@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpconv.cpp,v 1.5 2007/01/18 16:03:59 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpconv.cpp,v 1.6 2007/01/19 08:54:41 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -160,13 +160,102 @@ static void write_latte(const SPxLP& lp, std::ofstream& ofile)
    }
 }
 
+static void read_latte(
+   SPxLP& lp, 
+   std::ifstream& ifile,
+   NameSet& rownames,
+   NameSet& colnames,
+   DIdxSet& intvars)
+{
+   int rows;
+   int cols;
+
+   ifile >> rows;
+   ifile >> cols;
+
+   std::cout << "Reading Latte file with " << rows << " rows and " << cols << " columns\n";
+
+   for(int r = 0; r < rows; ++r)
+   {
+      DSVector vec(cols);
+      double  rhs;
+
+      ifile >> rhs;
+
+      for(int c = 0; c < cols; ++c)
+      {
+         double val;
+
+         ifile >> val;
+
+         if (isNotZero(val))
+            vec.add(c, -val);
+      }
+      lp.addRow(LPRow(vec, LPRow::LESS_EQUAL, rhs));
+   }
+   char keyword[256];
+
+   ifile >> keyword;
+
+   if (!strcmp(keyword, "linearity"))
+   {
+      std::cout << "Found linearity line\n";
+
+      int count;
+
+      ifile >> count;
+
+      for(int n = 0; n < count; ++n)
+      {
+         int c;
+
+         ifile >> c;
+
+         lp.changeLhs(c - 1, lp.rhs(c - 1));
+      }
+   }
+   for(int c = 0; c < cols; ++c)
+      lp.changeLower(c, -infinity);
+
+   if (!strcmp(keyword, "nonnegative"))
+   {
+      std::cout << "Found nonnegative line\n";
+
+      int count;
+
+      ifile >> count;
+
+      for(int n = 0; n < count; ++n)
+      {
+         int c;
+
+         ifile >> c;
+
+         lp.changeLower(c - 1, 0.0);         
+      }
+   }
+   for(int c = 0; c < cols; ++c)
+   {
+      char tmp[32];
+      sprintf(tmp, "x%d", c + 1);
+      colnames.add(tmp);
+      intvars.add(c);
+   }
+   for(int r = 0; r < rows; ++r)
+   {
+      char tmp[32];
+      sprintf(tmp, "c%d", r + 1);
+      rownames.add(tmp);
+   }
+}
+
 int main(int argc, char **argv)
 {
    const char* banner =
    "************************************************************************\n"
    "*                                                                      *\n"
    "*       LPConv --- Convert LPF to MPS format.                          *\n"
-   "*                  Release 1.0.1                                       *\n"
+   "*                  Release 1.0.2                                       *\n"
    "*    Copyright (C) 2007 Konrad-Zuse-Zentrum                            *\n"
    "*                       fuer Informationstechnik Berlin                *\n"
    "*                                                                      *\n"
@@ -181,6 +270,7 @@ int main(int argc, char **argv)
    "[options] input-file output-file\n\n"
    "          input-file can be either in MPS or LPF format\n\n"
    "options:  (*) indicates default\n" 
+   " -i        Latte input format\n"
    " -l        Latte output format\n"
    " -m        MPS output format\n"
    " -vLevel   set verbosity Level [0-3], default 1\n"
@@ -189,6 +279,7 @@ int main(int argc, char **argv)
    ;
 
    enum { LPF, MPS, LATTE } output = LPF;
+   bool latte_input = false;
    int  verbose = 1;
    int  optidx;
 
@@ -199,6 +290,9 @@ int main(int argc, char **argv)
 
       switch(argv[optidx][1])
       {
+      case 'i' :
+         latte_input = true;
+         break;
       case 'l' :
          output = LATTE;
          break;
@@ -242,10 +336,16 @@ int main(int argc, char **argv)
       std::cerr << "Can't open file: " << inpfile << std::endl;
       exit(1);
    }
-   if (!lp.read(ifile, &rownames, &colnames, &intvars))
+
+   if (latte_input)
+      read_latte(lp, ifile, rownames, colnames, intvars);
+   else
    {
-      std::cerr << "Error while reading file: " << inpfile << std::endl;
-      exit(1);
+      if (!lp.read(ifile, &rownames, &colnames, &intvars))
+      {
+         std::cerr << "Error while reading file: " << inpfile << std::endl;
+         exit(1);
+      }
    }
 
    std::ofstream ofile(outfile);
