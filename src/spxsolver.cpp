@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.26 2005/12/12 20:22:50 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.27 2007/01/19 13:51:09 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -510,6 +510,8 @@ void SPxSolver::factorize()
       }
 
    }
+   if (SPxBasis::status() == SPxBasis::SINGULAR)
+      m_status = SINGULAR;
 }
 
 Real SPxSolver::maxInfeas() const
