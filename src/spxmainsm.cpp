@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.6 2007/01/19 13:48:19 bzftuchs Exp $"
+#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.7 2007/01/19 14:21:15 bzftuchs Exp $"
 
 //#define DEBUGGING 1
 
@@ -1147,7 +1147,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
    // 1. detect implied free variables
    // 2. detect implied free constraints
    // 3. detect infeasible constraints
-   // 4. remove unconstraint constraints
+   // 4. remove unconstrained constraints
    // 5. remove empty constraints
    // 6. remove row singletons and tighten the corresponding variable bounds if necessary  
    // 7. detect forcing rows and fix the corresponding variables
@@ -1412,7 +1412,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
       }
 
 #ifdef FREE_CONSTRAINT      
-      // 4. unconstraint constraint
+      // 4. unconstrained constraint
       if (lp.lhs(i) <= -infinity && lp.rhs(i) >= infinity)
       {
          MSG_INFO3( spxout << "IMAISM20 row " << i 
@@ -1626,7 +1626,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
    //
    // The following operations are done:
    // 1. detect empty columns and fix corresponding variables
-   // 2. detect variables that are unconstraint from below or above
+   // 2. detect variables that are unconstrained from below or above
    //    and fix corresponding variables or remove involved constraints
    // 3. fix variables
    // 4. use column singleton variables with zero objective to adjust constraint bounds 
@@ -1743,7 +1743,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
             }
          }
         
-         // 2. detect variables that are unconstraint from below or above
+         // 2. detect variables that are unconstrained from below or above
          // max  3 x
          // s.t. 5 x >= 8
          if (GT(lp.maxObj(j), 0.0, epsZero()) && upFree)
@@ -1751,7 +1751,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
 #ifdef FIX_VARIABLE
             MSG_INFO3( spxout << "IMAISM32 col " << j
                               << ": x" << j
-                              << " unconstraint above ->"; )
+                              << " unconstrained above ->"; )
                
             if (lp.upper(j) >= infinity)
             {
@@ -1770,7 +1770,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
          {
             MSG_INFO3( spxout << "IMAISM33 col " << j
                               << ": x" << j
-                              << " unconstraint below ->"; )
+                              << " unconstrained below ->"; )
 
             if (lp.lower(j) <= -infinity)
             {
@@ -1791,7 +1791,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
             {               
                MSG_INFO3( spxout << "IMAISM34 col " << j
                                  << ": x" << j
-                                 << " unconstraint below with zero objective (" << lp.maxObj(j)
+                                 << " unconstrained below with zero objective (" << lp.maxObj(j)
                                  << ")" << std::endl; )
          
                // variable j can be removed together with all constraints with variable j     
@@ -1818,7 +1818,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
             {
                MSG_INFO3( spxout << "IMAISM35 col " << j
                                  << ": x" << j
-                                 << " unconstraint above with zero objective (" << lp.maxObj(j)
+                                 << " unconstrained above with zero objective (" << lp.maxObj(j)
                                  << ")" << std::endl; )
          
                // variable j can be removed together with all constraints with variable j
@@ -2049,7 +2049,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
                MSG_INFO3( spxout << "IMAISM40 col " << j
                                  << ": free singleton in inequality constraint" << std::endl; )
                
-               // do nothing if constraint i is unconstraint
+               // do nothing if constraint i is unconstrained
                if (lp.lhs(i) <= -infinity && lp.rhs(i) >= infinity)
                   continue;
                
@@ -2166,11 +2166,11 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
    // init
    for(int i = lp.nRows()-1; i >= 0; --i)
    {
-      // check for unconstraint constraints
+      // check for unconstrained constraints
       if (lp.lhs(i) <= -infinity && lp.rhs(i) >= infinity) 
       {
          MSG_INFO3( spxout << "IMAISM43 row " << i 
-                           << ": unconstraint" << std::endl; )
+                           << ": unconstrained" << std::endl; )
 
 	 m_hist.append(new FreeConstraintPS(lp, *this, i));
 
@@ -2496,7 +2496,6 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
       remRow[k] = false;
       dupRows[pClass[k]].add(k, 0.0);
    }
-
    
    for(int k = 0; k < dupRows.size(); ++k)
    {
@@ -3006,6 +3005,8 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real delta)
    for(int j = 0; j < lp.nCols(); ++j)
       m_cIdx[j] = j;
 
+   m_stat.reSize(15);
+   
    for(int k = 0; k < m_stat.size(); ++k)
       m_stat[k] = 0;
    
@@ -3045,7 +3046,7 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real delta)
 #endif
    }
    
-   // preprocessing detected infeasibility of unboundness
+   // preprocessing detected infeasibility or unboundness
    if (ret != OKAY)
       return ret;
    
