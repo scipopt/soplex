@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.h,v 1.7 2006/08/28 13:10:34 bzftuchs Exp $"
+#pragma ident "@(#) $Id: spxmainsm.h,v 1.8 2007/01/19 13:48:30 bzftuchs Exp $"
 
 /**@file  spxmainsm.h
  * @brief General methods in LP preprocessing.
@@ -152,10 +152,10 @@ private:
       const bool m_maxSense;
       const Real m_obj;
       DSVector   m_col;
-      Real m_newLo;
-      Real m_newUp;
-      Real m_oldLo;
-      Real m_oldUp;
+      const Real m_newLo;
+      const Real m_newUp;
+      const Real m_oldLo;
+      const Real m_oldUp;
       
    public:
       ///
