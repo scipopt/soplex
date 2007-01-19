@@ -1,4 +1,4 @@
-# $Id: check.awk,v 1.20 2005/11/18 08:13:24 bzfhille Exp $
+# $Id: check.awk,v 1.21 2007/01/19 13:44:39 bzforlow Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: check.awk                                                     *
@@ -23,7 +23,7 @@ function printviol(x)
       printf(" %.2e", abs(x));
 }
 BEGIN {
-    print "$Id: check.awk,v 1.20 2005/11/18 08:13:24 bzfhille Exp $";
+    print "$Id: check.awk,v 1.21 2007/01/19 13:44:39 bzforlow Exp $";
     print "";
     line = "-----------------------------------------------------------------------------------------------------------------------------\n";
     printf(line);
@@ -41,6 +41,7 @@ BEGIN {
 /IEXAMP31/       { infeas = 1; }
 /IEXAMP32/       { infeas = 1; } 
 /IEXAMP33/       { timeout = 1; }
+/EEXAMP39/       { singular = 1; }
 /EEXAMP40/       { cycling = 1; }
 /IEXAMP07/       { cvm = $4; cvs = $5; if (cvm > cvmax[type]) cvmax[type] = cvm; cvsum[type] += cvs; }
 /IEXAMP09/       { bvm = $4; bvs = $5; if (bvm > bvmax[type]) bvmax[type] = bvm; bvsum[type] += bvs; }
@@ -74,6 +75,8 @@ BEGIN {
 	    printf("%-14s", "timeout");
 	else if (cycling)
 	    printf("%-14s", "cycling");
+	else if (singular)
+	    printf("%-14s", "singular");
 	else if (obj == "error")
 	    printf("%-14s", "error");
 	else
@@ -147,6 +150,7 @@ BEGIN {
     prevname = name;
     timeout  = 0;
     infeas   = 0;
+    singular = 0;
     cycling  = 0;
     obj      = "error";
     iter     = 0;
