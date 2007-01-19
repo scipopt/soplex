@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.5 2006/08/28 13:09:28 bzftuchs Exp $"
+#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.6 2007/01/19 13:48:19 bzftuchs Exp $"
 
 //#define DEBUGGING 1
 
@@ -965,7 +965,7 @@ void SPxMainSM::handleExtremes(SPxLP& lp)
 
          if (absBnd < 1.0)
             absBnd = 1.0;
-
+         
          // non-zeros
          SVector& col = lp.colVector_w(j);
          int        i = 0;
@@ -2608,7 +2608,7 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
 SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
 {  
    METHOD( "SPxMainSM::duplicateCols" );
-
+   
    // This method simplifies the LP by removing duplicate columns
    // Duplicates are detected using the algorithm of Bixby and Wagner [1987]
 
@@ -2724,21 +2724,15 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
          MSG_INFO3( spxout << "IMAISM58 " << dupCols[k].size()
                            << " duplicate columns found" << std::endl; )
    
-         DataArray<bool> colRemoved(dupCols[k].size());
-         
-         for(int l = 0; l < dupCols[k].size(); ++l)
-            colRemoved[l] = false;
-         
          for(int l = 0; l < dupCols[k].size(); ++l)
          {
             for(int m = 0; m < dupCols[k].size(); ++m)
             {               
-               int  j1  = dupCols[k].index(l);
-               int  j2  = dupCols[k].index(m);
-
+               int j1  = dupCols[k].index(l);
+               int j2  = dupCols[k].index(m);
+                     
                if (l != m && !remCol[j1] && !remCol[j2])
                {
-                   
                   Real cj1 = lp.maxObj(j1);
                   Real cj2 = lp.maxObj(j2);
                   
@@ -2789,7 +2783,7 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
                      ++m_stat[SUB_DUPLICATE_COL];
                   }
                   else
-                  {
+                  {                     
                      // case 2: objectives not duplicate
                      // considered for maximization sense
                      if (lp.lower(j2) <= -infinity)
@@ -2798,7 +2792,7 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
                         {
                            if (lp.upper(j1) >= infinity)
                            {
-                              MSG_INFO3( spxout << "LP unbounded" << std::endl; )
+                              MSG_INFO3( spxout << "IMAISM75 LP unbounded" << std::endl; )
                               return UNBOUNDED;
                            }
                            
@@ -2814,7 +2808,7 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
                         {
                            if (lp.lower(j1) <= -infinity)
                            {
-                              MSG_INFO3( spxout << "LP unbounded" << std::endl; )
+                              MSG_INFO3( spxout << "IMAISM76 LP unbounded" << std::endl; )
                               return UNBOUNDED;
                            }
                         
@@ -2834,7 +2828,7 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
                         {
                            if (lp.upper(j1) >= infinity)
                            {
-                              MSG_INFO3( spxout << "LP unbounded" << std::endl; )
+                              MSG_INFO3( spxout << "IMAISM77 LP unbounded" << std::endl; )
                               return UNBOUNDED;
                            }
                         
@@ -2852,7 +2846,7 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
                         {
                            if (lp.lower(j1) <= -infinity)
                            {
-                              MSG_INFO3( spxout << "LP unbounded" << std::endl; )
+                              MSG_INFO3( spxout << "IMAISM78 LP unbounded" << std::endl; )
                               return UNBOUNDED;
                            }
                         
@@ -3063,12 +3057,18 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real delta)
 
    MSG_INFO1( spxout << "IMAISM69 Main simplifier removed "
                      << m_remRows << " rows, "
-                     << m_remCols << " cols, "
-                     << m_remNzos << " non-zeros, "
+                     << m_remCols << " columns, "
+                     << m_remNzos << " nonzeros, "
                      << m_chgBnds << " col bounds, " 
-                     << m_chgLRhs << " row bounds,"
+                     << m_chgLRhs << " row bounds"
                      << std::endl; )
       
+   MSG_INFO1( spxout << "IMAISM74 Reduced LP has "
+                     << lp.nRows() << " rows "
+                     << lp.nCols() << " columns "
+                     << lp.nNzos() << " nonzeros"
+                     << std::endl; )   
+
    if (lp.nCols() == 0 && lp.nRows() == 0)
    {
       MSG_INFO1( spxout << "IMAISM70 Main simplifier removed all rows and columns" << std::endl; )
