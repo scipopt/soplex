@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.84 2007/01/19 13:07:01 bzforlow Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.85 2007/01/19 14:22:12 bzftuchs Exp $"
 
 #include <iostream>
 
@@ -390,7 +390,6 @@ bool SoPlex::writeBasisFile(
    const NameSet& colNames)
    const
 {   
-   MSG_WARNING( spxout << "WSOLVR04 Warning! Not fully implemented / no unpresolve" << std::endl; )
    return m_solver.writeBasisFile(filename, rowNames, colNames);
 }
 
