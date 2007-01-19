@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.93 2006/11/27 10:23:07 bzforlow Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.94 2007/01/19 13:45:15 bzforlow Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -273,7 +273,7 @@ void read_input_file(MySoPlex&      work,
 
    if ( ! work.readFile(filename, &rownames, &colnames, NULL) )
    {
-      MSG_ERROR( spxout << "EEXAMP23 error while reading file \"" 
+      MSG_INFO1( spxout << "EEXAMP23 error while reading file \"" 
                         << filename << "\"" << std::endl; )
       exit(1);
    }
@@ -298,7 +298,7 @@ void read_basis_file(MySoPlex&      /* work     */,
 #if 0
    if (!work.readBasisFile(basisname, rownames, colnames))
    {
-      MSG_ERROR( spxout << "EEXAMP25 error while reading file \"" 
+      MSG_INFO1( spxout << "EEXAMP25 error while reading file \"" 
                         << basisname << "\"" << std::endl; )
       exit(1);
    }
@@ -512,7 +512,7 @@ void print_solution_and_status(const MySoPlex&      work,
       }
       if ( write_basis )
          if ( ! work.writeBasisFile( basisname, rownames, colnames ) )
-            MSG_ERROR( spxout << "EEXAMP30 error while writing file \"" 
+            MSG_INFO1( spxout << "EEXAMP30 error while writing file \"" 
                               << basisname << "\"" << std::endl; )
       break;
    case SPxSolver::UNBOUNDED:
@@ -614,10 +614,10 @@ void print_solution_and_status(const MySoPlex&      work,
       MSG_INFO1( spxout << "IEXAMP35 aborted due to objective value limit" << std::endl; )
       break;
    case SPxSolver::SINGULAR:
-      MSG_ERROR( spxout << "EEXAMP39 basis is singular" << std::endl; )
+      MSG_INFO1( spxout << "EEXAMP39 basis is singular" << std::endl; )
       break;
    default:
-      MSG_ERROR( spxout << "EEXAMP36 An error occurred during "
+      MSG_INFO1( spxout << "EEXAMP36 An error occurred during "
                         << "the solution process" << std::endl; )
       break;
    }
