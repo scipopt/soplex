@@ -1,5 +1,9 @@
 Release ???
 
+- Keyword RANGES added in MPS format output (spxmpswrite.cpp)
+
+- Bugfix in spxmainsm.cpp concerning index mapping.
+
 - Bugfix: unsimplify() now works if the problem has vanished in preprocessing.
 
 - Bugfix: spxsolver.cpp: Check for singular basis at the end of factorize().
