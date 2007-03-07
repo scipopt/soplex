@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpswrite.cpp,v 1.7 2005/01/12 12:00:03 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxmpswrite.cpp,v 1.8 2007/03/07 14:47:18 bzftuchs Exp $"
 
 /**@file  spxmpswrite.cpp
  * @brief Write LP as MPS format file.
@@ -249,6 +249,8 @@ void SPxLP::writeMPS(
    // --- RANGES Section ---
    if (has_ranges)
    {
+      p_output << "RANGES" << std::endl;
+         
       for(i = 0; i < nRows(); i++)
          if ((lhs(i) > -infinity) && (rhs(i) < infinity))
             writeRecord(p_output, "", "RANGE", 
