@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.7 2007/01/19 14:21:15 bzftuchs Exp $"
+#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.8 2007/03/07 14:16:47 bzftuchs Exp $"
 
 //#define DEBUGGING 1
 
@@ -3050,12 +3050,6 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real delta)
    if (ret != OKAY)
       return ret;
    
-   for(int i = 0; i < lp.nRows(); ++i)
-      m_rIdx[i] = lp.rId(i).getIdx();
-   
-   for(int j = 0; j < lp.nCols(); ++j)
-      m_cIdx[j] = lp.cId(j).getIdx();
-
    MSG_INFO1( spxout << "IMAISM69 Main simplifier removed "
                      << m_remRows << " rows, "
                      << m_remCols << " columns, "
