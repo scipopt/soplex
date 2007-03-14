@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.cpp,v 1.24 2005/12/14 17:01:38 bzfhille Exp $"
+#pragma ident "@(#) $Id: svset.cpp,v 1.25 2007/03/14 23:51:42 bzforlow Exp $"
 
 #include <assert.h>
 
@@ -99,10 +99,7 @@ SVector* SVSet::create(int idxmax)
       idxmax = memMax() - memSize() - 1;
    }
    else
-   {
-      idxmax = (idxmax >= 0) ? idxmax : 0;
       ensureMem(idxmax + 1);
-   }
 
    ensurePSVec(1);
    

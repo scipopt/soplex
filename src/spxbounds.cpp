@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbounds.cpp,v 1.26 2005/12/12 20:22:50 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxbounds.cpp,v 1.27 2007/03/14 23:51:42 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -346,9 +346,7 @@ void SPxSolver::testBounds() const
    }
    else
    {
-      int i;
-
-      for(i = 0; i < dim(); ++i )
+      for(int i = 0; i < dim(); ++i )
       {
          if ((*theCoPvec)[i] > (*theCoUbound)[i] + viol_max) // && (*theCoUbound)[i] != (*theCoLbound)[i])
          {
@@ -366,7 +364,8 @@ void SPxSolver::testBounds() const
                             << std::endl; )
          }
       }
-      for(i = 0; i < coDim(); ++i )
+
+      for(int i = 0; i < coDim(); ++i )
       {
          if ((*thePvec)[i] > (*theUbound)[i] + viol_max)  // &&  (*theUbound)[i] != (*theLbound)[i])
          {

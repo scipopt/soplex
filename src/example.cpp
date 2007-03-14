@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.94 2007/01/19 13:45:15 bzforlow Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.95 2007/03/14 23:51:42 bzforlow Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -415,7 +415,7 @@ SPxSimplifier* get_simplifier(const int simplifying)
    case 0  :
       /*FALLTHROUGH*/
    default :
-      simplifier = NULL;
+      assert(simplifier == NULL);
       break;
    }
 

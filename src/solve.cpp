@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: solve.cpp,v 1.34 2005/11/21 15:28:10 bzfhille Exp $"
+#pragma ident "@(#) $Id: solve.cpp,v 1.35 2007/03/14 23:51:42 bzforlow Exp $"
 
 #include <assert.h>
 
@@ -985,14 +985,13 @@ int CLUFactor::solveLleftEps(Real* vec, int* nonz, Real eps)
    rbeg = l.rbeg;
    rorig = l.rorig;
    n = 0;
-   i = l.firstUpdate - 1;
 #ifndef WITH_L_ROWS
    Real* lval = l.val;
-   int*    lidx = l.idx;
-   int*    lrow = l.row;
-   int*    lbeg = l.start;
+   int*  lidx = l.idx;
+   int*  lrow = l.row;
+   int*  lbeg = l.start;
 
-   for (; i >= 0; --i)
+   for (i = l.firstUpdate - 1; i >= 0; --i)
    {
       k = lbeg[i];
       val = &lval[k];
