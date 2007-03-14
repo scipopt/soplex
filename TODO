@@ -1,4 +1,4 @@
-$Id: TODO,v 1.83 2006/08/25 18:22:20 bzforlow Exp $
+$Id: TODO,v 1.84 2007/03/14 23:42:27 bzforlow Exp $
 
 - solu Dateien vervollständigen, insbesondere miplib.solu
 - alle Tests auf allen Maschinen durchlaufen lassen -> results
@@ -9,7 +9,6 @@ $Id: TODO,v 1.83 2006/08/25 18:22:20 bzforlow Exp $
 - flexelint
 - soplex.zib.de mit link besorgen
 - sendit.sh mit mutt ?
-- web auf CVS umstellen
 - soplex logo
 - MPS Link korrigieren
 - Mailingliste auf Stand bringen
@@ -17,10 +16,12 @@ $Id: TODO,v 1.83 2006/08/25 18:22:20 bzforlow Exp $
 - SCIP/SoPlex testen
 - sw installationen
 
-- nachgucken, ob die Fehlermeldung ESOLVR04 beim Rausschreiben einer Basis noch aktuell ist.
+- nachgucken, ob die Fehlermeldung ESOLVR04 beim Rausschreiben einer
+  Basis noch aktuell ist.  Kann eine Basis gelesen werden? Falls ja,
+  dann auch diese Möglichkeit in example.cpp wieder bereitstellen.
 
-- factor.cpp: "??? mkwtz originally was long, maybe to avoid an overflow in this instruction?"
-   -> später auf long ändern
+- factor.cpp: "??? mkwtz originally was long, maybe to avoid an overflow
+  in this instruction?" -> später auf long ändern
 
 - diverse "#ifdef USE_OLD"-Stellen rauswerfen
 
@@ -29,38 +30,36 @@ $Id: TODO,v 1.83 2006/08/25 18:22:20 bzforlow Exp $
 
 - der col_first parameter bei scale wird nicht mehr benutzt.
 
-Vermutlich sind die meisten solve() methoden in 
-CLUFactor::solve.cpp const. Müßten von den Pointern
-befreit werden
+- Vermutlich sind die meisten solve() methoden in CLUFactor::solve.cpp
+  const. Müssten von den Pointern befreit werden.
 
-SSVector::multAdd() sollte von den pointern befreit werden.
+- SSVector::multAdd() sollte von den pointern befreit werden.
 
-simplifier sollten nicht unsimplify machen, sondern
-uncrush_x und uncrush_pi, das LP kann man sich auch merken.
+- simplifier sollten nicht unsimplify machen, sondern
+   uncrush_x und uncrush_pi, das LP kann man sich auch merken.
 
-neos4, neos5 werden fälschlicherweise als infeasible gemeldet.
+- neos4, neos5 werden fälschlicherweise als infeasible gemeldet.
 
-Diesen Kram mal als @todo's schreiben ;-)
+- Diesen Kram mal als @todo's schreiben ;-)
 
-Genau gucken, was spxredundantsm eigendlich macht. Das scheint mir
-mehr ein bound strengthening zu sein.
-Ich habe nicht den eindruck, das der doppelte Zeilen/Spalten finden
-würde.
+- Genau gucken, was spxredundantsm eigendlich macht. Das scheint mir
+  mehr ein bound strengthening zu sein. Ich habe nicht den eindruck,
+  das der doppelte Zeilen/Spalten finden würde.
 
-Einzel remove so implementieren, dass alles weitergeschoben wird.
+- Einzel remove so implementieren, dass alles weitergeschoben wird.
 
+- Es gibt Probleme, wenn der Preprocessor das Problem komplett erledigt.
+  Denn die Rueckgabe ist dann nicht UNBOUNDED/INFEASIBLE, sondern fertig.
+  --> Ist diese Fehlermeldung noch aktuell? <--
 
-Es gibt Probleme, wenn der Preprocessor das Problem komplett erledigt.
-Denn die Rueckgabe ist dann nicht UNBOUNDED/INFEASIBLE, sondern fertig.
+- isConsistent sollte eigentlich virtuell sein.
 
-isConsistent sollte eigentlich virtuell sein.
+- Memberfunctionen .has -> bool
 
-Memberfunctionen .has -> bool
+- Abbruch bei minimieren mit Upper Bound
 
-Abbruch bei minimieren mit Upper Bound
-
-primal: >= UB und optimal
-dual  : >= UB und shift = 0
+- primal: >= UB und optimal
+  dual  : >= UB und shift = 0
 
 ---------------
 
@@ -175,8 +174,353 @@ linux.x86.intel LC 0 936 5121
 greenbea ER
 
 
+#---------------------------------------------------
+#  Codesonar-Meldungen
+#---------------------------------------------------
 
 
+#------- Buffer Overruns/Underruns -----------------
+
+Bug 1, dvector.cpp, buffer underrun:
+   Sehe auf Anhieb höchstens ein Problem mit negativen Vektordimensionen, was
+   der Fall sein sollte, aber hier nicht überprüft wird. Lint hat sich da aber
+   anscheinend auch beschwert. Was passiert eigentlich bei newdim < memsize?
+
+Bug 31, soplex.cpp, buffer underrun: wie Bug 1.
+
+Bug 58, nameset.cpp, buffer overrun:
+   Die Schleife vor der Aufrufstelle in spxlpfread.cpp:182 ist etwas suspekt.
+   Könnte Probleme geben, falls strlen(name) == 0?
+
+Bug 72, nameset.cpp, buffer overrun: wie Bug 58.
+
+Bug 78, factor.cpp, buffer overrun:
+   Auf Anhieb erstmal unklar. Da wird von verschiedenen Methoden 
+   in der Instanz temp rumgefuhrwerkt -- wer weiß, was die machen...
+
+#------- memcpy Length Unreasonable ------------------
+
+Bug 144, dataarray.h:
+   Mögliche Probleme mit thesize < 0 sind nicht auszuschließen. Im Constructor
+   wird zwar isConsistent() aufgerufen, das u.a. auf thesize >= 0 testet, aber
+   durch insert() und andere Modifikationen könnte es negativ werden.
+
+#------- NULL pointer dereference ------------------
+
+Bug 0, idlist.h:
+   Code sieht fragwürdig aus; wer sagt, dass it->next() nicht NULL ist?
+
+      for (T * it = first(); it; it = next(it))
+      {
+         [...]
+         if (it != last() && it->next()->prev() != it)
+            return MSGinconsistent("IdList");
+      }
+
+Bug 6, svector.cpp: wie Bug 37.
+
+Bug 18, nameset.h: wie Bug 55.
+
+Bug 44, nameset.cpp/dataset.h: wie Bug 55.
+
+Bug 55, datakey.h:
+   Sieht berechtigt aus:
+   /**@todo suspicious: hashtab.get(nam) could return a NULL pointer if nam
+      is not in the table, which would core dump (?) the *hashtab.get() */
+
+Bug 56, dataset.h: wie Bug 55.
+
+Bug 60, svset.cpp: 
+   Ich kann nicht ausschließen, dass Element* ps->mem() auch mal NULL sein
+   könnte. Dann gibt es Probleme.
+
+Bug 37, svector.cpp: 
+   Gibt Probleme, falls m_elem mal NULL ist. Es gibt im SVector öfter mal
+   Abfragen, ob m_elem NULL ist, also scheint das vorkommen zu können.
+
+Bug 92, spxmpsread.cpp/mpsinput.h: 
+   Eine NULL pointer dereference sehe ich da nicht, aber evtl. einen buffer
+   overflow durch Strings fester Länge in strcpy()? Die möglichen
+   Initialisierungen von mps.m_f1 sind ziemlich undurchschaubar.
+
+Bug 105, nameset.h: wie Bug 55.
+
+Bug 112, spxmpsread.cpp: wie Bug 92, aber mit strcmp().
+
+Bug 122, spxmpsread.cpp/mpsinput.h: wie Bug 92.
+
+Bug 79, 137, vector.h: Uninitialized value, NULL pointer dereference
+   Ist ok, falls die Dimension beim Erzeugen eines Vektors immer korrekt
+   angegeben wird. Wenn nicht, dann nicht.
+
+#------- Type Overrun ------------------------------
+
+Bugs 91, 106, 121, 145, alle an derselben Stelle in mpsinput.cpp:
+
+   len = int(strlen(m_buf)); 
+   for(int i = 0; i < len; i++) 
+      if ((m_buf[i] == '\t') ||      /* Type Overrun (ID: 106) */
+          (m_buf[i] == '\n') || 
+          (m_buf[i] == '\r'))
+         [...]
+
+   Keine Ahnung, was der will und was ein Type Overrun ist. Gibt es dazu
+   eine Definition? Die Stelle sieht eigentlich ok aus.
 
 
+#--------------------- Leak -----------------------
+
+Anmerkung: Die folgenden Leak-Warnungen sind aus Code-Analyse-Sicht
+korrekt, aber wahrscheinlich trotzdem unberechtigt. Es ist schwer
+nachvollziehbar, ob die internen size-Variablen immer den richtigen Wert
+haben, aber die Stellen sind uns nie um die Ohren geflogen. Der Code ist
+also wahrscheinlich korrekt, aber wirklich klar ist es nicht.
+
+Bug 19, dataarray.h: 
+   In DataArray() wird Speicher alloziiert, aber nicht aufgeräumt. Ist
+   ok, wird in ~DataArray freigegeben. Größenanpassungen sehen auf den
+   ersten Blick sinnvoll aus.
+
+Bug 98, dataarray.h: 
+   Beschwert sich über Real memfactor(p_real) in DataArray::DataArray(). 
+   Was soll da passieren? Im ebenfalls bemängelten DataSet wird der im
+   Konstruktor geholte Speicher im Destruktor wieder aufgeräumt.
+
+Bug 115, dvector.cpp:
+   Ok, der in DVector() erzeugte Speicher wird in ~DVector() freigegeben.
+   Größenanpassungen (reMax() etc.) sehen auf den ersten Blick sinnvoll aus.
+
+Bug 15, dsvector.cpp:
+   Wie Bug 115, nur mit dem DSVector.
+
+Bugs 7, 9, 23, 38, 68, 69, 70, 80, 97, 143: wie Bug 15, 98 oder 115.
+
+Bug 43, array.h:
+   Wie Bug 115, aber mit Array().
+
+#------- Uninitialized variable --------------------
+
+Bugs 2, 20, 82, dataarray.h:
+   Typisch abstruser Roland-Code, sieht aber ok aus, was
+   uninitialisierte Variablen angeht. Allerdings wird Element i nicht
+   verschoben, sondern nur alles ab i+1. Soll das so sein?
+
+Bugs 29, 30, dataset.h:
+   Korrekter Code, falls thenum immer mit theitem[] synchron gehalten
+   wird. Sieht auf den ersten Blick so aus, ist aber wegen etwas unklarer 
+   Operationen vor allem in remove() schwer nachvollziehbar.
+
+Bugs 28, 51, dataset.h:
+   Korrekter Code, falls die internen Variablen firstfree und themax
+   immer passend gesetzt sind. An der fraglichen Stelle etwas unklare 
+   Abfrage der Initialisierung firstfree = -themax - 1. 
+
+Bug 59, ssvector.cpp:
+   Korrekter Code, falls val und Vector::dim() immer synchron sind.
+   Schwer nachvollziehbar. Die danebenstehende Meldung über den unklaren
+   setupStatus ist mir unklar. Der betreffende Code steht in 
+   if (isSetup()) {...} drin, also sollte der setupStatus klar sein.
+
+Bug 71, 89, vector.cpp:
+   Korrekter Code, falls val und Vector::dim() immer synchron sind.
+   Schwer nachvollziehbar.
+
+Bugs 76, 77, factor.cpp:
+   Kann sein, kann auch nicht sein. Die Belegung der internen Variable
+   temp ist für mich nicht nachvollziehbar.
+
+Bugs 24, 25, 26, 107, 108, forest.cpp:
+   Kann sein, kann auch nicht sein. Die Belegung der internen Variable
+   #u# ist für mich nicht nachvollziehbar.
+
+Bug 27, factor.cpp:
+   Nicht ganz von der Hand zu weisen. Es ist unklar, ob l.start 
+   irgendwie sinnvoll initialisiert ist.
+
+Bugs 81, 83, spxlp.cpp:
+   Für moreArray.data wird in DataArray::DataArray(int) Speicher geholt.
+   Da steht dann zwar nichts drin, aber die nachfolgende Initialisierung
+   mit dem Nullvektor ist zulässig. Ob der anschließend bemängelte
+   Zugriff auf more[vec.index(j)] (alias more[p_add[i].index(j)])
+   zulässig ist, ist mir unklar. Was weiß ich, wie p_set und p_add
+   zusammenhängen...
+
+#------- Unreachable code --------------------
+
+Bug 8, spxbasis.cpp:
+   Da scheint er recht zu haben. Die zweite Schleife und das zweite
+   assert scheinen mir ziemlich sinnlos; es steht auch schon ein
+   entsprechender Kommentar dabei.
+
+Bug 36, unitvector.cpp:
+   Das, was gemeint ist, sieht auf Anhieb sinnvoll aus, aber die 
+   Pointerarithmetik an der Stell Schreibweise ist schon sehr
+   merkwürdig. Nochmal genau draufgucken.
+
+Bug 53, spxmainsm.cpp:
+   Ich sehe auf Anhieb keinen Grund, warum dieser else-Zweig nicht
+   auftreten können sollte. Also wahrscheinlich eine Warnung von
+   derselben Sorte wie Bugs 1wff. (s.u.), aber vielleicht nochmal
+   draufgucken.
+
+Bugs 10, 11, 65, 66, 93, 94, 99, 100, 116, 117, spxsolve.cpp/spxsolver.cpp:
+   Unreachable Code, redundant condition:
+
+   Berechtigte Frage. Darf das nun auftreten oder nicht?
+   Sieht aus wie "weiß ich nicht so genau":
+      assert(isInitialized()); 
+      if (!isInitialized()) 
+         return NOT_INIT;
+
+Bugs 42, 109, 130, 138, enter.cpp/leave.cpp:
+   Da sind break-Anweisungen nicht erreichbar, weil direkt davor
+   assert(false) steht. Das sieht mir alles nach 
+   "bin-mir-nicht-sicher-mal-gucken-was-passiert"-asserts aus.
+
+Bugs 73, 110, 118, 133, spxsteeppr.cpp/spxweightpr.cpp:
+   Die Methoden removedCoVec() und removedCoVecs werden laut grep nur
+   definiert, aber nirgendwo benutzt. Wozu sind die gut? Rauswerfen? 
+
+Bugs 104, 136, 142:
+   Könnte allgemeines Unwohlsein sein wie Bugs 12ff. (s.u.), kann aber
+   auch etwas dran sein. Thorsten: nochmal draufgucken.
+
+#------- Ignored return value ----------------------
+
+Bugs 148-157, spxmainsm.cpp/spxsolve.cpp: 
+   Keine Ahnung, was der da will. Stört ihn der nicht abgefragte
+   Rückgabewert von spxout::operator<<()? Manchmal muss es aber etwas
+   anderes sein, weil keine Ausgabe vorkommt. Vielleicht auch nur
+   allgemeines Unwohlsein. Die Meldungen kommen jedenfalls teilweise aus
+   Zeilen, wo definitiv ein Rückgabewert abgefragt wird.
+
+#------- Useless assignment ------------------------
+
+Bugs 85, 95, 96, spxchangebasis.cpp:
+   Keine Ahnung, ob diese Zuweisung wirklich nötig ist, aber beim
+   Löschen einer Zeile oder Spalte schadet es wohl nicht, factorized und
+   matrixIsSetup auf false zu setzen. Das würde ich da lieber nicht
+   wegnehmen. Vielleicht war es mal auf einem execution path unnötig.
+
+Bug 16, ssvector.cpp:
+   Keine Ahnung. Ich würde es sicherheitshalber stehenlassen.
+
+#------- Redundant condition -----------------------
+
+Bugs 101, 102, 103, 135, 139, 140, 141, mpsinput.h:
+   Kann sein, dass einige Felder nie NULL sind, wenn andere es auch
+   nicht sind, oder umgekehrt. Weiß ich nicht.
+
+Bug 52, spxmainsm.cpp:
+   Angeblich steht m_onLhs immer auf true. Es wird jedenfalls nur einmal
+   im Konstruktor initialisiert (mit Gleichheitstest auf Real! Absicht?).
+
+Bugs 32, 33, 34, 74, 75, spxmainsm.cpp:
+   Wie Bug 52, aber mit m_strictUp bzw. m_strictLo.
+
+Bugs 86, 87, spxchangebasis.cpp:
+   Angeblich ist matrixIsSetup hier immer true. Mit so einer Behauptung
+   wäre ich vorsichtig. Ob die Bedingung "status() > NO_PROBLEM" hier
+   immer gilt, kann ich nicht sagen.
+
+Bug 41, ssvector.cpp:
+   Laut dem assert davor ist der Vektor hier immer setup. 
+   Ist das ein "ich-weiß-nicht-so-genau"-assert?
+
+Bug 64, spxchangebasis.cpp:
+   Laut dem assert davor ist die Status-Abfrage hier überflüssig. 
+   Ist das ein "ich-weiß-nicht-so-genau"-assert? Passiert eigentlich das
+   Gewünschte, falls im opt-Modus die if-Abfrage nicht zuschlagen sollte?
+
+Bug 35, unitvector.cpp:
+   Wo er recht hat, hat er recht... Siehe auch Bug 36.
+
+Bug 134, spxmpsread.cpp:
+   Stimmt. Die Abfrage scheint nach der Initialisierung überflüssig zu sein.
+
+Bug 147, soplex.cpp:
+   Ist immer nCols() <= 0, wenn nRows() <= 0 ist? Kann das überhaupt < 0 werden?
+
+#------- Code sieht in Ordnung aus -----------------
+
+Bugs 12, 13, 14, 17, 39, 47, 48, 57, 114, 123, 124, 125, 128: Unreachable code
+   Abstruse Fehlermeldungen, völlig unklar, was der da will. Sieht nach
+   allgemeinem Unwohlsein von Codesonar aus (kein Wunder bei dem Code ;-)).
+
+Bugs 45, 46, spxid.cpp: unreachable code, redundant condition
+   Ist ok, assert(false) im switch-default, alle möglichen Werte sind abgedeckt.
+
+Bugs 21, 22, 49, 61, spxmainsm.cpp: leak
+   Aus Code-Analysis-Sicht berechtigt (nicht trivial nachvollziehbar),
+   aber von Andreas für gut befunden (von mir nach Erklärung auch).
+
+Bug 62, mpsinput.cpp: NULL pointer dereference
+   Nicht besonders lesbarer Code, aber dereferenziert wird nur, falls nicht NULL.
+
+Bug 67, dataarray.h: uninitialized variable
+   Dataarray::theitem könnte laut Codesonar uninitialisiert sein. Vorher
+   passiert aber ein reMax(), falls notwendig, sieht also ok aus.
+
+Bugs 90, 111, 120, spxmpsread.cpp: unreachable code
+   Ich finde zwar, dass das while(false) erreichbar (die Warnung
+   also unberechtigt) ist, aber ein etwas dreckiger Hack ist diese
+   Pseudoschleife schon...
+
+Bug 129, example.cpp: unused value
+   Warnung teilweise korrekt wegen auskommentiertem Body von
+   read_basis_file() (stört nicht weiter), teilweise Blödsinn.
+
+Bug 40, ssvector.cpp: useless assignment
+   Stimmt. setupStatus wird im vorhergehenden clear() schon auf true
+   gesetzt, und in assign2product() wird auch nochmal clear()
+   aufgerufen. Ich würde die Zuweisung "setupStatus = true" trotzdem da
+   stehen lassen.
+
+Bugs 131, 132, forest.cpp: useless assignment
+   Stimmt. Die Pointer cidx und cval werden erst vor der if-Abfrage und
+   dann jeweils nochmal im if- und im else-Zweig zugewiesen. Habe es
+   sicherheitshalber so gelassen, weil ich nicht weiß, was da noch alles
+   passiert. Wieso findet Codesonar diese überflüssige Zuweisung nur im
+   else-Teil und nicht im if-Teil?
+
+Bug 119, spxweightst.cpp: redundant condition
+   Stimmt, SPxStarter::isConsistent() liefert immer true zurück. Macht nix.
+
+Bugs 126, 127, example.cpp: 
+   Stimmt, read_basis ist vorübergehend auf false hardcodiert, weil da
+   irgendetwas noch nicht funktionierte oder nicht richtig getestet war
+   oder so, wenn ich mich recht entsinne. Ist das noch aktuell? Die
+   Abfragen sollten jedenfalls so stehen bleiben.
+
+Bug 84, spxequilisc.cpp:
+   Ich finde, die Warnung ist falsch. Per Konstruktor von SpxScaler kann
+   m_doBoth auch auf false gesetzt werden. Das passiert auch teilweise
+   in example.cpp.
+
+#------- Korrekte Warnung, behoben -----------------
+
+Bugs 3, 4, 5, svset.cpp: unreachable code, useless assignment, redundant condition
+   if (idxmax < 0) {...}
+   else 
+   {
+      idxmax = (idxmax >= 0 ? idxmax : 0);
+      [...]
+   }
+
+   Erstens komische Schreibweise für 
+      if (idxmax < 0) { idxmax = 0; },
+   zweitens überflüssig. Hab's behoben.
+      
+Bug 54, solve.cpp: unused value
+   Wert wurde nur in #ifndef WITH_L_ROWS benutzt, was nicht aufgerufen
+   wurde. Zuweisung in diesen Teil verschoben. Nebenbei ist dieser Code
+   alles andere als leserlich.
+
+Bug 113, example.cpp: useless assignment
+   Stimmt, behoben.
+
+Bug 50, spxbounds.cpp: useless assignment
+   Die Meldung halte ich für Blödsinn. Habe aus i eine interne
+   Schleifenvariable gemacht, wie auch darüber. Damit ist das Problem
+   sowieso erledigt.
 
