@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.h,v 1.25 2005/11/09 13:53:51 bzforlow Exp $"
+#pragma ident "@(#) $Id: svector.h,v 1.26 2007/03/27 11:05:59 bzfpfend Exp $"
 
 /**@file  svector.h
  * @brief Sparse vectors.
@@ -197,7 +197,7 @@ public:
          return 0;
    }
 
-   /// maximal index.
+   /// dimension of the vector: maximal index + 1
    int dim() const;
 
    /// Number of index \p i.

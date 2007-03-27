@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.27 2007/01/19 13:51:09 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.28 2007/03/27 11:05:59 bzfpfend Exp $"
 
 //#define DEBUGGING 1
 
@@ -870,8 +870,8 @@ int SPxSolver::terminationIter() const
 void SPxSolver::setTerminationValue(Real /*p_value*/)
 {
    METHOD( "SPxSolver::setTerminationValue()" );
-   MSG_ERROR( spxout << "ESOLVE25 setTerminationValue not yet implemented" << std::endl; )
-   //maxValue = p_value;
+   MSG_ERROR( spxout << "ESOLVE25 setTerminationValue not yet implemented" << std::endl; );
+   /*maxValue = p_value;*/
 }
 
 Real SPxSolver::terminationValue() const

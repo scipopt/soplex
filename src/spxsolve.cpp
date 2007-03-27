@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.95 2006/01/31 08:36:16 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.96 2007/03/27 11:05:59 bzfpfend Exp $"
 
 //#define DEBUGGING 1
 
@@ -703,7 +703,7 @@ bool SPxSolver::terminate()
          if( sign * (value() - maxValue) >= 0.0 )
          {
             MSG_INFO2( spxout << "ISOLVE55 Objective value limit (" << maxValue
-                              << ") reached" << std::endl; )
+               << ") reached" << std::endl; )
             MSG_DEBUG(
                spxout << "DSOLVE56 Objective value limit reached" << std::endl
                       << " (value: " << value()

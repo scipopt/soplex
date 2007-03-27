@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.cpp,v 1.19 2005/09/16 12:42:39 bzfhille Exp $"
+#pragma ident "@(#) $Id: svector.cpp,v 1.20 2007/03/27 11:05:59 bzfpfend Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -75,7 +75,7 @@ int SVector::dim() const
       d = (d > e->idx) ? d : e->idx;
       e++;
    }
-   return d;
+   return d+1;
 }
 
 void SVector::sort()
