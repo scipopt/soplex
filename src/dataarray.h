@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataarray.h,v 1.24 2006/08/25 18:18:36 bzforlow Exp $"
+#pragma ident "@(#) $Id: dataarray.h,v 1.25 2007/05/03 12:38:36 bzforlow Exp $"
 
 /**@file  dataarray.h
  * @brief Save arrays of data objects.
@@ -139,6 +139,8 @@ public:
    /// insert \p n uninitialized elements before \p i 'th element.
    void insert(int i, int n)
    {
+      assert(i >= 0);
+      assert(n >= 0);
       int j = size();
       reSize(thesize + n);
       while (i < j--)
