@@ -1,4 +1,4 @@
-# $Id: Makefile.lpstat,v 1.1 2002/12/16 09:25:56 bzfkocht Exp $
+# $Id: Makefile.lpstat,v 1.2 2007/05/19 14:32:06 bzfkocht Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -51,13 +51,13 @@ GCCWARN		=	-Wall -W -Wpointer-arith -Wbad-function-cast \
 			-Wcast-qual -Wold-style-cast -Wshadow 
 #			-Weffc++ -Wredundant-decls    
 
-BASE            =       $(OSTYPE).$(ARCH).$(COMP).$(OPT)
+BASE            =       $(OSTYPE).$(ARCH).$(COMP).$(OPT).static
 TARGET		=	$(NAME).$(BASE)
 LIBNAME		=	soplex.$(BASE)
 BINARY		=	$(BINDIR)/$(TARGET)
 DEPEND		=	extra/lpstat.dep
 
-OBJDIR		=	obj/O.$(OSTYPE).$(ARCH).$(COMP).$(OPT)
+OBJDIR		=	obj/O.$(OSTYPE).$(ARCH).$(COMP).$(OPT).static
 OBJXXX		=	$(addprefix $(OBJDIR)/,$(OBJECT))
 LIBXXX		=	$(addprefix $(OBJDIR)/,$(LIBOBJ))
 OBJSRC		=	$(addprefix $(SRCDIR)/,$(OBJECT:.o=.cpp))
@@ -77,7 +77,7 @@ clean:
 depend:
 		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
 		$(OBJSRC:.o=.cpp) $(LIBSRC:.o=.cpp) \
-		| sed '\''s|^\([0-9A-z]\{1,\}\)\.o|$$\(OBJDIR\)/\1.o|g'\'' \
+		| sed '\''s|^\([0-9A-Za-z]\{1,\}\)\.o|$$\(OBJDIR\)/\1.o|g'\'' \
 		>$(DEPEND)'
 
 -include	$(DEPEND)

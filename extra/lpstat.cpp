@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpstat.cpp,v 1.2 2003/01/05 17:50:15 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpstat.cpp,v 1.3 2007/05/19 14:32:06 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -30,9 +30,9 @@ int main(int argc, char **argv)
    "************************************************************************\n"
    "*                                                                      *\n"
    "*       LPStat --- Print Statistics about LPs.                         *\n"
-   "*                  Release 1.0.0                                       *\n"
-   "*    Copyright (C) 2002 Konrad-Zuse-Zentrum                            *\n"
-   "*                       fuer Informationstechnik Berlin                *\n"
+   "*                  Release 1.0.1                                       *\n"
+   "*    Copyright (C) 2002-2007 Konrad-Zuse-Zentrum                       *\n"
+   "*                            fuer Informationstechnik Berlin           *\n"
    "*                                                                      *\n"
    "*  LPStat is distributed under the terms of the ZIB Academic Licence.  *\n"
    "*  You should have received a copy of the ZIB Academic License         *\n"
@@ -45,12 +45,14 @@ int main(int argc, char **argv)
    "[options] input-file\n\n"
    "          input-file can be either in MPS or LPF format\n\n"
    "options:  (*) indicates default\n" 
+   " -s        output only one line\n"
    " -vLevel   set verbosity Level [0-3], default 1\n"
    " -V        show program version\n"
    " -h        show this help\n"
    ;
 
    int verbose = 1;
+   int short_output = 0;
    int optidx;
 
    for(optidx = 1; optidx < argc; optidx++)
@@ -60,6 +62,9 @@ int main(int argc, char **argv)
 
       switch(argv[optidx][1])
       {
+      case 's' :
+         short_output = 1;
+         break;
       case 'v' :
          verbose = atoi(&argv[optidx][2]);
          break;
@@ -139,12 +144,20 @@ int main(int argc, char **argv)
          vints++;
       }
    }
-   std::cout << "Variables  : " << std::setw(8) << vars  << std::endl
-             << "     binary: " << std::setw(8) << vbins << std::endl
-             << "    integer: " << std::setw(8) << vints << std::endl
-             << "      boxed: " << std::setw(8) << boxed << std::endl
-             << "       free: " << std::setw(8) << frees << std::endl
-             << std::endl;
+   if (short_output)
+      std::cout << inpfile << " " 
+               << vars    << " " 
+               << vbins   << " " 
+               << vints   << " " 
+               << boxed   << " " 
+               << frees   << " ";
+   else
+      std::cout << "Variables  : " << std::setw(8) << vars  << std::endl
+                << "     binary: " << std::setw(8) << vbins << std::endl
+                << "    integer: " << std::setw(8) << vints << std::endl
+                << "      boxed: " << std::setw(8) << boxed << std::endl
+                << "       free: " << std::setw(8) << frees << std::endl
+                << std::endl;
    //
    int cons  = lp.nRows();
    int cbins = 0;
@@ -204,17 +217,29 @@ int main(int argc, char **argv)
       else
          mixed++;
    }
-   std::cout << "Constraints: " << std::setw(8) << cons  << std::endl
-             << "     binary: " << std::setw(8) << cbins << " " << bin28 << std::endl
-             << "     SOS-T3: " << std::setw(8) << sos3s << std::endl
-             << "    integer: " << std::setw(8) << cints << std::endl
-             << "      mixed: " << std::setw(8) << mixed << std::endl
-             << "  continous: " << std::setw(8) << conts << std::endl
-             << "         ==: " << std::setw(8) << equls << std::endl
-             << "         >=: " << std::setw(8) << grets << std::endl
-             << "         <=: " << std::setw(8) << lests << std::endl
-             << "     ranged: " << std::setw(8) << rngs  << std::endl
-             << std::endl;
+   if (short_output)
+      std::cout << cons  << " "
+               << cbins << " "
+               << sos3s << " "
+               << cints << " "
+               << mixed << " "
+               << conts << " "
+               << equls << " "
+               << grets << " "
+               << lests << " "
+               << rngs  << std::endl;
+   else
+      std::cout << "Constraints: " << std::setw(8) << cons  << std::endl
+                << "     binary: " << std::setw(8) << cbins << " " << bin28 << std::endl
+                << "     SOS-T3: " << std::setw(8) << sos3s << std::endl
+                << "    integer: " << std::setw(8) << cints << std::endl
+                << "      mixed: " << std::setw(8) << mixed << std::endl
+                << "  continous: " << std::setw(8) << conts << std::endl
+                << "         ==: " << std::setw(8) << equls << std::endl
+                << "         >=: " << std::setw(8) << grets << std::endl
+                << "         <=: " << std::setw(8) << lests << std::endl
+                << "     ranged: " << std::setw(8) << rngs  << std::endl
+                << std::endl;
 
    return 0;
 }
