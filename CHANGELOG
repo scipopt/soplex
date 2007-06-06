@@ -11,6 +11,8 @@ Release ???
 - Bugfix: spxmainsm.cpp: assertion bug removed in 
   FreeZeroObjVariablePS::execute().
 
+- Bugfix: SVector::dim() has to return the dimension and not the maximal index
+
 #----------------------------------------------------------------
 
 Release 1.3.1
