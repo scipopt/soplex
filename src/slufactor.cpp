@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.47 2006/08/07 15:25:06 bzforlow Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.48 2007/06/19 13:02:46 bzforlow Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -616,7 +616,6 @@ SLUFactor::SLUFactor()
    , forest (1)
 {
    METHOD( "SLUFactor::SLUFactor()" );
-#ifndef NDEBUG
    row.perm    = 0;
    row.orig    = 0;
    col.perm    = 0;
@@ -642,7 +641,6 @@ SLUFactor::SLUFactor()
    l.rbeg      = 0;
    l.rorig     = 0;
    l.rperm     = 0;
-#endif
 
    nzCnt  = 0;
    thedim = 1;
@@ -740,7 +738,6 @@ SLUFactor::SLUFactor(const SLUFactor& old)
    , eta (old.eta)
    , forest(old.forest)
 {
-#ifndef NDEBUG
    row.perm    = 0;
    row.orig    = 0;
    col.perm    = 0;
@@ -767,7 +764,6 @@ SLUFactor::SLUFactor(const SLUFactor& old)
    l.rbeg      = 0;
    l.rorig     = 0;
    l.rperm     = 0;
-#endif
 
    assign(old);
    assert(SLUFactor::isConsistent());
