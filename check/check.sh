@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: check.sh,v 1.27 2007/05/04 11:25:28 bzfhille Exp $
+# $Id: check.sh,v 1.28 2007/06/19 13:03:10 bzforlow Exp $
 # Parameters
 # $1 Name of the test, e.g. netlib (needs netlib.test, netlib.solu)
 # $2 Path/Name of the binary, e.g. ../bin/soplex.linux.x86.gnu.opt
@@ -13,8 +13,9 @@ RESFILE=check.$TSTNAME.$BINNAME.res
 date >$OUTFILE
 date >$ERRFILE
 
-# Avoid problems with foreign locales.
-export LANG=C
+# Avoid problems with foreign locales (two separate commands for SunOS)
+LANG=C
+export LANG
 
 # Determine awk program to use.
 AWK=awk
