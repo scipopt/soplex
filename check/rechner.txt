@@ -1,0 +1,16 @@
+Architektur     OS      Compiler        Rechner         Wer?
+x86             Linux   GCC             opt31           Andreas
+                        Intel 8.0       opt24           Andreas
+                Windows GCC                             Benjamin
+                        MS VS 2003      opt29           Benjamin
+x86_64          Linux   GCC             htc012          Andreas
+PowerPC         MacOS   GCC             htc014          Sebastian
+Sparc           SunOS   Sun             htc015          Sebastian
+IBM Power4      AIX                     berni1-en0      Thorsten
+
+
+Nicht mehr unterstützt (nur bei Langeweile):
+* Alpha, OSF, GCC/Compaq 6.5-39, opt98/opt99
+* MIPS unter IRIX (in the Visualization department)
+* PA-RISC, HP-UX, lachs (Vis.)
+
