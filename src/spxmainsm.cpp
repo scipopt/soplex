@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.8 2007/03/07 14:16:47 bzftuchs Exp $"
+#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.9 2007/06/21 14:39:29 bzftuchs Exp $"
 
 //#define DEBUGGING 1
 
@@ -2979,6 +2979,12 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real delta)
    m_timeUsed.reset();
    m_timeUsed.start();
 
+   m_remRows = 0;
+   m_remCols = 0;
+   m_remNzos = 0;
+   m_chgBnds = 0;
+   m_chgLRhs = 0;
+   
    Result ret   = OKAY;
    bool   again = true;
 
