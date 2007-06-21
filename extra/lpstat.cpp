@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpstat.cpp,v 1.3 2007/05/19 14:32:06 bzfkocht Exp $"
+#pragma ident "@(#) $Id: lpstat.cpp,v 1.4 2007/06/21 15:14:40 bzfkocht Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -30,7 +30,7 @@ int main(int argc, char **argv)
    "************************************************************************\n"
    "*                                                                      *\n"
    "*       LPStat --- Print Statistics about LPs.                         *\n"
-   "*                  Release 1.0.1                                       *\n"
+   "*                  Release 1.0.2                                       *\n"
    "*    Copyright (C) 2002-2007 Konrad-Zuse-Zentrum                       *\n"
    "*                            fuer Informationstechnik Berlin           *\n"
    "*                                                                      *\n"
@@ -94,14 +94,7 @@ int main(int argc, char **argv)
    NameSet     colnames;
    DIdxSet     intvars;
 
-   std::ifstream ifile(inpfile);
-
-   if (!ifile)
-   {
-      std::cerr << "Can't open file: " << inpfile << std::endl;
-      exit(1);
-   }
-   if (!lp.read(ifile, &rownames, &colnames, &intvars))
+   if (!lp.readFile(inpfile, &rownames, &colnames, &intvars))
    {
       std::cerr << "Error while reading file: " << inpfile << std::endl;
       exit(1);
