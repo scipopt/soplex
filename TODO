@@ -1,4 +1,4 @@
-$Id: TODO,v 1.85 2007/06/19 13:03:18 bzforlow Exp $
+$Id: TODO,v 1.86 2007/06/26 09:20:12 bzforlow Exp $
 
 - solu Dateien vervollständigen, insbesondere miplib.solu
 - alle Tests auf allen Maschinen durchlaufen lassen -> results
@@ -105,15 +105,6 @@ stdio.h/printf die letzten erlegen.
 
 tester/simplifier usw. auch wie pricer mit namen versehen.
 
-neue abstracte basisklasse spxscaler mit spxequilim=spxscale
-als erste implementierung.
-   DataArray < Real > colscale;  ///< column scaling factors
-   DataArray < Real > rowscale;  ///< row scaling factors
-kann in die basisklasse
-Als unterscheid zu simplifier kommt noch ein
-getObjValue(col) aufruf dazu, außerdem kann dann der scaler
-gleichseitig mit dem simplifiern eingesetzt werden.
-
 vsolve/solve/update isNotZero() benutzen
 
 openMP insbesondere pricer/ratiotest (compaq,intel)
@@ -172,54 +163,6 @@ pilot-ja LR
 
 linux.x86.intel LC 0 936 5121
 greenbea ER
-
-#---------------------------------------------------
-#  Meldungen des Sun-Compilers CC
-#---------------------------------------------------
-
-Nach Stichproben scheinen mir diese Methoden in spxlp usw. überflüssig
-zu sein. Die rufen nur die jeweilige Methode der Basisklasse auf und sind
-nicht virtuell. Denselben Effekt sollten wir auch bekommen, wenn wir die
-Methoden in den abgeleiteten Klassen rauswerfen. -- Sebastian
-
-"src/spxlp.h", line 753: Warning: soplex::SPxLP::rowVector hides the function soplex::LPRowSet::rowVector(const soplex::DataKey&) const.
-"src/spxlp.h", line 753: Warning: soplex::SPxLP::rhs hides the function soplex::LPRowSet::rhs(const soplex::DataKey&) const.
-"src/spxlp.h", line 753: Warning: soplex::SPxLP::lhs hides the function soplex::LPRowSet::lhs(const soplex::DataKey&) const.
-"src/spxlp.h", line 753: Warning: soplex::SPxLP::colVector hides the function soplex::LPColSet::colVector(const soplex::DataKey&) const.
-"src/spxlp.h", line 753: Warning: soplex::SPxLP::maxObj hides the function soplex::LPColSet::maxObj(const soplex::DataKey&) const.
-"src/spxlp.h", line 753: Warning: soplex::SPxLP::upper hides the function soplex::LPColSet::upper(const soplex::DataKey&) const.
-"src/spxlp.h", line 753: Warning: soplex::SPxLP::lower hides the function soplex::LPColSet::lower(const soplex::DataKey&) const.
-"src/spxlp.h", line 753: Warning: soplex::SPxLP::number hides the function soplex::LPRowSet::number(const soplex::DataKey&) const.
-"src/spxlp.h", line 753: Warning: soplex::SPxLP::number hides the function soplex::LPColSet::number(const soplex::DataKey&) const.
-"src/spxlp.h", line 753: Warning: soplex::SPxLP::rhs_w hides the function soplex::LPRowSet::rhs_w().
-"src/spxlp.h", line 753: Warning: soplex::SPxLP::rhs_w hides the function soplex::LPRowSet::rhs_w(const soplex::DataKey&).
-"src/spxlp.h", line 753: Warning: soplex::SPxLP::lhs_w hides the function soplex::LPRowSet::lhs_w().
-"src/spxlp.h", line 753: Warning: soplex::SPxLP::lhs_w hides the function soplex::LPRowSet::lhs_w(const soplex::DataKey&).
-"src/spxlp.h", line 753: Warning: soplex::SPxLP::maxObj_w hides the function soplex::LPColSet::maxObj_w().
-"src/spxlp.h", line 753: Warning: soplex::SPxLP::maxObj_w hides the function soplex::LPColSet::maxObj_w(const soplex::DataKey&).
-"src/spxlp.h", line 753: Warning: soplex::SPxLP::upper_w hides the function soplex::LPColSet::upper_w().
-"src/spxlp.h", line 753: Warning: soplex::SPxLP::upper_w hides the function soplex::LPColSet::upper_w(const soplex::DataKey&).
-"src/spxlp.h", line 753: Warning: soplex::SPxLP::lower_w hides the function soplex::LPColSet::lower_w().
-"src/spxlp.h", line 753: Warning: soplex::SPxLP::lower_w hides the function soplex::LPColSet::lower_w(const soplex::DataKey&).
-"src/spxlp.h", line 753: Warning: soplex::SPxLP::colVector_w hides the function soplex::LPColSet::colVector_w(const soplex::DataKey&).
-"src/spxlp.h", line 753: Warning: soplex::SPxLP::rowVector_w hides the function soplex::LPRowSet::rowVector_w(const soplex::DataKey&).
-"src/spxsolver.h", line 881: Warning: Comparing different enum types "soplex::SPxBasis::Desc::Status" and "soplex::SPxSolver::Representation".
-"src/spxsolver.h", line 1711: Warning: soplex::SPxSolver::type hides the function soplex::LPRowSet::type(int) const.
-"src/spxsolver.h", line 1711: Warning: soplex::SPxSolver::type hides the function soplex::LPRowSet::type(const soplex::DataKey&) const.
-"src/spxsolver.h", line 1711: Warning: soplex::SPxSolver::setRep hides the function soplex::SPxBasis::setRep().
-"src/spxsolver.h", line 1711: Warning: soplex::SPxSolver::setType hides the function soplex::LPRowSet::setType(int, soplex::LPRow::Type).
-"src/spxsolver.h", line 1711: Warning: soplex::SPxSolver::solve hides the function soplex::SPxBasis::solve(soplex::Vector&, const soplex::Vector&).
-"src/spxsolver.h", line 1711: Warning: soplex::SPxSolver::solve hides the function soplex::SPxBasis::solve(soplex::SSVector&, const soplex::SVector&).
-"src/spxsolver.h", line 1711: Warning: soplex::SPxSolver::value hides the function soplex::LPRowSet::value(int) const.
-"src/spxsolver.h", line 1711: Warning: soplex::SPxSolver::value hides the function soplex::LPRowSet::value(const soplex::DataKey&) const.
-"src/slufactor.h", line 233: Warning: soplex::SLUFactor::solveRight hides the function soplex::CLUFactor::solveRight(double*, double*).
-"src/slufactor.h", line 233: Warning: soplex::SLUFactor::solveRight4update hides the function soplex::CLUFactor::solveRight4update(double*, int*, double, double*, double*, int*, int*).
-"src/slufactor.h", line 233: Warning: soplex::SLUFactor::solveLeft hides the function soplex::CLUFactor::solveLeft(double*, double*).
-"src/soplex.h", line 285: Warning: soplex::SoPlex::type hides the function soplex::LPRowSet::type(int) const.
-"src/soplex.h", line 285: Warning: soplex::SoPlex::type hides the function soplex::LPRowSet::type(const soplex::DataKey&) const.
-"src/soplex.h", line 285: Warning: soplex::SoPlex::setType hides the function soplex::LPRowSet::setType(int, soplex::LPRow::Type).
-
-
 
 #---------------------------------------------------
 #  Codesonar-Meldungen
@@ -570,4 +513,39 @@ Bug 50, spxbounds.cpp: useless assignment
    Die Meldung halte ich für Blödsinn. Habe aus i eine interne
    Schleifenvariable gemacht, wie auch darüber. Damit ist das Problem
    sowieso erledigt.
+
+-----------------------------------------------------------------------------
+
+Das Folgende kann ein soplex-, ilpi- oder discnet-Bug sein. Der
+Debugging-Output von Uli liegt bei mir. -- Sebastian
+
+Date: Wed, 16 May 2007 12:44:49 +0200
+From: Ulrich Menne <menne@zib.de>
+To: Sebastian Orlowski <orlowski@zib.de>
+Subject: bug in soplex::SoPlex::removeCol
+
+Hallo Sebastian,
+
+ich habe jetzt mal in der Methode soplex_LP::remove_col vor und nach
+dem  Removen der Variable mit der col_id 174 alle Koeffizienten in allen
+Zeilen gedumpt, und es faellt folgendes auf:
+
+In jeder Zeile wo die Id 174 vorkam wurde sie durch die letzte, in der
+Zeile vorkommende Id ausgetauscht. Trotzdem kommt die Id 174 nach der
+Loeschung weiterhin vor. Sie tritt jetzt an jeder Stelle auf, wo vorher
+die hoechste Koeffizientenid (379) stand. Diese kommt jetzt im LP nicht
+mehr vor.
+
+Diese zwei Veraenderungen geschehen exakt nach dem Aufruf von
+   soplex::SoPlex::removeCol( colids_.pos( colid ) );
+ 
+Gruesse
+Uli
+
+-----------------------------------------------------------------------------
+
+
+
+
+
 
