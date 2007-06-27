@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.56 2006/08/25 18:20:06 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.57 2007/06/27 10:01:19 bzfkocht Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -387,6 +387,7 @@ bool SPxLP::readLPF(
    int       k;
    char*     s;
    char*     pos;
+   char*     pos_old = 0;
 
    cnames = (p_cnames != 0) 
       ? p_cnames : new NameSet();
@@ -481,6 +482,19 @@ bool SPxLP::readLPF(
             finished = true;
             break;
          }
+         else if (hasKeyword(pos, "s[ubject][   ]t[o]") // second time
+            || hasKeyword(pos, "s[uch][    ]t[hat]")
+            || hasKeyword(pos, "s[.][    ]t[.]")
+            || hasKeyword(pos, "lazy con[straints]"))
+         {
+            // In principle this has to checked for all keywords above,
+            // otherwise we just ignore any half finished constraint
+            if (have_value)
+               goto syntax_error;
+
+            have_value = true;
+            val        = 1.0;
+         }
       }
 
       // 3a. Look for row names in objective and drop it.
@@ -530,6 +544,9 @@ bool SPxLP::readLPF(
       // 7. We have something left to process. 
       while((pos != 0) && (*pos != '\0'))
       {
+         // remember our position, so we are sure we make progress.
+         pos_old = pos;
+
          // Now process the sections 
          switch(section)
          {
@@ -787,6 +804,8 @@ bool SPxLP::readLPF(
          default :
             assert(false);
          }
+         if (pos == pos_old)
+            goto syntax_error;
       }
    }
    //--------------------------------------------------------------------------
