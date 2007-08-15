@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.71 2006/08/25 18:19:34 bzforlow Exp $
+# $Id: Makefile,v 1.72 2007/08/15 19:30:44 bzfpfend Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -22,6 +22,7 @@ ARCH            :=      $(shell uname -m | \
 OSTYPE		:=	$(shell uname -s | tr '[:upper:]' '[:lower:]' | sed -e s/cygwin.*/cygwin/ -e s/irix../irix/ )
 HOSTNAME	:=	$(shell uname -n | tr '[:upper:]' '[:lower:]')
 
+VERBOSE		=	false
 OPT		=	opt
 LINK		=	static
 LIBEXT		=	a
@@ -113,17 +114,36 @@ BINSRC		=	$(addprefix $(SRCDIR)/,$(BINOBJ:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
 
 $(BINFILE):	_$(BINDIR) _$(BINOBJDIR) $(LIBFILE) $(BINOBJFILES)
+		@echo "-> linking $@"
+ifeq ($(VERBOSE), true)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOBJFILES) \
 		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+else
+		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOBJFILES) \
+		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+endif
 
 $(LIBFILE):	_$(LIBDIR) _$(LIBOBJDIR) $(LIBOBJFILES) 
+		@echo "-> generating library $@"
+ifeq ($(VERBOSE), true)
 		-rm -f $(LIBFILE)
 		$(AR) $(ARFLAGS) $@ $(LIBOBJFILES) $(REPOSIT)
 		$(RANLIB) $@
+else
+		@-rm -f $(LIBFILE)
+		@$(AR) $(ARFLAGS) $@ $(LIBOBJFILES) $(REPOSIT)
+		@$(RANLIB) $@
+endif
 
 $(CHANGEBINFILE): _$(BINDIR) _$(BINOBJDIR) $(LIBFILE) $(CHANGEBINOBJFILES)
+		@echo "-> linking $@"
+ifeq ($(VERBOSE), true)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(CHANGEBINOBJFILES) \
 		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+else
+		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(CHANGEBINOBJFILES) \
+		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+endif
 
 lint:		$(BINSRC) $(LIBSRC)
 		$(LINT) lint/soplex.lnt -os\(lint.out\) \
@@ -186,9 +206,19 @@ depend:
 -include	$(DEPEND)
 
 $(BINOBJDIR)/%.o:	$(SRCDIR)/%.cpp
+		@echo "-> compiling $@"
+ifeq ($(VERBOSE), true)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) -c $< -o $@
+else
+		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) -c $< -o $@
+endif
 
 $(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp
+		@echo "-> compiling $@"
+ifeq ($(VERBOSE), true)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LIBOFLAGS) -c $< -o $@
+else
+		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LIBOFLAGS) -c $< -o $@
+endif
 
 # --- EOF ---------------------------------------------------------------------
