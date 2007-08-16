@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.73 2007/08/16 13:31:43 bzfpfend Exp $
+# $Id: Makefile,v 1.74 2007/08/16 14:05:03 bzfpfend Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -215,7 +215,7 @@ depend:
 
 -include	$(DEPEND)
 
-$(BINOBJDIR)/%.o:	$(SRCDIR)/%.cpp $(BINOBJDIR)
+$(BINOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 		@echo "-> compiling $@"
 ifeq ($(VERBOSE), true)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) -c $< -o $@
@@ -223,7 +223,7 @@ else
 		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) -c $< -o $@
 endif
 
-$(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp $(LIBOBJDIR)
+$(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 		@echo "-> compiling $@"
 ifeq ($(VERBOSE), true)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LIBOFLAGS) -c $< -o $@
