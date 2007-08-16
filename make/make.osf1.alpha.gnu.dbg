@@ -1,0 +1,12 @@
+#--- $Id: make.osf1.alpha.gnu.dbg,v 1.5 2007/08/16 13:39:08 bzfpfend Exp $
+CXX	=	g++
+CPPFLAGS=	-Isrc -DWITH_ZLIB
+CXXFLAGS=	-O -g -Wall -W -Wpointer-arith -Wbad-function-cast \
+		-Wcast-align -Wwrite-strings -Wconversion \
+		-Wstrict-prototypes -Wmissing-prototypes \
+		-Wmissing-declarations -Wno-unknown-pragmas \
+		-Wctor-dtor-privacy -Wnon-virtual-dtor -Wreorder \
+		-Woverloaded-virtual -Wsign-promo -Wsynth -Wundef \
+		-Wcast-qual -Wshadow 
+LDFLAGS	=	-lz -lm
+ARFLAGS	=	crs

@@ -1,0 +1,10 @@
+#--- $Id: make.osf1.alpha.compaq.dbg-ld,v 1.6 2007/08/16 13:39:08 bzfpfend Exp $
+CXX	=	cxx
+CPPFLAGS=	-Isrc -DWITH_LONG_DOUBLE -DWITH_ZLIB
+CXXFLAGS=	-O0 -w0 -std strict_ansi -distinguish_nested_enums -ptr $(OBJDIR)/cxx_repository \
+		-gall -verbose -check -trapuv \
+		-msg_disable basclsnondto,boolexprconst,constrlitnondep 
+REPOSIT	=	$(OBJDIR)/cxx_repository/*.o
+# -ieee
+LDFLAGS	=	-lz -lm
+ARFLAGS	=	crs

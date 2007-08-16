@@ -1,0 +1,8 @@
+#--- $Id: make.irix.mips.sgi.opt,v 1.6 2007/08/16 13:39:06 bzfpfend Exp $
+CXX	=	CC
+CXXFLAGS=	-O3 -mips4 -n32 -DNDEBUG -DNO_ADDITIONAL_CHECKS\
+		-LANG:std:ansi-for-init-scope=on:exceptions=off 
+AR	=	CC
+ARFLAGS	=	$(CXXFLAGS) -ar -o
+RANLIB	=	true
+LDFLAGS	=	-lCio -lm

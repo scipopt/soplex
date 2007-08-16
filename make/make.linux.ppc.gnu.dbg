@@ -1,0 +1,6 @@
+#--- $Id: make.linux.ppc.gnu.dbg,v 1.4 2007/08/16 13:39:06 bzfpfend Exp $
+CXX	=	g++
+CPPFLAGS=	-Isrc -DWITH_ZLIB
+CXXFLAGS=	-O0 -g -ansi $(GCCWARN)
+LDFLAGS	=	-lz -lm
+ARFLAGS	=	crs

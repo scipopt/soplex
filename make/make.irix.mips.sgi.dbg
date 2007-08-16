@@ -1,0 +1,9 @@
+#--- $Id: make.irix.mips.sgi.dbg,v 1.6 2007/08/16 13:39:06 bzfpfend Exp $
+CXX	=	CC
+CXXFLAGS=	-Isrc -DWITH_ZLIB -fullwarn -g -LANG:exceptions=off:libc_in_namespace_std=off
+AR	=	CC
+ARFLAGS	=	$(CXXFLAGS) -ar -o
+RANLIB	=	true
+LDFLAGS	=	-lm -lz 
+
+

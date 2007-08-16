@@ -1,0 +1,8 @@
+#--- $Id: make.linux.x86.intel.dbg,v 1.10 2007/08/16 13:39:07 bzfpfend Exp $
+CXX	=	icc
+CPPFLAGS=	-Isrc -DWITH_ZLIB
+CXXFLAGS=	-g -ansi -fp_port -fpstkchk -mp -w2 \
+		-wd279,383,444,810,981,1572 -par_report0 -vec_report0
+LDFLAGS	=	-lz -lm -lstdc++ -static
+ARFLAGS	=	crs
+RANLIB	=	true

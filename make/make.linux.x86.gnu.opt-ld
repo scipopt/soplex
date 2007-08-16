@@ -1,0 +1,8 @@
+#--- $Id: make.linux.x86.gnu.opt-ld,v 1.6 2007/08/16 13:39:07 bzfpfend Exp $
+CXX	=	g++
+CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -DWITH_ZLIB -DWITH_LONG_DOUBLE \
+                -DDEFAULT_BND_VIOL=1e-8 -DDEFAULT_EPS_ZERO=1e-22 \
+CXXFLAGS=	-g -O -march=pentium4 -fno-exceptions \
+		-m128bit-long-double #-ffast-math
+LDFLAGS	=	-lz -lm # -static
+ARFLAGS	=	crs

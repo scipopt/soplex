@@ -1,0 +1,8 @@
+#--- $Id: make.sunos.sparc.purify.dbg,v 1.4 2007/08/16 13:39:08 bzfpfend Exp $
+CXX	=	purify  -best-effort CC
+CPPFLAGS=	-Isrc 
+CXXFLAGS=	-g 
+LDFLAGS	=	-lm
+RANLIB	=	true
+AR	=	CC
+ARFLAGS	=	$(CPPFLAGS) $(CXXFLAGS) -xar -o
