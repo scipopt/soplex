@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.74 2007/08/16 14:05:03 bzfpfend Exp $
+# $Id: Makefile,v 1.75 2007/08/16 14:36:12 bzfpfend Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -117,7 +117,7 @@ LIBOBJFILES	=	$(addprefix $(LIBOBJDIR)/,$(LIBOBJ))
 BINSRC		=	$(addprefix $(SRCDIR)/,$(BINOBJ:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
 
-all:		$(LIBFILE) $(BINFILE) $(LIBLINK) $(BINLINK) $(CHANGEBINFILE)
+all:		$(LIBFILE) $(BINFILE) $(LIBLINK) $(BINLINK)
 
 $(LIBLINK):	$(LIBFILE)
 		@rm -f $@
