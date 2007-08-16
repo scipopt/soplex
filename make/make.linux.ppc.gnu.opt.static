@@ -1,7 +1,0 @@
-#--- $Id: make.linux.ppc.gnu.opt.static,v 1.2 2006/02/01 16:26:30 bzfhille Exp $
-CXX	=	g++
-CPPFLAGS=	-Isrc -DWITH_ZLIB -DNDEBUG -DNO_ADDITIONAL_CHECKS
-CXXFLAGS=	-O3 -fno-exceptions \
-		-ffast-math -fforce-addr -funroll-loops #-march=
-LDFLAGS	=	-lz -lm
-ARFLAGS	=	crs

@@ -1,6 +1,0 @@
-#--- $Id: make.linux.x86.gnu.std.static,v 1.1 2005/07/15 16:26:52 bzfpfend Exp $
-CXX	=	g++
-CPPFLAGS=	-Isrc -DNDEBUG -DWITH_ZLIB
-CXXFLAGS=	-O -g -march=pentiumpro
-LDFLAGS	=	-lz -lm
-ARFLAGS	=	crs

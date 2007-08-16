@@ -1,6 +1,0 @@
-#--- $Id: make.linux.alpha.compaq.opt.static,v 1.2 2006/02/01 16:26:30 bzfhille Exp $
-CXX	=	cxx
-CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -DWITH_ZLIB
-CXXFLAGS=	-std strict_ansi -O4 -fast -noexceptions -nortti
-LDFLAGS	=	-lz -lcpml -lm
-ARFLAGS	=	crs

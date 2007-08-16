@@ -1,6 +1,0 @@
-#--- $Id: make.linux.x86.intel.opt.static,v 1.4 2006/02/03 15:41:21 bzfkocht Exp $
-CXX	=	icc
-CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -DWITH_ZLIB
-CXXFLAGS=	-O3 -tpp6 -axK -ansi -w1 -fno-rtti -par_report0 -vec_report0 -ip
-LDFLAGS	=	-lpthread -lz -lm -lstdc++ -static
-ARFLAGS	=	crs

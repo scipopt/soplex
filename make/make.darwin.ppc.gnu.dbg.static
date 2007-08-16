@@ -1,6 +1,0 @@
-#--- $Id: make.darwin.ppc.gnu.dbg.static,v 1.1 2005/07/15 16:26:48 bzfpfend Exp $
-CXX	=	g++
-CPPFLAGS=	-Isrc -DWITH_ZLIB
-CXXFLAGS=	-O0 -g -ansi $(GCCWARN)
-LDFLAGS	=	-lz -lm
-ARFLAGS	=	crs

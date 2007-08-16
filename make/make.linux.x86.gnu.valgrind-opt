@@ -1,4 +1,4 @@
-#--- $Id: make.linux.x86.gnu.valgrind-opt.static,v 1.6 2006/02/03 14:54:46 bzforlow Exp $
+#--- $Id: make.linux.x86.gnu.valgrind-opt,v 1.1 2007/08/16 13:37:56 bzfpfend Exp $
 CXX	=	g++
 CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -DWITH_ZLIB
 CXXFLAGS=	-O3 -march=pentiumpro -fno-exceptions -g -ansi $(GCCWARN)

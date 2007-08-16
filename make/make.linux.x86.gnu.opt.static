@@ -1,6 +1,0 @@
-#--- $Id: make.linux.x86.gnu.opt.static,v 1.3 2006/02/03 14:54:46 bzforlow Exp $
-CXX	=	g++
-CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -DWITH_ZLIB
-CXXFLAGS=	-O3 -march=pentiumpro -fno-exceptions -fomit-frame-pointer # -malign-double -ffast-math
-LDFLAGS	=	-lz -lm -static
-ARFLAGS	=	crs

@@ -1,7 +1,0 @@
-#--- $Id: make.linux.alpha.compaq.dbg-ld.static,v 1.1 2005/07/15 16:26:49 bzfpfend Exp $
-CXX	=	cxx
-CPPFLAGS=	-Isrc -DWITH_ZLIB -DWITH_LONG_DOUBLE
-CXXFLAGS=	-O0 -w0 -std strict_ansi -gall -verbose -check \
-		-msg_disable basclsnondto,boolexprconst # -ieee
-LDFLAGS	=	-lz -lm
-ARFLAGS	=	crs

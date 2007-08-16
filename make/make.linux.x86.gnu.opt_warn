@@ -1,4 +1,4 @@
-#--- $Id: make.linux.x86.gnu.opt_warn.static,v 1.2 2006/02/03 14:54:46 bzforlow Exp $
+#--- $Id: make.linux.x86.gnu.opt_warn,v 1.1 2007/08/16 13:37:55 bzfpfend Exp $
 CXX	=	g++
 CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -DWITH_WARNINGS -DWITH_ZLIB
 CXXFLAGS=	-g -O3 -march=pentiumpro -fno-exceptions -fomit-frame-pointer # -ffloat-store # -malign-double -ffast-math

@@ -1,6 +1,0 @@
-#--- $Id: make.linux.x86.intel.std.static,v 1.3 2006/02/03 14:54:46 bzforlow Exp $
-CXX	=	icc
-CPPFLAGS=	-Isrc -DNDEBUG -DWITH_ZLIB
-CXXFLAGS=	-O -wd1572
-LDFLAGS	=	-lz -lm -lstdc++
-ARFLAGS	=	crs

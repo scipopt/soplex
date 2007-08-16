@@ -1,7 +1,0 @@
-#--- $Id: make.linux.x86.intel.dbg-ld.static,v 1.2 2006/02/03 13:57:56 bzforlow Exp $
-CXX	=	icc
-CPPFLAGS=	-Isrc -DWITH_ZLIB -DWITH_LONG_DOUBLE \
-		-DDEFAULT_BND_VIOL=1e-8 -DDEFAULT_EPS_ZERO=1e-22
-CXXFLAGS=	-g -mp -Xc -w2 -wd279,383,444,810,981
-LDFLAGS	=	-lz -lm -static -lstdc++
-ARFLAGS	=	crs

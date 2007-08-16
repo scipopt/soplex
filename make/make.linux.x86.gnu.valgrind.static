@@ -1,6 +1,0 @@
-#--- $Id: make.linux.x86.gnu.valgrind.static,v 1.2 2006/02/03 14:54:46 bzforlow Exp $
-CXX	=	g++
-CPPFLAGS=	-Isrc -DWITH_ZLIB
-CXXFLAGS=	-O -g -ansi $(GCCWARN)
-LDFLAGS	=	-lz -lm
-ARFLAGS	=	crs

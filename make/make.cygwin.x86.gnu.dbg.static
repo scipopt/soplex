@@ -1,6 +1,0 @@
-#--- $Id: make.cygwin.x86.gnu.dbg.static,v 1.1 2005/09/05 14:10:18 bzfpfend Exp $
-CXX	=	g++
-CPPFLAGS=	-Isrc
-CXXFLAGS=	-O0 -g
-LDFLAGS	=	-lm # -static
-ARFLAGS	=	crs

@@ -1,4 +1,4 @@
-#--- $Id: make.linux.x86_64.gnu.dbg.static,v 1.2 2006/02/03 14:54:46 bzforlow Exp $
+#--- $Id: make.linux.x86_64.gnu.dbg,v 1.1 2007/08/16 13:37:57 bzfpfend Exp $
 CXX	=	g++
 CPPFLAGS=	-Isrc -DWITH_ZLIB
 CXXFLAGS=	-O0 -g -ansi $(GCCWARN)

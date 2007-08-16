@@ -1,6 +1,0 @@
-#--- $Id: make.linux.x86.gnu.dbg.static,v 1.2 2006/02/03 14:54:46 bzforlow Exp $
-CXX	=	g++
-CPPFLAGS=	-Isrc -DWITH_ZLIB
-CXXFLAGS=	-O0 -g -ansi $(GCCWARN)
-LDFLAGS	=	-lz -lm -static
-ARFLAGS	=	crs

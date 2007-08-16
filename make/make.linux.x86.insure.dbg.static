@@ -1,6 +1,0 @@
-#--- $Id: make.linux.x86.insure.dbg.static,v 1.1 2005/07/15 16:26:53 bzfpfend Exp $
-CXX	=	insure g++
-CPPFLAGS=	-Isrc 
-CXXFLAGS=	-g -DNDEBUG -DWITH_ZLIB
-LDFLAGS	=	-lz -lm
-ARFLAGS	=	crs
