@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.72 2007/08/15 19:30:44 bzfpfend Exp $
+# $Id: Makefile,v 1.73 2007/08/16 13:31:43 bzfpfend Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -8,7 +8,9 @@
 #*                                                                           *
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-.PHONY:		depend clean distclean lint doc lib check all
+.PHONY:		all depend clean distclean lint doc check
+
+VERSION		:=	1.3.1
 
 ARCH            :=      $(shell uname -m | \
                         sed \
@@ -24,7 +26,6 @@ HOSTNAME	:=	$(shell uname -n | tr '[:upper:]' '[:lower:]')
 
 VERBOSE		=	false
 OPT		=	opt
-LINK		=	static
 LIBEXT		=	a
 TEST		=	quick
 ALGO		=	1 2 3 4 5 6
@@ -90,21 +91,24 @@ GCCWARN		=	-Wall -W -Wpointer-arith -Wno-unknown-pragmas \
 
 #GCCWARN =
 #-----------------------------------------------------------------------------
-include make/make.$(OSTYPE).$(ARCH).$(COMP).$(OPT).$(LINK)
+include make/make.$(OSTYPE).$(ARCH).$(COMP).$(OPT)
 -include make/local/make.$(HOSTNAME)
 #-----------------------------------------------------------------------------
 
-BINNAME		=	$(NAME).$(OSTYPE).$(ARCH).$(COMP).$(OPT).$(LINK)
-LIBNAME		=	$(NAME).$(OSTYPE).$(ARCH).$(COMP).$(OPT).$(LINK)
+BINNAME		=	$(NAME)-$(VERSION).$(OSTYPE).$(ARCH).$(COMP).$(OPT)
+LIBNAME		=	$(NAME)-$(VERSION).$(OSTYPE).$(ARCH).$(COMP).$(OPT)
 BINFILE		=	$(BINDIR)/$(BINNAME)
-CHANGEBINFILE   =	$(BINDIR)/exercise_LP_changes.$(OSTYPE).$(ARCH).$(COMP).$(OPT).$(LINK)
-LIBFILE		=	$(LIBDIR)/lib$(LIBNAME).$(LIBEXT)
+BINLINK		=	$(BINDIR)/$(NAME).$(OSTYPE).$(ARCH).$(COMP).$(OPT)
+CHANGEBINFILE   =	$(BINDIR)/exercise_LP_changes.$(OSTYPE).$(ARCH).$(COMP).$(OPT)
+LIBFILENAME	=	lib$(LIBNAME).$(LIBEXT)
+LIBFILE		=	$(LIBDIR)/$(LIBFILENAME)
+LIBLINK		=	$(LIBDIR)/lib$(NAME).$(OSTYPE).$(ARCH).$(COMP).$(OPT).$(LIBEXT)
 DEPEND		=	src/depend
 
 # potential valgrind suppression file name
 VSUPPNAME	= 	$(OSTYPE).$(ARCH).$(COMP).supp
 
-OBJDIR		=	obj/O.$(OSTYPE).$(ARCH).$(COMP).$(OPT).$(LINK)
+OBJDIR		=	obj/O.$(OSTYPE).$(ARCH).$(COMP).$(OPT)
 BINOBJDIR	=	$(OBJDIR)/bin
 LIBOBJDIR	=	$(OBJDIR)/lib
 BINOBJFILES	=	$(addprefix $(BINOBJDIR)/,$(BINOBJ))
@@ -113,7 +117,17 @@ LIBOBJFILES	=	$(addprefix $(LIBOBJDIR)/,$(LIBOBJ))
 BINSRC		=	$(addprefix $(SRCDIR)/,$(BINOBJ:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
 
-$(BINFILE):	_$(BINDIR) _$(BINOBJDIR) $(LIBFILE) $(BINOBJFILES)
+all:		$(LIBFILE) $(BINFILE) $(LIBLINK) $(BINLINK) $(CHANGEBINFILE)
+
+$(LIBLINK):	$(LIBFILE)
+		@rm -f $@
+		@ln -s $(LIBFILENAME) $@
+
+$(BINLINK):	$(BINFILE)
+		@rm -f $@
+		@ln -s $(BINNAME) $@
+
+$(BINFILE):	$(BINDIR) $(BINOBJDIR) $(LIBFILE) $(BINOBJFILES)
 		@echo "-> linking $@"
 ifeq ($(VERBOSE), true)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOBJFILES) \
@@ -123,7 +137,7 @@ else
 		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
 endif
 
-$(LIBFILE):	_$(LIBDIR) _$(LIBOBJDIR) $(LIBOBJFILES) 
+$(LIBFILE):	$(LIBDIR) $(LIBOBJDIR) $(LIBOBJFILES) 
 		@echo "-> generating library $@"
 ifeq ($(VERBOSE), true)
 		-rm -f $(LIBFILE)
@@ -135,7 +149,7 @@ else
 		@$(RANLIB) $@
 endif
 
-$(CHANGEBINFILE): _$(BINDIR) _$(BINOBJDIR) $(LIBFILE) $(CHANGEBINOBJFILES)
+$(CHANGEBINFILE): $(BINDIR) $(BINOBJDIR) $(LIBFILE) $(CHANGEBINOBJFILES)
 		@echo "-> linking $@"
 ifeq ($(VERBOSE), true)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(CHANGEBINOBJFILES) \
@@ -152,11 +166,7 @@ lint:		$(BINSRC) $(LIBSRC)
 doc:		
 		cd doc; $(DOXY) soplex.dxy
 
-lib:		$(LIBFILE)
-
 change_exerciser: $(CHANGEBINFILE)
-
-all:		$(BINFILE) $(CHANGEBINFILE)
 
 check:		#$(BINFILE)
 		cd check; ./check.sh $(TEST).test ../$(BINFILE) '$(ALGO)' $(LIMIT)
@@ -178,19 +188,19 @@ vimtags:
 etags:
 		-ctags -e -o TAGS src/*.cpp src/*.h
 
-_$(OBJDIR):	
+$(OBJDIR):	
 		@-mkdir -p $(OBJDIR)
 
-_$(BINOBJDIR):	_$(OBJDIR)
+$(BINOBJDIR):	$(OBJDIR)
 		@-mkdir -p $(BINOBJDIR)
 
-_$(LIBOBJDIR):	_$(OBJDIR)
+$(LIBOBJDIR):	$(OBJDIR)
 		@-mkdir -p $(LIBOBJDIR)
 
-_$(BINDIR):
+$(BINDIR):
 		@-mkdir -p $(BINDIR)
 
-_$(LIBDIR):
+$(LIBDIR):
 		@-mkdir -p $(LIBDIR)
 
 depend:
@@ -205,7 +215,7 @@ depend:
 
 -include	$(DEPEND)
 
-$(BINOBJDIR)/%.o:	$(SRCDIR)/%.cpp
+$(BINOBJDIR)/%.o:	$(SRCDIR)/%.cpp $(BINOBJDIR)
 		@echo "-> compiling $@"
 ifeq ($(VERBOSE), true)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) -c $< -o $@
@@ -213,7 +223,7 @@ else
 		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) -c $< -o $@
 endif
 
-$(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp
+$(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp $(LIBOBJDIR)
 		@echo "-> compiling $@"
 ifeq ($(VERBOSE), true)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LIBOFLAGS) -c $< -o $@
