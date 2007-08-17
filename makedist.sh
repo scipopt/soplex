@@ -29,3 +29,8 @@ $NAME/doc/xternal.cpp \
 $NAME/make/* \
 $NAME/src/*
 rm -f $NAME
+echo ""
+echo "check version numbers in src/spxdefines.h, doc/xternal.cpp, Makefile and makedist.sh ($VERSION):"
+grep "VERSION" src/spxdefines.h
+grep "@version" doc/xternal.cpp
+grep "^VERSION" Makefile
