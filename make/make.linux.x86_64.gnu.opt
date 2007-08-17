@@ -1,6 +1,8 @@
-#--- $Id: make.linux.x86_64.gnu.opt,v 1.1 2007/08/16 13:37:57 bzfpfend Exp $
+#--- $Id: make.linux.x86_64.gnu.opt,v 1.2 2007/08/17 14:14:08 bzfpfend Exp $
 CXX	=	g++
-CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -DWITH_ZLIB
+CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS
 CXXFLAGS=	-O3 -march=k8 -fno-exceptions -fomit-frame-pointer # -malign-double -ffast-math
-LDFLAGS	=	-lz -lm -static
+LDFLAGS	=	-lm -static
 ARFLAGS	=	crs
+ZLIB_FLAGS	=
+ZLIB_LDFLAGS 	=	-lz

@@ -224,6 +224,12 @@ $(LIBOBJDIR)/spxlpfread.o: src/spxlpfread.cpp src/spxdefines.h src/spxlp.h \
   src/message.h src/idlist.h src/islist.h src/lprow.h src/dsvector.h \
   src/ssvector.h src/didxset.h src/idxset.h src/lpcol.h src/lprowset.h \
   src/lpcolset.h src/nameset.h src/datahashtable.h
+$(LIBOBJDIR)/spxlpfwrite.o: src/spxlpfwrite.cpp src/spxdefines.h src/spxlp.h \
+  src/datakey.h src/spxid.h src/dvector.h src/vector.h src/svector.h \
+  src/svset.h src/dataset.h src/dataarray.h src/spxalloc.h src/spxout.h \
+  src/message.h src/idlist.h src/islist.h src/lprow.h src/dsvector.h \
+  src/ssvector.h src/didxset.h src/idxset.h src/lpcol.h src/lprowset.h \
+  src/lpcolset.h src/nameset.h src/datahashtable.h
 $(LIBOBJDIR)/spxmainsm.o: src/spxmainsm.cpp src/spxmainsm.h src/spxdefines.h \
   src/spxsimplifier.h src/timer.h src/spxlp.h src/datakey.h src/spxid.h \
   src/dvector.h src/vector.h src/svector.h src/svset.h src/dataset.h \

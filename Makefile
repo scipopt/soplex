@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.76 2007/08/17 09:59:39 bzfpfend Exp $
+# $Id: Makefile,v 1.77 2007/08/17 14:14:07 bzfpfend Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -30,6 +30,8 @@ LIBEXT		=	a
 TEST		=	quick
 ALGO		=	1 2 3 4 5 6
 LIMIT		=	#
+
+ZLIB		=	true
 
 COMP		=	gnu
 CXX		=	g++
@@ -77,6 +79,10 @@ BINOBJ		=	example.o
 CHANGEBINOBJ	=	exercise_LP_changes.o
 REPOSIT		=	# template repository, explicitly empty  #spxproof.o 
 
+BASE		=	$(OSTYPE).$(ARCH).$(COMP).$(OPT)
+
+LASTSETTINGS	=	$(OBJDIR)/make.lastsettings
+
 #------------------------------------------------------------------------------
 #--- NOTHING TO CHANGE FROM HERE ON -------------------------------------------
 #------------------------------------------------------------------------------
@@ -91,25 +97,25 @@ GCCWARN		=	-Wall -W -Wpointer-arith -Wno-unknown-pragmas \
 
 #GCCWARN =
 #-----------------------------------------------------------------------------
-include make/make.$(OSTYPE).$(ARCH).$(COMP).$(OPT)
+include make/make.$(BASE)
 -include make/local/make.$(HOSTNAME)
 #-----------------------------------------------------------------------------
 
-BINNAME		=	$(NAME)-$(VERSION).$(OSTYPE).$(ARCH).$(COMP).$(OPT)
-LIBNAME		=	$(NAME)-$(VERSION).$(OSTYPE).$(ARCH).$(COMP).$(OPT)
+BINNAME		=	$(NAME)-$(VERSION).$(BASE)
+LIBNAME		=	$(NAME)-$(VERSION).$(BASE)
 BINFILE		=	$(BINDIR)/$(BINNAME)
-BINLINK		=	$(BINDIR)/$(NAME).$(OSTYPE).$(ARCH).$(COMP).$(OPT)
+BINLINK		=	$(BINDIR)/$(NAME).$(BASE)
 BINSHORTLINK	=	$(BINDIR)/$(NAME)
-CHANGEBINFILE   =	$(BINDIR)/exercise_LP_changes.$(OSTYPE).$(ARCH).$(COMP).$(OPT)
+CHANGEBINFILE   =	$(BINDIR)/exercise_LP_changes.$(BASE)
 LIBFILENAME	=	lib$(LIBNAME).$(LIBEXT)
 LIBFILE		=	$(LIBDIR)/$(LIBFILENAME)
-LIBLINK		=	$(LIBDIR)/lib$(NAME).$(OSTYPE).$(ARCH).$(COMP).$(OPT).$(LIBEXT)
+LIBLINK		=	$(LIBDIR)/lib$(NAME).$(BASE).$(LIBEXT)
 DEPEND		=	src/depend
 
 # potential valgrind suppression file name
 VSUPPNAME	= 	$(OSTYPE).$(ARCH).$(COMP).supp
 
-OBJDIR		=	obj/O.$(OSTYPE).$(ARCH).$(COMP).$(OPT)
+OBJDIR		=	obj/O.$(BASE)
 BINOBJDIR	=	$(OBJDIR)/bin
 LIBOBJDIR	=	$(OBJDIR)/lib
 BINOBJFILES	=	$(addprefix $(BINOBJDIR)/,$(BINOBJ))
@@ -117,6 +123,16 @@ CHANGEBINOBJFILES =	$(addprefix $(BINOBJDIR)/,$(CHANGEBINOBJ))
 LIBOBJFILES	=	$(addprefix $(LIBOBJDIR)/,$(LIBOBJ))
 BINSRC		=	$(addprefix $(SRCDIR)/,$(BINOBJ:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
+
+ZLIBDEP		:=	$(SRCDIR)/depend.zlib
+ZLIBSRC		:=	$(shell cat $(ZLIBDEP))
+ifeq ($(ZLIB_LDFLAGS),)
+ZLIB		=	false
+endif
+ifeq ($(ZLIB),true)
+CPPFLAGS	+=	-DWITH_ZLIB $(ZLIB_FLAGS)
+LDFLAGS		+=	$(ZLIB_LDFLAGS)
+endif
 
 all:		$(LIBFILE) $(BINFILE) $(LIBLINK) $(BINLINK) $(BINSHORTLINK)
 
@@ -138,7 +154,7 @@ else
 		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
 endif
 
-$(LIBFILE):	$(LIBDIR) $(LIBOBJDIR) $(LIBOBJFILES) 
+$(LIBFILE):	$(LIBDIR) $(LIBOBJDIR) touchexternal $(LIBOBJFILES) 
 		@echo "-> generating library $@"
 ifeq ($(VERBOSE), true)
 		-rm -f $(LIBFILE)
@@ -161,11 +177,11 @@ else
 endif
 
 lint:		$(BINSRC) $(LIBSRC)
-		$(LINT) lint/soplex.lnt -os\(lint.out\) \
+		$(LINT) lint/$(NAME).lnt -os\(lint.out\) \
 		$(CPPFLAGS) -UNDEBUG $^
 
 doc:		
-		cd doc; $(DOXY) soplex.dxy
+		cd doc; $(DOXY) $(NAME).dxy
 
 change_exerciser: $(CHANGEBINFILE)
 
@@ -181,7 +197,7 @@ clean:
 		-rm -rf $(OBJDIR)/* $(BINFILE) $(LIBFILE)
 
 distclean:
-		-rm -rf obj/* lib/libsoplex.* bin/soplex.* 
+		-rm -rf obj/* lib/lib$(NAME).* bin/$(NAME).* 
 
 vimtags:
 		-ctags -o TAGS src/*.cpp src/*.h
@@ -213,6 +229,7 @@ depend:
 		$(LIBSRC:.o=.cpp) \
 		| sed '\''s|^\([0-9A-Za-z]\{1,\}\)\.o|$$\(LIBOBJDIR\)/\1.o|g'\'' \
 		>>$(DEPEND)'
+		@echo `grep -l "WITH_ZLIB" $(SRCDIR)/*` >$(ZLIBDEP)
 
 -include	$(DEPEND)
 
@@ -231,5 +248,17 @@ ifeq ($(VERBOSE), true)
 else
 		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LIBOFLAGS) -c $< -o $@
 endif
+
+
+-include $(LASTSETTINGS)
+
+.PHONY: touchexternal
+touchexternal:	$(ZLIBDEP)
+ifneq ($(ZLIB),$(LAST_ZLIB))
+		@-touch $(ZLIBSRC)
+endif
+		@-rm -f $(LASTSETTINGS)
+		@echo "LAST_ZLIB=$(ZLIB)" >> $(LASTSETTINGS)
+
 
 # --- EOF ---------------------------------------------------------------------
