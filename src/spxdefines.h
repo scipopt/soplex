@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.34 2006/09/21 19:46:30 bzfkocht Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.35 2007/08/17 10:27:50 bzfpfend Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
@@ -28,7 +28,7 @@
  * If \c TRACE_METHOD is defined, the method tracing with #METHOD is
  * activated.
  *
- * If \c WITH_LONG_DOUBLE is defined, all #Real numbers are of type 
+ * If \c WITH_LONG_DOUBLE is defined, all Real numbers are of type 
  * long double instead of just double.
  */
 #ifndef _SPXDEFINES_H_
