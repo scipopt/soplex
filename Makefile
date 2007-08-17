@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.75 2007/08/16 14:36:12 bzfpfend Exp $
+# $Id: Makefile,v 1.76 2007/08/17 09:59:39 bzfpfend Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -99,6 +99,7 @@ BINNAME		=	$(NAME)-$(VERSION).$(OSTYPE).$(ARCH).$(COMP).$(OPT)
 LIBNAME		=	$(NAME)-$(VERSION).$(OSTYPE).$(ARCH).$(COMP).$(OPT)
 BINFILE		=	$(BINDIR)/$(BINNAME)
 BINLINK		=	$(BINDIR)/$(NAME).$(OSTYPE).$(ARCH).$(COMP).$(OPT)
+BINSHORTLINK	=	$(BINDIR)/$(NAME)
 CHANGEBINFILE   =	$(BINDIR)/exercise_LP_changes.$(OSTYPE).$(ARCH).$(COMP).$(OPT)
 LIBFILENAME	=	lib$(LIBNAME).$(LIBEXT)
 LIBFILE		=	$(LIBDIR)/$(LIBFILENAME)
@@ -117,13 +118,13 @@ LIBOBJFILES	=	$(addprefix $(LIBOBJDIR)/,$(LIBOBJ))
 BINSRC		=	$(addprefix $(SRCDIR)/,$(BINOBJ:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
 
-all:		$(LIBFILE) $(BINFILE) $(LIBLINK) $(BINLINK)
+all:		$(LIBFILE) $(BINFILE) $(LIBLINK) $(BINLINK) $(BINSHORTLINK)
 
 $(LIBLINK):	$(LIBFILE)
 		@rm -f $@
 		@ln -s $(LIBFILENAME) $@
 
-$(BINLINK):	$(BINFILE)
+$(BINLINK) $(BINSHORTLINK):	$(BINFILE)
 		@rm -f $@
 		@ln -s $(BINNAME) $@
 
