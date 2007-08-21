@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.77 2007/08/17 14:14:07 bzfpfend Exp $
+# $Id: Makefile,v 1.78 2007/08/21 11:13:38 bzfpfend Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -99,6 +99,8 @@ GCCWARN		=	-Wall -W -Wpointer-arith -Wno-unknown-pragmas \
 #-----------------------------------------------------------------------------
 include make/make.$(BASE)
 -include make/local/make.$(HOSTNAME)
+-include make/local/make.$(HOSTNAME).$(COMP)
+-include make/local/make.$(HOSTNAME).$(COMP).$(OPT)
 #-----------------------------------------------------------------------------
 
 BINNAME		=	$(NAME)-$(VERSION).$(BASE)
