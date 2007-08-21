@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.78 2007/08/21 11:13:38 bzfpfend Exp $
+# $Id: Makefile,v 1.79 2007/08/21 11:50:39 bzfpfend Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -136,47 +136,36 @@ CPPFLAGS	+=	-DWITH_ZLIB $(ZLIB_FLAGS)
 LDFLAGS		+=	$(ZLIB_LDFLAGS)
 endif
 
+
+ifeq ($(VERBOSE),false)
+.SILENT:	$(LIBLINK) $(BINLINK) $(BINFILE) $(LIBFILE) $(CHANGEBINFILE) $(BINOBJFILES) $(LIBOBJFILES)
+endif
+
 all:		$(LIBFILE) $(BINFILE) $(LIBLINK) $(BINLINK) $(BINSHORTLINK)
 
 $(LIBLINK):	$(LIBFILE)
 		@rm -f $@
-		@ln -s $(LIBFILENAME) $@
+		ln -s $(LIBFILENAME) $@
 
 $(BINLINK) $(BINSHORTLINK):	$(BINFILE)
 		@rm -f $@
-		@ln -s $(BINNAME) $@
+		ln -s $(BINNAME) $@
 
 $(BINFILE):	$(BINDIR) $(BINOBJDIR) $(LIBFILE) $(BINOBJFILES)
 		@echo "-> linking $@"
-ifeq ($(VERBOSE), true)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOBJFILES) \
 		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
-else
-		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOBJFILES) \
-		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
-endif
 
 $(LIBFILE):	$(LIBDIR) $(LIBOBJDIR) touchexternal $(LIBOBJFILES) 
 		@echo "-> generating library $@"
-ifeq ($(VERBOSE), true)
 		-rm -f $(LIBFILE)
 		$(AR) $(ARFLAGS) $@ $(LIBOBJFILES) $(REPOSIT)
 		$(RANLIB) $@
-else
-		@-rm -f $(LIBFILE)
-		@$(AR) $(ARFLAGS) $@ $(LIBOBJFILES) $(REPOSIT)
-		@$(RANLIB) $@
-endif
 
 $(CHANGEBINFILE): $(BINDIR) $(BINOBJDIR) $(LIBFILE) $(CHANGEBINOBJFILES)
 		@echo "-> linking $@"
-ifeq ($(VERBOSE), true)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(CHANGEBINOBJFILES) \
 		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
-else
-		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(CHANGEBINOBJFILES) \
-		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
-endif
 
 lint:		$(BINSRC) $(LIBSRC)
 		$(LINT) lint/$(NAME).lnt -os\(lint.out\) \
@@ -237,19 +226,11 @@ depend:
 
 $(BINOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 		@echo "-> compiling $@"
-ifeq ($(VERBOSE), true)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) -c $< -o $@
-else
-		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) -c $< -o $@
-endif
 
 $(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 		@echo "-> compiling $@"
-ifeq ($(VERBOSE), true)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LIBOFLAGS) -c $< -o $@
-else
-		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LIBOFLAGS) -c $< -o $@
-endif
 
 
 -include $(LASTSETTINGS)
