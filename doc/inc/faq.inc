@@ -167,7 +167,7 @@
    </p>
 
    <p class="a">
-     You can use  ZIMPL, available at http://www.zib.de/koch/zimpl/
+     You can use <a href="http://zimpl.zib.de/">ZIMPL</a>, available at 
      under the ZIB academic license. It takes a (human readable) file
      describing the linear program together with a data file as input and 
      generates LPs or MIPs in LPF- or MPS-format.
