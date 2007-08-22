@@ -147,8 +147,11 @@
 
    <p class="a">
      No. There was done research in this direction. You can find most of 
-     the results in http://www.zib.de/PaperWeb/abstracts/TR-96-09 and 
-     http://www.zib.de/PaperWeb/abstracts/SC-95-45 .
+     the results in
+     <a href="http://www.zib.de/PaperWeb/abstracts/TR-96-09">
+     http://www.zib.de/PaperWeb/abstracts/TR-96-09</a> and 
+     <a href="http://www.zib.de/PaperWeb/abstracts/SC-95-45">
+     http://www.zib.de/PaperWeb/abstracts/SC-95-45</a>.
    </p>
 
    <p class="q">
