@@ -56,7 +56,7 @@
      Then some of them, like assert, are macros which have no namespace.
      The practical point is that the compiler vendors seem to be 
      unsure as well. Most of them put everything in both namespaces std 
-     and global. So there is no advantage in using \<cassert\>. Compaq 
+     and global. So there is no advantage in using &lt;cassert&gt;. Compaq 
      even left them off because it seemed unclear to them.
      So our reasoning was: If it is a C++ header we use the correct form
      without the .h and in std. If it is a C header, according to the
