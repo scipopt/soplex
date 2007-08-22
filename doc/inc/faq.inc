@@ -71,7 +71,7 @@
    <p class="a">
      Because there is no realloc with new/delete. Because malloc
      is faster. And we only use it for builtin types or so called 
-     \ref DataObjects "Data Objects" .
+     "Data Objects" .
      If you do not like this decision, it is quite easy to change 
      spxalloc.h such as to use new/delete.
    </p>
@@ -95,7 +95,7 @@
 
    <p class="a">
      The code is tested to compile under Microsoft Visual Studio 2003.
-     However, we do \b not provide any Makefiles or project files for VC++.
+     However, we do not provide any Makefiles or project files for VC++.
      It should also be possible to create a Windows version by compiling it
      with the GCC under <a href="http://www.cygwin.com/">Cygwin</a>.
    </p>
