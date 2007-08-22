@@ -34,15 +34,16 @@
      Yes, but the corresponding software needs an interface.
 
      Currently, the following frameworks have an
-     interface to SoPlex.  <a
-     href="http://scip.zib.de">SCIP</a> - Solving
-     Constraint Integer Programs. <a
-     href="http://www.informatik.uni-koeln.de/abacus/">ABACUS</a>
-     has an older interface to 1.2.1 only. There is
-     also an old interface to <a
+     interface to SoPlex.</p>
+     <ul>
+     <li><a  href="http://scip.zib.de">SCIP</a> - Solving
+     Constraint Integer Programs.</li>
+     <li><a href="http://www.informatik.uni-koeln.de/abacus/">ABACUS</a>
+     has an older interface to 1.2.1 only.</li>
+     <li>There is also an old interface to <a
      href="https://projects.coin-or.org/Osi">COIN
-     OSI</a>.		      
-   </p>
+     OSI</a>.</li>
+     </ul>
 
    <p class="q">
      Why is &lt;iostream&gt; used but &lt;assert.h&gt; and not &lt;cassert&gt;?
@@ -85,8 +86,8 @@
      as a subroutine and do some kind of Branch-and-Bound. For
      instance, you can use  SCIP (Solving Constraint Integer Programs) 
      together with SoPlex to solve IPs.  SCIP can be obtained at 
-     http://scip.zib.de/ and is distributed under the ZIB academic
-     license, like SoPlex.
+     <a href="http://scip.zib.de/">http://scip.zib.de/</a> and is 
+     distributed under the ZIB academic license, like SoPlex.
    </p>
 
    <p class="q">
@@ -108,13 +109,17 @@
     That is nearly easy. You can set SoPlex to use the  
     ENTERing and LEAVEing algorithm and
     COLUMN and ROW representation.
+   </p>
 
+   <center>
     <table border="1" rules="all">
     <tr><td>&nbsp;</td><td>ENTER </td><td>LEAVE </td></tr>
     <tr><td>COLUMN</td><td>Primal</td><td>Dual  </td></tr>
     <tr><td>ROW   </td><td>Dual  </td><td>Primal</td></tr>
     </table>
+   </center>
 
+   <p class="a">
      COLUMN oriented is the "usual" representation.
      Then Entering is the Primal and Leaving is the Dual algorithm.
      In ROW oriented representation, we have in principle the
@@ -133,7 +138,7 @@
 
    <p class="a">
      If all of the test instances from Netlib work, but your LP gives this
-     problem, mail your LP in as an gzip'ed MPS of LPF file and we will
+     problem, mail your LP in as an gzip'ed MPS of LP file and we will
      check. If you have this problem also with the test instances, check your
      stack space:  ulimit  -s will report the current size in kilobytes.
      Try a higher value. If this doesn't help, maybe your compiler is broken.
@@ -170,7 +175,7 @@
      You can use <a href="http://zimpl.zib.de/">ZIMPL</a>, available at 
      under the ZIB academic license. It takes a (human readable) file
      describing the linear program together with a data file as input and 
-     generates LPs or MIPs in LPF- or MPS-format.
+     generates LPs or MIPs in LP- or MPS-format.
    </p>
 
    <p class="q">
@@ -184,11 +189,8 @@
      be detected. The simplification cannot be undone, but given a
      primal/dual solution for the simplified LP, the simplifier can
      reconstruct the primal/dual solution and basis of the
-     unsimplified LP.
-
-     <br><br>     
-     Handled are:
-
+     unsimplified LP.<br/><br/>
+     Handled are:</p>
      <ul>
      <li> empty rows / columns                                  </li>
      <li> unconstrained rows                                    </li>
@@ -205,6 +207,7 @@
      <li> duplicate rows / columns                              </li>
      </ul>
 
+   <p class="a">
      The preprocessing can be switched off by using the option  -s0.
    </p>
 </div>
