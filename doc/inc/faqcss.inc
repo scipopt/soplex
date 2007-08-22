@@ -2,11 +2,11 @@
 
 #faq p.q {
   font-weight:   bold;
+  padding-top: 2em;
 }
 
 #faq p.a {
   padding-left:   1em;
-  padding-bottom: 2em;
   type: circle;
 }
 </style>
