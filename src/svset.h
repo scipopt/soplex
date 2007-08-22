@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.h,v 1.24 2007/08/22 15:47:55 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.h,v 1.25 2007/08/22 19:47:56 bzfpfets Exp $"
 
 /**@file  svset.h
  * @brief Set of sparse vectors.
@@ -478,9 +478,9 @@ public:
       : DataArray < SVector::Element >
          (0, (pmemmax > 0) ? pmemmax : 8 * ((pmax > 0) ? pmax : 8), pmemFac)
          , set ((pmax > 0) ? pmax : 8)
+         , possiblyUnusedMem (0)
          , factor (pfac)
          , memFactor (DataArray < SVector::Element > ::memFactor )
-         , possiblyUnusedMem (0)
    {}
    /// destructor
    ~SVSet()
