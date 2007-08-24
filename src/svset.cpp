@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.cpp,v 1.26 2007/08/22 15:47:55 bzfkocht Exp $"
+#pragma ident "@(#) $Id: svset.cpp,v 1.27 2007/08/24 12:19:05 bzfberth Exp $"
 
 #include <assert.h>
 
@@ -127,9 +127,11 @@ void SVSet::xtend(SVector& svec, int newmax)
 {
    if (svec.max() < newmax)
    {
+#if 0
+      /// @todo: open bug in mempack()
       if (possiblyUnusedMem * memFactor > memSize())
-         memPack();
-
+         memPack(); 
+#endif
       assert(has(&svec));
       DLPSV* ps = static_cast<DLPSV*>( & svec );
 
@@ -156,8 +158,10 @@ void SVSet::xtend(SVector& svec, int newmax)
             prev->setMem (prev->max()
                            + ps->max() + 2, prev->mem());
             prev->set_size(prevsz);
-
+            
+#if 0
             possiblyUnusedMem += ps->max();
+#endif
          }
          list.remove(ps);
          list.append(ps);
@@ -294,7 +298,10 @@ void SVSet::memPack()
       used += sz + 1;
    }
    SVSetBase::reSize(used);
+
+#if 0
    possiblyUnusedMem = 0;
+#endif
 
    assert(isConsistent());
 }
