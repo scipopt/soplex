@@ -4,7 +4,7 @@
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1997-1999 Roland Wunderling                              */
-/*                  1997-2002 Konrad-Zuse-Zentrum                            */
+/*                  1997-2007 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfwrite.cpp,v 1.3 2006/09/01 13:54:16 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxlpfwrite.cpp,v 1.4 2007/08/27 15:35:12 bzfberth Exp $"
 
 /**@file  spxlpfwrite.cpp
  * @brief Write LP as LPF format file.
