@@ -1,11 +1,12 @@
 //-----------------------------------------------------------------------------
-/**@mainpage SoPlex 
-   @version  1.3.1
+/**@mainpage SoPlex
+   @version  1.3.2
    @author   Roland Wunderling
-   @author   Andreas Bley
    @author   Tobias Achterberg
-   @author   Thorsten Koch
+   @author   Timo Berthold
+   @author   Andreas Bley
    @author   Benjamin Hiller
+   @author   Thorsten Koch
    @author   Sebastian Orlowski
    @author   Andreas Tuchscherer
 
