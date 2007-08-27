@@ -1,0 +1,8 @@
+#--- $Id: make.mingw32_nt-5.1.x86.gnu.dbg,v 1.1 2007/08/27 17:34:06 bzfpfets Exp $
+CXX	=	g++
+CPPFLAGS=	-Isrc
+CXXFLAGS=	-O0 -g
+LDFLAGS	=	-lm # -static
+ARFLAGS	=	crs
+ZLIB_FLAGS	=
+ZLIB_LDFLAGS 	=	-lz
