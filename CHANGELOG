@@ -1,4 +1,9 @@
-Release ???
+Release ????
+
+
+#----------------------------------------------------------------
+
+Release 1.3.2
 
 - Keyword RANGES added in MPS format output (spxmpswrite.cpp)
 
