@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.81 2007/08/27 18:37:39 bzfpfets Exp $
+# $Id: Makefile,v 1.82 2007/08/30 13:05:38 bzfpfend Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -106,15 +106,12 @@ include make/make.$(BASE)
 BINNAME		=	$(NAME)-$(VERSION).$(BASE)
 LIBNAME		=	$(NAME)-$(VERSION).$(BASE)
 BINFILE		=	$(BINDIR)/$(BINNAME)
-BINLINKNAME	=	$(NAME).$(BASE)
-BINLINK		=	$(BINDIR)/$(BINLINKNAME)
-BINSHORTLINKNAME=	$(NAME)
-BINSHORTLINK	=	$(BINDIR)/$(BINSHORTLINKNAME)
 CHANGEBINFILE   =	$(BINDIR)/exercise_LP_changes.$(BASE)
 LIBFILENAME	=	lib$(LIBNAME).$(LIBEXT)
 LIBFILE		=	$(LIBDIR)/$(LIBFILENAME)
-LIBLINKNAME	=	lib$(NAME).$(BASE).$(LIBEXT)
-LIBLINK		=	$(LIBDIR)/$(LIBLINKNAME)
+LIBLINK		=	$(LIBDIR)/lib$(NAME).$(BASE).$(LIBEXT)
+BINLINK		=	$(BINDIR)/$(NAME).$(BASE)
+BINSHORTLINK	=	$(BINDIR)/$(NAME)
 DEPEND		=	src/depend
 
 # potential valgrind suppression file name
@@ -148,15 +145,11 @@ all:		$(LIBFILE) $(BINFILE) $(LIBLINK) $(BINLINK) $(BINSHORTLINK)
 
 $(LIBLINK):	$(LIBFILE)
 		@rm -f $@
-		cd $(LIBDIR) && ln -s $(LIBFILENAME) $(LIBLINKNAME)
+		cd $(dir $@) && ln -s $(LIBFILENAME) $(notdir $@)
 
-$(BINLINK):	$(BINFILE)
+$(BINLINK) $(BINSHORTLINK):	$(BINFILE)
 		@rm -f $@
-		cd $(BINDIR) && ln -s $(BINNAME) $(BINLINKNAME)
-
-$(BINSHORTLINK):	$(BINFILE)
-		@rm -f $@
-		cd $(BINDIR) && ln -s $(BINNAME) $(BINSHORTLINKNAME)
+		cd $(dir $@) && ln -s $(BINNAME) $(notdir $@)
 
 $(BINFILE):	$(BINDIR) $(BINOBJDIR) $(LIBFILE) $(BINOBJFILES)
 		@echo "-> linking $@"
