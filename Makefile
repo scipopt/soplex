@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.82 2007/08/30 13:05:38 bzfpfend Exp $
+# $Id: Makefile,v 1.83 2007/08/30 13:24:46 bzfpfend Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -107,8 +107,7 @@ BINNAME		=	$(NAME)-$(VERSION).$(BASE)
 LIBNAME		=	$(NAME)-$(VERSION).$(BASE)
 BINFILE		=	$(BINDIR)/$(BINNAME)
 CHANGEBINFILE   =	$(BINDIR)/exercise_LP_changes.$(BASE)
-LIBFILENAME	=	lib$(LIBNAME).$(LIBEXT)
-LIBFILE		=	$(LIBDIR)/$(LIBFILENAME)
+LIBFILE		=	$(LIBDIR)/lib$(LIBNAME).$(LIBEXT)
 LIBLINK		=	$(LIBDIR)/lib$(NAME).$(BASE).$(LIBEXT)
 BINLINK		=	$(BINDIR)/$(NAME).$(BASE)
 BINSHORTLINK	=	$(BINDIR)/$(NAME)
@@ -145,11 +144,11 @@ all:		$(LIBFILE) $(BINFILE) $(LIBLINK) $(BINLINK) $(BINSHORTLINK)
 
 $(LIBLINK):	$(LIBFILE)
 		@rm -f $@
-		cd $(dir $@) && ln -s $(LIBFILENAME) $(notdir $@)
+		cd $(dir $@) && ln -s $(notdir $(LIBFILE)) $(notdir $@)
 
 $(BINLINK) $(BINSHORTLINK):	$(BINFILE)
 		@rm -f $@
-		cd $(dir $@) && ln -s $(BINNAME) $(notdir $@)
+		cd $(dir $@) && ln -s $(notdir $(BINFILE)) $(notdir $@)
 
 $(BINFILE):	$(BINDIR) $(BINOBJDIR) $(LIBFILE) $(BINOBJFILES)
 		@echo "-> linking $@"
@@ -185,10 +184,10 @@ valgrind-check:	$(BINFILE)
 		"$(VALGRIND) $(VFLAGS)" $(VSUPPNAME)
 
 clean:
-		-rm -rf $(OBJDIR)/* $(BINFILE) $(LIBFILE)
+		-rm -rf $(OBJDIR)/* $(BINFILE) $(LIBFILE) $(LIBLINK) $(BINLINK) $(BINSHORTLINK)
 
-distclean:
-		-rm -rf obj/* lib/lib$(NAME).* bin/$(NAME).* 
+distclean:	clean
+		-rm -rf obj/* $(LIBDIR)/lib$(NAME).* $(BINDIR)/$(NAME).* 
 
 vimtags:
 		-ctags -o TAGS src/*.cpp src/*.h
