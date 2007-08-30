@@ -3,10 +3,9 @@
 
 1.	All the documentation is available online at 
 
-        http://www.zib.de/Optimization/Software/Soplex
-        http://www.zib.de/Optimization/Software/Soplex/html/index.html
+        http://soplex.zib.de
 
-	you can also generate it, if you have doxgen installed by 
+	You can also generate it, if you have doxgen installed by 
         typing 'make doc'. It will then be in doc/html/index.html.
         On some systems, it might be necessary to use 'gmake' instead
         of 'make'.
@@ -26,7 +25,7 @@
         AIX with VisualAge C++    :  make COMP=ibm OPT=opt
 
         Then get and unpack in the check directory the Netlib testset from 
-        http://www.zib.de/Optimization/Software/Soplex/netlib.tgz
+        http://soplex.zib.de/download.shtml
         and say make COMP=<as before> OPT=<as before> check
         This should report no fails.
 
