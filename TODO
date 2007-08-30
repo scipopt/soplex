@@ -1,4 +1,4 @@
-$Id: TODO,v 1.86 2007/06/26 09:20:12 bzforlow Exp $
+$Id: TODO,v 1.87 2007/08/30 08:40:59 bzfpfets Exp $
 
 - solu Dateien vervollständigen, insbesondere miplib.solu
 - alle Tests auf allen Maschinen durchlaufen lassen -> results
@@ -7,14 +7,10 @@ $Id: TODO,v 1.86 2007/06/26 09:20:12 bzforlow Exp $
 - excercise_LP nach extra verlagern
 - COIN Interface update
 - flexelint
-- soplex.zib.de mit link besorgen
-- sendit.sh mit mutt ?
 - soplex logo
-- MPS Link korrigieren
 - Mailingliste auf Stand bringen
 - @ in gif ändern
 - SCIP/SoPlex testen
-- sw installationen
 
 - nachgucken, ob die Fehlermeldung ESOLVR04 beim Rausschreiben einer
   Basis noch aktuell ist.  Kann eine Basis gelesen werden? Falls ja,
