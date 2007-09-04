@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.96 2007/08/27 15:35:08 bzfberth Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.97 2007/09/04 10:24:10 bzfpfets Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -668,11 +668,12 @@ void clean_up( SPxScaler*&       prescaler,
 
 int main(int argc, const char* const argv[])
 {
-   const char* banner =
+   const char* banner1 =
    "************************************************************************\n"
    "*                                                                      *\n"
    "*       SoPlex --- the Sequential object-oriented simPlex.             *\n"
-   "*                  Release 1.3.1                                       *\n"
+   "*                  Release ";
+   const char* banner2 = "                                       *\n"
    "*    Copyright (C) 1997-1999 Roland Wunderling                         *\n"
    "*                  1997-2006 Konrad-Zuse-Zentrum                       *\n"
    "*                            fuer Informationstechnik Berlin           *\n"
@@ -779,7 +780,9 @@ int main(int argc, const char* const argv[])
             verbose = argv[optidx][2] - '0';
          break;
       case 'V' :
-         std::cout << banner << std::endl;
+         std::cout << banner1 << SOPLEX_VERSION/100 << ".";
+         std::cout << (SOPLEX_VERSION % 100)/10 << ".";
+         std::cout << SOPLEX_VERSION % 10 << banner2 << std::endl;
          exit(0);
       case 'x' :
          print_solution = true;
@@ -804,7 +807,9 @@ int main(int argc, const char* const argv[])
          break;
       case 'h' :
       case '?' :
-         std::cout << banner << std::endl;
+         std::cout << banner1 << SOPLEX_VERSION/100 << ".";
+         std::cout << (SOPLEX_VERSION % 100)/10 << ".";
+         std::cout << SOPLEX_VERSION % 10 << banner2 << std::endl;
          //lint -fallthrough
       default :
          print_usage_and_exit( argv );
