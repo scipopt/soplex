@@ -1,6 +1,4 @@
-$Id: TODO,v 1.88 2007/10/09 10:43:22 bzforlow Exp $
-
-- unbounded-bug von Oscar Gustafsson, siehe Tobis mail vom 26.9.07
+$Id: TODO,v 1.89 2007/10/09 10:50:47 bzforlow Exp $
 
 - solu Dateien vervollständigen, insbesondere miplib.solu
 - alle Tests auf allen Maschinen durchlaufen lassen -> results
@@ -513,6 +511,13 @@ Bug 50, spxbounds.cpp: useless assignment
    sowieso erledigt.
 
 -----------------------------------------------------------------------------
+
+- Bug von Oscar Gustafsson: LP fälschlicherweise als unbounded gemeldet.
+  Siehe Tobis mail vom 26.9.07.
+
+- Bug Uli: Cannot allocate 1 GB.                                                                                                                                                           
+
+- Bug Uli: remove_col funktioniert nicht richtig:
 
 Das Folgende kann ein soplex-, ilpi- oder discnet-Bug sein. Der
 Debugging-Output von Uli liegt bei mir. -- Sebastian
