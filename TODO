@@ -1,4 +1,6 @@
-$Id: TODO,v 1.87 2007/08/30 08:40:59 bzfpfets Exp $
+$Id: TODO,v 1.88 2007/10/09 10:43:22 bzforlow Exp $
+
+- unbounded-bug von Oscar Gustafsson, siehe Tobis mail vom 26.9.07
 
 - solu Dateien vervollständigen, insbesondere miplib.solu
 - alle Tests auf allen Maschinen durchlaufen lassen -> results
