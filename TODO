@@ -1,86 +1,108 @@
-$Id: TODO,v 1.89 2007/10/09 10:50:47 bzforlow Exp $
+#-----------------------------------------------------------------------
+# $Id: TODO,v 1.90 2007/10/09 15:18:35 bzforlow Exp $
+#-----------------------------------------------------------------------
 
-- solu Dateien vervollständigen, insbesondere miplib.solu
-- alle Tests auf allen Maschinen durchlaufen lassen -> results
-- USE_OLD entfernen
-- extra Programme testen/integrieren
-- excercise_LP nach extra verlagern
-- COIN Interface update
-- flexelint
-- soplex logo
-- Mailingliste auf Stand bringen
-- @ in gif ändern
-- SCIP/SoPlex testen
+#-----------------------------------------------------------------------
+#  Bugs (Details stehen weiter unten)
+#-----------------------------------------------------------------------
 
+- Bug von Oscar Gustafsson: 
+  /optimi/kombadon/LP/soplex_probleme/exp2.lp wird fälschlicherweise 
+  als unbounded gemeldet. Numerik sieht eigentlich unkritisch aus.
+  Details siehe unten.
+
+- neos4, neos5 werden fälschlicherweise als infeasible gemeldet. Kann
+  der gleiche Fehler (oder Numerik) wie bei exp2 sein oder auch nicht.
+
+- Speicherbug in svset: bei mehrfachem Löschen und Hinzufügen von Zeilen
+  oder Spalten kann der Speicher rapide in die Höhe gehen.
+
+- Bug von Uli: Cannot allocate 1 GB (aus discnet heraus, mit LP aus
+  Datei laden geht es). Könnte der svset-Speicherbug sein.
+
+- Bug Uli: beim Löschen von Spalten werden ids durcheinandergeworfen.
+  Kann auch ein bug in discnet oder ILPI sein. Details siehe unten.
+
+- etamacro-assert in spvecs.cpp, Details siehe unten.
+
+
+#-----------------------------------------------------------------------
+#  Bereits verteilte Arbeiten
+#-----------------------------------------------------------------------
+
+Benjamin:
+- Exception-Branch in den trunk mergen (mit Sebastian)
+- diverse "#ifdef USE_OLD"-Stellen rauswerfen (mit Sebastian)
+- miplib.solu für MIPLIB 2003 (mit Robert)
+
+
+Sebastian:
+- Exception-Branch, USE_OLD, s.o.
+- flexelint unter /sw installieren
+- flexelint, Codesonar (mit Robert, ggf. mit Thorsten)
+
+
+Andreas:
 - nachgucken, ob die Fehlermeldung ESOLVR04 beim Rausschreiben einer
   Basis noch aktuell ist.  Kann eine Basis gelesen werden? Falls ja,
   dann auch diese Möglichkeit in example.cpp wieder bereitstellen.
 
-- factor.cpp: "??? mkwtz originally was long, maybe to avoid an overflow
-  in this instruction?" -> später auf long ändern
-
-- diverse "#ifdef USE_OLD"-Stellen rauswerfen
-
-- Es wird infeasible/unbounded gemeldet je nach dem welcher algo 
-  gerade am Laufen war.
-
 - der col_first parameter bei scale wird nicht mehr benutzt.
-
-- Vermutlich sind die meisten solve() methoden in CLUFactor::solve.cpp
-  const. Müssten von den Pointern befreit werden.
-
-- SSVector::multAdd() sollte von den pointern befreit werden.
-
-- simplifier sollten nicht unsimplify machen, sondern
-   uncrush_x und uncrush_pi, das LP kann man sich auch merken.
-
-- neos4, neos5 werden fälschlicherweise als infeasible gemeldet.
-
-- Diesen Kram mal als @todo's schreiben ;-)
-
-- Genau gucken, was spxredundantsm eigendlich macht. Das scheint mir
-  mehr ein bound strengthening zu sein. Ich habe nicht den eindruck,
-  das der doppelte Zeilen/Spalten finden würde.
-
-- Einzel remove so implementieren, dass alles weitergeschoben wird.
+   -> Meldung noch aktuell? --> evtl. col_first rauswerfen
 
 - Es gibt Probleme, wenn der Preprocessor das Problem komplett erledigt.
   Denn die Rueckgabe ist dann nicht UNBOUNDED/INFEASIBLE, sondern fertig.
   --> Ist diese Fehlermeldung noch aktuell? <--
 
-- isConsistent sollte eigentlich virtuell sein.
+- BUG in spxscalesm.cc value() wird nicht descaliert. 
+   Entsprechender Aufruf fehlt auch in spxgeneralsm.cc
 
-- Memberfunctionen .has -> bool
 
-- Abbruch bei minimieren mit Upper Bound
-
-- primal: >= UB und optimal
+Thorsten:
+- svset-Speicherbug beheben (mit Robert)
+- bei flexelint/Codesonar mit draufgucken
+- Abbruch bei minimieren mit Upper Bound:
+  primal: >= UB und optimal
   dual  : >= UB und shift = 0
 
----------------
 
-spxbasis  load(xxx) umbennen in loadDesc, loadLP usw.
+Marc:
+- COIN Interface (OSI) updaten
+- Mailingliste auf Stand bringen
+- soplex-logo basteln
 
------------------------------------------------------------------------------
 
-bin/soplex.linux.x86.gnu.dbg-ld  -e -r check/LP/netlib/etamacro.mps
+Robert:
+- Programme im extra-Verzeichnis testen/integrieren
+- excercise_LP nach extra verlagern
+- SCIP/SoPlex testen
+- Vermutlich sind die meisten solve()-Methoden in CLUFactor::solve.cpp
+  const. Müssten von den Pointern befreit werden.
+- SSVector::multAdd() sollte von den Pointern befreit werden.
+- isConsistent() sollte in Klassen, die sowieso virtuelle Methoden
+  haben, eigentlich auch virtuell sein.
+- Memberfunctionen .hasXXX() sollten bool zurückliefern
+- spxbasis: load(xxx) umbennen in loadDesc, loadLP usw.
 
-soplex.linux.x86.gnu.dbg-ld: src/spxvecs.cpp:240: void soplex::SoPlex::computeFrhs2(const soplex::Vector &, const soplex::Vector &): Assertion `colfb[i] == coufb[i]' failed.
+#-----------------------------------------------------------------------
+#  Noch zu verteilende Arbeiten
+#-----------------------------------------------------------------------
 
-240                 assert(colfb[i] == coufb[i]);
-Current language:  auto; currently c++
-(gdb) print i
-$1 = 368
-(gdb) print colfb[i]
-$2 = 0
-(gdb) print coufb[i]
-$3 = -nan(0xc000000000000000)
+- factor.cpp: "??? mkwtz originally was long, maybe to avoid an overflow
+  in this instruction?" -> später auf long ändern
 
-kommt auch bei check.netlib.linux.x86.gnu.dbg
+- Diesen Kram mal als @todo's schreiben ;-)
 
------------------------------------------------------------------------------
+- stdio.h/printf die letzten erlegen.
 
-nug12
+- Membernamen vereinheitlichen: m_...
+
+- long step dual implementieren
+
+#----------------------------------------------------------------------
+
+Die Methoden updateRow() und vSolveLright2 brauchen zuviel Zeit.
+Output von gprof zur Instanz nug12:
 
 Each sample counts as 0.01 seconds.
   %   cumulative   self              self     total           
@@ -94,26 +116,22 @@ Each sample counts as 0.01 seconds.
  34.29   4791.24  4791.24 634306343     0.00     0.00  soplex::CLUFactor::updateRow(int, int, int, int, double, double)
  11.91   6455.54  1664.30   709664     0.00     0.00  soplex::CLUFactor::vSolveLright2(double *, int *, int *, double, double *, int *, int
 
------------------------------------------------------------------------------
+#-----------------------------------------------------------------------
+#  Was diese TODOs bedeuten, ist unklar.
+#-----------------------------------------------------------------------
 
+- tester/simplifier usw. auch wie pricer mit namen versehen.
 
-stdio.h/printf die letzten erlegen.
+- vsolve/solve/update isNotZero() benutzen
 
-tester/simplifier usw. auch wie pricer mit namen versehen.
+- openMP insbesondere pricer/ratiotest (compaq,intel)
+  evtl die enterX/leaveX funktionen inlinen.
 
-vsolve/solve/update isNotZero() benutzen
+- cplexrun mit delta = 1e-9 für bessere werte in check.
 
-openMP insbesondere pricer/ratiotest (compaq,intel)
-ewtl die enterX/leaveX funktionen inlinen.
+- SVSet::memPack, vermutlichen bug in flexelint melden. this-> ist überflüssig.
 
-cplexrun mit delta = 1e-9 für bessere werte in check.
-
-SVSet::memPack, vermutlichen bug in flexelint melden. this-> ist überflüssig.
-
-BUG in spxscalesm.cc value() wird nicht descaliert. 
-Entsprechender Aufruf fehlt auch in spxgeneralsm.cc
-
-reinterpret_cast durchsehen
+- reinterpret_cast durchsehen
 
 // lprow.cpp:double LPRow::infinity = 1e+100;
 // spxlp.cpp:const double SPxLP::infinity = 1e+100;
@@ -160,10 +178,13 @@ pilot-ja LR
 linux.x86.intel LC 0 936 5121
 greenbea ER
 
+
 #---------------------------------------------------
 #  Codesonar-Meldungen
 #---------------------------------------------------
 
+Die Bugnummern beziehen sich auf den HTML-Output von Codesonar, 
+der bei Thorsten oder Sebastian herumliegt.
 
 #------- Buffer Overruns/Underruns -----------------
 
@@ -510,12 +531,59 @@ Bug 50, spxbounds.cpp: useless assignment
    Schleifenvariable gemacht, wie auch darüber. Damit ist das Problem
    sowieso erledigt.
 
------------------------------------------------------------------------------
+#-----------------------------------------------------------------------
+#  Bugdetails
+#-----------------------------------------------------------------------
 
-- Bug von Oscar Gustafsson: LP fälschlicherweise als unbounded gemeldet.
-  Siehe Tobis mail vom 26.9.07.
+- Bug von Oscar Gustafsson: 
+  /optimi/kombadon/LP/soplex_probleme/exp2.lp wird fälschlicherweise als unbounded gemeldet.
+  Sowohl GLPK als auch CPLEX behaupten das Gegenteil.
 
-- Bug Uli: Cannot allocate 1 GB.                                                                                                                                                           
+  Auszug aus Tobis mail vom 26.9.07:
+
+  Es sieht numerisch nicht schlimm aus:
+
+  Dual simplex - Optimal:  Objective =  2.5320220696e-05
+  Solution time =    1.10 sec.  Iterations = 5357 (1)
+
+  Maximum bound infeasibility        = 9.85454e-07
+  Maximum Ax-b  residual             = 7.04115e-16
+  Maximum c-B'pi residual            = 0
+  Maximum |x|                        = 0.175143
+  Maximum |slack|                    = 5.16259e-05
+  Maximum |pi|                       = 0.25
+  Maximum |red-cost|                 = 0
+  Condition number of unscaled basis = 2.4e+04
+
+  Mit allem moeglichen ausgeschaltet bis hin zu 
+      "soplex -s0 -g0 -p0 -t0 -e exp2.lp" 
+  versagt Soplex immernoch. Aber mit der rowwise representation 
+      "soplex -s0 -g0 -p0 -t0 -e -r exp2.lp" 
+  klappt es dann:
+
+  ISOLVE02 Finished solving (status=OPTIMAL, iters=26953, leave=26944, enter=9,
+  objValue=2.532022e-05)
+  IEXAMP01 Factorizations   : 143
+  IEXAMP02     Time spent   : 1.400000e+00
+  IEXAMP03 Solves           : 54368
+  IEXAMP04     Time spent   : 9.310000e+00
+  IEXAMP27 solution time  is: 1.055300e+02
+  IEXAMP28 iterations       : 26953
+  IEXAMP29 solution value is: 2.5320221e-05
+
+  In der Tat funktioniert auch schon bereits "soplex -r exp2.lp":
+
+  ISOLVE02 Finished solving (status=OPTIMAL, iters=2198, leave=246, enter=1952,
+  objValue=2.532022e-05)
+  IEXAMP01 Factorizations   : 17
+  IEXAMP02     Time spent   : 1.000000e-01
+  IEXAMP03 Solves           : 4414
+  IEXAMP04     Time spent   : 1.060000e+00
+  IEXAMP27 solution time  is: 1.446000e+01
+  IEXAMP28 iterations       : 2198
+  IEXAMP29 solution value is: 2.5320221e-05
+
+#-----------------------------------------------------------------------
 
 - Bug Uli: remove_col funktioniert nicht richtig:
 
@@ -545,10 +613,26 @@ Diese zwei Veraenderungen geschehen exakt nach dem Aufruf von
 Gruesse
 Uli
 
------------------------------------------------------------------------------
+#----------------------------------------------------------------------
 
+- etamacro:
 
+bin/soplex.linux.x86.gnu.dbg-ld  -e -r check/LP/netlib/etamacro.mps
 
+soplex.linux.x86.gnu.dbg-ld: src/spxvecs.cpp:240: void soplex::SoPlex::computeFrhs2(const soplex::Vector &, const soplex::Vector &): Assertion `colfb[i] == coufb[i]' failed.
 
+240                 assert(colfb[i] == coufb[i]);
+Current language:  auto; currently c++
+(gdb) print i
+$1 = 368
+(gdb) print colfb[i]
+$2 = 0
+(gdb) print coufb[i]
+$3 = -nan(0xc000000000000000)
 
+kommt auch bei check.netlib.linux.x86.gnu.dbg
+
+#-----------------------------------------------------------------------
+#  THE END
+#-----------------------------------------------------------------------
 
