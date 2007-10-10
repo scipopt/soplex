@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-# $Id: TODO,v 1.91 2007/10/10 11:00:21 bzforlow Exp $
+# $Id: TODO,v 1.92 2007/10/10 12:40:55 bzforlow Exp $
 #-----------------------------------------------------------------------
 
 #-----------------------------------------------------------------------
@@ -25,8 +25,7 @@
 
 - etamacro-assert in spvecs.cpp, Details siehe unten.
 
-- Bug in spxlpfread.cpp von Michael Winkler, siehe Thorstens mail vom
-  9.10.2007.
+- Bug in spxlpfread.cpp von Michael Winkler, siehe unten.
 
 #-----------------------------------------------------------------------
 #  Bereits verteilte Arbeiten
@@ -634,6 +633,64 @@ $2 = 0
 $3 = -nan(0xc000000000000000)
 
 kommt auch bei check.netlib.linux.x86.gnu.dbg
+
+#-----------------------------------------------------------------------
+
+- Bug in spxlpfread.cpp:
+
+From: Michael Winkler <michael.winkler@zib.de>
+To: koch@zib.de
+Subject: SOPLEX BUG
+Date: Fri, 21 Sep 2007 17:22:09 +0200
+
+Hi,
+
+also wie schon angedeudet der Bug beim Soplex Reader:
+
+in der Datei "spxlpfread.cpp" Zeile 728:
+
+         if ((colidx = readColName(pos, cnames, cset, 0)) < 0)
+            {
+               MSG_WARNING( spxout << "WLPFRD11 in Bounds section line "
+                                   << lineno << " ignored" << std::endl; )
+               continue;
+            }
+ich schicke ein Test LP im Anhang mit, hier schonmal das gekürzte Beispiel:
+"x_1" sei dabei weder in der Zielfunktion noch in einem Constraint vorgekommen
+
+Bounds
+13 <= x_1 <= 13
+
+Dadurch, dass die Variable "x_1" nirgends davor vorkam tritt der Reader
+in die oben genannte if Bedingung. Das bedeutet, dass der Lesezeiger nun
+dirket hinter der Variable steht und nun versucht eine neue Zeile
+einzulesen. Da dort das nächste Zeichen aber "<" ist endet das
+Programm mit einer Syntaxfehlermeldung zum LP-Format.
+
+Man kann dieses Problem beheben, indem man vor dem "continue" an das
+Ende der Zeile (oder besser, falls 13 <= x_1 <= 13  24 <= x_2 <= 25 in
+einem LP-File möglich ist, an das Ende der Bedingung) springt.
+
+Ich hoffe die Erklärung war verständlich und umfassend.
+                                                                                                                                                                                           
+
+MfG
+Micha
+
+
+Test-LP:
+
+Maximize
+obj:
+Subject To
+ row_0 : 1 x_2 = 37
+Bounds
+13 <= x_1 <= 13
+24 <= x_2 <= 25
+Integer
+  x_1 x_2
+End
+
 
 #-----------------------------------------------------------------------
 #  THE END
