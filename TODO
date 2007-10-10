@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-# $Id: TODO,v 1.90 2007/10/09 15:18:35 bzforlow Exp $
+# $Id: TODO,v 1.91 2007/10/10 11:00:21 bzforlow Exp $
 #-----------------------------------------------------------------------
 
 #-----------------------------------------------------------------------
@@ -25,6 +25,8 @@
 
 - etamacro-assert in spvecs.cpp, Details siehe unten.
 
+- Bug in spxlpfread.cpp von Michael Winkler, siehe Thorstens mail vom
+  9.10.2007.
 
 #-----------------------------------------------------------------------
 #  Bereits verteilte Arbeiten
@@ -60,6 +62,7 @@ Andreas:
 
 Thorsten:
 - svset-Speicherbug beheben (mit Robert)
+- spxlpfread-Bug beheben
 - bei flexelint/Codesonar mit draufgucken
 - Abbruch bei minimieren mit Upper Bound:
   primal: >= UB und optimal
