@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-# $Id: TODO,v 1.92 2007/10/10 12:40:55 bzforlow Exp $
+# $Id: TODO,v 1.93 2007/10/16 13:13:35 bzforlow Exp $
 #-----------------------------------------------------------------------
 
 #-----------------------------------------------------------------------
@@ -34,12 +34,10 @@
 Benjamin:
 - Exception-Branch in den trunk mergen (mit Sebastian)
 - diverse "#ifdef USE_OLD"-Stellen rauswerfen (mit Sebastian)
-- miplib.solu für MIPLIB 2003 (mit Robert)
 
 
 Sebastian:
 - Exception-Branch, USE_OLD, s.o.
-- flexelint unter /sw installieren
 - flexelint, Codesonar (mit Robert, ggf. mit Thorsten)
 
 
