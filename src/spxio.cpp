@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxio.cpp,v 1.27 2007/10/19 15:44:25 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxio.cpp,v 1.28 2007/10/19 16:08:28 bzforlow Exp $"
 
 
 //#define DEBUGGING 1
@@ -49,11 +49,10 @@ namespace soplex
  *                 Maybe 0 if the information is not needed.
  * @todo  Make sure the Id's in the NameSet%s are the same as in the LP.
  */
-bool SPxLP::read(
-   std::istream& is, 
-   NameSet* rowNames,
-   NameSet* colNames,
-   DIdxSet* intVars)
+bool SPxLP::read(std::istream&   is, 
+                 NameSet*        rowNames,
+                 NameSet*        colNames,
+                 DIdxSet*        intVars)
 {
    bool ok;
    char c;
@@ -76,91 +75,6 @@ bool SPxLP::read(
    return ok;
 }
 
-//static void dumpRows(std::ostream& s, const SPxLP& lp)
-//{
-//   int i;
-//
-//   s << "\nSubject To\n";
-//   for (i = 0; i < lp.nRows(); ++i)
-//   {
-//      s << "  C" << (i + 1) << ": ";
-//      Real low;
-//      Real up;
-//      low = lp.lhs(i);
-//      up = lp.rhs(i);
-//      if (low > -infinity && up < infinity && low != up)
-//      {
-//         s << low << " <= " << lp.rowVector(i) << " <= " << up << '\n';
-//      }
-//      else if (low == up)
-//         s << lp.rowVector(i) << " = " << up << '\n';
-//      else if (low <= -infinity)
-//         s << lp.rowVector(i) << " <= " << up << '\n';
-//      else
-//         s << lp.rowVector(i) << " >= " << low << '\n';
-//   }
-//}
-//
-//static void dumpBounds(std::ostream& s, const SPxLP& lp)
-//{
-//   int i;
-//
-//   s << "Bounds\n";
-//
-//   for (i = 0; i < lp.nCols(); ++i)
-//   {
-//      Real up  = lp.upper(i);
-//      Real low = lp.lower(i);
-//
-//      if (low == up)
-//         s << "  x" << i << " = " << up << '\n';
-//      else if (low > -infinity)
-//      {
-//         if (up < infinity)
-//            s << "  " << low << " <= x" << i << " <= " << up << '\n';
-//         else if (low != 0)
-//            s << "  x" << i <<" >= " << low << '\n';
-//      }
-//      else if (up < infinity)
-//         s << "  x" << i << " <= " << up << '\n';
-//      else
-//         s << "  x" << i << " FREE\n";
-//   }
-//}
-//
-//std::ostream& operator<<(std::ostream& s, const SPxLP& lp)
-//{
-//   int i, j;
-//   int sns = lp.spxSense();
-//
-//   s << ((sns == SPxLP::MINIMIZE) ? "Minimize\n" : "Maximize\n");
-//
-//   s << "  obj: ";
-//   for (i = j = 0; i < lp.nCols(); ++i)
-//   {
-//      Real obj = lp.obj(i);
-//      if (obj != 0)
-//      {
-//         if (j)
-//         {
-//            if (obj < 0)
-//               s << " - " << -obj << " x" << i;
-//            else
-//               s << " + " << obj << " x" << i;
-//         }
-//         else
-//            s << obj << " x" << i;
-//         j++;
-//         if (j % 5 == 0)
-//            s << "\n\t";
-//      }
-//   }
-//   dumpRows(s, lp);
-//   dumpBounds(s, lp);
-//
-//   s << "End\n";
-//   return s;
-//}
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

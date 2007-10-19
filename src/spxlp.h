@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.44 2007/10/19 15:44:25 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.45 2007/10/19 16:08:28 bzforlow Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -78,9 +78,6 @@ class SPxLP : protected LPRowSet, protected LPColSet
    friend class SPxGeometSC;
    friend class SPxMainSM;
    
-//   /// output operator, replaced by dumpFile()/writeLPF()
-//   friend std::ostream& operator<<(std::ostream& os, const SPxLP& lp);
-
 public:
 
    //---------------------------
