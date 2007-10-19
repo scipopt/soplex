@@ -13,9 +13,10 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxout.cpp,v 1.3 2007/08/27 15:35:12 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxout.cpp,v 1.4 2007/10/19 15:44:25 bzforlow Exp $"
 
 #include "spxout.h"
+#include "exceptions.h"
 
 namespace soplex
 {
@@ -41,7 +42,6 @@ namespace soplex
 
    // define global instance
    SPxOut spxout;
-
 
 } // namespace soplex
 

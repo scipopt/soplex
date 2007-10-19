@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dvector.cpp,v 1.17 2007/08/27 15:35:08 bzfberth Exp $"
+#pragma ident "@(#) $Id: dvector.cpp,v 1.18 2007/10/19 15:44:24 bzforlow Exp $"
 
 
 #include "spxdefines.h"
@@ -185,7 +185,8 @@ DVector::DVector(int p_dim)
 
 DVector::~DVector()
 {
-   spx_free(mem);
+   if(mem != 0)
+      spx_free(mem);
 }
 
 #ifndef NO_CONSISTENCY_CHECKS

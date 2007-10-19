@@ -1,7 +1,6 @@
 #! /bin/bash
-# $Id: valgrind.sh,v 1.2 2007/10/19 15:44:24 bzforlow Exp $
 #
-# Ths script runs the binary under control of valgrind.
+# Ths script runs the the memory exception tests under control of valgrind.
 #
 # Parameters
 # $1 Name of the test, e.g. netlib (needs netlib.test, netlib.solu)
@@ -10,6 +9,10 @@
 # $4 Limits, e.g. -l10000 as time limit.
 # $5 valgrind command with parameters (inclusive valgrind binary name)
 # $6 potential suppression file name
+l=1
+n=300
+echo $l > PARAMS
+RUN=true
 BINNAME=`basename $2`
 TSTNAME=`basename $1 .test`
 OUTFILE=check.$TSTNAME.$BINNAME.out
@@ -17,15 +20,6 @@ ERRFILE=check.$TSTNAME.$BINNAME.err
 RESFILE=check.$TSTNAME.$BINNAME.res
 date >$OUTFILE
 date >$ERRFILE
-
-# echo '$1->' $1
-# echo '$2->' $2
-# echo '$3->' $3
-# echo '$4->' $4
-# echo '$5->' $5
-# echo '$6->' $6
-
-
 
 VALGRINDCMD=$5
 VSUPPNAME=$6
@@ -36,10 +30,17 @@ then
   VALGRINDCMD="$VALGRINDCMD --suppressions=$VSUPPNAME"
 fi
 
+while $RUN
+  do
+  echo "*****************************************************************************"
+  echo "*****************************************************************************"
+  echo "LIMIT: "$l
+
 for i in `cat $1`
 do
     echo @01 $i ===========
     echo @01 $i =========== >>$ERRFILE
+    echo @01 LIMIT: $l>>$ERRFILE
     for k in $3
     do
         case $k in
@@ -69,11 +70,16 @@ do
 	    opt="-e -p1" ;;
         esac
 
-        $VALGRINDCMD $2 $opt -q $4 $i 2>>$ERRFILE
+        $VALGRINDCMD $2 $opt -q $4 $i 2 #>>$ERRFILE
         echo =ready=
     done
 done | tee -a $OUTFILE
+  if [ $l -ge $n ]
+      then RUN=false 
+  fi
+  l=$(($l+1))
+  echo $l > PARAMS
+done
+rm PARAMS
 date >>$OUTFILE
 date >>$ERRFILE
-gawk -f check.awk $TSTNAME.solu $OUTFILE | tee $RESFILE
- 

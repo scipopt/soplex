@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.47 2007/08/27 15:35:09 bzfberth Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.48 2007/10/19 15:44:25 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -26,6 +26,7 @@
 #include "spxsolver.h"
 #include "spxratiotester.h"
 #include "spxout.h"
+#include "exceptions.h"
 
 namespace soplex
 {
@@ -108,8 +109,7 @@ void SPxSolver::getLeaveVals(
          break;
       case SPxBasis::Desc::P_FREE :
          assert( rep() == ROW );
-         assert(false);
-         break;
+         throw SPxInternalCodeException("XLEAVE01 This should never happen.");
       case SPxBasis::Desc::D_FREE :
          assert( rep() == COLUMN );
          ds.rowStatus(leaveNum) = SPxBasis::Desc::P_FIXED;
@@ -151,7 +151,7 @@ void SPxSolver::getLeaveVals(
          break;
 
       default:
-         assert(false);
+         throw SPxInternalCodeException("XLEAVE02 This should never happen.");
       }
       MSG_DEBUG( spxout << "DLEAVE51 SPxSolver::getLeaveVals() : row " << leaveNum
                         << ": " << leaveStat
@@ -235,7 +235,7 @@ void SPxSolver::getLeaveVals(
          }
          break;
       default:
-         assert(false);
+         throw SPxInternalCodeException("XLEAVE03 This should never happen.");
       }
       MSG_DEBUG( spxout << "DLEAVE52 SPxSolver::getLeaveVals() : col " << leaveNum
                         << ": " << leaveStat
@@ -329,7 +329,7 @@ void SPxSolver::getLeaveVals2(
       case SPxBasis::Desc::P_FREE :
          assert(rep() == COLUMN);
 #if 1
-         assert(false);
+         throw SPxInternalCodeException("XLEAVE04 This should never happen.");
 #else
          MSG_ERROR( spxout << "ELEAVE53 ERROR: not yet debugged!" << std::endl; )
          ds.rowStatus(idx) = dualRowStatus(idx);
@@ -346,10 +346,10 @@ void SPxSolver::getLeaveVals2(
                            << "idx="   << idx
                            << ", lhs=" << lhs(idx)
                            << ", rhs=" << rhs(idx) << std::endl; )
-         assert(false);
+         throw SPxInternalCodeException("XLEAVE05 This should never happen.");
 
       default:
-         assert(false);
+         throw SPxInternalCodeException("XLEAVE06 This should never happen.");
       }
       MSG_DEBUG( spxout << "DLEAVE55 SPxSolver::getLeaveVals2(): row " << idx
                         << ": " << enterStat
@@ -442,10 +442,9 @@ void SPxSolver::getLeaveVals2(
                            << "idx="     << idx
                            << ", lower=" << lower(idx)
                            << ", upper=" << upper(idx) << std::endl; )
-         assert(false);
-
+         throw SPxInternalCodeException("XLEAVE07 This should never happen.");
       default:
-         assert(false);
+         throw SPxInternalCodeException("XLEAVE08 This should never happen.");
       }
 
       MSG_DEBUG( spxout << "DLEAVE57 col " << idx

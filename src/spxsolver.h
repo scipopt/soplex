@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.28 2007/08/27 15:35:12 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.29 2007/10/19 15:44:25 bzforlow Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -394,6 +394,9 @@ public:
    /** Solves the loaded LP by processing the Simplex iteration until
     *  the termination criteria is fullfilled (see #terminate()). 
     *  The SPxStatus of the solver will indicate the reason for termination.
+    *  
+    *  @throw SPxStatusException if either no problem, solver, pricer 
+    *  or ratiotester loaded or if solve is still running when it shouldn't be
     */
    virtual Status solve();
 
@@ -423,6 +426,8 @@ public:
     *  the primal solution vector of the current basis will be copied
     *  to the argument \p vector. Hence, \p vector must be of dimension
     *  #nCols().
+    *
+    *  @throw SPxStatusException if not initialized 
     */
    virtual Status getPrimal(Vector& vector) const;
 
@@ -438,6 +443,8 @@ public:
     *     Let \em x be the current solution vector and \em A the constraint
     *     matrix. Then the vector of slack variables is defined as
     *     \f$s = Ax\f$.
+    *
+    *  @throw SPxStatusException if no problem loaded
     */
    virtual Status getSlacks (Vector& vector) const;
 
@@ -464,6 +471,8 @@ public:
     *       In this case only the dual variable for the tight
     *       constraint is given with the standard definition, while
     *       the other constraint is implicitely set to 0.
+    *
+    *  @throw SPxStatusException if no problem loaded
     */
    virtual Status getDual (Vector& vector) const;
 
@@ -477,10 +486,13 @@ public:
     *  Let \em d denote the vector of dual variables, as defined above,
     *  and \em A the LPs constraint matrix. Then the reduced cost vector
     *  \em r is defined as \f$r^T = c^T - d^TA\f$.
+    *
+    *  @throw SPxStatusException if no problem loaded
     */
    virtual Status getRedCost (Vector& vector) const;
 
    /// get dual farkas proof of infeasibility.
+   ///  @throw SPxStatusException if no problem loaded
    virtual Status getDualfarkas (Vector& vector) const;
 
    /// Termination criterion.
@@ -1351,6 +1363,7 @@ public:
 
 protected:
    /// Factorize basis matrix.
+   /// @throw SPxStatusException if loaded matrix is singular
    virtual void factorize();
 
 private:

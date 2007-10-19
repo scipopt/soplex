@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: forest.cpp,v 1.23 2007/08/27 15:35:09 bzfberth Exp $"
+#pragma ident "@(#) $Id: forest.cpp,v 1.24 2007/10/19 15:44:25 bzforlow Exp $"
 
 #include <assert.h>
 
@@ -21,6 +21,7 @@
 #include "clufactor.h"
 #include "cring.h"
 #include "spxalloc.h"
+#include "exceptions.h"
 
 namespace soplex
 {
@@ -261,6 +262,8 @@ void CLUFactor::forestReMaxCol(int p_col, int len)
    Also num and nonz are used to maintain a heap if there are only very few 
    nonzeros to be eliminated. This is plainly wrong if the method is called with
    nonz==0, see todo at the corresponding place below.
+
+   @throw SPxStatusException if the loaded matrix is singular
 
    @todo Use an extra member variable as a buffer for working with the dense 
          row instead of misusing p_work. I think that should be as efficient and
@@ -540,7 +543,7 @@ void CLUFactor::forestUpdate(int p_col, Real* p_work, int num, int *nonz)
          if (i != r)
          {
             stat = SLinSolver::SINGULAR;
-            return;
+            throw SPxStatusException("XFORE01 The loaded matrix is singular");
          }
          k = corig[r];
          x = p_work[k];
@@ -649,7 +652,8 @@ void CLUFactor::forestUpdate(int p_col, Real* p_work, int num, int *nonz)
          if (x == 0.0)
          {
             stat = SLinSolver::SINGULAR;
-            return;
+            throw SPxStatusException("XFORE02 The loaded matrix is singular");
+            //            return;
          }
          diag[rowno] = 1 / x;
          p_work[k] = 0;
@@ -719,7 +723,8 @@ void CLUFactor::forestUpdate(int p_col, Real* p_work, int num, int *nonz)
    else /* r < c */
    {
       stat = SLinSolver::SINGULAR;
-      return;
+      throw SPxStatusException("XFORE03 The loaded matrix is singular");
+      //      return;
    }
    maxabs = l_maxabs;
 

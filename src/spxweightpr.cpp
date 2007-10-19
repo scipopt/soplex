@@ -13,13 +13,14 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.22 2007/08/27 15:35:13 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxweightpr.cpp,v 1.23 2007/10/19 15:44:25 bzforlow Exp $"
 
 #include <assert.h>
 
 #include "spxdefines.h"
 #include "spxweightpr.h"
 #include "message.h"
+#include "exceptions.h"
 
 namespace soplex
 {
@@ -195,7 +196,7 @@ SPxId SPxWeightPR::selectEnter()
          case SPxBasis::Desc::D_UNDEFINED :
          case SPxBasis::Desc::P_FIXED :
          default:
-            assert(false);
+            throw SPxInternalCodeException("XWGTPR01 This should never happen.");
          }
          if (x < best)
          {
@@ -233,7 +234,7 @@ SPxId SPxWeightPR::selectEnter()
          case SPxBasis::Desc::P_FIXED :
          case SPxBasis::Desc::D_UNDEFINED :
          default:
-            assert(false);
+            throw SPxInternalCodeException("XWGTPR02 This should never happen.");
          }
          if (x < best)
          {

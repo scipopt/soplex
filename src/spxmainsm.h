@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.h,v 1.9 2007/08/27 15:35:12 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxmainsm.h,v 1.10 2007/10/19 15:44:25 bzforlow Exp $"
 
 /**@file  spxmainsm.h
  * @brief General methods in LP preprocessing.
@@ -26,6 +26,7 @@
 #include "spxdefines.h"
 #include "spxsimplifier.h"
 #include "array.h"
+#include "exceptions.h"
 
 namespace soplex
 {
@@ -283,7 +284,9 @@ private:
          else if (lp.lower(j) <= -infinity && lp.upper(j) >= infinity)
             m_status = SPxSolver::ZERO;
          else
-            assert(false);
+         {
+            throw SPxInternalCodeException("XMAISM14 This should never happen.");
+         }
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,

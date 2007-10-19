@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.42 2007/08/27 15:35:13 bzfberth Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.43 2007/10/19 15:44:26 bzforlow Exp $"
 
 #include <iostream>
 #include <iomanip>
@@ -23,6 +23,7 @@
 #include "ssvector.h"
 #include "svset.h"
 #include "message.h"
+#include "exceptions.h"
 
 /**@file ssvector.cpp
  * @todo There is a lot pointer arithmetic done here. It is not clear if
@@ -480,7 +481,7 @@ SSVector& SSVector::multAdd(Real xx, const SSVector& svec)
        *       Fortunately the whole function seems not to be called
        *       at all. 
        */
-      assert(false);
+      throw SPxInternalCodeException("XSSVEC01 This should never happen.");
 
       Real y;
       int* ii = idx;

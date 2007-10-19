@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.58 2007/08/27 15:35:10 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.59 2007/10/19 15:44:25 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -29,6 +29,7 @@
 #include "mpsinput.h"
 #include "message.h"
 #include "spxout.h"
+#include "exceptions.h"
 
 namespace soplex
 {
@@ -322,11 +323,10 @@ bool SPxBasis::readBasis(
    return !mps.hasError();
 }
 
-void SPxBasis::writeBasis(   
-   std::ostream&  os, 
-   const NameSet& rownames, 
-   const NameSet& colnames)
-   const
+void SPxBasis::writeBasis
+   ( std::ostream&  os, 
+     const NameSet& rownames, 
+     const NameSet& colnames ) const
 {
    METHOD( "SPxBasis::writeBasis()" );
    assert(theLP != 0);
@@ -500,7 +500,7 @@ void SPxBasis::factorize()
    assert(matrixIsSetup);
 
    updateCount = 0;
-
+   
    switch(factor->load(matrix.get_ptr(), matrix.size()))
    {
    case SLinSolver::OK :
@@ -522,7 +522,7 @@ void SPxBasis::factorize()
       break;
    default :
       MSG_ERROR( spxout << "EBASIS08 error: unknown status of factorization.\n"; )
-      assert(false);
+      throw SPxInternalCodeException("XBASIS01 This should never happen.");
       // factorized = false;
    }
 
@@ -575,7 +575,7 @@ Vector& SPxBasis::multBaseWith(Vector& x) const
    return x;
 }
 
-void SPxBasis::dump() const
+void SPxBasis::dump()
 {
    METHOD( "SPxBasis::dump()" );
    assert(status() > NO_PROBLEM);

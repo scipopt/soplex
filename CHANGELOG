@@ -1,5 +1,11 @@
 Current Version
 
+- Introduced exceptions for all unrecoverable errors (lack of memory, 
+  no pricer, etc.) to allow a calling application to clean up.
+
+- Split the main() method in example.cpp into several smaller methods.
+
+- Replaced SPxLP::operator<< by a method writeLPF().
 
 #----------------------------------------------------------------
 
@@ -17,6 +23,8 @@ Release 1.3.2
   FreeZeroObjVariablePS::execute().
 
 - Bugfix: SVector::dim() has to return the dimension and not the maximal index
+
+- Extended FAQ
 
 #----------------------------------------------------------------
 

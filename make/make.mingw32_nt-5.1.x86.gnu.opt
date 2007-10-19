@@ -1,7 +1,7 @@
-#--- $Id: make.mingw32_nt-5.1.x86.gnu.opt,v 1.1 2007/08/27 17:34:06 bzfpfets Exp $
+#--- $Id: make.mingw32_nt-5.1.x86.gnu.opt,v 1.2 2007/10/19 15:44:24 bzforlow Exp $
 CXX	=	g++
 CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS
-CXXFLAGS=	-O3 -march=pentiumpro -fno-exceptions \
+CXXFLAGS=	-O3 -march=pentiumpro  \
 		-ffast-math -fforce-addr -funroll-loops
 LDFLAGS	=	-lm # -static
 ARFLAGS	=	crs

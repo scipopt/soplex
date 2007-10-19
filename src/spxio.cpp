@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxio.cpp,v 1.26 2007/08/27 15:35:11 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxio.cpp,v 1.27 2007/10/19 15:44:25 bzforlow Exp $"
 
 
 //#define DEBUGGING 1
@@ -40,14 +40,14 @@ namespace soplex
  *                 (rows) in the same order as the rows in the LP.
  *                 Constraints without a name (only possible with LPF 
  *                 files) are automatically assigned a name.
- *                 May be NULL if the names are not needed.
+ *                 Maybe 0 if the names are not needed.
  * @param colNames contains after the call the names of the variables
  *                 (columns) in the same order as the columns in the LP.
- *                 May be NULL if the names are not needed.
+ *                 Maybe 0 if the names are not needed.
  * @param intVars  contains after the call the indices of those variables
- *                 that where marked as being integer in the file.
- *                 May be NULL if the information is not needed.
- * @todo  Make sure the Ids in the NameSet%s are the same as in the LP.
+ *                 that where marked as beeing integer in the file.
+ *                 Maybe 0 if the information is not needed.
+ * @todo  Make sure the Id's in the NameSet%s are the same as in the LP.
  */
 bool SPxLP::read(
    std::istream& is, 
@@ -76,13 +76,91 @@ bool SPxLP::read(
    return ok;
 }
 
-// LP output operator with default row and column names
-std::ostream& operator<<(std::ostream& s, const SPxLP& lp)
-{
-   lp.writeLPF(s, NULL, NULL, NULL);
-   return s;
-}
-
+//static void dumpRows(std::ostream& s, const SPxLP& lp)
+//{
+//   int i;
+//
+//   s << "\nSubject To\n";
+//   for (i = 0; i < lp.nRows(); ++i)
+//   {
+//      s << "  C" << (i + 1) << ": ";
+//      Real low;
+//      Real up;
+//      low = lp.lhs(i);
+//      up = lp.rhs(i);
+//      if (low > -infinity && up < infinity && low != up)
+//      {
+//         s << low << " <= " << lp.rowVector(i) << " <= " << up << '\n';
+//      }
+//      else if (low == up)
+//         s << lp.rowVector(i) << " = " << up << '\n';
+//      else if (low <= -infinity)
+//         s << lp.rowVector(i) << " <= " << up << '\n';
+//      else
+//         s << lp.rowVector(i) << " >= " << low << '\n';
+//   }
+//}
+//
+//static void dumpBounds(std::ostream& s, const SPxLP& lp)
+//{
+//   int i;
+//
+//   s << "Bounds\n";
+//
+//   for (i = 0; i < lp.nCols(); ++i)
+//   {
+//      Real up  = lp.upper(i);
+//      Real low = lp.lower(i);
+//
+//      if (low == up)
+//         s << "  x" << i << " = " << up << '\n';
+//      else if (low > -infinity)
+//      {
+//         if (up < infinity)
+//            s << "  " << low << " <= x" << i << " <= " << up << '\n';
+//         else if (low != 0)
+//            s << "  x" << i <<" >= " << low << '\n';
+//      }
+//      else if (up < infinity)
+//         s << "  x" << i << " <= " << up << '\n';
+//      else
+//         s << "  x" << i << " FREE\n";
+//   }
+//}
+//
+//std::ostream& operator<<(std::ostream& s, const SPxLP& lp)
+//{
+//   int i, j;
+//   int sns = lp.spxSense();
+//
+//   s << ((sns == SPxLP::MINIMIZE) ? "Minimize\n" : "Maximize\n");
+//
+//   s << "  obj: ";
+//   for (i = j = 0; i < lp.nCols(); ++i)
+//   {
+//      Real obj = lp.obj(i);
+//      if (obj != 0)
+//      {
+//         if (j)
+//         {
+//            if (obj < 0)
+//               s << " - " << -obj << " x" << i;
+//            else
+//               s << " + " << obj << " x" << i;
+//         }
+//         else
+//            s << obj << " x" << i;
+//         j++;
+//         if (j % 5 == 0)
+//            s << "\n\t";
+//      }
+//   }
+//   dumpRows(s, lp);
+//   dumpBounds(s, lp);
+//
+//   s << "End\n";
+//   return s;
+//}
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

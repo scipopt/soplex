@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdesc.cpp,v 1.17 2007/08/27 15:35:11 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxdesc.cpp,v 1.18 2007/10/19 15:44:25 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -22,6 +22,7 @@
 #include "spxdefines.h"
 #include "spxbasis.h"
 #include "spxsolver.h"
+#include "exceptions.h"
 
 namespace soplex
 {
@@ -161,7 +162,7 @@ std::ostream& operator<<(std::ostream& os, const SPxBasis::Desc::Status& stat)
       break;
    default :
       os << std::endl << "Invalid status <" << int(stat) << ">" << std::endl;
-      assert(false);
+      throw SPxInternalCodeException("XSPXDE01 This should never happen.");
    }
    os << text;
 

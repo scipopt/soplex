@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpswrite.cpp,v 1.9 2007/08/27 15:35:12 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxmpswrite.cpp,v 1.10 2007/10/19 15:44:25 bzforlow Exp $"
 
 /**@file  spxmpswrite.cpp
  * @brief Write LP as MPS format file.
@@ -26,6 +26,7 @@
 
 #include "spxdefines.h"
 #include "spxlp.h"
+#include "exceptions.h"
 
 namespace soplex
 {
@@ -69,7 +70,7 @@ static Real getRHS(Real left, Real right)
    else if (right <  infinity)
       rhsval = right;
    else
-      assert(false);
+      throw SPxInternalCodeException("XMPSWR01 This should never happen.");
 
    return rhsval;
 }
@@ -158,7 +159,7 @@ void SPxLP::writeMPS(
       else if (rhs(i) <  infinity)
          indicator = "L";
       else
-         assert(false);
+         throw SPxInternalCodeException("XMPSWR02 This should never happen.");
 
       writeRecord(p_output, indicator, getRowName(*this, i, p_rnames, name)); 
    }

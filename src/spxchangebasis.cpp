@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.28 2007/08/27 15:35:10 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.29 2007/10/19 15:44:25 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -23,6 +23,7 @@
 #include "spxbasis.h"
 #include "spxsolver.h"
 #include "spxout.h"
+#include "exceptions.h"
 
 namespace soplex
 {
@@ -113,7 +114,7 @@ void SPxBasis::addedRows(int n)
          break;
       default:
          MSG_ERROR( spxout << "ECHBAS04 Unknown basis status!" << std::endl; )
-         assert(false);
+         throw SPxInternalCodeException("XCHBAS01 This should never happen.");
       }
    }
 }
@@ -305,7 +306,7 @@ void SPxBasis::addedCols(int n)
          break;
       default:
          MSG_ERROR( spxout << "ECHBAS08 Unknown basis status!" << std::endl; )
-         assert(false);
+         throw SPxInternalCodeException("XCHBAS02 This should never happen.");
       }
    }
 }

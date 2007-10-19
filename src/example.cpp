@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.97 2007/09/04 10:24:10 bzfpfets Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.98 2007/10/19 15:44:25 bzforlow Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -61,9 +61,8 @@ class MySoPlex : public SoPlex
 {
 public:
    /// default constructor
-   MySoPlex(
-      SPxSolver::Type p_type = SPxSolver::LEAVE, 
-      SPxSolver::Representation p_rep = SPxSolver::COLUMN)
+   MySoPlex( SPxSolver::Type           p_type = SPxSolver::LEAVE, 
+             SPxSolver::Representation p_rep  = SPxSolver::COLUMN )
       : SoPlex(p_type, p_rep)
    {}
    //------------------------------------------------------------------------
@@ -81,45 +80,45 @@ public:
       m_solver.qualConstraintViolation(maxviol, sumviol);
 
       MSG_INFO1( spxout << "IEXAMP06 Constraints      :" 
-                        << std::setw(16) << maxviol << "  " 
-                        << std::setw(16) << sumviol << std::endl; )
+                 << std::setw(16) << maxviol << "  " 
+                 << std::setw(16) << sumviol << std::endl; )
 
       qualConstraintViolation(maxviol, sumviol);
 
       MSG_INFO1( spxout << "IEXAMP07       (unscaled) :" 
-                        << std::setw(16) << maxviol << "  " 
-                        << std::setw(16) << sumviol << std::endl; )
+                 << std::setw(16) << maxviol << "  " 
+                 << std::setw(16) << sumviol << std::endl; )
 
       m_solver.qualBoundViolation(maxviol, sumviol);
 
       MSG_INFO1( spxout << "IEXAMP08 Bounds           :" 
-                        << std::setw(16) << maxviol << "  " 
-                        << std::setw(16) << sumviol << std::endl; )
+                 << std::setw(16) << maxviol << "  " 
+                 << std::setw(16) << sumviol << std::endl; )
 
       qualBoundViolation(maxviol, sumviol);
 
       MSG_INFO1( spxout << "IEXAMP09       (unscaled) :" 
-                        << std::setw(16) << maxviol << "  " 
-                        << std::setw(16) << sumviol << std::endl; )
+                 << std::setw(16) << maxviol << "  " 
+                 << std::setw(16) << sumviol << std::endl; )
 
       if (!m_vanished)
       {
          m_solver.qualSlackViolation(maxviol, sumviol);
 
          MSG_INFO1( spxout << "IEXAMP10 Slacks           :" 
-                           << std::setw(16) << maxviol << "  " 
-                           << std::setw(16) << sumviol << std::endl; )
+                    << std::setw(16) << maxviol << "  " 
+                    << std::setw(16) << sumviol << std::endl; )
 
          m_solver.qualRedCostViolation(maxviol, sumviol);
 
          MSG_INFO1( spxout << "IEXAMP11 Reduced costs    :" 
-                           << std::setw(16) << maxviol << "  " 
-                           << std::setw(16) << sumviol << std::endl; )
+                    << std::setw(16) << maxviol << "  " 
+                    << std::setw(16) << sumviol << std::endl; )
 #if 0
          MSG_INFO1( spxout << "IEXAMP12 Proven dual bound:" 
-                           << std::setw(20)
-                           << std::setprecision(20)
-                           << m_solver.provedDualbound() << std::endl; )
+                    << std::setw(20)
+                    << std::setprecision(20)
+                    << m_solver.provedDualbound() << std::endl; )
 #endif
       }
    }
@@ -131,10 +130,10 @@ public:
 #if 0
       if( m_solver.isProvenInfeasible() )
          MSG_INFO1( spxout << "IEXAMP13 Infeasibility is proven." 
-                           << std::endl; )
-      else
-         MSG_INFO1( spxout << "IEXAMP13 Infeasibility could not be proven!"
-                           << std::endl; )
+                    << std::endl; )
+            else
+               MSG_INFO1( spxout << "IEXAMP13 Infeasibility could not be proven!"
+                          << std::endl; )
 #endif
    }
 };
@@ -149,70 +148,70 @@ void print_usage_and_exit( const char* const argv[] )
    /**
       The following code block is just to test compilation parameters.
    */
-#if 0
+#if 1
    std::cout << "compiled with NDEBUG: "
-   #ifdef NDEBUG
+#ifdef NDEBUG
              << "yes"
-   #else
+#else
              << "no"
-   #endif
+#endif
              << std::endl;
 
    std::cout << "compiled with WITH_WARNINGS: "
-   #ifdef WITH_WARNINGS
+#ifdef WITH_WARNINGS
              << "yes"
-   #else
+#else
              << "no"
-   #endif
+#endif
              << std::endl;
 
    std::cout << "compiled with NO_ADDITIONAL_CHECKS: "
-   #ifdef NO_ADDITIONAL_CHECKS
+#ifdef NO_ADDITIONAL_CHECKS
              << "yes (ENABLE_ADDITIONAL_CHECKS = " << ENABLE_ADDITIONAL_CHECKS << ")" 
-   #else
+#else
              << "no (ENABLE_ADDITIONAL_CHECKS = " << ENABLE_ADDITIONAL_CHECKS << ")"
-   #endif
+#endif
              << std::endl;
 
    std::cout << "compiled with NO_CONSISTENCY_CHECKS: "
-   #ifdef NO_CONSISTENCY_CHECKS
+#ifdef NO_CONSISTENCY_CHECKS
              << "yes"
-   #else
+#else
              << "no"
-   #endif
+#endif
              << std::endl;
-
+   
    std::cout << std::endl;
 #endif
 
    const char* usage =
-   "[options] LPfile [Basfile]\n\n"
-   "          LPfile can be either in MPS or LPF format\n\n"
-   "options:  (*) indicates default\n" 
-   "          (!) indicates experimental features which may give wrong results\n" 
-   " -e        select entering algorithm (default is leaving)\n"
-   " -r        select row wise representation (default is column)\n"
-   " -i        select Eta-update (default is Forest-Tomlin)\n"
-   " -x        output solution vector (works only together with -s0)\n"
-   " -q        display solution quality\n"
-//   " -br       read file with starting basis from Basfile\n"
-   " -bw       write file with optimal basis to Basfile\n"
-   " -lSec     set timelimit to Sec seconds\n"
-   " -dDelta   set maximal allowed bound violation to Delta\n"
-   " -zzEps    set general zero tolerance to Eps\n\n"
-   " -zfEps    set factorization zero tolerance to Eps\n\n"
-   " -zuEps    set update zero tolerance to Eps\n\n"
-   " -vLevel   set verbosity Level: from 0 (ERROR) to 5 (DEBUG), default 2\n"
-   " -V        show program version\n"
-   " -h        show this help\n"
-   "Simplifier:     Scaler:         Starter:     Pricer:        Ratiotester:\n"
-   " -s0 none       -g0 none         -c0 none*   -p0 Textbook  -t0 Textbook\n"
-   " -s1 Main*      -g1 C-uni-Equi   -c1 Weight  -p1 ParMult   -t1 Harris\n"
-   "                -g2 R-uni-Equi   -c2 Sum     -p2 Devex     -t2 Fast*\n"
-   "                -g3 bi-Equi*     -c3 Vector  -p3 Hybrid!\n"
-   "                -g4 bi-Equi+Geom1            -p4 Steep*\n"
-   "                -g5 bi-Equi+Geom8            -p5 Weight\n"
-   ;
+      "[options] LPfile [Basfile]\n\n"
+      "          LPfile can be either in MPS or LPF format\n\n"
+      "options:  (*) indicates default\n" 
+      "          (!) indicates experimental features which may give wrong results\n" 
+      " -e        select entering algorithm (default is leaving)\n"
+      " -r        select row wise representation (default is column)\n"
+      " -i        select Eta-update (default is Forest-Tomlin)\n"
+      " -x        output solution vector (works only together with -s0)\n"
+      " -q        display solution quality\n"
+      " -br       read file with starting basis from Basfile\n"
+      " -bw       write file with optimal basis to Basfile\n"
+      " -lSec     set timelimit to Sec seconds\n"
+      " -dDelta   set maximal allowed bound violation to Delta\n"
+      " -zzEps    set general zero tolerance to Eps\n\n"
+      " -zfEps    set factorization zero tolerance to Eps\n\n"
+      " -zuEps    set update zero tolerance to Eps\n\n"
+      " -vLevel   set verbosity Level: from 0 (ERROR) to 5 (DEBUG), default 2\n"
+      " -V        show program version\n"
+      " -h        show this help\n"
+      "Simplifier:     Scaler:         Starter:     Pricer:        Ratiotester:\n"
+      " -s0 none       -g0 none         -c0 none*   -p0 Textbook  -t0 Textbook\n"
+      " -s1 Main*      -g1 C-uni-Equi   -c1 Weight  -p1 ParMult   -t1 Harris\n"
+      "                -g2 R-uni-Equi   -c2 Sum     -p2 Devex     -t2 Fast*\n"
+      "                -g3 bi-Equi*     -c3 Vector  -p3 Hybrid!\n"
+      "                -g4 bi-Equi+Geom1            -p4 Steep*\n"
+      "                -g5 bi-Equi+Geom8            -p5 Weight\n"
+      ;
 
    std::cerr << "usage: " << argv[0] << " " << usage << std::endl;
    exit(0);
@@ -398,9 +397,9 @@ void get_scalers(SPxScaler*& prescaler,
    }
 
    MSG_INFO1( spxout << "IEXAMP19 "
-                     << ((prescaler != 0) ? prescaler->getName() : "no ") 
+                     << ((prescaler != 0) ? prescaler->getName() : "no") 
                      << " / "
-                     << ((postscaler != 0) ? postscaler->getName() : "no ")
+                     << ((postscaler != 0) ? postscaler->getName() : "no")
                      << " scaling" << std::endl; )
 }
 //------------------------------------------------------------------------
@@ -581,6 +580,7 @@ void print_solution_and_status(const MySoPlex&      work,
             MSG_INFO1( spxout << "All other row multipliers are zero." << std::endl; )
             MSG_INFO1( spxout << "Farkas infeasibility proof: \t"; )
             MSG_INFO1( spxout << lhs << " <= "; )
+
             bool nonzerofound = false;
             for( int i = 0; i < work.nCols(); ++i )
             {
@@ -661,7 +661,6 @@ void clean_up( SPxScaler*&       prescaler,
       delete [] basisname;
 }
 
-
 //------------------------------------------------------------------------
 //    main program
 //------------------------------------------------------------------------
@@ -673,9 +672,10 @@ int main(int argc, const char* const argv[])
    "*                                                                      *\n"
    "*       SoPlex --- the Sequential object-oriented simPlex.             *\n"
    "*                  Release ";
+
    const char* banner2 = "                                       *\n"
    "*    Copyright (C) 1997-1999 Roland Wunderling                         *\n"
-   "*                  1997-2006 Konrad-Zuse-Zentrum                       *\n"
+   "*                  1997-2007 Konrad-Zuse-Zentrum                       *\n"
    "*                            fuer Informationstechnik Berlin           *\n"
    "*                                                                      *\n"
    "*  SoPlex is distributed under the terms of the ZIB Academic Licence.  *\n"
@@ -685,7 +685,7 @@ int main(int argc, const char* const argv[])
    "************************************************************************\n"
    ;
 
-   const char*               filename;
+   const char*               filename; 
    char*                     basisname      = 0;
    SPxSolver::Type           type           = SPxSolver::LEAVE;
    SPxSolver::Representation representation = SPxSolver::COLUMN;
@@ -696,256 +696,210 @@ int main(int argc, const char* const argv[])
    SPxRatioTester*           ratiotester    = 0;
    SPxScaler*                prescaler      = 0;
    SPxScaler*                postscaler     = 0;
-   NameSet                   rownames;
-   NameSet                   colnames;
-   int                       starting       = 0;
-   int                       pricing        = 4;
-   int                       ratiotest      = 2;
-   int                       scaling        = 3;
-   int                       simplifying    = 1;
-   Real                      timelimit      = -1.0;
-   Real                      delta          = DEFAULT_BND_VIOL;
-   Real                      epsilon        = DEFAULT_EPS_ZERO;
-   Real                      epsilon_factor = DEFAULT_EPS_FACTOR;
-   Real                      epsilon_update = DEFAULT_EPS_UPDATE;
-   int                       verbose        = SPxOut::INFO1;
-   bool                      print_solution = false;
-   bool                      print_quality  = false;
-   bool                      read_basis     = false;
-   bool                      write_basis    = false;
-   int                       precision;
-   int                       optidx;
 
-   // parse the command line
-   for(optidx = 1; optidx < argc; optidx++)
-   {
-      if (*argv[optidx] != '-')
-         break;
+   try {
+      NameSet                   rownames;
+      NameSet                   colnames;
+      int                       starting       = 0;
+      int                       pricing        = 4;
+      int                       ratiotest      = 2;
+      int                       scaling        = 3;
+      int                       simplifying    = 1;
+      Real                      timelimit      = -1.0;
+      Real                      delta          = DEFAULT_BND_VIOL;
+      Real                      epsilon        = DEFAULT_EPS_ZERO;
+      Real                      epsilon_factor = DEFAULT_EPS_FACTOR;
+      Real                      epsilon_update = DEFAULT_EPS_UPDATE;
+      int                       verbose        = SPxOut::INFO1;
+      bool                      print_solution = false;
+      bool                      print_quality  = false;
+      bool                      read_basis     = false;
+      bool                      write_basis    = false;
+      int                       precision;
+      int                       optidx;
 
-      switch(argv[optidx][1])
+      for(optidx = 1; optidx < argc; optidx++)
       {
-      case 'b' :
-         check_parameter(argv[optidx][2], argv); // use -b{r,w}, not -b
-//         if (argv[optidx][2] == 'r')
-//            read_basis = true;   // not sure if reading a basis works
-         if (argv[optidx][2] == 'w')
-            write_basis = true;
-         else
-            print_usage_and_exit(argv);
-         break;
-      case 'c' :
-         check_parameter(argv[optidx][2], argv); // use -c[0-3], not -c
-         starting = atoi(&argv[optidx][2]);
-         break;
-      case 'd' :
-         check_parameter(argv[optidx][2], argv); // use -dx, not -d
-         delta = atof(&argv[optidx][2]);
-         break;
-      case 'e':
-         type = SPxSolver::ENTER;
-         break;
-      case 'g' :
-         check_parameter(argv[optidx][2], argv); // use -g[0-5], not -g
-         scaling = atoi(&argv[optidx][2]);
-         break;
-      case 'i' :
-         update = SLUFactor::ETA;
-         break;
-      case 'l' :
-         if (argv[optidx][2] == '\0' )  // use -lx, not -l
-            print_usage_and_exit( argv );
-         timelimit = atof(&argv[optidx][2]);
-         break;
-      case 'p' :
-         check_parameter(argv[optidx][2], argv); // use -p[0-5], not -p
-         pricing = atoi(&argv[optidx][2]);
-         break;
-      case 'q' :
-         print_quality = true;
-         break;
-      case 'r' :
-         representation = SPxSolver::ROW;
-         break;
-      case 's' :
-         check_parameter(argv[optidx][2], argv); // use -s[0-4], not -s
-         simplifying = atoi(&argv[optidx][2]);
-         break;
-      case 't' :
-         check_parameter(argv[optidx][2], argv); // use -r[0-2], not -r
-         ratiotest = atoi(&argv[optidx][2]);
-         break;
-      case 'v' :
-         check_parameter(argv[optidx][2], argv); // use -v[0-5], not -v
-         if (argv[optidx][2] >= '0' && argv[optidx][2] <= '9')
-            verbose = argv[optidx][2] - '0';
-         break;
-      case 'V' :
-         std::cout << banner1 << SOPLEX_VERSION/100 << ".";
-         std::cout << (SOPLEX_VERSION % 100)/10 << ".";
-         std::cout << SOPLEX_VERSION % 10 << banner2 << std::endl;
-         exit(0);
-      case 'x' :
-         print_solution = true;
-         break;
-      case 'z' :
-         check_parameter(argv[optidx][2], argv); // must not be empty
-         check_parameter(argv[optidx][3], argv); // must not be empty
-         switch(argv[optidx][2])
+         if (*argv[optidx] != '-')
+            break;
+
+         switch(argv[optidx][1])
          {
+         case 'b' :
+            check_parameter(argv[optidx][2], argv); // use -b{r,w}, not -b
+            if (argv[optidx][2] == 'r')
+               read_basis = true;
+            if (argv[optidx][2] == 'w')
+               write_basis = true;
+            break;
+         case 'c' :
+            check_parameter(argv[optidx][2], argv); // use -c[0-3], not -c
+            starting = atoi(&argv[optidx][2]);
+            break;
+         case 'd' :
+            check_parameter(argv[optidx][2], argv); // use -dx, not -d
+            delta = atof(&argv[optidx][2]);
+            break;
+         case 'e':
+            type = SPxSolver::ENTER;
+            break;
+         case 'g' :
+            check_parameter(argv[optidx][2], argv); // use -g[0-5], not -g
+            scaling = atoi(&argv[optidx][2]);
+            break;
+         case 'i' :
+            update = SLUFactor::ETA;
+            break;
+         case 'l' :
+            if (argv[optidx][2] == '\0' )  // use -lx, not -l
+               print_usage_and_exit( argv );
+            timelimit = atof(&argv[optidx][2]);
+            break;
+         case 'p' :
+            check_parameter(argv[optidx][2], argv); // use -p[0-5], not -p
+            pricing = atoi(&argv[optidx][2]);
+            break;
+         case 'q' :
+            print_quality = true;
+            break;
+         case 'r' :
+            representation = SPxSolver::ROW;
+            break;
+         case 's' :
+            check_parameter(argv[optidx][2], argv); // use -s[0-4], not -s
+            simplifying = atoi(&argv[optidx][2]);
+            break;
+         case 't' :
+            check_parameter(argv[optidx][2], argv); // use -r[0-2], not -r
+            ratiotest = atoi(&argv[optidx][2]);
+            break;
+         case 'v' :
+            check_parameter(argv[optidx][2], argv); // use -v[0-5], not -v
+            if (argv[optidx][2] >= '0' && argv[optidx][2] <= '9')
+               verbose = argv[optidx][2] - '0';
+            break;
+         case 'V' :
+            std::cout << banner1 << SOPLEX_VERSION/100 << ".";
+            std::cout << (SOPLEX_VERSION % 100)/10 << ".";
+            std::cout << SOPLEX_VERSION % 10 << banner2 << std::endl;
+            exit(0);
+         case 'x' :
+            print_solution = true;
+            break;
          case 'z' :
-            epsilon = atof(&argv[optidx][3]);
+            check_parameter(argv[optidx][2], argv); // must not be empty
+            check_parameter(argv[optidx][3], argv); // must not be empty
+            switch(argv[optidx][2])
+            {
+            case 'z' :
+               epsilon = atof(&argv[optidx][3]);
+               break;
+            case 'f' :
+               epsilon_factor = atof(&argv[optidx][3]);
+               break;
+            case 'u' :
+               epsilon_update = atof(&argv[optidx][3]);
+               break;
+            default :
+               print_usage_and_exit( argv );
+            }
             break;
-         case 'f' :
-            epsilon_factor = atof(&argv[optidx][3]);
-            break;
-         case 'u' :
-            epsilon_update = atof(&argv[optidx][3]);
-            break;
+         case 'h' :
+         case '?' :
+            std::cout << banner1 << SOPLEX_VERSION/100 << ".";
+            std::cout << (SOPLEX_VERSION % 100)/10 << ".";
+            std::cout << SOPLEX_VERSION % 10 << banner2 << std::endl;
+            //lint -fallthrough
          default :
             print_usage_and_exit( argv );
          }
-         break;
-      case 'h' :
-      case '?' :
-         std::cout << banner1 << SOPLEX_VERSION/100 << ".";
-         std::cout << (SOPLEX_VERSION % 100)/10 << ".";
-         std::cout << SOPLEX_VERSION % 10 << banner2 << std::endl;
-         //lint -fallthrough
-      default :
+      }
+
+      // enough arguments?
+      if ((argc - optidx) < 1 + (read_basis ? 1 : 0) + (write_basis ? 1 : 0))
          print_usage_and_exit( argv );
-      }
-   }
+      filename  = argv[optidx];
 
-   // enough arguments?
-   if ((argc - optidx) < 1 + (read_basis ? 1 : 0) + (write_basis ? 1 : 0))
-      print_usage_and_exit( argv );
-   filename  = argv[optidx];
+      ++optidx;
 
-   ++optidx;
+      if ( read_basis || write_basis )
+         basisname = strcpy( new char[strlen(argv[optidx]) + 1], argv[optidx] ); 
 
-   if ( read_basis || write_basis )
-      basisname = strcpy( new char[strlen(argv[optidx]) + 1], argv[optidx] ); 
+      // set some algorithm parameters
+      Param::setEpsilon             ( epsilon );
+      Param::setEpsilonFactorization( epsilon_factor );
+      Param::setEpsilonUpdate       ( epsilon_update );
+      Param::setVerbose             ( verbose );
 
-   // Set some output parameters
-   std::cout.setf( std::ios::scientific | std::ios::showpoint );
-   std::cerr.setf( std::ios::scientific | std::ios::showpoint );
-   precision = int(-log10(delta)) + 1;
+      // Set the output precision.
+      precision = int(-log10(delta)) + 1;
 
-#ifdef  SEND_ALL_OUTPUT_TO_FILES
-   // Example of redirecting output to different files.
-   // Default is cerr for errors and warnings, cout for everything else. 
-   std::ofstream  myerrstream ( "errwarn.txt" );
-   std::ofstream  myinfostream( "infos.txt" );
-   redirect_output(myerrstream, myinfostream);
+      std::cout.setf( std::ios::scientific | std::ios::showpoint );
+      std::cerr.setf( std::ios::scientific | std::ios::showpoint );
+
+#ifdef SEND_ALL_OUTPUT_TO_FILES
+      // Example of redirecting output to different files.
+      // Default is cerr for errors and warnings, cout for everything else. 
+      std::ofstream  myerrstream ( "errwarn.txt" );
+      std::ofstream  myinfostream( "infos.txt" );
+      redirect_output(myerrstream, myinfostream);
 #endif
 
-   // set some algorithm parameters
-   Param::setEpsilon             ( epsilon );
-   Param::setVerbose             ( verbose );
-   Param::setEpsilonFactorization( epsilon_factor );
-   Param::setEpsilonUpdate       ( epsilon_update );
+      // create an instance of MySoPlex
+      MySoPlex work( type, representation );
+      work.setUtype             ( update );
+      work.setDelta             ( delta  );
+      work.setTerminationTime   ( timelimit );
+      print_algorithm_parameters( work, representation, update );
+      assert( work.isConsistent() );
 
-   // create an instance of MySoPlex
-   MySoPlex work(type, representation);
-   work.setUtype                 ( update );
-   work.setDelta                 ( delta  );
-   work.setTerminationTime       ( timelimit );
-   print_algorithm_parameters    ( work, representation, update );
-   assert(work.isConsistent());
+      // set pricer, starter, simplifier, and ratio tester
+      work.setPricer    ( pricer      = get_pricer      (pricing) );
+      work.setStarter   ( starter     = get_starter     (starting) );
+      work.setSimplifier( simplifier  = get_simplifier  (simplifying) );
+      work.setTester    ( ratiotester = get_ratio_tester(ratiotest) );
+      assert(work.isConsistent());
 
-   // set pricer, starter, simplifier, and ratio tester
-   work.setPricer    ( pricer      = get_pricer      (pricing) );
-   work.setStarter   ( starter     = get_starter     (starting) );
-   work.setSimplifier( simplifier  = get_simplifier  (simplifying) );
-   work.setTester    ( ratiotester = get_ratio_tester(ratiotest) );
-   assert(work.isConsistent());
+      // set pre- and postscaler
+      get_scalers(prescaler, postscaler, scaling, representation);
+      work.setPreScaler (prescaler);
+      work.setPostScaler(postscaler);
+      assert(work.isConsistent());
 
-   // set pre- and postscaler
-   get_scalers(prescaler, postscaler, scaling, representation);
-   work.setPreScaler (prescaler);
-   work.setPostScaler(postscaler);
-   assert(work.isConsistent());
+      // read the LP from an input file (.lp or .mps)
+      read_input_file(work, filename, rownames, colnames);
 
-   // read the LP from an input file (.lp or .mps)
-   read_input_file(work, filename, rownames, colnames);
+      // read a basis file if specified
+      if (read_basis)
+         read_basis_file(work, basisname, rownames, colnames);
 
-   // read a basis file if specified
-   if (read_basis)
-      read_basis_file(work, basisname, rownames, colnames);
+      // solve the LP
+      solve_LP(work);
 
-   // solve the LP
-   solve_LP(work);
-   
-   // print solution, status, infeasibility system,...
-   print_solution_and_status(work, rownames, colnames, 
-                             precision, print_quality,
-                             print_solution, write_basis,
-                             basisname);
+      // print solution, status, infeasibility system,...
+      print_solution_and_status(work, rownames, colnames, 
+                                precision, print_quality,
+                                print_solution, write_basis,
+                                basisname);
 
+      // clean up
+      clean_up( prescaler, postscaler, simplifier, 
+                starter, pricer, ratiotester, basisname );
 
-   // clean up
-   clean_up( prescaler, postscaler, simplifier, 
-             starter, pricer, ratiotester, basisname );
-
-   assert( pricer == 0 );
-
-   return 0;
+      return 0;
+   }
+   catch(SPxException& x) {
+      std::cout << "exception caught : " << x.what() << std::endl;
+      delete [] basisname;
+      if(simplifier)
+         delete simplifier;
+      delete starter;
+      delete pricer;
+      delete ratiotester;
+      delete prescaler;
+      delete postscaler;
+   }
 }
-
-//---------------------------------------------------------------------
-//  Example of constructing an LP using the callable library
-//---------------------------------------------------------------------
-
-#if 0
-   SoPlex  mysoplex;
-   NameSet rownames;
-   NameSet colnames;
-
-   const int num_rows = 5;
-   const int num_cols = 5;
-
-   // for all rows 
-   for (int i = 0; i < num_rows; ++i) {
-
-      // create a row and add the coefficient of each column
-      DSVector dsvec(num_cols);
-      for ( int j = 0; j < num_cols; ++j ) {
-         const double mycoeff = (i+1) * (j+1);
-         dsvec.add(j, mycoeff);
-      }
-
-      // create a row and add it to the LP
-      const double myrhs = 10;
-      LPRow row(-infinity, dsvec, myrhs);  // -infinity <= row <= myrhs
-      mysoplex.addRow( row );
-
-      // set the name of the row
-      char myrowname[ 20 ];
-      sprintf(myrowname, "row%d", i);
-      rownames.add( myrowname );
-   }
-
-   // for all columns
-   for (int j = 0; j < num_cols; ++j) {
-
-      // set the name of the column
-      char mycolname[ 20 ];
-      sprintf(mycolname, "y%d", j);
-      colnames.add( mycolname );
-
-      // set the objective coefficient
-      // (soplex always maximizes; multiply by -1 for minimizing)
-      const double myobjcoeff = j+1;
-      mysoplex.changeObj(j, myobjcoeff);
-   }
-
-   // bound the first variable (index 0) to 1 <= x <= 2
-   mysoplex.changeLower(0, 1);
-   mysoplex.changeUpper(0, 2);
-
-   // dump the LP to stdout
-   mysoplex.writeLPF(std::cout, &rownames, &colnames, NULL);
-#endif
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:

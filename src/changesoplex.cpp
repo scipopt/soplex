@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: changesoplex.cpp,v 1.29 2007/08/27 15:35:08 bzfberth Exp $"
+#pragma ident "@(#) $Id: changesoplex.cpp,v 1.30 2007/10/19 15:44:24 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -24,6 +24,7 @@
 #include "spxsolver.h"
 #include "spxpricer.h"
 #include "spxratiotester.h"
+#include "exceptions.h"
 
 namespace soplex
 {
@@ -708,7 +709,7 @@ static void changeLowerStatus(
       stat = basis.dualColStatus(i);
       break;
    default:
-      assert(false);
+      throw SPxInternalCodeException("XCHANG01 This should never happen.");
    }
    MSG_DEBUG( spxout << " -> " << stat << std::endl; )
 }
@@ -784,7 +785,7 @@ static void changeUpperStatus(
       stat = basis.dualColStatus(i);
       break;
    default:
-      assert(false);
+      throw SPxInternalCodeException("XCHANG02 This should never happen.");
    }
    MSG_DEBUG( spxout << " -> " << stat << std::endl; );
 }
@@ -875,7 +876,7 @@ static void changeLhsStatus(
       stat = basis.dualRowStatus(i);
       break;
    default:
-      assert(false);
+      throw SPxInternalCodeException("XCHANG03 This should never happen.");
    }
    MSG_DEBUG( spxout << " -> " << stat << std::endl; )
 }
@@ -945,7 +946,7 @@ static void changeRhsStatus(
       stat = basis.dualRowStatus(i);
       break;
    default:
-      assert(false);
+      throw SPxInternalCodeException("XCHANG04 This should never happen.");
    }
    MSG_DEBUG( spxout << " -> " << stat << std::endl; )
 }

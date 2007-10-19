@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.38 2007/08/27 15:35:08 bzfberth Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.39 2007/10/19 15:44:24 bzforlow Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -29,6 +29,7 @@
 #include "datakey.h"
 #include "spxalloc.h"
 #include "message.h"
+#include "exceptions.h"
 
 namespace soplex
 {
@@ -481,7 +482,6 @@ public:
       *lastfree = -newmax - 1;
 
       themax = newmax;
-
       spx_realloc(theitem, themax);
       spx_realloc(thekey,  themax);
 
@@ -528,9 +528,18 @@ public:
       
    {
       firstfree = -themax - 1;
-
+      
       spx_alloc(theitem, themax);
-      spx_alloc(thekey, themax);
+      
+      try
+      {
+         spx_alloc(thekey, themax);
+      }
+      catch(SPxMemoryException& x)
+      {
+         spx_free(theitem);
+         throw;
+      }
    }
    
    /// copy constructor.
@@ -546,7 +555,15 @@ public:
          : old.firstfree;
 
       spx_alloc(theitem, themax);
-      spx_alloc(thekey, themax);
+      try
+      {
+         spx_alloc(thekey, themax);
+      }
+      catch(SPxMemoryException& x)
+      {
+         spx_free(theitem);
+         throw;
+      }
 
       memcpy(theitem, old.theitem, themax * sizeof(*theitem));
       memcpy(thekey,  old.thekey,  themax * sizeof(*thekey));
@@ -595,8 +612,10 @@ public:
    /// destructor.
    ~DataSet()
    {
-      spx_free(theitem);
-      spx_free(thekey);
+      if(theitem)
+         spx_free(theitem);
+      if(thekey)
+         spx_free(thekey);
    }
    //@}
 };

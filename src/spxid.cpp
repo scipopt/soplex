@@ -13,12 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxid.cpp,v 1.5 2007/08/27 15:35:11 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxid.cpp,v 1.6 2007/10/19 15:44:25 bzforlow Exp $"
 
 #include <stdlib.h>
 #include <assert.h>
 
 #include "spxid.h"
+#include "exceptions.h"
 
 namespace soplex
 {
@@ -64,7 +65,7 @@ std::ostream& operator<<(std::ostream& os, const SPxId& id)
       os << "Invalid ";
       break;
    default :
-      assert(false);
+      throw SPxInternalCodeException("XSPXID01 This should never happen.");
    }
    os << id.idx << " (" << id.info << ")";
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dsvector.cpp,v 1.18 2007/08/27 15:35:08 bzfberth Exp $"
+#pragma ident "@(#) $Id: dsvector.cpp,v 1.19 2007/10/19 15:44:24 bzforlow Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -38,7 +38,8 @@ DSVector::DSVector(int n)
 
 DSVector::~DSVector()
 {
-   spx_free(theelem);
+   if(theelem)
+      spx_free(theelem);
 }
 
 DSVector::DSVector(const Vector& vec)

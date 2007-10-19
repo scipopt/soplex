@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.43 2007/08/27 15:35:11 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.44 2007/10/19 15:44:25 bzforlow Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -78,8 +78,8 @@ class SPxLP : protected LPRowSet, protected LPColSet
    friend class SPxGeometSC;
    friend class SPxMainSM;
    
-   /// output operator.
-   friend std::ostream& operator<<(std::ostream& os, const SPxLP& lp);
+//   /// output operator, replaced by dumpFile()/writeLPF()
+//   friend std::ostream& operator<<(std::ostream& os, const SPxLP& lp);
 
 public:
 
@@ -468,59 +468,53 @@ public:
 
    /// clears the LP.
    virtual void clear();
-
    //@}
 
 
    //--------------------------
    /**@name IO */
    //@{
-   /// Reads a file, determining the file type (mps or lp) automatically.
-   virtual bool readFile(const char* filename, NameSet* rowNames = 0, 
-      NameSet* colNames = 0, DIdxSet* intVars = 0);
+   /// reads a file from a file.
+   virtual bool readFile( const char*  filename, 
+                          NameSet*     rowNames = 0, 
+                          NameSet*     colNames = 0, 
+                          DIdxSet*     intVars  = 0 );
 
-   /** Reads a file from input stream \p in, 
-       determining the file type (mps or lp) automatically.
-    */
-   virtual bool read (std::istream& in, 
-      NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
+   /// reads a file from input stream \p in.
+   virtual bool read( std::istream& in, 
+                      NameSet*      rowNames = 0, 
+                      NameSet*      colNames = 0, 
+                      DIdxSet*      intVars  = 0 );
 
-   /** Reads a file in LP format from \p in. If \p rowNames and \p
-    *  colNames are not \c NULL, they are filled with the names from the
-    *  input, or with default names if no names are given in the input. 
-    *  If \p intVars is not \c NULL, it is filled with the indeces of the
-    *  integer variables (only for I/O purposes).
-    */
-   virtual bool readLPF (std::istream& in, 
-      NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
-
-   /** Reads a file in MPS format from \p in. If \p rowNames and \p
-    *  colNames are not \c NULL, they are filled with the names from the
-    *  input. If \p intVars is not \c NULL, it is filled with the indeces of 
-    *  the integer variables (only for I/O purposes).
-    */
-   virtual bool readMPS(std::istream& in, 
-      NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
-
-   /** Writes a file in MPS format to \p out. If \p rowNames and \p
-    *  colNames are \c NULL, default names are used for the constraints and
-    *  variables. If \p intVars is not \c NULL, the variables contained in
-    *  it are marked as integer in the output.
-    */
-   virtual void writeMPS(std::ostream& out, 
-      const NameSet* rowNames, const NameSet* colNames, 
-      const DIdxSet* p_intvars = 0) const;
+   /// reads a file in LP format from \p in.
+   virtual bool readLPF( std::istream& in, 
+                         NameSet*      rowNames = 0, 
+                         NameSet*      colNames = 0, 
+                         DIdxSet*      intVars  = 0 );
 
    /** Writes a file in LP format to \p out. If \p rowNames and \p
     *  colNames are \c NULL, default names are used for the constraints and
     *  variables. If \p intVars is not \c NULL, the variables contained in
     *  it are marked as integer in the output.
     */
-   virtual void writeLPF(std::ostream& out, 
-      const NameSet* rowNames, const NameSet* colNames, 
-      const DIdxSet* p_intvars = 0) const;
-   /// Wrapper method for writeLPF with default names
-   virtual void dumpFile(const char* fname);
+   virtual void writeLPF( std::ostream&  out, 
+                          const NameSet* rowNames, 
+                          const NameSet* colNames, 
+                          const DIdxSet* p_intvars = 0 ) const;
+
+   /// reads a file in MPS format from \p in.
+   virtual bool readMPS( std::istream& in, 
+                         NameSet*      rowNames = 0, 
+                         NameSet*      colNames = 0, 
+                         DIdxSet*      intVars  = 0 );
+
+   virtual void writeMPS( std::ostream&  out, 
+                          const NameSet* rowNames, 
+                          const NameSet* colNames, 
+                          const DIdxSet* p_intvars = 0 ) const;
+
+   /// dump loaded LP to \p filename in LPF format.
+   virtual void dumpFile(const char* filename) const;
    //@}
 
 

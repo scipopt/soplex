@@ -1,7 +1,7 @@
-#--- $Id: make.linux.alpha.gnu.opt,v 1.6 2007/08/17 14:14:08 bzfpfend Exp $
+#--- $Id: make.linux.alpha.gnu.opt,v 1.7 2007/10/19 15:44:24 bzforlow Exp $
 CXX	=	g++
 CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS
-CXXFLAGS=	-O3 -mcpu=ev6 -fno-exceptions \
+CXXFLAGS=	-O3 -mcpu=ev6  \
 		-ffast-math -fforce-addr -funroll-loops
 LDFLAGS	=	-lm
 ARFLAGS	=	crs

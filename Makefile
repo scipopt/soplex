@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.83 2007/08/30 13:24:46 bzfpfend Exp $
+# $Id: Makefile,v 1.84 2007/10/19 15:44:23 bzforlow Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -49,7 +49,7 @@ LIBOFLAGS	=
 LDFLAGS		=	-lm
 ARFLAGS		=	cr
 DFLAGS		=	-MM
-VFLAGS		=	--tool=memcheck --leak-check=yes --show-reachable=yes
+VFLAGS		=	--tool=memcheck --leak-check=yes --show-reachable=yes #--gen-suppressions=yes
 
 SRCDIR		=	src
 BINDIR		=	bin
@@ -66,17 +66,19 @@ LIBOBJ		= 	changesoplex.o didxset.o \
 			spxdefines.o spxdesc.o spxdevexpr.o \
 			spxfastrt.o spxfileio.o spxgeometsc.o \
 			spxharrisrt.o spxhybridpr.o spxid.o spxio.o \
-			spxlp.o spxlpfread.o spxlpfwrite.o spxmainsm.o \
-			spxmpsread.o spxmpswrite.o spxout.o spxparmultpr.o \
-			spxquality.o spxscaler.o spxshift.o spxsolver.o \
-			spxsolve.o spxstarter.o spxsteeppr.o spxsumst.o \
-			spxvecs.o spxvectorst.o spxweightpr.o spxweightst.o \
+			spxlp.o spxlpfread.o spxmainsm.o spxmpsread.o \
+			spxmpswrite.o spxlpfwrite.o \
+			spxout.o spxparmultpr.o spxquality.o \
+			spxscaler.o spxshift.o spxsolver.o spxsolve.o \
+			spxstarter.o spxsteeppr.o spxsumst.o spxvecs.o \
+			spxvectorst.o spxweightpr.o spxweightst.o \
 			ssvector.o svector.o svset.o timer.o \
 			tracemethod.o unitvector.o update.o updatevector.o \
 			vector.o vsolve.o \
 			gzstream.o
 BINOBJ		=	example.o
 CHANGEBINOBJ	=	exercise_LP_changes.o
+EXCEPTIONBINOBJ	=	status_exception_test.o
 REPOSIT		=	# template repository, explicitly empty  #spxproof.o 
 
 BASE		=	$(OSTYPE).$(ARCH).$(COMP).$(OPT)
@@ -107,6 +109,8 @@ BINNAME		=	$(NAME)-$(VERSION).$(BASE)
 LIBNAME		=	$(NAME)-$(VERSION).$(BASE)
 BINFILE		=	$(BINDIR)/$(BINNAME)
 CHANGEBINFILE   =	$(BINDIR)/exercise_LP_changes.$(BASE)
+EXCEPTIONBINFILE=	$(BINDIR)/status_exception_test.$(BASE)
+TESTEXBINFILE	=	$(BINDIR)/mem_exception_test.$(BASE)
 LIBFILE		=	$(LIBDIR)/lib$(LIBNAME).$(LIBEXT)
 LIBLINK		=	$(LIBDIR)/lib$(NAME).$(BASE).$(LIBEXT)
 BINLINK		=	$(BINDIR)/$(NAME).$(BASE)
@@ -120,7 +124,9 @@ OBJDIR		=	obj/O.$(BASE)
 BINOBJDIR	=	$(OBJDIR)/bin
 LIBOBJDIR	=	$(OBJDIR)/lib
 BINOBJFILES	=	$(addprefix $(BINOBJDIR)/,$(BINOBJ))
+TESTEXBINOBJFILES	=	$(addprefix $(BINOBJDIR)/,$(BINOBJ))
 CHANGEBINOBJFILES =	$(addprefix $(BINOBJDIR)/,$(CHANGEBINOBJ))
+EXCEPTIONBINOBJFILES =	$(addprefix $(BINOBJDIR)/,$(EXCEPTIONBINOBJ))
 LIBOBJFILES	=	$(addprefix $(LIBOBJDIR)/,$(LIBOBJ))
 BINSRC		=	$(addprefix $(SRCDIR)/,$(BINOBJ:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
@@ -161,9 +167,19 @@ $(LIBFILE):	$(LIBDIR) $(LIBOBJDIR) touchexternal $(LIBOBJFILES)
 		$(AR) $(ARFLAGS) $@ $(LIBOBJFILES) $(REPOSIT)
 		$(RANLIB) $@
 
+# build test binaries
+$(TESTEXBINFILE):	_$(BINDIR) _$(BINOBJDIR) $(LIBFILE) $(TESTEXBINOBJFILES)
+			$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOBJFILES) \
+			-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+
+
 $(CHANGEBINFILE): $(BINDIR) $(BINOBJDIR) $(LIBFILE) $(CHANGEBINOBJFILES)
 		@echo "-> linking $@"
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(CHANGEBINOBJFILES) \
+		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+
+$(EXCEPTIONBINFILE): $(BINDIR) $(BINOBJDIR) $(LIBFILE) $(EXCEPTIONBINOBJFILES)
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(EXCEPTIONBINOBJFILES) \
 		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
 
 lint:		$(BINSRC) $(LIBSRC)
@@ -175,12 +191,23 @@ doc:
 
 change_exerciser: $(CHANGEBINFILE)
 
+status_exception_test: $(EXCEPTIONBINFILE)
+		cd bin; \
+		../$(EXCEPTIONBINFILE)
+
+all:		$(BINFILE) $(CHANGEBINFILE)
+
 check:		#$(BINFILE)
 		cd check; ./check.sh $(TEST).test ../$(BINFILE) '$(ALGO)' $(LIMIT)
 
 valgrind-check:	$(BINFILE)
 		cd check; \
 		./valgrind.sh $(TEST).test ../$(BINFILE) '$(ALGO)' '$(LIMIT)' \
+		"$(VALGRIND) $(VFLAGS)" $(VSUPPNAME)
+
+memory_exception_test: $(BINFILE)
+		cd check; \
+		./exception.sh $(TEST).test ../$(BINFILE) '$(ALGO)' '$(LIMIT)' \
 		"$(VALGRIND) $(VFLAGS)" $(VSUPPNAME)
 
 clean:

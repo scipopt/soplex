@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.97 2007/08/27 15:35:12 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.98 2007/10/19 15:44:25 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -26,6 +26,7 @@
 #include "spxratiotester.h"
 #include "spxstarter.h"
 #include "spxout.h"
+#include "exceptions.h"
 
 #define MAXCYCLES 400
 
@@ -90,25 +91,23 @@ SPxSolver::Status SPxSolver::solve()
    Real  newDelta;
    Real  minShift = infinity;
    int   cycleCount = 0;
-
    if (dim() <= 0 && coDim() <= 0) // no problem loaded
-      return NO_PROBLEM;
+      throw SPxStatusException("XSOLVE01 No Problem loaded");
 
    if (slinSolver() == 0) // linear system solver is required.
-      return NO_SOLVER;
+      throw SPxStatusException("XSOLVE02 No Solver loaded");
 
    if (thepricer == 0) // pricer is required.
-      return NO_PRICER;
+      throw SPxStatusException("XSOLVE03 No Pricer loaded");
 
    if (theratiotester == 0) // ratiotester is required.
-      return NO_RATIOTESTER;
+      throw SPxStatusException("XSOLVE04 No RatioTester loaded");
 
    theTime.reset();
    theTime.start();
 
    m_numCycle = 0;
    iterCount  = 0;
-
    if (!isInitialized())
    {
       /*
@@ -219,7 +218,6 @@ SPxSolver::Status SPxSolver::solve()
                // BH 2005-12-15: For some reason we must do this even if lastUpdate() == 0,
                // otherwise something goes wrong, e.g. in instances of the siemens test set.
                factorize();
-
                // Inna/Tobi: if the factorization was found out to be singular, we have to quit
                if (SPxBasis::status() < SPxBasis::REGULAR)
                {
@@ -233,6 +231,7 @@ SPxSolver::Status SPxSolver::solve()
                if (!enterId.isValid())
                   break;
             }
+
             enter(enterId);
             assert((testBounds(), 1));
             thepricer->entered4(lastEntered(), lastIndex());
@@ -352,7 +351,6 @@ SPxSolver::Status SPxSolver::solve()
                // BH 2005-12-15: For some reason we must do this even if lastUpdate() == 0,
                // otherwise something goes wrong, e.g. in instances of the siemens test set.
                factorize();
-
                // Inna/Tobi: if the factorization was found out to be singular, we have to quit
                if (SPxBasis::status() < SPxBasis::REGULAR)
                {
@@ -459,7 +457,10 @@ SPxSolver::Status SPxSolver::solve()
    theTime.stop();
 
    if (m_status == RUNNING)
+   {
       m_status = ERROR;
+      throw SPxStatusException("XSOLVE05 Status is still RUNNING when it shouldn't be");
+   }
 
    MSG_INFO1(
       spxout << "ISOLVE02 Finished solving (status=" << status()
@@ -733,7 +734,7 @@ SPxSolver::Status SPxSolver::getPrimal (Vector& p_vector) const
    METHOD( "SPxSolver::getPrimal()" );
 
    if (!isInitialized())
-      return NOT_INIT;
+      throw SPxStatusException("XSOLVE06 Not Initialized");
 
    if (rep() == ROW)
       p_vector = coPvec();
@@ -762,7 +763,7 @@ SPxSolver::Status SPxSolver::getPrimal (Vector& p_vector) const
          case SPxBasis::Desc::D_UNDEFINED :
             break;
          default:
-            assert(false);
+            throw SPxInternalCodeException("XSOLVE07 This should never happen.");
          }
       }
       for (int j = 0; j < dim(); ++j)
@@ -780,8 +781,11 @@ SPxSolver::Status SPxSolver::getDual (Vector& p_vector) const
 
    assert(isInitialized());
 
-   if (!isInitialized())
-      return NOT_INIT;
+   if (!isInitialized()) 
+   {
+      throw SPxStatusException("XSOLVE08 No Problem loaded");
+      // return NOT_INIT;
+   }
 
    if (rep() == ROW)
    {
@@ -808,7 +812,10 @@ SPxSolver::Status SPxSolver::getRedCost (Vector& p_vector) const
    assert(isInitialized());
 
    if (!isInitialized())
-      return NOT_INIT;
+   {
+      throw SPxStatusException("XSOLVE09 No Problem loaded");    
+      // return NOT_INIT;
+   }
 
    if (rep() == ROW)
    {
@@ -849,7 +856,10 @@ SPxSolver::Status SPxSolver::getDualfarkas (Vector& p_vector) const
    assert(isInitialized());
 
    if (!isInitialized())
-      return NOT_INIT;
+   {
+      throw SPxStatusException("XSOLVE10 No Problem loaded");
+      // return NOT_INIT;
+   }
 
    assert(SPxBasis::status() == SPxBasis::INFEASIBLE);
    p_vector.clear();
@@ -865,7 +875,10 @@ SPxSolver::Status SPxSolver::getSlacks (Vector& p_vector) const
    assert(isInitialized());
 
    if (!isInitialized())
-      return NOT_INIT;
+   {
+      throw SPxStatusException("XSOLVE11 No Problem loaded");
+      // return NOT_INIT;
+   }
 
    if (rep() == COLUMN)
    {
@@ -892,7 +905,7 @@ SPxSolver::Status SPxSolver::getSlacks (Vector& p_vector) const
          case SPxBasis::Desc::D_UNDEFINED :
             break;
          default:
-            assert(false);
+            throw SPxInternalCodeException("XSOLVE12 This should never happen.");
          }
       }
       for (i = dim() - 1; i >= 0; --i)
@@ -910,7 +923,6 @@ SPxSolver::Status SPxSolver::getSlacks (Vector& p_vector) const
 SPxSolver::Status SPxSolver::status() const
 {
    METHOD( "SPxSolver::status()" );
-
    switch( m_status )
    {
    case UNKNOWN :      
@@ -933,6 +945,8 @@ SPxSolver::Status SPxSolver::status() const
       default:
          return ERROR;
       }
+   case SINGULAR : 
+      return m_status;
    case OPTIMAL :
       assert( SPxBasis::status() == SPxBasis::OPTIMAL );
       /*lint -fallthrough*/

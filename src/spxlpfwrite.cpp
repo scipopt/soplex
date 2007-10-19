@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfwrite.cpp,v 1.4 2007/08/27 15:35:12 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxlpfwrite.cpp,v 1.5 2007/10/19 15:44:25 bzforlow Exp $"
 
 /**@file  spxlpfwrite.cpp
  * @brief Write LP as LPF format file.
@@ -273,7 +273,7 @@ void SPxLP::writeLPF( std::ostream&  p_output,          ///< output stream
    p_output << "End" << std::endl;
 }
 
-void SPxLP::dumpFile(const char* fname)
+void SPxLP::dumpFile(const char* fname) const
 {
    std::ofstream tmp(fname);
    writeLPF(tmp, NULL, NULL, NULL);

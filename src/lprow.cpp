@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprow.cpp,v 1.22 2007/08/27 15:35:09 bzfberth Exp $"
+#pragma ident "@(#) $Id: lprow.cpp,v 1.23 2007/10/19 15:44:25 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -23,6 +23,7 @@
 
 #include "spxdefines.h"
 #include "lprow.h"
+#include "exceptions.h"
 
 namespace soplex
 {
@@ -56,9 +57,9 @@ void LPRow::setType( LPRow::Type p_type )
    case RANGE:
       MSG_ERROR( spxout << "ELPROW01 RANGE not supported in LPRow::setType()" 
                         << std::endl; )
-      assert(false);
+      throw SPxInternalCodeException("XLPROW01 This should never happen.");
    default:
-      assert(false);
+      throw SPxInternalCodeException("XLPROW02 This should never happen.");
    }
 }
 
@@ -87,7 +88,7 @@ LPRow::LPRow(const SVector& p_rowVector, LPRow::Type p_type, Real p_value)
       right = infinity;
       break;
    default:
-      assert(false);
+      throw SPxInternalCodeException("XLPROW03 This should never happen.");
    }
 }
 } // namespace soplex

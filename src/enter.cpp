@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.38 2007/08/27 15:35:08 bzfberth Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.39 2007/10/19 15:44:24 bzforlow Exp $"
 
 // #define DEBUGGING 1
 
@@ -25,6 +25,7 @@
 #include "soplex.h"
 #include "spxratiotester.h"
 #include "spxout.h"
+#include "exceptions.h"
 
 namespace soplex
 {
@@ -383,7 +384,7 @@ void SPxSolver::getEnterVals
          }
          break;
       default:
-         assert(false);
+         throw SPxInternalCodeException("XENTER01 This should never happen.");
       }
       MSG_DEBUG( spxout << "DENTER03 SPxSolver::getEnterVals() : col " << enterIdx
                         << ": " << enterStat
@@ -448,7 +449,7 @@ void SPxSolver::getEnterVals
       case SPxBasis::Desc::P_FREE :
          assert( rep() == COLUMN );
 #if 1
-         assert(false);
+         throw SPxInternalCodeException("XENTER02 This should never happen.");
 #else
          MSG_ERROR( spxout << "EENTER99 ERROR: not yet debugged!" << std::endl; )
          enterPric = (*theCoPvec)[enterIdx];
@@ -515,7 +516,7 @@ void SPxSolver::getEnterVals
          break;
 
       default:
-         assert(false);
+         throw SPxInternalCodeException("XENTER03 This should never happen.");
       }
       MSG_DEBUG( spxout << "DENTER05 SPxSolver::getEnterVals() : row " 
                         << enterIdx << ": " << enterStat
@@ -547,7 +548,7 @@ void SPxSolver::getEnterVals2
       {
       case SPxBasis::Desc::P_FIXED :
          assert(rep() == ROW);
-         assert(false);
+         throw SPxInternalCodeException("XENTER04 This should never happen.");
          break;
       case SPxBasis::Desc::P_ON_UPPER :
          assert(rep() == ROW);
@@ -564,7 +565,7 @@ void SPxSolver::getEnterVals2
       case SPxBasis::Desc::P_FREE :
          assert(rep() == ROW);
 #if 1
-         assert(false);
+         throw SPxInternalCodeException("XENTER05 This should never happen.");
 #else
          MSG_ERROR( spxout << "EENTER98 ERROR: not yet debugged!" << std::endl; )
          if ((*theCoPvec)[leaveIdx] - theLBbound[leaveIdx] <
@@ -584,7 +585,7 @@ void SPxSolver::getEnterVals2
          // primal/columnwise cases:
       case SPxBasis::Desc::D_UNDEFINED :
          assert(rep() == COLUMN);
-         assert(false);
+         throw SPxInternalCodeException("XENTER06 This should never happen.");
          break;
       case SPxBasis::Desc::D_FREE :
          assert(rep() == COLUMN);
@@ -625,7 +626,7 @@ void SPxSolver::getEnterVals2
          break;
 
       default:
-         assert(false);
+         throw SPxInternalCodeException("XENTER07 This should never happen.");
       }
       MSG_DEBUG( spxout << "DENTER06 SPxSolver::getEnterVals2(): row " 
                         << idx << ": " << leaveStat
@@ -669,7 +670,7 @@ void SPxSolver::getEnterVals2
          break;
       case SPxBasis::Desc::P_FIXED:
          assert(rep() == ROW);
-         assert(false);
+         throw SPxInternalCodeException("XENTER08 This should never happen.");
          break;
          // primal/columnwise cases:
       case SPxBasis::Desc::D_FREE :
@@ -712,7 +713,7 @@ void SPxSolver::getEnterVals2
          break;
 
       default:
-         assert(false);
+         throw SPxInternalCodeException("XENTER09 This should never happen.");
       }
       MSG_DEBUG( spxout << "DENTER07 SPxSolver::getEnterVals2(): col " 
                         << idx << ": " << leaveStat

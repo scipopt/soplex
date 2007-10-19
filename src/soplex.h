@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.70 2007/08/27 15:35:10 bzfberth Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.71 2007/10/19 15:44:25 bzforlow Exp $"
 
 /**@file  soplex.h
  * @brief preconfigured \ref soplex::SoPlex "SoPlex" LP-solver.
@@ -180,7 +180,7 @@ public:
    //---------------------------------------
    //**@name Solving and solution query */
    //@{
-   ///
+   /// @throw SPxStatusException if no problem loaded
    virtual SPxSolver::Status solve();
    ///
    virtual Real objValue() const;
@@ -202,7 +202,8 @@ public:
    /// get current basis, and return solver status.
    SPxSolver::Status getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const;
 
-   ///
+   /// @throw SPxStatusException if simplifier loaded, this is not yet
+   /// implemented
    virtual SPxSolver::Status getDualfarkas(Vector& vector) const;
 
    /// get violation of constraints.
@@ -261,8 +262,7 @@ public:
    /// write basis to \p filename in MPS format.
    virtual bool writeBasisFile ( const char*    filename, 
                                  const NameSet& rowNames, 
-                                 const NameSet& colNames ) 
-      const;
+                                 const NameSet& colNames ) const;
    //@}
 
 private:

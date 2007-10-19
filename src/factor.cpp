@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.47 2007/08/27 15:35:09 bzfberth Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.48 2007/10/19 15:44:25 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -24,6 +24,8 @@
 #include "clufactor.h"
 #include "cring.h"
 #include "spxalloc.h"
+#include "exceptions.h"
+
 
 namespace soplex
 {
@@ -1459,14 +1461,17 @@ void CLUFactor::setupRowVals()
    beg   = l.start;
    mem   = beg[vecs];
 
-   if (l.rval != 0)
-   {
+   if (l.rval)
       spx_free(l.rval);
+   if(l.ridx)
       spx_free(l.ridx);
+   if(l.rbeg)
       spx_free(l.rbeg);
+   if(l.rorig)
       spx_free(l.rorig);
+   if(l.rperm)
       spx_free(l.rperm);
-   }
+
    spx_alloc(l.rval, mem);
    spx_alloc(l.ridx, mem);
    spx_alloc(l.rbeg, thedim + 1);
@@ -1521,8 +1526,7 @@ void CLUFactor::setupRowVals()
 
 /*****************************************************************************/
 
-void CLUFactor::factor( 
-   const SVector** vec,          ///< Array of column vector pointers   
+void CLUFactor::factor(const SVector** vec,          ///< Array of column vector pointers   
    Real            threshold,    ///< pivoting threshold                
    Real            eps)          ///< epsilon for zero detection        
 {

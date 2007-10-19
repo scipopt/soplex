@@ -13,11 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.86 2007/08/27 15:35:10 bzfberth Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.87 2007/10/19 15:44:25 bzforlow Exp $"
 
 #include <iostream>
 
 #include "soplex.h"
+#include "exceptions.h"
 
 namespace soplex
 {
@@ -76,7 +77,7 @@ SPxSolver::Status SoPlex::solve()
    METHOD( "SoPlex::solve()" );
 
    if (nRows() <= 0 && nCols() <= 0) // no problem loaded
-      return SPxSolver::NO_PROBLEM;
+      throw SPxStatusException("XSOLVR01 No Problem loaded");
 
    // assume presolver did NOT solve problem
    m_vanished = false; 
@@ -105,7 +106,7 @@ SPxSolver::Status SoPlex::solve()
          case SPxSimplifier::OKAY:
             break;
          default:
-            assert(false);
+            throw SPxInternalCodeException("XRSOLVR01 This should never happen.");
          }
       }
       // should the LP be scaled after simplifing?
@@ -304,7 +305,8 @@ SPxSolver::Status SoPlex::getDualfarkas(Vector& dualfarkas) const
    if (has_simplifier())
    {
       MSG_ERROR( spxout << "ESOLVR02 Not yet implemented" << std::endl; )
-      return SPxSolver::ERROR;
+      throw SPxStatusException("XSOLVR02 Not yet implemented");
+      //      return SPxSolver::ERROR;
    }
    SPxSolver::Status stat = m_solver.getDualfarkas(dualfarkas);
 
@@ -384,12 +386,11 @@ void SoPlex::qualBoundViolation(
    }
 }
 
-bool SoPlex::writeBasisFile(
-   const char* filename, 
-   const NameSet& rowNames, 
-   const NameSet& colNames)
-   const
-{   
+bool SoPlex::writeBasisFile
+   ( const char*    filename, 
+     const NameSet& rowNames, 
+     const NameSet& colNames ) const
+{
    return m_solver.writeBasisFile(filename, rowNames, colNames);
 }
 
@@ -404,7 +405,7 @@ void SoPlex::unsimplify() const
    DVector psp_y(m_solver.nRows());  // dual solution   (prescaled simplified postscaled) 
    DVector psp_s(m_solver.nRows());  // slacks          (prescaled simplified postscaled)
    DVector psp_r(m_solver.nCols());  // reduced costs   (prescaled simplified postscaled)
-    
+
    // If there is no sensible solution, do nothing.
    const SPxSolver::Status  stat = status();
    if (stat != SPxSolver::OPTIMAL)
@@ -425,8 +426,7 @@ void SoPlex::unsimplify() const
          m_postScaler->unscaleRedCost(psp_r);
       }
    }
-   else
-   {
+   else {
       psp_x.reDim(0);
       psp_y.reDim(0);
       psp_s.reDim(0);
@@ -434,11 +434,21 @@ void SoPlex::unsimplify() const
    }
 
    // unsimplify
-   SPxSolver::VarStatus* rows = new SPxSolver::VarStatus[m_solver.nRows()];
-   SPxSolver::VarStatus* cols = new SPxSolver::VarStatus[m_solver.nCols()];
-   m_solver.getBasis(rows, cols);
+   SPxSolver::VarStatus *rows, *cols;
+   try
+   {
+      rows = new SPxSolver::VarStatus[m_solver.nRows()];
+      cols = new SPxSolver::VarStatus[m_solver.nCols()];
 
-   m_simplifier->unsimplify(psp_x, psp_y, psp_s, psp_r, rows, cols);
+      m_solver.getBasis(rows, cols);
+      m_simplifier->unsimplify(psp_x, psp_y, psp_s, psp_r, rows, cols);
+   }
+   catch(std::bad_alloc& x)
+   {
+      delete[] rows;
+      delete[] cols;
+      throw;
+   }
    
    delete[] rows;
    delete[] cols;

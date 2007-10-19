@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.29 2007/08/27 15:35:12 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.30 2007/10/19 15:44:25 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -27,6 +27,8 @@
 #include "spxratiotester.h"
 #include "spxstarter.h"
 #include "spxout.h"
+#include "exceptions.h"
+
 
 namespace soplex
 {
@@ -430,18 +432,18 @@ void SPxSolver::clearUpdateVecs(void)
 }
 
 /*
-    When the basis matrix factorization is recomputed from scratch, we also
-    recompute the vectors.
+    When the basis matrix factorization is recomputed from scratch, 
+    we also recompute the vectors.
  */
 void SPxSolver::factorize()
 {
    METHOD( "SPxSolver::factorize()" );
 
    MSG_INFO1( spxout << "ISOLVE01 " 
-                        << "iteration = "    << std::setw(8) << basis().iteration() 
-                        << "\tlastUpdate = " << std::setw(4) << basis().lastUpdate()
-                        << "\tvalue = "      << (isInitialized() ? value() : 0.0) 
-                        << std::endl; )
+                     << "iteration = "    << std::setw(8) << basis().iteration() 
+                     << "\tlastUpdate = " << std::setw(4) << basis().lastUpdate()
+                     << "\tvalue = "      << (isInitialized() ? value() : 0.0) 
+                     << std::endl; )
 
 
    SPxBasis::factorize();
@@ -473,7 +475,7 @@ void SPxSolver::factorize()
          multBaseWith(ftmp);
          ftmp -= fRhs();
          if (ftmp.length() > delta())
-            MSG_ERROR( spxout << "ESOLVE29" << iteration() << ": fVec error = " 
+            MSG_ERROR( spxout << "ESOLVE29 " << iteration() << ": fVec error = " 
                             << ftmp.length() << std::endl; )
       }
       if (ctmp.length() > delta())
@@ -483,7 +485,7 @@ void SPxSolver::factorize()
          multWithBase(ctmp);
          ctmp -= coPrhs();
          if (ctmp.length() > delta())
-            MSG_ERROR( spxout << "ESOLVE30" << iteration() << ": coPvec error = " 
+            MSG_ERROR( spxout << "ESOLVE30 " << iteration() << ": coPvec error = " 
                             << ctmp.length() << std::endl; )
       }
       if (ptmp.length() > delta())
@@ -495,23 +497,24 @@ void SPxSolver::factorize()
       if (type() == ENTER)
       {
          computeCoTest();
-         /*
-                     if(pricing() == FULL)
-                     {
-                         computePvec();
-                         computeTest();
-                     }
-         */
+//         if(pricing() == FULL)
+//         {
+//             computePvec();
+//             computeTest();
+//         }
       }
       else
       {
          computeFtest();
-         //          computePvec();
+//          computePvec();
       }
-
    }
+
    if (SPxBasis::status() == SPxBasis::SINGULAR)
+   {
       m_status = SINGULAR;
+      throw SPxStatusException("XSOLVE21 Problem is singular");
+   }
 }
 
 Real SPxSolver::maxInfeas() const
@@ -910,7 +913,7 @@ SPxSolver::basisStatusToVarStatus( SPxBasis::Desc::Status stat ) const
    default:
       MSG_ERROR( spxout << "ESOLVE26 ERROR: unknown basis status (" << stat << ")" 
                         << std::endl; )
-      assert(false);
+      throw SPxInternalCodeException("XSOLVE22 This should never happen.");
    }
    return vstat;
 }
@@ -949,7 +952,7 @@ SPxSolver::varStatusToBasisStatusRow( int row, SPxSolver::VarStatus stat ) const
    default:
       MSG_ERROR( spxout << "ESOLVE27 ERROR: unknown VarStatus (" << int(stat) << ")" 
                         << std::endl; )
-      assert(false);
+      throw SPxInternalCodeException("XSOLVE23 This should never happen.");
    }
    return rstat;
 }
@@ -988,7 +991,7 @@ SPxSolver::varStatusToBasisStatusCol( int col, SPxSolver::VarStatus stat ) const
    default:
       MSG_ERROR( spxout << "ESOLVE28 ERROR: unknown VarStatus (" << int(stat) << ")" 
                         << std::endl; )
-      assert(false);
+      throw SPxInternalCodeException("XSOLVE24 This should never happen.");
    }
    return cstat;
 }

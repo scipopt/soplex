@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.cpp,v 1.25 2007/08/27 15:35:09 bzfberth Exp $"
+#pragma ident "@(#) $Id: lprowset.cpp,v 1.26 2007/10/19 15:44:25 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -23,6 +23,7 @@
 #include "spxdefines.h"
 #include "lprowset.h"
 #include "message.h"
+#include "exceptions.h"
 
 namespace soplex
 {
@@ -155,9 +156,9 @@ void LPRowSet::setType(
    case LPRow::RANGE :
       MSG_ERROR( spxout << "EROWST01 RANGE not supported in LPRowSet::setType()" 
                         << std::endl; )
-      assert(false);
+      throw SPxInternalCodeException("XROWST01 This should never happen.");
    default:
-      assert(false);
+      throw SPxInternalCodeException("XROWST02 This should never happen.");
    }
 }
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfileio.cpp,v 1.7 2007/08/27 15:35:11 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxfileio.cpp,v 1.8 2007/10/19 15:44:25 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -40,11 +40,10 @@ bool SPxSolver::readBasisFile(
    return readBasis(file, rowNames, colNames);
 }
 
-bool SPxSolver::writeBasisFile(
-   const char*    filename, 
-   const NameSet& rowNames,
-   const NameSet& colNames)
-   const
+bool SPxSolver::writeBasisFile
+   ( const char*    filename, 
+     const NameSet& rowNames,
+     const NameSet& colNames ) const
 {
    METHOD( "SPxSolver::writeBasisFile()" );
    std::ofstream file(filename);

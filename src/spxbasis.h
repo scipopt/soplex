@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.47 2007/08/27 15:35:10 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.48 2007/10/19 15:44:25 bzforlow Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -723,7 +723,7 @@ public:
    void restoreInitialBasis();
 
    /// output basis entries.
-   void dump() const;
+   void dump();
    
 #ifndef NO_CONSISTENCY_CHECKS
    /// consistency check.

@@ -13,13 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.50 2007/08/27 15:35:10 bzfberth Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.51 2007/10/19 15:44:25 bzforlow Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
  *       This should be properly integrated and demangled.
- * @todo Does it make sense to call x.clear() when next x.altValues()
- *       is called?
+ * @todo Does is make sense, to call x.clear() when next x.altValues()
+ *       is called.
  *       
  */
 //#define DEBUGGING 1
@@ -31,6 +31,7 @@
 #include "cring.h"
 #include "spxalloc.h"
 #include "spxout.h"
+#include "exceptions.h"
 
 #ifdef DEBUGGING
 #include <stdio.h>
@@ -79,7 +80,7 @@ void SLUFactor::solveRight4update(SSVector& x, const SVector& b)
 
    x.clear();
    ssvec = b;
-   n = ssvec.size(); // might be smaller than b.size() due to near-zeroes
+   n = b.size();
    if (l.updateType == ETA)
    {
       m = vSolveRight4update(x.getEpsilon(), x.altValues(), x.altIndexMem(),
@@ -130,7 +131,7 @@ void SLUFactor::solve2right4update(
 
    if (l.updateType == ETA)
    {
-      n = ssvec.size(); // might be smaller than b.size() due to near-zeroes
+      n = b.size();
       m = vSolveRight4update2(x.getEpsilon(), x.altValues(), x.altIndexMem(), 
          ssvec.get_ptr(), sidx, n, y.get_ptr(),
          rhs.getEpsilon(), rhs.altValues(), ridx, rsize, 0, 0, 0);
@@ -163,7 +164,7 @@ void SLUFactor::solveLeft(Vector& x, const Vector& b) //const
    solveTime.start();
 
    vec = b;
-   ///@todo Why is x.clear() used here and not with solveRight() ?
+   ///@todo Why is x.clear() here used and not with solveRight() ?
    x.clear();
    CLUFactor::solveLeft(x.get_ptr(), vec.get_ptr());
 
@@ -357,32 +358,49 @@ void SLUFactor::clear()
    l.startSize   = 100;
 
    if (l.rval)
-   {
       spx_free(l.rval);
+   if(l.ridx)
       spx_free(l.ridx);
+   if(l.rbeg)
       spx_free(l.rbeg);
+   if(l.rorig)
       spx_free(l.rorig);
+   if(l.rperm)
       spx_free(l.rperm);
-   }
 
    if (l.val)
-   {
       spx_free(u.row.val);
+   if(u.row.idx)
       spx_free(u.row.idx);
+   if(u.col.idx)
       spx_free(u.col.idx);
+   if(l.val)
       spx_free(l.val);
+   if(l.idx)
       spx_free(l.idx);
+   if(l.start)
       spx_free(l.start);
+   if(l.row)
       spx_free(l.row);
-   }
-   spx_alloc(u.row.val, u.row.size);
-   spx_alloc(u.row.idx, u.row.size);
-   spx_alloc(u.col.idx, u.col.size);
 
-   spx_alloc(l.val,   l.size);
-   spx_alloc(l.idx,   l.size);
-   spx_alloc(l.start, l.startSize);
-   spx_alloc(l.row,   l.startSize);
+   // G clear() is used in constructor of SLUFactor so we have to
+   // G clean up if anything goes wrong here
+   try
+   {
+      spx_alloc(u.row.val, u.row.size);
+      spx_alloc(u.row.idx, u.row.size);
+      spx_alloc(u.col.idx, u.col.size);
+
+      spx_alloc(l.val,   l.size);
+      spx_alloc(l.idx,   l.size);
+      spx_alloc(l.start, l.startSize);
+      spx_alloc(l.row,   l.startSize);
+   }
+   catch(SPxMemoryException& x)
+   {
+      freeAll();
+      throw;
+   }
 }
 
 /** assignment used to implement operator=() and copy constructor.
@@ -600,7 +618,15 @@ SLUFactor& SLUFactor::operator=(const SLUFactor& old)
       forest = old.forest;
 
       freeAll();
-      assign(old);
+      try
+      {
+         assign(old);
+      }
+      catch(SPxMemoryException& x)
+      {
+         freeAll();
+         throw;
+      }
       assert(isConsistent());
    }
    return *this;
@@ -632,6 +658,7 @@ SLUFactor::SLUFactor()
    u.col.start = 0;
    u.col.len   = 0;
    u.col.max   = 0;
+   u.col.val   = 0;
    l.val       = 0;
    l.idx       = 0;
    l.start     = 0;
@@ -644,55 +671,61 @@ SLUFactor::SLUFactor()
 
    nzCnt  = 0;
    thedim = 0;
+   try
+   {
+      spx_alloc(row.perm, thedim);
+      spx_alloc(row.orig, thedim);
+      spx_alloc(col.perm, thedim);
+      spx_alloc(col.orig, thedim);
+      spx_alloc(diag,     thedim);
 
-   spx_alloc(row.perm, thedim);
-   spx_alloc(row.orig, thedim);
-   spx_alloc(col.perm, thedim);
-   spx_alloc(col.orig, thedim);
+      work = vec.get_ptr();
 
-   spx_alloc(diag, thedim);
+      u.row.size = 1;
+      u.row.used = 0;
+      spx_alloc(u.row.elem,  thedim);
+      spx_alloc(u.row.val,   u.row.size);
+      spx_alloc(u.row.idx,   u.row.size);
+      spx_alloc(u.row.start, thedim + 1);
+      spx_alloc(u.row.len,   thedim + 1);
+      spx_alloc(u.row.max,   thedim + 1);
 
-   work = vec.get_ptr();
+      u.row.list.idx      = thedim;
+      u.row.start[thedim] = 0;
+      u.row.max  [thedim] = 0;
+      u.row.len  [thedim] = 0;
 
-   u.row.size = 1;
-   u.row.used = 0;
-   spx_alloc(u.row.elem,  thedim);
-   spx_alloc(u.row.val,   u.row.size);
-   spx_alloc(u.row.idx,   u.row.size);
-   spx_alloc(u.row.start, thedim + 1);
-   spx_alloc(u.row.len,   thedim + 1);
-   spx_alloc(u.row.max,   thedim + 1);
+      u.col.size = 1;
+      u.col.used = 0;
+      spx_alloc(u.col.elem,  thedim);
+      spx_alloc(u.col.idx,   u.col.size);
+      spx_alloc(u.col.start, thedim + 1);
+      spx_alloc(u.col.len,   thedim + 1);
+      spx_alloc(u.col.max,   thedim + 1);
+      u.col.val = 0;
 
-   u.row.list.idx      = thedim;
-   u.row.start[thedim] = 0;
-   u.row.max[thedim]   = 0;
-   u.row.len[thedim]   = 0;
+      u.col.list.idx      = thedim;
+      u.col.start[thedim] = 0;
+      u.col.max[thedim]   = 0;
+      u.col.len[thedim]   = 0;
 
-   u.col.size = 1;
-   u.col.used = 0;
-   spx_alloc(u.col.elem,  thedim);
-   spx_alloc(u.col.idx,   u.col.size);
-   spx_alloc(u.col.start, thedim + 1);
-   spx_alloc(u.col.len,   thedim + 1);
-   spx_alloc(u.col.max,   thedim + 1);
-   u.col.val = 0;
-
-   u.col.list.idx      = thedim;
-   u.col.start[thedim] = 0;
-   u.col.max[thedim]   = 0;
-   u.col.len[thedim]   = 0;
-
-   l.size = 1;
-
-   spx_alloc(l.val, l.size);
-   spx_alloc(l.idx, l.size);
-
-   l.startSize   = 1;
-   l.firstUpdate = 0;
-   l.firstUnused = 0;
-
-   spx_alloc(l.start, l.startSize);
-   spx_alloc(l.row,   l.startSize);
+      l.size = 1;
+      
+      spx_alloc(l.val, l.size);
+      spx_alloc(l.idx, l.size);
+      
+      l.startSize   = 1;
+      l.firstUpdate = 0;
+      l.firstUnused = 0;
+      
+      spx_alloc(l.start, l.startSize);
+      spx_alloc(l.row,   l.startSize);
+   }
+   catch(SPxMemoryException& x)
+   {
+      freeAll();
+      throw;
+   }
 
    l.rval  = 0;
    l.ridx  = 0;
@@ -765,7 +798,15 @@ SLUFactor::SLUFactor(const SLUFactor& old)
    l.rorig     = 0;
    l.rperm     = 0;
 
-   assign(old);
+   try
+   {
+      assign(old);
+   }
+   catch(SPxMemoryException& x)
+   {
+      freeAll();
+      throw;
+   }
    assert(SLUFactor::isConsistent());
 }
 
@@ -773,38 +814,36 @@ void SLUFactor::freeAll()
 {
    METHOD( "SLUFactor::freeAll()" );
 
-   spx_free(row.perm);
-   spx_free(row.orig);
-   spx_free(col.perm);
-   spx_free(col.orig);
-   spx_free(u.row.elem);
-   spx_free(u.row.val);
-   spx_free(u.row.idx);
-   spx_free(u.row.start);
-   spx_free(u.row.len);
-   spx_free(u.row.max);
-   spx_free(u.col.elem);
-   spx_free(u.col.idx);
-   spx_free(u.col.start);
-   spx_free(u.col.len);
-   spx_free(u.col.max);
-   spx_free(l.val);
-   spx_free(l.idx);
-   spx_free(l.start);
-   spx_free(l.row);
-   spx_free(diag);
+   if(row.perm) spx_free(row.perm);
+   if(row.orig) spx_free(row.orig);
+   if(col.perm) spx_free(col.perm);
+   if(col.orig) spx_free(col.orig);
+   if(u.row.elem) spx_free(u.row.elem);
+   if(u.row.val) spx_free(u.row.val);
+   if(u.row.idx) spx_free(u.row.idx);
+   if(u.row.start) spx_free(u.row.start);
+   if(u.row.len) spx_free(u.row.len);
+   if(u.row.max) spx_free(u.row.max);
+   if(u.col.elem) spx_free(u.col.elem);
+   if(u.col.idx) spx_free(u.col.idx);
+   if(u.col.start) spx_free(u.col.start);
+   if(u.col.len) spx_free(u.col.len);
+   if(u.col.max) spx_free(u.col.max);
+   if(l.val) spx_free(l.val);
+   if(l.idx) spx_free(l.idx);
+   if(l.start) spx_free(l.start);
+   if(l.row) spx_free(l.row);
+  
+ if(diag) spx_free(diag);
 
-   if (u.col.val)
-      spx_free(u.col.val);
+ if (u.col.val) spx_free(u.col.val);
 
-   if (l.rval)
-   {
-      spx_free(l.rval);
-      spx_free(l.ridx);
-      spx_free(l.rbeg);
-      spx_free(l.rorig);
-      spx_free(l.rperm);
-   }
+   if (l.rval) spx_free(l.rval);
+   if(l.ridx) spx_free(l.ridx);
+   if(l.rbeg) spx_free(l.rbeg);
+   if(l.rorig) spx_free(l.rorig);
+   if(l.rperm) spx_free(l.rperm);
+  
 }
 
 SLUFactor::~SLUFactor()
@@ -904,9 +943,7 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
    for (;;)
    {
       stat = OK;
-
       factor(matrix, lastThreshold, epsilon);
-
       if (stability() >= minStability)
          break;
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: didxset.cpp,v 1.11 2007/08/27 15:35:08 bzfberth Exp $"
+#pragma ident "@(#) $Id: didxset.cpp,v 1.12 2007/10/19 15:44:24 bzforlow Exp $"
 
 #include "didxset.h"
 #include "spxalloc.h"
@@ -63,7 +63,8 @@ DIdxSet::DIdxSet(int n)
 
 DIdxSet::~DIdxSet()
 {
-   spx_free(idx);
+   if(idx)   
+      spx_free(idx);
 }
 } // namespace soplex
 

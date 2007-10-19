@@ -13,13 +13,14 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvecs.cpp,v 1.29 2007/08/27 15:35:13 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxvecs.cpp,v 1.30 2007/10/19 15:44:25 bzforlow Exp $"
 
 #include <assert.h>
 #include <iostream>
 
 #include "spxdefines.h"
 #include "spxsolver.h"
+#include "exceptions.h"
 
 namespace soplex
 {
@@ -80,7 +81,7 @@ void SPxSolver::computeFrhs()
                   MSG_ERROR( spxout << "ESVECS01 ERROR: "
                                     << "inconsistent basis must not happen!" 
                                     << std::endl; )
-                  assert(false);
+                  throw SPxInternalCodeException("XSVECS01 This should never happen.");
                }
                assert(x < infinity);
                assert(x > -infinity);
@@ -145,7 +146,7 @@ void SPxSolver::computeFrhsXtra()
             MSG_ERROR( spxout << "ESVECS02 ERROR: "
                               << "inconsistent basis must not happen!" 
                               << std::endl; )
-            assert(false);
+            throw SPxInternalCodeException("XSVECS02 This should never happen.");
          }
          assert(x < infinity);
          assert(x > -infinity);
@@ -203,7 +204,7 @@ void SPxSolver::computeFrhs1(
             MSG_ERROR( spxout << "ESVECS03 ERROR: "
                               << "inconsistent basis must not happen!" 
                               << std::endl; )
-            assert(false);
+            throw SPxInternalCodeException("XSVECS04 This should never happen.");
          }
          assert(x < infinity);
          assert(x > -infinity);
@@ -265,7 +266,7 @@ void SPxSolver::computeFrhs2(
             MSG_ERROR( spxout << "ESVECS05 ERROR: "
                               << "inconsistent basis must not happen!" 
                               << std::endl; )
-            assert(false);
+            throw SPxInternalCodeException("XSVECS05 This should never happen.");
          }
          assert(x < infinity);
          assert(x > -infinity);
