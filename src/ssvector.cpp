@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.44 2007/10/19 16:08:56 bzforlow Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.45 2007/10/19 16:27:24 bzforlow Exp $"
 
 #include <iostream>
 #include <iomanip>
@@ -320,28 +320,6 @@ SSVector& SSVector::operator*=(Real x)
    return *this;
 }
 
-// #ifdef USE_OLD // old
-// Real SSVector::maxAbs() const
-// {
-//    if (isSetup())
-//    {
-//       int* i = idx;
-//       int* end = idx + num;
-//       Real* v = val;
-//       Real absval = 0.0;
-// 
-//       for (; i < end; ++i)
-//       {
-//          Real x = v[*i];
-//          if (fabs(x) > absval)
-//             absval = fabs(x);
-//       }
-//       return absval;
-//    }
-//    else
-//       return Vector::maxAbs();
-// }
-// #else // new, not fully tested
 Real SSVector::maxAbs() const
 {
    if (isSetup())
@@ -360,7 +338,6 @@ Real SSVector::maxAbs() const
    else
       return Vector::maxAbs();
 }
-// #endif // !0
 
 Real SSVector::length2() const
 {
@@ -645,28 +622,7 @@ SSVector& SSVector::operator=(const SVector& rhs)
    return assign(rhs);
 }
 
-// #ifdef USE_OLD // old version (buggy or optimization dependent)
-// SSVector& SSVector::assign(const SVector& rhs)
-// {
-//    assert(rhs.dim() <= Vector::dim());
-// 
-//    const SVector::Element* e = rhs.m_elem;
-//    int* p = idx;
-//    int i = rhs.size();
-// 
-//    while (i--)
-//    {
-//       val[*p = e->idx] = e->val;
-//       p += ((e++)->val != 0);
-//    }
-//    num = int(p - idx);
-//    setupStatus = true;
-// 
-//    assert(isConsistent());
-//    return *this;
-// }
-// 
-// #else // new version not yet fully tested, could be put into operator=()
+// @todo implementation of SSVector::assign() could be put into operator=()
 SSVector& SSVector::assign(const SVector& rhs)
 {
    assert(rhs.dim() <= Vector::dim());
@@ -692,7 +648,6 @@ SSVector& SSVector::assign(const SVector& rhs)
 
    return *this;
 }
-// #endif
 
 SSVector& SSVector::assign2product1(const SVSet& A, const SSVector& x)
 {
