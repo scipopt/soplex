@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: solve.cpp,v 1.36 2007/08/27 15:35:10 bzfberth Exp $"
+#pragma ident "@(#) $Id: solve.cpp,v 1.37 2007/10/19 16:08:56 bzforlow Exp $"
 
 #include <assert.h>
 
@@ -22,47 +22,6 @@
 
 namespace soplex
 {
-#if 0
-void CLUFactor::solveUright(Real* wrk, Real* vec)
-{
-   METHOD( "CLUFactor::solveUright()" );
-   int i, j, r, c;
-   int *rorig, *corig;
-   int *cidx, *clen, *cbeg;
-   Real *cval;
-   Real x;
-
-   int *idx;
-   Real *val;
-
-   rorig = row.orig;
-   corig = col.orig;
-
-   cidx = u.col.idx;
-   cval = u.col.val;
-   clen = u.col.len;
-   cbeg = u.col.start;
-
-   for (i = thedim - 1; i >= 0; --i)
-   {
-      r = rorig[i];
-      c = corig[i];
-
-      wrk[c] = x = diag[r] * vec[r];
-      vec[r] = 0;
-
-      if (x != 0.0)
-      {
-         val = &cval[cbeg[c]];
-         idx = &cidx[cbeg[c]];
-         j   = clen[c];
-
-         while (j-- > 0)
-            vec[*idx++] -= x * (*val++);
-      }
-   }
-}
-#else
 
 void CLUFactor::solveUright(Real* wrk, Real* vec) const
 {
@@ -84,7 +43,6 @@ void CLUFactor::solveUright(Real* wrk, Real* vec) const
       }
    }
 }
-#endif
 
 int CLUFactor::solveUrightEps(Real* vec, int* nonz, Real eps, Real* rhs)
 {
@@ -920,33 +878,6 @@ void CLUFactor::solveLleft(Real* vec) const
       vec[lrow[i]] -= x;
    }
 #else
-#ifdef USE_OLD // old
-   int*  idx;
-   Real* val;
-   Real* rval  = l.rval;
-   int*  ridx  = l.ridx;
-   int*  rbeg  = l.rbeg;
-   int*  rorig = l.rorig;
-
-   for(int i = thedim; i--;)
-   {
-      int  r = rorig[i];
-      Real x = vec[r];
-
-      if (x != 0.0)
-      {
-         int k = rbeg[r];
-         int j = rbeg[r + 1] - k;
-         val = &rval[k];
-         idx = &ridx[k];
-         while (j-- > 0)
-         {
-            assert(l.rperm[*idx] < i);
-            vec[*idx++] -= x * *val++;
-         }
-      }
-   }
-#else // understandable
    for(int i = thedim - 1; i >= 0; --i)
    {
       int  r = l.rorig[i];
@@ -964,8 +895,6 @@ void CLUFactor::solveLleft(Real* vec) const
          }
       }
    }
-#endif
-
 #endif // WITH_L_ROWS
 }
 

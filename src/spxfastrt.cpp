@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.33 2007/08/27 15:35:11 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.34 2007/10/19 16:08:56 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -128,15 +128,10 @@ int SPxFastRT::maxDelta(
             if (u < inf)
             {
                y = u - vec[i];
-#ifdef USE_OLD
-               // x = ((1 - (y<=0)) * y + l_delta) / x;
-               x = (y - (y <= 0) * (y + delta01) + l_delta) / x;
-#else
                if (y <= 0)
                   x = (l_delta - delta01) / x;
                else
                   x = (y + l_delta) / x;
-#endif
 
                if (x < max)
                {
@@ -152,15 +147,10 @@ int SPxFastRT::maxDelta(
             if (l > -inf)
             {
                y = l - vec[i];
-#ifdef USE_OLD
-               // x = ((1 - (y>=0)) * y - l_delta) / x;
-               x = (y - (y >= 0) * (y - delta01) - l_delta) / x;
-#else
                if ( y >= 0 )
                   x = ( delta01 - l_delta ) / x;
                else
                   x = ( y - l_delta ) / x;
-#endif
 
                if (x < max)
                {
@@ -195,15 +185,10 @@ int SPxFastRT::maxDelta(
                if (u < inf)
                {
                   y = u - vec[i];
-#ifdef USE_OLD
-                  // x = ((1 - (y<=0)) * y + l_delta) / x;
-                  x = (y - (y <= 0) * (y + delta01) + l_delta) / x;
-#else
                   if (y <= 0)
                      x = (l_delta - delta01) / x;
                   else
                      x = (y + l_delta) / x;
-#endif
 
                   if (x < max)
                   {
@@ -220,15 +205,10 @@ int SPxFastRT::maxDelta(
                if (l > -inf)
                {
                   y = l - vec[i];
-#ifdef USE_OLD
-                  // x = ((1 - (y>=0)) * y - l_delta) / x;
-                  x = (y - (y >= 0) * (y - delta01) - l_delta) / x;
-#else
                   if ( y >= 0 )
                      x = ( delta01 - l_delta ) / x;
                   else
                      x = ( y - l_delta ) / x;
-#endif
 
                   if (x < max)
                   {
@@ -293,15 +273,10 @@ int SPxFastRT::minDelta(
             if (l > -inf)
             {
                y = l - vec[i];
-#ifdef USE_OLD
-               // x = ((1 - (y>=0)) * y - l_delta) / x;
-               x = (y - (y >= 0) * (y - delta01) - l_delta) / x;
-#else
                if ( y >= 0 )
                   x = ( delta01 - l_delta ) / x;
                else
                   x = ( y - l_delta ) / x;
-#endif
 
                if (x > max)
                {
@@ -317,15 +292,10 @@ int SPxFastRT::minDelta(
             if (u < inf)
             {
                y = u - vec[i];
-#ifdef USE_OLD
-               // x = ((1 - (y<=0)) * y + l_delta) / x;
-               x = (y - (y <= 0) * (y + delta01) + l_delta) / x;
-#else
                if (y <= 0)
                   x = (l_delta - delta01) / x;
                else
                   x = (y + l_delta) / x;
-#endif
 
                if (x > max)
                {
@@ -356,15 +326,10 @@ int SPxFastRT::minDelta(
                if (l > -inf)
                {
                   y = l - vec[i];
-#ifdef USE_OLD
-                  // x = ((1 - (y>=0)) * y - l_delta) / x;
-                  x = (y - (y >= 0) * (y - delta01) - l_delta) / x;
-#else
                   if ( y >= 0 )
                      x = ( delta01 - l_delta ) / x;
                   else
                      x = ( y - l_delta ) / x;
-#endif
 
                   if (x > max)
                   {
@@ -381,15 +346,10 @@ int SPxFastRT::minDelta(
                if (u < inf)
                {
                   y = u - vec[i];
-#ifdef USE_OLD
-                  // x = ((1 - (y<=0)) * y + l_delta) / x;
-                  x = (y - (y <= 0) * (y + delta01) + l_delta) / x;
-#else
                   if (y <= 0)
                      x = (l_delta - delta01) / x;
                   else
                      x = (y + l_delta) / x;
-#endif
 
                   if (x > max)
                   {

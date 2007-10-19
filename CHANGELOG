@@ -1,11 +1,11 @@
 Current Version
 
 - Introduced exceptions for all unrecoverable errors (lack of memory, 
-  no pricer, etc.) to allow a calling application to clean up.
+  no pricer, singular basis, etc.) to allow a calling application to clean up.
 
 - Split the main() method in example.cpp into several smaller methods.
 
-- Replaced SPxLP::operator<< by a method writeLPF().
+- Replaced SPxLP::operator<< by SPxLP::writeLPF().
 
 #----------------------------------------------------------------
 

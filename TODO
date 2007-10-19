@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-# $Id: TODO,v 1.94 2007/10/19 15:44:23 bzforlow Exp $
+# $Id: TODO,v 1.95 2007/10/19 16:08:55 bzforlow Exp $
 #-----------------------------------------------------------------------
 
 #-----------------------------------------------------------------------
@@ -39,10 +39,8 @@ Benjamin:
 - SOPLEX_VERSION auf string ändern (auch scip/lpi_spx.c anpassen!)
 
 Sebastian:
-- netlib/dbg
-- siemens/dbg
-- diverse "#ifdef USE_OLD"-Stellen rauswerfen (mit Sebastian)
-- SPxLP::operator<< wegwerfen
+- netlib/dbg   --> läuft auf opt42
+- siemens/dbg  --> läuft auf opt33
 - flexelint, Codesonar (mit Robert, ggf. mit Thorsten)
 - ABORT_CYCLING zur Exception umwandeln, check.awk anpassen
 

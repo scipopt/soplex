@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.cpp,v 1.43 2007/10/19 15:44:26 bzforlow Exp $"
+#pragma ident "@(#) $Id: ssvector.cpp,v 1.44 2007/10/19 16:08:56 bzforlow Exp $"
 
 #include <iostream>
 #include <iomanip>
@@ -102,104 +102,104 @@ void SSVector::setValue(int i, Real x)
    assert(isConsistent());
 }
 
-#ifdef USE_OLD // old version
-void SSVector::setup()
-{
-   if (!isSetup())
-   {
-      IdxSet::clear();
-
-      // #define      TWO_LOOPS
-#ifdef  TWO_LOOPS
-      int i = 0;
-      int n = 0;
-      int* id = idx;
-      Real* v = val;
-      const Real* end = val + dim();
-
-      while (v < end)
-      {
-         id[n] = i++;
-         n += (*v++ != 0);
-      }
-
-      Real x;
-      int* ii = idx;
-      int* last = idx + n;
-      v = val;
-
-      for (; id < last; ++id)
-      {
-         x = v[*id];
-         if (isNotZero(x, epsilon))
-            *ii++ = *id;
-         else
-            v[*id] = 0;
-      }
-      num = ii - idx;
-
-#else
-
-      if (dim() <= 1)
-      {
-         if (dim())
-         {
-            if (isNotZero(*val, epsilon))
-               IdxSet::add(0);
-            else
-               *val = 0;
-         }
-      }
-      else
-      {
-         int* ii = idx;
-         Real* v = val;
-         Real* end = v + dim() - 1;
-
-         /* setze weissen Elefanten */
-         Real last = *end;
-         *end = MARKER;
-
-         /* erstes element extra */
-         if (isNotZero(*v, epsilon))
-            *ii++ = 0;
-         else
-            *v = 0.0;
-
-         for(;;)
-         {
-            while (*++v == 0.0)
-               ;
-            if (isNotZero(*v, epsilon))
-            {
-               *ii++ = int(v - val);
-            }
-            else
-            {
-               *v = 0.0;
-               if (v == end)
-                  break;
-            }
-         }
-         /* fange weissen Elefanten wieder ein */
-         if (isNotZero(last, epsilon))
-         {
-            *v = last;
-            *ii++ = dim() - 1;
-         }
-         else
-            *v = 0;
-
-         num = int(ii - idx);
-      }
-
-#endif
-
-      setupStatus = true;
-      assert(isConsistent());
-   }
-}
-#else // new version, not yet fully tested
+// #ifdef USE_OLD // old version
+// void SSVector::setup()
+// {
+//    if (!isSetup())
+//    {
+//       IdxSet::clear();
+// 
+// // #define      TWO_LOOPS
+// #ifdef  TWO_LOOPS
+//       int i = 0;
+//       int n = 0;
+//       int* id = idx;
+//       Real* v = val;
+//       const Real* end = val + dim();
+// 
+//       while (v < end)
+//       {
+//          id[n] = i++;
+//          n += (*v++ != 0);
+//       }
+// 
+//       Real x;
+//       int* ii = idx;
+//       int* last = idx + n;
+//       v = val;
+// 
+//       for (; id < last; ++id)
+//       {
+//          x = v[*id];
+//          if (isNotZero(x, epsilon))
+//             *ii++ = *id;
+//          else
+//             v[*id] = 0;
+//       }
+//       num = ii - idx;
+// 
+// #else
+// 
+//       if (dim() <= 1)
+//       {
+//          if (dim())
+//          {
+//             if (isNotZero(*val, epsilon))
+//                IdxSet::add(0);
+//             else
+//                *val = 0;
+//          }
+//       }
+//       else
+//       {
+//          int* ii = idx;
+//          Real* v = val;
+//          Real* end = v + dim() - 1;
+// 
+//          /* setze weissen Elefanten */
+//          Real last = *end;
+//          *end = MARKER;
+// 
+//          /* erstes element extra */
+//          if (isNotZero(*v, epsilon))
+//             *ii++ = 0;
+//          else
+//             *v = 0.0;
+// 
+//          for(;;)
+//          {
+//             while (*++v == 0.0)
+//                ;
+//             if (isNotZero(*v, epsilon))
+//             {
+//                *ii++ = int(v - val);
+//             }
+//             else
+//             {
+//                *v = 0.0;
+//                if (v == end)
+//                   break;
+//             }
+//          }
+//          /* fange weissen Elefanten wieder ein */
+//          if (isNotZero(last, epsilon))
+//          {
+//             *v = last;
+//             *ii++ = dim() - 1;
+//          }
+//          else
+//             *v = 0;
+// 
+//          num = int(ii - idx);
+//       }
+// 
+// #endif
+// 
+//       setupStatus = true;
+//       assert(isConsistent());
+//    }
+// }
+// #else // new version, not yet fully tested
 void SSVector::setup()
 {
    if (!isSetup())
@@ -225,7 +225,7 @@ void SSVector::setup()
       assert(isConsistent());
    }
 }
-#endif
+// #endif
 
 SSVector& SSVector::operator+=(const Vector& vec)
 {
@@ -251,20 +251,6 @@ SSVector& SSVector::operator+=(const SVector& vec)
    return *this;
 }
 
-#ifdef USE_OLD // old version
-SSVector& SSVector::operator+=(const SSVector& vec)
-{
-   for (int i = vec.size() - 1; i >= 0; --i)
-      val[vec.index(i)] += vec.value(i);
-
-   if (isSetup())
-   {
-      setupStatus = false;
-      setup();
-   }
-   return *this;
-}
-#else
 SSVector& SSVector::operator+=(const SSVector& vec)
 {
    for (int i = 0; i < vec.size(); ++i)
@@ -277,7 +263,6 @@ SSVector& SSVector::operator+=(const SSVector& vec)
    }
    return *this;
 }
-#endif
 
 SSVector& SSVector::operator-=(const Vector& vec)
 {
@@ -303,27 +288,6 @@ SSVector& SSVector::operator-=(const SVector& vec)
    return *this;
 }
 
-#ifdef USE_OLD // old version
-SSVector& SSVector::operator-=(const SSVector& vec)
-{
-   if (vec.isSetup())
-   {
-      for (int i = vec.size() - 1; i >= 0; --i)
-         val[vec.index(i)] -= vec.value(i);
-   }
-   else
-   {
-      Vector::operator-=(Vector(vec));
-   }
-
-   if (isSetup())
-   {
-      setupStatus = false;
-      setup();
-   }
-   return *this;
-}
-#else
 SSVector& SSVector::operator-=(const SSVector& vec)
 {
    if (vec.isSetup())
@@ -343,19 +307,7 @@ SSVector& SSVector::operator-=(const SSVector& vec)
    }
    return *this;
 }
-#endif
 
-#ifdef USE_OLD // old version
-SSVector& SSVector::operator*=(Real x)
-{
-   assert(isSetup());
-
-   for (int i = size() - 1; i >= 0; --i)
-      val[index(i)] *= x;
-   assert(isConsistent());
-   return *this;
-}
-#else
 SSVector& SSVector::operator*=(Real x)
 {
    assert(isSetup());
@@ -367,30 +319,29 @@ SSVector& SSVector::operator*=(Real x)
 
    return *this;
 }
-#endif
 
-#ifdef USE_OLD // old
-Real SSVector::maxAbs() const
-{
-   if (isSetup())
-   {
-      int* i = idx;
-      int* end = idx + num;
-      Real* v = val;
-      Real absval = 0.0;
-
-      for (; i < end; ++i)
-      {
-         Real x = v[*i];
-         if (fabs(x) > absval)
-            absval = fabs(x);
-      }
-      return absval;
-   }
-   else
-      return Vector::maxAbs();
-}
-#else // new, not fully tested
+// #ifdef USE_OLD // old
+// Real SSVector::maxAbs() const
+// {
+//    if (isSetup())
+//    {
+//       int* i = idx;
+//       int* end = idx + num;
+//       Real* v = val;
+//       Real absval = 0.0;
+// 
+//       for (; i < end; ++i)
+//       {
+//          Real x = v[*i];
+//          if (fabs(x) > absval)
+//             absval = fabs(x);
+//       }
+//       return absval;
+//    }
+//    else
+//       return Vector::maxAbs();
+// }
+// #else // new, not fully tested
 Real SSVector::maxAbs() const
 {
    if (isSetup())
@@ -409,7 +360,7 @@ Real SSVector::maxAbs() const
    else
       return Vector::maxAbs();
 }
-#endif // !0
+// #endif // !0
 
 Real SSVector::length2() const
 {
@@ -597,72 +548,6 @@ SSVector& SSVector::multAdd(Real x, const Vector& vec)
    return *this;
 }
 
-#ifdef USE_OLD // old version
-SSVector& SSVector::operator=(const SSVector& rhs)
-{
-   assert(rhs.isConsistent());
-
-   if (this != &rhs)
-   {
-      clear();
-
-      setMax(rhs.max());
-      IdxSet::operator=(rhs);
-      DVector::reDim(rhs.dim());
-
-      if (rhs.isSetup())
-      {
-         for (int i = size() - 1; i >= 0; --i)
-         {
-            int j = index(i);
-            val[j] = rhs.val[j];
-         }
-      }
-      else
-      {
-         int* ii = idx;
-         Real* v = val;
-         Real* rv = static_cast<Real*>(rhs.val);
-         Real* last = rv + rhs.dim() - 1;
-         Real x = *last;
-         
-         *last = MARKER;
-         for(;;)
-         {
-            while (!*rv)
-            {
-               ++rv;
-               ++v;
-            }
-            if (isNotZero(*rv, epsilon))
-            {
-               *ii++ = int(v - val);
-               *v++ = *rv++;
-            }
-            else if (rv == last)
-               break;
-            else
-            {
-               v++;
-               rv++;
-            }
-         }
-         *rv = x;
-         
-         if (isNotZero(x, epsilon))
-         {
-            *ii++ = int(v - val);
-            *v++ = x;
-         }
-         num = int(ii - idx);
-      }
-      setupStatus = true;
-   }
-   assert(isConsistent());
-
-   return *this;
-}
-#else // new version
 SSVector& SSVector::operator=(const SSVector& rhs)
 {
    assert(rhs.isConsistent());
@@ -704,77 +589,8 @@ SSVector& SSVector::operator=(const SSVector& rhs)
 
    return *this;
 }
-#endif // 0
 
-#ifdef USE_OLD // old version
-void SSVector::setup_and_assign(SSVector& rhs)
-{
-   assert(rhs.isConsistent());
-
-   clear();
-   epsilon = rhs.epsilon;
-   setMax(rhs.max());
-   DVector::reDim(rhs.dim());
-
-   if (rhs.isSetup())
-   {
-      int i, j;
-      IdxSet::operator=(rhs);
-      for (i = size() - 1; i >= 0; --i)
-      {
-         j = index(i);
-         val[j] = rhs.val[j];
-      }
-   }
-   else
-   {
-      int* ri = rhs.idx;
-      int* ii = idx;
-      Real* rv = rhs.val;
-      Real* v = val;
-      Real* last = rv + rhs.dim() - 1;
-      Real x = *last;
-
-      *last = MARKER;
-
-      for(;;)
-      {
-         while (!*rv)
-         {
-            ++rv;
-            ++v;
-         }
-         if (isNotZero(*rv, rhs.epsilon))
-         {
-            *ri++ = *ii++ = int(v - val);
-            *v++ = *rv++;
-         }
-         else if (rv == last)
-            break;
-         else
-         {
-            v++;
-            *rv++ = 0;
-         }
-      }
-
-      if (isNotZero(x, rhs.epsilon))
-      {
-         *ri++ = *ii++ = int(v - val);
-         *v++ = *rv = x;
-      }
-      else
-         *rv = 0;
-      num = rhs.num = int(ii - idx);
-      rhs.setupStatus = true;
-   }
-   setupStatus = true;
-
-   assert(isConsistent());
-}
-#else // new version
-/* setup rhs and assign to this
- */
+// setup rhs and assign to this
 void SSVector::setup_and_assign(SSVector& rhs)
 {
    clear();
@@ -821,7 +637,6 @@ void SSVector::setup_and_assign(SSVector& rhs)
    assert(rhs.isConsistent());
    assert(isConsistent());
 }
-#endif // 0
 
 
 SSVector& SSVector::operator=(const SVector& rhs)
@@ -830,28 +645,28 @@ SSVector& SSVector::operator=(const SVector& rhs)
    return assign(rhs);
 }
 
-#ifdef USE_OLD // old version (buggy or optimization dependent)
-SSVector& SSVector::assign(const SVector& rhs)
-{
-   assert(rhs.dim() <= Vector::dim());
-
-   const SVector::Element* e = rhs.m_elem;
-   int* p = idx;
-   int i = rhs.size();
-
-   while (i--)
-   {
-      val[*p = e->idx] = e->val;
-      p += ((e++)->val != 0);
-   }
-   num = int(p - idx);
-   setupStatus = true;
-
-   assert(isConsistent());
-   return *this;
-}
-
-#else // new version not yet fully tested, could be put into operator=()
+// #ifdef USE_OLD // old version (buggy or optimization dependent)
+// SSVector& SSVector::assign(const SVector& rhs)
+// {
+//    assert(rhs.dim() <= Vector::dim());
+// 
+//    const SVector::Element* e = rhs.m_elem;
+//    int* p = idx;
+//    int i = rhs.size();
+// 
+//    while (i--)
+//    {
+//       val[*p = e->idx] = e->val;
+//       p += ((e++)->val != 0);
+//    }
+//    num = int(p - idx);
+//    setupStatus = true;
+// 
+//    assert(isConsistent());
+//    return *this;
+// }
+// 
+// #else // new version not yet fully tested, could be put into operator=()
 SSVector& SSVector::assign(const SVector& rhs)
 {
    assert(rhs.dim() <= Vector::dim());
@@ -877,27 +692,12 @@ SSVector& SSVector::assign(const SVector& rhs)
 
    return *this;
 }
-#endif
+// #endif
 
 SSVector& SSVector::assign2product1(const SVSet& A, const SSVector& x)
 {
    assert(x.isSetup());
    assert(x.size() == 1);
-
-#if 0    // unreadable and buggy (missing test for 'svec.size() == 0' and 'x.size() == 0')
-   const Real* vl = x.val;
-   const int* xi = x.idx;
-
-   int* ii = idx;
-   SVector* svec = const_cast<SVector*>( & A[*xi] );
-   const SVector::Element* e = &(svec->element(0));
-   const SVector::Element* last = e + (num = svec->size());
-   Real* v = val;
-   Real y = vl[*xi];
-
-   for (; e < last; ++e)
-      v[ *ii++ = e->idx ] = y * e->val;
-#else
 
    // get the nonzero value of x and the corresponding vector in A:
    const int      nzidx = x.idx[0];
@@ -917,7 +717,6 @@ SSVector& SSVector::assign2product1(const SVSet& A, const SSVector& x)
          val[Aij.idx] = nzval * Aij.val;
       }
    }
-#endif
 
    assert(isConsistent());
    return *this;
@@ -926,59 +725,6 @@ SSVector& SSVector::assign2product1(const SVSet& A, const SSVector& x)
 SSVector& SSVector::assign2productShort(const SVSet& A, const SSVector& x)
 {
    assert(x.isSetup());
-
-#if 0    // unreadable and buggy (missing test for 'svec.size() == 0' and 'x.size() == 0')
-   // first entry of x
-   Real           xx            = x.val[x.idx[0]];
-   const SVector* svec          = & A[x.idx[0]];
-   num                          = svec->size();
-   const SVector::Element* e    = &(svec->element(0));
-   const SVector::Element* last = e + num;
-
-   int*           ii            = idx;
-   const int*     xi            = x.idx;
-   ++xi;
-
-   for ( ; e < last; ++e )
-   {
-      Real y = xx * e->val;
-      *ii    = e->idx;
-      val[*ii] = y;
-      if ( y != 0 )
-         ii++;
-   }
-
-   // second to last entries of x
-   for ( int i = x.size(); --i > 0; )
-   {
-      xx   = x.val[*xi];
-      svec = & A[*xi++];
-      e = &(svec->element(0));
-      for ( int k = svec->size(); --k >= 0; )
-      {
-         *ii = e->idx;
-         Real y = val[e->idx];
-         if ( y == 0 )
-            ii++; 
-         y   += xx * e->val;
-         val[e->idx] = (y != 0) ? y : MARKER;
-         e++;
-      }
-   }
-
-   // clean up
-   int* is = idx;
-   int* it = idx;
-   for (; is < ii; ++is)
-   {
-      if (isNotZero(val[*is], epsilon))
-         *it++ = *is;
-      else
-         val[*is] = 0;
-   }
-   num = int(it - idx);
-
-#else
 
    if (x.size() == 0) // x can be setup but have size 0 => this := zero vector
    {
@@ -1066,7 +812,6 @@ SSVector& SSVector::assign2productShort(const SVSet& A, const SSVector& x)
       }
       num = nz_counter;
    }
-#endif
 
    assert(isConsistent());
    return *this;
@@ -1075,19 +820,6 @@ SSVector& SSVector::assign2productShort(const SVSet& A, const SSVector& x)
 SSVector& SSVector::assign2productFull(const SVSet& A, const SSVector& x)
 {
    assert(x.isSetup());
-
-#if 0   // buggy (missing test for 'svec.size() == 0' and 'x.size() == 0' )
-   const int* xi = x.idx;
-   for (int i = x.size(); i-- > 0; ++xi)
-   {
-      const SVector& svec = A[*xi];
-      const SVector::Element* elem = &(svec.element(0));
-      const SVector::Element* last = elem + svec.size();
-      const Real y = x.val[*xi];
-      for (; elem < last; ++elem)
-         val[elem->idx] += y * elem->val;
-   }
-#else
 
    if (x.size() == 0) // x can be setup but have size 0 => this := zero vector
    {
@@ -1114,7 +846,6 @@ SSVector& SSVector::assign2productFull(const SVSet& A, const SSVector& x)
 
    if ( A_is_zero )
       clear();       // case x != 0 but A == 0
-#endif
 
    return *this;
 }
