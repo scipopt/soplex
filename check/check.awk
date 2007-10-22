@@ -1,4 +1,4 @@
-# $Id: check.awk,v 1.22 2007/10/19 15:44:24 bzforlow Exp $
+# $Id: check.awk,v 1.23 2007/10/22 09:00:34 bzforlow Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: check.awk                                                     *
@@ -23,7 +23,7 @@ function printviol(x)
       printf(" %.2e", abs(x));
 }
 BEGIN {
-    print "$Id: check.awk,v 1.22 2007/10/19 15:44:24 bzforlow Exp $";
+    print "$Id: check.awk,v 1.23 2007/10/22 09:00:34 bzforlow Exp $";
     print "";
     line = "-----------------------------------------------------------------------------------------------------------------------------\n";
     printf(line);
@@ -43,7 +43,8 @@ BEGIN {
 /IEXAMP33/       { timeout = 1; }
 #/EEXAMP39/       { singular = 1; }
 /XSOLVE21/       { singular = 1; }
-/EEXAMP40/       { cycling = 1; }
+#/EEXAMP40/       { cycling = 1; }
+/XSOLVE13/       { cycling = 1; }
 /IEXAMP07/       { cvm = $4; cvs = $5; if (cvm > cvmax[type]) cvmax[type] = cvm; cvsum[type] += cvs; }
 /IEXAMP09/       { bvm = $4; bvs = $5; if (bvm > bvmax[type]) bvmax[type] = bvm; bvsum[type] += bvs; }
 /IEXAMP11/       { rcm = $5; rcs = $6; if (rcm > rcmax[type]) rcmax[type] = rcm; rcsum[type] += rcs; }

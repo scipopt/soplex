@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-# $Id: TODO,v 1.96 2007/10/19 16:27:24 bzforlow Exp $
+# $Id: TODO,v 1.97 2007/10/22 09:00:33 bzforlow Exp $
 #-----------------------------------------------------------------------
 
 #-----------------------------------------------------------------------
@@ -39,9 +39,6 @@ Benjamin:
 - SOPLEX_VERSION auf string ändern (auch scip/lpi_spx.c anpassen!)
 
 Sebastian:
-- netlib/dbg   --> läuft auf opt42 --> mit soplex-trunk vergleichen
-- siemens/dbg  --> läuft auf opt33 --> mit soplex-trunk vergleichen
-- ABORT_CYCLING zur Exception umwandeln, check.awk anpassen
 - flexelint, Codesonar (mit Robert, ggf. mit Thorsten)
 
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.98 2007/10/19 15:44:25 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.99 2007/10/22 09:00:34 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -412,9 +412,10 @@ SPxSolver::Status SPxSolver::solve()
                cycleCount++;
                if( cycleCount > MAXCYCLES )
                {
-                  MSG_INFO2( spxout << "ISOLVE85 Abort solving due to cycling" << std::endl; )
                   m_status = ABORT_CYCLING;
                   stop = true;
+                  //MSG_INFO2( spxout << "ISOLVE85 Abort solving due to cycling" << std::endl; )
+                  throw SPxStatusException("XSOLVE13 Abort solving due to cycling");
                }
                MSG_INFO3(
                   spxout << "ISOLVE86 maxInfeas: " << maxInfeas()
