@@ -1,5 +1,9 @@
 Current Version
 
+#----------------------------------------------------------------
+
+Release 1.3.3
+
 - Introduced exceptions for all unrecoverable errors (lack of memory, 
   no pricer, singular basis, etc.) to allow a calling application to clean up.
 
