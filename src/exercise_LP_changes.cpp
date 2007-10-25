@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: exercise_LP_changes.cpp,v 1.12 2007/08/27 15:35:09 bzfberth Exp $"
+#pragma ident "@(#) $Id: exercise_LP_changes.cpp,v 1.13 2007/10/25 07:38:11 bzfhille Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -640,7 +640,7 @@ void ChangeExerciser::test_add_delete_rows()
 
 
 /**
-   Deletes and re-adds a single row.
+   Deletes and re-adds a single col.
 */
 void ChangeExerciser::test_add_delete_col()
 {
