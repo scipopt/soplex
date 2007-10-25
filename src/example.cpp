@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.99 2007/10/22 09:00:34 bzforlow Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.100 2007/10/25 08:07:19 bzfhille Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -143,12 +143,31 @@ public:
 //    Helpers
 //------------------------------------------------------------------------
 
-void print_usage_and_exit( const char* const argv[] )
+void print_version_info()
 {
-   /**
-      The following code block is just to test compilation parameters.
-   */
-#if 1
+   const char* banner1 =
+   "************************************************************************\n"
+   "*                                                                      *\n"
+   "*       SoPlex --- the Sequential object-oriented simPlex.             *\n"
+   "*                  Release ";
+
+   const char* banner2 = "                                       *\n"
+   "*    Copyright (C) 1997-1999 Roland Wunderling                         *\n"
+   "*                  1997-2007 Konrad-Zuse-Zentrum                       *\n"
+   "*                            fuer Informationstechnik Berlin           *\n"
+   "*                                                                      *\n"
+   "*  SoPlex is distributed under the terms of the ZIB Academic Licence.  *\n"
+   "*  You should have received a copy of the ZIB Academic License         *\n"
+   "*  along with SoPlex; If not email to soplex@zib.de.                   *\n"
+   "*                                                                      *\n"
+   "************************************************************************\n"
+   ;
+
+   std::cout << banner1 << SOPLEX_VERSION/100 << ".";
+   std::cout << (SOPLEX_VERSION % 100)/10 << ".";
+   std::cout << SOPLEX_VERSION % 10 << banner2 << std::endl;
+
+   /// The following code block is tests and shows compilation parameters.
    std::cout << "compiled with NDEBUG: "
 #ifdef NDEBUG
              << "yes"
@@ -182,8 +201,10 @@ void print_usage_and_exit( const char* const argv[] )
              << std::endl;
    
    std::cout << std::endl;
-#endif
-
+}
+//------------------------------------------------------------------------
+void print_usage_and_exit( const char* const argv[] )
+{
    const char* usage =
       "[options] LPfile [Basfile]\n\n"
       "          LPfile can be either in MPS or LPF format\n\n"
@@ -669,24 +690,6 @@ void clean_up( SPxScaler*&       prescaler,
 
 int main(int argc, const char* const argv[])
 {
-   const char* banner1 =
-   "************************************************************************\n"
-   "*                                                                      *\n"
-   "*       SoPlex --- the Sequential object-oriented simPlex.             *\n"
-   "*                  Release ";
-
-   const char* banner2 = "                                       *\n"
-   "*    Copyright (C) 1997-1999 Roland Wunderling                         *\n"
-   "*                  1997-2007 Konrad-Zuse-Zentrum                       *\n"
-   "*                            fuer Informationstechnik Berlin           *\n"
-   "*                                                                      *\n"
-   "*  SoPlex is distributed under the terms of the ZIB Academic Licence.  *\n"
-   "*  You should have received a copy of the ZIB Academic License         *\n"
-   "*  along with SoPlex; If not email to soplex@zib.de.                   *\n"
-   "*                                                                      *\n"
-   "************************************************************************\n"
-   ;
-
    const char*               filename; 
    char*                     basisname      = 0;
    SPxSolver::Type           type           = SPxSolver::LEAVE;
@@ -781,9 +784,7 @@ int main(int argc, const char* const argv[])
                verbose = argv[optidx][2] - '0';
             break;
          case 'V' :
-            std::cout << banner1 << SOPLEX_VERSION/100 << ".";
-            std::cout << (SOPLEX_VERSION % 100)/10 << ".";
-            std::cout << SOPLEX_VERSION % 10 << banner2 << std::endl;
+            print_version_info();
             exit(0);
          case 'x' :
             print_solution = true;
@@ -808,9 +809,7 @@ int main(int argc, const char* const argv[])
             break;
          case 'h' :
          case '?' :
-            std::cout << banner1 << SOPLEX_VERSION/100 << ".";
-            std::cout << (SOPLEX_VERSION % 100)/10 << ".";
-            std::cout << SOPLEX_VERSION % 10 << banner2 << std::endl;
+            print_version_info();
             //lint -fallthrough
          default :
             print_usage_and_exit( argv );

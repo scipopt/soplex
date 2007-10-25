@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-# $Id: TODO,v 1.101 2007/10/25 07:39:49 bzfhille Exp $
+# $Id: TODO,v 1.102 2007/10/25 08:07:19 bzfhille Exp $
 #-----------------------------------------------------------------------
 
 #-----------------------------------------------------------------------
@@ -34,8 +34,6 @@
 Benjamin:
 - status-exception-test etc. in test-Verzeichnis schieben
 - "make tests" zum Compilieren (und Ausführen?) der Testbinaries
-- SOPLEX_VERSION auf string ändern (auch scip/lpi_spx.c anpassen!)
-- Kommandozeilenoption, die Compilerflags anzeigt
 
 
 Sebastian:

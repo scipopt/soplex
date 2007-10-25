@@ -9,6 +9,9 @@ Release 1.3.3
 
 - Split the main() method in example.cpp into several smaller methods.
 
+- Command line options "-V" and "-h" of example solver now output info
+  on compilation flags.
+
 - Replaced SPxLP::operator<< by SPxLP::writeLPF().
 
 #----------------------------------------------------------------
