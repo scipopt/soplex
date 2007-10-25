@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-# $Id: TODO,v 1.100 2007/10/23 09:51:42 bzforlow Exp $
+# $Id: TODO,v 1.101 2007/10/25 07:39:49 bzfhille Exp $
 #-----------------------------------------------------------------------
 
 #-----------------------------------------------------------------------
@@ -33,10 +33,9 @@
 
 Benjamin:
 - status-exception-test etc. in test-Verzeichnis schieben
-- "make tests" zum Compilieren der Testbinaries
-- ../bin/exercise_LP_changes.linux.x86.gnu.dbg -v quick.test:
-  src/spxchangebasis.cpp:333: void soplex::SPxBasis::removedCol(int): Assertion `matrixIsSetup' failed.
+- "make tests" zum Compilieren (und Ausführen?) der Testbinaries
 - SOPLEX_VERSION auf string ändern (auch scip/lpi_spx.c anpassen!)
+- Kommandozeilenoption, die Compilerflags anzeigt
 
 
 Sebastian:

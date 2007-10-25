@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.29 2007/10/19 15:44:25 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.30 2007/10/25 07:39:49 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -330,7 +330,6 @@ void SPxBasis::removedCol(int i)
          setStatus(NO_PROBLEM);
       else if (status() > NO_PROBLEM)
       {
-         assert( matrixIsSetup );
          for (int j = theLP->dim(); j >= 0; --j)
          {
             SPxId id = baseId(j);
@@ -338,7 +337,8 @@ void SPxBasis::removedCol(int i)
                  && theLP->number(SPxColId(id)) < 0)
             {
                baseId(j) = baseId(theLP->dim());
-               if (j < theLP->dim())
+               if ( matrixIsSetup &&
+                    j < theLP->dim() )
                   matrix[j] = &theLP->vector(baseId(j));
                break;
             }
