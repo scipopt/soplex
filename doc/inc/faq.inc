@@ -66,7 +66,7 @@
    </p>
       
    <p class="q">
-     Why is malloc/free sometimes used and not new/delete ?
+     Why is malloc/free sometimes used and not new/delete?
    </p>
 
    <p class="a">
@@ -78,7 +78,7 @@
    </p>
 
    <p class="q">
-     Can SoPlex solve Integer Programs (IPs) ?
+     Can SoPlex solve Integer Programs (IPs)?
    </p>
 
    <p class="a">
@@ -91,7 +91,7 @@
    </p>
 
    <p class="q">
-     Is there a Windows version ?
+     Is there a Windows version?
    </p>
 
    <p class="a">
@@ -102,7 +102,7 @@
    </p>
 
    <p class="q">
-     I want a primal and a dual simplex, where are they ?
+     I want a primal and a dual simplex, where are they?
    </p>
 
    <p class="a">
@@ -133,7 +133,7 @@
    </p>
 
    <p class="q">
-     I got an segment violation or a signal 11.
+     I got a segment violation or a signal 11.
    </p>
 
    <p class="a">
@@ -146,12 +146,29 @@
    </p>
        
    <p class="q">
+     I got messages stating &quot;This shall not be.&quot; or similar.    
+   </p>
+
+   <p class="a">
+     Such messages are an indication of numerical trouble, which may happen
+     from time to time especially on LPs with weird numbers. If the problem
+     occurs with the binary, try using another scaler (call soplex without
+     parameters to see how to specify this). If the problem occurs while using
+     the callable library of soplex, you can try to add a scaler and a
+     preprocessor yourself (see the SoPlex class) unless you solve the same LP
+     repeatedly with small changes (as in a Branch-and-cut process, for
+     instance). If you send us an LP or MPS file with the offending linear
+     program together with a description of your settings, we may have a
+     closer look at it to see if we can do something about it.
+   </p>
+       
+   <p class="q">
      SoPlex means &quot;Sequential Simplex&quot;. Is there a parallel version
      available? 
    </p>
 
    <p class="a">
-     No. There was done research in this direction. You can find most of 
+     No. Some research was done in this direction. You can find most of 
      the results in
      <a href="http://www.zib.de/PaperWeb/abstracts/TR-96-09">
      http://www.zib.de/PaperWeb/abstracts/TR-96-09</a> and 
