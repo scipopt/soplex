@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.34 2007/08/27 15:35:13 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.35 2008/01/14 16:26:25 bzfhille Exp $"
 
 //#define DEBUGGING 1
 
@@ -271,19 +271,16 @@ int SPxSteepPR::selectLeave()
       {         
          /**@todo this was an assert! is an assertion correct?*/
          // assert(coPenalty_ptr[i] >= theeps);
-#if ENABLE_ADDITIONAL_CHECKS
          if( coPenalty_ptr[i] < theeps )
          {
-            MSG_ERROR( spxout << "ESTEEP02 SPxSteepPR::selectLeaveX(): This shall not be!"
-                              << std::endl
-                              << "i=" << i
-                              << " x=" << x
-                              << " coPenalty_ptr[i]=" << coPenalty_ptr[i]
-                              << " theeps=" << theeps << std::endl; )
+#if ENABLE_ADDITIONAL_CHECKS
+            MSG_WARNING( spxout << "WSTEEP02 SPxSteepPR::selectLeaveX(): coPenalty too small ("
+                                << coPenalty_ptr[i] << "), assuming epsilon (" << theeps << ")!" << std::endl; )
+#endif
+
             x = x * x / theeps * p[i];
          }
          else
-#endif
             x = x * x / coPenalty_ptr[i] * p[i];
 
          if (x > best)
