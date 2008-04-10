@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.58 2007/10/19 15:44:25 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.59 2008/04/10 15:01:34 bzforlow Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -727,6 +727,7 @@ bool SPxLP::readLPF(
             {
                MSG_WARNING( spxout << "WLPFRD11 in Bounds section line " 
                                    << lineno << " ignored" << std::endl; )
+                  *pos = '\0';
                continue;
             }
             if (sense)

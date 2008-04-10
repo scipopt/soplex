@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.99 2007/10/22 09:00:34 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.100 2008/04/10 15:01:34 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -92,17 +92,26 @@ SPxSolver::Status SPxSolver::solve()
    Real  minShift = infinity;
    int   cycleCount = 0;
    if (dim() <= 0 && coDim() <= 0) // no problem loaded
+   {
+      m_status = NO_PROBLEM;
       throw SPxStatusException("XSOLVE01 No Problem loaded");
+   }
 
    if (slinSolver() == 0) // linear system solver is required.
+   {
+      m_status = NO_SOLVER;
       throw SPxStatusException("XSOLVE02 No Solver loaded");
-
+   }
    if (thepricer == 0) // pricer is required.
+   {
+      m_status = NO_PRICER;
       throw SPxStatusException("XSOLVE03 No Pricer loaded");
-
+   }
    if (theratiotester == 0) // ratiotester is required.
+   {
+      m_status = NO_RATIOTESTER;
       throw SPxStatusException("XSOLVE04 No RatioTester loaded");
-
+   }
    theTime.reset();
    theTime.start();
 
@@ -735,8 +744,9 @@ SPxSolver::Status SPxSolver::getPrimal (Vector& p_vector) const
    METHOD( "SPxSolver::getPrimal()" );
 
    if (!isInitialized())
+   {
       throw SPxStatusException("XSOLVE06 Not Initialized");
-
+   }
    if (rep() == ROW)
       p_vector = coPvec();
    else
@@ -785,7 +795,6 @@ SPxSolver::Status SPxSolver::getDual (Vector& p_vector) const
    if (!isInitialized()) 
    {
       throw SPxStatusException("XSOLVE08 No Problem loaded");
-      // return NOT_INIT;
    }
 
    if (rep() == ROW)
