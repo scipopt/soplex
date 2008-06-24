@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.85 2007/10/23 09:21:42 bzfberth Exp $
+# $Id: Makefile,v 1.86 2008/06/24 12:48:02 bzfhille Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -77,8 +77,6 @@ LIBOBJ		= 	changesoplex.o didxset.o \
 			vector.o vsolve.o \
 			gzstream.o
 BINOBJ		=	example.o
-CHANGEBINOBJ	=	exercise_LP_changes.o
-EXCEPTIONBINOBJ	=	status_exception_test.o
 REPOSIT		=	# template repository, explicitly empty  #spxproof.o 
 
 BASE		=	$(OSTYPE).$(ARCH).$(COMP).$(OPT)
@@ -108,9 +106,6 @@ include make/make.$(BASE)
 BINNAME		=	$(NAME)-$(VERSION).$(BASE)
 LIBNAME		=	$(NAME)-$(VERSION).$(BASE)
 BINFILE		=	$(BINDIR)/$(BINNAME)
-CHANGEBINFILE   =	$(BINDIR)/exercise_LP_changes.$(BASE)
-EXCEPTIONBINFILE=	$(BINDIR)/status_exception_test.$(BASE)
-TESTEXBINFILE	=	$(BINDIR)/mem_exception_test.$(BASE)
 LIBFILE		=	$(LIBDIR)/lib$(LIBNAME).$(LIBEXT)
 LIBLINK		=	$(LIBDIR)/lib$(NAME).$(BASE).$(LIBEXT)
 BINLINK		=	$(BINDIR)/$(NAME).$(BASE)
@@ -124,9 +119,6 @@ OBJDIR		=	obj/O.$(BASE)
 BINOBJDIR	=	$(OBJDIR)/bin
 LIBOBJDIR	=	$(OBJDIR)/lib
 BINOBJFILES	=	$(addprefix $(BINOBJDIR)/,$(BINOBJ))
-TESTEXBINOBJFILES	=	$(addprefix $(BINOBJDIR)/,$(BINOBJ))
-CHANGEBINOBJFILES =	$(addprefix $(BINOBJDIR)/,$(CHANGEBINOBJ))
-EXCEPTIONBINOBJFILES =	$(addprefix $(BINOBJDIR)/,$(EXCEPTIONBINOBJ))
 LIBOBJFILES	=	$(addprefix $(LIBOBJDIR)/,$(LIBOBJ))
 BINSRC		=	$(addprefix $(SRCDIR)/,$(BINOBJ:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
@@ -143,7 +135,7 @@ endif
 
 
 ifeq ($(VERBOSE),false)
-.SILENT:	$(LIBLINK) $(BINLINK) $(BINSHORTLINK) $(BINFILE) $(LIBFILE) $(CHANGEBINFILE) $(BINOBJFILES) $(LIBOBJFILES)
+.SILENT:	$(LIBLINK) $(BINLINK) $(BINSHORTLINK) $(BINFILE) $(LIBFILE) $(BINOBJFILES) $(LIBOBJFILES)
 endif
 
 all:		$(LIBFILE) $(BINFILE) $(LIBLINK) $(BINLINK) $(BINSHORTLINK)
@@ -167,20 +159,6 @@ $(LIBFILE):	$(LIBDIR) $(LIBOBJDIR) touchexternal $(LIBOBJFILES)
 		$(AR) $(ARFLAGS) $@ $(LIBOBJFILES) $(REPOSIT)
 		$(RANLIB) $@
 
-# build test binaries
-$(TESTEXBINFILE):	_$(BINDIR) _$(BINOBJDIR) $(LIBFILE) $(TESTEXBINOBJFILES)
-			$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOBJFILES) \
-			-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
-
-
-$(CHANGEBINFILE): $(BINDIR) $(BINOBJDIR) $(LIBFILE) $(CHANGEBINOBJFILES)
-		@echo "-> linking $@"
-		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(CHANGEBINOBJFILES) \
-		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
-
-$(EXCEPTIONBINFILE): $(BINDIR) $(BINOBJDIR) $(LIBFILE) $(EXCEPTIONBINOBJFILES)
-		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(EXCEPTIONBINOBJFILES) \
-		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
 
 lint:		$(BINSRC) $(LIBSRC)
 		$(LINT) lint/$(NAME).lnt -os\(lint.out\) \
@@ -189,13 +167,7 @@ lint:		$(BINSRC) $(LIBSRC)
 doc:		
 		cd doc; $(DOXY) $(NAME).dxy
 
-change_exerciser: $(CHANGEBINFILE)
-
-status_exception_test: $(EXCEPTIONBINFILE)
-		cd bin; \
-		../$(EXCEPTIONBINFILE)
-
-all:		$(BINFILE) $(CHANGEBINFILE)
+all:		$(BINFILE)
 
 check:		#$(BINFILE)
 		cd check; ./check.sh $(TEST).test ../$(BINFILE) '$(ALGO)' $(LIMIT)
