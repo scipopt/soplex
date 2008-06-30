@@ -1,0 +1,14 @@
+#--- $Id: make.linux.x86.gnu.opt-shared,v 1.1 2008/06/30 19:05:45 bzfpfets Exp $
+CXX		=	g++
+CPPFLAGS	=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -FPIC
+CXXFLAGS	=	-O3 -march=pentiumpro -fexceptions -fomit-frame-pointer # -malign-double -ffast-math
+LDFLAGS		=	-lm
+ARFLAGS		=	crs
+ZLIB_FLAGS	=
+ZLIB_LDFLAGS 	=	-lz
+LIBBUILD        =       $(CXX)
+LIBBUILDFLAGS   =	-shared -FPIC
+LIBBUILD_o      =       -o # the trailing space is important
+LIBEXT		=	so
+ARFLAGS         =
+RANLIB          =
