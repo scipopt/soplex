@@ -49,6 +49,9 @@ CHANGEBINFILE   =	exercise_LP_changes.$(BASE)
 EXCEPTIONBINOBJ	=	status_exception_test.o
 EXCEPTIONBINFILE=	status_exception_test.$(BASE)
 
+TESTCHANGEELEMENTOBJ	=	testChangeElement.o
+TESTCHANGEELEMENTBIN	=	testChangeElement.$(BASE)
+
 
 #------------------------------------------------------------------------------
 #--- NOTHING TO CHANGE FROM HERE ON -------------------------------------------
@@ -64,13 +67,15 @@ GCCWARN		=	-Wall -W -Wpointer-arith -Wno-unknown-pragmas \
 #include make/make.$(OSTYPE).$(ARCH).$(COMP).$(OPT).$(LINK)
 #-----------------------------------------------------------------------------
 
-.PHONY: change_exerciser status_exception_test clean all
+.PHONY: change_exerciser status_exception_test testChangeElement clean all
 
-all: change_exerciser status_exception_test
+all: change_exerciser status_exception_test testChangeElement
 
 change_exerciser: $(CHANGEBINFILE)
 
 status_exception_test: $(EXCEPTIONBINFILE)
+
+testChangeElement: $(TESTCHANGEELEMENTBIN)
 
 
 $(CHANGEBINFILE): $(LIBFILE) $(CHANGEBINOBJ)
@@ -81,6 +86,11 @@ $(CHANGEBINFILE): $(LIBFILE) $(CHANGEBINOBJ)
 $(EXCEPTIONBINFILE): $(LIBFILE) $(EXCEPTIONBINOBJ)
 		@echo "-> linking $@"
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(EXCEPTIONBINOBJ) \
+		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+
+$(TESTCHANGEELEMENTBIN): $(LIBFILE) $(TESTCHANGEELEMENTOBJ)
+		@echo "-> linking $@"
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(TESTCHANGEELEMENTOBJ) \
 		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
 
 %.o:	%.cpp
