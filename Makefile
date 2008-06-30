@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.86 2008/06/24 12:48:02 bzfhille Exp $
+# $Id: Makefile,v 1.87 2008/06/30 19:06:55 bzfpfets Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -41,6 +41,10 @@ AR		=	ar
 RANLIB		=	ranlib
 DOXY		=	doxygen
 VALGRIND	=	valgrind
+
+LIBBUILD	=	$(AR)
+LIBBUILD_o	=	$(AR_o)
+LIBBUILDFLAGS	=       $(ARFLAGS)
 
 CPPFLAGS	=	-Isrc
 CXXFLAGS	=	-O
@@ -151,13 +155,15 @@ $(BINLINK) $(BINSHORTLINK):	$(BINFILE)
 $(BINFILE):	$(BINDIR) $(BINOBJDIR) $(LIBFILE) $(BINOBJFILES)
 		@echo "-> linking $@"
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOBJFILES) \
-		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+		-Wl,-rpath,$(CURDIR)/$(LIBDIR) -L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
 
 $(LIBFILE):	$(LIBDIR) $(LIBOBJDIR) touchexternal $(LIBOBJFILES) 
 		@echo "-> generating library $@"
 		-rm -f $(LIBFILE)
-		$(AR) $(ARFLAGS) $@ $(LIBOBJFILES) $(REPOSIT)
+		$(LIBBUILD) $(LIBBUILDFLAGS) $(LIBBUILD_o)$@ $(LIBOBJFILES) $(REPOSIT)
+ifneq ($(RANLIB),)
 		$(RANLIB) $@
+endif
 
 
 lint:		$(BINSRC) $(LIBSRC)
