@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.87 2007/10/19 15:44:25 bzforlow Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.88 2008/07/01 09:46:48 bzforlow Exp $"
 
 #include <iostream>
 
@@ -304,8 +304,8 @@ SPxSolver::Status SoPlex::getDualfarkas(Vector& dualfarkas) const
    /// Does not work yet with presolve
    if (has_simplifier())
    {
-      MSG_ERROR( spxout << "ESOLVR02 Not yet implemented" << std::endl; )
-      throw SPxStatusException("XSOLVR02 Not yet implemented");
+      MSG_ERROR( spxout << "ESOLVR02 Dual farkas with presolving not yet implemented" << std::endl; )
+      throw SPxStatusException("XSOLVR02 Dual farkas with presolving not yet implemented");
       //      return SPxSolver::ERROR;
    }
    SPxSolver::Status stat = m_solver.getDualfarkas(dualfarkas);
