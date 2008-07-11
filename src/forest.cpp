@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: forest.cpp,v 1.24 2007/10/19 15:44:25 bzforlow Exp $"
+#pragma ident "@(#) $Id: forest.cpp,v 1.25 2008/07/11 14:00:55 bzforlow Exp $"
 
 #include <assert.h>
 
@@ -324,6 +324,7 @@ void CLUFactor::forestUpdate(int p_col, Real* p_work, int num, int *nonz)
        Distinguish between optimized call (num > 0, nonz != 0) and 
        non-optimized one.
    */
+   assert( num ); // otherwise the assert( nonz != 0 ) below should fail
    if (num)
    {
       // Optimized call.
@@ -338,7 +339,7 @@ void CLUFactor::forestUpdate(int p_col, Real* p_work, int num, int *nonz)
       r = 0;
       for (j = 0; j < num; ++j)
       {
-         i = *nonz++;
+         i = nonz[j];  
          x = p_work[i];
          p_work[i] = 0;
 
@@ -466,7 +467,9 @@ void CLUFactor::forestUpdate(int p_col, Real* p_work, int num, int *nonz)
           with nonzero==0.
 
           @todo Use an extra member variable as a buffer for the heap instead of
-                misusing nonz.
+                misusing nonz and num. The method enQueueMin() seems to
+                sort the nonzeros or something, for which it only needs
+                some empty vector of size num.
        */
          assert(nonz != 0);
 
