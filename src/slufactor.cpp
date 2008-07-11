@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.51 2007/10/19 15:44:25 bzforlow Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.52 2008/07/11 14:03:28 bzforlow Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -304,6 +304,8 @@ SLUFactor::Status SLUFactor::change(
    }
    else if (l.updateType == FOREST_TOMLIN)            // FOREST_TOMLIN updates
    {
+      assert(0);  // probably this part is never called.
+                  // forestUpdate() with the last parameter set to NULL should fail.
       forest = subst;
       CLUFactor::solveLright(forest.altValues());
       forestUpdate(idx, forest.altValues(), 0, 0);
