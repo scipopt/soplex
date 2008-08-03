@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.71 2007/10/19 15:44:25 bzforlow Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.72 2008/08/03 21:04:06 bzfpfets Exp $"
 
 /**@file  soplex.h
  * @brief preconfigured \ref soplex::SoPlex "SoPlex" LP-solver.
@@ -259,6 +259,11 @@ public:
    //---------------------------------------
    //**@name I/O */
    //@{
+   /// load basis from \p filename in MPS format.
+   virtual bool readBasisFile(const char* filename, 
+      const NameSet& rowNames,
+      const NameSet& colNames);
+
    /// write basis to \p filename in MPS format.
    virtual bool writeBasisFile ( const char*    filename, 
                                  const NameSet& rowNames, 
