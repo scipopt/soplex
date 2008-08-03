@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: changesoplex.cpp,v 1.30 2007/10/19 15:44:24 bzforlow Exp $"
+#pragma ident "@(#) $Id: changesoplex.cpp,v 1.31 2008/08/03 20:59:33 bzfpfets Exp $"
 
 //#define DEBUGGING 1
 
@@ -1033,10 +1033,10 @@ void SPxSolver::changeCol(int i, const LPCol& newCol)
 void SPxSolver::changeElement(int i, int j, Real val)
 {
    METHOD( "SPxSolver::changeElement()" );
-   assert( SPxBasis::status() > SPxBasis::NO_PROBLEM );
 
    SPxLP::changeElement(i, j, val);
-   SPxBasis::changedElement( i, j );
+   if ( SPxBasis::status() > SPxBasis::NO_PROBLEM )
+      SPxBasis::changedElement( i, j );
    unInit();
 }
 
