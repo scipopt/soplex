@@ -14,6 +14,15 @@ Release 1.3.3
 
 - Replaced SPxLP::operator<< by SPxLP::writeLPF().
 
+- Created directory 'tests' that should contain small programms that illustrate
+  a (former) bug in SoPlex or something like unit tests.
+
+- Corrected changeElement(): it now works also in the initial phase (NO_PROBLEM).
+  A corresponding test file is 'tests/testChangeElement.cpp'.
+
+- Implemented basic handling of reading a basis file (not yet thoroughly tested).
+  The basic changes are in example.cpp, spxbasis.cpp, soplex.cpp, soplex.h.
+
 #----------------------------------------------------------------
 
 Release 1.3.2
