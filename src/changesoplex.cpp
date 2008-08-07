@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: changesoplex.cpp,v 1.31 2008/08/03 20:59:33 bzfpfets Exp $"
+#pragma ident "@(#) $Id: changesoplex.cpp,v 1.32 2008/08/07 10:44:15 bzfpfets Exp $"
 
 //#define DEBUGGING 1
 
@@ -1013,20 +1013,20 @@ void SPxSolver::changeRange(int i, Real newLhs, Real newRhs)
 void SPxSolver::changeRow(int i, const LPRow& newRow)
 {
    METHOD( "SPxSolver::changeRow()" );
-   assert( SPxBasis::status() > SPxBasis::NO_PROBLEM );
 
    SPxLP::changeRow(i, newRow);
-   SPxBasis::changedRow( i );
+   if ( SPxBasis::status() > SPxBasis::NO_PROBLEM )
+      SPxBasis::changedRow( i );
    unInit();
 }
 
 void SPxSolver::changeCol(int i, const LPCol& newCol)
 {
    METHOD( "SPxSolver::changeCol()" );
-   assert( SPxBasis::status() > SPxBasis::NO_PROBLEM );
 
    SPxLP::changeCol(i, newCol);
-   SPxBasis::changedCol( i );
+   if ( SPxBasis::status() > SPxBasis::NO_PROBLEM )
+      SPxBasis::changedCol( i );
    unInit();
 }
 
