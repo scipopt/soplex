@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.59 2007/10/19 15:44:25 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.60 2008/08/07 10:28:52 bzfpfets Exp $"
 
 //#define DEBUGGING 1
 
@@ -242,8 +242,23 @@ void SPxBasis::loadSolver(SLinSolver* p_solver)
  *
  *  @return true if the file was read correctly.
  *
- *  @todo This routine is untested.
- *  @todo We have to check for P_FIXED, if lower == upper
+ *  @todo This routine is (almost) untested.
+ *  @todo Check whether handling of P_FIXED is correct.
+ *  @todo Check whether it is a good idea to set the status to REGULAR.
+ *
+ *  Here is a very brief outline of the format:
+ *
+ *  The format is in a form similar to an MPS file. The basic assumption is that all (column)
+ *  variables are nonbasic at their lower bound and all row (variables) are basic; only the
+ *  differences to this rule are given. Each data line contains an indicator, a variable name and
+ *  possibly a row/constraint name. The following meaning applies with respect to the indicators:
+ *
+ *  - XU: the variable is basic, the row is nonbasic at its upper bound 
+ *  - XL: the variable is basic, the row is nonbasic at its lower bound 
+ *  - UL: the variable is nonbasic and at its upper bound
+ *  - LL: the variable is nonbasic and at its lower bound
+ *
+ *  The CPLEX format contains an additional indicater 'BS', but this is unsupported here.
  */
 bool SPxBasis::readBasis(
    std::istream&  is, 
@@ -260,13 +275,18 @@ bool SPxBasis::readBasis(
       l_desc.rowstat[i] = dualRowStatus(i);
 
    for(i = 0; i < theLP->nCols(); i++)
-      l_desc.colstat[i] = Desc::P_ON_LOWER;
+   {
+      if (theLP->SPxLP::lower(i) == theLP->SPxLP::upper(i))
+         l_desc.colstat[i] = Desc::P_FIXED;
+      else
+         l_desc.colstat[i] = Desc::P_ON_LOWER;
+   }
 
    MPSInput mps(is);
 
    if (mps.readLine() && (mps.field0() != 0) && !strcmp(mps.field0(), "NAME"))
    {
-      while(mps.readLine())
+      while (mps.readLine())
       {
          int c = -1;
          int r = -1;
@@ -289,12 +309,18 @@ bool SPxBasis::readBasis(
          if (!strcmp(mps.field1(), "XU"))
          {
             l_desc.colstat[c] = dualColStatus(c);
-            l_desc.rowstat[r] = Desc::P_ON_UPPER;
+            if ( theLP->SPxLP::lhs(i) == theLP->SPxLP::rhs(i) )
+               l_desc.rowstat[r] = Desc::P_FIXED;
+            else
+               l_desc.rowstat[r] = Desc::P_ON_UPPER;
          }
          else if (!strcmp(mps.field1(), "XL"))
          {
             l_desc.colstat[c] = dualColStatus(c);
-            l_desc.rowstat[r] = Desc::P_ON_LOWER;
+            if ( theLP->SPxLP::lhs(r) == theLP->SPxLP::rhs(r) )
+               l_desc.rowstat[r] = Desc::P_FIXED;
+            else
+               l_desc.rowstat[r] = Desc::P_ON_LOWER;
          }
          else if (!strcmp(mps.field1(), "UL"))
          {
@@ -314,7 +340,12 @@ bool SPxBasis::readBasis(
    if (!mps.hasError())
    {
       if (mps.section() == MPSInput::ENDATA)
+      {
+         // force basis to be different from NO_PROBLEM (is REGULAR a good idea?),
+         // otherwise the basis will be overwritten at later stages.
+         setStatus(REGULAR);
          loadDesc(l_desc);
+      }
       else
          mps.syntaxError();
    }
