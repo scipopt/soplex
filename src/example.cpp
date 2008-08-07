@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.100 2007/10/25 08:07:19 bzfhille Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.101 2008/08/07 10:31:11 bzfpfets Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -310,19 +310,19 @@ void read_input_file(MySoPlex&      work,
    MSG_INFO1( spxout << "IEXAMP41 LP reading time: " << timer.userTime() << std::endl; )
 }
 //------------------------------------------------------------------------
-void read_basis_file(MySoPlex&      /* work     */,
-                     const char*    /* filename */,
-                     NameSet&       /* rownames */,
-                     NameSet&       /* colnames */)
+void read_basis_file(MySoPlex&      work    ,
+                     const char*    filename,
+                     NameSet&       rownames,
+                     NameSet&       colnames)
 {
-#if 0
-   if (!work.readBasisFile(basisname, rownames, colnames))
+   //#if 0
+   if (!work.readBasisFile(filename, rownames, colnames))
    {
       MSG_INFO1( spxout << "EEXAMP25 error while reading file \"" 
-                        << basisname << "\"" << std::endl; )
+                        << filename << "\"" << std::endl; )
       exit(1);
    }
-#endif
+   //#endif
 }
 //------------------------------------------------------------------------
 SPxPricer* get_pricer(const int pricing)
@@ -621,6 +621,10 @@ void print_solution_and_status(const MySoPlex&      work,
       }
       if ( print_quality )
          work.displayInfeasibility();
+      if ( write_basis )  // write basis even if we are infeasible
+         if ( ! work.writeBasisFile( basisname, rownames, colnames ) )
+            MSG_INFO1( spxout << "EEXAMP30 error while writing file \"" 
+                              << basisname << "\"" << std::endl; )
       break;
    case SPxSolver::ABORT_CYCLING:
       MSG_INFO1( spxout << "EEXAMP40 aborted due to cycling" << std::endl; )
