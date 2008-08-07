@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.48 2007/10/19 15:44:25 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.49 2008/08/07 10:29:43 bzfpfets Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -98,9 +98,9 @@ public:
       //**@name Status */
       //@{
       /// Status of a variable.
-      /** A basis is described by assigning a Status to all of the LPs
+      /** A basis is described by assigning a Status to all of the LP
           variables and covariables. This assignment is maintained by the
-          basis Descriptor.
+          basis #Desc%riptor.
           
           Variables and covariables may have a primal or dual Status. The
           first type specifies that a variable is set on a primal bound, while
@@ -115,13 +115,13 @@ public:
 
           For a column basis, primal #Status%es correspond to nonbasic
           variables, while dual ones are basic. This is reversed for a row
-          basis. We will now reveil in more detail the significance of
+          basis. We will now reveal in more detail the significance of
           variable #Status%es.
 
-          \f$ \mbox{\bf Primal Variables} \f$
+          <b>Primal Variables</b>
 
           Consider a range inequality \f$l_r \le a^T x \le u_r\f$ or bounds on
-          a variable \f$l_c \le x_c \le u_c\f$. The following table reveils
+          a variable \f$l_c \le x_c \le u_c\f$. The following table reveals
           what is implied if the corresponding variable or covariable is
           assigned to a primal #Status:
 
@@ -140,16 +140,16 @@ public:
           \end{array}
           \f]
 
-          Note that to determine if a variable with Status stat is set to
+          Note that to determine whether a variable with #Status stat is set to
           its upper bound, one can compute the test (-stat | -#P_ON_UPPER).
           This will yield true even if the variable is fixed, i.e., sitting on
           both bounds at the same time.
 
-          \f$ \mbox{\bf Dual Variables} \f$
+          <b>Dual Variables</b>
 
           In principle for implementing the Simplex algorithm it would suffice
-          to use only one dual Status. However, for performance reasons it
-          is advisable to introduce various dual Status types, reflecting
+          to use only one dual #Status. However, for performance reasons it
+          is advisable to introduce various dual status types, reflecting
           the structure of the bounds. Given an upper bound \f$u\f$ and a lower
           bound \f$l\f$ of a constraint or variable, the following table 
           indicates the setting of the dual Status of this variable.
@@ -167,7 +167,7 @@ public:
           \f]
 
           Note that unbounded primal variables are reflected by an #D_UNDEFINED
-          dual variable, since no DUAL variables exist to them. To facilate
+          dual variable, since no dual variables exist for them. To facilitate
           the assignment of dual #Status%es, class SPxBasis provides methods
           #dualStatus(), #dualColStatus() and #dualRowStatus)().
       */
