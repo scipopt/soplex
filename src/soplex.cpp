@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.89 2008/08/03 21:04:06 bzfpfets Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.90 2008/08/07 10:38:15 bzfpfets Exp $"
 
 #include <iostream>
 
@@ -113,7 +113,11 @@ SPxSolver::Status SoPlex::solve()
       if (m_postScaler != 0)
          m_postScaler->scale(work);
 
-      m_solver.loadLP(work);
+      // If a basis was loaded via readBasisFile() (i.e, status() != NO_PROBLEM) then 
+      // the LP is already loaded into solver. To avoid the deletion of the basis we
+      // do not (re)load the LP.
+      if ( m_solver.basis().status() == SPxBasis::NO_PROBLEM )
+         m_solver.loadLP(work);
    }
    return m_solver.solve();
 }
@@ -391,6 +395,8 @@ bool SoPlex::readBasisFile
      const NameSet& rowNames, 
      const NameSet& colNames )
 {
+   // init solver using original LP
+   m_solver.loadLP(*this);
    return m_solver.readBasisFile(filename, rowNames, colNames);
 }
 
