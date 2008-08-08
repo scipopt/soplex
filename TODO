@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-# $Id: TODO,v 1.103 2007/11/02 12:54:17 bzforlow Exp $
+# $Id: TODO,v 1.104 2008/08/08 15:33:00 bzftuchs Exp $
 #-----------------------------------------------------------------------
 
 #-----------------------------------------------------------------------
@@ -41,10 +41,6 @@ Sebastian:
 
 
 Andreas:
-- nachgucken, ob die Fehlermeldung ESOLVR04 beim Rausschreiben einer
-  Basis noch aktuell ist.  Kann eine Basis gelesen werden? Falls ja,
-  dann auch diese Möglichkeit in example.cpp wieder bereitstellen.
-
 - der col_first parameter bei scale wird nicht mehr benutzt.
    -> Meldung noch aktuell? --> evtl. col_first rauswerfen
 
