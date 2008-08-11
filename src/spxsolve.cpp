@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.100 2008/04/10 15:01:34 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.101 2008/08/11 17:53:05 bzfpfets Exp $"
 
 //#define DEBUGGING 1
 
@@ -213,10 +213,10 @@ SPxSolver::Status SPxSolver::solve()
                                           << thepricer->epsilon() 
                                           << std::endl; )
                   }
-                  // solution seems good, no check we are precice enough
+                  // solution seems good, no check whether we are precise enough
                   else if (lastUpdate() == 0)
                      break;
-                  // We have a iterationlimit and everything look good? Then stop!
+                  // We have an iterationlimit and everything looks good? Then stop!
                   // 6 is just a number picked.
                   else if (maxIters > 0 && lastUpdate() < 6)
                      break;
@@ -346,7 +346,7 @@ SPxSolver::Status SPxSolver::solve()
                                           << thepricer->epsilon() 
                                           << std::endl; );
                   }
-                  // solution seems good, no check we are precise enough
+                  // solution seems good, no check whether we are precise enough
                   else if (lastUpdate() == 0)
                      break;
                   // We have an iteration limit and everything looks good? Then stop!
