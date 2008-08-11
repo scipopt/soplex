@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.48 2007/10/19 15:44:25 bzforlow Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.49 2008/08/11 17:46:30 bzfpfets Exp $"
 
 //#define DEBUGGING 1
 
@@ -34,8 +34,8 @@ static const Real reject_leave_tol = 1e-8;
 
 /*
     Vector |fTest| gives the feasibility test of all basic variables. For its
-    compution |fVec|, |theUBbound| and |theLBbound| must be setup correctly.
-    Values of |fTest| $<0$ represent infeasible variables, which are eligable
+    computation |fVec|, |theUBbound| and |theLBbound| must be setup correctly.
+    Values of |fTest| $<0$ represent infeasible variables, which are eligible
     for leaving the basis in the simplex loop.
  */
 void SPxSolver::computeFtest()
@@ -71,7 +71,7 @@ void SPxSolver::updateFtest()
 }
 
 
-/* compute statistics on leaveing variable 
+/* compute statistics on leaving variable 
    Compute a set of statistical values on the variable selected for leaving the
    basis.
  */
