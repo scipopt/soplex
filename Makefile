@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.88 2008/08/27 20:38:57 bzfpfets Exp $
+# $Id: Makefile,v 1.89 2008/08/27 20:52:54 bzfpfets Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -81,6 +81,7 @@ LIBOBJ		= 	changesoplex.o didxset.o \
 			vector.o vsolve.o \
 			gzstream.o
 BINOBJ		=	soplexmain.o
+EXAMPLEOBJ	=	example.o
 REPOSIT		=	# template repository, explicitly empty  #spxproof.o 
 
 BASE		=	$(OSTYPE).$(ARCH).$(COMP).$(OPT)
@@ -108,8 +109,10 @@ include make/make.$(BASE)
 #-----------------------------------------------------------------------------
 
 BINNAME		=	$(NAME)-$(VERSION).$(BASE)
+EXAMPLENAME	=	example.$(BASE)
 LIBNAME		=	$(NAME)-$(VERSION).$(BASE)
 BINFILE		=	$(BINDIR)/$(BINNAME)
+EXAMPLEFILE	=	$(BINDIR)/$(EXAMPLENAME)
 LIBFILE		=	$(LIBDIR)/lib$(LIBNAME).$(LIBEXT)
 LIBLINK		=	$(LIBDIR)/lib$(NAME).$(BASE).$(LIBEXT)
 BINLINK		=	$(BINDIR)/$(NAME).$(BASE)
@@ -123,8 +126,10 @@ OBJDIR		=	obj/O.$(BASE)
 BINOBJDIR	=	$(OBJDIR)/bin
 LIBOBJDIR	=	$(OBJDIR)/lib
 BINOBJFILES	=	$(addprefix $(BINOBJDIR)/,$(BINOBJ))
+EXAMPLEOBJFILES	=	$(addprefix $(BINOBJDIR)/,$(EXAMPLEOBJ))
 LIBOBJFILES	=	$(addprefix $(LIBOBJDIR)/,$(LIBOBJ))
 BINSRC		=	$(addprefix $(SRCDIR)/,$(BINOBJ:.o=.cpp))
+EXAMPLESRC	=	$(addprefix $(SRCDIR)/,$(EXAMPLEOBJ:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
 
 ZLIBDEP		:=	$(SRCDIR)/depend.zlib
@@ -143,6 +148,7 @@ ifeq ($(VERBOSE),false)
 endif
 
 all:		$(LIBFILE) $(BINFILE) $(LIBLINK) $(BINLINK) $(BINSHORTLINK)
+example:	$(LIBFILE) $(EXAMPLEFILE) $(LIBLINK)
 
 $(LIBLINK):	$(LIBFILE)
 		@rm -f $@
@@ -155,6 +161,11 @@ $(BINLINK) $(BINSHORTLINK):	$(BINFILE)
 $(BINFILE):	$(BINDIR) $(BINOBJDIR) $(LIBFILE) $(BINOBJFILES)
 		@echo "-> linking $@"
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOBJFILES) \
+		-Wl,-rpath,$(CURDIR)/$(LIBDIR) -L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+
+$(EXAMPLEFILE):	$(BINDIR) $(EXAMPLEOBJDIR) $(LIBFILE) $(EXAMPLEOBJFILES)
+		@echo "-> linking $@"
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(EXAMPLEOBJFILES) \
 		-Wl,-rpath,$(CURDIR)/$(LIBDIR) -L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
 
 $(LIBFILE):	$(LIBDIR) $(LIBOBJDIR) touchexternal $(LIBOBJFILES) 
@@ -189,7 +200,7 @@ memory_exception_test: $(BINFILE)
 		"$(VALGRIND) $(VFLAGS)" $(VSUPPNAME)
 
 clean:
-		-rm -rf $(OBJDIR)/* $(BINFILE) $(LIBFILE) $(LIBLINK) $(BINLINK) $(BINSHORTLINK)
+		-rm -rf $(OBJDIR)/* $(BINFILE) $(EXAMPLEFILE) $(LIBFILE) $(LIBLINK) $(BINLINK) $(BINSHORTLINK)
 
 distclean:	clean
 		-rm -rf obj/* $(LIBDIR)/lib$(NAME).* $(BINDIR)/$(NAME).* 
@@ -220,6 +231,10 @@ depend:
 		$(BINSRC:.o=.cpp) \
 		| sed '\''s|^\([0-9A-Za-z]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g'\'' \
 		>$(DEPEND)'
+		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
+		$(EXAMPLESRC:.o=.cpp) \
+		| sed '\''s|^\([0-9A-Za-z]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g'\'' \
+		>>$(DEPEND)'
 		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
 		$(LIBSRC:.o=.cpp) \
 		| sed '\''s|^\([0-9A-Za-z]\{1,\}\)\.o|$$\(LIBOBJDIR\)/\1.o|g'\'' \
