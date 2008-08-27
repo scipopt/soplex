@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.101 2008/08/11 17:53:05 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.102 2008/08/27 06:45:20 bzfheinz Exp $"
 
 //#define DEBUGGING 1
 
@@ -701,27 +701,42 @@ bool SPxSolver::terminate()
       m_status = ABORT_TIME;
       return true;   
    }
-   if (maxValue < infinity)
+
+   // objLimit is set and we are running DUAL:
+   // - objLimit is set if objLimit < infinity
+   // - DUAL is running if rep() * type() > 0 == DUAL (-1 == PRIMAL)
+   //
+   // In this case we have given a objective value limit, e.g, through a
+   // MIP solver, and we want stop solving the LP if we figure out that the
+   // optimal value of the current LP can not be better then this objective
+   // limit. More precisely:
+   // - MINIMIZATION Problem
+   //   We want stop the solving process if
+   //   objLimit <= current objective value of the DUAL LP
+   // - MAXIMIZATION Problem
+   //   We want stop the solving process if 
+   //   objLimit >= current objective value of the DUAL LP
+   if (objLimit < infinity && type() * rep() > 0)
    {
-      /**@todo This code is *NOT* tested. */
-         
+      // We have no bound shifts; therefore, we can trust the current
+      // objective value.
+      // It might be even possible to use this termination value in case of
+      // bound violations (shifting) but in this case it is quite difficult
+      // to determine if we already reached the limit.
       if( shift() < epsilon() && maxInfeas() + shift() <= delta() )
       {
          // SPxSense::MINIMIZE == -1, so we have sign = 1 on minimizing
-         // rep() * type() > 0 == DUAL, -1 == PRIMAL.
-         int sign = -1 * spxSense() * rep() * type();
-         
-         if( sign * (value() - maxValue) >= 0.0 )
+         if( spxSense() * value() <= spxSense() * objLimit ) 
          {
-            MSG_INFO2( spxout << "ISOLVE55 Objective value limit (" << maxValue
+            MSG_INFO2( spxout << "ISOLVE55 Objective value limit (" << objLimit
                << ") reached" << std::endl; )
             MSG_DEBUG(
                spxout << "DSOLVE56 Objective value limit reached" << std::endl
                       << " (value: " << value()
-                      << ", limit: " << maxValue << ")" << std::endl
+                      << ", limit: " << objLimit << ")" << std::endl
                       << " (spxSense: " << int(spxSense())
                       << ", rep: " << int(rep())
-                      << ", type: " << int(type()) << std::endl;
+                      << ", type: " << int(type()) << ")" << std::endl;
             )
             
             m_status = ABORT_VALUE;

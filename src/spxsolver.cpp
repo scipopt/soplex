@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.30 2007/10/19 15:44:25 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.31 2008/08/27 06:45:20 bzfheinz Exp $"
 
 //#define DEBUGGING 1
 
@@ -710,7 +710,7 @@ SPxSolver::SPxSolver(
    , thePricing(FULL)
    , maxIters (-1)
    , maxTime (infinity)
-   , maxValue(infinity)
+   , objLimit(infinity)
    , m_status(UNKNOWN)
    , theShift (0)
    , m_maxCycle(100)
@@ -866,21 +866,22 @@ int SPxSolver::terminationIter() const
    return maxIters;
 }
 
-/**@todo Terminationvalue should be implemented. The Problem is that
- *       with allowing bound violations (shifting) it is quite 
- *       difficult to determine if we allready reached the limit.
+/**@todo A first version for the termination value is
+ *       implemented. Currently we check if no bound violations (shifting)
+ *       is present. It might be even possible to use this termination
+ *       value in case of bound violations (shifting) but in this case it
+ *       is quite difficult to determine if we already reached the limit.
  */
-void SPxSolver::setTerminationValue(Real /*p_value*/)
+void SPxSolver::setTerminationValue(Real p_value)
 {
    METHOD( "SPxSolver::setTerminationValue()" );
-   MSG_ERROR( spxout << "ESOLVE25 setTerminationValue not yet implemented" << std::endl; );
-   /*maxValue = p_value;*/
+   objLimit = p_value;
 }
 
 Real SPxSolver::terminationValue() const
 {
    METHOD( "SPxSolver::terminationValue()" );
-   return maxValue;
+   return objLimit;
 }
    
 SPxSolver::VarStatus

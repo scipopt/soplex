@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.29 2007/10/19 15:44:25 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.30 2008/08/27 06:45:20 bzfheinz Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -204,7 +204,7 @@ private:
    Timer          theTime;
    int            maxIters;    ///< maximum allowed iterations.
    Real           maxTime;     ///< maximum allowed time.
-   Real           maxValue;    ///< maximum allowed objective value.
+   Real           objLimit;    ///< objective value limit.
    Status         m_status;    ///< status of algorithm.
 
    Real           theDelta;    ///< maximum allowed bound violation.
