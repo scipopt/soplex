@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.87 2008/06/30 19:06:55 bzfpfets Exp $
+# $Id: Makefile,v 1.88 2008/08/27 20:38:57 bzfpfets Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -80,7 +80,7 @@ LIBOBJ		= 	changesoplex.o didxset.o \
 			tracemethod.o unitvector.o update.o updatevector.o \
 			vector.o vsolve.o \
 			gzstream.o
-BINOBJ		=	example.o
+BINOBJ		=	soplexmain.o
 REPOSIT		=	# template repository, explicitly empty  #spxproof.o 
 
 BASE		=	$(OSTYPE).$(ARCH).$(COMP).$(OPT)
