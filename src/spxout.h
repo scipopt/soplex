@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxout.h,v 1.12 2007/08/27 15:35:12 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxout.h,v 1.13 2008/08/27 20:35:23 bzfpfets Exp $"
 
 /**@file  spxout.h
  * @brief Wrapper for different output streams and verbosity levels.
@@ -41,12 +41,11 @@ namespace soplex
    is set via a manipulator or via the member function, it is persistent
    until a new value is set.
 
-   Most ostream member functions (e.g., @c precision()) are not provided here;
-   use the corresponding stream manipulators (e.g., @c setprecision())
-   instead. These are passed on to the <em>current</em> ostream, which is
-   chosen according to the verbosity level. In particular, this means that the
-   first element in an output stream should always be the verbosity. For
-   instance, use
+   Most ostream member functions are not provided here; use the corresponding 
+   stream manipulators (e.g., @c setprecision()) instead. These are passed on 
+   to the <em>current</em> ostream, which is chosen according to the verbosity 
+   level. In particular, this means that the first element in an output stream
+   should always be the verbosity. For instance, use
    @code
       spxout << verb( SPxOut::WARNING ) << std::setw( 15 ) << 42 << std::endl;
    @endcode
@@ -130,6 +129,11 @@ public:
    inline bool operator ! () const
    {
       return ! getCurrentStream();
+   }
+   ///
+   inline std::streamsize precision() const
+   { 
+      return getCurrentStream().precision();
    }
    //@}
 
