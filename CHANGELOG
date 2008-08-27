@@ -25,6 +25,14 @@ Release 1.3.3
 
 - Bugfix: fix the the termination value (objective limit) problem (spxsolve.cpp)
 
+- Added member function precision() in spxout.h
+
+- Changed main target to soplexmain (from example)
+
+- soplexmain.cpp now contains the main function. The output of this function should
+  be more readable than the one of example. The example is now available as target
+  'example' in the makefile.
+
 #----------------------------------------------------------------
 
 Release 1.3.2
