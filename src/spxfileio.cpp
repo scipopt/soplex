@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfileio.cpp,v 1.8 2007/10/19 15:44:25 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxfileio.cpp,v 1.9 2008/09/02 15:33:41 bzfpfets Exp $"
 
 //#define DEBUGGING 1
 
@@ -54,22 +54,6 @@ bool SPxSolver::writeBasisFile
    writeBasis(file, rowNames, colNames);
 
    return true;
-}
-
-bool SPxLP::readFile( 
-   const char* filename, 
-   NameSet*    rowNames,
-   NameSet*    colNames, 
-   DIdxSet*    intVars)
-{
-   METHOD( "SPxLP::readFile()" );
-
-   spxifstream file(filename);
-
-   if (!file)
-      return false;
-
-   return read(file, rowNames, colNames, intVars);
 }
 
 } // namespace soplex

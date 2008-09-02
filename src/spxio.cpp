@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxio.cpp,v 1.28 2007/10/19 16:08:28 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxio.cpp,v 1.29 2008/09/02 15:33:41 bzfpfets Exp $"
 
 
 //#define DEBUGGING 1
@@ -32,6 +32,7 @@
 #include "lpcolset.h"
 #include "nameset.h"
 #include "spxout.h"
+#include "spxfileio.h"
 
 namespace soplex
 {
@@ -73,6 +74,34 @@ bool SPxLP::read(std::istream&   is,
    MSG_DEBUG( spxout << "DSPXIO01\n" << *this; );
 
    return ok;
+}
+
+
+bool SPxLP::readFile( 
+   const char* filename, 
+   NameSet*    rowNames,
+   NameSet*    colNames, 
+   DIdxSet*    intVars)
+{
+   METHOD( "SPxLP::readFile()" );
+
+   spxifstream file(filename);
+
+   if (!file)
+      return false;
+
+   return read(file, rowNames, colNames, intVars);
+}
+
+
+void SPxLP::writeFile(const char* filename,
+      const NameSet* rowNames,
+      const NameSet* colNames, 
+      const DIdxSet* p_intvars ) const
+{
+   /* @todo decide on format by looking at suffix of filename */
+   std::ofstream tmp(filename);
+   writeLPF(tmp, rowNames, colNames, p_intvars);
 }
 
 } // namespace soplex
