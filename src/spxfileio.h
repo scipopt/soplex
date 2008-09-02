@@ -13,13 +13,15 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfileio.h,v 1.2 2007/08/27 15:35:11 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxfileio.h,v 1.3 2008/09/02 15:34:30 bzfpfets Exp $"
 
 /**@file  spxfileio.h
  * @brief declaration of types for file output
  *
  * This is to make the use of compressed input files transparent
  * when programming.
+ *
+ * @todo maybe rename this file (it is unrelated to spxfileio.cpp)
  */
 #ifndef _SPXFILEIO_H_
 #define _SPXFILEIO_H_
