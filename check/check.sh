@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: check.sh,v 1.28 2007/06/19 13:03:10 bzforlow Exp $
+# $Id: check.sh,v 1.29 2008/09/03 10:47:48 bzfpfets Exp $
 # Parameters
 # $1 Name of the test, e.g. netlib (needs netlib.test, netlib.solu)
 # $2 Path/Name of the binary, e.g. ../bin/soplex.linux.x86.gnu.opt
@@ -71,7 +71,7 @@ do
 	15) echo =type= CV3
 	    opt="-r -i -t0 -c3 -s4" ;;
         esac
-        $2 $opt -q $4 $i 2>>$ERRFILE
+        $2 $opt -C -q $4 $i 2>>$ERRFILE
         echo =ready=
     done
 done | tee -a $OUTFILE
