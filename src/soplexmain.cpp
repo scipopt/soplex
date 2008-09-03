@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplexmain.cpp,v 1.1 2008/08/27 20:41:44 bzfpfets Exp $"
+#pragma ident "@(#) $Id: soplexmain.cpp,v 1.2 2008/09/03 10:44:55 bzfpfets Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -51,6 +51,13 @@
 
 using namespace soplex;
 
+
+//------------------------------------------------------------------------
+// for simplicity: store whether we are in check mode:
+static bool checkMode = false;
+//------------------------------------------------------------------------
+
+
 //------------------------------------------------------------------------
 //    class MySoPlex
 //------------------------------------------------------------------------
@@ -74,51 +81,103 @@ public:
       Real maxviol;
       Real sumviol;
 
-      MSG_INFO1( spxout << "Violations (max/sum)" << std::endl; )
-
-      m_solver.qualConstraintViolation(maxviol, sumviol);
-
-      MSG_INFO1( spxout << "Constraints      :"
-                 << std::setw(16) << maxviol << "  "
-                 << std::setw(16) << sumviol << std::endl; )
-
-      qualConstraintViolation(maxviol, sumviol);
-
-      MSG_INFO1( spxout << "      (unscaled) :"
-                 << std::setw(16) << maxviol << "  "
-                 << std::setw(16) << sumviol << std::endl; )
-
-      m_solver.qualBoundViolation(maxviol, sumviol);
-
-      MSG_INFO1( spxout << "Bounds           :"
-                 << std::setw(16) << maxviol << "  "
-                 << std::setw(16) << sumviol << std::endl; )
-
-      qualBoundViolation(maxviol, sumviol);
-
-      MSG_INFO1( spxout << "      (unscaled) :"
-                 << std::setw(16) << maxviol << "  "
-                 << std::setw(16) << sumviol << std::endl; )
-
-      if (!m_vanished)
+      if ( checkMode )
       {
-         m_solver.qualSlackViolation(maxviol, sumviol);
+	 MSG_INFO1( spxout << "IEXAMP05 Violations (max/sum)" << std::endl; )
 
-         MSG_INFO1( spxout << "Slacks           :"
-                    << std::setw(16) << maxviol << "  "
-                    << std::setw(16) << sumviol << std::endl; )
+	 m_solver.qualConstraintViolation(maxviol, sumviol);
 
-         m_solver.qualRedCostViolation(maxviol, sumviol);
+	 MSG_INFO1( spxout << "IEXAMP06 Constraints      :"
+	    << std::setw(16) << maxviol << "  "
+	    << std::setw(16) << sumviol << std::endl; )
 
-         MSG_INFO1( spxout << "Reduced costs    :"
-                    << std::setw(16) << maxviol << "  "
-                    << std::setw(16) << sumviol << std::endl; )
+	 qualConstraintViolation(maxviol, sumviol);
+
+	 MSG_INFO1( spxout << "IEXAMP07       (unscaled) :"
+	    << std::setw(16) << maxviol << "  "
+	    << std::setw(16) << sumviol << std::endl; )
+
+	 m_solver.qualBoundViolation(maxviol, sumviol);
+
+	 MSG_INFO1( spxout << "IEXAMP08 Bounds           :"
+	    << std::setw(16) << maxviol << "  "
+	    << std::setw(16) << sumviol << std::endl; )
+
+	 qualBoundViolation(maxviol, sumviol);
+
+	 MSG_INFO1( spxout << "IEXAMP09       (unscaled) :"
+	    << std::setw(16) << maxviol << "  "
+	    << std::setw(16) << sumviol << std::endl; )
+
+	 if (!m_vanished)
+	 {
+	    m_solver.qualSlackViolation(maxviol, sumviol);
+
+	    MSG_INFO1( spxout << "IEXAMP10 Slacks           :"
+	       << std::setw(16) << maxviol << "  "
+	       << std::setw(16) << sumviol << std::endl; )
+
+	    m_solver.qualRedCostViolation(maxviol, sumviol);
+
+	    MSG_INFO1( spxout << "IEXAMP11 Reduced costs    :"
+	       << std::setw(16) << maxviol << "  "
+	       << std::setw(16) << sumviol << std::endl; )
 #if 0
-         MSG_INFO1( spxout << "Proven dual bound:"
-                    << std::setw(20)
-                    << std::setprecision(20)
-                    << m_solver.provedDualbound() << std::endl; )
+	    MSG_INFO1( spxout << "IEXAMP12 Proven dual bound:"
+	       << std::setw(20)
+	       << std::setprecision(20)
+	       << m_solver.provedDualbound() << std::endl; )
 #endif
+	  }
+      }
+      else
+      {
+	 MSG_INFO1( spxout << "Violations (max/sum)" << std::endl; )
+
+	 m_solver.qualConstraintViolation(maxviol, sumviol);
+
+	 MSG_INFO1( spxout << "Constraints      :"
+	    << std::setw(16) << maxviol << "  "
+	    << std::setw(16) << sumviol << std::endl; )
+
+	 qualConstraintViolation(maxviol, sumviol);
+
+	 MSG_INFO1( spxout << "      (unscaled) :"
+	    << std::setw(16) << maxviol << "  "
+	    << std::setw(16) << sumviol << std::endl; )
+
+	 m_solver.qualBoundViolation(maxviol, sumviol);
+
+	 MSG_INFO1( spxout << "Bounds           :"
+	    << std::setw(16) << maxviol << "  "
+	    << std::setw(16) << sumviol << std::endl; )
+
+	 qualBoundViolation(maxviol, sumviol);
+
+	 MSG_INFO1( spxout << "      (unscaled) :"
+	    << std::setw(16) << maxviol << "  "
+	    << std::setw(16) << sumviol << std::endl; )
+
+	 if (!m_vanished)
+	 {
+	    m_solver.qualSlackViolation(maxviol, sumviol);
+
+	    MSG_INFO1( spxout << "Slacks           :"
+	       << std::setw(16) << maxviol << "  "
+	       << std::setw(16) << sumviol << std::endl; )
+
+	    m_solver.qualRedCostViolation(maxviol, sumviol);
+
+	    MSG_INFO1( spxout << "Reduced costs    :"
+	       << std::setw(16) << maxviol << "  "
+	       << std::setw(16) << sumviol << std::endl; )
+#if 0
+	    MSG_INFO1( spxout << "Proven dual bound:"
+	       << std::setw(20)
+	       << std::setprecision(20)
+	       << m_solver.provedDualbound() << std::endl; )
+#endif
+	  }
       }
    }
    //------------------------------------------------------------------------
@@ -127,13 +186,23 @@ public:
       assert(m_solver.status() == SPxSolver::INFEASIBLE);
 
 #if 0
-      if ( m_solver.isProvenInfeasible() )
+      if ( checkMode )
       {
-         MSG_INFO1( spxout << "Infeasibility is proven." << std::endl; )
+	 if( m_solver.isProvenInfeasible() )
+	    MSG_INFO1( spxout << "IEXAMP13 Infeasibility is proven." << std::endl; )
+         else
+	    MSG_INFO1( spxout << "IEXAMP13 Infeasibility could not be proven!" << std::endl; )
       }
       else
       {
-         MSG_INFO1( spxout << "Infeasibility could not be proven!" << std::endl; )
+         if ( m_solver.isProvenInfeasible() )
+	 {
+	    MSG_INFO1( spxout << "Infeasibility is proven." << std::endl; )
+	 }
+	 else
+	 {
+	    MSG_INFO1( spxout << "Infeasibility could not be proven!" << std::endl; )
+	 }
       }
 #endif
    }
@@ -240,6 +309,7 @@ void print_usage_and_exit( const char* const argv[] )
       " -zuEps    set update zero tolerance to Eps\n\n"
       " -vLevel   set verbosity Level: from 0 (ERROR) to 5 (DEBUG), default 2\n"
       " -V        show program version\n"
+      " -C        check mode (for check scripts)\n"
       " -h        show this help\n"
       "Simplifier:     Scaler:         Starter:     Pricer:        Ratiotester:\n"
       " -s0 none       -g0 none         -c0 none*   -p0 Textbook  -t0 Textbook\n"
@@ -267,22 +337,47 @@ void print_algorithm_parameters(
    const SLUFactor::UpdateType     update
    )
 {
-   MSG_INFO1( spxout
-      << "SoPlex parameters: " << std::endl
-      << "Delta          = "
-      << std::setw(16) << work.delta() << std::endl
-      << "Epsilon Zero   = "
-      << std::setw(16) << Param::epsilon() << std::endl
-      << "Epsilon Factor = "
-      << std::setw(16) << Param::epsilonFactorization() << std::endl
-      << "Epsilon Update = "
-      << std::setw(16) << Param::epsilonUpdate() << std::endl
-      << (work.type() == SPxSolver::ENTER ? "- Entering" : "- Leaving")
-      << " algorithm" << std::endl
-      << (representation == SPxSolver::ROW ? "- Row" : "- Column")
-      << " representation" << std::endl
-      << (update == SLUFactor::ETA ? "- Eta" : "- Forest-Tomlin")
-      << " update" << std::endl; )
+   if ( checkMode )
+   {
+      MSG_INFO1( spxout
+	 << "IEXAMP12 Delta          = "
+	 << std::setw(16) << work.delta() << std::endl
+	 << "IEXAMP13 Epsilon Zero   = "
+	 << std::setw(16) << Param::epsilon() << std::endl
+	 << "IEXAMP37 Epsilon Factor = "
+	 << std::setw(16) << Param::epsilonFactorization() << std::endl
+	 << "IEXAMP38 Epsilon Update = "
+	 << std::setw(16) << Param::epsilonUpdate() << std::endl
+	 << "IEXAMP14 "
+	 << (work.type() == SPxSolver::ENTER ? "Entering" : "Leaving")
+	 << " algorithm" << std::endl
+	 << "IEXAMP15 "
+	 << (representation == SPxSolver::ROW ? "Row" : "Column")
+	 << " representation" << std::endl
+	 << "IEXAMP16 "
+	 << (update == SLUFactor::ETA ? "Eta" : "Forest-Tomlin")
+	 << " update" << std::endl; )
+   }
+   else
+   {
+      MSG_INFO1( spxout
+	 << "SoPlex parameters: " << std::endl
+	 << "Delta          = "
+	 << std::setw(16) << work.delta() << std::endl
+	 << "Epsilon Zero   = "
+	 << std::setw(16) << Param::epsilon() << std::endl
+	 << "Epsilon Factor = "
+	 << std::setw(16) << Param::epsilonFactorization() << std::endl
+	 << "Epsilon Update = "
+	 << std::setw(16) << Param::epsilonUpdate() << std::endl
+	 << std::endl
+	 << "algorithm      = " << (work.type() == SPxSolver::ENTER ? "Entering" : "Leaving")
+	 << std::endl
+	 << "representation = " << (representation == SPxSolver::ROW ? "Row" : "Column")
+	 << std::endl
+	 << "update         = " << (update == SLUFactor::ETA ? "Eta" : "Forest-Tomlin")
+	 << std::endl; )
+   }
 }
 
 //------------------------------------------------------------------------
@@ -314,7 +409,10 @@ SPxPricer* get_pricer(const int pricing)
    }
 
    assert(pricer != NULL);
-   MSG_INFO1( spxout << "- " << pricer->getName() << " pricing"  << std::endl; )
+   if ( checkMode )
+      MSG_INFO1( spxout << "IEXAMP17 " << pricer->getName() << " pricing"  << std::endl; )
+   else
+      MSG_INFO1( spxout << "pricing        = " << pricer->getName() << std::endl; )
    return pricer;
 }
 
@@ -338,7 +436,10 @@ SPxRatioTester* get_ratio_tester(const int ratiotest)
    }
 
    assert(ratiotester != NULL);
-   MSG_INFO1( spxout << "- " << ratiotester->getName() << " ratiotest" << std::endl; )
+   if ( checkMode )
+      MSG_INFO1( spxout << "IEXAMP18 " << ratiotester->getName() << " ratiotest" << std::endl; )
+   else
+      MSG_INFO1( spxout << "ratiotest      = " << ratiotester->getName() << std::endl; )
    return ratiotester;
 }
 
@@ -380,11 +481,22 @@ void get_scalers(
       break;
    }
 
-   MSG_INFO1( spxout << "- "
-                     << ((prescaler != 0) ? prescaler->getName() : "no")
-                     << " / "
-                     << ((postscaler != 0) ? postscaler->getName() : "no")
-                     << " scaling" << std::endl; )
+   if ( checkMode )
+   {
+      MSG_INFO1( spxout << "IEXAMP19 "
+	 << ((prescaler != 0) ? prescaler->getName() : "no")
+	 << " / "
+	 << ((postscaler != 0) ? postscaler->getName() : "no")
+	 << " scaling" << std::endl; )
+   }
+   else
+   {
+      MSG_INFO1( spxout << "scaling        = "
+	 << ((prescaler != 0) ? prescaler->getName() : "no")
+	 << " / "
+	 << ((postscaler != 0) ? postscaler->getName() : "no")
+	 << std::endl; )
+   }
 }
 
 //------------------------------------------------------------------------
@@ -403,8 +515,10 @@ SPxSimplifier* get_simplifier(const int simplifying)
       break;
    }
 
-   MSG_INFO1( spxout << "- " << ((simplifier == 0) ? "no" : simplifier->getName())
-                     << " simplifier" << std::endl; )
+   if ( checkMode )
+      MSG_INFO1( spxout << "IEXAMP20 " << ((simplifier == 0) ? "no" : simplifier->getName()) << " simplifier" << std::endl; )
+   else
+      MSG_INFO1( spxout << "simplifier     = " << ((simplifier == 0) ? "no" : simplifier->getName()) << std::endl; )
    return simplifier;
 }
 
@@ -429,8 +543,10 @@ SPxStarter* get_starter(const int starting)
       break;
    }
 
-   MSG_INFO1( spxout << "- " << ((starter == 0) ? "no" : starter->getName())
-                     << " starter" << std::endl; )
+   if ( checkMode )
+      MSG_INFO1( spxout << "IEXAMP21 " << ((starter == 0) ? "no" : starter->getName()) << " starter" << std::endl; )
+   else
+      MSG_INFO1( spxout << "starter        = " << ((starter == 0) ? "no" : starter->getName()) << std::endl; )
 
    return starter;
 }
@@ -458,30 +574,49 @@ void read_input_file(
    NameSet&       rownames,
    NameSet&       colnames)
 {
-   MSG_INFO1( spxout << "\nLoading LP file " << filename << std::endl; )
+   if ( checkMode )
+      MSG_INFO1( spxout << "IEXAMP22 loading LP file " << filename << std::endl; )
+   else
+      MSG_INFO1( spxout << "\nLoading LP file " << filename << std::endl; )
 
    Timer timer;
    timer.start();
 
    if ( ! work.readFile(filename, &rownames, &colnames, NULL) )
    {
-      MSG_INFO1( spxout << "error while reading file \""  << filename << "\"" << std::endl; )
+      if ( checkMode )
+	 MSG_INFO1( spxout << "EEXAMP23 error while reading file \"" << filename << "\"" << std::endl; )
+      else
+	 MSG_INFO1( spxout << "error while reading file \""  << filename << "\"" << std::endl; )
       exit(1);
    }
    assert(work.isConsistent());
 
    timer.stop();
 
-   MSG_INFO1( spxout << "LP has "
-                     << work.nRows() << " rows "
-                     << work.nCols() << " columns "
-                     << work.nNzos() << " nonzeros"
-                     << std::endl; )
+   if ( checkMode )
+   {
+      MSG_INFO1( spxout << "IEXAMP24 LP has "
+	 << work.nRows() << " rows "
+	 << work.nCols() << " columns "
+	 << work.nNzos() << " nonzeros"
+	 << std::endl; )
 
-   MSG_INFO1(
-      std::streamsize prec = spxout.precision();
-      spxout << "LP reading time: " << std::fixed << std::setprecision(2) << timer.userTime();
-      spxout << std::scientific << std::setprecision(prec) << std::endl; )
+      MSG_INFO1( spxout << "IEXAMP41 LP reading time: " << timer.userTime() << std::endl; )
+   }
+   else
+   {
+      MSG_INFO1( spxout << "LP has "
+	 << work.nRows() << " rows "
+	 << work.nCols() << " columns "
+	 << work.nNzos() << " nonzeros"
+	 << std::endl; )
+
+      MSG_INFO1(
+	 std::streamsize prec = spxout.precision();
+	 spxout << "LP reading time: " << std::fixed << std::setprecision(2) << timer.userTime();
+	 spxout << std::scientific << std::setprecision(prec) << std::endl; )
+   }
 }
 
 //------------------------------------------------------------------------
@@ -493,7 +628,10 @@ void read_basis_file(
 {
    if (!work.readBasisFile(filename, rownames, colnames))
    {
-      MSG_INFO1( spxout << "Error while reading file \"" << filename << "\"" << std::endl; )
+      if ( checkMode )
+	 MSG_INFO1( spxout << "EEXAMP25 error while reading file \"" << filename << "\"" << std::endl; )
+      else
+         MSG_INFO1( spxout << "Error while reading file \"" << filename << "\"" << std::endl; )
       exit(1);
    }
 }
@@ -503,20 +641,37 @@ void solve_LP(MySoPlex& work)
 {
    Timer timer;
    timer.start();
-   MSG_INFO1( spxout << "\nSolving LP ..." << std::endl; )
+
+   if ( checkMode )
+      MSG_INFO1( spxout << "IEXAMP26 solving LP" << std::endl; )
+   else
+      MSG_INFO1( spxout << "\nSolving LP ..." << std::endl; )
 
    work.solve();
    timer.stop();
 
-   MSG_INFO1( std::streamsize prec = spxout.precision();
-      spxout << "\nSoPlex statistics:\n"
-      << "  Factorizations : " << work.getFactorCount() << std::endl
-      << "      Time spent : " << std::fixed << std::setprecision(2) << work.getFactorTime() << std::endl
-      << "  Solves         : " << work.getSolveCount() << std::endl
-      << "      Time spent : " << work.getSolveTime() << std::endl
-      << "  solution time  : " << timer.userTime() << std::endl
-      << "  iterations     : " << work.iteration() << std::endl
-      << std::scientific << std::setprecision(prec); )
+   if ( checkMode )
+   {
+      MSG_INFO1( spxout
+	 << "IEXAMP01 Factorizations   : " << work.getFactorCount() << std::endl
+	 << "IEXAMP02     Time spent   : " << work.getFactorTime() << std::endl
+	 << "IEXAMP03 Solves           : " << work.getSolveCount() << std::endl
+	 << "IEXAMP04     Time spent   : " << work.getSolveTime() << std::endl
+	 << "IEXAMP27 solution time  is: " << timer.userTime() << std::endl
+	 << "IEXAMP28 iterations       : " << work.iteration() << std::endl; )
+   }
+   else
+   {
+      MSG_INFO1( std::streamsize prec = spxout.precision();
+	 spxout << "\nSoPlex statistics:\n"
+	 << "  Factorizations : " << work.getFactorCount() << std::endl
+	 << "      Time spent : " << std::fixed << std::setprecision(2) << work.getFactorTime() << std::endl
+	 << "  Solves         : " << work.getSolveCount() << std::endl
+	 << "      Time spent : " << work.getSolveTime() << std::endl
+	 << "  solution time  : " << timer.userTime() << std::endl
+	 << "  iterations     : " << work.iteration() << std::endl
+	 << std::scientific << std::setprecision(prec); )
+   }
 }
 
 //------------------------------------------------------------------------
@@ -534,13 +689,15 @@ void print_solution_and_status(
    // get the solution status
    SPxSolver::Status stat = work.status();
 
-   MSG_INFO1( spxout << std::endl; )
+   if ( ! checkMode )
+      MSG_INFO1( spxout << std::endl; )
    switch (stat)
    {
    case SPxSolver::OPTIMAL:
-      MSG_INFO1( spxout << "Solution value is: "
-                        << std::setprecision( precision )
-                        << work.objValue() << std::endl; )
+      if ( checkMode )
+	 MSG_INFO1( spxout << "IEXAMP29 solution value is: " << std::setprecision( precision ) << work.objValue() << std::endl; )
+      else
+	 MSG_INFO1( spxout << "Solution value is: " << std::setprecision( precision ) << work.objValue() << std::endl; )
 
       if ( print_quality )
          work.displayQuality();
@@ -567,15 +724,24 @@ void print_solution_and_status(
       {
          if ( ! work.writeBasisFile( basisname, rownames, colnames ) )
          {
-            MSG_INFO1( spxout << "Error while writing file \"" << basisname << "\"" << std::endl; )
+	    if ( checkMode )
+	       MSG_INFO1( spxout << "EEXAMP30 error while writing file \"" << basisname << "\"" << std::endl; )
+	    else
+	       MSG_INFO1( spxout << "Error while writing file \"" << basisname << "\"" << std::endl; )
          }
       }
       break;
    case SPxSolver::UNBOUNDED:
-      MSG_INFO1( spxout << "LP is unbounded" << std::endl; )
+      if ( checkMode )
+	 MSG_INFO1( spxout << "IEXAMP31 LP is unbounded" << std::endl; )
+      else
+	 MSG_INFO1( spxout << "LP is unbounded" << std::endl; )
       break;
    case SPxSolver::INFEASIBLE:
-      MSG_INFO1( spxout << "LP is infeasible" << std::endl; )
+      if ( checkMode )
+	 MSG_INFO1( spxout << "IEXAMP32 LP is infeasible" << std::endl; )
+      else
+	 MSG_INFO1( spxout << "LP is infeasible" << std::endl; )
       if ( print_solution )
       {
          DVector farkasx(work.nRows());
@@ -665,28 +831,49 @@ void print_solution_and_status(
       if ( write_basis )  // write basis even if we are infeasible
          if ( ! work.writeBasisFile( basisname, rownames, colnames ) )
          {
-            MSG_INFO1( spxout << "Error while writing file \"" << basisname << "\"" << std::endl; )
+	    if ( checkMode )
+	       MSG_INFO1( spxout << "EEXAMP30 error while writing file \"" << basisname << "\"" << std::endl; )
+	    else
+	       MSG_INFO1( spxout << "Error while writing file \"" << basisname << "\"" << std::endl; )
          }
       break;
    case SPxSolver::ABORT_CYCLING:
-      MSG_INFO1( spxout << "Aborted due to cycling" << std::endl; )
+      if ( checkMode )
+	 MSG_INFO1( spxout << "EEXAMP40 aborted due to cycling" << std::endl; )
+      else
+	 MSG_INFO1( spxout << "Aborted due to cycling" << std::endl; )
       assert( false ); // This should be an exception by now.
       break;
    case SPxSolver::ABORT_TIME:
-      MSG_INFO1( spxout << "Aborted due to time limit" << std::endl; )
+      if ( checkMode )
+	 MSG_INFO1( spxout << "IEXAMP33 aborted due to time limit" << std::endl; )
+      else
+	 MSG_INFO1( spxout << "Aborted due to time limit" << std::endl; )
       break;
    case SPxSolver::ABORT_ITER:
-      MSG_INFO1( spxout << "Aborted due to iteration limit" << std::endl; )
+      if ( checkMode )
+	 MSG_INFO1( spxout << "IEXAMP34 aborted due to iteration limit" << std::endl; )
+      else
+	 MSG_INFO1( spxout << "Aborted due to iteration limit" << std::endl; )
       break;
    case SPxSolver::ABORT_VALUE:
-      MSG_INFO1( spxout << "Aborted due to objective value limit" << std::endl; )
+      if ( checkMode )
+	 MSG_INFO1( spxout << "IEXAMP35 aborted due to objective value limit" << std::endl; )
+      else
+	 MSG_INFO1( spxout << "Aborted due to objective value limit" << std::endl; )
       break;
    case SPxSolver::SINGULAR:
-      MSG_INFO1( spxout << "Basis is singular" << std::endl; )
+      if ( checkMode )
+	 MSG_INFO1( spxout << "EEXAMP39 basis is singular" << std::endl; )
+      else
+	 MSG_INFO1( spxout << "Basis is singular" << std::endl; )
       assert( false ); // This should be an exception by now.
       break;
    default:
-      MSG_INFO1( spxout << "An error occurred during " << "the solution process" << std::endl; )
+      if ( checkMode )
+	 MSG_INFO1( spxout << "EEXAMP36 An error occurred during " << "the solution process" << std::endl; )
+      else
+	 MSG_INFO1( spxout << "An error occurred during " << "the solution process" << std::endl; )
       break;
    }
    MSG_INFO1( spxout << std::endl; )
@@ -859,6 +1046,9 @@ int main(int argc, const char* const argv[])
                print_usage_and_exit( argv );
             }
             break;
+	 case 'C' :
+	    checkMode = true;
+	    break;
          case 'h' :
          case '?' :
             print_version_info();
@@ -869,7 +1059,8 @@ int main(int argc, const char* const argv[])
       }
 
       // print short version
-      print_short_version_info();
+      if ( ! checkMode )
+	 print_short_version_info();
 
       // enough arguments?
       if ((argc - optidx) < 1 + (read_basis ? 1 : 0) + (write_basis ? 1 : 0))
