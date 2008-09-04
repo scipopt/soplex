@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: timer.cpp,v 1.10 2007/08/27 15:35:13 bzfberth Exp $"
+#pragma ident "@(#) $Id: timer.cpp,v 1.11 2008/09/04 15:59:39 bzforlow Exp $"
 
 #include <assert.h>
 
@@ -64,7 +64,7 @@ void Timer::updateTicks() const
    struct tms now;
    clock_t    ret = times(&now);
 
-   if (ret == -1)
+   if (int(ret) == -1)
       now.tms_utime = now.tms_stime = ret = 0;
 
    uTicks = long(now.tms_utime);
