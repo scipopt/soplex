@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.35 2008/01/14 16:26:25 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.36 2008/09/04 16:00:21 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -85,10 +85,11 @@ void SPxSteepPR::setType(SPxSolver::Type type)
          for (i = thesolver->dim() - 1; i >= 0; --i)
          {
             // coPenalty[i] = 1;
-            SPxId id     = thesolver->basis().baseId(i);
-            int n        = thesolver->number(id);
-            leavePref[i] = thesolver->isId(id) ? pref[n] : coPref[n];
-            coPenalty[i] = 1.0 + thesolver->basis().baseVec(i).size() / Real(thesolver->dim());
+            const SPxId id = thesolver->basis().baseId(i);
+            const int n    = thesolver->number(id);
+            assert(n >= 0);
+            leavePref[i]   = thesolver->isId(id) ? pref[n] : coPref[n];
+            coPenalty[i]   = 1.0 + thesolver->basis().baseVec(i).size() / Real(thesolver->dim());
          }
       }
    }
@@ -298,9 +299,11 @@ int SPxSteepPR::selectLeave()
 
    if (lastIdx >= 0)
    {
+      assert( thesolver->coPvec().delta().isConsistent() );
       thesolver->basis().coSolve(thesolver->coPvec().delta(),
                                  thesolver->unitVector(lastIdx));
       workRhs.setEpsilon(accuracy);
+      assert( thesolver->coPvec().delta().isConsistent() );
       workRhs.setup_and_assign(thesolver->coPvec().delta());
       thesolver->setup4solve(&workVec, &workRhs);
    }
