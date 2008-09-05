@@ -1,8 +1,8 @@
-#--- $Id: make.linux.x86.gnu.opt-shared,v 1.1 2008/06/30 19:05:45 bzfpfets Exp $
+#--- $Id: make.linux.x86.gnu.opt-shared,v 1.2 2008/09/05 13:13:39 bzforlow Exp $
 CXX		=	g++
 CPPFLAGS	=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -FPIC
 CXXFLAGS	=	-O3 -march=pentiumpro -fexceptions -fomit-frame-pointer # -malign-double -ffast-math
-LDFLAGS		=	-lm
+LDFLAGS		=	-lm -Wl,-rpath,$(CURDIR)/$(LIBDIR)
 ARFLAGS		=	crs
 ZLIB_FLAGS	=
 ZLIB_LDFLAGS 	=	-lz

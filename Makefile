@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.89 2008/08/27 20:52:54 bzfpfets Exp $
+# $Id: Makefile,v 1.90 2008/09/05 13:13:39 bzforlow Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -161,12 +161,11 @@ $(BINLINK) $(BINSHORTLINK):	$(BINFILE)
 $(BINFILE):	$(BINDIR) $(BINOBJDIR) $(LIBFILE) $(BINOBJFILES)
 		@echo "-> linking $@"
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOBJFILES) \
-		-Wl,-rpath,$(CURDIR)/$(LIBDIR) -L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
 
 $(EXAMPLEFILE):	$(BINDIR) $(EXAMPLEOBJDIR) $(LIBFILE) $(EXAMPLEOBJFILES)
 		@echo "-> linking $@"
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(EXAMPLEOBJFILES) \
-		-Wl,-rpath,$(CURDIR)/$(LIBDIR) -L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
 
 $(LIBFILE):	$(LIBDIR) $(LIBOBJDIR) touchexternal $(LIBOBJFILES) 
 		@echo "-> generating library $@"
