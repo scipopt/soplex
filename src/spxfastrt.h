@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.h,v 1.16 2007/08/27 15:35:11 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxfastrt.h,v 1.17 2008/09/05 17:33:42 bzfpfets Exp $"
 
 /**@file  spxfastrt.h
  * @brief Fast shifting ratio test.
@@ -72,11 +72,11 @@ private:
        such that it would still fullfill the upper and lower bounds \p up and
        \p low, respectively, within #delta. Return value is the index where the
        minimum value is encountered. At the same time the maximum absolute value
-       of \p upd.delta() is computed and returned in \p abs. Internally all
+       of \p upd.delta() is computed and returned in \p p_abs. Internally all
        loops are started at \p start and incremented by \p incr.
     */
    int maxDelta(Real& val, Real& p_abs, UpdateVector& upd,
-      Vector& low, Vector& up, int start, int incr) const;
+      const Vector& low, const Vector& up, int start, int incr) const;
    ///
    int maxDelta(Real& val, Real& p_abs);
    ///
@@ -91,7 +91,7 @@ private:
        loops are started at \p start and incremented by \p incr.
    */
    int minDelta(Real& val, Real& p_abs, UpdateVector& upd,
-      Vector& low, Vector& up, int start, int incr) const;
+      const Vector& low, const Vector& up, int start, int incr) const;
    
    ///
    int minDelta(Real& val, Real& p_abs,

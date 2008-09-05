@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.34 2007/10/19 16:08:56 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.35 2008/09/05 17:33:42 bzfpfets Exp $"
 
 //#define DEBUGGING 1
 
@@ -90,8 +90,8 @@ int SPxFastRT::maxDelta(
    Real& val,
    Real& p_abs,
    UpdateVector& update,
-   Vector& lowBound,
-   Vector& upBound,
+   const Vector& lowBound,
+   const Vector& upBound,
    int start,
    int incr) const
 {
@@ -105,8 +105,8 @@ int SPxFastRT::maxDelta(
    Real inf = infinity;
    Real mabs = p_abs;
 
-   Real* up = upBound.get_ptr();
-   Real* low = lowBound.get_ptr();
+   const Real* up = upBound.get_const_ptr();
+   const Real* low = lowBound.get_const_ptr();
    const Real* vec = update.get_const_ptr();
    const Real* upd = update.delta().values();
    const int* idx = update.delta().indexMem();
@@ -235,8 +235,8 @@ int SPxFastRT::minDelta(
    Real& val,
    Real& p_abs,
    UpdateVector& update,
-   Vector& lowBound,
-   Vector& upBound,
+   const Vector& lowBound,
+   const Vector& upBound,
    int start,
    int incr) const
 {
@@ -250,8 +250,8 @@ int SPxFastRT::minDelta(
    Real inf = infinity;
    Real mabs = p_abs;
 
-   Real* up = upBound.get_ptr();
-   Real* low = lowBound.get_ptr();
+   const Real* up = upBound.get_const_ptr();
+   const Real* low = lowBound.get_const_ptr();
    const Real* vec = update.get_const_ptr();
    const Real* upd = update.delta().values();
    const int* idx = update.delta().indexMem();
@@ -393,6 +393,8 @@ SPxId SPxFastRT::maxDelta(
    Real& max,
    Real& maxabs)
 {
+   /* The following cause side effects on coPvec and pVec - both changes may be needed later in
+      maxSelect(). We can therefore not move the first function after the (indp >= 0) check. */
    int indc = maxDelta(max, maxabs,
       thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
    int indp = maxDelta(max, maxabs,
@@ -417,6 +419,8 @@ SPxId SPxFastRT::minDelta(
    Real& max,
    Real& maxabs)
 {
+   /* The following cause side effects on coPvec and pVec - both changes may be needed later in
+      minSelect(). We can therefore not move the first function after the (indp >= 0) check. */
    const int indc = minDelta(max, maxabs,
       thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
    const int indp = minDelta(max, maxabs,
@@ -1195,6 +1199,7 @@ SPxId SPxFastRT::selectEnter(Real& val)
          spxout << "DFSTRT04 " << thesolver->basis().iteration() 
                 << ": skipping instable pivot" << std::endl;
    )
+
 
    if (enterId.isValid() || minStab > 2*epsilon)
    {
