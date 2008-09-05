@@ -38,6 +38,7 @@ Release 1.3.3
   + moved SPxLP::readFile() from spxfileio.cpp to spxio.cpp
   + renamed SPxLP::dumpFile() to SPxLP::writeFile(), included default parameters, and moved it from spxlpfwrite.cpp to spxio.cpp
 
+- Added option to produce shared libraries with x86-Linux (OPT=opt-shared).
 
 #----------------------------------------------------------------
 
