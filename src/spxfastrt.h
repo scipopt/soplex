@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.h,v 1.17 2008/09/05 17:33:42 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxfastrt.h,v 1.18 2008/09/08 21:44:05 bzfpfets Exp $"
 
 /**@file  spxfastrt.h
  * @brief Fast shifting ratio test.
@@ -71,7 +71,7 @@ private:
    /** Computes the maximum value \p val that could be used for updating \p upd
        such that it would still fullfill the upper and lower bounds \p up and
        \p low, respectively, within #delta. Return value is the index where the
-       minimum value is encountered. At the same time the maximum absolute value
+       maximum value is encountered. At the same time the maximum absolute value
        of \p upd.delta() is computed and returned in \p p_abs. Internally all
        loops are started at \p start and incremented by \p incr.
     */
