@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.59 2008/04/10 15:01:34 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.60 2008/09/17 19:04:42 bzfpfets Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -325,7 +325,7 @@ static Real readInfinity(char*& pos)
 
    Real sense = (*pos == '-') ? -1.0 : 1.0;
 
-   hasKeyword(++pos, "inf[inity]");
+   (void) hasKeyword(++pos, "inf[inity]");
 
    return sense * infinity;
 }
