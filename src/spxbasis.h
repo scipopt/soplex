@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.49 2008/08/07 10:29:43 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.50 2008/09/18 18:25:25 bzfpfets Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -175,14 +175,12 @@ public:
       {
          P_ON_LOWER  = -4,  ///< primal variable is set to its lower bound
          P_ON_UPPER  = -2,  ///< primal variable is set to its upper bound
-         P_FREE      = -1,  ///< primal variable is left free, but not unset
-         /// primal variable is fixed to both bounds
-         P_FIXED     = P_ON_UPPER + P_ON_LOWER,
-         D_FREE      = 1,   ///< dual variable is left free, but not unset
+         P_FREE      = -1,  ///< primal variable is left free, but unset
+         P_FIXED     = P_ON_UPPER + P_ON_LOWER,  ///< primal variable is fixed to both bounds
+         D_FREE      = 1,   ///< dual variable is left free, but unset
          D_ON_UPPER  = 2,   ///< dual variable is set to its upper bound
          D_ON_LOWER  = 4,   ///< dual variable is set to its lower bound
-         /// dual variable has two bounds
-         D_ON_BOTH   = D_ON_LOWER + D_ON_UPPER,
+         D_ON_BOTH   = D_ON_LOWER + D_ON_UPPER,  ///< dual variable has two bounds
          D_UNDEFINED = 8    ///< primal or dual variable has no status
       };
       //@}
