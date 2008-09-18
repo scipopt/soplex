@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.39 2007/10/19 15:44:25 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.40 2008/09/18 16:57:27 bzfpfets Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.
@@ -235,7 +235,9 @@ static void readCols(
             col.setColVector(vec);
             cset.add(col);
          }
-         strcpy(colname, mps.field1());
+         // save copy of string (make sure string ends with \0)
+         strncpy(colname, mps.field1(), MPSInput::MAX_LINE_LEN-1);
+         colname[MPSInput::MAX_LINE_LEN-1] = '\0';
          cnames.add(colname);
          vec.clear();
          col.setObj(0.0);
