@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-# $Id: TODO,v 1.104 2008/08/08 15:33:00 bzftuchs Exp $
+# $Id: TODO,v 1.105 2008/09/18 16:33:28 bzfpfets Exp $
 #-----------------------------------------------------------------------
 
 #-----------------------------------------------------------------------
@@ -32,13 +32,7 @@
 #-----------------------------------------------------------------------
 
 Benjamin:
-- status-exception-test etc. in test-Verzeichnis schieben
 - "make tests" zum Compilieren (und Ausführen?) der Testbinaries
-
-
-Sebastian:
-- flexelint, Codesonar (mit Robert, ggf. mit Thorsten)
-
 
 Andreas:
 - der col_first parameter bei scale wird nicht mehr benutzt.
@@ -59,9 +53,8 @@ Andreas:
 
 
 Thorsten:
-- svset-Speicherbug beheben (mit Robert)
+- svset-Speicherbug beheben
 - spxlpfread-Bugs beheben
-- bei flexelint/Codesonar mit draufgucken
 - Abbruch bei minimieren mit Upper Bound:
   primal: >= UB und optimal
   dual  : >= UB und shift = 0
@@ -70,13 +63,9 @@ Thorsten:
 Marc:
 - COIN Interface (OSI) updaten
 - Mailingliste auf Stand bringen
-- soplex-logo basteln
 
 
 Robert:
-- Programme im extra-Verzeichnis testen/integrieren
-- excercise_LP nach extra verlagern
-- SCIP/SoPlex testen
 - Vermutlich sind die meisten solve()-Methoden in CLUFactor::solve.cpp
   const. Müssten von den Pointern befreit werden.
 - SSVector::multAdd() sollte von den Pointern befreit werden.
@@ -86,9 +75,6 @@ Robert:
 - spxbasis: load(xxx) umbennen in loadDesc, loadLP usw.
 - memory_exception_test überarbeiten (mit Benjamin)
 
-
-Timo/Kati:
-   - miplib2003 mit scip/soplex testen
 
 #-----------------------------------------------------------------------
 #  Noch zu verteilende Arbeiten
@@ -104,6 +90,8 @@ Timo/Kati:
 - Membernamen vereinheitlichen: m_...
 
 - long step dual implementieren
+
+- cplexrun mit delta = 1e-9 für bessere werte in check.
 
 #----------------------------------------------------------------------
 
@@ -133,8 +121,6 @@ Each sample counts as 0.01 seconds.
 - openMP insbesondere pricer/ratiotest (compaq,intel)
   evtl die enterX/leaveX funktionen inlinen.
 
-- cplexrun mit delta = 1e-9 für bessere werte in check.
-
 - SVSet::memPack, vermutlichen bug in flexelint melden. this-> ist überflüssig.
 
 - reinterpret_cast durchsehen
@@ -142,12 +128,14 @@ Each sample counts as 0.01 seconds.
 // lprow.cpp:double LPRow::infinity = 1e+100;
 // spxlp.cpp:const double SPxLP::infinity = 1e+100;
 
-Dokumentation: (alle * sind bereits fertig)
+Dokumentation:
 
 cring.h
 clufactor.h
 +slufactor.h  // hier fehlen noch ein paar Sachen  -> Thorsten!
-+soplex.h // in Arbeit ;-)
++soplex.h     // in Arbeit ;-)
+
+
 
 sunos.sparc.sun LC 0 2494 14255
 greenbea ER 
