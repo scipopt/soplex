@@ -23,6 +23,8 @@ Release 1.3.3
 - Implemented basic handling of reading a basis file (not yet thoroughly tested).
   The basic changes are in example.cpp, spxbasis.cpp, soplex.cpp, soplex.h.
 
+- Bugfix in forest.cpp: use proper array access instead of pointer iteration.
+
 - Bugfix: fix the the termination value (objective limit) problem (spxsolve.cpp)
 
 - Added member function precision() in spxout.h
