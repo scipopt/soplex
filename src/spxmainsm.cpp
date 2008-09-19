@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.12 2008/09/19 13:07:00 bzftuchs Exp $"
+#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.13 2008/09/19 13:31:57 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -611,7 +611,7 @@ void SPxMainSM::DoubletonEquationPS::execute(DVector&, DVector& y, DVector&, DVe
    }
 }
 
-void SPxMainSM::DuplicateRowsPS::execute(DVector&, DVector& y, DVector& s, DVector& r,
+void SPxMainSM::DuplicateRowsPS::execute(DVector&, DVector& y, DVector& s, DVector&,
                                          DataArray<SPxSolver::VarStatus>&,
                                          DataArray<SPxSolver::VarStatus>& rStatus) const
 {
