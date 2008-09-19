@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.11 2007/10/19 15:44:25 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.12 2008/09/19 13:07:00 bzftuchs Exp $"
 
 //#define DEBUGGING 1
 
@@ -460,7 +460,6 @@ void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& 
       }
       else
          throw SPxInternalCodeException("XMAISM02 This should never happen.");
-
    }
    else if (rStatus[m_i] == SPxSolver::FIXED)
    {
@@ -664,19 +663,8 @@ void SPxMainSM::DuplicateRowsPS::execute(DVector&, DVector& y, DVector& s, DVect
          rStatus[i] = SPxSolver::BASIC;
       }
    }   
-        
-   for(int k = 0; k < m_obj.size(); ++k)
-   {
-      int j    = m_obj.index(k);
-      Real val = m_obj.value(k);
       
-      const SVector& col = m_cols[k];
-      
-      for (int l = 0; l < col.size(); ++l)
-         val -= col.value(l) * y[col.index(l)];
-       
-      r[j] = val;
-   }
+   // nothing to do for the reduced cost values
 }
 
 void SPxMainSM::DuplicateColsPS::execute(DVector& x, 
@@ -1028,7 +1016,7 @@ void SPxMainSM::handleExtremes(SPxLP& lp)
       m_chgLRhs += chgLRhs;
       m_chgBnds += chgBnds;
 
-      MSG_INFO1( spxout << "IMAISM06 Main simplifier (extremes) removed "
+      MSG_INFO2( spxout << "IMAISM06 Main simplifier (extremes) removed "
                         << remRows << " rows, "
                         << remNzos << " non-zeros, "
                         << chgBnds << " col bounds, "
@@ -2384,7 +2372,6 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
                         << remNzos << " non-zeros"
                         << std::endl; )
    }
-   
    return OKAY;
 }
 

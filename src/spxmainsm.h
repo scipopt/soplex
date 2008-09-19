@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.h,v 1.10 2007/10/19 15:44:25 bzforlow Exp $"
+#pragma ident "@(#) $Id: spxmainsm.h,v 1.11 2008/09/19 13:07:00 bzftuchs Exp $"
 
 /**@file  spxmainsm.h
  * @brief General methods in LP preprocessing.
@@ -477,8 +477,6 @@ private:
       const int       m_minRhsIdx;
       const bool      m_maxSense;
       DSVector        m_scale;
-      DSVector        m_obj;
-      Array<DSVector> m_cols;
       
    public:
       DuplicateRowsPS(const SPxLP& lp, const SPxMainSM& simplifier, int i,
@@ -488,26 +486,11 @@ private:
          , m_minRhsIdx((minRhsIdx == -1) ? -1 : simplifier.rIdx(minRhsIdx))
          , m_maxSense(lp.spxSense() == SPxLP::MAXIMIZE)
          , m_scale(dupRows.size())
-         , m_obj(lp.rowVector(i).size())
-         , m_cols(lp.rowVector(i).size())
       {
          Real rowScale = scale[i];
          
          for(int k = 0; k < dupRows.size(); ++k)
-            m_scale.add(simplifier.rIdx(dupRows.index(k)), rowScale / scale[dupRows.index(k)]);
-         
-         const SVector& row = lp.rowVector(i);
-         
-         for(int k = 0; k < row.size(); ++k)
-         {
-            m_obj.add(simplifier.cIdx(row.index(k)), lp.obj(row.index(k)));
-            
-            const SVector& col = lp.colVector(row.index(k));
-            m_cols[k].setMax(col.size());
-            
-            for(int l = 0; l < col.size(); ++l)
-               m_cols[k].add(simplifier.rIdx(col.index(l)), col.value(l));
-         }         
+            m_scale.add(simplifier.rIdx(dupRows.index(k)), rowScale / scale[dupRows.index(k)]);    
       }
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
