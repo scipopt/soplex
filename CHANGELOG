@@ -42,6 +42,14 @@ Release 1.3.3
 
 - Added option to produce shared libraries with x86-Linux (OPT=opt-shared).
 
+- Simplified postsolving in spxmainsm.cpp (do not recompute reduced costs) and removed memory leak
+
+- Overworked spxbasis.cpp:readBasis(): removed bug and superflous code at end
+
+- Removed bug in spxchangebasis.cpp, addedRows(), addedCols(): need to call loadMatrixVecs in all cases, since the
+  references to the matrix might have been invalided due to reallocation.
+
+
 #----------------------------------------------------------------
 
 Release 1.3.2
