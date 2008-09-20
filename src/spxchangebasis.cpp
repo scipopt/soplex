@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.30 2007/10/25 07:39:49 bzfhille Exp $"
+#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.31 2008/09/20 12:08:20 bzfpfets Exp $"
 
 //#define DEBUGGING 1
 
@@ -94,6 +94,15 @@ void SPxBasis::addedRows(int n)
 
          for (int i = theLP->nRows() - n; i < theLP->nRows(); ++i)
             thedesc.rowStatus(i) = dualRowStatus(i);
+
+         /* In the row case, the basis is not effected by adding rows. However, 
+          * since @c matrix stores references to the rows in the LP (SPxLP), a realloc
+          * in SPxLP (e.g. due to space requirements) might invalidate these references.
+          * We therefore have to "reload" the matrix if it is set up. Note that reDim()
+          * leaves @c matrixIsSetup untouched if only row have been added, since the basis
+          * matrix already has the correct size. */
+         if (status() > NO_PROBLEM && matrixIsSetup)
+            loadMatrixVecs();
       }
 
       /* update basis status */
@@ -133,7 +142,7 @@ void SPxBasis::removedRow(int i)
          setStatus(NO_PROBLEM);
          factorized = false;
 
-         MSG_DEBUG( spxout << "DCHBAS05 Are you sure you wanna do that?\n"; )
+         MSG_DEBUG( spxout << "DCHBAS05 Warning: deleting basic row!\n"; )
       }
    }
    else
@@ -143,7 +152,7 @@ void SPxBasis::removedRow(int i)
       if (!theLP->isBasic(thedesc.rowStatus(i)))
       {
          setStatus(NO_PROBLEM);
-         MSG_DEBUG( spxout << "DCHBAS06 Are you sure, you wanna do that?\n"; )
+         MSG_DEBUG( spxout << "DCHBAS06 Warning: deleting nonbasic row!\n"; )
       }
       else if (status() > NO_PROBLEM && matrixIsSetup)
       {
@@ -187,7 +196,7 @@ void SPxBasis::removedRows(const int perm[])
                {
                   setStatus(NO_PROBLEM);
                   factorized = matrixIsSetup = false;
-                  MSG_DEBUG( spxout << "DCHBAS07 Are you sure, you wanna do that?\n"; )
+                  MSG_DEBUG( spxout << "DCHBAS07 Warning: deleting basic row!\n"; )
                }
             }
             else                            // row was moved
@@ -285,8 +294,18 @@ void SPxBasis::addedCols(int n)
       else
       {
          assert(theLP->rep() == SPxSolver::COLUMN);
+
          for (int i = theLP->nCols() - n; i < theLP->nCols(); ++i)
             thedesc.colStatus(i) = primalColStatus(i, theLP);
+
+         /* In the column case, the basis is not effected by adding columns. However, 
+          * since @c matrix stores references to the columns in the LP (SPxLP), a realloc
+          * in SPxLP (e.g. due to space requirements) might invalidate these references.
+          * We therefore have to "reload" the matrix if it is set up. Note that reDim()
+          * leaves @c matrixIsSetup untouched if only columns have been added, since the 
+          * basis matrix already has the correct size. */
+         if (status() > NO_PROBLEM && matrixIsSetup)
+            loadMatrixVecs();
       }
          
       switch (status())
@@ -506,4 +525,3 @@ void SPxBasis::changedElement(int /*row*/, int /*col*/)
 //Emacs indent-tabs-mode:nil
 //Emacs End:
 //-----------------------------------------------------------------------------
-
