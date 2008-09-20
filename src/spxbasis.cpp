@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.60 2008/08/07 10:28:52 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.61 2008/09/20 11:59:09 bzfpfets Exp $"
 
 //#define DEBUGGING 1
 
@@ -258,7 +258,7 @@ void SPxBasis::loadSolver(SLinSolver* p_solver)
  *  - UL: the variable is nonbasic and at its upper bound
  *  - LL: the variable is nonbasic and at its lower bound
  *
- *  The CPLEX format contains an additional indicater 'BS', but this is unsupported here.
+ *  The CPLEX format contains an additional indicator 'BS', but this is unsupported here.
  */
 bool SPxBasis::readBasis(
    std::istream&  is, 
@@ -268,13 +268,12 @@ bool SPxBasis::readBasis(
    METHOD( "SPxBasis::readBasis()" );
    assert(theLP != 0);
 
-   int  i;
    Desc l_desc(thedesc);
 
-   for(i = 0; i < theLP->nRows(); i++)
+   for (int i = 0; i < theLP->nRows(); i++)
       l_desc.rowstat[i] = dualRowStatus(i);
 
-   for(i = 0; i < theLP->nCols(); i++)
+   for (int i = 0; i < theLP->nCols(); i++)
    {
       if (theLP->SPxLP::lower(i) == theLP->SPxLP::upper(i))
          l_desc.colstat[i] = Desc::P_FIXED;
@@ -309,7 +308,7 @@ bool SPxBasis::readBasis(
          if (!strcmp(mps.field1(), "XU"))
          {
             l_desc.colstat[c] = dualColStatus(c);
-            if ( theLP->SPxLP::lhs(i) == theLP->SPxLP::rhs(i) )
+            if ( theLP->SPxLP::lhs(r) == theLP->SPxLP::rhs(r) )
                l_desc.rowstat[r] = Desc::P_FIXED;
             else
                l_desc.rowstat[r] = Desc::P_ON_UPPER;
@@ -354,6 +353,10 @@ bool SPxBasis::readBasis(
    return !mps.hasError();
 }
 
+/* writes a file in MPS basis format to \p os.
+ *
+ * See SPxBasis::readBasis() for a short description of the format.
+ */
 void SPxBasis::writeBasis
    ( std::ostream&  os, 
      const NameSet& rownames, 
@@ -361,12 +364,6 @@ void SPxBasis::writeBasis
 {
    METHOD( "SPxBasis::writeBasis()" );
    assert(theLP != 0);
-
-   int col   = 0;
-   int row   = 0;
-
-   os.setf(std::ios::left);
-   os << "NAME  soplex.bas\n";     
 
    if (theLP->rep() == SPxSolver::ROW)
    {
@@ -376,15 +373,20 @@ void SPxBasis::writeBasis
    }
    assert(theLP->rep() == SPxSolver::COLUMN);
 
-   for(; col < theLP->nCols(); col++)
+   os.setf(std::ios::left);
+   os << "NAME  soplex.bas\n";
+
+   int row = 0;
+   for (int col = 0; col < theLP->nCols(); col++)
    {
-      if( theLP->isBasic( thedesc.colStatus( col ))) 
+      if ( theLP->isBasic( thedesc.colStatus( col ))) 
       {
-         /* Find non basic row
-          */
-         for(; row < theLP->nRows(); row++)
-            if( !theLP->isBasic( thedesc.rowStatus( row )))
+         /* Find non basic row */
+         for (; row < theLP->nRows(); row++)
+         {
+            if ( !theLP->isBasic( thedesc.rowStatus( row )))
                break;
+         }
 
          assert( row != theLP->nRows() );
 
@@ -398,7 +400,7 @@ void SPxBasis::writeBasis
       }
       else
       {
-         if( thedesc.colStatus( col ) == Desc::P_ON_UPPER )
+         if ( thedesc.colStatus( col ) == Desc::P_ON_UPPER )
          {
             os << " UL "
                << colnames[theLP->SPxLP::cId( col )]
@@ -408,7 +410,7 @@ void SPxBasis::writeBasis
          {
             /* Default is all slacks basic, all variables on lower bound,
              * nothing to do in this case.
-             * Non basic free variable should better not accure.
+             * Non basic free variable should better not occur.
              */
             assert(thedesc.colStatus( col ) == Desc::P_ON_LOWER
                || thedesc.colStatus( col ) == Desc::P_FIXED);
@@ -417,22 +419,15 @@ void SPxBasis::writeBasis
    }
 
 #ifndef NDEBUG
-   for( ; row < theLP->nRows(); row++)
-      if( ! theLP->isBasic( thedesc.rowStatus( row )))
+   // Check that we covered all nonbasic rows - the remaining should be basic.
+   for (; row < theLP->nRows(); row++)
+   {
+      if ( ! theLP->isBasic( thedesc.rowStatus( row )))
          break;
-   
+   }
    assert( row == theLP->nRows() );
 
    thedesc.dump();
-
-   // Does this second for-loop make any sense?
-   for( ; row < theLP->nRows(); row++)
-      if( ! theLP->isBasic( thedesc.rowStatus( row )))
-         break;
-
-//   std::cout << row << " " << theLP->nRows() << std::endl;
-
-   assert( row == theLP->nRows() );
 #endif // NDEBUG
 
    os << "ENDATA" << std::endl;
