@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.60 2008/09/17 19:04:42 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.61 2008/09/20 20:34:37 bzfpfets Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -114,7 +114,7 @@ static Real readValue(char*& pos)
    {
       s++;
 
-      // 4. If there was a dot, posible digit behind it
+      // 4. If there was a dot, possible digit behind it
       while((*s >= '0') && (*s <= '9'))
       {
          has_digits = true;
@@ -345,20 +345,20 @@ static Real readInfinity(char*& pos)
  *  The reader will accept the keyword INT[egers] as a synonym for 
  *  GEN[erals] which is an undocumented feature in CPLEX.
  *
- *  A difference to the CPLEX reader, ist that no name for the objective 
+ *  A difference to the CPLEX reader, is that no name for the objective 
  *  row is required.
  *
  *  @return true if the file was read correctly
  */  
 bool SPxLP::readLPF(
-   std::istream& p_input, 
+   std::istream& p_input,
    NameSet*      p_rnames,               ///< row names.
    NameSet*      p_cnames,               ///< column names.
    DIdxSet*      p_intvars)              ///< integer variables.
 {
    enum 
    { 
-      START, OBJECTIVE, CONSTRAINTS, BOUNDS, INTEGERS, BINARYS 
+      START, OBJECTIVE, CONSTRAINTS, BOUNDS, INTEGERS, BINARIES 
    } section = START;
 
    NameSet*  rnames;                ///< row names.
@@ -475,9 +475,9 @@ bool SPxLP::readLPF(
          else if (hasKeyword(pos, "bound[s]"))
             section = BOUNDS;
          else if (hasKeyword(pos, "bin[ary]"))
-            section = BINARYS;
+            section = BINARIES;
          else if (hasKeyword(pos, "bin[aries]"))
-            section = BINARYS;
+            section = BINARIES;
          else if (hasKeyword(pos, "gen[erals]"))
             section = INTEGERS;
          else if (hasKeyword(pos, "int[egers]")) // this is undocumented
@@ -778,7 +778,7 @@ bool SPxLP::readLPF(
             if (!other)
                goto syntax_error;
             break;
-         case BINARYS  :
+         case BINARIES  :
          case INTEGERS :
             if ((colidx = readColName(pos, cnames, cset, 0)) < 0)
             {
@@ -787,7 +787,7 @@ bool SPxLP::readLPF(
             }
             else
             {
-               if (section == BINARYS)
+               if (section == BINARIES)
                {
                   cset.lower_w(colidx) = 0.0;
                   cset.upper_w(colidx) = 1.0;
