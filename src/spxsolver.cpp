@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.31 2008/08/27 06:45:20 bzfheinz Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.32 2008/09/20 20:33:41 bzfpfets Exp $"
 
 //#define DEBUGGING 1
 
@@ -944,8 +944,29 @@ SPxSolver::varStatusToBasisStatusRow( int row, SPxSolver::VarStatus stat ) const
          : SPxBasis::Desc::P_FIXED;
       break;
    case ZERO :
-      assert(lhs(row) <= -infinity && rhs(row) >= infinity);
-      rstat = SPxBasis::Desc::P_FREE;
+      /* A 'free' row (i.e., infinite lower & upper bounds) does not really make sense. The user
+       * might (think to) know better, e.g., when temporarily turning off a row. We therefore apply
+       * the same adjustment as in the column case in varStatusToBasisStatusCol(). */
+      if (lhs(row) <= -infinity && rhs(row) >= infinity)
+         rstat = SPxBasis::Desc::P_FREE;
+      else
+      {
+         if ( lhs(row) == rhs(row) )
+         {
+            assert( rhs(row) < infinity );
+            rstat = SPxBasis::Desc::P_FIXED;
+         }
+         else
+         {
+            if ( lhs(row) > -infinity )
+               rstat = SPxBasis::Desc::P_ON_LOWER;
+            else
+            {
+               assert( rhs(row) < infinity );
+               rstat = SPxBasis::Desc::P_ON_UPPER;
+            }
+         }
+      }
       break;
    case BASIC :
       rstat = dualRowStatus(row);
@@ -983,8 +1004,31 @@ SPxSolver::varStatusToBasisStatusCol( int col, SPxSolver::VarStatus stat ) const
          : SPxBasis::Desc::P_FIXED;
       break;
    case ZERO :
-      assert(lower(col) <= -infinity && upper(col) >= infinity);
-      cstat = SPxBasis::Desc::P_FREE;
+      /* In this case the upper and lower bounds on the variable should be infinite. The bounds
+       * might, however, have changed and we try to recover from this by changing the status to
+       * 'resonable' settings. A solve has to find the correct values afterwards. Note that the
+       * approach below is consistent with changesoplex.cpp (e.g., changeUpperStatus() and
+       * changeLowerStatus() ). */
+      if (lower(col) <= -infinity && upper(col) >= infinity)
+         cstat = SPxBasis::Desc::P_FREE;
+      else
+      {
+         if ( lower(col) == upper(col) )
+         {
+            assert( upper(col) < infinity );
+            cstat = SPxBasis::Desc::P_FIXED;
+         }
+         else
+         {
+            if ( lower(col) > -infinity )
+               cstat = SPxBasis::Desc::P_ON_LOWER;
+            else
+            {
+               assert( upper(col) < infinity );
+               cstat = SPxBasis::Desc::P_ON_UPPER;
+            }
+         }
+      }
       break;
    case BASIC :
       cstat = dualColStatus(col);

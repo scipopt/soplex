@@ -17,6 +17,9 @@ Release 1.3.3
 - Created directory 'tests' that should contain small programs that illustrate
   a (former) bug in SoPlex or something like unit tests.
 
+- Fixed two bugs in spxlpfread.cpp (variables appearing in the bounds
+  and general/integer/binary section).
+
 - Corrected changeElement(): it now works also in the initial phase (NO_PROBLEM).
   A corresponding test file is 'tests/testChangeElement.cpp'.
 
@@ -38,7 +41,8 @@ Release 1.3.3
 
 - Name unification:
   + moved SPxLP::readFile() from spxfileio.cpp to spxio.cpp
-  + renamed SPxLP::dumpFile() to SPxLP::writeFile(), included default parameters, and moved it from spxlpfwrite.cpp to spxio.cpp
+  + renamed SPxLP::dumpFile() to SPxLP::writeFile(), included default parameters, 
+    and moved it from spxlpfwrite.cpp to spxio.cpp
 
 - Added option to produce shared libraries with x86-Linux (OPT=opt-shared).
 
@@ -46,8 +50,11 @@ Release 1.3.3
 
 - Overworked spxbasis.cpp:readBasis(): removed bug and superflous code at end
 
-- Removed bug in spxchangebasis.cpp, addedRows(), addedCols(): need to call loadMatrixVecs in all cases, since the
-  references to the matrix might have been invalided due to reallocation.
+- Removed bug in spxchangebasis.cpp, addedRows(), addedCols(): need to call loadMatrixVecs 
+  in all cases, since the references to the matrix might have been invalided due to reallocation.
+
+- Added fixing of the basis status if ZERO/P_FREE is not appropriate anymore, see spxsolver.cpp
+  varStatusToBasisStatusCol() and varStatusToBasisStatusRow().
 
 
 #----------------------------------------------------------------
