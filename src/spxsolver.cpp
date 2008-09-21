@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.32 2008/09/20 20:33:41 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.33 2008/09/21 16:48:02 bzfpfets Exp $"
 
 //#define DEBUGGING 1
 
@@ -513,7 +513,7 @@ void SPxSolver::factorize()
    if (SPxBasis::status() == SPxBasis::SINGULAR)
    {
       m_status = SINGULAR;
-      throw SPxStatusException("XSOLVE21 Problem is singular");
+      throw SPxStatusException("XSOLVE21 Basis is singular (numerical troubles)");
    }
 }
 
@@ -527,18 +527,6 @@ Real SPxSolver::maxInfeas() const
    {
       for(i = 0; i < dim(); i++)
       {
-         if ((*theFvec)[i] > theUBbound[i])
-            inf = MAXIMUM(inf, (*theFvec)[i] - theUBbound[i]);
-         if (theLBbound[i] > (*theFvec)[i])
-            inf = MAXIMUM(inf, theLBbound[i] - (*theFvec)[i]);
-      }
-   }
-   else
-   {
-      assert(type() == LEAVE);
-
-      for(i = 0; i < dim(); i++)
-      {
          if ((*theCoPvec)[i] > (*theCoUbound)[i])
             inf = MAXIMUM(inf, (*theCoPvec)[i] - (*theCoUbound)[i]);
          if ((*theCoLbound)[i] > (*theCoPvec)[i])
@@ -550,6 +538,18 @@ Real SPxSolver::maxInfeas() const
             inf = MAXIMUM(inf, (*thePvec)[i] - (*theUbound)[i]);
          else if ((*thePvec)[i] < (*theLbound)[i])
             inf = MAXIMUM(inf, (*theLbound)[i] - (*thePvec)[i]);
+      }
+   }
+   else
+   {
+      assert(type() == LEAVE);
+
+      for(i = 0; i < dim(); i++)
+      {
+         if ((*theFvec)[i] > theUBbound[i])
+            inf = MAXIMUM(inf, (*theFvec)[i] - theUBbound[i]);
+         if (theLBbound[i] > (*theFvec)[i])
+            inf = MAXIMUM(inf, theLBbound[i] - (*theFvec)[i]);
       }
    }
 
