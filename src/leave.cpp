@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.50 2008/09/22 15:47:11 bzfgleix Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.51 2008/09/22 17:17:01 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -600,9 +600,9 @@ bool SPxSolver::leave(int leaveIdx)
             {
                instableLeaveNum = leaveIdx;
             }
-            // Problem: These changes do not survive a refactorization
-            theCoTest[leaveIdx] *= 0.01;            // #== fTest()#
-            //            theCoTest[leaveIdx] -= 2 * delta();     // #== fTest()#
+            // Note: These changes do not survive a refactorization
+            theCoTest[leaveIdx] *= 0.01;
+            //            theCoTest[leaveIdx] -= 2 * delta();
 
             return true;
          }
@@ -704,7 +704,9 @@ bool SPxSolver::leave(int leaveIdx)
                      << ")" << std::endl; )
 
                   // factorize();
-                  theCoTest[leaveIdx] *= 0.01;            // #== fTest()#
+
+                  // Note: These changes do not survive a refactorization
+                  theCoTest[leaveIdx] *= 0.01;
 
                   return true;
                }
