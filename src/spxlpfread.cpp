@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.61 2008/09/20 20:34:37 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.62 2008/09/22 15:56:37 bzfgleix Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -789,8 +789,14 @@ bool SPxLP::readLPF(
             {
                if (section == BINARIES)
                {
-                  cset.lower_w(colidx) = 0.0;
-                  cset.upper_w(colidx) = 1.0;
+		  if (cset.lower(colidx) < 0.0)
+		  {
+		     cset.lower_w(colidx) = 0.0;
+		  }
+		  if (cset.upper(colidx) > 1.0)
+		  {
+		     cset.upper_w(colidx) = 1.0;
+		  }
                }
                if (p_intvars != 0)
                   p_intvars->addIdx(colidx);
