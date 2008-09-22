@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxparmultpr.cpp,v 1.14 2007/08/27 15:35:12 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxparmultpr.cpp,v 1.15 2008/09/22 16:39:42 bzfgleix Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -40,7 +40,6 @@ void SPxParMultPR::setType(SPxSolver::Type tp)
    }
 
    last = 0;
-   count = 1;
    min = partialSize / 2;
 }
 
@@ -67,7 +66,6 @@ SPxId SPxParMultPR::selectEnter()
       Real val;
       Real eps = -theeps;
       lastlast = last;
-      count = 0;
 
       for (i = used - 1; i >= 0; --i)
       {
@@ -96,7 +94,6 @@ SPxId SPxParMultPR::selectEnter()
 
       do
       {
-         count++;
          last = (last + 1) % multiParts;
          for (i = thesolver->coDim() - last - 1;
                i >= 0; i -= multiParts)

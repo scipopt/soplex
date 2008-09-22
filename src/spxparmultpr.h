@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxparmultpr.h,v 1.15 2007/08/27 15:35:12 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxparmultpr.h,v 1.16 2008/09/22 16:39:37 bzfgleix Exp $"
 
 /**@file  spxparmultpr.h
  * @brief Partial multiple pricing.
@@ -76,8 +76,6 @@ private:
    int min;
    ///
    int last;
-   ///
-   int count;
    /// Set size for partial pricing.
    static int partialSize;
    //@}
