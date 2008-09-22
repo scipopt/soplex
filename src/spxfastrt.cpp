@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.35 2008/09/05 17:33:42 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.36 2008/09/22 15:47:11 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -1123,6 +1123,10 @@ SPxId SPxFastRT::selectEnter(Real& val)
    int nr;
    int cnt = 0;
 
+   // force instable pivot iff true (see explanation in leave.cpp and spxsolve.cpp)
+   bool instable = solver()->instableLeave;
+   assert(!instable || solver()->instableLeaveNum >= 0);
+
    resetTols();
    sel = 0;
 
@@ -1143,7 +1147,15 @@ SPxId SPxFastRT::selectEnter(Real& val)
             Real bestDelta, stab;
             // stab = minStab;
             stab = minStability(minStab, maxabs);
-            enterId = maxSelect(nr, sel, stab, bestDelta, max);
+            // force instable pivot iff instable is true (see explanation in leave.cpp and spxsolve.cpp)
+            if (instable)
+            {
+               enterId = maxSelect(nr, sel, epsilon, bestDelta, max);
+            }
+            else
+            {
+               enterId = maxSelect(nr, sel, stab, bestDelta, max);
+            }
             if (bestDelta < DELTA_SHIFT*TRIES)
                cnt++;
             else
@@ -1171,7 +1183,15 @@ SPxId SPxFastRT::selectEnter(Real& val)
             Real bestDelta, stab;
             // stab = minStab;
             stab = minStability(minStab, maxabs);
-            enterId = minSelect(nr, sel, stab, bestDelta, max);
+            // force instable pivot iff instable is true (see explanation in leave.cpp and spxsolve.cpp)
+            if (instable)
+            {
+               enterId = minSelect(nr, sel, epsilon, bestDelta, max);
+            }
+            else
+            {
+               enterId = minSelect(nr, sel, stab, bestDelta, max);
+            }
             if (bestDelta < DELTA_SHIFT*TRIES)
                cnt++;
             else

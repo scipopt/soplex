@@ -1,7 +1,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /*                                                                           */
 /*                  This file is part of the class library                   */
-/*       SoPlex --- the Sequential object-oriented simPlex.                  */
+/*       SsoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1997-1999 Roland Wunderling                              */
 /*                  1997-2007 Konrad-Zuse-Zentrum                            */
@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.49 2008/08/11 17:46:30 bzfpfets Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.50 2008/09/22 15:47:11 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -504,6 +504,9 @@ bool SPxSolver::leave(int leaveIdx)
    assert(type() == LEAVE);
    assert(initialized);
 
+   bool instable = instableLeave;
+   assert(!instable || instableLeaveNum >= 0);
+
    /*
        Before performing the actual basis update, we must determine, how this
        is to be accomplished.
@@ -557,6 +560,9 @@ bool SPxSolver::leave(int leaveIdx)
       Real enterVal = leaveMax;
       SPxId enterId = theratiotester->selectEnter(enterVal);
 
+      instableLeaveNum = -1;
+      instableLeave = false;
+
       /*
           No variable could be selected to enter the basis and even the leaving
           variable is unbounded --- this is a failure.
@@ -578,6 +584,22 @@ bool SPxSolver::leave(int leaveIdx)
                               << ", theCoTest=" << theCoTest[leaveIdx] << ")" 
                               << std::endl; )
 
+            /* In the LEAVE algorithm, when for a selected leaving variable we find only
+               an instable entering variable, then the basis change is not conducted.
+               Instead, we save the leaving variable's index in instableLeaveNum and scale
+               theCoTest[leaveIdx] down by some factor, hoping to find a different leaving
+               variable with a stable entering variable.
+               If this fails, however, and no more leaving variable is found, we have to
+               perform the instable basis change using instableLeaveNum. In this (and only
+               in this) case, the flag instableLeave is set to true.
+               
+               enterVal != leaveMax is the case that selectEnter has found only an instable entering
+               variable. We store this leaving variable for later -- if we are not already in the
+               instable case. */
+            if (!instable)
+            {
+               instableLeaveNum = leaveIdx;
+            }
             // Problem: These changes do not survive a refactorization
             theCoTest[leaveIdx] *= 0.01;            // #== fTest()#
             //            theCoTest[leaveIdx] -= 2 * delta();     // #== fTest()#
@@ -611,175 +633,209 @@ bool SPxSolver::leave(int leaveIdx)
          }
          return false;
       }
-      /*
-          If an entering variable has been found, a regular basis update is to
-          be performed.
-       */
-      else if (enterId != baseId(leaveIdx))
+      else 
       {
-         const SVector& newVector = *enterVector(enterId);
+         /*
+           If an entering variable has been found, a regular basis update is to
+           be performed.
+         */
+         if (enterId != baseId(leaveIdx))
+         {
+            const SVector& newVector = *enterVector(enterId);
 
-         // update feasibility vectors
-         if (solveVector2)
-            SPxBasis::solve4update (theFvec->delta(), *solveVector2,
-               newVector, *solveVector2rhs);
-         else
-            SPxBasis::solve4update (theFvec->delta(), newVector);
+            // update feasibility vectors
+            if (solveVector2)
+               SPxBasis::solve4update (theFvec->delta(), *solveVector2,
+                  newVector, *solveVector2rhs);
+            else
+               SPxBasis::solve4update (theFvec->delta(), newVector);
 
 #if ENABLE_ADDITIONAL_CHECKS
-         {
-            SSVector tmp(dim(), epsilon());
-            SPxBasis::solve(tmp, newVector);
-            tmp -= fVec().delta();
-            if (tmp.length() > delta()) {
-               // This happens very frequently and does usually not hurt, so print
-               // these warnings only with verbose level INFO2 and higher.
-               MSG_INFO2( spxout << "WLEAVE62\t(" << tmp.length() << ")\n"; )
+            {
+               SSVector tmp(dim(), epsilon());
+               SPxBasis::solve(tmp, newVector);
+               tmp -= fVec().delta();
+               if (tmp.length() > delta()) {
+                  // This happens very frequently and does usually not hurt, so print
+                  // these warnings only with verbose level INFO2 and higher.
+                  MSG_INFO2( spxout << "WLEAVE62\t(" << tmp.length() << ")\n"; )
+                     }
             }
-         }
 #endif  // ENABLE_ADDITIONAL_CHECKS
 
 
-         if (fabs(theFvec->delta()[leaveIdx]) < reject_leave_tol)
+            if (fabs(theFvec->delta()[leaveIdx]) < reject_leave_tol)
+            {
+               if (instable)
+               {
+                  /* We are in the case that for all leaving variables only instable entering
+                     variables were found: Thus, above we already accepted such an instable
+                     entering variable. Now even this seems to be impossible, thus we conclude
+                     unboundedness/infeasibility. */
+                  MSG_INFO3( spxout << "ILEAVE03 unboundness/infeasiblity found "
+                     << "in leave()" << std::endl; )
+
+                  if (rep() != COLUMN)
+                     setBasisStatus(SPxBasis::UNBOUNDED);
+                  else
+                  {
+                     int sign;
+                     int i;
+
+                     dualFarkas.clear();
+                     dualFarkas.setMax(coPvec().delta().size());
+                     sign = (enterVal > 0 ? -1 : +1);
+                     for( i = 0; i < coPvec().delta().size(); ++i )
+                        dualFarkas.add(coPvec().delta().index(i), sign * coPvec().delta().value(i));
+
+                     setBasisStatus(SPxBasis::INFEASIBLE);
+                  }
+
+                  return false;
+               }
+               else
+               {
+                  SPxId none;
+                  change(leaveIdx, none, 0);
+                  theFvec->delta().clear();
+                  rejectLeave(leaveNum, leaveId, leaveStat, &newVector);
+                  MSG_DEBUG( spxout << "DLEAVE63 rejecting leave B (leaveIdx=" << leaveIdx
+                     << ", theCoTest=" << theCoTest[leaveIdx] 
+                     << ")" << std::endl; )
+
+                  // factorize();
+                  theCoTest[leaveIdx] *= 0.01;            // #== fTest()#
+
+                  return true;
+               }
+            }
+
+            //      process leaving variable
+            if (leavebound > epsilon() || leavebound < -epsilon())
+               theFrhs->multAdd(-leavebound, baseVec(leaveIdx));
+
+            //      process entering variable
+            Real enterBound;
+            Real newUBbound;
+            Real newLBbound;
+            Real newCoPrhs;
+
+            getLeaveVals2(leaveMax, enterId,
+               enterBound, newUBbound, newLBbound, newCoPrhs);
+
+            theUBbound[leaveIdx] = newUBbound;
+            theLBbound[leaveIdx] = newLBbound;
+            (*theCoPrhs)[leaveIdx] = newCoPrhs;
+
+            if (enterBound > epsilon() || enterBound < -epsilon())
+               theFrhs->multAdd(enterBound, newVector);
+
+            // update pricing vectors
+            theCoPvec->value() = enterVal;
+            thePvec->value() = enterVal;
+            if (enterVal > epsilon() || enterVal < -epsilon())
+               doPupdate();
+
+            // update feasibility vector
+            theFvec->value() = -((*theFvec)[leaveIdx] - leavebound)
+               / theFvec->delta()[leaveIdx];
+            theFvec->update();
+            (*theFvec)[leaveIdx] = enterBound - theFvec->value();
+            updateFtest();
+
+            //  change basis matrix
+            change(leaveIdx, enterId, &newVector, &(theFvec->delta()));
+         }
+
+         /*
+           No entering vector has been selected from the basis. However, if the
+           shift amount for |coPvec| is bounded, we are in the case, that the
+           entering variable is moved from one bound to its other, before any of
+           the basis feasibility variables reaches their bound. This may only
+           happen in primal/columnwise case with upper and lower bounds on
+           variables.
+         */
+         else
          {
+            assert(rep() == ROW);
+            SPxBasis::Desc& ds = desc();
+
             SPxId none;
             change(leaveIdx, none, 0);
-            theFvec->delta().clear();
-            rejectLeave(leaveNum, leaveId, leaveStat, &newVector);
-            MSG_DEBUG( spxout << "DLEAVE63 rejecting leave B (leaveIdx=" << leaveIdx
-                              << ", theCoTest=" << theCoTest[leaveIdx] 
-                              << ")" << std::endl; )
 
-            // factorize();
-            theCoTest[leaveIdx] *= 0.01;            // #== fTest()#
-            return true;
-         }
-
-         //      process leaving variable
-         if (leavebound > epsilon() || leavebound < -epsilon())
-            theFrhs->multAdd(-leavebound, baseVec(leaveIdx));
-
-         //      process entering variable
-         Real enterBound;
-         Real newUBbound;
-         Real newLBbound;
-         Real newCoPrhs;
-
-         getLeaveVals2(leaveMax, enterId,
-                       enterBound, newUBbound, newLBbound, newCoPrhs);
-
-         theUBbound[leaveIdx] = newUBbound;
-         theLBbound[leaveIdx] = newLBbound;
-         (*theCoPrhs)[leaveIdx] = newCoPrhs;
-
-         if (enterBound > epsilon() || enterBound < -epsilon())
-            theFrhs->multAdd(enterBound, newVector);
-
-         // update pricing vectors
-         theCoPvec->value() = enterVal;
-         thePvec->value() = enterVal;
-         if (enterVal > epsilon() || enterVal < -epsilon())
-            doPupdate();
-
-         // update feasibility vector
-         theFvec->value() = -((*theFvec)[leaveIdx] - leavebound)
-                            / theFvec->delta()[leaveIdx];
-         theFvec->update();
-         (*theFvec)[leaveIdx] = enterBound - theFvec->value();
-         updateFtest();
-
-         //  change basis matrix
-         change(leaveIdx, enterId, &newVector, &(theFvec->delta()));
-      }
-
-      /*
-          No entering vector has been selected from the basis. However, if the
-          shift amount for |coPvec| is bounded, we are in the case, that the
-          entering variable is moved from one bound to its other, before any of
-          the basis feasibility variables reaches their bound. This may only
-          happen in primal/columnwise case with upper and lower bounds on
-          variables.
-       */
-      else
-      {
-         assert(rep() == ROW);
-         SPxBasis::Desc& ds = desc();
-
-         SPxId none;
-         change(leaveIdx, none, 0);
-
-         if (leaveStat == SPxBasis::Desc::P_ON_UPPER)
-         {
-            if (leaveId.isSPxRowId())
+            if (leaveStat == SPxBasis::Desc::P_ON_UPPER)
             {
-               ds.rowStatus(leaveNum) = SPxBasis::Desc::P_ON_LOWER;
-               (*theCoPrhs)[leaveIdx] = theLRbound[leaveNum];
+               if (leaveId.isSPxRowId())
+               {
+                  ds.rowStatus(leaveNum) = SPxBasis::Desc::P_ON_LOWER;
+                  (*theCoPrhs)[leaveIdx] = theLRbound[leaveNum];
+               }
+               else
+               {
+                  ds.colStatus(leaveNum) = SPxBasis::Desc::P_ON_LOWER;
+                  (*theCoPrhs)[leaveIdx] = theLCbound[leaveNum];
+               }
+               theUBbound[leaveIdx] = 0;
+               theLBbound[leaveIdx] = -infinity;
             }
             else
             {
-               ds.colStatus(leaveNum) = SPxBasis::Desc::P_ON_LOWER;
-               (*theCoPrhs)[leaveIdx] = theLCbound[leaveNum];
+               assert( leaveStat == SPxBasis::Desc::P_ON_LOWER );
+               if (leaveId.isSPxRowId())
+               {
+                  ds.rowStatus(leaveNum) = SPxBasis::Desc::P_ON_UPPER;
+                  (*theCoPrhs)[leaveIdx] = theURbound[leaveNum];
+               }
+               else
+               {
+                  ds.colStatus(leaveNum) = SPxBasis::Desc::P_ON_UPPER;
+                  (*theCoPrhs)[leaveIdx] = theUCbound[leaveNum];
+               }
+               theUBbound[leaveIdx] = infinity;
+               theLBbound[leaveIdx] = 0;
             }
-            theUBbound[leaveIdx] = 0;
-            theLBbound[leaveIdx] = -infinity;
+
+            // update copricing vector
+            theCoPvec->value() = enterVal;
+            thePvec->value() = enterVal;
+            if (enterVal > epsilon() || enterVal < -epsilon())
+               doPupdate();
+
+            // update feasibility vectors
+            theFvec->value() = 0;
+            theCoTest[leaveIdx] *= -1;
+         }
+
+         if ((leaveMax > delta() && enterVal <= delta()) || (leaveMax < -delta() && enterVal >= -delta()))
+         {
+            if ((theUBbound[leaveIdx] < infinity || theLBbound[leaveIdx] > -infinity)
+               && leaveStat != SPxBasis::Desc::P_FREE
+               && leaveStat != SPxBasis::Desc::D_FREE)
+               m_numCycle++;
          }
          else
-         {
-            assert( leaveStat == SPxBasis::Desc::P_ON_LOWER );
-            if (leaveId.isSPxRowId())
-            {
-               ds.rowStatus(leaveNum) = SPxBasis::Desc::P_ON_UPPER;
-               (*theCoPrhs)[leaveIdx] = theURbound[leaveNum];
-            }
-            else
-            {
-               ds.colStatus(leaveNum) = SPxBasis::Desc::P_ON_UPPER;
-               (*theCoPrhs)[leaveIdx] = theUCbound[leaveNum];
-            }
-            theUBbound[leaveIdx] = infinity;
-            theLBbound[leaveIdx] = 0;
-         }
-
-         // update copricing vector
-         theCoPvec->value() = enterVal;
-         thePvec->value() = enterVal;
-         if (enterVal > epsilon() || enterVal < -epsilon())
-            doPupdate();
-
-         // update feasibility vectors
-         theFvec->value() = 0;
-         theCoTest[leaveIdx] *= -1;
-      }
-
-      if ((leaveMax > delta() && enterVal <= delta()) || (leaveMax < -delta() && enterVal >= -delta()))
-      {
-         if ((theUBbound[leaveIdx] < infinity || theLBbound[leaveIdx] > -infinity)
-            && leaveStat != SPxBasis::Desc::P_FREE
-            && leaveStat != SPxBasis::Desc::D_FREE)
-            m_numCycle++;
-      }
-      else
-         m_numCycle /= 2;
+            m_numCycle /= 2;
 
 #if ENABLE_ADDITIONAL_CHECKS
-      {
-         DVector tmp = fVec();
-         multBaseWith(tmp);
-         tmp -= fRhs();
-         if (tmp.length() > delta())
          {
-            // This happens very frequently and does usually not hurt, so print
-            // these warnings only with verbose level INFO2 and higher.
-            MSG_INFO2( spxout << "WLEAVE64\t" << basis().iteration()
-                         << ": fVec error = " << tmp.length() << std::endl; )
-            SPxBasis::solve(tmp, fRhs());
-            tmp -= fVec();
-            MSG_INFO2( spxout << "WLEAVE65\t(" << tmp.length() << ")\n"; )
+            DVector tmp = fVec();
+            multBaseWith(tmp);
+            tmp -= fRhs();
+            if (tmp.length() > delta())
+            {
+               // This happens very frequently and does usually not hurt, so print
+               // these warnings only with verbose level INFO2 and higher.
+               MSG_INFO2( spxout << "WLEAVE64\t" << basis().iteration()
+                  << ": fVec error = " << tmp.length() << std::endl; )
+                  SPxBasis::solve(tmp, fRhs());
+               tmp -= fVec();
+               MSG_INFO2( spxout << "WLEAVE65\t(" << tmp.length() << ")\n"; )
+                  }
          }
-      }
 #endif  // ENABLE_ADDITIONAL_CHECKS
 
-      return true;
+         return true;
+      }
    }
 }
 } // namespace soplex

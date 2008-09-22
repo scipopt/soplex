@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.102 2008/08/27 06:45:20 bzfheinz Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.103 2008/09/22 15:47:11 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -24,6 +24,7 @@
 #include "spxsolver.h"
 #include "spxpricer.h"
 #include "spxratiotester.h"
+#include "spxdefaultrt.h"
 #include "spxstarter.h"
 #include "spxout.h"
 #include "exceptions.h"
@@ -91,6 +92,7 @@ SPxSolver::Status SPxSolver::solve()
    Real  newDelta;
    Real  minShift = infinity;
    int   cycleCount = 0;
+
    if (dim() <= 0 && coDim() <= 0) // no problem loaded
    {
       m_status = NO_PROBLEM;
@@ -306,10 +308,13 @@ SPxSolver::Status SPxSolver::solve()
       }
       else
       {
-         int leaveCycleCount = 0;
-
          assert(type() == LEAVE);
          
+         int leaveCycleCount = 0;
+
+         instableLeaveNum = -1;
+         instableLeave = false;
+
          thepricer->setEpsilon(maxDelta);
 
          do
@@ -322,6 +327,20 @@ SPxSolver::Status SPxSolver::solve()
             )
             
             leaveNum = thepricer->selectLeave();
+
+            if (leaveNum < 0 && instableLeaveNum >= 0)
+            {
+               /* no leaving variable was found, but because of instableLeaveNum >= 0 we know
+                  that this is due to the scaling of theCoTest[...]. Thus, we use 
+                  instableLeaveNum and SPxFastRT::selectEnter shall accept even an instable
+                  entering variable. */
+               leaveNum = instableLeaveNum;
+               instableLeave = true;
+            }
+            else
+            {
+               instableLeave = false;
+            }
 
             if (leaveNum < 0)
             {
