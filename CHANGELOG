@@ -1,4 +1,4 @@
-Current Version
+#Current Version
 
 #----------------------------------------------------------------
 
@@ -56,6 +56,14 @@ Release 1.3.3
 - Added fixing of the basis status if ZERO/P_FREE is not appropriate anymore, see spxsolver.cpp
   varStatusToBasisStatusCol() and varStatusToBasisStatusRow().
 
+- Fixed bug with detecting infeasible instances if scaling theCoTest does not help.
+
+- Corrected bug in spxlpfread.cpp with bounds on binary (old bounds were discarded).
+  Furthermore a bug with an unused variable appearing in the bounds section is corrected.
+
+- Corrected bug in spxsolver.cpp:maxInfeas(): the leave and entering case were switched.
+
+- Removed superfluous variable 'count' in spxparmultpr.cpp/h
 
 #----------------------------------------------------------------
 
