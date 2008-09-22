@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.32 2008/09/22 15:47:11 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.33 2008/09/22 16:06:06 bzfgleix Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -1094,7 +1094,7 @@ public:
     *  constraint matrix. As #coPvec, also #pVec is maintained within
     *  its bound for the leaving Simplex algorithm, while the bounds
     *  are tested for the entering Simplex. #pVec is of dimension
-    *  #dim(). Vector #pVec() is only up to date for #LEAVE%ing
+    *  #coDim(). Vector #pVec() is only up to date for #LEAVE%ing
     *  Simplex or #FULL pricing in #ENTER%ing Simplex.
     */
    UpdateVector& pVec() const
@@ -1328,8 +1328,8 @@ public:
       coSolveVector2rhs = p_rhs;
    }
    /// maximal infeasibility of basis
-   /** This method is called for prooving optimality. Since it is
-    *  possible, that some stable implementation of class
+   /** This method is called for proving optimality. Since it is
+    *  possible that some stable implementation of class
     *  SPxRatioTester yielded a slightly infeasible (or unpriced)
     *  basis, this must be checked before terminating with an optimal
     *  solution.
