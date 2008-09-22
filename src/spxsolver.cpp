@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.34 2008/09/22 16:37:19 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.35 2008/09/22 17:12:44 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -455,7 +455,8 @@ void SPxSolver::factorize()
       DVector ftmp(fVec());
       DVector ptmp(pVec());
       DVector ctmp(coPvec());
-      testVecs();
+      /* move this test after the computation of fTest and coTest below, since these vectors might not be set up, e.g., for an initial basis. */
+      // testVecs();
 #endif  // NDEBUG
 
       if (type() == LEAVE)
@@ -509,6 +510,11 @@ void SPxSolver::factorize()
 //          computePvec();
       }
    }
+
+#ifndef NDEBUG
+   /* see note near top of function */
+   testVecs();
+#endif  // NDEBUG
 
    if (SPxBasis::status() == SPxBasis::SINGULAR)
    {
