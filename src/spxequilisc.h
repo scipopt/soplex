@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxequilisc.h,v 1.7 2007/08/27 15:35:11 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxequilisc.h,v 1.8 2008/09/22 10:02:45 bzftuchs Exp $"
 
 /**@file  spxequilisc.h
  * @brief LP euilibrium scaling.
@@ -41,8 +41,8 @@ public:
    //-------------------------------------
    /**@name Construction / destruction */
    //@{
-   /// default constructor.
-   explicit SPxEquiliSC(bool colFirst = true, bool doBoth = true);
+   /// default constructor (this scaler makes no use of inherited member m_colFirst)
+   explicit SPxEquiliSC(bool doBoth = true);
    /// destructor
    virtual ~SPxEquiliSC()
    {}

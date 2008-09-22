@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxequilisc.cpp,v 1.14 2007/08/27 15:35:11 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxequilisc.cpp,v 1.15 2008/09/22 10:02:45 bzftuchs Exp $"
 
 /**@file  spxequilisc.cpp
  * @brief Equilibrium row/column scaling.
@@ -25,20 +25,13 @@
 
 namespace soplex
 {
-static const char* makename(bool colFirst, bool doBoth)
+static const char* makename(bool doBoth)
 {
-   const char* name;
-
-   if (doBoth)
-      name = colFirst ? "CR-Equilibrium" : "RC-Equilibrium";
-   else
-      name = colFirst ? "C-Equilibrium" : "R-Equilibrium";
-
-   return name;
+   return doBoth ? "bi-Equilibrium" : "uni-Equilibrium";
 }
 
-SPxEquiliSC::SPxEquiliSC(bool colFirst, bool doBoth)
-   : SPxScaler(makename(colFirst, doBoth), colFirst, doBoth)
+SPxEquiliSC::SPxEquiliSC(bool doBoth)
+   : SPxScaler(makename(doBoth), false, doBoth)
 {}
 
 Real SPxEquiliSC::computeScale(Real /*mini*/, Real maxi) const
@@ -75,7 +68,7 @@ void SPxEquiliSC::scale(SPxLP& lp)
    Real colratio = maxColRatio(lp);
    Real rowratio = maxRowRatio(lp);
 
-   m_colFirst = colratio < rowratio;
+   bool colFirst = colratio < rowratio;
 
    MSG_INFO2( spxout << "IEQUSC02 LP scaling statistics:" 
                         << " min= " << lp.minAbsNzo()
@@ -83,7 +76,7 @@ void SPxEquiliSC::scale(SPxLP& lp)
                         << " col-ratio= " << colratio 
                         << " row-ratio= " << rowratio
                         << std::endl; )
-   if (m_colFirst)
+   if (colFirst)
    {
       computeScalingVecs(lp.colSet(), m_rowscale, m_colscale);
 

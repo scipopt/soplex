@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeometsc.cpp,v 1.15 2007/08/27 15:35:11 bzfberth Exp $"
+#pragma ident "@(#) $Id: spxgeometsc.cpp,v 1.16 2008/09/22 10:02:45 bzftuchs Exp $"
 
 /**@file  spxgeometsc.cpp
  * @brief Geometric mean row/column scaling.
@@ -25,18 +25,12 @@
 
 namespace soplex
 {
-static const char* makename(bool colFirst)
-{
-   return colFirst ? "CR-Geometric" : "RC-Geometric";
-}
-
-/**@param colFirst   first scale columns or rows?
-   @param maxIters   arbitrary small number, we choose 8
+/**@param maxIters   arbitrary small number, we choose 8
    @param minImpr    Bixby said Fourer said in MP 23, 274 ff. that 0.9 is a good value.
    @param goodEnough if the max/min ratio is allready less then 1000/1 we do not scale.
 */ 
-SPxGeometSC::SPxGeometSC(bool colFirst, int maxIters, Real minImpr, Real goodEnough)
-   : SPxScaler(makename(colFirst), colFirst, true)
+SPxGeometSC::SPxGeometSC(int maxIters, Real minImpr, Real goodEnough)
+   : SPxScaler("Geometric")
    , m_maxIterations(maxIters)
    , m_minImprovement(minImpr)
    , m_goodEnoughRatio(goodEnough)
@@ -67,7 +61,7 @@ void SPxGeometSC::scale(SPxLP& lp)
    Real colratio = maxColRatio(lp);
    Real rowratio = maxRowRatio(lp);
 
-   m_colFirst = colratio < rowratio;
+   bool colFirst = colratio < rowratio;
 
    MSG_INFO2( spxout << "IGEOSC02 LP scaling statistics:" 
                         << " min= " << lp.minAbsNzo()
@@ -79,7 +73,7 @@ void SPxGeometSC::scale(SPxLP& lp)
    // We make at most m_maxIterations. 
    for(int count = 0; count < m_maxIterations; count++)
    {
-      if (m_colFirst)
+      if (colFirst)
       {
          p0 = computeScalingVecs(lp.colSet(), m_rowscale, m_colscale);
          p1 = computeScalingVecs(lp.rowSet(), m_colscale, m_rowscale);
@@ -90,8 +84,8 @@ void SPxGeometSC::scale(SPxLP& lp)
          p1 = computeScalingVecs(lp.colSet(), m_rowscale, m_colscale);
       }
       MSG_INFO3( spxout << "IGEOSC03 Geometric scaling round " << count
-                           << " col-ratio= " << (m_colFirst ? p0 : p1)
-                           << " row-ratio= " << (m_colFirst ? p1 : p0)
+                           << " col-ratio= " << (colFirst ? p0 : p1)
+                           << " row-ratio= " << (colFirst ? p1 : p0)
                            << std::endl; )
 
       // record start value, this is done with m_col/rowscale = 1.0, so it is the
