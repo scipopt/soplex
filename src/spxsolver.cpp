@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.33 2008/09/21 16:48:02 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.34 2008/09/22 16:37:19 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -517,22 +517,24 @@ void SPxSolver::factorize()
    }
 }
 
+/* We compute how much the current solution violates (primal or dual) feasibility. In the dual
+   algorithm (row/enter or column/leave) the maximum violation of primal feasibility is computed. In
+   the primal case (row/leave or column/enter) the dual feasibility is checked. */
 Real SPxSolver::maxInfeas() const
 {
    METHOD( "SPxSolver::maxInfeas()" );
-   int i;
    Real inf = 0.0;
 
    if (type() == ENTER)
    {
-      for(i = 0; i < dim(); i++)
+      for (int i = 0; i < dim(); i++)
       {
          if ((*theCoPvec)[i] > (*theCoUbound)[i])
             inf = MAXIMUM(inf, (*theCoPvec)[i] - (*theCoUbound)[i]);
          if ((*theCoLbound)[i] > (*theCoPvec)[i])
             inf = MAXIMUM(inf, (*theCoLbound)[i] - (*theCoPvec)[i]);
       }
-      for(i = 0; i < coDim(); i++)
+      for (int i = 0; i < coDim(); i++)
       {
          if ((*thePvec)[i] > (*theUbound)[i])
             inf = MAXIMUM(inf, (*thePvec)[i] - (*theUbound)[i]);
@@ -544,7 +546,7 @@ Real SPxSolver::maxInfeas() const
    {
       assert(type() == LEAVE);
 
-      for(i = 0; i < dim(); i++)
+      for (int i = 0; i < dim(); i++)
       {
          if ((*theFvec)[i] > theUBbound[i])
             inf = MAXIMUM(inf, (*theFvec)[i] - theUBbound[i]);
