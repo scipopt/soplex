@@ -4,7 +4,7 @@
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1997-1999 Roland Wunderling                              */
-/*                  1997-2007 Konrad-Zuse-Zentrum                            */
+/*                  1997-2008 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.101 2008/08/07 10:31:11 bzfpfets Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.102 2008/09/22 20:43:17 bzfpfets Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -153,7 +153,7 @@ void print_version_info()
 
    const char* banner2 = "                                       *\n"
    "*    Copyright (C) 1997-1999 Roland Wunderling                         *\n"
-   "*                  1997-2007 Konrad-Zuse-Zentrum                       *\n"
+   "*                  1997-2008 Konrad-Zuse-Zentrum                       *\n"
    "*                            fuer Informationstechnik Berlin           *\n"
    "*                                                                      *\n"
    "*  SoPlex is distributed under the terms of the ZIB Academic Licence.  *\n"

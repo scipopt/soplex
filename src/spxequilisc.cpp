@@ -4,7 +4,7 @@
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1997-1999 Roland Wunderling                              */
-/*                  1997-2007 Konrad-Zuse-Zentrum                            */
+/*                  1997-2008 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxequilisc.cpp,v 1.15 2008/09/22 10:02:45 bzftuchs Exp $"
+#pragma ident "@(#) $Id: spxequilisc.cpp,v 1.16 2008/09/22 20:43:18 bzfpfets Exp $"
 
 /**@file  spxequilisc.cpp
  * @brief Equilibrium row/column scaling.
