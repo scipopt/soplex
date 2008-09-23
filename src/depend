@@ -230,7 +230,8 @@ $(LIBOBJDIR)/spxio.o: src/spxio.cpp src/spxdefines.h src/spxlp.h src/datakey.h \
   src/dataset.h src/dataarray.h src/spxalloc.h src/spxout.h \
   src/exceptions.h src/message.h src/idlist.h src/islist.h src/lprow.h \
   src/dsvector.h src/ssvector.h src/didxset.h src/idxset.h src/lpcol.h \
-  src/lprowset.h src/lpcolset.h src/nameset.h src/datahashtable.h
+  src/lprowset.h src/lpcolset.h src/nameset.h src/datahashtable.h \
+  src/spxfileio.h src/gzstream.h
 $(LIBOBJDIR)/spxlp.o: src/spxlp.cpp src/spxdefines.h src/spxlp.h src/datakey.h \
   src/spxid.h src/dvector.h src/vector.h src/svector.h src/svset.h \
   src/dataset.h src/dataarray.h src/spxalloc.h src/spxout.h \
@@ -323,7 +324,7 @@ $(LIBOBJDIR)/spxsolve.o: src/spxsolve.cpp src/spxdefines.h src/spxsolver.h src/t
   src/lpcol.h src/lprowset.h src/lpcolset.h src/nameset.h \
   src/datahashtable.h src/spxbasis.h src/slinsolver.h src/array.h \
   src/random.h src/unitvector.h src/updatevector.h src/spxpricer.h \
-  src/spxratiotester.h src/spxstarter.h
+  src/spxratiotester.h src/spxdefaultrt.h src/spxstarter.h
 $(LIBOBJDIR)/spxstarter.o: src/spxstarter.cpp src/spxdefines.h src/spxstarter.h \
   src/spxsolver.h src/timer.h src/spxlp.h src/datakey.h src/spxid.h \
   src/dvector.h src/vector.h src/svector.h src/svset.h src/dataset.h \
