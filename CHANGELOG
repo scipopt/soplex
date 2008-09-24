@@ -1,9 +1,5 @@
 Release 1.4.0
 
-#----------------------------------------------------------------
-
-Release 1.3.3
-
 - Constructor interface for the scalers SPxEquiliSC and SPxGeometSC
   changed: parameter colFirst is removed since the corresponding member is not
   used. Printed names of the scalars are slightly changed. There are only 5
