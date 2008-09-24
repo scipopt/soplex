@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.14 2008/09/22 20:43:18 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.15 2008/09/24 10:20:01 bzftuchs Exp $"
 
 //#define DEBUGGING 1
 
@@ -416,9 +416,9 @@ void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& 
       up = 0.0;   
   
    assert(LErel(lo, up));
-   assert((LErel(m_lower, lo, 1e-12) && LErel(lo, m_upper, 1e-12)) ||
-          (LErel(m_lower, up, 1e-12) && LErel(up, m_upper, 1e-12)) ||
-          (LErel(lo, m_lower, 1e-12) && LErel(m_upper, up, 1e-12)));
+   assert((LErel(m_lower, lo, 1e-10) && LErel(lo, m_upper, 1e-10)) ||
+          (LErel(m_lower, up, 1e-10) && LErel(up, m_upper, 1e-10)) ||
+          (LErel(lo, m_lower, 1e-10) && LErel(m_upper, up, 1e-10)));
    ASSERT_WARN( "WMAISM01", isNotZero(aij) );
    
    if (rStatus[m_i] == SPxSolver::ON_LOWER)
@@ -825,7 +825,7 @@ void SPxMainSM::DuplicateColsPS::execute(DVector& x,
       }
       else if (m_upK < infinity                           &&
                GErel(z2 * scale2 / m_scale, m_loJ, eps()) &&  
-               LErel(z2 * scale2 / m_scale, m_upJ, eps() ))
+               LErel(z2 * scale2 / m_scale, m_upJ, eps()))
       {
          x[m_j]       = z2 * scale2 / m_scale;                
          x[m_k]       = m_upK;
@@ -3039,7 +3039,7 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real delta)
 #endif
 
    // main presolving loop
-   while(again) 
+   while(again && ret == OKAY) 
    {
       again = false;
 
@@ -3093,23 +3093,22 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real delta)
       ret = VANISHED;
    }
    
-   MSG_INFO2( spxout << std::endl
-                     << "IMAISM71 Main simplifier performed:" << std::endl
-                     << m_stat[EMPTY_ROW]            << " empty rows" << std::endl
-                     << m_stat[FREE_ROW]             << " free rows" << std::endl
-                     << m_stat[SINGLETON_ROW]        << " singleton rows" << std::endl
-                     << m_stat[FORCE_ROW]            << " forcing rows" << std::endl
-                     << m_stat[EMPTY_COL]            << " empty columns" << std::endl
-                     << m_stat[FIX_COL]              << " fixed columns" << std::endl
-                     << m_stat[FREE_ZOBJ_COL]        << " free columns with zero objective" << std::endl
-                     << m_stat[ZOBJ_SINGLETON_COL]   << " singleton columns with zero objective" << std::endl
-                     << m_stat[DOUBLETON_ROW]        << " singleton columns combined with a doubleton equation" << std::endl
-                     << m_stat[FREE_SINGLETON_COL]   << " free singleton columns" << std::endl
-                     << m_stat[DOMINATED_COL]        << " dominated columns" << std::endl
-                     << m_stat[WEAKLY_DOMINATED_COL] << " weakly dominated columns" << std::endl
-                     << m_stat[DUPLICATE_ROW]        << " duplicate rows" << std::endl
-                     << m_stat[FIX_DUPLICATE_COL]    << " duplicate columns (fixed)" << std::endl
-                     << m_stat[SUB_DUPLICATE_COL]    << " duplicate columns (substituted)" << std::endl
+   MSG_INFO2( spxout << "\nIMAISM71 Main simplifier performed:\n"
+                     << m_stat[EMPTY_ROW]            << " empty rows\n"
+                     << m_stat[FREE_ROW]             << " free rows\n"
+                     << m_stat[SINGLETON_ROW]        << " singleton rows\n"
+                     << m_stat[FORCE_ROW]            << " forcing rows\n"
+                     << m_stat[EMPTY_COL]            << " empty columns\n"
+                     << m_stat[FIX_COL]              << " fixed columns\n"
+                     << m_stat[FREE_ZOBJ_COL]        << " free columns with zero objective\n"
+                     << m_stat[ZOBJ_SINGLETON_COL]   << " singleton columns with zero objective\n"
+                     << m_stat[DOUBLETON_ROW]        << " singleton columns combined with a doubleton equation\n"
+                     << m_stat[FREE_SINGLETON_COL]   << " free singleton columns\n"
+                     << m_stat[DOMINATED_COL]        << " dominated columns\n"
+                     << m_stat[WEAKLY_DOMINATED_COL] << " weakly dominated columns\n"
+                     << m_stat[DUPLICATE_ROW]        << " duplicate rows\n"
+                     << m_stat[FIX_DUPLICATE_COL]    << " duplicate columns (fixed)\n"
+                     << m_stat[SUB_DUPLICATE_COL]    << " duplicate columns (substituted)\n"
                      << std::endl; );
 
    m_timeUsed.stop();

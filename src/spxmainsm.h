@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.h,v 1.12 2008/09/22 20:43:18 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxmainsm.h,v 1.13 2008/09/24 10:20:01 bzftuchs Exp $"
 
 /**@file  spxmainsm.h
  * @brief General methods in LP preprocessing.
@@ -80,7 +80,7 @@ private:
    public:
       /// constructor.
       PostStep()
-         : m_eps(1e-7)
+         : m_eps(1e-6)
       {}
       /// destructor.
       virtual ~PostStep()
