@@ -4,6 +4,14 @@ Release 1.4.0
 
 Release 1.3.3
 
+- Constructor interface for the scalers SPxEquiliSC and SPxGeometSC
+  changed: parameter colFirst is removed since the corresponding member is not
+  used. Printed names of the scalars are slightly changed. There are only 5
+  command line options for the scalar left since two of the previous 6 options
+  coincided.  
+
+- Some modifications in the simplifier SPxMainSM to avoid numerical problems.
+
 - Introduced exceptions for all unrecoverable errors (lack of memory, 
   no pricer, singular basis, etc.) to allow a calling application to clean up.
 

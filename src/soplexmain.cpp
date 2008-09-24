@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplexmain.cpp,v 1.4 2008/09/22 20:43:18 bzfpfets Exp $"
+#pragma ident "@(#) $Id: soplexmain.cpp,v 1.5 2008/09/24 10:21:27 bzftuchs Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -464,10 +464,6 @@ void get_scalers(
       prescaler  = new SPxEquiliSC(true);
       postscaler = 0;
       break;
-//    case 2 :
-//       prescaler  = new SPxEquiliSC(representation == SPxSolver::ROW, false);
-//       postscaler = 0;
-//       break;
    case 1 :
       prescaler  = new SPxEquiliSC(false);
       postscaler = 0;
