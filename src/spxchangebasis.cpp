@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.32 2008/09/22 20:43:18 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxchangebasis.cpp,v 1.33 2008/09/24 16:40:19 bzfberth Exp $"
 
 //#define DEBUGGING 1
 
@@ -478,15 +478,15 @@ void SPxBasis::restoreInitialBasis()
 }
 
 /**
-   The following methods (changedRow(), changedCol(), changedElement()) radically
-   change the current basis to the original (slack) basis also present after 
-   loading the LP. The reason is that through the changes, the current basis may
-   become singular. Going back to the initial basis is quite inefficient, but 
-   correct.
-
-   @todo Implement changedRow(), changedCol(), changedElement() in a more clever
-   way. For instance, the basis won't be singular (but maybe infeasible) if the 
-   change doesn't affect the basis rows/columns.
+ * @todo Implement changedRow(), changedCol(), changedElement() in a more clever
+ * way. For instance, the basis won't be singular (but maybe infeasible) if the 
+ * change doesn't affect the basis rows/columns.
+ *
+ * The following methods (changedRow(), changedCol(), changedElement()) radically
+ * change the current basis to the original (slack) basis also present after 
+ * loading the LP. The reason is that through the changes, the current basis may
+ * become singular. Going back to the initial basis is quite inefficient, but 
+ * correct.
  */
 
 /**@todo is this correctly implemented?

@@ -26,6 +26,8 @@ $NAME/check/check.sh \
 $NAME/check/check.awk \
 $NAME/doc/soplex.dxy \
 $NAME/doc/xternal.cpp \
+$NAME/doc/inc/faq.inc \
+$NAME/doc/inc/faqcss.inc \
 $NAME/make/* \
 $NAME/src/*
 rm -f $NAME

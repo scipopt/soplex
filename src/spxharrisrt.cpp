@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.28 2008/09/22 20:43:18 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.29 2008/09/24 16:40:19 bzfberth Exp $"
 
 //#define DEBUGGING 1
 
@@ -26,15 +26,14 @@
 namespace soplex
 {
 /**@todo suspicious: *max is not set, but it is used 
-         (with the default setting *max=1) in selectLeave and selectEnter
-         The question might be if max shouldn't be updated with themax?
-*/
-
-/**@todo numCycle and maxCycle are integers. So degeneps will be 
-  *       exactly delta until numCycle >= maxCycle. Then it will be
-  *       0 until numCycle >= 2 * maxCycle, after wich it becomes
-  *       negative. This does not look ok.
-  */
+ * (with the default setting *max=1) in selectLeave and selectEnter
+ * The question might be if max shouldn't be updated with themax?
+ *
+ * numCycle and maxCycle are integers. So degeneps will be 
+ * exactly delta until numCycle >= maxCycle. Then it will be
+ * 0 until numCycle >= 2 * maxCycle, after wich it becomes
+ * negative. This does not look ok.
+ */
 Real SPxHarrisRT::degenerateEps() const
 {
    return solver()->delta() 
