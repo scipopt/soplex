@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.102 2008/09/22 20:43:17 bzfpfets Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.103 2008/09/26 11:00:08 bzftuchs Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -225,13 +225,13 @@ void print_usage_and_exit( const char* const argv[] )
       " -vLevel   set verbosity Level: from 0 (ERROR) to 5 (DEBUG), default 2\n"
       " -V        show program version\n"
       " -h        show this help\n"
-      "Simplifier:     Scaler:         Starter:     Pricer:        Ratiotester:\n"
-      " -s0 none       -g0 none         -c0 none*   -p0 Textbook  -t0 Textbook\n"
-      " -s1 Main*      -g1 C-uni-Equi   -c1 Weight  -p1 ParMult   -t1 Harris\n"
-      "                -g2 R-uni-Equi   -c2 Sum     -p2 Devex     -t2 Fast*\n"
-      "                -g3 bi-Equi*     -c3 Vector  -p3 Hybrid!\n"
-      "                -g4 bi-Equi+Geom1            -p4 Steep*\n"
-      "                -g5 bi-Equi+Geom8            -p5 Weight\n"
+      "Simplifier:  Scaler:           Starter:    Pricer:        Ratiotester:\n"
+      " -s0 none     -g0 none          -c0 none*   -p0 Textbook   -t0 Textbook\n"
+      " -s1 Main*    -g1 uni-Equi      -c1 Weight  -p1 ParMult    -t1 Harris\n"
+      "              -g2 bi-Equi*      -c2 Sum     -p2 Devex      -t2 Fast*\n"
+      "              -g3 bi-Equi+Geo1  -c3 Vector  -p3 Hybrid!\n"
+      "              -g4 bi-Equi+Geo8              -p4 Steep*\n"
+      "                                            -p5 Weight\n"
       ;
 
    std::cerr << "usage: " << argv[0] << " " << usage << std::endl;
@@ -384,31 +384,26 @@ SPxRatioTester* get_ratio_tester(const int ratiotest)
 //------------------------------------------------------------------------
 void get_scalers(SPxScaler*& prescaler,
                  SPxScaler*& postscaler,
-                 const int   scaling,
-                 const int   representation)
+                 const int   scaling)
 {
    switch(scaling)
    {
-   case 5:
-      prescaler  = new SPxEquiliSC(representation == SPxSolver::COLUMN, true);
-      postscaler = new SPxGeometSC(representation == SPxSolver::COLUMN, 8);
-      break; 
    case 4:
-      prescaler  = new SPxEquiliSC(representation == SPxSolver::COLUMN, true);
-      postscaler = new SPxGeometSC(representation == SPxSolver::COLUMN, 1);
-      break; 
-   case 3 :
-      prescaler  = new SPxEquiliSC(representation == SPxSolver::COLUMN, true);
-      postscaler = 0;
-      break; 
+      prescaler  = new SPxEquiliSC(true);
+      postscaler = new SPxGeometSC(8);
+      break;
+   case 3:
+      prescaler  = new SPxEquiliSC(true);
+      postscaler = new SPxGeometSC(1);
+      break;
    case 2 :
-      prescaler  = new SPxEquiliSC(representation == SPxSolver::ROW, false);
+      prescaler  = new SPxEquiliSC(true);
       postscaler = 0;
-      break; 
+      break;
    case 1 :
-      prescaler  = new SPxEquiliSC(representation == SPxSolver::COLUMN, false);
+      prescaler  = new SPxEquiliSC(false);
       postscaler = 0;
-      break; 
+      break;
    case 0 : 
       /*FALLTHROUGH*/
    default :
@@ -712,7 +707,7 @@ int main(int argc, const char* const argv[])
       int                       starting       = 0;
       int                       pricing        = 4;
       int                       ratiotest      = 2;
-      int                       scaling        = 3;
+      int                       scaling        = 2;
       int                       simplifying    = 1;
       Real                      timelimit      = -1.0;
       Real                      delta          = DEFAULT_BND_VIOL;
@@ -866,7 +861,7 @@ int main(int argc, const char* const argv[])
       assert(work.isConsistent());
 
       // set pre- and postscaler
-      get_scalers(prescaler, postscaler, scaling, representation);
+      get_scalers(prescaler, postscaler, scaling);
       work.setPreScaler (prescaler);
       work.setPostScaler(postscaler);
       assert(work.isConsistent());
