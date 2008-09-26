@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idlist.h,v 1.21 2008/09/22 20:43:17 bzfpfets Exp $"
+#pragma ident "@(#) $Id: idlist.h,v 1.22 2008/09/26 14:37:27 bzfgleix Exp $"
 
 /**@file  idlist.h
  * @brief Generic Real linked list.
@@ -32,7 +32,7 @@ namespace soplex
 //  class IdElement<T>
 //---------------------------------------------------------------------
 
-/**@brief   Elements for \ref IdList "IdLists".
+/**@brief   Elements for \ref soplex::IdList "IdList"s.
    @ingroup Elementary
 
    #IdElement%s are derived from the template parameter class T and can hence

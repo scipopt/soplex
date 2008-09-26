@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slinsolver.h,v 1.16 2008/09/22 20:43:17 bzfpfets Exp $"
+#pragma ident "@(#) $Id: slinsolver.h,v 1.17 2008/09/26 14:37:27 bzfgleix Exp $"
 
 /**@file  slinsolver.h
  * @brief Sparse Linear Solver virtual base class.
@@ -48,7 +48,7 @@ public:
    //---------------------------------------
    /**@name Types */
    //@{
-   /// status flags of the #SLinSolver class.
+   /// status flags of the SLinSolver class.
    enum Status
    {
       /** The SLinSolver is ready for solving linear systems with the

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datahashtable.h,v 1.24 2008/09/22 20:42:28 bzfpfets Exp $"
+#pragma ident "@(#) $Id: datahashtable.h,v 1.25 2008/09/26 14:37:28 bzfgleix Exp $"
 
 /**@file  datahashtable.h
  * @brief Generic hash table for data objects.
@@ -111,7 +111,7 @@ private:
    int m_used;            
    /// pointer to hash function (mapping: \a HashItem -> int)
    int (*m_hashfun) (const HashItem*);  
-   /// memory is #reMax()%ed by this factor if a new element does't fit
+   /// memory is \ref soplex::DataHashTable::reMax() "reMax()"ed by this factor if a new element does't fit
    Real m_memfactor;  
    //@}
 
@@ -286,7 +286,7 @@ private:
    //-----------------------------------
    /**@name Helpers */
    //@{
-   /// automatically computes a good #m_hashsize.
+   /// automatically computes a good \ref soplex::DataHashTable::m_hashsize "m_hashsize".
    /** Computes a good #m_hashsize as the product of all prime numbers 
     *  not divisors of the number of elements that are <= 
     *  the maximum divisor of the number of elemens.

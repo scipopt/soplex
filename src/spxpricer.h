@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxpricer.h,v 1.17 2008/09/22 20:43:18 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxpricer.h,v 1.18 2008/09/26 14:37:27 bzfgleix Exp $"
 
 
 /**@file  spxpricer.h
@@ -91,7 +91,7 @@ public:
       return thesolver;
    }
 
-   /// returns violation bound #theeps.
+   /// returns violation bound \ref soplex::SPxPricer::theeps "theeps".
    virtual Real epsilon() const
    {
       return theeps;

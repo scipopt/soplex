@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.34 2008/09/22 20:43:18 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.35 2008/09/26 14:37:27 bzfgleix Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -178,10 +178,10 @@ public:
       NO_PRICER      = -11, ///< No pricer loaded
       NO_SOLVER      = -10, ///< No linear solver loaded
       NOT_INIT       = -9,  ///< not initialised error
-      ABORT_CYCLING  = -8,  ///< #solve() aborted due to detection of cycling.
-      ABORT_TIME     = -7,  ///< #solve() aborted due to time limit.
-      ABORT_ITER     = -6,  ///< #solve() aborted due to iteration limit.
-      ABORT_VALUE    = -5,  ///< #solve() aborted due to objective limit.
+      ABORT_CYCLING  = -8,  ///< solve() aborted due to detection of cycling.
+      ABORT_TIME     = -7,  ///< solve() aborted due to time limit.
+      ABORT_ITER     = -6,  ///< solve() aborted due to iteration limit.
+      ABORT_VALUE    = -5,  ///< solve() aborted due to objective limit.
       SINGULAR       = -4,  ///< Basis is singular, numerical troubles?
       NO_PROBLEM     = -3,  ///< No Problem has been loaded.
       REGULAR        = -2,  ///< LP has a usable Basis (maybe LP is changed).
@@ -372,9 +372,9 @@ public:
 
    /// set #ROW or #COLUMN representation.
    void setRep (Representation p_rep);
-   /// set #LEAVE or #ENTER algorithm.
+   /// set \ref soplex::SPxSolver::LEAVE "LEAVE" or \ref soplex::SPxSolver::ENTER "ENTER" algorithm.
    void setType(Type tp);
-   /// set #FULL or #PARTIAL pricing.
+   /// set \ref soplex::SPxSolver::FULL "FULL" or \ref soplex::SPxSolver::PARTIAL "PARTIAL" pricing.
    void setPricing(Pricing pr);
 
    /// reload LP.
@@ -946,7 +946,7 @@ public:
    {
       return *theFvec;
    }
-   /// right-hand side vector for #fVec.
+   /// right-hand side vector for \ref soplex::SPxSolver::fVec "fVec"
    /** The feasibility vector is computed by solving a linear system with the
     *  basis matrix. The right-hand side vector of this system is referred 
     *  to as \em feasibility, \em right-hand \em side \em vector #fRhs().
@@ -959,7 +959,7 @@ public:
    {
       return *theFrhs;
    }
-   /// upper bound for #fVec.
+   /// upper bound for \ref soplex::SPxSolver::fVec "fVec".
    const Vector& ubBound() const
    {
       return theUBbound;
@@ -977,7 +977,7 @@ public:
    {
       return theUBbound;
    }
-   /// lower bound for #fVec, 
+   /// lower bound for \ref soplex::SPxSolver::fVec "fVec".
    const Vector& lbBound() const
    {
       return theLBbound;
@@ -996,7 +996,7 @@ public:
       return theLBbound;
    }
 
-   /// Violations of #fVec.
+   /// Violations of \ref soplex::SPxSolver::fVec "fVec"
    /** For the leaving Simplex algorithm, pricing involves selecting a
     *  variable from #fVec that violates its bounds that is to leave
     *  the basis. When a SPxPricer is called to select such a
@@ -1022,8 +1022,8 @@ public:
       return *theCoPvec;
    }
 
-   /// Right-hand side vector for #coPvec.
-   /** Vector #coPvec is computed by solving a linear system with the
+   /// Right-hand side vector for \ref soplex::SPxSolver::coPvec "coPvec".
+   /** The vector #coPvec is computed by solving a linear system with the
     *  basis matrix and #coPrhs as the right-hand side vector. For
     *  column basis representation, #coPrhs is build up of the
     *  objective vector elements of all basic variables. For a row
@@ -1077,7 +1077,7 @@ public:
       return *theCoLbound;
    }
 
-   /// violations of #coPvec.
+   /// violations of \ref soplex::SPxSolver::coPvec "coPvec".
    /** In entering Simplex pricing selects checks vectors #coPvec()
     *  and #pVec() for violation of its bounds. #coTest() contains
     *  the violations for #coPvec() which are indicated by a negative
@@ -1143,7 +1143,7 @@ public:
       return *theLbound;
    }
 
-   /// Violations of #pVec.
+   /// Violations of \ref soplex::SPxSolver::pVec "pVec".
    /** In entering Simplex pricing selects checks vectors #coPvec()
     *  and #pVec() for violation of its bounds. Vector #test()
     *  contains the violations for #pVec(), i.e., if #test()[i] < 0,
@@ -1156,13 +1156,13 @@ public:
       return theTest;
    }
 
-   /// compute and return #pVec()[i].
+   /// compute and return \ref soplex::SPxSolver::pVec() "pVec()"[i].
    Real computePvec(int i);
-   /// compute entire #pVec().
+   /// compute entire \ref soplex::SPxSolver::pVec() "pVec()".
    void computePvec();
-   /// compute and return #test()[i] in #ENTER%ing Simplex.
+   /// compute and return \ref soplex::SPxSolver::test() "test()"[i] in \ref soplex::SPxSolver::ENTER "ENTER"ing Simplex.
    Real computeTest(int i);
-   /// compute test vector in #ENTER%ing Simplex.
+   /// compute test vector in \ref soplex::SPxSolver::ENTER "ENTER"ing Simplex.
    void computeTest();
 
    //------------------------------------
@@ -1194,42 +1194,42 @@ public:
    /// Perform initial shifting to optain an feasible or pricable basis.
    void shiftPvec();
 
-   /// shift \p i 'th #ubBound to \p to.
+   /// shift \p i 'th \ref soplex::SPxSolver::ubBound "ubBound" to \p to.
    void shiftUBbound(int i, Real to)
    {
       assert(theType == ENTER);
       theShift += to - theUBbound[i];
       theUBbound[i] = to;
    }
-   /// shift \p i 'th #lbBound to \p to.
+   /// shift \p i 'th \ref soplex::SPxSolver::lbBound "lbBound" to \p to.
    void shiftLBbound(int i, Real to)
    {
       assert(theType == ENTER);
       theShift += theLBbound[i] - to;
       theLBbound[i] = to;
    }
-   /// shift \p i 'th #upBound to \p to.
+   /// shift \p i 'th \ref soplex::SPxSolver::upBound "upBound" to \p to.
    void shiftUPbound(int i, Real to)
    {
       assert(theType == LEAVE);
       theShift += to - (*theUbound)[i];
       (*theUbound)[i] = to;
    }
-   /// shift \p i 'th #lpBound to \p to.
+   /// shift \p i 'th \ref soplex::SPxSolver::lpBound "lpBound" to \p to.
    void shiftLPbound(int i, Real to)
    {
       assert(theType == LEAVE);
       theShift += (*theLbound)[i] - to;
       (*theLbound)[i] = to;
    }
-   /// shift \p i 'th #ucBound to \p to.
+   /// shift \p i 'th \ref soplex::SPxSolver::ucBound "ucBound" to \p to.
    void shiftUCbound(int i, Real to)
    {
       assert(theType == LEAVE);
       theShift += to - (*theCoUbound)[i];
       (*theCoUbound)[i] = to;
    }
-   /// shift \p i 'th #lcBound to \p to.
+   /// shift \p i 'th \ref soplex::SPxSolver::lcBound "lcBound" to \p to.
    void shiftLCbound(int i, Real to)
    {
       assert(theType == LEAVE);
@@ -1452,13 +1452,13 @@ protected:
    virtual void computeFrhs1(const Vector&, const Vector&);
    ///
    void computeFrhs2(const Vector&, const Vector&);
-   /// compute #theCoPrhs for entering Simplex.
+   /// compute \ref soplex::SPxSolver::theCoPrhs "theCoPrhs" for entering Simplex.
    virtual void computeEnterCoPrhs();
    ///
    void computeEnterCoPrhs4Row(int i, int n);
    ///
    void computeEnterCoPrhs4Col(int i, int n);
-   /// compute #theCoPrhs for leaving Simplex.
+   /// compute \ref soplex::SPxSolver::theCoPrhs "theCoPrhs" for leaving Simplex.
    virtual void computeLeaveCoPrhs();
    ///
    void computeLeaveCoPrhs4Row(int i, int n);
@@ -1616,7 +1616,7 @@ public:
       return basis().iteration();
    }
 
-   /// time spent in last call to method #solve().
+   /// time spent in last call to method solve().
    Real time() const
    {
       return theTime.userTime();

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dvector.h,v 1.16 2008/09/22 20:43:17 bzfpfets Exp $"
+#pragma ident "@(#) $Id: dvector.h,v 1.17 2008/09/26 14:37:28 bzfgleix Exp $"
 
 /**@file  dvector.h
  * @brief Dynamic vectors.
@@ -55,7 +55,7 @@ class DVector : public Vector
    //-----------------------------------
    /**@name Data */
    //@{
-   int     memsize;        ///< length of array of values #mem
+   int   memsize;        ///< length of array of values \ref soplex::DVector::mem "mem"
    Real* mem;            ///< value array to be used
    //@}
 
@@ -142,16 +142,16 @@ public:
    //--------------------------------------------------
    /**@name Access */
    //@{
-   /// resets #DVector%'s dimension to \p newdim.
+   /// resets  \ref soplex::DVector "DVector"'s dimension to \p newdim.
    void reDim(int newdim);
 
-   /// resets #DVector%'s memory size to \p newsize.
+   /// resets  \ref soplex::DVector "DVector"'s memory size to \p newsize.
    void reSize(int newsize);
 
-   /// resets #DVector%'s memory size to \p newsize and dimension to \p newdim.
+   /// resets  \ref soplex::DVector "DVector"'s memory size to \p newsize and dimension to \p newdim.
    void reSize(int newsize, int newdim);
 
-   /// returns #DVector%'s memory size.
+   /// returns \ref soplex::DVector "DVector"'s memory size.
    int memSize() const
    {
       return memsize;

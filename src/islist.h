@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: islist.h,v 1.18 2008/09/22 20:43:17 bzfpfets Exp $"
+#pragma ident "@(#) $Id: islist.h,v 1.19 2008/09/26 14:37:27 bzfgleix Exp $"
 
 /**@file  islist.h
  * @brief Generic single linked list.
@@ -33,7 +33,7 @@ namespace soplex
 //  class IsElement<T>
 //---------------------------------------------------------------------
 
-/**@brief   Elements for \ref IsList "IsLists".
+/**@brief   Elements for \ref soplex::IsList "IsList"s.
    @ingroup Elementary
 
    Class IsElement allows to easily construct list elements for an intrusive

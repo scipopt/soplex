@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.h,v 1.24 2008/09/22 20:43:17 bzfpfets Exp $"
+#pragma ident "@(#) $Id: slufactor.h,v 1.25 2008/09/26 14:37:27 bzfgleix Exp $"
 
 /**@file  slufactor.h
  * @brief Implementation of Sparse Linear Solver.
@@ -46,7 +46,7 @@ public:
    //--------------------------------
    /**@name Types */
    //@{
-   /// Specifies how to perform #change method.
+   /// Specifies how to perform \ref soplex::SLUFactor::change "change" method.
    enum UpdateType
    {
       ETA = 0,       ///<
@@ -71,7 +71,7 @@ protected:
    /**@name Protected data */
    //@{
    bool       usetup;        ///< TRUE iff update vector has been setup
-   UpdateType uptype;        ///< the current #UpdateType.
+   UpdateType uptype;        ///< the current \ref soplex::SLUFactor::UpdateType "UpdateType".
    SSVector   eta;           ///< 
    SSVector   forest;        ///< ? Update vector set up by solveRight4update() and solve2right4update()
    Real       lastThreshold; ///< pivoting threshold of last factorization

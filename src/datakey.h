@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datakey.h,v 1.11 2008/09/22 20:42:28 bzfpfets Exp $"
+#pragma ident "@(#) $Id: datakey.h,v 1.12 2008/09/26 14:37:28 bzfgleix Exp $"
 
 /**@file  datakey.h
  * @brief Entry identifier class for items of a DataSet.
@@ -90,12 +90,12 @@ public:
    //-------------------------------------
    /**@name Access / modification */
    //@{
-   /// gets the index number (#idx) of the DataKey.
+   /// gets the index number (\ref soplex::DataKey::idx "idx") of the DataKey.
    inline int getIdx() const
    {
       return idx;
    }
-   /// sets the index number (#idx) of the DataKey.
+   /// sets the index number (\ref soplex::DataKey::idx "idx") of the DataKey.
    inline void setIdx(int p_idx) 
    {
       idx = p_idx;
@@ -105,7 +105,7 @@ public:
    {
       return idx >= 0;
    }
-   /// makes the DataKey invalid and clears the #info field.
+   /// makes the DataKey invalid and clears the \ref soplex::DataKey::info "info" field.
    inline void inValidate()
    {
       idx  = -1;

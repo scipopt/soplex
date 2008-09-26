@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.51 2008/09/22 20:43:18 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.52 2008/09/26 14:37:27 bzfgleix Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -234,7 +234,7 @@ public:
       {
          return rowstat[i];
       }
-      /// returns the array of row #Status%es.
+      /// returns the array of row  \ref soplex::SPxBasis::Desc::Status "Status"es.
       const Status* rowStatus(void) const
       {
          return rowstat.get_const_ptr();
@@ -249,7 +249,7 @@ public:
       {
          return colstat[i];
       }
-      /// returns the array of column #Status%es.
+      /// returns the array of column \ref soplex::SPxBasis::Desc::Status "Status"es.
       const Status* colStatus(void) const
       {
          return colstat.get_const_ptr();
@@ -264,7 +264,7 @@ public:
       {
          return (*stat)[i];
       }
-      /// returns the array of variable #Status%es.
+      /// returns the array of variable \ref soplex::SPxBasis::Desc::Status "Status"es.
       const Status* status(void) const
       {
          return stat->get_const_ptr();
@@ -279,7 +279,7 @@ public:
       {
          return (*costat)[i];
       }
-      /// returns the array of covariable #Status%es.
+      /// returns the array of covariable \ref soplex::SPxBasis::Desc::Status "Status"es.
       const Status* coStatus(void) const
       {
          return costat->get_const_ptr();
@@ -335,7 +335,7 @@ protected:
    DataArray < SPxId > theBaseId;
    /// pointers to the vectors of the basis matrix.
    DataArray < const SVector* > matrix;
-   /// \c true iff the pointers in #matrix are set up correctly.
+   /// \c true iff the pointers in \ref soplex::SPxBasis::matrix "matrix" are set up correctly.
    bool matrixIsSetup;
 
    /* @brief LU factorization of basis matrix
@@ -343,7 +343,7 @@ protected:
       Otherwise #factor is undefined.
    */
    SLinSolver* factor;
-   /// \c true iff #factor = matrix\f$^{-1}\f$.
+   /// \c true iff \ref soplex::SPxBasis::factor "factor" = \ref soplex::SPxBasis::matrix "matrix" \f$^{-1}\f$.
    bool factorized;
 
    /// number of updates before refactorization.
@@ -371,15 +371,15 @@ protected:
       this case, the factorization is updated, and the following members are
       reset.
    */
-   int    iterCount;     ///< number of calls to #change() since last manipulation
-   int    updateCount;   ///< number of calls to #change() since last #factorize()
+   int    iterCount;     ///< number of calls to change() since last manipulation
+   int    updateCount;   ///< number of calls to change() since last factorize()
    int    nzCount;       ///< number of nonzeros in basis matrix
    int    lastMem;       ///< memory needed after last fresh factorization
    Real   lastFill;      ///< fill ratio that occured during last factorization
 
-   SPxId  lastin;        ///< #lastEntered(): variable entered the base last
-   SPxId  lastout;       ///< #lastLeft(): variable left the base last
-   int    lastidx;       ///< #lastIndex(): basis index where last update was done
+   SPxId  lastin;        ///< lastEntered(): variable entered the base last
+   SPxId  lastout;       ///< lastLeft(): variable left the base last
+   int    lastidx;       ///< lastIndex(): basis index where last update was done
    Real   minStab;       ///< minimum stability
    //@}
 
@@ -497,7 +497,7 @@ public:
       return updateCount;
    }
 
-   /// returns number of basis changes since last #load().
+   /// returns number of basis changes since last \ref soplex::SPxBasis::load() "load()".
    inline int iteration() const
    {
       return iterCount;
@@ -749,7 +749,7 @@ protected:
    //--------------------------------------
    /**@name Protected helpers */
    //@{
-   /// loads #matrix according to the SPxId%s stored in #theBaseId.
+   /// loads \ref soplex::SPxBasis::matrix "matrix" according to the SPxId%s stored in \ref soplex::SPxBasis::theBaseId "theBaseId".
    /** This method must  be called whenever there is a chance, that the vector
        pointers may have changed due to manipulations of the LP.
     */
