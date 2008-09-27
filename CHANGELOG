@@ -69,6 +69,8 @@ Release 1.4.0
 
 - Removed superfluous variable 'count' in spxparmultpr.cpp/h
 
+- Fixed small bug in SLUFactor::solveRight4update(): now variable n is storing ssvec's size correctly.
+
 #----------------------------------------------------------------
 
 Release 1.3.2
