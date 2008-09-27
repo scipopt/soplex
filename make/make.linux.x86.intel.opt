@@ -1,7 +1,7 @@
-#--- $Id: make.linux.x86.intel.opt,v 1.16 2008/09/25 22:11:39 bzfwinkm Exp $
+#--- $Id: make.linux.x86.intel.opt,v 1.17 2008/09/27 20:26:25 bzfwinkm Exp $
 CXX	=	icc
 CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS
-CXXFLAGS=	-O3 -mtune=core2 -march=core2 -axT -w1 -fno-rtti -par_report0 -vec_report0 -ip -ansi
+CXXFLAGS=	-O3 -mtune=core2 -axT -w1 -fno-rtti -par_report0 -vec_report0 -ip
 LDFLAGS	=	-lpthread -lm -lstdc++ -static
 ARFLAGS	=	crs
 ZLIB_FLAGS	=
