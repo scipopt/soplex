@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.53 2008/09/22 20:43:17 bzfpfets Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.54 2008/09/27 18:04:54 bzfgleix Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -80,7 +80,7 @@ void SLUFactor::solveRight4update(SSVector& x, const SVector& b)
 
    x.clear();
    ssvec = b;
-   n = b.size();
+   n = ssvec.size();
    if (l.updateType == ETA)
    {
       m = vSolveRight4update(x.getEpsilon(), x.altValues(), x.altIndexMem(),
