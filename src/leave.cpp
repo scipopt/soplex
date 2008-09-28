@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.52 2008/09/22 20:43:17 bzfpfets Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.53 2008/09/28 12:41:36 bzfpfets Exp $"
 
 //#define DEBUGGING 1
 
@@ -674,6 +674,10 @@ bool SPxSolver::leave(int leaveIdx)
                      unboundedness/infeasibility. */
                   MSG_INFO3( spxout << "ILEAVE03 unboundness/infeasiblity found "
                      << "in leave()" << std::endl; )
+
+                  SPxId none;
+                  change(leaveIdx, none, 0);
+                  rejectLeave(leaveNum, leaveId, leaveStat);
 
                   if (rep() != COLUMN)
                      setBasisStatus(SPxBasis::UNBOUNDED);
