@@ -5,24 +5,27 @@
    @author   Tobias Achterberg
    @author   Timo Berthold
    @author   Andreas Bley
+   @author   Ambros Gleixner
    @author   Benjamin Hiller
    @author   Thorsten Koch
    @author   Sebastian Orlowski
+   @author   Marc Pfetsch
    @author   Andreas Tuchscherer
 
    @section The Sequential object-oriented simplex class library.
 
-   This software has been implemented as a part of Roland Wunderlings 
+   This software has been implemented as a part of Roland Wunderling's 
    Ph.D. thesis "Paralleler und Objektorientierter Simplex-Algorithmus"
    which can be found at http://www.zib.de/PaperWeb/abstracts/TR-96-09
    (in German).
 
    SoPlex is implemented in C++. The code should be compliant with the 
-   current ANSI standard. Exceptions, RTTI and STL (other then iostream) 
-   are not used. Everything is in one namespace \em soplex.
+   current ANSI standard. RTTI and STL (other then iostream) are not used. 
+   Everything is in one namespace \em soplex.
 
-   Note, that you are allowed to retrieve SoPlex only for research purpose 
-   as a member of a \em non-commercial and \em academic institution.
+   Note that you are allowed to retrieve and use SoPlex free of charge 
+   only for research purposes as a member of a \em non-commercial and 
+   \em academic institution.
 
    - \ref RUN      "Where does it run"
 
@@ -111,7 +114,7 @@
 //-----------------------------------------------------------------------------
 /**@page INST Installation
  
- \section Prequisites Prequisites 
+ \section Prerequisites Prerequisites 
  You need the following programs to compile SoPlex:
 
   - C++ compiler (e.g. http://www.gnu.org/software/gcc)
@@ -124,7 +127,7 @@
  unpack it with \c tar (http://www.gnu.org/software/tar)
  into a directory. Then change to that directory.
 
- \section Tested Linux/x86, Linux/AXP, Tru64, Solaris, IRIX, HP-UX
+ \section Tested Linux/x86, Linux/AXP, Darwin, Tru64, Solaris, IRIX, HP-UX
  If you are working under one those OSes you should try the following:
  
  \c gmake \c COMP=xxx \c OPT=yyy
@@ -156,7 +159,7 @@
  version. Add flags as needed. 
 
  \section Testing Testing the Binary
- After you compiled the binary you should get the Netlib LP files at
+ After you compiled the binary you should download the Netlib LP files at
  http://www.zib.de/Optimization/Software/Soplex/netlib.tar.gz and
  unpack them in the \c check directory. Then you can try
 
@@ -261,10 +264,10 @@
    LP simplifiers to use with SoPlex or who want to derive own
    implementations (e.g. parallel versions) using SoPlex.
 
-   @section Virtualizing the Representation
+   @section Representation Virtualizing the Representation
    The primal Simplex on the columnwise representation is
    structurally equivalent to the dual Simplex on the rowwise
-   representation and vice versa (see above). Hence, it is
+   representation and vice versa (see below). Hence, it is
    desirable to treat both cases in a very similar manner. This
    is supported by the programmer's interface of SoPlex which
    provides access methods for all internal data in two ways: one
@@ -287,7 +290,7 @@
    <TR><TD>coVector</TD><TD>colVector</TD><TD>rowVector</TD></TR>
    </TABLE>
     
-   Weather the soplex::SPxBasis::Desc::Status of a variable indicates that the
+   Whether the soplex::SPxBasis::Desc::Status of a variable indicates that the
    corresponding vector is in the basis matrix or not also depends on the
    chosen representation. Hence, methods \c isBasic() are provided to get the
    correct answer for both representations.  
@@ -300,7 +303,7 @@
    satisfy their bounds, which means that the optimal solution has been found.
     
    With each update of the basis, also the three vectors need to be
-   updated. This is best supported by the use of UpdateVectors.
+   updated. This is best supported by the use of \c UpdateVectors.
     
    @subsection Variables
    The Simplex algorithm works with two types of variables, primals and
@@ -330,7 +333,7 @@
    The following vectors are declared for holding the values to be computed:
    \c primRhs, \c primVec (with dimension \c nCols()) for the primal
    variables, and \c dualRhs, \c dualVec (with dimension \c nRows()) for the 
-   dual variables. The additional variable \c addvec (with dimension \c coDim() 
+   dual variables. The additional variable \c addvec (with dimension \c coDim())
    depends on the representation.
 
    @subsection Bounds 
