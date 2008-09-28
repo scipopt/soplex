@@ -1,13 +1,5 @@
 Release 1.4.0
 
-- Constructor interface for the scalers SPxEquiliSC and SPxGeometSC
-  changed: parameter colFirst is removed since the corresponding member is not
-  used. Printed names of the scalars are slightly changed. There are only 5
-  command line options for the scalar left since two of the previous 6 options
-  coincided.  
-
-- Some modifications in the simplifier SPxMainSM to avoid numerical problems.
-
 - Introduced exceptions for all unrecoverable errors (lack of memory, 
   no pricer, singular basis, etc.) to allow a calling application to clean up.
 
@@ -63,13 +55,27 @@ Release 1.4.0
 - Fixed bug with detecting infeasible instances if scaling theCoTest does not help.
 
 - Corrected bug in spxlpfread.cpp with bounds on binary (old bounds were discarded).
-  Furthermore a bug with an unused variable appearing in the bounds section is corrected.
 
 - Corrected bug in spxsolver.cpp:maxInfeas(): the leave and entering case were switched.
 
 - Removed superfluous variable 'count' in spxparmultpr.cpp/h
 
 - Fixed small bug in SLUFactor::solveRight4update(): now variable n is storing ssvec's size correctly.
+
+- Constructor interface for the scalers SPxEquiliSC and SPxGeometSC
+  changed: parameter colFirst is removed since the corresponding member is not
+  used. Printed names of the scalars are slightly changed. There are only 5
+  command line options for the scalar left since two of the previous 6 options
+  coincided.  
+
+- Some modifications in the simplifier SPxMainSM to avoid numerical problems.
+
+- Modified reading and writing of basis: the row and column names are now passed as pointers.
+  Default names are entered if the pointers are 0. The changes appear in soplexmain.cpp, 
+  spxbasis.cpp, soplex.cpp, soplex.h.
+
+- Corrected bug in leave.cpp, left over from above correction dealing with infeasible instances.
+
 
 #----------------------------------------------------------------
 
