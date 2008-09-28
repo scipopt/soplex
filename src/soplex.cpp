@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.91 2008/09/22 20:43:17 bzfpfets Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.92 2008/09/28 12:51:10 bzfpfets Exp $"
 
 #include <iostream>
 
@@ -390,20 +390,22 @@ void SoPlex::qualBoundViolation(
    }
 }
 
-bool SoPlex::readBasisFile
-   ( const char*    filename, 
-     const NameSet& rowNames, 
-     const NameSet& colNames )
+bool SoPlex::readBasisFile(
+   const char*    filename, 
+   const NameSet* rowNames, 
+   const NameSet* colNames
+   )
 {
    // init solver using original LP
    m_solver.loadLP(*this);
    return m_solver.readBasisFile(filename, rowNames, colNames);
 }
 
-bool SoPlex::writeBasisFile
-   ( const char*    filename, 
-     const NameSet& rowNames, 
-     const NameSet& colNames ) const
+bool SoPlex::writeBasisFile(
+   const char*    filename, 
+   const NameSet* rowNames, 
+   const NameSet* colNames
+   ) const
 {
    return m_solver.writeBasisFile(filename, rowNames, colNames);
 }

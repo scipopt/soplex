@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplexmain.cpp,v 1.5 2008/09/24 10:21:27 bzftuchs Exp $"
+#pragma ident "@(#) $Id: soplexmain.cpp,v 1.6 2008/09/28 12:51:10 bzfpfets Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -618,8 +618,8 @@ void read_input_file(
 void read_basis_file(
    MySoPlex&      work    ,
    const char*    filename,
-   NameSet&       rownames,
-   NameSet&       colnames)
+   const NameSet* rownames,
+   const NameSet* colnames)
 {
    if (!work.readBasisFile(filename, rownames, colnames))
    {
@@ -717,7 +717,7 @@ void print_solution_and_status(
       }
       if ( write_basis )
       {
-         if ( ! work.writeBasisFile( basisname, rownames, colnames ) )
+         if ( ! work.writeBasisFile( basisname, &rownames, &colnames ) )
          {
 	    if ( checkMode )
 	       MSG_INFO1( spxout << "EEXAMP30 error while writing file \"" << basisname << "\"" << std::endl; )
@@ -824,7 +824,7 @@ void print_solution_and_status(
       if ( print_quality )
          work.displayInfeasibility();
       if ( write_basis )  // write basis even if we are infeasible
-         if ( ! work.writeBasisFile( basisname, rownames, colnames ) )
+         if ( ! work.writeBasisFile( basisname, &rownames, &colnames ) )
          {
 	    if ( checkMode )
 	       MSG_INFO1( spxout << "EEXAMP30 error while writing file \"" << basisname << "\"" << std::endl; )
@@ -1113,7 +1113,7 @@ int main(int argc, const char* const argv[])
 
       // read a basis file if specified
       if (read_basis)
-         read_basis_file(work, basisname, rownames, colnames);
+         read_basis_file(work, basisname, &rownames, &colnames);
 
       // solve the LP
       solve_LP(work);

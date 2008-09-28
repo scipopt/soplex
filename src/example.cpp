@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.103 2008/09/26 11:00:08 bzftuchs Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.104 2008/09/28 12:51:10 bzfpfets Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -311,18 +311,16 @@ void read_input_file(MySoPlex&      work,
 }
 //------------------------------------------------------------------------
 void read_basis_file(MySoPlex&      work    ,
-                     const char*    filename,
-                     NameSet&       rownames,
-                     NameSet&       colnames)
+   const char*    filename,
+   const NameSet* rownames,
+   const NameSet* colnames)
 {
-   //#if 0
    if (!work.readBasisFile(filename, rownames, colnames))
    {
       MSG_INFO1( spxout << "EEXAMP25 error while reading file \"" 
                         << filename << "\"" << std::endl; )
       exit(1);
    }
-   //#endif
 }
 //------------------------------------------------------------------------
 SPxPricer* get_pricer(const int pricing)
@@ -526,7 +524,7 @@ void print_solution_and_status(const MySoPlex&      work,
          }
       }
       if ( write_basis )
-         if ( ! work.writeBasisFile( basisname, rownames, colnames ) )
+         if ( ! work.writeBasisFile( basisname, &rownames, &colnames ) )
             MSG_INFO1( spxout << "EEXAMP30 error while writing file \"" 
                               << basisname << "\"" << std::endl; )
       break;
@@ -617,7 +615,7 @@ void print_solution_and_status(const MySoPlex&      work,
       if ( print_quality )
          work.displayInfeasibility();
       if ( write_basis )  // write basis even if we are infeasible
-         if ( ! work.writeBasisFile( basisname, rownames, colnames ) )
+         if ( ! work.writeBasisFile( basisname, &rownames, &colnames ) )
             MSG_INFO1( spxout << "EEXAMP30 error while writing file \"" 
                               << basisname << "\"" << std::endl; )
       break;
@@ -871,7 +869,7 @@ int main(int argc, const char* const argv[])
 
       // read a basis file if specified
       if (read_basis)
-         read_basis_file(work, basisname, rownames, colnames);
+         read_basis_file(work, basisname, &rownames, &colnames);
 
       // solve the LP
       solve_LP(work);

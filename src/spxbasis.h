@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.52 2008/09/26 14:37:27 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.53 2008/09/28 12:51:10 bzfpfets Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -675,13 +675,17 @@ public:
    virtual void change(int i, SPxId& id,
       const SVector* enterVec, const SSVector* eta = 0);
 
-   /// reads a file in MPS basis format from \p in.
+   /** Load basis from \p in in MPS format. If \p rowNames and \p colNames 
+    *  are \c NULL, default names are used for the constraints and variables.
+    */
    virtual bool readBasis(std::istream& in,
-      const NameSet& rowNames, const NameSet& colNames);
+      const NameSet* rowNames, const NameSet* colNames);
 
-   /// writes a file in MPS basis format to \p os.
+   /** Write basis to \p os in MPS format. If \p rowNames and \p colNames are
+    *  \c NULL, default names are used for the constraints and variables.
+    */
    virtual void writeBasis(std::ostream& os, 
-      const NameSet& rownames, const NameSet& colnames) const;
+      const NameSet* rownames, const NameSet* colnames) const;
 
    /// sets up basis.
    /** Loads a Descriptor to the basis and sets up the basis matrix and

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.62 2008/09/22 20:43:18 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.63 2008/09/28 12:51:10 bzfpfets Exp $"
 
 //#define DEBUGGING 1
 
@@ -233,6 +233,9 @@ void SPxBasis::loadSolver(SLinSolver* p_solver)
    factor->clear();
 }
 
+
+
+
 /** 
  *  The specification is taken from the
  *
@@ -262,12 +265,53 @@ void SPxBasis::loadSolver(SLinSolver* p_solver)
  */
 bool SPxBasis::readBasis(
    std::istream&  is, 
-   const NameSet& rownames, 
-   const NameSet& colnames)
+   const NameSet* rowNames, 
+   const NameSet* colNames)
 {
    METHOD( "SPxBasis::readBasis()" );
    assert(theLP != 0);
 
+   /* prepare names */
+   const NameSet* rNames = rowNames;
+   const NameSet* cNames = colNames;
+
+   if ( colNames == 0 )
+   {
+      int nCols = theLP->nCols();
+      char name [255];
+
+      NameSet* p_colNames = new NameSet();
+      p_colNames->reMax(nCols);
+      for (int j = 0; j < nCols; ++j)
+      {
+         snprintf(name, 255, "x%d_", j);
+         DataKey key = theLP->colId(j);
+         p_colNames->add(key, name);
+      }
+      cNames = p_colNames;
+   }
+
+   if ( rNames == 0 )
+   {
+      int nRows = theLP->nRows();
+      char name [255];
+
+      NameSet* p_rowNames = new NameSet();
+      p_rowNames->reMax(nRows);
+      for (int i = 0; i < nRows; ++i)
+      {
+         snprintf(name, 255, "C%d_", i);
+         DataKey key = theLP->rowId(i);
+         p_rowNames->add(key, name);
+      }
+      rNames = p_rowNames;
+   }
+
+   /* load default basis if necessary */
+   if (status() == NO_PROBLEM)
+      load(theLP);
+
+   /* initialize with standard settings */
    Desc l_desc(thedesc);
 
    for (int i = 0; i < theLP->nRows(); i++)
@@ -298,11 +342,11 @@ bool SPxBasis::readBasis(
          if ((mps.field1() == 0) || (mps.field2() == 0))
             break;
 
-         if ((c = colnames.number(mps.field2())) < 0)
+         if ((c = cNames->number(mps.field2())) < 0)
             break;
 
          if (*mps.field1() == 'X')
-            if (mps.field3() == 0 || (r = rownames.number(mps.field3())) < 0)
+            if (mps.field3() == 0 || (r = rNames->number(mps.field3())) < 0)
                break;
 
          if (!strcmp(mps.field1(), "XU"))
@@ -348,19 +392,81 @@ bool SPxBasis::readBasis(
       else
          mps.syntaxError();
    }
+
+   if ( rowNames == 0 )
+      delete rNames;
+   if ( colNames == 0 )
+      delete cNames;
+
+#ifndef NDEBUG
    thedesc.dump();
+#endif
 
    return !mps.hasError();
+}
+
+
+/* Get row name - copied from spxmpswrite.cpp 
+ *
+ * @todo put this in a common file and unify accross different formats (mps, lp, basis).
+ */
+static const char* getRowName(
+   const SPxLP*   lp,
+   int            idx,
+   const NameSet* rnames, 
+   char*          buf)
+{
+   assert(buf != 0);
+   assert(idx >= 0);
+   assert(idx < lp->nRows());
+
+   if (rnames != 0) 
+   {
+      DataKey key = lp->rId(idx);
+
+      if (rnames->has(key))
+         return (*rnames)[key];
+   }
+   sprintf(buf, "C%d_", idx);
+   
+   return buf;
+}
+   
+/* Get column name - copied from spxmpswrite.cpp 
+ *
+ * @todo put this in a common file and unify accross different formats (mps, lp, basis).
+ */
+static const char* getColName(
+   const SPxLP*   lp,
+   int            idx,
+   const NameSet* cnames, 
+   char*          buf)
+{
+   assert(buf != 0);
+   assert(idx >= 0);
+   assert(idx < lp->nCols());
+
+   if (cnames != 0) 
+   {
+      DataKey key = lp->cId(idx);
+
+      if (cnames->has(key))
+         return (*cnames)[key];
+   }
+   sprintf(buf, "x%d_", idx);
+   
+   return buf;
 }
 
 /* writes a file in MPS basis format to \p os.
  *
  * See SPxBasis::readBasis() for a short description of the format.
  */
-void SPxBasis::writeBasis
-   ( std::ostream&  os, 
-     const NameSet& rownames, 
-     const NameSet& colnames ) const
+void SPxBasis::writeBasis(
+   std::ostream&  os, 
+   const NameSet* rowNames, 
+   const NameSet* colNames 
+   ) const
 {
    METHOD( "SPxBasis::writeBasis()" );
    assert(theLP != 0);
@@ -376,6 +482,15 @@ void SPxBasis::writeBasis
    os.setf(std::ios::left);
    os << "NAME  soplex.bas\n";
 
+   /* do not write basis if there is none */
+   if (status() == NO_PROBLEM)
+   {
+      os << "ENDATA" << std::endl;
+      return;
+   }
+
+   /* start writing */
+   char buf[255];
    int row = 0;
    for (int col = 0; col < theLP->nCols(); col++)
    {
@@ -391,9 +506,11 @@ void SPxBasis::writeBasis
          assert( row != theLP->nRows() );
 
          os << ( thedesc.rowStatus( row ) == Desc::P_ON_UPPER ? " XU " : " XL " )
-            << std::setw(8) << colnames[theLP->SPxLP::cId( col )]
-            << "       " 
-            << rownames[theLP->SPxLP::rId( row )]
+            << std::setw(8) << getColName(theLP, col, colNames, buf);
+
+         /* break in two parts since buf is reused */
+         os << "       " 
+            << getRowName(theLP, row, rowNames, buf)
             << std::endl;
 
          row++;
@@ -403,7 +520,7 @@ void SPxBasis::writeBasis
          if ( thedesc.colStatus( col ) == Desc::P_ON_UPPER )
          {
             os << " UL "
-               << colnames[theLP->SPxLP::cId( col )]
+               << getColName(theLP, col, colNames, buf)
                << std::endl;
          }
          else
@@ -419,6 +536,8 @@ void SPxBasis::writeBasis
    }
 
 #ifndef NDEBUG
+   thedesc.dump();
+
    // Check that we covered all nonbasic rows - the remaining should be basic.
    for (; row < theLP->nRows(); row++)
    {
@@ -427,7 +546,6 @@ void SPxBasis::writeBasis
    }
    assert( row == theLP->nRows() );
 
-   thedesc.dump();
 #endif // NDEBUG
 
    os << "ENDATA" << std::endl;

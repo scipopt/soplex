@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.35 2008/09/26 14:37:27 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.36 2008/09/28 12:51:10 bzfpfets Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -383,14 +383,19 @@ public:
    /// clear all data in solver.
    virtual void clear();
 
-   /// load basis from \p filename in MPS format.
+   /** Load basis from \p filename in MPS format. If \p rowNames and \p
+    *  colNames are \c NULL, default names are used for the constraints and
+    *  variables.
+    */
    virtual bool readBasisFile(const char* filename, 
-      const NameSet& rowNames,
-      const NameSet& colNames);
+      const NameSet* rowNames, const NameSet* colNames);
 
-   /// write basis to \p filename in MPS format.
+   /** Write basis to \p filename in MPS format. If \p rowNames and \p
+    *  colNames are \c NULL, default names are used for the constraints and
+    *  variables.
+    */
    virtual bool writeBasisFile(const char* filename, 
-      const NameSet& rowNames, const NameSet& colNames) const;
+      const NameSet* rowNames, const NameSet* colNames) const;
 
    //@}
 
