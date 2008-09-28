@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.40 2008/09/22 20:42:28 bzfpfets Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.41 2008/09/28 22:22:09 bzfviger Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -538,7 +538,7 @@ public:
       catch(SPxMemoryException& x)
       {
          spx_free(theitem);
-         throw;
+         throw x;
       }
    }
    
