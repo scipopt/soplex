@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxio.cpp,v 1.30 2008/09/22 20:43:18 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxio.cpp,v 1.31 2008/09/28 12:47:35 bzfpfets Exp $"
 
 
 //#define DEBUGGING 1
@@ -94,12 +94,15 @@ bool SPxLP::readFile(
 }
 
 
+/** write loaded LP to \p filename
+ *
+ * @todo decide on format by looking at suffix of filename 
+ */
 void SPxLP::writeFile(const char* filename,
       const NameSet* rowNames,
       const NameSet* colNames, 
       const DIdxSet* p_intvars ) const
 {
-   /* @todo decide on format by looking at suffix of filename */
    std::ofstream tmp(filename);
    writeLPF(tmp, rowNames, colNames, p_intvars);
 }

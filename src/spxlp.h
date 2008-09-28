@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.47 2008/09/22 20:43:18 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.48 2008/09/28 12:47:12 bzfpfets Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -500,19 +500,20 @@ public:
                           const NameSet* colNames, 
                           const DIdxSet* p_intvars = 0 ) const;
 
-   /// write loaded LP to \p filename in LPF format.
+   /// Write loaded LP to \p filename.
    virtual void writeFile(const char* filename,
                           const NameSet* rowNames = 0, 
                           const NameSet* colNames = 0, 
                           const DIdxSet* p_intvars = 0 ) const;
 
 
-   /// reads a file in MPS format from \p in.
+   /// Reads a file in MPS format from \p in.
    virtual bool readMPS( std::istream& in, 
                          NameSet*      rowNames = 0, 
                          NameSet*      colNames = 0, 
                          DIdxSet*      intVars  = 0 );
 
+   /// Writes a file in MPS format to \p out.
    virtual void writeMPS( std::ostream&  out, 
                           const NameSet* rowNames, 
                           const NameSet* colNames, 
