@@ -18,9 +18,9 @@
      To just read LPs from a file and solve them without modifying the LPs, 
      compile SoPlex and use it on the command line. Calling the binary
      without parameters gives you some usage information. To use SoPlex as a
-     callable library, see src/example.cpp (from which the SoPleX binary is
-     compiled) on how to construct an LP, solve it, and extract the
-     solution. For further details, you have to consult the doxygen
+     callable library, see src/example.cpp or src/soplexmain.cpp (from which 
+     the SoPlex binary is compiled) on how to construct an LP, solve it, and 
+     extract the solution. For further details, you have to consult the doxygen
      documentation of the code (or even the code itself).<br>
      Another good starting point might also be
      the SoPlex interface of <a href="http://scip.zib.de">SCIP</a>.
@@ -98,7 +98,7 @@
      The code is tested to compile under Microsoft Visual Studio 2003.
      However, we do not provide any Makefiles or project files for VC++.
      It should also be possible to create a Windows version by compiling it
-     with the GCC under <a href="http://www.cygwin.com/">Cygwin</a>.
+     with the GCC under <a href="http://www.cygwin.com/">Cygwin</a> or minGW
    </p>
 
    <p class="q">
@@ -146,7 +146,7 @@
    </p>
        
    <p class="q">
-     I got messages stating &quot;This shall not be.&quot; or similar.    
+     I got messages or exceptions stating &quot;This shall not be.&quot; or similar.    
    </p>
 
    <p class="a">
@@ -154,13 +154,26 @@
      from time to time especially on LPs with weird numbers. If the problem
      occurs with the binary, try using another scaler (call soplex without
      parameters to see how to specify this). If the problem occurs while using
-     the callable library of soplex, you can try to add a scaler and a
+     the callable library of SoPlex, you can try to add a scaler and a
      preprocessor yourself (see the SoPlex class) unless you solve the same LP
      repeatedly with small changes (as in a Branch-and-cut process, for
      instance). If you send us an LP or MPS file with the offending linear
      program together with a description of your settings, we may have a
      closer look at it to see if we can do something about it.
    </p>
+
+   <p class="q">
+     Can SoPlex handle basis files?
+   </p>
+   <p class="a">
+     Yes, the binary version allows to read and write basis files using the
+     options <code>-br</code> and <code>-bw</code>, respectively. The library 
+     version allows to read or write a basis file from within the code as well. 
+     This can be useful for debugging. If you cannot reconstruct an error occurring 
+     in the library code with the binary version, try to save a basis and try again. 
+     Note that the LP needs to be in MPS format in order to ensure compatability of the 
+     basis and the LP (the LP format cannot store ranged rows).
+  </p>
        
    <p class="q">
      SoPlex means &quot;Sequential Simplex&quot;. Is there a parallel version
@@ -225,6 +238,6 @@
      </ul>
 
    <p class="a">
-     The preprocessing can be switched off by using the option  -s0.
+     The preprocessing can be switched off by using the option  <code>-s0</code>.
    </p>
 </div>
