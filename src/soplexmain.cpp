@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplexmain.cpp,v 1.6 2008/09/28 12:51:10 bzfpfets Exp $"
+#pragma ident "@(#) $Id: soplexmain.cpp,v 1.7 2008/09/29 13:09:13 bzfpfets Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -213,6 +213,7 @@ public:
 //    Helpers
 //------------------------------------------------------------------------
 
+static
 void print_version_info()
 {
    const char* banner1 =
@@ -273,6 +274,7 @@ void print_version_info()
    std::cout << std::endl;
 }
 
+static
 void print_short_version_info()
 {
    const char* banner1 =
@@ -288,6 +290,7 @@ void print_short_version_info()
 }
 
 //------------------------------------------------------------------------
+static
 void print_usage_and_exit( const char* const argv[] )
 {
    const char* usage =
@@ -325,12 +328,15 @@ void print_usage_and_exit( const char* const argv[] )
 }
 
 //------------------------------------------------------------------------
+static
 void check_parameter(const char param, const char* const argv[])
 {
    if (param == '\0')
       print_usage_and_exit( argv );
 }
+
 //------------------------------------------------------------------------
+static
 void print_algorithm_parameters(
    const MySoPlex&                 work,
    const SPxSolver::Representation representation,
@@ -381,6 +387,7 @@ void print_algorithm_parameters(
 }
 
 //------------------------------------------------------------------------
+static
 SPxPricer* get_pricer(const int pricing)
 {
    SPxPricer* pricer = NULL;
@@ -417,6 +424,7 @@ SPxPricer* get_pricer(const int pricing)
 }
 
 //------------------------------------------------------------------------
+static
 SPxRatioTester* get_ratio_tester(const int ratiotest)
 {
    SPxRatioTester* ratiotester = NULL;
@@ -444,6 +452,7 @@ SPxRatioTester* get_ratio_tester(const int ratiotest)
 }
 
 //------------------------------------------------------------------------
+static
 void get_scalers(
    SPxScaler*& prescaler,
    SPxScaler*& postscaler,
@@ -495,6 +504,7 @@ void get_scalers(
 }
 
 //------------------------------------------------------------------------
+static
 SPxSimplifier* get_simplifier(const int simplifying)
 {
    SPxSimplifier* simplifier = NULL;
@@ -518,6 +528,7 @@ SPxSimplifier* get_simplifier(const int simplifying)
 }
 
 //------------------------------------------------------------------------
+static
 SPxStarter* get_starter(const int starting)
 {
    SPxStarter* starter = NULL;
@@ -547,6 +558,7 @@ SPxStarter* get_starter(const int starting)
 }
 
 //------------------------------------------------------------------------
+static
 void redirect_output(
    std::ostream&  myerrstream,
    std::ostream&  myinfostream
@@ -563,6 +575,7 @@ void redirect_output(
 }
 
 //------------------------------------------------------------------------
+static
 void read_input_file(
    MySoPlex&      work,
    const char*    filename,
@@ -615,6 +628,7 @@ void read_input_file(
 }
 
 //------------------------------------------------------------------------
+static
 void read_basis_file(
    MySoPlex&      work    ,
    const char*    filename,
@@ -632,6 +646,7 @@ void read_basis_file(
 }
 
 //------------------------------------------------------------------------
+static
 void solve_LP(MySoPlex& work)
 {
    Timer timer;
@@ -670,6 +685,7 @@ void solve_LP(MySoPlex& work)
 }
 
 //------------------------------------------------------------------------
+static
 void print_solution_and_status(
    const MySoPlex&      work,
    const NameSet&       rownames,
@@ -875,6 +891,7 @@ void print_solution_and_status(
 }
 
 //------------------------------------------------------------------------
+static
 void clean_up(
    SPxScaler*&       prescaler,
    SPxScaler*&       postscaler,
