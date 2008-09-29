@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idxset.h,v 1.12 2008/09/26 14:37:27 bzfgleix Exp $"
+#pragma ident "@(#) $Id: idxset.h,v 1.13 2008/09/29 17:28:24 bzfgleix Exp $"
 
 /**@file  idxset.h
  * @brief Set of indices.
@@ -108,7 +108,7 @@ public:
    /// access \p n 'th index.
    int index(int n) const
    {
-      assert(n >= 0 && n < size());
+      assert(n >= 0 && n < size() && idx != 0);
       return idx[n];
    }
    /// returns the number of used indices.
