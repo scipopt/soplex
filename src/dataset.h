@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.41 2008/09/28 22:22:09 bzfviger Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.42 2008/09/29 17:27:42 bzfgleix Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -350,26 +350,26 @@ public:
    ///
    DATA& operator[](int n)
    {
-      assert( n < thenum );
+      assert(n >= 0 && n < thenum);
       return theitem[thekey[n].idx].data;
    }
    /// returns element number \p n.
    const DATA& operator[](int n) const
    {
-      assert( n < thenum );
+      assert(n >= 0 && n < thenum);
       return theitem[thekey[n].idx].data;
    }
 
    ///
    DATA& operator[](const DataKey& k)
    {
-      assert( k.idx < thesize );
+      assert(k.idx < thesize);
       return theitem[k.idx].data;
    }
    /// returns element with DataKey \p k.
    const DATA& operator[](const DataKey& k) const
    {
-      assert( k.idx < thesize );
+      assert(k.idx < thesize);
       return theitem[k.idx].data;
    }
    //@}
@@ -562,7 +562,7 @@ public:
       catch(SPxMemoryException& x)
       {
          spx_free(theitem);
-         throw;
+         throw x;
       }
 
       memcpy(theitem, old.theitem, themax * sizeof(*theitem));
