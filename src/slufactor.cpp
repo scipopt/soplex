@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.54 2008/09/27 18:04:54 bzfgleix Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.55 2008/09/29 10:56:47 bzfgleix Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -401,7 +401,7 @@ void SLUFactor::clear()
    catch(SPxMemoryException& x)
    {
       freeAll();
-      throw;
+      throw x;
    }
 }
 
@@ -627,7 +627,7 @@ SLUFactor& SLUFactor::operator=(const SLUFactor& old)
       catch(SPxMemoryException& x)
       {
          freeAll();
-         throw;
+         throw x;
       }
       assert(isConsistent());
    }
@@ -726,7 +726,7 @@ SLUFactor::SLUFactor()
    catch(SPxMemoryException& x)
    {
       freeAll();
-      throw;
+      throw x;
    }
 
    l.rval  = 0;
@@ -807,7 +807,7 @@ SLUFactor::SLUFactor(const SLUFactor& old)
    catch(SPxMemoryException& x)
    {
       freeAll();
-      throw;
+      throw x;
    }
    assert(SLUFactor::isConsistent());
 }

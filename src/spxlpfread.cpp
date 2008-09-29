@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.62 2008/09/22 15:56:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.63 2008/09/29 10:56:47 bzfgleix Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -400,7 +400,7 @@ bool SPxLP::readLPF(
    {
       if(p_cnames == 0)
          delete cnames;
-      throw;
+      throw x;
    }
    rnames->clear();
 

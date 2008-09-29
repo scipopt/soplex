@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.41 2008/09/22 20:43:18 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.42 2008/09/29 10:56:47 bzfgleix Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.
@@ -627,7 +627,7 @@ bool SPxLP::readMPS(
    {
       if(p_cnames == 0)
          delete cnames;
-      throw;
+      throw x;
    }
 
    rnames->clear();

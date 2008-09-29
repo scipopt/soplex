@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.92 2008/09/28 12:51:10 bzfpfets Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.93 2008/09/29 10:56:47 bzfgleix Exp $"
 
 #include <iostream>
 
@@ -463,7 +463,7 @@ void SoPlex::unsimplify() const
    {
       delete[] rows;
       delete[] cols;
-      throw;
+      throw x;
    }
    
    delete[] rows;

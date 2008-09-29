@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.15 2008/09/24 10:20:01 bzftuchs Exp $"
+#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.16 2008/09/29 10:56:47 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -2481,12 +2481,12 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
    catch(std::bad_alloc& x)
    {
       spx_free(idxMem);
-      throw;
+      throw x;
    }
    catch(SPxMemoryException& x)
    {
       spx_free(idxMem);
-      throw;
+      throw x;
    }
    spx_free(idxMem);
    
@@ -2712,12 +2712,12 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
    catch(std::bad_alloc& x)
    {
       spx_free(idxMem);
-      throw;
+      throw x;
    }
    catch(SPxMemoryException& x)
    {
       spx_free(idxMem);
-      throw;
+      throw x;
    }
     
    spx_free(idxMem);
