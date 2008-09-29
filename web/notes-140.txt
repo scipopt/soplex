@@ -3,11 +3,11 @@ Notes for SoPlex Release 1.4
 What's new
 ----------
  - All unrecoverable errors are now reported via exceptions.
- - The 'main' file is now called soplexmain.cpp.
  - Elementary handling of basis files is now possible.
- - The standard output of SoPlex should be more (human) readable now.
  - Objective limit termination now works.
- - Several bugs fixes.
+ - The standard output of SoPlex should be more (human) readable now.
+ - The 'main' file is now called soplexmain.cpp.
+ - Several bugfixes.
    
 For details see the CHANGELOG file.
 
@@ -18,11 +18,11 @@ Remarks
 Reading and writing basis files is now possible. The LP-format does
 not support ranged rows (nor a mapping of a ranged (in)equality that
 has been split into two parts to the original one). For full
-compatability between the basis file and the LP, the LP has to be
+compatibility between the basis file and the LP, the LP has to be
 available in MPS format.
 
 The interfaces were changed slightly. Check CHANGELOG if you are
 missing a method.
 
-A shared library of SoPlex can be build with a makefile similar to
+A shared library of SoPlex can be built with a makefile similar to
 make.linux.x86.gnu.opt-shared in the 'make' directory.
