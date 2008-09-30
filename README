@@ -15,7 +15,9 @@
 	Read the documentation!
 
         For the impatient:
-
+        
+	On systems with GNU gcc4.2
+	and greater               :  make COMP=gnu OPT=opt-gcc42
 	On systems with GNU g++   :  make COMP=gnu OPT=opt
 	Linux/x86 with Intel C++  :  make COMP=intel OPT=opt
         Tru64 with Compaq C++     :  make COMP=compaq OPT=opt
