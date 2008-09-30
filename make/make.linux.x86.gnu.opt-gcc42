@@ -1,0 +1,8 @@
+#--- $Id: make.linux.x86.gnu.opt-gcc42,v 1.1 2008/09/30 14:31:44 bzfheinz Exp $
+CXX	=	g++
+CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS
+CXXFLAGS=	-O3 -march=native -mtune=native -fomit-frame-pointer # -malign-double -ffast-math
+LDFLAGS	=	-lm -static
+ARFLAGS	=	crs
+ZLIB_FLAGS	=
+ZLIB_LDFLAGS 	=	-lz
