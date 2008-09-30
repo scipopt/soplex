@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.55 2008/09/29 10:56:47 bzfgleix Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.56 2008/09/30 08:50:05 bzforlow Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -118,23 +118,20 @@ void SLUFactor::solve2right4update(
    solveTime.start();
 
    int  m;
-   int  n;
    int  f;
-   int* sidx = ssvec.altIndexMem();
-   int  rsize = rhs.size();
-   int* ridx = rhs.altIndexMem();
+   int* sidx  = ssvec.altIndexMem();
+   int* ridx  = rhs.altIndexMem();
 
    x.clear();
    y.clear();
    usetup = true;
-   ssvec = b;
+   ssvec  = b;
 
    if (l.updateType == ETA)
    {
-      n = b.size();
       m = vSolveRight4update2(x.getEpsilon(), x.altValues(), x.altIndexMem(), 
-         ssvec.get_ptr(), sidx, n, y.get_ptr(),
-         rhs.getEpsilon(), rhs.altValues(), ridx, rsize, 0, 0, 0);
+         ssvec.get_ptr(), sidx, ssvec.size(), y.get_ptr(),
+         rhs.getEpsilon(), rhs.altValues(), ridx, rhs.size(), 0, 0, 0);
       x.setSize(m);
       //      x.forceSetup();
       x.unSetup();
@@ -143,10 +140,9 @@ void SLUFactor::solve2right4update(
    else
    {
       forest.clear();
-      n = ssvec.size();
       m = vSolveRight4update2(x.getEpsilon(), x.altValues(), x.altIndexMem(), 
-         ssvec.get_ptr(), sidx, n, y.get_ptr(),
-         rhs.getEpsilon(), rhs.altValues(), ridx, rsize,
+         ssvec.get_ptr(), sidx, ssvec.size(), y.get_ptr(),
+         rhs.getEpsilon(), rhs.altValues(), ridx, rhs.size(),
          forest.altValues(), &f, forest.altIndexMem());
       x.setSize(m);
       x.forceSetup();
