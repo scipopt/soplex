@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplexmain.cpp,v 1.7 2008/09/29 13:09:13 bzfpfets Exp $"
+#pragma ident "@(#) $Id: soplexmain.cpp,v 1.8 2008/10/06 15:44:46 bzfpfets Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -558,6 +558,7 @@ SPxStarter* get_starter(const int starting)
 }
 
 //------------------------------------------------------------------------
+#ifdef SEND_ALL_OUTPUT_TO_FILES
 static
 void redirect_output(
    std::ostream&  myerrstream,
@@ -573,7 +574,7 @@ void redirect_output(
    spxout.setStream( SPxOut::INFO3,    myinfostream );
    spxout.setStream( SPxOut::DEBUG,    myinfostream );
 }
-
+#endif
 //------------------------------------------------------------------------
 static
 void read_input_file(
