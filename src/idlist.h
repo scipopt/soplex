@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idlist.h,v 1.22 2008/09/26 14:37:27 bzfgleix Exp $"
+#pragma ident "@(#) $Id: idlist.h,v 1.23 2008/10/10 12:10:36 bzforlow Exp $"
 
 /**@file  idlist.h
  * @brief Generic Real linked list.
@@ -316,12 +316,14 @@ public:
    /// consistency check.
    bool isConsistent() const
    {
-      for (T * it = first(); it; it = next(it))
+      const T* my_first = first();
+      const T* my_last  = last();
+      for (const T * it = my_first; it; it = next(it))
       {
-         if (it != first() && it->prev()->next() != it)
+         if (it != my_first && it->prev()->next() != it)
             return MSGinconsistent("IdList");
 
-         if (it != last() && it->next()->prev() != it)
+         if (it != my_last && it->next()->prev() != it)
             return MSGinconsistent("IdList");
       }
       return IsList<T>::isConsistent();

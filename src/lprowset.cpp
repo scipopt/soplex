@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.cpp,v 1.27 2008/09/22 20:43:17 bzfpfets Exp $"
+#pragma ident "@(#) $Id: lprowset.cpp,v 1.28 2008/10/10 12:10:36 bzforlow Exp $"
 
 //#define DEBUGGING 1
 
@@ -165,9 +165,10 @@ void LPRowSet::setType(
 #ifndef NO_CONSISTENCY_CHECKS
 bool LPRowSet::isConsistent() const
 {
-   if (left.dim() != right.dim())
+   const int ldim = left.dim();
+   if (ldim != right.dim())
       return MSGinconsistent("LPRowSet");
-   if (left.dim() != num())
+   if (ldim != num())
       return MSGinconsistent("LPRowSet");
 
    return left.isConsistent() && right.isConsistent() && SVSet::isConsistent();

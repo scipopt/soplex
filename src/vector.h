@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector.h,v 1.21 2008/09/22 20:43:19 bzfpfets Exp $"
+#pragma ident "@(#) $Id: vector.h,v 1.22 2008/10/10 12:10:37 bzforlow Exp $"
 
 /**@file  vector.h
  * @brief Dense vector for linear algebra.
@@ -146,21 +146,21 @@ public:
    /**@name Access */
    //@{
    /// dimension of vector
-   int dim() const
+   inline int dim() const
    {
       return dimen;
    }
    /// return \p n 'th value by reference
    Real& operator[](int n)
    {
-      assert(n >= 0 && n < dim());
+      assert(n >= 0 && n < dimen);
       return val[n];
    }
 
    /// return \p n 'th value
    Real operator[](int n) const
    {
-      assert(n >= 0 && n < dim());
+      assert(n >= 0 && n < dimen);
       return val[n];
    }
    //@}
@@ -192,7 +192,7 @@ public:
    /// inner product.
    Real operator*(const Vector& v) const
    {
-      assert(v.dim() == dim());
+      assert(v.dim() == dimen);
       Real x = 0;
       for(int i = 0; i < dimen; i++)
          x += val[i] * v.val[i];
@@ -215,9 +215,9 @@ public:
    ///  addition of scaled vector
    Vector& multAdd(Real x, const Vector& vec)
    {
-      assert(vec.dim() == dim());
+      assert(vec.dim() == dimen);
 
-      for(int i = 0; i < dim(); i++)
+      for(int i = 0; i < dimen; i++)
          val[i] += x * vec.val[i];
 
       return *this;

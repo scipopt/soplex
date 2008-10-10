@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplexmain.cpp,v 1.8 2008/10/06 15:44:46 bzfpfets Exp $"
+#pragma ident "@(#) $Id: soplexmain.cpp,v 1.9 2008/10/10 12:10:36 bzforlow Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -307,9 +307,9 @@ void print_usage_and_exit( const char* const argv[] )
       " -bw       write file with optimal basis to Basfile\n"
       " -lSec     set timelimit to Sec seconds\n"
       " -dDelta   set maximal allowed bound violation to Delta\n"
-      " -zzEps    set general zero tolerance to Eps\n\n"
-      " -zfEps    set factorization zero tolerance to Eps\n\n"
-      " -zuEps    set update zero tolerance to Eps\n\n"
+      " -zzEps    set general zero tolerance to Eps\n"
+      " -zfEps    set factorization zero tolerance to Eps\n"
+      " -zuEps    set update zero tolerance to Eps\n"
       " -vLevel   set verbosity Level: from 0 (ERROR) to 5 (DEBUG), default 2\n"
       " -V        show program version\n"
       " -C        check mode (for check scripts)\n"

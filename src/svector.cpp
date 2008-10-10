@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.cpp,v 1.22 2008/09/22 20:43:19 bzfpfets Exp $"
+#pragma ident "@(#) $Id: svector.cpp,v 1.23 2008/10/10 12:10:37 bzforlow Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -260,10 +260,12 @@ bool SVector::isConsistent() const
 {
    if (m_elem != 0)
    {
-      if (size() < 0 || max() < 0 || size() > max())
+      const int my_size = size();
+      const int my_max  = max();
+      if (my_size < 0 || my_max < 0 || my_size > my_max)
          return MSGinconsistent("SVector");
 
-      for (int i = 1; i < size(); ++i)
+      for (int i = 1; i < my_size; ++i)
       {
          for (int j = 0; j < i; ++j)
          {
