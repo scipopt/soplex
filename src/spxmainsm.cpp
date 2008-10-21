@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.17 2008/10/09 09:13:26 bzftuchs Exp $"
+#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.18 2008/10/21 12:49:29 bzftuchs Exp $"
 
 //#define DEBUGGING 1
 
@@ -547,7 +547,7 @@ void SPxMainSM::FreeColSingletonPS::execute(DVector& x, DVector& y, DVector& s, 
    
    // basis:
    cStatus[m_j] = SPxSolver::BASIC;
-   
+      
    if (m_eqCons)
       rStatus[m_i] = SPxSolver::FIXED;
    else if (m_onLhs)
@@ -2050,8 +2050,6 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
                Real sLo     = lp.lhs(i);
                Real sUp     = lp.rhs(i);
                
-               lp.changeRange(i, 0.0, 0.0);
-               
                if (GT(sMaxObj, 0.0, epsZero()))
                {
                   if (sUp >= infinity)
@@ -2083,9 +2081,6 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
                }
             }
            
-            // constraint i is an equality constraint
-            assert(EQrel(lp.lhs(i), lp.rhs(i), deltaBnd()));
-            
             m_hist.append(new FreeColSingletonPS(lp, *this, j, i, slackVal));
             
             MSG_INFO3( spxout << "IMAISM41 col " << j
