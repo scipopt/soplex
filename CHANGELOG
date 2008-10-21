@@ -1,3 +1,10 @@
+Release 1.4.1
+
+- Speed up of the simplifier due to combined removal of rows/columns and
+ combined updates of lhs and rhs in some cases.
+
+#----------------------------------------------------------------
+
 Release 1.4.0
 
 - Introduced exceptions for all unrecoverable errors (lack of memory, 
