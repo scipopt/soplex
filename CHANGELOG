@@ -1,7 +1,10 @@
 Release 1.4.1
 
+- Bugfix in simplifier spxmainsm.cpp: wrong init for postsolving free column
+  singletons fixed.
+
 - Speed up of the simplifier due to combined removal of rows/columns and
- combined updates of lhs and rhs in some cases.
+  combined updates of lhs and rhs in some cases.
 
 #----------------------------------------------------------------
 
