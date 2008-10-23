@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxratiotester.h,v 1.15 2008/09/22 20:43:18 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxratiotester.h,v 1.16 2008/10/23 20:29:28 bzfpfets Exp $"
 
 /**@file  spxratiotester.h
  * @brief Abstract ratio test base class.
@@ -50,6 +50,8 @@ protected:
    SPxSolver*  thesolver;
    /// name of the ratio tester
    const char* m_name;
+   /// internal storage of type
+   SPxSolver::Type m_type;
    //@}
 
 public:
