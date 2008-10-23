@@ -6,6 +6,8 @@ Release 1.4.1
 - Speed up of the simplifier due to combined removal of rows/columns and
   combined updates of lhs and rhs in some cases.
 
+- Overworked spxfastrt.h, spxfastrt.cpp
+
 #----------------------------------------------------------------
 
 Release 1.4.0
