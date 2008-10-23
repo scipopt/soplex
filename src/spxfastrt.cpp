@@ -13,17 +13,31 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.37 2008/09/22 20:43:18 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.38 2008/10/23 20:28:05 bzfpfets Exp $"
 
 //#define DEBUGGING 1
 
 #include <assert.h>
 #include <stdio.h>
-#include <iostream>
-#include <iomanip>
 
 #include "spxdefines.h"
 #include "spxfastrt.h"
+
+
+/*
+    Here comes our implementation of the Harris procedure improved by shifting
+    bounds. The basic idea is to allow a slight infeasibility within |delta| to
+    allow for more freedom when selecting the leaving variable. This freedom
+    may then be used for selecting numerically stable variables yielding great
+    improvements.
+
+    The algorithms operates in two phases. In a first phase, the maximum value
+    |val| is determined, when infeasibility within |delta| is allowed. In the second
+    phase, between all variables with value < |val| the one is selected which
+    has the largest update vector component. However, this may not
+    always yield an improvement. In that case, we shift the variable towards
+    infeasibility and retry. This avoids cycling in the shifted LP.
+ */
 
 namespace soplex
 {
@@ -42,10 +56,7 @@ void SPxFastRT::resetTols()
    /*
        if(thesolver->basis().stability() < 1e-4)
            epsilon *= 1e-4 / thesolver->basis().stability();
-       std::cout << "epsilon = " << epsilon << '\t';
-       std::cout << "delta   = " << delta   << '\t';
-       std::cout << "minStab = " << minStab << std::endl;
-    */
+   */
 }
 
 void SPxFastRT::tighten()
@@ -75,10 +86,9 @@ void SPxFastRT::relax()
    minStab *= 0.95;
    delta += 3 * DELTA_SHIFT;
    // delta   += 2 * (thesolver->theShift > delta) * DELTA_SHIFT;
-   //@ std::cout << '\t' << minStab << '\t' << delta << std::endl;
 }
 
-
+/// Compute stability requirement
 static Real minStability(Real minStab, Real maxabs)
 {
    if (maxabs < 1000.0)
@@ -86,9 +96,16 @@ static Real minStability(Real minStab, Real maxabs)
    return maxabs*minStab / 1000.0;
 }
 
+/* The code below implements phase 1 of the ratio test. It differs from the description in the
+ * Ph.D. thesis page 57 as follows: It uses \f$\delta_i = d_i - s_i - \delta\f$ if \f$d_i > s_i\f$.
+ *
+ * This change leads to the following behavior of the source code. Consider the first case (x >
+ * epsilon, u < infinity): If u - vec[i] <= 0, vec[i] violates the upper bound. In the Harris ratio
+ * test, we would compute (u - vec[i] + delta)/upd[i]. The code computes instead delta/upd[i].
+ */
 int SPxFastRT::maxDelta(
    Real& val,
-   Real& p_abs,
+   Real& maxabs,
    UpdateVector& update,
    const Vector& lowBound,
    const Vector& upBound,
@@ -99,11 +116,7 @@ int SPxFastRT::maxDelta(
    Real x, y, max;
    Real u, l;
 
-   Real l_delta = this->delta;
-   // Real           delta01 = 0.5*l_delta;
-   Real delta01 = 0;
-   Real inf = infinity;
-   Real mabs = p_abs;
+   Real mabs = maxabs;
 
    const Real* up = upBound.get_const_ptr();
    const Real* low = lowBound.get_const_ptr();
@@ -125,13 +138,13 @@ int SPxFastRT::maxDelta(
          {
             mabs = (x > mabs) ? x : mabs;
             u = up[i];
-            if (u < inf)
+            if (u < infinity)
             {
                y = u - vec[i];
                if (y <= 0)
-                  x = (l_delta - delta01) / x;
+                  x = delta / x;
                else
-                  x = (y + l_delta) / x;
+                  x = (y + delta) / x;
 
                if (x < max)
                {
@@ -144,13 +157,13 @@ int SPxFastRT::maxDelta(
          {
             mabs = (-x > mabs) ? -x : mabs;
             l = low[i];
-            if (l > -inf)
+            if (l > -infinity)
             {
                y = l - vec[i];
                if ( y >= 0 )
-                  x = ( delta01 - l_delta ) / x;
+                  x = - delta / x;
                else
-                  x = ( y - l_delta ) / x;
+                  x = ( y - delta ) / x;
 
                if (x < max)
                {
@@ -163,32 +176,29 @@ int SPxFastRT::maxDelta(
    }
    else
    {
+      /* In this case, the indices of the semi-sparse vector update.delta() are not set up and are filled below. */
       int* l_idx = update.delta().altIndexMem();
       Real* uval = update.delta().altValues();
       const Real* uend = uval + update.dim();
+      assert( uval == upd );
 
-      for (; uval < uend; ++uval)
+      for (i = 0; uval < uend; ++uval, ++i)
       {
-         if (*uval)
+         x = *uval;
+         if (x)
          {
-            x = *uval;
-
-            /**@todo The type of i is wrong, this should be ptrdiff_t, 
-             *        but what exactly is done here anyway?
-             */
-            i = uval - upd;
             if (x > epsilon)
             {
                *l_idx++ = i;
                mabs = (x > mabs) ? x : mabs;
                u = up[i];
-               if (u < inf)
+               if (u < infinity)
                {
                   y = u - vec[i];
                   if (y <= 0)
-                     x = (l_delta - delta01) / x;
+                     x = delta / x;
                   else
-                     x = (y + l_delta) / x;
+                     x = (y + delta) / x;
 
                   if (x < max)
                   {
@@ -202,13 +212,13 @@ int SPxFastRT::maxDelta(
                *l_idx++ = i;
                mabs = (-x > mabs) ? -x : mabs;
                l = low[i];
-               if (l > -inf)
+               if (l > -infinity)
                {
                   y = l - vec[i];
                   if ( y >= 0 )
-                     x = ( delta01 - l_delta ) / x;
+                     x = - delta / x;
                   else
-                     x = ( y - l_delta ) / x;
+                     x = ( y - delta ) / x;
 
                   if (x < max)
                   {
@@ -226,14 +236,15 @@ int SPxFastRT::maxDelta(
    }
 
    val = max;
-   p_abs = mabs;
+   maxabs = mabs;
 
    return sel;
 }
 
+/* See maxDelta() */
 int SPxFastRT::minDelta(
    Real& val,
-   Real& p_abs,
+   Real& maxabs,
    UpdateVector& update,
    const Vector& lowBound,
    const Vector& upBound,
@@ -244,11 +255,7 @@ int SPxFastRT::minDelta(
    Real x, y, max;
    Real u, l;
 
-   Real l_delta = this->delta;
-   // Real           delta01 = 0.5*l_delta;
-   Real delta01 = 0;
-   Real inf = infinity;
-   Real mabs = p_abs;
+   Real mabs = maxabs;
 
    const Real* up = upBound.get_const_ptr();
    const Real* low = lowBound.get_const_ptr();
@@ -270,13 +277,13 @@ int SPxFastRT::minDelta(
          {
             mabs = (x > mabs) ? x : mabs;
             l = low[i];
-            if (l > -inf)
+            if (l > -infinity)
             {
                y = l - vec[i];
                if ( y >= 0 )
-                  x = ( delta01 - l_delta ) / x;
+                  x = - delta / x;
                else
-                  x = ( y - l_delta ) / x;
+                  x = ( y - delta ) / x;
 
                if (x > max)
                {
@@ -289,13 +296,13 @@ int SPxFastRT::minDelta(
          {
             mabs = (-x > mabs) ? -x : mabs;
             u = up[i];
-            if (u < inf)
+            if (u < infinity)
             {
                y = u - vec[i];
                if (y <= 0)
-                  x = (l_delta - delta01) / x;
+                  x = delta / x;
                else
-                  x = (y + l_delta) / x;
+                  x = (y + delta) / x;
 
                if (x > max)
                {
@@ -308,28 +315,29 @@ int SPxFastRT::minDelta(
    }
    else
    {
+      /* In this case, the indices of the semi-sparse vector update.delta() are not set up and are filled below. */
       int* l_idx = update.delta().altIndexMem();
       Real* uval = update.delta().altValues();
       const Real* uend = uval + update.dim();
+      assert( uval == upd );
 
-      for (; uval < uend; ++uval)
+      for (i = 0; uval < uend; ++uval, ++i)
       {
-         if (*uval)
+         x = *uval;
+         if (x)
          {
-            x = *uval;
-            i = uval - upd;
             if (x > epsilon)
             {
                *l_idx++ = i;
                mabs = (x > mabs) ? x : mabs;
                l = low[i];
-               if (l > -inf)
+               if (l > -infinity)
                {
                   y = l - vec[i];
                   if ( y >= 0 )
-                     x = ( delta01 - l_delta ) / x;
+                     x = - delta / x;
                   else
-                     x = ( y - l_delta ) / x;
+                     x = ( y - delta ) / x;
 
                   if (x > max)
                   {
@@ -343,13 +351,13 @@ int SPxFastRT::minDelta(
                *l_idx++ = i;
                mabs = (-x > mabs) ? -x : mabs;
                u = up[i];
-               if (u < inf)
+               if (u < infinity)
                {
                   y = u - vec[i];
                   if (y <= 0)
-                     x = (l_delta - delta01) / x;
+                     x = delta / x;
                   else
-                     x = (y + l_delta) / x;
+                     x = (y + delta) / x;
 
                   if (x > max)
                   {
@@ -367,24 +375,24 @@ int SPxFastRT::minDelta(
    }
 
    val = max;
-   p_abs = mabs;
+   maxabs = mabs;
 
    return sel;
 }
 
 int SPxFastRT::maxDelta(
    Real& val,
-   Real& p_abs)
+   Real& maxabs)
 {
-   return maxDelta(val, p_abs,
+   return maxDelta(val, maxabs,
       thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(), 0, 1);
 }
 
 int SPxFastRT::minDelta(
    Real& val,
-   Real& p_abs)
+   Real& maxabs)
 {
-   return minDelta(val, p_abs,
+   return minDelta(val, maxabs,
       thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(), 0, 1);
 }
 
@@ -440,7 +448,9 @@ SPxId SPxFastRT::minDelta(
    return SPxId();
 }
 
-
+/* \p best returns the minimum update value such that the corresponding value of \p upd.delta() is
+ * at least \p stab and the update value is smaller than \p max. If no valid update value has been
+ * found \p bestDelta returns the slack to the bound corresponding to the index used for \p best. */
 int SPxFastRT::minSelect(
    Real& val,
    Real& stab,
@@ -512,6 +522,7 @@ int SPxFastRT::minSelect(
    return nr;
 }
 
+/* See minSelect() */
 int SPxFastRT::maxSelect(
    Real& val,
    Real& stab,
@@ -572,10 +583,14 @@ int SPxFastRT::maxSelect(
          }
       }
    }
+
    if (nr < 0 && bestNr > 0)
-      bestDelta = (upd[bestNr] > 0)
-         ? up[bestNr] - vec[bestNr]
-         : vec[bestNr] - low[bestNr];
+   {
+      if (upd[bestNr] > 0)
+         bestDelta = up[bestNr] - vec[bestNr];
+      else
+         bestDelta = vec[bestNr] - low[bestNr];
+   }
 
    return nr;
 }
@@ -588,7 +603,7 @@ int SPxFastRT::maxSelect(
    Real max)
 {
    Real best = -infinity;
-   bestDelta = 0;
+   bestDelta = 0.0;
    return maxSelect(val, stab, best, bestDelta, max,
       thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(),  0, 1);
 }
@@ -603,7 +618,7 @@ SPxId SPxFastRT::maxSelect(
 {
    int indp, indc;
    Real best = -infinity;
-   bestDelta = 0;
+   bestDelta = 0.0;
    indc = maxSelect(val, stab, best, bestDelta, max,
       thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
    indp = maxSelect(val, stab, best, bestDelta, max,
@@ -630,7 +645,7 @@ int SPxFastRT::minSelect(
    Real max)
 {
    Real best = infinity;
-   bestDelta = 0;
+   bestDelta = 0.0;
    return minSelect(val, stab, best, bestDelta, max,
       thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(), 0, 1);
 }
@@ -643,7 +658,7 @@ SPxId SPxFastRT::minSelect(
    Real max)
 {
    Real best = infinity;
-   bestDelta = 0;
+   bestDelta = 0.0;
    int indc = minSelect(val, stab, best, bestDelta, max,
       thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
    int indp = minSelect(val, stab, best, bestDelta, max,
@@ -663,136 +678,125 @@ SPxId SPxFastRT::minSelect(
    return SPxId();
 }
 
-/*
-    Here comes our implementation of the Haris procedure improved by shifting
-    bounds. The basic idea is to allow a slight infeasibility within |delta| to
-    allow for more freedom when selecting the leaveing variable. This freedom
-    may than be used for selecting numerical stable variables with great
-    improves.
- 
-    The algorithms operates in two phases. In a first phase, the maximum |val|
-    is determined, when in feasibility within |inf| is allowed. In the second
-    phase, between all variables with values |< val| the one is selected which
-    gives the best step forward in the simplex iteration. However, this may not
-    allways yield an improvement. In that case, we shift the variable toward
-    infeasibility and retry. This avoids cycling in the shifted LP.
- */
-/**@todo suspicious: max is not used, but it looks like a used parameter 
- *       in selectLeave()
- */
-int SPxFastRT::maxShortLeave(Real& sel, int leave, 
-   Real /*max*/, Real p_abs)
+
+bool SPxFastRT::maxShortLeave(Real& sel, int leave, Real maxabs)
 {
    assert(leave >= 0);
+   assert(maxabs >= 0);
+
    sel = thesolver->fVec().delta()[leave];
-   if (sel > p_abs*SHORT || -sel > p_abs*SHORT)
+
+   if (sel > maxabs*SHORT)
    {
-      if (sel > 0)
-         sel = (thesolver->ubBound()[leave] - thesolver->fVec()[leave]) / sel;
-      else
-         sel = (thesolver->lbBound()[leave] - thesolver->fVec()[leave]) / sel;
-      return 1;
+      sel = (thesolver->ubBound()[leave] - thesolver->fVec()[leave]) / sel;
+      return true;
    }
-   return 0;
+
+   if (sel < -maxabs*SHORT)
+   {
+      sel = (thesolver->lbBound()[leave] - thesolver->fVec()[leave]) / sel;
+      return true;
+   }
+
+   return false;
 }
 
-/**@todo suspicious: max is not used, but it looks like a used parameter 
- *       in selectLeave()
- */
-int SPxFastRT::minShortLeave(Real& sel, int leave, 
-   Real /*max*/, Real p_abs)
+bool SPxFastRT::minShortLeave(Real& sel, int leave, Real maxabs)
 {
    assert(leave >= 0);
+   assert(maxabs >= 0);
+
    sel = thesolver->fVec().delta()[leave];
-   if (sel > p_abs*SHORT || -sel > p_abs*SHORT)
+
+   if (sel > maxabs*SHORT)
    {
-      if (sel > 0)
-         sel = (thesolver->lbBound()[leave] - thesolver->fVec()[leave]) / sel;
-      else
-         sel = (thesolver->ubBound()[leave] - thesolver->fVec()[leave]) / sel;
-      return 1;
+      sel = (thesolver->lbBound()[leave] - thesolver->fVec()[leave]) / sel;
+      return true;
    }
-   return 0;
+
+   if ( sel < -maxabs*SHORT)
+   {
+      sel = (thesolver->ubBound()[leave] - thesolver->fVec()[leave]) / sel;
+      return true;
+   }
+
+   return false;
 }
 
-int SPxFastRT::maxReleave(Real& sel, int leave, Real maxabs)
+bool SPxFastRT::maxReLeave(Real& sel, int leave, Real maxabs)
 {
    UpdateVector& vec = thesolver->fVec();
    Vector& low = thesolver->lbBound();
    Vector& up = thesolver->ubBound();
 
-   if (leave >= 0)
+   if (leave < 0)
+      return true;
+
+   if (up[leave] > low[leave])
    {
-      if (up[leave] > low[leave])
+      Real x = vec.delta()[leave];
+
+      if (sel < -delta / maxabs)
       {
-         Real x = vec.delta()[leave];
-
-         if (sel < -delta / maxabs)
-         {
-            sel = 0;
-            if (x < 0)
-               thesolver->shiftLBbound(leave, vec[leave]);
-            else
-               thesolver->shiftUBbound(leave, vec[leave]);
-         }
-      }
-      else
-      {
-         sel = 0;
-         thesolver->shiftLBbound(leave, vec[leave]);
-         thesolver->shiftUBbound(leave, vec[leave]);
-      }
-   }
-   else
-      return 1;
-
-   return 0;
-}
-
-int SPxFastRT::minReleave(Real& sel, int leave, Real maxabs)
-{
-   UpdateVector& vec = thesolver->fVec();
-   Vector& low = thesolver->lbBound();
-   Vector& up = thesolver->ubBound();
-
-   if (leave >= 0)
-   {
-      if (up[leave] > low[leave])
-      {
-         Real x = vec.delta()[leave];
-
-         if (sel > delta / maxabs)
-         {
-            if (x > 0)
-            {
-               thesolver->theShift += low[leave];
-               sel = 0;
-               low[leave] = vec[leave] + sel * x;
-               thesolver->theShift -= low[leave];
-            }
-            else
-            {
-               thesolver->theShift -= up[leave];
-               sel = 0;
-               up[leave] = vec[leave] + sel * x;
-               thesolver->theShift += up[leave];
-            }
-         }
-      }
-      else
-      {
-         sel = 0;
-         if (vec[leave] < low[leave])
-            thesolver->theShift += low[leave] - vec[leave];
+         sel = 0.0;
+         if (x < 0.0)
+            thesolver->shiftLBbound(leave, vec[leave]);
          else
-            thesolver->theShift += vec[leave] - up[leave];
-         low[leave] = up[leave] = vec[leave];
+            thesolver->shiftUBbound(leave, vec[leave]);
       }
    }
    else
-      return 1;
+   {
+      sel = 0.0;
+      thesolver->shiftLBbound(leave, vec[leave]);
+      thesolver->shiftUBbound(leave, vec[leave]);
+   }
 
-   return 0;
+   return false;
+}
+
+bool SPxFastRT::minReLeave(Real& sel, int leave, Real maxabs)
+{
+   UpdateVector& vec = thesolver->fVec();
+   Vector& low = thesolver->lbBound();
+   Vector& up = thesolver->ubBound();
+
+   if (leave < 0)
+      return true;
+
+   if (up[leave] > low[leave])
+   {
+      Real x = vec.delta()[leave];
+
+      if (sel > delta / maxabs)
+      {
+         if (x > 0.0)
+         {
+            thesolver->theShift += low[leave];
+            sel = 0.0;
+            low[leave] = vec[leave] + sel * x;
+            thesolver->theShift -= low[leave];
+         }
+         else
+         {
+            thesolver->theShift -= up[leave];
+            sel = 0.0;
+            up[leave] = vec[leave] + sel * x;
+            thesolver->theShift += up[leave];
+         }
+      }
+   }
+   else
+   {
+      sel = 0.0;
+      if (vec[leave] < low[leave])
+         thesolver->theShift += low[leave] - vec[leave];
+      else
+         thesolver->theShift += vec[leave] - up[leave];
+      low[leave] = up[leave] = vec[leave];
+   }
+
+   return false;
 }
 
 int SPxFastRT::selectLeave(Real& val)
@@ -800,6 +804,8 @@ int SPxFastRT::selectLeave(Real& val)
    Real maxabs, max, sel;
    int leave = -1;
    int cnt = 0;
+
+   assert( m_type == SPxSolver::ENTER );
 
    resetTols();
 
@@ -809,23 +815,23 @@ int SPxFastRT::selectLeave(Real& val)
       {
          // phase 1:
          max = val;
-         maxabs = 0;
+         maxabs = 0.0;
          leave = maxDelta(max, maxabs);
          if (max == val)
             return -1;
 
-         if (!maxShortLeave(sel, leave, max, maxabs))
+         if (!maxShortLeave(sel, leave, maxabs))
          {
             // phase 2:
             Real stab, bestDelta;
-            stab = 100 * minStability(minStab, maxabs);
+            stab = 100.0 * minStability(minStab, maxabs);
             leave = maxSelect(sel, stab, bestDelta, max);
             if (bestDelta < DELTA_SHIFT*TRIES)
                cnt++;
             else
                cnt += TRIES;
          }
-         if (!maxReleave(sel, leave, maxabs))
+         if (!maxReLeave(sel, leave, maxabs))
             break;
          relax();
       }
@@ -845,21 +851,22 @@ int SPxFastRT::selectLeave(Real& val)
           *       In a first try the version with the ; runs better.
           *       minShortLeave changes sel. Have a look what happens
           *       if we drop the if above also.
+          * @todo Check whether minShortLeave() should be called at all.
           */
          // if (!
-         minShortLeave(sel, leave, max, maxabs);
+         minShortLeave(sel, leave, maxabs);
          // );
          {
             // phase 2:
             Real stab, bestDelta;
-            stab = 100 * minStability(minStab, maxabs);
+            stab = 100.0 * minStability(minStab, maxabs);
             leave = minSelect(sel, stab, bestDelta, max);
             if (bestDelta < DELTA_SHIFT*TRIES)
                cnt++;
             else
                cnt += TRIES;
          }
-         if (!minReleave(sel, leave, maxabs))
+         if (!minReLeave(sel, leave, maxabs))
             break;
          relax();
       }
@@ -870,7 +877,7 @@ int SPxFastRT::selectLeave(Real& val)
 
    MSG_DEBUG(
       if (leave >= 0)
-         spxout 
+         spxout
            << "DFSTRT01 "
            << thesolver->basis().iteration() << "("
            << std::setprecision(6) << thesolver->value() << ","
@@ -878,10 +885,10 @@ int SPxFastRT::selectLeave(Real& val)
            << leave << "\t"
            << std::setprecision(4) << sel << " "
            << std::setprecision(4) << thesolver->fVec().delta()[leave] << " "
-           << std::setprecision(6) << maxabs 
+           << std::setprecision(6) << maxabs
            << std::endl;
       else
-         spxout << "DFSTRT02 " << thesolver->basis().iteration() 
+         spxout << "DFSTRT02 " << thesolver->basis().iteration()
                 << ": skipping instable pivot" << std::endl;
    )
 
@@ -895,14 +902,10 @@ int SPxFastRT::selectLeave(Real& val)
 }
 
 
-/**@todo suspicious: max is not used, 
- *       but it looks like a used parameter in selectEnter()
- */
-int SPxFastRT::maxReenter(
-   Real& sel, 
-   Real /*max*/, 
+bool SPxFastRT::maxReEnter(
+   Real& sel,
    Real maxabs,
-   const SPxId& id, 
+   const SPxId& id,
    int nr)
 {
    Real x, d;
@@ -923,7 +926,7 @@ int SPxFastRT::maxReenter(
       if (thesolver->isCoBasic(nr))
       {
          cupd.clearIdx(nr);
-         return 1;
+         return true;
       }
 
       x = cvec[nr];
@@ -931,19 +934,18 @@ int SPxFastRT::maxReenter(
       up = &ucb;
       low = &lcb;
 
-      if (d < 0)
+      if (d < 0.0)
          sel = (lcb[nr] - cvec[nr]) / d;
       else
          sel = (ucb[nr] - cvec[nr]) / d;
    }
-
    else if (thesolver->isId(id))
    {
       pvec[nr] = thesolver->vector(nr) * cvec;
       if (thesolver->isBasic(nr))
       {
          pupd.clearIdx(nr);
-         return 1;
+         return true;
       }
 
       x = pvec[nr];
@@ -951,29 +953,29 @@ int SPxFastRT::maxReenter(
       up = &upb;
       low = &lpb;
 
-      if (d < 0)
+      if (d < 0.0)
          sel = (lpb[nr] - pvec[nr]) / d;
       else
          sel = (upb[nr] - pvec[nr]) / d;
    }
    else
-      return 1;
+      return true;
 
    if ((*up)[nr] != (*low)[nr])
    {
       if (sel < -delta / maxabs)
       {
-         if (d > 0)
+         if (d > 0.0)
          {
             thesolver->theShift -= (*up)[nr];
-            sel = 0;
+            sel = 0.0;
             (*up)[nr] = x + sel * d;
             thesolver->theShift += (*up)[nr];
          }
          else
          {
             thesolver->theShift += (*low)[nr];
-            sel = 0;
+            sel = 0.0;
             (*low)[nr] = x + sel * d;
             thesolver->theShift -= (*low)[nr];
          }
@@ -981,7 +983,7 @@ int SPxFastRT::maxReenter(
    }
    else
    {
-      sel = 0;
+      sel = 0.0;
       if (x > (*up)[nr])
          thesolver->theShift += x - (*up)[nr];
       else
@@ -989,16 +991,13 @@ int SPxFastRT::maxReenter(
       (*up)[nr] = (*low)[nr] = x;
    }
 
-   return 0;
+   return false;
 }
 
-/**@todo suspicious: max is not used, but it looks 
- *       like a used parameter in selectEnter()
- */
-int SPxFastRT::minReenter(
-   Real& sel, Real /*max*/, 
+bool SPxFastRT::minReEnter(
+   Real& sel,
    Real maxabs,
-   const SPxId& id, 
+   const SPxId& id,
    int nr)
 {
    Real x, d;
@@ -1019,13 +1018,13 @@ int SPxFastRT::minReenter(
       if (thesolver->isCoBasic(nr))
       {
          cupd.clearIdx(nr);
-         return 1;
+         return true;
       }
       x = cvec[nr];
       d = cupd[nr];
       up = &ucb;
       low = &lcb;
-      if (d > 0)
+      if (d > 0.0)
          sel = (thesolver->lcBound()[nr] - cvec[nr]) / d;
       else
          sel = (thesolver->ucBound()[nr] - cvec[nr]) / d;
@@ -1037,36 +1036,36 @@ int SPxFastRT::minReenter(
       if (thesolver->isBasic(nr))
       {
          pupd.clearIdx(nr);
-         return 1;
+         return true;
       }
       x = pvec[nr];
       d = pupd[nr];
       up = &upb;
       low = &lpb;
-      if (d > 0)
+      if (d > 0.0)
          sel = (thesolver->lpBound()[nr] - pvec[nr]) / d;
       else
          sel = (thesolver->upBound()[nr] - pvec[nr]) / d;
    }
 
    else
-      return 1;
+      return true;
 
    if ((*up)[nr] != (*low)[nr])
    {
       if (sel > delta / maxabs)
       {
-         if (d < 0)
+         if (d < 0.0)
          {
             thesolver->theShift -= (*up)[nr];
-            sel = 0;
+            sel = 0.0;
             (*up)[nr] = x + sel * d;
             thesolver->theShift += (*up)[nr];
          }
          else
          {
             thesolver->theShift += (*low)[nr];
-            sel = 0;
+            sel = 0.0;
             (*low)[nr] = x + sel * d;
             thesolver->theShift -= (*low)[nr];
          }
@@ -1074,7 +1073,7 @@ int SPxFastRT::minReenter(
    }
    else
    {
-      sel = 0;
+      sel = 0.0;
       if (x > (*up)[nr])
          thesolver->theShift += x - (*up)[nr];
       else
@@ -1082,10 +1081,10 @@ int SPxFastRT::minReenter(
       (*up)[nr] = (*low)[nr] = x;
    }
 
-   return 0;
+   return false;
 }
 
-int SPxFastRT::shortEnter(
+bool SPxFastRT::shortEnter(
    const SPxId& enterId,
    int nr,
    Real max,
@@ -1093,26 +1092,26 @@ int SPxFastRT::shortEnter(
 {
    if (thesolver->isCoId(enterId))
    {
-      if (max != 0)
+      if (max != 0.0)
       {
          Real x = thesolver->coPvec().delta()[nr];
          if (x < maxabs * SHORT && -x < maxabs * SHORT)
-            return 0;
+            return false;
       }
-      return 1;
+      return true;
    }
    else if (thesolver->isId(enterId))
    {
-      if (max != 0)
+      if (max != 0.0)
       {
          Real x = thesolver->pVec().delta()[nr];
          if (x < maxabs * SHORT && -x < maxabs * SHORT)
-            return 0;
+            return false;
       }
-      return 1;
+      return true;
    }
 
-   return 0;
+   return false;
 }
 
 SPxId SPxFastRT::selectEnter(Real& val)
@@ -1123,12 +1122,14 @@ SPxId SPxFastRT::selectEnter(Real& val)
    int nr;
    int cnt = 0;
 
+   assert( m_type == SPxSolver::LEAVE );
+
    // force instable pivot iff true (see explanation in leave.cpp and spxsolve.cpp)
    bool instable = solver()->instableLeave;
    assert(!instable || solver()->instableLeaveNum >= 0);
 
    resetTols();
-   sel = 0;
+   sel = 0.0;
 
    if (val > epsilon)
    {
@@ -1161,7 +1162,7 @@ SPxId SPxFastRT::selectEnter(Real& val)
             else
                cnt += TRIES;
          }
-         if (!maxReenter(sel, max, maxabs, enterId, nr))
+         if (!maxReEnter(sel, maxabs, enterId, nr))
             break;
          relax();
       }
@@ -1197,7 +1198,7 @@ SPxId SPxFastRT::selectEnter(Real& val)
             else
                cnt += TRIES;
          }
-         if (!minReenter(sel, max, maxabs, enterId, nr))
+         if (!minReEnter(sel, maxabs, enterId, nr))
             break;
          relax();
       }
@@ -1206,17 +1207,17 @@ SPxId SPxFastRT::selectEnter(Real& val)
 
    MSG_DEBUG(
       if (enterId.isValid())
-         {
-            Real x;
-            if (thesolver->isCoId(enterId))
-               x = thesolver->coPvec().delta()[ thesolver->number(enterId) ];
-            else
-               x = thesolver->pVec().delta()[ thesolver->number(enterId) ];
-            spxout << "DFSTRT03 " << thesolver->basis().iteration() << ": " 
-                   << sel << '\t' << x << " (" << maxabs << ")" << std::endl;
-         }
+      {
+         Real x;
+         if (thesolver->isCoId(enterId))
+            x = thesolver->coPvec().delta()[ thesolver->number(enterId) ];
+         else
+            x = thesolver->pVec().delta()[ thesolver->number(enterId) ];
+         spxout << "DFSTRT03 " << thesolver->basis().iteration() << ": "
+                << sel << '\t' << x << " (" << maxabs << ")" << std::endl;
+      }
       else
-         spxout << "DFSTRT04 " << thesolver->basis().iteration() 
+         spxout << "DFSTRT04 " << thesolver->basis().iteration()
                 << ": skipping instable pivot" << std::endl;
    )
 
@@ -1237,19 +1238,15 @@ void SPxFastRT::load(SPxSolver* spx)
    setType(spx->type());
 }
 
-/**@todo suspicious: Why is the type never used? 
- *       This holds for all implementations of SPxRatioTester!
- */
-void SPxFastRT::setType(SPxSolver::Type)
+void SPxFastRT::setType(SPxSolver::Type type)
 {
+   m_type = type;
+
    minStab = MINSTAB;
    delta = thesolver->delta();
 
    /*
        resetTols();
-       std::cout << "epsilon = " << epsilon << '\t';
-       std::cout << "delta   = " << delta   << '\t';
-       std::cout << "minStab = " << minStab << std::endl;
     */
 
    if (delta > 1e-4)
