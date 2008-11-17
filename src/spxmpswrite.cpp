@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpswrite.cpp,v 1.11 2008/09/22 20:43:18 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxmpswrite.cpp,v 1.12 2008/11/17 11:49:01 bzfgleix Exp $"
 
 /**@file  spxmpswrite.cpp
  * @brief Write LP as MPS format file.
@@ -26,6 +26,7 @@
 
 #include "spxdefines.h"
 #include "spxlp.h"
+#include "spxout.h"
 #include "exceptions.h"
 
 namespace soplex
@@ -307,6 +308,12 @@ void SPxLP::writeMPS(
    }   
    // --- ENDATA Section ---
    p_output << "ENDATA" << std::endl;   
+
+   // Output warning when writing a maximisation problem
+   if(spxSense() == SPxLP::MAXIMIZE)
+   {
+      MSG_WARNING( spxout << "XMPSWR03 Warning: objective function inverted when writing maximization problem in MPS file format" << std::endl; )
+   }
 } 
 
 } // namespace soplex
