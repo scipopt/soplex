@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.41 2008/10/01 11:00:04 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.42 2008/11/17 11:02:31 bzfgleix Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
@@ -39,6 +39,8 @@
 #ifdef TRACE_METHOD
 #include "tracemethod.h"
 #endif
+
+
 
 
 namespace soplex
@@ -152,7 +154,10 @@ namespace soplex
  *-----------------------------------------------------------------------------
  */
 
+
+
 #ifdef WITH_LONG_DOUBLE
+
 
 typedef long double Real;
 
@@ -178,6 +183,33 @@ typedef long double Real;
 ///
 #define DEFAULT_INFINITY   1e100
 
+
+#else
+
+#ifdef WITH_FLOAT
+
+typedef float Real;
+
+#ifndef REAL
+#define REAL(x)  x
+#endif
+/// default allowed bound violation
+#ifndef DEFAULT_BND_VIOL
+#define DEFAULT_BND_VIOL   1e-1
+#endif
+/// default allowed additive zero: 1.0 + EPS_ZERO == 1.0
+#ifndef DEFAULT_EPS_ZERO
+#define DEFAULT_EPS_ZERO   1e-7
+#endif
+#ifndef DEFAULT_EPS_FACTOR
+#define DEFAULT_EPS_FACTOR 1e-7
+#endif
+#ifndef DEFAULT_EPS_UPDATE
+#define DEFAULT_EPS_UPDATE 1e-6
+#endif
+#define DEFAULT_INFINITY   1e100
+
+
 #else
 
 typedef double Real;
@@ -201,6 +233,11 @@ typedef double Real;
 #endif
 #define DEFAULT_INFINITY   1e100
 
+
+
+
+
+#endif // !WITH_FLOAT
 #endif // !WITH_LONG_DOUBLE
 
 extern const Real infinity;
