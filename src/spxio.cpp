@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxio.cpp,v 1.33 2008/11/17 11:13:54 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxio.cpp,v 1.34 2008/11/19 16:36:57 bzfgleix Exp $"
 
 
 //#define DEBUGGING 1
@@ -103,7 +103,7 @@ void SPxLP::writeFile(const char* filename,
       const DIdxSet* p_intvars ) const
 {
    std::ofstream tmp(filename);
-   int len_f = (int) strlen(filename);
+   size_t len_f = strlen(filename);
    if (len_f > 4 && filename[len_f-1] == 's' && filename[len_f-2] == 'p' && filename[len_f-3] == 'm' && filename[len_f-4] == '.')
    {
       writeMPS(tmp, rowNames, colNames, p_intvars);
