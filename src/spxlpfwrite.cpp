@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfwrite.cpp,v 1.7 2008/09/22 20:43:18 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxlpfwrite.cpp,v 1.8 2008/11/30 17:54:20 bzfpfets Exp $"
 
 /**@file  spxlpfwrite.cpp
  * @brief Write LP as LPF format file.
@@ -225,8 +225,9 @@ namespace soplex
                               << " <= " << upper << '\n';
                }
                else if (lower != 0)
-                  p_output << "  "   << getColName(p_lp, j, p_cnames, name) 
-                           << " >= " << lower << '\n';
+                  p_output << "  " << lower << " <= "
+                           << getColName(p_lp, j, p_cnames, name)
+                           << '\n';
             }
             else if (upper < infinity)
                p_output << "   -Inf <= "
@@ -247,7 +248,7 @@ namespace soplex
          METHOD("writeGenerals");
          char  name[16];
 
-         if (p_intvars == NULL || p_intvars->size() < 0) 
+         if (p_intvars == NULL || p_intvars->size() <= 0) 
             return;  // no integer variables
          
          p_output << "Generals\n";
