@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.h,v 1.28 2008/09/22 20:43:19 bzfpfets Exp $"
+#pragma ident "@(#) $Id: svset.h,v 1.29 2008/12/01 14:09:10 bzfwanie Exp $"
 
 /**@file  svset.h
  * @brief Set of sparse vectors.
@@ -416,19 +416,19 @@ public:
    }
 
    /// true iff SVSet contains a SVector for DataKey \p k
-   int has(const DataKey& k) const
+   bool has(const DataKey& k) const
    {
       return set.has(k);
    }
 
    ///true iff SVSet contains a SVector for vector number n
-   int has(int n) const
+   bool has(int n) const
    {
       return set.has(n);
    }
 
    /// is an SVector in the %set.
-   int has(const SVector* svec) const
+   bool has(const SVector* svec) const
    {
       return set.has(static_cast<const DLPSV*>(svec));
    }

@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-# $Id: TODO,v 1.108 2008/09/24 10:21:27 bzftuchs Exp $
+# $Id: TODO,v 1.109 2008/12/01 14:09:10 bzfwanie Exp $
 #-----------------------------------------------------------------------
 
 #-----------------------------------------------------------------------
@@ -46,13 +46,7 @@ Marc:
 
 
 Robert:
-- Vermutlich sind die meisten solve()-Methoden in CLUFactor::solve.cpp
-  const. Müssten von den Pointern befreit werden.
 - SSVector::multAdd() sollte von den Pointern befreit werden.
-- isConsistent() sollte in Klassen, die sowieso virtuelle Methoden
-  haben, eigentlich auch virtuell sein.
-- Memberfunctionen .hasXXX() sollten bool zurückliefern
-- spxbasis: load(xxx) umbennen in loadDesc, loadLP usw.
 - memory_exception_test überarbeiten (mit Benjamin)
 
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.h,v 1.30 2008/09/22 20:43:17 bzfpfets Exp $"
+#pragma ident "@(#) $Id: lprowset.h,v 1.31 2008/12/01 14:09:10 bzfwanie Exp $"
 
 /**@file  lprowset.h
  * @brief Set of LP columns.
@@ -221,7 +221,7 @@ public:
    }
 
    /// does DataKey \p k belong to LPRowSet ?
-   int has(const DataKey& k) const
+   bool has(const DataKey& k) const
    {
       return SVSet::has(k);
    }

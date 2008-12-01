@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.h,v 1.27 2008/09/22 20:43:17 bzfpfets Exp $"
+#pragma ident "@(#) $Id: nameset.h,v 1.28 2008/12/01 14:09:10 bzfwanie Exp $"
 
 /**@file  nameset.h
  * @brief Set of strings.
@@ -228,20 +228,20 @@ public:
    }
 
    /// does NameSet has a name with number \p pnum?
-   int has(int pnum) const
+   bool has(int pnum) const
    {
       return set.has(pnum);
    }
 
    /// does NameSet has a name \p str?
-   int has(const char* str) const
+   bool has(const char* str) const
    {
       const Name nam(str);
       return hashtab.has(nam);
    }
 
    /// does NameSet has a name with DataKey \p pkey?
-   int has(const DataKey& pkey) const
+   bool has(const DataKey& pkey) const
    {
       return set.has(pkey);
    }

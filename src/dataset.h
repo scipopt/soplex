@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.42 2008/09/29 17:27:42 bzfgleix Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.43 2008/12/01 14:09:10 bzfwanie Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -442,19 +442,19 @@ public:
    }
 
    /// Is \p k a valid DataKey of an element in DataSet?
-   int has(const DataKey& k) const
+   bool has(const DataKey& k) const
    {
       return theitem[k.idx].info >= 0;
    }
 
    /// Is \p n a valid number of an element in DataSet?
-   int has(int n) const
+   bool has(int n) const
    {
       return (n >= 0 && n < num());
    }
 
    /// Does \p item belong to DataSet?
-   int has(const DATA* item) const
+   bool has(const DATA* item) const
    {
       return number(item) >= 0;
    }
