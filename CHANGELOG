@@ -1,5 +1,8 @@
 Release 1.4.1
 
+- Small changes in spxlpfwrite.cpp (make bounds LP-format conform, do
+  not output 'generals' if no integer variables are there).
+
 - Bugfix in simplifier spxmainsm.cpp: wrong init for postsolving free column
   singletons fixed.
 
