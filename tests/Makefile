@@ -3,7 +3,7 @@
 #
 
 NAME		=	soplex
-VERSION		:=	1.3.3
+VERSION		:=	1.4.1
 
 ARCH            :=      $(shell uname -m | \
                         sed \
@@ -52,6 +52,9 @@ EXCEPTIONBINFILE=	status_exception_test.$(BASE)
 TESTCHANGEELEMENTOBJ	=	testChangeElement.o
 TESTCHANGEELEMENTBIN	=	testChangeElement.$(BASE)
 
+TESTCHANGEOBJECTIVEOBJ	=	testChangeObjective.o
+TESTCHANGEOBJECTIVEBIN	=	testChangeObjective.$(BASE)
+
 
 #------------------------------------------------------------------------------
 #--- NOTHING TO CHANGE FROM HERE ON -------------------------------------------
@@ -67,7 +70,7 @@ GCCWARN		=	-Wall -W -Wpointer-arith -Wno-unknown-pragmas \
 #include make/make.$(OSTYPE).$(ARCH).$(COMP).$(OPT).$(LINK)
 #-----------------------------------------------------------------------------
 
-.PHONY: change_exerciser status_exception_test testChangeElement clean all
+.PHONY: change_exerciser status_exception_test testChangeElement testChangeObjective clean all
 
 all: change_exerciser status_exception_test testChangeElement
 
@@ -76,6 +79,8 @@ change_exerciser: $(CHANGEBINFILE)
 status_exception_test: $(EXCEPTIONBINFILE)
 
 testChangeElement: $(TESTCHANGEELEMENTBIN)
+
+testChangeObjective: $(TESTCHANGEOBJECTIVEBIN)
 
 
 $(CHANGEBINFILE): $(LIBFILE) $(CHANGEBINOBJ)
@@ -93,9 +98,14 @@ $(TESTCHANGEELEMENTBIN): $(LIBFILE) $(TESTCHANGEELEMENTOBJ)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(TESTCHANGEELEMENTOBJ) \
 		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
 
+$(TESTCHANGEOBJECTIVEBIN): $(LIBFILE) $(TESTCHANGEOBJECTIVEOBJ)
+		@echo "-> linking $@"
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(TESTCHANGEOBJECTIVEOBJ) \
+		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+
 %.o:	%.cpp
 		@echo "-> compiling $@"
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) -c $< -o $@
 
 clean:
-		-rm -rf *.o $(EXCEPTIONBINFILE) $(CHANGEBINFILE)
+		-rm -rf *.o $(EXCEPTIONBINFILE) $(CHANGEBINFILE) $(TESTCHANGEELEMENTBIN) $(TESTCHANGEOBJECTIVEBIN)
