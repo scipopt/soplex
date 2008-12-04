@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.104 2008/09/22 20:43:18 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.105 2008/12/04 23:44:41 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -334,6 +334,10 @@ SPxSolver::Status SPxSolver::solve()
                   that this is due to the scaling of theCoTest[...]. Thus, we use 
                   instableLeaveNum and SPxFastRT::selectEnter shall accept even an instable
                   entering variable. */
+               MSG_INFO3(
+                  spxout << "ISOLVE98 Trying instable leave iteration" << std::endl;
+               )
+            
                leaveNum = instableLeaveNum;
                instableLeave = true;
             }
