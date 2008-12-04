@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.53 2008/09/28 12:41:36 bzfpfets Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.54 2008/12/04 23:46:56 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -30,7 +30,7 @@
 
 namespace soplex
 {
-static const Real reject_leave_tol = 1e-8;
+static const Real reject_leave_tol = 1e-10; // = EPSILON as defined in spxfastrt.cpp
 
 /*
     Vector |fTest| gives the feasibility test of all basic variables. For its
