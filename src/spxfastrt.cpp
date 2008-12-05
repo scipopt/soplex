@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.38 2008/10/23 20:28:05 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.39 2008/12/05 00:25:03 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -48,6 +48,7 @@ namespace soplex
 #define SHORT           1e-5
 #define DELTA_SHIFT     1e-5
 #define EPSILON         1e-10
+#define LOWSTAB         1e-10
 
 void SPxFastRT::resetTols()
 {
@@ -1126,6 +1127,7 @@ SPxId SPxFastRT::selectEnter(Real& val)
 
    // force instable pivot iff true (see explanation in leave.cpp and spxsolve.cpp)
    bool instable = solver()->instableLeave;
+   Real lowstab = LOWSTAB;
    assert(!instable || solver()->instableLeaveNum >= 0);
 
    resetTols();
@@ -1151,7 +1153,7 @@ SPxId SPxFastRT::selectEnter(Real& val)
             // force instable pivot iff instable is true (see explanation in leave.cpp and spxsolve.cpp)
             if (instable)
             {
-               enterId = maxSelect(nr, sel, epsilon, bestDelta, max);
+               enterId = maxSelect(nr, sel, lowstab, bestDelta, max);
             }
             else
             {
@@ -1187,7 +1189,7 @@ SPxId SPxFastRT::selectEnter(Real& val)
             // force instable pivot iff instable is true (see explanation in leave.cpp and spxsolve.cpp)
             if (instable)
             {
-               enterId = minSelect(nr, sel, epsilon, bestDelta, max);
+               enterId = minSelect(nr, sel, lowstab, bestDelta, max);
             }
             else
             {
