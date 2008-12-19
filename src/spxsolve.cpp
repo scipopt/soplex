@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.105 2008/12/04 23:44:41 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.106 2008/12/19 09:46:02 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -141,7 +141,7 @@ SPxSolver::Status SPxSolver::solve()
          return status();
       }
    }
-   maxDelta = 1e-6 > delta() ? 1e-6 : delta();
+   maxDelta = delta();
    minDelta = delta() * 1e-2;
 
    //thepricer->setEpsilon(delta());
