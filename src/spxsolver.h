@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.36 2008/09/28 12:51:10 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.37 2008/12/19 10:03:21 bzfgleix Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -1333,7 +1333,7 @@ public:
       coSolveVector2rhs = p_rhs;
    }
    /// maximal infeasibility of basis
-   /** This method is called for proving optimality. Since it is
+   /** This method is called before concluding optimality. Since it is
     *  possible that some stable implementation of class
     *  SPxRatioTester yielded a slightly infeasible (or unpriced)
     *  basis, this must be checked before terminating with an optimal
