@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.36 2008/09/22 20:43:18 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.37 2008/12/19 10:01:51 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -523,9 +523,9 @@ void SPxSolver::factorize()
    }
 }
 
-/* We compute how much the current solution violates (primal or dual) feasibility. In the dual
-   algorithm (row/enter or column/leave) the maximum violation of primal feasibility is computed. In
-   the primal case (row/leave or column/enter) the dual feasibility is checked. */
+/* We compute how much the current solution violates (primal or dual) feasibility. In the
+   row/enter or column/leave algorithm the maximum violation of dual feasibility is
+   computed. In the row/leave or column/enter algorithm the primal feasibility is checked. */
 Real SPxSolver::maxInfeas() const
 {
    METHOD( "SPxSolver::maxInfeas()" );
@@ -533,6 +533,18 @@ Real SPxSolver::maxInfeas() const
 
    if (type() == ENTER)
    {
+      for (int i = 0; i < dim(); i++)
+      {
+         if ((*theFvec)[i] > theUBbound[i])
+            inf = MAXIMUM(inf, (*theFvec)[i] - theUBbound[i]);
+         if (theLBbound[i] > (*theFvec)[i])
+            inf = MAXIMUM(inf, theLBbound[i] - (*theFvec)[i]);
+      }
+   }
+   else
+   {
+      assert(type() == LEAVE);
+
       for (int i = 0; i < dim(); i++)
       {
          if ((*theCoPvec)[i] > (*theCoUbound)[i])
@@ -546,18 +558,6 @@ Real SPxSolver::maxInfeas() const
             inf = MAXIMUM(inf, (*thePvec)[i] - (*theUbound)[i]);
          else if ((*thePvec)[i] < (*theLbound)[i])
             inf = MAXIMUM(inf, (*theLbound)[i] - (*thePvec)[i]);
-      }
-   }
-   else
-   {
-      assert(type() == LEAVE);
-
-      for (int i = 0; i < dim(); i++)
-      {
-         if ((*theFvec)[i] > theUBbound[i])
-            inf = MAXIMUM(inf, (*theFvec)[i] - theUBbound[i]);
-         if (theLBbound[i] > (*theFvec)[i])
-            inf = MAXIMUM(inf, theLBbound[i] - (*theFvec)[i]);
       }
    }
 
