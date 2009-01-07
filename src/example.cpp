@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: example.cpp,v 1.104 2008/09/28 12:51:10 bzfpfets Exp $"
+#pragma ident "@(#) $Id: example.cpp,v 1.105 2009/01/07 10:08:34 bzfpfets Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -291,7 +291,7 @@ void read_input_file(MySoPlex&      work,
    Timer timer;
    timer.start();
 
-   if ( ! work.readFile(filename, &rownames, &colnames, NULL) )
+   if ( ! work.readFile(filename, &rownames, &colnames, 0) )
    {
       MSG_INFO1( spxout << "EEXAMP23 error while reading file \"" 
                         << filename << "\"" << std::endl; )
@@ -325,7 +325,7 @@ void read_basis_file(MySoPlex&      work    ,
 //------------------------------------------------------------------------
 SPxPricer* get_pricer(const int pricing)
 {
-   SPxPricer* pricer = NULL;
+   SPxPricer* pricer = 0;
    switch(pricing)
    {
    case 5 :
@@ -350,7 +350,7 @@ SPxPricer* get_pricer(const int pricing)
       break;
    }
 
-   assert(pricer != NULL);
+   assert(pricer != 0);
    MSG_INFO1( spxout << "IEXAMP17 " << pricer->getName() 
                      << " pricing"  << std::endl; )
    return pricer;
@@ -358,7 +358,7 @@ SPxPricer* get_pricer(const int pricing)
 //------------------------------------------------------------------------
 SPxRatioTester* get_ratio_tester(const int ratiotest)
 {
-   SPxRatioTester* ratiotester = NULL;
+   SPxRatioTester* ratiotester = 0;
    switch(ratiotest)
    {
    case 2 :
@@ -374,7 +374,7 @@ SPxRatioTester* get_ratio_tester(const int ratiotest)
       break;
    }
 
-   assert(ratiotester != NULL);
+   assert(ratiotester != 0);
    MSG_INFO1( spxout << "IEXAMP18 " << ratiotester->getName() 
                      << " ratiotest" << std::endl; )
    return ratiotester;
@@ -419,7 +419,7 @@ void get_scalers(SPxScaler*& prescaler,
 //------------------------------------------------------------------------
 SPxSimplifier* get_simplifier(const int simplifying)
 {
-   SPxSimplifier* simplifier = NULL;
+   SPxSimplifier* simplifier = 0;
    switch(simplifying)
    {
    case 1 :
@@ -428,7 +428,7 @@ SPxSimplifier* get_simplifier(const int simplifying)
    case 0  :
       /*FALLTHROUGH*/
    default :
-      assert(simplifier == NULL);
+      assert(simplifier == 0);
       break;
    }
 
@@ -440,7 +440,7 @@ SPxSimplifier* get_simplifier(const int simplifying)
 //------------------------------------------------------------------------
 SPxStarter* get_starter(const int starting)
 {
-   SPxStarter* starter = NULL;
+   SPxStarter* starter = 0;
    switch(starting)
    {
    case 3 :
@@ -652,33 +652,38 @@ void clean_up( SPxScaler*&       prescaler,
                SPxRatioTester*&  ratiotester, 
                char*&            basisname )
 {
-   if ( prescaler != NULL ) {
-      prescaler = NULL;
+   if ( prescaler != 0 ) 
+   {
       delete prescaler;
+      prescaler = 0;
    }
-   if ( postscaler != NULL ) {
-      postscaler = NULL;
+   if ( postscaler != 0 ) 
+   {
       delete postscaler;
+      postscaler = 0;
    }
-   if ( simplifier != NULL ) {
-      simplifier = NULL;
+   if ( simplifier != 0 ) 
+   {
       delete simplifier;
+      simplifier = 0;
    }
-   if ( starter != 0 ) {
-      starter = NULL;
+   if ( starter != 0 )
+   {
       delete starter;
+      starter = 0;
    }
 
    assert( pricer != 0 );
-   pricer = NULL;
    delete pricer;
+   pricer = 0;
 
    assert( ratiotester != 0 );
-   ratiotester = NULL;
    delete ratiotester;
+   ratiotester = 0;
 
    if ( basisname != 0 )
       delete [] basisname;
+   basisname = 0;
 }
 
 //------------------------------------------------------------------------
