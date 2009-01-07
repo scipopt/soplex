@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplexmain.cpp,v 1.9 2008/10/10 12:10:36 bzforlow Exp $"
+#pragma ident "@(#) $Id: soplexmain.cpp,v 1.10 2009/01/07 11:38:37 bzfpfets Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -390,7 +390,7 @@ void print_algorithm_parameters(
 static
 SPxPricer* get_pricer(const int pricing)
 {
-   SPxPricer* pricer = NULL;
+   SPxPricer* pricer = 0;
    switch(pricing)
    {
    case 5 :
@@ -415,7 +415,7 @@ SPxPricer* get_pricer(const int pricing)
       break;
    }
 
-   assert(pricer != NULL);
+   assert(pricer != 0);
    if ( checkMode )
       MSG_INFO1( spxout << "IEXAMP17 " << pricer->getName() << " pricing"  << std::endl; )
    else
@@ -427,7 +427,7 @@ SPxPricer* get_pricer(const int pricing)
 static
 SPxRatioTester* get_ratio_tester(const int ratiotest)
 {
-   SPxRatioTester* ratiotester = NULL;
+   SPxRatioTester* ratiotester = 0;
    switch(ratiotest)
    {
    case 2 :
@@ -443,7 +443,7 @@ SPxRatioTester* get_ratio_tester(const int ratiotest)
       break;
    }
 
-   assert(ratiotester != NULL);
+   assert(ratiotester != 0);
    if ( checkMode )
       MSG_INFO1( spxout << "IEXAMP18 " << ratiotester->getName() << " ratiotest" << std::endl; )
    else
@@ -507,7 +507,7 @@ void get_scalers(
 static
 SPxSimplifier* get_simplifier(const int simplifying)
 {
-   SPxSimplifier* simplifier = NULL;
+   SPxSimplifier* simplifier = 0;
    switch(simplifying)
    {
    case 1 :
@@ -516,7 +516,7 @@ SPxSimplifier* get_simplifier(const int simplifying)
    case 0  :
       /*FALLTHROUGH*/
    default :
-      assert(simplifier == NULL);
+      assert(simplifier == 0);
       break;
    }
 
@@ -531,7 +531,7 @@ SPxSimplifier* get_simplifier(const int simplifying)
 static
 SPxStarter* get_starter(const int starting)
 {
-   SPxStarter* starter = NULL;
+   SPxStarter* starter = 0;
    switch(starting)
    {
    case 3 :
@@ -591,7 +591,7 @@ void read_input_file(
    Timer timer;
    timer.start();
 
-   if ( ! work.readFile(filename, &rownames, &colnames, NULL) )
+   if ( ! work.readFile(filename, &rownames, &colnames, 0) )
    {
       if ( checkMode )
 	 MSG_INFO1( spxout << "EEXAMP23 error while reading file \"" << filename << "\"" << std::endl; )
@@ -624,7 +624,7 @@ void read_input_file(
       MSG_INFO1(
 	 std::streamsize prec = spxout.precision();
 	 spxout << "LP reading time: " << std::fixed << std::setprecision(2) << timer.userTime();
-	 spxout << std::scientific << std::setprecision(prec) << std::endl; )
+	 spxout << std::scientific << std::setprecision(int(prec)) << std::endl; )
    }
 }
 
@@ -681,7 +681,7 @@ void solve_LP(MySoPlex& work)
 	 << "      Time spent : " << work.getSolveTime() << std::endl
 	 << "  solution time  : " << timer.userTime() << std::endl
 	 << "  iterations     : " << work.iteration() << std::endl
-	 << std::scientific << std::setprecision(prec); )
+	 << std::scientific << std::setprecision(int(prec)); )
    }
 }
 
@@ -903,37 +903,38 @@ void clean_up(
    char*&            basisname
    )
 {
-   if ( prescaler != NULL )
+   if ( prescaler != 0 )
    {
-      prescaler = NULL;
       delete prescaler;
+      prescaler = 0;
    }
-   if ( postscaler != NULL )
+   if ( postscaler != 0 )
    {
-      postscaler = NULL;
       delete postscaler;
+      postscaler = 0;
    }
-   if ( simplifier != NULL )
+   if ( simplifier != 0 )
    {
-      simplifier = NULL;
       delete simplifier;
+      simplifier = 0;
    }
    if ( starter != 0 )
    {
-      starter = NULL;
       delete starter;
+      starter = 0;
    }
 
    assert( pricer != 0 );
-   pricer = NULL;
    delete pricer;
+   pricer = 0;
 
    assert( ratiotester != 0 );
-   ratiotester = NULL;
    delete ratiotester;
+   ratiotester = 0;
 
    if ( basisname != 0 )
       delete [] basisname;
+   basisname = 0;
 }
 
 //------------------------------------------------------------------------
@@ -1141,14 +1142,14 @@ int main(int argc, const char* const argv[])
                                 print_solution, write_basis, basisname);
 
       // clean up
-      clean_up( prescaler, postscaler, simplifier, starter, pricer, ratiotester, basisname );
+      clean_up(prescaler, postscaler, simplifier, starter, pricer, ratiotester, basisname);
 
       return 0;
    }
    catch(SPxException& x) {
       std::cout << "exception caught : " << x.what() << std::endl;
       delete [] basisname;
-      if(simplifier)
+      if (simplifier)
          delete simplifier;
       delete starter;
       delete pricer;
