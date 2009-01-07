@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.39 2008/12/05 00:25:03 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.40 2009/01/07 11:38:52 bzfpfets Exp $"
 
 //#define DEBUGGING 1
 
@@ -232,7 +232,7 @@ int SPxFastRT::maxDelta(
                *uval = 0;
          }
       }
-      update.delta().setSize(l_idx - update.delta().indexMem());
+      update.delta().setSize(int(l_idx - update.delta().indexMem()));
       update.delta().forceSetup();
    }
 
@@ -371,7 +371,7 @@ int SPxFastRT::minDelta(
                *uval = 0;
          }
       }
-      update.delta().setSize(l_idx - update.delta().indexMem());
+      update.delta().setSize(int(l_idx - update.delta().indexMem()));
       update.delta().forceSetup();
    }
 
