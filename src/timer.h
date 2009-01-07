@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: timer.h,v 1.13 2008/09/22 20:43:19 bzfpfets Exp $"
+#pragma ident "@(#) $Id: timer.h,v 1.14 2009/01/07 11:39:01 bzfpfets Exp $"
 
 /**@file  timer.h
  * @brief Timer class.
@@ -131,7 +131,7 @@ private:
    /// convert ticks to secounds.
    Real ticks2sec(long ticks) const
    {
-      return (Real(ticks) * 1000.0 / ticks_per_sec) / 1000.0;
+      return (Real(ticks) * 1000.0 / Real(ticks_per_sec)) / 1000.0;
    }
 
    /// get actual user, system and real ticks from the system.
