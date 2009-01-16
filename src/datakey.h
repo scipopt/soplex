@@ -13,7 +13,11 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datakey.h,v 1.12 2008/09/26 14:37:28 bzfgleix Exp $"
+#pragma ident "@(#) $Id: datakey.h,v 1.13 2009/01/16 19:14:34 bzfpfets Exp $"
+// Turn off gcc warnings on conversion concerning assignments to the bit-fields in DataKey
+// (it seems that there is not way of casting to bit-fields directly and we cannot tell gcc
+// that we are aware of the fact that the assignment might result in a loss of precision).
+#pragma GCC diagnostic ignored "-Wconversion"
 
 /**@file  datakey.h
  * @brief Entry identifier class for items of a DataSet.
