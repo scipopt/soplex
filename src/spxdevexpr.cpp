@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.26 2008/09/22 20:43:18 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.cpp,v 1.27 2009/01/20 14:20:37 bzfgleix Exp $"
 
 #include "spxdefines.h"
 #include "spxdevexpr.h"
@@ -121,6 +121,13 @@ void SPxDevexPR::left4X(int n, const SPxId& id, int start, int incr)
       Real beta_q = thesolver->coPvec().delta().length2() * rhov_1 * rhov_1;
 
       ASSERT_WARN( "WDEVEX01", fabs(rhoVec[n]) >= theeps );
+#ifndef NDEBUG
+      if (fabs(rhoVec[n]) < theeps)
+      {
+         MSG_ERROR( spxout << "WDEVEX01: rhoVec = "
+                           << rhoVec[n] << " with smaller absolute value than theeps = " << theeps << std::endl; )
+      }
+#endif  // NDEBUG
 
       //  Update #coPenalty# vector
       const IdxSet& rhoIdx = thesolver->fVec().idx();

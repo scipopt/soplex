@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.37 2008/12/19 10:01:51 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.38 2009/01/20 14:20:38 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -477,7 +477,7 @@ void SPxSolver::factorize()
          ftmp -= fRhs();
          if (ftmp.length() > delta())
             MSG_ERROR( spxout << "ESOLVE29 " << iteration() << ": fVec error = " 
-                            << ftmp.length() << std::endl; )
+                              << ftmp.length() << " exceeding Delta = " << delta() << std::endl; )
       }
       if (ctmp.length() > delta())
       {
@@ -487,7 +487,7 @@ void SPxSolver::factorize()
          ctmp -= coPrhs();
          if (ctmp.length() > delta())
             MSG_ERROR( spxout << "ESOLVE30 " << iteration() << ": coPvec error = " 
-                            << ctmp.length() << std::endl; )
+                              << ctmp.length() << " exceeding Delta = " << delta() << std::endl; )
       }
       if (ptmp.length() > delta())
       {

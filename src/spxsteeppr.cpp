@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.37 2008/09/22 20:43:19 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.38 2009/01/20 14:20:37 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -227,6 +227,13 @@ void SPxSteepPR::left4(int n, SPxId id)
 
       //TK: I gave the 0.5 extra, because I am not sure how hard this assert is.
       ASSERT_WARN( "WSTEEP04", fabs(rhoVec[n]) >= theeps * 0.5 );
+#ifndef NDEBUG
+      if (fabs(rhoVec[n]) < theeps * 0.5)
+      {
+         MSG_ERROR( spxout << "WSTEEP04: rhoVec = "
+                           << rhoVec[n] << " with smaller absolute value than 0.5*theeps = " << 0.5*theeps << std::endl; )
+      }
+#endif  // NDEBUG
 
       //  Update #coPenalty# vector
       const IdxSet& rhoIdx = thesolver->fVec().idx();
