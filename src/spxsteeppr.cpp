@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.38 2009/01/20 14:20:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.39 2009/01/26 20:31:57 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -299,11 +299,6 @@ int SPxSteepPR::selectLeave()
       }
    }
 
-   /*
-       if(lastIdx >= 0)
-           std::cout << fTest[lastIdx] << std::endl;
-    */ 
-
    if (lastIdx >= 0)
    {
       assert( thesolver->coPvec().delta().isConsistent() );
@@ -314,18 +309,6 @@ int SPxSteepPR::selectLeave()
       workRhs.setup_and_assign(thesolver->coPvec().delta());
       thesolver->setup4solve(&workVec, &workRhs);
    }
-
-   /*
-       if(thesolver->basis().iteration() < 10)
-       {
-           std::cout.precision(16);
-           std::cout << lastIdx
-                << '\t' << thesolver->fTest()[lastIdx]
-                << '\t' << leavePref[lastIdx]
-                << '\t' << coPenalty[lastIdx]
-                << std::endl;
-       }
-    */
 
    return lastIdx;
 }
