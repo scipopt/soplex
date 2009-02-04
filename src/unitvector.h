@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: unitvector.h,v 1.12 2008/09/22 20:43:19 bzfpfets Exp $"
+#pragma ident "@(#) $Id: unitvector.h,v 1.13 2009/02/04 14:29:34 bzfgleix Exp $"
 
 /**@file  unitvector.h
  * @brief Sparse vector \f$e_i\f$.
@@ -48,8 +48,7 @@ private:
    //------------------------------------
    /**@name Data */
    //@{
-   Element themem;  ///< memory for 1st sparse vector entry (size)
-   Element themem1; ///< memory for 2nd sparse vector entry (idx,1.0)
+   Element themem[2];  ///< memory for 1st and 2nd sparse vector entry (themem[0]/themem[1])
    //@}
 
 public:
@@ -74,21 +73,25 @@ public:
    /// construct \c i 'th unit vector.
    explicit
    UnitVector(int i = 0)
-      : SVector(2, &themem)
+      : SVector(2, themem)
    {
       add(i, 1.0);
    }
    ///  copy constructor
    UnitVector(const UnitVector& rhs)
-      : SVector(2, &themem)
-      , themem (rhs.themem)
-      , themem1(rhs.themem1)
-   {}
+      : SVector(2, themem)
+   {
+      themem[0] = rhs.themem[0];
+      themem[1] = rhs.themem[1];
+   }
    /// assignment
    UnitVector& operator=(const UnitVector& rhs)
    {
       if ( this != &rhs )
-         themem1 = rhs.themem1;
+      {
+         themem[0] = rhs.themem[0];
+         themem[1] = rhs.themem[1];
+      }
       return *this;
    }
    /// destructor
