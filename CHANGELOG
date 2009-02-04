@@ -1,3 +1,4 @@
+
 Release 1.4.1
 
 - Small changes in spxlpfwrite.cpp (make bounds LP-format conform, do
@@ -10,6 +11,12 @@ Release 1.4.1
   combined updates of lhs and rhs in some cases.
 
 - Overworked spxfastrt.h, spxfastrt.cpp
+
+- Corrected wrong bugfix in spxsolver.cpp:maxInfeas(): the leave and entering case were switched back.
+
+- Corrected setting of feasibility/optimality tolerance for pricer in spxsolve.cpp.
+
+- Corrected memory handling in class UnitVector.
 
 #----------------------------------------------------------------
 
