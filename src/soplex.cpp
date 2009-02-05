@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.93 2008/09/29 10:56:47 bzfgleix Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.94 2009/02/05 04:57:36 bzfgleix Exp $"
 
 #include <iostream>
 
@@ -113,11 +113,18 @@ SPxSolver::Status SoPlex::solve()
       if (m_postScaler != 0)
          m_postScaler->scale(work);
 
-      // If a basis was loaded via readBasisFile() (i.e, status() != NO_PROBLEM) then 
-      // the LP is already loaded into solver. To avoid the deletion of the basis we
-      // do not (re)load the LP.
-      if ( m_solver.basis().status() == SPxBasis::NO_PROBLEM )
+      // If a basis with status at least REGULAR exists (loaded via readBasisFile()
+      // or available from previous simplex run), we check whether it can be (re)used
+      // for the newly loaded LP.
+      if ( m_solver.basis().status() <= SPxBasis::SINGULAR )
          m_solver.loadLP(work);
+      else
+      {
+         SPxBasis::Desc oldbasisdesc(m_solver.basis().desc());
+         m_solver.loadLP(work);
+         if(m_solver.basis().isDescValid(oldbasisdesc))
+            m_solver.loadBasis(oldbasisdesc);
+      }
    }
    return m_solver.solve();
 }
