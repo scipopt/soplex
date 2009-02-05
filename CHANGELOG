@@ -18,6 +18,11 @@ Release 1.4.1
 
 - Corrected memory handling in class UnitVector.
 
+- Added new method isDescValid() in class SPxBasis to check if some descriptor is valid w.r.t. to the
+  bounds of the loaded LP.
+  In SPxSoplex::solve(): Corrected behavior when resolving after change of LP: apply changes and (re)use
+  basis if possible.
+
 #----------------------------------------------------------------
 
 Release 1.4.0
