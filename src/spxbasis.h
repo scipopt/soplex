@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.53 2008/09/28 12:51:10 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.54 2009/02/05 04:58:32 bzfgleix Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -104,7 +104,7 @@ public:
           
           Variables and covariables may have a primal or dual Status. The
           first type specifies that a variable is set on a primal bound, while
-          the later type indicates a dual variable to be set on a bound.
+          the latter type indicates a dual variable to be set on a bound.
           If a row variable has a primal status, say #P_ON_UPPER, this means
           that the upper bound of the inequality is set to be tight. Hence,
           in this case the upper bound must not be infinity.
@@ -686,6 +686,9 @@ public:
     */
    virtual void writeBasis(std::ostream& os, 
       const NameSet* rownames, const NameSet* colnames) const;
+
+   /// checks if a Descriptor is valid for the current LP w.r.t. its bounds
+   virtual bool isDescValid(const Desc& ds);
 
    /// sets up basis.
    /** Loads a Descriptor to the basis and sets up the basis matrix and

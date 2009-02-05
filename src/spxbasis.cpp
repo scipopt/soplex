@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.63 2008/09/28 12:51:10 bzfpfets Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.64 2009/02/05 04:58:32 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -115,6 +115,57 @@ void SPxBasis::loadMatrixVecs()
    factorized = false;
    if (factor != 0)
       factor->clear();
+}
+
+bool SPxBasis::isDescValid(const Desc& ds)
+{
+   METHOD( "SPxBasis::isDescValid()" );
+   assert(status() > NO_PROBLEM);
+   assert(theLP != 0);
+
+   if ( ds.nRows() != theLP->nRows() || ds.nCols() != theLP->nCols() )
+      return false;
+
+   for ( int row = ds.nRows(); row >= 0; --row )
+   {
+      // row is basic
+      if ( ds.rowstat[row] > 0 )
+      {
+         if ( ds.rowstat[row] != dualRowStatus(row) )
+            return false;
+      }
+      // row is nonbasic
+      else
+      {
+         if ( (ds.rowstat[row] == Desc::P_FIXED && theLP->SPxLP::lhs(row) != theLP->SPxLP::rhs(row))
+              || (ds.rowstat[row] == Desc::P_ON_UPPER && theLP->SPxLP::rhs(row) >= infinity)
+              || (ds.rowstat[row] == Desc::P_ON_LOWER && theLP->SPxLP::lhs(row) <= -infinity)
+              || (ds.rowstat[row] == Desc::P_FREE && (theLP->SPxLP::lhs(row) > -infinity || theLP->SPxLP::rhs(row) < infinity)) )
+            return false;
+      }
+   }
+
+   for ( int col = ds.nCols(); col >= 0; --col )
+   {
+      // col is basic
+      if ( ds.colstat[col] > 0 )
+      {
+         if ( ds.colstat[col] !=  dualColStatus(col) )
+            return false;
+      }
+      // col is nonbasic
+      else
+      {
+         if ( (ds.colstat[col] == Desc::P_FIXED && theLP->SPxLP::lower(col) != theLP->SPxLP::upper(col))
+              || (ds.colstat[col] == Desc::P_ON_UPPER && theLP->SPxLP::upper(col) >= infinity)
+              || (ds.colstat[col] == Desc::P_ON_LOWER && theLP->SPxLP::lower(col) <= -infinity)
+              || (ds.colstat[col] == Desc::P_FREE && (theLP->SPxLP::lower(col) > -infinity || theLP->SPxLP::upper(col) < infinity)) )
+            return false;
+      }
+   }
+
+   // basis descriptor valid conforming to all bounds
+   return true;
 }
 
 /*
