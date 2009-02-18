@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.64 2009/02/05 04:58:32 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.65 2009/02/18 13:43:02 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -126,7 +126,7 @@ bool SPxBasis::isDescValid(const Desc& ds)
    if ( ds.nRows() != theLP->nRows() || ds.nCols() != theLP->nCols() )
       return false;
 
-   for ( int row = ds.nRows(); row >= 0; --row )
+   for ( int row = ds.nRows()-1; row >= 0; --row )
    {
       // row is basic
       if ( ds.rowstat[row] > 0 )
@@ -145,7 +145,7 @@ bool SPxBasis::isDescValid(const Desc& ds)
       }
    }
 
-   for ( int col = ds.nCols(); col >= 0; --col )
+   for ( int col = ds.nCols()-1; col >= 0; --col )
    {
       // col is basic
       if ( ds.colstat[col] > 0 )
@@ -164,7 +164,7 @@ bool SPxBasis::isDescValid(const Desc& ds)
       }
    }
 
-   // basis descriptor valid conforming to all bounds
+   // basis descriptor valid w.r.t. bounds
    return true;
 }
 
