@@ -4,7 +4,7 @@
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1997-1999 Roland Wunderling                              */
-/*                  1997-2008 Konrad-Zuse-Zentrum                            */
+/*                  1997-2009 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.54 2009/02/05 04:58:32 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.55 2009/02/20 01:06:36 bzfgleix Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.

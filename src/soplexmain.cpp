@@ -4,7 +4,7 @@
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1997-1999 Roland Wunderling                              */
-/*                  1997-2008 Konrad-Zuse-Zentrum                            */
+/*                  1997-2009 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplexmain.cpp,v 1.10 2009/01/07 11:38:37 bzfpfets Exp $"
+#pragma ident "@(#) $Id: soplexmain.cpp,v 1.11 2009/02/20 01:06:36 bzfgleix Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -224,7 +224,7 @@ void print_version_info()
 
    const char* banner2 = "                                       *\n"
    "*    Copyright (C) 1997-1999 Roland Wunderling                         *\n"
-   "*                  1997-2008 Konrad-Zuse-Zentrum                       *\n"
+   "*                  1997-2009 Konrad-Zuse-Zentrum                       *\n"
    "*                            fuer Informationstechnik Berlin           *\n"
    "*                                                                      *\n"
    "*  SoPlex is distributed under the terms of the ZIB Academic Licence.  *\n"
@@ -281,7 +281,7 @@ void print_short_version_info()
    "************************************************************************\n"
    "* SoPlex --- the Sequential object-oriented simPlex. Release ";
    const char* banner2 = "     *\n"
-   "* Copyright (C)  1997-2008 Zuse Institute Berlin                       *\n"
+   "* Copyright (C)  1997-2009 Zuse Institute Berlin                       *\n"
    "************************************************************************\n";
 
    std::cout << banner1 << SOPLEX_VERSION/100 << ".";

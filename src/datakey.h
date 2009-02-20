@@ -4,7 +4,7 @@
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1997-1999 Roland Wunderling                              */
-/*                  1997-2008 Konrad-Zuse-Zentrum                            */
+/*                  1997-2009 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datakey.h,v 1.13 2009/01/16 19:14:34 bzfpfets Exp $"
+#pragma ident "@(#) $Id: datakey.h,v 1.14 2009/02/20 01:06:35 bzfgleix Exp $"
 // Turn off gcc warnings on conversion concerning assignments to the bit-fields in DataKey
 // (it seems that there is not way of casting to bit-fields directly and we cannot tell gcc
 // that we are aware of the fact that the assignment might result in a loss of precision).
