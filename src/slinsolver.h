@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slinsolver.h,v 1.17 2008/09/26 14:37:27 bzfgleix Exp $"
+#pragma ident "@(#) $Id: slinsolver.h,v 1.18 2009/02/20 00:48:34 bzfgleix Exp $"
 
 /**@file  slinsolver.h
  * @brief Sparse Linear Solver virtual base class.
@@ -69,6 +69,9 @@ public:
    //---------------------------------------
    /**@name Miscellaneous */
    //@{
+   /// returns the name of the SLinSolver.
+   virtual const char* getName() const = 0;
+
    /// returns the Status of the SLinSolver.
    virtual Status status() const = 0;
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.h,v 1.25 2008/09/26 14:37:27 bzfgleix Exp $"
+#pragma ident "@(#) $Id: slufactor.h,v 1.26 2009/02/20 00:48:34 bzfgleix Exp $"
 
 /**@file  slufactor.h
  * @brief Implementation of Sparse Linear Solver.
@@ -142,6 +142,11 @@ public:
    int memory() const
    {
       return nzCnt + l.start[l.firstUnused];
+   }
+   ///
+   const char* getName() const
+   {
+      return (uptype == SLUFactor::ETA) ? "SLU-Eta" : "SLU-Forest-Tomlin";
    }
    ///
    Status status() const
