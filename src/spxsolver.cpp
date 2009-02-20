@@ -13,13 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.38 2009/01/20 14:20:38 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.39 2009/02/20 00:46:33 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
 #include <assert.h>
 #include <iostream>
-//#include <fstream>
+#include <sstream>
 
 #include "spxdefines.h"
 #include "soplex.h"
@@ -519,7 +519,9 @@ void SPxSolver::factorize()
    if (SPxBasis::status() == SPxBasis::SINGULAR)
    {
       m_status = SINGULAR;
-      throw SPxStatusException("XSOLVE21 Basis is singular (numerical troubles)");
+      std::stringstream s;
+      s << "XSOLVE21 Basis is singular (numerical troubles, delta = " << delta() << ")";
+      throw SPxStatusException(s.str());
    }
 }
 
