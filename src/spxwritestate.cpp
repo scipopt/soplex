@@ -13,6 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+#pragma ident "@(#) $Id: spxwritestate.cpp,v 1.3 2009/02/20 13:53:46 bzfgleix Exp $"
 
 #include <iostream>
 #include <fstream>
