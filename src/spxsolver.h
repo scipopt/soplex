@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.37 2008/12/19 10:03:21 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.38 2009/02/20 00:50:49 bzfgleix Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -319,6 +319,12 @@ public:
    {
       return thePricing;
    }
+
+   /// return current starter.
+   SPxStarter* starter() const
+   {
+      return thestarter;
+   }
    //@}
 
    //-----------------------------
@@ -395,6 +401,14 @@ public:
     *  variables.
     */
    virtual bool writeBasisFile(const char* filename, 
+      const NameSet* rowNames, const NameSet* colNames) const;
+
+   /** Write current LP, basis, and parameter settings.
+    *  LP is written in MPS format to "\p filename".mps, basis is written in "\p filename".bas, and parameters
+    *  are written to "\p filename".set. If \p rowNames and \p colNames are \c NULL, default names are used for
+    *  the constraints and variables.
+    */
+   virtual bool writeState(const char* filename, 
       const NameSet* rowNames, const NameSet* colNames) const;
 
    //@}

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.94 2009/02/05 04:57:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.95 2009/02/20 00:50:49 bzfgleix Exp $"
 
 #include <iostream>
 
@@ -415,6 +415,16 @@ bool SoPlex::writeBasisFile(
    ) const
 {
    return m_solver.writeBasisFile(filename, rowNames, colNames);
+}
+
+bool SoPlex::writeState(
+   const char*    filename, 
+   const NameSet* rowNames,
+   const NameSet* colNames ) const
+{
+   METHOD( "SoPlex::writeState()" );
+
+   return m_solver.writeState(filename, rowNames, colNames);
 }
 
 void SoPlex::unsimplify() const

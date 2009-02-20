@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.75 2008/09/28 12:51:10 bzfpfets Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.76 2009/02/20 00:50:49 bzfgleix Exp $"
 
 /**@file  soplex.h
  * @brief preconfigured \ref soplex::SoPlex "SoPlex" LP-solver.
@@ -273,6 +273,16 @@ public:
     */
    virtual bool writeBasisFile(const char* filename, 
       const NameSet* rowNames, const NameSet* colNames ) const;
+
+   /** Write LP, basis and parameter settings of the current SPxSolver object
+    *  (i.e. after simplifying and scaling).
+    *  LP is written in MPS format to "\p filename".mps, basis is written in
+    *  "\p filename".bas, and parameters are written to "\p filename".set.
+    *  If \p rowNames and \p colNames are \c NULL, default names are used for
+    *  the constraints and variables.
+    */
+   virtual bool writeState(const char* filename, 
+      const NameSet* rowNames, const NameSet* colNames) const;
    //@}
 
 private:
