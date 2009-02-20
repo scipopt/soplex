@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.93 2008/10/09 09:51:26 bzfgleix Exp $
+# $Id: Makefile,v 1.94 2009/02/20 00:51:25 bzfgleix Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -75,7 +75,7 @@ LIBOBJ		= 	changesoplex.o didxset.o \
 			spxout.o spxparmultpr.o spxquality.o \
 			spxscaler.o spxshift.o spxsolver.o spxsolve.o \
 			spxstarter.o spxsteeppr.o spxsumst.o spxvecs.o \
-			spxvectorst.o spxweightpr.o spxweightst.o \
+			spxvectorst.o spxweightpr.o spxweightst.o spxwritestate.o \
 			ssvector.o svector.o svset.o timer.o \
 			tracemethod.o unitvector.o update.o updatevector.o \
 			vector.o vsolve.o \
