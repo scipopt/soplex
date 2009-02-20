@@ -5,6 +5,6 @@ if [ -f $i ]
 then
 echo $i
 mv $i $i.olddate
-sed 's!1997-2007!1997-2008!g' $i.olddate > $i
+sed 's!1997-2008!1997-2009!g' $i.olddate > $i
 fi
 done
