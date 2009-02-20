@@ -23,6 +23,9 @@ Release 1.4.1
   In SoPlex::solve(): Corrected behavior when resolving after change of LP: apply changes and (re)use
   basis if possible.
 
+- Added new method writeState() to classes SoPlex and SPxSolver for dumping LP, basis, and parameter
+  settings at once.
+
 #----------------------------------------------------------------
 
 Release 1.4.0
