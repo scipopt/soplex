@@ -1,0 +1,9 @@
+Notes for SoPlex Release 1.4.1
+
+What's new
+----------
+ - New method writeState() for printing current LP, basis, and parameter
+   setting all at once.
+ - Several bugfixes.
+   
+For details see the CHANGELOG file.
