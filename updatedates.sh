@@ -1,5 +1,5 @@
 #!/bin/sh
-for i in Makefile INSTALL check/*.sh check/*.awk doc/*.cpp src/*.cpp src/*.h test/*.cpp extra/*.cpp
+for i in Makefile INSTALL check/*.sh check/*.awk doc/*.cpp src/*.cpp src/*.h tests/*.cpp extra/*.cpp
 do
 if [ -f $i ]
 then
