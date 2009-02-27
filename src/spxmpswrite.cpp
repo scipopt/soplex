@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpswrite.cpp,v 1.13 2009/02/20 01:06:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxmpswrite.cpp,v 1.14 2009/02/27 19:24:35 bzfgleix Exp $"
 
 /**@file  spxmpswrite.cpp
  * @brief Write LP as MPS format file.
@@ -291,11 +291,11 @@ void SPxLP::writeMPS(
 
       if (has_intvars && (p_intvars->number(i) >= 0))
       {
-         // Integer variables have default upper bound 1.0
-         if (upper(i) != 1.0)
-            writeRecord(p_output, "UP", "BOUND", 
-               getColName(*this, i, p_cnames, name1),
-               upper(i));
+         // Integer variables have default upper bound 1.0, but we should write
+         // it nevertheless since CPLEX seems to assume infinity otherwise.
+         writeRecord(p_output, "UP", "BOUND", 
+            getColName(*this, i, p_cnames, name1),
+            upper(i));
       }
       else
       {
