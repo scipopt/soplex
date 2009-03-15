@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: timer.h,v 1.15 2009/02/20 01:06:38 bzfgleix Exp $"
+#pragma ident "@(#) $Id: timer.h,v 1.16 2009/03/15 01:12:20 bzfgleix Exp $"
 
 /**@file  timer.h
  * @brief Timer class.
@@ -21,6 +21,8 @@
 
 #ifndef _TIMER_H_
 #define _TIMER_H_
+
+#include "spxdefines.h"
 
 namespace soplex
 {
