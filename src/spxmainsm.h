@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.h,v 1.14 2009/02/20 01:06:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxmainsm.h,v 1.15 2009/03/17 23:21:33 bzfgleix Exp $"
 
 /**@file  spxmainsm.h
  * @brief General methods in LP preprocessing.
@@ -589,7 +589,7 @@ private:
    /// handles extreme values by setting them to zero or infinity.
    void handleExtremes(SPxLP& lp);
    
-   /// removed empty rows and empty constraints.
+   /// removed empty rows and empty columns.
    Result removeEmpty(SPxLP& lp);
    
    /// performs simplification steps on the rows of the LP.
