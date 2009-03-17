@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.19 2009/02/20 01:06:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.20 2009/03/17 23:25:26 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -1837,10 +1837,10 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
          }
       }
       
+#if FIX_VARIABLE
       // 3. fix variable
       if (EQrel(lp.lower(j), lp.upper(j), deltaBnd()))
       {
-#if FIX_VARIABLE
          MSG_INFO3( spxout << "IMAISM36 col " << j
                            << ": x" << j
                            << " fixed -> lower=" << lp.lower(j)
@@ -1855,8 +1855,8 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
          ++m_stat[FIX_COL];
 
          continue;
-#endif
       }
+#endif
 
       // handle column singletons
       if (col.size() == 1)
