@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.59 2009/02/20 01:06:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.60 2009/04/07 14:58:52 bzfgleix Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -25,6 +25,7 @@
 //#define DEBUGGING 1
 
 #include <assert.h>
+#include <sstream>
 
 #include "spxdefines.h"
 #include "slufactor.h"
@@ -182,6 +183,7 @@ void SLUFactor::solveLeft(SSVector& x, const SVector& b) //const
 
    x.clear();
    int sz = ssvec.size(); // see .altValues()
+   assert(x.altIndexMem().size() >= sz);
    int n = vSolveLeft(x.getEpsilon(), x.altValues(), x.altIndexMem(),
       ssvec.altValues(), ssvec.altIndexMem(), sz);
 
@@ -251,6 +253,17 @@ Real SLUFactor::stability() const
       return 1;
 
    return initMaxabs / maxabs;
+}
+
+std::string SLUFactor::statistics() const
+{
+   std::stringstream s;
+   s  << "  Factorizations : " << getFactorCount() << std::endl
+      << "      Time spent : " << std::fixed << std::setprecision(2) << getFactorTime() << std::endl
+      << "  Solves         : " << getSolveCount() << std::endl
+      << "      Time spent : " << getSolveTime() << std::endl;
+
+   return s.str();
 }
 
 void SLUFactor::changeEta(int idx, SSVector& et)

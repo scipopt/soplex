@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.77 2009/02/20 01:06:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.78 2009/04/07 14:58:52 bzfgleix Exp $"
 
 /**@file  soplex.h
  * @brief preconfigured \ref soplex::SoPlex "SoPlex" LP-solver.
@@ -22,6 +22,7 @@
 #define _SOPLEX_H_
 
 #include <assert.h>
+#include <string>
 
 #include "spxsolver.h"
 #include "spxscaler.h"
@@ -283,6 +284,12 @@ public:
     */
    virtual bool writeState(const char* filename, 
       const NameSet* rowNames, const NameSet* colNames) const;
+
+   /// returns statistical information in form of a string.
+   std::string statistics() const
+   {
+      return m_solver.statistics();
+   }
    //@}
 
 private:

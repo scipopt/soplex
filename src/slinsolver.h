@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slinsolver.h,v 1.19 2009/02/20 01:06:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: slinsolver.h,v 1.20 2009/04/07 14:58:52 bzfgleix Exp $"
 
 /**@file  slinsolver.h
  * @brief Sparse Linear Solver virtual base class.
@@ -23,6 +23,7 @@
 
 
 #include <assert.h>
+#include <string>
 
 #include "spxdefines.h"
 #include "svector.h"
@@ -95,6 +96,9 @@ public:
        singularity, while 1 indicates perfect stability.
    */
    virtual Real stability() const = 0;
+
+   /// returns statistical information in form of a string.
+   virtual std::string statistics() const = 0;
 
    /// Substitute column \p idx with \p subst.
    /** The change method is used to modify the loaded matrix by substituting

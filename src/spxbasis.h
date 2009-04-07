@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.55 2009/02/20 01:06:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.56 2009/04/07 14:58:52 bzfgleix Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -22,6 +22,10 @@
 #define _SPXBASIS_H_
 
 #include <assert.h>
+#include <iostream>
+#include <iomanip>
+#include <string>
+#include <sstream>
 
 #include "spxdefines.h"
 #include "spxlp.h"
@@ -734,6 +738,12 @@ public:
    /// consistency check.
    bool isConsistent() const;
 #endif
+
+   /// returns statistical information in form of a string.
+   std::string statistics() const
+   {
+      return factor->statistics();
+   }
    //@}
 
    //--------------------------------------

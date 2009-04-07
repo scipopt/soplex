@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.39 2009/02/20 01:06:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.40 2009/04/07 14:58:52 bzfgleix Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -22,6 +22,9 @@
 #define _SPXSOLVER_H_
 
 #include <assert.h>
+#include <iostream>
+#include <iomanip>
+#include <sstream>
 
 #include "spxdefines.h"
 #include "timer.h"
@@ -37,6 +40,7 @@ namespace soplex
 class SPxPricer;
 class SPxRatioTester;
 class SPxStarter;
+class SLUFactor;
 
 /**@brief   Sequential object-oriented SimPlex.
    @ingroup Algo
@@ -1679,6 +1683,17 @@ public:
    SPxSense sense() const
    {
       return spxSense();
+   }
+
+   /// returns statistical information in form of a string.
+   std::string statistics() const
+   {
+      std::stringstream s;
+      s << basis().statistics()
+        << "  solution time  : " << std::fixed << std::setprecision(2) << time() << std::endl
+        << "  iterations     : " << iterations() << std::endl;
+
+      return s.str();
    }
    //@}
 

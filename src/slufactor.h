@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.h,v 1.27 2009/02/20 01:06:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: slufactor.h,v 1.28 2009/04/07 14:58:52 bzfgleix Exp $"
 
 /**@file  slufactor.h
  * @brief Implementation of Sparse Linear Solver.
@@ -155,6 +155,8 @@ public:
    }
    ///
    Real stability() const;
+   ///
+   std::string statistics() const;
    ///
    Status load(const SVector* vec[], int dim);
    //@}
