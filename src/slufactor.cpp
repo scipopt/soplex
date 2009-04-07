@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.60 2009/04/07 14:58:52 bzfgleix Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.61 2009/04/07 15:02:06 bzfgleix Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -183,7 +183,6 @@ void SLUFactor::solveLeft(SSVector& x, const SVector& b) //const
 
    x.clear();
    int sz = ssvec.size(); // see .altValues()
-   assert(x.altIndexMem().size() >= sz);
    int n = vSolveLeft(x.getEpsilon(), x.altValues(), x.altIndexMem(),
       ssvec.altValues(), ssvec.altIndexMem(), sz);
 
