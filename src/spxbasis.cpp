@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.66 2009/02/20 01:06:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.67 2009/04/08 08:48:08 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -296,10 +296,6 @@ void SPxBasis::loadSolver(SLinSolver* p_solver)
  *
  *  @return true if the file was read correctly.
  *
- *  @todo This routine is (almost) untested.
- *  @todo Check whether handling of P_FIXED is correct.
- *  @todo Check whether it is a good idea to set the status to REGULAR.
- *
  *  Here is a very brief outline of the format:
  *
  *  The format is in a form similar to an MPS file. The basic assumption is that all (column)
@@ -435,7 +431,7 @@ bool SPxBasis::readBasis(
    {
       if (mps.section() == MPSInput::ENDATA)
       {
-         // force basis to be different from NO_PROBLEM (is REGULAR a good idea?),
+         // force basis to be different from NO_PROBLEM
          // otherwise the basis will be overwritten at later stages.
          setStatus(REGULAR);
          loadDesc(l_desc);
