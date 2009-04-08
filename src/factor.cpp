@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.50 2009/02/20 01:06:35 bzfgleix Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.51 2009/04/08 08:40:18 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -1575,9 +1575,6 @@ void CLUFactor::factor(const SVector** vec,          ///< Array of column vector
    }
    factorTime.stop();
    factorCount++;
-
-   /* temp.clear(); */
-   /* assert(dump()); */
 }
 
 void CLUFactor::dump() const
