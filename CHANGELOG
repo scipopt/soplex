@@ -1,5 +1,8 @@
 Current version
 
+- Added method 'std::string statistics() const' to classes SoPlex, SPxSolver, SPxBasis,
+  SLinSolver, SLUFactor, returning statistical information like number of factorizations etc.
+
 - Small change in spxmpswrite.cpp: always write the default upper bound of 1.0 for integer
   variables, since CPLEX seems to set infinity otherwise.
 
