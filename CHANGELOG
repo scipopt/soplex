@@ -6,6 +6,8 @@ Current version
 - Small change in spxmpswrite.cpp: always write the default upper bound of 1.0 for integer
   variables, since CPLEX seems to set infinity otherwise.
 
+- Correctly resetting basis status to REGULAR in method SPxSolver::loadBasis().
+
 #----------------------------------------------------------------
 
 Release 1.4.1
@@ -19,7 +21,7 @@ Release 1.4.1
 - Speed up of the simplifier due to combined removal of rows/columns and
   combined updates of lhs and rhs in some cases.
 
-- Overworked spxfastrt.h, spxfastrt.cpp
+- Overworked spxfastrt.h, spxfastrt.cpp.
 
 - Corrected wrong bugfix in spxsolver.cpp:maxInfeas(): the leave and entering case were switched back.
 

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.40 2009/02/20 01:06:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.41 2009/04/09 14:00:04 bzfwinkm Exp $"
 
 //#define DEBUGGING 1
 
@@ -96,6 +96,7 @@ void SPxSolver::loadBasis(const SPxBasis::Desc& p_desc)
    if (SPxBasis::status() == SPxBasis::NO_PROBLEM)
       SPxBasis::load(this);
    SPxBasis::loadDesc(p_desc);
+   setBasisStatus(SPxBasis::REGULAR);
 }
 
 void SPxSolver::setPricer(SPxPricer* x)
