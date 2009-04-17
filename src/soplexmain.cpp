@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplexmain.cpp,v 1.11 2009/02/20 01:06:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: soplexmain.cpp,v 1.12 2009/04/17 09:44:57 bzfgleix Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -301,7 +301,7 @@ void print_usage_and_exit( const char* const argv[] )
       " -e        select entering algorithm (default is leaving)\n"
       " -r        select row wise representation (default is column)\n"
       " -i        select Eta-update (default is Forest-Tomlin)\n"
-      " -x        output solution vector (works only together with -s0)\n"
+      " -x        output solution vector\n"
       " -q        display solution quality\n"
       " -br       read file with starting basis from Basfile\n"
       " -bw       write file with optimal basis to Basfile\n"
@@ -729,7 +729,7 @@ void print_solution_and_status(
                                     << std::setprecision( precision )
                                     << objx[i] << std::endl; )
             }
-            MSG_INFO1( spxout << "All other variable are zero." << std::endl; )
+            MSG_INFO1( spxout << "All other variables are zero." << std::endl; )
          }
       }
       if ( write_basis )
