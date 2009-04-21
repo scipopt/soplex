@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxwritestate.cpp,v 1.3 2009/02/20 13:53:46 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxwritestate.cpp,v 1.4 2009/04/21 07:57:10 bzfgleix Exp $"
 
 #include <iostream>
 #include <fstream>
@@ -74,7 +74,6 @@ bool SPxSolver::writeState(
    commandline
       << "bin/soplex -g0 -s0"
       << " -d" << delta()
-      << " -v" << Param::verbose()
       << (type() == SPxSolver::ENTER ? " -e" : "")
       << (rep()  == SPxSolver::ROW   ? " -r" : "")
       << (!strcmp(slinSolver()->getName(), "SLU-Eta") ? " -i" : "");
