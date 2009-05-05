@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.h,v 1.28 2009/04/07 14:58:52 bzfgleix Exp $"
+#pragma ident "@(#) $Id: slufactor.h,v 1.29 2009/05/05 16:28:53 bzfgleix Exp $"
 
 /**@file  slufactor.h
  * @brief Implementation of Sparse Linear Solver.
@@ -197,12 +197,12 @@ public:
    {
       return factorCount;
    }
-   /// time spent in factorizations
+   /// time spent in solves
    Real getSolveTime() const
    {
       return solveTime.userTime();
    }
-   /// number of factorizations performed
+   /// number of solves performed
    int getSolveCount() const
    {
       return solveCount;

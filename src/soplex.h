@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.78 2009/04/07 14:58:52 bzfgleix Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.79 2009/05/05 16:28:53 bzfgleix Exp $"
 
 /**@file  soplex.h
  * @brief preconfigured \ref soplex::SoPlex "SoPlex" LP-solver.
@@ -227,12 +227,12 @@ public:
    {
       return m_vanished ? 0 : m_slu.getFactorCount();
    }
-   /// time spent in factorizations
+   /// time spent in solves
    virtual Real getSolveTime() const
    {
       return m_vanished ? REAL(0.0) : m_slu.getSolveTime();
    }
-   /// number of factorizations performed
+   /// number of solves performed
    virtual int getSolveCount() const
    {
       return m_vanished ? 0 : m_slu.getSolveCount();
