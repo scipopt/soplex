@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.40 2009/04/07 14:58:52 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.41 2009/05/05 16:28:06 bzfgleix Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -1690,8 +1690,8 @@ public:
    {
       std::stringstream s;
       s << basis().statistics()
-        << "  solution time  : " << std::fixed << std::setprecision(2) << time() << std::endl
-        << "  iterations     : " << iterations() << std::endl;
+        << "Solution time      : " << std::setw(10) << std::fixed << std::setprecision(2) << time() << std::endl
+        << "Iterations         : " << std::setw(10) << iterations() << std::endl;
 
       return s.str();
    }

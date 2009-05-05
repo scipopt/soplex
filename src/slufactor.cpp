@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.61 2009/04/07 15:02:06 bzfgleix Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.62 2009/05/05 16:29:27 bzfgleix Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -257,10 +257,10 @@ Real SLUFactor::stability() const
 std::string SLUFactor::statistics() const
 {
    std::stringstream s;
-   s  << "  Factorizations : " << getFactorCount() << std::endl
-      << "      Time spent : " << std::fixed << std::setprecision(2) << getFactorTime() << std::endl
-      << "  Solves         : " << getSolveCount() << std::endl
-      << "      Time spent : " << getSolveTime() << std::endl;
+   s  << "Factorizations     : " << std::setw(10) << getFactorCount() << std::endl
+      << "  Time spent       : " << std::setw(10) << std::fixed << std::setprecision(2) << getFactorTime() << std::endl
+      << "Solves             : " << std::setw(10) << getSolveCount() << std::endl
+      << "  Time spent       : " << std::setw(10) << getSolveTime() << std::endl;
 
    return s.str();
 }
