@@ -55,6 +55,9 @@ TESTCHANGEELEMENTBIN	=	testChangeElement.$(BASE)
 TESTCHANGEOBJECTIVEOBJ	=	testChangeObjective.o
 TESTCHANGEOBJECTIVEBIN	=	testChangeObjective.$(BASE)
 
+TESTMEMORYOBJ	=	testMemory.o
+TESTMEMORYBIN	=	testMemory.$(BASE)
+
 
 #------------------------------------------------------------------------------
 #--- NOTHING TO CHANGE FROM HERE ON -------------------------------------------
@@ -70,9 +73,9 @@ GCCWARN		=	-Wall -W -Wpointer-arith -Wno-unknown-pragmas \
 #include make/make.$(OSTYPE).$(ARCH).$(COMP).$(OPT).$(LINK)
 #-----------------------------------------------------------------------------
 
-.PHONY: change_exerciser status_exception_test testChangeElement testChangeObjective clean all
+.PHONY: change_exerciser status_exception_test testChangeElement testChangeObjective testMemory clean all
 
-all: change_exerciser status_exception_test testChangeElement
+all: change_exerciser status_exception_test testChangeElement testMemory
 
 change_exerciser: $(CHANGEBINFILE)
 
@@ -81,6 +84,8 @@ status_exception_test: $(EXCEPTIONBINFILE)
 testChangeElement: $(TESTCHANGEELEMENTBIN)
 
 testChangeObjective: $(TESTCHANGEOBJECTIVEBIN)
+
+testMemory: $(TESTMEMORYBIN)
 
 
 $(CHANGEBINFILE): $(LIBFILE) $(CHANGEBINOBJ)
@@ -103,9 +108,16 @@ $(TESTCHANGEOBJECTIVEBIN): $(LIBFILE) $(TESTCHANGEOBJECTIVEOBJ)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(TESTCHANGEOBJECTIVEOBJ) \
 		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
 
+$(TESTMEMORYBIN): $(LIBFILE) $(TESTMEMORYOBJ)
+		@echo "-> linking $@"
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(TESTMEMORYOBJ) \
+		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+
 %.o:	%.cpp
 		@echo "-> compiling $@"
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) -c $< -o $@
 
 clean:
-		-rm -rf *.o $(EXCEPTIONBINFILE) $(CHANGEBINFILE) $(TESTCHANGEELEMENTBIN) $(TESTCHANGEOBJECTIVEBIN)
+		-rm -rf *.o $(EXCEPTIONBINFILE) $(CHANGEBINFILE) $(TESTCHANGEELEMENTBIN) $(TESTCHANGEOBJECTIVEBIN) \
+		$(TESTMEMORYBIN)
+
