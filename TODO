@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-# $Id: TODO,v 1.109 2008/12/01 14:09:10 bzfwanie Exp $
+# $Id: TODO,v 1.110 2009/05/13 19:47:41 bzfpfets Exp $
 #-----------------------------------------------------------------------
 
 #-----------------------------------------------------------------------
@@ -29,22 +29,6 @@
 #  Bereits verteilte Arbeiten
 #-----------------------------------------------------------------------
 
-Benjamin:
-- "make tests" zum Compilieren (und Ausführen?) der Testbinaries
-
-
-Thorsten:
-- svset-Speicherbug beheben
-- Abbruch bei minimieren mit Upper Bound:
-  primal: >= UB und optimal
-  dual  : >= UB und shift = 0
-
-
-Marc:
-- COIN Interface (OSI) updaten
-- Mailingliste auf Stand bringen
-
-
 Robert:
 - SSVector::multAdd() sollte von den Pointern befreit werden.
 - memory_exception_test überarbeiten (mit Benjamin)
@@ -53,6 +37,8 @@ Robert:
 #-----------------------------------------------------------------------
 #  Noch zu verteilende Arbeiten
 #-----------------------------------------------------------------------
+
+- COIN Interface (OSI) updaten - braucht das jemand?
 
 - factor.cpp: "??? mkwtz originally was long, maybe to avoid an overflow
   in this instruction?" -> später auf long ändern
@@ -64,8 +50,6 @@ Robert:
 - Membernamen vereinheitlichen: m_...
 
 - long step dual implementieren
-
-- cplexrun mit delta = 1e-9 für bessere werte in check.
 
 - Thread-Safe Versionen von strtok verwenden.
 
