@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.cpp,v 1.29 2009/02/20 01:06:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxlp.cpp,v 1.30 2009/05/18 18:30:41 bzfpfets Exp $"
 
 #include <stdio.h>
 
@@ -259,13 +259,16 @@ void SPxLP::doAddRows(const LPRowSet& p_set)
       }
    }
 
-   // extend columns as required
-   for( i = 0; i < nCols(); ++i )
+   // extend columns as required (backward because of memory efficiency reasons)
+   for (i = nCols() - 1; i >= 0; --i)
    {
       if (newCols[i] > 0)
       {
          int len = newCols[i] + colVector(i).size();
          LPColSet::xtend(i, len);
+         /* preset the sizes: beware that this can irritate a consistency check call from
+            xtend(). We need to set the sizes here, because a possible garbage collection called
+            from xtend might destroy the sizes again. */
          colVector_w(i).set_size( len );
       }
    }
@@ -280,6 +283,7 @@ void SPxLP::doAddRows(const LPRowSet& p_set)
          col = &colVector_w(k);
          idx = col->size() - newCols[k];
          assert(newCols[k] > 0);
+         assert(idx >= 0);
          newCols[k]--;
          col->index(idx) = i;
          col->value(idx) = vec.value(j);
@@ -289,6 +293,7 @@ void SPxLP::doAddRows(const LPRowSet& p_set)
    for( i = 0; i < nCols(); ++i )
       assert( newCols[i] == 0 );
 #endif
+   assert(SPxLP::isConsistent());
 
    assert( p_set.num() == nRows() - oldRowNumber );
    addedRows( nRows() - oldRowNumber );
@@ -374,7 +379,7 @@ void SPxLP::doAddCols(const LPColSet& p_set)
 
 void SPxLP::addRows(SPxRowId id[], const LPRowSet& p_set)
 {
-   METHOD( "SPxLP::isConsistent()" );
+   METHOD( "SPxLP::addRows()" );
    int i = nRows();
    addRows(p_set);
    for (int j = 0; i < nRows(); ++i, ++j)
