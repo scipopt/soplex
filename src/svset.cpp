@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.cpp,v 1.31 2009/05/18 17:07:09 bzfpfets Exp $"
+#pragma ident "@(#) $Id: svset.cpp,v 1.32 2009/05/18 18:27:56 bzfpfets Exp $"
 
 #include <assert.h>
 
@@ -127,11 +127,9 @@ void SVSet::xtend(SVector& svec, int newmax)
 {
    if (svec.max() < newmax)
    {
-#if 0
-      /// @todo: open bug in mempack()
       if (possiblyUnusedMem * memFactor > memSize())
          memPack(); 
-#endif
+
       assert(has(&svec));
       DLPSV* ps = static_cast<DLPSV*>( & svec );
 
@@ -159,9 +157,7 @@ void SVSet::xtend(SVector& svec, int newmax)
                            + ps->max() + 2, prev->mem());
             prev->set_size(prevsz);
             
-#if 0
             possiblyUnusedMem += ps->max();
-#endif
          }
          list.remove(ps);
          list.append(ps);
@@ -275,35 +271,43 @@ void SVSet::memRemax(int newmax)
    }
 }
 
+/** garbage collection in nonzero memory.
+ *
+ * Pack the svectors together as tightly as possible. This removes all additional unused memory,
+ * i.e., size = max for every svector after the call.
+ *
+ * Note: do *not* call isConsistent() here, because the following might happen: In
+ * SPxLP::doAddRows(const LPRowSet& p_set), when adding rows, the sizes of the vectors for the
+ * columns of the LP are increased (without yet filling in the data) to recieve the additional
+ * entries. This is done by calling xtend() above. xtend() in turn might call this method, which
+ * checks the yet unfilled positions, i.e., isConsistent() is likely to fail. In general,
+ * isConsistent() should not be called within this class, but in classes further up in the
+ * hierarchy.
+ */
 void SVSet::memPack()
 {
-   assert(isConsistent());
-
    int used;
    int j;
    DLPSV* ps;
    for (used = 0, ps = list.first(); ps; ps = list.next(ps))
    {
-      const DLPSV * cps = ps;
-      const int sz = cps->size();
+      const int sz = ps->size();
 
       if (ps->mem() != &this->SVSetBase::operator[](used))
       {
+         // cannot use memcpy, because the memory might overlap
          for (j = 0; j <= sz; ++j)
             this->SVSetBase::operator[](used + j) = ps->mem()[j];
          ps->setMem(sz + 1, &this->SVSetBase::operator[](used));
          ps->set_size(sz);
-
       }
+      else
+         ps->set_max(sz);
       used += sz + 1;
    }
    SVSetBase::reSize(used);
 
-#if 0
    possiblyUnusedMem = 0;
-#endif
-
-   assert(isConsistent());
 }
 
 #ifndef NO_CONSISTENCY_CHECKS
