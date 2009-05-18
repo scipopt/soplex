@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.h,v 1.30 2009/02/20 01:06:38 bzfgleix Exp $"
+#pragma ident "@(#) $Id: svset.h,v 1.31 2009/05/18 17:06:36 bzfpfets Exp $"
 
 /**@file  svset.h
  * @brief Set of sparse vectors.
@@ -72,15 +72,15 @@ private:
       @brief SVector with prev/next pointers
       @todo Check whether SVSet::DLPSV can be implemented as IdElement<SVector>
 
-      The management of the SVectors is implemented by by a DataSet<DLPSV>,
+      The management of the SVectors is implemented by a DataSet<DLPSV>,
       the keys used externally are DataKey%s.
 
       The management of nonzeros is done by a Real linked list
-      IdList<DLPSV>, where the SVector%s are kept in the order their
-      indices occurr in the DataArray. The SVector%s are kept without
-      holes: If one is removed or moved to the end, the SVector
-      preceeding it obtains all the nonzeros that previously belonged
-      to the (re-)moved one.  However, the nonzeros in use are
+      IdList<DLPSV>, where the SVector%s are kept in the order in which
+      their indices occurr in the DataArray. The SVector%s are kept 
+      without holes: If one is removed or moved to the end, the SVector
+      preceeding it obtains the space for all the nonzeros that previously 
+      belonged to the (re-)moved one.  However, the nonzeros in use are
       uneffected by this.  
    */
    class DLPSV : public SVector
@@ -159,27 +159,17 @@ private:
    void ensureMem(int n);
    //@}
 
-public:
-
    //------------------------------------
-   /**@name Control Parameters 
-      @todo Should factor amd memFactor really be public variables in svset?
-   */
+   /**@name Control Parameters */
    //@{
    /// Sparse vector memory enlargment factor.
-   /** If the SVSet runs out of vector memory, it is enlareged by
-       \p factor.
+   /** If the SVSet runs out of vector memory, it is enlarged by \p factor.
     */
    Real factor;
-
-   /// Nonzero element memory enlargment factor.
-   /** If the SVSet runs out of nonzero memory it is enlareged by a
-       memFactor.
-       @todo Should memFactor really be a Real& instead of a plain Real in svset?
-    */
-   Real& memFactor;
    //@}
    
+
+public:
 
    //------------------------------------
    /**@name Extension */
@@ -484,7 +474,6 @@ public:
          , possiblyUnusedMem (0)
 #endif
          , factor (pfac)
-         , memFactor (DataArray < SVector::Element > ::memFactor )
    {}
    /// destructor
    ~SVSet()
