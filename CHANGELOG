@@ -1,5 +1,8 @@
 Current version
 
+- Added method 'Real cumulativeTime() const' to class SPxSolver returning time used in all calls
+  to method solve() since beginning or last call of 'resetCumulativeTime()'.
+
 - Added method 'std::string statistics() const' to classes SoPlex, SPxSolver, SPxBasis,
   SLinSolver, SLUFactor, returning statistical information like number of factorizations etc.
 

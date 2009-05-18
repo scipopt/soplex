@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.41 2009/04/09 14:00:04 bzfwinkm Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.42 2009/05/18 09:19:01 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -719,6 +719,7 @@ SPxSolver::SPxSolver(
    SPxStarter*     start)
    : theType (p_type)
    , thePricing(FULL)
+   , theCumulativeTime(0.0)
    , maxIters (-1)
    , maxTime (infinity)
    , objLimit(infinity)

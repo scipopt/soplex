@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.41 2009/05/05 16:28:06 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.42 2009/05/18 09:19:01 bzfgleix Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -205,7 +205,8 @@ private:
    Type           theType;     ///< entering or leaving algortihm.
    Pricing        thePricing;  ///< full or partial pricing.
    Representation theRep;      ///< row or column representation.
-   Timer          theTime;
+   Timer          theTime;     ///< time spent in last call to method solve()
+   Real           theCumulativeTime; ///< cumulative time spent in all calls to method solve()
    int            maxIters;    ///< maximum allowed iterations.
    Real           maxTime;     ///< maximum allowed time.
    Real           objLimit;    ///< objective value limit.
@@ -1632,6 +1633,11 @@ public:
          m_status = UNKNOWN;
       SPxBasis::setStatus( stat );
    }
+   /// reset cumulative time counter to zero.
+   void resetCumulativeTime()
+   {
+      theCumulativeTime = 0.0;
+   }
 
    /// get number of iterations of current solution.
    int iterations() const
@@ -1643,6 +1649,11 @@ public:
    Real time() const
    {
       return theTime.userTime();
+   }
+   /// cumulative time spent in all calls to method solve().
+   Real cumulativeTime() const
+   {
+      return theCumulativeTime;
    }
    /// return const lp's rows if available.
    const LPRowSet& rows() const

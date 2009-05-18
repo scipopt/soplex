@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.107 2009/02/20 01:06:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.108 2009/05/18 09:19:01 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -488,6 +488,7 @@ SPxSolver::Status SPxSolver::solve()
       }
    }
    theTime.stop();
+   theCumulativeTime += time();
 
    if (m_status == RUNNING)
    {
