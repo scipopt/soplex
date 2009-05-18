@@ -1,15 +1,21 @@
 Current version
 
-- Added method 'Real cumulativeTime() const' to class SPxSolver returning time used in all calls
-  to method solve() since beginning or last call of 'resetCumulativeTime()'.
-
-- Added method 'std::string statistics() const' to classes SoPlex, SPxSolver, SPxBasis,
-  SLinSolver, SLUFactor, returning statistical information like number of factorizations etc.
+- Correctly resetting basis status to REGULAR in method SPxSolver::loadBasis().
 
 - Small change in spxmpswrite.cpp: always write the default upper bound of 1.0 for integer
   variables, since CPLEX seems to set infinity otherwise.
 
-- Correctly resetting basis status to REGULAR in method SPxSolver::loadBasis().
+- Added method 'std::string statistics() const' to classes SoPlex, SPxSolver, SPxBasis,
+  SLinSolver, SLUFactor, returning statistical information like number of factorizations etc.
+
+- Added method 'Real cumulativeTime() const' to class SPxSolver returning time used in all calls
+  to method solve() since beginning or last call of 'resetCumulativeTime()'.
+
+- Removed memory bug in function memPack() in svset.cpp. This method
+  is now called to clean up memory, in case too much memory is
+  lost. This removes a large increase of the use of memory as tested
+  in tests/testMemory.cpp.
+
 
 #----------------------------------------------------------------
 
