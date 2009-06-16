@@ -13,11 +13,12 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.67 2009/04/08 08:48:08 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.68 2009/06/16 12:47:33 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
 #include <assert.h>
+#include <cstdio>
 #include <iostream>
 #include <iomanip>
 
@@ -331,7 +332,7 @@ bool SPxBasis::readBasis(
       p_colNames->reMax(nCols);
       for (int j = 0; j < nCols; ++j)
       {
-         snprintf(name, 255, "x%d_", j);
+         std::snprintf(name, 255, "x%d_", j);
          DataKey key = theLP->colId(j);
          p_colNames->add(key, name);
       }
@@ -347,7 +348,7 @@ bool SPxBasis::readBasis(
       p_rowNames->reMax(nRows);
       for (int i = 0; i < nRows; ++i)
       {
-         snprintf(name, 255, "C%d_", i);
+         std::snprintf(name, 255, "C%d_", i);
          DataKey key = theLP->rowId(i);
          p_rowNames->add(key, name);
       }
@@ -474,7 +475,7 @@ static const char* getRowName(
       if (rnames->has(key))
          return (*rnames)[key];
    }
-   sprintf(buf, "C%d_", idx);
+   std::sprintf(buf, "C%d_", idx);
    
    return buf;
 }
@@ -500,7 +501,7 @@ static const char* getColName(
       if (cnames->has(key))
          return (*cnames)[key];
    }
-   sprintf(buf, "x%d_", idx);
+   std::sprintf(buf, "x%d_", idx);
    
    return buf;
 }
