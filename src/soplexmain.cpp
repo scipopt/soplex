@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplexmain.cpp,v 1.12 2009/04/17 09:44:57 bzfgleix Exp $"
+#pragma ident "@(#) $Id: soplexmain.cpp,v 1.13 2009/06/16 09:38:44 bzfgleix Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -854,7 +854,6 @@ void print_solution_and_status(
 	 MSG_INFO1( spxout << "EEXAMP40 aborted due to cycling" << std::endl; )
       else
 	 MSG_INFO1( spxout << "Aborted due to cycling" << std::endl; )
-      assert( false ); // This should be an exception by now.
       break;
    case SPxSolver::ABORT_TIME:
       if ( checkMode )
@@ -879,7 +878,6 @@ void print_solution_and_status(
 	 MSG_INFO1( spxout << "EEXAMP39 basis is singular" << std::endl; )
       else
 	 MSG_INFO1( spxout << "Basis is singular" << std::endl; )
-      assert( false ); // This should be an exception by now.
       break;
    default:
       if ( checkMode )
