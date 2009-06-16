@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.68 2009/06/16 12:47:33 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.69 2009/06/16 17:11:00 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -631,22 +631,22 @@ void SPxBasis::change(
       if (!factorized)
          factorize();
       // relative fill too high ?
-      else if (Real(factor->memory()) > lastFill * Real(lastMem))
+      else if (Real(factor->memory()) > lastFill * Real(nzCount))
       {
          MSG_INFO3( spxout << "IBASIS04 fill factor triggers refactorization"
                               << " memory= " << factor->memory()
-                              << " lastMem= " << lastMem
+                              << " nzCount= " << nzCount
                               << " lastFill= " << lastFill
                               << std::endl; )
 
          factorize();
       }
       // absolute fill too high ?
-      else if (Real(factor->memory()) > nonzeroFactor * Real(nzCount))
+      else if (nzCount > lastNzCount)
       {
          MSG_INFO3( spxout << "IBASIS05 nonzero factor triggers refactorization"
-                              << " memory= " << factor->memory()
                               << " nzCount= " << nzCount
+                              << " lastNzCount= " << lastNzCount
                               << " nonzeroFactor= " << nonzeroFactor
                               << std::endl; )
          factorize();
@@ -720,6 +720,7 @@ void SPxBasis::factorize()
 
    lastMem    = factor->memory();
    lastFill   = fillFactor * Real(factor->memory()) / Real(nzCount > 0 ? nzCount : 1);
+   lastNzCount = int(nonzeroFactor * Real(nzCount > 0 ? nzCount : 1));
    factorized = true;
 }
 
@@ -893,6 +894,7 @@ SPxBasis::SPxBasis(const SPxBasis& old)
    , iterCount(old.iterCount)
    , nzCount(old.nzCount)
    , lastFill(old.lastFill)
+   , lastNzCount(old.lastNzCount)
    , lastin(old.lastin)
    , lastout(old.lastout)
    , lastidx(old.lastidx)
@@ -924,6 +926,7 @@ SPxBasis& SPxBasis::operator=(const SPxBasis& rhs)
       iterCount     = rhs.iterCount;
       nzCount       = rhs.nzCount;
       lastFill      = rhs.lastFill;
+      lastNzCount   = rhs.lastNzCount;
       lastin        = rhs.lastin;
       lastout       = rhs.lastout;
       lastidx       = rhs.lastidx;

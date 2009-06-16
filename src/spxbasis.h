@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.56 2009/04/07 14:58:52 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.57 2009/06/16 17:11:00 bzfgleix Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -380,6 +380,7 @@ protected:
    int    nzCount;       ///< number of nonzeros in basis matrix
    int    lastMem;       ///< memory needed after last fresh factorization
    Real   lastFill;      ///< fill ratio that occured during last factorization
+   int    lastNzCount;   ///< number of nonzeros in basis matrix after last fresh factorization
 
    SPxId  lastin;        ///< lastEntered(): variable entered the base last
    SPxId  lastout;       ///< lastLeft(): variable left the base last
