@@ -16,6 +16,8 @@ Current version
   lost. This removes a large increase of the use of memory as tested
   in tests/testMemory.cpp.
 
+- Corrected bug in formulas for triggering refactorizations after
+  increased relative/absolute fill.
 
 #----------------------------------------------------------------
 
