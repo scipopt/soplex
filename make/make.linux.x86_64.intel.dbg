@@ -1,8 +1,8 @@
-#--- $Id: make.linux.x86_64.intel.dbg,v 1.1 2008/09/29 08:39:33 bzfviger Exp $
-CXX	=	icc
+#--- $Id: make.linux.x86_64.intel.dbg,v 1.2 2009/06/27 23:50:00 bzfwinkm Exp $
+CXX	=	icpc
 CPPFLAGS=	-Isrc
-CXXFLAGS=	-g -ansi -mp -w2 \
-		-wd279,383,444,810,981,1572 -par_report0 -vec_report0
+CXXFLAGS=	-g -ansi -w2 \
+		-wd279,383,444,810,981,1572 -par_report0 -vec_report0 -fp-model extended
 LDFLAGS	=	-lm -lstdc++ -static
 ARFLAGS	=	crs
 RANLIB	=	true
