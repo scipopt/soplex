@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.40 2009/02/20 01:06:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.41 2009/07/17 11:01:45 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -226,7 +226,6 @@ void SPxSteepPR::left4(int n, SPxId id)
       Real        beta_q        = thesolver->coPvec().delta().length2() * rhov_1 * rhov_1;
 
       //TK: I gave the 0.5 extra, because I am not sure how hard this assert is.
-      ASSERT_WARN( "WSTEEP04", fabs(rhoVec[n]) >= theeps * 0.5 );
 #ifndef NDEBUG
       if (fabs(rhoVec[n]) < theeps * 0.5)
       {
@@ -234,6 +233,8 @@ void SPxSteepPR::left4(int n, SPxId id)
                            << rhoVec[n] << " with smaller absolute value than 0.5*theeps = " << 0.5*theeps << std::endl; )
       }
 #endif  // NDEBUG
+      if (fabs(rhoVec[n]) < theeps * 0.5)
+         throw SPxStatusException("WSTEEP04 Condition 'fabs(rhoVec[n]) >= theeps * 0.5' violated");
 
       //  Update #coPenalty# vector
       const IdxSet& rhoIdx = thesolver->fVec().idx();
