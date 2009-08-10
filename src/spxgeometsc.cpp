@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeometsc.cpp,v 1.18 2009/02/20 01:06:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxgeometsc.cpp,v 1.19 2009/08/10 15:02:06 bzfgleix Exp $"
 
 /**@file  spxgeometsc.cpp
  * @brief Geometric mean row/column scaling.
@@ -35,6 +35,23 @@ SPxGeometSC::SPxGeometSC(int maxIters, Real minImpr, Real goodEnough)
    , m_minImprovement(minImpr)
    , m_goodEnoughRatio(goodEnough)
 {}
+
+SPxGeometSC::SPxGeometSC(const SPxGeometSC& old)
+   : SPxScaler(old)
+   , m_maxIterations(old.m_maxIterations)
+   , m_minImprovement(old.m_minImprovement)
+   , m_goodEnoughRatio(old.m_goodEnoughRatio)
+{}
+
+SPxGeometSC& SPxGeometSC::operator=(const SPxGeometSC& rhs)
+{
+   if (this != &rhs)
+   {
+      SPxScaler::operator=(rhs);
+   }
+
+   return *this;
+}
 
 Real SPxGeometSC::computeScale(Real mini, Real maxi) const
 {

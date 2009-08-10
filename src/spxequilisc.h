@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxequilisc.h,v 1.10 2009/02/20 01:06:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxequilisc.h,v 1.11 2009/08/10 15:02:05 bzfgleix Exp $"
 
 /**@file  spxequilisc.h
  * @brief LP euilibrium scaling.
@@ -43,9 +43,18 @@ public:
    //@{
    /// default constructor (this scaler makes no use of inherited member m_colFirst)
    explicit SPxEquiliSC(bool doBoth = true);
+   /// copy constructor
+   SPxEquiliSC(const SPxEquiliSC& old);
+   /// assignment operator
+   SPxEquiliSC& operator=(const SPxEquiliSC& );
    /// destructor
    virtual ~SPxEquiliSC()
    {}
+   /// clone function for polymorphism
+   inline virtual SPxScaler* clone() const
+   {
+      return new SPxEquiliSC(*this);
+   }
    //@}
 
    //-------------------------------------

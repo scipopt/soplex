@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxgeometsc.h,v 1.10 2009/02/20 01:06:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxgeometsc.h,v 1.11 2009/08/10 15:02:06 bzfgleix Exp $"
 
 /**@file  spxgeometsc.h
  * @brief LP geometric mean scaling.
@@ -60,9 +60,18 @@ public:
    //@{
    /// default constructor (this scaler makes no use of inherited members m_colFirst and m_doBoth)
    explicit SPxGeometSC(int maxIters = 8, Real minImpr = 0.85, Real goodEnough = 1e3);
+   /// copy constructor
+   SPxGeometSC(const SPxGeometSC& old);
+   /// assignment operator
+   SPxGeometSC& operator=(const SPxGeometSC& );
    /// destructor
    virtual ~SPxGeometSC()
    {}
+   /// clone function for polymorphism
+   inline virtual SPxScaler* clone() const
+   {
+      return new SPxGeometSC(*this);
+   }
    //@}
 
    //-------------------------------------

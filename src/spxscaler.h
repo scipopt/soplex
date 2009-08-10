@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscaler.h,v 1.11 2009/02/20 01:06:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxscaler.h,v 1.12 2009/08/10 15:02:05 bzfgleix Exp $"
 
 /**@file  spxscaler.h
  * @brief LP scaling base class.
@@ -78,8 +78,14 @@ public:
    //@{
    /// constructor
    explicit SPxScaler(const char* name, bool colFirst = false, bool doBoth = true);
+   /// copy constructor
+   SPxScaler(const SPxScaler& );
+   /// assignment operator
+   SPxScaler& operator=(const SPxScaler& );
    /// destructor.
    virtual ~SPxScaler();
+   /// clone function for polymorphism
+   virtual SPxScaler* clone() const = 0;
    //@}
 
    //-------------------------------------
@@ -129,17 +135,6 @@ public:
    virtual bool isConsistent() const;
    //@}
 #endif
-
-private:
-
-   //-------------------------------------
-   /**@name Blocked */
-   //@{
-   /// copy constructor
-   SPxScaler(const SPxScaler& );
-   /// assignment operator
-   SPxScaler& operator=(const SPxScaler& );
-   //@}
 
 };
 } // namespace soplex

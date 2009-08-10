@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxequilisc.cpp,v 1.17 2009/02/20 01:06:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxequilisc.cpp,v 1.18 2009/08/10 15:02:06 bzfgleix Exp $"
 
 /**@file  spxequilisc.cpp
  * @brief Equilibrium row/column scaling.
@@ -33,6 +33,20 @@ static const char* makename(bool doBoth)
 SPxEquiliSC::SPxEquiliSC(bool doBoth)
    : SPxScaler(makename(doBoth), false, doBoth)
 {}
+
+SPxEquiliSC::SPxEquiliSC(const SPxEquiliSC& old)
+   : SPxScaler(old)
+{}
+
+SPxEquiliSC& SPxEquiliSC::operator=(const SPxEquiliSC& rhs)
+{
+   if(this != &rhs)
+   {
+      SPxScaler::operator=(rhs);
+   }
+
+   return *this;
+}
 
 Real SPxEquiliSC::computeScale(Real /*mini*/, Real maxi) const
 {

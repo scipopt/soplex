@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxscaler.cpp,v 1.15 2009/02/20 01:06:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxscaler.cpp,v 1.16 2009/08/10 15:02:05 bzfgleix Exp $"
 
 /**@file  spxscaler.cpp
  * @brief LP scaling base class.
@@ -54,7 +54,6 @@ SPxScaler::SPxScaler(
    assert(SPxScaler::isConsistent());
 }
 
-/* does anybody need this?
 SPxScaler::SPxScaler(const SPxScaler& old)
    : m_name(old.m_name)
    , m_colscale(old.m_colscale)
@@ -64,14 +63,12 @@ SPxScaler::SPxScaler(const SPxScaler& old)
 {
    assert(SPxScaler::isConsistent());
 }
-*/
 
 SPxScaler::~SPxScaler()
 {
    m_name = 0;
 }   
 
-/* does anybody need this?
 SPxScaler& SPxScaler::operator=(const SPxScaler& rhs)
 {
    if (this != &rhs)
@@ -86,7 +83,7 @@ SPxScaler& SPxScaler::operator=(const SPxScaler& rhs)
    }
    return *this;
 }
-*/
+
 
 const char* SPxScaler::getName() const
 {
