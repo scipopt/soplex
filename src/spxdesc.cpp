@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdesc.cpp,v 1.20 2009/02/20 01:06:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxdesc.cpp,v 1.21 2009/08/10 14:45:56 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -44,6 +44,8 @@ SPxBasis::Desc::Desc(const SPxSolver& base)
       stat   = &colstat;
       costat = &rowstat;
    }
+
+   assert(Desc::isConsistent());
 }
 
 SPxBasis::Desc::Desc(const Desc& old)
@@ -64,6 +66,8 @@ SPxBasis::Desc::Desc(const Desc& old)
       stat   = &colstat;
       costat = &rowstat;
    }
+
+   assert(Desc::isConsistent());
 }
 
 SPxBasis::Desc& SPxBasis::Desc::operator=(const SPxBasis::Desc& rhs)
@@ -87,6 +91,8 @@ SPxBasis::Desc& SPxBasis::Desc::operator=(const SPxBasis::Desc& rhs)
          stat   = &colstat;
          costat = &rowstat;
       }
+
+      assert(Desc::isConsistent());
    }
    return *this;
 }

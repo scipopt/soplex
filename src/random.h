@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: random.h,v 1.14 2009/02/20 01:06:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: random.h,v 1.15 2009/08/10 14:45:56 bzfgleix Exp $"
 
 /**@file  random.h
  * @brief Random numbers.
@@ -150,6 +150,8 @@ public:
       if (p_seed < p_min || p_seed > p_max)
          p_seed = (p_min + p_max) / 2;
       setSeed(p_seed);
+
+      assert(isConsistent());
    }
    /// destructor
    ~Random() 
