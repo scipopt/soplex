@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.63 2009/08/10 14:40:17 bzfgleix Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.64 2009/08/10 14:44:09 bzfgleix Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -779,11 +779,10 @@ SLUFactor::SLUFactor()
 SLUFactor::SLUFactor(const SLUFactor& old)
    : SLinSolver( old )
    , CLUFactor()
+   , vec(1)     // we don't need to copy it, because they are temporary vectors
+   , ssvec(1)   // we don't need to copy it, because they are temporary vectors
    , eta (old.eta)
    , forest(old.forest)
-   // we don't need to copy them, because they are temporary vectors
-   , vec(1)
-   , ssvec(1)
 {
    row.perm    = 0;
    row.orig    = 0;
