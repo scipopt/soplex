@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idlist.h,v 1.24 2009/02/20 01:06:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: idlist.h,v 1.25 2009/08/10 13:53:50 bzfgleix Exp $"
 
 /**@file  idlist.h
  * @brief Generic Real linked list.
@@ -342,7 +342,9 @@ public:
    explicit
    IdList(T* pfirst = 0, T* plast = 0)
       : IsList<T>(pfirst, plast)
-   {}
+   {
+      assert(isConsistent());  
+   }
 
    //@}
 };

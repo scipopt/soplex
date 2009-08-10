@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dvector.h,v 1.18 2009/02/20 01:06:35 bzfgleix Exp $"
+#pragma ident "@(#) $Id: dvector.h,v 1.19 2009/08/10 13:52:34 bzfgleix Exp $"
 
 /**@file  dvector.h
  * @brief Dynamic vectors.
@@ -179,6 +179,9 @@ public:
       if (vec.dim() != dim())
          reDim(vec.dim());
       Vector::operator=(vec);
+      
+      assert(isConsistent());
+
       return *this;
    }
    /// assignment operator.
@@ -189,6 +192,8 @@ public:
          if (vec.dim() != dim())
             reDim(vec.dim());
          Vector::operator=(vec);
+
+         assert(isConsistent());
       }
       return *this;
    }
@@ -198,6 +203,8 @@ public:
       if (vec.dim() != dim())
          reDim(vec.dim()); 
       Vector::operator=(vec);
+
+      assert(isConsistent());
 
       return *this;
    }

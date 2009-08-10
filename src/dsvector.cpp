@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dsvector.cpp,v 1.21 2009/02/20 01:06:35 bzfgleix Exp $"
+#pragma ident "@(#) $Id: dsvector.cpp,v 1.22 2009/08/10 13:52:34 bzfgleix Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -34,6 +34,8 @@ DSVector::DSVector(int n)
    : theelem( 0 )
 {
    allocMem((n < 1) ? 2 : n + 1);
+
+   assert(DSVector::isConsistent());
 }
 
 DSVector::~DSVector()
@@ -47,6 +49,8 @@ DSVector::DSVector(const Vector& vec)
 {
    allocMem((vec.dim() < 1) ? 2 : vec.dim() + 1);
    *this = vec;
+
+   assert(DSVector::isConsistent());
 }
 
 DSVector::DSVector(const SVector& old)
@@ -54,6 +58,8 @@ DSVector::DSVector(const SVector& old)
 {
    allocMem(old.size() + 1);
    SVector::operator= ( old );
+
+   assert(DSVector::isConsistent());
 }
 
 DSVector::DSVector(const SSVector& old)
@@ -61,6 +67,8 @@ DSVector::DSVector(const SSVector& old)
 {
    allocMem(old.size() + 1);
    SVector::operator= ( old );
+
+   assert(DSVector::isConsistent());
 }
 
 DSVector::DSVector(const DSVector& old)
@@ -69,6 +77,8 @@ DSVector::DSVector(const DSVector& old)
 {
    allocMem(old.size() + 1);
    SVector::operator= ( old );
+
+   assert(DSVector::isConsistent());
 }
 
 DSVector& DSVector::operator=(const Vector& vec)
@@ -76,6 +86,9 @@ DSVector& DSVector::operator=(const Vector& vec)
    clear();
    setMax(vec.dim());
    SVector::operator=(vec);
+
+   assert(DSVector::isConsistent());
+
    return *this;
 }
 

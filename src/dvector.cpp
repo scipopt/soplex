@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dvector.cpp,v 1.20 2009/02/20 01:06:35 bzfgleix Exp $"
+#pragma ident "@(#) $Id: dvector.cpp,v 1.21 2009/08/10 13:52:34 bzfgleix Exp $"
 
 
 #include "spxdefines.h"
@@ -156,6 +156,8 @@ DVector::DVector(const Vector& old)
    spx_alloc(mem, memsize);
    val = mem;
    *this = old;
+
+   assert(DVector::isConsistent());
 }
 
 DVector::DVector(const DVector& old)
@@ -167,6 +169,8 @@ DVector::DVector(const DVector& old)
    spx_alloc(mem, memsize);
    val = mem;
    *this = old;
+
+   assert(DVector::isConsistent());
 }
 
 DVector::DVector(int p_dim)
@@ -181,6 +185,8 @@ DVector::DVector(int p_dim)
        for(int i = 0; i < memsize; ++i)
            mem[i] = 0;
    */
+
+   assert(DVector::isConsistent());
 }
 
 DVector::~DVector()

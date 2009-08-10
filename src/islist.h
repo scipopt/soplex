@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: islist.h,v 1.20 2009/02/20 01:06:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: islist.h,v 1.21 2009/08/10 13:53:50 bzfgleix Exp $"
 
 /**@file  islist.h
  * @brief Generic single linked list.
@@ -424,6 +424,8 @@ public:
          assert(plast != 0);
          assert(find(plast));
       }
+
+      assert(isConsistent());
    }
    //@}
 };
