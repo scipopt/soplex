@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datahashtable.h,v 1.26 2009/02/20 01:06:35 bzfgleix Exp $"
+#pragma ident "@(#) $Id: datahashtable.h,v 1.27 2009/08/10 13:46:25 bzfgleix Exp $"
 
 /**@file  datahashtable.h
  * @brief Generic hash table for data objects.
@@ -278,6 +278,32 @@ public:
       m_hashsize = (hashsize < 1) ? autoHashSize() : hashsize;
 
       assert(m_memfactor > 1.0);
+      assert(isConsistent());
+   }
+
+   /// assignment operator.
+   DataHashTable& operator=(const DataHashTable& base)
+   {
+      m_elem = base.m_elem;
+      m_hashfun = base.hashfun;
+      m_memfactor = base.m_memfactor;
+      m_used = base.m_used;
+      m_hashsize = base.m_hashsize;
+
+      assert(m_memfactor > 1.0);
+      assert(isConsistent());
+   }
+
+   /// copy constructor.
+   DataHashTable(const DataHashTable& base)
+      : m_elem(base.m_elem)
+      , m_hashfun(base.m_hashfun)
+      , m_memfactor(base.m_memfactor)
+      , m_used(base.m_used)
+      , m_hashsize(base.hashsize)
+   {
+      assert(m_memfactor > 1.0);
+      assert(isConsistent());
    }
    //@}
 
@@ -359,14 +385,6 @@ private:
    }
    //@}
 
-   //-----------------------------------
-   /**@name Blocked */
-   //@{
-   /// assignment operator is not implemented.
-   DataHashTable& operator=(const DataHashTable& base);
-   /// copy constructor is not implemented.
-   DataHashTable(const DataHashTable& base);
-   //@}
 };
 } // namespace soplex
 #endif   // _DATAHAHSTABLE_H_
