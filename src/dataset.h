@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataset.h,v 1.44 2009/02/20 01:06:35 bzfgleix Exp $"
+#pragma ident "@(#) $Id: dataset.h,v 1.45 2009/08/10 13:46:48 bzfgleix Exp $"
 
 /**@file  dataset.h
  * @brief Set of data objects.
@@ -540,6 +540,8 @@ public:
          spx_free(theitem);
          throw x;
       }
+
+      assert(isConsistent());
    }
    
    /// copy constructor.
@@ -567,6 +569,8 @@ public:
 
       memcpy(theitem, old.theitem, themax * sizeof(*theitem));
       memcpy(thekey,  old.thekey,  themax * sizeof(*thekey));
+
+      assert(isConsistent());
    }
 
    /// assignment operator.
@@ -605,6 +609,8 @@ public:
          }
          thenum = rhs.thenum;
          thesize = rhs.thesize;
+
+         assert(isConsistent());
       }
       return *this;
    }

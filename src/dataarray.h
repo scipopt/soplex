@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataarray.h,v 1.29 2009/02/20 01:06:35 bzfgleix Exp $"
+#pragma ident "@(#) $Id: dataarray.h,v 1.30 2009/08/10 13:44:16 bzfgleix Exp $"
 
 /**@file  dataarray.h
  * @brief Save arrays of data objects.
@@ -265,6 +265,8 @@ public:
       {
          reSize(rhs.size());
          memcpy(data, rhs.data, size() * sizeof(T));
+
+         assert(isConsistent());
       }
       return *this;
    }
