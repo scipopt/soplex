@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idxset.h,v 1.14 2009/02/20 01:06:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: idxset.h,v 1.15 2009/08/10 14:13:28 bzfgleix Exp $"
 
 /**@file  idxset.h
  * @brief Set of indices.
@@ -22,6 +22,7 @@
 #define _IDXSET_H_
 
 #include "spxdefines.h"
+#include "spxalloc.h"
 #include <assert.h>
 
 namespace soplex
@@ -64,6 +65,7 @@ protected:
    int  num;           ///< number of used indices
    int  len;           ///< length of array \ref soplex::IdxSet::idx "idx"
    int* idx;           ///< array of indices
+   bool freeArray;     ///< true iff \idx should be freed inside of this object
    //@}
 
 public:
@@ -78,7 +80,7 @@ public:
        indices in \p imem.
     */
    IdxSet(int n, int imem[], int l = 0)
-      : num(l), len(n), idx(imem)
+      : num(l), len(n), idx(imem), freeArray(false)
    {
       assert(isConsistent());
    }
@@ -89,9 +91,16 @@ public:
        the default constructor.
    */
    IdxSet()
-      : num(0), len(0), idx(0)
+      : num(0), len(0), idx(0), freeArray(false)
    {
       assert(isConsistent());
+   }
+   
+   /// destructor.
+   ~IdxSet()
+   {
+      if(freeArray)
+         spx_free(idx);
    }
 
    /// assignment operator.
@@ -100,6 +109,8 @@ public:
        enough index memory.
     */
    IdxSet& operator=(const IdxSet& set);
+   /// copy constructor.
+   IdxSet(const IdxSet&);
    //@}
 
    //---------------------------------------
@@ -189,14 +200,6 @@ public:
 
 #endif
 
-private:
-
-   //---------------------------------------
-   /**@name Blocked */
-   //@{
-   /// blocked copy constructor.
-   IdxSet(const IdxSet&);
-   //@}
 };
 
 } // namespace soplex

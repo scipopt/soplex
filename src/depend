@@ -62,7 +62,8 @@ $(LIBOBJDIR)/forest.o: src/forest.cpp src/spxdefines.h src/clufactor.h \
   src/slinsolver.h src/svector.h src/vector.h src/ssvector.h \
   src/dvector.h src/didxset.h src/idxset.h src/spxalloc.h src/spxout.h \
   src/exceptions.h src/dsvector.h src/timer.h src/cring.h
-$(LIBOBJDIR)/idxset.o: src/idxset.cpp src/idxset.h src/spxdefines.h src/message.h
+$(LIBOBJDIR)/idxset.o: src/idxset.cpp src/idxset.h src/spxdefines.h src/spxalloc.h \
+  src/spxout.h src/exceptions.h src/message.h
 $(LIBOBJDIR)/leave.o: src/leave.cpp src/spxdefines.h src/spxsolver.h src/timer.h \
   src/spxlp.h src/datakey.h src/spxid.h src/dvector.h src/vector.h \
   src/svector.h src/svset.h src/dataset.h src/dataarray.h src/spxalloc.h \

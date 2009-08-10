@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idxset.cpp,v 1.13 2009/02/20 01:06:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: idxset.cpp,v 1.14 2009/08/10 14:13:28 bzfgleix Exp $"
 
 #include "idxset.h"
 #include "message.h"
@@ -74,13 +74,39 @@ IdxSet& IdxSet::operator=(const IdxSet& rhs)
    {
       assert(max() >= rhs.size());
 
+      if (freeArray)
+         spx_free(idx);
+
+      int sizeOfIdx = sizeof(rhs.idx)/sizeof(int);
+      spx_alloc(idx, sizeOfIdx);
+
       for (num = 0; num < rhs.size(); num++)
          idx[num] = rhs.idx[num];
+
+      freeArray = true;
    }
+
    assert(size() == rhs.size());
    assert(size() <= max());
+   assert(isConsistent());
 
    return *this;
+}
+
+IdxSet::IdxSet(const IdxSet& old)
+   : len(old.len)
+{
+   int sizeOfIdx = sizeof(old.idx)/sizeof(int);
+   spx_alloc(idx, sizeOfIdx);
+
+   for (num = 0; num < old.num; num++)
+      idx[num] = old.idx[num];
+
+   freeArray = true;
+   
+   assert(size() == old.size());
+   assert(size() <= max());
+   assert(isConsistent());
 }
 
 #ifndef NO_CONSISTENCY_CHECKS
