@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.h,v 1.32 2009/05/18 18:28:35 bzfpfets Exp $"
+#pragma ident "@(#) $Id: svset.h,v 1.33 2009/08/10 14:51:46 bzfgleix Exp $"
 
 /**@file  svset.h
  * @brief Set of sparse vectors.
@@ -470,7 +470,9 @@ public:
          , set ((pmax > 0) ? pmax : 8)
          , possiblyUnusedMem (0)
          , factor (pfac)
-   {}
+   {
+      assert(isConsistent());
+   }
    /// destructor
    ~SVSet()
    {}

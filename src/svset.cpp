@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svset.cpp,v 1.32 2009/05/18 18:27:56 bzfpfets Exp $"
+#pragma ident "@(#) $Id: svset.cpp,v 1.33 2009/08/10 14:51:46 bzfgleix Exp $"
 
 #include <assert.h>
 
@@ -369,9 +369,11 @@ SVSet& SVSet::operator=(const SVSet& rhs)
 
 SVSet::SVSet(const SVSet& old)
    : DataArray < SVector::Element > ()
+   , possiblyUnusedMem (old.possiblyUnusedMem)
    , factor (old.factor)
 {
    *this = old;
+   assert(SVSet::isConsistent());
 }
 } // namespace soplex
 
