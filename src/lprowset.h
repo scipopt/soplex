@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprowset.h,v 1.32 2009/02/20 01:06:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: lprowset.h,v 1.33 2009/08/10 14:34:50 bzfgleix Exp $"
 
 /**@file  lprowset.h
  * @brief Set of LP columns.
@@ -393,7 +393,9 @@ public:
    explicit
    LPRowSet(int pmax = -1, int pmemmax = -1)
       : SVSet(pmax, pmemmax), left(0), right(0)
-   { }
+   { 
+      assert(isConsistent());
+   }
 
    /// assignment operator.
    LPRowSet& operator=(const LPRowSet& rs)
@@ -403,6 +405,8 @@ public:
          SVSet::operator=(rs);
          left  = rs.left;
          right = rs.right;
+
+         assert(isConsistent());
       }
       return *this;
    }
@@ -412,7 +416,9 @@ public:
       : SVSet( rs )
       , left ( rs.left )
       , right( rs.right )
-   {}
+   {
+      assert(isConsistent());
+   }
 
    /// destructor
    ~LPRowSet()

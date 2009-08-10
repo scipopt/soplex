@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcolset.h,v 1.26 2009/02/20 01:06:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: lpcolset.h,v 1.27 2009/08/10 14:34:49 bzfgleix Exp $"
 
 /**@file  lpcolset.h
  * @brief Set of LP columns.
@@ -384,7 +384,9 @@ public:
    explicit
    LPColSet(int pmax = -1, int pmemmax = -1)
       : SVSet(pmax, pmemmax), low(0), up(0), object(0)
-   { }
+   { 
+      assert(isConsistent());
+   }
 
    /// assignment operator.
    LPColSet& operator=(const LPColSet& rs)
@@ -395,6 +397,8 @@ public:
          low = rs.low;
          up = rs.up;
          object = rs.object;
+
+         assert(isConsistent());
       }
       return *this;
    }
@@ -404,7 +408,9 @@ public:
       , low   ( rs.low )
       , up    ( rs.up )
       , object( rs.object )
-   {}
+   {
+      assert(isConsistent());
+   }
 
    /// destructor
    ~LPColSet()
