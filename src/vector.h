@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector.h,v 1.23 2009/02/20 01:06:38 bzfgleix Exp $"
+#pragma ident "@(#) $Id: vector.h,v 1.24 2009/08/10 14:57:54 bzfgleix Exp $"
 
 /**@file  vector.h
  * @brief Dense vector for linear algebra.
@@ -111,6 +111,7 @@ public:
       , val(p_val)
    {
       assert(dimen >= 0);
+      assert(isConsistent());
    }
    /// Assignment operator.
    Vector& operator=(const Vector& vec);

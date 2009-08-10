@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector.cpp,v 1.16 2009/02/20 01:06:38 bzfgleix Exp $"
+#pragma ident "@(#) $Id: vector.cpp,v 1.17 2009/08/10 14:57:54 bzfgleix Exp $"
 
 #include <iostream>
 
@@ -31,6 +31,8 @@ Vector& Vector::operator=(const Vector& vec)
    {
       assert(dim() == vec.dim());
       memcpy(val, vec.val, dimen*sizeof(Real));
+
+      assert(isConsistent());
    }
    return *this;
 }
@@ -39,6 +41,9 @@ Vector& Vector::operator=(const SVector& vec)
 {
    clear();
    assign(vec);
+
+   assert(isConsistent());
+
    return *this;
 }
 
@@ -46,6 +51,9 @@ Vector& Vector::assign(const SVector& psv)
 {
    for (int i = psv.size(); i-- > 0;)
       val[psv.index(i)] = psv.value(i);
+
+   assert(isConsistent());
+      
    return *this;
 }
 

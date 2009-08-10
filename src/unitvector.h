@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: unitvector.h,v 1.14 2009/02/20 01:06:38 bzfgleix Exp $"
+#pragma ident "@(#) $Id: unitvector.h,v 1.15 2009/08/10 14:57:54 bzfgleix Exp $"
 
 /**@file  unitvector.h
  * @brief Sparse vector \f$e_i\f$.
@@ -76,6 +76,8 @@ public:
       : SVector(2, themem)
    {
       add(i, 1.0);
+
+      assert(isConsistent());
    }
    ///  copy constructor
    UnitVector(const UnitVector& rhs)
@@ -83,6 +85,8 @@ public:
    {
       themem[0] = rhs.themem[0];
       themem[1] = rhs.themem[1];
+
+      assert(isConsistent());
    }
    /// assignment
    UnitVector& operator=(const UnitVector& rhs)
@@ -91,6 +95,8 @@ public:
       {
          themem[0] = rhs.themem[0];
          themem[1] = rhs.themem[1];
+
+         assert(isConsistent());
       }
       return *this;
    }
