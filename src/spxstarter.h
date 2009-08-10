@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxstarter.h,v 1.13 2009/02/20 01:06:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxstarter.h,v 1.14 2009/08/10 15:09:13 bzfgleix Exp $"
 
 
 /**@file  spxstarter.h
@@ -60,11 +60,27 @@ public:
    explicit SPxStarter(const char* name)
       : m_name(name)
    {}
+   /// copy constructor
+   SPxStarter( const SPxStarter& old)
+      : m_name(old.m_name)
+   {}
+   /// assignment operator
+   SPxStarter& operator=( const SPxStarter& rhs)
+   {
+      if(this != &rhs)
+      {
+         m_name = rhs.m_name;
+      }
+
+      return *this;
+   }
    /// destructor.
    virtual ~SPxStarter()
    {
       m_name = 0;
    }
+   /// clone function for polymorphism
+   virtual SPxStarter* clone()const = 0;
    //@}
 
    //-------------------------------------
@@ -93,19 +109,16 @@ public:
    //@}
 #endif
 
-   //-------------------------------------
+private:
+
+   //------------------------------------
    /**@name Blocked */
    //@{
-   /// empty constructor
+   /// we have no default constructor.
    SPxStarter();
-   /// copy constructor
-   SPxStarter( const SPxStarter& );
-   /// assignment operator
-   SPxStarter& operator=( const SPxStarter& );
    //@}
+
 };
-
-
 } // namespace soplex
 #endif // _SPXDSTARTER_H_
 

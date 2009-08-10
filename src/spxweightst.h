@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.h,v 1.20 2009/02/20 01:06:38 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxweightst.h,v 1.21 2009/08/10 15:09:13 bzfgleix Exp $"
 
 
 /**@file  spxweightst.h
@@ -111,13 +111,74 @@ public:
    /// default constructor.
    SPxWeightST()
       : SPxStarter("Weight")
-   {}
+   {
+      assert(isConsistent());
+   }
+   /// copy constructor
+   SPxWeightST( const SPxWeightST& old)
+      : SPxStarter(old)
+      , forbidden(old.forbidden)
+      , rowWeight(old.rowWeight)
+      , colWeight(old.colWeight)
+      , rowRight(old.rowRight)
+      , colUp(old.colUp)
+   {
+      if (old.weight == &old.colWeight)
+      {
+         weight   = &colWeight;
+         coWeight = &rowWeight;
+      }
+      else if (old.weight == &old.rowWeight)
+      {
+         weight   = &rowWeight;
+         coWeight = &colWeight;
+      }
+      else  // old.weight and old.coWeight are not set correctly, do nothing.
+      {}
+
+      assert(isConsistent());
+   }
+   /// assignment operator
+   SPxWeightST& operator=( const SPxWeightST& rhs)
+   {
+      if(this != &rhs)
+      {
+         SPxStarter::operator=(rhs);
+         forbidden = rhs.forbidden;
+         rowWeight = rhs.rowWeight;
+         colWeight = rhs.colWeight;
+         rowRight = rhs.rowRight;
+         colUp = rhs.colUp;
+         
+         if (rhs.weight == &rhs.colWeight)
+         {
+            weight   = &colWeight;
+            coWeight = &rowWeight;
+         }
+         else if (rhs.weight == &rhs.rowWeight)
+         {
+            weight   = &rowWeight;
+            coWeight = &colWeight;
+         }
+         else  // old.weight and old.coWeight are not set correctly, do nothing.
+         {}
+
+         assert(isConsistent());
+      }
+
+      return *this;
+   }
    /// destructor.
    virtual ~SPxWeightST()
    { 
       weight   = 0; 
       coWeight = 0; 
    }  
+   /// clone function for polymorphism
+   inline virtual SPxStarter* clone() const
+   {
+      return new SPxWeightST(*this);
+   }
    //@}
 
    //-----------------------------------
@@ -136,16 +197,6 @@ public:
 #endif
    //@}
 
-private:
-
-   //-------------------------------------
-   /**@name Blocked */
-   //@{
-   /// copy constructor
-   SPxWeightST( const SPxWeightST& );
-   /// assignment operator
-   SPxWeightST& operator=( const SPxWeightST& );
-   //@}
 };
 
 } // namespace soplex

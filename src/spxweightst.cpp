@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightst.cpp,v 1.31 2009/02/20 01:06:38 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxweightst.cpp,v 1.32 2009/08/10 15:09:13 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 //#define TEST 1
@@ -37,8 +37,8 @@ bool SPxWeightST::isConsistent() const
    return rowWeight.isConsistent()
           && colWeight.isConsistent()
           && rowRight.isConsistent()
-          && colUp.isConsistent()
-          && SPxStarter::isConsistent();
+          && colUp.isConsistent();
+          // && SPxStarter::isConsistent();   // not yet implemented
 }
 #endif
 

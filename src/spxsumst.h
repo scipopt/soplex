@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsumst.h,v 1.11 2009/02/20 01:06:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsumst.h,v 1.12 2009/08/10 15:09:13 bzfgleix Exp $"
 
 
 /**@file  spxsumst.h
@@ -57,21 +57,34 @@ public:
    {
       m_name = "Sum";
    }
+   /// copy constructor
+   SPxSumST( const SPxSumST& old)
+      : SPxVectorST(old)
+   {
+      assert(isConsistent());
+   }
+   /// assignment operator
+   SPxSumST& operator=( const SPxSumST& rhs)
+   {
+      if(this != &rhs)
+      {
+         SPxVectorST::operator=(rhs);
+
+         assert(isConsistent());
+      }
+
+      return *this;
+   }
    /// destructor.
    virtual ~SPxSumST()
    {}  
+   /// clone function for polymorphism
+   inline virtual SPxStarter* clone() const
+   {
+      return new SPxSumST(*this);
+   }
    //@}
 
-private:
-
-   //-------------------------------------
-   /**@name Blocked */
-   //@{
-   /// copy constructor
-   SPxSumST( const SPxSumST& );
-   /// assignment operator
-   SPxSumST& operator=( const SPxSumST& );
-   //@}
 };
 
 } // namespace soplex

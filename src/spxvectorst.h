@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvectorst.h,v 1.11 2009/02/20 01:06:38 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxvectorst.h,v 1.12 2009/08/10 15:09:13 bzfgleix Exp $"
 
 /**@file  spxvectorst.h
  * @brief Solution vector based start basis.
@@ -81,9 +81,36 @@ public:
    {
       m_name = "Vector";
    }
+   /// copy constructor
+   SPxVectorST( const SPxVectorST& old)
+      : SPxWeightST(old)
+      , state(old.state)
+      , vec(old.vec)
+   {
+      assert(isConsistent());
+   }
+   /// assignment operator
+   SPxVectorST& operator=( const SPxVectorST& rhs)
+   {
+      if(this != &rhs)
+      {
+         SPxWeightST::operator=(rhs);
+         state = rhs.state;
+         vec = rhs.vec;
+
+         assert(isConsistent());
+      }
+
+      return *this;
+   }
    /// destructor.
    virtual ~SPxVectorST()
    {}  
+   /// clone function for polymorphism
+   inline virtual SPxStarter* clone() const
+   {
+      return new SPxVectorST(*this);
+   }
    //@}
 
    //-------------------------------------
@@ -103,14 +130,6 @@ public:
    }
    //@}
 
-   //-------------------------------------
-   /**@name Blocked */
-   //@{
-   /// copy constructor
-   SPxVectorST( const SPxVectorST& );
-   /// assignment operator
-   SPxVectorST& operator=( const SPxVectorST& );
-   //@}
 };
 
 } // namespace soplex
