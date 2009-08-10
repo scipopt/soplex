@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.69 2009/06/16 17:11:00 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.70 2009/08/10 14:44:51 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -273,16 +273,26 @@ void SPxBasis::load(SPxSolver* lp)
    loadDesc(thedesc);
 }
 
-void SPxBasis::loadSolver(SLinSolver* p_solver)
+void SPxBasis::loadSolver(SLinSolver* p_solver, const bool destroy)
 {
    METHOD( "SPxBasis::loadSolver()" );
+
+   assert(!freeSlinSolver || factor != 0);
 
    MSG_INFO3( spxout << "IBASIS03 loading of Solver invalidates factorization" 
                         << std::endl; )
 
+
+   if(freeSlinSolver)
+   {
+      delete factor;
+      factor = 0;
+   }
+
    factor = p_solver;
    factorized = false;
    factor->clear();
+   freeSlinSolver = destroy;
 }
 
 
@@ -874,12 +884,17 @@ SPxBasis::SPxBasis()
    , nzCount (1)
    , minStab(0.0)
    , thestatus (NO_PROBLEM)
+   , freeSlinSolver(false)
 {
    METHOD( "SPxBasis::SPxBasis()" );
+
+   // info: is not consistent at this moment, e.g. because theLP == 0
 }
 
-/**@warning Do not change the LP or the SLinSolver object.
- *  Only pointers to those objects are copied.
+/**@warning Do not change the LP object.
+ *  Only pointer to that object is copied.
+ *  Hint: no problem, we use this function for copy
+ *   constructor of SPxSolver
  */
 SPxBasis::SPxBasis(const SPxBasis& old)
    : theLP(old.theLP)
@@ -903,14 +918,35 @@ SPxBasis::SPxBasis(const SPxBasis& old)
    , thedesc(old.thedesc)
 {
    METHOD( "SPxBasis::SPxBasis()" );
+
+   this->factor = old.factor->clone();
+   freeSlinSolver = true;
+
+   assert(SPxBasis::isConsistent());
 }
 
-/**@warning Do not change the LP or the SLinSolver object.
- *  Only pointers to those objects are copied.
+SPxBasis::~SPxBasis()
+{
+   METHOD( "SPxBasis::~SPxBasis()" );
+
+   assert(!freeSlinSolver || factor != 0);
+
+   if(freeSlinSolver)
+   {
+      delete factor;
+      factor = 0;
+   }
+}
+
+
+/**@warning  Note that we do not create a deep copy of the corresponding SPxSolver object.
+ *  Only the reference to that object is copied.
  */
 SPxBasis& SPxBasis::operator=(const SPxBasis& rhs)
 {
    METHOD( "SPxBasis::operator=()" );
+
+   assert(!freeSlinSolver || factor != 0);
 
    if (this != &rhs)
    {
@@ -918,7 +954,15 @@ SPxBasis& SPxBasis::operator=(const SPxBasis& rhs)
       theBaseId     = rhs.theBaseId;
       matrix        = rhs.matrix;
       matrixIsSetup = rhs.matrixIsSetup;
-      factor        = rhs.factor;
+
+      if(freeSlinSolver)
+      {
+         delete factor;
+         factor = 0;
+      }
+      factor = rhs.factor->clone();
+      freeSlinSolver = true;
+      
       factorized    = rhs.factorized;
       maxUpdates    = rhs.maxUpdates;
       nonzeroFactor = rhs.nonzeroFactor;
@@ -933,7 +977,10 @@ SPxBasis& SPxBasis::operator=(const SPxBasis& rhs)
       minStab       = rhs.minStab;
       thestatus     = rhs.thestatus;
       thedesc       = rhs.thedesc;
+
+      assert(SPxBasis::isConsistent());
    }
+
    return *this;
 }
 

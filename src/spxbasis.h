@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.57 2009/06/16 17:11:00 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.58 2009/08/10 14:44:51 bzfgleix Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -395,6 +395,7 @@ private:
    //@{
    SPxStatus thestatus;      ///< current status of the basis.
    Desc      thedesc;        ///< the basis' Descriptor
+   bool      freeSlinSolver; ///< true iff factor should be freed inside of this object
    //@}
 
 public:
@@ -703,7 +704,9 @@ public:
    virtual void loadDesc(const Desc&);
 
    /// sets up linear solver to use.
-   virtual void loadSolver(SLinSolver* solver);
+   /** If destroy is true, solver will be freed inside this object, e.g. in the destructor.
+   */
+   virtual void loadSolver(SLinSolver* solver, const bool destroy = false);
 
    /// loads the LP \p lp to the basis.
    /** This involves resetting all counters to 0 and setting up a regular
@@ -757,8 +760,7 @@ public:
    /// assignment operator
    SPxBasis& operator=(const SPxBasis& rhs);
    /// destructor.
-   virtual ~SPxBasis()
-   {}
+   virtual ~SPxBasis();
    //@}
    
 
