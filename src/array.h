@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: array.h,v 1.21 2009/02/20 01:06:35 bzfgleix Exp $"
+#pragma ident "@(#) $Id: array.h,v 1.22 2009/08/10 13:43:06 bzfgleix Exp $"
 
 /**@file  array.h
  * @brief Save arrays of arbitrary types.
@@ -208,6 +208,7 @@ public:
          reSize(rhs.size());
          for (int i = 0; i < size(); ++i)
             data[i] = rhs.data[i];
+         assert(Array::isConsistent());
       }
       return *this;
    }
@@ -226,6 +227,7 @@ public:
          data = new T[num];
          assert(data != 0);
       }
+      assert(Array::isConsistent());
    }
 
    /// copy constructor
@@ -238,6 +240,7 @@ public:
          assert(data != 0);
          *this = old;
       }
+      assert(Array::isConsistent());
    }
 
    /// destructor
