@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: updatevector.cpp,v 1.11 2009/02/20 01:06:38 bzfgleix Exp $"
+#pragma ident "@(#) $Id: updatevector.cpp,v 1.12 2009/08/10 14:52:40 bzfgleix Exp $"
 
 #include "updatevector.h"
 #include "message.h"
@@ -28,8 +28,18 @@ UpdateVector& UpdateVector::operator=(const UpdateVector& rhs)
       theval   = rhs.theval;
       thedelta = rhs.thedelta;
       DVector::operator=(rhs);
+
+      assert(UpdateVector::isConsistent());
    }
    return *this;
+}
+
+UpdateVector::UpdateVector( const UpdateVector& base)
+   : DVector( base )
+   , theval(base.theval)
+   , thedelta(base.thedelta)
+{
+   assert(UpdateVector::isConsistent());
 }
 
 #ifndef NO_CONSISTENCY_CHECKS

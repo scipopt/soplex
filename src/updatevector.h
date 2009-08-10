@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: updatevector.h,v 1.16 2009/02/20 01:06:38 bzfgleix Exp $"
+#pragma ident "@(#) $Id: updatevector.h,v 1.17 2009/08/10 14:52:40 bzfgleix Exp $"
 
 /**@file  updatevector.h
  * @brief Dense vector with semi-sparse vector for updates
@@ -74,15 +74,22 @@ public:
       : DVector (p_dim)
       , theval (0)
       , thedelta(p_dim, p_eps)
-   {}
+   {
+      assert(isConsistent());
+   }
    ///
    ~UpdateVector()
    {}
+   /// copy constructor
+   UpdateVector( const UpdateVector& );
    /// assignment from DVector
    UpdateVector& operator=(const DVector& rhs)
    {
       if ( this != & rhs )
          DVector::operator=(rhs);
+
+      assert(isConsistent());
+
       return *this;
    }
    /// assignment
@@ -164,15 +171,6 @@ public:
    bool isConsistent() const;
    //@}
 #endif
-
-private:
-
-   //------------------------------------
-   /**@name Blocked */
-   //@{
-   /// blocked copy constructor
-   UpdateVector( const UpdateVector& );
-   //@}
 
 };
 
