@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprow.cpp,v 1.25 2009/02/20 01:06:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: lprow.cpp,v 1.26 2009/08/10 14:15:43 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -90,6 +90,8 @@ LPRow::LPRow(const SVector& p_rowVector, LPRow::Type p_type, Real p_value)
    default:
       throw SPxInternalCodeException("XLPROW03 This should never happen.");
    }
+
+   assert(isConsistent());
 }
 } // namespace soplex
 

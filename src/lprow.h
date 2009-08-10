@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lprow.h,v 1.17 2009/02/20 01:06:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: lprow.h,v 1.18 2009/08/10 14:15:43 bzfgleix Exp $"
 
 /**@file  lprow.h
  * @brief (In)equality for LPs.
@@ -92,18 +92,24 @@ public:
    /// Construct LPRow with a vector ready to hold \p defDim nonzeros
    explicit LPRow(int defDim = 0) 
       : left(0), right(infinity), vec(defDim)
-   {}
+   {
+      assert(isConsistent());
+   }
 
    /// copy constructor
    LPRow(const LPRow& row) 
       : left(row.left), right(row.right), vec(row.vec)
-   {}
+   {
+      assert(isConsistent());
+   }
 
    /// Construct LPRow with the given left-hand side, right-hand side
    /// and rowVector.
    LPRow(Real p_lhs, const SVector& p_rowVector, Real p_rhs)
       : left(p_lhs), right(p_rhs), vec(p_rowVector)
-   {}
+   {
+      assert(isConsistent());
+   }
 
    /// Construct LPRow from passed \p rowVector, \p type and \p value
    LPRow(const SVector& p_rowVector, Type p_type, Real p_value);

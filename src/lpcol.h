@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcol.h,v 1.15 2009/02/20 01:06:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: lpcol.h,v 1.16 2009/08/10 14:15:43 bzfgleix Exp $"
 
 /**@file  lpcol.h
  * @brief LP column.
@@ -69,7 +69,9 @@ public:
     */
    explicit LPCol(int defDim = 0)
       : up(infinity), low(0), object(0), vec(defDim)
-   {}
+   {
+      assert(isConsistent());  
+   }
 
    /// initializing constructor.
    /*  Construct LPCol with the given objective value \p obj, a column
@@ -77,12 +79,16 @@ public:
     */
    LPCol(Real p_obj, const SVector& p_vector, Real p_upper, Real p_lower)
       : up(p_upper), low(p_lower), object(p_obj), vec(p_vector)
-   {}
+   {
+      assert(isConsistent());
+   }
 
    /// copy constructor.
    LPCol(const LPCol& old)
       : up(old.up), low(old.low), object(old.object), vec(old.vec)
-   {}
+   {
+      assert(isConsistent());
+   }
 
    /// destructor
    ~LPCol()
