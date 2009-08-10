@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.62 2009/05/05 16:29:27 bzfgleix Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.63 2009/08/10 14:40:17 bzfgleix Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -612,6 +612,7 @@ void SLUFactor::assign(const SLUFactor& old)
    assert(l.idx   != 0);
    assert(l.start != 0);
    assert(l.row   != 0);
+
 }
 
 SLUFactor& SLUFactor::operator=(const SLUFactor& old)
@@ -620,14 +621,10 @@ SLUFactor& SLUFactor::operator=(const SLUFactor& old)
 
    if (this != &old)
    {
-#if 1
+      // we don't need to copy them, because they are temporary vectors
       vec.clear();
       ssvec.clear();
-#else
-      ///@todo Why does this not work ? (Gives isConsistent() failure in idxset)
-      vec    = old.vec;
-      ssvec  = old.ssvec;
-#endif
+
       eta    = old.eta;
       forest = old.forest;
 
@@ -775,15 +772,18 @@ SLUFactor::SLUFactor()
    assert(l.idx   != 0);
    assert(l.start != 0);
    assert(l.row   != 0);
+
+   assert(SLUFactor::isConsistent());
 }
 
 SLUFactor::SLUFactor(const SLUFactor& old)
    : SLinSolver( old )
    , CLUFactor()
-   , vec (old.vec)
-   , ssvec (old.ssvec)
    , eta (old.eta)
    , forest(old.forest)
+   // we don't need to copy them, because they are temporary vectors
+   , vec(1)
+   , ssvec(1)
 {
    row.perm    = 0;
    row.orig    = 0;

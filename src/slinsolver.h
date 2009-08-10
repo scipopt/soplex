@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slinsolver.h,v 1.20 2009/04/07 14:58:52 bzfgleix Exp $"
+#pragma ident "@(#) $Id: slinsolver.h,v 1.21 2009/08/10 14:40:17 bzfgleix Exp $"
 
 /**@file  slinsolver.h
  * @brief Sparse Linear Solver virtual base class.
@@ -171,7 +171,11 @@ public:
    /// destructor
    virtual ~SLinSolver()
    {}
+   /// clone function for polymorphism
+   virtual SLinSolver* clone() const = 0;
    //@}
+
+
 
 };
 

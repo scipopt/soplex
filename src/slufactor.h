@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.h,v 1.29 2009/05/05 16:28:53 bzfgleix Exp $"
+#pragma ident "@(#) $Id: slufactor.h,v 1.30 2009/08/10 14:40:17 bzfgleix Exp $"
 
 /**@file  slufactor.h
  * @brief Implementation of Sparse Linear Solver.
@@ -227,6 +227,11 @@ public:
    SLUFactor(const SLUFactor& old);
    /// destructor.
    virtual ~SLUFactor();
+   /// clone function for polymorphism
+   inline virtual SLinSolver* clone() const
+   {
+      return new SLUFactor(*this);
+   }
    //@}
 
 private:
