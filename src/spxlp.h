@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.49 2009/02/20 01:06:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.50 2009/08/11 12:51:03 bzfgleix Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -753,11 +753,22 @@ public:
    SPxLP()
    {
       SPxLP::clear(); // clear is virtual.
+
+      assert(isConsistent());
    }
 
    /// destructor.
    virtual ~SPxLP()
    {}
+
+   /// copy constructor.
+   SPxLP(const SPxLP& old)
+      : LPRowSet(old)
+      , LPColSet(old)
+      , thesense(old.thesense)
+   {
+      assert(isConsistent());
+   }
 
    /// assignment operator
    SPxLP& operator=(const SPxLP& old)
@@ -767,6 +778,8 @@ public:
          LPRowSet::operator=(old);
          LPColSet::operator=(old);
          thesense = old.thesense;
+
+         assert(isConsistent());
       }
       return *this;
    }
