@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsimplifier.h,v 1.21 2009/02/20 01:06:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsimplifier.h,v 1.22 2009/08/11 12:48:40 bzfgleix Exp $"
 
 /**@file  spxsimplifier.h
  * @brief LP simplification base class.
@@ -90,12 +90,44 @@ public:
       , m_remNzos(0)
       , m_chgBnds(0)
       , m_chgLRhs(0)
-   {}
+   {
+      assert(isConsistent());
+   }
+   /// copy constructor
+   SPxSimplifier( const SPxSimplifier& old)
+      : m_name(old.m_name)
+      , m_remRows(old.m_remRows)
+      , m_remCols(old.m_remCols)
+      , m_remNzos(old.m_remNzos)
+      , m_chgBnds(old.m_chgBnds)
+      , m_chgLRhs(old.m_chgLRhs)
+   {
+      assert(isConsistent());
+   }
+   /// assignment operator
+   SPxSimplifier& operator=( const SPxSimplifier& rhs)
+   {   
+      if(this != &rhs)
+      {
+         m_name = rhs.m_name;
+         m_remRows = rhs.m_remRows;
+         m_remCols = rhs.m_remCols;
+         m_remNzos = rhs.m_remNzos;
+         m_chgBnds = rhs.m_chgBnds;
+         m_chgLRhs = rhs.m_chgLRhs;
+
+         assert(isConsistent());
+      }
+
+      return *this;
+   }
    /// destructor.
    virtual ~SPxSimplifier()
    {
       m_name = 0;
    }
+   /// clone function for polymorphism
+   virtual SPxSimplifier* clone() const = 0;
    //@}
 
    //-------------------------------------
@@ -159,16 +191,6 @@ public:
    //@}
 #endif
 
-private:
-
-   //-------------------------------------
-   /**@name Blocked */
-   //@{
-   /// copy constructor
-   SPxSimplifier( const SPxSimplifier& );
-   /// assignment operator
-   SPxSimplifier& operator=( const SPxSimplifier& );
-   //@}
 };
 } // namespace soplex
 #endif // _SPXSIMPLIFIER_H_

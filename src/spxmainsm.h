@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.h,v 1.15 2009/03/17 23:21:33 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxmainsm.h,v 1.16 2009/08/11 12:48:40 bzfgleix Exp $"
 
 /**@file  spxmainsm.h
  * @brief General methods in LP preprocessing.
@@ -82,9 +82,20 @@ private:
       PostStep()
          : m_eps(1e-6)
       {}
+      /// copy constructor.
+      PostStep(const PostStep& old)
+         : m_eps(old.m_eps)
+      {}
+      /// assignment operator
+      PostStep& operator=(const PostStep& /*rhs*/)
+      {
+         return *this;
+      }
       /// destructor.
       virtual ~PostStep()
       {}
+      /// clone function for polymorphism
+      virtual PostStep* clone() const = 0;
       /// executes the postsolving.
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const = 0;
@@ -117,9 +128,31 @@ private:
          for(int k = 0; k < row.size(); ++k)
             m_row.add(simplifier.cIdx(row.index(k)), row.value(k));
       }
+      /// copy constructor
+      FreeConstraintPS(const FreeConstraintPS& old)
+         : PostStep(old)
+         , m_i(old.m_i)
+         , m_row(old.m_row)
+      {}
+      /// assignment operator
+      FreeConstraintPS& operator=( const FreeConstraintPS& rhs)
+      {
+         if(this != &rhs)
+         {
+            PostStep::operator=(rhs);
+            m_row = rhs.m_row;
+         }
+
+         return *this;
+      }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
+      /// clone function for polymorphism
+      inline virtual PostStep* clone() const
+      {
+         return new FreeConstraintPS(*this);
+      }
    };
 
    /**@brief   Postsolves empty constraints.
@@ -135,9 +168,29 @@ private:
       EmptyConstraintPS(int i)
          : m_i(i)
       {}
+      /// copy constructor
+      EmptyConstraintPS(const EmptyConstraintPS& old)
+         : PostStep(old)
+         , m_i(old.m_i)
+      {}
+      /// assignment operator
+      EmptyConstraintPS& operator=( const EmptyConstraintPS& rhs)
+      {
+         if(this != &rhs)
+         {
+            PostStep::operator=(rhs);
+         }
+
+         return *this;
+      }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
+      /// clone function for polymorphism
+      inline virtual PostStep* clone() const
+      {
+         return new EmptyConstraintPS(*this);
+      }
    };
    
    /**@brief   Postsolves row singletons.
@@ -178,6 +231,37 @@ private:
          
          for(int k = 0; k < col.size(); ++k)
             m_col.add(simplifier.rIdx(col.index(k)), col.value(k));
+      }
+      /// copy constructor
+      RowSingletonPS(const RowSingletonPS& old)
+         : PostStep(old)
+         , m_i(old.m_i)
+         , m_j(old.m_j)
+         , m_strictLo(old.m_strictLo)
+         , m_strictUp(old.m_strictUp)
+         , m_maxSense(old.m_maxSense)
+         , m_obj(old.m_obj)
+         , m_col(old.m_col)
+         , m_newLo(old.m_newLo)
+         , m_newUp(old.m_newUp)
+         , m_oldLo(old.m_oldLo)
+         , m_oldUp(old.m_oldUp)
+      {}
+      /// assignment operator
+      RowSingletonPS& operator=( const RowSingletonPS& rhs)
+      {
+         if(this != &rhs)
+         {
+            PostStep::operator=(rhs);
+            m_col = rhs.m_col;
+         }
+
+         return *this;
+      }
+      /// clone function for polymorphism
+      inline virtual PostStep* clone() const
+      {
+         return new RowSingletonPS(*this);
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
@@ -227,6 +311,37 @@ private:
                m_cols[k].add(simplifier.rIdx(col.index(l)), col.value(l));
          }
       }
+      /// copy constructor
+      ForceConstraintPS(const ForceConstraintPS& old)
+         : PostStep(old)
+         , m_i(old.m_i)
+         , m_lRhs(old.m_lRhs)
+         , m_row(old.m_row)
+         , m_objs(old.m_objs)
+         , m_fixed(old.m_fixed)
+         , m_cols(old.m_cols)
+         , m_lhsFixed(old.m_lhsFixed)
+         , m_maxSense(old.m_maxSense)
+      {}
+      /// assignment operator
+      ForceConstraintPS& operator=( const ForceConstraintPS& rhs)
+      {
+         if(this != &rhs)
+         {
+            PostStep::operator=(rhs);
+            m_row = rhs.m_row;
+            m_objs = rhs.m_objs;
+            m_fixed = rhs.m_fixed;
+            m_cols = rhs.m_cols;
+         }
+
+         return *this;
+      }
+      /// clone function for polymorphism
+      inline virtual PostStep* clone() const
+      {
+         return new ForceConstraintPS(*this);
+      }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
@@ -255,6 +370,30 @@ private:
          
          for(int k = 0; k < col.size(); ++k)
             m_col.add(simplifier.rIdx(col.index(k)), col.value(k));
+      }
+      /// copy constructor
+      FixVariablePS(const FixVariablePS& old)
+         : PostStep(old)
+         , m_j(old.m_j)
+         , m_val(old.m_val)
+         , m_obj(old.m_obj)
+         , m_col(old.m_col)
+      {}
+      /// assignment operator
+      FixVariablePS& operator=( const FixVariablePS& rhs)
+      {
+         if(this != &rhs)
+         {
+            PostStep::operator=(rhs);
+            m_col = rhs.m_col;
+         }
+
+         return *this;
+      }
+      /// clone function for polymorphism
+      inline virtual PostStep* clone() const
+      {
+         return new FixVariablePS(*this);
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
@@ -287,6 +426,28 @@ private:
          {
             throw SPxInternalCodeException("XMAISM14 This should never happen.");
          }
+      }
+      /// copy constructor
+      FixBoundsPS(const FixBoundsPS& old)
+         : PostStep(old)
+         , m_j(old.m_j)
+         , m_status(old.m_status)
+      {}
+      /// assignment operator
+      FixBoundsPS& operator=( const FixBoundsPS& rhs)
+      {
+         if(this != &rhs)
+         {
+            PostStep::operator=(rhs);
+            m_status = rhs.m_status;
+         }
+
+         return *this;
+      }
+      /// clone function for polymorphism
+      inline virtual PostStep* clone() const
+      {
+         return new FixBoundsPS(*this);
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
@@ -340,6 +501,34 @@ private:
                m_rows[k].add(simplifier.cIdx(row.index(l)), row.value(l));
          }
       }
+      /// copy constructor
+      FreeZeroObjVariablePS(const FreeZeroObjVariablePS& old)
+         : PostStep(old)
+         , m_j(old.m_j)
+         , m_bnd(old.m_bnd)
+         , m_col(old.m_col)
+         , m_lRhs(old.m_lRhs)
+         , m_rows(old.m_rows)
+         , m_loFree(old.m_loFree)
+      {}
+      /// assignment operator
+      FreeZeroObjVariablePS& operator=( const FreeZeroObjVariablePS& rhs)
+      {
+         if(this != &rhs)
+         {
+            PostStep::operator=(rhs);
+            m_col = rhs.m_col;
+            m_lRhs = rhs.m_lRhs;
+            m_rows = rhs.m_rows;
+         }
+
+         return *this;
+      }
+      /// clone function for polymorphism
+      inline virtual PostStep* clone() const
+      {
+         return new FreeZeroObjVariablePS(*this);
+      }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
@@ -375,6 +564,33 @@ private:
          for(int k = 0; k < row.size(); ++k)
             m_row.add(simplifier.cIdx(row.index(k)), row.value(k));
       }
+      /// copy constructor
+      ZeroObjColSingletonPS(const ZeroObjColSingletonPS& old)
+         : PostStep(old)
+         , m_j(old.m_j)
+         , m_i(old.m_i)
+         , m_lhs(old.m_lhs)
+         , m_rhs(old.m_rhs)
+         , m_lower(old.m_lower)
+         , m_upper(old.m_upper)
+         , m_row(old.m_row)
+      {}
+      /// assignment operator
+      ZeroObjColSingletonPS& operator=( const ZeroObjColSingletonPS& rhs)
+      {
+         if(this != &rhs)
+         {
+            PostStep::operator=(rhs);
+            m_row = rhs.m_row;
+         }
+
+         return *this;
+      }
+      /// clone function for polymorphism
+      inline virtual PostStep* clone() const
+      {
+         return new ZeroObjColSingletonPS(*this);
+      }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
@@ -409,6 +625,33 @@ private:
       
          for(int k = 0; k < row.size(); ++k)
             m_row.add(simplifier.cIdx(row.index(k)), row.value(k));
+      }
+      /// copy constructor
+      FreeColSingletonPS(const FreeColSingletonPS& old)
+         : PostStep(old)
+         , m_j(old.m_j)
+         , m_i(old.m_i)
+         , m_obj(old.m_obj)
+         , m_lRhs(old.m_lRhs)
+         , m_onLhs(old.m_onLhs)
+         , m_eqCons(old.m_eqCons)
+         , m_row(old.m_row)
+      {}
+      /// assignment operator
+      FreeColSingletonPS& operator=( const FreeColSingletonPS& rhs)
+      {
+         if(this != &rhs)
+         {
+            PostStep::operator=(rhs);
+            m_row = rhs.m_row;
+         }
+
+         return *this;
+      }
+      /// clone function for polymorphism
+      inline virtual PostStep* clone() const
+      {
+         return new FreeColSingletonPS(*this);
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
@@ -461,6 +704,41 @@ private:
          for(int l = 0; l < col.size(); ++l)
             m_col.add(simplifier.rIdx(col.index(l)), col.value(l));
       }
+      /// copy constructor
+      DoubletonEquationPS(const DoubletonEquationPS& old)
+         : PostStep(old)
+         , m_j(old.m_j)
+         , m_k(old.m_k)
+         , m_i(old.m_i)
+         , m_maxSense(old.m_maxSense)
+         , m_jFixed(old.m_jFixed)
+         , m_jObj(old.m_jObj)
+         , m_kObj(old.m_kObj)
+         , m_aij(old.m_aij)
+         , m_strictLo(old.m_strictLo)
+         , m_strictUp(old.m_strictUp)
+         , m_newLo(old.m_newLo)
+         , m_newUp(old.m_newUp)
+         , m_oldLo(old.m_oldLo)
+         , m_oldUp(old.m_oldUp)
+         , m_col(old.m_col)
+      {}
+      /// assignment operator
+      DoubletonEquationPS& operator=( const DoubletonEquationPS& rhs)
+      {
+         if(this != &rhs)
+         {
+            PostStep::operator=(rhs);
+            m_col = rhs.m_col;
+         }
+
+         return *this;
+      }
+      /// clone function for polymorphism
+      inline virtual PostStep* clone() const
+      {
+         return new DoubletonEquationPS(*this);
+      }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
@@ -492,6 +770,31 @@ private:
          for(int k = 0; k < dupRows.size(); ++k)
             m_scale.add(simplifier.rIdx(dupRows.index(k)), rowScale / scale[dupRows.index(k)]);    
       }
+      /// copy constructor
+      DuplicateRowsPS(const DuplicateRowsPS& old)
+         : PostStep(old)
+         , m_i(old.m_i)
+         , m_maxLhsIdx(old.m_maxLhsIdx)
+         , m_minRhsIdx(old.m_minRhsIdx)
+         , m_maxSense(old.m_maxSense)  
+         , m_scale(old.m_scale)
+      {}
+      /// assignment operator
+      DuplicateRowsPS& operator=( const DuplicateRowsPS& rhs)
+      {
+         if(this != &rhs)
+         {
+            PostStep::operator=(rhs);
+            m_scale = rhs.m_scale;
+         }
+
+         return *this;
+      }
+      /// clone function for polymorphism
+      inline virtual PostStep* clone() const
+      {
+         return new DuplicateRowsPS(*this);
+      }
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
    };
@@ -520,6 +823,32 @@ private:
          , m_upK(lp.upper(k))
          , m_scale(scale)
       {}
+      /// copy constructor
+      DuplicateColsPS(const DuplicateColsPS& old)
+         : PostStep(old)
+         , m_j(old.m_j)
+         , m_k(old.m_k)
+         , m_loJ(old.m_loJ)
+         , m_upJ(old.m_upJ)
+         , m_loK(old.m_loK)
+         , m_upK (old.m_upK)
+         , m_scale (old.m_scale)
+      {}
+      /// assignment operator
+      DuplicateColsPS& operator=( const DuplicateColsPS& rhs)
+      {
+         if(this != &rhs)
+         {
+            PostStep::operator=(rhs);
+         }
+
+         return *this;
+      }
+      /// clone function for polymorphism
+      inline virtual PostStep* clone() const
+      {
+         return new DuplicateColsPS(*this);
+      }
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
    };
@@ -653,6 +982,72 @@ public:
       : SPxSimplifier("MainSM")
       , m_stat(15)
    {}   
+   /// copy constructor.
+   SPxMainSM(const SPxMainSM& old) 
+      : SPxSimplifier(old)
+      , m_prim(old.m_prim)
+      , m_slack(old.m_slack)
+      , m_dual(old.m_dual)
+      , m_redCost(old.m_redCost)
+      , m_cBasisStat(old.m_cBasisStat)
+      , m_rBasisStat(old.m_rBasisStat)
+      , m_cIdx(old.m_cIdx)
+      , m_rIdx(old.m_rIdx)
+      , m_postsolved(old.m_postsolved)
+      , m_epsilon(old.m_epsilon)
+      , m_delta(old.m_delta)
+      , m_stat(old.m_stat)
+   {
+      // copy pointers in m_hist
+      m_hist.reSize(0);
+      for(int k = 0; k < old.m_hist.size(); ++k)
+      {
+         if(old.m_hist[k] != 0)
+            m_hist.append(old.m_hist[k]->clone());
+         else
+            m_hist.append(0);
+      }
+   }
+   /// assignment operator
+   SPxMainSM& operator=( const SPxMainSM& rhs)
+   {
+      if(this != &rhs)
+      {
+         SPxSimplifier::operator=(rhs);
+         m_prim = rhs.m_prim;
+         m_slack = rhs.m_slack;
+         m_dual = rhs.m_dual;
+         m_redCost = rhs.m_redCost;
+         m_cBasisStat = rhs.m_cBasisStat;
+         m_rBasisStat = rhs.m_rBasisStat;
+         m_cIdx = rhs.m_cIdx;
+         m_rIdx = rhs.m_rIdx;
+         m_postsolved = rhs.m_postsolved;
+         m_epsilon = rhs.m_epsilon;
+         m_delta = rhs.m_delta;
+         m_stat = rhs.m_stat;
+
+         // delete pointers in m_hist
+         for(int k = 0; k < m_hist.size(); ++k)
+         {
+            delete m_hist[k];
+            m_hist[k] = 0;
+         }
+
+         m_hist.clear();
+
+         // copy pointers in m_hist
+         for(int k = 0; k < rhs.m_hist.size(); ++k)
+         {
+            if(rhs.m_hist[k] != 0)
+               m_hist.append(rhs.m_hist[k]->clone());
+            else
+               m_hist.append(0);
+         }
+      }
+      
+      return *this;
+   }   
    /// destructor.
    virtual ~SPxMainSM()
    {
@@ -663,6 +1058,11 @@ public:
          m_hist[k] = 0;
       }
    }  
+   /// clone function for polymorphism
+   inline virtual SPxSimplifier* clone() const
+   {
+      return new SPxMainSM(*this);
+   }
    //@}
 
    //------------------------------------
