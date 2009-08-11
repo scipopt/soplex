@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxratiotester.h,v 1.17 2009/02/20 01:06:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxratiotester.h,v 1.18 2009/08/11 13:11:34 bzfgleix Exp $"
 
 /**@file  spxratiotester.h
  * @brief Abstract ratio test base class.
@@ -155,22 +155,34 @@ public:
       : thesolver(0)
       , m_name(name)
    {}
+   /// copy constructor
+   SPxRatioTester( const SPxRatioTester& old)
+      : thesolver(old.thesolver)
+      , m_name(old.m_name)
+      , m_type(old.m_type)
+   {}
+   /// assignment operator
+   SPxRatioTester& operator=( const SPxRatioTester& rhs)
+   {
+      if(this != &rhs)
+      {
+         m_name = rhs.m_name;
+         thesolver = rhs.thesolver;
+         m_type = rhs.m_type;
+      }
+
+      return *this;
+   }
    /// destructor.
    virtual ~SPxRatioTester()
    {
       thesolver = 0;
       m_name    = 0;
    }
+   /// clone function for polymorphism
+   virtual SPxRatioTester* clone() const = 0;
    //@}
 
-   //-------------------------------------
-   /**@name Blocked */
-   //@{
-   /// copy constructor
-   SPxRatioTester( const SPxRatioTester& );
-   /// assignment operator
-   SPxRatioTester& operator=( const SPxRatioTester& );
-   //@}
 };
 
 

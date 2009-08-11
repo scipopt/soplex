@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.h,v 1.20 2009/02/20 01:06:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.h,v 1.21 2009/08/11 13:11:34 bzfgleix Exp $"
 
 /**@file  spxharrisrt.h
  * @brief Harris pricing with shifting.
@@ -87,9 +87,28 @@ public:
    SPxHarrisRT() 
       : SPxRatioTester("Harris")
    {}
+   /// copy constructor
+   SPxHarrisRT(const SPxHarrisRT& old) 
+      : SPxRatioTester(old)
+   {}
+   /// assignment operator
+   SPxHarrisRT& operator=( const SPxHarrisRT& rhs)
+   {
+      if(this != &rhs)
+      {
+         SPxRatioTester::operator=(rhs);
+      }
+
+      return *this;
+   }
    /// destructor
    virtual ~SPxHarrisRT()
    {}
+   /// clone function for polymorphism
+   inline virtual SPxRatioTester* clone() const
+   {
+      return new SPxHarrisRT(*this);
+   }
    //@}
 
    //-------------------------------------

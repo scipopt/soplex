@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdantzigpr.h,v 1.5 2009/02/20 01:06:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxdantzigpr.h,v 1.6 2009/08/11 13:05:27 bzfgleix Exp $"
 
 /**@file  spxdantzigpr.h
  * @brief Dantzig pricer.
@@ -47,10 +47,29 @@ public:
    /// default constructor
    SPxDantzigPR() 
       : SPxPricer("Dantzig")
-   {}   
+   {} 
+   /// copy constructor
+   SPxDantzigPR(const SPxDantzigPR& old ) 
+      : SPxPricer(old)
+   {}
+   /// assignment operator
+   SPxDantzigPR& operator=( const SPxDantzigPR& rhs)
+   {
+      if(this != &rhs)
+      {
+         SPxPricer::operator=(rhs);
+      }
+
+      return *this;
+   }   
    /// destructor
    virtual ~SPxDantzigPR()
    {}
+   /// clone function for polymorphism
+   inline virtual SPxPricer* clone() const
+   {
+      return new SPxDantzigPR(*this);
+   }
    //@}
 
    //-------------------------------------

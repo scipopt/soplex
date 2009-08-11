@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdevexpr.h,v 1.22 2009/02/20 01:06:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxdevexpr.h,v 1.23 2009/08/11 13:05:27 bzfgleix Exp $"
 
 /**@file  spxdevexpr.h
  * @brief Devex pricer.
@@ -75,10 +75,35 @@ public:
    /// default constructor
    SPxDevexPR() 
       : SPxPricer("Devex")
-   {}   
+   {}
+   /// copy constructor
+   SPxDevexPR( const SPxDevexPR& old)
+      : SPxPricer(old)
+      , last(old.last)
+      , penalty(old.penalty)
+      , coPenalty(old.coPenalty)
+   {}
+   /// assignment operator
+   SPxDevexPR& operator=( const SPxDevexPR& rhs)
+   {
+      if(this != &rhs)
+      {
+         SPxPricer::operator=(rhs);
+         last = rhs.last;
+         penalty = rhs.penalty;
+         coPenalty = rhs.coPenalty;
+      }
+
+      return *this;
+   }  
    /// destructor
    virtual ~SPxDevexPR()
    {}
+   /// clone function for polymorphism
+   inline virtual SPxPricer* clone()  const 
+   {
+      return new SPxDevexPR(*this);
+   }
    //@}
 
    //-------------------------------------
@@ -113,16 +138,6 @@ public:
    //@}
 #endif
 
-private:
-
-   //-------------------------------------
-   /**@name Blocked */
-   //@{
-   /// copy constructor
-   SPxDevexPR( const SPxDevexPR& );
-   /// assignment operator
-   SPxDevexPR& operator=( const SPxDevexPR& );
-   //@}
 };
 
 } // namespace soplex

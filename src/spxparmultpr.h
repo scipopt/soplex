@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxparmultpr.h,v 1.18 2009/02/20 01:06:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxparmultpr.h,v 1.19 2009/08/11 13:05:27 bzfgleix Exp $"
 
 /**@file  spxparmultpr.h
  * @brief Partial multiple pricing.
@@ -88,10 +88,42 @@ public:
    /// default constructor
    SPxParMultPR() 
       : SPxPricer("ParMult")
-   {}   
+   {}
+   /// copy constructor
+   SPxParMultPR( const SPxParMultPR& old)
+      : SPxPricer(old)
+      , pricSet(old.pricSet)
+      , multiParts(old.multiParts)
+      , used(old.used)
+      , min(old.min)
+      , last(old.last)
+   {
+      partialSize = old.partialSize;
+   }
+   /// assignment operator
+   SPxParMultPR& operator=( const SPxParMultPR& rhs)
+   {
+      if(this != &rhs)
+      {
+         SPxPricer::operator=(rhs);
+         pricSet = rhs.pricSet;
+         multiParts = rhs.multiParts;
+         used = rhs.used;
+         min = rhs.min;
+         last = rhs.last;
+         partialSize = rhs.partialSize;
+      }
+
+      return *this;
+   }  
    /// destructor
    virtual ~SPxParMultPR()
    {}
+   /// clone function for polymorphism
+   inline virtual SPxPricer* clone()  const
+   {
+      return new SPxParMultPR(*this);
+   }
    //@}
 
    //-------------------------------------
@@ -107,14 +139,6 @@ public:
    virtual SPxId selectEnter();
    //@}
 
-   //-------------------------------------
-   /**@name Blocked */
-   //@{
-   /// copy constructor
-   SPxParMultPR( const SPxParMultPR& );
-   /// assignment operator
-   SPxParMultPR& operator=( const SPxParMultPR& );
-   //@}
 };
 
 

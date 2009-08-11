@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightpr.h,v 1.18 2009/02/20 01:06:38 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxweightpr.h,v 1.19 2009/08/11 13:05:27 bzfgleix Exp $"
 
 /**@file  spxweightpr.h
  * @brief Weighted pricing.
@@ -81,9 +81,59 @@ public:
    SPxWeightPR() 
       : SPxPricer("Weight")
    {}   
+   /// copy constructor
+   SPxWeightPR( const SPxWeightPR& old)
+      : SPxPricer(old)
+      , cPenalty(old.cPenalty)
+      , rPenalty(old.rPenalty)
+      , leavePenalty(old.leavePenalty)
+      , objlength(old.objlength)
+   {
+      if (old.penalty == old.rPenalty.get_const_ptr())
+      {
+         penalty = rPenalty.get_const_ptr();
+         coPenalty = cPenalty.get_const_ptr();
+      }
+      else if (old.penalty == old.cPenalty.get_const_ptr())
+      {
+         penalty = cPenalty.get_const_ptr();
+         coPenalty = rPenalty.get_const_ptr();
+      }
+      // otherwise, old.penalty and old.coPenalty are not set and do not have to be copied
+   }
+   /// assignment operator
+   SPxWeightPR& operator=( const SPxWeightPR& rhs)
+   {
+      if(this != &rhs)
+      {
+         SPxPricer::operator=(rhs);
+         cPenalty = rhs.cPenalty;
+         rPenalty = rhs.rPenalty;
+         leavePenalty = rhs.leavePenalty;
+         objlength = rhs.objlength;
+         if (rhs.penalty == rhs.rPenalty.get_const_ptr())
+         {
+            penalty = rPenalty.get_const_ptr();
+            coPenalty = cPenalty.get_const_ptr();
+         }
+         else if (rhs.penalty == rhs.cPenalty.get_const_ptr())
+         {
+            penalty = cPenalty.get_const_ptr();
+            coPenalty = rPenalty.get_const_ptr();
+         }
+         // otherwise, old.penalty and old.coPenalty are not set and do not have to be copied
+      }
+
+      return *this;
+   } 
    /// destructor
    virtual ~SPxWeightPR()
    {}
+   /// clone function for polymorphism
+   inline virtual SPxPricer* clone()  const 
+   {
+      return new SPxWeightPR(*this);
+   }
    //@}
 
    //-------------------------------------
@@ -122,16 +172,6 @@ public:
    //@}
 #endif
 
-private:
-
-   //-------------------------------------
-   /**@name Blocked */
-   //@{
-   /// copy constructor
-   SPxWeightPR( const SPxWeightPR& );
-   /// assignment operator
-   SPxWeightPR& operator=( const SPxWeightPR& );
-   //@}
 };
 } // namespace soplex
 #endif // _SPXWEIGHTPR_H_

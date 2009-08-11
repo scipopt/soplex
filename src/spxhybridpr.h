@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxhybridpr.h,v 1.19 2009/02/20 01:06:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxhybridpr.h,v 1.20 2009/08/11 13:07:13 bzfgleix Exp $"
 
 /**@file  spxhybridpr.h
  * @brief Hybrid pricer.
@@ -106,9 +106,69 @@ public:
       , thepricer(0)
       , hybridFactor(3.0) // we want the ParMult pricer
    {}
+   /// copy constructor
+   SPxHybridPR(const SPxHybridPR& old)
+      : SPxPricer(old)
+      , steep(old.steep)
+      , parmult(old.parmult)
+      , devex(old.devex)
+      , hybridFactor(old.hybridFactor)
+   {
+      if(old.thepricer == &old.steep)
+      {
+         thepricer = &steep;
+      }
+      else if(old.thepricer == &old.parmult)
+      {
+         thepricer = &parmult;
+      }
+      else if(old.thepricer == &old.devex)
+      {
+         thepricer = &devex;
+      }
+      else // old.thepricer should be 0 
+      {
+         thepricer = 0;
+      }
+   }
+   /// assignment operator
+   SPxHybridPR& operator=( const SPxHybridPR& rhs)
+   {
+      if(this != &rhs)
+      {
+         SPxPricer::operator=(rhs);
+         steep = rhs.steep;
+         parmult = rhs.parmult;
+         devex = rhs.devex;
+         hybridFactor = rhs.hybridFactor;
+         if(rhs.thepricer == &rhs.steep)
+         {
+            thepricer = &steep;
+         }
+         else if(rhs.thepricer == &rhs.parmult)
+         {
+            thepricer = &parmult;
+         }
+         else if(rhs.thepricer == &rhs.devex)
+         {
+            thepricer = &devex;
+         }
+         else // rhs.thepricer should be 0 
+         {
+            thepricer = 0;
+         }
+      }
+
+      return *this;
+   }  
    /// destructor
    virtual ~SPxHybridPR()
    {}
+   /// clone function for polymorphism
+   inline virtual SPxPricer* clone()  const
+   {
+      return new SPxHybridPR(*this);
+   }
    //@}
 };
 

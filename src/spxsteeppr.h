@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.h,v 1.22 2009/02/20 01:06:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.h,v 1.23 2009/08/11 13:05:27 bzfgleix Exp $"
 
 
 /**@file  spxsteeppr.h
@@ -107,10 +107,57 @@ public:
       , workRhs (0, 1e-16)
       , setup (DEFAULT)
       , accuracy(1e-4)
-   {}
+   {
+      assert(isConsistent());
+   }
+   /// copy constructor
+   SPxSteepPR( const SPxSteepPR& old)
+      : SPxPricer(old)
+      , penalty(old.penalty)
+      , coPenalty(old.coPenalty)
+      , workVec(old.workVec)
+      , workRhs(old.workRhs)
+      , pi_p(old.pi_p)
+      , prefSetup(old.prefSetup)
+      , coPref(old.coPref)
+      , pref(old.pref)
+      , leavePref(old.leavePref)
+      , setup(old.setup)
+      , accuracy(old.accuracy)
+   {
+      assert(isConsistent());
+   }
+   /// assignment operator
+   SPxSteepPR& operator=( const SPxSteepPR& rhs)
+   {
+      if(this != &rhs)
+      {
+         SPxPricer::operator=(rhs);
+         penalty = rhs.penalty;
+         coPenalty = rhs.coPenalty;
+         workVec = rhs.workVec;
+         workRhs = rhs.workRhs;
+         pi_p = rhs.pi_p;
+         prefSetup = rhs.prefSetup;
+         coPref = rhs.coPref;
+         pref = rhs.pref;
+         leavePref = rhs.leavePref;
+         setup = rhs.setup;
+         accuracy = rhs.accuracy;
+
+         assert(isConsistent());
+      }
+
+      return *this;
+   }
    /// destructor
    virtual ~SPxSteepPR()
    {}
+   /// clone function for polymorphism
+   inline virtual SPxPricer* clone()  const 
+   {
+      return new SPxSteepPR(*this);
+   }
    //@}
 
    //-------------------------------------
@@ -154,17 +201,6 @@ public:
    virtual bool isConsistent() const;
    //@}
 #endif
-
-private:
-
-   //-------------------------------------
-   /**@name Blocked */
-   //@{
-   /// copy constructor
-   SPxSteepPR( const SPxSteepPR& );
-   /// assignment operator
-   SPxSteepPR& operator=( const SPxSteepPR& );
-   //@}
 
 };
 

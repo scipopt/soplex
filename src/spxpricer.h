@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxpricer.h,v 1.19 2009/02/20 01:06:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxpricer.h,v 1.20 2009/08/11 13:05:27 bzfgleix Exp $"
 
 
 /**@file  spxpricer.h
@@ -225,23 +225,37 @@ public:
       , theeps(0.0)
    {}
 
+   /// copy constructor
+   SPxPricer(const SPxPricer& old)
+      : m_name(old.m_name) 
+      , thesolver(old.thesolver)
+      , theeps(old.theeps)
+   {}
+   
+   /// assignment operator
+   SPxPricer& operator=( const SPxPricer& rhs)
+   {
+      if(this != &rhs)
+      {
+         m_name = rhs.m_name; 
+         thesolver = rhs.thesolver;
+         theeps = rhs.theeps;
+
+         assert(isConsistent());
+      }
+
+      return *this;
+   }
+
    /// destructor.
    virtual ~SPxPricer()
    {
       m_name    = 0;
       thesolver = 0;
    }
-   //@}
 
-private:
-
-   //-------------------------------------
-   /**@name Blocked */
-   //@{
-   /// copy constructor
-   SPxPricer( const SPxPricer& );
-   /// assignment operator
-   SPxPricer& operator=( const SPxPricer& );
+   /// clone function for polymorphism
+   virtual SPxPricer* clone()  const  = 0;
    //@}
 
 };
