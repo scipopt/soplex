@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.42 2009/05/18 09:19:01 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.43 2009/08/11 13:30:45 bzfgleix Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -168,7 +168,8 @@ public:
       ON_LOWER,      ///< variable set to its lower bound.
       FIXED,         ///< variable fixed to identical bounds.
       ZERO,          ///< free variable fixed to zero.
-      BASIC          ///< variable is basic.
+      BASIC,         ///< variable is basic.
+      UNDEFINED      ///< nothing known about basis status (possibly due to a singular basis in transformed problem)
    };
 
    /**@todo In spxchange and at loadbasis, change the status to
@@ -223,6 +224,10 @@ private:
    SSVector*      solveVector2rhs;   ///< when 2 systems are to solve at a time
    Vector*        coSolveVector2;    ///< when 2 systems are to solve at a time
    SSVector*      coSolveVector2rhs; ///< when 2 systems are to solve at a time
+
+   bool           freePricer;        ///< true iff thepricer should be freed inside of object
+   bool           freeRatioTester;   ///< true iff theratiotester should be freed inside of object
+   bool           freeStarter;       ///< true iff thestarter should be freed inside of object
 
    /* Store the index of a leaving variable if only an instable entering variable has been found.
       instableLeave == true iff this instable basis change should be performed. 
@@ -370,14 +375,14 @@ public:
 
    /// copy LP.
    virtual void loadLP(const SPxLP& LP);
-   /// setup linear solver to use.
-   virtual void setSolver(SLinSolver* slu);
-   /// setup pricer to use.
-   virtual void setPricer(SPxPricer* pricer);
-   /// setup ratio-tester to use.
-   virtual void setTester(SPxRatioTester* tester);
-   /// setup starting basis generator to use.
-   virtual void setStarter(SPxStarter* starter);
+   /// setup linear solver to use. If \p destroy is true, \p slusolver will be freed in destructor.
+   virtual void setSolver(SLinSolver* slu, const bool destroy = false);
+   /// setup pricer to use. If \p destroy is true, \p pricer will be freed in destructor.
+   virtual void setPricer(SPxPricer* pricer, const bool destroy = false);
+   /// setup ratio-tester to use. If \p destroy is true, \p tester will be freed in destructor.
+   virtual void setTester(SPxRatioTester* tester, const bool destroy = false);
+   /// setup starting basis generator to use. If \p destroy is true, \p starter will be freed in destructor.
+   virtual void setStarter(SPxStarter* starter, const bool destroy = false);
    /// set a start basis.
    virtual void loadBasis(const SPxBasis::Desc&);
 
@@ -1623,6 +1628,11 @@ public:
    /// get current basis, and return solver status.
    Status getBasis(VarStatus rows[], VarStatus cols[]) const;
 
+   /// gets basis status
+   SPxBasis::SPxStatus getBasisStatus() const
+   {
+      return SPxBasis::status();
+   }
    /// set the lp solver's basis.
    void setBasis(const VarStatus rows[], const VarStatus cols[]);
 
@@ -1729,13 +1739,9 @@ public:
    /// default constructor.
    explicit
    SPxSolver( Type            type  = LEAVE, 
-              Representation  rep   = ROW, 
-              SPxPricer*      pric  = 0, 
-              SPxRatioTester* rt    = 0, 
-              SPxStarter*     start = 0 );
+              Representation  rep   = ROW  );
    // virtual destructor
-   virtual ~SPxSolver()
-   {}
+   virtual ~SPxSolver();
    //@}
 
    //------------------------------------
@@ -1747,14 +1753,12 @@ public:
 #endif
    //@}
 
-private:
-
    //------------------------------------
-   /** Blocked */
+   /** assignment operator and copy constructor */
    //@{
-   /// assignment operator is not implemented.
+   /// assignment operator
    SPxSolver& operator=(const SPxSolver& base);
-   /// copy constructor is not implemented.
+   /// copy constructor
    SPxSolver(const SPxSolver& base);
    //@}
 

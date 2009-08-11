@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.42 2009/05/18 09:19:01 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.43 2009/08/11 13:30:45 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -83,10 +83,10 @@ void SPxSolver::loadLP(const SPxLP& lp)
    SPxBasis::load(this);
 }
 
-void SPxSolver::setSolver(SLinSolver* slu)
+void SPxSolver::setSolver(SLinSolver* slu, const bool destroy)
 {
    METHOD( "SPxSolver::setSolver()" );
-   SPxBasis::loadSolver(slu);
+   SPxBasis::loadSolver(slu, destroy);
 }
 
 void SPxSolver::loadBasis(const SPxBasis::Desc& p_desc)
@@ -99,9 +99,18 @@ void SPxSolver::loadBasis(const SPxBasis::Desc& p_desc)
    setBasisStatus(SPxBasis::REGULAR);
 }
 
-void SPxSolver::setPricer(SPxPricer* x)
+void SPxSolver::setPricer(SPxPricer* x, const bool destroy)
 {
    METHOD( "SPxSolver::setPricer()" );
+   
+   assert(!freePricer || thepricer != 0);
+
+   if(freePricer)
+   {
+      delete thepricer;
+      thepricer = 0;
+   }
+
    if (x != 0)
    {
       setPricing(FULL);
@@ -110,14 +119,26 @@ void SPxSolver::setPricer(SPxPricer* x)
       else
          x->clear();
    }
+
    if (thepricer && thepricer != x)
       thepricer->clear();
    thepricer = x;
+
+   freePricer = destroy;
 }
 
-void SPxSolver::setTester(SPxRatioTester* x)
+void SPxSolver::setTester(SPxRatioTester* x, const bool destroy)
 {
    METHOD( "SPxSolver::setTester()" );
+
+   assert(!freeRatioTester || theratiotester != 0);
+
+   if(freeRatioTester)
+   {
+      delete theratiotester;
+      theratiotester = 0;
+   }
+
    if (x)
    {
       if (isInitialized() && x != theratiotester)
@@ -125,15 +146,28 @@ void SPxSolver::setTester(SPxRatioTester* x)
       else
          x->clear();
    }
-   if (theratiotester && theratiotester != x)
+
+   if (theratiotester !=0 && theratiotester != x)
       theratiotester->clear();
    theratiotester = x;
+
+   freeRatioTester = destroy;
 }
 
-void SPxSolver::setStarter(SPxStarter* x)
+void SPxSolver::setStarter(SPxStarter* x, const bool destroy)
 {
    METHOD( "SPxSolver::setStarter()" );
+
+   assert(!freeStarter || thestarter != 0);
+
+   if(freeStarter)
+   {
+      delete thestarter;
+      thestarter = 0;
+   }
    thestarter = x;
+
+   freeStarter = destroy;
 }
 
 void SPxSolver::setType(Type tp)
@@ -205,11 +239,9 @@ void SPxSolver::setRep(Representation p_rep)
    unInit();
    reDim();
 
+   SPxBasis::setRep();
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
-   {
-      SPxBasis::setRep();
       SPxBasis::loadDesc(desc());
-   }
    if (thepricer && thepricer->solver() == this)
       thepricer->setRep(p_rep);
 }
@@ -713,10 +745,7 @@ void SPxSolver::setDelta(Real d)
 
 SPxSolver::SPxSolver(
    Type            p_type, 
-   Representation  p_rep,
-   SPxPricer*      pric, 
-   SPxRatioTester* rt,
-   SPxStarter*     start)
+   Representation  p_rep )
    : theType (p_type)
    , thePricing(FULL)
    , theCumulativeTime(0.0)
@@ -724,24 +753,319 @@ SPxSolver::SPxSolver(
    , maxTime (infinity)
    , objLimit(infinity)
    , m_status(UNKNOWN)
+   , theDelta(DEFAULT_BND_VIOL)
    , theShift (0)
    , m_maxCycle(100)
    , m_numCycle(0)
    , initialized (false)
    , solveVector2 (0)
    , coSolveVector2(0)
+   , freePricer (false)
+   , freeRatioTester (false)
+   , freeStarter (false)
    , unitVecs (0)
    , primVec (0, Param::epsilon())
    , dualVec (0, Param::epsilon())
    , addVec (0, Param::epsilon())
-   , thepricer (pric)
-   , theratiotester(rt)
-   , thestarter (start)
+   , thepricer (0)
+   , theratiotester (0)
+   , thestarter (0)
 {
    METHOD( "SPxSolver::SPxSolver()" );
-   setRep (p_rep);
-   setDelta (DEFAULT_BND_VIOL);
+
    theLP = this;
+   setRep (p_rep);
+
+   // info: SPxBasis is not consistent in this moment.
+   //assert(SPxSolver::isConsistent());
+}
+
+SPxSolver::~SPxSolver()
+{
+   assert(!freePricer || thepricer != 0);
+   assert(!freeRatioTester || theratiotester != 0);
+   assert(!freeStarter || thestarter != 0);
+
+   if(freePricer)
+   {
+      delete thepricer;
+      thepricer = 0;
+   }
+
+   if(freeRatioTester)
+   {
+      delete theratiotester;
+      theratiotester = 0;
+   }
+
+   if(freeStarter)
+   {
+      delete thestarter;
+      thestarter = 0;
+   }
+}
+
+
+SPxSolver& SPxSolver::operator=(const SPxSolver& base)
+{
+   METHOD( "SPxSolver::operator=(const SPxSolver&base)"  );
+   if(this != &base)
+   {
+      SPxLP::operator=(base);
+      SPxBasis::operator=(base);
+      theType = base.theType;
+      thePricing = base.thePricing;
+      theRep = base.theRep;
+      theTime = base.theTime;
+      maxIters = base.maxIters;
+      maxTime = base.maxTime;
+      objLimit = base.objLimit;
+      m_status = base.m_status;
+      theDelta = base.theDelta;
+      theShift = base.theShift;
+      lastShift = base.lastShift;
+      m_maxCycle = base.m_maxCycle;
+      m_numCycle = base.m_numCycle;
+      initialized = base.initialized;
+      instableLeaveNum = base.instableLeaveNum;
+      instableLeave = base.instableLeave;
+      unitVecs = base.unitVecs;
+      primRhs = base.primRhs;
+      primVec = base.primVec;
+      dualRhs = base.dualRhs;
+      dualVec = base.dualVec;
+      addVec = base.addVec;
+      theURbound = base.theURbound;
+      theLRbound = base.theLRbound;
+      theUCbound = base.theUCbound;
+      theLCbound = base.theLCbound;
+      theUBbound = base.theUBbound;
+      theLBbound = base.theLBbound;
+      theCoTest = base.theCoTest;
+      theTest = base.theTest;
+      dualFarkas = base.dualFarkas;
+      leaveCount = base.leaveCount;
+      enterCount = base.enterCount;
+      theCumulativeTime = base.theCumulativeTime;
+
+      if (base.theRep == COLUMN)
+      {
+         thevectors   = colSet();
+         thecovectors = rowSet(); 
+         theFrhs      = &primRhs;
+         theFvec      = &primVec;
+         theCoPrhs    = &dualRhs;
+         theCoPvec    = &dualVec;
+         thePvec      = &addVec;
+         theRPvec     = theCoPvec;
+         theCPvec     = thePvec;
+         theUbound    = &theUCbound;
+         theLbound    = &theLCbound;
+         theCoUbound  = &theURbound;
+         theCoLbound  = &theLRbound;
+      }
+      else
+      {
+         assert(base.theRep == ROW);
+         
+         thevectors   = rowSet(); 
+         thecovectors = colSet();
+         theFrhs      = &dualRhs;
+         theFvec      = &dualVec;
+         theCoPrhs    = &primRhs;
+         theCoPvec    = &primVec;
+         thePvec      = &addVec;
+         theRPvec     = thePvec;
+         theCPvec     = theCoPvec;
+         theUbound    = &theURbound;
+         theLbound    = &theLRbound;
+         theCoUbound  = &theUCbound;
+         theCoLbound  = &theLCbound;
+      }
+
+      SPxBasis::theLP = this;
+
+      assert(!freePricer || thepricer != 0);
+      assert(!freeRatioTester || theratiotester != 0);
+      assert(!freeStarter || thestarter != 0);
+
+      // thepricer
+      if(freePricer)
+      {
+         delete thepricer;
+         thepricer = 0;
+      }
+      if(base.thepricer == 0)
+      {
+         thepricer = 0;
+         freePricer = false;
+      }
+      else
+      {
+         thepricer = base.thepricer->clone();
+         freePricer = true;
+         thepricer->load(this);
+      }
+
+      // theratiotester
+      if(freeRatioTester)
+      {
+         delete theratiotester;
+         theratiotester = 0;
+      }
+      if(base.theratiotester == 0)
+      {
+         theratiotester = 0;
+         freeRatioTester = false;
+      }
+      else
+      {
+         theratiotester = base.theratiotester->clone();
+         freeRatioTester = true;
+         theratiotester->load(this);
+      }
+
+      // thestarter
+      if(freeStarter)
+      {
+         delete thestarter;
+         thestarter = 0;
+      }
+      if(base.thestarter == 0)
+      {
+         thestarter = 0;
+         freeStarter = false;
+      }
+      else
+      {
+         thestarter = base.thestarter->clone();
+         freeStarter = true;
+      }
+
+      assert(SPxSolver::isConsistent());
+   }
+
+   return *this;
+}
+
+
+SPxSolver::SPxSolver(const SPxSolver& base)
+   : SPxLP (base)
+   , SPxBasis::SPxBasis(base)
+   , theType(base.theType)
+   , thePricing(base.thePricing)
+   , theRep(base.theRep)
+   , theTime(base.theTime)
+   , theCumulativeTime(base.theCumulativeTime)
+   , maxIters(base.maxIters)
+   , maxTime(base.maxTime)
+   , objLimit(base.objLimit)
+   , m_status(base.m_status)
+   , theDelta(base.theDelta)
+   , theShift(base.theShift)
+   , lastShift(base.lastShift)
+   , m_maxCycle(base.m_maxCycle)
+   , m_numCycle(base.m_numCycle)
+   , initialized(base.initialized)
+   , solveVector2 (0)
+   , coSolveVector2(0)
+   , instableLeaveNum(base.instableLeaveNum)
+   , instableLeave(base.instableLeave)
+   , unitVecs(base.unitVecs)
+   , primRhs(base.primRhs)
+   , primVec(base.primVec)
+   , dualRhs(base.dualRhs)
+   , dualVec(base.dualVec)
+   , addVec(base.addVec)
+   , theURbound(base.theURbound)
+   , theLRbound(base.theLRbound)
+   , theUCbound(base.theUCbound)
+   , theLCbound(base.theLCbound)
+   , theUBbound(base.theUBbound)
+   , theLBbound(base.theLBbound)
+   , theCoTest(base.theCoTest)
+   , theTest(base.theTest)
+   , dualFarkas(base.dualFarkas)
+   , leaveCount(base.leaveCount)
+   , enterCount(base.enterCount)
+{
+   METHOD( "SPxSolver::SPxSolver(const SPxSolver&base)"  );
+
+   if (base.theRep == COLUMN)
+   {
+      thevectors   = colSet();
+      thecovectors = rowSet(); 
+      theFrhs      = &primRhs;
+      theFvec      = &primVec;
+      theCoPrhs    = &dualRhs;
+      theCoPvec    = &dualVec;
+      thePvec      = &addVec;
+      theRPvec     = theCoPvec;
+      theCPvec     = thePvec;
+      theUbound    = &theUCbound;
+      theLbound    = &theLCbound;
+      theCoUbound  = &theURbound;
+      theCoLbound  = &theLRbound;
+   }
+   else
+   {
+      assert(base.theRep == ROW);
+
+      thevectors   = rowSet(); 
+      thecovectors = colSet();
+      theFrhs      = &dualRhs;
+      theFvec      = &dualVec;
+      theCoPrhs    = &primRhs;
+      theCoPvec    = &primVec;
+      thePvec      = &addVec;
+      theRPvec     = thePvec;
+      theCPvec     = theCoPvec;
+      theUbound    = &theURbound;
+      theLbound    = &theLRbound;
+      theCoUbound  = &theUCbound;
+      theCoLbound  = &theLCbound;
+   }
+
+   SPxBasis::theLP = this;
+
+   if(base.thepricer == 0)
+   {
+      thepricer = 0;
+      freePricer = false;
+   }
+   else
+   {
+      thepricer = base.thepricer->clone();
+      freePricer = true;
+      thepricer->clear();
+      thepricer->load(this);
+   }
+
+   if(base.theratiotester == 0)
+   {
+      theratiotester = 0;
+      freeRatioTester = false;
+   }
+   else
+   {
+      theratiotester = base.theratiotester->clone();
+      freeRatioTester = true;
+      theratiotester->clear();
+      theratiotester->load(this);
+   }
+
+   if(base.thestarter == 0)
+   {
+      thestarter = 0;
+      freeStarter = false;
+   }
+   else
+   {
+      thestarter = base.thestarter->clone();
+      freeStarter = true;
+   }
+
+   assert(SPxSolver::isConsistent());
 }
 
 #ifndef NO_CONSISTENCY_CHECKS
@@ -1126,6 +1450,9 @@ std::ostream& operator<<( std::ostream& os,
          break;
       case SPxSolver::ZERO:
          os << "ZERO";
+         break;
+      case SPxSolver::UNDEFINED:
+         os << "UNDEFINED";
          break;
       default:
          os << "?invalid?";
