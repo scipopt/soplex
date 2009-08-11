@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idxset.cpp,v 1.14 2009/08/10 14:13:28 bzfgleix Exp $"
+#pragma ident "@(#) $Id: idxset.cpp,v 1.15 2009/08/11 14:29:44 bzfgleix Exp $"
 
 #include "idxset.h"
 #include "message.h"
@@ -72,18 +72,22 @@ IdxSet& IdxSet::operator=(const IdxSet& rhs)
 {
    if (this != &rhs)
    {
-      assert(max() >= rhs.size());
+      if (idx != 0 && max() < rhs.size())
+      {
+         if (freeArray)
+            spx_free(idx);
+         idx = 0;
+      }
 
-      if (freeArray)
-         spx_free(idx);
+      if (idx == 0)
+      {
+         len = sizeof(rhs.idx)/sizeof(int);
+         spx_alloc(idx, len);
+         freeArray = true;
+      }
 
-      int sizeOfIdx = sizeof(rhs.idx)/sizeof(int);
-      spx_alloc(idx, sizeOfIdx);
-
-      for (num = 0; num < rhs.size(); num++)
+      for (num = 0; num < rhs.size(); ++num)
          idx[num] = rhs.idx[num];
-
-      freeArray = true;
    }
 
    assert(size() == rhs.size());
@@ -95,9 +99,9 @@ IdxSet& IdxSet::operator=(const IdxSet& rhs)
 
 IdxSet::IdxSet(const IdxSet& old)
    : len(old.len)
+   , idx(0)
 {
-   int sizeOfIdx = sizeof(old.idx)/sizeof(int);
-   spx_alloc(idx, sizeOfIdx);
+   spx_alloc(idx, len);
 
    for (num = 0; num < old.num; num++)
       idx[num] = old.idx[num];
