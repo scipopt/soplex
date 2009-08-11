@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.96 2009/02/20 01:06:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.97 2009/08/11 13:52:37 bzfgleix Exp $"
 
 #include <iostream>
 
@@ -28,37 +28,203 @@ SoPlex::SoPlex(SPxSolver::Type p_type, SPxSolver::Representation p_rep)
    , m_postScaler(0)
    , m_simplifier(0)
    , m_vanished(false)
+   , m_freePreScaler(false)
+   , m_freePostScaler(false)
+   , m_freeSimplifier(false)
 {
    m_solver.setSolver(&m_slu);  
-   m_solver.setTester(&m_fastRT);
-   m_solver.setPricer(&m_steepPR);
+   m_solver.setTester(new SPxFastRT(), true);
+   m_solver.setPricer(new SPxSteepPR(), true);
    m_solver.setStarter(0);
 
    assert(SoPlex::isConsistent());
 }
 
 SoPlex::~SoPlex()
-{}
-
-void SoPlex::setPreScaler(SPxScaler* x)
 {
-   METHOD( "SoPlex::setScaler()" );
+   assert(!m_freePreScaler || m_preScaler != 0);
+   assert(!m_freePostScaler || m_postScaler != 0);
+   assert(!m_freeSimplifier || m_simplifier != 0);
 
+   if(m_freePreScaler)
+   {
+      delete m_preScaler;
+      m_preScaler = 0;
+   }
+
+   if(m_freePostScaler)
+   {
+      delete m_postScaler;
+      m_postScaler = 0;
+   }
+
+   if(m_freeSimplifier)
+   {
+      delete m_simplifier;
+      m_simplifier = 0;
+   }
+}
+
+SoPlex& SoPlex::operator=(const SoPlex& base)
+{
+   assert(!m_freePreScaler || m_preScaler != 0);
+   assert(!m_freePostScaler || m_postScaler != 0);
+   assert(!m_freeSimplifier || m_simplifier != 0);
+
+   if(this != &base)
+   {
+      SPxLP::operator=(base);
+      m_slu = base.m_slu;  // call of SLinSolver::clone() SPxBasis assignment operator not necessary (done by m_solver.setSolver(&m_slu) below)
+      m_solver = base.m_solver;
+      m_vanished = base.m_vanished;
+      m_solver.setSolver(&m_slu);
+
+      // m_preScaler
+      if(m_freePreScaler)
+      {
+         delete m_preScaler;
+         m_preScaler = 0;
+      }
+      if(base.m_preScaler == 0)
+      {
+         m_preScaler = 0;
+         m_freePreScaler = false;
+      }
+      else
+      {
+         m_preScaler = base.m_preScaler->clone();
+         m_freePreScaler = true;
+      }
+
+      // m_postScaler
+      if(m_freePostScaler)
+      {
+         delete m_postScaler;
+         m_postScaler = 0;
+      }
+      if(base.m_postScaler == 0)
+      {
+         m_postScaler = 0;
+         m_freePostScaler = false;
+      }
+      else
+      {
+         m_postScaler = base.m_postScaler->clone();
+         m_freePostScaler = true;
+      }
+
+      // m_simplifier
+      if(m_freeSimplifier)
+      {
+         delete m_simplifier;
+         m_simplifier = 0;
+      }
+      if(base.m_simplifier == 0)
+      {
+         m_simplifier = 0;
+         m_freeSimplifier = false;
+      }
+      else
+      {
+         m_simplifier = base.m_simplifier->clone();
+         m_freeSimplifier = true;
+      }
+   }
+
+   return *this;
+}
+
+
+SoPlex::SoPlex(const SoPlex& old)
+   : SPxLP(old)
+   , m_slu(old.m_slu)  // call of SLinSolver::clone() SPxBasis copy constructor not necessary (done by m_solver.setSolver(&m_slu) below)
+   , m_solver(old.m_solver)
+   , m_vanished(old.m_vanished)
+{
+   m_solver.setSolver(&m_slu);
+
+   // m_preScaler
+   if(old.m_preScaler == 0)
+   {
+      m_preScaler = 0;
+      m_freePreScaler = false;
+   }
+   else
+   {
+      m_preScaler = old.m_preScaler->clone();
+      m_freePreScaler = true;
+   }
+
+   // m_postScaler
+   if(old.m_postScaler == 0)
+   {
+      m_postScaler = 0;
+      m_freePostScaler = false;
+   }
+   else
+   {
+      m_postScaler = old.m_postScaler->clone();
+      m_freePostScaler = true;
+   }
+
+   // m_simplifier
+   if(old.m_simplifier == 0)
+   {
+      m_simplifier = 0;
+      m_freeSimplifier = false;
+   }
+   else
+   {
+      m_simplifier = old.m_simplifier->clone();
+      m_freeSimplifier = true;
+   }
+}
+
+
+
+void SoPlex::setPreScaler(SPxScaler* x, const bool destroy)
+{
+   METHOD( "SoPlex::setPreScaler()" );
+
+   assert(!m_freePreScaler || m_preScaler != 0);
+
+   if(m_freePreScaler)
+   {
+      delete m_preScaler;
+      m_preScaler = 0;
+   }
    m_preScaler = x;
+   m_freePreScaler = destroy;
 }
 
-void SoPlex::setPostScaler(SPxScaler* x)
+void SoPlex::setPostScaler(SPxScaler* x, const bool destroy)
 {
-   METHOD( "SoPlex::setScaler()" );
+   METHOD( "SoPlex::setPostScaler()" );
 
+   assert(!m_freePostScaler || m_postScaler != 0);
+
+   if(m_freePostScaler)
+   {
+      delete m_postScaler;
+      m_postScaler = 0;
+   }
    m_postScaler = x;
+   m_freePostScaler = destroy;
 }
 
-void SoPlex::setSimplifier(SPxSimplifier* x)
+void SoPlex::setSimplifier(SPxSimplifier* x, const bool destroy)
 {
    METHOD( "SoPlex::setSimplifier()" );
 
+   assert(!m_freeSimplifier || m_simplifier != 0);
+
+   if(m_freeSimplifier)
+   {
+      delete m_simplifier;
+      m_simplifier = 0;
+   }
    m_simplifier = x;
+   m_freeSimplifier = destroy;
 }
 
 Real SoPlex::objValue() const
@@ -126,6 +292,8 @@ SPxSolver::Status SoPlex::solve()
             m_solver.loadBasis(oldbasisdesc);
       }
    }
+
+
    return m_solver.solve();
 }
 
@@ -271,6 +439,10 @@ SPxSolver::Status SoPlex::getRedCost(Vector& rdcost) const
 
 SPxSolver::VarStatus SoPlex::getBasisRowStatus(int i) const
 {
+   SPxBasis::SPxStatus b_status = m_solver.getBasisStatus();
+   if(b_status == SPxBasis::NO_PROBLEM || (has_simplifier() && b_status == SPxBasis::SINGULAR))
+      return SPxSolver::UNDEFINED;
+
    if (has_simplifier())
    {
       if (!m_simplifier->isUnsimplified())
@@ -284,6 +456,10 @@ SPxSolver::VarStatus SoPlex::getBasisRowStatus(int i) const
 
 SPxSolver::VarStatus SoPlex::getBasisColStatus(int j) const
 {
+   SPxBasis::SPxStatus b_status = m_solver.getBasisStatus();
+   if(b_status == SPxBasis::NO_PROBLEM || (has_simplifier() && b_status == SPxBasis::SINGULAR))
+      return SPxSolver::UNDEFINED;
+
    if (has_simplifier())
    {
       if (!m_simplifier->isUnsimplified())
@@ -297,6 +473,22 @@ SPxSolver::VarStatus SoPlex::getBasisColStatus(int j) const
 
 SPxSolver::Status SoPlex::getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const
 {
+   SPxBasis::SPxStatus b_status = m_solver.getBasisStatus();
+   if(b_status == SPxBasis::NO_PROBLEM || (has_simplifier() && b_status == SPxBasis::SINGULAR))
+   {
+      int i;
+
+      if (cols)
+         for (i = nCols() - 1; i >= 0; --i)
+            cols[i] = SPxSolver::UNDEFINED;
+
+      if (rows)
+         for (i = nRows() - 1; i >= 0; --i)
+            rows[i] = SPxSolver::UNDEFINED;
+
+      return m_solver.status();
+   }
+
    if (has_simplifier())
    {
       if (!m_simplifier->isUnsimplified())
@@ -439,9 +631,9 @@ void SoPlex::unsimplify() const
    DVector psp_s(m_solver.nRows());  // slacks          (prescaled simplified postscaled)
    DVector psp_r(m_solver.nCols());  // reduced costs   (prescaled simplified postscaled)
 
-   // If there is no sensible solution, do nothing.
-   const SPxSolver::Status  stat = status();
-   if (stat != SPxSolver::OPTIMAL)
+   // If basis status is not regular, do nothing.
+   SPxBasis::SPxStatus b_status = m_solver.getBasisStatus();
+   if(b_status < SPxBasis::REGULAR)
       return;
     
    if (! m_vanished) {

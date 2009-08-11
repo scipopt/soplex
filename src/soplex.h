@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.79 2009/05/05 16:28:53 bzfgleix Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.80 2009/08/11 13:52:37 bzfgleix Exp $"
 
 /**@file  soplex.h
  * @brief preconfigured \ref soplex::SoPlex "SoPlex" LP-solver.
@@ -46,8 +46,6 @@ protected:
    //-------------------------
    //**@name Protected data */
    //@{
-   SPxFastRT       m_fastRT;     ///< fast ratio test
-   SPxSteepPR      m_steepPR;    ///< steepest edge pricing
    //   SPxWeightST st;  ///< weight starter
    SLUFactor       m_slu;        ///< LU Factorisation
    SPxSolver       m_solver;     ///< solver
@@ -55,6 +53,9 @@ protected:
    SPxScaler*      m_postScaler; ///< post-scaler
    SPxSimplifier*  m_simplifier; ///< simplifier
    bool            m_vanished;   ///< did the presolver solve the problem ?
+   bool            m_freePreScaler;   ///< true iff m_preScaler should be freed inside of this object
+   bool            m_freePostScaler;  ///< true iff m_postScaler should be freed inside of this object
+   bool            m_freeSimplifier;  ///< true iff m_simplifier should be freed inside of this object
    //@}
 
 public:
@@ -67,6 +68,10 @@ public:
       SPxSolver::Type           type = SPxSolver::LEAVE, 
       SPxSolver::Representation rep  = SPxSolver::COLUMN );
    virtual ~SoPlex();
+   /// assignment operator.
+   SoPlex& operator=(const SoPlex& rhs);
+   /// copy constructor.
+   SoPlex(const SoPlex&);
    //@}
 
    //---------------------------------------
@@ -92,17 +97,27 @@ public:
    {
       return m_solver.type();
    }
+   /// return current basis representation.
+   inline SPxSolver::Representation rep() const
+   {
+      return m_solver.rep();
+   }
    /// set LEAVE or ENTER algorithm.
    virtual void setType(SPxSolver::Type tp)
    {
       m_solver.setType(tp);
    }
-   /// setup prescaler to use.
-   virtual void setPreScaler(SPxScaler* scaler);
-   /// setup postscaler to use.
-   virtual void setPostScaler(SPxScaler* scaler);
-   /// setup simplifier to use.
-   virtual void setSimplifier(SPxSimplifier* simpli);
+   /// set #ROW or #COLUMN representation.
+   virtual void setRep (SPxSolver::Representation p_rep)
+   {
+      m_solver.setRep(p_rep);
+   }
+   /// setup prescaler to use. If \p destroy is true, \p scaler will be freed in destructor.
+   virtual void setPreScaler(SPxScaler* scaler, const bool destroy = false);
+   /// setup postscaler to use. If \p destroy is true, \p scaler will be freed in destructor.
+   virtual void setPostScaler(SPxScaler* scaler, const bool destroy = false);
+   /// setup simplifier to use. If \p destroy is true, \p simpli will be freed in destructor.
+   virtual void setSimplifier(SPxSimplifier* simpli, const bool destroy = false);
    /// has a simplifier been set?
    inline bool has_simplifier() const
    {
@@ -119,19 +134,19 @@ public:
       return m_postScaler != 0;
    }
    /// setup pricer to use.
-   virtual void setPricer(SPxPricer* pricer)
+   virtual void setPricer(SPxPricer* pricer, const bool destroy = false)
    {
-      m_solver.setPricer(pricer);
+      m_solver.setPricer(pricer, destroy);
    }
    /// setup ratio-tester to use.
-   virtual void setTester(SPxRatioTester* tester)
+   virtual void setTester(SPxRatioTester* tester, const bool destroy = false)
    {
-      m_solver.setTester(tester);
+      m_solver.setTester(tester, destroy);
    }
    /// setup starting basis generator to use.
-   virtual void setStarter(SPxStarter* starter)
+   virtual void setStarter(SPxStarter* starter, const bool destroy = false)
    {
-      m_solver.setStarter(starter);
+      m_solver.setStarter(starter, destroy);
    }
    /// set time limit.
    virtual void setTerminationTime(Real time = infinity)
@@ -293,15 +308,6 @@ public:
    //@}
 
 private:
-
-   //---------------------------------------
-   //**@name Blocked */
-   //@{
-   /// assignment operator is not implemented.
-   SoPlex& operator=(const SoPlex& rhs);
-   /// copy constructor is not implemented.
-   SoPlex(const SoPlex&);
-   //@}
 
    //------------------------------------
    //**@name Private helpers */
