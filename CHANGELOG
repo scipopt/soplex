@@ -19,6 +19,22 @@ Current version
 - Corrected bug in formulas for triggering refactorizations after
   increased relative/absolute fill.
 
+- Fixed memory leak in class SPxMainSM when calling simplify() multiple times.
+
+- Implemented copy constructors and assignment operators for almost all classes, especially
+  SoPlex and SPxSolver.
+
+- The set methods (for pricer, ratiotester, ...) in classes SoPlex and SPxSolver now have an
+  optional boolean parameter (false by default) controlling whether the memory of the object handed
+  over shall be managed internally. (This does not affect the default behaviour of the interface
+  methods.)
+
+- The constructor of class SPxSolver does not have parameters for pricer, ratiotester and starter,
+  anymore. Use set methods instead.
+
+- In class SoPlex, enabled getBasis... methodsalso when simplifier is present and basis suboptimal,
+  but regular.
+
 #----------------------------------------------------------------
 
 Release 1.4.1
