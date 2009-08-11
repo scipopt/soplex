@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.20 2009/03/17 23:25:26 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.21 2009/08/11 12:49:16 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -3052,6 +3052,17 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real delta)
 
    m_cIdx.reSize(lp.nCols());
    m_rIdx.reSize(lp.nRows());
+
+   if(m_hist.size() > 0)
+   {
+      // delete pointers in old m_hist
+      for(int k = 0; k < m_hist.size(); ++k)
+      {
+         delete m_hist[k];
+         m_hist[k] = 0;
+      }
+      m_hist.clear();
+   }
    
    m_hist.reSize(0);
    m_postsolved = false;
