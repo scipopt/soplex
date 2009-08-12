@@ -35,6 +35,11 @@ Current version
 - In class SoPlex, enabled getBasis... methodsalso when simplifier is present and basis suboptimal,
   but regular.
 
+- Fixed bug in class DataKey leading to a segmentation fault when reading LPs with more than
+  8,388,607 variables or constraints: now the maximum number allowed is 536,870,911 and asserted in
+  debug mode.
+
+
 #----------------------------------------------------------------
 
 Release 1.4.1
