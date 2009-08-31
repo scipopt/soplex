@@ -59,6 +59,10 @@ TESTMEMORYOBJ	=	testMemory.o
 TESTMEMORYBIN	=	testMemory.$(BASE)
 
 
+TESTCOPYCONSASSIGNMENTFUNCOBJ    =  testCopyconsAssignmentfunc.o
+TESTCOPYCONSASSIGNMENTFUNCBIN    =  testCopyconsAssignmentfunc.$(BASE)
+
+
 #------------------------------------------------------------------------------
 #--- NOTHING TO CHANGE FROM HERE ON -------------------------------------------
 #------------------------------------------------------------------------------
@@ -73,9 +77,9 @@ GCCWARN		=	-Wall -W -Wpointer-arith -Wno-unknown-pragmas \
 #include make/make.$(OSTYPE).$(ARCH).$(COMP).$(OPT).$(LINK)
 #-----------------------------------------------------------------------------
 
-.PHONY: change_exerciser status_exception_test testChangeElement testChangeObjective testMemory clean all
+.PHONY: change_exerciser status_exception_test testChangeElement testChangeObjective testCopyconsAssignmentfunc testMemory  clean all
 
-all: change_exerciser status_exception_test testChangeElement testMemory
+all: change_exerciser status_exception_test testChangeElement testCopyconsAssignmentfunc testMemory
 
 change_exerciser: $(CHANGEBINFILE)
 
@@ -84,6 +88,8 @@ status_exception_test: $(EXCEPTIONBINFILE)
 testChangeElement: $(TESTCHANGEELEMENTBIN)
 
 testChangeObjective: $(TESTCHANGEOBJECTIVEBIN)
+
+testCopyconsAssignmentfunc: $(TESTCOPYCONSASSIGNMENTFUNCBIN)
 
 testMemory: $(TESTMEMORYBIN)
 
@@ -108,6 +114,11 @@ $(TESTCHANGEOBJECTIVEBIN): $(LIBFILE) $(TESTCHANGEOBJECTIVEOBJ)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(TESTCHANGEOBJECTIVEOBJ) \
 		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
 
+$(TESTCOPYCONSASSIGNMENTFUNCBIN): $(LIBFILE) $(TESTCOPYCONSASSIGNMENTFUNCOBJ)
+		@echo "-> linking $@"
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(TESTCOPYCONSASSIGNMENTFUNCOBJ) \
+		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+
 $(TESTMEMORYBIN): $(LIBFILE) $(TESTMEMORYOBJ)
 		@echo "-> linking $@"
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(TESTMEMORYOBJ) \
@@ -119,5 +130,5 @@ $(TESTMEMORYBIN): $(LIBFILE) $(TESTMEMORYOBJ)
 
 clean:
 		-rm -rf *.o $(EXCEPTIONBINFILE) $(CHANGEBINFILE) $(TESTCHANGEELEMENTBIN) $(TESTCHANGEOBJECTIVEBIN) \
-		$(TESTMEMORYBIN)
+		$(TESTCOPYCONSASSIGNMENTFUNCBIN) $(TESTMEMORYBIN)
 
