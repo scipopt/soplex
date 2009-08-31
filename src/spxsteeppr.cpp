@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.41 2009/07/17 11:01:45 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.42 2009/08/31 16:15:32 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -233,8 +233,6 @@ void SPxSteepPR::left4(int n, SPxId id)
                            << rhoVec[n] << " with smaller absolute value than 0.5*theeps = " << 0.5*theeps << std::endl; )
       }
 #endif  // NDEBUG
-      if (fabs(rhoVec[n]) < theeps * 0.5)
-         throw SPxStatusException("WSTEEP04 Condition 'fabs(rhoVec[n]) >= theeps * 0.5' violated");
 
       //  Update #coPenalty# vector
       const IdxSet& rhoIdx = thesolver->fVec().idx();
