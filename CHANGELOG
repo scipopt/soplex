@@ -39,6 +39,9 @@ Current version
   8,388,607 variables or constraints: now the maximum number allowed is 536,870,911 and asserted in
   debug mode.
 
+- Fixed bug in SPxFastRT leading to failed assert 'rep() == ROW' (in leave.cpp): In column/leaving
+  algorithm, now we only consider nonbasic variables for entering the basis.
+
 
 #----------------------------------------------------------------
 

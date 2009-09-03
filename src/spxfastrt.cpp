@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.41 2009/02/20 01:06:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.42 2009/09/03 08:40:56 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -135,6 +135,7 @@ int SPxFastRT::maxDelta(
       {
          i = *idx;
          x = upd[i];
+
          if (x > epsilon)
          {
             mabs = (x > mabs) ? x : mabs;
@@ -274,6 +275,7 @@ int SPxFastRT::minDelta(
       {
          i = *idx;
          x = upd[i];
+
          if (x > epsilon)
          {
             mabs = (x > mabs) ? x : mabs;
@@ -466,6 +468,7 @@ int SPxFastRT::minSelect(
 {
    int i;
    Real x, y;
+   bool columnleaving = thesolver->rep() == SPxSolver::COLUMN && m_type == SPxSolver::LEAVE;
 
    const Real* up = upBound.get_const_ptr();
    const Real* low = lowBound.get_const_ptr();
@@ -481,6 +484,11 @@ int SPxFastRT::minSelect(
    {
       i = *idx;
       x = upd[i];
+
+      // in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables
+      if( columnleaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
+         continue;
+
       if (x > stab)
       {
          y = (low[i] - vec[i]) / x;
@@ -538,6 +546,7 @@ int SPxFastRT::maxSelect(
 {
    int i;
    Real x, y;
+   bool columnleaving = thesolver->rep() == SPxSolver::COLUMN && m_type == SPxSolver::LEAVE;
 
    const Real* up = upBound.get_const_ptr();
    const Real* low = lowBound.get_const_ptr();
@@ -553,6 +562,11 @@ int SPxFastRT::maxSelect(
    {
       i = *idx;
       x = upd[i];
+
+      // in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables
+      if( columnleaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
+         continue;
+
       if (x > stab)
       {
          y = (up[i] - vec[i]) / x;
@@ -620,8 +634,10 @@ SPxId SPxFastRT::maxSelect(
    int indp, indc;
    Real best = -infinity;
    bestDelta = 0.0;
+   iscoid = true;
    indc = maxSelect(val, stab, best, bestDelta, max,
       thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
+   iscoid = false;
    indp = maxSelect(val, stab, best, bestDelta, max,
       thesolver->pVec(), thesolver->lpBound(), thesolver->upBound(), 0, 1);
 
@@ -660,8 +676,10 @@ SPxId SPxFastRT::minSelect(
 {
    Real best = infinity;
    bestDelta = 0.0;
+   iscoid = true;
    int indc = minSelect(val, stab, best, bestDelta, max,
       thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
+   iscoid = false;
    int indp = minSelect(val, stab, best, bestDelta, max,
       thesolver->pVec(), thesolver->lpBound(), thesolver->upBound(), 0, 1);
 

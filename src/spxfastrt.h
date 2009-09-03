@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.h,v 1.22 2009/08/11 13:11:34 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxfastrt.h,v 1.23 2009/09/03 08:40:56 bzfgleix Exp $"
 
 /**@file  spxfastrt.h
  * @brief Fast shifting ratio test.
@@ -43,7 +43,6 @@ namespace soplex
 class SPxFastRT : public SPxRatioTester
 {
 private:
-
    //-------------------------------------
    /**@name Data */
    //@{
@@ -55,6 +54,8 @@ private:
    Real delta;
    /// initially allowed infeasibility.
    Real delta0;
+   /// flag used in methods minSelect/maxSelect to retrieve correct basis status
+   bool iscoid;
    //@}
 
    //-------------------------------------
@@ -179,6 +180,7 @@ public:
       , epsilon(old.epsilon)
       , delta(old.delta)
       , delta0(old.delta0)
+      , iscoid(false)
    {}
    /// assignment operator
    SPxFastRT& operator=( const SPxFastRT& rhs)
@@ -216,7 +218,6 @@ public:
    ///
    virtual void setType(SPxSolver::Type type);
    //@}
-
 };
 } // namespace soplex
 #endif // _SPXFASTRT_H_
