@@ -31,8 +31,11 @@ SRCDIR		=	../src
 BINDIR		=	../bin
 LIBDIR		=	../lib
 
+DEPEND		=	dependencies
+
 CPPFLAGS	=	-I$(SRCDIR)
 CXXFLAGS	=	-g
+DFLAGS		=	-MM
 BINOFLAGS	=	
 LIBOFLAGS	=	
 LDFLAGS		=	-lm -lz -static
@@ -58,10 +61,10 @@ TESTCHANGEOBJECTIVEBIN	=	testChangeObjective.$(BASE)
 TESTMEMORYOBJ	=	testMemory.o
 TESTMEMORYBIN	=	testMemory.$(BASE)
 
-
 TESTCOPYCONSASSIGNMENTFUNCOBJ    =  testCopyconsAssignmentfunc.o
 TESTCOPYCONSASSIGNMENTFUNCBIN    =  testCopyconsAssignmentfunc.$(BASE)
 
+ALLOBJ		= $(CHANGEBINOBJ) $(EXCEPTIONBINOBJ) $(TESTCHANGEOBJECTIVEOBJ) $(TESTCHANGEOBJECTIVEOBJ) $(TESTMEMORYOBJ) $(TESTCOPYCONSASSIGNMENTFUNCOBJ)
 
 #------------------------------------------------------------------------------
 #--- NOTHING TO CHANGE FROM HERE ON -------------------------------------------
@@ -96,37 +99,81 @@ testMemory: $(TESTMEMORYBIN)
 
 $(CHANGEBINFILE): $(LIBFILE) $(CHANGEBINOBJ)
 		@echo "-> linking $@"
+ifeq ($(VERBOSE), true)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(CHANGEBINOBJ) \
 		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+else
+		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(CHANGEBINOBJ) \
+		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+endif
 
 $(EXCEPTIONBINFILE): $(LIBFILE) $(EXCEPTIONBINOBJ)
 		@echo "-> linking $@"
+ifeq ($(VERBOSE), true)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(EXCEPTIONBINOBJ) \
 		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+else
+		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(EXCEPTIONBINOBJ) \
+		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+endif
 
 $(TESTCHANGEELEMENTBIN): $(LIBFILE) $(TESTCHANGEELEMENTOBJ)
 		@echo "-> linking $@"
+ifeq ($(VERBOSE), true)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(TESTCHANGEELEMENTOBJ) \
 		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+else
+		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(TESTCHANGEELEMENTOBJ) \
+		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+endif
 
 $(TESTCHANGEOBJECTIVEBIN): $(LIBFILE) $(TESTCHANGEOBJECTIVEOBJ)
 		@echo "-> linking $@"
+ifeq ($(VERBOSE), true)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(TESTCHANGEOBJECTIVEOBJ) \
 		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+else
+		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(TESTCHANGEOBJECTIVEOBJ) \
+		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+endif
 
 $(TESTCOPYCONSASSIGNMENTFUNCBIN): $(LIBFILE) $(TESTCOPYCONSASSIGNMENTFUNCOBJ)
 		@echo "-> linking $@"
+ifeq ($(VERBOSE), true)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(TESTCOPYCONSASSIGNMENTFUNCOBJ) \
 		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+else
+		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(TESTCOPYCONSASSIGNMENTFUNCOBJ) \
+		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+endif
 
 $(TESTMEMORYBIN): $(LIBFILE) $(TESTMEMORYOBJ)
 		@echo "-> linking $@"
+ifeq ($(VERBOSE), true)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(TESTMEMORYOBJ) \
 		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+else
+		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(TESTMEMORYOBJ) \
+		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+endif
+
+.PHONY: $(DEPEND)
+depend:
+		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
+		$(ALLOBJ:.o=.cpp) \
+		| sed '\''s|^\([0-9A-Za-z]\{1,\}\)\.o|\1.o|g'\'' \
+		>$(DEPEND)'
+
+-include	$(DEPEND)
+
 
 %.o:	%.cpp
 		@echo "-> compiling $@"
+ifeq ($(VERBOSE), true)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) -c $< -o $@
+else
+		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) -c $< -o $@
+endif
 
 clean:
 		-rm -rf *.o $(EXCEPTIONBINFILE) $(CHANGEBINFILE) $(TESTCHANGEELEMENTBIN) $(TESTCHANGEOBJECTIVEBIN) \
