@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.43 2009/08/11 13:30:45 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.44 2009/09/07 19:08:20 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -546,7 +546,8 @@ void SPxSolver::factorize()
 
 #ifndef NDEBUG
    /* see note near top of function */
-   testVecs();
+   if (SPxBasis::status() > SPxBasis::SINGULAR)
+      testVecs();
 #endif  // NDEBUG
 
    if (SPxBasis::status() == SPxBasis::SINGULAR)
