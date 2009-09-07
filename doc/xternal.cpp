@@ -6,6 +6,7 @@
    @author   Timo Berthold
    @author   Andreas Bley
    @author   Ambros Gleixner
+   @author   Wei Huang
    @author   Benjamin Hiller
    @author   Thorsten Koch
    @author   Sebastian Orlowski
