@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.43 2009/08/11 13:30:45 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.44 2009/09/07 22:01:02 bzfgleix Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -172,7 +172,7 @@ public:
       UNDEFINED      ///< nothing known about basis status (possibly due to a singular basis in transformed problem)
    };
 
-   /**@todo In spxchange and at loadbasis, change the status to
+   /**@todo In spxchange, change the status to
             if (m_status > 0) m_status = REGULAR;
      */
    enum Status
