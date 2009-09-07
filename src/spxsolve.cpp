@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.108 2009/05/18 09:19:01 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.109 2009/09/07 20:14:13 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -587,6 +587,9 @@ SPxSolver::Status SPxSolver::solve()
 void SPxSolver::testVecs()
 {
    METHOD( "SPxSolver::testVecs()" );
+
+   assert(SPxBasis::status() > SPxBasis::SINGULAR);
+
    DVector tmp(dim());
 
    tmp = *theCoPvec;
@@ -659,7 +662,8 @@ bool SPxSolver::terminate()
 {
    METHOD( "SPxSolver::terminate()" );
 #if ENABLE_ADDITIONAL_CHECKS
-   testVecs();
+   if (SPxBasis::status() > SPxBasis::SINGULAR)
+      testVecs();
 #endif
 
    int redo = dim();
