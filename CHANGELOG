@@ -42,6 +42,10 @@ Current version
 - Fixed bug in SPxFastRT leading to failed assert 'rep() == ROW' (in leave.cpp): In column/leaving
   algorithm, now we only consider nonbasic variables for entering the basis.
 
+- Added check for stalling in main solve loop SPxSolver::solve(): if objective value and shift
+  haven't changed after a large number of iterations, switch algorithm.  This fixes a timeout of
+  SCIP/SoPlex on instance glass4 (MIPLIB2003).
+
 
 #----------------------------------------------------------------
 
