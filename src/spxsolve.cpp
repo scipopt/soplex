@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.109 2009/09/07 20:14:13 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.110 2009/09/10 18:43:17 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -30,6 +30,8 @@
 #include "exceptions.h"
 
 #define MAXCYCLES 400
+#define MAXSTALLS 10000
+#define MAXSTALLRECOVERS 10
 
 namespace soplex
 {
@@ -92,6 +94,11 @@ SPxSolver::Status SPxSolver::solve()
    Real  newDelta;
    Real  minShift = infinity;
    int   cycleCount = 0;
+
+   /* store the last (primal or dual) feasible objective value to recover/abort in case of stalling */
+   Real  stallRefValue;
+   Real  stallRefShift;
+   int   stallNumRecovers;
 
    if (dim() <= 0 && coDim() <= 0) // no problem loaded
    {
@@ -174,11 +181,16 @@ SPxSolver::Status SPxSolver::solve()
    leaveCount = 0;
    enterCount = 0;
 
+   stallNumRecovers = 0;
+
    while (!stop)
    {
       if (type() == ENTER)
       {
          int enterCycleCount = 0;
+
+         stallRefShift = shift();
+         stallRefValue = value();
 
          thepricer->setEpsilon(maxDelta);
 
@@ -264,6 +276,37 @@ SPxSolver::Status SPxSolver::solve()
                   stop = true;
                }
             }
+
+            /* check every MAXSTALLS iterations whether shift and objective value have not changed */
+            if( iteration() % MAXSTALLS == 0 && iteration() >= 1 )
+            {
+               if( fabs(value() - stallRefValue) <= epsilon() && fabs(shift() - stallRefShift) <= epsilon() )
+               {
+                  if( stallNumRecovers < MAXSTALLRECOVERS )
+                  {
+                     /* try to recover by unshifting/switching algorithm up to MAXSTALLRECOVERS times (just a number picked) */
+                     MSG_INFO3( spxout << "ISOLVE21 Stalling detected - trying to recover by switching to LEAVING algorithm." << std::endl; )
+
+                     ++stallNumRecovers;
+                     break;
+                  }
+                  else
+                  {
+                     /* giving up */
+                     MSG_INFO2( spxout << "ISOLVE22 Abort solving due to stalling in entering algorithm." << std::endl; );
+
+                     m_status = ABORT_CYCLING;
+                     stop = true;
+                  }
+               }
+               else
+               {
+                  /* merely update reference values */
+                  stallRefShift = shift();
+                  stallRefValue = value();
+               }
+            }
+
             //@ assert(isConsistent());
          }
          while (!stop);
@@ -314,6 +357,9 @@ SPxSolver::Status SPxSolver::solve()
 
          instableLeaveNum = -1;
          instableLeave = false;
+
+         stallRefShift = shift();
+         stallRefValue = value();
 
          thepricer->setEpsilon(maxDelta);
 
@@ -416,6 +462,37 @@ SPxSolver::Status SPxSolver::solve()
                   stop = true;
                }
             }
+
+            /* check every MAXSTALLS iterations whether shift and objective value have not changed */
+            if( iteration() % MAXSTALLS == 0 && iteration() >= 1 )
+            {
+               if( fabs(value() - stallRefValue) <= epsilon() && fabs(shift() - stallRefShift) <= epsilon() )
+               {
+                  if( stallNumRecovers < MAXSTALLRECOVERS )
+                  {
+                     /* try to recover by switching algorithm up to MAXSTALLRECOVERS times */
+                     MSG_INFO3( spxout << "ISOLVE24 Stalling detected - trying to recover by switching to ENTERING algorithm." << std::endl; )
+
+                     ++stallNumRecovers;
+                     break;
+                  }
+                  else
+                  {
+                     /* giving up */
+                     MSG_INFO2( spxout << "ISOLVE25 Abort solving due to stalling in leaving algorithm" << std::endl; );
+
+                     m_status = ABORT_CYCLING;
+                     stop = true;
+                  }
+               }
+               else
+               {
+                  /* merely update reference values */
+                  stallRefShift = shift();
+                  stallRefValue = value();
+               }
+            }
+
             //@ assert(isConsistent());
          }
          while (!stop);
@@ -581,6 +658,7 @@ SPxSolver::Status SPxSolver::solve()
       }
    }
 #endif  // ENABLE_ADDITIONAL_CHECKS
+
    return status();
 }
 
