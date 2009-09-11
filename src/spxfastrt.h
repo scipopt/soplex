@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.h,v 1.23 2009/09/03 08:40:56 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxfastrt.h,v 1.24 2009/09/11 13:03:32 bzfgleix Exp $"
 
 /**@file  spxfastrt.h
  * @brief Fast shifting ratio test.
@@ -172,6 +172,7 @@ public:
    /// default constructor
    SPxFastRT()
       : SPxRatioTester("Fast")
+      , iscoid(false)
    {}
    /// copy constructor
    SPxFastRT(const SPxFastRT& old)
@@ -192,6 +193,7 @@ public:
          epsilon = rhs.epsilon;
          delta = rhs.delta;
          delta0 = rhs.delta0;
+         iscoid = false;
       }
 
       return *this;
