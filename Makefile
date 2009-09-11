@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.94 2009/02/20 00:51:25 bzfgleix Exp $
+# $Id: Makefile,v 1.95 2009/09/11 13:37:13 bzfgleix Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -10,7 +10,7 @@
 
 .PHONY:		all depend clean distclean lint doc check
 
-VERSION		:=	1.4.1
+VERSION		:=	1.4.2
 
 ARCH            :=      $(shell uname -m | \
                         sed \
