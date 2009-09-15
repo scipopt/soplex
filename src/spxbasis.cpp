@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.70 2009/08/10 14:44:51 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.71 2009/09/15 12:49:29 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -21,6 +21,7 @@
 #include <cstdio>
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 
 #include "spxdefines.h"
 #include "spxbasis.h"
@@ -336,15 +337,15 @@ bool SPxBasis::readBasis(
    if ( colNames == 0 )
    {
       int nCols = theLP->nCols();
-      char name [255];
+      std::stringstream name;
 
       NameSet* p_colNames = new NameSet();
       p_colNames->reMax(nCols);
       for (int j = 0; j < nCols; ++j)
       {
-         std::snprintf(name, 255, "x%d_", j);
+         name << "x" << j << "_";
          DataKey key = theLP->colId(j);
-         p_colNames->add(key, name);
+         p_colNames->add(key, name.str().c_str());
       }
       cNames = p_colNames;
    }
@@ -352,15 +353,15 @@ bool SPxBasis::readBasis(
    if ( rNames == 0 )
    {
       int nRows = theLP->nRows();
-      char name [255];
+      std::stringstream name;
 
       NameSet* p_rowNames = new NameSet();
       p_rowNames->reMax(nRows);
       for (int i = 0; i < nRows; ++i)
       {
-         std::snprintf(name, 255, "C%d_", i);
+         name << "C" << i << "_";
          DataKey key = theLP->rowId(i);
-         p_rowNames->add(key, name);
+         p_rowNames->add(key, name.str().c_str());
       }
       rNames = p_rowNames;
    }
