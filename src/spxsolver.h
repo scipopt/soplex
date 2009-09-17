@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.44 2009/09/07 22:01:02 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.45 2009/09/17 14:42:51 bzfgleix Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -419,7 +419,7 @@ public:
     *  the constraints and variables.
     */
    virtual bool writeState(const char* filename, 
-      const NameSet* rowNames, const NameSet* colNames) const;
+      const NameSet* rowNames = NULL, const NameSet* colNames = NULL) const;
 
    //@}
 

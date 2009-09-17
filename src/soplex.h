@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.80 2009/08/11 13:52:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.81 2009/09/17 14:42:51 bzfgleix Exp $"
 
 /**@file  soplex.h
  * @brief preconfigured \ref soplex::SoPlex "SoPlex" LP-solver.
@@ -298,7 +298,7 @@ public:
     *  the constraints and variables.
     */
    virtual bool writeState(const char* filename, 
-      const NameSet* rowNames, const NameSet* colNames) const;
+      const NameSet* rowNames = NULL, const NameSet* colNames = NULL) const;
 
    /// returns statistical information in form of a string.
    std::string statistics() const
