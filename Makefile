@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.95 2009/09/11 13:37:13 bzfgleix Exp $
+# $Id: Makefile,v 1.96 2009/10/13 00:11:25 bzfgleix Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -114,6 +114,7 @@ LIBNAME		=	$(NAME)-$(VERSION).$(BASE)
 BINFILE		=	$(BINDIR)/$(BINNAME)
 EXAMPLEFILE	=	$(BINDIR)/$(EXAMPLENAME)
 LIBFILE		=	$(LIBDIR)/lib$(LIBNAME).$(LIBEXT)
+LIBSHORTLINK	=	$(LIBDIR)/lib$(NAME).$(LIBEXT)
 LIBLINK		=	$(LIBDIR)/lib$(NAME).$(BASE).$(LIBEXT)
 BINLINK		=	$(BINDIR)/$(NAME).$(BASE)
 BINSHORTLINK	=	$(BINDIR)/$(NAME)
@@ -144,13 +145,13 @@ endif
 
 
 ifeq ($(VERBOSE),false)
-.SILENT:	$(LIBLINK) $(BINLINK) $(BINSHORTLINK) $(BINFILE) $(LIBFILE) $(BINOBJFILES) $(LIBOBJFILES)
+.SILENT:	$(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK) $(BINFILE) $(LIBFILE) $(BINOBJFILES) $(LIBOBJFILES)
 endif
 
-all:		$(LIBFILE) $(BINFILE) $(LIBLINK) $(BINLINK) $(BINSHORTLINK)
-example:	$(LIBFILE) $(EXAMPLEFILE) $(LIBLINK)
+all:		$(LIBFILE) $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
+example:	$(LIBFILE) $(EXAMPLEFILE) $(LIBLINK) $(LIBSHORTLINK)
 
-$(LIBLINK):	$(LIBFILE)
+$(LIBLINK) $(LIBSHORTLINK):	$(LIBFILE)
 		@rm -f $@
 		cd $(dir $@) && ln -s $(notdir $(LIBFILE)) $(notdir $@)
 
@@ -186,7 +187,7 @@ doc:
 
 all:		$(BINFILE)
 
-check:		#$(BINFILE)
+check:		$(BINFILE)
 		cd check; ./check.sh $(TEST).test ../$(BINFILE) '$(ALGO)' $(LIMIT)
 
 valgrind-check:	$(BINFILE)
@@ -243,11 +244,11 @@ depend:
 
 -include	$(DEPEND)
 
-$(BINOBJDIR)/%.o:	$(SRCDIR)/%.cpp
+$(BINOBJDIR)/%.o:	$(SRCDIR)/%.cpp $(BINOBJDIR)
 		@echo "-> compiling $@"
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) -c $< -o $@
 
-$(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp
+$(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp $(LIBOBJDIR)
 		@echo "-> compiling $@"
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LIBOFLAGS) -c $< -o $@
 
