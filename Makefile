@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.96 2009/10/13 00:11:25 bzfgleix Exp $
+# $Id: Makefile,v 1.97 2009/12/04 18:32:12 bzfgleix Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -28,7 +28,7 @@ VERBOSE		=	false
 OPT		=	opt
 LIBEXT		=	a
 TEST		=	quick
-ALGO		=	1 2 3 4 5 6
+ALGO		=	1 2 3 4
 LIMIT		=	#
 
 ZLIB		=	true
@@ -187,7 +187,7 @@ doc:
 
 all:		$(BINFILE)
 
-check:		$(BINFILE)
+check:		#$(BINFILE)
 		cd check; ./check.sh $(TEST).test ../$(BINFILE) '$(ALGO)' $(LIMIT)
 
 valgrind-check:	$(BINFILE)
