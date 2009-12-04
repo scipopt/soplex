@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.44 2009/09/07 19:08:20 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.45 2009/12/04 23:48:08 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -483,72 +483,67 @@ void SPxSolver::factorize()
 
    if (SPxBasis::status() >= SPxBasis::REGULAR)
    {
-      // #undef       NDEBUG
 #ifndef NDEBUG
       DVector ftmp(fVec());
       DVector ptmp(pVec());
       DVector ctmp(coPvec());
-      /* move this test after the computation of fTest and coTest below, since these vectors might not be set up, e.g., for an initial basis. */
-      // testVecs();
 #endif  // NDEBUG
 
       if (type() == LEAVE)
       {
          SPxBasis::solve (*theFvec, *theFrhs);
          SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
-      }
 
 #ifndef NDEBUG
-      ftmp -= fVec();
-      ptmp -= pVec();
-      ctmp -= coPvec();
-      if (ftmp.length() > delta())
-      {
-         MSG_DEBUG( spxout << "DSOLVE21 fVec:   " << ftmp.length() << std::endl; )
-         ftmp = fVec();
-         multBaseWith(ftmp);
-         ftmp -= fRhs();
+         ftmp -= fVec();
+         ptmp -= pVec();
+         ctmp -= coPvec();
          if (ftmp.length() > delta())
-            MSG_ERROR( spxout << "ESOLVE29 " << iteration() << ": fVec error = " 
-                              << ftmp.length() << " exceeding Delta = " << delta() << std::endl; )
-      }
-      if (ctmp.length() > delta())
-      {
-         MSG_DEBUG( spxout << "DSOLVE23 coPvec: " << ctmp.length() << std::endl; )
-         ctmp = coPvec();
-         multWithBase(ctmp);
-         ctmp -= coPrhs();
+         {
+            MSG_DEBUG( spxout << "DSOLVE21 fVec:   " << ftmp.length() << std::endl; )
+            ftmp = fVec();
+            multBaseWith(ftmp);
+            ftmp -= fRhs();
+            if (ftmp.length() > delta())
+               MSG_ERROR( spxout << "ESOLVE29 " << iteration() << ": fVec error = " 
+                                 << ftmp.length() << " exceeding Delta = " << delta() << std::endl; )
+         }
          if (ctmp.length() > delta())
-            MSG_ERROR( spxout << "ESOLVE30 " << iteration() << ": coPvec error = " 
-                              << ctmp.length() << " exceeding Delta = " << delta() << std::endl; )
-      }
-      if (ptmp.length() > delta())
-      {
-         MSG_DEBUG( spxout << "DSOLVE24 pVec:   " << ptmp.length() << std::endl; )
-      }
+         {
+            MSG_DEBUG( spxout << "DSOLVE23 coPvec: " << ctmp.length() << std::endl; )
+            ctmp = coPvec();
+            multWithBase(ctmp);
+            ctmp -= coPrhs();
+            if (ctmp.length() > delta())
+               MSG_ERROR( spxout << "ESOLVE30 " << iteration() << ": coPvec error = " 
+                                 << ctmp.length() << " exceeding Delta = " << delta() << std::endl; )
+         }
+         if (ptmp.length() > delta())
+         {
+            MSG_DEBUG( spxout << "DSOLVE24 pVec:   " << ptmp.length() << std::endl; )
+         }
 #endif  // NDEBUG
 
-      if (type() == ENTER)
-      {
-         computeCoTest();
-//         if(pricing() == FULL)
-//         {
-//             computePvec();
-//             computeTest();
-//         }
+         computeFtest();
+#if 0    /* was deactivated */
+         computePvec();
+#endif
       }
       else
       {
-         computeFtest();
-//          computePvec();
+         assert(type() == ENTER);
+         
+         computeCoTest();
+         if (pricing() == FULL)
+         {
+#if 0       /* was deactivated */
+            computePvec();
+#endif
+            /* was deactivated, but this leads to warnings in testVecs() */
+            computeTest();
+         }
       }
    }
-
-#ifndef NDEBUG
-   /* see note near top of function */
-   if (SPxBasis::status() > SPxBasis::SINGULAR)
-      testVecs();
-#endif  // NDEBUG
 
    if (SPxBasis::status() == SPxBasis::SINGULAR)
    {
@@ -557,6 +552,12 @@ void SPxSolver::factorize()
       s << "XSOLVE21 Basis is singular (numerical troubles, delta = " << delta() << ")";
       throw SPxStatusException(s.str());
    }
+
+#ifndef NDEBUG
+   /* moved this test after the computation of fTest and coTest below, since these vectors might not be set up at top, e.g. for an initial basis */
+   if (SPxBasis::status() > SPxBasis::SINGULAR)
+      testVecs();
+#endif  // NDEBUG
 }
 
 /* We compute how much the current solution violates (primal or dual) feasibility. In the
