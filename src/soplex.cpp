@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.97 2009/08/11 13:52:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.98 2009/12/07 14:24:43 bzfgleix Exp $"
 
 #include <iostream>
 
@@ -631,12 +631,12 @@ void SoPlex::unsimplify() const
    DVector psp_s(m_solver.nRows());  // slacks          (prescaled simplified postscaled)
    DVector psp_r(m_solver.nCols());  // reduced costs   (prescaled simplified postscaled)
 
-   // If basis status is not regular, do nothing.
-   SPxBasis::SPxStatus b_status = m_solver.getBasisStatus();
-   if(b_status < SPxBasis::REGULAR)
-      return;
-    
    if (! m_vanished) {
+      // If solver status is not regular or optimal, do nothing.
+      const SPxSolver::Status stat = status();
+      if( stat != SPxSolver::OPTIMAL && stat != SPxSolver::REGULAR )
+         return;
+
       m_solver.getPrimal(psp_x);
       m_solver.getDual(psp_y);
       m_solver.getSlacks(psp_s);
@@ -652,6 +652,11 @@ void SoPlex::unsimplify() const
       }
    }
    else {
+      // If there is no sensible solution, do nothing.
+      const SPxSolver::Status  stat = status();
+      if (stat != SPxSolver::OPTIMAL)
+         return;
+
       psp_x.reDim(0);
       psp_y.reDim(0);
       psp_s.reDim(0);
