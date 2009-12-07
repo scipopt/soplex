@@ -1,4 +1,12 @@
 
+Current development version
+
+- fixed bug in class SoPlex appearing when LP is solved in simplifier and optimal solution
+  retrieved
+
+
+#----------------------------------------------------------------
+
 11 Sep 2009 - Release 1.4.2
 
 - Correctly resetting basis status to REGULAR in method SPxSolver::loadBasis().
