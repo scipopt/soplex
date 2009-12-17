@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.97 2009/12/04 18:32:12 bzfgleix Exp $
+# $Id: Makefile,v 1.98 2009/12/17 12:27:36 bzfgleix Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: Makefile                                                      *
@@ -244,11 +244,11 @@ depend:
 
 -include	$(DEPEND)
 
-$(BINOBJDIR)/%.o:	$(SRCDIR)/%.cpp $(BINOBJDIR)
+$(BINOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 		@echo "-> compiling $@"
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) -c $< -o $@
 
-$(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp $(LIBOBJDIR)
+$(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 		@echo "-> compiling $@"
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LIBOFLAGS) -c $< -o $@
 
