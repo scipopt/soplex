@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.h,v 1.16 2009/08/11 12:48:40 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxmainsm.h,v 1.17 2009/12/17 16:01:27 bzfgleix Exp $"
 
 /**@file  spxmainsm.h
  * @brief General methods in LP preprocessing.
@@ -201,6 +201,8 @@ private:
    private:
       const int  m_i;
       const int  m_j;
+      const Real m_lhs;
+      const Real m_rhs;
       const bool m_strictLo;
       const bool m_strictUp;
       const bool m_maxSense;
@@ -217,6 +219,8 @@ private:
                      Real newLo, Real newUp, Real oldLo, Real oldUp)
          : m_i(simplifier.rIdx(i))
          , m_j(simplifier.cIdx(j))
+         , m_lhs(lp.lhs(i))
+         , m_rhs(lp.rhs(i))
          , m_strictLo(strictLo)
          , m_strictUp(strictUp)
          , m_maxSense(lp.spxSense() == SPxLP::MAXIMIZE)
@@ -237,6 +241,8 @@ private:
          : PostStep(old)
          , m_i(old.m_i)
          , m_j(old.m_j)
+         , m_lhs(old.m_lhs)
+         , m_rhs(old.m_rhs)
          , m_strictLo(old.m_strictLo)
          , m_strictUp(old.m_strictUp)
          , m_maxSense(old.m_maxSense)
@@ -277,23 +283,31 @@ private:
       const int       m_i;
       const Real      m_lRhs;
       DSVector        m_row;
-      DSVector        m_objs;
+      DataArray<Real> m_objs;
       DataArray<bool> m_fixed;
       Array<DSVector> m_cols;
       const bool      m_lhsFixed;
       const bool      m_maxSense;
+      DataArray<Real> m_oldLowers;
+      DataArray<Real> m_oldUppers;
+      const Real      m_lhs;
+      const Real      m_rhs;
       
    public:
       ///
-      ForceConstraintPS(const SPxLP& lp, const SPxMainSM& simplifier, int i, bool lhsFixed)
+      ForceConstraintPS(const SPxLP& lp, const SPxMainSM& simplifier, int i, bool lhsFixed, DataArray<bool>& fixCols, DataArray<Real>& lo, DataArray<Real>& up)
          : m_i(simplifier.rIdx(i))
          , m_lRhs(lhsFixed ? lp.lhs(i) : lp.rhs(i))
          , m_row(lp.rowVector(i).size())
          , m_objs(lp.rowVector(i).size())
-         , m_fixed(lp.rowVector(i).size())
+         , m_fixed(fixCols)
          , m_cols(lp.rowVector(i).size())
          , m_lhsFixed(lhsFixed)
          , m_maxSense(lp.spxSense() == SPxLP::MAXIMIZE)
+         , m_oldLowers(lo)
+         , m_oldUppers(up)
+         , m_lhs(lp.lhs(i))
+         , m_rhs(lp.rhs(i))
       {
          const SVector& row = lp.rowVector(i);
          
@@ -301,8 +315,7 @@ private:
          {
             int j = simplifier.cIdx(row.index(k));
             m_row.add(j, row.value(k));
-            m_objs.add(j, lp.obj(row.index(k)));
-            m_fixed[k] = EQrel(lp.lower(row.index(k)), lp.upper(row.index(k)));
+            m_objs[k] = lp.obj(row.index(k));
             
             const SVector& col = lp.colVector(row.index(k));
             m_cols[k].setMax(col.size());
@@ -322,6 +335,10 @@ private:
          , m_cols(old.m_cols)
          , m_lhsFixed(old.m_lhsFixed)
          , m_maxSense(old.m_maxSense)
+         , m_oldLowers(old.m_oldLowers)
+         , m_oldUppers(old.m_oldUppers)
+         , m_lhs(old.m_lhs)
+         , m_rhs(old.m_rhs)
       {}
       /// assignment operator
       ForceConstraintPS& operator=( const ForceConstraintPS& rhs)
@@ -333,6 +350,8 @@ private:
             m_objs = rhs.m_objs;
             m_fixed = rhs.m_fixed;
             m_cols = rhs.m_cols;
+            m_oldLowers = rhs.m_oldLowers;
+            m_oldUppers = rhs.m_oldUppers;
          }
 
          return *this;
@@ -356,6 +375,8 @@ private:
       const int  m_j;
       const Real m_val;
       const Real m_obj;
+      const Real m_lower;
+      const Real m_upper;
       DSVector   m_col;
       
    public:
@@ -364,6 +385,8 @@ private:
          : m_j(simplifier.cIdx(j))
          , m_val(val)
          , m_obj(lp.obj(j))
+         , m_lower(lp.lower(j))
+         , m_upper(lp.upper(j))
          , m_col(lp.colVector(j).size())
       {
          const SVector& col = lp.colVector(j);
@@ -377,6 +400,8 @@ private:
          , m_j(old.m_j)
          , m_val(old.m_val)
          , m_obj(old.m_obj)
+         , m_lower(old.m_lower)
+         , m_upper(old.m_upper)
          , m_col(old.m_col)
       {}
       /// assignment operator
@@ -490,9 +515,9 @@ private:
             
             if ((m_loFree  && col.value(k) > 0) || 
                 (!m_loFree && col.value(k) < 0))
-               m_lRhs.add(i, lp.rhs(col.index(k)));
+               m_lRhs.add(k, lp.rhs(col.index(k)));
             else
-               m_lRhs.add(i, lp.lhs(col.index(k)));
+               m_lRhs.add(k, lp.lhs(col.index(k)));
             
             const SVector& row = lp.rowVector(col.index(k));
             m_rows[k].setMax(row.size());
@@ -1124,7 +1149,7 @@ public:
       for(int i = 0; i < m_rBasisStat.size(); ++i)
          rows[i] = m_rBasisStat[i];
 
-      for(int j = 0; j < m_rBasisStat.size(); ++j)
+      for(int j = 0; j < m_cBasisStat.size(); ++j)
          cols[j] = m_cBasisStat[j];
    }   
    //@}

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.21 2009/08/11 12:49:16 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.22 2009/12/17 16:01:27 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -28,23 +28,28 @@
 #include <iostream>
 #include <fstream>
 
-#define FREE_BOUNDS             1
+
+//rows
 #define FREE_LHS_RHS            1
 #define FREE_CONSTRAINT         1
 #define EMPTY_CONSTRAINT        1
 #define ROW_SINGLETON           1
 #define FORCE_CONSTRAINT        1
+//cols
+#define FREE_BOUNDS             1
 #define EMPTY_COLUMN            1
+#define FIX_VARIABLE            1
 #define FREE_ZERO_OBJ_VARIABLE  1
 #define ZERO_OBJ_COL_SINGLETON  1
-#define FREE_COL_SINGLETON      1
 #define DOUBLETON_EQUATION      1
+#define FREE_COL_SINGLETON      1
+//dual
 #define DOMINATED_COLUMN        1
 #define WEAKLY_DOMINATED_COLUMN 1
-#define FIX_VARIABLE            1
+
 
 #define EXTREMES                1
-#define ROWS                    1 
+#define ROWS                    1
 #define COLS                    1
 #define DUAL                    1
 #define DUPLICATE_ROWS          1
@@ -100,130 +105,234 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
    for(int k = 0; k < m_col.size(); ++k)
       if (m_col.index(k) != m_i) 
          val -= m_col.value(k) * y[m_col.index(k)];
-  
-   if (cStatus[m_j] == SPxSolver::BASIC)
-   {
-      assert(isZero(r[m_j], eps()));
-      
-      y[m_i] = val / aij;
-      r[m_j] = 0.0;
-      
-      rStatus[m_i] = SPxSolver::BASIC;
-   }
-   else if (cStatus[m_j] == SPxSolver::ON_LOWER && m_strictLo)
-   {
-      y[m_i] = val / aij;
-      r[m_j] = 0.0;
 
-      cStatus[m_j] = SPxSolver::BASIC;
-      rStatus[m_i] = (aij > 0) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
-   }
-   else if (cStatus[m_j] == SPxSolver::ON_UPPER && m_strictUp)
-   {
-      y[m_i] = val / aij;
-      r[m_j] = 0.0;
+   Real im_lhs = (aij > 0) ? m_lhs/aij : m_rhs/aij;  // implicit lhs
+   Real im_rhs = (aij > 0) ? m_rhs/aij : m_lhs/aij;  // implicit rhs 
 
-      cStatus[m_j] = SPxSolver::BASIC;
-      rStatus[m_i] = (aij > 0) ? SPxSolver::ON_UPPER : SPxSolver::ON_LOWER;
-   }
-   else if (cStatus[m_j] == SPxSolver::FIXED &&
-            (( m_maxSense && ((r[m_j] > 0 && m_strictUp) || (r[m_j] < 0 && m_strictLo))) ||
-             (!m_maxSense && ((r[m_j] > 0 && m_strictLo) || (r[m_j] < 0 && m_strictUp)))))
+   switch(cStatus[m_j])
    {
-      y[m_i] = val / aij;
-      r[m_j] = 0.0;
-      
-      cStatus[m_j] = SPxSolver::BASIC;
-      if (m_strictLo && m_strictUp)
-         rStatus[m_i] = SPxSolver::FIXED;
-      else if (m_strictLo)
-         rStatus[m_i] = (aij > 0) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
-      else if (m_strictUp)
-         rStatus[m_i] = (aij > 0) ? SPxSolver::ON_UPPER : SPxSolver::ON_LOWER;
-   }
-   else
-   {
-      y[m_i] = 0.0;
-      r[m_j] = val;
-       
-      rStatus[m_i] = SPxSolver::BASIC;
-
-      if (cStatus[m_j] == SPxSolver::FIXED && (!m_strictLo || !m_strictUp))
+   case SPxSolver::FIXED:
+      if(im_lhs < (m_lhs - eps()) && (im_rhs > m_rhs + eps()))
       {
-         if (m_strictLo)
-            rStatus[m_i] = (aij > 0) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
-         else 
-            rStatus[m_i] = (aij > 0) ? SPxSolver::ON_UPPER : SPxSolver::ON_LOWER;
+         // this row is totally redundant, has not changed bound of xj
+         rStatus[m_i] = SPxSolver::BASIC;
+         y[m_i] = 0.0;
       }
+      else if(EQrel(im_lhs, im_rhs, eps()))
+      {
+         // row is in the type  aij * xj = b 
+         assert(EQrel(im_lhs, x[m_j], eps()));
+         
+         if(EQrel(m_oldLo, m_oldUp, eps()))
+         {
+            // xj has been fixed in other row
+            rStatus[m_i] = SPxSolver::BASIC;
+            y[m_i] = 0.0;
+         }
+         else if((EQrel(m_oldLo, x[m_j], eps()) && r[m_j] <= -eps())
+                 || (EQrel(m_oldUp, x[m_j], eps()) && r[m_j] >= eps())
+                 || (!EQrel(m_oldLo, x[m_j], eps()) && !(EQrel(m_oldUp, x[m_j], eps()))))
+         {
+            // if x_j on lower but reduced cost is negative, or x_j on upper but reduced cost is positive, or x_j not on bound: basic
+            rStatus[m_i] = (EQrel(m_lhs, x[m_j]*aij, eps())) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
+            cStatus[m_j] = SPxSolver::BASIC;
+            y[m_i] = val / aij;
+            r[m_j] = 0.0;
+         }
+         else
+         {
+            // set x_j on one of the bound
+            assert(EQrel(m_oldLo, x[m_j], eps()) || EQrel(m_oldUp, x[m_j], eps()));
+
+            cStatus[m_j] = EQrel(m_oldLo, x[m_j], eps()) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
+            rStatus[m_i] = SPxSolver::BASIC;
+            y[m_i] = 0.0;
+            r[m_j] = val;
+         }
+      }
+      else if(EQrel(im_lhs, x[m_j], eps()))
+      {
+         // row is in the type  xj >= b/aij, try to set xj on upper
+         assert(EQrel(im_lhs, m_oldUp, eps()));
+         
+         if(r[m_j] >= eps())
+         {
+            // the reduced cost is positive, xj should in the basic
+            assert(EQrel(m_rhs, x[m_j]*aij, eps()) || EQrel(m_lhs, x[m_j]*aij, eps()));
+            
+            rStatus[m_i] = (EQrel(m_lhs, x[m_j]*aij, eps())) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
+            cStatus[m_j] = SPxSolver::BASIC;
+            y[m_i] = val / aij;
+            r[m_j] = 0.0;
+         }
+         else
+         {
+            cStatus[m_j] = SPxSolver::ON_UPPER;
+            rStatus[m_i] = SPxSolver::BASIC;
+            y[m_i] = 0.0;
+            r[m_j] = val;
+         }
+      }
+      else if(EQrel(im_rhs, x[m_j], eps())) 
+      {
+         // row is in the type  xj <= b/aij, try to set xj on lower
+         assert(EQrel(im_rhs, m_oldLo, eps()));
+
+         if(r[m_j] <= -eps())
+         {
+            // the reduced cost is negative, xj should in the basic
+            assert(EQrel(m_rhs, x[m_j]*aij, eps()) || EQrel(m_lhs, x[m_j]*aij, eps()));  
+
+            rStatus[m_i] = (EQrel(m_lhs, x[m_j]*aij, eps())) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
+            cStatus[m_j] = SPxSolver::BASIC;
+            y[m_i] = val / aij;
+            r[m_j] = 0.0;
+         }
+         else
+         {
+            cStatus[m_j] = SPxSolver::ON_LOWER;
+            rStatus[m_i] = SPxSolver::BASIC;
+            y[m_i] = 0.0;
+            r[m_j] = val;
+         }
+      }
+      break;
+   case SPxSolver::BASIC:
+      rStatus[m_i] = SPxSolver::BASIC;
+      y[m_i] = 0.0;
+      r[m_j] = 0.0;
+      break;
+   case SPxSolver::ON_LOWER:
+      assert(r[m_j] >= -eps());
+
+      if(EQrel(m_oldLo, x[m_j], eps())) // xj should be on lower
+      {
+         rStatus[m_i] = SPxSolver::BASIC;
+         y[m_i] = 0.0;
+         r[m_j] = val;
+      }
+      else
+      {
+         assert(EQrel(im_lhs, x[m_j], eps()));
+         assert(EQrel(m_rhs, x[m_j]*aij, eps()) || EQrel(m_lhs, x[m_j]*aij, eps()));
+
+         cStatus[m_j] = SPxSolver::BASIC;
+         rStatus[m_i] = (EQrel(m_lhs, x[m_j]*aij, eps()))? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
+         y[m_i] = val / aij;
+         r[m_j] = 0.0;
+      }
+      break;
+   case SPxSolver::ON_UPPER:
+      assert(r[m_j] <= eps());
+
+      if(EQrel(m_oldUp, x[m_j], eps())) // xj should be on upper
+      {
+         rStatus[m_i] = SPxSolver::BASIC;
+         y[m_i] = 0.0;
+         r[m_j] = val;
+      }
+      else
+      {
+         assert(EQrel(im_rhs, x[m_j], eps()));
+         assert(EQrel(m_rhs, x[m_j]*aij, eps()) || EQrel(m_lhs, x[m_j]*aij, eps()));
+        
+         cStatus[m_j] = SPxSolver::BASIC;
+         rStatus[m_i] = (EQrel(m_lhs, x[m_j]*aij, eps()))? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
+         y[m_i] = val / aij;
+         r[m_j] = 0.0;
+      }
+      break;
+   default:
+      break;
    }
 }
 
-void SPxMainSM::ForceConstraintPS::execute(DVector&, DVector& y, DVector& s, DVector& r,
+void SPxMainSM::ForceConstraintPS::execute(DVector& x, DVector& y, DVector& s, DVector& r,
                                            DataArray<SPxSolver::VarStatus>& cStatus,
                                            DataArray<SPxSolver::VarStatus>& rStatus) const
 {
    // primal:
    s[m_i] = m_lRhs;
 
-   // dual:
-   Real lo = -infinity;
-   Real up =  infinity;
+   // basis:
+   int cBasisCandidate = -1;
+   Real maxViolation = -1.0;
+   int bas_k = -1;
 
    for(int k = 0; k < m_row.size(); ++k)
    {
-      const SVector& col = m_cols[k];
-      Real aij           = m_row.value(k);
-      Real bound         = m_objs[m_row.index(k)];
-      
-      ASSERT_WARN( "WMAISM72", isNotZero(aij) );
-             
-      for(int l = 0; l < col.size(); ++l)
-         if (col.index(l) != m_i)
-            bound -= col.value(l) * y[col.index(l)]; 
-      
-      bound /= aij;
+      int  cIdx  = m_row.index(k);
+      Real aij   = m_row.value(k);
+      Real oldLo = m_oldLowers[k];
+      Real oldUp = m_oldUppers[k];
 
-      if (m_maxSense)
+      switch(cStatus[cIdx])
       {
-         if (m_lhsFixed && bound < up)
-            up = bound; 
-         else if (!m_lhsFixed && bound > lo)
-            lo = bound;             
-      }
-      else
-      {
-         if (m_lhsFixed && bound > lo)
-            lo = bound;
-         else if (!m_lhsFixed && bound < up)
-            up = bound;
+      case SPxSolver::FIXED:
+         if(m_fixed[k])
+         {
+            assert(EQrel(oldLo, x[cIdx], eps()) || EQrel(oldUp, x[cIdx], eps()));
+
+            Real violation = fabs(r[cIdx]/aij);
+
+            cStatus[cIdx] = EQrel(oldLo, x[cIdx], eps()) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
+
+            if( violation > maxViolation && ( (EQrel(oldLo, x[cIdx], eps()) && r[cIdx] < -eps()) || (EQrel(oldUp, x[cIdx], eps()) && r[cIdx] > eps()) ) )
+            {
+               maxViolation = violation;
+               cBasisCandidate = cIdx;
+               bas_k = k;
+            }
+         } // do nothing, if the old bounds are equal, i.e. variable has been not fixed in this row
+         break;
+      case SPxSolver::ON_LOWER:
+      case SPxSolver::ON_UPPER:
+      case SPxSolver::BASIC:
+         break;
+      default:
+         break;
       }
    }
-   
-   assert(LE(lo, up));
-  
-   if (lo > -infinity)
-      y[m_i] = lo;
-   else if (up < infinity)
-      y[m_i] = up;
-   else
-      y[m_i] = 0.0;
 
-   if (isZero(y[m_i], eps()))
-      y[m_i] = 0.0;
-   
-   for(int k = 0; k < m_row.size(); ++k)
-      r[m_row.index(k)] -= m_row.value(k) * y[m_i];
-
-   // basis:
-   rStatus[m_i] = SPxSolver::BASIC;
-   for(int k = 0; k < m_row.size(); ++k)
+   // dual and basis :
+   if(cBasisCandidate >= 0)  // one of the variable in the row should in the basis
    {
-      if (m_fixed[k])
-         cStatus[m_row.index(k)] = SPxSolver::FIXED;
-      else if (m_lhsFixed)
-         cStatus[m_row.index(k)] = (m_row.value(k) > 0) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
-      else
-         cStatus[m_row.index(k)] = (m_row.value(k) > 0) ? SPxSolver::ON_UPPER : SPxSolver::ON_LOWER;
+      assert(EQrel(m_lRhs, m_rhs, eps()) || EQrel(m_lRhs, m_lhs, eps()));
+      assert(bas_k >= 0);
+      assert(cBasisCandidate == m_row.index(bas_k));
+
+      cStatus[cBasisCandidate] = SPxSolver::BASIC;
+      rStatus[m_i] = (EQrel(m_lRhs, m_lhs, eps())) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
+
+      Real aij = m_row.value(bas_k);
+      Real multiplier = r[cBasisCandidate]/aij;
+      r[cBasisCandidate] = 0.0;
+
+      for(int k = 0; k < m_row.size(); ++k)  // update the reduced cost
+      {
+         if(k == bas_k)
+         {
+            continue;
+         }
+         r[m_row.index(k)] -= m_row.value(k) * multiplier;
+      }
+
+      // compute the value of new dual variable (because we have a new row)
+      Real val = m_objs[bas_k];
+      DSVector basis_col = m_cols[bas_k];
+   
+      for(int k = 0; k < basis_col.size(); ++k)
+      {
+         if (basis_col.index(k) != m_i) 
+            val -= basis_col.value(k) * y[basis_col.index(k)];
+      }
+
+      y[m_i] = val/aij;
+   }
+   else // slack in the basis
+   {
+      rStatus[m_i] = SPxSolver::BASIC;
+      y[m_i] = 0.0;
    }
 }
 
@@ -246,7 +355,18 @@ void SPxMainSM::FixVariablePS::execute(DVector& x, DVector& y, DVector& s, DVect
    r[m_j] = val;
 
    // basis:
-   cStatus[m_j] = SPxSolver::FIXED;
+   if(EQrel(m_lower, m_upper))
+   {
+      assert(EQrel(m_lower, m_val));
+
+      cStatus[m_j] = SPxSolver::FIXED;
+   }
+   else
+   {
+      assert(EQrel(m_val, m_lower) || EQrel(m_val, m_upper));
+
+      cStatus[m_j] = EQrel(m_val, m_lower) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
+   }
 }
 
 void SPxMainSM::FixBoundsPS::execute(DVector&, DVector&, DVector&, DVector&,
@@ -331,7 +451,7 @@ void SPxMainSM::FreeZeroObjVariablePS::execute(DVector& x, DVector& y, DVector& 
          
          Real lo = z * scale / row[m_j];
 	 slack.add(k, val);
-	 
+         
          if (lo > maxRowLo)
          {
             maxRowLo = lo; 
@@ -608,6 +728,10 @@ void SPxMainSM::DoubletonEquationPS::execute(DVector&, DVector& y, DVector&, DVe
       }
       
       cStatus[m_k] = SPxSolver::BASIC;
+
+      assert((r[m_j] >= -eps() && cStatus[m_j] == SPxSolver::ON_LOWER)||
+             (r[m_j] <= eps() && cStatus[m_j] == SPxSolver::ON_UPPER ) ||
+             (cStatus[m_j] == SPxSolver::FIXED));
    }
 }
 
@@ -621,44 +745,68 @@ void SPxMainSM::DuplicateRowsPS::execute(DVector&, DVector& y, DVector& s, DVect
          s[m_scale.index(k)] = s[m_i] / m_scale.value(k); 
 
    // dual & basis:
+   bool haveSetBasis = false;
+
    for(int k = 0; k < m_scale.size(); ++k)
    {
       int i = m_scale.index(k);
 
+      if (rStatus[m_i] == SPxSolver::BASIC || (haveSetBasis && i!=m_i))
+         // if the row with tightest lower and upper bound in the basic, every duplicate row should in basic
+         // or basis status of row m_i has been set, this row should be in basis
+      {
+         y[i]       = 0.0;
+         rStatus[i] = SPxSolver::BASIC;
+         continue;
+      }
+
       ASSERT_WARN( "WMAISM02", isNotZero(m_scale.value(k)) );
       
-      if (rStatus[m_i] == SPxSolver::FIXED && i == m_maxLhsIdx && i == m_minRhsIdx)
+      if (rStatus[m_i] == SPxSolver::FIXED && (i == m_maxLhsIdx || i == m_minRhsIdx))
       {
+         // this row leads to the tightest lower or upper bound, slack should not be in the basis
          y[i]   = y[m_i] * m_scale.value(k);
          y[m_i] = 0.0;
          
-         rStatus[i]   = SPxSolver::FIXED;
-         rStatus[m_i] = SPxSolver::BASIC;
+         if(i == m_maxLhsIdx)
+         {
+            rStatus[i]   = m_scale.value(k) > 0 ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
+         }
+         else
+         {
+            assert(i == m_minRhsIdx);
+
+            rStatus[i]   = m_scale.value(k) > 0 ? SPxSolver::ON_UPPER : SPxSolver::ON_LOWER;
+         }
+         if (i != m_i)
+            rStatus[m_i] = SPxSolver::BASIC;
+         haveSetBasis = true;
       }
-      else if (i == m_maxLhsIdx &&
-               ((rStatus[m_i] == SPxSolver::ON_LOWER) ||
-                (rStatus[m_i] == SPxSolver::FIXED    &&
-                 ((m_maxSense && y[m_i] < 0) || (!m_maxSense && y[m_i] > 0))))) 
+      else if (i == m_maxLhsIdx && rStatus[m_i] == SPxSolver::ON_LOWER) 
       {
+         // this row leads to the tightest lower bound, slack should not be in the basis
          y[i]   = y[m_i] * m_scale.value(k);
          y[m_i] = 0.0;
 
-         rStatus[i]   = (m_scale.value(k) > 0) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
-         rStatus[m_i] = SPxSolver::BASIC;
+         rStatus[i]   = m_scale.value(k) > 0 ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
+         if (i != m_i)
+            rStatus[m_i] = SPxSolver::BASIC;
+         haveSetBasis = true;
       }
-      else if (i == m_minRhsIdx &&
-               ((rStatus[m_i] == SPxSolver::ON_UPPER) ||
-                (rStatus[m_i] == SPxSolver::FIXED    &&
-                 ((m_maxSense && y[m_i] > 0) || (!m_maxSense && y[m_i] < 0)))))
+      else if (i == m_minRhsIdx && rStatus[m_i] == SPxSolver::ON_UPPER)
       {   
+         // this row leads to the tightest upper bound, slack should not be in the basis
          y[i]   = y[m_i] * m_scale.value(k);
          y[m_i] = 0.0;
 
-         rStatus[i]   = (m_scale.value(k) > 0) ? SPxSolver::ON_UPPER : SPxSolver::ON_LOWER;
-         rStatus[m_i] = SPxSolver::BASIC;
+         rStatus[i]   = m_scale.value(k) > 0 ? SPxSolver::ON_UPPER : SPxSolver::ON_LOWER;
+         if (i != m_i)
+            rStatus[m_i] = SPxSolver::BASIC;
+         haveSetBasis = true;
       }
       else if (i != m_i)
       {
+         // this row does not lead to the tightest lower or upper bound, slack should be in the basis
          y[i]       = 0.0;
          rStatus[i] = SPxSolver::BASIC;
       }
@@ -1532,11 +1680,20 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                            << " rhsBnd=" << rhsBnd
                            << std::endl; )
 
+         DataArray<bool> fixedCol(row.size());
+         DataArray<Real> lowers(row.size());
+         DataArray<Real> uppers(row.size());
+
          for(int k = 0; k < row.size(); ++k)
          {
             Real aij = row.value(k);
             int  j   = row.index(k);
+
+            fixedCol[k] = !(EQrel(lp.upper(j), lp.lower(j), m_epsilon));
             
+            lowers[k] = lp.lower(j);
+            uppers[k] = lp.upper(j);
+
             ASSERT_WARN( "WMAISM25", isNotZero(aij, epsZero()) );
             
             if (aij > 0.0)
@@ -1545,7 +1702,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                lp.changeUpper(j, lp.lower(j));
          }
          
-         m_hist.append(new ForceConstraintPS(lp, *this, i, true));
+         m_hist.append(new ForceConstraintPS(lp, *this, i, true, fixedCol, lowers, uppers));
 
          ++remRows;
          remNzos += row.size();
@@ -1564,11 +1721,20 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                            << " lhsBnd=" << lhsBnd
                            << std::endl; )
 
+         DataArray<bool> fixedCol(row.size());
+         DataArray<Real> lowers(row.size());
+         DataArray<Real> uppers(row.size());
+
          for(int k = 0; k < row.size(); ++k)
          {
             Real aij   = row.value(k);
             int  j     = row.index(k);
-            
+
+            fixedCol[k] = !(EQrel(lp.upper(j), lp.lower(j), m_epsilon));
+
+            lowers[k] = lp.lower(j);
+            uppers[k] = lp.upper(j);
+
             ASSERT_WARN( "WMAISM27", isNotZero(aij, epsZero()) );
             
             if (aij > 0.0)
@@ -1576,8 +1742,9 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
             else
                lp.changeLower(j, lp.upper(j));
          }
-         m_hist.append(new ForceConstraintPS(lp, *this, i, false));
-            
+
+         m_hist.append(new ForceConstraintPS(lp, *this, i, false, fixedCol, lowers, uppers));
+
          ++remRows;
          remNzos += row.size();
          removeRow(lp, i);
@@ -2225,7 +2392,7 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
          {
             if (dualVarLo[i] <= -infinity)
                dualConsLo[j] = -infinity;
-            else 
+            else
                dualConsLo[j] += aij * dualVarLo[i];
             
             if (dualVarUp[i] >= infinity)

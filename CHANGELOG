@@ -4,6 +4,10 @@ Current development version
 - fixed bug in class SoPlex appearing when LP is solved in simplifier and optimal solution
   retrieved
 
+- changed memory handling in class DataKey: replacing bitfield implementation by two int's
+
+- corrected postsolving of bases in class SPxMainSM
+
 
 #----------------------------------------------------------------
 
