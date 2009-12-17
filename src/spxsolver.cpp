@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.45 2009/12/04 23:48:08 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.46 2009/12/17 10:49:18 bzfhuang Exp $"
 
 //#define DEBUGGING 1
 
@@ -953,7 +953,7 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
 
 SPxSolver::SPxSolver(const SPxSolver& base)
    : SPxLP (base)
-   , SPxBasis::SPxBasis(base)
+   , SPxBasis(base)
    , theType(base.theType)
    , thePricing(base.thePricing)
    , theRep(base.theRep)
