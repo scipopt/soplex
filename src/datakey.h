@@ -13,11 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datakey.h,v 1.15 2009/08/12 12:17:07 bzfgleix Exp $"
-// Turn off gcc warnings on conversion concerning assignments to the bit-fields in DataKey
-// (it seems that there is not way of casting to bit-fields directly and we cannot tell gcc
-// that we are aware of the fact that the assignment might result in a loss of precision).
-#pragma GCC diagnostic ignored "-Wconversion"
+#pragma ident "@(#) $Id: datakey.h,v 1.16 2009/12/17 12:17:55 bzfgleix Exp $"
 
 /**@file  datakey.h
  * @brief Entry identifier class for items of a DataSet.
@@ -56,8 +52,8 @@ public:
    //-------------------------------------
    /**@name Data */
    //@{
-   signed int info: 2;                        ///< user information (2 bit) to store values -1, 0, +1
-   signed int idx : (8 * sizeof(int) - 2);    ///< (locally) unique key index
+   signed int info;                           ///< user information (2 bit) to store values -1, 0, +1
+   signed int idx;                            ///< (locally) unique key index
    //@}
 
 public:
@@ -75,7 +71,6 @@ public:
       , idx(p_idx)
    {
       assert( p_info <= 1 && p_info >= -1 );
-      assert( p_idx <= 536870911 && p_idx >= -536870911 );
    }
    /// Assignment operator.
    DataKey& operator=(const DataKey& rhs)
@@ -105,8 +100,6 @@ public:
    /// sets the index number (\ref soplex::DataKey::idx "idx") of the DataKey.
    inline void setIdx(int p_idx) 
    {
-      assert( p_idx <= 536870911 && p_idx >= -536870911 );
-
       idx = p_idx;
    }   
    /// returns TRUE, iff the DataKey is valid.
