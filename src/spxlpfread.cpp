@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.63 2008/09/29 10:56:47 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.64 2009/12/17 13:30:16 bzfgleix Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -467,6 +467,14 @@ bool SPxLP::readLPF(
             val        = 1.0;
             section    = CONSTRAINTS;
          }
+      }
+      else if (section == CONSTRAINTS &&
+              (hasKeyword(pos, "s[ubject][   ]t[o]")
+              || hasKeyword(pos, "s[uch][    ]t[hat]")
+              || hasKeyword(pos, "s[.][    ]t[.]")))
+      {
+         have_value = true;
+         val        = 1.0;
       }
       else 
       {
