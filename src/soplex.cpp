@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.98 2009/12/07 14:24:43 bzfgleix Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.99 2009/12/17 12:58:33 bzfgleix Exp $"
 
 #include <iostream>
 
@@ -440,7 +440,7 @@ SPxSolver::Status SoPlex::getRedCost(Vector& rdcost) const
 SPxSolver::VarStatus SoPlex::getBasisRowStatus(int i) const
 {
    SPxBasis::SPxStatus b_status = m_solver.getBasisStatus();
-   if(b_status == SPxBasis::NO_PROBLEM || (has_simplifier() && b_status == SPxBasis::SINGULAR))
+   if((b_status == SPxBasis::NO_PROBLEM || (has_simplifier() && b_status == SPxBasis::SINGULAR)) && !m_vanished)
       return SPxSolver::UNDEFINED;
 
    if (has_simplifier())
@@ -457,7 +457,7 @@ SPxSolver::VarStatus SoPlex::getBasisRowStatus(int i) const
 SPxSolver::VarStatus SoPlex::getBasisColStatus(int j) const
 {
    SPxBasis::SPxStatus b_status = m_solver.getBasisStatus();
-   if(b_status == SPxBasis::NO_PROBLEM || (has_simplifier() && b_status == SPxBasis::SINGULAR))
+   if((b_status == SPxBasis::NO_PROBLEM || (has_simplifier() && b_status == SPxBasis::SINGULAR)) && !m_vanished)
       return SPxSolver::UNDEFINED;
 
    if (has_simplifier())
@@ -474,7 +474,7 @@ SPxSolver::VarStatus SoPlex::getBasisColStatus(int j) const
 SPxSolver::Status SoPlex::getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const
 {
    SPxBasis::SPxStatus b_status = m_solver.getBasisStatus();
-   if(b_status == SPxBasis::NO_PROBLEM || (has_simplifier() && b_status == SPxBasis::SINGULAR))
+   if((b_status == SPxBasis::NO_PROBLEM || (has_simplifier() && b_status == SPxBasis::SINGULAR)) && !m_vanished)
    {
       int i;
 
@@ -664,26 +664,32 @@ void SoPlex::unsimplify() const
    }
 
    // unsimplify
-   SPxSolver::VarStatus *rows, *cols;
-   try
+   if(m_vanished)
    {
-      rows = new SPxSolver::VarStatus[m_solver.nRows()];
-      cols = new SPxSolver::VarStatus[m_solver.nCols()];
-
-      m_solver.getBasis(rows, cols);
-      m_simplifier->unsimplify(psp_x, psp_y, psp_s, psp_r, rows, cols);
+      m_simplifier->unsimplify(psp_x, psp_y, psp_s, psp_r, NULL, NULL);
    }
-   catch(std::bad_alloc& x)
+   else
    {
+      SPxSolver::VarStatus *rows, *cols;
+      try
+      {
+         rows = new SPxSolver::VarStatus[m_solver.nRows()];
+         cols = new SPxSolver::VarStatus[m_solver.nCols()];
+         
+         m_solver.getBasis(rows, cols);
+         m_simplifier->unsimplify(psp_x, psp_y, psp_s, psp_r, rows, cols);
+      }
+      catch(std::bad_alloc& x)
+      {
+         delete[] rows;
+         delete[] cols;
+         throw x;
+      }
+   
       delete[] rows;
       delete[] cols;
-      throw x;
    }
-   
-   delete[] rows;
-   delete[] cols;
 }
-
 } // namespace soplex
 
 //-----------------------------------------------------------------------------
