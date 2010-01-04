@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datakey.h,v 1.16 2009/12/17 12:17:55 bzfgleix Exp $"
+#pragma ident "@(#) $Id: datakey.h,v 1.17 2010/01/04 13:04:09 bzfgleix Exp $"
 
 /**@file  datakey.h
  * @brief Entry identifier class for items of a DataSet.
@@ -52,8 +52,10 @@ public:
    //-------------------------------------
    /**@name Data */
    //@{
-   signed int info;                           ///< user information (2 bit) to store values -1, 0, +1
-   signed int idx;                            ///< (locally) unique key index
+   /* This was originally implemented as bitfield "signed int info: 2; signed int idx: (8 * sizeof(int) - 2);",
+      however, this seems to trigger a bug with old versions of GCC/glibc on 32bit machines. */
+   int info;                                  ///< user information to store values -1, 0, +1
+   int idx;                                   ///< (locally) unique key index
    //@}
 
 public:
