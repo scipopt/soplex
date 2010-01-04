@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.cpp,v 1.30 2009/02/20 01:06:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: nameset.cpp,v 1.31 2010/01/04 12:44:23 bzfpfets Exp $"
 
 #include <string.h>
 #include "spxdefines.h"
@@ -168,7 +168,7 @@ void NameSet::memPack()
       const char* t = &mem[set[i]];
       strcpy(&newmem[newlast], t);
       set[i] = newlast;
-      newlast += strlen(t) + 1;      
+      newlast += int(strlen(t)) + 1;      
    }
    memcpy(mem, newmem, static_cast<size_t>(newlast));
    memused = newlast;
