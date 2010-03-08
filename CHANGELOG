@@ -8,6 +8,8 @@ Current development version
 
 - corrected postsolving of bases in class SPxMainSM
 
+- submakefile for FreeBSD added
+
 
 #----------------------------------------------------------------
 
