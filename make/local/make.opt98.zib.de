@@ -1,3 +1,0 @@
-#--- $Id: make.opt98.zib.de,v 1.1 2006/02/03 14:54:47 bzforlow Exp $
-CPPFLAGS+= -I/usr/local/include
-LDFLAGS+= -L/usr/local/lib

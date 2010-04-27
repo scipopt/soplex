@@ -1,8 +1,0 @@
-#--- $Id: make.linux.x86.gnu.opt_warn,v 1.3 2007/10/19 15:44:24 bzforlow Exp $
-CXX	=	g++
-CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -DWITH_WARNINGS
-CXXFLAGS=	-g -O3 -march=pentiumpro  -fomit-frame-pointer # -ffloat-store # -malign-double -ffast-math
-LDFLAGS	=	-lm -static
-ARFLAGS	=	crs
-ZLIB_FLAGS	=
-ZLIB_LDFLAGS 	=	-lz

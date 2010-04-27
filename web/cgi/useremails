@@ -1,4 +1,0 @@
-#  LAST EDIT: Thu May 22 15:49:27 1997 by Loebel/Borndoerfer (kombi24!kompfleg) 
-#! /bin/csh
-
-cut -d: -f2 users | sort | awk '{if (last != $0) printf "%s ", $0; last = $0}'
