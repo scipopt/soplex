@@ -10,6 +10,9 @@ Current development version
 
 - submakefile for FreeBSD added
 
+- improved handling of singular bases and cycling: automatically restart from initial basis
+  with tighter tolerances
+
 
 #----------------------------------------------------------------
 

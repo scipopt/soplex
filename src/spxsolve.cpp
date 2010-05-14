@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.110 2009/09/10 18:43:17 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.111 2010/05/14 10:45:54 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -151,8 +151,6 @@ SPxSolver::Status SPxSolver::solve()
    maxDelta = delta();
    minDelta = delta() * 1e-2;
 
-   //thepricer->setEpsilon(delta());
-
    //setType(type());
 
    if (!matrixIsSetup)
@@ -183,8 +181,18 @@ SPxSolver::Status SPxSolver::solve()
 
    stallNumRecovers = 0;
 
+   // save the current basis and tolerance; if we run into a singular basis, we will restore it and try
+   // with tighter tolerance
+   Real origtol = maxDelta;
+   SPxBasis::Desc origdesc = desc();
+   SPxSolver::Type origtype = theType;
+   bool tightened = false;
+
    while (!stop)
    {
+      try
+      {
+
       if (type() == ENTER)
       {
          int enterCycleCount = 0;
@@ -563,7 +571,70 @@ SPxSolver::Status SPxSolver::solve()
             theratiotester->setType(type());
          }
       }
+      assert(m_status != SINGULAR);
+
+      }
+      catch(SPxStatusException E)
+      {
+         // if we stopped due to a singular basis, we reload the original basis and try again with tighter
+         // tolerance (only once)
+         if (m_status == SINGULAR && !tightened)
+         {
+            Real newtol = 0.001*origtol;
+
+            MSG_INFO2( spxout << "ISOLVE26 basis singular: reloading basis and solving with tighter tolerance " << newtol << std::endl; )
+
+            // tighten tolerances (pricer tolerance automatically set during solve loop)
+            setDelta(newtol);
+            maxDelta = newtol;
+            minDelta = newtol * 1e-2;
+
+            // return to original algorithm type
+            if (type() != origtype)
+               setType(origtype);
+
+            // load original basis
+            int niters = iterations();
+            loadBasis(origdesc);
+            init();
+
+            // remember iteration count
+            assert(iterations() == 0);
+            iterCount = niters;
+            assert(iterations() == niters);
+
+            // reset status and counters
+            m_status = RUNNING;
+            m_numCycle = 0;
+            leaveCount = 0;
+            enterCount = 0;
+            stallNumRecovers = 0;
+
+            // continue
+            stop = false;
+            tightened = true;
+         }
+         else
+         {
+            // reset tolerance to its original value
+            if (tightened)
+            {
+               thepricer->setEpsilon(origtol);
+               setDelta(origtol);
+            }
+
+            throw E;
+         }
+      }
    }
+
+   // reset tolerance to its original value
+   if (tightened)
+   {
+      thepricer->setEpsilon(origtol);
+      setDelta(origtol);
+   }
+
    theTime.stop();
    theCumulativeTime += time();
 
@@ -789,6 +860,7 @@ bool SPxSolver::terminate()
          if (type() == ENTER)
             computeTest();
       }
+
       if (shift() > 0.0)
          unShift();
    }
