@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.111 2010/05/14 10:45:54 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.112 2010/05/18 13:30:59 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -183,9 +183,9 @@ SPxSolver::Status SPxSolver::solve()
 
    // save the current basis and tolerance; if we run into a singular basis, we will restore it and try
    // with tighter tolerance
-   Real origtol = maxDelta;
-   SPxBasis::Desc origdesc = desc();
-   SPxSolver::Type origtype = theType;
+   const Real origtol = maxDelta;
+   const SPxBasis::Desc origdesc = desc();
+   const SPxSolver::Type origtype = theType;
    bool tightened = false;
 
    while (!stop)
@@ -574,7 +574,7 @@ SPxSolver::Status SPxSolver::solve()
       assert(m_status != SINGULAR);
 
       }
-      catch(SPxStatusException E)
+      catch( SPxException E )
       {
          // if we stopped due to a singular basis, we reload the original basis and try again with tighter
          // tolerance (only once)
@@ -596,12 +596,25 @@ SPxSolver::Status SPxSolver::solve()
             // load original basis
             int niters = iterations();
             loadBasis(origdesc);
-            init();
 
             // remember iteration count
-            assert(iterations() == 0);
             iterCount = niters;
-            assert(iterations() == niters);
+
+            // try initializing basis (might fail if starting basis was already singular)
+            try
+            {
+               init();
+            }
+            catch( SPxException E )
+            {
+               MSG_INFO2( spxout << "ISOLVE27 reloaded basis singular, resetting original tolerances" << std::endl; )
+               std::cin.get();
+
+               thepricer->setEpsilon(origtol);
+               setDelta(origtol);
+
+               throw E;
+            }
 
             // reset status and counters
             m_status = RUNNING;
@@ -634,6 +647,8 @@ SPxSolver::Status SPxSolver::solve()
       thepricer->setEpsilon(origtol);
       setDelta(origtol);
    }
+
+   assert(delta() == origtol);
 
    theTime.stop();
    theCumulativeTime += time();
