@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.113 2010/05/18 14:46:14 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.114 2010/05/18 18:29:21 bzfwinkm Exp $"
 
 //#define DEBUGGING 1
 
@@ -605,14 +605,14 @@ SPxSolver::Status SPxSolver::solve()
             {
                init();
             }
-            catch( SPxException E )
+            catch( SPxException Ex )
             {
                MSG_INFO2( spxout << "ISOLVE27 reloaded basis singular, resetting original tolerances" << std::endl; )
 
                thepricer->setEpsilon(origtol);
                setDelta(origtol);
 
-               throw E;
+               throw Ex;
             }
 
             // reset status and counters
