@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.72 2010/05/19 12:08:45 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.73 2010/05/19 12:15:26 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -688,19 +688,19 @@ void SPxBasis::change(
 
             // if factorize() detects singularity, an exception is thrown, hence at this point we have a regular basis
             // and can try the update again
-            assert(status() >= SPxStatus::REGULAR);
+            assert(status() >= SPxBasis::REGULAR);
             try
             {
                factor->change(i, *enterVec, eta);
             }
             // with a freshly factorized, regular basis, the update is unlikely to fail; if this happens nevertheless,
             // we have to invalidate the basis to have the statuses correct
-            catch( SPxException E )
+            catch( SPxException F )
             {
                MSG_INFO3( spxout << "IBASIS14 problems updating factorization; invalidating basis"
                   << std::endl; )
                invalidate();
-               throw E;
+               throw F;
             }
          }
 
