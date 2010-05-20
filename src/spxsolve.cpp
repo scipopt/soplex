@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.114 2010/05/18 18:29:21 bzfwinkm Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.115 2010/05/20 10:59:04 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -98,6 +98,7 @@ SPxSolver::Status SPxSolver::solve()
    /* store the last (primal or dual) feasible objective value to recover/abort in case of stalling */
    Real  stallRefValue;
    Real  stallRefShift;
+   int   stallRefIter;
    int   stallNumRecovers;
 
    if (dim() <= 0 && coDim() <= 0) // no problem loaded
@@ -197,6 +198,7 @@ SPxSolver::Status SPxSolver::solve()
       {
          int enterCycleCount = 0;
 
+         stallRefIter = iteration()-1;
          stallRefShift = shift();
          stallRefValue = value();
 
@@ -286,7 +288,7 @@ SPxSolver::Status SPxSolver::solve()
             }
 
             /* check every MAXSTALLS iterations whether shift and objective value have not changed */
-            if( iteration() % MAXSTALLS == 0 && iteration() >= 1 )
+            if( (iteration() - stallRefIter) % MAXSTALLS == 0 )
             {
                if( fabs(value() - stallRefValue) <= epsilon() && fabs(shift() - stallRefShift) <= epsilon() )
                {
@@ -310,6 +312,7 @@ SPxSolver::Status SPxSolver::solve()
                else
                {
                   /* merely update reference values */
+                  stallRefIter = iteration()-1;
                   stallRefShift = shift();
                   stallRefValue = value();
                }
@@ -366,6 +369,7 @@ SPxSolver::Status SPxSolver::solve()
          instableLeaveNum = -1;
          instableLeave = false;
 
+         stallRefIter = iteration()-1;
          stallRefShift = shift();
          stallRefValue = value();
 
@@ -472,7 +476,7 @@ SPxSolver::Status SPxSolver::solve()
             }
 
             /* check every MAXSTALLS iterations whether shift and objective value have not changed */
-            if( iteration() % MAXSTALLS == 0 && iteration() >= 1 )
+            if( (iteration() - stallRefIter) % MAXSTALLS == 0 )
             {
                if( fabs(value() - stallRefValue) <= epsilon() && fabs(shift() - stallRefShift) <= epsilon() )
                {
@@ -496,6 +500,7 @@ SPxSolver::Status SPxSolver::solve()
                else
                {
                   /* merely update reference values */
+                  stallRefIter = iteration()-1;
                   stallRefShift = shift();
                   stallRefValue = value();
                }
