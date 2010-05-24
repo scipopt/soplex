@@ -4,7 +4,7 @@
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1997-1999 Roland Wunderling                              */
-/*                  1997-2009 Konrad-Zuse-Zentrum                            */
+/*                  1997-2010 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplexmain.cpp,v 1.13 2009/06/16 09:38:44 bzfgleix Exp $"
+#pragma ident "@(#) $Id: soplexmain.cpp,v 1.14 2010/05/24 10:01:00 bzfgleix Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -224,7 +224,7 @@ void print_version_info()
 
    const char* banner2 = "                                       *\n"
    "*    Copyright (C) 1997-1999 Roland Wunderling                         *\n"
-   "*                  1997-2009 Konrad-Zuse-Zentrum                       *\n"
+   "*                  1997-2010 Konrad-Zuse-Zentrum                       *\n"
    "*                            fuer Informationstechnik Berlin           *\n"
    "*                                                                      *\n"
    "*  SoPlex is distributed under the terms of the ZIB Academic Licence.  *\n"
@@ -281,7 +281,7 @@ void print_short_version_info()
    "************************************************************************\n"
    "* SoPlex --- the Sequential object-oriented simPlex. Release ";
    const char* banner2 = "     *\n"
-   "* Copyright (C)  1997-2009 Zuse Institute Berlin                       *\n"
+   "* Copyright (C)  1997-2010 Zuse Institute Berlin                       *\n"
    "************************************************************************\n";
 
    std::cout << banner1 << SOPLEX_VERSION/100 << ".";
@@ -302,6 +302,7 @@ void print_usage_and_exit( const char* const argv[] )
       " -r        select row wise representation (default is column)\n"
       " -i        select Eta-update (default is Forest-Tomlin)\n"
       " -x        output solution vector\n"
+      " -y        output dual multipliers\n"
       " -q        display solution quality\n"
       " -br       read file with starting basis from Basfile\n"
       " -bw       write file with optimal basis to Basfile\n"
@@ -694,6 +695,7 @@ void print_solution_and_status(
    const int            precision,
    const bool           print_quality,
    const bool           print_solution,
+   const bool           print_dual,
    const bool           write_basis,
    const char*          basisname
    )
@@ -720,16 +722,48 @@ void print_solution_and_status(
 
          if( work.getPrimal(objx) != SPxSolver::ERROR )
          {
+            MSG_INFO1( spxout << std::endl << "Primal solution (name, id, value):" << std::endl; )
             for( int i = 0; i < work.nCols(); ++i )
             {
-               if ( isNotZero( objx[i], Param::epsilon() ) )
+               if ( isNotZero( objx[i], 0.001 * work.delta() ) )
                   MSG_INFO1( spxout << colnames[ work.cId(i) ] << "\t"
                                     << i << "\t"
-                                    << std::setw(16)
+                                    << std::setw(17)
                                     << std::setprecision( precision )
                                     << objx[i] << std::endl; )
             }
-            MSG_INFO1( spxout << "All other variables are zero." << std::endl; )
+            MSG_INFO1( spxout << "All other variables are zero (within " << std::setprecision(1) << 0.001*work.delta() << ")." << std::endl; )
+         }
+      }
+      if ( print_dual )
+      {
+         DVector objy(work.nRows());
+
+         if( work.getDual(objy) != SPxSolver::ERROR )
+         {
+            MSG_INFO1( spxout << std::endl << "Dual multipliers (name, id, value):" << std::endl; )
+            for( int i = 0; i < work.nRows(); ++i )
+            {
+               if ( isNotZero( objy[i] , 0.001 * work.delta() ) )
+                  MSG_INFO1( spxout << rownames[ work.rId(i) ] << "\t"
+                                    << i << "\t"
+                                    << std::setw(17)
+                                    << std::setprecision( precision )
+                                    << objy[i] << std::endl; )
+            }
+
+            if( work.spxSense() == SPxLP::MINIMIZE )
+            {
+               MSG_INFO1( spxout << "Minimizing: a positive/negative value corresponds to left-hand (>=) resp. right-hand (<=) side."
+                                 << std::endl; )
+            }
+            else
+            {
+               MSG_INFO1( spxout << "Maximizing: a positive/negative value corresponds to right-hand (<=) resp. left-hand (>=) side."
+                                 << std::endl; )
+            }
+            MSG_INFO1( spxout << "All other dual values are zero (within " << std::setprecision(1) << 0.001*work.delta() << ")."
+                              << std::endl; )
          }
       }
       if ( write_basis )
@@ -769,7 +803,7 @@ void print_solution_and_status(
             proofvec.clear();
             for( int i = 0; i < work.nRows(); ++i )
             {
-               if ( isNotZero( farkasx[i], Param::epsilon() ) )
+               if ( isNotZero( farkasx[i], 0.001 * work.delta() ) )
                {
                   MSG_INFO1( spxout << rownames[ work.rId(i) ] << "\t"
                                     << i << "\t"
@@ -814,14 +848,14 @@ void print_solution_and_status(
                }
             }
 
-            MSG_INFO1( spxout << "All other row multipliers are zero." << std::endl; )
+            MSG_INFO1( spxout << "All other row multipliers are zero (within " << std::setprecision(1) << 0.001*work.delta() << ")." << std::endl; )
             MSG_INFO1( spxout << "Farkas infeasibility proof: \t"; )
             MSG_INFO1( spxout << lhs << " <= "; )
 
             bool nonzerofound = false;
             for( int i = 0; i < work.nCols(); ++i )
             {
-               if ( isNotZero( proofvec[i], Param::epsilon() ) )
+               if ( isNotZero( proofvec[i], 0.001 * work.delta() ) )
                {
                   if( proofvec[i] > 0 )
                   {
@@ -968,6 +1002,7 @@ int main(int argc, const char* const argv[])
       Real                      epsilon_update = DEFAULT_EPS_UPDATE;
       int                       verbose        = SPxOut::INFO1;
       bool                      print_solution = false;
+      bool                      print_dual     = false;
       bool                      print_quality  = false;
       bool                      read_basis     = false;
       bool                      write_basis    = false;
@@ -1039,6 +1074,9 @@ int main(int argc, const char* const argv[])
             exit(0);
          case 'x' :
             print_solution = true;
+            break;
+         case 'y' :
+            print_dual = true;
             break;
          case 'z' :
             check_parameter(argv[optidx][2], argv); // must not be empty
@@ -1137,7 +1175,7 @@ int main(int argc, const char* const argv[])
 
       // print solution, status, infeasibility system,...
       print_solution_and_status(work, rownames, colnames, precision, print_quality,
-                                print_solution, write_basis, basisname);
+                                print_solution, print_dual, write_basis, basisname);
 
       // clean up
       clean_up(prescaler, postscaler, simplifier, starter, pricer, ratiotester, basisname);

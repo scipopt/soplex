@@ -16,6 +16,8 @@ Current development version
 - fixed bug in spxbasis.cpp: when basis is detected as singular during update step, now we
   refactorize to double check; if the singularity is not resolved we exit with correct status 
 
+- added command line option '-y' to output dual row multipliers
+
 
 #----------------------------------------------------------------
 
