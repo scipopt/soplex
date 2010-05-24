@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplexmain.cpp,v 1.14 2010/05/24 10:01:00 bzfgleix Exp $"
+#pragma ident "@(#) $Id: soplexmain.cpp,v 1.15 2010/05/24 10:20:02 bzfgleix Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -738,6 +738,7 @@ void print_solution_and_status(
       if ( print_dual )
       {
          DVector objy(work.nRows());
+         bool allzero = true;
 
          if( work.getDual(objy) != SPxSolver::ERROR )
          {
@@ -745,25 +746,32 @@ void print_solution_and_status(
             for( int i = 0; i < work.nRows(); ++i )
             {
                if ( isNotZero( objy[i] , 0.001 * work.delta() ) )
+               {
                   MSG_INFO1( spxout << rownames[ work.rId(i) ] << "\t"
                                     << i << "\t"
                                     << std::setw(17)
                                     << std::setprecision( precision )
                                     << objy[i] << std::endl; )
+                  allzero = false;
+               }
             }
 
-            if( work.spxSense() == SPxLP::MINIMIZE )
+            MSG_INFO1( spxout << "All " << (allzero ? "" : "other ") << "dual values are zero (within "
+                              << std::setprecision(1) << 0.001*work.delta() << ")." << std::endl; )
+
+            if( !allzero )
             {
-               MSG_INFO1( spxout << "Minimizing: a positive/negative value corresponds to left-hand (>=) resp. right-hand (<=) side."
-                                 << std::endl; )
+               if( work.spxSense() == SPxLP::MINIMIZE )
+               {
+                  MSG_INFO1( spxout << "Minimizing: a positive/negative value corresponds to left-hand (>=) resp. right-hand (<=) side."
+                                    << std::endl; )
+               }
+               else
+               {
+                  MSG_INFO1( spxout << "Maximizing: a positive/negative value corresponds to right-hand (<=) resp. left-hand (>=) side."
+                                    << std::endl; )
+               }
             }
-            else
-            {
-               MSG_INFO1( spxout << "Maximizing: a positive/negative value corresponds to right-hand (<=) resp. left-hand (>=) side."
-                                 << std::endl; )
-            }
-            MSG_INFO1( spxout << "All other dual values are zero (within " << std::setprecision(1) << 0.001*work.delta() << ")."
-                              << std::endl; )
          }
       }
       if ( write_basis )
