@@ -18,6 +18,8 @@ Current development version
 
 - added command line option '-y' to output dual row multipliers
 
+- fixed bug in simplifier postsolving: empty columns may not only be fixed to bounds but also
+  to zero for free variable
 
 #----------------------------------------------------------------
 

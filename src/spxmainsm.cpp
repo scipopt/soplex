@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.22 2009/12/17 16:01:27 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.23 2010/05/27 10:18:37 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -363,9 +363,9 @@ void SPxMainSM::FixVariablePS::execute(DVector& x, DVector& y, DVector& s, DVect
    }
    else
    {
-      assert(EQrel(m_val, m_lower) || EQrel(m_val, m_upper));
+      assert(EQrel(m_val, m_lower) || EQrel(m_val, m_upper) || m_val == 0.0);
 
-      cStatus[m_j] = EQrel(m_val, m_lower) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
+      cStatus[m_j] = EQrel(m_val, m_lower) ? SPxSolver::ON_LOWER : (EQrel(m_val, m_upper) ? SPxSolver::ON_UPPER : SPxSolver::ZERO);
    }
 }
 
