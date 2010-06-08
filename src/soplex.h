@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.81 2009/09/17 14:42:51 bzfgleix Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.82 2010/06/08 10:43:14 bzfgleix Exp $"
 
 /**@file  soplex.h
  * @brief preconfigured \ref soplex::SoPlex "SoPlex" LP-solver.
@@ -147,6 +147,17 @@ public:
    virtual void setStarter(SPxStarter* starter, const bool destroy = false)
    {
       m_solver.setStarter(starter, destroy);
+   }
+   /// @throw SPxStatusException if simplifier loaded, this is not yet implemented
+   /// set starting basis
+   virtual void setBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[])
+   {
+      if (has_simplifier())
+      {
+         MSG_ERROR( spxout << "ESOLVR04 setting starting basis with presolving not yet implemented" << std::endl; )
+            throw SPxStatusException("XSOLVR04 setting starting basis with presolving not yet implemented");
+      }
+      m_solver.setBasis(rows, cols);
    }
    /// set time limit.
    virtual void setTerminationTime(Real time = infinity)

@@ -21,6 +21,9 @@ Current development version
 - fixed bug in simplifier postsolving: empty columns may not only be fixed to bounds but also
   to zero for free variable
 
+- additional interface method SoPlex::setBasis to set starting basis (if no simplifer present)
+
+
 #----------------------------------------------------------------
 
 11 Sep 2009 - Release 1.4.2
