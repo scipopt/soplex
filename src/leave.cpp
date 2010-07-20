@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.56 2009/02/20 01:06:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.57 2010/07/20 15:31:19 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -595,16 +595,17 @@ bool SPxSolver::leave(int leaveIdx)
                
                enterVal != leaveMax is the case that selectEnter has found only an instable entering
                variable. We store this leaving variable for later -- if we are not already in the
-               instable case. */
+               instable case: then we continue and conclude unboundness/infeasiblity */
             if (!instable)
             {
                instableLeaveNum = leaveIdx;
-            }
-            // Note: These changes do not survive a refactorization
-            theCoTest[leaveIdx] *= 0.01;
-            //            theCoTest[leaveIdx] -= 2 * delta();
 
-            return true;
+               // Note: These changes do not survive a refactorization
+               theCoTest[leaveIdx] *= 0.01;
+               //            theCoTest[leaveIdx] -= 2 * delta();
+
+               return true;
+            }
          }
          if (lastUpdate() > 1)
          {
