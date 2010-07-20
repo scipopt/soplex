@@ -23,6 +23,8 @@ Current development version
 
 - additional interface method SoPlex::setBasis to set starting basis (if no simplifer present)
 
+- fixed bug in SPxSolver::setPricer() appearing when switching pricers in initialized state
+
 
 #----------------------------------------------------------------
 

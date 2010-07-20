@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.46 2009/12/17 10:49:18 bzfhuang Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.47 2010/07/20 15:10:54 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -111,10 +111,10 @@ void SPxSolver::setPricer(SPxPricer* x, const bool destroy)
       thepricer = 0;
    }
 
-   if (x != 0)
+   if (x != 0 && x != thepricer)
    {
       setPricing(FULL);
-      if (isInitialized() && x != thepricer)
+      if (isInitialized())
          x->load(this);
       else
          x->clear();
@@ -201,6 +201,7 @@ void SPxSolver::setType(Type tp)
 void SPxSolver::setRep(Representation p_rep)
 {
    METHOD( "SPxSolver::setRep()" );
+
    if (p_rep == COLUMN)
    {
       thevectors   = colSet();
