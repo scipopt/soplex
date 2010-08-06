@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: array.h,v 1.22 2009/08/10 13:43:06 bzfgleix Exp $"
+#pragma ident "@(#) $Id: array.h,v 1.23 2010/08/06 14:18:34 bzfgleix Exp $"
 
 /**@file  array.h
  * @brief Save arrays of arbitrary types.
@@ -240,6 +240,8 @@ public:
          assert(data != 0);
          *this = old;
       }
+      else
+         data = 0;
       assert(Array::isConsistent());
    }
 
