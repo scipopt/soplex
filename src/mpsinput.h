@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: mpsinput.h,v 1.15 2009/02/20 01:06:36 bzfgleix Exp $"
+#pragma ident "@(#) $Id: mpsinput.h,v 1.16 2010/08/06 14:50:40 bzfgleix Exp $"
 
 /**@file  mpsinput.h
  * @brief Read MPS format files.
@@ -165,11 +165,13 @@ public:
    ///
    void setProbName(const char* p_probname)
    {
+      assert(strlen(p_probname) < MAX_LINE_LEN);
       strcpy(m_probname, p_probname);
    }
    ///
    void setObjName(const char* p_objname)
    {
+      assert(strlen(p_objname) < MAX_LINE_LEN);
       strcpy(m_objname, p_objname);
    }
    ///

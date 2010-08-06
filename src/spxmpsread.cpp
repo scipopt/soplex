@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.44 2010/08/06 14:36:47 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.45 2010/08/06 14:50:40 bzfgleix Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.
@@ -331,6 +331,7 @@ static void readRhs(
       {
          if (strcmp(addname, mps.field1()))
          {
+            assert(strlen(mps.field1()) < MPSInput::MAX_LINE_LEN);
             strcpy(addname, mps.field1());
             MSG_INFO3( spxout << "IMPSRD07 RHS ignored    : " << addname 
                                  << std::endl; );
@@ -406,7 +407,10 @@ static void readRanges(
          break;
 
       if (*rngname == '\0')
+      {
+         assert(strlen(mps.field2()) < MPSInput::MAX_LINE_LEN);
          strcpy(rngname, mps.field1());
+      }
 
       /* The rules are:
        * Row Sign   LHS             RHS
