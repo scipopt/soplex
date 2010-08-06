@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.43 2009/02/20 01:06:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.44 2010/08/06 14:36:47 bzfgleix Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.
@@ -523,7 +523,10 @@ static void readBounds(
          break;
 
       if (*bndname == '\0')
+      {
+         assert(strlen(mps.field2()) < MPSInput::MAX_LINE_LEN);
          strcpy(bndname, mps.field2());
+      }
       
       // Only read the first Bound in section
       if (!strcmp(bndname, mps.field2()))
