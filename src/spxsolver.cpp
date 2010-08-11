@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.48 2010/08/11 02:03:00 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.49 2010/08/11 14:53:51 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -577,7 +577,7 @@ Real SPxSolver::maxInfeas() const
    METHOD( "SPxSolver::maxInfeas()" );
    Real inf = 0.0;
 
-   if ((type() == ENTER && rep() == COLUMN) || (type() == LEAVE && rep() == ROW))
+   if (type() == ENTER)
    {
       for (int i = 0; i < dim(); i++)
       {
@@ -589,8 +589,7 @@ Real SPxSolver::maxInfeas() const
    }
    else
    {
-      assert(type() != ENTER || rep() == ROW);
-      assert(type() != LEAVE || rep() == COLUMN);
+      assert(type() == LEAVE);
 
       for (int i = 0; i < dim(); i++)
       {
