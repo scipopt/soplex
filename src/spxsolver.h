@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.45 2009/09/17 14:42:51 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.46 2010/08/11 02:03:00 bzfgleix Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -386,7 +386,9 @@ public:
    /// set a start basis.
    virtual void loadBasis(const SPxBasis::Desc&);
 
-   /// set #ROW or #COLUMN representation.
+   /// initialize #ROW or #COLUMN representation.
+   void initRep (Representation p_rep);
+   /// switch to #ROW or #COLUMN representation if not already used.
    void setRep (Representation p_rep);
    /// set \ref soplex::SPxSolver::LEAVE "LEAVE" or \ref soplex::SPxSolver::ENTER "ENTER" algorithm.
    void setType(Type tp);

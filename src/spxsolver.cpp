@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.47 2010/07/20 15:10:54 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.48 2010/08/11 02:03:00 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -198,9 +198,9 @@ void SPxSolver::setType(Type tp)
    }
 }
 
-void SPxSolver::setRep(Representation p_rep)
+void SPxSolver::initRep(Representation p_rep)
 {
-   METHOD( "SPxSolver::setRep()" );
+   METHOD( "SPxSolver::initRep()" );
 
    if (p_rep == COLUMN)
    {
@@ -245,6 +245,14 @@ void SPxSolver::setRep(Representation p_rep)
       SPxBasis::loadDesc(desc());
    if (thepricer && thepricer->solver() == this)
       thepricer->setRep(p_rep);
+}
+
+void SPxSolver::setRep(Representation p_rep)
+{
+   METHOD( "SPxSolver::setRep()" );
+
+   if (p_rep != theRep)
+      initRep(p_rep);
 }
 
 // needed for strongbranching. use carefully
@@ -569,7 +577,7 @@ Real SPxSolver::maxInfeas() const
    METHOD( "SPxSolver::maxInfeas()" );
    Real inf = 0.0;
 
-   if (type() == ENTER)
+   if ((type() == ENTER && rep() == COLUMN) || (type() == LEAVE && rep() == ROW))
    {
       for (int i = 0; i < dim(); i++)
       {
@@ -581,7 +589,8 @@ Real SPxSolver::maxInfeas() const
    }
    else
    {
-      assert(type() == LEAVE);
+      assert(type() != ENTER || rep() == ROW);
+      assert(type() != LEAVE || rep() == COLUMN);
 
       for (int i = 0; i < dim(); i++)
       {
@@ -777,7 +786,7 @@ SPxSolver::SPxSolver(
    METHOD( "SPxSolver::SPxSolver()" );
 
    theLP = this;
-   setRep (p_rep);
+   initRep(p_rep);
 
    // info: SPxBasis is not consistent in this moment.
    //assert(SPxSolver::isConsistent());
