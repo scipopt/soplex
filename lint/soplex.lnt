@@ -1,4 +1,4 @@
-// $Id: soplex.lnt,v 1.12 2005/01/06 17:12:09 bzfkocht Exp $
+// $Id: soplex.lnt,v 1.13 2010/08/11 02:01:45 bzfgleix Exp $
 -passes(1)
 +cpp(.h,.cpp)
 // esoteric size settings to find erros.
@@ -52,7 +52,7 @@
 -e1736 // Redundant access specifier 
 -e1748 // non-virtual base class included twice in class 
 
--esym(1704,Vector::Vector) // Vector has no (private) default constructor
+       -esym(1704,Vector::Vector) // Vector has no (private) default constructor
 -esym(1526,Vector::Vector) // correctly not implemented
 -esym(1510,Vector) // Vector has no destructor, this is ok
 -esym(1509,DVector) // base class destructor for class 'DVector' is not virtual
@@ -86,8 +86,8 @@
 -esym(1762,SPxSolver::basis)        // Member function could be made const
 
 // spxlpfread.cpp
--esym(429,colnames);
--esym(429,rownames);
+-esym(429,colnames)
+-esym(429,rownames)
 
 // spxlp.h
 -esym(219, Id::operator=) // no need to check.
@@ -129,7 +129,7 @@
 -esym(1555,soplex::SPxScaler::m_name)       // Direct pointer copy of member
 
 // idxset.h
--esym(1704,IdxSet::IdxSet)) // Vector has no (private) default constructor
+-esym(1704,IdxSet::IdxSet) // Vector has no (private) default constructor
 
 // islist.h
 -esym(1764,list)  // Reference parameter could be declared const ref
