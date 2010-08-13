@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.64 2009/08/10 14:44:09 bzfgleix Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.65 2010/08/13 13:25:40 bzfgleix Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -280,7 +280,7 @@ SLUFactor::Status SLUFactor::change(
    const SVector&  subst,
    const SSVector* e)
 {
-   METHOD( "SLUFactor::Status()" );
+   METHOD( "SLUFactor::change()" );
 
    // BH 2005-08-23: The boolean usetup indicates that an "update vector" 
    // has been set up. I suppose that SSVector forest is this
@@ -309,10 +309,9 @@ SLUFactor::Status SLUFactor::change(
    }
    else if (e != 0)                                   // ETA updates
    {
-      // Only to test if this happens ?
-      assert(l.updateType == ETA);
       l.updateType = ETA;
       updateNoClear(idx, e->values(), e->indexMem(), e->size());
+      l.updateType = uptype;
    }
    else if (l.updateType == FOREST_TOMLIN)            // FOREST_TOMLIN updates
    {
