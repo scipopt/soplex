@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvecs.cpp,v 1.32 2009/02/20 01:06:38 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxvecs.cpp,v 1.33 2010/08/13 12:14:56 bzfgleix Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -195,8 +195,8 @@ void SPxSolver::computeFrhs1(
             break;
 
          case (SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER) :
-         case (SPxBasis::Desc::D_ON_UPPER + SPxBasis::Desc::D_ON_LOWER) :
             assert(lfb[i] == ufb[i]);
+         case (SPxBasis::Desc::D_ON_UPPER + SPxBasis::Desc::D_ON_LOWER) :
             x = lfb[i];
             break;
 
