@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.51 2009/04/08 08:40:18 bzfgleix Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.52 2010/08/16 13:58:43 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -708,7 +708,11 @@ void CLUFactor::initFactorRings()
    {
       if (rperm[i] < 0)
       {
-         assert(u.row.len[i] > 1);
+         if (u.row.len[i] <= 0)
+         {
+            stat = SLinSolver::SINGULAR;
+            return;
+         }
          ring = &(temp.pivot_rowNZ[u.row.len[i]]);
          init2DR(temp.pivot_row[i], *ring);
          temp.pivot_row[i].idx = i;
@@ -716,7 +720,11 @@ void CLUFactor::initFactorRings()
       }
       if (cperm[i] < 0)
       {
-         assert(temp.s_cact[i] > 1);
+         if(temp.s_cact[i] <= 0)
+         {
+            stat = SLinSolver::SINGULAR;
+            return;
+         }
          ring = &(temp.pivot_colNZ[temp.s_cact[i]]);
          init2DR(temp.pivot_col[i], *ring);
          temp.pivot_col[i].idx = i;
@@ -1320,6 +1328,9 @@ void CLUFactor::eliminateNucleus( const Real eps,
    METHOD( "CLUFactor::eliminateNucleus()" );
    int r, c;
    CLUFactor::Pring *pivot;
+
+   if (stat == SLinSolver::SINGULAR)
+      return;
 
    temp.pivots.mkwtz = -1;
    temp.pivots.idx = -1;
