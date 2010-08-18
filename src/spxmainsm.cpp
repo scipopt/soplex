@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.24 2010/08/18 14:35:10 bzfhuang Exp $"
+#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.25 2010/08/18 16:17:43 bzfhuang Exp $"
 
 //#define DEBUGGING 1
 
@@ -2472,10 +2472,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
                
                if (k != j)
                {
-                  Real obj_j = lp.obj(j);
-                  Real objAdd = -1.0 * obj_j * row.value(h) / aij;
-                  Real obj_k = lp.obj(k);
-                  Real new_obj = obj_k + objAdd;
+                  Real new_obj = lp.obj(k) - (lp.obj(j) * row.value(h) / aij);
                   lp.changeObj(k, new_obj);
                }
             }
@@ -3667,15 +3664,17 @@ void SPxMainSM::unsimplify(const Vector& x, const Vector& y, const Vector& s, co
    METHOD( "SPxMainSM::unsimplify()" );
    
    // assign values of variables in reduced LP
+   // NOTE: for maximization problems, we have to switch signs of dual and reduced cost values,
+   // since simplifier assumes minimization problem
    for(int j = 0; j < x.dim(); ++j)
    {
       m_prim[j] = isZero(x[j], epsZero()) ? 0.0 : x[j];
-      m_redCost[j] = isZero(r[j], epsZero()) ? 0.0 : r[j];
+      m_redCost[j] = isZero(r[j], epsZero()) ? 0.0 : (m_thesense == SPxLP::MAXIMIZE ? -r[j] : r[j]);
       m_cBasisStat[j] = cols[j];
    }
    for(int i = 0; i < y.dim(); ++i)
    {
-      m_dual[i] = isZero(y[i], epsZero()) ? 0.0 : y[i];
+      m_dual[i] = isZero(y[i], epsZero()) ? 0.0 : (m_thesense == SPxLP::MAXIMIZE ? -y[i] : y[i]);
       m_slack[i] = isZero(s[i], epsZero()) ? 0.0 : s[i];
       m_rBasisStat[i] = rows[i];
    }
@@ -3689,6 +3688,16 @@ void SPxMainSM::unsimplify(const Vector& x, const Vector& y, const Vector& s, co
 
       delete psPtr;
       psPtr = 0;
+   }
+
+   // for maximization problems, we have to switch signs of dual and reduced cost values back
+   if(m_thesense == SPxLP::MAXIMIZE)
+   {
+      for(int j = 0; j < m_redCost.dim(); ++j)
+         m_redCost[j] = -m_redCost[j];
+
+      for(int i = 0; i < m_dual.dim(); ++i)
+         m_dual[i] = -m_dual[i];
    }
 
 #if CHECK_BASIC_DIM

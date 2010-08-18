@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.h,v 1.18 2010/08/18 14:35:10 bzfhuang Exp $"
+#pragma ident "@(#) $Id: spxmainsm.h,v 1.19 2010/08/18 16:17:43 bzfhuang Exp $"
 
 /**@file  spxmainsm.h
  * @brief General methods in LP preprocessing.
@@ -247,7 +247,7 @@ private:
          , m_strictLo(strictLo)
          , m_strictUp(strictUp)
          , m_maxSense(lp.spxSense() == SPxLP::MAXIMIZE)
-         , m_obj(lp.obj(_j))
+         , m_obj(lp.spxSense() == SPxLP::MINIMIZE ? lp.obj(_j) : -lp.obj(_j))
          , m_col(lp.colVector(_j))
          , m_newLo(newLo)
          , m_newUp(newUp)
@@ -333,7 +333,7 @@ private:
       {         
          for(int k = 0; k < m_row.size(); ++k)
          {
-            m_objs[k] = lp.obj(m_row.index(k));
+            m_objs[k] = (lp.spxSense() == SPxLP::MINIMIZE ? lp.obj(m_row.index(k)) : -lp.obj(m_row.index(k)));
             m_cols[k] = lp.colVector(m_row.index(k));
          }
       }
@@ -402,7 +402,7 @@ private:
          , m_j(_j)
          , m_old_j(lp.nCols()-1)
          , m_val(val)
-         , m_obj(lp.obj(_j))
+         , m_obj(lp.spxSense() == SPxLP::MINIMIZE ? lp.obj(_j) : -lp.obj(_j))
          , m_lower(lp.lower(_j))
          , m_upper(lp.upper(_j))
          , m_correctIdx(correctIdx)
@@ -658,7 +658,7 @@ private:
          , m_i(_i)
          , m_old_j(lp.nCols()-1)
          , m_old_i(lp.nRows()-1)
-         , m_obj(lp.obj(_j))
+         , m_obj(lp.spxSense() == SPxLP::MINIMIZE ? lp.obj(_j) : -lp.obj(_j))
          , m_lRhs(slackVal)
          , m_onLhs(slackVal == lp.lhs(_i))
          , m_eqCons(EQrel(lp.lhs(_i), lp.rhs(_i)))
@@ -733,8 +733,8 @@ private:
          , m_i(_i)
          , m_maxSense(lp.spxSense() == SPxLP::MAXIMIZE)
          , m_jFixed(EQrel(lp.lower(_j), lp.upper(_j)))
-         , m_jObj(lp.obj(_j))
-         , m_kObj(lp.obj(_k))
+         , m_jObj(lp.spxSense() == SPxLP::MINIMIZE ? lp.obj(_j) : -lp.obj(_j))
+         , m_kObj(lp.spxSense() == SPxLP::MINIMIZE ? lp.obj(_k) : -lp.obj(_k))
          , m_aij(lp.colVector(_j).value(0))
          , m_strictLo(lp.lower(_k) > oldLo)
          , m_strictUp(lp.upper(_k) < oldUp)

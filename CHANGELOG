@@ -28,6 +28,9 @@ Current development version
 - major rework of simplifier SPxMainSM: "localized" postsolving steps; many bugfixes mainly
   concerning basis statuses, dual values and reduced costs
 
+- fixed bug in simplifier SPxMainSM occuring for maximization problems
+
+
 #----------------------------------------------------------------
 
 11 Sep 2009 - Release 1.4.2
