@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.23 2010/05/27 10:18:37 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.24 2010/08/18 14:35:10 bzfhuang Exp $"
 
 //#define DEBUGGING 1
 
@@ -52,15 +52,44 @@
 #define ROWS                    1
 #define COLS                    1
 #define DUAL                    1
+///@todo check: with this simplification step, the unsimplified basis seems to be slightly suboptimal for some instances
 #define DUPLICATE_ROWS          1
 #define DUPLICATE_COLS          1
 
+
+#ifndef NDEBUG
+#define CHECK_BASIC_DIM         1
+#endif  // NDEBUG
+
 namespace soplex
 {
+bool SPxMainSM::PostStep::checkBasisDim(DataArray<SPxSolver::VarStatus> rows,
+                                        DataArray<SPxSolver::VarStatus> cols) const
+{
+   int numBasis = 0;
+   for(int rs = 0; rs < nRows; ++rs)
+   {
+      if(rows[rs] == SPxSolver::BASIC)
+         numBasis++;
+   }
+
+   for(int cs = 0; cs < nCols; ++cs)
+   {
+      if(cols[cs] == SPxSolver::BASIC)
+         numBasis++;
+   }
+   return numBasis == nRows;
+}
+
 void SPxMainSM::FreeConstraintPS::execute(DVector& x, DVector& y, DVector& s, DVector&,
-                                          DataArray<SPxSolver::VarStatus>&,
+                                          DataArray<SPxSolver::VarStatus>& cStatus,
                                           DataArray<SPxSolver::VarStatus>& rStatus) const
 {
+   // correcting the change of idx by deletion of the row:
+   s[m_old_i] = s[m_i];
+   y[m_old_i] = y[m_i];
+   rStatus[m_old_i] = rStatus[m_i];
+
    // primal:
    Real slack = 0.0;
 
@@ -74,12 +103,24 @@ void SPxMainSM::FreeConstraintPS::execute(DVector& x, DVector& y, DVector& s, DV
    
    // basis:
    rStatus[m_i] = SPxSolver::BASIC;
+
+#if CHECK_BASIC_DIM
+   if (!checkBasisDim(rStatus, cStatus))
+   {
+       throw SPxInternalCodeException("XMAISM15 Dimension doesn't match after this step.");
+   }
+#endif
 }
 
 void SPxMainSM::EmptyConstraintPS::execute(DVector&, DVector& y, DVector& s, DVector&,
-                                           DataArray<SPxSolver::VarStatus>&,
+                                           DataArray<SPxSolver::VarStatus>& cStatus,
                                            DataArray<SPxSolver::VarStatus>& rStatus) const
 {
+   // correcting the change of idx by deletion of the row:
+   s[m_old_i] = s[m_i];
+   y[m_old_i] = y[m_i];
+   rStatus[m_old_i] = rStatus[m_i];
+
    // primal: 
    s[m_i] = 0.0;
 
@@ -88,12 +129,24 @@ void SPxMainSM::EmptyConstraintPS::execute(DVector&, DVector& y, DVector& s, DVe
    
    // basis:
    rStatus[m_i] = SPxSolver::BASIC;
+
+#if CHECK_BASIC_DIM
+   if (!checkBasisDim(rStatus, cStatus))
+   {
+       throw SPxInternalCodeException("XMAISM16 Dimension doesn't match after this step.");
+   }
+#endif
 }
-   
+  
 void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVector& r,
                                         DataArray<SPxSolver::VarStatus>& cStatus,
                                         DataArray<SPxSolver::VarStatus>& rStatus) const
 {
+   // correcting the change of idx by deletion of the row:
+   s[m_old_i] = s[m_i];
+   y[m_old_i] = y[m_i];
+   rStatus[m_old_i] = rStatus[m_i];
+
    Real aij = m_col[m_i];
    
    // primal:
@@ -242,15 +295,31 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
          r[m_j] = 0.0;
       }
       break;
+   case SPxSolver::ZERO:
+      rStatus[m_i] = SPxSolver::BASIC;
+      y[m_i] = 0.0;
+      r[m_j] = val;
    default:
       break;
    }
+
+#if CHECK_BASIC_DIM
+   if (!checkBasisDim(rStatus, cStatus))
+   {
+       throw SPxInternalCodeException("XMAISM17 Dimension doesn't match after this step.");
+   }
+#endif
 }
 
 void SPxMainSM::ForceConstraintPS::execute(DVector& x, DVector& y, DVector& s, DVector& r,
                                            DataArray<SPxSolver::VarStatus>& cStatus,
                                            DataArray<SPxSolver::VarStatus>& rStatus) const
 {
+   // correcting the change of idx by deletion of the row:
+   s[m_old_i] = s[m_i];
+   y[m_old_i] = y[m_i];
+   rStatus[m_old_i] = rStatus[m_i];
+
    // primal:
    s[m_i] = m_lRhs;
 
@@ -334,12 +403,27 @@ void SPxMainSM::ForceConstraintPS::execute(DVector& x, DVector& y, DVector& s, D
       rStatus[m_i] = SPxSolver::BASIC;
       y[m_i] = 0.0;
    }
+
+#if CHECK_BASIC_DIM
+   if (!checkBasisDim(rStatus, cStatus))
+   {
+       throw SPxInternalCodeException("XMAISM18 Dimension doesn't match after this step.");
+   }
+#endif
 }
 
 void SPxMainSM::FixVariablePS::execute(DVector& x, DVector& y, DVector& s, DVector& r,
                                        DataArray<SPxSolver::VarStatus>& cStatus,
-                                       DataArray<SPxSolver::VarStatus>&) const
+                                       DataArray<SPxSolver::VarStatus>& rStatus) const
 {
+   // update the index mapping; if m_correctIdx is false, we assume that this has happened already
+   if(m_correctIdx)
+   {
+      x[m_old_j] = x[m_j];
+      r[m_old_j] = r[m_j];
+      cStatus[m_old_j] = cStatus[m_j];
+   }
+
    // primal:
    x[m_j] = m_val;
    
@@ -367,11 +451,21 @@ void SPxMainSM::FixVariablePS::execute(DVector& x, DVector& y, DVector& s, DVect
 
       cStatus[m_j] = EQrel(m_val, m_lower) ? SPxSolver::ON_LOWER : (EQrel(m_val, m_upper) ? SPxSolver::ON_UPPER : SPxSolver::ZERO);
    }
+
+#if CHECK_BASIC_DIM
+   if(m_correctIdx)
+   {
+      if (!checkBasisDim(rStatus, cStatus))
+      {
+         throw SPxInternalCodeException("XMAISM19 Dimension doesn't match after this step.");
+      }
+   }
+#endif
 }
 
 void SPxMainSM::FixBoundsPS::execute(DVector&, DVector&, DVector&, DVector&,
                                      DataArray<SPxSolver::VarStatus>& cStatus,
-                                     DataArray<SPxSolver::VarStatus>&) const
+                                     DataArray<SPxSolver::VarStatus>& ) const
 {
    // basis:
    cStatus[m_j] = m_status;
@@ -381,6 +475,22 @@ void SPxMainSM::FreeZeroObjVariablePS::execute(DVector& x, DVector& y, DVector& 
                                                DataArray<SPxSolver::VarStatus>& cStatus,
                                                DataArray<SPxSolver::VarStatus>& rStatus) const
 {
+   // correcting the change of idx by deletion of the column and corresponding rows:
+   x[m_old_j] = x[m_j];
+   r[m_old_j] = r[m_j];
+   cStatus[m_old_j] = cStatus[m_j];
+
+   int rIdx = m_old_i - m_col.size() + 1;
+
+   for(int k = 0; k < m_col.size(); ++k)
+   {
+      int rIdx_new = m_col.index(k);
+      s[rIdx] = s[rIdx_new];
+      y[rIdx] = y[rIdx_new];
+      rStatus[rIdx] = rStatus[rIdx_new];
+      rIdx++;
+   }
+
    // primal:
    int      domIdx = -1;
    DSVector slack(m_col.size());
@@ -499,12 +609,24 @@ void SPxMainSM::FreeZeroObjVariablePS::execute(DVector& x, DVector& y, DVector& 
       else
          cStatus[m_j] = SPxSolver::ON_LOWER;
    }
+
+#if CHECK_BASIC_DIM
+   if (!checkBasisDim(rStatus, cStatus))
+   {
+       throw SPxInternalCodeException("XMAISM20 Dimension doesn't match after this step.");
+   }
+#endif
 }
 
 void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVector& r,
                                                DataArray<SPxSolver::VarStatus>& cStatus,
                                                DataArray<SPxSolver::VarStatus>& rStatus) const
 {
+   // correcting the change of idx by deletion of the column and corresponding rows:
+   x[m_old_j] = x[m_j];
+   r[m_old_j] = r[m_j];
+   cStatus[m_old_j] = cStatus[m_j];
+
    // primal & basis:
    Real aij = m_row[m_j];
 
@@ -540,7 +662,7 @@ void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& 
           (LErel(m_lower, up, 1e-10) && LErel(up, m_upper, 1e-10)) ||
           (LErel(lo, m_lower, 1e-10) && LErel(m_upper, up, 1e-10)));
    ASSERT_WARN( "WMAISM01", isNotZero(aij) );
-   
+
    if (rStatus[m_i] == SPxSolver::ON_LOWER)
    {
       if (EQrel(m_lower, m_upper))
@@ -634,12 +756,30 @@ void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& 
    r[m_j] = -1.0 * aij * y[m_i];
 
    assert(cStatus[m_j] != SPxSolver::BASIC || isZero(r[m_j], eps()));
+
+#if CHECK_BASIC_DIM
+   if (!checkBasisDim(rStatus, cStatus))
+   {
+       throw SPxInternalCodeException("XMAISM21 Dimension doesn't match after this step.");
+   }
+#endif
 }
 
 void SPxMainSM::FreeColSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVector& r,
                                             DataArray<SPxSolver::VarStatus>& cStatus,
                                             DataArray<SPxSolver::VarStatus>& rStatus) const
 {
+
+   // correcting the change of idx by deletion of the row:
+   s[m_old_i] = s[m_i];
+   y[m_old_i] = y[m_i];
+   rStatus[m_old_i] = rStatus[m_i];
+
+   // correcting the change of idx by deletion of the column:
+   x[m_old_j] = x[m_j];
+   r[m_old_j] = r[m_j];
+   cStatus[m_old_j] = cStatus[m_j];
+
    // primal:
    Real val = 0.0;
    Real aij = m_row[m_j];
@@ -674,11 +814,18 @@ void SPxMainSM::FreeColSingletonPS::execute(DVector& x, DVector& y, DVector& s, 
       rStatus[m_i] = SPxSolver::ON_LOWER;
    else
       rStatus[m_i] = SPxSolver::ON_UPPER;
+
+#if CHECK_BASIC_DIM
+   if (!checkBasisDim(rStatus, cStatus))
+   {
+       throw SPxInternalCodeException("XMAISM22 Dimension doesn't match after this step.");
+   }
+#endif
 }
 
 void SPxMainSM::DoubletonEquationPS::execute(DVector&, DVector& y, DVector&, DVector& r,
                                              DataArray<SPxSolver::VarStatus>& cStatus,
-                                             DataArray<SPxSolver::VarStatus>&) const
+                                             DataArray<SPxSolver::VarStatus>& rStatus) const
 {
    // dual: 
    if ((cStatus[m_k]  != SPxSolver::BASIC) &&
@@ -691,9 +838,9 @@ void SPxMainSM::DoubletonEquationPS::execute(DVector&, DVector& y, DVector&, DVe
       Real val  = m_kObj;
       Real aik  = m_col[m_i];
       
-      for(int k = 0; k < m_col.size(); ++k)
-         if (m_col.index(k) != m_i)
-            val -= m_col.value(k) * y[m_col.index(k)];
+      for(int _k = 0; _k < m_col.size(); ++_k)
+         if (m_col.index(_k) != m_i)
+            val -= m_col.value(_k) * y[m_col.index(_k)];
       
       y[m_i] = val / aik;
       r[m_k] = 0.0;
@@ -733,12 +880,35 @@ void SPxMainSM::DoubletonEquationPS::execute(DVector&, DVector& y, DVector&, DVe
              (r[m_j] <= eps() && cStatus[m_j] == SPxSolver::ON_UPPER ) ||
              (cStatus[m_j] == SPxSolver::FIXED));
    }
+
+#if CHECK_BASIC_DIM
+   if (!checkBasisDim(rStatus, cStatus))
+   {
+       throw SPxInternalCodeException("XMAISM23 Dimension doesn't match after this step.");
+   }
+#endif
 }
 
 void SPxMainSM::DuplicateRowsPS::execute(DVector&, DVector& y, DVector& s, DVector&,
-                                         DataArray<SPxSolver::VarStatus>&,
+                                         DataArray<SPxSolver::VarStatus>& cStatus,
                                          DataArray<SPxSolver::VarStatus>& rStatus) const
 {
+   // correcting the change of idx by deletion of the duplicated rows:
+   if(m_isLast)
+   {
+      for(int i = m_perm.size() - 1; i >= 0; --i)
+      {
+         if (m_perm[i] >= 0)
+         {
+            int rIdx_new = m_perm[i];
+            int rIdx = i;
+            s[rIdx] = s[rIdx_new];
+            y[rIdx] = y[rIdx_new];
+            rStatus[rIdx] = rStatus[rIdx_new];
+         }
+      }
+   }
+
    // primal:
    for(int k = 0; k < m_scale.size(); ++k)
       if (m_scale.index(k) != m_i)
@@ -768,15 +938,19 @@ void SPxMainSM::DuplicateRowsPS::execute(DVector&, DVector& y, DVector& s, DVect
          y[i]   = y[m_i] * m_scale.value(k);
          y[m_i] = 0.0;
          
-         if(i == m_maxLhsIdx)
+         if(m_isLhsEqualRhs[k])
          {
-            rStatus[i]   = m_scale.value(k) > 0 ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
+            rStatus[i] = SPxSolver::FIXED;
+         }
+         else if(i == m_maxLhsIdx)
+         {
+            rStatus[i] = m_scale.value(k)*m_scale.value(0) > 0 ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
          }
          else
          {
             assert(i == m_minRhsIdx);
 
-            rStatus[i]   = m_scale.value(k) > 0 ? SPxSolver::ON_UPPER : SPxSolver::ON_LOWER;
+            rStatus[i] = m_scale.value(k)*m_scale.value(0) > 0 ? SPxSolver::ON_UPPER : SPxSolver::ON_LOWER;
          }
          if (i != m_i)
             rStatus[m_i] = SPxSolver::BASIC;
@@ -788,7 +962,7 @@ void SPxMainSM::DuplicateRowsPS::execute(DVector&, DVector& y, DVector& s, DVect
          y[i]   = y[m_i] * m_scale.value(k);
          y[m_i] = 0.0;
 
-         rStatus[i]   = m_scale.value(k) > 0 ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
+         rStatus[i] = m_scale.value(k)*m_scale.value(0) > 0 ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
          if (i != m_i)
             rStatus[m_i] = SPxSolver::BASIC;
          haveSetBasis = true;
@@ -799,7 +973,7 @@ void SPxMainSM::DuplicateRowsPS::execute(DVector&, DVector& y, DVector& s, DVect
          y[i]   = y[m_i] * m_scale.value(k);
          y[m_i] = 0.0;
 
-         rStatus[i]   = m_scale.value(k) > 0 ? SPxSolver::ON_UPPER : SPxSolver::ON_LOWER;
+         rStatus[i] = m_scale.value(k)*m_scale.value(0) > 0 ? SPxSolver::ON_UPPER : SPxSolver::ON_LOWER;
          if (i != m_i)
             rStatus[m_i] = SPxSolver::BASIC;
          haveSetBasis = true;
@@ -811,7 +985,14 @@ void SPxMainSM::DuplicateRowsPS::execute(DVector&, DVector& y, DVector& s, DVect
          rStatus[i] = SPxSolver::BASIC;
       }
    }   
-      
+
+#if CHECK_BASIC_DIM
+   if(m_isFirst && !checkBasisDim(rStatus, cStatus))
+   {
+      throw SPxInternalCodeException("XMAISM24 Dimension doesn't match after this step.");
+   }
+#endif
+
    // nothing to do for the reduced cost values
 }
 
@@ -820,8 +1001,38 @@ void SPxMainSM::DuplicateColsPS::execute(DVector& x,
                                          DVector&, 
                                          DVector& r,
                                          DataArray<SPxSolver::VarStatus>& cStatus,
-                                         DataArray<SPxSolver::VarStatus>&) const
+                                         DataArray<SPxSolver::VarStatus>& rStatus) const
 {
+
+   if(m_isFirst)
+   {
+#if CHECK_BASIC_DIM
+      if (!checkBasisDim(rStatus, cStatus))
+      {
+         throw SPxInternalCodeException("XMAISM25 Dimension doesn't match after this step.");
+      }
+#endif
+      return;
+   }
+
+
+   // correcting the change of idx by deletion of the columns:
+   if(m_isLast)
+   {
+      for(int i = m_perm.size() - 1; i >= 0; --i)
+      {
+         if (m_perm[i] >= 0)
+         {
+            int cIdx_new = m_perm[i];
+            int cIdx = i;
+            x[cIdx] = x[cIdx_new];
+            r[cIdx] = r[cIdx_new];
+            cStatus[cIdx] = cStatus[cIdx_new];
+         }
+      }
+      return;
+   }
+
    // primal & basis:
    ASSERT_WARN( "WMAISM03", isNotZero(m_scale) );
 
@@ -1046,7 +1257,7 @@ void SPxMainSM::handleExtremes(SPxLP& lp)
 
       if (lp.lhs(i) <= -infinity && lp.rhs(i) >= infinity)
       {
-         m_hist.append(new FreeConstraintPS(lp, *this, i));
+         m_hist.append(new FreeConstraintPS(lp, i));
 
          removeRow(lp, i);
          ++remRows;
@@ -1200,7 +1411,7 @@ SPxSimplifier::Result SPxMainSM::removeEmpty(SPxLP& lp)
          }         
          MSG_INFO3( spxout << " removed" << std::endl; )
 
-         m_hist.append(new EmptyConstraintPS(rIdx(i)));
+         m_hist.append(new EmptyConstraintPS(lp, i));
          
          ++remRows;
          removeRow(lp, i);
@@ -1253,8 +1464,8 @@ SPxSimplifier::Result SPxMainSM::removeEmpty(SPxLP& lp)
          }
          MSG_INFO3( spxout << " removed" << std::endl; )
 
-         m_hist.append(new FixBoundsPS(lp, *this, j, val));  
-         m_hist.append(new FixVariablePS(lp, *this, j, val));
+         m_hist.append(new FixBoundsPS(lp, j, val));  
+         m_hist.append(new FixVariablePS(lp, j, val));
             
          ++remCols;
          removeCol(lp, j);
@@ -1558,7 +1769,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
          MSG_INFO3( spxout << "IMAISM20 row " << i 
                            << ": unconstrained -> removed" << std::endl; )
 
-         m_hist.append(new FreeConstraintPS(lp, *this, i));
+         m_hist.append(new FreeConstraintPS(lp, i));
          
  	 ++remRows;
          remNzos += row.size();
@@ -1584,8 +1795,8 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
             return INFEASIBLE;
          }         
          MSG_INFO3( spxout << " removed" << std::endl; )
-         
-         m_hist.append(new EmptyConstraintPS(rIdx(i)));   
+
+         m_hist.append(new EmptyConstraintPS(lp, i));   
         
          ++remRows;
          removeRow(lp, i);
@@ -1657,7 +1868,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
             stricterLo = true;
          }
 
-         m_hist.append(new RowSingletonPS(lp, *this, i, j, stricterLo, stricterUp, lp.lower(j), lp.upper(j), oldLo, oldUp));
+         m_hist.append(new RowSingletonPS(lp, i, j, stricterLo, stricterUp, lp.lower(j), lp.upper(j), oldLo, oldUp));
          
          ++remRows;
          ++remNzos;
@@ -1702,7 +1913,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                lp.changeUpper(j, lp.lower(j));
          }
          
-         m_hist.append(new ForceConstraintPS(lp, *this, i, true, fixedCol, lowers, uppers));
+         m_hist.append(new ForceConstraintPS(lp, i, true, fixedCol, lowers, uppers));
 
          ++remRows;
          remNzos += row.size();
@@ -1743,7 +1954,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                lp.changeLower(j, lp.upper(j));
          }
 
-         m_hist.append(new ForceConstraintPS(lp, *this, i, false, fixedCol, lowers, uppers));
+         m_hist.append(new ForceConstraintPS(lp, i, false, fixedCol, lowers, uppers));
 
          ++remRows;
          remNzos += row.size();
@@ -1855,8 +2066,8 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
          }
          MSG_INFO3( spxout << " removed" << std::endl; )
 
-         m_hist.append(new FixBoundsPS(lp, *this, j, val));  
-         m_hist.append(new FixVariablePS(lp, *this, j, val));
+         m_hist.append(new FixBoundsPS(lp, j, val));  
+         m_hist.append(new FixVariablePS(lp, j, val));
            
          ++remCols;
          removeCol(lp, j);
@@ -1920,7 +2131,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
             }         
             MSG_INFO3( spxout << " fixed at upper=" << lp.upper(j) << std::endl; )
 
-            m_hist.append(new FixBoundsPS(lp, *this, j, lp.upper(j)));
+            m_hist.append(new FixBoundsPS(lp, j, lp.upper(j)));
             lp.changeLower(j, lp.upper(j));
          }
          // max -3 x
@@ -1939,7 +2150,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
             }
             MSG_INFO3( spxout << " fixed at lower=" << lp.lower(j) << std::endl; )
             
-            m_hist.append(new FixBoundsPS(lp, *this, j, lp.lower(j)));
+            m_hist.append(new FixBoundsPS(lp, j, lp.lower(j)));
             lp.changeUpper(j, lp.lower(j));
 #endif
          }
@@ -1959,7 +2170,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
                   int l   =  col.index(k);
 		  remNzos += lp.rowVector(l).size();
                }
-               m_hist.append(new FreeZeroObjVariablePS(lp, *this, j, true));
+               m_hist.append(new FreeZeroObjVariablePS(lp, j, true));
                
                ++remCols;
                remRows += col.size();
@@ -1986,7 +2197,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
                   int l   =  col.index(k);                 
                   remNzos += lp.rowVector(l).size();
                }
-               m_hist.append(new FreeZeroObjVariablePS(lp, *this, j, false));
+               m_hist.append(new FreeZeroObjVariablePS(lp, j, false));
                
                ++remCols;
                remRows += col.size();
@@ -2014,7 +2225,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
                            << " upper=" << lp.upper(j) << std::endl; )         
 
          fixColumn(lp, j);
-         
+
          ++remCols;
          remNzos += col.size();
          removeCol(lp, j);
@@ -2085,7 +2296,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
 
             if (lp.lhs(i) <= -infinity && lp.rhs(i) >= infinity)
             {
-               m_hist.append(new FreeConstraintPS(lp, *this, i));
+               m_hist.append(new FreeConstraintPS(lp, i));
                
                ++remRows;
                removeRow(lp, i);
@@ -2183,7 +2394,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
                return INFEASIBLE;
             }
             
-            m_hist.append(new DoubletonEquationPS(lp, *this, j, k, i, oldLower, oldUpper));
+            m_hist.append(new DoubletonEquationPS(lp, j, k, i, oldLower, oldUpper));
 
             if (lp.lower(j) > -infinity && lp.upper(j) < infinity)
                chgBnds += 2;
@@ -2248,7 +2459,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
                }
             }
            
-            m_hist.append(new FreeColSingletonPS(lp, *this, j, i, slackVal));
+            m_hist.append(new FreeColSingletonPS(lp, j, i, slackVal));
             
             MSG_INFO3( spxout << "IMAISM41 col " << j
                               << ": free singleton removed" << std::endl; )
@@ -2261,8 +2472,11 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
                
                if (k != j)
                {
-                  Real objAdd = -1.0 * lp.obj(j) * row.value(h) / aij;
-                  lp.changeObj(k, lp.obj(k) + objAdd);
+                  Real obj_j = lp.obj(j);
+                  Real objAdd = -1.0 * obj_j * row.value(h) / aij;
+                  Real obj_k = lp.obj(k);
+                  Real new_obj = obj_k + objAdd;
+                  lp.changeObj(k, new_obj);
                }
             }
             
@@ -2326,7 +2540,7 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
          MSG_INFO3( spxout << "IMAISM43 row " << i 
                            << ": unconstrained" << std::endl; )
 
-	 m_hist.append(new FreeConstraintPS(lp, *this, i));
+         m_hist.append(new FreeConstraintPS(lp, i));
 
          ++remRows;
          remNzos += lp.rowVector(i).size();
@@ -2353,7 +2567,7 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
          ASSERT_WARN( "WMAISM44", isNotZero(aij, epsZero()) );
          
          Real bound = lp.maxObj(j) / aij;
-         
+
          if (aij > 0)
          {
             if (lp.lower(j) <= -infinity && bound < dualVarUp[i])
@@ -2448,7 +2662,7 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
         
          MSG_INFO3( spxout << " fixed at upper=" << lp.upper(j) << std::endl; )
          
-         m_hist.append(new FixBoundsPS(lp, *this, j, lp.upper(j)));
+         m_hist.append(new FixBoundsPS(lp, j, lp.upper(j)));
          lp.changeLower(j, lp.upper(j));
 
          ++m_stat[DOMINATED_COL];
@@ -2469,7 +2683,7 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
          
          MSG_INFO3( spxout << " fixed at lower=" << lp.lower(j) << std::endl; )
          
-         m_hist.append(new FixBoundsPS(lp, *this, j, lp.lower(j)));
+         m_hist.append(new FixBoundsPS(lp, j, lp.lower(j)));
          lp.changeUpper(j, lp.lower(j));
 
          ++m_stat[DOMINATED_COL];
@@ -2484,7 +2698,7 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
                            << ": weakly dominated -> maxObj=" << obj
                            << " dual rhs bound=" << dualConsUp[j] << std::endl; )
 
-         m_hist.append(new FixBoundsPS(lp, *this, j, lp.upper(j)));
+         m_hist.append(new FixBoundsPS(lp, j, lp.upper(j)));
          lp.changeLower(j, lp.upper(j));
 
          ++m_stat[WEAKLY_DOMINATED_COL];
@@ -2497,7 +2711,7 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
                            << ": weakly dominated -> maxObj=" << obj
                            << " dual lhs bound=" << dualConsLo[j] << std::endl; )
          
-         m_hist.append(new FixBoundsPS(lp, *this, j, lp.lower(j)));
+         m_hist.append(new FixBoundsPS(lp, j, lp.lower(j)));
          lp.changeUpper(j, lp.lower(j));
 
          ++m_stat[WEAKLY_DOMINATED_COL];
@@ -2593,7 +2807,7 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
          {
             Real aij = col.value(k);
             int  i   = col.index(k);
-	
+
             ASSERT_WARN( "WMAISM52", isNotZero(aij, epsZero()) );
          
             if (scale[i] == 0.0)
@@ -2662,6 +2876,48 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
       dupRows[pClass[k]].add(k, 0.0);
    }
    
+   const int nRowsOld_tmp = lp.nRows();
+   int* perm_tmp = new int[nRowsOld_tmp];
+
+   for(int j = 0; j < nRowsOld_tmp; ++j)
+   {
+      perm_tmp[j] = 0;
+   }
+
+   int idxFirstDupRows = -1;
+   int idxLastDupRows = -1;
+   int numDelRows = 0;
+
+   for(int k = 0; k < dupRows.size(); ++k)
+   {
+      if (dupRows[k].size() > 1)
+      {
+         idxLastDupRows = k;
+
+         if(idxFirstDupRows < 0)
+         {
+            idxFirstDupRows = k;
+         }
+
+         for(int l = 1; l < dupRows[k].size(); ++l)
+         {
+            int i = dupRows[k].index(l);
+            perm_tmp[i] = -1;
+         }
+
+         numDelRows += (dupRows[k].size()-1);
+      }
+   }
+
+   {
+      int k_tmp, j_tmp = -1;
+      for (k_tmp = j_tmp = 0; k_tmp < nRowsOld_tmp; ++k_tmp)
+      {
+         if (perm_tmp[k_tmp] >= 0)
+            perm_tmp[k_tmp] = j_tmp++;
+      }
+   }
+
    // store rhs and lhs changes for combined update
    bool doChangeRanges = false;
    DVector newLhsVec(lp.lhs());
@@ -2682,11 +2938,14 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
          int  minRhsIdx = -1;
          Real maxLhs    = -infinity;
          Real minRhs    = +infinity;
-     
+
+         DataArray<bool> isLhsEqualRhs(dupRows[k].size());
+                 
          // determine strictest bounds on constraint
          for(int l = 0; l < dupRows[k].size(); ++l)
          {
             int i = dupRows[k].index(l);
+            isLhsEqualRhs[l] = EQrel(lp.lhs(i), lp.rhs(i), PostStep::eps());
                
             ASSERT_WARN( "WMAISM54", isNotZero(scale[i], epsZero()) );
 
@@ -2728,19 +2987,33 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
                   
          if (rowIdx != -1)
          {
-            m_hist.append(new DuplicateRowsPS(lp, *this, rowIdx, maxLhsIdx, minRhsIdx, dupRows[k], scale));
-            
+            Real newLhs = (maxLhs > lp.lhs(rowIdx)) ? maxLhs : lp.lhs(rowIdx);  
+            Real newRhs = (minRhs < lp.rhs(rowIdx)) ? minRhs : lp.rhs(rowIdx);
+
+            if(k == idxLastDupRows)
+            {
+               DataArray<int> da_perm(nRowsOld_tmp);
+               for(int j = 0; j < nRowsOld_tmp; ++j)
+               {
+                  da_perm[j] = perm_tmp[j];
+               }
+               m_hist.append(new DuplicateRowsPS(lp, rowIdx, maxLhsIdx, minRhsIdx, dupRows[k], scale, da_perm, isLhsEqualRhs, true, EQrel(newLhs, newRhs), k==idxFirstDupRows));
+            }
+            else
+            {
+               DataArray<int> da_perm_empty(0);
+
+               m_hist.append(new DuplicateRowsPS(lp, rowIdx, maxLhsIdx, minRhsIdx, dupRows[k], scale, da_perm_empty, isLhsEqualRhs, false, EQrel(newLhs, newRhs), k == idxFirstDupRows));
+            }
+
             if (maxLhs > lp.lhs(rowIdx) || minRhs < lp.rhs(rowIdx))
             {
                // modify lhs and rhs of constraint rowIdx
-               Real newLhs = (maxLhs > lp.lhs(rowIdx)) ? maxLhs : lp.lhs(rowIdx);  
-               Real newRhs = (minRhs < lp.rhs(rowIdx)) ? minRhs : lp.rhs(rowIdx);
-                     
                doChangeRanges = true;
                
                newLhsVec[rowIdx] = newLhs;
                newRhsVec[rowIdx] = newRhs;
-                              
+               
                if (LTrel(newRhs, newLhs, deltaBnd()))
                {
                   MSG_INFO3( spxout << "IMAISM55 duplicate rows yield infeasible bounds:"
@@ -2752,7 +3025,7 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
          }
       }
    }
-
+   
    // change ranges for all modified constraints by one single call (more efficient)
    if (doChangeRanges)
    {
@@ -2762,7 +3035,7 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
    // remove all rows by one single method call (more efficient)
    const int nRowsOld = lp.nRows();
    int* perm = new int[nRowsOld];
-   
+  
    for(int i = 0; i < nRowsOld; ++i)
    {
       if (remRow[i])
@@ -2775,13 +3048,19 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
          perm[i] = 0;
    }
    lp.removeRows(perm);
-   
+
    for(int i = 0; i < nRowsOld; ++i)
    {
+      // assert that the pre-computed permutation was correct
+      assert(perm[i] == perm_tmp[i]);
+
+      // update the global index mapping
       if (perm[i] >= 0)
          m_rIdx[perm[i]] = m_rIdx[i];
    }   
-   delete[] perm;   
+
+   delete[] perm;
+   delete[] perm_tmp;
    
    if (remRows + remNzos > 0)
    {
@@ -2919,10 +3198,32 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
       dupCols[pClass[k]].add(k, 0.0);
    
    DataArray<bool> remCol(lp.nCols());
+   DataArray<bool> fixAndRemCol(lp.nCols());
    
    for(int j = 0; j < lp.nCols(); ++j)
+   {
       remCol[j] = false;
-   
+      fixAndRemCol[j] = false;
+   }
+
+   bool hasDuplicateCol = false;
+
+   for(int k = 0; k < dupCols.size(); ++k)
+   {
+      if (dupCols[k].size() > 1)
+      {
+         hasDuplicateCol = true;
+         break;
+      }
+   }
+
+   DataArray<int>  m_perm_empty(0);
+
+   if(hasDuplicateCol)
+   {
+      m_hist.append(new DuplicateColsPS(lp, 0, 0, 1.0, m_perm_empty,  true));
+   }
+
    for(int k = 0; k < dupCols.size(); ++k)
    {
       if (dupCols[k].size() > 1)
@@ -2947,12 +3248,12 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
                   Real objDif = cj1 - cj2 * scale[j1] / scale[j2];
                                     
                   ASSERT_WARN( "WMAISM59", isNotZero(factor, epsZero()) );
-		  
+
                   if (isZero(objDif, epsZero()))
                   {
                      // case 1: objectives also duplicate
                      // variable substitution xj2' := xj2 + factor * xj1 <=> xj2 = -factor * xj1 + xj2'
-                     m_hist.append(new DuplicateColsPS(lp, *this, j1, j2, factor));
+                     m_hist.append(new DuplicateColsPS(lp, j1, j2, factor, m_perm_empty));
                      
                      // update bounds of remaining column j2 (new column j2')
                      if (factor > 0)
@@ -3007,7 +3308,7 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
                                              << ", " << j2
                                              << " first one fixed at upper bound=" << lp.upper(j1) << std::endl; )
                            
-                           m_hist.append(new FixBoundsPS(lp, *this, j1, lp.upper(j1)));
+                           m_hist.append(new FixBoundsPS(lp, j1, lp.upper(j1)));
                            lp.changeLower(j1, lp.upper(j1));
                         }
                         else if (factor < 0 && objDif < 0)
@@ -3023,7 +3324,7 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
                                              << ", " << j2
                                              << " first one fixed at lower bound=" << lp.lower(j1) << std::endl; )
                            
-                           m_hist.append(new FixBoundsPS(lp, *this, j1, lp.lower(j1)));
+                           m_hist.append(new FixBoundsPS(lp, j1, lp.lower(j1)));
                            lp.changeUpper(j1, lp.lower(j1));
                         }
                      }
@@ -3043,7 +3344,7 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
                                              << ", " << j2
                                              << " first one fixed at upper bound=" << lp.upper(j1) << std::endl; )
                            
-                           m_hist.append(new FixBoundsPS(lp, *this, j1, lp.upper(j1)));
+                           m_hist.append(new FixBoundsPS(lp, j1, lp.upper(j1)));
                            lp.changeLower(j1, lp.upper(j1));
                         }
 
@@ -3061,14 +3362,14 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
                                              << ", " << j2
                                              << " first one fixed at lower bound=" << lp.lower(j1) << std::endl; )
                            
-                           m_hist.append(new FixBoundsPS(lp, *this, j1, lp.lower(j1)));
+                           m_hist.append(new FixBoundsPS(lp, j1, lp.lower(j1)));
                            lp.changeUpper(j1, lp.lower(j1));
                         } 
                      }
                      if (EQrel(lp.lower(j1), lp.upper(j1), deltaBnd()))
                      {
-                        fixColumn(lp, j1);
                         remCol[j1] = true;
+                        fixAndRemCol[j1] = true;
 
                         ++m_stat[FIX_DUPLICATE_COL];
                      }
@@ -3077,6 +3378,17 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
 	    }
          }
       }     
+   }
+
+   for(int j = 0; j < lp.nCols(); ++j)
+   {
+      if(fixAndRemCol[j])
+      {
+         assert(remCol[j]);
+
+         // correctIdx == false, because the index mapping will be handled by the postsolving in DuplicateColsPS
+         fixColumn(lp, j, false);
+      }
    }
    
    // remove all columns by one single method call (more efficient)
@@ -3101,6 +3413,18 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
       if (perm[j] >= 0)
          m_cIdx[perm[j]] = m_cIdx[j];
    }   
+
+   DataArray<int> da_perm(nColsOld);
+   for(int j = 0; j < nColsOld; ++j)
+   {
+       da_perm[j] = perm[j];
+   }
+
+   if(hasDuplicateCol)
+   {
+      m_hist.append(new DuplicateColsPS(lp, 0, 0, 1.0, da_perm, false, true));
+   }
+
    delete[] perm;
 
    assert(remCols > 0 || remNzos == 0);
@@ -3119,7 +3443,7 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
    return OKAY;
 }
 
-void SPxMainSM::fixColumn(SPxLP& lp, int j)
+void SPxMainSM::fixColumn(SPxLP& lp, int j, bool correctIdx)
 {
    METHOD( "SPxMainSM::fixColumn" );
 
@@ -3190,13 +3514,14 @@ void SPxMainSM::fixColumn(SPxLP& lp, int j)
       }
    }
    
-   m_hist.append(new FixVariablePS(lp, *this, j, lp.lower(j)));
+   m_hist.append(new FixVariablePS(lp, j, lp.lower(j), correctIdx));
 }
 
 SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real delta)
 {
    METHOD( "SPxMainSM::simplify()" );
       
+   m_thesense = lp.spxSense();
    m_timeUsed.reset();
    m_timeUsed.start();
 
@@ -3344,32 +3669,51 @@ void SPxMainSM::unsimplify(const Vector& x, const Vector& y, const Vector& s, co
    // assign values of variables in reduced LP
    for(int j = 0; j < x.dim(); ++j)
    {
-      m_prim[cIdx(j)]       = isZero(x[j], epsZero()) ? 0.0 : x[j];
-      m_redCost[cIdx(j)]    = isZero(r[j], epsZero()) ? 0.0 : r[j];
-      m_cBasisStat[cIdx(j)] = cols[j];
+      m_prim[j] = isZero(x[j], epsZero()) ? 0.0 : x[j];
+      m_redCost[j] = isZero(r[j], epsZero()) ? 0.0 : r[j];
+      m_cBasisStat[j] = cols[j];
    }
    for(int i = 0; i < y.dim(); ++i)
    {
-      m_dual[rIdx(i)]       = isZero(y[i], epsZero()) ? 0.0 : y[i];
-      m_slack[rIdx(i)]      = isZero(s[i], epsZero()) ? 0.0 : s[i];
-      m_rBasisStat[rIdx(i)] = rows[i];
+      m_dual[i] = isZero(y[i], epsZero()) ? 0.0 : y[i];
+      m_slack[i] = isZero(s[i], epsZero()) ? 0.0 : s[i];
+      m_rBasisStat[i] = rows[i];
    }
-   
+
    // undo preprocessing
    for(int k = m_hist.size()-1; k >= 0; --k)
    {
       const PostStep* psPtr = m_hist[k];
-      
+
       psPtr->execute(m_prim, m_dual, m_slack, m_redCost, m_cBasisStat, m_rBasisStat);
-      
+
       delete psPtr;
       psPtr = 0;
    }
 
+#if CHECK_BASIC_DIM
+   int numBasis = 0;
+   for(int rs = 0; rs < m_rBasisStat.size(); ++rs)
+   {
+      if(m_rBasisStat[rs] == SPxSolver::BASIC)
+         numBasis ++;
+   }
+   
+   for(int cs = 0; cs < m_cBasisStat.size(); ++cs)
+   {
+      if(m_cBasisStat[cs] == SPxSolver::BASIC)
+         numBasis ++;
+   }
+
+   if( numBasis != m_rBasisStat.size())
+   {
+      throw SPxInternalCodeException("XMAISM26 Dimension doesn't match after this step.");
+   }
+#endif
+
    m_hist.clear();
    m_postsolved = true;
 }
-
 } //namespace soplex
 
 //-----------------------------------------------------------------------------

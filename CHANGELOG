@@ -25,6 +25,8 @@ Current development version
 
 - fixed bug in SPxSolver::setPricer() appearing when switching pricers in initialized state
 
+- major rework of simplifier SPxMainSM: "localized" postsolving steps; many bugfixes mainly
+  concerning basis statuses, dual values and reduced costs
 
 #----------------------------------------------------------------
 

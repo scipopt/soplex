@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.h,v 1.17 2009/12/17 16:01:27 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxmainsm.h,v 1.18 2010/08/18 14:35:10 bzfhuang Exp $"
 
 /**@file  spxmainsm.h
  * @brief General methods in LP preprocessing.
@@ -75,16 +75,26 @@ private:
    class PostStep
    {
    private:
-      const Real m_eps;
+      const static Real m_eps = 1e-6;
+      /// name of the simplifier
+      const char* m_name;
+      /// number of cols
+      int nCols;
+      /// number of rows
+      int nRows;
       
    public:
       /// constructor.
-      PostStep()
-         : m_eps(1e-6)
+      PostStep(const char* p_name, int nR = 0, int nC = 0)
+         : m_name(p_name)
+         , nCols(nC)
+         , nRows(nR)
       {}
       /// copy constructor.
       PostStep(const PostStep& old)
-         : m_eps(old.m_eps)
+         : m_name(old.m_name)
+         , nCols(old.nCols)
+         , nRows(old.nRows)
       {}
       /// assignment operator
       PostStep& operator=(const PostStep& /*rhs*/)
@@ -93,16 +103,23 @@ private:
       }
       /// destructor.
       virtual ~PostStep()
-      {}
+      {
+         m_name = 0;
+      }
+      /// get name of pricer.
+      virtual const char* getName() const
+      {
+         return m_name;
+      }
       /// clone function for polymorphism
       virtual PostStep* clone() const = 0;
       /// executes the postsolving.
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const = 0;
 
-   protected:
-      ///
-      Real eps() const
+      virtual bool checkBasisDim(DataArray<SPxSolver::VarStatus> rows,  DataArray<SPxSolver::VarStatus> cols) const;
+
+      static Real eps()
       {
          return m_eps;
       }
@@ -115,23 +132,22 @@ private:
    {
    private:
       const int m_i;
+      const int m_old_i;
       DSVector  m_row;
    
    public:
       ///
-      FreeConstraintPS(const SPxLP& lp, const SPxMainSM& simplifier, int i)
-         : m_i(simplifier.rIdx(i))
-         , m_row(lp.rowVector(i).size())
-      {
-         const SVector& row = lp.rowVector(i);
-         
-         for(int k = 0; k < row.size(); ++k)
-            m_row.add(simplifier.cIdx(row.index(k)), row.value(k));
-      }
+      FreeConstraintPS(const SPxLP& lp, int _i)
+         : PostStep("FreeConstraint", lp.nRows(), lp.nCols())
+         , m_i(_i)
+         , m_old_i(lp.nRows()-1)
+         , m_row(lp.rowVector(_i))
+      {}
       /// copy constructor
       FreeConstraintPS(const FreeConstraintPS& old)
          : PostStep(old)
          , m_i(old.m_i)
+         , m_old_i(old.m_old_i)
          , m_row(old.m_row)
       {}
       /// assignment operator
@@ -162,16 +178,20 @@ private:
    {
    private:
       const int m_i;
+      const int m_old_i;
       
    public:
       ///
-      EmptyConstraintPS(int i)
-         : m_i(i)
+      EmptyConstraintPS(const SPxLP& lp, int _i)
+         : PostStep("EmptyConstraint", lp.nRows(), lp.nCols())
+         , m_i(_i)
+         , m_old_i(lp.nRows()-1)
       {}
       /// copy constructor
       EmptyConstraintPS(const EmptyConstraintPS& old)
          : PostStep(old)
          , m_i(old.m_i)
+         , m_old_i(old.m_old_i)
       {}
       /// assignment operator
       EmptyConstraintPS& operator=( const EmptyConstraintPS& rhs)
@@ -200,6 +220,7 @@ private:
    {
    private:
       const int  m_i;
+      const int  m_old_i;
       const int  m_j;
       const Real m_lhs;
       const Real m_rhs;
@@ -215,31 +236,29 @@ private:
       
    public:
       ///
-      RowSingletonPS(const SPxLP& lp, const SPxMainSM& simplifier, int i, int j, bool strictLo, bool strictUp,
+      RowSingletonPS(const SPxLP& lp, int _i, int _j, bool strictLo, bool strictUp,
                      Real newLo, Real newUp, Real oldLo, Real oldUp)
-         : m_i(simplifier.rIdx(i))
-         , m_j(simplifier.cIdx(j))
-         , m_lhs(lp.lhs(i))
-         , m_rhs(lp.rhs(i))
+         : PostStep("RowSingleton", lp.nRows(), lp.nCols())
+         , m_i(_i)
+         , m_old_i(lp.nRows()-1)
+         , m_j(_j)
+         , m_lhs(lp.lhs(_i))
+         , m_rhs(lp.rhs(_i))
          , m_strictLo(strictLo)
          , m_strictUp(strictUp)
          , m_maxSense(lp.spxSense() == SPxLP::MAXIMIZE)
-         , m_obj(lp.obj(j))
-         , m_col(lp.colVector(j).size())
+         , m_obj(lp.obj(_j))
+         , m_col(lp.colVector(_j))
          , m_newLo(newLo)
          , m_newUp(newUp)
          , m_oldLo(oldLo)
          , m_oldUp(oldUp)
-      {
-         const SVector& col = lp.colVector(j);
-         
-         for(int k = 0; k < col.size(); ++k)
-            m_col.add(simplifier.rIdx(col.index(k)), col.value(k));
-      }
+      {}
       /// copy constructor
       RowSingletonPS(const RowSingletonPS& old)
          : PostStep(old)
          , m_i(old.m_i)
+         , m_old_i(old.m_old_i)
          , m_j(old.m_j)
          , m_lhs(old.m_lhs)
          , m_rhs(old.m_rhs)
@@ -281,6 +300,7 @@ private:
    {
    private:
       const int       m_i;
+      const int       m_old_i;
       const Real      m_lRhs;
       DSVector        m_row;
       DataArray<Real> m_objs;
@@ -295,39 +315,33 @@ private:
       
    public:
       ///
-      ForceConstraintPS(const SPxLP& lp, const SPxMainSM& simplifier, int i, bool lhsFixed, DataArray<bool>& fixCols, DataArray<Real>& lo, DataArray<Real>& up)
-         : m_i(simplifier.rIdx(i))
-         , m_lRhs(lhsFixed ? lp.lhs(i) : lp.rhs(i))
-         , m_row(lp.rowVector(i).size())
-         , m_objs(lp.rowVector(i).size())
+      ForceConstraintPS(const SPxLP& lp, int _i, bool lhsFixed, DataArray<bool>& fixCols, DataArray<Real>& lo, DataArray<Real>& up)
+         : PostStep("ForceConstraint", lp.nRows(), lp.nCols())
+         , m_i(_i)
+         , m_old_i(lp.nRows()-1)
+         , m_lRhs(lhsFixed ? lp.lhs(_i) : lp.rhs(_i))
+         , m_row(lp.rowVector(_i))
+         , m_objs(lp.rowVector(_i).size())
          , m_fixed(fixCols)
-         , m_cols(lp.rowVector(i).size())
+         , m_cols(lp.rowVector(_i).size())
          , m_lhsFixed(lhsFixed)
          , m_maxSense(lp.spxSense() == SPxLP::MAXIMIZE)
          , m_oldLowers(lo)
          , m_oldUppers(up)
-         , m_lhs(lp.lhs(i))
-         , m_rhs(lp.rhs(i))
-      {
-         const SVector& row = lp.rowVector(i);
-         
-         for(int k = 0; k < row.size(); ++k)
+         , m_lhs(lp.lhs(_i))
+         , m_rhs(lp.rhs(_i))
+      {         
+         for(int k = 0; k < m_row.size(); ++k)
          {
-            int j = simplifier.cIdx(row.index(k));
-            m_row.add(j, row.value(k));
-            m_objs[k] = lp.obj(row.index(k));
-            
-            const SVector& col = lp.colVector(row.index(k));
-            m_cols[k].setMax(col.size());
-            
-            for(int l = 0; l < col.size(); ++l)
-               m_cols[k].add(simplifier.rIdx(col.index(l)), col.value(l));
+            m_objs[k] = lp.obj(m_row.index(k));
+            m_cols[k] = lp.colVector(m_row.index(k));
          }
       }
       /// copy constructor
       ForceConstraintPS(const ForceConstraintPS& old)
          : PostStep(old)
          , m_i(old.m_i)
+         , m_old_i(old.m_old_i)
          , m_lRhs(old.m_lRhs)
          , m_row(old.m_row)
          , m_objs(old.m_objs)
@@ -373,35 +387,37 @@ private:
    {
    private:
       const int  m_j;
+      const int  m_old_j;
       const Real m_val;
       const Real m_obj;
       const Real m_lower;
       const Real m_upper;
+      const bool m_correctIdx; /// does the index mapping have to be updated in postsolving?
       DSVector   m_col;
-      
+
    public:
       ///
-      FixVariablePS(const SPxLP& lp, const SPxMainSM& simplifier, int j, const Real val)
-         : m_j(simplifier.cIdx(j))
+      FixVariablePS(const SPxLP& lp, int _j, const Real val, bool correctIdx = true)
+         : PostStep("FixVariable", lp.nRows(), lp.nCols())
+         , m_j(_j)
+         , m_old_j(lp.nCols()-1)
          , m_val(val)
-         , m_obj(lp.obj(j))
-         , m_lower(lp.lower(j))
-         , m_upper(lp.upper(j))
-         , m_col(lp.colVector(j).size())
-      {
-         const SVector& col = lp.colVector(j);
-         
-         for(int k = 0; k < col.size(); ++k)
-            m_col.add(simplifier.rIdx(col.index(k)), col.value(k));
-      }
+         , m_obj(lp.obj(_j))
+         , m_lower(lp.lower(_j))
+         , m_upper(lp.upper(_j))
+         , m_correctIdx(correctIdx)
+         , m_col(lp.colVector(_j))
+      {}
       /// copy constructor
       FixVariablePS(const FixVariablePS& old)
          : PostStep(old)
          , m_j(old.m_j)
+         , m_old_j(old.m_old_j)
          , m_val(old.m_val)
          , m_obj(old.m_obj)
          , m_lower(old.m_lower)
          , m_upper(old.m_upper)
+         , m_correctIdx(old.m_correctIdx)
          , m_col(old.m_col)
       {}
       /// assignment operator
@@ -436,8 +452,9 @@ private:
       
    public:
       ///
-      FixBoundsPS(const SPxLP& lp, const SPxMainSM& simplifier, int j, Real val)
-         : m_j(simplifier.cIdx(j))
+      FixBoundsPS(const SPxLP& lp, int j, Real val)
+         : PostStep("FixBounds", lp.nRows(), lp.nCols())
+         , m_j(j)
       { 
          if (EQrel(lp.lower(j), lp.upper(j), eps()))
             m_status = SPxSolver::FIXED;
@@ -487,6 +504,8 @@ private:
    {
    private:
       const int       m_j;
+      const int       m_old_j;
+      const int       m_old_i;
       const Real      m_bnd;
       DSVector        m_col;
       DSVector        m_lRhs;
@@ -495,41 +514,36 @@ private:
       
    public:
       ///
-      FreeZeroObjVariablePS(const SPxLP& lp, const SPxMainSM& simplifier, int j, bool loFree)
-         : m_j(simplifier.cIdx(j))
-         , m_bnd(loFree ? lp.upper(j) : lp.lower(j))
-         , m_col(lp.colVector(j).size())
-         , m_lRhs(lp.colVector(j).size())
-         , m_rows(lp.colVector(j).size())
+      FreeZeroObjVariablePS(const SPxLP& lp, int _j, bool loFree)
+         : PostStep("FreeZeroObjVariable", lp.nRows(), lp.nCols())
+         , m_j(_j)
+         , m_old_j(lp.nCols()-1)
+         , m_old_i(lp.nRows()-1)
+         , m_bnd(loFree ? lp.upper(_j) : lp.lower(_j))
+         , m_col(lp.colVector(_j))
+         , m_lRhs(lp.colVector(_j).size())
+         , m_rows(lp.colVector(_j).size())
          , m_loFree(loFree)
-      {
-         const SVector& col = lp.colVector(j);
-         
-         for(int k = 0; k < col.size(); ++k)
+      {  
+         for(int k = 0; k < m_col.size(); ++k)
          {
-            int i = simplifier.rIdx(col.index(k));
-
-            m_col.add(i, col.value(k));
-
-	    assert(isNotZero(col.value(k)));
+            assert(isNotZero(m_col.value(k)));
             
-            if ((m_loFree  && col.value(k) > 0) || 
-                (!m_loFree && col.value(k) < 0))
-               m_lRhs.add(k, lp.rhs(col.index(k)));
+            if ((m_loFree  && m_col.value(k) > 0) || 
+                (!m_loFree && m_col.value(k) < 0))
+               m_lRhs.add(k, lp.rhs(m_col.index(k)));
             else
-               m_lRhs.add(k, lp.lhs(col.index(k)));
+               m_lRhs.add(k, lp.lhs(m_col.index(k)));
             
-            const SVector& row = lp.rowVector(col.index(k));
-            m_rows[k].setMax(row.size());
-            
-            for(int l = 0; l < row.size(); ++l)
-               m_rows[k].add(simplifier.cIdx(row.index(l)), row.value(l));
+            m_rows[k] = lp.rowVector(m_col.index(k));
          }
       }
       /// copy constructor
       FreeZeroObjVariablePS(const FreeZeroObjVariablePS& old)
          : PostStep(old)
          , m_j(old.m_j)
+         , m_old_j(old.m_old_j)
+         , m_old_i(old.m_old_i)
          , m_bnd(old.m_bnd)
          , m_col(old.m_col)
          , m_lRhs(old.m_lRhs)
@@ -567,6 +581,7 @@ private:
    private:
       const int  m_j;
       const int  m_i;
+      const int  m_old_j;
       const Real m_lhs;
       const Real m_rhs;
       const Real m_lower;
@@ -575,25 +590,23 @@ private:
       
     public:
       ///
-      ZeroObjColSingletonPS(const SPxLP& lp, const SPxMainSM& simplifier, int j, int i)
-         : m_j(simplifier.cIdx(j))
-         , m_i(simplifier.rIdx(i))
-         , m_lhs(lp.lhs(i))
-         , m_rhs(lp.rhs(i))
-         , m_lower(lp.lower(j))
-         , m_upper(lp.upper(j))
-         , m_row(lp.rowVector(i).size())
-      {
-         const SVector& row = lp.rowVector(i);
-      
-         for(int k = 0; k < row.size(); ++k)
-            m_row.add(simplifier.cIdx(row.index(k)), row.value(k));
-      }
+      ZeroObjColSingletonPS(const SPxLP& lp, const SPxMainSM& , int _j, int _i)
+         : PostStep("ZeroObjColSingleton", lp.nRows(), lp.nCols())
+         , m_j(_j)
+         , m_i(_i)
+         , m_old_j(lp.nCols()-1)
+         , m_lhs(lp.lhs(_i))
+         , m_rhs(lp.rhs(_i))
+         , m_lower(lp.lower(_j))
+         , m_upper(lp.upper(_j))
+         , m_row(lp.rowVector(_i))
+      {}
       /// copy constructor
       ZeroObjColSingletonPS(const ZeroObjColSingletonPS& old)
          : PostStep(old)
          , m_j(old.m_j)
          , m_i(old.m_i)
+         , m_old_j(old.m_old_j)
          , m_lhs(old.m_lhs)
          , m_rhs(old.m_rhs)
          , m_lower(old.m_lower)
@@ -629,6 +642,8 @@ private:
    private:
       const int  m_j;
       const int  m_i;
+      const int  m_old_j;
+      const int  m_old_i;
       const Real m_obj;
       const Real m_lRhs;
       const bool m_onLhs;
@@ -637,25 +652,25 @@ private:
       
    public:
       ///
-      FreeColSingletonPS(const SPxLP& lp, const SPxMainSM& simplifier, int j, int i, Real slackVal)
-         : m_j(simplifier.cIdx(j))
-         , m_i(simplifier.rIdx(i))
-         , m_obj(lp.obj(j))
+      FreeColSingletonPS(const SPxLP& lp, int _j, int _i, Real slackVal)
+         : PostStep("FreeColSingleton", lp.nRows(), lp.nCols())
+         , m_j(_j)
+         , m_i(_i)
+         , m_old_j(lp.nCols()-1)
+         , m_old_i(lp.nRows()-1)
+         , m_obj(lp.obj(_j))
          , m_lRhs(slackVal)
-         , m_onLhs(slackVal == lp.lhs(i))
-         , m_eqCons(EQrel(lp.lhs(i), lp.rhs(i)))
-         , m_row(lp.rowVector(i).size())
-      {
-         const SVector& row = lp.rowVector(i);
-      
-         for(int k = 0; k < row.size(); ++k)
-            m_row.add(simplifier.cIdx(row.index(k)), row.value(k));
-      }
+         , m_onLhs(slackVal == lp.lhs(_i))
+         , m_eqCons(EQrel(lp.lhs(_i), lp.rhs(_i)))
+         , m_row(lp.rowVector(_i))
+      {}
       /// copy constructor
       FreeColSingletonPS(const FreeColSingletonPS& old)
          : PostStep(old)
          , m_j(old.m_j)
          , m_i(old.m_i)
+         , m_old_j(old.m_old_j)
+         , m_old_i(old.m_old_i)
          , m_obj(old.m_obj)
          , m_lRhs(old.m_lRhs)
          , m_onLhs(old.m_onLhs)
@@ -703,32 +718,36 @@ private:
       const Real m_newUp;
       const Real m_oldLo;
       const Real m_oldUp;
+      const Real m_Lo_j;
+      const Real m_Up_j;
+      const Real m_lhs;
+      const Real m_rhs;
       DSVector   m_col;
       
    public:
       ///
-      DoubletonEquationPS(const SPxLP& lp, const SPxMainSM& simplifier, int j, int k, int i, Real oldLo, Real oldUp)
-         : m_j(simplifier.cIdx(j))
-         , m_k(simplifier.cIdx(k))
-         , m_i(simplifier.rIdx(i))
+      DoubletonEquationPS(const SPxLP& lp, int _j, int _k, int _i, Real oldLo, Real oldUp)
+         : PostStep("DoubletonEquation", lp.nRows(), lp.nCols())
+         , m_j(_j)
+         , m_k(_k)
+         , m_i(_i)
          , m_maxSense(lp.spxSense() == SPxLP::MAXIMIZE)
-         , m_jFixed(EQrel(lp.lower(j), lp.upper(j)))
-         , m_jObj(lp.obj(j))
-         , m_kObj(lp.obj(k))
-         , m_aij(lp.colVector(j).value(0))
-         , m_strictLo(lp.lower(k) > oldLo)
-         , m_strictUp(lp.upper(k) < oldUp)
-         , m_newLo(lp.lower(k))
-         , m_newUp(lp.upper(k))
+         , m_jFixed(EQrel(lp.lower(_j), lp.upper(_j)))
+         , m_jObj(lp.obj(_j))
+         , m_kObj(lp.obj(_k))
+         , m_aij(lp.colVector(_j).value(0))
+         , m_strictLo(lp.lower(_k) > oldLo)
+         , m_strictUp(lp.upper(_k) < oldUp)
+         , m_newLo(lp.lower(_k))
+         , m_newUp(lp.upper(_k))
          , m_oldLo(oldLo)
          , m_oldUp(oldUp)
-         , m_col(lp.colVector(k).size())
-      {
-         const SVector& col = lp.colVector(k);
-         
-         for(int l = 0; l < col.size(); ++l)
-            m_col.add(simplifier.rIdx(col.index(l)), col.value(l));
-      }
+         , m_Lo_j(lp.lower(_j))
+         , m_Up_j(lp.upper(_j))
+         , m_lhs(lp.lhs(_i))
+         , m_rhs(lp.rhs(_i))
+         , m_col(lp.colVector(_k))
+      {}
       /// copy constructor
       DoubletonEquationPS(const DoubletonEquationPS& old)
          : PostStep(old)
@@ -746,6 +765,10 @@ private:
          , m_newUp(old.m_newUp)
          , m_oldLo(old.m_oldLo)
          , m_oldUp(old.m_oldUp)
+         , m_Lo_j(old.m_Lo_j)
+         , m_Up_j(old.m_Up_j)
+         , m_lhs(old.m_lhs)
+         , m_rhs(old.m_rhs)
          , m_col(old.m_col)
       {}
       /// assignment operator
@@ -779,21 +802,41 @@ private:
       const int       m_maxLhsIdx;
       const int       m_minRhsIdx;
       const bool      m_maxSense;
+      const bool      m_isFirst;
+      const bool      m_isLast;
+      const bool      m_fixed;
+      const int       m_nCols;
       DSVector        m_scale;
+      DataArray<int>  m_rIdxLocalOld;
+      DataArray<int>  m_perm;
+      DataArray<bool> m_isLhsEqualRhs;
       
    public:
-      DuplicateRowsPS(const SPxLP& lp, const SPxMainSM& simplifier, int i,
-                      int maxLhsIdx, int minRhsIdx, const DSVector& dupRows, const DataArray<double> scale)
-         : m_i(simplifier.rIdx(i))
-         , m_maxLhsIdx((maxLhsIdx == -1) ? -1 : simplifier.rIdx(maxLhsIdx))
-         , m_minRhsIdx((minRhsIdx == -1) ? -1 : simplifier.rIdx(minRhsIdx))
+      DuplicateRowsPS(const SPxLP& lp, int _i,
+                      int maxLhsIdx, int minRhsIdx, const DSVector& dupRows, 
+                      const DataArray<double> scale, const DataArray<int> perm, const DataArray<bool> isLhsEqualRhs,
+                      bool isTheLast, bool isFixedRow, bool isFirst = false)
+         : PostStep("DuplicateRows", lp.nRows(), lp.nCols())
+         , m_i(_i)
+         , m_maxLhsIdx((maxLhsIdx == -1) ? -1 : maxLhsIdx)
+         , m_minRhsIdx((minRhsIdx == -1) ? -1 : minRhsIdx)
          , m_maxSense(lp.spxSense() == SPxLP::MAXIMIZE)
+         , m_isFirst(isFirst)
+         , m_isLast(isTheLast)
+         , m_fixed(isFixedRow)
+         , m_nCols(lp.nCols())
          , m_scale(dupRows.size())
+         , m_rIdxLocalOld(dupRows.size())
+         , m_perm(perm)
+         , m_isLhsEqualRhs(isLhsEqualRhs)
       {
-         Real rowScale = scale[i];
+         Real rowScale = scale[_i];
          
          for(int k = 0; k < dupRows.size(); ++k)
-            m_scale.add(simplifier.rIdx(dupRows.index(k)), rowScale / scale[dupRows.index(k)]);    
+         {
+            m_scale.add(dupRows.index(k), rowScale / scale[dupRows.index(k)]);    
+            m_rIdxLocalOld[k] = dupRows.index(k);
+         }
       }
       /// copy constructor
       DuplicateRowsPS(const DuplicateRowsPS& old)
@@ -802,7 +845,14 @@ private:
          , m_maxLhsIdx(old.m_maxLhsIdx)
          , m_minRhsIdx(old.m_minRhsIdx)
          , m_maxSense(old.m_maxSense)  
+         , m_isFirst(old.m_isFirst)
+         , m_isLast(old.m_isLast)
+         , m_fixed(old.m_fixed)
+         , m_nCols(old.m_nCols)
          , m_scale(old.m_scale)
+         , m_rIdxLocalOld(old.m_rIdxLocalOld)
+         , m_perm(old.m_perm)
+         , m_isLhsEqualRhs(old.m_isLhsEqualRhs)
       {}
       /// assignment operator
       DuplicateRowsPS& operator=( const DuplicateRowsPS& rhs)
@@ -811,6 +861,9 @@ private:
          {
             PostStep::operator=(rhs);
             m_scale = rhs.m_scale;
+            m_rIdxLocalOld = rhs.m_rIdxLocalOld;
+            m_perm = rhs.m_perm;
+            m_isLhsEqualRhs = rhs.m_isLhsEqualRhs;
          }
 
          return *this;
@@ -837,16 +890,23 @@ private:
       const Real           m_loK;
       const Real           m_upK;
       const Real           m_scale;
+      const bool           m_isFirst;
+      const bool           m_isLast;
+      DataArray<int>       m_perm;
       
    public:
-      DuplicateColsPS(const SPxLP& lp, const SPxMainSM& simplifier, int j, int k, Real scale)
-         : m_j(simplifier.cIdx(j))
-         , m_k(simplifier.cIdx(k))
-         , m_loJ(lp.lower(j))
-         , m_upJ(lp.upper(j))
-         , m_loK(lp.lower(k))
-         , m_upK(lp.upper(k))
+      DuplicateColsPS(const SPxLP& lp, int _j, int _k, Real scale, DataArray<int>  perm, bool isFirst = false, bool isTheLast = false)
+         : PostStep("DuplicateCols", lp.nRows(), lp.nCols())
+         , m_j(_j)
+         , m_k(_k)
+         , m_loJ(lp.lower(_j))
+         , m_upJ(lp.upper(_j))
+         , m_loK(lp.lower(_k))
+         , m_upK(lp.upper(_k))
          , m_scale(scale)
+         , m_isFirst(isFirst)
+         , m_isLast(isTheLast)
+         , m_perm(perm)
       {}
       /// copy constructor
       DuplicateColsPS(const DuplicateColsPS& old)
@@ -858,6 +918,9 @@ private:
          , m_loK(old.m_loK)
          , m_upK (old.m_upK)
          , m_scale (old.m_scale)
+         , m_isFirst(old.m_isFirst)
+         , m_isLast(old.m_isLast)
+         , m_perm(old.m_perm)
       {}
       /// assignment operator
       DuplicateColsPS& operator=( const DuplicateColsPS& rhs)
@@ -934,6 +997,7 @@ private:
    Real                            m_epsilon;    ///< epsilon zero.
    Real                            m_delta;      ///< maximum bound violation.
    DataArray<int>                  m_stat;       ///< preprocessing history.
+   SPxLP::SPxSense                 m_thesense;   ///< optimization sense.
    //@}
      
 private:
@@ -961,8 +1025,8 @@ private:
    /// removes duplicate columns
    Result duplicateCols(SPxLP& lp, bool& again);
    
-   /// handles the fixing of a variable.
-   void fixColumn(SPxLP& lp, int i);
+   /// handles the fixing of a variable. correctIdx is true iff the index mapping has to be updated.
+   void fixColumn(SPxLP& lp, int i, bool correctIdx = true);
    
    /// removes a row in the LP.
    void removeRow(SPxLP& lp, int i)
@@ -999,6 +1063,7 @@ private:
    //@}
 
 public:
+
    //------------------------------------
    //**@name Constructors / destructors */
    //@{
@@ -1022,6 +1087,7 @@ public:
       , m_epsilon(old.m_epsilon)
       , m_delta(old.m_delta)
       , m_stat(old.m_stat)
+      , m_thesense(old.m_thesense)
    {
       // copy pointers in m_hist
       m_hist.reSize(0);
@@ -1051,6 +1117,7 @@ public:
          m_epsilon = rhs.m_epsilon;
          m_delta = rhs.m_delta;
          m_stat = rhs.m_stat;
+         m_thesense = rhs.m_thesense;
 
          // delete pointers in m_hist
          for(int k = 0; k < m_hist.size(); ++k)
@@ -1151,7 +1218,7 @@ public:
 
       for(int j = 0; j < m_cBasisStat.size(); ++j)
          cols[j] = m_cBasisStat[j];
-   }   
+   }
    //@}
 
 private:
