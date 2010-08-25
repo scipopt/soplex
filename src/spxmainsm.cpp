@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.25 2010/08/18 16:17:43 bzfhuang Exp $"
+#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.26 2010/08/25 15:35:27 bzfhuang Exp $"
 
 //#define DEBUGGING 1
 
@@ -256,41 +256,35 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
       r[m_j] = 0.0;
       break;
    case SPxSolver::ON_LOWER:
-      assert(r[m_j] >= -eps());
-
-      if(EQrel(m_oldLo, x[m_j], eps())) // xj should be on lower
+      if(EQrel(m_oldLo, x[m_j], eps()) && r[m_j] >= -eps()) // xj should be on lower
       {
          rStatus[m_i] = SPxSolver::BASIC;
          y[m_i] = 0.0;
          r[m_j] = val;
       }
-      else
+      else // if reduced costs are negative or old lower bound not equal to xj, we need to change xj into the basis
       {
-         assert(EQrel(im_lhs, x[m_j], eps()));
          assert(EQrel(m_rhs, x[m_j]*aij, eps()) || EQrel(m_lhs, x[m_j]*aij, eps()));
 
          cStatus[m_j] = SPxSolver::BASIC;
-         rStatus[m_i] = (EQrel(m_lhs, x[m_j]*aij, eps()))? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
+         rStatus[m_i] = (EQrel(m_lhs, x[m_j]*aij, eps())) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
          y[m_i] = val / aij;
          r[m_j] = 0.0;
       }
       break;
    case SPxSolver::ON_UPPER:
-      assert(r[m_j] <= eps());
-
-      if(EQrel(m_oldUp, x[m_j], eps())) // xj should be on upper
+      if(EQrel(m_oldUp, x[m_j], eps()) && r[m_j] <= eps()) // xj should be on upper
       {
          rStatus[m_i] = SPxSolver::BASIC;
          y[m_i] = 0.0;
          r[m_j] = val;
       }
-      else
+      else // if reduced costs are positive or old upper bound not equal to xj, we need to change xj into the basis
       {
-         assert(EQrel(im_rhs, x[m_j], eps()));
          assert(EQrel(m_rhs, x[m_j]*aij, eps()) || EQrel(m_lhs, x[m_j]*aij, eps()));
         
          cStatus[m_j] = SPxSolver::BASIC;
-         rStatus[m_i] = (EQrel(m_lhs, x[m_j]*aij, eps()))? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
+         rStatus[m_i] = (EQrel(m_lhs, x[m_j]*aij, eps())) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
          y[m_i] = val / aij;
          r[m_j] = 0.0;
       }
