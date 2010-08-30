@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.h,v 1.19 2010/08/18 16:17:43 bzfhuang Exp $"
+#pragma ident "@(#) $Id: spxmainsm.h,v 1.20 2010/08/30 10:31:13 bzfgleix Exp $"
 
 /**@file  spxmainsm.h
  * @brief General methods in LP preprocessing.
@@ -1009,6 +1009,9 @@ private:
    
    /// removed empty rows and empty columns.
    Result removeEmpty(SPxLP& lp);
+
+   /// remove row singletons.
+   Result removeRowSingleton(SPxLP& lp, const SVector& row, int& i);
    
    /// performs simplification steps on the rows of the LP.
    Result simplifyRows(SPxLP& lp, bool& again);

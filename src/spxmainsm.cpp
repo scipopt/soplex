@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.26 2010/08/25 15:35:27 bzfhuang Exp $"
+#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.27 2010/08/30 10:31:13 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -1482,6 +1482,77 @@ SPxSimplifier::Result SPxMainSM::removeEmpty(SPxLP& lp)
    return OKAY;
 }
  
+SPxSimplifier::Result SPxMainSM::removeRowSingleton(SPxLP& lp, const SVector& row, int& i)
+{
+   assert(row.size() == 1);
+
+   Real aij = row.value(0);
+   int  j   = row.index(0);
+   Real lo  = -infinity;
+   Real up  =  infinity;
+         
+   MSG_INFO3( spxout << "IMAISM22 row " << i 
+                     << ": singleton -> val=" << aij 
+                     << " lhs=" << lp.lhs(i)
+                     << " rhs=" << lp.rhs(i); )
+    
+   if (GT(aij, 0.0, epsZero()))           // aij > 0
+   {
+      lo = (lp.lhs(i) <= -infinity) ? -infinity : lp.lhs(i) / aij;
+      up = (lp.rhs(i) >=  infinity) ?  infinity : lp.rhs(i) / aij;
+   }
+   else if (LT(aij, 0.0, epsZero()))      // aij < 0
+   {
+      lo = (lp.rhs(i) >=  infinity) ? -infinity : lp.rhs(i) / aij;
+      up = (lp.lhs(i) <= -infinity) ?  infinity : lp.lhs(i) / aij;
+   }
+   else if (LT(lp.rhs(i), 0.0, deltaBnd()) || GT(lp.lhs(i), 0.0, deltaBnd()))  
+   {
+      // aij == 0, rhs < 0 or lhs > 0
+      MSG_INFO3( spxout << " infeasible" << std::endl; )
+      return INFEASIBLE;
+   }
+
+   if (isZero(lo, epsZero()))
+      lo = 0.0;
+
+   if (isZero(up, epsZero()))
+      up = 0.0;
+
+   MSG_INFO3( spxout << " removed, lower=" << lo
+                     << " (" << lp.lower(j)
+                     << ") upper=" << up
+                     << " (" << lp.upper(j)
+                     << ")" << std::endl; )
+            
+   bool stricterUp = false;
+   bool stricterLo = false;
+
+   Real oldLo = lp.lower(j);
+   Real oldUp = lp.upper(j);
+         
+   if (LTrel(up, lp.upper(j), deltaBnd()))
+   {
+      lp.changeUpper(j, up);
+      stricterUp = true;
+   }
+   if (GTrel(lo, lp.lower(j), deltaBnd()))
+   {
+      lp.changeLower(j, lo);
+      stricterLo = true;
+   }
+
+   m_hist.append(new RowSingletonPS(lp, i, j, stricterLo, stricterUp, lp.lower(j), lp.upper(j), oldLo, oldUp));
+
+   removeRow(lp, i);
+
+   m_remRows++;
+   m_remNzos++;
+   ++m_stat[SINGLETON_ROW];
+
+   return OKAY;
+}
+
 SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
 {
    METHOD( "SPxMainSM::simplifyRows" );
@@ -1805,71 +1876,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
       // 6. row singleton
       if (row.size() == 1)
       {
-         Real aij = row.value(0);
-         int  j   = row.index(0);
-         Real lo  = -infinity;
-         Real up  =  infinity;
-         
-         MSG_INFO3( spxout << "IMAISM22 row " << i 
-                           << ": singleton -> val=" << aij 
-                           << " lhs=" << lp.lhs(i)
-                           << " rhs=" << lp.rhs(i); )
-    
-         if (GT(aij, 0.0, epsZero()))           // aij > 0
-         {
-            lo = (lp.lhs(i) <= -infinity) ? -infinity : lp.lhs(i) / aij;
-            up = (lp.rhs(i) >=  infinity) ?  infinity : lp.rhs(i) / aij;
-         }
-         else if (LT(aij, 0.0, epsZero()))      // aij < 0
-         {
-            lo = (lp.rhs(i) >=  infinity) ? -infinity : lp.rhs(i) / aij;
-            up = (lp.lhs(i) <= -infinity) ?  infinity : lp.lhs(i) / aij;
-         }
-         else if (LT(lp.rhs(i), 0.0, deltaBnd()) || GT(lp.lhs(i), 0.0, deltaBnd()))  
-         {
-            // aij == 0, rhs < 0 or lhs > 0
-            MSG_INFO3( spxout << " infeasible" << std::endl; )
-
-            return INFEASIBLE;
-         }
-
-         if (isZero(lo, epsZero()))
-            lo = 0.0;
-
-         if (isZero(up, epsZero()))
-            up = 0.0;
-
-         MSG_INFO3( spxout << " removed, lower=" << lo
-                           << " (" << lp.lower(j)
-                           << ") upper=" << up
-                           << " (" << lp.upper(j)
-                           << ")" << std::endl; )
-            
-         bool stricterUp = false;
-         bool stricterLo = false;
-
-         Real oldLo = lp.lower(j);
-         Real oldUp = lp.upper(j);
-         
-         if (LTrel(up, lp.upper(j), deltaBnd()))
-         {
-            lp.changeUpper(j, up);
-            stricterUp = true;
-         }
-         if (GTrel(lo, lp.lower(j), deltaBnd()))
-         {
-            lp.changeLower(j, lo);
-            stricterLo = true;
-         }
-
-         m_hist.append(new RowSingletonPS(lp, i, j, stricterLo, stricterUp, lp.lower(j), lp.upper(j), oldLo, oldUp));
-         
-         ++remRows;
-         ++remNzos;
-         removeRow(lp, i);
-         
-         ++m_stat[SINGLETON_ROW];
-         
+         removeRowSingleton(lp, row, i);
          continue;
       }
 #endif
@@ -2760,6 +2767,28 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
    if (ret != OKAY)
       return ret;
  
+#if ROW_SINGLETON
+   int rs_remRows = 0;
+   for (int i = 0; i < lp.nRows(); ++i)
+   {
+      const SVector& row = lp.rowVector(i);
+
+      if (row.size() == 1)
+      {
+         removeRowSingleton(lp, row, i);
+         rs_remRows++;
+      }
+   }
+
+   if (rs_remRows > 0)
+   {
+      MSG_INFO2( spxout << "IMAISM79 Main simplifier duplicate rows (row singleton stage) removed "
+                        << rs_remRows << " rows, "
+                        << rs_remRows << " non-zeros"
+                        << std::endl; )
+   }
+#endif
+
    if (lp.nRows() < 2)
       return OKAY;
     
@@ -2881,7 +2910,7 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
 
    for(int k = 0; k < dupRows.size(); ++k)
    {
-      if (dupRows[k].size() > 1)
+      if (dupRows[k].size() > 1 && !(lp.rowVector(dupRows[k].index(0)).size() == 1))
       {
          idxLastDupRows = k;
 
@@ -2916,7 +2945,7 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
    
    for(int k = 0; k < dupRows.size(); ++k)
    {
-      if (dupRows[k].size() > 1)
+      if (dupRows[k].size() > 1 && !(lp.rowVector(dupRows[k].index(0)).size() == 1))
       {
          MSG_INFO3( spxout << "IMAISM53 " << dupRows[k].size()
                            << " duplicate rows found" << std::endl; )
@@ -3184,7 +3213,7 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
   
    // arrange duplicate columns w.r.t. their pClass values
    Array<DSVector> dupCols(lp.nCols());
-   
+
    for(int k = 0; k < dupCols.size(); ++k)
       dupCols[pClass[k]].add(k, 0.0);
    
@@ -3198,30 +3227,21 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
    }
 
    bool hasDuplicateCol = false;
-
-   for(int k = 0; k < dupCols.size(); ++k)
-   {
-      if (dupCols[k].size() > 1)
-      {
-         hasDuplicateCol = true;
-         break;
-      }
-   }
-
    DataArray<int>  m_perm_empty(0);
 
-   if(hasDuplicateCol)
-   {
-      m_hist.append(new DuplicateColsPS(lp, 0, 0, 1.0, m_perm_empty,  true));
-   }
-
    for(int k = 0; k < dupCols.size(); ++k)
    {
-      if (dupCols[k].size() > 1)
+      if (dupCols[k].size() > 1 && !(lp.colVector(dupCols[k].index(0)).size() == 1))
       {
          MSG_INFO3( spxout << "IMAISM58 " << dupCols[k].size()
                            << " duplicate columns found" << std::endl; )
    
+         if (!hasDuplicateCol)
+         {
+            m_hist.append(new DuplicateColsPS(lp, 0, 0, 1.0, m_perm_empty, true));
+            hasDuplicateCol = true;
+         }
+
          for(int l = 0; l < dupCols[k].size(); ++l)
          {
             for(int m = 0; m < dupCols[k].size(); ++m)
@@ -3411,7 +3431,7 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
        da_perm[j] = perm[j];
    }
 
-   if(hasDuplicateCol)
+   if (hasDuplicateCol)
    {
       m_hist.append(new DuplicateColsPS(lp, 0, 0, 1.0, da_perm, false, true));
    }

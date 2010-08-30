@@ -30,6 +30,10 @@ Current development version
 
 - fixed bug in simplifier SPxMainSM occuring for maximization problems
 
+- performance improved in simplifier SPxMainSM: always processing singleton rows before
+  finding duplicate rows; ignoring singleton rows and columns when checking for linear
+  dependency
+
 
 #----------------------------------------------------------------
 
