@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.27 2010/08/30 10:31:13 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.28 2010/09/03 14:35:03 bzfhuang Exp $"
 
 //#define DEBUGGING 1
 
@@ -2158,60 +2158,47 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
          else if (isZero(lp.maxObj(j), epsZero()))
          {
 #if FREE_ZERO_OBJ_VARIABLE
-            if (loFree && lp.lower(j) <= -infinity)
+            bool unconstrained_below = loFree && lp.lower(j) <= -infinity;
+            bool unconstrained_above = upFree && lp.upper(j) >= infinity;
+
+            if (unconstrained_below || unconstrained_above)
             {               
                MSG_INFO3( spxout << "IMAISM34 col " << j
                                  << ": x" << j
-                                 << " unconstrained below with zero objective (" << lp.maxObj(j)
+                                 << " unconstrained "
+                                 << (unconstrained_below ? "below" : "above")
+                                 << " with zero objective (" << lp.maxObj(j)
                                  << ")" << std::endl; )
          
-               // variable j can be removed together with all constraints with variable j     
+               SVector col_idx_sorted(col);
+
+               // sort col elements by increasing idx
+               IdxCompare compare;
+               sorter_qsort(col_idx_sorted.mem()+1, col_idx_sorted.size(), compare);
+
+               m_hist.append(new FreeZeroObjVariablePS(lp, j, unconstrained_below, col_idx_sorted));
+
+               // we have to remove the rows with larger idx first, because otherwise the rows are reorder and indices
+               // are out-of-date
+	       for(int k = col_idx_sorted.size()-1; k >= 0; --k)
+                  removeRow(lp, col_idx_sorted.index(k));
+
+               // remove column
+               removeCol(lp, j);
+
+               // statistics
                for(int k = 0; k < col.size(); ++k)
                {
                   int l   =  col.index(k);
 		  remNzos += lp.rowVector(l).size();
                }
-               m_hist.append(new FreeZeroObjVariablePS(lp, j, true));
-               
+
+               ++m_stat[FREE_ZOBJ_COL];
                ++remCols;
                remRows += col.size();
-
-	       for(int k = col.size()-1; k >= 0; --k)
-                  removeRow(lp, col.index(k));
-               
-               removeCol(lp, j);
-             
-               ++m_stat[FREE_ZOBJ_COL];
 
                continue;
             }
-            if (upFree && lp.upper(j) >= infinity)
-            {
-               MSG_INFO3( spxout << "IMAISM35 col " << j
-                                 << ": x" << j
-                                 << " unconstrained above with zero objective (" << lp.maxObj(j)
-                                 << ")" << std::endl; )
-         
-               // variable j can be removed together with all constraints with variable j
-               for(int k = 0; k < col.size(); ++k)
-               {
-                  int l   =  col.index(k);                 
-                  remNzos += lp.rowVector(l).size();
-               }
-               m_hist.append(new FreeZeroObjVariablePS(lp, j, false));
-               
-               ++remCols;
-               remRows += col.size();
-
-               for(int k = col.size()-1; k >= 0; --k)
-                  removeRow(lp, col.index(k));
-               
-               removeCol(lp, j);
-               
-               ++m_stat[FREE_ZOBJ_COL];
-               
-               continue;
-            }  
 #endif
          }
       }

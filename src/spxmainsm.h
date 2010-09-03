@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.h,v 1.21 2010/09/03 14:07:11 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxmainsm.h,v 1.22 2010/09/03 14:35:03 bzfhuang Exp $"
 
 /**@file  spxmainsm.h
  * @brief General methods in LP preprocessing.
@@ -513,13 +513,13 @@ private:
       
    public:
       ///
-      FreeZeroObjVariablePS(const SPxLP& lp, int _j, bool loFree)
+      FreeZeroObjVariablePS(const SPxLP& lp, int _j, bool loFree, SVector col_idx_sorted)
          : PostStep("FreeZeroObjVariable", lp.nRows(), lp.nCols())
          , m_j(_j)
          , m_old_j(lp.nCols()-1)
          , m_old_i(lp.nRows()-1)
          , m_bnd(loFree ? lp.upper(_j) : lp.lower(_j))
-         , m_col(lp.colVector(_j))
+         , m_col(col_idx_sorted)
          , m_lRhs(lp.colVector(_j).size())
          , m_rows(lp.colVector(_j).size())
          , m_loFree(loFree)
@@ -1227,7 +1227,7 @@ private:
    //------------------------------------
    //**@name Types */
    //@{
-   /// 
+   /// comparator for class SVector::Element: compare nonzeros according to value
    struct ElementCompare
    {
    public: 
@@ -1240,6 +1240,22 @@ private:
          if (e1.val < e2.val)
 	    return -1;
 	 else // (e1.val > e2.val)
+	    return 1;
+      }
+   };
+   /// comparator for class SVector::Element: compare nonzeros according to index
+   struct IdxCompare
+   {
+   public: 
+      IdxCompare() {}
+      
+      int operator()(const SVector::Element& e1, const SVector::Element& e2) const
+      {
+	 if (EQ(e1.idx, e2.idx))
+            return 0;
+         if (e1.idx < e2.idx)
+	    return -1;
+	 else // (e1.idx > e2.idx)
 	    return 1;
       }
    };
