@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.h,v 1.20 2010/08/30 10:31:13 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxmainsm.h,v 1.21 2010/09/03 14:07:11 bzfgleix Exp $"
 
 /**@file  spxmainsm.h
  * @brief General methods in LP preprocessing.
@@ -75,7 +75,6 @@ private:
    class PostStep
    {
    private:
-      const static Real m_eps = 1e-6;
       /// name of the simplifier
       const char* m_name;
       /// number of cols
@@ -121,7 +120,7 @@ private:
 
       static Real eps()
       {
-         return m_eps;
+         return 1e-6;
       }
    };
 
