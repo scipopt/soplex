@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.28 2010/09/03 14:35:03 bzfhuang Exp $"
+#pragma ident "@(#) $Id: spxmainsm.cpp,v 1.29 2010/09/09 01:32:24 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -1459,7 +1459,7 @@ SPxSimplifier::Result SPxMainSM::removeEmpty(SPxLP& lp)
          MSG_INFO3( spxout << " removed" << std::endl; )
 
          m_hist.append(new FixBoundsPS(lp, j, val));  
-         m_hist.append(new FixVariablePS(lp, j, val));
+         m_hist.append(new FixVariablePS(lp, *this, j, val));
             
          ++remCols;
          removeCol(lp, j);
@@ -2068,7 +2068,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
          MSG_INFO3( spxout << " removed" << std::endl; )
 
          m_hist.append(new FixBoundsPS(lp, j, val));  
-         m_hist.append(new FixVariablePS(lp, j, val));
+         m_hist.append(new FixVariablePS(lp, *this, j, val));
            
          ++remCols;
          removeCol(lp, j);
@@ -2447,7 +2447,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
                }
             }
            
-            m_hist.append(new FreeColSingletonPS(lp, j, i, slackVal));
+            m_hist.append(new FreeColSingletonPS(lp, *this, j, i, slackVal));
             
             MSG_INFO3( spxout << "IMAISM41 col " << j
                               << ": free singleton removed" << std::endl; )
@@ -3512,7 +3512,7 @@ void SPxMainSM::fixColumn(SPxLP& lp, int j, bool correctIdx)
       }
    }
    
-   m_hist.append(new FixVariablePS(lp, j, lp.lower(j), correctIdx));
+   m_hist.append(new FixVariablePS(lp, *this, j, lp.lower(j), correctIdx));
 }
 
 SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real delta)

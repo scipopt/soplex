@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsimplifier.h,v 1.22 2009/08/11 12:48:40 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsimplifier.h,v 1.23 2010/09/09 01:32:24 bzfgleix Exp $"
 
 /**@file  spxsimplifier.h
  * @brief LP simplification base class.
@@ -61,6 +61,8 @@ protected:
    int         m_chgBnds;
    /// number of change right-hand sides
    int         m_chgLRhs;
+   /// objective offset
+   Real        m_objoffset;
    //@}
 
 public:
@@ -90,6 +92,7 @@ public:
       , m_remNzos(0)
       , m_chgBnds(0)
       , m_chgLRhs(0)
+      , m_objoffset(0.0)
    {
       assert(isConsistent());
    }
@@ -101,6 +104,7 @@ public:
       , m_remNzos(old.m_remNzos)
       , m_chgBnds(old.m_chgBnds)
       , m_chgLRhs(old.m_chgLRhs)
+      , m_objoffset(old.m_objoffset)
    {
       assert(isConsistent());
    }
@@ -115,6 +119,7 @@ public:
          m_remNzos = rhs.m_remNzos;
          m_chgBnds = rhs.m_chgBnds;
          m_chgLRhs = rhs.m_chgLRhs;
+         m_objoffset = m_objoffset;
 
          assert(isConsistent());
       }
@@ -177,6 +182,18 @@ public:
 
    /// get optimal basis.
    virtual void getBasis(SPxSolver::VarStatus[], SPxSolver::VarStatus[]) const = 0;
+
+   /// get objective offset.
+   virtual Real getObjoffset() const
+   {
+      return m_objoffset;
+   }
+
+   /// add objective offset.
+   virtual void addObjoffset(const Real val)
+   {
+      m_objoffset += val;
+   }
    //@}
 
 #ifndef NO_CONSISTENCY_CHECKS

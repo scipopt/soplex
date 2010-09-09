@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.h,v 1.22 2010/09/03 14:35:03 bzfhuang Exp $"
+#pragma ident "@(#) $Id: spxmainsm.h,v 1.23 2010/09/09 01:32:24 bzfgleix Exp $"
 
 /**@file  spxmainsm.h
  * @brief General methods in LP preprocessing.
@@ -396,7 +396,7 @@ private:
 
    public:
       ///
-      FixVariablePS(const SPxLP& lp, int _j, const Real val, bool correctIdx = true)
+      FixVariablePS(const SPxLP& lp, SPxMainSM& simplifier, int _j, const Real val, bool correctIdx = true)
          : PostStep("FixVariable", lp.nRows(), lp.nCols())
          , m_j(_j)
          , m_old_j(lp.nCols()-1)
@@ -406,7 +406,9 @@ private:
          , m_upper(lp.upper(_j))
          , m_correctIdx(correctIdx)
          , m_col(lp.colVector(_j))
-      {}
+      {
+         simplifier.addObjoffset(m_val*lp.obj(m_j));
+      }
       /// copy constructor
       FixVariablePS(const FixVariablePS& old)
          : PostStep(old)
@@ -651,7 +653,7 @@ private:
       
    public:
       ///
-      FreeColSingletonPS(const SPxLP& lp, int _j, int _i, Real slackVal)
+      FreeColSingletonPS(const SPxLP& lp, SPxMainSM& simplifier, int _j, int _i, Real slackVal)
          : PostStep("FreeColSingleton", lp.nRows(), lp.nCols())
          , m_j(_j)
          , m_i(_i)
@@ -662,7 +664,10 @@ private:
          , m_onLhs(slackVal == lp.lhs(_i))
          , m_eqCons(EQrel(lp.lhs(_i), lp.rhs(_i)))
          , m_row(lp.rowVector(_i))
-      {}
+      {
+         assert(m_row[m_j] != 0.0);
+         simplifier.addObjoffset(m_lRhs*(lp.obj(m_j)/m_row[m_j]));
+      }
       /// copy constructor
       FreeColSingletonPS(const FreeColSingletonPS& old)
          : PostStep(old)
