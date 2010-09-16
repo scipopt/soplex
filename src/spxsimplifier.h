@@ -3,8 +3,8 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1997-1999 Roland Wunderling                              */
-/*                  1997-2009 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996      Roland Wunderling                              */
+/*                  1996-2010 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsimplifier.h,v 1.23 2010/09/09 01:32:24 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsimplifier.h,v 1.24 2010/09/16 17:45:04 bzfgleix Exp $"
 
 /**@file  spxsimplifier.h
  * @brief LP simplification base class.

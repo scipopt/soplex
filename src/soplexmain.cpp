@@ -3,8 +3,8 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1997-1999 Roland Wunderling                              */
-/*                  1997-2010 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996      Roland Wunderling                              */
+/*                  1996-2010 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplexmain.cpp,v 1.15 2010/05/24 10:20:02 bzfgleix Exp $"
+#pragma ident "@(#) $Id: soplexmain.cpp,v 1.16 2010/09/16 17:45:03 bzfgleix Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -223,8 +223,8 @@ void print_version_info()
    "*                  Release ";
 
    const char* banner2 = "                                       *\n"
-   "*    Copyright (C) 1997-1999 Roland Wunderling                         *\n"
-   "*                  1997-2010 Konrad-Zuse-Zentrum                       *\n"
+   "*    Copyright (C) 1996      Roland Wunderling                         *\n"
+   "*                  1996-2010 Konrad-Zuse-Zentrum                       *\n"
    "*                            fuer Informationstechnik Berlin           *\n"
    "*                                                                      *\n"
    "*  SoPlex is distributed under the terms of the ZIB Academic Licence.  *\n"
@@ -281,7 +281,7 @@ void print_short_version_info()
    "************************************************************************\n"
    "* SoPlex --- the Sequential object-oriented simPlex. Release ";
    const char* banner2 = "     *\n"
-   "* Copyright (C)  1997-2010 Zuse Institute Berlin                       *\n"
+   "* Copyright (C)  1996-2010 Zuse Institute Berlin                       *\n"
    "************************************************************************\n";
 
    std::cout << banner1 << SOPLEX_VERSION/100 << ".";

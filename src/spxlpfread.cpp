@@ -3,8 +3,8 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 2001-2002 Thorsten Koch                                  */
-/*                  2001-2002 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996      Roland Wunderling                              */
+/*                  1996-2010 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.64 2009/12/17 13:30:16 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.65 2010/09/16 17:45:04 bzfgleix Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.

@@ -3,8 +3,8 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1997-1999 Roland Wunderling                              */
-/*                  1997-2009 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996      Roland Wunderling                              */
+/*                  1996-2010 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: testMemory.cpp,v 1.1 2009/05/07 18:14:04 bzfpfets Exp $"
+#pragma ident "@(#) $Id: testMemory.cpp,v 1.2 2010/09/16 17:45:05 bzfgleix Exp $"
 
 /* Test a for a bug in the memory allocation, which results in a dramatic increase of the used
  * memory - at least to date (May 2009).

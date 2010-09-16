@@ -3,8 +3,8 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1997-1999 Roland Wunderling                              */
-/*                  1997-2009 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996      Roland Wunderling                              */
+/*                  1996-2010 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpstat.cpp,v 1.7 2009/02/20 01:06:35 bzfgleix Exp $"
+#pragma ident "@(#) $Id: lpstat.cpp,v 1.8 2010/09/16 17:45:02 bzfgleix Exp $"
 
 #include <assert.h>
 #include <iostream>
@@ -31,7 +31,7 @@ int main(int argc, char **argv)
    "*                                                                      *\n"
    "*       LPStat --- Print Statistics about LPs.                         *\n"
    "*                  Release 1.0.2                                       *\n"
-   "*    Copyright (C) 2002-2007 Konrad-Zuse-Zentrum                       *\n"
+   "*    Copyright (C) 2002-2010 Konrad-Zuse-Zentrum                       *\n"
    "*                            fuer Informationstechnik Berlin           *\n"
    "*                                                                      *\n"
    "*  LPStat is distributed under the terms of the ZIB Academic Licence.  *\n"
