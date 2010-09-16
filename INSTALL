@@ -1,5 +1,19 @@
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*                                                                           *
+*                  This file is part of the class library                   *
+*       SoPlex --- the Sequential object-oriented simPlex.                  *
+*                                                                           *
+*    Copyright (C) 1997-1999 Roland Wunderling                              *
+*                  1997-2009 Konrad-Zuse-Zentrum                            *
+*                            fuer Informationstechnik Berlin                *
+*                                                                           *
+*  SoPlex is distributed under the terms of the ZIB Academic Licence.       *
+*                                                                           *
+*  You should have received a copy of the ZIB Academic License              *
+*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  *
+*                                                                           *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-	SoPlex --- the Sequential Object-oriented simPlex
 
 1.	All the documentation is available online at 
 
@@ -33,15 +47,14 @@
 
         Now read the documentation!
 
-3.1	Using soplex
+3.1	Using SopPex
 
 	Start one of the binaries in the bin directory with the -h flag.
 
 3.2	Using the library
 
-    	An example on how to use the soplex library is provided in the
-	file 'src/example.cpp'. It shows how to read and solve LPs 
-        with SoPlex. 
+    	Examples on how to use the SoPlex library is provided in the files
+	'src/soplexmain.cpp' and 'src/simpleexample.cpp'.
 
 4.	Bug report
 
@@ -59,5 +72,3 @@
 
 	A copy of the thesis can be retreived from
 	www.zib.de/Publications/abstracts/TR-96-09/
- 
-
