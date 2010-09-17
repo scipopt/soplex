@@ -1,5 +1,5 @@
 #!/bin/sh
-VERSION="1.4.2"
+VERSION="1.5.0a"
 NAME="soplex-$VERSION"
 rm -f $NAME
 ln -s . $NAME
@@ -10,6 +10,7 @@ tar -cvzhf $NAME.tgz \
 --exclude=".?*" \
 --exclude="*exercise_LP_changes.cpp" \
 --exclude="*/local/*" \
+--exclude="TODO" \
 $NAME/COPYING \
 $NAME/README \
 $NAME/CHANGELOG \

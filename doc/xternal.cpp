@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 /**@mainpage SoPlex
-   @version  1.4.2
+   @version  1.5.0a
    @author   Roland Wunderling
    @author   Tobias Achterberg
    @author   Timo Berthold

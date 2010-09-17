@@ -1,16 +1,27 @@
-# $Id: Makefile,v 1.99 2010/03/08 14:17:48 bzfwanie Exp $
-#* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-#*                                                                           *
-#*   File....: Makefile                                                      *
-#*   Name....: SoPlex Makefile                                               *
-#*   Author..: Thorsten Koch                                                 *
-#*   Copyright by Author, All rights reserved                                *
-#*                                                                           *
-#* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+#* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
+#*                                                                           *#
+#*                  This file is part of the class library                   *#
+#*       SoPlex --- the Sequential object-oriented simPlex.                  *#
+#*                                                                           *#
+#*    Copyright (C) 1996      Roland Wunderling                              *#
+#*                  1996-2010 Konrad-Zuse-Zentrum                            *#
+#*                            fuer Informationstechnik Berlin                *#
+#*                                                                           *#
+#*  SoPlex is distributed under the terms of the ZIB Academic Licence.       *#
+#*                                                                           *#
+#*  You should have received a copy of the ZIB Academic License              *#
+#*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  *#
+#*                                                                           *#
+#* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
+# $Id: Makefile,v 1.100 2010/09/17 07:34:55 bzfgleix Exp $		      
+
+#@file    Makefile
+#@brief   SoPlex Makefile
+#@author  Thorsten Koch
 
 .PHONY:		all depend clean distclean lint doc check
 
-VERSION		:=	1.4.2
+VERSION		:=	1.5.0a
 
 ARCH            :=      $(shell uname -m | \
                         sed \
