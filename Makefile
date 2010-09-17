@@ -13,7 +13,7 @@
 #*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  *#
 #*                                                                           *#
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
-# $Id: Makefile,v 1.102 2010/09/17 14:43:38 bzfgleix Exp $		      
+# $Id: Makefile,v 1.103 2010/09/17 19:35:36 bzfviger Exp $		      
 
 #@file    Makefile
 #@brief   SoPlex Makefile
@@ -118,6 +118,16 @@ include make/make.$(BASE)
 -include make/local/make.$(HOSTNAME)
 -include make/local/make.$(HOSTNAME).$(COMP)
 -include make/local/make.$(HOSTNAME).$(COMP).$(OPT)
+#-----------------------------------------------------------------------------
+
+FLAGS		+=	$(USRFLAGS)
+OFLAGS		+=	$(USROFLAGS)
+CFLAGS		+=	$(USRCFLAGS)
+CXXFLAGS	+=	$(USRCXXFLAGS)
+LDFLAGS		+=	$(USRLDFLAGS)
+ARFLAGS		+=	$(USRARFLAGS)
+DFLAGS		+=	$(USRDFLAGS)
+
 #-----------------------------------------------------------------------------
 
 BINNAME		=	$(NAME)-$(VERSION).$(BASE)
