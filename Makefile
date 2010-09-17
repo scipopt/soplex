@@ -13,7 +13,7 @@
 #*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  *#
 #*                                                                           *#
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
-# $Id: Makefile,v 1.100 2010/09/17 07:34:55 bzfgleix Exp $		      
+# $Id: Makefile,v 1.101 2010/09/17 07:44:41 bzfgleix Exp $		      
 
 #@file    Makefile
 #@brief   SoPlex Makefile
@@ -40,7 +40,7 @@ VERBOSE		=	false
 OPT		=	opt
 LIBEXT		=	a
 TEST		=	quick
-ALGO		=	1 2 3 4
+ALGO		=	1 2 3 4 7 8
 LIMIT		=	#
 
 ZLIB		=	true
