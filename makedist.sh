@@ -12,7 +12,7 @@ tar -cvzhf $NAME.tgz \
 --exclude="*/local/*" \
 --exclude="TODO" \
 $NAME/COPYING \
-$NAME/README \
+$NAME/INSTALL \
 $NAME/CHANGELOG \
 $NAME/Makefile \
 $NAME/check/netlib.test \
@@ -25,6 +25,7 @@ $NAME/check/mittelmann.solu \
 $NAME/check/infeas.solu \
 $NAME/check/check.sh \
 $NAME/check/check.awk \
+$NAME/check/instances/* \
 $NAME/doc/soplex.dxy \
 $NAME/doc/xternal.cpp \
 $NAME/doc/inc/faq.inc \
@@ -33,7 +34,9 @@ $NAME/make/* \
 $NAME/src/*
 rm -f $NAME
 echo ""
-echo "check version numbers in src/spxdefines.h, doc/xternal.cpp, Makefile and makedist.sh ($VERSION):"
+echo "check version numbers in src/spxdefines.h, doc/xternal.cpp, doc/soplex.dxy, Makefile and makedist.sh ($VERSION):"
 grep "VERSION" src/spxdefines.h
 grep "@version" doc/xternal.cpp
+grep "^PROJECT_NUMBER" doc/soplex.dxy
 grep "^VERSION" Makefile
+grep "^VERSION" makedist.sh
