@@ -1,7 +1,7 @@
-#--- $Id: make.linux.x86.gnu.opt-shared,v 1.2 2008/09/05 13:13:39 bzforlow Exp $
+#--- $Id: make.linux.x86.gnu.opt-shared,v 1.3 2010/09/21 13:27:49 bzfwinkm Exp $
 CXX		=	g++
 CPPFLAGS	=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -FPIC
-CXXFLAGS	=	-O3 -march=pentiumpro -fexceptions -fomit-frame-pointer # -malign-double -ffast-math
+CXXFLAGS	=	-O3 -mtune=native -fexceptions -fomit-frame-pointer # -malign-double -ffast-math
 LDFLAGS		=	-lm -Wl,-rpath,$(CURDIR)/$(LIBDIR)
 ARFLAGS		=	crs
 ZLIB_FLAGS	=

@@ -1,7 +1,7 @@
-#--- $Id: make.linux.x86.gnu.std,v 1.7 2007/08/17 14:14:08 bzfpfend Exp $
+#--- $Id: make.linux.x86.gnu.std,v 1.8 2010/09/21 13:27:49 bzfwinkm Exp $
 CXX	=	g++
 CPPFLAGS=	-Isrc -DNDEBUG
-CXXFLAGS=	-O -g -march=pentiumpro
+CXXFLAGS=	-O -g -mtune=native
 LDFLAGS	=	-lm
 ARFLAGS	=	crs
 ZLIB_FLAGS	=
