@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.h,v 1.31 2010/09/16 17:45:03 bzfgleix Exp $"
+#pragma ident "@(#) $Id: slufactor.h,v 1.32 2010/09/27 14:24:47 bzfgleix Exp $"
 
 /**@file  slufactor.h
  * @brief Implementation of Sparse Linear Solver.
@@ -39,7 +39,7 @@ namespace soplex
  * This class implements a #SLinSolver interface by using the sparse LU
  * factorization implementet in #CLUFactor.
  */
-class SLUFactor : public SLinSolver, private CLUFactor
+class SLUFactor : public SLinSolver, protected CLUFactor
 {
 public:
 
