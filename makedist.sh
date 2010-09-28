@@ -1,9 +1,17 @@
 #!/bin/sh
+
 VERSION="1.5.0a"
 NAME="soplex-$VERSION"
 rm -f $NAME
 ln -s . $NAME
 rm -f $NAME.tgz
+
+# Before we create a tarball change the directory and file rights in a command way
+echo adjust file modes
+find ./ -type d -exec chmod 750 {} \;
+find ./ -type f -exec chmod 640 {} \;
+find ./ -name "*.sh" -exec chmod 750 {} \;
+
 tar -cvzhf $NAME.tgz \
 --exclude="*CVS*" \
 --exclude="*~" \
@@ -33,6 +41,7 @@ $NAME/doc/inc/faqcss.inc \
 $NAME/make/* \
 $NAME/src/*
 rm -f $NAME
+
 echo ""
 echo "check version numbers in src/spxdefines.h, doc/xternal.cpp, doc/soplex.dxy, Makefile and makedist.sh ($VERSION):"
 grep "VERSION" src/spxdefines.h
