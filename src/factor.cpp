@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: factor.cpp,v 1.53 2010/09/16 17:45:02 bzfgleix Exp $"
+#pragma ident "@(#) $Id: factor.cpp,v 1.54 2010/09/28 18:18:50 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -343,7 +343,7 @@ void CLUFactor::remaxCol(int p_col, int len)
  
         Indices clen[i]-cbeg[i]:      ^^^
 \end{verbatim}
-        belong to column i, but have allready been pivotal and don't belong to
+        belong to column i, but have already been pivotal and don't belong to
         the active submatrix.
  */
 
@@ -355,8 +355,9 @@ void CLUFactor::remaxCol(int p_col, int len)
 void CLUFactor::initFactorMatrix(const SVector** vec, const Real eps )
 {
    METHOD( "CLUFactor::initFactorMatrix()" );
+
    Real x;
-   int i, j, ll, k, m;
+   int m;
    int tot;
    Dring *rring, *lastrring;
    Dring *cring, *lastcring;
@@ -368,29 +369,29 @@ void CLUFactor::initFactorMatrix(const SVector** vec, const Real eps )
     *  - nonzeros counts per row
     *  - total number of nonzeros
     */
-   for (i = 0; i < thedim; ++i)
+   for (int i = 0; i < thedim; i++)
       u.row.max[i] = u.row.len[i] = 0;
 
    tot = 0;
 
-   for (i = 0; i < thedim; ++i)
+   for (int i = 0; i < thedim; i++)
    {
+      int k;
+
       psv = vec[i];
-      ll = psv->size();
-      if (ll > 1)
+      k = psv->size();
+      if (k > 1)
       {
-         tot += ll;
-         for (j = 0; j < ll; ++j)
-            ++(u.row.max[psv->index(j)]);
+         tot += k;
+         for (int j = 0; j < k; ++j)
+            u.row.max[psv->index(j)]++;
       }
-      else if (ll == 0)
+      else if (k == 0)
       {
          stat = SLinSolver::SINGULAR;
          return;
       }
    }
-
-
 
    /*  Resize nonzero memory if necessary
     */
@@ -417,7 +418,7 @@ void CLUFactor::initFactorMatrix(const SVector** vec, const Real eps )
    lastcring->next = cring;
 
    m = 0;
-   for (i = 0; i < thedim; ++i)
+   for (int i = 0; i < thedim; i++)
    {
       u.row.start[i] = m;
       m += u.row.max[i];
@@ -451,58 +452,93 @@ void CLUFactor::initFactorMatrix(const SVector** vec, const Real eps )
    temp.stage = 0;
 
    initMaxabs = 0;
-   for (i = 0; i < thedim; ++i)
+   for (int i = 0; i < thedim; i++)
    {
+      int nnonzeros;
+
       psv = vec[i];
-      ll = psv->size();
       u.col.start[i] = m;
-      if (ll > 1)                               /* exclude column singletons */
+
+      /* check whether number of nonzeros above tolerance is 0, 1 or >= 2 */
+      nnonzeros = 0;
+      for (int j = 0; j < psv->size() && nnonzeros <= 1; j++)
       {
-         int kk, lll;
-         for (j = lll = 0; j < ll; ++j)
-         {
-            x = psv->value(j);
-            if (isNotZero(x, eps))
-            {
-               k = psv->index(j);
-               kk = u.row.start[k] + (u.row.len[k]++);
-               u.col.idx[m++] = k;
-               u.row.idx[kk] = i;
-               u.row.val[kk] = x;
-               ++lll;
-               if (fabs(x) > initMaxabs)
-                  initMaxabs = fabs(x);
-            }
-         }
-         ll = lll;
-         --m;
+         if (isNotZero(psv->value(j), eps))
+            nnonzeros++;
       }
-      if (ll > 1)
-      {
-         ++m;
-         temp.s_cact[i] = u.col.len[i] = u.col.max[i] = ll;
-      }
-      else if (ll <= 0)       /* singular */
+
+      /* basis is singular due to empty column */
+      if (nnonzeros == 0)
       {
          stat = SLinSolver::SINGULAR;
          return;
       }
-      else                    /* singleton */
+      /* exclude column singletons */
+      else if (nnonzeros == 1)
       {
-         u.col.len[i] = u.col.max[i] = 0;
-         for (j = 0; isZero(psv->value(j), eps); ++j)
+         int j;
+
+         /* find nonzero */
+         for (j = 0; isZero(psv->value(j), eps); j++)
             ;
+         assert(j < psv->size());
+
+         /* basis is singular due to two linearly dependent column singletons */
          if (row.perm[psv->index(j)] >= 0)
          {
             stat = SLinSolver::SINGULAR;
             return;
          }
+
+         /* update maximum absolute nonzero value */
          x = psv->value(j);
          if (fabs(x) > initMaxabs)
             initMaxabs = fabs(x);
 
+         /* permute to front and mark as singleton */
          setPivot(temp.stage, i, psv->index(j), x);
-         sing[temp.stage++] = i;
+         sing[temp.stage] = i;
+         temp.stage++;
+
+         /* set column length to zero */
+         temp.s_cact[i] = u.col.len[i] = u.col.max[i] = 0;
+      }
+      /* add to active matrix if not a column singleton */
+      else
+      {
+         int end;
+         int k;
+
+         /* go through all nonzeros in column */
+         assert(nnonzeros >= 2);
+         nnonzeros = 0;
+         for (int j = 0; j < psv->size(); j++)
+         {
+            x = psv->value(j);
+            if (isNotZero(x, eps))
+            {
+               /* add to column array */
+               k = psv->index(j);
+               u.col.idx[m] = k;
+               m++;
+
+               /* add to row array */
+               end = u.row.start[k] + u.row.len[k];
+               u.row.idx[end] = i;
+               u.row.val[end] = x;
+               u.row.len[k]++;
+
+               /* update maximum absolute nonzero value */
+               if (fabs(x) > initMaxabs)
+                  initMaxabs = fabs(x);
+
+               nnonzeros++;
+            }
+         }
+         assert(nnonzeros >= 2);
+
+         /* set column length */
+         temp.s_cact[i] = u.col.len[i] = u.col.max[i] = nnonzeros;
       }
    }
    u.col.used = m;
@@ -544,6 +580,8 @@ void CLUFactor::colSingletons()
          /*  Move pivotal nonzeros to front of column.
           */
          p_col = idx[j];
+         assert(temp.s_cact[p_col] > 0);
+
          n = u.col.start[p_col] + u.col.len[p_col] - temp.s_cact[p_col];
          for (k = n; u.col.idx[k] != p_row; ++k)
             ;

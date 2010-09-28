@@ -35,6 +35,7 @@
 
 - fixed bug in simplifier SPxMainSM for postsolving of free columns with zero objective
 
+- fixed bug in factorization triggered by column singletons with nonzeros below numerical zero tolerance
 
 #----------------------------------------------------------------
 
