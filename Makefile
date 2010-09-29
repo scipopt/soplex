@@ -13,7 +13,7 @@
 #*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  *#
 #*                                                                           *#
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
-# $Id: Makefile,v 1.104 2010/09/29 15:42:30 bzfviger Exp $		      
+# $Id: Makefile,v 1.105 2010/09/29 15:58:26 bzfviger Exp $		      
 
 #@file    Makefile
 #@brief   SoPlex Makefile
@@ -40,6 +40,7 @@ HOSTNAME	:=	$(shell uname -n | tr '[:upper:]' '[:lower:]')
 VERBOSE		=	false
 OPT		=	opt
 LIBEXT		=	a
+EXEEXTENSION	=	exe
 TEST		=	quick
 ALGO		=	1 2 3 4
 LIMIT		=	#
@@ -143,13 +144,13 @@ DFLAGS		+=	$(USRDFLAGS)
 BINNAME		=	$(NAME)-$(VERSION).$(BASE)
 #EXAMPLENAME	=	example.$(BASE)
 LIBNAME		=	$(NAME)-$(VERSION).$(BASE)
-BINFILE		=	$(BINDIR)/$(BINNAME)
+BINFILE		=	$(BINDIR)/$(BINNAME)$(EXEEXTENSION)
 #EXAMPLEFILE	=	$(BINDIR)/$(EXAMPLENAME)
 LIBFILE		=	$(LIBDIR)/lib$(LIBNAME).$(LIBEXT)
 LIBSHORTLINK	=	$(LIBDIR)/lib$(NAME).$(LIBEXT)
 LIBLINK		=	$(LIBDIR)/lib$(NAME).$(BASE).$(LIBEXT)
-BINLINK		=	$(BINDIR)/$(NAME).$(BASE)
-BINSHORTLINK	=	$(BINDIR)/$(NAME)
+BINLINK		=	$(BINDIR)/$(NAME).$(BASE)$(EXEEXTENSION)
+BINSHORTLINK	=	$(BINDIR)/$(NAME)$(EXEEXTENSION)
 DEPEND		=	src/depend
 
 # potential valgrind suppression file name
@@ -193,12 +194,12 @@ $(BINLINK) $(BINSHORTLINK):	$(BINFILE)
 
 $(BINFILE):	$(BINDIR) $(BINOBJDIR) $(LIBFILE) $(BINOBJFILES)
 		@echo "-> linking $@"
-		$(LINKCXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOBJFILES) \
+		$(LINKCXX) $(BINOBJFILES) \
 		$(LINKCXX_L)$(LIBDIR) $(LINKCXX_l)$(LIBNAME)$(LINKLIBSUFFIX) $(LDFLAGS) $(LINKCXX_o)$@
 
 #$(EXAMPLEFILE):	$(BINDIR) $(EXAMPLEOBJDIR) $(LIBFILE) $(EXAMPLEOBJFILES)
 #		@echo "-> linking $@"
-#		$(LINKCXX) $(CPPFLAGS) $(CXXFLAGS) $(EXAMPLEOBJFILES) \
+#		$(LINKCXX) $(EXAMPLEOBJFILES) \
 #		$(LINKCXX_L)$(LIBDIR) $(LINKCXX_l)$(LIBNAME)$(LINKLIBSUFFIX) $(LDFLAGS) $(LINKCXX_o)$@
 
 $(LIBFILE):	$(LIBDIR) $(LIBOBJDIR) touchexternal $(LIBOBJFILES)
