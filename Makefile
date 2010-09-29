@@ -13,7 +13,7 @@
 #*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  *#
 #*                                                                           *#
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
-# $Id: Makefile,v 1.105 2010/09/29 15:58:26 bzfviger Exp $		      
+# $Id: Makefile,v 1.106 2010/09/29 16:43:34 bzfviger Exp $		      
 
 #@file    Makefile
 #@brief   SoPlex Makefile
@@ -23,18 +23,23 @@
 
 VERSION		:=	1.5.0a
 
-ARCH            :=      $(shell uname -m | \
+ARCH		:=	$(shell uname -m | \
 			sed \
-			-e s/sun../sparc/ \
-			-e s/i.86/x86/ \
-			-e s/i86pc/x86/ \
-			-e s/[0-9]86/x86/ \
-			-e s/amd64/x86_64/ \
-			-e s/IP../mips/ \
-			-e s/9000..../hppa/ \
-			-e s/Power\ Macintosh/ppc/ \
-			-e s/00........../pwr4/)
-OSTYPE		:=	$(shell uname -s | tr '[:upper:]' '[:lower:]' | sed -e 's/cygwin.*/cygwin/' -e 's/irix../irix/' -e 's/windows.*/windows/' )
+			-e 's/sun../sparc/' \
+			-e 's/i.86/x86/' \
+			-e 's/i86pc/x86/' \
+			-e 's/[0-9]86/x86/' \
+			-e 's/amd64/x86_64/' \
+			-e 's/IP../mips/' \
+			-e 's/9000..../hppa/' \
+			-e 's/Power\ Macintosh/ppc/' \
+			-e 's/00........../pwr4/' )
+OSTYPE		:=	$(shell uname -s | tr '[:upper:]' '[:lower:]' | \
+			sed \
+			-e 's/cygwin.*/cygwin/' \
+			-e 's/irix../irix/' \
+			-e 's/windows.*/windows/' \
+			-e 's/mingw.*/mingw/')
 HOSTNAME	:=	$(shell uname -n | tr '[:upper:]' '[:lower:]')
 
 VERBOSE		=	false
