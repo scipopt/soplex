@@ -13,7 +13,7 @@
 #*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  *#
 #*                                                                           *#
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
-# $Id: Makefile,v 1.103 2010/09/17 19:35:36 bzfviger Exp $		      
+# $Id: Makefile,v 1.104 2010/09/29 15:42:30 bzfviger Exp $		      
 
 #@file    Makefile
 #@brief   SoPlex Makefile
@@ -24,16 +24,17 @@
 VERSION		:=	1.5.0a
 
 ARCH            :=      $(shell uname -m | \
-                        sed \
+			sed \
 			-e s/sun../sparc/ \
 			-e s/i.86/x86/ \
-	                -e s/i86pc/x86/ \
-	                -e s/amd64/x86_64/ \
+			-e s/i86pc/x86/ \
+			-e s/[0-9]86/x86/ \
+			-e s/amd64/x86_64/ \
 			-e s/IP../mips/ \
 			-e s/9000..../hppa/ \
 			-e s/Power\ Macintosh/ppc/ \
 			-e s/00........../pwr4/)
-OSTYPE		:=	$(shell uname -s | tr '[:upper:]' '[:lower:]' | sed -e s/cygwin.*/cygwin/ -e s/irix../irix/ )
+OSTYPE		:=	$(shell uname -s | tr '[:upper:]' '[:lower:]' | sed -e 's/cygwin.*/cygwin/' -e 's/irix../irix/' -e 's/windows.*/windows/' )
 HOSTNAME	:=	$(shell uname -n | tr '[:upper:]' '[:lower:]')
 
 VERBOSE		=	false
@@ -47,22 +48,31 @@ ZLIB		=	true
 
 COMP		=	gnu
 CXX		=	g++
+CXX_c		=	-c # the trailing space is important
+CXX_o		=	-o # the trailing space is important
+LINKCXX		=	g++
+LINKCXX_L	=	-L
+LINKCXX_l	=	-l
+LINKCXX_o	=	-o # the trailing space is important
+LINKLIBSUFFIX	=
 DCXX		=	g++
 LINT		=	flexelint
 AR		=	ar
+AR_o		=
 RANLIB		=	ranlib
 DOXY		=	doxygen
 VALGRIND	=	valgrind
+LN_s		=	ln -s
 
 LIBBUILD	=	$(AR)
 LIBBUILD_o	=	$(AR_o)
 LIBBUILDFLAGS	=       $(ARFLAGS)
 
 CPPFLAGS	=	-Isrc
-CXXFLAGS	=	-O
+CXXFLAGS	=	
 BINOFLAGS	=	
 LIBOFLAGS	=	
-LDFLAGS		=	-lm
+LDFLAGS		=	$(LINKCC_l)m$(LINKLIBSUFFIX)
 ARFLAGS		=	cr
 DFLAGS		=	-MM
 VFLAGS		=	--tool=memcheck --leak-check=yes --show-reachable=yes #--gen-suppressions=yes
@@ -93,7 +103,7 @@ LIBOBJ		= 	changesoplex.o didxset.o \
 			vector.o vsolve.o \
 			gzstream.o
 BINOBJ		=	soplexmain.o
-EXAMPLEOBJ	=	example.o
+#EXAMPLEOBJ	=	example.o
 REPOSIT		=	# template repository, explicitly empty  #spxproof.o 
 
 BASE		=	$(OSTYPE).$(ARCH).$(COMP).$(OPT)
@@ -131,10 +141,10 @@ DFLAGS		+=	$(USRDFLAGS)
 #-----------------------------------------------------------------------------
 
 BINNAME		=	$(NAME)-$(VERSION).$(BASE)
-EXAMPLENAME	=	example.$(BASE)
+#EXAMPLENAME	=	example.$(BASE)
 LIBNAME		=	$(NAME)-$(VERSION).$(BASE)
 BINFILE		=	$(BINDIR)/$(BINNAME)
-EXAMPLEFILE	=	$(BINDIR)/$(EXAMPLENAME)
+#EXAMPLEFILE	=	$(BINDIR)/$(EXAMPLENAME)
 LIBFILE		=	$(LIBDIR)/lib$(LIBNAME).$(LIBEXT)
 LIBSHORTLINK	=	$(LIBDIR)/lib$(NAME).$(LIBEXT)
 LIBLINK		=	$(LIBDIR)/lib$(NAME).$(BASE).$(LIBEXT)
@@ -149,10 +159,10 @@ OBJDIR		=	obj/O.$(BASE)
 BINOBJDIR	=	$(OBJDIR)/bin
 LIBOBJDIR	=	$(OBJDIR)/lib
 BINOBJFILES	=	$(addprefix $(BINOBJDIR)/,$(BINOBJ))
-EXAMPLEOBJFILES	=	$(addprefix $(BINOBJDIR)/,$(EXAMPLEOBJ))
+#EXAMPLEOBJFILES	=	$(addprefix $(BINOBJDIR)/,$(EXAMPLEOBJ))
 LIBOBJFILES	=	$(addprefix $(LIBOBJDIR)/,$(LIBOBJ))
 BINSRC		=	$(addprefix $(SRCDIR)/,$(BINOBJ:.o=.cpp))
-EXAMPLESRC	=	$(addprefix $(SRCDIR)/,$(EXAMPLEOBJ:.o=.cpp))
+#EXAMPLESRC	=	$(addprefix $(SRCDIR)/,$(EXAMPLEOBJ:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
 
 ZLIBDEP		:=	$(SRCDIR)/depend.zlib
@@ -171,27 +181,27 @@ ifeq ($(VERBOSE),false)
 endif
 
 all:		$(LIBFILE) $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
-example:	$(LIBFILE) $(EXAMPLEFILE) $(LIBLINK) $(LIBSHORTLINK)
+#example:	$(LIBFILE) $(EXAMPLEFILE) $(LIBLINK) $(LIBSHORTLINK)
 
 $(LIBLINK) $(LIBSHORTLINK):	$(LIBFILE)
 		@rm -f $@
-		cd $(dir $@) && ln -s $(notdir $(LIBFILE)) $(notdir $@)
+		cd $(dir $@) && $(LN_s) $(notdir $(LIBFILE)) $(notdir $@)
 
 $(BINLINK) $(BINSHORTLINK):	$(BINFILE)
 		@rm -f $@
-		cd $(dir $@) && ln -s $(notdir $(BINFILE)) $(notdir $@)
+		cd $(dir $@) && $(LN_s) $(notdir $(BINFILE)) $(notdir $@)
 
 $(BINFILE):	$(BINDIR) $(BINOBJDIR) $(LIBFILE) $(BINOBJFILES)
 		@echo "-> linking $@"
-		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOBJFILES) \
-		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+		$(LINKCXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOBJFILES) \
+		$(LINKCXX_L)$(LIBDIR) $(LINKCXX_l)$(LIBNAME)$(LINKLIBSUFFIX) $(LDFLAGS) $(LINKCXX_o)$@
 
-$(EXAMPLEFILE):	$(BINDIR) $(EXAMPLEOBJDIR) $(LIBFILE) $(EXAMPLEOBJFILES)
-		@echo "-> linking $@"
-		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(EXAMPLEOBJFILES) \
-		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+#$(EXAMPLEFILE):	$(BINDIR) $(EXAMPLEOBJDIR) $(LIBFILE) $(EXAMPLEOBJFILES)
+#		@echo "-> linking $@"
+#		$(LINKCXX) $(CPPFLAGS) $(CXXFLAGS) $(EXAMPLEOBJFILES) \
+#		$(LINKCXX_L)$(LIBDIR) $(LINKCXX_l)$(LIBNAME)$(LINKLIBSUFFIX) $(LDFLAGS) $(LINKCXX_o)$@
 
-$(LIBFILE):	$(LIBDIR) $(LIBOBJDIR) touchexternal $(LIBOBJFILES) 
+$(LIBFILE):	$(LIBDIR) $(LIBOBJDIR) touchexternal $(LIBOBJFILES)
 		@echo "-> generating library $@"
 		-rm -f $(LIBFILE)
 		$(LIBBUILD) $(LIBBUILDFLAGS) $(LIBBUILD_o)$@ $(LIBOBJFILES) $(REPOSIT)
@@ -254,10 +264,10 @@ depend:
 		$(BINSRC:.o=.cpp) \
 		| sed '\''s|^\([0-9A-Za-z]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g'\'' \
 		>$(DEPEND)'
-		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
-		$(EXAMPLESRC:.o=.cpp) \
-		| sed '\''s|^\([0-9A-Za-z]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g'\'' \
-		>>$(DEPEND)'
+#		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
+#		$(EXAMPLESRC:.o=.cpp) \
+#		| sed '\''s|^\([0-9A-Za-z]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g'\'' \
+#		>>$(DEPEND)'
 		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
 		$(LIBSRC:.o=.cpp) \
 		| sed '\''s|^\([0-9A-Za-z]\{1,\}\)\.o|$$\(LIBOBJDIR\)/\1.o|g'\'' \
@@ -268,11 +278,11 @@ depend:
 
 $(BINOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 		@echo "-> compiling $@"
-		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) -c $< -o $@
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) $(CXX_c)$< $(CXX_o)$@
 
 $(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 		@echo "-> compiling $@"
-		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LIBOFLAGS) -c $< -o $@
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LIBOFLAGS) $(CXX_c)$< $(CXX_o)$@
 
 
 -include $(LASTSETTINGS)
