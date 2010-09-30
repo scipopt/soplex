@@ -1,0 +1,14 @@
+Notes for SoPlex Release 1.5
+
+What's new
+----------
+ - rework of preprocessing routines:
+   + several bugfixes concerning basis statuses, dual values
+     and reduced costs
+   + improved performance in linear dependency check:
+     exclude singleton rows and columns
+ - improved handling of singular bases and cycling
+ - clearer iteration log output
+ - several bugfixes and improvements in numerical stability
+
+For details see the CHANGELOG file.
