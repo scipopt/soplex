@@ -13,7 +13,7 @@
 #*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  *#
 #*                                                                           *#
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
-# $Id: Makefile,v 1.106 2010/09/29 16:43:34 bzfviger Exp $		      
+# $Id: Makefile,v 1.107 2010/09/30 07:11:46 bzfviger Exp $		      
 
 #@file    Makefile
 #@brief   SoPlex Makefile
@@ -45,7 +45,7 @@ HOSTNAME	:=	$(shell uname -n | tr '[:upper:]' '[:lower:]')
 VERBOSE		=	false
 OPT		=	opt
 LIBEXT		=	a
-EXEEXTENSION	=	exe
+EXEEXTENSION	=	
 TEST		=	quick
 ALGO		=	1 2 3 4
 LIMIT		=	#
