@@ -13,7 +13,7 @@
 #*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  *#
 #*                                                                           *#
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
-# $Id: Makefile,v 1.107 2010/09/30 07:11:46 bzfviger Exp $		      
+# $Id: Makefile,v 1.108 2010/09/30 08:45:11 bzfviger Exp $		      
 
 #@file    Makefile
 #@brief   SoPlex Makefile
@@ -87,7 +87,6 @@ SRCDIR		=	src
 BINDIR		=	bin
 LIBDIR		=	lib
 NAME		=	soplex
-FLAGS		=       #
 LIBOBJ		= 	changesoplex.o didxset.o \
 			dsvector.o dvector.o enter.o factor.o \
 			forest.o idxset.o leave.o lpcolset.o lprowset.o \
@@ -136,9 +135,6 @@ include make/make.$(BASE)
 -include make/local/make.$(HOSTNAME).$(COMP).$(OPT)
 #-----------------------------------------------------------------------------
 
-FLAGS		+=	$(USRFLAGS)
-OFLAGS		+=	$(USROFLAGS)
-CFLAGS		+=	$(USRCFLAGS)
 CXXFLAGS	+=	$(USRCXXFLAGS)
 LDFLAGS		+=	$(USRLDFLAGS)
 ARFLAGS		+=	$(USRARFLAGS)
