@@ -13,7 +13,7 @@
 #*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  *#
 #*                                                                           *#
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
-# $Id: Makefile,v 1.108 2010/09/30 08:45:11 bzfviger Exp $		      
+# $Id: Makefile,v 1.109 2010/10/01 08:40:14 bzfviger Exp $		      
 
 #@file    Makefile
 #@brief   SoPlex Makefile
@@ -108,7 +108,7 @@ LIBOBJ		= 	changesoplex.o didxset.o \
 			vector.o vsolve.o \
 			gzstream.o
 BINOBJ		=	soplexmain.o
-#EXAMPLEOBJ	=	example.o
+EXAMPLEOBJ	=	simpleexample.o
 REPOSIT		=	# template repository, explicitly empty  #spxproof.o 
 
 BASE		=	$(OSTYPE).$(ARCH).$(COMP).$(OPT)
@@ -143,10 +143,10 @@ DFLAGS		+=	$(USRDFLAGS)
 #-----------------------------------------------------------------------------
 
 BINNAME		=	$(NAME)-$(VERSION).$(BASE)
-#EXAMPLENAME	=	example.$(BASE)
+EXAMPLENAME	=	simpleexample.$(BASE)
 LIBNAME		=	$(NAME)-$(VERSION).$(BASE)
 BINFILE		=	$(BINDIR)/$(BINNAME)$(EXEEXTENSION)
-#EXAMPLEFILE	=	$(BINDIR)/$(EXAMPLENAME)
+EXAMPLEFILE	=	$(BINDIR)/$(EXAMPLENAME)
 LIBFILE		=	$(LIBDIR)/lib$(LIBNAME).$(LIBEXT)
 LIBSHORTLINK	=	$(LIBDIR)/lib$(NAME).$(LIBEXT)
 LIBLINK		=	$(LIBDIR)/lib$(NAME).$(BASE).$(LIBEXT)
@@ -161,10 +161,10 @@ OBJDIR		=	obj/O.$(BASE)
 BINOBJDIR	=	$(OBJDIR)/bin
 LIBOBJDIR	=	$(OBJDIR)/lib
 BINOBJFILES	=	$(addprefix $(BINOBJDIR)/,$(BINOBJ))
-#EXAMPLEOBJFILES	=	$(addprefix $(BINOBJDIR)/,$(EXAMPLEOBJ))
+EXAMPLEOBJFILES	=	$(addprefix $(BINOBJDIR)/,$(EXAMPLEOBJ))
 LIBOBJFILES	=	$(addprefix $(LIBOBJDIR)/,$(LIBOBJ))
 BINSRC		=	$(addprefix $(SRCDIR)/,$(BINOBJ:.o=.cpp))
-#EXAMPLESRC	=	$(addprefix $(SRCDIR)/,$(EXAMPLEOBJ:.o=.cpp))
+EXAMPLESRC	=	$(addprefix $(SRCDIR)/,$(EXAMPLEOBJ:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
 
 ZLIBDEP		:=	$(SRCDIR)/depend.zlib
@@ -183,7 +183,7 @@ ifeq ($(VERBOSE),false)
 endif
 
 all:		$(LIBFILE) $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
-#example:	$(LIBFILE) $(EXAMPLEFILE) $(LIBLINK) $(LIBSHORTLINK)
+simpleexample:	$(LIBFILE) $(EXAMPLEFILE) $(LIBLINK) $(LIBSHORTLINK)
 
 $(LIBLINK) $(LIBSHORTLINK):	$(LIBFILE)
 		@rm -f $@
@@ -198,10 +198,10 @@ $(BINFILE):	$(BINDIR) $(BINOBJDIR) $(LIBFILE) $(BINOBJFILES)
 		$(LINKCXX) $(BINOBJFILES) \
 		$(LINKCXX_L)$(LIBDIR) $(LINKCXX_l)$(LIBNAME)$(LINKLIBSUFFIX) $(LDFLAGS) $(LINKCXX_o)$@
 
-#$(EXAMPLEFILE):	$(BINDIR) $(EXAMPLEOBJDIR) $(LIBFILE) $(EXAMPLEOBJFILES)
-#		@echo "-> linking $@"
-#		$(LINKCXX) $(EXAMPLEOBJFILES) \
-#		$(LINKCXX_L)$(LIBDIR) $(LINKCXX_l)$(LIBNAME)$(LINKLIBSUFFIX) $(LDFLAGS) $(LINKCXX_o)$@
+$(EXAMPLEFILE):	$(BINDIR) $(EXAMPLEOBJDIR) $(LIBFILE) $(EXAMPLEOBJFILES)
+		@echo "-> linking $@"
+		$(LINKCXX) $(EXAMPLEOBJFILES) \
+		$(LINKCXX_L)$(LIBDIR) $(LINKCXX_l)$(LIBNAME)$(LINKLIBSUFFIX) $(LDFLAGS) $(LINKCXX_o)$@
 
 $(LIBFILE):	$(LIBDIR) $(LIBOBJDIR) touchexternal $(LIBOBJFILES)
 		@echo "-> generating library $@"
@@ -266,10 +266,10 @@ depend:
 		$(BINSRC:.o=.cpp) \
 		| sed '\''s|^\([0-9A-Za-z]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g'\'' \
 		>$(DEPEND)'
-#		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
-#		$(EXAMPLESRC:.o=.cpp) \
-#		| sed '\''s|^\([0-9A-Za-z]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g'\'' \
-#		>>$(DEPEND)'
+		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
+		$(EXAMPLESRC:.o=.cpp) \
+		| sed '\''s|^\([0-9A-Za-z]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g'\'' \
+		>>$(DEPEND)'
 		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
 		$(LIBSRC:.o=.cpp) \
 		| sed '\''s|^\([0-9A-Za-z]\{1,\}\)\.o|$$\(LIBOBJDIR\)/\1.o|g'\'' \
