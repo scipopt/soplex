@@ -13,13 +13,13 @@
 #*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  *#
 #*                                                                           *#
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
-# $Id: Makefile,v 1.110 2010/10/01 15:01:53 bzfgleix Exp $		      
+# $Id: Makefile,v 1.111 2010/10/01 18:42:03 bzfgleix Exp $		      
 
 #@file    Makefile
 #@brief   SoPlex Makefile
 #@author  Thorsten Koch
 
-.PHONY:		all depend clean distclean lint doc check
+.PHONY:		all depend clean distclean lint doc check test
 
 VERSION		:=	1.5.0
 
@@ -220,6 +220,8 @@ doc:
 		cd doc; $(DOXY) $(NAME).dxy
 
 all:		$(BINFILE)
+
+test:		check
 
 check:		#$(BINFILE)
 		cd check; ./check.sh $(TEST).test ../$(BINFILE) '$(ALGO)' $(LIMIT)
