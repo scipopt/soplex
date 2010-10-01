@@ -13,7 +13,7 @@
 #*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  *#
 #*                                                                           *#
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
-# $Id: Makefile,v 1.109 2010/10/01 08:40:14 bzfviger Exp $		      
+# $Id: Makefile,v 1.110 2010/10/01 15:01:53 bzfgleix Exp $		      
 
 #@file    Makefile
 #@brief   SoPlex Makefile
@@ -21,7 +21,7 @@
 
 .PHONY:		all depend clean distclean lint doc check
 
-VERSION		:=	1.5.0a
+VERSION		:=	1.5.0
 
 ARCH		:=	$(shell uname -m | \
 			sed \
