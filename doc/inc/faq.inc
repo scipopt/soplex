@@ -40,7 +40,7 @@
      Constraint Integer Programs.</li>
      <li><a href="http://www.informatik.uni-koeln.de/abacus/">ABACUS</a>
      has an older interface to 1.2.1 only.</li>
-     <li>There is also an old interface to <a
+     <li>There is also an interface to <a
      href="https://projects.coin-or.org/Osi">COIN
      OSI</a>.</li>
      </ul>
