@@ -534,7 +534,7 @@ EXCLUDE_SYMBOLS        =
 # directories that contain example code fragments that are included (see 
 # the \include command).
 
-EXAMPLE_PATH           = ../src/example.cpp \
+EXAMPLE_PATH           = ../src/simpleexample.cpp \
                          inc/
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the 
