@@ -35,6 +35,8 @@ $NAME/check/check.sh \
 $NAME/check/check.awk \
 $NAME/check/instances/* \
 $NAME/doc/soplex.dxy \
+$NAME/doc/soplex.css \
+$NAME/doc/soplexheader.html \
 $NAME/doc/xternal.cpp \
 $NAME/doc/inc/faq.inc \
 $NAME/doc/inc/faqcss.inc \
