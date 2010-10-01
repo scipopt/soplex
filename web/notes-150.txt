@@ -10,4 +10,12 @@ What's new
  - improved handling of singular bases and cycling
  - several bugfixes and improvements in numerical stability
 
+SoPlex interfaces
+-----------------
+ - The LP interface of SCIP 2.0 to SoPlex now uses
+   equilibrium scaling when solving without advanced
+   starting basis.
+ - We have updated the SoPlex interface contained in the
+   OSI project of the COIN-OR initiative.
+
 For details see the CHANGELOG file.
