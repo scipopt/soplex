@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: nameset.h,v 1.30 2010/09/16 17:45:03 bzfgleix Exp $"
+#pragma ident "@(#) $Id: nameset.h,v 1.31 2010/10/01 19:30:47 bzfwinkm Exp $"
 
 /**@file  nameset.h
  * @brief Set of strings.
@@ -369,7 +369,7 @@ private:
 extern std::ostream& operator<<(std::ostream& s, const NameSet& nset);
 
 } // namespace soplex
-#endif
+#endif // _NAMESET_H_
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:

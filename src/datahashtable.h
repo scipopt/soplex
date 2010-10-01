@@ -13,13 +13,13 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datahashtable.h,v 1.28 2010/09/16 17:45:02 bzfgleix Exp $"
+#pragma ident "@(#) $Id: datahashtable.h,v 1.29 2010/10/01 19:30:47 bzfwinkm Exp $"
 
 /**@file  datahashtable.h
  * @brief Generic hash table for data objects.
  */
-#ifndef _DATAHAHSTABLE_H_
-#define _DATAHAHSTABLE_H_
+#ifndef _DATAHASHTABLE_H_
+#define _DATAHASHTABLE_H_
 
 #include <iostream>
 #include <assert.h>
@@ -387,7 +387,7 @@ private:
 
 };
 } // namespace soplex
-#endif   // _DATAHAHSTABLE_H_
+#endif // _DATAHASHTABLE_H_
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:

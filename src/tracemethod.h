@@ -1,3 +1,24 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/*                                                                           */
+/*                  This file is part of the class library                   */
+/*       SoPlex --- the Sequential object-oriented simPlex.                  */
+/*                                                                           */
+/*    Copyright (C) 1996      Roland Wunderling                              */
+/*                  1996-2010 Konrad-Zuse-Zentrum                            */
+/*                            fuer Informationstechnik Berlin                */
+/*                                                                           */
+/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*                                                                           */
+/*  You should have received a copy of the ZIB Academic License              */
+/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*                                                                           */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+#pragma ident "@(#) $Id: tracemethod.h,v 1.8 2010/10/01 19:30:47 bzfwinkm Exp $"
+
+/**@file  timer.h
+ * @brief TraceMethod class.
+ */
+
 #ifndef _TRACEMETHOD_H_
 #define _TRACEMETHOD_H_
 
@@ -47,4 +68,4 @@ public:
 }
 
 
-#endif
+#endif // _TRACEMETHOD_H_

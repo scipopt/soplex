@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.h,v 1.32 2010/09/27 14:24:47 bzfgleix Exp $"
+#pragma ident "@(#) $Id: slufactor.h,v 1.33 2010/10/01 19:30:47 bzfwinkm Exp $"
 
 /**@file  slufactor.h
  * @brief Implementation of Sparse Linear Solver.
@@ -245,7 +245,7 @@ private:
 };
 
 } // namespace soplex
-#endif
+#endif // _SLUFACTOR_H_
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:

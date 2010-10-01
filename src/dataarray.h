@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: dataarray.h,v 1.31 2010/09/16 17:45:02 bzfgleix Exp $"
+#pragma ident "@(#) $Id: dataarray.h,v 1.32 2010/10/01 19:30:46 bzfwinkm Exp $"
 
 /**@file  dataarray.h
  * @brief Save arrays of data objects.
@@ -334,7 +334,7 @@ public:
 };
 
 } // namespace soplex
-#endif
+#endif // _DATAARRAY_H_
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:

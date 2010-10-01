@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slinsolver.h,v 1.22 2010/09/16 17:45:03 bzfgleix Exp $"
+#pragma ident "@(#) $Id: slinsolver.h,v 1.23 2010/10/01 19:30:47 bzfwinkm Exp $"
 
 /**@file  slinsolver.h
  * @brief Sparse Linear Solver virtual base class.
@@ -180,7 +180,7 @@ public:
 };
 
 } // namespace soplex
-#endif
+#endif // _SLINSOLVER_H_
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:

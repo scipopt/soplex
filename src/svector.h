@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: svector.h,v 1.30 2010/09/16 17:45:04 bzfgleix Exp $"
+#pragma ident "@(#) $Id: svector.h,v 1.31 2010/10/01 19:30:47 bzfwinkm Exp $"
 
 /**@file  svector.h
  * @brief Sparse vectors.
@@ -408,7 +408,7 @@ inline Vector& Vector::multAdd(Real x, const SVector& vec)
 }
 
 } // namespace soplex
-#endif  // _SVECTOR_H_
+#endif // _SVECTOR_H_
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:

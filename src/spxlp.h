@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlp.h,v 1.51 2010/09/16 17:45:04 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxlp.h,v 1.52 2010/10/01 19:30:47 bzfwinkm Exp $"
 
 /**@file  spxlp.h
  * @brief Saving LPs in a form suitable for SoPlex.
@@ -788,7 +788,7 @@ public:
 
 
 } // namespace soplex
-#endif  // _SPXLP_H_
+#endif // _SPXLP_H_
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:

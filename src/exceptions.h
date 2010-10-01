@@ -17,8 +17,8 @@
 /**@file  exceptions.h
  * @brief Exception classes for SoPlex.
  */
-#ifndef EXCEPTIONS_H
-#define EXCEPTIONS_H
+#ifndef _EXCEPTIONS_H_
+#define _EXCEPTIONS_H_
 
 #include <string>
 
@@ -121,5 +121,5 @@ namespace soplex
 
 } //namespace soplex
 
-#endif //EXCEPTIONS_H
+#endif // _EXCEPTIONS_H_
 
