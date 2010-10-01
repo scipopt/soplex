@@ -1,8 +1,8 @@
 (maintain each list from top to bottom)
 
 
-17 Sep 2010 - Release 1.5
-=========================
+17 Sep 2010 - Release 1.5.0
+===========================
 
 code quality & new features:
 - changed memory handling in class DataKey: replacing bitfield implementation by two int's
