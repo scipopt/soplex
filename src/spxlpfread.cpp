@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.65 2010/09/16 17:45:04 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.66 2010/10/01 18:43:33 bzfgleix Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -351,7 +351,7 @@ static Real readInfinity(char*& pos)
  *  @return true if the file was read correctly
  */  
 bool SPxLP::readLPF(
-   std::istream& p_input,
+   std::istream& p_input,                ///< input stream.
    NameSet*      p_rnames,               ///< row names.
    NameSet*      p_cnames,               ///< column names.
    DIdxSet*      p_intvars)              ///< integer variables.
