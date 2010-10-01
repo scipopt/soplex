@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: array.h,v 1.24 2010/09/16 17:45:02 bzfgleix Exp $"
+#pragma ident "@(#) $Id: array.h,v 1.25 2010/10/01 19:28:34 bzfgleix Exp $"
 
 /**@file  array.h
  * @brief Save arrays of arbitrary types.
@@ -47,7 +47,7 @@ namespace soplex
     required size.
  
     An Array is implemented in a C++-compliant way with respect to
-    how memory is managed: Only operators ::new and ::delete are
+    how memory is managed: Only operators new and delete are
     used for allocating memory. This involves some overhead for all
     methods effecting the length of an Array, i.e., all methods
     insert(), append(), remove() and reSize(). This involves
