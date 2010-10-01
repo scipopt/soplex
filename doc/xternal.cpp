@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-/**@mainpage SoPlex
+/**@mainpage Overview
    @version  1.5.0
    @author   Roland Wunderling
    @author   Tobias Achterberg
