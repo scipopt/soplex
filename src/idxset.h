@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: idxset.h,v 1.16 2010/09/16 17:45:02 bzfgleix Exp $"
+#pragma ident "@(#) $Id: idxset.h,v 1.17 2010/10/01 18:20:15 bzfgleix Exp $"
 
 /**@file  idxset.h
  * @brief Set of indices.
@@ -65,7 +65,7 @@ protected:
    int  num;           ///< number of used indices
    int  len;           ///< length of array \ref soplex::IdxSet::idx "idx"
    int* idx;           ///< array of indices
-   bool freeArray;     ///< true iff \idx should be freed inside of this object
+   bool freeArray;     ///< true iff \ref soplex::IdxSet::idx "idx" should be freed inside of this object
    //@}
 
 public:
