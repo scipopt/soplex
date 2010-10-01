@@ -13,11 +13,14 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: mpsinput.h,v 1.17 2010/09/16 17:45:03 bzfgleix Exp $"
+#pragma ident "@(#) $Id: mpsinput.h,v 1.18 2010/10/01 19:18:34 bzfgleix Exp $"
 
 /**@file  mpsinput.h
  * @brief Read MPS format files.
  */
+#ifndef _MPSINPUT_H_
+#define _MPSINPUT_H_
+
 #include <iostream>
 
 #include "spxlp.h"
@@ -222,6 +225,7 @@ public:
    //@}
 };
 } // namespace soplex
+#endif // _MPSINPUT_H_
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:
@@ -231,5 +235,4 @@ public:
 //Emacs indent-tabs-mode:nil
 //Emacs End:
 //-----------------------------------------------------------------------------
-
 
