@@ -1,4 +1,4 @@
-Notes for SoPlex Release 1.5
+Notes for SoPlex Release 1.5.0
 
 What's new
 ----------
