@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.46 2010/09/16 17:45:04 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.47 2010/10/01 18:27:24 bzfgleix Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.
@@ -611,7 +611,7 @@ static void readBounds(
  *  @return true if the file was read correctly.
  */  
 bool SPxLP::readMPS(
-   std::istream& p_input, 
+   std::istream& p_input,           ///< input stream.
    NameSet*      p_rnames,          ///< row names.
    NameSet*      p_cnames,          ///< column names.
    DIdxSet*      p_intvars)         ///< integer variables.

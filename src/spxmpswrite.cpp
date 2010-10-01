@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpswrite.cpp,v 1.15 2010/09/16 17:45:04 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxmpswrite.cpp,v 1.16 2010/10/01 18:27:24 bzfgleix Exp $"
 
 /**@file  spxmpswrite.cpp
  * @brief Write LP as MPS format file.
@@ -124,7 +124,7 @@ static const char* getColName(
 /** @note There will always be a BOUNDS section, even if there are no bounds.
  */
 void SPxLP::writeMPS(
-   std::ostream&  p_output, 
+   std::ostream&  p_output,          ///< output stream.
    const NameSet* p_rnames,          ///< row names.
    const NameSet* p_cnames,          ///< column names.
    const DIdxSet* p_intvars)         ///< integer variables.
