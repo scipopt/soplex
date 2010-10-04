@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.46 2010/09/17 07:34:56 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.47 2010/10/04 14:57:34 bzfwinkm Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
@@ -298,15 +298,16 @@ public:
 /// returns max(|a|,|b|)
 inline static Real maxAbs(Real a, Real b)
 {
-   return fabs(a) > fabs(b) ? fabs(a) : fabs(b);
+   const Real absa = fabs(a);
+   const Real absb = fabs(b);
+
+   return absa > absb ? absa : absb;
 }
 
 /// returns (a-b) / max(|a|,|b|,1.0)
 inline static Real relDiff(Real a, Real b)
 {
-   Real scale = 1.0 / maxAbs(maxAbs(a, b), 1.0);
-
-   return a * scale - b * scale;
+   return (a - b) / (maxAbs(a, b) > 1.0 ? maxAbs(a, b) : 1.0);
 }
 
 /// returns \c true iff |a-b| <= eps
