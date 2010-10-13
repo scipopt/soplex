@@ -95,8 +95,10 @@
    </p>
 
    <p class="a">
-     The code is tested to compile under Microsoft Visual Studio 2003.
-     However, we do not provide any Makefiles or project files for VC++.
+     The code is tested to compile under Microsoft Visual Studio 2008 and 2010.
+     Installation instructions are available for the ZIB Optimization Suite,
+     which contains SoPlex.
+     See the download section at <a href="http://zibopt.zib.de">http://zibopt.zib.de</a>.
      It should also be possible to create a Windows version by compiling it
      with the GCC under <a href="http://www.cygwin.com/">Cygwin</a> or minGW
    </p>
