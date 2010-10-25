@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.59 2010/09/16 17:45:03 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.60 2010/10/25 05:02:46 bzfgleix Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -35,6 +35,9 @@
 #include "slinsolver.h"
 #include "nameset.h"
 #include "spxout.h"
+#include "timer.h"
+
+//#define MEASUREUPDATETIME
 
 namespace soplex
 {
@@ -377,6 +380,8 @@ protected:
    */
    int    iterCount;     ///< number of calls to change() since last manipulation
    int    updateCount;   ///< number of calls to change() since last factorize()
+   int    totalUpdateCount;///< number of updates
+   Timer  totalUpdateTime;///< time spent in updates
    int    nzCount;       ///< number of nonzeros in basis matrix
    int    lastMem;       ///< memory needed after last fresh factorization
    Real   lastFill;      ///< fill ratio that occured during last factorization
@@ -743,9 +748,29 @@ public:
    bool isConsistent() const;
 #endif
 
+   /// time spent in updates
+   Real getTotalUpdateTime() const
+   {
+      return totalUpdateTime.userTime();
+   }
+   /// number of updates performed
+   int getTotalUpdateCount() const
+   {
+      return totalUpdateCount;
+   }
+
    /// returns statistical information in form of a string.
    std::string statistics() const
    {
+      std::stringstream s;
+      s  << factor->statistics()
+#ifdef MEASUREUPDATETIME
+         << "Updates            : " << std::setw(10) << getTotalUpdateCount() << std::endl
+         << "  Time spent       : " << std::setw(10) << getTotalUpdateTime() << std::endl
+#endif
+         ;
+
+   return s.str();
       return factor->statistics();
    }
    //@}

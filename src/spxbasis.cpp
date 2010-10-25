@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.cpp,v 1.74 2010/09/16 17:45:03 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxbasis.cpp,v 1.75 2010/10/25 05:02:46 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -675,12 +675,23 @@ void SPxBasis::change(
       {
          try
          {
+#ifdef MEASUREUPDATETIME
+            totalUpdateTime.start();
+#endif
             factor->change(i, *enterVec, eta);
+            totalUpdateCount++;
+#ifdef MEASUREUPDATETIME
+            totalUpdateTime.stop();
+#endif
          }
          catch( SPxException E )
          {
             MSG_INFO3( spxout << "IBASIS13 problems updating factorization; refactorizing basis"
                << std::endl; )
+
+#ifdef MEASUREUPDATETIME
+            totalUpdateTime.stop();
+#endif
 
             // singularity was detected in update; we refactorize
             invalidate();
@@ -691,7 +702,14 @@ void SPxBasis::change(
             assert(status() >= SPxBasis::REGULAR);
             try
             {
+#ifdef MEASUREUPDATETIME
+               totalUpdateTime.start();
+#endif
                factor->change(i, *enterVec, eta);
+               totalUpdateCount++;
+#ifdef MEASUREUPDATETIME
+               totalUpdateTime.stop();
+#endif
             }
             // with a freshly factorized, regular basis, the update is unlikely to fail; if this happens nevertheless,
             // we have to invalidate the basis to have the statuses correct
@@ -699,6 +717,11 @@ void SPxBasis::change(
             {
                MSG_INFO3( spxout << "IBASIS14 problems updating factorization; invalidating basis"
                   << std::endl; )
+
+#ifdef MEASUREUPDATETIME
+               totalUpdateTime.stop();
+#endif
+
                invalidate();
                throw F;
             }

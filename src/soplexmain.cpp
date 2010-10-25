@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplexmain.cpp,v 1.16 2010/09/16 17:45:03 bzfgleix Exp $"
+#pragma ident "@(#) $Id: soplexmain.cpp,v 1.17 2010/10/25 05:02:46 bzfgleix Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -662,28 +662,7 @@ void solve_LP(MySoPlex& work)
    work.solve();
    timer.stop();
 
-   if ( checkMode )
-   {
-      MSG_INFO1( spxout
-	 << "IEXAMP01 Factorizations   : " << work.getFactorCount() << std::endl
-	 << "IEXAMP02     Time spent   : " << work.getFactorTime() << std::endl
-	 << "IEXAMP03 Solves           : " << work.getSolveCount() << std::endl
-	 << "IEXAMP04     Time spent   : " << work.getSolveTime() << std::endl
-	 << "IEXAMP27 solution time  is: " << timer.userTime() << std::endl
-	 << "IEXAMP28 iterations       : " << work.iteration() << std::endl; )
-   }
-   else
-   {
-      MSG_INFO1( std::streamsize prec = spxout.precision();
-	 spxout << "\nSoPlex statistics:\n"
-	 << "  Factorizations : " << work.getFactorCount() << std::endl
-	 << "      Time spent : " << std::fixed << std::setprecision(2) << work.getFactorTime() << std::endl
-	 << "  Solves         : " << work.getSolveCount() << std::endl
-	 << "      Time spent : " << work.getSolveTime() << std::endl
-	 << "  solution time  : " << timer.userTime() << std::endl
-	 << "  iterations     : " << work.iteration() << std::endl
-	 << std::scientific << std::setprecision(int(prec)); )
-   }
+   MSG_INFO1( spxout << "\nSoPlex statistics:\n" << work.statistics(); )
 }
 
 //------------------------------------------------------------------------

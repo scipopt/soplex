@@ -1,6 +1,13 @@
 (maintain each list from top to bottom)
 
 
+DEVELOPER
+=========
+
+code quality & new features:
+- time for basis updates can now be measured by defining flag MEASUREUPDATETIME in spxbasis.h (off by default)
+
+
 30 Sep 2010 - Release 1.5.0
 ===========================
 
