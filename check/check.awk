@@ -1,4 +1,4 @@
-# $Id: check.awk,v 1.24 2010/11/30 18:15:34 bzfmilte Exp $
+# $Id: check.awk,v 1.25 2010/11/30 18:17:37 bzfgamra Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: check.awk                                                     *
@@ -23,13 +23,13 @@ function printviol(x)
       printf(" %.2e", abs(x));
 }
 BEGIN {
-    print "$Id: check.awk,v 1.24 2010/11/30 18:15:34 bzfmilte Exp $";
-    print "";
-    line = "-----------------------------------------------------------------------------------------------------------------------------\n";
-    printf(line);
-    printf("Name         Rows   Cols Type   Iter     Time Objective        relErr   maxVCons sumVCons maxVBoun sumVBoun maxVRedc sumVRedc\n");
+   print "$Id: check.awk,v 1.25 2010/11/30 18:17:37 bzfgamra Exp $";
+   print "";
+   line = "-----------------------------------------------------------------------------------------------------------------------------\n";
+   printf(line);
+   printf("Name         Rows   Cols Type   Iter     Time Objective        relErr   maxVCons sumVCons maxVBoun sumVBoun maxVRedc sumVRedc\n");
 
-    obj      = "error";
+   obj      = "error";
 }
 /=opt=/          { sol[$2] = $3; }
 /=type=/         { type = $2; }
@@ -54,150 +54,150 @@ BEGIN {
       type = type substr($i, 2);
 }
 /ready/       {
-    n = split(file, a, "/");
-    split(a[n], b, ".");
-    name = b[1];
+   n = split(file, a, "/");
+   split(a[n], b, ".");
+   name = b[1];
 
-    if (sol[name] == "")
-       print name, "nicht gefunden";
-    else
-    {
-        if (name == prevname)
-            printf("%25s", "");
-        else
-        {
-            printf(line);
-		    printf("%-10s %6d %6d ", name, rows, cols);
-        }
-		printf("%-3s %7d %8.2f ", type, iter, time);
+   if (sol[name] == "")
+      print name, "nicht gefunden";
+   else
+   {
+      if (name == prevname)
+	 printf("%25s", "");
+      else
+      {
+	 printf(line);
+	 printf("%-10s %6d %6d ", name, rows, cols);
+      }
+      printf("%-3s %7d %8.2f ", type, iter, time);
 
-        if (infeas)
-		    printf("%-14s", "infeasible");
-		else if (timeout)
-		    printf("%-14s", "timeout");
-		else if (cycling)
-		    printf("%-14s", "cycling");
-		else if (singular)
-		    printf("%-14s", "singular");
-		else if (obj == "error")
-		    printf("%-14s", "error");
-		else
-		    printf("%+e ", obj);
+      if (infeas)
+	 printf("%-14s", "infeasible");
+      else if (timeout)
+	 printf("%-14s", "timeout");
+      else if (cycling)
+	 printf("%-14s", "cycling");
+      else if (singular)
+	 printf("%-14s", "singular");
+      else if (obj == "error")
+	 printf("%-14s", "error");
+      else
+	 printf("%+e ", obj);
 
-		if (timeout)
-		   printf("\n");
-		else if ( obj == "error" && !infeas)
-		{
-	    	printf("XX\n");
-	    	fail[type]++;
-	    	fails++;
-	  	}
-		else
-		{
-            if (!infeas && sol[name] != "infeasible")
-            {
-                abserr = abs(sol[name] - obj);
-                if (abs(sol[name]) >= 1e-5)
-                    relerr = abserr / abs(sol[name]);
-                else
-                    relerr = abserr;
+      if (timeout)
+	 printf("\n");
+      else if ( obj == "error" && !infeas)
+      {
+	 printf("XX\n");
+	 fail[type]++;
+	 fails++;
+      }
+      else
+      {
+	 if (!infeas && sol[name] != "infeasible")
+	 {
+	    abserr = abs(sol[name] - obj);
+	    if (abs(sol[name]) >= 1e-5)
+	       relerr = abserr / abs(sol[name]);
+	    else
+	       relerr = abserr;
 
-    	        if ((abserr < 1e-4) || (relerr < 1e-5))
-				{
-		   			printf("ok %.2e", relerr);
-				   	pass[type]++;
-                   	relerrsum[type] += relerr;
-					passes++;
-				}
-				else
-				{
-					printf("XX %.2e", abserr);
-					fail[type]++;
-		   			fails++;
-				}
-				printviol(cvm);
-				printviol(cvs);
-				printviol(bvm);
-				printviol(bvs);
-				printviol(rcm);
-				printviol(rcs); 
-				print "";
-	    	}
-	    	else
-	    	{
-	    		if (infeas == 1 && sol[name] == "infeasible")
-	       		{
-		  			printf("ok\n");
-					pass[type]++;
-					passes++;
-	    		}
-				else
-	    		{
-					if (infeas && sol[name] != "infeasible")
-		    			printf("XX %.2e\n", abs(sol[name]));
-					else
-		    			printf("XX infeasible\n");
+	    if ((abserr < 1e-4) || (relerr < 1e-5))
+	    {
+	       printf("ok %.2e", relerr);
+	       pass[type]++;
+	       relerrsum[type] += relerr;
+	       passes++;
+	    }
+	    else
+	    {
+	       printf("XX %.2e", abserr);
+	       fail[type]++;
+	       fails++;
+	    }
+	    printviol(cvm);
+	    printviol(cvs);
+	    printviol(bvm);
+	    printviol(bvs);
+	    printviol(rcm);
+	    printviol(rcs); 
+	    print "";
+	 }
+	 else
+	 {
+	    if (infeas == 1 && sol[name] == "infeasible")
+	    {
+	       printf("ok\n");
+	       pass[type]++;
+	       passes++;
+	    }
+	    else
+	    {
+	       if (infeas && sol[name] != "infeasible")
+		  printf("XX %.2e\n", abs(sol[name]));
+	       else
+		  printf("XX infeasible\n");
 		  
-					fail[type]++;
-		  			fails++;
-	       		}
-	    	}
-		}
-        sum[type] += time;
-        cnt[type]++;
-        counts++;
-        times += time;
-    }
-    prevname = name;
-    timeout  = 0;
-    infeas   = 0;
-    singular = 0;
-    cycling  = 0;
-    obj      = "error";
-    iter     = 0;
-    time     = 0;
-    rows     = 0;
-    cols     = 0;
+	       fail[type]++;
+	       fails++;
+	    }
+	 }
+      }
+      sum[type] += time;
+      cnt[type]++;
+      counts++;
+      times += time;
+   }
+   prevname = name;
+   timeout  = 0;
+   infeas   = 0;
+   singular = 0;
+   cycling  = 0;
+   obj      = "error";
+   iter     = 0;
+   time     = 0;
+   rows     = 0;
+   cols     = 0;
 }
 END {
-    print "";
-    printf(line);
-    printf("Alg            Cnt  Pass  Fail       Time                      relErr   maxVCons sumVCons maxVBoun sumVBoun maxVRedc sumVRedc\n");
-    printf(line);
-    for(i in sum)
-    {
-        printf("%-12s %5d %5d %5d %10.2f                     ",
-	   i, cnt[i], pass[i], fail[i], sum[i]);
-        printviol(relerrsum[i]);
-	printviol(cvmax[i]);
-	printviol(cvsum[i]);
-	printviol(bvmax[i]);
-	printviol(bvsum[i]);
-	printviol(rcmax[i]);
-	printviol(rcsum[i]);
-	print "";
+   print "";
+   printf(line);
+   printf("Alg            Cnt  Pass  Fail       Time                      relErr   maxVCons sumVCons maxVBoun sumVBoun maxVRedc sumVRedc\n");
+   printf(line);
+   for(i in sum)
+   {
+      printf("%-12s %5d %5d %5d %10.2f                     ",
+	     i, cnt[i], pass[i], fail[i], sum[i]);
+      printviol(relerrsum[i]);
+      printviol(cvmax[i]);
+      printviol(cvsum[i]);
+      printviol(bvmax[i]);
+      printviol(bvsum[i]);
+      printviol(rcmax[i]);
+      printviol(rcsum[i]);
+      print "";
 
-	relerrsumsum += relerrsum[i];
-	cvmaxsum += cvmax[i];
-	cvsumsum += cvsum[i];
-	bvmaxsum += bvmax[i];
-	bvsumsum += bvsum[i];
-	rcmaxsum += rcmax[i];
-	rcsumsum += rcsum[i];
-    }
-    printf(line);
-    printf("%-12s %5d %5d %5d %10.2f                     ",
-       "Sum", counts, passes, fails, times);
+      relerrsumsum += relerrsum[i];
+      cvmaxsum += cvmax[i];
+      cvsumsum += cvsum[i];
+      bvmaxsum += bvmax[i];
+      bvsumsum += bvsum[i];
+      rcmaxsum += rcmax[i];
+      rcsumsum += rcsum[i];
+   }
+   printf(line);
+   printf("%-12s %5d %5d %5d %10.2f                     ",
+	  "Sum", counts, passes, fails, times);
 
-    printviol(relerrsumsum);
-    printviol(cvmaxsum);
-    printviol(cvsumsum);
-    printviol(bvmaxsum);
-    printviol(bvsumsum);
-    printviol(rcmaxsum);
-    printviol(rcsumsum);
-    print "";
-    printf(line);
+   printviol(relerrsumsum);
+   printviol(cvmaxsum);
+   printviol(cvsumsum);
+   printviol(bvmaxsum);
+   printviol(bvsumsum);
+   printviol(rcmaxsum);
+   printviol(rcsumsum);
+   print "";
+   printf(line);
 }
 
 
