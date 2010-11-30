@@ -1,4 +1,4 @@
-# $Id: check.awk,v 1.23 2007/10/22 09:00:34 bzforlow Exp $
+# $Id: check.awk,v 1.24 2010/11/30 18:15:34 bzfmilte Exp $
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 #*                                                                           *
 #*   File....: check.awk                                                     *
@@ -23,7 +23,7 @@ function printviol(x)
       printf(" %.2e", abs(x));
 }
 BEGIN {
-    print "$Id: check.awk,v 1.23 2007/10/22 09:00:34 bzforlow Exp $";
+    print "$Id: check.awk,v 1.24 2010/11/30 18:15:34 bzfmilte Exp $";
     print "";
     line = "-----------------------------------------------------------------------------------------------------------------------------\n";
     printf(line);
@@ -35,8 +35,8 @@ BEGIN {
 /=type=/         { type = $2; }
 /IEXAMP22/       { file = $5; }
 /IEXAMP24/       { rows = $4; cols = $6; }
-/IEXAMP27/       { time = $5; } 
-/IEXAMP28/       { iter = $4; }
+/Solution time/  { time = $4; } 
+/Iterations/     { iter = $3; }
 /IEXAMP29/       { obj  = $5; }
 /IEXAMP31/       { infeas = 1; }
 /IEXAMP32/       { infeas = 1; } 
@@ -67,33 +67,33 @@ BEGIN {
         else
         {
             printf(line);
-	    printf("%-10s %6d %6d ", name, rows, cols);
+		    printf("%-10s %6d %6d ", name, rows, cols);
         }
-	printf("%-3s %7d %8.2f ", type, iter, time);
+		printf("%-3s %7d %8.2f ", type, iter, time);
 
         if (infeas)
-	    printf("%-14s", "infeasible");
-	else if (timeout)
-	    printf("%-14s", "timeout");
-	else if (cycling)
-	    printf("%-14s", "cycling");
-	else if (singular)
-	    printf("%-14s", "singular");
-	else if (obj == "error")
-	    printf("%-14s", "error");
-	else
-	    printf("%+e ", obj);
+		    printf("%-14s", "infeasible");
+		else if (timeout)
+		    printf("%-14s", "timeout");
+		else if (cycling)
+		    printf("%-14s", "cycling");
+		else if (singular)
+		    printf("%-14s", "singular");
+		else if (obj == "error")
+		    printf("%-14s", "error");
+		else
+		    printf("%+e ", obj);
 
-	if (timeout)
-	   printf("\n");
-	else if ( obj == "error" && !infeas)
-	  {
-	    printf("XX\n");
-	    fail[type]++;
-	    fails++;
-	  }
-	else
-	{
+		if (timeout)
+		   printf("\n");
+		else if ( obj == "error" && !infeas)
+		{
+	    	printf("XX\n");
+	    	fail[type]++;
+	    	fails++;
+	  	}
+		else
+		{
             if (!infeas && sol[name] != "infeasible")
             {
                 abserr = abs(sol[name] - obj);
@@ -103,46 +103,46 @@ BEGIN {
                     relerr = abserr;
 
     	        if ((abserr < 1e-4) || (relerr < 1e-5))
-		{
-		   printf("ok %.2e", relerr);
-		   pass[type]++;
-                   relerrsum[type] += relerr;
-		   passes++;
-		}
-		else
-		{
-		   printf("XX %.2e", abserr);
-		   fail[type]++;
-		   fails++;
-		}
-		printviol(cvm);
-		printviol(cvs);
-		printviol(bvm);
-		printviol(bvs);
-		printviol(rcm);
-		printviol(rcs); 
-		print "";
-	    }
-	    else
-	    {
-	       if (infeas == 1 && sol[name] == "infeasible")
-	       {
-		  printf("ok\n");
-		  pass[type]++;
-		  passes++;
-	       }
-	       else
-	       {
-		  if (infeas && sol[name] != "infeasible")
-		     printf("XX %.2e\n", abs(sol[name]));
-		  else
-		     printf("XX infeasible\n");
+				{
+		   			printf("ok %.2e", relerr);
+				   	pass[type]++;
+                   	relerrsum[type] += relerr;
+					passes++;
+				}
+				else
+				{
+					printf("XX %.2e", abserr);
+					fail[type]++;
+		   			fails++;
+				}
+				printviol(cvm);
+				printviol(cvs);
+				printviol(bvm);
+				printviol(bvs);
+				printviol(rcm);
+				printviol(rcs); 
+				print "";
+	    	}
+	    	else
+	    	{
+	    		if (infeas == 1 && sol[name] == "infeasible")
+	       		{
+		  			printf("ok\n");
+					pass[type]++;
+					passes++;
+	    		}
+				else
+	    		{
+					if (infeas && sol[name] != "infeasible")
+		    			printf("XX %.2e\n", abs(sol[name]));
+					else
+		    			printf("XX infeasible\n");
 		  
-		  fail[type]++;
-		  fails++;
-	       }
-	    }
-	}
+					fail[type]++;
+		  			fails++;
+	       		}
+	    	}
+		}
         sum[type] += time;
         cnt[type]++;
         counts++;
