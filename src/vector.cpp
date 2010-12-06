@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector.cpp,v 1.18 2010/09/16 17:45:04 bzfgleix Exp $"
+#pragma ident "@(#) $Id: vector.cpp,v 1.19 2010/12/06 19:14:39 bzfgleix Exp $"
 
 #include <iostream>
 
@@ -67,12 +67,22 @@ Vector& Vector::operator+=(const Vector& vec)
 
 Vector& Vector::operator+=(const SVector& vec)
 {
-   // for (int i = vec.size(); i > 0; --i)
-   for( int i = 0; i < vec.size(); ++i )
+   for( int i = vec.size()-1; i >= 0 ; i-- )
    {
       assert(vec.index(i) >= 0);
       assert(vec.index(i) < dim());
       val[vec.index(i)] += vec.value(i);
+   }
+   return *this;
+}
+
+Vector& Vector::operator+=(const SSVector& vec)
+{
+   for( int i = vec.size()-1; i >= 0 ; i-- )
+   {
+      assert(vec.index(i) >= 0);
+      assert(vec.index(i) < dim());
+      val[vec.index(i)] -= vec.value(i);
    }
    return *this;
 }
@@ -87,8 +97,18 @@ Vector& Vector::operator-=(const Vector& vec)
 
 Vector& Vector::operator-=(const SVector& vec)
 {
-   // for (int i = vec.size(); i--;)
-   for( int i = 0; i < vec.size(); ++i )
+   for( int i = vec.size()-1; i >= 0 ; i-- )
+   {
+      assert(vec.index(i) >= 0);
+      assert(vec.index(i) < dim());
+      val[vec.index(i)] -= vec.value(i);
+   }
+   return *this;
+}
+
+Vector& Vector::operator-=(const SSVector& vec)
+{
+   for( int i = vec.size()-1; i >= 0 ; i-- )
    {
       assert(vec.index(i) >= 0);
       assert(vec.index(i) < dim());
