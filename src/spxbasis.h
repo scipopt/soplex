@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.60 2010/10/25 05:02:46 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.61 2010/12/06 18:31:42 bzfgleix Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -418,12 +418,17 @@ public:
    void setStatus(SPxStatus stat)
    {
       METHOD( "SPxBasis::setStatus()" );
-      MSG_DEBUG( spxout << "DBSTAT01 SPxBasis::setStatus(): status: "
-                 << int(thestatus) << " (" << thestatus << ") -> "
-                 << int(stat) << " (" << stat << ")" << std::endl; )
-      thestatus = stat;
-      if( stat == NO_PROBLEM )
-         invalidate();
+      
+      if( thestatus != stat )
+      {
+         MSG_DEBUG( spxout << "DBSTAT01 SPxBasis::setStatus(): status: "
+                    << int(thestatus) << " (" << thestatus << ") -> "
+                    << int(stat) << " (" << stat << ")" << std::endl; )
+
+         thestatus = stat;
+         if( stat == NO_PROBLEM )
+            invalidate();
+      }
    }
 
    ///
