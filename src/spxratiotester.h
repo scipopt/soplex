@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxratiotester.h,v 1.19 2010/09/16 17:45:04 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxratiotester.h,v 1.20 2010/12/06 19:38:13 bzfgleix Exp $"
 
 /**@file  spxratiotester.h
  * @brief Abstract ratio test base class.
@@ -137,7 +137,7 @@ public:
        element of pVec() or coPvec(), that reaches one of its bounds
        with this update.
     */
-   virtual SPxId selectEnter(Real& val) = 0;
+   virtual SPxId selectEnter(Real& val, int leaveIdx) = 0;
 
    /// sets Simplex type.
    /** Informs pricer about (a change of) the loaded SoPlex's Type. In

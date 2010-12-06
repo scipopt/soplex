@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.58 2010/09/16 17:45:02 bzfgleix Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.59 2010/12/06 19:38:14 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -558,7 +558,7 @@ bool SPxSolver::leave(int leaveIdx)
    for(;;)
    {
       Real enterVal = leaveMax;
-      SPxId enterId = theratiotester->selectEnter(enterVal);
+      SPxId enterId = theratiotester->selectEnter(enterVal, leaveIdx);
 
       instableLeaveNum = -1;
       instableLeave = false;

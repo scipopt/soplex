@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultrt.h,v 1.18 2010/09/16 17:45:03 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxdefaultrt.h,v 1.19 2010/12/06 19:38:14 bzfgleix Exp $"
 
 /**@file  spxdefaultrt.h
  * @brief Textbook ratio test for SoPlex.
@@ -82,7 +82,7 @@ public:
    /// 
    virtual int selectLeave(Real& val);
    ///
-   virtual SPxId selectEnter(Real& val);
+   virtual SPxId selectEnter(Real& val, int);
 };
 
 } // namespace soplex

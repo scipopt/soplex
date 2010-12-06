@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.29 2010/09/16 17:45:03 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.30 2010/12/06 19:38:14 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -177,7 +177,7 @@ int SPxDefaultRT::selectLeave(Real& val)
  Here comes the ratio test. It is assumed that theCoPvec.delta() and
  theCoPvec.idx() have been setup correctly!
  */
-SPxId SPxDefaultRT::selectEnter(Real& max)
+SPxId SPxDefaultRT::selectEnter(Real& max, int)
 {
    solver()->coPvec().delta().setup();
    solver()->pVec().delta().setup();
@@ -385,8 +385,7 @@ SPxId SPxDefaultRT::selectEnter(Real& max)
          solver()->coPvec().delta().clearNum(cnum);
       else
          solver()->pVec().delta().clearNum(pnum);
-
-      return SPxDefaultRT::selectEnter(max);
+      return SPxDefaultRT::selectEnter(max, 0);
    }
 
    MSG_DEBUG(

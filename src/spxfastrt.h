@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.h,v 1.25 2010/09/16 17:45:03 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxfastrt.h,v 1.26 2010/12/06 19:38:14 bzfgleix Exp $"
 
 /**@file  spxfastrt.h
  * @brief Fast shifting ratio test.
@@ -216,7 +216,7 @@ public:
    ///
    virtual int selectLeave(Real& val);
    ///
-   virtual SPxId selectEnter(Real& val);
+   virtual SPxId selectEnter(Real& val, int);
    ///
    virtual void setType(SPxSolver::Type type);
    //@}

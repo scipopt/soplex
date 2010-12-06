@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.43 2010/09/16 17:45:03 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.44 2010/12/06 19:38:14 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -1133,7 +1133,7 @@ bool SPxFastRT::shortEnter(
    return false;
 }
 
-SPxId SPxFastRT::selectEnter(Real& val)
+SPxId SPxFastRT::selectEnter(Real& val, int)
 {
    SPxId enterId;
    Real max, sel;

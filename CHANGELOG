@@ -7,6 +7,9 @@ DEVELOPER
 code quality & new features:
 - time for basis updates can now be measured by defining flag MEASUREUPDATETIME in spxbasis.h (off by default)
 
+interface:
+- method selectEnter() in ratio testers now receives index of leaving variable as input parameter
+
 
 30 Sep 2010 - Release 1.5.0
 ===========================

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.31 2010/09/16 17:45:03 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.32 2010/12/06 19:38:14 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -327,7 +327,7 @@ int SPxHarrisRT::selectLeave(Real& val)
 }
 
 
-SPxId SPxHarrisRT::selectEnter(Real& val)
+SPxId SPxHarrisRT::selectEnter(Real& val, int)
 {
    int i, j;
    SPxId enterId;
