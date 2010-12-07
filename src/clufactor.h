@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: clufactor.h,v 1.31 2010/09/16 17:45:02 bzfgleix Exp $"
+#pragma ident "@(#) $Id: clufactor.h,v 1.32 2010/12/07 09:11:56 bzfgleix Exp $"
 
 /**@file  clufactor.h
  * @brief Implementation of sparse LU factorization.
@@ -405,6 +405,15 @@ protected:
       Real* rhs, int* ridx, int rn,     /* rhs1    */
       Real* vec2, Real eps2,            /* result2 */
       Real* rhs2, int* ridx2, int rn2,  /* rhs2    */
+      Real* forest, int* forestNum, int* forestIdx);
+   ///
+   int vSolveRight4update3(Real eps,
+      Real* vec, int* idx,              /* result1 */
+      Real* rhs, int* ridx, int rn,     /* rhs1    */
+      Real* vec2, Real eps2,            /* result2 */
+      Real* rhs2, int* ridx2, int rn2,  /* rhs2    */
+      Real* vec3, Real eps3,            /* result3 */
+      Real* rhs3, int* ridx3, int rn3,  /* rhs3    */
       Real* forest, int* forestNum, int* forestIdx);
    ///
    void vSolveRightNoNZ(Real* vec2, Real eps2,              /* result2 */

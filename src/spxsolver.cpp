@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.50 2010/09/16 17:45:04 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.51 2010/12/07 09:11:56 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -470,6 +470,7 @@ void SPxSolver::clearUpdateVecs(void)
    thePvec->clearUpdate();
    theCoPvec->clearUpdate();
    solveVector2 = 0;
+   solveVector3 = 0;
    coSolveVector2 = 0;
 }
 
@@ -770,6 +771,7 @@ SPxSolver::SPxSolver(
    , m_numCycle(0)
    , initialized (false)
    , solveVector2 (0)
+   , solveVector3 (0)
    , coSolveVector2(0)
    , freePricer (false)
    , freeRatioTester (false)
@@ -979,6 +981,7 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , m_numCycle(base.m_numCycle)
    , initialized(base.initialized)
    , solveVector2 (0)
+   , solveVector3 (0)
    , coSolveVector2(0)
    , instableLeaveNum(base.instableLeaveNum)
    , instableLeave(base.instableLeave)

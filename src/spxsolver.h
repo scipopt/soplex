@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.47 2010/09/16 17:45:04 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.48 2010/12/07 09:11:56 bzfgleix Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -222,6 +222,8 @@ private:
 
    Vector*        solveVector2;      ///< when 2 systems are to solve at a time
    SSVector*      solveVector2rhs;   ///< when 2 systems are to solve at a time
+   Vector*        solveVector3;      ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
+   SSVector*      solveVector3rhs;   ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
    Vector*        coSolveVector2;    ///< when 2 systems are to solve at a time
    SSVector*      coSolveVector2rhs; ///< when 2 systems are to solve at a time
 
@@ -289,7 +291,7 @@ protected:
 
    int             leaveCount;    ///< number of LEAVE iterations
    int             enterCount;    ///< number of ENTER iterations
-
+   
    SPxPricer*      thepricer;
    SPxRatioTester* theratiotester;
    SPxStarter*     thestarter;
@@ -1344,6 +1346,20 @@ public:
       solveVector2    = p_y;
       solveVector2rhs = p_rhs;
    }
+   /// Setup vectors to be solved within Simplex loop.
+   /** Load a second additional vector \p y2 to be #solve%d with the
+    *  basis matrix during the #LEAVE Simplex. The system will be
+    *  solved after #SPxSolver%'s call to SPxRatioTester.
+    *  The system will be solved along with at least one
+    *  other system. Solving several linear system at a time has
+    *  performance advantages over solving them seperately.
+    */
+   void setup4solve2(Vector* p_y2, SSVector* p_rhs2)
+   {
+      assert(type() == LEAVE);
+      solveVector3    = p_y2;
+      solveVector3rhs = p_rhs2;
+   }   
    /// Setup vectors to be cosolved within Simplex loop.
    /** Load vector \p y to be #coSolve%d with the basis matrix during
     *  the #ENTER Simplex. The system will be solved after #SPxSolver%'s

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.cpp,v 1.66 2010/09/16 17:45:03 bzfgleix Exp $"
+#pragma ident "@(#) $Id: slufactor.cpp,v 1.67 2010/12/07 09:11:56 bzfgleix Exp $"
 
 /**@file slufactor.cpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
@@ -148,6 +148,64 @@ void SLUFactor::solve2right4update(
       m = vSolveRight4update2(x.getEpsilon(), x.altValues(), x.altIndexMem(), 
          ssvec.get_ptr(), sidx, n, y.get_ptr(),
          rhs.getEpsilon(), rhs.altValues(), ridx, rsize,
+         forest.altValues(), &f, forest.altIndexMem());
+      x.setSize(m);
+      x.forceSetup();
+      forest.setSize(f);
+      forest.forceSetup();
+   }
+   solveCount++;
+   solveTime.stop();
+}
+
+void SLUFactor::solve3right4update(
+   SSVector&      x,
+   Vector&        y,
+   Vector&        y2,
+   const SVector& b,
+   SSVector&      rhs,
+   SSVector&      rhs2)
+{
+   METHOD( "SLUFactor::solve3right4update()" );
+
+   solveTime.start();
+
+   int  m;
+   int  n;
+   int  f;
+   int* sidx = ssvec.altIndexMem();
+   int  rsize = rhs.size();
+   int* ridx = rhs.altIndexMem();
+   int rsize2 = rhs2.size();
+   int* ridx2 = rhs2.altIndexMem();
+
+   x.clear();
+   y.clear();
+   y2.clear();
+   usetup = true;
+   ssvec = b;
+
+   if (l.updateType == ETA)
+   {
+      n = ssvec.size();
+      m = vSolveRight4update3(x.getEpsilon(),
+         x.altValues(), x.altIndexMem(), ssvec.get_ptr(), sidx, n,
+         y.get_ptr(), rhs.getEpsilon(), rhs.altValues(), ridx, rsize,
+         y2.get_ptr(), rhs2.getEpsilon(),rhs2.altValues(), ridx2, rsize2,
+         0, 0, 0);
+      x.setSize(m);
+      //      x.forceSetup();
+      x.unSetup();
+      eta.setup_and_assign(x);
+   }
+   else
+   {
+      forest.clear();
+      n = ssvec.size();
+      m = vSolveRight4update3(x.getEpsilon(),
+         x.altValues(), x.altIndexMem(), ssvec.get_ptr(), sidx, n,
+         y.get_ptr(), rhs.getEpsilon(), rhs.altValues(), ridx, rsize,
+         y2.get_ptr(), rhs2.getEpsilon(),rhs2.altValues(), ridx2, rsize2,
          forest.altValues(), &f, forest.altIndexMem());
       x.setSize(m);
       x.forceSetup();

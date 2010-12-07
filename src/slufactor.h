@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slufactor.h,v 1.33 2010/10/01 19:30:47 bzfwinkm Exp $"
+#pragma ident "@(#) $Id: slufactor.h,v 1.34 2010/12/07 09:11:56 bzfgleix Exp $"
 
 /**@file  slufactor.h
  * @brief Implementation of Sparse Linear Solver.
@@ -174,6 +174,9 @@ public:
    void solveRight4update(SSVector& x, const SVector& b);
    /// Solves \f$Ax=b\f$ and \f$Ay=d\f$.
    void solve2right4update(SSVector& x, Vector& y, const SVector& b, SSVector& d);
+   /// Solves \f$Ax=b\f$, \f$Ay=d\ and \f$Az=e\f$.
+   void solve3right4update(SSVector& x, Vector& y, Vector& z, 
+                           const SVector& b, SSVector& d, SSVector& e);
    /// Solves \f$Ax=b\f$.
    void solveLeft(Vector& x, const Vector& b);
    /// Solves \f$Ax=b\f$.

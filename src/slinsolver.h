@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slinsolver.h,v 1.23 2010/10/01 19:30:47 bzfwinkm Exp $"
+#pragma ident "@(#) $Id: slinsolver.h,v 1.24 2010/12/07 09:11:56 bzfgleix Exp $"
 
 /**@file  slinsolver.h
  * @brief Sparse Linear Solver virtual base class.
@@ -150,6 +150,13 @@ public:
                                    Vector& y,
                                    const SVector& b,
                                    SSVector& d ) = 0;
+   /// Solves \f$Ax=b\f$, \f$Ay=d\f$ and \f$Az=e\f$.
+   virtual void solve3right4update(SSVector& x,
+                                   Vector& y,
+                                   Vector& z,
+                                   const SVector& b,
+                                   SSVector& d,
+                                   SSVector& e) = 0;
    /// solves \f$x^TA=b^T\f$.
    virtual void solveLeft (Vector& x, const Vector& b) /* const */ = 0;
    /// solves \f$x^TA=b^T\f$.

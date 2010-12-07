@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vsolve.cpp,v 1.24 2010/09/16 17:45:05 bzfgleix Exp $"
+#pragma ident "@(#) $Id: vsolve.cpp,v 1.25 2010/12/07 09:11:56 bzfgleix Exp $"
 
 #include <assert.h>
 
@@ -954,6 +954,133 @@ int CLUFactor::vSolveRight4update2(Real eps,
    {
       rn = vSolveUpdateRight(vec, idx, rn, eps);
       vSolveUpdateRightNoNZ(vec2, eps2);
+   }
+
+   return rn;
+}
+
+int CLUFactor::vSolveRight4update3(Real eps,
+   Real* vec, int* idx,                 /* result1 */
+   Real* rhs, int* ridx, int rn,        /* rhs1    */
+   Real* vec2, Real eps2,               /* result2 */
+   Real* rhs2, int* ridx2, int rn2,     /* rhs2    */
+   Real* vec3, Real eps3,               /* result3 */
+   Real* rhs3, int* ridx3, int rn3,     /* rhs3    */
+   Real* forest, int* forestNum, int* forestIdx)
+{
+   METHOD( "CLUFactor::vSolveRight4update3()" );
+
+   vSolveLright2(rhs, ridx, &rn, eps, rhs2, ridx2, &rn2, eps2);
+   rn3 = vSolveLright(rhs3, ridx3, rn3, eps3);
+   
+   /*  turn index list into a heap
+    */
+   if (forest)
+   {
+      Real x;
+      int i, j, k;
+      int* rperm;
+      int* it = forestIdx;
+
+      rperm = row.perm;
+      for (i = j = 0; i < rn; ++i)
+      {
+         k = ridx[i];
+         x = rhs[k];
+         if (isNotZero(x, eps))
+         {
+            enQueueMax(ridx, &j, rperm[*it++ = k]);
+            forest[k] = x;
+         }
+         else
+            rhs[k] = 0;
+      }
+      *forestNum = rn = j;
+   }
+   else
+   {
+      Real x;
+      int i, j, k;
+      int* rperm;
+
+      rperm = row.perm;
+      for (i = j = 0; i < rn; ++i)
+      {
+         k = ridx[i];
+         x = rhs[k];
+         if (isNotZero(x, eps))
+            enQueueMax(ridx, &j, rperm[k]);
+         else
+            rhs[k] = 0;
+      }
+      rn = j;
+   }
+   if (rn2 > thedim*verySparseFactor4right)
+   {
+      ridx2[0] = thedim - 1;
+   }
+   else
+   {
+      Real x;
+      int i, j, k;
+      int* rperm;
+
+      rperm = row.perm;
+      for (i = j = 0; i < rn2; ++i)
+      {
+         k = ridx2[i];
+         x = rhs2[k];
+         if (x < -eps2)
+         {
+            enQueueMax(ridx2, &j, rperm[k]);
+         }
+         else if (x > eps2)
+         {
+            enQueueMax(ridx2, &j, rperm[k]);
+         }
+         else
+            rhs2[k] = 0;
+      }
+      rn2 = j;
+   }
+   if (rn3 > thedim*verySparseFactor4right)
+   {
+      ridx3[0] = thedim - 1;
+   }
+   else
+   {
+      Real x;
+      int i, j, k;
+      int* rperm;
+
+      rperm = row.perm;
+      for (i = j = 0; i < rn3; ++i)
+      {
+         k = ridx3[i];
+         x = rhs3[k];
+         if (x < -eps3)
+         {
+            enQueueMax(ridx3, &j, rperm[k]);
+         }
+         else if (x > eps3)
+         {
+            enQueueMax(ridx3, &j, rperm[k]);
+         }
+         else
+            rhs3[k] = 0;
+      }
+      rn3 = j;
+   }
+
+   rn = vSolveUright(vec, idx, rhs, ridx, rn, eps);
+   vSolveUrightNoNZ(vec2, rhs2, ridx2, rn2, eps2);
+   vSolveUrightNoNZ(vec3, rhs3, ridx3, rn3, eps3);
+
+   if (!l.updateType)            /* no Forest-Tomlin Updates */
+   {      
+      rn = vSolveUpdateRight(vec, idx, rn, eps);
+      vSolveUpdateRightNoNZ(vec2, eps2);
+      vSolveUpdateRightNoNZ(vec3, eps3);
    }
 
    return rn;

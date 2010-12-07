@@ -9,6 +9,7 @@ code quality & new features:
 
 interface:
 - method selectEnter() in ratio testers now receives index of leaving variable as input parameter
+- adding methods to solve the linear systems of equations for 3 right hand sides simultaneously
 
 
 30 Sep 2010 - Release 1.5.0

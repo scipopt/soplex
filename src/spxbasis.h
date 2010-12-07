@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxbasis.h,v 1.61 2010/12/06 18:31:42 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxbasis.h,v 1.62 2010/12/07 09:11:56 bzfgleix Exp $"
 
 /**@file  spxbasis.h
  * @brief Simplex basis.
@@ -418,7 +418,7 @@ public:
    void setStatus(SPxStatus stat)
    {
       METHOD( "SPxBasis::setStatus()" );
-      
+
       if( thestatus != stat )
       {
          MSG_DEBUG( spxout << "DBSTAT01 SPxBasis::setStatus(): status: "
@@ -595,6 +595,17 @@ public:
       if (!factorized) 
          factorize();
       factor->solve2right4update(x, y, rhsx, rhsy);
+   }
+   /// solves three systems in one call.
+   void solve4update(SSVector& x, Vector& y, Vector& y2,
+                     const SVector& rhsx, SSVector& rhsy, SSVector& rhsy2)
+   {
+      METHOD( "SPxBasis::solve4update()" );
+      if (!factorized) 
+         factorize();
+      assert(rhsy.isSetup());
+      assert(rhsy2.isSetup());
+      factor->solve3right4update(x, y, y2, rhsx, rhsy, rhsy2);
    }
 
    /// Cosolves linear system with basis matrix.

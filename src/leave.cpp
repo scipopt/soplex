@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.59 2010/12/06 19:38:14 bzfgleix Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.60 2010/12/07 09:11:56 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -645,9 +645,46 @@ bool SPxSolver::leave(int leaveIdx)
             const SVector& newVector = *enterVector(enterId);
 
             // update feasibility vectors
-            if (solveVector2)
-               SPxBasis::solve4update (theFvec->delta(), *solveVector2,
-                  newVector, *solveVector2rhs);
+            if( solveVector2 != NULL && solveVector3 != NULL )
+            {
+               assert(solveVector2->isConsistent());
+               assert(solveVector2rhs->isSetup());
+               assert(solveVector3->isConsistent());
+               assert(solveVector3rhs->isSetup());
+
+               SPxBasis::solve4update(theFvec->delta(),
+                                      *solveVector2,
+                                      *solveVector3,
+                                      newVector,
+                                      *solveVector2rhs,
+                                      *solveVector3rhs);
+
+               // perform update of basic solution
+               (*theFvec) -= (*solveVector3);
+            }
+            else if( solveVector2 != NULL )
+            {
+               assert(solveVector2->isConsistent());
+               assert(solveVector2rhs->isSetup());
+
+               SPxBasis::solve4update(theFvec->delta(),
+                                      *solveVector2,
+                                      newVector,
+                                      *solveVector2rhs);
+            }
+            else if( solveVector3 != NULL )
+            {
+               assert(solveVector3->isConsistent());
+               assert(solveVector3rhs->isSetup());
+
+               SPxBasis::solve4update(theFvec->delta(),
+                                      *solveVector3,
+                                      newVector,
+                                      *solveVector3rhs);
+
+               // perform update of basic solution
+               (*theFvec) -= (*solveVector3);
+            }
             else
                SPxBasis::solve4update (theFvec->delta(), newVector);
 
