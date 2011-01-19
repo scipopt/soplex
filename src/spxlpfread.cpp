@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.66 2010/10/01 18:43:33 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxlpfread.cpp,v 1.67 2011/01/19 14:41:13 bzfgleix Exp $"
 
 /**@file  spxlpfread.cpp
  * @brief Read LP format files.
@@ -98,6 +98,7 @@ static Real readValue(char*& pos)
    char*       t;
    Real        value = 1.0;
    bool        has_digits = false;
+   bool        has_emptyexponent = false;
 
    // 1. sign 
    if ((*s == '+') || (*s == '-'))
@@ -124,6 +125,7 @@ static Real readValue(char*& pos)
    // 5. Exponent
    if (tolower(*s) == 'e')
    {
+      has_emptyexponent = true;
       s++;
 
       // 6. Exponent sign 
@@ -132,9 +134,17 @@ static Real readValue(char*& pos)
 
       // 7. Exponent digits
       while((*s >= '0') && (*s <= '9'))
+      {
+         has_emptyexponent = false;
          s++;      
+      }
    }
    assert(s != pos);
+
+   if( has_emptyexponent )
+   {
+      MSG_WARNING( spxout << "WLPFRD01 Warning: found empty exponent in LP file - check for forbidden variable names with initial 'e' or 'E'\n"; )
+   }
    
    if (!has_digits)
       value = (*pos == '-') ? -1.0 : 1.0;
