@@ -1,8 +1,8 @@
-#--- $Id: make.sunos.x86.gnu.dbg,v 1.1 2008/09/29 08:56:18 bzfviger Exp $
+#--- $Id: make.sunos.x86.gnu.dbg,v 1.2 2011/01/25 13:01:45 bzfwinkm Exp $
 CXX	=	g++
 CPPFLAGS=	-Isrc
 CXXFLAGS=	-O0 -g -ansi $(GCCWARN)
-LDFLAGS	=	-lm -Bstatic
+LDFLAGS	=	-lm
 ARFLAGS	=	crs
 ZLIB_FLAGS	=
 ZLIB_LDFLAGS 	=	-lz

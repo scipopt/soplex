@@ -1,8 +1,8 @@
-#--- $Id: make.darwin.x86.intel.opt,v 1.1 2008/09/29 09:10:45 bzfviger Exp $
+#--- $Id: make.darwin.x86.intel.opt,v 1.2 2011/01/25 13:01:44 bzfwinkm Exp $
 CXX	=	icc
 CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS
 CXXFLAGS=	-O3 -axT -w1 -fno-rtti -par_report0 -vec_report0 -ip
-LDFLAGS =       -lpthread -lm -lstdc++ -Bstatic
+LDFLAGS =       -lpthread -lm -lstdc++
 ARFLAGS	=	crs
 ZLIB_FLAGS	=
 ZLIB_LDFLAGS 	=	-lz
