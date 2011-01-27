@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxratiotester.h,v 1.20 2010/12/06 19:38:13 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxratiotester.h,v 1.21 2011/01/27 14:47:59 bzfgleix Exp $"
 
 /**@file  spxratiotester.h
  * @brief Abstract ratio test base class.
@@ -108,7 +108,7 @@ public:
        returned index, must be the index of an element of fVec(), that
        reaches one of its bounds with this update.
    */
-   virtual int selectLeave(Real& val) = 0;
+   virtual int selectLeave(Real& val, SPxId enterId) = 0;
 
    /// selects variable Id to enter the basis.
    /** Method #selectEnter() is called by the loaded SoPlex solver, when

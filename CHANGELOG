@@ -12,7 +12,8 @@ code quality & new features:
   added using the make option "USRLDFLAGS=-static"
 
 interface:
-- method selectEnter() in ratio testers now receives index of leaving variable as input parameter
+- methods selectEnter() and selectLeave() in ratio testers now receive index/id of leaving/entering variable as input
+  parameter
 - adding methods to solve the linear systems of equations for 3 right hand sides simultaneously
 
 fixed bugs:

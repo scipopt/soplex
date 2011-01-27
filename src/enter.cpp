@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.42 2010/09/16 17:45:02 bzfgleix Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.43 2011/01/27 14:47:59 bzfgleix Exp $"
 
 // #define DEBUGGING 1
 
@@ -847,7 +847,7 @@ bool SPxSolver::enter(SPxId& enterId)
 
    Real leaveVal = -enterMax;
 
-   int leaveIdx = theratiotester->selectLeave(leaveVal);
+   int leaveIdx = theratiotester->selectLeave(leaveVal, enterId);
 
    /*
        We now tried to find a variable to leave the basis. If one has been

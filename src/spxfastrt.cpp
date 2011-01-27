@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.44 2010/12/06 19:38:14 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.45 2011/01/27 14:47:59 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -818,7 +818,7 @@ bool SPxFastRT::minReLeave(Real& sel, int leave, Real maxabs)
    return false;
 }
 
-int SPxFastRT::selectLeave(Real& val)
+int SPxFastRT::selectLeave(Real& val, SPxId)
 {
    Real maxabs, max, sel;
    int leave = -1;

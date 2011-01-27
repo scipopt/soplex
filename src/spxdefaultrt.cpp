@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.30 2010/12/06 19:38:14 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxdefaultrt.cpp,v 1.31 2011/01/27 14:47:59 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -41,7 +41,7 @@ namespace soplex
  * basis selected to leave the basis. -1 indicates that no variable could be
  * selected. Otherwise, parameter \p val contains the chosen fVec.value().
  */
-int SPxDefaultRT::selectLeave(Real& val)
+int SPxDefaultRT::selectLeave(Real& val, SPxId)
 {
    solver()->fVec().delta().setup();
 

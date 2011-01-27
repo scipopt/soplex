@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.h,v 1.23 2010/12/06 19:38:14 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.h,v 1.24 2011/01/27 14:47:59 bzfgleix Exp $"
 
 /**@file  spxharrisrt.h
  * @brief Harris pricing with shifting.
@@ -115,7 +115,7 @@ public:
    /**@name Leave / enter */
    //@{
    ///
-   virtual int selectLeave(Real& val);
+   virtual int selectLeave(Real& val, SPxId);
    ///
    virtual SPxId selectEnter(Real& val, int);
    //@}

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.32 2010/12/06 19:38:14 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxharrisrt.cpp,v 1.33 2011/01/27 14:47:59 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -152,7 +152,7 @@ int SPxHarrisRT::minDelta(
     allways yield an improvement. In that case, we shift the variable toward
     infeasibility and retry. This avoids cycling in the shifted LP.
  */
-int SPxHarrisRT::selectLeave(Real& val)
+int SPxHarrisRT::selectLeave(Real& val, SPxId enterId)
 {
    int i, j;
    Real stab, x, y;
@@ -319,7 +319,8 @@ int SPxHarrisRT::selectLeave(Real& val)
 
 
    if (lastshift != solver()->shift())
-      return selectLeave(val);
+      return selectLeave(val, enterId);
+
    assert(leave >= 0);
 
    val = sel;
