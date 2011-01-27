@@ -8,14 +8,16 @@ code quality & new features:
 - time for basis updates can now be measured by defining flag MEASUREUPDATETIME in spxbasis.h (off by default)
 - LP reader: print warning when encountering a floating point number with empty exponent (hints at variable name with
   initial 'e' or 'E')
+- removed "-static" option from Makefile due to linking troubles on newer systems without static libraries; can still be
+  added using the make option "USRLDFLAGS=-static"
 
 interface:
 - method selectEnter() in ratio testers now receives index of leaving variable as input parameter
 - adding methods to solve the linear systems of equations for 3 right hand sides simultaneously
 
-Makefiles: 
-- removed "-static" option for linking due to troubles on newer systems; can still be added by adding to the make command
-  "USRLDFLAGS=-static"
+fixed bugs:
+- fixed incorrect access to member variables in constructors of class DataHashTable
+
 
 30 Sep 2010 - Release 1.5.0
 ===========================

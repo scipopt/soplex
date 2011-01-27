@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: datahashtable.h,v 1.29 2010/10/01 19:30:47 bzfwinkm Exp $"
+#pragma ident "@(#) $Id: datahashtable.h,v 1.30 2011/01/27 14:34:56 bzfgleix Exp $"
 
 /**@file  datahashtable.h
  * @brief Generic hash table for data objects.
@@ -285,13 +285,14 @@ public:
    DataHashTable& operator=(const DataHashTable& base)
    {
       m_elem = base.m_elem;
-      m_hashfun = base.hashfun;
+      m_hashfun = base.m_hashfun;
       m_memfactor = base.m_memfactor;
       m_used = base.m_used;
       m_hashsize = base.m_hashsize;
 
       assert(m_memfactor > 1.0);
       assert(isConsistent());
+      return *this;
    }
 
    /// copy constructor.
@@ -300,7 +301,7 @@ public:
       , m_hashfun(base.m_hashfun)
       , m_memfactor(base.m_memfactor)
       , m_used(base.m_used)
-      , m_hashsize(base.hashsize)
+      , m_hashsize(base.m_hashsize)
    {
       assert(m_memfactor > 1.0);
       assert(isConsistent());
