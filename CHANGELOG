@@ -11,11 +11,12 @@ code quality & new features:
 - removed "-static" option from Makefile due to linking troubles on newer systems without static libraries; can still be
   added using the make option "USRLDFLAGS=-static"
 - added -fp:precise and -Oi to make.mingw.x86.{cl,intel}.opt
+- added SOPLEX_SUBVERSION to track internal development version
 
 interface:
 - methods selectEnter() and selectLeave() in ratio testers now receive index/id of leaving/entering variable as input
   parameter
-- adding methods to solve the linear systems of equations for 3 right hand sides simultaneously
+- added methods to solve the linear systems of equations for 3 right hand sides simultaneously
 
 fixed bugs:
 - added missing -m64 in LDFLAGS of make.{darwin,sunos}.x86_64.gnu.* and make.{linux,freebsd}.x86_64.gnu.opt*

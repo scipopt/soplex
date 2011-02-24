@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplexmain.cpp,v 1.17 2010/10/25 05:02:46 bzfgleix Exp $"
+#pragma ident "@(#) $Id: soplexmain.cpp,v 1.18 2011/02/24 11:39:09 bzfgleix Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -220,9 +220,10 @@ void print_version_info()
    "************************************************************************\n"
    "*                                                                      *\n"
    "*       SoPlex --- the Sequential object-oriented simPlex.             *\n"
-   "*                  Release ";
+   ;
 
-   const char* banner2 = "                                       *\n"
+   const char* banner2 = 
+   "*                                                                      *\n"
    "*    Copyright (C) 1996      Roland Wunderling                         *\n"
    "*                  1996-2010 Konrad-Zuse-Zentrum                       *\n"
    "*                            fuer Informationstechnik Berlin           *\n"
@@ -234,9 +235,23 @@ void print_version_info()
    "************************************************************************\n"
    ;
 
-   std::cout << banner1 << SOPLEX_VERSION/100 << ".";
-   std::cout << (SOPLEX_VERSION % 100)/10 << ".";
-   std::cout << SOPLEX_VERSION % 10 << banner2 << std::endl;
+   std::cout << banner1;
+
+#if (SOPLEX_SUBVERSION > 0)
+   std::cout <<    "*                  Version "
+             << SOPLEX_VERSION/100 << "."
+             << (SOPLEX_VERSION % 100)/10 << "."
+             << SOPLEX_VERSION % 10 << "."
+             << SOPLEX_SUBVERSION
+             << "                                     *\n";
+#else
+   std::cout <<    "*                  Release "
+             << SOPLEX_VERSION/100 << "."
+             << (SOPLEX_VERSION % 100)/10 << "."
+             << SOPLEX_VERSION % 10
+             << "                                       *\n";
+#endif
+   std::cout << banner2 << std::endl;
 
    /// The following code block is tests and shows compilation parameters.
    std::cout << "compiled with NDEBUG: "
@@ -279,14 +294,27 @@ void print_short_version_info()
 {
    const char* banner1 =
    "************************************************************************\n"
-   "* SoPlex --- the Sequential object-oriented simPlex. Release ";
-   const char* banner2 = "     *\n"
+   "* SoPlex --- the Sequential object-oriented simPlex. ";
+   const char* banner2 =
    "* Copyright (C)  1996-2010 Zuse Institute Berlin                       *\n"
    "************************************************************************\n";
 
-   std::cout << banner1 << SOPLEX_VERSION/100 << ".";
-   std::cout << (SOPLEX_VERSION % 100)/10 << ".";
-   std::cout << SOPLEX_VERSION % 10 << banner2 << std::endl;
+   std::cout << banner1;
+#if (SOPLEX_SUBVERSION > 0)
+   std::cout <<    "Version "
+             << SOPLEX_VERSION/100 << "."
+             << (SOPLEX_VERSION % 100)/10 << "."
+             << SOPLEX_VERSION % 10 << "."
+             << SOPLEX_SUBVERSION
+             << "   *\n";
+#else
+   std::cout <<    "Release "
+             << SOPLEX_VERSION/100 << "."
+             << (SOPLEX_VERSION % 100)/10 << "."
+             << SOPLEX_VERSION % 10
+             << "     *\n";
+#endif
+   std::cout << banner2 << std::endl;
 }
 
 //------------------------------------------------------------------------

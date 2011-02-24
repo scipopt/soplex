@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.48 2010/12/07 09:11:56 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.49 2011/02/24 11:39:09 bzfgleix Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -313,6 +313,11 @@ public:
    int version() const
    {
       return SOPLEX_VERSION;
+   }
+   /// return the internal subversion of SPxSolver as number
+   int subversion() const
+   {
+      return SOPLEX_SUBVERSION;
    }
    /// return the current basis representation.
    Representation rep() const
