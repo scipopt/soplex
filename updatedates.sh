@@ -1,17 +1,15 @@
 #!/bin/bash
 #
-# This bash script updates all copyrights in the SCIP files and posted
+# This bash script updates all copyrights in the SoPlex files and posted
 # those files which contain a copyright which do not have the right format
 #
 # You just have to run this script. There is nothing to adjust. 
 # The correct year is detected through the 'date' function 
 #
 # Note that not all files (usually scripts) contain a copyright. A copyright is only 
-# needed for those files which are part of a SCIP distribution (see makedist.sh)
+# needed for those files which are part of a SoPlex distribution (see makedist.sh)
 #
-# This bash script also changes the copyrights of the SCIP examples
-#
-# $Id: updatedates.sh,v 1.4 2010/09/16 17:45:02 bzfgleix Exp $
+# $Id: updatedates.sh,v 1.5 2011/02/24 11:52:52 bzfgleix Exp $
 
 NEWYEAR=`date +"%Y"`
 LASTYEAR=`expr $NEWYEAR - 1`
