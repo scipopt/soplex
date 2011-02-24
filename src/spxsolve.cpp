@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.116 2010/09/16 17:45:04 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.117 2011/02/24 11:51:15 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -1071,9 +1071,28 @@ SPxSolver::Status SPxSolver::getRedCost (Vector& p_vector) const
    return status();
 }
 
+SPxSolver::Status SPxSolver::getPrimalray (Vector& p_vector) const
+{
+   METHOD( "SPxSolver::getPrimalray()" );
+
+   assert(isInitialized());
+
+   if (!isInitialized())
+   {
+      throw SPxStatusException("XSOLVE10 No Problem loaded");
+      // return NOT_INIT;
+   }
+
+   assert(SPxBasis::status() == SPxBasis::UNBOUNDED);
+   p_vector.clear();
+   p_vector = primalRay;
+
+   return status();
+}
+
 SPxSolver::Status SPxSolver::getDualfarkas (Vector& p_vector) const
 {
-   METHOD( "SPxSolver::getRedDualfarkas()" );
+   METHOD( "SPxSolver::getDualfarkas()" );
 
    assert(isInitialized());
 

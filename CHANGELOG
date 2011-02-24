@@ -17,6 +17,7 @@ interface:
 - methods selectEnter() and selectLeave() in ratio testers now receive index/id of leaving/entering variable as input
   parameter
 - added methods to solve the linear systems of equations for 3 right hand sides simultaneously
+- added method getPrimalray() to classes SoPlex and SPxSolver for primal unbounded LPs
 
 fixed bugs:
 - added missing -m64 in LDFLAGS of make.{darwin,sunos}.x86_64.gnu.* and make.{linux,freebsd}.x86_64.gnu.opt*

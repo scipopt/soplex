@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.cpp,v 1.51 2010/12/07 09:11:56 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolver.cpp,v 1.52 2011/02/24 11:51:15 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -856,6 +856,7 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       theLBbound = base.theLBbound;
       theCoTest = base.theCoTest;
       theTest = base.theTest;
+      primalRay = base.primalRay;
       dualFarkas = base.dualFarkas;
       leaveCount = base.leaveCount;
       enterCount = base.enterCount;
@@ -999,6 +1000,7 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , theLBbound(base.theLBbound)
    , theCoTest(base.theCoTest)
    , theTest(base.theTest)
+   , primalRay(base.primalRay)
    , dualFarkas(base.dualFarkas)
    , leaveCount(base.leaveCount)
    , enterCount(base.enterCount)

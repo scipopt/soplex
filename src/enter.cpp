@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.43 2011/01/27 14:47:59 bzfgleix Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.44 2011/02/24 11:51:14 bzfgleix Exp $"
 
 // #define DEBUGGING 1
 
@@ -967,7 +967,26 @@ bool SPxSolver::enter(SPxId& enterId)
       if (rep() != COLUMN)
          setBasisStatus(SPxBasis::INFEASIBLE);
       else
+      {
+         Real sign;
+
+         primalRay.clear();
+         primalRay.setMax(fVec().delta().size() + 1);
+         sign = leaveVal > 0 ? 1 : -1;
+
+         for( int j = 0; j < fVec().delta().size(); ++j )
+         {
+            SPxId i = baseId(fVec().idx().index(j));
+
+            if( i.isSPxColId() )
+               primalRay.add(number(SPxColId(i)), sign*fVec().delta().value(j));
+         }
+
+         if( enterId.isSPxColId() )
+            primalRay.add(number(SPxColId(enterId)), -sign);
+
          setBasisStatus(SPxBasis::UNBOUNDED);
+      }
       return false;
    }
    return true;

@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplexmain.cpp,v 1.18 2011/02/24 11:39:09 bzfgleix Exp $"
+#pragma ident "@(#) $Id: soplexmain.cpp,v 1.19 2011/02/24 11:51:14 bzfgleix Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -797,6 +797,41 @@ void print_solution_and_status(
 	 MSG_INFO1( spxout << "IEXAMP31 LP is unbounded" << std::endl; )
       else
 	 MSG_INFO1( spxout << "LP is unbounded" << std::endl; )
+
+      if ( print_solution )
+      {
+         DVector objx(work.nCols());
+         if( work.getPrimal(objx) != SPxSolver::ERROR )
+         {
+            MSG_INFO1( spxout << std::endl << "Primal solution (name, id, value):" << std::endl; )
+            for( int i = 0; i < work.nCols(); ++i )
+            {
+               if ( isNotZero( objx[i], 0.001 * work.delta() ) )
+                  MSG_INFO1( spxout << colnames[ work.cId(i) ] << "\t"
+                                    << i << "\t"
+                                    << std::setw(17)
+                                    << std::setprecision( precision )
+                                    << objx[i] << std::endl; )
+            }
+            MSG_INFO1( spxout << "All other variables are zero (within " << std::setprecision(1) << 0.001*work.delta() << ")." << std::endl; )
+         }
+
+         DVector ray(work.nCols());
+         if( work.getPrimalray(ray) != SPxSolver::ERROR )
+         {
+            MSG_INFO1( spxout << std::endl << "Primal ray (name, id, value):" << std::endl; )
+            for( int i = 0; i < work.nCols(); ++i )
+            {
+               if ( isNotZero( ray[i], 0.001 * work.delta() ) )
+                  MSG_INFO1( spxout << colnames[ work.cId(i) ] << "\t"
+                                    << i << "\t"
+                                    << std::setw(17)
+                                    << std::setprecision( precision )
+                                    << ray[i] << std::endl; )
+            }
+            MSG_INFO1( spxout << "All other variables have zero value (within " << std::setprecision(1) << 0.001*work.delta() << ")." << std::endl; )
+         }
+      }
       break;
    case SPxSolver::INFEASIBLE:
       if ( checkMode )

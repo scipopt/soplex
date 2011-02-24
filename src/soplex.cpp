@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.cpp,v 1.100 2010/09/16 17:45:03 bzfgleix Exp $"
+#pragma ident "@(#) $Id: soplex.cpp,v 1.101 2011/02/24 11:51:14 bzfgleix Exp $"
 
 #include <iostream>
 
@@ -502,6 +502,25 @@ SPxSolver::Status SoPlex::getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarSt
       return m_solver.getBasis(rows, cols);
 }
 
+SPxSolver::Status SoPlex::getPrimalray(Vector& primalray) const
+{
+   /// Does not work yet with presolve
+   if (has_simplifier())
+   {
+      MSG_ERROR( spxout << "ESOLVR02 Primal ray with presolving not yet implemented" << std::endl; )
+      throw SPxStatusException("XSOLVR02 Primal ray with presolving not yet implemented");
+   }
+   SPxSolver::Status stat = m_solver.getPrimalray(primalray);
+
+   if (m_postScaler != 0)
+      m_postScaler->unscalePrimal(primalray);
+
+   if (m_preScaler != 0)
+      m_preScaler->unscalePrimal(primalray);
+   
+   return stat;
+}
+  
 SPxSolver::Status SoPlex::getDualfarkas(Vector& dualfarkas) const
 {
    /// Does not work yet with presolve

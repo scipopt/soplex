@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolver.h,v 1.49 2011/02/24 11:39:09 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolver.h,v 1.50 2011/02/24 11:51:15 bzfgleix Exp $"
 
 /**@file  spxsolver.h
  * @brief main LP solver class
@@ -287,6 +287,7 @@ protected:
    DVector        theCoTest;
    DVector        theTest;
 
+   DSVector       primalRay;      ///< stores primal ray in case of unboundedness
    DSVector       dualFarkas;     ///< stores dual farkas proof in case of infeasibility
 
    int             leaveCount;    ///< number of LEAVE iterations
@@ -534,6 +535,10 @@ public:
     *  @throw SPxStatusException if no problem loaded
     */
    virtual Status getRedCost (Vector& vector) const;
+
+   /// get primal ray in case of unboundedness.
+   ///  @throw SPxStatusException if no problem loaded
+   virtual Status getPrimalray (Vector& vector) const;
 
    /// get dual farkas proof of infeasibility.
    ///  @throw SPxStatusException if no problem loaded

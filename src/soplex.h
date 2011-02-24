@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplex.h,v 1.84 2010/10/01 18:20:15 bzfgleix Exp $"
+#pragma ident "@(#) $Id: soplex.h,v 1.85 2011/02/24 11:51:14 bzfgleix Exp $"
 
 /**@file  soplex.h
  * @brief preconfigured \ref soplex::SoPlex "SoPlex" LP-solver.
@@ -228,6 +228,10 @@ public:
 
    /// get current basis, and return solver status.
    SPxSolver::Status getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const;
+
+   /// @throw SPxStatusException if simplifier loaded, this is not yet
+   /// implemented
+   virtual SPxSolver::Status getPrimalray(Vector& vector) const;
 
    /// @throw SPxStatusException if simplifier loaded, this is not yet
    /// implemented
