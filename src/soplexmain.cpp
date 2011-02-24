@@ -4,7 +4,7 @@
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1996      Roland Wunderling                              */
-/*                  1996-2010 Konrad-Zuse-Zentrum                            */
+/*                  1996-2011 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplexmain.cpp,v 1.19 2011/02/24 11:51:14 bzfgleix Exp $"
+#pragma ident "@(#) $Id: soplexmain.cpp,v 1.20 2011/02/24 13:53:39 bzfgleix Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -225,7 +225,7 @@ void print_version_info()
    const char* banner2 = 
    "*                                                                      *\n"
    "*    Copyright (C) 1996      Roland Wunderling                         *\n"
-   "*                  1996-2010 Konrad-Zuse-Zentrum                       *\n"
+   "*                  1996-2011 Konrad-Zuse-Zentrum                       *\n"
    "*                            fuer Informationstechnik Berlin           *\n"
    "*                                                                      *\n"
    "*  SoPlex is distributed under the terms of the ZIB Academic Licence.  *\n"
@@ -296,7 +296,7 @@ void print_short_version_info()
    "************************************************************************\n"
    "* SoPlex --- the Sequential object-oriented simPlex. ";
    const char* banner2 =
-   "* Copyright (C)  1996-2010 Zuse Institute Berlin                       *\n"
+   "* Copyright (C)  1996-2011 Zuse Institute Berlin                       *\n"
    "************************************************************************\n";
 
    std::cout << banner1;
