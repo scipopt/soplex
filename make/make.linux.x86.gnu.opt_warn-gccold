@@ -1,8 +1,8 @@
-#--- $Id: make.linux.x86.gnu.opt_warn-gccold,v 1.2 2011/01/25 13:01:44 bzfwinkm Exp $
+#--- $Id: make.linux.x86.gnu.opt_warn-gccold,v 1.3 2011/02/25 09:31:40 bzfheinz Exp $
 CXX	=	g++
-CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -DWITH_WARNINGS
+CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -m32 -DWITH_WARNINGS
 CXXFLAGS=	-g -O3 -fomit-frame-pointer # -ffloat-store # -malign-double -ffast-math
-LDFLAGS	=	-lm
+LDFLAGS	=	-m32 -lm
 ARFLAGS	=	crs
 ZLIB_FLAGS	=
 ZLIB_LDFLAGS 	=	-lz

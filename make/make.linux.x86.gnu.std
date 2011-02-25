@@ -1,8 +1,8 @@
-#--- $Id: make.linux.x86.gnu.std,v 1.8 2010/09/21 13:27:49 bzfwinkm Exp $
-CXX	=	g++
-CPPFLAGS=	-Isrc -DNDEBUG
-CXXFLAGS=	-O -g -mtune=native
-LDFLAGS	=	-lm
-ARFLAGS	=	crs
+#--- $Id: make.linux.x86.gnu.std,v 1.9 2011/02/25 09:31:40 bzfheinz Exp $
+CXX	  	=	g++
+CPPFLAGS	=	-Isrc -DNDEBUG -m32
+CXXFLAGS	=	-O -g -mtune=native
+LDFLAGS		=	-m32 -lm
+ARFLAGS		=	crs
 ZLIB_FLAGS	=
 ZLIB_LDFLAGS 	=	-lz
