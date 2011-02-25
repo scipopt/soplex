@@ -1,8 +1,8 @@
-#--- $Id: make.linux.x86_64.gnu.opt,v 1.7 2011/01/25 13:01:44 bzfwinkm Exp $
-CXX	=	g++
-CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS
-CXXFLAGS=	-O3 -m64 -mtune=native -fomit-frame-pointer # -malign-double -ffast-math
-LDFLAGS	=	-lm -m64
-ARFLAGS	=	crs
+#--- $Id: make.linux.x86_64.gnu.opt,v 1.8 2011/02/25 09:17:22 bzfheinz Exp $
+CXX	  	=	g++
+CPPFLAGS	=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -m64
+CXXFLAGS	=	-O3 -mtune=native -fomit-frame-pointer # -malign-double -ffast-math
+LDFLAGS		=	-lm -m64
+ARFLAGS		=	crs
 ZLIB_FLAGS	=
 ZLIB_LDFLAGS 	=	-lz
