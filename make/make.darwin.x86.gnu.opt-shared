@@ -1,4 +1,4 @@
-#--- $Id: make.linux.x86.gnu.opt-shared,v 1.5 2011/03/01 16:09:19 bzfheinz Exp $
+#--- $Id: make.darwin.x86.gnu.opt-shared,v 1.1 2011/03/01 16:09:19 bzfheinz Exp $
 CXX		=	g++
 CPPFLAGS	=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -m32 -fPIC
 CXXFLAGS	=	-O3 -mtune=native -fexceptions -fomit-frame-pointer # -malign-double -ffast-math
@@ -11,3 +11,4 @@ LIBBUILD_o      =       -o # the trailing space is important
 LIBEXT		=	so
 ARFLAGS         =
 RANLIB          =
+

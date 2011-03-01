@@ -1,12 +1,12 @@
-#--- $Id: make.linux.x86.gnu.opt-shared,v 1.5 2011/03/01 16:09:19 bzfheinz Exp $
+#--- $Id: make.darwin.x86_64.gnu.opt-shared,v 1.1 2011/03/01 16:09:19 bzfheinz Exp $
 CXX		=	g++
-CPPFLAGS	=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -m32 -fPIC
+CPPFLAGS	=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -fPIC -m64
 CXXFLAGS	=	-O3 -mtune=native -fexceptions -fomit-frame-pointer # -malign-double -ffast-math
-LDFLAGS		=	-m32 -lm -Wl,-rpath,$(CURDIR)/$(LIBDIR)
+LDFLAGS		=	-m64 -lm -Wl,-rpath,$(CURDIR)/$(LIBDIR)
 ZLIB_FLAGS	=
 ZLIB_LDFLAGS 	=	-lz
 LIBBUILD        =       $(CXX)
-LIBBUILDFLAGS   =	-shared -m32 -fPIC
+LIBBUILDFLAGS   =	-shared -m64 -fPIC
 LIBBUILD_o      =       -o # the trailing space is important
 LIBEXT		=	so
 ARFLAGS         =
