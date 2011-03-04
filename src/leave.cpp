@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: leave.cpp,v 1.61 2011/02/24 13:53:38 bzfgleix Exp $"
+#pragma ident "@(#) $Id: leave.cpp,v 1.62 2011/03/04 17:42:20 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -572,10 +572,10 @@ bool SPxSolver::leave(int leaveIdx)
          SPxId none;
 
          change(leaveIdx, none, 0);
+
          /* the following line originally was below in "rejecting leave" case;
             we need it in the unbounded/infeasible case, too, to have the 
             correct basis size */
-
          rejectLeave(leaveNum, leaveId, leaveStat);
             
          if (enterVal != leaveMax)
@@ -601,12 +601,12 @@ bool SPxSolver::leave(int leaveIdx)
                instableLeaveNum = leaveIdx;
 
                // Note: These changes do not survive a refactorization
-               theCoTest[leaveIdx] *= 0.01;
-               //            theCoTest[leaveIdx] -= 2 * delta();
+               theCoTest[leaveIdx] = 0.0;
 
                return true;
             }
          }
+
          if (lastUpdate() > 1)
          {
             MSG_INFO3( spxout << "ILEAVE01 factorization triggered in "
@@ -614,6 +614,7 @@ bool SPxSolver::leave(int leaveIdx)
             factorize();
             return leave(leaveIdx);
          }
+
          MSG_INFO3( spxout << "ILEAVE02 unboundness/infeasiblity found "
                               << "in leave()" << std::endl; )
 
