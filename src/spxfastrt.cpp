@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.46 2011/02/24 13:53:39 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxfastrt.cpp,v 1.47 2011/03/04 19:04:58 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -105,8 +105,8 @@ static Real minStability(Real minStab, Real maxabs)
  * test, we would compute (u - vec[i] + delta)/upd[i]. The code computes instead delta/upd[i].
  */
 int SPxFastRT::maxDelta(
-   Real& val,
-   Real& maxabs,
+   Real& val,                                /* on return: maximum step length */
+   Real& maxabs,                             /* on return: maximum absolute value in upd vector */
    UpdateVector& update,
    const Vector& lowBound,
    const Vector& upBound,
@@ -116,6 +116,7 @@ int SPxFastRT::maxDelta(
    int i, sel;
    Real x, y, max;
    Real u, l;
+   bool columnleaving = thesolver->rep() == SPxSolver::COLUMN && m_type == SPxSolver::LEAVE;
 
    Real mabs = maxabs;
 
@@ -135,6 +136,10 @@ int SPxFastRT::maxDelta(
       {
          i = *idx;
          x = upd[i];
+
+         /* in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables */
+         if( columnleaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
+            continue;
 
          if (x > epsilon)
          {
@@ -189,9 +194,20 @@ int SPxFastRT::maxDelta(
          x = *uval;
          if (x)
          {
+            if (x >= -epsilon && x <= epsilon)
+            {
+               *uval = 0.0;
+               continue;
+            }
+            else
+               *l_idx++ = i;
+
+            /* in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables */
+            if( columnleaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
+               continue;
+
             if (x > epsilon)
             {
-               *l_idx++ = i;
                mabs = (x > mabs) ? x : mabs;
                u = up[i];
                if (u < infinity)
@@ -211,7 +227,6 @@ int SPxFastRT::maxDelta(
             }
             else if (x < -epsilon)
             {
-               *l_idx++ = i;
                mabs = (-x > mabs) ? -x : mabs;
                l = low[i];
                if (l > -infinity)
@@ -229,8 +244,6 @@ int SPxFastRT::maxDelta(
                   }
                }
             }
-            else
-               *uval = 0;
          }
       }
       update.delta().setSize(int(l_idx - update.delta().indexMem()));
@@ -256,6 +269,7 @@ int SPxFastRT::minDelta(
    int i, sel;
    Real x, y, max;
    Real u, l;
+   bool columnleaving = thesolver->rep() == SPxSolver::COLUMN && m_type == SPxSolver::LEAVE;
 
    Real mabs = maxabs;
 
@@ -275,6 +289,10 @@ int SPxFastRT::minDelta(
       {
          i = *idx;
          x = upd[i];
+
+         /* in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables */
+         if( columnleaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
+            continue;
 
          if (x > epsilon)
          {
@@ -327,11 +345,23 @@ int SPxFastRT::minDelta(
       for (i = 0; uval < uend; ++uval, ++i)
       {
          x = *uval;
+
          if (x)
          {
+            if (x >= -epsilon && x <= epsilon)
+            {
+               *uval = 0.0;
+               continue;
+            }
+            else
+               *l_idx++ = i;
+
+            /* in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables */
+            if( columnleaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
+               continue;
+
             if (x > epsilon)
             {
-               *l_idx++ = i;
                mabs = (x > mabs) ? x : mabs;
                l = low[i];
                if (l > -infinity)
@@ -351,7 +381,6 @@ int SPxFastRT::minDelta(
             }
             else if (x < -epsilon)
             {
-               *l_idx++ = i;
                mabs = (-x > mabs) ? -x : mabs;
                u = up[i];
                if (u < infinity)
@@ -369,8 +398,6 @@ int SPxFastRT::minDelta(
                   }
                }
             }
-            else
-               *uval = 0;
          }
       }
       update.delta().setSize(int(l_idx - update.delta().indexMem()));
@@ -401,13 +428,15 @@ int SPxFastRT::minDelta(
 
 SPxId SPxFastRT::maxDelta(
    int& nr,
-   Real& max,
-   Real& maxabs)
+   Real& max,                                /* on return: maximum step length */
+   Real& maxabs)                             /* on return: maximum absolute value in delta vector */
 {
    /* The following cause side effects on coPvec and pVec - both changes may be needed later in
       maxSelect(). We can therefore not move the first function after the (indp >= 0) check. */
+   iscoid = true;
    int indc = maxDelta(max, maxabs,
       thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
+   iscoid = false;
    int indp = maxDelta(max, maxabs,
       thesolver->pVec(), thesolver->lpBound(), thesolver->upBound(), 0, 1);
 
@@ -432,8 +461,10 @@ SPxId SPxFastRT::minDelta(
 {
    /* The following cause side effects on coPvec and pVec - both changes may be needed later in
       minSelect(). We can therefore not move the first function after the (indp >= 0) check. */
+   iscoid = true;
    const int indc = minDelta(max, maxabs,
       thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
+   iscoid = false;
    const int indp = minDelta(max, maxabs,
       thesolver->pVec(), thesolver->lpBound(), thesolver->upBound(), 0, 1);
 
@@ -492,6 +523,7 @@ int SPxFastRT::minSelect(
       if (x > stab)
       {
          y = (low[i] - vec[i]) / x;
+
          if (y >= max)
          {
             val = y;

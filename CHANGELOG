@@ -23,6 +23,7 @@ fixed bugs:
 - added missing -m64 in LDFLAGS of make.{darwin,sunos}.x86_64.gnu.* and make.{linux,freebsd}.x86_64.gnu.opt*
 - added missing -DNDEBUG -DNO_ADDITIONAL_CHECKS in make.mingw.x86.{cl,intel}.opt
 - fixed incorrect access to member variables in constructors of class DataHashTable
+- fixed bug in SPxFastRT: also in the first phase consider only nonbasic entering variables in COLUMN/LEAVING mode
 
 
 30 Sep 2010 - Release 1.5.0
