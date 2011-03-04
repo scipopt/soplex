@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.h,v 1.51 2011/02/24 13:55:46 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxdefines.h,v 1.52 2011/03/04 19:57:12 bzfgleix Exp $"
 
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
@@ -78,19 +78,6 @@ namespace soplex
 #define ASSERT_WARN( prefix, expr ) ( assert( expr ) )
 #endif
 
-
-/**
-   \brief This macro evaluates to true if additional checks for warnings shall be
-          included.
-
-   It will be used to conditionally include larger blocks of code doing additional
-   checking.
-*/
-#if !defined (NO_ADDITIONAL_CHECKS)
-#define ENABLE_ADDITIONAL_CHECKS 1
-#else
-#define ENABLE_ADDITIONAL_CHECKS 0
-#endif
 
 
 /*-----------------------------------------------------------------------------

@@ -1,6 +1,6 @@
-#--- $Id: make.darwin.ppc.gnu.opt,v 1.5 2007/10/19 15:44:24 bzforlow Exp $
+#--- $Id: make.darwin.ppc.gnu.opt,v 1.6 2011/03/04 19:57:10 bzfgleix Exp $
 CXX	=	g++
-CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS
+CPPFLAGS=	-Isrc -DNDEBUG 
 CXXFLAGS=	-O3  \
 		-ffast-math -fforce-addr -funroll-loops #-march=
 LDFLAGS	=	-lm

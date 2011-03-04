@@ -1,6 +1,6 @@
-#--- $Id: make.linux.x86_64.gnu.prf,v 1.1 2009/08/04 16:10:15 bzfgleix Exp $
+#--- $Id: make.linux.x86_64.gnu.prf,v 1.2 2011/03/04 19:57:11 bzfgleix Exp $
 CXX	=	g++
-CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS
+CPPFLAGS=	-Isrc -DNDEBUG 
 CXXFLAGS=	-O2 -g -pg  \
 		-ffast-math -fforce-addr -funroll-loops
 LDFLAGS	=	-lm

@@ -1,6 +1,6 @@
-#--- $Id: make.linux.x86.gnu.opt_warn,v 1.6 2011/02/25 09:31:40 bzfheinz Exp $
+#--- $Id: make.linux.x86.gnu.opt_warn,v 1.7 2011/03/04 19:57:11 bzfgleix Exp $
 CXX	  	=	g++
-CPPFLAGS	=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -DWITH_WARNINGS -m32
+CPPFLAGS	=	-Isrc -DNDEBUG  -DWITH_WARNINGS -m32
 CXXFLAGS	=	-g -O3 -mtune=native  -fomit-frame-pointer # -ffloat-store # -malign-double -ffast-math
 LDFLAGS		=	-m32 -lm
 ARFLAGS		=	crs

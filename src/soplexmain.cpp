@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: soplexmain.cpp,v 1.20 2011/02/24 13:53:39 bzfgleix Exp $"
+#pragma ident "@(#) $Id: soplexmain.cpp,v 1.21 2011/03/04 19:57:12 bzfgleix Exp $"
 
 #include <assert.h>
 #include <math.h>
@@ -270,11 +270,11 @@ void print_version_info()
 #endif
              << std::endl;
 
-   std::cout << "compiled with NO_ADDITIONAL_CHECKS: "
-#ifdef NO_ADDITIONAL_CHECKS
-             << "yes (ENABLE_ADDITIONAL_CHECKS = " << ENABLE_ADDITIONAL_CHECKS << ")"
+   std::cout << "compiled with ENABLE_ADDITIONAL_CHECKS (globally): "
+#ifdef ENABLE_ADDITIONAL_CHECKS
+             << "yes"
 #else
-             << "no (ENABLE_ADDITIONAL_CHECKS = " << ENABLE_ADDITIONAL_CHECKS << ")"
+             << "no"
 #endif
              << std::endl;
 

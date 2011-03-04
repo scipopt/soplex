@@ -1,6 +1,6 @@
-#--- $Id: make.sunos.sparc.gnu.opt,v 1.7 2007/10/19 15:44:24 bzforlow Exp $
+#--- $Id: make.sunos.sparc.gnu.opt,v 1.8 2011/03/04 19:57:11 bzfgleix Exp $
 CXX	=	g++
-CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS
+CPPFLAGS=	-Isrc -DNDEBUG 
 CXXFLAGS=	-O3 -mcpu=v8  \
 		-ffast-math -fforce-addr -funroll-loops
 LDFLAGS	=	-lm

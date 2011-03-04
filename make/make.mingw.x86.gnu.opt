@@ -1,6 +1,6 @@
-#--- $Id: make.mingw.x86.gnu.opt,v 1.1 2010/09/29 16:43:34 bzfviger Exp $
+#--- $Id: make.mingw.x86.gnu.opt,v 1.2 2011/03/04 19:57:11 bzfgleix Exp $
 CXX	=	g++
-CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS
+CPPFLAGS=	-Isrc -DNDEBUG 
 CXXFLAGS=	-O3 -mtune=native  \
 		-ffast-math -fforce-addr -funroll-loops
 LDFLAGS	=	-lm # -static

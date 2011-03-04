@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.44 2011/02/24 13:53:40 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsteeppr.cpp,v 1.45 2011/03/04 19:57:12 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -280,7 +280,7 @@ int SPxSteepPR::selectLeave()
          // assert(coPenalty_ptr[i] >= theeps);
          if( coPenalty_ptr[i] < theeps )
          {
-#if ENABLE_ADDITIONAL_CHECKS
+#ifdef ENABLE_ADDITIONAL_CHECKS
             MSG_WARNING( spxout << "WSTEEP02 SPxSteepPR::selectLeaveX(): coPenalty too small ("
                                 << coPenalty_ptr[i] << "), assuming epsilon (" << theeps << ")!" << std::endl; )
 #endif

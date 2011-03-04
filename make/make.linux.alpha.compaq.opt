@@ -1,6 +1,6 @@
-#--- $Id: make.linux.alpha.compaq.opt,v 1.8 2007/08/17 14:14:08 bzfpfend Exp $
+#--- $Id: make.linux.alpha.compaq.opt,v 1.9 2011/03/04 19:57:10 bzfgleix Exp $
 CXX	=	cxx
-CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS
+CPPFLAGS=	-Isrc -DNDEBUG 
 CXXFLAGS=	-std strict_ansi -O4 -fast -noexceptions -nortti
 LDFLAGS	=	-lcpml -lm
 ARFLAGS	=	crs

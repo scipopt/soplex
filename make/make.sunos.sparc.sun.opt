@@ -1,6 +1,6 @@
-#--- $Id: make.sunos.sparc.sun.opt,v 1.9 2007/08/17 14:14:09 bzfpfend Exp $
+#--- $Id: make.sunos.sparc.sun.opt,v 1.10 2011/03/04 19:57:11 bzfgleix Exp $
 CXX	=	CC
-CPPFLAGS=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS 
+CPPFLAGS=	-Isrc -DNDEBUG  
 CXXFLAGS=	-fast -xprefetch=auto -xipo=2
 LDFLAGS	=	-lm
 RANLIB	=	true

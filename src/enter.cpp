@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: enter.cpp,v 1.45 2011/02/24 13:53:38 bzfgleix Exp $"
+#pragma ident "@(#) $Id: enter.cpp,v 1.46 2011/03/04 19:57:12 bzfgleix Exp $"
 
 // #define DEBUGGING 1
 
@@ -818,7 +818,7 @@ bool SPxSolver::enter(SPxId& enterId)
    //   Base * theFvec->delta() = enterVec 
    if (theFvec->delta().isSetup() && theFvec->delta().size() == 0)
       SPxBasis::solve4update(theFvec->delta(), *enterVec);
-#if ENABLE_ADDITIONAL_CHECKS
+#ifdef ENABLE_ADDITIONAL_CHECKS
    else
    {
       // BH 2005-11-29: This code block seems to check the assertion

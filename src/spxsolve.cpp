@@ -13,7 +13,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsolve.cpp,v 1.118 2011/02/24 13:53:40 bzfgleix Exp $"
+#pragma ident "@(#) $Id: spxsolve.cpp,v 1.119 2011/03/04 19:57:12 bzfgleix Exp $"
 
 //#define DEBUGGING 1
 
@@ -673,7 +673,7 @@ SPxSolver::Status SPxSolver::solve()
       spxout << ")" << std::endl;
    )
 
-#if ENABLE_ADDITIONAL_CHECKS
+#ifdef ENABLE_ADDITIONAL_CHECKS
    /* check if solution is really feasible */
    if( status() == OPTIMAL )
    {
@@ -795,7 +795,7 @@ void SPxSolver::testVecs()
       MSG_INFO3( spxout << "ISOLVE97\t\t" << tmp.length() << std::endl; )
    }
 
-#if ENABLE_ADDITIONAL_CHECKS
+#ifdef ENABLE_ADDITIONAL_CHECKS
    if (type() == ENTER)
    {
       for (int i = 0; i < dim(); ++i)
@@ -829,7 +829,7 @@ void SPxSolver::testVecs()
 bool SPxSolver::terminate()
 {
    METHOD( "SPxSolver::terminate()" );
-#if ENABLE_ADDITIONAL_CHECKS
+#ifdef ENABLE_ADDITIONAL_CHECKS
    if (SPxBasis::status() > SPxBasis::SINGULAR)
       testVecs();
 #endif
@@ -841,7 +841,7 @@ bool SPxSolver::terminate()
 
    if (iteration() > 10 && iteration() % redo == 0)
    {
-#if ENABLE_ADDITIONAL_CHECKS
+#ifdef ENABLE_ADDITIONAL_CHECKS
       DVector cr(*theCoPrhs);
       DVector fr(*theFrhs);
 #endif 
@@ -853,7 +853,7 @@ bool SPxSolver::terminate()
 
       computeFrhs();
 
-#if ENABLE_ADDITIONAL_CHECKS
+#ifdef ENABLE_ADDITIONAL_CHECKS
       cr -= *theCoPrhs;
       fr -= *theFrhs;
       if (cr.length() > delta())

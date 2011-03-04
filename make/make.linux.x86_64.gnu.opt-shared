@@ -1,6 +1,6 @@
-#--- $Id: make.linux.x86_64.gnu.opt-shared,v 1.1 2011/02/25 09:17:22 bzfheinz Exp $
+#--- $Id: make.linux.x86_64.gnu.opt-shared,v 1.2 2011/03/04 19:57:11 bzfgleix Exp $
 CXX		=	g++
-CPPFLAGS	=	-Isrc -DNDEBUG -DNO_ADDITIONAL_CHECKS -m64 -fPIC
+CPPFLAGS	=	-Isrc -DNDEBUG  -m64 -fPIC
 CXXFLAGS	=	-O3 -mtune=native -fexceptions -fomit-frame-pointer # -malign-double -ffast-math
 LDFLAGS		=	-m64 -lm -Wl,-rpath,$(CURDIR)/$(LIBDIR)
 ARFLAGS		=	crs
