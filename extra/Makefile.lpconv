@@ -19,7 +19,7 @@ ARCH            :=      $(shell uname -m | \
 OSTYPE		:=	$(shell uname -s | tr A-Z a-z)
 
 OPT		=	opt
-LINK		=	static
+ZLIB		=	true
 COMP		=	gnu
 CXX		=	g++
 DCXX		=	g++
@@ -51,7 +51,7 @@ GCCWARN		=	-Wall -W -Wpointer-arith -Wbad-function-cast \
 			-Wcast-qual -Wold-style-cast -Wshadow 
 #			-Weffc++ -Wredundant-decls    
 
-BASE            =       $(OSTYPE).$(ARCH).$(COMP).$(OPT).$(LINK)
+BASE            =       $(OSTYPE).$(ARCH).$(COMP).$(OPT)
 TARGET		=	$(NAME).$(BASE)
 LIBNAME		=	soplex.$(BASE)
 BINARY		=	$(BINDIR)/$(TARGET)
@@ -63,9 +63,15 @@ LIBXXX		=	$(addprefix $(OBJDIR)/,$(LIBOBJ))
 OBJSRC		=	$(addprefix $(SRCDIR)/,$(OBJECT:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
 
+
 #-----------------------------------------------------------------------------
 include make/make.$(BASE)
 #-----------------------------------------------------------------------------
+
+ifeq ($(ZLIB),true)
+CPPFLAGS	+=	-DWITH_ZLIB $(ZLIB_FLAGS)
+LDFLAGS		+=	$(ZLIB_LDFLAGS)
+endif
 
 $(BINARY):	$(OBJXXX) $(LIBDIR)/lib$(LIBNAME).a
 		$(CXX) $(CXXFLAGS) $(OBJXXX) \
