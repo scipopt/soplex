@@ -1,4 +1,3 @@
-#--- $Id: make.sunos.sparc.gnu.dbg,v 1.2 2011/03/04 19:57:11 bzfgleix Exp $
 CXX	=	g++
 CPPFLAGS=	-Isrc -DNDEBUG  -DWITH_ZLIB
 CXXFLAGS=	-O0 -mcpu=v8 -fforce-addr -funroll-loops

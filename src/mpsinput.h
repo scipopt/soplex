@@ -13,7 +13,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: mpsinput.h,v 1.19 2011/02/24 13:53:38 bzfgleix Exp $"
 
 /**@file  mpsinput.h
  * @brief Read MPS format files.

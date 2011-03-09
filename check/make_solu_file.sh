@@ -1,5 +1,4 @@
 #!/bin/sh
-# $Id: make_solu_file.sh,v 1.3 2006/01/18 16:14:06 bzfhille Exp $
 
 #
 # Shell script for generating .solu file from a .test file using CPLEX and perplex.

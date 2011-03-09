@@ -13,7 +13,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: cring.h,v 1.10 2011/02/24 13:53:38 bzfgleix Exp $"
 
 #ifndef _CRING_H_
 #define _CRING_H_

@@ -13,7 +13,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxequilisc.cpp,v 1.20 2011/02/24 13:53:39 bzfgleix Exp $"
 
 /**@file  spxequilisc.cpp
  * @brief Equilibrium row/column scaling.

@@ -1,4 +1,3 @@
-#--- $Id: make.htc015,v 1.1 2006/02/03 14:54:47 bzforlow Exp $
 CPPFLAGS += -I/client/include
 LDFLAGS	 += -L/client/lib
 

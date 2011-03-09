@@ -1,4 +1,3 @@
-#--- $Id: make.darwin.x86.gnu.opt-shared,v 1.2 2011/03/04 19:57:10 bzfgleix Exp $
 CXX		=	g++
 CPPFLAGS	=	-Isrc -DNDEBUG  -m32 -fPIC
 CXXFLAGS	=	-O3 -mtune=native -fexceptions -fomit-frame-pointer # -malign-double -ffast-math

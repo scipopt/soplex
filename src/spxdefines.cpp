@@ -13,7 +13,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefines.cpp,v 1.11 2011/02/24 13:53:39 bzfgleix Exp $"
 
 /**@file  spxdefines.cpp
  * @brief Debugging, floating point type and parameter definitions.

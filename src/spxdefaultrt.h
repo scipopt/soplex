@@ -13,7 +13,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxdefaultrt.h,v 1.21 2011/02/24 13:53:39 bzfgleix Exp $"
 
 /**@file  spxdefaultrt.h
  * @brief Textbook ratio test for SoPlex.

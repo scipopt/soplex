@@ -13,7 +13,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: vector.h,v 1.26 2011/02/24 13:53:40 bzfgleix Exp $"
 
 /**@file  vector.h
  * @brief Dense vector for linear algebra.

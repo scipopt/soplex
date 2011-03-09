@@ -13,7 +13,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxout.cpp,v 1.8 2011/02/24 13:53:39 bzfgleix Exp $"
 
 #include "spxout.h"
 #include "exceptions.h"

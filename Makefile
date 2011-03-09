@@ -13,7 +13,6 @@
 #*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  *#
 #*                                                                           *#
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
-# $Id: Makefile,v 1.114 2011/03/07 01:01:54 bzfgleix Exp $		      
 
 #@file    Makefile
 #@brief   SoPlex Makefile

@@ -1,4 +1,3 @@
-# $Id: make_solu_file.awk,v 1.5 2006/03/15 15:39:44 bzfhille Exp $
 #
 # Takes two files:  <CPLEX log> <Perplex log> (order is critical!)
 #

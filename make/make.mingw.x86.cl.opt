@@ -1,4 +1,3 @@
-#--- $Id: make.mingw.x86.cl.opt,v 1.4 2011/03/04 19:57:11 bzfgleix Exp $
 CXX		=	cl -nologo
 CXX_o		=	-Fo
 LINKCXX		=	link -nologo

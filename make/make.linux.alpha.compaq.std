@@ -1,4 +1,3 @@
-#--- $Id: make.linux.alpha.compaq.std,v 1.7 2007/08/17 14:14:08 bzfpfend Exp $
 CXX	=	cxx
 CPPFLAGS=	-Isrc -DNDEBUG
 CXXFLAGS=	-std strict_ansi -O2 -arch host -noexceptions -nortti \

@@ -9,7 +9,6 @@
 # Note that not all files (usually scripts) contain a copyright. A copyright is only 
 # needed for those files which are part of a SoPlex distribution (see makedist.sh)
 #
-# $Id: updatedates.sh,v 1.6 2011/02/24 13:53:37 bzfgleix Exp $
 
 NEWYEAR=`date +"%Y"`
 LASTYEAR=`expr $NEWYEAR - 1`

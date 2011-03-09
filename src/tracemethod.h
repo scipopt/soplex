@@ -13,7 +13,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: tracemethod.h,v 1.9 2011/02/24 13:53:40 bzfgleix Exp $"
 
 /**@file  timer.h
  * @brief TraceMethod class.

@@ -13,7 +13,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: testMemory.cpp,v 1.3 2011/02/24 13:53:40 bzfgleix Exp $"
 
 /* Test a for a bug in the memory allocation, which results in a dramatic increase of the used
  * memory - at least to date (May 2009).

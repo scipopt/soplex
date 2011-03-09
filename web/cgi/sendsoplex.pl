@@ -1,5 +1,4 @@
 #!/softis/bin/perl
-# $Id: sendsoplex.pl,v 1.6 2002/05/01 08:18:20 bzfkocht Exp $
 
 # einige Vereinbarungen, fuer die Lage von Dateien
 # Arbeitsverzeichnis, ggf. aendern
