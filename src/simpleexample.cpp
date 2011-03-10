@@ -13,7 +13,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: simpleexample.cpp,v 1.3 2011/02/24 13:53:38 bzfgleix Exp $"
 
 /**@file   simpleexample.cpp
  * @brief  simple example of how to build up and solve an lp using the SoPlex callable library

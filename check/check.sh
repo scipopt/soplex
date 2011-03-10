@@ -1,5 +1,4 @@
 #!/bin/sh
-# $Id: check.sh,v 1.29 2008/09/03 10:47:48 bzfpfets Exp $
 # Parameters
 # $1 Name of the test, e.g. netlib (needs netlib.test, netlib.solu)
 # $2 Path/Name of the binary, e.g. ../bin/soplex.linux.x86.gnu.opt

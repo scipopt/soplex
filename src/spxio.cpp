@@ -13,7 +13,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxio.cpp,v 1.37 2011/02/24 13:53:39 bzfgleix Exp $"
 
 
 //#define DEBUGGING 1

@@ -13,7 +13,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: ssvector.h,v 1.27 2011/02/24 13:53:40 bzfgleix Exp $"
 
 
 /**@file  ssvector.h

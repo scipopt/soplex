@@ -13,7 +13,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmainsm.h,v 1.25 2011/02/24 13:53:39 bzfgleix Exp $"
 
 /**@file  spxmainsm.h
  * @brief General methods in LP preprocessing.

@@ -13,7 +13,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: testChangeObjective.cpp,v 1.4 2011/02/24 13:53:40 bzfgleix Exp $"
 
 /* Test a for a bug in soplex (version 1.4), which avoids the change of the objective. */
 

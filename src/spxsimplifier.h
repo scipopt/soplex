@@ -13,7 +13,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxsimplifier.h,v 1.25 2011/02/24 13:53:40 bzfgleix Exp $"
 
 /**@file  spxsimplifier.h
  * @brief LP simplification base class.

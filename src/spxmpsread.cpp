@@ -13,7 +13,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpsread.cpp,v 1.48 2011/02/24 13:53:39 bzfgleix Exp $"
 
 /**@file  spxmpsread.cpp
  * @brief Read LP from MPS format file.

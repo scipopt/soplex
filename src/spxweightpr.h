@@ -13,7 +13,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxweightpr.h,v 1.21 2011/02/24 13:53:40 bzfgleix Exp $"
 
 /**@file  spxweightpr.h
  * @brief Weighted pricing.

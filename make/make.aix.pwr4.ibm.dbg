@@ -1,4 +1,3 @@
-#--- $Id: make.aix.pwr4.ibm.dbg,v 1.8 2007/08/17 14:14:07 bzfpfend Exp $
 CXX	=	xlC_r
 CPPFLAGS=	-Isrc
 CXXFLAGS=	-g -q32 -bnoquiet \

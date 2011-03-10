@@ -13,7 +13,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: exercise_LP_changes.cpp,v 1.5 2011/02/24 13:53:40 bzfgleix Exp $"
 
 #include <assert.h>
 #include <math.h>

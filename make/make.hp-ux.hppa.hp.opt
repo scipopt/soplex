@@ -1,4 +1,3 @@
-#--- $Id: make.hp-ux.hppa.hp.opt,v 1.5 2011/03/04 19:57:10 bzfgleix Exp $
 CXX	=	aCC
 CPPFLAGS=	-Isrc -DNDEBUG 
 CXXFLAGS=	-AA +W67 -fast 

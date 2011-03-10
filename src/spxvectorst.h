@@ -13,7 +13,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxvectorst.h,v 1.14 2011/02/24 13:53:40 bzfgleix Exp $"
 
 /**@file  spxvectorst.h
  * @brief Solution vector based start basis.

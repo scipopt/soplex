@@ -13,7 +13,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: testChangeElement.cpp,v 1.6 2011/02/24 13:53:40 bzfgleix Exp $"
 
 /* Test a for a bug in changesoplex.cpp (version 1.3.3), which produces an assert if columns or rows
  *  are added and then changeElement is called.

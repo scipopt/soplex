@@ -1,5 +1,4 @@
 #! /bin/bash
-# $Id: valgrind.sh,v 1.2 2007/10/19 15:44:24 bzforlow Exp $
 #
 # Ths script runs the binary under control of valgrind.
 #

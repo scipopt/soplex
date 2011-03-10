@@ -13,7 +13,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: lpcolset.h,v 1.29 2011/02/24 13:53:38 bzfgleix Exp $"
 
 /**@file  lpcolset.h
  * @brief Set of LP columns.

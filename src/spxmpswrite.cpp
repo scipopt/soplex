@@ -13,7 +13,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: spxmpswrite.cpp,v 1.17 2011/02/24 13:53:39 bzfgleix Exp $"
 
 /**@file  spxmpswrite.cpp
  * @brief Write LP as MPS format file.

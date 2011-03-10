@@ -1,4 +1,3 @@
-# $Id: cover.sh,v 1.5 2001/11/15 08:26:59 bzfkocht Exp $
 BINNAME=`basename $2`
 TSTNAME=`basename $1 .test`
 OUTFILE=cover.$TSTNAME.$BINNAME.out

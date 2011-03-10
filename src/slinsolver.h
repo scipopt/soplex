@@ -13,7 +13,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: slinsolver.h,v 1.25 2011/02/24 13:53:38 bzfgleix Exp $"
 
 /**@file  slinsolver.h
  * @brief Sparse Linear Solver virtual base class.

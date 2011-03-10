@@ -13,7 +13,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma ident "@(#) $Id: unitvector.h,v 1.17 2011/02/24 13:53:40 bzfgleix Exp $"
 
 /**@file  unitvector.h
  * @brief Sparse vector \f$e_i\f$.

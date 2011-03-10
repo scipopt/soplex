@@ -1,4 +1,3 @@
-#--- $Id: make.linux.x86.intel.opt-p4,v 1.9 2011/03/04 19:57:11 bzfgleix Exp $
 CXX	=	icc
 CPPFLAGS=	-Isrc -DNDEBUG 
 CXXFLAGS=	-O3 -tpp7 -xW -Xc -w1 -ip 
