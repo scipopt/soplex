@@ -321,7 +321,7 @@ void SPxSolver::getEnterVals
          enterPric = (*thePvec)[enterIdx];
          enterRO = maxObj(enterIdx);
          ds.colStatus(enterIdx) = SPxBasis::Desc::D_UNDEFINED;
-         enterMax = (enterRO > 0) ? infinity : -infinity;
+         enterMax = (enterRO - enterPric > 0) ? infinity : -infinity;
          break;
 
          // dual/rowwise cases:

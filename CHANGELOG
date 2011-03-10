@@ -26,6 +26,9 @@ fixed bugs:
 - fixed bug in SPxFastRT: also in the first phase consider only nonbasic entering variables in COLUMN/LEAVING mode
 - removed compiler flag NO_ADDITIONAL_CHECKS in code and makefile options: in the future, additional checks are only
   performed when ENABLE_ADDITIONAL_CHECKS is explicitly defined (globally or in a specific file)
+- fixed bug in COLUMN/ENTERING algorithm yielding incorrect detection of unboundedness or inverted primal ray: when
+  deciding whether a free variable entering the basis should increase or decrease from zero, we have to look at the
+  reduced cost, not the objective function
 
 
 30 Sep 2010 - Release 1.5.0
