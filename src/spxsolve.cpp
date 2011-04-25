@@ -205,14 +205,23 @@ SPxSolver::Status SPxSolver::solve()
 
          do
          {
-            MSG_INFO3(
-               if( iteration() % iterationInterval == 0 )
-                  spxout << "ISOLVE74 Enter iteration: " << iteration()
-                         << ", Value = " << value()
-                         << ", Shift = " << shift() << std::endl;
-            )
-            enterId = thepricer->selectEnter();
+            int niters = iteration();
 
+            if ( maxIters >= 0 && niters >= maxIters )
+            {
+               MSG_INFO2( spxout << "ISOLVE53 Maximum number of iterations (" << maxIters
+                                 << ") reached" << std::endl; )
+               m_status = ABORT_ITER;
+               stop = true;
+            }
+            else if( niters % iterationInterval == 0 )
+            {
+               MSG_INFO3( spxout << "ISOLVE74 Enter iteration: " << niters
+                                 << ", Value = " << value()
+                                 << ", Shift = " << shift() << std::endl; )
+            }
+
+            enterId = thepricer->selectEnter();
             if (!enterId.isValid())
             {
                // we are not infeasible and have no shift
@@ -376,15 +385,23 @@ SPxSolver::Status SPxSolver::solve()
 
          do
          {
-            MSG_INFO3(
-               if( iteration() % iterationInterval == 0 )
-                  spxout << "ISOLVE80 Leave Iteration: " << iteration()
-                         << ", Value = " << value()
-                         << ", Shift = " << shift() << std::endl;
-            )
-            
-            leaveNum = thepricer->selectLeave();
+            int niters = iteration();
 
+            if ( maxIters >= 0 && niters >= maxIters )
+            {
+               MSG_INFO2( spxout << "ISOLVE53 Maximum number of iterations (" << maxIters
+                                 << ") reached" << std::endl; )
+               m_status = ABORT_ITER;
+               stop = true;
+            }
+            else if( niters % iterationInterval == 0 )
+            {
+               MSG_INFO3( spxout << "ISOLVE80 Leave Iteration: " << niters
+                                 << ", Value = " << value()
+                                 << ", Shift = " << shift() << std::endl; )
+            }
+
+            leaveNum = thepricer->selectLeave();
             if (leaveNum < 0 && instableLeaveNum >= 0)
             {
                /* no leaving variable was found, but because of instableLeaveNum >= 0 we know
@@ -598,7 +615,7 @@ SPxSolver::Status SPxSolver::solve()
                setType(origtype);
 
             // load original basis
-            int niters = iterations();
+            int niters = iteration();
             loadBasis(origdesc);
 
             // remember iteration count
@@ -883,13 +900,6 @@ bool SPxSolver::terminate()
          unShift();
    }
 
-   if ( maxIters >= 0 && iterations() >= maxIters )
-   {
-      MSG_INFO2( spxout << "ISOLVE53 Maximum number of iterations (" << maxIters
-                        << ") reached" << std::endl; )
-      m_status = ABORT_ITER;
-      return true;
-   }
    if ( maxTime >= 0 && maxTime < infinity && time() >= maxTime )
    {
       MSG_INFO2( spxout << "ISOLVE54 Timelimit (" << maxTime
