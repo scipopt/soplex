@@ -20,7 +20,7 @@
 
 .PHONY:		all depend clean distclean lint doc check test
 
-VERSION		:=	1.5.0.4
+VERSION		:=	1.5.0.5
 
 ARCH		:=	$(shell uname -m | \
 			sed \
