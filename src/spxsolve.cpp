@@ -203,7 +203,7 @@ SPxSolver::Status SPxSolver::solve()
 
          thepricer->setEpsilon(maxDelta);
 
-         while (!stop && (maxIters < 0 || iterations() < maxIters))
+         do
          {
             MSG_INFO3(
                if( iteration() % iterationInterval == 0 )
@@ -264,6 +264,16 @@ SPxSolver::Status SPxSolver::solve()
                   break;
             }
 
+            /* check if we have iterations left */
+            if (maxIters >= 0 && iterations() >= maxIters)
+            {
+               MSG_INFO2( spxout << "ISOLVE53e Maximum number of iterations (" << maxIters
+                                 << ") reached" << std::endl; )
+               m_status = ABORT_ITER;
+               stop = true;
+               break;
+            }
+
             enter(enterId);
             assert((testBounds(), 1));
             thepricer->entered4(lastEntered(), lastIndex());
@@ -319,6 +329,7 @@ SPxSolver::Status SPxSolver::solve()
 
             //@ assert(isConsistent());
          }
+         while (!stop);
 
          MSG_INFO3(
             spxout << "ISOLVE78 Enter finished. iteration: " << iteration() 
@@ -332,38 +343,26 @@ SPxSolver::Status SPxSolver::solve()
                    << ", solver status: " << m_status << " (" << int(m_status) << ")" << std::endl;
          )
 
-         /* check if we are optimal */
-         if (shift() <= epsilon())
-         {
-            // factorize();
-            unShift();
-
-            MSG_INFO3(
-               spxout << "ISOLVE79 maxInfeas: " << maxInfeas()
-                      << ", shift: " << shift()
-                      << ", delta: " << delta() << std::endl;
-            )
-
-            if (maxInfeas() + shift() <= delta())
-            {
-               setBasisStatus(SPxBasis::OPTIMAL);
-               m_status = OPTIMAL;
-               break;
-            }
-         }
-
-         /* check if we have iterations left */
-         if (maxIters >= 0 && iterations() >= maxIters)
-         {
-            MSG_INFO2( spxout << "ISOLVE53e Maximum number of iterations (" << maxIters
-                              << ") reached" << std::endl; )
-            m_status = ABORT_ITER;
-            stop = true;
-            break;
-         }
-
          if (!stop)
          {
+            if (shift() <= epsilon())
+            {
+               // factorize();
+               unShift();
+
+               MSG_INFO3(
+                  spxout << "ISOLVE79 maxInfeas: " << maxInfeas()
+                         << ", shift: " << shift()
+                         << ", delta: " << delta() << std::endl;
+               )
+
+               if (maxInfeas() + shift() <= delta())
+               {
+                  setBasisStatus(SPxBasis::OPTIMAL);
+                  m_status = OPTIMAL;
+                  break;
+               }
+            }
             setType(LEAVE);
             init();
             thepricer->setType(type());
@@ -385,7 +384,7 @@ SPxSolver::Status SPxSolver::solve()
 
          thepricer->setEpsilon(maxDelta);
 
-         while (!stop && (maxIters < 0 || iterations() < maxIters))
+         do
          {
             MSG_INFO3(
                if( iteration() % iterationInterval == 0 )
@@ -464,6 +463,17 @@ SPxSolver::Status SPxSolver::solve()
                if (leaveNum < 0)
                   break;
             }
+
+            /* check if we have iterations left */
+            if (maxIters >= 0 && iterations() >= maxIters)
+            {
+               MSG_INFO2( spxout << "ISOLVE53l Maximum number of iterations (" << maxIters
+                                 << ") reached" << std::endl; )
+               m_status = ABORT_ITER;
+               stop = true;
+               break;
+            }
+
             leave(leaveNum);
             assert((testBounds(), 1));
             thepricer->left4(lastIndex(), lastLeft());
@@ -518,6 +528,7 @@ SPxSolver::Status SPxSolver::solve()
 
             //@ assert(isConsistent());
          }
+         while (!stop);
 
          MSG_INFO3(
             spxout << "ISOLVE84 Leave finished. iteration: " << iteration() 
@@ -530,41 +541,6 @@ SPxSolver::Status SPxSolver::solve()
                    << ", basis status: " << SPxBasis::status() << " (" << int(SPxBasis::status()) << ")"
                    << ", solver status: " << m_status << " (" << int(m_status) << ")" << std::endl;
          )
-
-         /* check if we are optimal */
-         if (shift() <= epsilon())
-         {
-            cycleCount = 0;
-            // factorize();
-            unShift();
-
-            MSG_INFO3(
-               spxout << "ISOLVE87 maxInfeas: " << maxInfeas()
-                      << ", shift: " << shift()
-                      << ", delta: " << delta() << std::endl;
-            )
-
-            // We stop if we are indeed optimal, or if we have already been
-            // two times at this place. In this case it seems futile to
-            // continue.
-            if (maxInfeas() + shift() <= delta() || loopCount >= 2)
-            {
-               setBasisStatus(SPxBasis::OPTIMAL);
-               m_status = OPTIMAL;
-               break;
-            }
-            loopCount++;
-         }
-
-         /* check if we have iterations left */
-         if (maxIters >= 0 && iterations() >= maxIters)
-         {
-            MSG_INFO2( spxout << "ISOLVE53l Maximum number of iterations (" << maxIters
-                              << ") reached" << std::endl; )
-            m_status = ABORT_ITER;
-            stop = true;
-            break;
-         }
 
          if (!stop)
          {
@@ -591,6 +567,29 @@ SPxSolver::Status SPxSolver::solve()
                )
             }
 
+            if (shift() <= epsilon())
+            {
+               cycleCount = 0;
+               // factorize();
+               unShift();
+
+               MSG_INFO3(
+                  spxout << "ISOLVE87 maxInfeas: " << maxInfeas()
+                         << ", shift: " << shift()
+                         << ", delta: " << delta() << std::endl;
+               )
+
+               // We stop if we are indeed optimal, or if we have already been
+               // two times at this place. In this case it seems futile to
+               // continue.
+               if (maxInfeas() + shift() <= delta() || loopCount >= 2)
+               {
+                  setBasisStatus(SPxBasis::OPTIMAL);
+                  m_status = OPTIMAL;
+                  break;
+               }
+               loopCount++;
+            }
             setType(ENTER);
             init();
             thepricer->setType(type());
