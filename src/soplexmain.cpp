@@ -333,12 +333,13 @@ void print_usage_and_exit( const char* const argv[] )
       " -q        display solution quality\n"
       " -br       read file with starting basis from Basfile\n"
       " -bw       write file with optimal basis to Basfile\n"
-      " -lSec     set timelimit to Sec seconds\n"
-      " -dDelta   set maximal allowed bound violation to Delta\n"
-      " -zzEps    set general zero tolerance to Eps\n"
-      " -zfEps    set factorization zero tolerance to Eps\n"
-      " -zuEps    set update zero tolerance to Eps\n"
-      " -vLevel   set verbosity Level: from 0 (ERROR) to 5 (DEBUG), default 2\n"
+      " -l        set time limit in seconds\n"
+      " -L        set iteration limit\n"
+      " -d        set maximal allowed bound violation\n"
+      " -zz       set general zero tolerance\n"
+      " -zf       set factorization zero tolerance\n"
+      " -zu       set update zero tolerance\n"
+      " -v        set verbosity Level: from 0 (ERROR) to 5 (DEBUG), default 2\n"
       " -V        show program version\n"
       " -C        check mode (for check scripts)\n"
       " -h        show this help\n"
@@ -1044,6 +1045,7 @@ int main(int argc, const char* const argv[])
       int                       ratiotest      = 2;
       int                       scaling        = 2;
       int                       simplifying    = 1;
+      int                       iterlimit      = -1;
       Real                      timelimit      = -1.0;
       Real                      delta          = DEFAULT_BND_VIOL;
       Real                      epsilon        = DEFAULT_EPS_ZERO;
@@ -1094,6 +1096,11 @@ int main(int argc, const char* const argv[])
             if (argv[optidx][2] == '\0' )  // use -lx, not -l
                print_usage_and_exit( argv );
             timelimit = atof(&argv[optidx][2]);
+            break;
+         case 'L' :
+            if (argv[optidx][2] == '\0' )  // use -Lx, not -L
+               print_usage_and_exit( argv );
+            iterlimit = atoi(&argv[optidx][2]);
             break;
          case 'p' :
             check_parameter(argv[optidx][2], argv); // use -p[0-5], not -p
@@ -1196,6 +1203,7 @@ int main(int argc, const char* const argv[])
       work.setUtype             ( update );
       work.setDelta             ( delta  );
       work.setTerminationTime   ( timelimit );
+      work.setTerminationIter   ( iterlimit );
       print_algorithm_parameters( work, representation, update );
       assert( work.isConsistent() );
 
