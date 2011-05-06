@@ -203,25 +203,16 @@ SPxSolver::Status SPxSolver::solve()
 
          thepricer->setEpsilon(maxDelta);
 
-         do
+         while (!stop && (maxIters < 0 || iterations() < maxIters))
          {
-            int niters = iteration();
-
-            if ( maxIters >= 0 && niters >= maxIters )
-            {
-               MSG_INFO2( spxout << "ISOLVE53 Maximum number of iterations (" << maxIters
-                                 << ") reached" << std::endl; )
-               m_status = ABORT_ITER;
-               stop = true;
-            }
-            else if( niters % iterationInterval == 0 )
-            {
-               MSG_INFO3( spxout << "ISOLVE74 Enter iteration: " << niters
-                                 << ", Value = " << value()
-                                 << ", Shift = " << shift() << std::endl; )
-            }
-
+            MSG_INFO3(
+               if( iteration() % iterationInterval == 0 )
+                  spxout << "ISOLVE74 Enter iteration: " << iteration()
+                         << ", Value = " << value()
+                         << ", Shift = " << shift() << std::endl;
+            )
             enterId = thepricer->selectEnter();
+
             if (!enterId.isValid())
             {
                // we are not infeasible and have no shift
@@ -328,7 +319,6 @@ SPxSolver::Status SPxSolver::solve()
 
             //@ assert(isConsistent());
          }
-         while (!stop);
 
          MSG_INFO3(
             spxout << "ISOLVE78 Enter finished. iteration: " << iteration() 
@@ -342,26 +332,38 @@ SPxSolver::Status SPxSolver::solve()
                    << ", solver status: " << m_status << " (" << int(m_status) << ")" << std::endl;
          )
 
+         /* check if we are optimal */
+         if (shift() <= epsilon())
+         {
+            // factorize();
+            unShift();
+
+            MSG_INFO3(
+               spxout << "ISOLVE79 maxInfeas: " << maxInfeas()
+                      << ", shift: " << shift()
+                      << ", delta: " << delta() << std::endl;
+            )
+
+            if (maxInfeas() + shift() <= delta())
+            {
+               setBasisStatus(SPxBasis::OPTIMAL);
+               m_status = OPTIMAL;
+               break;
+            }
+         }
+
+         /* check if we have iterations left */
+         if (maxIters >= 0 && iterations() >= maxIters)
+         {
+            MSG_INFO2( spxout << "ISOLVE53e Maximum number of iterations (" << maxIters
+                              << ") reached" << std::endl; )
+            m_status = ABORT_ITER;
+            stop = true;
+            break;
+         }
+
          if (!stop)
          {
-            if (shift() <= epsilon())
-            {
-               // factorize();
-               unShift();
-
-               MSG_INFO3(
-                  spxout << "ISOLVE79 maxInfeas: " << maxInfeas()
-                         << ", shift: " << shift()
-                         << ", delta: " << delta() << std::endl;
-               )
-
-               if (maxInfeas() + shift() <= delta())
-               {
-                  setBasisStatus(SPxBasis::OPTIMAL);
-                  m_status = OPTIMAL;
-                  break;
-               }
-            }
             setType(LEAVE);
             init();
             thepricer->setType(type());
@@ -383,25 +385,17 @@ SPxSolver::Status SPxSolver::solve()
 
          thepricer->setEpsilon(maxDelta);
 
-         do
+         while (!stop && (maxIters < 0 || iterations() < maxIters))
          {
-            int niters = iteration();
-
-            if ( maxIters >= 0 && niters >= maxIters )
-            {
-               MSG_INFO2( spxout << "ISOLVE53 Maximum number of iterations (" << maxIters
-                                 << ") reached" << std::endl; )
-               m_status = ABORT_ITER;
-               stop = true;
-            }
-            else if( niters % iterationInterval == 0 )
-            {
-               MSG_INFO3( spxout << "ISOLVE80 Leave Iteration: " << niters
-                                 << ", Value = " << value()
-                                 << ", Shift = " << shift() << std::endl; )
-            }
-
+            MSG_INFO3(
+               if( iteration() % iterationInterval == 0 )
+                  spxout << "ISOLVE80 Leave Iteration: " << iteration()
+                         << ", Value = " << value()
+                         << ", Shift = " << shift() << std::endl;
+            )
+            
             leaveNum = thepricer->selectLeave();
+
             if (leaveNum < 0 && instableLeaveNum >= 0)
             {
                /* no leaving variable was found, but because of instableLeaveNum >= 0 we know
@@ -524,7 +518,6 @@ SPxSolver::Status SPxSolver::solve()
 
             //@ assert(isConsistent());
          }
-         while (!stop);
 
          MSG_INFO3(
             spxout << "ISOLVE84 Leave finished. iteration: " << iteration() 
@@ -537,6 +530,41 @@ SPxSolver::Status SPxSolver::solve()
                    << ", basis status: " << SPxBasis::status() << " (" << int(SPxBasis::status()) << ")"
                    << ", solver status: " << m_status << " (" << int(m_status) << ")" << std::endl;
          )
+
+         /* check if we are optimal */
+         if (shift() <= epsilon())
+         {
+            cycleCount = 0;
+            // factorize();
+            unShift();
+
+            MSG_INFO3(
+               spxout << "ISOLVE87 maxInfeas: " << maxInfeas()
+                      << ", shift: " << shift()
+                      << ", delta: " << delta() << std::endl;
+            )
+
+            // We stop if we are indeed optimal, or if we have already been
+            // two times at this place. In this case it seems futile to
+            // continue.
+            if (maxInfeas() + shift() <= delta() || loopCount >= 2)
+            {
+               setBasisStatus(SPxBasis::OPTIMAL);
+               m_status = OPTIMAL;
+               break;
+            }
+            loopCount++;
+         }
+
+         /* check if we have iterations left */
+         if (maxIters >= 0 && iterations() >= maxIters)
+         {
+            MSG_INFO2( spxout << "ISOLVE53l Maximum number of iterations (" << maxIters
+                              << ") reached" << std::endl; )
+            m_status = ABORT_ITER;
+            stop = true;
+            break;
+         }
 
          if (!stop)
          {
@@ -563,29 +591,6 @@ SPxSolver::Status SPxSolver::solve()
                )
             }
 
-            if (shift() <= epsilon())
-            {
-               cycleCount = 0;
-               // factorize();
-               unShift();
-
-               MSG_INFO3(
-                  spxout << "ISOLVE87 maxInfeas: " << maxInfeas()
-                         << ", shift: " << shift()
-                         << ", delta: " << delta() << std::endl;
-               )
-
-               // We stop if we are indeed optimal, or if we have already been
-               // two times at this place. In this case it seems futile to
-               // continue.
-               if (maxInfeas() + shift() <= delta() || loopCount >= 2)
-               {
-                  setBasisStatus(SPxBasis::OPTIMAL);
-                  m_status = OPTIMAL;
-                  break;
-               }
-               loopCount++;
-            }
             setType(ENTER);
             init();
             thepricer->setType(type());
@@ -615,7 +620,7 @@ SPxSolver::Status SPxSolver::solve()
                setType(origtype);
 
             // load original basis
-            int niters = iteration();
+            int niters = iterations();
             loadBasis(origdesc);
 
             // remember iteration count
