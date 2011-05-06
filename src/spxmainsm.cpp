@@ -248,6 +248,14 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
             r[m_j] = val;
          }
       }
+      else
+      {
+         // the variable is set to FIXED by other constraints, i.e., this singleton row is redundant
+         assert(x[m_j] > (im_lhs + eps()) && x[m_j] < (im_rhs - eps()));
+
+         rStatus[m_i] = SPxSolver::BASIC;
+         y[m_i] = 0.0;
+      }
       break;
    case SPxSolver::BASIC:
       rStatus[m_i] = SPxSolver::BASIC;
