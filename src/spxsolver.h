@@ -1660,6 +1660,10 @@ public:
    {
       return SPxBasis::status();
    }
+
+   /// check a given basis for validity.
+   bool isBasisValid(DataArray<VarStatus> rows, DataArray<VarStatus> cols);
+
    /// set the lp solver's basis.
    void setBasis(const VarStatus rows[], const VarStatus cols[]);
 

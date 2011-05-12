@@ -128,6 +128,8 @@ SoPlex& SoPlex::operator=(const SoPlex& base)
          m_simplifier = base.m_simplifier->clone();
          m_freeSimplifier = true;
       }
+
+      
    }
 
    return *this;
@@ -247,51 +249,64 @@ SPxSolver::Status SoPlex::solve()
    // assume presolver did NOT solve problem
    m_vanished = false; 
 
-   {  // context for working LP
-      SPxLP work(*this);
+   // working LP
+   SPxLP work(*this);
 
-      // should the LP be scaled
-      if (m_preScaler != 0)
-         m_preScaler->scale(work);
+   // should the LP be scaled
+   if (m_preScaler != 0)
+      m_preScaler->scale(work);
 
-      // should the LP be simplified ?
-      if (m_simplifier != 0)
+   // should the LP be simplified ?
+   if (m_simplifier != 0)
+   {
+      switch(m_simplifier->simplify(work, m_solver.epsilon(), m_solver.delta()))
       {
-         switch(m_simplifier->simplify(work, m_solver.epsilon(), m_solver.delta()))
-         {
-         case SPxSimplifier::UNBOUNDED :
-            m_solver.setBasisStatus(SPxBasis::UNBOUNDED);
-            return SPxSolver::UNBOUNDED;
-         case SPxSimplifier::INFEASIBLE :
-            m_solver.setBasisStatus(SPxBasis::INFEASIBLE);
-            return SPxSolver::INFEASIBLE;
-         case SPxSimplifier::VANISHED :
-            m_vanished = true;
-            return SPxSolver::OPTIMAL;
-         case SPxSimplifier::OKAY:
-            break;
-         default:
-            throw SPxInternalCodeException("XRSOLVR01 This should never happen.");
-         }
-      }
-      // should the LP be scaled after simplifing?
-      if (m_postScaler != 0)
-         m_postScaler->scale(work);
-
-      // If a basis with status at least REGULAR exists (loaded via readBasisFile()
-      // or available from previous simplex run), we check whether it can be (re)used
-      // for the newly loaded LP.
-      if ( m_solver.basis().status() <= SPxBasis::SINGULAR )
-         m_solver.loadLP(work);
-      else
-      {
-         SPxBasis::Desc oldbasisdesc(m_solver.basis().desc());
-         m_solver.loadLP(work);
-         if(m_solver.basis().isDescValid(oldbasisdesc))
-            m_solver.loadBasis(oldbasisdesc);
+      case SPxSimplifier::UNBOUNDED :
+         m_solver.setBasisStatus(SPxBasis::UNBOUNDED);
+         return SPxSolver::UNBOUNDED;
+      case SPxSimplifier::INFEASIBLE :
+         m_solver.setBasisStatus(SPxBasis::INFEASIBLE);
+         return SPxSolver::INFEASIBLE;
+      case SPxSimplifier::VANISHED :
+         m_vanished = true;
+         return SPxSolver::OPTIMAL;
+      case SPxSimplifier::OKAY:
+         break;
+      default:
+         throw SPxInternalCodeException("XRSOLVR01 This should never happen.");
       }
    }
 
+   // should the LP be scaled after simplifing?
+   if (m_postScaler != 0)
+      m_postScaler->scale(work);
+
+   /* if a basis of correct size was set externally, try to load it into the transformed LP */
+   if ( m_colsbasisstatus.size() == work.nCols() && m_rowsbasisstatus.size() == work.nRows() )
+   {
+      m_solver.loadLP(work);
+      if ( m_solver.isBasisValid(m_rowsbasisstatus, m_colsbasisstatus) )
+      {
+         m_solver.setBasis(m_rowsbasisstatus.get_const_ptr(), m_colsbasisstatus.get_const_ptr());
+      }
+      m_colsbasisstatus.clear();
+      m_rowsbasisstatus.clear();
+   }
+   /* if a basis with status at least REGULAR exists (loaded via readBasisFile()
+    * or available from previous simplex run), we check whether it can be (re)used
+    * for the newly loaded LP.
+    */
+   else if ( m_solver.basis().status() <= SPxBasis::SINGULAR )
+   {
+      m_solver.loadLP(work);
+   }
+   else
+   {
+      SPxBasis::Desc oldbasisdesc(m_solver.basis().desc());
+      m_solver.loadLP(work);
+      if(m_solver.basis().isDescValid(oldbasisdesc))
+         m_solver.loadBasis(oldbasisdesc);
+   }
 
    return m_solver.solve();
 }

@@ -121,17 +121,22 @@ void SPxBasis::loadMatrixVecs()
 bool SPxBasis::isDescValid(const Desc& ds)
 {
    METHOD( "SPxBasis::isDescValid()" );
+
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
+
+   int basisdim;
 
    if ( ds.nRows() != theLP->nRows() || ds.nCols() != theLP->nCols() )
       return false;
 
+   basisdim = 0;
    for ( int row = ds.nRows()-1; row >= 0; --row )
    {
       // row is basic
-      if ( ds.rowstat[row] > 0 )
+      if ( theLP->isBasic(ds.rowstat[row]) )
       {
+         basisdim++;
          if ( ds.rowstat[row] != dualRowStatus(row) )
             return false;
       }
@@ -149,8 +154,9 @@ bool SPxBasis::isDescValid(const Desc& ds)
    for ( int col = ds.nCols()-1; col >= 0; --col )
    {
       // col is basic
-      if ( ds.colstat[col] > 0 )
+      if ( theLP->isBasic(ds.colstat[col]) )
       {
+         basisdim++;
          if ( ds.colstat[col] !=  dualColStatus(col) )
             return false;
       }
@@ -165,7 +171,10 @@ bool SPxBasis::isDescValid(const Desc& ds)
       }
    }
 
-   // basis descriptor valid w.r.t. bounds
+   if ( basisdim != theLP->dim() )
+      return false;
+
+   // basis descriptor valid
    return true;
 }
 

@@ -33,6 +33,7 @@ fixed bugs:
 - fixed too early check of iteration limit (now not checked in SPxSolver::terminate() anymore, but at beginning of each
   iteration)
 - fixed bug in unsimplifcation of duplicate rows presolving
+- fixed bug when setting basis through class SoPlex
 
 
 30 Sep 2010 - Release 1.5.0

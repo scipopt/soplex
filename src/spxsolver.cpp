@@ -1423,9 +1423,67 @@ SPxSolver::Status SPxSolver::getBasis(VarStatus row[], VarStatus col[]) const
    return status();
 }
 
+bool SPxSolver::isBasisValid(DataArray<VarStatus> p_rows, DataArray<VarStatus> p_cols)
+{
+   METHOD( "SPxSolver::isBasisValid()" );
+
+   int basisdim;
+
+   if ( p_rows.size() != nRows() || p_cols.size() != nCols() )
+      return false;
+
+   basisdim = 0;
+   for ( int row = nRows()-1; row >= 0; --row )
+   {
+      if ( p_rows[row] == UNDEFINED )
+            return false;
+      // row is basic
+      else if ( p_rows[row] == BASIC )
+      {
+         basisdim++;
+      }
+      // row is nonbasic
+      else
+      {
+         if ( (p_rows[row] == FIXED && lhs(row) != rhs(row))
+              || (p_rows[row] == ON_UPPER && rhs(row) >= infinity)
+              || (p_rows[row] == ON_LOWER && lhs(row) <= -infinity)
+              || (p_rows[row] == ZERO && (lhs(row) > -infinity || rhs(row) < infinity)) )
+            return false;
+      }
+   }
+
+   for ( int col = nCols()-1; col >= 0; --col )
+   {
+      if ( p_cols[col] == UNDEFINED )
+            return false;
+      // col is basic
+      else if ( p_cols[col] == BASIC )
+      {
+         basisdim++;
+      }
+      // col is nonbasic
+      else
+      {
+         if ( (p_cols[col] == FIXED && lower(col) != upper(col))
+              || (p_cols[col] == ON_UPPER && upper(col) >= infinity)
+              || (p_cols[col] == ON_LOWER && lower(col) <= -infinity)
+              || (p_cols[col] == ZERO && (lower(col) > -infinity || upper(col) < infinity)) )
+            return false;
+      }
+   }
+
+   if ( basisdim != dim() )
+      return false;
+
+   // basis valid
+   return true;
+}
+
 void SPxSolver::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
 {
    METHOD( "SPxSolver::setBasis()" );
+
    if (SPxBasis::status() == SPxBasis::NO_PROBLEM)
       SPxBasis::load(this);
 

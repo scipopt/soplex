@@ -55,6 +55,8 @@ protected:
    bool            m_freePreScaler;   ///< true iff m_preScaler should be freed inside of this object
    bool            m_freePostScaler;  ///< true iff m_postScaler should be freed inside of this object
    bool            m_freeSimplifier;  ///< true iff m_simplifier should be freed inside of this object
+   DataArray<SPxSolver::VarStatus> m_colsbasisstatus;
+   DataArray<SPxSolver::VarStatus> m_rowsbasisstatus;
    //@}
 
 public:
@@ -156,7 +158,14 @@ public:
          MSG_ERROR( spxout << "ESOLVR04 setting starting basis with presolving not yet implemented" << std::endl; )
             throw SPxStatusException("XSOLVR04 setting starting basis with presolving not yet implemented");
       }
-      m_solver.setBasis(rows, cols);
+
+      m_colsbasisstatus.reSize(nCols());
+      for (int i = 0; i < nCols(); i++)
+         m_colsbasisstatus[i] = cols[i];
+
+      m_rowsbasisstatus.reSize(nRows());
+      for (int i = 0; i < nRows(); i++)
+         m_rowsbasisstatus[i] = rows[i];
    }
    /// set time limit.
    virtual void setTerminationTime(Real time = infinity)
