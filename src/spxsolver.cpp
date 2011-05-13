@@ -500,6 +500,10 @@ void SPxSolver::factorize()
 
       if (type() == LEAVE)
       {
+         /* we have to recompute theFrhs, because roundoff errors can occur during updating, especially when
+          * columns/rows with large bounds are present
+          */
+         computeFrhs();
          SPxBasis::solve (*theFvec, *theFrhs);
          SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
 
@@ -541,7 +545,7 @@ void SPxSolver::factorize()
       else
       {
          assert(type() == ENTER);
-         
+
          computeCoTest();
          if (pricing() == FULL)
          {
