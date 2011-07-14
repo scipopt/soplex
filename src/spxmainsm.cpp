@@ -3690,12 +3690,10 @@ void SPxMainSM::unsimplify(const Vector& x, const Vector& y, const Vector& s, co
    // undo preprocessing
    for(int k = m_hist.size()-1; k >= 0; --k)
    {
-      const PostStep* psPtr = m_hist[k];
+      m_hist[k]->execute(m_prim, m_dual, m_slack, m_redCost, m_cBasisStat, m_rBasisStat);
 
-      psPtr->execute(m_prim, m_dual, m_slack, m_redCost, m_cBasisStat, m_rBasisStat);
-
-      delete psPtr;
-      psPtr = 0;
+      delete m_hist[k];
+      m_hist[k] = 0;
    }
 
    // for maximization problems, we have to switch signs of dual and reduced cost values back
