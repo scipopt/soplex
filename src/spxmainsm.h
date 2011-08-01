@@ -1152,8 +1152,8 @@ public:
       // delete pointers in m_hist
       for(int k = 0; k < m_hist.size(); ++k)
       {
-         delete m_hist[k];
-         m_hist[k] = 0;
+         if( m_hist[k] != 0 )
+            delete m_hist[k];
       }
    }  
    /// clone function for polymorphism
