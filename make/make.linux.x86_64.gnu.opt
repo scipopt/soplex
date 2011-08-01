@@ -1,6 +1,6 @@
 CXX	  	=	g++
 CPPFLAGS	=	-Isrc -DNDEBUG  -m64
-CXXFLAGS	=	-O3 -mtune=native -fomit-frame-pointer # -malign-double -ffast-math
+CXXFLAGS	=	-O3 -g -mtune=native -fomit-frame-pointer # -malign-double -ffast-math
 LDFLAGS		=	-lm -m64
 ARFLAGS		=	crs
 ZLIB_FLAGS	=

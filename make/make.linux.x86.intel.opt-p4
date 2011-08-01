@@ -1,4 +1,6 @@
-CXX	=	icc
+CXX	=	icpc
+LINKCXX	=	icpc
+DCXX	=	icpc
 CPPFLAGS=	-Isrc -DNDEBUG 
 CXXFLAGS=	-O3 -tpp7 -xW -Xc -w1 -ip 
 LDFLAGS	=	-lm -lstdc++

@@ -1,4 +1,6 @@
 CXX		=	icl -nologo
+LINKCXX		=	icl -nologo
+DCXX		=	icl -nologo
 CXX_o		=	-Fo
 LINKCXX		=	link
 LINKCXX_L	=	-LIBPATH:
