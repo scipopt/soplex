@@ -9,6 +9,7 @@
    @author   Wei Huang
    @author   Benjamin Hiller
    @author   Thorsten Koch
+   @author   Matthias Miltenberger
    @author   Sebastian Orlowski
    @author   Marc Pfetsch
    @author   Andreas Tuchscherer
