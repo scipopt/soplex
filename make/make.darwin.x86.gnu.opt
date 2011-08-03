@@ -1,8 +1,6 @@
-CXX	=	g++
-CPPFLAGS=	-Isrc -DNDEBUG 
-CXXFLAGS=	-O3  \
-		-ffast-math -fforce-addr -funroll-loops #-march=
-LDFLAGS	=	-lm
-ARFLAGS	=	crs
-ZLIB_FLAGS	=
-ZLIB_LDFLAGS 	=	-lz
+CPPFLAGS	+=	-m32
+LDFLAGS		+=	-m32
+
+ifeq ($(SHARED),true)
+LIBBUILDFLAGS	+=     	-m32
+endif

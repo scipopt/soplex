@@ -12,6 +12,7 @@ code quality & new features:
   added using the make option "USRLDFLAGS=-static"
 - added -fp:precise and -Oi to make.mingw.x86.{cl,intel}.opt
 - added SOPLEX_SUBVERSION to track internal development version
+- added SHARED variable in Makefile for creating shared libraries and binaries
 
 interface:
 - methods selectEnter() and selectLeave() in ratio testers now receive index/id of leaving/entering variable as input

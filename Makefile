@@ -42,8 +42,11 @@ OSTYPE		:=	$(shell uname -s | tr '[:upper:]' '[:lower:]' | \
 HOSTNAME	:=	$(shell uname -n | tr '[:upper:]' '[:lower:]')
 
 VERBOSE		=	false
+SHARED		=	false
 OPT		=	opt
-LIBEXT		=	a
+STATICLIBEXT	=	a
+SHAREDLIBEXT	=	so
+LIBEXT		=	$(STATICLIBEXT)
 EXEEXTENSION	=	
 TEST		=	quick
 ALGO		=	1 2 3 4
@@ -77,7 +80,7 @@ CPPFLAGS	=	-Isrc
 CXXFLAGS	=	
 BINOFLAGS	=	
 LIBOFLAGS	=	
-LDFLAGS		=	$(LINKCC_l)m$(LINKLIBSUFFIX)
+LDFLAGS		=	
 ARFLAGS		=	cr
 DFLAGS		=	-MM
 VFLAGS		=	--tool=memcheck --leak-check=yes --show-reachable=yes #--gen-suppressions=yes
@@ -114,6 +117,7 @@ BASE		=	$(OSTYPE).$(ARCH).$(COMP).$(OPT)
 
 LASTSETTINGS	=	$(OBJDIR)/make.lastsettings
 
+
 #------------------------------------------------------------------------------
 #--- NOTHING TO CHANGE FROM HERE ON -------------------------------------------
 #------------------------------------------------------------------------------
@@ -129,10 +133,25 @@ GCCWARN		=	-Wall -W -Wpointer-arith -Wno-unknown-pragmas \
 #GCCWARN =
 #-----------------------------------------------------------------------------
 include make/make.$(BASE)
+-include make/make.$(OSTYPE).$(COMP).$(OPT)
 -include make/local/make.$(HOSTNAME)
 -include make/local/make.$(HOSTNAME).$(COMP)
 -include make/local/make.$(HOSTNAME).$(COMP).$(OPT)
 #-----------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
+# SHARED Libaries
+#-----------------------------------------------------------------------------
+
+ifeq ($(SHARED),true)
+CPPFLAGS	+=	-fPIC
+LIBEXT		=	$(SHAREDLIBEXT)
+LIBBUILD	=	$(LINKCXX)
+LIBBUILDFLAGS	+=      -shared -fPIC
+LIBBUILD_o	= 	-o # the trailing space is important
+ARFLAGS		=
+RANLIB		=
+endif
 
 CXXFLAGS	+=	$(USRCXXFLAGS)
 LDFLAGS		+=	$(USRLDFLAGS)
@@ -295,8 +314,12 @@ touchexternal:	$(ZLIBDEP)
 ifneq ($(ZLIB),$(LAST_ZLIB))
 		@-touch $(ZLIBSRC)
 endif
+ifneq ($(SHARED),$(LAST_SHARED))
+		@-touch $(LIBSRC)
+		@-touch $(BINSRC)
+endif
 		@-rm -f $(LASTSETTINGS)
 		@echo "LAST_ZLIB=$(ZLIB)" >> $(LASTSETTINGS)
-
+		@echo "LAST_SHARED=$(SHARED)" >> $(LASTSETTINGS)
 
 # --- EOF ---------------------------------------------------------------------

@@ -1,7 +1,6 @@
-CXX	  	=	g++
-CPPFLAGS	=	-Isrc -DNDEBUG  -m64
-CXXFLAGS	=	-O3 -g -mtune=native -fomit-frame-pointer # -malign-double -ffast-math
-LDFLAGS		=	-lm -m64
-ARFLAGS		=	crs
-ZLIB_FLAGS	=
-ZLIB_LDFLAGS 	=	-lz
+CPPFLAGS	+=	-m64
+LDFLAGS		+=	-m64
+
+ifeq ($(SHARED),true)
+LIBBUILDFLAGS	+=     	-m64
+endif

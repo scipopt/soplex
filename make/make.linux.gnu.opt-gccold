@@ -1,0 +1,6 @@
+CPPFLAGS	+=	-Isrc -DNDEBUG
+CXXFLAGS	+=	-O3 -fomit-frame-pointer # -g -malign-double -ffast-math
+LDFLAGS		+=	-lm -Wl,-rpath,$(CURDIR)/$(LIBDIR)
+ARFLAGS		=	crs
+ZLIB_FLAGS	=
+ZLIB_LDFLAGS 	=	-lz
