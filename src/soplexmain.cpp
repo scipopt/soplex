@@ -816,20 +816,30 @@ void print_solution_and_status(
             MSG_INFO1( spxout << "All other variables are zero (within " << std::setprecision(1) << 0.001*work.delta() << ")." << std::endl; )
          }
 
+         DVector objcoef(work.nCols());
          DVector ray(work.nCols());
          if( work.getPrimalray(ray) != SPxSolver::ERROR )
          {
+            Real rayobjval = 0.0;
+
+            work.getObj(objcoef);
+
             MSG_INFO1( spxout << std::endl << "Primal ray (name, id, value):" << std::endl; )
             for( int i = 0; i < work.nCols(); ++i )
             {
                if ( isNotZero( ray[i], 0.001 * work.delta() ) )
+               {
+                  rayobjval += ray[i] * objcoef[i];
+
                   MSG_INFO1( spxout << colnames[ work.cId(i) ] << "\t"
                                     << i << "\t"
                                     << std::setw(17)
                                     << std::setprecision( precision )
                                     << ray[i] << std::endl; )
+               }
             }
             MSG_INFO1( spxout << "All other variables have zero value (within " << std::setprecision(1) << 0.001*work.delta() << ")." << std::endl; )
+            MSG_INFO1( spxout << "Objective change per unit along primal ray is " << rayobjval << "." << std::endl; )
          }
       }
       break;

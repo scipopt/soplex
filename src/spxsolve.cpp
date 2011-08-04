@@ -787,17 +787,16 @@ void SPxSolver::testVecs()
    {
       MSG_INFO3( spxout << "ISOLVE93 " << iteration() << ":\tcoP error = \t"
                         << tmp.length() << std::endl; )
+
       tmp.clear();
       SPxBasis::coSolve(tmp, *theCoPrhs);
       multWithBase(tmp);
       tmp -= *theCoPrhs;
-
       MSG_INFO3( spxout << "ISOLVE94\t\t" << tmp.length() << std::endl; )
 
       tmp.clear();
       SPxBasis::coSolve(tmp, *theCoPrhs);
       tmp -= *theCoPvec;
-      
       MSG_INFO3( spxout << "ISOLVE95\t\t" << tmp.length() << std::endl; )
    }
 
@@ -808,10 +807,10 @@ void SPxSolver::testVecs()
    {
       MSG_INFO3( spxout << "ISOLVE96 " << iteration() << ":\t  F error = \t"
                            << tmp.length() << std::endl; )
+
       tmp.clear();
       SPxBasis::solve(tmp, *theFrhs);
       tmp -= *theFvec;
-
       MSG_INFO3( spxout << "ISOLVE97\t\t" << tmp.length() << std::endl; )
    }
 

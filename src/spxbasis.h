@@ -713,6 +713,8 @@ public:
    virtual void writeBasis(std::ostream& os, 
       const NameSet* rownames, const NameSet* colnames) const;
 
+   virtual void printMatrix() const;
+
    /// checks if a Descriptor is valid for the current LP w.r.t. its bounds
    virtual bool isDescValid(const Desc& ds);
 

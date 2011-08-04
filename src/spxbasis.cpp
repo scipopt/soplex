@@ -329,6 +329,10 @@ void SPxBasis::loadSolver(SLinSolver* p_solver, const bool destroy)
  *  - LL: the variable is nonbasic and at its lower bound
  *
  *  The CPLEX format contains an additional indicator 'BS', but this is unsupported here.
+ *
+ *  Nonbasic variables without lower bound have the following default status for SoPlex:
+ *  - at their upper bound if finite,
+ *  - at zero if free.
  */
 bool SPxBasis::readBasis(
    std::istream&  is, 
@@ -388,6 +392,10 @@ bool SPxBasis::readBasis(
    {
       if (theLP->SPxLP::lower(i) == theLP->SPxLP::upper(i))
          l_desc.colstat[i] = Desc::P_FIXED;
+      else if (theLP->SPxLP::lower(i) <= -infinity && theLP->SPxLP::upper(i) >= infinity)
+         l_desc.colstat[i] = Desc::P_FREE;
+      else if (theLP->SPxLP::lower(i) <= -infinity)
+         l_desc.colstat[i] = Desc::P_ON_UPPER;
       else
          l_desc.colstat[i] = Desc::P_ON_LOWER;
    }
@@ -592,12 +600,11 @@ void SPxBasis::writeBasis(
          }
          else
          {
-            /* Default is all slacks basic, all variables on lower bound,
+            /* Default is all non-basic variables on lower bound (if finite) or at zero (if free).
              * nothing to do in this case.
-             * Non basic free variable should better not occur.
              */
-            assert(thedesc.colStatus( col ) == Desc::P_ON_LOWER
-               || thedesc.colStatus( col ) == Desc::P_FIXED);
+            assert(theLP->lower(col) <= -infinity || thedesc.colStatus(col) == Desc::P_ON_LOWER);
+            assert(theLP->lower(col) > -infinity || theLP->upper(col) < infinity || thedesc.colStatus(col) == Desc::P_FREE);
          }
       }
    }
@@ -618,6 +625,17 @@ void SPxBasis::writeBasis(
    os << "ENDATA" << std::endl;
 }
 
+void SPxBasis::printMatrix() const
+{
+   METHOD( "SPxBasis::printMatrix()" );
+
+   assert(matrixIsSetup);
+
+   for( int i = 0; i < matrix.size(); i++ )
+   {
+      spxout << "C" << i << "=" << *matrix[i] << std::endl;
+   }
+}
 
 void SPxBasis::change(
    int i,
