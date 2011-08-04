@@ -39,7 +39,6 @@ namespace soplex
 class SPxPricer;
 class SPxRatioTester;
 class SPxStarter;
-class SLUFactor;
 
 /**@brief   Sequential object-oriented SimPlex.
    @ingroup Algo
