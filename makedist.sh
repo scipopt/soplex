@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION="1.5.0.5"
+VERSION="1.5.0.6"
 NAME="soplex-$VERSION"
 rm -f $NAME
 ln -s . $NAME
@@ -45,9 +45,8 @@ $NAME/src/*
 rm -f $NAME
 
 echo ""
-echo "check version numbers in src/spxdefines.h, doc/xternal.cpp, doc/soplex.dxy, Makefile and makedist.sh ($VERSION):"
+echo "check version numbers in src/spxdefines.h, doc/xternal.cpp, Makefile and makedist.sh ($VERSION):"
 grep "VERSION" src/spxdefines.h
 grep "@version" doc/xternal.cpp
-grep "^PROJECT_NUMBER" doc/soplex.dxy
 grep "^VERSION" Makefile
 grep "^VERSION" makedist.sh
