@@ -27,7 +27,6 @@
 
 namespace soplex
 {
-class SLUFactor;
 class SVector;
 class SSVector;
 

@@ -39,7 +39,7 @@
 
 namespace soplex
 {
-#define MINSTABILITY    REAL(1e-2)
+#define MINSTABILITY    REAL(4e-2)
  
 void SLUFactor::solveRight(Vector& x, const Vector& b) //const
 {

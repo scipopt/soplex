@@ -20,6 +20,10 @@ interface:
 - added methods to solve the linear systems of equations for 3 right hand sides simultaneously
 - added method getPrimalray() to classes SoPlex and SPxSolver for primal unbounded LPs
 - added command line option '-L' to set iteration limit
+- adapted method to read/write basis for free nonbasic variables
+
+performance:
+- increased default Markowitz threshold to 0.04 to increase numerical stability of the factorization 
 
 fixed bugs:
 - added missing -m64 in LDFLAGS of make.{darwin,sunos}.x86_64.gnu.* and make.{linux,freebsd}.x86_64.gnu.opt*

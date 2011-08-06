@@ -240,16 +240,23 @@ void CLUFactor::solveLright(Real* vec)
    {
       if ((x = vec[lrow[i]]) != 0.0)
       {
+         MSG_DEBUG( spxout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl; )
+
          k = lbeg[i];
          idx = &(lidx[k]);
          val = &(lval[k]);
          for (j = lbeg[i + 1]; j > k; --j)
+         {
+            MSG_DEBUG( spxout << "                         -> y" << *idx << " -= " << x << " * " << *val << " = " << x * (*val) << "    -> " << vec[*idx] - x * (*val) << std::endl; )
             vec[*idx++] -= x * (*val++);
+         }
       }
    }
 
    if (l.updateType)                     /* Forest-Tomlin Updates */
    {
+      MSG_DEBUG( spxout << "performing FT updates..." << std::endl; )
+
       end = l.firstUnused;
       for (; i < end; ++i)
       {
@@ -260,7 +267,11 @@ void CLUFactor::solveLright(Real* vec)
          for (j = lbeg[i + 1]; j > k; --j)
             x += vec[*idx++] * (*val++);
          vec[lrow[i]] -= x;
+
+         MSG_DEBUG( spxout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl; )
       }
+
+      MSG_DEBUG( spxout << "finished FT updates." << std::endl; )
    }
 }
 
