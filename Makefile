@@ -18,7 +18,7 @@
 #@brief   SoPlex Makefile
 #@author  Thorsten Koch
 
-.PHONY:		all depend clean distclean lint doc check test
+.PHONY:		all depend clean cleanlib lint doc check test
 
 VERSION		:=	1.5.0.6
 
@@ -211,15 +211,15 @@ $(BINLINK) $(BINSHORTLINK):	$(BINFILE)
 		@rm -f $@
 		cd $(dir $@) && $(LN_s) $(notdir $(BINFILE)) $(notdir $@)
 
-$(BINFILE):	$(BINDIR) $(BINOBJDIR) $(LIBFILE) $(BINOBJFILES)
+$(BINFILE):	$(BINDIR) $(BINOBJDIR) $(LIBOBJFILES) $(BINOBJFILES)
 		@echo "-> linking $@"
-		$(LINKCXX) $(BINOBJFILES) \
-		$(LINKCXX_L)$(LIBDIR) $(LINKCXX_l)$(LIBNAME)$(LINKLIBSUFFIX) $(LDFLAGS) $(LINKCXX_o)$@
+		$(LINKCXX) $(BINOBJFILES) $(LIBOBJFILES) \
+		$(LDFLAGS) $(LINKCXX_o)$@
 
-$(EXAMPLEFILE):	$(BINDIR) $(EXAMPLEOBJDIR) $(LIBFILE) $(EXAMPLEOBJFILES)
+$(EXAMPLEFILE):	$(BINDIR) $(EXAMPLEOBJDIR) $(LIBOBJFILES) $(EXAMPLEOBJFILES)
 		@echo "-> linking $@"
-		$(LINKCXX) $(EXAMPLEOBJFILES) \
-		$(LINKCXX_L)$(LIBDIR) $(LINKCXX_l)$(LIBNAME)$(LINKLIBSUFFIX) $(LDFLAGS) $(LINKCXX_o)$@
+		$(LINKCXX) $(EXAMPLEOBJFILES) $(LIBOBJFILES) \
+		$(LDFLAGS) $(LINKCXX_o)$@
 
 $(LIBFILE):	$(LIBDIR) $(LIBOBJDIR) touchexternal $(LIBOBJFILES)
 		@echo "-> generating library $@"
@@ -254,11 +254,33 @@ memory_exception_test: $(BINFILE)
 		./exception.sh $(TEST).test ../$(BINFILE) '$(ALGO)' '$(LIMIT)' \
 		"$(VALGRIND) $(VFLAGS)" $(VSUPPNAME)
 
-clean:
-		-rm -rf $(OBJDIR)/* $(BINFILE) $(EXAMPLEFILE) $(LIBFILE) $(LIBLINK) $(BINLINK) $(BINSHORTLINK)
+.PHONY: cleanbin
+cleanbin:       $(BINDIR)
+		@echo "remove binary" 
+		@-rm -f $(BINFILE) $(BINLINK) $(BINSHORTLINK)
+		@-rmdir --ignore-fail-on-non-empty $(BINDIR)
 
-distclean:	clean
-		-rm -rf obj/* $(LIBDIR)/lib$(NAME).* $(BINDIR)/$(NAME).* 
+.PHONY: cleanlib
+cleanlib:       $(LIBDIR)
+		@echo "remove library $(LIBFILE)" 
+		@-rm -f $(LIBFILE) $(LIBLINK) $(LIBSHORTLINK)
+		@-rmdir --ignore-fail-on-non-empty $(LIBDIR)
+
+.PHONY: clean
+clean:          cleanlib cleanbin $(LIBOBJDIR) $(BINOBJDIR) $(OBJDIR)
+		@echo "remove objective files" 
+ifneq ($(LIBOBJDIR),)
+		@-rm -f $(LIBOBJDIR)/*.o && rmdir $(LIBOBJDIR)
+endif
+ifneq ($(BINOBJDIR),)
+		@-rm -f $(BINOBJDIR)/*.o && rmdir $(BINOBJDIR)
+endif
+ifneq ($(OBJDIR),)
+		@-rm -f $(LASTSETTINGS)
+		@-rmdir $(OBJDIR)
+		@-rmdir --ignore-fail-on-non-empty obj
+endif
+		@-rm -f $(EXAMPLEFILE)
 
 vimtags:
 		-ctags -o TAGS src/*.cpp src/*.h
