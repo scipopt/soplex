@@ -42,7 +42,7 @@ fixed bugs:
 - fixed bug occuring with large column/row bounds: if we refactorize, we also have to recompute the right hand side of
   Bx=b, because roundoff errors might have occured during its update
 - fixed segmentation fault in simplifier when postsolving is interrupted with an exception
-
+- fixed wrong error output in statistics when an instance is solved during presolve
 
 30 Sep 2010 - Release 1.5.0
 ===========================

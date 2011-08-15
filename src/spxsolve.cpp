@@ -969,6 +969,9 @@ SPxSolver::Status SPxSolver::getPrimal (Vector& p_vector) const
 
    if (!isInitialized())
    {
+      /* exit if presolving/simplifier cleared the problem */
+      if (status() == NO_PROBLEM)
+         return status();
       throw SPxStatusException("XSOLVE06 Not Initialized");
    }
    if (rep() == ROW)
@@ -1018,6 +1021,9 @@ SPxSolver::Status SPxSolver::getDual (Vector& p_vector) const
 
    if (!isInitialized()) 
    {
+      /* exit if presolving/simplifier cleared the problem */
+      if (status() == NO_PROBLEM)
+         return status();
       throw SPxStatusException("XSOLVE08 No Problem loaded");
    }
 
