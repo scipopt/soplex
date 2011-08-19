@@ -51,17 +51,20 @@ private:
    Real  last;           ///< penalty, selected at last iteration.
    DVector penalty;      ///< vector of pricing penalties.
    DVector coPenalty;    ///< vector of pricing penalties.
+   bool refined;         ///< has a refinement step already been tried?
    ///@}
 
    //-------------------------------------
    /**@name Private helpers */
    //@{
+   /// set entering/leaving algorithm
+   void init(SPxSolver::Type);
    /// internal implementation of SPxPricer::selectLeave()
-   int selectLeaveX(Real& best, int start = 0, int incr = 1);
+   int selectLeaveX(Real& best, Real feastol, int start = 0, int incr = 1);
    /// internal implementation of SPxPricer::left4()
    void left4X(int n, const SPxId& id, int start, int incr);
    /// internal implementation of SPxPricer::selectEnter()
-   SPxId selectEnterX(Real& best, int start1 = 0, int incr1 = 1, int start2 = 0, int incr2 = 1);
+   SPxId selectEnterX(Real& best, Real feastol, int start1 = 0, int incr1 = 1, int start2 = 0, int incr2 = 1);
    /// internal implementation of SPxPricer::entered4()
    void entered4X(SPxId id, int n, int start1, int incr1, int start2, int incr2);
    //@}

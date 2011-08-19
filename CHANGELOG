@@ -43,6 +43,9 @@ fixed bugs:
   Bx=b, because roundoff errors might have occured during its update
 - fixed segmentation fault in simplifier when postsolving is interrupted with an exception
 - fixed wrong error output in statistics when an instance is solved during presolve
+- pricer SPxDevex now performs one additional pivot if only slightly feasible/optimal; this helps to prevent suboptimal
+  results on some unsimplified instances
+
 
 30 Sep 2010 - Release 1.5.0
 ===========================

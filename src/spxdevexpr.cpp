@@ -18,6 +18,8 @@
 #include "spxdevexpr.h"
 #include "message.h"
 
+#define DEVEX_REFINETOL 2.0
+
 namespace soplex
 {
 
@@ -40,7 +42,7 @@ bool SPxDevexPR::isConsistent() const
 }
 #endif
 
-void SPxDevexPR::setType(SPxSolver::Type tp)
+void SPxDevexPR::init(SPxSolver::Type tp)
 {
    int i;
    if (tp == SPxSolver::ENTER)
@@ -58,6 +60,12 @@ void SPxDevexPR::setType(SPxSolver::Type tp)
    assert(isConsistent());
 }
 
+void SPxDevexPR::setType(SPxSolver::Type tp)
+{
+   init(tp);
+   refined = false;
+}
+
 /**@todo suspicious: Shouldn't the relation between dim, coDim, Vecs, 
  *       and CoVecs be influenced by the representation ?
  */
@@ -73,11 +81,22 @@ void SPxDevexPR::setRep(SPxSolver::Representation)
 
 int SPxDevexPR::selectLeave()
 {
+   int retid;
    Real val;
-   return selectLeaveX(val);
+
+   retid = selectLeaveX(val, theeps);
+
+   if( retid < 0 && !refined )
+   {
+      refined = true;
+      MSG_INFO3( spxout << "WDEVEX02 trying refinement step..\n"; )
+      retid = selectLeaveX(val, theeps/DEVEX_REFINETOL);
+   }
+
+   return retid;
 }
 
-int SPxDevexPR::selectLeaveX(Real& best, int start, int incr)
+int SPxDevexPR::selectLeaveX(Real& best, Real feastol, int start, int incr)
 {
    Real x;
 
@@ -144,16 +163,29 @@ void SPxDevexPR::left4X(int n, const SPxId& id, int start, int incr)
 
 SPxId SPxDevexPR::selectEnter()
 {
+   SPxId retid;
    Real val;
-   return selectEnterX(val);
+
+   retid = selectEnterX(val, theeps);
+
+   if( !retid.isValid() && !refined )
+   {
+      refined = true;
+      MSG_INFO3( spxout << "WDEVEX02 trying refinement step..\n"; )
+      retid = selectEnterX(val, theeps/DEVEX_REFINETOL);
+   }
+
+   return retid;
 }
 
 SPxId SPxDevexPR::selectEnterX(
    Real& best,
+   Real feastol,
    int start1,
    int incr1,
    int start2,
-   int incr2)
+   int incr2
+   )
 {
    Real x;
 
@@ -173,7 +205,7 @@ SPxId SPxDevexPR::selectEnterX(
 
    for (; start1 < end1; start1 += incr1)
    {
-      if (cTest[start1] < -theeps)
+      if (cTest[start1] < -feastol)
       {
          x = cTest[start1] * cTest[start1] / cpen[start1];
          if (x > bstX1)
@@ -187,7 +219,7 @@ SPxId SPxDevexPR::selectEnterX(
 
    for (; start2 < end2; start2 += incr2)
    {
-      if (test[start2] < -theeps)
+      if (test[start2] < -feastol)
       {
          x = test[start2] * test[start2] / pen[start2];
          if (x > bstX2)
@@ -247,7 +279,7 @@ void SPxDevexPR::entered4X(SPxId /*id*/, int n,
          coPenalty[i] += xi_p * coPvec[i] * coPvec[i];
          if (coPenalty[i] <= 1 || coPenalty[i] > 1e+6)
          {
-            setType(SPxSolver::ENTER);
+            init(SPxSolver::ENTER);
             return;
          }
       }
@@ -258,7 +290,7 @@ void SPxDevexPR::entered4X(SPxId /*id*/, int n,
          penalty[i] += xi_p * pVec[i] * pVec[i];
          if (penalty[i] <= 1 || penalty[i] > 1e+6)
          {
-            setType(SPxSolver::ENTER);
+            init(SPxSolver::ENTER);
             return;
          }
       }
