@@ -17,17 +17,17 @@
 /**@file  spxdefines.h
  * @brief Debugging, floating point type and parameter definitions.
  *
- * In optimized code with \c NDEBUG defined, only 
- * \ref soplex::SPxOut::INFO1 "INFO1", 
- * \ref soplex::SPxOut::INFO2 "INFO2", and 
+ * In optimized code with \c NDEBUG defined, only
+ * \ref soplex::SPxOut::INFO1 "INFO1",
+ * \ref soplex::SPxOut::INFO2 "INFO2", and
  * \ref soplex::SPxOut::INFO3 "INFO3" are set.
  * If \c NDEBUG is not defined, the code within #TRACE is used.
- * If \c DEBUGGING is defined, the code within 
+ * If \c DEBUGGING is defined, the code within
  * \ref soplex::SPxOut::DEBUG "DEBUG" is also used.
  * If \c TRACE_METHOD is defined, the method tracing with #METHOD is
  * activated.
  *
- * If \c WITH_LONG_DOUBLE is defined, all Real numbers are of type 
+ * If \c WITH_LONG_DOUBLE is defined, all Real numbers are of type
  * long double instead of just double.
  */
 #ifndef _SPXDEFINES_H_
@@ -45,7 +45,7 @@
 namespace soplex
 {
 #define SOPLEX_VERSION   150
-#define SOPLEX_SUBVERSION  6
+#define SOPLEX_SUBVERSION  7
 
 /*-----------------------------------------------------------------------------
  * Assertion Macros etc.
@@ -55,8 +55,8 @@ namespace soplex
 /**
    \brief Macro to turn some assertions into warnings.
 
-   If both \c NDEBUG and \c WITH_WARNINGS are defined then the failed 
-   assertion is converted to a warning. In all other cases this macro is 
+   If both \c NDEBUG and \c WITH_WARNINGS are defined then the failed
+   assertion is converted to a warning. In all other cases this macro is
    equivalent to assert().
 
    @param  prefix  Short string for grepping in source code.
@@ -86,7 +86,7 @@ namespace soplex
 
 /**
    Executes \p do_something with verbosity level \p verbosity, resetting
-   the old verbosity level afterwards. 
+   the old verbosity level afterwards.
    Usually the parameter \p do_something prints something out.
    This is an internal define used by MSG_ERROR, MSG_WARNING, etc.
 */
@@ -210,7 +210,7 @@ typedef double Real;
 #endif
 /// default allowed additive zero: 1.0 + EPS_ZERO == 1.0
 #ifndef DEFAULT_EPS_ZERO
-#define DEFAULT_EPS_ZERO   1e-16 
+#define DEFAULT_EPS_ZERO   1e-16
 #endif
 #ifndef DEFAULT_EPS_FACTOR
 #define DEFAULT_EPS_FACTOR 1e-20
@@ -252,7 +252,7 @@ public:
    /**@name Access / modification */
    //@{
    ///
-   inline static Real epsilon() 
+   inline static Real epsilon()
    {
       return s_epsilon;
    }
