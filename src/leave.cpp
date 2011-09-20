@@ -564,7 +564,7 @@ bool SPxSolver::leave(int leaveIdx)
 
       /*
           No variable could be selected to enter the basis and even the leaving
-          variable is unbounded --- this is a failure.
+          variable is unbounded.
        */
       if (!enterId.isValid())
       {
@@ -651,7 +651,7 @@ bool SPxSolver::leave(int leaveIdx)
                assert(solveVector2rhs->isSetup());
                assert(solveVector3->isConsistent());
                assert(solveVector3rhs->isSetup());
-
+               assert(boundflips > 0);
                SPxBasis::solve4update(theFvec->delta(),
                                       *solveVector2,
                                       *solveVector3,
@@ -660,7 +660,12 @@ bool SPxSolver::leave(int leaveIdx)
                                       *solveVector3rhs);
 
                // perform update of basic solution
-               (*theFvec) -= (*solveVector3);
+               primVec -= (*solveVector3);
+               MSG_INFO3( spxout << "ILSTEP02 "
+                                 << "breakpoints passed / bounds flipped = " << boundflips
+                                 << std::endl; )
+               totalboundflips += boundflips;
+               boundflips = 0;
             }
             else if( solveVector2 != NULL )
             {
@@ -676,14 +681,19 @@ bool SPxSolver::leave(int leaveIdx)
             {
                assert(solveVector3->isConsistent());
                assert(solveVector3rhs->isSetup());
-
+               assert(boundflips > 0);
                SPxBasis::solve4update(theFvec->delta(),
                                       *solveVector3,
                                       newVector,
                                       *solveVector3rhs);
 
                // perform update of basic solution
-               (*theFvec) -= (*solveVector3);
+               primVec -= (*solveVector3);
+               MSG_INFO3( spxout << "ILSTEP02 "
+                                 << "breakpoints passed / bounds flipped = " << boundflips
+                                 << std::endl; )
+               totalboundflips += boundflips;
+               boundflips = 0;
             }
             else
                SPxBasis::solve4update (theFvec->delta(), newVector);

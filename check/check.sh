@@ -1,4 +1,5 @@
 #!/bin/sh
+# $Id: check.sh,v 1.29 2008/09/03 10:47:48 bzfpfets Exp $
 # Parameters
 # $1 Name of the test, e.g. netlib (needs netlib.test, netlib.solu)
 # $2 Path/Name of the binary, e.g. ../bin/soplex.linux.x86.gnu.opt
@@ -69,12 +70,23 @@ do
 	    opt="-e -r -i -p3 -t1 -c2 -s3" ;;
 	15) echo =type= CV3
 	    opt="-r -i -t0 -c3 -s4" ;;
-        esac
-        $2 $opt -C -q $4 $i 2>>$ERRFILE
-        echo =ready=
+	#
+	# Here we test the new bound flipping ratio test in all four combinations of basis representation and algorithm type.
+        #
+	16) echo =type= LCb
+	    opt="-t3" ;;
+     17) echo =type= ECb
+         opt="-e -t3" ;;
+     18) echo =type= LRb
+         opt="-r -t3" ;;
+     19) echo =type= ERb
+         opt="-e -r -t3" ;;
+     esac
+     $2 $opt -C -q $4 $i 2>>$ERRFILE
+     echo =ready=
     done
 done | tee -a $OUTFILE
 date >>$OUTFILE
 date >>$ERRFILE
 $AWK -f check.awk $TSTNAME.solu $OUTFILE | tee $RESFILE
- 
+

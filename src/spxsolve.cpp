@@ -178,6 +178,8 @@ SPxSolver::Status SPxSolver::solve()
    bool stop  = terminate();
    leaveCount = 0;
    enterCount = 0;
+   boundflips = 0;
+   totalboundflips = 0;
 
    stallNumRecovers = 0;
 
@@ -687,7 +689,8 @@ SPxSolver::Status SPxSolver::solve()
       spxout << "ISOLVE02 Finished solving (status=" << status()
              << ", iters=" << iterCount
              << ", leave=" << leaveCount
-             << ", enter=" << enterCount;
+             << ", enter=" << enterCount
+             << ", flips=" << totalboundflips;
       if( status() == OPTIMAL )
          spxout << ", objValue=" << value();
       spxout << ")" << std::endl;

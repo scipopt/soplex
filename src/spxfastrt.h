@@ -41,7 +41,7 @@ namespace soplex
 */
 class SPxFastRT : public SPxRatioTester
 {
-private:
+protected:
    //-------------------------------------
    /**@name Data */
    //@{
@@ -66,6 +66,8 @@ private:
    void relax();
    /// tightens stability requirements.
    void tighten();
+   /// Compute stability requirement
+   Real minStability(Real minStab, Real maxabs);
 
    /// Max phase 1 value.
    /** Computes the maximum value \p val that could be used for updating \p update
@@ -197,6 +199,11 @@ public:
 
       return *this;
    }
+   /// bound flipping constructor
+   SPxFastRT(const char* name)
+      : SPxRatioTester(name)
+      , iscoid(false)
+   {}
    /// destructor
    virtual ~SPxFastRT()
    {}

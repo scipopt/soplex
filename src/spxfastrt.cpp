@@ -43,11 +43,11 @@ namespace soplex
 
 //@ #define     MINSTAB thesolver->delta()
 #define MINSTAB         1e-5
+#define LOWSTAB         1e-10
 #define TRIES           2
 #define SHORT           1e-5
 #define DELTA_SHIFT     1e-5
 #define EPSILON         1e-10
-#define LOWSTAB         1e-10
 
 void SPxFastRT::resetTols()
 {
@@ -88,8 +88,7 @@ void SPxFastRT::relax()
    // delta   += 2 * (thesolver->theShift > delta) * DELTA_SHIFT;
 }
 
-/// Compute stability requirement
-static Real minStability(Real minStab, Real maxabs)
+Real SPxFastRT::minStability(Real minStab, Real maxabs)
 {
    if (maxabs < 1000.0)
       return minStab;
@@ -142,6 +141,7 @@ int SPxFastRT::maxDelta(
 
          if (x > epsilon)
          {
+            // @todo check wether mabs should be computed only over bounded vars, i.e., in the if block below
             mabs = (x > mabs) ? x : mabs;
             u = up[i];
             if (u < infinity)
@@ -161,6 +161,7 @@ int SPxFastRT::maxDelta(
          }
          else if (x < -epsilon)
          {
+            // @todo check wether mabs should be computed only over bounded vars, i.e., in the if block below
             mabs = (-x > mabs) ? -x : mabs;
             l = low[i];
             if (l > -infinity)
@@ -295,6 +296,7 @@ int SPxFastRT::minDelta(
 
          if (x > epsilon)
          {
+            // @todo check wether mabs should be computed only over bounded vars, i.e., in the if block below
             mabs = (x > mabs) ? x : mabs;
             l = low[i];
             if (l > -infinity)
@@ -314,6 +316,7 @@ int SPxFastRT::minDelta(
          }
          else if (x < -epsilon)
          {
+            // @todo check wether mabs should be computed only over bounded vars, i.e., in the if block below
             mabs = (-x > mabs) ? -x : mabs;
             u = up[i];
             if (u < infinity)

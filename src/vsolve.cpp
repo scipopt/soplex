@@ -340,6 +340,193 @@ void CLUFactor::vSolveLright2(
    *rn2ptr = rn2;
 }
 
+void CLUFactor::vSolveLright3(
+   Real* vec, int* ridx, int* rnptr, Real eps,
+   Real* vec2, int* ridx2, int* rn2ptr, Real eps2,
+   Real* vec3, int* ridx3, int* rn3ptr, Real eps3)
+{
+   METHOD( "CLUFactor::vSolveLright3()" );
+   int i, j, k, n;
+   int end;
+   Real x, y;
+   Real x2, y2;
+   Real x3, y3;
+   Real *lval, *val;
+   int *lrow, *lidx, *idx;
+   int *lbeg;
+
+   int rn = *rnptr;
+   int rn2 = *rn2ptr;
+   int rn3 = *rn3ptr;
+
+   lval = l.val;
+   lidx = l.idx;
+   lrow = l.row;
+   lbeg = l.start;
+
+   end = l.firstUpdate;
+   for (i = 0; i < end; ++i)
+   {
+      j = lrow[i];
+      x3 = vec3[j];
+      x2 = vec2[j];
+      x = vec[j];
+      if (isNotZero(x, eps))
+      {
+         k = lbeg[i];
+         idx = &(lidx[k]);
+         val = &(lval[k]);
+         if (isNotZero(x2, eps2))
+         {
+            if (isNotZero(x3, eps3))
+            {
+               // case 1: all three vectors are nonzero at j
+               for (j = lbeg[i + 1]; j > k; --j)
+               {
+                  ridx[rn] = ridx2[rn2] = ridx3[rn3] = n = *idx++;
+                  y = vec[n];
+                  y2 = vec2[n];
+                  y3 = vec3[n];
+                  rn += (y == 0) ? 1 : 0;
+                  rn2 += (y2 == 0) ? 1 : 0;
+                  rn3 += (y3 == 0) ? 1 : 0;
+                  y -= x * (*val);
+                  y2 -= x2 * (*val);
+                  y3 -= x3 * (*val++);
+                  vec[n] = y + (y == 0 ? MARKER : 0);
+                  vec2[n] = y2 + (y2 == 0 ? MARKER : 0);
+                  vec3[n] = y3 + (y3 == 0 ? MARKER : 0);
+               }
+            }
+            else
+            {
+               // case 2: 1 and 2 are nonzero at j
+               for (j = lbeg[i + 1]; j > k; --j)
+               {
+                  ridx[rn] = ridx2[rn2] = n = *idx++;
+                  y = vec[n];
+                  y2 = vec2[n];
+                  rn += (y == 0) ? 1 : 0;
+                  rn2 += (y2 == 0) ? 1 : 0;
+                  y -= x * (*val);
+                  y2 -= x2 * (*val++);
+                  vec[n] = y + (y == 0 ? MARKER : 0);
+                  vec2[n] = y2 + (y2 == 0 ? MARKER : 0);
+               }
+            }
+         }
+         else if (isNotZero(x3, eps3))
+         {
+            // case 3: 1 and 3 are nonzero at j
+            for (j = lbeg[i + 1]; j > k; --j)
+            {
+               ridx[rn] = ridx3[rn3] = n = *idx++;
+               y = vec[n];
+               y3 = vec3[n];
+               rn += (y == 0) ? 1 : 0;
+               rn3 += (y3 == 0) ? 1 : 0;
+               y -= x * (*val);
+               y3 -= x3 * (*val++);
+               vec[n] = y + (y == 0 ? MARKER : 0);
+               vec3[n] = y3 + (y3 == 0 ? MARKER : 0);
+            }
+         }
+         else
+         {
+            // case 4: only 1 is nonzero at j
+            for (j = lbeg[i + 1]; j > k; --j)
+            {
+               ridx[rn] = n = *idx++;
+               y = vec[n];
+               rn += (y == 0) ? 1 : 0;
+               y -= x * (*val++);
+               vec[n] = y + (y == 0 ? MARKER : 0);
+            }
+         }
+      }
+      else if (isNotZero(x2, eps2))
+      {
+         k = lbeg[i];
+         idx = &(lidx[k]);
+         val = &(lval[k]);
+         if (isNotZero(x3, eps3))
+         {
+            // case 5: 2 and 3 are nonzero at j
+            for (j = lbeg[i + 1]; j > k; --j)
+            {
+               ridx2[rn2] = ridx3[rn3] = n = *idx++;
+               y2 = vec2[n];
+               y3 = vec3[n];
+               rn2 += (y2 == 0) ? 1 : 0;
+               rn3 += (y3 == 0) ? 1 : 0;
+               y2 -= x2 * (*val);
+               y3 -= x3 * (*val++);
+               vec2[n] = y2 + (y2 == 0 ? MARKER : 0);
+               vec3[n] = y3 + (y3 == 0 ? MARKER : 0);
+            }
+         }
+         else
+         {
+            // case 6: only 2 is nonzero at j
+            for (j = lbeg[i + 1]; j > k; --j)
+            {
+               ridx2[rn2] = n = *idx++;
+               y2 = vec2[n];
+               rn2 += (y2 == 0) ? 1 : 0;
+               y2 -= x2 * (*val++);
+               vec2[n] = y2 + (y2 == 0 ? MARKER : 0);
+            }
+         }
+      }
+      else if (isNotZero(x3, eps3))
+      {
+         // case 7: only 3 is nonzero at j
+         k = lbeg[i];
+         idx = &(lidx[k]);
+         val = &(lval[k]);
+         for (j = lbeg[i + 1]; j > k; --j)
+         {
+            ridx3[rn3] = n = *idx++;
+            y3 = vec3[n];
+            rn3 += (y3 == 0) ? 1 : 0;
+            y3 -= x3 * (*val++);
+            vec3[n] = y3 + (y3 == 0 ? MARKER : 0);
+         }
+      }
+   }
+
+   if (l.updateType)                     /* Forest-Tomlin Updates */
+   {
+      end = l.firstUnused;
+      for (; i < end; ++i)
+      {
+         x = x2 = x3 = 0;
+         k = lbeg[i];
+         idx = &(lidx[k]);
+         val = &(lval[k]);
+         for (j = lbeg[i + 1]; j > k; --j)
+         {
+            x += vec[*idx] * (*val);
+            x2 += vec2[*idx] * (*val);
+            x3 += vec3[*idx++] * (*val++);
+         }
+         ridx[rn] = ridx2[rn2] = ridx3[rn3] = j = lrow[i];
+         rn += (vec[j] == 0) ? 1 : 0;
+         rn2 += (vec2[j] == 0) ? 1 : 0;
+         rn3 += (vec3[j] == 0) ? 1 : 0;
+         vec[j] -= x;
+         vec2[j] -= x2;
+         vec3[j] -= x3;
+         vec[j] += (vec[j] == 0) ? MARKER : 0;
+         vec2[j] += (vec2[j] == 0) ? MARKER : 0;
+         vec3[j] += (vec3[j] == 0) ? MARKER : 0;
+      }
+   }
+
+   *rnptr = rn;
+   *rn2ptr = rn2;
+   *rn3ptr = rn3;
+}
 
 int CLUFactor::vSolveUright(Real* vec, int* vidx,
    Real* rhs, int* ridx, int rn, Real eps)
@@ -776,8 +963,8 @@ void CLUFactor::vSolveUpdateRightNoNZ(Real* vec, Real /*eps*/)
    lidx = l.idx;
    lrow = l.row;
    lbeg = l.start;
-
    end = l.firstUnused;
+
    for (i = l.firstUpdate; i < end; ++i)
    {
       if ((x = vec[lrow[i]]) != 0.0)
@@ -969,8 +1156,7 @@ int CLUFactor::vSolveRight4update3(Real eps,
 {
    METHOD( "CLUFactor::vSolveRight4update3()" );
 
-   vSolveLright2(rhs, ridx, &rn, eps, rhs2, ridx2, &rn2, eps2);
-   rn3 = vSolveLright(rhs3, ridx3, rn3, eps3);
+   vSolveLright3(rhs, ridx, &rn, eps, rhs2, ridx2, &rn2, eps2, rhs3, ridx3, &rn3, eps3);
    
    /*  turn index list into a heap
     */

@@ -94,7 +94,7 @@ LIBOBJ		= 	changesoplex.o didxset.o \
 			forest.o idxset.o leave.o lpcolset.o lprowset.o \
 			lprow.o message.o mpsinput.o nameset.o \
 			slufactor.o solve.o soplex.o \
-			spxbasis.o spxbounds.o spxchangebasis.o \
+			spxbasis.o spxbounds.o spxboundflippingrt.o spxchangebasis.o \
 			spxequilisc.o spxdantzigpr.o spxdefaultrt.o \
 			spxdefines.o spxdesc.o spxdevexpr.o \
 			spxfastrt.o spxfileio.o spxgeometsc.o \

@@ -13,6 +13,9 @@ code quality & new features:
 - added -fp:precise and -Oi to make.mingw.x86.{cl,intel}.opt
 - added SOPLEX_SUBVERSION to track internal development version
 - added SHARED variable in Makefile for creating shared libraries and binaries
+- added bound flipping ratio test (long step dual)
+- added functionality to solve systems with three right hand sides
+- added partial quicksort to sorter.h
 
 interface:
 - methods selectEnter() and selectLeave() in ratio testers now receive index/id of leaving/entering variable as input
@@ -21,9 +24,11 @@ interface:
 - added method getPrimalray() to classes SoPlex and SPxSolver for primal unbounded LPs
 - added command line option '-L' to set iteration limit
 - adapted method to read/write basis for free nonbasic variables
+- added command line option '-t3' to use the bound flipping ratio test (long step dual)
+- number of performed bound flips during ratio test are displayed as 'flips=' in line 'Finished solving...'
 
 performance:
-- increased default Markowitz threshold to 0.04 to increase numerical stability of the factorization 
+- increased default Markowitz threshold to 0.04 to increase numerical stability of the factorization
 
 fixed bugs:
 - added missing -m64 in LDFLAGS of make.{darwin,sunos}.x86_64.gnu.* and make.{linux,freebsd}.x86_64.gnu.opt*
@@ -66,7 +71,7 @@ interface:
 fixed bugs:
 - bug in class SoPlex appearing when LP is solved completely in simplifier and optimal solution retrieved
 - bug in spxbasis.cpp: when basis is detected as singular during update step, now we refactorize to double check; if the
-  singularity is not resolved we exit with correct status 
+  singularity is not resolved we exit with correct status
 - bug in simplifier postsolving: empty columns may not only be fixed to bounds but also to zero for free variable
 - bug in SPxSolver::setPricer() appearing when switching pricers in initialized state
 - bug in simplifier SPxMainSM yielding incorrect dual values and reduced costs for maximization problems

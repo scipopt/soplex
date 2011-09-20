@@ -257,8 +257,13 @@ private:
    // From vsolve.cpp 
    ///
    int vSolveLright(Real* vec, int* ridx, int rn, Real eps);
+   ///
    void vSolveLright2(Real* vec, int* ridx, int* rnptr, Real eps,
       Real* vec2, int* ridx2, int* rn2ptr, Real eps2);
+   ///
+   void vSolveLright3(Real* vec, int* ridx, int* rnptr, Real eps,
+      Real* vec2, int* ridx2, int* rn2ptr, Real eps2,
+      Real* vec3, int* ridx3, int* rn3ptr, Real eps3);
    ///
    int vSolveUright(Real* vec, int* vidx, Real* rhs, int* ridx, int rn, Real eps);
    ///

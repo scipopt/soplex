@@ -30,7 +30,7 @@
 namespace soplex
 {
 bool SPxSolver::writeState(
-   const char*    filename, 
+   const char*    filename,
    const NameSet* rowNames,
    const NameSet* colNames ) const
 {
@@ -99,6 +99,8 @@ bool SPxSolver::writeState(
       commandline << " -t0";
    else if (!strcmp(ratiotester()->getName(), "Harris"))
       commandline << " -t1";
+   else if (!strcmp(ratiotester()->getName(), "Bound flipping"))
+      commandline << " -t3";
    commandline  << " -br " << filename << ".mps " << filename << ".bas";
    ofs << "SoPlex Parameters:\n\n"  << table.str() << "Command line     > " << commandline.str();
    ofs.close();

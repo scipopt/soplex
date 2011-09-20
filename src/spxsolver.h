@@ -72,6 +72,7 @@ class SPxStarter;
 class SPxSolver : public SPxLP, protected SPxBasis
 {
    friend class SPxFastRT;
+   friend class SPxBoundFlippingRT;
 
 public:
 
@@ -291,6 +292,9 @@ protected:
    int             leaveCount;    ///< number of LEAVE iterations
    int             enterCount;    ///< number of ENTER iterations
    
+   int             boundflips;          ///< number of performed bound flips
+   int             totalboundflips;     ///< total number of bound flips
+
    SPxPricer*      thepricer;
    SPxRatioTester* theratiotester;
    SPxStarter*     thestarter;
