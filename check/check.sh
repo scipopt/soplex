@@ -75,15 +75,15 @@ do
         #
 	16) echo =type= LCb
 	    opt="-t3" ;;
-     17) echo =type= ECb
-         opt="-e -t3" ;;
-     18) echo =type= LRb
-         opt="-r -t3" ;;
-     19) echo =type= ERb
-         opt="-e -r -t3" ;;
-     esac
-     $2 $opt -C -q $4 $i 2>>$ERRFILE
-     echo =ready=
+        17) echo =type= ECb
+            opt="-e -t3" ;;
+        18) echo =type= LRb
+            opt="-r -t3" ;;
+        19) echo =type= ERb
+            opt="-e -r -t3" ;;
+        esac
+        $2 $opt -C -q $4 $i 2>>$ERRFILE
+        echo =ready=
     done
 done | tee -a $OUTFILE
 date >>$OUTFILE
