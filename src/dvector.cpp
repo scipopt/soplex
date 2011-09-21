@@ -101,6 +101,8 @@ void DVector::reSize(int newsize, int newdim)
 
 void DVector::reDim(int newdim)
 {
+   assert(memsize >= 0);
+
    if ( newdim > memsize )
       reSize(int(newdim + 0.2 * memsize));
    // Seems lint is wrong here. Replace with memset anyway.

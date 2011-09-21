@@ -226,7 +226,10 @@ SVector& SVector::operator=(const SVector& sv)
       Element       *e = m_elem;
       const Element *s = sv.m_elem;
       while (i--)
+      {
+         assert(e != 0);
          *e++ = *s++;
+      }
       set_size( sv.size() );
    }
    return *this;

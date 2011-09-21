@@ -88,6 +88,7 @@ void NameSet::remove(const char *str)
    if (hashtab.has(nam))
    {
       const DataKey* hkey = hashtab.get(nam);
+      assert(hkey != 0);
       hashtab.remove(nam);
       set.remove(*hkey);
    }

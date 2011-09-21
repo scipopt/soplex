@@ -730,6 +730,7 @@ void CLUFactor::initFactorRings()
    int *cperm = col.perm;
    CLUFactor::Pring *ring;
 
+   assert(thedim >= 0);
    spx_alloc(temp.pivot_col,   thedim + 1);
    spx_alloc(temp.pivot_colNZ, thedim + 1);
    spx_alloc(temp.pivot_row,   thedim + 1);

@@ -220,7 +220,10 @@ public:
    {
       const Name nam(str);
       if (hashtab.has(nam))
+      {
+         assert(hashtab.get(nam) != 0);
          return number(*hashtab.get(nam));
+      }
       else
          return -1;
    }
