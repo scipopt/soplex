@@ -16,6 +16,7 @@ code quality & new features:
 - added bound flipping ratio test (long step dual)
 - added functionality to solve systems with three right hand sides
 - added partial quicksort to sorter.h
+- increased priority of debugging output
 
 interface:
 - methods selectEnter() and selectLeave() in ratio testers now receive index/id of leaving/entering variable as input
@@ -52,6 +53,7 @@ fixed bugs:
   results on some unsimplified instances
 - fixed potential NULL pointer dereference in nameset.h, when name is not found in hashtable
 - fixed potential segmentation fault when calling sorting routines on empty arrays (sorter.h)
+- send debugging output to standard out instead of error stream
 
 
 30 Sep 2010 - Release 1.5.0

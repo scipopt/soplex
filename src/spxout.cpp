@@ -22,10 +22,10 @@ namespace soplex
    /// constructor
    SPxOut::SPxOut()
       : m_verbosity( ERROR )
-      , m_streams( new std::ostream*[ DEBUG+1 ] )
+      , m_streams( new std::ostream*[ INFO3+1 ] )
    {
       m_streams[ ERROR ] = m_streams[ WARNING ] = &std::cerr;
-      for ( int i = INFO1; i <= DEBUG; ++i )
+      for ( int i = DEBUG; i <= INFO3; ++i )
          m_streams[ i ] = &std::cout;
    }
 

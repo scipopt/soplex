@@ -75,10 +75,10 @@ public:
       // If you change this, change the implementation as well.
       ERROR    = 0, 
       WARNING  = 1,
-      INFO1    = 2,
-      INFO2    = 3,
-      INFO3    = 4,
-      DEBUG    = 5
+      DEBUG    = 2,
+      INFO1    = 3,
+      INFO2    = 4,
+      INFO3    = 5
    } Verbosity;
 
    /// helper struct for the output operator

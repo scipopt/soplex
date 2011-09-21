@@ -340,7 +340,7 @@ void print_usage_and_exit( const char* const argv[] )
       " -zz       set general zero tolerance\n"
       " -zf       set factorization zero tolerance\n"
       " -zu       set update zero tolerance\n"
-      " -v        set verbosity Level: from 0 (ERROR) to 5 (DEBUG), default 2\n"
+      " -v        set verbosity Level: from 0 (ERROR) to 5 (INFO3), default 3 (INFO1)\n"
       " -V        show program version\n"
       " -C        check mode (for check scripts)\n"
       " -h        show this help\n"
