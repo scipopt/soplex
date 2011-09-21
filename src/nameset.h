@@ -201,13 +201,12 @@ public:
       return set.key(pnum);
    }
 
-   /**@todo suspicious: hashtab.get(nam) could return a NULL pointer if nam
-      is not in the table, which would core dump (?) the *hashtab.get() */
    /// returns DataKey of name \p str in NameSet.
    DataKey key(const char* str) const
    {
       const Name nam(str);
-      return (*hashtab.get(nam));
+      const DataKey* result = hashtab.get(nam);
+      return result == 0 ? DataKey() : *hashtab.get(nam);
    }
 
    /// returns number of name with DataKey \p pkey in NameSet.

@@ -50,6 +50,7 @@ fixed bugs:
 - fixed wrong error output in statistics when an instance is solved during presolve
 - pricer SPxDevex now performs one additional pivot if only slightly feasible/optimal; this helps to prevent suboptimal
   results on some unsimplified instances
+- fixed potential NULL pointer dereference in nameset.h, when name is not found in hashtable
 
 
 30 Sep 2010 - Release 1.5.0
