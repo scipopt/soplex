@@ -108,7 +108,7 @@ int SPxDevexPR::selectLeaveX(Real& best, Real feastol, int start, int incr)
 
    for (; start < end; start += incr)
    {
-      if (fTest[start] < -theeps)
+      if (fTest[start] < -feastol)
       {
          x = fTest[start] * fTest[start] / cpen[start];
          if (x > bstX)
@@ -299,20 +299,20 @@ void SPxDevexPR::entered4X(SPxId /*id*/, int n,
 
 void SPxDevexPR::addedVecs (int n)
 {
-   int init = (thesolver->type() == SPxSolver::ENTER) ? 2 : 1;
+   int initval = (thesolver->type() == SPxSolver::ENTER) ? 2 : 1;
    n = penalty.dim();
    penalty.reDim (thesolver->coDim());
    for (int i = penalty.dim()-1; i >= n; --i )
-      penalty[i] = init;
+      penalty[i] = initval;
 }
 
 void SPxDevexPR::addedCoVecs(int n)
 {
-   int init = (thesolver->type() == SPxSolver::ENTER) ? 2 : 1;
+   int initval = (thesolver->type() == SPxSolver::ENTER) ? 2 : 1;
    n = coPenalty.dim();
    coPenalty.reDim(thesolver->dim());
    for (int i = coPenalty.dim()-1; i >= n; --i)
-      coPenalty[i] = init;
+      coPenalty[i] = initval;
 }
 
 } // namespace soplex
