@@ -67,7 +67,7 @@ protected:
    /// tightens stability requirements.
    void tighten();
    /// Compute stability requirement
-   Real minStability(Real minStab, Real maxabs);
+   Real minStability(Real maxabs);
 
    /// Max phase 1 value.
    /** Computes the maximum value \p val that could be used for updating \p update

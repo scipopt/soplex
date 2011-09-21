@@ -453,7 +453,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
    degeneps = delta / moststable;  /* as in SPxFastRT */
    instable = thesolver->instableLeave;
    assert(!instable || thesolver->instableLeaveNum >= 0);
-   stab = instable ? LOWSTAB : SPxFastRT::minStability(minStab, moststable);
+   stab = instable ? LOWSTAB : SPxFastRT::minStability(moststable);
    stab *= moststable;
 
    while( usedBp >= 0 && nBp > 0)

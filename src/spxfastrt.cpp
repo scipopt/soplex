@@ -88,7 +88,7 @@ void SPxFastRT::relax()
    // delta   += 2 * (thesolver->theShift > delta) * DELTA_SHIFT;
 }
 
-Real SPxFastRT::minStability(Real minStab, Real maxabs)
+Real SPxFastRT::minStability(Real maxabs)
 {
    if (maxabs < 1000.0)
       return minStab;
@@ -877,7 +877,7 @@ int SPxFastRT::selectLeave(Real& val, SPxId)
          {
             // phase 2:
             Real stab, bestDelta;
-            stab = 100.0 * minStability(minStab, maxabs);
+            stab = 100.0 * minStability(maxabs);
             leave = maxSelect(sel, stab, bestDelta, max);
             if (bestDelta < DELTA_SHIFT*TRIES)
                cnt++;
@@ -912,7 +912,7 @@ int SPxFastRT::selectLeave(Real& val, SPxId)
          {
             // phase 2:
             Real stab, bestDelta;
-            stab = 100.0 * minStability(minStab, maxabs);
+            stab = 100.0 * minStability(maxabs);
             leave = minSelect(sel, stab, bestDelta, max);
             if (bestDelta < DELTA_SHIFT*TRIES)
                cnt++;
@@ -1200,8 +1200,9 @@ SPxId SPxFastRT::selectEnter(Real& val, int)
          if (!shortEnter(enterId, nr, max, maxabs))
          {
             Real bestDelta, stab;
-            // stab = minStab;
-            stab = minStability(minStab, maxabs);
+
+            stab = minStability(maxabs);
+
             // force instable pivot iff instable is true (see explanation in leave.cpp and spxsolve.cpp)
             if (instable)
             {
@@ -1236,8 +1237,9 @@ SPxId SPxFastRT::selectEnter(Real& val, int)
          if (!shortEnter(enterId, nr, max, maxabs))
          {
             Real bestDelta, stab;
-            // stab = minStab;
-            stab = minStability(minStab, maxabs);
+
+            stab = minStability(maxabs);
+
             // force instable pivot iff instable is true (see explanation in leave.cpp and spxsolve.cpp)
             if (instable)
             {
