@@ -37,6 +37,12 @@ namespace soplex
 template < class T, class COMPARATOR >
 void sorter_qsort(T* t, int end, COMPARATOR& compare, int start = 0)
 {
+   assert(start >= 0);
+
+   /* nothing to sort for less than two elements */
+   if( end <= start + 1 )
+      return;
+
    int i0, i1, j;
    Real c;
 
@@ -106,6 +112,14 @@ int sorter_qsortPart(
    int                   end2 = 0            /**< auxiliary end index of sub range used for recursive call */
    )
 {
+   assert(start >= 0);
+
+   /* nothing to sort for less than two elements */
+   if( end < start + 1 )
+      return 0;
+   else if( end <= start + 1 )
+      return 1;
+
    T work;
    T pivotval;                               /* value of pivot element */
    T tmp;

@@ -51,6 +51,7 @@ fixed bugs:
 - pricer SPxDevex now performs one additional pivot if only slightly feasible/optimal; this helps to prevent suboptimal
   results on some unsimplified instances
 - fixed potential NULL pointer dereference in nameset.h, when name is not found in hashtable
+- fixed potential segmentation fault when calling sorting routines on empty arrays (sorter.h)
 
 
 30 Sep 2010 - Release 1.5.0
