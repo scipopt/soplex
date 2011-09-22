@@ -20,7 +20,7 @@
 
 .PHONY:		all depend clean cleanlib lint doc check test
 
-VERSION		:=	1.5.0.6
+VERSION		:=	1.5.0.7
 
 ARCH		:=	$(shell uname -m | \
 			sed \
