@@ -430,7 +430,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
    // check for unboundedness/infeasibility
    if( slope > 0 && usedBp >= nBp - 1 )
    {
-      MSG_INFO3( spxout << "ILSTEP03 "
+      MSG_DEBUG( spxout << "DLSTEP03 "
                                  << "unboundedness in ratio test"
                                  << std::endl; )
       return enterId;
@@ -439,7 +439,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
    // do not make long steps if the gain in the dual objective is too small, except to avoid degenerate steps
    if( fabs(breakpoints[usedBp].val) - fabs(breakpoints[0].val) < MIN_LONGSTEP && fabs(breakpoints[0].val) > epsilon )
    {
-      MSG_INFO3( spxout << "ILSTEP04 "
+      MSG_DEBUG( spxout << "DLSTEP04 "
                                  << "bound flip gain is too small"
                                  << std::endl; )
       usedBp = 0;
@@ -454,7 +454,6 @@ SPxId SPxBoundFlippingRT::selectEnter(
    instable = thesolver->instableLeave;
    assert(!instable || thesolver->instableLeaveNum >= 0);
    stab = instable ? LOWSTAB : SPxFastRT::minStability(moststable);
-   stab *= moststable;
 
    while( usedBp >= 0 && nBp > 0)
    {
@@ -604,7 +603,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
       assert(usedBp < 0);
       if( relax_count < MAX_RELAX_COUNT )
       {
-         MSG_INFO2( spxout << "ILSTEP05 "
+         MSG_DEBUG( spxout << "DLSTEP05 "
                                  << "no valid enterId found - relaxing..."
                                  << std::endl; )
          relax();
@@ -614,7 +613,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
       }
       else
       {
-         MSG_INFO2( spxout << "ILSTEP06 "
+         MSG_DEBUG( spxout << "DLSTEP06 "
                                  << "no valid enterId found - breaking..."
                                  << std::endl; )
          return enterId;
