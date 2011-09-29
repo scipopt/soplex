@@ -113,7 +113,7 @@ public:
       {
          int k;
          T *olddata = data;
-         data = new T[size() + n];
+         data = new T[size() + n]();
          assert(data != 0);
          if (size() > 0)
          {
@@ -156,7 +156,7 @@ public:
          if (num > 0)
          {
             int i;
-            data = new T[num];
+            data = new T[num]();
             for (i = 0; i < n; ++i)
                data[i] = olddata[i];
             for (; i < num; ++i)
@@ -223,7 +223,7 @@ public:
       num = n;
       if (num > 0)
       {
-         data = new T[num];
+         data = new T[num]();
          assert(data != 0);
       }
       assert(Array::isConsistent());
@@ -235,7 +235,7 @@ public:
    {
       if (num > 0)
       {
-         data = new T[num];
+         data = new T[num]();
          assert(data != 0);
          *this = old;
       }
