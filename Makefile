@@ -20,26 +20,14 @@
 
 .PHONY:		all depend clean cleanlib lint doc check test
 
-VERSION		:=	1.5.0.7
+#-----------------------------------------------------------------------------
+# detect host architecture
+#-----------------------------------------------------------------------------
+include make/make.detecthost
 
-ARCH		:=	$(shell uname -m | \
-			sed \
-			-e 's/sun../sparc/' \
-			-e 's/i.86/x86/' \
-			-e 's/i86pc/x86/' \
-			-e 's/[0-9]86/x86/' \
-			-e 's/amd64/x86_64/' \
-			-e 's/IP../mips/' \
-			-e 's/9000..../hppa/' \
-			-e 's/Power\ Macintosh/ppc/' \
-			-e 's/00........../pwr4/' )
-OSTYPE		:=	$(shell uname -s | tr '[:upper:]' '[:lower:]' | \
-			sed \
-			-e 's/cygwin.*/cygwin/' \
-			-e 's/irix../irix/' \
-			-e 's/windows.*/windows/' \
-			-e 's/mingw.*/mingw/')
-HOSTNAME	:=	$(shell uname -n | tr '[:upper:]' '[:lower:]')
+
+#-----------------------------------------------------------------------------
+VERSION		:=	1.5.0.7
 
 VERBOSE		=	false
 SHARED		=	false
@@ -51,6 +39,8 @@ EXEEXTENSION	=
 TEST		=	quick
 ALGO		=	1 2 3 4
 LIMIT		=	#
+
+INSTALLDIR	=	#
 
 ZLIB		=	true
 
@@ -88,6 +78,7 @@ VFLAGS		=	--tool=memcheck --leak-check=yes --show-reachable=yes #--gen-suppressi
 SRCDIR		=	src
 BINDIR		=	bin
 LIBDIR		=	lib
+INCLUDEDIR	=	include
 NAME		=	soplex
 LIBOBJ		= 	changesoplex.o didxset.o \
 			dsvector.o dvector.o enter.o factor.o \
@@ -184,6 +175,7 @@ LIBOBJFILES	=	$(addprefix $(LIBOBJDIR)/,$(LIBOBJ))
 BINSRC		=	$(addprefix $(SRCDIR)/,$(BINOBJ:.o=.cpp))
 EXAMPLESRC	=	$(addprefix $(SRCDIR)/,$(EXAMPLEOBJ:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
+LIBSRCHEADER	=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.h))
 
 ZLIBDEP		:=	$(SRCDIR)/depend.zlib
 ZLIBSRC		:=	$(shell cat $(ZLIBDEP))
@@ -202,6 +194,9 @@ endif
 
 all:		$(LIBFILE) $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
 simpleexample:	$(LIBFILE) $(EXAMPLEFILE) $(LIBLINK) $(LIBSHORTLINK)
+
+# include install targets
+-include make/make.install
 
 $(LIBLINK) $(LIBSHORTLINK):	$(LIBFILE)
 		@rm -f $@

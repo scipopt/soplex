@@ -17,6 +17,8 @@ code quality & new features:
 - added functionality to solve systems with three right hand sides
 - added partial quicksort to sorter.h
 - increased priority of debugging output
+- added "install" target to Makefile; this target can be used to install SoPlex into certain directory on the system 
+  (works for Linux and Mac); Therefore you have to specify a INSTALLDIR (make install INSTALLDIR=/urs/local/)
 
 interface:
 - methods selectEnter() and selectLeave() in ratio testers now receive index/id of leaving/entering variable as input
