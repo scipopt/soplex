@@ -97,7 +97,16 @@ void SPxBoundFlippingRT::flipAndUpdate(
                                    << " bp.val: " << breakpoints[i].val
                                    << std::endl; )
          }
+         MSG_DEBUG( spxout << "PVEC flipped from: " << stat
+                           << " index: " << idx
+                           << " val: " << thesolver->pVec()[idx]
+                           << " upd: " << thesolver->pVec().delta()[idx]
+                           << " lower: " << lower
+                           << " upper: " << upper
+                           << " bp.val: " << breakpoints[i].val
+                           << std::endl; )
          assert(fabs(range) < 1e20);
+//          thesolver->pVec().delta().clearIdx(idx);
          updPrimRhs.multAdd(range, thesolver->vector(idx));
       }
       else if( breakpoints[i].src == COPVEC )
@@ -132,7 +141,16 @@ void SPxBoundFlippingRT::flipAndUpdate(
                                    << " bp.val: " << breakpoints[i].val
                                    << std::endl; )
          }
+         MSG_DEBUG( spxout << "COPVEC flipped from: " << stat
+                           << " index: " << idx
+                           << " val: " << thesolver->coPvec()[idx]
+                           << " upd: " << thesolver->coPvec().delta()[idx]
+                           << " lower: " << lower
+                           << " upper: " << upper
+                           << " bp.val: " << breakpoints[i].val
+                           << std::endl; )
          assert(fabs(range) < 1e20);
+//          thesolver->coPvec().delta().clearIdx(idx);
          updPrimRhs.setValue(idx, updPrimRhs[idx] - range);
       }
    }
@@ -381,7 +399,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
       // this may only happen if SoPlex decides to make an instable pivot
       assert(thesolver->instableLeaveNum >= 0);
       // restore original slope
-      slope = thesolver->instableLeaveVal;
+      slope = fabs(thesolver->instableLeaveVal);
    }
 
    // set up structures for the quicksort implementation
@@ -440,18 +458,18 @@ SPxId SPxBoundFlippingRT::selectEnter(
    --usedBp;
    assert(usedBp >= 0);
 
-   MSG_DEBUG( spxout << "DLSTEP09 "
-                     << thesolver->basis().iteration() << ": "
-                     << "number of flip candidates: "
+   MSG_DEBUG( spxout << "DLSTEP01 "
+                     << thesolver->basis().iteration()
+                     << ": number of flip candidates: "
                      << usedBp
                      << std::endl; )
 
    // check for unboundedness/infeasibility
    if( slope > 0 && usedBp >= nBp - 1 )
    {
-      MSG_DEBUG( spxout << "DLSTEP03 "
-                        << thesolver->basis().iteration() << ": "
-                        << "unboundedness in ratio test"
+      MSG_DEBUG( spxout << "DLSTEP02 "
+                        << thesolver->basis().iteration()
+                        << ": unboundedness in ratio test"
                         << std::endl; )
       return enterId;
    }
@@ -459,9 +477,9 @@ SPxId SPxBoundFlippingRT::selectEnter(
    // do not make long steps if the gain in the dual objective is too small, except to avoid degenerate steps
    if( usedBp > 0 && fabs(breakpoints[usedBp].val) - fabs(breakpoints[0].val) < MIN_LONGSTEP && fabs(breakpoints[0].val) > epsilon )
    {
-      MSG_DEBUG( spxout << "DLSTEP04 "
-                        << thesolver->basis().iteration() << ": "
-                        << "bound flip gain is too small"
+      MSG_DEBUG( spxout << "DLSTEP03 "
+                        << thesolver->basis().iteration()
+                        << ": bound flip gain is too small"
                         << std::endl; )
       usedBp = 0;
 
@@ -624,20 +642,22 @@ SPxId SPxBoundFlippingRT::selectEnter(
       assert(usedBp < 0);
       if( relax_count < MAX_RELAX_COUNT )
       {
-         MSG_DEBUG( spxout << "DLSTEP05 "
-                           << thesolver->basis().iteration() << ": "
-                           << "no valid enterId found - relaxing..."
+         MSG_DEBUG( spxout << "DLSTEP04 "
+                           << thesolver->basis().iteration()
+                           << ": no valid enterId found - relaxing..."
                            << std::endl; )
          relax();
          ++relax_count;
-
+         // restore original value
+         val = max;
          return SPxBoundFlippingRT::selectEnter(val, leaveIdx);
       }
       else
       {
-         MSG_DEBUG( spxout << "DLSTEP06 "
-                                 << "no valid enterId found - breaking..."
-                                 << std::endl; )
+         MSG_DEBUG( spxout << "DLSTEP05 "
+                           << thesolver->basis().iteration()
+                           << "no valid enterId found - breaking..."
+                           << std::endl; )
          return enterId;
       }
    }
@@ -654,11 +674,11 @@ SPxId SPxBoundFlippingRT::selectEnter(
    // estimate wether long steps may be possible in future iterations
    flipPotential *= (usedBp + 0.95);
 
-   MSG_DEBUG( spxout << "DLSTEP10 "
-                        << thesolver->basis().iteration() << ": "
-                        << "selected Id: "
-                        << enterId
-                        << std::endl; )
+   MSG_DEBUG( spxout << "DLSTEP06 "
+                     << thesolver->basis().iteration()
+                     << ": selected Id: "
+                     << enterId
+                     << std::endl; )
    return enterId;
 }
 
