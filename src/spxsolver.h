@@ -235,6 +235,7 @@ private:
       (see spxsolve.cpp and leave.cpp) */
    int            instableLeaveNum;
    bool           instableLeave;
+   Real           instableLeaveVal;
    //@}
 
 protected:

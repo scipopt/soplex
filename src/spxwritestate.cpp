@@ -99,7 +99,7 @@ bool SPxSolver::writeState(
       commandline << " -t0";
    else if (!strcmp(ratiotester()->getName(), "Harris"))
       commandline << " -t1";
-   else if (!strcmp(ratiotester()->getName(), "Bound flipping"))
+   else if (!strcmp(ratiotester()->getName(), "Bound Flipping"))
       commandline << " -t3";
    commandline  << " -br " << filename << ".mps " << filename << ".bas";
    ofs << "SoPlex Parameters:\n\n"  << table.str() << "Command line     > " << commandline.str();

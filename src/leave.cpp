@@ -600,6 +600,7 @@ bool SPxSolver::leave(int leaveIdx)
                instableLeaveNum = leaveIdx;
 
                // Note: These changes do not survive a refactorization
+               instableLeaveVal = theCoTest[leaveIdx];
                theCoTest[leaveIdx] = 0.0;
 
                return true;

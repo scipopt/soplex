@@ -325,7 +325,10 @@ SPxId SPxBoundFlippingRT::selectEnter(
    int minIdx;
    Breakpoint tmp;
 
-   //most stable pivot value in candidate set
+   // index in breakpoint array of minimal value (i.e. choice of normal RT)
+   minIdx = -1;
+
+   // most stable pivot value in candidate set
    Real moststable;
 
    // initialize invalid enterId
@@ -364,6 +367,8 @@ SPxId SPxBoundFlippingRT::selectEnter(
    if( nBp == 0 )
       return enterId;
 
+   assert(minIdx >= 0);
+
    // swap smallest breakpoint to the front to skip the sorting phase if no bound flip is possible
    tmp = breakpoints[minIdx];
    breakpoints[minIdx] = breakpoints[0];
@@ -371,6 +376,13 @@ SPxId SPxBoundFlippingRT::selectEnter(
 
    // compute initial slope
    slope = fabs(thesolver->fTest()[leaveIdx]);
+   if( slope == 0 )
+   {
+      // this may only happen if SoPlex decides to make an instable pivot
+      assert(thesolver->instableLeaveNum >= 0);
+      // restore original slope
+      slope = thesolver->instableLeaveVal;
+   }
 
    // set up structures for the quicksort implementation
    BreakpointCompare compare;
@@ -382,7 +394,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
    int sortsize = 4;
 
    // get all skipable breakpoints
-   for( usedBp = 0; usedBp < nBp && slope > epsilon; ++usedBp)
+   for( usedBp = 0; usedBp < nBp && slope > 0; ++usedBp)
    {
       // sort breakpoints only partially to save time
       if( usedBp > sorted )
@@ -426,22 +438,31 @@ SPxId SPxBoundFlippingRT::selectEnter(
       }
    }
    --usedBp;
+   assert(usedBp >= 0);
+
+   MSG_DEBUG( spxout << "DLSTEP09 "
+                     << thesolver->basis().iteration() << ": "
+                     << "number of flip candidates: "
+                     << usedBp
+                     << std::endl; )
 
    // check for unboundedness/infeasibility
    if( slope > 0 && usedBp >= nBp - 1 )
    {
       MSG_DEBUG( spxout << "DLSTEP03 "
-                                 << "unboundedness in ratio test"
-                                 << std::endl; )
+                        << thesolver->basis().iteration() << ": "
+                        << "unboundedness in ratio test"
+                        << std::endl; )
       return enterId;
    }
 
    // do not make long steps if the gain in the dual objective is too small, except to avoid degenerate steps
-   if( fabs(breakpoints[usedBp].val) - fabs(breakpoints[0].val) < MIN_LONGSTEP && fabs(breakpoints[0].val) > epsilon )
+   if( usedBp > 0 && fabs(breakpoints[usedBp].val) - fabs(breakpoints[0].val) < MIN_LONGSTEP && fabs(breakpoints[0].val) > epsilon )
    {
       MSG_DEBUG( spxout << "DLSTEP04 "
-                                 << "bound flip gain is too small"
-                                 << std::endl; )
+                        << thesolver->basis().iteration() << ": "
+                        << "bound flip gain is too small"
+                        << std::endl; )
       usedBp = 0;
 
       // ensure that the first breakpoint is nonbasic
@@ -604,8 +625,9 @@ SPxId SPxBoundFlippingRT::selectEnter(
       if( relax_count < MAX_RELAX_COUNT )
       {
          MSG_DEBUG( spxout << "DLSTEP05 "
-                                 << "no valid enterId found - relaxing..."
-                                 << std::endl; )
+                           << thesolver->basis().iteration() << ": "
+                           << "no valid enterId found - relaxing..."
+                           << std::endl; )
          relax();
          ++relax_count;
 
@@ -621,6 +643,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
    }
    else
    {
+      assert(usedBp >= 0);
       relax_count = 0;
       tighten();
    }
@@ -631,6 +654,11 @@ SPxId SPxBoundFlippingRT::selectEnter(
    // estimate wether long steps may be possible in future iterations
    flipPotential *= (usedBp + 0.95);
 
+   MSG_DEBUG( spxout << "DLSTEP10 "
+                        << thesolver->basis().iteration() << ": "
+                        << "selected Id: "
+                        << enterId
+                        << std::endl; )
    return enterId;
 }
 
