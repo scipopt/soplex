@@ -152,7 +152,7 @@ public:
    //@{
    /// default constructor
    SPxBoundFlippingRT()
-      : SPxFastRT("Bound flipping")
+      : SPxFastRT("Bound Flipping")
       , flipPotential(1)
       , relax_count(0)
       , breakpoints(10)
