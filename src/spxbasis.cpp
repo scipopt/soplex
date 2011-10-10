@@ -781,7 +781,7 @@ void SPxBasis::factorize()
    assert(matrixIsSetup);
 
    updateCount = 0;
-   
+
    switch(factor->load(matrix.get_ptr(), matrix.size()))
    {
    case SLinSolver::OK :
@@ -956,7 +956,7 @@ SPxBasis::SPxBasis()
    , matrixIsSetup (false)
    , factor (0)
    , factorized (false)
-   , maxUpdates (200) 
+   , maxUpdates (180)
    , nonzeroFactor(10.0)
    , fillFactor(5.0)
    , iterCount (0)

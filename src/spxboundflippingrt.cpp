@@ -106,7 +106,6 @@ void SPxBoundFlippingRT::flipAndUpdate(
                            << " bp.val: " << breakpoints[i].val
                            << std::endl; )
          assert(fabs(range) < 1e20);
-//          thesolver->pVec().delta().clearIdx(idx);
          updPrimRhs.multAdd(range, thesolver->vector(idx));
       }
       else if( breakpoints[i].src == COPVEC )
@@ -150,7 +149,6 @@ void SPxBoundFlippingRT::flipAndUpdate(
                            << " bp.val: " << breakpoints[i].val
                            << std::endl; )
          assert(fabs(range) < 1e20);
-//          thesolver->coPvec().delta().clearIdx(idx);
          updPrimRhs.setValue(idx, updPrimRhs[idx] - range);
       }
    }
@@ -195,6 +193,7 @@ void SPxBoundFlippingRT::collectBreakpointsMax(
          {
             Real y = upp[i] - vec[i];
             curVal = (y <= 0) ? delta / x : (y + delta) / x;
+            assert(curVal > 0);
 
             breakpoints[nBp].idx = i;
             breakpoints[nBp].src = src;
@@ -215,6 +214,7 @@ void SPxBoundFlippingRT::collectBreakpointsMax(
          {
             Real y = low[i] - vec[i];
             curVal = (y >= 0) ? -delta / x : (y - delta) / x;
+            assert(curVal > 0);
 
             breakpoints[nBp].idx = i;
             breakpoints[nBp].src = src;
@@ -268,6 +268,7 @@ void SPxBoundFlippingRT::collectBreakpointsMin(
             Real y = low[i] - vec[i];
 
             curVal = (y >= 0) ? delta / x : (delta - y) / x;
+            assert(curVal > 0);
 
             breakpoints[nBp].idx = i;
             breakpoints[nBp].src = src;
@@ -288,6 +289,7 @@ void SPxBoundFlippingRT::collectBreakpointsMin(
          {
             Real y = upp[i] - vec[i];
             curVal = (y <= 0) ? -delta / x : -(y + delta) / x;
+            assert(curVal > 0);
 
             breakpoints[nBp].idx = i;
             breakpoints[nBp].src = src;
@@ -340,11 +342,12 @@ SPxId SPxBoundFlippingRT::selectEnter(
    resetTols();
 
    Real max;
-   int minIdx;
-   Breakpoint tmp;
 
    // index in breakpoint array of minimal value (i.e. choice of normal RT)
-   minIdx = -1;
+   int minIdx;
+
+   // temporary breakpoint data structure to make swaps possible
+   Breakpoint tmp;
 
    // most stable pivot value in candidate set
    Real moststable;
@@ -369,6 +372,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
    val = 0.0;
    moststable = 0.0;
    nBp = 0;
+   minIdx = -1;
 
    // get breakpoints and and determine the index of the minimal value
    if( max > 0 )
@@ -465,7 +469,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
                      << std::endl; )
 
    // check for unboundedness/infeasibility
-   if( slope > 0 && usedBp >= nBp - 1 )
+   if( slope > epsilon && usedBp >= nBp - 1 )
    {
       MSG_DEBUG( spxout << "DLSTEP02 "
                         << thesolver->basis().iteration()
@@ -475,7 +479,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
    }
 
    // do not make long steps if the gain in the dual objective is too small, except to avoid degenerate steps
-   if( usedBp > 0 && fabs(breakpoints[usedBp].val) - fabs(breakpoints[0].val) < MIN_LONGSTEP && fabs(breakpoints[0].val) > epsilon )
+   if( usedBp > 0 && breakpoints[usedBp].val - breakpoints[0].val < MIN_LONGSTEP && breakpoints[0].val > epsilon )
    {
       MSG_DEBUG( spxout << "DLSTEP03 "
                         << thesolver->basis().iteration()
@@ -494,7 +498,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
    assert(!instable || thesolver->instableLeaveNum >= 0);
    stab = instable ? LOWSTAB : SPxFastRT::minStability(moststable);
 
-   while( usedBp >= 0 && nBp > 0)
+   while( usedBp >= 0 )
    {
       int idx = breakpoints[usedBp].idx;
 
