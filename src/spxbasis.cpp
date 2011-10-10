@@ -145,8 +145,7 @@ bool SPxBasis::isDescValid(const Desc& ds)
       {
          if ( (ds.rowstat[row] == Desc::P_FIXED && theLP->SPxLP::lhs(row) != theLP->SPxLP::rhs(row))
               || (ds.rowstat[row] == Desc::P_ON_UPPER && theLP->SPxLP::rhs(row) >= infinity)
-              || (ds.rowstat[row] == Desc::P_ON_LOWER && theLP->SPxLP::lhs(row) <= -infinity)
-              || (ds.rowstat[row] == Desc::P_FREE && (theLP->SPxLP::lhs(row) > -infinity || theLP->SPxLP::rhs(row) < infinity)) )
+              || (ds.rowstat[row] == Desc::P_ON_LOWER && theLP->SPxLP::lhs(row) <= -infinity) )
             return false;
       }
    }
@@ -165,8 +164,7 @@ bool SPxBasis::isDescValid(const Desc& ds)
       {
          if ( (ds.colstat[col] == Desc::P_FIXED && theLP->SPxLP::lower(col) != theLP->SPxLP::upper(col))
               || (ds.colstat[col] == Desc::P_ON_UPPER && theLP->SPxLP::upper(col) >= infinity)
-              || (ds.colstat[col] == Desc::P_ON_LOWER && theLP->SPxLP::lower(col) <= -infinity)
-              || (ds.colstat[col] == Desc::P_FREE && (theLP->SPxLP::lower(col) > -infinity || theLP->SPxLP::upper(col) < infinity)) )
+              || (ds.colstat[col] == Desc::P_ON_LOWER && theLP->SPxLP::lower(col) <= -infinity) )
             return false;
       }
    }

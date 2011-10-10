@@ -29,6 +29,7 @@ interface:
 - adapted method to read/write basis for free nonbasic variables
 - added command line option '-t3' to use the bound flipping ratio test (long step dual)
 - number of performed bound flips during ratio test are displayed as 'flips=' in line 'Finished solving...'
+- allowed free basis status (SPxSolver::ZERO, SPxBasis::Desc::P_FREE) for variables and constraints with finite bounds
 
 performance:
 - increased default Markowitz threshold to 0.04 to increase numerical stability of the factorization

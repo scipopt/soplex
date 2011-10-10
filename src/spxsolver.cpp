@@ -1451,8 +1451,7 @@ bool SPxSolver::isBasisValid(DataArray<VarStatus> p_rows, DataArray<VarStatus> p
       {
          if ( (p_rows[row] == FIXED && lhs(row) != rhs(row))
               || (p_rows[row] == ON_UPPER && rhs(row) >= infinity)
-              || (p_rows[row] == ON_LOWER && lhs(row) <= -infinity)
-              || (p_rows[row] == ZERO && (lhs(row) > -infinity || rhs(row) < infinity)) )
+              || (p_rows[row] == ON_LOWER && lhs(row) <= -infinity) )
             return false;
       }
    }
@@ -1471,8 +1470,7 @@ bool SPxSolver::isBasisValid(DataArray<VarStatus> p_rows, DataArray<VarStatus> p
       {
          if ( (p_cols[col] == FIXED && lower(col) != upper(col))
               || (p_cols[col] == ON_UPPER && upper(col) >= infinity)
-              || (p_cols[col] == ON_LOWER && lower(col) <= -infinity)
-              || (p_cols[col] == ZERO && (lower(col) > -infinity || upper(col) < infinity)) )
+              || (p_cols[col] == ON_LOWER && lower(col) <= -infinity) )
             return false;
       }
    }
