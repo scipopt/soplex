@@ -20,6 +20,7 @@
 
 #include "spxdefines.h"
 #include "spxlp.h"
+#include "spxfileio.h"
 
 using namespace soplex;
 
@@ -161,7 +162,7 @@ static void write_latte(const SPxLP& lp, std::ofstream& ofile)
 
 static void read_latte(
    SPxLP& lp, 
-   std::ifstream& ifile,
+   spxifstream& ifile,
    NameSet& rownames,
    NameSet& colnames,
    DIdxSet& intvars)
@@ -328,7 +329,7 @@ int main(int argc, char **argv)
    NameSet     colnames;
    DIdxSet     intvars;
 
-   std::ifstream ifile(inpfile);
+   spxifstream ifile(inpfile);
 
    if (!ifile)
    {
