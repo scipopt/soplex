@@ -405,6 +405,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
       // restore original slope
       slope = fabs(thesolver->instableLeaveVal);
    }
+   assert(slope > 0);
 
    // set up structures for the quicksort implementation
    BreakpointCompare compare;
@@ -475,7 +476,9 @@ SPxId SPxBoundFlippingRT::selectEnter(
                         << thesolver->basis().iteration()
                         << ": unboundedness in ratio test"
                         << std::endl; )
-      return enterId;
+      // in theory this case should only occur in an infeasible instance,
+      // unfortunately this appears to be wrong and we try to continue nevertheless
+      // return enterId;
    }
 
    // do not make long steps if the gain in the dual objective is too small, except to avoid degenerate steps
