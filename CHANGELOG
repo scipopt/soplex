@@ -57,6 +57,8 @@ fixed bugs:
 - fixed potential NULL pointer dereference in nameset.h, when name is not found in hashtable
 - fixed potential segmentation fault when calling sorting routines on empty arrays (sorter.h)
 - send debugging output to standard out instead of error stream
+- fixed bug in unsimplification of duplicate columns (do not replace two linearly dependent columns by one if free basis
+  status can not be resolved in unsimplification)
 
 
 30 Sep 2010 - Release 1.5.0

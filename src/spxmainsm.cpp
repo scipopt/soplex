@@ -1075,65 +1075,35 @@ void SPxMainSM::DuplicateColsPS::execute(DVector& x,
    }
    else if (cStatus[m_k] == SPxSolver::ZERO)
    {
-      if (m_loK <= -infinity && m_upK >= infinity)
-      {
-         x[m_j] = 0.0;
+      /* we only aggregate duplicate columns if 0 is contained in their bounds, so we can handle this case properly */
+      assert(x[m_k] == 0.0);
+      assert(LErel(m_loJ, 0.0));
+      assert(GErel(m_upJ, 0.0));
+      assert(LErel(m_loK, 0.0));
+      assert(GErel(m_upK, 0.0));
 
-         if (isZero(m_loJ) && isZero(m_upJ))
-            cStatus[m_j] = SPxSolver::FIXED;
-         else if (isZero(m_loJ))
-            cStatus[m_j] = SPxSolver::ON_LOWER;
-         else if (isZero(m_upJ))
-            cStatus[m_j] = SPxSolver::ON_UPPER;
-         else if (m_loJ <= -infinity && m_upJ >= infinity)
-            cStatus[m_j] = SPxSolver::ZERO;
-         else
-            throw SPxInternalCodeException("XMAISM05 This should never happen.");
-      }
-      else if (m_loJ <= -infinity && m_upJ >= infinity)
-      {
-         x[m_j]       = 0.0;
-         cStatus[m_j] = SPxSolver::ZERO;
-
-         if (isZero(m_loK) && isZero(m_upK))
-            cStatus[m_k] = SPxSolver::FIXED;
-         else if (isZero(m_loK))
-            cStatus[m_k] = SPxSolver::ON_LOWER;
-         else if (isZero(m_upK))
-            cStatus[m_k] = SPxSolver::ON_UPPER;
-         else if (m_loK <= -infinity && m_upK >= infinity)
-            cStatus[m_k] = SPxSolver::ZERO;
-         else
-            throw SPxInternalCodeException("XMAISM06 This should never happen.");
-      }
-      else if (m_loK > -infinity)
-      {
-         x[m_j]       = x[m_k] - m_scale * m_loK;
-         x[m_k]       = m_loK;
+      if (isZero(m_loK) && isZero(m_upK))
+         cStatus[m_k] = SPxSolver::FIXED;
+      else if (isZero(m_loK))
          cStatus[m_k] = SPxSolver::ON_LOWER;
-
-         if (EQrel(x[m_j], m_loJ))
-            cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
-         else if (EQrel(x[m_j], m_upJ))
-            cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
-         else
-            throw SPxInternalCodeException("XMAISM07 This should never happen.");
-      }
-      else if (m_upK < infinity)
-      {
-         x[m_j]       = x[m_k] - m_scale * m_upK;
-         x[m_k]       = m_upK;
+      else if (isZero(m_upK))
          cStatus[m_k] = SPxSolver::ON_UPPER;
-
-         if (EQrel(x[m_j], m_loJ))
-            cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
-         else if (EQrel(x[m_j], m_upJ))
-            cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
-         else
-            throw SPxInternalCodeException("XMAISM08 This should never happen.");
-      }
+      else if (LErel(m_loK, 0.0) && GErel(m_upK, 0.0))
+         cStatus[m_k] = SPxSolver::ZERO;
       else
-         throw SPxInternalCodeException("XMAISM09 This should never happen.");
+         throw SPxInternalCodeException("XMAISM05 This should never happen.");
+
+      x[m_j] = 0.0;
+      if (isZero(m_loJ) && isZero(m_upJ))
+         cStatus[m_j] = SPxSolver::FIXED;
+      else if (isZero(m_loJ))
+         cStatus[m_j] = SPxSolver::ON_LOWER;
+      else if (isZero(m_upJ))
+         cStatus[m_j] = SPxSolver::ON_UPPER;
+      else if (LErel(m_loJ, 0.0) && GErel(m_upJ, 0.0))
+            cStatus[m_j] = SPxSolver::ZERO;
+      else
+         throw SPxInternalCodeException("XMAISM06 This should never happen.");
    }
    else if (cStatus[m_k] == SPxSolver::BASIC)
    {
@@ -3257,42 +3227,55 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
                   if (isZero(objDif, epsZero()))
                   {
                      // case 1: objectives also duplicate
-                     // variable substitution xj2' := xj2 + factor * xj1 <=> xj2 = -factor * xj1 + xj2'
-                     m_hist.append(new DuplicateColsPS(lp, j1, j2, factor, m_perm_empty));
 
-                     // update bounds of remaining column j2 (new column j2')
-                     if (factor > 0)
+                     // if 0 is not within the column bounds, we are not able to postsolve if the aggregated column has
+                     // status ZERO, hence we skip this case
+                     if (LErel(lp.lower(j1), 0.0) && GErel(lp.upper(j1), 0.0)
+                        && LErel(lp.lower(j2), 0.0) && GErel(lp.upper(j2), 0.0))
                      {
-                        if (lp.lower(j2) <= -infinity || lp.lower(j1) <= -infinity)
-                           lp.changeLower(j2, -infinity);
-                        else
-                           lp.changeLower(j2, lp.lower(j2) + factor * lp.lower(j1));
+                        // variable substitution xj2' := xj2 + factor * xj1 <=> xj2 = -factor * xj1 + xj2'
+                        m_hist.append(new DuplicateColsPS(lp, j1, j2, factor, m_perm_empty));
 
-                        if (lp.upper(j2) >= infinity || lp.upper(j1) >= infinity)
-                           lp.changeUpper(j2, infinity);
-                        else
-                           lp.changeUpper(j2, lp.upper(j2) + factor * lp.upper(j1));
+                        // update bounds of remaining column j2 (new column j2')
+                        if (factor > 0)
+                        {
+                           if (lp.lower(j2) <= -infinity || lp.lower(j1) <= -infinity)
+                              lp.changeLower(j2, -infinity);
+                           else
+                              lp.changeLower(j2, lp.lower(j2) + factor * lp.lower(j1));
+
+                           if (lp.upper(j2) >= infinity || lp.upper(j1) >= infinity)
+                              lp.changeUpper(j2, infinity);
+                           else
+                              lp.changeUpper(j2, lp.upper(j2) + factor * lp.upper(j1));
+                        }
+                        else if (factor < 0)
+                        {
+                           if (lp.lower(j2) <= -infinity || lp.upper(j1) >= infinity)
+                              lp.changeLower(j2, -infinity);
+                           else
+                              lp.changeLower(j2, lp.lower(j2) + factor * lp.upper(j1));
+
+                           if (lp.upper(j2) >= infinity || lp.lower(j1) <= -infinity)
+                              lp.changeUpper(j2, infinity);
+                           else
+                              lp.changeUpper(j2, lp.upper(j2) + factor * lp.lower(j1));
+                        }
+
+                        MSG_INFO3( spxout << "IMAISM60 two duplicate columns " << j1
+                           << ", " << j2
+                           << " replaced by one" << std::endl; )
+
+                           remCol[j1] = true;
+
+                        ++m_stat[SUB_DUPLICATE_COL];
                      }
-                     else if (factor < 0)
+                     else
                      {
-                        if (lp.lower(j2) <= -infinity || lp.upper(j1) >= infinity)
-                           lp.changeLower(j2, -infinity);
-                        else
-                           lp.changeLower(j2, lp.lower(j2) + factor * lp.upper(j1));
-
-                        if (lp.upper(j2) >= infinity || lp.lower(j1) <= -infinity)
-                           lp.changeUpper(j2, infinity);
-                        else
-                           lp.changeUpper(j2, lp.upper(j2) + factor * lp.lower(j1));
+                        MSG_INFO3( spxout << "IMAISM80 not removing two duplicate columns " << j1
+                           << ", " << j2
+                           << " because zero not contained in their bounds" << std::endl; )
                      }
-
-                     MSG_INFO3( spxout << "IMAISM60 two duplicate columns " << j1
-                                       << ", " << j2
-                                       << " replaced by one" << std::endl; )
-
-                     remCol[j1] = true;
-
-                     ++m_stat[SUB_DUPLICATE_COL];
                   }
                   else
                   {
