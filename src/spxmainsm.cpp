@@ -3003,6 +3003,7 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
                   MSG_INFO3( spxout << "IMAISM55 duplicate rows yield infeasible bounds:"
                                     << " lhs=" << newLhs
                                     << " rhs=" << newRhs << std::endl; )
+                  delete[] perm_tmp;
                   return INFEASIBLE;
                }
             }
