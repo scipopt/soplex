@@ -18,8 +18,6 @@
 #@brief   SoPlex Makefile
 #@author  Thorsten Koch
 
-.PHONY:		all depend clean cleanlib lint doc check test
-
 #-----------------------------------------------------------------------------
 # detect host architecture
 #-----------------------------------------------------------------------------
@@ -138,7 +136,7 @@ ifeq ($(SHARED),true)
 CPPFLAGS	+=	-fPIC
 LIBEXT		=	$(SHAREDLIBEXT)
 LIBBUILD	=	$(LINKCXX)
-LIBBUILDFLAGS	+=      -shared -fPIC
+LIBBUILDFLAGS	+=      -shared
 LIBBUILD_o	= 	-o # the trailing space is important
 ARFLAGS		=
 RANLIB		=
@@ -192,6 +190,7 @@ ifeq ($(VERBOSE),false)
 .SILENT:	$(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK) $(BINFILE) $(LIBFILE) $(BINOBJFILES) $(LIBOBJFILES)
 endif
 
+.PHONY: all
 all:		$(LIBFILE) $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
 simpleexample:	$(LIBFILE) $(EXAMPLEFILE) $(LIBLINK) $(LIBSHORTLINK)
 
@@ -224,18 +223,21 @@ ifneq ($(RANLIB),)
 		$(RANLIB) $@
 endif
 
-
+.PHONY: lint
 lint:		$(BINSRC) $(LIBSRC)
 		$(LINT) lint/$(NAME).lnt -os\(lint.out\) \
 		$(CPPFLAGS) -UNDEBUG $^
 
+.PHONY: doc
 doc:		
 		cd doc; $(DOXY) $(NAME).dxy
 
 all:		$(BINFILE)
 
+.PHONY: test
 test:		check
 
+.PHONY: check
 check:		#$(BINFILE)
 		cd check; ./check.sh $(TEST).test ../$(BINFILE) '$(ALGO)' $(LIMIT)
 
@@ -251,15 +253,13 @@ memory_exception_test: $(BINFILE)
 
 .PHONY: cleanbin
 cleanbin:       $(BINDIR)
-		@echo "remove binary" 
+		@echo "remove binary $(BINFILE)"
 		@-rm -f $(BINFILE) $(BINLINK) $(BINSHORTLINK)
-		@-rmdir --ignore-fail-on-non-empty $(BINDIR)
 
 .PHONY: cleanlib
 cleanlib:       $(LIBDIR)
 		@echo "remove library $(LIBFILE)" 
 		@-rm -f $(LIBFILE) $(LIBLINK) $(LIBSHORTLINK)
-		@-rmdir --ignore-fail-on-non-empty $(LIBDIR)
 
 .PHONY: clean
 clean:          cleanlib cleanbin $(LIBOBJDIR) $(BINOBJDIR) $(OBJDIR)
@@ -273,7 +273,6 @@ endif
 ifneq ($(OBJDIR),)
 		@-rm -f $(LASTSETTINGS)
 		@-rmdir $(OBJDIR)
-		@-rmdir --ignore-fail-on-non-empty obj
 endif
 		@-rm -f $(EXAMPLEFILE)
 
@@ -298,6 +297,7 @@ $(BINDIR):
 $(LIBDIR):
 		@-mkdir -p $(LIBDIR)
 
+.PHONY: depend
 depend:
 		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
 		$(BINSRC:.o=.cpp) \
