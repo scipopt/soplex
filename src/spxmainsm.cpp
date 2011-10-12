@@ -1123,47 +1123,107 @@ void SPxMainSM::DuplicateColsPS::execute(DVector& x,
       if (isZero(z2))
          z2 = 0.0;
 
-      if (m_loJ <= -infinity && m_upJ >= infinity && m_loK <= -infinity && m_upK >= infinity)
+      if( m_loJ <= -infinity && m_upJ >= infinity && m_loK <= -infinity && m_upK >= infinity )
       {
-         x[m_j]       = 0.0;
          cStatus[m_j] = SPxSolver::ZERO;
+         x[m_j] = 0.0;
       }
-      else if (m_loJ > -infinity                             &&
-               GErel(x[m_k] - m_scale * m_loJ, m_loK, eps()) &&
-               LErel(x[m_k] - m_scale * m_loJ, m_upK, eps()))
+      else if( m_scale > 0.0 )
       {
-         x[m_j]       = m_loJ;
-         x[m_k]      -= m_scale * x[m_j];
-         cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
-      }
-      else if (m_upJ < infinity                              &&
-               GErel(x[m_k] - m_scale * m_upJ, m_loK, eps()) &&
-               LErel(x[m_k] - m_scale * m_upJ, m_upK, eps()))
-      {
-         x[m_j]       = m_upJ;
-         x[m_k]      -= m_scale * x[m_j];
-         cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
-      }
-      else if (m_loK > -infinity                          &&
-               GErel(z1 * scale1 / m_scale, m_loJ, eps()) &&
-               LErel(z1 * scale1 / m_scale, m_upJ, eps()))
-      {
-         x[m_j]       = z1 * scale1 / m_scale;
-         x[m_k]       = m_loK;
-         cStatus[m_j] = SPxSolver::BASIC;
-         cStatus[m_k] = EQrel(m_loK, m_upK) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
-      }
-      else if (m_upK < infinity                           &&
-               GErel(z2 * scale2 / m_scale, m_loJ, eps()) &&
-               LErel(z2 * scale2 / m_scale, m_upJ, eps()))
-      {
-         x[m_j]       = z2 * scale2 / m_scale;
-         x[m_k]       = m_upK;
-         cStatus[m_j] = SPxSolver::BASIC;
-         cStatus[m_k] = EQrel(m_loK, m_upK) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
+         if( GErel(x[m_k], m_upK + m_scale * m_upJ) )
+         {
+            assert(m_upJ < infinity);
+            cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
+            x[m_j] = m_upJ;
+            x[m_k] -= m_scale * x[m_j];
+         }
+         else if( GErel(x[m_k], m_loK + m_scale * m_upJ) && m_upJ < infinity )
+         {
+            cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
+            x[m_j] = m_upJ;
+            x[m_k] -= m_scale * x[m_j];
+         }
+         else if( GErel(x[m_k], m_upK + m_scale * m_loJ) && m_upK < infinity )
+         {
+            cStatus[m_k] = EQrel(m_loK, m_upK) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
+            x[m_k] = m_upK;
+            cStatus[m_j] = SPxSolver::BASIC;
+            x[m_j] = z2 * scale2 / m_scale;
+         }
+         else if( GErel(x[m_k], m_loK + m_scale * m_loJ) && m_loJ > -infinity )
+         {
+            cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
+            x[m_j] = m_loJ;
+            x[m_k] -= m_scale * x[m_j];
+         }
+         else if( GErel(x[m_k], m_loK + m_scale * m_loJ) && m_loK > -infinity )
+         {
+            cStatus[m_k] = EQrel(m_loK, m_upK) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
+            x[m_k] = m_loK;
+            cStatus[m_j] = SPxSolver::BASIC;
+            x[m_j] = z1 * scale1 / m_scale;
+         }
+         else if( LTrel(x[m_k], m_loK + m_scale * m_loJ) )
+         {
+            assert(m_loJ > -infinity);
+            cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
+            x[m_j] = m_loJ;
+            x[m_k] -= m_scale * x[m_j];
+         }
+         else
+         {
+            throw SPxInternalCodeException("XMAISM08 This should never happen.");
+         }
       }
       else
-         throw SPxInternalCodeException("XMAISM10 This should never happen.");
+      {
+         assert(m_scale < 0.0);
+
+         if( GErel(x[m_k], m_upK + m_scale * m_loJ) )
+         {
+            assert(m_loJ > -infinity);
+            cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
+            x[m_j] = m_loJ;
+            x[m_k] -= m_scale * x[m_j];
+         }
+         else if( GErel(x[m_k], m_loK + m_scale * m_loJ) && m_loJ > -infinity )
+         {
+            cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
+            x[m_j] = m_loJ;
+            x[m_k] -= m_scale * x[m_j];
+         }
+         else if( GErel(x[m_k], m_upK + m_scale * m_upJ) && m_upK < infinity )
+         {
+            cStatus[m_k] = EQrel(m_loK, m_upK) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
+            x[m_k] = m_upK;
+            cStatus[m_j] = SPxSolver::BASIC;
+            x[m_j] = z2 * scale2 / m_scale;
+         }
+         else if( GErel(x[m_k], m_loK + m_scale * m_upJ) && m_upJ < infinity )
+         {
+            cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
+            x[m_j] = m_upJ;
+            x[m_k] -= m_scale * x[m_j];
+         }
+         else if( GErel(x[m_k], m_loK + m_scale * m_upJ) && m_loK > -infinity )
+         {
+            cStatus[m_k] = EQrel(m_loK, m_upK) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
+            x[m_k] = m_loK;
+            cStatus[m_j] = SPxSolver::BASIC;
+            x[m_j] = z1 * scale1 / m_scale;
+         }
+         else if( LTrel(x[m_k], m_loK + m_scale * m_upJ) )
+         {
+            assert(m_upJ < infinity);
+            cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
+            x[m_j] = m_upJ;
+            x[m_k] -= m_scale * x[m_j];
+         }
+         else
+         {
+            throw SPxInternalCodeException("XMAISM09 This should never happen.");
+         }
+      }
    }
 
    // dual:

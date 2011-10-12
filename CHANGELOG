@@ -60,6 +60,7 @@ fixed bugs:
 - send debugging output to standard out instead of error stream
 - fixed bug in unsimplification of duplicate columns (do not replace two linearly dependent columns by one if free basis
   status can not be resolved in unsimplification)
+- fixed several bugs when unsimplifying infeasible bases
 
 
 30 Sep 2010 - Release 1.5.0
