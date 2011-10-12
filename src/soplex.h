@@ -167,6 +167,13 @@ public:
       for (int i = 0; i < nRows(); i++)
          m_rowsbasisstatus[i] = rows[i];
    }
+   /// clear starting basis
+   virtual void clearBasis()
+   {
+      m_colsbasisstatus.clear();
+      m_rowsbasisstatus.clear();
+      m_solver.reLoad();
+   }
    /// set time limit.
    virtual void setTerminationTime(Real time = infinity)
    {
