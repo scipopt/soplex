@@ -475,7 +475,9 @@ SPxId SPxBoundFlippingRT::selectEnter(
                         << thesolver->basis().iteration()
                         << ": unboundedness in ratio test"
                         << std::endl; )
-      return enterId;
+      flipPotential *= 0.95;
+      val = max;
+      return SPxFastRT::selectEnter(val, leaveIdx);
    }
 
    // do not make long steps if the gain in the dual objective is too small, except to avoid degenerate steps
