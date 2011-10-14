@@ -31,7 +31,7 @@ namespace soplex
 #define LOWSTAB          1e-10
 #define MAX_RELAX_COUNT  2
 #define LONGSTEP_FREQ    500
-#define MIN_LONGSTEP     1e-6
+#define MIN_LONGSTEP     1e-2
 
 /** perform necessary bound flips to restore dual feasibility */
 void SPxBoundFlippingRT::flipAndUpdate(
@@ -317,6 +317,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
    )
 {
    assert( m_type == SPxSolver::LEAVE );
+   assert(thesolver->boundflips == 0);
 
    // reset the history and try again to do some long steps
    if( thesolver->leaveCount % LONGSTEP_FREQ == 0 )
@@ -481,7 +482,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
    }
 
    // do not make long steps if the gain in the dual objective is too small, except to avoid degenerate steps
-   if( usedBp > 0 && breakpoints[usedBp].val - breakpoints[0].val < MIN_LONGSTEP && breakpoints[0].val > epsilon )
+   if( usedBp > 0 && breakpoints[0].val > epsilon && breakpoints[usedBp].val - breakpoints[0].val < MIN_LONGSTEP * breakpoints[0].val )
    {
       MSG_DEBUG( spxout << "DLSTEP03 "
                         << thesolver->basis().iteration()
@@ -492,6 +493,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
       // ensure that the first breakpoint is nonbasic
       while( breakpoints[usedBp].idx < 0 && usedBp < nBp )
          ++usedBp;
+      // @todo make shure that the selected pivot element is stable
    }
 
    // scan pivot candidates from back to front and stop as soon as a good one is found
