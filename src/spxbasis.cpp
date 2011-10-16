@@ -708,7 +708,7 @@ void SPxBasis::change(
             totalUpdateTime.stop();
 #endif
          }
-         catch( SPxException E )
+         catch( ... )
          {
             MSG_INFO3( spxout << "IBASIS13 problems updating factorization; refactorizing basis"
                << std::endl; )
