@@ -35,7 +35,7 @@ namespace soplex
 */
 
 template < class T, class COMPARATOR >
-void sorter_qsort(T* t, int end, COMPARATOR& compare, int start = 0)
+static void sorter_qsort(T* t, int end, COMPARATOR& compare, int start = 0)
 {
    assert(start >= 0);
 
@@ -102,7 +102,7 @@ void sorter_qsort(T* t, int end, COMPARATOR& compare, int start = 0)
  * - > 0, if \p t1 is to appear after \p t2.
  */
 template < class T, class COMPARATOR >
-int sorter_qsortPart(
+static int sorter_qsortPart(
    T*                    t,                  /**< array of elements to be sorted between index start and end */
    COMPARATOR&           compare,            /**< comparator */
    int                   start,              /**< index of first element in range to be sorted */

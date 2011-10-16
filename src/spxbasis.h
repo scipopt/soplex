@@ -787,8 +787,7 @@ public:
 #endif
          ;
 
-   return s.str();
-      return factor->statistics();
+      return s.str();
    }
    //@}
 

@@ -1037,7 +1037,7 @@ void clean_up(
 //    main program
 //------------------------------------------------------------------------
 
-int main(int argc, const char* const argv[])
+int main(int argc, char* argv[])
 {
    const char*               filename;
    char*                     basisname      = 0;
