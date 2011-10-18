@@ -659,9 +659,6 @@ void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& 
       up = 0.0;
 
    assert(LErel(lo, up));
-   assert((LErel(m_lower, lo, 1e-10) && LErel(lo, m_upper, 1e-10)) ||
-          (LErel(m_lower, up, 1e-10) && LErel(up, m_upper, 1e-10)) ||
-          (LErel(lo, m_lower, 1e-10) && LErel(m_upper, up, 1e-10)));
    ASSERT_WARN( "WMAISM01", isNotZero(aij) );
 
    if (rStatus[m_i] == SPxSolver::ON_LOWER)
@@ -713,40 +710,32 @@ void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& 
    }
    else if (rStatus[m_i] == SPxSolver::BASIC)
    {
-      if (GErel(m_lower, lo, eps()) && LErel(m_lower, up, eps()))
+      if (GErel(m_lower, lo, eps()) && m_lower > -infinity)
       {
          x[m_j]       = m_lower;
          cStatus[m_j] = EQrel(m_lower, m_upper) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
       }
-      else if (GErel(m_upper, lo, eps()) && LErel(m_upper, up, eps()))
+      else if (LErel(m_upper, up, eps()) && m_upper < infinity)
       {
          x[m_j]       = m_upper;
          cStatus[m_j] = EQrel(m_lower, m_upper) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
       }
-      else
+      else if (lo > -infinity)
       {
          // make m_i non-basic and m_j basic
-         if (EQrel(lo, up))
-         {
-            x[m_j]       = lo;
-            cStatus[m_j] = SPxSolver::BASIC;
-            rStatus[m_i] = SPxSolver::FIXED;
-         }
-         else if (GE(lo, m_lower, eps()) && LE(lo, m_upper, eps()))
-         {
-            x[m_j]       = lo;
-            cStatus[m_j] = SPxSolver::BASIC;
-            rStatus[m_i] = (aij > 0) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
-         }
-         else if (GE(up, m_lower, eps()) && LE(up, m_upper, eps()))
-         {
-            x[m_j]       = up;
-            cStatus[m_j] = SPxSolver::BASIC;
-            rStatus[m_i] = (aij > 0) ? SPxSolver::ON_UPPER : SPxSolver::ON_LOWER;
-         }
-         else
-            throw SPxInternalCodeException("XMAISM03 This should never happen.");
+         x[m_j]       = lo;
+         cStatus[m_j] = SPxSolver::BASIC;
+         rStatus[m_i] = EQrel(lo, up) ? SPxSolver::FIXED : (aij > 0 ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER);
       }
+      else if (up < infinity)
+      {
+         // make m_i non-basic and m_j basic
+         x[m_j]       = up;
+         cStatus[m_j] = SPxSolver::BASIC;
+         rStatus[m_i] = EQrel(lo, up) ? SPxSolver::FIXED : (aij > 0 ? SPxSolver::ON_UPPER : SPxSolver::ON_LOWER);
+      }
+      else
+         throw SPxInternalCodeException("XMAISM03 This should never happen.");
    }
    else
       throw SPxInternalCodeException("XMAISM04 This should never happen.");
