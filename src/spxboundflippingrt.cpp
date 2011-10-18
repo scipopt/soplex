@@ -33,6 +33,7 @@ namespace soplex
 #define LONGSTEP_FREQ    500
 #define MIN_LONGSTEP     1e-2
 
+
 /** perform necessary bound flips to restore dual feasibility */
 void SPxBoundFlippingRT::flipAndUpdate(
    int&                  usedBp              /**< number of bounds that should be flipped */
@@ -322,7 +323,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
    // reset the history and try again to do some long steps
    if( thesolver->leaveCount % LONGSTEP_FREQ == 0 )
       flipPotential = 1;
-   if( thesolver->rep() == SPxSolver::ROW || flipPotential < 0.01 )
+   if( !enableLongsteps || thesolver->rep() == SPxSolver::ROW || flipPotential < 0.01 )
    {
       return SPxFastRT::selectEnter(val, leaveIdx);
    }
@@ -493,7 +494,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
       // ensure that the first breakpoint is nonbasic
       while( breakpoints[usedBp].idx < 0 && usedBp < nBp )
          ++usedBp;
-      // @todo make shure that the selected pivot element is stable
+      // @todo make sure that the selected pivot element is stable
    }
 
    // scan pivot candidates from back to front and stop as soon as a good one is found
@@ -501,6 +502,8 @@ SPxId SPxBoundFlippingRT::selectEnter(
    instable = thesolver->instableLeave;
    assert(!instable || thesolver->instableLeaveNum >= 0);
    stab = instable ? LOWSTAB : SPxFastRT::minStability(moststable);
+   // @todo select the moststable pivot or one that is comparably stable
+   // stab = moststable * 1e-2;
 
    while( usedBp >= 0 )
    {
