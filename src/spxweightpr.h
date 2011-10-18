@@ -162,15 +162,12 @@ public:
    virtual void removedCoVecs(const int perm[]);
    //@}
 
-#ifndef NO_CONSISTENCY_CHECKS
    //-------------------------------------
    /**@name Consistency check */
    //@{
    /// checks for consistency
    virtual bool isConsistent() const;
    //@}
-#endif
-
 };
 } // namespace soplex
 #endif // _SPXWEIGHTPR_H_

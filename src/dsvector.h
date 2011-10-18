@@ -156,14 +156,12 @@ public:
    void setMax(int newmax = 1);
    //@}
 
-#ifndef NO_CONSISTENCY_CHECKS
    //-----------------------------------
    /**@name Consistency check */
    //@{
    /// consistency check.
    bool isConsistent() const;
    //@}
-#endif
 };
 } // namespace soplex
 #endif // _DSVECTOR_H_

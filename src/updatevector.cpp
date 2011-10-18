@@ -41,15 +41,17 @@ UpdateVector::UpdateVector( const UpdateVector& base)
    assert(UpdateVector::isConsistent());
 }
 
-#ifndef NO_CONSISTENCY_CHECKS
 bool UpdateVector::isConsistent() const
 {
+#ifdef ENABLE_CONSISTENCY_CHECKS
    if (dim() != thedelta.dim())
       return MSGinconsistent("UpdateVector");
 
    return DVector::isConsistent() && thedelta.isConsistent();
-}
+#else
+   return true;
 #endif
+}
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

@@ -126,15 +126,12 @@ public:
    virtual Real maxRowRatio(const SPxLP& lp) const;
    //@}
 
-#ifndef NO_CONSISTENCY_CHECKS
    //-------------------------------------
    /**@name Debugging */
    //@{
    /// consistency check
    virtual bool isConsistent() const;
    //@}
-#endif
-
 };
 } // namespace soplex
 #endif // _SPXSCALER_H_

@@ -388,10 +388,10 @@ public:
       }
    }
 
-#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check.
    bool isConsistent() const
    {
+#ifdef ENABLE_CONSISTENCY_CHECKS
       if (first() != 0 && last() == 0)
          return MSGinconsistent("IsList");
 
@@ -400,10 +400,10 @@ public:
 
       if (first() && find(last()) == 0)
          return MSGinconsistent("IsList");
+#endif
 
       return true;
    }
-#endif
    //@}
 
    //------------------------------------

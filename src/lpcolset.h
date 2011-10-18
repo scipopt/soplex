@@ -364,10 +364,8 @@ public:
    //------------------------------------
    /**@name Miscellaneous */
    //@{
-#ifndef NO_CONSISTENCY_CHECKS
    ///
    bool isConsistent() const;
-#endif
    //@}
 
    //------------------------------------

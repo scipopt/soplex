@@ -311,10 +311,10 @@ public:
       }
    }
 
-#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check.
    bool isConsistent() const
    {
+#ifdef ENABLE_CONSISTENCY_CHECKS
       const T* my_first = first();
       const T* my_last  = last();
       for (const T * it = my_first; it; it = next(it))
@@ -326,8 +326,10 @@ public:
             return MSGinconsistent("IdList");
       }
       return IsList<T>::isConsistent();
-   }
+#else
+      return true;
 #endif
+   }
    //@}
 
    //---------------------------------------

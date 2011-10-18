@@ -327,10 +327,8 @@ public:
    /// clears vector.
    void clear ();
 
-#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check.
    bool isConsistent() const;
-#endif
    //@}
 
 

@@ -953,9 +953,9 @@ SSVector& SSVector::assign2productAndSetup(const SVSet& A, SSVector& x)
 }
 
 
-#ifndef NO_CONSISTENCY_CHECKS
 bool SSVector::isConsistent() const
 {
+#ifdef ENABLE_CONSISTENCY_CHECKS
    if (Vector::dim() > IdxSet::max())
       return MSGinconsistent("SSVector");
 
@@ -979,8 +979,10 @@ bool SSVector::isConsistent() const
       }
    }
    return DVector::isConsistent() && IdxSet::isConsistent();
-}
+#else
+   return true;
 #endif
+}
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

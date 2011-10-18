@@ -131,15 +131,12 @@ public:
    virtual void addedCoVecs(int n);
    //@}
 
-#ifndef NO_CONSISTENCY_CHECKS
    //-------------------------------------
    /**@name Consistency check */
    //@{
    /// consistency check
    virtual bool isConsistent() const;
    //@}
-#endif
-
 };
 
 } // namespace soplex

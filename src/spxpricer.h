@@ -203,16 +203,18 @@ public:
    {}
    //@}
 
-#ifndef NO_CONSISTENCY_CHECKS
    //-------------------------------------
    /**@name Debugging */
    //@{
    virtual bool isConsistent() const 
    {
+#ifdef ENABLE_CONSISTENCY_CHECKS
       return thesolver != 0;
+#else
+      return true;
+#endif
    }
    //@}
-#endif
 
    //-------------------------------------
    /**@name Constructors / Destructors */

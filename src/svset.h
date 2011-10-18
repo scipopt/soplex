@@ -449,10 +449,9 @@ public:
    //@{
    /// reset maximum number of SVector%s.
    void reMax(int newmax = 0);
-#ifndef NO_CONSISTENCY_CHECKS
+
    /// consistency check.
    bool isConsistent() const;
-#endif
    //@}
 
    //------------------------------------

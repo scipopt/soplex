@@ -115,15 +115,15 @@ void DSVector::setMax(int newmax)
 //   consistency check
 //-----------------------------------------------------------
 
-#ifndef NO_CONSISTENCY_CHECKS
 bool DSVector::isConsistent() const
 {
+#ifdef ENABLE_CONSISTENCY_CHECKS
    if ((theelem != 0) && (mem() != theelem))
       return MSGinconsistent("DSVector");
+#endif
 
    return true;
 }
-#endif
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

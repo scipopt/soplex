@@ -180,15 +180,15 @@ Real Vector::operator*(const SVector& v) const
    return x;
 }
 
-#ifndef NO_CONSISTENCY_CHECKS
 bool Vector::isConsistent() const
 {
+#ifdef ENABLE_CONSISTENCY_CHECKS
    if (dim() > 0 && val == 0)
       return MSGinconsistent("Vector");
+#endif
 
    return true;
 }
-#endif
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

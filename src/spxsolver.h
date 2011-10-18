@@ -1782,10 +1782,8 @@ public:
    //------------------------------------
    /** Miscellaneous */
    //@{
-#ifndef NO_CONSISTENCY_CHECKS
    /// check consistency.
    bool isConsistent() const;
-#endif
    //@}
 
    //------------------------------------

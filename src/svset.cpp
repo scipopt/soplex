@@ -309,9 +309,9 @@ void SVSet::memPack()
    possiblyUnusedMem = 0;
 }
 
-#ifndef NO_CONSISTENCY_CHECKS
 bool SVSet::isConsistent() const
 {
+#ifdef ENABLE_CONSISTENCY_CHECKS
    DLPSV* ps;
    DLPSV* next;
    for (ps = list.first(); ps; ps = next)
@@ -327,8 +327,10 @@ bool SVSet::isConsistent() const
    }
    return DataArray < SVector::Element > ::isConsistent() 
       && set.isConsistent() && list.isConsistent();
-}
+#else
+   return true;
 #endif
+}
 
 SVSet& SVSet::operator=(const SVSet& rhs)
 {

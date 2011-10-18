@@ -99,14 +99,12 @@ public:
    virtual void generate(SPxSolver& base) = 0;
    //@}
 
-#ifndef NO_CONSISTENCY_CHECKS
    //-------------------------------------
    /**@name Misc */
    //@{
    /// checks consistency.
    virtual bool isConsistent() const;
    //@}
-#endif
 
 private:
 

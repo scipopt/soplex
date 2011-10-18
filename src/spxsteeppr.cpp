@@ -514,9 +514,9 @@ void SPxSteepPR::removedCoVecs(const int perm[])
    prefSetup = 0;
 }
 
-#ifndef NO_CONSISTENCY_CHECKS
 bool SPxSteepPR::isConsistent() const
 {
+#ifdef ENABLE_CONSISTENCY_CHECKS
    if (thesolver != 0 && thesolver->type() == SPxSolver::LEAVE && setup == EXACT)
    {
       int i;
@@ -544,9 +544,10 @@ bool SPxSteepPR::isConsistent() const
          if (penalty[i] < thesolver->epsilon())
             return MSGinconsistent("SPxSteepPR");
    }
+#endif
+
    return true;
 }
-#endif
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

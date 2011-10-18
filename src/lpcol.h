@@ -143,17 +143,19 @@ public:
    }
    //@}
 
-#ifndef NO_CONSISTENCY_CHECKS
    //------------------------------------
    /**@name Consistency check */
    //@{
    /// check consistency.
    bool isConsistent() const
    {
+#ifdef ENABLE_CONSISTENCY_CHECKS
       return vec.isConsistent();
+#else
+      return true;
+#endif
    }
    //@}
-#endif
 };
 } // namespace soplex
 #endif // _LPCOL_H_

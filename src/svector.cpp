@@ -257,9 +257,9 @@ std::ostream& operator<<(std::ostream& os, const SVector& v)
    return os;
 }
 
-#ifndef NO_CONSISTENCY_CHECKS
 bool SVector::isConsistent() const
 {
+#ifdef ENABLE_CONSISTENCY_CHECKS
    if (m_elem != 0)
    {
       const int my_size = size();
@@ -277,9 +277,10 @@ bool SVector::isConsistent() const
          }
       }
    }
+#endif
+
    return true;
 }
-#endif
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

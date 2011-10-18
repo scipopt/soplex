@@ -107,10 +107,8 @@ public:
    //------------------------------------
    /**@name Miscellaneous */
    //@{
-#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check
    bool isConsistent() const;
-#endif
    //@}
 };
 

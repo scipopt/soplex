@@ -161,9 +161,9 @@ void LPRowSet::setType(
    }
 }
 
-#ifndef NO_CONSISTENCY_CHECKS
 bool LPRowSet::isConsistent() const
 {
+#ifdef ENABLE_CONSISTENCY_CHECKS
    const int ldim = left.dim();
    if (ldim != right.dim())
       return MSGinconsistent("LPRowSet");
@@ -171,8 +171,10 @@ bool LPRowSet::isConsistent() const
       return MSGinconsistent("LPRowSet");
 
    return left.isConsistent() && right.isConsistent() && SVSet::isConsistent();
-}
+#else
+   return true;
 #endif
+}
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

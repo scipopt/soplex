@@ -299,10 +299,9 @@ public:
       //@{
       /// Prints out status.
       void dump() const;
-#ifndef NO_CONSISTENCY_CHECKS
+
       /// consistency check.
       bool isConsistent() const;
-#endif
       //@}
 
       //------------------------------------
@@ -760,10 +759,8 @@ public:
    /// output basis entries.
    void dump();
    
-#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check.
    bool isConsistent() const;
-#endif
 
    /// time spent in updates
    Real getTotalUpdateTime() const

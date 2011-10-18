@@ -112,9 +112,9 @@ IdxSet::IdxSet(const IdxSet& old)
    assert(isConsistent());
 }
 
-#ifndef NO_CONSISTENCY_CHECKS
 bool IdxSet::isConsistent() const
 {
+#ifdef ENABLE_CONSISTENCY_CHECKS
    int i, j;
 
    if (len > 0 && idx == 0)
@@ -129,9 +129,10 @@ bool IdxSet::isConsistent() const
          if (index(i) == index(j))
             return MSGinconsistent("IdxSet");
    }
+#endif
+
    return true;
 }
-#endif
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

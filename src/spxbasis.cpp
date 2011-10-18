@@ -902,9 +902,9 @@ void SPxBasis::dump()
 }
 
 
-#ifndef NO_CONSISTENCY_CHECKS
 bool SPxBasis::isConsistent() const
 {
+#ifdef ENABLE_CONSISTENCY_CHECKS
    METHOD( "SPxBasis::isConsistent()" );
    int primals = 0;
    int i;
@@ -946,8 +946,10 @@ bool SPxBasis::isConsistent() const
    }
    return thedesc.isConsistent() && theBaseId.isConsistent() 
       && matrix.isConsistent() && factor->isConsistent();
-}
+#else
+   return true;
 #endif // CONSISTENCY_CHECKS
+}
 
 SPxBasis::SPxBasis()
    : theLP (0)

@@ -107,10 +107,8 @@ public:
    */
    virtual Status change(int idx, const SVector& subst, const SSVector* eta = 0) = 0;
 
-#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check.
    virtual bool isConsistent() const = 0;
-#endif
    //@}
 
 

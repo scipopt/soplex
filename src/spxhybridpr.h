@@ -90,10 +90,8 @@ public:
    //-------------------------------------
    /**@name Consistency check */
    //@{
-#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check
    virtual bool isConsistent() const;
-#endif
    //@}
 
    //-------------------------------------

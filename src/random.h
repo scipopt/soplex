@@ -125,13 +125,15 @@ public:
    //--------------------------------------
    /**@name Debugging */
    //@{
-#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check.
    bool isConsistent() const
    {
+#ifdef ENABLE_CONSISTENCY_CHECKS
       return themin <= themax;
-   }
+#else
+      return true;
 #endif
+   }
    //@}
 
    //--------------------------------------

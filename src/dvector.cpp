@@ -196,15 +196,17 @@ DVector::~DVector()
       spx_free(mem);
 }
 
-#ifndef NO_CONSISTENCY_CHECKS
 bool DVector::isConsistent() const
 {
+#ifdef ENABLE_CONSISTENCY_CHECKS
    if (val != mem || dimen > memsize || dimen < 0)
       return MSGinconsistent("DVector");
 
    return Vector::isConsistent();
-}
+#else
+   return true;
 #endif
+}
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

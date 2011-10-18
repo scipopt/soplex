@@ -1087,9 +1087,9 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    assert(SPxSolver::isConsistent());
 }
 
-#ifndef NO_CONSISTENCY_CHECKS
 bool SPxSolver::isConsistent() const
 {
+#ifdef ENABLE_CONSISTENCY_CHECKS
    METHOD( "SPxSolver::isConsistent()" );
    if (epsilon() < 0)
       return MSGinconsistent("SPxSolver");
@@ -1189,8 +1189,10 @@ bool SPxSolver::isConsistent() const
           && theLCbound.isConsistent()
           && SPxBasis::isConsistent()
          ;
-}
+#else
+   return true;
 #endif
+}
 
 
 void SPxSolver::setTerminationTime(Real p_time)

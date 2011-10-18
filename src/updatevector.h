@@ -162,15 +162,12 @@ public:
    }
    //@}
 
-#ifndef NO_CONSISTENCY_CHECKS
    //------------------------------------
    /**@name Consistency check */
    //@{
    /// 
    bool isConsistent() const;
    //@}
-#endif
-
 };
 
 

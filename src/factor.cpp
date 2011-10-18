@@ -1737,11 +1737,11 @@ int CLUFactor::makeLvec(int p_len, int p_row)
 }
 
 
-#ifndef NO_CONSISTENCY_CHECKS
 /*****************************************************************************/
 
 bool CLUFactor::isConsistent() const
 {
+#ifdef ENABLE_CONSISTENCY_CHECKS
    METHOD( "CLUFactor::isConsistent()" );
    int              i, j, k, ll;
    Dring            *ring;
@@ -1875,9 +1875,10 @@ bool CLUFactor::isConsistent() const
       }
    }
 #endif
+#endif // CONSISTENCY_CHECKS
+
    return true;
 }
-#endif // CONSISTENCY_CHECKS
 
 } // namespace soplex
 

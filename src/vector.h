@@ -247,10 +247,8 @@ public:
    /// output operator.
    friend std::ostream& operator<<(std::ostream& s, const Vector& vec);
 
-#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check.
    bool isConsistent() const;
-#endif
 
    /// set vector to 0.
    void clear()

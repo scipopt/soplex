@@ -374,9 +374,9 @@ void SPxWeightPR::removedCoVecs(const int perm[])
    }
 }
 
-#ifndef NO_CONSISTENCY_CHECKS
 bool SPxWeightPR::isConsistent() const
 {
+#ifdef ENABLE_CONSISTENCY_CHECKS
    if (solver() != 0)
    {
       if (rPenalty.dim() != solver()->nRows())
@@ -384,9 +384,10 @@ bool SPxWeightPR::isConsistent() const
       if (cPenalty.dim() != solver()->nCols())
          return MSGinconsistent("SPxWeightPR");
    }
+#endif
+
    return true;
 }
-#endif
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

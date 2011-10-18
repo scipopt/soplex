@@ -261,9 +261,9 @@ NameSet::~NameSet()
    spx_free(mem);
 }
 
-#ifndef NO_CONSISTENCY_CHECKS
 bool NameSet::isConsistent() const
 {
+#ifdef ENABLE_CONSISTENCY_CHECKS
    if (memused > memmax)
       return MSGinconsistent("NameSet");
 
@@ -280,8 +280,10 @@ bool NameSet::isConsistent() const
          return MSGinconsistent("NameSet");
    }
    return set.isConsistent() && hashtab.isConsistent();
-}
+#else
+   return true;
 #endif
+}
 
 std::ostream& operator<<(std::ostream& s, const NameSet& nset)
 {

@@ -372,14 +372,16 @@ Real SPxScaler::maxRowRatio(const SPxLP& lp) const
    return pmax;
 }
 
-#ifndef NO_CONSISTENCY_CHECKS
 bool SPxScaler::isConsistent() const
 {
+#ifdef ENABLE_CONSISTENCY_CHECKS
    METHOD( "SPxScaler::isConsistent()" );
 
    return m_colscale.isConsistent() && m_rowscale.isConsistent();
-}
+#else
+   return true;
 #endif
+}
 
 } // namespace soplex
 

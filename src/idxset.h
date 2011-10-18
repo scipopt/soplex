@@ -188,17 +188,12 @@ public:
    }
    //@}
 
-#ifndef NO_CONSISTENCY_CHECKS
-
    //---------------------------------------
    /**@name Consistency check */
    //@{
    /// consistency check.
    bool isConsistent() const;
    //@}
-
-#endif
-
 };
 
 } // namespace soplex

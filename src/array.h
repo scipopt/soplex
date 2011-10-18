@@ -251,16 +251,16 @@ public:
          delete[] data;
    }
 
-#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check
    bool isConsistent() const
    {
+#ifdef ENABLE_CONSISTENCY_CHECKS
       if (num < 0 || (num > 0 && data == 0))
          return MSGinconsistent("Array");
+#endif
 
       return true;
    }
-#endif
    //@}
 };
 } // namespace soplex

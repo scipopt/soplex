@@ -791,9 +791,9 @@ void SPxLP::changeElement(int i, int j, Real val)
    assert(isConsistent());
 }
 
-#ifndef NO_CONSISTENCY_CHECKS
 bool SPxLP::isConsistent() const
 {
+#ifdef ENABLE_CONSISTENCY_CHECKS
    METHOD( "SPxLP::isConsistent()" );
    int i, j, n;
 
@@ -825,8 +825,10 @@ bool SPxLP::isConsistent() const
       }
    }
    return LPRowSet::isConsistent() && LPColSet::isConsistent();
-}
+#else
+   return true;
 #endif
+}
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

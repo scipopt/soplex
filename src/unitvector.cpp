@@ -22,9 +22,9 @@
 namespace soplex
 {
 
-#ifndef NO_CONSISTENCY_CHECKS
 bool UnitVector::isConsistent() const
 {
+#ifdef ENABLE_CONSISTENCY_CHECKS
    if (mem() != themem)
       return MSGinconsistent("UnitVector");
    if (mem() + 1 != &themem[1])
@@ -35,8 +35,10 @@ bool UnitVector::isConsistent() const
       return MSGinconsistent("UnitVector");
 
    return SVector::isConsistent();
-}
+#else
+   return true;
 #endif
+}
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

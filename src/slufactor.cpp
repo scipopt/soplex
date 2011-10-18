@@ -1054,13 +1054,15 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
 }
 
 
-#ifndef NO_CONSISTENCY_CHECKS
 bool SLUFactor::isConsistent() const
 {
+#ifdef ENABLE_CONSISTENCY_CHECKS
    METHOD( "SLUFactor::isConsistent()" );
    return CLUFactor::isConsistent();
-}
+#else
+   return true;
 #endif
+}
 
 void SLUFactor::dump() const
 {

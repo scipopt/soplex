@@ -31,6 +31,8 @@ interface:
 - number of performed bound flips during ratio test are displayed as 'flips=' in line 'Finished solving...'
 - allowed free basis status (SPxSolver::ZERO, SPxBasis::Desc::P_FREE) for variables and constraints with finite bounds
 - added method to clear starting basis in class SoPlex (SoPlex::clearBasis())
+- removed compiler flag NO_ADDITIONAL_CHECKS in code and makefile options: now, additional checks are only performed
+  when ENABLE_ADDITIONAL_CHECKS or ENABLE_CONSISTENCY_CHECKS is explicitly defined (globally or in a specific file)
 
 performance:
 - increased default Markowitz threshold to 0.04 to increase numerical stability of the factorization
@@ -40,8 +42,6 @@ fixed bugs:
 - added missing -DNDEBUG in make.mingw.x86.{cl,intel}.opt
 - fixed incorrect access to member variables in constructors of class DataHashTable
 - fixed bug in SPxFastRT: also in the first phase consider only nonbasic entering variables in COLUMN/LEAVING mode
-- removed compiler flag NO_ADDITIONAL_CHECKS in code and makefile options: in the future, additional checks are only
-  performed when ENABLE_ADDITIONAL_CHECKS is explicitly defined (globally or in a specific file)
 - fixed bug in COLUMN/ENTERING algorithm yielding incorrect detection of unboundedness or inverted primal ray: when
   deciding whether a free variable entering the basis should increase or decrease from zero, we have to look at the
   reduced cost, not the objective function

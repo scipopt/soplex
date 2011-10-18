@@ -224,10 +224,10 @@ public:
    //-----------------------------------
    /**@name Debugging */
    //@{
-#ifndef NO_CONSISTENCY_CHECKS
    /// checks whether DataHashTable is consistent
    bool isConsistent() const
    {
+#ifdef ENABLE_CONSISTENCY_CHECKS
       int total = 0;
 
       for(int i = 0; i < m_elem.size(); i++)
@@ -243,8 +243,10 @@ public:
          return MSGinconsistent("DataHashTable");
 
       return m_elem.isConsistent();
-   }
+#else
+      return true;
 #endif
+   }
    //@}
 
    //-----------------------------------

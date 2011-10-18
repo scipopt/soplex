@@ -458,10 +458,8 @@ protected:
    ///
    void dump() const;
 
-#ifndef NO_CONSISTENCY_CHECKS
    ///
    bool isConsistent() const;
-#endif
    //@}
 };
 

@@ -124,13 +124,15 @@ void SPxBasis::Desc::dump() const
    spxout.setVerbosity( tmp_verbosity );
 }
 
-#ifndef NO_CONSISTENCY_CHECKS
 bool SPxBasis::Desc::isConsistent() const
 {
+#ifdef ENABLE_CONSISTENCY_CHECKS
    METHOD( "SPxBasis::Desc::isConsistent()" );
    return rowstat.isConsistent() && colstat.isConsistent();
-}
+#else
+   return true;
 #endif
+}
 
 std::ostream& operator<<(std::ostream& os, const SPxBasis::Desc::Status& stat)
 {

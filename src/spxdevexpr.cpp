@@ -30,17 +30,17 @@ void SPxDevexPR::load(SPxSolver* base)
    assert(isConsistent());
 }
 
-#ifndef NO_CONSISTENCY_CHECKS
 bool SPxDevexPR::isConsistent() const
 {
+#ifdef ENABLE_CONSISTENCY_CHECKS
    if (thesolver != 0)
       if (penalty.dim() != thesolver->coDim()
            || coPenalty.dim() != thesolver->dim())
          return MSGinconsistent("SPxDevexPR");
+#endif
 
    return true;
 }
-#endif
 
 void SPxDevexPR::init(SPxSolver::Type tp)
 {

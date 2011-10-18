@@ -371,13 +371,11 @@ public:
    }
    //@}
 
-#ifndef NO_CONSISTENCY_CHECKS
    //-----------------------------------
    /**@name Consistency check */
    /// check consistency.
    bool isConsistent() const;
    //@}
-#endif
 
    //------------------------------------
    /**@name Construction / Destruction */

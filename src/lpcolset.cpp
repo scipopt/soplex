@@ -146,9 +146,9 @@ void LPColSet::clear()
    object.reDim(num());
 }
 
-#ifndef NO_CONSISTENCY_CHECKS
 bool LPColSet::isConsistent() const
 {
+#ifdef ENABLE_CONSISTENCY_CHECKS
    if (low.dim() != object.dim())
       return MSGinconsistent("LPColSet");
    if (low.dim() != up.dim())
@@ -157,8 +157,10 @@ bool LPColSet::isConsistent() const
       return MSGinconsistent("LPColSet");
 
    return low.isConsistent() && up.isConsistent() && SVSet::isConsistent();
-}
+#else
+   return true;
 #endif
+}
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

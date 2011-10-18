@@ -195,7 +195,6 @@ public:
    }
    //@}
 
-#ifndef NO_CONSISTENCY_CHECKS
    //-------------------------------------
    /**@name Consistency check */
    //@{
@@ -205,7 +204,6 @@ public:
       return true;
    }
    //@}
-#endif
 
 };
 } // namespace soplex

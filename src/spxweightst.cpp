@@ -30,16 +30,18 @@ namespace soplex
 #define EPS     1e-6
 #define STABLE  1e-3
 
-#ifndef NO_CONSISTENCY_CHECKS
 bool SPxWeightST::isConsistent() const
 {
+#ifdef ENABLE_CONSISTENCY_CHECKS
    return rowWeight.isConsistent()
           && colWeight.isConsistent()
           && rowRight.isConsistent()
           && colUp.isConsistent();
           // && SPxStarter::isConsistent();   // not yet implemented
-}
+#else
+   return true;
 #endif
+}
 
 /* Generating the Starting Basis
    The generation of a starting basis works as follows: After setting up the

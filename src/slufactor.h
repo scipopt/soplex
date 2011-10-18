@@ -212,10 +212,8 @@ public:
    /// prints the LU factorization to stdout.
    void dump() const;
 
-#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check.
    bool isConsistent() const;
-#endif
    //@}
 
    //------------------------------------

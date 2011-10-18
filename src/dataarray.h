@@ -270,20 +270,20 @@ public:
       return *this;
    }
 
-#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check
    bool isConsistent() const
    {
+#ifdef ENABLE_CONSISTENCY_CHECKS
       if (  (data == 0)
          || (themax < 1)
          || (themax < thesize)
          || (thesize < 0)
          || (memFactor < 1.0))
          return MSGinconsistent("DataArray");
+#endif
 
       return true;
    }
-#endif
 
    /// copy constructor
    DataArray(const DataArray& old)

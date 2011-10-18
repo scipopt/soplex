@@ -25,14 +25,14 @@
 namespace soplex
 {
 
-#ifndef NO_CONSISTENCY_CHECKS
 bool SPxStarter::isConsistent() const
 {
+#ifdef ENABLE_CONSISTENCY_CHECKS
    MSG_ERROR( spxout << "ESTART95 Not yet implemented" << std::endl; )
+#endif
 
    return true;
 }
-#endif
 } // namespace soplex
 
 //-----------------------------------------------------------------------------

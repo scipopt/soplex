@@ -488,10 +488,10 @@ public:
          - reinterpret_cast<char*>(old_theitem);
    }
 
-#ifndef NO_CONSISTENCY_CHECKS
    /// consistency check.
    bool isConsistent() const
    {
+#ifdef ENABLE_CONSISTENCY_CHECKS
       if (theitem == 0 || thekey == 0)
          return MSGinconsistent("DataSet");
 
@@ -507,10 +507,10 @@ public:
       for (int i = 0; i < thenum; ++i)
          if (theitem[thekey[i].idx].info != i)
             return MSGinconsistent("DataSet");
+#endif
 
       return true;
    }
-#endif
    //@}
 
    //-----------------------------------
