@@ -193,7 +193,8 @@ void SPxSolver::addedRows(int n)
          }
       }
    }
-   assert(isConsistent());
+
+   /* we must not assert consistency here, since addedCols() might be still necessary to obtain a consistent basis */
 }
 #endif //0
 
@@ -211,7 +212,8 @@ void SPxSolver::addedRows(int n)
       if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
          SPxBasis::addedRows(n);
    }
-   assert(isConsistent());
+
+   /* we must not assert consistency here, since addedCols() might be still necessary to obtain a consistent basis */
 }
 
 #if 0
@@ -396,7 +398,8 @@ void SPxSolver::addedCols(int n)
          }
       }
    }
-   assert(isConsistent());
+
+   /* we must not assert consistency here, since addedRows() might be still necessary to obtain a consistent basis */
 }
 #endif //0
 
@@ -414,7 +417,8 @@ void SPxSolver::addedCols(int n)
       if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
          SPxBasis::addedCols(n);
    }
-   assert(isConsistent());
+
+   /* we must not assert consistency here, since addedRows() might be still necessary to obtain a consistent basis */
 }
    
 void SPxSolver::doRemoveRow(int i)
