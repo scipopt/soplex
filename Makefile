@@ -335,8 +335,13 @@ ifneq ($(SHARED),$(LAST_SHARED))
 		@-touch $(LIBSRC)
 		@-touch $(BINSRC)
 endif
+ifneq ($(USRCXXFLAGS),$(LAST_USRCXXFLAGS))
+		@-touch $(LIBSRC)
+		@-touch $(BINSRC)
+endif
 		@-rm -f $(LASTSETTINGS)
 		@echo "LAST_ZLIB=$(ZLIB)" >> $(LASTSETTINGS)
 		@echo "LAST_SHARED=$(SHARED)" >> $(LASTSETTINGS)
+		@echo "LAST_USRCXXFLAGS=$(USRCXXFLAGS)" >> $(LASTSETTINGS)
 
 # --- EOF ---------------------------------------------------------------------
