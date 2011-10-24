@@ -250,6 +250,10 @@ void print_version_info()
              << SOPLEX_SUBVERSION
              << " - Githash "
              << std::setw(13) << std::setiosflags(std::ios::left) << getGitHash();
+   if( !checkMode )
+      std::cout << "             *\n" << banner2 << std::endl;
+   else
+      std::cout << "\n";
 #else
    if( !checkMode )
       std::cout <<    "*                  Release ";
@@ -260,11 +264,11 @@ void print_version_info()
              << SOPLEX_VERSION % 10
              << " - Githash "
              << std::setw(13) << std::setiosflags(std::ios::left) << getGitHash();
-#endif
    if( !checkMode )
-      std::cout << "             *\n" << banner2 << std::endl;
+      std::cout << "               *\n" << banner2 << std::endl;
    else
       std::cout << "\n";
+#endif
 
    /// The following code block is tests and shows compilation parameters.
    std::cout << "compiled with NDEBUG: "
