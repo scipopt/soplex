@@ -259,7 +259,7 @@ void print_version_info()
              << (SOPLEX_VERSION % 100)/10 << "."
              << SOPLEX_VERSION % 10
              << " - Githash "
-             << std::setw(13) << std::setiosflags(std::ios::left) << getGitHash()
+             << std::setw(13) << std::setiosflags(std::ios::left) << getGitHash();
 #endif
    if( !checkMode )
       std::cout << "             *\n" << banner2 << std::endl;
