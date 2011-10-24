@@ -33,6 +33,7 @@ interface:
 - added method to clear starting basis in class SoPlex (SoPlex::clearBasis())
 - removed compiler flag NO_ADDITIONAL_CHECKS in code and makefile options: now, additional checks are only performed
   when ENABLE_ADDITIONAL_CHECKS or ENABLE_CONSISTENCY_CHECKS is explicitly defined (globally or in a specific file)
+- githash of current commit is displayed (also in check mode)
 
 performance:
 - increased default Markowitz threshold to 0.04 to increase numerical stability of the factorization
