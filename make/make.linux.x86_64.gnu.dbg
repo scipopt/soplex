@@ -1,7 +1,11 @@
 CXX	=	g++
-CPPFLAGS=	-Isrc
+CPPFLAGS=	-Isrc -m64
 CXXFLAGS=	-O0 -g -ansi $(GCCWARN)
-LDFLAGS	=	-lm
+LDFLAGS	=	-lm -m64
 ARFLAGS	=	crs
 ZLIB_FLAGS	=
 ZLIB_LDFLAGS 	=	-lz
+
+ifeq ($(SHARED),true)
+LIBBUILDFLAGS	+=     	-m64
+endif
