@@ -86,7 +86,7 @@ LIBOBJ		= 	changesoplex.o didxset.o \
 			spxbasis.o spxbounds.o spxboundflippingrt.o spxchangebasis.o \
 			spxequilisc.o spxdantzigpr.o spxdefaultrt.o \
 			spxdefines.o spxdesc.o spxdevexpr.o \
-			spxfastrt.o spxfileio.o spxgeometsc.o \
+			spxfastrt.o spxfileio.o spxgeometsc.o spxgithash.o\
 			spxharrisrt.o spxhybridpr.o spxid.o spxio.o \
 			spxlp.o spxlpfread.o spxmainsm.o spxmpsread.o \
 			spxmpswrite.o spxlpfwrite.o \
@@ -191,7 +191,7 @@ ifeq ($(VERBOSE),false)
 endif
 
 .PHONY: all
-all:		$(LIBFILE) $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
+all:		githash $(LIBFILE) $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
 simpleexample:	$(LIBFILE) $(EXAMPLEFILE) $(LIBLINK) $(LIBSHORTLINK)
 
 # include install targets
@@ -343,5 +343,9 @@ endif
 		@echo "LAST_ZLIB=$(ZLIB)" >> $(LASTSETTINGS)
 		@echo "LAST_SHARED=$(SHARED)" >> $(LASTSETTINGS)
 		@echo "LAST_USRCXXFLAGS=$(USRCXXFLAGS)" >> $(LASTSETTINGS)
+
+-include make/local/make.detectgithash
+# this empty target is needed for the SoPlex release versions
+githash::	# do not remove the double-colon
 
 # --- EOF ---------------------------------------------------------------------

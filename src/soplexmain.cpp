@@ -26,6 +26,7 @@
 #include "spxsolver.h"
 
 #include "timer.h"
+#include "spxgithash.h"
 #include "spxpricer.h"
 #include "spxdantzigpr.h"
 #include "spxparmultpr.h"
@@ -235,23 +236,35 @@ void print_version_info()
    "************************************************************************\n"
    ;
 
-   std::cout << banner1;
+   if( !checkMode )
+      std::cout << banner1;
 
 #if (SOPLEX_SUBVERSION > 0)
-   std::cout <<    "*                  Version "
-             << SOPLEX_VERSION/100 << "."
+   if( !checkMode )
+      std::cout <<    "*                  Version ";
+   else
+      std::cout << "SoPlex version ";
+   std::cout << SOPLEX_VERSION/100 << "."
              << (SOPLEX_VERSION % 100)/10 << "."
              << SOPLEX_VERSION % 10 << "."
              << SOPLEX_SUBVERSION
-             << "                                     *\n";
+             << " - Githash "
+             << std::setw(13) << std::setiosflags(std::ios::left) << getGitHash();
 #else
-   std::cout <<    "*                  Release "
-             << SOPLEX_VERSION/100 << "."
+   if( !checkMode )
+      std::cout <<    "*                  Release ";
+   else
+      std::cout << "SoPlex release ";
+   std::cout << SOPLEX_VERSION/100 << "."
              << (SOPLEX_VERSION % 100)/10 << "."
              << SOPLEX_VERSION % 10
-             << "                                       *\n";
+             << " - Githash "
+             << std::setw(13) << std::setiosflags(std::ios::left) << getGitHash()
 #endif
-   std::cout << banner2 << std::endl;
+   if( !checkMode )
+      std::cout << "             *\n" << banner2 << std::endl;
+   else
+      std::cout << "\n";
 
    /// The following code block is tests and shows compilation parameters.
    std::cout << "compiled with NDEBUG: "
@@ -278,8 +291,8 @@ void print_version_info()
 #endif
              << std::endl;
 
-   std::cout << "compiled with NO_CONSISTENCY_CHECKS: "
-#ifdef NO_CONSISTENCY_CHECKS
+   std::cout << "compiled with ENABLE_CONSISTENCY_CHECKS: "
+#ifdef ENABLE_CONSISTENCY_CHECKS
              << "yes"
 #else
              << "no"
@@ -1166,9 +1179,9 @@ int main(int argc, char* argv[])
                print_usage_and_exit( argv );
             }
             break;
-	 case 'C' :
-	    checkMode = true;
-	    break;
+         case 'C' :
+            checkMode = true;
+            break;
          case 'h' :
          case '?' :
             print_version_info();
@@ -1178,9 +1191,8 @@ int main(int argc, char* argv[])
          }
       }
 
-      // print short version
-      if ( ! checkMode )
-	 print_short_version_info();
+      // print version
+      print_version_info();
 
       // enough arguments?
       if ((argc - optidx) < 1 + (read_basis ? 1 : 0) + (write_basis ? 1 : 0))
