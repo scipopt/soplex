@@ -306,6 +306,7 @@ void print_version_info()
    std::cout << std::endl;
 }
 
+#if 0
 static
 void print_short_version_info()
 {
@@ -333,6 +334,7 @@ void print_short_version_info()
 #endif
    std::cout << banner2 << std::endl;
 }
+#endif
 
 //------------------------------------------------------------------------
 static
