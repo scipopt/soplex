@@ -6,6 +6,9 @@ rm -f $NAME
 ln -s . $NAME
 rm -f $NAME.tgz
 
+# compile to create the correct GiTHash
+make OPT=opt-gccold ZLIB=false -j4
+
 # Before we create a tarball change the directory and file rights in a command way
 echo adjust file modes
 find ./ -type d -exec chmod 750 {} \;
@@ -50,3 +53,4 @@ grep "VERSION" src/spxdefines.h
 grep "@version" doc/xternal.cpp
 grep "^VERSION" Makefile
 grep "^VERSION" makedist.sh
+tail src/githash.cpp
