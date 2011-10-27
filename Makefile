@@ -190,8 +190,8 @@ ifeq ($(VERBOSE),false)
 .SILENT:	$(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK) $(BINFILE) $(LIBFILE) $(BINOBJFILES) $(LIBOBJFILES)
 endif
 
-.PHONY: all
 all:		githash $(LIBFILE) $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
+
 simpleexample:	$(LIBFILE) $(EXAMPLEFILE) $(LIBLINK) $(LIBSHORTLINK)
 
 # include install targets
@@ -231,8 +231,6 @@ lint:		$(BINSRC) $(LIBSRC)
 .PHONY: doc
 doc:		
 		cd doc; $(DOXY) $(NAME).dxy
-
-all:		$(BINFILE)
 
 .PHONY: test
 test:		check
@@ -315,11 +313,13 @@ depend:
 
 -include	$(DEPEND)
 
-$(BINOBJDIR)/%.o:	$(SRCDIR)/%.cpp $(BINOBJDIR)
+$(BINOBJDIR)/%.o:	$(SRCDIR)/%.cpp
+		@-mkdir -p $(BINOBJDIR)
 		@echo "-> compiling $@"
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) $(CXX_c)$< $(CXX_o)$@
 
-$(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp $(LIBOBJDIR) 
+$(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp
+		@-mkdir -p $(LIBOBJDIR)
 		@echo "-> compiling $@"
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LIBOFLAGS) $(CXX_c)$< $(CXX_o)$@
 
