@@ -2998,7 +2998,7 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
                   scaledLhs = (lp.lhs(i) <= -infinity) ? -infinity : lp.lhs(i) * factor;
                   scaledRhs = (lp.rhs(i) >=  infinity) ?  infinity : lp.rhs(i) * factor;
                }
-               if (factor < 0)
+               else
                {
                   scaledLhs = (lp.rhs(i) >=  infinity) ? -infinity : lp.rhs(i) * factor;
                   scaledRhs = (lp.lhs(i) <= -infinity) ?  infinity : lp.lhs(i) * factor;

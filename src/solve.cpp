@@ -590,7 +590,9 @@ void CLUFactor::solveUleft(Real* p_work, Real* vec)
       ASSERT_WARN( "WSOLVE01", fabs(x) < 1e40 );
       ASSERT_WARN( "WSOLVE02", fabs(vec[c]) < 1e40 );
 
+#if defined(WITH_WARNINGS) || !defined(NDEBUG)
       Real y = vec[c];
+#endif
 
       vec[c]  = 0.0;
 

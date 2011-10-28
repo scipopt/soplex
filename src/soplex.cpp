@@ -704,6 +704,8 @@ void SoPlex::unsimplify() const
    else
    {
       SPxSolver::VarStatus *rows, *cols;
+      rows = NULL;
+      cols = NULL;
       try
       {
          rows = new SPxSolver::VarStatus[m_solver.nRows()];
