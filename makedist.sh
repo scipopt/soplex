@@ -7,7 +7,7 @@ ln -s . $NAME
 rm -f $NAME.tgz
 
 # compile to create the correct GiTHash
-make OPT=opt-gccold ZLIB=false -j4
+make githash
 
 # Before we create a tarball change the directory and file rights in a command way
 echo adjust file modes
@@ -44,7 +44,8 @@ $NAME/doc/xternal.cpp \
 $NAME/doc/inc/faq.inc \
 $NAME/doc/inc/faqcss.inc \
 $NAME/make/* \
-$NAME/src/*
+$NAME/src/*h \
+$NAME/src/*cpp
 rm -f $NAME
 
 echo ""
