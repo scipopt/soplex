@@ -3,7 +3,8 @@ Notes for SoPlex Release 1.6.0
 What's new
 ----------
 
- - Implemented bound flipping ratio test ("long step dual")
+ - Implemented bound flipping ratio test ("long step dual") for column
+   representation
 
  - Implemented method getPrimalray() to classes SoPlex and SPxSolver
    for primal unbounded LPs

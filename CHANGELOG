@@ -33,7 +33,7 @@ interface:
 
 performance:
 - increased default Markowitz threshold to 0.04 to increase numerical stability of the factorization
-- implemented bound flipping ratio test ("long step dual")
+- implemented bound flipping ratio test ("long step dual") for column representation
 
 fixed bugs:
 - added missing -m64 in LDFLAGS of make.{darwin,sunos}.x86_64.gnu.* and make.{linux,freebsd}.x86_64.gnu.opt*
