@@ -44,6 +44,7 @@ $NAME/doc/xternal.cpp \
 $NAME/doc/inc/faq.inc \
 $NAME/doc/inc/faqcss.inc \
 $NAME/make/make* \
+$NAME/src/depend* \
 $NAME/src/*h \
 $NAME/src/*cpp
 rm -f $NAME
