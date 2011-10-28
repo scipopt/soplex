@@ -6,10 +6,10 @@ What's new
  - Implemented bound flipping ratio test ("long step dual") for column
    representation
 
- - Implemented method getPrimalray() to classes SoPlex and SPxSolver
+ - Implemented method getPrimalray() in classes SoPlex and SPxSolver
    for primal unbounded LPs
 
- - Interface: methods selectEnter() and selectLeave() in ratio testers
+ - Interface: methods selectEnter() and selectLeave() in ratiotesters
    now have index/id of leaving/entering variable as input parameter
 
  - Replaced compiler flag NO_ADDITIONAL_CHECKS for optimized mode by
