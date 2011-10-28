@@ -271,35 +271,35 @@ void print_version_info()
 #endif
 
    /// The following code block is tests and shows compilation parameters.
-   std::cout << "[NDEBUG: "
+   std::cout << "[NDEBUG:"
 #ifdef NDEBUG
-             << "yes"
+             << "YES"
 #else
-             << "no"
+             << "NO"
 #endif
-             << "] ";
+             << "]";
 
-   std::cout << "[WITH_WARNINGS: "
+   std::cout << "[WITH_WARNINGS:"
 #ifdef WITH_WARNINGS
-             << "yes"
+             << "YES"
 #else
-             << "no"
+             << "NO"
 #endif
-             << "]" << std::endl;
+             << "]";
 
-   std::cout << "[ENABLE_ADDITIONAL_CHECKS: "
+   std::cout << "[ENABLE_ADDITIONAL_CHECKS:"
 #ifdef ENABLE_ADDITIONAL_CHECKS
-             << "yes"
+             << "YES"
 #else
-             << "no"
+             << "NO"
 #endif
-             << "] ";
+             << "]";
 
-   std::cout << "[ENABLE_CONSISTENCY_CHECKS: "
+   std::cout << "[ENABLE_CONSISTENCY_CHECKS:"
 #ifdef ENABLE_CONSISTENCY_CHECKS
-             << "yes"
+             << "YES"
 #else
-             << "no"
+             << "NO"
 #endif
              << "]" << std::endl;
 
