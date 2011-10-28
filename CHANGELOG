@@ -1,42 +1,39 @@
-(maintain each list from top to bottom)
-
-
-DEVELOPER
-=========
+28 Oct 2011 - Release 1.6.0
+===========================
 
 code quality & new features:
 - time for basis updates can now be measured by defining flag MEASUREUPDATETIME in spxbasis.h (off by default)
-- LP reader: print warning when encountering a floating point number with empty exponent (hints at variable name with
-  initial 'e' or 'E')
 - removed "-static" option from Makefile due to linking troubles on newer systems without static libraries; can still be
   added using the make option "USRLDFLAGS=-static"
 - added -fp:precise and -Oi to make.mingw.x86.{cl,intel}.opt
-- added SOPLEX_SUBVERSION to track internal development version
+- added define SOPLEX_SUBVERSION to track internal development version (src/spxdefines.h)
 - added SHARED variable in Makefile for creating shared libraries and binaries
-- added bound flipping ratio test (long step dual)
 - added functionality to solve systems with three right hand sides
 - added partial quicksort to sorter.h
 - increased priority of debugging output
 - added "install" target to Makefile; this target can be used to install SoPlex into certain directory on the system 
-  (works for Linux and Mac); Therefore you have to specify a INSTALLDIR (make install INSTALLDIR=/urs/local/)
+  (works for Linux and Mac); for this, you have to specify INSTALLDIR (make install INSTALLDIR=/urs/local/)
+- removed compiler flag NO_ADDITIONAL_CHECKS in code and makefile options: now, additional checks are only performed
+  when ENABLE_ADDITIONAL_CHECKS or ENABLE_CONSISTENCY_CHECKS is explicitly defined (globally or in a specific file)
+- githash of current commit is displayed (also in check mode)
 
 interface:
+- LP reader: print warning when encountering a floating point number with empty exponent (hints at variable name with
+  initial 'e' or 'E')
 - methods selectEnter() and selectLeave() in ratio testers now receive index/id of leaving/entering variable as input
   parameter
 - added methods to solve the linear systems of equations for 3 right hand sides simultaneously
 - added method getPrimalray() to classes SoPlex and SPxSolver for primal unbounded LPs
 - added command line option '-L' to set iteration limit
+- allowed free basis status (SPxSolver::ZERO, SPxBasis::Desc::P_FREE) for variables and constraints with finite bounds
 - adapted method to read/write basis for free nonbasic variables
 - added command line option '-t3' to use the bound flipping ratio test (long step dual)
 - number of performed bound flips during ratio test are displayed as 'flips=' in line 'Finished solving...'
-- allowed free basis status (SPxSolver::ZERO, SPxBasis::Desc::P_FREE) for variables and constraints with finite bounds
 - added method to clear starting basis in class SoPlex (SoPlex::clearBasis())
-- removed compiler flag NO_ADDITIONAL_CHECKS in code and makefile options: now, additional checks are only performed
-  when ENABLE_ADDITIONAL_CHECKS or ENABLE_CONSISTENCY_CHECKS is explicitly defined (globally or in a specific file)
-- githash of current commit is displayed (also in check mode)
 
 performance:
 - increased default Markowitz threshold to 0.04 to increase numerical stability of the factorization
+- implemented bound flipping ratio test ("long step dual")
 
 fixed bugs:
 - added missing -m64 in LDFLAGS of make.{darwin,sunos}.x86_64.gnu.* and make.{linux,freebsd}.x86_64.gnu.opt*

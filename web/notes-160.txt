@@ -1,0 +1,31 @@
+Notes for SoPlex Release 1.6.0
+
+What's new
+----------
+
+ - Implemented bound flipping ratio test ("long step dual")
+
+ - Implemented method getPrimalray() to classes SoPlex and SPxSolver
+   for primal unbounded LPs
+
+ - Interface: methods selectEnter() and selectLeave() in ratio testers
+   now have index/id of leaving/entering variable as input parameter
+
+ - Replaced compiler flag NO_ADDITIONAL_CHECKS for optimized mode by
+   flags ENABLE_ADDITIONAL_CHECKS and ENABLE_CONSISTENCY_CHECKS for
+   debug mode
+
+ - Makefile: added install target and SHARED variable for creating
+   shared libraries and binaries
+
+ - Several bugfixes and improvements in numerical stability
+
+
+SoPlex interfaces
+-----------------
+
+ - The LP interface of SCIP 2.1 to SoPlex now uses the LP simplifier
+   when solving without advanced starting basis
+
+
+For details see the CHANGELOG file.
