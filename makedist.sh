@@ -43,7 +43,7 @@ $NAME/doc/soplexheader.html \
 $NAME/doc/xternal.cpp \
 $NAME/doc/inc/faq.inc \
 $NAME/doc/inc/faqcss.inc \
-$NAME/make/* \
+$NAME/make/make* \
 $NAME/src/*h \
 $NAME/src/*cpp
 rm -f $NAME
