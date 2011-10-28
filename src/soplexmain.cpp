@@ -271,37 +271,37 @@ void print_version_info()
 #endif
 
    /// The following code block is tests and shows compilation parameters.
-   std::cout << "compiled with NDEBUG: "
+   std::cout << "[NDEBUG: "
 #ifdef NDEBUG
              << "yes"
 #else
              << "no"
 #endif
-             << std::endl;
+             << "] ";
 
-   std::cout << "compiled with WITH_WARNINGS: "
+   std::cout << "[WITH_WARNINGS: "
 #ifdef WITH_WARNINGS
              << "yes"
 #else
              << "no"
 #endif
-             << std::endl;
+             << "]" << std::endl;
 
-   std::cout << "compiled with ENABLE_ADDITIONAL_CHECKS (globally): "
+   std::cout << "[ENABLE_ADDITIONAL_CHECKS: "
 #ifdef ENABLE_ADDITIONAL_CHECKS
              << "yes"
 #else
              << "no"
 #endif
-             << std::endl;
+             << "] ";
 
-   std::cout << "compiled with ENABLE_CONSISTENCY_CHECKS: "
+   std::cout << "[ENABLE_CONSISTENCY_CHECKS: "
 #ifdef ENABLE_CONSISTENCY_CHECKS
              << "yes"
 #else
              << "no"
 #endif
-             << std::endl;
+             << "]" << std::endl;
 
    std::cout << std::endl;
 }
@@ -362,7 +362,7 @@ void print_usage_and_exit( const char* const argv[] )
       " -v        set verbosity Level: from 0 (ERROR) to 5 (INFO3), default 3 (INFO1)\n"
       " -V        show program version\n"
       " -C        check mode (for check scripts)\n"
-      " -h        show this help\n"
+      " -h        show this help\n\n"
       "Simplifier:  Scaler:           Starter:    Pricer:        Ratiotester:\n"
       " -s0 none     -g0 none          -c0 none*   -p0 Textbook   -t0 Textbook\n"
       " -s1 Main*    -g1 uni-Equi      -c1 Weight  -p1 ParMult    -t1 Harris\n"
