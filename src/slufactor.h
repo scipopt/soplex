@@ -173,7 +173,7 @@ public:
    void solveRight4update(SSVector& x, const SVector& b);
    /// Solves \f$Ax=b\f$ and \f$Ay=d\f$.
    void solve2right4update(SSVector& x, Vector& y, const SVector& b, SSVector& d);
-   /// Solves \f$Ax=b\f$, \f$Ay=d\ and \f$Az=e\f$.
+   /// Solves \f$Ax=b\f$, \f$Ay=d\f$ and \f$Az=e\f$.
    void solve3right4update(SSVector& x, Vector& y, Vector& z, 
                            const SVector& b, SSVector& d, SSVector& e);
    /// Solves \f$Ax=b\f$.

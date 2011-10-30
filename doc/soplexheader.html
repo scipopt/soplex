@@ -1,22 +1,60 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<title>$title</title>
-<link href="$relpath$tabs.css" rel="stylesheet" type="text/css"/>
-<link href="$relpath$search/search.css" rel="stylesheet" type="text/css"/>
-<script type="text/javaScript" src="$relpath$search/search.js"></script>
-<link href="$relpath$soplex.css" rel="stylesheet" type="text/css"/>
-</head>
-<body onload='searchBox.OnSelectItem(0);'>
-  <div class="mainheadertitle">
-    <table cellpadding="0px" width="100%">
-      <tr>
-	  <td nowrap class="mainheadertitle">
-	    <a class="el" href="http://soplex.zib.de">
-	      SoPlex &mdash; the Sequential object-oriented simPlex
-	    </a>
-	</td>
-      </tr>
-    </table>
-  </div>
+  <head>
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+    <!--BEGIN PROJECT_NAME--><title>$projectname: $title</title><!--END PROJECT_NAME-->
+    <!--BEGIN !PROJECT_NAME--><title>$title</title><!--END !PROJECT_NAME-->
+    $search
+    <link href="$relpath$tabs.css" rel="stylesheet" type="text/css"/>
+    <link href="$relpath$soplex.css" rel="stylesheet" type="text/css"/>
+  </head>
+  <body>
+    <div class="outer">
+      <div class="inner">
+	<table width="100%" cellspacing="0" cellpadding="12" border="0">
+          <tr>
+            <td valign="top" width="1%">
+                <div id="menu">
+		  <ul>
+		    <li class="hdr"><a href="http://soplex.zib.de/soplex.shtml">Main page</a></li>
+		  </ul>
+                  <ul>
+                    <li class="hdr"><a href="http://soplex.zib.de/information.shtml">Information</a></li>
+                    <li><a href="http://soplex.zib.de/news.shtml">News</a></li>
+                    <li><a href="http://soplex.zib.de/whatis.shtml">What is SoPlex?</a></li>
+                    <li><a href="http://soplex.zib.de/licence.shtml">License</a></li>
+		    <li><a href="http://soplex.zib.de/platforms.shtml">Supported Platforms</a>&nbsp;</li>
+                    <li><a href="http://soplex.zib.de/bugs.shtml">Bugs &amp; Mailing List</a></li>
+                    <li><a href="http://soplex.zib.de/people.shtml">Involved Persons</a></li>
+                    <li><a href="http://soplex.zib.de/cooperation.shtml">Cooperation</a></li>
+                  </ul>
+                  <ul>
+                    <li class="hdr"><a href="http://soplex.zib.de/download.shtml">Download</a></li>
+                  </ul>
+                  <ul>
+                    <li class="hdr"><a href="http://soplex.zib.de/documentation.shtml">Documentation</a></li>
+                    <li><a href="http://soplex.zib.de/doc/html/index.html">Doxygen-Docs</a></li>
+                    <li><a href="FAQ.html">FAQ</a></li>
+                  </ul>
+		  <ul>
+                    <li class="hdr"><a href="http://zibopt.zib.de/">ZIBopt</a></li>
+                    <li><a href="http://zimpl.zib.de/">ZIMPL</a></li>
+                    <li><a href="http://soplex.zib.de/">SoPlex</a></li>
+                    <li><a href="http://scip.zib.de/">SCIP</a></li>
+                  </ul>
+		</div>
+	    </td>
+            <td valign="top" width="99%">
+	      <div id="top"><!-- do not remove this div! -->
+		<table width="100%" cellspacing="0" cellpadding="12" border="0">
+                  <tr>
+                    <td nowrap class="mainheadertitle">
+                      SoPlex Doxygen Documentation
+                    </td>
+                  </tr>
+                </table>
+	      </div>
+
+
+
+

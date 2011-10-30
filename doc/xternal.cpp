@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 /**@mainpage Overview
-   @version  1.6.0.0
+   @version  1.6.0
    @author   Roland Wunderling
    @author   Tobias Achterberg
    @author   Timo Berthold
@@ -24,10 +24,6 @@
    SoPlex is implemented in C++. The code should be compliant with the 
    current ANSI standard. RTTI and STL (other then iostream) are not used. 
    Everything is in one namespace \em soplex.
-
-   Note that you are allowed to retrieve and use SoPlex free of charge 
-   only for research purposes as a member of a \em non-commercial and 
-   \em academic institution.
 
    - \ref RUN      "Where does it run"
 
