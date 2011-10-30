@@ -89,6 +89,14 @@ public:
       return data[n];
    }
 
+   /** This function serves for using a Vector in an C-style
+    *  function. It returns a pointer to the first value of the array.
+    */
+   T* get_ptr()
+   {
+      return data;
+   }
+
    /// append \p n uninitialized elements.
    void append(int n)
    {
