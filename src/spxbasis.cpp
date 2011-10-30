@@ -868,7 +868,7 @@ void SPxBasis::dump()
 
    // Dump regardless of the verbosity level if this method is called.
    const SPxOut::Verbosity tmp_verbosity = spxout.getVerbosity();
-   spxout.setVerbosity( SPxOut::ERROR );
+   spxout.setVerbosity( SPxOut::DEBUG );
 
    spxout << "DBASIS09 Basis entries:" << std::endl;
    basesize = 0;
