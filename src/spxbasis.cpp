@@ -601,7 +601,7 @@ void SPxBasis::writeBasis(
             /* Default is all non-basic variables on lower bound (if finite) or at zero (if free).
              * nothing to do in this case.
              */
-            assert(theLP->lower(col) <= -infinity || thedesc.colStatus(col) == Desc::P_ON_LOWER);
+            assert(theLP->lower(col) <= -infinity || thedesc.colStatus(col) == Desc::P_ON_LOWER || thedesc.colStatus(col) == Desc::P_FIXED);
             assert(theLP->lower(col) > -infinity || theLP->upper(col) < infinity || thedesc.colStatus(col) == Desc::P_FREE);
          }
       }
