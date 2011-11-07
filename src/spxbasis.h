@@ -714,6 +714,12 @@ public:
 
    virtual void printMatrix() const;
 
+   /** Prints current basis matrix to a file using the MatrixMarket format:
+    *  row col value
+    *  The filename is basis/basis[number].mtx where number is a parameter.
+    */
+   void printMatrixMTX(int number);
+
    /// checks if a Descriptor is valid for the current LP w.r.t. its bounds
    virtual bool isDescValid(const Desc& ds);
 

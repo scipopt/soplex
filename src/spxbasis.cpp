@@ -635,6 +635,37 @@ void SPxBasis::printMatrix() const
    }
 }
 
+void SPxBasis::printMatrixMTX(int number)
+{
+   int dim;
+   int nnz;
+   char filename[20];
+
+   dim = matrix.size();
+   nnz = nzCount;
+   sprintf(filename, "basis/basis%d.mtx",number);
+   std::cout << "printing basis matrix to file " << filename << "\n";
+   FILE * basisfile;
+   basisfile = fopen (filename,"w");
+   // print marker necessary for reading the file in Matlab
+   fprintf(basisfile, "%%%%MatrixMarket matrix coordinate real general\n");
+   // print matrix information
+   fprintf(basisfile, "%d %d %d\n", dim, dim, nnz );
+   // print matrix data
+   for( int i = 0; i < matrix.size(); ++i )
+   {
+      for( int j = 0; j < baseVec(i).size(); ++j )
+      {
+         int idx = baseVec(i).index(j);
+         Real val = baseVec(i).value(j);
+         fprintf(basisfile, "%d %d %.13e\n",i+1,idx+1,val);
+      }
+   }
+   fclose (basisfile);
+
+   return;
+}
+
 void SPxBasis::change(
    int i,
    SPxId& id,
