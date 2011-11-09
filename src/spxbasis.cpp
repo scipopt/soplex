@@ -472,7 +472,7 @@ bool SPxBasis::readBasis(
       delete cNames;
 
 #ifndef NDEBUG
-   thedesc.dump();
+   MSG_DEBUG( thedesc.dump() );
 #endif
 
    return !mps.hasError();
@@ -608,7 +608,7 @@ void SPxBasis::writeBasis(
    }
 
 #ifndef NDEBUG
-   thedesc.dump();
+   MSG_DEBUG( thedesc.dump() );
 
    // Check that we covered all nonbasic rows - the remaining should be basic.
    for (; row < theLP->nRows(); row++)
