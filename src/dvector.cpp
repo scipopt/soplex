@@ -25,7 +25,7 @@ namespace soplex
 
 DVector operator+(const Vector& v, const Vector& w)
 {
-   assert(v.dim() == v.dim());
+   assert(v.dim() == w.dim());
    DVector res(v.dim());
    for (int i = 0; i < res.dim(); ++i)
       res[i] = v[i] + w[i];
