@@ -263,6 +263,10 @@ void SPxLP::writeMPS(
 
    for(i = 0; i < nCols(); i++)
    {
+      // skip variables that do not appear in the objective function or any constraint
+      const SVector& col = colVector(i);
+      if (col.size() == 0 && isZero(maxObj(i)))
+         continue;
       if (lower(i) == upper(i))
       {
          writeRecord(p_output, "FX", "BOUND", 
