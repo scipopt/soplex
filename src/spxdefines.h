@@ -90,11 +90,15 @@ namespace soplex
    Usually the parameter \p do_something prints something out.
    This is an internal define used by MSG_ERROR, MSG_WARNING, etc.
 */
+#ifdef DISABLE_VERBOSITY
+#define DO_WITH_TMP_VERBOSITY( verbosity, do_something ) {}
+#else
 #define DO_WITH_TMP_VERBOSITY( verbosity, do_something ) \
    { const SPxOut::Verbosity  old_verbosity = spxout.getVerbosity(); \
      spxout.setVerbosity( verbosity ); \
      do_something \
      spxout.setVerbosity( old_verbosity ); }
+#endif
 
 /// Prints out message \p x if the verbosity level is at least SPxOut::ERROR.
 #define MSG_ERROR(x)    { DO_WITH_TMP_VERBOSITY( SPxOut::ERROR,    x ) }

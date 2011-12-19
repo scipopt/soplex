@@ -40,6 +40,9 @@ LIMIT		=	#
 
 INSTALLDIR	=	#
 
+#will this be compiled for PARASCIP? (disables output because it uses global variables)
+PARASCIP	=	false
+
 ZLIB		=	true
 
 COMP		=	gnu
@@ -146,6 +149,14 @@ CXXFLAGS	+=	$(USRCXXFLAGS)
 LDFLAGS		+=	$(USRLDFLAGS)
 ARFLAGS		+=	$(USRARFLAGS)
 DFLAGS		+=	$(USRDFLAGS)
+
+#-----------------------------------------------------------------------------
+# PARASCIP
+#-----------------------------------------------------------------------------
+
+ifeq ($(PARASCIP),true)
+CPPFLAGS	+=	-DDISABLE_VERBOSITY
+endif
 
 #-----------------------------------------------------------------------------
 
