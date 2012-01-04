@@ -84,7 +84,11 @@ int SPxDevexPR::selectLeave()
    int retid;
    Real val;
 
+#ifdef PARTIAL_PRICING
+   retid = selectLeavePart(val, theeps);
+#else
    retid = selectLeaveX(val, theeps);
+#endif
 
    if( retid < 0 && !refined )
    {
@@ -122,6 +126,66 @@ int SPxDevexPR::selectLeaveX(Real& best, Real feastol, int start, int incr)
    best = bstX;
    return bstI;
 }
+
+int SPxDevexPR::selectLeavePart(Real& best, Real feastol)
+{
+   Real x;
+
+   const Real* fTest = thesolver->fTest().get_const_ptr();
+   const Real* cpen = coPenalty.get_const_ptr();
+   Real bstX = 0;
+   int bstI = -1;
+   int end = coPenalty.dim();
+   int count = 0;
+   int oldstartpricing = startpricing;
+
+   for (int i = oldstartpricing; i < end; ++i)
+   {
+      if (fTest[i] < -feastol)
+      {
+         x = fTest[i] * fTest[i] / cpen[i];
+         if (x > bstX)
+         {
+            bstX = x;
+            bstI = i;
+            last = cpen[i];
+            if (count == 0)
+               startpricing = (i + 1) % end;
+            ++count;
+            if (count >= MAX_PRICING_CANDIDATES)
+            {
+               best = bstX;
+               return bstI;
+            }
+         }
+      }
+   }
+   for (int i = 0; i < oldstartpricing; ++i)
+   {
+      if (fTest[i] < -feastol)
+      {
+         x = fTest[i] * fTest[i] / cpen[i];
+         if (x > bstX)
+         {
+            bstX = x;
+            bstI = i;
+            last = cpen[i];
+            if (count == 0)
+               startpricing = (i + 1) % end;
+            ++count;
+            if (count >= MAX_PRICING_CANDIDATES)
+            {
+               best = bstX;
+               return bstI;
+            }
+         }
+      }
+   }
+   best = bstX;
+   return bstI;
+}
+
+
 
 void SPxDevexPR::left4(int n, SPxId id)
 {
