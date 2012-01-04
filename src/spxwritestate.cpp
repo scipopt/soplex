@@ -64,6 +64,9 @@ bool SPxSolver::writeState(
       << "Update           = " << slinSolver()->getName()
       << std::endl
       << "Pricer           = " << pricer()->getName()
+#ifdef PARTIAL_PRICING
+      << " (partial, size = " << MAX_PRICING_CANDIDATES << ")"
+#endif
       << std::endl
       << "Starter          = " << ((starter() == 0) ? "no" : starter()->getName())
       << std::endl

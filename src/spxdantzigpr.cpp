@@ -29,6 +29,10 @@ int SPxDantzigPR::selectLeave()
 {
    assert(thesolver != 0);
 
+#ifdef PARTIAL_PRICING
+   return selectLeavePart();
+#endif
+
    //    const Real* up  = thesolver->ubBound();
    //    const Real* low = thesolver->lbBound();
 
@@ -51,6 +55,53 @@ int SPxDantzigPR::selectLeave()
    }
    return n;
 }
+
+int SPxDantzigPR::selectLeavePart()
+{
+   assert(thesolver != 0);
+   Real best = -theeps;
+   int n = -1;
+   int dim = thesolver->dim();
+   int count = 0;
+   int oldstart = start;
+
+   for(int i = oldstart; i < dim; ++i)
+   {
+      Real x = thesolver->fTest()[i];
+      if (x < -theeps)
+      {
+         if (x < best)
+         {
+            if( count == 0 )
+               start = (i + 1) % dim;
+            n = i;
+            best = x;
+            ++count;
+            if (count >= MAX_PRICING_CANDIDATES)
+               return n;
+         }
+      }
+   }
+   for(int i = 0; i < oldstart; ++i)
+   {
+      Real x = thesolver->fTest()[i];
+      if (x < -theeps)
+      {
+         if (x < best)
+         {
+            if( count == 0 )
+               start = (i + 1) % dim;
+            n = i;
+            best = x;
+            ++count;
+            if (count >= MAX_PRICING_CANDIDATES)
+               return n;
+         }
+      }
+   }
+   return n;
+}
+
 
 SPxId SPxDantzigPR::selectEnter()
 {

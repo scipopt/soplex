@@ -38,6 +38,11 @@ namespace soplex
 */
 class SPxDantzigPR : public SPxPricer
 {
+private:
+   int                   start;              /**< index where the search starts */
+
+   int                   selectLeavePart();  /**< partial pricing method, define
+                                              *   PARTIAL_PRICING to use */
 public:
 
    //-------------------------------------
@@ -46,10 +51,12 @@ public:
    /// default constructor
    SPxDantzigPR() 
       : SPxPricer("Dantzig")
+      , start(0)
    {} 
    /// copy constructor
    SPxDantzigPR(const SPxDantzigPR& old ) 
       : SPxPricer(old)
+      , start(old.start)
    {}
    /// assignment operator
    SPxDantzigPR& operator=( const SPxDantzigPR& rhs)
@@ -57,6 +64,7 @@ public:
       if(this != &rhs)
       {
          SPxPricer::operator=(rhs);
+         start = rhs.start;
       }
 
       return *this;
@@ -70,6 +78,7 @@ public:
       return new SPxDantzigPR(*this);
    }
    //@}
+
 
    //-------------------------------------
    /**@name Select enter/leave */
