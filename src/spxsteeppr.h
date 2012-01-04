@@ -84,6 +84,9 @@ private:
    Setup setup;
    /// accuracy for computing steepest directions.
    Real accuracy;
+   /// index at which partial pricing should start
+   int startpricing;
+
    //@}
 
    //-------------------------------------
@@ -106,6 +109,7 @@ public:
       , workRhs (0, 1e-16)
       , setup (DEFAULT)
       , accuracy(1e-4)
+      , startpricing(0)
    {
       assert(isConsistent());
    }
@@ -123,6 +127,7 @@ public:
       , leavePref(old.leavePref)
       , setup(old.setup)
       , accuracy(old.accuracy)
+      ,startpricing(old.startpricing)
    {
       assert(isConsistent());
    }
@@ -143,6 +148,7 @@ public:
          leavePref = rhs.leavePref;
          setup = rhs.setup;
          accuracy = rhs.accuracy;
+         startpricing = rhs.startpricing;
 
          assert(isConsistent());
       }
@@ -172,6 +178,8 @@ public:
    virtual void setRep(SPxSolver::Representation rep);
    ///
    virtual int selectLeave();
+   /// implementation of partial pricing
+   int selectLeavePart();
    ///
    virtual void left4(int n, SPxId id);
    ///

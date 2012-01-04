@@ -258,6 +258,10 @@ int SPxSteepPR::selectLeave()
 {
    assert(isConsistent());
 
+#ifdef PARTIAL_PRICING
+   return selectLeavePart();
+#endif
+
    const Real* coPenalty_ptr = coPenalty.get_const_ptr();
    const Real* fTest         = thesolver->fTest().get_const_ptr();
    //    const Real* low     = thesolver->lbBound();
@@ -297,6 +301,97 @@ int SPxSteepPR::selectLeave()
       }
    }
 
+   if (lastIdx >= 0)
+   {
+      assert( thesolver->coPvec().delta().isConsistent() );
+      thesolver->basis().coSolve(thesolver->coPvec().delta(),
+                                 thesolver->unitVector(lastIdx));
+      workRhs.setEpsilon(accuracy);
+      assert( thesolver->coPvec().delta().isConsistent() );
+      workRhs.setup_and_assign(thesolver->coPvec().delta());
+      thesolver->setup4solve(&workVec, &workRhs);
+   }
+
+   return lastIdx;
+}
+
+int SPxSteepPR::selectLeavePart()
+{
+   const Real* coPenalty_ptr = coPenalty.get_const_ptr();
+   const Real* fTest         = thesolver->fTest().get_const_ptr();
+   //    const Real* low     = thesolver->lbBound();
+   //    const Real* up      = thesolver->ubBound();
+   const Real* p             = leavePref.get_const_ptr();
+
+   Real best = -infinity;
+   Real x;
+
+   int oldstart = startpricing;
+   int lastIdx = -1;
+   int count = 0;
+   int dim = thesolver->dim();
+
+   for (int i = oldstart; i < dim; ++i)
+   {
+      x = fTest[i];
+
+      if (x < -theeps)
+      {
+         if( coPenalty_ptr[i] < theeps )
+         {
+#ifdef ENABLE_ADDITIONAL_CHECKS
+            MSG_WARNING( spxout << "WSTEEP02 SPxSteepPR::selectLeavePart(): coPenalty too small ("
+                                << coPenalty_ptr[i] << "), assuming epsilon (" << theeps << ")!" << std::endl; )
+#endif
+
+            x = x * x / theeps * p[i];
+         }
+         else
+            x = x * x / coPenalty_ptr[i] * p[i];
+
+         if (x > best)
+         {
+            if( count == 0 )
+               startpricing = (i + 1) % dim;
+            best = x;
+            lastIdx = i;
+            ++count;
+            if (count >= MAX_PRICING_CANDIDATES)
+               goto TERMINATE;
+         }
+      }
+   }
+   for (int i = 0; i < oldstart; ++i)
+   {
+      x = fTest[i];
+
+      if (x < -theeps)
+      {
+         if( coPenalty_ptr[i] < theeps )
+         {
+#ifdef ENABLE_ADDITIONAL_CHECKS
+            MSG_WARNING( spxout << "WSTEEP02 SPxSteepPR::selectLeavePart(): coPenalty too small ("
+                                << coPenalty_ptr[i] << "), assuming epsilon (" << theeps << ")!" << std::endl; )
+#endif
+            x = x * x / theeps * p[i];
+         }
+         else
+            x = x * x / coPenalty_ptr[i] * p[i];
+
+         if (x > best)
+         {
+            if( count == 0 )
+               startpricing = (i + 1) % dim;
+            best = x;
+            lastIdx = i;
+            ++count;
+            if (count >= MAX_PRICING_CANDIDATES)
+               goto TERMINATE;
+         }
+      }
+   }
+
+TERMINATE:
    if (lastIdx >= 0)
    {
       assert( thesolver->coPvec().delta().isConsistent() );
