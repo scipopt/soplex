@@ -135,52 +135,65 @@ int SPxDevexPR::selectLeavePart(Real& best, Real feastol)
    const Real* cpen = coPenalty.get_const_ptr();
    Real bstX = 0;
    int bstI = -1;
-   int end = coPenalty.dim();
+   int dim = coPenalty.dim();
    int count = 0;
    int oldstartpricing = startpricing;
+   int end = oldstartpricing + IMPROVEMENT_STEPLENGTH;
 
-   for (int i = oldstartpricing; i < end; ++i)
+   for (int i = oldstartpricing; i < dim; ++i)
    {
-      if (fTest[i] < -feastol)
+      Real fTesti = fTest[i];
+      if (fTesti < -feastol)
       {
-         x = fTest[i] * fTest[i] / cpen[i];
-         if (x > bstX)
+         Real cpeni = cpen[i];
+         x = fTesti * fTesti / cpeni;
+         if (x > bstX * IMPROVEMENT_THRESHOLD)
          {
             bstX = x;
             bstI = i;
-            last = cpen[i];
-            if (count == 0)
-               startpricing = (i + 1) % end;
+            last = cpeni;
+            end = i + IMPROVEMENT_STEPLENGTH;
+//             if (count == 0)
+               startpricing = (i + 1) % dim;
             ++count;
-            if (count >= MAX_PRICING_CANDIDATES)
-            {
-               best = bstX;
-               return bstI;
-            }
          }
       }
+      if (i >= end && count >= MAX_PRICING_CANDIDATES)
+         break;
    }
+
+   if (end < dim && count >= MAX_PRICING_CANDIDATES)
+   {
+      best = bstX;
+      return bstI;
+   }
+   else
+   {
+      end -= dim;
+   }
+
    for (int i = 0; i < oldstartpricing; ++i)
    {
-      if (fTest[i] < -feastol)
+      Real fTesti = fTest[i];
+      if (fTesti < -feastol)
       {
-         x = fTest[i] * fTest[i] / cpen[i];
-         if (x > bstX)
+         Real cpeni = cpen[i];
+         x = fTesti * fTesti / cpeni;
+         if (x > bstX * IMPROVEMENT_THRESHOLD)
          {
             bstX = x;
             bstI = i;
-            last = cpen[i];
-            if (count == 0)
-               startpricing = (i + 1) % end;
+            last = cpeni;
+            end = i + IMPROVEMENT_STEPLENGTH;
+//             if (count == 0)
+               startpricing = (i + 1) % dim;
             ++count;
-            if (count >= MAX_PRICING_CANDIDATES)
-            {
-               best = bstX;
-               return bstI;
-            }
          }
       }
+      if (i >= end && count >= MAX_PRICING_CANDIDATES)
+         break;
    }
+
    best = bstX;
    return bstI;
 }

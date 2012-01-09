@@ -330,6 +330,7 @@ int SPxSteepPR::selectLeavePart()
    int lastIdx = -1;
    int count = 0;
    int dim = thesolver->dim();
+   int end = oldstart + IMPROVEMENT_STEPLENGTH;
 
    for (int i = oldstart; i < dim; ++i)
    {
@@ -349,18 +350,22 @@ int SPxSteepPR::selectLeavePart()
          else
             x = x * x / coPenalty_ptr[i] * p[i];
 
-         if (x > best)
+         if (x > best * IMPROVEMENT_THRESHOLD)
          {
             if( count == 0 )
                startpricing = (i + 1) % dim;
             best = x;
             lastIdx = i;
             ++count;
-            if (count >= MAX_PRICING_CANDIDATES)
-               goto TERMINATE;
+            end = i + IMPROVEMENT_STEPLENGTH;
          }
       }
+      if (i >= end && count >= MAX_PRICING_CANDIDATES)
+         goto TERMINATE;
    }
+   assert(end >= dim);
+   end -= dim;
+
    for (int i = 0; i < oldstart; ++i)
    {
       x = fTest[i];
@@ -378,17 +383,18 @@ int SPxSteepPR::selectLeavePart()
          else
             x = x * x / coPenalty_ptr[i] * p[i];
 
-         if (x > best)
+         if (x > best * IMPROVEMENT_THRESHOLD)
          {
             if( count == 0 )
                startpricing = (i + 1) % dim;
             best = x;
             lastIdx = i;
             ++count;
-            if (count >= MAX_PRICING_CANDIDATES)
-               goto TERMINATE;
+            end = i + IMPROVEMENT_STEPLENGTH;
          }
       }
+      if (i >= end && count >= MAX_PRICING_CANDIDATES)
+         goto TERMINATE;
    }
 
 TERMINATE:
