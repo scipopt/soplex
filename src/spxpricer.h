@@ -26,6 +26,9 @@
 #include "spxdefines.h"
 #include "spxsolver.h"
 
+#define MAX_PRICING_CANDIDATES   8
+#define IMPROVEMENT_STEPLENGTH  20
+#define IMPROVEMENT_THRESHOLD    1
 
 namespace soplex
 {

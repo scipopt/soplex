@@ -44,9 +44,8 @@
 
 namespace soplex
 {
-#define SOPLEX_VERSION       160
-#define SOPLEX_SUBVERSION      2
-#define MAX_PRICING_CANDIDATES 4
+#define SOPLEX_VERSION         160
+#define SOPLEX_SUBVERSION        2
 
 /*-----------------------------------------------------------------------------
  * Assertion Macros etc.
