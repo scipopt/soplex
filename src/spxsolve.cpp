@@ -397,7 +397,7 @@ SPxSolver::Status SPxSolver::solve()
             
             leaveNum = thepricer->selectLeave();
 
-            if (leaveNum < 0 && instableLeaveNum >= 0)
+            if (leaveNum < 0 && instableLeaveNum >= 0 && lastUpdate() == 0)
             {
                /* no leaving variable was found, but because of instableLeaveNum >= 0 we know
                   that this is due to the scaling of theCoTest[...]. Thus, we use 

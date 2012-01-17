@@ -1,3 +1,14 @@
+(maintain each list from top to bottom)
+
+
+DEVELOPER
+=========
+
+fixed bugs:
+- allow instable leave iterations, i.e., leave iterations with pivot element below default stability threshold, only
+  after a fresh factorization
+
+
 28 Oct 2011 - Release 1.6.0
 ===========================
 
