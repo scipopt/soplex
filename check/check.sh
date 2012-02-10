@@ -81,6 +81,8 @@ do
             opt="-r -t3" ;;
         19) echo =type= ERb
             opt="-e -r -t3" ;;
+        20) echo =type= LCd
+	    opt="-p0" ;;
         esac
         $2 $opt -C -q $4 $i 2>>$ERRFILE
         echo =ready=
