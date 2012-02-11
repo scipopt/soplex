@@ -14,8 +14,8 @@
 #*                                                                           *#
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
 
-#@file    Makefile include to detect host system
-#@brief   SCIP Makefile
+#@file    make.detecthost
+#@brief   Makefile to detect host system
 #@author  Stefan Heinz
 
 

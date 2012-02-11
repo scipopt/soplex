@@ -1,6 +1,2 @@
-CPPFLAGS	+=	-Isrc -DNDEBUG
+CPPFLAGS	+=	-DNDEBUG
 CXXFLAGS	+=	-O3 -mtune=native -fomit-frame-pointer # -g -malign-double -ffast-math
-LDFLAGS		+=	-lm
-ARFLAGS		=	crs
-ZLIB_FLAGS	=
-ZLIB_LDFLAGS 	=	-lz

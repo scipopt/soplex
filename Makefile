@@ -124,10 +124,7 @@ GCCWARN		=	-Wall -W -Wpointer-arith -Wno-unknown-pragmas \
 
 #GCCWARN =
 #-----------------------------------------------------------------------------
--include make/make.$(BASE)
--include make/make.$(OSTYPE).$(COMP)
--include make/make.$(OSTYPE).$(COMP).$(OPT)
--include make/make.$(OSTYPE).$(ARCH).$(COMP)
+include make/make.$(BASE)
 -include make/local/make.$(HOSTNAME)
 -include make/local/make.$(HOSTNAME).$(COMP)
 -include make/local/make.$(HOSTNAME).$(COMP).$(OPT)

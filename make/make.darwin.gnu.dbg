@@ -1,2 +1,2 @@
-CPPFLAGS	+=	-Isrc
-CXXFLAGS	+=	-O0 -g -ansi $(GCCWARN) -m32
+CPPFLAGS	+=
+CXXFLAGS	+=	-O0 -g -ansi $(GCCWARN)
