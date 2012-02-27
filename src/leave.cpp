@@ -43,11 +43,20 @@ void SPxSolver::computeFtest()
 
    assert(type() == LEAVE);
 
-   for(int i = 0; i < dim(); ++i)
+   int ninfeas = 0;
+
+   for( int i = 0; i < dim(); ++i )
    {
       theCoTest[i] = ((*theFvec)[i] > theUBbound[i])
          ? theUBbound[i] - (*theFvec)[i]
          : (*theFvec)[i] - theLBbound[i];
+
+      if( theCoTest[i] < 0 )
+      {
+         assert(ninfeas < infeasibilities.size());
+         infeasibilities[ninfeas] = i;
+         ninfeas++;
+      }
    }
 }
 
