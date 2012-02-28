@@ -195,6 +195,15 @@ public:
       UNBOUNDED      =  2,  ///< LP has been proven to be primal unbounded.
       INFEASIBLE     =  3   ///< LP has been proven to be primal infeasible.
    };
+
+   /** For the leaving Simplex algorithm this array contains the indices of basic variables
+    * which violates one of its bounds
+    *
+    * After a basis change the array will be updated; if the basis change takes a variable from the basis,
+    * it will no longer be included in the vector and the entry gets an negative value.
+    */
+  DIdxSet infeasibilities;
+
    //@}
 
 private:

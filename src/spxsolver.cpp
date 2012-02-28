@@ -398,6 +398,7 @@ void SPxSolver::setPricing(Pricing pr)
       computeCoTest();
       computeTest();
    }
+   infeasibilities.setMax(dim());;
 }
 
 /*

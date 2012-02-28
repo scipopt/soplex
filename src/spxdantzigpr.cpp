@@ -38,17 +38,18 @@ int SPxDantzigPR::selectLeave()
 
    Real best = -theeps;
    int  n    = -1;
+   int  idx    = 0;
 
-   for(int i = thesolver->dim() - 1; i >= 0; --i)
+   for(int i = thesolver->infeasibilities.size() - 1; i >= 0; --i)
    {
-      Real x = thesolver->fTest()[i];
-
+      idx = thesolver->infeasibilities.index(i);
+      Real x = thesolver->fTest()[idx];
       if (x < -theeps)
       {
          // x *= EQ_PREF * (1 + (up[i] == low[i]));
          if (x < best)
          {
-            n    = i;
+            n    = idx;
             best = x;
          }
       }
