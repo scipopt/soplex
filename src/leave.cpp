@@ -53,8 +53,8 @@ void SPxSolver::computeFtest()
 
       if( theCoTest[i] < 0 )
       {
-         assert(ninfeas < infeasibilities.size());
-         infeasibilities[ninfeas] = i;
+         assert(ninfeas < infeasibilities.max());
+         infeasibilities.addIdx(i);;
          ninfeas++;
       }
    }
