@@ -272,10 +272,12 @@ int SPxSteepPR::selectLeave()
    Real x;
 
    int lastIdx = -1;
+   int idx = 0;
 
-   for (int i = thesolver->dim() - 1; i >= 0; --i)
+   for (int i = thesolver->infeasibilities.size() - 1; i >= 0; --i)
    {
-      x = fTest[i];
+      idx = thesolver->infeasibilities.index(i);
+      x = fTest[idx];
 
       if (x < -theeps)
       {         
@@ -288,15 +290,15 @@ int SPxSteepPR::selectLeave()
                                 << coPenalty_ptr[i] << "), assuming epsilon (" << theeps << ")!" << std::endl; )
 #endif
 
-            x = x * x / theeps * p[i];
+            x = x * x / theeps * p[idx];
          }
          else
-            x = x * x / coPenalty_ptr[i] * p[i];
+            x = x * x / coPenalty_ptr[i] * p[idx];
 
          if (x > best)
          {
             best = x;
-            lastIdx = i;
+            lastIdx = idx;
          }
       }
    }
