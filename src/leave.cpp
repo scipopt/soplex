@@ -43,8 +43,7 @@ void SPxSolver::computeFtest()
 
    assert(type() == LEAVE);
 
-   int ninfeas = 0;
-
+   infeasibilities.clear();
    for( int i = 0; i < dim(); ++i )
    {
       theCoTest[i] = ((*theFvec)[i] > theUBbound[i])
@@ -53,11 +52,11 @@ void SPxSolver::computeFtest()
 
       if( theCoTest[i] < 0 )
       {
-         assert(ninfeas < infeasibilities.max());
-         infeasibilities.addIdx(i);;
-         ninfeas++;
+         assert(infeasibilities.size() < infeasibilities.max());
+         infeasibilities.addIdx(i);
       }
    }
+   //MSG_INFO1( spxout << "(COMPUTE) number infeasibilities: " << infeasibilities.size() << "; basic dimension: " << dim() << std::endl; )
 }
 
 void SPxSolver::updateFtest()
@@ -68,6 +67,8 @@ void SPxSolver::updateFtest()
    assert(&ftest == &fTest());
 
    assert(type() == LEAVE);
+
+   infeasibilities.clear();
    for (int j = idx.size() - 1; j >= 0; --j)
    {
       int i = idx.index(j);
@@ -75,7 +76,14 @@ void SPxSolver::updateFtest()
       ftest[i] = ((*theFvec)[i] > theUBbound[i])
          ? theUBbound[i] - (*theFvec)[i]
          : (*theFvec)[i] - theLBbound[i];
+         if( ftest[i] < 0 )
+         {
+            assert(infeasibilities.size() < infeasibilities.max());
+            infeasibilities.addIdx(i);
+            //MSG_INFO1 ( spxout << "(UPDATE) violation at index " << i << " add index; number infeasibilities: " << infeasibilities.size() << std::endl; )
+         }
    }
+   //MSG_INFO1( spxout << "(UPDATE_END) number infeasibilities: " << infeasibilities.size() << std::endl; )
 }
 
 
