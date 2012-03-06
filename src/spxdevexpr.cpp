@@ -109,17 +109,19 @@ int SPxDevexPR::selectLeaveX(Real& best, Real feastol, int start, int incr)
    Real bstX = 0;
    int bstI = -1;
    int end = coPenalty.dim();
+   int idx = -1;
 
-   for (; start < end; start += incr)
+   for (; start < thesolver->infeasibilities.size(); start += incr)
    {
-      if (fTest[start] < -feastol)
+      idx = thesolver->infeasibilities.index(start);
+      if (fTest[idx] < -feastol)
       {
-         x = fTest[start] * fTest[start] / cpen[start];
+         x = fTest[idx] * fTest[idx] / cpen[idx];
          if (x > bstX)
          {
             bstX = x;
-            bstI = start;
-            last = cpen[start];
+            bstI = idx;
+            last = cpen[idx];
          }
       }
    }
