@@ -52,7 +52,7 @@ void SPxSolver::computeFtest()
          ? theUBbound[i] - (*theFvec)[i]
          : (*theFvec)[i] - theLBbound[i];
 
-      if( theCoTest[i] < theeps )
+      if( theCoTest[i] < -theeps )
       {
          assert(infeasibilities.size() < infeasibilities.max());
          infeasibilities.addIdx(i);
@@ -77,7 +77,7 @@ void SPxSolver::updateFtest()
       ftest[i] = ((*theFvec)[i] > theUBbound[i])
          ? theUBbound[i] - (*theFvec)[i]
          : (*theFvec)[i] - theLBbound[i];
-//       if (ftest[i] < theeps)
+//       if (ftest[i] < -theeps)
 //       {
 //          if (infeasibilities.number(i) >= 0)
 //             infeasibilities.addIdx(i);
