@@ -32,28 +32,31 @@ int SPxDantzigPR::selectLeave()
 #ifdef PARTIAL_PRICING
    return selectLeavePart();
 #endif
+   if (sparsePricing)
+      return selectLeaveSparse();
 
    //    const Real* up  = thesolver->ubBound();
    //    const Real* low = thesolver->lbBound();
 
    Real best = -theeps;
    int  n    = -1;
-   int  idx    = 0;
 
-   for(int i = thesolver->infeasibilities.size() - 1; i >= 0; --i)
+   for(int i = thesolver->dim() - 1; i >= 0; --i)
    {
-      idx = thesolver->infeasibilities.index(i);
-      Real x = thesolver->fTest()[idx];
+      Real x = thesolver->fTest()[i];
+      
       if (x < -theeps)
       {
          // x *= EQ_PREF * (1 + (up[i] == low[i]));
          if (x < best)
          {
-            n    = idx;
+            n    = i;
             best = x;
          }
       }
    }
+   int m = selectLeaveSparse();
+   MSG_INFO1( spxout << "(SPARSE)/ (NORMAL) " << m << "/ " << n << std::endl; )
    return n;
 }
 
@@ -97,6 +100,31 @@ int SPxDantzigPR::selectLeavePart()
             ++count;
             if (count >= MAX_PRICING_CANDIDATES)
                return n;
+         }
+      }
+   }
+   return n;
+}
+
+int SPxDantzigPR::selectLeaveSparse()
+{
+   assert(thesolver != 0);
+   
+   Real best = -theeps;
+   int  n    = -1;
+   int  idx    = 0;
+
+   for(int i = thesolver->infeasibilities.size() - 1; i >= 0; --i)
+   {
+      idx = thesolver->infeasibilities.index(i);
+      Real x = thesolver->fTest()[idx];
+      if (x < -theeps)
+      {
+         // x *= EQ_PREF * (1 + (up[i] == low[i]));
+         if (x < best)
+         {
+            n    = idx;
+            best = x;
          }
       }
    }

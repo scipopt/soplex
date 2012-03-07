@@ -181,6 +181,8 @@ public:
    /// implementation of partial pricing
    int selectLeavePart();
    ///
+   int selectLeaveSparse();
+   ///
    virtual void left4(int n, SPxId id);
    ///
    virtual SPxId selectEnter();

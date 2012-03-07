@@ -64,6 +64,8 @@ private:
    int selectLeaveX(Real& best, Real feastol, int start = 0, int incr = 1);
    /// implementation of partial pricing
    int selectLeavePart(Real& best, Real feastol);
+   ///
+   int selectLeaveSparse(Real& best, Real feastol);
    /// internal implementation of SPxPricer::left4()
    void left4X(int n, const SPxId& id, int start, int incr);
    /// internal implementation of SPxPricer::selectEnter()

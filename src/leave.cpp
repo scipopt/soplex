@@ -26,6 +26,7 @@
 #include "spxratiotester.h"
 #include "spxout.h"
 #include "exceptions.h"
+#include "spxpricer.h"
 
 namespace soplex
 {
@@ -43,6 +44,7 @@ void SPxSolver::computeFtest()
 
    assert(type() == LEAVE);
 
+   Real theeps = thepricer->epsilon();
    infeasibilities.clear();
    for( int i = 0; i < dim(); ++i )
    {
@@ -50,13 +52,12 @@ void SPxSolver::computeFtest()
          ? theUBbound[i] - (*theFvec)[i]
          : (*theFvec)[i] - theLBbound[i];
 
-      if( theCoTest[i] < 0 )
+      if( theCoTest[i] < theeps )
       {
          assert(infeasibilities.size() < infeasibilities.max());
          infeasibilities.addIdx(i);
       }
    }
-   //MSG_INFO1( spxout << "(COMPUTE) number infeasibilities: " << infeasibilities.size() << "; basic dimension: " << dim() << std::endl; )
 }
 
 void SPxSolver::updateFtest()
@@ -68,7 +69,7 @@ void SPxSolver::updateFtest()
 
    assert(type() == LEAVE);
 
-   infeasibilities.clear();
+   Real theeps = thepricer->epsilon();
    for (int j = idx.size() - 1; j >= 0; --j)
    {
       int i = idx.index(j);
@@ -76,14 +77,12 @@ void SPxSolver::updateFtest()
       ftest[i] = ((*theFvec)[i] > theUBbound[i])
          ? theUBbound[i] - (*theFvec)[i]
          : (*theFvec)[i] - theLBbound[i];
-         if( ftest[i] < 0 )
-         {
-            assert(infeasibilities.size() < infeasibilities.max());
-            infeasibilities.addIdx(i);
-            //MSG_INFO1 ( spxout << "(UPDATE) violation at index " << i << " add index; number infeasibilities: " << infeasibilities.size() << std::endl; )
-         }
+//       if (ftest[i] < theeps)
+//       {
+//          if (infeasibilities.number(i) >= 0)
+//             infeasibilities.addIdx(i);
+//       }
    }
-   //MSG_INFO1( spxout << "(UPDATE_END) number infeasibilities: " << infeasibilities.size() << std::endl; )
 }
 
 
