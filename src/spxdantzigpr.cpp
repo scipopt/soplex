@@ -137,14 +137,14 @@ int SPxDantzigPR::selectLeaveSparse()
             best = x;
          }
       }
-      else
-      {
-         thesolver->infeasibilities.remove(i);
+//       else
+//       {
+//          thesolver->infeasibilities.remove(i);
 //          MSG_INFO1( spxout << "remove index " << idx 
 //                            << " at position " << i << std::endl; )
-         numInf--;
-         
-      }
+//          numInf--;
+//          
+//       }
    }
 //    MSG_INFO1( spxout << "leavingIndex: " << n 
 //                      << " -- bestValue: " << best 
