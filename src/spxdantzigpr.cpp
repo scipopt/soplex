@@ -44,9 +44,13 @@ int SPxDantzigPR::selectLeave()
    for(int i = thesolver->dim() - 1; i >= 0; --i)
    {
       Real x = thesolver->fTest()[i];
-      
+
       if (x < -theeps)
       {
+//          MSG_INFO1( spxout << "DENSE: fTest[" << i << "] = " << x
+//          << " -- i/ index : " << i << "/ "
+//          << i << " __ theepsValue: "
+//          << theeps << std::endl; )
          // x *= EQ_PREF * (1 + (up[i] == low[i]));
          if (x < best)
          {
@@ -59,6 +63,7 @@ int SPxDantzigPR::selectLeave()
 //    MSG_INFO1( spxout << "(SPARSE)/ (NORMAL) " << m 
 //                      << "/ " << n << " -- infeasibilitiesDim: " 
 //                      << thesolver->infeasibilities.size() << std::endl; )
+//    spxout << "--------------------------------\n";
    return n;
 }
 
@@ -123,9 +128,9 @@ int SPxDantzigPR::selectLeaveSparse()
    {
       idx = thesolver->infeasibilities.index(i);
       Real x = thesolver->fTest()[idx];
-//       MSG_INFO1( spxout << "fTest[" << idx << "] = " << x 
-//                         << " -- i/ index : " << i << "/ " 
-//                         << idx << " __ theepsValue: " 
+//       MSG_INFO1( spxout << "SPARSE: fTest[" << idx << "] = " << x
+//                         << " -- i/ index : " << i << "/ "
+//                         << idx << " __ theepsValue: "
 //                         << theeps << std::endl; )
       if (x < -theeps)
       {

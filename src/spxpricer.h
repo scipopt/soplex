@@ -231,7 +231,7 @@ public:
       , thesolver(0)
       , theeps(0.0)
       // for testing sparse pricing
-      , sparsePricing(0)
+      , sparsePricing(1)
    {}
 
    /// copy constructor

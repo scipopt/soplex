@@ -77,11 +77,11 @@ void SPxSolver::updateFtest()
       ftest[i] = ((*theFvec)[i] > theUBbound[i])
          ? theUBbound[i] - (*theFvec)[i]
          : (*theFvec)[i] - theLBbound[i];
-//       if (ftest[i] < -theeps)
-//       {
-//          if (infeasibilities.number(i) >= 0)
-//             infeasibilities.addIdx(i);
-//       }
+      if (ftest[i] < -theeps)
+      {
+         if (infeasibilities.number(i) == -1)
+            infeasibilities.addIdx(i);
+      }
    }
 }
 
