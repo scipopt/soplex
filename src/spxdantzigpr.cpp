@@ -55,8 +55,10 @@ int SPxDantzigPR::selectLeave()
          }
       }
    }
-   int m = selectLeaveSparse();
-   MSG_INFO1( spxout << "(SPARSE)/ (NORMAL) " << m << "/ " << n << std::endl; )
+//    int m = selectLeaveSparse();
+//    MSG_INFO1( spxout << "(SPARSE)/ (NORMAL) " << m 
+//                      << "/ " << n << " -- infeasibilitiesDim: " 
+//                      << thesolver->infeasibilities.size() << std::endl; )
    return n;
 }
 
@@ -110,24 +112,45 @@ int SPxDantzigPR::selectLeaveSparse()
 {
    assert(thesolver != 0);
    
-   Real best = -theeps;
-   int  n    = -1;
+   Real best   = -theeps;
+   int  n      = -1;
+   int  idxn   = -1;
    int  idx    = 0;
+   int  numInf = thesolver->infeasibilities.size() +1
+   ;
 
    for(int i = thesolver->infeasibilities.size() - 1; i >= 0; --i)
    {
       idx = thesolver->infeasibilities.index(i);
       Real x = thesolver->fTest()[idx];
+//       MSG_INFO1( spxout << "fTest[" << idx << "] = " << x 
+//                         << " -- i/ index : " << i << "/ " 
+//                         << idx << " __ theepsValue: " 
+//                         << theeps << std::endl; )
       if (x < -theeps)
       {
          // x *= EQ_PREF * (1 + (up[i] == low[i]));
          if (x < best)
          {
             n    = idx;
+            idxn = i;
             best = x;
          }
       }
+      else
+      {
+         thesolver->infeasibilities.remove(i);
+//          MSG_INFO1( spxout << "remove index " << idx 
+//                            << " at position " << i << std::endl; )
+         numInf--;
+         
+      }
    }
+//    MSG_INFO1( spxout << "leavingIndex: " << n 
+//                      << " -- bestValue: " << best 
+//                      << " -- numberInfeasibilities: " << numInf 
+//                      << std::endl; )
+   thesolver->infeasibilities.remove(idxn);
    return n;
 }
 
