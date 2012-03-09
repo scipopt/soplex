@@ -177,8 +177,9 @@ public:
 //      /**@todo Shouldn't this be an assert instead of an if (see add()) */
 //      if (n < size() && n >= 0)
 //         idx[n] = idx[--num];
-      assert(n >= 0 && n < size()); 
-      idx[n] = idx[--num];
+      assert(n >= 0 && n < size());
+      if( n != --num )
+         idx[n] = idx[num];
    }
 
    /// removes all indices.
