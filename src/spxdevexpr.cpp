@@ -87,10 +87,11 @@ int SPxDevexPR::selectLeave()
 #ifdef PARTIAL_PRICING
    retid = selectLeavePart(val, theeps);
 #else
-   retid = selectLeaveX(val, theeps);
-#endif
    if (thesolver->sparsePricing)
       retid = selectLeaveSparse(val, theeps);
+   else
+      retid = selectLeaveX(val, theeps);
+#endif
    if ( retid < 0 && !refined )
    {
       refined = true;

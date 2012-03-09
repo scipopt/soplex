@@ -788,7 +788,7 @@ SPxSolver::SPxSolver(
    , theratiotester (0)
    , thestarter (0)
    // for testing sparse pricing
-   , sparsePricing(1)
+   , sparsePricing(false)
 {
    METHOD( "SPxSolver::SPxSolver()" );
 

@@ -58,10 +58,6 @@ void SPxSolver::computeFtest()
       {
          assert(infeasibilities.size() < infeasibilities.max());
          infeasibilities.addIdx(i);
-//          MSG_INFO1( spxout << "inf(" << i << "): " << infeasibilities.index(numInf) 
-//                            << " -- theCoTestValue[" << i << "] = " 
-//                            << theCoTest[i] << std::endl; )
-         
          numInf++;
       }
    }
@@ -78,26 +74,17 @@ void SPxSolver::updateFtest()
    assert(type() == LEAVE);
 
    Real theeps = thepricer->epsilon();
-   int  infIdx = -1;
    for (int j = idx.size() - 1; j >= 0; --j)
    {
       int i = idx.index(j);
-      infIdx = infeasibilities.number(i);
 
       ftest[i] = ((*theFvec)[i] > theUBbound[i])
          ? theUBbound[i] - (*theFvec)[i]
          : (*theFvec)[i] - theLBbound[i];
       if (ftest[i] < -theeps)
       {
-         if (infIdx == -1)
+         if (infeasibilities.number(i) == -1)
             infeasibilities.addIdx(i);
-      }
-      else
-      {
-         if (infIdx >= 0)
-         {
-            infeasibilities.remove(infIdx);
-         }
       }
    }
 }

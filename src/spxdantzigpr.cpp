@@ -107,12 +107,10 @@ int SPxDantzigPR::selectLeavePart()
 int SPxDantzigPR::selectLeaveSparse()
 {
    assert(thesolver != 0);
-   
+
    Real best   = -theeps;
    int  n      = -1;
-   int  infIdx   = -1;
    int  idx    = 0;
-   ;
 
    for(int i = thesolver->infeasibilities.size() - 1; i >= 0; --i)
    {
@@ -124,7 +122,6 @@ int SPxDantzigPR::selectLeaveSparse()
          if (x < best)
          {
             n    = idx;
-            infIdx = i;
             best = x;
          }
       }
