@@ -44,7 +44,7 @@ int SPxDantzigPR::selectLeave()
    for(int i = thesolver->dim() - 1; i >= 0; --i)
    {
       Real x = thesolver->fTest()[i];
-      
+
       if (x < -theeps)
       {
          // x *= EQ_PREF * (1 + (up[i] == low[i]));
