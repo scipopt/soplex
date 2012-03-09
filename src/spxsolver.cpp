@@ -867,6 +867,7 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       leaveCount = base.leaveCount;
       enterCount = base.enterCount;
       theCumulativeTime = base.theCumulativeTime;
+      sparsePricing = base.sparsePricing;
 
       if (base.theRep == COLUMN)
       {
