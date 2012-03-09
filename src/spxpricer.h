@@ -124,9 +124,6 @@ public:
    {}
    //@}
    
-   /// 
-   bool sparsePricing;
-
    //-------------------------------------
    /**@name Pivoting */
    //@{
@@ -230,8 +227,6 @@ public:
       : m_name(p_name)
       , thesolver(0)
       , theeps(0.0)
-      // for testing sparse pricing
-      , sparsePricing(0)
    {}
 
    /// copy constructor

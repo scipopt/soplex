@@ -32,7 +32,7 @@ int SPxDantzigPR::selectLeave()
 #ifdef PARTIAL_PRICING
    return selectLeavePart();
 #endif
-   if (sparsePricing)
+   if (thesolver->sparsePricing)
       return selectLeaveSparse();
 
    //    const Real* up  = thesolver->ubBound();
@@ -55,10 +55,6 @@ int SPxDantzigPR::selectLeave()
          }
       }
    }
-//    int m = selectLeaveSparse();
-//    MSG_INFO1( spxout << "(SPARSE)/ (NORMAL) " << m 
-//                      << "/ " << n << " -- infeasibilitiesDim: " 
-//                      << thesolver->infeasibilities.size() << std::endl; )
    return n;
 }
 
@@ -114,43 +110,30 @@ int SPxDantzigPR::selectLeaveSparse()
    
    Real best   = -theeps;
    int  n      = -1;
-   int  idxn   = -1;
+   int  infIdx   = -1;
    int  idx    = 0;
-   int  numInf = thesolver->infeasibilities.size() +1
    ;
 
    for(int i = thesolver->infeasibilities.size() - 1; i >= 0; --i)
    {
       idx = thesolver->infeasibilities.index(i);
       Real x = thesolver->fTest()[idx];
-//       MSG_INFO1( spxout << "fTest[" << idx << "] = " << x 
-//                         << " -- i/ index : " << i << "/ " 
-//                         << idx << " __ theepsValue: " 
-//                         << theeps << std::endl; )
       if (x < -theeps)
       {
          // x *= EQ_PREF * (1 + (up[i] == low[i]));
          if (x < best)
          {
             n    = idx;
-            idxn = i;
+            infIdx = i;
             best = x;
          }
       }
-//       else
-//       {
-//          thesolver->infeasibilities.remove(i);
-//          MSG_INFO1( spxout << "remove index " << idx 
-//                            << " at position " << i << std::endl; )
-//          numInf--;
-//          
-//       }
+      else
+      {
+         thesolver->infeasibilities.remove(i);
+      }
    }
-//    MSG_INFO1( spxout << "leavingIndex: " << n 
-//                      << " -- bestValue: " << best 
-//                      << " -- numberInfeasibilities: " << numInf 
-//                      << std::endl; )
-   thesolver->infeasibilities.remove(idxn);
+//    thesolver->infeasibilities.remove(infIdx);
    return n;
 }
 

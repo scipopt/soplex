@@ -160,6 +160,9 @@ public:
        */
       PARTIAL  
    };
+   
+   //Pricing type
+   bool sparsePricing;
 
    enum VarStatus
    {

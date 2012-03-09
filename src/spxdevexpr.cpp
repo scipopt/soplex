@@ -89,7 +89,7 @@ int SPxDevexPR::selectLeave()
 #else
    retid = selectLeaveX(val, theeps);
 #endif
-   if (sparsePricing)
+   if (thesolver->sparsePricing)
       retid = selectLeaveSparse(val, theeps);
    if ( retid < 0 && !refined )
    {
@@ -224,6 +224,10 @@ int SPxDevexPR::selectLeaveSparse(Real& best, Real feastol)
             bstI = idx;
             last = cpeni;
          }
+      }
+      else
+      {
+         thesolver->infeasibilities.remove(i);
       }
    }
    best = bstX;

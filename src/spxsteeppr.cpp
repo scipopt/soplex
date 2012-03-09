@@ -261,7 +261,7 @@ int SPxSteepPR::selectLeave()
 #ifdef PARTIAL_PRICING
    return selectLeavePart();
 #endif
-   if (sparsePricing)
+   if (thesolver->sparsePricing)
       return selectLeaveSparse();
 
    const Real* coPenalty_ptr = coPenalty.get_const_ptr();
@@ -454,6 +454,10 @@ int SPxSteepPR::selectLeaveSparse()
             best = x;
             lastIdx = idx;
          }
+      }
+      else
+      {
+         thesolver->infeasibilities.remove(i);
       }
    }
 

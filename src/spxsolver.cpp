@@ -787,6 +787,8 @@ SPxSolver::SPxSolver(
    , thepricer (0)
    , theratiotester (0)
    , thestarter (0)
+   // for testing sparse pricing
+   , sparsePricing(1)
 {
    METHOD( "SPxSolver::SPxSolver()" );
 
@@ -1008,6 +1010,8 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , dualFarkas(base.dualFarkas)
    , leaveCount(base.leaveCount)
    , enterCount(base.enterCount)
+   // for testing sparse pricing
+   , sparsePricing(base.sparsePricing)
 {
    METHOD( "SPxSolver::SPxSolver(const SPxSolver&base)"  );
 
