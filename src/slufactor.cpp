@@ -1023,6 +1023,9 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
       if (EQ(x, lastThreshold))
          break;
 
+      MSG_INFO3( spxout << "ISLUFA01 refactorizing with increased Markowitz threshold: "
+                        << lastThreshold << std::endl; )
+
       minStability /= 2.0;
    }
    MSG_DEBUG( spxout << "DSLUFA02 threshold = " << lastThreshold
