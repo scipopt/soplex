@@ -26,7 +26,6 @@
 #include "spxratiotester.h"
 #include "spxout.h"
 #include "exceptions.h"
-#include "spxpricer.h"
 
 namespace soplex
 {
@@ -44,9 +43,9 @@ void SPxSolver::computeFtest()
 
    assert(type() == LEAVE);
 
-   Real theeps = thepricer->epsilon();
+   Real theeps = epsilon();
    infeasibilities.clear();
-   int numInf = 0;
+   int tol = dim() / 4;
    
    for( int i = 0; i < dim(); ++i )
    {
@@ -54,14 +53,31 @@ void SPxSolver::computeFtest()
          ? theUBbound[i] - (*theFvec)[i]
          : (*theFvec)[i] - theLBbound[i];
 
-      if( theCoTest[i] < -theeps )
+      if( sparse == 0 )
       {
-         assert(infeasibilities.size() < infeasibilities.max());
-         infeasibilities.addIdx(i);
-         numInf++;
+         if( theCoTest[i] < -theeps )
+         {
+            assert(infeasibilities.size() < infeasibilities.max());
+            infeasibilities.addIdx(i);
+         }
       }
    }
-//    MSG_INFO1( spxout << "number infeasibilities: " << numInf << std::endl; )
+   if( sparsePricing == false )
+   {
+      if( infeasibilities.size() > tol )
+      {
+         sparse = 5;
+      }
+      else if( infeasibilities.size() > 0 )
+      {
+         sparsePricing = true;
+      }
+      else
+      {
+         assert(sparsePricing == false);
+         --sparse;
+      }
+   }
 }
 
 void SPxSolver::updateFtest()
@@ -73,7 +89,7 @@ void SPxSolver::updateFtest()
 
    assert(type() == LEAVE);
 
-   Real theeps = thepricer->epsilon();
+   Real theeps = epsilon();
    for (int j = idx.size() - 1; j >= 0; --j)
    {
       int i = idx.index(j);

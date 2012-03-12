@@ -789,6 +789,7 @@ SPxSolver::SPxSolver(
    , thestarter (0)
    // for testing sparse pricing
    , sparsePricing(false)
+   , sparse(0)
 {
    METHOD( "SPxSolver::SPxSolver()" );
 
@@ -1012,6 +1013,7 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , enterCount(base.enterCount)
    // for testing sparse pricing
    , sparsePricing(base.sparsePricing)
+   , sparse(base.sparse)
 {
    METHOD( "SPxSolver::SPxSolver(const SPxSolver&base)"  );
 

@@ -161,8 +161,9 @@ public:
       PARTIAL  
    };
    
-   //Pricing type
+   ///Pricing type
    bool sparsePricing;
+   int  sparse;
 
    enum VarStatus
    {
@@ -199,11 +200,10 @@ public:
       INFEASIBLE     =  3   ///< LP has been proven to be primal infeasible.
    };
 
-   /** For the leaving Simplex algorithm this array contains the indices of basic variables
-    * which violates one of its bounds
+   /** For the leaving Simplex algorithm this DIDxSet contains the indices of basic variables
+    * which violates one of its bounds.
     *
-    * After a basis change the array will be updated; if the basis change takes a variable from the basis,
-    * it will no longer be included in the vector and the entry gets an negative value.
+    * After a basis change the indexset will be updated.
     */
   DIdxSet infeasibilities;
 
