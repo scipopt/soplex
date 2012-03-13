@@ -59,7 +59,6 @@ void SPxBoundFlippingRT::flipAndUpdate(
          ++skipped;
          continue;
       }
-      Real tmp;
       Real range;
       Real upper;
       Real lower;
@@ -76,16 +75,14 @@ void SPxBoundFlippingRT::flipAndUpdate(
             case SPxBasis::Desc::P_ON_UPPER :
                ds.status(idx) = SPxBasis::Desc::P_ON_LOWER;
                range = lower - upper;
-               tmp = (*thesolver->theLbound)[idx];
                (*thesolver->theLbound)[idx] = (*thesolver->theUbound)[idx];
-               (*thesolver->theUbound)[idx] = -tmp;
+               (*thesolver->theUbound)[idx] = infinity;
                break;
             case SPxBasis::Desc::P_ON_LOWER :
                ds.status(idx) = SPxBasis::Desc::P_ON_UPPER;
                range = upper - lower;
-               tmp = (*thesolver->theUbound)[idx];
                (*thesolver->theUbound)[idx] = (*thesolver->theLbound)[idx];
-               (*thesolver->theLbound)[idx] = -tmp;
+               (*thesolver->theLbound)[idx] = -infinity;
                break;
             default :
                ++skipped;
@@ -119,16 +116,14 @@ void SPxBoundFlippingRT::flipAndUpdate(
             case SPxBasis::Desc::P_ON_UPPER :
                ds.coStatus(idx) = SPxBasis::Desc::P_ON_LOWER;
                range = lower - upper;
-               tmp = (*thesolver->theCoLbound)[idx];
-               (*thesolver->theCoLbound)[idx] = -(*thesolver->theCoUbound)[idx];
-               (*thesolver->theCoUbound)[idx] = tmp;
+               (*thesolver->theCoUbound)[idx] = -(*thesolver->theCoLbound)[idx];
+               (*thesolver->theCoLbound)[idx] = -infinity;
                break;
             case SPxBasis::Desc::P_ON_LOWER :
                ds.coStatus(idx) = SPxBasis::Desc::P_ON_UPPER;
                range = upper - lower;
-               tmp = (*thesolver->theCoUbound)[idx];
-               (*thesolver->theCoUbound)[idx] = -(*thesolver->theCoLbound)[idx];
-               (*thesolver->theCoLbound)[idx] = tmp;
+               (*thesolver->theCoLbound)[idx] = -(*thesolver->theCoUbound)[idx];
+               (*thesolver->theCoUbound)[idx] = infinity;
                break;
             default :
                ++skipped;
@@ -322,9 +317,13 @@ SPxId SPxBoundFlippingRT::selectEnter(
 
    // reset the history and try again to do some long steps
    if( thesolver->leaveCount % LONGSTEP_FREQ == 0 )
+   {
+      MSG_DEBUG( spxout << "ILSTEP06 resetting long step history" << std::endl; )
       flipPotential = 1;
+   }
    if( !enableLongsteps || thesolver->rep() == SPxSolver::ROW || flipPotential < 0.01 )
    {
+      MSG_DEBUG( spxout << "ILSTEP07 switching to fast ratio test" << std::endl; )
       return SPxFastRT::selectEnter(val, leaveIdx);
    }
    const Real*  pvec = thesolver->pVec().get_const_ptr();
@@ -681,6 +680,8 @@ SPxId SPxBoundFlippingRT::selectEnter(
    if( usedBp > 0 )
       flipAndUpdate(usedBp);
 
+   //TODO incorporate the ratio between usedBp, nBp and dim/coDim
+   //     to get an idea of effort and speed
    thesolver->boundflips = usedBp;
    // estimate wether long steps may be possible in future iterations
    flipPotential *= (usedBp + 0.95);
@@ -689,6 +690,8 @@ SPxId SPxBoundFlippingRT::selectEnter(
                      << thesolver->basis().iteration()
                      << ": selected Id: "
                      << enterId
+                     << " number of candidates: "
+                     << nBp
                      << std::endl; )
    return enterId;
 }
