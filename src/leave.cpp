@@ -45,7 +45,8 @@ void SPxSolver::computeFtest()
 
    Real theeps = epsilon();
    infeasibilities.clear();
-   int tol = dim() / 4;
+   int tol = dim() / 3;
+   int numInf = infeasibilities.size();
    
    for( int i = 0; i < dim(); ++i )
    {
@@ -62,21 +63,18 @@ void SPxSolver::computeFtest()
          }
       }
    }
-   if( sparsePricing == false )
+   if( numInf > tol)
    {
-      if( infeasibilities.size() > tol )
-      {
-         sparse = 5;
-      }
-      else if( infeasibilities.size() > 0 )
-      {
-         sparsePricing = true;
-      }
-      else
-      {
-         assert(sparsePricing == false);
-         --sparse;
-      }
+      sparse = 5;
+      sparsePricing = false;
+   }
+   else if( (numInf == 0) && (sparsePricing == false) )
+   {
+      --sparse;
+   }
+   else
+   {
+      sparsePricing = true;
    }
 }
 
