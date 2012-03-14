@@ -27,6 +27,9 @@
 #include "spxout.h"
 #include "exceptions.h"
 
+#define SPARSITYTOLERANCE     10
+#define DENSEROUNDS           5
+
 namespace soplex
 {
 static const Real reject_leave_tol = 1e-10; // = LOWSTAB as defined in spxfastrt.cpp
@@ -45,9 +48,9 @@ void SPxSolver::computeFtest()
 
    Real theeps = epsilon();
    infeasibilities.clear();
-   int tol = dim() / 3;
-   int numInf = infeasibilities.size();
-   
+   int tol = dim() / SPARSITYTOLERANCE;
+   int ninfeasibilities;
+
    for( int i = 0; i < dim(); ++i )
    {
       theCoTest[i] = ((*theFvec)[i] > theUBbound[i])
@@ -63,17 +66,23 @@ void SPxSolver::computeFtest()
          }
       }
    }
-   if( numInf > tol)
+   ninfeasibilities = infeasibilities.size();
+   if( ninfeasibilities > tol)
    {
-      sparse = 5;
+      MSG_INFO3( spxout << "IPRICE01 switching off sparse Pricing, "
+                        << ninfeasibilities << " infeasibilities "
+                        << "Basis size: " << dim()
+                        << std::endl; )
+      sparse = DENSEROUNDS;
       sparsePricing = false;
    }
-   else if( (numInf == 0) && (sparsePricing == false) )
+   else if( ninfeasibilities == 0 && sparsePricing == false )
    {
       --sparse;
    }
    else
    {
+      MSG_INFO3( spxout << "IPRICE02 switching on sparse Pricing" << std::endl; )
       sparsePricing = true;
    }
 }
@@ -95,8 +104,9 @@ void SPxSolver::updateFtest()
       ftest[i] = ((*theFvec)[i] > theUBbound[i])
          ? theUBbound[i] - (*theFvec)[i]
          : (*theFvec)[i] - theLBbound[i];
-      if (ftest[i] < -theeps)
+      if( sparsePricing == true && ftest[i] < -theeps )
       {
+         assert(sparse == 0);
          if (infeasibilities.number(i) == -1)
             infeasibilities.addIdx(i);
       }
