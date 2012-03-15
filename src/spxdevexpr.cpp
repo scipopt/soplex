@@ -208,7 +208,6 @@ int SPxDevexPR::selectLeaveSparse(Real& best, Real feastol)
    const Real* cpen = coPenalty.get_const_ptr();
    Real bstX = 0;
    int bstI = -1;
-   int end = coPenalty.dim();
    int idx = -1;
 
    for (int i = thesolver->infeasibilities.size() - 1; i >= 0; --i)
@@ -230,8 +229,8 @@ int SPxDevexPR::selectLeaveSparse(Real& best, Real feastol)
       {
          thesolver->infeasibilities.remove(i);
 
-         assert(thesolver->isInfeasible[idx] == 1);
-         thesolver->isInfeasible[idx] = 0;
+         assert(thesolver->isInfeasible[idx] == true);
+         thesolver->isInfeasible[idx] = false;
       }
    }
    best = bstX;

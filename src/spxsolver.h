@@ -209,7 +209,7 @@ public:
   /** the i-th entry is 0, if the i-th basic variable is not infeasible
    * the i-th entry is 1, if the i-th basic variable is infeasible
    */
-  Array<int> isInfeasible;
+  Array<bool> isInfeasible;
 
    //@}
 

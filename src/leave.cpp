@@ -50,6 +50,7 @@ void SPxSolver::computeFtest()
    infeasibilities.clear();
    int tol = dim() / SPARSITYTOLERANCE;
    int ninfeasibilities;
+   ninfeasibilities = 0;
 
    for( int i = 0; i < dim(); ++i )
    {
@@ -63,27 +64,29 @@ void SPxSolver::computeFtest()
          {
             assert(infeasibilities.size() < infeasibilities.max());
             infeasibilities.addIdx(i);
-            isInfeasible[i] = 1;
+            isInfeasible[i] = true;
+            ++ninfeasibilities;
          }
          else
-            isInfeasible[i] = 0;
+            isInfeasible[i] = false;
+         if( ninfeasibilities > tol)
+         {
+            MSG_INFO3( spxout << "IPRICE01 switching off sparse Pricing, "
+            << ninfeasibilities << " infeasibilities "
+            << "Basis size: " << dim()
+            << std::endl; )
+            sparse = DENSEROUNDS;
+            sparsePricing = false;
+            ninfeasibilities = 0;
+         }
       }
    }
-   ninfeasibilities = infeasibilities.size();
-   if( ninfeasibilities > tol)
-   {
-      MSG_INFO3( spxout << "IPRICE01 switching off sparse Pricing, "
-                        << ninfeasibilities << " infeasibilities "
-                        << "Basis size: " << dim()
-                        << std::endl; )
-      sparse = DENSEROUNDS;
-      sparsePricing = false;
-   }
-   else if( ninfeasibilities == 0 && sparsePricing == false )
+
+   if( ninfeasibilities == 0 && sparsePricing == false )
    {
       --sparse;
    }
-   else
+   else if( ninfeasibilities <= tol )
    {
       MSG_INFO3( spxout << "IPRICE02 switching on sparse Pricing" << std::endl; )
       sparsePricing = true;
@@ -110,10 +113,10 @@ void SPxSolver::updateFtest()
       if( sparsePricing == true && ftest[i] < -theeps )
       {
          assert(sparse == 0);
-         if( isInfeasible[i] == 0 )
+         if( isInfeasible[i] == false )
          {
             infeasibilities.addIdx(i);
-            isInfeasible[i] = 1;
+            isInfeasible[i] = true;
          }
       }
    }
