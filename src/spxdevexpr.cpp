@@ -229,6 +229,9 @@ int SPxDevexPR::selectLeaveSparse(Real& best, Real feastol)
       else
       {
          thesolver->infeasibilities.remove(i);
+
+         assert(thesolver->isInfeasible[idx] == 1);
+         thesolver->isInfeasible[idx] = 0;
       }
    }
    best = bstX;

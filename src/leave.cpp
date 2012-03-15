@@ -27,7 +27,7 @@
 #include "spxout.h"
 #include "exceptions.h"
 
-#define SPARSITYTOLERANCE     10
+#define SPARSITYTOLERANCE     3
 #define DENSEROUNDS           5
 
 namespace soplex
@@ -63,7 +63,10 @@ void SPxSolver::computeFtest()
          {
             assert(infeasibilities.size() < infeasibilities.max());
             infeasibilities.addIdx(i);
+            isInfeasible[i] = 1;
          }
+         else
+            isInfeasible[i] = 0;
       }
    }
    ninfeasibilities = infeasibilities.size();
@@ -107,8 +110,11 @@ void SPxSolver::updateFtest()
       if( sparsePricing == true && ftest[i] < -theeps )
       {
          assert(sparse == 0);
-         if (infeasibilities.number(i) == -1)
+         if( isInfeasible[i] == 0 )
+         {
             infeasibilities.addIdx(i);
+            isInfeasible[i] = 1;
+         }
       }
    }
 }

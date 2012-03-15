@@ -128,9 +128,11 @@ int SPxDantzigPR::selectLeaveSparse()
       else
       {
          thesolver->infeasibilities.remove(i);
+
+         assert(thesolver->isInfeasible[idx] == 1);
+         thesolver->isInfeasible[idx] = 0;
       }
    }
-//    thesolver->infeasibilities.remove(infIdx);
    return n;
 }
 
