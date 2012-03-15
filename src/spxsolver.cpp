@@ -80,6 +80,9 @@ void SPxSolver::loadLP(const SPxLP& lp)
    SPxLP::operator=(lp);
    reDim();
    SPxBasis::load(this);
+
+   infeasibilities.setMax(dim());
+   isInfeasible.reSize(dim());
 }
 
 void SPxSolver::setSolver(SLinSolver* slu, const bool destroy)
@@ -398,7 +401,6 @@ void SPxSolver::setPricing(Pricing pr)
       computeCoTest();
       computeTest();
    }
-   infeasibilities.setMax(dim());;
 }
 
 /*
@@ -461,6 +463,9 @@ void SPxSolver::clear()
    SPxLP::clear();
    setBasisStatus(SPxBasis::NO_PROBLEM);
    SPxBasis::reDim();
+
+   infeasibilities.clear();
+   isInfeasible.clear();
 }
 
 void SPxSolver::clearUpdateVecs(void)
@@ -787,7 +792,6 @@ SPxSolver::SPxSolver(
    , thepricer (0)
    , theratiotester (0)
    , thestarter (0)
-   // for testing sparse pricing
    , sparsePricing(false)
    , sparse(0)
 {
@@ -869,6 +873,9 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       enterCount = base.enterCount;
       theCumulativeTime = base.theCumulativeTime;
       sparsePricing = base.sparsePricing;
+      sparse = base.sparse;
+      infeasibilities = base.infeasibilities;
+      isInfeasible = base.isInfeasible;
 
       if (base.theRep == COLUMN)
       {
@@ -1012,9 +1019,10 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , dualFarkas(base.dualFarkas)
    , leaveCount(base.leaveCount)
    , enterCount(base.enterCount)
-   // for testing sparse pricing
    , sparsePricing(base.sparsePricing)
    , sparse(base.sparse)
+   , infeasibilities(base.infeasibilities)
+   , isInfeasible(base.isInfeasible)
 {
    METHOD( "SPxSolver::SPxSolver(const SPxSolver&base)"  );
 

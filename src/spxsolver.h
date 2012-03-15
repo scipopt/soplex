@@ -162,8 +162,8 @@ public:
    };
    
    ///Pricing type
-   bool sparsePricing;
-   int  sparse;
+   bool sparsePricing;  ///< true if sparsePricing is turned on
+   int  sparse;         ///< indicates how many dense rounds have to be compleated before sparsePricing will be checked again
 
    enum VarStatus
    {
@@ -206,6 +206,10 @@ public:
     * After a basis change the indexset will be updated.
     */
   DIdxSet infeasibilities;
+  /** the i-th entry is 0, if the i-th basic variable is not infeasible
+   * the i-th entry is 1, if the i-th basic variable is infeasible
+   */
+  Array<int> isInfeasible;
 
    //@}
 
