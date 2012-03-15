@@ -110,7 +110,7 @@ void SPxSolver::updateFtest()
          : (*theFvec)[i] - theLBbound[i];
       if( sparsePricing == true && ftest[i] < -theeps )
       {
-         assert(remainRounds == 0);
+         assert(remainingRounds == 0);
          if( isInfeasible[i] == false )
          {
             infeasibilities.addIdx(i);

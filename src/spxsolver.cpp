@@ -81,10 +81,6 @@ void SPxSolver::loadLP(const SPxLP& lp)
    SPxLP::operator=(lp);
    reDim();
    SPxBasis::load(this);
-
-   infeasibilities.setMax(dim());
-   isInfeasible.reSize(dim());
-   tolerance = dim()/ SPARSITYTOLERANCE;
 }
 
 void SPxSolver::setSolver(SLinSolver* slu, const bool destroy)
@@ -362,6 +358,9 @@ void SPxSolver::init()
       setLeaveBounds();
       computeLeaveCoPrhs();
    }
+   infeasibilities.setMax(dim());
+   isInfeasible.reSize(dim());
+   tolerance = dim()/ SPARSITYTOLERANCE;
 
    SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
    computePvec();
@@ -794,6 +793,8 @@ SPxSolver::SPxSolver(
    , thepricer (0)
    , theratiotester (0)
    , thestarter (0)
+   , infeasibilities(0)
+   , isInfeasible(0)
    , sparsePricing(false)
    , remainingRounds(0)
 {
@@ -874,10 +875,10 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       leaveCount = base.leaveCount;
       enterCount = base.enterCount;
       theCumulativeTime = base.theCumulativeTime;
-      sparsePricing = base.sparsePricing;
-      remainingRounds = base.remainingRounds;
       infeasibilities = base.infeasibilities;
       isInfeasible = base.isInfeasible;
+      sparsePricing = base.sparsePricing;
+      remainingRounds = base.remainingRounds;
       tolerance = base.tolerance;
 
       if (base.theRep == COLUMN)
@@ -1022,10 +1023,10 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , dualFarkas(base.dualFarkas)
    , leaveCount(base.leaveCount)
    , enterCount(base.enterCount)
-   , sparsePricing(base.sparsePricing)
-   , remainingRounds(base.remainingRounds)
    , infeasibilities(base.infeasibilities)
    , isInfeasible(base.isInfeasible)
+   , sparsePricing(base.sparsePricing)
+   , remainingRounds(base.remainingRounds)
    , tolerance(base.tolerance)
 {
    METHOD( "SPxSolver::SPxSolver(const SPxSolver&base)"  );
