@@ -27,7 +27,6 @@
 #include "spxout.h"
 #include "exceptions.h"
 
-#define SPARSITYTOLERANCE     3
 #define DENSEROUNDS           5
 
 namespace soplex
@@ -48,7 +47,6 @@ void SPxSolver::computeFtest()
 
    Real theeps = epsilon();
    infeasibilities.clear();
-   int tol = dim() / SPARSITYTOLERANCE;
    int ninfeasibilities;
    ninfeasibilities = 0;
 
@@ -58,7 +56,7 @@ void SPxSolver::computeFtest()
          ? theUBbound[i] - (*theFvec)[i]
          : (*theFvec)[i] - theLBbound[i];
 
-      if( sparse == 0 )
+      if( remainingRounds == 0 )
       {
          if( theCoTest[i] < -theeps )
          {
@@ -69,13 +67,13 @@ void SPxSolver::computeFtest()
          }
          else
             isInfeasible[i] = false;
-         if( ninfeasibilities > tol)
+         if( ninfeasibilities > tolerance )
          {
             MSG_INFO3( spxout << "IPRICE01 switching off sparse Pricing, "
             << ninfeasibilities << " infeasibilities "
             << "Basis size: " << dim()
             << std::endl; )
-            sparse = DENSEROUNDS;
+            remainingRounds = DENSEROUNDS;
             sparsePricing = false;
             ninfeasibilities = 0;
          }
@@ -84,9 +82,9 @@ void SPxSolver::computeFtest()
 
    if( ninfeasibilities == 0 && sparsePricing == false )
    {
-      --sparse;
+      --remainingRounds;
    }
-   else if( ninfeasibilities <= tol )
+   else if( ninfeasibilities <= tolerance )
    {
       MSG_INFO3( spxout << "IPRICE02 switching on sparse Pricing" << std::endl; )
       sparsePricing = true;
@@ -112,7 +110,7 @@ void SPxSolver::updateFtest()
          : (*theFvec)[i] - theLBbound[i];
       if( sparsePricing == true && ftest[i] < -theeps )
       {
-         assert(sparse == 0);
+         assert(remainRounds == 0);
          if( isInfeasible[i] == false )
          {
             infeasibilities.addIdx(i);

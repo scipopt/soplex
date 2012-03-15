@@ -160,10 +160,6 @@ public:
        */
       PARTIAL  
    };
-   
-   ///Pricing type
-   bool sparsePricing;  ///< true if sparsePricing is turned on
-   int  sparse;         ///< indicates how many dense rounds have to be compleated before sparsePricing will be checked again
 
    enum VarStatus
    {
@@ -205,11 +201,17 @@ public:
     *
     * After a basis change the indexset will be updated.
     */
-  DIdxSet infeasibilities;
-  /** the i-th entry is 0, if the i-th basic variable is not infeasible
-   * the i-th entry is 1, if the i-th basic variable is infeasible
+   DIdxSet infeasibilities;
+
+   /** the i-th entry equals false, if the i-th basic variable is not infeasible
+   * the i-th entry equals true, if the i-th basic variable is infeasible
    */
-  Array<bool> isInfeasible;
+   Array<bool> isInfeasible;
+
+   ///Pricing type
+   bool sparsePricing;        ///< true if sparsePricing is turned on
+   int  remainingRounds;      ///< indicates how many dense rounds have to be compleated before sparsePricing will be checked again
+   int tolerance;             ///< maximum allowed length of \ref soplex::SPxSolver::infeasibilities "infeasibilities" 
 
    //@}
 

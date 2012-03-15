@@ -28,6 +28,7 @@
 #include "spxout.h"
 #include "exceptions.h"
 
+#define SPARSITYTOLERANCE     3
 
 namespace soplex
 {
@@ -83,6 +84,7 @@ void SPxSolver::loadLP(const SPxLP& lp)
 
    infeasibilities.setMax(dim());
    isInfeasible.reSize(dim());
+   tolerance = dim()/ SPARSITYTOLERANCE;
 }
 
 void SPxSolver::setSolver(SLinSolver* slu, const bool destroy)
@@ -793,7 +795,7 @@ SPxSolver::SPxSolver(
    , theratiotester (0)
    , thestarter (0)
    , sparsePricing(false)
-   , sparse(0)
+   , remainingRounds(0)
 {
    METHOD( "SPxSolver::SPxSolver()" );
 
@@ -873,9 +875,10 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       enterCount = base.enterCount;
       theCumulativeTime = base.theCumulativeTime;
       sparsePricing = base.sparsePricing;
-      sparse = base.sparse;
+      remainingRounds = base.remainingRounds;
       infeasibilities = base.infeasibilities;
       isInfeasible = base.isInfeasible;
+      tolerance = base.tolerance;
 
       if (base.theRep == COLUMN)
       {
@@ -1020,9 +1023,10 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , leaveCount(base.leaveCount)
    , enterCount(base.enterCount)
    , sparsePricing(base.sparsePricing)
-   , sparse(base.sparse)
+   , remainingRounds(base.remainingRounds)
    , infeasibilities(base.infeasibilities)
    , isInfeasible(base.isInfeasible)
+   , tolerance(base.tolerance)
 {
    METHOD( "SPxSolver::SPxSolver(const SPxSolver&base)"  );
 
