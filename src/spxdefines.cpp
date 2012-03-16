@@ -46,7 +46,9 @@ void Param::setEpsilonUpdate(Real eps)
 
 void Param::setVerbose(int p_verbose)
 {
+#ifndef DISABLE_VERBOSITY
    s_verbose = p_verbose;
+#endif
 }
 
 } // namespace soplex
