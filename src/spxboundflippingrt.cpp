@@ -75,12 +75,14 @@ void SPxBoundFlippingRT::flipAndUpdate(
             case SPxBasis::Desc::P_ON_UPPER :
                ds.status(idx) = SPxBasis::Desc::P_ON_LOWER;
                range = lower - upper;
+               assert((*thesolver->theLbound)[idx] == -infinity);
                (*thesolver->theLbound)[idx] = (*thesolver->theUbound)[idx];
                (*thesolver->theUbound)[idx] = infinity;
                break;
             case SPxBasis::Desc::P_ON_LOWER :
                ds.status(idx) = SPxBasis::Desc::P_ON_UPPER;
                range = upper - lower;
+               assert((*thesolver->theUbound)[idx] == infinity);
                (*thesolver->theUbound)[idx] = (*thesolver->theLbound)[idx];
                (*thesolver->theLbound)[idx] = -infinity;
                break;
@@ -116,12 +118,14 @@ void SPxBoundFlippingRT::flipAndUpdate(
             case SPxBasis::Desc::P_ON_UPPER :
                ds.coStatus(idx) = SPxBasis::Desc::P_ON_LOWER;
                range = lower - upper;
+               assert((*thesolver->theCoUbound)[idx] == infinity);
                (*thesolver->theCoUbound)[idx] = -(*thesolver->theCoLbound)[idx];
                (*thesolver->theCoLbound)[idx] = -infinity;
                break;
             case SPxBasis::Desc::P_ON_LOWER :
                ds.coStatus(idx) = SPxBasis::Desc::P_ON_UPPER;
                range = upper - lower;
+               assert((*thesolver->theCoLbound)[idx] == -infinity);
                (*thesolver->theCoLbound)[idx] = -(*thesolver->theCoUbound)[idx];
                (*thesolver->theCoUbound)[idx] = infinity;
                break;
