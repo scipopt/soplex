@@ -27,8 +27,6 @@
 #include "spxout.h"
 #include "exceptions.h"
 
-#define DENSEROUNDS           5
-
 namespace soplex
 {
 static const Real reject_leave_tol = 1e-10; // = LOWSTAB as defined in spxfastrt.cpp
@@ -67,12 +65,10 @@ void SPxSolver::computeFtest()
          }
          else
             isInfeasible[i] = false;
-         if( ninfeasibilities > tolerance )
+         if( ninfeasibilities > sparsityThreshold )
          {
-            MSG_INFO3( spxout << "IPRICE01 switching off sparse Pricing, "
-            << ninfeasibilities << " infeasibilities "
-            << "Basis size: " << dim()
-            << std::endl; )
+            MSG_INFO2( spxout << "IPRICE01 too many infeasibilities for sparse pricing"
+                              << std::endl; )
             remainingRounds = DENSEROUNDS;
             sparsePricing = false;
             ninfeasibilities = 0;
@@ -84,9 +80,12 @@ void SPxSolver::computeFtest()
    {
       --remainingRounds;
    }
-   else if( ninfeasibilities <= tolerance )
+   else if( ninfeasibilities <= sparsityThreshold )
    {
-      MSG_INFO3( spxout << "IPRICE02 switching on sparse Pricing" << std::endl; )
+      MSG_INFO2( spxout << "IPRICE02 sparse pricing active, "
+                        << "basis size: " << dim()
+                        << ", infeasibilities: " << ninfeasibilities
+                        << std::endl; )
       sparsePricing = true;
    }
 }

@@ -28,8 +28,6 @@
 #include "spxout.h"
 #include "exceptions.h"
 
-#define SPARSITYTOLERANCE     3
-
 namespace soplex
 {
 #define MAXIMUM(x,y)        ((x)>(y) ? (x) : (y))
@@ -358,9 +356,10 @@ void SPxSolver::init()
       setLeaveBounds();
       computeLeaveCoPrhs();
    }
+   // prepare support vectors for sparse pricing
    infeasibilities.setMax(dim());
    isInfeasible.reSize(dim());
-   tolerance = dim()/ SPARSITYTOLERANCE;
+   sparsityThreshold = dim() * SPARSITYTHRESHOLD;
 
    SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
    computePvec();
@@ -879,7 +878,7 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       isInfeasible = base.isInfeasible;
       sparsePricing = base.sparsePricing;
       remainingRounds = base.remainingRounds;
-      tolerance = base.tolerance;
+      sparsityThreshold = base.sparsityThreshold;
 
       if (base.theRep == COLUMN)
       {
@@ -1027,7 +1026,7 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , isInfeasible(base.isInfeasible)
    , sparsePricing(base.sparsePricing)
    , remainingRounds(base.remainingRounds)
-   , tolerance(base.tolerance)
+   , sparsityThreshold(base.sparsityThreshold)
 {
    METHOD( "SPxSolver::SPxSolver(const SPxSolver&base)"  );
 

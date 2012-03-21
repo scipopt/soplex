@@ -34,6 +34,9 @@
 #include "unitvector.h"
 #include "updatevector.h"
 
+#define SPARSITYTHRESHOLD        0.4      /**< percentage of basic infeasibilities that is considered sparse */
+#define DENSEROUNDS               5       /**< number of refactorization until sparsity is tested again */
+
 namespace soplex
 {
 class SPxPricer;
@@ -323,10 +326,10 @@ public:
     */
    Array<bool> isInfeasible;
 
-   ///Pricing type
-   bool sparsePricing;        ///< true if sparsePricing is turned on
-   int  remainingRounds;      ///< indicates how many dense rounds have to be compleated before sparsePricing will be checked again
-   int tolerance;             ///< maximum allowed length of \ref soplex::SPxSolver::infeasibilities "infeasibilities"
+   /// These values enable or disable sparse pricing
+   bool     sparsePricing;        ///< true if sparsePricing is turned on
+   int      remainingRounds;      ///< indicates how many dense rounds have to be completed before sparsePricing will be checked again
+   int      sparsityThreshold;    ///< maximum allowed length of \ref soplex::SPxSolver::infeasibilities "infeasibilities"
 
    //-----------------------------
    /**@name Access */
