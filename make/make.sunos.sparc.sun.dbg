@@ -1,4 +1,5 @@
 CXX	=	CC
+LINKCXX	=	CC
 CPPFLAGS=	-Isrc
 CXXFLAGS=	-g +w2
 LDFLAGS	=	-lm

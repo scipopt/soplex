@@ -3,8 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996      Roland Wunderling                              */
-/*                  1996-2011 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2012 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -434,7 +433,7 @@ int SPxSteepPR::selectLeaveSparse()
       x = fTest[idx];
 
       if (x < -theeps)
-      {         
+      {
          /**@todo this was an assert! is an assertion correct?*/
          // assert(coPenalty_ptr[i] >= theeps);
          if( coPenalty_ptr[idx] < theeps )

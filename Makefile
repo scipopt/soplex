@@ -3,8 +3,7 @@
 #*                  This file is part of the class library                   *#
 #*       SoPlex --- the Sequential object-oriented simPlex.                  *#
 #*                                                                           *#
-#*    Copyright (C) 1996      Roland Wunderling                              *#
-#*                  1996-2011 Konrad-Zuse-Zentrum                            *#
+#*    Copyright (C) 1996-2012 Konrad-Zuse-Zentrum                            *#
 #*                            fuer Informationstechnik Berlin                *#
 #*                                                                           *#
 #*  SoPlex is distributed under the terms of the ZIB Academic Licence.       *#
@@ -25,7 +24,7 @@ include make/make.detecthost
 
 
 #-----------------------------------------------------------------------------
-VERSION		:=	1.6.0.2
+VERSION		:=	1.6.0.3
 
 VERBOSE		=	false
 SHARED		=	false
@@ -125,7 +124,6 @@ GCCWARN		=	-Wall -W -Wpointer-arith -Wno-unknown-pragmas \
 #GCCWARN =
 #-----------------------------------------------------------------------------
 include make/make.$(BASE)
--include make/make.$(OSTYPE).$(COMP).$(OPT)
 -include make/local/make.$(HOSTNAME)
 -include make/local/make.$(HOSTNAME).$(COMP)
 -include make/local/make.$(HOSTNAME).$(COMP).$(OPT)

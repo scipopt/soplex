@@ -1,4 +1,5 @@
 CXX	=	CC
+LINKCXX	=	CC
 CPPFLAGS=	-Isrc -DNDEBUG  
 CXXFLAGS=	-fast -xprefetch=auto -xipo=2
 LDFLAGS	=	-lm

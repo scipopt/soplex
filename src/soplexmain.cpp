@@ -3,8 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996      Roland Wunderling                              */
-/*                  1996-2011 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2012 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -225,8 +224,7 @@ void print_version_info()
 
    const char* banner2 = 
    "*                                                                      *\n"
-   "*    Copyright (C) 1996      Roland Wunderling                         *\n"
-   "*                  1996-2011 Konrad-Zuse-Zentrum                       *\n"
+   "*    Copyright (C) 1996-2012 Konrad-Zuse-Zentrum                       *\n"
    "*                            fuer Informationstechnik Berlin           *\n"
    "*                                                                      *\n"
    "*  SoPlex is distributed under the terms of the ZIB Academic Licence.  *\n"
@@ -314,7 +312,7 @@ void print_short_version_info()
    "************************************************************************\n"
    "* SoPlex --- the Sequential object-oriented simPlex. ";
    const char* banner2 =
-   "* Copyright (C)  1996-2011 Zuse Institute Berlin                       *\n"
+   "* Copyright (C)  1996-2012 Zuse Institute Berlin                       *\n"
    "************************************************************************\n";
 
    std::cout << banner1;

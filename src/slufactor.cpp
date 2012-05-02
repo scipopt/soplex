@@ -3,8 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996      Roland Wunderling                              */
-/*                  1996-2011 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2012 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -1022,6 +1021,9 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
 
       if (EQ(x, lastThreshold))
          break;
+
+      MSG_INFO3( spxout << "ISLUFA01 refactorizing with increased Markowitz threshold: "
+                        << lastThreshold << std::endl; )
 
       minStability /= 2.0;
    }

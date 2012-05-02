@@ -1,7 +1,6 @@
-CXX	=	g++
-CPPFLAGS=	-Isrc
-CXXFLAGS=	-O0 -g -m64 -ansi $(GCCWARN)
-LDFLAGS	=	-lm -m64
-ARFLAGS	=	crs
-ZLIB_FLAGS	=
-ZLIB_LDFLAGS 	=	-lz
+# note that the local make file is a dummy and is eventually the union of
+# following sub make files
+
+include make/make.$(OSTYPE).$(COMP)
+include make/make.$(OSTYPE).$(COMP).$(OPT)
+include make/make.$(OSTYPE).$(ARCH).$(COMP)
