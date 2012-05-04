@@ -313,21 +313,20 @@ protected:
 
 public:
 
-   /** For the leaving Simplex algorithm this DIDxSet contains the indices of basic variables
-    * which violates one of its bounds.
-    *
-    * After a basis change the indexset will be updated.
+   /** For the leaving Simplex algorithm this vector contains the indices of infeasible basic variables
+    *  After a basis change the indexset is updated.
     */
    DIdxSet infeasibilities;
 
-   /** the i-th entry equals false, if the i-th basic variable is not infeasible
-    * the i-th entry equals true, if the i-th basic variable is infeasible
+   /** Binary vector to store whether basic indices are infeasible
+    *  the i-th entry equals false, if the i-th basic variable is not infeasible
+    *  the i-th entry equals true, if the i-th basic variable is infeasible
     */
    Array<bool> isInfeasible;
 
    /// These values enable or disable sparse pricing
    bool     sparsePricing;        ///< true if sparsePricing is turned on
-   int      remainingRounds;      ///< indicates how many dense rounds have to be completed before sparsePricing will be checked again
+   int      remainingRounds;      ///< number of dense rounds/refactorizations until sparsePricing is enabled again
    int      sparsityThreshold;    ///< maximum allowed length of \ref soplex::SPxSolver::infeasibilities "infeasibilities"
 
    //-----------------------------
