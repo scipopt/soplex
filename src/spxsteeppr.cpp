@@ -54,27 +54,29 @@ void SPxSteepPR::load(SPxSolver* base)
 
 void SPxSteepPR::setType(SPxSolver::Type type)
 {
-   int i;
-
    workRhs.setEpsilon(thesolver->epsilon());
 
    pref.reSize (thesolver->coDim());
    coPref.reSize(thesolver->dim());
    setupPrefs(type);
+   setupWeights(type);
+   workVec.clear();
+   workRhs.clear();
+}
 
+void SPxSteepPR::setupWeights(SPxSolver::Type type)
+{
+   int i;
    if (setup == DEFAULT)
    {
       if (type == SPxSolver::ENTER)
       {
          coPenalty.reDim(thesolver->dim());
          for (i = thesolver->dim() - 1; i >= 0; --i)
-            // coPenalty[i] = 10;
             coPenalty[i] = 2;
          penalty.reDim(thesolver->coDim());
          for (i = thesolver->coDim() - 1; i >= 0; --i)
-            // penalty[i] = 10;
             penalty[i] = 1;
-         // penalty[i] = 1 + thesolver->vector(i).size() / thesolver->dim();
       }
       else
       {
@@ -82,19 +84,17 @@ void SPxSteepPR::setType(SPxSolver::Type type)
          coPenalty.reDim(thesolver->dim());
          for (i = thesolver->dim() - 1; i >= 0; --i)
          {
-            // coPenalty[i] = 1;
             const SPxId id = thesolver->basis().baseId(i);
             const int n    = thesolver->number(id);
             assert(n >= 0);
             leavePref[i]   = thesolver->isId(id) ? pref[n] : coPref[n];
-            coPenalty[i]   = 1.0 + thesolver->basis().baseVec(i).size() / Real(thesolver->dim());
+            coPenalty[i]   = 1.0;
          }
       }
    }
    else
    {
-      MSG_ERROR( spxout << "ESTEEP01 sorry, no exact setup for steepest "
-                        << "edge multipliers implemented" << std::endl; )
+      MSG_INFO1( spxout << "ISTEEP01 initializing steepest edge multipliers" << std::endl; )
 
       if (type == SPxSolver::ENTER)
       {
@@ -109,15 +109,18 @@ void SPxSteepPR::setType(SPxSolver::Type type)
       {
          assert(type == SPxSolver::LEAVE);
          coPenalty.reDim(thesolver->dim());
+         SSVector tmp(thesolver->dim(), thesolver->epsilon());
          for (i = thesolver->dim() - 1; i >= 0; --i)
          {
-            coPenalty[i] = 1 + thesolver->basis().baseVec(i).size()
-                           / Real(thesolver->dim());
+            const SPxId id = thesolver->basis().baseId(i);
+            const int n    = thesolver->number(id);
+            assert(n >= 0);
+            leavePref[i]   = thesolver->isId(id) ? pref[n] : coPref[n];
+            thesolver->basis().coSolve(tmp, thesolver->unitVector(i));
+            coPenalty[i] = tmp.length2();
          }
       }
    }
-   workVec.clear();
-   workRhs.clear();
 }
 
 void SPxSteepPR::setupPrefsX(

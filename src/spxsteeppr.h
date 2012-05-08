@@ -55,6 +55,8 @@ public:
       DEFAULT  ///< starting with multipliers set to 1
    };
    //@}
+   /// setup steepest edge weights
+   void setupWeights(SPxSolver::Type type);
 
 private:
 
@@ -103,10 +105,10 @@ public:
    /**@name Construction / destruction */
    //@{
    ///
-   SPxSteepPR()
+   SPxSteepPR(Setup mode = DEFAULT)
       : SPxPricer("Steep")
       , workRhs (0, 1e-16)
-      , setup (DEFAULT)
+      , setup (mode)
       , accuracy(1e-4)
       , startpricing(0)
    {
