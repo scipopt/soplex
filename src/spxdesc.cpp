@@ -27,8 +27,7 @@ namespace soplex
  
 SPxBasis::Desc::Desc(const SPxSolver& base)
 {
-   rowstat.reSize(base.nRows());
-   colstat.reSize(base.nCols());
+   reSize(base.nRows(), base.nCols());
 
    if (base.rep() == SPxSolver::ROW)
    {
@@ -98,8 +97,21 @@ SPxBasis::Desc& SPxBasis::Desc::operator=(const SPxBasis::Desc& rhs)
 void SPxBasis::Desc::reSize(int rowDim, int colDim)
 {
    METHOD( "SPxBasis::Desc::reSize()" );
+
+   assert(rowDim >= 0);
+   assert(colDim >= 0);
+
+   int noldrows = rowstat.size();
+   int noldcols = colstat.size();
+
    rowstat.reSize(rowDim);
    colstat.reSize(colDim);
+
+   for( int i = rowDim - 1; i >= noldrows; i-- )
+      rowstat[i] = D_UNDEFINED;
+
+   for( int i = colDim - 1; i >= noldcols; i-- )
+      colstat[i] = D_UNDEFINED;
 }
 
 void SPxBasis::Desc::dump() const

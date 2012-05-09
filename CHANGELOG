@@ -7,8 +7,9 @@ DEVELOPER
 fixed bugs:
 - allow instable leave iterations, i.e., leave iterations with pivot element below default stability threshold, only
   after a fresh factorization
-- check redundant variable bounds implied by rows more carefully: do not apply if max/min activity and sides differ
-  by more than 1.0/epsilon to avoid roundoff errors
+- check redundant variable bounds implied by rows more carefully: do not apply if max/min activity exceeds sides by a
+  factor greater than1.0/epsilon to avoid roundoff errors
+- initialize basis descriptor to statuses D_UNDEFINED in order to avoid access of uninitialized values at time out
 
 
 28 Oct 2011 - Release 1.6.0
@@ -24,7 +25,7 @@ code quality & new features:
 - added functionality to solve systems with three right hand sides
 - added partial quicksort to sorter.h
 - increased priority of debugging output
-- added "install" target to Makefile; this target can be used to install SoPlex into certain directory on the system 
+- added "install" target to Makefile; this target can be used to install SoPlex into certain directory on the system
   (works for Linux and Mac); for this, you have to specify INSTALLDIR (make install INSTALLDIR=/urs/local/)
 - removed compiler flag NO_ADDITIONAL_CHECKS in code and makefile options: now, additional checks are only performed
   when ENABLE_ADDITIONAL_CHECKS or ENABLE_CONSISTENCY_CHECKS is explicitly defined (globally or in a specific file)
