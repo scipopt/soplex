@@ -368,6 +368,7 @@ void print_usage_and_exit( const char* const argv[] )
       "              -g3 bi-Equi+Geo1  -c3 Vector  -p3 Hybrid!    -t3 Bound Flipping\n"
       "              -g4 bi-Equi+Geo8              -p4 Steep*\n"
       "                                            -p5 Weight\n"
+      "                                            -p6 SteepExactSetup\n"
       ;
 
    std::cerr << "usage: " << argv[0] << " " << usage << std::endl;
@@ -440,6 +441,9 @@ SPxPricer* get_pricer(const int pricing)
    SPxPricer* pricer = 0;
    switch(pricing)
    {
+   case 6 :
+      pricer = new SPxSteepPR(SPxSteepPR::EXACT);
+      break;
    case 5 :
       pricer = new SPxWeightPR;
       break;

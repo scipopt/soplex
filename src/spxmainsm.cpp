@@ -1656,7 +1656,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
             {
                if (lp.lhs(i) > -infinity && lp.lower(j) > -infinity && rhsCnt <= 1 && NErel(lp.lhs(i), rhsBnd, deltaBnd())
                   // do not perform if strongly different orders of magnitude occur
-                  && fabs(lp.lhs(i) / rhsBnd) < Param::epsilon() && fabs(rhsBnd / lp.lhs(i)) < Param::epsilon())
+                  && fabs(lp.lhs(i) / rhsBnd) > Param::epsilon())
                {
                   Real lo    = -infinity;
                   Real scale = maxAbs(lp.lhs(i), rhsBnd);
@@ -1696,7 +1696,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                }
                if (lp.rhs(i) < infinity && lp.upper(j) < infinity && lhsCnt <= 1 && NErel(lp.rhs(i), lhsBnd, deltaBnd())
                   // do not perform if strongly different orders of magnitude occur
-                  && fabs(lp.rhs(i) / lhsBnd) < Param::epsilon() && fabs(lhsBnd / lp.rhs(i)) < Param::epsilon())
+                  && fabs(lp.rhs(i) / lhsBnd) > Param::epsilon())
                {
                   Real up    = infinity;
                   Real scale = maxAbs(lp.rhs(i), lhsBnd);
@@ -1739,7 +1739,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
             {
                if (lp.lhs(i) > -infinity && lp.upper(j) < infinity && rhsCnt <= 1 && NErel(lp.lhs(i), rhsBnd, deltaBnd())
                   // do not perform if strongly different orders of magnitude occur
-                  && fabs(lp.lhs(i) / rhsBnd) < Param::epsilon() && fabs(rhsBnd / lp.lhs(i)) < Param::epsilon())
+                  && fabs(lp.lhs(i) / rhsBnd) > Param::epsilon())
                {
                   Real up    = infinity;
                   Real scale = maxAbs(lp.lhs(i), rhsBnd);
@@ -1779,7 +1779,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                }
                if (lp.rhs(i) < infinity && lp.lower(j) > -infinity && lhsCnt <= 1 && NErel(lp.rhs(i), lhsBnd, deltaBnd())
                   // do not perform if strongly different orders of magnitude occur
-                  && fabs(lp.rhs(i) / lhsBnd) < Param::epsilon() && fabs(lhsBnd / lp.rhs(i)) < Param::epsilon())
+                  && fabs(lp.rhs(i) / lhsBnd) > Param::epsilon())
                {
                   Real lo    = -infinity;
                   Real scale = maxAbs(lp.rhs(i), lhsBnd);

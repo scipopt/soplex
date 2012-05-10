@@ -29,6 +29,7 @@ code quality & new features:
 - removed compiler flag NO_ADDITIONAL_CHECKS in code and makefile options: now, additional checks are only performed
   when ENABLE_ADDITIONAL_CHECKS or ENABLE_CONSISTENCY_CHECKS is explicitly defined (globally or in a specific file)
 - githash of current commit is displayed (also in check mode)
+- exact initialization of steepest edge weights possible by calling setupWeights of SPxSteepPR
 
 interface:
 - LP reader: print warning when encountering a floating point number with empty exponent (hints at variable name with
@@ -43,6 +44,7 @@ interface:
 - added command line option '-t3' to use the bound flipping ratio test (long step dual)
 - number of performed bound flips during ratio test are displayed as 'flips=' in line 'Finished solving...'
 - added method to clear starting basis in class SoPlex (SoPlex::clearBasis())
+- new option -p6 to use steepest edge pricer with exact initialization
 
 performance:
 - increased default Markowitz threshold to 0.04 to increase numerical stability of the factorization
