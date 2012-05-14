@@ -117,7 +117,6 @@ int SPxDantzigPR::selectLeaveSparse()
       Real x = thesolver->fTest()[idx];
       if (x < -theeps)
       {
-         // x *= EQ_PREF * (1 + (up[i] == low[i]));
          if (x < best)
          {
             n    = idx;

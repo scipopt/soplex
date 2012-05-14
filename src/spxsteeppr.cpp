@@ -420,8 +420,6 @@ int SPxSteepPR::selectLeaveSparse()
 {
    const Real* coPenalty_ptr = coPenalty.get_const_ptr();
    const Real* fTest         = thesolver->fTest().get_const_ptr();
-   //    const Real* low     = thesolver->lbBound();
-   //    const Real* up      = thesolver->ubBound();
    const Real* p             = leavePref.get_const_ptr();
 
    Real best = -infinity;
@@ -437,12 +435,10 @@ int SPxSteepPR::selectLeaveSparse()
 
       if (x < -theeps)
       {
-         /**@todo this was an assert! is an assertion correct?*/
-         // assert(coPenalty_ptr[i] >= theeps);
          if( coPenalty_ptr[idx] < theeps )
          {
 #ifdef ENABLE_ADDITIONAL_CHECKS
-            MSG_WARNING( spxout << "WSTEEP02 SPxSteepPR::selectLeaveX(): coPenalty too small ("
+            MSG_WARNING( spxout << "WSTEEP02 SPxSteepPR::selectLeaveSparse(): coPenalty too small ("
                                 << coPenalty_ptr[idx] << "), assuming epsilon (" << theeps << ")!" << std::endl; )
 #endif
 
