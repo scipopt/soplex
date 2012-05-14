@@ -31,6 +31,8 @@ int SPxDantzigPR::selectLeave()
 #ifdef PARTIAL_PRICING
    return selectLeavePart();
 #endif
+   if (thesolver->sparsePricing)
+      return selectLeaveSparse();
 
    //    const Real* up  = thesolver->ubBound();
    //    const Real* low = thesolver->lbBound();
@@ -96,6 +98,37 @@ int SPxDantzigPR::selectLeavePart()
             if (count >= MAX_PRICING_CANDIDATES)
                return n;
          }
+      }
+   }
+   return n;
+}
+
+int SPxDantzigPR::selectLeaveSparse()
+{
+   assert(thesolver != 0);
+
+   Real best   = -theeps;
+   int  n      = -1;
+   int  idx    = 0;
+
+   for(int i = thesolver->infeasibilities.size() - 1; i >= 0; --i)
+   {
+      idx = thesolver->infeasibilities.index(i);
+      Real x = thesolver->fTest()[idx];
+      if (x < -theeps)
+      {
+         if (x < best)
+         {
+            n    = idx;
+            best = x;
+         }
+      }
+      else
+      {
+         thesolver->infeasibilities.remove(i);
+
+         assert(thesolver->isInfeasible[idx] == true);
+         thesolver->isInfeasible[idx] = false;
       }
    }
    return n;

@@ -42,11 +42,50 @@ void SPxSolver::computeFtest()
 
    assert(type() == LEAVE);
 
-   for(int i = 0; i < dim(); ++i)
+   Real theeps = epsilon();
+   infeasibilities.clear();
+   int ninfeasibilities;
+   ninfeasibilities = 0;
+
+   for( int i = 0; i < dim(); ++i )
    {
       theCoTest[i] = ((*theFvec)[i] > theUBbound[i])
          ? theUBbound[i] - (*theFvec)[i]
          : (*theFvec)[i] - theLBbound[i];
+
+      if( remainingRounds == 0 )
+      {
+         if( theCoTest[i] < -theeps )
+         {
+            assert(infeasibilities.size() < infeasibilities.max());
+            infeasibilities.addIdx(i);
+            isInfeasible[i] = true;
+            ++ninfeasibilities;
+         }
+         else
+            isInfeasible[i] = false;
+         if( ninfeasibilities > sparsityThreshold )
+         {
+            MSG_INFO2( spxout << "IPRICE01 too many infeasibilities for sparse pricing"
+                              << std::endl; )
+            remainingRounds = DENSEROUNDS;
+            sparsePricing = false;
+            ninfeasibilities = 0;
+         }
+      }
+   }
+
+   if( ninfeasibilities == 0 && sparsePricing == false )
+   {
+      --remainingRounds;
+   }
+   else if( ninfeasibilities <= sparsityThreshold )
+   {
+      MSG_INFO2( spxout << "IPRICE02 sparse pricing active, "
+                        << "basis size: " << dim()
+                        << ", infeasibilities: " << ninfeasibilities
+                        << std::endl; )
+      sparsePricing = true;
    }
 }
 
@@ -58,6 +97,8 @@ void SPxSolver::updateFtest()
    assert(&ftest == &fTest());
 
    assert(type() == LEAVE);
+
+   Real theeps = epsilon();
    for (int j = idx.size() - 1; j >= 0; --j)
    {
       int i = idx.index(j);
@@ -65,6 +106,15 @@ void SPxSolver::updateFtest()
       ftest[i] = ((*theFvec)[i] > theUBbound[i])
          ? theUBbound[i] - (*theFvec)[i]
          : (*theFvec)[i] - theLBbound[i];
+      if( sparsePricing == true && ftest[i] < -theeps )
+      {
+         assert(remainingRounds == 0);
+         if( isInfeasible[i] == false )
+         {
+            infeasibilities.addIdx(i);
+            isInfeasible[i] = true;
+         }
+      }
    }
 }
 

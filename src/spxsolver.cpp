@@ -27,7 +27,6 @@
 #include "spxout.h"
 #include "exceptions.h"
 
-
 namespace soplex
 {
 #define MAXIMUM(x,y)        ((x)>(y) ? (x) : (y))
@@ -356,6 +355,10 @@ void SPxSolver::init()
       setLeaveBounds();
       computeLeaveCoPrhs();
    }
+   // prepare support vectors for sparse pricing
+   infeasibilities.setMax(dim());
+   isInfeasible.reSize(dim());
+   sparsityThreshold = dim() * SPARSITYTHRESHOLD;
 
    SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
    computePvec();
@@ -459,6 +462,9 @@ void SPxSolver::clear()
    SPxLP::clear();
    setBasisStatus(SPxBasis::NO_PROBLEM);
    SPxBasis::reDim();
+
+   infeasibilities.clear();
+   isInfeasible.clear();
 }
 
 void SPxSolver::clearUpdateVecs(void)
@@ -785,6 +791,10 @@ SPxSolver::SPxSolver(
    , thepricer (0)
    , theratiotester (0)
    , thestarter (0)
+   , infeasibilities(0)
+   , isInfeasible(0)
+   , sparsePricing(false)
+   , remainingRounds(0)
 {
    METHOD( "SPxSolver::SPxSolver()" );
 
@@ -863,6 +873,11 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       leaveCount = base.leaveCount;
       enterCount = base.enterCount;
       theCumulativeTime = base.theCumulativeTime;
+      infeasibilities = base.infeasibilities;
+      isInfeasible = base.isInfeasible;
+      sparsePricing = base.sparsePricing;
+      remainingRounds = base.remainingRounds;
+      sparsityThreshold = base.sparsityThreshold;
 
       if (base.theRep == COLUMN)
       {
@@ -1006,6 +1021,11 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , dualFarkas(base.dualFarkas)
    , leaveCount(base.leaveCount)
    , enterCount(base.enterCount)
+   , infeasibilities(base.infeasibilities)
+   , isInfeasible(base.isInfeasible)
+   , sparsePricing(base.sparsePricing)
+   , remainingRounds(base.remainingRounds)
+   , sparsityThreshold(base.sparsityThreshold)
 {
    METHOD( "SPxSolver::SPxSolver(const SPxSolver&base)"  );
 

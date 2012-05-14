@@ -33,6 +33,9 @@
 #include "unitvector.h"
 #include "updatevector.h"
 
+#define SPARSITYTHRESHOLD        0.4      /**< percentage of basic infeasibilities that is considered sparse */
+#define DENSEROUNDS               5       /**< number of refactorization until sparsity is tested again */
+
 namespace soplex
 {
 class SPxPricer;
@@ -194,6 +197,7 @@ public:
       UNBOUNDED      =  2,  ///< LP has been proven to be primal unbounded.
       INFEASIBLE     =  3   ///< LP has been proven to be primal infeasible.
    };
+
    //@}
 
 private:
@@ -308,6 +312,22 @@ protected:
    //@}
 
 public:
+
+   /** For the leaving Simplex algorithm this vector contains the indices of infeasible basic variables
+    *  After a basis change the indexset is updated.
+    */
+   DIdxSet infeasibilities;
+
+   /** Binary vector to store whether basic indices are infeasible
+    *  the i-th entry equals false, if the i-th basic variable is not infeasible
+    *  the i-th entry equals true, if the i-th basic variable is infeasible
+    */
+   Array<bool> isInfeasible;
+
+   /// These values enable or disable sparse pricing
+   bool     sparsePricing;        ///< true if sparsePricing is turned on
+   int      remainingRounds;      ///< number of dense rounds/refactorizations until sparsePricing is enabled again
+   int      sparsityThreshold;    ///< maximum allowed length of \ref soplex::SPxSolver::infeasibilities "infeasibilities"
 
    //-----------------------------
    /**@name Access */

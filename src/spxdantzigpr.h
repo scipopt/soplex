@@ -42,6 +42,7 @@ private:
 
    int                   selectLeavePart();  /**< partial pricing method, define
                                               *   PARTIAL_PRICING to use */
+   int                   selectLeaveSparse();
 public:
 
    //-------------------------------------

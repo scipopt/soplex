@@ -86,10 +86,12 @@ int SPxDevexPR::selectLeave()
 #ifdef PARTIAL_PRICING
    retid = selectLeavePart(val, theeps);
 #else
-   retid = selectLeaveX(val, theeps);
+   if (thesolver->sparsePricing)
+      retid = selectLeaveSparse(val, theeps);
+   else
+      retid = selectLeaveX(val, theeps);
 #endif
-
-   if( retid < 0 && !refined )
+   if ( retid < 0 && !refined )
    {
       refined = true;
       MSG_INFO3( spxout << "WDEVEX02 trying refinement step..\n"; )
@@ -197,6 +199,42 @@ int SPxDevexPR::selectLeavePart(Real& best, Real feastol)
    return bstI;
 }
 
+int SPxDevexPR::selectLeaveSparse(Real& best, Real feastol)
+{
+   Real x;
+
+   const Real* fTest = thesolver->fTest().get_const_ptr();
+   const Real* cpen = coPenalty.get_const_ptr();
+   Real bstX = 0;
+   int bstI = -1;
+   int idx = -1;
+
+   for (int i = thesolver->infeasibilities.size() - 1; i >= 0; --i)
+   {
+      idx = thesolver->infeasibilities.index(i);
+      Real fTesti = fTest[idx];
+      if (fTesti < -feastol)
+      {
+         Real cpeni = cpen[idx];
+         x = fTesti * fTesti / cpeni;
+         if (x > bstX)
+         {
+            bstX = x;
+            bstI = idx;
+            last = cpeni;
+         }
+      }
+      else
+      {
+         thesolver->infeasibilities.remove(i);
+
+         assert(thesolver->isInfeasible[idx] == true);
+         thesolver->isInfeasible[idx] = false;
+      }
+   }
+   best = bstX;
+   return bstI;
+}
 
 
 void SPxDevexPR::left4(int n, SPxId id)

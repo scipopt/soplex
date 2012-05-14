@@ -46,10 +46,12 @@ interface:
 - number of performed bound flips during ratio test are displayed as 'flips=' in line 'Finished solving...'
 - added method to clear starting basis in class SoPlex (SoPlex::clearBasis())
 - new option -p6 to use steepest edge pricer with exact initialization
+- verb levels v4 and higher display current pricing mode (sparse or conventional)
 
 performance:
 - increased default Markowitz threshold to 0.04 to increase numerical stability of the factorization
 - implemented bound flipping ratio test ("long step dual") for column representation
+- sparse pricing for leaving simplex is activated depending on ratio of basis dimension and number of infeasibilities
 
 fixed bugs:
 - added missing -m64 in LDFLAGS of make.{darwin,sunos}.x86_64.gnu.* and make.{linux,freebsd}.x86_64.gnu.opt*

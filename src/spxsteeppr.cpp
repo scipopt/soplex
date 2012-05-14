@@ -263,6 +263,8 @@ int SPxSteepPR::selectLeave()
 #ifdef PARTIAL_PRICING
    return selectLeavePart();
 #endif
+   if (thesolver->sparsePricing)
+      return selectLeaveSparse();
 
    const Real* coPenalty_ptr = coPenalty.get_const_ptr();
    const Real* fTest         = thesolver->fTest().get_const_ptr();
@@ -400,6 +402,66 @@ int SPxSteepPR::selectLeavePart()
    }
 
 TERMINATE:
+   if (lastIdx >= 0)
+   {
+      assert( thesolver->coPvec().delta().isConsistent() );
+      thesolver->basis().coSolve(thesolver->coPvec().delta(),
+                                 thesolver->unitVector(lastIdx));
+      workRhs.setEpsilon(accuracy);
+      assert( thesolver->coPvec().delta().isConsistent() );
+      workRhs.setup_and_assign(thesolver->coPvec().delta());
+      thesolver->setup4solve(&workVec, &workRhs);
+   }
+
+   return lastIdx;
+}
+
+int SPxSteepPR::selectLeaveSparse()
+{
+   const Real* coPenalty_ptr = coPenalty.get_const_ptr();
+   const Real* fTest         = thesolver->fTest().get_const_ptr();
+   const Real* p             = leavePref.get_const_ptr();
+
+   Real best = -infinity;
+   Real x;
+
+   int lastIdx = -1;
+   int idx = 0;
+
+   for (int i = thesolver->infeasibilities.size() - 1; i >= 0; --i)
+   {
+      idx = thesolver->infeasibilities.index(i);
+      x = fTest[idx];
+
+      if (x < -theeps)
+      {
+         if( coPenalty_ptr[idx] < theeps )
+         {
+#ifdef ENABLE_ADDITIONAL_CHECKS
+            MSG_WARNING( spxout << "WSTEEP02 SPxSteepPR::selectLeaveSparse(): coPenalty too small ("
+                                << coPenalty_ptr[idx] << "), assuming epsilon (" << theeps << ")!" << std::endl; )
+#endif
+
+            x = x * x / theeps * p[idx];
+         }
+         else
+            x = x * x / coPenalty_ptr[idx] * p[idx];
+
+         if (x > best)
+         {
+            best = x;
+            lastIdx = idx;
+         }
+      }
+      else
+      {
+         thesolver->infeasibilities.remove(i);
+
+         assert(thesolver->isInfeasible[idx] == true);
+         thesolver->isInfeasible[idx] = false;
+      }
+   }
+
    if (lastIdx >= 0)
    {
       assert( thesolver->coPvec().delta().isConsistent() );
