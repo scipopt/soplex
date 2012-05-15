@@ -92,7 +92,7 @@ SPxSolver::Status SPxSolver::solve()
    Real  newDelta;
    Real  minShift = infinity;
    int   cycleCount = 0;
-   bool priced = false;
+   bool  priced = false;
 
    /* store the last (primal or dual) feasible objective value to recover/abort in case of stalling */
    Real  stallRefValue;
