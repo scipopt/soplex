@@ -92,6 +92,7 @@ SPxSolver::Status SPxSolver::solve()
    Real  newDelta;
    Real  minShift = infinity;
    int   cycleCount = 0;
+   bool priced = false;
 
    /* store the last (primal or dual) feasible objective value to recover/abort in case of stalling */
    Real  stallRefValue;
@@ -202,6 +203,8 @@ SPxSolver::Status SPxSolver::solve()
          stallRefShift = shift();
          stallRefValue = value();
 
+         priced = false;
+
          thepricer->setEpsilon(maxDelta);
 
          do
@@ -239,11 +242,17 @@ SPxSolver::Status SPxSolver::solve()
                   }
                   // solution seems good, no check whether we are precise enough
                   else if (lastUpdate() == 0)
+                  {
+                     priced = true;
                      break;
+                  }
                   // We have an iterationlimit and everything looks good? Then stop!
                   // 6 is just a number picked.
                   else if (maxIters > 0 && lastUpdate() < 6)
+                  {
+                     priced = true;
                      break;
+                  }
                }
                MSG_INFO3( spxout << "ISOLVE76 solve(enter) triggers refactorization" << std::endl; )
 
@@ -262,7 +271,10 @@ SPxSolver::Status SPxSolver::solve()
                enterId = thepricer->selectEnter();
 
                if (!enterId.isValid())
+               {
+                  priced = true;
                   break;
+               }
             }
 
             /* check if we have iterations left */
@@ -357,7 +369,7 @@ SPxSolver::Status SPxSolver::solve()
                          << ", delta: " << delta() << std::endl;
                )
 
-               if (maxInfeas() + shift() <= delta())
+               if (priced && maxInfeas() + shift() <= delta())
                {
                   setBasisStatus(SPxBasis::OPTIMAL);
                   m_status = OPTIMAL;
@@ -384,6 +396,8 @@ SPxSolver::Status SPxSolver::solve()
          stallRefValue = value();
 
          thepricer->setEpsilon(maxDelta);
+
+         priced = false;
 
          do
          {
@@ -439,11 +453,17 @@ SPxSolver::Status SPxSolver::solve()
                   }
                   // solution seems good, no check whether we are precise enough
                   else if (lastUpdate() == 0)
+                  {
+                     priced = true;
                      break;
+                  }
                   // We have an iteration limit and everything looks good? Then stop!
                   // 6 is just a number picked.
                   else if (maxIters > 0 && lastUpdate() < 6)
+                  {
+                     priced = true;
                      break;
+                  }
                }
                MSG_INFO3( spxout << "ISOLVE82 solve(leave) triggers refactorization" << std::endl; )
 
@@ -462,7 +482,10 @@ SPxSolver::Status SPxSolver::solve()
                leaveNum = thepricer->selectLeave();
 
                if (leaveNum < 0)
+               {
+                  priced = true;
                   break;
+               }
             }
 
             /* check if we have iterations left */
@@ -556,8 +579,6 @@ SPxSolver::Status SPxSolver::solve()
                if( cycleCount > MAXCYCLES )
                {
                   m_status = ABORT_CYCLING;
-                  stop = true;
-                  //MSG_INFO2( spxout << "ISOLVE85 Abort solving due to cycling" << std::endl; )
                   throw SPxStatusException("XSOLVE13 Abort solving due to cycling");
                }
                MSG_INFO3(
@@ -583,7 +604,12 @@ SPxSolver::Status SPxSolver::solve()
                // We stop if we are indeed optimal, or if we have already been
                // two times at this place. In this case it seems futile to
                // continue.
-               if (maxInfeas() + shift() <= delta() || loopCount >= 2)
+               if (loopCount >= 2)
+               {
+                  m_status = ABORT_CYCLING;
+                  throw SPxStatusException("XSOLVE14 Abort solving due to looping");
+               }
+               else if (priced && maxInfeas() + shift() <= delta())
                {
                   setBasisStatus(SPxBasis::OPTIMAL);
                   m_status = OPTIMAL;

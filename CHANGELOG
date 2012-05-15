@@ -8,8 +8,9 @@ fixed bugs:
 - allow instable leave iterations, i.e., leave iterations with pivot element below default stability threshold, only
   after a fresh factorization
 - check redundant variable bounds implied by rows more carefully: do not apply if max/min activity exceeds sides by a
-  factor greater than1.0/epsilon to avoid roundoff errors
+  factor greater than 1.0/epsilon to avoid roundoff errors
 - initialize basis descriptor to statuses D_UNDEFINED in order to avoid access of uninitialized values at time out
+- fixed bug in stalling detection: SoPlex incorrectly assumed that pricing had been finished and hence claimed optimality
 
 
 28 Oct 2011 - Release 1.6.0
