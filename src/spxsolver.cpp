@@ -1364,8 +1364,12 @@ SPxSolver::varStatusToBasisStatusCol( int col, SPxSolver::VarStatus stat ) const
    switch( stat )
    {
    case FIXED :
-      assert(upper(col) == lower(col));
-      cstat = SPxBasis::Desc::P_FIXED;
+      if (upper(col) == lower(col))
+         cstat = SPxBasis::Desc::P_FIXED;
+      else if (maxObj(col) > 0.0)
+         cstat = SPxBasis::Desc::P_ON_UPPER;
+      else
+         cstat = SPxBasis::Desc::P_ON_LOWER;
       break;
    case ON_UPPER :
       assert(upper(col) < infinity);

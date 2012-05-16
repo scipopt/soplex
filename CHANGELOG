@@ -18,6 +18,7 @@ fixed bugs:
   factor greater than 1.0/epsilon to avoid roundoff errors
 - initialize basis descriptor to statuses D_UNDEFINED in order to avoid access of uninitialized values at time out
 - fixed bug in stalling detection: SoPlex incorrectly assumed that pricing had been finished and hence claimed optimality
+- handled setting FIXED basis status when bounds are only approximately equal
 
 interface:
 - info message in case a fresh factorization is not stable enough and has to be done again with higher Markowitz threshold
