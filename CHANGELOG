@@ -4,13 +4,28 @@
 DEVELOPER
 =========
 
+code quality & new features:
+- partial pricing can be switched on for dantzig-, devex- and steep-pricing by defining PARTIAL_PRICING (only LEAVING mode)
+- current basis matrix can be written to a file in MatrixMarket format using SPxBasis::printMatrixMTX
+- exact initialization of steepest edge weights possible by calling setupWeights of SPxSteepPR
+
 fixed bugs:
+- variables that do not appear in the objective function or any constraint are not printed anymore in the BOUNDS section
+  of the mps file.
 - allow instable leave iterations, i.e., leave iterations with pivot element below default stability threshold, only
   after a fresh factorization
 - check redundant variable bounds implied by rows more carefully: do not apply if max/min activity exceeds sides by a
   factor greater than 1.0/epsilon to avoid roundoff errors
 - initialize basis descriptor to statuses D_UNDEFINED in order to avoid access of uninitialized values at time out
 - fixed bug in stalling detection: SoPlex incorrectly assumed that pricing had been finished and hence claimed optimality
+
+interface:
+- info message in case a fresh factorization is not stable enough and has to be done again with higher Markowitz threshold
+- new option -p6 to use steepest edge pricer with exact initialization
+- verb levels v4 and higher display current pricing mode (sparse or conventional)
+
+performance:
+- sparse pricing for leaving simplex is activated depending on ratio of basis dimension and number of infeasibilities
 
 
 28 Oct 2011 - Release 1.6.0
@@ -31,7 +46,6 @@ code quality & new features:
 - removed compiler flag NO_ADDITIONAL_CHECKS in code and makefile options: now, additional checks are only performed
   when ENABLE_ADDITIONAL_CHECKS or ENABLE_CONSISTENCY_CHECKS is explicitly defined (globally or in a specific file)
 - githash of current commit is displayed (also in check mode)
-- exact initialization of steepest edge weights possible by calling setupWeights of SPxSteepPR
 
 interface:
 - LP reader: print warning when encountering a floating point number with empty exponent (hints at variable name with
@@ -46,13 +60,10 @@ interface:
 - added command line option '-t3' to use the bound flipping ratio test (long step dual)
 - number of performed bound flips during ratio test are displayed as 'flips=' in line 'Finished solving...'
 - added method to clear starting basis in class SoPlex (SoPlex::clearBasis())
-- new option -p6 to use steepest edge pricer with exact initialization
-- verb levels v4 and higher display current pricing mode (sparse or conventional)
 
 performance:
 - increased default Markowitz threshold to 0.04 to increase numerical stability of the factorization
 - implemented bound flipping ratio test ("long step dual") for column representation
-- sparse pricing for leaving simplex is activated depending on ratio of basis dimension and number of infeasibilities
 
 fixed bugs:
 - added missing -m64 in LDFLAGS of make.{darwin,sunos}.x86_64.gnu.* and make.{linux,freebsd}.x86_64.gnu.opt*
@@ -78,6 +89,7 @@ fixed bugs:
 - fixed bug in unsimplification of duplicate columns (do not replace two linearly dependent columns by one if free basis
   status can not be resolved in unsimplification)
 - fixed several bugs when unsimplifying infeasible bases
+- fixed counting of removed rows during simplifier
 
 
 30 Sep 2010 - Release 1.5.0
