@@ -457,7 +457,7 @@ int SPxSteepPR::selectLeaveSparse()
       {
          thesolver->infeasibilities.remove(i);
 
-         assert(thesolver->isInfeasible[idx] == true);
+         assert(thesolver->isInfeasible[idx]);
          thesolver->isInfeasible[idx] = false;
       }
    }
