@@ -27,6 +27,7 @@
 #include "spxsimplifier.h"
 #include "spxsteeppr.h"
 #include "spxfastrt.h"
+#include "spxfileio.h"
 #include "spxweightst.h"
 #include "slufactor.h"
 
@@ -243,6 +244,48 @@ public:
    /// get current basis, and return solver status.
    SPxSolver::Status getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const;
 
+   const char* getColName(
+      int            idx,
+      const NameSet* cnames,
+      char*          buf)
+   {
+      assert(buf != 0);
+      assert(idx >= 0);
+      assert(idx < nCols());
+
+      if (cnames != 0)
+      {
+         DataKey key = cId(idx);
+
+         if (cnames->has(key))
+            return (*cnames)[key];
+      }
+      std::sprintf(buf, "x%d_", idx);
+
+      return buf;
+   }
+
+   const char* getRowName(
+      int            idx,
+      const NameSet* rnames,
+      char*          buf)
+   {
+      assert(buf != 0);
+      assert(idx >= 0);
+      assert(idx < nRows());
+
+      if (rnames != 0)
+      {
+         DataKey key = rId(idx);
+
+         if (rnames->has(key))
+            return (*rnames)[key];
+      }
+      std::sprintf(buf, "C%d_", idx);
+
+      return buf;
+   }
+
    /// @throw SPxStatusException if simplifier loaded, this is not yet
    /// implemented
    virtual SPxSolver::Status getPrimalray(Vector& vector) const;
@@ -316,8 +359,8 @@ public:
     *  colNames are \c NULL, default names are used for the constraints and
     *  variables.
     */
-   virtual bool writeBasisFile(const char* filename, 
-      const NameSet* rowNames, const NameSet* colNames ) const;
+   virtual bool writeBasisFile(const char* filename,
+      const NameSet* rowNames, const NameSet* colNames);
 
    /** Write LP, basis and parameter settings of the current SPxSolver object
     *  (i.e. after simplifying and scaling).

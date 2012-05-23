@@ -8,6 +8,7 @@ code quality & new features:
 - partial pricing can be switched on for dantzig-, devex- and steep-pricing by defining PARTIAL_PRICING (only LEAVING mode)
 - current basis matrix can be written to a file in MatrixMarket format using SPxBasis::printMatrixMTX
 - exact initialization of steepest edge weights possible by calling setupWeights of SPxSteepPR
+- option -bw writes the basis of the original problem to a file; works now with simplifier as well
 
 fixed bugs:
 - variables that do not appear in the objective function or any constraint are not printed anymore in the BOUNDS section
@@ -19,6 +20,7 @@ fixed bugs:
 - initialize basis descriptor to statuses D_UNDEFINED in order to avoid access of uninitialized values at time out
 - fixed bug in stalling detection: SoPlex incorrectly assumed that pricing had been finished and hence claimed optimality
 - handled setting FIXED basis status when bounds are only approximately equal
+- using a starting basis from file disables simplifier
 
 interface:
 - info message in case a fresh factorization is not stable enough and has to be done again with higher Markowitz threshold

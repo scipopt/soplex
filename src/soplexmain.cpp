@@ -386,7 +386,7 @@ void check_parameter(const char param, const char* const argv[])
 //------------------------------------------------------------------------
 static
 void print_algorithm_parameters(
-   const MySoPlex&                 work,
+   MySoPlex&                       work,
    const SPxSolver::Representation representation,
    const SLUFactor::UpdateType     update
    )
@@ -698,10 +698,11 @@ void read_basis_file(
    const NameSet* rownames,
    const NameSet* colnames)
 {
+   MSG_INFO1( spxout << "Reading basis from file (disables simplifier)" << std::endl; )
    if (!work.readBasisFile(filename, rownames, colnames))
    {
       if ( checkMode )
-	 MSG_INFO1( spxout << "EEXAMP25 error while reading file \"" << filename << "\"" << std::endl; )
+         MSG_INFO1( spxout << "EEXAMP25 error while reading file \"" << filename << "\"" << std::endl; )
       else
          MSG_INFO1( spxout << "Error while reading file \"" << filename << "\"" << std::endl; )
       exit(1);
@@ -729,7 +730,7 @@ void solve_LP(MySoPlex& work)
 //------------------------------------------------------------------------
 static
 void print_solution_and_status(
-   const MySoPlex&      work,
+   MySoPlex&            work,
    const NameSet&       rownames,
    const NameSet&       colnames,
    const int            precision,
@@ -816,12 +817,13 @@ void print_solution_and_status(
       }
       if ( write_basis )
       {
+         MSG_INFO1( spxout << "Writing basis of original problem to file " << basisname << std::endl; )
          if ( ! work.writeBasisFile( basisname, &rownames, &colnames ) )
          {
-	    if ( checkMode )
-	       MSG_INFO1( spxout << "EEXAMP30 error while writing file \"" << basisname << "\"" << std::endl; )
-	    else
-	       MSG_INFO1( spxout << "Error while writing file \"" << basisname << "\"" << std::endl; )
+            if ( checkMode )
+               MSG_INFO1( spxout << "EEXAMP30 error while writing file \"" << basisname << "\"" << std::endl; )
+            else
+               MSG_INFO1( spxout << "Error while writing file \"" << basisname << "\"" << std::endl; )
          }
       }
       break;
@@ -1216,6 +1218,10 @@ int main(int argc, char* argv[])
       filename  = argv[optidx];
 
       ++optidx;
+
+      // switch off simplifier when using a starting basis
+      if ( read_basis )
+         simplifying = 0;
 
       if ( read_basis || write_basis )
          basisname = strcpy( new char[strlen(argv[optidx]) + 1], argv[optidx] );

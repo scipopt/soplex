@@ -633,12 +633,81 @@ bool SoPlex::readBasisFile(
 }
 
 bool SoPlex::writeBasisFile(
-   const char*    filename, 
-   const NameSet* rowNames, 
+   const char*    filename,
+   const NameSet* rowNames,
    const NameSet* colNames
-   ) const
+   )
 {
-   return m_solver.writeBasisFile(filename, rowNames, colNames);
+   assert(rep() == SPxSolver::COLUMN);
+
+   /* make sure the basis of the original problem is written */
+   unsimplify();
+
+   std::ofstream file(filename);
+   std::ostream& os = file;
+
+   os.setf(std::ios::left);
+   os << "NAME  soplex.bas\n";
+
+   /* do not write basis if there is none */
+   if( status() == SPxSolver::NO_PROBLEM )
+   {
+      os << "ENDATA" << std::endl;
+      return true;
+   }
+
+   /* start writing */
+   char buf[255];
+   int row = 0;
+   for( int col = 0; col < nCols(); col++ )
+   {
+      if( getBasisColStatus(col) == SPxSolver::BASIC )
+      {
+         /* Find non basic row */
+         for( ; row < nRows(); row++ )
+         {
+            if( getBasisRowStatus(row) != SPxSolver::BASIC )
+               break;
+         }
+
+         assert(row != nRows());
+
+         os << ( getBasisRowStatus(row) == SPxSolver::ON_UPPER ? " XU " : " XL " )
+         << std::setw(8) << getColName(col, colNames, buf);
+
+         /* break in two parts since buf is reused */
+         os << "       "
+         << getRowName(row, rowNames, buf)
+         << std::endl;
+
+         row++;
+      }
+      else
+      {
+         if ( getBasisColStatus(col) == SPxSolver::ON_UPPER )
+         {
+            os << " UL "
+            << getColName(col, colNames, buf)
+            << std::endl;
+         }
+      }
+   }
+
+   #ifndef NDEBUG
+   MSG_DEBUG( thedesc.dump() );
+
+   // Check that we covered all nonbasic rows - the remaining should be basic.
+   for( ; row < nRows(); row++ )
+   {
+      if( getBasisRowStatus(row) != SPxSolver::BASIC )
+         break;
+   }
+   assert(row == nRows());
+
+   #endif // NDEBUG
+
+   os << "ENDATA" << std::endl;
+   return true;
 }
 
 bool SoPlex::writeState(
