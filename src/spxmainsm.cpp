@@ -1344,7 +1344,7 @@ void SPxMainSM::handleExtremes(SPxLP& lp)
          {
             Real aij = fabs(col.value(i));
 
-            if (isZero(aij, epsZero()) || isZero(aij * absBnd, deltaBnd()))
+            if (isZero(aij, epsZero()) || isZero(aij * absBnd, feastol()))
             {
                SVector& row = lp.rowVector_w(col.index(i));
 
@@ -1422,7 +1422,7 @@ SPxSimplifier::Result SPxMainSM::removeEmpty(SPxLP& lp)
          MSG_INFO3( spxout << "IMAISM07 row " << i
                            << ": empty ->"; )
 
-         if (LT(lp.rhs(i), 0.0, deltaBnd()) || GT(lp.lhs(i), 0.0, deltaBnd()))
+         if (LT(lp.rhs(i), 0.0, feastol()) || GT(lp.lhs(i), 0.0, feastol()))
          {
             MSG_INFO3( spxout << " infeasible lhs=" << lp.lhs(i)
                               << " rhs=" << lp.rhs(i) << std::endl; )
@@ -1531,7 +1531,7 @@ SPxSimplifier::Result SPxMainSM::removeRowSingleton(SPxLP& lp, const SVector& ro
       lo = (lp.rhs(i) >=  infinity) ? -infinity : lp.rhs(i) / aij;
       up = (lp.lhs(i) <= -infinity) ?  infinity : lp.lhs(i) / aij;
    }
-   else if (LT(lp.rhs(i), 0.0, deltaBnd()) || GT(lp.lhs(i), 0.0, deltaBnd()))
+   else if (LT(lp.rhs(i), 0.0, feastol()) || GT(lp.lhs(i), 0.0, feastol()))
    {
       // aij == 0, rhs < 0 or lhs > 0
       MSG_INFO3( spxout << " infeasible" << std::endl; )
@@ -1556,12 +1556,12 @@ SPxSimplifier::Result SPxMainSM::removeRowSingleton(SPxLP& lp, const SVector& ro
    Real oldLo = lp.lower(j);
    Real oldUp = lp.upper(j);
 
-   if (LTrel(up, lp.upper(j), deltaBnd()))
+   if (LTrel(up, lp.upper(j), feastol()))
    {
       lp.changeUpper(j, up);
       stricterUp = true;
    }
-   if (GTrel(lo, lp.lower(j), deltaBnd()))
+   if (GTrel(lo, lp.lower(j), feastol()))
    {
       lp.changeLower(j, lo);
       stricterLo = true;
@@ -1654,7 +1654,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
 
             if (aij > 0.0)
             {
-               if (lp.lhs(i) > -infinity && lp.lower(j) > -infinity && rhsCnt <= 1 && NErel(lp.lhs(i), rhsBnd, deltaBnd())
+               if (lp.lhs(i) > -infinity && lp.lower(j) > -infinity && rhsCnt <= 1 && NErel(lp.lhs(i), rhsBnd, feastol())
                   // do not perform if strongly different orders of magnitude occur
                   && fabs(lp.lhs(i) / rhsBnd) > Param::epsilon())
                {
@@ -1679,7 +1679,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                   if (isZero(lo, epsZero()))
                      lo = 0.0;
 
-                  if (GErel(lo, lp.lower(j), deltaBnd()))
+                  if (GErel(lo, lp.lower(j), feastol()))
                   {
                      MSG_INFO3( spxout << "IMAISM13 row " << i
                                        << ": redundant lower bound on x" << j
@@ -1694,7 +1694,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                      ++chgBnds;
                   }
                }
-               if (lp.rhs(i) < infinity && lp.upper(j) < infinity && lhsCnt <= 1 && NErel(lp.rhs(i), lhsBnd, deltaBnd())
+               if (lp.rhs(i) < infinity && lp.upper(j) < infinity && lhsCnt <= 1 && NErel(lp.rhs(i), lhsBnd, feastol())
                   // do not perform if strongly different orders of magnitude occur
                   && fabs(lp.rhs(i) / lhsBnd) > Param::epsilon())
                {
@@ -1719,7 +1719,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                   if (isZero(up, epsZero()))
                      up = 0.0;
 
-                  if (LErel(up, lp.upper(j), deltaBnd()))
+                  if (LErel(up, lp.upper(j), feastol()))
                   {
                      MSG_INFO3( spxout << "IMAISM14 row " << i
                                        << ": redundant upper bound on x" << j
@@ -1737,7 +1737,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
             }
             else if (aij < 0.0)
             {
-               if (lp.lhs(i) > -infinity && lp.upper(j) < infinity && rhsCnt <= 1 && NErel(lp.lhs(i), rhsBnd, deltaBnd())
+               if (lp.lhs(i) > -infinity && lp.upper(j) < infinity && rhsCnt <= 1 && NErel(lp.lhs(i), rhsBnd, feastol())
                   // do not perform if strongly different orders of magnitude occur
                   && fabs(lp.lhs(i) / rhsBnd) > Param::epsilon())
                {
@@ -1762,7 +1762,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                   if (isZero(up, epsZero()))
                      up = 0.0;
 
-                  if (LErel(up, lp.upper(j), deltaBnd()))
+                  if (LErel(up, lp.upper(j), feastol()))
                   {
                      MSG_INFO3( spxout << "IMAISM15 row " << i
                                        << ": redundant upper bound on x" << j
@@ -1777,7 +1777,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                      ++chgBnds;
                   }
                }
-               if (lp.rhs(i) < infinity && lp.lower(j) > -infinity && lhsCnt <= 1 && NErel(lp.rhs(i), lhsBnd, deltaBnd())
+               if (lp.rhs(i) < infinity && lp.lower(j) > -infinity && lhsCnt <= 1 && NErel(lp.rhs(i), lhsBnd, feastol())
                   // do not perform if strongly different orders of magnitude occur
                   && fabs(lp.rhs(i) / lhsBnd) > Param::epsilon())
                {
@@ -1824,7 +1824,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
 
 #if FREE_LHS_RHS
       // 2. detect implied free constraints
-      if (lp.lhs(i) > -infinity && lhsCnt == 0 && GErel(lhsBnd, lp.lhs(i), deltaBnd()))
+      if (lp.lhs(i) > -infinity && lhsCnt == 0 && GErel(lhsBnd, lp.lhs(i), feastol()))
       {
          MSG_INFO3( spxout << "IMAISM17 row " << i
                            << ": redundant lhs -> lhsBnd=" << lhsBnd
@@ -1834,7 +1834,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
          lp.changeLhs(i, -infinity);
          ++chgLRhs;
       }
-      if (lp.rhs(i) <  infinity && rhsCnt == 0 && LErel(rhsBnd, lp.rhs(i), deltaBnd()))
+      if (lp.rhs(i) <  infinity && rhsCnt == 0 && LErel(rhsBnd, lp.rhs(i), feastol()))
       {
          MSG_INFO3( spxout << "IMAISM18 row " << i
                            << ": redundant rhs -> rhsBnd=" << rhsBnd
@@ -1847,9 +1847,9 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
 #endif
 
       // 3. infeasible constraint
-      if (LTrel(lp.rhs(i), lp.lhs(i), deltaBnd())                 ||
-          (LTrel(rhsBnd,   lp.lhs(i), deltaBnd()) && rhsCnt == 0) ||
-          (GTrel(lhsBnd,   lp.rhs(i), deltaBnd()) && lhsCnt == 0))
+      if (LTrel(lp.rhs(i), lp.lhs(i), feastol())                 ||
+          (LTrel(rhsBnd,   lp.lhs(i), feastol()) && rhsCnt == 0) ||
+          (GTrel(lhsBnd,   lp.rhs(i), feastol()) && lhsCnt == 0))
       {
          MSG_INFO3( spxout << "IMAISM19 row " << std::setprecision(20) << i
                            << ": infeasible -> lhs=" << lp.lhs(i)
@@ -1886,7 +1886,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
          MSG_INFO3( spxout << "IMAISM21 row " << i
                            << ": empty ->"; )
 
-         if (LT(lp.rhs(i), 0.0, deltaBnd()) || GT(lp.lhs(i), 0.0, deltaBnd()))
+         if (LT(lp.rhs(i), 0.0, feastol()) || GT(lp.lhs(i), 0.0, feastol()))
          {
             MSG_INFO3( spxout << " infeasible lhs=" << lp.lhs(i)
                               << " rhs=" << lp.rhs(i) << std::endl; )
@@ -1917,7 +1917,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
 #if FORCE_CONSTRAINT
       // 7. forcing constraint (postsolving)
       // fix variables to obtain the upper bound on constraint value
-      if (rhsCnt == 0 && EQrel(rhsBnd, lp.lhs(i), deltaBnd()))
+      if (rhsCnt == 0 && EQrel(rhsBnd, lp.lhs(i), feastol()))
       {
          MSG_INFO3( spxout << "IMAISM24 row " << i
                            << ": forcing constraint fix on lhs ->"
@@ -1958,7 +1958,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
          continue;
       }
       // fix variables to obtain the lower bound on constraint value
-      if (lhsCnt == 0 && EQrel(lhsBnd, lp.rhs(i), deltaBnd()))
+      if (lhsCnt == 0 && EQrel(lhsBnd, lp.rhs(i), feastol()))
       {
          MSG_INFO3( spxout << "IMAISM26 row " << i
                            << ": forcing constraint fix on rhs ->"
@@ -2048,7 +2048,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
        const SVector& col = lp.colVector(j);
 
       // infeasible bounds
-      if (GTrel(lp.lower(j), lp.upper(j), deltaBnd()))
+      if (GTrel(lp.lower(j), lp.upper(j), feastol()))
       {
          MSG_INFO3( spxout << "IMAISM29 col " << j
                            << ": infeasible bounds on x" << j
@@ -2112,7 +2112,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
 #endif
       }
 
-      if (NErel(lp.lower(j), lp.upper(j), deltaBnd()))
+      if (NErel(lp.lower(j), lp.upper(j), feastol()))
       {
          // will be set to false if any constraint implies a bound on the variable
          bool loFree = true;
@@ -2238,7 +2238,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
 
 #if FIX_VARIABLE
       // 3. fix variable
-      if (EQrel(lp.lower(j), lp.upper(j), deltaBnd()))
+      if (EQrel(lp.lower(j), lp.upper(j), feastol()))
       {
          MSG_INFO3( spxout << "IMAISM36 col " << j
                            << ": x" << j
@@ -2330,7 +2330,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
          }
 
          // 5. not free column singleton combined with doubleton equation
-         else if (EQrel(lp.lhs(i), lp.rhs(i), deltaBnd())             &&
+         else if (EQrel(lp.lhs(i), lp.rhs(i), feastol())             &&
                   lp.rowVector(i).size() == 2                         &&
                   (lp.lower(j) > -infinity || lp.upper(j) < infinity))
          {
@@ -2408,7 +2408,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
                               << ")" << std::endl; )
 
             // infeasible bounds
-            if (GTrel(lp.lower(k), lp.upper(k), deltaBnd()))
+            if (GTrel(lp.lower(k), lp.upper(k), feastol()))
             {
                MSG_INFO3( spxout << "new bounds are infeasible"
                                  << std::endl; )
@@ -2435,7 +2435,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
             Real slackVal = lp.lhs(i);
 
             // constraint i is an inequality constraint -> transform into equation type
-            if (NErel(lp.lhs(i), lp.rhs(i), deltaBnd()))
+            if (NErel(lp.lhs(i), lp.rhs(i), feastol()))
             {
                MSG_INFO3( spxout << "IMAISM40 col " << j
                                  << ": free singleton in inequality constraint" << std::endl; )
@@ -2653,7 +2653,7 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
          continue;
 
       // dual infeasibility checks
-      if (LTrel(dualConsUp[j], dualConsLo[j], deltaBnd()))
+      if (LTrel(dualConsUp[j], dualConsLo[j], opttol()))
       {
          MSG_INFO3( spxout << "IMAISM46 col " << j
                            << ": dual infeasible -> dual lhs bound=" << dualConsLo[j]
@@ -2665,7 +2665,7 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
 
       // 1. dominated column
       // Is the problem really unbounded in the cases below ??? Or is only dual infeasiblity be shown
-      if (GTrel(obj, dualConsUp[j], deltaBnd()))
+      if (GTrel(obj, dualConsUp[j], opttol()))
       {
 #if DOMINATED_COLUMN
          MSG_INFO3( spxout << "IMAISM47 col " << j
@@ -2686,7 +2686,7 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
          ++m_stat[DOMINATED_COL];
 #endif
       }
-      else if (LTrel(obj, dualConsLo[j], deltaBnd()))
+      else if (LTrel(obj, dualConsLo[j], opttol()))
       {
 #if DOMINATED_COLUMN
          MSG_INFO3( spxout << "IMAISM48 col " << j
@@ -2709,7 +2709,7 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
       }
 
       // 2. weakly dominated column (no postsolving)
-      else if (lp.upper(j) < infinity && EQrel(obj, dualConsUp[j], deltaBnd()))
+      else if (lp.upper(j) < infinity && EQrel(obj, dualConsUp[j], opttol()))
       {
 #if WEAKLY_DOMINATED_COLUMN
          MSG_INFO3( spxout << "IMAISM49 col " << j
@@ -2722,7 +2722,7 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
          ++m_stat[WEAKLY_DOMINATED_COL];
 #endif
       }
-      else if (lp.lower(j) > -infinity && EQrel(obj, dualConsLo[j], deltaBnd()))
+      else if (lp.lower(j) > -infinity && EQrel(obj, dualConsLo[j], opttol()))
       {
 #if WEAKLY_DOMINATED_COLUMN
          MSG_INFO3( spxout << "IMAISM50 col " << j
@@ -2737,7 +2737,7 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
       }
 
       // fix column
-      if (EQrel(lp.lower(j), lp.upper(j), deltaBnd()))
+      if (EQrel(lp.lower(j), lp.upper(j), feastol()))
       {
 #if FIX_VARIABLE
          fixColumn(lp, j);
@@ -3054,7 +3054,7 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
                newLhsVec[rowIdx] = newLhs;
                newRhsVec[rowIdx] = newRhs;
 
-               if (LTrel(newRhs, newLhs, deltaBnd()))
+               if (LTrel(newRhs, newLhs, feastol()))
                {
                   MSG_INFO3( spxout << "IMAISM55 duplicate rows yield infeasible bounds:"
                                     << " lhs=" << newLhs
@@ -3411,7 +3411,7 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
                            lp.changeUpper(j1, lp.lower(j1));
                         }
                      }
-                     if (EQrel(lp.lower(j1), lp.upper(j1), deltaBnd()))
+                     if (EQrel(lp.lower(j1), lp.upper(j1), feastol()))
                      {
                         remCol[j1] = true;
                         fixAndRemCol[j1] = true;
@@ -3492,7 +3492,7 @@ void SPxMainSM::fixColumn(SPxLP& lp, int j, bool correctIdx)
 {
    METHOD( "SPxMainSM::fixColumn" );
 
-   assert(EQrel(lp.lower(j), lp.upper(j), deltaBnd()));
+   assert(EQrel(lp.lower(j), lp.upper(j), feastol()));
 
    Real lo            = lp.lower(j);
    const SVector& col = lp.colVector(j);
@@ -3562,7 +3562,7 @@ void SPxMainSM::fixColumn(SPxLP& lp, int j, bool correctIdx)
    m_hist.append(new FixVariablePS(lp, *this, j, lp.lower(j), correctIdx));
 }
 
-SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real delta)
+SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real feastol, Real opttol)
 {
    METHOD( "SPxMainSM::simplify()" );
 
@@ -3604,8 +3604,18 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real delta)
    m_hist.reSize(0);
    m_postsolved = false;
 
+   if( eps < 0.0 )
+      throw SPxInterfaceException("XMAISM30 Cannot use negative epsilon in simplify().");
+
+   if( feastol < 0.0 )
+      throw SPxInterfaceException("XMAISM31 Cannot use negative feastol in simplify().");
+
+   if( opttol < 0.0 )
+      throw SPxInterfaceException("XMAISM32 Cannot use negative opttol in simplify().");
+
    m_epsilon = eps;
-   m_delta   = delta;
+   m_feastol = feastol;
+   m_opttol = opttol;
 
    for(int i = 0; i < lp.nRows(); ++i)
       m_rIdx[i] = i;

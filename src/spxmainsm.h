@@ -997,7 +997,8 @@ private:
    DataArray<PostStep*>            m_hist;       ///< vector of presolve history.
    bool                            m_postsolved; ///< status of postsolving.
    Real                            m_epsilon;    ///< epsilon zero.
-   Real                            m_delta;      ///< maximum bound violation.
+   Real                            m_feastol;    ///< primal feasibility tolerance.
+   Real                            m_opttol;     ///< dual feasibility tolerance.
    DataArray<int>                  m_stat;       ///< preprocessing history.
    SPxLP::SPxSense                 m_thesense;   ///< optimization sense.
    //@}
@@ -1061,9 +1062,14 @@ private:
       return m_epsilon;
    }
    ///
-   Real deltaBnd() const
+   Real feastol() const
    {
-      return m_delta;
+      return m_feastol;
+   }
+   ///
+   Real opttol() const
+   {
+      return m_opttol;
    }
    //@}
 
@@ -1090,7 +1096,8 @@ public:
       , m_rIdx(old.m_rIdx)
       , m_postsolved(old.m_postsolved)
       , m_epsilon(old.m_epsilon)
-      , m_delta(old.m_delta)
+      , m_feastol(old.m_feastol)
+      , m_opttol(old.m_opttol)
       , m_stat(old.m_stat)
       , m_thesense(old.m_thesense)
    {
@@ -1120,7 +1127,8 @@ public:
          m_rIdx = rhs.m_rIdx;
          m_postsolved = rhs.m_postsolved;
          m_epsilon = rhs.m_epsilon;
-         m_delta = rhs.m_delta;
+         m_feastol = rhs.m_feastol;
+         m_opttol = rhs.m_opttol;
          m_stat = rhs.m_stat;
          m_thesense = rhs.m_thesense;
 
@@ -1165,8 +1173,13 @@ public:
    //------------------------------------
    //**@name LP simplification */
    //@{
-   /// simplifies LP.
-   virtual Result simplify(SPxLP& lp, Real eps, Real delta);
+   /// simplify SPxLP \p lp with identical primal and dual feasibility tolerance.
+   virtual Result simplify(SPxLP& lp, Real eps, Real delta)
+   {
+      return simplify(lp, eps, delta, delta);
+   }
+   /// simplify SPxLP \p lp with independent primal and dual feasibility tolerance.
+   virtual Result simplify(SPxLP& lp, Real eps, Real feastol, Real opttol);
 
    /// reconstructs an optimal solution for the unsimplified LP.
    virtual void unsimplify(const Vector& x, const Vector& y, const Vector& s, const Vector& r,

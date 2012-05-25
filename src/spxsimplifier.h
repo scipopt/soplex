@@ -150,8 +150,10 @@ public:
    //-------------------------------------
    /**@name Simplifying / unsimplifying */
    //@{
-   /// simplify SPxLP \p lp. 
+   /// simplify SPxLP \p lp with identical primal and dual feasibility tolerance.
    virtual Result simplify(SPxLP& lp, Real eps, Real delta) = 0;
+   /// simplify SPxLP \p lp with independent primal and dual feasibility tolerance.
+   virtual Result simplify(SPxLP& lp, Real eps, Real feastol, Real opttol) = 0;
    /// reconstructs an optimal solution for the unsimplified LP.
    virtual void unsimplify(const Vector&, const Vector&, const Vector&, const Vector&,
                            const SPxSolver::VarStatus[], const SPxSolver::VarStatus[]) {}

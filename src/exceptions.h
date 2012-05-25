@@ -118,6 +118,23 @@ namespace soplex
       //@}
    };
 
+
+   /**@brief   Exception class for incorrect usage of interface methods.
+    * @ingroup Elementary
+    */
+   class SPxInterfaceException : public SPxException
+   {
+   public:
+     //----------------------------------------
+      /**@name Construction / destruction */
+      //@{
+      /// constructor
+      /** The constructor receives an optional string as an exception message.
+       */
+      SPxInterfaceException(const std::string& m = "") : SPxException(m) {}
+      //@}
+   };
+
 } //namespace soplex
 
 #endif // _EXCEPTIONS_H_
