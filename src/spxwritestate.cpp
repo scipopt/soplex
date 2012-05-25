@@ -86,6 +86,8 @@ bool SPxSolver::writeState(
       commandline << " -p2";
    else if (!strcmp(pricer()->getName(), "Hybrid"))
       commandline << " -p3";
+   else if (!strcmp(pricer()->getName(), "Steep"))
+      commandline << " -p4";
    else if (!strcmp(pricer()->getName(), "Weight"))
       commandline << " -p5";
    if (starter() != 0)
@@ -101,6 +103,8 @@ bool SPxSolver::writeState(
       commandline << " -t0";
    else if (!strcmp(ratiotester()->getName(), "Harris"))
       commandline << " -t1";
+   else if (!strcmp(ratiotester()->getName(), "Fast"))
+      commandline << " -t2";
    else if (!strcmp(ratiotester()->getName(), "Bound Flipping"))
       commandline << " -t3";
    commandline  << " -br " << filename << ".mps " << filename << ".bas";
