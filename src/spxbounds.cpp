@@ -318,10 +318,10 @@ void SPxSolver::testBounds() const
 {
    METHOD( "SPxSolver::testBounds()" );
 
-   Real viol_max = (1 + iterCount) * delta();
-
    if (type() == ENTER)
    {
+      Real viol_max = (1 + iterCount) * entertol();
+
       for(int i = 0; i < dim(); ++i )
       {
          // Minor bound violations happen frequently, so print these
@@ -344,6 +344,8 @@ void SPxSolver::testBounds() const
    }
    else
    {
+      Real viol_max = (1 + iterCount) * leavetol();
+
       for(int i = 0; i < dim(); ++i )
       {
          if ((*theCoPvec)[i] > (*theCoUbound)[i] + viol_max) // && (*theCoUbound)[i] != (*theCoLbound)[i])

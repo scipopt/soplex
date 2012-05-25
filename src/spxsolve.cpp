@@ -36,8 +36,8 @@ namespace soplex
 /// Interval for displaying iteration information.
 long iterationInterval = 100;
 
-
-bool SPxSolver::precisionReached(Real& newDelta) const
+/**@todo check separately for ENTER and LEAVE algorithm */
+bool SPxSolver::precisionReached(Real& newpricertol) const
 {
    Real maxViolRedCost;
    Real sumViolRedCost;
@@ -51,16 +51,16 @@ bool SPxSolver::precisionReached(Real& newDelta) const
    qualConstraintViolation(maxViolConst, sumViolConst);
 
    // is the solution good enough ?
-   bool reached = maxViolRedCost < delta() && maxViolBounds < delta() && maxViolConst < delta();
+   bool reached = maxViolRedCost < opttol() && maxViolBounds < feastol() && maxViolConst < feastol();
 
    if (!reached)
    {
-      newDelta = thepricer->epsilon() / 10.0;
+      newpricertol = thepricer->epsilon() / 10.0;
 
       MSG_INFO3( spxout << "ISOLVE71 "
-                           << "Precision not reached: Pricer delta= " 
-                           << thepricer->epsilon() 
-                           << " new delta= " << newDelta
+                           << "Precision not reached: Pricer tolerance = "
+                           << thepricer->epsilon()
+                           << " new tolerance = " << newpricertol
                            << std::endl
                            << " maxViolRedCost= " << maxViolRedCost
                            << " maxViolBounds= " << maxViolBounds
@@ -87,9 +87,6 @@ SPxSolver::Status SPxSolver::solve()
    SPxId enterId;
    int   leaveNum;
    int   loopCount = 0;
-   Real  minDelta;
-   Real  maxDelta;
-   Real  newDelta;
    Real  minShift = infinity;
    int   cycleCount = 0;
    bool  priced = false;
@@ -148,8 +145,6 @@ SPxSolver::Status SPxSolver::solve()
          return status();
       }
    }
-   maxDelta = delta();
-   minDelta = delta() * 1e-2;
 
    //setType(type());
 
@@ -183,15 +178,14 @@ SPxSolver::Status SPxSolver::solve()
 
    stallNumRecovers = 0;
 
-   // save the current basis and tolerance; if we run into a singular basis, we will restore it and try
-   // with tighter tolerance
-   const Real origtol = maxDelta;
-   const SPxBasis::Desc origdesc = desc();
-   const SPxSolver::Type origtype = theType;
+   /* if we run into a singular basis, we will retry from regulardesc with tighter tolerance in the ratio test */
+   SPxSolver::Type tightenedtype = type();
    bool tightened = false;
 
    while (!stop)
    {
+      const SPxBasis::Desc regulardesc = desc();
+
       try
       {
 
@@ -203,9 +197,11 @@ SPxSolver::Status SPxSolver::solve()
          stallRefShift = shift();
          stallRefValue = value();
 
-         priced = false;
+         Real maxpricertol = leavetol();
+         Real minpricertol = 0.01 * maxpricertol;
 
-         thepricer->setEpsilon(maxDelta);
+         thepricer->setEpsilon(maxpricertol);
+         priced = false;
 
          do
          {
@@ -225,19 +221,21 @@ SPxSolver::Status SPxSolver::solve()
                      || SPxBasis::status() == SPxBasis::DUAL 
                      || SPxBasis::status() == SPxBasis::PRIMAL))
                {
+                  Real newpricertol = minpricertol;
+
                   // is the solution good enough ?
                   // max three times reduced
-                  if ((thepricer->epsilon() > minDelta) && !precisionReached(newDelta))
+                  if ((thepricer->epsilon() > minpricertol) && !precisionReached(newpricertol))
                   {  // no!
-                     // we reduce delta(). Note that if the pricer does not find a candiate
-                     // with the reduced delta, we quit, regardless of the violations.
-                     if (newDelta < minDelta)
-                        newDelta = minDelta;
+                     // we reduce the pricer tolerance. Note that if the pricer does not find a candiate
+                     // with the reduced tolerance, we quit, regardless of the violations.
+                     if (newpricertol < minpricertol)
+                        newpricertol = minpricertol;
 
-                     thepricer->setEpsilon(newDelta);
+                     thepricer->setEpsilon(newpricertol);
 
-                     MSG_INFO2( spxout << "ISOLVE75 Setting delta= " 
-                                          << thepricer->epsilon() 
+                     MSG_INFO2( spxout << "ISOLVE75 Setting pricer tolerance = "
+                                          << thepricer->epsilon()
                                           << std::endl; )
                   }
                   // solution seems good, no check whether we are precise enough
@@ -349,7 +347,8 @@ SPxSolver::Status SPxSolver::solve()
                    << ", value: " << value()
                    << ", shift: " << shift()
                    << ", epsilon: " << epsilon()
-                   << ", delta: " << delta()
+                   << ", feastol: " << feastol()
+                   << ", opttol: " << opttol()
                    << std::endl
                    << "ISOLVE56 stop: " << stop
                    << ", basis status: " << SPxBasis::status() << " (" << int(SPxBasis::status()) << ")"
@@ -363,13 +362,15 @@ SPxSolver::Status SPxSolver::solve()
                // factorize();
                unShift();
 
+               Real maxinfeas = maxInfeas();
+
                MSG_INFO3(
-                  spxout << "ISOLVE79 maxInfeas: " << maxInfeas()
+                  spxout << "ISOLVE79 maxInfeas: " << maxinfeas
                          << ", shift: " << shift()
-                         << ", delta: " << delta() << std::endl;
+                         << ", entertol: " << entertol() << std::endl;
                )
 
-               if (priced && maxInfeas() + shift() <= delta())
+               if (priced && maxinfeas + shift() <= entertol())
                {
                   setBasisStatus(SPxBasis::OPTIMAL);
                   m_status = OPTIMAL;
@@ -395,8 +396,10 @@ SPxSolver::Status SPxSolver::solve()
          stallRefShift = shift();
          stallRefValue = value();
 
-         thepricer->setEpsilon(maxDelta);
+         Real maxpricertol = leavetol();
+         Real minpricertol = 0.01 * maxpricertol;
 
+         thepricer->setEpsilon(maxpricertol);
          priced = false;
 
          do
@@ -436,19 +439,21 @@ SPxSolver::Status SPxSolver::solve()
                      || SPxBasis::status() == SPxBasis::DUAL 
                      || SPxBasis::status() == SPxBasis::PRIMAL))
                {
+                  Real newpricertol = minpricertol;
+
                   // is the solution good enough ?
                   // max three times reduced
-                  if ((thepricer->epsilon() > minDelta) && !precisionReached(newDelta))
+                  if ((thepricer->epsilon() > minpricertol) && !precisionReached(newpricertol))
                   {  // no
-                     // we reduce delta(). Note that if the pricer does not find a candiate
-                     // with the reduced delta, we quit, regardless of the violations.
-                     if (newDelta < minDelta)
-                        newDelta = minDelta;
+                     // we reduce the pricer tolerance. Note that if the pricer does not find a candiate
+                     // with the reduced pricer tolerance, we quit, regardless of the violations.
+                     if (newpricertol < minpricertol)
+                        newpricertol = minpricertol;
 
-                     thepricer->setEpsilon(newDelta);
+                     thepricer->setEpsilon(newpricertol);
 
-                     MSG_INFO2( spxout << "ISOLVE81 Setting delta= " 
-                                          << thepricer->epsilon() 
+                     MSG_INFO2( spxout << "ISOLVE81 Setting pricer tolerance = "
+                                          << thepricer->epsilon()
                                           << std::endl; );
                   }
                   // solution seems good, no check whether we are precise enough
@@ -559,7 +564,8 @@ SPxSolver::Status SPxSolver::solve()
                    << ", value: " << value()
                    << ", shift: " << shift()
                    << ", epsilon: " << epsilon()
-                   << ", delta: " << delta()
+                   << ", feastol: " << feastol()
+                   << ", opttol: " << opttol()
                    << std::endl
                    << "ISOLVE57 stop: " << stop
                    << ", basis status: " << SPxBasis::status() << " (" << int(SPxBasis::status()) << ")"
@@ -584,7 +590,7 @@ SPxSolver::Status SPxSolver::solve()
                MSG_INFO3(
                   spxout << "ISOLVE86 maxInfeas: " << maxInfeas()
                          << ", shift: " << shift()
-                         << ", delta: " << delta()
+                         << ", leavetol: " << leavetol()
                          << ", cycle count: " << cycleCount << std::endl;
                )
             }
@@ -595,10 +601,12 @@ SPxSolver::Status SPxSolver::solve()
                // factorize();
                unShift();
 
+               Real maxinfeas = maxInfeas();
+
                MSG_INFO3(
-                  spxout << "ISOLVE87 maxInfeas: " << maxInfeas()
+                  spxout << "ISOLVE87 maxInfeas: " << maxinfeas
                          << ", shift: " << shift()
-                         << ", delta: " << delta() << std::endl;
+                         << ", leavetol: " << leavetol() << std::endl;
                )
 
                // We stop if we are indeed optimal, or if we have already been
@@ -609,7 +617,7 @@ SPxSolver::Status SPxSolver::solve()
                   m_status = ABORT_CYCLING;
                   throw SPxStatusException("XSOLVE14 Abort solving due to looping");
                }
-               else if (priced && maxInfeas() + shift() <= delta())
+               else if (priced && maxinfeas + shift() <= leavetol())
                {
                   setBasisStatus(SPxBasis::OPTIMAL);
                   m_status = OPTIMAL;
@@ -632,22 +640,24 @@ SPxSolver::Status SPxSolver::solve()
          // tolerance (only once)
          if (m_status == SINGULAR && !tightened)
          {
-            Real newtol = 0.001*origtol;
+            tightenedtype = type();
 
-            MSG_INFO2( spxout << "ISOLVE26 basis singular: reloading basis and solving with tighter tolerance " << newtol << std::endl; )
+            if( tightenedtype == ENTER )
+            {
+               m_entertol = 0.01 * m_entertol;
 
-            // tighten tolerances (pricer tolerance automatically set during solve loop)
-            setDelta(newtol);
-            maxDelta = newtol;
-            minDelta = newtol * 1e-2;
+               MSG_INFO2( spxout << "ISOLVE26e basis singular: reloading basis and solving with tighter ratio test tolerance " << m_entertol << std::endl; )
+            }
+            else
+            {
+               m_leavetol = 0.01 * m_leavetol;
 
-            // return to original algorithm type
-            if (type() != origtype)
-               setType(origtype);
+               MSG_INFO2( spxout << "ISOLVE26l basis singular: reloading basis and solving with tighter ratio test tolerance " << m_leavetol << std::endl; )
+            }
 
             // load original basis
             int niters = iterations();
-            loadBasis(origdesc);
+            loadBasis(regulardesc);
 
             // remember iteration count
             iterCount = niters;
@@ -656,13 +666,18 @@ SPxSolver::Status SPxSolver::solve()
             try
             {
                init();
+               theratiotester->setType(type());
             }
             catch( SPxException Ex )
             {
                MSG_INFO2( spxout << "ISOLVE27 reloaded basis singular, resetting original tolerances" << std::endl; )
 
-               thepricer->setEpsilon(origtol);
-               setDelta(origtol);
+               if( tightenedtype == ENTER )
+                  m_entertol = 100.0 * m_entertol;
+               else
+                  m_leavetol = 100.0 * m_leavetol;
+
+               theratiotester->setType(type());
 
                throw Ex;
             }
@@ -678,28 +693,34 @@ SPxSolver::Status SPxSolver::solve()
             stop = false;
             tightened = true;
          }
-         else
+         // reset tolerance to its original value and pass on the exception
+         else if (tightened)
          {
-            // reset tolerance to its original value
-            if (tightened)
-            {
-               thepricer->setEpsilon(origtol);
-               setDelta(origtol);
-            }
+            if( tightenedtype == ENTER )
+               m_entertol = 100.0 * m_entertol;
+            else
+               m_leavetol = 100.0 * m_leavetol;
+
+            theratiotester->setType(type());
 
             throw E;
          }
+         // pass on the exception
+         else
+            throw E;
       }
    }
 
    // reset tolerance to its original value
    if (tightened)
    {
-      thepricer->setEpsilon(origtol);
-      setDelta(origtol);
-   }
+      if( tightenedtype == ENTER )
+         m_entertol = 100.0 * m_entertol;
+      else
+         m_leavetol = 100.0 * m_leavetol;
 
-   assert(delta() == origtol);
+      theratiotester->setType(type());
+   }
 
    theTime.stop();
    theCumulativeTime += time();
@@ -738,8 +759,8 @@ SPxSolver::Status SPxSolver::solve()
          for( c = 0; c < rowvec.size(); ++c )
             val += rowvec.value( c ) * sol[rowvec.index( c )];
 
-         if( LT( val, lhs( row ), delta() ) ||
-             GT( val, rhs( row ), delta() ) )
+         if( LT( val, lhs( row ), feastol() ) ||
+             GT( val, rhs( row ), feastol() ) )
          {
             // Minor rhs violations happen frequently, so print these
             // warnings only with verbose level INFO2 and higher.
@@ -768,8 +789,8 @@ SPxSolver::Status SPxSolver::solve()
       }
       for(int col = 0; col < nCols(); ++col )
       {
-         if( LT( sol[col], lower( col ), delta() ) ||
-             GT( sol[col], upper( col ), delta() ) )
+         if( LT( sol[col], lower( col ), feastol() ) ||
+             GT( sol[col], upper( col ), feastol() ) )
          {
             // Minor bound violations happen frequently, so print these
             // warnings only with verbose level INFO2 and higher.
@@ -811,7 +832,7 @@ void SPxSolver::testVecs()
    tmp = *theCoPvec;
    multWithBase(tmp);
    tmp -= *theCoPrhs;
-   if (tmp.length() > delta())
+   if (tmp.length() > leavetol())
    {
       MSG_INFO3( spxout << "ISOLVE93 " << iteration() << ":\tcoP error = \t"
                         << tmp.length() << std::endl; )
@@ -831,7 +852,7 @@ void SPxSolver::testVecs()
    tmp = *theFvec;
    multBaseWith(tmp);
    tmp -= *theFrhs;
-   if (tmp.length() > delta())
+   if (tmp.length() > entertol())
    {
       MSG_INFO3( spxout << "ISOLVE96 " << iteration() << ":\t  F error = \t"
                            << tmp.length() << std::endl; )
@@ -842,35 +863,33 @@ void SPxSolver::testVecs()
       MSG_INFO3( spxout << "ISOLVE97\t\t" << tmp.length() << std::endl; )
    }
 
-#ifdef ENABLE_ADDITIONAL_CHECKS
    if (type() == ENTER)
    {
       for (int i = 0; i < dim(); ++i)
       {
-         if (theCoTest[i] < -delta() && isCoBasic(i))
+         if (theCoTest[i] < -leavetol() && isCoBasic(i))
          {
             /// @todo Error message "this shalt not be": shalt this be an assert (also below)?
             MSG_ERROR( spxout << "ESOLVE98 testVecs: theCoTest: this shalt not be!"
                               << std::endl
                               << "  i=" << i 
                               << ", theCoTest[i]=" << theCoTest[i]
-                              << ", delta()=" << delta() << std::endl; )
+                              << ", leavetol()=" << leavetol() << std::endl; )
          }
       }
 
       for (int i = 0; i < coDim(); ++i)
       {
-         if (theTest[i] < -delta() && isBasic(i))
+         if (theTest[i] < -leavetol() && isBasic(i))
          {
             MSG_ERROR( spxout << "ESOLVE99 testVecs: theTest: this shalt not be!"
                               << std::endl
                               << "  i=" << i 
                               << ", theTest[i]=" << theTest[i]
-                              << ", delta()=" << delta() << std::endl; )
+                              << ", leavetol()=" << leavetol() << std::endl; )
          }
       }
    }
-#endif // ENABLE_ADDITIONAL_CHECKS
 }
 
 bool SPxSolver::terminate()
@@ -903,10 +922,10 @@ bool SPxSolver::terminate()
 #ifdef ENABLE_ADDITIONAL_CHECKS
       cr -= *theCoPrhs;
       fr -= *theFrhs;
-      if (cr.length() > delta())
+      if (cr.length() > leavetol())
          MSG_WARNING( spxout << "WSOLVE50 unexpected change of coPrhs " 
                              << cr.length() << std::endl; )
-      if (fr.length() > delta())
+      if (fr.length() > entertol())
          MSG_WARNING( spxout << "WSOLVE51 unexpected change of   Frhs " 
                              << fr.length() << std::endl; )
 #endif
@@ -960,7 +979,7 @@ bool SPxSolver::terminate()
       // It might be even possible to use this termination value in case of
       // bound violations (shifting) but in this case it is quite difficult
       // to determine if we already reached the limit.
-      if( shift() < epsilon() && maxInfeas() + shift() <= delta() )
+      if( shift() < epsilon() && maxInfeas() + shift() <= opttol() )
       {
          // SPxSense::MINIMIZE == -1, so we have sign = 1 on minimizing
          if( spxSense() * value() <= spxSense() * objLimit ) 

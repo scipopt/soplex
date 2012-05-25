@@ -215,7 +215,8 @@ private:
    Real           objLimit;    ///< objective value limit.
    Status         m_status;    ///< status of algorithm.
 
-   Real           theDelta;    ///< maximum allowed bound violation.
+   Real           m_entertol;  ///< feasibility tolerance maintained during entering algorithm
+   Real           m_leavetol;  ///< feasibility tolerance maintained during leaving algorithm
    Real           theShift;    ///< sum of all shifts applied to any bound.
    Real           lastShift;   ///< for forcing feasibility.
    int            m_maxCycle;  ///< maximum steps before cycling is detected.
@@ -308,7 +309,7 @@ protected:
    /**@name Precision */
    //@{
    /// is the solution precise enough, or should we increase delta() ? 
-   virtual bool precisionReached(Real& newDelta) const;
+   virtual bool precisionReached(Real& newpricertol) const;
    //@}
 
 public:
@@ -596,15 +597,49 @@ public:
    {
       return primVec.delta().getEpsilon();
    }
-   /// allowed bound violation for optimal Solution.
-   /** When all vectors do not violate their bounds by more than \f$\delta\f$,
-    *  the basis is considered optimal.
-    */
+   /// feasibility tolerance maintained by ratio test during ENTER algorithm.
+   Real entertol() const
+   {
+      assert(m_entertol > 0.0);
+
+      return m_entertol;
+   }
+   /// feasibility tolerance maintained by ratio test during LEAVE algorithm.
+   Real leavetol() const
+   {
+      assert(m_leavetol > 0.0);
+
+      return m_leavetol;
+   }
+   /// allowed primal feasibility tolerance.
+   Real feastol() const
+   {
+      assert(m_entertol > 0.0);
+      assert(m_leavetol > 0.0);
+
+      return theRep == COLUMN ? m_entertol : m_leavetol;
+   }
+   /// allowed optimality, i.e., dual feasibility tolerance.
+   Real opttol() const
+   {
+      assert(m_entertol > 0.0);
+      assert(m_leavetol > 0.0);
+
+      return theRep == COLUMN ? m_leavetol : m_entertol;
+   }
+   /// guaranteed primal and dual bound violation for optimal solution, returning the maximum of feastol() and opttol(), i.e., the less tight tolerance.
    Real delta() const
    {
-      return theDelta;
+      assert(m_entertol > 0.0);
+      assert(m_leavetol > 0.0);
+
+      return m_entertol > m_leavetol ? m_entertol : m_leavetol;
    }
-   /// set parameter \p delta.
+   /// set parameter \p feastol.
+   void setFeastol(Real d);
+   /// set parameter \p opttol.
+   void setOpttol(Real d);
+   /// set parameter \p delta, i.e., set \p feastol and \p opttol to same value.
    void setDelta(Real d);
 
    /** SPxSolver considers a Simplex step as degenerate if the
@@ -1329,11 +1364,11 @@ private:
    //@{
    ///
    void perturbMin(
-      const UpdateVector& vec, Vector& low, Vector& up, Real eps,
+      const UpdateVector& vec, Vector& low, Vector& up, Real eps, Real delta,
       int start = 0, int incr = 1);
    ///
    void perturbMax(
-      const UpdateVector& vec, Vector& low, Vector& up, Real eps,
+      const UpdateVector& vec, Vector& low, Vector& up, Real eps, Real delta,
       int start = 0, int incr = 1);
    ///
    Real perturbMin(const UpdateVector& uvec,

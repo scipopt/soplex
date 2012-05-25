@@ -40,7 +40,6 @@
 namespace soplex
 {
 
-//@ #define     MINSTAB thesolver->delta()
 #define MINSTAB         1e-5
 #define LOWSTAB         1e-10
 #define TRIES           2
@@ -1298,14 +1297,7 @@ void SPxFastRT::setType(SPxSolver::Type type)
    m_type = type;
 
    minStab = MINSTAB;
-   delta = thesolver->delta();
-
-   /*
-       resetTols();
-    */
-
-   if (delta > 1e-4)
-      delta = 1e-4;
+   delta = (type == SPxSolver::ENTER) ? thesolver->entertol() : thesolver->leavetol();
 
    delta0 = delta;
 }

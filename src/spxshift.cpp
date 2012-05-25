@@ -27,12 +27,16 @@ namespace soplex
 void SPxSolver::shiftFvec()
 {
    METHOD( "SPxSolver::shiftFvec()" );
-   // Random   mult(delta(), 100*delta());
-   Random mult(10*delta(), 100*delta());
-   Real allow = delta() - epsilon();
+
+   /* the allowed tolerance is (rep() == COLUMN) ? feastol() : opttol() because theFvec is the primal vector in COLUMN
+    * and the dual vector in ROW representation; this is equivalent to entertol()
+    */
+   Random mult(10.0 * entertol(), 100.0 * entertol());
+   Real allow = entertol() - epsilon();
 
    assert(type() == ENTER);
    assert(allow > 0);
+
    for (int i = dim() - 1; i >= 0; --i)
    {
       if (theUBbound[i] + allow < (*theFvec)[i])
@@ -73,12 +77,17 @@ void SPxSolver::shiftFvec()
 void SPxSolver::shiftPvec()
 {
    METHOD( "SPxSolver::shiftPvec()" );
+
+   /* the allowed tolerance is (rep() == ROW) ? feastol() : opttol() because thePvec is the primal vector in ROW and the
+    * dual vector in COLUMN representation; this is equivalent to leavetol()
+    */
+   Random mult(10.0 * leavetol(), 100.0 * leavetol());
+   Real allow = leavetol() - epsilon();
    int i, tmp;
-   // Random   mult(delta(), 100*delta());
-   Random mult(10*delta(), 100*delta());
-   Real allow = delta() - epsilon();
 
    assert(type() == LEAVE);
+   assert(allow > 0.0);
+
    for (i = dim() - 1; i >= 0; --i)
    {
       tmp = !isBasic(coId(i));
@@ -140,6 +149,7 @@ void SPxSolver::perturbMin(
    Vector& p_low,
    Vector& p_up,
    Real eps,
+   Real delta,
    int start,
    int incr)
 {
@@ -150,13 +160,12 @@ void SPxSolver::perturbMin(
    const Real* vec = uvec.get_const_ptr();
    const Real* upd = uvec.delta().values();
    const IdxSet& idx = uvec.delta().indices();
-   // Random           mult(1*delta(), 100*delta());
-   Random mult(10*delta(), 100*delta());
+   Random mult(10.0 * delta, 100.0 * delta);
    Real x, l, u;
    int i, j;
 
 #ifdef  FULL_SHIFT
-   eps = delta();
+   eps = delta;
 
    for (i = uvec.dim() - start - 1; i >= 0; i -= incr)
    {
@@ -208,6 +217,7 @@ void SPxSolver::perturbMax(
    Vector& p_low,
    Vector& p_up,
    Real eps,
+   Real delta,
    int start,
    int incr) 
 {
@@ -218,12 +228,12 @@ void SPxSolver::perturbMax(
    const Real* vec = uvec.get_const_ptr();
    const Real* upd = uvec.delta().values();
    const IdxSet& idx = uvec.delta().indices();
-   Random mult(10*delta(), 100*delta());
+   Random mult(10.0 * delta, 100.0 * delta);
    Real x, l, u;
    int i, j;
 
 #ifdef  FULL_SHIFT
-   eps = delta();
+   eps = delta;
    for (i = uvec.dim() - start - 1; i >= 0; i -= incr)
    {
       u = p_up[i];
@@ -272,7 +282,7 @@ void SPxSolver::perturbMinEnter(void)
    METHOD( "SPxSolver::perturbMinEnter()" );
    MSG_DEBUG( spxout << "DSHIFT03 iteration= " << iteration() << ": perturbing " << shift(); )
    fVec().delta().setup();
-   perturbMin(fVec(), lbBound(), ubBound(), epsilon());
+   perturbMin(fVec(), lbBound(), ubBound(), epsilon(), entertol());
    MSG_DEBUG( spxout << "\t->" << shift() << std::endl; )
 }
 
@@ -282,7 +292,7 @@ void SPxSolver::perturbMaxEnter(void)
    METHOD( "SPxSolver::perturbMaxEnter()" );
    MSG_DEBUG( spxout << "DSHIFT04 iteration= " << iteration() << ": perturbing " << shift(); )
    fVec().delta().setup();
-   perturbMax(fVec(), lbBound(), ubBound(), epsilon());
+   perturbMax(fVec(), lbBound(), ubBound(), epsilon(), entertol());
    MSG_DEBUG( spxout << "\t->" << shift() << std::endl; )
 }
 
@@ -430,9 +440,9 @@ void SPxSolver::perturbMinLeave(void)
    MSG_DEBUG( spxout << "DSHIFT05 iteration= " << iteration() << ": perturbing " << shift(); )
    pVec().delta().setup();
    coPvec().delta().setup();
-   theShift += perturbMin(pVec(), lpBound(), upBound(), epsilon(), delta(),
+   theShift += perturbMin(pVec(), lpBound(), upBound(), epsilon(), leavetol(),
       desc().status(), 0, 1);
-   theShift += perturbMin(coPvec(), lcBound(), ucBound(), epsilon(), delta(),
+   theShift += perturbMin(coPvec(), lcBound(), ucBound(), epsilon(), leavetol(),
       desc().coStatus(), 0, 1);
    MSG_DEBUG( spxout << "\t->" << shift() << std::endl; )
 }
@@ -444,9 +454,9 @@ void SPxSolver::perturbMaxLeave(void)
    MSG_DEBUG( spxout << "DSHIFT06 iteration= " << iteration() << ": perturbing " << shift(); )
    pVec().delta().setup();
    coPvec().delta().setup();
-   theShift += perturbMax(pVec(), lpBound(), upBound(), epsilon(), delta(),
+   theShift += perturbMax(pVec(), lpBound(), upBound(), epsilon(), leavetol(),
       desc().status(), 0, 1);
-   theShift += perturbMax(coPvec(), lcBound(), ucBound(), epsilon(), delta(),
+   theShift += perturbMax(coPvec(), lcBound(), ucBound(), epsilon(), leavetol(),
       desc().coStatus(), 0, 1);
    MSG_DEBUG( spxout << "\t->" << shift() << std::endl; )
 }
@@ -461,12 +471,13 @@ void SPxSolver::unShift(void)
    {
       int i;
       Real t_up, t_low;
-      Real eps = delta();
       const SPxBasis::Desc& ds = desc();
 
       theShift = 0;
       if (type() == ENTER)
       {
+         Real eps = entertol();
+
          if (rep() == COLUMN)
          {
             for (i = dim(); i-- > 0;)
@@ -590,6 +601,9 @@ void SPxSolver::unShift(void)
       else
       {
          assert(type() == LEAVE);
+
+         Real eps = leavetol();
+
          if (rep() == COLUMN)
          {
             for (i = nRows(); i-- > 0;)

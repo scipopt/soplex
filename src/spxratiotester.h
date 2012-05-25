@@ -94,7 +94,7 @@ public:
        \ref SPxSolver::fVec() "fVec()" fullfills the basic bounds 
        \ref SPxSolver::lbBound() "lbBound()" and
        \ref SPxSolver::ubBound() "ubBound()" within 
-       \ref SPxSolver::delta() "delta()". 
+       \ref SPxSolver::entertol() "entertol()".
        fVec().delta() is the vector by
        which fVec() will be updated in this simplex step. Its nonzero
        indices are stored in sorted order in fVec().idx().
@@ -102,7 +102,7 @@ public:
        If \p val > 0, \p val is the maximum allowed update value for fVec(),
        otherwise the minimum. Method #selectLeave() must chose \p val of the
        same sign as passed, such that updating fVec() by \p val yields a
-       new vector that satisfies all basic bounds (within delta). The
+       new vector that satisfies all basic bounds (within entertol). The
        returned index, must be the index of an element of fVec(), that
        reaches one of its bounds with this update.
    */
@@ -116,12 +116,12 @@ public:
        \ref SPxSolver::pVec() "pVec()" fullfills the bounds 
        \ref SPxSolver::lbBound() "lbBound()" and
        \ref SPxSolver::ubBound() "ubBound()" within 
-       \ref SPxSolver::delta() "delta()". 
+       \ref SPxSolver::leavetol() "leavetol()".
        Similarly, 
        \ref SPxSolver::coPvec() "coPvec()" fulfills the bounds
        \ref SPxSolver::lbBound() "lbBound()" and
        \ref SPxSolver::ubBound() "ubBound()" within
-       \ref SPxSolver::delta() "delta()". 
+       \ref SPxSolver::leavetol() "leavetol()".
        pVec().delta() and coPvec().delta() are
        the vectors by which pVec() and coPvec() will be updated in this
        simplex step. Their nonzero indices are stored in sorted order in
@@ -131,7 +131,7 @@ public:
        and coPvec(), otherwise the minimum. Method #selectEnter() must
        chose \p val of the same sign as passed, such that updating pVec()
        and coPvec() by \p val yields a new vector that satisfies all basic
-       bounds (within delta). The returned Id must be the Id of an
+       bounds (within leavetol). The returned Id must be the Id of an
        element of pVec() or coPvec(), that reaches one of its bounds
        with this update.
     */

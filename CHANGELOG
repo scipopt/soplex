@@ -9,7 +9,7 @@ code quality & new features:
 - current basis matrix can be written to a file in MatrixMarket format using SPxBasis::printMatrixMTX
 - exact initialization of steepest edge weights possible by calling setupWeights of SPxSteepPR
 - option -bw writes the basis of the original problem to a file; works now with simplifier as well
-- allowed primal and dual feasibility tolerance to be set independently in simplifier
+- allowed primal and dual feasibility tolerance to be set independently in simplifier and simplex routines
 
 fixed bugs:
 - variables that do not appear in the objective function or any constraint are not printed anymore in the BOUNDS section
@@ -30,6 +30,8 @@ interface:
 - verb levels v4 and higher display current pricing mode (sparse or conventional)
 - additional simplify() method with independent primal and dual feasibility tolerance as parameters
 - new exception SPxInterfaceException to be thrown if inconsistent parameters are passed to interface methods
+- new methods feastol(), opttol(), setFeastol(), setOpttol() in classes SoPlex and SPxSolver to get/set primal and dual
+  feasibility tolerance; delta() and setDelta() still exist and work as before
 
 performance:
 - sparse pricing for leaving simplex is activated depending on ratio of basis dimension and number of infeasibilities

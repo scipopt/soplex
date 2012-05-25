@@ -199,6 +199,9 @@ void SPxSolver::initRep(Representation p_rep)
 {
    METHOD( "SPxSolver::initRep()" );
 
+   Real tmpfeastol = feastol();
+   Real tmpopttol = opttol();
+
    if (p_rep == COLUMN)
    {
       thevectors   = colSet();
@@ -237,9 +240,13 @@ void SPxSolver::initRep(Representation p_rep)
    unInit();
    reDim();
 
+   setFeastol(tmpfeastol);
+   setOpttol(tmpopttol);
+
    SPxBasis::setRep();
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
       SPxBasis::loadDesc(desc());
+
    if (thepricer && thepricer->solver() == this)
       thepricer->setRep(p_rep);
 }
@@ -370,15 +377,18 @@ void SPxSolver::init()
    if (type() == ENTER)
    {
       shiftFvec();
+      lastShift = theShift + entertol();
+
       computeCoTest();
       computeTest();
    }
    else
    {
       shiftPvec();
+      lastShift = theShift + leavetol();
+
       computeFtest();
    }
-   lastShift = theShift + delta();
 
    if (!initialized)
    {
@@ -516,27 +526,27 @@ void SPxSolver::factorize()
          ftmp -= fVec();
          ptmp -= pVec();
          ctmp -= coPvec();
-         if (ftmp.length() > delta())
+         if (ftmp.length() > entertol())
          {
             MSG_DEBUG( spxout << "DSOLVE21 fVec:   " << ftmp.length() << std::endl; )
             ftmp = fVec();
             multBaseWith(ftmp);
             ftmp -= fRhs();
-            if (ftmp.length() > delta())
+            if (ftmp.length() > entertol())
                MSG_ERROR( spxout << "ESOLVE29 " << iteration() << ": fVec error = " 
-                                 << ftmp.length() << " exceeding Delta = " << delta() << std::endl; )
+                                 << ftmp.length() << " exceeding entertol = " << entertol() << std::endl; )
          }
-         if (ctmp.length() > delta())
+         if (ctmp.length() > leavetol())
          {
             MSG_DEBUG( spxout << "DSOLVE23 coPvec: " << ctmp.length() << std::endl; )
             ctmp = coPvec();
             multWithBase(ctmp);
             ctmp -= coPrhs();
-            if (ctmp.length() > delta())
+            if (ctmp.length() > leavetol())
                MSG_ERROR( spxout << "ESOLVE30 " << iteration() << ": coPvec error = " 
-                                 << ctmp.length() << " exceeding Delta = " << delta() << std::endl; )
+                                 << ctmp.length() << " exceeding leavetol = " << leavetol() << std::endl; )
          }
-         if (ptmp.length() > delta())
+         if (ptmp.length() > leavetol())
          {
             MSG_DEBUG( spxout << "DSOLVE24 pVec:   " << ptmp.length() << std::endl; )
          }
@@ -567,15 +577,15 @@ void SPxSolver::factorize()
    {
       m_status = SINGULAR;
       std::stringstream s;
-      s << "XSOLVE21 Basis is singular (numerical troubles, delta = " << delta() << ")";
+      s << "XSOLVE21 Basis is singular (numerical troubles, feastol = " << feastol() << ", opttol = " << opttol() << ")";
       throw SPxStatusException(s.str());
    }
 
-#ifndef NDEBUG
+#ifdef ENABLE_ADDITIONAL_CHECKS
    /* moved this test after the computation of fTest and coTest below, since these vectors might not be set up at top, e.g. for an initial basis */
    if (SPxBasis::status() > SPxBasis::SINGULAR)
       testVecs();
-#endif  // NDEBUG
+#endif
 }
 
 /* We compute how much the current solution violates (primal or dual) feasibility. In the
@@ -757,10 +767,41 @@ Real SPxSolver::value() const
    return x;
 }
 
+void SPxSolver::setFeastol(Real d)
+{
+   METHOD( "SPxSolver::setFeastol()" );
+
+   if( d < 0.0 )
+      throw SPxInterfaceException("XSOLVE30 Cannot set negative feastol.");
+
+   if( theRep == COLUMN )
+      m_entertol = d;
+   else
+      m_leavetol = d;
+}
+
+void SPxSolver::setOpttol(Real d)
+{
+   METHOD( "SPxSolver::setOpttol()" );
+
+   if( d < 0.0 )
+      throw SPxInterfaceException("XSOLVE31 Cannot set negative opttol.");
+
+   if( theRep == COLUMN )
+      m_leavetol = d;
+   else
+      m_entertol = d;
+}
+
 void SPxSolver::setDelta(Real d)
 {
    METHOD( "SPxSolver::setDelta()" );
-   theDelta = d;
+
+   if( d < 0.0 )
+      throw SPxInterfaceException("XSOLVE32 Cannot set negative delta.");
+
+   m_entertol = d;
+   m_leavetol = d;
 }
 
 SPxSolver::SPxSolver(
@@ -773,7 +814,6 @@ SPxSolver::SPxSolver(
    , maxTime (infinity)
    , objLimit(infinity)
    , m_status(UNKNOWN)
-   , theDelta(DEFAULT_BND_VIOL)
    , theShift (0)
    , m_maxCycle(100)
    , m_numCycle(0)
@@ -797,6 +837,8 @@ SPxSolver::SPxSolver(
    , remainingRounds(0)
 {
    METHOD( "SPxSolver::SPxSolver()" );
+
+   setDelta(DEFAULT_BND_VIOL);
 
    theLP = this;
    initRep(p_rep);
@@ -846,7 +888,8 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       maxTime = base.maxTime;
       objLimit = base.objLimit;
       m_status = base.m_status;
-      theDelta = base.theDelta;
+      m_entertol = base.m_entertol;
+      m_leavetol = base.m_leavetol;
       theShift = base.theShift;
       lastShift = base.lastShift;
       m_maxCycle = base.m_maxCycle;
@@ -992,7 +1035,8 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , maxTime(base.maxTime)
    , objLimit(base.objLimit)
    , m_status(base.m_status)
-   , theDelta(base.theDelta)
+   , m_entertol(base.m_entertol)
+   , m_leavetol(base.m_leavetol)
    , theShift(base.theShift)
    , lastShift(base.lastShift)
    , m_maxCycle(base.m_maxCycle)

@@ -570,7 +570,7 @@ bool SPxSolver::leave(int leaveIdx)
       tmp.clear();
       coSolve(tmp, unitVecs[leaveIdx]);
       tmp -= theCoPvec->delta();
-      if (tmp.length() > delta()) {
+      if (tmp.length() > leavetol()) {
          // This happens very frequently and does usually not hurt, so print
          // these warnings only with verbose level INFO2 and higher.
          MSG_INFO2( spxout << "WLEAVE60 iteration=" << basis().iteration() 
@@ -753,7 +753,7 @@ bool SPxSolver::leave(int leaveIdx)
                SSVector tmp(dim(), epsilon());
                SPxBasis::solve(tmp, newVector);
                tmp -= fVec().delta();
-               if (tmp.length() > delta()) {
+               if (tmp.length() > entertol()) {
                   // This happens very frequently and does usually not hurt, so print
                   // these warnings only with verbose level INFO2 and higher.
                   MSG_INFO2( spxout << "WLEAVE62\t(" << tmp.length() << ")\n"; )
@@ -910,7 +910,7 @@ bool SPxSolver::leave(int leaveIdx)
             theCoTest[leaveIdx] *= -1;
          }
 
-         if ((leaveMax > delta() && enterVal <= delta()) || (leaveMax < -delta() && enterVal >= -delta()))
+         if ((leaveMax > entertol() && enterVal <= entertol()) || (leaveMax < -entertol() && enterVal >= -entertol()))
          {
             if ((theUBbound[leaveIdx] < infinity || theLBbound[leaveIdx] > -infinity)
                && leaveStat != SPxBasis::Desc::P_FREE
@@ -925,7 +925,7 @@ bool SPxSolver::leave(int leaveIdx)
             DVector tmp = fVec();
             multBaseWith(tmp);
             tmp -= fRhs();
-            if (tmp.length() > delta())
+            if (tmp.length() > entertol())
             {
                // This happens very frequently and does usually not hurt, so print
                // these warnings only with verbose level INFO2 and higher.

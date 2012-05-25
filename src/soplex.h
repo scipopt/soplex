@@ -204,15 +204,32 @@ public:
    {
       return m_solver.terminationValue();
    }
-   /// allowed bound violation for optimal solution.
-   /** When no vector violates its bound by more than \f$\delta\f$,
-    *  the basis is considered optimal.
-    */
+   /// allowed primal feasibility tolerance.
+   virtual Real feastol() const
+   {
+      return m_solver.feastol();
+   }
+   /// allowed optimality, i.e., dual feasibility tolerance.
+   virtual Real opttol() const
+   {
+      return m_solver.opttol();
+   }
+   /// guaranteed primal and dual bound violation for optimal solution, returning the maximum of feastol() and opttol(), i.e., the less tight tolerance.
    virtual Real delta() const
    {
       return m_solver.delta();
    }
-   /// set parameter \p delta.
+   /// set parameter \p feastol.
+   virtual void setFeastol(Real d)
+   {
+      m_solver.setFeastol(d);
+   }
+   /// set parameter \p opttol.
+   virtual void setOpttol(Real d)
+   {
+      m_solver.setOpttol(d);
+   }
+   /// set parameter \p delta, i.e., set \p feastol and \p opttol to same value.
    virtual void setDelta(Real d)
    {
       m_solver.setDelta(d);

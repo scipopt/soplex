@@ -141,10 +141,10 @@ int SPxHarrisRT::minDelta(
 /**
     Here comes our implementation of the Harris procedure improved by shifting
     bounds. The basic idea is to used the tolerated infeasibility within
-    delta for searching numerically stable pivots.
+    solver()->entertol() for searching numerically stable pivots.
  
     The algorithms operates in two phases. In a first phase, the maximum \p val
-    is determined, when in feasibility within delta is allowed. In the second
+    is determined, when infeasibility within solver()->entertol() is allowed. In the second
     phase, between all variables with values < \p val the one is selected which
     gives the best step forward in the simplex iteration. However, this may not
     allways yield an improvement. In that case, we shift the variable toward
@@ -162,7 +162,7 @@ int SPxHarrisRT::selectLeave(Real& val, SPxId enterId)
    Real maxabs = 1;
 
    Real epsilon  = solver()->epsilon();
-   Real delta    = solver()->delta();
+   Real delta    = solver()->entertol();
    Real degeneps = degenerateEps();
 
    SSVector& upd = solver()->fVec().delta();
@@ -342,7 +342,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int)
 
    Real minStability = 0.0001;
    Real epsilon      = solver()->epsilon();
-   Real delta        = solver()->delta();
+   Real delta        = solver()->leavetol();
    Real degeneps     = degenerateEps();
 
    Vector& pvec = solver()->pVec();

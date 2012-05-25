@@ -258,7 +258,7 @@ SPxSolver::Status SoPlex::solve()
    // should the LP be simplified ?
    if (m_simplifier != 0)
    {
-      switch(m_simplifier->simplify(work, m_solver.epsilon(), m_solver.delta()))
+      switch(m_simplifier->simplify(work, m_solver.epsilon(), m_solver.feastol(), m_solver.opttol()))
       {
       case SPxSimplifier::UNBOUNDED :
          m_solver.setBasisStatus(SPxBasis::UNBOUNDED);

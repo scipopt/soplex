@@ -691,7 +691,7 @@ bool SPxSteepPR::isConsistent() const
       {
          thesolver->basis().coSolve(tmp, thesolver->unitVector(i));
          x = coPenalty[i] - tmp.length2();
-         if (x > thesolver->delta() || -x > thesolver->delta())
+         if (x > thesolver->leavetol() || -x > thesolver->leavetol())
          {
             MSG_ERROR( spxout << "ESTEEP03 x[" << i << "] = " << x << std::endl; )
          }

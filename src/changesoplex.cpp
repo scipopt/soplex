@@ -82,9 +82,13 @@ void SPxSolver::localAddRows(int start)
          SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
          for (i = start; i < SPxLP::nRows(); ++i)
          {
-            if (theUBbound[i] + delta() < (*theFvec)[i])
+            /* we need to compare with tolerance (rep() == COLUMN) ? feastol() : opttol() because theFvec is the primal
+             * vector in COLUMN and the dual vector in ROW representation; this is equivalent to entertol(); this also
+             * fits because we are within the "type() == ENTER" case
+             */
+            if (theUBbound[i] + entertol() < (*theFvec)[i])
                shiftUBbound(i, (*theFvec)[i]);
-            else if ((*theFvec)[i] < theLBbound[i] - delta())
+            else if ((*theFvec)[i] < theLBbound[i] - entertol())
                shiftLBbound(i, (*theFvec)[i]);
          }
          computePvec();
@@ -114,9 +118,14 @@ void SPxSolver::localAddRows(int start)
             theURbound[i] = rhs(i);
             theLRbound[i] = lhs(i);
             (*thePvec)[i] = vector(i) * (*theCoPvec);
-            if (theURbound[i] + delta() < (*thePvec)[i])
+
+            /* we need to compare with tolerance (rep() == ROW) ? feastol() : opttol() because thePvec is the primal
+             * vector in ROW and the dual vector in COLUMN representation; this is equivalent to leavetol(); this also
+             * fits because we are within the "type() == LEAVE" case
+             */
+            if (theURbound[i] + leavetol() < (*thePvec)[i])
                shiftUPbound(i, (*thePvec)[i]);
-            else if ((*thePvec)[i] < theLRbound[i] - delta())
+            else if ((*thePvec)[i] < theLRbound[i] - leavetol())
                shiftLPbound(i, (*thePvec)[i]);
          }
       }
@@ -293,9 +302,13 @@ void SPxSolver::localAddCols(int start)
          SPxBasis::solve(*theFvec, *theFrhs);
          for (i = start; i < SPxLP::nCols(); ++i)
          {
-            if (theUBbound[i] + delta() < (*theFvec)[i])
+            /* we need to compare with tolerance (rep() == COLUMN) ? feastol() : opttol() because theFvec is the primal
+             * vector in COLUMN and the dual vector in ROW representation; this is equivalent to entertol(); this also
+             * fits because we are within the "type() == ENTER" case
+             */
+            if (theUBbound[i] + entertol() < (*theFvec)[i])
                shiftUBbound(i, (*theFvec)[i]);
-            if ((*theFvec)[i] < theLBbound[i] - delta())
+            if ((*theFvec)[i] < theLBbound[i] - entertol())
                shiftLBbound(i, (*theFvec)[i]);
          }
       }
@@ -339,9 +352,14 @@ void SPxSolver::localAddCols(int start)
             theLCbound[i] *= -1;
 
             (*thePvec)[i] = vector(i) * (*theCoPvec);
-            if (theUCbound[i] + delta() < (*thePvec)[i])
+
+            /* we need to compare with tolerance (rep() == ROW) ? feastol() : opttol() because thePvec is the primal
+             * vector in ROW and the dual vector in COLUMN representation; this is equivalent to leavetol(); this also
+             * fits because we are within the "type() == LEAVE" case
+             */
+            if (theUCbound[i] + leavetol() < (*thePvec)[i])
                shiftUPbound(i, (*thePvec)[i]);
-            if (theLCbound[i] - delta() > (*thePvec)[i])
+            if (theLCbound[i] - leavetol() > (*thePvec)[i])
                shiftLPbound(i, (*thePvec)[i]);
 
             switch (ds.colStatus(i))

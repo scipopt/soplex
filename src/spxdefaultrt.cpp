@@ -30,9 +30,9 @@ namespace soplex
  *
  * The leaving variable is selected such that the update of fVec() (using
  * fVec.value() * fVec.delta()) keeps the basis feasible within
- * solver()->delta(). Hence, fVec.value() must be chosen such that one
+ * solver()->entertol(). Hence, fVec.value() must be chosen such that one
  * updated value of theFvec just reaches its bound and no other one exceeds
- * them by more than solver()->delta(). Further, fVec.value() must have the
+ * them by more than solver()->entertol(). Further, fVec.value() must have the
  * same sign as argument \p val.
  *
  * The return value of selectLeave() is the number of a variable in the
@@ -49,7 +49,7 @@ int SPxDefaultRT::selectLeave(Real& val, SPxId)
    const Real*   ub  = solver()->ubBound().get_const_ptr();
    const Real*   lb  = solver()->lbBound().get_const_ptr();
 
-   Real delta   = solver()->delta();
+   Real delta   = solver()->entertol();
    Real epsilon = solver()->epsilon();
    int  leave   = -1;
 
@@ -193,7 +193,7 @@ SPxId SPxDefaultRT::selectEnter(Real& max, int)
    const Real*   ucb  = solver()->ucBound().get_const_ptr();
 
    Real epsilon = solver()->epsilon();
-   Real delta   = solver()->delta();
+   Real delta   = solver()->leavetol();
    Real val     = max;
    int  pnum    = -1;
    int  cnum    = -1;

@@ -37,7 +37,7 @@ Real SPxSolver::provedBound(Vector& dualsol, const Vector& objvec) const
 {
    DVector lhsvec(dim());
    DVector rhsvec(dim());
-   Real eps = delta();
+   Real eps = opttol();
    Easyval ytb;
    Easyval scalprod;
    int sen = (spxSense() == MINIMIZE ? +1 : -1);

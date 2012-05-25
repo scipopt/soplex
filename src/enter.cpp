@@ -797,7 +797,7 @@ bool SPxSolver::enter(SPxId& enterId)
 
    getEnterVals(enterId, enterTest, enterUB, enterLB,
       enterVal, enterMax, enterPric, enterStat, enterRO);
-   //@ if(enterTest > ((theShift>epsilon()) ? -delta() : -epsilon()))
+
    if (enterTest > -epsilon())
    {
       rejectEnter(enterId, enterTest, enterStat);
@@ -820,13 +820,13 @@ bool SPxSolver::enter(SPxId& enterId)
    else
    {
       // BH 2005-11-29: This code block seems to check the assertion
-      //   || Base * theFvec->delta() - enterVec ||_2 <= delta()
+      //   || Base * theFvec->delta() - enterVec ||_2 <= entertol()
       DVector tmp(dim());
       // BH 2005-11-15: This cast is necessary since SSVector inherits protected from DVector.
       tmp = reinterpret_cast<DVector&>(theFvec->delta());
       multBaseWith(tmp);
       tmp -= *enterVec;
-      if (tmp.length() > delta()) {
+      if (tmp.length() > entertol()) {
          // This happens frequently and does usually not hurt, so print these
          // warnings only with verbose level INFO2 and higher.
          MSG_INFO2( spxout << "WENTER09 fVec updated error = " 
@@ -853,7 +853,7 @@ bool SPxSolver::enter(SPxId& enterId)
     */
    if (leaveIdx >= 0)
    {
-      if (fabs(leaveVal) < delta())
+      if (fabs(leaveVal) < entertol())
       {
          if (theUBbound[leaveIdx] != theLBbound[leaveIdx] 
             && enterStat != Desc::P_FREE && enterStat != Desc::D_FREE) 
@@ -915,7 +915,7 @@ bool SPxSolver::enter(SPxId& enterId)
     */
    else if (leaveVal != -enterMax)
    {
-      rejectEnter(enterId, REAL(0.01) * enterTest - REAL(2.0) * delta(), enterStat);
+      rejectEnter(enterId, REAL(0.01) * enterTest - REAL(2.0) * leavetol(), enterStat);
       change(-1, enterId, enterVec);
    }
    /*  No leaving vector has been selected from the basis. However, if the
