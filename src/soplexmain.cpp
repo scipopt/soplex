@@ -353,7 +353,9 @@ void print_usage_and_exit( const char* const argv[] )
       " -bw       write file with optimal basis to Basfile\n"
       " -l        set time limit in seconds\n"
       " -L        set iteration limit\n"
-      " -d        set maximal allowed bound violation\n"
+      " -f        set primal feasibility tolerance\n"
+      " -o        set optimality, i.e., dual feasibility tolerance\n"
+      " -d        set primal and dual feasibility tolerance to same value\n"
       " -zz       set general zero tolerance\n"
       " -zf       set factorization zero tolerance\n"
       " -zu       set update zero tolerance\n"
@@ -394,8 +396,10 @@ void print_algorithm_parameters(
    if ( checkMode )
    {
       MSG_INFO1( spxout
-	 << "IEXAMP12 Delta          = "
-	 << std::setw(16) << work.delta() << std::endl
+	 << "IEXAMP12 Feastol        = "
+	 << std::setw(16) << work.feastol() << std::endl
+	 << "IEXAMP52 Opttol         = "
+	 << std::setw(16) << work.opttol() << std::endl
 	 << "IEXAMP13 Epsilon Zero   = "
 	 << std::setw(16) << Param::epsilon() << std::endl
 	 << "IEXAMP37 Epsilon Factor = "
@@ -416,8 +420,10 @@ void print_algorithm_parameters(
    {
       MSG_INFO1( spxout
 	 << "SoPlex parameters: " << std::endl
-	 << "Delta          = "
-	 << std::setw(16) << work.delta() << std::endl
+	 << "Feastol        = "
+	 << std::setw(16) << work.feastol() << std::endl
+	 << "Opttol         = "
+	 << std::setw(16) << work.opttol() << std::endl
 	 << "Epsilon Zero   = "
 	 << std::setw(16) << Param::epsilon() << std::endl
 	 << "Epsilon Factor = "
@@ -766,14 +772,14 @@ void print_solution_and_status(
             MSG_INFO1( spxout << std::endl << "Primal solution (name, id, value):" << std::endl; )
             for( int i = 0; i < work.nCols(); ++i )
             {
-               if ( isNotZero( objx[i], 0.001 * work.delta() ) )
+               if ( isNotZero( objx[i], 0.001 * work.feastol() ) )
                   MSG_INFO1( spxout << colnames[ work.cId(i) ] << "\t"
                                     << i << "\t"
                                     << std::setw(17)
                                     << std::setprecision( precision )
                                     << objx[i] << std::endl; )
             }
-            MSG_INFO1( spxout << "All other variables are zero (within " << std::setprecision(1) << 0.001*work.delta() << ")." << std::endl; )
+            MSG_INFO1( spxout << "All other variables are zero (within " << std::setprecision(1) << 0.001*work.feastol() << ")." << std::endl; )
          }
       }
       if ( print_dual )
@@ -786,7 +792,7 @@ void print_solution_and_status(
             MSG_INFO1( spxout << std::endl << "Dual multipliers (name, id, value):" << std::endl; )
             for( int i = 0; i < work.nRows(); ++i )
             {
-               if ( isNotZero( objy[i] , 0.001 * work.delta() ) )
+               if ( isNotZero( objy[i] , 0.001 * work.opttol() ) )
                {
                   MSG_INFO1( spxout << rownames[ work.rId(i) ] << "\t"
                                     << i << "\t"
@@ -798,7 +804,7 @@ void print_solution_and_status(
             }
 
             MSG_INFO1( spxout << "All " << (allzero ? "" : "other ") << "dual values are zero (within "
-                              << std::setprecision(1) << 0.001*work.delta() << ")." << std::endl; )
+                              << std::setprecision(1) << 0.001*work.opttol() << ")." << std::endl; )
 
             if( !allzero )
             {
@@ -841,14 +847,14 @@ void print_solution_and_status(
             MSG_INFO1( spxout << std::endl << "Primal solution (name, id, value):" << std::endl; )
             for( int i = 0; i < work.nCols(); ++i )
             {
-               if ( isNotZero( objx[i], 0.001 * work.delta() ) )
+               if ( isNotZero( objx[i], 0.001 * work.feastol() ) )
                   MSG_INFO1( spxout << colnames[ work.cId(i) ] << "\t"
                                     << i << "\t"
                                     << std::setw(17)
                                     << std::setprecision( precision )
                                     << objx[i] << std::endl; )
             }
-            MSG_INFO1( spxout << "All other variables are zero (within " << std::setprecision(1) << 0.001*work.delta() << ")." << std::endl; )
+            MSG_INFO1( spxout << "All other variables are zero (within " << std::setprecision(1) << 0.001*work.feastol() << ")." << std::endl; )
          }
 
          DVector objcoef(work.nCols());
@@ -862,7 +868,7 @@ void print_solution_and_status(
             MSG_INFO1( spxout << std::endl << "Primal ray (name, id, value):" << std::endl; )
             for( int i = 0; i < work.nCols(); ++i )
             {
-               if ( isNotZero( ray[i], 0.001 * work.delta() ) )
+               if ( isNotZero( ray[i], 0.001 * work.feastol() ) )
                {
                   rayobjval += ray[i] * objcoef[i];
 
@@ -873,7 +879,7 @@ void print_solution_and_status(
                                     << ray[i] << std::endl; )
                }
             }
-            MSG_INFO1( spxout << "All other variables have zero value (within " << std::setprecision(1) << 0.001*work.delta() << ")." << std::endl; )
+            MSG_INFO1( spxout << "All other variables have zero value (within " << std::setprecision(1) << 0.001*work.feastol() << ")." << std::endl; )
             MSG_INFO1( spxout << "Objective change per unit along primal ray is " << rayobjval << "." << std::endl; )
          }
       }
@@ -898,7 +904,7 @@ void print_solution_and_status(
             proofvec.clear();
             for( int i = 0; i < work.nRows(); ++i )
             {
-               if ( isNotZero( farkasx[i], 0.001 * work.delta() ) )
+               if ( isNotZero( farkasx[i], 0.001 * work.opttol() ) )
                {
                   MSG_INFO1( spxout << rownames[ work.rId(i) ] << "\t"
                                     << i << "\t"
@@ -943,14 +949,14 @@ void print_solution_and_status(
                }
             }
 
-            MSG_INFO1( spxout << "All other row multipliers are zero (within " << std::setprecision(1) << 0.001*work.delta() << ")." << std::endl; )
+            MSG_INFO1( spxout << "All other row multipliers are zero (within " << std::setprecision(1) << 0.001*work.opttol() << ")." << std::endl; )
             MSG_INFO1( spxout << "Farkas infeasibility proof: \t"; )
             MSG_INFO1( spxout << lhs << " <= "; )
 
             bool nonzerofound = false;
             for( int i = 0; i < work.nCols(); ++i )
             {
-               if ( isNotZero( proofvec[i], 0.001 * work.delta() ) )
+               if ( isNotZero( proofvec[i], 0.001 * work.opttol() ) )
                {
                   if( proofvec[i] > 0 )
                   {
@@ -1093,6 +1099,8 @@ int main(int argc, char* argv[])
       int                       iterlimit      = -1;
       Real                      timelimit      = -1.0;
       Real                      delta          = DEFAULT_BND_VIOL;
+      Real                      feastol        = DEFAULT_BND_VIOL;
+      Real                      opttol         = DEFAULT_BND_VIOL;
       Real                      epsilon        = DEFAULT_EPS_ZERO;
       Real                      epsilon_factor = DEFAULT_EPS_FACTOR;
       Real                      epsilon_update = DEFAULT_EPS_UPDATE;
@@ -1126,6 +1134,14 @@ int main(int argc, char* argv[])
          case 'd' :
             check_parameter(argv[optidx][2], argv); // use -dx, not -d
             delta = atof(&argv[optidx][2]);
+            break;
+         case 'f' :
+            check_parameter(argv[optidx][2], argv); // use -fx, not -f
+            feastol = atof(&argv[optidx][2]);
+            break;
+         case 'o' :
+            check_parameter(argv[optidx][2], argv); // use -ox, not -o
+            opttol = atof(&argv[optidx][2]);
             break;
          case 'e':
             type = SPxSolver::ENTER;
@@ -1233,7 +1249,7 @@ int main(int argc, char* argv[])
       Param::setVerbose             ( verbose );
 
       // Set the output precision.
-      precision = int(-log10(delta)) + 1;
+      precision = int(-log10(std::min(feastol, opttol))) + 1;
 
       std::cout.setf( std::ios::scientific | std::ios::showpoint );
       std::cerr.setf( std::ios::scientific | std::ios::showpoint );
@@ -1249,7 +1265,8 @@ int main(int argc, char* argv[])
       // create an instance of MySoPlex
       MySoPlex work( type, representation );
       work.setUtype             ( update );
-      work.setDelta             ( delta  );
+      work.setFeastol           ( std::min(feastol, delta) );
+      work.setOpttol            ( std::min(opttol, delta) );
       work.setTerminationTime   ( timelimit );
       work.setTerminationIter   ( iterlimit );
       print_algorithm_parameters( work, representation, update );

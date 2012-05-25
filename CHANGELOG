@@ -26,12 +26,14 @@ fixed bugs:
 
 interface:
 - info message in case a fresh factorization is not stable enough and has to be done again with higher Markowitz threshold
-- new option -p6 to use steepest edge pricer with exact initialization
+- new command line option -p6 to use steepest edge pricer with exact initialization
 - verb levels v4 and higher display current pricing mode (sparse or conventional)
 - additional simplify() method with independent primal and dual feasibility tolerance as parameters
 - new exception SPxInterfaceException to be thrown if inconsistent parameters are passed to interface methods
 - new methods feastol(), opttol(), setFeastol(), setOpttol() in classes SoPlex and SPxSolver to get/set primal and dual
   feasibility tolerance; delta() and setDelta() still exist and work as before
+- new command line options -f and -o to set primal feasibility and optimality tolerance, respectively; -d still exists and
+  works as before
 
 performance:
 - sparse pricing for leaving simplex is activated depending on ratio of basis dimension and number of infeasibilities

@@ -74,7 +74,8 @@ bool SPxSolver::writeState(
 
    commandline
       << "bin/soplex -g0 -s0"
-      << " -d" << delta()
+      << " -f" << feastol()
+      << " -o" << opttol()
       << (type() == SPxSolver::ENTER ? " -e" : "")
       << (rep()  == SPxSolver::ROW   ? " -r" : "")
       << (!strcmp(slinSolver()->getName(), "SLU-Eta") ? " -i" : "");
