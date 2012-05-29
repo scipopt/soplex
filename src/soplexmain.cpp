@@ -32,6 +32,7 @@
 #include "spxdevexpr.h"
 #include "spxhybridpr.h"
 #include "spxsteeppr.h"
+#include "spxsteepexpr.h"
 #include "spxweightpr.h"
 #include "spxratiotester.h"
 #include "spxharrisrt.h"
@@ -448,7 +449,7 @@ SPxPricer* get_pricer(const int pricing)
    switch(pricing)
    {
    case 6 :
-      pricer = new SPxSteepPR(SPxSteepPR::EXACT);
+      pricer = new SPxSteepExPR;
       break;
    case 5 :
       pricer = new SPxWeightPR;
@@ -1092,7 +1093,7 @@ int main(int argc, char* argv[])
       NameSet                   rownames;
       NameSet                   colnames;
       int                       starting       = 0;
-      int                       pricing        = 4;
+      int                       pricing        = 6;
       int                       ratiotest      = 2;
       int                       scaling        = 2;
       int                       simplifying    = 1;

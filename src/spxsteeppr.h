@@ -105,8 +105,8 @@ public:
    /**@name Construction / destruction */
    //@{
    ///
-   SPxSteepPR(Setup mode = DEFAULT)
-      : SPxPricer("Steep")
+   SPxSteepPR(const char* name = "Steep", Setup mode = DEFAULT)
+      : SPxPricer(name)
       , workRhs (0, 1e-16)
       , setup (mode)
       , accuracy(1e-4)
@@ -128,7 +128,7 @@ public:
       , leavePref(old.leavePref)
       , setup(old.setup)
       , accuracy(old.accuracy)
-      ,startpricing(old.startpricing)
+      , startpricing(old.startpricing)
    {
       assert(isConsistent());
    }

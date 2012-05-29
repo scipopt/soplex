@@ -34,6 +34,7 @@ interface:
   feasibility tolerance; delta() and setDelta() still exist and work as before
 - new command line options -f and -o to set primal feasibility and optimality tolerance, respectively; -d still exists and
   works as before
+- exact steepest edge is the new default pricing strategy and is implemented as separate class (inherited from SPxSteepPR)
 
 performance:
 - sparse pricing for leaving simplex is activated depending on ratio of basis dimension and number of infeasibilities
