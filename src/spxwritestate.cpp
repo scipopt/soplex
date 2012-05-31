@@ -91,6 +91,8 @@ bool SPxSolver::writeState(
       commandline << " -p4";
    else if (!strcmp(pricer()->getName(), "Weight"))
       commandline << " -p5";
+   else if (!strcmp(pricer()->getName(), "SteepEx"))
+      commandline << " -p6";
    if (starter() != 0)
    {
       if (!strcmp(starter()->getName(), "Weight"))
