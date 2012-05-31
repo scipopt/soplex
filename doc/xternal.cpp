@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 /**@mainpage Overview
-   @version  1.6.0.5
+   @version  1.6.0.6
    @author   Roland Wunderling
    @author   Tobias Achterberg
    @author   Timo Berthold
@@ -12,6 +12,7 @@
    @author   Matthias Miltenberger
    @author   Sebastian Orlowski
    @author   Marc Pfetsch
+   @author   Eva Ramlow
    @author   Andreas Tuchscherer
 
    @section The Sequential object-oriented simplex class library.
