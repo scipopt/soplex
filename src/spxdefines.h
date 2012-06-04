@@ -95,7 +95,7 @@ namespace soplex
 #define DO_WITH_TMP_VERBOSITY( verbosity, do_something ) \
    { const SPxOut::Verbosity  old_verbosity = spxout.getVerbosity(); \
      spxout.setVerbosity( verbosity ); \
-     do_something \
+     do_something; \
      spxout.setVerbosity( old_verbosity ); }
 #endif
 
