@@ -120,7 +120,7 @@ namespace soplex
 
 #if defined(DEBUGGING)
 // print output in any case, regardless of Param::verbose():
-#define MSG_DEBUG(x) { DO_WITH_TMP_VERBOSITY( SPxOut::ERROR, x ) }
+#define MSG_DEBUG(x) { DO_WITH_TMP_VERBOSITY( SPxOut::DEBUG, x ) }
 #else
 #define MSG_DEBUG(x) /**/
 #endif //!DEBUGGING
