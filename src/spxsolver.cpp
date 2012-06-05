@@ -199,10 +199,12 @@ void SPxSolver::initRep(Representation p_rep)
 {
    METHOD( "SPxSolver::initRep()" );
 
+   theRep = p_rep;
+
    Real tmpfeastol = feastol();
    Real tmpopttol = opttol();
 
-   if (p_rep == COLUMN)
+   if (theRep == COLUMN)
    {
       thevectors   = colSet();
       thecovectors = rowSet(); 
@@ -220,7 +222,7 @@ void SPxSolver::initRep(Representation p_rep)
    }
    else
    {
-      assert(p_rep == ROW);
+      assert(theRep == ROW);
 
       thevectors   = rowSet(); 
       thecovectors = colSet();
@@ -236,7 +238,6 @@ void SPxSolver::initRep(Representation p_rep)
       theCoUbound  = &theUCbound;
       theCoLbound  = &theLCbound;
    }
-   theRep = p_rep;
    unInit();
    reDim();
 
