@@ -680,12 +680,19 @@ SPxId SPxBoundFlippingRT::selectEnter(
       relax_count = 0;
       tighten();
    }
-   if( usedBp > 0 )
+
+   // flip bounds of skipped breakpoints only if a nondegenerate step is to be performed
+   if( usedBp > 0 && fabs(breakpoints[usedBp].val) > delta )
+   {
       flipAndUpdate(usedBp);
+      thesolver->boundflips = usedBp;
+   }
+   else
+      thesolver->boundflips = 0;
 
    //TODO incorporate the ratio between usedBp, nBp and dim/coDim
    //     to get an idea of effort and speed
-   thesolver->boundflips = usedBp;
+
    // estimate wether long steps may be possible in future iterations
    flipPotential *= (usedBp + 0.95);
 
