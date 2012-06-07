@@ -722,9 +722,7 @@ bool SoPlex::writeState(
 
 void SoPlex::unsimplify() const
 {
-   assert(has_simplifier());
-
-   if (m_simplifier->isUnsimplified())
+   if (!has_simplifier() || m_simplifier->isUnsimplified())
       return;
 
    DVector psp_x(m_solver.nCols());  // primal solution (prescaled simplified postscaled)
