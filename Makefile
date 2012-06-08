@@ -24,7 +24,7 @@ include make/make.detecthost
 
 
 #-----------------------------------------------------------------------------
-VERSION		:=	1.6.0.6
+VERSION		:=	1.6.0.7
 
 VERBOSE		=	false
 SHARED		=	false
