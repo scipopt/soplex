@@ -41,6 +41,8 @@ void SPxSolver::shiftFvec()
    {
       if (theUBbound[i] + allow < (*theFvec)[i])
       {
+         MSG_DEBUG( spxout << "DSHIFT08 theUBbound[" << i << "] violated by " << (*theFvec)[i] - theUBbound[i] - allow << std::endl );
+
          if (theUBbound[i] != theLBbound[i])
             shiftUBbound(i, (*theFvec)[i] + Real(mult));
          else
@@ -51,6 +53,8 @@ void SPxSolver::shiftFvec()
       }
       else if ((*theFvec)[i] < theLBbound[i] - allow)
       {
+         MSG_DEBUG( spxout << "DSHIFT08 theLBbound[" << i << "] violated by " << theLBbound[i] - (*theFvec)[i] - allow << std::endl );
+
          if (theUBbound[i] != theLBbound[i])
             shiftLBbound(i, (*theFvec)[i] - Real(mult));
          else
