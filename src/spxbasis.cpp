@@ -127,49 +127,63 @@ bool SPxBasis::isDescValid(const Desc& ds)
    int basisdim;
 
    if ( ds.nRows() != theLP->nRows() || ds.nCols() != theLP->nCols() )
+   {
+      MSG_DEBUG( spxout << "IBASIS20 Dimension mismatch\n" );
       return false;
+   }
 
    basisdim = 0;
    for ( int row = ds.nRows()-1; row >= 0; --row )
    {
-      // row is basic
-      if ( theLP->isBasic(ds.rowstat[row]) )
+      if ( ds.rowstat[row] >= 0 )
       {
-         basisdim++;
          if ( ds.rowstat[row] != dualRowStatus(row) )
+         {
+            MSG_DEBUG( spxout << "IBASIS21 Basic row " << row << " with incorrect dual status " << dualRowStatus(row) << "\n");
             return false;
+         }
       }
-      // row is nonbasic
       else
       {
+         basisdim++;
          if ( (ds.rowstat[row] == Desc::P_FIXED && theLP->SPxLP::lhs(row) != theLP->SPxLP::rhs(row))
               || (ds.rowstat[row] == Desc::P_ON_UPPER && theLP->SPxLP::rhs(row) >= infinity)
               || (ds.rowstat[row] == Desc::P_ON_LOWER && theLP->SPxLP::lhs(row) <= -infinity) )
+         {
+            MSG_DEBUG( spxout << "IBASIS22 Nonbasic row with incorrect status: lhs=" << theLP->SPxLP::lhs(row) << ", rhs=" << theLP->SPxLP::rhs(row) << ", stat=" << ds.rowstat[row] << "\n");
             return false;
+         }
       }
    }
 
    for ( int col = ds.nCols()-1; col >= 0; --col )
    {
-      // col is basic
-      if ( theLP->isBasic(ds.colstat[col]) )
+      if ( ds.colstat[col] >= 0 )
       {
-         basisdim++;
          if ( ds.colstat[col] !=  dualColStatus(col) )
+         {
+            MSG_DEBUG( spxout << "IBASIS23 Basic column " << col << " with incorrect dual status " << ds.colstat[col] << " != " << dualColStatus(col) << "\n");
             return false;
+         }
       }
-      // col is nonbasic
       else
       {
+         basisdim++;
          if ( (ds.colstat[col] == Desc::P_FIXED && theLP->SPxLP::lower(col) != theLP->SPxLP::upper(col))
               || (ds.colstat[col] == Desc::P_ON_UPPER && theLP->SPxLP::upper(col) >= infinity)
               || (ds.colstat[col] == Desc::P_ON_LOWER && theLP->SPxLP::lower(col) <= -infinity) )
+         {
+            MSG_DEBUG( spxout << "IBASIS24 Nonbasic column with incorrect status: lower=" << theLP->SPxLP::lower(col) << ", upper=" << theLP->SPxLP::upper(col) << ", stat=" << ds.colstat[col] << "\n");
             return false;
+         }
       }
    }
 
-   if ( basisdim != theLP->dim() )
+   if ( basisdim != theLP->nCols() )
+   {
+      MSG_DEBUG( spxout << "IBASIS25 Incorrect basis dimension " << basisdim << " != " << theLP->nCols() << "\n" );
       return false;
+   }
 
    // basis descriptor valid
    return true;
@@ -210,11 +224,17 @@ void SPxBasis::loadDesc(const Desc& ds)
 
    assert(theLP->dim() == matrix.size());
 
-   MSG_DEBUG( dump(); )
+   // MSG_DEBUG( dump(); )
 
    nzCount = 0;
    for (j = i = 0; i < theLP->nRows(); ++i)
    {
+      /* for columns and rows with D_... status, the correct D_... status depends on bounds and sides; if a basis
+       * descriptor is loaded after changing bounds or sides, e.g. in the refine() method, we have to correct them
+       */
+      if (thedesc.rowStatus(i) >= 0)
+         thedesc.rowStatus(i) = dualRowStatus(i);
+
       if (theLP->isBasic(thedesc.rowStatus(i)))
       {
          SPxRowId id = theLP->SPxLP::rId(i);
@@ -226,6 +246,12 @@ void SPxBasis::loadDesc(const Desc& ds)
 
    for (i = 0; i < theLP->nCols(); ++i)
    {
+      /* for columns and rows with D_... status, the correct D_... status depends on bounds and sides; if a basis
+       * descriptor is loaded after changing bounds or sides, e.g. in the refine() method, we have to correct them
+       */
+      if (thedesc.colStatus(i) >= 0)
+         thedesc.colStatus(i) = dualColStatus(i);
+
       if (theLP->isBasic(thedesc.colStatus(i)))
       {
          SPxColId id = theLP->SPxLP::cId(i);
@@ -236,6 +262,7 @@ void SPxBasis::loadDesc(const Desc& ds)
    }
 
    assert(j == matrix.size());
+   assert(isDescValid(thedesc));
 
    matrixIsSetup = true;
    factorized = false;
@@ -900,17 +927,17 @@ void SPxBasis::dump()
    const SPxOut::Verbosity tmp_verbosity = spxout.getVerbosity();
    spxout.setVerbosity( SPxOut::DEBUG );
 
-   spxout << "DBASIS09 Basis entries:" << std::endl;
+   spxout << "DBASIS09 Basis entries:";
    basesize = 0;
    for (i = 0; i < theLP->nRows(); ++i)
    {
       if (theLP->isBasic(thedesc.rowStatus(i)))
       {
+         if(basesize % 10 == 0)
+            spxout << std::endl << "DBASIS10 ";
          SPxRowId id = theLP->SPxLP::rId(i);
-         spxout << "DBASIS10 \tR" << theLP->number(id);
+         spxout << "\tR" << theLP->number(id);
          basesize++;
-         if(basesize % 8 == 0)
-            spxout << std::endl;
       }
    }
 
@@ -918,11 +945,11 @@ void SPxBasis::dump()
    {
       if (theLP->isBasic(thedesc.colStatus(i)))
       {
+         if(basesize % 10 == 0)
+            spxout << std::endl << "DBASIS11 ";
          SPxColId id = theLP->SPxLP::cId(i);
-         spxout << "DBASIS11 \tC" << theLP->number(id);
+         spxout << "\tC" << theLP->number(id);
          basesize++;
-         if(basesize % 8 == 0)
-            spxout << std::endl;
       }
    }
    spxout << std::endl;

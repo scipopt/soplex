@@ -36,6 +36,8 @@ interface:
 - new command line options -f and -o to set primal feasibility and optimality tolerance, respectively; -d still exists and
   works as before
 - exact steepest edge is the new default pricing strategy and is implemented as separate class (inherited from SPxSteepPR)
+- correct dual statuses when loading a basis with SPxBasis::loadDesc(); they might have become inconsistent when bounds
+  or sides had been changed
 
 performance:
 - sparse pricing for leaving simplex is activated depending on ratio of basis dimension and number of infeasibilities
