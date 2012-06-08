@@ -90,6 +90,16 @@ public:
 
       return *this;
    }
+   /// assignment from Vector
+   UpdateVector& operator=(const Vector& rhs)
+   {
+      if ( this != & rhs )
+         DVector::operator=(rhs);
+
+      assert(isConsistent());
+
+      return *this;
+   }
    /// assignment
    UpdateVector& operator=(const UpdateVector& rhs);
    //@}
