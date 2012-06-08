@@ -28,6 +28,8 @@
 
 namespace soplex
 {
+class Vector_exact;
+
 /**@brief   Dynamic vectors.
    @ingroup Algebra
 
@@ -167,6 +169,8 @@ public:
    DVector(int dim = 0);
    /// copy constructor.
    explicit DVector(const Vector& old);
+   /// cast from exact vector.
+   explicit DVector(const Vector_exact& old);
    /// copy constructor.
    DVector(const DVector& old);
    /// assignment operator.

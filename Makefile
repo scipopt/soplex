@@ -42,6 +42,7 @@ INSTALLDIR	=	#
 #will this be compiled for PARASCIP? (disables output because it uses global variables)
 PARASCIP	=	false
 
+GMP		=	true
 ZLIB		=	true
 
 COMP		=	gnu
@@ -75,15 +76,18 @@ ARFLAGS		=	cr
 DFLAGS		=	-MM
 VFLAGS		=	--tool=memcheck --leak-check=yes --show-reachable=yes #--gen-suppressions=yes
 
+GMP_FLAGS	=
+GMP_LDFLAGS	=	-lgmpxx -lgmp
+
 SRCDIR		=	src
 BINDIR		=	bin
 LIBDIR		=	lib
 INCLUDEDIR	=	include
 NAME		=	soplex
 LIBOBJ		= 	changesoplex.o didxset.o \
-			dsvector.o dvector.o enter.o factor.o \
+			dsvector.o dvector.o dvector_exact.o enter.o factor.o \
 			forest.o idxset.o leave.o lpcolset.o lprowset.o \
-			lprow.o message.o mpsinput.o nameset.o \
+			lprow.o message.o mpqreal.o mpsinput.o nameset.o \
 			slufactor.o solve.o soplex.o \
 			spxbasis.o spxbounds.o spxboundflippingrt.o spxchangebasis.o \
 			spxequilisc.o spxdantzigpr.o spxdefaultrt.o \
@@ -98,7 +102,7 @@ LIBOBJ		= 	changesoplex.o didxset.o \
 			spxvectorst.o spxweightpr.o spxweightst.o spxwritestate.o \
 			ssvector.o svector.o svset.o timer.o \
 			tracemethod.o unitvector.o update.o updatevector.o \
-			vector.o vsolve.o \
+			vector.o vector_exact.o vsolve.o \
 			gzstream.o
 BINOBJ		=	soplexmain.o
 EXAMPLEOBJ	=	simpleexample.o
@@ -183,6 +187,13 @@ BINSRC		=	$(addprefix $(SRCDIR)/,$(BINOBJ:.o=.cpp))
 EXAMPLESRC	=	$(addprefix $(SRCDIR)/,$(EXAMPLEOBJ:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
 LIBSRCHEADER	=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.h))
+
+GMPDEP		:=	$(SRCDIR)/depend.gmp
+GMPSRC		:=	$(shell cat $(GMPDEP))
+ifeq ($(GMP),true)
+CPPFLAGS	+=	-DWITH_GMP $(GMP_FLAGS)
+LDFLAGS		+=	$(GMP_LDFLAGS)
+endif
 
 ZLIBDEP		:=	$(SRCDIR)/depend.zlib
 ZLIBSRC		:=	$(shell cat $(ZLIBDEP))
@@ -318,6 +329,7 @@ depend:
 		$(LIBSRC:.o=.cpp) \
 		| sed '\''s|^\([0-9A-Za-z]\{1,\}\)\.o|$$\(LIBOBJDIR\)/\1.o|g'\'' \
 		>>$(DEPEND)'
+		@echo `grep -l "WITH_GMP" $(SRCDIR)/*` >$(GMPDEP)
 		@echo `grep -l "WITH_ZLIB" $(SRCDIR)/*` >$(ZLIBDEP)
 
 -include	$(DEPEND)
@@ -336,7 +348,10 @@ $(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 -include $(LASTSETTINGS)
 
 .PHONY: touchexternal
-touchexternal:	$(ZLIBDEP)
+touchexternal:	$(GMPDEP) $(ZLIBDEP)
+ifneq ($(GMP),$(LAST_GMP))
+		@-touch $(GMPSRC)
+endif
 ifneq ($(ZLIB),$(LAST_ZLIB))
 		@-touch $(ZLIBSRC)
 endif
@@ -349,6 +364,7 @@ ifneq ($(USRCXXFLAGS),$(LAST_USRCXXFLAGS))
 		@-touch $(BINSRC)
 endif
 		@-rm -f $(LASTSETTINGS)
+		@echo "LAST_GMP=$(GMP)" >> $(LASTSETTINGS)
 		@echo "LAST_ZLIB=$(ZLIB)" >> $(LASTSETTINGS)
 		@echo "LAST_SHARED=$(SHARED)" >> $(LASTSETTINGS)
 		@echo "LAST_USRCXXFLAGS=$(USRCXXFLAGS)" >> $(LASTSETTINGS)

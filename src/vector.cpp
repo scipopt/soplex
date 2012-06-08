@@ -17,6 +17,7 @@
 
 #include "spxdefines.h"
 #include "vector.h"
+#include "vector_exact.h"
 #include "ssvector.h"
 #include "svector.h"
 #include "message.h"
@@ -39,6 +40,20 @@ Vector& Vector::operator=(const SVector& vec)
 {
    clear();
    assign(vec);
+
+   assert(isConsistent());
+
+   return *this;
+}
+
+Vector& Vector::operator=(const Vector_exact& vec)
+{
+   assert(dim() == vec.dim());
+
+   for( int i = 0; i < dim(); i++ )
+   {
+      val[i] = get_d(vec[i]);
+   }
 
    assert(isConsistent());
 

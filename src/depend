@@ -7,12 +7,13 @@ $(BINOBJDIR)/soplexmain.o: src/soplexmain.cpp src/spxdefines.h src/soplex.h \
  src/lpcolset.h src/nameset.h src/datahashtable.h src/spxbasis.h \
  src/slinsolver.h src/array.h src/random.h src/unitvector.h \
  src/updatevector.h src/spxscaler.h src/spxsimplifier.h src/spxsteeppr.h \
- src/spxpricer.h src/spxfastrt.h src/spxratiotester.h src/spxweightst.h \
- src/spxstarter.h src/slufactor.h src/clufactor.h src/spxgithash.h \
- src/spxdantzigpr.h src/spxparmultpr.h src/spxdevexpr.h src/spxhybridpr.h \
- src/spxweightpr.h src/spxharrisrt.h src/spxdefaultrt.h \
- src/spxboundflippingrt.h src/spxmainsm.h src/spxequilisc.h \
- src/spxgeometsc.h src/spxsumst.h src/spxvectorst.h
+ src/spxpricer.h src/spxfastrt.h src/spxratiotester.h src/spxfileio.h \
+ src/gzstream.h src/spxweightst.h src/spxstarter.h src/slufactor.h \
+ src/clufactor.h src/spxgithash.h src/spxdantzigpr.h src/spxparmultpr.h \
+ src/spxdevexpr.h src/spxhybridpr.h src/spxsteepexpr.h src/spxweightpr.h \
+ src/spxharrisrt.h src/spxdefaultrt.h src/spxboundflippingrt.h \
+ src/spxmainsm.h src/spxequilisc.h src/spxgeometsc.h src/spxsumst.h \
+ src/spxvectorst.h
 $(BINOBJDIR)/simpleexample.o: src/simpleexample.cpp src/soplex.h src/spxsolver.h \
  src/spxdefines.h src/timer.h src/spxlp.h src/datakey.h src/spxid.h \
  src/dvector.h src/vector.h src/svector.h src/svset.h src/dataset.h \
@@ -22,8 +23,9 @@ $(BINOBJDIR)/simpleexample.o: src/simpleexample.cpp src/soplex.h src/spxsolver.h
  src/lpcolset.h src/nameset.h src/datahashtable.h src/spxbasis.h \
  src/slinsolver.h src/array.h src/random.h src/unitvector.h \
  src/updatevector.h src/spxscaler.h src/spxsimplifier.h src/spxsteeppr.h \
- src/spxpricer.h src/spxfastrt.h src/spxratiotester.h src/spxweightst.h \
- src/spxstarter.h src/slufactor.h src/clufactor.h
+ src/spxpricer.h src/spxfastrt.h src/spxratiotester.h src/spxfileio.h \
+ src/gzstream.h src/spxweightst.h src/spxstarter.h src/slufactor.h \
+ src/clufactor.h
 $(LIBOBJDIR)/changesoplex.o: src/changesoplex.cpp src/spxdefines.h src/spxsolver.h \
  src/timer.h src/spxlp.h src/datakey.h src/spxid.h src/dvector.h \
  src/vector.h src/svector.h src/svset.h src/dataset.h src/dataarray.h \
@@ -39,6 +41,10 @@ $(LIBOBJDIR)/dsvector.o: src/dsvector.cpp src/spxdefines.h src/dsvector.h \
  src/svector.h src/vector.h src/ssvector.h src/dvector.h src/didxset.h \
  src/idxset.h src/spxalloc.h src/spxout.h src/exceptions.h src/message.h
 $(LIBOBJDIR)/dvector.o: src/dvector.cpp src/spxdefines.h src/dvector.h src/vector.h \
+ src/svector.h src/vector_exact.h src/mpqreal.h src/message.h \
+ src/spxalloc.h src/spxout.h src/exceptions.h
+dvector_exact.o: src/dvector_exact.cpp src/spxdefines.h \
+ src/dvector_exact.h src/mpqreal.h src/vector_exact.h src/vector.h \
  src/svector.h src/message.h src/spxalloc.h src/spxout.h src/exceptions.h
 $(LIBOBJDIR)/enter.o: src/enter.cpp src/spxdefines.h src/soplex.h src/spxsolver.h \
  src/timer.h src/spxlp.h src/datakey.h src/spxid.h src/dvector.h \
@@ -49,8 +55,8 @@ $(LIBOBJDIR)/enter.o: src/enter.cpp src/spxdefines.h src/soplex.h src/spxsolver.
  src/datahashtable.h src/spxbasis.h src/slinsolver.h src/array.h \
  src/random.h src/unitvector.h src/updatevector.h src/spxscaler.h \
  src/spxsimplifier.h src/spxsteeppr.h src/spxpricer.h src/spxfastrt.h \
- src/spxratiotester.h src/spxweightst.h src/spxstarter.h src/slufactor.h \
- src/clufactor.h
+ src/spxratiotester.h src/spxfileio.h src/gzstream.h src/spxweightst.h \
+ src/spxstarter.h src/slufactor.h src/clufactor.h
 $(LIBOBJDIR)/factor.o: src/factor.cpp src/spxdefines.h src/clufactor.h \
  src/slinsolver.h src/svector.h src/vector.h src/ssvector.h src/dvector.h \
  src/didxset.h src/idxset.h src/spxalloc.h src/spxout.h src/exceptions.h \
@@ -83,6 +89,7 @@ $(LIBOBJDIR)/lprow.o: src/lprow.cpp src/spxdefines.h src/lprow.h src/dsvector.h 
  src/svector.h src/vector.h src/ssvector.h src/dvector.h src/didxset.h \
  src/idxset.h src/spxalloc.h src/spxout.h src/exceptions.h
 $(LIBOBJDIR)/message.o: src/message.cpp src/message.h src/spxout.h src/spxdefines.h
+$(LIBOBJDIR)/mpqreal.o: src/mpqreal.cpp src/mpqreal.h src/spxdefines.h
 $(LIBOBJDIR)/mpsinput.o: src/mpsinput.cpp src/spxdefines.h src/mpsinput.h src/spxlp.h \
  src/datakey.h src/spxid.h src/dvector.h src/vector.h src/svector.h \
  src/svset.h src/dataset.h src/dataarray.h src/spxalloc.h src/spxout.h \
@@ -109,8 +116,8 @@ $(LIBOBJDIR)/soplex.o: src/soplex.cpp src/soplex.h src/spxsolver.h src/spxdefine
  src/datahashtable.h src/spxbasis.h src/slinsolver.h src/array.h \
  src/random.h src/unitvector.h src/updatevector.h src/spxscaler.h \
  src/spxsimplifier.h src/spxsteeppr.h src/spxpricer.h src/spxfastrt.h \
- src/spxratiotester.h src/spxweightst.h src/spxstarter.h src/slufactor.h \
- src/clufactor.h
+ src/spxratiotester.h src/spxfileio.h src/gzstream.h src/spxweightst.h \
+ src/spxstarter.h src/slufactor.h src/clufactor.h
 $(LIBOBJDIR)/spxbasis.o: src/spxbasis.cpp src/spxdefines.h src/spxbasis.h src/spxlp.h \
  src/datakey.h src/spxid.h src/dvector.h src/vector.h src/svector.h \
  src/svset.h src/dataset.h src/dataarray.h src/spxalloc.h src/spxout.h \
@@ -323,8 +330,9 @@ $(LIBOBJDIR)/spxsolver.o: src/spxsolver.cpp src/spxdefines.h src/soplex.h \
  src/lpcolset.h src/nameset.h src/datahashtable.h src/spxbasis.h \
  src/slinsolver.h src/array.h src/random.h src/unitvector.h \
  src/updatevector.h src/spxscaler.h src/spxsimplifier.h src/spxsteeppr.h \
- src/spxpricer.h src/spxfastrt.h src/spxratiotester.h src/spxweightst.h \
- src/spxstarter.h src/slufactor.h src/clufactor.h
+ src/spxpricer.h src/spxfastrt.h src/spxratiotester.h src/spxfileio.h \
+ src/gzstream.h src/spxweightst.h src/spxstarter.h src/slufactor.h \
+ src/clufactor.h
 $(LIBOBJDIR)/spxsolve.o: src/spxsolve.cpp src/spxdefines.h src/spxsolver.h src/timer.h \
  src/spxlp.h src/datakey.h src/spxid.h src/dvector.h src/vector.h \
  src/svector.h src/svset.h src/dataset.h src/dataarray.h src/spxalloc.h \
@@ -427,9 +435,11 @@ $(LIBOBJDIR)/update.o: src/update.cpp src/spxdefines.h src/clufactor.h \
 $(LIBOBJDIR)/updatevector.o: src/updatevector.cpp src/updatevector.h src/spxdefines.h \
  src/dvector.h src/vector.h src/svector.h src/ssvector.h src/didxset.h \
  src/idxset.h src/spxalloc.h src/spxout.h src/exceptions.h src/message.h
-$(LIBOBJDIR)/vector.o: src/vector.cpp src/spxdefines.h src/vector.h src/ssvector.h \
- src/dvector.h src/svector.h src/didxset.h src/idxset.h src/spxalloc.h \
- src/spxout.h src/exceptions.h src/message.h
+$(LIBOBJDIR)/vector.o: src/vector.cpp src/spxdefines.h src/vector.h src/vector_exact.h \
+ src/mpqreal.h src/ssvector.h src/dvector.h src/svector.h src/didxset.h \
+ src/idxset.h src/spxalloc.h src/spxout.h src/exceptions.h src/message.h
+vector_exact.o: src/vector_exact.cpp src/spxdefines.h src/vector_exact.h \
+ src/mpqreal.h src/vector.h src/svector.h src/message.h
 $(LIBOBJDIR)/vsolve.o: src/vsolve.cpp src/spxdefines.h src/clufactor.h \
  src/slinsolver.h src/svector.h src/vector.h src/ssvector.h src/dvector.h \
  src/didxset.h src/idxset.h src/spxalloc.h src/spxout.h src/exceptions.h \

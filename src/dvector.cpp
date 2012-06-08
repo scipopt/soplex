@@ -16,6 +16,7 @@
 
 #include "spxdefines.h"
 #include "dvector.h"
+#include "vector_exact.h"
 #include "message.h"
 #include "spxalloc.h"
 
@@ -156,6 +157,20 @@ DVector::DVector(const Vector& old)
    spx_alloc(mem, memsize);
    val = mem;
    *this = old;
+
+   assert(DVector::isConsistent());
+}
+
+DVector::DVector(const Vector_exact& old)
+   : Vector(0, 0)
+   , mem( 0 )
+{
+   dimen = old.dim();
+   memsize = dimen;
+   spx_alloc(mem, memsize);
+   val = mem;
+
+   Vector::operator=(old);
 
    assert(DVector::isConsistent());
 }

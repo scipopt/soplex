@@ -24,10 +24,13 @@
 #include <math.h>
 #include <iostream>
 
+#include "spxdefines.h"
+
 namespace soplex
 {
 class SVector;
 class SSVector;
+class Vector_exact;
 
 /**@brief   Dense vector
    @ingroup Algebra
@@ -126,6 +129,9 @@ public:
     *  This is diffent in method assign().
     */
    Vector& operator=(const SSVector& vec);
+
+   /// Assignment operator.
+   Vector& operator=(const Vector_exact& vec);
 
    /// Assign values of \p sv.
    /** Assigns all nonzeros of \p sv to the vector. 

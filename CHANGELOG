@@ -10,6 +10,7 @@ code quality & new features:
 - exact initialization of steepest edge weights possible by calling setupWeights of SPxSteepPR
 - option -bw writes the basis of the original problem to a file; works now with simplifier as well
 - allowed primal and dual feasibility tolerance to be set independently in simplifier and simplex routines
+- added GMP support and data type MpqReal, a wrapper for mpq_class if compiled with GMP=true, soplex::Real otherwise
 
 fixed bugs:
 - variables that do not appear in the objective function or any constraint are not printed anymore in the BOUNDS section
