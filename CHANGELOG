@@ -38,6 +38,8 @@ interface:
 - exact steepest edge is the new default pricing strategy and is implemented as separate class (inherited from SPxSteepPR)
 - correct dual statuses when loading a basis with SPxBasis::loadDesc(); they might have become inconsistent when bounds
   or sides had been changed
+- new methods SPxLP::computePrimalActivity() and SPxLP::computeDualActivity() for given primal and dual solution vectors
+  using exact arithmetic
 
 performance:
 - sparse pricing for leaving simplex is activated depending on ratio of basis dimension and number of infeasibilities

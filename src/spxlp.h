@@ -27,6 +27,7 @@
 #include "datakey.h"
 #include "spxid.h"
 #include "dvector.h"
+#include "dvector_exact.h"
 #include "svset.h"
 #include "dataarray.h"
 #include "lprow.h"
@@ -640,6 +641,14 @@ public:
          LPColSet::maxObj_w() *= -1.0;
       thesense = sns;
    }
+
+   /// compute activity of the rows for a given primal vector exactly.
+   /// @throw SPxInternalCodeException if dimension of primal vector does not match number of columns
+   virtual DVector_exact computePrimalActivity(const Vector_exact& primal) const;
+
+   /// compute "dual" activity of the columns for a given dual vector, i.e., y^T A, exactly
+   /// @throw SPxInternalCodeException if dimension of dual vector does not match number of rows
+   virtual DVector_exact computeDualActivity(const Vector_exact& dual) const;
    //@}
 
    //--------------------------

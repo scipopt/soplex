@@ -790,6 +790,50 @@ void SPxLP::changeElement(int i, int j, Real val)
    assert(isConsistent());
 }
 
+DVector_exact SPxLP::computePrimalActivity(
+   const Vector_exact& primal
+   ) const
+{
+   METHOD( "SPxLP::computePrimalActivity()" );
+
+   if( primal.dim() != nCols() )
+   {
+      throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
+   }
+
+   DVector_exact activity(nRows());
+
+   activity.clear();
+   for( int c = 0; c < nCols(); c++ )
+   {
+      activity.multAdd(primal[c], colVector(c));
+   }
+
+   return activity;
+}
+
+DVector_exact SPxLP::computeDualActivity(
+   const Vector_exact& dual
+   ) const
+{
+   METHOD( "SPxLP::computeDualActivity()" );
+
+   if( dual.dim() != nRows() )
+   {
+      throw SPxInternalCodeException("XSPXLP02 Dual vector for computing activity has wrong dimension");
+   }
+
+   DVector_exact activity(nCols());
+
+   activity.clear();
+   for( int r = 0; r < nRows(); r++ )
+   {
+      activity.multAdd(dual[r], rowVector(r));
+   }
+
+   return activity;
+}
+
 bool SPxLP::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
