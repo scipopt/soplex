@@ -81,6 +81,14 @@ do
             opt="-r -t3" ;;
         19) echo =type= ERb
             opt="-e -r -t3" ;;
+	20) echo =type= R0
+	    opt="-d1e-25 -R1e-9" ;;
+	21) echo =type= R1
+	    opt="-d1e-25 -R1e-9 -s0 -g0" ;;
+	22) echo =type= R2
+	    opt="-d1e-25 -r" ;;
+	23) echo =type= R3
+	    opt="-d1e-250 -R1e-6 -e" ;;
         esac
         $2 $opt -C -q $4 $i 2>>$ERRFILE
         echo =ready=

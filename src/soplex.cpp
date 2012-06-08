@@ -540,7 +540,7 @@ SPxSolver::Status SoPlex::getDualfarkas(Vector& dualfarkas) const
    if (has_simplifier())
    {
       MSG_ERROR( spxout << "ESOLVR02 Dual farkas with presolving not yet implemented" << std::endl; )
-      throw SPxStatusException("XSOLVR02 Dual farkas with presolving not yet implemented");
+      throw SPxStatusException("XSOLVR03 Dual farkas with presolving not yet implemented");
       //      return SPxSolver::ERROR;
    }
    SPxSolver::Status stat = m_solver.getDualfarkas(dualfarkas);

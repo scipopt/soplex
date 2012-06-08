@@ -300,6 +300,14 @@ void print_version_info()
 #else
              << "NO"
 #endif
+             << "]";
+
+   std::cout << "[WITH_GMP:"
+#ifdef WITH_GMP
+             << "YES"
+#else
+             << "NO"
+#endif
              << "]" << std::endl;
 
    std::cout << std::endl;
@@ -357,6 +365,7 @@ void print_usage_and_exit( const char* const argv[] )
       " -f        set primal feasibility tolerance\n"
       " -o        set optimality, i.e., dual feasibility tolerance\n"
       " -d        set primal and dual feasibility tolerance to same value\n"
+      " -R        set threshold for tolerances below which iterative refinement is applied\n"
       " -zz       set general zero tolerance\n"
       " -zf       set factorization zero tolerance\n"
       " -zu       set update zero tolerance\n"
@@ -401,6 +410,8 @@ void print_algorithm_parameters(
 	 << std::setw(16) << work.feastol() << std::endl
 	 << "IEXAMP52 Opttol         = "
 	 << std::setw(16) << work.opttol() << std::endl
+	 << "IEXAMP53 Irthreshold    = "
+	 << std::setw(16) << work.irthreshold() << std::endl
 	 << "IEXAMP13 Epsilon Zero   = "
 	 << std::setw(16) << Param::epsilon() << std::endl
 	 << "IEXAMP37 Epsilon Factor = "
@@ -425,6 +436,8 @@ void print_algorithm_parameters(
 	 << std::setw(16) << work.feastol() << std::endl
 	 << "Opttol         = "
 	 << std::setw(16) << work.opttol() << std::endl
+	 << "Irthreshold    = "
+	 << std::setw(16) << work.irthreshold() << std::endl
 	 << "Epsilon Zero   = "
 	 << std::setw(16) << Param::epsilon() << std::endl
 	 << "Epsilon Factor = "
@@ -1102,6 +1115,7 @@ int main(int argc, char* argv[])
       Real                      delta          = DEFAULT_BND_VIOL;
       Real                      feastol        = DEFAULT_BND_VIOL;
       Real                      opttol         = DEFAULT_BND_VIOL;
+      Real                      irthreshold    = DEFAULT_BND_VIOL * 1e-6;
       Real                      epsilon        = DEFAULT_EPS_ZERO;
       Real                      epsilon_factor = DEFAULT_EPS_FACTOR;
       Real                      epsilon_update = DEFAULT_EPS_UPDATE;
@@ -1143,6 +1157,10 @@ int main(int argc, char* argv[])
          case 'o' :
             check_parameter(argv[optidx][2], argv); // use -ox, not -o
             opttol = atof(&argv[optidx][2]);
+            break;
+         case 'R' :
+            check_parameter(argv[optidx][2], argv); // use -Rx, not -R
+            irthreshold = atof(&argv[optidx][2]);
             break;
          case 'e':
             type = SPxSolver::ENTER;
@@ -1268,6 +1286,7 @@ int main(int argc, char* argv[])
       work.setUtype             ( update );
       work.setFeastol           ( std::min(feastol, delta) );
       work.setOpttol            ( std::min(opttol, delta) );
+      work.setIrthreshold       ( irthreshold );
       work.setTerminationTime   ( timelimit );
       work.setTerminationIter   ( iterlimit );
       print_algorithm_parameters( work, representation, update );

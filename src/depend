@@ -365,16 +365,16 @@ $(LIBOBJDIR)/spxsolver.o: src/spxsolver.cpp src/spxdefines.h src/soplex.h \
  src/spxpricer.h src/spxfastrt.h src/spxratiotester.h src/spxfileio.h \
  src/gzstream.h src/spxweightst.h src/spxstarter.h src/slufactor.h \
  src/clufactor.h
-$(LIBOBJDIR)/spxsolve.o: src/spxsolve.cpp src/spxdefines.h src/spxsolver.h src/timer.h \
- src/spxlp.h src/datakey.h src/spxid.h src/dvector.h src/vector.h \
- src/svector.h src/dvector_exact.h src/mpqreal.h src/vector_exact.h \
- src/svset.h src/dataset.h src/dataarray.h src/spxalloc.h src/spxout.h \
- src/exceptions.h src/message.h src/idlist.h src/islist.h src/lprow.h \
- src/dsvector.h src/ssvector.h src/didxset.h src/idxset.h src/lpcol.h \
- src/lprowset.h src/lpcolset.h src/nameset.h src/datahashtable.h \
- src/spxbasis.h src/slinsolver.h src/array.h src/random.h \
- src/unitvector.h src/updatevector.h src/spxpricer.h src/spxratiotester.h \
- src/spxdefaultrt.h src/spxstarter.h
+$(LIBOBJDIR)/spxsolve.o: src/spxsolve.cpp src/spxdefines.h src/mpqreal.h \
+ src/spxsolver.h src/timer.h src/spxlp.h src/datakey.h src/spxid.h \
+ src/dvector.h src/vector.h src/svector.h src/dvector_exact.h \
+ src/vector_exact.h src/svset.h src/dataset.h src/dataarray.h \
+ src/spxalloc.h src/spxout.h src/exceptions.h src/message.h src/idlist.h \
+ src/islist.h src/lprow.h src/dsvector.h src/ssvector.h src/didxset.h \
+ src/idxset.h src/lpcol.h src/lprowset.h src/lpcolset.h src/nameset.h \
+ src/datahashtable.h src/spxbasis.h src/slinsolver.h src/array.h \
+ src/random.h src/unitvector.h src/updatevector.h src/spxpricer.h \
+ src/spxratiotester.h src/spxdefaultrt.h src/spxstarter.h
 $(LIBOBJDIR)/spxstarter.o: src/spxstarter.cpp src/spxdefines.h src/spxstarter.h \
  src/spxsolver.h src/timer.h src/spxlp.h src/datakey.h src/spxid.h \
  src/dvector.h src/vector.h src/svector.h src/dvector_exact.h \

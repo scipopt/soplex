@@ -421,14 +421,14 @@ void SPxSolver::reDim()
 {
    METHOD( "SPxSolver::reDim()" );
 
-   int newdim = (rep() == ROW) ? SPxLP::nCols() : SPxLP::nRows();
+   int newsize = SPxLP::nCols() > SPxLP::nRows() ? SPxLP::nCols() : SPxLP::nRows();
 
-   if (newdim > unitVecs.size())
+   if (newsize > unitVecs.size())
    {
-      unitVecs.reSize(newdim);
+      unitVecs.reSize(newsize);
 
-      while(newdim-- > 0)
-         unitVecs[newdim] = UnitVector( newdim );
+      while (newsize-- > 0)
+         unitVecs[newsize] = UnitVector(newsize);
    }
 
    if (isInitialized())
@@ -502,7 +502,6 @@ void SPxSolver::factorize()
                      << "\tlastUpdate = " << std::setw(4) << basis().lastUpdate()
                      << "\tvalue = "      << (isInitialized() ? value() : 0.0) 
                      << std::endl; )
-
 
    SPxBasis::factorize();
 
@@ -805,6 +804,16 @@ void SPxSolver::setDelta(Real d)
    m_leavetol = d;
 }
 
+void SPxSolver::setIrthreshold(Real d)
+{
+   METHOD( "SPxSolver::setIrthreshold()" );
+
+   if( d <= 0.0 )
+      throw SPxInterfaceException("XSOLVE33 Cannot set negative or zero irthreshold.");
+
+   m_irthreshold = d;
+}
+
 SPxSolver::SPxSolver(
    Type            p_type, 
    Representation  p_rep )
@@ -812,6 +821,7 @@ SPxSolver::SPxSolver(
    , thePricing(FULL)
    , theCumulativeTime(0.0)
    , maxIters (-1)
+   , maxRefines (100)
    , maxTime (infinity)
    , objLimit(infinity)
    , m_status(UNKNOWN)
@@ -840,6 +850,7 @@ SPxSolver::SPxSolver(
    METHOD( "SPxSolver::SPxSolver()" );
 
    setDelta(DEFAULT_BND_VIOL);
+   setIrthreshold(DEFAULT_BND_VIOL * 1e-6);
 
    theLP = this;
    initRep(p_rep);
@@ -886,11 +897,13 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       theRep = base.theRep;
       theTime = base.theTime;
       maxIters = base.maxIters;
+      maxRefines = base.maxRefines;
       maxTime = base.maxTime;
       objLimit = base.objLimit;
       m_status = base.m_status;
       m_entertol = base.m_entertol;
       m_leavetol = base.m_leavetol;
+      m_irthreshold = base.m_irthreshold;
       theShift = base.theShift;
       lastShift = base.lastShift;
       m_maxCycle = base.m_maxCycle;
@@ -1033,11 +1046,13 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , theTime(base.theTime)
    , theCumulativeTime(base.theCumulativeTime)
    , maxIters(base.maxIters)
+   , maxRefines(base.maxRefines)
    , maxTime(base.maxTime)
    , objLimit(base.objLimit)
    , m_status(base.m_status)
    , m_entertol(base.m_entertol)
    , m_leavetol(base.m_leavetol)
+   , m_irthreshold(base.m_irthreshold)
    , theShift(base.theShift)
    , lastShift(base.lastShift)
    , m_maxCycle(base.m_maxCycle)
@@ -1164,7 +1179,7 @@ bool SPxSolver::isConsistent() const
    if (dualVec.delta().getEpsilon() != addVec.delta().getEpsilon())
       return MSGinconsistent("SPxSolver");
 
-   if (unitVecs.size() < ((rep() == ROW) ? SPxLP::nCols() : SPxLP::nRows()))
+   if (unitVecs.size() < SPxLP::nCols() || unitVecs.size() < SPxLP::nRows())
       return MSGinconsistent("SPxSolver");
 
    if (initialized)
@@ -1285,6 +1300,20 @@ int SPxSolver::terminationIter() const
 {
    METHOD( "SPxSolver::terminationIter()" );
    return maxIters;
+}
+
+void SPxSolver::setMaxRefinements(int p_maxrefinements)
+{
+   METHOD( "SPxSolver::setMaxRefinements()" );
+   if( p_maxrefinements < 0 )
+      p_maxrefinements = -1;
+   maxRefines = p_maxrefinements;
+}
+
+int SPxSolver::maxRefinements() const
+{
+   METHOD( "SPxSolver::terminationIter()" );
+   return maxRefines;
 }
 
 /**@todo A first version for the termination value is

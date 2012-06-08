@@ -219,6 +219,11 @@ public:
    {
       return m_solver.delta();
    }
+   /// iterative refinement threshold: if feastol() or opttol() are below this value, iterative refinement is applied.
+   Real irthreshold() const
+   {
+      return m_solver.irthreshold();
+   }
    /// set parameter \p feastol.
    virtual void setFeastol(Real d)
    {
@@ -233,6 +238,11 @@ public:
    virtual void setDelta(Real d)
    {
       m_solver.setDelta(d);
+   }
+   /// set parameter \p irthreshold.
+   virtual void setIrthreshold(Real d)
+   {
+      m_solver.setIrthreshold(d);
    }
    //@}
 

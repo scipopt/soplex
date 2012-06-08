@@ -11,6 +11,8 @@ code quality & new features:
 - option -bw writes the basis of the original problem to a file; works now with simplifier as well
 - allowed primal and dual feasibility tolerance to be set independently in simplifier and simplex routines
 - added GMP support and data type MpqReal, a wrapper for mpq_class if compiled with GMP=true, soplex::Real otherwise
+- implemented iterative refinement for feasible and bounded LPs, applied when a feasibility or optimality tolerance below
+  the new parameter SPxSolver::irthreshold() is requested
 
 fixed bugs:
 - variables that do not appear in the objective function or any constraint are not printed anymore in the BOUNDS section
@@ -40,6 +42,8 @@ interface:
   or sides had been changed
 - new methods SPxLP::computePrimalActivity() and SPxLP::computeDualActivity() for given primal and dual solution vectors
   using exact arithmetic
+- new methods irthreshold() and setIrthreshold() for threshold parameter below which iterative refinement is applied
+- new command line option -R to set parameter irthreshold()
 
 performance:
 - sparse pricing for leaving simplex is activated depending on ratio of basis dimension and number of infeasibilities
