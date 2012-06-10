@@ -319,15 +319,15 @@ $(LIBDIR):
 depend:
 		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
 		$(BINSRC:.o=.cpp) \
-		| sed '\''s|^\([0-9A-Za-z]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g'\'' \
+		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g'\'' \
 		>$(DEPEND)'
 		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
 		$(EXAMPLESRC:.o=.cpp) \
-		| sed '\''s|^\([0-9A-Za-z]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g'\'' \
+		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g'\'' \
 		>>$(DEPEND)'
 		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
 		$(LIBSRC:.o=.cpp) \
-		| sed '\''s|^\([0-9A-Za-z]\{1,\}\)\.o|$$\(LIBOBJDIR\)/\1.o|g'\'' \
+		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(LIBOBJDIR\)/\1.o|g'\'' \
 		>>$(DEPEND)'
 		@echo `grep -l "WITH_GMP" $(SRCDIR)/*` >$(GMPDEP)
 		@echo `grep -l "WITH_ZLIB" $(SRCDIR)/*` >$(ZLIBDEP)

@@ -46,7 +46,7 @@ $(LIBOBJDIR)/dsvector.o: src/dsvector.cpp src/spxdefines.h src/dsvector.h \
 $(LIBOBJDIR)/dvector.o: src/dvector.cpp src/spxdefines.h src/dvector.h src/vector.h \
  src/svector.h src/vector_exact.h src/mpqreal.h src/message.h \
  src/spxalloc.h src/spxout.h src/exceptions.h
-dvector_exact.o: src/dvector_exact.cpp src/spxdefines.h \
+$(LIBOBJDIR)/dvector_exact.o: src/dvector_exact.cpp src/spxdefines.h \
  src/dvector_exact.h src/mpqreal.h src/vector_exact.h src/vector.h \
  src/svector.h src/message.h src/spxalloc.h src/spxout.h src/exceptions.h
 $(LIBOBJDIR)/enter.o: src/enter.cpp src/spxdefines.h src/soplex.h src/spxsolver.h \
@@ -479,7 +479,7 @@ $(LIBOBJDIR)/updatevector.o: src/updatevector.cpp src/updatevector.h src/spxdefi
 $(LIBOBJDIR)/vector.o: src/vector.cpp src/spxdefines.h src/vector.h src/vector_exact.h \
  src/mpqreal.h src/ssvector.h src/dvector.h src/svector.h src/didxset.h \
  src/idxset.h src/spxalloc.h src/spxout.h src/exceptions.h src/message.h
-vector_exact.o: src/vector_exact.cpp src/spxdefines.h src/vector_exact.h \
+$(LIBOBJDIR)/vector_exact.o: src/vector_exact.cpp src/spxdefines.h src/vector_exact.h \
  src/mpqreal.h src/vector.h src/svector.h src/message.h
 $(LIBOBJDIR)/vsolve.o: src/vsolve.cpp src/spxdefines.h src/clufactor.h \
  src/slinsolver.h src/svector.h src/vector.h src/ssvector.h src/dvector.h \
