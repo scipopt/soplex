@@ -1002,32 +1002,35 @@ SPxSolver::Status SPxSolver::solve()
       row = slackcols.colVector(i).index(0);
       assert(row >= 0);
       assert(row < nRows());
-      assert(basisdesc.rowStatus(row) == SPxBasis::Desc::P_FIXED);
+      assert(basisdesc.rowStatus(row) == SPxBasis::Desc::P_FIXED || basisdesc.rowStatus(row) == SPxBasis::Desc::D_FREE);
 
       MSG_DEBUG( spxout << "removing slack column C" << col << ": status=" << basisdesc.colStatus(col) << ", lower=" << lower(col) << ", upper=" << upper(col) << "\n" );
 
-      switch( basisdesc.colStatus(col) )
+      if( basisdesc.rowStatus(row) == SPxBasis::Desc::P_FIXED )
       {
-      case SPxBasis::Desc::P_ON_LOWER:
-         basisdesc.rowStatus(row) = SPxBasis::Desc::P_ON_UPPER;
-         break;
-      case SPxBasis::Desc::P_ON_UPPER:
-         basisdesc.rowStatus(row) = SPxBasis::Desc::P_ON_LOWER;
-         break;
-      case SPxBasis::Desc::D_ON_UPPER:
-         basisdesc.rowStatus(row) = SPxBasis::Desc::D_ON_LOWER;
-         break;
-      case SPxBasis::Desc::D_ON_LOWER:
-         basisdesc.rowStatus(row) = SPxBasis::Desc::D_ON_UPPER;
-         break;
-      case SPxBasis::Desc::P_FREE:
-      case SPxBasis::Desc::P_FIXED:
-      case SPxBasis::Desc::D_FREE:
-      case SPxBasis::Desc::D_ON_BOTH:
-      case SPxBasis::Desc::D_UNDEFINED:
-      default:
-         basisdesc.rowStatus(row) = basisdesc.colStatus(col);
-         break;
+         switch( basisdesc.colStatus(col) )
+         {
+         case SPxBasis::Desc::P_ON_LOWER:
+            basisdesc.rowStatus(row) = SPxBasis::Desc::P_ON_UPPER;
+            break;
+         case SPxBasis::Desc::P_ON_UPPER:
+            basisdesc.rowStatus(row) = SPxBasis::Desc::P_ON_LOWER;
+            break;
+         case SPxBasis::Desc::D_ON_UPPER:
+            basisdesc.rowStatus(row) = SPxBasis::Desc::D_ON_LOWER;
+            break;
+         case SPxBasis::Desc::D_ON_LOWER:
+            basisdesc.rowStatus(row) = SPxBasis::Desc::D_ON_UPPER;
+            break;
+         case SPxBasis::Desc::P_FREE:
+         case SPxBasis::Desc::P_FIXED:
+         case SPxBasis::Desc::D_FREE:
+         case SPxBasis::Desc::D_ON_BOTH:
+         case SPxBasis::Desc::D_UNDEFINED:
+         default:
+            basisdesc.rowStatus(row) = basisdesc.colStatus(col);
+            break;
+         }
       }
 
       changeLhs(row, -upper(col));
