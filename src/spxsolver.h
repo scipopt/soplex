@@ -690,8 +690,9 @@ private:
    void localAddRows(int start);
    ///
    void localAddCols(int start);
-   ///
-   Status refine(
+   /// apply iterative refinement until irfeastol and iropttol are reached or modified problem is not solved to
+   /// optimality; returns true if and only if precision has been reached
+   bool refine(
       Real               irfeastol,          /**< primal feasibility tolerance */
       Real               iropttol,           /**< dual feasibility tolerance */
       Vector_exact&      primal_ex,          /**< buffer to return refined primal solution values */

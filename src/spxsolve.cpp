@@ -828,7 +828,6 @@ SPxSolver::Status SPxSolver::solve()
    }
 
    /* otherwise apply iterative refinement */
-   SPxSolver::Status retstat;
    SPxBasis::SPxStatus basisstat;
    SPxBasis::Desc basisdesc;
    LPColSet slackcols;
@@ -837,6 +836,7 @@ SPxSolver::Status SPxSolver::solve()
    Real iropttol;
    int iteroffset;
    bool refined;
+   bool precisionreached;
 
    /* refined solution vectors */
    DVector_exact primal_ex;
@@ -941,6 +941,9 @@ SPxSolver::Status SPxSolver::solve()
       loadBasis(basisdesc);
    }
 
+   refined = false;
+   precisionreached = false;
+
    try
    {
       /* perform initial floating point solve */
@@ -958,8 +961,6 @@ SPxSolver::Status SPxSolver::solve()
 
       /* apply iterative refinement only if initial solve returned optimal */
       refined = (status() == OPTIMAL);
-
-      retstat = UNKNOWN;
       if( refined )
       {
          /* create refined solution vectors */
@@ -968,9 +969,7 @@ SPxSolver::Status SPxSolver::solve()
          dual_ex = DVector_exact(nRows());
          redcost_ex = DVector_exact(nCols());
 
-         retstat = refine(irfeastol, iropttol, primal_ex, slack_ex, dual_ex, redcost_ex, 5 * iterations());
-
-         refined = (retstat == OPTIMAL);
+         precisionreached = refine(irfeastol, iropttol, primal_ex, slack_ex, dual_ex, redcost_ex, 5 * iterations());
 
          /* count simplex iterations and update iteration limit */
          iteroffset += iterations();
@@ -989,7 +988,6 @@ SPxSolver::Status SPxSolver::solve()
    catch( SPxException E )
    {
       MSG_INFO1( spxout << "iterative refinement threw exception: " << E.what() << "\n" );
-      refined = false;
    }
 
    /* adjust basis; restore lhs and rhs */
@@ -1069,8 +1067,13 @@ SPxSolver::Status SPxSolver::solve()
       basisdesc.reSize(nRows(), nCols());
       loadBasis(basisdesc);
 
-      /* initialize data structures after removing the slack columns */
-      init();
+      /* initialize data structures after removing the slack columns; if refinement has been applied, we are at an
+       * optimal basis; otherwise we have to perform a last floating point solve after removing slack columns
+       */
+      if( refined )
+         init();
+      else
+         fpsolve();
    }
    catch( SPxException E )
    {
@@ -1168,22 +1171,25 @@ SPxSolver::Status SPxSolver::solve()
    if( terminationIter() >= 0 )
       setTerminationIter(terminationIter() + iteroffset);
 
-   /* set return status */
+   /* set refinement has been applied, we are at an optimal basis */
    if( refined )
    {
-      m_status = retstat;
-      if( retstat == SPxSolver::OPTIMAL )
-         setBasisStatus(SPxBasis::OPTIMAL);
+      m_status = SPxSolver::OPTIMAL;
+      setBasisStatus(SPxBasis::OPTIMAL);
    }
-   else if( !refined && SPxBasis::status() >= SPxBasis::REGULAR)
-      setBasisStatus(SPxBasis::REGULAR);
+
+   /* print warning if iterative refinement terminated before reaching tolerances */
+   if( !precisionreached )
+   {
+      MSG_INFO1( spxout << "\nwarning: iterative refinement could not reach final precision\n" );
+   }
 
    MSG_DEBUG( spxout << "returning with status " << status() << "\n" );
 
    return status();
 }
 
-SPxSolver::Status SPxSolver::refine(
+bool SPxSolver::refine(
    Real                  irfeastol,          /**< primal feasibility tolerance */
    Real                  iropttol,           /**< dual feasibility tolerance */
    Vector_exact&         primal_ex,          /**< buffer to return refined primal solution values */
@@ -1241,7 +1247,7 @@ SPxSolver::Status SPxSolver::refine(
    int npivotrefines;
 
    /* return status */
-   SPxSolver::Status retstat = OPTIMAL;
+   bool precisionreached = false;
 
    /* flag to mark whether problem has been modified */
    bool changed = false;
@@ -1353,7 +1359,7 @@ SPxSolver::Status SPxSolver::refine(
       {
          MSG_INFO1( spxout << "\nrefinement finished: tolerances reached\n\n" );
          assert(status() == OPTIMAL);
-         retstat = OPTIMAL;
+         precisionreached = true;
          break;
       }
 
@@ -1362,20 +1368,17 @@ SPxSolver::Status SPxSolver::refine(
       {
          MSG_INFO1( spxout << "\nrefinement finished: maximum number of refinement rounds reached\n\n" );
          assert(status() == OPTIMAL);
-         retstat = ABORT_ITER;
          break;
       }
 
       /* otherwise continue */
-      MSG_INFO1( spxout << "\nstarting refinement round " << nrefines+1 << ": \n" );
+      MSG_INFO1( spxout << "\nstarting refinement round " << nrefines+1 << ": " );
 
       /* compute primal scaling factor; limit increase in scaling by tolerance used in floating point solve */
       maxscale_ex = primalscale_ex / feastol();
 
       primalscale_ex = boundsviol_ex > sidesviol_ex ? boundsviol_ex : sidesviol_ex;
       assert(primalscale_ex >= 0);
-
-      MSG_DEBUG( spxout << "primal scaling limit = " << maxscale_ex << "\n" );
 
       if( primalscale_ex > 0 )
       {
@@ -1388,13 +1391,13 @@ SPxSolver::Status SPxSolver::refine(
 
       assert(primalscale_ex > 1);
 
+      MSG_INFO1( spxout << "scaling primal by " << primalscale_ex );
+
       /* compute dual scaling factor; limit increase in scaling by tolerance used in floating point solve */
       maxscale_ex = dualscale_ex / opttol();
 
       dualscale_ex = redcostviol_ex;
       assert(dualscale_ex >= 0);
-
-      MSG_DEBUG( spxout << "dual scaling limit = " << maxscale_ex << ", dual viol = " << dualscale_ex << "\n" );
 
       if( dualscale_ex > 0 )
       {
@@ -1407,7 +1410,6 @@ SPxSolver::Status SPxSolver::refine(
 
       assert(dualscale_ex > 1);
 
-      MSG_INFO1( spxout << "scaling primal by " << primalscale_ex );
       MSG_INFO1( spxout << ", scaling dual by " << dualscale_ex << " . . .\n\n" );
 
       /* perform primal scaling */
@@ -1474,7 +1476,10 @@ SPxSolver::Status SPxSolver::refine(
       if( status() != OPTIMAL )
       {
          MSG_INFO1( spxout << "\nrefinement finished: modified problem terminated with status " << status() << "\n\n" );
-         retstat = status();
+
+         /* load last optimal basis */
+         loadBasis(basisdesc);
+
          break;
       }
       /* otherwise continue and correct primal and dual solution */
@@ -1585,7 +1590,7 @@ SPxSolver::Status SPxSolver::refine(
    if( terminationIter() >= 0 )
       setTerminationIter(terminationIter() + iteroffset);
 
-   return retstat;
+   return precisionreached;
 }
 
 void SPxSolver::testVecs()
