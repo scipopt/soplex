@@ -1392,7 +1392,8 @@ bool SPxSolver::refine(
       else
          primalscale_ex = maxscale_ex;
 
-      assert(primalscale_ex > 1);
+      if( primalscale_ex < 1 )
+         primalscale_ex = 1;
 
       MSG_INFO1( spxout << "scaling primal by " << primalscale_ex );
 
@@ -1411,7 +1412,8 @@ bool SPxSolver::refine(
       else
          dualscale_ex = maxscale_ex;
 
-      assert(dualscale_ex > 1);
+      if( dualscale_ex < 1 )
+         dualscale_ex = 1;
 
       MSG_INFO1( spxout << ", scaling dual by " << dualscale_ex << " . . .\n\n" );
 
