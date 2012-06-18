@@ -42,7 +42,12 @@ private:
 
    int                   selectLeavePart();  /**< partial pricing method, define
                                               *   PARTIAL_PRICING to use */
-   int                   selectLeaveSparse();
+   int                   selectLeaveSparse();/**< sparse pricing method for leaving Simplex */
+
+   SPxId                 selectEnterSparseDim(Real& best,SPxId& id);    /**< sparse pricing method for entering Simplex */
+   SPxId                 selectEnterSparseCoDim(Real& best, SPxId& id); /**< sparse pricing method for entering Simplex */
+   SPxId                 selectEnterDenseDim(Real& best, SPxId& id);
+   SPxId                 selectEnterDenseCoDim(Real& best,SPxId& id);
 public:
 
    //-------------------------------------

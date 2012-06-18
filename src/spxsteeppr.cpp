@@ -263,7 +263,7 @@ int SPxSteepPR::selectLeave()
 #ifdef PARTIAL_PRICING
    return selectLeavePart();
 #endif
-   if (thesolver->sparsePricing)
+   if (thesolver->sparsePricingLeave)
       return selectLeaveSparse();
 
    const Real* coPenalty_ptr = coPenalty.get_const_ptr();
@@ -428,9 +428,9 @@ int SPxSteepPR::selectLeaveSparse()
    int lastIdx = -1;
    int idx = 0;
 
-   for (int i = thesolver->infeasibilities.size() - 1; i >= 0; --i)
+   for (int i = thesolver->infeasibilitiesFtest.size() - 1; i >= 0; --i)
    {
-      idx = thesolver->infeasibilities.index(i);
+      idx = thesolver->infeasibilitiesFtest.index(i);
       x = fTest[idx];
 
       if (x < -theeps)
@@ -455,7 +455,7 @@ int SPxSteepPR::selectLeaveSparse()
       }
       else
       {
-         thesolver->infeasibilities.remove(i);
+         thesolver->infeasibilitiesFtest.remove(i);
 
          assert(thesolver->isInfeasible[idx]);
          thesolver->isInfeasible[idx] = false;
@@ -544,36 +544,121 @@ void SPxSteepPR::entered4(SPxId /* id */, int n)
 
 SPxId SPxSteepPR::selectEnter()
 {
-   const Real* p             = pref.get_const_ptr();
+   assert(thesolver != 0);
+   SPxId enterId;
+   Real  best = -infinity;
+
+   enterId = (thesolver->sparsePricingEnter) ? selectEnterSparseDim(best, enterId) : selectEnterDenseDim(best, enterId);
+   enterId = (thesolver->sparsePricingEnterCo) ? selectEnterSparseCoDim(best, enterId) : selectEnterDenseCoDim(best, enterId);
+
+   assert(isConsistent());
+
+   if (enterId.isValid())
+   {
+      SSVector& delta = thesolver->fVec().delta();
+
+      thesolver->basis().solve4update(delta, thesolver->vector(enterId));
+
+      // workRhs.epsilon = 0.1*accuracy;
+      workRhs.setEpsilon(accuracy);
+      workRhs.setup_and_assign(delta);
+      pi_p = 1 + delta.length2();
+
+      thesolver->setup4coSolve(&workVec, &workRhs);
+   }
+   return enterId;
+}
+
+SPxId SPxSteepPR::selectEnterSparseDim(Real& best, SPxId enterId)
+{
    const Real* cp            = coPref.get_const_ptr();
-   const Real* test          = thesolver->test().get_const_ptr();
    const Real* coTest        = thesolver->coTest().get_const_ptr();
-   const Real* penalty_ptr   = penalty.get_const_ptr();
    const Real* coPenalty_ptr = coPenalty.get_const_ptr();
 
-   SPxId lastId;
-   Real  best = -infinity;
-   Real  x;
-   int   i;
-   int   end;
+   int idx;
+   Real x;
+   Real coPen;
+   Real coPref;
 
-   for(i = 0, end = thesolver->coDim(); i < end; ++i)
+   for (int i = thesolver->infeasibilitiesCoTest.size() -1; i >= 0; --i)
    {
-      x = test[i];
+      idx = thesolver->infeasibilitiesCoTest.index(i);
+      x = coTest[idx];
 
       if (x < -theeps)
       {
-         x *= x / penalty_ptr[i];
-         x *= p[i];
+         coPen = coPenalty_ptr[idx];
+         x = x * x / coPen;
+         coPref = cp[idx];
+         x = x * coPref;
+         // x *= 1 + cp[i];
+         if (x > best)
+         {
+            best = x;
+            enterId = thesolver->coId(idx);
+         }
+      }
+      else
+      {
+         thesolver->infeasibilitiesCoTest.remove(i);
+
+         assert(thesolver->isInfeasible[idx]);
+         thesolver->isInfeasible[idx] = false;
+      }
+   }
+   return enterId;
+}
+
+SPxId SPxSteepPR::selectEnterSparseCoDim(Real& best, SPxId enterId)
+{
+   const Real* p             = pref.get_const_ptr();
+   const Real* test          = thesolver->test().get_const_ptr();
+   const Real* penalty_ptr   = penalty.get_const_ptr();
+
+   int idx;
+   Real x;
+   Real pen;
+   Real pref;
+
+   for (int i = thesolver->infeasibilitiesTest.size() -1; i >= 0; --i)
+   {
+      idx = thesolver->infeasibilitiesTest.index(i);
+      x = test[idx];
+
+      if (x < -theeps)
+      {
+         pen = penalty_ptr[idx];
+         x = x * x / pen;
+         pref = p[idx];
+         x = x * pref;
          // x *= 1 + p[i];
          if (x > best)
          {
             best   = x;
-            lastId = thesolver->id(i);
+            enterId = thesolver->id(idx);
          }
       }
+      else
+      {
+         thesolver->infeasibilitiesTest.remove(i);
+
+         assert(thesolver->isInfeasibleCo[idx]);
+         thesolver->isInfeasibleCo[idx] = false;
+      }
    }
-   for (end = thesolver->dim(), i = 0; i < end; ++i)
+   return enterId;
+}
+
+SPxId SPxSteepPR::selectEnterDenseDim(Real& best, SPxId enterId)
+{
+   const Real* cp            = coPref.get_const_ptr();
+   const Real* coTest        = thesolver->coTest().get_const_ptr();
+   const Real* coPenalty_ptr = coPenalty.get_const_ptr();
+
+   int   end;
+   Real x;
+
+   for (int i = 0, end = thesolver->dim(); i < end; ++i)
    {
       x = coTest[i];
       if (x < -theeps)
@@ -584,27 +669,40 @@ SPxId SPxSteepPR::selectEnter()
          if (x > best)
          {
             best = x;
-            lastId = thesolver->coId(i);
+            enterId = thesolver->coId(i);
          }
       }
    }
-   assert(isConsistent());
-
-   if (lastId.isValid())
-   {
-      SSVector& delta = thesolver->fVec().delta();
-
-      thesolver->basis().solve4update(delta, thesolver->vector(lastId));
-
-      // workRhs.epsilon = 0.1*accuracy;
-      workRhs.setEpsilon(accuracy);
-      workRhs.setup_and_assign(delta);
-      pi_p = 1 + delta.length2();
-
-      thesolver->setup4coSolve(&workVec, &workRhs);
-   }
-   return lastId;
+   return enterId;
 }
+
+SPxId SPxSteepPR::selectEnterDenseCoDim(Real& best, SPxId enterId)
+{
+   const Real* p             = pref.get_const_ptr();
+   const Real* test          = thesolver->test().get_const_ptr();
+   const Real* penalty_ptr   = penalty.get_const_ptr();
+
+   int   end;
+   Real x;
+
+   for(int i = 0, end = thesolver->coDim(); i < end; ++i)
+   {
+      x = test[i];
+      if (x < -theeps)
+      {
+         x *= x / penalty_ptr[i];
+         x *= p[i];
+         // x *= 1 + p[i];
+         if (x > best)
+         {
+            best   = x;
+            enterId = thesolver->id(i);
+         }
+      }
+   }
+   return enterId;
+}
+
 
 void SPxSteepPR::addedVecs(int n)
 {

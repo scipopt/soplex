@@ -33,7 +33,7 @@
 #include "unitvector.h"
 #include "updatevector.h"
 
-#define SPARSITYTHRESHOLD        0.4      /**< percentage of basic infeasibilities that is considered sparse */
+#define SPARSITYTHRESHOLD        0.5      /**< percentage of basic infeasibilities that is considered sparse */
 #define DENSEROUNDS               5       /**< number of refactorization until sparsity is tested again */
 
 namespace soplex
@@ -320,18 +320,33 @@ public:
    /** For the leaving Simplex algorithm this vector contains the indices of infeasible basic variables
     *  After a basis change the indexset is updated.
     */
-   DIdxSet infeasibilities;
+   DIdxSet infeasibilitiesFtest;
+   /**For the entering Simplex algorithm these vectors contains the indices of ...
+    * 
+    */
+   DIdxSet infeasibilitiesTest;
+   DIdxSet infeasibilitiesCoTest;
 
-   /** Binary vector to store whether basic indices are infeasible
+   /** Binary vectors to store whether basic indices are infeasible
     *  the i-th entry equals false, if the i-th basic variable is not infeasible
     *  the i-th entry equals true, if the i-th basic variable is infeasible
     */
-   Array<bool> isInfeasible;
+   Array<bool> isInfeasible;           ///< belongs to \ref soplex::SPxSolver::infeasibilitiesFtest "infeasibilitiesFtest" in the leaving Simplex
+                                       ///< and \ref soplex::SPxSolver::infeasibilitiesCoTest "infeasibilitiesCoTest" in the entering Simplex
+   Array<bool> isInfeasibleCo;         ///< belongs to \ref soplex::SPxSolver::infeasibilitiesTest "infeasibilitiesTest" in the entering Simplex
 
    /// These values enable or disable sparse pricing
-   bool     sparsePricing;        ///< true if sparsePricing is turned on
-   int      remainingRounds;      ///< number of dense rounds/refactorizations until sparsePricing is enabled again
-   int      sparsityThreshold;    ///< maximum allowed length of \ref soplex::SPxSolver::infeasibilities "infeasibilities"
+   bool     sparsePricingLeave;        ///< true if sparsePricing is turned on in the leaving Simplex
+   bool     sparsePricingEnter;        ///< true if sparsePricing is turned on in the entering Simplex
+   bool     sparsePricingEnterCo;      ///< true if sparsePricing is turned on in the entering Simplex
+
+   int      remainingRoundsLeave;      ///< number of dense rounds/refactorizations until sparsePricing is enabled again
+   int      remainingRoundsEnter;
+   int      remainingRoundsEnterCo;
+
+   int      sparsityThresholdLeave;    ///< maximum allowed length of \ref soplex::SPxSolver::infeasibilitiesFtest "infeasibilitiesFtest" in the leaving Simplex 
+   int      sparsityThresholdEnter;    ///< maximum allowed length of \ref soplex::SPxSolver::infeasibilitiesCoTest "infeasibilitiesCoTest" in the entering Simplex
+   int      sparsityThresholdEnterCo;  ///< maximum allowed length of \ref soplex::SPxSolver::infeasibilitiesTest "infeasibilitiesTest" in the entering Simplex
 
    //-----------------------------
    /**@name Access */

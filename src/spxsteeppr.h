@@ -181,12 +181,18 @@ public:
    virtual int selectLeave();
    /// implementation of partial pricing
    int selectLeavePart();
-   ///
+   /// implementation of sparse pricing in the leaving Simplex
    int selectLeaveSparse();
    ///
    virtual void left4(int n, SPxId id);
    ///
    virtual SPxId selectEnter();
+   /// implementation of sparse pricing for the entering Simplex
+   SPxId selectEnterSparseDim(Real& best, SPxId lastId);
+   SPxId selectEnterSparseCoDim(Real& best, SPxId lastId);
+   /// interlan implementation of SPxSteepPR::selectEnter()
+   SPxId selectEnterDenseDim(Real& best, SPxId lastId);
+   SPxId selectEnterDenseCoDim(Real& best, SPxId lastId);
    ///
    virtual void entered4(SPxId id, int n);
    /// \p n vectors have been added to loaded LP.

@@ -86,7 +86,7 @@ int SPxDevexPR::selectLeave()
 #ifdef PARTIAL_PRICING
    retid = selectLeavePart(val, theeps);
 #else
-   if (thesolver->sparsePricing)
+   if (thesolver->sparsePricingLeave)
       retid = selectLeaveSparse(val, theeps);
    else
       retid = selectLeaveX(val, theeps);
@@ -208,25 +208,27 @@ int SPxDevexPR::selectLeaveSparse(Real& best, Real feastol)
    Real bstX = 0;
    int bstI = -1;
    int idx = -1;
+   Real fTesti;
+   Real coPeni;
 
-   for (int i = thesolver->infeasibilities.size() - 1; i >= 0; --i)
+   for (int i = thesolver->infeasibilitiesFtest.size() - 1; i >= 0; --i)
    {
-      idx = thesolver->infeasibilities.index(i);
-      Real fTesti = fTest[idx];
+      idx = thesolver->infeasibilitiesFtest.index(i);
+      fTesti = fTest[idx];
       if (fTesti < -feastol)
       {
-         Real cpeni = cpen[idx];
-         x = fTesti * fTesti / cpeni;
+         coPeni = cpen[idx];
+         x = fTesti * fTesti / coPeni;
          if (x > bstX)
          {
             bstX = x;
             bstI = idx;
-            last = cpeni;
+            last = coPeni;
          }
       }
       else
       {
-         thesolver->infeasibilities.remove(i);
+         thesolver->infeasibilitiesFtest.remove(i);
 
          assert(thesolver->isInfeasible[idx]);
          thesolver->isInfeasible[idx] = false;
@@ -277,89 +279,178 @@ void SPxDevexPR::left4X(int n, const SPxId& id, int start, int incr)
 
 SPxId SPxDevexPR::selectEnter()
 {
-   SPxId retid;
-   Real val;
+   assert(thesolver != 0);
 
-   retid = selectEnterX(val, theeps);
+   SPxId enterId;
+   SPxId enterIdCo;
+   Real best = 0;
 
-   if( !retid.isValid() && !refined )
+   enterId = (thesolver->sparsePricingEnter) ? selectEnterSparseDim(best, theeps) : selectEnterDenseDim(best,theeps);
+   enterIdCo = (thesolver->sparsePricingEnterCo) ? selectEnterSparseCoDim(best, theeps) : selectEnterDenseCoDim(best, theeps);
+   if( enterIdCo.isValid() )
+      enterId = enterIdCo;
+
+   if( !enterId.isValid() && !refined )
    {
       refined = true;
       MSG_INFO3( spxout << "WDEVEX02 trying refinement step..\n"; )
-      retid = selectEnterX(val, theeps/DEVEX_REFINETOL);
+      enterId = selectEnterSparseDim(best, theeps/DEVEX_REFINETOL);
+      enterIdCo = selectEnterSparseCoDim(best, theeps/DEVEX_REFINETOL);
+      if( enterIdCo.isValid() )
+         enterId = enterIdCo;
    }
 
-   return retid;
+   return enterId;
 }
 
-SPxId SPxDevexPR::selectEnterX(
-   Real& best,
-   Real feastol,
-   int start1,
-   int incr1,
-   int start2,
-   int incr2
-   )
+SPxId SPxDevexPR::selectEnterSparseDim(Real& best, Real feastol)
 {
-   Real x;
-
-   const Real* test = thesolver->test().get_const_ptr();
    const Real* cTest = thesolver->coTest().get_const_ptr();
    const Real* cpen = coPenalty.get_const_ptr();
-   const Real* pen = penalty.get_const_ptr();
-   Real bstX1 = 0;
-   Real bstX2 = 0;
-   int bstI1 = -1;
-   int bstI2 = -1;
-   int end1 = coPenalty.dim();
-   int end2 = penalty.dim();
+   int end = coPenalty.dim();
+   int enterIdx = -1;
+   int idx;
+   Real coTesti;
+   Real coPeni;
+   Real x;
 
-   assert(end1 == thesolver->coTest().dim());
-   assert(end2 == thesolver->test().dim());
-
-   for (; start1 < end1; start1 += incr1)
+   assert(end == thesolver->coTest().dim());
+   for(int i = thesolver->infeasibilitiesCoTest.size() -1; i >= 0; --i)
    {
-      if (cTest[start1] < -feastol)
+      idx = thesolver->infeasibilitiesCoTest.index(i);
+      coTesti = cTest[idx];
+      if (coTesti < -feastol)
       {
-         x = cTest[start1] * cTest[start1] / cpen[start1];
-         if (x > bstX1)
+         coPeni = cpen[idx];
+         x = coTesti * coTesti / coPeni;
+         if (x > best)
          {
-            bstX1 = x;
-            bstI1 = start1;
-            last = cpen[start1];
+            best = x;
+            enterIdx = idx;
+            last = cpen[idx];
          }
       }
-   }
-
-   for (; start2 < end2; start2 += incr2)
-   {
-      if (test[start2] < -feastol)
+      else
       {
-         x = test[start2] * test[start2] / pen[start2];
-         if (x > bstX2)
-         {
-            bstX2 = x;
-            bstI2 = start2;
-            last = pen[start2];
-         }
+         thesolver->infeasibilitiesCoTest.remove(i);
+
+         assert(thesolver->isInfeasible[idx]);
+         thesolver->isInfeasible[idx] = false;
       }
    }
-
-   if (bstI2 >= 0)
-   {
-      best = bstX2;
-      return thesolver->id(bstI2);
-   }
-
-   if (bstI1 >= 0)
-   {
-      best = bstX1;
-      return thesolver->coId(bstI1);
-   }
+   if (enterIdx >= 0)
+      return thesolver->coId(enterIdx);
 
    SPxId none;
    return none;
 }
+
+
+SPxId SPxDevexPR::selectEnterSparseCoDim(Real& best, Real feastol)
+{
+   const Real* test = thesolver->test().get_const_ptr();
+   const Real* pen = penalty.get_const_ptr();
+   int end = penalty.dim();
+   int enterIdx = -1;
+   int idx;
+   Real testi;
+   Real peni;
+   Real x;
+
+   assert(end == thesolver->test().dim());
+   for (int i = thesolver->infeasibilitiesTest.size() -1; i >= 0; --i)
+   {
+      idx = thesolver->infeasibilitiesTest.index(i);
+      testi = test[idx];
+      if (testi < -feastol)
+      {
+         peni = pen[idx];
+         x = testi * testi / peni;
+         if (x > best)
+         {
+            best = x;
+            enterIdx = idx;
+            last = pen[idx];
+         }
+      }
+      else
+      {
+         thesolver->infeasibilitiesTest.remove(i);
+
+         assert(thesolver->isInfeasibleCo[idx]);
+         thesolver->isInfeasibleCo[idx] = false;
+      }
+   }
+   
+   if (enterIdx >= 0)
+      return thesolver->id(enterIdx);
+
+   SPxId none;
+   return none;
+}
+
+
+SPxId SPxDevexPR::selectEnterDenseDim(Real& best, Real feastol, int start, int incr)
+{
+   const Real* cTest = thesolver->coTest().get_const_ptr();
+   const Real* cpen = coPenalty.get_const_ptr();
+   int end = coPenalty.dim();
+   int enterIdx = -1;
+   Real x;
+
+   assert(end == thesolver->coTest().dim());
+   for (; start < end; start += incr)
+   {
+      if (cTest[start] < -feastol)
+      {
+         x = cTest[start] * cTest[start] / cpen[start];
+         if (x > best)
+         {
+            best = x;
+            enterIdx = start;
+            last = cpen[start];
+         }
+      }
+   }
+   
+   if (enterIdx >= 0)
+      return thesolver->coId(enterIdx);
+
+   SPxId none;
+   return none;
+}
+
+
+SPxId SPxDevexPR::selectEnterDenseCoDim(Real& best, Real feastol, int start, int incr)
+{
+   const Real* test = thesolver->test().get_const_ptr();
+   const Real* pen = penalty.get_const_ptr();
+   int end = penalty.dim();
+   int enterIdx = -1;
+   Real x;
+
+   assert(end == thesolver->test().dim());
+   for (; start < end; start += incr)
+   {
+      if (test[start] < -feastol)
+      {
+         x = test[start] * test[start] / pen[start];
+         if (x > best)
+         {
+            best = x;
+            enterIdx = start;
+            last = pen[start];
+         }
+      }
+   }
+
+   if (enterIdx >= 0)
+      return thesolver->id(enterIdx);
+
+   SPxId none;
+   return none;
+}
+
 
 void SPxDevexPR::entered4(SPxId id, int n)
 {

@@ -46,7 +46,7 @@ interface:
 - new command line option -R to set parameter irthreshold()
 
 performance:
-- sparse pricing for leaving simplex is activated depending on ratio of basis dimension and number of infeasibilities
+- sparse pricing for leaving and entering simplex is activated depending on ratio of basis dimension and number of infeasibilities
 
 
 28 Oct 2011 - Release 1.6.0

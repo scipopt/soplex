@@ -43,9 +43,8 @@ void SPxSolver::computeFtest()
    assert(type() == LEAVE);
 
    Real theeps = epsilon();
-   infeasibilities.clear();
-   int ninfeasibilities;
-   ninfeasibilities = 0;
+   infeasibilitiesFtest.clear();
+   int ninfeasibilities = 0;
 
    for( int i = 0; i < dim(); ++i )
    {
@@ -53,39 +52,38 @@ void SPxSolver::computeFtest()
          ? theUBbound[i] - (*theFvec)[i]
          : (*theFvec)[i] - theLBbound[i];
 
-      if( remainingRounds == 0 )
+      if( remainingRoundsLeave == 0 )
       {
          if( theCoTest[i] < -theeps )
          {
-            assert(infeasibilities.size() < infeasibilities.max());
-            infeasibilities.addIdx(i);
+            assert(infeasibilitiesFtest.size() < infeasibilitiesFtest.max());
+            infeasibilitiesFtest.addIdx(i);
             isInfeasible[i] = true;
             ++ninfeasibilities;
          }
          else
             isInfeasible[i] = false;
-         if( ninfeasibilities > sparsityThreshold )
+         if( ninfeasibilities > sparsityThresholdLeave )
          {
-            MSG_INFO2( spxout << "IPRICE01 too many infeasibilities for sparse pricing"
+            MSG_INFO2( spxout << "ILEAVE04 too many infeasibilities for sparse pricing"
                               << std::endl; )
-            remainingRounds = DENSEROUNDS;
-            sparsePricing = false;
+            remainingRoundsLeave = DENSEROUNDS;
+            sparsePricingLeave = false;
             ninfeasibilities = 0;
          }
       }
    }
 
-   if( ninfeasibilities == 0 && sparsePricing == false )
+   if( ninfeasibilities == 0 && !sparsePricingLeave )
    {
-      --remainingRounds;
+      --remainingRoundsLeave;
    }
-   else if( ninfeasibilities <= sparsityThreshold )
+   else if( ninfeasibilities <= sparsityThresholdLeave )
    {
-      MSG_INFO2( spxout << "IPRICE02 sparse pricing active, "
-                        << "basis size: " << dim()
-                        << ", infeasibilities: " << ninfeasibilities
+      MSG_INFO2( spxout << "ILEAVE05 sparse pricing active, " << "sparsity: "
+                        << (Real) ninfeasibilities/dim()
                         << std::endl; )
-      sparsePricing = true;
+      sparsePricingLeave = true;
    }
 }
 
@@ -106,12 +104,12 @@ void SPxSolver::updateFtest()
       ftest[i] = ((*theFvec)[i] > theUBbound[i])
          ? theUBbound[i] - (*theFvec)[i]
          : (*theFvec)[i] - theLBbound[i];
-      if( sparsePricing == true && ftest[i] < -theeps )
+      if( sparsePricingLeave && ftest[i] < -theeps )
       {
-         assert(remainingRounds == 0);
-         if( isInfeasible[i] == false )
+         assert(remainingRoundsLeave == 0);
+         if( !isInfeasible[i] )
          {
-            infeasibilities.addIdx(i);
+            infeasibilitiesFtest.addIdx(i);
             isInfeasible[i] = true;
          }
       }

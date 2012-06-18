@@ -347,6 +347,13 @@ void SPxSolver::init()
       }
       setEnterBounds();
       computeEnterCoPrhs();
+      // prepare support vectors for sparse pricing
+      infeasibilitiesTest.setMax(coDim());
+      infeasibilitiesCoTest.setMax(dim());
+      isInfeasible.reSize(dim());
+      isInfeasibleCo.reSize(coDim());
+      sparsityThresholdEnter = (int) dim() * SPARSITYTHRESHOLD;
+      sparsityThresholdEnterCo = (int) coDim() * SPARSITYTHRESHOLD;
    }
    else
    {
@@ -362,11 +369,11 @@ void SPxSolver::init()
       }
       setLeaveBounds();
       computeLeaveCoPrhs();
+      // prepare support vectors for sparse pricing
+      infeasibilitiesFtest.setMax(dim());
+      isInfeasible.reSize(dim());
+      sparsityThresholdLeave = (int) dim() * SPARSITYTHRESHOLD;
    }
-   // prepare support vectors for sparse pricing
-   infeasibilities.setMax(dim());
-   isInfeasible.reSize(dim());
-   sparsityThreshold = dim() * SPARSITYTHRESHOLD;
 
    SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
    computePvec();
@@ -474,8 +481,11 @@ void SPxSolver::clear()
    setBasisStatus(SPxBasis::NO_PROBLEM);
    SPxBasis::reDim();
 
-   infeasibilities.clear();
+   infeasibilitiesFtest.clear();
+   infeasibilitiesCoTest.clear();
+   infeasibilitiesTest.clear();
    isInfeasible.clear();
+   isInfeasibleCo.clear();
 }
 
 void SPxSolver::clearUpdateVecs(void)
@@ -842,10 +852,17 @@ SPxSolver::SPxSolver(
    , thepricer (0)
    , theratiotester (0)
    , thestarter (0)
-   , infeasibilities(0)
+   , infeasibilitiesFtest(0)
+   , infeasibilitiesCoTest(0)
+   , infeasibilitiesTest(0)
    , isInfeasible(0)
-   , sparsePricing(false)
-   , remainingRounds(0)
+   , isInfeasibleCo(0)
+   , sparsePricingLeave(false)
+   , sparsePricingEnter(false)
+   , sparsePricingEnterCo(false)
+   , remainingRoundsLeave(0)
+   , remainingRoundsEnter(0)
+   , remainingRoundsEnterCo(0)
 {
    METHOD( "SPxSolver::SPxSolver()" );
 
@@ -930,11 +947,20 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       leaveCount = base.leaveCount;
       enterCount = base.enterCount;
       theCumulativeTime = base.theCumulativeTime;
-      infeasibilities = base.infeasibilities;
+      infeasibilitiesFtest = base.infeasibilitiesFtest;
+      infeasibilitiesCoTest = base.infeasibilitiesCoTest;
+      infeasibilitiesTest = base.infeasibilitiesTest;
       isInfeasible = base.isInfeasible;
-      sparsePricing = base.sparsePricing;
-      remainingRounds = base.remainingRounds;
-      sparsityThreshold = base.sparsityThreshold;
+      isInfeasibleCo = base.isInfeasibleCo;
+      sparsePricingLeave = base.sparsePricingLeave;
+      sparsePricingEnter = base.sparsePricingEnter;
+      sparsePricingEnterCo = base.sparsePricingEnterCo;
+      remainingRoundsLeave = base.remainingRoundsLeave;
+      remainingRoundsEnter = base.remainingRoundsEnter;
+      remainingRoundsEnterCo = base.remainingRoundsEnterCo;
+      sparsityThresholdLeave = base.sparsityThresholdLeave;
+      sparsityThresholdEnter = base.sparsityThresholdEnter;
+      sparsityThresholdEnterCo = base.sparsityThresholdEnterCo;
 
       if (base.theRep == COLUMN)
       {
@@ -1081,11 +1107,20 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , dualFarkas(base.dualFarkas)
    , leaveCount(base.leaveCount)
    , enterCount(base.enterCount)
-   , infeasibilities(base.infeasibilities)
+   , infeasibilitiesFtest(base.infeasibilitiesFtest)
+   , infeasibilitiesCoTest(base.infeasibilitiesCoTest)
+   , infeasibilitiesTest(base.infeasibilitiesTest)
    , isInfeasible(base.isInfeasible)
-   , sparsePricing(base.sparsePricing)
-   , remainingRounds(base.remainingRounds)
-   , sparsityThreshold(base.sparsityThreshold)
+   , isInfeasibleCo(base.isInfeasibleCo)
+   , sparsePricingLeave(base.sparsePricingLeave)
+   , sparsePricingEnter(base.sparsePricingEnter)
+   , sparsePricingEnterCo(base.sparsePricingEnterCo)
+   , remainingRoundsLeave(base.remainingRoundsLeave)
+   , remainingRoundsEnter(base.remainingRoundsEnter)
+   , remainingRoundsEnterCo(base.remainingRoundsEnterCo)
+   , sparsityThresholdLeave(base.sparsityThresholdLeave)
+   , sparsityThresholdEnter(base.sparsityThresholdEnter)
+   , sparsityThresholdEnterCo(base.sparsityThresholdEnterCo)
 {
    METHOD( "SPxSolver::SPxSolver(const SPxSolver&base)"  );
 

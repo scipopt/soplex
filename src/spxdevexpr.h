@@ -63,12 +63,16 @@ private:
    int selectLeaveX(Real& best, Real feastol, int start = 0, int incr = 1);
    /// implementation of partial pricing
    int selectLeavePart(Real& best, Real feastol);
-   ///
+   /// implementation of sparse pricing in the leaving Simplex
    int selectLeaveSparse(Real& best, Real feastol);
    /// internal implementation of SPxPricer::left4()
    void left4X(int n, const SPxId& id, int start, int incr);
+   /// implementation of sparse pricing
+   SPxId selectEnterSparseDim(Real& best, Real feastol);
+   SPxId selectEnterSparseCoDim(Real& best, Real feastol);
    /// internal implementation of SPxPricer::selectEnter()
-   SPxId selectEnterX(Real& best, Real feastol, int start1 = 0, int incr1 = 1, int start2 = 0, int incr2 = 1);
+   SPxId selectEnterDenseDim(Real& best, Real feastol, int start = 0, int incr = 1);
+   SPxId selectEnterDenseCoDim(Real& best, Real feastol, int start = 0, int incr = 1);
    /// internal implementation of SPxPricer::entered4()
    void entered4X(SPxId id, int n, int start1, int incr1, int start2, int incr2);
    //@}

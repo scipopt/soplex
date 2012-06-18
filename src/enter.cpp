@@ -107,12 +107,51 @@ void SPxSolver::computeTest()
    METHOD( "SPxSolver::computeTest()" );
 
    const SPxBasis::Desc& ds = desc();
+   Real theeps = epsilon();
+   infeasibilitiesTest.clear();
+   int ninfeasibilities = 0;
 
    for(int i = 0; i < coDim(); ++i)
    {
       SPxBasis::Desc::Status stat = ds.status(i);
 
-      theTest[i] = isBasic(stat) ? 0.0 : test(i, stat);
+      if(isBasic(stat))
+         theTest[i] = 0.0;
+      else
+      {
+         theTest[i] = test(i, stat);
+
+         if( remainingRoundsEnterCo == 0 )
+         {
+            if( theTest[i] < -theeps )
+            {
+               assert(infeasibilitiesTest.size() < infeasibilitiesTest.max());
+               infeasibilitiesTest.addIdx(i);
+               isInfeasibleCo[i] = true;
+               ++ninfeasibilities;
+            }
+            else
+               isInfeasibleCo[i] = false;
+            if( ninfeasibilities > sparsityThresholdEnterCo )
+            {
+               MSG_INFO2( spxout << "IENTER03 too many infeasibilities for sparse pricing"
+                                 << std::endl; )
+               remainingRoundsEnterCo = DENSEROUNDS;
+               sparsePricingEnterCo = false;
+               ninfeasibilities = 0;
+            }
+         }
+      }
+   }
+   if( ninfeasibilities == 0 && sparsePricingEnterCo == false )
+      --remainingRoundsEnterCo;
+   else if( ninfeasibilities <= sparsityThresholdEnterCo )
+   {
+      MSG_INFO2( spxout << "IENTER04 sparse pricing active, "
+                        << "sparsity: "
+                        << (Real) ninfeasibilities/coDim()
+                        << std::endl; )
+      sparsePricingEnterCo = true;
    }
 }
 
@@ -178,6 +217,9 @@ void SPxSolver::computeCoTest()
 {
    METHOD( "SPxSolver::computeCoTest()" );
    int i;
+   Real theeps = epsilon();
+   infeasibilitiesCoTest.clear();
+   int ninfeasibilities = 0;
    const SPxBasis::Desc& ds = desc();
 
    for (i = dim() - 1; i >= 0; --i)
@@ -186,7 +228,39 @@ void SPxSolver::computeCoTest()
       if (isBasic(stat))
          theCoTest[i] = 0;
       else
+      {
          theCoTest[i] = coTest(i, stat);
+         if( remainingRoundsEnter == 0 )
+         {
+            if( theCoTest[i] < -theeps )
+            {
+               assert(infeasibilitiesCoTest.size() < infeasibilitiesCoTest.max());
+               infeasibilitiesCoTest.addIdx(i);
+               isInfeasible[i] = true;
+               ++ninfeasibilities;
+            }
+            else
+               isInfeasible[i] = false;
+            if( ninfeasibilities > sparsityThresholdEnter )
+            {
+               MSG_INFO2( spxout << "IENTER05 too many infeasibilities for sparse pricing"
+                                 << std::endl; )
+               remainingRoundsEnter = DENSEROUNDS;
+               sparsePricingEnter = false;
+               ninfeasibilities = 0;
+            }
+         }
+      }
+   }
+   if( ninfeasibilities == 0 && sparsePricingEnter == false )
+      --remainingRoundsEnter;
+   else if( ninfeasibilities <= sparsityThresholdEnter )
+   {
+      MSG_INFO2( spxout << "IENTER06 sparse pricing active, "
+                        << "sparsity: "
+                        << (Real) ninfeasibilities/dim()
+                        << std::endl; )
+      sparsePricingEnter = true;
    }
 }
 
@@ -202,6 +276,7 @@ void SPxSolver::updateTest()
 
    const IdxSet& idx = thePvec->idx();
    const SPxBasis::Desc& ds = desc();
+   Real theeps = epsilon();
 
    int i;
    for (i = idx.size() - 1; i >= 0; --i)
@@ -209,7 +284,19 @@ void SPxSolver::updateTest()
       int j = idx.index(i);
       SPxBasis::Desc::Status stat = ds.status(j);
       if (!isBasic(stat))
+      {
          theTest[j] = test(j, stat);
+
+         if( sparsePricingEnterCo && theTest[j] < -theeps )
+         {
+            assert(remainingRoundsEnterCo == 0);
+            if( !isInfeasibleCo[j] )
+            {
+               infeasibilitiesTest.addIdx(j);
+               isInfeasibleCo[j] = true;
+            }
+         }
+      }
       else
          theTest[j] = 0;
    }
@@ -222,6 +309,7 @@ void SPxSolver::updateCoTest()
 
    const IdxSet& idx = theCoPvec->idx();
    const SPxBasis::Desc& ds = desc();
+   Real theeps = epsilon();
 
    int i;
    for (i = idx.size() - 1; i >= 0; --i)
@@ -229,7 +317,19 @@ void SPxSolver::updateCoTest()
       int j = idx.index(i);
       SPxBasis::Desc::Status stat = ds.coStatus(j);
       if (!isBasic(stat))
+      {
          theCoTest[j] = coTest(j, stat);
+
+         if( sparsePricingEnter && theCoTest[j] < -theeps )
+         {
+            assert(remainingRoundsEnter == 0);
+            if( !isInfeasible[j] )
+            {
+               infeasibilitiesCoTest.addIdx(j);
+               isInfeasible[j] = true;
+            }
+         }
+      }
       else
          theCoTest[j] = 0;
    }
