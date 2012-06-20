@@ -43,7 +43,7 @@ void SPxSolver::computeFtest()
    assert(type() == LEAVE);
 
    Real theeps = epsilon();
-   infeasibilitiesFtest.clear();
+   infeasibilities.clear();
    int ninfeasibilities = 0;
 
    for( int i = 0; i < dim(); ++i )
@@ -56,8 +56,8 @@ void SPxSolver::computeFtest()
       {
          if( theCoTest[i] < -theeps )
          {
-            assert(infeasibilitiesFtest.size() < infeasibilitiesFtest.max());
-            infeasibilitiesFtest.addIdx(i);
+            assert(infeasibilities.size() < infeasibilities.max());
+            infeasibilities.addIdx(i);
             isInfeasible[i] = true;
             ++ninfeasibilities;
          }
@@ -65,7 +65,7 @@ void SPxSolver::computeFtest()
             isInfeasible[i] = false;
          if( ninfeasibilities > sparsityThresholdLeave )
          {
-            MSG_INFO2( spxout << "ILEAVE04 too many infeasibilities for sparse pricing"
+            MSG_INFO2( spxout << "ILEAVE05 too many infeasibilities for sparse pricing"
                               << std::endl; )
             remainingRoundsLeave = DENSEROUNDS;
             sparsePricingLeave = false;
@@ -78,9 +78,11 @@ void SPxSolver::computeFtest()
    {
       --remainingRoundsLeave;
    }
-   else if( ninfeasibilities <= sparsityThresholdLeave )
+   else if( ninfeasibilities <= sparsityThresholdLeave && !sparsePricingLeave )
    {
-      MSG_INFO2( spxout << "ILEAVE05 sparse pricing active, " << "sparsity: "
+      MSG_INFO2( spxout << "ILEAVE04 sparse pricing active, "
+                        << "sparsity: "
+                        << std::setw(6) << std::fixed << std::setprecision(4)
                         << (Real) ninfeasibilities/dim()
                         << std::endl; )
       sparsePricingLeave = true;
@@ -109,7 +111,7 @@ void SPxSolver::updateFtest()
          assert(remainingRoundsLeave == 0);
          if( !isInfeasible[i] )
          {
-            infeasibilitiesFtest.addIdx(i);
+            infeasibilities.addIdx(i);
             isInfeasible[i] = true;
          }
       }

@@ -67,11 +67,15 @@ private:
    int selectLeaveSparse(Real& best, Real feastol);
    /// internal implementation of SPxPricer::left4()
    void left4X(int n, const SPxId& id, int start, int incr);
-   /// implementation of sparse pricing
+   /// choose the best entering index among columns and rows but prefer sparsity
+   SPxId selectEnterX(Real tol);
+   /// implementation of sparse pricing in the entering Simplex (slack variables)
    SPxId selectEnterSparseDim(Real& best, Real feastol);
+   /// implementation of sparse pricing in the entering Simplex
    SPxId selectEnterSparseCoDim(Real& best, Real feastol);
-   /// internal implementation of SPxPricer::selectEnter()
+   /// SPxPricer::selectEnter() in dense case (slack variabels)
    SPxId selectEnterDenseDim(Real& best, Real feastol, int start = 0, int incr = 1);
+   /// SPxPricer::selectEnter() in dense case
    SPxId selectEnterDenseCoDim(Real& best, Real feastol, int start = 0, int incr = 1);
    /// internal implementation of SPxPricer::entered4()
    void entered4X(SPxId id, int n, int start1, int incr1, int start2, int incr2);

@@ -187,12 +187,16 @@ public:
    virtual void left4(int n, SPxId id);
    ///
    virtual SPxId selectEnter();
+   /// choose the best entering index among columns and rows but prefer sparsity
+   SPxId selectEnterX();
+   /// implementation of sparse pricing for the entering Simplex (slack variables)
+   SPxId selectEnterSparseDim(Real& best, SPxId enterId);
    /// implementation of sparse pricing for the entering Simplex
-   SPxId selectEnterSparseDim(Real& best, SPxId lastId);
-   SPxId selectEnterSparseCoDim(Real& best, SPxId lastId);
-   /// interlan implementation of SPxSteepPR::selectEnter()
-   SPxId selectEnterDenseDim(Real& best, SPxId lastId);
-   SPxId selectEnterDenseCoDim(Real& best, SPxId lastId);
+   SPxId selectEnterSparseCoDim(Real& best, SPxId enterId);
+   /// implementation of selectEnter() in dense case (slack variables)
+   SPxId selectEnterDenseDim(Real& best, SPxId enterId);
+   /// implementation of selectEnter() in dense case
+   SPxId selectEnterDenseCoDim(Real& best, SPxId enterId);
    ///
    virtual void entered4(SPxId id, int n);
    /// \p n vectors have been added to loaded LP.

@@ -348,8 +348,8 @@ void SPxSolver::init()
       setEnterBounds();
       computeEnterCoPrhs();
       // prepare support vectors for sparse pricing
-      infeasibilitiesTest.setMax(coDim());
-      infeasibilitiesCoTest.setMax(dim());
+      infeasibilities.setMax(dim());
+      infeasibilitiesCo.setMax(coDim());
       isInfeasible.reSize(dim());
       isInfeasibleCo.reSize(coDim());
       sparsityThresholdEnter = (int) dim() * SPARSITYTHRESHOLD;
@@ -370,7 +370,7 @@ void SPxSolver::init()
       setLeaveBounds();
       computeLeaveCoPrhs();
       // prepare support vectors for sparse pricing
-      infeasibilitiesFtest.setMax(dim());
+      infeasibilities.setMax(dim());
       isInfeasible.reSize(dim());
       sparsityThresholdLeave = (int) dim() * SPARSITYTHRESHOLD;
    }
@@ -481,9 +481,8 @@ void SPxSolver::clear()
    setBasisStatus(SPxBasis::NO_PROBLEM);
    SPxBasis::reDim();
 
-   infeasibilitiesFtest.clear();
-   infeasibilitiesCoTest.clear();
-   infeasibilitiesTest.clear();
+   infeasibilities.clear();
+   infeasibilitiesCo.clear();
    isInfeasible.clear();
    isInfeasibleCo.clear();
 }
@@ -870,9 +869,8 @@ SPxSolver::SPxSolver(
    , thepricer (0)
    , theratiotester (0)
    , thestarter (0)
-   , infeasibilitiesFtest(0)
-   , infeasibilitiesCoTest(0)
-   , infeasibilitiesTest(0)
+   , infeasibilities(0)
+   , infeasibilitiesCo(0)
    , isInfeasible(0)
    , isInfeasibleCo(0)
    , sparsePricingLeave(false)
@@ -965,9 +963,8 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       leaveCount = base.leaveCount;
       enterCount = base.enterCount;
       theCumulativeTime = base.theCumulativeTime;
-      infeasibilitiesFtest = base.infeasibilitiesFtest;
-      infeasibilitiesCoTest = base.infeasibilitiesCoTest;
-      infeasibilitiesTest = base.infeasibilitiesTest;
+      infeasibilities = base.infeasibilities;
+      infeasibilitiesCo = base.infeasibilitiesCo;
       isInfeasible = base.isInfeasible;
       isInfeasibleCo = base.isInfeasibleCo;
       sparsePricingLeave = base.sparsePricingLeave;
@@ -1125,9 +1122,8 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , dualFarkas(base.dualFarkas)
    , leaveCount(base.leaveCount)
    , enterCount(base.enterCount)
-   , infeasibilitiesFtest(base.infeasibilitiesFtest)
-   , infeasibilitiesCoTest(base.infeasibilitiesCoTest)
-   , infeasibilitiesTest(base.infeasibilitiesTest)
+   , infeasibilities(base.infeasibilities)
+   , infeasibilitiesCo(base.infeasibilitiesCo)
    , isInfeasible(base.isInfeasible)
    , isInfeasibleCo(base.isInfeasibleCo)
    , sparsePricingLeave(base.sparsePricingLeave)

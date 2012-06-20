@@ -428,9 +428,9 @@ int SPxSteepPR::selectLeaveSparse()
    int lastIdx = -1;
    int idx = 0;
 
-   for (int i = thesolver->infeasibilitiesFtest.size() - 1; i >= 0; --i)
+   for (int i = thesolver->infeasibilities.size() - 1; i >= 0; --i)
    {
-      idx = thesolver->infeasibilitiesFtest.index(i);
+      idx = thesolver->infeasibilities.index(i);
       x = fTest[idx];
 
       if (x < -theeps)
@@ -455,7 +455,7 @@ int SPxSteepPR::selectLeaveSparse()
       }
       else
       {
-         thesolver->infeasibilitiesFtest.remove(i);
+         thesolver->infeasibilities.remove(i);
 
          assert(thesolver->isInfeasible[idx]);
          thesolver->isInfeasible[idx] = false;
@@ -546,11 +546,8 @@ SPxId SPxSteepPR::selectEnter()
 {
    assert(thesolver != 0);
    SPxId enterId;
-   Real  best = -infinity;
 
-   enterId = (thesolver->sparsePricingEnter) ? selectEnterSparseDim(best, enterId) : selectEnterDenseDim(best, enterId);
-   enterId = (thesolver->sparsePricingEnterCo) ? selectEnterSparseCoDim(best, enterId) : selectEnterDenseCoDim(best, enterId);
-
+   enterId = selectEnterX();
    assert(isConsistent());
 
    if (enterId.isValid())
@@ -569,6 +566,26 @@ SPxId SPxSteepPR::selectEnter()
    return enterId;
 }
 
+SPxId SPxSteepPR::selectEnterX()
+{
+   SPxId enterId;
+   SPxId enterIdCo;
+   Real best;
+   Real bestCo;
+
+   best = -infinity;
+   bestCo = -infinity;
+   enterId = (thesolver->sparsePricingEnter) ? selectEnterSparseDim(best, enterId) : selectEnterDenseDim(best, enterId);
+   enterIdCo = (thesolver->sparsePricingEnterCo) ? selectEnterSparseCoDim(bestCo, enterId) : selectEnterDenseCoDim(bestCo, enterId);
+
+   // prefer slack indices to reduce nonzeros in basis matrix
+   if( enterId.isValid() && (best > SPARSITY_TRADEOFF * bestCo || !enterIdCo.isValid()) )
+      return enterId;
+   else
+      return enterIdCo;
+}
+
+
 SPxId SPxSteepPR::selectEnterSparseDim(Real& best, SPxId enterId)
 {
    const Real* cp            = coPref.get_const_ptr();
@@ -580,9 +597,9 @@ SPxId SPxSteepPR::selectEnterSparseDim(Real& best, SPxId enterId)
    Real coPen;
    Real coPref;
 
-   for (int i = thesolver->infeasibilitiesCoTest.size() -1; i >= 0; --i)
+   for (int i = thesolver->infeasibilities.size() -1; i >= 0; --i)
    {
-      idx = thesolver->infeasibilitiesCoTest.index(i);
+      idx = thesolver->infeasibilities.index(i);
       x = coTest[idx];
 
       if (x < -theeps)
@@ -600,7 +617,7 @@ SPxId SPxSteepPR::selectEnterSparseDim(Real& best, SPxId enterId)
       }
       else
       {
-         thesolver->infeasibilitiesCoTest.remove(i);
+         thesolver->infeasibilities.remove(i);
 
          assert(thesolver->isInfeasible[idx]);
          thesolver->isInfeasible[idx] = false;
@@ -620,9 +637,9 @@ SPxId SPxSteepPR::selectEnterSparseCoDim(Real& best, SPxId enterId)
    Real pen;
    Real pref;
 
-   for (int i = thesolver->infeasibilitiesTest.size() -1; i >= 0; --i)
+   for (int i = thesolver->infeasibilitiesCo.size() -1; i >= 0; --i)
    {
-      idx = thesolver->infeasibilitiesTest.index(i);
+      idx = thesolver->infeasibilitiesCo.index(i);
       x = test[idx];
 
       if (x < -theeps)
@@ -640,7 +657,7 @@ SPxId SPxSteepPR::selectEnterSparseCoDim(Real& best, SPxId enterId)
       }
       else
       {
-         thesolver->infeasibilitiesTest.remove(i);
+         thesolver->infeasibilitiesCo.remove(i);
 
          assert(thesolver->isInfeasibleCo[idx]);
          thesolver->isInfeasibleCo[idx] = false;

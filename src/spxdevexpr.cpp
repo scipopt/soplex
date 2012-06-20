@@ -211,9 +211,9 @@ int SPxDevexPR::selectLeaveSparse(Real& best, Real feastol)
    Real fTesti;
    Real coPeni;
 
-   for (int i = thesolver->infeasibilitiesFtest.size() - 1; i >= 0; --i)
+   for (int i = thesolver->infeasibilities.size() - 1; i >= 0; --i)
    {
-      idx = thesolver->infeasibilitiesFtest.index(i);
+      idx = thesolver->infeasibilities.index(i);
       fTesti = fTest[idx];
       if (fTesti < -feastol)
       {
@@ -228,7 +228,7 @@ int SPxDevexPR::selectLeaveSparse(Real& best, Real feastol)
       }
       else
       {
-         thesolver->infeasibilitiesFtest.remove(i);
+         thesolver->infeasibilities.remove(i);
 
          assert(thesolver->isInfeasible[idx]);
          thesolver->isInfeasible[idx] = false;
@@ -277,30 +277,44 @@ void SPxDevexPR::left4X(int n, const SPxId& id, int start, int incr)
    }
 }
 
+
+
 SPxId SPxDevexPR::selectEnter()
 {
    assert(thesolver != 0);
 
    SPxId enterId;
-   SPxId enterIdCo;
-   Real best = 0;
 
-   enterId = (thesolver->sparsePricingEnter) ? selectEnterSparseDim(best, theeps) : selectEnterDenseDim(best,theeps);
-   enterIdCo = (thesolver->sparsePricingEnterCo) ? selectEnterSparseCoDim(best, theeps) : selectEnterDenseCoDim(best, theeps);
-   if( enterIdCo.isValid() )
-      enterId = enterIdCo;
+   enterId = selectEnterX(theeps);
 
    if( !enterId.isValid() && !refined )
    {
       refined = true;
       MSG_INFO3( spxout << "WDEVEX02 trying refinement step..\n"; )
-      enterId = selectEnterSparseDim(best, theeps/DEVEX_REFINETOL);
-      enterIdCo = selectEnterSparseCoDim(best, theeps/DEVEX_REFINETOL);
-      if( enterIdCo.isValid() )
-         enterId = enterIdCo;
+      enterId = selectEnterX(theeps/DEVEX_REFINETOL);
    }
 
    return enterId;
+}
+
+// choose the best entering index among columns and rows but prefer sparsity
+SPxId SPxDevexPR::selectEnterX(Real tol)
+{
+   SPxId enterId;
+   SPxId enterIdCo;
+   Real best;
+   Real bestCo;
+
+   best = 0;
+   bestCo = 0;
+   enterId = (thesolver->sparsePricingEnter) ? selectEnterSparseDim(best, tol) : selectEnterDenseDim(best, tol);
+   enterIdCo = (thesolver->sparsePricingEnterCo) ? selectEnterSparseCoDim(bestCo, tol) : selectEnterDenseCoDim(bestCo, tol);
+
+   // prefer slack indices to reduce nonzeros in basis matrix
+   if( enterId.isValid() && (best > SPARSITY_TRADEOFF * bestCo || !enterIdCo.isValid()) )
+      return enterId;
+   else
+      return enterIdCo;
 }
 
 SPxId SPxDevexPR::selectEnterSparseDim(Real& best, Real feastol)
@@ -315,9 +329,9 @@ SPxId SPxDevexPR::selectEnterSparseDim(Real& best, Real feastol)
    Real x;
 
    assert(end == thesolver->coTest().dim());
-   for(int i = thesolver->infeasibilitiesCoTest.size() -1; i >= 0; --i)
+   for(int i = thesolver->infeasibilities.size() -1; i >= 0; --i)
    {
-      idx = thesolver->infeasibilitiesCoTest.index(i);
+      idx = thesolver->infeasibilities.index(i);
       coTesti = cTest[idx];
       if (coTesti < -feastol)
       {
@@ -332,8 +346,7 @@ SPxId SPxDevexPR::selectEnterSparseDim(Real& best, Real feastol)
       }
       else
       {
-         thesolver->infeasibilitiesCoTest.remove(i);
-
+         thesolver->infeasibilities.remove(i);
          assert(thesolver->isInfeasible[idx]);
          thesolver->isInfeasible[idx] = false;
       }
@@ -358,9 +371,9 @@ SPxId SPxDevexPR::selectEnterSparseCoDim(Real& best, Real feastol)
    Real x;
 
    assert(end == thesolver->test().dim());
-   for (int i = thesolver->infeasibilitiesTest.size() -1; i >= 0; --i)
+   for (int i = thesolver->infeasibilitiesCo.size() -1; i >= 0; --i)
    {
-      idx = thesolver->infeasibilitiesTest.index(i);
+      idx = thesolver->infeasibilitiesCo.index(i);
       testi = test[idx];
       if (testi < -feastol)
       {
@@ -375,13 +388,12 @@ SPxId SPxDevexPR::selectEnterSparseCoDim(Real& best, Real feastol)
       }
       else
       {
-         thesolver->infeasibilitiesTest.remove(i);
-
+         thesolver->infeasibilitiesCo.remove(i);
          assert(thesolver->isInfeasibleCo[idx]);
          thesolver->isInfeasibleCo[idx] = false;
       }
    }
-   
+
    if (enterIdx >= 0)
       return thesolver->id(enterIdx);
 
@@ -412,7 +424,7 @@ SPxId SPxDevexPR::selectEnterDenseDim(Real& best, Real feastol, int start, int i
          }
       }
    }
-   
+
    if (enterIdx >= 0)
       return thesolver->coId(enterIdx);
 

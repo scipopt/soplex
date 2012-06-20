@@ -108,7 +108,7 @@ void SPxSolver::computeTest()
 
    const SPxBasis::Desc& ds = desc();
    Real theeps = epsilon();
-   infeasibilitiesTest.clear();
+   infeasibilitiesCo.clear();
    int ninfeasibilities = 0;
 
    for(int i = 0; i < coDim(); ++i)
@@ -125,8 +125,8 @@ void SPxSolver::computeTest()
          {
             if( theTest[i] < -theeps )
             {
-               assert(infeasibilitiesTest.size() < infeasibilitiesTest.max());
-               infeasibilitiesTest.addIdx(i);
+               assert(infeasibilitiesCo.size() < infeasibilitiesCo.max());
+               infeasibilitiesCo.addIdx(i);
                isInfeasibleCo[i] = true;
                ++ninfeasibilities;
             }
@@ -134,7 +134,7 @@ void SPxSolver::computeTest()
                isInfeasibleCo[i] = false;
             if( ninfeasibilities > sparsityThresholdEnterCo )
             {
-               MSG_INFO2( spxout << "IENTER03 too many infeasibilities for sparse pricing"
+               MSG_INFO2( spxout << "IENTER04 too many infeasibilities for sparse pricing"
                                  << std::endl; )
                remainingRoundsEnterCo = DENSEROUNDS;
                sparsePricingEnterCo = false;
@@ -143,12 +143,13 @@ void SPxSolver::computeTest()
          }
       }
    }
-   if( ninfeasibilities == 0 && sparsePricingEnterCo == false )
+   if( ninfeasibilities == 0 && !sparsePricingEnterCo )
       --remainingRoundsEnterCo;
-   else if( ninfeasibilities <= sparsityThresholdEnterCo )
+   else if( ninfeasibilities <= sparsityThresholdEnterCo && !sparsePricingEnterCo )
    {
-      MSG_INFO2( spxout << "IENTER04 sparse pricing active, "
+      MSG_INFO2( spxout << "IENTER03 sparse pricing active, "
                         << "sparsity: "
+                        << std::setw(6) << std::fixed << std::setprecision(4)
                         << (Real) ninfeasibilities/coDim()
                         << std::endl; )
       sparsePricingEnterCo = true;
@@ -218,7 +219,7 @@ void SPxSolver::computeCoTest()
    METHOD( "SPxSolver::computeCoTest()" );
    int i;
    Real theeps = epsilon();
-   infeasibilitiesCoTest.clear();
+   infeasibilities.clear();
    int ninfeasibilities = 0;
    const SPxBasis::Desc& ds = desc();
 
@@ -234,8 +235,8 @@ void SPxSolver::computeCoTest()
          {
             if( theCoTest[i] < -theeps )
             {
-               assert(infeasibilitiesCoTest.size() < infeasibilitiesCoTest.max());
-               infeasibilitiesCoTest.addIdx(i);
+               assert(infeasibilities.size() < infeasibilities.max());
+               infeasibilities.addIdx(i);
                isInfeasible[i] = true;
                ++ninfeasibilities;
             }
@@ -243,7 +244,7 @@ void SPxSolver::computeCoTest()
                isInfeasible[i] = false;
             if( ninfeasibilities > sparsityThresholdEnter )
             {
-               MSG_INFO2( spxout << "IENTER05 too many infeasibilities for sparse pricing"
+               MSG_INFO2( spxout << "IENTER06 too many infeasibilities for sparse pricing"
                                  << std::endl; )
                remainingRoundsEnter = DENSEROUNDS;
                sparsePricingEnter = false;
@@ -252,12 +253,13 @@ void SPxSolver::computeCoTest()
          }
       }
    }
-   if( ninfeasibilities == 0 && sparsePricingEnter == false )
+   if( ninfeasibilities == 0 && !sparsePricingEnter )
       --remainingRoundsEnter;
-   else if( ninfeasibilities <= sparsityThresholdEnter )
+   else if( ninfeasibilities <= sparsityThresholdEnter && !sparsePricingEnter )
    {
-      MSG_INFO2( spxout << "IENTER06 sparse pricing active, "
+      MSG_INFO2( spxout << "IENTER05 sparse pricing active, "
                         << "sparsity: "
+                        << std::setw(6) << std::fixed << std::setprecision(4)
                         << (Real) ninfeasibilities/dim()
                         << std::endl; )
       sparsePricingEnter = true;
@@ -292,7 +294,7 @@ void SPxSolver::updateTest()
             assert(remainingRoundsEnterCo == 0);
             if( !isInfeasibleCo[j] )
             {
-               infeasibilitiesTest.addIdx(j);
+               infeasibilitiesCo.addIdx(j);
                isInfeasibleCo[j] = true;
             }
          }
@@ -325,7 +327,7 @@ void SPxSolver::updateCoTest()
             assert(remainingRoundsEnter == 0);
             if( !isInfeasible[j] )
             {
-               infeasibilitiesCoTest.addIdx(j);
+               infeasibilities.addIdx(j);
                isInfeasible[j] = true;
             }
          }

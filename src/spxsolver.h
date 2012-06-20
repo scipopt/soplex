@@ -35,6 +35,10 @@
 
 #define SPARSITYTHRESHOLD        0.5      /**< percentage of basic infeasibilities that is considered sparse */
 #define DENSEROUNDS               5       /**< number of refactorization until sparsity is tested again */
+#define SPARSITY_TRADEOFF        0.8      /**< threshold to decide whether slack or structural variables enter the basis
+                                           * slack variables are preferred if their pricing value is not worse than
+                                           * SPARSITY_TRADEOFF * the best structural value
+                                           */
 
 namespace soplex
 {
@@ -317,15 +321,13 @@ protected:
 
 public:
 
-   /** For the leaving Simplex algorithm this vector contains the indices of infeasible basic variables
-    *  After a basis change the indexset is updated.
+   /** For the leaving Simplex algorithm this vector contains the indices of infeasible basic variables;
+    *  for the entering Simplex algorithm this vector contains the indices of infeasible slack variables.
     */
-   DIdxSet infeasibilitiesFtest;
-   /**For the entering Simplex algorithm these vectors contains the indices of ...
-    * 
+   DIdxSet infeasibilities;
+   /**For the entering Simplex algorithm these vectors contains the indices of infeasible basic variables.
     */
-   DIdxSet infeasibilitiesTest;
-   DIdxSet infeasibilitiesCoTest;
+   DIdxSet infeasibilitiesCo;
 
    /** Binary vectors to store whether basic indices are infeasible
     *  the i-th entry equals false, if the i-th basic variable is not infeasible
@@ -337,16 +339,16 @@ public:
 
    /// These values enable or disable sparse pricing
    bool     sparsePricingLeave;        ///< true if sparsePricing is turned on in the leaving Simplex
-   bool     sparsePricingEnter;        ///< true if sparsePricing is turned on in the entering Simplex
+   bool     sparsePricingEnter;        ///< true if sparsePricing is turned on in the entering Simplex for slack variables
    bool     sparsePricingEnterCo;      ///< true if sparsePricing is turned on in the entering Simplex
 
    int      remainingRoundsLeave;      ///< number of dense rounds/refactorizations until sparsePricing is enabled again
    int      remainingRoundsEnter;
    int      remainingRoundsEnterCo;
 
-   int      sparsityThresholdLeave;    ///< maximum allowed length of \ref soplex::SPxSolver::infeasibilitiesFtest "infeasibilitiesFtest" in the leaving Simplex 
-   int      sparsityThresholdEnter;    ///< maximum allowed length of \ref soplex::SPxSolver::infeasibilitiesCoTest "infeasibilitiesCoTest" in the entering Simplex
-   int      sparsityThresholdEnterCo;  ///< maximum allowed length of \ref soplex::SPxSolver::infeasibilitiesTest "infeasibilitiesTest" in the entering Simplex
+   int      sparsityThresholdLeave;    ///< maximum allowed length of \ref soplex::SPxSolver::infeasibilitiesFtest "infeasibilities" in the leaving Simplex
+   int      sparsityThresholdEnter;    ///< maximum allowed length of \ref soplex::SPxSolver::infeasibilitiesCoTest "infeasibilities" in the entering Simplex
+   int      sparsityThresholdEnterCo;  ///< maximum allowed length of \ref soplex::SPxSolver::infeasibilitiesTest "infeasibilitiesCo" in the entering Simplex
 
    //-----------------------------
    /**@name Access */
