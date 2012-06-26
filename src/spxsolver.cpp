@@ -784,6 +784,12 @@ void SPxSolver::setFeastol(Real d)
    if( d < 0.0 )
       throw SPxInterfaceException("XSOLVE30 Cannot set negative feastol.");
 
+   if( !MpqRealIsExact() && d < DEFAULT_BND_VIOL * 1e-6 )
+   {
+      MSG_WARNING( spxout << "WSOLVE32 Warning: Cannot set primal feasibility tolerance smaller than " << DEFAULT_BND_VIOL * 1e-6 << " because of missing GMP support (compile with GMP=true).\n" );
+      d = DEFAULT_BND_VIOL * 1e-6;
+   }
+
    if( theRep == COLUMN )
       m_entertol = d;
    else
@@ -797,6 +803,12 @@ void SPxSolver::setOpttol(Real d)
    if( d < 0.0 )
       throw SPxInterfaceException("XSOLVE31 Cannot set negative opttol.");
 
+   if( !MpqRealIsExact() && d < DEFAULT_BND_VIOL * 1e-6 )
+   {
+      MSG_WARNING( spxout << "WSOLVE33 Warning: Cannot set dual feasibility tolerance smaller than " << DEFAULT_BND_VIOL * 1e-6 << " because of missing GMP support (compile with GMP=true).\n" );
+      d = DEFAULT_BND_VIOL * 1e-6;
+   }
+
    if( theRep == COLUMN )
       m_leavetol = d;
    else
@@ -809,6 +821,12 @@ void SPxSolver::setDelta(Real d)
 
    if( d < 0.0 )
       throw SPxInterfaceException("XSOLVE32 Cannot set negative delta.");
+
+   if( !MpqRealIsExact() && d < DEFAULT_BND_VIOL * 1e-6 )
+   {
+      MSG_WARNING( spxout << "WSOLVE34 Warning: Cannot set feasibility tolerance smaller than " << DEFAULT_BND_VIOL * 1e-6 << " because of missing GMP support (compile with GMP=true).\n" );
+      d = DEFAULT_BND_VIOL * 1e-6;
+   }
 
    m_entertol = d;
    m_leavetol = d;

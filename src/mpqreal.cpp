@@ -24,26 +24,34 @@
 namespace soplex
 {
 #ifdef WITH_GMP
+
+/// print MpqReal with limited floating point precision
 std::ostream& operator<<(std::ostream& os, const MpqReal& q)
 {
    os << mpf_class(q);
    return os;
 }
 
+/// cast MpqReal to Real
 Real get_d(const MpqReal& q)
 {
    return q.get_d();
 }
+
 #else
+
+/// cast MpqReal to Real
 Real get_d(const MpqReal& q)
 {
    return q;
 }
 
+/// return maximal absolute value
 MpqReal abs(const MpqReal& q)
 {
    return fabs(q);
 }
+
 #endif
 } // namespace soplex
 

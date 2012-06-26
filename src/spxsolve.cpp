@@ -827,6 +827,15 @@ SPxSolver::Status SPxSolver::solve()
       return status();
    }
 
+   /* perform iterative refinement only if exact arithmetic is available */
+   if( !MpqRealIsExact() )
+   {
+      MSG_WARNING( spxout << "WSOLVE35 Warning: Iterative refinement disabled because of missing GMP support (compile with GMP=true).\n" );
+
+      fpsolve();
+      return status();
+   }
+
    /* otherwise apply iterative refinement */
    SPxBasis::SPxStatus basisstat;
    SPxBasis::Desc basisdesc;

@@ -39,14 +39,30 @@ namespace soplex
  * We wrap mpq_class so that we can replace it by SoPlex's normal Real type if GMP is not available.
  */
 #ifdef WITH_GMP
+
+/// If compiled with GMP support, MpqReal is defined as mpq_class.
 typedef mpq_class MpqReal;
+
+/// return whether MpqReal provides exact arithmetic
+#define MpqRealIsExact() (true)
+
+/// print MpqReal with limited floating point precision
 std::ostream& operator<<(std::ostream& os, const MpqReal& q);
-Real get_d(const MpqReal& q);
+
 #else
+
+/// If compiled without GMP support, MpqReal is defined as SoPlex's normal Real.
 typedef Real MpqReal;
-Real get_d(const MpqReal& q);
+
+/// return whether MpqReal provides exact arithmetic
+#define MpqRealIsExact() (false)
+
+/// return maximal absolute value
 MpqReal abs(const MpqReal& q);
 #endif
+
+/// cast MpqReal to Real
+Real get_d(const MpqReal& q);
 
 } // namespace soplex
 #endif // _MPQREAL_H_
