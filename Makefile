@@ -42,7 +42,7 @@ INSTALLDIR	=	#
 #will this be compiled for PARASCIP? (disables output because it uses global variables)
 PARASCIP	=	false
 
-GMP		=	true
+GMP		=	false
 ZLIB		=	true
 
 COMP		=	gnu
