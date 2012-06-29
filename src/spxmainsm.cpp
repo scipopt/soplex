@@ -3051,9 +3051,6 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
                // modify lhs and rhs of constraint rowIdx
                doChangeRanges = true;
 
-               newLhsVec[rowIdx] = newLhs;
-               newRhsVec[rowIdx] = newRhs;
-
                if (LTrel(newRhs, newLhs, feastol()))
                {
                   MSG_INFO3( spxout << "IMAISM55 duplicate rows yield infeasible bounds:"
@@ -3062,6 +3059,12 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
                   delete[] perm_tmp;
                   return INFEASIBLE;
                }
+               // if we accept the infeasibility we should clean up the values to avoid problems later
+               if( newRhs < newLhs )
+                  newRhs = newLhs;
+
+               newLhsVec[rowIdx] = newLhs;
+               newRhsVec[rowIdx] = newRhs;
             }
          }
       }
@@ -3556,6 +3559,7 @@ void SPxMainSM::fixColumn(SPxLP& lp, int j, bool correctIdx)
 
             lp.changeLhs(i, lhs);
          }
+         assert(lp.lhs(i) <= lp.rhs(i));
       }
    }
 
