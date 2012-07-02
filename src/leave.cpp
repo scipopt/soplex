@@ -80,10 +80,12 @@ void SPxSolver::computeFtest()
    }
    else if( ninfeasibilities <= sparsityThresholdLeave && !sparsePricingLeave )
    {
+      std::streamsize prec = spxout.precision();
       MSG_INFO2( spxout << "ILEAVE04 sparse pricing active, "
                         << "sparsity: "
                         << std::setw(6) << std::fixed << std::setprecision(4)
                         << (Real) ninfeasibilities/dim()
+                        << std::scientific << std::setprecision(int(prec))
                         << std::endl; )
       sparsePricingLeave = true;
    }
