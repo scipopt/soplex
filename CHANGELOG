@@ -27,6 +27,7 @@ fixed bugs:
 - using a starting basis from file disables simplifier
 - fixed bug in computeLeaveCoPrhs4Col() for column status D_UNDEFINED
 - fixed bug in unsimplifying singleton rows
+- fixed cycling caused by refactorization after pricer finds no more candidates
 
 interface:
 - info message in case a fresh factorization is not stable enough and has to be done again with higher Markowitz threshold

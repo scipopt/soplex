@@ -31,6 +31,7 @@
 #define MAXCYCLES 400
 #define MAXSTALLS 10000
 #define MAXSTALLRECOVERS 10
+#define MAXREFACPIVOTS 10
 
 namespace soplex
 {
@@ -187,6 +188,7 @@ SPxSolver::Status SPxSolver::fpsolve()
       if (type() == ENTER)
       {
          int enterCycleCount = 0;
+         int enterFacPivotCount = 0;
 
          stallRefIter = iteration()-1;
          stallRefShift = shift();
@@ -249,21 +251,29 @@ SPxSolver::Status SPxSolver::fpsolve()
                }
                MSG_INFO3( spxout << "ISOLVE76 solve(enter) triggers refactorization" << std::endl; )
 
-               // We better refactor to make sure the solution is ok.
-               // BH 2005-12-15: For some reason we must do this even if lastUpdate() == 0,
-               // otherwise something goes wrong, e.g. in instances of the siemens test set.
-               factorize();
-               // Inna/Tobi: if the factorization was found out to be singular, we have to quit
-               if (SPxBasis::status() < SPxBasis::REGULAR)
+               // if the factorization is not fresh, we better refactorize and call the pricer again; however, this can
+               // create cycling, so it is performed only a limited number of times per ENTER round
+               if( lastUpdate() > 0 && enterFacPivotCount < MAXREFACPIVOTS )
                {
-                  MSG_ERROR( spxout << "ESOLVE09 something wrong with factorization, Basis status: " << SPxBasis::status() << std::endl; )
-                  stop = true;
-                  break;
+                  factorize();
+
+                  // if the factorization was found out to be singular, we have to quit
+                  if( SPxBasis::status() < SPxBasis::REGULAR )
+                  {
+                     MSG_ERROR( spxout << "ESOLVE09 something wrong with factorization, Basis status: " << SPxBasis::status() << std::endl; )
+                     stop = true;
+                     break;
+                  }
+
+                  // call pricer again
+                  enterId = thepricer->selectEnter();
+
+                  // count how often the pricer has found something only after refactorizing
+                  if( enterId.isValid() )
+                     enterFacPivotCount++;
                }
 
-               enterId = thepricer->selectEnter();
-
-               if (!enterId.isValid())
+               if( !enterId.isValid() )
                {
                   priced = true;
                   break;
@@ -381,8 +391,9 @@ SPxSolver::Status SPxSolver::fpsolve()
       else
       {
          assert(type() == LEAVE);
-         
+
          int leaveCycleCount = 0;
+         int leaveFacPivotCount = 0;
 
          instableLeaveNum = -1;
          instableLeave = false;
@@ -467,19 +478,27 @@ SPxSolver::Status SPxSolver::fpsolve()
                }
                MSG_INFO3( spxout << "ISOLVE82 solve(leave) triggers refactorization" << std::endl; )
 
-               // We better refactor to make sure the solution is ok.
-               // BH 2005-12-15: For some reason we must do this even if lastUpdate() == 0,
-               // otherwise something goes wrong, e.g. in instances of the siemens test set.
-               factorize();
-               // Inna/Tobi: if the factorization was found out to be singular, we have to quit
-               if (SPxBasis::status() < SPxBasis::REGULAR)
+               // if the factorization is not fresh, we better refactorize and call the pricer again; however, this can
+               // create cycling, so it is performed only a limited number of times per LEAVE round
+               if( lastUpdate() > 0 && leaveFacPivotCount < MAXREFACPIVOTS )
                {
-                  MSG_ERROR( spxout << "ESOLVE10 something wrong with factorization, Basis status: " << SPxBasis::status() << std::endl; )
-                  stop = true;
-                  break;
-               }
+                  factorize();
 
-               leaveNum = thepricer->selectLeave();
+                  // Inna/Tobi: if the factorization was found out to be singular, we have to quit
+                  if (SPxBasis::status() < SPxBasis::REGULAR)
+                  {
+                     MSG_ERROR( spxout << "ESOLVE10 something wrong with factorization, Basis status: " << SPxBasis::status() << std::endl; )
+                     stop = true;
+                     break;
+                  }
+
+                  // call pricer again
+                  leaveNum = thepricer->selectLeave();
+
+                  // count how often the pricer has found something only after refactorizing
+                  if( leaveNum >= 0 )
+                     leaveFacPivotCount++;
+               }
 
                if (leaveNum < 0)
                {
