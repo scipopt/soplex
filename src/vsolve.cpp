@@ -207,6 +207,7 @@ int CLUFactor::vSolveLright(Real* vec, int* ridx, int rn, Real eps)
          val = &(lval[k]);
          for (j = lbeg[i + 1]; j > k; --j)
          {
+            assert(*idx >= 0 && *idx < thedim);
             ridx[rn] = n = *idx++;
             rn += (vec[n] == 0) ? 1 : 0;
             vec[n] -= x * (*val++);
@@ -225,7 +226,10 @@ int CLUFactor::vSolveLright(Real* vec, int* ridx, int rn, Real eps)
          idx = &(lidx[k]);
          val = &(lval[k]);
          for (j = lbeg[i + 1]; j > k; --j)
+         {
+            assert(*idx >= 0 && *idx < thedim);
             x += vec[*idx++] * (*val++);
+         }
          ridx[rn] = j = lrow[i];
          rn += (vec[j] == 0) ? 1 : 0;
          vec[j] -= x;
@@ -272,6 +276,7 @@ void CLUFactor::vSolveLright2(
          {
             for (j = lbeg[i + 1]; j > k; --j)
             {
+               assert(*idx >= 0 && *idx < thedim);
                ridx[rn] = ridx2[rn2] = n = *idx++;
                y = vec[n];
                y2 = vec2[n];
@@ -287,6 +292,7 @@ void CLUFactor::vSolveLright2(
          {
             for (j = lbeg[i + 1]; j > k; --j)
             {
+               assert(*idx >= 0 && *idx < thedim);
                ridx[rn] = n = *idx++;
                y = vec[n];
                rn += (y == 0) ? 1 : 0;
@@ -302,6 +308,7 @@ void CLUFactor::vSolveLright2(
          val = &(lval[k]);
          for (j = lbeg[i + 1]; j > k; --j)
          {
+            assert(*idx >= 0 && *idx < thedim);
             ridx2[rn2] = n = *idx++;
             y2 = vec2[n];
             rn2 += (y2 == 0) ? 1 : 0;
@@ -322,6 +329,7 @@ void CLUFactor::vSolveLright2(
          val = &(lval[k]);
          for (j = lbeg[i + 1]; j > k; --j)
          {
+            assert(*idx >= 0 && *idx < thedim);
             x += vec[*idx] * (*val);
             x2 += vec2[*idx++] * (*val++);
          }
@@ -382,6 +390,7 @@ void CLUFactor::vSolveLright3(
                // case 1: all three vectors are nonzero at j
                for (j = lbeg[i + 1]; j > k; --j)
                {
+                  assert(*idx >= 0 && *idx < thedim);
                   ridx[rn] = ridx2[rn2] = ridx3[rn3] = n = *idx++;
                   y = vec[n];
                   y2 = vec2[n];
@@ -402,6 +411,7 @@ void CLUFactor::vSolveLright3(
                // case 2: 1 and 2 are nonzero at j
                for (j = lbeg[i + 1]; j > k; --j)
                {
+                  assert(*idx >= 0 && *idx < thedim);
                   ridx[rn] = ridx2[rn2] = n = *idx++;
                   y = vec[n];
                   y2 = vec2[n];
@@ -419,6 +429,7 @@ void CLUFactor::vSolveLright3(
             // case 3: 1 and 3 are nonzero at j
             for (j = lbeg[i + 1]; j > k; --j)
             {
+               assert(*idx >= 0 && *idx < thedim);
                ridx[rn] = ridx3[rn3] = n = *idx++;
                y = vec[n];
                y3 = vec3[n];
@@ -435,6 +446,7 @@ void CLUFactor::vSolveLright3(
             // case 4: only 1 is nonzero at j
             for (j = lbeg[i + 1]; j > k; --j)
             {
+               assert(*idx >= 0 && *idx < thedim);
                ridx[rn] = n = *idx++;
                y = vec[n];
                rn += (y == 0) ? 1 : 0;
@@ -453,6 +465,7 @@ void CLUFactor::vSolveLright3(
             // case 5: 2 and 3 are nonzero at j
             for (j = lbeg[i + 1]; j > k; --j)
             {
+               assert(*idx >= 0 && *idx < thedim);
                ridx2[rn2] = ridx3[rn3] = n = *idx++;
                y2 = vec2[n];
                y3 = vec3[n];
@@ -469,6 +482,7 @@ void CLUFactor::vSolveLright3(
             // case 6: only 2 is nonzero at j
             for (j = lbeg[i + 1]; j > k; --j)
             {
+               assert(*idx >= 0 && *idx < thedim);
                ridx2[rn2] = n = *idx++;
                y2 = vec2[n];
                rn2 += (y2 == 0) ? 1 : 0;
@@ -485,6 +499,7 @@ void CLUFactor::vSolveLright3(
          val = &(lval[k]);
          for (j = lbeg[i + 1]; j > k; --j)
          {
+            assert(*idx >= 0 && *idx < thedim);
             ridx3[rn3] = n = *idx++;
             y3 = vec3[n];
             rn3 += (y3 == 0) ? 1 : 0;
@@ -505,6 +520,7 @@ void CLUFactor::vSolveLright3(
          val = &(lval[k]);
          for (j = lbeg[i + 1]; j > k; --j)
          {
+            assert(*idx >= 0 && *idx < thedim);
             x += vec[*idx] * (*val);
             x2 += vec2[*idx] * (*val);
             x3 += vec3[*idx++] * (*val++);
@@ -557,13 +573,16 @@ int CLUFactor::vSolveUright(Real* vec, int* vidx,
       /*      Find nonzero with highest permuted row index and setup i and r
        */
       i = deQueueMax(ridx, &rn);
+      assert(i >= 0 && i < thedim);
       r = rorig[i];
+      assert(r >= 0 && r < thedim);
 
       x = diag[r] * rhs[r];
       rhs[r] = 0;
       if (isNotZero(x, eps))
       {
          c = corig[i];
+         assert(c >= 0 && c < thedim);
          vidx[n++] = c;
          vec[c] = x;
          val = &cval[cbeg[c]];
@@ -571,7 +590,9 @@ int CLUFactor::vSolveUright(Real* vec, int* vidx,
          j = clen[c];
          while (j-- > 0)
          {
+            assert(*idx >= 0 && *idx < thedim);
             k = *idx++;
+            assert(k >= 0 && k < thedim);
             y = rhs[k];
             if (y == 0)
             {
@@ -595,18 +616,23 @@ int CLUFactor::vSolveUright(Real* vec, int* vidx,
             for (i = *ridx; i >= 0; --i)
             {
                r = rorig[i];
+               assert(r >= 0 && r < thedim);
                x = diag[r] * rhs[r];
                rhs[r] = 0;
                if (isNotZero(x, eps))
                {
                   c = corig[i];
+                  assert(c >= 0 && c < thedim);
                   vidx[n++] = c;
                   vec[c] = x;
                   val = &cval[cbeg[c]];
                   idx = &cidx[cbeg[c]];
                   j = clen[c];
                   while (j-- > 0)
+                  {
+                     assert(*idx >= 0 && *idx < thedim);
                      rhs[*idx++] -= x * (*val++);
+                  }
                }
             }
             break;
@@ -647,7 +673,9 @@ void CLUFactor::vSolveUrightNoNZ(Real* vec,
       {                                       /* continue with dense case */
          for (i = *ridx; i >= 0; --i)
          {
+            assert(i >= 0 && i < thedim);
             r = rorig[i];
+            assert(r >= 0 && r < thedim);
             x = diag[r] * rhs[r];
             rhs[r] = 0;
             if (isNotZero(x, eps))
@@ -658,7 +686,10 @@ void CLUFactor::vSolveUrightNoNZ(Real* vec,
                idx = &cidx[cbeg[c]];
                j = clen[c];
                while (j-- > 0)
+               {
+                  assert(*idx >= 0 && *idx < thedim);
                   rhs[*idx++] -= x * (*val++);
+               }
             }
          }
          break;
@@ -667,7 +698,9 @@ void CLUFactor::vSolveUrightNoNZ(Real* vec,
       /*      Find nonzero with highest permuted row index and setup i and r
        */
       i = deQueueMax(ridx, &rn);
+      assert(i >= 0 && i < thedim);
       r = rorig[i];
+      assert(r >= 0 && r < thedim);
 
       x = diag[r] * rhs[r];
       rhs[r] = 0;
@@ -681,6 +714,7 @@ void CLUFactor::vSolveUrightNoNZ(Real* vec,
          while (j-- > 0)
          {
             k = *idx++;
+            assert(k >= 0 && k < thedim);
             y = rhs[k];
             if (y == 0)
             {
@@ -747,7 +781,9 @@ int CLUFactor::vSolveUright2(
          i = deQueueMax(ridx, &rn);
          i = deQueueMax(ridx2, &rn2);
       }
+      assert(i >= 0 && i < thedim);
       r = rorig[i];
+      assert(r >= 0 && r < thedim);
 
       x = diag[r] * rhs[r];
       x2 = diag[r] * rhs2[r];
@@ -767,6 +803,7 @@ int CLUFactor::vSolveUright2(
             while (j-- > 0)
             {
                k = *idx++;
+               assert(k >= 0 && k < thedim);
                y2 = rhs2[k];
                if (y2 == 0)
                {
@@ -805,6 +842,7 @@ int CLUFactor::vSolveUright2(
             while (j-- > 0)
             {
                k = *idx++;
+               assert(k >= 0 && k < thedim);
                y = rhs[k];
                if (y == 0)
                {
@@ -827,6 +865,7 @@ int CLUFactor::vSolveUright2(
       else if (isNotZero(x2, eps2))
       {
          c = corig[i];
+         assert(c >= 0 && c < thedim);
          vec2[c] = x2;
          val = &cval[cbeg[c]];
          idx = &cidx[cbeg[c]];
@@ -834,6 +873,7 @@ int CLUFactor::vSolveUright2(
          while (j-- > 0)
          {
             k = *idx++;
+            assert(k >= 0 && k < thedim);
             y2 = rhs2[k];
             if (y2 == 0)
             {
@@ -860,7 +900,9 @@ int CLUFactor::vSolveUright2(
             i = *ridx2;
          for (; i >= 0; --i)
          {
+            assert(i < thedim);
             r = rorig[i];
+            assert(r >= 0 && r < thedim);
             x = diag[r] * rhs[r];
             x2 = diag[r] * rhs2[r];
             rhs[r] = 0;
@@ -868,6 +910,7 @@ int CLUFactor::vSolveUright2(
             if (isNotZero(x2, eps2))
             {
                c = corig[i];
+               assert(c >= 0 && c < thedim);
                vec2[c] = x2;
                val = &cval[cbeg[c]];
                idx = &cidx[cbeg[c]];
@@ -878,6 +921,7 @@ int CLUFactor::vSolveUright2(
                   vec[c] = x;
                   while (j-- > 0)
                   {
+                     assert(*idx >= 0 && *idx < thedim);
                      rhs[*idx] -= x * (*val);
                      rhs2[*idx++] -= x2 * (*val++);
                   }
@@ -885,19 +929,26 @@ int CLUFactor::vSolveUright2(
                else
                {
                   while (j-- > 0)
+                  {
+                     assert(*idx >= 0 && *idx < thedim);
                      rhs2[*idx++] -= x2 * (*val++);
+                  }
                }
             }
             else if (isNotZero(x, eps))
             {
                c = corig[i];
+               assert(c >= 0 && c < thedim);
                vidx[n++] = c;
                vec[c] = x;
                val = &cval[cbeg[c]];
                idx = &cidx[cbeg[c]];
                j = clen[c];
                while (j-- > 0)
+               {
+                  assert(*idx >= 0 && *idx < thedim);
                   rhs[*idx++] -= x * (*val++);
+               }
             }
          }
          break;
@@ -927,15 +978,18 @@ int CLUFactor::vSolveUpdateRight(Real* vec, int* ridx, int n, Real eps)
 
    for (i = l.firstUpdate; i < end; ++i)
    {
+      assert(i >= 0 && i < thedim);
       x = vec[lrow[i]];
       if (isNotZero(x, eps))
       {
          k = lbeg[i];
+         assert(k >= 0 && k < l.size);
          idx = &(lidx[k]);
          val = &(lval[k]);
          for (j = lbeg[i + 1]; j > k; --j)
          {
             int m = ridx[n] = *idx++;
+            assert(m >= 0 && m < thedim);
             y = vec[m];
             n += (y == 0) ? 1 : 0;
             y = y - x * (*val++);
@@ -966,13 +1020,18 @@ void CLUFactor::vSolveUpdateRightNoNZ(Real* vec, Real /*eps*/)
 
    for (i = l.firstUpdate; i < end; ++i)
    {
+      assert(i >= 0 && i < thedim);
       if ((x = vec[lrow[i]]) != 0.0)
       {
          k = lbeg[i];
+         assert(k >= 0 && k < l.size);
          idx = &(lidx[k]);
          val = &(lval[k]);
          for (j = lbeg[i + 1]; j > k; --j)
+         {
+            assert(*idx >= 0 && *idx < thedim);
             vec[*idx++] -= x * (*val++);
+         }
       }
    }
 }
@@ -1000,6 +1059,7 @@ int CLUFactor::vSolveRight4update(Real eps,
       for (i = j = 0; i < rn; ++i)
       {
          k = ridx[i];
+         assert(k >= 0 && k < thedim);
          x = rhs[k];
          if (isNotZero(x, eps))
          {
@@ -1022,6 +1082,7 @@ int CLUFactor::vSolveRight4update(Real eps,
       for (i = j = 0; i < rn; ++i)
       {
          k = ridx[i];
+         assert(k >= 0 && k < thedim);
          x = rhs[k];
          if (isNotZero(x, eps))
             enQueueMax(ridx, &j, rperm[k]);
@@ -1064,6 +1125,7 @@ int CLUFactor::vSolveRight4update2(Real eps,
       for (i = j = 0; i < rn; ++i)
       {
          k = ridx[i];
+         assert(k >= 0 && k < thedim);
          x = rhs[k];
          if (isNotZero(x, eps))
          {
@@ -1085,6 +1147,7 @@ int CLUFactor::vSolveRight4update2(Real eps,
       for (i = j = 0; i < rn; ++i)
       {
          k = ridx[i];
+         assert(k >= 0 && k < thedim);
          x = rhs[k];
          if (isNotZero(x, eps))
             enQueueMax(ridx, &j, rperm[k]);
@@ -1110,6 +1173,7 @@ int CLUFactor::vSolveRight4update2(Real eps,
       for (i = j = 0; i < rn2; ++i)
       {
          k = ridx2[i];
+         assert(k >= 0 && k < thedim);
          x = rhs2[k];
          if (x < -eps2)
          {
@@ -1156,7 +1220,10 @@ int CLUFactor::vSolveRight4update3(Real eps,
    METHOD( "CLUFactor::vSolveRight4update3()" );
 
    vSolveLright3(rhs, ridx, &rn, eps, rhs2, ridx2, &rn2, eps2, rhs3, ridx3, &rn3, eps3);
-   
+   assert(rn >= 0 && rn < thedim);
+   assert(rn2 >= 0 && rn2 < thedim);
+   assert(rn3 >= 0 && rn3 < thedim);
+
    /*  turn index list into a heap
     */
    if (forest)
@@ -1170,6 +1237,7 @@ int CLUFactor::vSolveRight4update3(Real eps,
       for (i = j = 0; i < rn; ++i)
       {
          k = ridx[i];
+         assert(k >= 0 && k < thedim);
          x = rhs[k];
          if (isNotZero(x, eps))
          {
@@ -1191,6 +1259,7 @@ int CLUFactor::vSolveRight4update3(Real eps,
       for (i = j = 0; i < rn; ++i)
       {
          k = ridx[i];
+         assert(k >= 0 && k < thedim);
          x = rhs[k];
          if (isNotZero(x, eps))
             enQueueMax(ridx, &j, rperm[k]);
@@ -1213,6 +1282,7 @@ int CLUFactor::vSolveRight4update3(Real eps,
       for (i = j = 0; i < rn2; ++i)
       {
          k = ridx2[i];
+         assert(k >= 0 && k < thedim);
          x = rhs2[k];
          if (x < -eps2)
          {
@@ -1241,6 +1311,7 @@ int CLUFactor::vSolveRight4update3(Real eps,
       for (i = j = 0; i < rn3; ++i)
       {
          k = ridx3[i];
+         assert(k >= 0 && k < thedim);
          x = rhs3[k];
          if (x < -eps3)
          {
@@ -1276,6 +1347,7 @@ void CLUFactor::vSolveRightNoNZ(
 {
    METHOD( "CLUFactor::vSolveRightNoNZ()" );
    rn2 = vSolveLright(rhs2, ridx2, rn2, eps2);
+   assert(rn2 >= 0 && rn2 < thedim);
 
    if (rn2 > thedim*verySparseFactor4right)
    {
@@ -1293,6 +1365,7 @@ void CLUFactor::vSolveRightNoNZ(
       for (i = j = 0; i < rn2; ++i)
       {
          k = ridx2[i];
+         assert(k >= 0 && k < thedim);
          x = rhs2[k];
          if (x < -eps2)
          {
@@ -1350,21 +1423,26 @@ int CLUFactor::solveUleft(Real eps,
    while (rhsn > 0)
    {
       i = deQueueMin(rhsidx, &rhsn);
+      assert(i >= 0 && i < thedim);
       c = corig[i];
+      assert(c >= 0 && c < thedim);
       x = rhs[c];
       rhs[c] = 0;
       if (isNotZero(x, eps))
       {
          r = rorig[i];
+         assert(r >= 0 && r < thedim);
          vecidx[n++] = r;
          x *= diag[r];
          vec[r] = x;
          k = rbeg[r];
+         assert(k >= 0 && k < u.row.size);
          idx = &ridx[k];
          val = &rval[k];
          for (int m = rlen[r]; m; --m)
          {
             j = *idx++;
+            assert(j >= 0 && j < thedim);
             y = rhs[j];
             if (y == 0)
             {
@@ -1415,21 +1493,26 @@ void CLUFactor::solveUleftNoNZ(Real eps, Real* vec,
    while (rhsn > 0)
    {
       i = deQueueMin(rhsidx, &rhsn);
+      assert(i >= 0 && i < thedim);
       c = corig[i];
+      assert(c >= 0 && c < thedim);
       x = rhs[c];
       rhs[c] = 0;
 
       if (isNotZero(x, eps))
       {
          r = rorig[i];
+         assert(r >= 0 && r < thedim);
          x *= diag[r];
          vec[r] = x;
          k = rbeg[r];
+         assert(k >= 0 && k < u.row.size);
          idx = &ridx[k];
          val = &rval[k];
          for (int m = rlen[r]; m; --m)
          {
             j = *idx++;
+            assert(j >= 0 && j < thedim);
             y = rhs[j];
             if (y == 0)
             {
@@ -1467,14 +1550,17 @@ int CLUFactor::solveLleftForest(Real eps, Real* vec, int* nonz, int n)
 
    for (i = l.firstUnused - 1; i >= end; --i)
    {
+      assert(i >= 0 && i < l.size);
       if ((x = vec[lrow[i]]) != 0.0)
       {
          k = lbeg[i];
+         assert(k >= 0 && k < l.size);
          val = &lval[k];
          idx = &lidx[k];
          for (j = lbeg[i + 1]; j > k; --j)
          {
             int m = *idx++;
+            assert(m >= 0 && m < thedim);
             y = vec[m];
             if (y == 0)
             {
@@ -1516,11 +1602,16 @@ void CLUFactor::solveLleftForestNoNZ(Real* vec)
    {
       if ((x = vec[lrow[i]]) != 0.0)
       {
+         assert(i >= 0 && i < l.size);
          k = lbeg[i];
+         assert(k >= 0 && k < l.size);
          val = &lval[k];
          idx = &lidx[k];
          for (j = lbeg[i + 1]; j > k; --j)
+         {
+            assert(*idx >= 0 && *idx < thedim);
             vec[*idx++] -= x * (*val++);
+         }
       }
    }
 }
@@ -1639,14 +1730,19 @@ void CLUFactor::solveLleftNoNZ(Real* vec)
    int*    lbeg = l.start;
 
    i = l.firstUpdate - 1;
+   assert(i < thedim);
    for (; i >= 0; --i)
    {
       k = lbeg[i];
+      assert(k >= 0 && k < l.size);
       val = &lval[k];
       idx = &lidx[k];
       x = 0;
       for (j = lbeg[i + 1]; j > k; --j)
+      {
+         assert(*idx >= 0 && *idx < thedim);
          x += vec[*idx++] * (*val++);
+      }
       vec[lrow[i]] -= x;
    }
 #else
@@ -1691,11 +1787,15 @@ int CLUFactor::solveUpdateLeft(Real eps, Real* vec, int* nonz, int n)
    for (i = l.firstUnused - 1; i >= end; --i)
    {
       k = lbeg[i];
+      assert(k >= 0 && k < l.size);
       val = &lval[k];
       idx = &lidx[k];
       x = 0;
       for (j = lbeg[i + 1]; j > k; --j)
+      {
+         assert(*idx >= 0 && *idx < thedim);
          x += vec[*idx++] * (*val++);
+      }
       k = lrow[i];
       y = vec[k];
       if (y == 0)
