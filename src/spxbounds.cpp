@@ -321,6 +321,7 @@ void SPxSolver::testBounds() const
    if (type() == ENTER)
    {
       Real viol_max = (1 + iterCount) * entertol();
+      int nlinesprinted = 0;
 
       for(int i = 0; i < dim(); ++i )
       {
@@ -332,6 +333,7 @@ void SPxSolver::testBounds() const
                             << " viol_max: " << viol_max
                             << " Fvec: " << (*theFvec)[i] 
                             << " UBbound: "<< theUBbound[i] << std::endl; )
+            nlinesprinted++;
          }
          if ((*theFvec)[i] < theLBbound[i] - viol_max)  //@ &&  theUBbound[i] != theLBbound[i])
          {
@@ -339,12 +341,19 @@ void SPxSolver::testBounds() const
                             << " viol_max: " << viol_max
                             << " Fvec: " << (*theFvec)[i] 
                             << " LBbound: "<< theLBbound[i] << std::endl; )
+            nlinesprinted++;
+         }
+         if( nlinesprinted >= 3 )
+         {
+            MSG_INFO2( spxout << "WBOUND10 suppressing further warnings of type WBOUND{01,02} in this round" << std::endl );
+            break;
          }
       }
    }
    else
    {
       Real viol_max = (1 + iterCount) * leavetol();
+      int nlinesprinted = 0;
 
       for(int i = 0; i < dim(); ++i )
       {
@@ -354,6 +363,7 @@ void SPxSolver::testBounds() const
                             << " viol_max: " << viol_max
                             << " CoPvec: " << (*theCoPvec)[i]
                             << " CoUbound: "<< (*theCoUbound)[i] << std::endl; )
+            nlinesprinted++;
          }
          if ((*theCoPvec)[i] < (*theCoLbound)[i] - viol_max) // && (*theCoUbound)[i] != (*theCoLbound)[i])
          {
@@ -362,9 +372,16 @@ void SPxSolver::testBounds() const
                             << " CoPvec: " << (*theCoPvec )[i]
                             << " CoLbound: " << (*theCoLbound)[i] 
                             << std::endl; )
+            nlinesprinted++;
+         }
+         if( nlinesprinted >= 3 )
+         {
+            MSG_INFO2( spxout << "WBOUND11 suppressing further warnings of type WBOUND{03,04} in this round" << std::endl );
+            break;
          }
       }
 
+      nlinesprinted = 0;
       for(int i = 0; i < coDim(); ++i )
       {
          if ((*thePvec)[i] > (*theUbound)[i] + viol_max)  // &&  (*theUbound)[i] != (*theLbound)[i])
@@ -373,6 +390,7 @@ void SPxSolver::testBounds() const
                             << " viol_max: " << viol_max
                             << " Pvec: " << (*thePvec)[i]
                             << " Ubound: " << (*theUbound)[i] << std::endl; )
+            nlinesprinted++;
          }
          if ((*thePvec)[i] < (*theLbound)[i] - viol_max)  // &&  (*theUbound)[i] != (*theLbound)[i])
          {
@@ -380,6 +398,12 @@ void SPxSolver::testBounds() const
                             << " viol_max: " << viol_max
                             << " Pvec: " << (*thePvec)[i]
                             << " Lbound: " << (*theLbound)[i] << std::endl; )
+            nlinesprinted++;
+         }
+         if( nlinesprinted >= 3 )
+         {
+            MSG_INFO2( spxout << "WBOUND12 suppressing further warnings of type WBOUND{05,06} in this round" << std::endl );
+            break;
          }
       }
    }

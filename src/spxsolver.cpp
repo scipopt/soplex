@@ -535,27 +535,27 @@ void SPxSolver::factorize()
          ftmp -= fVec();
          ptmp -= pVec();
          ctmp -= coPvec();
-         if (ftmp.length() > entertol())
+         if (ftmp.length() > DEFAULT_BND_VIOL)
          {
             MSG_DEBUG( spxout << "DSOLVE21 fVec:   " << ftmp.length() << std::endl; )
             ftmp = fVec();
             multBaseWith(ftmp);
             ftmp -= fRhs();
-            if (ftmp.length() > entertol())
+            if (ftmp.length() > DEFAULT_BND_VIOL)
                MSG_ERROR( spxout << "ESOLVE29 " << iteration() << ": fVec error = " 
-                                 << ftmp.length() << " exceeding entertol = " << entertol() << std::endl; )
+                                 << ftmp.length() << " exceeding DEFAULT_BND_VIOL = " << DEFAULT_BND_VIOL << std::endl; )
          }
-         if (ctmp.length() > leavetol())
+         if (ctmp.length() > DEFAULT_BND_VIOL)
          {
             MSG_DEBUG( spxout << "DSOLVE23 coPvec: " << ctmp.length() << std::endl; )
             ctmp = coPvec();
             multWithBase(ctmp);
             ctmp -= coPrhs();
-            if (ctmp.length() > leavetol())
+            if (ctmp.length() > DEFAULT_BND_VIOL)
                MSG_ERROR( spxout << "ESOLVE30 " << iteration() << ": coPvec error = " 
-                                 << ctmp.length() << " exceeding leavetol = " << leavetol() << std::endl; )
+                                 << ctmp.length() << " exceeding DEFAULT_BND_VIOL = " << DEFAULT_BND_VIOL << std::endl; )
          }
-         if (ptmp.length() > leavetol())
+         if (ptmp.length() > DEFAULT_BND_VIOL)
          {
             MSG_DEBUG( spxout << "DSOLVE24 pVec:   " << ptmp.length() << std::endl; )
          }
