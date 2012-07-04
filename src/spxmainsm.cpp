@@ -157,22 +157,22 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
       if (m_col.index(k) != m_i)
          val -= m_col.value(k) * y[m_col.index(k)];
 
-   Real im_lhs = (aij > 0) ? m_lhs/aij : m_rhs/aij;  // implicit lhs
-   Real im_rhs = (aij > 0) ? m_rhs/aij : m_lhs/aij;  // implicit rhs
+   Real m_newLo = (aij > 0) ? m_lhs/aij : m_rhs/aij;  // implicit lhs
+   Real m_newUp = (aij > 0) ? m_rhs/aij : m_lhs/aij;  // implicit rhs
 
    switch(cStatus[m_j])
    {
    case SPxSolver::FIXED:
-      if(im_lhs < (m_lhs - eps()) && (im_rhs > m_rhs + eps()))
+      if(m_newLo < (m_oldLo - eps()) && (m_newUp > m_oldUp + eps()))
       {
          // this row is totally redundant, has not changed bound of xj
          rStatus[m_i] = SPxSolver::BASIC;
          y[m_i] = 0.0;
       }
-      else if(EQrel(im_lhs, im_rhs, eps()))
+      else if(EQrel(m_newLo, m_newUp, eps()))
       {
          // row is in the type  aij * xj = b
-         assert(EQrel(im_lhs, x[m_j], eps()));
+         assert(EQrel(m_newLo, x[m_j], eps()));
 
          if(EQrel(m_oldLo, m_oldUp, eps()))
          {
@@ -201,10 +201,10 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
             r[m_j] = val;
          }
       }
-      else if(EQrel(im_lhs, x[m_j], eps()))
+      else if(EQrel(m_newLo, x[m_j], eps()))
       {
          // row is in the type  xj >= b/aij, try to set xj on upper
-         assert(EQrel(im_lhs, m_oldUp, eps()));
+         assert(EQrel(m_newLo, m_oldUp, eps())); //???????????????
 
          if(r[m_j] >= eps())
          {
@@ -224,10 +224,10 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
             r[m_j] = val;
          }
       }
-      else if(EQrel(im_rhs, x[m_j], eps()))
+      else if(EQrel(m_newUp, x[m_j], eps()))
       {
          // row is in the type  xj <= b/aij, try to set xj on lower
-         assert(EQrel(im_rhs, m_oldLo, eps()));
+         assert(EQrel(m_newUp, m_oldLo, eps()));
 
          if(r[m_j] <= -eps())
          {
@@ -250,7 +250,7 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
       else
       {
          // the variable is set to FIXED by other constraints, i.e., this singleton row is redundant
-         assert(x[m_j] > (im_lhs + eps()) && x[m_j] < (im_rhs - eps()));
+         assert(x[m_j] > (m_newLo + eps()) && x[m_j] < (m_newUp - eps()));
 
          rStatus[m_i] = SPxSolver::BASIC;
          y[m_i] = 0.0;
@@ -3744,6 +3744,7 @@ void SPxMainSM::unsimplify(const Vector& x, const Vector& y, const Vector& s, co
    // undo preprocessing
    for(int k = m_hist.size()-1; k >= 0; --k)
    {
+      MSG_DEBUG( spxout << "unsimplifying " << m_hist[k]->getName() << "\n" );
       m_hist[k]->execute(m_prim, m_dual, m_slack, m_redCost, m_cBasisStat, m_rBasisStat);
 
       delete m_hist[k];

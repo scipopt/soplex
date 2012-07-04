@@ -103,7 +103,7 @@ private:
       {
          m_name = 0;
       }
-      /// get name of pricer.
+      /// get name of simplifying step.
       virtual const char* getName() const
       {
          return m_name;

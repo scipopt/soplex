@@ -26,6 +26,7 @@ fixed bugs:
 - handled setting FIXED basis status when bounds are only approximately equal
 - using a starting basis from file disables simplifier
 - fixed bug in computeLeaveCoPrhs4Col() for column status D_UNDEFINED
+- fixed bug in unsimplifying singleton rows
 
 interface:
 - info message in case a fresh factorization is not stable enough and has to be done again with higher Markowitz threshold
