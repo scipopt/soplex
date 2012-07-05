@@ -234,6 +234,15 @@ void SPxBasis::loadDesc(const Desc& ds)
        */
       if (thedesc.rowStatus(i) >= 0)
          thedesc.rowStatus(i) = dualRowStatus(i);
+      else if (thedesc.rowStatus(i) == SPxBasis::Desc::P_FIXED && theLP->SPxLP::lhs(i) != theLP->SPxLP::rhs(i))
+      {
+         if (theLP->SPxLP::lhs(i) > -infinity)
+            thedesc.rowStatus(i) = SPxBasis::Desc::P_ON_LOWER;
+         else if (theLP->SPxLP::rhs(i) < infinity)
+            thedesc.rowStatus(i) = SPxBasis::Desc::P_ON_UPPER;
+         else
+            thedesc.rowStatus(i) = SPxBasis::Desc::P_FREE;
+      }
 
       if (theLP->isBasic(thedesc.rowStatus(i)))
       {
@@ -251,6 +260,15 @@ void SPxBasis::loadDesc(const Desc& ds)
        */
       if (thedesc.colStatus(i) >= 0)
          thedesc.colStatus(i) = dualColStatus(i);
+      else if (thedesc.colStatus(i) == SPxBasis::Desc::P_FIXED && theLP->SPxLP::lower(i) != theLP->SPxLP::upper(i))
+      {
+         if (theLP->SPxLP::lower(i) <= -infinity && theLP->SPxLP::upper(i) >= infinity)
+            thedesc.rowStatus(i) = SPxBasis::Desc::P_FREE;
+         else if (theLP->SPxLP::upper(i) >= infinity || (theLP->SPxLP::lower(i) > -infinity && theLP->SPxLP::maxObj(i) < 0.0))
+            thedesc.rowStatus(i) = SPxBasis::Desc::P_ON_LOWER;
+         else
+            thedesc.rowStatus(i) = SPxBasis::Desc::P_ON_UPPER;
+      }
 
       if (theLP->isBasic(thedesc.colStatus(i)))
       {
