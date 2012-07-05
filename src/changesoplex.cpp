@@ -753,7 +753,7 @@ void SPxSolver::changeLower(int i, Real newLower)
 {
    METHOD( "SPxSolver::changeLower()" );
 
-   if (NE(newLower, lower(i)))
+   if (newLower != lower(i))
    {
       // This has to be done before calling changeLowerStatus() because that is calling
       // basis.dualColStatus() which calls lower() and needs the changed value.
@@ -829,7 +829,7 @@ void SPxSolver::changeUpper(int i, Real newUpper)
 {
    METHOD( "SPxSolver::changeUpper()" );
 
-   if (NE(newUpper, upper(i)))
+   if (newUpper != upper(i))
    {
       SPxLP::changeUpper(i, newUpper);
 
