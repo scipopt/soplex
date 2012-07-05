@@ -672,7 +672,6 @@ SPxId SPxSteepPR::selectEnterDenseDim(Real& best, SPxId enterId)
    const Real* coTest        = thesolver->coTest().get_const_ptr();
    const Real* coPenalty_ptr = coPenalty.get_const_ptr();
 
-   int   end;
    Real x;
 
    for (int i = 0, end = thesolver->dim(); i < end; ++i)
@@ -699,7 +698,6 @@ SPxId SPxSteepPR::selectEnterDenseCoDim(Real& best, SPxId enterId)
    const Real* test          = thesolver->test().get_const_ptr();
    const Real* penalty_ptr   = penalty.get_const_ptr();
 
-   int   end;
    Real x;
 
    for(int i = 0, end = thesolver->coDim(); i < end; ++i)

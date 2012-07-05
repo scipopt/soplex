@@ -1256,7 +1256,9 @@ bool SPxSolver::refine(
    /* number of simplex iterations, refinements in total, and refinements with actual simplex iterations being performed */
    int iteroffset;
    int nrefines;
+#if defined(DEBUGGING)
    int npivotrefines;
+#endif
 
    /* return status */
    bool precisionreached = false;
@@ -1285,9 +1287,11 @@ bool SPxSolver::refine(
 
    /* initialize values */
    nrefines = 0;
-   npivotrefines = 0;
    primalscale_ex = 1;
    dualscale_ex = 1;
+#if defined(DEBUGGING)
+   npivotrefines = 0;
+#endif
 
    /* count iterations performed during refinement */
    iteroffset = 0;
@@ -1473,9 +1477,11 @@ bool SPxSolver::refine(
          setTerminationIter(maxiters);
       }
 
+#if defined(DEBUGGING)
       /* remember whether we moved to a new basis */
       if( iterations() > 0 )
          npivotrefines = nrefines;
+#endif
 
       /* count simplex iterations and update global iteration limit */
       iteroffset += iterations();

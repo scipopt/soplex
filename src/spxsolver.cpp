@@ -352,8 +352,8 @@ void SPxSolver::init()
       infeasibilitiesCo.setMax(coDim());
       isInfeasible.reSize(dim());
       isInfeasibleCo.reSize(coDim());
-      sparsityThresholdEnter = (int) dim() * SPARSITYTHRESHOLD;
-      sparsityThresholdEnterCo = (int) coDim() * SPARSITYTHRESHOLD;
+      sparsityThresholdEnter = (int) (dim() * SPARSITYTHRESHOLD);
+      sparsityThresholdEnterCo = (int) (coDim() * SPARSITYTHRESHOLD);
    }
    else
    {
@@ -372,7 +372,7 @@ void SPxSolver::init()
       // prepare support vectors for sparse pricing
       infeasibilities.setMax(dim());
       isInfeasible.reSize(dim());
-      sparsityThresholdLeave = (int) dim() * SPARSITYTHRESHOLD;
+      sparsityThresholdLeave = (int) (dim() * SPARSITYTHRESHOLD);
    }
 
    SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
