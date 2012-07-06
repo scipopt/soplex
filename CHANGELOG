@@ -31,6 +31,7 @@ fixed bugs:
 - fixed bug that bound changes were not performed if new bound deviates by only epsilon; this can lead to slightly
   inconsistent bounds which trigger asserts later
 - sparse pricing stores only infeasibilities > entertol() in leaving or > leavetol() in entering (was epsilon() before)
+- fixed false infeasibility detection in ratiotest after fresh factorization
 
 interface:
 - info message in case a fresh factorization is not stable enough and has to be done again with higher Markowitz threshold

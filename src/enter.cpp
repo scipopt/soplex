@@ -1057,7 +1057,11 @@ bool SPxSolver::enter(SPxId& enterId)
          MSG_INFO3( spxout << "IENTER01 factorization triggered in "
                               << "enter() for feasibility test" << std::endl; )
          factorize();
-         return enter(enterId);
+
+         /* after a factorization, the entering column/row might not be infeasible or suboptimal anymore, hence we do
+          * not try to call leave(leaveIdx), but rather return to the main solving loop and call the pricer again
+          */
+         return false;
       }
 
       SPxId none;

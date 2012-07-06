@@ -663,7 +663,11 @@ bool SPxSolver::leave(int leaveIdx)
             MSG_INFO3( spxout << "ILEAVE01 factorization triggered in "
                                  << "leave() for feasibility test" << std::endl; )
             factorize();
-            return leave(leaveIdx);
+
+            /* after a factorization, the leaving column/row might not be infeasible or suboptimal anymore, hence we do
+             * not try to call leave(leaveIdx), but rather return to the main solving loop and call the pricer again
+             */
+            return false;
          }
 
          MSG_INFO3( spxout << "ILEAVE02 unboundness/infeasiblity found "
