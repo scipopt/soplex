@@ -194,6 +194,9 @@ SPxSolver::Status SPxSolver::fpsolve()
          stallRefShift = shift();
          stallRefValue = value();
 
+         /* in the entering algorithm, entertol() should be maintained by the ratio test and leavetol() should be
+          * reached by the pricer
+          */
          Real maxpricertol = leavetol();
          Real minpricertol = 0.01 * maxpricertol;
 
@@ -402,7 +405,10 @@ SPxSolver::Status SPxSolver::fpsolve()
          stallRefShift = shift();
          stallRefValue = value();
 
-         Real maxpricertol = leavetol();
+         /* in the leaving algorithm, leavetol() should be maintained by the ratio test and entertol() should be reached
+          * by the pricer
+          */
+         Real maxpricertol = entertol();
          Real minpricertol = 0.01 * maxpricertol;
 
          thepricer->setEpsilon(maxpricertol);
