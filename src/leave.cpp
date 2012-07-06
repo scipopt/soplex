@@ -42,7 +42,7 @@ void SPxSolver::computeFtest()
 
    assert(type() == LEAVE);
 
-   Real theeps = epsilon();
+   Real theeps = entertol();
    infeasibilities.clear();
    int ninfeasibilities = 0;
 
@@ -100,7 +100,7 @@ void SPxSolver::updateFtest()
 
    assert(type() == LEAVE);
 
-   Real theeps = epsilon();
+   Real theeps = entertol();
    for (int j = idx.size() - 1; j >= 0; --j)
    {
       int i = idx.index(j);

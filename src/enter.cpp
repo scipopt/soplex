@@ -107,7 +107,7 @@ void SPxSolver::computeTest()
    METHOD( "SPxSolver::computeTest()" );
 
    const SPxBasis::Desc& ds = desc();
-   Real theeps = epsilon();
+   Real pricingTol = leavetol();
    infeasibilitiesCo.clear();
    int ninfeasibilities = 0;
 
@@ -123,7 +123,7 @@ void SPxSolver::computeTest()
 
          if( remainingRoundsEnterCo == 0 )
          {
-            if( theTest[i] < -theeps )
+            if( theTest[i] < -pricingTol )
             {
                assert(infeasibilitiesCo.size() < infeasibilitiesCo.max());
                infeasibilitiesCo.addIdx(i);
@@ -220,7 +220,7 @@ void SPxSolver::computeCoTest()
 {
    METHOD( "SPxSolver::computeCoTest()" );
    int i;
-   Real theeps = epsilon();
+   Real pricingTol = leavetol();
    infeasibilities.clear();
    int ninfeasibilities = 0;
    const SPxBasis::Desc& ds = desc();
@@ -235,7 +235,7 @@ void SPxSolver::computeCoTest()
          theCoTest[i] = coTest(i, stat);
          if( remainingRoundsEnter == 0 )
          {
-            if( theCoTest[i] < -theeps )
+            if( theCoTest[i] < -pricingTol )
             {
                assert(infeasibilities.size() < infeasibilities.max());
                infeasibilities.addIdx(i);
@@ -280,7 +280,7 @@ void SPxSolver::updateTest()
 
    const IdxSet& idx = thePvec->idx();
    const SPxBasis::Desc& ds = desc();
-   Real theeps = epsilon();
+   Real pricingTol = epsilon();
 
    int i;
    for (i = idx.size() - 1; i >= 0; --i)
@@ -291,7 +291,7 @@ void SPxSolver::updateTest()
       {
          theTest[j] = test(j, stat);
 
-         if( sparsePricingEnterCo && theTest[j] < -theeps )
+         if( sparsePricingEnterCo && theTest[j] < -pricingTol )
          {
             assert(remainingRoundsEnterCo == 0);
             if( !isInfeasibleCo[j] )
@@ -313,7 +313,7 @@ void SPxSolver::updateCoTest()
 
    const IdxSet& idx = theCoPvec->idx();
    const SPxBasis::Desc& ds = desc();
-   Real theeps = epsilon();
+   Real pricingTol = epsilon();
 
    int i;
    for (i = idx.size() - 1; i >= 0; --i)
@@ -324,7 +324,7 @@ void SPxSolver::updateCoTest()
       {
          theCoTest[j] = coTest(j, stat);
 
-         if( sparsePricingEnter && theCoTest[j] < -theeps )
+         if( sparsePricingEnter && theCoTest[j] < -pricingTol )
          {
             assert(remainingRoundsEnter == 0);
             if( !isInfeasible[j] )
