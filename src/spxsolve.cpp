@@ -87,6 +87,7 @@ SPxSolver::Status SPxSolver::fpsolve()
    Real  minShift = infinity;
    int   cycleCount = 0;
    bool  priced = false;
+   Real  lastDelta = 1;
 
    /* store the last (primal or dual) feasible objective value to recover/abort in case of stalling */
    Real  stallRefValue;
@@ -202,6 +203,17 @@ SPxSolver::Status SPxSolver::fpsolve()
 
          thepricer->setEpsilon(maxpricertol);
          priced = false;
+
+         // to avoid shifts we restrict tolerances in the ratio test
+         if( loopCount > 0 )
+         {
+            lastDelta = (lastDelta < entertol()) ? lastDelta : entertol();
+            lastDelta *= 0.01;
+            theratiotester->setDelta(lastDelta);
+            MSG_DEBUG( spxout << "decreased delta for ratiotest to: " << theratiotester->getDelta() << std::endl; )
+         }
+         else
+            lastDelta = 1;
 
          do
          {
@@ -413,6 +425,17 @@ SPxSolver::Status SPxSolver::fpsolve()
 
          thepricer->setEpsilon(maxpricertol);
          priced = false;
+
+         // to avoid shifts we restrict tolerances in the ratio test
+         if( loopCount > 0 )
+         {
+            lastDelta = (lastDelta < leavetol()) ? lastDelta : leavetol();
+            lastDelta *= 0.01;
+            theratiotester->setDelta(lastDelta);
+            MSG_DEBUG( spxout << "decreased delta for ratiotest to: " << theratiotester->getDelta() << std::endl; )
+         }
+         else
+            lastDelta = 1;
 
          do
          {
@@ -632,7 +655,7 @@ SPxSolver::Status SPxSolver::fpsolve()
                // We stop if we are indeed optimal, or if we have already been
                // two times at this place. In this case it seems futile to
                // continue.
-               if (loopCount >= 2)
+               if (loopCount > 2)
                {
                   m_status = ABORT_CYCLING;
                   throw SPxStatusException("XSOLVE14 Abort solving due to looping");

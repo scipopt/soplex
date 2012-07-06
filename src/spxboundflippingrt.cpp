@@ -191,7 +191,7 @@ void SPxBoundFlippingRT::collectBreakpointsMax(
          if( upp[i] < infinity )
          {
             Real y = upp[i] - vec[i];
-            curVal = (y <= 0) ? delta / x : (y + delta) / x;
+            curVal = (y <= 0) ? fastDelta / x : (y + fastDelta) / x;
             assert(curVal > 0);
 
             breakpoints[nBp].idx = i;
@@ -212,7 +212,7 @@ void SPxBoundFlippingRT::collectBreakpointsMax(
          if (low[i] > -infinity)
          {
             Real y = low[i] - vec[i];
-            curVal = (y >= 0) ? -delta / x : (y - delta) / x;
+            curVal = (y >= 0) ? -fastDelta / x : (y - fastDelta) / x;
             assert(curVal > 0);
 
             breakpoints[nBp].idx = i;
@@ -266,7 +266,7 @@ void SPxBoundFlippingRT::collectBreakpointsMin(
          {
             Real y = low[i] - vec[i];
 
-            curVal = (y >= 0) ? delta / x : (delta - y) / x;
+            curVal = (y >= 0) ? fastDelta / x : (fastDelta - y) / x;
             assert(curVal > 0);
 
             breakpoints[nBp].idx = i;
@@ -287,7 +287,7 @@ void SPxBoundFlippingRT::collectBreakpointsMin(
          if (upp[i] < infinity)
          {
             Real y = upp[i] - vec[i];
-            curVal = (y <= 0) ? -delta / x : -(y + delta) / x;
+            curVal = (y <= 0) ? -fastDelta / x : -(y + fastDelta) / x;
             assert(curVal > 0);
 
             breakpoints[nBp].idx = i;
@@ -500,7 +500,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
    }
 
    // scan pivot candidates from back to front and stop as soon as a good one is found
-   degeneps = delta / moststable;  /* as in SPxFastRT */
+   degeneps = fastDelta / moststable;  /* as in SPxFastRT */
    instable = thesolver->instableLeave;
    assert(!instable || thesolver->instableLeaveNum >= 0);
    stab = instable ? LOWSTAB : SPxFastRT::minStability(moststable);
@@ -682,7 +682,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
    }
 
    // flip bounds of skipped breakpoints only if a nondegenerate step is to be performed
-   if( usedBp > 0 && fabs(breakpoints[usedBp].val) > delta )
+   if( usedBp > 0 && fabs(breakpoints[usedBp].val) > fastDelta )
    {
       flipAndUpdate(usedBp);
       thesolver->boundflips = usedBp;

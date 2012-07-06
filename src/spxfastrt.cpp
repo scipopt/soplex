@@ -64,11 +64,11 @@ void SPxFastRT::tighten()
        (delta > 1e-4   &&  thesolver->theShift > 1e-4))
     */
    // if(delta > 1.99 * DELTA_SHIFT)
-   if (delta >= delta0 + DELTA_SHIFT)
+   if (fastDelta >= delta + DELTA_SHIFT)
    {
-      delta -= DELTA_SHIFT;
-      if (delta > 1e-4)
-         delta -= 2 * DELTA_SHIFT;
+      fastDelta -= DELTA_SHIFT;
+      if (fastDelta > 1e-4)
+         fastDelta -= 2 * DELTA_SHIFT;
    }
 
    if (minStab < MINSTAB)
@@ -82,7 +82,7 @@ void SPxFastRT::tighten()
 void SPxFastRT::relax()
 {
    minStab *= 0.95;
-   delta += 3 * DELTA_SHIFT;
+   fastDelta += 3 * DELTA_SHIFT;
    // delta   += 2 * (thesolver->theShift > delta) * DELTA_SHIFT;
 }
 
@@ -146,9 +146,9 @@ int SPxFastRT::maxDelta(
             {
                y = u - vec[i];
                if (y <= 0)
-                  x = delta / x;
+                  x = fastDelta / x;
                else
-                  x = (y + delta) / x;
+                  x = (y + fastDelta) / x;
 
                if (x < max)
                {
@@ -166,9 +166,9 @@ int SPxFastRT::maxDelta(
             {
                y = l - vec[i];
                if ( y >= 0 )
-                  x = - delta / x;
+                  x = - fastDelta / x;
                else
-                  x = ( y - delta ) / x;
+                  x = ( y - fastDelta ) / x;
 
                if (x < max)
                {
@@ -212,9 +212,9 @@ int SPxFastRT::maxDelta(
                {
                   y = u - vec[i];
                   if (y <= 0)
-                     x = delta / x;
+                     x = fastDelta / x;
                   else
-                     x = (y + delta) / x;
+                     x = (y + fastDelta) / x;
 
                   if (x < max)
                   {
@@ -231,9 +231,9 @@ int SPxFastRT::maxDelta(
                {
                   y = l - vec[i];
                   if ( y >= 0 )
-                     x = - delta / x;
+                     x = - fastDelta / x;
                   else
-                     x = ( y - delta ) / x;
+                     x = ( y - fastDelta ) / x;
 
                   if (x < max)
                   {
@@ -301,9 +301,9 @@ int SPxFastRT::minDelta(
             {
                y = l - vec[i];
                if ( y >= 0 )
-                  x = - delta / x;
+                  x = - fastDelta / x;
                else
-                  x = ( y - delta ) / x;
+                  x = ( y - fastDelta ) / x;
 
                if (x > max)
                {
@@ -321,9 +321,9 @@ int SPxFastRT::minDelta(
             {
                y = u - vec[i];
                if (y <= 0)
-                  x = delta / x;
+                  x = fastDelta / x;
                else
-                  x = (y + delta) / x;
+                  x = (y + fastDelta) / x;
 
                if (x > max)
                {
@@ -368,9 +368,9 @@ int SPxFastRT::minDelta(
                {
                   y = l - vec[i];
                   if ( y >= 0 )
-                     x = - delta / x;
+                     x = - fastDelta / x;
                   else
-                     x = ( y - delta ) / x;
+                     x = ( y - fastDelta ) / x;
 
                   if (x > max)
                   {
@@ -387,9 +387,9 @@ int SPxFastRT::minDelta(
                {
                   y = u - vec[i];
                   if (y <= 0)
-                     x = delta / x;
+                     x = fastDelta / x;
                   else
-                     x = (y + delta) / x;
+                     x = (y + fastDelta) / x;
 
                   if (x > max)
                   {
@@ -787,7 +787,7 @@ bool SPxFastRT::maxReLeave(Real& sel, int leave, Real maxabs)
    {
       Real x = vec.delta()[leave];
 
-      if (sel < -delta / maxabs)
+      if (sel < -fastDelta / maxabs)
       {
          sel = 0.0;
          if (x < 0.0)
@@ -819,7 +819,7 @@ bool SPxFastRT::minReLeave(Real& sel, int leave, Real maxabs)
    {
       Real x = vec.delta()[leave];
 
-      if (sel > delta / maxabs)
+      if (sel > fastDelta / maxabs)
       {
          if (x > 0.0)
          {
@@ -1014,7 +1014,7 @@ bool SPxFastRT::maxReEnter(
 
    if ((*up)[nr] != (*low)[nr])
    {
-      if (sel < -delta / maxabs)
+      if (sel < -fastDelta / maxabs)
       {
          if (d > 0.0)
          {
@@ -1104,7 +1104,7 @@ bool SPxFastRT::minReEnter(
 
    if ((*up)[nr] != (*low)[nr])
    {
-      if (sel > delta / maxabs)
+      if (sel > fastDelta / maxabs)
       {
          if (d < 0.0)
          {
@@ -1297,9 +1297,7 @@ void SPxFastRT::setType(SPxSolver::Type type)
    m_type = type;
 
    minStab = MINSTAB;
-   delta = (type == SPxSolver::ENTER) ? thesolver->entertol() : thesolver->leavetol();
-
-   delta0 = delta;
+   fastDelta = delta;
 }
 } // namespace soplex
 

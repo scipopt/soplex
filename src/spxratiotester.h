@@ -50,6 +50,8 @@ protected:
    const char* m_name;
    /// internal storage of type
    SPxSolver::Type m_type;
+   /// allowed bound violation
+   Real delta;
    //@}
 
 public:
@@ -80,6 +82,18 @@ public:
    virtual SPxSolver* solver() const
    {
       return thesolver;
+   }
+
+   /// set allowed bound violation
+   virtual void setDelta( Real newDelta )
+   {
+      delta = newDelta;
+   }
+
+   /// get allowed bound violation
+   virtual Real getDelta()
+   {
+      return delta;
    }
    //@}
 
@@ -152,12 +166,14 @@ public:
    explicit SPxRatioTester(const char* name)
       : thesolver(0)
       , m_name(name)
+      , delta(1e-6)
    {}
    /// copy constructor
    SPxRatioTester( const SPxRatioTester& old)
       : thesolver(old.thesolver)
       , m_name(old.m_name)
       , m_type(old.m_type)
+      , delta(old.delta)
    {}
    /// assignment operator
    SPxRatioTester& operator=( const SPxRatioTester& rhs)
@@ -167,6 +183,7 @@ public:
          m_name = rhs.m_name;
          thesolver = rhs.thesolver;
          m_type = rhs.m_type;
+         delta = rhs.delta;
       }
 
       return *this;

@@ -49,9 +49,7 @@ protected:
    /// |value| < epsilon is considered 0.
    Real epsilon;
    /// currently allowed infeasibility.
-   Real delta;
-   /// initially allowed infeasibility.
-   Real delta0;
+   Real fastDelta;
    /// flag used in methods minSelect/maxSelect to retrieve correct basis status
    bool iscoid;
    //@}
@@ -179,8 +177,7 @@ public:
       : SPxRatioTester(old)
       , minStab(old.minStab)
       , epsilon(old.epsilon)
-      , delta(old.delta)
-      , delta0(old.delta0)
+      , fastDelta(old.fastDelta)
       , iscoid(false)
    {}
    /// assignment operator
@@ -191,8 +188,7 @@ public:
          SPxRatioTester::operator=(rhs);
          minStab = rhs.minStab;
          epsilon = rhs.epsilon;
-         delta = rhs.delta;
-         delta0 = rhs.delta0;
+         fastDelta = rhs.fastDelta;
          iscoid = false;
       }
 
@@ -224,6 +220,17 @@ public:
    virtual SPxId selectEnter(Real& val, int);
    ///
    virtual void setType(SPxSolver::Type type);
+   ///
+   virtual void setDelta(Real newDelta)
+   {
+      delta = newDelta;
+      fastDelta = newDelta;
+   }
+   ///
+   virtual Real getDelta()
+   {
+      return fastDelta;
+   }
    //@}
 };
 } // namespace soplex

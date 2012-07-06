@@ -57,7 +57,6 @@ private:
       const Real* vec,      ///< current vector
       const Real* low,      ///< lower bounds for \p vec
       const Real* up,       ///< upper bounds for \p vec
-      Real delta,           ///< allowed bound violation
       Real epsilon          ///< what is 0?
       ) const;
 
@@ -71,7 +70,6 @@ private:
       const Real* vec,      ///< current vector
       const Real* low,      ///< lower bounds for \p vec
       const Real* up,       ///< upper bounds for \p vec
-      Real delta,           ///< allowed bound violation
       Real epsilon          ///< what is 0?
       ) const;
    //@}

@@ -354,6 +354,7 @@ void SPxSolver::init()
       isInfeasibleCo.reSize(coDim());
       sparsityThresholdEnter = (int) (dim() * SPARSITYTHRESHOLD);
       sparsityThresholdEnterCo = (int) (coDim() * SPARSITYTHRESHOLD);
+      theratiotester->setDelta(entertol());
    }
    else
    {
@@ -373,6 +374,7 @@ void SPxSolver::init()
       infeasibilities.setMax(dim());
       isInfeasible.reSize(dim());
       sparsityThresholdLeave = (int) (dim() * SPARSITYTHRESHOLD);
+      theratiotester->setDelta(leavetol());
    }
 
    SPxBasis::coSolve(*theCoPvec, *theCoPrhs);

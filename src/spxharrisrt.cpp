@@ -47,7 +47,6 @@ int SPxHarrisRT::maxDelta(
    const Real* vec,             /* current vector */
    const Real* low,             /* lower bounds for vec */
    const Real* up,              /* upper bounds for vec */
-   Real delta,           /* allowed bound violation */
    Real epsilon)  const       /* what is 0? */
 {
    Real x;
@@ -99,7 +98,6 @@ int SPxHarrisRT::minDelta(
    const Real* vec,             /* current vector */
    const Real* low,             /* lower bounds for vec */
    const Real* up,              /* upper bounds for vec */
-   Real delta,           /* allowed bound violation */
    Real epsilon) const         /* what is 0? */
 {
    Real x;
@@ -162,7 +160,6 @@ int SPxHarrisRT::selectLeave(Real& val, SPxId enterId)
    Real maxabs = 1;
 
    Real epsilon  = solver()->epsilon();
-   Real delta    = solver()->entertol();
    Real degeneps = degenerateEps();
 
    SSVector& upd = solver()->fVec().delta();
@@ -192,7 +189,6 @@ int SPxHarrisRT::selectLeave(Real& val, SPxId enterId)
          vec.get_const_ptr(),         /* current vector */
          low.get_const_ptr(),                 /* lower bounds for vec */
          up.get_const_ptr(),                  /* upper bounds for vec */
-         delta,               /* allowed bound violation */
          epsilon);             /* what is 0? */
 
       if (max == val)
@@ -259,7 +255,6 @@ int SPxHarrisRT::selectLeave(Real& val, SPxId enterId)
          vec.get_const_ptr(),                 /* current vector */
          low.get_const_ptr(),                 /* lower bounds for vec */
          up.get_const_ptr(),                  /* upper bounds for vec */
-         delta,               /* allowed bound violation */
          epsilon);             /* what is 0? */
     
       if (max == val)
@@ -342,7 +337,6 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int)
 
    Real minStability = 0.0001;
    Real epsilon      = solver()->epsilon();
-   Real delta        = solver()->leavetol();
    Real degeneps     = degenerateEps();
 
    Vector& pvec = solver()->pVec();
@@ -384,7 +378,6 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int)
             pvec.get_const_ptr(),                /* current vector */
             lpb.get_const_ptr(),                 /* lower bounds for vec */
             upb.get_const_ptr(),                 /* upper bounds for vec */
-            delta,               /* allowed bound violation */
             epsilon);             /* what is 0? */
             
          maxDelta(
@@ -396,7 +389,6 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int)
             cvec.get_const_ptr(),                /* current vector */
             lcb.get_const_ptr(),                 /* lower bounds for vec */
             ucb.get_const_ptr(),                 /* upper bounds for vec */
-            delta,               /* allowed bound violation */
             epsilon);            /* what is 0? */
 
          if (max == val)
@@ -583,7 +575,6 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int)
             pvec.get_const_ptr(),                /* current vector */
             lpb.get_const_ptr(),                 /* lower bounds for vec */
             upb.get_const_ptr(),                 /* upper bounds for vec */
-            delta,               /* allowed bound violation */
             epsilon);             /* what is 0? */
 
          minDelta
@@ -596,7 +587,6 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int)
             cvec.get_const_ptr(),                /* current vector */
             lcb.get_const_ptr(),                 /* lower bounds for vec */
             ucb.get_const_ptr(),                 /* upper bounds for vec */
-            delta,               /* allowed bound violation */
             epsilon);             /* what is 0? */
 
          if (max == val)
