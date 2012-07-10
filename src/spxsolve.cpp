@@ -116,8 +116,6 @@ SPxSolver::Status SPxSolver::fpsolve()
       m_status = NO_RATIOTESTER;
       throw SPxStatusException("XSOLVE04 No RatioTester loaded");
    }
-   theTime.reset();
-   theTime.start();
 
    m_numCycle = 0;
    iterCount  = 0;
@@ -765,9 +763,6 @@ SPxSolver::Status SPxSolver::fpsolve()
       theratiotester->setType(type());
    }
 
-   theTime.stop();
-   theCumulativeTime += time();
-
    if (m_status == RUNNING)
    {
       m_status = ERROR;
@@ -868,10 +863,17 @@ SPxSolver::Status SPxSolver::solve()
 {
    METHOD( "SPxSolver::solve()" );
 
+   theTime.reset();
+   theTime.start();
+
    /* if tolerances are not below irthreshold(), perform a standard floating point solve */
    if( feastol() >= irthreshold() && opttol() >= irthreshold() )
    {
       fpsolve();
+
+      theTime.stop();
+      theCumulativeTime += time();
+
       return status();
    }
 
@@ -881,6 +883,10 @@ SPxSolver::Status SPxSolver::solve()
       MSG_WARNING( spxout << "WSOLVE35 Warning: Iterative refinement disabled because of missing GMP support (compile with GMP=true).\n" );
 
       fpsolve();
+
+      theTime.stop();
+      theCumulativeTime += time();
+
       return status();
    }
 
@@ -1246,6 +1252,9 @@ SPxSolver::Status SPxSolver::solve()
 
    MSG_DEBUG( spxout << "returning with status " << status() << "\n" );
 
+   theTime.stop();
+   theCumulativeTime += time();
+
    return status();
 }
 
@@ -1506,8 +1515,6 @@ bool SPxSolver::refine(
 
       /* load basis */
       loadBasis(basisdesc);
-
-      /**@todo respect updated time limit */
 
       /* count refinement rounds */
       nrefines++;
