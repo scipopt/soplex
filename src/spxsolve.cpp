@@ -1520,6 +1520,7 @@ bool SPxSolver::refine(
       nrefines++;
 
       /* solve modified problem */
+      try
       {
          int maxiters = terminationIter();
 
@@ -1530,6 +1531,10 @@ bool SPxSolver::refine(
          fpsolve();
 
          setTerminationIter(maxiters);
+      }
+      catch( SPxException E )
+      {
+         MSG_DEBUG( spxout << "fpsolve() threw exception: " << E.what() << "\n" );
       }
 
 #if defined(DEBUGGING)
