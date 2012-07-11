@@ -181,6 +181,11 @@ SPxSolver::Status SPxSolver::fpsolve()
    {
       const SPxBasis::Desc regulardesc = desc();
 
+      // we need to reset these pointers to avoid unnecessary/wrong solves in leave() or enter()
+      solveVector2 = 0;
+      solveVector3 = 0;
+      coSolveVector2 = 0;
+
       try
       {
 
