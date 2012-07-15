@@ -1,8 +1,8 @@
 (maintain each list from top to bottom)
 
 
-DEVELOPER
-=========
+15 Jul 2012 - Release 1.7.0 Beta
+================================
 
 code quality & new features:
 - partial pricing can be switched on for dantzig-, devex- and steep-pricing by defining PARTIAL_PRICING (only LEAVING mode)
