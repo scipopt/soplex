@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 /**@mainpage Overview
-   @version  1.6.0.7
+   @version  1.7.0
    @author   Roland Wunderling
    @author   Tobias Achterberg
    @author   Timo Berthold
