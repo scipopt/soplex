@@ -153,6 +153,9 @@ private:
    }
    ///  provides enough nonzero memory for \p n more Elements%s.
    void ensureMem(int n);
+
+   ///  deleting a vector from the dataarray
+   void deleteVec(DLPSV* ps);
    //@}
 
    //------------------------------------
@@ -261,6 +264,7 @@ public:
    //------------------------------------
    /**@name Shrinking */
    //@{
+
    /// removes the vector with key \p removekey from the %set
    /** @pre \p removekey must be a key from SVSet */
    void remove(const DataKey& removekey);

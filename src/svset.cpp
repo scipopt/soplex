@@ -100,16 +100,14 @@ SVector* SVSet::create(int idxmax)
       ensureMem(idxmax + 1);
 
    ensurePSVec(1);
-   
-   // We must call ensureMem() before insert() below, since insert() doesn't
-   // know about the pointers into the NZE memory and therefore doesn't update
-   // them if a realloc is necessary.
-   ensureMem( memSize() + idxmax + 1 );
+
    assert( memMax() >= memSize() + idxmax + 1 );
-   
+
    ps = set.create();
    list.append(ps);
-   insert(memSize(), idxmax + 1);
+   /// resize the dataarray
+   SVSetBase::reSize(memSize() + idxmax + 1);
+
    ps->setMem(idxmax + 1, &last() - idxmax);
    return ps;
 }
@@ -178,21 +176,62 @@ void SVSet::add2(SVector &svec, int n, const int idx[], const Real val[])
    svec.add(n, idx, val);
 }
 
-void SVSet::remove(const DataKey& removekey)
+void SVSet::deleteVec(DLPSV* ps)
 {
-   DLPSV* ps = &set[removekey];
-
+   /* delete last entries, in an SVECTOR and also in an DLPSV there is always the position -1 used for memorizing
+    * the size; this is the reason why we need to delete max()+1 entries
+    */
    if (list.last() == ps)
       removeLast(ps->max() + 1);
-
+   /* merge space of predecessor with position which will be deleted, therefore we do not need to delete any
+    * memory or do an expensive memmove
+    *
+    * @note an SVECTOR and also in an DLPSV memorize the size always on position -1; this is the reason why we
+    *       need to set the new mem size to the old combined size + 2
+    */
    else if (list.first() != ps)
    {
       SVector* prev = ps->prev();
       int sz = prev->size();
-      prev->setMem (prev->max() + ps->max() + 2, prev->mem());
+      prev->setMem(prev->max() + ps->max() + 2, prev->mem());
       prev->set_size(sz);
    }
+   /* delete the front entries of the first list entry and correct the memory pointers in the vectors */
+   /* @note we do this by merging the first both vectors, move the entries from the second vector up front, and
+    *       correct the size
+    */
+   else
+   {
+      SVector* next = ps->next();
+      int sz = next->size();
+      int bothmax = next->max() + ps->max();
+      int offset = 0;
+
+      /* the first element does not need to start at the beginning of the data array; why ??? */
+      while( &(this->SVSetBase::operator[](offset)) != ps->mem() )
+      {
+         ++offset;
+         assert(offset < size());
+      }
+
+      /* move all entries of the second vector to the front */
+      for(int j = 0; j <= sz; ++j)
+      {
+         this->SVSetBase::operator[](offset + j) = next->mem()[j];
+      }
+
+      /* correct the data memmory pointer and the maximal space */
+      next->setMem(bothmax + 2, ps->mem());
+      /* correct size */
+      next->set_size(sz);
+   }
+
    list.remove(ps);
+}
+
+void SVSet::remove(const DataKey& removekey)
+{
+   deleteVec(&set[removekey]);
    set.remove(removekey);
 }
 
@@ -200,23 +239,14 @@ void SVSet::remove(int perm[])
 {
    int j = num();
 
-   for (int i = 0; i < j; ++i)
+   /* due to performance reasons we use a backwards loop to delete entries, because it could result instead of only
+    * decreasing the number of elements j times in memmoving the whole array j times
+    */
+   for (int i = j - 1; i >= 0; --i)
    {
       if (perm[i] < 0)
       {
-         DLPSV* ps = &set[i];
-
-         if (list.last() == ps)
-            removeLast(ps->max() + 1);
-
-         else if (list.first() != ps)
-         {
-            SVector* prev = ps->prev();
-            int sz = prev->size();
-            prev->setMem (prev->max() + ps->max() + 2, prev->mem());
-            prev->set_size(sz);
-         }
-         list.remove(ps);
+         deleteVec(&set[i]);
       }
    }
    set.remove(perm);

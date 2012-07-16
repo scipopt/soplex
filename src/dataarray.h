@@ -137,12 +137,16 @@ public:
    /// insert \p n uninitialized elements before \p i 'th element.
    void insert(int i, int n)
    {
+      int j = thesize;
+
       assert(i >= 0);
       assert(n >= 0);
-      int j = size();
+
       reSize(thesize + n);
-      while (i < j--)
-         data[j + n] = data[j];
+
+      /// move \p n elements in memory from insert position \p i to the back
+      if( j > i )
+         memmove(&(data[i+n]), &(data[i]), j - i);
    }
 
    /// insert \p n elements from \p t before \p i 'the element.
@@ -169,8 +173,9 @@ public:
    void remove(int n = 0, int m = 1)
    {
       assert(n < size() && n >= 0);
+      /* use memmove instead of memcopy because the destination and the source might overlap */
       if (n + m < size())
-         memcpy(&(data[n]), &(data[n + m]), (size() - (n + m)) * sizeof(T));
+         memmove(&(data[n]), &(data[n + m]), (size() - (n + m)) * sizeof(T));
       else
          m = size() - n;
       thesize -= m;

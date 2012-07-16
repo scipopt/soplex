@@ -13,6 +13,7 @@ code quality & new features:
 - added GMP support and data type MpqReal, a wrapper for mpq_class if compiled with GMP=true, soplex::Real otherwise
 - implemented iterative refinement for feasible and bounded LPs, applied when a feasibility or optimality tolerance below
   the new parameter SPxSolver::irthreshold() is requested
+- reduced and commented code by adding "void deleteVec(DLPSV* ps);" method in svset.{h,cpp}
 
 fixed bugs:
 - variables that do not appear in the objective function or any constraint are not printed anymore in the BOUNDS section
@@ -32,6 +33,11 @@ fixed bugs:
   inconsistent bounds which trigger asserts later
 - sparse pricing stores only infeasibilities > entertol() in leaving or > leavetol() in entering (was epsilon() before)
 - fixed false infeasibility detection in ratiotest after fresh factorization
+- fixed bug in the svset data array, when removing the first vector, the memory was not 'freed' and therefore the memory
+  consumption could have increased to a very huge value (bug 319)
+- also fixed wrong ensureMem() call in SVSet create(), which lead to a to big data array and change an unnecessary
+  insert() call to an reSize() call
+- corrected a memcpy() to a memmove() call due to possible overlapping memory
 
 interface:
 - info message in case a fresh factorization is not stable enough and has to be done again with higher Markowitz threshold
@@ -53,6 +59,8 @@ interface:
 
 performance:
 - sparse pricing for leaving and entering simplex is activated depending on ratio of basis dimension and number of infeasibilities
+- fixed performance issue removing (all) vectors from a SVSet where it is better to delete the elements from behind to
+  the front
 
 
 28 Oct 2011 - Release 1.6.0
