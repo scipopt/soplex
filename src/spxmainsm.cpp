@@ -163,7 +163,7 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
    switch(cStatus[m_j])
    {
    case SPxSolver::FIXED:
-      if(m_newLo < (m_oldLo - eps()) && (m_newUp > m_oldUp + eps()))
+      if(m_newLo <= m_oldLo && m_newUp >= m_oldUp)
       {
          // this row is totally redundant, has not changed bound of xj
          rStatus[m_i] = SPxSolver::BASIC;
@@ -201,11 +201,9 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
             r[m_j] = val;
          }
       }
-      else if(EQrel(m_newLo, x[m_j], eps()))
+      else if(EQrel(m_newLo, m_oldUp, eps()))
       {
          // row is in the type  xj >= b/aij, try to set xj on upper
-         assert(EQrel(m_newLo, m_oldUp, eps())); //???????????????
-
          if(r[m_j] >= eps())
          {
             // the reduced cost is positive, xj should in the basic
@@ -218,17 +216,17 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
          }
          else
          {
+            assert(EQrel(m_oldUp, x[m_j], eps()));
+
             cStatus[m_j] = SPxSolver::ON_UPPER;
             rStatus[m_i] = SPxSolver::BASIC;
             y[m_i] = 0.0;
             r[m_j] = val;
          }
       }
-      else if(EQrel(m_newUp, x[m_j], eps()))
+      else if(EQrel(m_newUp, m_oldLo, eps()))
       {
          // row is in the type  xj <= b/aij, try to set xj on lower
-         assert(EQrel(m_newUp, m_oldLo, eps()));
-
          if(r[m_j] <= -eps())
          {
             // the reduced cost is negative, xj should in the basic
@@ -241,6 +239,8 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
          }
          else
          {
+            assert(EQrel(m_oldLo, x[m_j], eps()));
+
             cStatus[m_j] = SPxSolver::ON_LOWER;
             rStatus[m_i] = SPxSolver::BASIC;
             y[m_i] = 0.0;
