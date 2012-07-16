@@ -13,7 +13,7 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-//#define DEBUGGING 1
+// #define DEBUGGING
 
 #include <assert.h>
 #include "spxdefines.h"
@@ -29,8 +29,8 @@ namespace soplex
 #define MINSTAB          1e-5
 #define LOWSTAB          1e-10
 #define MAX_RELAX_COUNT  2
-#define LONGSTEP_FREQ    500
-#define MIN_LONGSTEP     1e-2
+#define LONGSTEP_FREQ    100
+#define MIN_LONGSTEP     1e-1
 
 
 /** perform necessary bound flips to restore dual feasibility */
@@ -418,6 +418,12 @@ SPxId SPxBoundFlippingRT::selectEnter(
    int sorted = 0;
    // minimum number of entries that are supposed to be sorted by partial sort
    int sortsize = 4;
+   // delta value like in Harris ratio test
+   Real harrisDelta = max;
+   // index for Harris ratio test w/o bound flips
+   int harrisIdx;
+   // shall bound flips be done?
+   bool doFlips = true;
 
    // get all skipable breakpoints
    for( usedBp = 0; usedBp < nBp && slope > 0; ++usedBp)
@@ -440,9 +446,27 @@ SPxId SPxBoundFlippingRT::selectEnter(
          else
          {
             Real absupd = fabs(pupd[i]);
-            slope -= (thesolver->upper(i) - thesolver->lower(i)) * absupd;
+            slope -= (thesolver->upper(i) * absupd) - (thesolver->lower(i) * absupd);
+            // get most stable pivot
             if( absupd > moststable )
                moststable = absupd;
+            // compute fallback values if no bound flips are possible
+            if( max > 0 )
+            {
+               if( breakpoints[usedBp].val <= harrisDelta )
+               {
+                  harrisDelta = breakpoints[usedBp].val;
+                  harrisIdx = usedBp;
+               }
+            }
+            else
+            {
+               if( breakpoints[usedBp].val >= harrisDelta )
+               {
+                  harrisDelta = breakpoints[usedBp].val;
+                  harrisIdx = usedBp;
+               }
+            }
          }
       }
       else
@@ -457,9 +481,25 @@ SPxId SPxBoundFlippingRT::selectEnter(
          else
          {
             Real absupd = fabs(cupd[i]);
-            slope -= (thesolver->rhs(i) - thesolver->lhs(i)) * absupd;
+            slope -= (thesolver->rhs(i) * absupd) - (thesolver->lhs(i) * absupd);
             if( absupd > moststable )
                moststable = absupd;
+            if( max > 0 )
+            {
+               if( breakpoints[usedBp].val <= harrisDelta )
+               {
+                  harrisDelta = breakpoints[usedBp].val;
+                  harrisIdx = usedBp;
+               }
+            }
+            else
+            {
+               if( breakpoints[usedBp].val >= harrisDelta )
+               {
+                  harrisDelta = breakpoints[usedBp].val;
+                  harrisIdx = usedBp;
+               }
+            }
          }
       }
    }
@@ -491,11 +531,14 @@ SPxId SPxBoundFlippingRT::selectEnter(
                         << thesolver->basis().iteration()
                         << ": bound flip gain is too small"
                         << std::endl; )
-      usedBp = 0;
+      usedBp = harrisIdx;
+      doFlips = false;
+//       val = max;
+//       return SPxFastRT::selectEnter(val, leaveIdx);
 
       // ensure that the first breakpoint is nonbasic
-      while( breakpoints[usedBp].idx < 0 && usedBp < nBp )
-         ++usedBp;
+//       while( breakpoints[usedBp].idx < 0 && usedBp < nBp )
+//          ++usedBp;
       // @todo make sure that the selected pivot element is stable
    }
 
@@ -505,7 +548,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
    assert(!instable || thesolver->instableLeaveNum >= 0);
    stab = instable ? LOWSTAB : SPxFastRT::minStability(moststable);
    // @todo select the moststable pivot or one that is comparably stable
-   // stab = moststable * 1e-2;
+   stab = (moststable > stab) ? moststable * 0.5 : stab;
 
    while( usedBp >= 0 )
    {
@@ -682,7 +725,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
    }
 
    // flip bounds of skipped breakpoints only if a nondegenerate step is to be performed
-   if( usedBp > 0 && fabs(breakpoints[usedBp].val) > fastDelta )
+   if( usedBp > 0 && fabs(breakpoints[usedBp].val) > fastDelta && doFlips)
    {
       flipAndUpdate(usedBp);
       thesolver->boundflips = usedBp;
