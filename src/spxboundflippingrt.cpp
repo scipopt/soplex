@@ -418,12 +418,6 @@ SPxId SPxBoundFlippingRT::selectEnter(
    int sorted = 0;
    // minimum number of entries that are supposed to be sorted by partial sort
    int sortsize = 4;
-   // delta value like in Harris ratio test
-   Real harrisDelta = max;
-   // index for Harris ratio test w/o bound flips
-   int harrisIdx;
-   // shall bound flips be done?
-   bool doFlips = true;
 
    // get all skipable breakpoints
    for( usedBp = 0; usedBp < nBp && slope > 0; ++usedBp)
@@ -450,23 +444,6 @@ SPxId SPxBoundFlippingRT::selectEnter(
             // get most stable pivot
             if( absupd > moststable )
                moststable = absupd;
-            // compute fallback values if no bound flips are possible
-            if( max > 0 )
-            {
-               if( breakpoints[usedBp].val <= harrisDelta )
-               {
-                  harrisDelta = breakpoints[usedBp].val;
-                  harrisIdx = usedBp;
-               }
-            }
-            else
-            {
-               if( breakpoints[usedBp].val >= harrisDelta )
-               {
-                  harrisDelta = breakpoints[usedBp].val;
-                  harrisIdx = usedBp;
-               }
-            }
          }
       }
       else
@@ -484,22 +461,6 @@ SPxId SPxBoundFlippingRT::selectEnter(
             slope -= (thesolver->rhs(i) * absupd) - (thesolver->lhs(i) * absupd);
             if( absupd > moststable )
                moststable = absupd;
-            if( max > 0 )
-            {
-               if( breakpoints[usedBp].val <= harrisDelta )
-               {
-                  harrisDelta = breakpoints[usedBp].val;
-                  harrisIdx = usedBp;
-               }
-            }
-            else
-            {
-               if( breakpoints[usedBp].val >= harrisDelta )
-               {
-                  harrisDelta = breakpoints[usedBp].val;
-                  harrisIdx = usedBp;
-               }
-            }
          }
       }
    }
@@ -511,6 +472,62 @@ SPxId SPxBoundFlippingRT::selectEnter(
                      << ": number of flip candidates: "
                      << usedBp
                      << std::endl; )
+
+   // try to get an more stable pivot by looking at those with similar step length
+   int stableBp = usedBp;     // index to walk over additional breakpoints (after slope change)
+   int bestBp = -1;           // breakpoints index with best possible stability
+   Real bestDelta = breakpoints[stableBp].val;  // best step length (including bound flips)
+   stableBp++;
+   while( stableBp < nBp )
+   {
+      Real stableDelta;
+      // get next breakpoints in increasing order
+      if( stableBp > sorted )
+      {
+         sorted = sorter_qsortPart(breakpoints.get_ptr(), compare, sorted + 1, nBp, sortsize);
+      }
+      int idx = breakpoints[stableBp].idx;
+      if( breakpoints[stableBp].src == PVEC )
+      {
+         thesolver->pVec()[idx] = thesolver->vector(idx) * thesolver->coPvec();
+         Real x = pupd[idx];
+         stableDelta = (x > 0.0) ? upb[idx] : lpb[idx];
+         stableDelta = (stableDelta - pvec[idx]) / x;
+
+         if( stableDelta <= bestDelta)
+         {
+            if( fabs(x) > moststable )
+            {
+               moststable = fabs(x);
+               bestBp = stableBp;
+            }
+         }
+         else if( stableDelta > 2 * bestDelta )
+            break;
+      }
+      else
+      {
+         Real x = cupd[idx];
+         stableDelta = (x > 0.0) ? ucb[idx] : lcb[idx];
+         stableDelta = (stableDelta - cvec[idx]) / x;
+
+         if( stableDelta <= bestDelta)
+         {
+            if( fabs(x) > moststable )
+            {
+               moststable = fabs(x);
+               bestBp = stableBp;
+            }
+         }
+         else if( stableDelta > 2 * bestDelta )
+            break;
+      }
+   }
+   if( bestBp > -1 )
+   {
+      //get Id and stuff
+
+   }
 
    // check for unboundedness/infeasibility
    if( slope > epsilon && usedBp >= nBp - 1 )
@@ -531,8 +548,6 @@ SPxId SPxBoundFlippingRT::selectEnter(
                         << thesolver->basis().iteration()
                         << ": bound flip gain is too small"
                         << std::endl; )
-      usedBp = harrisIdx;
-      doFlips = false;
 //       val = max;
 //       return SPxFastRT::selectEnter(val, leaveIdx);
 
@@ -548,7 +563,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
    assert(!instable || thesolver->instableLeaveNum >= 0);
    stab = instable ? LOWSTAB : SPxFastRT::minStability(moststable);
    // @todo select the moststable pivot or one that is comparably stable
-   stab = (moststable > stab) ? moststable * 0.5 : stab;
+   stab = (moststable > stab) ? moststable : stab;
 
    while( usedBp >= 0 )
    {
