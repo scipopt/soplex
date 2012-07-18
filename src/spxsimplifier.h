@@ -108,7 +108,7 @@ public:
    }
    /// assignment operator
    SPxSimplifier& operator=( const SPxSimplifier& rhs)
-   {   
+   {
       if(this != &rhs)
       {
          m_name = rhs.m_name;
@@ -117,7 +117,7 @@ public:
          m_remNzos = rhs.m_remNzos;
          m_chgBnds = rhs.m_chgBnds;
          m_chgLRhs = rhs.m_chgLRhs;
-         m_objoffset = m_objoffset;
+         m_objoffset = rhs.m_objoffset;
 
          assert(isConsistent());
       }
