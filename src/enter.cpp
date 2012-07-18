@@ -1049,8 +1049,6 @@ bool SPxSolver::enter(SPxId& enterId)
     */
    else
    {
-      SPxId none;
-
       /* The following line originally was in the "lastUpdate() > 1" case;
          we need it in the INFEASIBLE/UNBOUNDED case, too, to have the
          basis descriptor at the correct size. 
