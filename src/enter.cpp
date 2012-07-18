@@ -1046,11 +1046,14 @@ bool SPxSolver::enter(SPxId& enterId)
     */
    else
    {
+      SPxId none;
+
       /* The following line originally was in the "lastUpdate() > 1" case;
          we need it in the INFEASIBLE/UNBOUNDED case, too, to have the
          basis descriptor at the correct size. 
        */
       rejectEnter(enterId, enterTest, enterStat);
+      change(-1, none, 0);
 
       if (lastUpdate() > 1)
       {
@@ -1061,11 +1064,8 @@ bool SPxSolver::enter(SPxId& enterId)
          /* after a factorization, the entering column/row might not be infeasible or suboptimal anymore, hence we do
           * not try to call leave(leaveIdx), but rather return to the main solving loop and call the pricer again
           */
-         return false;
+         return true;
       }
-
-      SPxId none;
-      change(-1, none, 0);
 
       MSG_INFO3( spxout << "IENTER02 unboundness/infeasiblity found in "
                            << "enter()" << std::endl; )
