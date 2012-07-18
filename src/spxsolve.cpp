@@ -313,7 +313,7 @@ SPxSolver::Status SPxSolver::fpsolve()
             thepricer->entered4(lastEntered(), lastIndex());
             stop = terminate();
             clearUpdateVecs();
-            if (lastIndex() >= 0)
+            if( lastEntered().isValid() ) /* either a successful pivot was performed or a nonbasic variable flipped to the other bound */
             {
                enterCount++;
                enterCycleCount = 0;
@@ -554,7 +554,7 @@ SPxSolver::Status SPxSolver::fpsolve()
             thepricer->left4(lastIndex(), lastLeft());
             stop = terminate();
             clearUpdateVecs();
-            if( lastEntered().isValid() )
+            if( lastIndex() >= 0 ) /* either a successful pivot was performed or a nonbasic variable flipped to the other bound */
             {
                leaveCount++;
                leaveCycleCount = 0;

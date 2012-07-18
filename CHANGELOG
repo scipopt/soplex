@@ -38,6 +38,7 @@ fixed bugs:
 - also fixed wrong ensureMem() call in SVSet create(), which lead to a to big data array and change an unnecessary
   insert() call to an reSize() call
 - corrected a memcpy() to a memmove() call due to possible overlapping memory
+- fixed bug in counting unsuccessful pivots
 
 interface:
 - info message in case a fresh factorization is not stable enough and has to be done again with higher Markowitz threshold

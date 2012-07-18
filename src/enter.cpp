@@ -889,6 +889,7 @@ bool SPxSolver::enter(SPxId& enterId)
    assert(type() == ENTER);
    assert(initialized);
 
+   SPxId none;          // invalid id used when enter fails
    Real enterTest;      // correct test value of entering var
    Real enterUB;        // upper bound of entering variable
    Real enterLB;        // lower bound of entering variable
@@ -905,8 +906,10 @@ bool SPxSolver::enter(SPxId& enterId)
    if (enterTest > -epsilon())
    {
       rejectEnter(enterId, enterTest, enterStat);
-      change(-1, enterId, enterVec);
+      change(-1, none, 0);
+
       MSG_DEBUG( spxout << "DENTER08 rejecting false enter pivot" << std::endl; )
+
       return true;
    }
 
@@ -1020,7 +1023,7 @@ bool SPxSolver::enter(SPxId& enterId)
    else if (leaveVal != -enterMax)
    {
       rejectEnter(enterId, REAL(0.01) * enterTest - REAL(2.0) * leavetol(), enterStat);
-      change(-1, enterId, enterVec);
+      change(-1, none, 0);
    }
    /*  No leaving vector has been selected from the basis. However, if the
        shift amount for |fVec| is bounded, we are in the case, that the

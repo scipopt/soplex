@@ -589,6 +589,7 @@ bool SPxSolver::leave(int leaveIdx)
 
    SPxBasis::Desc::Status leaveStat;      // status of leaving var
    SPxId leaveId;        // id of leaving var
+   SPxId none;           // invalid id used if leave fails
    Real leaveMax;       // maximium lambda of leaving var
    Real leavebound;     // current fVec value of leaving var
    int  leaveNum;       // number of leaveId in bounds
@@ -619,15 +620,12 @@ bool SPxSolver::leave(int leaveIdx)
        */
       if (!enterId.isValid())
       {
-         SPxId none;
-
-         change(leaveIdx, none, 0);
-
          /* the following line originally was below in "rejecting leave" case;
-            we need it in the unbounded/infeasible case, too, to have the 
+            we need it in the unbounded/infeasible case, too, to have the
             correct basis size */
          rejectLeave(leaveNum, leaveId, leaveStat);
-            
+         change(-1, none, 0);
+
          if (enterVal != leaveMax)
          {
             MSG_DEBUG( spxout << "DLEAVE61 rejecting leave A (leaveIdx=" << leaveIdx
@@ -779,9 +777,8 @@ bool SPxSolver::leave(int leaveIdx)
                   MSG_INFO3( spxout << "ILEAVE03 unboundness/infeasiblity found "
                      << "in leave()" << std::endl; )
 
-                  SPxId none;
-                  change(leaveIdx, none, 0);
                   rejectLeave(leaveNum, leaveId, leaveStat);
+                  change(-1, none, 0);
 
                   if (rep() != COLUMN)
                      setBasisStatus(SPxBasis::UNBOUNDED);
@@ -803,15 +800,13 @@ bool SPxSolver::leave(int leaveIdx)
                }
                else
                {
-                  SPxId none;
-                  change(leaveIdx, none, 0);
                   theFvec->delta().clear();
                   rejectLeave(leaveNum, leaveId, leaveStat, &newVector);
+                  change(-1, none, 0);
+
                   MSG_DEBUG( spxout << "DLEAVE63 rejecting leave B (leaveIdx=" << leaveIdx
                      << ", theCoTest=" << theCoTest[leaveIdx] 
                      << ")" << std::endl; )
-
-                  // factorize();
 
                   // Note: These changes do not survive a refactorization
                   theCoTest[leaveIdx] *= 0.01;
@@ -870,7 +865,6 @@ bool SPxSolver::leave(int leaveIdx)
             assert(rep() == ROW);
             SPxBasis::Desc& ds = desc();
 
-            SPxId none;
             change(leaveIdx, none, 0);
 
             if (leaveStat == SPxBasis::Desc::P_ON_UPPER)
