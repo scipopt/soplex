@@ -1220,9 +1220,9 @@ int CLUFactor::vSolveRight4update3(Real eps,
    METHOD( "CLUFactor::vSolveRight4update3()" );
 
    vSolveLright3(rhs, ridx, &rn, eps, rhs2, ridx2, &rn2, eps2, rhs3, ridx3, &rn3, eps3);
-   assert(rn >= 0 && rn < thedim);
-   assert(rn2 >= 0 && rn2 < thedim);
-   assert(rn3 >= 0 && rn3 < thedim);
+   assert(rn >= 0 && rn <= thedim);
+   assert(rn2 >= 0 && rn2 <= thedim);
+   assert(rn3 >= 0 && rn3 <= thedim);
 
    /*  turn index list into a heap
     */
@@ -1347,7 +1347,7 @@ void CLUFactor::vSolveRightNoNZ(
 {
    METHOD( "CLUFactor::vSolveRightNoNZ()" );
    rn2 = vSolveLright(rhs2, ridx2, rn2, eps2);
-   assert(rn2 >= 0 && rn2 < thedim);
+   assert(rn2 >= 0 && rn2 <= thedim);
 
    if (rn2 > thedim*verySparseFactor4right)
    {
