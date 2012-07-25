@@ -488,17 +488,23 @@ SPxPricer* get_pricer(const int pricing)
 
    assert(pricer != 0);
    if ( checkMode )
+#ifdef PARTIAL_PRICING
       MSG_INFO1( spxout << "IEXAMP17 " << pricer->getName() << " pricing"
-#ifdef PARTIAL_PRICING
                         << " (partial, size = " << MAX_PRICING_CANDIDATES << ")"
-#endif
                         << std::endl; )
+#else
+      MSG_INFO1( spxout << "IEXAMP17 " << pricer->getName() << " pricing"
+                        << std::endl; )
+#endif
    else
-      MSG_INFO1( spxout << "pricing        = " << pricer->getName()
 #ifdef PARTIAL_PRICING
+      MSG_INFO1( spxout << "pricing        = " << pricer->getName()
                         << " (partial, size = " << MAX_PRICING_CANDIDATES << ")"
-#endif
                         << std::endl; )
+#else
+      MSG_INFO1( spxout << "pricing        = " << pricer->getName()
+                        << std::endl; )
+#endif
    return pricer;
 }
 
