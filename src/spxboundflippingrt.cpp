@@ -30,7 +30,7 @@ namespace soplex
 #define LOWSTAB          1e-10
 #define MAX_RELAX_COUNT  2
 #define LONGSTEP_FREQ    100
-#define MIN_LONGSTEP     1e-1
+#define MIN_LONGSTEP     1e-5
 
 
 /** perform necessary bound flips to restore dual feasibility */
@@ -309,6 +309,82 @@ void SPxBoundFlippingRT::collectBreakpointsMin(
    return;
 }
 
+/** get values for entering index and perform shifts if necessary */
+bool SPxBoundFlippingRT::getData(
+   Real&                 val,
+   SPxId&                enterId,
+   int                   idx,
+   Real                  stab,
+   Real                  degeneps,
+   const Real*           upd,
+   const Real*           vec,
+   const Real*           low,
+   const Real*           upp,
+   BreakpointSource      src,
+   Real                  max
+   )
+{
+   if( src == PVEC )
+   {
+      thesolver->pVec()[idx] = thesolver->vector(idx) * thesolver->coPvec();
+      Real x = upd[idx];
+      // skip breakpoint if it is too small
+      if( fabs(x) < stab )
+      {
+         return false;
+      }
+      enterId = thesolver->id(idx);
+      val = (max * x > 0) ? upp[idx] : low[idx];
+      val = (val - vec[idx]) / x;
+      if( upp[idx] == low[idx] )
+      {
+         val = 0.0;
+         if( vec[idx] > upp[idx] )
+            thesolver->theShift += vec[idx] - upp[idx];
+         else
+            thesolver->theShift += low[idx] - vec[idx];
+         thesolver->upBound()[idx] = thesolver->lpBound()[idx] = vec[idx];
+      }
+      else if( (max > 0 && val < -degeneps) || (max < 0 && val > degeneps) )
+      {
+         val = 0.0;
+         if( max * x > 0 )
+            thesolver->shiftUPbound(idx, vec[idx]);
+         else
+            thesolver->shiftLPbound(idx, vec[idx]);
+      }
+   }
+   else // breakpoints[usedBp].src == COPVEC
+   {
+      Real x = upd[idx];
+      if( fabs(x) < stab )
+      {
+         return false;
+      }
+      enterId = thesolver->coId(idx);
+      val = (max * x > 0.0) ? upp[idx] : low[idx];
+      val = (val - vec[idx]) / x;
+      if( upp[idx] == low[idx] )
+      {
+         val = 0.0;
+         if( vec[idx] > upp[idx] )
+            thesolver->theShift += vec[idx] - upp[idx];
+         else
+            thesolver->theShift += low[idx] - vec[idx];
+         thesolver->ucBound()[idx] = thesolver->lcBound()[idx] = vec[idx];
+      }
+      else if( (max > 0 && val < -degeneps) || (max < 0 && val > degeneps) )
+      {
+         val = 0.0;
+         if( max * x > 0 )
+            thesolver->shiftUCbound(idx, vec[idx]);
+         else
+            thesolver->shiftLCbound(idx, vec[idx]);
+      }
+   }
+   return true;
+}
+
 /** determine entering variable */
 SPxId SPxBoundFlippingRT::selectEnter(
    Real&                 val,
@@ -467,18 +543,27 @@ SPxId SPxBoundFlippingRT::selectEnter(
    --usedBp;
    assert(usedBp >= 0);
 
+   // check for unboundedness/infeasibility
+   if( slope > delta && usedBp >= nBp - 1 )
+   {
+      MSG_DEBUG( spxout << "DLSTEP02 " << thesolver->basis().iteration()
+                        << ": unboundedness in ratio test" << std::endl; )
+      flipPotential *= 0.95;
+      val = max;
+      return SPxFastRT::selectEnter(val, leaveIdx);
+   }
+
    MSG_DEBUG( spxout << "DLSTEP01 "
                      << thesolver->basis().iteration()
                      << ": number of flip candidates: "
                      << usedBp
                      << std::endl; )
 
-   // try to get an more stable pivot by looking at those with similar step length
-   int stableBp = usedBp;     // index to walk over additional breakpoints (after slope change)
+   // try to get a more stable pivot by looking at those with similar step length
+   int stableBp;              // index to walk over additional breakpoints (after slope change)
    int bestBp = -1;           // breakpoints index with best possible stability
-   Real bestDelta = breakpoints[stableBp].val;  // best step length (including bound flips)
-   stableBp++;
-   while( stableBp < nBp )
+   Real bestDelta = breakpoints[usedBp].val;  // best step length (after bound flips)
+   for( stableBp = usedBp + 1; stableBp < nBp; ++stableBp )
    {
       Real stableDelta;
       // get next breakpoints in increasing order
@@ -489,6 +574,14 @@ SPxId SPxBoundFlippingRT::selectEnter(
       int idx = breakpoints[stableBp].idx;
       if( breakpoints[stableBp].src == PVEC )
       {
+         if( thesolver->isBasic(idx) )
+         {
+            // mark basic indices
+            // TODO this is probably unnecessary since we do not look at these breakpoints anymore
+            breakpoints[stableBp].idx = -1;
+            thesolver->pVec().delta().clearIdx(idx);
+            continue;
+         }
          thesolver->pVec()[idx] = thesolver->vector(idx) * thesolver->coPvec();
          Real x = pupd[idx];
          stableDelta = (x > 0.0) ? upb[idx] : lpb[idx];
@@ -502,11 +595,19 @@ SPxId SPxBoundFlippingRT::selectEnter(
                bestBp = stableBp;
             }
          }
+         // stop searching if the step length is too big
          else if( stableDelta > 2 * bestDelta )
             break;
       }
       else
       {
+         if( thesolver->isCoBasic(idx) )
+         {
+            // mark basic indices
+            breakpoints[usedBp].idx = -1;
+            thesolver->coPvec().delta().clearIdx(idx);
+            continue;
+         }
          Real x = cupd[idx];
          stableDelta = (x > 0.0) ? ucb[idx] : lcb[idx];
          stableDelta = (stableDelta - cvec[idx]) / x;
@@ -519,28 +620,35 @@ SPxId SPxBoundFlippingRT::selectEnter(
                bestBp = stableBp;
             }
          }
+         // stop searching if the step length is too big
          else if( stableDelta > 2 * bestDelta )
             break;
       }
    }
+
+   degeneps = fastDelta / moststable;  /* as in SPxFastRT */
+   // get stability requirements
+   instable = thesolver->instableLeave;
+   assert(!instable || thesolver->instableLeaveNum >= 0);
+   stab = instable ? LOWSTAB : SPxFastRT::minStability(moststable);
+
+   bool foundStable= false;
+
    if( bestBp > -1 )
    {
-      //get Id and stuff
-
+      // we found a more stable pivot
+      if( moststable > stab )
+      {
+         // stability requirements are satisfied
+         int idx = breakpoints[bestBp].idx;
+         if( breakpoints[bestBp].src == PVEC )
+            foundStable = getData(val, enterId, idx, stab, degeneps, pupd, pvec, lpb, upb, PVEC, max);
+         else
+            foundStable = getData(val, enterId, idx, stab, degeneps, cupd, cvec, lcb, ucb, COPVEC, max);
+      }
    }
 
-   // check for unboundedness/infeasibility
-   if( slope > epsilon && usedBp >= nBp - 1 )
-   {
-      MSG_DEBUG( spxout << "DLSTEP02 "
-                        << thesolver->basis().iteration()
-                        << ": unboundedness in ratio test"
-                        << std::endl; )
-      flipPotential *= 0.95;
-      val = max;
-      return SPxFastRT::selectEnter(val, leaveIdx);
-   }
-
+#if 0
    // do not make long steps if the gain in the dual objective is too small, except to avoid degenerate steps
    if( usedBp > 0 && breakpoints[0].val > epsilon && breakpoints[usedBp].val - breakpoints[0].val < MIN_LONGSTEP * breakpoints[0].val )
    {
@@ -548,169 +656,37 @@ SPxId SPxBoundFlippingRT::selectEnter(
                         << thesolver->basis().iteration()
                         << ": bound flip gain is too small"
                         << std::endl; )
-//       val = max;
-//       return SPxFastRT::selectEnter(val, leaveIdx);
 
       // ensure that the first breakpoint is nonbasic
-//       while( breakpoints[usedBp].idx < 0 && usedBp < nBp )
-//          ++usedBp;
+      while( breakpoints[usedBp].idx < 0 && usedBp < nBp )
+         ++usedBp;
       // @todo make sure that the selected pivot element is stable
    }
+#endif
 
    // scan pivot candidates from back to front and stop as soon as a good one is found
-   degeneps = fastDelta / moststable;  /* as in SPxFastRT */
-   instable = thesolver->instableLeave;
-   assert(!instable || thesolver->instableLeaveNum >= 0);
-   stab = instable ? LOWSTAB : SPxFastRT::minStability(moststable);
    // @todo select the moststable pivot or one that is comparably stable
-   stab = (moststable > stab) ? moststable : stab;
+//    stab = (moststable > stab) ? moststable : stab;
 
-   while( usedBp >= 0 )
+   while( !foundStable && usedBp >= 0 )
    {
       int idx = breakpoints[usedBp].idx;
 
-      // skip basic variables
-      if( idx < 0 )
-      {
-         --usedBp;
-         continue;
-      }
-      if( max > 0 )
+      // only look for non-basic variables
+      if( idx >= 0 )
       {
          if( breakpoints[usedBp].src == PVEC )
-         {
-            thesolver->pVec()[idx] = thesolver->vector(idx) * thesolver->coPvec();
-            Real x = pupd[idx];
-            // skip breakpoint if it is too small
-            if( fabs(x) < stab )
-            {
-               --usedBp;
-               continue;
-            }
-            enterId = thesolver->id(idx);
-            val = (x > 0.0) ? upb[idx] : lpb[idx];
-            val = (val - pvec[idx]) / x;
-            if( upb[idx] == lpb[idx] )
-            {
-               val = 0.0;
-               if( pvec[idx] > upb[idx] )
-                  thesolver->theShift += pvec[idx] - upb[idx];
-               else
-                  thesolver->theShift += lpb[idx] - pvec[idx];
-               thesolver->upBound()[idx] = thesolver->lpBound()[idx] = pvec[idx];
-            }
-            else if( val < -degeneps )
-            {
-               val = 0.0;
-               if( x > 0.0 )
-                  thesolver->shiftUPbound(idx, pvec[idx]);
-               else
-                  thesolver->shiftLPbound(idx, pvec[idx]);
-            }
-         }
-         else // breakpoints[usedBp].src == COPVEC
-         {
-            Real x = cupd[idx];
-            if( fabs(x) < stab )
-            {
-               --usedBp;
-               continue;
-            }
-            enterId = thesolver->coId(idx);
-            val = (x > 0.0) ? ucb[idx] : lcb[idx];
-            val = (val - cvec[idx]) / x;
-            if( ucb[idx] == lcb[idx] )
-            {
-               val = 0.0;
-               if( cvec[idx] > ucb[idx] )
-                  thesolver->theShift += cvec[idx] - ucb[idx];
-               else
-                  thesolver->theShift += lcb[idx] - cvec[idx];
-               thesolver->ucBound()[idx] = thesolver->lcBound()[idx] = cvec[idx];
-            }
-            else if( val < -degeneps )
-            {
-               val = 0.0;
-               if( x > 0.0 )
-                  thesolver->shiftUCbound(idx, cvec[idx]);
-               else
-                  thesolver->shiftLCbound(idx, cvec[idx]);
-            }
-         }
+            foundStable = getData(val, enterId, idx, stab, degeneps, pupd, pvec, lpb, upb, PVEC, max);
+         else
+            foundStable = getData(val, enterId, idx, stab, degeneps, cupd, cvec, lcb, ucb, COPVEC, max);
       }
-      else // (max < 0)
-      {
-         if( breakpoints[usedBp].src == PVEC )
-         {
-            Real x;
-
-            thesolver->pVec()[idx] = thesolver->vector(idx) * thesolver->coPvec();
-            x = pupd[idx];
-            if( fabs(x) < stab )
-            {
-               --usedBp;
-               continue;
-            }
-
-            enterId = thesolver->id(idx);
-            val = (x < 0.0) ? upb[idx] : lpb[idx];
-            val = (val - pvec[idx]) / x;
-            if( upb[idx] == lpb[idx] )
-            {
-               val = 0.0;
-               if( pvec[idx] > upb[idx] )
-                  thesolver->theShift += pvec[idx] - upb[idx];
-               else
-                  thesolver->theShift += lpb[idx] - pvec[idx];
-
-               thesolver->upBound()[idx] = thesolver->lpBound()[idx] = pvec[idx];
-            }
-            else if( val > degeneps )
-            {
-               val = 0.0;
-               if( x > 0.0 )
-                  thesolver->shiftLPbound(idx, pvec[idx]);
-               else
-                  thesolver->shiftUPbound(idx, pvec[idx]);
-            }
-         }
-         else // breakpoints[usedBp].src == COPVEC
-         {
-            Real x = cupd[idx];
-            if( fabs(x) < stab )
-            {
-               --usedBp;
-               continue;
-            }
-            enterId = thesolver->coId(idx);
-            val = (x < 0.0) ? ucb[idx] : lcb[idx];
-            val = (val - cvec[idx]) / x;
-            if( ucb[idx] == lcb[idx] )
-            {
-               val = 0.0;
-               if( cvec[idx] > ucb[idx] )
-                  thesolver->theShift += cvec[idx] - ucb[idx];
-               else
-                  thesolver->theShift += lcb[idx] - cvec[idx];
-
-               thesolver->ucBound()[idx] = thesolver->lcBound()[idx] = cvec[idx];
-            }
-            else if( val > degeneps )
-            {
-               val = 0.0;
-               if( x > 0.0 )
-                  thesolver->shiftLCbound(idx, cvec[idx]);
-               else
-                  thesolver->shiftUCbound(idx, cvec[idx]);
-            }
-         }
-      }
-      break;
+      --usedBp;
    }
 
-   if( !enterId.isValid())
+   if( !foundStable )
    {
-      assert(usedBp < 0);
+//       assert(usedBp < 0);
+      assert(!enterId.isValid());
       if( relax_count < MAX_RELAX_COUNT )
       {
          MSG_DEBUG( spxout << "DLSTEP04 "
@@ -721,26 +697,28 @@ SPxId SPxBoundFlippingRT::selectEnter(
          ++relax_count;
          // restore original value
          val = max;
+         // try again with relaxed delta
          return SPxBoundFlippingRT::selectEnter(val, leaveIdx);
       }
       else
       {
          MSG_DEBUG( spxout << "DLSTEP05 "
                            << thesolver->basis().iteration()
-                           << "no valid enterId found - breaking..."
+                           << " no valid enterId found - breaking..."
                            << std::endl; )
+         assert(!enterId.isValid());
          return enterId;
       }
    }
    else
    {
-      assert(usedBp >= 0);
+//       assert(usedBp >= 0);
       relax_count = 0;
       tighten();
    }
 
    // flip bounds of skipped breakpoints only if a nondegenerate step is to be performed
-   if( usedBp > 0 && fabs(breakpoints[usedBp].val) > fastDelta && doFlips)
+   if( usedBp > 0 && fabs(breakpoints[usedBp].val) > fastDelta )
    {
       flipAndUpdate(usedBp);
       thesolver->boundflips = usedBp;

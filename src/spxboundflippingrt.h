@@ -131,6 +131,21 @@ private:
       BreakpointSource   src                 /**< type of vector (pVec or coPvec)*/
       );
 
+   /** get values for entering index and perform shifts if necessary */
+   bool getData(
+      Real&              val,
+      SPxId&             enterId,
+      int                idx,
+      Real               stab,
+      Real               degeneps,
+      const Real*        upd,
+      const Real*        vec,
+      const Real*        low,
+      const Real*        upp,
+      BreakpointSource   src,
+      Real               max
+      );
+
    /** perform necessary bound flips to restore dual feasibility */
    void flipAndUpdate(
       int&               usedBp              /**< number of bounds that should be flipped */
