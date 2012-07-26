@@ -34,6 +34,8 @@
 
    - \ref FAQ      "Frequently asked questions"
 
+   - \ref IR       "Iterative Refinement"
+
    - \ref PROG     "Programming with SoPlex"
 */
 //-----------------------------------------------------------------------------
@@ -357,6 +359,83 @@
    bound, depending on the Simplex type (see \c theURbound,
    \c theLRbound, \c theUCbound, \c theLCbound). 
 */
+//-----------------------------------------------------------------------------
+/**@page IR Iterative Refinement
+
+   Since version 1.7, SoPlex provides the new feature Iterative Refinement that
+   allows for computing extended-precision solutions beyond the limits of
+   standard floating-point arithmetic.  It may be particularly helpful for
+   numerically troublesome LPs and applications which require solutions within
+   tight feasibility tolerances.
+
+   Iterative Refinement is still under development and deactivated by default.
+   In the following, we explain in detail how to install and use Iterative
+   Refinement in SoPlex 1.7.  Be aware that the interface may change in future
+   releases.
+
+   Installation: For Iterative Refinement, SoPlex must be built with support for
+   GMP, the GNU Multiple Precision library (http://www.gmplib.org/).  Since
+   SoPlex uses the C++ interface of GMP, both libgmp and libgmpxx must be
+   available on your system.
+
+   When using SoPlex's Makefile build system, it suffices to make with option
+   GMP=true, see the INSTALL file for details.  If you use a different build
+   system than the provided Makefile, you need to define the preprocessor flag
+   WITH_GMP and link with libgmp and libgmpxx.
+
+   Usage: SoPlex 1.7 comes with a new parameter called "iterative refinement
+   threshold".  At the command line, this threshold can be changed via option
+   -R; the callable library provides the methods SoPlex::setIrthreshold() and
+   SPxSolver::setIrthreshold().  By default, this threshold is 1e-12.
+
+   If GMP support is not available, the primal and dual feasibility tolerance
+   cannot be set below the iterative refinement threshold.  With GMP support
+   enabled, as soon as either the primal or dual feasibility tolerance (command
+   line options -f and -o, respectively) is set to value smaller than this
+   threshold, iterative refinement is performed automatically.
+
+   For a detailed explanation on the iterative refinement algorithm see the ZIB
+   technical report 12-19 available online at
+
+   http://opus4.kobv.de/opus4-zib/frontdoor/index/index/docId/1545
+
+   Vaguely speaking, at each round of the iterative refinement process, SoPlex
+   computes the primal and dual violation of the current solution in exact
+   arithmetic and uses this to set up an LP with modified bounds, sides, and
+   objective function.  The solution to this LP is then used to correct the
+   solution and reduce primal and dual violation.  This is repeated until the
+   requested feasibility and optimality tolerance is reached.
+
+   Limitations: Currently, iterative refinement is only implemented for LPs with
+   an optimal solution; unbounded or infeasible LPs cannot be handled, yet.
+   Furthermore, SoPlex supports exact arithmetic only internally.  Input and
+   output cannot yet be performed in standard floating-point precision.  This
+   leads to the following two limitations.
+
+   First, SoPlex only accepts LPs in double-precision, hence when parsing an LP
+   or MPS file, roundoff errors may be introduced and hence the LP in SoPlex may
+   be slightly perturbed.  Be aware that the result returned by SoPlex hence
+   might apply for a slightly modified problem.  In extreme cases, this can even
+   lead to the internally stored LP becoming slightly infeasible.  While a
+   standard flaoting-point LP solver would not detect these minimal
+   infeasibilities, the iterative refinement procedure will do so if high
+   feasibility tolerances are used.  Because of this, we have currently decided
+   that in case infeasibility is detected at higher rounds of iterative
+   refinement, SoPlex will return the solution of the previous round.
+
+   Second, SoPlex can currently return only a floating-point rounding of the
+   high-precision solution computed internally.  Be aware that even if iterative
+   refinement terminates and claims that the requested tolerances have been
+   reached, this may not hold for the solution returned by the interface, e.g.,
+   the options -x and -y on the command line.  Note that the basis information
+   returned by SoPlex (command line option -bw) is exact in any case and tools
+   like PerPlex or QSopt_ex can be used to recompute the corresponding
+   primal-dual solution in exact arithmetic.
+
+   These limitations will be overcome in future release.  We appreciate any
+   feedback, comments, and questions on this new feature.  They can be directed
+   to soplex@zib.de and will help improve the future development of SoPlex.
+ */
 //-----------------------------------------------------------------------------
 
 
