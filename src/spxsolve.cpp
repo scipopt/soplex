@@ -213,10 +213,14 @@ SPxSolver::Status SPxSolver::fpsolve()
             lastDelta = (lastDelta < entertol()) ? lastDelta : entertol();
             lastDelta *= 0.01;
             theratiotester->setDelta(lastDelta);
+            assert(theratiotester->getDelta() > 0);
             MSG_DEBUG( spxout << "decreased delta for ratiotest to: " << theratiotester->getDelta() << std::endl; )
          }
          else
+         {
             lastDelta = 1;
+            theratiotester->setDelta(entertol());
+         }
 
          do
          {
@@ -435,10 +439,14 @@ SPxSolver::Status SPxSolver::fpsolve()
             lastDelta = (lastDelta < leavetol()) ? lastDelta : leavetol();
             lastDelta *= 0.01;
             theratiotester->setDelta(lastDelta);
+            assert(theratiotester->getDelta() > 0);
             MSG_DEBUG( spxout << "decreased delta for ratiotest to: " << theratiotester->getDelta() << std::endl; )
          }
          else
+         {
             lastDelta = 1;
+            theratiotester->setDelta(leavetol());
+         }
 
          do
          {

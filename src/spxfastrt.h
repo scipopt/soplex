@@ -223,6 +223,8 @@ public:
    ///
    virtual void setDelta(Real newDelta)
    {
+      if( newDelta <= DEFAULT_EPS_ZERO )
+         newDelta = DEFAULT_EPS_ZERO;
       delta = newDelta;
       fastDelta = newDelta;
    }
