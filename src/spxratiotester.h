@@ -87,7 +87,10 @@ public:
    /// set allowed bound violation
    virtual void setDelta( Real newDelta )
    {
-      delta = newDelta;
+      if( newDelta <= DEFAULT_EPS_ZERO )
+         delta = DEFAULT_EPS_ZERO;
+      else
+         delta = newDelta;
    }
 
    /// get allowed bound violation
