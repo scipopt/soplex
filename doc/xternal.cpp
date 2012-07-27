@@ -369,8 +369,8 @@
    tight feasibility tolerances.
 
    Iterative refinement is still under development and deactivated by default.
-   In the following, we explain in detail how to install and use Iterative
-   Refinement in SoPlex 1.7.  Be aware that the interface may change in future
+   In the following, we explain in detail how to install and use iterative
+   refinement in SoPlex 1.7.  Be aware that the interface may change in future
    releases.
 
    @section IR-Installation Installation
