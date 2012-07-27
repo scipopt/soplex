@@ -333,9 +333,8 @@ public:
     *  the i-th entry equals false, if the i-th basic variable is not infeasible
     *  the i-th entry equals true, if the i-th basic variable is infeasible
     */
-   Array<bool> isInfeasible;           ///< belongs to \ref soplex::SPxSolver::infeasibilitiesFtest "infeasibilitiesFtest" in the leaving Simplex
-                                       ///< and \ref soplex::SPxSolver::infeasibilitiesCoTest "infeasibilitiesCoTest" in the entering Simplex
-   Array<bool> isInfeasibleCo;         ///< belongs to \ref soplex::SPxSolver::infeasibilitiesTest "infeasibilitiesTest" in the entering Simplex
+   Array<bool> isInfeasible;           ///< belongs to \ref soplex::SPxSolver::infeasibilities "infeasibilities" in the leaving and entering Simplex
+   Array<bool> isInfeasibleCo;         ///< belongs to \ref soplex::SPxSolver::infeasibilitiesCo "infeasibilitiesCo" in the entering Simplex
 
    /// These values enable or disable sparse pricing
    bool     sparsePricingLeave;        ///< true if sparsePricing is turned on in the leaving Simplex
@@ -346,9 +345,9 @@ public:
    int      remainingRoundsEnter;
    int      remainingRoundsEnterCo;
 
-   int      sparsityThresholdLeave;    ///< maximum allowed length of \ref soplex::SPxSolver::infeasibilitiesFtest "infeasibilities" in the leaving Simplex
-   int      sparsityThresholdEnter;    ///< maximum allowed length of \ref soplex::SPxSolver::infeasibilitiesCoTest "infeasibilities" in the entering Simplex
-   int      sparsityThresholdEnterCo;  ///< maximum allowed length of \ref soplex::SPxSolver::infeasibilitiesTest "infeasibilitiesCo" in the entering Simplex
+   int      sparsityThresholdLeave;    ///< maximum number of infeasibilities that is considered sparse for leaving Simplex
+   int      sparsityThresholdEnter;    ///< maximum number of infeasibilities that is considered sparse for entering Simplex (dim)
+   int      sparsityThresholdEnterCo;  ///< maximum number of infeasibilities that is considered sparse for entering Simplex (coDim)
 
    //-----------------------------
    /**@name Access */
