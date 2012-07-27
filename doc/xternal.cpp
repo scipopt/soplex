@@ -362,20 +362,20 @@
 //-----------------------------------------------------------------------------
 /**@page IR Iterative Refinement
 
-   Since version 1.7, SoPlex provides the new feature Iterative Refinement that
+   Since version 1.7, SoPlex provides the new feature \em iterative \em refinement that
    allows for computing extended-precision solutions beyond the limits of
    standard floating-point arithmetic.  It may be particularly helpful for
-   numerically troublesome LPs and applications which require solutions within
+   numerically troublesome LPs and applications that require solutions within
    tight feasibility tolerances.
 
-   Iterative Refinement is still under development and deactivated by default.
+   Iterative refinement is still under development and deactivated by default.
    In the following, we explain in detail how to install and use Iterative
    Refinement in SoPlex 1.7.  Be aware that the interface may change in future
    releases.
 
    @section IR-Installation Installation
 
-   For Iterative Refinement, SoPlex must be built with support for
+   For iterative refinement, SoPlex must be built with support for
    GMP, the GNU Multiple Precision library (http://www.gmplib.org/).  Since
    SoPlex uses the C++ interface of GMP, both libgmp and libgmpxx must be
    available on your system.
@@ -398,7 +398,7 @@
    line options -f and -o, respectively) is set to a value smaller than this
    threshold, iterative refinement is performed automatically.
 
-   For a detailed explanation on the iterative refinement algorithm see the ZIB
+   For a detailed explanation of the iterative refinement algorithm see the ZIB
    technical report 12-19 available online at
 
    http://opus4.kobv.de/opus4-zib/frontdoor/index/index/docId/1545
