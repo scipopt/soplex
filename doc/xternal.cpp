@@ -373,7 +373,9 @@
    Refinement in SoPlex 1.7.  Be aware that the interface may change in future
    releases.
 
-   Installation: For Iterative Refinement, SoPlex must be built with support for
+   @section Installation
+
+   For Iterative Refinement, SoPlex must be built with support for
    GMP, the GNU Multiple Precision library (http://www.gmplib.org/).  Since
    SoPlex uses the C++ interface of GMP, both libgmp and libgmpxx must be
    available on your system.
@@ -383,7 +385,9 @@
    system than the provided Makefile, you need to define the preprocessor flag
    WITH_GMP and link with libgmp and libgmpxx.
 
-   Usage: SoPlex 1.7 comes with a new parameter called "iterative refinement
+   @section Usage
+
+   SoPlex 1.7 comes with a new parameter called "iterative refinement
    threshold".  At the command line, this threshold can be changed via option
    -R; the callable library provides the methods SoPlex::setIrthreshold() and
    SPxSolver::setIrthreshold().  By default, this threshold is 1e-12.
@@ -406,7 +410,9 @@
    solution and reduce primal and dual violation.  This is repeated until the
    requested feasibility and optimality tolerance is reached.
 
-   Limitations: Currently, iterative refinement is only implemented for LPs with
+   @section Current limitations
+
+   Currently, iterative refinement is only implemented for LPs with
    an optimal solution; unbounded or infeasible LPs cannot be handled, yet.
    Furthermore, SoPlex supports exact arithmetic only internally.  Input and
    output cannot yet be performed in standard floating-point precision.  This
@@ -431,6 +437,8 @@
    returned by SoPlex (command line option -bw) is exact in any case and tools
    like PerPlex or QSopt_ex can be used to recompute the corresponding
    primal-dual solution in exact arithmetic.
+
+   @section Feedback
 
    These limitations will be overcome in future release.  We appreciate any
    feedback, comments, and questions on this new feature.  They can be directed
