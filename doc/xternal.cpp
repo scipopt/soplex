@@ -15,7 +15,7 @@
    @author   Eva Ramlow
    @author   Andreas Tuchscherer
 
-   @section The Sequential object-oriented simplex class library.
+   @section Main The Sequential object-oriented simplex class library.
 
    This software has been implemented as a part of Roland Wunderling's 
    Ph.D. thesis "Paralleler und Objektorientierter Simplex-Algorithmus"
@@ -373,7 +373,7 @@
    Refinement in SoPlex 1.7.  Be aware that the interface may change in future
    releases.
 
-   @section Installation
+   @section IR-Installation Installation
 
    For Iterative Refinement, SoPlex must be built with support for
    GMP, the GNU Multiple Precision library (http://www.gmplib.org/).  Since
@@ -385,17 +385,17 @@
    system than the provided Makefile, you need to define the preprocessor flag
    WITH_GMP and link with libgmp and libgmpxx.
 
-   @section Usage
+   @section IR-Usage Usage
 
    SoPlex 1.7 comes with a new parameter called "iterative refinement
    threshold".  At the command line, this threshold can be changed via option
-   -R; the callable library provides the methods SoPlex::setIrthreshold() and
-   SPxSolver::setIrthreshold().  By default, this threshold is 1e-12.
+   -R; the callable library provides the methods \ref soplex::SoPlex::setIrthreshold() and
+   \ref soplex::SPxSolver::setIrthreshold().  By default, this threshold is 1e-12.
 
    If GMP support is not available, the primal and dual feasibility tolerance
    cannot be set below the iterative refinement threshold.  With GMP support
    enabled, as soon as either the primal or dual feasibility tolerance (command
-   line options -f and -o, respectively) is set to value smaller than this
+   line options -f and -o, respectively) is set to a value smaller than this
    threshold, iterative refinement is performed automatically.
 
    For a detailed explanation on the iterative refinement algorithm see the ZIB
@@ -410,7 +410,7 @@
    solution and reduce primal and dual violation.  This is repeated until the
    requested feasibility and optimality tolerance is reached.
 
-   @section Current limitations
+   @section IR-Limitations Current limitations
 
    Currently, iterative refinement is only implemented for LPs with
    an optimal solution; unbounded or infeasible LPs cannot be handled, yet.
@@ -438,7 +438,7 @@
    like PerPlex or QSopt_ex can be used to recompute the corresponding
    primal-dual solution in exact arithmetic.
 
-   @section Feedback
+   @section IR-Feedback Feedback
 
    These limitations will be overcome in future release.  We appreciate any
    feedback, comments, and questions on this new feature.  They can be directed
