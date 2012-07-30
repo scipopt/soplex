@@ -620,6 +620,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
                bestBp = stableBp;
             }
          }
+         // TODO check whether 2 is a good factor
          // stop searching if the step length is too big
          else if( stableDelta > 2 * bestDelta )
             break;
