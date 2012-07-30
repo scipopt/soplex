@@ -3,8 +3,8 @@ Notes for SoPlex Release 1.7.0
 What's new
 ----------
 
- - performance improvements in pricing algorithms: partial pricing,
-   sparse pricing, exact steepest edge pricing
+ - performance improvements in pricing algorithms: sparse pricing,
+   exact steepest edge pricing, ...
 
  - independent parameters for primal and dual feasibility tolerance
 
