@@ -1,0 +1,20 @@
+Notes for SoPlex Release 1.7.0
+
+What's new
+----------
+
+ - performance improvements in pricing algorithms: partial pricing,
+   sparse pricing, exact steepest edge pricing
+
+ - independent parameters for primal and dual feasibility tolerance
+
+ - improved reading and writing of basis in connection with simplifier
+
+ - beta: new feature iterative refinement for computing high-precision
+   solutions using the GNU Multiple Precision Library
+
+ - many bugfixes and improvements in numerical stability and
+   infeasibility detection
+
+
+For details see the CHANGELOG file and the Doxygen documentation.

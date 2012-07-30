@@ -1,8 +1,8 @@
 (maintain each list from top to bottom)
 
 
-15 Jul 2012 - Release 1.7.0 Beta
-================================
+31 Jul 2012 - Release 1.7.0
+===========================
 
 code quality & new features:
 - partial pricing can be switched on for dantzig-, devex- and steep-pricing by defining PARTIAL_PRICING (only LEAVING mode)
@@ -17,7 +17,7 @@ code quality & new features:
 
 fixed bugs:
 - variables that do not appear in the objective function or any constraint are not printed anymore in the BOUNDS section
-  of the mps file.
+  of the mps file
 - allow instable leave iterations, i.e., leave iterations with pivot element below default stability threshold, only
   after a fresh factorization
 - check redundant variable bounds implied by rows more carefully: do not apply if max/min activity exceeds sides by a
