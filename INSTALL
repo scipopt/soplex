@@ -63,9 +63,9 @@
         option GMP=true, e.g., make COMP=<as before> OPT=<as before> GMP=true.
 
         If you use a different build system than the provided Makefile, you need
-        to add the define "-DWITH_GMP" and link with flags "-lgmp -lgmpxx".  Note
-        that SoPlex uses the C++ interface of GMP, hence the C library libgmp is
-        not sufficient.
+        to add the define "-DSOPLEX_WITH_GMP" and link with flags "-lgmp -lgmpxx".
+        Note that SoPlex uses the C++ interface of GMP, hence the C library libgmp
+        is not sufficient.
 
         For more help on using iterative refinement, see the section in the
         Doxygen documentation available online at http://soplex.zib.de/.

@@ -26,7 +26,7 @@
 
 
 
-#ifdef WITH_GMP
+#ifdef SOPLEX_WITH_GMP
 #include "gmp.h"
 #include "gmpxx.h"
 #endif
@@ -38,7 +38,7 @@ namespace soplex
  *
  * We wrap mpq_class so that we can replace it by SoPlex's normal Real type if GMP is not available.
  */
-#ifdef WITH_GMP
+#ifdef SOPLEX_WITH_GMP
 
 /// If compiled with GMP support, MpqReal is defined as mpq_class.
 typedef mpq_class MpqReal;

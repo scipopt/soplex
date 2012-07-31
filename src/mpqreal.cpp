@@ -23,7 +23,7 @@
 
 namespace soplex
 {
-#ifdef WITH_GMP
+#ifdef SOPLEX_WITH_GMP
 
 /// print MpqReal with limited floating point precision
 std::ostream& operator<<(std::ostream& os, const MpqReal& q)

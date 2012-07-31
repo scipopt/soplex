@@ -22,6 +22,10 @@
    which can be found at http://www.zib.de/PaperWeb/abstracts/TR-96-09
    (in German).
 
+   SoPlex is part of the SCIP Optmization Suite.  A tutorial article for
+   getting started with the SCIP Optimization Suite is available as ZIB
+   technical report 12-27 <a href="http://scip.zib.de/doc/ZR-12-27.pdf">here</a>.
+
    SoPlex is implemented in C++. The code should be compliant with the 
    current ANSI standard. RTTI and STL (other then iostream) are not used. 
    Everything is in one namespace \em soplex.
@@ -383,7 +387,7 @@
    When using SoPlex's Makefile build system, it suffices to make with option
    GMP=true, see the INSTALL file for details.  If you use a different build
    system than the provided Makefile, you need to define the preprocessor flag
-   WITH_GMP and link with libgmp and libgmpxx.
+   SOPLEX_WITH_GMP and link with libgmp and libgmpxx.
 
    @section IR-Usage Usage
 

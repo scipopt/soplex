@@ -191,7 +191,7 @@ LIBSRCHEADER	=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.h))
 GMPDEP		:=	$(SRCDIR)/depend.gmp
 GMPSRC		:=	$(shell cat $(GMPDEP))
 ifeq ($(GMP),true)
-CPPFLAGS	+=	-DWITH_GMP $(GMP_FLAGS)
+CPPFLAGS	+=	-DSOPLEX_WITH_GMP $(GMP_FLAGS)
 LDFLAGS		+=	$(GMP_LDFLAGS)
 endif
 
@@ -329,7 +329,7 @@ depend:
 		$(LIBSRC:.o=.cpp) \
 		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(LIBOBJDIR\)/\1.o|g'\'' \
 		>>$(DEPEND)'
-		@echo `grep -l "WITH_GMP" $(SRCDIR)/*` >$(GMPDEP)
+		@echo `grep -l "SOPLEX_WITH_GMP" $(SRCDIR)/*` >$(GMPDEP)
 		@echo `grep -l "WITH_ZLIB" $(SRCDIR)/*` >$(ZLIBDEP)
 
 -include	$(DEPEND)

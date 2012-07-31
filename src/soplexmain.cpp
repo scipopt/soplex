@@ -302,8 +302,8 @@ void print_version_info()
 #endif
              << "]";
 
-   std::cout << "[WITH_GMP:"
-#ifdef WITH_GMP
+   std::cout << "[SOPLEX_WITH_GMP:"
+#ifdef SOPLEX_WITH_GMP
              << "YES"
 #else
              << "NO"
