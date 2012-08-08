@@ -16,6 +16,13 @@
 /**@file  spxscaler.cpp
  * @brief LP scaling base class.
  */
+
+#define BITSHIFTSCALING
+
+#ifdef BITSHIFTSCALING
+#include <cmath>
+#endif
+
 #include <iostream>
 #include <assert.h>
 
@@ -32,7 +39,7 @@ std::ostream& operator<<(std::ostream& s, const SPxScaler& sc)
    for(int ci = 0; ci < sc.m_colscale.size(); ++ci )
       s << sc.m_colscale[ci] << " ";
    s << "]" << std::endl;
-      
+
    s << "rowscale = [ ";
    for(int ri = 0; ri < sc.m_rowscale.size(); ++ri )
       s << sc.m_rowscale[ri] << " ";
@@ -65,7 +72,7 @@ SPxScaler::SPxScaler(const SPxScaler& old)
 SPxScaler::~SPxScaler()
 {
    m_name = 0;
-}   
+}
 
 SPxScaler& SPxScaler::operator=(const SPxScaler& rhs)
 {
@@ -143,14 +150,14 @@ Real SPxScaler::computeScalingVecs(
    for(int i = 0; i < vecset->num(); ++i )
    {
       const SVector& vec = (*vecset)[i];
-            
+
       Real maxi = 0.0;
       Real mini = infinity;
-            
+
       for( int j = 0; j < vec.size(); ++j)
       {
          Real x = fabs(vec.value(j) * coScaleval[vec.index(j)]);
-               
+
          if (!isZero(x))
          {
             if (x > maxi)
@@ -169,9 +176,9 @@ Real SPxScaler::computeScalingVecs(
       assert(maxi > 0.0);
 
       scaleval[i] = 1.0 / computeScale(mini, maxi);
-            
+
       Real p = maxi / mini;
-            
+
       if (p > pmax)
          pmax = p;
    }
@@ -187,7 +194,25 @@ void SPxScaler::applyScaling(SPxLP& lp)
    for(i = 0; i < lp.nRows(); ++i )
    {
       SVector& vec = lp.rowVector_w(i);
-
+#ifdef BITSHIFTSCALING
+      int exp1,exp2;
+      for( int j = 0; j < vec.size(); ++j)
+      {
+         frexp(m_colscale[vec.index(j)], &exp1);
+         frexp(m_rowscale[i], &exp2);
+         vec.value(j) = ldexp(vec.value(j), exp1 + exp2 - 2);
+      }
+      if (lp.rhs(i) < infinity)
+      {
+         frexp(m_rowscale[i], &exp1);
+         lp.rhs_w(i) = ldexp(lp.rhs_w(i), exp1 - 1);
+      }
+      if (lp.lhs(i) > -infinity)
+      {
+         frexp(m_rowscale[i], &exp1);
+         lp.lhs_w(i) = ldexp(lp.lhs_w(i), exp1 - 1);
+      }
+#else
       for( int j = 0; j < vec.size(); ++j)
          vec.value(j) *= m_colscale[vec.index(j)] * m_rowscale[i];
 
@@ -195,20 +220,44 @@ void SPxScaler::applyScaling(SPxLP& lp)
          lp.rhs_w(i) *= m_rowscale[i];
       if (lp.lhs(i) > -infinity)
          lp.lhs_w(i) *= m_rowscale[i];
+#endif
    }
    for(i = 0; i < lp.nCols(); ++i )
    {
       SVector& vec = lp.colVector_w(i);
-      
+#ifdef BITSHIFTSCALING
+      int exp1,exp2;
+      for( int j = 0; j < vec.size(); ++j)
+      {
+         frexp(m_rowscale[vec.index(j)], &exp1);
+         frexp(m_colscale[i], &exp2);
+         vec.value(j) = ldexp(vec.value(j), exp1 + exp2 - 2);
+      }
+
+      frexp(m_colscale[i], &exp1);
+      lp.maxObj_w(i) = ldexp(lp.maxObj_w(i), exp1 - 1);
+
+      if (lp.upper(i) < infinity)
+      {
+         frexp(m_colscale[i], &exp1);
+         lp.upper_w(i) = ldexp(lp.upper_w(i), -exp1 + 1);
+      }
+      if (lp.lower(i) > -infinity)
+      {
+         frexp(m_colscale[i], &exp1);
+         lp.lower_w(i) = ldexp(lp.lower_w(i), -exp1 + 1);
+      }
+#else
       for( int j = 0; j < vec.size(); ++j)
          vec.value(j) *= m_rowscale[vec.index(j)] * m_colscale[i];
-      
+
       lp.maxObj_w(i) *= m_colscale[i];
-      
+
       if (lp.upper(i) < infinity)
          lp.upper_w(i) /= m_colscale[i];
       if (lp.lower(i) > -infinity)
          lp.lower_w(i) /= m_colscale[i];
+#endif
    }
    assert(lp.isConsistent());
 }
@@ -218,9 +267,17 @@ void SPxScaler::unscalePrimal(Vector& x) const
    METHOD( "SPxScaler::unscalePrimal()" );
 
    assert(x.dim() == m_colscale.size());
-
+#ifdef BITSHIFTSCALING
+   int exp1;
+   for(int j = 0; j < x.dim(); ++j)
+   {
+      frexp(m_colscale[j], &exp1);
+      x[j] = ldexp(x[j], exp1 - 1);
+   }
+#else
    for(int j = 0; j < x.dim(); ++j)
       x[j] *= m_colscale[j];
+#endif
 }
 
 void SPxScaler::unscaleSlacks(Vector& s) const
@@ -228,9 +285,17 @@ void SPxScaler::unscaleSlacks(Vector& s) const
    METHOD( "SPxScaler::unscaleSlacks()" );
 
    assert(s.dim() == m_rowscale.size());
-
+#ifdef BITSHIFTSCALING
+   int exp1;
+   for(int i = 0; i < s.dim(); ++i)
+   {
+      frexp(m_rowscale[i], &exp1);
+      s[i] = ldexp(s[i], -exp1 + 1);
+   }
+#else
    for(int i = 0; i < s.dim(); ++i)
       s[i] /= m_rowscale[i];
+#endif
 }
 
 void SPxScaler::unscaleDual(Vector& pi) const
@@ -238,9 +303,17 @@ void SPxScaler::unscaleDual(Vector& pi) const
    METHOD( "SPxScaler::unscaleDual()" );
 
    assert(pi.dim() == m_rowscale.size());
-
+#ifdef BITSHIFTSCALING
+   int exp1;
+   for(int i = 0; i < pi.dim(); ++i)
+   {
+      frexp(m_rowscale[i], &exp1);
+      pi[i] = ldexp(pi[i], exp1 - 1);
+   }
+#else
    for(int i = 0; i < pi.dim(); ++i)
       pi[i] *= m_rowscale[i];
+#endif
 }
 
 void SPxScaler::unscaleRedCost(Vector& r) const
@@ -248,9 +321,17 @@ void SPxScaler::unscaleRedCost(Vector& r) const
    METHOD( "SPxScaler::unscaleRedCost()" );
 
    assert(r.dim() == m_colscale.size());
-
+#ifdef BITSHIFTSCALING
+   int exp1;
+   for(int j = 0; j < r.dim(); ++j)
+   {
+      frexp(m_colscale[j], &exp1);
+      r[j] = ldexp(r[j], -exp1 + 1);
+   }
+#else
    for(int j = 0; j < r.dim(); ++j)
       r[j] /= m_colscale[j];
+#endif
 }
 
 Real SPxScaler::minAbsColscale() const
@@ -262,7 +343,11 @@ Real SPxScaler::minAbsColscale() const
    for(int i = 0; i < m_colscale.size(); ++i)
       if (fabs(m_colscale[i]) < mini)
          mini = fabs(m_colscale[i]);
-
+#ifdef BITSHIFTSCALING
+   int exp;
+   frexp(mini, &exp);
+   mini = ldexp(2, exp - 1);
+#endif
    return mini;
 }
 
@@ -276,6 +361,11 @@ Real SPxScaler::maxAbsColscale() const
       if (fabs(m_colscale[i]) > maxi)
          maxi = fabs(m_colscale[i]);
 
+#ifdef BITSHIFTSCALING
+   int exp;
+   frexp(maxi, &exp);
+   maxi = ldexp(2, exp - 1);
+#endif
    return maxi;
 }
 
@@ -288,7 +378,11 @@ Real SPxScaler::minAbsRowscale() const
    for(int i = 0; i < m_rowscale.size(); ++i)
       if (fabs(m_rowscale[i]) < mini)
          mini = fabs(m_rowscale[i]);
-
+#ifdef BITSHIFTSCALING
+   int exp;
+   frexp(mini, &exp);
+   mini = ldexp(2, exp - 1);
+#endif
    return mini;
 }
 
@@ -301,7 +395,11 @@ Real SPxScaler::maxAbsRowscale() const
    for(int i = 0; i < m_rowscale.size(); ++i)
       if (fabs(m_rowscale[i]) > maxi)
          maxi = fabs(m_rowscale[i]);
-
+#ifdef BITSHIFTSCALING
+   int exp;
+   frexp(maxi, &exp);
+   maxi = ldexp(2, exp - 1);
+#endif
    return maxi;
 }
 
@@ -334,7 +432,7 @@ Real SPxScaler::maxColRatio(const SPxLP& lp) const
 
       if (p > pmax)
          pmax = p;
-   }   
+   }
    return pmax;
 }
 
@@ -367,7 +465,7 @@ Real SPxScaler::maxRowRatio(const SPxLP& lp) const
 
       if (p > pmax)
          pmax = p;
-   }   
+   }
    return pmax;
 }
 
