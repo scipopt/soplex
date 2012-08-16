@@ -683,7 +683,7 @@ void SPxBasis::printMatrixMTX(int number)
 {
    int dim;
    int nnz;
-   char filename[20];
+   char filename[30];
 
    dim = matrix.size();
    nnz = nzCount;
