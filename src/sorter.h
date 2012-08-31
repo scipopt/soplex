@@ -13,7 +13,6 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-
 /**@file  sorter.h
  * @brief Generic QuickSort implementation.
  */
@@ -24,6 +23,43 @@
 
 namespace soplex
 {
+
+#define SHELLSORTMAX 25
+
+/** shell-sort an array of data elements; use it only for arrays smaller than 25 entries */
+template < class T, class COMPARATOR >
+static void sorter_shellsort(T* keys, int end, COMPARATOR& compare, int start = 0)
+{
+   static const int incs[3] = {1, 5, 19}; /* sequence of increments */
+   int k;
+
+   assert(start <= end);
+
+   for( k = 2; k >= 0; --k )
+   {
+      int h = incs[k];
+      int first = h + start;
+      int i;
+
+      for( i = first; i <= end; ++i )
+      {
+         int j;
+         T tempkey = keys[i];
+
+         j = i;
+         while( j >= first && compare(tempkey, keys[j-h]) < 0 )
+         {
+            keys[j] = keys[j-h];
+            j -= h;
+         }
+
+         keys[j] = tempkey;
+      }
+   }
+}
+
+
+
 /// Generic QuickSort implementation.
 /** This template function sorts an array \p t holding \p n elements of
     type T using \p compare for comparisons. Class COMPARATOR must provide
@@ -34,7 +70,7 @@ namespace soplex
 */
 
 template < class T, class COMPARATOR >
-static void sorter_qsort(T* t, int end, COMPARATOR& compare, int start = 0)
+static void sorter_qsort(T* keys, int end, COMPARATOR& compare, int start = 0, bool type = true)
 {
    assert(start >= 0);
 
@@ -42,49 +78,128 @@ static void sorter_qsort(T* t, int end, COMPARATOR& compare, int start = 0)
    if( end <= start + 1 )
       return;
 
-   int i0, i1, j;
-   Real c;
+   /* reduce end position to last element index */
+   --end;
 
-   T work, mid, tmp;
-
-   work = t[start];
-   t[start] = t[(start + end) / 2];
-   t[(start + end) / 2] = work;
-   
-   mid = t[start];
-   work = t[end - 1];
-   
-   for (i0 = i1 = start, j = end - 1; i1 < j;)
+   /* use quick-sort for long lists */
+   while( end - start >= SHELLSORTMAX )
    {
-      c = compare(mid, work);
-      if (c > 0)
+      T pivotkey;
+      T tmp;
+      int lo;
+      int hi;
+      int mid;
+
+      /* select pivot element */
+      mid = (start+end)/2;
+      pivotkey = keys[mid];
+
+      /* partition the array into elements < pivot [start,hi] and elements >= pivot [lo,end] */
+      lo = start;
+      hi = end;
+      for( ;; )
       {
-         tmp = t[i0];
-         t[i0] = work;
-         i0++;
-         i1++;
-         work = t[i1];
-         t[i1] = tmp;
+         if( type )
+         {
+            while( lo < end && compare(keys[lo], pivotkey) < 0 )
+               lo++;
+            while( hi > start && compare(keys[hi], pivotkey) >= 0 )
+               hi--;
+         }
+         else
+         {
+            while( lo < end && compare(keys[lo], pivotkey) <= 0 )
+               lo++;
+            while( hi > start && compare(keys[hi], pivotkey) > 0 )
+               hi--;
+         }
+
+         if( lo >= hi )
+            break;
+
+         tmp = keys[lo];
+         keys[lo] = keys[hi];
+         keys[hi] = tmp;
+
+         lo++;
+         hi--;
       }
-      else if (c < 0)
+      assert((hi == lo-1) || (type && hi == start) || (!type && lo == end));
+
+      /* skip entries which are equal to the pivot element (three partitions, <, =, > than pivot)*/
+      if( type )
       {
-         t[j] = work;
-         --j;
-         work = t[j];
+         while( lo < end && compare(pivotkey, keys[lo]) >= 0 )
+            lo++;
+
+         /* make sure that we have at least one element in the smaller partition */
+         if( lo == start )
+         {
+            /* everything is greater or equal than the pivot element: move pivot to the left (degenerate case) */
+            assert(compare(keys[mid], pivotkey) == 0); /* the pivot element did not change its position */
+
+            tmp = keys[lo];
+            keys[lo] = keys[mid];
+            keys[mid] = tmp;
+
+            lo++;
+         }
       }
       else
       {
-         i1++;
-         tmp = t[i1];
-         t[i1] = work;
-         work = tmp;
+         while( hi > start && compare(pivotkey, keys[hi]) <= 0 )
+            hi--;
+
+         /* make sure that we have at least one element in the smaller partition */
+         if( hi == end )
+         {
+            /* everything is greater or equal than the pivot element: move pivot to the left (degenerate case) */
+            assert(compare(keys[mid], pivotkey) == 0); /* the pivot element did not change its position */
+
+            tmp = keys[hi];
+            keys[hi] = keys[mid];
+            keys[mid] = tmp;
+
+            hi--;
+         }
       }
+
+      /* sort the smaller partition by a recursive call, sort the larger part without recursion */
+      if( hi - start <= end - lo )
+      {
+         /* sort [start,hi] with a recursive call */
+         if( start < hi )
+         {
+            sorter_qsort(keys, hi+1, compare, start, !type);
+         }
+
+         /* now focus on the larger part [lo,end] */
+         start = lo;
+      }
+      else
+      {
+         if( lo < end )
+         {
+            sorter_qsort(keys, end+1, compare, lo, !type);
+         }
+
+         /* now focus on the larger part [start,hi] */
+         end = hi;
+      }
+      type = !type;
    }
-   
-   if (start < i0 - 1)
-      sorter_qsort(t, i0, compare, start);
-   if (i1 + 1 < end)
-      sorter_qsort(t, end, compare, i1 + 1);
+
+   /* use shell sort on the remaining small list */
+   if( end - start >= 1 )
+   {
+      sorter_shellsort(keys, end, compare, start);
+   }
+
+
+#ifdef CHECK_SORTING
+   for( int i = start; i < end; ++i )
+      assert(compare(keys[i], keys[i+1]) <= 0);
+#endif
 }
 
 
@@ -102,13 +217,14 @@ static void sorter_qsort(T* t, int end, COMPARATOR& compare, int start = 0)
  */
 template < class T, class COMPARATOR >
 static int sorter_qsortPart(
-   T*                    t,                  /**< array of elements to be sorted between index start and end */
+   T*                    keys,               /**< array of elements to be sorted between index start and end */
    COMPARATOR&           compare,            /**< comparator */
    int                   start,              /**< index of first element in range to be sorted */
    int                   end,                /**< index of last element in range to be sorted, plus 1 */
    int                   size,               /**< guaranteed number of sorted elements */
    int                   start2 = 0,         /**< auxiliary start index of sub range used for recursive call */
-   int                   end2 = 0            /**< auxiliary end index of sub range used for recursive call */
+   int                   end2 = 0,           /**< auxiliary end index of sub range used for recursive call */
+   bool                  type = true         /**< type of sorting, to be more flexable on degenerated cases */
    )
 {
    assert(start >= 0);
@@ -116,97 +232,133 @@ static int sorter_qsortPart(
    /* nothing to sort for less than two elements */
    if( end < start + 1 )
       return 0;
-   else if( end <= start + 1 )
+   else if( end == start + 1 )
       return 1;
-
-   T work;
-   T pivotval;                               /* value of pivot element */
-   T tmp;
-
-   Real c;
-
-   int pivotind;                             /* index of pivot element */
-   int i0;                                   /* elements start, ..., i0-1 are strictly smaller than the pivot value */
-   int i1;                                   /* elements i0, ..., i1-1 are equal to the pivot value */
-   int j;                                    /* elements i1, ..., j-1 have arbitrary value; elements j, ..., end-1 are strictly greater than the pivot value */
 
    /* we assume that range {start, ..., start2-1} already contains the start2-start smallest elements in sorted order;
     * start2 has to lie in {start, ..., end-1} */
    if( start2 < start )
       start2 = start;
 
+#ifdef CHECK_SORTING
+   assert(start2 < end);
+
+   for( int i = start; i < start2 - 1; ++i )
+      assert(compare(keys[i], keys[i+1]) <= 0);
+#endif
+   assert(end2 <= end);
+
    /* if all remaining elements should be sorted, we simply call standard quicksort */
-   if( start2+size >= end-1 )
+   if( start2 + size >= end - 1 )
    {
-      sorter_qsort(t, end, compare, start2);
-      return end > end2 ? end-1 : end2-1;
+      sorter_qsort(keys, end, compare, start2, type);
+      return end-1;
    }
 
-   /* select middle element as pivot element */
-   pivotind = (start2+end)/2;
-   pivotval = t[pivotind];
+   T pivotkey;
+   T tmp;
+   int lo;
+   int hi;
+   int mid;
 
-   /* exchange first element with pivot element */
-   t[pivotind] = t[start2];
-   t[start2] = pivotval;
+   /* reduce end position to last element index */
+   --end;
 
-   /* the unsorted part covers {start2, ..., end-1} */
-   i0 = start2;
-   i1 = start2;
-   j = end-1;
+   /* select pivot element */
+   mid = (start2 + end)/2;
+   pivotkey = keys[mid];
 
-   /* we start at the end of the unsorted range */
-   work = t[j];
-
-   /* keep sorting as long as the part with arbitrary values is nonempty */
-   while( i1 < j )
+   /* partition the array into elements < pivot [start,hi] and elements >= pivot [lo,end] */
+   lo = start2;
+   hi = end;
+   for( ;; )
    {
-      /* compare work to pivot element */
-      c = compare(pivotval, work);
-
-      /* work < mid */
-      if( c > 0 )
+      if( type )
       {
-         tmp = t[i0];
-         t[i0] = work;
-         i0++;
-         i1++;
-         work = t[i1];
-         t[i1] = tmp;
+         while( lo < end && compare(keys[lo], pivotkey) < 0 )
+            lo++;
+         while( hi > start2 && compare(keys[hi], pivotkey) >= 0 )
+            hi--;
       }
-      /* work > mid */
-      else if (c < 0)
-      {
-         t[j] = work;
-         j--;
-         work = t[j];
-      }
-      /* work == mid */
       else
       {
-         i1++;
-         tmp = t[i1];
-         t[i1] = work;
-         work = tmp;
+         while( lo < end && compare(keys[lo], pivotkey) <= 0 )
+            lo++;
+         while( hi > start2 && compare(keys[hi], pivotkey) > 0 )
+            hi--;
+      }
+
+      if( lo >= hi )
+         break;
+
+      tmp = keys[lo];
+      keys[lo] = keys[hi];
+      keys[hi] = tmp;
+
+      lo++;
+      hi--;
+   }
+   assert((hi == lo-1) || (type && hi == start2) || (!type && lo == end));
+
+   /* skip entries which are equal to the pivot element (three partitions, <, =, > than pivot)*/
+   if( type )
+   {
+      while( lo < end && compare(pivotkey, keys[lo]) >= 0 )
+         lo++;
+
+      /* make sure that we have at least one element in the smaller partition */
+      if( lo == start2 )
+      {
+         /* everything is greater or equal than the pivot element: move pivot to the left (degenerate case) */
+         assert(compare(keys[mid], pivotkey) == 0); /* the pivot element did not change its position */
+
+         tmp = keys[lo];
+         keys[lo] = keys[mid];
+         keys[mid] = tmp;
+
+         lo++;
+      }
+   }
+   else
+   {
+      while( hi > start2 && compare(pivotkey, keys[hi]) <= 0 )
+         hi--;
+
+      /* make sure that we have at least one element in the smaller partition */
+      if( hi == end )
+      {
+         /* everything is greater or equal than the pivot element: move pivot to the left (degenerate case) */
+         assert(compare(keys[mid], pivotkey) == 0); /* the pivot element did not change its position */
+
+         tmp = keys[hi];
+         keys[hi] = keys[mid];
+         keys[mid] = tmp;
+
+         hi--;
       }
    }
 
+#ifdef CHECK_SORTING
+   for( int i = start2; i < lo; ++i )
+      assert(compare(keys[i], pivotkey) <= 0);
+#endif
+
    /* if we only need to sort less than half of the "<" part, use partial sort again */
-   if( 2*size <= i0 - start2 )
+   if( 2*size <= hi - start2 )
    {
-      return sorter_qsortPart(t, compare, start, i0, size, start2, i1);
+      return sorter_qsortPart(keys, compare, start, hi+1, size, start2, end2, !type);
    }
    /* otherwise, and if we do not need to sort the ">" part, use standard quicksort on the "<" part */
-   else if( size <= i1 - start2 )
+   else if( size <= lo - start2 )
    {
-      sorter_qsort(t, i0, compare, start2);
-      return i1-1;
+      sorter_qsort(keys, hi+1, compare, start2, !type);
+      return lo-1;
    }
    /* otherwise we have to sort the "<" part fully (use standard quicksort) and the ">" part partially */
    else
    {
-      sorter_qsort(t, i0, compare, start);
-      return sorter_qsortPart(t, compare, start, end, size+start2-i1, i1+1, i1);
+      sorter_qsort(keys, hi+1, compare, start2, !type);
+      return sorter_qsortPart(keys, compare, start, end, size+start2-lo, lo, end2, !type);
    }
 }
 
