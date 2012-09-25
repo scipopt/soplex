@@ -1408,7 +1408,6 @@ bool SPxSolver::refine(
          else if( modrhs_ex[r] < -sidesviol_ex )
             sidesviol_ex = -modrhs_ex[r];
       }
-      MSG_DEBUG( spxout << "\n" );
 
       /* compute reduced costs and reduced cost violation */
       redcost_ex = computeDualActivity(dual_ex);
@@ -1438,12 +1437,17 @@ bool SPxSolver::refine(
          }
       }
 
+      MSG_INFO1( spxout << std::endl );
+
+      /* output violations; the reduced cost violations for artificially introduced slack columns are actually violations of the dual multipliers */
+      MSG_INFO1( spxout << "maximum (internal) violation: bounds=" << boundsviol_ex << ", sides=" << sidesviol_ex << ", duals/redcosts=" << redcostviol_ex << "\n" );
+
       /* at this point the vectors primal_ex, slack_ex, dual_ex, redcost_ex are computed and we may exit */
 
       /* terminate if tolerances are satisfied */
       if( boundsviol_ex <= irfeastol && sidesviol_ex <= irfeastol && redcostviol_ex <= iropttol )
       {
-         MSG_INFO1( spxout << "\nrefinement finished: tolerances reached\n\n" );
+         MSG_INFO1( spxout << "refinement finished: tolerances reached\n\n" );
          assert(status() == OPTIMAL);
          precisionreached = true;
          break;
@@ -1452,13 +1456,13 @@ bool SPxSolver::refine(
       /* terminate if maximum number of refinements is reached */
       if( maxRefines >= 0 && nrefines >= maxRefines )
       {
-         MSG_INFO1( spxout << "\nrefinement finished: maximum number of refinement rounds reached\n\n" );
+         MSG_INFO1( spxout << "refinement finished: maximum number of refinement rounds reached\n\n" );
          assert(status() == OPTIMAL);
          break;
       }
 
       /* otherwise continue */
-      MSG_INFO1( spxout << "\nstarting refinement round " << nrefines+1 << ": " );
+      MSG_INFO1( spxout << "starting refinement round " << nrefines+1 << ": " );
 
       /* compute primal scaling factor; limit increase in scaling by tolerance used in floating point solve */
       maxscale_ex = primalscale_ex / feastol();
@@ -1592,6 +1596,69 @@ bool SPxSolver::refine(
          modprimal_ex = primal_fp;
          moddual_ex = dual_fp;
 
+#ifdef DEBUGGING
+         MSG_DEBUG( spxout << "\ncomputing violation of modified problems's solution exactly . . .\n" );
+
+         /* compute bound violations */
+         boundsviol_ex = 0;
+         for( int c = 0; c < nCols(); c++ )
+         {
+            modlower_ex[c] -= modprimal_ex[c];
+            modupper_ex[c] -= modprimal_ex[c];
+
+            if( modlower_ex[c] > boundsviol_ex )
+               boundsviol_ex = modlower_ex[c];
+
+            if( modupper_ex[c] < -boundsviol_ex )
+               boundsviol_ex = -modupper_ex[c];
+         }
+
+         /* compute sides violation */
+         slack_ex = computePrimalActivity(modprimal_ex);
+
+         sidesviol_ex = 0;
+         for( int r = 0; r < nRows(); r++ )
+         {
+            assert(lhs(r) == rhs(r));
+
+            modrhs_ex[r] -= slack_ex[r];
+
+            if( modrhs_ex[r] > sidesviol_ex )
+               sidesviol_ex = modrhs_ex[r];
+            else if( modrhs_ex[r] < -sidesviol_ex )
+               sidesviol_ex = -modrhs_ex[r];
+         }
+
+         /* compute reduced costs and reduced cost violation */
+         redcost_ex = computeDualActivity(moddual_ex);
+
+         redcostviol_ex = 0;
+         for( int c = 0; c < nCols(); c++ )
+         {
+            SPxBasis::Desc::Status basisstat = basisdesc.colStatus(c);
+
+            redcost_ex[c] *= -1;
+            redcost_ex[c] += modobj_ex[c];
+
+            if( (spxSense() == MINIMIZE && basisstat != SPxBasis::Desc::P_ON_UPPER && basisstat != SPxBasis::Desc::P_FIXED)
+               || (spxSense() == MAXIMIZE && basisstat != SPxBasis::Desc::P_ON_LOWER && basisstat != SPxBasis::Desc::P_FIXED) )
+            {
+               if( redcost_ex[c] < -redcostviol_ex )
+                  redcostviol_ex = -redcost_ex[c];
+            }
+
+            if( (spxSense() == MINIMIZE && basisstat != SPxBasis::Desc::P_ON_LOWER && basisstat != SPxBasis::Desc::P_FIXED)
+               || (spxSense() == MAXIMIZE && basisstat != SPxBasis::Desc::P_ON_UPPER && basisstat != SPxBasis::Desc::P_FIXED) )
+            {
+               if( redcost_ex[c] > redcostviol_ex )
+                  redcostviol_ex = redcost_ex[c];
+            }
+         }
+
+         MSG_DEBUG( spxout << "maximum violation of modified problem's solution: bounds=" << boundsviol_ex
+            << ", sides=" << sidesviol_ex << ", duals/redcosts=" << redcostviol_ex << "\n\n" );
+#endif
+
          /* correct primal solution */
          MSG_DEBUG( spxout << "correcting primal solution . . ." );
 
@@ -1640,9 +1707,6 @@ bool SPxSolver::refine(
       }
    }
    while( true );
-
-   /* output violations; the reduced cost violations for artificially introduced slack columns are actually violations of the dual multipliers */
-   MSG_INFO3( spxout << "maximum violations: bounds=" << boundsviol_ex << ", sides=" << sidesviol_ex << ", duals/redcosts=" << redcostviol_ex << "\n" );
 
    MSG_DEBUG(
       MpqReal viol_ex = boundsviol_ex;
