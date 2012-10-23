@@ -860,89 +860,45 @@ SSVector& SSVector::assign2productAndSetup(const SVSet& A, SSVector& x)
    if (x.isSetup())
       return assign2product4setup(A, x);
 
-#if 0   // buggy (missing test for 'svec.size() == 0' and 'x.dim() == 0' )
-   int*  xi  = x.idx;
-   Real* xv  = x.val;
-   Real* end = xv + x.dim() - 1;
-
-   /* setze weissen Elefanten */
-   Real lastval = *end;
-   *end = MARKER;
-
-   for(;;)
-   {
-      while (!*xv)
-         ++xv;
-      if (isNotZero(*xv, epsilon))
-      {
-         const SVector& svec = A[ *xi++ = int(xv - x.val) ];
-         const SVector::Element* elem = &(svec.element(0));
-         const SVector::Element* last = elem + svec.size();
-         for (; elem < last; ++elem)
-            val[elem->idx] += *xv * elem->val;
-      }
-      else
-      {
-         *xv = 0;
-         if (xv == end)
-            break;
-      }
-      xv++;
-   }
-
-   /* fange weissen Elefanten wieder ein */
-   if (isNotZero(lastval, epsilon))
-   {
-      *xv = lastval;
-      const SVector& svec = A[ *xi++ = int(xv - x.val) ];
-      const SVector::Element* elem = &(svec.element(0));
-      const SVector::Element* last = elem + svec.size();
-      for (; elem < last; ++elem)
-         val[elem->idx] += *xv * elem->val;
+   if (x.dim() == 0)
+   { // x == 0 => this := zero vector
+      clear();
+      x.num = 0;
    }
    else
-      *xv = 0;
-
-   x.num = int(xi - x.idx);
-
-#else
-
-   if (x.dim() == 0) // x == 0 => this := zero vector
-      clear();
-
-   // x is not setup, so walk through its value vector
-   int nzcount = 0;
-   for ( register int i = 0; i < x.dim(); ++i )
    {
-      // advance to the next element != 0
-      Real& xi = x.val[i];
-      if (xi == 0)
-         continue;
+      // x is not setup, so walk through its value vector
+      int nzcount = 0;
+      int end = x.dim();
 
-      // If x[i] is really nonzero, compute A[i] * x[i] and adapt x.idx,
-      // otherwise set x[i] to 0.
-      if (isNotZero(xi, epsilon))
+      for ( int i = 0; i < end; ++i )
       {
-         x.idx[ nzcount++ ]    = i;
-         const SVector& Ai     = A[i];
-         const int      Aisize = Ai.size();
-         if ( Aisize > 0 ) // otherwise: Ai == 0 => do nothing
+         // advance to the next element != 0
+         Real& xval = x.val[i];
+
+         if( xval != 0 )
          {
-            for ( register int j = 0; j < Aisize; ++j )
+            // If x[i] is really nonzero, compute A[i] * x[i] and adapt x.idx,
+            // otherwise set x[i] to 0.
+            if (isNotZero(xval, epsilon))
             {
-               const SVector::Element& elt = Ai.element(j);
-               val[elt.idx] += xi * elt.val;
+               const SVector& Ai     = A[i];
+               x.idx[ nzcount++ ]    = i;
+
+               for ( int j = Ai.size() - 1; j >= 0; --j )
+               {
+                  const SVector::Element& elt = Ai.element(j);
+                  val[elt.idx] += xval * elt.val;
+               }
+            }
+            else
+            {
+               xval = 0;
             }
          }
       }
-      else
-      {
-         xi = 0;
-      }
+      x.num = nzcount;
    }
-   x.num = nzcount;
-
-#endif
 
    x.setupStatus = true;
    setupStatus   = false;
