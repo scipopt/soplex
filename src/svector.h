@@ -136,6 +136,8 @@ public:
    {
       assert( m_elem != 0 );
       int n = size();
+      assert(n < max());
+
       m_elem[n].idx = i;
       m_elem[n].val = v;
       set_size( n + 1 );
@@ -397,7 +399,7 @@ inline Vector& Vector::multAdd(Real x, const SVector& vec)
 {
    assert(vec.dim() <= dim());
 
-   for(int i = 0; i < vec.size(); i++)
+   for(int i = vec.size() - 1; i >= 0; --i)
       val[vec.m_elem[i].idx] += x * vec.m_elem[i].val;
 
    return *this;

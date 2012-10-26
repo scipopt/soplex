@@ -102,8 +102,11 @@ public:
     */
    void setEpsilon(Real eps)
    {
-      epsilon     = eps;
-      setupStatus = false;
+      if( eps != epsilon )
+      {
+         epsilon     = eps;
+         setupStatus = false;
+      }
    }
    /// returns setup status.
    bool isSetup() const
@@ -373,7 +376,6 @@ public:
       len = (vec.dim() < 1) ? 1 : vec.dim();
       spx_alloc(idx, len);
       /// TODO: @todo Is there an IdxSet::operator=( vec ) missing here?
-
       assert(isConsistent());
    }
 
