@@ -1112,7 +1112,7 @@ int main(int argc, char* argv[])
       NameSet                   rownames;
       NameSet                   colnames;
       int                       starting       = 0;
-      int                       pricing        = 6;
+      int                       pricing        = 4;
       int                       ratiotest      = 2;
       int                       scaling        = 2;
       int                       simplifying    = 1;
