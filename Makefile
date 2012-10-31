@@ -84,11 +84,11 @@ BINDIR		=	bin
 LIBDIR		=	lib
 INCLUDEDIR	=	include
 NAME		=	soplex
-LIBOBJ		= 	changesoplex.o didxset.o \
-			dsvector.o dvector.o dvector_exact.o enter.o factor.o \
-			forest.o idxset.o leave.o lpcolset.o lprowset.o \
+LIBOBJ		= 	changesoplex.o clufactor.o didxset.o \
+			dsvector.o dvector.o dvector_exact.o enter.o \
+			idxset.o leave.o lpcolset.o lprowset.o \
 			lprow.o message.o mpqreal.o mpsinput.o nameset.o \
-			slufactor.o solve.o soplex.o \
+			slufactor.o soplex.o \
 			spxbasis.o spxbounds.o spxboundflippingrt.o spxchangebasis.o \
 			spxequilisc.o spxdantzigpr.o spxdefaultrt.o \
 			spxdefines.o spxdesc.o spxdevexpr.o \
@@ -101,8 +101,8 @@ LIBOBJ		= 	changesoplex.o didxset.o \
 			spxstarter.o spxsteeppr.o spxsumst.o spxvecs.o \
 			spxvectorst.o spxweightpr.o spxweightst.o spxwritestate.o \
 			ssvector.o svector.o svset.o timer.o \
-			tracemethod.o unitvector.o update.o updatevector.o \
-			vector.o vector_exact.o vsolve.o \
+			tracemethod.o unitvector.o updatevector.o \
+			vector.o vector_exact.o \
 			gzstream.o
 BINOBJ		=	soplexmain.o
 EXAMPLEOBJ	=	simpleexample.o
