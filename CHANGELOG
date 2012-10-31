@@ -14,6 +14,7 @@ code quality & new features:
 - implemented iterative refinement for feasible and bounded LPs, applied when a feasibility or optimality tolerance below
   the new parameter SPxSolver::irthreshold() is requested
 - reduced and commented code by adding "void deleteVec(DLPSV* ps);" method in svset.{h,cpp}
+- unfied members/methods of CLUFactor in new file clufactor.cpp (contains factor.cpp, forest.cpp, update.cpp, (v)solve.cpp)
 
 fixed bugs:
 - variables that do not appear in the objective function or any constraint are not printed anymore in the BOUNDS section
