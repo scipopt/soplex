@@ -110,6 +110,9 @@ namespace soplex
 /// Prints out message \p x if the verbosity level is at least SPxOut::INFO3.
 #define MSG_INFO3(x)    { DO_WITH_TMP_VERBOSITY( SPxOut::INFO3, x ) }
 
+extern bool msginconsistent(const char* name, const char* file, int line);
+
+#define MSGinconsistent(name) msginconsistent(name, __FILE__, __LINE__)
 
 #ifndef NDEBUG
 // print output in any case, regardless of Param::verbose():
