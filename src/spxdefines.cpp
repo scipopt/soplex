@@ -17,6 +17,8 @@
  * @brief Debugging, floating point type and parameter definitions.
  */
 #include "spxdefines.h"
+#include "assert.h"
+#include "spxout.h"
 
 namespace soplex
 {
@@ -27,7 +29,19 @@ Real Param::s_epsilon               = DEFAULT_EPS_ZERO;
 Real Param::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
 Real Param::s_epsilon_update        = DEFAULT_EPS_UPDATE;
 int  Param::s_verbose               = 1;
-   
+
+bool msginconsistent(const char* name, const char* file, int line)
+{
+   assert(name != 0);
+   assert(file != 0);
+   assert(line >= 0);
+
+   MSG_ERROR( spxout << file << "(" << line << ") "
+   << "Inconsistency detected in " << name << std::endl; )
+
+   return 0;
+}
+
 void Param::setEpsilon(Real eps)
 {
    s_epsilon = eps;
