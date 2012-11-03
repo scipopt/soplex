@@ -17,7 +17,6 @@
 
 #include "spxdefines.h"
 #include "spxweightpr.h"
-#include "message.h"
 #include "exceptions.h"
 
 namespace soplex

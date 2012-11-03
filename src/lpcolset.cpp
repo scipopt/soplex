@@ -17,7 +17,6 @@
 
 #include "spxdefines.h"
 #include "lpcolset.h"
-#include "message.h"
 
 namespace soplex
 {

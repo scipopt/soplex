@@ -26,7 +26,6 @@
 #include "dataarray.h"
 #include "datakey.h"
 #include "spxalloc.h"
-#include "message.h"
 #include "exceptions.h"
 
 namespace soplex

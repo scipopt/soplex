@@ -20,7 +20,6 @@
 
 #include "spxdefines.h"
 #include "lprowset.h"
-#include "message.h"
 #include "exceptions.h"
 
 namespace soplex

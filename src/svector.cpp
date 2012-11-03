@@ -19,7 +19,6 @@
 #include "spxdefines.h"
 #include "svector.h"
 #include "ssvector.h"
-#include "message.h"
 
 namespace soplex
 {

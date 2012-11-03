@@ -27,7 +27,6 @@
 #include "dvector.h"
 #include "spxsolver.h"
 #include "mpsinput.h"
-#include "message.h"
 #include "spxout.h"
 #include "exceptions.h"
 

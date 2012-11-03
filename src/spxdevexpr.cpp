@@ -15,7 +15,6 @@
 
 #include "spxdefines.h"
 #include "spxdevexpr.h"
-#include "message.h"
 
 #define DEVEX_REFINETOL 2.0
 

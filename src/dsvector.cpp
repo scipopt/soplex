@@ -19,7 +19,6 @@
 #include "spxdefines.h"
 #include "dsvector.h"
 #include "spxalloc.h"
-#include "message.h"
 
 namespace soplex
 {

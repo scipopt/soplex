@@ -19,7 +19,6 @@
 
 #include "spxdefines.h"
 #include "spxhybridpr.h"
-#include "message.h"
 #include "spxout.h"
 
 namespace soplex
