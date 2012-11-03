@@ -17,7 +17,6 @@
 
 #include "spxdefines.h"
 #include "svset.h"
-#include "message.h"
 
 namespace soplex
 {

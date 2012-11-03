@@ -14,7 +14,6 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "updatevector.h"
-#include "message.h"
 
 namespace soplex
 {

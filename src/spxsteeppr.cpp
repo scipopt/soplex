@@ -19,7 +19,6 @@
 #include <iostream>
 
 #include "spxdefines.h"
-#include "message.h"
 #include "spxsteeppr.h"
 #include "random.h"
 

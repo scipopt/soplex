@@ -14,7 +14,6 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "idxset.h"
-#include "message.h"
 
 namespace soplex
 {

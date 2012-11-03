@@ -20,7 +20,6 @@
 #include "vector_exact.h"
 #include "vector.h"
 #include "svector.h"
-#include "message.h"
 
 namespace soplex
 {

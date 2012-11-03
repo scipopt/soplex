@@ -20,7 +20,6 @@
 #include "spxdefines.h"
 #include "ssvector.h"
 #include "svset.h"
-#include "message.h"
 #include "exceptions.h"
 
 /**@file ssvector.cpp

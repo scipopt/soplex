@@ -16,7 +16,6 @@
 #include <assert.h>
 
 #include "unitvector.h"
-#include "message.h"
 
 namespace soplex
 {

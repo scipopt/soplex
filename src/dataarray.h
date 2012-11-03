@@ -26,7 +26,6 @@
 
 #include "spxdefines.h"
 #include "spxalloc.h"
-#include "message.h"
 
 namespace soplex
 {

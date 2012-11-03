@@ -21,7 +21,6 @@
 
 #include <assert.h>
 
-#include "message.h"
 
 namespace soplex
 {

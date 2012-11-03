@@ -23,7 +23,6 @@
 #include <assert.h>
 
 #include "spxdefines.h"
-#include "message.h"
 
 namespace soplex
 {
