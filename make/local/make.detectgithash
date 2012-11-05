@@ -19,12 +19,12 @@
 #@author  Matthias Miltenberger
 
 
-SPXGITHASHFILE = $(SRCDIR)/githash.cpp
+SPXGITHASHFILE = $(SRCDIR)/git_hash.cpp
 SPXGITHASH = $(shell git describe --always --dirty)
 
 .PHONY: githash
 githash:: # do not remove the double-colon
 	    @echo "#define SPX_GITHASH \"$(SPXGITHASH)\"" > $(SPXGITHASHFILE)
 
-# rule for generating the githash.cpp
+# rule for generating the git_hash.cpp
 $(SPXGITHASHFILE): githash

@@ -14,7 +14,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "spxgithash.h"
-#include "githash.cpp"
+#include "git_hash.cpp"
 
 namespace soplex
 {
