@@ -15,6 +15,7 @@ code quality & new features:
   the new parameter SPxSolver::irthreshold() is requested
 - reduced and commented code by adding "void deleteVec(DLPSV* ps);" method in svset.{h,cpp}
 - unfied members/methods of CLUFactor in new file clufactor.cpp (contains factor.cpp, forest.cpp, update.cpp, (v)solve.cpp)
+- moved code from message.h,cpp to spxdefines.h,cpp to avoid name clashes with SCIP
 
 fixed bugs:
 - variables that do not appear in the objective function or any constraint are not printed anymore in the BOUNDS section
@@ -58,6 +59,7 @@ interface:
   using exact arithmetic
 - new methods irthreshold() and setIrthreshold() for threshold parameter below which iterative refinement is applied
 - new command line option -R to set parameter irthreshold()
+- new methods in SPxSolver to set and get maximum number of updates before next refactorization
 
 performance:
 - sparse pricing for leaving and entering simplex is activated depending on ratio of basis dimension and number of infeasibilities
