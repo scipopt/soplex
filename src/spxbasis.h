@@ -428,6 +428,20 @@ public:
       }
    }
 
+   // TODO control factorization frequency dynamically
+   /// change maximum number of iterations until a refactorization is performed
+   void setMaxUpdates( int maxUp )
+   {
+      assert(maxUp >= 0);
+      maxUpdates = maxUp;
+   }
+
+   /// returns maximum number of updates before a refactorization is performed
+   int getMaxUpdates()
+   {
+      return maxUpdates;
+   }
+
    ///
    const Desc& desc() const
    {
