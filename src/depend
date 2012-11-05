@@ -226,7 +226,7 @@ $(LIBOBJDIR)/spxgeometsc.o: src/spxgeometsc.cpp src/spxgeometsc.h src/spxdefines
  src/lprow.h src/dsvector.h src/ssvector.h src/didxset.h src/idxset.h \
  src/lpcol.h src/lprowset.h src/lpcolset.h src/nameset.h \
  src/datahashtable.h
-$(LIBOBJDIR)/spxgithash.o: src/spxgithash.cpp src/spxgithash.h src/githash.cpp
+$(LIBOBJDIR)/spxgithash.o: src/spxgithash.cpp src/spxgithash.h src/git_hash.cpp
 $(LIBOBJDIR)/spxharrisrt.o: src/spxharrisrt.cpp src/spxdefines.h src/spxharrisrt.h \
  src/spxratiotester.h src/spxsolver.h src/timer.h src/spxlp.h \
  src/datakey.h src/spxid.h src/dvector.h src/vector.h src/svector.h \
