@@ -175,14 +175,14 @@ static void initPrefs(
 
    compare.weight = rowWeight.get_const_ptr();
 
-   sorter_qsort(row.get_ptr(), row.size(), compare); // Sort rows
+   SPxQuicksort(row.get_ptr(), row.size(), compare); // Sort rows
 
    for(i = 0; i < base.nCols(); ++i)
       col[i] = i;
 
    compare.weight = colWeight.get_const_ptr();
 
-   sorter_qsort(col.get_ptr(), col.size(), compare); // Sort column
+   SPxQuicksort(col.get_ptr(), col.size(), compare); // Sort column
 
    i = 0;
    j = 0;

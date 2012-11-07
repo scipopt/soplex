@@ -501,7 +501,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
       // sort breakpoints only partially to save time
       if( usedBp > sorted )
       {
-         sorted = sorter_qsortPart(breakpoints.get_ptr(), compare, sorted + 1, nBp, sortsize);
+         sorted = SPxQuicksortPart(breakpoints.get_ptr(), compare, sorted + 1, nBp, sortsize);
       }
       int i = breakpoints[usedBp].idx;
       // compute new slope
@@ -569,7 +569,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
       // get next breakpoints in increasing order
       if( stableBp > sorted )
       {
-         sorted = sorter_qsortPart(breakpoints.get_ptr(), compare, sorted + 1, nBp, sortsize);
+         sorted = SPxQuicksortPart(breakpoints.get_ptr(), compare, sorted + 1, nBp, sortsize);
       }
       int idx = breakpoints[stableBp].idx;
       if( breakpoints[stableBp].src == PVEC )

@@ -28,7 +28,7 @@ namespace soplex
 
 /** shell-sort an array of data elements; use it only for arrays smaller than 25 entries */
 template < class T, class COMPARATOR >
-static void sorter_shellsort(T* keys, int end, COMPARATOR& compare, int start = 0)
+void SPxShellsort(T* keys, int end, COMPARATOR& compare, int start = 0)
 {
    static const int incs[3] = {1, 5, 19}; /* sequence of increments */
    int k;
@@ -70,7 +70,7 @@ static void sorter_shellsort(T* keys, int end, COMPARATOR& compare, int start = 
 */
 
 template < class T, class COMPARATOR >
-static void sorter_qsort(T* keys, int end, COMPARATOR& compare, int start = 0, bool type = true)
+void SPxQuicksort(T* keys, int end, COMPARATOR& compare, int start = 0, bool type = true)
 {
    assert(start >= 0);
 
@@ -170,7 +170,7 @@ static void sorter_qsort(T* keys, int end, COMPARATOR& compare, int start = 0, b
          /* sort [start,hi] with a recursive call */
          if( start < hi )
          {
-            sorter_qsort(keys, hi+1, compare, start, !type);
+            SPxQuicksort(keys, hi+1, compare, start, !type);
          }
 
          /* now focus on the larger part [lo,end] */
@@ -180,7 +180,7 @@ static void sorter_qsort(T* keys, int end, COMPARATOR& compare, int start = 0, b
       {
          if( lo < end )
          {
-            sorter_qsort(keys, end+1, compare, lo, !type);
+            SPxQuicksort(keys, end+1, compare, lo, !type);
          }
 
          /* now focus on the larger part [start,hi] */
@@ -192,7 +192,7 @@ static void sorter_qsort(T* keys, int end, COMPARATOR& compare, int start = 0, b
    /* use shell sort on the remaining small list */
    if( end - start >= 1 )
    {
-      sorter_shellsort(keys, end, compare, start);
+      SPxShellsort(keys, end, compare, start);
    }
 
 
@@ -216,7 +216,7 @@ static void sorter_qsort(T* keys, int end, COMPARATOR& compare, int start = 0, b
  * - > 0, if \p t1 is to appear after \p t2.
  */
 template < class T, class COMPARATOR >
-static int sorter_qsortPart(
+int SPxQuicksortPart(
    T*                    keys,               /**< array of elements to be sorted between index start and end */
    COMPARATOR&           compare,            /**< comparator */
    int                   start,              /**< index of first element in range to be sorted */
@@ -251,7 +251,7 @@ static int sorter_qsortPart(
    /* if all remaining elements should be sorted, we simply call standard quicksort */
    if( start2 + size >= end - 1 )
    {
-      sorter_qsort(keys, end, compare, start2, type);
+      SPxQuicksort(keys, end, compare, start2, type);
       return end-1;
    }
 
@@ -346,19 +346,19 @@ static int sorter_qsortPart(
    /* if we only need to sort less than half of the "<" part, use partial sort again */
    if( 2*size <= hi - start2 )
    {
-      return sorter_qsortPart(keys, compare, start, hi+1, size, start2, end2, !type);
+      return SPxQuicksortPart(keys, compare, start, hi+1, size, start2, end2, !type);
    }
    /* otherwise, and if we do not need to sort the ">" part, use standard quicksort on the "<" part */
    else if( size <= lo - start2 )
    {
-      sorter_qsort(keys, hi+1, compare, start2, !type);
+      SPxQuicksort(keys, hi+1, compare, start2, !type);
       return lo-1;
    }
    /* otherwise we have to sort the "<" part fully (use standard quicksort) and the ">" part partially */
    else
    {
-      sorter_qsort(keys, hi+1, compare, start2, !type);
-      return sorter_qsortPart(keys, compare, start, end, size+start2-lo, lo, end2, !type);
+      SPxQuicksort(keys, hi+1, compare, start2, !type);
+      return SPxQuicksortPart(keys, compare, start, end, size+start2-lo, lo, end2, !type);
    }
 }
 
