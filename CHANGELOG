@@ -1,6 +1,14 @@
 (maintain each list from top to bottom)
 
 
+Developer version
+=================
+
+fixed bugs:
+- fixed inconsistent generic column and row names
+
+
+
 31 Jul 2012 - Release 1.7.0
 ===========================
 

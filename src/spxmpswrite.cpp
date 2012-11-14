@@ -91,7 +91,7 @@ static const char* getRowName(
       if (rnames->has(key))
          return (*rnames)[key];
    }
-   sprintf(buf, "C%d_", idx);
+   sprintf(buf, "C%d", idx);
    
    return buf;
 }
@@ -113,7 +113,7 @@ static const char* getColName(
       if (cnames->has(key))
          return (*cnames)[key];
    }
-   sprintf(buf, "x%d_", idx);
+   sprintf(buf, "x%d", idx);
    
    return buf;
 }

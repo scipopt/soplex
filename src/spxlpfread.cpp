@@ -650,7 +650,7 @@ bool SPxLP::readLPF(
                   else
                   {
                      char name[16];
-                     sprintf(name, "C%d_", rset.num());
+                     sprintf(name, "C%d", rset.num());
                      rnames->add(name);
                   }
                   have_value = true;

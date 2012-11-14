@@ -396,7 +396,7 @@ bool SPxBasis::readBasis(
       p_colNames->reMax(nCols);
       for (int j = 0; j < nCols; ++j)
       {
-         name << "x" << j << "_";
+         name << "x" << j;
          DataKey key = theLP->colId(j);
          p_colNames->add(key, name.str().c_str());
       }
@@ -412,7 +412,7 @@ bool SPxBasis::readBasis(
       p_rowNames->reMax(nRows);
       for (int i = 0; i < nRows; ++i)
       {
-         name << "C" << i << "_";
+         name << "C" << i;
          DataKey key = theLP->rowId(i);
          p_rowNames->add(key, name.str().c_str());
       }
@@ -543,7 +543,7 @@ static const char* getRowName(
       if (rnames->has(key))
          return (*rnames)[key];
    }
-   std::sprintf(buf, "C%d_", idx);
+   std::sprintf(buf, "C%d", idx);
    
    return buf;
 }
@@ -569,7 +569,7 @@ static const char* getColName(
       if (cnames->has(key))
          return (*cnames)[key];
    }
-   std::sprintf(buf, "x%d_", idx);
+   std::sprintf(buf, "x%d", idx);
    
    return buf;
 }
