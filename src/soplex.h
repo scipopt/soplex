@@ -287,7 +287,7 @@ public:
          if (cnames->has(key))
             return (*cnames)[key];
       }
-      std::sprintf(buf, "x%d_", idx);
+      std::sprintf(buf, "x%d", idx);
 
       return buf;
    }
@@ -308,7 +308,7 @@ public:
          if (rnames->has(key))
             return (*rnames)[key];
       }
-      std::sprintf(buf, "C%d_", idx);
+      std::sprintf(buf, "C%d", idx);
 
       return buf;
    }
