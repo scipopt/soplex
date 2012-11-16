@@ -2917,7 +2917,8 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
    }
 
    const int nRowsOld_tmp = lp.nRows();
-   int* perm_tmp = new int[nRowsOld_tmp];
+   int* perm_tmp = 0;
+   spx_alloc(perm_tmp, nRowsOld_tmp);
 
    for(int j = 0; j < nRowsOld_tmp; ++j)
    {
@@ -3056,7 +3057,7 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
                   MSG_INFO3( spxout << "IMAISM55 duplicate rows yield infeasible bounds:"
                                     << " lhs=" << newLhs
                                     << " rhs=" << newRhs << std::endl; )
-                  delete[] perm_tmp;
+                  spx_free(perm_tmp);
                   return INFEASIBLE;
                }
                // if we accept the infeasibility we should clean up the values to avoid problems later
@@ -3078,7 +3079,8 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
 
    // remove all rows by one single method call (more efficient)
    const int nRowsOld = lp.nRows();
-   int* perm = new int[nRowsOld];
+   int* perm = 0;
+   spx_alloc(perm, nRowsOld);
 
    for(int i = 0; i < nRowsOld; ++i)
    {
@@ -3103,8 +3105,8 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
          m_rIdx[perm[i]] = m_rIdx[i];
    }
 
-   delete[] perm;
-   delete[] perm_tmp;
+   spx_free(perm);
+   spx_free(perm_tmp);
 
    if (remRows + remNzos > 0)
    {
@@ -3441,7 +3443,8 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
 
    // remove all columns by one single method call (more efficient)
    const int nColsOld = lp.nCols();
-   int* perm = new int[nColsOld];
+   int* perm = 0;
+   spx_alloc(perm, nColsOld);
 
    for(int j = 0; j < nColsOld; ++j)
    {
@@ -3473,7 +3476,7 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
       m_hist.append(new DuplicateColsPS(lp, 0, 0, 1.0, da_perm, false, true));
    }
 
-   delete[] perm;
+   spx_free(perm);
 
    assert(remCols > 0 || remNzos == 0);
 
