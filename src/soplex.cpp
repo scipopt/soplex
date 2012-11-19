@@ -774,21 +774,21 @@ void SoPlex::unsimplify() const
       cols = NULL;
       try
       {
-         rows = new SPxSolver::VarStatus[m_solver.nRows()];
-         cols = new SPxSolver::VarStatus[m_solver.nCols()];
+         spx_alloc(rows, m_solver.nRows());
+         spx_alloc(cols, m_solver.nCols());
          
          m_solver.getBasis(rows, cols);
          m_simplifier->unsimplify(psp_x, psp_y, psp_s, psp_r, rows, cols);
       }
       catch(std::bad_alloc& x)
       {
-         delete[] rows;
-         delete[] cols;
+         spx_free(rows);
+         spx_free(cols);
          throw x;
       }
-   
-      delete[] rows;
-      delete[] cols;
+
+      spx_free(rows);
+      spx_free(cols);
    }
 }
 } // namespace soplex

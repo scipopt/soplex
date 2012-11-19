@@ -619,20 +619,33 @@ bool SPxLP::readMPS(
    NameSet*  rnames;                ///< row names.
    NameSet*  cnames;                ///< column names.
 
-   cnames = (p_cnames != 0) 
-      ? p_cnames : new NameSet();
+   if( p_cnames )
+      cnames = p_cnames;
+   else
+   {
+      spx_alloc(cnames, 1);
+      cnames = new (cnames) NameSet();
+   }
 
    cnames->clear();
 
-   try
+   if( p_rnames )
+      rnames = p_rnames;
+   else
    {
-      rnames = (p_rnames != 0)
-         ? p_rnames : new NameSet();
-   }catch(std::bad_alloc& x)
-   {
-      if(p_cnames == 0)
-         delete cnames;
-      throw x;
+      try
+      {
+         spx_alloc(rnames, 1);
+         rnames = new (rnames) NameSet();
+      }catch(std::bad_alloc& x)
+      {
+         if( !p_cnames )
+         {
+            cnames->~NameSet();
+            spx_free(cnames);
+         }
+         throw x;
+      }
    }
 
    rnames->clear();
@@ -692,10 +705,16 @@ bool SPxLP::readMPS(
       assert(isConsistent());
    }
 
-   if (p_cnames == 0) 
-      delete cnames;
+   if (p_cnames == 0)
+   {
+      cnames->~NameSet();
+      spx_free(cnames);
+   }
    if (p_rnames == 0)
-      delete rnames;
+   {
+      rnames->~NameSet();
+      spx_free(rnames);
+   }
 
    return !mps.hasError();
 }

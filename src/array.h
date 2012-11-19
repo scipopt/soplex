@@ -118,13 +118,12 @@ public:
       assert(i <= num);
       if (n > 0)
       {
-         int k;
          spx_realloc(data, num + n);
          data = new (data) T[num + n]();
          assert(data != 0);
 
          // non-overlapping memory areas
-         if( num - i <= n )
+         if( num - i < n )
             memcpy(&data[i+n], &data[i], num - i);
          // overlapping memory areas
          else
@@ -160,23 +159,21 @@ public:
          assert(num == size());
          m -= (n + m <= num) ? 0 : n + m - num;
 
-         int oldm = m;
-
          // call destructor of elements in data
-         for( --m; m >= n; --m )
-            data[n+m].~T();
+         for( int k = m-1; k >= 0; --k )
+            data[n+k].~T();
 
-         if( oldm < num )
+         if( m < num )
          {
             // non-overlapping memory areas
-            if( oldm < num - oldm )
-               memcpy(&data[n], &data[n + oldm], num - oldm);
+            if( num - m - n < m )
+               memcpy(&data[n], &data[n + m], num - m - n);
             // overlapping memory areas
             else
-               memmove(&data[n], &data[oldm], num - oldm);
+               memmove(&data[n], &data[n + m], num - m - n);
          }
 
-         num -= oldm;
+         num -= m;
 
          if( num > 0 )
             spx_realloc(data, num);

@@ -15,14 +15,17 @@
 
 #include "spxout.h"
 #include "exceptions.h"
+#include "spxalloc.h"
 
 namespace soplex
 {
    /// constructor
    SPxOut::SPxOut()
       : m_verbosity( ERROR )
-      , m_streams( new std::ostream*[ INFO3+1 ] )
+      , m_streams(0)
    {
+      spx_alloc(m_streams, INFO3+1);
+      m_streams = new (m_streams) std::ostream*[INFO3+1];
       m_streams[ ERROR ] = m_streams[ WARNING ] = &std::cerr;
       for ( int i = DEBUG; i <= INFO3; ++i )
          m_streams[ i ] = &std::cout;
@@ -33,7 +36,9 @@ namespace soplex
    // destructor
    SPxOut::~SPxOut()
    {
-      delete [] m_streams;
+      for( int i = DEBUG; i <= INFO3; i++ )
+         m_streams[i]->std::ostream::~ostream();
+      spx_free(m_streams);
    }
 
    //---------------------------------------------------

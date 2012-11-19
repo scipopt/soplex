@@ -387,12 +387,16 @@ bool SPxBasis::readBasis(
    const NameSet* rNames = rowNames;
    const NameSet* cNames = colNames;
 
+   NameSet* p_colNames = 0;
+   NameSet* p_rowNames = 0;
+
    if ( colNames == 0 )
    {
       int nCols = theLP->nCols();
       std::stringstream name;
 
-      NameSet* p_colNames = new NameSet();
+      spx_alloc(p_colNames, 1);
+      p_colNames = new (p_colNames) NameSet();
       p_colNames->reMax(nCols);
       for (int j = 0; j < nCols; ++j)
       {
@@ -408,7 +412,8 @@ bool SPxBasis::readBasis(
       int nRows = theLP->nRows();
       std::stringstream name;
 
-      NameSet* p_rowNames = new NameSet();
+      spx_alloc(p_rowNames, 1);
+      p_rowNames = new (p_rowNames) NameSet();
       p_rowNames->reMax(nRows);
       for (int i = 0; i < nRows; ++i)
       {
@@ -510,9 +515,15 @@ bool SPxBasis::readBasis(
    }
 
    if ( rowNames == 0 )
-      delete rNames;
+   {
+      p_rowNames->~NameSet();
+      spx_free(p_rowNames);
+   }
    if ( colNames == 0 )
-      delete cNames;
+   {
+      p_colNames->~NameSet();
+      spx_free(p_colNames);
+   }
 
 #ifndef NDEBUG
    MSG_DEBUG( thedesc.dump() );
