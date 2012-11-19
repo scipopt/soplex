@@ -20,7 +20,8 @@
 #define _ARRAY_H_
 
 #include <assert.h>
-
+#include <string.h>
+#include "spxalloc.h"
 
 namespace soplex
 {
@@ -77,13 +78,13 @@ public:
    /// reference \p n 'th element.
    T& operator[](int n)
    {
-      assert(n >= 0 && n < size());
+      assert(n >= 0 && n < num);
       return data[n];
    }
    /// reference \p n 'th element.
    const T& operator[](int n) const
    {
-      assert(n >= 0 && n < size());
+      assert(n >= 0 && n < num);
       return data[n];
    }
 
@@ -98,37 +99,37 @@ public:
    /// append \p n uninitialized elements.
    void append(int n)
    {
-      insert(size(), n);
+      insert(num, n);
    }
    /// append \p n elements from \p p_array.
    void append(int n, const T* p_array)
    {
-      insert(size(), n, p_array);
+      insert(num, n, p_array);
    }
    /// append all elements from \p p_array.
    void append(const Array<T>& p_array)
    {
-      insert(size(), p_array);
+      insert(num, p_array);
    }
 
    /// insert \p n uninitialized elements before \p i 'th element.
    void insert(int i, int n)
    {
-      assert(i <= size());
+      assert(i <= num);
       if (n > 0)
       {
          int k;
-         T *olddata = data;
-         data = new T[size() + n]();
+         spx_realloc(data, num + n);
+         data = new (data) T[num + n]();
          assert(data != 0);
-         if (size() > 0)
-         {
-            for (k = 0; k < i; ++k)
-               data[k] = olddata[k];
-            for (; k < size(); ++k)
-               data[k + n] = olddata[k];
-            delete[] olddata;
-         }
+
+         // non-overlapping memory areas
+         if( num - i <= n )
+            memcpy(&data[i+n], &data[i], num - i);
+         // overlapping memory areas
+         else
+            memmove(&data[i+n], &data[i], num - i);
+
          num += n;
       }
    }
@@ -154,32 +155,48 @@ public:
    void remove(int n = 0, int m = 1)
    {
       assert(n >= 0 && m >= 0);
-      if (m > 0 && n < size())
+      if (m > 0 && n < num)
       {
-         T *olddata = data;
-         m -= (n + m <= size()) ? 0 : n + m - size();
-         num -= m;
-         if (num > 0)
+         assert(num == size());
+         m -= (n + m <= num) ? 0 : n + m - num;
+
+         int oldm = m;
+
+         // call destructor of elements in data
+         for( --m; m >= n; --m )
+            data[n+m].~T();
+
+         if( oldm < num )
          {
-            int i;
-            data = new T[num]();
-            for (i = 0; i < n; ++i)
-               data[i] = olddata[i];
-            for (; i < num; ++i)
-               data[i] = olddata[i + m];
+            // non-overlapping memory areas
+            if( oldm < num - oldm )
+               memcpy(&data[n], &data[n + oldm], num - oldm);
+            // overlapping memory areas
+            else
+               memmove(&data[n], &data[oldm], num - oldm);
          }
-         delete[] olddata;
+
+         num -= oldm;
+
+         if( num > 0 )
+            spx_realloc(data, num);
+         else
+            spx_free(data);
       }
    }
 
    /// remove all elements.
    void clear()
    {
-      if (num > 0)
+      // call destructors of all elements
+      while( num > 0 )
       {
-         num = 0;
-         delete[] data;
+         --num;
+         data[num].~T();
       }
+      if( data )
+         spx_free(data);
+      assert(num == 0);
    }
 
    /// return the number of elements.
@@ -191,10 +208,10 @@ public:
    /// reset the number of elements.
    void reSize(int newsize)
    {
-      if (newsize < size())
-         remove(newsize, size() - newsize);
-      else if (newsize > size())
-         append(newsize - size());
+      if (newsize < num)
+         remove(newsize, num - newsize);
+      else if (newsize > num)
+         append(newsize - num);
    }
    //@}
 
@@ -211,7 +228,7 @@ public:
       if (this != &rhs)
       {
          reSize(rhs.size());
-         for (int i = 0; i < size(); ++i)
+         for (int i = 0; i < num; ++i)
             data[i] = rhs.data[i];
          assert(Array::isConsistent());
       }
@@ -229,7 +246,8 @@ public:
       num = n;
       if (num > 0)
       {
-         data = new T[num]();
+         spx_alloc(data, num);
+         data = new (data) T[num]();
          assert(data != 0);
       }
       assert(Array::isConsistent());
@@ -241,7 +259,9 @@ public:
    {
       if (num > 0)
       {
-         data = new T[num]();
+         data = 0;
+         spx_alloc(data, num);
+         data = new (data) T[num]();
          assert(data != 0);
          *this = old;
       }
@@ -253,8 +273,13 @@ public:
    /// destructor
    ~Array()
    {
-      if (num > 0)
-         delete[] data;
+      while( num > 0 )
+      {
+         --num;
+         data[num].~T();
+      }
+      if( data )
+         spx_free(data);
    }
 
    /// consistency check
