@@ -998,7 +998,16 @@ bool SPxSolver::enter(SPxId& enterId)
       assert(!baseId(leaveIdx).isSPxColId() || desc().colStatus(number(SPxColId(baseId(leaveIdx)))) != SPxBasis::Desc::P_FIXED);
 
       Real leavebound;             // bound on which leaving variable moves
-      getEnterVals2(leaveIdx, enterMax, leavebound);
+      try
+      {
+         getEnterVals2(leaveIdx, enterMax, leavebound);
+      }
+      catch( SPxException F )
+      {
+         rejectEnter(enterId, enterTest, enterStat);
+         change(-1, none, 0);
+         throw F;
+      }
 
       //  process entering variable
       theUBbound[leaveIdx] = enterUB;

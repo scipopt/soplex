@@ -13,6 +13,7 @@ fixed bugs:
 - fixed bug in adjusting basis statuses to sides/bounds when loading or reloading the basis
 - fixed bug in refactorization in the case when update detects singularity: invalidate only the factorization, not the
   matrix since this would change the order of colums/rows in the basis
+- catch possible exception when finally performing basis update
 
 interface:
 - new methods in SPxSolver to set and get maximum number of updates before next refactorization

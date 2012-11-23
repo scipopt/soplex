@@ -825,8 +825,16 @@ bool SPxSolver::leave(int leaveIdx)
             Real newLBbound;
             Real newCoPrhs;
 
-            getLeaveVals2(leaveMax, enterId,
-               enterBound, newUBbound, newLBbound, newCoPrhs);
+            try
+            {
+               getLeaveVals2(leaveMax, enterId, enterBound, newUBbound, newLBbound, newCoPrhs);
+            }
+            catch( SPxException F )
+            {
+               rejectLeave(leaveNum, leaveId, leaveStat);
+               change(-1, none, 0);
+               throw F;
+            }
 
             theUBbound[leaveIdx] = newUBbound;
             theLBbound[leaveIdx] = newLBbound;
