@@ -803,7 +803,6 @@ void SPxBasis::change(
 #endif
 
             // singularity was detected in update; we refactorize
-            invalidate();
             factorize();
 
             // if factorize() detects singularity, an exception is thrown, hence at this point we have a regular basis
@@ -824,14 +823,14 @@ void SPxBasis::change(
             // we have to invalidate the basis to have the statuses correct
             catch( SPxException F )
             {
-               MSG_INFO3( spxout << "IBASIS14 problems updating factorization; invalidating basis"
+               MSG_INFO3( spxout << "IBASIS14 problems updating factorization; invalidating factorization"
                   << std::endl; )
 
 #ifdef MEASUREUPDATETIME
                totalUpdateTime.stop();
 #endif
 
-               invalidate();
+               factorized = false;
                throw F;
             }
          }
