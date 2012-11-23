@@ -262,11 +262,11 @@ void SPxBasis::loadDesc(const Desc& ds)
       else if (thedesc.colStatus(i) == SPxBasis::Desc::P_FIXED && theLP->SPxLP::lower(i) != theLP->SPxLP::upper(i))
       {
          if (theLP->SPxLP::lower(i) <= -infinity && theLP->SPxLP::upper(i) >= infinity)
-            thedesc.rowStatus(i) = SPxBasis::Desc::P_FREE;
+            thedesc.colStatus(i) = SPxBasis::Desc::P_FREE;
          else if (theLP->SPxLP::upper(i) >= infinity || (theLP->SPxLP::lower(i) > -infinity && theLP->SPxLP::maxObj(i) < 0.0))
-            thedesc.rowStatus(i) = SPxBasis::Desc::P_ON_LOWER;
+            thedesc.colStatus(i) = SPxBasis::Desc::P_ON_LOWER;
          else
-            thedesc.rowStatus(i) = SPxBasis::Desc::P_ON_UPPER;
+            thedesc.colStatus(i) = SPxBasis::Desc::P_ON_UPPER;
       }
 
       if (theLP->isBasic(thedesc.colStatus(i)))
