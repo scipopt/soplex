@@ -954,6 +954,10 @@ bool SPxSolver::enter(SPxId& enterId)
 
    int leaveIdx = theratiotester->selectLeave(leaveVal, enterId);
 
+   /* in row representation, fixed columns and rows should not leave the basis */
+   assert(leaveIdx < 0 || !baseId(leaveIdx).isSPxColId() || desc().colStatus(number(SPxColId(baseId(leaveIdx)))) != SPxBasis::Desc::P_FIXED);
+   assert(leaveIdx < 0 || !baseId(leaveIdx).isSPxRowId() || desc().rowStatus(number(SPxRowId(baseId(leaveIdx)))) != SPxBasis::Desc::P_FIXED);
+
    /*
        We now tried to find a variable to leave the basis. If one has been
        found, a regular basis update is to be performed.
@@ -989,6 +993,9 @@ bool SPxSolver::enter(SPxId& enterId)
       }
       assert(thePvec->isConsistent());
       assert(theCoPvec->isConsistent());
+
+      assert(!baseId(leaveIdx).isSPxRowId() || desc().rowStatus(number(SPxRowId(baseId(leaveIdx)))) != SPxBasis::Desc::P_FIXED);
+      assert(!baseId(leaveIdx).isSPxColId() || desc().colStatus(number(SPxColId(baseId(leaveIdx)))) != SPxBasis::Desc::P_FIXED);
 
       Real leavebound;             // bound on which leaving variable moves
       getEnterVals2(leaveIdx, enterMax, leavebound);

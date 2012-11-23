@@ -895,6 +895,9 @@ int SPxFastRT::selectLeave(Real& val, SPxId)
          max = val;
          maxabs = 0;
          leave = minDelta(max, maxabs);
+
+         assert(leave < 0 || !(thesolver->baseId(leave).isSPxColId()) || thesolver->desc().colStatus(thesolver->number(SPxColId(thesolver->baseId(leave)))) != SPxBasis::Desc::P_FIXED);
+
          if (max == val)
             return -1;
 
@@ -912,6 +915,9 @@ int SPxFastRT::selectLeave(Real& val, SPxId)
             Real stab, bestDelta;
             stab = 100.0 * minStability(maxabs);
             leave = minSelect(sel, stab, bestDelta, max);
+
+            assert(leave < 0 || !(thesolver->baseId(leave).isSPxColId()) || thesolver->desc().colStatus(thesolver->number(SPxColId(thesolver->baseId(leave)))) != SPxBasis::Desc::P_FIXED);
+
             if (bestDelta < DELTA_SHIFT*TRIES)
                cnt++;
             else
@@ -949,6 +955,9 @@ int SPxFastRT::selectLeave(Real& val, SPxId)
       if (leave >= 0)
          tighten();
    }
+
+   assert(leave < 0 || !(thesolver->baseId(leave).isSPxColId()) || thesolver->desc().colStatus(thesolver->number(SPxColId(thesolver->baseId(leave)))) != SPxBasis::Desc::P_FIXED);
+
    return leave;
 }
 
