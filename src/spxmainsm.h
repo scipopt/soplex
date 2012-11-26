@@ -164,7 +164,9 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         return new FreeConstraintPS(*this);
+         FreeConstraintPS* FreeConstraintPSptr = 0;
+         spx_alloc(FreeConstraintPSptr);
+         return new (FreeConstraintPSptr) FreeConstraintPS(*this);
       }
    };
 
@@ -206,7 +208,9 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         return new EmptyConstraintPS(*this);
+         EmptyConstraintPS* EmptyConstraintPSptr = 0;
+         spx_alloc(EmptyConstraintPSptr);
+         return new (EmptyConstraintPSptr) EmptyConstraintPS(*this);
       }
    };
 
@@ -283,7 +287,9 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         return new RowSingletonPS(*this);
+         RowSingletonPS* RowSingletonPSptr = 0;
+         spx_alloc(RowSingletonPSptr);
+         return new (RowSingletonPSptr) RowSingletonPS(*this);
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
@@ -370,7 +376,9 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         return new ForceConstraintPS(*this);
+         ForceConstraintPS* ForceConstraintPSptr = 0;
+         spx_alloc(ForceConstraintPSptr);
+         return new (ForceConstraintPSptr) ForceConstraintPS(*this);
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
@@ -433,7 +441,9 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         return new FixVariablePS(*this);
+         FixVariablePS* FixVariablePSptr = 0;
+         spx_alloc(FixVariablePSptr);
+         return new (FixVariablePSptr) FixVariablePS(*this);
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
@@ -488,7 +498,9 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         return new FixBoundsPS(*this);
+         FixBoundsPS* FixBoundsPSptr = 0;
+         spx_alloc(FixBoundsPSptr);
+         return new (FixBoundsPSptr) FixBoundsPS(*this);
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
@@ -565,7 +577,9 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         return new FreeZeroObjVariablePS(*this);
+         FreeZeroObjVariablePS* FreeZeroObjVariablePSptr = 0;
+         spx_alloc(FreeZeroObjVariablePSptr);
+         return new (FreeZeroObjVariablePSptr) FreeZeroObjVariablePS(*this);
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
@@ -626,7 +640,9 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         return new ZeroObjColSingletonPS(*this);
+         ZeroObjColSingletonPS* ZeroObjColSingletonPSptr = 0;
+         spx_alloc(ZeroObjColSingletonPSptr);
+         return new (ZeroObjColSingletonPSptr) ZeroObjColSingletonPS(*this);
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
@@ -693,7 +709,9 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         return new FreeColSingletonPS(*this);
+         FreeColSingletonPS* FreeColSingletonPSptr = 0;
+         spx_alloc(FreeColSingletonPSptr);
+         return new (FreeColSingletonPSptr) FreeColSingletonPS(*this);
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
@@ -787,7 +805,9 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         return new DoubletonEquationPS(*this);
+         DoubletonEquationPS* DoubletonEquationPSptr = 0;
+         spx_alloc(DoubletonEquationPSptr);
+         return new (DoubletonEquationPSptr) DoubletonEquationPS(*this);
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
@@ -873,7 +893,9 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         return new DuplicateRowsPS(*this);
+         DuplicateRowsPS* DuplicateRowsPSptr = 0;
+         spx_alloc(DuplicateRowsPSptr);
+         return new (DuplicateRowsPSptr) DuplicateRowsPS(*this);
       }
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
@@ -937,7 +959,9 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         return new DuplicateColsPS(*this);
+         DuplicateColsPS* DuplicateColsPSptr = 0;
+         spx_alloc(DuplicateColsPSptr);
+         return new (DuplicateColsPSptr) DuplicateColsPS(*this);
       }
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
@@ -1135,8 +1159,8 @@ public:
          // delete pointers in m_hist
          for(int k = 0; k < m_hist.size(); ++k)
          {
-            delete m_hist[k];
-            m_hist[k] = 0;
+            m_hist[k]->~PostStep();
+            spx_free(m_hist[k]);
          }
 
          m_hist.clear();
@@ -1160,13 +1184,18 @@ public:
       for(int k = 0; k < m_hist.size(); ++k)
       {
          if( m_hist[k] != 0 )
-            delete m_hist[k];
+         {
+            m_hist[k]->~PostStep();
+            spx_free(m_hist[k]);
+         }
       }
    }
    /// clone function for polymorphism
    inline virtual SPxSimplifier* clone() const
    {
-      return new SPxMainSM(*this);
+      SPxMainSM* SPxMainSMptr = 0;
+      spx_alloc(SPxMainSMptr);
+      return new (SPxMainSMptr) SPxMainSM(*this);
    }
    //@}
 

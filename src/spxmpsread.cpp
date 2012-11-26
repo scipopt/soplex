@@ -623,7 +623,7 @@ bool SPxLP::readMPS(
       cnames = p_cnames;
    else
    {
-      spx_alloc(cnames, 1);
+      spx_alloc(cnames);
       cnames = new (cnames) NameSet();
    }
 
@@ -635,7 +635,7 @@ bool SPxLP::readMPS(
    {
       try
       {
-         spx_alloc(rnames, 1);
+         spx_alloc(rnames);
          rnames = new (rnames) NameSet();
       }catch(std::bad_alloc& x)
       {

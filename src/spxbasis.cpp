@@ -395,7 +395,7 @@ bool SPxBasis::readBasis(
       int nCols = theLP->nCols();
       std::stringstream name;
 
-      spx_alloc(p_colNames, 1);
+      spx_alloc(p_colNames);
       p_colNames = new (p_colNames) NameSet();
       p_colNames->reMax(nCols);
       for (int j = 0; j < nCols; ++j)
@@ -412,7 +412,7 @@ bool SPxBasis::readBasis(
       int nRows = theLP->nRows();
       std::stringstream name;
 
-      spx_alloc(p_rowNames, 1);
+      spx_alloc(p_rowNames);
       p_rowNames = new (p_rowNames) NameSet();
       p_rowNames->reMax(nRows);
       for (int i = 0; i < nRows; ++i)

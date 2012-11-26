@@ -1276,7 +1276,9 @@ void SPxMainSM::handleExtremes(SPxLP& lp)
 
       if (lp.lhs(i) <= -infinity && lp.rhs(i) >= infinity)
       {
-         m_hist.append(new FreeConstraintPS(lp, i));
+         FreeConstraintPS* FreeConstraintPSptr = 0;
+         spx_alloc(FreeConstraintPSptr);
+         m_hist.append(new (FreeConstraintPSptr) FreeConstraintPS(lp, i));
 
          removeRow(lp, i);
          ++remRows;
@@ -1430,7 +1432,9 @@ SPxSimplifier::Result SPxMainSM::removeEmpty(SPxLP& lp)
          }
          MSG_INFO3( spxout << " removed" << std::endl; )
 
-         m_hist.append(new EmptyConstraintPS(lp, i));
+         EmptyConstraintPS* EmptyConstraintPSptr = 0;
+         spx_alloc(EmptyConstraintPSptr);
+         m_hist.append(new (EmptyConstraintPSptr) EmptyConstraintPS(lp, i));
 
          ++remRows;
          removeRow(lp, i);
@@ -1483,8 +1487,12 @@ SPxSimplifier::Result SPxMainSM::removeEmpty(SPxLP& lp)
          }
          MSG_INFO3( spxout << " removed" << std::endl; )
 
-         m_hist.append(new FixBoundsPS(lp, j, val));
-         m_hist.append(new FixVariablePS(lp, *this, j, val));
+         FixBoundsPS* FixBoundsPSptr = 0;
+         FixVariablePS* FixVariablePSptr = 0;
+         spx_alloc(FixBoundsPSptr);
+         spx_alloc(FixVariablePSptr);
+         m_hist.append(new (FixBoundsPSptr) FixBoundsPS(lp, j, val));
+         m_hist.append(new (FixVariablePSptr) FixVariablePS(lp, *this, j, val));
 
          ++remCols;
          removeCol(lp, j);
@@ -1567,7 +1575,9 @@ SPxSimplifier::Result SPxMainSM::removeRowSingleton(SPxLP& lp, const SVector& ro
       stricterLo = true;
    }
 
-   m_hist.append(new RowSingletonPS(lp, i, j, stricterLo, stricterUp, lp.lower(j), lp.upper(j), oldLo, oldUp));
+   RowSingletonPS* RowSingletonPSptr = 0;
+   spx_alloc(RowSingletonPSptr);
+   m_hist.append(new (RowSingletonPSptr) RowSingletonPS(lp, i, j, stricterLo, stricterUp, lp.lower(j), lp.upper(j), oldLo, oldUp));
 
    removeRow(lp, i);
 
@@ -1867,7 +1877,9 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
          MSG_INFO3( spxout << "IMAISM20 row " << i
                            << ": unconstrained -> removed" << std::endl; )
 
-         m_hist.append(new FreeConstraintPS(lp, i));
+         FreeConstraintPS* FreeConstraintPSptr = 0;
+         spx_alloc(FreeConstraintPSptr);
+         m_hist.append(new (FreeConstraintPSptr) FreeConstraintPS(lp, i));
 
  	 ++remRows;
          remNzos += row.size();
@@ -1894,7 +1906,9 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
          }
          MSG_INFO3( spxout << " removed" << std::endl; )
 
-         m_hist.append(new EmptyConstraintPS(lp, i));
+         EmptyConstraintPS* EmptyConstraintPSptr = 0;
+         spx_alloc(EmptyConstraintPSptr);
+         m_hist.append(new (EmptyConstraintPSptr) EmptyConstraintPS(lp, i));
 
          ++remRows;
          removeRow(lp, i);
@@ -1947,7 +1961,9 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                lp.changeUpper(j, lp.lower(j));
          }
 
-         m_hist.append(new ForceConstraintPS(lp, i, true, fixedCol, lowers, uppers));
+         ForceConstraintPS* ForceConstraintPSptr = 0;
+         spx_alloc(ForceConstraintPSptr);
+         m_hist.append(new (ForceConstraintPSptr) ForceConstraintPS(lp, i, true, fixedCol, lowers, uppers));
 
          ++remRows;
          remNzos += row.size();
@@ -1988,7 +2004,9 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                lp.changeLower(j, lp.upper(j));
          }
 
-         m_hist.append(new ForceConstraintPS(lp, i, false, fixedCol, lowers, uppers));
+         ForceConstraintPS* ForceConstraintPSptr = 0;
+         spx_alloc(ForceConstraintPSptr);
+         m_hist.append(new (ForceConstraintPSptr) ForceConstraintPS(lp, i, false, fixedCol, lowers, uppers));
 
          ++remRows;
          remNzos += row.size();
@@ -2100,8 +2118,12 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
          }
          MSG_INFO3( spxout << " removed" << std::endl; )
 
-         m_hist.append(new FixBoundsPS(lp, j, val));
-         m_hist.append(new FixVariablePS(lp, *this, j, val));
+         FixBoundsPS* FixBoundsPSptr = 0;
+         FixVariablePS* FixVariablePSptr = 0;
+         spx_alloc(FixBoundsPSptr);
+         spx_alloc(FixVariablePSptr);
+         m_hist.append(new (FixBoundsPSptr) FixBoundsPS(lp, j, val));
+         m_hist.append(new (FixVariablePSptr) FixVariablePS(lp, *this, j, val));
 
          ++remCols;
          removeCol(lp, j);
@@ -2165,7 +2187,9 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
             }
             MSG_INFO3( spxout << " fixed at upper=" << lp.upper(j) << std::endl; )
 
-            m_hist.append(new FixBoundsPS(lp, j, lp.upper(j)));
+            FixBoundsPS* FixBoundsPSptr = 0;
+            spx_alloc(FixBoundsPSptr);
+            m_hist.append(new (FixBoundsPSptr) FixBoundsPS(lp, j, lp.upper(j)));
             lp.changeLower(j, lp.upper(j));
          }
          // max -3 x
@@ -2184,7 +2208,9 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
             }
             MSG_INFO3( spxout << " fixed at lower=" << lp.lower(j) << std::endl; )
 
-            m_hist.append(new FixBoundsPS(lp, j, lp.lower(j)));
+            FixBoundsPS* FixBoundsPSptr = 0;
+            spx_alloc(FixBoundsPSptr);
+            m_hist.append(new (FixBoundsPSptr) FixBoundsPS(lp, j, lp.lower(j)));
             lp.changeUpper(j, lp.lower(j));
 #endif
          }
@@ -2209,7 +2235,9 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
                IdxCompare compare;
                SPxQuicksort(col_idx_sorted.mem()+1, col_idx_sorted.size(), compare);
 
-               m_hist.append(new FreeZeroObjVariablePS(lp, j, unconstrained_below, col_idx_sorted));
+               FreeZeroObjVariablePS* FreeZeroObjVariablePSptr = 0;
+               spx_alloc(FreeZeroObjVariablePSptr);
+               m_hist.append(new (FreeZeroObjVariablePSptr) FreeZeroObjVariablePS(lp, j, unconstrained_below, col_idx_sorted));
 
                // we have to remove the rows with larger idx first, because otherwise the rows are reorder and indices
                // are out-of-date
@@ -2305,7 +2333,9 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
                               << " (" << lp.rhs(i)
                               << ")" << std::endl; )
 
-            m_hist.append(new ZeroObjColSingletonPS(lp, *this, j, i));
+            ZeroObjColSingletonPS* ZeroObjColSingletonPSptr = 0;
+            spx_alloc(ZeroObjColSingletonPSptr);
+            m_hist.append(new (ZeroObjColSingletonPSptr) ZeroObjColSingletonPS(lp, *this, j, i));
 
             lp.changeRange(i, lhs, rhs);
 
@@ -2317,7 +2347,9 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
 
             if (lp.lhs(i) <= -infinity && lp.rhs(i) >= infinity)
             {
-               m_hist.append(new FreeConstraintPS(lp, i));
+               FreeConstraintPS* FreeConstraintPSptr = 0;
+               spx_alloc(FreeConstraintPSptr);
+               m_hist.append(new (FreeConstraintPSptr) FreeConstraintPS(lp, i));
 
                ++remRows;
                removeRow(lp, i);
@@ -2415,7 +2447,9 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
                return INFEASIBLE;
             }
 
-            m_hist.append(new DoubletonEquationPS(lp, j, k, i, oldLower, oldUpper));
+            DoubletonEquationPS* DoubletonEquationPSptr = 0;
+            spx_alloc(DoubletonEquationPSptr);
+            m_hist.append(new (DoubletonEquationPSptr) DoubletonEquationPS(lp, j, k, i, oldLower, oldUpper));
 
             if (lp.lower(j) > -infinity && lp.upper(j) < infinity)
                chgBnds += 2;
@@ -2480,7 +2514,9 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
                }
             }
 
-            m_hist.append(new FreeColSingletonPS(lp, *this, j, i, slackVal));
+            FreeColSingletonPS* FreeColSingletonPSptr = 0;
+            spx_alloc(FreeColSingletonPSptr);
+            m_hist.append(new (FreeColSingletonPSptr) FreeColSingletonPS(lp, *this, j, i, slackVal));
 
             MSG_INFO3( spxout << "IMAISM41 col " << j
                               << ": free singleton removed" << std::endl; )
@@ -2558,7 +2594,9 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
          MSG_INFO3( spxout << "IMAISM43 row " << i
                            << ": unconstrained" << std::endl; )
 
-         m_hist.append(new FreeConstraintPS(lp, i));
+         FreeConstraintPS* FreeConstraintPSptr = 0;
+         spx_alloc(FreeConstraintPSptr);
+         m_hist.append(new (FreeConstraintPSptr) FreeConstraintPS(lp, i));
 
          ++remRows;
          remNzos += lp.rowVector(i).size();
@@ -2680,7 +2718,9 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
 
          MSG_INFO3( spxout << " fixed at upper=" << lp.upper(j) << std::endl; )
 
-         m_hist.append(new FixBoundsPS(lp, j, lp.upper(j)));
+         FixBoundsPS* FixBoundsPSptr = 0;
+         spx_alloc(FixBoundsPSptr);
+         m_hist.append(new (FixBoundsPSptr) FixBoundsPS(lp, j, lp.upper(j)));
          lp.changeLower(j, lp.upper(j));
 
          ++m_stat[DOMINATED_COL];
@@ -2701,7 +2741,9 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
 
          MSG_INFO3( spxout << " fixed at lower=" << lp.lower(j) << std::endl; )
 
-         m_hist.append(new FixBoundsPS(lp, j, lp.lower(j)));
+         FixBoundsPS* FixBoundsPSptr = 0;
+         spx_alloc(FixBoundsPSptr);
+         m_hist.append(new (FixBoundsPSptr) FixBoundsPS(lp, j, lp.lower(j)));
          lp.changeUpper(j, lp.lower(j));
 
          ++m_stat[DOMINATED_COL];
@@ -2716,7 +2758,9 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
                            << ": weakly dominated -> maxObj=" << obj
                            << " dual rhs bound=" << dualConsUp[j] << std::endl; )
 
-         m_hist.append(new FixBoundsPS(lp, j, lp.upper(j)));
+         FixBoundsPS* FixBoundsPSptr = 0;
+         spx_alloc(FixBoundsPSptr);
+         m_hist.append(new (FixBoundsPSptr) FixBoundsPS(lp, j, lp.upper(j)));
          lp.changeLower(j, lp.upper(j));
 
          ++m_stat[WEAKLY_DOMINATED_COL];
@@ -2729,7 +2773,9 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
                            << ": weakly dominated -> maxObj=" << obj
                            << " dual lhs bound=" << dualConsLo[j] << std::endl; )
 
-         m_hist.append(new FixBoundsPS(lp, j, lp.lower(j)));
+         FixBoundsPS* FixBoundsPSptr = 0;
+         spx_alloc(FixBoundsPSptr);
+         m_hist.append(new (FixBoundsPSptr) FixBoundsPS(lp, j, lp.lower(j)));
          lp.changeUpper(j, lp.lower(j));
 
          ++m_stat[WEAKLY_DOMINATED_COL];
@@ -3038,13 +3084,16 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
                {
                   da_perm[j] = perm_tmp[j];
                }
-               m_hist.append(new DuplicateRowsPS(lp, rowIdx, maxLhsIdx, minRhsIdx, dupRows[k], scale, da_perm, isLhsEqualRhs, true, EQrel(newLhs, newRhs), k==idxFirstDupRows));
+               DuplicateRowsPS* DuplicateRowsPSptr = 0;
+               spx_alloc(DuplicateRowsPSptr);
+               m_hist.append(new (DuplicateRowsPSptr) DuplicateRowsPS(lp, rowIdx, maxLhsIdx, minRhsIdx, dupRows[k], scale, da_perm, isLhsEqualRhs, true, EQrel(newLhs, newRhs), k==idxFirstDupRows));
             }
             else
             {
                DataArray<int> da_perm_empty(0);
-
-               m_hist.append(new DuplicateRowsPS(lp, rowIdx, maxLhsIdx, minRhsIdx, dupRows[k], scale, da_perm_empty, isLhsEqualRhs, false, EQrel(newLhs, newRhs), k == idxFirstDupRows));
+               DuplicateRowsPS* DuplicateRowsPSptr = 0;
+               spx_alloc(DuplicateRowsPSptr);
+               m_hist.append(new (DuplicateRowsPSptr) DuplicateRowsPS(lp, rowIdx, maxLhsIdx, minRhsIdx, dupRows[k], scale, da_perm_empty, isLhsEqualRhs, false, EQrel(newLhs, newRhs), k == idxFirstDupRows));
             }
 
             if (maxLhs > lp.lhs(rowIdx) || minRhs < lp.rhs(rowIdx))
@@ -3264,7 +3313,9 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
 
          if (!hasDuplicateCol)
          {
-            m_hist.append(new DuplicateColsPS(lp, 0, 0, 1.0, m_perm_empty, true));
+            DuplicateColsPS* DuplicateColsPSptr = 0;
+            spx_alloc(DuplicateColsPSptr);
+            m_hist.append(new (DuplicateColsPSptr) DuplicateColsPS(lp, 0, 0, 1.0, m_perm_empty, true));
             hasDuplicateCol = true;
          }
 
@@ -3295,8 +3346,10 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
                      if (LErel(lp.lower(j1), 0.0) && GErel(lp.upper(j1), 0.0)
                         && LErel(lp.lower(j2), 0.0) && GErel(lp.upper(j2), 0.0))
                      {
+                        DuplicateColsPS* DuplicateColsPSptr = 0;
+                        spx_alloc(DuplicateColsPSptr);
                         // variable substitution xj2' := xj2 + factor * xj1 <=> xj2 = -factor * xj1 + xj2'
-                        m_hist.append(new DuplicateColsPS(lp, j1, j2, factor, m_perm_empty));
+                        m_hist.append(new (DuplicateColsPSptr) DuplicateColsPS(lp, j1, j2, factor, m_perm_empty));
 
                         // update bounds of remaining column j2 (new column j2')
                         if (factor > 0)
@@ -3358,7 +3411,9 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
                                              << ", " << j2
                                              << " first one fixed at upper bound=" << lp.upper(j1) << std::endl; )
 
-                           m_hist.append(new FixBoundsPS(lp, j1, lp.upper(j1)));
+                           FixBoundsPS* FixBoundsPSptr = 0;
+                           spx_alloc(FixBoundsPSptr);
+                           m_hist.append(new (FixBoundsPSptr) FixBoundsPS(lp, j1, lp.upper(j1)));
                            lp.changeLower(j1, lp.upper(j1));
                         }
                         else if (factor < 0 && objDif < 0)
@@ -3374,7 +3429,9 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
                                              << ", " << j2
                                              << " first one fixed at lower bound=" << lp.lower(j1) << std::endl; )
 
-                           m_hist.append(new FixBoundsPS(lp, j1, lp.lower(j1)));
+                           FixBoundsPS* FixBoundsPSptr = 0;
+                           spx_alloc(FixBoundsPSptr);
+                           m_hist.append(new (FixBoundsPSptr) FixBoundsPS(lp, j1, lp.lower(j1)));
                            lp.changeUpper(j1, lp.lower(j1));
                         }
                      }
@@ -3394,7 +3451,9 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
                                              << ", " << j2
                                              << " first one fixed at upper bound=" << lp.upper(j1) << std::endl; )
 
-                           m_hist.append(new FixBoundsPS(lp, j1, lp.upper(j1)));
+                           FixBoundsPS* FixBoundsPSptr = 0;
+                           spx_alloc(FixBoundsPSptr);
+                           m_hist.append(new (FixBoundsPSptr) FixBoundsPS(lp, j1, lp.upper(j1)));
                            lp.changeLower(j1, lp.upper(j1));
                         }
 
@@ -3412,7 +3471,9 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
                                              << ", " << j2
                                              << " first one fixed at lower bound=" << lp.lower(j1) << std::endl; )
 
-                           m_hist.append(new FixBoundsPS(lp, j1, lp.lower(j1)));
+                           FixBoundsPS* FixBoundsPSptr = 0;
+                           spx_alloc(FixBoundsPSptr);
+                           m_hist.append(new (FixBoundsPSptr) FixBoundsPS(lp, j1, lp.lower(j1)));
                            lp.changeUpper(j1, lp.lower(j1));
                         }
                      }
@@ -3473,7 +3534,9 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
 
    if (hasDuplicateCol)
    {
-      m_hist.append(new DuplicateColsPS(lp, 0, 0, 1.0, da_perm, false, true));
+      DuplicateColsPS* DuplicateColsPSptr = 0;
+      spx_alloc(DuplicateColsPSptr);
+      m_hist.append(new (DuplicateColsPSptr) DuplicateColsPS(lp, 0, 0, 1.0, da_perm, false, true));
    }
 
    spx_free(perm);
@@ -3566,7 +3629,9 @@ void SPxMainSM::fixColumn(SPxLP& lp, int j, bool correctIdx)
       }
    }
 
-   m_hist.append(new FixVariablePS(lp, *this, j, lp.lower(j), correctIdx));
+   FixVariablePS* FixVariablePSptr = 0;
+   spx_alloc(FixVariablePSptr);
+   m_hist.append(new (FixVariablePSptr) FixVariablePS(lp, *this, j, lp.lower(j), correctIdx));
 }
 
 SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real feastol, Real opttol)
@@ -3602,8 +3667,8 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real feastol, Rea
       // delete pointers in old m_hist
       for(int k = 0; k < m_hist.size(); ++k)
       {
-         delete m_hist[k];
-         m_hist[k] = 0;
+         m_hist[k]->~PostStep();
+         spx_free(m_hist[k]);
       }
       m_hist.clear();
    }
@@ -3750,8 +3815,8 @@ void SPxMainSM::unsimplify(const Vector& x, const Vector& y, const Vector& s, co
       MSG_DEBUG( spxout << "unsimplifying " << m_hist[k]->getName() << "\n" );
       m_hist[k]->execute(m_prim, m_dual, m_slack, m_redCost, m_cBasisStat, m_rBasisStat);
 
-      delete m_hist[k];
-      m_hist[k] = 0;
+      m_hist[k]->~PostStep();
+      spx_free(m_hist[k]);
    }
 
    // for maximization problems, we have to switch signs of dual and reduced cost values back

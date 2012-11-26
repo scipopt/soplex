@@ -45,7 +45,7 @@ namespace soplex
  * @throw SPxMemoryException if memory could not be allocated.
  */
 template <class T>
-inline void spx_alloc(T& p, int n)
+inline void spx_alloc(T& p, int n = 1)
 {
    assert(p == 0);
    assert(n >= 0);

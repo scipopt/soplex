@@ -399,7 +399,7 @@ bool SPxLP::readLPF(
       cnames = p_cnames;
    else
    {
-      spx_alloc(cnames, 1);
+      spx_alloc(cnames);
       cnames = new (cnames) NameSet();
    }
 
@@ -411,7 +411,7 @@ bool SPxLP::readLPF(
    {
       try
       {
-         spx_alloc(rnames, 1);
+         spx_alloc(rnames);
          rnames = new (rnames) NameSet();
       }catch(std::bad_alloc& x)
       {
@@ -863,9 +863,9 @@ syntax_error:
       MSG_ERROR( spxout << "ELPFRD15 Syntax error in line " << lineno << std::endl; )
 
    if (p_cnames == 0)
-      delete cnames;
+      spx_free(cnames);
    if (p_rnames == 0)
-      delete rnames;
+      spx_free(rnames);
 
    MSG_DEBUG( spxout << "DLPFRD16\n" << *this; )
 

@@ -7,6 +7,7 @@ Developer version
 code quality & new features:
 - unfied members/methods of CLUFactor in new file clufactor.cpp (contains factor.cpp, forest.cpp, update.cpp, (v)solve.cpp)
 - moved code from message.h,cpp to spxdefines.h,cpp to avoid name clashes with SCIP
+- new/delete calls are modified to channel memory (de)allocation through spx_alloc calls (-> "placement new")
 
 fixed bugs:
 - fixed inconsistent generic column and row names
