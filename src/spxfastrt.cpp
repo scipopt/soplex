@@ -901,15 +901,7 @@ int SPxFastRT::selectLeave(Real& val, SPxId)
          if (max == val)
             return -1;
 
-         /**@todo Here is a ; above is none.
-          *       In a first try the version with the ; runs better.
-          *       minShortLeave changes sel. Have a look what happens
-          *       if we drop the if above also.
-          * @todo Check whether minShortLeave() should be called at all.
-          */
-         // if (!
-         minShortLeave(sel, leave, maxabs);
-         // );
+         if (!minShortLeave(sel, leave, maxabs))
          {
             // phase 2:
             Real stab, bestDelta;
