@@ -14,6 +14,7 @@ fixed bugs:
 - fixed bug in refactorization in the case when update detects singularity: invalidate only the factorization, not the
   matrix since this would change the order of colums/rows in the basis
 - catch possible exception when finally performing basis update
+- fixed inconsistency in "Fast" ratiotester when "short" leave is possible
 
 interface:
 - new methods in SPxSolver to set and get maximum number of updates before next refactorization
