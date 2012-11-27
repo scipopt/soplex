@@ -724,14 +724,14 @@ void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& 
          // make m_i non-basic and m_j basic
          x[m_j]       = lo;
          cStatus[m_j] = SPxSolver::BASIC;
-         rStatus[m_i] = EQrel(lo, up) ? SPxSolver::FIXED : (aij > 0 ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER);
+         rStatus[m_i] = (aij > 0 ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER);
       }
       else if (up < infinity)
       {
          // make m_i non-basic and m_j basic
          x[m_j]       = up;
          cStatus[m_j] = SPxSolver::BASIC;
-         rStatus[m_i] = EQrel(lo, up) ? SPxSolver::FIXED : (aij > 0 ? SPxSolver::ON_UPPER : SPxSolver::ON_LOWER);
+         rStatus[m_i] = (aij > 0 ? SPxSolver::ON_UPPER : SPxSolver::ON_LOWER);
       }
       else
          throw SPxInternalCodeException("XMAISM03 This should never happen.");
