@@ -20,6 +20,8 @@ fixed bugs:
 
 interface:
 - new methods in SPxSolver to set and get maximum number of updates before next refactorization
+- implemented writing of basis file for row representation
+
 
 31 Jul 2012 - Release 1.7.0
 ===========================
