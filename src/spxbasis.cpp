@@ -587,14 +587,6 @@ void SPxBasis::writeBasis(
    METHOD( "SPxBasis::writeBasis()" );
    assert(theLP != 0);
 
-   if (theLP->rep() == SPxSolver::ROW)
-   {
-      MSG_ERROR( spxout << "EBASIS09 writing basis for row representation "
-                        << "not yet implemented!" << std::endl; )
-      return;
-   }
-   assert(theLP->rep() == SPxSolver::COLUMN);
-
    os.setf(std::ios::left);
    os << "NAME  soplex.bas\n";
 
@@ -610,12 +602,12 @@ void SPxBasis::writeBasis(
    int row = 0;
    for (int col = 0; col < theLP->nCols(); col++)
    {
-      if ( theLP->isBasic( thedesc.colStatus( col ))) 
+      if ( thedesc.colStatus(col) > 0 )
       {
          /* Find non basic row */
          for (; row < theLP->nRows(); row++)
          {
-            if ( !theLP->isBasic( thedesc.rowStatus( row )))
+            if ( thedesc.rowStatus(row) < 0 )
                break;
          }
 
@@ -656,7 +648,7 @@ void SPxBasis::writeBasis(
    // Check that we covered all nonbasic rows - the remaining should be basic.
    for (; row < theLP->nRows(); row++)
    {
-      if ( ! theLP->isBasic( thedesc.rowStatus( row )))
+      if ( thedesc.rowStatus(row) < 0 )
          break;
    }
    assert( row == theLP->nRows() );
