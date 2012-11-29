@@ -35,9 +35,8 @@
 
 #define SPARSITYTHRESHOLD        0.5      /**< percentage of basic infeasibilities that is considered sparse */
 #define DENSEROUNDS               5       /**< number of refactorization until sparsity is tested again */
-#define SPARSITY_TRADEOFF        0.8      /**< threshold to decide whether slack or structural variables enter the basis
-                                           * slack variables are preferred if their pricing value is not worse than
-                                           * SPARSITY_TRADEOFF * the best structural value
+#define SPARSITY_TRADEOFF        0.8      /**< threshold to decide whether Ids or coIds are preferred to enter the basis;
+                                           * coIds are more likely to enter if SPARSITY_TRADEOFF is close to 0
                                            */
 
 namespace soplex

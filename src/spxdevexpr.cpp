@@ -300,20 +300,20 @@ SPxId SPxDevexPR::selectEnter()
 SPxId SPxDevexPR::selectEnterX(Real tol)
 {
    SPxId enterId;
-   SPxId enterIdCo;
+   SPxId enterCoId;
    Real best;
    Real bestCo;
 
    best = 0;
    bestCo = 0;
-   enterId = (thesolver->sparsePricingEnter) ? selectEnterSparseDim(best, tol) : selectEnterDenseDim(best, tol);
-   enterIdCo = (thesolver->sparsePricingEnterCo) ? selectEnterSparseCoDim(bestCo, tol) : selectEnterDenseCoDim(bestCo, tol);
+   enterCoId = (thesolver->sparsePricingEnter) ? selectEnterSparseDim(best, tol) : selectEnterDenseDim(best, tol);
+   enterId = (thesolver->sparsePricingEnterCo) ? selectEnterSparseCoDim(bestCo, tol) : selectEnterDenseCoDim(bestCo, tol);
 
-   // prefer slack indices to reduce nonzeros in basis matrix
-   if( enterId.isValid() && (best > SPARSITY_TRADEOFF * bestCo || !enterIdCo.isValid()) )
-      return enterId;
+   // prefer coIds to increase the number of unit vectors in the basis matrix, i.e., rows in colrep and cols in rowrep
+   if( enterCoId.isValid() && (best > SPARSITY_TRADEOFF * bestCo || !enterId.isValid()) )
+      return enterCoId;
    else
-      return enterIdCo;
+      return enterId;
 }
 
 SPxId SPxDevexPR::selectEnterSparseDim(Real& best, Real feastol)
