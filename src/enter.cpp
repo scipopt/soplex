@@ -1087,15 +1087,35 @@ bool SPxSolver::enter(SPxId& enterId)
       MSG_INFO3( spxout << "IENTER02 unboundness/infeasiblity found in "
                            << "enter()" << std::endl; )
 
-      if (rep() != COLUMN)
+      if (rep() == ROW)
+      {
+         Real sign;
+
+         dualFarkas.clear();
+         dualFarkas.setMax(fVec().delta().size() + 1);
+         sign = (leaveVal > 0 ? -1.0 : 1.0);
+
+         for( int j = 0; j < fVec().delta().size(); ++j )
+         {
+            SPxId id = baseId(fVec().idx().index(j));
+
+            if( id.isSPxRowId() )
+               dualFarkas.add(number(SPxRowId(id)), sign * fVec().delta().value(j));
+         }
+
+         if( enterId.isSPxRowId() )
+            dualFarkas.add(number(SPxRowId(enterId)), -sign);
+
          setBasisStatus(SPxBasis::INFEASIBLE);
+      }
+      /**@todo if shift() is not zero, we must not conclude primal unboundedness */
       else
       {
          Real sign;
 
          primalRay.clear();
          primalRay.setMax(fVec().delta().size() + 1);
-         sign = leaveVal > 0 ? 1 : -1;
+         sign = leaveVal > 0 ? 1.0 : -1.0;
 
          for( int j = 0; j < fVec().delta().size(); ++j )
          {
