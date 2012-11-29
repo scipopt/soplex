@@ -780,8 +780,20 @@ bool SPxSolver::leave(int leaveIdx)
                   rejectLeave(leaveNum, leaveId, leaveStat);
                   change(-1, none, 0);
 
-                  if (rep() != COLUMN)
+                  /**@todo if shift() is not zero we must not conclude unboundedness */
+                  if (rep() == ROW)
+                  {
+                     int sign;
+
+                     primalRay.clear();
+                     primalRay.setMax(coPvec().delta().size());
+                     sign = (enterVal > 0 ? 1.0 : -1.0);
+
+                     for( int i = 0; i < coPvec().delta().size(); ++i )
+                        primalRay.add(coPvec().delta().index(i), sign * coPvec().delta().value(i));
+
                      setBasisStatus(SPxBasis::UNBOUNDED);
+                  }
                   else
                   {
                      int sign;
@@ -789,7 +801,8 @@ bool SPxSolver::leave(int leaveIdx)
 
                      dualFarkas.clear();
                      dualFarkas.setMax(coPvec().delta().size());
-                     sign = (enterVal > 0 ? -1 : +1);
+                     sign = (enterVal > 0 ? -1.0 : +1.0);
+
                      for( i = 0; i < coPvec().delta().size(); ++i )
                         dualFarkas.add(coPvec().delta().index(i), sign * coPvec().delta().value(i));
 
