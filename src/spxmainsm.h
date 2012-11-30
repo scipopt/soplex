@@ -164,9 +164,7 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         FreeConstraintPS* FreeConstraintPSptr = 0;
-         spx_alloc(FreeConstraintPSptr);
-         return new (FreeConstraintPSptr) FreeConstraintPS(*this);
+         return new FreeConstraintPS(*this);
       }
    };
 
@@ -208,9 +206,7 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         EmptyConstraintPS* EmptyConstraintPSptr = 0;
-         spx_alloc(EmptyConstraintPSptr);
-         return new (EmptyConstraintPSptr) EmptyConstraintPS(*this);
+         return new EmptyConstraintPS(*this);
       }
    };
 
@@ -287,9 +283,7 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         RowSingletonPS* RowSingletonPSptr = 0;
-         spx_alloc(RowSingletonPSptr);
-         return new (RowSingletonPSptr) RowSingletonPS(*this);
+         return new RowSingletonPS(*this);
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
@@ -376,9 +370,7 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         ForceConstraintPS* ForceConstraintPSptr = 0;
-         spx_alloc(ForceConstraintPSptr);
-         return new (ForceConstraintPSptr) ForceConstraintPS(*this);
+         return new ForceConstraintPS(*this);
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
@@ -441,9 +433,7 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         FixVariablePS* FixVariablePSptr = 0;
-         spx_alloc(FixVariablePSptr);
-         return new (FixVariablePSptr) FixVariablePS(*this);
+         return new FixVariablePS(*this);
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
@@ -1193,9 +1183,7 @@ public:
    /// clone function for polymorphism
    inline virtual SPxSimplifier* clone() const
    {
-      SPxMainSM* SPxMainSMptr = 0;
-      spx_alloc(SPxMainSMptr);
-      return new (SPxMainSMptr) SPxMainSM(*this);
+      return new SPxMainSM(*this);
    }
    //@}
 
