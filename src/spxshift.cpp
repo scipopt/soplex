@@ -564,12 +564,17 @@ void SPxSolver::unShift(void)
                }
                else
                {
-                  assert(theUBbound[i] >= t_up);
+                  /* if the basic (primal or dual) variable is fixed (e.g., basis status P_FREE in row representation)
+                   * then shiftFvec() and shiftPvec() do not relax the bounds, but shift both, hence they may be outside
+                   * of [t_low,t_up] */
+                  assert(theLBbound[i] == theUBbound[i] || theUBbound[i] >= t_up);
+                  assert(theLBbound[i] == theUBbound[i] || theLBbound[i] <= t_low);
+
                   if ((*theFvec)[i] < t_up - eps)
                      theUBbound[i] = t_up;
                   else if ((*theFvec)[i] > t_up)
                      theShift += theUBbound[i] - t_up;
-                  assert(theLBbound[i] <= t_low);
+
                   if ((*theFvec)[i] > t_low + eps)
                      theLBbound[i] = t_low;
                   else if ((*theFvec)[i] < t_low)
