@@ -16,6 +16,7 @@ fixed bugs:
 - catch possible exception when finally performing basis update
 - fixed inconsistency in "Fast" ratiotester when "short" leave is possible
 - fixed bug in unsimplification of zero objective singleton columns
+- relaxed wrong assert in SPxSolver::unShift()
 
 interface:
 - new methods in SPxSolver to set and get maximum number of updates before next refactorization
