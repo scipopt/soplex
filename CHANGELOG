@@ -15,7 +15,7 @@ fixed bugs:
   matrix since this would change the order of colums/rows in the basis
 - catch possible exception when finally performing basis update
 - fixed inconsistency in "Fast" ratiotester when "short" leave is possible
-- fixed bug in unsimplification of zero objective singleton columns
+- fixed bugs in unsimplification of zero objective singleton columns and row singletons
 - relaxed wrong assert in SPxSolver::unShift()
 
 interface:
