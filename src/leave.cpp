@@ -497,7 +497,7 @@ void SPxSolver::getLeaveVals2(
          throw SPxInternalCodeException("XLEAVE08 This should never happen.");
       }
 
-      MSG_DEBUG( spxout << "DLEAVE57 col " << idx
+      MSG_DEBUG( spxout << "DLEAVE57 SPxSolver::getLeaveVals2(): col " << idx
                         << ": " << enterStat
                         << " -> " << ds.colStatus(idx)
                         << std::endl; )
@@ -610,6 +610,8 @@ bool SPxSolver::leave(int leaveIdx)
    {
       Real enterVal = leaveMax;
       SPxId enterId = theratiotester->selectEnter(enterVal, leaveIdx);
+
+      assert(!enterId.isValid() || !isBasic(enterId));
 
       instableLeaveNum = -1;
       instableLeave = false;
