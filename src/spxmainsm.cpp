@@ -262,7 +262,7 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
       r[m_j] = 0.0;
       break;
    case SPxSolver::ON_LOWER:
-      if(EQrel(m_oldLo, x[m_j], eps()) && r[m_j] >= -eps()) // xj should be on lower
+      if(EQrel(m_oldLo, x[m_j], eps())) // xj may stay on lower
       {
          rStatus[m_i] = SPxSolver::BASIC;
          y[m_i] = 0.0;
@@ -279,7 +279,7 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
       }
       break;
    case SPxSolver::ON_UPPER:
-      if(EQrel(m_oldUp, x[m_j], eps()) && r[m_j] <= eps()) // xj should be on upper
+      if(EQrel(m_oldUp, x[m_j], eps())) // xj may stay on upper
       {
          rStatus[m_i] = SPxSolver::BASIC;
          y[m_i] = 0.0;
