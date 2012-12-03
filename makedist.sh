@@ -14,6 +14,7 @@ echo adjust file modes
 find ./ -type d -exec chmod 750 {} \;
 find ./ -type f -exec chmod 640 {} \;
 find ./ -name "*.sh" -exec chmod 750 {} \;
+chmod 750 bin/*
 
 tar -cvzhf $NAME.tgz \
 --exclude="*CVS*" \
@@ -55,4 +56,4 @@ grep "VERSION" src/spxdefines.h
 grep "@version" doc/xternal.cpp
 grep "^VERSION" Makefile
 grep "^VERSION" makedist.sh
-tail src/githash.cpp
+tail src/git_hash.cpp
