@@ -112,7 +112,7 @@ int SPxFastRT::maxDelta(
    int i, sel;
    Real x, y, max;
    Real u, l;
-   bool columnleaving = thesolver->rep() == SPxSolver::COLUMN && m_type == SPxSolver::LEAVE;
+   bool leaving = m_type == SPxSolver::LEAVE;
 
    Real mabs = maxabs;
 
@@ -134,7 +134,7 @@ int SPxFastRT::maxDelta(
          x = upd[i];
 
          /* in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables */
-         if( columnleaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
+         if( leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
             continue;
 
          if (x > epsilon)
@@ -201,7 +201,7 @@ int SPxFastRT::maxDelta(
                *l_idx++ = i;
 
             /* in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables */
-            if( columnleaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
+            if( leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
                continue;
 
             if (x > epsilon)
@@ -267,7 +267,7 @@ int SPxFastRT::minDelta(
    int i, sel;
    Real x, y, max;
    Real u, l;
-   bool columnleaving = thesolver->rep() == SPxSolver::COLUMN && m_type == SPxSolver::LEAVE;
+   bool leaving = m_type == SPxSolver::LEAVE;
 
    Real mabs = maxabs;
 
@@ -289,7 +289,7 @@ int SPxFastRT::minDelta(
          x = upd[i];
 
          /* in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables */
-         if( columnleaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
+         if( leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
             continue;
 
          if (x > epsilon)
@@ -357,7 +357,7 @@ int SPxFastRT::minDelta(
                *l_idx++ = i;
 
             /* in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables */
-            if( columnleaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
+            if( leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
                continue;
 
             if (x > epsilon)
@@ -499,7 +499,7 @@ int SPxFastRT::minSelect(
 {
    int i;
    Real x, y;
-   bool columnleaving = thesolver->rep() == SPxSolver::COLUMN && m_type == SPxSolver::LEAVE;
+   bool leaving = m_type == SPxSolver::LEAVE;
 
    const Real* up = upBound.get_const_ptr();
    const Real* low = lowBound.get_const_ptr();
@@ -517,7 +517,7 @@ int SPxFastRT::minSelect(
       x = upd[i];
 
       // in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables
-      if( columnleaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
+      if( leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
          continue;
 
       if (x > stab)
@@ -578,7 +578,7 @@ int SPxFastRT::maxSelect(
 {
    int i;
    Real x, y;
-   bool columnleaving = thesolver->rep() == SPxSolver::COLUMN && m_type == SPxSolver::LEAVE;
+   bool leaving = m_type == SPxSolver::LEAVE;
 
    const Real* up = upBound.get_const_ptr();
    const Real* low = lowBound.get_const_ptr();
@@ -596,7 +596,7 @@ int SPxFastRT::maxSelect(
       x = upd[i];
 
       // in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables
-      if( columnleaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
+      if( leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
          continue;
 
       if (x > stab)
