@@ -20,6 +20,9 @@ fixed bugs:
 - relaxed wrong assert in SPxSolver::unShift()
 - allow instable enter pivot when no other is available; only after a fresh factorization
 
+performance:
+- consider density of vector entering the basis in fast ratio test
+
 interface:
 - new methods in SPxSolver to set and get maximum number of updates before next refactorization
 - implemented writing of basis file for row representation
