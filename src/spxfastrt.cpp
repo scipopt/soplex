@@ -414,6 +414,7 @@ int SPxFastRT::maxDelta(
    Real& val,
    Real& maxabs)
 {
+   assert(m_type == SPxSolver::ENTER);
    return maxDelta(val, maxabs,
       thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(), 0, 1);
 }
@@ -422,6 +423,7 @@ int SPxFastRT::minDelta(
    Real& val,
    Real& maxabs)
 {
+   assert(m_type == SPxSolver::ENTER);
    return minDelta(val, maxabs,
       thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(), 0, 1);
 }
@@ -651,6 +653,7 @@ int SPxFastRT::maxSelect(
 {
    Real best = -infinity;
    bestDelta = 0.0;
+   assert(m_type == SPxSolver::ENTER);
    return maxSelect(val, stab, best, bestDelta, max,
       thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(),  0, 1);
 }
@@ -695,6 +698,7 @@ int SPxFastRT::minSelect(
 {
    Real best = infinity;
    bestDelta = 0.0;
+   assert(m_type == SPxSolver::ENTER);
    return minSelect(val, stab, best, bestDelta, max,
       thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(), 0, 1);
 }
@@ -858,6 +862,11 @@ int SPxFastRT::selectLeave(Real& val, SPxId)
 
    assert( m_type == SPxSolver::ENTER );
 
+   // force instable pivot iff true (see explanation in enter.cpp and spxsolve.cpp)
+   bool instable = solver()->instableEnter;
+   Real lowstab = LOWSTAB;
+   assert(!instable || solver()->instableEnterId.isValid());
+
    resetTols();
 
    if (val > epsilon)
@@ -875,8 +884,15 @@ int SPxFastRT::selectLeave(Real& val, SPxId)
          {
             // phase 2:
             Real stab, bestDelta;
+
             stab = 100.0 * minStability(maxabs);
-            leave = maxSelect(sel, stab, bestDelta, max);
+
+            // force instable pivot iff instable is true (see explanation in enter.cpp and spxsolve.cpp)
+            if (instable)
+               leave = maxSelect(sel, lowstab, bestDelta, max);
+            else
+               leave = maxSelect(sel, stab, bestDelta, max);
+
             if (bestDelta < DELTA_SHIFT*TRIES)
                cnt++;
             else
@@ -905,8 +921,14 @@ int SPxFastRT::selectLeave(Real& val, SPxId)
          {
             // phase 2:
             Real stab, bestDelta;
+
             stab = 100.0 * minStability(maxabs);
-            leave = minSelect(sel, stab, bestDelta, max);
+
+            // force instable pivot iff instable is true (see explanation in enter.cpp and spxsolve.cpp)
+            if (instable)
+               leave = minSelect(sel, lowstab, bestDelta, max);
+            else
+               leave = minSelect(sel, stab, bestDelta, max);
 
             assert(leave < 0 || !(thesolver->baseId(leave).isSPxColId()) || thesolver->desc().colStatus(thesolver->number(SPxColId(thesolver->baseId(leave)))) != SPxBasis::Desc::P_FIXED);
 
@@ -1195,6 +1217,7 @@ SPxId SPxFastRT::selectEnter(Real& val, int)
          if (!enterId.isValid())
             return enterId;
          assert(max >= 0.0);
+         assert(!enterId.isValid() || !solver()->isBasic(enterId));
 
          if (!shortEnter(enterId, nr, max, maxabs))
          {
@@ -1232,6 +1255,7 @@ SPxId SPxFastRT::selectEnter(Real& val, int)
          if (!enterId.isValid())
             return enterId;
          assert(max <= 0.0);
+         assert(!enterId.isValid() || !solver()->isBasic(enterId));
 
          if (!shortEnter(enterId, nr, max, maxabs))
          {
@@ -1263,6 +1287,8 @@ SPxId SPxFastRT::selectEnter(Real& val, int)
    MSG_DEBUG(
       if (enterId.isValid())
       {
+         assert(!enterId.isValid() || !solver()->isBasic(enterId));
+
          Real x;
          if (thesolver->isCoId(enterId))
             x = thesolver->coPvec().delta()[ thesolver->number(enterId) ];
@@ -1283,6 +1309,8 @@ SPxId SPxFastRT::selectEnter(Real& val, int)
       if (enterId.isValid())
          tighten();
    }
+
+   assert(!enterId.isValid() || !solver()->isBasic(enterId));
 
    return enterId;
 }

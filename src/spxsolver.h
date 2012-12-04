@@ -246,6 +246,13 @@ private:
    int            instableLeaveNum;
    bool           instableLeave;
    Real           instableLeaveVal;
+
+   /* Store the id of an entering row or column if only an instable pivot has been found.
+      instableEnter == true iff this instable basis change should be performed.
+      (see spxsolve.cpp and enter.cpp) */
+   SPxId          instableEnterId;
+   bool           instableEnter;
+   Real           instableEnterVal;
    //@}
 
 protected:

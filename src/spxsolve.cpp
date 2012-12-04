@@ -194,6 +194,9 @@ SPxSolver::Status SPxSolver::fpsolve()
          int enterCycleCount = 0;
          int enterFacPivotCount = 0;
 
+         instableEnterId = SPxId();
+         instableEnter = false;
+
          stallRefIter = iteration()-1;
          stallRefShift = shift();
          stallRefValue = value();
@@ -231,6 +234,24 @@ SPxSolver::Status SPxSolver::fpsolve()
                          << ", Shift = " << shift() << std::endl;
             )
             enterId = thepricer->selectEnter();
+
+            if (!enterId.isValid() && instableEnterId.isValid() && lastUpdate() == 0)
+            {
+               /* no entering variable was found, but because of valid instableEnterId we know
+                  that this is due to the scaling of the test values. Thus, we use
+                  instableEnterId and SPxFastRT::selectEnter shall accept even an instable
+                  leaving variable. */
+               MSG_INFO3(
+                  spxout << "ISOLVE99 Trying instable enter iteration" << std::endl;
+                  )
+
+               enterId = instableEnterId;
+               instableEnter = true;
+            }
+            else
+            {
+               instableEnter = false;
+            }
 
             if (!enterId.isValid())
             {

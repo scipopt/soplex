@@ -946,6 +946,8 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       initialized = base.initialized;
       instableLeaveNum = base.instableLeaveNum;
       instableLeave = base.instableLeave;
+      instableEnterId = base.instableEnterId;
+      instableEnter = base.instableEnter;
       unitVecs = base.unitVecs;
       primRhs = base.primRhs;
       primVec = base.primVec;
@@ -1106,6 +1108,8 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , coSolveVector2(0)
    , instableLeaveNum(base.instableLeaveNum)
    , instableLeave(base.instableLeave)
+   , instableEnterId(base.instableEnterId)
+   , instableEnter(base.instableEnter)
    , unitVecs(base.unitVecs)
    , primRhs(base.primRhs)
    , primVec(base.primVec)

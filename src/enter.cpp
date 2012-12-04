@@ -900,6 +900,9 @@ bool SPxSolver::enter(SPxId& enterId)
    Real enterRO;        // rhs/obj of entering variable
    const SVector* enterVec = enterVector(enterId);
 
+   bool instable = instableEnter;
+   assert(!instable || instableEnterId.isValid());
+
    getEnterVals(enterId, enterTest, enterUB, enterLB,
       enterVal, enterMax, enterPric, enterStat, enterRO);
 
@@ -957,6 +960,9 @@ bool SPxSolver::enter(SPxId& enterId)
    /* in row representation, fixed columns and rows should not leave the basis */
    assert(leaveIdx < 0 || !baseId(leaveIdx).isSPxColId() || desc().colStatus(number(SPxColId(baseId(leaveIdx)))) != SPxBasis::Desc::P_FIXED);
    assert(leaveIdx < 0 || !baseId(leaveIdx).isSPxRowId() || desc().rowStatus(number(SPxRowId(baseId(leaveIdx)))) != SPxBasis::Desc::P_FIXED);
+
+   instableEnterId = SPxId();
+   instableEnter = false;
 
    /*
        We now tried to find a variable to leave the basis. If one has been
@@ -1038,8 +1044,33 @@ bool SPxSolver::enter(SPxId& enterId)
     */
    else if (leaveVal != -enterMax)
    {
-      rejectEnter(enterId, REAL(0.01) * enterTest - REAL(2.0) * leavetol(), enterStat);
-      change(-1, none, 0);
+      /* In the ENTER algorithm, when for a selected entering variable we find only
+         an instable leaving variable, then the basis change is not conducted.
+         Instead, we save the entering variable's id in instableEnterId and set
+         the test value to zero, hoping to find a different leaving
+         variable with a stable leavingvariable.
+         If this fails, however, and no more entering variable is found, we have to
+         perform the instable basis change using instableEnterId. In this (and only
+         in this) case, the flag instableEnter is set to true.
+
+         leaveVal != enterMax is the case that selectLeave has found only an instable leaving
+         variable. We store this leaving variable for later if we are not already in the
+         instable case */
+      if (!instable)
+      {
+         instableEnterId = enterId;
+         instableEnterVal = enterTest;
+
+         rejectEnter(enterId, 0.0, enterStat);
+         change(-1, none, 0);
+
+         return true;
+      }
+      else
+      {
+         rejectEnter(enterId, enterTest, enterStat);
+         change(-1, none, 0);
+      }
    }
    /*  No leaving vector has been selected from the basis. However, if the
        shift amount for |fVec| is bounded, we are in the case, that the
