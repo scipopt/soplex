@@ -442,15 +442,15 @@ SPxId SPxFastRT::maxDelta(
    int indp = maxDelta(max, maxabs,
       thesolver->pVec(), thesolver->lpBound(), thesolver->upBound(), 0, 1);
 
-   if (indc >= 0)
-   {
-      nr = indc;
-      return thesolver->coId(indc);
-   }
    if (indp >= 0)
    {
       nr = indp;
       return thesolver->id(indp);
+   }
+   if (indc >= 0)
+   {
+      nr = indc;
+      return thesolver->coId(indc);
    }
    nr = -1;
    return SPxId();
@@ -470,15 +470,15 @@ SPxId SPxFastRT::minDelta(
    const int indp = minDelta(max, maxabs,
       thesolver->pVec(), thesolver->lpBound(), thesolver->upBound(), 0, 1);
 
-   if (indc >= 0)
-   {
-      nr = indc;
-      return thesolver->coId(indc);
-   }
    if (indp >= 0)
    {
       nr = indp;
       return thesolver->id(indp);
+   }
+   if (indc >= 0)
+   {
+      nr = indc;
+      return thesolver->coId(indc);
    }
    nr = -1;
    return SPxId();
@@ -676,15 +676,15 @@ SPxId SPxFastRT::maxSelect(
    indp = maxSelect(val, stab, best, bestDelta, max,
       thesolver->pVec(), thesolver->lpBound(), thesolver->upBound(), 0, 1);
 
-   if (indc >= 0)
-   {
-      nr = indc;
-      return thesolver->coId(indc);
-   }
    if (indp >= 0)
    {
       nr = indp;
       return thesolver->id(indp);
+   }
+   if (indc >= 0)
+   {
+      nr = indc;
+      return thesolver->coId(indc);
    }
    nr = -1;
    return SPxId();
@@ -719,15 +719,15 @@ SPxId SPxFastRT::minSelect(
    int indp = minSelect(val, stab, best, bestDelta, max,
       thesolver->pVec(), thesolver->lpBound(), thesolver->upBound(), 0, 1);
 
-   if (indc >= 0)
-   {
-      nr = indc;
-      return thesolver->coId(indc);
-   }
    if (indp >= 0)
    {
       nr = indp;
       return thesolver->id(indp);
+   }
+   if (indc >= 0)
+   {
+      nr = indc;
+      return thesolver->coId(indc);
    }
    nr = -1;
    return SPxId();
