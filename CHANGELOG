@@ -1,8 +1,8 @@
 (maintain each list from top to bottom)
 
 
-Developer version
-=================
+07 Dec 2012 - Release 1.7.1 beta
+================================
 
 code quality & new features:
 - unfied members/methods of CLUFactor in new file clufactor.cpp (contains factor.cpp, forest.cpp, update.cpp, (v)solve.cpp)
@@ -17,6 +17,7 @@ fixed bugs:
 - fixed inconsistency in "Fast" ratiotester when "short" leave is possible
 - fixed bugs in unsimplification of zero objective singleton columns and row singletons
 - relaxed wrong assert in SPxSolver::unShift()
+- fixed bug in ratio test: consider only nonbasic entering variables in leaving algorithm, also in row representation
 
 interface:
 - new methods in SPxSolver to set and get maximum number of updates before next refactorization
