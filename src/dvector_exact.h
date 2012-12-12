@@ -15,7 +15,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /**@file  dvector_exact.h
- * @brief Dynamic vectors of MpqReal.
+ * @brief Dynamic vectors of Rational.
  */
 #ifndef _DVECTOR_EXACT_H_
 #define _DVECTOR_EXACT_H_
@@ -24,17 +24,17 @@
 #include <assert.h>
 
 #include "spxdefines.h"
-#include "mpqreal.h"
+#include "rational.h"
 #include "vector_exact.h"
 #include "vector.h"
 #include "svector.h"
 
 namespace soplex
 {
-/**@brief   Dynamic vectors of MpqReal.
+/**@brief   Dynamic vectors of Rational.
  * @ingroup Algebra
  *
- * Class DVector_exact is a copy of class DVector replacing the floating point type Real with the exact MpqReal.
+ * Class DVector_exact is a copy of class DVector replacing the floating point type Real with the exact Rational.
  */
 class DVector_exact : public Vector_exact
 {
@@ -42,7 +42,7 @@ class DVector_exact : public Vector_exact
    /**@name Data */
    //@{
    int   memsize;        ///< length of array of values \ref soplex::DVector::mem "mem"
-   MpqReal* mem;         ///< value array to be used
+   Rational* mem;        ///< value array to be used
    //@}
 
 public:

@@ -161,7 +161,7 @@ Vector_exact& Vector_exact::operator-=(const SVector& vec)
    return *this;
 }
 
-Vector_exact& Vector_exact::operator*=(MpqReal x)
+Vector_exact& Vector_exact::operator*=(Rational x)
 {
    for( int i = 0; i < dim(); i++ )
    {
@@ -171,13 +171,13 @@ Vector_exact& Vector_exact::operator*=(MpqReal x)
    return *this;
 }
 
-MpqReal Vector_exact::maxAbs() const
+Rational Vector_exact::maxAbs() const
 {
-   MpqReal maxi = 0.0;
+   Rational maxi = 0.0;
 
    for( int i = 0; i < dim(); i++ )
    {
-      MpqReal x = abs(val[i]);
+      Rational x = abs(val[i]);
 
       if( x > maxi )
          maxi = x;
@@ -188,15 +188,15 @@ MpqReal Vector_exact::maxAbs() const
    return maxi;
 }
 
-MpqReal Vector_exact::minAbs() const
+Rational Vector_exact::minAbs() const
 {
    assert(dim() > 0);
 
-   MpqReal mini = abs(val[0]);
+   Rational mini = abs(val[0]);
 
    for( int i = 1; i < dim(); i++ )
    {
-      MpqReal x = abs(val[i]);
+      Rational x = abs(val[i]);
 
       if( x < mini )
          mini = x;
@@ -207,7 +207,7 @@ MpqReal Vector_exact::minAbs() const
    return mini;
 }
 
-Vector_exact& Vector_exact::multAdd(MpqReal x, const Vector_exact& vec)
+Vector_exact& Vector_exact::multAdd(Rational x, const Vector_exact& vec)
 {
    assert(vec.dim() == dimen);
 
@@ -217,7 +217,7 @@ Vector_exact& Vector_exact::multAdd(MpqReal x, const Vector_exact& vec)
    return *this;
 }
 
-Vector_exact& Vector_exact::multAdd(MpqReal x, const SVector& vec)
+Vector_exact& Vector_exact::multAdd(Rational x, const SVector& vec)
 {
    for( int i = 0; i < vec.size(); i++ )
    {

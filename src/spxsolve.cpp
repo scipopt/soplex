@@ -19,7 +19,7 @@
 #include <iostream>
 
 #include "spxdefines.h"
-#include "mpqreal.h"
+#include "rational.h"
 #include "spxsolver.h"
 #include "spxpricer.h"
 #include "spxratiotester.h"
@@ -923,7 +923,7 @@ SPxSolver::Status SPxSolver::solve()
    }
 
    /* perform iterative refinement only if exact arithmetic is available */
-   if( !MpqRealIsExact() )
+   if( !RationalIsExact() )
    {
       MSG_WARNING( spxout << "WSOLVE35 Warning: Iterative refinement disabled because of missing GMP support (compile with GMP=true).\n" );
 
@@ -1347,13 +1347,13 @@ bool SPxSolver::refine(
    DVector dual_fp(nRows());
 
    /* maximum violations */
-   MpqReal boundsviol_ex;
-   MpqReal sidesviol_ex;
-   MpqReal redcostviol_ex;
+   Rational boundsviol_ex;
+   Rational sidesviol_ex;
+   Rational redcostviol_ex;
 
    /* scaling factors */
-   MpqReal primalscale_ex;
-   MpqReal dualscale_ex;
+   Rational primalscale_ex;
+   Rational dualscale_ex;
 
    /* number of simplex iterations, refinements in total, and refinements with actual simplex iterations being performed */
    int iteroffset;
@@ -1401,7 +1401,7 @@ bool SPxSolver::refine(
    /* refinement loop */
    do
    {
-      MpqReal maxscale_ex;
+      Rational maxscale_ex;
 
       assert(status() == OPTIMAL);
 
@@ -1694,7 +1694,7 @@ bool SPxSolver::refine(
          /* correct primal solution */
          MSG_DEBUG( spxout << "correcting primal solution . . ." );
 
-         modprimal_ex *= MpqReal(1 / primalscale_ex);
+         modprimal_ex *= Rational(1 / primalscale_ex);
          primal_ex += modprimal_ex;
 
          /* force values of nonbasic variables to bounds */
@@ -1734,14 +1734,14 @@ bool SPxSolver::refine(
          /* correct dual solution */
          MSG_DEBUG( spxout << "correcting dual solution . . .\n" );
 
-         moddual_ex *= MpqReal(1 / dualscale_ex);
+         moddual_ex *= Rational(1 / dualscale_ex);
          dual_ex += moddual_ex;
       }
    }
    while( true );
 
    MSG_DEBUG(
-      MpqReal viol_ex = boundsviol_ex;
+      Rational viol_ex = boundsviol_ex;
       if( sidesviol_ex > viol_ex )
          viol_ex = sidesviol_ex;
       if( redcostviol_ex > viol_ex )

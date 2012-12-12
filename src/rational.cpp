@@ -13,41 +13,41 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file  mpqreal.cpp
+/**@file  rational.cpp
  * @brief Wrapper for GMP types.
  */
 
 #include <math.h>
 
-#include "mpqreal.h"
+#include "rational.h"
 
 namespace soplex
 {
 #ifdef SOPLEX_WITH_GMP
 
-/// print MpqReal with limited floating point precision
-std::ostream& operator<<(std::ostream& os, const MpqReal& q)
+/// print Rational with limited floating point precision
+std::ostream& operator<<(std::ostream& os, const Rational& q)
 {
    os << mpf_class(q);
    return os;
 }
 
-/// cast MpqReal to Real
-Real get_d(const MpqReal& q)
+/// cast Rational to Real
+Real get_d(const Rational& q)
 {
    return q.get_d();
 }
 
 #else
 
-/// cast MpqReal to Real
-Real get_d(const MpqReal& q)
+/// cast Rational to Real
+Real get_d(const Rational& q)
 {
    return q;
 }
 
 /// return maximal absolute value
-MpqReal abs(const MpqReal& q)
+Rational abs(const Rational& q)
 {
    return fabs(q);
 }
