@@ -384,6 +384,11 @@ SPxSolver::Status SPxSolver::fpsolve()
 
          if (!stop)
          {
+            /**@todo technically it would be ok to finish already when (priced && maxinfeas + shift() <= entertol()) is
+             *  satisfied; maybe at least in the case when SoPlex keeps jumping back between ENTER and LEAVE always
+             *  shifting (looping), we may relax this condition here;
+             *  note also that unShift may increase shift() slightly due to roundoff errors
+             */
             if (shift() <= epsilon())
             {
                // factorize();
@@ -649,6 +654,11 @@ SPxSolver::Status SPxSolver::fpsolve()
                )
             }
 
+            /**@todo technically it would be ok to finish already when (priced && maxinfeas + shift() <= entertol()) is
+             *  satisfied; maybe at least in the case when SoPlex keeps jumping back between ENTER and LEAVE always
+             *  shifting (looping), we may relax this condition here;
+             *  note also that unShift may increase shift() slightly due to roundoff errors
+             */
             if (shift() <= epsilon())
             {
                cycleCount = 0;
