@@ -18,6 +18,7 @@ fixed bugs:
 - fixed inconsistency in "Fast" ratiotester when "short" leave is possible
 - fixed bugs in unsimplification of zero objective singleton columns and row singletons
 - relaxed wrong assert in SPxSolver::unShift()
+- fixed bug in ratio test: consider only nonbasic entering variables in leaving algorithm, also in row representation
 - allow instable enter pivot when no other is available; only after a fresh factorization
 
 interface:
