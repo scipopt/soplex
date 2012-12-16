@@ -18,7 +18,6 @@ fixed bugs:
 - fixed bugs in unsimplification of zero objective singleton columns and row singletons
 - relaxed wrong assert in SPxSolver::unShift()
 - fixed bug in ratio test: consider only nonbasic entering variables in leaving algorithm, also in row representation
-- ensure that problem is not perturbed when concluding optimality
 
 interface:
 - new methods in SPxSolver to set and get maximum number of updates before next refactorization
