@@ -20,6 +20,7 @@ fixed bugs:
 - relaxed wrong assert in SPxSolver::unShift()
 - fixed bug in ratio test: consider only nonbasic entering variables in leaving algorithm, also in row representation
 - allow instable enter pivot when no other is available; only after a fresh factorization
+- ensure that problem is not perturbed when concluding optimality
 
 interface:
 - new methods in SPxSolver to set and get maximum number of updates before next refactorization

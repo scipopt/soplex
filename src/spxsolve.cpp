@@ -418,7 +418,8 @@ SPxSolver::Status SPxSolver::fpsolve()
                          << ", entertol: " << entertol() << std::endl;
                )
 
-               if (priced && maxinfeas + shift() <= entertol())
+               /* because unShift() may lead to a slight increase in shift(), we check again that it is below epsilon */
+               if (priced && shift() <= epsilon() && maxinfeas + shift() <= entertol())
                {
                   setBasisStatus(SPxBasis::OPTIMAL);
                   m_status = OPTIMAL;
@@ -692,7 +693,8 @@ SPxSolver::Status SPxSolver::fpsolve()
                   m_status = ABORT_CYCLING;
                   throw SPxStatusException("XSOLVE14 Abort solving due to looping");
                }
-               else if (priced && maxinfeas + shift() <= leavetol())
+               /* because unShift() may lead to a slight increase in shift(), we check again that it is below epsilon */
+               else if (priced && shift() <= epsilon() && maxinfeas + shift() <= leavetol())
                {
                   setBasisStatus(SPxBasis::OPTIMAL);
                   m_status = OPTIMAL;
