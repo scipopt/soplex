@@ -49,6 +49,9 @@ typedef mpq_class Rational;
 /// print Rational with limited floating point precision
 std::ostream& operator<<(std::ostream& os, const Rational& q);
 
+/// cast Rational to Real
+Real get_d(const Rational& q);
+
 #else
 
 /// If compiled without GMP support, Rational is defined as SoPlex's normal Real.
@@ -57,12 +60,7 @@ typedef Real Rational;
 /// return whether Rational provides exact arithmetic
 #define RationalIsExact() (false)
 
-/// return maximal absolute value
-Rational abs(const Rational& q);
 #endif
-
-/// cast Rational to Real
-Real get_d(const Rational& q);
 
 } // namespace soplex
 #endif // _RATIONAL_H_

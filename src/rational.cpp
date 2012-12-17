@@ -38,20 +38,6 @@ Real get_d(const Rational& q)
    return q.get_d();
 }
 
-#else
-
-/// cast Rational to Real
-Real get_d(const Rational& q)
-{
-   return q;
-}
-
-/// return maximal absolute value
-Rational abs(const Rational& q)
-{
-   return fabs(q);
-}
-
 #endif
 } // namespace soplex
 
