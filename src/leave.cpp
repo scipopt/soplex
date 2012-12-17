@@ -717,7 +717,7 @@ bool SPxSolver::leave(int leaveIdx)
 
                // perform update of basic solution
                primVec -= (*solveVector3);
-               MSG_INFO3( spxout << "ILSTEP02 "
+               MSG_INFO3( spxout << "ILBFRT02 "
                                  << "breakpoints passed / bounds flipped = " << boundflips
                                  << std::endl; )
                totalboundflips += boundflips;
@@ -745,7 +745,7 @@ bool SPxSolver::leave(int leaveIdx)
 
                // perform update of basic solution
                primVec -= (*solveVector3);
-               MSG_INFO3( spxout << "ILSTEP02 "
+               MSG_INFO3( spxout << "ILBFRT02 "
                                  << "breakpoints passed / bounds flipped = " << boundflips
                                  << std::endl; )
                totalboundflips += boundflips;

@@ -35,10 +35,11 @@ namespace soplex
 
 /** perform necessary bound flips to restore dual feasibility */
 void SPxBoundFlippingRT::flipAndUpdate(
-   int&                  usedBp              /**< number of bounds that should be flipped */
+   int&                  nflips              /**< number of bounds that should be flipped */
    )
 {
    assert(thesolver->rep() == SPxSolver::COLUMN);
+   assert(nflips > 0);
 
    int skipped;
 
@@ -49,7 +50,7 @@ void SPxBoundFlippingRT::flipAndUpdate(
    updPrimVec.clear();
 
    skipped = 0;
-   for( int i = 0; i < usedBp; ++i )
+   for( int i = 0; i < nflips; ++i )
    {
       int idx;
       idx = breakpoints[i].idx;
@@ -151,8 +152,8 @@ void SPxBoundFlippingRT::flipAndUpdate(
          updPrimRhs.setValue(idx, updPrimRhs[idx] - range);
       }
    }
-   usedBp -= skipped;
-   if( usedBp > 0 )
+   nflips -= skipped;
+   if( nflips > 0 )
    {
       thesolver->primRhs -= updPrimRhs;
       thesolver->setup4solve2(&updPrimVec, &updPrimRhs);
@@ -354,7 +355,7 @@ bool SPxBoundFlippingRT::getData(
             thesolver->shiftLPbound(idx, vec[idx]);
       }
    }
-   else // breakpoints[usedBp].src == COPVEC
+   else // src == COPVEC
    {
       Real x = upd[idx];
       if( fabs(x) < stab )
@@ -397,12 +398,12 @@ SPxId SPxBoundFlippingRT::selectEnter(
    // reset the history and try again to do some long steps
    if( thesolver->leaveCount % LONGSTEP_FREQ == 0 )
    {
-      MSG_DEBUG( spxout << "ILSTEP06 resetting long step history" << std::endl; )
+      MSG_DEBUG( spxout << "ILBFRT06 resetting long step history" << std::endl; )
       flipPotential = 1;
    }
-   if( !enableLongsteps || thesolver->rep() == SPxSolver::ROW || flipPotential < 0.01 )
+   if( !enableLongsteps || thesolver->rep() == SPxSolver::ROW || flipPotential <= 0 )
    {
-      MSG_DEBUG( spxout << "ILSTEP07 switching to fast ratio test" << std::endl; )
+      MSG_DEBUG( spxout << "ILBFRT07 switching to fast ratio test" << std::endl; )
       return SPxFastRT::selectEnter(val, leaveIdx);
    }
    const Real*  pvec = thesolver->pVec().get_const_ptr();
@@ -441,8 +442,8 @@ SPxId SPxBoundFlippingRT::selectEnter(
    // number of found breakpoints
    int nBp;
 
-   // number of latest skipable breakpoint
-   int usedBp;
+   // number of passed breakpoints
+   int npassedBp;
 
    Real degeneps;
    Real stab;
@@ -496,21 +497,21 @@ SPxId SPxBoundFlippingRT::selectEnter(
    int sortsize = 4;
 
    // get all skipable breakpoints
-   for( usedBp = 0; usedBp < nBp && slope > 0; ++usedBp)
+   for( npassedBp = 0; npassedBp < nBp && slope >= 0; ++npassedBp)
    {
       // sort breakpoints only partially to save time
-      if( usedBp > sorted )
+      if( npassedBp > sorted )
       {
          sorted = SPxQuicksortPart(breakpoints.get_ptr(), compare, sorted + 1, nBp, sortsize);
       }
-      int i = breakpoints[usedBp].idx;
+      int i = breakpoints[npassedBp].idx;
       // compute new slope
-      if( breakpoints[usedBp].src == PVEC )
+      if( breakpoints[npassedBp].src == PVEC )
       {
          if( thesolver->isBasic(i) )
          {
             // mark basic indices
-            breakpoints[usedBp].idx = -1;
+            breakpoints[npassedBp].idx = -1;
             thesolver->pVec().delta().clearIdx(i);
          }
          else
@@ -524,11 +525,11 @@ SPxId SPxBoundFlippingRT::selectEnter(
       }
       else
       {
-         assert(breakpoints[usedBp].src == COPVEC);
+         assert(breakpoints[npassedBp].src == COPVEC);
          if( thesolver->isCoBasic(i) )
          {
             // mark basic indices
-            breakpoints[usedBp].idx = -1;
+            breakpoints[npassedBp].idx = -1;
             thesolver->coPvec().delta().clearIdx(i);
          }
          else
@@ -540,30 +541,31 @@ SPxId SPxBoundFlippingRT::selectEnter(
          }
       }
    }
-   --usedBp;
-   assert(usedBp >= 0);
+   --npassedBp;
+   assert(npassedBp >= 0);
 
    // check for unboundedness/infeasibility
-   if( slope > delta && usedBp >= nBp - 1 )
+   if( slope > delta && npassedBp >= nBp - 1 )
    {
-      MSG_DEBUG( spxout << "DLSTEP02 " << thesolver->basis().iteration()
+      MSG_DEBUG( spxout << "DLBFRT02 " << thesolver->basis().iteration()
                         << ": unboundedness in ratio test" << std::endl; )
-      flipPotential *= 0.95;
+      flipPotential -= 0.5;
       val = max;
       return SPxFastRT::selectEnter(val, leaveIdx);
    }
 
-   MSG_DEBUG( spxout << "DLSTEP01 "
+   MSG_DEBUG( spxout << "DLBFRT01 "
                      << thesolver->basis().iteration()
                      << ": number of flip candidates: "
-                     << usedBp
+                     << npassedBp
                      << std::endl; )
 
    // try to get a more stable pivot by looking at those with similar step length
    int stableBp;              // index to walk over additional breakpoints (after slope change)
    int bestBp = -1;           // breakpoints index with best possible stability
-   Real bestDelta = breakpoints[usedBp].val;  // best step length (after bound flips)
-   for( stableBp = usedBp + 1; stableBp < nBp; ++stableBp )
+   Real bestDelta = breakpoints[npassedBp].val;  // best step length (after bound flips)
+
+   for( stableBp = npassedBp + 1; stableBp < nBp; ++stableBp )
    {
       Real stableDelta;
       // get next breakpoints in increasing order
@@ -577,54 +579,50 @@ SPxId SPxBoundFlippingRT::selectEnter(
          if( thesolver->isBasic(idx) )
          {
             // mark basic indices
-            // TODO this is probably unnecessary since we do not look at these breakpoints anymore
             breakpoints[stableBp].idx = -1;
             thesolver->pVec().delta().clearIdx(idx);
             continue;
          }
-         thesolver->pVec()[idx] = thesolver->vector(idx) * thesolver->coPvec();
          Real x = pupd[idx];
-         stableDelta = (x > 0.0) ? upb[idx] : lpb[idx];
-         stableDelta = (stableDelta - pvec[idx]) / x;
-
-         if( stableDelta <= bestDelta)
+         if( fabs(x) > moststable )
          {
-            if( fabs(x) > moststable )
+            thesolver->pVec()[idx] = thesolver->vector(idx) * thesolver->coPvec();
+            stableDelta = (x > 0.0) ? upb[idx] : lpb[idx];
+            stableDelta = (stableDelta - pvec[idx]) / x;
+
+            if( stableDelta <= bestDelta)
             {
                moststable = fabs(x);
                bestBp = stableBp;
             }
          }
-         // stop searching if the step length is too big
-         else if( stableDelta > 2 * bestDelta )
-            break;
       }
       else
       {
          if( thesolver->isCoBasic(idx) )
          {
             // mark basic indices
-            breakpoints[usedBp].idx = -1;
+            breakpoints[stableBp].idx = -1;
             thesolver->coPvec().delta().clearIdx(idx);
             continue;
          }
          Real x = cupd[idx];
-         stableDelta = (x > 0.0) ? ucb[idx] : lcb[idx];
-         stableDelta = (stableDelta - cvec[idx]) / x;
-
-         if( stableDelta <= bestDelta)
+         if( fabs(x) > moststable )
          {
-            if( fabs(x) > moststable )
+            stableDelta = (x > 0.0) ? ucb[idx] : lcb[idx];
+            stableDelta = (stableDelta - cvec[idx]) / x;
+
+            if( stableDelta <= bestDelta )
             {
                moststable = fabs(x);
                bestBp = stableBp;
             }
          }
-         // TODO check whether 2 is a good factor
-         // stop searching if the step length is too big
-         else if( stableDelta > 2 * bestDelta )
-            break;
       }
+
+      // stop searching if the step length is too big
+      if( stableDelta > delta + bestDelta )
+         break;
    }
 
    degeneps = fastDelta / moststable;  /* as in SPxFastRT */
@@ -633,64 +631,48 @@ SPxId SPxBoundFlippingRT::selectEnter(
    assert(!instable || thesolver->instableLeaveNum >= 0);
    stab = instable ? LOWSTAB : SPxFastRT::minStability(moststable);
 
-   bool foundStable= false;
+   bool foundStable = false;
 
-   if( bestBp > -1 )
+   if( bestBp >= 0 )
    {
-      // we found a more stable pivot
+      // found a more stable pivot
       if( moststable > stab )
       {
          // stability requirements are satisfied
          int idx = breakpoints[bestBp].idx;
+         assert(idx >= 0);
          if( breakpoints[bestBp].src == PVEC )
             foundStable = getData(val, enterId, idx, stab, degeneps, pupd, pvec, lpb, upb, PVEC, max);
          else
             foundStable = getData(val, enterId, idx, stab, degeneps, cupd, cvec, lcb, ucb, COPVEC, max);
       }
    }
-
-#if 0
-   // do not make long steps if the gain in the dual objective is too small, except to avoid degenerate steps
-   if( usedBp > 0 && breakpoints[0].val > epsilon && breakpoints[usedBp].val - breakpoints[0].val < MIN_LONGSTEP * breakpoints[0].val )
+   else
    {
-      MSG_DEBUG( spxout << "DLSTEP03 "
-                        << thesolver->basis().iteration()
-                        << ": bound flip gain is too small"
-                        << std::endl; )
-
-      // ensure that the first breakpoint is nonbasic
-      while( breakpoints[usedBp].idx < 0 && usedBp < nBp )
-         ++usedBp;
-      // @todo make sure that the selected pivot element is stable
-   }
-#endif
-
-   // scan pivot candidates from back to front and stop as soon as a good one is found
-   // @todo select the moststable pivot or one that is comparably stable
-//    stab = (moststable > stab) ? moststable : stab;
-
-   while( !foundStable && usedBp >= 0 )
-   {
-      int idx = breakpoints[usedBp].idx;
-
-      // only look for non-basic variables
-      if( idx >= 0 )
+      // scan passed breakpoints from back to front and stop as soon as a good one is found
+      while( !foundStable && npassedBp >= 0 )
       {
-         if( breakpoints[usedBp].src == PVEC )
-            foundStable = getData(val, enterId, idx, stab, degeneps, pupd, pvec, lpb, upb, PVEC, max);
-         else
-            foundStable = getData(val, enterId, idx, stab, degeneps, cupd, cvec, lcb, ucb, COPVEC, max);
+         int idx = breakpoints[npassedBp].idx;
+
+         // only look for non-basic variables
+         if( idx >= 0 )
+         {
+            if( breakpoints[npassedBp].src == PVEC )
+               foundStable = getData(val, enterId, idx, stab, degeneps, pupd, pvec, lpb, upb, PVEC, max);
+            else
+               foundStable = getData(val, enterId, idx, stab, degeneps, cupd, cvec, lcb, ucb, COPVEC, max);
+         }
+         --npassedBp;
       }
-      --usedBp;
+      ++npassedBp;
    }
 
    if( !foundStable )
    {
-//       assert(usedBp < 0);
       assert(!enterId.isValid());
       if( relax_count < MAX_RELAX_COUNT )
       {
-         MSG_DEBUG( spxout << "DLSTEP04 "
+         MSG_DEBUG( spxout << "DLBFRT04 "
                            << thesolver->basis().iteration()
                            << ": no valid enterId found - relaxing..."
                            << std::endl; )
@@ -703,37 +685,38 @@ SPxId SPxBoundFlippingRT::selectEnter(
       }
       else
       {
-         MSG_DEBUG( spxout << "DLSTEP05 "
+         MSG_DEBUG( spxout << "DLBFRT05 "
                            << thesolver->basis().iteration()
                            << " no valid enterId found - breaking..."
                            << std::endl; )
          assert(!enterId.isValid());
+         flipPotential = 0;
          return enterId;
       }
    }
    else
    {
-//       assert(usedBp >= 0);
       relax_count = 0;
       tighten();
    }
 
    // flip bounds of skipped breakpoints only if a nondegenerate step is to be performed
-   if( usedBp > 0 && fabs(breakpoints[usedBp].val) > fastDelta )
+   if( npassedBp > 0 && fabs(breakpoints[npassedBp].val) > fastDelta )
    {
-      flipAndUpdate(usedBp);
-      thesolver->boundflips = usedBp;
+      flipAndUpdate(npassedBp);
+      thesolver->boundflips = npassedBp;
+      if( npassedBp >= 10 )
+         flipPotential = 1;
+      else
+         flipPotential -= 0.05;
    }
    else
+   {
       thesolver->boundflips = 0;
+      flipPotential -= 0.1;
+   }
 
-   //TODO incorporate the ratio between usedBp, nBp and dim/coDim
-   //     to get an idea of effort and speed
-
-   // estimate wether long steps may be possible in future iterations
-   flipPotential *= (usedBp + 0.95);
-
-   MSG_DEBUG( spxout << "DLSTEP06 "
+   MSG_DEBUG( spxout << "DLBFRT06 "
                      << thesolver->basis().iteration()
                      << ": selected Id: "
                      << enterId
