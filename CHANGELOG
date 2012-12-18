@@ -21,6 +21,7 @@ fixed bugs:
 - fixed bug in ratio test: consider only nonbasic entering variables in leaving algorithm, also in row representation
 - allow instable enter pivot when no other is available; only after a fresh factorization
 - ensure that problem is not perturbed when concluding optimality
+- reverted wrong bugfix (99f913d7) in computeLeaveCoPrhs4Col() for column status D_UNDEFINED
 
 interface:
 - new methods in SPxSolver to set and get maximum number of updates before next refactorization

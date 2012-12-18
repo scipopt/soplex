@@ -417,8 +417,6 @@ void SPxSolver::computeLeaveCoPrhs4Col(int i, int n)
    switch (desc().colStatus(n))
    {
    case SPxBasis::Desc::D_UNDEFINED :
-      (*theCoPrhs)[i] = 0.0;
-      break;
    case SPxBasis::Desc::D_ON_LOWER + SPxBasis::Desc::D_ON_UPPER :
    case SPxBasis::Desc::P_ON_LOWER + SPxBasis::Desc::P_ON_UPPER :
       assert(theLCbound[n] > -infinity);
@@ -437,6 +435,7 @@ void SPxSolver::computeLeaveCoPrhs4Col(int i, int n)
 
    default:
       (*theCoPrhs)[i] = maxObj(n);
+      //      (*theCoPrhs)[i] = 0;
       break;
    }
 }
