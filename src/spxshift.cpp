@@ -622,11 +622,19 @@ void SPxSolver::unShift(void)
                if (!isBasic(ds.rowStatus(i)))
                {
                   if ((*theCoPvec)[i] < t_up - eps)
+                  {
                      theURbound[i] = t_up;
+                     if( t_up == t_low )
+                        theLRbound[i] = t_low; // for fixed rows we change both bounds
+                  }
                   else
                      theShift += theURbound[i] - t_up;
                   if ((*theCoPvec)[i] > t_low + eps)
+                  {
                      theLRbound[i] = t_low;
+                     if( t_up == t_low )
+                        theURbound[i] = t_up; // for fixed rows we change both bounds
+                  }
                   else
                      theShift += t_low - theLRbound[i];
                }
@@ -642,11 +650,19 @@ void SPxSolver::unShift(void)
                if (!isBasic(ds.colStatus(i)))
                {
                   if ((*thePvec)[i] < -t_up - eps)
+                  {
                      theUCbound[i] = -t_up;
+                     if( t_up == t_low )
+                        theLCbound[i] = -t_low; // for fixed variables we change both bounds
+                  }
                   else
                      theShift += theUCbound[i] - (-t_up);
                   if ((*thePvec)[i] > -t_low + eps)
+                  {
                      theLCbound[i] = -t_low;
+                     if( t_up == t_low )
+                        theUCbound[i] = -t_up; // for fixed variables we change both bounds
+                  }
                   else
                      theShift += (-t_low) - theLCbound[i];
                }
