@@ -40,7 +40,9 @@ $NAME/check/check.awk \
 $NAME/check/instances/* \
 $NAME/doc/soplex.dxy \
 $NAME/doc/soplex.css \
+$NAME/doc/soplexfooter.html \
 $NAME/doc/soplexheader.html \
+$NAME/doc/soplexlayout.xml \
 $NAME/doc/xternal.cpp \
 $NAME/doc/inc/faq.inc \
 $NAME/doc/inc/faqcss.inc \
@@ -56,4 +58,6 @@ grep "VERSION" src/spxdefines.h
 grep "@version" doc/xternal.cpp
 grep "^VERSION" Makefile
 grep "^VERSION" makedist.sh
+echo "check copyright info in doxygen documentation:"
+grep "2003" doc/soplexfooter.html
 tail src/git_hash.cpp
