@@ -1,8 +1,8 @@
 (maintain each list from top to bottom)
 
 
-07 Dec 2012 - Release 1.7.1 beta
-================================
+04 Jan 2013 - Release 1.7.1
+===========================
 
 code quality & new features:
 - unfied members/methods of CLUFactor in new file clufactor.cpp (contains factor.cpp, forest.cpp, update.cpp, (v)solve.cpp)
