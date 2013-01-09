@@ -5,9 +5,20 @@ Developer version
 =================
 
 code quality & new features:
+- new/delete calls are modified to channel memory (de)allocation through spx_alloc calls (-> "placement new")
+
+fixed bugs:
+- allow instable enter pivot when no other is available; only after a fresh factorization
+- ensure that problem is not perturbed when concluding optimality
+- fixed numerical bug in unsimplification of doubleton equations
+
+
+04 Jan 2013 - Release 1.7.1
+===========================
+
+code quality & new features:
 - unfied members/methods of CLUFactor in new file clufactor.cpp (contains factor.cpp, forest.cpp, update.cpp, (v)solve.cpp)
 - moved code from message.h,cpp to spxdefines.h,cpp to avoid name clashes with SCIP
-- new/delete calls are modified to channel memory (de)allocation through spx_alloc calls (-> "placement new")
 
 fixed bugs:
 - fixed inconsistent generic column and row names
@@ -19,8 +30,6 @@ fixed bugs:
 - fixed bugs in unsimplification of zero objective singleton columns and row singletons
 - relaxed wrong assert in SPxSolver::unShift()
 - fixed bug in ratio test: consider only nonbasic entering variables in leaving algorithm, also in row representation
-- allow instable enter pivot when no other is available; only after a fresh factorization
-- ensure that problem is not perturbed when concluding optimality
 - reverted wrong bugfix (99f913d7) in computeLeaveCoPrhs4Col() for column status D_UNDEFINED
 
 interface:
