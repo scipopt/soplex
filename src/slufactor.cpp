@@ -296,6 +296,44 @@ void SLUFactor::solveLeft(
    solveTime.stop();
 }
 
+void SLUFactor::solveLeft(
+   SSVector&      x,
+   Vector&        y,
+   Vector&        z,
+   const SVector& rhs1,
+   SSVector&      rhs2,
+   SSVector&      rhs3)
+{
+   METHOD( "SLUFactor::solveLeft()" );
+
+   solveTime.start();
+
+   int   n;
+   Real* svec = ssvec.altValues();
+   int*  sidx = ssvec.altIndexMem();
+
+   x.clear();
+   y.clear();
+   z.clear();
+   ssvec.assign(rhs1);
+   n = ssvec.size(); // see altValues();
+   n = vSolveLeft3(x.getEpsilon(), x.altValues(), x.altIndexMem(), svec, sidx, n,
+                   y.get_ptr(), rhs2.altValues(), rhs2.altIndexMem(), rhs2.size(),
+                   z.get_ptr(), rhs3.altValues(), rhs3.altIndexMem(), rhs3.size());
+
+   x.setSize(n);
+
+   if (n > 0)
+      x.forceSetup();
+   else
+      x.unSetup();
+
+   ssvec.setSize(0);
+   ssvec.forceSetup();
+
+   solveCount++;
+   solveTime.stop();
+}
 
 Real SLUFactor::stability() const
 {

@@ -148,7 +148,7 @@ int SPxHarrisRT::minDelta(
     allways yield an improvement. In that case, we shift the variable toward
     infeasibility and retry. This avoids cycling in the shifted LP.
  */
-int SPxHarrisRT::selectLeave(Real& val, SPxId enterId)
+int SPxHarrisRT::selectLeave(Real& val, Real)
 {
    int i, j;
    Real stab, x, y;
@@ -312,7 +312,7 @@ int SPxHarrisRT::selectLeave(Real& val, SPxId enterId)
 
 
    if (lastshift != solver()->shift())
-      return selectLeave(val, enterId);
+      return selectLeave(val, 0);
 
    assert(leave >= 0);
 

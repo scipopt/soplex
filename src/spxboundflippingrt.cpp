@@ -30,7 +30,6 @@ namespace soplex
 #define LOWSTAB          1e-10
 #define MAX_RELAX_COUNT  2
 #define LONGSTEP_FREQ    100
-#define MIN_LONGSTEP     1e-5
 
 
 /** perform necessary bound flips to restore dual feasibility */
@@ -38,9 +37,9 @@ void SPxBoundFlippingRT::flipAndUpdate(
    int&                  nflips              /**< number of bounds that should be flipped */
    )
 {
-   assert(thesolver->rep() == SPxSolver::COLUMN);
    assert(nflips > 0);
 
+   // number of bound flips that are not performed
    int skipped;
 
    updPrimRhs.setup();
@@ -64,9 +63,11 @@ void SPxBoundFlippingRT::flipAndUpdate(
       Real lower;
       SPxBasis::Desc::Status stat;
       SPxBasis::Desc& ds = thesolver->basis().desc();
+
       range = 0;
       if( breakpoints[i].src == PVEC )
       {
+         assert(thesolver->rep() == SPxSolver::COLUMN);
          stat = ds.status(idx);
          upper = thesolver->upper(idx);
          lower = thesolver->lower(idx);
@@ -104,12 +105,15 @@ void SPxBoundFlippingRT::flipAndUpdate(
                            << " lower: " << lower
                            << " upper: " << upper
                            << " bp.val: " << breakpoints[i].val
+                           << " UCbound: " << thesolver->theUCbound[idx]
+                           << " LCbound: " << thesolver->theLCbound[idx]
                            << std::endl; )
          assert(fabs(range) < 1e20);
          updPrimRhs.multAdd(range, thesolver->vector(idx));
       }
       else if( breakpoints[i].src == COPVEC )
       {
+         assert(thesolver->rep() == SPxSolver::COLUMN);
          stat = ds.coStatus(idx);
          upper = thesolver->rhs(idx);
          lower = thesolver->lhs(idx);
@@ -147,16 +151,117 @@ void SPxBoundFlippingRT::flipAndUpdate(
                            << " lower: " << lower
                            << " upper: " << upper
                            << " bp.val: " << breakpoints[i].val
+                           << " URbound: " << thesolver->theURbound[idx]
+                           << " LRbound: " << thesolver->theLRbound[idx]
                            << std::endl; )
          assert(fabs(range) < 1e20);
          updPrimRhs.setValue(idx, updPrimRhs[idx] - range);
+      }
+      else if( breakpoints[i].src == FVEC )
+      {
+         assert(thesolver->rep() == SPxSolver::ROW);
+         SPxId baseId = thesolver->basis().baseId(idx);
+         int IdNumber;
+
+         if( baseId.isSPxRowId() )
+         {
+            IdNumber = thesolver->number(SPxRowId(baseId));
+            stat = ds.rowStatus(IdNumber);
+            upper = thesolver->rhs(IdNumber);
+            lower = thesolver->lhs(IdNumber);
+            switch( stat )
+            {
+               case SPxBasis::Desc::P_ON_UPPER :
+                  ds.rowStatus(IdNumber) = SPxBasis::Desc::P_ON_LOWER;
+                  range = upper - lower;
+                  assert(thesolver->theUBbound[idx] == infinity);
+                  thesolver->theUBbound[idx] = -thesolver->theLBbound[idx];
+                  thesolver->theLBbound[idx] = -infinity;
+                  break;
+               case SPxBasis::Desc::P_ON_LOWER :
+                  ds.rowStatus(IdNumber) = SPxBasis::Desc::P_ON_UPPER;
+                  range = lower - upper;
+                  assert(thesolver->theLBbound[idx] == -infinity);
+                  thesolver->theLBbound[idx] = -thesolver->theUBbound[idx];
+                  thesolver->theUBbound[idx] = infinity;
+                  break;
+               default :
+                  ++skipped;
+                  MSG_WARNING( spxout << "unexpected basis status: " << stat
+                                    << " index: " << idx
+                                    << " val: " << thesolver->fVec()[idx]
+                                    << " upd: " << thesolver->fVec().delta()[idx]
+                                    << " lower: " << lower
+                                    << " upper: " << upper
+                                    << " bp.val: " << breakpoints[i].val
+                                    << std::endl; )
+            }
+         }
+         else
+         {
+            assert(baseId.isSPxColId());
+            IdNumber = thesolver->number(SPxColId(baseId));
+            stat = ds.colStatus(IdNumber);
+            upper = thesolver->upper(IdNumber);
+            lower = thesolver->lower(IdNumber);
+
+            switch( stat )
+            {
+               case SPxBasis::Desc::P_ON_UPPER :
+                  ds.colStatus(IdNumber) = SPxBasis::Desc::P_ON_LOWER;
+                  range = upper - lower;
+                  assert(thesolver->theUBbound[idx] == infinity);
+                  thesolver->theUBbound[idx] = -thesolver->theLBbound[idx];
+                  thesolver->theLBbound[idx] = -infinity;
+                  break;
+               case SPxBasis::Desc::P_ON_LOWER :
+                  ds.colStatus(IdNumber) = SPxBasis::Desc::P_ON_UPPER;
+                  range = lower - upper;
+                  assert(thesolver->theLBbound[idx] == -infinity);
+                  thesolver->theLBbound[idx] = -thesolver->theUBbound[idx];
+                  thesolver->theUBbound[idx] = infinity;
+                  break;
+               default :
+                  ++skipped;
+                  MSG_WARNING( spxout << "FVEC unexpected status: " << stat
+                                    << " index: " << idx
+                                    << " val: " << thesolver->fVec()[idx]
+                                    << " upd: " << thesolver->fVec().delta()[idx]
+                                    << " lower: " << lower
+                                    << " upper: " << upper
+                                    << " bp.val: " << breakpoints[i].val
+                                    << std::endl; )
+            }
+         }
+         MSG_DEBUG( spxout << "basic row/col flipped from: " << stat
+                           << " index: " << idx
+                           << " val: " << thesolver->fVec()[idx]
+                           << " upd: " << thesolver->fVec().delta()[idx]
+                           << " lower: " << lower
+                           << " upper: " << upper
+                           << " bp.val: " << breakpoints[i].val
+                           << std::endl; )
+         assert(fabs(range) < 1e20);
+         assert(updPrimRhs[idx] == 0);
+         updPrimRhs.add(idx, range);
       }
    }
    nflips -= skipped;
    if( nflips > 0 )
    {
-      thesolver->primRhs -= updPrimRhs;
-      thesolver->setup4solve2(&updPrimVec, &updPrimRhs);
+      if(thesolver->rep() == SPxSolver::ROW)
+      {
+         assert(m_type == SPxSolver::ENTER);
+         (*thesolver->theCoPrhs) -= updPrimRhs;
+         thesolver->setup4coSolve2(&updPrimVec, &updPrimRhs);
+      }
+      else
+      {
+         assert(thesolver->rep() == SPxSolver::COLUMN);
+         assert(m_type == SPxSolver::LEAVE);
+         (*thesolver->theFrhs) -= updPrimRhs;
+         thesolver->setup4solve2(&updPrimVec, &updPrimRhs);
+      }
    }
 
    return;
@@ -172,7 +277,7 @@ void SPxBoundFlippingRT::collectBreakpointsMax(
    const Real*           vec,                /**< pointer to values of current vector */
    const Real*           upp,                /**< pointer to upper bound/rhs of current vector */
    const Real*           low,                /**< pointer to lower bound/lhs of current vector */
-   BreakpointSource      src                 /**< type of vector (pVec or coPvec)*/
+   BreakpointSource      src                 /**< type of vector (pVec, coPvec or fVec)*/
    )
 {
    Real minVal;
@@ -182,7 +287,6 @@ void SPxBoundFlippingRT::collectBreakpointsMax(
    minVal = ( nBp == 0 ) ? infinity : breakpoints[minIdx].val;
 
    last = idx + nnz;
-
    for( ; idx < last; ++idx )
    {
       int i = *idx;
@@ -246,7 +350,7 @@ void SPxBoundFlippingRT::collectBreakpointsMin(
    const Real*           vec,                /**< pointer to values of current vector */
    const Real*           upp,                /**< pointer to upper bound/rhs of current vector */
    const Real*           low,                /**< pointer to lower bound/lhs of current vector */
-   BreakpointSource      src                 /**< type of vector (pVec or coPvec)*/
+   BreakpointSource      src                 /**< type of vector (pVec, coPvec or fVec)*/
    )
 {
    Real minVal;
@@ -386,7 +490,53 @@ bool SPxBoundFlippingRT::getData(
    return true;
 }
 
-/** determine entering variable */
+/** get values for leaving index and perform shifts if necessary */
+bool SPxBoundFlippingRT::getData(
+   Real&                 val,
+   int&                  leaveIdx,
+   int                   idx,
+   Real                  stab,
+   Real                  degeneps,
+   const Real*           upd,
+   const Real*           vec,
+   const Real*           low,
+   const Real*           upp,
+   BreakpointSource      src,
+   Real                  max
+   )
+{
+   assert( src == FVEC );
+
+   Real x = upd[idx];
+   // skip breakpoint if it is too small
+   if( fabs(x) < stab )
+   {
+      return false;
+   }
+   leaveIdx = idx;
+   val = (max * x > 0) ? upp[idx] : low[idx];
+   val = (val - vec[idx]) / x;
+   if( upp[idx] == low[idx] )
+   {
+      val = 0.0;
+      if( vec[idx] > upp[idx] )
+         thesolver->theShift += vec[idx] - upp[idx];
+      else
+         thesolver->theShift += low[idx] - vec[idx];
+      thesolver->ubBound()[idx] = thesolver->lbBound()[idx] = vec[idx];
+   }
+   else if( (max > 0 && val < -degeneps) || (max < 0 && val > degeneps) )
+   {
+      val = 0.0;
+      if( max * x > 0 )
+         thesolver->shiftUBbound(idx, vec[idx]);
+      else
+         thesolver->shiftLBbound(idx, vec[idx]);
+   }
+   return true;
+}
+
+/** determine entering row/column */
 SPxId SPxBoundFlippingRT::selectEnter(
    Real&                 val,
    int                   leaveIdx
@@ -398,12 +548,12 @@ SPxId SPxBoundFlippingRT::selectEnter(
    // reset the history and try again to do some long steps
    if( thesolver->leaveCount % LONGSTEP_FREQ == 0 )
    {
-      MSG_DEBUG( spxout << "ILBFRT06 resetting long step history" << std::endl; )
+      MSG_DEBUG( spxout << "DLBFRT06 resetting long step history" << std::endl; )
       flipPotential = 1;
    }
    if( !enableLongsteps || thesolver->rep() == SPxSolver::ROW || flipPotential <= 0 )
    {
-      MSG_DEBUG( spxout << "ILBFRT07 switching to fast ratio test" << std::endl; )
+      MSG_DEBUG( spxout << "DLBFRT07 switching to fast ratio test" << std::endl; )
       return SPxFastRT::selectEnter(val, leaveIdx);
    }
    const Real*  pvec = thesolver->pVec().get_const_ptr();
@@ -468,7 +618,10 @@ SPxId SPxBoundFlippingRT::selectEnter(
    }
 
    if( nBp == 0 )
+   {
+      val = max;
       return enterId;
+   }
 
    assert(minIdx >= 0);
 
@@ -477,7 +630,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
    breakpoints[minIdx] = breakpoints[0];
    breakpoints[0] = tmp;
 
-   // compute initial slope
+   // get initial slope
    slope = fabs(thesolver->fTest()[leaveIdx]);
    if( slope == 0 )
    {
@@ -647,6 +800,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
             foundStable = getData(val, enterId, idx, stab, degeneps, cupd, cvec, lcb, ucb, COPVEC, max);
       }
    }
+
    else
    {
       // scan passed breakpoints from back to front and stop as soon as a good one is found
@@ -689,8 +843,6 @@ SPxId SPxBoundFlippingRT::selectEnter(
                            << thesolver->basis().iteration()
                            << " no valid enterId found - breaking..."
                            << std::endl; )
-         assert(!enterId.isValid());
-         flipPotential = 0;
          return enterId;
       }
    }
@@ -726,12 +878,290 @@ SPxId SPxBoundFlippingRT::selectEnter(
    return enterId;
 }
 
+/** determine leaving row/column */
 int SPxBoundFlippingRT::selectLeave(
-   Real&                 max,
-   SPxId                 enterId
+   Real&                 val,
+   Real                  enterTest
    )
 {
-   return SPxFastRT::selectLeave(max, enterId);
+   assert( m_type == SPxSolver::ENTER );
+   assert(thesolver->boundflips == 0);
+
+   // reset the history and try again to do some long steps
+   if( thesolver->enterCount % LONGSTEP_FREQ == 0 )
+   {
+      MSG_DEBUG( spxout << "DEBFRT06 resetting long step history" << std::endl; )
+      flipPotential = 1;
+   }
+   if( !enableLongsteps || thesolver->rep() == SPxSolver::COLUMN || flipPotential <= 0 )
+   {
+      MSG_DEBUG( spxout << "DEBFRT07 switching to fast ratio test" << std::endl; )
+      return SPxFastRT::selectLeave(val, enterTest);
+   }
+   const Real*  vec = thesolver->fVec().get_const_ptr();         /**< pointer to values of current vector */
+   const Real*  upd = thesolver->fVec().delta().values();        /**< pointer to update values of current vector */
+   const int*   idx = thesolver->fVec().delta().indexMem();      /**< pointer to indices of current vector */
+   int          updnnz = thesolver->fVec().delta().size();       /**< number of nonzeros in update vector */
+   const Real*  lb  = thesolver->lbBound().get_const_ptr();      /**< pointer to lower bound/lhs of current vector */
+   const Real*  ub  = thesolver->ubBound().get_const_ptr();      /**< pointer to upper bound/rhs of current vector */
+
+   resetTols();
+
+   Real max;
+
+   // index in breakpoint array of minimal value (i.e. choice of normal RT)
+   int minIdx;
+
+   // temporary breakpoint data structure to make swaps possible
+   Breakpoint tmp;
+
+   // most stable pivot value in candidate set
+   Real moststable;
+
+   // initialize invalid leaving index
+   int leaveIdx = -1;
+
+   // slope of objective function improvement
+   Real slope;
+
+   // number of found breakpoints
+   int nBp;
+
+   // number of passed breakpoints
+   int npassedBp;
+
+   Real degeneps;
+   Real stab;
+   bool instable;
+
+   max = val;
+   val = 0.0;
+   moststable = 0.0;
+   nBp = 0;
+   minIdx = -1;
+
+   assert(thesolver->fVec().delta().isSetup());
+
+   // get breakpoints and and determine the index of the minimal value
+   if( max > 0 )
+   {
+      collectBreakpointsMax(nBp, minIdx, idx, updnnz, upd, vec, ub, lb, FVEC);
+   }
+   else
+   {
+      collectBreakpointsMin(nBp, minIdx, idx, updnnz, upd, vec, ub, lb, FVEC);
+   }
+
+   // return -1 if no BP was found
+   if( nBp == 0 )
+   {
+      val = max;
+      return leaveIdx;
+   }
+
+   assert(minIdx >= 0);
+
+   // swap smallest breakpoint to the front to skip the sorting phase if no bound flip is possible
+   tmp = breakpoints[minIdx];
+   breakpoints[minIdx] = breakpoints[0];
+   breakpoints[0] = tmp;
+
+   // get initial slope
+   slope = fabs(enterTest);
+   if( slope == 0 )
+   {
+      // this may only happen if SoPlex decides to make an instable pivot
+      assert(thesolver->instableEnterId.isValid());
+      // restore original slope
+      slope = thesolver->instableEnterVal;
+   }
+
+   // set up structures for the quicksort implementation
+   BreakpointCompare compare;
+   compare.entry = breakpoints.get_const_ptr();
+
+   // pointer to end of sorted part of breakpoints
+   int sorted = 0;
+   // minimum number of entries that are supposed to be sorted by partial sort
+   int sortsize = 4;
+
+   // get all skipable breakpoints
+   for( npassedBp = 0; npassedBp < nBp && slope >= 0; ++npassedBp)
+   {
+      // sort breakpoints only partially to save time
+      if( npassedBp > sorted )
+      {
+         sorted = SPxQuicksortPart(breakpoints.get_ptr(), compare, sorted + 1, nBp, sortsize);
+      }
+      assert( breakpoints[npassedBp].src == FVEC );
+      int idx = breakpoints[npassedBp].idx;
+      // compute new slope
+      Real upper;
+      Real lower;
+      Real absupd = fabs(upd[idx]);
+      SPxId baseId = thesolver->baseId(idx);
+      int i = thesolver->number(baseId);
+      if( baseId.isSPxColId() )
+      {
+         upper = thesolver->upper(i);
+         lower = thesolver->lower(i);
+      }
+      else
+      {
+         assert(baseId.isSPxRowId());
+         upper = thesolver->rhs(i);
+         lower = thesolver->lhs(i);
+      }
+
+      slope -= (upper * absupd) - (lower * absupd);
+      // get most stable pivot
+      if( absupd > moststable )
+         moststable = absupd;
+   }
+   --npassedBp;
+   assert(npassedBp >= 0);
+
+   // check for unboundedness/infeasibility
+   if( slope > delta && npassedBp >= nBp - 1 )
+   {
+      MSG_DEBUG( spxout << "DEBFRT02 " << thesolver->basis().iteration()
+                        << ": unboundedness in ratio test" << std::endl; )
+      flipPotential -= 0.5;
+      val = max;
+      return SPxFastRT::selectLeave(val, enterTest);
+   }
+
+   MSG_DEBUG( spxout << "DEBFRT01 "
+                     << thesolver->basis().iteration()
+                     << ": number of flip candidates: "
+                     << npassedBp
+                     << std::endl; )
+
+   // try to get a more stable pivot by looking at those with similar step length
+   int stableBp;              // index to walk over additional breakpoints (after slope change)
+   int bestBp = -1;           // breakpoints index with best possible stability
+   Real bestDelta = breakpoints[npassedBp].val;  // best step length (after bound flips)
+
+   for( stableBp = npassedBp + 1; stableBp < nBp; ++stableBp )
+   {
+      Real stableDelta;
+      // get next breakpoints in increasing order
+      if( stableBp > sorted )
+      {
+         sorted = SPxQuicksortPart(breakpoints.get_ptr(), compare, sorted + 1, nBp, sortsize);
+      }
+      int idx = breakpoints[stableBp].idx;
+      assert( breakpoints[stableBp].src == FVEC );
+      Real x = upd[idx];
+      if( fabs(x) > moststable )
+      {
+         stableDelta = (x > 0.0) ? ub[idx] : lb[idx];
+         stableDelta = (stableDelta - vec[idx]) / x;
+
+         if( stableDelta <= bestDelta)
+         {
+            moststable = fabs(x);
+            bestBp = stableBp;
+         }
+      }
+      // stop searching if the step length is too big
+      else if( stableDelta > delta + bestDelta )
+         break;
+   }
+
+   degeneps = fastDelta / moststable;  /* as in SPxFastRT */
+   // get stability requirements
+   instable = thesolver->instableEnter;
+   assert(!instable || thesolver->instableEnterId.isValid());
+   stab = instable ? LOWSTAB : SPxFastRT::minStability(moststable);
+
+   bool foundStable = false;
+
+   if( bestBp >= 0 )
+   {
+      // found a more stable pivot
+      if( moststable > stab )
+      {
+         // stability requirements are satisfied
+         int idx = breakpoints[bestBp].idx;
+         assert(idx >= 0);
+         foundStable = getData(val, leaveIdx, idx, moststable, degeneps, upd, vec, lb, ub, FVEC, max);
+      }
+   }
+
+   else
+   {
+      // scan passed breakpoints from back to front and stop as soon as a good one is found
+      while( !foundStable && npassedBp >= 0 )
+      {
+         int idx = breakpoints[npassedBp].idx;
+
+         // only look for non-basic variables
+         if( idx >= 0 )
+         {
+            foundStable = getData(val, leaveIdx, idx, moststable, degeneps, upd, vec, lb, ub, FVEC, max);
+         }
+         --npassedBp;
+      }
+      ++npassedBp;
+   }
+
+   if( !foundStable )
+   {
+      assert(leaveIdx < 0);
+      if( relax_count < MAX_RELAX_COUNT )
+      {
+         MSG_DEBUG( spxout << "DEBFRT04 "
+                           << thesolver->basis().iteration()
+                           << ": no valid leaveIdx found - relaxing..."
+                           << std::endl; )
+         relax();
+         ++relax_count;
+         // restore original value
+         val = max;
+         // try again with relaxed delta
+         return SPxBoundFlippingRT::selectLeave(val, enterTest);
+      }
+      else
+      {
+         MSG_DEBUG( spxout << "DEBFRT05 "
+                           << thesolver->basis().iteration()
+                           << " no valid leaveIdx found - breaking..."
+                           << std::endl; )
+         return leaveIdx;
+      }
+   }
+   else
+   {
+      relax_count = 0;
+      tighten();
+   }
+
+   // flip bounds of skipped breakpoints only if a nondegenerate step is to be performed
+   if( npassedBp > 0 && fabs(breakpoints[npassedBp].val) > fastDelta )
+   {
+      flipAndUpdate(npassedBp);
+      thesolver->boundflips = npassedBp;
+      if( npassedBp >= 10 )
+         flipPotential = 1;
+      else
+         flipPotential -= 0.05;
+   }
+   else
+   {
+      thesolver->boundflips = 0;
+      flipPotential -= 0.1;
+   }
+
+   MSG_DEBUG( spxout << "DEBFRT06 "
+                     << thesolver->basis().iteration()
+                     << ": selected Index: "
+                     << leaveIdx
+                     << " number of candidates: "
+                     << nBp
+                     << std::endl; )
+
+   return leaveIdx;
 }
 
 

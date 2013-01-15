@@ -162,6 +162,9 @@ public:
                            Vector& two,
                            const SVector& b,
                            SSVector& rhs2) /* const */ = 0;
+   /// solves \f$x^TA=b^T\f$, \f$y^TA=d^T\f$ and \f$z^TA=e^T\f$
+   virtual void solveLeft (SSVector& x, Vector& y, Vector& z,
+                           const SVector& b, SSVector& d, SSVector& e) = 0;
    //@}
 
 

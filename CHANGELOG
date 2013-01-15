@@ -6,6 +6,7 @@ Developer version
 
 code quality & new features:
 - new/delete calls are modified to channel memory (de)allocation through spx_alloc calls (-> "placement new")
+- implemented bound flipping ratio test for row representation
 
 fixed bugs:
 - allow instable enter pivot when no other is available; only after a fresh factorization

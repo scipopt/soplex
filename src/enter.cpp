@@ -955,7 +955,7 @@ bool SPxSolver::enter(SPxId& enterId)
 
    Real leaveVal = -enterMax;
 
-   int leaveIdx = theratiotester->selectLeave(leaveVal, enterId);
+   int leaveIdx = theratiotester->selectLeave(leaveVal, enterTest);
 
    /* in row representation, fixed columns and rows should not leave the basis */
    assert(leaveIdx < 0 || !baseId(leaveIdx).isSPxColId() || desc().colStatus(number(SPxColId(baseId(leaveIdx)))) != SPxBasis::Desc::P_FIXED);
@@ -980,10 +980,53 @@ bool SPxSolver::enter(SPxId& enterId)
          m_numCycle /= 2;
 
       // setup for updating the copricing vector
-      if (coSolveVector2)
+      if (coSolveVector3 && coSolveVector2 )
+      {
+         assert(coSolveVector2->isConsistent());
+         assert(coSolveVector2rhs->isSetup());
+         assert(coSolveVector3->isConsistent());
+         assert(coSolveVector3rhs->isSetup());
+         assert(boundflips > 0);
+         SPxBasis::coSolve(theCoPvec->delta(), *coSolveVector2, *coSolveVector3
+                        , unitVecs[leaveIdx], *coSolveVector2rhs, *coSolveVector3rhs);
+         (*theCoPvec) -= (*coSolveVector3);
+      }
+      else if (coSolveVector3)
+      {
+         assert(coSolveVector3->isConsistent());
+         assert(coSolveVector3rhs->isSetup());
+         assert(boundflips > 0);
+         SPxBasis::coSolve(theCoPvec->delta(), *coSolveVector3, unitVecs[leaveIdx], *coSolveVector3rhs);
+         (*theCoPvec) -= (*coSolveVector3);
+      }
+      else if (coSolveVector2)
          SPxBasis::coSolve(theCoPvec->delta(), *coSolveVector2, unitVecs[leaveIdx], *coSolveVector2rhs);
       else
          SPxBasis::coSolve(theCoPvec->delta(), unitVecs[leaveIdx]);
+
+      if( boundflips > 0 )
+      {
+#if 1
+         for( int i = coSolveVector3->dim()-1; i >= 0; --i)
+         {
+            if( fabs((*coSolveVector3)[i]) > epsilon() )
+               (*thePvec).multAdd(-(*coSolveVector3)[i],(*thecovectors)[i]);
+         }
+#else
+         // this yields the same result but may be more expensive to compute
+         computePvec();
+#endif
+         // we need to update enterPric in case it was changed by bound flips
+         if( enterId.isSPxColId() )
+            enterPric = (*theCoPvec)[number(SPxColId(enterId))];
+         else
+            enterPric = (*thePvec)[number(SPxRowId(enterId))];
+         MSG_INFO3( spxout << "IEBFRT02 "
+         << "breakpoints passed / bounds flipped = " << boundflips
+         << std::endl; )
+         totalboundflips += boundflips;
+         boundflips = 0;
+      }
 
       (*theCoPrhs)[leaveIdx] = enterRO;
       theCoPvec->value() = (enterRO - enterPric) / theFvec->delta()[leaveIdx];
@@ -1023,7 +1066,6 @@ bool SPxSolver::enter(SPxId& enterId)
       updateCoTest();
       if (pricing() == FULL)
          updateTest();
-
 
       // update feasibility vectors
       theFvec->value() = leaveVal;

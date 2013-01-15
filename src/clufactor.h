@@ -219,7 +219,6 @@ private:
       as zero.
    */
    //@{
-   // From solve.cpp
    ///
    void solveUright(Real* wrk, Real* vec) const;
    ///
@@ -253,7 +252,6 @@ private:
    ///
    void solveUpdateLeft2(Real* vec1, Real* vec2);
 
-   // From vsolve.cpp 
    ///
    int vSolveLright(Real* vec, int* ridx, int rn, Real eps);
    ///
@@ -288,16 +286,14 @@ private:
    void solveLleftNoNZ(Real* vec);
    ///
    int solveUpdateLeft(Real eps, Real* vec, int* nonz, int n);
-   
-   // from forest.cpp
+
    ///
    void forestPackColumns();
    ///
    void forestMinColMem(int size);
    ///
    void forestReMaxCol(int col, int len);
-   
-   // from factor.cpp
+
    ///
    void initPerm();
    ///
@@ -376,7 +372,6 @@ protected:
    //----------------------------------------
    /**@name Solver methods */
    //@{
-   // From solve.cpp 
    ///
    void solveLright(Real* vec);
    ///
@@ -396,7 +391,6 @@ protected:
    ///
    int solveLeft2(Real* vec1, int* nonz, Real* vec2, Real eps, Real* rhs1, Real* rhs2);
 
-   // From vsolve.cpp: Very sparse solution methods.
    ///
    int vSolveRight4update(Real eps, 
       Real* vec, int* idx,               /* result       */
@@ -435,16 +429,20 @@ protected:
       Real* rhs, int* ridx, int rn,            /* rhs    */
       Real* vec2,                              /* result2 */
       Real* rhs2, int* ridx2, int rn2);        /* rhs2    */
+   ///
+   int vSolveLeft3(Real eps,
+                   Real* vec, int* idx,                     /* result */
+                   Real* rhs, int* ridx, int rn,            /* rhs    */
+                   Real* vec2,                              /* result2 */
+                   Real* rhs2, int* ridx2, int rn2,         /* rhs2    */
+                   Real* vec3,                              /* result3 */
+                   Real* rhs3, int* ridx3, int rn3);        /* rhs3    */
 
-   // from forest.cpp
    void forestUpdate(int col, Real* work, int num, int *nonz);
 
-   // from update.cpp
    void update(int p_col, Real* p_work, const int* p_idx, int num);
    void updateNoClear(int p_col, const Real* p_work, const int* p_idx, int num);
 
-
-   // from factor.cpp
    ///
    void factor(const SVector** vec,   ///< Array of column vector pointers  
                Real threshold,    ///< pivoting threshold                

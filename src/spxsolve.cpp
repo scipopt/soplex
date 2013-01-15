@@ -185,6 +185,7 @@ SPxSolver::Status SPxSolver::fpsolve()
       solveVector2 = 0;
       solveVector3 = 0;
       coSolveVector2 = 0;
+      coSolveVector3 = 0;
 
       try
       {

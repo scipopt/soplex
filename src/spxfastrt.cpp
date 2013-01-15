@@ -250,7 +250,6 @@ int SPxFastRT::maxDelta(
 
    val = max;
    maxabs = mabs;
-
    return sel;
 }
 
@@ -854,7 +853,7 @@ bool SPxFastRT::minReLeave(Real& sel, int leave, Real maxabs)
    return false;
 }
 
-int SPxFastRT::selectLeave(Real& val, SPxId)
+int SPxFastRT::selectLeave(Real& val, Real)
 {
    Real maxabs, max, sel;
    int leave = -1;

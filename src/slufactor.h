@@ -181,6 +181,9 @@ public:
    void solveLeft(SSVector& x, const SVector& b);
    /// Solves \f$Ax=b\f$ and \f$Ay=d\f$.
    void solveLeft(SSVector& x, Vector& y, const SVector& b, SSVector& d);
+   /// Solves \f$Ax=b\f$, \f$Ay=d\f$ and \f$Az=e\f$.
+   void solveLeft(SSVector& x, Vector& y, Vector& z,
+                  const SVector& b, SSVector& d, SSVector& e);
    ///
    Status change(int idx, const SVector& subst, const SSVector* eta = 0);
    //@}

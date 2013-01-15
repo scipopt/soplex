@@ -235,6 +235,8 @@ private:
    SSVector*      solveVector3rhs;   ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
    Vector*        coSolveVector2;    ///< when 2 systems are to solve at a time
    SSVector*      coSolveVector2rhs; ///< when 2 systems are to solve at a time
+   Vector*        coSolveVector3;    ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
+   SSVector*      coSolveVector3rhs; ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
 
    bool           freePricer;        ///< true iff thepricer should be freed inside of object
    bool           freeRatioTester;   ///< true iff theratiotester should be freed inside of object
@@ -1499,6 +1501,19 @@ public:
       coSolveVector2    = p_y;
       coSolveVector2rhs = p_rhs;
    }
+   /// Setup vectors to be cosolved within Simplex loop.
+   /** Load a second vector \p z to be #coSolve%d with the basis matrix during
+    *  the #ENTER Simplex. The system will be solved after #SPxSolver%'s
+    *  call to SPxRatioTester. The system will be solved along
+    *  with two other systems.
+    */
+   void setup4coSolve2(Vector* p_z, SSVector* p_rhs)
+   {
+      assert(type() == ENTER);
+      coSolveVector3    = p_z;
+      coSolveVector3rhs = p_rhs;
+   }
+
    /// maximal infeasibility of basis
    /** This method is called before concluding optimality. Since it is
     *  possible that some stable implementation of class

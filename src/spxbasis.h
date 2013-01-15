@@ -652,6 +652,14 @@ public:
          factorize();
       factor->solveLeft(x, y, rhsx, rhsy);
    }
+   /// solves three systems in one call. May be improved by using just one pass through the basis.
+   void coSolve(SSVector& x, Vector& y, Vector& z, const SVector& rhsx, SSVector& rhsy, SSVector& rhsz)
+   {
+      METHOD( "SPxBasis::coSolve()" );
+      if (!factorized)
+         factorize();
+      factor->solveLeft(x, y, z, rhsx, rhsy, rhsz);
+   }
    //@}
 
 

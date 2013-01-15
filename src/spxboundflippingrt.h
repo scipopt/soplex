@@ -16,6 +16,7 @@
 /**@file   spxboundflippingrt.h
  * @brief  Bound flipping ratio test (long step dual) for SoPlex.
  * @author Matthias Miltenberger
+ * @author Eva Ramlow
  */
 #ifndef _SPXBOUNDFLIPPINGRT_H_
 #define _SPXBOUNDFLIPPINGRT_H_
@@ -146,6 +147,21 @@ private:
       Real               max
       );
 
+   /** get values for leaving index and perform shifts if necessary */
+   bool getData(
+      Real&              val,
+      int&             leaveIdx,
+      int                idx,
+      Real               stab,
+      Real               degeneps,
+      const Real*        upd,
+      const Real*        vec,
+      const Real*        low,
+      const Real*        upp,
+      BreakpointSource   src,
+      Real               max
+      );
+
    /** perform necessary bound flips to restore dual feasibility */
    void flipAndUpdate(
       int&               usedBp              /**< number of bounds that should be flipped */
@@ -218,7 +234,7 @@ public:
    ///
    virtual int selectLeave(
       Real&              val,
-      SPxId              enterId
+      Real               enterTest
       );
    ///
    virtual SPxId selectEnter(

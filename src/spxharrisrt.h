@@ -111,7 +111,7 @@ public:
    /**@name Leave / enter */
    //@{
    ///
-   virtual int selectLeave(Real& val, SPxId);
+   virtual int selectLeave(Real& val, Real);
    ///
    virtual SPxId selectEnter(Real& val, int);
    //@}

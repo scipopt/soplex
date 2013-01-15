@@ -6146,6 +6146,43 @@ int CLUFactor::vSolveLeft2( Real eps,
    return rn;
 }
 
+int CLUFactor::vSolveLeft3( Real eps,
+                            Real* vec, int* idx,                      /* result */
+                            Real* rhs, int* ridx, int rn,             /* rhs    */
+                            Real* vec2,                               /* result2 */
+                            Real* rhs2, int* ridx2, int rn2,          /* rhs2    */
+                            Real* vec3,                               /* result3 */
+                            Real* rhs3, int* ridx3, int rn3 )         /* rhs3    */
+{
+   METHOD( "CLUFactor::vSolveLeft2()" );
+
+   if ( !l.updateType )          /* no Forest-Tomlin Updates */
+   {
+      rn = solveUpdateLeft( eps, rhs, ridx, rn );
+      rn = solveUleft( eps, vec, idx, rhs, ridx, rn );
+      rn2 = solveUpdateLeft( eps, rhs2, ridx2, rn2 );
+      solveUleftNoNZ( eps, vec2, rhs2, ridx2, rn2 );
+      rn3 = solveUpdateLeft( eps, rhs3, ridx3, rn3 );
+      solveUleftNoNZ( eps, vec3, rhs3, ridx3, rn3 );
+   }
+   else
+   {
+      rn = solveUleft( eps, vec, idx, rhs, ridx, rn );
+      rn = solveLleftForest( eps, vec, idx, rn );
+      solveUleftNoNZ( eps, vec2, rhs2, ridx2, rn2 );
+      solveLleftForestNoNZ( vec2 );
+      solveUleftNoNZ( eps, vec3, rhs3, ridx3, rn3 );
+      solveLleftForestNoNZ( vec3 );
+   }
+
+   rn = solveLleft( eps, vec, idx, rn );
+
+   solveLleftNoNZ( vec2 );
+   solveLleftNoNZ( vec3 );
+
+   return rn;
+}
+
 void CLUFactor::vSolveLeftNoNZ( Real eps,
                                 Real* vec2,                            /* result2 */
                                 Real* rhs2, int* ridx2, int rn2 )    /* rhs2    */

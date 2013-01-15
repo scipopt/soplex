@@ -215,7 +215,7 @@ public:
    ///
    virtual void load(SPxSolver* solver);
    ///
-   virtual int selectLeave(Real& val, SPxId);
+   virtual int selectLeave(Real& val, Real);
    ///
    virtual SPxId selectEnter(Real& val, int);
    ///

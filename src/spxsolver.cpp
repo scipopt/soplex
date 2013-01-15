@@ -498,6 +498,7 @@ void SPxSolver::clearUpdateVecs(void)
    solveVector2 = 0;
    solveVector3 = 0;
    coSolveVector2 = 0;
+   coSolveVector3 = 0;
 }
 
 /*
@@ -861,6 +862,7 @@ SPxSolver::SPxSolver(
    , solveVector2 (0)
    , solveVector3 (0)
    , coSolveVector2(0)
+   , coSolveVector3(0)
    , freePricer (false)
    , freeRatioTester (false)
    , freeStarter (false)
@@ -1106,6 +1108,7 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , solveVector2 (0)
    , solveVector3 (0)
    , coSolveVector2(0)
+   , coSolveVector3(0)
    , instableLeaveNum(base.instableLeaveNum)
    , instableLeave(base.instableLeave)
    , instableEnterId(base.instableEnterId)
