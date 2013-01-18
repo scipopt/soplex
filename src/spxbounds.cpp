@@ -322,8 +322,9 @@ void SPxSolver::testBounds() const
    {
       Real viol_max = (1 + iterCount) * entertol();
       int nlinesprinted = 0;
+      int m = dim();
 
-      for(int i = 0; i < dim(); ++i )
+      for(int i = 0; i < m; ++i )
       {
          // Minor bound violations happen frequently, so print these
          // warnings only with verbose level INFO2 and higher.
@@ -354,8 +355,10 @@ void SPxSolver::testBounds() const
    {
       Real viol_max = (1 + iterCount) * leavetol();
       int nlinesprinted = 0;
+      int m = dim();
+      int n = coDim();
 
-      for(int i = 0; i < dim(); ++i )
+      for(int i = 0; i < m; ++i )
       {
          if ((*theCoPvec)[i] > (*theCoUbound)[i] + viol_max) // && (*theCoUbound)[i] != (*theCoLbound)[i])
          {
@@ -382,7 +385,7 @@ void SPxSolver::testBounds() const
       }
 
       nlinesprinted = 0;
-      for(int i = 0; i < coDim(); ++i )
+      for(int i = 0; i < n; ++i )
       {
          if ((*thePvec)[i] > (*theUbound)[i] + viol_max)  // &&  (*theUbound)[i] != (*theLbound)[i])
          {

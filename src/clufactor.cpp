@@ -901,8 +901,10 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
        */
       j = rorig[c];
 
-      for ( i = c; i < r; ++i )
-         rorig[i] = rorig[i + 1];
+      // memmove is more efficient than a for loop
+      // for ( i = c; i < r; ++i )
+      //    rorig[i] = rorig[i + 1];
+      memmove(&rorig[c], &rorig[c + 1], (r - c) * sizeof(int));
 
       rorig[r] = j;
 
@@ -911,8 +913,10 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
 
       j = corig[c];
 
-      for ( i = c; i < r; ++i )
-         corig[i] = corig[i + 1];
+      // memmove is more efficient than a for loop
+      // for ( i = c; i < r; ++i )
+      //    corig[i] = corig[i + 1];
+      memmove(&corig[c], &corig[c + 1], (r - c) * sizeof(int));
 
       corig[r] = j;
 
