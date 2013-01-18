@@ -650,7 +650,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
    int sortsize = 4;
 
    // get all skipable breakpoints
-   for( npassedBp = 0; npassedBp < nBp && slope >= 0; ++npassedBp)
+   for( npassedBp = 0; npassedBp < nBp && slope > 0; ++npassedBp)
    {
       // sort breakpoints only partially to save time
       if( npassedBp > sorted )
@@ -986,7 +986,7 @@ int SPxBoundFlippingRT::selectLeave(
    int sortsize = 4;
 
    // get all skipable breakpoints
-   for( npassedBp = 0; npassedBp < nBp && slope >= 0; ++npassedBp)
+   for( npassedBp = 0; npassedBp < nBp && slope > 0; ++npassedBp)
    {
       // sort breakpoints only partially to save time
       if( npassedBp > sorted )
