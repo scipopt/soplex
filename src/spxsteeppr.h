@@ -83,8 +83,6 @@ private:
    DataArray < Real > leavePref;
    /// setup type.
    Setup setup;
-   /// accuracy for computing steepest directions.
-   Real accuracy;
    /// index at which partial pricing should start
    int startpricing;
 
@@ -109,7 +107,6 @@ public:
       : SPxPricer(name)
       , workRhs (0, 1e-16)
       , setup (mode)
-      , accuracy(1e-4)
       , startpricing(0)
    {
       assert(isConsistent());
@@ -127,7 +124,6 @@ public:
       , pref(old.pref)
       , leavePref(old.leavePref)
       , setup(old.setup)
-      , accuracy(old.accuracy)
       , startpricing(old.startpricing)
    {
       assert(isConsistent());
@@ -148,7 +144,6 @@ public:
          pref = rhs.pref;
          leavePref = rhs.leavePref;
          setup = rhs.setup;
-         accuracy = rhs.accuracy;
          startpricing = rhs.startpricing;
 
          assert(isConsistent());

@@ -309,7 +309,6 @@ int SPxSteepPR::selectLeave()
       assert( thesolver->coPvec().delta().isConsistent() );
       thesolver->basis().coSolve(thesolver->coPvec().delta(),
                                  thesolver->unitVector(lastIdx));
-      workRhs.setEpsilon(accuracy);
       assert( thesolver->coPvec().delta().isConsistent() );
       workRhs.setup_and_assign(thesolver->coPvec().delta());
       thesolver->setup4solve(&workVec, &workRhs);
@@ -406,7 +405,6 @@ TERMINATE:
       assert( thesolver->coPvec().delta().isConsistent() );
       thesolver->basis().coSolve(thesolver->coPvec().delta(),
                                  thesolver->unitVector(lastIdx));
-      workRhs.setEpsilon(accuracy);
       assert( thesolver->coPvec().delta().isConsistent() );
       workRhs.setup_and_assign(thesolver->coPvec().delta());
       thesolver->setup4solve(&workVec, &workRhs);
@@ -466,7 +464,6 @@ int SPxSteepPR::selectLeaveSparse()
       assert( thesolver->coPvec().delta().isConsistent() );
       thesolver->basis().coSolve(thesolver->coPvec().delta(),
                                  thesolver->unitVector(lastIdx));
-      workRhs.setEpsilon(accuracy);
       assert( thesolver->coPvec().delta().isConsistent() );
       workRhs.setup_and_assign(thesolver->coPvec().delta());
       thesolver->setup4solve(&workVec, &workRhs);
@@ -555,8 +552,6 @@ SPxId SPxSteepPR::selectEnter()
 
       thesolver->basis().solve4update(delta, thesolver->vector(enterId));
 
-      // workRhs.epsilon = 0.1*accuracy;
-      workRhs.setEpsilon(accuracy);
       workRhs.setup_and_assign(delta);
       pi_p = 1 + delta.length2();
 
