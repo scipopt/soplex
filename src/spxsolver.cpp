@@ -377,6 +377,10 @@ void SPxSolver::init()
       theratiotester->setDelta(leavetol());
    }
 
+   // we better factorize explicitly before solving
+   if( !factorized )
+      SPxBasis::factorize();
+
    SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
    computePvec();
    computeFrhs();
@@ -512,10 +516,17 @@ void SPxSolver::factorize()
    MSG_INFO1( spxout << "ISOLVE01 " 
                      << "iteration = "    << std::setw(8) << basis().iteration() 
                      << "\tlastUpdate = " << std::setw(4) << basis().lastUpdate()
-                     << "\tvalue = "      << (isInitialized() ? value() : 0.0) 
+                     << "\tvalue = "      << (initialized ? value() : 0.0)
                      << std::endl; )
 
    SPxBasis::factorize();
+
+   if( !initialized )
+   {
+      init();  // not sure if init() is neccessary here
+      // we must not go on here because not all vectors (e.g. fVec) may be set up correctly
+      return;
+   }
 
    if (SPxBasis::status() >= SPxBasis::REGULAR)
    {

@@ -571,7 +571,7 @@ public:
    {
       METHOD( "SPxBasis::solve()" );
       if (!factorized) 
-         factorize();
+         factorize();  // this calls SPxSolver::factorize()
       factor->solveRight(x, rhs);
    }
    ///
@@ -579,7 +579,7 @@ public:
    {
       METHOD( "SPxBasis::solve()" );
       if (!factorized) 
-         factorize();
+         factorize();  // this calls SPxSolver::factorize()
       factor->solveRight(x, rhs);
    }
    /// solves linear system with basis matrix.
@@ -596,7 +596,7 @@ public:
    {
       METHOD( "SPxBasis::solve4update()" );
       if (!factorized) 
-         factorize();
+         factorize();  // this calls SPxSolver::factorize()
       factor->solveRight4update(x, rhs);
    }
    /// solves two systems in one call.
@@ -604,7 +604,7 @@ public:
    {
       METHOD( "SPxBasis::solve4update()" );
       if (!factorized) 
-         factorize();
+         factorize();  // this calls SPxSolver::factorize()
       factor->solve2right4update(x, y, rhsx, rhsy);
    }
    /// solves three systems in one call.
@@ -613,7 +613,7 @@ public:
    {
       METHOD( "SPxBasis::solve4update()" );
       if (!factorized) 
-         factorize();
+         factorize();  // this calls SPxSolver::factorize()
       assert(rhsy.isSetup());
       assert(rhsy2.isSetup());
       factor->solve3right4update(x, y, y2, rhsx, rhsy, rhsy2);
@@ -633,7 +633,7 @@ public:
    {
       METHOD( "SPxBasis::coSolve()" );
       if (!factorized) 
-         factorize();
+         factorize();  // this calls SPxSolver::factorize()
       factor->solveLeft(x, rhs);
    }
    ///
@@ -641,7 +641,7 @@ public:
    {
       METHOD( "SPxBasis::coSolve()" );
       if (!factorized) 
-         factorize();
+         factorize();  // this calls SPxSolver::factorize()
       factor->solveLeft(x, rhs);
    }
    /// solves two systems in one call.
@@ -649,7 +649,7 @@ public:
    {
       METHOD( "SPxBasis::coSolve()" );
       if (!factorized) 
-         factorize();
+         factorize();  // this calls SPxSolver::factorize()
       factor->solveLeft(x, y, rhsx, rhsy);
    }
    /// solves three systems in one call. May be improved by using just one pass through the basis.
@@ -657,7 +657,7 @@ public:
    {
       METHOD( "SPxBasis::coSolve()" );
       if (!factorized)
-         factorize();
+         factorize();  // this calls SPxSolver::factorize()
       factor->solveLeft(x, y, z, rhsx, rhsy, rhsz);
    }
    //@}
