@@ -12,6 +12,7 @@ fixed bugs:
 - allow instable enter pivot when no other is available; only after a fresh factorization
 - ensure that problem is not perturbed when concluding optimality
 - fixed numerical bug in unsimplification of doubleton equations
+- (co)solve calls in SPxBasis do not trigger factorization() of SPxSolver but of SPxBasis
 
 
 04 Jan 2013 - Release 1.7.1
