@@ -15,6 +15,9 @@
 
 //#define DEBUGGING 1
 
+//TODO may be faster to have a greater zero tolerance for sparse pricing vectors
+//     to reduce the number of nonzero entries, e.g. for workVec
+
 #include <assert.h>
 #include <iostream>
 
