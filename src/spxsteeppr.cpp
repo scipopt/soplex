@@ -262,11 +262,10 @@ int SPxSteepPR::selectLeave()
 {
    assert(isConsistent());
 
-#ifdef PARTIAL_PRICING
-   return selectLeavePart();
-#endif
    if (thesolver->sparsePricingLeave)
       return selectLeaveSparse();
+   else if (thesolver->partialPricing)
+      return selectLeavePart();
 
    const Real* coPenalty_ptr = coPenalty.get_const_ptr();
    const Real* fTest         = thesolver->fTest().get_const_ptr();
@@ -331,11 +330,11 @@ int SPxSteepPR::selectLeavePart()
    Real best = -infinity;
    Real x;
 
-   int oldstart = startpricing;
    int lastIdx = -1;
    int count = 0;
    int dim = thesolver->dim();
-   int end = oldstart + IMPROVEMENT_STEPLENGTH;
+   int oldstart = startpricing % dim; // within SCIP, dimensions may change
+   int end = dim;
 
    for (int i = oldstart; i < dim; ++i)
    {
@@ -365,11 +364,15 @@ int SPxSteepPR::selectLeavePart()
             end = i + IMPROVEMENT_STEPLENGTH;
          }
       }
-      if (i >= end && count >= MAX_PRICING_CANDIDATES)
+      if( i >= end || count >= MAX_PRICING_CANDIDATES )
          goto TERMINATE;
    }
    assert(end >= dim);
-   end -= dim;
+
+   if( count == 0 )
+      end = oldstart;
+   else
+      end -= dim;
 
    for (int i = 0; i < oldstart; ++i)
    {
@@ -398,7 +401,7 @@ int SPxSteepPR::selectLeavePart()
             end = i + IMPROVEMENT_STEPLENGTH;
          }
       }
-      if (i >= end && count >= MAX_PRICING_CANDIDATES)
+      if( i >= end || count >= MAX_PRICING_CANDIDATES )
          goto TERMINATE;
    }
 

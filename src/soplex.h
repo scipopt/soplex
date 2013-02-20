@@ -244,6 +244,11 @@ public:
    {
       m_solver.setIrthreshold(d);
    }
+   /// enable or disable partial pricing
+   void setPartialPricing( bool p )
+   {
+      m_solver.setPartialPricing(p);
+   }
    //@}
 
    //---------------------------------------

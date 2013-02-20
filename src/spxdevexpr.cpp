@@ -82,20 +82,21 @@ int SPxDevexPR::selectLeave()
    int retid;
    Real val;
 
-#ifdef PARTIAL_PRICING
-   retid = selectLeavePart(val, theeps);
-#else
    if (thesolver->sparsePricingLeave)
       retid = selectLeaveSparse(val, theeps);
+   else if (thesolver->partialPricing)
+      retid = selectLeavePart(val, theeps);
    else
       retid = selectLeaveX(val, theeps);
-#endif
+
    if ( retid < 0 && !refined )
    {
       refined = true;
       MSG_INFO3( spxout << "WDEVEX02 trying refinement step..\n"; )
       retid = selectLeaveX(val, theeps/DEVEX_REFINETOL);
    }
+
+   assert(retid < thesolver->dim());
 
    return retid;
 }
@@ -137,10 +138,10 @@ int SPxDevexPR::selectLeavePart(Real& best, Real feastol)
    int bstI = -1;
    int dim = coPenalty.dim();
    int count = 0;
-   int oldstartpricing = startpricing;
-   int end = oldstartpricing + IMPROVEMENT_STEPLENGTH;
+   int oldstart = startpricing % dim; // within SCIP, dimensions may change
+   int end = dim;
 
-   for (int i = oldstartpricing; i < dim; ++i)
+   for (int i = oldstart; i < dim; ++i)
    {
       Real fTesti = fTest[i];
       if (fTesti < -feastol)
@@ -153,26 +154,31 @@ int SPxDevexPR::selectLeavePart(Real& best, Real feastol)
             bstI = i;
             last = cpeni;
             end = i + IMPROVEMENT_STEPLENGTH;
-//             if (count == 0)
-               startpricing = (i + 1) % dim;
+            if (count == 0)
+               startpricing = i;
             ++count;
          }
       }
-      if (i >= end && count >= MAX_PRICING_CANDIDATES)
+      if (i >= end || count >= MAX_PRICING_CANDIDATES)
          break;
    }
 
-   if (end < dim && count >= MAX_PRICING_CANDIDATES)
+   if (end < dim || count >= MAX_PRICING_CANDIDATES)
    {
+      assert(bstX != 0);
       best = bstX;
       return bstI;
    }
    else
    {
-      end -= dim;
+      assert(end >= dim);
+      if( count == 0 )
+         end = oldstart;
+      else
+         end -= dim;
    }
 
-   for (int i = 0; i < oldstartpricing; ++i)
+   for (int i = 0; i < oldstart; ++i)
    {
       Real fTesti = fTest[i];
       if (fTesti < -feastol)
@@ -185,12 +191,12 @@ int SPxDevexPR::selectLeavePart(Real& best, Real feastol)
             bstI = i;
             last = cpeni;
             end = i + IMPROVEMENT_STEPLENGTH;
-//             if (count == 0)
-               startpricing = (i + 1) % dim;
+            if (count == 0)
+               startpricing = i;
             ++count;
          }
       }
-      if (i >= end && count >= MAX_PRICING_CANDIDATES)
+      if (i >= end || count >= MAX_PRICING_CANDIDATES)
          break;
    }
 

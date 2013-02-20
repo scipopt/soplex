@@ -28,11 +28,10 @@ int SPxDantzigPR::selectLeave()
 {
    assert(thesolver != 0);
 
-#ifdef PARTIAL_PRICING
-   return selectLeavePart();
-#endif
    if( thesolver->sparsePricingLeave )
       return selectLeaveSparse();
+   else if (thesolver->partialPricing)
+      return selectLeavePart();
 
    //    const Real* up  = thesolver->ubBound();
    //    const Real* low = thesolver->lbBound();

@@ -33,7 +33,7 @@
 #include "unitvector.h"
 #include "updatevector.h"
 
-#define SPARSITYTHRESHOLD        0.5      /**< percentage of basic infeasibilities that is considered sparse */
+#define SPARSITYTHRESHOLD        0.5      /**< percentage of infeasibilities that is considered sparse */
 #define DENSEROUNDS               5       /**< number of refactorization until sparsity is tested again */
 #define SPARSITY_TRADEOFF        0.8      /**< threshold to decide whether Ids or coIds are preferred to enter the basis;
                                            * coIds are more likely to enter if SPARSITY_TRADEOFF is close to 0
@@ -357,6 +357,8 @@ public:
    int      sparsityThresholdEnter;    ///< maximum number of infeasibilities that is considered sparse for entering Simplex (dim)
    int      sparsityThresholdEnterCo;  ///< maximum number of infeasibilities that is considered sparse for entering Simplex (coDim)
 
+   bool     partialPricing;            ///< enables partial (= incomplete) pricing in leaving Simplex
+
    //-----------------------------
    /**@name Access */
    //@{
@@ -673,6 +675,11 @@ public:
    void setDelta(Real d);
    /// set parameter \p irthreshold.
    void setIrthreshold(Real d);
+   /// enable or disable partial pricing
+   void setPartialPricing( bool p )
+   {
+      partialPricing = p;
+   }
 
    /** SPxSolver considers a Simplex step as degenerate if the
     *  steplength does not exceed #epsilon(). Cycling occurs if only

@@ -7,6 +7,11 @@ Developer version
 code quality & new features:
 - new/delete calls are modified to channel memory (de)allocation through spx_alloc calls (-> "placement new")
 - implemented bound flipping ratio test for row representation
+- partial pricing can be activated with parameter -P
+    If activated, partial pricing replaces normal dense pricing. If only few violations are left
+    (see SPARSITYTHRESHOLD in spxsolver.h) sparse, full pricing is used. Partial pricing is only recommended for large
+    instances, or instances, that spend much time in pricing. Partial pricing is likely to increase the number of iterations.
+
 
 fixed bugs:
 - allow instable enter pivot when no other is available; only after a fresh factorization

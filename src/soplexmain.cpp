@@ -369,6 +369,7 @@ void print_usage_and_exit( const char* const argv[] )
       " -zz       set general zero tolerance\n"
       " -zf       set factorization zero tolerance\n"
       " -zu       set update zero tolerance\n"
+      " -P        enable partial (= incomplete) pricing for leaving algorithm\n"
       " -v        set verbosity Level: from 0 (ERROR) to 5 (INFO3), default 3 (INFO1)\n"
       " -V        show program version\n"
       " -C        check mode (for check scripts)\n"
@@ -1107,6 +1108,7 @@ int main(int argc, char* argv[])
    SPxRatioTester*           ratiotester    = 0;
    SPxScaler*                prescaler      = 0;
    SPxScaler*                postscaler     = 0;
+   bool                      partialpricing = false;
 
    try {
       NameSet                   rownames;
@@ -1191,6 +1193,9 @@ int main(int argc, char* argv[])
          case 'p' :
             check_parameter(argv[optidx][2], argv); // use -p[0-5], not -p
             pricing = atoi(&argv[optidx][2]);
+            break;
+         case 'P' :
+            partialpricing = true;
             break;
          case 'q' :
             print_quality = true;
@@ -1295,6 +1300,7 @@ int main(int argc, char* argv[])
       work.setIrthreshold       ( irthreshold );
       work.setTerminationTime   ( timelimit );
       work.setTerminationIter   ( iterlimit );
+      work.setPartialPricing    ( partialpricing );
       print_algorithm_parameters( work, representation, update );
       assert( work.isConsistent() );
 
