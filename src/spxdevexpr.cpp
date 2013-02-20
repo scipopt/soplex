@@ -80,20 +80,19 @@ void SPxDevexPR::setRep(SPxSolver::Representation)
 int SPxDevexPR::selectLeave()
 {
    int retid;
-   Real val;
 
    if (thesolver->sparsePricingLeave)
-      retid = selectLeaveSparse(val, theeps);
+      retid = selectLeaveSparse(theeps);
    else if (thesolver->partialPricing)
-      retid = selectLeavePart(val, theeps);
+      retid = selectLeavePart(theeps);
    else
-      retid = selectLeaveX(val, theeps);
+      retid = selectLeaveX(theeps);
 
    if ( retid < 0 && !refined )
    {
       refined = true;
       MSG_INFO3( spxout << "WDEVEX02 trying refinement step..\n"; )
-      retid = selectLeaveX(val, theeps/DEVEX_REFINETOL);
+      retid = selectLeaveX(theeps/DEVEX_REFINETOL);
    }
 
    assert(retid < thesolver->dim());
@@ -101,13 +100,13 @@ int SPxDevexPR::selectLeave()
    return retid;
 }
 
-int SPxDevexPR::selectLeaveX(Real& best, Real feastol, int start, int incr)
+int SPxDevexPR::selectLeaveX(Real feastol, int start, int incr)
 {
    Real x;
 
    const Real* fTest = thesolver->fTest().get_const_ptr();
    const Real* cpen = coPenalty.get_const_ptr();
-   Real bstX = 0;
+   Real best = 0;
    int bstI = -1;
    int end = coPenalty.dim();
 
@@ -116,25 +115,24 @@ int SPxDevexPR::selectLeaveX(Real& best, Real feastol, int start, int incr)
       if (fTest[start] < -feastol)
       {
          x = fTest[start] * fTest[start] / cpen[start];
-         if (x > bstX)
+         if (x > best)
          {
-            bstX = x;
+            best = x;
             bstI = start;
             last = cpen[start];
          }
       }
    }
-   best = bstX;
    return bstI;
 }
 
-int SPxDevexPR::selectLeavePart(Real& best, Real feastol)
+int SPxDevexPR::selectLeavePart(Real feastol)
 {
    Real x;
 
    const Real* fTest = thesolver->fTest().get_const_ptr();
    const Real* cpen = coPenalty.get_const_ptr();
-   Real bstX = 0;
+   Real best = 0;
    int bstI = -1;
    int dim = coPenalty.dim();
    int count = 0;
@@ -148,9 +146,9 @@ int SPxDevexPR::selectLeavePart(Real& best, Real feastol)
       {
          Real cpeni = cpen[i];
          x = fTesti * fTesti / cpeni;
-         if (x > bstX * IMPROVEMENT_THRESHOLD)
+         if (x > best * IMPROVEMENT_THRESHOLD)
          {
-            bstX = x;
+            best = x;
             bstI = i;
             last = cpeni;
             end = i + IMPROVEMENT_STEPLENGTH;
@@ -165,8 +163,7 @@ int SPxDevexPR::selectLeavePart(Real& best, Real feastol)
 
    if (end < dim || count >= MAX_PRICING_CANDIDATES)
    {
-      assert(bstX != 0);
-      best = bstX;
+      assert(best != 0);
       return bstI;
    }
    else
@@ -185,9 +182,9 @@ int SPxDevexPR::selectLeavePart(Real& best, Real feastol)
       {
          Real cpeni = cpen[i];
          x = fTesti * fTesti / cpeni;
-         if (x > bstX * IMPROVEMENT_THRESHOLD)
+         if (x > best * IMPROVEMENT_THRESHOLD)
          {
-            bstX = x;
+            best = x;
             bstI = i;
             last = cpeni;
             end = i + IMPROVEMENT_STEPLENGTH;
@@ -200,17 +197,16 @@ int SPxDevexPR::selectLeavePart(Real& best, Real feastol)
          break;
    }
 
-   best = bstX;
    return bstI;
 }
 
-int SPxDevexPR::selectLeaveSparse(Real& best, Real feastol)
+int SPxDevexPR::selectLeaveSparse(Real feastol)
 {
    Real x;
 
    const Real* fTest = thesolver->fTest().get_const_ptr();
    const Real* cpen = coPenalty.get_const_ptr();
-   Real bstX = 0;
+   Real best = 0;
    int bstI = -1;
    int idx = -1;
    Real fTesti;
@@ -224,9 +220,9 @@ int SPxDevexPR::selectLeaveSparse(Real& best, Real feastol)
       {
          coPeni = cpen[idx];
          x = fTesti * fTesti / coPeni;
-         if (x > bstX)
+         if (x > best)
          {
-            bstX = x;
+            best = x;
             bstI = idx;
             last = coPeni;
          }
@@ -239,7 +235,6 @@ int SPxDevexPR::selectLeaveSparse(Real& best, Real feastol)
          thesolver->isInfeasible[idx] = false;
       }
    }
-   best = bstX;
    return bstI;
 }
 

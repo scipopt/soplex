@@ -60,11 +60,11 @@ private:
    /// set entering/leaving algorithm
    void init(SPxSolver::Type);
    /// internal implementation of SPxPricer::selectLeave()
-   int selectLeaveX(Real& best, Real feastol, int start = 0, int incr = 1);
+   int selectLeaveX(Real feastol, int start = 0, int incr = 1);
    /// implementation of partial pricing
-   int selectLeavePart(Real& best, Real feastol);
+   int selectLeavePart(Real feastol);
    /// implementation of sparse pricing in the leaving Simplex
-   int selectLeaveSparse(Real& best, Real feastol);
+   int selectLeaveSparse(Real feastol);
    /// internal implementation of SPxPricer::left4()
    void left4X(int n, const SPxId& id, int start, int incr);
    /// choose the best entering index among columns and rows but prefer sparsity

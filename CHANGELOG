@@ -11,7 +11,7 @@ code quality & new features:
     If activated, partial pricing replaces normal dense pricing. If only few violations are left
     (see SPARSITYTHRESHOLD in spxsolver.h) sparse, full pricing is used. Partial pricing is only recommended for large
     instances, or instances, that spend much time in pricing. Partial pricing is likely to increase the number of iterations.
-
+- refinement step to improve feasibility/optimality also for steep pricer (was devex only)
 
 fixed bugs:
 - allow instable enter pivot when no other is available; only after a fresh factorization

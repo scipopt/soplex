@@ -25,6 +25,8 @@
 #include "spxsteeppr.h"
 #include "random.h"
 
+#define STEEP_REFINETOL 2.0
+
 namespace soplex
 {
 
@@ -64,6 +66,7 @@ void SPxSteepPR::setType(SPxSolver::Type type)
    setupWeights(type);
    workVec.clear();
    workRhs.clear();
+   refined = false;
 }
 
 void SPxSteepPR::setupWeights(SPxSolver::Type type)
@@ -262,11 +265,37 @@ int SPxSteepPR::selectLeave()
 {
    assert(isConsistent());
 
-   if (thesolver->sparsePricingLeave)
-      return selectLeaveSparse();
-   else if (thesolver->partialPricing)
-      return selectLeavePart();
+   int retid;
 
+   if (thesolver->sparsePricingLeave)
+      retid = selectLeaveSparse(theeps);
+   else if (thesolver->partialPricing)
+      retid = selectLeavePart(theeps);
+   else
+      retid = selectLeaveX(theeps);
+
+   if( retid < 0 && !refined )
+   {
+      refined = true;
+      MSG_INFO3( spxout << "WSTEEP03 trying refinement step..\n"; )
+      retid = selectLeaveX(theeps/STEEP_REFINETOL);
+   }
+
+   if( retid >= 0 )
+   {
+      assert( thesolver->coPvec().delta().isConsistent() );
+      thesolver->basis().coSolve(thesolver->coPvec().delta(),
+                                 thesolver->unitVector(retid));
+      assert( thesolver->coPvec().delta().isConsistent() );
+      workRhs.setup_and_assign(thesolver->coPvec().delta());
+      thesolver->setup4solve(&workVec, &workRhs);
+   }
+
+   return retid;
+}
+
+int SPxSteepPR::selectLeaveX(Real tol)
+{
    const Real* coPenalty_ptr = coPenalty.get_const_ptr();
    const Real* fTest         = thesolver->fTest().get_const_ptr();
    //    const Real* low     = thesolver->lbBound();
@@ -282,18 +311,17 @@ int SPxSteepPR::selectLeave()
    {
       x = fTest[i];
 
-      if (x < -theeps)
-      {         
+      if (x < -tol)
+      {
          /**@todo this was an assert! is an assertion correct?*/
          // assert(coPenalty_ptr[i] >= theeps);
-         if( coPenalty_ptr[i] < theeps )
+         if( coPenalty_ptr[i] < tol )
          {
 #ifdef ENABLE_ADDITIONAL_CHECKS
             MSG_WARNING( spxout << "WSTEEP02 SPxSteepPR::selectLeaveX(): coPenalty too small ("
-                                << coPenalty_ptr[i] << "), assuming epsilon (" << theeps << ")!" << std::endl; )
+                                << coPenalty_ptr[i] << "), assuming epsilon (" << tol << ")!" << std::endl; )
 #endif
-
-            x = x * x / theeps * p[i];
+            x = x * x / tol * p[i];
          }
          else
             x = x * x / coPenalty_ptr[i] * p[i];
@@ -306,20 +334,10 @@ int SPxSteepPR::selectLeave()
       }
    }
 
-   if (lastIdx >= 0)
-   {
-      assert( thesolver->coPvec().delta().isConsistent() );
-      thesolver->basis().coSolve(thesolver->coPvec().delta(),
-                                 thesolver->unitVector(lastIdx));
-      assert( thesolver->coPvec().delta().isConsistent() );
-      workRhs.setup_and_assign(thesolver->coPvec().delta());
-      thesolver->setup4solve(&workVec, &workRhs);
-   }
-
    return lastIdx;
 }
 
-int SPxSteepPR::selectLeavePart()
+int SPxSteepPR::selectLeavePart(Real tol)
 {
    const Real* coPenalty_ptr = coPenalty.get_const_ptr();
    const Real* fTest         = thesolver->fTest().get_const_ptr();
@@ -340,16 +358,16 @@ int SPxSteepPR::selectLeavePart()
    {
       x = fTest[i];
 
-      if (x < -theeps)
+      if (x < -tol)
       {
-         if( coPenalty_ptr[i] < theeps )
+         if( coPenalty_ptr[i] < tol )
          {
 #ifdef ENABLE_ADDITIONAL_CHECKS
             MSG_WARNING( spxout << "WSTEEP02 SPxSteepPR::selectLeavePart(): coPenalty too small ("
-                                << coPenalty_ptr[i] << "), assuming epsilon (" << theeps << ")!" << std::endl; )
+                                << coPenalty_ptr[i] << "), assuming epsilon (" << tol << ")!" << std::endl; )
 #endif
 
-            x = x * x / theeps * p[i];
+            x = x * x / tol * p[i];
          }
          else
             x = x * x / coPenalty_ptr[i] * p[i];
@@ -378,15 +396,15 @@ int SPxSteepPR::selectLeavePart()
    {
       x = fTest[i];
 
-      if (x < -theeps)
+      if (x < -tol)
       {
-         if( coPenalty_ptr[i] < theeps )
+         if( coPenalty_ptr[i] < tol )
          {
 #ifdef ENABLE_ADDITIONAL_CHECKS
             MSG_WARNING( spxout << "WSTEEP02 SPxSteepPR::selectLeavePart(): coPenalty too small ("
-                                << coPenalty_ptr[i] << "), assuming epsilon (" << theeps << ")!" << std::endl; )
+                                << coPenalty_ptr[i] << "), assuming epsilon (" << tol << ")!" << std::endl; )
 #endif
-            x = x * x / theeps * p[i];
+            x = x * x / tol * p[i];
          }
          else
             x = x * x / coPenalty_ptr[i] * p[i];
@@ -406,20 +424,10 @@ int SPxSteepPR::selectLeavePart()
    }
 
 TERMINATE:
-   if (lastIdx >= 0)
-   {
-      assert( thesolver->coPvec().delta().isConsistent() );
-      thesolver->basis().coSolve(thesolver->coPvec().delta(),
-                                 thesolver->unitVector(lastIdx));
-      assert( thesolver->coPvec().delta().isConsistent() );
-      workRhs.setup_and_assign(thesolver->coPvec().delta());
-      thesolver->setup4solve(&workVec, &workRhs);
-   }
-
    return lastIdx;
 }
 
-int SPxSteepPR::selectLeaveSparse()
+int SPxSteepPR::selectLeaveSparse(Real tol)
 {
    const Real* coPenalty_ptr = coPenalty.get_const_ptr();
    const Real* fTest         = thesolver->fTest().get_const_ptr();
@@ -436,16 +444,16 @@ int SPxSteepPR::selectLeaveSparse()
       idx = thesolver->infeasibilities.index(i);
       x = fTest[idx];
 
-      if (x < -theeps)
+      if (x < -tol)
       {
-         if( coPenalty_ptr[idx] < theeps )
+         if( coPenalty_ptr[idx] < tol )
          {
 #ifdef ENABLE_ADDITIONAL_CHECKS
             MSG_WARNING( spxout << "WSTEEP02 SPxSteepPR::selectLeaveSparse(): coPenalty too small ("
-                                << coPenalty_ptr[idx] << "), assuming epsilon (" << theeps << ")!" << std::endl; )
+                                << coPenalty_ptr[idx] << "), assuming epsilon (" << tol << ")!" << std::endl; )
 #endif
 
-            x = x * x / theeps * p[idx];
+            x = x * x / tol * p[idx];
          }
          else
             x = x * x / coPenalty_ptr[idx] * p[idx];
@@ -463,16 +471,6 @@ int SPxSteepPR::selectLeaveSparse()
          assert(thesolver->isInfeasible[idx]);
          thesolver->isInfeasible[idx] = false;
       }
-   }
-
-   if (lastIdx >= 0)
-   {
-      assert( thesolver->coPvec().delta().isConsistent() );
-      thesolver->basis().coSolve(thesolver->coPvec().delta(),
-                                 thesolver->unitVector(lastIdx));
-      assert( thesolver->coPvec().delta().isConsistent() );
-      workRhs.setup_and_assign(thesolver->coPvec().delta());
-      thesolver->setup4solve(&workVec, &workRhs);
    }
 
    return lastIdx;
@@ -549,7 +547,15 @@ SPxId SPxSteepPR::selectEnter()
    assert(thesolver != 0);
    SPxId enterId;
 
-   enterId = selectEnterX();
+   enterId = selectEnterX(theeps);
+
+   if( !enterId.isValid() && !refined )
+   {
+      refined = true;
+      MSG_INFO3( spxout << "WSTEEP05 trying refinement step..\n"; )
+      enterId = selectEnterX(theeps/STEEP_REFINETOL);
+   }
+
    assert(isConsistent());
 
    if (enterId.isValid())
@@ -566,7 +572,7 @@ SPxId SPxSteepPR::selectEnter()
    return enterId;
 }
 
-SPxId SPxSteepPR::selectEnterX()
+SPxId SPxSteepPR::selectEnterX(Real tol)
 {
    SPxId enterId;
    SPxId enterIdCo;
@@ -575,8 +581,8 @@ SPxId SPxSteepPR::selectEnterX()
 
    best = -infinity;
    bestCo = -infinity;
-   enterId = (thesolver->sparsePricingEnter) ? selectEnterSparseDim(best, enterId) : selectEnterDenseDim(best, enterId);
-   enterIdCo = (thesolver->sparsePricingEnterCo) ? selectEnterSparseCoDim(bestCo, enterId) : selectEnterDenseCoDim(bestCo, enterId);
+   enterId = (thesolver->sparsePricingEnter) ? selectEnterSparseDim(best, tol) : selectEnterDenseDim(best, tol);
+   enterIdCo = (thesolver->sparsePricingEnterCo) ? selectEnterSparseCoDim(bestCo, tol) : selectEnterDenseCoDim(bestCo, tol);
 
    // prefer slack indices to reduce nonzeros in basis matrix
    if( enterId.isValid() && (best > SPARSITY_TRADEOFF * bestCo || !enterIdCo.isValid()) )
@@ -586,8 +592,9 @@ SPxId SPxSteepPR::selectEnterX()
 }
 
 
-SPxId SPxSteepPR::selectEnterSparseDim(Real& best, SPxId enterId)
+SPxId SPxSteepPR::selectEnterSparseDim(Real& best, Real tol)
 {
+   SPxId enterId;
    const Real* cp            = coPref.get_const_ptr();
    const Real* coTest        = thesolver->coTest().get_const_ptr();
    const Real* coPenalty_ptr = coPenalty.get_const_ptr();
@@ -602,7 +609,7 @@ SPxId SPxSteepPR::selectEnterSparseDim(Real& best, SPxId enterId)
       idx = thesolver->infeasibilities.index(i);
       x = coTest[idx];
 
-      if (x < -theeps)
+      if (x < -tol)
       {
          coPen = coPenalty_ptr[idx];
          x = x * x / coPen;
@@ -626,8 +633,9 @@ SPxId SPxSteepPR::selectEnterSparseDim(Real& best, SPxId enterId)
    return enterId;
 }
 
-SPxId SPxSteepPR::selectEnterSparseCoDim(Real& best, SPxId enterId)
+SPxId SPxSteepPR::selectEnterSparseCoDim(Real& best, Real tol)
 {
+   SPxId enterId;
    const Real* p             = pref.get_const_ptr();
    const Real* test          = thesolver->test().get_const_ptr();
    const Real* penalty_ptr   = penalty.get_const_ptr();
@@ -642,7 +650,7 @@ SPxId SPxSteepPR::selectEnterSparseCoDim(Real& best, SPxId enterId)
       idx = thesolver->infeasibilitiesCo.index(i);
       x = test[idx];
 
-      if (x < -theeps)
+      if (x < -tol)
       {
          pen = penalty_ptr[idx];
          x = x * x / pen;
@@ -666,8 +674,9 @@ SPxId SPxSteepPR::selectEnterSparseCoDim(Real& best, SPxId enterId)
    return enterId;
 }
 
-SPxId SPxSteepPR::selectEnterDenseDim(Real& best, SPxId enterId)
+SPxId SPxSteepPR::selectEnterDenseDim(Real& best, Real tol)
 {
+   SPxId enterId;
    const Real* cp            = coPref.get_const_ptr();
    const Real* coTest        = thesolver->coTest().get_const_ptr();
    const Real* coPenalty_ptr = coPenalty.get_const_ptr();
@@ -677,7 +686,7 @@ SPxId SPxSteepPR::selectEnterDenseDim(Real& best, SPxId enterId)
    for (int i = 0, end = thesolver->dim(); i < end; ++i)
    {
       x = coTest[i];
-      if (x < -theeps)
+      if (x < -tol)
       {
          x *= x / coPenalty_ptr[i];
          x *= cp[i];
@@ -692,8 +701,9 @@ SPxId SPxSteepPR::selectEnterDenseDim(Real& best, SPxId enterId)
    return enterId;
 }
 
-SPxId SPxSteepPR::selectEnterDenseCoDim(Real& best, SPxId enterId)
+SPxId SPxSteepPR::selectEnterDenseCoDim(Real& best, Real tol)
 {
+   SPxId enterId;
    const Real* p             = pref.get_const_ptr();
    const Real* test          = thesolver->test().get_const_ptr();
    const Real* penalty_ptr   = penalty.get_const_ptr();
@@ -703,7 +713,7 @@ SPxId SPxSteepPR::selectEnterDenseCoDim(Real& best, SPxId enterId)
    for(int i = 0, end = thesolver->coDim(); i < end; ++i)
    {
       x = test[i];
-      if (x < -theeps)
+      if (x < -tol)
       {
          x *= x / penalty_ptr[i];
          x *= p[i];
