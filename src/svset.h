@@ -31,8 +31,6 @@
 
 namespace soplex
 {
-typedef DataArray < SVector::Element > SVSetBase;
-
 /**@brief   sparse vector set.
    @ingroup Algebra
 
@@ -62,9 +60,11 @@ typedef DataArray < SVector::Element > SVSetBase;
    of them returns the DataKey%s assigned to the SVector%s added to the
    SVSet.
 */
-class SVSet : protected SVSetBase
+class SVSet : protected DataArray < SVector::Element >
 {
 private:
+
+   typedef DataArray < SVector::Element > SVSetArray;
 
    /**@class DLPSV
       @brief SVector with prev/next pointers
