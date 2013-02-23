@@ -245,6 +245,9 @@ void SPxBasis::loadDesc(const Desc& ds)
 
       if (theLP->isBasic(thedesc.rowStatus(i)))
       {
+         assert(theLP->dim() == matrix.size());
+         assert(j < matrix.size());
+
          SPxRowId id = theLP->SPxLP::rId(i);
          theBaseId[j] = id;
          matrix[j] = &theLP->vector(id);
@@ -271,6 +274,9 @@ void SPxBasis::loadDesc(const Desc& ds)
 
       if (theLP->isBasic(thedesc.colStatus(i)))
       {
+         assert(theLP->dim() == matrix.size());
+         assert(j < matrix.size());
+
          SPxColId id = theLP->SPxLP::cId(i);
          theBaseId[j] = id;
          matrix[j] = &theLP->vector(id);
