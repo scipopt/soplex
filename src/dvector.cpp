@@ -87,17 +87,6 @@ void DVector::reSize(int newsize)
    memsize = newsize;
 }
 
-void DVector::reSize(int newsize, int newdim)
-{
-   assert(newsize >= newdim);
-   
-   spx_realloc(mem, newsize);
-
-   val = mem;
-   memsize = newsize;
-   dimen = newdim;
-}
-
 void DVector::reDim(int newdim)
 {
    assert(memsize >= 0);

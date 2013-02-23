@@ -148,9 +148,6 @@ public:
    /// resets  \ref soplex::DVector "DVector"'s memory size to \p newsize.
    void reSize(int newsize);
 
-   /// resets  \ref soplex::DVector "DVector"'s memory size to \p newsize and dimension to \p newdim.
-   void reSize(int newsize, int newdim);
-
    /// returns \ref soplex::DVector "DVector"'s memory size.
    int memSize() const
    {
