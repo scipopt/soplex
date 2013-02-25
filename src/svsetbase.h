@@ -671,21 +671,18 @@ public:
    /// Used nonzero memory.
    int memSize() const
    {
-      /**@todo delete: return DataArray < Element<R> > ::size(); */
       return SVSetBaseArray::size();
    }
 
    /// Length of nonzero memory.
    int memMax() const
    {
-      /**@todo delete: return DataArray < SVectorBase::Element > ::max(); */
       return SVSetBaseArray::max();
    }
 
    /// Reset length of nonzero memory.
    void memRemax(int newmax)
    {
-      /**@todo delete: ptrdiff_t delta = DataArray < SVector::Element > ::reMax(newmax); */
       ptrdiff_t delta = SVSetBaseArray::reMax(newmax);
 
       if( delta != 0 )
@@ -780,7 +777,6 @@ public:
             return MSGinconsistent("SVSetBase");
       }
 
-      /**@todo delete: return DataArray < SVector::Element > ::isConsistent() && set.isConsistent() && list.isConsistent(); */
       return SVSetBaseArray::isConsistent() && set.isConsistent() && list.isConsistent();
 #else
       return true;
@@ -796,7 +792,7 @@ public:
    /// Default constructor.
    explicit
    SVSetBase<R>(int pmax = -1, int pmemmax = -1, double pfac = 1.1, double pmemFac = 1.2)
-      : SVSetBaseArray(0, (pmemmax > 0) ? pmemmax : 8 * ((pmax > 0) ? pmax : 8), pmemFac) //@todo delete: DataArray < SVectorBase::Element > (0, (pmemmax > 0) ? pmemmax : 8 * ((pmax > 0) ? pmax : 8), pmemFac)
+      : SVSetBaseArray(0, (pmemmax > 0) ? pmemmax : 8 * ((pmax > 0) ? pmax : 8), pmemFac)
       , set((pmax > 0) ? pmax : 8)
       , possiblyUnusedMem(0)
       , factor(pfac)
@@ -817,7 +813,6 @@ public:
 
          if( rhs.size() > 0 )
          {
-            //@todo delete: DataArray < SVector::Element > ::operator=(rhs);
             SVSetBaseArray::operator=(rhs);
             set = rhs.set;
 
@@ -855,7 +850,6 @@ public:
 
          if( rhs.size() > 0 )
          {
-            //@todo delete: DataArray < SVector::Element > ::operator=(rhs);
             SVSetBaseArray::operator=(rhs);
             set = rhs.set;
 
