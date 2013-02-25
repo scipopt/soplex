@@ -112,6 +112,8 @@ public:
 template < class R >
 class SVectorBase
 {
+   template < class S > friend class SVectorBase;
+
 #if 0 // needed?
    friend class VectorBase;
    friend class SSVector;
@@ -469,10 +471,33 @@ public:
    SVectorBase<R>& operator=(const VectorBase<S>& vec);
 
    /// Assignment operator.
+   SVectorBase<R>& operator=(const SVectorBase<R>& sv)
+   {
+      if( this != &sv )
+      {
+         assert(max() >= sv.size());
+
+         int i = sv.size();
+         Element<R>* e = m_elem;
+         const Element<R>* s = sv.m_elem;
+
+         while( i-- )
+         {
+            assert(e != 0);
+            *e++ = *s++;
+         }
+
+         set_size(sv.size());
+      }
+
+      return *this;
+   }
+
+   /// Assignment operator.
    template < class S >
    SVectorBase<R>& operator=(const SVectorBase<S>& sv)
    {
-      if( this != &sv )
+      if( this != (SVectorBase<R>*)(&sv) )
       {
          assert(max() >= sv.size());
 

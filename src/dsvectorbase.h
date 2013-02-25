@@ -215,7 +215,7 @@ public:
       if( len == SVectorBase<R>::max() )
          return;
 
-      Element<R>* newmem;
+      Element<R>* newmem = 0;
 
       /* allocate and initialize new memory */
       spx_alloc(newmem, len);

@@ -993,6 +993,16 @@ std::ostream& operator<<(std::ostream& os, const SVectorBase<R>& v)
    return os;
 }
 
+/// Output operator.
+template < class R >
+std::ostream& operator<<(std::ostream& os, const SVSetBase<R>& s)
+{
+   for( int i = 0; i < s.num(); i++ )
+      os << s[i] << "\n";
+
+   return os;
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 //  Explicit instantiations
 // ---------------------------------------------------------------------------------------------------------------------

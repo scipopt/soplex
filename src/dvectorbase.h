@@ -255,7 +255,7 @@ public:
    {
       assert(newsize > VectorBase<R>::dim());
 
-      R* newmem;
+      R* newmem = 0;
 
       /* allocate and initialize new memory */
       spx_alloc(newmem, newsize);

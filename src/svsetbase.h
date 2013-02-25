@@ -55,6 +55,8 @@ namespace soplex
 template < class R >
 class SVSetBase : protected ClassArray < Element<R> >
 {
+   template < class S > friend class SVSetBase;
+
 private:
 
    typedef ClassArray < Element<R> > SVSetBaseArray;
@@ -301,7 +303,8 @@ public:
    }
 
    /// Adds all SVectorBase%s in \p pset to an SVSetBase.
-   void add(const SVSetBase<R>& pset)
+   template < class S >
+   void add(const SVSetBase<S>& pset)
    {
       int i;
       int n;
@@ -325,7 +328,8 @@ public:
     *
     * @pre \p nkey must be large enough to fit \p pset.num() DataKey%s.
     */
-   void add(DataKey nkey[], const SVSetBase<R>& pset)
+   template < class S >
+   void add(DataKey nkey[], const SVSetBase<S>& pset)
    {
       add(pset);
 
@@ -347,7 +351,7 @@ public:
       {
          ps = list.last();
          removeLast(ps->max() - ps->size());
-         ps->set_max( ps->size() );
+         ps->set_max(ps->size());
       }
 
       if( idxmax < 0 )
@@ -839,43 +843,22 @@ public:
       return *this;
    }
 
-#if 0 ///@todo implement correctly; we need cast in SVectorBase::Element and build up SVSetBase from scratch
    /// Assignment operator.
    template < class S >
    SVSetBase<R>& operator=(const SVSetBase<S>& rhs)
    {
-      if( this != &rhs )
+      if( this != (SVSetBase<R>*)(&rhs) )
       {
          clear();
 
          if( rhs.size() > 0 )
-         {
-            SVSetBaseArray::operator=(rhs);
-            set = rhs.set;
-
-            DLPSV* ps;
-            DLPSV* newps;
-
-            void* delta0 = &(*(static_cast<SVSetBaseArray*>(this)))[0];
-            void* delta1 = &(*(static_cast<SVSetBaseArray*>(const_cast<SVSetBase<R>*>(&rhs))))[0];
-            ptrdiff_t delta = reinterpret_cast<char*>(delta0) - reinterpret_cast<char*>(delta1);
-
-            for( ps = rhs.list.first(); ps; ps = rhs.list.next(ps) )
-            {
-               newps = &set[rhs.number(ps)];
-               list.append(newps);
-               newps->setMem(ps->max(),
-                  reinterpret_cast<Element<R>*>(reinterpret_cast<char*>(ps->mem()) + delta));
-               newps->set_size(ps->size());
-            }
-         }
+            this->add(rhs);
       }
 
       assert(isConsistent());
 
       return *this;
    }
-#endif
 
    /// Copy constructor.
    SVSetBase<R>(const SVSetBase<R>& old)
@@ -888,7 +871,6 @@ public:
       assert(SVSetBase::isConsistent());
    }
 
-#if 0
    /// Copy constructor.
    template < class S >
    SVSetBase<R>(const SVSetBase<S>& old)
@@ -900,7 +882,6 @@ public:
 
       assert(SVSetBase::isConsistent());
    }
-#endif
 
    //@}
 };

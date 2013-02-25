@@ -265,7 +265,7 @@ public:
       }
 
       /* allocate and initialize new memory */
-      T* newMem;
+      T* newMem = 0;
       spx_alloc(newMem, newMax);
       newMem = new (newMem) T[newMax]();
 
