@@ -1,6 +1,13 @@
 (maintain each list from top to bottom)
 
 
+Bugfix Version
+==============
+
+fixed bugs:
+- fixed minor bug in SVSet::add()
+
+
 04 Jan 2013 - Release 1.7.1
 ===========================
 
