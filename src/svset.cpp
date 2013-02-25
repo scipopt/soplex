@@ -72,8 +72,8 @@ void SVSet::add(DataKey nkey[], const SVSet& pset)
 {
    add(pset);
 
-   int i = size();
-   int n = pset.size();
+   int i = num();
+   int n = pset.num();
 
    while(n > 0)
       nkey[--n] = key(--i);
