@@ -1497,14 +1497,14 @@ bool SPxSolver::refine(
       MSG_INFO1( spxout << "starting refinement round " << nrefines+1 << ": " );
 
       /* compute primal scaling factor; limit increase in scaling by tolerance used in floating point solve */
-      maxscale_ex = primalscale_ex / feastol();
+      maxscale_ex = primalscale_ex / Rational(feastol());
 
       primalscale_ex = boundsviol_ex > sidesviol_ex ? boundsviol_ex : sidesviol_ex;
       assert(primalscale_ex >= 0);
 
       if( primalscale_ex > 0 )
       {
-         primalscale_ex = 1 / primalscale_ex;
+         primalscale_ex = Rational(1) / primalscale_ex;
          if( primalscale_ex > maxscale_ex )
             primalscale_ex = maxscale_ex;
       }
@@ -1517,14 +1517,14 @@ bool SPxSolver::refine(
       MSG_INFO1( spxout << "scaling primal by " << primalscale_ex );
 
       /* compute dual scaling factor; limit increase in scaling by tolerance used in floating point solve */
-      maxscale_ex = dualscale_ex / opttol();
+      maxscale_ex = dualscale_ex / Rational(opttol());
 
       dualscale_ex = redcostviol_ex;
       assert(dualscale_ex >= 0);
 
       if( dualscale_ex > 0 )
       {
-         dualscale_ex = 1 / dualscale_ex;
+         dualscale_ex = Rational(1) / dualscale_ex;
          if( dualscale_ex > maxscale_ex )
             dualscale_ex = maxscale_ex;
       }
@@ -1694,7 +1694,7 @@ bool SPxSolver::refine(
          /* correct primal solution */
          MSG_DEBUG( spxout << "correcting primal solution . . ." );
 
-         modprimal_ex *= Rational(1 / primalscale_ex);
+         modprimal_ex /= primalscale_ex;
          primal_ex += modprimal_ex;
 
          /* force values of nonbasic variables to bounds */
@@ -1734,7 +1734,7 @@ bool SPxSolver::refine(
          /* correct dual solution */
          MSG_DEBUG( spxout << "correcting dual solution . . .\n" );
 
-         moddual_ex *= Rational(1 / dualscale_ex);
+         moddual_ex /= dualscale_ex;
          dual_ex += moddual_ex;
       }
    }

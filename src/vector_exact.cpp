@@ -171,6 +171,16 @@ Vector_exact& Vector_exact::operator*=(Rational x)
    return *this;
 }
 
+Vector_exact& Vector_exact::operator/=(Rational x)
+{
+   for( int i = 0; i < dim(); i++ )
+   {
+      val[i] /= x;
+   }
+
+   return *this;
+}
+
 Rational Vector_exact::maxAbs() const
 {
    Rational maxi = 0.0;

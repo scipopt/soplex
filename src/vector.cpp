@@ -51,7 +51,7 @@ Vector& Vector::operator=(const Vector_exact& vec)
 
    for( int i = 0; i < dim(); i++ )
    {
-      val[i] = get_d(vec[i]);
+      val[i] = vec[i];
    }
 
    assert(isConsistent());

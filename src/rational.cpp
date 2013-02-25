@@ -25,17 +25,27 @@ namespace soplex
 {
 #ifdef SOPLEX_WITH_GMP
 
+/// Negation.
+Rational operator-(const Rational& q)
+{
+   Rational res = q;
+   res *= -1;
+   return res;
+}
+
+/// Division.
+Rational operator/(const Rational& p, const Rational& q)
+{
+   Rational res = p;
+   res /= q;
+   return res;
+}
+
 /// print Rational with limited floating point precision
 std::ostream& operator<<(std::ostream& os, const Rational& q)
 {
    os << mpf_class(q);
    return os;
-}
-
-/// cast Rational to Real
-Real get_d(const Rational& q)
-{
-   return q.get_d();
 }
 
 #endif

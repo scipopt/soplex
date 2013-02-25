@@ -20,6 +20,7 @@
 #define _RATIONAL_H_
 
 #include <math.h>
+#include <assert.h>
 #include <iostream>
 
 #include "spxdefines.h"
@@ -41,16 +42,53 @@ namespace soplex
 #ifdef SOPLEX_WITH_GMP
 
 /// If compiled with GMP support, Rational is defined as mpq_class.
-typedef mpq_class Rational;
+class Rational : public mpq_class
+{
+public:
+
+   Rational()
+      : mpq_class()
+   {
+   }
+
+   Rational(const Rational& r)
+      : mpq_class()
+   {
+      *this = r;
+   }
+
+   Rational(const Real& r)
+      : mpq_class(r)
+   {
+   }
+
+   operator Real() const
+   {
+      return this->get_d();
+   }
+};
 
 /// return whether Rational provides exact arithmetic
 #define RationalIsExact() (true)
 
+inline static Rational abs(const Rational& r)
+{
+   Rational res = r;
+
+   if( r < 0 )
+      res *= -1;
+
+   return res;
+}
+
 /// print Rational with limited floating point precision
 std::ostream& operator<<(std::ostream& os, const Rational& q);
 
-/// cast Rational to Real
-Real get_d(const Rational& q);
+/// Negation.
+Rational operator-(const Rational& q);
+
+/// Division.
+Rational operator/(const Rational& p, const Rational& q);
 
 #else
 

@@ -132,6 +132,9 @@ public:
    /// scaling
    Vector_exact& operator*=(Rational x);
 
+   /// scaling
+   Vector_exact& operator/=(Rational x);
+
    /// absolute biggest element (infinity norm).
    Rational maxAbs() const;
    /// absolute smallest element.

@@ -288,12 +288,6 @@ public:
    //@}
 };
 
-/// returns a
-inline static Real get_d(Real a)
-{
-   return a;
-}
-
 /// returns |a|
 inline static Real abs(Real a)
 {
