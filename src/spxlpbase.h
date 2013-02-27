@@ -1,0 +1,1754 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/*                                                                           */
+/*                  This file is part of the class library                   */
+/*       SoPlex --- the Sequential object-oriented simPlex.                  */
+/*                                                                           */
+/*    Copyright (C) 1996-2012 Konrad-Zuse-Zentrum                            */
+/*                            fuer Informationstechnik Berlin                */
+/*                                                                           */
+/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*                                                                           */
+/*  You should have received a copy of the ZIB Academic License              */
+/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*                                                                           */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+/**@file  spxlpbase.h
+ * @brief Saving LPs in a form suitable for SoPlex.
+ */
+#ifndef _SPXLPBASE_H_
+#define _SPXLPBASE_H_
+
+#include <assert.h>
+#include <iostream>
+#include <iomanip>
+#include <typeinfo>
+
+#include "spxdefines.h"
+#include "basevectors.h"
+#include "dataarray.h"
+#include "datakey.h"
+#include "spxid.h"
+#include "lprowbase.h"
+#include "lpcolbase.h"
+#include "lprowsetbase.h"
+#include "lpcolsetbase.h"
+#include "nameset.h"
+#include "didxset.h"
+#include "spxfileio.h"
+
+namespace soplex
+{
+class SPxSolver;
+
+/**@brief   Saving LPs in a form suitable for SoPlex.
+ * @ingroup Algo
+ *
+ *  Class SPxLPBase provides the data structures required for saving a linear program in the form
+ *  \f[
+ *  \begin{array}{rl}
+ *      \hbox{max}  & c^T x              \      \
+ *      \hbox{s.t.} & l_r \le Ax \le u_r \      \
+ *                  & l_c \le x \le u_c
+ *  \end{array}
+ *  \f]
+ *  suitable for solving with SoPlex. This includes:
+ *  - SVSetBase%s for both columns and rows
+ *  - objective Vector
+ *  - upper and lower bound Vectors for variables (\f$l_c\f$ and \f$u_c\f$)
+ *  - upper and lower bound Vectors for inequalities (\f$l_r\f$ and \f$u_r\f$)
+ *
+ *  Note, that the optimization sense is not saved directly. Instead, the objective function are multiplied by -1 to
+ *  transform the LP to our standard form maximizing the objective function. However, the sense of the loaded LP can be
+ *  retreived with method #spxSense().
+ *
+ *  Further, equality constraints are modelled by \f$l_r = u_r\f$.  Analogously, fixed variables have \f$l_c = u_c\f$.
+ *
+ *  #SPxLPBase%s are saved as an SVSet, both for columns and rows. Note that this is redundant but eases the access.
+ */
+template < class R >
+class SPxLPBase : protected LPRowSetBase<R>, protected LPColSetBase<R>
+{
+   template < class S > friend class SPxLPBase;
+   friend class SPxBasis;
+   friend class SPxScaler;
+   friend class SPxEquiliSC;
+   friend class SPxGeometSC;
+   friend class SPxMainSM;
+
+public:
+
+   // ------------------------------------------------------------------------------------------------------------------
+   /**@name Types */
+   //@{
+
+   /// Optimization sense.
+   enum SPxSense
+   {
+      MAXIMIZE = 1,
+      MINIMIZE = -1
+   };
+
+   //@}
+
+private:
+
+   // ------------------------------------------------------------------------------------------------------------------
+   /**@name Data */
+   //@{
+
+   SPxSense thesense;   ///< optimization sense.
+
+   //@}
+
+public:
+
+   // ------------------------------------------------------------------------------------------------------------------
+   /**@name Inquiry */
+   //@{
+
+   /// Returns number of rows in LP.
+   int nRows() const
+   {
+      return LPRowSetBase<R>::num();
+   }
+
+   /// Returns number of columns in LP.
+   int nCols() const
+   {
+      return LPColSetBase<R>::num();
+   }
+
+   /// Returns number of nonzeros in LP.
+   int nNzos() const
+   {
+      METHOD( "SPxLPBase::nNzos()" );
+
+      int n = 0;
+      for( int i = 0; i < nCols(); ++i )
+         n += colVector(i).size();
+
+      return n;
+   }
+
+   /// Absolute smallest non-zero element in LP.
+   R minAbsNzo() const
+   {
+      METHOD( "SPxLPBase::minAbsNzo()" );
+
+      R mini = infinity;
+
+      for( int i = 0; i < nCols(); ++i )
+      {
+         R m = colVector(i).minAbs();
+
+         if( m < mini )
+            mini = m;
+      }
+
+      assert(mini >= 0.0);
+
+      return mini;
+   }
+
+   /// Absolute biggest non-zero element in LP.
+   R maxAbsNzo() const
+   {
+      METHOD( "SPxLPBase::maxAbsNzo()" );
+
+      Real maxi = 0.0;
+
+      for( int i = 0; i < nCols(); ++i )
+      {
+         Real m = colVector(i).maxAbs();
+
+         if( m > maxi )
+            maxi = m;
+      }
+
+      assert(maxi >= 0.0);
+
+      return maxi;
+   }
+
+   /// Gets \p i 'th row.
+   void getRow(int i, LPRowBase<R>& row) const
+   {
+      METHOD( "SPxLPBase::getRow()" );
+
+      row.setLhs(lhs(i));
+      row.setRhs(rhs(i));
+      row.setRowVector(DSVectorBase<R>(rowVector(i)));
+   }
+
+   /// Gets row with identifier \p id.
+   void getRow(const SPxRowId& id, LPRowBase<R>& row) const
+   {
+      getRow(number(id), row);
+   }
+
+   /// Gets rows \p start, ... \p end.
+   void getRows(int start, int end, LPRowSetBase<R>& set) const
+   {
+      METHOD( "SPxLPBase::getRows()" );
+
+      set.clear();
+      for( int i = start; i <= end; i++ )
+         set.add(lhs(i), rowVector(i), rhs(i));
+   }
+
+   /// Gets row vector of row \p i.
+   const SVectorBase<R>& rowVector(int i) const
+   {
+      return LPRowSetBase<R>::rowVector(i);
+   }
+
+   /// Gets row vector of row with identifier \p id.
+   const SVectorBase<R>& rowVector(const SPxRowId& id) const
+   {
+      return LPRowSetBase<R>::rowVector(id);
+   }
+
+   /// Returns right hand side vector.
+   const VectorBase<R>& rhs() const
+   {
+      return LPRowSetBase<R>::rhs();
+   }
+
+   ///
+   R rhs(int i) const
+   {
+      return LPRowSetBase<R>::rhs(i);
+   }
+
+   /// Returns right hand side of row with identifier \p id.
+   R rhs(const SPxRowId& id) const
+   {
+      return LPRowSetBase<R>::rhs(id);
+   }
+
+   /// Returns left hand side vector.
+   const VectorBase<R>& lhs() const
+   {
+      return LPRowSetBase<R>::lhs();
+   }
+
+   ///
+   R lhs(int i) const
+   {
+      return LPRowSetBase<R>::lhs(i);
+   }
+
+   /// Returns left hand side of row with identifier \p id.
+   R lhs(const SPxRowId& id) const
+   {
+      return LPRowSetBase<R>::lhs(id);
+   }
+
+   /// Returns the inequality type of the \p i'th LPRow.
+   typename LPRowBase<R>::Type rowType(int i) const
+   {
+      return LPRowSetBase<R>::type(i);
+   }
+
+   /// Returns the inequality type of the row with identifier \p key.
+   typename LPRowBase<R>::Type rowType(const SPxRowId& id) const
+   {
+      return LPRowSetBase<R>::type(id);
+   }
+
+   /// Gets \p i 'th column.
+   void getCol(int i, LPColBase<R>& col) const
+   {
+      METHOD( "SPxLPBase::getCol()" );
+
+      col.setUpper(upper(i));
+      col.setLower(lower(i));
+      col.setObj(obj(i));
+      col.setColVector(colVector(i));
+   }
+
+   /// Gets column with identifier \p id.
+   void getCol(const SPxColId& id, LPColBase<R>& col) const
+   {
+      getCol(number(id), col);
+   }
+
+   /// Gets columns \p start, ..., \p end.
+   void getCols(int start, int end, LPColSetBase<R>& set) const
+   {
+      METHOD( "SPxLPBase::getCols()" );
+
+      set.clear();
+      for( int i = start; i <= end; i++ )
+         set.add(obj(i), lower(i), colVector(i), upper(i));
+   }
+
+   /// Returns column vector of column \p i.
+   const SVectorBase<R>& colVector(int i) const
+   {
+      return LPColSetBase<R>::colVector(i);
+   }
+
+   /// Returns column vector of column with identifier \p id.
+   const SVectorBase<R>& colVector(const SPxColId& id) const
+   {
+      return LPColSetBase<R>::colVector(id);
+   }
+
+   /// Gets objective vector.
+   void getObj(VectorBase<R>& obj) const
+   {
+      METHOD( "SPxLPBase::getObj()" );
+
+      obj = LPColSetBase<R>::maxObj();
+      if( spxSense() == MINIMIZE )
+         obj *= -1.0;
+   }
+
+   /// Returns objective value of column \p i.
+   R obj(int i) const
+   {
+      return R(spxSense()) * maxObj(i);
+   }
+
+   /// Returns objective value of column with identifier \p id.
+   R obj(const SPxColId& id) const
+   {
+      return R(spxSense()) * maxObj(id);
+   }
+
+   /// Returns objective vector for maximization problem.
+   /** Methods #maxObj() return the objective vector or its elements, after transformation to a maximization
+    *  problem. Since this is how SPxLPBase internally stores any LP these methods are generally faster. The following
+    *  condition holds: #obj() = #spxSense() * maxObj().
+    */
+   const VectorBase<R>& maxObj() const
+   {
+      return LPColSetBase<R>::maxObj();
+   }
+
+   /// Returns objective value of column \p i for maximization problem.
+   R maxObj(int i) const
+   {
+      return LPColSetBase<R>::maxObj(i);
+   }
+
+   /// Returns objective value of column with identifier \p id for maximization problem.
+   R maxObj(const SPxColId& id) const
+   {
+      return LPColSetBase<R>::maxObj(id);
+   }
+
+   /// Returns upper bound vector.
+   const VectorBase<R>& upper() const
+   {
+      return LPColSetBase<R>::upper();
+   }
+
+   /// Returns upper bound of column \p i.
+   R upper(int i) const
+   {
+      return LPColSetBase<R>::upper(i);
+   }
+
+   /// Returns upper bound of column with identifier \p id.
+   R upper(const SPxColId& id) const
+   {
+      return LPColSetBase<R>::upper(id);
+   }
+
+   /// Returns lower bound vector.
+   const VectorBase<R>& lower() const
+   {
+      return LPColSetBase<R>::lower();
+   }
+
+   /// Returns lower bound of column \p i.
+   R lower(int i) const
+   {
+      return LPColSetBase<R>::lower(i);
+   }
+
+   /// Returns lower bound of column with identifier \p id.
+   R lower(const SPxColId& id) const
+   {
+      return LPColSetBase<R>::lower(id);
+   }
+
+   /// Returns the optimization sense.
+   SPxSense spxSense() const
+   {
+      return thesense;
+   }
+
+   /// Returns the row number of the row with identifier \p id.
+   int number(const SPxRowId& id) const
+   {
+      return LPRowSetBase<R>::number(id);
+   }
+
+   /// Returns the column number of the column with identifier \p id.
+   int number(const SPxColId& id) const
+   {
+      return LPColSetBase<R>::number(id);
+   }
+
+   /// Returns the row or column number for identifier \p id.
+   int number(const SPxId& id) const
+   {
+      return (id.type() == SPxId::COL_ID)
+         ? LPColSetBase<R>::number(id)
+         : LPRowSetBase<R>::number(id);
+   }
+
+   /// Returns the row identifier for row \p n.
+   SPxRowId rId(int n) const
+   {
+      return SPxRowId(LPRowSetBase<R>::key(n));
+   }
+
+   /// Returns the column identifier for column \p n.
+   SPxColId cId(int n) const
+   {
+      return SPxColId(LPColSetBase<R>::key(n));
+   }
+
+   //@}
+
+   // ------------------------------------------------------------------------------------------------------------------
+   /**@name Extension */
+   //@{
+
+   ///
+   virtual void addRow(const LPRowBase<R>& row)
+   {
+      doAddRow(row);
+   }
+
+   /// Adds \p row to LPRowSetBase.
+   virtual void addRow(SPxRowId& id, const LPRowBase<R>& row)
+   {
+      addRow(row);
+      id = rId(nRows() - 1);
+   }
+
+   ///
+   virtual void addRows(const LPRowSetBase<R>& pset)
+   {
+      doAddRows(pset);
+   }
+
+   /// adds all LPRowBase%s of \p pset to LPRowSetBase.
+   virtual void addRows(SPxRowId id[], const LPRowSetBase<R>& set)
+   {
+      METHOD( "SPxLPBase::addRows()" );
+
+      int i = nRows();
+      addRows(set);
+      for( int j = 0; i < nRows(); ++i, ++j )
+         id[j] = rId(i);
+   }
+
+   ///
+   virtual void addCol(const LPColBase<R>& col)
+   {
+      doAddCol(col);
+   }
+
+   /// Adds \p col to LPColSetVBase.
+   virtual void addCol(SPxColId& id, const LPColBase<R>& col)
+   {
+      addCol(col);
+      id = cId(nCols() - 1);
+   }
+
+   ///
+   virtual void addCols(const LPColSetBase<R>& pset)
+   {
+      doAddCols(pset);
+   }
+
+   /// Adds all LPColBase%s of \p set to LPColSetBase.
+   virtual void addCols(SPxColId id[], const LPColSetBase<R>& set)
+   {
+      METHOD( "SPxLPBase::addCols()" );
+
+      int i = nCols();
+      addCols(set);
+      for( int j = 0; i < nCols(); ++i, ++j )
+         id[j] = cId(i);
+   }
+
+   //@}
+
+   // ------------------------------------------------------------------------------------------------------------------
+   /**@name Shrinking */
+   //@{
+
+   /// Removes \p i 'th row.
+   virtual void removeRow(int i)
+   {
+      doRemoveRow(i);
+   }
+
+   /// Removes row with identifier \p id.
+   virtual void removeRow(SPxRowId id)
+   {
+      removeRow(number(id));
+   }
+
+   /// Removes multiple rows.
+   /** This method removes all LPRowBase%s from the SPxLPBase with an index \p i such that \p perm[i] < 0. Upon
+    *  completion, \p perm[i] >= 0 indicates the new index where the \p i'th LPRow has been moved to due to this
+    *  removal. Note that \p perm must point to an array of at least #nRows() ints.
+    */
+   virtual void removeRows(int perm[])
+   {
+      doRemoveRows(perm);
+   }
+
+   ///
+   virtual void removeRows(SPxRowId id[], int n, int perm[] = 0)
+   {
+      METHOD( "SPxLPBase::removeRows()" );
+
+      if( perm == 0 )
+      {
+         DataArray < int > p(nRows());
+         removeRows(id, n, p.get_ptr());
+         return;
+      }
+
+      for( int i = nRows() - 1; i >= 0; --i )
+         perm[i] = i;
+
+      while( n-- )
+         perm[number(id[n])] = -1;
+
+      removeRows(perm);
+   }
+
+   /// Removes \p n LPRowBase%s.
+   /** Removing multiple rows with one method invocation is available in two flavours. An array \p perm can be passed as
+    *  third argument or not. If given, \p perm must be an array at least of size #nRows(). It is used to return the
+    *  permutations resulting from this removal: \p perm[i] < 0 indicates, that the element to index \p i has been
+    *  removed.  Otherwise, \p perm[i] is the new index of the element with index \p i before the removal.
+    */
+   virtual void removeRows(int nums[], int n, int perm[] = 0)
+   {
+      METHOD( "SPxLPBase::removeRows()" );
+
+      if( perm == 0 )
+      {
+         DataArray < int > p(nRows());
+         removeRows(nums, n, p.get_ptr());
+         return;
+      }
+
+      for( int i = nRows() - 1; i >= 0; --i )
+         perm[i] = i;
+
+      while( n-- )
+         perm[nums[n]] = -1;
+
+      removeRows(perm);
+   }
+
+   /// Removes rows from \p start to \p end (including both).
+   virtual void removeRowRange(int start, int end, int perm[] = 0)
+   {
+      METHOD( "SPxLPBase::removeRowRange()" );
+
+      if( perm == 0 )
+      {
+         int i = end - start + 1;
+         DataArray < int > p(i);
+
+         while( --i >= 0 )
+            p[i] = start + i;
+
+         removeRows(p.get_ptr(), end - start + 1);
+         return;
+      }
+
+      int i;
+      for( i = 0; i < start; ++i )
+         perm[i] = i;
+      for( ; i <= end; ++i )
+         perm[i] = -1;
+      for( ; i < nRows(); ++i )
+         perm[i] = i;
+
+      removeRows(perm);
+   }
+
+   /// Removes \p i 'th column.
+   virtual void removeCol(int i)
+   {
+      doRemoveCol(i);
+   }
+
+   /// Removes column with identifier \p id.
+   virtual void removeCol(SPxColId id)
+   {
+      removeCol(number(id));
+   }
+
+   /// Removes multiple columns.
+   /** This method removes all LPColBase%s from the SPxLPBase with an index \p i such that \p perm[i] < 0. Upon
+    *  completion, \p perm[i] >= 0 indicates the new index where the \p i 'th LPColBase has been moved to due to this
+    *  removal. Note, that \p perm must point to an array of at least #nCols() ints.
+    */
+   virtual void removeCols(int perm[])
+   {
+      doRemoveCols(perm);
+   }
+
+   ///
+   virtual void removeCols(SPxColId id[], int n, int perm[] = 0)
+   {
+      METHOD( "SPxLPBase::removeCols()" );
+
+      if( perm == 0 )
+      {
+         DataArray < int > p(nCols());
+         removeCols(id, n, p.get_ptr());
+         return;
+      }
+
+      for( int i = nCols() - 1; i >= 0; --i )
+         perm[i] = i;
+
+      while( n-- )
+         perm[number(id[n])] = -1;
+
+      removeCols(perm);
+   }
+
+   /// Removes \p n LPCols.
+   /** Removing multiple columns with one method invocation is available in two flavours. An array \p perm can be passed
+    *  as third argument or not. If given, \p perm must be an array at least of size #nCols(). It is used to return the
+    *  permutations resulting from this removal: \p perm[i] < 0 indicates, that the element to index \p i has been
+    *  removed.  Otherwise, \p perm[i] is the new index of the element with index \p i before the removal.
+    */
+   virtual void removeCols(int nums[], int n, int perm[] = 0)
+   {
+      METHOD( "SPxLPBase::removeCols()" );
+
+      if( perm == 0 )
+      {
+         DataArray < int > p(nCols());
+         removeCols(nums, n, p.get_ptr());
+         return;
+      }
+
+      for( int i = nCols() - 1; i >= 0; --i )
+         perm[i] = i;
+
+      while( n-- )
+         perm[nums[n]] = -1;
+
+      removeCols(perm);
+   }
+
+   /// Removes columns from \p start to \p end (including both).
+   virtual void removeColRange(int start, int end, int perm[] = 0)
+   {
+      METHOD( "SPxLPBase::removeColRange()" );
+
+      if( perm == 0 )
+      {
+         int i = end - start + 1;
+         DataArray < int > p(i);
+
+         while( --i >= 0 )
+            p[i] = start + i;
+
+         removeCols(p.get_ptr(), end - start + 1);
+         return;
+      }
+
+      int i;
+      for( i = 0; i < start; ++i )
+         perm[i] = i;
+      for( ; i <= end; ++i )
+         perm[i] = -1;
+      for( ; i < nCols(); ++i )
+         perm[i] = i;
+
+      removeCols(perm);
+   }
+
+   /// clears the LP.
+   virtual void clear()
+   {
+      METHOD( "SPxLPBase::clear()" );
+
+      LPRowSetBase<R>::clear();
+      LPColSetBase<R>::clear();
+      thesense = MAXIMIZE;
+   }
+
+   //@}
+
+   // ------------------------------------------------------------------------------------------------------------------
+   /**@name IO */
+   //@{
+
+   /// Reads LP in LP format from input stream \p in.
+   virtual bool readLPF(std::istream& in, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0)
+   {
+      MSG_ERROR( spxout << "LP reader for type " << typeid(R).name() << " not implemented.\n" );
+      return false;
+   }
+
+   /// Reads an LP in MPS format from input stream \p in.
+   virtual bool readMPS(std::istream& in, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0)
+   {
+      MSG_ERROR( spxout << "MPS reader for type " << typeid(R).name() << " not implemented.\n" );
+      return false;
+   }
+
+   /// Reads LP in LP or MPS format from input stream \p in.
+   /**@param is       input stream.
+    * @param rowNames contains after the call the names of the constraints (rows) in the same order as the rows in the
+    *                 LP.  Constraints without a name (only possible with LPF files) are automatically assigned a name.
+    *                 Maybe 0 if the names are not needed.
+    * @param colNames contains after the call the names of the variables (columns) in the same order as the columns in
+    *                 the LP.  Maybe 0 if the names are not needed.
+    * @param intVars contains after the call the indices of those variables that where marked as beeing integer in the
+    *                 file.  Maybe 0 if the information is not needed.
+    * @todo Make sure the Id's in the NameSet%s are the same as in the LP.
+    */
+   virtual bool read(std::istream& in, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars  = 0)
+   {
+      bool ok;
+      char c;
+
+      in.get(c);
+      in.putback(c);
+
+      /* MPS starts either with a comment mark '*' or with the keyword 'NAME' at the first column.  LPF starts either
+       * with blanks, a comment mark '\' or with the keyword "MAX" or "MIN" in upper or lower case.  There is no
+       * possible valid LPF file starting with a '*' or 'N'.
+       */
+      ok = ((c == '*') || (c == 'N'))
+         ? readMPS(in, rowNames, colNames, intVars)
+         : readLPF(in, rowNames, colNames, intVars);
+
+      MSG_DEBUG( spxout << "DSPXIO01\n" << *this );
+
+      return ok;
+   }
+
+   /// Reads LP from a file.
+   virtual bool readFile(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0)
+   {
+      METHOD( "SPxLPBase::readFile()" );
+
+      spxifstream file(filename);
+
+      if( !file )
+         return false;
+
+      return read(file, rowNames, colNames, intVars);
+   }
+
+   /** Writes a file in LP format to \p out. If \p rowNames and \p colNames are \c NULL, default names are used for the
+    *  constraints and variables. If \p intVars is not \c NULL, the variables contained in it are marked as integer in
+    *  the output.
+    */
+   virtual void writeLPF(std::ostream&  out, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* p_intvars = 0) const
+   {
+      MSG_ERROR( spxout << "LP writer for type " << typeid(R).name() << " not implemented.\n" );
+   }
+
+   /// Writes a file in MPS format to \p out.
+   virtual void writeMPS(std::ostream&  out, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* p_intvars = 0) const
+   {
+      MSG_ERROR( spxout << "MPS writer for type " << typeid(R).name() << " not implemented.\n" );
+   }
+
+   /// Write loaded LP to \p filename.
+   virtual void writeFile(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* p_intvars = 0) const
+   {
+      METHOD( "SPxLPBase::writeFile()" );
+
+      std::ofstream tmp(filename);
+      size_t len_f = strlen(filename);
+
+      if( len_f > 4 && filename[len_f-1] == 's' && filename[len_f-2] == 'p' && filename[len_f-3] == 'm' && filename[len_f-4] == '.' )
+      {
+         writeMPS(tmp, rowNames, colNames, p_intvars);
+      }
+      else
+      {
+         writeLPF(tmp, rowNames, colNames, p_intvars);
+      }
+   }
+
+   //@}
+
+   // ------------------------------------------------------------------------------------------------------------------
+   /**@name Manipulation */
+   //@{
+
+   /// Changes objective vector to \p newObj.
+   virtual void changeObj(const VectorBase<R>& newObj)
+   {
+      METHOD( "SPxLPBase::changeObj()" );
+
+      assert(maxObj().dim() == newObj.dim());
+      LPColSetBase<R>::maxObj_w() = newObj;
+      LPColSetBase<R>::maxObj_w() *= R(spxSense());
+      assert(isConsistent());
+   }
+
+   /// changes \p i 'th objective vector element to \p newVal.
+   virtual void changeObj(int i, R newVal)
+   {
+      METHOD( "SPxLPBase::changeObj()" );
+
+      newVal *= R(spxSense());
+      LPColSetBase<R>::maxObj_w(i) = newVal;
+      assert(isConsistent());
+   }
+
+   /// Changes objective value of column with identifier \p id to \p newVal.
+   virtual void changeObj(SPxColId id, R newVal)
+   {
+      changeObj(number(id), newVal);
+   }
+
+   /// Changes vector of lower bounds to \p newLower.
+   virtual void changeLower(const VectorBase<R>& newLower)
+   {
+      METHOD( "SPxLPBase::changeLower()" );
+
+      assert(lower().dim() == newLower.dim());
+      LPColSetBase<R>::lower_w() = newLower;
+      assert(isConsistent());
+   }
+
+   /// changes \p i 'th lower bound to \p newLower.
+   virtual void changeLower(int i, R newLower)
+   {
+      METHOD( "SPxLPBase::changeLower()" );
+
+      LPColSetBase<R>::lower_w(i) = newLower;
+      assert(isConsistent());
+   }
+
+   /// changes lower bound of column with identifier \p id to \p newLower.
+   virtual void changeLower(SPxColId id, R newLower)
+   {
+      changeLower(number(id), newLower);
+   }
+
+   /// Changes vector of upper bounds to \p newUpper.
+   virtual void changeUpper(const VectorBase<R>& newUpper)
+   {
+      METHOD( "SPxLPBase::changeUpper()" );
+
+      assert(upper().dim() == newUpper.dim());
+      LPColSetBase<R>::upper_w() = newUpper;
+      assert(isConsistent());
+   }
+
+   /// Changes \p i 'th upper bound to \p newUpper.
+   virtual void changeUpper(int i, R newUpper)
+   {
+      METHOD( "SPxLPBase::changeUpper()" );
+
+      LPColSetBase<R>::upper_w(i) = newUpper;
+      assert(isConsistent());
+   }
+
+   /// Changes upper bound of column with identifier \p id to \p newLower.
+   virtual void changeUpper(SPxColId id, R newUpper)
+   {
+      changeUpper(number(id), newUpper);
+   }
+
+   /// Changes variable bounds to \p newLower and \p newUpper.
+   virtual void changeBounds(const VectorBase<R>& newLower, const VectorBase<R>& newUpper)
+   {
+      METHOD( "SPxLPBase::changeBounds()" );
+
+      changeLower(newLower);
+      changeUpper(newUpper);
+      assert(isConsistent());
+   }
+
+   /// Changes bounds of column \p i to \p newLower and \p newUpper.
+   virtual void changeBounds(int i, R newLower, R newUpper)
+   {
+      METHOD( "SPxLPBase::changeBounds()" );
+
+      changeLower(i, newLower);
+      changeUpper(i, newUpper);
+      assert(isConsistent());
+   }
+
+   /// Changes bounds of column with identifier \p id.
+   virtual void changeBounds(SPxColId id, R newLower, R newUpper)
+   {
+      changeBounds(number(id), newLower, newUpper);
+   }
+
+   /// Changes left hand side vector for constraints to \p newLhs.
+   virtual void changeLhs(const VectorBase<R>& newLhs)
+   {
+      METHOD( "SPxLPBase::changeLhs()" );
+
+      assert(lhs().dim() == newLhs.dim());
+      LPRowSetBase<R>::lhs_w() = newLhs;
+      assert(isConsistent());
+   }
+
+   /// Changes \p i 'th left hand side value to \p newLhs.
+   virtual void changeLhs(int i, R newLhs)
+   {
+      METHOD( "SPxLPBase::changeLhs()" );
+
+      LPRowSetBase<R>::lhs_w(i) = newLhs;
+      assert(isConsistent());
+   }
+
+   /// Changes left hand side value for row with identifier \p id.
+   virtual void changeLhs(SPxRowId id, R newLhs)
+   {
+      changeLhs(number(id), newLhs);
+   }
+
+   /// Changes right hand side vector for constraints to \p newRhs.
+   virtual void changeRhs(const VectorBase<R>& newRhs)
+   {
+      METHOD( "SPxLPBase<R>::changeRhs()" );
+
+      assert(rhs().dim() == newRhs.dim());
+      LPRowSetBase<R>::rhs_w() = newRhs;
+      assert(isConsistent());
+   }
+
+   /// Changes \p i 'th right hand side value to \p newRhs.
+   virtual void changeRhs(int i, R newRhs)
+   {
+      METHOD( "SPxLPBase::changeRhs()" );
+
+      LPRowSetBase<R>::rhs_w(i) = newRhs;
+      assert(isConsistent());
+   }
+
+   /// Changes right hand side value for row with identifier \p id.
+   virtual void changeRhs(SPxRowId id, R newRhs)
+   {
+      changeRhs(number(id), newRhs);
+   }
+
+   /// Changes left and right hand side vectors.
+   virtual void changeRange(const VectorBase<R>& newLhs, const VectorBase<R>& newRhs)
+   {
+      METHOD( "SPxLPBase::changeRange()" );
+
+      changeLhs(newLhs);
+      changeRhs(newRhs);
+      assert(isConsistent());
+   }
+
+   /// Changes left and right hand side of row \p i.
+   virtual void changeRange(int i, R newLhs, R newRhs)
+   {
+      METHOD( "SPxLPBase::changeRange()" );
+
+      changeLhs(i, newLhs);
+      changeRhs(i, newRhs);
+      assert(isConsistent());
+   }
+
+   /// Changes left and right hand side of row with identifier \p id.
+   virtual void changeRange(SPxRowId id, R newLhs, R newRhs)
+   {
+      changeRange(number(id), newLhs, newRhs);
+   }
+
+   /// Replaces \p i 'th row of LP with \p newRow.
+   virtual void changeRow(int n, const LPRowBase<R>& newRow)
+   {
+      METHOD( "SPxLPBase<R>::changeRow()" );
+
+      int j;
+      SVectorBase<R>& row = rowVector_w(n);
+      for( j = row.size() - 1; j >= 0; --j )
+      {
+         SVectorBase<R>& col = colVector_w(row.index(j));
+         col.remove(col.number(n));
+      }
+
+      row.clear();
+
+      changeLhs(n, newRow.lhs());
+      changeRhs(n, newRow.rhs());
+
+      const SVectorBase<R>& newrow = newRow.rowVector();
+      for( j = newrow.size() - 1; j >= 0; --j )
+      {
+         int idx = newrow.index(j);
+         R val = newrow.value(j);
+         LPRowSetBase<R>::add2(n, 1, &idx, &val);
+         LPColSetBase<R>::add2(idx, 1, &n, &val);
+      }
+
+      assert(isConsistent());
+   }
+
+   /// Replaces row with identifier \p id with \p newRow.
+   virtual void changeRow(SPxRowId id, const LPRowBase<R>& newRow)
+   {
+      changeRow(number(id), newRow);
+   }
+
+   /// Replaces \p i 'th column of LP with \p newCol.
+   virtual void changeCol(int n, const LPColBase<R>& newCol)
+   {
+      METHOD( "SPxLPBase::changeCol()" );
+
+      int j;
+      SVectorBase<R>& col = colVector_w(n);
+      for( j = col.size() - 1; j >= 0; --j )
+      {
+         SVectorBase<R>& row = rowVector_w(col.index(j));
+         row.remove(row.number(n));
+      }
+
+      col.clear();
+
+      changeUpper(n, newCol.upper());
+      changeLower(n, newCol.lower());
+      changeObj(n, newCol.obj());
+
+      const SVectorBase<R>& newcol = newCol.colVector();
+      for( j = newcol.size() - 1; j >= 0; --j )
+      {
+         int idx = newcol.index(j);
+         R val = newcol.value(j);
+         LPColSetBase<R>::add2(n, 1, &idx, &val);
+         LPRowSetBase<R>::add2(idx, 1, &n, &val);
+      }
+
+      assert(isConsistent());
+   }
+
+   /// Replaces column with identifier \p id with \p newCol.
+   virtual void changeCol(SPxColId id, const LPColBase<R>& newCol)
+   {
+      changeCol(number(id), newCol);
+   }
+
+   /// Changes LP element (\p i, \p j) to \p val.
+   virtual void changeElement(int i, int j, R val)
+   {
+      METHOD( "SPxLPBase::changeElement()" );
+
+      SVectorBase<R>& row = rowVector_w(i);
+      SVectorBase<R>& col = colVector_w(j);
+
+      if( val != 0.0 )
+      {
+         if( row.number(j) >= 0 )
+         {
+            row.value(row.number(j)) = val;
+            col.value(col.number(i)) = val;
+         }
+         else
+         {
+            LPRowSetBase<R>::add2(i, 1, &j, &val);
+            LPColSetBase<R>::add2(j, 1, &i, &val);
+         }
+      }
+      else if( row.number(j) >= 0 )
+      {
+         row.remove(row.number(j));
+         col.remove(col.number(i));
+      }
+
+      assert(isConsistent());
+   }
+
+   /// Changes LP element identified by (\p rid, \p cid) to \p val.
+   virtual void changeElement(SPxRowId rid, SPxColId cid, R val)
+   {
+      changeElement(number(rid), number(cid), val);
+   }
+
+   /// Changes optimization sense to \p sns.
+   virtual void changeSense(SPxSense sns)
+   {
+      if( sns != thesense )
+         LPColSetBase<R>::maxObj_w() *= -1.0;
+      thesense = sns;
+   }
+
+   /// Computes activity of the rows for a given primal vector.
+   /// @throw SPxInternalCodeException if dimension of primal vector does not match number of columns
+   virtual DVectorBase<R> computePrimalActivity(const VectorBase<R>& primal) const
+   {
+      METHOD( "SPxLPBase::computePrimalActivity()" );
+
+      if( primal.dim() != nCols() )
+      {
+         throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
+      }
+
+      DVectorBase<R> activity(nRows());
+
+      activity.clear();
+
+      for( int c = 0; c < nCols(); c++ )
+         activity.multAdd(primal[c], colVector(c));
+
+      return activity;
+   }
+
+   /// Computes "dual" activity of the columns for a given dual vector, i.e., y^T A.
+   /// @throw SPxInternalCodeException if dimension of dual vector does not match number of rows
+   virtual DVectorBase<R> computeDualActivity(const VectorBase<R>& dual) const
+   {
+      METHOD( "SPxLPBase::computeDualActivity()" );
+
+      if( dual.dim() != nRows() )
+      {
+         throw SPxInternalCodeException("XSPXLP02 Dual vector for computing activity has wrong dimension");
+      }
+
+      DVectorBase<R> activity(nCols());
+
+      activity.clear();
+
+      for( int r = 0; r < nRows(); r++ )
+         activity.multAdd(dual[r], rowVector(r));
+
+      return activity;
+   }
+
+   //@}
+
+   // ------------------------------------------------------------------------------------------------------------------
+   /**@name Miscellaneous */
+   //@{
+
+   /// Consistency check.
+   bool isConsistent() const
+   {
+#ifdef ENABLE_CONSISTENCY_CHECKS
+      METHOD( "SPxLPBase::isConsistent()" );
+
+      for( int i = nCols() - 1; i >= 0; --i )
+      {
+         const SVectorBase<R>& v = colVector(i);
+
+         for( int j = v.size() - 1; j >= 0; --j )
+         {
+            const SVectorBase<R>& w = rowVector(v.index(j));
+            int n = w.number(i);
+
+            if( n < 0 )
+               return MSGinconsistent("SPxLPBase");
+
+            if( v.value(j) != w.value(n) )
+               return MSGinconsistent("SPxLPBase");
+         }
+      }
+
+      for( int i = nRows() - 1; i >= 0; --i )
+      {
+         const SVectorBase<R>& v = rowVector(i);
+
+         for( int j = v.size() - 1; j >= 0; --j )
+         {
+            const SVectorBase<R>& w = colVector(v.index(j));
+            int n = w.number(i);
+
+            if( n < 0 )
+               return MSGinconsistent("SPxLPBase");
+
+            if( v.value(j) != w.value(n) )
+               return MSGinconsistent("SPxLPBase");
+         }
+      }
+
+      return LPRowSetBase<R>::isConsistent() && LPColSetBase<R>::isConsistent();
+#else
+      return true;
+#endif
+   }
+
+   //@}
+
+protected:
+
+   // ------------------------------------------------------------------------------------------------------------------
+   /**@name Protected write access */
+   //@{
+
+   /// Returns right hand side of row \p i.
+   R& rhs_w(int i)
+   {
+      return LPRowSetBase<R>::rhs_w(i);
+   }
+
+   /// Returns left hand side of row \p i.
+   R& lhs_w(int i)
+   {
+      return LPRowSetBase<R>::lhs_w(i);
+   }
+
+   /// Returns objective value of column \p i for maximization problem.
+   R& maxObj_w(int i)
+   {
+      return LPColSetBase<R>::maxObj_w(i);
+   }
+
+   /// Returns upper bound of column \p i.
+   R& upper_w(int i)
+   {
+      return LPColSetBase<R>::upper_w(i);
+   }
+
+   /// Returns lower bound of column \p i.
+   R& lower_w(int i)
+   {
+      return LPColSetBase<R>::lower_w(i);
+   }
+
+   //@}
+
+   // ------------------------------------------------------------------------------------------------------------------
+   /**@name Protected helpers */
+   //@{
+
+   /// Returns the LP as an LPRowSetBase.
+   const LPRowSetBase<R>* lprowset() const
+   {
+      return static_cast<const LPRowSetBase<R>*>(this);
+   }
+
+   /// Returns the LP as an LPColSetBase.
+   const LPColSetBase<R>* lpcolset() const
+   {
+      return static_cast<const LPColSetBase<R>*>(this);
+   }
+
+   /// Internal helper method.
+   virtual void doRemoveRow(int j)
+   {
+      METHOD( "SPxLPBase::doRemoveRow()" );
+
+      const SVectorBase<R>& vec = rowVector(j);
+
+      // remove row vector from column file
+      for( int i = vec.size() - 1; i >= 0; --i )
+      {
+         SVectorBase<R>& remvec = colVector_w(vec.index(i));
+         remvec.remove(remvec.number(j));
+      }
+
+      // move last row to removed position
+      int idx = nRows() - 1;
+      if( j != idx )
+      {
+         const SVectorBase<R>& l_vec = rowVector(idx);
+         for( int i = l_vec.size() - 1; i >= 0; --i )
+         {
+            SVectorBase<R>& movevec = colVector_w(l_vec.index(i));
+            movevec.index(movevec.number(idx)) = j;
+         }
+      }
+
+      LPRowSetBase<R>::remove(j);
+   }
+
+   /// Internal helper method.
+   virtual void doRemoveRows(int perm[])
+   {
+      METHOD( "SPxLPBase::doRemoveRows()" );
+
+      int j = nCols();
+
+      LPRowSetBase<R>::remove(perm);
+
+      for( int i = 0; i < j; ++i )
+      {
+         SVectorBase<R>& vec = colVector_w(i);
+         for( int k = vec.size() - 1; k >= 0; --k )
+         {
+            int idx = vec.index(k);
+            if( perm[idx] < 0 )
+               vec.remove(k);
+            else
+               vec.index(k) = perm[idx];
+         }
+      }
+   }
+
+   /// Internal helper method.
+   virtual void doRemoveCol(int j)
+   {
+      METHOD( "SPxLPBase::doRemoveCol()" );
+
+      const SVectorBase<R>& vec = colVector(j);
+      int i;
+
+      // remove column vector from row file
+      for( i = vec.size() - 1; i >= 0; --i )
+      {
+         SVectorBase<R>& remvec = rowVector_w(vec.index(i));
+         remvec.remove(remvec.number(j));
+      }
+
+      // move last column to removed position
+      int idx = nCols() - 1;
+      if( j != idx )
+      {
+         const SVectorBase<R>& l_vec = colVector(idx);
+         for( i = l_vec.size() - 1; i >= 0; --i )
+         {
+            SVectorBase<R>& movevec = rowVector_w(l_vec.index(i));
+            movevec.index(movevec.number(idx)) = j;
+         }
+      }
+
+      LPColSetBase<R>::remove(j);
+   }
+
+   /// Internal helper method.
+   virtual void doRemoveCols(int perm[])
+   {
+      METHOD( "SPxLPBase::doRemoveCols()" );
+
+      int j = nRows();
+
+      LPColSetBase<R>::remove(perm);
+
+      for( int i = 0; i < j; ++i )
+      {
+         SVectorBase<R>& vec = rowVector_w(i);
+
+         for( int k = vec.size() - 1; k >= 0; --k )
+         {
+            int idx = vec.index(k);
+            if( perm[idx] < 0 )
+               vec.remove(k);
+            else
+               vec.index(k) = perm[idx];
+         }
+      }
+   }
+
+   /// Called after the last \p n rows have just been added.
+   virtual void addedRows(int)
+   {}
+
+   /// Called after the last \p n columns have just been added.
+   virtual void addedCols(int)
+   {}
+
+   ///
+   void added2Set(SVSetBase<R>& set, const SVSetBase<R>& addset, int n)
+   {
+      METHOD( "SPxLPBase::added2Set()" );
+
+      if( n == 0 )
+         return;
+
+      DataArray<int> moreArray(set.num());
+      int* more = moreArray.get_ptr();
+
+      for( int i = set.num() - 1; i >= 0; --i )
+         more[i] = 0;
+
+      int tot = 0;
+      int end = addset.num();
+
+      for( int i = addset.num() - n; i < end; ++i )
+      {
+         const SVectorBase<R>& vec = addset[i];
+
+         tot += vec.size();
+         for( int j = vec.size() - 1; j >= 0; --j )
+            more[vec.index(j)]++;
+      }
+
+      if( set.memMax() < tot )
+         set.memRemax(tot);
+
+      for( int i = set.num() - 1; i >= 0; --i )
+      {
+         int j = set[i].size();
+         set.xtend(set[i], j + more[i]);
+         set[i].set_size( j + more[i] );
+         more[i] = j;
+      }
+
+      for( int i = addset.num() - n; i < addset.num(); ++i)
+      {
+         const SVectorBase<R>& vec = addset[i];
+
+         for( int j = vec.size() - 1; j >= 0; --j )
+         {
+            int k = vec.index(j);
+            int m = more[k]++;
+            SVectorBase<R>& l_xtend = set[k];
+            l_xtend.index(m) = i;
+            l_xtend.value(m) = vec.value(j);
+         }
+      }
+   }
+
+   //@}
+
+
+private:
+
+   // ------------------------------------------------------------------------------------------------------------------
+   /**@name Private helpers */
+   //@{
+
+   /// Returns the LP as an LPRowSet.
+   SVectorBase<R>& colVector_w(int i)
+   {
+      return LPColSetBase<R>::colVector_w(i);
+   }
+
+   ///
+   SVectorBase<R>& rowVector_w(int i)
+   {
+      return LPRowSetBase<R>::rowVector_w(i);
+   }
+
+   ///
+   void doAddRow (const LPRowBase<R>& row)
+   {
+      METHOD( "SPxLPBase::doAddRow()" );
+
+      int idx = nRows();
+      int oldColNumber = nCols();
+      const SVectorBase<R>& vec = row.rowVector();
+
+      LPRowSetBase<R>::add(row);
+
+      // now insert nonzeros to column file also
+      for( int j = vec.size() - 1; j >= 0; --j )
+      {
+         R val = vec.value(j);
+         int i = vec.index(j);
+
+         // create new columns if required
+         if( i >= nCols() )
+         {
+            LPColBase<R> empty;
+            for( int k = nCols(); k <= i; ++k )
+               LPColSetBase<R>::add(empty);
+         }
+
+         assert(i < nCols());
+         LPColSetBase<R>::add2(i, 1, &idx, &val);
+      }
+
+      addedRows(1);
+      addedCols(nCols() - oldColNumber);
+   }
+
+   ///
+   void doAddRows(const LPRowSetBase<R>& set)
+   {
+      METHOD( "SPxLPBase::doAddRows()" );
+
+      int i, j, k, ii, idx;
+      SVectorBase<R>* col;
+      DataArray < int > newCols(nCols());
+      int oldRowNumber = nRows();
+      int oldColNumber = nCols();
+
+      if( &set != this )
+         LPRowSetBase<R>::add(set);
+
+      assert(LPRowSetBase<R>::isConsistent());
+      assert(LPColSetBase<R>::isConsistent());
+
+      // count additional nonzeros per column
+      for( i = nCols() - 1; i >= 0; --i )
+         newCols[i] = 0;
+      for( i = set.num() - 1; i >= 0; --i )
+      {
+         const SVectorBase<R>& vec = set.rowVector(i);
+
+         for( j = vec.size() - 1; j >= 0; --j )
+         {
+            // create new columns if required
+            ii = vec.index(j);
+            if( ii >= nCols() )
+            {
+               LPColBase<R> empty;
+               newCols.reSize(ii + 1);
+               for( k = nCols(); k <= ii; ++k )
+               {
+                  newCols[k] = 0;
+                  LPColSetBase<R>::add(empty);
+               }
+            }
+
+            assert(ii < nCols());
+            newCols[ii]++;
+         }
+      }
+
+      // extend columns as required (backward because of memory efficiency reasons)
+      for( i = nCols() - 1; i >= 0; --i )
+      {
+         if( newCols[i] > 0 )
+         {
+            int len = newCols[i] + colVector(i).size();
+            LPColSetBase<R>::xtend(i, len);
+
+            /* preset the sizes: beware that this can irritate a consistency check call from xtend(). We need to set the
+             * sizes here, because a possible garbage collection called from xtend might destroy the sizes again. */
+            colVector_w(i).set_size( len );
+         }
+      }
+
+      // insert new elements to column file
+      for( i = nRows() - 1; i >= oldRowNumber; --i )
+      {
+         const SVectorBase<R>& vec = rowVector(i);
+
+         for( j = vec.size() - 1; j >= 0; --j )
+         {
+            k = vec.index(j);
+            col = &colVector_w(k);
+            idx = col->size() - newCols[k];
+            assert(newCols[k] > 0);
+            assert(idx >= 0);
+            newCols[k]--;
+            col->index(idx) = i;
+            col->value(idx) = vec.value(j);
+         }
+      }
+
+#ifndef NDEBUG
+      for( i = 0; i < nCols(); ++i )
+         assert( newCols[i] == 0 );
+#endif
+
+      assert(SPxLPBase<R>::isConsistent());
+
+      assert( set.num() == nRows() - oldRowNumber );
+      addedRows( nRows() - oldRowNumber );
+      addedCols( nCols() - oldColNumber );
+   }
+
+   ///
+   void doAddCol (const LPColBase<R>& col)
+   {
+      METHOD( "SPxLPBase::doAddCol()" );
+
+      int idx = nCols();
+      int oldRowNumber = nRows();
+      const SVectorBase<R>& vec = col.colVector();
+
+      LPColSetBase<R>::add(col);
+      LPColSetBase<R>::maxObj_w(idx) *= thesense;
+
+      // now insert nonzeros to row file also
+      for( int j = vec.size() - 1; j >= 0; --j )
+      {
+         R val = vec.value(j);
+         int i = vec.index(j);
+
+         // create new rows if required
+         if( i >= nRows() )
+         {
+            LPRowBase<R> empty;
+            for( int k = nRows(); k <= i; ++k )
+               LPRowSetBase<R>::add(empty);
+         }
+
+         assert(i < nRows());
+         LPRowSetBase<R>::add2(i, 1, &idx, &val);
+      }
+
+      addedCols(1);
+      addedRows(nRows() - oldRowNumber);
+   }
+
+   ///
+   void doAddCols(const LPColSetBase<R>& set)
+   {
+      METHOD( "SPxLPBase::doAddCols()" );
+
+      int i, j;
+      int oldColNumber = nCols();
+      int oldRowNumber = nRows();
+      DataArray < int > newRows(nRows());
+
+      if( &set != this )
+         LPColSetBase<R>::add(set);
+
+      assert(LPColSetBase<R>::isConsistent());
+      assert(LPRowSetBase<R>::isConsistent());
+
+      // count additional nonzeros per row
+      for( i = nRows() - 1; i >= 0; --i )
+         newRows[i] = 0;
+
+      for( i = set.num() - 1; i >= 0; --i )
+      {
+         const SVectorBase<R>& vec = set.colVector(i);
+
+         for( j = vec.size() - 1; j >= 0; --j )
+         {
+            // create new rows if required
+            int l = vec.index(j);
+            if( l >= nRows() )
+            {
+               LPRowBase<R> empty;
+               newRows.reSize(l + 1);
+               for( int k = nRows(); k <= l; ++k )
+               {
+                  newRows[k] = 0;
+                  LPRowSetBase<R>::add(empty);
+               }
+
+            }
+
+            assert(l < nRows());
+            newRows[l]++;
+         }
+      }
+
+      // extend rows as required
+      for( i = 0; i < nRows(); ++i )
+      {
+         if( newRows[i] > 0 )
+         {
+            int len = newRows[i] + rowVector(i).size();
+            LPRowSetBase<R>::xtend(i, len);
+            rowVector_w(i).set_size( len );
+         }
+      }
+
+      // insert new elements to row file
+      for( i = oldColNumber; i < nCols(); ++i )
+      {
+         LPColSetBase<R>::maxObj_w(i) *= thesense;
+         const SVectorBase<R>& vec = colVector(i);
+
+         for( j = vec.size() - 1; j >= 0; --j )
+         {
+            int k = vec.index(j);
+            SVectorBase<R>& row = rowVector_w(k);
+            int idx = row.size() - newRows[k];
+            assert(newRows[k] > 0);
+            newRows[k]--;
+            row.index(idx) = i;
+            row.value(idx) = vec.value(j);
+         }
+      }
+
+#ifndef NDEBUG
+      for( i = 0; i < nRows(); ++i )
+         assert( newRows[i] == 0 );
+#endif
+
+      assert(SPxLPBase<R>::isConsistent());
+
+      assert(set.num() == nCols() - oldColNumber);
+      addedCols(nCols() - oldColNumber);
+      addedRows(nRows() - oldRowNumber);
+   }
+
+   //@}
+
+public:
+
+   // ------------------------------------------------------------------------------------------------------------------
+   /**@name Constructors / Destructors */
+   //@{
+
+   /// Default constructor.
+   SPxLPBase<R>()
+   {
+      SPxLPBase<R>::clear(); // clear is virtual.
+
+      assert(isConsistent());
+   }
+
+   /// Destructor.
+   virtual ~SPxLPBase<R>()
+   {}
+
+   /// Copy constructor.
+   SPxLPBase<R>(const SPxLPBase<R>& old)
+      : LPRowSetBase<R>(old)
+      , LPColSetBase<R>(old)
+      , thesense(old.thesense)
+   {
+      assert(isConsistent());
+   }
+
+   /// Copy constructor.
+   template < class S >
+   SPxLPBase<R>(const SPxLPBase<S>& old)
+      : LPRowSetBase<R>(old)
+      , LPColSetBase<R>(old)
+      , thesense(old.thesense == SPxLPBase<S>::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE)
+   {
+      assert(isConsistent());
+   }
+
+   /// Assignment operator.
+   SPxLPBase<R>& operator=(const SPxLPBase<R>& old)
+   {
+      if( this != &old )
+      {
+         LPRowSetBase<R>::operator=(old);
+         LPColSetBase<R>::operator=(old);
+         thesense = old.thesense;
+
+         assert(isConsistent());
+      }
+
+      return *this;
+   }
+
+   /// Assignment operator.
+   template < class S >
+   SPxLPBase<R>& operator=(const SPxLPBase<S>& old)
+   {
+      if( this != (SPxLPBase<R>*)(&old) )
+      {
+         LPRowSetBase<R>::operator=(old);
+         LPColSetBase<R>::operator=(old);
+         thesense = (old.thesense) == SPxLPBase<S>::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE;
+
+         assert(isConsistent());
+      }
+
+      return *this;
+   }
+
+   //@}
+};
+
+} // namespace soplex
+#endif // _SPXLPBASE_H_
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Emacs Local Variables:
+// Emacs mode:c++
+// Emacs c-basic-offset:3
+// Emacs tab-width:8
+// Emacs indent-tabs-mode:nil
+// Emacs End:
+// ---------------------------------------------------------------------------------------------------------------------
