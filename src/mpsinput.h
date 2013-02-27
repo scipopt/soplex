@@ -21,8 +21,7 @@
 
 #include <iostream>
 
-#include "spxlp.h"
-
+#include "spxout.h"
 
 namespace soplex
 { 
@@ -40,14 +39,24 @@ public:
    /**@name Types */
    //@{
    ///
+
    enum Section
    {
       NAME, OBJSEN, OBJNAME, ROWS, COLUMNS, RHS, RANGES, BOUNDS, ENDATA
    };
    ///
+
+   /// optimization sense.
+   enum Sense
+   {
+      MAXIMIZE = 1,
+      MINIMIZE = -1
+   };
+
    enum { MAX_LINE_LEN = 256 };
+
    //@}
-   
+
 private:
 
    //-----------------------------------
@@ -60,7 +69,7 @@ private:
    /// line number
    int             m_lineno;
    /// objctive sense (maximization or minimization)
-   SPxLP::SPxSense m_objsense;
+   Sense           m_objsense;
    /// is set to \c true upon a syntax error
    bool            m_has_error;
    /// the line buffer
@@ -102,7 +111,7 @@ public:
       : m_section       ( NAME )
       , m_input         ( p_input )
       , m_lineno        ( 0 )
-      , m_objsense      ( SPxLP::MINIMIZE )
+      , m_objsense      ( MPSInput::MINIMIZE )
       , m_has_error     ( false )
       , m_is_integer    ( false )
       , m_is_new_format ( false )
@@ -148,7 +157,7 @@ public:
    ///
    const char*     objName()   const { return m_objname; }
    ///
-   SPxLP::SPxSense objSense()  const { return m_objsense; }
+   Sense           objSense()  const { return m_objsense; }
    ///
    bool            hasError()  const { return m_has_error; }
    ///
@@ -176,7 +185,7 @@ public:
       strcpy(m_objname, p_objname);
    }
    ///
-   void setObjSense(SPxLP::SPxSense sense)
+   void setObjSense(Sense sense)
    {
       m_objsense = sense;
    }

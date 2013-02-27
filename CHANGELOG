@@ -12,6 +12,7 @@ code quality & new features:
     (see SPARSITYTHRESHOLD in spxsolver.h) sparse, full pricing is used. Partial pricing is only recommended for large
     instances, or instances, that spend much time in pricing. Partial pricing is likely to increase the number of iterations.
 - refinement step to improve feasibility/optimality also for steep pricer (was devex only)
+- own objective sense enumerator in MPS parser
 
 interface:
 - renamed class MpqReal to Rational

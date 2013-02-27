@@ -79,9 +79,9 @@ static void readObjsen(MPSInput& mps)
          break;
 
       if (!strcmp(mps.field1(), "MIN"))
-         mps.setObjSense(SPxLP::MINIMIZE);
+         mps.setObjSense(MPSInput::MINIMIZE);
       else if (!strcmp(mps.field1(), "MAX"))
-         mps.setObjSense(SPxLP::MAXIMIZE);
+         mps.setObjSense(MPSInput::MAXIMIZE);
       else
          break;
 
@@ -689,12 +689,11 @@ bool SPxLP::readMPS(
       clear();
    else
    {
-      changeSense(mps.objSense());
+      changeSense(mps.objSense() == MPSInput::MINIMIZE ? SPxLP::MINIMIZE : SPxLP::MAXIMIZE);
 
       MSG_INFO2(
-         spxout << "IMPSRD06 Objective sense: " 
-                << ((mps.objSense() == MINIMIZE) ? "Minimize" : "Maximize") 
-                << std::endl;         
+         spxout << "IMPSRD06 Objective sense: "
+                << ((mps.objSense() == MPSInput::MINIMIZE) ? "Minimize" : "Maximize") << std::endl;
       )
 
       added2Set(
