@@ -184,7 +184,7 @@ public:
             --e;
             if( e->idx == i )
             {
-               assert(index(number(i)) == i);
+               assert(index(n) == i);
                return n;
             }
          }
@@ -536,14 +536,14 @@ public:
    /// Set size of the vector.
    void set_size(int s)
    {
-      assert(s == 0 || m_elem != 0);
+      assert(m_elem != 0 || s == 0);
       memused = s;
    }
 
    /// Set the maximum number of nonzeros in the vector.
    void set_max(int m)
    {
-      assert((m == 0) == (m_elem == 0));
+      assert(m_elem != 0 || m == 0);
       memsize = m;
    }
 

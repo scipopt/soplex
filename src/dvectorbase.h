@@ -193,7 +193,7 @@ public:
    {
       std::cout << "DVectorBase DVectorBaseS assignment\n";
 
-      if( (void*)this != (void*)&vec )
+      if( this != (DVectorBase<R>*)&vec )
       {
          std::cout << "...exec\n";
 
@@ -287,10 +287,10 @@ public:
    bool isConsistent() const
    {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-      if( val != mem || dimen > memsize || dimen < 0 )
+      if( VectorBase<R>::val != mem || VectorBase<R>::dimen > memsize || VectorBase<R>::dimen < 0 )
          return MSGinconsistent("DVectorBase");
 
-      return Vector::isConsistent();
+      return VectorBase<R>::isConsistent();
 #endif
 
       return true;

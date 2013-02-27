@@ -105,6 +105,17 @@ public:
    }
 
    /// Copy constructor.
+   DSVectorBase<R>(const DSVectorBase<R>& old)
+      : SVectorBase<R>()
+      , theelem(0)
+   {
+      allocMem(old.size());
+      SVectorBase<R>::operator=(old);
+
+      assert(isConsistent());
+   }
+
+   /// Copy constructor.
    template < class S >
    DSVectorBase<R>(const DSVectorBase<S>& old)
       : SVectorBase<R>()
@@ -139,10 +150,23 @@ public:
    }
 
    /// Assignment operator.
+   DSVectorBase<R>& operator=(const DSVectorBase<R>& vec)
+   {
+      if( this != &vec )
+      {
+         SVectorBase<R>::clear();
+         makeMem(vec.size());
+         SVectorBase<R>::operator=(vec);
+      }
+
+      return *this;
+   }
+
+   /// Assignment operator.
    template < class S >
    DSVectorBase<R>& operator=(const DSVectorBase<S>& vec)
    {
-      if( this != &vec )
+      if( this != (DSVectorBase<R>*)(&vec) )
       {
          SVectorBase<R>::clear();
          makeMem(vec.size());
@@ -246,7 +270,7 @@ public:
    bool isConsistent() const
    {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-      if( theelem != 0 && mem() != theelem )
+      if( theelem != 0 && SVectorBase<R>::mem() != theelem )
          return MSGinconsistent("DSVectorBase");
 #endif
 

@@ -354,9 +354,9 @@ public:
          ps->set_max(ps->size());
       }
 
-      if( idxmax < 0 )
+      if( idxmax <= 0 )
       {
-         ensureMem(2);
+         ensureMem(1);
          idxmax = memMax() - memSize();
       }
       else
@@ -772,7 +772,7 @@ public:
          if( !ps->isConsistent() )
             return MSGinconsistent("SVSetBase");
 
-         if( ps->mem() > &last() )
+         if( ps->mem() > &SVSetBaseArray::last() )
             return MSGinconsistent("SVSetBase");
 
          next = list.next(ps);
@@ -889,11 +889,11 @@ public:
 } // namespace soplex
 #endif // _SVSETBASE_H_
 
-//-----------------------------------------------------------------------------
-//Emacs Local Variables:
-//Emacs mode:c++
-//Emacs c-basic-offset:3
-//Emacs tab-width:8
-//Emacs indent-tabs-mode:nil
-//Emacs End:
-//-----------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// Emacs Local Variables:
+// Emacs mode:c++
+// Emacs c-basic-offset:3
+// Emacs tab-width:8
+// Emacs indent-tabs-mode:nil
+// Emacs End:
+// ---------------------------------------------------------------------------------------------------------------------

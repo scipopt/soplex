@@ -773,7 +773,7 @@ template < class R >
 template < class S >
 DSVectorBase<R>& DSVectorBase<R>::operator=(const VectorBase<S>& vec)
 {
-   assert(this != &vec);
+   assert(this != (DSVectorBase<R>*)(&vec));
 
    SVectorBase<R>::clear();
    setMax(vec.dim());
@@ -1022,6 +1022,7 @@ template class DSVectorBase < Rational >;
 template class SSVectorBase < Rational >;
 template class SVSetBase < Rational >;
 #endif
+
 }
 
 #endif // _VECTORS_H_
