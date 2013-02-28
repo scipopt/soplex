@@ -130,7 +130,7 @@ Real SVector::maxAbs() const
 #else // new
    Real maxi = 0.0;
 
-   for(int i = 0; i < size(); ++i)
+   for(int i = size()-1; i >= 0; --i)
       if (fabs(m_elem[i].val) > maxi)
          maxi = fabs(m_elem[i].val);
 
@@ -156,7 +156,7 @@ Real SVector::minAbs() const
 #else // new
    Real mini = infinity;
 
-   for(int i = 0; i < size(); ++i)
+   for(int i = size()-1; i >= 0; --i)
       if (fabs(m_elem[i].val) < mini)
          mini = fabs(m_elem[i].val);
 

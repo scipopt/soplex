@@ -203,9 +203,10 @@ void SSVector::setup()
    {
       IdxSet::clear();
 
+      int d = dim();
       num = 0;
 
-      for(int i = 0; i < dim(); ++i)
+      for(int i = 0; i < d; ++i)
       {
          if (val[i] != 0.0)
          {
@@ -250,7 +251,7 @@ SSVector& SSVector::operator+=(const SVector& vec)
 
 SSVector& SSVector::operator+=(const SSVector& vec)
 {
-   for (int i = 0; i < vec.size(); ++i)
+   for (int i = vec.size()-1; i >= 0; --i)
       val[vec.index(i)] += vec.value(i);
 
    if (isSetup())
@@ -289,7 +290,7 @@ SSVector& SSVector::operator-=(const SSVector& vec)
 {
    if (vec.isSetup())
    {
-      for (int i = 0; i < vec.size(); ++i)
+      for (int i = vec.size()-1; i >= 0; --i)
          val[vec.index(i)] -= vec.value(i);
    }
    else
@@ -309,7 +310,7 @@ SSVector& SSVector::operator*=(Real x)
 {
    assert(isSetup());
 
-   for (int i = 0; i < size(); ++i)
+   for (int i = size()-1; i >= 0; --i)
       val[index(i)] *= x;
 
    assert(isConsistent());
@@ -537,7 +538,7 @@ SSVector& SSVector::operator=(const SSVector& rhs)
       {
          IdxSet::operator=(rhs);
 
-         for(int i = 0; i < size(); ++i)
+         for(int i = size()-1; i >= 0; --i)
          {
             int j  = index(i);
             val[j] = rhs.val[j];
@@ -546,8 +547,9 @@ SSVector& SSVector::operator=(const SSVector& rhs)
       else
       {
          num = 0;
+         int d = rhs.dim();
 
-         for(int i = 0; i < rhs.dim(); ++i)
+         for(int i = 0; i < d; ++i)
          {
             if (isNotZero(rhs.val[i], epsilon))
             {
@@ -575,8 +577,8 @@ void SSVector::setup_and_assign(SSVector& rhs)
    if (rhs.isSetup())
    {
       IdxSet::operator=(rhs);
-      
-      for(int i = 0; i < size(); ++i)
+
+      for(int i = size()-1; i >= 0; --i)
       {
          int j  = index(i);
          val[j] = rhs.val[j];
@@ -585,8 +587,9 @@ void SSVector::setup_and_assign(SSVector& rhs)
    else
    {
       num = 0;
+      int d = rhs.dim();
 
-      for(int i = 0; i < rhs.dim(); ++i)
+      for(int i = 0; i < d; ++i)
       {
          if (rhs.val[i] != 0.0)
          {
@@ -624,9 +627,10 @@ SSVector& SSVector::assign(const SVector& rhs)
 {
    assert(rhs.dim() <= Vector::dim());
 
+   int s = rhs.size();
    num = 0;
 
-   for(int i = 0; i < rhs.size(); ++i)
+   for(int i = 0; i < s; ++i)
    {
       int  k = rhs.index(i);
       Real v = rhs.value(i);
@@ -689,6 +693,8 @@ SSVector& SSVector::assign2productShort(const SVSet& A, const SSVector& x)
    const Real     x0     = x.val[curidx];
    const SVector& A0     = A    [curidx];
    int            nonzero_idx = 0;
+   int            xsize  = x.size();
+   int            Aisize;
 
    num = A0.size();
    if ( isZero(x0, epsilon) || num == 0 )
@@ -711,17 +717,18 @@ SSVector& SSVector::assign2productShort(const SVSet& A, const SSVector& x)
    }
 
    // Compute the other x[i] * A[i] and add them to the existing vector.
-   for ( register int i = 1; i < x.size(); ++i )
+   for ( register int i = 1; i < xsize; ++i )
    {
       curidx                = x.idx[i];
       const Real     xi     = x.val[curidx];
       const SVector& Ai     = A    [curidx];
 
+      Aisize = Ai.size();
       // If A[i] == 0 or x[i] == 0, do nothing.
-      if ( isNotZero(xi, epsilon) || Ai.size() == 0 )
+      if ( isNotZero(xi, epsilon) || Aisize == 0 )
       {
          // Compute x[i] * A[i] and add it to the existing vector.
-         for ( register int j = 0; j < Ai.size(); ++j )
+         for ( register int j = 0; j < Aisize; ++j )
          {
             const SVector::Element& elt  = Ai.element(j);
             idx[ nonzero_idx ]           = elt.idx;
@@ -773,23 +780,27 @@ SSVector& SSVector::assign2productFull(const SVSet& A, const SSVector& x)
 {
    assert(x.isSetup());
 
-   if (x.size() == 0) // x can be setup but have size 0 => this := zero vector
+   int xsize = x.size();
+   int Aisize;
+
+   if (xsize == 0) // x can be setup but have size 0 => this := zero vector
    {
       clear();
       return *this;
    }
 
    bool A_is_zero = true;
-   for ( int i = 0; i < x.size(); ++i )
+   for ( int i = 0; i < xsize; ++i )
    {
       const int      curidx = x.idx[i];
       const Real     xi     = x.val[curidx];
       const SVector& Ai     = A    [curidx];
+      Aisize = Ai.size();
 
-      if ( A_is_zero && Ai.size() > 0 )
+      if ( A_is_zero && Aisize > 0 )
          A_is_zero = false;
 
-      for ( register int j = 0; j < Ai.size(); ++j )
+      for ( register int j = 0; j < Aisize; ++j )
       {
          const SVector::Element& elt  = Ai.element(j);
          val[ elt.idx ] += xi * elt.val;

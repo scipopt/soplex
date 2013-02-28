@@ -72,7 +72,7 @@ Vector& Vector::assign(const SVector& psv)
 Vector& Vector::operator+=(const Vector& vec)
 {
    assert(dim() == vec.dim());
-   for (int i = 0; i < dim(); ++i)
+   for (int i = dim()-1; i >= 0; --i)
       val[i] += vec[i];
    return *this;
 }
@@ -102,7 +102,7 @@ Vector& Vector::operator+=(const SSVector& vec)
 Vector& Vector::operator-=(const Vector& vec)
 {
    assert(dim() == vec.dim());
-   for (int i = 0; i < dim(); ++i)
+   for (int i = dim()-1; i >= 0; --i)
       val[i] -= vec[i];
    return *this;
 }
@@ -131,7 +131,7 @@ Vector& Vector::operator-=(const SSVector& vec)
 
 Vector& Vector::operator*=(Real x)
 {
-   for (int i = 0; i < dim(); ++i)
+   for( int i = dim()-1; i >= 0; --i )
       val[i] *= x;
 
    return *this;
@@ -151,7 +151,7 @@ Real Vector::maxAbs() const
 {
    Real maxi = 0.0;
 
-   for(int i = 0; i < dim(); ++i)
+   for( int i = dim()-1; i >= 0; --i )
       if (fabs(val[i]) > maxi)
          maxi = fabs(val[i]);
 
@@ -164,7 +164,7 @@ Real Vector::minAbs() const
 {
    Real mini = infinity;
 
-   for(int i = 0; i < dim(); ++i)
+   for( int i = dim()-1; i >= 0; --i )
       if (fabs(val[i]) < mini)
          mini = fabs(val[i]);
 
