@@ -13,11 +13,9 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file  spxlpreal.h
+/**@file  spxlpbase.cpp
  * @brief Saving LPs with Real values in a form suitable for SoPlex.
  */
-#ifndef _SPXLPREAL_H_
-#define _SPXLPREAL_H_
 
 #include <assert.h>
 #include <stdio.h>
@@ -2094,7 +2092,6 @@ void SPxLPBase<Real>::writeMPS(
 template class SPxLPBase < Real >;
 
 } // namespace soplex
-#endif // _SPXLPREAL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Emacs Local Variables:
