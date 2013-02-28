@@ -187,8 +187,6 @@ public:
    /// Destructor.
    ~DSVectorBase<R>()
    {
-      std::cout << "~DSVectorBase\n";
-
       if( theelem )
       {
          for( int i = SVectorBase<R>::max() - 1; i >= 0; i-- )

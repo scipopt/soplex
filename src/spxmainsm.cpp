@@ -2231,7 +2231,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
 
                // sort col elements by increasing idx
                IdxCompare compare;
-               SPxQuicksort(col_idx_sorted.mem()+1, col_idx_sorted.size(), compare);
+               SPxQuicksort(col_idx_sorted.mem(), col_idx_sorted.size(), compare);
 
                FreeZeroObjVariablePS* FreeZeroObjVariablePSptr = 0;
                spx_alloc(FreeZeroObjVariablePSptr);
@@ -2913,7 +2913,7 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
                ElementCompare compare;
 
                if (classSet[k].size() > 1)
-                  SPxQuicksort(classSet[k].mem()+1, classSet[k].size(), compare);
+                  SPxQuicksort(classSet[k].mem(), classSet[k].size(), compare);
 
                // use new index first
                int classIdx = idxSet.index(0);
@@ -3245,7 +3245,7 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
                ElementCompare compare;
 
                if (classSet[k].size() > 1)
-                  SPxQuicksort(classSet[k].mem()+1, classSet[k].size(), compare);
+                  SPxQuicksort(classSet[k].mem(), classSet[k].size(), compare);
 
                // use new index first
                int classIdx = idxSet.index(0);

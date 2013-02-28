@@ -20,6 +20,7 @@
 
 #include "spxdefines.h"
 #include "rational.h"
+#include "dvector_exact.h"
 #include "spxsolver.h"
 #include "spxpricer.h"
 #include "spxratiotester.h"
@@ -1425,7 +1426,8 @@ bool SPxSolver::refine(
       }
 
       /* compute sides violation */
-      slack_ex = computePrimalActivity(primal_ex);
+      /**@todo use exact LP */
+      slack_ex = computePrimalActivity(DVector(primal_ex));
 
       sidesviol_ex = 0;
       for( int r = 0; r < nRows(); r++ )
@@ -1442,7 +1444,8 @@ bool SPxSolver::refine(
       }
 
       /* compute reduced costs and reduced cost violation */
-      redcost_ex = computeDualActivity(dual_ex);
+      /**@todo use exact LP */
+      redcost_ex = computeDualActivity(DVector(dual_ex));
       redcostviol_ex = 0;
 
       for( int c = 0; c < nCols(); c++ )
@@ -1646,7 +1649,8 @@ bool SPxSolver::refine(
          }
 
          /* compute sides violation */
-         slack_ex = computePrimalActivity(modprimal_ex);
+         /**@todo use exact LP */
+         slack_ex = computePrimalActivity(DVector(modprimal_ex));
 
          sidesviol_ex = 0;
          for( int r = 0; r < nRows(); r++ )
@@ -1662,7 +1666,8 @@ bool SPxSolver::refine(
          }
 
          /* compute reduced costs and reduced cost violation */
-         redcost_ex = computeDualActivity(moddual_ex);
+         /**@todo use exact LP */
+         redcost_ex = computeDualActivity(DVector(moddual_ex));
 
          redcostviol_ex = 0;
          for( int c = 0; c < nCols(); c++ )

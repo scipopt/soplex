@@ -85,24 +85,18 @@ LIBDIR		=	lib
 INCLUDEDIR	=	include
 NAME		=	soplex
 LIBOBJ		= 	changesoplex.o clufactor.o didxset.o \
-			dsvector.o dvector.o dvector_exact.o enter.o \
-			idxset.o leave.o lpcolset.o lprowset.o \
-			lprow.o rational.o mpsinput.o nameset.o \
+			enter.o idxset.o leave.o rational.o mpsinput.o nameset.o \
 			slufactor.o soplex.o \
 			spxbasis.o spxbounds.o spxboundflippingrt.o spxchangebasis.o \
 			spxequilisc.o spxdantzigpr.o spxdefaultrt.o \
 			spxdefines.o spxdesc.o spxdevexpr.o \
 			spxfastrt.o spxfileio.o spxgeometsc.o spxgithash.o\
-			spxharrisrt.o spxhybridpr.o spxid.o spxio.o \
-			spxlp.o spxlpbase.o spxlpfread.o spxmainsm.o spxmpsread.o \
-			spxmpswrite.o spxlpfwrite.o \
+			spxharrisrt.o spxhybridpr.o spxid.o spxlpbase.o spxmainsm.o \
 			spxout.o spxparmultpr.o spxquality.o \
 			spxscaler.o spxshift.o spxsolver.o spxsolve.o \
 			spxstarter.o spxsteeppr.o spxsumst.o spxvecs.o \
 			spxvectorst.o spxweightpr.o spxweightst.o spxwritestate.o \
-			ssvector.o svector.o svset.o timer.o \
-			tracemethod.o unitvector.o updatevector.o \
-			vector.o vector_exact.o \
+			timer.o tracemethod.o unitvector.o updatevector.o \
 			gzstream.o
 BINOBJ		=	soplexmain.o
 EXAMPLEOBJ	=	simpleexample.o

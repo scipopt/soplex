@@ -20,118 +20,13 @@
 #ifndef _DVECTOR_EXACT_H_
 #define _DVECTOR_EXACT_H_
 
-#include <iostream>
-#include <assert.h>
-
-#include "spxdefines.h"
 #include "rational.h"
-#include "vector_exact.h"
-#include "vector.h"
-#include "svector.h"
+#include "basevectors.h"
+#include "vector_exact.h" // for compatibility
 
 namespace soplex
 {
-/**@brief   Dynamic vectors of Rational.
- * @ingroup Algebra
- *
- * Class DVector_exact is a copy of class DVector replacing the floating point type Real with the exact Rational.
- */
-class DVector_exact : public Vector_exact
-{
-   //-----------------------------------
-   /**@name Data */
-   //@{
-   int   memsize;        ///< length of array of values \ref soplex::DVector::mem "mem"
-   Rational* mem;        ///< value array to be used
-   //@}
-
-public:
-
-   //--------------------------------------------------
-   /**@name Access */
-   //@{
-   /// resets  \ref soplex::DVector "DVector"'s dimension to \p newdim.
-   void reDim(int newdim);
-
-   /// resets  \ref soplex::DVector "DVector"'s memory size to \p newsize.
-   void reSize(int newsize);
-
-   /// resets  \ref soplex::DVector "DVector"'s memory size to \p newsize and dimension to \p newdim.
-   void reSize(int newsize, int newdim);
-
-   /// returns \ref soplex::DVector "DVector"'s memory size.
-   int memSize() const
-   {
-      return memsize;
-   }
-
-   /// consistency check.
-   bool isConsistent() const;
-   //@}
-
-   //--------------------------------------------------
-   /**@name Construction / destruction */
-   //@{
-   /// default constructor. \p dim is the initial dimension.
-   explicit
-   DVector_exact(int dim = 0);
-   /// copy constructor.
-   explicit DVector_exact(const Vector& old);
-   /// copy constructor.
-   explicit DVector_exact(const Vector_exact& old);
-   /// copy constructor.
-   DVector_exact(const DVector_exact& old);
-   /// assignment operator.
-   DVector_exact& operator=(const DVector_exact& vec)
-   {
-      if( this != &vec )
-      {
-         if ( vec.dim() != dim() )
-            reDim(vec.dim());
-         Vector_exact::operator=(vec);
-
-         assert(isConsistent());
-      }
-
-      return *this;
-   }
-   /// assignment operator.
-   DVector_exact& operator=(const Vector_exact& vec)
-   {
-      if( vec.dim() != dim() )
-         reDim(vec.dim());
-      Vector_exact::operator=(vec);
-
-      assert(isConsistent());
-
-      return *this;
-   }
-   /// assignment operator.
-   DVector_exact& operator=(const Vector& vec)
-   {
-      if( vec.dim() != dim() )
-         reDim(vec.dim());
-      Vector_exact::operator=(vec);
-
-      assert(isConsistent());
-
-      return *this;
-   }
-   /// assignment operator.
-   DVector_exact& operator=(const SVector& vec)
-   {
-      if( vec.dim() != dim() )
-         reDim(vec.dim());
-      Vector_exact::operator=(vec);
-
-      assert(isConsistent());
-
-      return *this;
-   }
-
-   /// destructor.
-   ~DVector_exact();
-};
+typedef DVectorBase<Rational> DVector_exact;
 } // namespace soplex
 #endif // _DVECTOR_EXACT_H_
 

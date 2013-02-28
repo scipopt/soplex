@@ -74,8 +74,6 @@ public:
       : VectorBase<R>(0, 0)
       , mem(0)
    {
-      std::cout << "DVectorBase default constructor\n";
-
       memsize = (dim > 0) ? dim : 4;
 
       spx_alloc(mem, memsize);
@@ -93,8 +91,6 @@ public:
       : VectorBase<R>(0, 0)
       , mem(0)
    {
-      std::cout << "DVectorBase VectorBase constructor\n";
-
       VectorBase<R>::dimen = old.dim();
       memsize = VectorBase<R>::dimen;
 
@@ -112,8 +108,6 @@ public:
       : VectorBase<R>(0, 0)
       , mem(0)
    {
-      std::cout << "DVectorBase DVectorBase constructor\n";
-
       VectorBase<R>::dimen = old.dim();
       memsize = old.memsize;
 
@@ -132,8 +126,6 @@ public:
       : VectorBase<R>(0, 0)
       , mem(0)
    {
-      std::cout << "DVectorBase DVectorBaseS constructor\n";
-
       VectorBase<R>::dimen = old.dim();
       memsize = old.memsize;
 
@@ -150,12 +142,8 @@ public:
    template < class S >
    DVectorBase<R>& operator=(const VectorBase<S>& vec)
    {
-      std::cout << "DVectorBase VectorBase assignment\n";
-
       if( (VectorBase<S>*)this != &vec )
       {
-         std::cout << "...exec\n";
-
          if( vec.dim() != VectorBase<R>::dim() )
             reDim(vec.dim());
 
@@ -170,12 +158,8 @@ public:
    /// Assignment operator.
    DVectorBase<R>& operator=(const DVectorBase<R>& vec)
    {
-      std::cout << "DVectorBase DVectorBase assignment\n";
-
       if( (void*)this != (void*)&vec )
       {
-         std::cout << "...exec\n";
-
          if( vec.dim() != VectorBase<R>::dim() )
             reDim(vec.dim());
 
@@ -191,12 +175,8 @@ public:
    template < class S >
    DVectorBase<R>& operator=(const DVectorBase<S>& vec)
    {
-      std::cout << "DVectorBase DVectorBaseS assignment\n";
-
       if( this != (DVectorBase<R>*)&vec )
       {
-         std::cout << "...exec\n";
-
          if( vec.dim() != VectorBase<R>::dim() )
             reDim(vec.dim());
 

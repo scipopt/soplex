@@ -102,8 +102,6 @@ public:
       : dimen(p_dimen)
       , val(p_val)
    {
-      std::cout << "VectorBase default constructor\n";
-
       assert(dimen >= 0);
       assert(isConsistent());
    }
@@ -112,12 +110,8 @@ public:
    template < class S >
    VectorBase<R>& operator=(const VectorBase<S>& vec)
    {
-      std::cout << "VectorBase VectorBase assignment\n";
-
       if( (VectorBase<S>*)this != &vec )
       {
-         std::cout << "...exec\n";
-
          assert(dim() == vec.dim());
 
          for( int i = 0; i < dimen; i++ )
@@ -132,12 +126,8 @@ public:
    /// Assignment operator.
    VectorBase<R>& operator=(const VectorBase<R>& vec)
    {
-      std::cout << "VectorBase VectorBase assignment\n";
-
       if( this != &vec )
       {
-         std::cout << "...exec\n";
-
          assert(dim() == vec.dim());
 
          for( int i = 0; i < dimen; i++ )

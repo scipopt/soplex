@@ -32,6 +32,7 @@
 #include "random.h"
 #include "unitvector.h"
 #include "updatevector.h"
+#include "vector_exact.h"
 
 #define SPARSITYTHRESHOLD        0.5      /**< percentage of infeasibilities that is considered sparse */
 #define DENSEROUNDS               5       /**< number of refactorization until sparsity is tested again */
@@ -44,7 +45,6 @@ namespace soplex
 class SPxPricer;
 class SPxRatioTester;
 class SPxStarter;
-class DVector_exact;
 
 /**@brief   Sequential object-oriented SimPlex.
    @ingroup Algo
