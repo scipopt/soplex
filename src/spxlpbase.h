@@ -309,13 +309,19 @@ public:
    /// Returns objective value of column \p i.
    R obj(int i) const
    {
-      return R(spxSense()) * maxObj(i);
+      R res = maxObj(i);
+      if( spxSense() == MINIMIZE )
+         res *= -1;
+      return res;
    }
 
    /// Returns objective value of column with identifier \p id.
    R obj(const SPxColId& id) const
    {
-      return R(spxSense()) * maxObj(id);
+      R res = maxObj(id);
+      if( spxSense() == MINIMIZE )
+         res *= -1;
+      return res;
    }
 
    /// Returns objective vector for maximization problem.
@@ -801,7 +807,7 @@ public:
 
       assert(maxObj().dim() == newObj.dim());
       LPColSetBase<R>::maxObj_w() = newObj;
-      LPColSetBase<R>::maxObj_w() *= R(spxSense());
+      LPColSetBase<R>::maxObj_w() *= R(spxSense() == MINIMIZE ? -1 : 1);
       assert(isConsistent());
    }
 
@@ -810,7 +816,7 @@ public:
    {
       METHOD( "SPxLPBase::changeObj()" );
 
-      newVal *= R(spxSense());
+      newVal *= R(spxSense() == MINIMIZE ? -1 : 1);
       LPColSetBase<R>::maxObj_w(i) = newVal;
       assert(isConsistent());
    }
