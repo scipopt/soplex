@@ -703,18 +703,10 @@ public:
    //@{
 
    /// Reads LP in LP format from input stream \p in.
-   virtual bool readLPF(std::istream& in, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0)
-   {
-      MSG_ERROR( spxout << "LP reader for type " << typeid(R).name() << " not implemented.\n" );
-      return false;
-   }
+   virtual bool readLPF(std::istream& in, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
 
    /// Reads an LP in MPS format from input stream \p in.
-   virtual bool readMPS(std::istream& in, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0)
-   {
-      MSG_ERROR( spxout << "MPS reader for type " << typeid(R).name() << " not implemented.\n" );
-      return false;
-   }
+   virtual bool readMPS(std::istream& in, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
 
    /// Reads LP in LP or MPS format from input stream \p in.
    /**@param is       input stream.
@@ -765,16 +757,10 @@ public:
     *  constraints and variables. If \p intVars is not \c NULL, the variables contained in it are marked as integer in
     *  the output.
     */
-   virtual void writeLPF(std::ostream&  out, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* p_intvars = 0) const
-   {
-      MSG_ERROR( spxout << "LP writer for type " << typeid(R).name() << " not implemented.\n" );
-   }
+   virtual void writeLPF(std::ostream&  out, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* p_intvars = 0) const;
 
    /// Writes a file in MPS format to \p out.
-   virtual void writeMPS(std::ostream&  out, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* p_intvars = 0) const
-   {
-      MSG_ERROR( spxout << "MPS writer for type " << typeid(R).name() << " not implemented.\n" );
-   }
+   virtual void writeMPS(std::ostream&  out, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* p_intvars = 0) const;
 
    /// Write loaded LP to \p filename.
    virtual void writeFile(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* p_intvars = 0) const
