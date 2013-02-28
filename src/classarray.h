@@ -269,7 +269,7 @@ public:
       spx_alloc(newMem, newMax);
       newMem = new (newMem) T[newMax]();
 
-      for( int i = 0; i < newSize; i++ )
+      for( int i = 0; i < size() && i < newMax; i++ )
          newMem[i] = data[i];
 
       /* compute pointer difference */
