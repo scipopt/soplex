@@ -1226,6 +1226,8 @@ void SPxMainSM::handleExtremes(SPxLP& lp)
    // 2. setting numbers of very large absolute values to -infinity or +infinity, respectively.
 
    Real maxVal  = infinity / 5.0;
+   Real tol = feastol() * 1e-2;
+   tol = (tol < epsZero()) ? epsZero() : tol;
    int  remRows = 0;
    int  remNzos = 0;
    int  chgBnds = 0;
@@ -1342,7 +1344,7 @@ void SPxMainSM::handleExtremes(SPxLP& lp)
          {
             Real aij = fabs(col.value(i));
 
-            if (isZero(aij, epsZero()) || isZero(aij * absBnd, feastol()))
+            if (isZero(aij, epsZero()) || isZero(aij * absBnd, tol))
             {
                SVector& row = lp.rowVector_w(col.index(i));
 
