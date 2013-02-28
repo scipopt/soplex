@@ -553,16 +553,9 @@ public:
    void setMem(int n, Nonzero<R>* elmem)
    {
       assert(n >= 0);
+      assert(n == 0 || elmem != 0);
 
-      if( n > 0 )
-      {
-         assert(elmem != 0);
-
-         m_elem = elmem;
-      }
-      else
-         m_elem = 0;
-
+      m_elem = elmem;
       set_size(0);
       set_max(n);
    }
