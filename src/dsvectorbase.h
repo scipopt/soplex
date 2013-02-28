@@ -50,7 +50,7 @@ private:
    //@{
 
    /// Memory.
-   Element<R>* theelem;
+   Nonzero<R>* theelem;
 
    //@}
 
@@ -62,7 +62,7 @@ private:
    void allocMem(int n)
    {
       spx_alloc(theelem, n);
-      theelem = new (theelem) Element<R>[n]();
+      theelem = new (theelem) Nonzero<R>[n]();
       setMem(n, theelem);
    }
 
@@ -192,7 +192,7 @@ public:
       if( theelem )
       {
          for( int i = SVectorBase<R>::max() - 1; i >= 0; i-- )
-            theelem[i].~Element<R>();
+            theelem[i].~Nonzero<R>();
 
          spx_free(theelem);
       }
@@ -239,18 +239,18 @@ public:
       if( len == SVectorBase<R>::max() )
          return;
 
-      Element<R>* newmem = 0;
+      Nonzero<R>* newmem = 0;
 
       /* allocate and initialize new memory */
       spx_alloc(newmem, len);
-      newmem = new (newmem) Element<R>[len]();
+      newmem = new (newmem) Nonzero<R>[len]();
 
       for( int i = 0; i < siz; i++ )
          newmem[i] = theelem[i];
 
       /* free old memory */
       for( int i = SVectorBase<R>::max()-1; i >= 0; i-- )
-         theelem[i].~Element<R>();
+         theelem[i].~Nonzero<R>();
 
       spx_free(theelem);
 

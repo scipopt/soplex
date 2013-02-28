@@ -29,10 +29,10 @@ template < class R > class VectorBase;
 template < class R > class SSVectorBase;
 
 /// Sparse vector nonzero element.
-/** SVectorBase keeps its nonzeros in an array of Element%s providing members for saving the index and value.
+/** SVectorBase keeps its nonzeros in an array of Nonzero%s providing members for saving the index and value.
  */
 template < class R >
-class Element
+class Nonzero
 {
 public:
 
@@ -40,20 +40,20 @@ public:
    int idx;      ///< Index of nonzero element.
 
    template < class S >
-   Element<R>& operator=(const Element<S>& vec)
+   Nonzero<R>& operator=(const Nonzero<S>& vec)
    {
       val = R(vec.val);
       idx = vec.idx;
    }
 
    template < class S >
-   Element<R>(const Element<S>& vec)
+   Nonzero<R>(const Nonzero<S>& vec)
       : val(vec.val)
       , idx(vec.idx)
    {
    }
 
-   Element<R>()
+   Nonzero<R>()
       : val()
       , idx(0)
    {
@@ -104,7 +104,7 @@ public:
  *  n) and value(int n) allow to access the index and value of the \p n 'th nonzero.  \p n is referred to as the \em
  *  number of a nonzero.
  *
- *  @todo SVectorBase should get a new implementation.  There maybe a lot of memory lost due to padding the Element
+ *  @todo SVectorBase should get a new implementation.  There maybe a lot of memory lost due to padding the Nonzero
  *        structure. A better idea seems to be class SVectorBase { int size; int used; int* idx; R* val; }; which for
  *        several reasons could be faster or slower.  If SVectorBase is changed, also DSVectorBase and SVSet have to be
  *        modified.
@@ -126,13 +126,15 @@ private:
    /**@name Data */
    //@{
 
-   Element<R>* m_elem;
+   Nonzero<R>* m_elem;
    int memsize;
    int memused;
 
    //@}
 
 public:
+
+   typedef Nonzero<R> Element;
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Access */
@@ -155,7 +157,7 @@ public:
    /// Dimension of the vector defined as maximal index + 1
    int dim() const
    {
-      const Element<R>* e = m_elem;
+      const Nonzero<R>* e = m_elem;
       int d = -1;
       int n = size();
 
@@ -177,7 +179,7 @@ public:
       if( m_elem != 0 )
       {
          int n = size();
-         Element<R>* e = &(m_elem[n]);
+         Nonzero<R>* e = &(m_elem[n]);
 
          while( n-- )
          {
@@ -205,7 +207,7 @@ public:
    }
 
    /// Reference to the \p n 'th nonzero element.
-   Element<R>& element(int n)
+   Nonzero<R>& element(int n)
    {
       assert(n >= 0);
       assert(n < max());
@@ -214,7 +216,7 @@ public:
    }
 
    /// The \p n 'th nonzero element.
-   const Element<R>& element(int n) const
+   const Nonzero<R>& element(int n) const
    {
       assert(n >= 0);
       assert(n < size());
@@ -284,7 +286,7 @@ public:
    {
       assert(n + size() <= max());
 
-      Element<R>* e = m_elem + size();
+      Nonzero<R>* e = m_elem + size();
 
       set_size( size() + n );
       while( n-- )
@@ -296,11 +298,11 @@ public:
    }
 
    /// Append \p n nonzeros.
-   void add(int n, const Element<R> e[])
+   void add(int n, const Nonzero<R> e[])
    {
       assert(n + size() <= max());
 
-      Element<R>* ee = m_elem + size();
+      Nonzero<R>* ee = m_elem + size();
 
       set_size( size() + n );
       while( n-- )
@@ -319,8 +321,8 @@ public:
       int cpy = m - n;
       cpy = (size() - m >= cpy) ? cpy : size() - m;
 
-      Element<R>* e = &m_elem[size() - 1];
-      Element<R>* r = &m_elem[n];
+      Nonzero<R>* e = &m_elem[size() - 1];
+      Nonzero<R>* r = &m_elem[n];
 
       set_size(size() - cpy);
       do
@@ -351,11 +353,11 @@ public:
    {
       if( m_elem != 0 )
       {
-         Element<R> dummy;
-         Element<R>* w;
-         Element<R>* l;
-         Element<R>* s = &(m_elem[0]);
-         Element<R>* e = s + size();
+         Nonzero<R> dummy;
+         Nonzero<R>* w;
+         Nonzero<R>* l;
+         Nonzero<R>* s = &(m_elem[0]);
+         Nonzero<R>* e = s + size();
 
          for( l = s, w = s + 1; w < e; l = w, ++w )
          {
@@ -415,12 +417,12 @@ public:
       return mini;
    }
 
-   /// Squared eucledian norm.
+   /// Squared norm.
    R length2() const
    {
       R x = 0;
       int n = size();
-      const Element<R>* e = m_elem;
+      const Nonzero<R>* e = m_elem;
 
       while( n-- )
       {
@@ -435,7 +437,7 @@ public:
    SVectorBase<R>& operator*=(R x)
    {
       int n = size();
-      Element<R>* e = m_elem;
+      Nonzero<R>* e = m_elem;
 
       while( n-- )
       {
@@ -457,11 +459,11 @@ public:
 
    /// Default constructor.
    /** The constructor expects one memory block where to store the nonzero elements. This must be passed to the
-    *  constructor, where the \em number of Element%s needs that fit into the memory must be given and a pointer to the
+    *  constructor, where the \em number of Nonzero%s needs that fit into the memory must be given and a pointer to the
     *  beginning of the memory block. Once this memory has been passed, it shall not be modified until the SVectorBase
     *  is no longer used.
     */
-   explicit SVectorBase<R>(int n = 0, Element<R>* p_mem = 0)
+   explicit SVectorBase<R>(int n = 0, Nonzero<R>* p_mem = 0)
    {
       setMem(n, p_mem);
    }
@@ -478,8 +480,8 @@ public:
          assert(max() >= sv.size());
 
          int i = sv.size();
-         Element<R>* e = m_elem;
-         const Element<R>* s = sv.m_elem;
+         Nonzero<R>* e = m_elem;
+         const Nonzero<R>* s = sv.m_elem;
 
          while( i-- )
          {
@@ -502,8 +504,8 @@ public:
          assert(max() >= sv.size());
 
          int i = sv.size();
-         Element<R>* e = m_elem;
-         const Element<S>* s = sv.m_elem;
+         Nonzero<R>* e = m_elem;
+         const Nonzero<S>* s = sv.m_elem;
 
          while( i-- )
          {
@@ -528,7 +530,7 @@ public:
    //@{
 
    /// get pointer to internal memory.
-   Element<R>* mem() const
+   Nonzero<R>* mem() const
    {
       return m_elem;
    }
@@ -548,7 +550,7 @@ public:
    }
 
    /// Set the memory area where the nonzeros will be stored.
-   void setMem(int n, Element<R>* elmem)
+   void setMem(int n, Nonzero<R>* elmem)
    {
       assert(n >= 0);
 

@@ -420,7 +420,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product1(const SVSetBase<S>& A, const S
       num = Ai.size();
       for( register int j = 0; j < num; j++ )
       {
-         const Element<S>& Aij = Ai.element(j);
+         const Nonzero<S>& Aij = Ai.element(j);
          idx[j] = Aij.idx;
          VectorBase<R>::val[Aij.idx] = nzval * Aij.val;
       }
@@ -460,7 +460,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
    {
       for( register int j = 0; j < num; ++j )
       {
-         const Element<S>& elt = A0.element(j);
+         const Nonzero<S>& elt = A0.element(j);
          const R product = x0 * elt.val;
 
          // store the value in any case
@@ -486,7 +486,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
          // Compute x[i] * A[i] and add it to the existing vector.
          for( register int j = 0; j < Ai.size(); ++j )
          {
-            const Element<S>& elt = Ai.element(j);
+            const Nonzero<S>& elt = Ai.element(j);
             idx[nonzero_idx] = elt.idx;
             R oldval  = VectorBase<R>::val[elt.idx];
 
@@ -562,7 +562,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productFull(const SVSetBase<S>& A, cons
 
       for( register int j = 0; j < Ai.size(); ++j )
       {
-         const Element<S>& elt = Ai.element(j);
+         const Nonzero<S>& elt = Ai.element(j);
          VectorBase<R>::val[elt.idx] += xi * elt.val;
       }
    }
@@ -608,7 +608,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productAndSetup(const SVSetBase<S>& A, 
 
                for( int j = Ai.size() - 1; j >= 0; --j )
                {
-                  const Element<S>& elt = Ai.element(j);
+                  const Nonzero<S>& elt = Ai.element(j);
                   VectorBase<R>::val[elt.idx] += xval * elt.val;
                }
             }
@@ -679,7 +679,7 @@ SVectorBase<R>& SVectorBase<R>::operator=(const VectorBase<S>& vec)
 {
    int n = 0;
    int i = vec.dim();
-   Element<R> *e = m_elem;
+   Nonzero<R> *e = m_elem;
 
    clear();
 
@@ -711,7 +711,7 @@ SVectorBase<R>& SVectorBase<R>::operator=(const SSVectorBase<S>& sv)
    set_size(sv.size());
 
    int i = size();
-   Element<R> *e = m_elem;
+   Nonzero<R> *e = m_elem;
 
    while( i-- )
    {
@@ -729,7 +729,7 @@ R SVectorBase<R>::operator*(const VectorBase<R>& w) const
 {
    R x = 0;
    int n = size();
-   Element<R>* e = m_elem;
+   Nonzero<R>* e = m_elem;
 
    while( n-- )
    {

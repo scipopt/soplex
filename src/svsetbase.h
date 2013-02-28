@@ -53,13 +53,13 @@ namespace soplex
  *   SVectorBase%s added to the SVSetBase.
  */
 template < class R >
-class SVSetBase : protected ClassArray < Element<R> >
+class SVSetBase : protected ClassArray < Nonzero<R> >
 {
    template < class S > friend class SVSetBase;
 
 private:
 
-   typedef ClassArray < Element<R> > SVSetBaseArray;
+   typedef ClassArray < Nonzero<R> > SVSetBaseArray;
 
    /**@class DLPSV
     * @brief SVectorBase with prev/next pointers
@@ -167,7 +167,7 @@ private:
       }
    }
 
-   /// Provides enough nonzero memory for \p n more Elements%s.
+   /// Provides enough nonzero memory for \p n more Nonzero%s.
    void ensureMem(int n)
    {
       if( memSize() + n > memMax() )
@@ -694,7 +694,7 @@ public:
          for( DLPSV* ps = list.first(); ps; ps = list.next(ps) )
          {
             // get new shifted nonzero memory of the SVectorBase
-            Element<R>* newmem = reinterpret_cast<Element<R>*>(reinterpret_cast<char*>(ps->mem()) + delta);
+            Nonzero<R>* newmem = reinterpret_cast<Nonzero<R>*>(reinterpret_cast<char*>(ps->mem()) + delta);
 
             // get the size and maximum capacity of the SVectorBase
             int sz = ps->size();
@@ -832,7 +832,7 @@ public:
                newps = &set[rhs.number(ps)];
                list.append(newps);
                newps->setMem(ps->max(),
-                  reinterpret_cast<Element<R>*>(reinterpret_cast<char*>(ps->mem()) + delta));
+                  reinterpret_cast<Nonzero<R>*>(reinterpret_cast<char*>(ps->mem()) + delta));
                newps->set_size(ps->size());
             }
          }
