@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2012 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -31,8 +31,6 @@
 
 namespace soplex
 {
-typedef DataArray < SVector::Element > SVSetBase;
-
 /**@brief   sparse vector set.
    @ingroup Algebra
 
@@ -62,9 +60,11 @@ typedef DataArray < SVector::Element > SVSetBase;
    of them returns the DataKey%s assigned to the SVector%s added to the
    SVSet.
 */
-class SVSet : protected SVSetBase
+class SVSet : protected DataArray < SVector::Element >
 {
 private:
+
+   typedef DataArray < SVector::Element > SVSetArray;
 
    /**@class DLPSV
       @brief SVector with prev/next pointers

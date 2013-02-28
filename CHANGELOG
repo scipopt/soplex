@@ -12,6 +12,10 @@ code quality & new features:
     (see SPARSITYTHRESHOLD in spxsolver.h) sparse, full pricing is used. Partial pricing is only recommended for large
     instances, or instances, that spend much time in pricing. Partial pricing is likely to increase the number of iterations.
 - refinement step to improve feasibility/optimality also for steep pricer (was devex only)
+- own objective sense enumerator in MPS parser
+
+interface:
+- renamed class MpqReal to Rational
 
 fixed bugs:
 - allow instable enter pivot when no other is available; only after a fresh factorization
@@ -20,6 +24,7 @@ fixed bugs:
 - (co)solve calls in SPxBasis do not trigger factorization() of SPxSolver but of SPxBasis
 - fixed bug in unShift(): shifted bounds were not set to their original value even if the corresponding value was within
   the original bounds (feasibility tolerance was checked in wrong direction)
+- fixed minor bug in SVSet::add()
 
 
 04 Jan 2013 - Release 1.7.1

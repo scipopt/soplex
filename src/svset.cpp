@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2012 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -72,8 +72,8 @@ void SVSet::add(DataKey nkey[], const SVSet& pset)
 {
    add(pset);
 
-   int i = size();
-   int n = pset.size();
+   int i = num();
+   int n = pset.num();
 
    while(n > 0)
       nkey[--n] = key(--i);
@@ -105,7 +105,7 @@ SVector* SVSet::create(int idxmax)
    ps = set.create();
    list.append(ps);
    /// resize the dataarray
-   SVSetBase::reSize(memSize() + idxmax + 1);
+   SVSetArray::reSize(memSize() + idxmax + 1);
 
    ps->setMem(idxmax + 1, &last() - idxmax);
    return ps;
@@ -207,7 +207,7 @@ void SVSet::deleteVec(DLPSV* ps)
       int offset = 0;
 
       /* the first element does not need to start at the beginning of the data array; why ??? */
-      while( &(this->SVSetBase::operator[](offset)) != ps->mem() )
+      while( &(this->SVSetArray::operator[](offset)) != ps->mem() )
       {
          ++offset;
          assert(offset < size());
@@ -216,7 +216,7 @@ void SVSet::deleteVec(DLPSV* ps)
       /* move all entries of the second vector to the front */
       for(int j = 0; j <= sz; ++j)
       {
-         this->SVSetBase::operator[](offset + j) = next->mem()[j];
+         this->SVSetArray::operator[](offset + j) = next->mem()[j];
       }
 
       /* correct the data memmory pointer and the maximal space */
@@ -320,19 +320,19 @@ void SVSet::memPack()
    {
       const int sz = ps->size();
 
-      if (ps->mem() != &this->SVSetBase::operator[](used))
+      if (ps->mem() != &this->SVSetArray::operator[](used))
       {
          // cannot use memcpy, because the memory might overlap
          for (j = 0; j <= sz; ++j)
-            this->SVSetBase::operator[](used + j) = ps->mem()[j];
-         ps->setMem(sz + 1, &this->SVSetBase::operator[](used));
+            this->SVSetArray::operator[](used + j) = ps->mem()[j];
+         ps->setMem(sz + 1, &this->SVSetArray::operator[](used));
          ps->set_size(sz);
       }
       else
          ps->set_max(sz);
       used += sz + 1;
    }
-   SVSetBase::reSize(used);
+   SVSetArray::reSize(used);
 
    possiblyUnusedMem = 0;
 }
@@ -374,8 +374,8 @@ SVSet& SVSet::operator=(const SVSet& rhs)
          DLPSV* ps;
          DLPSV* newps;
 
-         void* delta0 = &(*(static_cast<SVSetBase*>(this)))[0];
-         void* delta1 = &(*(static_cast<SVSetBase*>(
+         void* delta0 = &(*(static_cast<SVSetArray*>(this)))[0];
+         void* delta1 = &(*(static_cast<SVSetArray*>(
             const_cast<SVSet*>(&rhs))))[0];
          ptrdiff_t delta = reinterpret_cast<char*>(
             delta0) - reinterpret_cast<char*>(delta1);

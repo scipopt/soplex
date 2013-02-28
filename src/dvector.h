@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2012 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -147,9 +147,6 @@ public:
 
    /// resets  \ref soplex::DVector "DVector"'s memory size to \p newsize.
    void reSize(int newsize);
-
-   /// resets  \ref soplex::DVector "DVector"'s memory size to \p newsize and dimension to \p newdim.
-   void reSize(int newsize, int newdim);
 
    /// returns \ref soplex::DVector "DVector"'s memory size.
    int memSize() const

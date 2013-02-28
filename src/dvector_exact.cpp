@@ -4,7 +4,7 @@
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1996      Roland Wunderling                              */
-/*                  1996-2012 Konrad-Zuse-Zentrum                            */
+/*                  1996-2013 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -33,9 +33,9 @@ void DVector_exact::reSize(int newsize, int newdim)
 
    if( newsize > memsize )
    {
-      MpqReal* olddata = mem;
+      Rational* olddata = mem;
 
-      mem = new MpqReal[newsize]();
+      mem = new Rational[newsize]();
       assert(mem != 0);
 
       if( dimen > 0 )
@@ -74,7 +74,7 @@ DVector_exact::DVector_exact(const DVector_exact& old)
    dimen = old.dim();
    memsize = old.memsize;
 
-   mem = new MpqReal[memsize]();
+   mem = new Rational[memsize]();
    assert(mem != 0);
 
    val = mem;
@@ -90,7 +90,7 @@ DVector_exact::DVector_exact(const Vector_exact& old)
    dimen = old.dim();
    memsize = dimen;
 
-   mem = new MpqReal[memsize]();
+   mem = new Rational[memsize]();
    assert(mem != 0);
 
    val = mem;
@@ -106,7 +106,7 @@ DVector_exact::DVector_exact(const Vector& old)
    dimen = old.dim();
    memsize = dimen;
 
-   mem = new MpqReal[memsize]();
+   mem = new Rational[memsize]();
    assert(mem != 0);
 
    val = mem;
@@ -121,7 +121,7 @@ DVector_exact::DVector_exact(int p_dim)
 {
    memsize = (p_dim > 0) ? p_dim : 4;
 
-   mem = new MpqReal[memsize]();
+   mem = new Rational[memsize]();
    assert(mem != 0);
 
    val = mem;

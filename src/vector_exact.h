@@ -4,7 +4,7 @@
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1996      Roland Wunderling                              */
-/*                  1996-2012 Konrad-Zuse-Zentrum                            */
+/*                  1996-2013 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -15,7 +15,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /**@file  vector_exact.h
- * @brief Dense vector of MpqReal.
+ * @brief Dense vector of Rational.
  */
 #ifndef _VECTOR_EXACT_H_
 #define _VECTOR_EXACT_H_
@@ -25,7 +25,7 @@
 #include <math.h>
 #include <iostream>
 
-#include "mpqreal.h"
+#include "rational.h"
 
 namespace soplex
 {
@@ -33,10 +33,10 @@ class Vector;
 class SVector;
 class SSVector;
 
-/**@brief   Dense vector of MpqReal.
+/**@brief   Dense vector of Rational.
  * @ingroup Algebra
  *
- * Class Vector_exact is a copy of class Vector replacing the floating point type Real with the exact MpqReal.
+ * Class Vector_exact is a copy of class Vector replacing the floating point type Real with the exact Rational.
  */
 class Vector_exact
 {
@@ -51,7 +51,7 @@ protected:
    /** The memory block pointed to by val must at least have size
     *  dimen * sizeof(Real)
     */
-   MpqReal* val;
+   Rational* val;
    //@}
 
 public:
@@ -65,7 +65,7 @@ public:
     *  Storage must be passed as a memory block val at construction. It
     *  must be large enough to fit at least dimen Real values.
     */
-   Vector_exact(int p_dimen, MpqReal *p_val)
+   Vector_exact(int p_dimen, Rational *p_val)
       : dimen(p_dimen)
       , val(p_val)
    {
@@ -95,14 +95,14 @@ public:
       return dimen;
    }
    /// return \p n 'th value by reference
-   MpqReal& operator[](int n)
+   Rational& operator[](int n)
    {
       assert(n >= 0 && n < dimen);
       return val[n];
    }
 
    /// return \p n 'th value
-   MpqReal operator[](int n) const
+   Rational operator[](int n) const
    {
       assert(n >= 0 && n < dimen);
       return val[n];
@@ -130,19 +130,19 @@ public:
    Vector_exact& operator-=(const SVector& vec);
 
    /// scaling
-   Vector_exact& operator*=(MpqReal x);
+   Vector_exact& operator*=(Rational x);
 
    /// absolute biggest element (infinity norm).
-   MpqReal maxAbs() const;
+   Rational maxAbs() const;
    /// absolute smallest element.
-   MpqReal minAbs() const;
+   Rational minAbs() const;
 
    /// addition of scaled vector
-   Vector_exact& multAdd(MpqReal x, const Vector_exact& vec);
+   Vector_exact& multAdd(Rational x, const Vector_exact& vec);
    ///  addition of scaled vector
-   Vector_exact& multAdd(MpqReal x, const Vector& vec);
+   Vector_exact& multAdd(Rational x, const Vector& vec);
    /// addition of scaled vector
-   Vector_exact& multAdd(MpqReal x, const SVector& vec);
+   Vector_exact& multAdd(Rational x, const SVector& vec);
    //@}
 
    //------------------------------------
@@ -154,7 +154,7 @@ public:
     *
     *  @todo check whether this non-const c-style acces should indeed be public
     */
-   MpqReal* get_ptr()
+   Rational* get_ptr()
    {
       return val;
    }
@@ -162,7 +162,7 @@ public:
    /** This function serves for using a Vector in an C-style
     *  function. It returns a pointer to the first value of the array.
     */
-   const MpqReal* get_const_ptr() const
+   const Rational* get_const_ptr() const
    {
       return val;
    }

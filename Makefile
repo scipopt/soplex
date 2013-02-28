@@ -87,7 +87,7 @@ NAME		=	soplex
 LIBOBJ		= 	changesoplex.o clufactor.o didxset.o \
 			dsvector.o dvector.o dvector_exact.o enter.o \
 			idxset.o leave.o lpcolset.o lprowset.o \
-			lprow.o mpqreal.o mpsinput.o nameset.o \
+			lprow.o rational.o mpsinput.o nameset.o \
 			slufactor.o soplex.o \
 			spxbasis.o spxbounds.o spxboundflippingrt.o spxchangebasis.o \
 			spxequilisc.o spxdantzigpr.o spxdefaultrt.o \

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2012 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -13,11 +13,11 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file  mpqreal.h
+/**@file  rational.h
  * @brief Wrapper for GMP types.
  */
-#ifndef _MPQREAL_H_
-#define _MPQREAL_H_
+#ifndef _RATIONAL_H_
+#define _RATIONAL_H_
 
 #include <math.h>
 #include <iostream>
@@ -40,32 +40,32 @@ namespace soplex
  */
 #ifdef SOPLEX_WITH_GMP
 
-/// If compiled with GMP support, MpqReal is defined as mpq_class.
-typedef mpq_class MpqReal;
+/// If compiled with GMP support, Rational is defined as mpq_class.
+typedef mpq_class Rational;
 
-/// return whether MpqReal provides exact arithmetic
-#define MpqRealIsExact() (true)
+/// return whether Rational provides exact arithmetic
+#define RationalIsExact() (true)
 
-/// print MpqReal with limited floating point precision
-std::ostream& operator<<(std::ostream& os, const MpqReal& q);
+/// print Rational with limited floating point precision
+std::ostream& operator<<(std::ostream& os, const Rational& q);
 
 #else
 
-/// If compiled without GMP support, MpqReal is defined as SoPlex's normal Real.
-typedef Real MpqReal;
+/// If compiled without GMP support, Rational is defined as SoPlex's normal Real.
+typedef Real Rational;
 
-/// return whether MpqReal provides exact arithmetic
-#define MpqRealIsExact() (false)
+/// return whether Rational provides exact arithmetic
+#define RationalIsExact() (false)
 
 /// return maximal absolute value
-MpqReal abs(const MpqReal& q);
+Rational abs(const Rational& q);
 #endif
 
-/// cast MpqReal to Real
-Real get_d(const MpqReal& q);
+/// cast Rational to Real
+Real get_d(const Rational& q);
 
 } // namespace soplex
-#endif // _MPQREAL_H_
+#endif // _RATIONAL_H_
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:
