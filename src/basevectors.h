@@ -144,6 +144,19 @@ VectorBase<R>& VectorBase<R>::operator-=(const SVectorBase<S>& vec)
    return *this;
 }
 
+/// Subtraction.
+template < class R >
+template < class S >
+VectorBase<R>& VectorBase<R>::operator-=(const SSVectorBase<S>& vec)
+{
+   assert(dim() == vec.dim());
+
+   for( int i = 0; i < dim(); i++ )
+      val[i] -= vec[i];
+
+   return *this;
+}
+
 /// Inner product.
 template < class R >
 R VectorBase<R>::operator*(const SVectorBase<R>& vec) const

@@ -267,12 +267,28 @@ public:
    template < class S >
    VectorBase<R>& operator-=(const SVectorBase<S>& vec);
 
+   /// Subtraction.
+   template < class S >
+   VectorBase<R>& operator-=(const SSVectorBase<S>& vec);
+
    /// Scaling.
    template < class S >
    VectorBase<R>& operator*=(S x)
    {
       for( int i = 0; i < dim(); i++ )
          val[i] *= x;
+
+      return *this;
+   }
+
+   /// Division.
+   template < class S >
+   VectorBase<R>& operator/=(S x)
+   {
+      assert(x != 0);
+
+      for( int i = 0; i < dim(); i++ )
+         val[i] /= x;
 
       return *this;
    }
