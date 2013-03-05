@@ -118,17 +118,27 @@ public:
       assert(i <= num);
       if (n > 0)
       {
-         spx_realloc(data, num + n);
-         data = new (data) T[num + n]();
-         assert(data != 0);
+         int k;
+         T* newdata = 0;
+         spx_alloc(newdata, num + n);
+         newdata = new (newdata) T[num + n]();
 
-         // non-overlapping memory areas
-         if( num - i < n )
-            memcpy(&data[i+n], &data[i], num - i);
-         // overlapping memory areas
-         else
-            memmove(&data[i+n], &data[i], num - i);
+         // copy front segment to new array
+         for( k = 0; k < i; ++k )
+         {
+            newdata[k] = data[k];
+            data[k].~T();
+         }
+         // copy rear segment to new array
+         for( ; k < num; ++k )
+         {
+            newdata[n + k] = data[k];
+            data[k].~T();
+         }
 
+         if( data )
+            spx_free(data);
+         data = newdata;
          num += n;
       }
    }
@@ -158,27 +168,31 @@ public:
       {
          assert(num == size());
          m -= (n + m <= num) ? 0 : n + m - num;
-
-         // call destructor of elements in data
-         for( int k = m-1; k >= 0; --k )
-            data[n+k].~T();
-
-         if( m < num )
-         {
-            // non-overlapping memory areas
-            if( num - m - n < m )
-               memcpy(&data[n], &data[n + m], num - m - n);
-            // overlapping memory areas
-            else
-               memmove(&data[n], &data[n + m], num - m - n);
-         }
-
          num -= m;
+         T* newdata = 0;
+         spx_alloc(newdata, num);
+         newdata = new (newdata) T[num]();
 
          if( num > 0 )
-            spx_realloc(data, num);
-         else
+         {
+            int i;
+            for( i = 0; i < n; ++i )
+            {
+               newdata[i] = data[i];
+               data[i].~T();
+            }
+            for(int k = 0; k < m; ++k )
+               data[i + k].~T();
+            for(; i < num; ++i )
+            {
+               newdata[i] = data[m + i];
+               data[m + i].~T();
+            }
+         }
+
+         if( data )
             spx_free(data);
+         data = newdata;
       }
    }
 
