@@ -112,26 +112,39 @@ public:
       insert(num, p_array);
    }
 
-   /// insert \p n uninitialized elements before \p i 'th element.
+   /** insert \p n uninitialized elements before \p i 'th element.
+    *
+    * You must not! use realloc, memcpy or memmove, because some data element points inside itself, and therefore you
+    * always need to copy all elements by hand.
+    */
    void insert(int i, int n)
    {
       assert(i <= num);
+      assert(num >= 0);
       if (n > 0)
       {
-         int k;
          T* newdata = 0;
+         int k;
+
          spx_alloc(newdata, num + n);
-         newdata = new (newdata) T[num + n]();
+         assert(newdata != 0);
 
          // copy front segment to new array
          for( k = 0; k < i; ++k )
          {
+            new (&(newdata[k])) T();
             newdata[k] = data[k];
             data[k].~T();
          }
+
+         // call constructor for new elements
+         for( ; k < i+n; ++k )
+            new (&(newdata[k])) T();
+
          // copy rear segment to new array
-         for( ; k < num; ++k )
+         for( k = i; k < num; ++k )
          {
+            new (&(newdata[n + k])) T();
             newdata[n + k] = data[k];
             data[k].~T();
          }
@@ -160,39 +173,63 @@ public:
          data[n + i] = p_array.data[n];
    }
 
-   /// remove \p m elements starting at \p n.
+   /** remove \p m elements starting at \p n.
+    *
+    * You must not! use realloc, memcpy or memmove, because some data element points inside itself, and therefore you
+    * always need to copy all elements by hand.
+    */
    void remove(int n = 0, int m = 1)
    {
       assert(n >= 0 && m >= 0);
       if (m > 0 && n < num)
       {
+         T* newdata = 0;
+         int k;
+
          assert(num == size());
          m -= (n + m <= num) ? 0 : n + m - num;
-         num -= m;
-         T* newdata = 0;
-         spx_alloc(newdata, num);
-         newdata = new (newdata) T[num]();
 
-         if( num > 0 )
+         if( num > m )
          {
-            int i;
-            for( i = 0; i < n; ++i )
+            spx_alloc(newdata, num - m);
+            assert(newdata != 0);
+
+            // copy rear segment to new array
+            for( k = num - 1; k >= n + m; --k )
             {
-               newdata[i] = data[i];
-               data[i].~T();
+               new (&(newdata[k - m])) T();
+               newdata[k - m] = data[k];
+               data[k].~T();
             }
-            for(int k = 0; k < m; ++k )
-               data[i + k].~T();
-            for(; i < num; ++i )
+
+            // call destructor for old elements
+            for( ; k >= n; --k )
+               data[k].~T();
+
+            // copy front segment to new array
+            for( ; k >= 0; --k )
             {
-               newdata[i] = data[m + i];
-               data[m + i].~T();
+               new (&(newdata[k])) T();
+               newdata[k] = data[k];
+               data[k].~T();
             }
          }
+         else
+         {
+            assert(num == m);
+            assert(n == 0);
 
-         if( data )
-            spx_free(data);
+            // call destructor for old elements
+            for( k = m - 1; k >= 0; --k )
+               data[k].~T();
+         }
+
+         assert(data != 0);
+         spx_free(data);
          data = newdata;
+
+         num -= m;
+         assert((data == 0) == (num == 0));
       }
    }
 
@@ -257,9 +294,13 @@ public:
       num = n;
       if (num > 0)
       {
+         int k;
+
          spx_alloc(data, num);
-         data = new (data) T[num]();
          assert(data != 0);
+
+         for( k = 0; k < num; ++k )
+            new (&(data[k])) T();
       }
       assert(Array::isConsistent());
    }
@@ -270,11 +311,17 @@ public:
    {
       if (num > 0)
       {
+         int k;
+
          data = 0;
          spx_alloc(data, num);
-         data = new (data) T[num]();
          assert(data != 0);
-         *this = old;
+
+         for( k = 0; k < num; ++k )
+         {
+            new (&(data[k])) T();
+            data[k] = old.data[k];
+         }
       }
       else
          data = 0;

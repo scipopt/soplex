@@ -26,7 +26,6 @@ fixed bugs:
   the original bounds (feasibility tolerance was checked in wrong direction)
 - fixed minor bug in SVSet::add()
 
-
 04 Jan 2013 - Release 1.7.1
 ===========================
 
