@@ -908,10 +908,10 @@ SSVector& SSVector::assign2productAndSetup(const SVSet& A, SSVector& x)
          }
       }
       x.num = nzcount;
+      setupStatus = false;
    }
 
    x.setupStatus = true;
-   setupStatus   = false;
    assert(isConsistent());
 
    return *this;
