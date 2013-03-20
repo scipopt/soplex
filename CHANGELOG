@@ -26,6 +26,7 @@ fixed bugs:
   the original bounds (feasibility tolerance was checked in wrong direction)
 - fixed minor bug in SVSet::add()
 - fixed behaviour in instable leave/enter: pricing values are now restored, before the instable pivot is performed
+- do a better check in precisionReached() by first recomputing correct test/coTest/fTest values
 
 04 Jan 2013 - Release 1.7.1
 ===========================

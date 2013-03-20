@@ -311,6 +311,10 @@ SPxSolver::Status SPxSolver::fpsolve()
                {
                   Real newpricertol = minpricertol;
 
+                  MSG_INFO2( spxout << "ISOLVE75e check feasibility/optimality\n")
+                  computeTest();
+                  computeCoTest();
+
                   // is the solution good enough ?
                   // max three times reduced
                   if ((thepricer->epsilon() > minpricertol) && !precisionReached(newpricertol))
@@ -569,6 +573,9 @@ SPxSolver::Status SPxSolver::fpsolve()
                      || SPxBasis::status() == SPxBasis::PRIMAL))
                {
                   Real newpricertol = minpricertol;
+
+                  MSG_INFO2( spxout << "ISOLVE75l check feasibility/optimality\n")
+                  computeFtest();
 
                   // is the solution good enough ?
                   // max three times reduced
