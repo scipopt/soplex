@@ -195,6 +195,7 @@ SPxSolver::Status SPxSolver::fpsolve()
          int enterCycleCount = 0;
          int enterFacPivotCount = 0;
 
+         instableEnterVal = 0;
          instableEnterId = SPxId();
          instableEnter = false;
 
@@ -248,6 +249,52 @@ SPxSolver::Status SPxSolver::fpsolve()
 
                enterId = instableEnterId;
                instableEnter = true;
+               // we also need to reset the test() or coTest() value for getEnterVals()
+               assert(instableEnterVal < 0);
+               if( enterId.isSPxColId() )
+               {
+                  int idx = number(SPxColId(enterId));
+                  if( rep() == COLUMN )
+                  {
+                     theTest[idx] = instableEnterVal;
+                     if( sparsePricingEnterCo && isInfeasibleCo[idx] == false )
+                     {
+                        infeasibilitiesCo.addIdx(idx);
+                        isInfeasibleCo[idx] = true;
+                     }
+                  }
+                  else
+                  {
+                     theCoTest[idx] = instableEnterVal;
+                     if( sparsePricingEnter && isInfeasible[idx] == false )
+                     {
+                        infeasibilities.addIdx(idx);
+                        isInfeasible[idx] = true;
+                     }
+                  }
+               }
+               else
+               {
+                  int idx = number(SPxRowId(enterId));
+                  if( rep() == COLUMN )
+                  {
+                     theCoTest[idx] = instableEnterVal;
+                     if( sparsePricingEnter && isInfeasible[idx] == false )
+                     {
+                        infeasibilities.addIdx(idx);
+                        isInfeasible[idx] = true;
+                     }
+                  }
+                  else
+                  {
+                     theTest[idx] = instableEnterVal;
+                     if( sparsePricingEnterCo && isInfeasibleCo[idx] == false )
+                     {
+                        infeasibilitiesCo.addIdx(idx);
+                        isInfeasibleCo[idx] = true;
+                     }
+                  }
+               }
             }
             else
             {
@@ -446,6 +493,7 @@ SPxSolver::Status SPxSolver::fpsolve()
 
          instableLeaveNum = -1;
          instableLeave = false;
+         instableLeaveVal = 0;
 
          stallRefIter = iteration()-1;
          stallRefShift = shift();
@@ -498,6 +546,14 @@ SPxSolver::Status SPxSolver::fpsolve()
             
                leaveNum = instableLeaveNum;
                instableLeave = true;
+               // we also need to reset the fTest() value for getLeaveVals()
+               assert(instableLeaveVal < 0);
+               theCoTest[instableLeaveNum] = instableLeaveVal;
+               if( sparsePricingLeave && isInfeasible[instableLeaveNum] == false )
+               {
+                  infeasibilities.addIdx(instableLeaveNum);
+                  isInfeasible[instableLeaveNum] = true;
+               }
             }
             else
             {

@@ -25,6 +25,7 @@ fixed bugs:
 - fixed bug in unShift(): shifted bounds were not set to their original value even if the corresponding value was within
   the original bounds (feasibility tolerance was checked in wrong direction)
 - fixed minor bug in SVSet::add()
+- fixed behaviour in instable leave/enter: pricing values are now restored, before the instable pivot is performed
 
 04 Jan 2013 - Release 1.7.1
 ===========================
