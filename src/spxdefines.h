@@ -93,10 +93,15 @@ namespace soplex
 #define DO_WITH_TMP_VERBOSITY( verbosity, do_something ) {}
 #else
 #define DO_WITH_TMP_VERBOSITY( verbosity, do_something ) \
-   { const SPxOut::Verbosity  old_verbosity = spxout.getVerbosity(); \
-     spxout.setVerbosity( verbosity ); \
-     do_something; \
-     spxout.setVerbosity( old_verbosity ); }
+   {                                                     \
+     if( verbosity <= Param::verbose() )                 \
+     {                                                   \
+        const SPxOut::Verbosity  old_verbosity = spxout.getVerbosity(); \
+        spxout.setVerbosity( verbosity );                \
+        do_something;                                    \
+        spxout.setVerbosity( old_verbosity );            \
+     }                                                   \
+   }
 #endif
 
 /// Prints out message \p x if the verbosity level is at least SPxOut::ERROR.
