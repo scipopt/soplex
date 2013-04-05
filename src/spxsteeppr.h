@@ -98,6 +98,24 @@ private:
    void setupPrefs(SPxSolver::Type);
    //@}
 
+   //-------------------------------------
+   /// implementation of full pricing
+   int selectLeaveX(Real tol);
+   /// implementation of partial pricing
+   int selectLeavePart(Real tol);
+   /// implementation of sparse pricing in the leaving Simplex
+   int selectLeaveSparse(Real tol);
+   /// choose the best entering index among columns and rows but prefer sparsity
+   SPxId selectEnterX(Real tol);
+   /// implementation of sparse pricing for the entering Simplex (slack variables)
+   SPxId selectEnterSparseDim(Real& best, Real tol);
+   /// implementation of sparse pricing for the entering Simplex
+   SPxId selectEnterSparseCoDim(Real& best, Real tol);
+   /// implementation of selectEnter() in dense case (slack variables)
+   SPxId selectEnterDenseDim(Real& best, Real tol);
+   /// implementation of selectEnter() in dense case
+   SPxId selectEnterDenseCoDim(Real& best, Real tol);
+
 public:
 
    //-------------------------------------
@@ -175,26 +193,10 @@ public:
    virtual void setRep(SPxSolver::Representation rep);
    ///
    virtual int selectLeave();
-   /// implementation of full pricing
-   int selectLeaveX(Real tol);
-   /// implementation of partial pricing
-   int selectLeavePart(Real tol);
-   /// implementation of sparse pricing in the leaving Simplex
-   int selectLeaveSparse(Real tol);
    ///
    virtual void left4(int n, SPxId id);
    ///
    virtual SPxId selectEnter();
-   /// choose the best entering index among columns and rows but prefer sparsity
-   SPxId selectEnterX(Real tol);
-   /// implementation of sparse pricing for the entering Simplex (slack variables)
-   SPxId selectEnterSparseDim(Real& best, Real tol);
-   /// implementation of sparse pricing for the entering Simplex
-   SPxId selectEnterSparseCoDim(Real& best, Real tol);
-   /// implementation of selectEnter() in dense case (slack variables)
-   SPxId selectEnterDenseDim(Real& best, Real tol);
-   /// implementation of selectEnter() in dense case
-   SPxId selectEnterDenseCoDim(Real& best, Real tol);
    ///
    virtual void entered4(SPxId id, int n);
    /// \p n vectors have been added to loaded LP.
