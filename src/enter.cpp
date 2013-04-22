@@ -961,6 +961,7 @@ bool SPxSolver::enter(SPxId& enterId)
    assert(leaveIdx < 0 || !baseId(leaveIdx).isSPxColId() || desc().colStatus(number(SPxColId(baseId(leaveIdx)))) != SPxBasis::Desc::P_FIXED);
    assert(leaveIdx < 0 || !baseId(leaveIdx).isSPxRowId() || desc().rowStatus(number(SPxRowId(baseId(leaveIdx)))) != SPxBasis::Desc::P_FIXED);
 
+   instableEnterVal = 0;
    instableEnterId = SPxId();
    instableEnter = false;
 

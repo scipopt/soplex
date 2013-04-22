@@ -22,6 +22,7 @@
 #include <iostream>
 #include <iomanip>
 #include "spxdefines.h"
+#include "assert.h"
 
 // ----------------------------------------------------------------------
 //    class SPxOut
@@ -233,8 +234,8 @@ private:
    //@{
    ///
 #define PASS_TO_CURRENT_OSTREAM( t ) \
-      if ( _spxout.getVerbosity() <= Param::verbose() ) \
-         _spxout.getCurrentStream() << t; \
+      assert(_spxout.getVerbosity() <= Param::verbose()); \
+      _spxout.getCurrentStream() << t; \
       return _spxout;
 
    /// Passes instances of type \p Type to the current stream. 

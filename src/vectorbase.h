@@ -230,6 +230,7 @@ public:
    VectorBase<R>& operator+=(const VectorBase<S>& vec)
    {
       assert(dim() == vec.dim());
+      assert(dim() == dimen);
 
       for( int i = 0; i < dimen; i++ )
          val[i] += vec[i];
@@ -246,8 +247,9 @@ public:
    VectorBase<R>& operator-=(const VectorBase<S>& vec)
    {
       assert(dim() == vec.dim());
+      assert(dim() == dimen);
 
-      for( int i = 0; i < dim(); i++ )
+      for( int i = 0; i < dimen; i++ )
          val[i] -= vec[i];
 
       return *this;
@@ -265,7 +267,9 @@ public:
    template < class S >
    VectorBase<R>& operator*=(S x)
    {
-      for( int i = 0; i < dim(); i++ )
+      assert(dim() == dimen);
+
+      for( int i = 0; i < dimen; i++ )
          val[i] *= x;
 
       return *this;
@@ -305,9 +309,12 @@ public:
    /// Maximum absolute value, i.e., infinity norm.
    R maxAbs() const
    {
+      assert(dim() > 0);
+      assert(dim() == dimen);
+
       R maxi = 0;
 
-      for( int i = 0; i < dim(); i++ )
+      for( int i = 0; i < dimen; i++ )
       {
          R x = abs(val[i]);
 
@@ -324,10 +331,11 @@ public:
    R minAbs() const
    {
       assert(dim() > 0);
+      assert(dim() == dimen);
 
       R mini = abs(val[0]);
 
-      for( int i = 1; i < dim(); i++ )
+      for( int i = 1; i < dimen; i++ )
       {
          R x = abs(val[i]);
 

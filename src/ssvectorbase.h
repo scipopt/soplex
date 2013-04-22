@@ -141,9 +141,10 @@ public:
       {
          IdxSet::clear();
 
+         int d = dim();
          num = 0;
 
-         for( int i = 0; i < dim(); ++i )
+         for( int i = 0; i < d; ++i )
          {
             if( VectorBase<R>::val[i] != 0.0 )
             {
@@ -350,7 +351,7 @@ public:
    template < class S >
    SSVectorBase<R>& operator+=(const SSVectorBase<S>& vec)
    {
-      for( int i = 0; i < vec.size(); ++i )
+      for( int i = vec.size() - 1; i >= 0; --i )
          VectorBase<R>::val[vec.index(i)] += vec.value(i);
 
       if( isSetup() )
@@ -387,7 +388,7 @@ public:
    {
       if( vec.isSetup() )
       {
-         for( int i = 0; i < vec.size(); ++i )
+         for( int i = vec.size() - 1; i >= 0; --i )
             VectorBase<R>::val[vec.index(i)] -= vec.value(i);
       }
       else
@@ -408,7 +409,7 @@ public:
    {
       assert(isSetup());
 
-      for( int i = 0; i < size(); ++i )
+      for( int i = size() - 1; i >= 0; --i )
          VectorBase<R>::val[index(i)] *= x;
 
       assert(isConsistent());
@@ -660,7 +661,7 @@ public:
       {
          IdxSet::operator=(rhs);
 
-         for( int i = 0; i < size(); ++i )
+         for( int i = size() - 1; i >= 0; --i )
          {
             int j  = index(i);
             VectorBase<R>::val[j] = rhs.val[j];
@@ -668,9 +669,10 @@ public:
       }
       else
       {
+         int d = rhs.dim();
          num = 0;
 
-         for( int i = 0; i < rhs.dim(); ++i )
+         for( int i = 0; i < d; ++i )
          {
             if( rhs.val[i] != 0 )
             {
@@ -717,7 +719,7 @@ public:
          {
             IdxSet::operator=(rhs);
 
-            for( int i = 0; i < size(); ++i )
+            for( int i = size() - 1; i >= 0; --i )
             {
                int j = index(i);
                VectorBase<R>::val[j] = rhs.val[j];
@@ -725,9 +727,10 @@ public:
          }
          else
          {
+            int d = rhs.dim();
             num = 0;
 
-            for( int i = 0; i < rhs.dim(); ++i )
+            for( int i = 0; i < d; ++i )
             {
                if( abs(rhs.val[i]) > epsilon )
                {

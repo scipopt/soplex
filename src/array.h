@@ -112,23 +112,46 @@ public:
       insert(num, p_array);
    }
 
-   /// insert \p n uninitialized elements before \p i 'th element.
+   /** insert \p n uninitialized elements before \p i 'th element.
+    *
+    * You must not! use realloc, memcpy or memmove, because some data element points inside itself, and therefore you
+    * always need to copy all elements by hand.
+    */
    void insert(int i, int n)
    {
       assert(i <= num);
+      assert(num >= 0);
       if (n > 0)
       {
-         spx_realloc(data, num + n);
-         data = new (data) T[num + n]();
-         assert(data != 0);
+         T* newdata = 0;
+         int k;
 
-         // non-overlapping memory areas
-         if( num - i < n )
-            memcpy(&data[i+n], &data[i], num - i);
-         // overlapping memory areas
-         else
-            memmove(&data[i+n], &data[i], num - i);
+         spx_alloc(newdata, num + n);
+         assert(newdata != 0);
 
+         // copy front segment to new array
+         for( k = 0; k < i; ++k )
+         {
+            new (&(newdata[k])) T();
+            newdata[k] = data[k];
+            data[k].~T();
+         }
+
+         // call constructor for new elements
+         for( ; k < i+n; ++k )
+            new (&(newdata[k])) T();
+
+         // copy rear segment to new array
+         for( k = i; k < num; ++k )
+         {
+            new (&(newdata[n + k])) T();
+            newdata[n + k] = data[k];
+            data[k].~T();
+         }
+
+         if( data )
+            spx_free(data);
+         data = newdata;
          num += n;
       }
    }
@@ -150,35 +173,63 @@ public:
          data[n + i] = p_array.data[n];
    }
 
-   /// remove \p m elements starting at \p n.
+   /** remove \p m elements starting at \p n.
+    *
+    * You must not! use realloc, memcpy or memmove, because some data element points inside itself, and therefore you
+    * always need to copy all elements by hand.
+    */
    void remove(int n = 0, int m = 1)
    {
       assert(n >= 0 && m >= 0);
       if (m > 0 && n < num)
       {
+         T* newdata = 0;
+         int k;
+
          assert(num == size());
          m -= (n + m <= num) ? 0 : n + m - num;
 
-         // call destructor of elements in data
-         for( int k = m-1; k >= 0; --k )
-            data[n+k].~T();
-
-         if( m < num )
+         if( num > m )
          {
-            // non-overlapping memory areas
-            if( num - m - n < m )
-               memcpy(&data[n], &data[n + m], num - m - n);
-            // overlapping memory areas
-            else
-               memmove(&data[n], &data[n + m], num - m - n);
+            spx_alloc(newdata, num - m);
+            assert(newdata != 0);
+
+            // copy rear segment to new array
+            for( k = num - 1; k >= n + m; --k )
+            {
+               new (&(newdata[k - m])) T();
+               newdata[k - m] = data[k];
+               data[k].~T();
+            }
+
+            // call destructor for old elements
+            for( ; k >= n; --k )
+               data[k].~T();
+
+            // copy front segment to new array
+            for( ; k >= 0; --k )
+            {
+               new (&(newdata[k])) T();
+               newdata[k] = data[k];
+               data[k].~T();
+            }
+         }
+         else
+         {
+            assert(num == m);
+            assert(n == 0);
+
+            // call destructor for old elements
+            for( k = m - 1; k >= 0; --k )
+               data[k].~T();
          }
 
-         num -= m;
+         assert(data != 0);
+         spx_free(data);
+         data = newdata;
 
-         if( num > 0 )
-            spx_realloc(data, num);
-         else
-            spx_free(data);
+         num -= m;
+         assert((data == 0) == (num == 0));
       }
    }
 
@@ -243,9 +294,13 @@ public:
       num = n;
       if (num > 0)
       {
+         int k;
+
          spx_alloc(data, num);
-         data = new (data) T[num]();
          assert(data != 0);
+
+         for( k = 0; k < num; ++k )
+            new (&(data[k])) T();
       }
       assert(Array::isConsistent());
    }
@@ -256,11 +311,17 @@ public:
    {
       if (num > 0)
       {
+         int k;
+
          data = 0;
          spx_alloc(data, num);
-         data = new (data) T[num]();
          assert(data != 0);
-         *this = old;
+
+         for( k = 0; k < num; ++k )
+         {
+            new (&(data[k])) T();
+            data[k] = old.data[k];
+         }
       }
       else
          data = 0;

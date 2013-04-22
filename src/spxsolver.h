@@ -341,8 +341,8 @@ public:
     *  the i-th entry equals false, if the i-th basic variable is not infeasible
     *  the i-th entry equals true, if the i-th basic variable is infeasible
     */
-   Array<bool> isInfeasible;           ///< belongs to \ref soplex::SPxSolver::infeasibilities "infeasibilities" in the leaving and entering Simplex
-   Array<bool> isInfeasibleCo;         ///< belongs to \ref soplex::SPxSolver::infeasibilitiesCo "infeasibilitiesCo" in the entering Simplex
+   DataArray<bool> isInfeasible;           ///< belongs to \ref soplex::SPxSolver::infeasibilities "infeasibilities" in the leaving and entering Simplex
+   DataArray<bool> isInfeasibleCo;         ///< belongs to \ref soplex::SPxSolver::infeasibilitiesCo "infeasibilitiesCo" in the entering Simplex
 
    /// These values enable or disable sparse pricing
    bool     sparsePricingLeave;        ///< true if sparsePricing is turned on in the leaving Simplex

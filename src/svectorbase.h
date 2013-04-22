@@ -390,7 +390,7 @@ public:
    {
       R maxi = 0.0;
 
-      for( int i = 0; i < size(); ++i )
+      for( int i = size() - 1; i >= 0; --i )
       {
          if( abs(m_elem[i].val) > maxi )
             maxi = abs(m_elem[i].val);
@@ -406,7 +406,7 @@ public:
    {
       R mini = infinity;
 
-      for( int i = 0; i < size(); ++i )
+      for( int i = size() - 1; i >= 0; --i )
       {
          if( abs(m_elem[i].val) < mini )
             mini = abs(m_elem[i].val);

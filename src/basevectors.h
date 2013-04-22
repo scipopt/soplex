@@ -462,6 +462,8 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
    const T x0 = x.val[curidx];
    const SVectorBase<S>& A0 = A[curidx];
    int nonzero_idx = 0;
+   int xsize = x.size();
+   int Aisize;
 
    num = A0.size();
    if( isZero(x0, epsilon) || num == 0 )
@@ -487,17 +489,18 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
    }
 
    // Compute the other x[i] * A[i] and add them to the existing vector.
-   for( register int i = 1; i < x.size(); ++i )
+   for( register int i = 1; i < xsize; ++i )
    {
       curidx = x.idx[i];
       const T xi     = x.val[curidx];
       const SVectorBase<S>& Ai = A[curidx];
 
       // If A[i] == 0 or x[i] == 0, do nothing.
-      if ( isNotZero(xi, epsilon) || Ai.size() == 0 )
+      Aisize = Ai.size();
+      if ( isNotZero(xi, epsilon) || Aisize == 0 )
       {
          // Compute x[i] * A[i] and add it to the existing vector.
-         for( register int j = 0; j < Ai.size(); ++j )
+         for( register int j = 0; j < Aisize; ++j )
          {
             const Nonzero<S>& elt = Ai.element(j);
             idx[nonzero_idx] = elt.idx;
@@ -563,17 +566,20 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productFull(const SVSetBase<S>& A, cons
    }
 
    bool A_is_zero = true;
+   int xsize = x.size();
+   int Aisize;
 
-   for( int i = 0; i < x.size(); ++i )
+   for( int i = 0; i < xsize; ++i )
    {
       const int curidx = x.idx[i];
       const T xi = x.val[curidx];
       const SVectorBase<S>& Ai = A[curidx];
+      Aisize = Ai.size();
 
-      if( A_is_zero && Ai.size() > 0 )
+      if( A_is_zero && Aisize > 0 )
          A_is_zero = false;
 
-      for( register int j = 0; j < Ai.size(); ++j )
+      for( register int j = 0; j < Aisize; ++j )
       {
          const Nonzero<S>& elt = Ai.element(j);
          VectorBase<R>::val[elt.idx] += xi * elt.val;
@@ -631,10 +637,10 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productAndSetup(const SVSetBase<S>& A, 
       }
 
       x.num = nzcount;
+      setupStatus = false;
    }
 
    x.setupStatus = true;
-   setupStatus = false;
 
    assert(isConsistent());
 
@@ -648,9 +654,10 @@ SSVectorBase<R>& SSVectorBase<R>::assign(const SVectorBase<S>& rhs)
 {
    assert(rhs.dim() <= VectorBase<R>::dim());
 
+   int s = rhs.size();
    num = 0;
 
-   for( int i = 0; i < rhs.size(); ++i )
+   for( int i = 0; i < s; ++i )
    {
       int k = rhs.index(i);
       S v = rhs.value(i);

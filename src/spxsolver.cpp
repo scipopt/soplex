@@ -188,7 +188,7 @@ void SPxSolver::setType(Type tp)
       factorized = false;
       m_numCycle = 0;
 #endif
-      MSG_DEBUG( spxout << "DSOLVE20 switching to " 
+      MSG_INFO1( spxout << "ISOLVE20 switching to "
                         << static_cast<const char*>((tp == LEAVE)
                            ? "leaving" : "entering")
                         << " algorithm" << std::endl; )
