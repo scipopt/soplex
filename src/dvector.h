@@ -25,7 +25,8 @@
 
 namespace soplex
 {
-typedef DVectorBase<Real> DVector;
+typedef DVectorBase< Real > DVector;
+typedef DVectorBase< Real > DVectorReal;
 } // namespace soplex
 #endif // _DVECTOR_H_
 

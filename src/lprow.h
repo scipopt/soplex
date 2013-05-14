@@ -24,7 +24,8 @@
 
 namespace soplex
 {
-typedef LPRowBase<Real> LPRow;
+typedef LPRowBase< Real > LPRow;
+typedef LPRowBase< Real > LPRowReal;
 } // namespace soplex
 #endif // _LPROW_H_
 

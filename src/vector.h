@@ -26,10 +26,11 @@
 
 namespace soplex
 {
-typedef VectorBase<Real> Vector;
+typedef VectorBase< Real > Vector;
+typedef VectorBase< Real > VectorReal;
 
 template <>
-Real VectorBase<Real>::length() const
+Real VectorBase< Real >::length() const
 {
    return sqrt(length2());
 }
