@@ -187,7 +187,7 @@ private:
       /* delete last entries */
       if( ps == list.last() )
       {
-         removeLast(ps->max());
+         SVSetBaseArray::removeLast(ps->max());
       }
       /* merge space of predecessor with position which will be deleted, therefore we do not need to delete any memory
        * or do an expensive memory reallocation
@@ -350,7 +350,7 @@ public:
       if( list.last() )
       {
          ps = list.last();
-         removeLast(ps->max() - ps->size());
+         SVSetBaseArray::removeLast(ps->max() - ps->size());
          ps->set_max(ps->size());
       }
 
@@ -410,7 +410,7 @@ public:
          {
             int sz = ps->size();
             ensureMem(newmax - ps->max());
-            insert(memSize(), newmax - ps->max());
+            SVSetBaseArray::insert(memSize(), newmax - ps->max());
             ps->setMem(newmax, ps->mem());
             ps->set_size(sz);
          }
@@ -419,7 +419,7 @@ public:
             ensureMem(newmax);
             SVectorBase<R> newps(newmax, &SVSetBaseArray::last() + 1);
             int sz = ps->size();
-            insert(memSize(), newmax);
+            SVSetBaseArray::insert(memSize(), newmax);
             newps = svec;
 
             if( ps != list.first() )

@@ -63,7 +63,7 @@ private:
    {
       spx_alloc(theelem, n);
       theelem = new (theelem) Nonzero<R>[n]();
-      setMem(n, theelem);
+      SVectorBase<R>::setMem(n, theelem);
    }
 
    /// Ensure there is room for \p n new nonzeros.
@@ -254,7 +254,7 @@ public:
 
       /* assign new memory */
       theelem = newmem;
-      setMem(len, theelem);
+      SVectorBase<R>::setMem(len, theelem);
       SVectorBase<R>::set_size(siz);
    }
 
