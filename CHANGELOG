@@ -18,6 +18,7 @@ interface:
 - renamed class MpqReal to Rational
 - new simplifier method to return result of the last simplification
 - new SPxSolver status INForUNBD
+- new interface class SoPlex2
 
 fixed bugs:
 - allow instable enter pivot when no other is available; only after a fresh factorization
