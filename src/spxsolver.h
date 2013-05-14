@@ -182,7 +182,6 @@ public:
      */
    enum Status
    {
-
       ERROR          = -13, ///< an error occured.
       NO_RATIOTESTER = -12, ///< No ratiotester loaded
       NO_PRICER      = -11, ///< No pricer loaded
@@ -199,7 +198,8 @@ public:
       UNKNOWN        =  0,  ///< nothing known on loaded problem.
       OPTIMAL        =  1,  ///< LP has been solved to optimality.
       UNBOUNDED      =  2,  ///< LP has been proven to be primal unbounded.
-      INFEASIBLE     =  3   ///< LP has been proven to be primal infeasible.
+      INFEASIBLE     =  3,  ///< LP has been proven to be primal infeasible.
+      INForUNBD      =  4   ///< LP is primal infeasible or unbounded.
    };
 
    //@}
