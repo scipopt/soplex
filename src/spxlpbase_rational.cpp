@@ -14,7 +14,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /**@file  spxlpbase.cpp
- * @brief Saving LPs with Real values in a form suitable for SoPlex.
+ * @brief Saving LPs with Rational values in a form suitable for SoPlex.
  */
 
 #include <assert.h>
@@ -42,11 +42,15 @@ static inline bool LPFisSpace(int c)
    return (c == ' ') || (c == '\t') || (c == '\n') || (c == '\r');
 }
 
+
+
 /// Is there a number at the beginning of \p s ?
 static bool LPFisValue(const char* s)
 {
    return ((*s >= '0') && (*s <= '9')) || (*s == '+') || (*s == '-') || (*s == '.');
 }
+
+
 
 /// Is there a possible column name at the beginning of \p s ?
 static bool LPFisColName(const char* s)
@@ -60,11 +64,15 @@ static bool LPFisColName(const char* s)
       || (strchr("!\"#$%&()/,;?@_'`{}|~", *s) != 0);
 }
 
+
+
 /// Is there a comparison operator at the beginning of \p s ?
 static bool LPFisSense(const char* s)
 {
    return (*s == '<') || (*s == '>') || (*s == '=');
 }
+
+
 
 static bool LPFisInfinity(const char* s)
 {
@@ -74,6 +82,8 @@ static bool LPFisInfinity(const char* s)
       && (tolower(s[3]) == 'f');
 }
 
+
+
 static bool LPFisFree(const char* s)
 {
    return (tolower(s[0]) == 'f')
@@ -82,18 +92,20 @@ static bool LPFisFree(const char* s)
       && ( tolower(s[3]) == 'e');
 }
 
+
+
 /// Read the next number and advance \p pos.
 /** If only a sign is encountered, the number is assumed to be \c sign * 1.0.  This routine will not catch malformatted
  *  numbers like .e10 !
  */
-static Real LPFreadValue(char*& pos)
+static Rational LPFreadValue(char*& pos)
 {
    assert(LPFisValue(pos));
 
    char        tmp[LPF_MAX_LINE_LEN];
    const char* s = pos;
    char*       t;
-   Real        value = 1.0;
+   Rational        value = 1.0;
    bool        has_digits = false;
    bool        has_emptyexponent = false;
 
@@ -167,12 +179,14 @@ static Real LPFreadValue(char*& pos)
    return value;
 }
 
+
+
 /// Read the next column name from the input.
 /** The name read is looked up and if not found \p emptycol
  *  is added to \p colset. \p pos is advanced behind the name.
  *  @return The Index of the named column.
  */
-static int LPFreadColName(char*& pos, NameSet* colnames, LPColSetBase<Real>& colset, const LPColBase<Real>* emptycol)
+static int LPFreadColName(char*& pos, NameSet* colnames, LPColSetBase<Rational>& colset, const LPColBase<Rational>* emptycol)
 {
    assert(LPFisColName(pos));
    assert(colnames != 0);
@@ -212,6 +226,8 @@ static int LPFreadColName(char*& pos, NameSet* colnames, LPColSetBase<Real>& col
    return colidx;
 }
 
+
+
 /// Read the next <,>,=,==,<=,=<,>=,=> and advance \p pos.
 static int LPFreadSense(char*& pos)
 {
@@ -231,6 +247,8 @@ static int LPFreadSense(char*& pos)
 
    return sense;
 }
+
+
 
 /// Is the \p keyword present in \p buf ? If yes, advance \p pos.
 /** \p keyword should be lower case. It can contain optional sections which are enclosed in '[' ']' like "min[imize]".
@@ -278,6 +296,8 @@ static bool LPFhasKeyword(char*& pos, const char* keyword)
 
    return false;
 }
+
+
 
 /// If \p buf start with "name:" store the name in \p rownames and advance \p pos.
 static bool LPFhasRowName(char*& pos, NameSet* rownames)
@@ -331,16 +351,21 @@ static bool LPFhasRowName(char*& pos, NameSet* rownames)
    return true;
 }
 
-static Real LPFreadInfinity(char*& pos)
+
+
+static Rational LPFreadInfinity(char*& pos)
 {
    assert(LPFisInfinity(pos));
 
-   Real sense = (*pos == '-') ? -1.0 : 1.0;
+   Rational sense = (*pos == '-') ? -1.0 : 1.0;
 
    (void) LPFhasKeyword(++pos, "inf[inity]");
 
-   return sense * infinity;
+   sense *= infinity;
+   return sense;
 }
+
+
 
 /// Read LP in "CPLEX LP File Format".
    /** The specification is taken from the ILOG CPLEX 7.0 Reference Manual, Appendix E, Page 527.
@@ -360,7 +385,7 @@ static Real LPFreadInfinity(char*& pos)
     *  @return true if the file was read correctly
     */
 template <>
-bool SPxLPBase<Real>::readLPF(
+bool SPxLPBase<Rational>::readLPF(
    std::istream& p_input,                ///< input stream.
    NameSet*      p_rnames,               ///< row names.
    NameSet*      p_cnames,               ///< column names.
@@ -374,13 +399,13 @@ bool SPxLPBase<Real>::readLPF(
    NameSet* rnames;                      ///< row names.
    NameSet* cnames;                      ///< column names.
 
-   LPColSetBase<Real> cset;              ///< the set of columns read.
-   LPRowSetBase<Real> rset;              ///< the set of rows read.
-   LPColBase<Real> emptycol;             ///< reusable empty column.
-   LPRowBase<Real> row;                  ///< last assembled row.
-   DSVectorBase<Real> vec;               ///< last assembled vector (from row).
+   LPColSetBase<Rational> cset;              ///< the set of columns read.
+   LPRowSetBase<Rational> rset;              ///< the set of rows read.
+   LPColBase<Rational> emptycol;             ///< reusable empty column.
+   LPRowBase<Rational> row;                  ///< last assembled row.
+   DSVectorBase<Rational> vec;               ///< last assembled vector (from row).
 
-   Real val = 1.0;
+   Rational val = 1.0;
    int colidx;
    int sense = 0;
 
@@ -432,7 +457,7 @@ bool SPxLPBase<Real>::readLPF(
 
    rnames->clear();
 
-   SPxLPBase<Real>::clear(); // clear the LP.
+   SPxLPBase<Rational>::clear(); // clear the LP.
 
    //--------------------------------------------------------------------------
    //--- Main Loop
@@ -470,12 +495,12 @@ bool SPxLPBase<Real>::readLPF(
       {
          if( LPFhasKeyword(pos, "max[imize]") )
          {
-            changeSense(SPxLPBase<Real>::MAXIMIZE);
+            changeSense(SPxLPBase<Rational>::MAXIMIZE);
             section = OBJECTIVE;
          }
          else if( LPFhasKeyword(pos, "min[imize]") )
          {
-            changeSense(SPxLPBase<Real>::MINIMIZE);
+            changeSense(SPxLPBase<Rational>::MINIMIZE);
             section = OBJECTIVE;
          }
       }
@@ -593,7 +618,7 @@ bool SPxLPBase<Real>::readLPF(
          case OBJECTIVE:
             if( LPFisValue(pos) )
             {
-               Real pre_sign = 1.0;
+               Rational pre_sign = 1.0;
 
                /* Already having here a value could only result from being the first number in a constraint, or a sign
                 * '+' or '-' as last token on the previous line.
@@ -607,7 +632,8 @@ bool SPxLPBase<Real>::readLPF(
                      pre_sign = val;
                }
                have_value = true;
-               val = LPFreadValue(pos) * pre_sign;
+               val = LPFreadValue(pos);
+               val *= pre_sign;
             }
             if( *pos == '\0' )
                continue;
@@ -622,7 +648,7 @@ bool SPxLPBase<Real>::readLPF(
          case CONSTRAINTS:
             if( LPFisValue(pos) )
             {
-               Real pre_sign = 1.0;
+               Rational pre_sign = 1.0;
 
                /* Already having here a value could only result from being the first number in a constraint, or a sign
                 * '+' or '-' as last token on the previous line.
@@ -637,7 +663,8 @@ bool SPxLPBase<Real>::readLPF(
                }
 
                have_value = true;
-               val = LPFreadValue(pos) * pre_sign;
+               val = LPFreadValue(pos);
+               val *= pre_sign;
 
                if( sense != 0 )
                {
@@ -872,6 +899,8 @@ syntax_error:
    return finished;
 }
 
+
+
 // ---------------------------------------------------------------------------------------------------------------------
 // Specialization for reading MPS format
 // ---------------------------------------------------------------------------------------------------------------------
@@ -910,6 +939,8 @@ static void MPSreadName(MPSInput& mps)
    mps.syntaxError();
 }
 
+
+
 /// Process OBJSEN section. This Section is an ILOG extension.
 static void MPSreadObjsen(MPSInput& mps)
 {
@@ -944,6 +975,8 @@ static void MPSreadObjsen(MPSInput& mps)
    mps.syntaxError();
 }
 
+
+
 /// Process OBJNAME section. This Section is an ILOG extension.
 static void MPSreadObjname(MPSInput& mps)
 {
@@ -971,10 +1004,12 @@ static void MPSreadObjname(MPSInput& mps)
    mps.syntaxError();
 }
 
+
+
 /// Process ROWS section.
-static void MPSreadRows(MPSInput& mps, LPRowSetBase<Real>& rset, NameSet& rnames)
+static void MPSreadRows(MPSInput& mps, LPRowSetBase<Rational>& rset, NameSet& rnames)
 {
-   LPRowBase<Real> row;
+   LPRowBase<Rational> row;
 
    while( mps.readLine() )
    {
@@ -1030,14 +1065,16 @@ static void MPSreadRows(MPSInput& mps, LPRowSetBase<Real>& rset, NameSet& rnames
    mps.syntaxError();
 }
 
+
+
 /// Process COLUMNS section.
-static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Real>& rset, const NameSet&  rnames, LPColSetBase<Real>& cset, NameSet& cnames, DIdxSet* intvars)
+static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const NameSet&  rnames, LPColSetBase<Rational>& cset, NameSet& cnames, DIdxSet* intvars)
 {
-   Real val;
+   Rational val;
    int idx;
    char colname[MPSInput::MAX_LINE_LEN] = { '\0' };
-   LPColBase<Real> col(rset.num());
-   DSVectorBase<Real> vec;
+   LPColBase<Rational> col(rset.num());
+   DSVectorBase<Rational> vec;
 
    col.setObj(0.0);
    vec.clear();
@@ -1127,13 +1164,15 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Real>& rset, const Nam
    mps.syntaxError();
 }
 
+
+
 /// Process RHS section.
-static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Real>& rset, const NameSet& rnames)
+static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSet& rnames)
 {
    char rhsname[MPSInput::MAX_LINE_LEN] = { '\0' };
    char addname[MPSInput::MAX_LINE_LEN] = { '\0' };
    int idx;
-   Real val;
+   Rational val;
 
    while( mps.readLine() )
    {
@@ -1209,12 +1248,14 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Real>& rset, const NameSet& r
    mps.syntaxError();
 }
 
+
+
 /// Process RANGES section.
-static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Real>& rset, const NameSet& rnames)
+static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const NameSet& rnames)
 {
    char rngname[MPSInput::MAX_LINE_LEN] = { '\0' };
    int idx;
-   Real val;
+   Rational val;
 
    while( mps.readLine() )
    {
@@ -1275,10 +1316,16 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Real>& rset, const NameSe
             {
                // GE
                if( rset.lhs(idx) > -infinity )
-                  rset.rhs_w(idx)  = rset.lhs(idx) + fabs(val);
+               {
+                  rset.rhs_w(idx) = rset.lhs(idx);
+                  rset.rhs_w(idx) += fabs(val);
+               }
                // LE
                else
-                  rset.lhs_w(idx)  = rset.rhs(idx) - fabs(val);
+               {
+                  rset.lhs_w(idx) = rset.rhs(idx);
+                  rset.lhs_w(idx) -= fabs(val);
+               }
             }
          }
 
@@ -1304,10 +1351,16 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Real>& rset, const NameSe
                {
                   // GE
                   if( rset.lhs(idx) > -infinity )
-                     rset.rhs_w(idx)  = rset.lhs(idx) + fabs(val);
+                  {
+                     rset.rhs_w(idx) = rset.lhs(idx);
+                     rset.rhs_w(idx) += fabs(val);
+                  }
                   // LE
                   else
-                     rset.lhs_w(idx)  = rset.rhs(idx) - fabs(val);
+                  {
+                     rset.lhs_w(idx) = rset.rhs(idx);
+                     rset.lhs_w(idx) -= fabs(val);
+                  }
                }
             }
          }
@@ -1317,12 +1370,14 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Real>& rset, const NameSe
    mps.syntaxError();
 }
 
+
+
 /// Process BOUNDS section.
-static void MPSreadBounds(MPSInput& mps, LPColSetBase<Real>& cset, const NameSet& cnames, DIdxSet* intvars)
+static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const NameSet& cnames, DIdxSet* intvars)
 {
    char bndname[MPSInput::MAX_LINE_LEN] = { '\0' };
    int  idx;
-   Real val;
+   Rational val;
 
    while( mps.readLine() )
    {
@@ -1425,6 +1480,8 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Real>& cset, const NameSet
    mps.syntaxError();
 }
 
+
+
 /// Read LP in MPS File Format.
 /**
  *  The specification is taken from the IBM Optimization Library Guide and Reference, online available at
@@ -1439,14 +1496,14 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Real>& cset, const NameSet
 #define INIT_COLS 10000 ///< initialy allocated columns.
 #define INIT_NZOS 100000 ///< initialy allocated non zeros.
 template <>
-bool SPxLPBase<Real>::readMPS(
+bool SPxLPBase<Rational>::readMPS(
    std::istream& p_input,           ///< input stream.
    NameSet*      p_rnames,          ///< row names.
    NameSet*      p_cnames,          ///< column names.
    DIdxSet*      p_intvars)         ///< integer variables.
 {
-   LPRowSetBase<Real>& rset = *this;
-   LPColSetBase<Real>& cset = *this;
+   LPRowSetBase<Rational>& rset = *this;
+   LPColSetBase<Rational>& cset = *this;
    NameSet* rnames;
    NameSet* cnames;
 
@@ -1484,7 +1541,7 @@ bool SPxLPBase<Real>::readMPS(
 
    rnames->clear();
 
-   SPxLPBase<Real>::clear(); // clear the LP.
+   SPxLPBase<Rational>::clear(); // clear the LP.
 
    cset.memRemax(INIT_NZOS);
    cset.reMax(INIT_COLS);
@@ -1523,13 +1580,13 @@ bool SPxLPBase<Real>::readMPS(
       clear();
    else
    {
-      changeSense(mps.objSense() == MPSInput::MINIMIZE ? SPxLPBase<Real>::MINIMIZE : SPxLPBase<Real>::MAXIMIZE);
+      changeSense(mps.objSense() == MPSInput::MINIMIZE ? SPxLPBase<Rational>::MINIMIZE : SPxLPBase<Rational>::MAXIMIZE);
 
       MSG_INFO2( spxout << "IMPSRD06 Objective sense: " << ((mps.objSense() == MPSInput::MINIMIZE) ? "Minimize\n" : "Maximize\n") );
 
       added2Set(
-         *(reinterpret_cast<SVSetBase<Real>*>(static_cast<LPRowSetBase<Real>*>(this))),
-         *(reinterpret_cast<SVSetBase<Real>*>(static_cast<LPColSetBase<Real>*>(this))),
+         *(reinterpret_cast<SVSetBase<Rational>*>(static_cast<LPRowSetBase<Rational>*>(this))),
+         *(reinterpret_cast<SVSetBase<Rational>*>(static_cast<LPColSetBase<Rational>*>(this))),
          cset.num());
       addedCols(cset.num());
 
@@ -1551,13 +1608,15 @@ bool SPxLPBase<Real>::readMPS(
    return !mps.hasError();
 }
 
+
+
 // ---------------------------------------------------------------------------------------------------------------------
 // Specialization for writing LP format
 // ---------------------------------------------------------------------------------------------------------------------
 
 // get the name of a row or construct one
 static const char* LPFgetRowName(
-   const SPxLPBase<Real>& p_lp,
+   const SPxLPBase<Rational>& p_lp,
    int                    p_idx,
    const NameSet*         p_rnames,
    char*                  p_buf,
@@ -1581,9 +1640,11 @@ static const char* LPFgetRowName(
    return p_buf;
 }
 
+
+
 // get the name of a column or construct one
 static const char* getColName(
-   const SPxLPBase<Real>& p_lp,
+   const SPxLPBase<Rational>& p_lp,
    int                    p_idx,
    const NameSet*         p_cnames,
    char*                  p_buf
@@ -1606,13 +1667,15 @@ static const char* getColName(
    return p_buf;
 }
 
+
+
 // write an SVector
 #define NUM_ENTRIES_PER_LINE 5
 static void LPFwriteSVector(
-   const SPxLPBase<Real>&   p_lp,       ///< the LP
+   const SPxLPBase<Rational>&   p_lp,       ///< the LP
    std::ostream&            p_output,   ///< output stream
    const NameSet*           p_cnames,   ///< column names
-   const SVectorBase<Real>& p_svec )    ///< vector to write
+   const SVectorBase<Rational>& p_svec )    ///< vector to write
 {
    METHOD("LPFwriteSVector");
 
@@ -1621,7 +1684,7 @@ static void LPFwriteSVector(
 
    for( int j = 0; j < p_lp.nCols(); ++j )
    {
-      const Real coeff = p_svec[j];
+      const Rational coeff = p_svec[j];
 
       if( coeff == 0 )
          continue;
@@ -1646,9 +1709,11 @@ static void LPFwriteSVector(
    }
 }
 
+
+
 // write the objective
 static void LPFwriteObjective(
-   const SPxLPBase<Real>& p_lp,       ///< the LP
+   const SPxLPBase<Rational>& p_lp,       ///< the LP
    std::ostream&          p_output,   ///< output stream
    const NameSet*         p_cnames    ///< column names
    )
@@ -1657,25 +1722,27 @@ static void LPFwriteObjective(
 
    const int sense = p_lp.spxSense();
 
-   p_output << ((sense == SPxLPBase<Real>::MINIMIZE) ? "Minimize\n" : "Maximize\n");
+   p_output << ((sense == SPxLPBase<Rational>::MINIMIZE) ? "Minimize\n" : "Maximize\n");
    p_output << "  obj: ";
 
-   const VectorBase<Real>& obj = p_lp.maxObj();
-   DSVectorBase<Real> svec(obj.dim());
+   const VectorBase<Rational>& obj = p_lp.maxObj();
+   DSVectorBase<Rational> svec(obj.dim());
    svec.operator=(obj);
-   svec *= Real(sense);
+   svec *= Rational(sense);
    LPFwriteSVector(p_lp, p_output, p_cnames, svec);
    p_output << "\n";
 }
 
+
+
 // write non-ranged rows
 static void LPFwriteRow(
-   const SPxLPBase<Real>&   p_lp,       ///< the LP
+   const SPxLPBase<Rational>&   p_lp,       ///< the LP
    std::ostream&            p_output,   ///< output stream
    const NameSet*           p_cnames,   ///< column names
-   const SVectorBase<Real>& p_svec,     ///< vector of the row
-   const Real&              p_lhs,      ///< lhs of the row
-   const Real&              p_rhs       ///< rhs of the row
+   const SVectorBase<Rational>& p_svec,     ///< vector of the row
+   const Rational&              p_lhs,      ///< lhs of the row
+   const Rational&              p_rhs       ///< rhs of the row
    )
 {
    METHOD("writeRow");
@@ -1695,9 +1762,11 @@ static void LPFwriteRow(
    p_output << "\n";
 }
 
+
+
 // write all rows
 static void LPFwriteRows(
-   const SPxLPBase<Real>& p_lp,       ///< the LP
+   const SPxLPBase<Rational>& p_lp,       ///< the LP
    std::ostream&          p_output,   ///< output stream
    const NameSet*         p_rnames,   ///< row names
    const NameSet*         p_cnames   ///< column names
@@ -1712,8 +1781,8 @@ static void LPFwriteRows(
    int num_written_rows = 0;  // num_written_rows > nRows with ranged rows
    for( int i = 0; i < p_lp.nRows(); ++i )
    {
-      const Real lhs = p_lp.lhs(i);
-      const Real rhs = p_lp.rhs(i);
+      const Rational lhs = p_lp.lhs(i);
+      const Rational rhs = p_lp.rhs(i);
 
       if( lhs > -infinity && rhs < infinity && lhs != rhs )
       {
@@ -1732,10 +1801,12 @@ static void LPFwriteRows(
    }
 }
 
+
+
 // write the variable bounds
 // (the default bounds 0 <= x <= infinity are not written)
 static void LPFwriteBounds(
-   const SPxLPBase<Real>&   p_lp,       ///< the LP to write
+   const SPxLPBase<Rational>&   p_lp,       ///< the LP to write
    std::ostream&            p_output,   ///< output stream
    const NameSet*           p_cnames    ///< column names
    )
@@ -1748,8 +1819,8 @@ static void LPFwriteBounds(
 
    for( int j = 0; j < p_lp.nCols(); ++j )
    {
-      const Real lower = p_lp.lower(j);
-      const Real upper = p_lp.upper(j);
+      const Rational lower = p_lp.lower(j);
+      const Rational upper = p_lp.upper(j);
 
       if( lower == upper )
       {
@@ -1783,9 +1854,11 @@ static void LPFwriteBounds(
    }
 }
 
+
+
 // write the generals section
 static void LPFwriteGenerals(
-   const SPxLPBase<Real>&   p_lp,         ///< the LP to write
+   const SPxLPBase<Rational>&   p_lp,         ///< the LP to write
    std::ostream&            p_output,     ///< output stream
    const NameSet*           p_cnames,     ///< column names
    const DIdxSet*           p_intvars     ///< integer variables
@@ -1805,9 +1878,11 @@ static void LPFwriteGenerals(
          p_output << "  " << getColName(p_lp, j, p_cnames, name) << "\n";
 }
 
+
+
 /// Write LP in LP Format.
 template <>
-void SPxLPBase<Real>::writeLPF(
+void SPxLPBase<Rational>::writeLPF(
    std::ostream&  p_output,          ///< output stream
    const NameSet* p_rnames,          ///< row names
    const NameSet* p_cnames,          ///< column names
@@ -1823,6 +1898,8 @@ void SPxLPBase<Real>::writeLPF(
 
    p_output << "End" << std::endl;
 }
+
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Specialization for writing MPS format
@@ -1858,9 +1935,11 @@ static void MPSwriteRecord(
    os << std::endl;
 }
 
-static Real MPSgetRHS(Real left, Real right)
+
+
+static Rational MPSgetRHS(Rational left, Rational right)
 {
-   Real rhsval;
+   Rational rhsval;
 
    if( left > -infinity ) /// This includes ranges
       rhsval = left;
@@ -1872,8 +1951,10 @@ static Real MPSgetRHS(Real left, Real right)
    return rhsval;
 }
 
+
+
 static const char* MPSgetRowName(
-   const SPxLPBase<Real>& lp,
+   const SPxLPBase<Rational>& lp,
    int                   idx,
    const NameSet*        rnames,
    char*                 buf
@@ -1896,11 +1977,13 @@ static const char* MPSgetRowName(
    return buf;
 }
 
+
+
 /// Write LP in MPS format.
 /** @note There will always be a BOUNDS section, even if there are no bounds.
  */
 template <>
-void SPxLPBase<Real>::writeMPS(
+void SPxLPBase<Rational>::writeMPS(
    std::ostream&  p_output,          ///< output stream.
    const NameSet* p_rnames,          ///< row names.
    const NameSet* p_cnames,          ///< column names.
@@ -1963,7 +2046,7 @@ void SPxLPBase<Real>::writeMPS(
          if( ( is_intrun && !is_intvar) || (!is_intrun &&  is_intvar) )
              continue;
 
-         const SVectorBase<Real>& col = colVector(i);
+         const SVectorBase<Rational>& col = colVector(i);
          int colsize2 = (col.size() / 2) * 2;
 
          assert(colsize2 % 2 == 0);
@@ -1991,8 +2074,8 @@ void SPxLPBase<Real>::writeMPS(
    i = 0;
    while( i < nRows() )
    {
-      Real rhsval1 = 0.0;
-      Real rhsval2 = 0.0;
+      Rational rhsval1 = 0.0;
+      Rational rhsval2 = 0.0;
 
       for( ; i < nRows(); i++ )
          if( (rhsval1 = MPSgetRHS(lhs(i), rhs(i))) != 0.0 )
@@ -2026,7 +2109,11 @@ void SPxLPBase<Real>::writeMPS(
       for( i = 0; i < nRows(); i++ )
       {
          if( (lhs(i) > -infinity) && (rhs(i) < infinity) )
-            MPSwriteRecord(p_output, "", "RANGE", MPSgetRowName(*this, i, p_rnames, name1), rhs(i) - lhs(i));
+         {
+            Rational value = rhs(i);
+            value -= lhs(i);
+            MPSwriteRecord(p_output, "", "RANGE", MPSgetRowName(*this, i, p_rnames, name1), value);
+         }
       }
    }
 
@@ -2036,7 +2123,7 @@ void SPxLPBase<Real>::writeMPS(
    for( i = 0; i < nCols(); i++ )
    {
       // skip variables that do not appear in the objective function or any constraint
-      const SVectorBase<Real>& col = colVector(i);
+      const SVectorBase<Rational>& col = colVector(i);
 
       if( col.size() == 0 && isZero(maxObj(i)) )
          continue;
@@ -2079,17 +2166,19 @@ void SPxLPBase<Real>::writeMPS(
    p_output << "ENDATA" << std::endl;
 
    // Output warning when writing a maximisation problem
-   if( spxSense() == SPxLPBase<Real>::MAXIMIZE )
+   if( spxSense() == SPxLPBase<Rational>::MAXIMIZE )
    {
       MSG_WARNING( spxout << "XMPSWR03 Warning: objective function inverted when writing maximization problem in MPS file format\n" );
    }
 }
 
+
+
 // ---------------------------------------------------------------------------------------------------------------------
 //  Explicit instantiation
 // ---------------------------------------------------------------------------------------------------------------------
 
-template class SPxLPBase < Real >;
+template class SPxLPBase < Rational >;
 
 } // namespace soplex
 

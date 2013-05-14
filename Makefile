@@ -91,8 +91,8 @@ LIBOBJ		= 	changesoplex.o clufactor.o didxset.o \
 			spxequilisc.o spxdantzigpr.o spxdefaultrt.o \
 			spxdefines.o spxdesc.o spxdevexpr.o \
 			spxfastrt.o spxfileio.o spxgeometsc.o spxgithash.o\
-			spxharrisrt.o spxhybridpr.o spxid.o spxlpbase.o spxmainsm.o \
-			spxout.o spxparmultpr.o spxquality.o \
+			spxharrisrt.o spxhybridpr.o spxid.o spxlpbase_real.o spxlpbase_rational.o \
+			spxmainsm.o spxout.o spxparmultpr.o spxquality.o \
 			spxscaler.o spxshift.o spxsolver.o spxsolve.o \
 			spxstarter.o spxsteeppr.o spxsumst.o spxvecs.o \
 			spxvectorst.o spxweightpr.o spxweightst.o spxwritestate.o \
