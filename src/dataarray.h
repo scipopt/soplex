@@ -122,6 +122,11 @@ public:
    {
       insert(thesize, 1, &t);
    }
+   /// append \p n elements with value \p t.
+   void append(int n, const T& t)
+   {
+      insert(thesize, n, t);
+   }
    /// append \p n elements from \p t.
    void append(int n, const T t[])
    {
@@ -146,6 +151,17 @@ public:
       /// move \p n elements in memory from insert position \p i to the back
       if( j > i )
          memmove(&(data[i+n]), &(data[i]), j - i);
+   }
+
+   /// insert \p n elements with value \p t before \p i 'the element.
+   void insert(int i, int n, const T& t)
+   {
+      if (n > 0)
+      {
+         insert(i, n);
+         for( int j = 0; j < n; j++ )
+            data[i + j] = t;
+      }
    }
 
    /// insert \p n elements from \p t before \p i 'the element.
