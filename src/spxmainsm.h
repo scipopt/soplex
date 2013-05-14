@@ -1015,6 +1015,7 @@ private:
    Real                            m_opttol;     ///< dual feasibility tolerance.
    DataArray<int>                  m_stat;       ///< preprocessing history.
    SPxLP::SPxSense                 m_thesense;   ///< optimization sense.
+   Result                          m_result;     ///< result of the simplfication.
    //@}
 
 private:
@@ -1201,6 +1202,12 @@ public:
    /// reconstructs an optimal solution for the unsimplified LP.
    virtual void unsimplify(const Vector& x, const Vector& y, const Vector& s, const Vector& r,
                            const SPxSolver::VarStatus rows[], const SPxSolver::VarStatus cols[]);
+
+   /// returns result status of the simplification
+   virtual Result result() const
+   {
+      return m_result;
+   }
 
    /// specifies whether an optimal solution has already been unsimplified.
    virtual bool isUnsimplified() const

@@ -3648,7 +3648,7 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real feastol, Rea
    m_chgBnds = 0;
    m_chgLRhs = 0;
 
-   Result ret   = OKAY;
+   m_result     = OKAY;
    bool   again = true;
 
    m_prim.reDim(lp.nCols());
@@ -3706,39 +3706,39 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real feastol, Rea
 #endif
 
    // main presolving loop
-   while(again && ret == OKAY)
+   while(again && m_result == OKAY)
    {
       again = false;
 
 #if ROWS
-      if (ret == OKAY)
-         ret = simplifyRows(lp, again);
+      if (m_result == OKAY)
+         m_result = simplifyRows(lp, again);
 #endif
 
 #if COLS
-      if (ret == OKAY)
-         ret = simplifyCols(lp, again);
+      if (m_result == OKAY)
+         m_result = simplifyCols(lp, again);
 #endif
 
 #if DUAL
-      if (ret == OKAY)
-         ret = simplifyDual(lp, again);
+      if (m_result == OKAY)
+         m_result = simplifyDual(lp, again);
 #endif
 
 #if DUPLICATE_ROWS
-      if (ret == OKAY)
-         ret = duplicateRows(lp, again);
+      if (m_result == OKAY)
+         m_result = duplicateRows(lp, again);
 #endif
 
 #if DUPLICATE_COLS
-      if (ret == OKAY)
-         ret = duplicateCols(lp, again);
+      if (m_result == OKAY)
+         m_result = duplicateCols(lp, again);
 #endif
    }
 
    // preprocessing detected infeasibility or unboundness
-   if (ret != OKAY)
-      return ret;
+   if (m_result != OKAY)
+      return m_result;
 
    MSG_INFO1( spxout << "IMAISM69 Main simplifier removed "
                      << m_remRows << " rows, "
@@ -3757,7 +3757,7 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real feastol, Rea
    if (lp.nCols() == 0 && lp.nRows() == 0)
    {
       MSG_INFO1( spxout << "IMAISM70 Main simplifier removed all rows and columns" << std::endl; )
-      ret = VANISHED;
+      m_result = VANISHED;
    }
 
    MSG_INFO2( spxout << "\nIMAISM71 Main simplifier performed:\n"
@@ -3780,7 +3780,7 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real feastol, Rea
 
    m_timeUsed.stop();
 
-   return ret;
+   return m_result;
 }
 
 void SPxMainSM::unsimplify(const Vector& x, const Vector& y, const Vector& s, const Vector& r,

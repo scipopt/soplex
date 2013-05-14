@@ -16,6 +16,7 @@ code quality & new features:
 
 interface:
 - renamed class MpqReal to Rational
+- new simplifier method to return result of the last simplification
 
 fixed bugs:
 - allow instable enter pivot when no other is available; only after a fresh factorization

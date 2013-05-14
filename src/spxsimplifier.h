@@ -157,6 +157,8 @@ public:
    /// reconstructs an optimal solution for the unsimplified LP.
    virtual void unsimplify(const Vector&, const Vector&, const Vector&, const Vector&,
                            const SPxSolver::VarStatus[], const SPxSolver::VarStatus[]) {}
+   /// returns result status of the simplification
+   virtual Result result() const = 0;
    /// specifies whether an optimal solution has already been unsimplified.
    virtual bool isUnsimplified() const
    {
