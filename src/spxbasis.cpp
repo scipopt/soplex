@@ -891,6 +891,9 @@ void SPxBasis::factorize()
    lastFill   = fillFactor * Real(factor->memory()) / Real(nzCount > 0 ? nzCount : 1);
    lastNzCount = int(nonzeroFactor * Real(nzCount > 0 ? nzCount : 1));
    factorized = true;
+
+   if (status() == SINGULAR)
+      throw SPxStatusException();
 }
 
 Vector& SPxBasis::multWithBase(Vector& x) const
