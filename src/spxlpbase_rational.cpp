@@ -17,6 +17,8 @@
  * @brief Saving LPs with Rational values in a form suitable for SoPlex.
  */
 
+#ifdef WITH_GMP
+
 #include <assert.h>
 #include <stdio.h>
 #include <ctype.h>
@@ -2181,6 +2183,8 @@ void SPxLPBase<Rational>::writeMPS(
 template class SPxLPBase < Rational >;
 
 } // namespace soplex
+
+#endif
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Emacs Local Variables:
