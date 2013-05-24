@@ -21,6 +21,7 @@
 
 #include <string>
 
+/// @todo SoPlex2 should also have an spxout object to avoid using a global one
 #include "rational.h"
 #include "spxsolver.h"
 #include "slufactor.h"
@@ -652,8 +653,11 @@ public:
       /// equilibrium scaling on rows and columns
       SCALER_BIEQUI = 2,
 
-      /// geometric mean scaling on rows and columns
-      SCALER_GEO = 3
+      /// geometric mean scaling on rows and columns, max 1 round
+      SCALER_GEO1 = 3,
+
+      /// geometric mean scaling on rows and columns, max 8 rounds
+      SCALER_GEO8 = 4,
    };
 
    /// values for parameter STARTER
@@ -672,6 +676,7 @@ public:
       STARTER_VECTOR = 3
    };
 
+   // is the order different than usual on purpose?
    /// values for parameter PRICER
    enum
    {
@@ -744,6 +749,7 @@ public:
       REALPARAM_COUNT = 8
    } RealParam;
 
+   // why are feasibility tolerances not real params? What about epsilons?
    /// rational parameters
    typedef enum
    {
@@ -801,7 +807,8 @@ private:
    SPxMainSM _simplifierMainSM;
    SPxEquiliSC _scalerUniequi;
    SPxEquiliSC _scalerBiequi;
-   SPxGeometSC _scalerGeo;
+   SPxGeometSC _scalerGeo1;
+   SPxGeometSC _scalerGeo8;
    SPxWeightST _starterWeight;
    SPxSumST _starterSum;
    SPxVectorST _starterVector;

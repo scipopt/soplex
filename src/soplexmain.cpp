@@ -21,7 +21,7 @@
 #include <fstream>
 
 #include "spxdefines.h"
-#include "soplex.h"
+#include "soplex2.h"
 #include "spxsolver.h"
 
 #include "timer.h"
@@ -52,170 +52,12 @@
 
 using namespace soplex;
 
-
-//------------------------------------------------------------------------
-// for simplicity: store whether we are in check mode:
-static bool checkMode = false;
-//------------------------------------------------------------------------
-
-
-//------------------------------------------------------------------------
-//    class MySoPlex
-//------------------------------------------------------------------------
-
-/** LP solver class for the command line. */
-class MySoPlex : public SoPlex
-{
-public:
-   /// default constructor
-   MySoPlex( SPxSolver::Type           p_type = SPxSolver::LEAVE,
-             SPxSolver::Representation p_rep  = SPxSolver::COLUMN )
-      : SoPlex(p_type, p_rep)
-   {}
-   //------------------------------------------------------------------------
-   /// virtual destructor
-   virtual ~MySoPlex()
-   {}
-   //------------------------------------------------------------------------
-   void displayQuality() const
-   {
-      Real maxviol;
-      Real sumviol;
-
-      if ( checkMode )
-      {
-	 MSG_INFO1( spxout << "IEXAMP05 Violations (max/sum)" << std::endl; )
-
-	 m_solver.qualConstraintViolation(maxviol, sumviol);
-
-	 MSG_INFO1( spxout << "IEXAMP06 Constraints      :"
-	    << std::setw(16) << maxviol << "  "
-	    << std::setw(16) << sumviol << std::endl; )
-
-	 qualConstraintViolation(maxviol, sumviol);
-
-	 MSG_INFO1( spxout << "IEXAMP07       (unscaled) :"
-	    << std::setw(16) << maxviol << "  "
-	    << std::setw(16) << sumviol << std::endl; )
-
-	 m_solver.qualBoundViolation(maxviol, sumviol);
-
-	 MSG_INFO1( spxout << "IEXAMP08 Bounds           :"
-	    << std::setw(16) << maxviol << "  "
-	    << std::setw(16) << sumviol << std::endl; )
-
-	 qualBoundViolation(maxviol, sumviol);
-
-	 MSG_INFO1( spxout << "IEXAMP09       (unscaled) :"
-	    << std::setw(16) << maxviol << "  "
-	    << std::setw(16) << sumviol << std::endl; )
-
-	 if (!m_vanished)
-	 {
-	    m_solver.qualSlackViolation(maxviol, sumviol);
-
-	    MSG_INFO1( spxout << "IEXAMP10 Slacks           :"
-	       << std::setw(16) << maxviol << "  "
-	       << std::setw(16) << sumviol << std::endl; )
-
-	    m_solver.qualRedCostViolation(maxviol, sumviol);
-
-	    MSG_INFO1( spxout << "IEXAMP11 Reduced costs    :"
-	       << std::setw(16) << maxviol << "  "
-	       << std::setw(16) << sumviol << std::endl; )
-#if 0
-	    MSG_INFO1( spxout << "IEXAMP12 Proven dual bound:"
-	       << std::setw(20)
-	       << std::setprecision(20)
-	       << m_solver.provedDualbound() << std::endl; )
-#endif
-	  }
-      }
-      else
-      {
-	 MSG_INFO1( spxout << "Violations (max/sum)" << std::endl; )
-
-	 m_solver.qualConstraintViolation(maxviol, sumviol);
-
-	 MSG_INFO1( spxout << "Constraints      :"
-	    << std::setw(16) << maxviol << "  "
-	    << std::setw(16) << sumviol << std::endl; )
-
-	 qualConstraintViolation(maxviol, sumviol);
-
-	 MSG_INFO1( spxout << "      (unscaled) :"
-	    << std::setw(16) << maxviol << "  "
-	    << std::setw(16) << sumviol << std::endl; )
-
-	 m_solver.qualBoundViolation(maxviol, sumviol);
-
-	 MSG_INFO1( spxout << "Bounds           :"
-	    << std::setw(16) << maxviol << "  "
-	    << std::setw(16) << sumviol << std::endl; )
-
-	 qualBoundViolation(maxviol, sumviol);
-
-	 MSG_INFO1( spxout << "      (unscaled) :"
-	    << std::setw(16) << maxviol << "  "
-	    << std::setw(16) << sumviol << std::endl; )
-
-	 if (!m_vanished)
-	 {
-	    m_solver.qualSlackViolation(maxviol, sumviol);
-
-	    MSG_INFO1( spxout << "Slacks           :"
-	       << std::setw(16) << maxviol << "  "
-	       << std::setw(16) << sumviol << std::endl; )
-
-	    m_solver.qualRedCostViolation(maxviol, sumviol);
-
-	    MSG_INFO1( spxout << "Reduced costs    :"
-	       << std::setw(16) << maxviol << "  "
-	       << std::setw(16) << sumviol << std::endl; )
-#if 0
-	    MSG_INFO1( spxout << "Proven dual bound:"
-	       << std::setw(20)
-	       << std::setprecision(20)
-	       << m_solver.provedDualbound() << std::endl; )
-#endif
-	  }
-      }
-   }
-   //------------------------------------------------------------------------
-   void displayInfeasibility() const
-   {
-      assert(m_solver.status() == SPxSolver::INFEASIBLE);
-
-#if 0
-      if ( checkMode )
-      {
-	 if( m_solver.isProvenInfeasible() )
-	    MSG_INFO1( spxout << "IEXAMP13 Infeasibility is proven." << std::endl; )
-         else
-	    MSG_INFO1( spxout << "IEXAMP13 Infeasibility could not be proven!" << std::endl; )
-      }
-      else
-      {
-         if ( m_solver.isProvenInfeasible() )
-	 {
-	    MSG_INFO1( spxout << "Infeasibility is proven." << std::endl; )
-	 }
-	 else
-	 {
-	    MSG_INFO1( spxout << "Infeasibility could not be proven!" << std::endl; )
-	 }
-      }
-#endif
-   }
-};
-
-
 //------------------------------------------------------------------------
 //    Helpers
 //------------------------------------------------------------------------
 
 static
-void print_version_info()
+void printVersionInfo( bool checkMode)
 {
    const char* banner1 =
    "************************************************************************\n"
@@ -223,7 +65,7 @@ void print_version_info()
    "*       SoPlex --- the Sequential object-oriented simPlex.             *\n"
    ;
 
-   const char* banner2 = 
+   const char* banner2 =
    "*                                                                      *\n"
    "*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                       *\n"
    "*                            fuer Informationstechnik Berlin           *\n"
@@ -345,7 +187,7 @@ void print_short_version_info()
 
 //------------------------------------------------------------------------
 static
-void print_usage_and_exit( const char* const argv[] )
+void printUsage( const char* const argv[] )
 {
    const char* usage =
       "[options] LPfile [Basfile]\n\n"
@@ -388,268 +230,338 @@ void print_usage_and_exit( const char* const argv[] )
    exit(0);
 }
 
-//------------------------------------------------------------------------
 static
-void check_parameter(const char param, const char* const argv[])
+void displayQuality( SoPlex2& SoPlexShell )
 {
-   if (param == '\0')
-      print_usage_and_exit( argv );
+
+   /// @todo needs more functionality from soplex2 regarding original/simplified LP
+   #if 0
+   Real maxviol;
+   Real sumviol;
+
+   if ( checkMode )
+   {
+      MSG_INFO1( spxout << "IEXAMP05 Violations (max/sum)" << std::endl; )
+
+      // get violations of simpified LP
+      SoPlexShell.getConstraintViolationReal(primal, maxviol, sumviol);
+      m_solver.qualConstraintViolation(maxviol, sumviol);
+
+      MSG_INFO1( spxout << "IEXAMP06 Constraints      :"
+      << std::setw(16) << maxviol << "  "
+      << std::setw(16) << sumviol << std::endl; )
+
+      // get violations of original LP
+      qualConstraintViolation(maxviol, sumviol);
+
+      MSG_INFO1( spxout << "IEXAMP07       (unscaled) :"
+      << std::setw(16) << maxviol << "  "
+      << std::setw(16) << sumviol << std::endl; )
+
+      m_solver.qualBoundViolation(maxviol, sumviol);
+
+      MSG_INFO1( spxout << "IEXAMP08 Bounds           :"
+      << std::setw(16) << maxviol << "  "
+      << std::setw(16) << sumviol << std::endl; )
+
+      qualBoundViolation(maxviol, sumviol);
+
+      MSG_INFO1( spxout << "IEXAMP09       (unscaled) :"
+      << std::setw(16) << maxviol << "  "
+      << std::setw(16) << sumviol << std::endl; )
+
+      if (!m_vanished)
+      {
+         m_solver.qualSlackViolation(maxviol, sumviol);
+
+         MSG_INFO1( spxout << "IEXAMP10 Slacks           :"
+         << std::setw(16) << maxviol << "  "
+         << std::setw(16) << sumviol << std::endl; )
+
+         m_solver.qualRedCostViolation(maxviol, sumviol);
+
+         MSG_INFO1( spxout << "IEXAMP11 Reduced costs    :"
+         << std::setw(16) << maxviol << "  "
+         << std::setw(16) << sumviol << std::endl; )
+         #if 0
+         MSG_INFO1( spxout << "IEXAMP12 Proven dual bound:"
+         << std::setw(20)
+         << std::setprecision(20)
+         << m_solver.provedDualbound() << std::endl; )
+         #endif
+}
+}
+else
+{
+   MSG_INFO1( spxout << "Violations (max/sum)" << std::endl; )
+
+   m_solver.qualConstraintViolation(maxviol, sumviol);
+
+   MSG_INFO1( spxout << "Constraints      :"
+   << std::setw(16) << maxviol << "  "
+   << std::setw(16) << sumviol << std::endl; )
+
+   qualConstraintViolation(maxviol, sumviol);
+
+   MSG_INFO1( spxout << "      (unscaled) :"
+   << std::setw(16) << maxviol << "  "
+   << std::setw(16) << sumviol << std::endl; )
+
+   m_solver.qualBoundViolation(maxviol, sumviol);
+
+   MSG_INFO1( spxout << "Bounds           :"
+   << std::setw(16) << maxviol << "  "
+   << std::setw(16) << sumviol << std::endl; )
+
+   qualBoundViolation(maxviol, sumviol);
+
+   MSG_INFO1( spxout << "      (unscaled) :"
+   << std::setw(16) << maxviol << "  "
+   << std::setw(16) << sumviol << std::endl; )
+
+   if (!m_vanished)
+   {
+      m_solver.qualSlackViolation(maxviol, sumviol);
+
+      MSG_INFO1( spxout << "Slacks           :"
+      << std::setw(16) << maxviol << "  "
+      << std::setw(16) << sumviol << std::endl; )
+
+      m_solver.qualRedCostViolation(maxviol, sumviol);
+
+      MSG_INFO1( spxout << "Reduced costs    :"
+      << std::setw(16) << maxviol << "  "
+      << std::setw(16) << sumviol << std::endl; )
+      #if 0
+      MSG_INFO1( spxout << "Proven dual bound:"
+      << std::setw(20)
+      << std::setprecision(20)
+      << m_solver.provedDualbound() << std::endl; )
+      #endif
+}
+}
+#endif
 }
 
 //------------------------------------------------------------------------
 static
-void print_algorithm_parameters(
-   MySoPlex&                       work,
-   const SPxSolver::Representation representation,
-   const SLUFactor::UpdateType     update
-   )
+void displayInfeasibility(SoPlex2& SoPlexShell)
 {
+   assert(SoPlexShell.statusReal() == SPxSolver::INFEASIBLE);
+
+   #if 0
    if ( checkMode )
    {
+      if( m_solver.isProvenInfeasible() )
+         MSG_INFO1( spxout << "IEXAMP13 Infeasibility is proven." << std::endl; )
+         else
+            MSG_INFO1( spxout << "IEXAMP13 Infeasibility could not be proven!" << std::endl; )
+   }
+   else
+   {
+      if ( m_solver.isProvenInfeasible() )
+      {
+         MSG_INFO1( spxout << "Infeasibility is proven." << std::endl; )
+      }
+      else
+      {
+         MSG_INFO1( spxout << "Infeasibility could not be proven!" << std::endl; )
+      }
+   }
+   #endif
+}
+
+
+//------------------------------------------------------------------------
+static
+void checkParameter(const char param, const char* const argv[])
+{
+   if (param == '\0')
+      printUsage( argv );
+}
+
+//------------------------------------------------------------------------
+static
+void printAlgorithmParameters(
+   SoPlex2& SoPlexShell,
+   bool checkMode)
+{
+   if( checkMode )
+   {
       MSG_INFO1( spxout
-	 << "IEXAMP12 Feastol        = "
-	 << std::setw(16) << work.feastol() << std::endl
-	 << "IEXAMP52 Opttol         = "
-	 << std::setw(16) << work.opttol() << std::endl
-	 << "IEXAMP53 Irthreshold    = "
-	 << std::setw(16) << work.irthreshold() << std::endl
-	 << "IEXAMP13 Epsilon Zero   = "
-	 << std::setw(16) << Param::epsilon() << std::endl
-	 << "IEXAMP37 Epsilon Factor = "
-	 << std::setw(16) << Param::epsilonFactorization() << std::endl
-	 << "IEXAMP38 Epsilon Update = "
-	 << std::setw(16) << Param::epsilonUpdate() << std::endl
-	 << "IEXAMP14 "
-	 << (work.type() == SPxSolver::ENTER ? "Entering" : "Leaving")
-	 << " algorithm" << std::endl
-	 << "IEXAMP15 "
-	 << (representation == SPxSolver::ROW ? "Row" : "Column")
-	 << " representation" << std::endl
-	 << "IEXAMP16 "
-	 << (update == SLUFactor::ETA ? "Eta" : "Forest-Tomlin")
-	 << " update" << std::endl; )
+    << "IEXAMP12 Feastol        = "
+    << std::setw(16) << SoPlexShell.rationalParam(SoPlex2::FEASTOL) << std::endl
+    << "IEXAMP52 Opttol         = "
+    << std::setw(16) << SoPlexShell.rationalParam(SoPlex2::OPTTOL) << std::endl
+    << "IEXAMP53 Irthreshold    = "
+    << std::setw(16) << SoPlexShell.realParam(SoPlex2::IRTHRESHOLD) << std::endl
+    << "IEXAMP13 Epsilon Zero   = "
+    << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_ZERO) << std::endl
+    << "IEXAMP37 Epsilon Factor = "
+    << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_FACTORIZATION) << std::endl
+    << "IEXAMP38 Epsilon Update = "
+    << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_UPDATE) << std::endl
+    << "IEXAMP14 "
+    << (SoPlexShell.intParam(SoPlex2::ALGORITHM) == SoPlex2::ALGORITHM_ENTER ? "Entering" : "Leaving")
+    << " algorithm" << std::endl
+    << "IEXAMP15 "
+    << (SoPlexShell.intParam(SoPlex2::REPRESENTATION) == SoPlex2::REPRESENTATION_ROW ? "Row" : "Column")
+    << " representation" << std::endl
+    << "IEXAMP16 "
+    << (SoPlexShell.intParam(SoPlex2::FACTOR_UPDATE_TYPE) == SoPlex2::FACTOR_UPDATE_TYPE_ETA ? "Eta" : "Forest-Tomlin")
+    << " update" << std::endl; )
    }
    else
    {
       MSG_INFO1( spxout
-	 << "SoPlex parameters: " << std::endl
-	 << "Feastol        = "
-	 << std::setw(16) << work.feastol() << std::endl
-	 << "Opttol         = "
-	 << std::setw(16) << work.opttol() << std::endl
-	 << "Irthreshold    = "
-	 << std::setw(16) << work.irthreshold() << std::endl
-	 << "Epsilon Zero   = "
-	 << std::setw(16) << Param::epsilon() << std::endl
-	 << "Epsilon Factor = "
-	 << std::setw(16) << Param::epsilonFactorization() << std::endl
-	 << "Epsilon Update = "
-	 << std::setw(16) << Param::epsilonUpdate() << std::endl
-	 << std::endl
-	 << "algorithm      = " << (work.type() == SPxSolver::ENTER ? "Entering" : "Leaving")
-	 << std::endl
-	 << "representation = " << (representation == SPxSolver::ROW ? "Row" : "Column")
-	 << std::endl
-	 << "update         = " << (update == SLUFactor::ETA ? "Eta" : "Forest-Tomlin")
-	 << std::endl; )
+    << "SoPlex parameters: " << std::endl
+    << "Feastol        = "
+    << std::setw(16) << SoPlexShell.rationalParam(SoPlex2::FEASTOL) << std::endl
+    << "Opttol         = "
+    << std::setw(16) << SoPlexShell.rationalParam(SoPlex2::OPTTOL) << std::endl
+    << "Irthreshold    = "
+    << std::setw(16) << SoPlexShell.realParam(SoPlex2::IRTHRESHOLD) << std::endl
+    << "Epsilon Zero   = "
+    << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_ZERO) << std::endl
+    << "Epsilon Factor = "
+    << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_FACTORIZATION) << std::endl
+    << "Epsilon Update = "
+    << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_UPDATE) << std::endl
+    << std::endl
+    << "algorithm      = " << (SoPlexShell.intParam(SoPlex2::ALGORITHM) == SoPlex2::ALGORITHM_ENTER ? "Entering" : "Leaving")
+    << std::endl
+    << "representation = " << (SoPlexShell.intParam(SoPlex2::REPRESENTATION) == SoPlex2::REPRESENTATION_ROW ? "Row" : "Column")
+    << std::endl
+    << "update         = " << (SoPlexShell.intParam(SoPlex2::FACTOR_UPDATE_TYPE) == SoPlex2::FACTOR_UPDATE_TYPE_ETA ? "Eta" : "Forest-Tomlin")
+    << std::endl; )
    }
+   /// @todo extend this to display remaining settings (pricing, ratio test, ...)
 }
 
 //------------------------------------------------------------------------
 static
-SPxPricer* get_pricer(const int pricing)
+void setPricer(
+   SoPlex2& SoPlexShell,
+   const int pricing)
 {
-   SPxPricer* pricer = 0;
+   /// @todo weight and partial pricers are not available
    switch(pricing)
    {
    case 6 :
-      pricer = new SPxSteepExPR;
+      SoPlexShell.setIntParam(SoPlex2::PRICER, SoPlex2::PRICER_STEEP);
       break;
    case 5 :
-      pricer = new SPxWeightPR;
+      SoPlexShell.setIntParam(SoPlex2::PRICER, SoPlex2::PRICER_AUTO);
       break;
    case 4 :
-      pricer = new SPxSteepPR;
+      SoPlexShell.setIntParam(SoPlex2::PRICER, SoPlex2::PRICER_QUICKSTEEP);
       break;
    case 3 :
-      pricer = new SPxHybridPR;
+      SoPlexShell.setIntParam(SoPlex2::PRICER, SoPlex2::PRICER_HYBRID);
       break;
    case 2 :
-      pricer = new SPxDevexPR;
+      SoPlexShell.setIntParam(SoPlex2::PRICER, SoPlex2::PRICER_DEVEX);
       break;
    case 1 :
-      pricer = new SPxParMultPR;
+      SoPlexShell.setIntParam(SoPlex2::PRICER, SoPlex2::PRICER_PARMULT);
       break;
    case 0 :
+      SoPlexShell.setIntParam(SoPlex2::PRICER, SoPlex2::PRICER_DANTZIG);
+      break;
       /*FALLTHROUGH*/
    default :
-      pricer = new SPxDantzigPR;
+      SoPlexShell.setIntParam(SoPlex2::PRICER, SoPlex2::PRICER_AUTO);
       break;
    }
-
-   assert(pricer != 0);
-   if ( checkMode )
-#ifdef PARTIAL_PRICING
-      MSG_INFO1( spxout << "IEXAMP17 " << pricer->getName() << " pricing"
-                        << " (partial, size = " << MAX_PRICING_CANDIDATES << ")"
-                        << std::endl; )
-#else
-      MSG_INFO1( spxout << "IEXAMP17 " << pricer->getName() << " pricing"
-                        << std::endl; )
-#endif
-   else
-#ifdef PARTIAL_PRICING
-      MSG_INFO1( spxout << "pricing        = " << pricer->getName()
-                        << " (partial, size = " << MAX_PRICING_CANDIDATES << ")"
-                        << std::endl; )
-#else
-      MSG_INFO1( spxout << "pricing        = " << pricer->getName()
-                        << std::endl; )
-#endif
-   return pricer;
 }
 
 //------------------------------------------------------------------------
 static
-SPxRatioTester* get_ratio_tester(const int ratiotest)
+void setRatiotester(
+   SoPlex2& SoPlexShell,
+   const int ratiotest)
 {
-   SPxRatioTester* ratiotester = 0;
    switch(ratiotest)
    {
    case 3 :
-      ratiotester = new SPxBoundFlippingRT;
+      SoPlexShell.setIntParam(SoPlex2::RATIOTESTER, SoPlex2::RATIOTESTER_BOUNDFLIPPING);
       break;
    case 2 :
-      ratiotester = new SPxFastRT;
+      SoPlexShell.setIntParam(SoPlex2::RATIOTESTER, SoPlex2::RATIOTESTER_FAST);
       break;
    case 1 :
-      ratiotester = new SPxHarrisRT;
+      SoPlexShell.setIntParam(SoPlex2::RATIOTESTER, SoPlex2::RATIOTESTER_HARRIS);
       break;
    case 0 :
       /*FALLTHROUGH*/
    default:
-      ratiotester = new SPxDefaultRT;
+      SoPlexShell.setIntParam(SoPlex2::RATIOTESTER, SoPlex2::RATIOTESTER_TEXTBOOK);
       break;
    }
-
-   assert(ratiotester != 0);
-   if ( checkMode )
-      MSG_INFO1( spxout << "IEXAMP18 " << ratiotester->getName() << " ratiotest" << std::endl; )
-   else
-      MSG_INFO1( spxout << "ratiotest      = " << ratiotester->getName() << std::endl; )
-   return ratiotester;
 }
 
 //------------------------------------------------------------------------
 static
-void get_scalers(
-   SPxScaler*& prescaler,
-   SPxScaler*& postscaler,
-   const int   scaling
-   )
+void setScalers(
+   SoPlex2&    SoPlexShell,
+   const int   scaling)
 {
    switch(scaling)
    {
    case 4:
-      prescaler  = new SPxEquiliSC(true);
-      postscaler = new SPxGeometSC(8);
+      SoPlexShell.setIntParam(SoPlex2::SCALER_BEFORE_SIMPLIFIER, SoPlex2::SCALER_BIEQUI);
+      SoPlexShell.setIntParam(SoPlex2::SCALER_AFTER_SIMPLIFIER, SoPlex2::SCALER_GEO8);
       break;
    case 3:
-      prescaler  = new SPxEquiliSC(true);
-      postscaler = new SPxGeometSC(1);
+      SoPlexShell.setIntParam(SoPlex2::SCALER_BEFORE_SIMPLIFIER, SoPlex2::SCALER_BIEQUI);
+      SoPlexShell.setIntParam(SoPlex2::SCALER_AFTER_SIMPLIFIER, SoPlex2::SCALER_GEO1);
       break;
    case 2 :
-      prescaler  = new SPxEquiliSC(true);
-      postscaler = 0;
+      SoPlexShell.setIntParam(SoPlex2::SCALER_BEFORE_SIMPLIFIER, SoPlex2::SCALER_BIEQUI);
+      SoPlexShell.setIntParam(SoPlex2::SCALER_AFTER_SIMPLIFIER, SoPlex2::SCALER_OFF);
       break;
    case 1 :
-      prescaler  = new SPxEquiliSC(false);
-      postscaler = 0;
+      SoPlexShell.setIntParam(SoPlex2::SCALER_BEFORE_SIMPLIFIER, SoPlex2::SCALER_UNIEQUI);
+      SoPlexShell.setIntParam(SoPlex2::SCALER_AFTER_SIMPLIFIER, SoPlex2::SCALER_OFF);
       break;
    case 0 :
       /*FALLTHROUGH*/
    default :
-      prescaler  = 0;
-      postscaler = 0;
+      SoPlexShell.setIntParam(SoPlex2::SCALER_BEFORE_SIMPLIFIER, SoPlex2::SCALER_OFF);
+      SoPlexShell.setIntParam(SoPlex2::SCALER_AFTER_SIMPLIFIER, SoPlex2::SCALER_OFF);
       break;
-   }
-
-   if ( checkMode )
-   {
-      MSG_INFO1( spxout << "IEXAMP19 "
-	 << ((prescaler != 0) ? prescaler->getName() : "no")
-	 << " / "
-	 << ((postscaler != 0) ? postscaler->getName() : "no")
-	 << " scaling" << std::endl; )
-   }
-   else
-   {
-      MSG_INFO1( spxout << "scaling        = "
-	 << ((prescaler != 0) ? prescaler->getName() : "no")
-	 << " / "
-	 << ((postscaler != 0) ? postscaler->getName() : "no")
-	 << std::endl; )
    }
 }
 
 //------------------------------------------------------------------------
 static
-SPxSimplifier* get_simplifier(const int simplifying)
+void setStarter(
+   SoPlex2& SoPlexShell,
+   const int starting)
 {
-   SPxSimplifier* simplifier = 0;
-   switch(simplifying)
-   {
-   case 1 :
-      simplifier = new SPxMainSM;
-      break;
-   case 0  :
-      /*FALLTHROUGH*/
-   default :
-      assert(simplifier == 0);
-      break;
-   }
-
-   if ( checkMode )
-      MSG_INFO1( spxout << "IEXAMP20 " << ((simplifier == 0) ? "no" : simplifier->getName()) << " simplifier" << std::endl; )
-   else
-      MSG_INFO1( spxout << "simplifier     = " << ((simplifier == 0) ? "no" : simplifier->getName()) << std::endl; )
-   return simplifier;
-}
-
-//------------------------------------------------------------------------
-static
-SPxStarter* get_starter(const int starting)
-{
-   SPxStarter* starter = 0;
    switch(starting)
    {
    case 3 :
-      starter = new SPxVectorST;
+      SoPlexShell.setIntParam(SoPlex2::STARTER, SoPlex2::STARTER_VECTOR);
       break;
    case 2 :
-      starter = new SPxSumST;
+      SoPlexShell.setIntParam(SoPlex2::STARTER, SoPlex2::STARTER_SUM);
       break;
    case 1 :
-      starter = new SPxWeightST;
+      SoPlexShell.setIntParam(SoPlex2::STARTER, SoPlex2::STARTER_WEIGHT);
       break;
    case 0 :
       /*FALLTHROUGH*/
    default :
+      SoPlexShell.setIntParam(SoPlex2::STARTER, SoPlex2::STARTER_OFF);
       break;
    }
-
-   if ( checkMode )
-      MSG_INFO1( spxout << "IEXAMP21 " << ((starter == 0) ? "no" : starter->getName()) << " starter" << std::endl; )
-   else
-      MSG_INFO1( spxout << "starter        = " << ((starter == 0) ? "no" : starter->getName()) << std::endl; )
-
-   return starter;
 }
 
 //------------------------------------------------------------------------
 #ifdef SEND_ALL_OUTPUT_TO_FILES
 static
-void redirect_output(
+void redirectOutput(
    std::ostream&  myerrstream,
    std::ostream&  myinfostream
    )
@@ -664,100 +576,11 @@ void redirect_output(
    spxout.setStream( SPxOut::DEBUG,    myinfostream );
 }
 #endif
-//------------------------------------------------------------------------
-static
-void read_input_file(
-   MySoPlex&      work,
-   const char*    filename,
-   NameSet&       rownames,
-   NameSet&       colnames)
-{
-   if ( checkMode )
-      MSG_INFO1( spxout << "IEXAMP22 loading LP file " << filename << std::endl; )
-   else
-      MSG_INFO1( spxout << "\nLoading LP file " << filename << std::endl; )
-
-   Timer timer;
-   timer.start();
-
-   if ( ! work.readFile(filename, &rownames, &colnames, 0) )
-   {
-      if ( checkMode )
-	 MSG_INFO1( spxout << "EEXAMP23 error while reading file \"" << filename << "\"" << std::endl; )
-      else
-	 MSG_INFO1( spxout << "error while reading file \""  << filename << "\"" << std::endl; )
-      exit(1);
-   }
-   assert(work.isConsistent());
-
-   timer.stop();
-
-   if ( checkMode )
-   {
-      MSG_INFO1( spxout << "IEXAMP24 LP has "
-	 << work.nRows() << " rows "
-	 << work.nCols() << " columns "
-	 << work.nNzos() << " nonzeros"
-	 << std::endl; )
-
-      MSG_INFO1( spxout << "IEXAMP41 LP reading time: " << timer.userTime() << std::endl; )
-   }
-   else
-   {
-      MSG_INFO1( spxout << "LP has "
-	 << work.nRows() << " rows "
-	 << work.nCols() << " columns "
-	 << work.nNzos() << " nonzeros"
-	 << std::endl; )
-
-      MSG_INFO1(
-	 std::streamsize prec = spxout.precision();
-	 spxout << "LP reading time: " << std::fixed << std::setprecision(2) << timer.userTime();
-	 spxout << std::scientific << std::setprecision(int(prec)) << std::endl; )
-   }
-}
 
 //------------------------------------------------------------------------
 static
-void read_basis_file(
-   MySoPlex&      work    ,
-   const char*    filename,
-   const NameSet* rownames,
-   const NameSet* colnames)
-{
-   MSG_INFO1( spxout << "Reading basis from file (disables simplifier)" << std::endl; )
-   if (!work.readBasisFile(filename, rownames, colnames))
-   {
-      if ( checkMode )
-         MSG_INFO1( spxout << "EEXAMP25 error while reading file \"" << filename << "\"" << std::endl; )
-      else
-         MSG_INFO1( spxout << "Error while reading file \"" << filename << "\"" << std::endl; )
-      exit(1);
-   }
-}
-
-//------------------------------------------------------------------------
-static
-void solve_LP(MySoPlex& work)
-{
-   Timer timer;
-   timer.start();
-
-   if ( checkMode )
-      MSG_INFO1( spxout << "IEXAMP26 solving LP" << std::endl; )
-   else
-      MSG_INFO1( spxout << "\nSolving LP ..." << std::endl; )
-
-   work.solve();
-   timer.stop();
-
-   MSG_INFO1( spxout << "\nSoPlex statistics:\n" << work.statistics(); )
-}
-
-//------------------------------------------------------------------------
-static
-void print_solution_and_status(
-   MySoPlex&            work,
+void printSolutionAndStatus(
+   SoPlex2&             SoPlexShell,
    const NameSet&       rownames,
    const NameSet&       colnames,
    const int            precision,
@@ -765,57 +588,57 @@ void print_solution_and_status(
    const bool           print_solution,
    const bool           print_dual,
    const bool           write_basis,
-   const char*          basisname
-   )
+   const char*          basisname,
+   bool                 checkMode)
 {
    // get the solution status
-   SPxSolver::Status stat = work.status();
+   SPxSolver::Status status = SoPlexShell.statusReal();
 
-   if ( ! checkMode )
+   if( !checkMode )
       MSG_INFO1( spxout << std::endl; )
-   switch (stat)
+   switch (status)
    {
    case SPxSolver::OPTIMAL:
-      if ( checkMode )
-	 MSG_INFO1( spxout << "IEXAMP29 solution value is: " << std::setprecision( precision ) << work.objValue() << std::endl; )
+      if( checkMode )
+    MSG_INFO1( spxout << "IEXAMP29 solution value is: " << std::setprecision( precision ) << SoPlexShell.objValueReal() << std::endl; )
       else
-	 MSG_INFO1( spxout << "Solution value is: " << std::setprecision( precision ) << work.objValue() << std::endl; )
+         MSG_INFO1( spxout << "Solution value is: " << std::setprecision( precision ) << SoPlexShell.objValueReal() << std::endl; )
 
-      if ( print_quality )
-         work.displayQuality();
+      if( print_quality )
+         displayQuality(SoPlexShell);
 
-      if ( print_solution )
+      if( print_solution )
       {
-         DVector objx(work.nCols());
+         DVector objx(SoPlexShell.numColsReal());
 
-         if( work.getPrimal(objx) != SPxSolver::ERROR )
+         if( SoPlexShell.getPrimalReal(objx) != SPxSolver::ERROR )
          {
             MSG_INFO1( spxout << std::endl << "Primal solution (name, id, value):" << std::endl; )
-            for( int i = 0; i < work.nCols(); ++i )
+            for( int i = 0; i < SoPlexShell.numColsReal(); ++i )
             {
-               if ( isNotZero( objx[i], 0.001 * work.feastol() ) )
-                  MSG_INFO1( spxout << colnames[ work.cId(i) ] << "\t"
+               if( isNotZero( objx[i], 0.001 * SoPlexShell.rationalParam(SoPlex2::FEASTOL) ) )
+                  MSG_INFO1( spxout << colnames[ SoPlexShell.colIdReal(i) ] << "\t"
                                     << i << "\t"
                                     << std::setw(17)
                                     << std::setprecision( precision )
                                     << objx[i] << std::endl; )
             }
-            MSG_INFO1( spxout << "All other variables are zero (within " << std::setprecision(1) << 0.001*work.feastol() << ")." << std::endl; )
+            MSG_INFO1( spxout << "All other variables are zero (within " << std::setprecision(1) << 0.001 * SoPlexShell.rationalParam(SoPlex2::FEASTOL) << ")." << std::endl; )
          }
       }
-      if ( print_dual )
+      if( print_dual )
       {
-         DVector objy(work.nRows());
+         DVector objy( SoPlexShell.numRowsReal() );
          bool allzero = true;
 
-         if( work.getDual(objy) != SPxSolver::ERROR )
+         if( SoPlexShell.getDualReal(objy) != SPxSolver::ERROR )
          {
             MSG_INFO1( spxout << std::endl << "Dual multipliers (name, id, value):" << std::endl; )
-            for( int i = 0; i < work.nRows(); ++i )
+            for( int i = 0; i < SoPlexShell.numRowsReal(); ++i )
             {
-               if ( isNotZero( objy[i] , 0.001 * work.opttol() ) )
+               if( isNotZero(objy[i] , 0.001 * SoPlexShell.rationalParam(SoPlex2::OPTTOL)) )
                {
-                  MSG_INFO1( spxout << rownames[ work.rId(i) ] << "\t"
+                  MSG_INFO1( spxout << rownames[ SoPlexShell.rowIdReal(i) ] << "\t"
                                     << i << "\t"
                                     << std::setw(17)
                                     << std::setprecision( precision )
@@ -825,11 +648,11 @@ void print_solution_and_status(
             }
 
             MSG_INFO1( spxout << "All " << (allzero ? "" : "other ") << "dual values are zero (within "
-                              << std::setprecision(1) << 0.001*work.opttol() << ")." << std::endl; )
+            << std::setprecision(1) << 0.001 * SoPlexShell.rationalParam(SoPlex2::OPTTOL) << ")." << std::endl; )
 
             if( !allzero )
             {
-               if( work.spxSense() == SPxLP::MINIMIZE )
+               if( SoPlexShell.intParam(SoPlex2::OBJSENSE) == SoPlex2::OBJSENSE_MINIMIZE )
                {
                   MSG_INFO1( spxout << "Minimizing: a positive/negative value corresponds to left-hand (>=) resp. right-hand (<=) side."
                                     << std::endl; )
@@ -842,98 +665,92 @@ void print_solution_and_status(
             }
          }
       }
-      if ( write_basis )
+      if( write_basis )
       {
          MSG_INFO1( spxout << "Writing basis of original problem to file " << basisname << std::endl; )
-         if ( ! work.writeBasisFile( basisname, &rownames, &colnames ) )
-         {
-            if ( checkMode )
-               MSG_INFO1( spxout << "EEXAMP30 error while writing file \"" << basisname << "\"" << std::endl; )
-            else
-               MSG_INFO1( spxout << "Error while writing file \"" << basisname << "\"" << std::endl; )
-         }
+         SoPlexShell.writeBasisFileReal( basisname, &rownames, &colnames );
       }
       break;
    case SPxSolver::UNBOUNDED:
-      if ( checkMode )
-	 MSG_INFO1( spxout << "IEXAMP31 LP is unbounded" << std::endl; )
+      if( checkMode )
+    MSG_INFO1( spxout << "IEXAMP31 LP is unbounded" << std::endl; )
       else
-	 MSG_INFO1( spxout << "LP is unbounded" << std::endl; )
+    MSG_INFO1( spxout << "LP is unbounded" << std::endl; )
 
-      if ( print_solution )
+      if( print_solution )
       {
-         DVector objx(work.nCols());
-         if( work.getPrimal(objx) != SPxSolver::ERROR )
+         DVector objx(SoPlexShell.numColsReal());
+         if( SoPlexShell.getPrimalReal(objx) )
          {
             MSG_INFO1( spxout << std::endl << "Primal solution (name, id, value):" << std::endl; )
-            for( int i = 0; i < work.nCols(); ++i )
+            for( int i = 0; i < SoPlexShell.numColsReal(); ++i )
             {
-               if ( isNotZero( objx[i], 0.001 * work.feastol() ) )
-                  MSG_INFO1( spxout << colnames[ work.cId(i) ] << "\t"
+               if( isNotZero( objx[i], 0.001 * SoPlexShell.rationalParam(SoPlex2::FEASTOL) ) )
+                  MSG_INFO1( spxout << colnames[ SoPlexShell.colIdReal(i) ] << "\t"
                                     << i << "\t"
                                     << std::setw(17)
                                     << std::setprecision( precision )
                                     << objx[i] << std::endl; )
             }
-            MSG_INFO1( spxout << "All other variables are zero (within " << std::setprecision(1) << 0.001*work.feastol() << ")." << std::endl; )
+            MSG_INFO1( spxout << "All other variables are zero (within " << std::setprecision(1) << 0.001 * SoPlexShell.rationalParam(SoPlex2::FEASTOL) << ")." << std::endl; )
          }
 
-         DVector objcoef(work.nCols());
-         DVector ray(work.nCols());
-         if( work.getPrimalray(ray) != SPxSolver::ERROR )
+         DVector objcoef(SoPlexShell.numColsReal());
+         DVector ray(SoPlexShell.numColsReal());
+         if( SoPlexShell.getPrimalrayReal(ray) )
          {
             Real rayobjval = 0.0;
 
-            work.getObj(objcoef);
+            SoPlexShell.getObjReal(objcoef);
 
             MSG_INFO1( spxout << std::endl << "Primal ray (name, id, value):" << std::endl; )
-            for( int i = 0; i < work.nCols(); ++i )
+            for( int i = 0; i < SoPlexShell.numColsReal(); ++i )
             {
-               if ( isNotZero( ray[i], 0.001 * work.feastol() ) )
+               if ( isNotZero( ray[i], 0.001 * SoPlexShell.rationalParam(SoPlex2::FEASTOL) ) )
                {
                   rayobjval += ray[i] * objcoef[i];
 
-                  MSG_INFO1( spxout << colnames[ work.cId(i) ] << "\t"
+                  MSG_INFO1( spxout << colnames[ SoPlexShell.colIdReal(i) ] << "\t"
                                     << i << "\t"
                                     << std::setw(17)
                                     << std::setprecision( precision )
                                     << ray[i] << std::endl; )
                }
             }
-            MSG_INFO1( spxout << "All other variables have zero value (within " << std::setprecision(1) << 0.001*work.feastol() << ")." << std::endl; )
+            MSG_INFO1( spxout << "All other variables have zero value (within " << std::setprecision(1) << 0.001 * SoPlexShell.rationalParam(SoPlex2::FEASTOL) << ")." << std::endl; )
             MSG_INFO1( spxout << "Objective change per unit along primal ray is " << rayobjval << "." << std::endl; )
          }
       }
       break;
    case SPxSolver::INFEASIBLE:
       if ( checkMode )
-	 MSG_INFO1( spxout << "IEXAMP32 LP is infeasible" << std::endl; )
+    MSG_INFO1( spxout << "IEXAMP32 LP is infeasible" << std::endl; )
       else
-	 MSG_INFO1( spxout << "LP is infeasible" << std::endl; )
+    MSG_INFO1( spxout << "LP is infeasible" << std::endl; )
       if ( print_solution )
       {
-         DVector farkasx(work.nRows());
+         DVector farkasx(SoPlexShell.numRowsReal());
 
-         if( work.getDualfarkas(farkasx) != SPxSolver::ERROR )
+         if( SoPlexShell.getDualfarkasReal(farkasx) )
          {
-            DVector proofvec(work.nCols());
+            DVector proofvec(SoPlexShell.numColsReal());
             double lhs;
             double rhs;
 
             lhs = 0.0;
             rhs = 0.0;
             proofvec.clear();
-            for( int i = 0; i < work.nRows(); ++i )
+            for( int i = 0; i < SoPlexShell.numRowsReal(); ++i )
             {
-               if ( isNotZero( farkasx[i], 0.001 * work.opttol() ) )
+               if ( isNotZero( farkasx[i], 0.001 * SoPlexShell.rationalParam(SoPlex2::OPTTOL) ) )
                {
-                  MSG_INFO1( spxout << rownames[ work.rId(i) ] << "\t"
+                  MSG_INFO1( spxout << rownames[ SoPlexShell.rowIdReal(i) ] << "\t"
                                     << i << "\t"
                                     << std::setw(16)
                                     << std::setprecision( precision )
                                     << farkasx[i] << "\t"; )
                   LPRow row;
-                  work.getRow(i, row);
+                  SoPlexShell.getRowReal(i, row);
                   if( row.lhs() > -soplex::infinity )
                   {
                      MSG_INFO1( spxout << row.lhs() << " <= "; );
@@ -946,7 +763,7 @@ void print_solution_and_status(
                      }
                      MSG_INFO1( spxout
                         << row.rowVector().value(j) << " "
-                        << colnames[ work.cId(row.rowVector().index(j)) ]
+                        << colnames[ SoPlexShell.colIdReal(row.rowVector().index(j)) ]
                         << " "; );
                   }
                   if( row.rhs() < soplex::infinity )
@@ -970,20 +787,20 @@ void print_solution_and_status(
                }
             }
 
-            MSG_INFO1( spxout << "All other row multipliers are zero (within " << std::setprecision(1) << 0.001*work.opttol() << ")." << std::endl; )
+            MSG_INFO1( spxout << "All other row multipliers are zero (within " << std::setprecision(1) << 0.001 * SoPlexShell.rationalParam(SoPlex2::OPTTOL) << ")." << std::endl; )
             MSG_INFO1( spxout << "Farkas infeasibility proof: \t"; )
             MSG_INFO1( spxout << lhs << " <= "; )
 
             bool nonzerofound = false;
-            for( int i = 0; i < work.nCols(); ++i )
+            for( int i = 0; i < SoPlexShell.numColsReal(); ++i )
             {
-               if ( isNotZero( proofvec[i], 0.001 * work.opttol() ) )
+               if ( isNotZero( proofvec[i], 0.001 * SoPlexShell.rationalParam(SoPlex2::OPTTOL) ) )
                {
                   if( proofvec[i] > 0 )
                   {
                      MSG_INFO1( spxout << "+"; )
                   }
-                  MSG_INFO1( spxout << proofvec[i] << " " << colnames[ work.cId(i) ] << " "; )
+                  MSG_INFO1( spxout << proofvec[i] << " " << colnames[ SoPlexShell.colIdReal(i) ] << " "; )
                   nonzerofound = true;
                }
             }
@@ -994,101 +811,49 @@ void print_solution_and_status(
             MSG_INFO1( spxout << "<= " << rhs << std::endl; );
          }
       }
-      if ( print_quality )
-         work.displayInfeasibility();
-      if ( write_basis )  // write basis even if we are infeasible
-         if ( ! work.writeBasisFile( basisname, &rownames, &colnames ) )
-         {
-	    if ( checkMode )
-	       MSG_INFO1( spxout << "EEXAMP30 error while writing file \"" << basisname << "\"" << std::endl; )
-	    else
-	       MSG_INFO1( spxout << "Error while writing file \"" << basisname << "\"" << std::endl; )
-         }
+      if( print_quality )
+         displayInfeasibility(SoPlexShell);
+      if( write_basis )  // write basis even if we are infeasible
+         SoPlexShell.writeBasisFileReal(basisname, &rownames, &colnames);
       break;
    case SPxSolver::ABORT_CYCLING:
-      if ( checkMode )
-	 MSG_INFO1( spxout << "EEXAMP40 aborted due to cycling" << std::endl; )
+      if( checkMode )
+    MSG_INFO1( spxout << "EEXAMP40 aborted due to cycling" << std::endl; )
       else
-	 MSG_INFO1( spxout << "Aborted due to cycling" << std::endl; )
+    MSG_INFO1( spxout << "Aborted due to cycling" << std::endl; )
       break;
    case SPxSolver::ABORT_TIME:
-      if ( checkMode )
-	 MSG_INFO1( spxout << "IEXAMP33 aborted due to time limit" << std::endl; )
+      if( checkMode )
+    MSG_INFO1( spxout << "IEXAMP33 aborted due to time limit" << std::endl; )
       else
-	 MSG_INFO1( spxout << "Aborted due to time limit" << std::endl; )
+    MSG_INFO1( spxout << "Aborted due to time limit" << std::endl; )
       break;
    case SPxSolver::ABORT_ITER:
-      if ( checkMode )
-	 MSG_INFO1( spxout << "IEXAMP34 aborted due to iteration limit" << std::endl; )
+      if( checkMode )
+    MSG_INFO1( spxout << "IEXAMP34 aborted due to iteration limit" << std::endl; )
       else
-	 MSG_INFO1( spxout << "Aborted due to iteration limit" << std::endl; )
+    MSG_INFO1( spxout << "Aborted due to iteration limit" << std::endl; )
       break;
    case SPxSolver::ABORT_VALUE:
-      if ( checkMode )
-	 MSG_INFO1( spxout << "IEXAMP35 aborted due to objective value limit" << std::endl; )
+      if( checkMode )
+    MSG_INFO1( spxout << "IEXAMP35 aborted due to objective value limit" << std::endl; )
       else
-	 MSG_INFO1( spxout << "Aborted due to objective value limit" << std::endl; )
+    MSG_INFO1( spxout << "Aborted due to objective value limit" << std::endl; )
       break;
    case SPxSolver::SINGULAR:
-      if ( checkMode )
-	 MSG_INFO1( spxout << "EEXAMP39 basis is singular" << std::endl; )
+      if( checkMode )
+    MSG_INFO1( spxout << "EEXAMP39 basis is singular" << std::endl; )
       else
-	 MSG_INFO1( spxout << "Basis is singular" << std::endl; )
+    MSG_INFO1( spxout << "Basis is singular" << std::endl; )
       break;
    default:
-      if ( checkMode )
-	 MSG_INFO1( spxout << "EEXAMP36 An error occurred during " << "the solution process" << std::endl; )
+      if( checkMode )
+    MSG_INFO1( spxout << "EEXAMP36 An error occurred during " << "the solution process" << std::endl; )
       else
-	 MSG_INFO1( spxout << "An error occurred during " << "the solution process" << std::endl; )
+    MSG_INFO1( spxout << "An error occurred during " << "the solution process" << std::endl; )
       break;
    }
    MSG_INFO1( spxout << std::endl; )
-}
-
-//------------------------------------------------------------------------
-static
-void clean_up(
-   SPxScaler*&       prescaler,
-   SPxScaler*&       postscaler,
-   SPxSimplifier*&   simplifier,
-   SPxStarter*&      starter,
-   SPxPricer*&       pricer,
-   SPxRatioTester*&  ratiotester,
-   char*&            basisname
-   )
-{
-   if ( prescaler != 0 )
-   {
-      delete prescaler;
-      prescaler = 0;
-   }
-   if ( postscaler != 0 )
-   {
-      delete postscaler;
-      postscaler = 0;
-   }
-   if ( simplifier != 0 )
-   {
-      delete simplifier;
-      simplifier = 0;
-   }
-   if ( starter != 0 )
-   {
-      delete starter;
-      starter = 0;
-   }
-
-   assert( pricer != 0 );
-   delete pricer;
-   pricer = 0;
-
-   assert( ratiotester != 0 );
-   delete ratiotester;
-   ratiotester = 0;
-
-   if ( basisname != 0 )
-      delete [] basisname;
-   basisname = 0;
 }
 
 //------------------------------------------------------------------------
@@ -1097,127 +862,121 @@ void clean_up(
 
 int main(int argc, char* argv[])
 {
+   SoPlex2*                  SoPlexShell    = new SoPlex2();
    const char*               filename;
    char*                     basisname      = 0;
-   SPxSolver::Type           type           = SPxSolver::LEAVE;
-   SPxSolver::Representation representation = SPxSolver::COLUMN;
-   SLUFactor::UpdateType     update         = SLUFactor::FOREST_TOMLIN;
-   SPxSimplifier*            simplifier     = 0;
-   SPxStarter*               starter        = 0;
-   SPxPricer*                pricer         = 0;
-   SPxRatioTester*           ratiotester    = 0;
-   SPxScaler*                prescaler      = 0;
-   SPxScaler*                postscaler     = 0;
-   bool                      partialpricing = false;
 
-   try {
-      NameSet                   rownames;
-      NameSet                   colnames;
-      int                       starting       = 0;
-      int                       pricing        = 4;
-      int                       ratiotest      = 2;
-      int                       scaling        = 2;
-      int                       simplifying    = 1;
-      int                       iterlimit      = -1;
-      Real                      timelimit      = -1.0;
-      Real                      delta          = DEFAULT_BND_VIOL;
-      Real                      feastol        = DEFAULT_BND_VIOL;
-      Real                      opttol         = DEFAULT_BND_VIOL;
-      Real                      irthreshold    = DEFAULT_BND_VIOL * 1e-6;
-      Real                      epsilon        = DEFAULT_EPS_ZERO;
-      Real                      epsilon_factor = DEFAULT_EPS_FACTOR;
-      Real                      epsilon_update = DEFAULT_EPS_UPDATE;
-      int                       verbose        = SPxOut::INFO1;
-      bool                      print_solution = false;
-      bool                      print_dual     = false;
-      bool                      print_quality  = false;
-      bool                      read_basis     = false;
-      bool                      write_basis    = false;
-      int                       precision;
-      int                       optidx;
+   NameSet                   rownames;
+   NameSet                   colnames;
+   int                       starting       = 0;
+   int                       pricing        = 4;
+   int                       ratiotest      = 2;
+   int                       scaling        = 2;
+   int                       simplifying    = 1;
+   int                       iterlimit      = -1;
+   Real                      timelimit      = -1.0;
+   Real                      delta          = DEFAULT_BND_VIOL;
+   Real                      feastol        = DEFAULT_BND_VIOL;
+   Real                      opttol         = DEFAULT_BND_VIOL;
+   Real                      irthreshold    = DEFAULT_BND_VIOL * 1e-6;
+   Real                      epsilon        = DEFAULT_EPS_ZERO;
+   Real                      epsilon_factor = DEFAULT_EPS_FACTOR;
+   Real                      epsilon_update = DEFAULT_EPS_UPDATE;
+   int                       verbose        = SPxOut::INFO1;
+   bool                      print_solution = false;
+   bool                      print_dual     = false;
+   bool                      print_quality  = false;
+   bool                      read_basis     = false;
+   bool                      write_basis    = false;
+   bool                      checkMode      = false;
+   int                       precision;
+   int                       optidx;
 
-      for(optidx = 1; optidx < argc; optidx++)
+   for(optidx = 1; optidx < argc; optidx++)
+   {
+      if (*argv[optidx] != '-')
+         break;
+
+      switch(argv[optidx][1])
       {
-         if (*argv[optidx] != '-')
-            break;
-
-         switch(argv[optidx][1])
-         {
          case 'b' :
-            check_parameter(argv[optidx][2], argv); // use -b{r,w}, not -b
+            checkParameter(argv[optidx][2], argv); // use -b{r,w}, not -b
             if (argv[optidx][2] == 'r')
                read_basis = true;
             if (argv[optidx][2] == 'w')
                write_basis = true;
             break;
          case 'c' :
-            check_parameter(argv[optidx][2], argv); // use -c[0-3], not -c
-            starting = atoi(&argv[optidx][2]);
+            checkParameter(argv[optidx][2], argv); // use -c[0-3], not -c
+            setStarter( *SoPlexShell, atoi(&argv[optidx][2]) );
             break;
          case 'd' :
-            check_parameter(argv[optidx][2], argv); // use -dx, not -d
-            delta = atof(&argv[optidx][2]);
+            checkParameter(argv[optidx][2], argv); // use -dx, not -d
+            SoPlexShell->setRationalParam( SoPlex2::FEASTOL, atof(&argv[optidx][2]) );
+            SoPlexShell->setRationalParam( SoPlex2::OPTTOL, atof(&argv[optidx][2]) );
             break;
          case 'f' :
-            check_parameter(argv[optidx][2], argv); // use -fx, not -f
-            feastol = atof(&argv[optidx][2]);
+            checkParameter(argv[optidx][2], argv); // use -fx, not -f
+            SoPlexShell->setRationalParam( SoPlex2::FEASTOL, atof(&argv[optidx][2]) );
             break;
          case 'o' :
-            check_parameter(argv[optidx][2], argv); // use -ox, not -o
-            opttol = atof(&argv[optidx][2]);
+            checkParameter(argv[optidx][2], argv); // use -ox, not -o
+            SoPlexShell->setRationalParam( SoPlex2::OPTTOL, atof(&argv[optidx][2]) );
             break;
          case 'R' :
-            check_parameter(argv[optidx][2], argv); // use -Rx, not -R
-            irthreshold = atof(&argv[optidx][2]);
+            checkParameter(argv[optidx][2], argv); // use -Rx, not -R
+            SoPlexShell->setRealParam( SoPlex2::IRTHRESHOLD, atof(&argv[optidx][2]) );
             break;
          case 'e':
-            type = SPxSolver::ENTER;
+            SoPlexShell->setIntParam( SoPlex2::ALGORITHM, SoPlex2::ALGORITHM_ENTER );
             break;
          case 'g' :
-            check_parameter(argv[optidx][2], argv); // use -g[0-5], not -g
+            checkParameter(argv[optidx][2], argv); // use -g[0-5], not -g
             scaling = atoi(&argv[optidx][2]);
+            setScalers( *SoPlexShell, scaling );
             break;
          case 'i' :
-            update = SLUFactor::ETA;
+            SoPlexShell->setIntParam( SoPlex2::FACTOR_UPDATE_TYPE, SoPlex2::FACTOR_UPDATE_TYPE_ETA );
             break;
          case 'l' :
-            if (argv[optidx][2] == '\0' )  // use -lx, not -l
-               print_usage_and_exit( argv );
-            timelimit = atof(&argv[optidx][2]);
+            checkParameter(argv[optidx][2], argv); // use -lx, not -l
+            SoPlexShell->setRealParam( SoPlex2::TIMELIMIT, atoi(&argv[optidx][2]) );
             break;
          case 'L' :
-            if (argv[optidx][2] == '\0' )  // use -Lx, not -L
-               print_usage_and_exit( argv );
-            iterlimit = atoi(&argv[optidx][2]);
+            checkParameter(argv[optidx][2], argv); // use -Lx, not -L
+            SoPlexShell->setIntParam( SoPlex2::ITERLIMIT, atoi(&argv[optidx][2]) );
             break;
          case 'p' :
-            check_parameter(argv[optidx][2], argv); // use -p[0-5], not -p
-            pricing = atoi(&argv[optidx][2]);
+            checkParameter(argv[optidx][2], argv); // use -p[0-5], not -p
+            setPricer( *SoPlexShell, atoi(&argv[optidx][2]) );
             break;
          case 'P' :
-            partialpricing = true;
+            SoPlexShell->setBoolParam(SoPlex2::PARTIAL_PRICING, true);
             break;
          case 'q' :
             print_quality = true;
             break;
          case 'r' :
-            representation = SPxSolver::ROW;
+            SoPlexShell->setIntParam( SoPlex2::REPRESENTATION, SoPlex2::REPRESENTATION_ROW );
             break;
          case 's' :
-            check_parameter(argv[optidx][2], argv); // use -s[0-4], not -s
-            simplifying = atoi(&argv[optidx][2]);
+            checkParameter(argv[optidx][2], argv); // use -s[0-4], not -s
+            SoPlexShell->setIntParam( SoPlex2::SIMPLIFIER, SoPlex2::SIMPLIFIER_AUTO );
             break;
          case 't' :
-            check_parameter(argv[optidx][2], argv); // use -r[0-2], not -r
-            ratiotest = atoi(&argv[optidx][2]);
+            checkParameter(argv[optidx][2], argv); // use -r[0-2], not -r
+            setRatiotester( *SoPlexShell, atoi(&argv[optidx][2]) );
             break;
          case 'v' :
-            check_parameter(argv[optidx][2], argv); // use -v[0-5], not -v
+            checkParameter(argv[optidx][2], argv); // use -v[0-5], not -v
             if (argv[optidx][2] >= '0' && argv[optidx][2] <= '9')
+            {
                verbose = argv[optidx][2] - '0';
+               Param::setVerbose( verbose );
+            }
             break;
          case 'V' :
-            print_version_info();
+            printVersionInfo(checkMode);
             exit(0);
          case 'x' :
             print_solution = true;
@@ -1226,21 +985,21 @@ int main(int argc, char* argv[])
             print_dual = true;
             break;
          case 'z' :
-            check_parameter(argv[optidx][2], argv); // must not be empty
-            check_parameter(argv[optidx][3], argv); // must not be empty
+            checkParameter(argv[optidx][2], argv); // must not be empty
+            checkParameter(argv[optidx][3], argv); // must not be empty
             switch(argv[optidx][2])
             {
             case 'z' :
-               epsilon = atof(&argv[optidx][3]);
+               SoPlexShell->setRealParam( SoPlex2::EPSILON_ZERO, atof(&argv[optidx][3]) );
                break;
             case 'f' :
-               epsilon_factor = atof(&argv[optidx][3]);
+               SoPlexShell->setRealParam( SoPlex2::EPSILON_FACTORIZATION, atof(&argv[optidx][3]) );
                break;
             case 'u' :
-               epsilon_update = atof(&argv[optidx][3]);
+               SoPlexShell->setRealParam( SoPlex2::EPSILON_UPDATE, atof(&argv[optidx][3]) );
                break;
             default :
-               print_usage_and_exit( argv );
+               printUsage( argv );
             }
             break;
          case 'C' :
@@ -1248,103 +1007,72 @@ int main(int argc, char* argv[])
             break;
          case 'h' :
          case '?' :
-            print_version_info();
+            printVersionInfo(checkMode);
             //lint -fallthrough
          default :
-            print_usage_and_exit( argv );
-         }
+            printUsage( argv );
       }
+   }
 
-      // print version
-      print_version_info();
+   // print version
+   printVersionInfo(checkMode);
 
-      // enough arguments?
-      if ((argc - optidx) < 1 + (read_basis ? 1 : 0) + (write_basis ? 1 : 0))
-         print_usage_and_exit( argv );
-      filename  = argv[optidx];
+   // enough arguments?
+   if ((argc - optidx) < 1 + (read_basis ? 1 : 0) + (write_basis ? 1 : 0))
+      printUsage( argv );
+   filename  = argv[optidx];
 
-      ++optidx;
+   ++optidx;
 
-      // switch off simplifier when using a starting basis
-      if ( read_basis )
-         simplifying = 0;
+   // switch off simplifier when using a starting basis
+   if ( read_basis )
+      SoPlexShell->setIntParam( SoPlex2::SIMPLIFIER, SoPlex2::SIMPLIFIER_OFF);
 
-      if ( read_basis || write_basis )
-         basisname = strcpy( new char[strlen(argv[optidx]) + 1], argv[optidx] );
+   if ( read_basis || write_basis )
+      basisname = strcpy( new char[strlen(argv[optidx]) + 1], argv[optidx] );
 
-      // set some algorithm parameters
-      Param::setEpsilon             ( epsilon );
-      Param::setEpsilonFactorization( epsilon_factor );
-      Param::setEpsilonUpdate       ( epsilon_update );
-      Param::setVerbose             ( verbose );
+   // Set the output precision.
+   precision = int(-log10(std::min(feastol, opttol))) + 1;
 
-      // Set the output precision.
-      precision = int(-log10(std::min(feastol, opttol))) + 1;
-
-      std::cout.setf( std::ios::scientific | std::ios::showpoint );
-      std::cerr.setf( std::ios::scientific | std::ios::showpoint );
+   std::cout.setf( std::ios::scientific | std::ios::showpoint );
+   std::cerr.setf( std::ios::scientific | std::ios::showpoint );
 
 #ifdef SEND_ALL_OUTPUT_TO_FILES
-      // Example of redirecting output to different files.
-      // Default is cerr for errors and warnings, cout for everything else.
-      std::ofstream  myerrstream ( "errwarn.txt" );
-      std::ofstream  myinfostream( "infos.txt" );
-      redirect_output(myerrstream, myinfostream);
+   // Example of redirecting output to different files.
+   // Default is cerr for errors and warnings, cout for everything else.
+   std::ofstream  myerrstream ( "errwarn.txt" );
+   std::ofstream  myinfostream( "infos.txt" );
+   redirectOutput(myerrstream, myinfostream);
 #endif
 
-      // create an instance of MySoPlex
-      MySoPlex work( type, representation );
-      work.setUtype             ( update );
-      work.setFeastol           ( std::min(feastol, delta) );
-      work.setOpttol            ( std::min(opttol, delta) );
-      work.setIrthreshold       ( irthreshold );
-      work.setTerminationTime   ( timelimit );
-      work.setTerminationIter   ( iterlimit );
-      work.setPartialPricing    ( partialpricing );
-      print_algorithm_parameters( work, representation, update );
-      assert( work.isConsistent() );
+   printAlgorithmParameters( *SoPlexShell, checkMode );
 
-      // set pricer, starter, simplifier, and ratio tester
-      work.setPricer    ( pricer      = get_pricer      (pricing) );
-      work.setStarter   ( starter     = get_starter     (starting) );
-      work.setSimplifier( simplifier  = get_simplifier  (simplifying) );
-      work.setTester    ( ratiotester = get_ratio_tester(ratiotest) );
-      assert(work.isConsistent());
-
-      // set pre- and postscaler
-      get_scalers(prescaler, postscaler, scaling);
-      work.setPreScaler (prescaler);
-      work.setPostScaler(postscaler);
-      assert(work.isConsistent());
-
+   try
+   {
       // read the LP from an input file (.lp or .mps)
-      read_input_file(work, filename, rownames, colnames);
+      SoPlexShell->readFileReal( filename, &rownames, &colnames );
 
       // read a basis file if specified
       if (read_basis)
-         read_basis_file(work, basisname, &rownames, &colnames);
+         SoPlexShell->readBasisFileReal( filename, &rownames, &colnames );
 
       // solve the LP
-      solve_LP(work);
+      SoPlexShell->solveReal();
 
       // print solution, status, infeasibility system,...
-      print_solution_and_status(work, rownames, colnames, precision, print_quality,
-                                print_solution, print_dual, write_basis, basisname);
+      printSolutionAndStatus( *SoPlexShell, rownames, colnames, precision, print_quality,
+                                 print_solution, print_dual, write_basis, basisname, checkMode );
 
       // clean up
-      clean_up(prescaler, postscaler, simplifier, starter, pricer, ratiotester, basisname);
+      delete [] basisname;
+      delete SoPlexShell;
 
       return 0;
    }
-   catch(SPxException& x) {
+   catch(SPxException& x)
+   {
       std::cout << "exception caught : " << x.what() << std::endl;
       delete [] basisname;
-      if (simplifier)
-         delete simplifier;
-      delete starter;
-      delete pricer;
-      delete ratiotester;
-      delete prescaler;
-      delete postscaler;
+      delete SoPlexShell;
    }
 }

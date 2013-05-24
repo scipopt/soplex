@@ -224,7 +224,8 @@ namespace soplex
    SoPlex2::SoPlex2()
       : _scalerUniequi(false)
       , _scalerBiequi(true)
-      , _scalerGeo(1)
+      , _scalerGeo1(1)
+      , _scalerGeo8(8)
       , _simplifier(0)
       , _firstScaler(0)
       , _secondScaler(0)
@@ -268,7 +269,8 @@ namespace soplex
          _simplifierMainSM = rhs._simplifierMainSM;
          _scalerUniequi = rhs._scalerUniequi;
          _scalerBiequi = rhs._scalerBiequi;
-         _scalerGeo = rhs._scalerGeo;
+         _scalerGeo1 = rhs._scalerGeo1;
+         _scalerGeo8 = rhs._scalerGeo8;
          _starterWeight = rhs._starterWeight;
          _starterSum = rhs._starterSum;
          _starterVector = rhs._starterVector;
@@ -1423,9 +1425,10 @@ namespace soplex
 
          if( applyPreprocessing )
          {
+            // why is this done? _realLP is now a copy of the loaded LP of _solver
             spx_alloc(_realLP);
             _realLP = new (_realLP) SPxLPReal(_solver);
-            _isRealLPLoaded = false;
+            _isRealLPLoaded = false; // why do we set this to false?
          }
          ///@todo maybe this should move closer to the actual solving routine
          else if( _hasBasisReal )
@@ -2369,8 +2372,11 @@ namespace soplex
          case SCALER_BIEQUI:
             _firstScaler = &_scalerBiequi;
             break;
-         case SCALER_GEO:
-            _firstScaler = &_scalerGeo;
+         case SCALER_GEO1:
+            _firstScaler = &_scalerGeo1;
+            break;
+         case SCALER_GEO8:
+            _firstScaler = &_scalerGeo8;
             break;
          default:
             return false;
@@ -2389,8 +2395,11 @@ namespace soplex
          case SCALER_BIEQUI:
             _secondScaler = &_scalerBiequi;
             break;
-         case SCALER_GEO:
-            _secondScaler = &_scalerGeo;
+         case SCALER_GEO1:
+            _secondScaler = &_scalerGeo1;
+            break;
+         case SCALER_GEO8:
+            _secondScaler = &_scalerGeo8;
             break;
          default:
             return false;

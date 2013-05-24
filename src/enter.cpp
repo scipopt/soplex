@@ -20,7 +20,6 @@
 #include <assert.h>
 
 #include "spxdefines.h"
-#include "soplex.h"
 #include "spxratiotester.h"
 #include "spxout.h"
 #include "exceptions.h"
