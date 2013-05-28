@@ -17,7 +17,7 @@
  * @brief Saving LPs with Rational values in a form suitable for SoPlex.
  */
 
-#ifdef WITH_GMP
+#ifdef SOPLEX_WITH_GMP
 
 #include <assert.h>
 #include <stdio.h>
