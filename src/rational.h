@@ -66,6 +66,9 @@ public:
    {
       return this->get_d();
    }
+
+   /// read Rational from string
+   bool readString(const char* s);
 };
 
 /// return whether Rational provides exact arithmetic
