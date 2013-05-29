@@ -2125,6 +2125,7 @@ namespace soplex
 #endif
 
 
+
    /// reads real LP in LP or MPS format from file and returns true on success; gets row names, column names, and
    /// integer variables if desired
    bool SoPlex2::readFileReal(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
@@ -2132,6 +2133,7 @@ namespace soplex
       assert(_realLP != 0);
       bool success = _realLP->readFile(filename, rowNames, colNames, intVars);
       _hasBasisReal = false;
+      return success;
    }
 
 
@@ -2656,6 +2658,8 @@ namespace soplex
 
       assert(intParam(SoPlex2::SCALER_AFTER_SIMPLIFIER) != SoPlex2::SCALER_OFF || _secondScaler == 0);
       assert(intParam(SoPlex2::SCALER_AFTER_SIMPLIFIER) == SoPlex2::SCALER_OFF || _secondScaler != 0);
+
+      return true;
    }
 
 
