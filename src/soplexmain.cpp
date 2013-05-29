@@ -960,8 +960,9 @@ int main(int argc, char* argv[])
             SoPlexShell->setIntParam( SoPlex2::REPRESENTATION, SoPlex2::REPRESENTATION_ROW );
             break;
          case 's' :
-            checkParameter(argv[optidx][2], argv); // use -s[0-4], not -s
-            SoPlexShell->setIntParam( SoPlex2::SIMPLIFIER, SoPlex2::SIMPLIFIER_AUTO );
+            checkParameter(argv[optidx][2], argv); // use -s[0-1], not -s
+            if (argv[optidx][2] >= '0' && argv[optidx][2] <= '9')
+               SoPlexShell->setIntParam( SoPlex2::SIMPLIFIER, argv[optidx][2] - '0');
             break;
          case 't' :
             checkParameter(argv[optidx][2], argv); // use -r[0-2], not -r
