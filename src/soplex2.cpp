@@ -1439,7 +1439,7 @@ namespace soplex
       if( _isRealLPLoaded )
       {
          assert(_realLP == &_solver);
-         assert(applyPreprocessing || _hasBasisReal);
+         assert(!applyPreprocessing || !_hasBasisReal);
 
          // preprocessing is always applied to the LP in the solver; hence we have to create a copy of the original LP
          // if preprocessing is turned on
@@ -1463,7 +1463,7 @@ namespace soplex
       else
       {
          assert(_realLP != &_solver);
-         assert(applyPreprocessing || _hasBasisReal);
+         assert(!applyPreprocessing || !_hasBasisReal);
 
          // ensure that the solver has the original problem
          _solver.loadLP(*_realLP);
