@@ -139,6 +139,9 @@ bool Rational::readString(const char* s)
    t = tmp;
    pos = s;
 
+   if( *pos == '+' )
+      pos++;
+
    while( ((*pos >= '0') && (*pos <= '9') ) || *pos == '+' || *pos == '-'  )
    {
       *t++ = *pos;
@@ -164,7 +167,7 @@ bool Rational::readString(const char* s)
    value.canonicalize();
 
    //record exponent and update final result
-   exponent  = 0;
+   exponent = -decshift;
    if( tolower(*pos) == 'e' )
    {
       pos++;
@@ -172,7 +175,7 @@ bool Rational::readString(const char* s)
       for( t = tmp; *pos != '\0'; pos++ )
          *t++ = *pos;
       *t = '\0';
-      exponent = atol(tmp) - decshift;
+      exponent += atol(tmp);
    }
    if( exponent > 0 )
    {
