@@ -2132,6 +2132,7 @@ namespace soplex
    {
       assert(_realLP != 0);
       bool success = _realLP->readFile(filename, rowNames, colNames, intVars);
+      setIntParam(SoPlex2::OBJSENSE, (_realLP->spxSense() == SPxLPReal::MAXIMIZE ? SoPlex2::OBJSENSE_MAXIMIZE : SoPlex2::OBJSENSE_MINIMIZE), true, true);
       _hasBasisReal = false;
       return success;
    }
