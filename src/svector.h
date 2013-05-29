@@ -29,6 +29,12 @@ namespace soplex
 typedef SVectorBase< Real > SVector;
 typedef SVectorBase< Real > SVectorReal;
 
+///@todo implement spezialization for Rational
+template <>
+Real SVectorBase< Real >::length() const
+{
+   return sqrt(length2());
+}
 } // namespace soplex
 #endif // _SVECTOR_H_
 
