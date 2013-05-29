@@ -299,6 +299,7 @@ namespace soplex
          // copy real LP if different from the LP in the solver
          if( rhs._realLP != &(rhs._solver) )
          {
+            _realLP = 0;
             spx_alloc(_realLP);
             _realLP = new (_realLP) SPxLPReal(*(rhs._realLP));
          }
@@ -306,6 +307,7 @@ namespace soplex
             _realLP = &_solver;
 
          // copy rational LP
+         _rationalLP = 0;
          spx_alloc(_rationalLP);
          _rationalLP = new (_rationalLP) SPxLPRational(*rhs._rationalLP);
 
@@ -1426,12 +1428,14 @@ namespace soplex
          assert(_realLP == &_solver);
          assert(applyPreprocessing || _hasBasisReal);
 
+         // preprocessing is always applied to the LP in the solver; hence we have to create a copy of the original LP
+         // if preprocessing is turned on
          if( applyPreprocessing )
          {
-            // why is this done? _realLP is now a copy of the loaded LP of _solver
+            _realLP = 0;
             spx_alloc(_realLP);
             _realLP = new (_realLP) SPxLPReal(_solver);
-            _isRealLPLoaded = false; // why do we set this to false?
+            _isRealLPLoaded = false;
          }
          ///@todo maybe this should move closer to the actual solving routine
          else if( _hasBasisReal )
