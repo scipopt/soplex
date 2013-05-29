@@ -1,1 +1,1 @@
-src/basevectors.h src/rational.cpp src/rational.h src/soplex2main.cpp~ src/soplexmain.cpp src/soplexmain.cpp~ src/soplexmain_old.cpp
+src/basevectors.h src/rational.cpp src/rational.h src/soplexmain.cpp src/spxlpbase_rational.cpp

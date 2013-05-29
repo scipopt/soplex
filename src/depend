@@ -315,7 +315,15 @@ $(LIBOBJDIR)/spxlpbase_real.o: src/spxlpbase_real.cpp src/spxdefines.h src/spxlp
  src/idlist.h src/islist.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
  src/didxset.h src/spxfileio.h src/gzstream.h src/mpsinput.h
-$(LIBOBJDIR)/spxlpbase_rational.o: src/spxlpbase_rational.cpp
+$(LIBOBJDIR)/spxlpbase_rational.o: src/spxlpbase_rational.cpp src/spxdefines.h \
+ src/spxlpbase.h src/basevectors.h src/rational.h src/vectorbase.h \
+ src/dvectorbase.h src/spxalloc.h src/spxout.h src/exceptions.h \
+ src/ssvectorbase.h src/idxset.h src/svectorbase.h src/dsvectorbase.h \
+ src/svsetbase.h src/classarray.h src/dataset.h src/dataarray.h \
+ src/datakey.h src/idlist.h src/islist.h src/spxid.h src/lprowbase.h \
+ src/lpcolbase.h src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h \
+ src/datahashtable.h src/didxset.h src/spxfileio.h src/gzstream.h \
+ src/mpsinput.h
 $(LIBOBJDIR)/spxmainsm.o: src/spxmainsm.cpp src/spxmainsm.h src/spxdefines.h \
  src/spxsimplifier.h src/timer.h src/spxlp.h src/spxlpbase.h \
  src/basevectors.h src/rational.h src/vectorbase.h src/dvectorbase.h \
