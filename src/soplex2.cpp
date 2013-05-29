@@ -232,6 +232,7 @@ namespace soplex
       , _secondScaler(0)
       , _starter(0)
       , _hasBasisReal(false)
+      , _hasBasisRational(false)
    {
       // give lu factorization to solver
       _solver.setSolver(&_slufactor);
@@ -314,6 +315,7 @@ namespace soplex
          // copy boolean flags
          _isRealLPLoaded = rhs._isRealLPLoaded;
          _hasBasisReal = rhs._hasBasisReal;
+         _hasBasisRational = rhs._hasBasisRational;
       }
 
       assert(_isConsistent());
@@ -2208,6 +2210,56 @@ namespace soplex
 
 
 
+   /// reads rational LP in LP or MPS format from file and returns true on success; gets row names, column names, and
+   /// integer variables if desired
+   bool SoPlex2::readFileRational(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
+   {
+      assert(_rationalLP != 0);
+      bool success = _rationalLP->readFile(filename, rowNames, colNames, intVars);
+      setIntParam(SoPlex2::OBJSENSE, (_rationalLP->spxSense() == SPxLPRational::MAXIMIZE ? SoPlex2::OBJSENSE_MAXIMIZE : SoPlex2::OBJSENSE_MINIMIZE), true, true);
+      _hasBasisRational = false;
+      return success;
+   }
+
+
+
+   /// writes rational LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
+   /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
+   /// marked as integer
+   void SoPlex2::writeFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars) const
+   {
+      ///@todo implement
+   }
+
+
+
+   /// reads basis information from \p filename and returns true on success; if \p rowNames and \p colNames are \c NULL,
+   /// default names are assumed
+   bool SoPlex2::readBasisFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames)
+   {
+      ///@todo implement
+   }
+
+
+
+   /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used
+   void SoPlex2::writeBasisFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames)
+   {
+      ///@todo implement
+   }
+
+
+
+#if 0
+   /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
+   /// default names are used
+   void SoPlex2::writeStateRational(const char* filename, const NameSet* rowNames, const NameSet* colNames) const
+   {
+   }
+#endif
+
+
+
    /// returns boolean parameter value
    bool SoPlex2::boolParam(const BoolParam param) const
    {
@@ -2296,9 +2348,10 @@ namespace soplex
       // objective sense
       case SoPlex2::OBJSENSE:
          assert(value == SoPlex2::OBJSENSE_MAXIMIZE || value == SoPlex2::OBJSENSE_MINIMIZE);
+         assert(_realLP != 0);
+         assert(_rationalLP != 0);
          _realLP->changeSense(value == SoPlex2::OBJSENSE_MAXIMIZE ? SPxLPReal::MAXIMIZE : SPxLPReal::MINIMIZE);
-         if( _rationalLP != 0 )
-            _rationalLP->changeSense(value == SoPlex2::OBJSENSE_MAXIMIZE ? SPxLPRational::MAXIMIZE : SPxLPRational::MINIMIZE);
+         _rationalLP->changeSense(value == SoPlex2::OBJSENSE_MAXIMIZE ? SPxLPRational::MAXIMIZE : SPxLPRational::MINIMIZE);
          break;
 
       // type of computational form, i.e., column or row representation
@@ -2639,17 +2692,19 @@ namespace soplex
    {
       assert(_currentSettings != 0);
       assert(_realLP != 0);
+      assert(_rationalLP != 0);
 
       assert(_realLP != &_solver || _isRealLPLoaded);
       assert(_realLP == &_solver || !_isRealLPLoaded);
 
       assert(!_hasBasisReal || _isRealLPLoaded || _basisStatusRowsReal.size() == numRowsReal());
       assert(!_hasBasisReal || _isRealLPLoaded || _basisStatusColsReal.size() == numColsReal());
+      assert(!_hasBasisRational);
 
       assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MAXIMIZE || _realLP->spxSense() == SPxLPReal::MAXIMIZE);
       assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MINIMIZE || _realLP->spxSense() == SPxLPReal::MINIMIZE);
-      assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MAXIMIZE || _rationalLP != 0 || _rationalLP->spxSense() == SPxLPRational::MAXIMIZE);
-      assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MINIMIZE || _rationalLP != 0 || _rationalLP->spxSense() == SPxLPRational::MINIMIZE);
+      assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MAXIMIZE || _rationalLP->spxSense() == SPxLPRational::MAXIMIZE);
+      assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MINIMIZE || _rationalLP->spxSense() == SPxLPRational::MINIMIZE);
 
       assert(intParam(SoPlex2::SIMPLIFIER) != SoPlex2::SIMPLIFIER_OFF || _simplifier == 0);
       assert(intParam(SoPlex2::SIMPLIFIER) == SoPlex2::SIMPLIFIER_OFF || _simplifier != 0);

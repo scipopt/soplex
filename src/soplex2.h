@@ -482,7 +482,7 @@ public:
    //@}
 #endif
 
-   //**@name I/O */
+   //**@name I/O for the real LP */
    //@{
 
    /// reads real LP in LP or MPS format from file and returns true on success; gets row names, column names, and
@@ -505,6 +505,34 @@ public:
    /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
    /// default names are used
    void writeStateReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0) const;
+#endif
+
+   //@}
+
+
+   //**@name I/O for the rational LP */
+   //@{
+
+   /// reads rational LP in LP or MPS format from file and returns true on success; gets row names, column names, and
+   /// integer variables if desired
+   bool readFileRational(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
+
+   /// writes rational LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
+   /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
+   /// marked as integer
+   void writeFileRational(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0) const;
+
+   /// reads basis information from \p filename and returns true on success; if \p rowNames and \p colNames are \c NULL,
+   /// default names are assumed
+   bool readBasisFileRational(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0);
+
+   /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used
+   void writeBasisFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames);
+
+#if 0
+   /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
+   /// default names are used
+   void writeStateRational(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0) const;
 #endif
 
    //@}
@@ -839,6 +867,7 @@ private:
 
    bool _isRealLPLoaded;
    bool _hasBasisReal;
+   bool _hasBasisRational;
 
    /// checks consistency
    bool _isConsistent() const;
