@@ -717,7 +717,7 @@ public:
       STARTER_VECTOR = 3
    };
 
-   // is the order different than usual on purpose?
+   ///@todo is the order different than usual on purpose?
    /// values for parameter PRICER
    enum
    {
@@ -790,7 +790,6 @@ public:
       REALPARAM_COUNT = 8
    } RealParam;
 
-   // why are feasibility tolerances not real params? What about epsilons?
    /// rational parameters
    typedef enum
    {
