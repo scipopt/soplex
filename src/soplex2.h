@@ -428,6 +428,16 @@ public:
    //@}
 
 
+   //**@name Solving and solution query for the rational LP */
+   //@{
+
+   /// solves rational LP
+   SPxSolver::Status solveRational();
+
+   //@}
+
+
+   /// returns the current status
    //**@name Basis information for the real LP */
    //@{
 

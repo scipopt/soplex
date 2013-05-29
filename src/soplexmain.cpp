@@ -194,6 +194,7 @@ void printUsage( const char* const argv[] )
       "          LPfile can be either in MPS or LPF format\n\n"
       "options:  (*) indicates default\n"
       "          (!) indicates experimental features which may give wrong results\n"
+      " -X        solve rational LP\n"
       " -e        select entering algorithm (default is leaving)\n"
       " -r        select row wise representation (default is column)\n"
       " -i        select Eta-update (default is Forest-Tomlin)\n"
@@ -868,6 +869,7 @@ int main(int argc, char* argv[])
 
    NameSet                   rownames;
    NameSet                   colnames;
+   bool                      exact          = false;
    int                       starting       = 0;
    int                       pricing        = 4;
    int                       ratiotest      = 2;
@@ -899,6 +901,9 @@ int main(int argc, char* argv[])
 
       switch(argv[optidx][1])
       {
+         case 'X' :
+            exact = true;
+            break;
          case 'b' :
             checkParameter(argv[optidx][2], argv); // use -b{r,w}, not -b
             if (argv[optidx][2] == 'r')
@@ -1050,19 +1055,34 @@ int main(int argc, char* argv[])
 
    try
    {
-      // read the LP from an input file (.lp or .mps)
-      SoPlexShell->readFileReal( filename, &rownames, &colnames );
+      if( exact )
+      {
+         // read the LP from an input file (.lp or .mps)
+         SoPlexShell->readFileRational( filename, &rownames, &colnames );
 
-      // read a basis file if specified
-      if (read_basis)
-         SoPlexShell->readBasisFileReal( filename, &rownames, &colnames );
+         // read a basis file if specified
+         if (read_basis)
+            SoPlexShell->readBasisFileRational( filename, &rownames, &colnames );
 
-      // solve the LP
-      SoPlexShell->solveReal();
+         // solve the LP
+         SoPlexShell->solveRational();
+      }
+      else
+      {
+         // read the LP from an input file (.lp or .mps)
+         SoPlexShell->readFileReal( filename, &rownames, &colnames );
 
-      // print solution, status, infeasibility system,...
-      printSolutionAndStatus( *SoPlexShell, rownames, colnames, precision, print_quality,
-                                 print_solution, print_dual, write_basis, basisname, checkMode );
+         // read a basis file if specified
+         if (read_basis)
+            SoPlexShell->readBasisFileReal( filename, &rownames, &colnames );
+
+         // solve the LP
+         SoPlexShell->solveReal();
+
+         // print solution, status, infeasibility system,...
+         printSolutionAndStatus( *SoPlexShell, rownames, colnames, precision, print_quality,
+            print_solution, print_dual, write_basis, basisname, checkMode );
+      }
 
       // clean up
       delete [] basisname;

@@ -1417,6 +1417,17 @@ namespace soplex
 
 
 
+   /// solves rational LP
+   SPxSolver::Status SoPlex2::solveRational()
+   {
+      assert(_isConsistent());
+
+      *_realLP = *_rationalLP;
+      solveReal();
+   }
+
+
+
    /// solves real LP
    SPxSolver::Status SoPlex2::solveReal()
    {
