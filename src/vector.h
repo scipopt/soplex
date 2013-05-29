@@ -29,11 +29,6 @@ namespace soplex
 typedef VectorBase< Real > Vector;
 typedef VectorBase< Real > VectorReal;
 
-template <>
-Real VectorBase< Real >::length() const
-{
-   return sqrt(length2());
-}
 } // namespace soplex
 #endif // _VECTOR_H_
 

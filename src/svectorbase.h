@@ -417,9 +417,6 @@ public:
       return mini;
    }
 
-   /// Euclidian norm.
-   R length() const;
-
    /// Squared norm.
    R length2() const
    {
@@ -434,6 +431,12 @@ public:
       }
 
       return x;
+   }
+
+   /// Euclidian norm.
+   R length() const
+   {
+      return sqrt(length2());
    }
 
    /// Scaling.

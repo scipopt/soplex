@@ -612,7 +612,7 @@ void printSolutionAndStatus(
       {
          DVector objx(SoPlexShell.numColsReal());
 
-         if( SoPlexShell.getPrimalReal(objx) != SPxSolver::ERROR )
+         if( SoPlexShell.getPrimalReal(objx) )
          {
             MSG_INFO1( spxout << std::endl << "Primal solution (name, id, value):" << std::endl; )
             for( int i = 0; i < SoPlexShell.numColsReal(); ++i )
@@ -632,7 +632,7 @@ void printSolutionAndStatus(
          DVector objy( SoPlexShell.numRowsReal() );
          bool allzero = true;
 
-         if( SoPlexShell.getDualReal(objy) != SPxSolver::ERROR )
+         if( SoPlexShell.getDualReal(objy) )
          {
             MSG_INFO1( spxout << std::endl << "Dual multipliers (name, id, value):" << std::endl; )
             for( int i = 0; i < SoPlexShell.numRowsReal(); ++i )

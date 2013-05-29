@@ -348,13 +348,16 @@ public:
       return mini;
    }
 
-   /// Euclidian norm.
-   R length() const;
-
    /// Squared norm.
    R length2() const
    {
       return (*this) * (*this);
+   }
+
+   /// Euclidian norm.
+   R length() const
+   {
+      return sqrt(length2());
    }
 
    /// Addition of scaled vector.

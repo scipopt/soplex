@@ -100,10 +100,10 @@ namespace soplex
             _intParamDefault[SoPlex2::SIMPLIFIER] = SoPlex2::SIMPLIFIER_AUTO;
 
             // type of scaler applied before simplification
-            _intParamDefault[SoPlex2::SCALER_BEFORE_SIMPLIFIER] = SoPlex2::SCALER_OFF;
+            _intParamDefault[SoPlex2::SCALER_BEFORE_SIMPLIFIER] = SoPlex2::SCALER_BIEQUI;
 
             // type of scaler applied after simplification
-            _intParamDefault[SoPlex2::SCALER_AFTER_SIMPLIFIER] = SoPlex2::SCALER_BIEQUI;
+            _intParamDefault[SoPlex2::SCALER_AFTER_SIMPLIFIER] = SoPlex2::SCALER_OFF;
 
             // type of starter used to create crash basis
             _intParamDefault[SoPlex2::STARTER] = SoPlex2::STARTER_OFF;
@@ -205,6 +205,8 @@ namespace soplex
 
          for( int i = 0; i < SoPlex2::RATIONALPARAM_COUNT; i++ )
             _rationalParamValues[i] = settings._rationalParamValues[i];
+
+         return *this;
       }
    };
 
@@ -319,6 +321,8 @@ namespace soplex
       }
 
       assert(_isConsistent());
+
+      return *this;
    }
 
 
@@ -540,7 +544,7 @@ namespace soplex
 
 
    /// returns inequality type of row \p i
-   typename LPRowReal::Type SoPlex2::rowTypeReal(int i) const
+   LPRowReal::Type SoPlex2::rowTypeReal(int i) const
    {
       assert(_realLP != 0);
       return _realLP->rowType(i);
@@ -549,7 +553,7 @@ namespace soplex
 
 
    /// returns inequality type of row with identifier \p id
-   typename LPRowReal::Type SoPlex2::rowTypeReal(const SPxRowId& id) const
+   LPRowReal::Type SoPlex2::rowTypeReal(const SPxRowId& id) const
    {
       assert(_realLP != 0);
       return _realLP->rowType(id);
@@ -1423,7 +1427,7 @@ namespace soplex
       assert(_isConsistent());
 
       *_realLP = *_rationalLP;
-      solveReal();
+      return solveReal();
    }
 
 
@@ -2178,7 +2182,7 @@ namespace soplex
          _isRealLPLoaded = true;
       }
 
-      _hasBasisReal = _solver.readBasisFile(filename, rowNames, colNames);
+      return _hasBasisReal = _solver.readBasisFile(filename, rowNames, colNames);
    }
 
 
@@ -2679,21 +2683,25 @@ namespace soplex
    {
       assert(init || _isConsistent());
 
+      bool success = true;
+
       *_currentSettings = settings;
 
       for( int i = 0; i < SoPlex2::BOOLPARAM_COUNT; i++ )
-         setBoolParam((BoolParam)i, _currentSettings->_boolParamValues[i], quiet, init);
+         success &= setBoolParam((BoolParam)i, _currentSettings->_boolParamValues[i], quiet, init);
 
       for( int i = 0; i < SoPlex2::INTPARAM_COUNT; i++ )
-         setIntParam((IntParam)i, _currentSettings->_intParamValues[i], quiet, init);
+         success &= setIntParam((IntParam)i, _currentSettings->_intParamValues[i], quiet, init);
 
       for( int i = 0; i < SoPlex2::REALPARAM_COUNT; i++ )
-         setRealParam((RealParam)i, _currentSettings->_realParamValues[i], quiet, init);
+         success &= setRealParam((RealParam)i, _currentSettings->_realParamValues[i], quiet, init);
 
       for( int i = 0; i < SoPlex2::RATIONALPARAM_COUNT; i++ )
-         setRationalParam((RationalParam)i, _currentSettings->_rationalParamValues[i], quiet, init);
+         success &= setRationalParam((RationalParam)i, _currentSettings->_rationalParamValues[i], quiet, init);
 
       assert(_isConsistent());
+
+      return success;
    }
 
 

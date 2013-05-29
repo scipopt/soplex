@@ -149,10 +149,10 @@ public:
    Real lhsReal(const SPxRowId& id) const;
 
    /// returns inequality type of row \p i
-   typename LPRowReal::Type rowTypeReal(int i) const;
+   LPRowReal::Type rowTypeReal(int i) const;
 
    /// returns inequality type of row with identifier \p id
-   typename LPRowReal::Type rowTypeReal(const SPxRowId& id) const;
+   LPRowReal::Type rowTypeReal(const SPxRowId& id) const;
 
    /// gets column \p i
    void getColReal(int i, LPCol& lpcol) const;
