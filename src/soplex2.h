@@ -621,14 +621,17 @@ public:
       /// only error and warning output
       VERBOSITY_WARNING = 1,
 
+      /// only error, warning, and debug output
+      VERBOSITY_DEBUG = 2,
+
       /// standard verbosity level
-      VERBOSITY_NORMAL = 2,
+      VERBOSITY_NORMAL = 3,
 
       /// high verbosity level
-      VERBOSITY_HIGH = 3,
+      VERBOSITY_HIGH = 4,
 
       /// full verbosity level
-      VERBOSITY_FULL = 4
+      VERBOSITY_FULL = 5
    };
 
    /// values for parameter SIMPLIFIER
