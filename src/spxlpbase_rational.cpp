@@ -100,7 +100,7 @@ static bool LPFisFree(const char* s)
 /** If only a sign is encountered, the number is assumed to be \c sign * 1.0.  This routine will not catch malformatted
  *  numbers like .e10 !
  */
-static Rational LPFreadValue(char*& pos)
+static Rational LPFreadValue(char*& pos, const int lineno = -1)
 {
    assert(LPFisValue(pos));
 
@@ -110,6 +110,9 @@ static Rational LPFreadValue(char*& pos)
    Rational        value = 1.0;
    bool        has_digits = false;
    bool        has_emptyexponent = false;
+   bool        has_dot = false;
+   bool        has_exponent = false;
+   bool        has_emptydivisor = false;
 
    // 1. sign
    if( (*s == '+') || (*s == '-') )
@@ -125,6 +128,7 @@ static Rational LPFreadValue(char*& pos)
    // 3. Decimal dot
    if( *s == '.' )
    {
+      has_dot = true;
       s++;
 
       // 4. If there was a dot, possible digit behind it
@@ -138,6 +142,7 @@ static Rational LPFreadValue(char*& pos)
    // 5. Exponent
    if( tolower(*s) == 'e' )
    {
+      has_exponent = true;
       has_emptyexponent = true;
       s++;
 
@@ -152,11 +157,30 @@ static Rational LPFreadValue(char*& pos)
          s++;
       }
    }
+
+   // 8. Division
+   if( *s == '/' )
+   {
+      s++;
+      has_emptydivisor = true;
+      while( (*s >= '0') && (*s <= '9') )
+      {
+         has_emptydivisor = false;
+         s++;
+      }
+      if( has_dot || has_exponent || has_emptydivisor ||
+         (*s == '.') ||(*s == '+') || (*s == '-') || (tolower(*s) == 'e') )
+      {
+         MSG_WARNING( spxout << "WLPFRD03 Warning: In line " << lineno << ": malformed rational value in LP file\n";)
+      }
+   }
+
+
    assert(s != pos);
 
    if( has_emptyexponent )
    {
-      MSG_WARNING( spxout << "WLPFRD01 Warning: found empty exponent in LP file - check for forbidden variable names with initial 'e' or 'E'\n"; )
+      MSG_WARNING( spxout << "WLPFRD01 Warning: In line " << lineno << ": found empty exponent in LP file - check for forbidden variable names with initial 'e' or 'E'\n" );
    }
 
    if( !has_digits )
@@ -166,9 +190,12 @@ static Rational LPFreadValue(char*& pos)
       for( t = tmp; pos != s; pos++ )
          *t++ = *pos;
       *t = '\0';
-      value = atof(tmp);
-   }
 
+      if( !value.readString(tmp) )
+      {
+         MSG_WARNING( spxout <<"WLPFRD04 Warning: In line " << lineno << ": malformed rational value in LP file\n" );
+      }
+   }
    pos += s - pos;
 
    assert(pos == s);
@@ -634,7 +661,7 @@ bool SPxLPBase<Rational>::readLPF(
                      pre_sign = val;
                }
                have_value = true;
-               val = LPFreadValue(pos);
+               val = LPFreadValue(pos, lineno);
                val *= pre_sign;
             }
             if( *pos == '\0' )
@@ -665,7 +692,7 @@ bool SPxLPBase<Rational>::readLPF(
                }
 
                have_value = true;
-               val = LPFreadValue(pos);
+               val = LPFreadValue(pos, lineno);
                val *= pre_sign;
 
                if( sense != 0 )
@@ -770,7 +797,7 @@ bool SPxLPBase<Rational>::readLPF(
 
             if( LPFisValue(pos) )
             {
-               val = LPFisInfinity(pos) ? LPFreadInfinity(pos) : LPFreadValue(pos);
+               val = LPFisInfinity(pos) ? LPFreadInfinity(pos) : LPFreadValue(pos, lineno);
 
                if( !LPFisSense(pos) )
                   goto syntax_error;
@@ -819,7 +846,7 @@ bool SPxLPBase<Rational>::readLPF(
                if( !LPFisValue(pos) )
                   goto syntax_error;
 
-               val = LPFisInfinity(pos) ? LPFreadInfinity(pos) : LPFreadValue(pos);
+               val = LPFisInfinity(pos) ? LPFreadInfinity(pos) : LPFreadValue(pos, lineno);
 
                if( sense == '<' )
                   cset.upper_w(colidx) = val;
@@ -1133,7 +1160,11 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
          }
       }
 
-      val = atof(mps.field3());
+      if( !val.readString(mps.field3()) )
+      {
+         MSG_WARNING( spxout <<"WMPSRD01 Warning: malformed rational value in MPS file\n" );
+      }
+
 
       if( !strcmp(mps.field2(), mps.objName()) )
          col.setObj(val);
@@ -1149,7 +1180,10 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
       {
          assert(mps.field4() != 0);
 
-         val = atof(mps.field5());
+         if( !val.readString(mps.field5()) )
+         {
+            MSG_WARNING( spxout <<"WMPSRD02 Warning: malformed rational value in MPS file\n" );
+         }
 
          if( !strcmp(mps.field4(), mps.objName()) )
             col.setObj(val);
@@ -1218,7 +1252,10 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
             mps.entryIgnored("RHS", mps.field1(), "row", mps.field2());
          else
          {
-            val = atof(mps.field3());
+            if( !val.readString(mps.field3()) )
+            {
+               MSG_WARNING( spxout <<"WMPSRD03 Warning: malformed rational value in MPS file\n" );
+            }
 
             // LE or EQ
             if( rset.rhs(idx) < infinity )
@@ -1234,7 +1271,10 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
                mps.entryIgnored("RHS", mps.field1(), "row", mps.field4());
             else
             {
-               val = atof(mps.field5());
+               if( !val.readString(mps.field5()) )
+               {
+                  MSG_WARNING( spxout <<"WMPSRD04 Warning: malformed rational value in MPS file\n" );
+               }
 
                // LE or EQ
                if( rset.rhs(idx) < infinity )
@@ -1302,7 +1342,10 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
             mps.entryIgnored("Range", mps.field1(), "row", mps.field2());
          else
          {
-            val = atof(mps.field3());
+            if( !val.readString(mps.field3()) )
+            {
+               MSG_WARNING( spxout <<"WMPSRD05 Warning: malformed rational value in MPS file\n" );
+            }
 
             // EQ
             if( (rset.lhs(idx) > -infinity) && (rset.rhs_w(idx) <  infinity) )
@@ -1337,7 +1380,10 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
                mps.entryIgnored("Range", mps.field1(), "row", mps.field4());
             else
             {
-               val = atof(mps.field5());
+               if( !val.readString(mps.field5()) )
+               {
+                  MSG_WARNING( spxout <<"WMPSRD06 Warning: malformed rational value in MPS file\n" );
+               }
 
                // EQ
                if( (rset.lhs(idx) > -infinity) && (rset.rhs(idx) <  infinity) )
@@ -1427,8 +1473,15 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
             mps.entryIgnored("column", mps.field3(), "bound", bndname);
          else
          {
-            val = (mps.field4() == 0) ? 0.0 : atof(mps.field4());
-
+            if( mps.field4() == 0 )
+               val = 0.0;
+            else
+            {
+               if( !val.readString(mps.field4()) )
+               {
+                  MSG_WARNING( spxout <<"WMPSRD07 Warning: malformed rational value in MPS file\n" );
+               }
+            }
             switch( *mps.field1() )
             {
             case 'L':
