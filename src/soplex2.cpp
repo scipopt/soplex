@@ -222,7 +222,8 @@ namespace soplex
 
    /// default constructor
    SoPlex2::SoPlex2()
-      : _scalerUniequi(false)
+      : _currentSettings(0)
+      , _scalerUniequi(false)
       , _scalerBiequi(true)
       , _scalerGeo1(1)
       , _scalerGeo8(8)
@@ -246,7 +247,7 @@ namespace soplex
       // initialize parameter settings to default
       spx_alloc(_currentSettings);
       _currentSettings = new (_currentSettings) Settings();
-      setSettings(*_currentSettings, true);
+      setSettings(*_currentSettings, true, true);
 
       assert(_isConsistent());
    }
@@ -2247,13 +2248,13 @@ namespace soplex
 
 
    /// sets boolean parameter value; returns true on success
-   bool SoPlex2::setBoolParam(const BoolParam param, const bool value, bool quiet)
+   bool SoPlex2::setBoolParam(const BoolParam param, const bool value, const bool quiet, const bool init)
    {
       assert(param >= 0);
       assert(param < SoPlex2::BOOLPARAM_COUNT);
-      assert(_isConsistent());
+      assert(init || _isConsistent());
 
-      if( value == boolParam(param) )
+      if( !init && value == boolParam(param) )
          return true;
 
       switch( param )
@@ -2266,20 +2267,19 @@ namespace soplex
       }
 
       _currentSettings->_boolParamValues[param] = value;
-      assert(_isConsistent());
       return true;
    }
 
 
 
    /// sets integer parameter value; returns true on success
-   bool SoPlex2::setIntParam(const IntParam param, const int value, bool quiet)
+   bool SoPlex2::setIntParam(const IntParam param, const int value, const bool quiet, const bool init)
    {
       assert(param >= 0);
       assert(param < INTPARAM_COUNT);
-      assert(_isConsistent());
+      assert(init || _isConsistent());
 
-      if( value == intParam(param) )
+      if( !init && value == intParam(param) )
          return true;
 
       switch( param )
@@ -2354,6 +2354,7 @@ namespace soplex
             break;
          case SIMPLIFIER_AUTO:
             _simplifier = &_simplifierMainSM;
+            assert(_simplifier != 0);
             break;
          default:
             return false;
@@ -2480,22 +2481,21 @@ namespace soplex
       }
 
       _currentSettings->_intParamValues[param] = value;
-      assert(_isConsistent());
       return true;
    }
 
 
 
    /// sets real parameter value; returns true on success
-   bool SoPlex2::setRealParam(const RealParam param, const Real value, bool quiet)
+   bool SoPlex2::setRealParam(const RealParam param, const Real value, const bool quiet, const bool init)
    {
       assert(param >= 0);
       assert(param < REALPARAM_COUNT);
       assert(value >= Settings::_realParamLower[param]);
       assert(value <= _currentSettings->_realParamUpper[param]);
-      assert(_isConsistent());
+      assert(init || _isConsistent());
 
-      if( value == realParam(param) )
+      if( !init && value == realParam(param) )
          return true;
 
       if( value < _currentSettings->_realParamLower[param] || value > _currentSettings->_realParamUpper[param] )
@@ -2553,22 +2553,21 @@ namespace soplex
       }
 
       _currentSettings->_realParamValues[param] = value;
-      assert(_isConsistent());
       return true;
    }
 
 
 
    /// sets rational parameter value; returns true on success
-   bool SoPlex2::setRationalParam(const RationalParam param, const Rational value, bool quiet)
+   bool SoPlex2::setRationalParam(const RationalParam param, const Rational value, const bool quiet, const bool init)
    {
       assert(param >= 0);
       assert(param < RATIONALPARAM_COUNT);
       assert(value >= _currentSettings->_rationalParamLower[param]);
       assert(value <= _currentSettings->_rationalParamUpper[param]);
-      assert(_isConsistent());
+      assert(init || _isConsistent());
 
-      if( value == rationalParam(param) )
+      if( !init && value == rationalParam(param) )
          return true;
 
       if( value < _currentSettings->_rationalParamLower[param] || value > _currentSettings->_rationalParamUpper[param] )
@@ -2591,28 +2590,31 @@ namespace soplex
       }
 
       _currentSettings->_rationalParamValues[param] = value;
-      assert(_isConsistent());
       return true;
    }
 
 
 
    /// sets parameter settings; returns true on success
-   bool SoPlex2::setSettings(const Settings& settings, bool quiet)
+   bool SoPlex2::setSettings(const Settings& settings, const bool quiet, const bool init)
    {
+      assert(init || _isConsistent());
+
       *_currentSettings = settings;
 
       for( int i = 0; i < SoPlex2::BOOLPARAM_COUNT; i++ )
-         setBoolParam((BoolParam)i, _currentSettings->_boolParamValues[i], quiet);
+         setBoolParam((BoolParam)i, _currentSettings->_boolParamValues[i], quiet, init);
 
       for( int i = 0; i < SoPlex2::INTPARAM_COUNT; i++ )
-         setIntParam((IntParam)i, _currentSettings->_intParamValues[i], quiet);
+         setIntParam((IntParam)i, _currentSettings->_intParamValues[i], quiet, init);
 
       for( int i = 0; i < SoPlex2::REALPARAM_COUNT; i++ )
-         setRealParam((RealParam)i, _currentSettings->_realParamValues[i], quiet);
+         setRealParam((RealParam)i, _currentSettings->_realParamValues[i], quiet, init);
 
       for( int i = 0; i < SoPlex2::RATIONALPARAM_COUNT; i++ )
-         setRationalParam((RationalParam)i, _currentSettings->_rationalParamValues[i], quiet);
+         setRationalParam((RationalParam)i, _currentSettings->_rationalParamValues[i], quiet, init);
+
+      assert(_isConsistent());
    }
 
 

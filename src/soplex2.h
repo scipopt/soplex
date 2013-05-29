@@ -782,19 +782,19 @@ public:
    const Settings& settings() const;
 
    /// sets boolean parameter value; returns true on success
-   bool setBoolParam(const BoolParam param, const bool value, bool quiet = false);
+   bool setBoolParam(const BoolParam param, const bool value, const bool quiet = false, const bool init = false);
 
    /// sets integer parameter value; returns true on success
-   bool setIntParam(const IntParam param, const int value, bool quiet = false);
+   bool setIntParam(const IntParam param, const int value, const bool quiet = false, const bool init = false);
 
    /// sets real parameter value; returns true on success
-   bool setRealParam(const RealParam param, const Real value, bool quiet = false);
+   bool setRealParam(const RealParam param, const Real value, const bool quiet = false, const bool init = false);
 
    /// sets rational parameter value; returns true on success
-   bool setRationalParam(const RationalParam param, const Rational value, bool quiet = false);
+   bool setRationalParam(const RationalParam param, const Rational value, const bool quiet = false, const bool init = false);
 
    /// sets parameter settings; returns true on success
-   bool setSettings(const Settings& settings, bool quiet = false);
+   bool setSettings(const Settings& settings, const bool quiet = false, const bool init = false);
 
    //@}
 
