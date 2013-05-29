@@ -291,10 +291,10 @@ namespace soplex
          _basisStatusColsReal = rhs._basisStatusColsReal;
 
          // initialize pointers for simplifier, scalers, and starter
-         setIntParam(SoPlex2::SIMPLIFIER, intParam(SoPlex2::SIMPLIFIER), true);
-         setIntParam(SoPlex2::SCALER_BEFORE_SIMPLIFIER, intParam(SoPlex2::SCALER_BEFORE_SIMPLIFIER), true);
-         setIntParam(SoPlex2::SCALER_AFTER_SIMPLIFIER, intParam(SoPlex2::SCALER_AFTER_SIMPLIFIER), true);
-         setIntParam(SoPlex2::STARTER, intParam(SoPlex2::STARTER), true);
+         setIntParam(SoPlex2::SIMPLIFIER, intParam(SoPlex2::SIMPLIFIER), true, true);
+         setIntParam(SoPlex2::SCALER_BEFORE_SIMPLIFIER, intParam(SoPlex2::SCALER_BEFORE_SIMPLIFIER), true, true);
+         setIntParam(SoPlex2::SCALER_AFTER_SIMPLIFIER, intParam(SoPlex2::SCALER_AFTER_SIMPLIFIER), true, true);
+         setIntParam(SoPlex2::STARTER, intParam(SoPlex2::STARTER), true, true);
 
          // copy real LP if different from the LP in the solver
          if( rhs._realLP != &(rhs._solver) )
@@ -313,6 +313,8 @@ namespace soplex
          _isRealLPLoaded = rhs._isRealLPLoaded;
          _hasBasisReal = rhs._hasBasisReal;
       }
+
+      assert(_isConsistent());
    }
 
 
@@ -2359,6 +2361,7 @@ namespace soplex
          default:
             return false;
          }
+         break;
 
       // type of scaler applied before simplification
       case SoPlex2::SCALER_BEFORE_SIMPLIFIER:
@@ -2382,6 +2385,7 @@ namespace soplex
          default:
             return false;
          }
+         break;
 
       // type of scaler applied after simplification
       case SoPlex2::SCALER_AFTER_SIMPLIFIER:
@@ -2405,6 +2409,7 @@ namespace soplex
          default:
             return false;
          }
+         break;
 
       // type of starter used to create crash basis
       case SoPlex2::STARTER:
@@ -2425,6 +2430,7 @@ namespace soplex
          default:
             return false;
          }
+         break;
 
       // type of pricer
       case SoPlex2::PRICER:
@@ -2455,6 +2461,7 @@ namespace soplex
          default:
             return false;
          }
+         break;
 
       // type of ratio test
       case SoPlex2::RATIOTESTER:
@@ -2475,6 +2482,7 @@ namespace soplex
          default:
             return false;
          }
+         break;
 
       default:
          return false;
