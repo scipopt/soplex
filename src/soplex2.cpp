@@ -1427,6 +1427,11 @@ namespace soplex
       assert(_isConsistent());
 
       *_realLP = *_rationalLP;
+      if( _isRealLPLoaded )
+         _solver.loadLP((SPxLPReal)(*_rationalLP));
+      else
+      *_realLP = *_rationalLP;
+
       return solveReal();
    }
 
