@@ -418,8 +418,11 @@ public:
       return mini;
    }
 
-   /// Euclidian norm.
-   R length() const;
+   /// Floating point approximation of euclidian norm (without any approximation guarantee).
+   Real length() const
+   {
+      return sqrt((Real)length2());
+   }
 
    /// Squared norm.
    R length2() const

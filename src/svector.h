@@ -16,7 +16,7 @@
 /**@file  svector.h
  * @brief Sparse vectors.
  */
-#ifndef _SVECTOR_H_ 
+#ifndef _SVECTOR_H_
 #define _SVECTOR_H_
 
 #include <math.h>
@@ -28,13 +28,6 @@ namespace soplex
 {
 typedef SVectorBase< Real > SVector;
 typedef SVectorBase< Real > SVectorReal;
-
-///@todo implement spezialization for Rational
-template <>
-Real SVectorBase< Real >::length() const
-{
-   return sqrt(length2());
-}
 } // namespace soplex
 #endif // _SVECTOR_H_
 
