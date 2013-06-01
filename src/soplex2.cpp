@@ -2253,6 +2253,7 @@ namespace soplex
    bool SoPlex2::readBasisFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames)
    {
       ///@todo implement
+      return false;
    }
 
 

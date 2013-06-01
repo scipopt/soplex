@@ -44,6 +44,7 @@ public:
    {
       val = R(vec.val);
       idx = vec.idx;
+      return *this;
    }
 
    template < class S >
