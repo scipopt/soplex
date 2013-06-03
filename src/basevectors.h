@@ -17,8 +17,8 @@
 /**@file  vectors.h
  * @brief Collection of dense, sparse, and semi-sparse vectors.
  */
-#ifndef _VECTORS_H_
-#define _VECTORS_H_
+#ifndef _BASEVECTORS_H_
+#define _BASEVECTORS_H_
 
 #include "spxdefines.h"
 #include "rational.h"
@@ -1045,7 +1045,7 @@ template class SVSetBase < Rational >;
 
 }
 
-#endif // _VECTORS_H_
+#endif // _BASEVECTORS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 //Emacs Local Variables:
