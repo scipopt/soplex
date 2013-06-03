@@ -21,7 +21,7 @@
 
 #include <string>
 
-/// @todo SoPlex2 should also have an spxout object to avoid using a global one
+///@todo SoPlex2 should also have an spxout object to avoid using a global one
 #include "rational.h"
 #include "spxsolver.h"
 #include "slufactor.h"
@@ -53,13 +53,34 @@
 #include "spxfastrt.h"
 #include "spxboundflippingrt.h"
 
+
+///@todo Rational file writer in spxlpbase_rational.cpp (Dan)
+///@todo maximum line length in LP and MPS reader/writer should be 6553? (Dan)
+///@todo implement interface to rational LP, including rational basis (Ambros)
+
+///@todo draw flow chart of main solving loop and performInfeasibilityIR() (Dan)
+///@todo solution structure (primal, dual, basis, maxviolation) and record and return "best" solutions found during IR (Ambros)
+///@todo implement main IR loop for primal and dual feasible case with fail otherwise (Ambros)
+///@todo implement statistical info (time, factor time, iters, ...) since last call to solveReal() or solveRational() (Ambros?)
+///@todo implement performInfeasibilityIR (Ambros?)
+///@todo extend IR loop to infeasible case (Dan?)
+///@todo extend IR loop to unbounded case (Dan?)
+
+///@todo interface rational reconstruction code for rational vectors
+///@todo integrate rational reconstruction into IR loop
+///@todo templatize SPxSolver and necessary components (SLUFactor, pricer, ratiotester)
+///@todo integrate rational SPxSolver and distinguish between original and transformed rational LP
+///@todo rational scalers
+///@todo rational simplifier
+
+
 namespace soplex
 {
 
 /**@class SoPlex2
-   @brief   Preconfigured SoPlex LP-solver.
-   @ingroup Algo
-*/
+ * @brief   Preconfigured SoPlex LP-solver.
+ * @ingroup Algo
+ */
 class SoPlex2
 {
 public:
@@ -437,7 +458,6 @@ public:
    //@}
 
 
-   /// returns the current status
    //**@name Basis information for the real LP */
    //@{
 
