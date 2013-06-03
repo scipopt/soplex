@@ -21,6 +21,8 @@
 #include <stdlib.h>
 
 #include "rational.h"
+#include <string>
+#include <sstream>
 
 namespace soplex
 {
@@ -42,11 +44,24 @@ Rational operator/(const Rational& p, const Rational& q)
    return res;
 }
 
-/// print Rational with limited floating point precision
+/// print Rational
 std::ostream& operator<<(std::ostream& os, const Rational& q)
 {
    os << mpq_class(q);
    return os;
+}
+
+/// return as string
+std::string Rational::toString(const bool asfloat)
+{
+   std::stringstream sstream;
+
+   if( asfloat )
+      sstream << mpf_class(*this);
+   else
+      sstream << mpq_class(*this);
+
+   return sstream.str();
 }
 
 #define MAX_STR_LEN 10000

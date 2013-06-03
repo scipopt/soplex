@@ -22,6 +22,7 @@
 #include <math.h>
 #include <assert.h>
 #include <iostream>
+#include <string>
 
 #include "spxdefines.h"
 
@@ -67,6 +68,9 @@ public:
       return this->get_d();
    }
 
+   /// return as string
+   std::string toString(const bool asfloat = true);
+
    /// read Rational from string
    bool readString(const char* s);
 };
@@ -84,7 +88,7 @@ inline static Rational abs(const Rational& r)
    return res;
 }
 
-/// print Rational with limited floating point precision
+/// print Rational
 std::ostream& operator<<(std::ostream& os, const Rational& q);
 
 /// Negation.
