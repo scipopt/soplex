@@ -103,7 +103,7 @@ public:
       idx = p_idx;
    }   
    /// returns TRUE, iff the DataKey is valid.
-   inline int isValid() const
+   inline bool isValid() const
    {
       return idx >= 0;
    }

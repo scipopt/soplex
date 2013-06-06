@@ -921,7 +921,7 @@ public:
    /** This method returns wheather or not \p p_id identifies a vector
     *  with respect to the chosen representation.
     */
-   int isId(const SPxId& p_id) const
+   bool isId(const SPxId& p_id) const
    {
       return p_id.info * theRep > 0;
    }
@@ -930,7 +930,7 @@ public:
    /** This method returns wheather or not \p p_id identifies a coVector
     *  with respect to the chosen representation.
     */
-   int isCoId(const SPxId& p_id) const
+   bool isCoId(const SPxId& p_id) const
    {
       return p_id.info * theRep < 0;
    }
@@ -1049,13 +1049,13 @@ public:
    }
 
    /// does \p stat describe a basic index ?
-   int isBasic(SPxBasis::Desc::Status stat) const
+   bool isBasic(SPxBasis::Desc::Status stat) const
    {
       return (stat * rep() > 0);
    }
 
    /// is the \p p_id 'th vector basic ?
-   int isBasic(const SPxId& p_id) const
+   bool isBasic(const SPxId& p_id) const
    {
       assert(p_id.isValid());
       return p_id.isSPxRowId()
@@ -1064,37 +1064,37 @@ public:
    }
 
    /// is the \p rid 'th vector basic ?
-   int isBasic(const SPxRowId& rid) const
+   bool isBasic(const SPxRowId& rid) const
    {
       return isBasic(desc().rowStatus(number(rid)));
    }
 
    /// is the \p cid 'th vector basic ?
-   int isBasic(const SPxColId& cid) const
+   bool isBasic(const SPxColId& cid) const
    {
       return isBasic(desc().colStatus(number(cid)));
    }
 
    /// is the \p i 'th row vector basic ?
-   int isRowBasic(int i) const
+   bool isRowBasic(int i) const
    {
       return isBasic(desc().rowStatus(i));
    }
 
    /// is the \p i 'th column vector basic ?
-   int isColBasic(int i) const
+   bool isColBasic(int i) const
    {
       return isBasic(desc().colStatus(i));
    }
 
    /// is the \p i 'th vector basic ?
-   int isBasic(int i) const
+   bool isBasic(int i) const
    {
       return isBasic(desc().status(i));
    }
 
    /// is the \p i 'th covector basic ?
-   int isCoBasic(int i) const
+   bool isCoBasic(int i) const
    {
       return isBasic(desc().coStatus(i));
    }
