@@ -26,6 +26,7 @@ namespace soplex
 {
 typedef LPRowSetBase< Real > LPRowSet;
 typedef LPRowSetBase< Real > LPRowSetReal;
+typedef LPRowSetBase< Rational > LPRowSetRational;
 } // namespace soplex
 #endif // _LPROWSET_H_
 

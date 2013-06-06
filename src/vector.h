@@ -28,6 +28,7 @@ namespace soplex
 {
 typedef VectorBase< Real > Vector;
 typedef VectorBase< Real > VectorReal;
+typedef VectorBase< Rational > VectorRational;
 } // namespace soplex
 #endif // _VECTOR_H_
 

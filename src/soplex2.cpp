@@ -562,7 +562,7 @@ namespace soplex
 
 
    /// gets column \p i
-   void SoPlex2::getColReal(int i, LPCol& lpcol) const
+   void SoPlex2::getColReal(int i, LPColReal& lpcol) const
    {
       assert(_realLP != 0);
       return _realLP->getCol(i, lpcol);
@@ -571,7 +571,7 @@ namespace soplex
 
 
    /// gets column with identifier \p id.
-   void SoPlex2::getColReal(const SPxColId& id, LPCol& lpcol) const
+   void SoPlex2::getColReal(const SPxColId& id, LPColReal& lpcol) const
    {
       assert(_realLP != 0);
       return _realLP->getCol(id, lpcol);
@@ -713,6 +713,369 @@ namespace soplex
    {
       assert(_realLP != 0);
       return _realLP->maxObj(id);
+   }
+
+
+
+   /// returns number of rows
+   int SoPlex2::numRowsRational() const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->nRows();
+   }
+
+
+
+   /// returns number of columns
+   int SoPlex2::numColsRational() const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->nCols();
+   }
+
+
+
+   /// returns number of nonzeros
+   int SoPlex2::numNonzerosRational() const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->nNzos();
+   }
+
+
+
+   /// returns smallest non-zero element in absolute value
+   Rational SoPlex2::minAbsNonzeroRational() const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->minAbsNzo();
+   }
+
+
+
+   /// returns biggest non-zero element in absolute value
+   Rational SoPlex2::maxAbsNonzeroRational() const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->maxAbsNzo();
+   }
+
+
+
+   /// returns row identifier for row \p i
+   SPxRowId SoPlex2::rowIdRational(int i) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->rId(i);
+   }
+
+
+
+   /// returns column identifier for column \p i
+   SPxColId SoPlex2::colIdRational(int i) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->cId(i);
+   }
+
+
+
+   /// returns index of the row with identifier \p id
+   int SoPlex2::idxRational(const SPxRowId& id) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->number(id);
+   }
+
+
+
+   /// returns index of the column with identifier \p id
+   int SoPlex2::idxRational(const SPxColId& id) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->number(id);
+   }
+
+
+
+   /// returns index of the row or column with identifier \p id
+   int SoPlex2::idxRational(const SPxId& id) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->number(id);
+   }
+
+
+
+   /// gets row \p i
+   void SoPlex2::getRowRational(int i, LPRowRational& lprow) const
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->getRow(i, lprow);
+   }
+
+
+
+   /// gets row with identifier \p id
+   void SoPlex2::getRowRational(const SPxRowId& id, LPRowRational& lprow) const
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->getRow(id, lprow);
+   }
+
+
+
+   /// gets rows \p start, ..., \p end.
+   void SoPlex2::getRowsRational(int start, int end, LPRowSetRational& lprowset) const
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->getRows(start, end, lprowset);
+   }
+
+
+
+   /// returns vector of row \p i
+   const SVectorRational& SoPlex2::rowVectorRational(int i) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->rowVector(i);
+   }
+
+
+
+   /// returns vector of row with identifier \p id
+   const SVectorRational& SoPlex2::rowVectorRational(const SPxRowId& id) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->rowVector(id);
+   }
+
+
+
+   /// returns right-hand side vector
+   const VectorRational& SoPlex2::rhsRational() const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->rhs();
+   }
+
+
+
+   /// returns right-hand side of row \p i
+   Rational SoPlex2::rhsRational(int i) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->rhs(i);
+   }
+
+
+
+   /// returns right-hand side of row with identifier \p id
+   Rational SoPlex2::rhsRational(const SPxRowId& id) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->rhs(id);
+   }
+
+
+
+   /// returns left-hand side vector
+   const VectorRational& SoPlex2::lhsRational() const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->lhs();
+   }
+
+
+
+   /// returns left-hand side of row \p i
+   Rational SoPlex2::lhsRational(int i) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->lhs(i);
+   }
+
+
+
+   /// returns left-hand side of row with identifier \p id
+   Rational SoPlex2::lhsRational(const SPxRowId& id) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->lhs(id);
+   }
+
+
+
+   /// returns inequality type of row \p i
+   LPRowRational::Type SoPlex2::rowTypeRational(int i) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->rowType(i);
+   }
+
+
+
+   /// returns inequality type of row with identifier \p id
+   LPRowRational::Type SoPlex2::rowTypeRational(const SPxRowId& id) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->rowType(id);
+   }
+
+
+
+   /// gets column \p i
+   void SoPlex2::getColRational(int i, LPColRational& lpcol) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->getCol(i, lpcol);
+   }
+
+
+
+   /// gets column with identifier \p id.
+   void SoPlex2::getColRational(const SPxColId& id, LPColRational& lpcol) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->getCol(id, lpcol);
+   }
+
+
+
+   /// gets columns \p start, ..., \p end
+   void SoPlex2::getColsRational(int start, int end, LPColSetRational& lpcolset) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->getCols(start, end, lpcolset);
+   }
+
+
+
+   /// returns vector of column \p i
+   const SVectorRational& SoPlex2::colVectorRational(int i) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->colVector(i);
+   }
+
+
+
+   /// returns vector of column with identifier \p id
+   const SVectorRational& SoPlex2::colVectorRational(const SPxColId& id) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->colVector(id);
+   }
+
+
+
+   /// returns upper bound vector
+   const VectorRational& SoPlex2::upperRational() const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->upper();
+   }
+
+
+
+   /// returns upper bound of column \p i
+   Rational SoPlex2::upperRational(int i) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->upper(i);
+   }
+
+
+
+   /// returns upper bound of column with identifier \p id
+   Rational SoPlex2::upperRational(const SPxColId& id) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->upper(id);
+   }
+
+
+
+   /// returns lower bound vector
+   const VectorRational& SoPlex2::lowerRational() const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->lower();
+   }
+
+
+
+   /// returns lower bound of column \p i
+   Rational SoPlex2::lowerRational(int i) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->lower(i);
+   }
+
+
+
+   /// returns lower bound of column with identifier \p id
+   Rational SoPlex2::lowerRational(const SPxColId& id) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->lower(id);
+   }
+
+
+
+   /// gets objective function vector
+   void SoPlex2::getObjRational(VectorRational& obj) const
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->getObj(obj);
+   }
+
+
+
+   /// returns objective value of column \p i
+   Rational SoPlex2::objRational(int i) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->obj(i);
+   }
+
+
+
+   /// returns objective value of column with identifier \p id
+   Rational SoPlex2::objRational(const SPxColId& id) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->obj(id);
+   }
+
+
+
+   /// returns objective function vector after transformation to a maximization problem; since this is how it is stored
+   /// internally, this is generally faster
+   const VectorRational& SoPlex2::maxObjRational() const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->maxObj();
+   }
+
+
+
+   /// returns objective value of column \p i after transformation to a maximization problem; since this is how it is
+   /// stored internally, this is generally faster
+   Rational SoPlex2::maxObjRational(int i) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->maxObj(i);
+   }
+
+
+
+   /// returns objective value of column with identifier \p id after transformation to a maximization problem; since
+   /// this is how it is stored internally, this is generally faster
+   Rational SoPlex2::maxObjRational(const SPxColId& id) const
+   {
+      assert(_rationalLP != 0);
+      return _rationalLP->maxObj(id);
    }
 
 

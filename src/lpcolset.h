@@ -26,6 +26,7 @@ namespace soplex
 {
 typedef LPColSetBase< Real > LPColSet;
 typedef LPColSetBase< Real > LPColSetReal;
+typedef LPColSetBase< Rational > LPColSetRational;
 } // namespace soplex
 #endif // _LPCOLSET_H_
 

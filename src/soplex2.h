@@ -176,10 +176,10 @@ public:
    LPRowReal::Type rowTypeReal(const SPxRowId& id) const;
 
    /// gets column \p i
-   void getColReal(int i, LPCol& lpcol) const;
+   void getColReal(int i, LPColReal& lpcol) const;
 
    /// gets column with identifier \p id.
-   void getColReal(const SPxColId& id, LPCol& lpcol) const;
+   void getColReal(const SPxColId& id, LPColReal& lpcol) const;
 
    /// gets columns \p start, ..., \p end
    void getColsReal(int start, int end, LPColSetReal& lpcolset) const;
@@ -234,6 +234,129 @@ public:
 
    //**@name Access of the rational LP */
    //@{
+
+   /// returns number of rows
+   int numRowsRational() const;
+
+   /// returns number of columns
+   int numColsRational() const;
+
+   /// returns number of nonzeros
+   int numNonzerosRational() const;
+
+   /// returns smallest non-zero element in absolute value
+   Rational minAbsNonzeroRational() const;
+
+   /// returns biggest non-zero element in absolute value
+   Rational maxAbsNonzeroRational() const;
+
+   /// returns row identifier for row \p i
+   SPxRowId rowIdRational(int i) const;
+
+   /// returns column identifier for column \p i
+   SPxColId colIdRational(int i) const;
+
+   /// returns index of the row with identifier \p id
+   int idxRational(const SPxRowId& id) const;
+
+   /// returns index of the column with identifier \p id
+   int idxRational(const SPxColId& id) const;
+
+   /// returns index of the row or column with identifier \p id
+   int idxRational(const SPxId& id) const;
+
+   /// gets row \p i
+   void getRowRational(int i, LPRowRational& lprow) const;
+
+   /// gets row with identifier \p id
+   void getRowRational(const SPxRowId& id, LPRowRational& lprow) const;
+
+   /// gets rows \p start, ..., \p end.
+   void getRowsRational(int start, int end, LPRowSetRational& lprowset) const;
+
+   /// returns vector of row \p i
+   const SVectorRational& rowVectorRational(int i) const;
+
+   /// returns vector of row with identifier \p id
+   const SVectorRational& rowVectorRational(const SPxRowId& id) const;
+
+   /// returns right-hand side vector
+   const VectorRational& rhsRational() const;
+
+   /// returns right-hand side of row \p i
+   Rational rhsRational(int i) const;
+
+   /// returns right-hand side of row with identifier \p id
+   Rational rhsRational(const SPxRowId& id) const;
+
+   /// returns left-hand side vector
+   const VectorRational& lhsRational() const;
+
+   /// returns left-hand side of row \p i
+   Rational lhsRational(int i) const;
+
+   /// returns left-hand side of row with identifier \p id
+   Rational lhsRational(const SPxRowId& id) const;
+
+   /// returns inequality type of row \p i
+   LPRowRational::Type rowTypeRational(int i) const;
+
+   /// returns inequality type of row with identifier \p id
+   LPRowRational::Type rowTypeRational(const SPxRowId& id) const;
+
+   /// gets column \p i
+   void getColRational(int i, LPColRational& lpcol) const;
+
+   /// gets column with identifier \p id.
+   void getColRational(const SPxColId& id, LPColRational& lpcol) const;
+
+   /// gets columns \p start, ..., \p end
+   void getColsRational(int start, int end, LPColSetRational& lpcolset) const;
+
+   /// returns vector of column \p i
+   const SVectorRational& colVectorRational(int i) const;
+
+   /// returns vector of column with identifier \p id
+   const SVectorRational& colVectorRational(const SPxColId& id) const;
+
+   /// returns upper bound vector
+   const VectorRational& upperRational() const;
+
+   /// returns upper bound of column \p i
+   Rational upperRational(int i) const;
+
+   /// returns upper bound of column with identifier \p id
+   Rational upperRational(const SPxColId& id) const;
+
+   /// returns lower bound vector
+   const VectorRational& lowerRational() const;
+
+   /// returns lower bound of column \p i
+   Rational lowerRational(int i) const;
+
+   /// returns lower bound of column with identifier \p id
+   Rational lowerRational(const SPxColId& id) const;
+
+   /// gets objective function vector
+   void getObjRational(VectorRational& obj) const;
+
+   /// returns objective value of column \p i
+   Rational objRational(int i) const;
+
+   /// returns objective value of column with identifier \p id
+   Rational objRational(const SPxColId& id) const;
+
+   /// returns objective function vector after transformation to a maximization problem; since this is how it is stored
+   /// internally, this is generally faster
+   const VectorRational& maxObjRational() const;
+
+   /// returns objective value of column \p i after transformation to a maximization problem; since this is how it is
+   /// stored internally, this is generally faster
+   Rational maxObjRational(int i) const;
+
+   /// returns objective value of column with identifier \p id after transformation to a maximization problem; since
+   /// this is how it is stored internally, this is generally faster
+   Rational maxObjRational(const SPxColId& id) const;
 
    //@}
 
