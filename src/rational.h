@@ -69,7 +69,7 @@ public:
    }
 
    /// return as string
-   std::string toString(const bool asfloat = true);
+   std::string toString(const bool asfloat = true) const;
 
    /// read Rational from string
    bool readString(const char* s);

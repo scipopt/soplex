@@ -52,7 +52,7 @@ std::ostream& operator<<(std::ostream& os, const Rational& q)
 }
 
 /// return as string
-std::string Rational::toString(const bool asfloat)
+std::string Rational::toString(const bool asfloat) const
 {
    std::stringstream sstream;
 

@@ -30,6 +30,8 @@
 #include "mpsinput.h"
 #include "exceptions.h"
 
+#define MAX_LINE_WRITE_LEN 65536   ///< maximum length allowed for writing lines
+
 namespace soplex
 {
 // ---------------------------------------------------------------------------------------------------------------------
@@ -1736,6 +1738,9 @@ static void LPFwriteSVector(
 
    char name[16];
    int num_coeffs = 0;
+   long long pos;
+
+   pos = p_output.tellp();
 
    for( int j = 0; j < p_lp.nCols(); ++j )
    {
@@ -1748,9 +1753,18 @@ static void LPFwriteSVector(
          p_output << coeff << " " << getColName(p_lp, j, p_cnames, name);
       else
       {
-         // insert a line break every NUM_ENTRIES_PER_LINE columns
-         if( num_coeffs % NUM_ENTRIES_PER_LINE == 0 )
+         // insert a line break every NUM_ENTRIES_PER_LINE columns or whenever max line length is nearly exceeded
+         if( num_coeffs == NUM_ENTRIES_PER_LINE ||
+            (p_output.tellp() - pos) + (long long) (coeff.toString(false).length() + 100) > MAX_LINE_WRITE_LEN )
+         {
+            num_coeffs = 0;
             p_output << "\n\t";
+            if( p_output.tellp() - pos  >  MAX_LINE_WRITE_LEN )
+            {
+               MSG_WARNING( spxout << "XLPSWR01 Warning: MAX_LINE_WRITE_LEN possibly exceeded when writing LP file\n" );
+            }
+            pos = p_output.tellp();
+         }
 
          if( coeff < 0 )
             p_output << " - " << -coeff;
@@ -1802,8 +1816,26 @@ static void LPFwriteRow(
 {
    METHOD("writeRow");
 
+   long long pos;
+   pos = p_output.tellp();
+
    LPFwriteSVector(p_lp, p_output, p_cnames, p_svec);
 
+   long long sidelen;
+   sidelen = (p_lhs == p_rhs || p_lhs <= -infinity) ? p_rhs.toString(false).length() : p_lhs.toString(false).length();
+
+   // insert a line break if max line length is in danger of being exceeded
+   if((p_output.tellp() - pos) + sidelen + (long long) 100 > MAX_LINE_WRITE_LEN )
+   {
+      p_output << "\n\t";
+      if( p_output.tellp() - pos  >  MAX_LINE_WRITE_LEN )
+      {
+         MSG_WARNING( spxout << "XLPSWR02 Warning: MAX_LINE_WRITE_LEN possibly exceeded when writing LP file\n" );
+      }
+      pos = p_output.tellp();
+   }
+
+   // write bound value
    if( p_lhs == p_rhs )
       p_output << " = " << p_rhs;
    else if( p_lhs <= -infinity )
@@ -1815,6 +1847,11 @@ static void LPFwriteRow(
    }
 
    p_output << "\n";
+
+   if( p_output.tellp() - pos  >  MAX_LINE_WRITE_LEN )
+   {
+      MSG_WARNING( spxout << "XLPSWR03 Warning: MAX_LINE_WRITE_LEN possibly exceeded when writing LP file\n" );
+   }
 }
 
 
@@ -1869,6 +1906,9 @@ static void LPFwriteBounds(
    METHOD("writeBounds");
 
    char name[16];
+   long long pos;
+
+   pos = p_output.tellp();
 
    p_output << "Bounds\n";
 
@@ -1906,6 +1946,13 @@ static void LPFwriteBounds(
       else
          p_output << "  "   << getColName(p_lp, j, p_cnames, name)
                   << " free\n";
+
+      // check if max line length exceeded
+      if( (p_output.tellp() - pos)  >  MAX_LINE_WRITE_LEN )
+      {
+         MSG_WARNING( spxout << "XLPSWR04 Warning: MAX_LINE_WRITE_LEN exceeded when writing LP file\n" );
+      }
+      pos = p_output.tellp();
    }
 }
 
@@ -1960,34 +2007,40 @@ void SPxLPBase<Rational>::writeLPF(
 // Specialization for writing MPS format
 // ---------------------------------------------------------------------------------------------------------------------
 
+
 static void MPSwriteRecord(
    std::ostream&  os,
    const char*    indicator,
    const char*    name,
    const char*    name1  = 0,
-   const Real     value1 = 0.0,
+   const Rational value1 = 0.0,
    const char*    name2  = 0,
-   const Real     value2 = 0.0
+   const Rational value2 = 0.0
    )
 {
    char buf[81];
-
+   long long pos;
+   pos = os.tellp();
    sprintf(buf, " %-2.2s %-8.8s", (indicator == 0) ? "" : indicator, (name == 0)      ? "" : name);
    os << buf;
 
    if( name1 != 0 )
    {
-      sprintf(buf, "  %-8.8s  %12.9g", name1, value1);
-      os << buf;
-
+      sprintf(buf, " %-8.8s ", name1);
+      os << buf << value1;
       if( name2 != 0 )
       {
-         sprintf(buf, "   %-8.8s  %12.9g", name2, value2);
-         os << buf;
+         sprintf(buf, " %-8.8s ", name2);
+         os << buf << value2;
       }
    }
-
    os << std::endl;
+
+   // Warning if line is too long
+   if( os.tellp() - pos > MAX_LINE_WRITE_LEN )
+   {
+      MSG_WARNING( spxout << "XMPSWR04 Warning: MAX_LINE_WRITE_LEN exceeded when writing MPS file\n" );
+   }
 }
 
 

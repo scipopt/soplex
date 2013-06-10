@@ -2611,7 +2611,7 @@ namespace soplex
    /// marked as integer
    void SoPlex2::writeFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars) const
    {
-      ///@todo implement
+      return _rationalLP->writeFile(filename, rowNames, colNames, intVars);
    }
 
 
