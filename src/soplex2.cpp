@@ -1786,22 +1786,6 @@ namespace soplex
 
 
 
-   /// solves rational LP
-   SPxSolver::Status SoPlex2::solveRational()
-   {
-      assert(_isConsistent());
-
-      *_realLP = *_rationalLP;
-      if( _isRealLPLoaded )
-         _solver.loadLP((SPxLPReal)(*_rationalLP));
-      else
-      *_realLP = *_rationalLP;
-
-      return solveReal();
-   }
-
-
-
    /// adds a single row
    void SoPlex2::addRowRational(const LPRowRational& lprow)
    {
@@ -3009,6 +2993,22 @@ namespace soplex
                maxviol = viol;
          }
       }
+   }
+
+
+
+   /// solves rational LP
+   SPxSolver::Status SoPlex2::solveRational()
+   {
+      assert(_isConsistent());
+
+      *_realLP = *_rationalLP;
+      if( _isRealLPLoaded )
+         _solver.loadLP((SPxLPReal)(*_rationalLP));
+      else
+      *_realLP = *_rationalLP;
+
+      return solveReal();
    }
 
 
