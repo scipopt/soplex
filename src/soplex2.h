@@ -54,7 +54,6 @@
 #include "spxboundflippingrt.h"
 
 
-///@todo Rational file writer in spxlpbase_rational.cpp (Dan)
 ///@todo maximum line length in LP and MPS reader/writer should be 6553? (Dan)
 ///@todo implement interface to rational LP, including rational basis (Ambros)
 

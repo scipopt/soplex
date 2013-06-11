@@ -1755,11 +1755,11 @@ static void LPFwriteSVector(
       {
          // insert a line break every NUM_ENTRIES_PER_LINE columns or whenever max line length is nearly exceeded
          if( num_coeffs == NUM_ENTRIES_PER_LINE ||
-            (p_output.tellp() - pos) + (long long) (coeff.toString(false).length() + 100) > MAX_LINE_WRITE_LEN )
+            (long long)(p_output.tellp()) - pos + (long long)(coeff.toString(false).length() + 100) > MAX_LINE_WRITE_LEN )
          {
             num_coeffs = 0;
             p_output << "\n\t";
-            if( p_output.tellp() - pos  >  MAX_LINE_WRITE_LEN )
+            if( (long long)(p_output.tellp()) - pos  >  MAX_LINE_WRITE_LEN )
             {
                MSG_WARNING( spxout << "XLPSWR01 Warning: MAX_LINE_WRITE_LEN possibly exceeded when writing LP file\n" );
             }
@@ -1825,10 +1825,10 @@ static void LPFwriteRow(
    sidelen = (p_lhs == p_rhs || p_lhs <= -infinity) ? p_rhs.toString(false).length() : p_lhs.toString(false).length();
 
    // insert a line break if max line length is in danger of being exceeded
-   if((p_output.tellp() - pos) + sidelen + (long long) 100 > MAX_LINE_WRITE_LEN )
+   if( (long long)(p_output.tellp()) - pos + sidelen + (long long)100 > MAX_LINE_WRITE_LEN )
    {
       p_output << "\n\t";
-      if( p_output.tellp() - pos  >  MAX_LINE_WRITE_LEN )
+      if( (long long)(p_output.tellp()) - pos  >  MAX_LINE_WRITE_LEN )
       {
          MSG_WARNING( spxout << "XLPSWR02 Warning: MAX_LINE_WRITE_LEN possibly exceeded when writing LP file\n" );
       }
@@ -1848,7 +1848,7 @@ static void LPFwriteRow(
 
    p_output << "\n";
 
-   if( p_output.tellp() - pos  >  MAX_LINE_WRITE_LEN )
+   if( (long long)(p_output.tellp()) - pos  >  MAX_LINE_WRITE_LEN )
    {
       MSG_WARNING( spxout << "XLPSWR03 Warning: MAX_LINE_WRITE_LEN possibly exceeded when writing LP file\n" );
    }
@@ -1948,7 +1948,7 @@ static void LPFwriteBounds(
                   << " free\n";
 
       // check if max line length exceeded
-      if( (p_output.tellp() - pos)  >  MAX_LINE_WRITE_LEN )
+      if( (long long)(p_output.tellp()) - pos  >  MAX_LINE_WRITE_LEN )
       {
          MSG_WARNING( spxout << "XLPSWR04 Warning: MAX_LINE_WRITE_LEN exceeded when writing LP file\n" );
       }
@@ -2037,7 +2037,7 @@ static void MPSwriteRecord(
    os << std::endl;
 
    // Warning if line is too long
-   if( os.tellp() - pos > MAX_LINE_WRITE_LEN )
+   if( (long long)(os.tellp()) - pos > MAX_LINE_WRITE_LEN )
    {
       MSG_WARNING( spxout << "XMPSWR04 Warning: MAX_LINE_WRITE_LEN exceeded when writing MPS file\n" );
    }
