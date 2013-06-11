@@ -292,6 +292,8 @@ namespace soplex
          // copy basis
          _basisStatusRowsReal = rhs._basisStatusRowsReal;
          _basisStatusColsReal = rhs._basisStatusColsReal;
+         _basisStatusRowsRational = rhs._basisStatusRowsRational;
+         _basisStatusColsRational = rhs._basisStatusColsRational;
 
          // initialize pointers for simplifier, scalers, and starter
          setIntParam(SoPlex2::SIMPLIFIER, intParam(SoPlex2::SIMPLIFIER), true, true);
@@ -1126,7 +1128,7 @@ namespace soplex
 
 
    /// adds a single column
-   void SoPlex2::addColReal(const LPCol& lpcol)
+   void SoPlex2::addColReal(const LPColReal& lpcol)
    {
       SPxColId id;
       addColReal(id, lpcol);
@@ -1135,7 +1137,7 @@ namespace soplex
 
 
    /// adds a single column and gets its \p id
-   void SoPlex2::addColReal(SPxColId& id, const LPCol& lpcol)
+   void SoPlex2::addColReal(SPxColId& id, const LPColReal& lpcol)
    {
       assert(_realLP != 0);
       _realLP->addCol(id, lpcol);
@@ -1796,6 +1798,710 @@ namespace soplex
       *_realLP = *_rationalLP;
 
       return solveReal();
+   }
+
+
+
+   /// adds a single row
+   void SoPlex2::addRowRational(const LPRowRational& lprow)
+   {
+      SPxRowId id;
+      addRowRational(id, lprow);
+   }
+
+
+
+   /// adds a single row and gets its \p id
+   void SoPlex2::addRowRational(SPxRowId& id, const LPRowRational& lprow)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->addRow(id, lprow);
+
+      if( _hasBasisRational )
+         _basisStatusRowsRational.append(SPxSolver::BASIC);
+   }
+
+
+
+   /// adds multiple rows
+   void SoPlex2::addRowsRational(const LPRowSetRational& lprowset)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->addRows(lprowset);
+
+      if( _hasBasisRational )
+         _basisStatusRowsRational.append(lprowset.num(), SPxSolver::BASIC);
+   }
+
+
+
+   /// adds multiple rows and gets an array of their \p id 's
+   void SoPlex2::addRowsRational(SPxRowId id[], const LPRowSetRational& lprowset)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->addRows(id, lprowset);
+
+      if( _hasBasisRational )
+         _basisStatusRowsRational.append(lprowset.num(), SPxSolver::BASIC);
+   }
+
+
+
+   /// adds a single column
+   void SoPlex2::addColRational(const LPColRational& lpcol)
+   {
+      SPxColId id;
+      addColRational(id, lpcol);
+   }
+
+
+
+   /// adds a single column and gets its \p id
+   void SoPlex2::addColRational(SPxColId& id, const LPColRational& lpcol)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->addCol(id, lpcol);
+
+      if( _hasBasisRational )
+      {
+         if( lpcol.lower() > -realParam(SoPlex2::INFTY) )
+            _basisStatusColsRational.append(SPxSolver::ON_LOWER);
+         else if( lpcol.upper() < realParam(SoPlex2::INFTY) )
+            _basisStatusColsRational.append(SPxSolver::ON_UPPER);
+         else
+            _basisStatusColsRational.append(SPxSolver::ZERO);
+      }
+   }
+
+
+
+   /// adds multiple columns
+   void SoPlex2::addColsRational(const LPColSetRational& lpcolset)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->addCols(lpcolset);
+
+      if( _hasBasisRational )
+      {
+         for( int i = 0; i < lpcolset.num(); i++ )
+         {
+            if( lpcolset.lower(i) > -realParam(SoPlex2::INFTY) )
+               _basisStatusColsRational.append(SPxSolver::ON_LOWER);
+            else if( lpcolset.upper(i) < realParam(SoPlex2::INFTY) )
+               _basisStatusColsRational.append(SPxSolver::ON_UPPER);
+            else
+               _basisStatusColsRational.append(SPxSolver::ZERO);
+         }
+      }
+   }
+
+
+
+   /// adds multiple columns and gets an array of their \p id 's
+   void SoPlex2::addColsRational(SPxColId id[], const LPColSetRational& lpcolset)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->addCols(id, lpcolset);
+
+      if( _hasBasisRational )
+      {
+         for( int i = 0; i < lpcolset.num(); i++ )
+         {
+            if( lpcolset.lower(i) > -realParam(SoPlex2::INFTY) )
+               _basisStatusColsRational.append(SPxSolver::ON_LOWER);
+            else if( lpcolset.upper(i) < realParam(SoPlex2::INFTY) )
+               _basisStatusColsRational.append(SPxSolver::ON_UPPER);
+            else
+               _basisStatusColsRational.append(SPxSolver::ZERO);
+         }
+      }
+   }
+
+
+
+   /// replaces row \p i with \p lprow
+   void SoPlex2::changeRowRational(int i, const LPRowRational& lprow)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->changeRow(i, lprow);
+
+      if( _hasBasisRational )
+      {
+         if( _basisStatusRowsRational[i] != SPxSolver::BASIC )
+            _hasBasisRational = false;
+         else if( _basisStatusRowsRational[i] == SPxSolver::ON_LOWER && lprow.lhs() <= -realParam(SoPlex2::INFTY) )
+            _basisStatusRowsRational[i] = (lprow.rhs() < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+         else if( _basisStatusRowsRational[i] == SPxSolver::ON_UPPER && lprow.rhs() >= realParam(SoPlex2::INFTY) )
+            _basisStatusRowsRational[i] = (lprow.lhs() > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+      }
+   }
+
+
+
+   /// replaces row with identifier \p id with \p lprow
+   void SoPlex2::changeRowRational(SPxRowId id, const LPRowRational& lprow)
+   {
+      changeRowRational(idxRational(id), lprow);
+   }
+
+
+
+   /// changes left-hand side vector for constraints to \p lhs
+   void SoPlex2::changeLhsRational(const VectorRational& lhs)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->changeLhs(lhs);
+
+      if( _hasBasisRational )
+      {
+         for( int i = numRowsRational() - 1; i >= 0; i-- )
+         {
+            if( _basisStatusRowsRational[i] == SPxSolver::ON_LOWER && lhs[i] <= -realParam(SoPlex2::INFTY) )
+               _basisStatusRowsRational[i] = (rhsRational(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+         }
+      }
+   }
+
+
+
+   /// changes left-hand side of row \p i to \p lhs
+   void SoPlex2::changeLhsRational(int i, Rational lhs)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->changeLhs(i, lhs);
+
+      if( _hasBasisRational && _basisStatusRowsRational[i] == SPxSolver::ON_LOWER && lhs <= -realParam(SoPlex2::INFTY) )
+         _basisStatusRowsRational[i] = (rhsRational(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+   }
+
+
+
+   /// changes left-hand side of row with identifier \p id to \p lhs
+   void SoPlex2::changeLhsRational(SPxRowId id, Rational lhs)
+   {
+      changeLhsRational(idxRational(id), lhs);
+   }
+
+
+
+   /// changes right-hand side vector to \p rhs
+   void SoPlex2::changeRhsRational(const VectorRational& rhs)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->changeRhs(rhs);
+
+      if( _hasBasisRational )
+      {
+         for( int i = numRowsRational() - 1; i >= 0; i-- )
+         {
+            if( _basisStatusRowsRational[i] == SPxSolver::ON_UPPER && rhs[i] >= realParam(SoPlex2::INFTY) )
+               _basisStatusRowsRational[i] = (lhsRational(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+         }
+      }
+   }
+
+
+
+   /// changes right-hand side of row \p i to \p rhs
+   void SoPlex2::changeRhsRational(int i, Rational rhs)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->changeRhs(i, rhs);
+
+      if( _hasBasisRational && _basisStatusRowsRational[i] == SPxSolver::ON_UPPER && rhs >= realParam(SoPlex2::INFTY) )
+         _basisStatusRowsRational[i] = (lhsRational(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+   }
+
+
+
+   /// changes right-hand of row with identifier \p id to \p rhs
+   void SoPlex2::changeRhsRational(SPxRowId id, Rational rhs)
+   {
+      changeRhsRational(idxRational(id), rhs);
+   }
+
+
+
+   /// changes left- and right-hand side vectors
+   void SoPlex2::changeRangeRational(const VectorRational& lhs, const VectorRational& rhs)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->changeRange(lhs, rhs);
+
+      if( _hasBasisRational )
+      {
+         for( int i = numRowsRational() - 1; i >= 0; i-- )
+         {
+            if( _basisStatusRowsRational[i] == SPxSolver::ON_LOWER && lhs[i] <= -realParam(SoPlex2::INFTY) )
+               _basisStatusRowsRational[i] = (rhs[i] < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+            else if( _basisStatusRowsRational[i] == SPxSolver::ON_UPPER && rhs[i] >= realParam(SoPlex2::INFTY) )
+               _basisStatusRowsRational[i] = (lhs[i] > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+         }
+      }
+   }
+
+
+
+   /// changes left- and right-hand side of row \p i
+   void SoPlex2::changeRangeRational(int i, Rational lhs, Rational rhs)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->changeRange(i, lhs, rhs);
+
+      if( _hasBasisRational )
+      {
+         if( _basisStatusRowsRational[i] == SPxSolver::ON_LOWER && lhs <= -realParam(SoPlex2::INFTY) )
+            _basisStatusRowsRational[i] = (rhs < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+         else if( _basisStatusRowsRational[i] == SPxSolver::ON_UPPER && rhs >= realParam(SoPlex2::INFTY) )
+            _basisStatusRowsRational[i] = (lhs > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+      }
+   }
+
+
+
+   /// changes left- and right-hand side of row with identifier \p id
+   void SoPlex2::changeRangeRational(SPxRowId id, Rational lhs, Rational rhs)
+   {
+      changeRangeRational(idxRational(id), lhs, rhs);
+   }
+
+
+
+   /// replaces column \p i with \p lpcol
+   void SoPlex2::changeColRational(int i, const LPColRational& lpcol)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->changeCol(i, lpcol);
+
+      if( _hasBasisRational )
+      {
+         if( _basisStatusColsRational[i] == SPxSolver::BASIC )
+            _hasBasisRational = false;
+         else if( _basisStatusColsRational[i] == SPxSolver::ON_LOWER && lpcol.lower() <= -realParam(SoPlex2::INFTY) )
+            _basisStatusColsRational[i] = (lpcol.upper() < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+         else if( _basisStatusColsRational[i] == SPxSolver::ON_UPPER && lpcol.upper() >= realParam(SoPlex2::INFTY) )
+            _basisStatusColsRational[i] = (lpcol.lower() > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+      }
+   }
+
+
+
+   /// replaces column with identifier \p id with \p lpcol
+   void SoPlex2::changeColRational(SPxColId id, const LPColRational& lpcol)
+   {
+      changeColRational(idxRational(id), lpcol);
+   }
+
+
+
+   /// changes vector of lower bounds to \p lower
+   void SoPlex2::changeLowerRational(const VectorRational& lower)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->changeLower(lower);
+
+      if( _hasBasisRational )
+      {
+         for( int i = numColsRational() - 1; i >= 0; i-- )
+         {
+            if( _basisStatusColsRational[i] == SPxSolver::ON_LOWER && lower[i] <= -realParam(SoPlex2::INFTY) )
+               _basisStatusColsRational[i] = (upperRational(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+         }
+      }
+   }
+
+
+
+   /// changes lower bound of column i to \p lower
+   void SoPlex2::changeLowerRational(int i, Rational lower)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->changeLower(i, lower);
+
+      if( _hasBasisRational && _basisStatusColsRational[i] == SPxSolver::ON_LOWER && lower <= -realParam(SoPlex2::INFTY) )
+         _basisStatusColsRational[i] = (upperRational(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+   }
+
+
+
+   /// changes lower bound of column with identifier \p id to \p lower
+   void SoPlex2::changeLowerRational(SPxColId id, Rational lower)
+   {
+      changeLowerRational(idxRational(id), lower);
+   }
+
+
+
+   /// changes vector of upper bounds to \p upper
+   void SoPlex2::changeUpperRational(const VectorRational& upper)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->changeUpper(upper);
+
+      if( _hasBasisRational )
+      {
+         for( int i = numColsRational() - 1; i >= 0; i-- )
+         {
+            if( _basisStatusColsRational[i] == SPxSolver::ON_UPPER && upper[i] >= realParam(SoPlex2::INFTY) )
+               _basisStatusColsRational[i] = (lowerRational(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+         }
+      }
+   }
+
+
+
+   /// changes \p i 'th upper bound to \p upper
+   void SoPlex2::changeUpperRational(int i, Rational upper)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->changeUpper(i, upper);
+
+      if( _hasBasisRational &&  _basisStatusColsRational[i] == SPxSolver::ON_UPPER && upper >= realParam(SoPlex2::INFTY) )
+         _basisStatusColsRational[i] = (lowerRational(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+   }
+
+
+
+   /// changes upper bound of column with identifier \p id to \p upper
+   void SoPlex2::changeUpperRational(SPxColId id, Rational upper)
+   {
+      changeUpperRational(idxRational(id), upper);
+   }
+
+
+
+   /// changes vectors of column bounds to \p lower and \p upper
+   void SoPlex2::changeBoundsRational(const VectorRational& lower, const VectorRational& upper)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->changeBounds(lower, upper);
+
+      if( _hasBasisRational )
+      {
+         for( int i = numColsRational() - 1; i >= 0; i-- )
+         {
+            if( _basisStatusColsRational[i] == SPxSolver::ON_LOWER && lower[i] <= -realParam(SoPlex2::INFTY) )
+               _basisStatusColsRational[i] = (upper[i] < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+            else if( _basisStatusColsRational[i] == SPxSolver::ON_UPPER && upper[i] >= realParam(SoPlex2::INFTY) )
+               _basisStatusColsRational[i] = (lower[i] > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+         }
+      }
+   }
+
+
+
+   /// changes bounds of column \p i to \p lower and \p upper
+   void SoPlex2::changeBoundsRational(int i, Rational lower, Rational upper)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->changeBounds(i, lower, upper);
+
+      if( _hasBasisRational )
+      {
+         if( _basisStatusColsRational[i] == SPxSolver::ON_LOWER && lower <= -realParam(SoPlex2::INFTY) )
+            _basisStatusColsRational[i] = (upper < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+         else if( _basisStatusColsRational[i] == SPxSolver::ON_UPPER && upper >= realParam(SoPlex2::INFTY) )
+            _basisStatusColsRational[i] = (lower > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+      }
+   }
+
+
+
+   /// changes bounds of column with identifier \p id to \p lower and \p upper
+   void SoPlex2::changeBoundsRational(SPxColId id, Rational lower, Rational upper)
+   {
+      changeBoundsRational(idxRational(id), lower, upper);
+   }
+
+
+
+   /// changes objective function vector to \p obj
+   void SoPlex2::changeObjRational(const VectorRational& obj)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->changeObj(obj);
+   }
+
+
+
+   /// changes objective coefficient of column i to \p obj
+   void SoPlex2::changeObjRational(int i, Rational obj)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->changeObj(i, obj);
+   }
+
+
+
+   /// changes objective coefficient of column with identifier \p id to \p obj
+   void SoPlex2::changeObjRational(SPxColId id, Rational obj)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->changeObj(id, obj);
+   }
+
+
+
+   /// changes matrix entry in row \p i and column \p j to \p val
+   void SoPlex2::changeElementRational(int i, int j, Rational val)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->changeElement(i, j, val);
+
+      if( _hasBasisRational )
+      {
+         if( _basisStatusRowsRational[i] != SPxSolver::BASIC && _basisStatusColsRational[i] == SPxSolver::BASIC )
+            _hasBasisRational = false;
+      }
+   }
+
+
+
+   /// changes matrix entry identified by (\p rowid, \p colid) to \p val
+   void SoPlex2::changeElementRational(SPxRowId rowid, SPxColId colid, Rational val)
+   {
+      changeElementRational(idxRational(rowid), idxRational(colid), val);
+   }
+
+
+
+   /// removes row \p i
+   void SoPlex2::removeRowRational(int i)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->removeRow(i);
+
+      if( _hasBasisRational )
+      {
+         if( _basisStatusRowsRational[i] != SPxSolver::BASIC )
+            _hasBasisRational = false;
+         else
+         {
+            _basisStatusRowsRational[i] = _basisStatusRowsRational[_basisStatusRowsRational.size() - 1];
+            _basisStatusRowsRational.removeLast();
+         }
+      }
+   }
+
+
+
+   /// removes row with identifier \p id
+   void SoPlex2::removeRowRational(SPxRowId id)
+   {
+      removeRowRational(idxRational(id));
+   }
+
+
+
+   /// removes all rows with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the new
+   /// index where row \p i has been moved to; note that \p perm must point to an array of size at least
+   /// #numRowsRational()
+   void SoPlex2::removeRowsRational(int perm[])
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->removeRows(perm);
+
+      if( _hasBasisRational )
+      {
+         for( int i = numRowsRational() - 1; i >= 0 && _hasBasisRational; i-- )
+         {
+            if( perm[i] < 0 && _basisStatusRowsRational[i] != SPxSolver::BASIC )
+               _hasBasisRational = false;
+            else if( perm[i] >= 0 && perm[i] != i )
+            {
+               assert(perm[i] < numRowsRational());
+               assert(perm[perm[i]] < 0);
+
+               _basisStatusRowsRational[perm[i]] = _basisStatusRowsRational[i];
+            }
+         }
+
+         if( _hasBasisRational )
+            _basisStatusRowsRational.reSize(numRowsRational());
+      }
+   }
+
+
+
+   /// remove all rows with identifier in array \p id of size \p n; an array \p perm of size #numRowsRational() may be
+   /// passed as buffer memory
+   void SoPlex2::removeRowsRational(SPxRowId id[], int n, int perm[])
+   {
+      if( perm == 0 )
+      {
+         DataArray< int > p(numRowsRational());
+         _idToPerm((SPxId*)id, n, p.get_ptr(), numRowsRational());
+         removeRowsRational(p.get_ptr());
+      }
+      else
+      {
+         _idToPerm((SPxId*)id, n, perm, numRowsRational());
+         removeRowsRational(perm);
+      }
+   }
+
+
+
+   /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsRational() may be
+   /// passed as buffer memory
+   void SoPlex2::removeRowsRational(int idx[], int n, int perm[])
+   {
+      if( perm == 0 )
+      {
+         DataArray< int > p(numRowsRational());
+         _idxToPerm(idx, n, p.get_ptr(), numRowsRational());
+         removeRowsRational(p.get_ptr());
+      }
+      else
+      {
+         _idxToPerm(idx, n, perm, numRowsRational());
+         removeRowsRational(perm);
+      }
+   }
+
+
+
+   /// removes rows \p start to \p end including both; an array \p perm of size #numRowsRational() may be passed as
+   /// buffer memory
+   void SoPlex2::removeRowRangeRational(int start, int end, int perm[])
+   {
+      if( perm == 0 )
+      {
+         DataArray< int > p(numRowsRational());
+         _rangeToPerm(start, end, p.get_ptr(), numRowsRational());
+         removeRowsRational(p.get_ptr());
+      }
+      else
+      {
+         _rangeToPerm(start, end, perm, numRowsRational());
+         removeRowsRational(perm);
+      }
+   }
+
+
+
+   /// removes column i
+   void SoPlex2::removeColRational(int i)
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->removeCol(i);
+
+      if( _hasBasisRational )
+      {
+         if( _basisStatusColsRational[i] == SPxSolver::BASIC )
+            _hasBasisRational = false;
+         else
+         {
+            _basisStatusColsRational[i] = _basisStatusColsRational[_basisStatusColsRational.size() - 1];
+            _basisStatusColsRational.removeLast();
+         }
+      }
+   }
+
+
+
+   /// removes column with identifier \p id
+   void SoPlex2::removeColRational(SPxColId id)
+   {
+      removeColRational(idxRational(id));
+   }
+
+
+
+   /// removes all columns with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
+   /// new index where column \p i has been moved to; note that \p perm must point to an array of size at least
+   /// #numColsRational()
+   void SoPlex2::removeColsRational(int perm[])
+   {
+      assert(_rationalLP != 0);
+      _rationalLP->removeCols(perm);
+
+      if( _hasBasisRational )
+      {
+         for( int i = numColsRational() - 1; i >= 0 && _hasBasisRational; i-- )
+         {
+            if( perm[i] < 0 && _basisStatusColsRational[i] == SPxSolver::BASIC )
+               _hasBasisRational = false;
+            else if( perm[i] >= 0 && perm[i] != i )
+            {
+               assert(perm[i] < numColsRational());
+               assert(perm[perm[i]] < 0);
+
+               _basisStatusColsRational[perm[i]] = _basisStatusColsRational[i];
+            }
+         }
+
+         if( _hasBasisRational )
+            _basisStatusColsRational.reSize(numColsRational());
+      }
+   }
+
+
+
+   /// remove all columns with identifier in array \p id of size \p n; an array \p perm of size #numColsRational() may
+   /// be passed as buffer memory
+   void SoPlex2::removeColsRational(SPxColId id[], int n, int perm[])
+   {
+      if( perm == 0 )
+      {
+         DataArray< int > p(numColsRational());
+         _idToPerm((SPxId*)id, n, p.get_ptr(), numColsRational());
+         removeColsRational(p.get_ptr());
+      }
+      else
+      {
+         _idToPerm((SPxId*)id, n, perm, numColsRational());
+         removeColsRational(perm);
+      }
+   }
+
+
+
+   /// remove all columns with indices in array \p idx of size \p n; an array \p perm of size #numColsRational() may be
+   /// passed as buffer memory
+   void SoPlex2::removeColsRational(int idx[], int n, int perm[])
+   {
+      if( perm == 0 )
+      {
+         DataArray< int > p(numColsRational());
+         _idxToPerm(idx, n, p.get_ptr(), numColsRational());
+         removeColsRational(p.get_ptr());
+      }
+      else
+      {
+         _idxToPerm(idx, n, perm, numColsRational());
+         removeColsRational(perm);
+      }
+   }
+
+
+
+   /// removes columns \p start to \p end including both; an array \p perm of size #numColsRational() may be passed as
+   /// buffer memory
+   void SoPlex2::removeColRangeRational(int start, int end, int perm[])
+   {
+      if( perm == 0 )
+      {
+         DataArray< int > p(numColsRational());
+         _rangeToPerm(start, end, p.get_ptr(), numColsRational());
+         removeColsRational(p.get_ptr());
+      }
+      else
+      {
+         _rangeToPerm(start, end, perm, numColsRational());
+         removeColsRational(perm);
+      }
+   }
+
+
+
+   /// clears the LP
+   void SoPlex2::clearLPRational()
+   {
+      assert(_rationalLP != 0);
+
+      _rationalLP->clear();
+      _hasBasisRational = false;
    }
 
 
@@ -3143,7 +3849,8 @@ namespace soplex
 
       assert(!_hasBasisReal || _isRealLPLoaded || _basisStatusRowsReal.size() == numRowsReal());
       assert(!_hasBasisReal || _isRealLPLoaded || _basisStatusColsReal.size() == numColsReal());
-      assert(!_hasBasisRational);
+      assert(!_hasBasisRational || _basisStatusRowsRational.size() == numRowsRational());
+      assert(!_hasBasisRational || _basisStatusColsRational.size() == numColsRational());
 
       assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MAXIMIZE || _realLP->spxSense() == SPxLPReal::MAXIMIZE);
       assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MINIMIZE || _realLP->spxSense() == SPxLPReal::MINIMIZE);

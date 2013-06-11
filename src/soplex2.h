@@ -523,6 +523,160 @@ public:
    //**@name Modification of the rational LP */
    //@{
 
+   /// adds a single row
+   void addRowRational(const LPRowRational& lprow);
+
+   /// adds a single row and gets its \p id
+   void addRowRational(SPxRowId& id, const LPRowRational& lprow);
+
+   /// adds multiple rows
+   void addRowsRational(const LPRowSetRational& lprowset);
+
+   /// adds multiple rows and gets an array of their \p id 's
+   void addRowsRational(SPxRowId id[], const LPRowSetRational& lprowset);
+
+   /// adds a single column
+   void addColRational(const LPColRational& lpcol);
+
+   /// adds a single column and gets its \p id
+   void addColRational(SPxColId& id, const LPColRational& lpcol);
+
+   /// adds multiple columns
+   void addColsRational(const LPColSetRational& lpcolset);
+
+   /// adds multiple columns and gets an array of their \p id 's
+   void addColsRational(SPxColId id[], const LPColSetRational& lpcolset);
+
+   /// replaces row \p i with \p lprow
+   void changeRowRational(int i, const LPRowRational& lprow);
+
+   /// replaces row with identifier \p id with \p lprow
+   void changeRowRational(SPxRowId id, const LPRowRational& lprow);
+
+   /// changes left-hand side vector for constraints to \p lhs
+   void changeLhsRational(const VectorRational& lhs);
+
+   /// changes left-hand side of row \p i to \p lhs
+   void changeLhsRational(int i, Rational lhs);
+
+   /// changes left-hand side of row with identifier \p id to \p lhs
+   void changeLhsRational(SPxRowId id, Rational lhs);
+
+   /// changes right-hand side vector to \p rhs
+   void changeRhsRational(const VectorRational& rhs);
+
+   /// changes right-hand side of row \p i to \p rhs
+   void changeRhsRational(int i, Rational rhs);
+
+   /// changes right-hand of row with identifier \p id to \p rhs
+   void changeRhsRational(SPxRowId id, Rational rhs);
+
+   /// changes left- and right-hand side vectors
+   void changeRangeRational(const VectorRational& lhs, const VectorRational& rhs);
+
+   /// changes left- and right-hand side of row \p i
+   void changeRangeRational(int i, Rational lhs, Rational rhs);
+
+   /// changes left- and right-hand side of row with identifier \p id
+   void changeRangeRational(SPxRowId id, Rational lhs, Rational rhs);
+
+   /// replaces column \p i with \p lpcol
+   void changeColRational(int i, const LPColRational& lpcol);
+
+   /// replaces column with identifier \p id with \p lpcol
+   void changeColRational(SPxColId id, const LPColRational& lpcol);
+
+   /// changes vector of lower bounds to \p lower
+   void changeLowerRational(const VectorRational& lower);
+
+   /// changes lower bound of column i to \p lower
+   void changeLowerRational(int i, Rational lower);
+
+   /// changes lower bound of column with identifier \p id to \p lower
+   void changeLowerRational(SPxColId id, Rational lower);
+
+   /// changes vector of upper bounds to \p upper
+   void changeUpperRational(const VectorRational& upper);
+
+   /// changes \p i 'th upper bound to \p upper
+   void changeUpperRational(int i, Rational upper);
+
+   /// changes upper bound of column with identifier \p id to \p upper
+   void changeUpperRational(SPxColId id, Rational upper);
+
+   /// changes vectors of column bounds to \p lower and \p upper
+   void changeBoundsRational(const VectorRational& lower, const VectorRational& upper);
+
+   /// changes bounds of column \p i to \p lower and \p upper
+   void changeBoundsRational(int i, Rational lower, Rational upper);
+
+   /// changes bounds of column with identifier \p id to \p lower and \p upper
+   void changeBoundsRational(SPxColId id, Rational lower, Rational upper);
+
+   /// changes objective function vector to \p obj
+   void changeObjRational(const VectorRational& obj);
+
+   /// changes objective coefficient of column i to \p obj
+   void changeObjRational(int i, Rational obj);
+
+   /// changes objective coefficient of column with identifier \p id to \p obj
+   void changeObjRational(SPxColId id, Rational obj);
+
+   /// changes matrix entry in row \p i and column \p j to \p val
+   void changeElementRational(int i, int j, Rational val);
+
+   /// changes matrix entry identified by (\p rowid, \p colid) to \p val
+   void changeElementRational(SPxRowId rowid, SPxColId colid, Rational val);
+
+   /// removes row \p i
+   void removeRowRational(int i);
+
+   /// removes row with identifier \p id
+   void removeRowRational(SPxRowId id);
+
+   /// removes all rows with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the new
+   /// index where row \p i has been moved to; note that \p perm must point to an array of size at least
+   /// #numRowsRational()
+   void removeRowsRational(int perm[]);
+
+   /// remove all rows with identifier in array \p id of size \p n; an array \p perm of size #numRowsRational() may be
+   /// passed as buffer memory
+   void removeRowsRational(SPxRowId id[], int n, int perm[] = 0);
+
+   /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsRational() may be
+   /// passed as buffer memory
+   void removeRowsRational(int idx[], int n, int perm[] = 0);
+
+   /// removes rows \p start to \p end including both; an array \p perm of size #numRowsRational() may be passed as
+   /// buffer memory
+   void removeRowRangeRational(int start, int end, int perm[] = 0);
+
+   /// removes column i
+   void removeColRational(int i);
+
+   /// removes column with identifier \p id
+   void removeColRational(SPxColId id);
+
+   /// removes all columns with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
+   /// new index where column \p i has been moved to; note that \p perm must point to an array of size at least
+   /// #numColsRational()
+   void removeColsRational(int perm[]);
+
+   /// remove all columns with identifier in array \p id of size \p n; an array \p perm of size #numColsRational() may be
+   /// passed as buffer memory
+   void removeColsRational(SPxColId id[], int n, int perm[] = 0);
+
+   /// remove all columns with indices in array \p idx of size \p n; an array \p perm of size #numColsRational() may be
+   /// passed as buffer memory
+   void removeColsRational(int idx[], int n, int perm[] = 0);
+
+   /// removes columns \p start to \p end including both; an array \p perm of size #numColsRational() may be passed as
+   /// buffer memory
+   void removeColRangeRational(int start, int end, int perm[] = 0);
+
+   /// clears the LP
+   void clearLPRational();
+
    //@}
 
 
@@ -1026,6 +1180,8 @@ private:
 
    DataArray< SPxSolver::VarStatus > _basisStatusRowsReal;
    DataArray< SPxSolver::VarStatus > _basisStatusColsReal;
+   DataArray< SPxSolver::VarStatus > _basisStatusRowsRational;
+   DataArray< SPxSolver::VarStatus > _basisStatusColsRational;
 
    SPxSimplifier* _simplifier;
    SPxScaler* _firstScaler;
