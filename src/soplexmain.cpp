@@ -436,7 +436,19 @@ void printAlgorithmParameters(
     << "update         = " << (SoPlexShell.intParam(SoPlex2::FACTOR_UPDATE_TYPE) == SoPlex2::FACTOR_UPDATE_TYPE_ETA ? "Eta" : "Forest-Tomlin")
     << std::endl; )
    }
-   /// @todo extend this to display remaining settings (pricing, ratio test, ...)
+
+   MSG_INFO1( spxout
+    << "pricer         = " << SoPlexShell.getPricerName()
+    << std::endl
+    << "starter        = " << SoPlexShell.getStarterName()
+    << std::endl
+    << "simplifier     = " << SoPlexShell.getSimplifierName()
+    << std::endl
+    << "ratiotest      = " << SoPlexShell.getRatiotesterName()
+    << std::endl
+    << "scaling        = " << SoPlexShell.getFirstScalerName() << " / " << SoPlexShell.getSecondScalerName()
+    << std::endl
+    << std::endl; )
 }
 
 //------------------------------------------------------------------------

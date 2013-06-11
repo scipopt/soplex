@@ -2510,6 +2510,62 @@ namespace soplex
 #endif
 
 
+   /// name of starter
+   const char* SoPlex2::getStarterName()
+   {
+      if( _starter )
+         return _starter->getName();
+      else
+         return "none";
+   }
+
+
+
+   /// name of simplifier
+   const char* SoPlex2::getSimplifierName()
+   {
+      if( _simplifier )
+         return _simplifier->getName();
+      else
+         return "none";
+   }
+
+   /// name of scaling method before simplifier
+   const char* SoPlex2::getFirstScalerName()
+   {
+      if( _firstScaler )
+         return _firstScaler->getName();
+      else
+         return "none";
+   }
+
+
+
+   /// name of scaling method after simplifier
+   const char* SoPlex2::getSecondScalerName()
+   {
+      if( _secondScaler )
+         return _secondScaler->getName();
+      else
+         return "none";
+   }
+
+
+   /// name of currently loaded pricer
+   const char* SoPlex2::getPricerName()
+   {
+      return _solver.pricer()->getName();
+   }
+
+
+
+   /// name of currently loaded ratiotester
+   const char* SoPlex2::getRatiotesterName()
+   {
+      return _solver.ratiotester()->getName();
+   }
+
+
 
    /// reads real LP in LP or MPS format from file and returns true on success; gets row names, column names, and
    /// integer variables if desired

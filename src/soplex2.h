@@ -634,6 +634,25 @@ public:
    //@}
 #endif
 
+
+   /// name of starter
+   const char* getStarterName();
+
+   /// name of simplifier
+   const char* getSimplifierName();
+
+   /// name of scaling method before simplifier
+   const char* getFirstScalerName();
+
+   /// name of scaling method after simplifier
+   const char* getSecondScalerName();
+
+   /// name of currently loaded pricer
+   const char* getPricerName();
+
+   /// name of currently loaded ratiotester
+   const char* getRatiotesterName();
+
    //**@name I/O for the real LP */
    //@{
 
