@@ -232,7 +232,7 @@ void printUsage( const char* const argv[] )
 }
 
 static
-void displayQuality( SoPlex2& SoPlexShell )
+void displayQuality( SoPlex2& SoPlexShell, bool checkMode )
 {
 
    /// @todo needs more functionality from soplex2 regarding original/simplified LP
@@ -437,6 +437,7 @@ void printAlgorithmParameters(
     << std::endl; )
    }
 
+   // @todo do we need checkMode keys for these lines?
    MSG_INFO1( spxout
     << "pricer         = " << SoPlexShell.getPricerName()
     << std::endl
@@ -618,7 +619,7 @@ void printSolutionAndStatus(
          MSG_INFO1( spxout << "Solution value is: " << std::setprecision( precision ) << SoPlexShell.objValueReal() << std::endl; )
 
       if( print_quality )
-         displayQuality(SoPlexShell);
+         displayQuality( SoPlexShell, checkMode );
 
       if( print_solution )
       {
@@ -1078,22 +1079,65 @@ int main(int argc, char* argv[])
 
          // solve the LP
          SoPlexShell->solveRational();
+
+         // print solution, status, infeasibility system,...
+         printSolutionAndStatus( *SoPlexShell, rownames, colnames, precision, print_quality,
+                                 print_solution, print_dual, write_basis, basisname, checkMode );
       }
       else
       {
+         if ( checkMode )
+            MSG_INFO1( spxout << "IEXAMP22 "; )
+         MSG_INFO1( spxout << "Loading LP file " << filename << std::endl; )
+
+         // set up timer
+         Timer timer;
+         timer.start();
          // read the LP from an input file (.lp or .mps)
-         SoPlexShell->readFileReal( filename, &rownames, &colnames );
+         if( !SoPlexShell->readFileReal( filename, &rownames, &colnames ) )
+         {
+            if ( checkMode )
+               MSG_INFO1( spxout << "EEXAMP23 "; )
+            MSG_INFO1( spxout << "error while reading file \""  << filename << "\"" << std::endl; )
+            exit(1);
+         }
+         timer.stop();
+
+         if ( checkMode )
+            MSG_INFO1( spxout << "IEXAMP24 "; )
+
+         MSG_INFO1( spxout << "LP has "
+            << SoPlexShell->numRowsReal() << " rows "
+            << SoPlexShell->numColsReal() << " columns "
+            << SoPlexShell->numNonzerosReal() << " nonzeros"
+            << std::endl; )
+
+         if( checkMode )
+            MSG_INFO1( spxout << "IEXAMP41 "; )
+
+         MSG_INFO1( std::streamsize prec = spxout.precision();
+            spxout << "LP reading time: "
+            << std::fixed << std::setprecision(2) << timer.userTime()
+            << std::scientific << std::setprecision(int(prec)) << std::endl << std::endl; )
 
          // read a basis file if specified
          if (read_basis)
-            SoPlexShell->readBasisFileReal( filename, &rownames, &colnames );
+         {
+            if( !SoPlexShell->readBasisFileReal( filename, &rownames, &colnames ) )
+            {
+               if ( checkMode )
+                  MSG_INFO1( spxout << "EEXAMP25 "; )
+               MSG_INFO1( spxout << "error while reading file \""  << filename << "\"" << std::endl; )
+               exit(1);
+            }
+         }
 
          // solve the LP
          SoPlexShell->solveReal();
 
          // print solution, status, infeasibility system,...
          printSolutionAndStatus( *SoPlexShell, rownames, colnames, precision, print_quality,
-            print_solution, print_dual, write_basis, basisname, checkMode );
+                                 print_solution, print_dual, write_basis, basisname, checkMode );
       }
 
       // clean up
