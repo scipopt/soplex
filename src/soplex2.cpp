@@ -2943,7 +2943,7 @@ namespace soplex
       maxviol = 0.0;
       sumviol = 0.0;
 
-      for( int i = numColsReal(); i >= 0; i-- )
+      for( int i = numColsReal() - 1; i >= 0; i-- )
       {
          Real viol = lowerReal(i) - primal[i];
          if( viol > 0.0 )
@@ -2975,7 +2975,7 @@ namespace soplex
       maxviol = 0.0;
       sumviol = 0.0;
 
-      for( int i = numRowsReal(); i >= 0; i-- )
+      for( int i = numRowsReal() - 1; i >= 0; i-- )
       {
          Real viol = lhsReal(i) - activity[i];
          if( viol > 0.0 )
@@ -3098,10 +3098,10 @@ namespace soplex
       // if no basis is available, return slack basis
       if( !_hasBasisReal )
       {
-         for( int i = numRowsReal(); i >= 0; i-- )
+         for( int i = numRowsReal() - 1; i >= 0; i-- )
             rows[i] = SPxSolver::BASIC;
 
-         for( int i = numColsReal(); i >= 0; i-- )
+         for( int i = numColsReal() - 1; i >= 0; i-- )
          {
             if( lowerReal(i) > -realParam(SoPlex2::INFTY) )
                cols[i] = SPxSolver::ON_LOWER;
@@ -3124,10 +3124,10 @@ namespace soplex
          assert(numRowsReal() == _basisStatusRowsReal.size());
          assert(numColsReal() == _basisStatusColsReal.size());
 
-         for( int i = numRowsReal(); i >= 0; i-- )
+         for( int i = numRowsReal() - 1; i >= 0; i-- )
             rows[i] = _basisStatusRowsReal[i];
 
-         for( int i = numColsReal(); i >= 0; i-- )
+         for( int i = numColsReal() - 1; i >= 0; i-- )
             cols[i] = _basisStatusColsReal[i];
       }
    }
@@ -3150,10 +3150,10 @@ namespace soplex
          _basisStatusRowsReal.reSize(numRowsReal());
          _basisStatusColsReal.reSize(numColsReal());
 
-         for( int i = numRowsReal(); i >= 0; i-- )
+         for( int i = numRowsReal() - 1; i >= 0; i-- )
             _basisStatusRowsReal[i] = rows[i];
 
-         for( int i = numColsReal(); i >= 0; i-- )
+         for( int i = numColsReal() - 1; i >= 0; i-- )
             _basisStatusColsReal[i] = cols[i];
 
       }
