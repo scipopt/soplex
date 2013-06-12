@@ -3,7 +3,8 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996      Roland Wunderling                              */
+/*                  1996-2013 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -13,29 +14,26 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file  dvector.h
- * @brief Dynamic vectors.
+/**@file  sol.h
+ * @brief Types of solution classes
  */
-#ifndef _DVECTOR_H_
-#define _DVECTOR_H_
+#ifndef _SOL_H_
+#define _SOL_H_
 
 #include "spxdefines.h"
-#include "basevectors.h"
-#include "vector.h" // for compatibility
+#include "solbase.h"
 
 namespace soplex
 {
-typedef DVectorBase< Real > DVector;
-typedef DVectorBase< Real > DVectorReal;
-typedef DVectorBase< Rational > DVectorRational;
+typedef SolBase< Rational > SolRational;
 } // namespace soplex
-#endif // _DVECTOR_H_
+#endif // _SOL_H_
 
-//-----------------------------------------------------------------------------
-//Emacs Local Variables:
-//Emacs mode:c++
-//Emacs c-basic-offset:3
-//Emacs tab-width:8
-//Emacs indent-tabs-mode:nil
-//Emacs End:
-//-----------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// Emacs Local Variables:
+// Emacs mode:c++
+// Emacs c-basic-offset:3
+// Emacs tab-width:8
+// Emacs indent-tabs-mode:nil
+// Emacs End:
+// ---------------------------------------------------------------------------------------------------------------------
