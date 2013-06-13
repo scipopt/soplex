@@ -2965,6 +2965,38 @@ namespace soplex
 
 
 
+   /// gets internal violation of bounds by given primal solution
+   void SoPlex2::getInternalBoundViolationReal(Real& maxviol, Real& sumviol) const
+   {
+      maxviol = 0.0;
+      sumviol = 0.0;
+
+      DVectorReal primal(_solver.nCols());
+
+      _solver.getPrimal(primal);
+
+      for( int i = _solver.nCols() - 1; i >= 0; i-- )
+      {
+         Real viol = _solver.lower(i) - primal[i];
+         if( viol > 0.0 )
+         {
+            sumviol += viol;
+            if( viol > maxviol )
+               maxviol = viol;
+         }
+
+         viol = primal[i] - _solver.upper(i);
+         if( viol > 0.0 )
+         {
+            sumviol += viol;
+            if( viol > maxviol )
+               maxviol = viol;
+         }
+      }
+   }
+
+
+
    /// gets violation of constraints
    void SoPlex2::getConstraintViolationReal(VectorReal& primal, Real& maxviol, Real& sumviol) const
    {
@@ -2993,6 +3025,55 @@ namespace soplex
                maxviol = viol;
          }
       }
+   }
+
+
+
+   /// gets internal violation of constraints
+   void SoPlex2::getInternalConstraintViolationReal(Real& maxviol, Real& sumviol) const
+   {
+      DVectorReal activity;
+      DVectorReal primal(_solver.nCols());
+
+      activity = _solver.computePrimalActivity(primal);
+
+      maxviol = 0.0;
+      sumviol = 0.0;
+
+      for( int i = _solver.nRows() - 1; i >= 0; i-- )
+      {
+         Real viol = _solver.lhs(i) - activity[i];
+         if( viol > 0.0 )
+         {
+            sumviol += viol;
+            if( viol > maxviol )
+               maxviol = viol;
+         }
+
+         viol = activity[i] - _solver.rhs(i);
+         if( viol > 0.0 )
+         {
+            sumviol += viol;
+            if( viol > maxviol )
+               maxviol = viol;
+         }
+      }
+   }
+
+
+
+   /// gets violation of slacks
+   void SoPlex2::getSlackViolationReal(Real& maxviol, Real& sumviol) const
+   {
+      _solver.qualSlackViolation(maxviol, sumviol);
+   }
+
+
+
+   /// gets violation of reduced cost
+   void SoPlex2::getRedCostViolationReal(Real& maxviol, Real& sumviol) const
+   {
+      _solver.qualRedCostViolation(maxviol, sumviol);
    }
 
 

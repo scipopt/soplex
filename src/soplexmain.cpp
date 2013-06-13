@@ -236,112 +236,82 @@ void displayQuality( SoPlex2& SoPlexShell, bool checkMode )
 {
 
    /// @todo needs more functionality from soplex2 regarding original/simplified LP
-   #if 0
+
    Real maxviol;
    Real sumviol;
 
+   DVectorReal primal(SoPlexShell.numColsReal());
+   DVectorReal dual(SoPlexShell.numRowsReal());
+   DVectorReal redCost(SoPlexShell.numColsReal());
+   DVectorReal slack(SoPlexShell.numRowsReal());
+
+   SoPlexShell.getPrimalReal(primal);
+   SoPlexShell.getDualReal(dual);
+   SoPlexShell.getRedcostReal(redCost);
+   SoPlexShell.getSlacksReal(slack);
+
    if ( checkMode )
-   {
-      MSG_INFO1( spxout << "IEXAMP05 Violations (max/sum)" << std::endl; )
-
-      // get violations of simpified LP
-      SoPlexShell.getConstraintViolationReal(primal, maxviol, sumviol);
-      m_solver.qualConstraintViolation(maxviol, sumviol);
-
-      MSG_INFO1( spxout << "IEXAMP06 Constraints      :"
-      << std::setw(16) << maxviol << "  "
-      << std::setw(16) << sumviol << std::endl; )
-
-      // get violations of original LP
-      qualConstraintViolation(maxviol, sumviol);
-
-      MSG_INFO1( spxout << "IEXAMP07       (unscaled) :"
-      << std::setw(16) << maxviol << "  "
-      << std::setw(16) << sumviol << std::endl; )
-
-      m_solver.qualBoundViolation(maxviol, sumviol);
-
-      MSG_INFO1( spxout << "IEXAMP08 Bounds           :"
-      << std::setw(16) << maxviol << "  "
-      << std::setw(16) << sumviol << std::endl; )
-
-      qualBoundViolation(maxviol, sumviol);
-
-      MSG_INFO1( spxout << "IEXAMP09       (unscaled) :"
-      << std::setw(16) << maxviol << "  "
-      << std::setw(16) << sumviol << std::endl; )
-
-      if (!m_vanished)
-      {
-         m_solver.qualSlackViolation(maxviol, sumviol);
-
-         MSG_INFO1( spxout << "IEXAMP10 Slacks           :"
-         << std::setw(16) << maxviol << "  "
-         << std::setw(16) << sumviol << std::endl; )
-
-         m_solver.qualRedCostViolation(maxviol, sumviol);
-
-         MSG_INFO1( spxout << "IEXAMP11 Reduced costs    :"
-         << std::setw(16) << maxviol << "  "
-         << std::setw(16) << sumviol << std::endl; )
-         #if 0
-         MSG_INFO1( spxout << "IEXAMP12 Proven dual bound:"
-         << std::setw(20)
-         << std::setprecision(20)
-         << m_solver.provedDualbound() << std::endl; )
-         #endif
-}
-}
-else
-{
+      MSG_INFO1( spxout << "IEXAMP05 "; )
    MSG_INFO1( spxout << "Violations (max/sum)" << std::endl; )
 
-   m_solver.qualConstraintViolation(maxviol, sumviol);
+   // get violations of simpified LP
+   SoPlexShell.getInternalConstraintViolationReal(maxviol, sumviol);
 
+   if( checkMode )
+      MSG_INFO1( spxout << "IEXAMP06 "; )
    MSG_INFO1( spxout << "Constraints      :"
    << std::setw(16) << maxviol << "  "
    << std::setw(16) << sumviol << std::endl; )
 
-   qualConstraintViolation(maxviol, sumviol);
+   // get violations of original LP
+   SoPlexShell.getConstraintViolationReal(primal, maxviol, sumviol);
 
+   if( checkMode )
+      MSG_INFO1( spxout << "IEXAMP07 "; )
    MSG_INFO1( spxout << "      (unscaled) :"
    << std::setw(16) << maxviol << "  "
    << std::setw(16) << sumviol << std::endl; )
 
-   m_solver.qualBoundViolation(maxviol, sumviol);
+   SoPlexShell.getInternalBoundViolationReal(maxviol, sumviol);
 
+   if( checkMode )
+      MSG_INFO1( spxout << "IEXAMP08 "; )
    MSG_INFO1( spxout << "Bounds           :"
    << std::setw(16) << maxviol << "  "
    << std::setw(16) << sumviol << std::endl; )
 
-   qualBoundViolation(maxviol, sumviol);
+   SoPlexShell.getBoundViolationReal(primal, maxviol, sumviol);
 
+   if( checkMode )
+      MSG_INFO1( spxout << "IEXAMP09 "; )
    MSG_INFO1( spxout << "      (unscaled) :"
    << std::setw(16) << maxviol << "  "
    << std::setw(16) << sumviol << std::endl; )
 
-   if (!m_vanished)
-   {
-      m_solver.qualSlackViolation(maxviol, sumviol);
+//    if ( !m_vanished)
+//       {
+   SoPlexShell.getSlackViolationReal(maxviol, sumviol);
 
-      MSG_INFO1( spxout << "Slacks           :"
-      << std::setw(16) << maxviol << "  "
-      << std::setw(16) << sumviol << std::endl; )
+   if( checkMode )
+      MSG_INFO1( spxout << "IEXAMP10 "; )
+   MSG_INFO1( spxout << "Slacks           :"
+   << std::setw(16) << maxviol << "  "
+   << std::setw(16) << sumviol << std::endl; )
 
-      m_solver.qualRedCostViolation(maxviol, sumviol);
+   SoPlexShell.getRedCostViolationReal(maxviol, sumviol);
 
-      MSG_INFO1( spxout << "Reduced costs    :"
-      << std::setw(16) << maxviol << "  "
-      << std::setw(16) << sumviol << std::endl; )
-      #if 0
-      MSG_INFO1( spxout << "Proven dual bound:"
-      << std::setw(20)
-      << std::setprecision(20)
-      << m_solver.provedDualbound() << std::endl; )
-      #endif
-}
-}
+   if( checkMode )
+      MSG_INFO1( spxout << "IEXAMP11 "; )
+   MSG_INFO1( spxout << "Reduced costs    :"
+   << std::setw(16) << maxviol << "  "
+   << std::setw(16) << sumviol << std::endl; )
+#if 0
+   MSG_INFO1( spxout << "IEXAMP12 Proven dual bound:"
+   << std::setw(20)
+   << std::setprecision(20)
+   << m_solver.provedDualbound() << std::endl; )
 #endif
+// }
 }
 
 //------------------------------------------------------------------------

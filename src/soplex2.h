@@ -719,8 +719,20 @@ public:
    /// gets violation of bounds by given primal solution
    void getBoundViolationReal(VectorReal& primal, Real& maxviol, Real& sumviol) const;
 
+   /// gets violation of bounds by given primal solution
+   void getInternalBoundViolationReal(Real& maxviol, Real& sumviol) const;
+
    /// gets violation of constraints by given primal solution
    void getConstraintViolationReal(VectorReal& primal, Real& maxviol, Real& sumviol) const;
+
+   /// gets violation of constraints by given primal solution
+   void getInternalConstraintViolationReal(Real& maxviol, Real& sumviol) const;
+
+   /// gets violation of slacks
+   void getSlackViolationReal(Real& maxviol, Real& sumviol) const;
+
+   /// gets violation of reduced cost
+   void getRedCostViolationReal(Real& maxviol, Real& sumviol) const;
 
    //@}
 
