@@ -2897,7 +2897,7 @@ namespace soplex
          }
          else
          {
-            _solver.getDual(vector);
+            _solver.getRedCost(vector);
 
             if( _secondScaler != 0 )
                _secondScaler->unscaleRedCost(vector);
@@ -3032,32 +3032,7 @@ namespace soplex
    /// gets internal violation of constraints
    void SoPlex2::getInternalConstraintViolationReal(Real& maxviol, Real& sumviol) const
    {
-      DVectorReal activity;
-      DVectorReal primal(_solver.nCols());
-
-      activity = _solver.computePrimalActivity(primal);
-
-      maxviol = 0.0;
-      sumviol = 0.0;
-
-      for( int i = _solver.nRows() - 1; i >= 0; i-- )
-      {
-         Real viol = _solver.lhs(i) - activity[i];
-         if( viol > 0.0 )
-         {
-            sumviol += viol;
-            if( viol > maxviol )
-               maxviol = viol;
-         }
-
-         viol = activity[i] - _solver.rhs(i);
-         if( viol > 0.0 )
-         {
-            sumviol += viol;
-            if( viol > maxviol )
-               maxviol = viol;
-         }
-      }
+      _solver.qualConstraintViolation(maxviol, sumviol);
    }
 
 
