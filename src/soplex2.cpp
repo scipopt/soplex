@@ -3263,13 +3263,15 @@ namespace soplex
    {
    }
 
+   #endif
 
 
    /// statistical information in form of a string
    std::string SoPlex2::statisticString() const
    {
+      return _solver.statistics();
    }
-#endif
+
 
 
    /// name of starter

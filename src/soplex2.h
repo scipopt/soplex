@@ -793,12 +793,12 @@ public:
 
    /// number of iterations since last call to solve
    int numIterations() const;
+   #endif
 
    /// statistical information in form of a string
    std::string statisticString() const;
 
    //@}
-#endif
 
 
    /// name of starter

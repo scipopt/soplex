@@ -584,9 +584,8 @@ void printSolutionAndStatus(
    {
    case SPxSolver::OPTIMAL:
       if( checkMode )
-    MSG_INFO1( spxout << "IEXAMP29 solution value is: " << std::setprecision( precision ) << SoPlexShell.objValueReal() << std::endl; )
-      else
-         MSG_INFO1( spxout << "Solution value is: " << std::setprecision( precision ) << SoPlexShell.objValueReal() << std::endl; )
+         MSG_INFO1( spxout << "IEXAMP29 "; )
+      MSG_INFO1( spxout << "Solution value is: " << std::setprecision( precision ) << SoPlexShell.objValueReal() << std::endl; )
 
       if( print_quality )
          displayQuality( SoPlexShell, checkMode );
@@ -1103,7 +1102,10 @@ int main(int argc, char* argv[])
          }
 
          // solve the LP
+         MSG_INFO1( spxout << "Solving LP..." << std::endl; )
          SoPlexShell->solveReal();
+
+         MSG_INFO1( spxout << "\nSoPlex statistics:\n" << SoPlexShell->statisticString(); )
 
          // print solution, status, infeasibility system,...
          printSolutionAndStatus( *SoPlexShell, rownames, colnames, precision, print_quality,
