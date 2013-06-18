@@ -2813,10 +2813,18 @@ namespace soplex
 
 
 
-   /// gets the primal ray if LP is unbounded; returns true on success
+   /// is a primal unbounded ray available?
+   bool SoPlex2::hasPrimalrayReal() const
+   {
+      return statusReal() == SPxSolver::UNBOUNDED && _simplifier == 0;
+   }
+
+
+
+   /// gets the primal ray if available; returns true on success
    bool SoPlex2::getPrimalrayReal(VectorReal& vector) const
    {
-      if( statusReal() == SPxSolver::UNBOUNDED && _simplifier == 0 )
+      if( hasPrimalrayReal() )
       {
          _solver.getPrimalray(vector);
 
@@ -2914,10 +2922,18 @@ namespace soplex
 
 
 
-   /// gets the Farkas proof if LP is infeasible; returns true on success
+   /// is Farkas proof of infeasibility available?
+   bool SoPlex2::hasDualfarkasReal() const
+   {
+      return statusReal() == SPxSolver::INFEASIBLE && _simplifier == 0;
+   }
+
+
+
+   /// gets the Farkas proof if available; returns true on success
    bool SoPlex2::getDualfarkasReal(VectorReal& vector) const
    {
-      if( statusReal() == SPxSolver::INFEASIBLE && _simplifier == 0 )
+      if( hasDualfarkasReal() )
       {
          _solver.getDualfarkas(vector);
 
@@ -3045,7 +3061,7 @@ namespace soplex
 
 
 
-   /// gets violation of reduced cost
+   /// gets violation of reduced costs
    void SoPlex2::getRedCostViolationReal(Real& maxviol, Real& sumviol) const
    {
       _solver.qualRedCostViolation(maxviol, sumviol);
@@ -3148,7 +3164,7 @@ namespace soplex
 
 
 
-   /// gets current basis and returns solver status
+   /// gets current basis
    void SoPlex2::getBasisReal(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const
    {
       // if no basis is available, return slack basis

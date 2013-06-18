@@ -701,7 +701,10 @@ public:
    /// gets the vector of slack values if available; returns true on success
    bool getSlacksReal(VectorReal& vector) const;
 
-   /// gets the primal ray if LP is unbounded; returns true on success
+   /// is a primal unbounded ray available?
+   bool hasPrimalrayReal() const;
+
+   /// gets the primal ray if available; returns true on success
    bool getPrimalrayReal(VectorReal& vector) const;
 
    /// is a dual feasible solution available?
@@ -713,7 +716,10 @@ public:
    /// gets the vector of reduced cost values if available; returns true on success
    bool getRedcostReal(VectorReal& vector) const;
 
-   /// gets the Farkas proof if LP is infeasible; returns true on success
+   /// is Farkas proof of infeasibility available?
+   bool hasDualfarkasReal() const;
+
+   /// gets the Farkas proof if available; returns true on success
    bool getDualfarkasReal(VectorReal& vector) const;
 
    /// gets violation of bounds by given primal solution
@@ -731,7 +737,7 @@ public:
    /// gets violation of slacks
    void getSlackViolationReal(Real& maxviol, Real& sumviol) const;
 
-   /// gets violation of reduced cost
+   /// gets violation of reduced costs
    void getRedCostViolationReal(Real& maxviol, Real& sumviol) const;
 
    //@}
@@ -764,7 +770,7 @@ public:
    /// returns basis status for a single column
    SPxSolver::VarStatus basisColStatusReal(const SPxColId& id) const;
 
-   /// gets current basis and returns solver status
+   /// gets current basis
    void getBasisReal(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const;
 
    /// sets starting basis via arrays of statuses
