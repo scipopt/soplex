@@ -232,7 +232,7 @@ void printUsage( const char* const argv[] )
 }
 
 static
-void displayQuality( SoPlex2& SoPlexShell, bool checkMode )
+void displayQualityReal( SoPlex2& SoPlexShell, bool checkMode )
 {
 
    /// @todo needs more functionality from soplex2 regarding original/simplified LP
@@ -314,6 +314,84 @@ void displayQuality( SoPlex2& SoPlexShell, bool checkMode )
 // }
 }
 
+static
+void displayQualityRational( SoPlex2& SoPlexShell, bool checkMode )
+{
+
+   /// @todo needs more functionality from soplex2 regarding original/simplified LP
+
+   Rational maxviol;
+   Rational sumviol;
+
+   DVectorRational primal(SoPlexShell.numColsRational());
+   DVectorRational dual(SoPlexShell.numRowsRational());
+   DVectorRational redCost(SoPlexShell.numColsRational());
+   DVectorRational slack(SoPlexShell.numRowsRational());
+
+   SoPlexShell.getPrimalRational(primal);
+   SoPlexShell.getDualRational(dual);
+   SoPlexShell.getRedcostRational(redCost);
+   SoPlexShell.getSlacksRational(slack);
+
+   if ( checkMode )
+      MSG_INFO1( spxout << "IEXAMP05 "; )
+   MSG_INFO1( spxout << "Violations (max/sum)" << std::endl; )
+
+   // get constraint violations of rational LP
+   SoPlexShell.getConstraintViolationRational(primal, maxviol, sumviol);
+
+   if( checkMode )
+      MSG_INFO1( spxout << "IEXAMP06 "; )
+
+   MSG_INFO1( spxout << "Constraints      : "
+      << std::setw(16) << maxviol.toString() << "  "
+      << std::setw(16) << sumviol.toString() << std::endl );
+
+   if( checkMode )
+      MSG_INFO1( spxout << "IEXAMP07 "; )
+
+   MSG_INFO1( spxout << "      (unscaled) : "
+      << std::setw(16) << maxviol.toString() << "  "
+      << std::setw(16) << sumviol.toString() << std::endl );
+
+   // get bound violations of rational LP
+   SoPlexShell.getBoundViolationRational(primal, maxviol, sumviol);
+
+   if( checkMode )
+      MSG_INFO1( spxout << "IEXAMP08 "; )
+
+   MSG_INFO1( spxout << "Bounds           : "
+      << std::setw(16) << maxviol.toString() << "  "
+      << std::setw(16) << sumviol.toString() << std::endl );
+
+   if( checkMode )
+      MSG_INFO1( spxout << "IEXAMP09 " );
+
+   MSG_INFO1( spxout << "      (unscaled) : "
+      << std::setw(16) << maxviol.toString() << "  "
+      << std::setw(16) << sumviol.toString() << std::endl );
+
+   // get slack violations of rational LP
+   SoPlexShell.getSlackViolationRational(maxviol, sumviol);
+
+   if( checkMode )
+      MSG_INFO1( spxout << "IEXAMP10 "; )
+
+   MSG_INFO1( spxout << "Slacks           : "
+      << std::setw(16) << maxviol.toString() << "  "
+      << std::setw(16) << sumviol.toString() << std::endl );
+
+   // get reduced cost violations of rational LP
+   SoPlexShell.getRedCostViolationRational(maxviol, sumviol);
+
+   if( checkMode )
+      MSG_INFO1( spxout << "IEXAMP11 "; )
+
+   MSG_INFO1( spxout << "Reduced costs    : "
+      << std::setw(16) << maxviol.toString() << "  "
+      << std::setw(16) << sumviol.toString() << std::endl );
+}
+
 //------------------------------------------------------------------------
 static
 void displayInfeasibility(SoPlex2& SoPlexShell)
@@ -361,9 +439,9 @@ void printAlgorithmParameters(
    {
       MSG_INFO1( spxout
     << "IEXAMP12 Feastol        = "
-    << std::setw(16) << SoPlexShell.rationalParam(SoPlex2::FEASTOL) << std::endl
+    << std::setw(16) << SoPlexShell.rationalParam(SoPlex2::FEASTOL).toString() << std::endl
     << "IEXAMP52 Opttol         = "
-    << std::setw(16) << SoPlexShell.rationalParam(SoPlex2::OPTTOL) << std::endl
+    << std::setw(16) << SoPlexShell.rationalParam(SoPlex2::OPTTOL).toString() << std::endl
     << "IEXAMP53 Irthreshold    = "
     << std::setw(16) << SoPlexShell.realParam(SoPlex2::IRTHRESHOLD) << std::endl
     << "IEXAMP13 Epsilon Zero   = "
@@ -387,9 +465,9 @@ void printAlgorithmParameters(
       MSG_INFO1( spxout
     << "SoPlex parameters: " << std::endl
     << "Feastol        = "
-    << std::setw(16) << SoPlexShell.rationalParam(SoPlex2::FEASTOL) << std::endl
+    << std::setw(16) << SoPlexShell.rationalParam(SoPlex2::FEASTOL).toString() << std::endl
     << "Opttol         = "
-    << std::setw(16) << SoPlexShell.rationalParam(SoPlex2::OPTTOL) << std::endl
+    << std::setw(16) << SoPlexShell.rationalParam(SoPlex2::OPTTOL).toString() << std::endl
     << "Irthreshold    = "
     << std::setw(16) << SoPlexShell.realParam(SoPlex2::IRTHRESHOLD) << std::endl
     << "Epsilon Zero   = "
@@ -563,7 +641,7 @@ void redirectOutput(
 
 //------------------------------------------------------------------------
 static
-void printSolutionAndStatus(
+void printSolutionAndStatusReal(
    SoPlex2&             SoPlexShell,
    const NameSet&       rownames,
    const NameSet&       colnames,
@@ -585,14 +663,14 @@ void printSolutionAndStatus(
    case SPxSolver::OPTIMAL:
       if( checkMode )
          MSG_INFO1( spxout << "IEXAMP29 "; )
-      MSG_INFO1( spxout << "Solution value is: " << std::setprecision( precision ) << SoPlexShell.objValueReal() << std::endl; )
+            MSG_INFO1( spxout << "Solution value is: " << std::setprecision( precision ) << SoPlexShell.objValueReal() << std::endl << std::endl );
 
       if( print_quality )
-         displayQuality( SoPlexShell, checkMode );
+         displayQualityReal( SoPlexShell, checkMode );
 
       if( print_solution )
       {
-         DVector objx(SoPlexShell.numColsReal());
+         DVectorReal objx(SoPlexShell.numColsReal());
 
          if( SoPlexShell.getPrimalReal(objx) )
          {
@@ -606,12 +684,12 @@ void printSolutionAndStatus(
                                     << std::setprecision( precision )
                                     << objx[i] << std::endl; )
             }
-            MSG_INFO1( spxout << "All other variables are zero (within " << std::setprecision(1) << 0.001 * SoPlexShell.rationalParam(SoPlex2::FEASTOL) << ")." << std::endl; )
+            MSG_INFO1( spxout << "All other variables are zero (within " << std::setprecision(1) << 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) << ")." << std::endl; )
          }
       }
       if( print_dual )
       {
-         DVector objy( SoPlexShell.numRowsReal() );
+         DVectorReal objy( SoPlexShell.numRowsReal() );
          bool allzero = true;
 
          if( SoPlexShell.getDualReal(objy) )
@@ -631,7 +709,7 @@ void printSolutionAndStatus(
             }
 
             MSG_INFO1( spxout << "All " << (allzero ? "" : "other ") << "dual values are zero (within "
-            << std::setprecision(1) << 0.001 * SoPlexShell.rationalParam(SoPlex2::OPTTOL) << ")." << std::endl; )
+               << std::setprecision(1) << 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::OPTTOL)) << ")." << std::endl );
 
             if( !allzero )
             {
@@ -662,7 +740,7 @@ void printSolutionAndStatus(
 
       if( print_solution )
       {
-         DVector objx(SoPlexShell.numColsReal());
+         DVectorReal objx(SoPlexShell.numColsReal());
          if( SoPlexShell.getPrimalReal(objx) )
          {
             MSG_INFO1( spxout << std::endl << "Primal solution (name, id, value):" << std::endl; )
@@ -675,11 +753,11 @@ void printSolutionAndStatus(
                                     << std::setprecision( precision )
                                     << objx[i] << std::endl; )
             }
-            MSG_INFO1( spxout << "All other variables are zero (within " << std::setprecision(1) << 0.001 * SoPlexShell.rationalParam(SoPlex2::FEASTOL) << ")." << std::endl; )
+            MSG_INFO1( spxout << "All other variables are zero (within " << std::setprecision(1) << 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) << ")." << std::endl );
          }
 
-         DVector objcoef(SoPlexShell.numColsReal());
-         DVector ray(SoPlexShell.numColsReal());
+         DVectorReal objcoef(SoPlexShell.numColsReal());
+         DVectorReal ray(SoPlexShell.numColsReal());
          if( SoPlexShell.getPrimalrayReal(ray) )
          {
             Real rayobjval = 0.0;
@@ -700,7 +778,7 @@ void printSolutionAndStatus(
                                     << ray[i] << std::endl; )
                }
             }
-            MSG_INFO1( spxout << "All other variables have zero value (within " << std::setprecision(1) << 0.001 * SoPlexShell.rationalParam(SoPlex2::FEASTOL) << ")." << std::endl; )
+            MSG_INFO1( spxout << "All other variables have zero value (within " << std::setprecision(1) << 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) << ")." << std::endl );
             MSG_INFO1( spxout << "Objective change per unit along primal ray is " << rayobjval << "." << std::endl; )
          }
       }
@@ -712,11 +790,11 @@ void printSolutionAndStatus(
     MSG_INFO1( spxout << "LP is infeasible" << std::endl; )
       if ( print_solution )
       {
-         DVector farkasx(SoPlexShell.numRowsReal());
+         DVectorReal farkasx(SoPlexShell.numRowsReal());
 
          if( SoPlexShell.getDualfarkasReal(farkasx) )
          {
-            DVector proofvec(SoPlexShell.numColsReal());
+            DVectorReal proofvec(SoPlexShell.numColsReal());
             double lhs;
             double rhs;
 
@@ -732,7 +810,7 @@ void printSolutionAndStatus(
                                     << std::setw(16)
                                     << std::setprecision( precision )
                                     << farkasx[i] << "\t"; )
-                  LPRow row;
+                  LPRowReal row;
                   SoPlexShell.getRowReal(i, row);
                   if( row.lhs() > -soplex::infinity )
                   {
@@ -764,13 +842,13 @@ void printSolutionAndStatus(
                      lhs += farkasx[i] * row.rhs();
                      rhs += farkasx[i] * row.lhs();
                   }
-                  SVector vec(row.rowVector());
+                  SVectorReal vec(row.rowVector());
                   vec *= farkasx[i];
                   proofvec += vec;
                }
             }
 
-            MSG_INFO1( spxout << "All other row multipliers are zero (within " << std::setprecision(1) << 0.001 * SoPlexShell.rationalParam(SoPlex2::OPTTOL) << ")." << std::endl; )
+            MSG_INFO1( spxout << "All other row multipliers are zero (within " << std::setprecision(1) << 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::OPTTOL)) << ")." << std::endl );
             MSG_INFO1( spxout << "Farkas infeasibility proof: \t"; )
             MSG_INFO1( spxout << lhs << " <= "; )
 
@@ -798,6 +876,284 @@ void printSolutionAndStatus(
          displayInfeasibility(SoPlexShell);
       if( write_basis )  // write basis even if we are infeasible
          SoPlexShell.writeBasisFileReal(basisname, &rownames, &colnames);
+      break;
+   case SPxSolver::ABORT_CYCLING:
+      if( checkMode )
+    MSG_INFO1( spxout << "EEXAMP40 aborted due to cycling" << std::endl; )
+      else
+    MSG_INFO1( spxout << "Aborted due to cycling" << std::endl; )
+      break;
+   case SPxSolver::ABORT_TIME:
+      if( checkMode )
+    MSG_INFO1( spxout << "IEXAMP33 aborted due to time limit" << std::endl; )
+      else
+    MSG_INFO1( spxout << "Aborted due to time limit" << std::endl; )
+      break;
+   case SPxSolver::ABORT_ITER:
+      if( checkMode )
+    MSG_INFO1( spxout << "IEXAMP34 aborted due to iteration limit" << std::endl; )
+      else
+    MSG_INFO1( spxout << "Aborted due to iteration limit" << std::endl; )
+      break;
+   case SPxSolver::ABORT_VALUE:
+      if( checkMode )
+    MSG_INFO1( spxout << "IEXAMP35 aborted due to objective value limit" << std::endl; )
+      else
+    MSG_INFO1( spxout << "Aborted due to objective value limit" << std::endl; )
+      break;
+   case SPxSolver::SINGULAR:
+      if( checkMode )
+    MSG_INFO1( spxout << "EEXAMP39 basis is singular" << std::endl; )
+      else
+    MSG_INFO1( spxout << "Basis is singular" << std::endl; )
+      break;
+   default:
+      if( checkMode )
+    MSG_INFO1( spxout << "EEXAMP36 An error occurred during " << "the solution process" << std::endl; )
+      else
+    MSG_INFO1( spxout << "An error occurred during " << "the solution process" << std::endl; )
+      break;
+   }
+   MSG_INFO1( spxout << std::endl; )
+}
+
+//------------------------------------------------------------------------
+static
+void printSolutionAndStatusRational(
+   SoPlex2&             SoPlexShell,
+   const NameSet&       rownames,
+   const NameSet&       colnames,
+   const int            precision,
+   const bool           print_quality,
+   const bool           print_solution,
+   const bool           print_dual,
+   const bool           write_basis,
+   const char*          basisname,
+   bool                 checkMode)
+{
+   // get the solution status
+   SPxSolver::Status status = SoPlexShell.statusRational();
+
+   if( !checkMode )
+      MSG_INFO1( spxout << std::endl; )
+   switch (status)
+   {
+   case SPxSolver::OPTIMAL:
+      if( checkMode )
+         MSG_INFO1( spxout << "IEXAMP29 "; )
+            MSG_INFO1( spxout << "Solution value is: " << std::setprecision( precision ) << SoPlexShell.objValueRational().toString() << std::endl << std::endl );
+
+      if( print_quality )
+         displayQualityRational( SoPlexShell, checkMode );
+
+      if( print_solution )
+      {
+         DVectorRational objx(SoPlexShell.numColsRational());
+
+         if( SoPlexShell.getPrimalRational(objx) )
+         {
+            MSG_INFO1( spxout << std::endl << "Primal solution (name, id, value):" << std::endl; )
+            for( int i = 0; i < SoPlexShell.numColsRational(); ++i )
+            {
+               if( isNotZero( objx[i], 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) ) )
+                  MSG_INFO1( spxout << colnames[ SoPlexShell.colIdRational(i) ] << "\t"
+                                    << i << "\t"
+                                    << std::setw(17)
+                                    << std::setprecision( precision )
+                                    << objx[i] << std::endl; )
+            }
+            MSG_INFO1( spxout << "All other variables are zero (within " << std::setprecision(1) << 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) << ")." << std::endl; )
+         }
+      }
+      if( print_dual )
+      {
+         DVectorRational objy( SoPlexShell.numRowsRational() );
+         bool allzero = true;
+
+         if( SoPlexShell.getDualRational(objy) )
+         {
+            MSG_INFO1( spxout << std::endl << "Dual multipliers (name, id, value):" << std::endl; )
+            for( int i = 0; i < SoPlexShell.numRowsRational(); ++i )
+            {
+               if( isNotZero(objy[i] , 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::OPTTOL))) )
+               {
+                  MSG_INFO1( spxout << rownames[ SoPlexShell.rowIdRational(i) ] << "\t"
+                                    << i << "\t"
+                                    << std::setw(17)
+                                    << std::setprecision( precision )
+                                    << objy[i] << std::endl; )
+                  allzero = false;
+               }
+            }
+
+            MSG_INFO1( spxout << "All " << (allzero ? "" : "other ") << "dual values are zero (within "
+               << std::setprecision(1) << 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::OPTTOL)) << ")." << std::endl );
+
+            if( !allzero )
+            {
+               if( SoPlexShell.intParam(SoPlex2::OBJSENSE) == SoPlex2::OBJSENSE_MINIMIZE )
+               {
+                  MSG_INFO1( spxout << "Minimizing: a positive/negative value corresponds to left-hand (>=) resp. right-hand (<=) side."
+                                    << std::endl; )
+               }
+               else
+               {
+                  MSG_INFO1( spxout << "Maximizing: a positive/negative value corresponds to right-hand (<=) resp. left-hand (>=) side."
+                                    << std::endl; )
+               }
+            }
+         }
+      }
+      if( write_basis )
+      {
+         MSG_INFO1( spxout << "Writing basis of original problem to file " << basisname << std::endl; )
+         SoPlexShell.writeBasisFileRational( basisname, &rownames, &colnames );
+      }
+      break;
+   case SPxSolver::UNBOUNDED:
+      if( checkMode )
+    MSG_INFO1( spxout << "IEXAMP31 LP is unbounded" << std::endl; )
+      else
+    MSG_INFO1( spxout << "LP is unbounded" << std::endl; )
+
+      if( print_solution )
+      {
+         DVectorRational objx(SoPlexShell.numColsRational());
+         if( SoPlexShell.getPrimalRational(objx) )
+         {
+            MSG_INFO1( spxout << std::endl << "Primal solution (name, id, value):" << std::endl; )
+            for( int i = 0; i < SoPlexShell.numColsRational(); ++i )
+            {
+               if( isNotZero( objx[i], 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) ) )
+                  MSG_INFO1( spxout << colnames[ SoPlexShell.colIdRational(i) ] << "\t"
+                                    << i << "\t"
+                                    << std::setw(17)
+                                    << std::setprecision( precision )
+                                    << objx[i] << std::endl; )
+            }
+            MSG_INFO1( spxout << "All other variables are zero (within " << std::setprecision(1) << 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) << ")." << std::endl );
+         }
+
+         DVectorRational objcoef(SoPlexShell.numColsRational());
+         DVectorRational ray(SoPlexShell.numColsRational());
+         if( SoPlexShell.getPrimalrayRational(ray) )
+         {
+            Rational rayobjval = 0.0;
+
+            SoPlexShell.getObjRational(objcoef);
+
+            MSG_INFO1( spxout << std::endl << "Primal ray (name, id, value):" << std::endl; )
+            for( int i = 0; i < SoPlexShell.numColsRational(); ++i )
+            {
+               if ( isNotZero( ray[i], 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) ) )
+               {
+                  rayobjval += ray[i] * objcoef[i];
+
+                  MSG_INFO1( spxout << colnames[ SoPlexShell.colIdRational(i) ] << "\t"
+                                    << i << "\t"
+                                    << std::setw(17)
+                                    << std::setprecision( precision )
+                                    << ray[i] << std::endl; )
+               }
+            }
+            MSG_INFO1( spxout << "All other variables have zero value (within " << std::setprecision(1) << 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) << ")." << std::endl );
+            MSG_INFO1( spxout << "Objective change per unit along primal ray is " << rayobjval << "." << std::endl; )
+         }
+      }
+      break;
+   case SPxSolver::INFEASIBLE:
+      if ( checkMode )
+    MSG_INFO1( spxout << "IEXAMP32 LP is infeasible" << std::endl; )
+      else
+    MSG_INFO1( spxout << "LP is infeasible" << std::endl; )
+      if ( print_solution )
+      {
+         DVectorRational farkasx(SoPlexShell.numRowsRational());
+
+         if( SoPlexShell.getDualfarkasRational(farkasx) )
+         {
+            DVectorRational proofvec(SoPlexShell.numColsRational());
+            double lhs;
+            double rhs;
+
+            lhs = 0.0;
+            rhs = 0.0;
+            proofvec.clear();
+            for( int i = 0; i < SoPlexShell.numRowsRational(); ++i )
+            {
+               if ( isNotZero( farkasx[i], 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::OPTTOL)) ) )
+               {
+                  MSG_INFO1( spxout << rownames[ SoPlexShell.rowIdRational(i) ] << "\t"
+                                    << i << "\t"
+                                    << std::setw(16)
+                                    << std::setprecision( precision )
+                                    << farkasx[i] << "\t"; )
+                  LPRowRational row;
+                  SoPlexShell.getRowRational(i, row);
+                  if( row.lhs() > -soplex::infinity )
+                  {
+                     MSG_INFO1( spxout << row.lhs() << " <= "; );
+                  }
+                  for( int j = 0; j < row.rowVector().size(); ++j )
+                  {
+                     if( row.rowVector().value(j) > 0 )
+                     {
+                        MSG_INFO1( spxout << "+"; )
+                     }
+                     MSG_INFO1( spxout
+                        << row.rowVector().value(j) << " "
+                        << colnames[ SoPlexShell.colIdRational(row.rowVector().index(j)) ]
+                        << " "; );
+                  }
+                  if( row.rhs() < soplex::infinity )
+                  {
+                     MSG_INFO1( spxout << "<= " << row.rhs(); );
+                  }
+                  MSG_INFO1( spxout << std::endl; )
+                  if( farkasx[i] > 0.0 )
+                  {
+                     lhs += farkasx[i] * row.lhs();
+                     rhs += farkasx[i] * row.rhs();
+                  }
+                  else
+                  {
+                     lhs += farkasx[i] * row.rhs();
+                     rhs += farkasx[i] * row.lhs();
+                  }
+                  SVectorRational vec(row.rowVector());
+                  vec *= farkasx[i];
+                  proofvec += vec;
+               }
+            }
+
+            MSG_INFO1( spxout << "All other row multipliers are zero (within " << std::setprecision(1) << 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::OPTTOL)) << ")." << std::endl );
+            MSG_INFO1( spxout << "Farkas infeasibility proof: \t"; )
+            MSG_INFO1( spxout << lhs << " <= "; )
+
+            bool nonzerofound = false;
+            for( int i = 0; i < SoPlexShell.numColsRational(); ++i )
+            {
+               if ( isNotZero( proofvec[i], 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::OPTTOL)) ) )
+               {
+                  if( proofvec[i] > 0 )
+                  {
+                     MSG_INFO1( spxout << "+"; )
+                  }
+                  MSG_INFO1( spxout << proofvec[i] << " " << colnames[ SoPlexShell.colIdRational(i) ] << " "; )
+                  nonzerofound = true;
+               }
+            }
+            if( !nonzerofound )
+            {
+               MSG_INFO1( spxout << "0 "; );
+            }
+            MSG_INFO1( spxout << "<= " << rhs << std::endl; );
+         }
+      }
+      if( print_quality )
+         displayInfeasibility(SoPlexShell);
+      if( write_basis )  // write basis even if we are infeasible
+         SoPlexShell.writeBasisFileRational(basisname, &rownames, &colnames);
       break;
    case SPxSolver::ABORT_CYCLING:
       if( checkMode )
@@ -1037,80 +1393,97 @@ int main(int argc, char* argv[])
 
    try
    {
-      if( exact )
+      const bool rational = exact;
+      bool success = false;
+
+      // start timer
+      Timer timer;
+      timer.start();
+
+      // read the LP from an input file (.lp or .mps)
+      if ( checkMode )
+         MSG_INFO1( spxout << "IEXAMP22 " );
+
+      MSG_INFO1( spxout << "Loading LP file " << filename << std::endl );
+
+      success = rational
+         ? SoPlexShell->readFileRational( filename, &rownames, &colnames )
+         : SoPlexShell->readFileReal( filename, &rownames, &colnames );
+
+      if( !success )
       {
-         // read the LP from an input file (.lp or .mps)
-         SoPlexShell->readFileRational( filename, &rownames, &colnames );
+         if ( checkMode )
+            MSG_INFO1( spxout << "EEXAMP23 " );
 
-         // read a basis file if specified
-         if (read_basis)
-            SoPlexShell->readBasisFileRational( filename, &rownames, &colnames );
+         MSG_INFO1( spxout << "error while reading file \""  << filename << "\"" << std::endl );
+         exit(1);
+      }
 
-         // solve the LP
-         SoPlexShell->solveRational();
+      // stop timer
+      timer.stop();
 
-         // print solution, status, infeasibility system,...
-         printSolutionAndStatus( *SoPlexShell, rownames, colnames, precision, print_quality,
-                                 print_solution, print_dual, write_basis, basisname, checkMode );
+      if ( checkMode )
+         MSG_INFO1( spxout << "IEXAMP24 " );
+
+      if( rational )
+      {
+         MSG_INFO1( spxout << "LP has "
+            << SoPlexShell->numRowsRational() << " rows "
+            << SoPlexShell->numColsRational() << " columns "
+            << SoPlexShell->numNonzerosRational() << " nonzeros"
+            << std::endl );
       }
       else
       {
-         if ( checkMode )
-            MSG_INFO1( spxout << "IEXAMP22 "; )
-         MSG_INFO1( spxout << "Loading LP file " << filename << std::endl; )
-
-         // set up timer
-         Timer timer;
-         timer.start();
-         // read the LP from an input file (.lp or .mps)
-         if( !SoPlexShell->readFileReal( filename, &rownames, &colnames ) )
-         {
-            if ( checkMode )
-               MSG_INFO1( spxout << "EEXAMP23 "; )
-            MSG_INFO1( spxout << "error while reading file \""  << filename << "\"" << std::endl; )
-            exit(1);
-         }
-         timer.stop();
-
-         if ( checkMode )
-            MSG_INFO1( spxout << "IEXAMP24 "; )
-
          MSG_INFO1( spxout << "LP has "
             << SoPlexShell->numRowsReal() << " rows "
             << SoPlexShell->numColsReal() << " columns "
             << SoPlexShell->numNonzerosReal() << " nonzeros"
-            << std::endl; )
+            << std::endl );
+      }
 
-         if( checkMode )
-            MSG_INFO1( spxout << "IEXAMP41 "; )
+      if( checkMode )
+         MSG_INFO1( spxout << "IEXAMP41 " );
 
-         MSG_INFO1( std::streamsize prec = spxout.precision();
-            spxout << "LP reading time: "
-            << std::fixed << std::setprecision(2) << timer.userTime()
-            << std::scientific << std::setprecision(int(prec)) << std::endl << std::endl; )
+      MSG_INFO1( std::streamsize prec = spxout.precision();
+         spxout << "LP reading time: "
+         << std::fixed << std::setprecision(2) << timer.userTime()
+         << std::scientific << std::setprecision(int(prec)) << std::endl << std::endl );
 
-         // read a basis file if specified
-         if (read_basis)
+      // read a basis file if specified
+      if (read_basis)
+      {
+         success = rational
+            ? SoPlexShell->readBasisFileRational( filename, &rownames, &colnames )
+            : SoPlexShell->readBasisFileReal( filename, &rownames, &colnames );
+
+         if( !success )
          {
-            if( !SoPlexShell->readBasisFileReal( filename, &rownames, &colnames ) )
-            {
-               if ( checkMode )
-                  MSG_INFO1( spxout << "EEXAMP25 "; )
-               MSG_INFO1( spxout << "error while reading file \""  << filename << "\"" << std::endl; )
-               exit(1);
-            }
-         }
+            if ( checkMode )
+               MSG_INFO1( spxout << "EEXAMP25 " );
 
-         // solve the LP
-         MSG_INFO1( spxout << "Solving LP..." << std::endl; )
+            MSG_INFO1( spxout << "error while reading file \""  << filename << "\"" << std::endl );
+            exit(1);
+         }
+      }
+
+      // solve the LP
+      MSG_INFO1( spxout << "Solving LP..." << std::endl );
+
+      if( rational )
+         SoPlexShell->solveRational();
+      else
          SoPlexShell->solveReal();
 
-         MSG_INFO1( spxout << "\nSoPlex statistics:\n" << SoPlexShell->statisticString(); )
+      MSG_INFO1( spxout << "\nSoPlex statistics:\n" << SoPlexShell->statisticString() << std::endl );
 
-         // print solution, status, infeasibility system,...
-         printSolutionAndStatus( *SoPlexShell, rownames, colnames, precision, print_quality,
-                                 print_solution, print_dual, write_basis, basisname, checkMode );
-      }
+      // print solution, status, infeasibility system,...
+      if( rational )
+         printSolutionAndStatusRational(*SoPlexShell, rownames, colnames, precision, print_quality,
+            print_solution, print_dual, write_basis, basisname, checkMode);
+      else
+         printSolutionAndStatusReal(*SoPlexShell, rownames, colnames, precision, print_quality,
+            print_solution, print_dual, write_basis, basisname, checkMode);
 
       // clean up
       delete [] basisname;
