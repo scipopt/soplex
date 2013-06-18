@@ -63,9 +63,42 @@ public:
    {
    }
 
+   Rational(const int& i)
+      : mpq_class(i)
+   {
+   }
+
    operator Real() const
    {
       return this->get_d();
+   }
+
+   Rational operator+(const Rational& r) const
+   {
+      Rational retval = *this;
+      retval += r;
+      return retval;
+   }
+
+   Rational operator-(const Rational& r) const
+   {
+      Rational retval = *this;
+      retval -= r;
+      return retval;
+   }
+
+   Rational operator*(const Rational& r) const
+   {
+      Rational retval = *this;
+      retval *= r;
+      return retval;
+   }
+
+   Rational operator/(const Rational& r) const
+   {
+      Rational retval = *this;
+      retval /= r;
+      return retval;
    }
 
    /// return as string
@@ -93,9 +126,6 @@ std::ostream& operator<<(std::ostream& os, const Rational& q);
 
 /// Negation.
 Rational operator-(const Rational& q);
-
-/// Division.
-Rational operator/(const Rational& p, const Rational& q);
 
 #else
 
