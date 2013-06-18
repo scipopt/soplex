@@ -55,7 +55,6 @@
 
 #include "sol.h"
 
-///@todo draw flow chart of main solving loop and performInfeasibilityIR() (Dan)
 ///@todo record and return "best" solutions found during IR (Ambros)
 ///@todo implement main IR loop for primal and dual feasible case with fail otherwise (Ambros)
 ///@todo implement statistical info (time, factor time, iters, ...) since last call to solveReal() or solveRational() (Ambros?)
