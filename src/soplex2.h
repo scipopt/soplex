@@ -55,11 +55,8 @@
 
 #include "sol.h"
 
-///@todo maximum line length in LP and MPS reader/writer should be 6553? (Dan)
-///@todo implement interface to rational LP, including rational basis (Ambros)
-
 ///@todo draw flow chart of main solving loop and performInfeasibilityIR() (Dan)
-///@todo solution structure (primal, dual, basis, maxviolation) and record and return "best" solutions found during IR (Ambros)
+///@todo record and return "best" solutions found during IR (Ambros)
 ///@todo implement main IR loop for primal and dual feasible case with fail otherwise (Ambros)
 ///@todo implement statistical info (time, factor time, iters, ...) since last call to solveReal() or solveRational() (Ambros?)
 ///@todo implement performInfeasibilityIR (Ambros?)
