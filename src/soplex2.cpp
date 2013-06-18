@@ -3074,13 +3074,257 @@ namespace soplex
    {
       assert(_isConsistent());
 
+      // round rational LP to floating-point precision
       *_realLP = *_rationalLP;
       if( _isRealLPLoaded )
          _solver.loadLP((SPxLPReal)(*_rationalLP));
       else
-      *_realLP = *_rationalLP;
+         *_realLP = *_rationalLP;
 
-      return solveReal();
+      // load basis if available
+      if( _hasBasisRational )
+      {
+         assert(_basisStatusRowsRational.size() == numRowsReal());
+         assert(_basisStatusColsRational.size() == numColsReal());
+         _solver.setBasis(_basisStatusRowsRational.get_ptr(), _basisStatusColsRational.get_ptr());
+      }
+
+      // solve floating-point LP
+      _statusRational = solveReal();
+
+      // store floating-point solution as rational solution
+      DVectorReal buffer;
+      _solRational._invalidate();
+
+      if( hasPrimalReal() )
+      {
+         _solRational._hasPrimal = true;
+
+         buffer.reDim(numColsReal());
+         getPrimalReal(buffer);
+         _solRational._primal = buffer;
+
+         buffer.reDim(numRowsReal());
+         getSlacksReal(buffer);
+         _solRational._slacks = buffer;
+      }
+
+      if( hasPrimalrayReal() )
+      {
+         _solRational._hasPrimalray = true;
+
+         buffer.reDim(numColsReal());
+         getPrimalrayReal(buffer);
+         _solRational._primalray = buffer;
+      }
+
+      if( hasDualReal() )
+      {
+         _solRational._hasDual = true;
+
+         buffer.reDim(numRowsReal());
+         getDualReal(buffer);
+         _solRational._dual = buffer;
+
+         buffer.reDim(numColsReal());
+         getRedcostReal(buffer);
+         _solRational._redcost = buffer;
+      }
+
+      if( hasDualfarkasReal() )
+      {
+         _solRational._hasDualfarkas = true;
+
+         buffer.reDim(numRowsReal());
+         getDualfarkasReal(buffer);
+         _solRational._dualfarkas = buffer;
+      }
+
+      if( hasBasisReal() )
+      {
+         _hasBasisRational = true;
+
+         _basisStatusRowsRational.reSize(numRowsReal());
+         _basisStatusColsRational.reSize(numColsReal());
+         getBasisReal(_basisStatusRowsRational.get_ptr(), _basisStatusColsRational.get_ptr());
+      }
+      else
+         _hasBasisRational = false;
+
+      return _statusRational;
+   }
+
+
+
+   /// returns the current status
+   SPxSolver::Status SoPlex2::statusRational() const
+   {
+      return _statusRational;
+   }
+
+
+
+   /// returns the objective value if a primal solution is available
+   Rational SoPlex2::objValueRational() const
+   {
+      assert(OBJSENSE_MAXIMIZE == 1);
+      assert(OBJSENSE_MINIMIZE == -1);
+
+      if( hasPrimalRational() )
+      {
+         ///@todo remember if computed once
+         DVectorRational primal(numColsRational());
+         getPrimalRational(primal);
+         return (primal * maxObjRational()) * (Rational)intParam(SoPlex2::OBJSENSE);
+      }
+      else
+         return -realParam(SoPlex2::INFTY) * intParam(SoPlex2::OBJSENSE);
+   }
+
+
+
+   /// is a primal feasible solution available?
+   bool SoPlex2::hasPrimalRational() const
+   {
+      return _solRational.hasPrimal();
+   }
+
+
+
+   /// gets the primal solution vector if available; returns true on success
+   bool SoPlex2::getPrimalRational(VectorRational& vector) const
+   {
+      return _solRational.getPrimal(vector);
+   }
+
+
+
+   /// gets the vector of slack values if available; returns true on success
+   bool SoPlex2::getSlacksRational(VectorRational& vector) const
+   {
+      return _solRational.getSlacks(vector);
+   }
+
+
+
+   /// gets the primal ray if LP is unbounded; returns true on success
+   bool SoPlex2::getPrimalrayRational(VectorRational& vector) const
+   {
+      return _solRational.getPrimalray(vector);
+   }
+
+
+
+   /// is a dual feasible solution available?
+   bool SoPlex2::hasDualRational() const
+   {
+      return _solRational.hasDual();
+   }
+
+
+
+   /// gets the dual solution vector if available; returns true on success
+   bool SoPlex2::getDualRational(VectorRational& vector) const
+   {
+      return _solRational.getDual(vector);
+   }
+
+
+
+   /// gets the vector of reduced cost values if available; returns true on success
+   bool SoPlex2::getRedcostRational(VectorRational& vector) const
+   {
+      return _solRational.getRedcost(vector);
+   }
+
+
+
+   /// gets the Farkas proof if LP is infeasible; returns true on success
+   bool SoPlex2::getDualfarkasRational(VectorRational& vector) const
+   {
+      return _solRational.getDualfarkas(vector);
+   }
+
+
+
+   /// gets violation of bounds by given primal solution
+   void SoPlex2::getBoundViolationRational(VectorRational& primal, Rational& maxviol, Rational& sumviol) const
+   {
+      assert(primal.dim() >= numColsRational());
+
+      maxviol = 0;
+      sumviol = 0;
+
+      for( int i = numColsRational() - 1; i >= 0; i-- )
+      {
+         Rational viol = lowerRational(i) - primal[i];
+         if( viol > 0 )
+         {
+            sumviol += viol;
+            if( viol > maxviol )
+               maxviol = viol;
+         }
+
+         viol = primal[i] - upperRational(i);
+         if( viol > 0 )
+         {
+            sumviol += viol;
+            if( viol > maxviol )
+               maxviol = viol;
+         }
+      }
+   }
+
+
+
+   /// gets violation of constraints
+   void SoPlex2::getConstraintViolationRational(VectorRational& primal, Rational& maxviol, Rational& sumviol) const
+   {
+      assert(primal.dim() >= numColsRational());
+
+      DVectorRational activity = _rationalLP->computePrimalActivity(primal);
+
+      maxviol = 0;
+      sumviol = 0;
+
+      for( int i = numRowsRational() - 1; i >= 0; i-- )
+      {
+         Rational viol = lhsRational(i) - activity[i];
+         if( viol > 0 )
+         {
+            sumviol += viol;
+            if( viol > maxviol )
+               maxviol = viol;
+         }
+
+         viol = activity[i] - rhsRational(i);
+         if( viol > 0 )
+         {
+            sumviol += viol;
+            if( viol > maxviol )
+               maxviol = viol;
+         }
+      }
+   }
+
+
+
+   /// gets violation of slacks
+   void SoPlex2::getSlackViolationRational(Rational& maxviol, Rational& sumviol) const
+   {
+      ///@todo implement
+      maxviol = 0;
+      sumviol = 0;
+   }
+
+
+
+   /// gets violation of reduced costs
+   void SoPlex2::getRedCostViolationRational(Rational& maxviol, Rational& sumviol) const
+   {
+      ///@todo implement
+      maxviol = 0;
+      sumviol = 0;
    }
 
 
@@ -3242,6 +3486,132 @@ namespace soplex
          _solver.reLoad();
 
       _hasBasisReal = false;
+   }
+
+
+
+   /// is an advanced starting basis available?
+   bool SoPlex2::hasBasisRational() const
+   {
+      return _hasBasisRational;
+   }
+
+
+
+   /// returns basis status for a single row
+   SPxSolver::VarStatus SoPlex2::basisRowStatusRational(int row) const
+   {
+      assert(row >= 0);
+      assert(row < numRowsRational());
+
+      // if no basis is available, return slack basis
+      if( !_hasBasisRational )
+         return SPxSolver::BASIC;
+      else
+      {
+         assert(row < _basisStatusRowsRational.size());
+         return _basisStatusRowsRational[row];
+      }
+   }
+
+
+
+   /// returns basis status for a single row
+   SPxSolver::VarStatus SoPlex2::basisRowStatusRational(const SPxRowId& id) const
+   {
+      return basisRowStatusRational(idxRational(id));
+   }
+
+
+
+   /// returns basis status for a single column
+   SPxSolver::VarStatus SoPlex2::basisColStatusRational(int col) const
+   {
+      assert(col >= 0);
+      assert(col < numColsRational());
+
+      // if no basis is available, return slack basis
+      if( !_hasBasisRational )
+      {
+         if( lowerRational(col) > -realParam(SoPlex2::INFTY) )
+            return SPxSolver::ON_LOWER;
+         else if( upperRational(col) < realParam(SoPlex2::INFTY) )
+            return SPxSolver::ON_UPPER;
+         else
+            return SPxSolver::ZERO;
+      }
+      else
+      {
+         assert(col < _basisStatusColsRational.size());
+         return _basisStatusColsRational[col];
+      }
+   }
+
+
+
+   /// returns basis status for a single column
+   SPxSolver::VarStatus SoPlex2::basisColStatusRational(const SPxColId& id) const
+   {
+      return basisColStatusRational(idxRational(id));
+   }
+
+
+
+   /// gets current basis
+   void SoPlex2::getBasisRational(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const
+   {
+      // if no basis is available, return slack basis
+      if( !_hasBasisRational )
+      {
+         for( int i = numRowsRational() - 1; i >= 0; i-- )
+            rows[i] = SPxSolver::BASIC;
+
+         for( int i = numColsRational() - 1; i >= 0; i-- )
+         {
+            if( lowerRational(i) > -realParam(SoPlex2::INFTY) )
+               cols[i] = SPxSolver::ON_LOWER;
+            else if( upperRational(i) < realParam(SoPlex2::INFTY) )
+               cols[i] = SPxSolver::ON_UPPER;
+            else
+               cols[i] = SPxSolver::ZERO;
+         }
+      }
+      else
+      {
+         assert(numRowsRational() == _basisStatusRowsRational.size());
+         assert(numColsRational() == _basisStatusColsRational.size());
+
+         for( int i = numRowsRational() - 1; i >= 0; i-- )
+            rows[i] = _basisStatusRowsRational[i];
+
+         for( int i = numColsRational() - 1; i >= 0; i-- )
+            cols[i] = _basisStatusColsRational[i];
+      }
+   }
+
+
+
+   /// sets starting basis via arrays of statuses
+   void SoPlex2::setBasisRational(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[])
+   {
+      _basisStatusRowsRational.reSize(numRowsRational());
+      _basisStatusColsRational.reSize(numColsRational());
+
+      for( int i = numRowsRational() - 1; i >= 0; i-- )
+         _basisStatusRowsRational[i] = rows[i];
+
+      for( int i = numColsRational() - 1; i >= 0; i-- )
+         _basisStatusColsRational[i] = cols[i];
+
+      _hasBasisRational = true;
+   }
+
+
+
+   /// clears starting basis
+   void SoPlex2::clearBasisRational()
+   {
+      _hasBasisRational = false;
    }
 
 

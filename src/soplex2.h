@@ -22,7 +22,7 @@
 #include <string>
 
 ///@todo SoPlex2 should also have an spxout object to avoid using a global one
-#include "rational.h"
+#include "spxdefines.h"
 #include "spxsolver.h"
 #include "slufactor.h"
 
@@ -53,6 +53,7 @@
 #include "spxfastrt.h"
 #include "spxboundflippingrt.h"
 
+#include "sol.h"
 
 ///@todo maximum line length in LP and MPS reader/writer should be 6553? (Dan)
 ///@todo implement interface to rational LP, including rational basis (Ambros)
@@ -71,7 +72,6 @@
 ///@todo integrate rational SPxSolver and distinguish between original and transformed rational LP
 ///@todo rational scalers
 ///@todo rational simplifier
-
 
 namespace soplex
 {
@@ -749,6 +749,48 @@ public:
    /// solves rational LP
    SPxSolver::Status solveRational();
 
+   /// returns the current status
+   SPxSolver::Status statusRational() const;
+
+   /// returns the objective value if a primal solution is available
+   Rational objValueRational() const;
+
+   /// is a primal feasible solution available?
+   bool hasPrimalRational() const;
+
+   /// gets the primal solution vector if available; returns true on success
+   bool getPrimalRational(VectorRational& vector) const;
+
+   /// gets the vector of slack values if available; returns true on success
+   bool getSlacksRational(VectorRational& vector) const;
+
+   /// gets the primal ray if LP is unbounded; returns true on success
+   bool getPrimalrayRational(VectorRational& vector) const;
+
+   /// is a dual feasible solution available?
+   bool hasDualRational() const;
+
+   /// gets the dual solution vector if available; returns true on success
+   bool getDualRational(VectorRational& vector) const;
+
+   /// gets the vector of reduced cost values if available; returns true on success
+   bool getRedcostRational(VectorRational& vector) const;
+
+   /// gets the Farkas proof if LP is infeasible; returns true on success
+   bool getDualfarkasRational(VectorRational& vector) const;
+
+   /// gets violation of bounds by given primal solution
+   void getBoundViolationRational(VectorRational& primal, Rational& maxviol, Rational& sumviol) const;
+
+   /// gets violation of constraints by given primal solution
+   void getConstraintViolationRational(VectorRational& primal, Rational& maxviol, Rational& sumviol) const;
+
+   /// gets violation of slacks
+   void getSlackViolationRational(Rational& maxviol, Rational& sumviol) const;
+
+   /// gets violation of reduced costs
+   void getRedCostViolationRational(Rational& maxviol, Rational& sumviol) const;
+
    //@}
 
 
@@ -781,10 +823,41 @@ public:
 
    //@}
 
-#if 0
+
+   //**@name Basis information for the rational LP */
+   //@{
+
+   /// is an advanced starting basis available?
+   bool hasBasisRational() const;
+
+   /// returns basis status for a single row
+   SPxSolver::VarStatus basisRowStatusRational(int row) const;
+
+   /// returns basis status for a single row
+   SPxSolver::VarStatus basisRowStatusRational(const SPxRowId& id) const;
+
+   /// returns basis status for a single column
+   SPxSolver::VarStatus basisColStatusRational(int col) const;
+
+   /// returns basis status for a single column
+   SPxSolver::VarStatus basisColStatusRational(const SPxColId& id) const;
+
+   /// gets current basis
+   void getBasisRational(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const;
+
+   /// sets starting basis via arrays of statuses
+   void setBasisRational(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]);
+
+   /// clears starting basis
+   void clearBasisRational();
+
+   //@}
+
+
    //**@name Statistical information */
    //@{
 
+#if 0
    /// time spent in factorizations
    Real factorTime() const;
 
@@ -799,13 +872,10 @@ public:
 
    /// number of iterations since last call to solve
    int numIterations() const;
-   #endif
+#endif
 
    /// statistical information in form of a string
    std::string statisticString() const;
-
-   //@}
-
 
    /// name of starter
    const char* getStarterName();
@@ -824,6 +894,9 @@ public:
 
    /// name of currently loaded ratiotester
    const char* getRatiotesterName();
+
+   //@}
+
 
    //**@name I/O for the real LP */
    //@{
@@ -1173,7 +1246,17 @@ public:
 
 
 private:
+
+   //**@name Parameter settings */
+   //@{
+
    Settings* _currentSettings;
+
+   //@}
+
+
+   //**@name Data for the real LP */
+   //@{
 
    SPxSolver _solver;
    SLUFactor _slufactor;
@@ -1196,22 +1279,40 @@ private:
    SPxFastRT _ratiotesterFast;
    SPxBoundFlippingRT _ratiotesterBoundFlipping;
 
-   DataArray< SPxSolver::VarStatus > _basisStatusRowsReal;
-   DataArray< SPxSolver::VarStatus > _basisStatusColsReal;
-   DataArray< SPxSolver::VarStatus > _basisStatusRowsRational;
-   DataArray< SPxSolver::VarStatus > _basisStatusColsRational;
-
+   SPxLPReal* _realLP;
    SPxSimplifier* _simplifier;
    SPxScaler* _firstScaler;
    SPxScaler* _secondScaler;
    SPxStarter* _starter;
 
-   SPxLPReal* _realLP;
-   SPxLPRational* _rationalLP;
+   DataArray< SPxSolver::VarStatus > _basisStatusRowsReal;
+   DataArray< SPxSolver::VarStatus > _basisStatusColsReal;
 
    bool _isRealLPLoaded;
    bool _hasBasisReal;
+
+   //@}
+
+
+   //**@name Data for the rational LP */
+   //@{
+
+   SPxLPRational* _rationalLP;
+   SPxSolver::Status _statusRational;
+   SolRational _solRational;
+
+   ///@todo this is still a bit of a hack: the _solRational stores only the numerical solution values, while the basis
+   ///      is stored in the arrays _basisStatusRowsRational and _basisStatusColsRational
+   DataArray< SPxSolver::VarStatus > _basisStatusRowsRational;
+   DataArray< SPxSolver::VarStatus > _basisStatusColsRational;
+
    bool _hasBasisRational;
+
+   //@}
+
+
+   //**@name Helper methods */
+   //@{
 
    /// checks consistency
    bool _isConsistent() const;
@@ -1224,6 +1325,8 @@ private:
 
    /// creates a permutation for removing rows/columns from a range of indices
    void _rangeToPerm(int start, int end, int* perm, int permSize) const;
+
+   //@}
 };
 } // namespace soplex
 #endif // _SOPLEX2_H_
