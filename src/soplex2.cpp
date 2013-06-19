@@ -233,7 +233,13 @@ namespace soplex
       , _firstScaler(0)
       , _secondScaler(0)
       , _starter(0)
+      , _statusReal(SPxSolver::UNKNOWN)
       , _hasBasisReal(false)
+      , _hasPrimalReal(false)
+      , _hasPrimalrayReal(false)
+      , _hasDualReal(false)
+      , _hasDualfarkasReal(false)
+      , _statusRational(SPxSolver::UNKNOWN)
       , _hasBasisRational(false)
    {
       // give lu factorization to solver
@@ -1086,7 +1092,7 @@ namespace soplex
    void SoPlex2::addRowReal(const LPRowReal& lprow)
    {
       SPxRowId id;
-      addRowReal(id, lprow);
+      SoPlex2::addRowReal(id, lprow);
    }
 
 
@@ -1099,6 +1105,8 @@ namespace soplex
 
       if( _hasBasisReal && !_isRealLPLoaded )
          _basisStatusRowsReal.append(SPxSolver::BASIC);
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1111,6 +1119,8 @@ namespace soplex
 
       if( _hasBasisReal && !_isRealLPLoaded )
          _basisStatusRowsReal.append(lprowset.num(), SPxSolver::BASIC);
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1123,6 +1133,8 @@ namespace soplex
 
       if( _hasBasisReal && !_isRealLPLoaded )
          _basisStatusRowsReal.append(lprowset.num(), SPxSolver::BASIC);
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1131,7 +1143,7 @@ namespace soplex
    void SoPlex2::addColReal(const LPColReal& lpcol)
    {
       SPxColId id;
-      addColReal(id, lpcol);
+      SoPlex2::addColReal(id, lpcol);
    }
 
 
@@ -1151,6 +1163,8 @@ namespace soplex
          else
             _basisStatusColsReal.append(SPxSolver::ZERO);
       }
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1173,6 +1187,8 @@ namespace soplex
                _basisStatusColsReal.append(SPxSolver::ZERO);
          }
       }
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1195,6 +1211,8 @@ namespace soplex
                _basisStatusColsReal.append(SPxSolver::ZERO);
          }
       }
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1214,6 +1232,8 @@ namespace soplex
          else if( _basisStatusRowsReal[i] == SPxSolver::ON_UPPER && lprow.rhs() >= realParam(SoPlex2::INFTY) )
             _basisStatusRowsReal[i] = (lprow.lhs() > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
       }
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1221,7 +1241,7 @@ namespace soplex
    /// replaces row with identifier \p id with \p lprow
    void SoPlex2::changeRowReal(SPxRowId id, const LPRowReal& lprow)
    {
-      changeRowReal(idxReal(id), lprow);
+      SoPlex2::changeRowReal(idxReal(id), lprow);
    }
 
 
@@ -1240,6 +1260,8 @@ namespace soplex
                _basisStatusRowsReal[i] = (rhsReal(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
          }
       }
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1252,6 +1274,8 @@ namespace soplex
 
       if( _hasBasisReal && !_isRealLPLoaded && _basisStatusRowsReal[i] == SPxSolver::ON_LOWER && lhs <= -realParam(SoPlex2::INFTY) )
          _basisStatusRowsReal[i] = (rhsReal(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1259,7 +1283,7 @@ namespace soplex
    /// changes left-hand side of row with identifier \p id to \p lhs
    void SoPlex2::changeLhsReal(SPxRowId id, Real lhs)
    {
-      changeLhsReal(idxReal(id), lhs);
+      SoPlex2::changeLhsReal(idxReal(id), lhs);
    }
 
 
@@ -1278,6 +1302,8 @@ namespace soplex
                _basisStatusRowsReal[i] = (lhsReal(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
          }
       }
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1290,6 +1316,8 @@ namespace soplex
 
       if( _hasBasisReal && !_isRealLPLoaded && _basisStatusRowsReal[i] == SPxSolver::ON_UPPER && rhs >= realParam(SoPlex2::INFTY) )
          _basisStatusRowsReal[i] = (lhsReal(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1297,7 +1325,7 @@ namespace soplex
    /// changes right-hand of row with identifier \p id to \p rhs
    void SoPlex2::changeRhsReal(SPxRowId id, Real rhs)
    {
-      changeRhsReal(idxReal(id), rhs);
+      SoPlex2::changeRhsReal(idxReal(id), rhs);
    }
 
 
@@ -1318,6 +1346,8 @@ namespace soplex
                _basisStatusRowsReal[i] = (lhs[i] > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
          }
       }
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1335,6 +1365,8 @@ namespace soplex
          else if( _basisStatusRowsReal[i] == SPxSolver::ON_UPPER && rhs >= realParam(SoPlex2::INFTY) )
             _basisStatusRowsReal[i] = (lhs > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
       }
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1342,7 +1374,7 @@ namespace soplex
    /// changes left- and right-hand side of row with identifier \p id
    void SoPlex2::changeRangeReal(SPxRowId id, Real lhs, Real rhs)
    {
-      changeRangeReal(idxReal(id), lhs, rhs);
+      SoPlex2::changeRangeReal(idxReal(id), lhs, rhs);
    }
 
 
@@ -1362,6 +1394,8 @@ namespace soplex
          else if( _basisStatusColsReal[i] == SPxSolver::ON_UPPER && lpcol.upper() >= realParam(SoPlex2::INFTY) )
             _basisStatusColsReal[i] = (lpcol.lower() > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
       }
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1369,7 +1403,7 @@ namespace soplex
    /// replaces column with identifier \p id with \p lpcol
    void SoPlex2::changeColReal(SPxColId id, const LPColReal& lpcol)
    {
-      changeColReal(idxReal(id), lpcol);
+      SoPlex2::changeColReal(idxReal(id), lpcol);
    }
 
 
@@ -1388,6 +1422,8 @@ namespace soplex
                _basisStatusColsReal[i] = (upperReal(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
          }
       }
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1400,6 +1436,8 @@ namespace soplex
 
       if( _hasBasisReal && !_isRealLPLoaded && _basisStatusColsReal[i] == SPxSolver::ON_LOWER && lower <= -realParam(SoPlex2::INFTY) )
          _basisStatusColsReal[i] = (upperReal(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1407,7 +1445,7 @@ namespace soplex
    /// changes lower bound of column with identifier \p id to \p lower
    void SoPlex2::changeLowerReal(SPxColId id, Real lower)
    {
-      changeLowerReal(idxReal(id), lower);
+      SoPlex2::changeLowerReal(idxReal(id), lower);
    }
 
 
@@ -1426,6 +1464,8 @@ namespace soplex
                _basisStatusColsReal[i] = (lowerReal(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
          }
       }
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1438,6 +1478,8 @@ namespace soplex
 
       if( _hasBasisReal && !_isRealLPLoaded &&  _basisStatusColsReal[i] == SPxSolver::ON_UPPER && upper >= realParam(SoPlex2::INFTY) )
          _basisStatusColsReal[i] = (lowerReal(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1445,7 +1487,7 @@ namespace soplex
    /// changes upper bound of column with identifier \p id to \p upper
    void SoPlex2::changeUpperReal(SPxColId id, Real upper)
    {
-      changeUpperReal(idxReal(id), upper);
+      SoPlex2::changeUpperReal(idxReal(id), upper);
    }
 
 
@@ -1466,6 +1508,8 @@ namespace soplex
                _basisStatusColsReal[i] = (lower[i] > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
          }
       }
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1483,6 +1527,8 @@ namespace soplex
          else if( _basisStatusColsReal[i] == SPxSolver::ON_UPPER && upper >= realParam(SoPlex2::INFTY) )
             _basisStatusColsReal[i] = (lower > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
       }
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1490,7 +1536,7 @@ namespace soplex
    /// changes bounds of column with identifier \p id to \p lower and \p upper
    void SoPlex2::changeBoundsReal(SPxColId id, Real lower, Real upper)
    {
-      changeBoundsReal(idxReal(id), lower, upper);
+      SoPlex2::changeBoundsReal(idxReal(id), lower, upper);
    }
 
 
@@ -1500,6 +1546,8 @@ namespace soplex
    {
       assert(_realLP != 0);
       _realLP->changeObj(obj);
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1509,6 +1557,8 @@ namespace soplex
    {
       assert(_realLP != 0);
       _realLP->changeObj(i, obj);
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1518,6 +1568,8 @@ namespace soplex
    {
       assert(_realLP != 0);
       _realLP->changeObj(id, obj);
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1533,6 +1585,8 @@ namespace soplex
          if( _basisStatusRowsReal[i] != SPxSolver::BASIC && _basisStatusColsReal[i] == SPxSolver::BASIC )
             _hasBasisReal = false;
       }
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1540,7 +1594,7 @@ namespace soplex
    /// changes matrix entry identified by (\p rowid, \p colid) to \p val
    void SoPlex2::changeElementReal(SPxRowId rowid, SPxColId colid, Real val)
    {
-      changeElementReal(idxReal(rowid), idxReal(colid), val);
+      SoPlex2::changeElementReal(idxReal(rowid), idxReal(colid), val);
    }
 
 
@@ -1561,6 +1615,8 @@ namespace soplex
             _basisStatusRowsReal.removeLast();
          }
       }
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1568,7 +1624,7 @@ namespace soplex
    /// removes row with identifier \p id
    void SoPlex2::removeRowReal(SPxRowId id)
    {
-      removeRowReal(idxReal(id));
+      SoPlex2::removeRowReal(idxReal(id));
    }
 
 
@@ -1599,6 +1655,8 @@ namespace soplex
          if( _hasBasisReal )
             _basisStatusRowsReal.reSize(numRowsReal());
       }
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1611,12 +1669,12 @@ namespace soplex
       {
          DataArray< int > p(numRowsReal());
          _idToPerm((SPxId*)id, n, p.get_ptr(), numRowsReal());
-         removeRowsReal(p.get_ptr());
+         SoPlex2::removeRowsReal(p.get_ptr());
       }
       else
       {
          _idToPerm((SPxId*)id, n, perm, numRowsReal());
-         removeRowsReal(perm);
+         SoPlex2::removeRowsReal(perm);
       }
    }
 
@@ -1630,12 +1688,12 @@ namespace soplex
       {
          DataArray< int > p(numRowsReal());
          _idxToPerm(idx, n, p.get_ptr(), numRowsReal());
-         removeRowsReal(p.get_ptr());
+         SoPlex2::removeRowsReal(p.get_ptr());
       }
       else
       {
          _idxToPerm(idx, n, perm, numRowsReal());
-         removeRowsReal(perm);
+         SoPlex2::removeRowsReal(perm);
       }
    }
 
@@ -1649,12 +1707,12 @@ namespace soplex
       {
          DataArray< int > p(numRowsReal());
          _rangeToPerm(start, end, p.get_ptr(), numRowsReal());
-         removeRowsReal(p.get_ptr());
+         SoPlex2::removeRowsReal(p.get_ptr());
       }
       else
       {
          _rangeToPerm(start, end, perm, numRowsReal());
-         removeRowsReal(perm);
+         SoPlex2::removeRowsReal(perm);
       }
    }
 
@@ -1676,6 +1734,8 @@ namespace soplex
             _basisStatusColsReal.removeLast();
          }
       }
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1683,7 +1743,7 @@ namespace soplex
    /// removes column with identifier \p id
    void SoPlex2::removeColReal(SPxColId id)
    {
-      removeColReal(idxReal(id));
+      SoPlex2::removeColReal(idxReal(id));
    }
 
 
@@ -1714,6 +1774,8 @@ namespace soplex
          if( _hasBasisReal )
             _basisStatusColsReal.reSize(numColsReal());
       }
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1726,12 +1788,12 @@ namespace soplex
       {
          DataArray< int > p(numColsReal());
          _idToPerm((SPxId*)id, n, p.get_ptr(), numColsReal());
-         removeColsReal(p.get_ptr());
+         SoPlex2::removeColsReal(p.get_ptr());
       }
       else
       {
          _idToPerm((SPxId*)id, n, perm, numColsReal());
-         removeColsReal(perm);
+         SoPlex2::removeColsReal(perm);
       }
    }
 
@@ -1745,12 +1807,12 @@ namespace soplex
       {
          DataArray< int > p(numColsReal());
          _idxToPerm(idx, n, p.get_ptr(), numColsReal());
-         removeColsReal(p.get_ptr());
+         SoPlex2::removeColsReal(p.get_ptr());
       }
       else
       {
          _idxToPerm(idx, n, perm, numColsReal());
-         removeColsReal(perm);
+         SoPlex2::removeColsReal(perm);
       }
    }
 
@@ -1764,12 +1826,12 @@ namespace soplex
       {
          DataArray< int > p(numColsReal());
          _rangeToPerm(start, end, p.get_ptr(), numColsReal());
-         removeColsReal(p.get_ptr());
+         SoPlex2::removeColsReal(p.get_ptr());
       }
       else
       {
          _rangeToPerm(start, end, perm, numColsReal());
-         removeColsReal(perm);
+         SoPlex2::removeColsReal(perm);
       }
    }
 
@@ -1782,6 +1844,8 @@ namespace soplex
 
       _realLP->clear();
       _hasBasisReal = false;
+
+      _invalidateSolutionReal();
    }
 
 
@@ -1790,7 +1854,7 @@ namespace soplex
    void SoPlex2::addRowRational(const LPRowRational& lprow)
    {
       SPxRowId id;
-      addRowRational(id, lprow);
+      SoPlex2::addRowRational(id, lprow);
    }
 
 
@@ -1803,6 +1867,8 @@ namespace soplex
 
       if( _hasBasisRational )
          _basisStatusRowsRational.append(SPxSolver::BASIC);
+
+      _invalidateSolutionRational();
    }
 
 
@@ -1815,6 +1881,8 @@ namespace soplex
 
       if( _hasBasisRational )
          _basisStatusRowsRational.append(lprowset.num(), SPxSolver::BASIC);
+
+      _invalidateSolutionRational();
    }
 
 
@@ -1827,6 +1895,8 @@ namespace soplex
 
       if( _hasBasisRational )
          _basisStatusRowsRational.append(lprowset.num(), SPxSolver::BASIC);
+
+      _invalidateSolutionRational();
    }
 
 
@@ -1835,7 +1905,7 @@ namespace soplex
    void SoPlex2::addColRational(const LPColRational& lpcol)
    {
       SPxColId id;
-      addColRational(id, lpcol);
+      SoPlex2::addColRational(id, lpcol);
    }
 
 
@@ -1855,6 +1925,8 @@ namespace soplex
          else
             _basisStatusColsRational.append(SPxSolver::ZERO);
       }
+
+      _invalidateSolutionRational();
    }
 
 
@@ -1877,6 +1949,8 @@ namespace soplex
                _basisStatusColsRational.append(SPxSolver::ZERO);
          }
       }
+
+      _invalidateSolutionRational();
    }
 
 
@@ -1899,6 +1973,8 @@ namespace soplex
                _basisStatusColsRational.append(SPxSolver::ZERO);
          }
       }
+
+      _invalidateSolutionRational();
    }
 
 
@@ -1918,6 +1994,8 @@ namespace soplex
          else if( _basisStatusRowsRational[i] == SPxSolver::ON_UPPER && lprow.rhs() >= realParam(SoPlex2::INFTY) )
             _basisStatusRowsRational[i] = (lprow.lhs() > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
       }
+
+      _invalidateSolutionRational();
    }
 
 
@@ -1925,7 +2003,7 @@ namespace soplex
    /// replaces row with identifier \p id with \p lprow
    void SoPlex2::changeRowRational(SPxRowId id, const LPRowRational& lprow)
    {
-      changeRowRational(idxRational(id), lprow);
+      SoPlex2::changeRowRational(idxRational(id), lprow);
    }
 
 
@@ -1944,6 +2022,8 @@ namespace soplex
                _basisStatusRowsRational[i] = (rhsRational(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
          }
       }
+
+      _invalidateSolutionRational();
    }
 
 
@@ -1956,6 +2036,8 @@ namespace soplex
 
       if( _hasBasisRational && _basisStatusRowsRational[i] == SPxSolver::ON_LOWER && lhs <= -realParam(SoPlex2::INFTY) )
          _basisStatusRowsRational[i] = (rhsRational(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+
+      _invalidateSolutionRational();
    }
 
 
@@ -1963,7 +2045,7 @@ namespace soplex
    /// changes left-hand side of row with identifier \p id to \p lhs
    void SoPlex2::changeLhsRational(SPxRowId id, Rational lhs)
    {
-      changeLhsRational(idxRational(id), lhs);
+      SoPlex2::changeLhsRational(idxRational(id), lhs);
    }
 
 
@@ -1982,6 +2064,8 @@ namespace soplex
                _basisStatusRowsRational[i] = (lhsRational(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
          }
       }
+
+      _invalidateSolutionRational();
    }
 
 
@@ -1994,6 +2078,8 @@ namespace soplex
 
       if( _hasBasisRational && _basisStatusRowsRational[i] == SPxSolver::ON_UPPER && rhs >= realParam(SoPlex2::INFTY) )
          _basisStatusRowsRational[i] = (lhsRational(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+
+      _invalidateSolutionRational();
    }
 
 
@@ -2001,7 +2087,7 @@ namespace soplex
    /// changes right-hand of row with identifier \p id to \p rhs
    void SoPlex2::changeRhsRational(SPxRowId id, Rational rhs)
    {
-      changeRhsRational(idxRational(id), rhs);
+      SoPlex2::changeRhsRational(idxRational(id), rhs);
    }
 
 
@@ -2022,6 +2108,8 @@ namespace soplex
                _basisStatusRowsRational[i] = (lhs[i] > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
          }
       }
+
+      _invalidateSolutionRational();
    }
 
 
@@ -2039,6 +2127,8 @@ namespace soplex
          else if( _basisStatusRowsRational[i] == SPxSolver::ON_UPPER && rhs >= realParam(SoPlex2::INFTY) )
             _basisStatusRowsRational[i] = (lhs > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
       }
+
+      _invalidateSolutionRational();
    }
 
 
@@ -2046,7 +2136,7 @@ namespace soplex
    /// changes left- and right-hand side of row with identifier \p id
    void SoPlex2::changeRangeRational(SPxRowId id, Rational lhs, Rational rhs)
    {
-      changeRangeRational(idxRational(id), lhs, rhs);
+      SoPlex2::changeRangeRational(idxRational(id), lhs, rhs);
    }
 
 
@@ -2066,6 +2156,8 @@ namespace soplex
          else if( _basisStatusColsRational[i] == SPxSolver::ON_UPPER && lpcol.upper() >= realParam(SoPlex2::INFTY) )
             _basisStatusColsRational[i] = (lpcol.lower() > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
       }
+
+      _invalidateSolutionRational();
    }
 
 
@@ -2073,7 +2165,7 @@ namespace soplex
    /// replaces column with identifier \p id with \p lpcol
    void SoPlex2::changeColRational(SPxColId id, const LPColRational& lpcol)
    {
-      changeColRational(idxRational(id), lpcol);
+      SoPlex2::changeColRational(idxRational(id), lpcol);
    }
 
 
@@ -2092,6 +2184,8 @@ namespace soplex
                _basisStatusColsRational[i] = (upperRational(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
          }
       }
+
+      _invalidateSolutionRational();
    }
 
 
@@ -2104,6 +2198,8 @@ namespace soplex
 
       if( _hasBasisRational && _basisStatusColsRational[i] == SPxSolver::ON_LOWER && lower <= -realParam(SoPlex2::INFTY) )
          _basisStatusColsRational[i] = (upperRational(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+
+      _invalidateSolutionRational();
    }
 
 
@@ -2111,7 +2207,7 @@ namespace soplex
    /// changes lower bound of column with identifier \p id to \p lower
    void SoPlex2::changeLowerRational(SPxColId id, Rational lower)
    {
-      changeLowerRational(idxRational(id), lower);
+      SoPlex2::changeLowerRational(idxRational(id), lower);
    }
 
 
@@ -2130,6 +2226,8 @@ namespace soplex
                _basisStatusColsRational[i] = (lowerRational(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
          }
       }
+
+      _invalidateSolutionRational();
    }
 
 
@@ -2142,6 +2240,8 @@ namespace soplex
 
       if( _hasBasisRational &&  _basisStatusColsRational[i] == SPxSolver::ON_UPPER && upper >= realParam(SoPlex2::INFTY) )
          _basisStatusColsRational[i] = (lowerRational(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+
+      _invalidateSolutionRational();
    }
 
 
@@ -2149,7 +2249,7 @@ namespace soplex
    /// changes upper bound of column with identifier \p id to \p upper
    void SoPlex2::changeUpperRational(SPxColId id, Rational upper)
    {
-      changeUpperRational(idxRational(id), upper);
+      SoPlex2::changeUpperRational(idxRational(id), upper);
    }
 
 
@@ -2170,6 +2270,8 @@ namespace soplex
                _basisStatusColsRational[i] = (lower[i] > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
          }
       }
+
+      _invalidateSolutionRational();
    }
 
 
@@ -2187,6 +2289,8 @@ namespace soplex
          else if( _basisStatusColsRational[i] == SPxSolver::ON_UPPER && upper >= realParam(SoPlex2::INFTY) )
             _basisStatusColsRational[i] = (lower > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
       }
+
+      _invalidateSolutionRational();
    }
 
 
@@ -2194,7 +2298,7 @@ namespace soplex
    /// changes bounds of column with identifier \p id to \p lower and \p upper
    void SoPlex2::changeBoundsRational(SPxColId id, Rational lower, Rational upper)
    {
-      changeBoundsRational(idxRational(id), lower, upper);
+      SoPlex2::changeBoundsRational(idxRational(id), lower, upper);
    }
 
 
@@ -2204,6 +2308,8 @@ namespace soplex
    {
       assert(_rationalLP != 0);
       _rationalLP->changeObj(obj);
+
+      _invalidateSolutionRational();
    }
 
 
@@ -2213,6 +2319,8 @@ namespace soplex
    {
       assert(_rationalLP != 0);
       _rationalLP->changeObj(i, obj);
+
+      _invalidateSolutionRational();
    }
 
 
@@ -2222,6 +2330,8 @@ namespace soplex
    {
       assert(_rationalLP != 0);
       _rationalLP->changeObj(id, obj);
+
+      _invalidateSolutionRational();
    }
 
 
@@ -2237,6 +2347,8 @@ namespace soplex
          if( _basisStatusRowsRational[i] != SPxSolver::BASIC && _basisStatusColsRational[i] == SPxSolver::BASIC )
             _hasBasisRational = false;
       }
+
+      _invalidateSolutionRational();
    }
 
 
@@ -2244,7 +2356,7 @@ namespace soplex
    /// changes matrix entry identified by (\p rowid, \p colid) to \p val
    void SoPlex2::changeElementRational(SPxRowId rowid, SPxColId colid, Rational val)
    {
-      changeElementRational(idxRational(rowid), idxRational(colid), val);
+      SoPlex2::changeElementRational(idxRational(rowid), idxRational(colid), val);
    }
 
 
@@ -2265,6 +2377,8 @@ namespace soplex
             _basisStatusRowsRational.removeLast();
          }
       }
+
+      _invalidateSolutionRational();
    }
 
 
@@ -2272,7 +2386,7 @@ namespace soplex
    /// removes row with identifier \p id
    void SoPlex2::removeRowRational(SPxRowId id)
    {
-      removeRowRational(idxRational(id));
+      SoPlex2::removeRowRational(idxRational(id));
    }
 
 
@@ -2303,6 +2417,8 @@ namespace soplex
          if( _hasBasisRational )
             _basisStatusRowsRational.reSize(numRowsRational());
       }
+
+      _invalidateSolutionRational();
    }
 
 
@@ -2315,12 +2431,12 @@ namespace soplex
       {
          DataArray< int > p(numRowsRational());
          _idToPerm((SPxId*)id, n, p.get_ptr(), numRowsRational());
-         removeRowsRational(p.get_ptr());
+         SoPlex2::removeRowsRational(p.get_ptr());
       }
       else
       {
          _idToPerm((SPxId*)id, n, perm, numRowsRational());
-         removeRowsRational(perm);
+         SoPlex2::removeRowsRational(perm);
       }
    }
 
@@ -2334,12 +2450,12 @@ namespace soplex
       {
          DataArray< int > p(numRowsRational());
          _idxToPerm(idx, n, p.get_ptr(), numRowsRational());
-         removeRowsRational(p.get_ptr());
+         SoPlex2::removeRowsRational(p.get_ptr());
       }
       else
       {
          _idxToPerm(idx, n, perm, numRowsRational());
-         removeRowsRational(perm);
+         SoPlex2::removeRowsRational(perm);
       }
    }
 
@@ -2353,12 +2469,12 @@ namespace soplex
       {
          DataArray< int > p(numRowsRational());
          _rangeToPerm(start, end, p.get_ptr(), numRowsRational());
-         removeRowsRational(p.get_ptr());
+         SoPlex2::removeRowsRational(p.get_ptr());
       }
       else
       {
          _rangeToPerm(start, end, perm, numRowsRational());
-         removeRowsRational(perm);
+         SoPlex2::removeRowsRational(perm);
       }
    }
 
@@ -2380,6 +2496,8 @@ namespace soplex
             _basisStatusColsRational.removeLast();
          }
       }
+
+      _invalidateSolutionRational();
    }
 
 
@@ -2387,7 +2505,7 @@ namespace soplex
    /// removes column with identifier \p id
    void SoPlex2::removeColRational(SPxColId id)
    {
-      removeColRational(idxRational(id));
+      SoPlex2::removeColRational(idxRational(id));
    }
 
 
@@ -2418,6 +2536,8 @@ namespace soplex
          if( _hasBasisRational )
             _basisStatusColsRational.reSize(numColsRational());
       }
+
+      _invalidateSolutionRational();
    }
 
 
@@ -2430,12 +2550,12 @@ namespace soplex
       {
          DataArray< int > p(numColsRational());
          _idToPerm((SPxId*)id, n, p.get_ptr(), numColsRational());
-         removeColsRational(p.get_ptr());
+         SoPlex2::removeColsRational(p.get_ptr());
       }
       else
       {
          _idToPerm((SPxId*)id, n, perm, numColsRational());
-         removeColsRational(perm);
+         SoPlex2::removeColsRational(perm);
       }
    }
 
@@ -2449,12 +2569,12 @@ namespace soplex
       {
          DataArray< int > p(numColsRational());
          _idxToPerm(idx, n, p.get_ptr(), numColsRational());
-         removeColsRational(p.get_ptr());
+         SoPlex2::removeColsRational(p.get_ptr());
       }
       else
       {
          _idxToPerm(idx, n, perm, numColsRational());
-         removeColsRational(perm);
+         SoPlex2::removeColsRational(perm);
       }
    }
 
@@ -2468,12 +2588,12 @@ namespace soplex
       {
          DataArray< int > p(numColsRational());
          _rangeToPerm(start, end, p.get_ptr(), numColsRational());
-         removeColsRational(p.get_ptr());
+         SoPlex2::removeColsRational(p.get_ptr());
       }
       else
       {
          _rangeToPerm(start, end, perm, numColsRational());
-         removeColsRational(perm);
+         SoPlex2::removeColsRational(perm);
       }
    }
 
@@ -2486,6 +2606,8 @@ namespace soplex
 
       _rationalLP->clear();
       _hasBasisRational = false;
+
+      _invalidateSolutionRational();
    }
 
 
@@ -2494,6 +2616,8 @@ namespace soplex
    SPxSolver::Status SoPlex2::solveReal()
    {
       assert(_isConsistent());
+
+      _invalidateSolutionReal();
 
       // will preprocessing be applied? (only if no basis is available)
       bool applyPreprocessing = (_firstScaler != 0 || _simplifier != 0 || _secondScaler != 0) && !_hasBasisReal;
@@ -2581,7 +2705,62 @@ namespace soplex
          _solver.solve();
       }
 
-      // evaluate result
+      ///@todo move to private helper methods
+      // evaluate status flag
+      assert(_statusReal == SPxSolver::UNKNOWN);
+      if( simplificationStatus == SPxSimplifier::OKAY )
+         _statusReal = _solver.status();
+      else if( simplificationStatus == SPxSimplifier::INFEASIBLE )
+         return SPxSolver::INFEASIBLE;
+      else if( simplificationStatus == SPxSimplifier::DUAL_INFEASIBLE )
+         return SPxSolver::INForUNBD;
+      else if( simplificationStatus == SPxSimplifier::UNBOUNDED )
+         return SPxSolver::UNBOUNDED;
+      else if( simplificationStatus == SPxSimplifier::VANISHED )
+         return SPxSolver::OPTIMAL;
+
+      ///@todo move to private helper methods
+      // evaluate solution flags
+      assert(!_hasPrimalReal);
+      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::ERROR);
+      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::NO_RATIOTESTER);
+      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::NO_PRICER);
+      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::NO_SOLVER);
+      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::NOT_INIT);
+      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::SINGULAR);
+      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::NO_PROBLEM);
+      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::UNBOUNDED);
+      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::INFEASIBLE);
+      assert(_solver.basis().status() != SPxBasis::UNBOUNDED || statusReal() == SPxSolver::UNBOUNDED);
+      assert(_solver.basis().status() == SPxBasis::UNBOUNDED || statusReal() != SPxSolver::UNBOUNDED);
+      _hasPrimalReal = (SPxSolver::OPTIMAL || (_simplifier == 0 &&
+            (_solver.basis().status() == SPxBasis::PRIMAL || _solver.basis().status() == SPxBasis::UNBOUNDED) &&
+            _solver.shift() < 10.0 * realParam(SoPlex2::EPSILON_ZERO)));
+
+      assert(!_hasPrimalrayReal);
+      _hasPrimalrayReal = (statusReal() == SPxSolver::UNBOUNDED && _simplifier == 0);
+
+      assert(!_hasDualReal);
+      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::ERROR);
+      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::NO_RATIOTESTER);
+      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::NO_PRICER);
+      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::NO_SOLVER);
+      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::NOT_INIT);
+      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::SINGULAR);
+      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::NO_PROBLEM);
+      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::UNBOUNDED);
+      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::INFEASIBLE);
+      assert(_solver.basis().status() != SPxBasis::INFEASIBLE || statusReal() == SPxSolver::INFEASIBLE);
+      assert(_solver.basis().status() == SPxBasis::INFEASIBLE || statusReal() != SPxSolver::INFEASIBLE);
+      _hasDualReal = (statusReal() == SPxSolver::OPTIMAL || (_simplifier == 0 &&
+            (_solver.basis().status() == SPxBasis::DUAL || _solver.basis().status() == SPxBasis::INFEASIBLE) &&
+            _solver.shift() < 10.0 * realParam(SoPlex2::EPSILON_ZERO)));
+
+      assert(!_hasDualfarkasReal);
+      _hasDualfarkasReal = (statusReal() == SPxSolver::INFEASIBLE && _simplifier == 0);
+
+      ///@todo move to private helper methods
+      // process result
       switch( statusReal() )
       {
       case SPxSolver::OPTIMAL:
@@ -2698,18 +2877,7 @@ namespace soplex
    /// returns the current status
    SPxSolver::Status SoPlex2::statusReal() const
    {
-      if( _simplifier == 0 || _simplifier->result() == SPxSimplifier::OKAY )
-         return _solver.status();
-      else if( _simplifier->result() == SPxSimplifier::INFEASIBLE )
-         return SPxSolver::INFEASIBLE;
-      else if( _simplifier->result() == SPxSimplifier::DUAL_INFEASIBLE )
-         return SPxSolver::INForUNBD;
-      else if( _simplifier->result() == SPxSimplifier::UNBOUNDED )
-         return SPxSolver::UNBOUNDED;
-      else if( _simplifier->result() == SPxSimplifier::VANISHED )
-         return SPxSolver::OPTIMAL;
-      else
-         return SPxSolver::UNKNOWN;
+      return _statusReal;
    }
 
 
@@ -2736,21 +2904,7 @@ namespace soplex
    /// is a primal feasible solution available?
    bool SoPlex2::hasPrimalReal() const
    {
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::ERROR);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::NO_RATIOTESTER);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::NO_PRICER);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::NO_SOLVER);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::NOT_INIT);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::SINGULAR);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::NO_PROBLEM);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::UNBOUNDED);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::INFEASIBLE);
-      assert(_solver.basis().status() != SPxBasis::UNBOUNDED || statusReal() == SPxSolver::UNBOUNDED);
-      assert(_solver.basis().status() == SPxBasis::UNBOUNDED || statusReal() != SPxSolver::UNBOUNDED);
-
-      return statusReal() == SPxSolver::OPTIMAL || (_simplifier == 0 &&
-         (_solver.basis().status() == SPxBasis::PRIMAL || _solver.basis().status() == SPxBasis::UNBOUNDED) &&
-         _solver.shift() < 10.0 * realParam(SoPlex2::EPSILON_ZERO));
+      return _hasPrimalReal;
    }
 
 
@@ -2816,7 +2970,7 @@ namespace soplex
    /// is a primal unbounded ray available?
    bool SoPlex2::hasPrimalrayReal() const
    {
-      return statusReal() == SPxSolver::UNBOUNDED && _simplifier == 0;
+      return _hasPrimalrayReal;
    }
 
 
@@ -2845,21 +2999,7 @@ namespace soplex
    /// is a dual feasible solution available?
    bool SoPlex2::hasDualReal() const
    {
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::ERROR);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::NO_RATIOTESTER);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::NO_PRICER);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::NO_SOLVER);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::NOT_INIT);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::SINGULAR);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::NO_PROBLEM);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::UNBOUNDED);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::INFEASIBLE);
-      assert(_solver.basis().status() != SPxBasis::INFEASIBLE || statusReal() == SPxSolver::INFEASIBLE);
-      assert(_solver.basis().status() == SPxBasis::INFEASIBLE || statusReal() != SPxSolver::INFEASIBLE);
-
-      return statusReal() == SPxSolver::OPTIMAL || (_simplifier == 0 &&
-         (_solver.basis().status() == SPxBasis::DUAL || _solver.basis().status() == SPxBasis::INFEASIBLE) &&
-         _solver.shift() < 10.0 * realParam(SoPlex2::EPSILON_ZERO));
+      return _hasDualReal;
    }
 
 
@@ -2925,7 +3065,7 @@ namespace soplex
    /// is Farkas proof of infeasibility available?
    bool SoPlex2::hasDualfarkasReal() const
    {
-      return statusReal() == SPxSolver::INFEASIBLE && _simplifier == 0;
+      return _hasDualfarkasReal;
    }
 
 
@@ -3044,7 +3184,7 @@ namespace soplex
    }
 
 
-
+   ///
    /// gets internal violation of constraints
    void SoPlex2::getInternalConstraintViolationReal(Real& maxviol, Real& sumviol) const
    {
@@ -3648,8 +3788,8 @@ namespace soplex
    int SoPlex2::numIterations() const
    {
    }
+#endif
 
-   #endif
 
 
    /// statistical information in form of a string
@@ -3680,6 +3820,8 @@ namespace soplex
          return "none";
    }
 
+
+
    /// name of scaling method before simplifier
    const char* SoPlex2::getFirstScalerName()
    {
@@ -3699,6 +3841,7 @@ namespace soplex
       else
          return "none";
    }
+
 
 
    /// name of currently loaded pricer
@@ -4277,6 +4420,27 @@ namespace soplex
       assert(_isConsistent());
 
       return success;
+   }
+
+
+
+   /// invalidates real solution
+   void SoPlex2::_invalidateSolutionReal()
+   {
+      _statusReal = SPxSolver::UNKNOWN;
+      _hasPrimalReal = false;
+      _hasPrimalrayReal = false;
+      _hasDualReal = false;
+      _hasDualfarkasReal = false;
+   }
+
+
+
+   /// invalidates rational solution
+   void SoPlex2::_invalidateSolutionRational()
+   {
+      _statusRational = SPxSolver::UNKNOWN;
+      _solRational._invalidate();
    }
 
 

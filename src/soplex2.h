@@ -55,6 +55,8 @@
 
 #include "sol.h"
 
+///@todo test basis interface of rational LP
+
 ///@todo record and return "best" solutions found during IR (Ambros)
 ///@todo implement main IR loop for primal and dual feasible case with fail otherwise (Ambros)
 ///@todo implement statistical info (time, factor time, iters, ...) since last call to solveReal() or solveRational() (Ambros?)
@@ -1284,8 +1286,13 @@ private:
    DataArray< SPxSolver::VarStatus > _basisStatusRowsReal;
    DataArray< SPxSolver::VarStatus > _basisStatusColsReal;
 
+   SPxSolver::Status _statusReal;
    bool _isRealLPLoaded;
    bool _hasBasisReal;
+   bool _hasPrimalReal;
+   bool _hasPrimalrayReal;
+   bool _hasDualReal;
+   bool _hasDualfarkasReal;
 
    //@}
 
@@ -1294,7 +1301,6 @@ private:
    //@{
 
    SPxLPRational* _rationalLP;
-   SPxSolver::Status _statusRational;
    SolRational _solRational;
 
    ///@todo this is still a bit of a hack: the _solRational stores only the numerical solution values, while the basis
@@ -1302,6 +1308,7 @@ private:
    DataArray< SPxSolver::VarStatus > _basisStatusRowsRational;
    DataArray< SPxSolver::VarStatus > _basisStatusColsRational;
 
+   SPxSolver::Status _statusRational;
    bool _hasBasisRational;
 
    //@}
@@ -1309,6 +1316,12 @@ private:
 
    //**@name Helper methods */
    //@{
+
+   /// invalidates real solution
+   void _invalidateSolutionReal();
+
+   /// invalidates rational solution
+   void _invalidateSolutionRational();
 
    /// checks consistency
    bool _isConsistent() const;
