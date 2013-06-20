@@ -1368,10 +1368,6 @@ int main(int argc, char* argv[])
 
    ++optidx;
 
-   // switch off simplifier when using a starting basis
-   if ( read_basis )
-      SoPlexShell->setIntParam( SoPlex2::SIMPLIFIER, SoPlex2::SIMPLIFIER_OFF);
-
    if ( read_basis || write_basis )
       basisname = strcpy( new char[strlen(argv[optidx]) + 1], argv[optidx] );
 
@@ -1454,15 +1450,15 @@ int main(int argc, char* argv[])
       if (read_basis)
       {
          success = rational
-            ? SoPlexShell->readBasisFileRational( filename, &rownames, &colnames )
-            : SoPlexShell->readBasisFileReal( filename, &rownames, &colnames );
+            ? SoPlexShell->readBasisFileRational( basisname, &rownames, &colnames )
+            : SoPlexShell->readBasisFileReal( basisname, &rownames, &colnames );
 
          if( !success )
          {
             if ( checkMode )
                MSG_INFO1( spxout << "EEXAMP25 " );
 
-            MSG_INFO1( spxout << "error while reading file \""  << filename << "\"" << std::endl );
+            MSG_INFO1( spxout << "error while reading file \""  << basisname << "\"" << std::endl );
             exit(1);
          }
       }
