@@ -2623,6 +2623,10 @@ namespace soplex
 
       // will preprocessing be applied? (only if no basis is available)
       bool applyPreprocessing = (_firstScaler != 0 || _simplifier != 0 || _secondScaler != 0) && !_hasBasisReal;
+      if( applyPreprocessing )
+         _enableSimplifierAndScalers();
+      else
+         _disableSimplifierAndScalers();
 
       if( _isRealLPLoaded )
       {
@@ -3217,7 +3221,6 @@ namespace soplex
       assert(_isConsistent());
 
       // round rational LP to floating-point precision
-      *_realLP = *_rationalLP;
       if( _isRealLPLoaded )
          _solver.loadLP((SPxLPReal)(*_rationalLP));
       else
@@ -3228,7 +3231,16 @@ namespace soplex
       {
          assert(_basisStatusRowsRational.size() == numRowsReal());
          assert(_basisStatusColsRational.size() == numColsReal());
-         _solver.setBasis(_basisStatusRowsRational.get_ptr(), _basisStatusColsRational.get_ptr());
+
+         if( _isRealLPLoaded )
+            _solver.setBasis(_basisStatusRowsRational.get_ptr(), _basisStatusColsRational.get_ptr());
+         else
+         {
+            _basisStatusRowsReal = _basisStatusRowsRational;
+            _basisStatusColsReal = _basisStatusColsRational;
+         }
+
+         _hasBasisReal = true;
       }
 
       // solve floating-point LP
@@ -4752,6 +4764,80 @@ namespace soplex
 
       for( int i = 0; i < permSize; i++ )
          perm[i] = (i < start || i > end) ? i : -1;
+   }
+
+
+
+   /// enables simplifier and scalers according to current parameters
+   void SoPlex2::_enableSimplifierAndScalers()
+   {
+      // type of simplifier
+      switch( intParam(SoPlex2::SIMPLIFIER) )
+      {
+      case SIMPLIFIER_OFF:
+         _simplifier = 0;
+         break;
+      case SIMPLIFIER_AUTO:
+         _simplifier = &_simplifierMainSM;
+         assert(_simplifier != 0);
+         break;
+      default:
+         break;
+      }
+
+      // type of scaler applied before simplification
+      switch( intParam(SoPlex2::SCALER_BEFORE_SIMPLIFIER) )
+      {
+      case SCALER_OFF:
+         _firstScaler = 0;
+         break;
+      case SCALER_UNIEQUI:
+         _firstScaler = &_scalerUniequi;
+         break;
+      case SCALER_BIEQUI:
+         _firstScaler = &_scalerBiequi;
+         break;
+      case SCALER_GEO1:
+         _firstScaler = &_scalerGeo1;
+         break;
+      case SCALER_GEO8:
+         _firstScaler = &_scalerGeo8;
+         break;
+      default:
+         break;
+      }
+
+      // type of scaler applied after simplification
+      switch( intParam(SoPlex2::SCALER_AFTER_SIMPLIFIER) )
+      {
+      case SCALER_OFF:
+         _secondScaler = 0;
+         break;
+      case SCALER_UNIEQUI:
+         _secondScaler = &_scalerUniequi;
+         break;
+      case SCALER_BIEQUI:
+         _secondScaler = &_scalerBiequi;
+         break;
+      case SCALER_GEO1:
+         _secondScaler = &_scalerGeo1;
+         break;
+      case SCALER_GEO8:
+         _secondScaler = &_scalerGeo8;
+         break;
+      default:
+         break;
+      }
+   }
+
+
+
+   /// disables simplifier and scalers
+   void SoPlex2::_disableSimplifierAndScalers()
+   {
+      _simplifier = 0;
+      _firstScaler = 0;
+      _secondScaler = 0;
    }
 } // namespace soplex
 

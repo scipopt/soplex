@@ -1337,6 +1337,12 @@ private:
    /// creates a permutation for removing rows/columns from a range of indices
    void _rangeToPerm(int start, int end, int* perm, int permSize) const;
 
+   /// enables simplifier and scalers according to current parameters
+   void _enableSimplifierAndScalers();
+
+   /// disables simplifier and scalers
+   void _disableSimplifierAndScalers();
+
    //@}
 };
 } // namespace soplex
