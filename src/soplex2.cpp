@@ -3190,7 +3190,6 @@ namespace soplex
    }
 
 
-   ///
    /// gets internal violation of constraints
    void SoPlex2::getInternalConstraintViolationReal(Real& maxviol, Real& sumviol) const
    {
