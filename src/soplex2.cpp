@@ -17,6 +17,8 @@
 #include <assert.h>
 
 #include "soplex2.h"
+#include "spxfileio.h"
+#include "mpsinput.h"
 
 namespace soplex
 {
@@ -3875,16 +3877,18 @@ namespace soplex
 
    /// writes real LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
    /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
-   /// marked as integer
-   void SoPlex2::writeFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars) const
+   /// marked as integer; returns true on success
+   bool SoPlex2::writeFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars) const
    {
-      return _realLP->writeFile(filename, rowNames, colNames, intVars);
+      ///@todo implement return value
+      _realLP->writeFile(filename, rowNames, colNames, intVars);
+      return true;
    }
 
 
 
    /// reads basis information from \p filename and returns true on success; if \p rowNames and \p colNames are \c NULL,
-   /// default names are assumed
+   /// default names are assumed; returns true on success
    bool SoPlex2::readBasisFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames)
    {
       assert(_realLP != 0);
@@ -3899,13 +3903,15 @@ namespace soplex
          _isRealLPLoaded = true;
       }
 
-      return _hasBasisReal = _solver.readBasisFile(filename, rowNames, colNames);
+      _hasBasisReal = _solver.readBasisFile(filename, rowNames, colNames);
+      return _hasBasisReal;
    }
 
 
 
-   /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used
-   void SoPlex2::writeBasisFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames)
+   /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used;
+   /// returns true on success
+   bool SoPlex2::writeBasisFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames)
    {
       if( !_isRealLPLoaded )
       {
@@ -3927,7 +3933,7 @@ namespace soplex
          }
       }
 
-      _solver.writeBasisFile(filename, rowNames, colNames);
+      return _solver.writeBasisFile(filename, rowNames, colNames);
    }
 
 
@@ -3957,28 +3963,254 @@ namespace soplex
 
    /// writes rational LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
    /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
-   /// marked as integer
-   void SoPlex2::writeFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars) const
+   /// marked as integer; returns true on success
+   bool SoPlex2::writeFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars) const
    {
-      return _rationalLP->writeFile(filename, rowNames, colNames, intVars);
+      ///@todo implement return value
+      _rationalLP->writeFile(filename, rowNames, colNames, intVars);
+      return true;
    }
 
 
 
    /// reads basis information from \p filename and returns true on success; if \p rowNames and \p colNames are \c NULL,
-   /// default names are assumed
+   /// default names are assumed; returns true on success
    bool SoPlex2::readBasisFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames)
    {
-      ///@todo implement
-      return false;
+      assert(filename != 0);
+
+      spxifstream file(filename);
+
+      if( !file )
+         return false;
+
+      // get problem size
+      int numRows = numRowsRational();
+      int numCols = numColsRational();
+
+      // prepare column names
+      const NameSet* colNamesPtr = colNames;
+      NameSet* tmpColNames = 0;
+      if( colNames == 0 )
+      {
+         std::stringstream name;
+
+         spx_alloc(tmpColNames);
+         tmpColNames = new (tmpColNames) NameSet();
+         tmpColNames->reMax(numCols);
+
+         for( int j = 0; j < numCols; ++j )
+         {
+            name << "x" << j;
+            DataKey key = colIdRational(j);
+            tmpColNames->add(key, name.str().c_str());
+         }
+
+         colNamesPtr = tmpColNames;
+      }
+
+      // prepare row names
+      const NameSet* rowNamesPtr = rowNames;
+      NameSet* tmpRowNames = 0;
+      if( rowNamesPtr == 0 )
+      {
+         std::stringstream name;
+
+         spx_alloc(tmpRowNames);
+         tmpRowNames = new (tmpRowNames) NameSet();
+         tmpRowNames->reMax(numRows);
+
+         for( int i = 0; i < numRows; ++i )
+         {
+            name << "C" << i;
+            DataKey key = rowIdRational(i);
+            tmpRowNames->add(key, name.str().c_str());
+         }
+
+         rowNamesPtr = tmpRowNames;
+      }
+
+      // initialize with default slack basis
+      _basisStatusRowsRational.reSize(numRows);
+      _basisStatusColsRational.reSize(numCols);
+
+      for( int i = 0; i < numRows; i++ )
+         _basisStatusRowsRational[i] = SPxSolver::BASIC;
+
+      for( int i = 0; i < numCols; i++ )
+      {
+         if( lowerRational(i) == upperRational(i) )
+            _basisStatusColsRational[i] = SPxSolver::FIXED;
+         else if( lowerRational(i) <= -realParam(SoPlex2::INFTY) && upperRational(i) >= realParam(SoPlex2::INFTY) )
+            _basisStatusColsRational[i] = SPxSolver::ZERO;
+         else if( lowerRational(i) <= -realParam(SoPlex2::INFTY) )
+            _basisStatusColsRational[i] = SPxSolver::ON_UPPER;
+         else
+            _basisStatusColsRational[i] = SPxSolver::ON_LOWER;
+      }
+
+      // read basis
+      MPSInput mps(file);
+      if( mps.readLine() && (mps.field0() != 0) && !strcmp(mps.field0(), "NAME") )
+      {
+         while( mps.readLine() )
+         {
+            int c = -1;
+            int r = -1;
+
+            if( mps.field0() != 0 && !strcmp(mps.field0(), "ENDATA") )
+            {
+               mps.setSection(MPSInput::ENDATA);
+               break;
+            }
+
+            if( mps.field1() == 0 || mps.field2() == 0 )
+               break;
+
+            if( (c = colNamesPtr->number(mps.field2())) < 0 )
+               break;
+
+            if( *mps.field1() == 'X' )
+            {
+               if( mps.field3() == 0 || (r = rowNamesPtr->number(mps.field3())) < 0 )
+                  break;
+            }
+
+            if( !strcmp(mps.field1(), "XU") )
+            {
+               _basisStatusColsRational[c] = SPxSolver::BASIC;
+               _basisStatusRowsRational[r] = (lhsRational(r) == rhsRational(r))
+                  ? SPxSolver::FIXED
+                  : SPxSolver::ON_UPPER;
+            }
+            else if( !strcmp(mps.field1(), "XL") )
+            {
+               _basisStatusColsRational[c] = SPxSolver::BASIC;
+               _basisStatusRowsRational[r] = (lhsRational(r) == rhsRational(r))
+                  ? SPxSolver::FIXED
+                  : SPxSolver::ON_LOWER;
+            }
+            else if( !strcmp(mps.field1(), "UL") )
+            {
+               _basisStatusColsRational[c] = SPxSolver::ON_UPPER;
+            }
+            else if( !strcmp(mps.field1(), "LL") )
+            {
+               _basisStatusColsRational[c] = SPxSolver::ON_LOWER;
+            }
+            else
+            {
+               mps.syntaxError();
+               break;
+            }
+         }
+      }
+
+      if( rowNames == 0 )
+      {
+         tmpRowNames->~NameSet();
+         spx_free(tmpRowNames);
+      }
+
+      if( colNames == 0 )
+      {
+         tmpColNames->~NameSet();
+         spx_free(tmpColNames);
+      }
+
+      _hasBasisRational = !mps.hasError();
+
+      return _hasBasisRational;
    }
 
 
 
-   /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used
-   void SoPlex2::writeBasisFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames)
+   /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used;
+   /// returns true on success
+   bool SoPlex2::writeBasisFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames)
    {
-      ///@todo implement
+      assert(filename != 0);
+
+      std::ofstream file(filename);
+      if( file == 0 )
+         return false;
+
+      file.setf(std::ios::left);
+      file << "NAME  " << filename << std::endl;
+
+      // do not write basis if there is none
+      if( !_hasBasisRational )
+      {
+         file << "ENDATA" << std::endl;
+         return true;
+      }
+
+      // start writing
+      int numRows = _basisStatusRowsRational.size();
+      int numCols = _basisStatusColsRational.size();
+      int row = 0;
+
+      for( int col = 0; col < numCols; col++ )
+      {
+         assert(_basisStatusColsRational[col] != SPxSolver::UNDEFINED);
+
+         if( _basisStatusColsRational[col] == SPxSolver::BASIC )
+         {
+            // find nonbasic row
+            for( ; row < numRows; row++ )
+            {
+               assert(_basisStatusRowsRational[row] != SPxSolver::UNDEFINED);
+               if( _basisStatusRowsRational[row] != SPxSolver::BASIC )
+                  break;
+            }
+
+            assert(row != numRows);
+
+            file << (_basisStatusRowsRational[row] == SPxSolver::ON_UPPER ? " XU " : " XL ");
+
+            file << std::setw(8);
+            if( colNames != 0 && colNames->has(colIdRational(col)) )
+               file << (*colNames)[colIdRational(col)];
+            else
+               file << "x" << col;
+
+            file << "       ";
+            if( rowNames != 0 && rowNames->has(rowIdRational(row)) )
+               file << (*rowNames)[rowIdRational(row)];
+            else
+               file << "C" << row;
+
+            file << std::endl;
+            row++;
+         }
+         else
+         {
+            if( _basisStatusColsRational[col] == SPxSolver::ON_UPPER )
+            {
+               file << " UL ";
+
+               file << std::setw(8);
+               if( colNames != 0 && colNames->has(colIdRational(col)) )
+                  file << (*colNames)[colIdRational(col)];
+               else
+                  file << "x" << col;
+
+               file << std::endl;
+            }
+         }
+      }
+
+      file << "ENDATA" << std::endl;
+
+#ifndef NDEBUG
+      // check that the remaining rows are basic
+      for( ; row < numRows; row++ )
+      {
+         assert(_basisStatusRowsRational[row] == SPxSolver::BASIC);
+      }
+#endif
+
+      return true;
    }
 
 
@@ -4464,15 +4696,6 @@ namespace soplex
       assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MINIMIZE || _realLP->spxSense() == SPxLPReal::MINIMIZE);
       assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MAXIMIZE || _rationalLP->spxSense() == SPxLPRational::MAXIMIZE);
       assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MINIMIZE || _rationalLP->spxSense() == SPxLPRational::MINIMIZE);
-
-      assert(intParam(SoPlex2::SIMPLIFIER) != SoPlex2::SIMPLIFIER_OFF || _simplifier == 0);
-      assert(intParam(SoPlex2::SIMPLIFIER) == SoPlex2::SIMPLIFIER_OFF || _simplifier != 0);
-
-      assert(intParam(SoPlex2::SCALER_BEFORE_SIMPLIFIER) != SoPlex2::SCALER_OFF || _firstScaler == 0);
-      assert(intParam(SoPlex2::SCALER_BEFORE_SIMPLIFIER) == SoPlex2::SCALER_OFF || _firstScaler != 0);
-
-      assert(intParam(SoPlex2::SCALER_AFTER_SIMPLIFIER) != SoPlex2::SCALER_OFF || _secondScaler == 0);
-      assert(intParam(SoPlex2::SCALER_AFTER_SIMPLIFIER) == SoPlex2::SCALER_OFF || _secondScaler != 0);
 
       return true;
    }

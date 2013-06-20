@@ -905,15 +905,16 @@ public:
 
    /// writes real LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
    /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
-   /// marked as integer
-   void writeFileReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0) const;
+   /// marked as integer; returns true on success
+   bool writeFileReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0) const;
 
    /// reads basis information from \p filename and returns true on success; if \p rowNames and \p colNames are \c NULL,
-   /// default names are assumed
+   /// default names are assumed; returns true on success
    bool readBasisFileReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0);
 
-   /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used
-   void writeBasisFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames);
+   /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used;
+   /// returns true on success
+   bool writeBasisFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames);
 
 #if 0
    /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
@@ -933,15 +934,16 @@ public:
 
    /// writes rational LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
    /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
-   /// marked as integer
-   void writeFileRational(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0) const;
+   /// marked as integer; returns true on success
+   bool writeFileRational(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0) const;
 
    /// reads basis information from \p filename and returns true on success; if \p rowNames and \p colNames are \c NULL,
-   /// default names are assumed
+   /// default names are assumed; returns true on success
    bool readBasisFileRational(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0);
 
-   /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used
-   void writeBasisFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames);
+   /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used;
+   /// returns true on success
+   bool writeBasisFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames);
 
 #if 0
    /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
