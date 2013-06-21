@@ -32,6 +32,7 @@ namespace soplex
       solvingTime = 0.0;
       iterations = 0;
       refinements = 0;
+      stallRefinements = 0;
    }
 
    /// prints statistics

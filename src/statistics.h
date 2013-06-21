@@ -53,6 +53,7 @@ namespace soplex
       Real solvingTime;
       int iterations;
       int refinements;
+      int stallRefinements;
 
       //@}
    };

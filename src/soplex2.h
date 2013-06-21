@@ -992,32 +992,38 @@ public:
       /// iteration limit (-1 if unlimited)
       ITERLIMIT = 5,
 
+      /// refinement limit (-1 if unlimited)
+      REFLIMIT = 6,
+
+      /// stalling refinement limit (-1 if unlimited)
+      STALLREFLIMIT = 7,
+
       /// display frequency
-      DISPLAY_FREQ = 6,
+      DISPLAY_FREQ = 8,
 
       /// verbosity level
-      VERBOSITY = 7,
+      VERBOSITY = 9,
 
       /// type of simplifier
-      SIMPLIFIER = 8,
+      SIMPLIFIER = 10,
 
       /// type of scaler applied before simplification
-      SCALER_BEFORE_SIMPLIFIER = 9,
+      SCALER_BEFORE_SIMPLIFIER = 11,
 
       /// type of scaler applied after simplification
-      SCALER_AFTER_SIMPLIFIER = 10,
+      SCALER_AFTER_SIMPLIFIER = 12,
 
       /// type of starter used to create crash basis
-      STARTER = 11,
+      STARTER = 13,
 
       /// type of pricer
-      PRICER = 12,
+      PRICER = 14,
 
       /// type of ratio test
-      RATIOTESTER = 13,
+      RATIOTESTER = 15,
 
       /// number of integer parameters
-      INTPARAM_COUNT = 14
+      INTPARAM_COUNT = 16
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -1372,6 +1378,9 @@ private:
 
    /// disables simplifier and scalers
    void _disableSimplifierAndScalers();
+
+   /// should solving process be stopped?
+   bool _isSolveStopped() const;
 
    //@}
 };

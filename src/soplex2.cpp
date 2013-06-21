@@ -93,6 +93,12 @@ namespace soplex
             // iteration limit (-1 if unlimited)
             _intParamDefault[SoPlex2::ITERLIMIT] = -1;
 
+            // refinement limit (-1 if unlimited)
+            _intParamDefault[SoPlex2::REFLIMIT] = -1;
+
+            // stalling refinement limit (-1 if unlimited)
+            _intParamDefault[SoPlex2::STALLREFLIMIT] = -1;
+
             // display frequency
             _intParamDefault[SoPlex2::DISPLAY_FREQ] = 100;
 
@@ -4890,6 +4896,19 @@ namespace soplex
       _simplifier = 0;
       _firstScaler = 0;
       _secondScaler = 0;
+   }
+
+
+
+   /// should solving process be stopped?
+   bool SoPlex2::_isSolveStopped() const
+   {
+      assert(_statistics != 0);
+
+      return _statistics->solvingTime > realParam(TIMELIMIT)
+         || (intParam(ITERLIMIT) >= 0 && _statistics->iterations > intParam(ITERLIMIT))
+         || (intParam(REFLIMIT) >= 0 && _statistics->refinements > intParam(REFLIMIT))
+         || (intParam(STALLREFLIMIT) >= 0 && _statistics->stallRefinements > intParam(STALLREFLIMIT));
    }
 } // namespace soplex
 
