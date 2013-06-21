@@ -143,8 +143,8 @@ namespace soplex
 
             // time limit in seconds (INFTY if unlimited)
             _realParamLower[SoPlex2::TIMELIMIT] = 0.0;
-            _realParamUpper[SoPlex2::TIMELIMIT] = _realParamLower[SoPlex2::INFTY];
-            _realParamDefault[SoPlex2::TIMELIMIT] = _realParamLower[SoPlex2::INFTY];
+            _realParamUpper[SoPlex2::TIMELIMIT] = DEFAULT_INFINITY;
+            _realParamDefault[SoPlex2::TIMELIMIT] = DEFAULT_INFINITY;
 
             // lower limit on objective value
             _realParamLower[SoPlex2::OBJLIMIT_LOWER] = -_realParamLower[SoPlex2::INFTY];
