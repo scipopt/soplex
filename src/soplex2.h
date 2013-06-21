@@ -1249,12 +1249,38 @@ public:
    //@}
 
 
+   //**@name Statistics */
+   //@{
+
+   /// prints problem statistics
+   void printProblemStatistics(std::ostream& os);
+
+   /// prints statistics on solving process
+   void printSolvingStatistics(std::ostream& os);
+
+   /// prints complete statistics
+   void printStatistics(std::ostream& os);
+
+   //@}
+
 private:
 
    //**@name Parameter settings */
    //@{
 
    Settings* _currentSettings;
+
+   //@}
+
+
+   //**@name Statistics on solving process */
+   //@{
+
+   /// class of statistics
+   class Statistics;
+
+   /// statistics since last call to solveReal() or solveRational()
+   Statistics* _statistics;
 
    //@}
 
