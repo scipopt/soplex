@@ -2888,6 +2888,14 @@ namespace soplex
 
 
 
+   /// returns the current basis status
+   SPxBasis::SPxStatus SoPlex2::basisStatusReal() const
+   {
+      return _solver.basis().status();
+   }
+
+
+
    /// returns the objective value if a primal solution is available
    Real SoPlex2::objValueReal() const
    {
@@ -3794,14 +3802,22 @@ namespace soplex
    int SoPlex2::luSolveCount() const
    {
    }
-
+#endif
 
 
    /// number of iterations since last call to solve
    int SoPlex2::numIterations() const
    {
+      return _solver.iterations();
    }
-#endif
+
+
+
+   ///
+   Real SoPlex2::solveTime() const
+   {
+       return _solver.time();
+   }
 
 
 
@@ -3913,7 +3929,6 @@ namespace soplex
          _realLP = &_solver;
          _isRealLPLoaded = true;
       }
-
       _hasBasisReal = _solver.readBasisFile(filename, rowNames, colNames);
       return _hasBasisReal;
    }
@@ -3949,13 +3964,14 @@ namespace soplex
 
 
 
-#if 0
    /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
    /// default names are used
-   void SoPlex2::writeStateReal(const char* filename, const NameSet* rowNames, const NameSet* colNames) const
+   void SoPlex2::writeStateReal(const char* filename, const NameSet* rowNames, const NameSet* colNames)
    {
+      writeFileReal(filename);
+      writeBasisFileReal(filename);
+      // @todo write settings file
    }
-#endif
 
 
 

@@ -55,6 +55,7 @@
 
 #include "sol.h"
 
+///@todo implement automatic rep switch, based on row/col dim
 ///@todo test basis interface of rational LP
 
 ///@todo record and return "best" solutions found during IR (Ambros)
@@ -100,7 +101,7 @@ public:
    //@}
 
 
-   //**@name Access of the real LP */
+   //**@name Access to the real LP */
    //@{
 
    /// returns number of rows
@@ -229,7 +230,7 @@ public:
    //@}
 
 
-   //**@name Access of the rational LP */
+   //**@name Access to the rational LP */
    //@{
 
    /// returns number of rows
@@ -687,6 +688,9 @@ public:
    /// returns the current status
    SPxSolver::Status statusReal() const;
 
+   /// returns the current basis status
+   SPxBasis::SPxStatus basisStatusReal() const;
+
    /// returns the objective value if a primal solution is available
    Real objValueReal() const;
 
@@ -867,10 +871,12 @@ public:
 
    /// number of solves performed
    int luSolveCount() const;
-
+#endif
    /// number of iterations since last call to solve
    int numIterations() const;
-#endif
+
+   /// time spent in last call to solve
+   Real solveTime() const;
 
    /// statistical information in form of a string
    std::string statisticString() const;
@@ -914,13 +920,11 @@ public:
 
    /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used;
    /// returns true on success
-   bool writeBasisFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames);
+   bool writeBasisFileReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0);
 
-#if 0
    /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
    /// default names are used
-   void writeStateReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0) const;
-#endif
+   void writeStateReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0);
 
    //@}
 
