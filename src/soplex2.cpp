@@ -233,8 +233,8 @@ namespace soplex
 
    /// default constructor
    SoPlex2::SoPlex2()
-      : _currentSettings(0)
-      , _statistics(0)
+      : _statistics(0)
+      , _currentSettings(0)
       , _scalerUniequi(false)
       , _scalerBiequi(true)
       , _scalerGeo1(1)
@@ -263,14 +263,14 @@ namespace soplex
       spx_alloc(_rationalLP);
       _rationalLP = new (_rationalLP) SPxLPRational();
 
+      // initialize statistics
+      spx_alloc(_statistics);
+      _statistics = new (_statistics) Statistics();
+
       // initialize parameter settings to default
       spx_alloc(_currentSettings);
       _currentSettings = new (_currentSettings) Settings();
       setSettings(*_currentSettings, true, true);
-
-      // initialize statistics
-      spx_alloc(_statistics);
-      _statistics = new (_statistics) Statistics();
 
       assert(_isConsistent());
    }
@@ -284,11 +284,11 @@ namespace soplex
 
       if( this != &rhs )
       {
-         // copy settings
-         *_currentSettings = *(rhs._currentSettings);
-
          // copy statistics
          *_statistics = *(rhs._statistics);
+
+         // copy settings
+         *_currentSettings = *(rhs._currentSettings);
 
          // copy solver components
          _solver = rhs._solver;
@@ -3213,6 +3213,7 @@ namespace soplex
    }
 
 
+
    /// gets internal violation of constraints
    void SoPlex2::getInternalConstraintViolationReal(Real& maxviol, Real& sumviol) const
    {
@@ -3237,6 +3238,7 @@ namespace soplex
 
 
 
+#if 1
    /// solves rational LP
    SPxSolver::Status SoPlex2::solveRational()
    {
@@ -3329,6 +3331,7 @@ namespace soplex
 
       return _statusRational;
    }
+#endif
 
 
 
@@ -4748,8 +4751,8 @@ namespace soplex
    /// checks consistency
    bool SoPlex2::_isConsistent() const
    {
-      assert(_currentSettings != 0);
       assert(_statistics != 0);
+      assert(_currentSettings != 0);
 
       assert(_realLP != 0);
       assert(_rationalLP != 0);

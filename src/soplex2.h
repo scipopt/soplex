@@ -56,7 +56,7 @@
 #include "sol.h"
 
 ///@todo implement automatic rep switch, based on row/col dim
-///@todo test basis interface of rational LP
+///@todo introduce status codes for SoPlex2, especially for rational solving
 
 ///@todo record and return "best" solutions found during IR (Ambros)
 ///@todo implement main IR loop for primal and dual feasible case with fail otherwise (Ambros)
@@ -1271,14 +1271,6 @@ public:
 
 private:
 
-   //**@name Parameter settings */
-   //@{
-
-   Settings* _currentSettings;
-
-   //@}
-
-
    //**@name Statistics on solving process */
    //@{
 
@@ -1287,6 +1279,14 @@ private:
 
    /// statistics since last call to solveReal() or solveRational()
    Statistics* _statistics;
+
+   //@}
+
+
+   //**@name Parameter settings */
+   //@{
+
+   Settings* _currentSettings;
 
    //@}
 
@@ -1352,17 +1352,8 @@ private:
    //@}
 
 
-   //**@name Helper methods */
+   //**@name Constant helper methods */
    //@{
-
-   /// invalidates real solution
-   void _invalidateSolutionReal();
-
-   /// invalidates rational solution
-   void _invalidateSolutionRational();
-
-   /// checks consistency
-   bool _isConsistent() const;
 
    /// creates a permutation for removing rows/columns from an array of IDs
    void _idToPerm(SPxId* id, int idSize, int* perm, int permSize) const;
@@ -1373,14 +1364,44 @@ private:
    /// creates a permutation for removing rows/columns from a range of indices
    void _rangeToPerm(int start, int end, int* perm, int permSize) const;
 
+   /// checks consistency
+   bool _isConsistent() const;
+
+   /// should solving process be stopped?
+   bool _isSolveStopped() const;
+
+   //@}
+
+
+   //**@name Non-constant helper methods */
+   //@{
+
+   /// invalidates real solution
+   void _invalidateSolutionReal();
+
+   /// invalidates rational solution
+   void _invalidateSolutionRational();
+
    /// enables simplifier and scalers according to current parameters
    void _enableSimplifierAndScalers();
 
    /// disables simplifier and scalers
    void _disableSimplifierAndScalers();
 
-   /// should solving process be stopped?
-   bool _isSolveStopped() const;
+   /// introduces slack variables to transform inequality constraints into equations
+   void _transformEqualityRational();
+
+   /// restores original problem
+   void _untransformEqualityRational();
+
+   /// solves current problem with iterative refinement and recovery mechanism
+   void _performOptIRStable(bool& primalFeasible, bool& dualFeasible, bool& infeasible, bool& unbounded, bool& stopped, bool& error);
+
+   /// performs iterative refinement on the auxiliary problem for testing unboundedness
+   void _performUnboundedIRStable(bool& hasUnboundedRay, bool& stopped, bool& error);
+
+   /// performs iterative refinement on the auxiliary problem for testing feasibility
+   void _performFeasIRStable(bool& infeasible, bool& stopped, bool& error);
 
    //@}
 };
