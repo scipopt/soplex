@@ -58,6 +58,11 @@ public:
       *this = r;
    }
 
+   Rational(const mpq_class& q)
+      : mpq_class(q)
+   {
+   }
+
    Rational(const Real& r)
       : mpq_class(r)
    {
