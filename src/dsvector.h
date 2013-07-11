@@ -27,6 +27,7 @@ namespace soplex
 {
 typedef DSVectorBase< Real > DSVector;
 typedef DSVectorBase< Real > DSVectorReal;
+typedef DSVectorBase< Rational > DSVectorRational;
 } // namespace soplex
 #endif // _DSVECTOR_H_
 

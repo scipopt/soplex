@@ -175,6 +175,52 @@ namespace soplex
    /// introduces slack variables to transform inequality constraints into equations
    void SoPlex2::_transformEqualityRational()
    {
+      _slackCols.clear();
+
+      MSG_DEBUG( spxout << "adding slack columns\n" );
+
+      // add artificial slack variables to convert inequality to equality constraints
+      for( int i = 0; i < numRowsRational(); i++ )
+      {
+         if( lhsRational(i) != rhsRational(i) )
+         {
+            _slackCols.add(0.0, -rhsRational(i), DSVectorRational(UnitVector(i)), -lhsRational(i));
+            _rationalLP->changeLhs(i, 0.0);
+            _rationalLP->changeRhs(i, 0.0);
+         }
+      }
+
+      _rationalLP->addCols(_slackCols);
+
+      // adjust basis
+      if( _hasBasisRational )
+      {
+         for( int i = 0; i < _slackCols.num(); i++ )
+         {
+            int col = numColsRational() - _slackCols.num() + i;
+            int row = _slackCols.colVector(i).index(0);
+
+            assert(row >= 0);
+            assert(row < numRowsRational());
+
+            switch( _basisStatusRowsRational[row] )
+            {
+            case SPxSolver::ON_LOWER:
+               _basisStatusColsRational.append(SPxSolver::ON_UPPER);
+               break;
+            case SPxSolver::ON_UPPER:
+               _basisStatusColsRational.append(SPxSolver::ON_LOWER);
+               break;
+            case SPxSolver::BASIC:
+            case SPxSolver::FIXED:
+            default:
+               _basisStatusColsRational.append(_basisStatusRowsRational[row]);
+               break;
+            }
+
+            _basisStatusRowsRational[row] = SPxSolver::FIXED;
+         }
+      }
    }
 
 
@@ -182,6 +228,80 @@ namespace soplex
    /// restores original problem
    void SoPlex2::_untransformEqualityRational()
    {
+      int numOrigCols = numColsRational() - _slackCols.num();
+
+      // adjust solution
+      if( _solRational.hasPrimal() )
+      {
+         for( int i = 0; i < _slackCols.num(); i++ )
+         {
+            int col = numOrigCols + i;
+            int row = _slackCols.colVector(i).index(0);
+
+            assert(row >= 0);
+            assert(row < numRowsRational());
+
+            _solRational._slacks[row] -= _solRational._primal[col];
+         }
+
+         _solRational._primal.reDim(numOrigCols);
+      }
+
+      if( _solRational.hasPrimalray() )
+      {
+         _solRational._primalray.reDim(numOrigCols);
+      }
+
+      if( _solRational.hasDual() )
+      {
+         _solRational._redcost.reDim(numOrigCols);
+      }
+
+      // adjust basis
+      if( _hasBasisRational )
+      {
+         for( int i = 0; i < _slackCols.num(); i++ )
+         {
+            int col = numOrigCols + i;
+            int row = _slackCols.colVector(i).index(0);
+
+            assert(row >= 0);
+            assert(row < numRowsRational());
+            assert(_basisStatusRowsRational[row] == SPxSolver::FIXED || _basisStatusRowsRational[row] == SPxSolver::BASIC);
+
+            if( _basisStatusRowsRational[row] == SPxSolver::FIXED )
+            {
+               switch( _basisStatusColsRational[col] )
+               {
+               case SPxSolver::ON_LOWER:
+                  _basisStatusRowsRational[row] = SPxSolver::ON_UPPER;
+                  break;
+               case SPxSolver::ON_UPPER:
+                  _basisStatusRowsRational[row] = SPxSolver::ON_LOWER;
+                  break;
+               case SPxSolver::BASIC:
+               case SPxSolver::FIXED:
+               default:
+                  _basisStatusRowsRational[row] = _basisStatusColsRational[col];
+                  break;
+               }
+            }
+         }
+
+         _basisStatusColsRational.reSize(numOrigCols);
+      }
+
+      // restore sides and remove slack columns
+      for( int i = 0; i < _slackCols.num(); i++ )
+      {
+         int col = numOrigCols + i;
+         int row = _slackCols.colVector(i).index(0);
+
+         _rationalLP->changeLhs(row, -upperRational(col));
+         _rationalLP->changeRhs(row, -lowerRational(col));
+      }
+
+      _rationalLP->removeColRange(numOrigCols, numColsRational() - 1);
    }
 
 

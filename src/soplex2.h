@@ -1349,6 +1349,8 @@ private:
    SPxSolver::Status _statusRational;
    bool _hasBasisRational;
 
+   LPColSetRational _slackCols;
+
    //@}
 
 
