@@ -20,9 +20,6 @@
 
 #include "ratrecon.h"
 
-#define BITMAX 20
-#define EPS 0.000001
-
 namespace soplex
 {
    void GMPqv_init(mpq_t * vect,int dim);
@@ -104,13 +101,15 @@ namespace soplex
       }
 
       //reconstruct
-      rval = Reconstruct(resvec,xnum,denom,dim);
-
-      Rational tmprat;
-      for( i = 0; i < dim; i++ )
+      if( Reconstruct(resvec,xnum,denom,dim))
       {
-         tmprat = mpq_class(resvec[i]);
-         input[i]=tmprat;
+         // if successful, assign original input to reconstructed vector
+         Rational tmprat;
+         for( i = 0; i < dim; i++ )
+         {
+            tmprat = mpq_class(resvec[i]);
+            input[i]=tmprat;
+         }
       }
 
       mpz_clear(denom);
@@ -119,284 +118,146 @@ namespace soplex
       return rval;
    }
 
-
    int Reconstruct(mpq_t *x,mpz_t * xnum, mpz_t denom,int dim)
    {
+
       /* This reconstruction routine will set x equal to the mpq vector where */
       /* each component is the best rational approximation of xnum / denom */
-      /* with denominator no larger than bound */
+      /* with where the GCD of denominators of x is at most Dbound */
+      /* it will return fail if more accuracy is required: specifically */
+      /* if componentwise rational reconstruction does not produce sucha vector */
 
-      mpz_t delta;
-      mpz_init_set_ui(delta,1);
-      mpz_t xi;
-      mpz_init(xi);
+      bool rval = true;
+      int j, done =0;
 
-      mpz_t vmod;	/* this is the variable modulous that changes with delta */
-      mpz_init(vmod);
+      //denominator must be positive
+      assert(mpz_sgn(denom)>0);
 
-      int i;
-      int done,skip,rrclose;
-      int bitcnt,step;
-      int verbose = 0;
-
-      mpz_t dbound;
-      mpz_init(dbound);
-
-      mpz_t bound;
-      mpz_init(bound);
-      mpz_div_ui(bound,bound,2);
-      mpz_sqrt(bound,denom);
-
-      mpz_t a,b,c,d,q,r0,r1,anext,bnext,cnext,dnext,r0next,r1next,temp;
-      mpz_init(a);
-      mpz_init(b);
-      mpz_init(c);
-      mpz_init(d);
-      mpz_init(q);
-      mpz_init(r0);
-      mpz_init(r1);
-      mpz_init(anext);
-      mpz_init(bnext);
-      mpz_init(cnext);
-      mpz_init(dnext);
-      mpz_init(r0next);
-      mpz_init(r1next);
+      mpz_t temp,td,tn,Dbound,gcd;
+      mpz_init(gcd); /* stores the gcd of denominators, if too big, abort */
+      mpz_set_ui(gcd,1);
       mpz_init(temp);
-      mpq_t qtemp;
-      mpq_init(qtemp);
+      mpz_init(td);
+      mpz_init(tn);
+      mpz_init(Dbound);
+      mpz_set(Dbound,denom);  /* This is the working bound on the denominator size */
+      mpz_sqrt(Dbound,Dbound);
 
-      double Df,Dq,Dtemp;
-      int Da,Db,Dc,Dd,Danext,Dcnext;
+      // if Dbound is below 2^24 increase it to this value, this avoids
+      // changing input vectors that have low denominator because
+      // they are floating point representable
+      if( mpz_cmp_ui(Dbound,16777216) < 0 )
+         mpz_set_ui(Dbound,16777216);
 
-      for(i =0; i<dim;i++)
+
+      /* The following represent a_i, the cont frac representation */
+      /*  and p_i/q_i, the convergents */
+      mpz_t a0,ai;
+      mpz_init(a0);
+      mpz_init(ai);
+
+      /* here we use p[2]=pk, p[1]=pk-1,p[0]=pk-2 and same for q */
+      mpz_t p[3];
+      GMPv_init(p,3);
+      mpz_t q[3];
+      GMPv_init(q,3);
+
+      for(j =0; j<dim;j++)
       {
-         mpz_set_ui(delta,1);
-         /* if x is in range, assign it */
-
-         if(mpz_sgn(xnum[i])==0)
+         if(mpz_sgn(xnum[j])!=0) /* if xnum =0, then just leave x[j] as zero */
          {
-            mpq_set_num(x[i],xnum[i]);
-            mpq_set_den(x[i],delta);
-            mpq_canonicalize(x[i]);
-         }
-         else if(mpz_cmp(delta,bound)>0)
-         {
-            mpz_mul(xi,xnum[i],delta);
-            mpz_fdiv_qr(xi,temp,xi,denom);
-            if(mpz_cmp_ui(temp,0.5)>0)
-               mpz_add_ui(xi,xi,1);
-            /* get xi to be rrclosest integer to xnum[i]*delta/denom */
+            /*  setup n and d for computing a_i the cont. frac. rep */
+            mpz_set(tn,xnum[j]);
+            mpz_set(td,denom);
 
-            mpq_set_num(x[i],xi);
-            mpq_set_den(x[i],delta);
-            mpq_canonicalize(x[i]);
-         }
-         else
-         {
-            mpz_set(xi,xnum[i]);
-            mpz_mul(xi,xi,delta);
+            /* 	  divide tn and td by gcd */
+            mpz_gcd(temp,tn,td);
+            mpz_divexact(tn,tn,temp);
+            mpz_divexact(td,td,temp);
 
-            mpz_cdiv_q(dbound,bound,delta);
+            if(mpz_cmp(td,Dbound)<=0)
+	    {
+               mpq_set_num(x[j],tn);
+               mpq_set_den(x[j],td);
+               done=1;
+	    }
+            else
+	    {
+               mpz_set_ui(temp,1);
 
-            mpz_set(r0,xi);
-            mpz_set(r1,denom);
+               mpz_fdiv_q(a0,tn,td);
+               mpz_fdiv_r(temp,tn,td);
+               mpz_set(tn,td);
+               mpz_set(td,temp);
+               mpz_fdiv_q(ai,tn,td);
+               mpz_fdiv_r(temp,tn,td);
+               mpz_set(tn,td);
+               mpz_set(td,temp);
 
-            mpz_gcd(temp,r0,r1);
-            mpz_divexact(r0,r0,temp);
-            mpz_divexact(r1,r1,temp);
+               mpz_set(p[1],a0);
+               mpz_set_ui(p[2],1);
+               mpz_addmul(p[2],a0,ai);
 
-            mpz_fdiv_qr(q,temp,r0,r1);
-            mpz_set(r0,r1);
-            mpz_set(r1,temp);
+               mpz_set_ui(q[1],1);
+               mpz_set(q[2],ai);
 
-            mpz_set_ui(a,1);
-            mpz_set_ui(b,0);
-            mpz_set(c,q);
-            mpz_set_ui(d,1);
+               done =0;
+               /* 	  if q is already big, skip loop */
+               if(mpz_cmp(q[2],Dbound)>0)
+                  done=1;
 
-            done =0;
-            skip = 0;
-            rrclose = 0;
+               int cfcnt=2;
+               while (!done && mpz_cmp_ui(td,0))
+               {/* update everything: compute next ai, then update convergents */
 
-            if(mpz_sgn(r1)==0)
-            {
-               done =1;
-            }
-            while(!done)
-            {
+		  /* update ai */
+		  mpz_fdiv_q(ai,tn,td);
+		  mpz_fdiv_r(temp,tn,td);
+		  mpz_set(tn,td);
+		  mpz_set(td,temp);
 
-               if( !skip && !rrclose)
-               {
-                  /* Do a part with doubles */
-                  /* Convert r0/r1 to double */
-                  mpq_set_num(qtemp,r0);
-                  mpq_set_den(qtemp,r1);
+		  /* shift p,q */
+		  mpz_set(q[0],q[1]);
+		  mpz_set(q[1],q[2]);
+		  mpz_set(p[0],p[1]);
+		  mpz_set(p[1],p[2]);
 
-                  Df=mpq_get_d(qtemp);
-                  bitcnt = 1.44*(log(floor(Df)));
+		  /* compute next p,q */
+		  mpz_set(p[2],p[0]);
+		  mpz_addmul(p[2],p[1],ai);
+		  mpz_set(q[2],q[0]);
+		  mpz_addmul(q[2],q[1],ai);
 
-                  /* if bitcnt is small enough do a dbl round */
-                  /* otherwise this will send us to an exact step */
-                  if(bitcnt >= BITMAX )
-                  {
-                     /* in this case, get out and do a full precision step */
-                     /* printf("bitcnt large, skipping next loop \n"); */
-                     skip =1;
-                  }
-                  else
-                  {
-                     /*  printf("bitcnt good, doing dbl EEA \n"); */
-                     Da=1;Db=0;Dc=0;Dd=1;
-                     step =0;
-
-                     /* while bitcount low, do EEA with dbls */
-                     while(bitcnt<BITMAX && Df > EPS && step <15)
-                     {
-
-                        /*  printf("Doing EEA step \n"); */
-
-                        Dq=floor(Df);
-                        /*  printf("Df = %f, Dq = %f\n",Df,Dq); */
-
-                        Dtemp=(Df-Dq);
-                        if(Dtemp>EPS)
-                        {
-                           Df=1/Dtemp;
-                           bitcnt += 1.44*(log(Dq))+1;
-                           if(bitcnt<BITMAX)
-                           {
-                              Danext = (int)(Da*Dq+Db+ EPS );
-                              Dcnext = (int)(Dc*Dq+Dd+ EPS );
-                              Db=Da;
-                              Dd=Dc;
-                              Da=Danext;
-                              Dc=Dcnext;
-                              step++;
-                           }
-                        }
-                        else
-                           bitcnt= BITMAX +1;
-                     }
-
-                     /* update Q and ri using DQ*/
-                     /* make Qtemp = Q x DQ */
-
-                     if(Da==1)
-                        skip = 1;
-                     else
-                     {
-                        mpz_mul_ui(anext,a,Da);
-                        mpz_addmul_ui(anext,b,Dc);
-
-                        if(mpz_cmp(anext,dbound)>0)
-                        {
-                           /*  printf("next dbound large, moving to all exact\n"); */
-                           rrclose = 1; /* rrclose to dbound do rest in full prec */
-                        }
-                        else
-                        {
-                           /* printf("updating exact Q\n");	 */
-                           /* printf("abcd = %d %d %d %d\n",Da,Db,Dc,Dd);  */
-                           /* if it is in correct range assign */
-
-                           mpz_mul_ui(bnext,a,Db);
-                           mpz_addmul_ui(bnext,b,Dd);
-
-                           mpz_mul_ui(cnext,c,Da);
-                           mpz_addmul_ui(cnext,d,Dc);
-
-                           mpz_mul_ui(dnext,c,Db);
-                           mpz_addmul_ui(dnext,d,Dd);
-
-                           mpz_set(a,anext);
-                           mpz_set(b,bnext);
-                           mpz_set(c,cnext);
-                           mpz_set(d,dnext);
-                           /* and update remainders as well */
-
-                           mpz_mul_ui(r0next,r0,Dd);
-                           mpz_submul_ui(r0next,r1,Db);
-
-                           mpz_mul_ui(r1next,r1,Da);
-                           mpz_submul_ui(r1next,r0,Dc);
-
-                           mpz_set(r0,r0next);
-                           mpz_set(r1,r1next);
-
-                           if(step%2==1) /* if step number is odd */
-                           {
-                              mpz_neg(r1,r1);
-                              mpz_neg(r0,r0);
-                           }
-                        }
-                     }
-                  }
-
+		  if(mpz_cmp(q[2],Dbound)>0)
+                     done=1;
+		  cfcnt++;
                }
-               else
+               /* Assign the values */
+
+               mpq_set_num(x[j],p[1]);
+               mpq_set_den(x[j],q[1]);
+               mpq_canonicalize(x[j]);
+               mpz_gcd(temp,gcd,mpq_denref(x[j]));
+               mpz_mul(gcd,gcd,temp);
+               if(mpz_cmp(gcd,Dbound)>0)
                {
-                  /* Do a step in full precision */
-
-                  skip=0; /* tell it to try dbl step again if it can */
-
-                  mpz_fdiv_qr(q,temp,r0,r1);
-                  mpz_set(r0,r1);
-                  mpz_set(r1,temp);
-
-                  mpz_mul(anext,a,q);
-                  mpz_mul(cnext,c,q);
-                  mpz_add(anext,anext,b);
-                  mpz_add(cnext,cnext,d);
-                  step++;
-
-                  if(mpz_cmp(anext,dbound)>0)
-                     done =1;
-                  else
-                  {
-                     mpz_set(b,a);
-                     mpz_set(d,c);
-                     mpz_set(a,anext);
-                     mpz_set(c,cnext);
-                  }
-                  if(mpz_sgn(r1)==0)
-                     done = 1;
+		  rval = false;
+		  goto CLEANUP;
                }
-            }
-
-            /* Assign Values */
-            mpq_set_num(x[i],c);
-            mpz_mul(delta,delta,a);
-            mpq_set_den(x[i],delta);
-            mpq_canonicalize(x[i]);
-            if(verbose)
-            {
-               printf("x[%d] set to ",i);
-               mpq_out_str(stdout,10,x[i]);
-               printf("\n");
-            }
+	    }
          }
       }
-
-      mpz_clear(xi);
-      mpz_clear(delta);
-      mpz_clear(dbound);
-      mpz_clear(bound);
-      mpz_clear(a);
-      mpz_clear(b);
-      mpz_clear(c);
-      mpz_clear(d);
-      mpz_clear(q);
-      mpz_clear(r0);
-      mpz_clear(r1);
-      mpz_clear(anext);
-      mpz_clear(bnext);
-      mpz_clear(cnext);
-      mpz_clear(dnext);
-      mpz_clear(r0next);
-      mpz_clear(r1next);
+   CLEANUP:
+      GMPv_clear(q,3);
+      GMPv_clear(p,3);
+      mpz_clear(td);
+      mpz_clear(tn);
+      mpz_clear(a0);
+      mpz_clear(ai);
       mpz_clear(temp);
-      mpq_clear(qtemp);
-      return true;
+      mpz_clear(Dbound);
+      mpz_clear(gcd);
+      return rval;
    }
 
    void GMPqv_init(mpq_t * vect,int dim)
