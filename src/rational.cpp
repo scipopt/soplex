@@ -51,17 +51,44 @@ std::ostream& operator<<(std::ostream& os, const Rational& q)
    return os;
 }
 
-/// return as string
-std::string Rational::toString(const bool asfloat) const
+/// convert rational number to string
+std::string rationalToString(const Rational& r, const bool asfloat)
 {
    std::stringstream sstream;
 
-   if( asfloat )
-      sstream << mpf_class(*this);
+   sstream << r;
+   if( !asfloat || sstream.str().find("/") == std::string::npos )
+      return sstream.str();
    else
-      sstream << mpq_class(*this);
+   {
+      sstream.str("");
+      sstream << mpf_class(r);
+      return sstream.str();
+   }
+
+   ///@todo the following code creates a string iof the form 1.333...e-06; this would be nice for human readable output,
+   ///      because it indicates that precision may have been lost, however, this cannot be parsed by our awk evaluation
+   ///      scripts; we should think about how this could be useful
+#if 0
+   sstream.str("");
+   sstream << mpf_class(r);
+   std::string origstring = sstream.str();
+   sstream.str("");
+
+   size_t epos = origstring.find("e");
+
+   sstream << origstring.substr(0, epos);
+
+   if( origstring.find(".") == std::string::npos )
+      sstream << ".0";
+
+   sstream << "...";
+
+   if( epos != std::string::npos )
+      sstream << origstring.substr(origstring.find("e"));
 
    return sstream.str();
+#endif
 }
 
 #define MAX_STR_LEN 10000
@@ -206,6 +233,16 @@ bool Rational::readString(const char* s)
    value.canonicalize();
    *this = value;
    return true;
+}
+
+#else
+
+/// convert rational number to string
+std::string rationalToString(const Rational& r, const bool asfloat)
+{
+   std::stringstream sstream;
+   sstream << r;
+   return sstream.str();
 }
 
 #endif

@@ -106,9 +106,6 @@ public:
       return retval;
    }
 
-   /// return as string
-   std::string toString(const bool asfloat = true) const;
-
    /// read Rational from string
    bool readString(const char* s);
 };
@@ -141,6 +138,9 @@ typedef Real Rational;
 #define RationalIsExact() (false)
 
 #endif
+
+/// convert rational number to string
+std::string rationalToString(const Rational& r, const bool asfloat = true);
 
 } // namespace soplex
 #endif // _RATIONAL_H_

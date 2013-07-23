@@ -1755,7 +1755,7 @@ static void LPFwriteSVector(
       {
          // insert a line break every NUM_ENTRIES_PER_LINE columns or whenever max line length is nearly exceeded
          if( num_coeffs == NUM_ENTRIES_PER_LINE ||
-            (long long)(p_output.tellp()) - pos + (long long)(coeff.toString(false).length() + 100) > MAX_LINE_WRITE_LEN )
+            (long long)(p_output.tellp()) - pos + (long long)(rationalToString(coeff, false).length() + 100) > MAX_LINE_WRITE_LEN )
          {
             num_coeffs = 0;
             p_output << "\n\t";
@@ -1822,7 +1822,7 @@ static void LPFwriteRow(
    LPFwriteSVector(p_lp, p_output, p_cnames, p_svec);
 
    long long sidelen;
-   sidelen = (p_lhs == p_rhs || p_lhs <= -infinity) ? p_rhs.toString(false).length() : p_lhs.toString(false).length();
+   sidelen = (p_lhs == p_rhs || p_lhs <= -infinity) ? rationalToString(p_rhs, false).length() : rationalToString(p_lhs, false).length();
 
    // insert a line break if max line length is in danger of being exceeded
    if( (long long)(p_output.tellp()) - pos + sidelen + (long long)100 > MAX_LINE_WRITE_LEN )

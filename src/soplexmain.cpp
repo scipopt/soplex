@@ -344,15 +344,15 @@ void displayQualityRational( SoPlex2& SoPlexShell, bool checkMode )
       MSG_INFO1( spxout << "IEXAMP06 "; )
 
    MSG_INFO1( spxout << "Constraints      : "
-      << std::setw(16) << maxviol.toString() << "  "
-      << std::setw(16) << sumviol.toString() << std::endl );
+      << std::setw(16) << rationalToString(maxviol) << "  "
+      << std::setw(16) << rationalToString(sumviol) << std::endl );
 
    if( checkMode )
       MSG_INFO1( spxout << "IEXAMP07 "; )
 
    MSG_INFO1( spxout << "      (unscaled) : "
-      << std::setw(16) << maxviol.toString() << "  "
-      << std::setw(16) << sumviol.toString() << std::endl );
+      << std::setw(16) << rationalToString(maxviol) << "  "
+      << std::setw(16) << rationalToString(sumviol) << std::endl );
 
    // get bound violations of rational LP
    SoPlexShell.getBoundViolationRational(primal, maxviol, sumviol);
@@ -361,15 +361,15 @@ void displayQualityRational( SoPlex2& SoPlexShell, bool checkMode )
       MSG_INFO1( spxout << "IEXAMP08 "; )
 
    MSG_INFO1( spxout << "Bounds           : "
-      << std::setw(16) << maxviol.toString() << "  "
-      << std::setw(16) << sumviol.toString() << std::endl );
+      << std::setw(16) << rationalToString(maxviol) << "  "
+      << std::setw(16) << rationalToString(sumviol) << std::endl );
 
    if( checkMode )
       MSG_INFO1( spxout << "IEXAMP09 " );
 
    MSG_INFO1( spxout << "      (unscaled) : "
-      << std::setw(16) << maxviol.toString() << "  "
-      << std::setw(16) << sumviol.toString() << std::endl );
+      << std::setw(16) << rationalToString(maxviol) << "  "
+      << std::setw(16) << rationalToString(sumviol) << std::endl );
 
    // get slack violations of rational LP
    SoPlexShell.getSlackViolationRational(maxviol, sumviol);
@@ -378,8 +378,8 @@ void displayQualityRational( SoPlex2& SoPlexShell, bool checkMode )
       MSG_INFO1( spxout << "IEXAMP10 "; )
 
    MSG_INFO1( spxout << "Slacks           : "
-      << std::setw(16) << maxviol.toString() << "  "
-      << std::setw(16) << sumviol.toString() << std::endl );
+      << std::setw(16) << rationalToString(maxviol) << "  "
+      << std::setw(16) << rationalToString(sumviol) << std::endl );
 
    // get reduced cost violations of rational LP
    SoPlexShell.getRedCostViolationRational(maxviol, sumviol);
@@ -388,8 +388,8 @@ void displayQualityRational( SoPlex2& SoPlexShell, bool checkMode )
       MSG_INFO1( spxout << "IEXAMP11 "; )
 
    MSG_INFO1( spxout << "Reduced costs    : "
-      << std::setw(16) << maxviol.toString() << "  "
-      << std::setw(16) << sumviol.toString() << std::endl );
+      << std::setw(16) << rationalToString(maxviol) << "  "
+      << std::setw(16) << rationalToString(sumviol) << std::endl );
 }
 
 //------------------------------------------------------------------------
@@ -438,66 +438,66 @@ void printAlgorithmParameters(
    if( checkMode )
    {
       MSG_INFO1( spxout
-    << "IEXAMP12 Feastol        = "
-    << std::setw(16) << SoPlexShell.rationalParam(SoPlex2::FEASTOL).toString() << std::endl
-    << "IEXAMP52 Opttol         = "
-    << std::setw(16) << SoPlexShell.rationalParam(SoPlex2::OPTTOL).toString() << std::endl
-    << "IEXAMP53 Irthreshold    = "
-    << std::setw(16) << SoPlexShell.realParam(SoPlex2::IRTHRESHOLD) << std::endl
-    << "IEXAMP13 Epsilon Zero   = "
-    << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_ZERO) << std::endl
-    << "IEXAMP37 Epsilon Factor = "
-    << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_FACTORIZATION) << std::endl
-    << "IEXAMP38 Epsilon Update = "
-    << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_UPDATE) << std::endl
-    << "IEXAMP14 "
-    << (SoPlexShell.intParam(SoPlex2::ALGORITHM) == SoPlex2::ALGORITHM_ENTER ? "Entering" : "Leaving")
-    << " algorithm" << std::endl
-    << "IEXAMP15 "
-    << (SoPlexShell.intParam(SoPlex2::REPRESENTATION) == SoPlex2::REPRESENTATION_ROW ? "Row" : "Column")
-    << " representation" << std::endl
-    << "IEXAMP16 "
-    << (SoPlexShell.intParam(SoPlex2::FACTOR_UPDATE_TYPE) == SoPlex2::FACTOR_UPDATE_TYPE_ETA ? "Eta" : "Forest-Tomlin")
-    << " update" << std::endl; )
+         << "IEXAMP12 Feastol        = "
+         << std::setw(16) << rationalToString(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) << std::endl
+         << "IEXAMP52 Opttol         = "
+         << std::setw(16) << rationalToString(SoPlexShell.rationalParam(SoPlex2::OPTTOL)) << std::endl
+         << "IEXAMP53 Irthreshold    = "
+         << std::setw(16) << SoPlexShell.realParam(SoPlex2::IRTHRESHOLD) << std::endl
+         << "IEXAMP13 Epsilon Zero   = "
+         << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_ZERO) << std::endl
+         << "IEXAMP37 Epsilon Factor = "
+         << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_FACTORIZATION) << std::endl
+         << "IEXAMP38 Epsilon Update = "
+         << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_UPDATE) << std::endl
+         << "IEXAMP14 "
+         << (SoPlexShell.intParam(SoPlex2::ALGORITHM) == SoPlex2::ALGORITHM_ENTER ? "Entering" : "Leaving")
+         << " algorithm" << std::endl
+         << "IEXAMP15 "
+         << (SoPlexShell.intParam(SoPlex2::REPRESENTATION) == SoPlex2::REPRESENTATION_ROW ? "Row" : "Column")
+         << " representation" << std::endl
+         << "IEXAMP16 "
+         << (SoPlexShell.intParam(SoPlex2::FACTOR_UPDATE_TYPE) == SoPlex2::FACTOR_UPDATE_TYPE_ETA ? "Eta" : "Forest-Tomlin")
+         << " update" << std::endl; )
    }
    else
    {
       MSG_INFO1( spxout
-    << "SoPlex parameters: " << std::endl
-    << "Feastol        = "
-    << std::setw(16) << SoPlexShell.rationalParam(SoPlex2::FEASTOL).toString() << std::endl
-    << "Opttol         = "
-    << std::setw(16) << SoPlexShell.rationalParam(SoPlex2::OPTTOL).toString() << std::endl
-    << "Irthreshold    = "
-    << std::setw(16) << SoPlexShell.realParam(SoPlex2::IRTHRESHOLD) << std::endl
-    << "Epsilon Zero   = "
-    << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_ZERO) << std::endl
-    << "Epsilon Factor = "
-    << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_FACTORIZATION) << std::endl
-    << "Epsilon Update = "
-    << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_UPDATE) << std::endl
-    << std::endl
-    << "algorithm      = " << (SoPlexShell.intParam(SoPlex2::ALGORITHM) == SoPlex2::ALGORITHM_ENTER ? "Entering" : "Leaving")
-    << std::endl
-    << "representation = " << (SoPlexShell.intParam(SoPlex2::REPRESENTATION) == SoPlex2::REPRESENTATION_ROW ? "Row" : "Column")
-    << std::endl
-    << "update         = " << (SoPlexShell.intParam(SoPlex2::FACTOR_UPDATE_TYPE) == SoPlex2::FACTOR_UPDATE_TYPE_ETA ? "Eta" : "Forest-Tomlin")
-    << std::endl; )
+         << "SoPlex parameters: " << std::endl
+         << "Feastol        = "
+         << std::setw(16) << rationalToString(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) << std::endl
+         << "Opttol         = "
+         << std::setw(16) << rationalToString(SoPlexShell.rationalParam(SoPlex2::OPTTOL)) << std::endl
+         << "Irthreshold    = "
+         << std::setw(16) << SoPlexShell.realParam(SoPlex2::IRTHRESHOLD) << std::endl
+         << "Epsilon Zero   = "
+         << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_ZERO) << std::endl
+         << "Epsilon Factor = "
+         << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_FACTORIZATION) << std::endl
+         << "Epsilon Update = "
+         << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_UPDATE) << std::endl
+         << std::endl
+         << "algorithm      = " << (SoPlexShell.intParam(SoPlex2::ALGORITHM) == SoPlex2::ALGORITHM_ENTER ? "Entering" : "Leaving")
+         << std::endl
+         << "representation = " << (SoPlexShell.intParam(SoPlex2::REPRESENTATION) == SoPlex2::REPRESENTATION_ROW ? "Row" : "Column")
+         << std::endl
+         << "update         = " << (SoPlexShell.intParam(SoPlex2::FACTOR_UPDATE_TYPE) == SoPlex2::FACTOR_UPDATE_TYPE_ETA ? "Eta" : "Forest-Tomlin")
+         << std::endl; )
    }
 
    // @todo do we need checkMode keys for these lines?
    MSG_INFO1( spxout
-    << "pricer         = " << SoPlexShell.getPricerName()
-    << std::endl
-    << "starter        = " << SoPlexShell.getStarterName()
-    << std::endl
-    << "simplifier     = " << SoPlexShell.getSimplifierName()
-    << std::endl
-    << "ratiotest      = " << SoPlexShell.getRatiotesterName()
-    << std::endl
-    << "scaling        = " << SoPlexShell.getFirstScalerName() << " / " << SoPlexShell.getSecondScalerName()
-    << std::endl
-    << std::endl; )
+      << "pricer         = " << SoPlexShell.getPricerName()
+      << std::endl
+      << "starter        = " << SoPlexShell.getStarterName()
+      << std::endl
+      << "simplifier     = " << SoPlexShell.getSimplifierName()
+      << std::endl
+      << "ratiotest      = " << SoPlexShell.getRatiotesterName()
+      << std::endl
+      << "scaling        = " << SoPlexShell.getFirstScalerName() << " / " << SoPlexShell.getSecondScalerName()
+      << std::endl
+      << std::endl; )
 }
 
 //------------------------------------------------------------------------
@@ -941,7 +941,7 @@ void printSolutionAndStatusRational(
    case SPxSolver::OPTIMAL:
       if( checkMode )
          MSG_INFO1( spxout << "IEXAMP29 "; )
-            MSG_INFO1( spxout << "Solution value is: " << std::setprecision( precision ) << SoPlexShell.objValueRational().toString() << std::endl << std::endl );
+            MSG_INFO1( spxout << "Solution value is: " << std::setprecision( precision ) << rationalToString(SoPlexShell.objValueRational()) << std::endl << std::endl );
 
       if( print_quality )
          displayQualityRational( SoPlexShell, checkMode );
