@@ -164,9 +164,14 @@ namespace soplex
 
             ///@todo define suitable values depending on Real type
             // threshold for activating iterative refinement
-            _realParamLower[SoPlex2::IRTHRESHOLD] = 0.0;
-            _realParamUpper[SoPlex2::IRTHRESHOLD] = 1.0;
-            _realParamDefault[SoPlex2::IRTHRESHOLD] = 1e-12;
+            _realParamLower[SoPlex2::FPFEASTOL] = 1e-12;
+            _realParamUpper[SoPlex2::FPFEASTOL] = 1.0;
+            _realParamDefault[SoPlex2::FPFEASTOL] = 1e-9;
+
+            // threshold for activating iterative refinement
+            _realParamLower[SoPlex2::FPOPTTOL] = 1e-12;
+            _realParamUpper[SoPlex2::FPOPTTOL] = 1.0;
+            _realParamDefault[SoPlex2::FPOPTTOL] = 1e-9;
 
             // primal feasibility tolerance
             _rationalParamLower[SoPlex2::FEASTOL] = 0.0;
@@ -2638,10 +2643,19 @@ namespace soplex
 
       // will preprocessing be applied? (only if no basis is available)
       bool applyPreprocessing = (_firstScaler != 0 || _simplifier != 0 || _secondScaler != 0) && !_hasBasisReal;
+
       if( applyPreprocessing )
+      {
          _enableSimplifierAndScalers();
+         _solver.setTerminationValue(realParam(SoPlex2::INFTY));
+      }
       else
+      {
          _disableSimplifierAndScalers();
+         ///@todo implement for both objective senses
+         _solver.setTerminationValue(intParam(SoPlex2::OBJSENSE) == SoPlex2::OBJSENSE_MINIMIZE
+            ? realParam(SoPlex2::OBJLIMIT_UPPER) : realParam(SoPlex2::INFTY));
+      }
 
       if( _isRealLPLoaded )
       {
@@ -4605,25 +4619,20 @@ namespace soplex
          _solver.setTerminationIter(value);
          break;
 
-      // lower limit on objective value
+      // lower limit on objective value is set in solveReal()
       case SoPlex2::OBJLIMIT_LOWER:
-         ///@todo implement for both objective senses in SPxSolver::terminate()
-         return false;
+         break;
 
-      // upper limit on objective value
+      // upper limit on objective value is set in solveReal()
       case SoPlex2::OBJLIMIT_UPPER:
-         ///@todo implement for both objective senses in SPxSolver::terminate()
-         if( intParam(SoPlex2::OBJSENSE) == SoPlex2::OBJSENSE_MINIMIZE )
-         {
-            _solver.setTerminationValue(value);
-            break;
-         }
-         else
-            return false;
+         break;
 
-      // threshold for activating iterative refinement
-      case SoPlex2::IRTHRESHOLD:
-         _solver.setIrthreshold(value);
+      // working tolerance for feasibility in floating-point solver
+      case SoPlex2::FPFEASTOL:
+         break;
+
+      // working tolerance for optimality in floating-point solver
+      case SoPlex2::FPOPTTOL:
          break;
 
       default:

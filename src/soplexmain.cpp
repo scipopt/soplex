@@ -208,7 +208,7 @@ void printUsage( const char* const argv[] )
       " -f        set primal feasibility tolerance\n"
       " -o        set optimality, i.e., dual feasibility tolerance\n"
       " -d        set primal and dual feasibility tolerance to same value\n"
-      " -R        set threshold for tolerances below which iterative refinement is applied\n"
+      " -R        set working tolerance for floating-point solves during iterative refinement\n"
       " -zz       set general zero tolerance\n"
       " -zf       set factorization zero tolerance\n"
       " -zu       set update zero tolerance\n"
@@ -442,8 +442,10 @@ void printAlgorithmParameters(
          << std::setw(16) << rationalToString(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) << std::endl
          << "IEXAMP52 Opttol         = "
          << std::setw(16) << rationalToString(SoPlexShell.rationalParam(SoPlex2::OPTTOL)) << std::endl
-         << "IEXAMP53 Irthreshold    = "
-         << std::setw(16) << SoPlexShell.realParam(SoPlex2::IRTHRESHOLD) << std::endl
+         << "IEXAMP53 FPFEASTOL      = "
+         << std::setw(16) << SoPlexShell.realParam(SoPlex2::FPFEASTOL) << std::endl
+         << "IEXAMP53 FPOPTTOL       = "
+         << std::setw(16) << SoPlexShell.realParam(SoPlex2::FPOPTTOL) << std::endl
          << "IEXAMP13 Epsilon Zero   = "
          << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_ZERO) << std::endl
          << "IEXAMP37 Epsilon Factor = "
@@ -468,8 +470,10 @@ void printAlgorithmParameters(
          << std::setw(16) << rationalToString(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) << std::endl
          << "Opttol         = "
          << std::setw(16) << rationalToString(SoPlexShell.rationalParam(SoPlex2::OPTTOL)) << std::endl
-         << "Irthreshold    = "
-         << std::setw(16) << SoPlexShell.realParam(SoPlex2::IRTHRESHOLD) << std::endl
+         << "FPFEASTOL      = "
+         << std::setw(16) << SoPlexShell.realParam(SoPlex2::FPFEASTOL) << std::endl
+         << "FPOPTTOL       = "
+         << std::setw(16) << SoPlexShell.realParam(SoPlex2::FPOPTTOL) << std::endl
          << "Epsilon Zero   = "
          << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_ZERO) << std::endl
          << "Epsilon Factor = "
@@ -1268,7 +1272,8 @@ int main(int argc, char* argv[])
             break;
          case 'R' :
             checkParameter(argv[optidx][2], argv); // use -Rx, not -R
-            SoPlexShell->setRealParam( SoPlex2::IRTHRESHOLD, atof(&argv[optidx][2]) );
+            SoPlexShell->setRealParam( SoPlex2::FPFEASTOL, atof(&argv[optidx][2]) );
+            SoPlexShell->setRealParam( SoPlex2::FPOPTTOL, atof(&argv[optidx][2]) );
             break;
          case 'e':
             SoPlexShell->setIntParam( SoPlex2::ALGORITHM, SoPlex2::ALGORITHM_ENTER );

@@ -1199,11 +1199,14 @@ public:
       /// upper limit on objective value
       OBJLIMIT_UPPER = 6,
 
-      /// threshold for activating iterative refinement
-      IRTHRESHOLD = 7,
+      /// working tolerance for feasibility in floating-point solver during iterative refinement
+      FPFEASTOL = 7,
+
+      /// working tolerance for optimality in floating-point solver during iterative refinement
+      FPOPTTOL = 8,
 
       /// number of real parameters
-      REALPARAM_COUNT = 8
+      REALPARAM_COUNT = 9
    } RealParam;
 
    /// rational parameters
