@@ -23,13 +23,22 @@ namespace soplex
    /// default constructor
    SoPlex2::Statistics::Statistics()
    {
-      clear();
+      clearAllData();
    }
 
-   /// clears statistics
-   void SoPlex2::Statistics::clear()
+   /// clears all statistics
+   void SoPlex2::Statistics::clearAllData()
    {
-      solvingTime = 0.0;
+      readingTime.reset();
+      clearSolvingData();
+   }
+
+   /// clears statistics on solving process
+   void SoPlex2::Statistics::clearSolvingData()
+   {
+      solvingTime.reset();
+      syncTime.reset();
+      transformTime.reset();
       iterations = 0;
       refinements = 0;
       stallRefinements = 0;

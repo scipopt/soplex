@@ -13,60 +13,26 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file  statistics.h
- * @brief Class for collecting statistical information
- */
-#ifndef _STATISTICS_H_
-#define _STATISTICS_H_
-
 #include <iostream>
+#include <assert.h>
 
 #include "soplex2.h"
-#include "timer.h"
+#include "statistics.h"
 
 namespace soplex
 {
-   /**@class   Statistics
-    * @brief   Class for collecting statistical information
-    * @ingroup Algo
-    */
-   class SoPlex2::Statistics
+   /// solves real LP with recovery mechanism
+   void SoPlex2::_solveRealStable()
    {
-   public:
+      ///@todo implement starter
+      ///@todo implement auto pricing
+      ///@todo implement recovery mechanism
+      _solver.solve();
 
-      //**@name Construction, resetting, printing */
-      //@{
-
-      /// default constructor
-      Statistics();
-
-      /// clears all statistics
-      void clearAllData();
-
-      /// clears statistics on solving process
-      void clearSolvingData();
-
-      /// prints statistics
-      void print(std::ostream& os);
-
-      //@}
-
-
-      //**@name Data */
-      //@{
-
-      Timer readingTime; ///< reading time not included in solving time
-      Timer solvingTime; ///< solving time
-      Timer syncTime; ///< time for synchronization between real and rational LP (included in solving time)
-      Timer transformTime; ///< time for transforming LPs (included in solving time)
-      int iterations; ///< number of iterations/pivots
-      int refinements; ///< number of refinement steps
-      int stallRefinements; ///< number of refinement steps without subsequent pivots
-
-      //@}
-   };
+      // record statistics
+      _statistics->iterations += _solver.iterations();
+   }
 } // namespace soplex
-#endif // _STATISTICS_H_
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:

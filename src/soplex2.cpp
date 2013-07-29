@@ -2639,6 +2639,13 @@ namespace soplex
    {
       assert(_isConsistent());
 
+      // clear statistics
+      _statistics->clearSolvingData();
+
+      // start timing
+      _statistics->solvingTime.start();
+
+      // the solution is no longer valid
       _invalidateSolutionReal();
 
       // will preprocessing be applied? (only if no basis is available)
@@ -2736,173 +2743,177 @@ namespace soplex
       // run the simplex method if problem has not been solved by the simplifier
       if( simplificationStatus == SPxSimplifier::OKAY )
       {
-         ///@todo this should become a separate method that implements starter and auto pricing
-         _solver.solve();
+         _solveRealStable();
       }
 
       ///@todo move to private helper methods
       // evaluate status flag
       assert(_statusReal == SPxSolver::UNKNOWN);
-      if( simplificationStatus == SPxSimplifier::OKAY )
-         _statusReal = _solver.status();
-      else if( simplificationStatus == SPxSimplifier::INFEASIBLE )
-         return SPxSolver::INFEASIBLE;
+      if( simplificationStatus == SPxSimplifier::INFEASIBLE )
+         _statusReal = SPxSolver::INFEASIBLE;
       else if( simplificationStatus == SPxSimplifier::DUAL_INFEASIBLE )
-         return SPxSolver::INForUNBD;
+         _statusReal = SPxSolver::INForUNBD;
       else if( simplificationStatus == SPxSimplifier::UNBOUNDED )
-         return SPxSolver::UNBOUNDED;
+         _statusReal = SPxSolver::UNBOUNDED;
       else if( simplificationStatus == SPxSimplifier::VANISHED )
-         return SPxSolver::OPTIMAL;
-
-      ///@todo move to private helper methods
-      // evaluate solution flags
-      assert(!_hasPrimalReal);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::ERROR);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::NO_RATIOTESTER);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::NO_PRICER);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::NO_SOLVER);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::NOT_INIT);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::SINGULAR);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::NO_PROBLEM);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::UNBOUNDED);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::INFEASIBLE);
-      assert(_solver.basis().status() != SPxBasis::UNBOUNDED || statusReal() == SPxSolver::UNBOUNDED);
-      assert(_solver.basis().status() == SPxBasis::UNBOUNDED || statusReal() != SPxSolver::UNBOUNDED);
-      _hasPrimalReal = (SPxSolver::OPTIMAL || (_simplifier == 0 &&
-            (_solver.basis().status() == SPxBasis::PRIMAL || _solver.basis().status() == SPxBasis::UNBOUNDED) &&
-            _solver.shift() < 10.0 * realParam(SoPlex2::EPSILON_ZERO)));
-
-      assert(!_hasPrimalrayReal);
-      _hasPrimalrayReal = (statusReal() == SPxSolver::UNBOUNDED && _simplifier == 0);
-
-      assert(!_hasDualReal);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::ERROR);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::NO_RATIOTESTER);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::NO_PRICER);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::NO_SOLVER);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::NOT_INIT);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::SINGULAR);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::NO_PROBLEM);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::UNBOUNDED);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::INFEASIBLE);
-      assert(_solver.basis().status() != SPxBasis::INFEASIBLE || statusReal() == SPxSolver::INFEASIBLE);
-      assert(_solver.basis().status() == SPxBasis::INFEASIBLE || statusReal() != SPxSolver::INFEASIBLE);
-      _hasDualReal = (statusReal() == SPxSolver::OPTIMAL || (_simplifier == 0 &&
-            (_solver.basis().status() == SPxBasis::DUAL || _solver.basis().status() == SPxBasis::INFEASIBLE) &&
-            _solver.shift() < 10.0 * realParam(SoPlex2::EPSILON_ZERO)));
-
-      assert(!_hasDualfarkasReal);
-      _hasDualfarkasReal = (statusReal() == SPxSolver::INFEASIBLE && _simplifier == 0);
-
-      ///@todo move to private helper methods
-      // process result
-      switch( statusReal() )
+         _statusReal = SPxSolver::OPTIMAL;
+      else if( simplificationStatus == SPxSimplifier::OKAY )
       {
-      case SPxSolver::OPTIMAL:
-         // unsimplify if simplifier is active and LP is solved to optimality; this must be done here and not at solution
-         // query, because we want to have the basis for the original problem
-         if( _simplifier != 0 )
+         _statusReal = _solver.status();
+
+         ///@todo move to private helper methods
+         // evaluate solution flags
+         assert(!_hasPrimalReal);
+         assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::ERROR);
+         assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::NO_RATIOTESTER);
+         assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::NO_PRICER);
+         assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::NO_SOLVER);
+         assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::NOT_INIT);
+         assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::SINGULAR);
+         assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::NO_PROBLEM);
+         assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::UNBOUNDED);
+         assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::INFEASIBLE);
+         assert(_solver.basis().status() != SPxBasis::UNBOUNDED || statusReal() == SPxSolver::UNBOUNDED);
+         assert(_solver.basis().status() == SPxBasis::UNBOUNDED || statusReal() != SPxSolver::UNBOUNDED);
+         _hasPrimalReal = (SPxSolver::OPTIMAL || (_simplifier == 0 &&
+               (_solver.basis().status() == SPxBasis::PRIMAL || _solver.basis().status() == SPxBasis::UNBOUNDED) &&
+               _solver.shift() < 10.0 * realParam(SoPlex2::EPSILON_ZERO)));
+
+         assert(!_hasPrimalrayReal);
+         _hasPrimalrayReal = (statusReal() == SPxSolver::UNBOUNDED && _simplifier == 0);
+
+         assert(!_hasDualReal);
+         assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::ERROR);
+         assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::NO_RATIOTESTER);
+         assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::NO_PRICER);
+         assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::NO_SOLVER);
+         assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::NOT_INIT);
+         assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::SINGULAR);
+         assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::NO_PROBLEM);
+         assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::UNBOUNDED);
+         assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::INFEASIBLE);
+         assert(_solver.basis().status() != SPxBasis::INFEASIBLE || statusReal() == SPxSolver::INFEASIBLE);
+         assert(_solver.basis().status() == SPxBasis::INFEASIBLE || statusReal() != SPxSolver::INFEASIBLE);
+         _hasDualReal = (statusReal() == SPxSolver::OPTIMAL || (_simplifier == 0 &&
+               (_solver.basis().status() == SPxBasis::DUAL || _solver.basis().status() == SPxBasis::INFEASIBLE) &&
+               _solver.shift() < 10.0 * realParam(SoPlex2::EPSILON_ZERO)));
+
+         assert(!_hasDualfarkasReal);
+         _hasDualfarkasReal = (statusReal() == SPxSolver::INFEASIBLE && _simplifier == 0);
+
+         ///@todo move to private helper methods
+         // process result
+         switch( statusReal() )
          {
-            assert(!_simplifier->isUnsimplified());
-            assert(simplificationStatus == SPxSimplifier::VANISHED || simplificationStatus == SPxSimplifier::OKAY);
-            assert(!_hasBasisReal);
-
-            bool vanished = simplificationStatus == SPxSimplifier::VANISHED;
-
-            // get solution vectors for transformed problem
-            DVectorReal primal(vanished ? 0 : _solver.nCols());
-            DVectorReal slacks(vanished ? 0 : _solver.nRows());
-            DVectorReal dual(vanished ? 0 : _solver.nRows());
-            DVectorReal redcost(vanished ? 0 : _solver.nCols());
-
-            _basisStatusRowsReal.reSize(numRowsReal());
-            _basisStatusColsReal.reSize(numColsReal());
-            assert(vanished || _basisStatusRowsReal.size() >= _solver.nRows());
-            assert(vanished || _basisStatusColsReal.size() >= _solver.nCols());
-
-            if( !vanished )
+         case SPxSolver::OPTIMAL:
+            // unsimplify if simplifier is active and LP is solved to optimality; this must be done here and not at solution
+            // query, because we want to have the basis for the original problem
+            if( _simplifier != 0 )
             {
-               assert(_solver.status() == SPxSolver::OPTIMAL);
+               assert(!_simplifier->isUnsimplified());
+               assert(simplificationStatus == SPxSimplifier::VANISHED || simplificationStatus == SPxSimplifier::OKAY);
+               assert(!_hasBasisReal);
 
-               _solver.getPrimal(primal);
-               _solver.getSlacks(slacks);
-               _solver.getDual(dual);
-               _solver.getRedCost(redcost);
+               bool vanished = simplificationStatus == SPxSimplifier::VANISHED;
 
-               // unscale vectors w.r.t. second scaler
-               if( _secondScaler != 0 )
+               // get solution vectors for transformed problem
+               DVectorReal primal(vanished ? 0 : _solver.nCols());
+               DVectorReal slacks(vanished ? 0 : _solver.nRows());
+               DVectorReal dual(vanished ? 0 : _solver.nRows());
+               DVectorReal redcost(vanished ? 0 : _solver.nCols());
+
+               _basisStatusRowsReal.reSize(numRowsReal());
+               _basisStatusColsReal.reSize(numColsReal());
+               assert(vanished || _basisStatusRowsReal.size() >= _solver.nRows());
+               assert(vanished || _basisStatusColsReal.size() >= _solver.nCols());
+
+               if( !vanished )
                {
-                  _secondScaler->unscalePrimal(primal);
-                  _secondScaler->unscaleSlacks(slacks);
-                  _secondScaler->unscaleDual(dual);
-                  _secondScaler->unscaleRedCost(redcost);
+                  assert(_solver.status() == SPxSolver::OPTIMAL);
+
+                  _solver.getPrimal(primal);
+                  _solver.getSlacks(slacks);
+                  _solver.getDual(dual);
+                  _solver.getRedCost(redcost);
+
+                  // unscale vectors w.r.t. second scaler
+                  if( _secondScaler != 0 )
+                  {
+                     _secondScaler->unscalePrimal(primal);
+                     _secondScaler->unscaleSlacks(slacks);
+                     _secondScaler->unscaleDual(dual);
+                     _secondScaler->unscaleRedCost(redcost);
+                  }
+
+                  // get basis of transformed problem
+                  _solver.getBasis(_basisStatusRowsReal.get_ptr(), _basisStatusColsReal.get_ptr());
                }
 
-               // get basis of transformed problem
+               ///@todo catch exception
+               _simplifier->unsimplify(primal, dual, slacks, redcost, _basisStatusRowsReal.get_ptr(), _basisStatusColsReal.get_ptr());
+
+               // store basis for original problem
+               _simplifier->getBasis(_basisStatusRowsReal.get_ptr(), _basisStatusColsReal.get_ptr());
+            }
+            // if the original problem is not in the solver because of scaling, we also need to store the basis
+            else if( !_isRealLPLoaded )
+            {
+               _basisStatusRowsReal.reSize(numRowsReal());
+               _basisStatusColsReal.reSize(numColsReal());
+               assert(_basisStatusRowsReal.size() == _solver.nRows());
+               assert(_basisStatusColsReal.size() == _solver.nCols());
+
                _solver.getBasis(_basisStatusRowsReal.get_ptr(), _basisStatusColsReal.get_ptr());
             }
 
-            ///@todo catch exception
-            _simplifier->unsimplify(primal, dual, slacks, redcost, _basisStatusRowsReal.get_ptr(), _basisStatusColsReal.get_ptr());
-
-            // store basis for original problem
-            _simplifier->getBasis(_basisStatusRowsReal.get_ptr(), _basisStatusColsReal.get_ptr());
-         }
-         // if the original problem is not in the solver because of scaling, we also need to store the basis
-         else if( !_isRealLPLoaded )
-         {
-            _basisStatusRowsReal.reSize(numRowsReal());
-            _basisStatusColsReal.reSize(numColsReal());
-            assert(_basisStatusRowsReal.size() == _solver.nRows());
-            assert(_basisStatusColsReal.size() == _solver.nCols());
-
-            _solver.getBasis(_basisStatusRowsReal.get_ptr(), _basisStatusColsReal.get_ptr());
-         }
-
-         // in all cases we have a basis for warmstarting
-         _hasBasisReal = true;
-         break;
-
-      case SPxSolver::ABORT_CYCLING:
-      case SPxSolver::ABORT_TIME:
-      case SPxSolver::ABORT_ITER:
-      case SPxSolver::ABORT_VALUE:
-      case SPxSolver::REGULAR:
-      case SPxSolver::RUNNING:
-      case SPxSolver::UNBOUNDED:
-      case SPxSolver::INFEASIBLE:
-      case SPxSolver::INForUNBD:
-         // store basis if it is regular and the original problem is not in the solver because of scaling
-         if( _simplifier == 0 && !_isRealLPLoaded )
-         {
-            _basisStatusRowsReal.reSize(numRowsReal());
-            _basisStatusColsReal.reSize(numColsReal());
-            assert(_basisStatusRowsReal.size() == _solver.nRows());
-            assert(_basisStatusColsReal.size() == _solver.nCols());
-
-            _solver.getBasis(_basisStatusRowsReal.get_ptr(), _basisStatusColsReal.get_ptr());
+            // in all cases we have a basis for warmstarting
             _hasBasisReal = true;
-         }
-         // non-optimal basis should currently not be unsimplified
-         else
+            break;
+
+         case SPxSolver::ABORT_CYCLING:
+         case SPxSolver::ABORT_TIME:
+         case SPxSolver::ABORT_ITER:
+         case SPxSolver::ABORT_VALUE:
+         case SPxSolver::REGULAR:
+         case SPxSolver::RUNNING:
+         case SPxSolver::UNBOUNDED:
+         case SPxSolver::INFEASIBLE:
+         case SPxSolver::INForUNBD:
+            // store basis if it is regular and the original problem is not in the solver because of scaling
+            if( _simplifier == 0 && !_isRealLPLoaded )
+            {
+               _basisStatusRowsReal.reSize(numRowsReal());
+               _basisStatusColsReal.reSize(numColsReal());
+               assert(_basisStatusRowsReal.size() == _solver.nRows());
+               assert(_basisStatusColsReal.size() == _solver.nCols());
+
+               _solver.getBasis(_basisStatusRowsReal.get_ptr(), _basisStatusColsReal.get_ptr());
+               _hasBasisReal = true;
+            }
+            // non-optimal basis should currently not be unsimplified
+            else
+               _hasBasisReal = false;
+            break;
+
+         case SPxSolver::SINGULAR:
+            // if there was a regular starting basis and the original problem is in the solver, load the basis
+            if( _hasBasisReal && _isRealLPLoaded )
+            {
+               assert(_simplifier == 0);
+               assert(_basisStatusRowsReal.size() == _solver.nRows());
+               assert(_basisStatusColsReal.size() == _solver.nCols());
+               _solver.setBasis(_basisStatusRowsReal.get_ptr(), _basisStatusColsReal.get_ptr());
+            }
+            break;
+
+         default:
             _hasBasisReal = false;
-         break;
-
-      case SPxSolver::SINGULAR:
-         // if there was a regular starting basis and the original problem is in the solver, load the basis
-         if( _hasBasisReal && _isRealLPLoaded )
-         {
-            assert(_simplifier == 0);
-            assert(_basisStatusRowsReal.size() == _solver.nRows());
-            assert(_basisStatusColsReal.size() == _solver.nCols());
-            _solver.setBasis(_basisStatusRowsReal.get_ptr(), _basisStatusColsReal.get_ptr());
+            break;
          }
-         break;
-
-      default:
-         _hasBasisReal = false;
-         break;
       }
+
+      // stop timing
+      _statistics->solvingTime.stop();
 
       return statusReal();
    }
@@ -3252,100 +3263,40 @@ namespace soplex
 
 
 
-#if 1
-   /// solves rational LP
+   /// synchronizes LPs, clears statistics, and solves rational LP
    SPxSolver::Status SoPlex2::solveRational()
    {
       assert(_isConsistent());
+      assert(_statistics != 0);
 
-      // round rational LP to floating-point precision
-      if( _isRealLPLoaded )
-         _solver.loadLP((SPxLPReal)(*_rationalLP));
-      else
-         *_realLP = *_rationalLP;
+      // clear statistics
+      _statistics->clearSolvingData();
 
-      // load basis if available
-      if( _hasBasisRational )
-      {
-         assert(_basisStatusRowsRational.size() == numRowsReal());
-         assert(_basisStatusColsRational.size() == numColsReal());
+      // start timing
+      _statistics->solvingTime.start();
 
-         if( _isRealLPLoaded )
-            _solver.setBasis(_basisStatusRowsRational.get_ptr(), _basisStatusColsRational.get_ptr());
-         else
-         {
-            _basisStatusRowsReal = _basisStatusRowsRational;
-            _basisStatusColsReal = _basisStatusColsRational;
-         }
+#if 1
+      // copy rounded rational LP to real LP
+      _syncRealLP();
 
-         _hasBasisReal = true;
-      }
+      // call rational solving routine
+      _solveRational();
+#else
+      // copy rounded rational LP to real LP
+      _syncRealLP();
 
       // solve floating-point LP
       _statusRational = solveReal();
 
-      // store floating-point solution as rational solution
-      DVectorReal buffer;
-      _solRational._invalidate();
+      // store real as rational solution
+      _syncRationalSolution(true, true, true);
+#endif
 
-      if( hasPrimalReal() )
-      {
-         _solRational._hasPrimal = true;
-
-         buffer.reDim(numColsReal());
-         getPrimalReal(buffer);
-         _solRational._primal = buffer;
-
-         buffer.reDim(numRowsReal());
-         getSlacksReal(buffer);
-         _solRational._slacks = buffer;
-      }
-
-      if( hasPrimalrayReal() )
-      {
-         _solRational._hasPrimalray = true;
-
-         buffer.reDim(numColsReal());
-         getPrimalrayReal(buffer);
-         _solRational._primalray = buffer;
-      }
-
-      if( hasDualReal() )
-      {
-         _solRational._hasDual = true;
-
-         buffer.reDim(numRowsReal());
-         getDualReal(buffer);
-         _solRational._dual = buffer;
-
-         buffer.reDim(numColsReal());
-         getRedcostReal(buffer);
-         _solRational._redcost = buffer;
-      }
-
-      if( hasDualfarkasReal() )
-      {
-         _solRational._hasDualfarkas = true;
-
-         buffer.reDim(numRowsReal());
-         getDualfarkasReal(buffer);
-         _solRational._dualfarkas = buffer;
-      }
-
-      if( hasBasisReal() )
-      {
-         _hasBasisRational = true;
-
-         _basisStatusRowsRational.reSize(numRowsReal());
-         _basisStatusColsRational.reSize(numColsReal());
-         getBasisReal(_basisStatusRowsRational.get_ptr(), _basisStatusColsRational.get_ptr());
-      }
-      else
-         _hasBasisRational = false;
+      // stop timing
+      _statistics->solvingTime.stop();
 
       return _statusRational;
    }
-#endif
 
 
 
@@ -3840,7 +3791,7 @@ namespace soplex
    /// number of iterations since last call to solve
    int SoPlex2::numIterations() const
    {
-      return _solver.iterations();
+      return _statistics->iterations;
    }
 
 
@@ -3926,9 +3877,21 @@ namespace soplex
    bool SoPlex2::readFileReal(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
    {
       assert(_realLP != 0);
+
+      // clear statistics
+      _statistics->clearAllData();
+
+      // start timing
+      _statistics->readingTime.start();
+
+      // read
       bool success = _realLP->readFile(filename, rowNames, colNames, intVars);
       setIntParam(SoPlex2::OBJSENSE, (_realLP->spxSense() == SPxLPReal::MAXIMIZE ? SoPlex2::OBJSENSE_MAXIMIZE : SoPlex2::OBJSENSE_MINIMIZE), true, true);
       _hasBasisReal = false;
+
+      // stop timing
+      _statistics->readingTime.stop();
+
       return success;
    }
 
@@ -3952,6 +3915,10 @@ namespace soplex
    {
       assert(_realLP != 0);
 
+      // start timing
+      _statistics->readingTime.start();
+
+      // read
       if( !_isRealLPLoaded )
       {
          assert(_realLP != &_solver);
@@ -3962,6 +3929,10 @@ namespace soplex
          _isRealLPLoaded = true;
       }
       _hasBasisReal = _solver.readBasisFile(filename, rowNames, colNames);
+
+      // stop timing
+      _statistics->readingTime.stop();
+
       return _hasBasisReal;
    }
 
@@ -4012,9 +3983,21 @@ namespace soplex
    bool SoPlex2::readFileRational(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
    {
       assert(_rationalLP != 0);
+
+      // clear statistics
+      _statistics->clearAllData();
+
+      // start timing
+      _statistics->readingTime.start();
+
+      // read
       bool success = _rationalLP->readFile(filename, rowNames, colNames, intVars);
       setIntParam(SoPlex2::OBJSENSE, (_rationalLP->spxSense() == SPxLPRational::MAXIMIZE ? SoPlex2::OBJSENSE_MAXIMIZE : SoPlex2::OBJSENSE_MINIMIZE), true, true);
       _hasBasisRational = false;
+
+      // stop timing
+      _statistics->readingTime.stop();
+
       return success;
    }
 
@@ -4038,6 +4021,10 @@ namespace soplex
    {
       assert(filename != 0);
 
+      // start timing
+      _statistics->readingTime.start();
+
+      // read
       spxifstream file(filename);
 
       if( !file )
@@ -4178,6 +4165,9 @@ namespace soplex
       }
 
       _hasBasisRational = !mps.hasError();
+
+      // stop timing
+      _statistics->readingTime.stop();
 
       return _hasBasisRational;
    }
@@ -4736,54 +4726,6 @@ namespace soplex
 
 
 
-   /// invalidates real solution
-   void SoPlex2::_invalidateSolutionReal()
-   {
-      _statusReal = SPxSolver::UNKNOWN;
-      _hasPrimalReal = false;
-      _hasPrimalrayReal = false;
-      _hasDualReal = false;
-      _hasDualfarkasReal = false;
-   }
-
-
-
-   /// invalidates rational solution
-   void SoPlex2::_invalidateSolutionRational()
-   {
-      _statusRational = SPxSolver::UNKNOWN;
-      _solRational._invalidate();
-   }
-
-
-
-   /// checks consistency
-   bool SoPlex2::_isConsistent() const
-   {
-      assert(_statistics != 0);
-      assert(_currentSettings != 0);
-
-      assert(_realLP != 0);
-      assert(_rationalLP != 0);
-
-      assert(_realLP != &_solver || _isRealLPLoaded);
-      assert(_realLP == &_solver || !_isRealLPLoaded);
-
-      assert(!_hasBasisReal || _isRealLPLoaded || _basisStatusRowsReal.size() == numRowsReal());
-      assert(!_hasBasisReal || _isRealLPLoaded || _basisStatusColsReal.size() == numColsReal());
-      assert(!_hasBasisRational || _basisStatusRowsRational.size() == numRowsRational());
-      assert(!_hasBasisRational || _basisStatusColsRational.size() == numColsRational());
-
-      assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MAXIMIZE || _realLP->spxSense() == SPxLPReal::MAXIMIZE);
-      assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MINIMIZE || _realLP->spxSense() == SPxLPReal::MINIMIZE);
-      assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MAXIMIZE || _rationalLP->spxSense() == SPxLPRational::MAXIMIZE);
-      assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MINIMIZE || _rationalLP->spxSense() == SPxLPRational::MINIMIZE);
-
-      return true;
-   }
-
-
-
    /// creates a permutation for removing rows/columns from an array of IDs
    void SoPlex2::_idToPerm(SPxId* id, int idSize, int* perm, int permSize) const
    {
@@ -4834,6 +4776,67 @@ namespace soplex
 
       for( int i = 0; i < permSize; i++ )
          perm[i] = (i < start || i > end) ? i : -1;
+   }
+
+
+
+   /// checks consistency
+   bool SoPlex2::_isConsistent() const
+   {
+      assert(_statistics != 0);
+      assert(_currentSettings != 0);
+
+      assert(_realLP != 0);
+      assert(_rationalLP != 0);
+
+      assert(_realLP != &_solver || _isRealLPLoaded);
+      assert(_realLP == &_solver || !_isRealLPLoaded);
+
+      assert(!_hasBasisReal || _isRealLPLoaded || _basisStatusRowsReal.size() == numRowsReal());
+      assert(!_hasBasisReal || _isRealLPLoaded || _basisStatusColsReal.size() == numColsReal());
+      assert(!_hasBasisRational || _basisStatusRowsRational.size() == numRowsRational());
+      assert(!_hasBasisRational || _basisStatusColsRational.size() == numColsRational());
+
+      assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MAXIMIZE || _realLP->spxSense() == SPxLPReal::MAXIMIZE);
+      assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MINIMIZE || _realLP->spxSense() == SPxLPReal::MINIMIZE);
+      assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MAXIMIZE || _rationalLP->spxSense() == SPxLPRational::MAXIMIZE);
+      assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MINIMIZE || _rationalLP->spxSense() == SPxLPRational::MINIMIZE);
+
+      return true;
+   }
+
+
+
+   /// should solving process be stopped?
+   bool SoPlex2::_isSolveStopped() const
+   {
+      assert(_statistics != 0);
+
+      return _statistics->solvingTime.userTime() > realParam(TIMELIMIT)
+         || (intParam(ITERLIMIT) >= 0 && _statistics->iterations > intParam(ITERLIMIT))
+         || (intParam(REFLIMIT) >= 0 && _statistics->refinements > intParam(REFLIMIT))
+         || (intParam(STALLREFLIMIT) >= 0 && _statistics->stallRefinements > intParam(STALLREFLIMIT));
+   }
+
+
+
+   /// invalidates real solution
+   void SoPlex2::_invalidateSolutionReal()
+   {
+      _statusReal = SPxSolver::UNKNOWN;
+      _hasPrimalReal = false;
+      _hasPrimalrayReal = false;
+      _hasDualReal = false;
+      _hasDualfarkasReal = false;
+   }
+
+
+
+   /// invalidates rational solution
+   void SoPlex2::_invalidateSolutionRational()
+   {
+      _statusRational = SPxSolver::UNKNOWN;
+      _solRational._invalidate();
    }
 
 
@@ -4912,15 +4915,108 @@ namespace soplex
 
 
 
-   /// should solving process be stopped?
-   bool SoPlex2::_isSolveStopped() const
+   /// synchronizes real LP with rational LP
+   void SoPlex2::_syncRealLP()
    {
-      assert(_statistics != 0);
+      assert(_isConsistent());
 
-      return _statistics->solvingTime > realParam(TIMELIMIT)
-         || (intParam(ITERLIMIT) >= 0 && _statistics->iterations > intParam(ITERLIMIT))
-         || (intParam(REFLIMIT) >= 0 && _statistics->refinements > intParam(REFLIMIT))
-         || (intParam(STALLREFLIMIT) >= 0 && _statistics->stallRefinements > intParam(STALLREFLIMIT));
+      // start timing
+      _statistics->syncTime.start();
+
+      // copy LP
+      if( _isRealLPLoaded )
+         _solver.loadLP((SPxLPReal)(*_rationalLP));
+      else
+         *_realLP = *_rationalLP;
+
+      // load basis if available
+      if( _hasBasisRational )
+      {
+         assert(_basisStatusRowsRational.size() == numRowsReal());
+         assert(_basisStatusColsRational.size() == numColsReal());
+
+         if( _isRealLPLoaded )
+            _solver.setBasis(_basisStatusRowsRational.get_ptr(), _basisStatusColsRational.get_ptr());
+         else
+         {
+            _basisStatusRowsReal = _basisStatusRowsRational;
+            _basisStatusColsReal = _basisStatusColsRational;
+         }
+
+         _hasBasisReal = true;
+      }
+      else
+         _hasBasisReal = false;
+
+      // invalidate solution
+      _invalidateSolutionReal();
+
+      // stop timing
+      _statistics->syncTime.stop();
+   }
+
+
+
+   /// synchronizes rational solution with real solution
+   void SoPlex2::_syncRationalSolution(bool snycPrimal, bool syncDual, bool syncBasis)
+   {
+      DVectorReal buffer;
+      _solRational._invalidate();
+
+      if( hasPrimalReal() )
+      {
+         _solRational._hasPrimal = true;
+
+         buffer.reDim(numColsReal());
+         getPrimalReal(buffer);
+         _solRational._primal = buffer;
+
+         buffer.reDim(numRowsReal());
+         getSlacksReal(buffer);
+         _solRational._slacks = buffer;
+      }
+
+      if( hasPrimalrayReal() )
+      {
+         _solRational._hasPrimalray = true;
+
+         buffer.reDim(numColsReal());
+         getPrimalrayReal(buffer);
+         _solRational._primalray = buffer;
+      }
+
+      if( hasDualReal() )
+      {
+         _solRational._hasDual = true;
+
+         buffer.reDim(numRowsReal());
+         getDualReal(buffer);
+         _solRational._dual = buffer;
+
+         buffer.reDim(numColsReal());
+         getRedcostReal(buffer);
+         _solRational._redcost = buffer;
+      }
+
+      if( hasDualfarkasReal() )
+      {
+         _solRational._hasDualfarkas = true;
+
+         buffer.reDim(numRowsReal());
+         getDualfarkasReal(buffer);
+         _solRational._dualfarkas = buffer;
+      }
+
+      if( hasBasisReal() )
+      {
+         _hasBasisRational = true;
+
+         _basisStatusRowsRational.reSize(numRowsReal());
+         _basisStatusColsRational.reSize(numColsReal());
+         getBasisReal(_basisStatusRowsRational.get_ptr(), _basisStatusColsRational.get_ptr());
+      }
+      else
+         _hasBasisRational = false;
    }
 } // namespace soplex
 

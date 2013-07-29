@@ -748,7 +748,7 @@ public:
    //**@name Solving and solution query for the rational LP */
    //@{
 
-   /// solves rational LP
+   /// synchronizes LPs, clears statistics, and solves rational LP
    SPxSolver::Status solveRational();
 
    /// returns the current status
@@ -1393,11 +1393,26 @@ private:
    /// disables simplifier and scalers
    void _disableSimplifierAndScalers();
 
-   /// introduces slack variables to transform inequality constraints into equations
-   void _transformEqualityRational();
+   /// synchronizes real LP with rational LP
+   void _syncRealLP();
+
+   /// synchronizes rational solution with real solution
+   void _syncRationalSolution(bool snycPrimal, bool syncDual, bool syncBasis);
+   //@}
+
+
+   //**@name Private solving methods implemented in solverational.cpp */
+   //@{
+
+   /// solves rational LP
+   void _solveRational();
+
+   /// introduces slack variables to transform inequality constraints into equations for both rational and real LP,
+   /// which should be in sync
+   void _transformEquality();
 
    /// restores original problem
-   void _untransformEqualityRational();
+   void _untransformEquality();
 
    /// solves current problem with iterative refinement and recovery mechanism
    void _performOptIRStable(bool& primalFeasible, bool& dualFeasible, bool& infeasible, bool& unbounded, bool& stopped, bool& error);
@@ -1407,6 +1422,15 @@ private:
 
    /// performs iterative refinement on the auxiliary problem for testing feasibility
    void _performFeasIRStable(bool& infeasible, bool& stopped, bool& error);
+
+   //@}
+
+
+   //**@name Private solving methods implemented in solvereal.cpp */
+   //@{
+
+   /// solves real LP with recovery mechanism
+   void _solveRealStable();
 
    //@}
 };
