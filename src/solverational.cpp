@@ -524,8 +524,6 @@ namespace soplex
          MSG_INFO1( spxout << std::endl );
          MSG_INFO1( spxout << "maximum violation: bounds=" << rationalToString(boundsViolation) << ", rows=" << rationalToString(sideViolation) << ", duals/redcosts=" << rationalToString(redcostViolation) << "\n" );
 
-         ///@todo at this point the vectors primal_ex, modSide, dual_ex, modObj are computed and we may exit?
-
          // terminate if tolerances are satisfied
          primalFeasible = (boundsViolation <= rationalParam(SoPlex2::FEASTOL) && sideViolation <= rationalParam(SoPlex2::FEASTOL));
          dualFeasible = (redcostViolation <= rationalParam(SoPlex2::OPTTOL));
@@ -542,6 +540,8 @@ namespace soplex
             stopped = true;
             return;
          }
+
+         ///@todo try rational reconstruction at geometric frequency
 
          // otherwise start refinement
          _statistics->refinements++;
