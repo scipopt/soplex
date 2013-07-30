@@ -1407,13 +1407,6 @@ private:
    /// solves rational LP
    void _solveRational();
 
-   /// introduces slack variables to transform inequality constraints into equations for both rational and real LP,
-   /// which should be in sync
-   void _transformEquality();
-
-   /// restores original problem
-   void _untransformEquality();
-
    /// solves current problem with iterative refinement and recovery mechanism
    void _performOptIRStable(bool& primalFeasible, bool& dualFeasible, bool& infeasible, bool& unbounded, bool& stopped, bool& error);
 
@@ -1422,6 +1415,13 @@ private:
 
    /// performs iterative refinement on the auxiliary problem for testing feasibility
    void _performFeasIRStable(bool& infeasible, bool& stopped, bool& error);
+
+   /// introduces slack variables to transform inequality constraints into equations for both rational and real LP,
+   /// which should be in sync
+   void _transformEquality();
+
+   /// restores original problem
+   void _untransformEquality();
 
    //@}
 
