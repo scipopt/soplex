@@ -166,12 +166,12 @@ namespace soplex
             // threshold for activating iterative refinement
             _realParamLower[SoPlex2::FPFEASTOL] = 1e-12;
             _realParamUpper[SoPlex2::FPFEASTOL] = 1.0;
-            _realParamDefault[SoPlex2::FPFEASTOL] = 1e-9;
+            _realParamDefault[SoPlex2::FPFEASTOL] = 1e-6;
 
             // threshold for activating iterative refinement
             _realParamLower[SoPlex2::FPOPTTOL] = 1e-12;
             _realParamUpper[SoPlex2::FPOPTTOL] = 1.0;
-            _realParamDefault[SoPlex2::FPOPTTOL] = 1e-9;
+            _realParamDefault[SoPlex2::FPOPTTOL] = 1e-6;
 
             // primal feasibility tolerance
             _rationalParamLower[SoPlex2::FEASTOL] = 0.0;
@@ -2743,7 +2743,8 @@ namespace soplex
       // run the simplex method if problem has not been solved by the simplifier
       if( simplificationStatus == SPxSimplifier::OKAY )
       {
-         _solveRealStable();
+         ///@todo this should be a separate method implementing starter, auto pricing, and recovery mechanisms
+         _solver.solve();
       }
 
       ///@todo move to private helper methods

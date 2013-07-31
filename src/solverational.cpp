@@ -57,7 +57,7 @@ namespace soplex
          bool error = false;
 
          // solve problem with iterative refinement and recovery mechanism
-         _performOptIRStable(_solRational, primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
+         _performOptIRStable(_solRational, false, primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
 
          // case: an unrecoverable error occured
          if( error )
@@ -193,7 +193,7 @@ namespace soplex
 
 
    /// solves current problem with iterative refinement and recovery mechanism
-   void SoPlex2::_performOptIRStable(SolRational& sol, bool& primalFeasible, bool& dualFeasible, bool& infeasible, bool& unbounded, bool& stopped, bool& error)
+   void SoPlex2::_performOptIRStable(SolRational& sol, bool acceptOnlyOptimal, bool& primalFeasible, bool& dualFeasible, bool& infeasible, bool& unbounded, bool& stopped, bool& error)
    {
       primalFeasible = false;
       dualFeasible = false;
@@ -216,7 +216,7 @@ namespace soplex
       if( _hasBasisRational )
          _solver.setBasis(_basisStatusRowsRational.get_const_ptr(), _basisStatusColsRational.get_const_ptr());
 
-      _solveRealStable();
+      _solveRealStable(acceptOnlyOptimal);
 
       _solver.setTerminationTime(realParam(SoPlex2::TIMELIMIT));
       _solver.setTerminationIter(intParam(SoPlex2::ITERLIMIT));
@@ -436,7 +436,7 @@ namespace soplex
          if( realParam(SoPlex2::TIMELIMIT) < realParam(SoPlex2::INFTY) )
             _solver.setTerminationTime(realParam(SoPlex2::TIMELIMIT) - _statistics->solvingTime.userTime());
 
-         _solveRealStable();
+         _solveRealStable(acceptOnlyOptimal);
 
          _solver.setTerminationTime(realParam(SoPlex2::TIMELIMIT));
          _solver.setTerminationIter(intParam(SoPlex2::ITERLIMIT));
@@ -560,8 +560,11 @@ namespace soplex
       // remove objective function, shift, homogenize
       _transformFeasibility();
 
+      // invalidate solution
+      sol._invalidate();
+
       // perform iterative refinement
-      _performOptIRStable(sol, primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
+      _performOptIRStable(sol, true, primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
 
       // the feasibility problem should always be solved to optimality
       if( error || unbounded || infeasible || !primalFeasible || !dualFeasible )
@@ -601,6 +604,8 @@ namespace soplex
    {
       // start timing
       _statistics->transformTime.start();
+
+      MSG_DEBUG( _realLP->writeFile("beforeTransEqu.lp", 0, 0, 0) );
 
       // transform LP to minimization problem
       if( intParam(SoPlex2::OBJSENSE) == SoPlex2::OBJSENSE_MAXIMIZE )
@@ -663,6 +668,8 @@ namespace soplex
             _basisStatusRowsRational[row] = SPxSolver::FIXED;
          }
       }
+
+      MSG_DEBUG( _realLP->writeFile("afterTransEqu.lp", 0, 0, 0) );
 
       // stop timing
       _statistics->transformTime.stop();

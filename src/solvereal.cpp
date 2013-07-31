@@ -22,15 +22,60 @@
 namespace soplex
 {
    /// solves real LP with recovery mechanism
-   void SoPlex2::_solveRealStable()
+   void SoPlex2::_solveRealStable(bool acceptOnlyOptimal)
    {
       ///@todo implement starter
       ///@todo implement auto pricing
       ///@todo implement recovery mechanism
-      _solver.solve();
+      Real feastol = realParam(SoPlex2::FPFEASTOL);
+      Real opttol = realParam(SoPlex2::FPOPTTOL);
+      bool solvedFromScratch = false;
+      bool inFirstRound = true;
+      bool solved = false;
 
-      // record statistics
-      _statistics->iterations += _solver.iterations();
+      while( !solved && !_isSolveStopped() && feastol < 0.5 && opttol < 0.5 )
+      {
+         try
+         {
+            _solver.setFeastol(feastol);
+            _solver.setOpttol(opttol);
+            _solver.solve();
+
+            // has LP been solved?
+            solved = (_solver.status() == SPxSolver::OPTIMAL || !acceptOnlyOptimal)
+               && (_solver.status() == SPxSolver::OPTIMAL || _solver.status() == SPxSolver::INFEASIBLE || _solver.status() == SPxSolver::UNBOUNDED);
+         }
+         catch( SPxException E )
+         {
+            solved = false;
+         }
+
+         // record statistics
+         _statistics->iterations += _solver.iterations();
+
+         // if not, relax tolerances or try from scratch
+         if( !solved )
+         {
+            if( _solver.status() == SPxSolver::INFEASIBLE )
+            {
+               _solver.setType(SPxSolver::ENTER);
+               feastol *= 10.0;
+            }
+            else if( _solver.status() == SPxSolver::UNBOUNDED )
+            {
+               _solver.setType(SPxSolver::LEAVE);
+               opttol *= 10.0;
+            }
+
+            if( !inFirstRound && !solvedFromScratch )
+            {
+               _solver.reLoad();
+               solvedFromScratch = true;
+            }
+         }
+
+         inFirstRound = false;
+      }
    }
 } // namespace soplex
 

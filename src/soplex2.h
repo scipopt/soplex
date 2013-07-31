@@ -1416,7 +1416,7 @@ private:
    void _solveRational();
 
    /// solves current problem with iterative refinement and recovery mechanism
-   void _performOptIRStable(SolRational& sol, bool& primalFeasible, bool& dualFeasible, bool& infeasible, bool& unbounded, bool& stopped, bool& error);
+   void _performOptIRStable(SolRational& sol, bool acceptOnlyOptimal, bool& primalFeasible, bool& dualFeasible, bool& infeasible, bool& unbounded, bool& stopped, bool& error);
 
    /// performs iterative refinement on the auxiliary problem for testing unboundedness
    void _performUnboundedIRStable(SolRational& sol, bool& hasUnboundedRay, bool& stopped, bool& error);
@@ -1445,7 +1445,7 @@ private:
    //@{
 
    /// solves real LP with recovery mechanism
-   void _solveRealStable();
+   void _solveRealStable(bool acceptOnlyOptimal);
 
    //@}
 };
