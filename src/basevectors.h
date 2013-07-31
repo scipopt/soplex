@@ -940,6 +940,25 @@ DVectorBase<R> operator*(R x, const VectorBase<R>& v)
    return v * x;
 }
 
+/// Scaling.
+template < class R >
+DSVectorBase<R> operator*(const SVectorBase<R>& v, R x)
+{
+   DSVectorBase<R> res(v.size());
+
+   for( int i = 0; i < v.size(); i++ )
+      res.add(v.index(i), v.value(i) * x);
+
+   return res;
+}
+
+/// Scaling.
+template < class R >
+DSVectorBase<R> operator*(R x, const SVectorBase<R>& v)
+{
+   return v * x;
+}
+
 /// Input operator.
 template < class R >
 std::istream& operator>>(std::istream& s, DVectorBase<R>& vec)

@@ -3351,6 +3351,14 @@ namespace soplex
 
 
 
+   /// is a primal unbounded ray available?
+   bool SoPlex2::hasPrimalrayRational() const
+   {
+      return _solRational.hasPrimalray();
+   }
+
+
+
    /// gets the primal ray if LP is unbounded; returns true on success
    bool SoPlex2::getPrimalrayRational(VectorRational& vector) const
    {
@@ -3382,6 +3390,12 @@ namespace soplex
    }
 
 
+
+   /// is Farkas proof of infeasibility available?
+   bool SoPlex2::hasDualfarkasRational() const
+   {
+      return _solRational.hasDualfarkas();
+   }
 
    /// gets the Farkas proof if LP is infeasible; returns true on success
    bool SoPlex2::getDualfarkasRational(VectorRational& vector) const

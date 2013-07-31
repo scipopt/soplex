@@ -735,8 +735,6 @@ public:
          ? readMPS(in, rowNames, colNames, intVars)
          : readLPF(in, rowNames, colNames, intVars);
 
-      MSG_DEBUG( spxout << "DSPXIO01\n" << *this );
-
       return ok;
    }
 

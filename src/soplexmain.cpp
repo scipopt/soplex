@@ -394,35 +394,6 @@ void displayQualityRational( SoPlex2& SoPlexShell, bool checkMode )
 
 //------------------------------------------------------------------------
 static
-void displayInfeasibility(SoPlex2& SoPlexShell)
-{
-   assert(SoPlexShell.statusReal() == SPxSolver::INFEASIBLE);
-
-   #if 0
-   if ( checkMode )
-   {
-      if( m_solver.isProvenInfeasible() )
-         MSG_INFO1( spxout << "IEXAMP13 Infeasibility is proven." << std::endl; )
-         else
-            MSG_INFO1( spxout << "IEXAMP13 Infeasibility could not be proven!" << std::endl; )
-   }
-   else
-   {
-      if ( m_solver.isProvenInfeasible() )
-      {
-         MSG_INFO1( spxout << "Infeasibility is proven." << std::endl; )
-      }
-      else
-      {
-         MSG_INFO1( spxout << "Infeasibility could not be proven!" << std::endl; )
-      }
-   }
-   #endif
-}
-
-
-//------------------------------------------------------------------------
-static
 void checkParameter(const char param, const char* const argv[])
 {
    if (param == '\0')
@@ -876,8 +847,6 @@ void printSolutionAndStatusReal(
             MSG_INFO1( spxout << "<= " << rhs << std::endl; );
          }
       }
-      if( print_quality )
-         displayInfeasibility(SoPlexShell);
       if( write_basis )  // write basis even if we are infeasible
          SoPlexShell.writeBasisFileReal(basisname, &rownames, &colnames);
       break;
@@ -1154,8 +1123,6 @@ void printSolutionAndStatusRational(
             MSG_INFO1( spxout << "<= " << rhs << std::endl; );
          }
       }
-      if( print_quality )
-         displayInfeasibility(SoPlexShell);
       if( write_basis )  // write basis even if we are infeasible
          SoPlexShell.writeBasisFileRational(basisname, &rownames, &colnames);
       break;

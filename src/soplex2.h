@@ -766,6 +766,9 @@ public:
    /// gets the vector of slack values if available; returns true on success
    bool getSlacksRational(VectorRational& vector) const;
 
+   /// is a primal unbounded ray available?
+   bool hasPrimalrayRational() const;
+
    /// gets the primal ray if LP is unbounded; returns true on success
    bool getPrimalrayRational(VectorRational& vector) const;
 
@@ -777,6 +780,9 @@ public:
 
    /// gets the vector of reduced cost values if available; returns true on success
    bool getRedcostRational(VectorRational& vector) const;
+
+   /// is Farkas proof of infeasibility available?
+   bool hasDualfarkasRational() const;
 
    /// gets the Farkas proof if LP is infeasible; returns true on success
    bool getDualfarkasRational(VectorRational& vector) const;
@@ -1353,6 +1359,8 @@ private:
    bool _hasBasisRational;
 
    LPColSetRational _slackCols;
+   DVectorRational _feasObj;
+   DSVectorRational _feasShiftValues;
 
    //@}
 
@@ -1408,20 +1416,27 @@ private:
    void _solveRational();
 
    /// solves current problem with iterative refinement and recovery mechanism
-   void _performOptIRStable(bool& primalFeasible, bool& dualFeasible, bool& infeasible, bool& unbounded, bool& stopped, bool& error);
+   void _performOptIRStable(SolRational& sol, bool& primalFeasible, bool& dualFeasible, bool& infeasible, bool& unbounded, bool& stopped, bool& error);
 
    /// performs iterative refinement on the auxiliary problem for testing unboundedness
-   void _performUnboundedIRStable(bool& hasUnboundedRay, bool& stopped, bool& error);
+   void _performUnboundedIRStable(SolRational& sol, bool& hasUnboundedRay, bool& stopped, bool& error);
 
    /// performs iterative refinement on the auxiliary problem for testing feasibility
-   void _performFeasIRStable(bool& infeasible, bool& stopped, bool& error);
+   void _performFeasIRStable(SolRational& sol, bool& infeasible, bool& stopped, bool& error);
 
    /// introduces slack variables to transform inequality constraints into equations for both rational and real LP,
    /// which should be in sync
    void _transformEquality();
 
-   /// restores original problem
-   void _untransformEquality();
+   /// undoes transformation to equality form
+   void _untransformEquality(SolRational& sol);
+
+   /// transforms LP to feasibility problem by removing the objective function, shifting variables, and homogenizing the
+   /// right-hand side
+   void _transformFeasibility();
+
+   /// undoes transformation to feasibility problem
+   void _untransformFeasibility(SolRational& sol, bool infeasible);
 
    //@}
 

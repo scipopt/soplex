@@ -139,6 +139,22 @@ public:
    }
 
    /// Assignment operator.
+   DVectorBase<R>& operator=(const VectorBase<R>& vec)
+   {
+      if( (VectorBase<R>*)this != &vec )
+      {
+         if( vec.dim() != VectorBase<R>::dim() )
+            reDim(vec.dim());
+
+         VectorBase<R>::operator=(vec);
+
+         assert(isConsistent());
+      }
+
+      return *this;
+   }
+
+   /// Assignment operator.
    template < class S >
    DVectorBase<R>& operator=(const VectorBase<S>& vec)
    {
