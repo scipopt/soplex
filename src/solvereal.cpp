@@ -56,6 +56,8 @@ namespace soplex
          // if not, relax tolerances or try from scratch
          if( !solved )
          {
+            _slufactor.setMarkowitz(0.99);
+
             if( _solver.status() == SPxSolver::INFEASIBLE )
             {
                _solver.setType(SPxSolver::ENTER);

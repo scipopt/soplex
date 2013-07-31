@@ -121,6 +121,18 @@ public:
    {
       uptype = tp;
    }
+
+   /// sets Markowitz threshold.
+   void setMarkowitz(Real m)
+   {
+      if( m < 0.01 )
+         m = 0.01;
+
+      if( m > 0.99 )
+         m = 0.99;
+
+      minThreshold = m;
+   }
    //@}
 
    //--------------------------------
