@@ -82,7 +82,7 @@ do
         19) echo =type= ERb
             opt="-e -r -t3" ;;
 	20) echo =type= R0
-	    opt="-X -d1e-25 -R1e-9" ;;
+	    opt="-X -d1e-25" ;;
 	21) echo =type= R1
 	    opt="-X -d1e-25 -R1e-9 -s0 -g0" ;;
 	22) echo =type= R2
