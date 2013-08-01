@@ -764,13 +764,12 @@ namespace soplex
          int row = _slackCols.colVector(i).index(0);
 
          _rationalLP->changeRange(row, -upperRational(col), -lowerRational(col));
-         _realLP->changeRange(row, -upperRational(col), -lowerRational(col));
       }
 
       _rationalLP->removeColRange(numOrigCols, numCols - 1);
       _realLP->removeColRange(numOrigCols, numCols - 1);
 
-      // transform LP to minimization problem
+      // restore original objective sense
       if( intParam(SoPlex2::OBJSENSE) == SoPlex2::OBJSENSE_MAXIMIZE )
       {
          assert(_rationalLP->spxSense() == SPxLPRational::MINIMIZE);
@@ -778,9 +777,20 @@ namespace soplex
 
          _rationalLP->changeObj(_rationalLP->maxObj());
          _rationalLP->changeSense(SPxLPRational::MAXIMIZE);
-
-         _realLP->changeObj(_realLP->maxObj());
          _realLP->changeSense(SPxLPReal::MAXIMIZE);
+      }
+
+      // restore bounds and objective coefficients in real LP
+      for( int c = numColsRational() - 1; c >= 0; c-- )
+      {
+         _realLP->changeBounds(c, (Real)lowerRational(c), (Real)upperRational(c));
+         _realLP->changeObj(c, (Real)objRational(c));
+      }
+
+      // restore sides in real LP
+      for( int r = numRowsRational() - 1; r >= 0; r-- )
+      {
+         _realLP->changeRange(r, (Real)lhsRational(r), (Real)rhsRational(r));
       }
 
       // print LP if in debug mode
