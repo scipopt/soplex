@@ -449,7 +449,6 @@ void SLUFactor::clear()
    usetup        = false;
    maxabs        = 1;
    initMaxabs    = 1;
-   minThreshold  = REAL(0.01);
    lastThreshold = minThreshold;
    minStability  = MINSTABILITY;
    stat          = UNLOADED;
@@ -744,6 +743,7 @@ SLUFactor::SLUFactor()
    , uptype (FOREST_TOMLIN)
    , eta (1)
    , forest (1)
+   , minThreshold (0.01)
 {
    METHOD( "SLUFactor::SLUFactor()" );
    row.perm    = 0;

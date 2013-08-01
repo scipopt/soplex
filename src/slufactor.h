@@ -122,7 +122,7 @@ public:
       uptype = tp;
    }
 
-   /// sets Markowitz threshold.
+   /// sets minimum Markowitz threshold.
    void setMarkowitz(Real m)
    {
       if( m < 0.01 )
@@ -132,6 +132,12 @@ public:
          m = 0.99;
 
       minThreshold = m;
+   }
+
+   /// returns Markowitz threshold.
+   Real markowitz()
+   {
+      return lastThreshold;
    }
    //@}
 
