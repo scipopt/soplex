@@ -4812,10 +4812,13 @@ namespace soplex
       assert(!_hasBasisRational || _basisStatusRowsRational.size() == numRowsRational());
       assert(!_hasBasisRational || _basisStatusColsRational.size() == numColsRational());
 
+#if 0
+      // this is not required since within _solveRational() we currently transform to minimization
       assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MAXIMIZE || _realLP->spxSense() == SPxLPReal::MAXIMIZE);
       assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MINIMIZE || _realLP->spxSense() == SPxLPReal::MINIMIZE);
       assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MAXIMIZE || _rationalLP->spxSense() == SPxLPRational::MAXIMIZE);
       assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MINIMIZE || _rationalLP->spxSense() == SPxLPRational::MINIMIZE);
+#endif
 
       return true;
    }

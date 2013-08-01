@@ -57,7 +57,7 @@ namespace soplex
          bool error = false;
 
          // solve problem with iterative refinement and recovery mechanism
-         _performOptIRStable(_solRational, false, primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
+         _performOptIRStable(_solRational, !unboundednessNotCertified, !infeasibilityNotCertified, primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
 
          // case: an unrecoverable error occured
          if( error )
@@ -193,7 +193,7 @@ namespace soplex
 
 
    /// solves current problem with iterative refinement and recovery mechanism
-   void SoPlex2::_performOptIRStable(SolRational& sol, bool acceptOnlyOptimal, bool& primalFeasible, bool& dualFeasible, bool& infeasible, bool& unbounded, bool& stopped, bool& error)
+   void SoPlex2::_performOptIRStable(SolRational& sol, bool acceptUnbounded, bool acceptInfeasible, bool& primalFeasible, bool& dualFeasible, bool& infeasible, bool& unbounded, bool& stopped, bool& error)
    {
       primalFeasible = false;
       dualFeasible = false;
@@ -216,7 +216,7 @@ namespace soplex
       if( _hasBasisRational )
          _solver.setBasis(_basisStatusRowsRational.get_const_ptr(), _basisStatusColsRational.get_const_ptr());
 
-      _solveRealStable(acceptOnlyOptimal);
+      _solveRealStable(acceptUnbounded, acceptInfeasible);
 
       _solver.setTerminationTime(realParam(SoPlex2::TIMELIMIT));
       _solver.setTerminationIter(intParam(SoPlex2::ITERLIMIT));
@@ -436,7 +436,7 @@ namespace soplex
          if( realParam(SoPlex2::TIMELIMIT) < realParam(SoPlex2::INFTY) )
             _solver.setTerminationTime(realParam(SoPlex2::TIMELIMIT) - _statistics->solvingTime.userTime());
 
-         _solveRealStable(acceptOnlyOptimal);
+         _solveRealStable(acceptUnbounded, acceptInfeasible);
 
          _solver.setTerminationTime(realParam(SoPlex2::TIMELIMIT));
          _solver.setTerminationIter(intParam(SoPlex2::ITERLIMIT));
@@ -564,11 +564,12 @@ namespace soplex
       sol._invalidate();
 
       // perform iterative refinement
-      _performOptIRStable(sol, true, primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
+      _performOptIRStable(sol, false, false, primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
 
       // the feasibility problem should always be solved to optimality
       if( error || unbounded || infeasible || !primalFeasible || !dualFeasible )
       {
+         sol._invalidate();
          infeasible = false;
          stopped = false;
          error = true;
@@ -576,6 +577,7 @@ namespace soplex
       // or stopped due to some limit
       else if( stopped )
       {
+         sol._invalidate();
          infeasible = false;
          error = false;
       }
@@ -590,6 +592,11 @@ namespace soplex
 
          error = (tau < -rationalParam(SoPlex2::FEASTOL) || tau > 1 + rationalParam(SoPlex2::FEASTOL));
          infeasible = (tau < 1);
+
+         if( infeasible )
+            sol._hasPrimal = false;
+         else
+            sol._hasDual = false;
       }
 
       // restore problem
@@ -683,6 +690,9 @@ namespace soplex
       // start timing
       _statistics->transformTime.start();
 
+      // print LP if in debug mode
+      MSG_DEBUG( _realLP->writeFile("beforeUntransEqu.lp", 0, 0, 0) );
+
       int numCols = numColsRational();
       int numOrigCols = numColsRational() - _slackCols.num();
 
@@ -773,6 +783,9 @@ namespace soplex
          _realLP->changeSense(SPxLPReal::MAXIMIZE);
       }
 
+      // print LP if in debug mode
+      MSG_DEBUG( _realLP->writeFile("afterUntransEqu.lp", 0, 0, 0) );
+
       // stop timing
       _statistics->transformTime.stop();
    }
@@ -789,6 +802,7 @@ namespace soplex
       // start timing
       _statistics->transformTime.start();
 
+      // print LP if in debug mode
       MSG_DEBUG( _realLP->writeFile("beforeTransFeas.lp", 0, 0, 0) );
 
       // store objective function
@@ -798,6 +812,7 @@ namespace soplex
       // set objective coefficients to zero; shift primal space such as to guarantee that the zero solution is within
       // the bounds
       DVectorRational shiftedSide(rhsRational());
+      _feasShiftValues.reDim(numColsRational());
 
       for( int c = numColsRational() - 1; c >= 0; c-- )
       {
@@ -807,16 +822,21 @@ namespace soplex
          if( lowerRational(c) > 0 )
          {
             shiftedSide -= (colVectorRational(c) * lowerRational(c));
-            _feasShiftValues.add(c, lowerRational(c));
+            _feasShiftValues[c] = lowerRational(c);
             _rationalLP->changeBounds(c, 0, upperRational(c) < realParam(SoPlex2::INFTY) ? upperRational(c) - lowerRational(c) : upperRational(c));
             _realLP->changeBounds(c, 0.0, (Real)upperRational(c));
          }
          else if( upperRational(c) < 0 )
          {
             shiftedSide -= (colVectorRational(c) * upperRational(c));
-            _feasShiftValues.add(c, upperRational(c));
+            _feasShiftValues[c] = upperRational(c);
             _rationalLP->changeBounds(c, lowerRational(c) > -realParam(SoPlex2::INFTY) ? lowerRational(c) - upperRational(c) : lowerRational(c), 0);
             _realLP->changeBounds(c, (Real)lowerRational(c), 0.0);
+         }
+         else
+         {
+            _feasShiftValues[c] = 0;
+            _realLP->changeBounds(c, (Real)lowerRational(c), (Real)upperRational(c));
          }
 
          assert(lowerReal(c) <= upperReal(c));
@@ -840,6 +860,7 @@ namespace soplex
          _basisStatusColsRational.append(SPxSolver::ON_UPPER);
       }
 
+      // print LP if in debug mode
       MSG_DEBUG( _realLP->writeFile("afterTransFeas.lp", 0, 0, 0) );
 
       // stop timing
@@ -853,6 +874,9 @@ namespace soplex
    {
       // start timing
       _statistics->transformTime.start();
+
+      // print LP if in debug mode
+      MSG_DEBUG( _realLP->writeFile("beforeUntransFeas.lp", 0, 0, 0) );
 
       int numOrigCols = numColsRational() - 1;
 
@@ -891,25 +915,33 @@ namespace soplex
       }
 
 
-      // unshift primal space
+      // unshift primal space and restore objective coefficients
       const SVectorRational& colVector = _rationalLP->colVector(numOrigCols);
       DVectorRational shiftedSide(numRowsRational());
 
       shiftedSide.clear();
       for( int i = colVector.size() - 1; i >= 0; i-- )
-         shiftedSide[colVector.index(i)] = colVector.value(i);
+         shiftedSide[colVector.index(i)] = -colVector.value(i);
 
-      for( int i = _feasShiftValues.size() - 1; i >= 0; i-- )
+      for( int c = numOrigCols - 1; c >= 0; c-- )
       {
-         Rational value = _feasShiftValues.value(i);
-         int index = _feasShiftValues.index(i);
+         Rational value = _feasShiftValues[c];
 
-         assert(lowerRational(index) == 0 || upperRational(index) == 0);
+         assert(value == 0 || lowerRational(c) == 0 || upperRational(c) == 0);
 
-         shiftedSide += (colVectorRational(index) * value);
-         _rationalLP->changeBounds(index, lowerRational(index) > -realParam(SoPlex2::INFTY) ? lowerRational(index) + value : lowerRational(index),
-            upperRational(index) < realParam(SoPlex2::INFTY) ? upperRational(index) + value : upperRational(index));
-         _realLP->changeBounds(index, (Real)lowerRational(index), (Real)upperRational(index));
+         shiftedSide += (colVectorRational(c) * value);
+         if( value != 0 )
+         {
+            _rationalLP->changeBounds(c, lowerRational(c) > -realParam(SoPlex2::INFTY) ? lowerRational(c) + value : lowerRational(c),
+               upperRational(c) < realParam(SoPlex2::INFTY) ? upperRational(c) + value : upperRational(c));
+         }
+
+         _realLP->changeBounds(c, (Real)lowerRational(c), (Real)upperRational(c));
+
+         _rationalLP->changeObj(c, _feasObj[c]);
+         _realLP->changeObj(c, _feasObj[c]);
+
+         assert(lowerReal(c) <= upperReal(c));
       }
 
       // restore right-hand side
@@ -921,14 +953,8 @@ namespace soplex
       _rationalLP->removeCol(numOrigCols);
       _realLP->removeCol(numOrigCols);
 
-      // restore objective coefficients
-      for( int c = numColsRational() - 1; c >= 0; c-- )
-      {
-         _rationalLP->changeObj(c, _feasObj[c]);
-         _realLP->changeObj(c, _feasObj[c]);
-
-         assert(lowerReal(c) <= upperReal(c));
-      }
+      // print LP if in debug mode
+      MSG_DEBUG( _realLP->writeFile("afterUntransFeas.lp", 0, 0, 0) );
 
       // stop timing
       _statistics->transformTime.stop();
