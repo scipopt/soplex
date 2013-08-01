@@ -4381,6 +4381,8 @@ namespace soplex
          assert(_rationalLP != 0);
          _realLP->changeSense(value == SoPlex2::OBJSENSE_MAXIMIZE ? SPxLPReal::MAXIMIZE : SPxLPReal::MINIMIZE);
          _rationalLP->changeSense(value == SoPlex2::OBJSENSE_MAXIMIZE ? SPxLPRational::MAXIMIZE : SPxLPRational::MINIMIZE);
+         _invalidateSolutionReal();
+         _invalidateSolutionRational();
          break;
 
       // type of computational form, i.e., column or row representation
