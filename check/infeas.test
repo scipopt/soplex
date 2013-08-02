@@ -14,7 +14,6 @@ LP/infeas/galenet.mps
 LP/infeas/gams10am.mps
 LP/infeas/gams30am.mps
 LP/infeas/gams60am.mps
-LP/infeas/gas11.mps
 LP/infeas/gosh.mps
 LP/infeas/gran.mps
 LP/infeas/greenbei.mps
@@ -29,6 +28,5 @@ LP/infeas/pilot4i.mps
 LP/infeas/qual.mps
 LP/infeas/reactor.mps
 LP/infeas/refinery.mps
-LP/infeas/self.mps
 LP/infeas/vol1.mps
 LP/infeas/woodinfe.mps

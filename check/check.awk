@@ -36,8 +36,8 @@ BEGIN {
 /Solution time/  { time = $4; } 
 /Iterations/     { iter = $3; }
 /IEXAMP29/       { obj  = $5; }
-/IEXAMP31/       { infeas = 1; }
-/IEXAMP32/       { infeas = 1; } 
+/IEXAMP31/       { unbd = 1 ; }
+/IEXAMP32/       { infeas = 1; }
 /IEXAMP33/       { timeout = 1; }
 #/EEXAMP39/       { singular = 1; }
 /XSOLVE21/       { singular = 1; }
@@ -71,6 +71,8 @@ BEGIN {
 
       if (infeas)
 	 printf("%-14s", "infeasible");
+      else if (unbd)
+	 printf("%-14s", "unbounded");
       else if (timeout)
 	 printf("%-14s", "timeout");
       else if (cycling)
@@ -84,7 +86,7 @@ BEGIN {
 
       if (timeout)
 	 printf("\n");
-      else if ( obj == "error" && !infeas)
+      else if ( obj == "error" && !infeas && !unbd )
       {
 	 printf("XX\n");
 	 fail[type]++;
@@ -92,7 +94,7 @@ BEGIN {
       }
       else
       {
-	 if (!infeas && sol[name] != "infeasible")
+	 if (!infeas && !unbd && sol[name] != "infeasible" && sol[name] != "unbounded")
 	 {
 	    abserr = abs(sol[name] - obj);
 	    if (abs(sol[name]) >= 1e-5)
@@ -121,25 +123,26 @@ BEGIN {
 	    printviol(rcs); 
 	    print "";
 	 }
-	 else
-	 {
-	    if (infeas == 1 && sol[name] == "infeasible")
-	    {
-	       printf("ok\n");
-	       pass[type]++;
-	       passes++;
-	    }
-	    else
-	    {
-	       if (infeas && sol[name] != "infeasible")
-		  printf("XX %.2e\n", abs(sol[name]));
-	       else
-		  printf("XX infeasible\n");
-		  
-	       fail[type]++;
-	       fails++;
-	    }
-	 }
+	 else if ((infeas == 1 && sol[name] == "infeasible") || (unbd == 1 && sol[name] == "unbounded"))
+    {
+        printf("ok\n");
+        pass[type]++;
+        passes++;
+    }
+    else
+    {
+        if (infeas && sol[name] != "infeasible")
+            printf("XX %.2e\n", abs(sol[name]));
+        else if (!infeas && sol[name] == "infeasible")
+            printf("XX infeasible\n");
+        else if (unbd && sol[name] != "unbounded")
+            printf("XX %.2e\n", abs(sol[name]));
+        else if (!unbd && sol[name] == "unbounded")
+            printf("XX unbounded\n");
+
+        fail[type]++;
+        fails++;
+    }
       }
       sum[type] += time;
       cnt[type]++;

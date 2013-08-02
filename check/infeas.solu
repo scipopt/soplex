@@ -14,7 +14,6 @@
 =opt= gams10am  infeasible
 =opt= gams30am  infeasible
 =opt= gams60am  infeasible
-=opt= gas11     infeasible
 =opt= gosh      infeasible
 =opt= gran      infeasible
 =opt= greenbei  infeasible
@@ -29,6 +28,5 @@
 =opt= qual      infeasible
 =opt= reactor   infeasible
 =opt= refinery  infeasible
-=opt= self      infeasible
 =opt= vol1      infeasible
 =opt= woodinfe  infeasible
