@@ -162,16 +162,20 @@ namespace soplex
             _realParamUpper[SoPlex2::OBJLIMIT_UPPER] = _realParamLower[SoPlex2::INFTY];
             _realParamDefault[SoPlex2::OBJLIMIT_UPPER] = _realParamLower[SoPlex2::INFTY];
 
-            ///@todo define suitable values depending on Real type
-            // threshold for activating iterative refinement
+            // working tolerance for feasibility in floating-point solver during iterative refinement
             _realParamLower[SoPlex2::FPFEASTOL] = 1e-12;
             _realParamUpper[SoPlex2::FPFEASTOL] = 1.0;
             _realParamDefault[SoPlex2::FPFEASTOL] = 1e-6;
 
-            // threshold for activating iterative refinement
+            // working tolerance for optimality in floating-point solver during iterative refinement
             _realParamLower[SoPlex2::FPOPTTOL] = 1e-12;
             _realParamUpper[SoPlex2::FPOPTTOL] = 1.0;
             _realParamDefault[SoPlex2::FPOPTTOL] = 1e-6;
+
+            // maximum increase of scaling factors between refinements
+            _realParamLower[SoPlex2::MAXSCALEINCR] = 1.0;
+            _realParamUpper[SoPlex2::MAXSCALEINCR] = DEFAULT_INFINITY;
+            _realParamDefault[SoPlex2::MAXSCALEINCR] = DEFAULT_INFINITY;
 
             // primal feasibility tolerance
             _rationalParamLower[SoPlex2::FEASTOL] = 0.0;
@@ -4640,6 +4644,10 @@ namespace soplex
 
       // working tolerance for optimality in floating-point solver
       case SoPlex2::FPOPTTOL:
+         break;
+
+      // maximum increase of scaling factors between refinements
+      case SoPlex2::MAXSCALEINCR:
          break;
 
       default:

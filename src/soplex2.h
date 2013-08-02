@@ -1211,8 +1211,11 @@ public:
       /// working tolerance for optimality in floating-point solver during iterative refinement
       FPOPTTOL = 8,
 
+      /// maximum increase of scaling factors between refinements
+      MAXSCALEINCR = 9,
+
       /// number of real parameters
-      REALPARAM_COUNT = 9
+      REALPARAM_COUNT = 10
    } RealParam;
 
    /// rational parameters

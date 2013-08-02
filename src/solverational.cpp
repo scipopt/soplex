@@ -396,7 +396,7 @@ namespace soplex
          _statistics->refinements++;
 
          // compute primal scaling factor; limit increase in scaling by tolerance used in floating point solve
-         maxScale = primalScale / Rational(realParam(SoPlex2::FPFEASTOL));
+         maxScale = primalScale * Rational(realParam(SoPlex2::MAXSCALEINCR));
 
          primalScale = boundsViolation > sideViolation ? boundsViolation : sideViolation;
          assert(primalScale >= 0);
@@ -416,7 +416,7 @@ namespace soplex
          MSG_INFO2( spxout << "Scaling primal by " << rationalToString(primalScale) << "." << std::endl );
 
          // compute dual scaling factor; limit increase in scaling by tolerance used in floating point solve
-         maxScale = dualScale / Rational(realParam(SoPlex2::FPOPTTOL));
+         maxScale = dualScale * Rational(realParam(SoPlex2::MAXSCALEINCR));
 
          dualScale = redcostViolation;
          assert(dualScale >= 0);
