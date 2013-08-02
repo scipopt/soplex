@@ -42,6 +42,8 @@ namespace soplex
 
          try
          {
+            MSG_INFO1( spxout << std::endl );
+
             _solver.solve();
 
             MSG_INFO1( spxout << std::endl );

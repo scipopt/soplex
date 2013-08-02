@@ -1436,8 +1436,6 @@ int main(int argc, char* argv[])
       }
 
       // solve the LP
-      MSG_INFO1( spxout << "Solving LP..." << std::endl );
-
       if( rational )
          SoPlexShell->solveRational();
       else
