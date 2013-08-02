@@ -191,6 +191,8 @@ namespace soplex
       if( _isSolveStopped() )
          _statusRational = SPxSolver::ABORT_TIME;
 
+      ///@todo set status to ABORT_VALUE if optimal solution exceeds objective limit
+
       // restore original problem
       _untransformEquality(_solRational);
    }
