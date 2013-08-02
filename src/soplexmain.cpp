@@ -938,7 +938,7 @@ void printSolutionAndStatusRational(
                                     << i << "\t"
                                     << std::setw(17)
                                     << std::setprecision( precision )
-                                    << objx[i] << std::endl; )
+                                    << rationalToString(objx[i]) << std::endl; )
             }
             MSG_INFO1( spxout << "All other variables are zero (within " << std::setprecision(1) << 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) << ")." << std::endl; )
          }
@@ -959,7 +959,7 @@ void printSolutionAndStatusRational(
                                     << i << "\t"
                                     << std::setw(17)
                                     << std::setprecision( precision )
-                                    << objy[i] << std::endl; )
+                                    << rationalToString(objy[i]) << std::endl; )
                   allzero = false;
                }
             }
@@ -1007,7 +1007,7 @@ void printSolutionAndStatusRational(
                                     << i << "\t"
                                     << std::setw(17)
                                     << std::setprecision( precision )
-                                    << objx[i] << std::endl; )
+                                    << rationalToString(objx[i]) << std::endl; )
             }
             MSG_INFO1( spxout << "All other variables are zero (within " << std::setprecision(1) << 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) << ")." << std::endl );
          }
@@ -1031,11 +1031,11 @@ void printSolutionAndStatusRational(
                                     << i << "\t"
                                     << std::setw(17)
                                     << std::setprecision( precision )
-                                    << ray[i] << std::endl; )
+                                    << rationalToString(ray[i]) << std::endl; )
                }
             }
             MSG_INFO1( spxout << "All other variables have zero value (within " << std::setprecision(1) << 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) << ")." << std::endl );
-            MSG_INFO1( spxout << "Objective change per unit along primal ray is " << rayobjval << "." << std::endl; )
+            MSG_INFO1( spxout << "Objective change per unit along primal ray is " << rationalToString(rayobjval) << "." << std::endl; )
          }
       }
       break;
@@ -1065,7 +1065,7 @@ void printSolutionAndStatusRational(
                                     << i << "\t"
                                     << std::setw(16)
                                     << std::setprecision( precision )
-                                    << farkasx[i] << "\t"; )
+                                    << rationalToString(farkasx[i]) << "\t"; )
                   LPRowRational row;
                   SoPlexShell.getRowRational(i, row);
                   if( row.lhs() > -soplex::infinity )
@@ -1079,7 +1079,7 @@ void printSolutionAndStatusRational(
                         MSG_INFO1( spxout << "+"; )
                      }
                      MSG_INFO1( spxout
-                        << row.rowVector().value(j) << " "
+                        << rationalToString(row.rowVector().value(j)) << " "
                         << colnames[ SoPlexShell.colIdRational(row.rowVector().index(j)) ]
                         << " "; );
                   }
@@ -1106,7 +1106,7 @@ void printSolutionAndStatusRational(
 
             MSG_INFO1( spxout << "All other row multipliers are zero (within " << std::setprecision(1) << 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::OPTTOL)) << ")." << std::endl );
             MSG_INFO1( spxout << "Farkas infeasibility proof: \t"; )
-            MSG_INFO1( spxout << lhs << " <= "; )
+            MSG_INFO1( spxout << rationalToString(lhs) << " <= "; )
 
             bool nonzerofound = false;
             for( int i = 0; i < SoPlexShell.numColsRational(); ++i )
@@ -1117,7 +1117,7 @@ void printSolutionAndStatusRational(
                   {
                      MSG_INFO1( spxout << "+"; )
                   }
-                  MSG_INFO1( spxout << proofvec[i] << " " << colnames[ SoPlexShell.colIdRational(i) ] << " "; )
+                  MSG_INFO1( spxout << rationalToString(proofvec[i]) << " " << colnames[ SoPlexShell.colIdRational(i) ] << " "; )
                   nonzerofound = true;
                }
             }
@@ -1125,7 +1125,7 @@ void printSolutionAndStatusRational(
             {
                MSG_INFO1( spxout << "0 "; );
             }
-            MSG_INFO1( spxout << "<= " << rhs << std::endl; );
+            MSG_INFO1( spxout << "<= " << rationalToString(rhs) << std::endl; );
          }
       }
       if( write_basis )  // write basis even if we are infeasible
