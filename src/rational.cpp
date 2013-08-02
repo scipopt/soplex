@@ -19,10 +19,11 @@
 
 #include <math.h>
 #include <stdlib.h>
-
-#include "rational.h"
+#include <iomanip>
 #include <string>
 #include <sstream>
+
+#include "rational.h"
 
 namespace soplex
 {
@@ -57,12 +58,12 @@ std::string rationalToString(const Rational& r, const bool asfloat)
    std::stringstream sstream;
 
    sstream << r;
-   if( !asfloat || sstream.str().find("/") == std::string::npos )
+   if( !asfloat )
       return sstream.str();
    else
    {
       sstream.str("");
-      sstream << mpf_class(r);
+      sstream << std::setprecision(20) << mpf_class(r, 128);
       return sstream.str();
    }
 
