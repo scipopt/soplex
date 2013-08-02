@@ -76,9 +76,8 @@ namespace soplex
          // case: unboundedness detected for the first time
          else if( unbounded && !unboundednessNotCertified )
          {
-            ///@todo merge solution data consistently
-
-            _performUnboundedIRStable(_solRational, hasUnboundedRay, stopped, error);
+            SolRational solUnbounded;
+            _performUnboundedIRStable(solUnbounded, hasUnboundedRay, stopped, error);
 
             if( error )
             {
@@ -87,8 +86,8 @@ namespace soplex
                break;
             }
 
-            assert(!hasUnboundedRay || _solRational.hasPrimalray());
-            assert(!_solRational.hasPrimalray() || hasUnboundedRay);
+            assert(!hasUnboundedRay || solUnbounded.hasPrimalray());
+            assert(!solUnbounded.hasPrimalray() || hasUnboundedRay);
 
             unboundednessNotCertified = !hasUnboundedRay;
 
@@ -100,6 +99,12 @@ namespace soplex
             }
 
             _performFeasIRStable(_solRational, infeasible, stopped, error);
+
+            if( hasUnboundedRay )
+            {
+               _solRational._primalray = solUnbounded._primalray;
+               _solRational._hasPrimalray = true;
+            }
 
             if( error )
             {
@@ -541,20 +546,68 @@ namespace soplex
    /// performs iterative refinement on the auxiliary problem for testing unboundedness
    void SoPlex2::_performUnboundedIRStable(SolRational& sol, bool& hasUnboundedRay, bool& stopped, bool& error)
    {
-      hasUnboundedRay = false;
-      stopped = false;
-      error = false;
+      bool primalFeasible;
+      bool dualFeasible;
+      bool infeasible;
+      bool unbounded;
 
-      MSG_INFO1( spxout << "iterative refinement not yet implemented for testing unboundedness\n" );
+      // move objective function to constraints and adjust sides and bounds
+      _transformUnbounded();
+
+      // invalidate solution
+      sol._invalidate();
+
+      // perform iterative refinement
+      _performOptIRStable(sol, false, false, primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
+
+      // the unbounded problem should always be solved to optimality
+      if( error || unbounded || infeasible || !primalFeasible || !dualFeasible )
+      {
+         sol._invalidate();
+         hasUnboundedRay = false;
+         stopped = false;
+         error = true;
+      }
+      // or stopped due to some limit
+      else if( stopped )
+      {
+         sol._invalidate();
+         hasUnboundedRay = false;
+         error = false;
+      }
+      else
+      {
+         Rational tau = sol._primal[numColsRational() - 1];
+
+         MSG_DEBUG( spxout << "tau = " << tau << " (roughly " << rationalToString(tau) << ")" << std::endl );
+
+         assert(tau <= 1 + 2 * rationalParam(SoPlex2::FEASTOL));
+         assert(tau >= -rationalParam(SoPlex2::FEASTOL));
+
+         // because the right-hand side and all bounds (but tau's upper bound) are zero, tau should be approximately
+         // zero if basic; otherwise 0 or 1
+         error = !(tau >= 1 || tau < rationalParam(SoPlex2::FEASTOL));
+         assert(!error);
+
+         hasUnboundedRay = (tau >= 1);
+
+         sol._hasDual = false;
+         if( !hasUnboundedRay )
+            sol._hasPrimal = false;
+      }
+
+      // restore problem
+      _untransformUnbounded(sol, hasUnboundedRay);
    }
 
 
 
    /// performs iterative refinement on the auxiliary problem for testing feasibility
-   void SoPlex2::_performFeasIRStable(SolRational& sol, bool& infeasible, bool& stopped, bool& error)
+   void SoPlex2::_performFeasIRStable(SolRational& sol, bool& hasDualfarkas, bool& stopped, bool& error)
    {
       bool primalFeasible;
       bool dualFeasible;
+      bool infeasible;
       bool unbounded;
 
       // remove objective function, shift, homogenize
@@ -570,7 +623,7 @@ namespace soplex
       if( error || unbounded || infeasible || !primalFeasible || !dualFeasible )
       {
          sol._invalidate();
-         infeasible = false;
+         hasDualfarkas = false;
          stopped = false;
          error = true;
       }
@@ -578,7 +631,7 @@ namespace soplex
       else if( stopped )
       {
          sol._invalidate();
-         infeasible = false;
+         hasDualfarkas = false;
          error = false;
       }
       else
@@ -591,16 +644,16 @@ namespace soplex
          assert(tau <= 1 + rationalParam(SoPlex2::FEASTOL));
 
          error = (tau < -rationalParam(SoPlex2::FEASTOL) || tau > 1 + rationalParam(SoPlex2::FEASTOL));
-         infeasible = (tau < 1);
+         hasDualfarkas = (tau < 1);
 
-         if( infeasible )
+         if( hasDualfarkas )
             sol._hasPrimal = false;
          else
             sol._hasDual = false;
       }
 
       // restore problem
-      _untransformFeasibility(sol, infeasible);
+      _untransformFeasibility(sol, hasDualfarkas);
    }
 
 
@@ -802,6 +855,165 @@ namespace soplex
 
 
 
+   /// transforms LP to unboundedness problem by moving the objective function to the constraints, changing right-hand
+   /// side and bounds to zero, and adding an auxiliary variable for the decrease in the objective function
+   void SoPlex2::_transformUnbounded()
+   {
+      assert(_rationalLP->spxSense() == SPxLPRational::MINIMIZE);
+      assert(_realLP->spxSense() == SPxLPReal::MINIMIZE);
+
+      // start timing
+      _statistics->transformTime.start();
+
+      // print LP if in debug mode
+      MSG_DEBUG( _realLP->writeFile("beforeTransUnbounded.lp", 0, 0, 0) );
+
+      // store right-hand side and bounds
+      _unboundedSide = _rationalLP->rhs();
+      _unboundedLower = _rationalLP->lower();
+      _unboundedUpper = _rationalLP->upper();
+
+      // make right-hand side zero
+      for( int r = numRowsRational() - 1; r >= 0; r-- )
+      {
+         _rationalLP->changeRange(r, 0, 0);
+         _realLP->changeRange(r, 0.0, 0.0);
+      }
+
+      // transform objective function to constraint and add auxiliary variable
+      int numOrigCols = numColsRational();
+      DSVectorRational obj(numOrigCols + 1);
+      obj = _rationalLP->maxObj();
+      obj *= -1;
+      obj.add(numOrigCols, 1);
+      _rationalLP->addRow(LPRowRational(0, obj, 0));
+      _realLP->addRow(LPRowReal(0, DSVectorReal(obj), 0));
+
+      assert(numColsRational() == numOrigCols + 1);
+
+      // set objective coefficient and bounds for auxiliary variable
+      _rationalLP->changeObj(numOrigCols, -1);
+      _realLP->changeObj(numOrigCols, -1.0);
+
+      _rationalLP->changeBounds(numOrigCols, 0, 1);
+      _realLP->changeBounds(numOrigCols, 0.0, 1.0);
+
+      // set objective coefficients to zero and adjust bounds for problem variables
+      for( int c = numColsRational() - 2; c >= 0; c-- )
+      {
+         _rationalLP->changeObj(c, 0);
+         _realLP->changeObj(c, 0.0);
+
+         if( lowerRational(c) > -realParam(SoPlex2::INFTY) )
+         {
+            _rationalLP->changeLower(c, 0);
+            _realLP->changeLower(c, 0.0);
+         }
+
+         if( upperRational(c) < realParam(SoPlex2::INFTY) )
+         {
+            _rationalLP->changeUpper(c, 0);
+            _realLP->changeUpper(c, 0.0);
+         }
+      }
+
+      // adjust basis
+      if( _hasBasisRational )
+      {
+         _basisStatusColsRational.append(SPxSolver::ON_UPPER);
+         _basisStatusRowsRational.append(SPxSolver::BASIC);
+      }
+
+      // print LP if in debug mode
+      MSG_DEBUG( _realLP->writeFile("afterTransUnbounded.lp", 0, 0, 0) );
+
+      // stop timing
+      _statistics->transformTime.stop();
+   }
+
+
+
+   /// undoes transformation to unboundedness problem
+   void SoPlex2::_untransformUnbounded(SolRational& sol, bool unbounded)
+   {
+      // start timing
+      _statistics->transformTime.start();
+
+      // print LP if in debug mode
+      MSG_DEBUG( _realLP->writeFile("beforeUntransUnbounded.lp", 0, 0, 0) );
+
+      int numOrigCols = numColsRational() - 1;
+      int numOrigRows = numRowsRational() - 1;
+
+      // adjust solution and basis
+      if( unbounded )
+      {
+         assert(sol._primal[numOrigCols] >= 1);
+
+         sol._hasPrimal = false;
+         sol._hasPrimalray = true;
+         sol._hasDual = false;
+         sol._hasDualfarkas = false;
+
+         if( sol._primal[numOrigCols] != 1 )
+            sol._primal /= sol._primal[numOrigCols];
+
+         sol._primalray = sol._primal;
+         sol._primalray.reDim(numOrigCols);
+
+         _hasBasisRational = (_basisStatusColsRational[numOrigCols] != SPxSolver::BASIC && _basisStatusRowsRational[numOrigRows] == SPxSolver::BASIC);
+         _basisStatusColsRational.reSize(numOrigCols);
+         _basisStatusColsRational.reSize(numOrigRows);
+      }
+      else
+      {
+         sol._invalidate();
+         _hasBasisRational = false;
+      }
+
+      // restore objective function
+      const SVectorRational& rowVector = _rationalLP->rowVector(numOrigRows);
+      DVectorRational obj(numOrigCols + 1);
+
+      obj.clear();
+      for( int i = rowVector.size() - 1; i >= 0; i-- )
+         obj[rowVector.index(i)] = rowVector.value(i);
+
+      DVectorReal objReal(obj);
+      _rationalLP->changeObj(obj);
+      _realLP->changeObj(objReal);
+
+      // remove objective function constraint and auxiliary variable
+      _rationalLP->removeRow(numOrigRows);
+      _realLP->removeRow(numOrigRows);
+
+      _rationalLP->removeCol(numOrigCols);
+      _realLP->removeCol(numOrigCols);
+
+      // restore right-hand side and bounds
+      DVectorReal vectorReal(_unboundedSide);
+
+      vectorReal = _unboundedSide;
+      _rationalLP->changeRange(_unboundedSide, _unboundedSide);
+      _realLP->changeRange(vectorReal, vectorReal);
+
+      vectorReal = _unboundedLower;
+      _rationalLP->changeLower(_unboundedLower);
+      _realLP->changeLower(vectorReal);
+
+      vectorReal = _unboundedUpper;
+      _rationalLP->changeUpper(_unboundedUpper);
+      _realLP->changeUpper(vectorReal);
+
+      // print LP if in debug mode
+      MSG_DEBUG( _realLP->writeFile("afterUntransUnbounded.lp", 0, 0, 0) );
+
+      // stop timing
+      _statistics->transformTime.stop();
+   }
+
+
+
    /// transforms LP to feasibility problem by removing the objective function, shifting variables, and homogenizing the
    /// right-hand side
    void SoPlex2::_transformFeasibility()
@@ -923,7 +1135,6 @@ namespace soplex
          _hasBasisRational = (_basisStatusColsRational[numOrigCols] != SPxSolver::BASIC);
          _basisStatusColsRational.reSize(numOrigCols);
       }
-
 
       // unshift primal space and restore objective coefficients
       const SVectorRational& colVector = _rationalLP->colVector(numOrigCols);

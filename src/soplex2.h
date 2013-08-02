@@ -1359,6 +1359,9 @@ private:
    bool _hasBasisRational;
 
    LPColSetRational _slackCols;
+   DVectorRational _unboundedLower;
+   DVectorRational _unboundedUpper;
+   DVectorRational _unboundedSide;
    DVectorRational _feasObj;
    DVectorRational _feasShiftValues;
 
@@ -1422,7 +1425,7 @@ private:
    void _performUnboundedIRStable(SolRational& sol, bool& hasUnboundedRay, bool& stopped, bool& error);
 
    /// performs iterative refinement on the auxiliary problem for testing feasibility
-   void _performFeasIRStable(SolRational& sol, bool& infeasible, bool& stopped, bool& error);
+   void _performFeasIRStable(SolRational& sol, bool& hasDualfarkas, bool& stopped, bool& error);
 
    /// introduces slack variables to transform inequality constraints into equations for both rational and real LP,
    /// which should be in sync
@@ -1430,6 +1433,13 @@ private:
 
    /// undoes transformation to equality form
    void _untransformEquality(SolRational& sol);
+
+   /// transforms LP to unboundedness problem by moving the objective function to the constraints, changing right-hand
+   /// side and bounds to zero, and adding an auxiliary variable for the decrease in the objective function
+   void _transformUnbounded();
+
+   /// undoes transformation to unboundedness problem
+   void _untransformUnbounded(SolRational& sol, bool unbounded);
 
    /// transforms LP to feasibility problem by removing the objective function, shifting variables, and homogenizing the
    /// right-hand side
