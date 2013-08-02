@@ -194,7 +194,6 @@ void printUsage( const char* const argv[] )
       "          LPfile can be either in MPS or LPF format\n\n"
       "options:  (*) indicates default\n"
       "          (!) indicates experimental features which may give wrong results\n"
-      " -X        solve rational LP\n"
       " -e        select entering algorithm (default is leaving)\n"
       " -r        select row wise representation (default is column)\n"
       " -i        select Eta-update (default is Forest-Tomlin)\n"
@@ -217,6 +216,12 @@ void printUsage( const char* const argv[] )
       " -V        show program version\n"
       " -C        check mode (for check scripts)\n"
       " -h        show this help\n\n"
+      "\n"
+      "Precision:\n"
+      " -X0       read and solve LP in real arithmetic (default)\n"
+      " -X1       read LP in real precision and solve LP in rational arithmetic\n"
+      " -X2       read and solve LP in rational arithmetic\n"
+      "\n"
       "Simplifier:  Scaler:           Starter:    Pricer:        Ratiotester:\n"
       " -s0 none     -g0 none          -c0 none*   -p0 Textbook   -t0 Textbook\n"
       " -s1 Main*    -g1 uni-Equi      -c1 Weight  -p1 ParMult    -t1 Harris\n"
@@ -1178,7 +1183,7 @@ int main(int argc, char* argv[])
 
    NameSet                   rownames;
    NameSet                   colnames;
-   bool                      exact          = false;
+   int                       exactmode      = 0;
    int                       starting       = 0;
    int                       pricing        = 4;
    int                       ratiotest      = 2;
@@ -1211,7 +1216,8 @@ int main(int argc, char* argv[])
       switch(argv[optidx][1])
       {
          case 'X' :
-            exact = true;
+            checkParameter(argv[optidx][2], argv); // use -X[0-2], not -X
+            exactmode = atoi(&argv[optidx][2]);
             break;
          case 'b' :
             checkParameter(argv[optidx][2], argv); // use -b{r,w}, not -b
@@ -1361,9 +1367,8 @@ int main(int argc, char* argv[])
 
    try
    {
-      const bool rational = exact;
       bool success = false;
-
+      bool rational = (exactmode >= 1);
       // start timer
       Timer timer;
       timer.start();
@@ -1374,9 +1379,19 @@ int main(int argc, char* argv[])
 
       MSG_INFO1( spxout << "Loading LP file " << filename << std::endl );
 
-      success = rational
-         ? SoPlexShell->readFileRational( filename, &rownames, &colnames )
-         : SoPlexShell->readFileReal( filename, &rownames, &colnames );
+      if( exactmode == 0 )
+      {
+         success = SoPlexShell->readFileReal( filename, &rownames, &colnames );
+      }
+      else if( exactmode == 1 )
+      {
+         success = SoPlexShell->readFileReal( filename, &rownames, &colnames );
+         SoPlexShell->syncRationalLP();
+      }
+      else
+      {
+         success = SoPlexShell->readFileRational( filename, &rownames, &colnames );
+      }
 
       if( !success )
       {
