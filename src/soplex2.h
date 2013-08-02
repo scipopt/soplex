@@ -516,6 +516,9 @@ public:
    /// clears the LP
    void clearLPReal();
 
+   /// synchronizes real LP with rational LP
+   void syncRealLP();
+
    //@}
 
 
@@ -675,6 +678,9 @@ public:
 
    /// clears the LP
    void clearLPRational();
+
+   /// synchronizes rational LP with real LP
+   void syncRationalLP();
 
    //@}
 
@@ -1406,9 +1412,6 @@ private:
 
    /// disables simplifier and scalers
    void _disableSimplifierAndScalers();
-
-   /// synchronizes real LP with rational LP
-   void _syncRealLP();
 
    /// synchronizes rational solution with real solution
    void _syncRationalSolution(bool snycPrimal, bool syncDual, bool syncBasis);

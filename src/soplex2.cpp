@@ -1876,6 +1876,48 @@ namespace soplex
 
 
 
+   /// synchronizes real LP with rational LP
+   void SoPlex2::syncRealLP()
+   {
+      assert(_isConsistent());
+
+      // start timing
+      _statistics->syncTime.start();
+
+      // copy LP
+      if( _isRealLPLoaded )
+         _solver.loadLP((SPxLPReal)(*_rationalLP));
+      else
+         *_realLP = *_rationalLP;
+
+      // load basis if available
+      if( _hasBasisRational )
+      {
+         assert(_basisStatusRowsRational.size() == numRowsReal());
+         assert(_basisStatusColsRational.size() == numColsReal());
+
+         if( _isRealLPLoaded )
+            _solver.setBasis(_basisStatusRowsRational.get_ptr(), _basisStatusColsRational.get_ptr());
+         else
+         {
+            _basisStatusRowsReal = _basisStatusRowsRational;
+            _basisStatusColsReal = _basisStatusColsRational;
+         }
+
+         _hasBasisReal = true;
+      }
+      else
+         _hasBasisReal = false;
+
+      // invalidate solution
+      _invalidateSolutionReal();
+
+      // stop timing
+      _statistics->syncTime.stop();
+   }
+
+
+
    /// adds a single row
    void SoPlex2::addRowRational(const LPRowRational& lprow)
    {
@@ -2638,6 +2680,40 @@ namespace soplex
 
 
 
+   /// synchronizes rational LP with real LP
+   void SoPlex2::syncRationalLP()
+   {
+      assert(_isConsistent());
+
+      // start timing
+      _statistics->syncTime.start();
+
+      // copy LP
+      *_rationalLP = *_realLP;
+
+      // load basis if available
+      if( _hasBasisReal )
+      {
+         assert(_basisStatusRowsReal.size() == numRowsRational());
+         assert(_basisStatusColsReal.size() == numColsRational());
+
+         _basisStatusRowsRational = _basisStatusRowsReal;
+         _basisStatusColsRational = _basisStatusColsReal;
+
+         _hasBasisRational = true;
+      }
+      else
+         _hasBasisRational = false;
+
+      // invalidate solution
+      _invalidateSolutionRational();
+
+      // stop timing
+      _statistics->syncTime.stop();
+   }
+
+
+
    /// solves real LP
    SPxSolver::Status SoPlex2::solveReal()
    {
@@ -3282,13 +3358,13 @@ namespace soplex
 
 #if 1
       // copy rounded rational LP to real LP
-      _syncRealLP();
+      syncRealLP();
 
       // call rational solving routine
       _solveRational();
 #else
       // copy rounded rational LP to real LP
-      _syncRealLP();
+      syncRealLP();
 
       // solve floating-point LP
       _statusRational = solveReal();
@@ -4939,48 +5015,6 @@ namespace soplex
       _simplifier = 0;
       _firstScaler = 0;
       _secondScaler = 0;
-   }
-
-
-
-   /// synchronizes real LP with rational LP
-   void SoPlex2::_syncRealLP()
-   {
-      assert(_isConsistent());
-
-      // start timing
-      _statistics->syncTime.start();
-
-      // copy LP
-      if( _isRealLPLoaded )
-         _solver.loadLP((SPxLPReal)(*_rationalLP));
-      else
-         *_realLP = *_rationalLP;
-
-      // load basis if available
-      if( _hasBasisRational )
-      {
-         assert(_basisStatusRowsRational.size() == numRowsReal());
-         assert(_basisStatusColsRational.size() == numColsReal());
-
-         if( _isRealLPLoaded )
-            _solver.setBasis(_basisStatusRowsRational.get_ptr(), _basisStatusColsRational.get_ptr());
-         else
-         {
-            _basisStatusRowsReal = _basisStatusRowsRational;
-            _basisStatusColsReal = _basisStatusColsRational;
-         }
-
-         _hasBasisReal = true;
-      }
-      else
-         _hasBasisReal = false;
-
-      // invalidate solution
-      _invalidateSolutionReal();
-
-      // stop timing
-      _statistics->syncTime.stop();
    }
 
 
