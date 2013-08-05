@@ -1460,11 +1460,17 @@ int main(int argc, char* argv[])
 
       // print solution, status, infeasibility system,...
       if( rational )
+      {
+         SoPlexShell->printStatisticsRational(std::cout);
          printSolutionAndStatusRational(*SoPlexShell, rownames, colnames, precision, print_quality,
             print_solution, print_dual, write_basis, basisname, checkMode);
+      }
       else
+      {
+         SoPlexShell->printStatisticsReal(std::cout);
          printSolutionAndStatusReal(*SoPlexShell, rownames, colnames, precision, print_quality,
             print_solution, print_dual, write_basis, basisname, checkMode);
+      }
 
       // clean up
       delete [] basisname;

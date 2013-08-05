@@ -1276,14 +1276,23 @@ public:
    //**@name Statistics */
    //@{
 
-   /// prints problem statistics
-   void printProblemStatistics(std::ostream& os);
+   /// prints statistics on real solution
+   void printSolutionStatisticsReal(std::ostream& os);
+
+   /// prints statistics on rational solution
+   void printSolutionStatisticsRational(std::ostream& os);
 
    /// prints statistics on solving process
    void printSolvingStatistics(std::ostream& os);
 
-   /// prints complete statistics
-   void printStatistics(std::ostream& os);
+   /// prints complete real statistics
+   void printStatisticsReal(std::ostream& os);
+
+   /// prints complete rational statistics
+   void printStatisticsRational(std::ostream& os);
+
+   /// prints rational status
+   void printStatus(std::ostream& os, SPxSolver::Status status);
 
    //@}
 

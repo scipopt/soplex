@@ -3395,7 +3395,11 @@ namespace soplex
       assert(OBJSENSE_MAXIMIZE == 1);
       assert(OBJSENSE_MINIMIZE == -1);
 
-      if( hasPrimalRational() )
+      if( hasPrimalrayRational() )
+      {
+         return realParam(SoPlex2::INFTY) * intParam(SoPlex2::OBJSENSE);
+      }
+      else if( hasPrimalRational() )
       {
          ///@todo remember if computed once
          DVectorRational primal(numColsRational());
@@ -4280,12 +4284,12 @@ namespace soplex
          return false;
 
       file.setf(std::ios::left);
-      file << "NAME  " << filename << std::endl;
+      file << "NAME  " << filename << "\n";
 
       // do not write basis if there is none
       if( !_hasBasisRational )
       {
-         file << "ENDATA" << std::endl;
+         file << "ENDATA\n";
          return true;
       }
 
@@ -4324,7 +4328,7 @@ namespace soplex
             else
                file << "C" << row;
 
-            file << std::endl;
+            file << "\n";
             row++;
          }
          else
@@ -4339,12 +4343,12 @@ namespace soplex
                else
                   file << "x" << col;
 
-               file << std::endl;
+               file << "\n";
             }
          }
       }
 
-      file << "ENDATA" << std::endl;
+      file << "ENDATA\n";
 
 #ifndef NDEBUG
       // check that the remaining rows are basic
@@ -4801,10 +4805,24 @@ namespace soplex
 
 
 
-   /// prints problem statistics
-   void SoPlex2::printProblemStatistics(std::ostream& os)
+   /// prints statistics on real solution
+   void SoPlex2::printSolutionStatisticsReal(std::ostream& os)
    {
-      ///@todo implement
+      os << "Solution           : \n"
+         << "  Value            : " << objValueReal() << "\n"
+         << "  Proven primal    : " << "?\n"
+         << "  Proven dual      : " << "?\n";
+   }
+
+
+
+   /// prints statistics on rational solution
+   void SoPlex2::printSolutionStatisticsRational(std::ostream& os)
+   {
+      os << "Solution           : \n"
+         << "  Value            : " << rationalToString(objValueRational()) << "\n"
+         << "  Proven primal    : " << "?\n"
+         << "  Proven dual      : " << "?\n";
    }
 
 
@@ -4818,11 +4836,104 @@ namespace soplex
 
 
 
-   /// prints complete statistics
-   void SoPlex2::printStatistics(std::ostream& os)
+   /// prints complete real statistics
+   void SoPlex2::printStatisticsReal(std::ostream& os)
    {
-      printProblemStatistics(os);
+      os << std::setprecision(2);
+
+      printStatus(os, _statusReal);
+
+      os << "Rational LP        : \n"
+         << "  Objective sense  : " << (intParam(SoPlex2::OBJSENSE) == SoPlex2::OBJSENSE_MINIMIZE ? "minimize\n" : "maximize\n");
+      _realLP->printProblemStatistics(os);
+
+      printSolutionStatisticsReal(os);
+
       printSolvingStatistics(os);
+   }
+
+
+
+   /// prints complete rational statistics
+   void SoPlex2::printStatisticsRational(std::ostream& os)
+   {
+      os << std::setprecision(2);
+
+      printStatus(os, _statusRational);
+
+      os << "Rational LP        : \n"
+         << "  Objective sense  : " << (intParam(SoPlex2::OBJSENSE) == SoPlex2::OBJSENSE_MINIMIZE ? "minimize\n" : "maximize\n");
+      _rationalLP->printProblemStatistics(os);
+
+      printSolutionStatisticsRational(os);
+
+      printSolvingStatistics(os);
+   }
+
+
+
+   /// prints status
+   void SoPlex2::printStatus(std::ostream& os, SPxSolver::Status status)
+   {
+      os << "SoPlex status      : ";
+
+      switch( status )
+      {
+      case SPxSolver::ERROR:
+         os << "error [unspecified]";
+         break;
+      case SPxSolver::NO_RATIOTESTER:
+         os << "error [no ratiotester loaded]";
+         break;
+      case SPxSolver::NO_PRICER:
+         os << "error [no pricer loaded]";
+         break;
+      case SPxSolver::NO_SOLVER:
+         os << "error [no linear solver loaded]";
+         break;
+      case SPxSolver::NOT_INIT:
+         os << "error [not initialized]";
+         break;
+      case SPxSolver::ABORT_CYCLING:
+         os << "solving aborted [cycling]";
+         break;
+      case SPxSolver::ABORT_TIME:
+         os << "solving aborted [time limit reached]";
+         break;
+      case SPxSolver::ABORT_ITER:
+         os << "solving aborted [iteration limit reached]";
+         break;
+      case SPxSolver::ABORT_VALUE:
+         os << "solving aborted [objective limit reached]";
+         break;
+      case SPxSolver::NO_PROBLEM:
+         os << "no problem loaded";
+         break;
+      case SPxSolver::REGULAR:
+         os << "basis is regular";
+         break;
+      case SPxSolver::SINGULAR:
+         os << "basis is singular";
+         break;
+      case SPxSolver::OPTIMAL:
+         os << "problem is solved [optimal]";
+         break;
+      case SPxSolver::UNBOUNDED:
+         os << "problem is solved [unbounded]";
+         break;
+      case SPxSolver::INFEASIBLE:
+         os << "problem is solved [infeasible]";
+         break;
+      case SPxSolver::INForUNBD:
+         os << "problem is solved [infeasible or unbounded]";
+         break;
+      default:
+      case SPxSolver::UNKNOWN:
+         os << "unknown";
+         break;
+      }
+
+      os << "\n";
    }
 
 

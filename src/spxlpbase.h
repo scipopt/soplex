@@ -778,6 +778,27 @@ public:
       }
    }
 
+   /** prints problem statistics */
+   void printProblemStatistics(std::ostream& os)
+   {
+      os << "  Columns          : " << nCols() << "\n"
+         << "             boxed : " << "?\n"
+         << "       lower bound : " << "?\n"
+         << "       upper bound : " << "?\n"
+         << "              free : " << "?\n"
+         << "  Rows             : " << nRows() << "\n"
+         << "            ranged : " << "?\n"
+         << "               lhs : " << "?\n"
+         << "               rhs : " << "?\n"
+         << "              free : " << "?\n"
+         << "  Nonzeros         : " << nNzos() << "\n"
+         << "        per column : " << Real(nNzos()) / Real(nCols()) << "\n"
+         << "           per row : " << Real(nNzos()) / Real(nRows()) << "\n"
+         << "          sparsity : " << Real(nNzos()) / Real(nCols()) / Real(nRows()) << "\n"
+         << "   min. abs. value : " << Real(minAbsNzo()) << "\n"
+         << "   max. abs. value : " << Real(maxAbsNzo()) << "\n";
+   }
+
    //@}
 
    // ------------------------------------------------------------------------------------------------------------------

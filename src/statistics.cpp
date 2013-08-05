@@ -47,7 +47,38 @@ namespace soplex
    /// prints statistics
    void SoPlex2::Statistics::print(std::ostream& os)
    {
-      ///@todo implement
+      Real solTime = solvingTime.userTime();
+      Real totTime = readingTime.userTime() + solTime;
+      Real otherTime = solTime - syncTime.userTime() - transformTime.userTime();
+
+      os << "Total time (sec)   : " << totTime << "\n"
+         << "  Reading          : " << readingTime.userTime() << "\n"
+         << "  Solving          : " << solTime << "\n"
+         << "  Preprocessing    : " << "?" << " (?% of solving time)\n"
+         << "  Simplex          : " << "?" << " (?% of solving time)\n"
+         << "  Synchronization  : " << syncTime.userTime() << " (" << syncTime.userTime() / solTime << "% of solving time)\n"
+         << "  Transformation   : " << transformTime.userTime() << " (" << transformTime.userTime() / solTime << "% of solving time)\n"
+         << "  Other            : " << otherTime << " (" << otherTime / solTime << "% of solving time)\n";
+
+      os << "Refinements        : " << refinements << "\n"
+         << "  Stalling         : " << stallRefinements << "\n";
+
+      os << "Iterations         : " << iterations << "\n"
+         << "  From scratch     : " << "?" << " (?%)\n"
+         << "  From basis       : " << "?" << " (?%)\n"
+         << "  Primal           : " << "?" << " (?%)\n"
+         << "  Dual             : " << "?" << " (?%)\n"
+         << "  Column rep.      : " << "?" << " (?%)\n"
+         << "  Row rep.         : " << "?" << " (?%)\n";
+
+      os << "Factorizations     : " << "?\n"
+         << "  Rate             : " << "? iterations per factorization\n"
+         << "  Time (sec)       : " << "?\n";
+
+      os << "Solves             : " << "?\n"
+         << "  Forward solves   : " << "?\n"
+         << "  Backward solves  : " << "?\n"
+         << "  Time (sec)       : " << "?\n";
    }
 } // namespace soplex
 
