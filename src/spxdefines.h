@@ -161,6 +161,7 @@ typedef long double Real;
 
 #ifndef REAL
 #define REAL(x)  x##L
+#define REAL_FORMAT "Lf"
 #endif
 /// default allowed bound violation
 #ifndef DEFAULT_BND_VIOL
@@ -190,6 +191,7 @@ typedef float Real;
 
 #ifndef REAL
 #define REAL(x)  x
+#define REAL_FORMAT "f"
 #endif
 /// default allowed bound violation
 #ifndef DEFAULT_BND_VIOL
@@ -214,6 +216,7 @@ typedef double Real;
 
 #ifndef REAL
 #define REAL(x)  x
+#define REAL_FORMAT "lf"
 #endif
 /// default allowed bound violation
 #ifndef DEFAULT_BND_VIOL

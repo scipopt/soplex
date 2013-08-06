@@ -413,7 +413,8 @@ void printAlgorithmParameters(
 {
    if( checkMode )
    {
-      MSG_INFO1( spxout
+      MSG_INFO1( spxout << std::endl
+         << "SoPlex parameters: " << std::endl
          << "IEXAMP12 Feastol        = "
          << std::setw(16) << rationalToString(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) << std::endl
          << "IEXAMP52 Opttol         = "
@@ -440,7 +441,7 @@ void printAlgorithmParameters(
    }
    else
    {
-      MSG_INFO1( spxout
+      MSG_INFO1( spxout << std::endl
          << "SoPlex parameters: " << std::endl
          << "Feastol        = "
          << std::setw(16) << rationalToString(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) << std::endl
@@ -1362,6 +1363,19 @@ int main(int argc, char* argv[])
    std::ofstream  myinfostream( "infos.txt" );
    redirectOutput(myerrstream, myinfostream);
 #endif
+
+   // write default settings file
+   MSG_INFO1( spxout << "Saving default parameters to settings file <default.set> . . .\n" );
+   SoPlexShell->saveSettingsFile("default.set");
+
+   // read soplex.set if available
+   spxifstream file("soplex.set");
+   if( !file )
+   {
+      MSG_INFO1( spxout << "User settings file <soplex.set> not found.  Using default parameters.\n" );
+   }
+   else
+      SoPlexShell->loadSettingsFile("soplex.set");
 
    printAlgorithmParameters( *SoPlexShell, checkMode );
 

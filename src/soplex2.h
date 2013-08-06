@@ -998,7 +998,7 @@ public:
       /// type of LU update
       FACTOR_UPDATE_TYPE = 3,
 
-      /// maximum number of updates before fresh factorization
+      /// maximum number of updates without fresh factorization
       FACTOR_UPDATE_MAX = 4,
 
       /// iteration limit (-1 if unlimited)
@@ -1011,7 +1011,7 @@ public:
       STALLREFLIMIT = 7,
 
       /// display frequency
-      DISPLAY_FREQ = 8,
+      DISPLAYFREQ = 8,
 
       /// verbosity level
       VERBOSITY = 9,
@@ -1196,7 +1196,7 @@ public:
       /// zero tolerance used in factorization
       EPSILON_FACTORIZATION = 1,
 
-      /// zero tolerance used in factorization update
+      /// zero tolerance used in update of the factorization
       EPSILON_UPDATE = 2,
 
       /// infinity threshold
@@ -1269,6 +1269,12 @@ public:
 
    /// sets parameter settings; returns true on success
    bool setSettings(const Settings& settings, const bool quiet = false, const bool init = false);
+
+   /// writes settings file; returns true on success
+   bool saveSettingsFile(const char* filename) const;
+
+   /// reads settings file; returns true on success
+   bool loadSettingsFile(const char* filename);
 
    //@}
 
@@ -1403,6 +1409,9 @@ private:
 
    /// should solving process be stopped?
    bool _isSolveStopped() const;
+
+   /// parses one line in a settings file; returns true on success
+   bool _parseSettingsLine(char* line, const int lineNumber);
 
    //@}
 

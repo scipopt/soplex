@@ -21,12 +21,39 @@
 #include "statistics.h"
 #include "mpsinput.h"
 
+/// maximum length of lines in settings file
+#define SET_MAX_LINE_LEN 500
+
 namespace soplex
 {
    /// class of parameter settings
    class SoPlex2::Settings
    {
    public:
+      /// array of names for boolean parameters
+      static std::string _boolParamName[SoPlex2::BOOLPARAM_COUNT];
+
+      /// array of names for integer parameters
+      static std::string _intParamName[SoPlex2::INTPARAM_COUNT];
+
+      /// array of names for real parameters
+      static std::string _realParamName[SoPlex2::REALPARAM_COUNT];
+
+      /// array of names for rational parameters
+      static std::string _rationalParamName[SoPlex2::RATIONALPARAM_COUNT];
+
+      /// array of descriptions for boolean parameters
+      static std::string _boolParamDescription[SoPlex2::BOOLPARAM_COUNT];
+
+      /// array of descriptions for integer parameters
+      static std::string _intParamDescription[SoPlex2::INTPARAM_COUNT];
+
+      /// array of descriptions for real parameters
+      static std::string _realParamDescription[SoPlex2::REALPARAM_COUNT];
+
+      /// array of descriptions for rational parameters
+      static std::string _rationalParamDescription[SoPlex2::RATIONALPARAM_COUNT];
+
       /// array of default values for boolean parameters
       static bool _boolParamDefault[SoPlex2::BOOLPARAM_COUNT];
 
@@ -72,120 +99,178 @@ namespace soplex
          if( !_defaultsAndBoundsInitialized )
          {
             // should partial pricing be used?
+            _boolParamName[SoPlex2::PARTIAL_PRICING] = "partial_pricing";
+            _boolParamDescription[SoPlex2::PARTIAL_PRICING] = "should partial pricing be used?";
             _boolParamDefault[SoPlex2::PARTIAL_PRICING] = false;
 
             // objective sense
+            _intParamName[SoPlex2::OBJSENSE] = "objsense";
+            _intParamDescription[SoPlex2::OBJSENSE] = "objective sense (-1 - minimize, +1 - maximize)";
             _intParamDefault[SoPlex2::OBJSENSE] = SoPlex2::OBJSENSE_MAXIMIZE;
 
             // type of computational form, i.e., column or row representation
+            _intParamName[SoPlex2::REPRESENTATION] = "representation";
+            _intParamDescription[SoPlex2::REPRESENTATION] = "type of computational form (0 - column representation, 1 - row representation)";
             _intParamDefault[SoPlex2::REPRESENTATION] = SoPlex2::REPRESENTATION_COLUMN;
 
             // type of algorithm, i.e., enter or leave
+            _intParamName[SoPlex2::ALGORITHM] = "algorithm";
+            _intParamDescription[SoPlex2::ALGORITHM] = "type of algorithm (0 - enter, 1 - leave)";
             _intParamDefault[SoPlex2::ALGORITHM] = SoPlex2::ALGORITHM_LEAVE;
 
             // type of LU update
+            _intParamName[SoPlex2::FACTOR_UPDATE_TYPE] = "factor_update_type";
+            _intParamDescription[SoPlex2::FACTOR_UPDATE_TYPE] = "type of LU update (0 - eta update, 1 - Forrest-Tomlin update)";
             _intParamDefault[SoPlex2::FACTOR_UPDATE_TYPE] = SoPlex2::FACTOR_UPDATE_TYPE_FT;
 
             ///@todo which value?
-            // maximum number of updates before fresh factorization
+            // maximum number of updates without fresh factorization
+            _intParamName[SoPlex2::FACTOR_UPDATE_MAX] = "factor_update_max";
+            _intParamDescription[SoPlex2::FACTOR_UPDATE_MAX] = "maximum number of LU updates without fresh factorization";
             _intParamDefault[SoPlex2::FACTOR_UPDATE_MAX] = 200;
 
             // iteration limit (-1 if unlimited)
+            _intParamName[SoPlex2::ITERLIMIT] = "iterlimit";
+            _intParamDescription[SoPlex2::ITERLIMIT] = "iteration limit (-1 - no limit)";
             _intParamDefault[SoPlex2::ITERLIMIT] = -1;
 
             // refinement limit (-1 if unlimited)
+            _intParamName[SoPlex2::REFLIMIT] = "reflimit";
+            _intParamDescription[SoPlex2::REFLIMIT] = "refinement limit (-1 - no limit)";
             _intParamDefault[SoPlex2::REFLIMIT] = -1;
 
             // stalling refinement limit (-1 if unlimited)
+            _intParamName[SoPlex2::STALLREFLIMIT] = "stallreflimit";
+            _intParamDescription[SoPlex2::STALLREFLIMIT] = "stalling refinement limit (-1 - no limit)";
             _intParamDefault[SoPlex2::STALLREFLIMIT] = -1;
 
             // display frequency
-            _intParamDefault[SoPlex2::DISPLAY_FREQ] = 100;
+            _intParamName[SoPlex2::DISPLAYFREQ] = "displayfreq";
+            _intParamDescription[SoPlex2::DISPLAYFREQ] = "display frequency";
+            _intParamDefault[SoPlex2::DISPLAYFREQ] = 100;
 
             // verbosity level
+            _intParamName[SoPlex2::VERBOSITY] = "verbosity";
+            _intParamDescription[SoPlex2::VERBOSITY] = "verbosity level (0 - error, 1 - warning, 2 - debug, 3 - normal, 4 - high, 5 - full)";
             _intParamDefault[SoPlex2::VERBOSITY] = SoPlex2::VERBOSITY_NORMAL;
 
             // type of simplifier
+            _intParamName[SoPlex2::SIMPLIFIER] = "simplifier";
+            _intParamDescription[SoPlex2::SIMPLIFIER] = "simplifier (0 - off, 1 - auto)";
             _intParamDefault[SoPlex2::SIMPLIFIER] = SoPlex2::SIMPLIFIER_AUTO;
 
             // type of scaler applied before simplification
+            _intParamName[SoPlex2::SCALER_BEFORE_SIMPLIFIER] = "scaler_before_simplifier";
+            _intParamDescription[SoPlex2::SCALER_BEFORE_SIMPLIFIER] = "scaling before simplification (0 - off, 1 - uni-equilibrium, 2 - bi-equilibrium, 3 - geometric, 4 - iterated geometric)";
             _intParamDefault[SoPlex2::SCALER_BEFORE_SIMPLIFIER] = SoPlex2::SCALER_BIEQUI;
 
             // type of scaler applied after simplification
+            _intParamName[SoPlex2::SCALER_AFTER_SIMPLIFIER] = "scaler_after_simplifier";
+            _intParamDescription[SoPlex2::SCALER_AFTER_SIMPLIFIER] = "scaling after simplification (0 - off, 1 - uni-equilibrium, 2 - bi-equilibrium, 3 - geometric, 4 - iterated geometric)";
             _intParamDefault[SoPlex2::SCALER_AFTER_SIMPLIFIER] = SoPlex2::SCALER_OFF;
 
             // type of starter used to create crash basis
+            _intParamName[SoPlex2::STARTER] = "starter";
+            _intParamDescription[SoPlex2::STARTER] = "crash basis generated when starting from scratch (0 - none, 1 - weight, 2 - sum, 3 - vector)";
             _intParamDefault[SoPlex2::STARTER] = SoPlex2::STARTER_OFF;
 
             // type of pricer
+            _intParamName[SoPlex2::PRICER] = "pricer";
+            _intParamDescription[SoPlex2::PRICER] = "pricing method (0 - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - hybrid quicksteep/parmult)";
             _intParamDefault[SoPlex2::PRICER] = SoPlex2::PRICER_QUICKSTEEP;
 
             // type of ratio test
+            _intParamName[SoPlex2::RATIOTESTER] = "ratiotester";
+            _intParamDescription[SoPlex2::RATIOTESTER] = "method for ratio test (0 - textbook, 1 - harris, 2 - fast, 3 - boundflipping)";
             _intParamDefault[SoPlex2::RATIOTESTER] = SoPlex2::RATIOTESTER_FAST;
 
             ///@todo define suitable values depending on Real type
             // general zero tolerance
+            _realParamName[SoPlex2::EPSILON_ZERO] = "epsilon_zero";
+            _realParamDescription[SoPlex2::EPSILON_ZERO] = "general zero tolerance";
             _realParamLower[SoPlex2::EPSILON_ZERO] = DEFAULT_EPS_ZERO;
             _realParamUpper[SoPlex2::EPSILON_ZERO] = DEFAULT_EPS_ZERO;
             _realParamDefault[SoPlex2::EPSILON_ZERO] = DEFAULT_EPS_ZERO;
 
             ///@todo define suitable values depending on Real type
             // zero tolerance used in factorization
+            _realParamName[SoPlex2::EPSILON_FACTORIZATION] = "epsilon_factorization";
+            _realParamDescription[SoPlex2::EPSILON_FACTORIZATION] = "zero tolerance used in factorization";
             _realParamLower[SoPlex2::EPSILON_FACTORIZATION] = DEFAULT_EPS_FACTOR;
             _realParamUpper[SoPlex2::EPSILON_FACTORIZATION] = DEFAULT_EPS_FACTOR;
             _realParamDefault[SoPlex2::EPSILON_FACTORIZATION] = DEFAULT_EPS_FACTOR;
 
             ///@todo define suitable values depending on Real type
-            // zero tolerance used in factorization update
+            // zero tolerance used in update of the factorization
+            _realParamName[SoPlex2::EPSILON_UPDATE] = "epsilon_update";
+            _realParamDescription[SoPlex2::EPSILON_UPDATE] = "zero tolerance used in update of the factorization";
             _realParamLower[SoPlex2::EPSILON_UPDATE] = DEFAULT_EPS_UPDATE;
             _realParamUpper[SoPlex2::EPSILON_UPDATE] = DEFAULT_EPS_UPDATE;
             _realParamDefault[SoPlex2::EPSILON_UPDATE] = DEFAULT_EPS_UPDATE;
 
             ///@todo define suitable values depending on Real type
             // infinity threshold
+            _realParamName[SoPlex2::INFTY] = "infty";
+            _realParamDescription[SoPlex2::INFTY] = "infinity threshold";
             _realParamLower[SoPlex2::INFTY] = DEFAULT_INFINITY;
             _realParamUpper[SoPlex2::INFTY] = DEFAULT_INFINITY;
             _realParamDefault[SoPlex2::INFTY] = DEFAULT_INFINITY;
 
             // time limit in seconds (INFTY if unlimited)
+            _realParamName[SoPlex2::TIMELIMIT] = "timelimit";
+            _realParamDescription[SoPlex2::TIMELIMIT] = "time limit in seconds";
             _realParamLower[SoPlex2::TIMELIMIT] = 0.0;
             _realParamUpper[SoPlex2::TIMELIMIT] = DEFAULT_INFINITY;
             _realParamDefault[SoPlex2::TIMELIMIT] = DEFAULT_INFINITY;
 
             // lower limit on objective value
+            _realParamName[SoPlex2::OBJLIMIT_LOWER] = "objlimit_lower";
+            _realParamDescription[SoPlex2::OBJLIMIT_LOWER] = "lower limit on objective value";
             _realParamLower[SoPlex2::OBJLIMIT_LOWER] = -_realParamLower[SoPlex2::INFTY];
             _realParamUpper[SoPlex2::OBJLIMIT_LOWER] = _realParamLower[SoPlex2::INFTY];
             _realParamDefault[SoPlex2::OBJLIMIT_LOWER] = -_realParamLower[SoPlex2::INFTY];
 
             // upper limit on objective value
+            _realParamName[SoPlex2::OBJLIMIT_UPPER] = "objlimit_upper";
+            _realParamDescription[SoPlex2::OBJLIMIT_UPPER] = "upper limit on objective value";
             _realParamLower[SoPlex2::OBJLIMIT_UPPER] = -_realParamLower[SoPlex2::INFTY];
             _realParamUpper[SoPlex2::OBJLIMIT_UPPER] = _realParamLower[SoPlex2::INFTY];
             _realParamDefault[SoPlex2::OBJLIMIT_UPPER] = _realParamLower[SoPlex2::INFTY];
 
             // working tolerance for feasibility in floating-point solver during iterative refinement
+            _realParamName[SoPlex2::FPFEASTOL] = "fpfeastol";
+            _realParamDescription[SoPlex2::FPFEASTOL] = "working tolerance for feasibility in floating-point solver during iterative refinement";
             _realParamLower[SoPlex2::FPFEASTOL] = 1e-12;
             _realParamUpper[SoPlex2::FPFEASTOL] = 1.0;
             _realParamDefault[SoPlex2::FPFEASTOL] = 1e-6;
 
             // working tolerance for optimality in floating-point solver during iterative refinement
+            _realParamName[SoPlex2::FPOPTTOL] = "fpopttol";
+            _realParamDescription[SoPlex2::FPOPTTOL] = "working tolerance for optimality in floating-point solver during iterative refinement";
             _realParamLower[SoPlex2::FPOPTTOL] = 1e-12;
             _realParamUpper[SoPlex2::FPOPTTOL] = 1.0;
             _realParamDefault[SoPlex2::FPOPTTOL] = 1e-6;
 
             // maximum increase of scaling factors between refinements
+            _realParamName[SoPlex2::MAXSCALEINCR] = "maxscaleincr";
+            _realParamDescription[SoPlex2::MAXSCALEINCR] = "maximum increase of scaling factors between refinements";
             _realParamLower[SoPlex2::MAXSCALEINCR] = 1.0;
             _realParamUpper[SoPlex2::MAXSCALEINCR] = DEFAULT_INFINITY;
             _realParamDefault[SoPlex2::MAXSCALEINCR] = DEFAULT_INFINITY;
 
             // primal feasibility tolerance
+            _rationalParamName[SoPlex2::FEASTOL] = "feastol";
+            _rationalParamDescription[SoPlex2::FEASTOL] = "primal feasibility tolerance";
             _rationalParamLower[SoPlex2::FEASTOL] = 0.0;
             _rationalParamUpper[SoPlex2::FEASTOL] = 1.0;
-            _rationalParamDefault[SoPlex2::FEASTOL] = 1e-6;
+            _rationalParamDefault[SoPlex2::FEASTOL] = Rational(1)/Rational(1000000);
 
             // dual feasibility tolerance
+            _rationalParamName[SoPlex2::OPTTOL] = "opttol";
+            _rationalParamDescription[SoPlex2::OPTTOL] = "dual feasibility tolerance";
             _rationalParamLower[SoPlex2::OPTTOL] = 0.0;
             _rationalParamUpper[SoPlex2::OPTTOL] = 1.0;
-            _rationalParamDefault[SoPlex2::OPTTOL] = 1e-6;
+            _rationalParamDefault[SoPlex2::OPTTOL] = Rational(1)/Rational(1000000);
 
             _defaultsAndBoundsInitialized = true;
          }
@@ -228,12 +313,34 @@ namespace soplex
       }
    };
 
+
+
    bool SoPlex2::Settings::_defaultsAndBoundsInitialized = false;
+
+
+
+   std::string SoPlex2::Settings::_boolParamName[SoPlex2::BOOLPARAM_COUNT];
+   std::string SoPlex2::Settings::_boolParamDescription[SoPlex2::BOOLPARAM_COUNT];
    bool SoPlex2::Settings::_boolParamDefault[SoPlex2::BOOLPARAM_COUNT];
+
+
+
+   std::string SoPlex2::Settings::_intParamName[SoPlex2::INTPARAM_COUNT];
+   std::string SoPlex2::Settings::_intParamDescription[SoPlex2::INTPARAM_COUNT];
    int SoPlex2::Settings::_intParamDefault[SoPlex2::INTPARAM_COUNT];
+
+
+
+   std::string SoPlex2::Settings::_realParamName[SoPlex2::REALPARAM_COUNT];
+   std::string SoPlex2::Settings::_realParamDescription[SoPlex2::REALPARAM_COUNT];
    Real SoPlex2::Settings::_realParamLower[SoPlex2::REALPARAM_COUNT];
    Real SoPlex2::Settings::_realParamUpper[SoPlex2::REALPARAM_COUNT];
    Real SoPlex2::Settings::_realParamDefault[SoPlex2::REALPARAM_COUNT];
+
+
+
+   std::string SoPlex2::Settings::_rationalParamName[SoPlex2::RATIONALPARAM_COUNT];
+   std::string SoPlex2::Settings::_rationalParamDescription[SoPlex2::RATIONALPARAM_COUNT];
    Rational SoPlex2::Settings::_rationalParamLower[SoPlex2::RATIONALPARAM_COUNT];
    Rational SoPlex2::Settings::_rationalParamUpper[SoPlex2::RATIONALPARAM_COUNT];
    Rational SoPlex2::Settings::_rationalParamDefault[SoPlex2::RATIONALPARAM_COUNT];
@@ -4460,9 +4567,8 @@ namespace soplex
       {
       // objective sense
       case SoPlex2::OBJSENSE:
-         assert(value == SoPlex2::OBJSENSE_MAXIMIZE || value == SoPlex2::OBJSENSE_MINIMIZE);
-         assert(_realLP != 0);
-         assert(_rationalLP != 0);
+         if( value != SoPlex2::OBJSENSE_MAXIMIZE && value != SoPlex2::OBJSENSE_MINIMIZE )
+            return false;
          _realLP->changeSense(value == SoPlex2::OBJSENSE_MAXIMIZE ? SPxLPReal::MAXIMIZE : SPxLPReal::MINIMIZE);
          _rationalLP->changeSense(value == SoPlex2::OBJSENSE_MAXIMIZE ? SPxLPRational::MAXIMIZE : SPxLPRational::MINIMIZE);
          _invalidateSolutionReal();
@@ -4471,19 +4577,22 @@ namespace soplex
 
       // type of computational form, i.e., column or row representation
       case SoPlex2::REPRESENTATION:
-         assert(value == SoPlex2::REPRESENTATION_COLUMN || value == SoPlex2::REPRESENTATION_ROW);
+         if( value != SoPlex2::REPRESENTATION_COLUMN && value != SoPlex2::REPRESENTATION_ROW )
+            return false;
          _solver.setRep(value == SoPlex2::REPRESENTATION_COLUMN ? SPxSolver::COLUMN : SPxSolver::ROW);
          break;
 
       // type of algorithm, i.e., enter or leave
       case SoPlex2::ALGORITHM:
-         assert(value == SoPlex2::ALGORITHM_ENTER || value == SoPlex2::ALGORITHM_LEAVE);
+         if( value != SoPlex2::ALGORITHM_ENTER && value != SoPlex2::ALGORITHM_LEAVE )
+            return false;
          _solver.setType(value == SoPlex2::ALGORITHM_ENTER ? SPxSolver::ENTER : SPxSolver::LEAVE);
          break;
 
       // type of LU update
       case SoPlex2::FACTOR_UPDATE_TYPE:
-         assert(value == SoPlex2::FACTOR_UPDATE_TYPE_ETA || value == SoPlex2::FACTOR_UPDATE_TYPE_FT);
+         if( value != SoPlex2::FACTOR_UPDATE_TYPE_ETA || value != SoPlex2::FACTOR_UPDATE_TYPE_FT )
+            return false;
          _slufactor.setUtype(value == SoPlex2::FACTOR_UPDATE_TYPE_ETA ? SLUFactor::ETA : SLUFactor::FOREST_TOMLIN);
          break;
 
@@ -4508,7 +4617,7 @@ namespace soplex
          }
 
       // display frequency
-      case SoPlex2::DISPLAY_FREQ:
+      case SoPlex2::DISPLAYFREQ:
          if( value <= 0 )
             return false;
          else
@@ -4674,8 +4783,6 @@ namespace soplex
    {
       assert(param >= 0);
       assert(param < REALPARAM_COUNT);
-      assert(value >= Settings::_realParamLower[param]);
-      assert(value <= _currentSettings->_realParamUpper[param]);
       assert(init || _isConsistent());
 
       if( !init && value == realParam(param) )
@@ -4696,7 +4803,7 @@ namespace soplex
          Param::setEpsilonFactorization(value);
          break;
 
-      // zero tolerance used in factorization update
+      // zero tolerance used in update of the factorization
       case SoPlex2::EPSILON_UPDATE:
          Param::setEpsilonUpdate(value);
          break;
@@ -4745,8 +4852,6 @@ namespace soplex
    {
       assert(param >= 0);
       assert(param < RATIONALPARAM_COUNT);
-      assert(value >= _currentSettings->_rationalParamLower[param]);
-      assert(value <= _currentSettings->_rationalParamUpper[param]);
       assert(init || _isConsistent());
 
       if( !init && value == rationalParam(param) )
@@ -4801,6 +4906,103 @@ namespace soplex
       assert(_isConsistent());
 
       return success;
+   }
+
+
+
+   /// writes settings file; returns true on success
+   bool SoPlex2::saveSettingsFile(const char* filename) const
+   {
+      assert(filename != 0);
+
+      std::ofstream file(filename);
+      if( file == 0 )
+         return false;
+
+      file.setf(std::ios::left);
+      file << "# SoPlex version " << SOPLEX_VERSION / 100 << "." << (SOPLEX_VERSION / 10) % 10 << "." << SOPLEX_VERSION % 10 << "." << SOPLEX_SUBVERSION << "\n";
+
+      for( int i = 0; i < SoPlex2::BOOLPARAM_COUNT; i++ )
+      {
+         file << "\n";
+         file << "# " << _currentSettings->_boolParamDescription[i] << "\n";
+         file << "# range {true, false}, default " << _currentSettings->_boolParamDefault[i] << "\n";
+         file << "bool:" << _currentSettings->_boolParamName[i] << " = " << (_currentSettings->_boolParamValues[i] ? "true\n" : "false\n");
+      }
+
+      for( int i = 0; i < SoPlex2::INTPARAM_COUNT; i++ )
+      {
+         file << "\n";
+         file << "# " << _currentSettings->_intParamDescription[i] << "\n";
+         file << "# range [-2147483648,2147483647], default " << _currentSettings->_intParamDefault[i] << "\n";
+         file << "int:" << _currentSettings->_intParamName[i] << " = " << _currentSettings->_intParamValues[i] << "\n";
+      }
+
+      for( int i = 0; i < SoPlex2::REALPARAM_COUNT; i++ )
+      {
+         file << "\n";
+         file << "# " << _currentSettings->_realParamDescription[i] << "\n";
+         file << "# range [" << _currentSettings->_realParamLower[i] << "," << _currentSettings->_realParamLower[i]
+            << "], default " << _currentSettings->_realParamDefault[i] << "\n";
+         file << "real:" << _currentSettings->_realParamName[i] << " = " << _currentSettings->_realParamValues[i] << "\n";
+      }
+
+      for( int i = 0; i < SoPlex2::RATIONALPARAM_COUNT; i++ )
+      {
+         file << "\n";
+         file << "# " << _currentSettings->_rationalParamDescription[i] << "\n";
+         file << "# range [" << _currentSettings->_rationalParamLower[i] << "," << _currentSettings->_rationalParamLower[i]
+            << "], default " << _currentSettings->_rationalParamDefault[i] << "\n";
+         file << "rational:" << _currentSettings->_rationalParamName[i] << " = " << _currentSettings->_rationalParamValues[i] << "\n";
+      }
+
+      return true;
+   }
+
+
+
+   /// reads settings file; returns true on success
+   bool SoPlex2::loadSettingsFile(const char* filename)
+   {
+      assert(filename != 0);
+
+      // start timing
+      _statistics->readingTime.start();
+
+      MSG_INFO1( spxout << "Loading settings file <" << filename << "> . . .\n" );
+
+      // open file
+      spxifstream file(filename);
+
+      if( !file )
+      {
+         MSG_ERROR( spxout << "Error opening settings file.\n" );
+         return false;
+      }
+
+      // read file
+      char line[SET_MAX_LINE_LEN];
+      int lineNumber = 0;
+      bool readError = false;
+      bool parseError = false;
+
+      while( !readError && !parseError)
+      {
+         lineNumber++;
+         readError = !file.getline(line, sizeof(line));
+         if( !readError )
+            parseError = !_parseSettingsLine(line, lineNumber);
+      }
+
+      if( readError && strlen(line) == SET_MAX_LINE_LEN - 1 )
+      {
+         MSG_ERROR( spxout << "Error reading settings file: line " << lineNumber << " in settings file exceeds " << SET_MAX_LINE_LEN - 2 << " characters.\n" );
+      }
+
+      // stop timing
+      _statistics->readingTime.stop();
+
+      return !readError && !parseError;
    }
 
 
@@ -5031,6 +5233,224 @@ namespace soplex
          || (intParam(ITERLIMIT) >= 0 && _statistics->iterations > intParam(ITERLIMIT))
          || (intParam(REFLIMIT) >= 0 && _statistics->refinements > intParam(REFLIMIT))
          || (intParam(STALLREFLIMIT) >= 0 && _statistics->stallRefinements > intParam(STALLREFLIMIT));
+   }
+
+
+
+   /// parses one line in a settings file; returns true on success
+   bool SoPlex2::_parseSettingsLine(char* line, const int lineNumber)
+   {
+      assert(line != 0);
+
+      // find the start of the parameter type
+      while( *line == ' ' || *line == '\t' || *line == '\r' )
+         line++;
+      if( *line == '\0' || *line == '\n' || *line == '#' )
+         return true;
+      char* paramTypeString = line;
+
+      // find the end of the parameter type
+      while( *line != ' ' && *line != '\t' && *line != '\r' && *line != '\n' && *line != '#' && *line != '\0' && *line != ':' )
+         line++;
+      if( *line == ':' )
+      {
+         *line = '\0';
+         line++;
+      }
+      else
+      {
+         *line = '\0';
+         line++;
+
+         // search for the ':' char in the line
+         while( *line == ' ' || *line == '\t' || *line == '\r' )
+            line++;
+         if( *line != ':' )
+         {
+            MSG_ERROR( spxout << "Error parsing settings file: no ':' separating parameter type and name in line " << lineNumber << ".\n" );
+            return false;
+         }
+         line++;
+      }
+
+      // find the start of the parameter name
+      while( *line == ' ' || *line == '\t' || *line == '\r' )
+         line++;
+      if( *line == '\0' || *line == '\n' || *line == '#' )
+      {
+         MSG_ERROR( spxout << "Error parsing settings file: no parameter name in line " << lineNumber << ".\n");
+         return false;
+      }
+      char* paramName = line;
+
+      // find the end of the parameter name
+      while( *line != ' ' && *line != '\t' && *line != '\r' && *line != '\n' && *line != '#' && *line != '\0' && *line != '=' )
+         line++;
+      if( *line == '=' )
+      {
+         *line = '\0';
+         line++;
+      }
+      else
+      {
+         *line = '\0';
+         line++;
+
+         // search for the '=' char in the line
+         while( *line == ' ' || *line == '\t' || *line == '\r' )
+            line++;
+         if( *line != '=' )
+         {
+            MSG_ERROR( spxout << "Error parsing settings file: no '=' after parameter name in line " << lineNumber << ".\n" );
+            return false;
+         }
+         line++;
+      }
+
+      // find the start of the parameter value string
+      while( *line == ' ' || *line == '\t' || *line == '\r' )
+         line++;
+      if( *line == '\0' || *line == '\n' || *line == '#' )
+      {
+         MSG_ERROR( spxout << "Error parsing settings file: no parameter value in line " << lineNumber << ".\n");
+         return false;
+      }
+      char* paramValueString = line;
+
+      // find the end of the parameter value string
+      while( *line != ' ' && *line != '\t' && *line != '\r' && *line != '\n' && *line != '#' && *line != '\0' )
+         line++;
+      if( *line != '\0' )
+      {
+         // check, if the rest of the line is clean
+         *line = '\0';
+         line++;
+         while( *line == ' ' || *line == '\t' || *line == '\r' )
+            line++;
+         if( *line != '\0' && *line != '\n' && *line != '#' )
+         {
+            MSG_ERROR( spxout << "Error parsing settings file: additional character '" << *line << "' after parameter value in line " << lineNumber << ".\n" );
+            return false;
+         }
+      }
+
+      // check whether we have a bool parameter
+      if( strncmp(paramTypeString, "bool", 4) == 0 )
+      {
+         for( int param = 0; ; param++ )
+         {
+            if( param >= SoPlex2::BOOLPARAM_COUNT )
+            {
+               MSG_ERROR( spxout << "Error parsing settings file: unknown parameter name <" << paramName << "> in line " << lineNumber << ".\n" );
+               return false;
+            }
+            else if( strncmp(paramName, _currentSettings->_boolParamName[param].c_str(), SET_MAX_LINE_LEN) == 0 )
+            {
+               if( strncasecmp(paramValueString, "true", 4) == 0 )
+               {
+                  setBoolParam((SoPlex2::BoolParam)param, true);
+                  break;
+               }
+               else if( strncasecmp(paramValueString, "false", 5) == 0 )
+               {
+                  setBoolParam((SoPlex2::BoolParam)param, false);
+                  break;
+               }
+               else
+               {
+                  MSG_ERROR( spxout << "Error parsing settings file: invalid value <" << paramValueString << "> for bool parameter <" << paramName << "> in line " << lineNumber << ".\n" );
+                  return false;
+               }
+            }
+         }
+
+         return true;
+      }
+
+      // check whether we have an integer parameter
+      if( strncmp(paramTypeString, "int", 3) == 0 )
+      {
+         for( int param = 0; ; param++ )
+         {
+            if( param >= SoPlex2::INTPARAM_COUNT )
+            {
+               MSG_ERROR( spxout << "Error parsing settings file: unknown parameter name <" << paramName << "> in line " << lineNumber << ".\n" );
+               return false;
+            }
+            else if( strncmp(paramName, _currentSettings->_intParamName[param].c_str(), SET_MAX_LINE_LEN) == 0 )
+            {
+               int value;
+
+               if( sscanf(paramValueString, "%d", &value) == 1 && setIntParam((SoPlex2::IntParam)param, value) )
+                  break;
+               else
+               {
+                  MSG_ERROR( spxout << "Error parsing settings file: invalid value <" << paramValueString << "> for int parameter <" << paramName << "> in line " << lineNumber << ".\n" );
+                  return false;
+               }
+            }
+         }
+
+         return true;
+      }
+
+      // check whether we have a real parameter
+      if( strncmp(paramTypeString, "real", 4) == 0 )
+      {
+         for( int param = 0; ; param++ )
+         {
+            if( param >= SoPlex2::REALPARAM_COUNT )
+            {
+               MSG_ERROR( spxout << "Error parsing settings file: unknown parameter name <" << paramName << "> in line " << lineNumber << ".\n" );
+               return false;
+            }
+            else if( strncmp(paramName, _currentSettings->_realParamName[param].c_str(), SET_MAX_LINE_LEN) == 0 )
+            {
+               Real value;
+
+               if( sscanf(paramValueString, "%"REAL_FORMAT, &value) == 1 && setRealParam((SoPlex2::RealParam)param, value) )
+                  break;
+               else
+               {
+                  MSG_ERROR( spxout << "Error parsing settings file: invalid value <" << paramValueString << "> for real parameter <" << paramName << "> in line " << lineNumber << ".\n" );
+                  return false;
+               }
+            }
+         }
+
+         return true;
+      }
+
+      // check whether we have a rational parameter
+      if( strncmp(paramTypeString, "rational", 8) == 0 )
+      {
+         for( int param = 0; ; param++ )
+         {
+            if( param >= SoPlex2::RATIONALPARAM_COUNT )
+            {
+               MSG_ERROR( spxout << "Error parsing settings file: unknown parameter name <" << paramName << "> in line " << lineNumber << ".\n" );
+               return false;
+            }
+            else if( strncmp(paramName, _currentSettings->_rationalParamName[param].c_str(), SET_MAX_LINE_LEN) == 0 )
+            {
+               Rational value;
+
+               if( readStringRational(paramValueString, value) && setRationalParam((SoPlex2::RationalParam)param, value) )
+                  break;
+               else
+               {
+                  MSG_ERROR( spxout << "Error parsing settings file: invalid value <" << paramValueString << "> for rational parameter <" << paramName << "> in line " << lineNumber << ".\n" );
+                  return false;
+               }
+            }
+         }
+
+         return true;
+      }
+
+      MSG_ERROR( spxout << "Error parsing settings file: invalid parameter type <" << paramTypeString << "> for parameter <" << paramName << "> in line " << lineNumber << ".\n" );
+
+      return false;
    }
 
 
