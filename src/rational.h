@@ -129,6 +129,9 @@ std::ostream& operator<<(std::ostream& os, const Rational& q);
 /// Negation.
 Rational operator-(const Rational& q);
 
+/// read Rational from string
+bool readStringRational(const char* s, Rational& value);
+
 #else
 
 /// If compiled without GMP support, Rational is defined as SoPlex's normal Real.
@@ -141,6 +144,9 @@ typedef Real Rational;
 
 /// convert rational number to string
 std::string rationalToString(const Rational& r, const bool asfloat = true);
+
+/// read Rational from string
+bool readStringRational(const char* s, Rational& value);
 
 } // namespace soplex
 #endif // _RATIONAL_H_
