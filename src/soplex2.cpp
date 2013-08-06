@@ -5022,9 +5022,14 @@ namespace soplex
    void SoPlex2::printSolutionStatisticsRational(std::ostream& os)
    {
       os << "Solution           : \n"
-         << "  Value            : " << rationalToString(objValueRational()) << "\n"
+         << "  Objective value  : " << rationalToString(objValueRational()) << "\n"
          << "  Proven primal    : " << "?\n"
          << "  Proven dual      : " << "?\n";
+
+      os << "Violations         : \n"
+         << "  Max. bound       : " << "?\n"
+         << "  Max. row         : " << "?\n"
+         << "  Max. dual        : " << "?\n";
    }
 
 
