@@ -5229,10 +5229,10 @@ namespace soplex
    {
       assert(_statistics != 0);
 
-      return _statistics->solvingTime.userTime() > realParam(TIMELIMIT)
-         || (intParam(ITERLIMIT) >= 0 && _statistics->iterations > intParam(ITERLIMIT))
-         || (intParam(REFLIMIT) >= 0 && _statistics->refinements > intParam(REFLIMIT))
-         || (intParam(STALLREFLIMIT) >= 0 && _statistics->stallRefinements > intParam(STALLREFLIMIT));
+      return _statistics->solvingTime.userTime() >= realParam(TIMELIMIT)
+         || (intParam(ITERLIMIT) >= 0 && _statistics->iterations >= intParam(ITERLIMIT))
+         || (intParam(REFLIMIT) >= 0 && _statistics->refinements >= intParam(REFLIMIT))
+         || (intParam(STALLREFLIMIT) >= 0 && _statistics->stallRefinements >= intParam(STALLREFLIMIT));
    }
 
 
