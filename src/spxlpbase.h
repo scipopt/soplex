@@ -297,13 +297,13 @@ public:
    }
 
    /// Gets objective vector.
-   void getObj(VectorBase<R>& obj) const
+   void getObj(VectorBase<R>& pobj) const
    {
       METHOD( "SPxLPBase::getObj()" );
 
-      obj = LPColSetBase<R>::maxObj();
+      pobj = LPColSetBase<R>::maxObj();
       if( spxSense() == MINIMIZE )
-         obj *= -1.0;
+         pobj *= -1.0;
    }
 
    /// Returns objective value of column \p i.

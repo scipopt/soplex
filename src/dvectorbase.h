@@ -69,18 +69,18 @@ public:
    /**@name Construction, destruction, and assignment */
    //@{
 
-   /// Default constructor. \p dim is the initial dimension.
-   explicit DVectorBase<R>(int dim = 0)
+   /// Default constructor. \p d is the initial dimension.
+   explicit DVectorBase<R>(int d = 0)
       : VectorBase<R>(0, 0)
       , mem(0)
    {
-      memsize = (dim > 0) ? dim : 4;
+      memsize = (d > 0) ? d : 4;
 
       spx_alloc(mem, memsize);
       mem = new (mem) R[memsize]();
 
       VectorBase<R>::val = mem;
-      VectorBase<R>::dimen = dim;
+      VectorBase<R>::dimen = d;
 
       assert(isConsistent());
    }

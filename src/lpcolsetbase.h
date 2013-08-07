@@ -270,9 +270,9 @@ public:
    }
 
    /// Adds LPColBase consisting of objective value \p obj, lower bound \p lower, column vector \p colVector and upper bound \p upper to LPColSetBase.
-   void add(DataKey& key, R obj, R lower, const SVectorBase<R>& colVector, R upper)
+   void add(DataKey& newkey, R obj, R newlower, const SVectorBase<R>& newcolVector, R newupper)
    {
-      SVSetBase<R>::add(key, colVector);
+      SVSetBase<R>::add(newkey, newcolVector);
 
       if( num() > low.dim() )
       {
@@ -281,8 +281,8 @@ public:
          object.reDim(num());
       }
 
-      low[num() - 1] = lower;
-      up[num() - 1] = upper;
+      low[num() - 1] = newlower;
+      up[num() - 1] = newupper;
       object[num() - 1] = obj;
    }
 
@@ -351,7 +351,7 @@ public:
    }
 
    /// Creates new LPColBase with specified arguments and returns a reference to its column vector.
-   SVectorBase<R>& create(DataKey& key, int nonzeros = 0, R obj = 1, R low = 0, R up = 1)
+   SVectorBase<R>& create(DataKey& newkey, int nonzeros = 0, R obj = 1, R newlow = 0, R newup = 1)
    {
       if( num() + 1 > low.dim() )
       {
@@ -360,11 +360,11 @@ public:
          object.reDim(num() + 1);
       }
 
-      low[num()] = low;
-      up[num()] = up;
+      low[num()] = newlow;
+      up[num()] = newup;
       object[num()] = obj;
 
-      return *SVSetBase<R>::create(key, nonzeros);
+      return *SVSetBase<R>::create(newkey, nonzeros);
    }
 
    //@}

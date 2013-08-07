@@ -3143,6 +3143,14 @@ namespace soplex
 
 
 
+   /// returns the termination value
+   Real SoPlex2::terminationValueReal() const
+   {
+      return _solver.terminationValue();
+   }
+
+
+
    /// is a primal feasible solution available?
    bool SoPlex2::hasPrimalReal() const
    {

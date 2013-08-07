@@ -700,6 +700,9 @@ public:
    /// returns the objective value if a primal solution is available
    Real objValueReal() const;
 
+   /// returns the termination value
+   Real terminationValueReal() const;
+
    /// is a primal feasible solution available?
    bool hasPrimalReal() const;
 
@@ -1126,7 +1129,7 @@ public:
       SCALER_GEO1 = 3,
 
       /// geometric mean scaling on rows and columns, max 8 rounds
-      SCALER_GEO8 = 4,
+      SCALER_GEO8 = 4
    };
 
    /// values for parameter STARTER

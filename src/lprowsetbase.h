@@ -300,9 +300,9 @@ public:
 
    /// Adds LPRowBase consisting of left hand side \p lhs, row vector \p rowVector, and right hand side \p rhs to
    /// LPRowSetBase, with DataKey \p key.
-   void add(DataKey& key, R lhs, const SVectorBase<R>& rowVector, R rhs)
+   void add(DataKey& newkey, R newlhs, const SVectorBase<R>& newrowVector, R newrhs)
    {
-      SVSetBase<R>::add(key, rowVector);
+      SVSetBase<R>::add(newkey, newrowVector);
 
       if( num() > left.dim() )
       {
@@ -310,8 +310,8 @@ public:
          right.reDim(num());
       }
 
-      left[num() - 1] = lhs;
-      right[num() - 1] = rhs;
+      left[num() - 1] = newlhs;
+      right[num() - 1] = newrhs;
    }
 
    ///
@@ -377,7 +377,7 @@ public:
    }
 
    /// Creates new LPRowBase with specified parameters and returns a reference to its row vector.
-   SVectorBase<R>& create(DataKey& key, int nonzeros = 0, R lhs = 0, R rhs = 1)
+   SVectorBase<R>& create(DataKey& newkey, int nonzeros = 0, R newlhs = 0, R newrhs = 1)
    {
       if( num() + 1 > left.dim() )
       {
@@ -385,10 +385,10 @@ public:
          right.reDim(num() + 1);
       }
 
-      left[num()] = lhs;
-      right[num()] = rhs;
+      left[num()] = newlhs;
+      right[num()] = newrhs;
 
-      return *SVSetBase<R>::create(key, nonzeros);
+      return *SVSetBase<R>::create(newkey, nonzeros);
    }
 
    //@}
