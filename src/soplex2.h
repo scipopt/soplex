@@ -1472,6 +1472,9 @@ private:
    /// undoes transformation to feasibility problem
    void _untransformFeasibility(SolRational& sol, bool infeasible);
 
+   /// compute radius of infeasibility box implied by an approximate Farkas' proof
+   void _computeInfeasBox(SolRational& sol);
+
    //@}
 
 

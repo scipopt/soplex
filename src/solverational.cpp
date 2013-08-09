@@ -1214,6 +1214,78 @@ namespace soplex
 
       assert(!sol._hasPrimal || sol._slacks == _rationalLP->computePrimalActivity(sol._primal));
    }
+
+   /// compute radius of infeasibility box implied by an approximate Farkas' proof
+   void SoPlex2::_computeInfeasBox(SolRational& sol)
+   {
+      // Given constraints of the form  b_l <= Ax <= b_r a farkas proof y should
+      // satisfy y^TA = 0 and (y(+)^T b_l - y(-)^T b_r) > 0 where (+),(-) denote
+      // the positive and negative parts of y.  If y is approximate, it may not
+      // satisfy y^TA = 0 exactly, but the proof is still valid as long as the
+      // following holds for all potentially feasible x:
+      //
+      //        y^TAx < (y(+)^T b_l - y(-)^T b_r)              (*)
+      //
+      // we may therefore calculate y^TA and (y(+)^T b_l - y(-)^T b_r) exactly
+      // and check if the upper and lower bounds on x imply that all feasible x
+      // satisfy (*), and if not then compute bounds on x to guarantee (*).
+      // The simplest way to do this is to compute
+      //        B = (y(+)^T b_l - y(-)^T b_r) / Sum_i(|(y^TA)_i|)
+      // noting that if every component of x has |x_i| < B, then (*) holds.
+      //
+      // Note: A bound tighter than B can be computed by using the available
+      // variable bound information.
+      // The speed of this method can be further improved by using interval
+      // arithmetic for all computations.
+      // For related information see Sec. 4 of Neumaier and Shcherbina (2004 MPA)
+
+      assert(sol._hasDualfarkas());
+
+      Rational ytransb; // stores (y(+)^T b_l - y(-)^T b_r)
+      DVectorRational ytransA(numColsRational());
+      DVectorRational y(numRowsRational());
+      Rational B;
+      Rational temp;
+
+      y = sol._dualfarkas;
+
+      for( int r = 0; r < numRowsRational(); r++ )
+      {
+         ytransA.multAdd(y[r], _rationalLP->rowVector(r));
+         (y[r] > 0) ? ytransb += y[r] * lhsRational(r) : ytransb += y[r] * rhsRational(r);
+      }
+      spxout << "ytransb = " << rationalToString(ytransb) << std::endl;
+
+      temp = 0;
+      for( int c = 0; c < numColsRational(); c++ )
+      {
+         (ytransA[c] > 0) ? temp += ytransA[c] * upperRational(c): temp += ytransA[c] * lowerRational(c);
+      }
+      spxout << "max ytransA*[x_l,x_u] = " << rationalToString(temp) << std::endl;
+
+      if( temp < ytransb )
+      {
+         spxout << "Primal infeasible.  Farkas' proof verified exactly." << std::endl;
+         return;
+      }
+
+      if( ytransb <= 0 )
+      {
+         spxout << "No infeasibility box available, Farkas' proof is no good." << std::endl;
+         return;
+      }
+
+      temp = 0;
+      for( int c = 0; c < numColsRational(); c++ )
+      {
+         temp += (ytransA[c] > 0) ? ytransA[c]: -ytransA[c];
+      }
+      assert(temp !=0);
+
+      B = ytransb/temp;
+      spxout << "Infeasibility box available, no feas. solutions with any compoents less than "
+             << rationalToString(B) << std::endl;
+   }
 } // namespace soplex
 
 //-----------------------------------------------------------------------------
