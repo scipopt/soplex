@@ -315,11 +315,11 @@ public:
    }
 
    ///
-   void add(const LPRowSetBase<R>& set)
+   void add(const LPRowSetBase<R>& newset)
    {
       int i = num();
 
-      SVSetBase<R>::add(set);
+      SVSetBase<R>::add(newset);
 
       if( num() > left.dim() )
       {
@@ -329,8 +329,8 @@ public:
 
       for( int j = 0; i < num(); ++i, ++j )
       {
-         left[i] = set.lhs(j);
-         right[i] = set.rhs(j);
+         left[i] = newset.lhs(j);
+         right[i] = newset.rhs(j);
       }
    }
 

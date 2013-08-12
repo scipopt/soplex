@@ -287,11 +287,11 @@ public:
    }
 
    ///
-   void add(const LPColSetBase<R>& set)
+   void add(const LPColSetBase<R>& newset)
    {
       int i = num();
 
-      SVSetBase<R>::add(set);
+      SVSetBase<R>::add(newset);
 
       if( num() > low.dim() )
       {
@@ -302,18 +302,18 @@ public:
 
       for( int j = 0; i < num(); ++i, ++j )
       {
-         low[i] = set.lower(j);
-         up[i] = set.upper(j);
-         object[i] = set.maxObj(j);
+         low[i] = newset.lower(j);
+         up[i] = newset.upper(j);
+         object[i] = newset.maxObj(j);
       }
    }
 
    /// Adds all LPColBase%s of \p set to LPColSetBase.
-   void add(DataKey keys[], const LPColSetBase<R>& set)
+   void add(DataKey keys[], const LPColSetBase<R>& newset)
    {
       int i = num();
 
-      add(set);
+      add(newset);
 
       for( int j = 0; i < num(); ++i, ++j )
          keys[j] = key(i);
