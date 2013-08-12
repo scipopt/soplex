@@ -82,7 +82,7 @@ namespace soplex
             }
             catch( ... )
             {
-               MSG_INFO2( spxout << std::endl << "Factorization failed." << std::endl );
+               MSG_DEBUG( spxout << std::endl << "Factorization failed." << std::endl );
             }
          }
 

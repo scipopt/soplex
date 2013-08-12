@@ -132,6 +132,7 @@ public:
          m = 0.99;
 
       minThreshold = m;
+      lastThreshold = m;
    }
 
    /// returns Markowitz threshold.
