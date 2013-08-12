@@ -1239,7 +1239,7 @@ namespace soplex
       // arithmetic for all computations.
       // For related information see Sec. 4 of Neumaier and Shcherbina (2004 MPA)
 
-      assert(sol._hasDualfarkas());
+      assert(sol.hasDualfarkas());
 
       Rational ytransb; // stores (y(+)^T b_l - y(-)^T b_r)
       DVectorRational ytransA(numColsRational());
