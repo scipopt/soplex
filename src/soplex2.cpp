@@ -3973,6 +3973,309 @@ namespace soplex
    }
 
 
+
+   /// returns the indices of the basic columns and rows; basic column n gives value n, basic row m gives value -1-m
+   void SoPlex2::getBasisInd(int* bind)
+   {
+      assert(hasBasisReal());
+
+      /* for column representation, return the basis */
+      if( intParam(SoPlex2::REPRESENTATION) == SoPlex2::REPRESENTATION_COLUMN )
+      {
+         for( int i = 0; i < numRowsReal(); ++i )
+         {
+            SPxId id = _solver.basis().baseId(i);
+
+            bind[i] = (id.isSPxColId() ? _solver.number(id) : - 1 - _solver.number(id));
+         }
+      }
+      /* for row representation, return the complement of the basis; for this, we need to loop through all rows and columns */
+      else
+      {
+         int k = 0;
+
+         assert(intParam(SoPlex2::REPRESENTATION) == SPxSolver::ROW);
+
+         for( int i = 0; i < numRowsReal(); ++i )
+         {
+            if( !_solver.isRowBasic(i) )
+               bind[k++] = -1 - i;
+         }
+
+         for( int j = 0; j < numColsReal(); ++j )
+         {
+            if( !_solver.isColBasic(j) )
+               bind[k++] = j;
+         }
+
+         assert(k == numRowsReal());
+      }
+   }
+
+
+
+   /// returns row r of basis inverse
+   void SoPlex2::getBasisInverseRow(int r, Real* coef)
+   {
+      assert(r >= 0);
+      assert(r < numRowsReal());
+      assert(coef != 0);
+
+      if( intParam(REPRESENTATION) == REPRESENTATION_COLUMN )
+      {
+         SSVectorBase< Real > x(numRowsReal());
+         _solver.basis().coSolve(x, _solver.unitVector(r));
+         coef = x.altValues();
+      }
+      else
+      {
+         assert(intParam(REPRESENTATION) == REPRESENTATION_ROW);
+
+         // @todo should rhs be a reference?
+         DSVector rhs(numColsReal());
+         SSVector y(numColsReal());
+         int* bind;
+         int index;
+
+         // get ordering of column basis matrix
+         spx_alloc(bind, numRowsReal());
+         getBasisInd(bind);
+
+         // get vector corresponding to requested index r
+         index = bind[r];
+
+         // r corresponds to a row vector
+         if( index < 0 )
+         {
+            // transform index to actual row index
+            index = -index - 1;
+
+            // should be a valid row index and in the column basis matrix, i.e., not basic w.r.t. row representation
+            assert(index >= 0);
+            assert(index < numRowsReal());
+            assert(!_solver.isRowBasic(index));
+
+            // get row vector
+            rhs = _solver.rowVector(index);
+            rhs *= -1.0;
+         }
+         // r corresponds to a column vector
+         else
+         {
+            // should be a valid column index and in the column basis matrix, i.e., not basic w.r.t. row representation
+            assert(index < numColsReal());
+            assert(!_solver.isColBasic(index));
+
+            // get unit vector
+            rhs = UnitVector(index);
+         }
+
+         // solve system "y B = rhs", where B is the row basis matrix
+         _solver.basis().solve(y, rhs);
+
+         // initialize result vector x as zero
+         memset(coef, 0, numRowsReal() * sizeof(Real));
+
+         // add nonzero entries
+         for( int i = 0; i < numColsReal(); ++i )
+         {
+            SPxId id = _solver.basis().baseId(i);
+
+            if( id.isSPxRowId() )
+            {
+               assert(_solver.number(id) >= 0);
+               assert(_solver.number(id) < numRowsReal());
+               assert(bind[r] >= 0 || _solver.number(id) != index);
+
+               coef[_solver.number(id)] = y[i];
+            }
+         }
+
+         // if r corresponds to a row vector, we have to add a 1 at position r
+         if( bind[r] < 0 )
+         {
+            assert(coef[index] == 0.0);
+            coef[index] = 1.0;
+         }
+
+         // free memory
+         spx_free(bind);
+      }
+   }
+
+
+
+   /// returns column c of basis inverse
+   void SoPlex2::getBasisInverseCol(int c, Real* coef)
+   {
+      assert(c >= 0);
+      assert(c < numRowsReal());
+      assert(coef != 0);
+
+      if( intParam(REPRESENTATION) == REPRESENTATION_COLUMN )
+      {
+         SSVectorBase< Real > x(numRowsReal());
+         _solver.basis().solve(x, _solver.unitVector(c));
+         coef = x.altValues();
+      }
+      else
+      {
+         assert(intParam(REPRESENTATION) == REPRESENTATION_ROW);
+
+         // @todo should rhs be a reference?
+         DSVector rhs(numColsReal());
+         SSVector y(numColsReal());
+         int* bind;
+         int index;
+
+         // get ordering of column basis matrix
+         spx_alloc(bind, numRowsReal());
+         getBasisInd(bind);
+
+         // get vector corresponding to requested index r
+         index = bind[c];
+
+         // c corresponds to a row vector
+         if( index < 0 )
+         {
+            // transform index to actual row index
+            index = -index - 1;
+
+            // should be a valid row index and in the column basis matrix, i.e., not basic w.r.t. row representation
+            assert(index >= 0);
+            assert(index < numRowsReal());
+            assert(!_solver.isRowBasic(index));
+
+            // get row vector
+            rhs = _solver.rowVector(index);
+            rhs *= -1.0;
+         }
+         // c corresponds to a column vector
+         else
+         {
+            // should be a valid column index and in the column basis matrix, i.e., not basic w.r.t. row representation
+            assert(index < numColsReal());
+            assert(!_solver.isColBasic(index));
+
+            // get unit vector
+            rhs = UnitVector(index);
+         }
+
+         // solve system "y B = rhs", where B is the row basis matrix
+         _solver.basis().coSolve(y, rhs);
+
+         // initialize result vector x as zero
+         memset(coef, 0, numRowsReal() * sizeof(Real));
+
+         // add nonzero entries
+         for( int i = 0; i < numColsReal(); ++i )
+         {
+            SPxId id = _solver.basis().baseId(i);
+
+            if( id.isSPxRowId() )
+            {
+               assert(_solver.number(id) >= 0);
+               assert(_solver.number(id) < numRowsReal());
+               assert(bind[c] >= 0 || _solver.number(id) != index);
+
+               coef[_solver.number(id)] = y[i];
+            }
+         }
+
+         // if r corresponds to a row vector, we have to add a 1 at position r
+         if( bind[c] < 0 )
+         {
+            assert(coef[index] == 0.0);
+            coef[index] = 1.0;
+         }
+
+         // free memory
+         spx_free(bind);
+      }
+   }
+
+
+
+   /// get dense solution of basis matrix B * sol = rhs
+   void SoPlex2::getBasisInverseTimesVec(Real* rhs, Real* sol)
+   {
+      Vector v(numRowsReal(), rhs);
+      Vector x(numRowsReal(), sol);
+
+      // in the column case use the existing factorization
+      if( intParam(SoPlex2::REPRESENTATION) == SoPlex2::REPRESENTATION_COLUMN )
+      {
+         // solve system "x = B^-1 * A_c" to get c'th column of B^-1 * A
+         _solver.basis().solve(x, v);
+      }
+      else
+      {
+         assert(intParam(SoPlex2::REPRESENTATION) == SoPlex2::REPRESENTATION_ROW);
+
+         DSVector rowrhs(numColsReal());
+         SSVector y(numColsReal());
+         int* bind;
+
+         // get ordering of column basis matrix
+         spx_alloc(bind, numRowsReal());
+         getBasisInd(bind);
+
+         // fill right-hand side for row-based system
+         for( int i = 0; i < numColsReal(); ++i )
+         {
+            SPxId id = _solver.basis().baseId(i);
+
+            if( id.isSPxRowId() )
+            {
+               assert(_solver.number(id) >= 0);
+               assert(_solver.number(id) < numRowsReal());
+
+               rowrhs.add(i, v[_solver.number(id)]);
+            }
+            else
+            {
+               assert(rowrhs[i] == 0.0);
+            }
+         }
+
+         // solve system "B y = rowrhs", where B is the row basis matrix
+         _solver.basis().coSolve(y, rowrhs);
+
+         // fill result w.r.t. order given by bind
+         for( int i = 0; i < numRowsReal(); ++i )
+         {
+            int index;
+
+            index = bind[i];
+
+            if( index < 0 )
+            {
+               index = -index-1;
+
+               // should be a valid row index and in the column basis matrix, i.e., not basic w.r.t. row representation
+               assert(index >= 0);
+               assert(index < numRowsReal());
+               assert(!_solver.isRowBasic(index));
+
+               x[i] = v[index] - (rowVectorReal(index) * Vector(numColsReal(), y.get_ptr()));
+            }
+            else
+            {
+               // should be a valid column index and in the column basis matrix, i.e., not basic w.r.t. row representation
+               assert(index >= 0);
+               assert(index < numColsReal());
+               assert(!_solver.isColBasic(index));
+
+               x[i] = y[index];
+            }
+         }
+
+         // free memory
+         spx_free(bind);
+      }
+   }
+
+
 #if 0
    /// time spent in factorizations
    Real SoPlex2::factorTime() const

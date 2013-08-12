@@ -868,8 +868,18 @@ public:
    /// clears starting basis
    void clearBasisRational();
 
+   /// returns the indices of the basic columns and rows; basic column n gives value n, basic row m gives value -1-m
+   void getBasisInd(int* bind);
    //@}
 
+   /// returns row r of basis inverse
+   void getBasisInverseRow(int r, Real* coef);
+
+   /// returns column c of basis inverse
+   void getBasisInverseCol(int c, Real* coef);
+
+   /// get dense solution of basis matrix B * sol = rhs
+   void getBasisInverseTimesVec(Real* rhs, Real* sol);
 
    //**@name Statistical information */
    //@{
