@@ -23,9 +23,7 @@ namespace soplex
 bool UnitVector::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-   if (mem() != themem)
-      return MSGinconsistent("UnitVector");
-   if (mem() + 1 != &themem[1])
+   if (mem() != &themem)
       return MSGinconsistent("UnitVector");
    if (size() != 1)
       return MSGinconsistent("UnitVector");

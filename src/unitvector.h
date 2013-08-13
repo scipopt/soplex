@@ -46,7 +46,7 @@ private:
    //------------------------------------
    /**@name Data */
    //@{
-   Element themem[2];  ///< memory for 1st and 2nd sparse vector entry (themem[0]/themem[1])
+   Element themem;  ///< memory for sparse vector entry
    //@}
 
 public:
@@ -71,7 +71,7 @@ public:
    /// construct \c i 'th unit vector.
    explicit
    UnitVector(int i = 0)
-      : SVector(2, themem)
+      : SVector(1, &themem)
    {
       add(i, 1.0);
 
@@ -79,10 +79,9 @@ public:
    }
    ///  copy constructor
    UnitVector(const UnitVector& rhs)
-      : SVector(2, themem)
+      : SVector(1, &themem)
    {
-      themem[0] = rhs.themem[0];
-      themem[1] = rhs.themem[1];
+      themem = rhs.themem;
 
       assert(isConsistent());
    }
@@ -91,8 +90,7 @@ public:
    {
       if ( this != &rhs )
       {
-         themem[0] = rhs.themem[0];
-         themem[1] = rhs.themem[1];
+         themem = rhs.themem;
 
          assert(isConsistent());
       }
