@@ -22,8 +22,10 @@
 namespace soplex
 {
    /// solves real LP with recovery mechanism
-   void SoPlex2::_solveRealStable(bool acceptUnbounded, bool acceptInfeasible)
+   SPxSolver::Status SoPlex2::_solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols)
    {
+      SPxSolver::Status result = SPxSolver::UNKNOWN;
+
       bool solved = false;
       bool solvedFromScratch = false;
       bool initialSolve = true;
@@ -45,15 +47,27 @@ namespace soplex
             MSG_INFO1( spxout << std::endl );
 
             _solver.solve();
+            result = _solver.status();
 
             MSG_INFO1( spxout << std::endl );
 
-            solved = (_solver.status() == SPxSolver::OPTIMAL)
-               || (_solver.status() == SPxSolver::INFEASIBLE && acceptInfeasible)
-               || (_solver.status() == SPxSolver::UNBOUNDED && acceptUnbounded);
+            solved = (result == SPxSolver::OPTIMAL)
+               || (result == SPxSolver::INFEASIBLE && acceptInfeasible)
+               || (result == SPxSolver::UNBOUNDED && acceptUnbounded);
+
+            if( result == SPxSolver::OPTIMAL )
+            {
+               assert(basisStatusRows.size() == _solver.nRows());
+               assert(basisStatusCols.size() == _solver.nCols());
+
+               _solver.getPrimal(primal);
+               _solver.getDual(dual);
+               _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr());
+            }
          }
          catch( ... )
          {
+            result = SPxSolver::ERROR;
             solved = false;
          }
 
@@ -98,7 +112,7 @@ namespace soplex
          setIntParam(SoPlex2::RATIOTESTER, ratiotester);
          setIntParam(SoPlex2::PRICER, pricer);
 
-         if( !relaxedTolerances && _solver.status() == SPxSolver::INFEASIBLE )
+         if( !relaxedTolerances && result == SPxSolver::INFEASIBLE )
          {
             MSG_INFO1( spxout << "Relaxing tolerances." << std::endl );
 
@@ -109,7 +123,7 @@ namespace soplex
             continue;
          }
 
-         if( !tightenedTolerances && _solver.status() != SPxSolver::INFEASIBLE )
+         if( !tightenedTolerances && result != SPxSolver::INFEASIBLE )
          {
             MSG_INFO1( spxout << "Tightening tolerances." << std::endl );
 
@@ -149,6 +163,8 @@ namespace soplex
 
       _solver.setFeastol(realParam(SoPlex2::FPFEASTOL));
       _solver.setOpttol(realParam(SoPlex2::FPOPTTOL));
+
+      return result;
    }
 } // namespace soplex
 

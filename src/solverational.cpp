@@ -224,6 +224,26 @@ namespace soplex
       _solver.setFeastol(realParam(SoPlex2::FPFEASTOL));
       _solver.setOpttol(realParam(SoPlex2::FPOPTTOL));
 
+      // declare vectors and variables
+      SPxSolver::Status result = SPxSolver::UNKNOWN;
+
+      DVectorRational modLower(numColsRational());
+      DVectorRational modUpper(numColsRational());
+      DVectorRational modSide(numRowsRational());
+      DVectorRational modObj(numColsRational());
+      DVectorReal primalReal(numColsRational());
+      DVectorReal dualReal(numRowsRational());
+
+      _basisStatusRowsRational.reSize(numRowsRational());
+      _basisStatusColsRational.reSize(numColsRational());
+
+      Rational boundsViolation;
+      Rational sideViolation;
+      Rational redcostViolation;
+      Rational primalScale;
+      Rational dualScale;
+      Rational maxScale;
+
       // solve original LP
       MSG_INFO1( spxout << "Initial floating-point solve . . ." << std::endl );
 
@@ -236,13 +256,13 @@ namespace soplex
       if( _hasBasisRational )
          _solver.setBasis(_basisStatusRowsRational.get_const_ptr(), _basisStatusColsRational.get_const_ptr());
 
-      _solveRealStable(acceptUnbounded, acceptInfeasible);
+      result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRowsRational, _basisStatusColsRational);
 
       _solver.setTerminationTime(realParam(SoPlex2::TIMELIMIT));
       _solver.setTerminationIter(intParam(SoPlex2::ITERLIMIT));
 
       // evaluate result
-      switch( _solver.status() )
+      switch( result )
       {
       case SPxSolver::OPTIMAL:
          MSG_INFO1( spxout << "Floating-point optimal." << std::endl );
@@ -264,25 +284,6 @@ namespace soplex
          return;
       }
 
-      // declare vectors and variables
-      DVectorRational modLower(numColsRational());
-      DVectorRational modUpper(numColsRational());
-      DVectorRational modSide(numRowsRational());
-      DVectorRational modObj(numColsRational());
-      DVectorReal primalReal(numColsRational());
-      DVectorReal dualReal(numRowsRational());
-
-      Rational boundsViolation;
-      Rational sideViolation;
-      Rational redcostViolation;
-      Rational primalScale;
-      Rational dualScale;
-      Rational maxScale;
-
-      // get floating-point solution of original LP
-      _solver.getPrimal(primalReal);
-      _solver.getDual(dualReal);
-
       // store floating-point solution of original LP as current rational solution
       sol._primal = primalReal;
       sol._slacks = _rationalLP->computePrimalActivity(sol._primal);
@@ -293,9 +294,6 @@ namespace soplex
       sol._redcost *= -1;
       sol._hasDual = true;
 
-      _basisStatusRowsRational.reSize(numRowsRational());
-      _basisStatusColsRational.reSize(numColsRational());
-      (void)_solver.getBasis(_basisStatusRowsRational.get_ptr(), _basisStatusColsRational.get_ptr());
       _hasBasisRational = true;
 
       // initial scaling factors are one
@@ -305,8 +303,6 @@ namespace soplex
       // refinement loop
       do
       {
-         assert(_solver.status() == SPxSolver::OPTIMAL);
-
          MSG_DEBUG( spxout << "Computing violations." << std::endl );
 
          // compute violation of bounds
@@ -458,7 +454,7 @@ namespace soplex
          if( realParam(SoPlex2::TIMELIMIT) < realParam(SoPlex2::INFTY) )
             _solver.setTerminationTime(realParam(SoPlex2::TIMELIMIT) - _statistics->solvingTime.userTime());
 
-         _solveRealStable(acceptUnbounded, acceptInfeasible);
+         result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRowsRational, _basisStatusColsRational);
 
          _solver.setTerminationTime(realParam(SoPlex2::TIMELIMIT));
          _solver.setTerminationIter(intParam(SoPlex2::ITERLIMIT));
@@ -468,7 +464,7 @@ namespace soplex
             _statistics->stallRefinements++;
 
          // evaluate result; if modified problem was not solved to optimality, stop refinement
-         switch( _solver.status() )
+         switch( result )
          {
          case SPxSolver::OPTIMAL:
             MSG_INFO1( spxout << "Floating-point optimal." << std::endl );
@@ -489,14 +485,6 @@ namespace soplex
             error = true;
             return;
          }
-
-         // get floating point solution of modified problem
-         _solver.getPrimal(primalReal);
-         _solver.getDual(dualReal);
-
-         // get basis
-         (void)_solver.getBasis(_basisStatusRowsRational.get_ptr(), _basisStatusColsRational.get_ptr());
-         assert(_hasBasisRational);
 
          // correct primal solution
          MSG_DEBUG( spxout << "Correcting primal solution." << std::endl );

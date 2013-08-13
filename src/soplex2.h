@@ -1495,7 +1495,7 @@ private:
    //@{
 
    /// solves real LP with recovery mechanism
-   void _solveRealStable(bool acceptUnbounded, bool acceptInfeasible);
+   SPxSolver::Status _solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols);
 
    //@}
 };
