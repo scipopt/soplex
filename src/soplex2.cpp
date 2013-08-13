@@ -2964,7 +2964,7 @@ namespace soplex
          assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::INFEASIBLE);
          assert(_solver.basis().status() != SPxBasis::UNBOUNDED || statusReal() == SPxSolver::UNBOUNDED);
          assert(_solver.basis().status() == SPxBasis::UNBOUNDED || statusReal() != SPxSolver::UNBOUNDED);
-         _hasPrimalReal = (SPxSolver::OPTIMAL || (_simplifier == 0 &&
+         _hasPrimalReal = (statusReal() == SPxSolver::OPTIMAL || (_simplifier == 0 &&
                (_solver.basis().status() == SPxBasis::PRIMAL || _solver.basis().status() == SPxBasis::UNBOUNDED) &&
                _solver.shift() < 10.0 * realParam(SoPlex2::EPSILON_ZERO)));
 
