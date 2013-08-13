@@ -2837,7 +2837,7 @@ namespace soplex
       _invalidateSolutionReal();
 
       // will preprocessing be applied? (only if no basis is available)
-      bool applyPreprocessing = (_firstScaler != 0 || _simplifier != 0 || _secondScaler != 0) && !_hasBasisReal;
+      bool applyPreprocessing = !_hasBasisReal;
 
       if( applyPreprocessing )
       {
