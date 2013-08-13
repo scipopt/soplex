@@ -87,7 +87,8 @@ void SPxSolver::shiftPvec()
     */
    Random mult(10.0 * leavetol(), 100.0 * leavetol());
    Real allow = leavetol() - epsilon();
-   int i, tmp;
+   bool tmp;
+   int i;
 
    assert(type() == LEAVE);
    assert(allow > 0.0);

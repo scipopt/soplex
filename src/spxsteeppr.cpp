@@ -575,20 +575,20 @@ SPxId SPxSteepPR::selectEnter()
 SPxId SPxSteepPR::selectEnterX(Real tol)
 {
    SPxId enterId;
-   SPxId enterIdCo;
+   SPxId enterCoId;
    Real best;
    Real bestCo;
 
    best = -infinity;
    bestCo = -infinity;
-   enterId = (thesolver->sparsePricingEnter) ? selectEnterSparseDim(best, tol) : selectEnterDenseDim(best, tol);
-   enterIdCo = (thesolver->sparsePricingEnterCo) ? selectEnterSparseCoDim(bestCo, tol) : selectEnterDenseCoDim(bestCo, tol);
+   enterCoId = (thesolver->sparsePricingEnter && !refined) ? selectEnterSparseDim(best, tol) : selectEnterDenseDim(best, tol);
+   enterId = (thesolver->sparsePricingEnterCo && !refined) ? selectEnterSparseCoDim(bestCo, tol) : selectEnterDenseCoDim(bestCo, tol);
 
    // prefer slack indices to reduce nonzeros in basis matrix
-   if( enterId.isValid() && (best > SPARSITY_TRADEOFF * bestCo || !enterIdCo.isValid()) )
-      return enterId;
+   if( enterCoId.isValid() && (best > SPARSITY_TRADEOFF * bestCo || !enterId.isValid()) )
+      return enterCoId;
    else
-      return enterIdCo;
+      return enterId;
 }
 
 

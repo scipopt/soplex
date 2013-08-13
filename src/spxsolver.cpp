@@ -381,6 +381,12 @@ void SPxSolver::init()
    if( !factorized )
       SPxBasis::factorize();
 
+   // we need to abort in case the factorization failed
+   if( SPxBasis::status() <= SPxBasis::SINGULAR )
+   {
+      throw SPxStatusException("XINIT01 Singular basis in initialization detected.");
+   }
+
    SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
    computePvec();
    computeFrhs();
@@ -519,7 +525,18 @@ void SPxSolver::factorize()
                      << "\tvalue = "      << (initialized ? value() : 0.0)
                      << std::endl; )
 
-   SPxBasis::factorize();
+   try
+   {
+      SPxBasis::factorize();
+   }
+   catch( SPxStatusException E )
+   {
+      assert(SPxBasis::status() == SPxBasis::SINGULAR);
+      m_status = SINGULAR;
+      std::stringstream s;
+      s << "XSOLVE21 Basis is singular (numerical troubles, feastol = " << feastol() << ", opttol = " << opttol() << ")";
+      throw SPxStatusException(s.str());
+   }
 
    if( !initialized )
    {
@@ -594,14 +611,6 @@ void SPxSolver::factorize()
             computeTest();
          }
       }
-   }
-
-   if (SPxBasis::status() == SPxBasis::SINGULAR)
-   {
-      m_status = SINGULAR;
-      std::stringstream s;
-      s << "XSOLVE21 Basis is singular (numerical troubles, feastol = " << feastol() << ", opttol = " << opttol() << ")";
-      throw SPxStatusException(s.str());
    }
 
 #ifdef ENABLE_ADDITIONAL_CHECKS

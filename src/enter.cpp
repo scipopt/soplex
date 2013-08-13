@@ -115,9 +115,14 @@ void SPxSolver::computeTest()
       SPxBasis::Desc::Status stat = ds.status(i);
 
       if(isBasic(stat))
+      {
          theTest[i] = 0.0;
+         if( remainingRoundsEnterCo == 0 )
+            isInfeasibleCo[i] = false;
+      }
       else
       {
+         assert(!isBasic(stat));
          theTest[i] = test(i, stat);
 
          if( remainingRoundsEnterCo == 0 )
@@ -228,7 +233,11 @@ void SPxSolver::computeCoTest()
    {
       SPxBasis::Desc::Status stat = ds.coStatus(i);
       if (isBasic(stat))
+      {
          theCoTest[i] = 0;
+         if( remainingRoundsEnter == 0 )
+            isInfeasible[i] = false;
+      }
       else
       {
          theCoTest[i] = coTest(i, stat);

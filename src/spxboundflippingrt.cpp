@@ -720,7 +720,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
 
    for( stableBp = npassedBp + 1; stableBp < nBp; ++stableBp )
    {
-      Real stableDelta;
+      Real stableDelta = 0;
       // get next breakpoints in increasing order
       if( stableBp > sorted )
       {
@@ -1044,7 +1044,7 @@ int SPxBoundFlippingRT::selectLeave(
 
    for( stableBp = npassedBp + 1; stableBp < nBp; ++stableBp )
    {
-      Real stableDelta;
+      Real stableDelta = 0;
       // get next breakpoints in increasing order
       if( stableBp > sorted )
       {
