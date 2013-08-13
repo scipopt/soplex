@@ -205,28 +205,29 @@ private:
        */
       else
       {
-         SVectorBase<R>* next = ps->next();
-         int sz = next->size();
-         int bothmax = next->max() + ps->max();
-         int offset = 0;
 
-         /* the first element does not need to start at the beginning of the data array, because if the first vector is
-          * extended, see xtend(), it is shifted to the end leaving unused memory behind
+         /* the first element does not necessarily start at the beginning of the data array, because if the first vector
+          * is extended, see xtend(), it is shifted to the end leaving unused memory behind; here we determine this
+          * offset
           */
+         int offset = 0;
          while( &(this->SVSetBaseArray::operator[](offset)) != ps->mem() )
          {
             ++offset;
             assert(offset < SVSetBaseArray::size());
          }
 
-         /* move all entries of the second vector to the front */
-         for( int j = 0; j <= sz; ++j )
+         /* move all entries of the second vector to the very front */
+         SVectorBase<R>* next = ps->next();
+         int sz = next->size();
+         for( int j = 0; j < sz; ++j )
          {
             this->SVSetBaseArray::operator[](j) = next->mem()[j];
          }
 
-         /* correct the data memmory pointer and the maximal space */
-         next->setMem(bothmax, ps->mem());
+         /* correct the data memory pointer and the maximal space */
+         int bothmax = next->max() + ps->max() + offset;
+         next->setMem(bothmax, &(this->SVSetBaseArray::operator[](0)));
 
          /* correct size */
          next->set_size(sz);
