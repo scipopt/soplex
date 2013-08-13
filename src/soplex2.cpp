@@ -349,7 +349,8 @@ namespace soplex
 
    /// default constructor
    SoPlex2::SoPlex2()
-      : _statistics(0)
+      : _rationalLP(0)
+      , _statistics(0)
       , _currentSettings(0)
       , _scalerUniequi(false)
       , _scalerBiequi(true)
