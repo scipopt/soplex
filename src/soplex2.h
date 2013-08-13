@@ -1343,10 +1343,14 @@ private:
    SPxSolver _solver;
    SLUFactor _slufactor;
    SPxMainSM _simplifierMainSM;
-   SPxEquiliSC _scalerUniequi;
-   SPxEquiliSC _scalerBiequi;
-   SPxGeometSC _scalerGeo1;
-   SPxGeometSC _scalerGeo8;
+   SPxEquiliSC _firstScalerUniequi;
+   SPxEquiliSC _firstScalerBiequi;
+   SPxGeometSC _firstScalerGeo1;
+   SPxGeometSC _firstScalerGeo8;
+   SPxEquiliSC _secondScalerUniequi;
+   SPxEquiliSC _secondScalerBiequi;
+   SPxGeometSC _secondScalerGeo1;
+   SPxGeometSC _secondScalerGeo8;
    SPxWeightST _starterWeight;
    SPxSumST _starterSum;
    SPxVectorST _starterVector;

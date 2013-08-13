@@ -352,10 +352,14 @@ namespace soplex
       : _rationalLP(0)
       , _statistics(0)
       , _currentSettings(0)
-      , _scalerUniequi(false)
-      , _scalerBiequi(true)
-      , _scalerGeo1(1)
-      , _scalerGeo8(8)
+      , _firstScalerUniequi(false)
+      , _firstScalerBiequi(true)
+      , _firstScalerGeo1(1)
+      , _firstScalerGeo8(8)
+      , _secondScalerUniequi(false)
+      , _secondScalerBiequi(true)
+      , _secondScalerGeo1(1)
+      , _secondScalerGeo8(8)
       , _simplifier(0)
       , _firstScaler(0)
       , _secondScaler(0)
@@ -411,10 +415,14 @@ namespace soplex
          _solver = rhs._solver;
          _slufactor = rhs._slufactor;
          _simplifierMainSM = rhs._simplifierMainSM;
-         _scalerUniequi = rhs._scalerUniequi;
-         _scalerBiequi = rhs._scalerBiequi;
-         _scalerGeo1 = rhs._scalerGeo1;
-         _scalerGeo8 = rhs._scalerGeo8;
+         _firstScalerUniequi = rhs._firstScalerUniequi;
+         _firstScalerBiequi = rhs._firstScalerBiequi;
+         _firstScalerGeo1 = rhs._firstScalerGeo1;
+         _firstScalerGeo8 = rhs._firstScalerGeo8;
+         _secondScalerUniequi = rhs._secondScalerUniequi;
+         _secondScalerBiequi = rhs._secondScalerBiequi;
+         _secondScalerGeo1 = rhs._secondScalerGeo1;
+         _secondScalerGeo8 = rhs._secondScalerGeo8;
          _starterWeight = rhs._starterWeight;
          _starterSum = rhs._starterSum;
          _starterVector = rhs._starterVector;
@@ -4967,16 +4975,16 @@ namespace soplex
             _firstScaler = 0;
             break;
          case SCALER_UNIEQUI:
-            _firstScaler = &_scalerUniequi;
+            _firstScaler = &_firstScalerUniequi;
             break;
          case SCALER_BIEQUI:
-            _firstScaler = &_scalerBiequi;
+            _firstScaler = &_firstScalerBiequi;
             break;
          case SCALER_GEO1:
-            _firstScaler = &_scalerGeo1;
+            _firstScaler = &_firstScalerGeo1;
             break;
          case SCALER_GEO8:
-            _firstScaler = &_scalerGeo8;
+            _firstScaler = &_firstScalerGeo8;
             break;
          default:
             return false;
@@ -4991,16 +4999,16 @@ namespace soplex
             _secondScaler = 0;
             break;
          case SCALER_UNIEQUI:
-            _secondScaler = &_scalerUniequi;
+            _secondScaler = &_secondScalerUniequi;
             break;
          case SCALER_BIEQUI:
-            _secondScaler = &_scalerBiequi;
+            _secondScaler = &_secondScalerBiequi;
             break;
          case SCALER_GEO1:
-            _secondScaler = &_scalerGeo1;
+            _secondScaler = &_secondScalerGeo1;
             break;
          case SCALER_GEO8:
-            _secondScaler = &_scalerGeo8;
+            _secondScaler = &_secondScalerGeo8;
             break;
          default:
             return false;
@@ -5817,16 +5825,16 @@ namespace soplex
          _firstScaler = 0;
          break;
       case SCALER_UNIEQUI:
-         _firstScaler = &_scalerUniequi;
+         _firstScaler = &_firstScalerUniequi;
          break;
       case SCALER_BIEQUI:
-         _firstScaler = &_scalerBiequi;
+         _firstScaler = &_firstScalerBiequi;
          break;
       case SCALER_GEO1:
-         _firstScaler = &_scalerGeo1;
+         _firstScaler = &_firstScalerGeo1;
          break;
       case SCALER_GEO8:
-         _firstScaler = &_scalerGeo8;
+         _firstScaler = &_firstScalerGeo8;
          break;
       default:
          break;
@@ -5839,16 +5847,16 @@ namespace soplex
          _secondScaler = 0;
          break;
       case SCALER_UNIEQUI:
-         _secondScaler = &_scalerUniequi;
+         _secondScaler = &_secondScalerUniequi;
          break;
       case SCALER_BIEQUI:
-         _secondScaler = &_scalerBiequi;
+         _secondScaler = &_secondScalerBiequi;
          break;
       case SCALER_GEO1:
-         _secondScaler = &_scalerGeo1;
+         _secondScaler = &_secondScalerGeo1;
          break;
       case SCALER_GEO8:
-         _secondScaler = &_scalerGeo8;
+         _secondScaler = &_secondScalerGeo8;
          break;
       default:
          break;
