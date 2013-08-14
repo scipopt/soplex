@@ -84,7 +84,7 @@ do
 	20) echo =type= R0
 	    opt="-X2 -d1e-50 -v4" ;;
 	21) echo =type= R1
-	    opt="-X2 -d1e-25 -R1e-9 -s0 -g0" ;;
+	    opt="-X2 -d1e-50 -R1e-9 -s0 -g0" ;;
 	22) echo =type= R2
 	    opt="-X2 -d1e-25 -r" ;;
 	23) echo =type= R3
