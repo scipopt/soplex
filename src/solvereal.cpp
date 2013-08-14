@@ -204,6 +204,9 @@ namespace soplex
          result = SPxSolver::ERROR;
       }
 
+      // record statistics
+      _statistics->iterations += _solver.iterations();
+
       if( result == SPxSolver::OPTIMAL )
       {
          // check violation in rational LP
@@ -285,9 +288,6 @@ namespace soplex
          solved = (result == SPxSolver::OPTIMAL)
             || (result == SPxSolver::INFEASIBLE && acceptInfeasible)
             || (result == SPxSolver::UNBOUNDED && acceptUnbounded);
-
-         // record statistics
-         _statistics->iterations += _solver.iterations();
 
          if( solved )
             break;
