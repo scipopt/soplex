@@ -216,14 +216,12 @@ private:
    Timer          theTime;     ///< time spent in last call to method solve()
    Real           theCumulativeTime; ///< cumulative time spent in all calls to method solve()
    int            maxIters;    ///< maximum allowed iterations.
-   int            maxRefines;  ///< maximum allowed refinement rounds.
    Real           maxTime;     ///< maximum allowed time.
    Real           objLimit;    ///< objective value limit.
    Status         m_status;    ///< status of algorithm.
 
    Real           m_entertol;  ///< feasibility tolerance maintained during entering algorithm
    Real           m_leavetol;  ///< feasibility tolerance maintained during leaving algorithm
-   Real           m_irthreshold; ///< iterative refinement threshold
    Real           theShift;    ///< sum of all shifts applied to any bound.
    Real           lastShift;   ///< for forcing feasibility.
    int            m_maxCycle;  ///< maximum steps before cycling is detected.
@@ -489,8 +487,12 @@ public:
    /**@name Solving LPs */
    //@{
    /// solve loaded LP.
-   /** Solves the loaded LP by calling the floating point routine fpsolve().
-    *  If feastol() or opttol() are below irtol(), iterative refinement is applied.
+   /** Solves the loaded LP by processing the Simplex iteration until
+    *  the termination criteria is fullfilled (see #terminate()).
+    *  The SPxStatus of the solver will indicate the reason for termination.
+    *
+    *  @throw SPxStatusException if either no problem, solver, pricer
+    *  or ratiotester loaded or if solve is still running when it shouldn't be
     */
    virtual Status solve();
 
@@ -640,33 +642,26 @@ public:
    /// allowed primal feasibility tolerance.
    Real feastol() const
    {
-      assert(m_entertol >= 0.0);
-      assert(m_leavetol >= 0.0);
+      assert(m_entertol > 0.0);
+      assert(m_leavetol > 0.0);
 
       return theRep == COLUMN ? m_entertol : m_leavetol;
    }
    /// allowed optimality, i.e., dual feasibility tolerance.
    Real opttol() const
    {
-      assert(m_entertol >= 0.0);
-      assert(m_leavetol >= 0.0);
+      assert(m_entertol > 0.0);
+      assert(m_leavetol > 0.0);
 
       return theRep == COLUMN ? m_leavetol : m_entertol;
    }
    /// guaranteed primal and dual bound violation for optimal solution, returning the maximum of feastol() and opttol(), i.e., the less tight tolerance.
    Real delta() const
    {
-      assert(m_entertol >= 0.0);
-      assert(m_leavetol >= 0.0);
+      assert(m_entertol > 0.0);
+      assert(m_leavetol > 0.0);
 
       return m_entertol > m_leavetol ? m_entertol : m_leavetol;
-   }
-   /// iterative refinement threshold: if feastol() or opttol() are below this value, iterative refinement is applied.
-   Real irthreshold() const
-   {
-      assert(m_irthreshold > 0.0);
-
-      return m_irthreshold;
    }
    /// set parameter \p feastol.
    void setFeastol(Real d);
@@ -674,8 +669,6 @@ public:
    void setOpttol(Real d);
    /// set parameter \p delta, i.e., set \p feastol and \p opttol to same value.
    void setDelta(Real d);
-   /// set parameter \p irthreshold.
-   void setIrthreshold(Real d);
    /// enable or disable partial pricing
    void setPartialPricing( bool p )
    {
@@ -709,30 +702,10 @@ private:
    //-----------------------------
    /**@name Private helpers */
    //@{
-   /// solve loaded LP using floating point arithmetic.
-   /** Solves the loaded LP by processing the Simplex iteration until
-    *  the termination criteria is fullfilled (see #terminate()).
-    *  The SPxStatus of the solver will indicate the reason for termination.
-    *
-    *  @throw SPxStatusException if either no problem, solver, pricer
-    *  or ratiotester loaded or if solve is still running when it shouldn't be
-    */
-   Status fpsolve();
    ///
    void localAddRows(int start);
    ///
    void localAddCols(int start);
-   /// apply iterative refinement until irfeastol and iropttol are reached or modified problem is not solved to
-   /// optimality; returns true if and only if precision has been reached
-   bool refine(
-      Real               irfeastol,          /**< primal feasibility tolerance */
-      Real               iropttol,           /**< dual feasibility tolerance */
-      Vector_exact&      primal_ex,          /**< buffer to return refined primal solution values */
-      Vector_exact&      slack_ex,           /**< buffer to return refined slack values */
-      Vector_exact&      dual_ex,            /**< buffer to return refined dual solution values */
-      Vector_exact&      redcost_ex,         /**< buffer to return refined reduced cost values */
-      int                maxitersround       /**< iteration limit per refinement round */
-      );
    ///
    void setPrimal(Vector& p_vector);
    ///
@@ -1754,10 +1727,6 @@ public:
    virtual void setTerminationIter(int iteration = -1);
    /// return iteration limit.
    virtual int terminationIter() const;
-   /// set refinement limit.
-   virtual void setMaxRefinements(int p_maxrefinements);
-   /// return refinement limit.
-   virtual int maxRefinements() const;
    /// set objective limit.
    virtual void setTerminationValue(Real value = infinity);
    /// return objective limit.

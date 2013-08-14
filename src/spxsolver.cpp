@@ -803,14 +803,8 @@ void SPxSolver::setFeastol(Real d)
 {
    METHOD( "SPxSolver::setFeastol()" );
 
-   if( d < 0.0 )
+   if( d <= 0.0 )
       throw SPxInterfaceException("XSOLVE30 Cannot set negative feastol.");
-
-   if( !RationalIsExact() && d < DEFAULT_BND_VIOL * 1e-6 )
-   {
-      MSG_WARNING( spxout << "WSOLVE32 Warning: Cannot set primal feasibility tolerance smaller than " << DEFAULT_BND_VIOL * 1e-6 << " because of missing GMP support (compile with GMP=true).\n" );
-      d = DEFAULT_BND_VIOL * 1e-6;
-   }
 
    if( theRep == COLUMN )
       m_entertol = d;
@@ -822,14 +816,8 @@ void SPxSolver::setOpttol(Real d)
 {
    METHOD( "SPxSolver::setOpttol()" );
 
-   if( d < 0.0 )
+   if( d <= 0.0 )
       throw SPxInterfaceException("XSOLVE31 Cannot set negative opttol.");
-
-   if( !RationalIsExact() && d < DEFAULT_BND_VIOL * 1e-6 )
-   {
-      MSG_WARNING( spxout << "WSOLVE33 Warning: Cannot set dual feasibility tolerance smaller than " << DEFAULT_BND_VIOL * 1e-6 << " because of missing GMP support (compile with GMP=true).\n" );
-      d = DEFAULT_BND_VIOL * 1e-6;
-   }
 
    if( theRep == COLUMN )
       m_leavetol = d;
@@ -841,27 +829,11 @@ void SPxSolver::setDelta(Real d)
 {
    METHOD( "SPxSolver::setDelta()" );
 
-   if( d < 0.0 )
+   if( d <= 0.0 )
       throw SPxInterfaceException("XSOLVE32 Cannot set negative delta.");
-
-   if( !RationalIsExact() && d < DEFAULT_BND_VIOL * 1e-6 )
-   {
-      MSG_WARNING( spxout << "WSOLVE34 Warning: Cannot set feasibility tolerance smaller than " << DEFAULT_BND_VIOL * 1e-6 << " because of missing GMP support (compile with GMP=true).\n" );
-      d = DEFAULT_BND_VIOL * 1e-6;
-   }
 
    m_entertol = d;
    m_leavetol = d;
-}
-
-void SPxSolver::setIrthreshold(Real d)
-{
-   METHOD( "SPxSolver::setIrthreshold()" );
-
-   if( d <= 0.0 )
-      throw SPxInterfaceException("XSOLVE33 Cannot set negative or zero irthreshold.");
-
-   m_irthreshold = d;
 }
 
 SPxSolver::SPxSolver(
@@ -871,7 +843,6 @@ SPxSolver::SPxSolver(
    , thePricing(FULL)
    , theCumulativeTime(0.0)
    , maxIters (-1)
-   , maxRefines (100)
    , maxTime (infinity)
    , objLimit(infinity)
    , m_status(UNKNOWN)
@@ -908,7 +879,6 @@ SPxSolver::SPxSolver(
    METHOD( "SPxSolver::SPxSolver()" );
 
    setDelta(DEFAULT_BND_VIOL);
-   setIrthreshold(DEFAULT_BND_VIOL * 1e-6);
 
    theLP = this;
    initRep(p_rep);
@@ -955,13 +925,11 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       theRep = base.theRep;
       theTime = base.theTime;
       maxIters = base.maxIters;
-      maxRefines = base.maxRefines;
       maxTime = base.maxTime;
       objLimit = base.objLimit;
       m_status = base.m_status;
       m_entertol = base.m_entertol;
       m_leavetol = base.m_leavetol;
-      m_irthreshold = base.m_irthreshold;
       theShift = base.theShift;
       lastShift = base.lastShift;
       m_maxCycle = base.m_maxCycle;
@@ -1114,13 +1082,11 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , theTime(base.theTime)
    , theCumulativeTime(base.theCumulativeTime)
    , maxIters(base.maxIters)
-   , maxRefines(base.maxRefines)
    , maxTime(base.maxTime)
    , objLimit(base.objLimit)
    , m_status(base.m_status)
    , m_entertol(base.m_entertol)
    , m_leavetol(base.m_leavetol)
-   , m_irthreshold(base.m_irthreshold)
    , theShift(base.theShift)
    , lastShift(base.lastShift)
    , m_maxCycle(base.m_maxCycle)
@@ -1379,20 +1345,6 @@ int SPxSolver::terminationIter() const
 {
    METHOD( "SPxSolver::terminationIter()" );
    return maxIters;
-}
-
-void SPxSolver::setMaxRefinements(int p_maxrefinements)
-{
-   METHOD( "SPxSolver::setMaxRefinements()" );
-   if( p_maxrefinements < 0 )
-      p_maxrefinements = -1;
-   maxRefines = p_maxrefinements;
-}
-
-int SPxSolver::maxRefinements() const
-{
-   METHOD( "SPxSolver::terminationIter()" );
-   return maxRefines;
 }
 
 /**@todo A first version for the termination value is
