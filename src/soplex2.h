@@ -1501,6 +1501,9 @@ private:
    /// solves real LP with recovery mechanism
    SPxSolver::Status _solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols);
 
+   /// solves real LP
+   SPxSolver::Status _solveReal(bool fromscratch, VectorReal& primal, VectorReal& dual, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols);
+
    //@}
 };
 } // namespace soplex
