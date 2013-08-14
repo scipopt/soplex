@@ -371,7 +371,7 @@ namespace soplex
 
          setIntParam(SoPlex2::SIMPLIFIER, SoPlex2::SIMPLIFIER_OFF);
 
-         if( !relaxedTolerances && result == SPxSolver::INFEASIBLE )
+         if( !relaxedTolerances )
          {
             MSG_INFO1( spxout << "Relaxing tolerances." << std::endl );
 
