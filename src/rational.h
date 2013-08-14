@@ -73,7 +73,7 @@ public:
    {
    }
 
-   operator Real() const
+   explicit operator Real() const
    {
       return this->get_d();
    }
