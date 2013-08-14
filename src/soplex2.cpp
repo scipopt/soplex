@@ -256,7 +256,7 @@ namespace soplex
             _realParamDescription[SoPlex2::MAXSCALEINCR] = "maximum increase of scaling factors between refinements";
             _realParamLower[SoPlex2::MAXSCALEINCR] = 1.0;
             _realParamUpper[SoPlex2::MAXSCALEINCR] = DEFAULT_INFINITY;
-            _realParamDefault[SoPlex2::MAXSCALEINCR] = DEFAULT_INFINITY;
+            _realParamDefault[SoPlex2::MAXSCALEINCR] = 1e12;
 
             // primal feasibility tolerance
             _rationalParamName[SoPlex2::FEASTOL] = "feastol";
