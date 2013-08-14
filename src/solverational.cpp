@@ -300,6 +300,10 @@ namespace soplex
       primalScale = 1;
       dualScale = 1;
 
+      // control progress
+      Real bestViolation = realParam(SoPlex2::INFTY);
+      int numFailedRefinements = 0;
+
       // refinement loop
       do
       {
@@ -365,7 +369,7 @@ namespace soplex
          }
 
          // output violations; the reduced cost violations for artificially introduced slack columns are actually violations of the dual multipliers
-         MSG_INFO2( spxout
+         MSG_INFO1( spxout
             << "Max. bound violation = " << rationalToString(boundsViolation) << std::endl
             << "Max. row violation = " << rationalToString(sideViolation) << std::endl
             << "Max. dual violation = " << rationalToString(redcostViolation) << std::endl );
@@ -383,6 +387,24 @@ namespace soplex
          if( _isSolveStopped() )
          {
             stopped = true;
+            return;
+         }
+
+         // check progress
+         Rational sumMaxViolation = boundsViolation + sideViolation + redcostViolation;
+         if( sumMaxViolation > 0.9 * bestViolation )
+         {
+            MSG_INFO2( spxout << "Refinement failed to reduce violation significantly.\n" );
+            numFailedRefinements++;
+         }
+
+         if( sumMaxViolation < bestViolation )
+            bestViolation = sumMaxViolation;
+
+         if( numFailedRefinements >= 15 )
+         {
+            MSG_INFO1( spxout << "Giving up after 15 refinements without significantly increased precision.\n" );
+            error = true;
             return;
          }
 
