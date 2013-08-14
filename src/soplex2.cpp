@@ -5134,7 +5134,7 @@ namespace soplex
 
       // time limit in seconds (INFTY if unlimited)
       case SoPlex2::TIMELIMIT:
-         _solver.setTerminationIter(value);
+         _solver.setTerminationTime(value);
          break;
 
       // lower limit on objective value is set in solveReal()
