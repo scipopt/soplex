@@ -317,7 +317,7 @@ namespace soplex
             // lower bound
             modLower[c] = lowerRational(c);
 
-            if( modLower[c] > -realParam(SoPlex2::INFTY) )
+            if( modLower[c] > double(-realParam(SoPlex2::INFTY)) )
                modLower[c] -= sol._primal[c];
 
             if( modLower[c] > boundsViolation )
@@ -326,7 +326,7 @@ namespace soplex
             // upper bound
             modUpper[c] = upperRational(c);
 
-            if( modUpper[c] < realParam(SoPlex2::INFTY) )
+            if( modUpper[c] < double(realParam(SoPlex2::INFTY)) )
                modUpper[c] -= sol._primal[c];
 
             if( modUpper[c] < -boundsViolation )
@@ -392,14 +392,14 @@ namespace soplex
 
          // check progress
          Rational sumMaxViolation = boundsViolation + sideViolation + redcostViolation;
-         if( sumMaxViolation > 0.9 * bestViolation )
+         if( sumMaxViolation > double(0.9 * bestViolation) )
          {
             MSG_INFO2( spxout << "Refinement failed to reduce violation significantly.\n" );
             numFailedRefinements++;
          }
 
-         if( sumMaxViolation < bestViolation )
-            bestViolation = sumMaxViolation;
+         if( sumMaxViolation < double(bestViolation) )
+            bestViolation = Real(sumMaxViolation);
 
          if( numFailedRefinements >= 15 )
          {
@@ -570,8 +570,8 @@ namespace soplex
       while( true );
 
       // reset tolerances in floating-point solver
-      _solver.setFeastol(rationalParam(SoPlex2::FEASTOL));
-      _solver.setOpttol(rationalParam(SoPlex2::OPTTOL));
+      _solver.setFeastol(Real(rationalParam(SoPlex2::FEASTOL)));
+      _solver.setOpttol(Real(rationalParam(SoPlex2::OPTTOL)));
    }
 
 
@@ -944,13 +944,13 @@ namespace soplex
          _rationalLP->changeObj(c, 0);
          _realLP->changeObj(c, 0.0);
 
-         if( lowerRational(c) > -realParam(SoPlex2::INFTY) )
+         if( lowerRational(c) > double(-realParam(SoPlex2::INFTY)) )
          {
             _rationalLP->changeLower(c, 0);
             _realLP->changeLower(c, 0.0);
          }
 
-         if( upperRational(c) < realParam(SoPlex2::INFTY) )
+         if( upperRational(c) < double(realParam(SoPlex2::INFTY)) )
          {
             _rationalLP->changeUpper(c, 0);
             _realLP->changeUpper(c, 0.0);
@@ -1087,14 +1087,14 @@ namespace soplex
          {
             shiftedSide -= (colVectorRational(c) * lowerRational(c));
             _feasShiftValues[c] = lowerRational(c);
-            _rationalLP->changeBounds(c, 0, upperRational(c) < realParam(SoPlex2::INFTY) ? upperRational(c) - lowerRational(c) : upperRational(c));
+            _rationalLP->changeBounds(c, 0, upperRational(c) < double(realParam(SoPlex2::INFTY)) ? upperRational(c) - lowerRational(c) : upperRational(c));
             _realLP->changeBounds(c, 0.0, (Real)upperRational(c));
          }
          else if( upperRational(c) < 0 )
          {
             shiftedSide -= (colVectorRational(c) * upperRational(c));
             _feasShiftValues[c] = upperRational(c);
-            _rationalLP->changeBounds(c, lowerRational(c) > -realParam(SoPlex2::INFTY) ? lowerRational(c) - upperRational(c) : lowerRational(c), 0);
+            _rationalLP->changeBounds(c, lowerRational(c) > double(-realParam(SoPlex2::INFTY)) ? lowerRational(c) - upperRational(c) : lowerRational(c), 0);
             _realLP->changeBounds(c, (Real)lowerRational(c), 0.0);
          }
          else
@@ -1195,14 +1195,14 @@ namespace soplex
          shiftedSide += (colVectorRational(c) * value);
          if( value != 0 )
          {
-            _rationalLP->changeBounds(c, lowerRational(c) > -realParam(SoPlex2::INFTY) ? lowerRational(c) + value : lowerRational(c),
-               upperRational(c) < realParam(SoPlex2::INFTY) ? upperRational(c) + value : upperRational(c));
+            _rationalLP->changeBounds(c, lowerRational(c) > double(-realParam(SoPlex2::INFTY)) ? lowerRational(c) + value : lowerRational(c),
+               upperRational(c) < double(realParam(SoPlex2::INFTY)) ? upperRational(c) + value : upperRational(c));
          }
 
          _realLP->changeBounds(c, (Real)lowerRational(c), (Real)upperRational(c));
 
          _rationalLP->changeObj(c, _feasObj[c]);
-         _realLP->changeObj(c, _feasObj[c]);
+         _realLP->changeObj(c, Real(_feasObj[c]));
 
          assert(lowerReal(c) <= upperReal(c));
       }

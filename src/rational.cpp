@@ -391,7 +391,7 @@ std::string rationalToString(const Rational& r, const bool asfloat)
 /// read Rational from string
 bool readStringRational(const char* s, Rational& value)
 {
-   return (sscanf(s, "%"REAL_FORMAT, &value) == 1);
+   return (sscanf(s, "%" REAL_FORMAT, &value) == 1);
 }
 
 #endif

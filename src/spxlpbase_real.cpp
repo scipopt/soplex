@@ -1907,12 +1907,12 @@ static void MPSwriteRecord(
 
    if( name1 != 0 )
    {
-      sprintf(buf, "  %-8.8s  %12.9g", name1, value1);
+      sprintf(buf, "  %-8.8s  %12.9" REAL_FORMAT, name1, value1);
       os << buf;
 
       if( name2 != 0 )
       {
-         sprintf(buf, "   %-8.8s  %12.9g", name2, value2);
+         sprintf(buf, "   %-8.8s  %12.9" REAL_FORMAT, name2, value2);
          os << buf;
       }
    }

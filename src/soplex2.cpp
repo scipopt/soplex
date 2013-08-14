@@ -2102,9 +2102,9 @@ namespace soplex
 
       if( _hasBasisRational )
       {
-         if( lpcol.lower() > -realParam(SoPlex2::INFTY) )
+         if( lpcol.lower() > double(-realParam(SoPlex2::INFTY)) )
             _basisStatusColsRational.append(SPxSolver::ON_LOWER);
-         else if( lpcol.upper() < realParam(SoPlex2::INFTY) )
+         else if( lpcol.upper() < double(realParam(SoPlex2::INFTY)) )
             _basisStatusColsRational.append(SPxSolver::ON_UPPER);
          else
             _basisStatusColsRational.append(SPxSolver::ZERO);
@@ -2125,9 +2125,9 @@ namespace soplex
       {
          for( int i = 0; i < lpcolset.num(); i++ )
          {
-            if( lpcolset.lower(i) > -realParam(SoPlex2::INFTY) )
+            if( lpcolset.lower(i) > double(-realParam(SoPlex2::INFTY)) )
                _basisStatusColsRational.append(SPxSolver::ON_LOWER);
-            else if( lpcolset.upper(i) < realParam(SoPlex2::INFTY) )
+            else if( lpcolset.upper(i) < double(realParam(SoPlex2::INFTY)) )
                _basisStatusColsRational.append(SPxSolver::ON_UPPER);
             else
                _basisStatusColsRational.append(SPxSolver::ZERO);
@@ -2149,9 +2149,9 @@ namespace soplex
       {
          for( int i = 0; i < lpcolset.num(); i++ )
          {
-            if( lpcolset.lower(i) > -realParam(SoPlex2::INFTY) )
+            if( lpcolset.lower(i) > double(-realParam(SoPlex2::INFTY)) )
                _basisStatusColsRational.append(SPxSolver::ON_LOWER);
-            else if( lpcolset.upper(i) < realParam(SoPlex2::INFTY) )
+            else if( lpcolset.upper(i) < double(realParam(SoPlex2::INFTY)) )
                _basisStatusColsRational.append(SPxSolver::ON_UPPER);
             else
                _basisStatusColsRational.append(SPxSolver::ZERO);
@@ -2173,10 +2173,10 @@ namespace soplex
       {
          if( _basisStatusRowsRational[i] != SPxSolver::BASIC )
             _hasBasisRational = false;
-         else if( _basisStatusRowsRational[i] == SPxSolver::ON_LOWER && lprow.lhs() <= -realParam(SoPlex2::INFTY) )
-            _basisStatusRowsRational[i] = (lprow.rhs() < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
-         else if( _basisStatusRowsRational[i] == SPxSolver::ON_UPPER && lprow.rhs() >= realParam(SoPlex2::INFTY) )
-            _basisStatusRowsRational[i] = (lprow.lhs() > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+         else if( _basisStatusRowsRational[i] == SPxSolver::ON_LOWER && lprow.lhs() <= double(-realParam(SoPlex2::INFTY)) )
+            _basisStatusRowsRational[i] = (lprow.rhs() < double(realParam(SoPlex2::INFTY))) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+         else if( _basisStatusRowsRational[i] == SPxSolver::ON_UPPER && lprow.rhs() >= double(realParam(SoPlex2::INFTY)) )
+            _basisStatusRowsRational[i] = (lprow.lhs() > double(-realParam(SoPlex2::INFTY))) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
       }
 
       _invalidateSolutionRational();
@@ -2202,8 +2202,8 @@ namespace soplex
       {
          for( int i = numRowsRational() - 1; i >= 0; i-- )
          {
-            if( _basisStatusRowsRational[i] == SPxSolver::ON_LOWER && lhs[i] <= -realParam(SoPlex2::INFTY) )
-               _basisStatusRowsRational[i] = (rhsRational(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+            if( _basisStatusRowsRational[i] == SPxSolver::ON_LOWER && lhs[i] <= double(-realParam(SoPlex2::INFTY)) )
+               _basisStatusRowsRational[i] = (rhsRational(i) < double(realParam(SoPlex2::INFTY))) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
          }
       }
 
@@ -2218,8 +2218,8 @@ namespace soplex
       assert(_rationalLP != 0);
       _rationalLP->changeLhs(i, lhs);
 
-      if( _hasBasisRational && _basisStatusRowsRational[i] == SPxSolver::ON_LOWER && lhs <= -realParam(SoPlex2::INFTY) )
-         _basisStatusRowsRational[i] = (rhsRational(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+      if( _hasBasisRational && _basisStatusRowsRational[i] == SPxSolver::ON_LOWER && lhs <= double(-realParam(SoPlex2::INFTY)) )
+         _basisStatusRowsRational[i] = (rhsRational(i) < double(realParam(SoPlex2::INFTY))) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
 
       _invalidateSolutionRational();
    }
@@ -2244,8 +2244,8 @@ namespace soplex
       {
          for( int i = numRowsRational() - 1; i >= 0; i-- )
          {
-            if( _basisStatusRowsRational[i] == SPxSolver::ON_UPPER && rhs[i] >= realParam(SoPlex2::INFTY) )
-               _basisStatusRowsRational[i] = (lhsRational(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+            if( _basisStatusRowsRational[i] == SPxSolver::ON_UPPER && rhs[i] >= double(realParam(SoPlex2::INFTY)) )
+               _basisStatusRowsRational[i] = (lhsRational(i) > double(-realParam(SoPlex2::INFTY))) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
          }
       }
 
@@ -2260,8 +2260,8 @@ namespace soplex
       assert(_rationalLP != 0);
       _rationalLP->changeRhs(i, rhs);
 
-      if( _hasBasisRational && _basisStatusRowsRational[i] == SPxSolver::ON_UPPER && rhs >= realParam(SoPlex2::INFTY) )
-         _basisStatusRowsRational[i] = (lhsRational(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+      if( _hasBasisRational && _basisStatusRowsRational[i] == SPxSolver::ON_UPPER && rhs >= double(realParam(SoPlex2::INFTY)) )
+         _basisStatusRowsRational[i] = (lhsRational(i) > double(-realParam(SoPlex2::INFTY))) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
 
       _invalidateSolutionRational();
    }
@@ -2286,10 +2286,10 @@ namespace soplex
       {
          for( int i = numRowsRational() - 1; i >= 0; i-- )
          {
-            if( _basisStatusRowsRational[i] == SPxSolver::ON_LOWER && lhs[i] <= -realParam(SoPlex2::INFTY) )
-               _basisStatusRowsRational[i] = (rhs[i] < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
-            else if( _basisStatusRowsRational[i] == SPxSolver::ON_UPPER && rhs[i] >= realParam(SoPlex2::INFTY) )
-               _basisStatusRowsRational[i] = (lhs[i] > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+            if( _basisStatusRowsRational[i] == SPxSolver::ON_LOWER && lhs[i] <= double(-realParam(SoPlex2::INFTY)) )
+               _basisStatusRowsRational[i] = (rhs[i] < double(realParam(SoPlex2::INFTY))) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+            else if( _basisStatusRowsRational[i] == SPxSolver::ON_UPPER && rhs[i] >= double(realParam(SoPlex2::INFTY)) )
+               _basisStatusRowsRational[i] = (lhs[i] > double(-realParam(SoPlex2::INFTY))) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
          }
       }
 
@@ -2306,10 +2306,10 @@ namespace soplex
 
       if( _hasBasisRational )
       {
-         if( _basisStatusRowsRational[i] == SPxSolver::ON_LOWER && lhs <= -realParam(SoPlex2::INFTY) )
-            _basisStatusRowsRational[i] = (rhs < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
-         else if( _basisStatusRowsRational[i] == SPxSolver::ON_UPPER && rhs >= realParam(SoPlex2::INFTY) )
-            _basisStatusRowsRational[i] = (lhs > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+         if( _basisStatusRowsRational[i] == SPxSolver::ON_LOWER && lhs <= double(-realParam(SoPlex2::INFTY)) )
+            _basisStatusRowsRational[i] = (rhs < double(realParam(SoPlex2::INFTY))) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+         else if( _basisStatusRowsRational[i] == SPxSolver::ON_UPPER && rhs >= double(realParam(SoPlex2::INFTY)) )
+            _basisStatusRowsRational[i] = (lhs > double(-realParam(SoPlex2::INFTY))) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
       }
 
       _invalidateSolutionRational();
@@ -2335,10 +2335,10 @@ namespace soplex
       {
          if( _basisStatusColsRational[i] == SPxSolver::BASIC )
             _hasBasisRational = false;
-         else if( _basisStatusColsRational[i] == SPxSolver::ON_LOWER && lpcol.lower() <= -realParam(SoPlex2::INFTY) )
-            _basisStatusColsRational[i] = (lpcol.upper() < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
-         else if( _basisStatusColsRational[i] == SPxSolver::ON_UPPER && lpcol.upper() >= realParam(SoPlex2::INFTY) )
-            _basisStatusColsRational[i] = (lpcol.lower() > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+         else if( _basisStatusColsRational[i] == SPxSolver::ON_LOWER && lpcol.lower() <= double(-realParam(SoPlex2::INFTY)) )
+            _basisStatusColsRational[i] = (lpcol.upper() < double(realParam(SoPlex2::INFTY))) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+         else if( _basisStatusColsRational[i] == SPxSolver::ON_UPPER && lpcol.upper() >= double(realParam(SoPlex2::INFTY)) )
+            _basisStatusColsRational[i] = (lpcol.lower() > double(-realParam(SoPlex2::INFTY))) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
       }
 
       _invalidateSolutionRational();
@@ -2364,8 +2364,8 @@ namespace soplex
       {
          for( int i = numColsRational() - 1; i >= 0; i-- )
          {
-            if( _basisStatusColsRational[i] == SPxSolver::ON_LOWER && lower[i] <= -realParam(SoPlex2::INFTY) )
-               _basisStatusColsRational[i] = (upperRational(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+            if( _basisStatusColsRational[i] == SPxSolver::ON_LOWER && lower[i] <= double(-realParam(SoPlex2::INFTY)) )
+               _basisStatusColsRational[i] = (upperRational(i) < double(realParam(SoPlex2::INFTY))) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
          }
       }
 
@@ -2380,8 +2380,8 @@ namespace soplex
       assert(_rationalLP != 0);
       _rationalLP->changeLower(i, lower);
 
-      if( _hasBasisRational && _basisStatusColsRational[i] == SPxSolver::ON_LOWER && lower <= -realParam(SoPlex2::INFTY) )
-         _basisStatusColsRational[i] = (upperRational(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+      if( _hasBasisRational && _basisStatusColsRational[i] == SPxSolver::ON_LOWER && lower <= double(-realParam(SoPlex2::INFTY)) )
+         _basisStatusColsRational[i] = (upperRational(i) < double(realParam(SoPlex2::INFTY))) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
 
       _invalidateSolutionRational();
    }
@@ -2406,8 +2406,8 @@ namespace soplex
       {
          for( int i = numColsRational() - 1; i >= 0; i-- )
          {
-            if( _basisStatusColsRational[i] == SPxSolver::ON_UPPER && upper[i] >= realParam(SoPlex2::INFTY) )
-               _basisStatusColsRational[i] = (lowerRational(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+            if( _basisStatusColsRational[i] == SPxSolver::ON_UPPER && upper[i] >= double(realParam(SoPlex2::INFTY)) )
+               _basisStatusColsRational[i] = (lowerRational(i) > double(-realParam(SoPlex2::INFTY))) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
          }
       }
 
@@ -2422,8 +2422,8 @@ namespace soplex
       assert(_rationalLP != 0);
       _rationalLP->changeUpper(i, upper);
 
-      if( _hasBasisRational &&  _basisStatusColsRational[i] == SPxSolver::ON_UPPER && upper >= realParam(SoPlex2::INFTY) )
-         _basisStatusColsRational[i] = (lowerRational(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+      if( _hasBasisRational &&  _basisStatusColsRational[i] == SPxSolver::ON_UPPER && upper >= double(realParam(SoPlex2::INFTY)) )
+         _basisStatusColsRational[i] = (lowerRational(i) > double(-realParam(SoPlex2::INFTY))) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
 
       _invalidateSolutionRational();
    }
@@ -2448,10 +2448,10 @@ namespace soplex
       {
          for( int i = numColsRational() - 1; i >= 0; i-- )
          {
-            if( _basisStatusColsRational[i] == SPxSolver::ON_LOWER && lower[i] <= -realParam(SoPlex2::INFTY) )
-               _basisStatusColsRational[i] = (upper[i] < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
-            else if( _basisStatusColsRational[i] == SPxSolver::ON_UPPER && upper[i] >= realParam(SoPlex2::INFTY) )
-               _basisStatusColsRational[i] = (lower[i] > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+            if( _basisStatusColsRational[i] == SPxSolver::ON_LOWER && lower[i] <= double(-realParam(SoPlex2::INFTY)) )
+               _basisStatusColsRational[i] = (upper[i] < double(realParam(SoPlex2::INFTY))) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+            else if( _basisStatusColsRational[i] == SPxSolver::ON_UPPER && upper[i] >= double(realParam(SoPlex2::INFTY)) )
+               _basisStatusColsRational[i] = (lower[i] > double(-realParam(SoPlex2::INFTY))) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
          }
       }
 
@@ -2468,10 +2468,10 @@ namespace soplex
 
       if( _hasBasisRational )
       {
-         if( _basisStatusColsRational[i] == SPxSolver::ON_LOWER && lower <= -realParam(SoPlex2::INFTY) )
-            _basisStatusColsRational[i] = (upper < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
-         else if( _basisStatusColsRational[i] == SPxSolver::ON_UPPER && upper >= realParam(SoPlex2::INFTY) )
-            _basisStatusColsRational[i] = (lower > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+         if( _basisStatusColsRational[i] == SPxSolver::ON_LOWER && lower <= double(-realParam(SoPlex2::INFTY)) )
+            _basisStatusColsRational[i] = (upper < double(realParam(SoPlex2::INFTY))) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+         else if( _basisStatusColsRational[i] == SPxSolver::ON_UPPER && upper >= double(realParam(SoPlex2::INFTY)) )
+            _basisStatusColsRational[i] = (lower > double(-realParam(SoPlex2::INFTY))) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
       }
 
       _invalidateSolutionRational();
@@ -2927,7 +2927,7 @@ namespace soplex
       SPxSimplifier::Result simplificationStatus = SPxSimplifier::OKAY;
       if( _simplifier != 0 )
       {
-         simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlex2::EPSILON_ZERO), rationalParam(SoPlex2::FEASTOL), rationalParam(SoPlex2::OPTTOL));
+         simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlex2::EPSILON_ZERO), Real(rationalParam(SoPlex2::FEASTOL)), Real(rationalParam(SoPlex2::OPTTOL)));
       }
 
       // apply scaling after the simplification
@@ -3900,9 +3900,9 @@ namespace soplex
       // if no basis is available, return slack basis
       if( !_hasBasisRational )
       {
-         if( lowerRational(col) > -realParam(SoPlex2::INFTY) )
+         if( lowerRational(col) > double(-realParam(SoPlex2::INFTY)) )
             return SPxSolver::ON_LOWER;
-         else if( upperRational(col) < realParam(SoPlex2::INFTY) )
+         else if( upperRational(col) < double(realParam(SoPlex2::INFTY)) )
             return SPxSolver::ON_UPPER;
          else
             return SPxSolver::ZERO;
@@ -3935,9 +3935,9 @@ namespace soplex
 
          for( int i = numColsRational() - 1; i >= 0; i-- )
          {
-            if( lowerRational(i) > -realParam(SoPlex2::INFTY) )
+            if( lowerRational(i) > double(-realParam(SoPlex2::INFTY)) )
                cols[i] = SPxSolver::ON_LOWER;
-            else if( upperRational(i) < realParam(SoPlex2::INFTY) )
+            else if( upperRational(i) < double(realParam(SoPlex2::INFTY)) )
                cols[i] = SPxSolver::ON_UPPER;
             else
                cols[i] = SPxSolver::ZERO;
@@ -4613,9 +4613,9 @@ namespace soplex
       {
          if( lowerRational(i) == upperRational(i) )
             _basisStatusColsRational[i] = SPxSolver::FIXED;
-         else if( lowerRational(i) <= -realParam(SoPlex2::INFTY) && upperRational(i) >= realParam(SoPlex2::INFTY) )
+         else if( lowerRational(i) <= double(-realParam(SoPlex2::INFTY)) && upperRational(i) >= double(realParam(SoPlex2::INFTY)) )
             _basisStatusColsRational[i] = SPxSolver::ZERO;
-         else if( lowerRational(i) <= -realParam(SoPlex2::INFTY) )
+         else if( lowerRational(i) <= double(-realParam(SoPlex2::INFTY)) )
             _basisStatusColsRational[i] = SPxSolver::ON_UPPER;
          else
             _basisStatusColsRational[i] = SPxSolver::ON_LOWER;
@@ -5184,12 +5184,12 @@ namespace soplex
       {
       // primal feasibility tolerance
       case SoPlex2::FEASTOL:
-         _solver.setFeastol(value);
+         _solver.setFeastol(Real(value));
          break;
 
       // dual feasibility tolerance
       case SoPlex2::OPTTOL:
-         _solver.setOpttol(value);
+         _solver.setOpttol(Real(value));
          break;
 
       default:
@@ -5733,7 +5733,7 @@ namespace soplex
             {
                Real value;
 
-               if( sscanf(paramValueString, "%"REAL_FORMAT, &value) == 1 && setRealParam((SoPlex2::RealParam)param, value) )
+               if( sscanf(paramValueString, "%" REAL_FORMAT, &value) == 1 && setRealParam((SoPlex2::RealParam)param, value) )
                   break;
                else
                {

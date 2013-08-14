@@ -239,7 +239,7 @@ namespace soplex
 
          Rational violation = (maxBoundViolation > maxConstraintViolation ? maxBoundViolation : maxConstraintViolation);
 
-         if( violation > realParam(SoPlex2::FPFEASTOL) )
+         if( violation > double(realParam(SoPlex2::FPFEASTOL)) )
          {
             MSG_INFO1( spxout << "Warning: Floating-point solution violates bounds and rows by up to " << rationalToString(violation) << ".\n" );
          }

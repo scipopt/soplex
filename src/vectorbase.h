@@ -115,7 +115,7 @@ public:
          assert(dim() == vec.dim());
 
          for( int i = 0; i < dimen; i++ )
-            val[i] = vec[i];
+            val[i] = R(vec[i]);
 
          assert(isConsistent());
       }

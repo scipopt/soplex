@@ -705,12 +705,12 @@ SVectorBase<R>& SVectorBase<R>::operator=(const VectorBase<S>& vec)
 
    while( i-- )
    {
-      if( vec[i] )
+      if( vec[i] != 0 )
       {
          assert(n < max());
 
          e->idx = i;
-         e->val = vec[i];
+         e->val = R(vec[i]);
          ++e;
          ++n;
       }
