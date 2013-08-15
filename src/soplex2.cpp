@@ -5275,7 +5275,7 @@ namespace soplex
       {
          file << "\n";
          file << "# " << _currentSettings->_boolParamDescription[i] << "\n";
-         file << "# range {true, false}, default " << _currentSettings->_boolParamDefault[i] << "\n";
+         file << "# range {true, false}, default " << (_currentSettings->_boolParamDefault[i] ? "true\n" : "false\n");
          file << "bool:" << _currentSettings->_boolParamName[i] << " = " << (_currentSettings->_boolParamValues[i] ? "true\n" : "false\n");
       }
 
