@@ -511,13 +511,23 @@ namespace soplex
       assert(_realLP != 0);
       assert(_rationalLP != 0);
 
+      // free settings
+      _currentSettings->~Settings();
+      spx_free(_currentSettings);
+
+      // free statistics
+      _statistics->~Statistics();
+      spx_free(_statistics);
+
       // free real LP if different from the LP in the solver
       if( _realLP != &_solver )
       {
+         _realLP->~SPxLPReal();
          spx_free(_realLP);
       }
 
       // free rational LP
+      _rationalLP->~SPxLPRational();
       spx_free(_rationalLP);
    }
 
@@ -2926,6 +2936,7 @@ namespace soplex
          // memory-efficient to keep only the problem in the solver
          if( !applyPreprocessing )
          {
+            _realLP->~SPxLPReal();
             spx_free(_realLP);
             _realLP = &_solver;
             _isRealLPLoaded = true;
@@ -4469,6 +4480,7 @@ namespace soplex
          assert(_realLP != &_solver);
 
          _solver.loadLP(*_realLP);
+         _realLP->~SPxLPReal();
          spx_free(_realLP);
          _realLP = &_solver;
          _isRealLPLoaded = true;
@@ -4492,6 +4504,7 @@ namespace soplex
          assert(_realLP != &_solver);
 
          _solver.loadLP(*_realLP);
+         _realLP->~SPxLPReal();
          spx_free(_realLP);
          _realLP = &_solver;
          _isRealLPLoaded = true;
