@@ -103,6 +103,11 @@ namespace soplex
             _boolParamDescription[SoPlex2::PARTIAL_PRICING] = "should partial pricing be used?";
             _boolParamDefault[SoPlex2::PARTIAL_PRICING] = false;
 
+            // should lifting be used to reduce range of nonzero matrix coefficients?
+            _boolParamName[SoPlex2::LIFTING] = "lifting";
+            _boolParamDescription[SoPlex2::LIFTING] = "should lifting be used to reduce range of nonzero matrix coefficients?";
+            _boolParamDefault[SoPlex2::LIFTING] = false;
+
             // objective sense
             _intParamName[SoPlex2::OBJSENSE] = "objsense";
             _intParamDescription[SoPlex2::OBJSENSE] = "objective sense (-1 - minimize, +1 - maximize)";
@@ -257,6 +262,20 @@ namespace soplex
             _realParamLower[SoPlex2::MAXSCALEINCR] = 1.0;
             _realParamUpper[SoPlex2::MAXSCALEINCR] = DEFAULT_INFINITY;
             _realParamDefault[SoPlex2::MAXSCALEINCR] = 1e12;
+
+            // lower threshold in lifting (nonzero matrix coefficients with smaller absolute value will be reformulated)
+            _realParamName[SoPlex2::LIFTMINVAL] = "liftminval";
+            _realParamDescription[SoPlex2::LIFTMINVAL] = "lower threshold in lifting (nonzero matrix coefficients with smaller absolute value will be reformulated)";
+            _realParamLower[SoPlex2::LIFTMINVAL] = 0.0;
+            _realParamUpper[SoPlex2::LIFTMINVAL] = 0.1;
+            _realParamDefault[SoPlex2::LIFTMINVAL] = 0.000976562; // = 1/1024
+
+            // upper threshold in lifting (nonzero matrix coefficients with larger absolute value will be reformulated)
+            _realParamName[SoPlex2::LIFTMAXVAL] = "liftmaxval";
+            _realParamDescription[SoPlex2::LIFTMAXVAL] = "lower threshold in lifting (nonzero matrix coefficients with smaller absolute value will be reformulated)";
+            _realParamLower[SoPlex2::LIFTMAXVAL] = 10.0;
+            _realParamUpper[SoPlex2::LIFTMAXVAL] = DEFAULT_INFINITY;
+            _realParamDefault[SoPlex2::LIFTMAXVAL] = 1024.0;
 
             // primal feasibility tolerance
             _rationalParamName[SoPlex2::FEASTOL] = "feastol";
@@ -4863,6 +4882,8 @@ namespace soplex
       case PARTIAL_PRICING:
          ///@todo activate partial pricing
          break;
+      case LIFTING:
+         break;
       default:
          return false;
       }
@@ -5155,6 +5176,14 @@ namespace soplex
 
       // maximum increase of scaling factors between refinements
       case SoPlex2::MAXSCALEINCR:
+         break;
+
+      // lower threshold in lifting (nonzero matrix coefficients with smaller absolute value will be reformulated)
+      case SoPlex2::LIFTMINVAL:
+         break;
+
+      // upper threshold in lifting (nonzero matrix coefficients with larger absolute value will be reformulated)
+      case SoPlex2::LIFTMAXVAL:
          break;
 
       default:

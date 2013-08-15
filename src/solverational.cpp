@@ -52,6 +52,10 @@ namespace soplex
       // introduce slack variables to transform inequality constraints into equations
       _transformEquality();
 
+      // apply lifting to reduce range of nonzero matrix coefficients
+      if( boolParam(SoPlex2::LIFTING) )
+         _lift();
+
       do
       {
          bool primalFeasible = false;
@@ -203,6 +207,10 @@ namespace soplex
          _statusRational = SPxSolver::ABORT_TIME;
 
       ///@todo set status to ABORT_VALUE if optimal solution exceeds objective limit
+
+      // undo lifting
+      if( boolParam(SoPlex2::LIFTING) )
+         _project(_solRational);
 
       // restore original problem
       _untransformEquality(_solRational);
@@ -687,6 +695,206 @@ namespace soplex
 
       // restore problem
       _untransformFeasibility(sol, hasDualfarkas);
+   }
+
+
+
+   /// reduces matrix coefficient in absolute value by the lifting procedure of Thiele et al. 2013
+   void SoPlex2::_lift()
+   {
+      MSG_DEBUG( spxout << "Reducing matrix coefficients by lifting.\n" );
+
+      // start timing
+      _statistics->transformTime.start();
+
+      MSG_DEBUG( _realLP->writeFile("beforeLift.lp", 0, 0, 0) );
+
+      // remember unlifted state
+      _beforeLiftCols = numColsRational();
+      _beforeLiftRows = numRowsRational();
+
+      // allocate vector memory
+      DSVectorRational colVector;
+      SVectorRational::Element liftingRowMem[2];
+      SVectorRational liftingRowVector(2, liftingRowMem);
+
+      // search each column for large nonzeros entries
+      const Rational maxValue = realParam(SoPlex2::LIFTMAXVAL);
+
+      for( int i = 0; i < numColsRational(); i++ )
+      {
+         MSG_DEBUG( spxout << "in lifting: examining column " << i << "\n" );
+
+         // get column vector
+         colVector = colVectorRational(i);
+
+         bool addedLiftingRow = false;
+         int liftingColumnIndex = -1;
+
+         // go through nonzero entries of the column
+         for( int k = colVector.size() - 1; k >= 0; k-- )
+         {
+            Rational value = colVector.value(k);
+
+            if( abs(value) > maxValue )
+            {
+               MSG_DEBUG( spxout << "   --> nonzero " << k << " has value " << rationalToString(value) << " in row " << colVector.index(k) << "\n" );
+
+               // add new column equal to maxValue times original column
+               if( !addedLiftingRow )
+               {
+                  MSG_DEBUG( spxout << "            --> adding lifting row\n" );
+
+                  assert(liftingRowVector.size() == 0);
+
+                  liftingColumnIndex = numColsRational();
+                  liftingRowVector.add(i, maxValue);
+                  liftingRowVector.add(liftingColumnIndex, -1);
+
+                  _rationalLP->addRow(LPRowRational(0, liftingRowVector, 0));
+                  _realLP->addRow(LPRowReal(0.0, DSVectorReal(liftingRowVector), 0.0));
+
+                  assert(liftingColumnIndex == numColsRational() - 1);
+                  assert(liftingColumnIndex == numColsReal() - 1);
+
+                  _rationalLP->changeBounds(liftingColumnIndex, -realParam(SoPlex2::INFTY), realParam(SoPlex2::INFTY));
+                  _realLP->changeBounds(liftingColumnIndex, -realParam(SoPlex2::INFTY), realParam(SoPlex2::INFTY));
+
+                  liftingRowVector.clear();
+                  addedLiftingRow = true;
+               }
+
+               // get row index
+               int rowIndex = colVector.index(k);
+               assert(rowIndex >= 0);
+               assert(rowIndex < _beforeLiftRows);
+               assert(liftingColumnIndex == numColsRational() - 1);
+
+               MSG_DEBUG( spxout << "            --> changing matrix\n" );
+
+               // remove nonzero from original column
+               _rationalLP->changeElement(rowIndex, i, 0);
+               _realLP->changeElement(rowIndex, i, 0.0);
+
+               // add nonzero divided by maxValue to new column
+               Rational newValue = value / maxValue;
+               _rationalLP->changeElement(rowIndex, liftingColumnIndex, newValue);
+               _realLP->changeElement(rowIndex, liftingColumnIndex, Real(newValue));
+            }
+         }
+      }
+
+      // adjust basis
+      if( _hasBasisRational )
+      {
+         assert(numColsRational() >= _beforeLiftCols);
+         assert(numRowsRational() >= _beforeLiftRows);
+
+         _basisStatusColsRational.append(numColsRational() - _beforeLiftCols, SPxSolver::BASIC);
+         _basisStatusRowsRational.append(numRowsRational() - _beforeLiftRows, SPxSolver::FIXED);
+      }
+
+      MSG_DEBUG( _realLP->writeFile("afterLift.lp", 0, 0, 0) );
+
+      // stop timing
+      _statistics->transformTime.stop();
+
+      if( numColsRational() > _beforeLiftCols || numRowsRational() > _beforeLiftRows )
+      {
+         MSG_INFO1( spxout << "Added " << numColsRational() - _beforeLiftCols << " columns and "
+            << numRowsRational() - _beforeLiftRows << " rows to reduce large matrix coefficients\n." );
+      }
+   }
+
+
+
+   /// undoes lifting
+   void SoPlex2::_project(SolRational& sol)
+   {
+      // start timing
+      _statistics->transformTime.start();
+
+      // print LP if in debug mode
+      MSG_DEBUG( _realLP->writeFile("beforeProject.lp", 0, 0, 0) );
+
+      assert(numColsRational() >= _beforeLiftCols);
+      assert(numRowsRational() >= _beforeLiftRows);
+
+      // shrink rational LP to original size
+      _rationalLP->removeColRange(_beforeLiftCols, numColsRational() - 1);
+      _rationalLP->removeRowRange(_beforeLiftRows, numRowsRational() - 1);
+
+      // shrink real LP to original size
+      _realLP->removeColRange(_beforeLiftCols, numColsReal() - 1);
+      _realLP->removeRowRange(_beforeLiftRows, numRowsReal() - 1);
+
+      // adjust solution
+      if( sol.hasPrimal() )
+      {
+         sol._primal.reDim(_beforeLiftCols);
+         sol._slacks.reDim(_beforeLiftRows);
+      }
+
+      if( sol.hasPrimalray() )
+      {
+         sol._primalray.reDim(_beforeLiftCols);
+      }
+
+      ///@todo if we know the mapping between original and lifting columns, we simply need to add the reduced cost of
+      ///      the lifting column to the reduced cost of the original column; this is not implemented now, because for
+      ///      optimal solutions the reduced costs of the lifting columns are zero
+      const Rational maxValue = realParam(SoPlex2::LIFTMAXVAL);
+
+      for( int i = _beforeLiftCols; i < numColsRational() && sol._hasDual; i++ )
+      {
+         if( abs(maxValue * sol._redcost[i]) > rationalParam(SoPlex2::OPTTOL) )
+         {
+            MSG_INFO1( spxout << "Warning: lost dual solution during project phase.\n" );
+            sol._hasDual = false;
+         }
+      }
+
+      if( sol.hasDual() )
+      {
+         sol._redcost.reDim(_beforeLiftCols);
+         sol._dual.reDim(_beforeLiftRows);
+      }
+
+      if( sol.hasDualfarkas() )
+      {
+         sol._dualfarkas.reDim(_beforeLiftRows);
+      }
+
+      // adjust basis
+      for( int i = _beforeLiftCols; i < numColsRational() && _hasBasisRational; i++ )
+      {
+         if( _basisStatusColsRational[i] != SPxSolver::BASIC )
+         {
+            MSG_INFO1( spxout << "Warning: lost basis during project phase because of nonbasic lifting column.\n" );
+            _hasBasisRational = false;
+         }
+      }
+
+      for( int i = _beforeLiftRows; i < numRowsRational() && _hasBasisRational; i++ )
+      {
+         if( _basisStatusRowsRational[i] == SPxSolver::BASIC )
+         {
+            MSG_INFO1( spxout << "Warning: lost basis during project phase because of basic lifting row.\n" );
+            _hasBasisRational = false;
+         }
+      }
+
+      if( _hasBasisRational )
+      {
+         _basisStatusColsRational.reSize(_beforeLiftCols);
+         _basisStatusRowsRational.reSize(_beforeLiftRows);
+      }
+
+      // print LP if in debug mode
+      MSG_DEBUG( _realLP->writeFile("afterProject.lp", 0, 0, 0) );
+
+      // stop timing
+      _statistics->transformTime.stop();
    }
 
 

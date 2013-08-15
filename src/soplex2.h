@@ -992,8 +992,11 @@ public:
       /// should partial pricing be used?
       PARTIAL_PRICING = 0,
 
+      /// should lifting be used to reduce range of nonzero matrix coefficients?
+      LIFTING = 1,
+
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 1
+      BOOLPARAM_COUNT = 2
    } BoolParam;
 
    /// integer parameters
@@ -1233,8 +1236,14 @@ public:
       /// maximum increase of scaling factors between refinements
       MAXSCALEINCR = 9,
 
+      /// lower threshold in lifting (nonzero matrix coefficients with smaller absolute value will be reformulated)
+      LIFTMINVAL = 10,
+
+      /// upper threshold in lifting (nonzero matrix coefficients with larger absolute value will be reformulated)
+      LIFTMAXVAL = 11,
+
       /// number of real parameters
-      REALPARAM_COUNT = 10
+      REALPARAM_COUNT = 12
    } RealParam;
 
    /// rational parameters
@@ -1405,6 +1414,8 @@ private:
    DVectorRational _unboundedSide;
    DVectorRational _feasObj;
    DVectorRational _feasShiftValues;
+   int _beforeLiftRows;
+   int _beforeLiftCols;
 
    //@}
 
@@ -1467,6 +1478,12 @@ private:
 
    /// performs iterative refinement on the auxiliary problem for testing feasibility
    void _performFeasIRStable(SolRational& sol, bool& hasDualfarkas, bool& stopped, bool& error);
+
+   /// reduces matrix coefficient in absolute value by the lifting procedure of Thiele et al. 2013
+   void _lift();
+
+   /// undoes lifting
+   void _project(SolRational& sol);
 
    /// introduces slack variables to transform inequality constraints into equations for both rational and real LP,
    /// which should be in sync
