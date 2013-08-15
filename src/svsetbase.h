@@ -172,10 +172,7 @@ private:
    {
       if( memSize() + n > memMax() )
       {
-         int newMax = int(SVSetBaseArray::memFactor * memMax());
-
-         if( memSize() + n > newMax )
-            newMax = memSize() + n;
+         int newMax = memSize() + n;
 
          memRemax(newMax);
       }
