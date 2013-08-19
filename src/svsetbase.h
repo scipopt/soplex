@@ -170,9 +170,23 @@ private:
    /// Provides enough nonzero memory for \p n more Nonzero%s.
    void ensureMem(int n)
    {
+      if( memSize() + n <= memMax() )
+         return;
+
+      if( list.last() )
+      {
+         DLPSV* ps = list.last();
+         assert(ps->max() >= ps->size());
+         SVSetBaseArray::removeLast(ps->max() - ps->size());
+         ps->set_max(ps->size());
+      }
+
       if( memSize() + n > memMax() )
       {
-         int newMax = memSize() + n;
+         int newMax = int(SVSetBaseArray::memFactor * memMax());
+
+         if( memSize() + n > newMax )
+            newMax = memSize() + n;
 
          memRemax(newMax);
       }
@@ -345,21 +359,10 @@ public:
    {
       DLPSV* ps;
 
-      if( list.last() )
-      {
-         ps = list.last();
-         SVSetBaseArray::removeLast(ps->max() - ps->size());
-         ps->set_max(ps->size());
-      }
-
       if( idxmax <= 0 )
-      {
-         ensureMem(1);
-         idxmax = memMax() - memSize();
-      }
-      else
-         ensureMem(idxmax);
+         idxmax = 1;
 
+      ensureMem(idxmax);
       ensurePSVec(1);
 
       assert(idxmax > 0);
