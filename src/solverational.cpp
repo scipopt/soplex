@@ -784,6 +784,72 @@ namespace soplex
          }
       }
 
+      // search each column for small nonzeros entries
+      const Rational minValue = realParam(SoPlex2::LIFTMINVAL);
+
+      for( int i = 0; i < numColsRational(); i++ )
+      {
+         MSG_DEBUG( spxout << "in lifting: examining column " << i << "\n" );
+
+         // get column vector
+         colVector = colVectorRational(i);
+
+         bool addedLiftingRow = false;
+         int liftingColumnIndex = -1;
+
+         // go through nonzero entries of the column
+         for( int k = colVector.size() - 1; k >= 0; k-- )
+         {
+            Rational value = colVector.value(k);
+
+            if( abs(value) < minValue )
+            {
+               MSG_DEBUG( spxout << "   --> nonzero " << k << " has value " << rationalToString(value) << " in row " << colVector.index(k) << "\n" );
+
+               // add new column equal to maxValue times original column
+               if( !addedLiftingRow )
+               {
+                  MSG_DEBUG( spxout << "            --> adding lifting row\n" );
+
+                  assert(liftingRowVector.size() == 0);
+
+                  liftingColumnIndex = numColsRational();
+                  liftingRowVector.add(i, minValue);
+                  liftingRowVector.add(liftingColumnIndex, -1);
+
+                  _rationalLP->addRow(LPRowRational(0, liftingRowVector, 0));
+                  _realLP->addRow(LPRowReal(0.0, DSVectorReal(liftingRowVector), 0.0));
+
+                  assert(liftingColumnIndex == numColsRational() - 1);
+                  assert(liftingColumnIndex == numColsReal() - 1);
+
+                  _rationalLP->changeBounds(liftingColumnIndex, -realParam(SoPlex2::INFTY), realParam(SoPlex2::INFTY));
+                  _realLP->changeBounds(liftingColumnIndex, -realParam(SoPlex2::INFTY), realParam(SoPlex2::INFTY));
+
+                  liftingRowVector.clear();
+                  addedLiftingRow = true;
+               }
+
+               // get row index
+               int rowIndex = colVector.index(k);
+               assert(rowIndex >= 0);
+               assert(rowIndex < _beforeLiftRows);
+               assert(liftingColumnIndex == numColsRational() - 1);
+
+               MSG_DEBUG( spxout << "            --> changing matrix\n" );
+
+               // remove nonzero from original column
+               _rationalLP->changeElement(rowIndex, i, 0);
+               _realLP->changeElement(rowIndex, i, 0.0);
+
+               // add nonzero divided by maxValue to new column
+               Rational newValue = value / minValue;
+               _rationalLP->changeElement(rowIndex, liftingColumnIndex, newValue);
+               _realLP->changeElement(rowIndex, liftingColumnIndex, Real(newValue));
+            }
+         }
+      }
+
       // adjust basis
       if( _hasBasisRational )
       {
