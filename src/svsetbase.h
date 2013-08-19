@@ -140,7 +140,8 @@ private:
 
    DataSet < DLPSV > set;  ///< %set of SVectorBase%s
    IdList < DLPSV > list;  ///< doubly linked list for non-zero management
-   int possiblyUnusedMem;  ///< an estimate of the used memory due to xtends
+   int unusedMem;  ///< an estimate of the unused memory (the difference of max() and size() summed up over all vectors) due to deleteVec() and xtend()
+   int numUnusedMemUpdates;  ///< counter for how often unusedMem has been updated since last exact value
 
    //@}
 
@@ -155,6 +156,30 @@ private:
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Helpers */
    //@{
+
+   /// count size of unused memory exactly
+   void countUnusedMem()
+   {
+      MSG_DEBUG( spxout << "counting unused memory (unusedMem = " << unusedMem << ", numUnusedMemUpdates = " << numUnusedMemUpdates << ", this = " << (void*)this << ")\n" );
+
+      unusedMem = memSize();
+      for( DLPSV* ps = list.first(); ps; ps = list.next(ps) )
+         unusedMem -= ps->size();
+
+      numUnusedMemUpdates = 0;
+
+      MSG_DEBUG( spxout << "               --> NEW: unusedMem = " << unusedMem << "\n" );
+   }
+
+   /// update estimation of unused memory
+   void updateUnusedMemEstimation(int change)
+   {
+      unusedMem += change;
+      numUnusedMemUpdates++;
+
+      if( unusedMem < 0 || unusedMem > memSize() || numUnusedMemUpdates >= 10000 )
+         countUnusedMem();
+   }
 
    /// Provides enough vector memory for \p n more SVectorBase%s.
    void ensurePSVec(int n)
@@ -175,12 +200,27 @@ private:
 
       if( list.last() )
       {
+         // get last vector and compute its unused memory
          DLPSV* ps = list.last();
-         assert(ps->max() >= ps->size());
-         SVSetBaseArray::removeLast(ps->max() - ps->size());
+         int unusedPsMem = ps->max() - ps->size();
+         assert(unusedPsMem >= 0);
+
+         // return vector's unused memory to common memory
+         SVSetBaseArray::removeLast(unusedPsMem);
          ps->set_max(ps->size());
+
+         // decrease counter of unused memory
+         MSG_DEBUG( spxout << "ensureMem, this = " << (void*)this << ": updateUnusedMemEstimation -= " << unusedPsMem << "\n" );
+         updateUnusedMemEstimation(-unusedPsMem);
       }
 
+      // if the missing memory can be acquired by packing the memory, we prefer this to allocating new memory
+      int missingMem = (memSize() + n - memMax());
+      ///@todo use an independent parameter "memwastefactor" here
+      if( missingMem > 0 && missingMem <= unusedMem && unusedMem > (SVSetBaseArray::memFactor - 1.0) * memMax() )
+         memPack();
+
+      // if the unused memory was overestimated and packing did not help, we need to reallocate
       if( memSize() + n > memMax() )
       {
          int newMax = int(SVSetBaseArray::memFactor * memMax());
@@ -199,6 +239,10 @@ private:
       if( ps == list.last() )
       {
          SVSetBaseArray::removeLast(ps->max());
+
+         // decrease counter of unused memory
+         MSG_DEBUG( spxout << "deleteVec (1), this = " << (void*)this << ": updateUnusedMemEstimation -= " << ps->max() - ps->size() << "\n" );
+         updateUnusedMemEstimation(ps->size() - ps->max());
       }
       /* merge space of predecessor with position which will be deleted, therefore we do not need to delete any memory
        * or do an expensive memory reallocation
@@ -210,38 +254,19 @@ private:
 
          prev->setMem(prev->max() + ps->max(), prev->mem());
          prev->set_size(sz);
+
+         // increase counter of unused memory
+         MSG_DEBUG( spxout << "deleteVec (2), this = " << (void*)this << ": updateUnusedMemEstimation += " << ps->size() << "\n" );
+         updateUnusedMemEstimation(ps->size());
       }
-      /* delete the front entries of the first list entry and correct the memory pointers in the vectors; we do this by
-       * merging the first both vectors, move the entries from the second vector up front, and correcting the size
+      /* simply remove the front entries; we do not shift the second vector to the front, because we count the unused
+       * memory exactly and rely on the automatic call of memPack()
        */
       else
       {
-
-         /* the first element does not necessarily start at the beginning of the data array, because if the first vector
-          * is extended, see xtend(), it is shifted to the end leaving unused memory behind; here we determine this
-          * offset
-          */
-         int offset = 0;
-         while( &(this->SVSetBaseArray::operator[](offset)) != ps->mem() )
-         {
-            ++offset;
-            assert(offset < SVSetBaseArray::size());
-         }
-
-         /* move all entries of the second vector to the very front */
-         SVectorBase<R>* next = ps->next();
-         int sz = next->size();
-         for( int j = 0; j < sz; ++j )
-         {
-            this->SVSetBaseArray::operator[](j) = next->mem()[j];
-         }
-
-         /* correct the data memory pointer and the maximal space */
-         int bothmax = next->max() + ps->max() + offset;
-         next->setMem(bothmax, &(this->SVSetBaseArray::operator[](0)));
-
-         /* correct size */
-         next->set_size(sz);
+         // increase counter of unused memory
+         MSG_DEBUG( spxout << "deleteVec (3), this = " << (void*)this << ": updateUnusedMemEstimation += " << ps->size() << "\n" );
+         updateUnusedMemEstimation(ps->size());
       }
 
       list.remove(ps);
@@ -261,8 +286,11 @@ public:
     */
    void add(const SVectorBase<R>& svec)
    {
+      // create empty vector
       ensurePSVec(1);
       SVectorBase<R>* new_svec = create(svec.size());
+
+      // assign values
       *new_svec = svec;
    }
 
@@ -274,13 +302,16 @@ public:
     */
    void add(DataKey& nkey, const SVectorBase<R>& svec)
    {
+      // create empty vector
       ensurePSVec(1);
       SVectorBase<R>* new_svec = create(nkey, svec.size());
+
+      // assign values
       *new_svec = svec;
    }
 
    /// Adds all \p n SVectorBase%s in the array \p svec to the %set.
-   /** @pre \p svec must be not larger than \p n.
+   /** @pre \p svec must hold at least \p n entries.
     */
    void add(const SVectorBase<R> svec[], int n)
    {
@@ -314,7 +345,7 @@ public:
          nkey[n] = key(i);
    }
 
-   /// Adds all SVectorBase%s in \p pset to an SVSetBase.
+   /// Adds all SVectorBase%s in \p pset to SVSetBase.
    template < class S >
    void add(const SVSetBase<S>& pset)
    {
@@ -355,24 +386,24 @@ public:
    /// Creates new SVectorBase in %set.
    /** The new SVectorBase will be ready to fit at least \p idxmax nonzeros.
     */
-   SVectorBase<R>* create(int idxmax = -1)
+   SVectorBase<R>* create(int idxmax = 0)
    {
       DLPSV* ps;
 
-      if( idxmax <= 0 )
+      if( idxmax < 0 )
+         idxmax = 0;
+
+      if( memSize() == 0 && idxmax <= 0 )
          idxmax = 1;
 
       ensureMem(idxmax);
-      ensurePSVec(1);
-
-      assert(idxmax > 0);
-      assert(memMax() >= memSize() + idxmax);
-
-      ps = set.create();
-      list.append(ps);
 
       // resize the data array
       SVSetBaseArray::reSize(memSize() + idxmax);
+
+      ensurePSVec(1);
+      ps = set.create();
+      list.append(ps);
 
       ps->setMem(idxmax, &SVSetBaseArray::last() - idxmax + 1);
 
@@ -400,18 +431,20 @@ public:
    {
       if( svec.max() < newmax )
       {
-         if( possiblyUnusedMem * SVSetBaseArray::memFactor > memSize() )
-            memPack();
-
          assert(has(&svec));
 
          DLPSV* ps = static_cast<DLPSV*>(&svec);
+         int sz = ps->size();
 
          if( ps == list.last() )
          {
-            int sz = ps->size();
             ensureMem(newmax - ps->max());
             SVSetBaseArray::insert(memSize(), newmax - ps->max());
+
+            // decrease counter of unused memory (assume that new entries will be used)
+            MSG_DEBUG( spxout << "xtend (1), this = " << (void*)this << ": updateUnusedMemEstimation -= " << ps->max() - sz << "\n" );
+            updateUnusedMemEstimation(sz - ps->max());
+
             ps->setMem(newmax, ps->mem());
             ps->set_size(sz);
          }
@@ -419,7 +452,6 @@ public:
          {
             ensureMem(newmax);
             SVectorBase<R> newps(newmax, &SVSetBaseArray::last() + 1);
-            int sz = ps->size();
             SVSetBaseArray::insert(memSize(), newmax);
             newps = svec;
 
@@ -429,9 +461,11 @@ public:
                int prevsz = prev->size();
                prev->setMem(prev->max() + ps->max(), prev->mem());
                prev->set_size(prevsz);
-
-               possiblyUnusedMem += ps->max();
             }
+
+            // increase counter of unused memory (assume that new entries will be used)
+            MSG_DEBUG( spxout << "xtend (2), this = " << (void*)this << ": updateUnusedMemEstimation += " << ps->size() << "\n" );
+            updateUnusedMemEstimation(ps->size());
 
             list.remove(ps);
             list.append(ps);
@@ -575,6 +609,8 @@ public:
       SVSetBaseArray::reMax(10000);
       set.clear();
       list.clear();
+      unusedMem = 0;
+      numUnusedMemUpdates = 0;
    }
 
    //@}
@@ -692,6 +728,9 @@ public:
 
       if( delta != 0 )
       {
+         MSG_DEBUG( spxout << "counting unused memory (unusedMem = " << unusedMem << ", numUnusedMemUpdates = " << numUnusedMemUpdates << ", this = " << (void*)this << ")\n" );
+
+         int used = 0;
          for( DLPSV* ps = list.first(); ps; ps = list.next(ps) )
          {
             // get new shifted nonzero memory of the SVectorBase
@@ -705,7 +744,16 @@ public:
             // set new nonzero memory
             ps->setMem(l_max, newmem);
             ps->set_size(sz);
+
+            // count used memory
+            used += sz;
          }
+
+         // update estimation of unused memory to exact value
+         unusedMem = memSize() - used;
+         numUnusedMemUpdates = 0;
+
+         MSG_DEBUG( spxout << "               --> NEW: unusedMem = " << unusedMem << " after memRemax(" << newmax << ")\n" );
       }
    }
 
@@ -744,9 +792,13 @@ public:
          used += sz;
       }
 
+      MSG_DEBUG( spxout << "counting unused memory (unusedMem = " << unusedMem << ", numUnusedMemUpdates = " << numUnusedMemUpdates << ", this = " << (void*)this << ")\n" );
+      MSG_DEBUG( spxout << "               --> NEW: unusedMem = " << memSize() - used << ", zero after memPack() at memMax() = "<< memMax() << "\n" );
+
       SVSetBaseArray::reSize(used);
 
-      possiblyUnusedMem = 0;
+      unusedMem = 0;
+      numUnusedMemUpdates = 0;
    }
 
    //@}
@@ -799,7 +851,8 @@ public:
    SVSetBase<R>(int pmax = -1, int pmemmax = -1, double pfac = 1.1, double pmemFac = 1.2)
       : SVSetBaseArray(0, (pmemmax > 0) ? pmemmax : 8 * ((pmax > 0) ? pmax : 8), pmemFac)
       , set((pmax > 0) ? pmax : 8)
-      , possiblyUnusedMem(0)
+      , unusedMem(0)
+      , numUnusedMemUpdates(0)
       , factor(pfac)
    {
       assert(isConsistent());
@@ -864,7 +917,8 @@ public:
    /// Copy constructor.
    SVSetBase<R>(const SVSetBase<R>& old)
       : SVSetBaseArray()
-      , possiblyUnusedMem(old.possiblyUnusedMem)
+      , unusedMem(old.unusedMem)
+      , numUnusedMemUpdates(old.numUnusedMemUpdates)
       , factor(old.factor)
    {
       *this = old;
@@ -876,7 +930,8 @@ public:
    template < class S >
    SVSetBase<R>(const SVSetBase<S>& old)
       : SVSetBaseArray()
-      , possiblyUnusedMem(old.possiblyUnusedMem)
+      , unusedMem(old.unusedMem)
+      , numUnusedMemUpdates(numUnusedMemUpdates)
       , factor(old.factor)
    {
       *this = old;
