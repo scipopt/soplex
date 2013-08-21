@@ -208,6 +208,11 @@ namespace soplex
 
       ///@todo set status to ABORT_VALUE if optimal solution exceeds objective limit
 
+      // if the problem has been found to be infeasible and an approximate Farkas proof is available, we compute a
+      // scaled unit box around the origin that provably contains no feasible solution
+      if( _solRational.hasDualfarkas() )
+         _computeInfeasBox(_solRational);
+
       // undo lifting
       if( boolParam(SoPlex2::LIFTING) )
          _project(_solRational);
@@ -1499,76 +1504,108 @@ namespace soplex
       assert(!sol._hasPrimal || sol._slacks == _rationalLP->computePrimalActivity(sol._primal));
    }
 
-   /// compute radius of infeasibility box implied by an approximate Farkas' proof
+   /// computes radius of infeasibility box implied by an approximate Farkas' proof
+   ///
+   /// Given constraints of the form \f$ lhs <= Ax <= rhs \f$, a farkas proof y should satisfy \f$ y^T A = 0 \f$ and \f$
+   /// y_+^T lhs - y_-^T rhs > 0 \f$, where \f$ y_+, y_- \f$ denote the positive and negative parts of \f$ y \f$.  If
+   /// \f$ y \f$ is approximate, it may not satisfy \f$y^T A = 0 \f$ exactly, but the proof is still valid as long as
+   /// the following holds for all potentially feasible \f$ x \f$:
+   ///
+   /// \f[
+   ///    y^T Ax < (y_+^T lhs - y_-^T rhs)              (*)
+   /// \f]
+   ///
+   /// we may therefore calculate \f$ y^T A \f$ and \f$ (y_+^T lhs - y_-^T rhs) exactly and check if the upper and lower
+   /// bounds on \f$ x \f$ imply that all feasible \f$ x \f$ satisfy (*), and if not then compute bounds on \f$ x \f$ to
+   /// guarantee (*).  The simplest way to do this is to compute
+   ///
+   /// \f[
+   ///    B = (y_+^T lhs - y_-^T rhs) / \sum_i(|(y^T A)_i|)
+   /// \f]
+   ///
+   /// noting that if every component of \f$ x \f$ has \f$ |x_i| < B \f$, then (*) holds.
+   ///
+   /// Note: A bound tighter than \f$ B \f$ can be computed by using the available variable bound information.  The
+   /// speed of this method can be further improved by using interval arithmetic for all computations.  For related
+   /// information see Sec. 4 of Neumaier and Shcherbina, Mathematical Programming A, 2004.
    void SoPlex2::_computeInfeasBox(SolRational& sol)
    {
-      // Given constraints of the form  b_l <= Ax <= b_r a farkas proof y should
-      // satisfy y^TA = 0 and (y(+)^T b_l - y(-)^T b_r) > 0 where (+),(-) denote
-      // the positive and negative parts of y.  If y is approximate, it may not
-      // satisfy y^TA = 0 exactly, but the proof is still valid as long as the
-      // following holds for all potentially feasible x:
-      //
-      //        y^TAx < (y(+)^T b_l - y(-)^T b_r)              (*)
-      //
-      // we may therefore calculate y^TA and (y(+)^T b_l - y(-)^T b_r) exactly
-      // and check if the upper and lower bounds on x imply that all feasible x
-      // satisfy (*), and if not then compute bounds on x to guarantee (*).
-      // The simplest way to do this is to compute
-      //        B = (y(+)^T b_l - y(-)^T b_r) / Sum_i(|(y^TA)_i|)
-      // noting that if every component of x has |x_i| < B, then (*) holds.
-      //
-      // Note: A bound tighter than B can be computed by using the available
-      // variable bound information.
-      // The speed of this method can be further improved by using interval
-      // arithmetic for all computations.
-      // For related information see Sec. 4 of Neumaier and Shcherbina (2004 MPA)
-
       assert(sol.hasDualfarkas());
 
-      Rational ytransb; // stores (y(+)^T b_l - y(-)^T b_r)
-      DVectorRational ytransA(numColsRational());
-      DVectorRational y(numRowsRational());
+      const VectorRational& y = sol._dualfarkas;
+      const int numRows = numRowsRational();
+      const int numCols = numColsRational();
+
+      DVectorRational ytransA(numCols);
+      Rational ytransb;
       Rational B;
       Rational temp;
 
-      y = sol._dualfarkas;
-
-      for( int r = 0; r < numRowsRational(); r++ )
+      // aggregate rows and sides using the multipliers of the Farkas ray
+      for( int r = 0; r < numRows; r++ )
       {
-         ytransA.multAdd(y[r], _rationalLP->rowVector(r));
-         (y[r] > 0) ? ytransb += y[r] * lhsRational(r) : ytransb += y[r] * rhsRational(r);
+         // do not use SSVectorRational::multAdd(), since this currently ignores entries below the zero tolerance
+         ytransA += y[r] * _rationalLP->rowVector(r);
+         ytransb += y[r] * (y[r] > 0 ? lhsRational(r) : rhsRational(r));
       }
-      spxout << "ytransb = " << rationalToString(ytransb) << std::endl;
 
+      MSG_DEBUG( spxout << "ytransb = " << rationalToString(ytransb) << "\n" );
+
+      // if we choose minus ytransb as vector of multipliers for the bound constraints on the variables, we obtain an
+      // exactly feasible dual solution for the LP with zero objective function; we aggregate the bounds of the
+      // variables accordingly and store its negation in temp
       temp = 0;
-      for( int c = 0; c < numColsRational(); c++ )
+      bool isTempFinite = true;
+      for( int c = 0; c < numCols && isTempFinite; c++ )
       {
-         (ytransA[c] > 0) ? temp += ytransA[c] * upperRational(c): temp += ytransA[c] * lowerRational(c);
-      }
-      spxout << "max ytransA*[x_l,x_u] = " << rationalToString(temp) << std::endl;
+         const Rational& minusRedCost = ytransA[c];
 
-      if( temp < ytransb )
+         if( minusRedCost > 0 )
+         {
+            if( upperRational(c) < realParam(SoPlex2::INFTY) )
+               temp += minusRedCost * upperRational(c);
+            else
+               isTempFinite = false;
+         }
+         else if( minusRedCost < 0 )
+         {
+            if( lowerRational(c) > -realParam(SoPlex2::INFTY) )
+               temp += minusRedCost * lowerRational(c);
+            else
+               isTempFinite = false;
+         }
+      }
+
+      MSG_DEBUG( spxout << "max ytransA*[x_l,x_u] = " << rationalToString(temp) << "\n" );
+
+      // ytransb - temp is the increase in the dual objective along the Farkas ray; if this is positive, the dual is
+      // unbounded and certifies primal infeasibility
+      if( isTempFinite && temp < ytransb )
       {
-         spxout << "Primal infeasible.  Farkas' proof verified exactly." << std::endl;
+         MSG_INFO1( spxout << "Farkas infeasibility proof verified exactly.\n" );
          return;
       }
 
       if( ytransb <= 0 )
       {
-         spxout << "No infeasibility box available, Farkas' proof is no good." << std::endl;
+         MSG_INFO1( spxout << "Could not compute infeasibility box.\n" );
          return;
       }
 
+      // compute the one norm of ytransA
       temp = 0;
-      for( int c = 0; c < numColsRational(); c++ )
+      for( int c = 0; c < numCols; c++ )
       {
          temp += (ytransA[c] > 0) ? ytransA[c]: -ytransA[c];
       }
+
+      // if the one norm is zero then ytransA is zero the Farkas proof should have been verified above
       assert(temp !=0);
 
       B = ytransb/temp;
-      spxout << "Infeasibility box available, no feas. solutions with any compoents less than "
-             << rationalToString(B) << std::endl;
+
+      MSG_INFO1( spxout << "Provably no solutions with components less than " << rationalToString(B)
+         << " in absolute value.\n" );
    }
 } // namespace soplex
 
