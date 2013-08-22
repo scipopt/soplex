@@ -156,11 +156,11 @@ public:
    {
       METHOD( "SPxLPBase::maxAbsNzo()" );
 
-      Real maxi = 0.0;
+      R maxi = 0.0;
 
       for( int i = 0; i < nCols(); ++i )
       {
-         Real m = colVector(i).maxAbs();
+         R m = colVector(i).maxAbs();
 
          if( m > maxi )
             maxi = m;
