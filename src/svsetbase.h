@@ -931,7 +931,7 @@ public:
    SVSetBase<R>(const SVSetBase<S>& old)
       : SVSetBaseArray()
       , unusedMem(old.unusedMem)
-      , numUnusedMemUpdates(numUnusedMemUpdates)
+      , numUnusedMemUpdates(old.numUnusedMemUpdates)
       , factor(old.factor)
    {
       *this = old;
