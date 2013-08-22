@@ -190,6 +190,26 @@ namespace soplex
             case SPxSolver::RUNNING:
             case SPxSolver::UNBOUNDED:
             case SPxSolver::INFEASIBLE:
+               // if simplifier is active we cannot return a Farkas ray currently
+               if( _simplifier != 0 )
+                  break;
+
+               // return Farkas ray as dual solution
+               _solver.getDualfarkas(dual);
+
+               // unscale vectors w.r.t. second scaler
+               if( _secondScaler != 0 )
+                  _secondScaler->unscaleDual(dual);
+
+               // unscale vectors w.r.t. first scaler
+               if( _firstScaler != 0 )
+                  _firstScaler->unscaleDual(dual);
+
+               // if the original problem is not in the solver because of scaling, we also need to store the basis
+               _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr());
+
+               break;
+
             case SPxSolver::INForUNBD:
             case SPxSolver::SINGULAR:
             default:

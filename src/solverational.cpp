@@ -282,6 +282,8 @@ namespace soplex
          break;
       case SPxSolver::INFEASIBLE:
          MSG_INFO1( spxout << "Floating-point infeasible.\n" );
+         sol._dualfarkas = dualReal;
+         sol._hasDualfarkas = true;
          infeasible = true;
          return;
       case SPxSolver::UNBOUNDED:
@@ -506,6 +508,8 @@ namespace soplex
             break;
          case SPxSolver::INFEASIBLE:
             MSG_INFO1( spxout << "Floating-point infeasible.\n" );
+            sol._dualfarkas = dualReal;
+            sol._hasDualfarkas = true;
             infeasible = true;
             return;
          case SPxSolver::UNBOUNDED:
@@ -655,6 +659,9 @@ namespace soplex
       bool dualFeasible;
       bool infeasible;
       bool unbounded;
+
+      ///@todo check whether approximate Farkas proof can be used
+      _computeInfeasBox(_solRational);
 
       // remove objective function, shift, homogenize
       _transformFeasibility();
