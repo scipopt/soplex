@@ -26,6 +26,8 @@
 namespace soplex
 {
 typedef SSVectorBase<Real> SSVector;
+typedef SSVectorBase<Real> SSVectorReal;
+typedef SSVectorBase<Rational> SSVectorRational;
 } // namespace soplex
 #endif // _SSVECTOR_H_
 

@@ -208,14 +208,14 @@ namespace soplex
 
       ///@todo set status to ABORT_VALUE if optimal solution exceeds objective limit
 
+      // undo lifting
+      if( boolParam(SoPlex2::LIFTING) )
+         _project(_solRational);
+
       // if the problem has been found to be infeasible and an approximate Farkas proof is available, we compute a
       // scaled unit box around the origin that provably contains no feasible solution
       if( _solRational.hasDualfarkas() )
          _computeInfeasBox(_solRational);
-
-      // undo lifting
-      if( boolParam(SoPlex2::LIFTING) )
-         _project(_solRational);
 
       // restore original problem
       _untransformEquality(_solRational);
@@ -1532,9 +1532,9 @@ namespace soplex
    ///
    /// noting that if every component of \f$ x \f$ has \f$ |x_i| < B \f$, then (*) holds.
    ///
-   /// Note: A bound tighter than \f$ B \f$ can be computed by using the available variable bound information.  The
-   /// speed of this method can be further improved by using interval arithmetic for all computations.  For related
-   /// information see Sec. 4 of Neumaier and Shcherbina, Mathematical Programming A, 2004.
+   /// \f$ B \f$ can be increased by iteratively including variable bounds smaller than \f$ B \f$.  The speed of this
+   /// method can be further improved by using interval arithmetic for all computations.  For related information see
+   /// Sec. 4 of Neumaier and Shcherbina, Mathematical Programming A, 2004.
    void SoPlex2::_computeInfeasBox(SolRational& sol)
    {
       assert(sol.hasDualfarkas());
@@ -1543,15 +1543,19 @@ namespace soplex
       const int numRows = numRowsRational();
       const int numCols = numColsRational();
 
-      DVectorRational ytransA(numCols);
+      SSVectorRational ytransA(numCols);
       Rational ytransb;
-      Rational B;
       Rational temp;
+
+      // prepare ytransA and ytransb; since we want exact arithmetic, we set the zero threshold of the semi-sparse
+      // vector to zero
+      ytransA.setEpsilon(0);
+      ytransA.clear();
+      ytransb = 0;
 
       // aggregate rows and sides using the multipliers of the Farkas ray
       for( int r = 0; r < numRows; r++ )
       {
-         // do not use SSVectorRational::multAdd(), since this currently ignores entries below the zero tolerance
          ytransA += y[r] * _rationalLP->rowVector(r);
          ytransb += y[r] * (y[r] > 0 ? lhsRational(r) : rhsRational(r));
       }
@@ -1569,50 +1573,177 @@ namespace soplex
 
          if( minusRedCost > 0 )
          {
-            if( upperRational(c) < realParam(SoPlex2::INFTY) )
+            if( upperRational(c) < double(realParam(SoPlex2::INFTY)) )
                temp += minusRedCost * upperRational(c);
             else
                isTempFinite = false;
          }
          else if( minusRedCost < 0 )
          {
-            if( lowerRational(c) > -realParam(SoPlex2::INFTY) )
+            if( lowerRational(c) > double(-realParam(SoPlex2::INFTY)) )
                temp += minusRedCost * lowerRational(c);
             else
                isTempFinite = false;
          }
       }
 
-      MSG_DEBUG( spxout << "max ytransA*[x_l,x_u] = " << rationalToString(temp) << "\n" );
+      MSG_DEBUG( spxout << "max ytransA*[x_l,x_u] = " << (isTempFinite ? rationalToString(temp) : "infinite") << "\n" );
 
       // ytransb - temp is the increase in the dual objective along the Farkas ray; if this is positive, the dual is
       // unbounded and certifies primal infeasibility
       if( isTempFinite && temp < ytransb )
       {
-         MSG_INFO1( spxout << "Farkas infeasibility proof verified exactly.\n" );
+         MSG_INFO1( spxout << "Farkas infeasibility proof verified exactly. (1)\n" );
          return;
       }
 
-      if( ytransb <= 0 )
+      // ensure that array of nonzero elements in ytransA is available
+      assert(ytransA.isSetup());
+      ytransA.setup();
+
+      // if ytransb is negative, try to make it zero by including a positive lower bound or a negative upper bound
+      if( ytransb < 0 )
       {
-         MSG_INFO1( spxout << "Could not compute infeasibility box.\n" );
+         for( int c = 0; c < numCols; c++ )
+         {
+            if( lowerRational(c) > 0 )
+            {
+               ytransA.setValue(c, ytransA[c] - ytransb / lowerRational(c));
+               ytransb = 0;
+               break;
+            }
+            else if( upperRational(c) < 0 )
+            {
+               ytransA.setValue(c, ytransA[c] - ytransb / upperRational(c));
+               ytransb = 0;
+               break;
+            }
+         }
+      }
+
+      // if ytransb is still zero then the zero solution is inside the bounds and cannot be cut off by the Farkas
+      // constraint; in this case, we cannot compute a Farkas box
+      if( ytransb < 0 )
+      {
+         MSG_INFO1( spxout << "Approximate Farkas proof to weak.  Could not compute Farkas box. (1)\n" );
          return;
       }
 
       // compute the one norm of ytransA
       temp = 0;
-      for( int c = 0; c < numCols; c++ )
-      {
-         temp += (ytransA[c] > 0) ? ytransA[c]: -ytransA[c];
-      }
+      const int size = ytransA.size();
+      for( int n = 0; n < size; n++ )
+         temp += abs(ytransA.value(n));
 
       // if the one norm is zero then ytransA is zero the Farkas proof should have been verified above
       assert(temp !=0);
 
-      B = ytransb/temp;
+      // initialize variables in loop: size of Farkas box B, flag whether B has been increased, and number of current
+      // nonzero in ytransA
+      Rational B = ytransb / temp;
+      bool success = false;
+      int n = 0;
 
-      MSG_INFO1( spxout << "Provably no solutions with components less than " << rationalToString(B)
-         << " in absolute value.\n" );
+      // loop through nonzeros of ytransA
+      MSG_DEBUG( spxout << "B = " << rationalToString(B) << "\n" );
+      assert(ytransb >= 0);
+
+      while( true )
+      {
+         // if all nonzeros have been inspected once without increasing B, we abort; otherwise, we start another round
+         if( n >= ytransA.size() )
+         {
+            if( !success )
+               break;
+
+            success = false;
+            n = 0;
+         }
+
+         // get Farkas multiplier of the bound constraint as minus the value in ytransA
+         const Rational& minusRedCost = ytransA.value(n);
+         int colIdx = ytransA.index(n);
+
+         // if the multiplier is positive we inspect the lower bound: if it is finite and within the Farkas box, we can
+         // increase B by including it in the Farkas proof
+         if( minusRedCost < 0 && lowerRational(colIdx) > -B && lowerRational(colIdx) > double(-realParam(SoPlex2::INFTY)) )
+         {
+            ytransA.clearNum(n);
+            ytransb -= minusRedCost * lowerRational(colIdx);
+            temp += minusRedCost;
+
+            assert(ytransb >= 0);
+            assert(temp >= 0);
+            assert(temp == 0 || ytransb / temp > B);
+
+            // if ytransA and ytransb are zero, we have 0^T x >= 0 and cannot compute a Farkas box
+            if( temp == 0 && ytransb == 0 )
+            {
+               MSG_INFO1( spxout << "Approximate Farkas proof to weak.  Could not compute Farkas box. (2)\n" );
+               return;
+            }
+            // if ytransb is positive and ytransA is zero, we have 0^T x > 0, proving infeasibility
+            else if( temp == 0 )
+            {
+               assert(ytransb > 0);
+               MSG_INFO1( spxout << "Farkas infeasibility proof verified exactly. (2)\n" );
+               return;
+            }
+            else
+            {
+               B = ytransb / temp;
+               MSG_DEBUG( spxout << "B = " << rationalToString(B) << "\n" );
+            }
+
+            success = true;
+         }
+         // if the multiplier is negative we inspect the upper bound: if it is finite and within the Farkas box, we can
+         // increase B by including it in the Farkas proof
+         else if( minusRedCost > 0 && upperRational(colIdx) < B && upperRational(colIdx) < double(realParam(SoPlex2::INFTY)) )
+         {
+            ytransA.clearNum(n);
+            ytransb -= minusRedCost * upperRational(colIdx);
+            temp -= minusRedCost;
+
+            assert(ytransb >= 0);
+            assert(temp >= 0);
+            assert(temp == 0 || ytransb / temp > B);
+
+            // if ytransA and ytransb are zero, we have 0^T x >= 0 and cannot compute a Farkas box
+            if( temp == 0 && ytransb == 0 )
+            {
+               MSG_INFO1( spxout << "Approximate Farkas proof to weak.  Could not compute Farkas box. (2)\n" );
+               return;
+            }
+            // if ytransb is positive and ytransA is zero, we have 0^T x > 0, proving infeasibility
+            else if( temp == 0 )
+            {
+               assert(ytransb > 0);
+               MSG_INFO1( spxout << "Farkas infeasibility proof verified exactly. (2)\n" );
+               return;
+            }
+            else
+            {
+               B = ytransb / temp;
+               MSG_DEBUG( spxout << "B = " << rationalToString(B) << "\n" );
+            }
+
+            success = true;
+         }
+         // the multiplier is zero, we can ignore the bound constraints on this variable
+         else if( minusRedCost == 0 )
+            ytransA.clearNum(n);
+         // currently this bound cannot be used to increase B; we will check it again in the next round, because B might
+         // have increased by then
+         else
+            n++;
+      }
+
+      if( B > 0 )
+      {
+         MSG_INFO1( spxout << "Computed Farkas box: provably no feasible solutions with components less than "
+            << rationalToString(B) << " in absolute value.\n" );
+      }
    }
 } // namespace soplex
 

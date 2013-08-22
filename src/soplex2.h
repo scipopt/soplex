@@ -1527,9 +1527,9 @@ private:
    ///
    /// noting that if every component of \f$ x \f$ has \f$ |x_i| < B \f$, then (*) holds.
    ///
-   /// Note: A bound tighter than \f$ B \f$ can be computed by using the available variable bound information.  The
-   /// speed of this method can be further improved by using interval arithmetic for all computations.  For related
-   /// information see Sec. 4 of Neumaier and Shcherbina, Mathematical Programming A, 2004.
+   /// \f$ B \f$ can be increased by iteratively including variable bounds smaller than \f$ B \f$.  The speed of this
+   /// method can be further improved by using interval arithmetic for all computations.  For related information see
+   /// Sec. 4 of Neumaier and Shcherbina, Mathematical Programming A, 2004.
    void _computeInfeasBox(SolRational& sol);
 
    //@}

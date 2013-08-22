@@ -306,7 +306,7 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
       {
          j = vec.index(i);
 
-         if( v[j] )
+         if( v[j] != 0 )
          {
             x = v[j] + xx * vec.value(i);
             if( isNotZero(x, epsilon) )
