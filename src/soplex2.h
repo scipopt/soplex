@@ -1521,7 +1521,9 @@ private:
    /// \f$ B \f$ can be increased by iteratively including variable bounds smaller than \f$ B \f$.  The speed of this
    /// method can be further improved by using interval arithmetic for all computations.  For related information see
    /// Sec. 4 of Neumaier and Shcherbina, Mathematical Programming A, 2004.
-   void _computeInfeasBox(SolRational& sol);
+   ///
+   /// Set transformed to true if this method is called after _transformFeasibility().
+   void _computeInfeasBox(SolRational& sol, bool transformed);
 
    //@}
 

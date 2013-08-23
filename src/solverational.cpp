@@ -213,9 +213,10 @@ namespace soplex
          _project(_solRational);
 
       // if the problem has been found to be infeasible and an approximate Farkas proof is available, we compute a
-      // scaled unit box around the origin that provably contains no feasible solution
+      // scaled unit box around the origin that provably contains no feasible solution; this currently only works for
+      // equality form
       if( _solRational.hasDualfarkas() )
-         _computeInfeasBox(_solRational);
+         _computeInfeasBox(_solRational, false);
 
       // restore original problem
       _untransformEquality(_solRational);
@@ -661,7 +662,7 @@ namespace soplex
       bool unbounded;
 
       ///@todo check whether approximate Farkas proof can be used
-      _computeInfeasBox(_solRational);
+      _computeInfeasBox(_solRational, false);
 
       // remove objective function, shift, homogenize
       _transformFeasibility();
@@ -671,6 +672,9 @@ namespace soplex
 
       // perform iterative refinement
       _performOptIRStable(sol, false, false, primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
+
+      ///@todo check whether we can compute a sufficiently large Farkas box; otherwise call _performOptIRStable() again
+      _computeInfeasBox(_solRational, true);
 
       // the feasibility problem should always be solved to optimality
       if( error || unbounded || infeasible || !primalFeasible || !dualFeasible )
@@ -1524,15 +1528,22 @@ namespace soplex
    /// \f$ B \f$ can be increased by iteratively including variable bounds smaller than \f$ B \f$.  The speed of this
    /// method can be further improved by using interval arithmetic for all computations.  For related information see
    /// Sec. 4 of Neumaier and Shcherbina, Mathematical Programming A, 2004.
-   void SoPlex2::_computeInfeasBox(SolRational& sol)
+   ///
+   /// Set transformed to true if this method is called after _transformFeasibility().
+   void SoPlex2::_computeInfeasBox(SolRational& sol, bool transformed)
    {
       assert(sol.hasDualfarkas());
 
+      const VectorRational& lower = transformed ? _feasLower : lowerRational();
+      const VectorRational& upper = transformed ? _feasUpper : upperRational();
+      const VectorRational& lhs = transformed ? _feasSide : lhsRational();
+      const VectorRational& rhs = transformed ? _feasSide : rhsRational();
       const VectorRational& y = sol._dualfarkas;
-      const int numRows = numRowsRational();
-      const int numCols = numColsRational();
 
-      SSVectorRational ytransA(numCols);
+      const int numRows = numRowsRational();
+      const int numCols = transformed ? numColsRational() - 1 : numColsRational();
+
+      SSVectorRational ytransA(numColsRational());
       Rational ytransb;
       Rational temp;
 
@@ -1542,12 +1553,17 @@ namespace soplex
       ytransA.clear();
       ytransb = 0;
 
+      ///@todo this currently works only if all constraints are equations
       // aggregate rows and sides using the multipliers of the Farkas ray
       for( int r = 0; r < numRows; r++ )
       {
          ytransA += y[r] * _rationalLP->rowVector(r);
-         ytransb += y[r] * (y[r] > 0 ? lhsRational(r) : rhsRational(r));
+         ytransb += y[r] * (y[r] > 0 ? lhs[r] : rhs[r]);
       }
+
+      // if we work on the feasibility problem, we ignore the last column
+      if( transformed )
+         ytransA.reDim(numCols);
 
       MSG_DEBUG( spxout << "ytransb = " << rationalToString(ytransb) << "\n" );
 
@@ -1562,15 +1578,15 @@ namespace soplex
 
          if( minusRedCost > 0 )
          {
-            if( upperRational(c) < double(realParam(SoPlex2::INFTY)) )
-               temp += minusRedCost * upperRational(c);
+            if( upper[c] < double(realParam(SoPlex2::INFTY)) )
+               temp += minusRedCost * upper[c];
             else
                isTempFinite = false;
          }
          else if( minusRedCost < 0 )
          {
-            if( lowerRational(c) > double(-realParam(SoPlex2::INFTY)) )
-               temp += minusRedCost * lowerRational(c);
+            if( lower[c] > double(-realParam(SoPlex2::INFTY)) )
+               temp += minusRedCost * lower[c];
             else
                isTempFinite = false;
          }
@@ -1595,15 +1611,15 @@ namespace soplex
       {
          for( int c = 0; c < numCols; c++ )
          {
-            if( lowerRational(c) > 0 )
+            if( lower[c] > 0 )
             {
-               ytransA.setValue(c, ytransA[c] - ytransb / lowerRational(c));
+               ytransA.setValue(c, ytransA[c] - ytransb / lower[c]);
                ytransb = 0;
                break;
             }
-            else if( upperRational(c) < 0 )
+            else if( upper[c] < 0 )
             {
-               ytransA.setValue(c, ytransA[c] - ytransb / upperRational(c));
+               ytransA.setValue(c, ytransA[c] - ytransb / upper[c]);
                ytransb = 0;
                break;
             }
@@ -1655,10 +1671,10 @@ namespace soplex
 
          // if the multiplier is positive we inspect the lower bound: if it is finite and within the Farkas box, we can
          // increase B by including it in the Farkas proof
-         if( minusRedCost < 0 && lowerRational(colIdx) > -B && lowerRational(colIdx) > double(-realParam(SoPlex2::INFTY)) )
+         if( minusRedCost < 0 && lower[colIdx] > -B && lower[colIdx] > double(-realParam(SoPlex2::INFTY)) )
          {
             ytransA.clearNum(n);
-            ytransb -= minusRedCost * lowerRational(colIdx);
+            ytransb -= minusRedCost * lower[colIdx];
             temp += minusRedCost;
 
             assert(ytransb >= 0);
@@ -1688,10 +1704,10 @@ namespace soplex
          }
          // if the multiplier is negative we inspect the upper bound: if it is finite and within the Farkas box, we can
          // increase B by including it in the Farkas proof
-         else if( minusRedCost > 0 && upperRational(colIdx) < B && upperRational(colIdx) < double(realParam(SoPlex2::INFTY)) )
+         else if( minusRedCost > 0 && upper[colIdx] < B && upper[colIdx] < double(realParam(SoPlex2::INFTY)) )
          {
             ytransA.clearNum(n);
-            ytransb -= minusRedCost * upperRational(colIdx);
+            ytransb -= minusRedCost * upper[colIdx];
             temp -= minusRedCost;
 
             assert(ytransb >= 0);
