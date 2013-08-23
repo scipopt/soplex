@@ -1359,10 +1359,14 @@ namespace soplex
       _feasObj.reDim(numColsRational());
       _rationalLP->getObj(_feasObj);
 
+      // store right-hand side and bounds
+      _feasSide = rhsRational();
+      _feasLower = lowerRational();
+      _feasUpper = upperRational();
+
       // set objective coefficients to zero; shift primal space such as to guarantee that the zero solution is within
       // the bounds
       DVectorRational shiftedSide(rhsRational());
-      _feasShiftValues.reDim(numColsRational());
 
       for( int c = numColsRational() - 1; c >= 0; c-- )
       {
@@ -1372,20 +1376,17 @@ namespace soplex
          if( lowerRational(c) > 0 )
          {
             shiftedSide -= (colVectorRational(c) * lowerRational(c));
-            _feasShiftValues[c] = lowerRational(c);
             _rationalLP->changeBounds(c, 0, upperRational(c) < double(realParam(SoPlex2::INFTY)) ? upperRational(c) - lowerRational(c) : upperRational(c));
             _realLP->changeBounds(c, 0.0, (Real)upperRational(c));
          }
          else if( upperRational(c) < 0 )
          {
             shiftedSide -= (colVectorRational(c) * upperRational(c));
-            _feasShiftValues[c] = upperRational(c);
             _rationalLP->changeBounds(c, lowerRational(c) > double(-realParam(SoPlex2::INFTY)) ? lowerRational(c) - upperRational(c) : lowerRational(c), 0);
             _realLP->changeBounds(c, (Real)lowerRational(c), 0.0);
          }
          else
          {
-            _feasShiftValues[c] = 0;
             _realLP->changeBounds(c, (Real)lowerRational(c), (Real)upperRational(c));
          }
 
@@ -1466,25 +1467,13 @@ namespace soplex
 
       // unshift primal space and restore objective coefficients
       const SVectorRational& colVector = _rationalLP->colVector(numOrigCols);
-      DVectorRational shiftedSide(numRowsRational());
-
-      shiftedSide.clear();
-      for( int i = colVector.size() - 1; i >= 0; i-- )
-         shiftedSide[colVector.index(i)] = -colVector.value(i);
 
       for( int c = numOrigCols - 1; c >= 0; c-- )
       {
-         Rational value = _feasShiftValues[c];
+         assert(upperRational(c) >= double(realParam(SoPlex2::INFTY)) || lowerRational(c) <= double(-realParam(SoPlex2::INFTY))
+            || _feasLower[c] - lowerRational(c) == _feasUpper[c] - upperRational(c));
 
-         assert(value == 0 || lowerRational(c) == 0 || upperRational(c) == 0);
-
-         shiftedSide += (colVectorRational(c) * value);
-         if( value != 0 )
-         {
-            _rationalLP->changeBounds(c, lowerRational(c) > double(-realParam(SoPlex2::INFTY)) ? lowerRational(c) + value : lowerRational(c),
-               upperRational(c) < double(realParam(SoPlex2::INFTY)) ? upperRational(c) + value : upperRational(c));
-         }
-
+         _rationalLP->changeBounds(c, _feasLower[c], _feasUpper[c]);
          _realLP->changeBounds(c, (Real)lowerRational(c), (Real)upperRational(c));
 
          _rationalLP->changeObj(c, _feasObj[c]);
@@ -1494,9 +1483,9 @@ namespace soplex
       }
 
       // restore right-hand side
-      DVectorReal shiftedSideReal(shiftedSide);
-      _rationalLP->changeRange(shiftedSide, shiftedSide);
-      _realLP->changeRange(shiftedSideReal, shiftedSideReal);
+      DVectorReal feasSideReal(_feasSide);
+      _rationalLP->changeRange(_feasSide, _feasSide);
+      _realLP->changeRange(feasSideReal, feasSideReal);
 
       // remove last column
       _rationalLP->removeCol(numOrigCols);
