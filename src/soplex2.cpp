@@ -164,15 +164,10 @@ namespace soplex
             _intParamDescription[SoPlex2::SIMPLIFIER] = "simplifier (0 - off, 1 - auto)";
             _intParamDefault[SoPlex2::SIMPLIFIER] = SoPlex2::SIMPLIFIER_AUTO;
 
-            // type of scaler applied before simplification
-            _intParamName[SoPlex2::SCALER_BEFORE_SIMPLIFIER] = "scaler_before_simplifier";
-            _intParamDescription[SoPlex2::SCALER_BEFORE_SIMPLIFIER] = "scaling before simplification (0 - off, 1 - uni-equilibrium, 2 - bi-equilibrium, 3 - geometric, 4 - iterated geometric)";
-            _intParamDefault[SoPlex2::SCALER_BEFORE_SIMPLIFIER] = SoPlex2::SCALER_BIEQUI;
-
-            // type of scaler applied after simplification
-            _intParamName[SoPlex2::SCALER_AFTER_SIMPLIFIER] = "scaler_after_simplifier";
-            _intParamDescription[SoPlex2::SCALER_AFTER_SIMPLIFIER] = "scaling after simplification (0 - off, 1 - uni-equilibrium, 2 - bi-equilibrium, 3 - geometric, 4 - iterated geometric)";
-            _intParamDefault[SoPlex2::SCALER_AFTER_SIMPLIFIER] = SoPlex2::SCALER_OFF;
+            // type of scaler
+            _intParamName[SoPlex2::SCALER] = "scaler";
+            _intParamDescription[SoPlex2::SCALER] = "scaling (0 - off, 1 - uni-equilibrium, 2 - bi-equilibrium, 3 - geometric, 4 - iterated geometric)";
+            _intParamDefault[SoPlex2::SCALER] = SoPlex2::SCALER_BIEQUI;
 
             // type of starter used to create crash basis
             _intParamName[SoPlex2::STARTER] = "starter";
@@ -371,17 +366,12 @@ namespace soplex
       : _rationalLP(0)
       , _statistics(0)
       , _currentSettings(0)
-      , _firstScalerUniequi(false)
-      , _firstScalerBiequi(true)
-      , _firstScalerGeo1(1)
-      , _firstScalerGeo8(8)
-      , _secondScalerUniequi(false)
-      , _secondScalerBiequi(true)
-      , _secondScalerGeo1(1)
-      , _secondScalerGeo8(8)
+      , _scalerUniequi(false)
+      , _scalerBiequi(true)
+      , _scalerGeo1(1)
+      , _scalerGeo8(8)
       , _simplifier(0)
-      , _firstScaler(0)
-      , _secondScaler(0)
+      , _scaler(0)
       , _starter(0)
       , _statusReal(SPxSolver::UNKNOWN)
       , _hasBasisReal(false)
@@ -434,14 +424,10 @@ namespace soplex
          _solver = rhs._solver;
          _slufactor = rhs._slufactor;
          _simplifierMainSM = rhs._simplifierMainSM;
-         _firstScalerUniequi = rhs._firstScalerUniequi;
-         _firstScalerBiequi = rhs._firstScalerBiequi;
-         _firstScalerGeo1 = rhs._firstScalerGeo1;
-         _firstScalerGeo8 = rhs._firstScalerGeo8;
-         _secondScalerUniequi = rhs._secondScalerUniequi;
-         _secondScalerBiequi = rhs._secondScalerBiequi;
-         _secondScalerGeo1 = rhs._secondScalerGeo1;
-         _secondScalerGeo8 = rhs._secondScalerGeo8;
+         _scalerUniequi = rhs._scalerUniequi;
+         _scalerBiequi = rhs._scalerBiequi;
+         _scalerGeo1 = rhs._scalerGeo1;
+         _scalerGeo8 = rhs._scalerGeo8;
          _starterWeight = rhs._starterWeight;
          _starterSum = rhs._starterSum;
          _starterVector = rhs._starterVector;
@@ -462,10 +448,9 @@ namespace soplex
          _basisStatusRowsRational = rhs._basisStatusRowsRational;
          _basisStatusColsRational = rhs._basisStatusColsRational;
 
-         // initialize pointers for simplifier, scalers, and starter
+         // initialize pointers for simplifier, scaler, and starter
          setIntParam(SoPlex2::SIMPLIFIER, intParam(SoPlex2::SIMPLIFIER), true, true);
-         setIntParam(SoPlex2::SCALER_BEFORE_SIMPLIFIER, intParam(SoPlex2::SCALER_BEFORE_SIMPLIFIER), true, true);
-         setIntParam(SoPlex2::SCALER_AFTER_SIMPLIFIER, intParam(SoPlex2::SCALER_AFTER_SIMPLIFIER), true, true);
+         setIntParam(SoPlex2::SCALER, intParam(SoPlex2::SCALER), true, true);
          setIntParam(SoPlex2::STARTER, intParam(SoPlex2::STARTER), true, true);
 
          // copy real LP if different from the LP in the solver
@@ -2878,12 +2863,12 @@ namespace soplex
 
       if( applyPreprocessing )
       {
-         _enableSimplifierAndScalers();
+         _enableSimplifierAndScaler();
          _solver.setTerminationValue(realParam(SoPlex2::INFTY));
       }
       else
       {
-         _disableSimplifierAndScalers();
+         _disableSimplifierAndScaler();
          ///@todo implement for both objective senses
          _solver.setTerminationValue(intParam(SoPlex2::OBJSENSE) == SoPlex2::OBJSENSE_MINIMIZE
             ? realParam(SoPlex2::OBJLIMIT_UPPER) : realParam(SoPlex2::INFTY));
@@ -2947,12 +2932,6 @@ namespace soplex
       assert(_realLP == &_solver || applyPreprocessing);
       assert(_realLP != &_solver || !applyPreprocessing);
 
-      // apply scaling before the simplification
-      if( _firstScaler != 0 )
-      {
-         _firstScaler->scale(_solver);
-      }
-
       // apply problem simplification
       SPxSimplifier::Result simplificationStatus = SPxSimplifier::OKAY;
       if( _simplifier != 0 )
@@ -2961,10 +2940,8 @@ namespace soplex
       }
 
       // apply scaling after the simplification
-      if( _secondScaler != 0 && simplificationStatus == SPxSimplifier::OKAY )
-      {
-         _secondScaler->scale(_solver);
-      }
+      if( _scaler != 0 && simplificationStatus == SPxSimplifier::OKAY )
+         _scaler->scale(_solver);
 
       // run the simplex method if problem has not been solved by the simplifier
       if( simplificationStatus == SPxSimplifier::OKAY )
@@ -3063,13 +3040,13 @@ namespace soplex
                   _solver.getDual(dual);
                   _solver.getRedCost(redcost);
 
-                  // unscale vectors w.r.t. second scaler
-                  if( _secondScaler != 0 )
+                  // unscale vectors
+                  if( _scaler != 0 )
                   {
-                     _secondScaler->unscalePrimal(primal);
-                     _secondScaler->unscaleSlacks(slacks);
-                     _secondScaler->unscaleDual(dual);
-                     _secondScaler->unscaleRedCost(redcost);
+                     _scaler->unscalePrimal(primal);
+                     _scaler->unscaleSlacks(slacks);
+                     _scaler->unscaleDual(dual);
+                     _scaler->unscaleRedCost(redcost);
                   }
 
                   // get basis of transformed problem
@@ -3212,12 +3189,9 @@ namespace soplex
          {
             _solver.getPrimal(vector);
 
-            if( _secondScaler != 0 )
-               _secondScaler->unscalePrimal(vector);
+            if( _scaler != 0 )
+               _scaler->unscalePrimal(vector);
          }
-
-         if( _firstScaler != 0 )
-            _firstScaler->unscalePrimal(vector);
 
          return true;
       }
@@ -3241,12 +3215,9 @@ namespace soplex
          {
             _solver.getSlacks(vector);
 
-            if( _secondScaler != 0 )
-               _secondScaler->unscaleSlacks(vector);
+            if( _scaler != 0 )
+               _scaler->unscaleSlacks(vector);
          }
-
-         if( _firstScaler != 0 )
-            _firstScaler->unscaleSlacks(vector);
 
          return true;
       }
@@ -3271,11 +3242,8 @@ namespace soplex
       {
          _solver.getPrimalray(vector);
 
-         if( _secondScaler != 0 )
-            _secondScaler->unscalePrimal(vector);
-
-         if( _firstScaler != 0 )
-            _firstScaler->unscalePrimal(vector);
+         if( _scaler != 0 )
+            _scaler->unscalePrimal(vector);
 
          return true;
       }
@@ -3307,12 +3275,9 @@ namespace soplex
          {
             _solver.getDual(vector);
 
-            if( _secondScaler != 0 )
-               _secondScaler->unscaleDual(vector);
+            if( _scaler != 0 )
+               _scaler->unscaleDual(vector);
          }
-
-         if( _firstScaler != 0 )
-            _firstScaler->unscaleDual(vector);
 
          return true;
       }
@@ -3336,12 +3301,9 @@ namespace soplex
          {
             _solver.getRedCost(vector);
 
-            if( _secondScaler != 0 )
-               _secondScaler->unscaleRedCost(vector);
+            if( _scaler != 0 )
+               _scaler->unscaleRedCost(vector);
          }
-
-         if( _firstScaler != 0 )
-            _firstScaler->unscaleRedCost(vector);
 
          return true;
       }
@@ -3366,11 +3328,8 @@ namespace soplex
       {
          _solver.getDualfarkas(vector);
 
-         if( _secondScaler != 0 )
-            _secondScaler->unscaleDual(vector);
-
-         if( _firstScaler != 0 )
-            _firstScaler->unscaleDual(vector);
+         if( _scaler != 0 )
+            _scaler->unscaleDual(vector);
 
          return true;
       }
@@ -4390,22 +4349,11 @@ namespace soplex
 
 
 
-   /// name of scaling method before simplifier
-   const char* SoPlex2::getFirstScalerName()
-   {
-      if( _firstScaler )
-         return _firstScaler->getName();
-      else
-         return "none";
-   }
-
-
-
    /// name of scaling method after simplifier
-   const char* SoPlex2::getSecondScalerName()
+   const char* SoPlex2::getScalerName()
    {
-      if( _secondScaler )
-         return _secondScaler->getName();
+      if( _scaler )
+         return _scaler->getName();
       else
          return "none";
    }
@@ -5001,48 +4949,24 @@ namespace soplex
          }
          break;
 
-      // type of scaler applied before simplification
-      case SoPlex2::SCALER_BEFORE_SIMPLIFIER:
+      // type of scaler
+      case SoPlex2::SCALER:
          switch( value )
          {
          case SCALER_OFF:
-            _firstScaler = 0;
+            _scaler = 0;
             break;
          case SCALER_UNIEQUI:
-            _firstScaler = &_firstScalerUniequi;
+            _scaler = &_scalerUniequi;
             break;
          case SCALER_BIEQUI:
-            _firstScaler = &_firstScalerBiequi;
+            _scaler = &_scalerBiequi;
             break;
          case SCALER_GEO1:
-            _firstScaler = &_firstScalerGeo1;
+            _scaler = &_scalerGeo1;
             break;
          case SCALER_GEO8:
-            _firstScaler = &_firstScalerGeo8;
-            break;
-         default:
-            return false;
-         }
-         break;
-
-      // type of scaler applied after simplification
-      case SoPlex2::SCALER_AFTER_SIMPLIFIER:
-         switch( value )
-         {
-         case SCALER_OFF:
-            _secondScaler = 0;
-            break;
-         case SCALER_UNIEQUI:
-            _secondScaler = &_secondScalerUniequi;
-            break;
-         case SCALER_BIEQUI:
-            _secondScaler = &_secondScalerBiequi;
-            break;
-         case SCALER_GEO1:
-            _secondScaler = &_secondScalerGeo1;
-            break;
-         case SCALER_GEO8:
-            _secondScaler = &_secondScalerGeo8;
+            _scaler = &_scalerGeo8;
             break;
          default:
             return false;
@@ -5843,8 +5767,8 @@ namespace soplex
 
 
 
-   /// enables simplifier and scalers according to current parameters
-   void SoPlex2::_enableSimplifierAndScalers()
+   /// enables simplifier and scaler
+   void SoPlex2::_enableSimplifierAndScaler()
    {
       // type of simplifier
       switch( intParam(SoPlex2::SIMPLIFIER) )
@@ -5860,45 +5784,23 @@ namespace soplex
          break;
       }
 
-      // type of scaler applied before simplification
-      switch( intParam(SoPlex2::SCALER_BEFORE_SIMPLIFIER) )
+      // type of scaler
+      switch( intParam(SoPlex2::SCALER) )
       {
       case SCALER_OFF:
-         _firstScaler = 0;
+         _scaler = 0;
          break;
       case SCALER_UNIEQUI:
-         _firstScaler = &_firstScalerUniequi;
+         _scaler = &_scalerUniequi;
          break;
       case SCALER_BIEQUI:
-         _firstScaler = &_firstScalerBiequi;
+         _scaler = &_scalerBiequi;
          break;
       case SCALER_GEO1:
-         _firstScaler = &_firstScalerGeo1;
+         _scaler = &_scalerGeo1;
          break;
       case SCALER_GEO8:
-         _firstScaler = &_firstScalerGeo8;
-         break;
-      default:
-         break;
-      }
-
-      // type of scaler applied after simplification
-      switch( intParam(SoPlex2::SCALER_AFTER_SIMPLIFIER) )
-      {
-      case SCALER_OFF:
-         _secondScaler = 0;
-         break;
-      case SCALER_UNIEQUI:
-         _secondScaler = &_secondScalerUniequi;
-         break;
-      case SCALER_BIEQUI:
-         _secondScaler = &_secondScalerBiequi;
-         break;
-      case SCALER_GEO1:
-         _secondScaler = &_secondScalerGeo1;
-         break;
-      case SCALER_GEO8:
-         _secondScaler = &_secondScalerGeo8;
+         _scaler = &_scalerGeo8;
          break;
       default:
          break;
@@ -5907,12 +5809,11 @@ namespace soplex
 
 
 
-   /// disables simplifier and scalers
-   void SoPlex2::_disableSimplifierAndScalers()
+   /// disables simplifier and scaler
+   void SoPlex2::_disableSimplifierAndScaler()
    {
       _simplifier = 0;
-      _firstScaler = 0;
-      _secondScaler = 0;
+      _scaler = 0;
    }
 
 

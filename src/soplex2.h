@@ -912,11 +912,8 @@ public:
    /// name of simplifier
    const char* getSimplifierName();
 
-   /// name of scaling method before simplifier
-   const char* getFirstScalerName();
-
-   /// name of scaling method after simplifier
-   const char* getSecondScalerName();
+   /// name of scaling method
+   const char* getScalerName();
 
    /// name of currently loaded pricer
    const char* getPricerName();
@@ -1035,23 +1032,20 @@ public:
       /// type of simplifier
       SIMPLIFIER = 10,
 
-      /// type of scaler applied before simplification
-      SCALER_BEFORE_SIMPLIFIER = 11,
-
-      /// type of scaler applied after simplification
-      SCALER_AFTER_SIMPLIFIER = 12,
+      /// type of scaler
+      SCALER = 11,
 
       /// type of starter used to create crash basis
-      STARTER = 13,
+      STARTER = 12,
 
       /// type of pricer
-      PRICER = 14,
+      PRICER = 13,
 
       /// type of ratio test
-      RATIOTESTER = 15,
+      RATIOTESTER = 14,
 
       /// number of integer parameters
-      INTPARAM_COUNT = 16
+      INTPARAM_COUNT = 15
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -1352,14 +1346,10 @@ private:
    SPxSolver _solver;
    SLUFactor _slufactor;
    SPxMainSM _simplifierMainSM;
-   SPxEquiliSC _firstScalerUniequi;
-   SPxEquiliSC _firstScalerBiequi;
-   SPxGeometSC _firstScalerGeo1;
-   SPxGeometSC _firstScalerGeo8;
-   SPxEquiliSC _secondScalerUniequi;
-   SPxEquiliSC _secondScalerBiequi;
-   SPxGeometSC _secondScalerGeo1;
-   SPxGeometSC _secondScalerGeo8;
+   SPxEquiliSC _scalerUniequi;
+   SPxEquiliSC _scalerBiequi;
+   SPxGeometSC _scalerGeo1;
+   SPxGeometSC _scalerGeo8;
    SPxWeightST _starterWeight;
    SPxSumST _starterSum;
    SPxVectorST _starterVector;
@@ -1376,8 +1366,7 @@ private:
 
    SPxLPReal* _realLP;
    SPxSimplifier* _simplifier;
-   SPxScaler* _firstScaler;
-   SPxScaler* _secondScaler;
+   SPxScaler* _scaler;
    SPxStarter* _starter;
 
    DataArray< SPxSolver::VarStatus > _basisStatusRowsReal;
@@ -1453,11 +1442,11 @@ private:
    /// invalidates rational solution
    void _invalidateSolutionRational();
 
-   /// enables simplifier and scalers according to current parameters
-   void _enableSimplifierAndScalers();
+   /// enables simplifier and scaler according to current parameters
+   void _enableSimplifierAndScaler();
 
-   /// disables simplifier and scalers
-   void _disableSimplifierAndScalers();
+   /// disables simplifier and scaler
+   void _disableSimplifierAndScaler();
 
    /// synchronizes rational solution with real solution
    void _syncRationalSolution(bool snycPrimal, bool syncDual, bool syncBasis);

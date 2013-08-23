@@ -35,12 +35,12 @@ namespace soplex
 
       if( fromscratch || !_hasBasisRational )
       {
-         _enableSimplifierAndScalers();
+         _enableSimplifierAndScaler();
          _solver.setTerminationValue(realParam(SoPlex2::INFTY));
       }
       else
       {
-         _disableSimplifierAndScalers();
+         _disableSimplifierAndScaler();
          ///@todo implement for both objective senses
          _solver.setTerminationValue(intParam(SoPlex2::OBJSENSE) == SoPlex2::OBJSENSE_MINIMIZE
             ? realParam(SoPlex2::OBJLIMIT_UPPER) : realParam(SoPlex2::INFTY));
@@ -56,12 +56,6 @@ namespace soplex
 
       try
       {
-         // apply scaling before the simplification
-         if( _firstScaler != 0 )
-         {
-            _firstScaler->scale(_solver);
-         }
-
          // apply problem simplification
          SPxSimplifier::Result simplificationStatus = SPxSimplifier::OKAY;
          if( _simplifier != 0 )
@@ -70,10 +64,8 @@ namespace soplex
          }
 
          // apply scaling after the simplification
-         if( _secondScaler != 0 && simplificationStatus == SPxSimplifier::OKAY )
-         {
-            _secondScaler->scale(_solver);
-         }
+         if( _scaler != 0 && simplificationStatus == SPxSimplifier::OKAY )
+            _scaler->scale(_solver);
 
          // run the simplex method if problem has not been solved by the simplifier
          if( simplificationStatus == SPxSimplifier::OKAY )
@@ -126,13 +118,13 @@ namespace soplex
                      _solver.getDual(tmpDual);
                      _solver.getRedCost(tmpRedcost);
 
-                     // unscale vectors w.r.t. second scaler
-                     if( _secondScaler != 0 )
+                     // unscale vectors
+                     if( _scaler != 0 )
                      {
-                        _secondScaler->unscalePrimal(tmpPrimal);
-                        _secondScaler->unscaleSlacks(tmpSlacks);
-                        _secondScaler->unscaleDual(tmpDual);
-                        _secondScaler->unscaleRedCost(tmpRedcost);
+                        _scaler->unscalePrimal(tmpPrimal);
+                        _scaler->unscaleSlacks(tmpSlacks);
+                        _scaler->unscaleDual(tmpDual);
+                        _scaler->unscaleRedCost(tmpRedcost);
                      }
 
                      // get basis of transformed problem
@@ -149,13 +141,6 @@ namespace soplex
 
                   primal = _simplifier->unsimplifiedPrimal();
                   dual = _simplifier->unsimplifiedDual();
-
-                  // unscale vectors w.r.t. first scaler
-                  if( _firstScaler != 0 )
-                  {
-                     _firstScaler->unscalePrimal(primal);
-                     _firstScaler->unscaleDual(dual);
-                  }
                }
                // if the original problem is not in the solver because of scaling, we also need to store the basis
                else
@@ -163,22 +148,15 @@ namespace soplex
                   _solver.getPrimal(primal);
                   _solver.getDual(dual);
 
-                  // unscale vectors w.r.t. second scaler
-                  if( _secondScaler != 0 )
+                  // unscale vectors
+                  if( _scaler != 0 )
                   {
-                     _secondScaler->unscalePrimal(primal);
-                     _secondScaler->unscaleDual(dual);
+                     _scaler->unscalePrimal(primal);
+                     _scaler->unscaleDual(dual);
                   }
 
                   // get basis of transformed problem
                   _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr());
-
-                  // unscale vectors w.r.t. first scaler
-                  if( _firstScaler != 0 )
-                  {
-                     _firstScaler->unscalePrimal(primal);
-                     _firstScaler->unscaleDual(dual);
-                  }
                }
                break;
 
@@ -197,13 +175,9 @@ namespace soplex
                // return Farkas ray as dual solution
                _solver.getDualfarkas(dual);
 
-               // unscale vectors w.r.t. second scaler
-               if( _secondScaler != 0 )
-                  _secondScaler->unscaleDual(dual);
-
-               // unscale vectors w.r.t. first scaler
-               if( _firstScaler != 0 )
-                  _firstScaler->unscaleDual(dual);
+               // unscale vectors
+               if( _scaler != 0 )
+                  _scaler->unscaleDual(dual);
 
                // if the original problem is not in the solver because of scaling, we also need to store the basis
                _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr());
@@ -266,7 +240,7 @@ namespace soplex
       }
 
       // copy rounded rational LP to real LP
-      if( _simplifier != 0 || _firstScaler != 0 || _secondScaler != 0 )
+      if( _simplifier != 0 || _scaler != 0 )
          _solver.loadLP((SPxLPReal)(rationalLP));
 
       return result;
@@ -286,7 +260,7 @@ namespace soplex
       bool increasedMarkowitz = false;
       bool relaxedTolerances = false;
       bool tightenedTolerances = false;
-      bool switchedScalers = false;
+      bool switchedScaler = false;
       bool switchedSimplifier = false;
       bool switchedRatiotester = false;
       bool switchedPricer = false;
@@ -294,8 +268,7 @@ namespace soplex
       int ratiotester = intParam(SoPlex2::RATIOTESTER);
       int pricer = intParam(SoPlex2::PRICER);
       int simplifier = intParam(SoPlex2::SIMPLIFIER);
-      int scaler_before_simplifier = intParam(SoPlex2::SCALER_BEFORE_SIMPLIFIER);
-      int scaler_after_simplifier = intParam(SoPlex2::SCALER_AFTER_SIMPLIFIER);
+      int scaler = intParam(SoPlex2::SCALER);
 
       setIntParam(SoPlex2::SIMPLIFIER, SoPlex2::SIMPLIFIER_OFF);
 
@@ -349,26 +322,20 @@ namespace soplex
          setIntParam(SoPlex2::RATIOTESTER, ratiotester);
          setIntParam(SoPlex2::PRICER, pricer);
 
-         if( !switchedScalers )
+         if( !switchedScaler )
          {
             MSG_INFO1( spxout << "Switching scaling." << std::endl );
 
-            if( scaler_before_simplifier == int(SoPlex2::SCALER_OFF) && scaler_after_simplifier == int(SoPlex2::SCALER_OFF) )
-            {
-               setIntParam(SoPlex2::SCALER_BEFORE_SIMPLIFIER, SoPlex2::SCALER_BIEQUI);
-               setIntParam(SoPlex2::SCALER_AFTER_SIMPLIFIER, SoPlex2::SCALER_BIEQUI);
-            }
+            if( scaler == int(SoPlex2::SCALER_OFF) )
+               setIntParam(SoPlex2::SCALER, SoPlex2::SCALER_BIEQUI);
             else
-            {
-               setIntParam(SoPlex2::SCALER_BEFORE_SIMPLIFIER, SoPlex2::SCALER_OFF);
-               setIntParam(SoPlex2::SCALER_AFTER_SIMPLIFIER, SoPlex2::SCALER_OFF);
-            }
+               setIntParam(SoPlex2::SCALER, SoPlex2::SCALER_OFF);
 
             fromScratch = true;
             _solver.reLoad();
 
             solvedFromScratch = true;
-            switchedScalers = true;
+            switchedScaler = true;
             continue;
          }
 
@@ -446,8 +413,7 @@ namespace soplex
       setIntParam(SoPlex2::RATIOTESTER, ratiotester);
       setIntParam(SoPlex2::PRICER, pricer);
       setIntParam(SoPlex2::SIMPLIFIER, simplifier);
-      setIntParam(SoPlex2::SCALER_BEFORE_SIMPLIFIER, scaler_before_simplifier);
-      setIntParam(SoPlex2::SCALER_AFTER_SIMPLIFIER, scaler_after_simplifier);
+      setIntParam(SoPlex2::SCALER, scaler);
 
       return result;
    }

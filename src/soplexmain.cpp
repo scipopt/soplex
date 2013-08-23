@@ -226,8 +226,8 @@ void printUsage( const char* const argv[] )
       " -s0 none     -g0 none          -c0 none*   -p0 Textbook   -t0 Textbook\n"
       " -s1 Main*    -g1 uni-Equi      -c1 Weight  -p1 ParMult    -t1 Harris\n"
       "              -g2 bi-Equi*      -c2 Sum     -p2 Devex      -t2 Fast*\n"
-      "              -g3 bi-Equi+Geo1  -c3 Vector  -p3 Hybrid!    -t3 Bound Flipping\n"
-      "              -g4 bi-Equi+Geo8              -p4 Steep*\n"
+      "              -g3 Geo1          -c3 Vector  -p3 Hybrid!    -t3 Bound Flipping\n"
+      "              -g4 Geo8                      -p4 Steep*\n"
       "                                            -p5 Weight\n"
       "                                            -p6 SteepExactSetup\n"
       ;
@@ -476,7 +476,7 @@ void printAlgorithmParameters(
       << std::endl
       << "ratiotest      = " << SoPlexShell.getRatiotesterName()
       << std::endl
-      << "scaling        = " << SoPlexShell.getFirstScalerName() << " / " << SoPlexShell.getSecondScalerName()
+      << "scaling        = " << SoPlexShell.getScalerName()
       << std::endl
       << std::endl; )
 }
@@ -545,33 +545,28 @@ void setRatiotester(
 
 //------------------------------------------------------------------------
 static
-void setScalers(
+void setScaler(
    SoPlex2&    SoPlexShell,
    const int   scaling)
 {
    switch(scaling)
    {
    case 4:
-      SoPlexShell.setIntParam(SoPlex2::SCALER_BEFORE_SIMPLIFIER, SoPlex2::SCALER_BIEQUI);
-      SoPlexShell.setIntParam(SoPlex2::SCALER_AFTER_SIMPLIFIER, SoPlex2::SCALER_GEO8);
+      SoPlexShell.setIntParam(SoPlex2::SCALER, SoPlex2::SCALER_GEO8);
       break;
    case 3:
-      SoPlexShell.setIntParam(SoPlex2::SCALER_BEFORE_SIMPLIFIER, SoPlex2::SCALER_BIEQUI);
-      SoPlexShell.setIntParam(SoPlex2::SCALER_AFTER_SIMPLIFIER, SoPlex2::SCALER_GEO1);
+      SoPlexShell.setIntParam(SoPlex2::SCALER, SoPlex2::SCALER_GEO1);
       break;
    case 2 :
-      SoPlexShell.setIntParam(SoPlex2::SCALER_BEFORE_SIMPLIFIER, SoPlex2::SCALER_BIEQUI);
-      SoPlexShell.setIntParam(SoPlex2::SCALER_AFTER_SIMPLIFIER, SoPlex2::SCALER_OFF);
+      SoPlexShell.setIntParam(SoPlex2::SCALER, SoPlex2::SCALER_BIEQUI);
       break;
    case 1 :
-      SoPlexShell.setIntParam(SoPlex2::SCALER_BEFORE_SIMPLIFIER, SoPlex2::SCALER_UNIEQUI);
-      SoPlexShell.setIntParam(SoPlex2::SCALER_AFTER_SIMPLIFIER, SoPlex2::SCALER_OFF);
+      SoPlexShell.setIntParam(SoPlex2::SCALER, SoPlex2::SCALER_UNIEQUI);
       break;
    case 0 :
       /*FALLTHROUGH*/
    default :
-      SoPlexShell.setIntParam(SoPlex2::SCALER_BEFORE_SIMPLIFIER, SoPlex2::SCALER_OFF);
-      SoPlexShell.setIntParam(SoPlex2::SCALER_AFTER_SIMPLIFIER, SoPlex2::SCALER_OFF);
+      SoPlexShell.setIntParam(SoPlex2::SCALER, SoPlex2::SCALER_OFF);
       break;
    }
 }
@@ -1255,7 +1250,7 @@ int main(int argc, char* argv[])
          case 'g' :
             checkParameter(argv[optidx][2], argv); // use -g[0-5], not -g
             scaling = atoi(&argv[optidx][2]);
-            setScalers( *SoPlexShell, scaling );
+            setScaler( *SoPlexShell, scaling );
             break;
          case 'i' :
             SoPlexShell->setIntParam( SoPlex2::FACTOR_UPDATE_TYPE, SoPlex2::FACTOR_UPDATE_TYPE_ETA );
