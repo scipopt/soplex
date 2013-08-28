@@ -66,7 +66,7 @@ namespace soplex
          bool error = false;
 
          // solve problem with iterative refinement and recovery mechanism
-         _performOptIRStable(_solRational, !unboundednessNotCertified, !infeasibilityNotCertified,
+         _performOptIRStable(_solRational, !unboundednessNotCertified, !infeasibilityNotCertified, 0,
             primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
 
          // case: an unrecoverable error occured
@@ -225,7 +225,7 @@ namespace soplex
 
 
    /// solves current problem with iterative refinement and recovery mechanism
-   void SoPlex2::_performOptIRStable(SolRational& sol, bool acceptUnbounded, bool acceptInfeasible, bool& primalFeasible, bool& dualFeasible, bool& infeasible, bool& unbounded, bool& stopped, bool& error)
+   void SoPlex2::_performOptIRStable(SolRational& sol, bool acceptUnbounded, bool acceptInfeasible, int minRounds, bool& primalFeasible, bool& dualFeasible, bool& infeasible, bool& unbounded, bool& stopped, bool& error)
    {
       primalFeasible = false;
       dualFeasible = false;
@@ -323,6 +323,7 @@ namespace soplex
       // refinement loop
       do
       {
+         minRounds--;//decrement minRounds counter
          MSG_DEBUG( spxout << "Computing violations.\n" );
 
          // compute violation of bounds
@@ -395,8 +396,15 @@ namespace soplex
          dualFeasible = (redcostViolation <= rationalParam(SoPlex2::OPTTOL));
          if( primalFeasible && dualFeasible )
          {
-            MSG_INFO1( spxout << "Tolerances reached.\n" );
-            return;
+            if( minRounds < 0 )
+            {
+               MSG_INFO1( spxout << "Tolerances reached.\n" );
+               return;
+            }
+            else
+            {
+               MSG_INFO1( spxout << "Tolerances reached but minRounds forcing additional refinement rounds.\n" );
+            }
          }
 
          // terminate if some limit is reached
@@ -609,7 +617,7 @@ namespace soplex
       sol._invalidate();
 
       // perform iterative refinement
-      _performOptIRStable(sol, false, false, primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
+      _performOptIRStable(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
 
       // the unbounded problem should always be solved to optimality
       if( error || unbounded || infeasible || !primalFeasible || !dualFeasible )
@@ -660,9 +668,12 @@ namespace soplex
       bool dualFeasible;
       bool infeasible;
       bool unbounded;
+      bool success = false;
+      error = false;
 
       ///@todo check whether approximate Farkas proof can be used
       _computeInfeasBox(_solRational, false);
+      ///@todo if approx Farkas proof is good enough then exit without doing any transformation
 
       // remove objective function, shift, homogenize
       _transformFeasibility();
@@ -670,44 +681,57 @@ namespace soplex
       // invalidate solution
       sol._invalidate();
 
-      // perform iterative refinement
-      _performOptIRStable(sol, false, false, primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
-
-      ///@todo check whether we can compute a sufficiently large Farkas box; otherwise call _performOptIRStable() again
-      _computeInfeasBox(_solRational, true);
-
-      // the feasibility problem should always be solved to optimality
-      if( error || unbounded || infeasible || !primalFeasible || !dualFeasible )
+      do
       {
-         sol._invalidate();
-         hasDualfarkas = false;
-         stopped = false;
-         error = true;
-      }
-      // or stopped due to some limit
-      else if( stopped )
-      {
-         sol._invalidate();
-         hasDualfarkas = false;
-         error = false;
-      }
-      else
-      {
-         Rational tau = sol._primal[numColsRational() - 1];
+         // perform iterative refinement with minRounds = 1
+         _performOptIRStable(sol, false, false, 1, primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
 
-         MSG_DEBUG( spxout << "tau = " << tau << " (roughly " << rationalToString(tau) << ")\n" );
-
-         assert(tau >= -rationalParam(SoPlex2::FEASTOL));
-         assert(tau <= 1 + rationalParam(SoPlex2::FEASTOL));
-
-         error = (tau < -rationalParam(SoPlex2::FEASTOL) || tau > 1 + rationalParam(SoPlex2::FEASTOL));
-         hasDualfarkas = (tau < 1);
-
-         if( hasDualfarkas )
-            sol._hasPrimal = false;
+         // the feasibility problem should always be solved to optimality
+         if( error || unbounded || infeasible || !primalFeasible || !dualFeasible )
+         {
+            sol._invalidate();
+            hasDualfarkas = false;
+            stopped = false;
+            error = true;
+         }
+         // or stopped due to some limit
+         else if( stopped )
+         {
+            sol._invalidate();
+            hasDualfarkas = false;
+            error = false;
+         }
+         // else we should have either a refined Farkas proof or an approximate feasible solution to the original
          else
-            sol._hasDual = false;
+         {
+            Rational tau = sol._primal[numColsRational() - 1];
+
+            MSG_DEBUG( spxout << "tau = " << tau << " (roughly " << rationalToString(tau) << ")\n" );
+
+            assert(tau >= -rationalParam(SoPlex2::FEASTOL));
+            assert(tau <= 1 + rationalParam(SoPlex2::FEASTOL));
+
+            error = (tau < -rationalParam(SoPlex2::FEASTOL) || tau > 1 + rationalParam(SoPlex2::FEASTOL));
+            hasDualfarkas = (tau < 1); ///@todo shouldn't this use a tolerance? like (tau < 1-eps)? or even (tau <1/2)?
+
+            if( hasDualfarkas )
+            {
+               // check if we can compute sufficiently large Farkas box
+               _computeInfeasBox(_solRational, true);
+               if( true )//@todo check if computeInfeasBox found a sufficient box
+               {
+                  success = true;
+                  sol._hasPrimal = false;
+               }
+            }
+            else
+            {
+               sol._hasDual = false;
+               success = true; //successfully found approximate feasible solution
+            }
+         }
       }
+      while(!error && !success);
 
       // restore problem
       _untransformFeasibility(sol, hasDualfarkas);

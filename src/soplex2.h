@@ -1462,7 +1462,7 @@ private:
    void _solveRational();
 
    /// solves current problem with iterative refinement and recovery mechanism
-   void _performOptIRStable(SolRational& sol, bool acceptUnbounded, bool acceptInfeasible, bool& primalFeasible, bool& dualFeasible, bool& infeasible, bool& unbounded, bool& stopped, bool& error);
+   void _performOptIRStable(SolRational& sol, bool acceptUnbounded, bool acceptInfeasible, int minRounds, bool& primalFeasible, bool& dualFeasible, bool& infeasible, bool& unbounded, bool& stopped, bool& error);
 
    /// performs iterative refinement on the auxiliary problem for testing unboundedness
    void _performUnboundedIRStable(SolRational& sol, bool& hasUnboundedRay, bool& stopped, bool& error);
