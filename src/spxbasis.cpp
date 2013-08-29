@@ -284,7 +284,10 @@ void SPxBasis::loadDesc(const Desc& ds)
       }
    }
 
-   assert(j == matrix.size());
+   /* if dimensions are inconsistent, restore slack basis */
+   if( j != matrix.size() )
+      restoreInitialBasis();
+
    assert(isDescValid(thedesc));
 
    matrixIsSetup = true;
