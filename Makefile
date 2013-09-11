@@ -37,6 +37,11 @@ TEST		=	quick
 ALGO		=	1 2 3 4
 LIMIT		=	#
 
+#these variables are needed for cluster runs
+TIME		=	3600
+MEM		=	6144
+CONTINUE	=	false
+
 INSTALLDIR	=	#
 
 #will this be compiled for PARASCIP? (disables output because it uses global variables)
@@ -79,6 +84,7 @@ VFLAGS		=	--tool=memcheck --leak-check=yes --show-reachable=yes #--gen-suppressi
 GMP_FLAGS	=
 GMP_LDFLAGS	=	-lgmpxx -lgmp
 
+SOPLEXDIR	=	$(realpath .)
 SRCDIR		=	src
 BINDIR		=	bin
 LIBDIR		=	lib
@@ -242,6 +248,8 @@ $(LIBFILE):	$(LIBDIR) $(LIBOBJDIR) touchexternal $(LIBOBJFILES)
 ifneq ($(RANLIB),)
 		$(RANLIB) $@
 endif
+
+-include make/local/make.targets
 
 .PHONY: lint
 lint:		$(BINSRC) $(LIBSRC)

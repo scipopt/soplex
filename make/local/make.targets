@@ -1,0 +1,13 @@
+# this local Makefile includes the cluster targets
+
+OPTHOST	   	 := $(shell uname -n | sed 's/\(.zib.de\)//g' | tr -cd '[:alpha:]')
+
+-include $(SOPLEXDIR)/make/local/make.$(OPTHOST)
+
+.PHONY: testcluster
+testcluster:
+		cd check; \
+		$(shell) ./check_cluster.sh $(TEST) $(BINDIR)/$(BINNAME) \
+		$(notdir $(BINNAME)) $(TIME) $(MEM) \
+		$(CONTINUE) \
+		$(QUEUETYPE) $(QUEUE) $(PPN) $(CLIENTTMPDIR) $(NOWAITCLUSTER) $(EXCLUSIVE);
