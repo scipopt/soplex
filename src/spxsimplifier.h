@@ -59,6 +59,10 @@ protected:
    int         m_chgBnds;
    /// number of change right-hand sides
    int         m_chgLRhs;
+   /// number of kept bounds
+   int         m_keptBnds;
+   /// number of kept left- and right-hand sides
+   int         m_keptLRhs;
    /// objective offset
    Real        m_objoffset;
    //@}
@@ -90,6 +94,8 @@ public:
       , m_remNzos(0)
       , m_chgBnds(0)
       , m_chgLRhs(0)
+      , m_keptBnds(0)
+      , m_keptLRhs(0)
       , m_objoffset(0.0)
    {
       assert(isConsistent());
@@ -102,6 +108,8 @@ public:
       , m_remNzos(old.m_remNzos)
       , m_chgBnds(old.m_chgBnds)
       , m_chgLRhs(old.m_chgLRhs)
+      , m_keptBnds(old.m_keptBnds)
+      , m_keptLRhs(old.m_keptLRhs)
       , m_objoffset(old.m_objoffset)
    {
       assert(isConsistent());
@@ -117,6 +125,8 @@ public:
          m_remNzos = rhs.m_remNzos;
          m_chgBnds = rhs.m_chgBnds;
          m_chgLRhs = rhs.m_chgLRhs;
+         m_keptBnds = rhs.m_keptBnds;
+         m_keptLRhs = rhs.m_keptLRhs;
          m_objoffset = rhs.m_objoffset;
 
          assert(isConsistent());
@@ -153,7 +163,7 @@ public:
    /// simplify SPxLP \p lp with identical primal and dual feasibility tolerance.
    virtual Result simplify(SPxLP& lp, Real eps, Real delta) = 0;
    /// simplify SPxLP \p lp with independent primal and dual feasibility tolerance.
-   virtual Result simplify(SPxLP& lp, Real eps, Real feastol, Real opttol) = 0;
+   virtual Result simplify(SPxLP& lp, Real eps, Real feastol, Real opttol, bool keepbounds = false) = 0;
    /// reconstructs an optimal solution for the unsimplified LP.
    virtual void unsimplify(const Vector&, const Vector&, const Vector&, const Vector&,
                            const SPxSolver::VarStatus[], const SPxSolver::VarStatus[]) {}

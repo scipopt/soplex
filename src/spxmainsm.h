@@ -1015,6 +1015,7 @@ private:
    Real                            m_opttol;     ///< dual feasibility tolerance.
    DataArray<int>                  m_stat;       ///< preprocessing history.
    SPxLP::SPxSense                 m_thesense;   ///< optimization sense.
+   bool                            m_keepbounds;  ///< keep some bounds (for boundflipping)
    //@}
 
 private:
@@ -1114,6 +1115,7 @@ public:
       , m_opttol(old.m_opttol)
       , m_stat(old.m_stat)
       , m_thesense(old.m_thesense)
+      , m_keepbounds(old.m_keepbounds)
    {
       // copy pointers in m_hist
       m_hist.reSize(0);
@@ -1145,6 +1147,7 @@ public:
          m_opttol = rhs.m_opttol;
          m_stat = rhs.m_stat;
          m_thesense = rhs.m_thesense;
+         m_keepbounds = rhs.m_keepbounds;
 
          // delete pointers in m_hist
          for(int k = 0; k < m_hist.size(); ++k)
@@ -1196,7 +1199,7 @@ public:
       return simplify(lp, eps, delta, delta);
    }
    /// simplify SPxLP \p lp with independent primal and dual feasibility tolerance.
-   virtual Result simplify(SPxLP& lp, Real eps, Real feastol, Real opttol);
+   virtual Result simplify(SPxLP& lp, Real eps, Real feastol, Real opttol, bool keepbounds = false);
 
    /// reconstructs an optimal solution for the unsimplified LP.
    virtual void unsimplify(const Vector& x, const Vector& y, const Vector& s, const Vector& r,

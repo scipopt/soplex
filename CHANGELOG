@@ -13,6 +13,7 @@ code quality & new features:
     instances, or instances, that spend much time in pricing. Partial pricing is likely to increase the number of iterations.
 - refinement step to improve feasibility/optimality also for steep pricer (was devex only)
 - own objective sense enumerator in MPS parser
+- keep relevant bounds if bound flipping ratio test is used
 
 interface:
 - renamed class MpqReal to Rational
