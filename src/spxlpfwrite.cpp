@@ -265,6 +265,7 @@ void SPxLP::writeLPF( std::ostream&  p_output,          ///< output stream
 {
    METHOD("writeLPF");
 
+   p_output << std::setprecision(15);
    writeObjective (*this, p_output, p_cnames);
    writeRows      (*this, p_output, p_rnames, p_cnames);
    writeBounds    (*this, p_output, p_cnames);
