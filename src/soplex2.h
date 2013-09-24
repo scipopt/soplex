@@ -1426,6 +1426,12 @@ private:
    /// checks consistency
    bool _isConsistent() const;
 
+   /// check simplification and solution status and clean up data
+   void _evaluateSolutionStatusReal(SPxSimplifier::Result simplificationStatus);
+
+   /// evaluate solution flags
+   void _evaluateSolutionFlags();
+
    /// should solving process be stopped?
    bool _isSolveStopped() const;
 
