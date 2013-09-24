@@ -2888,15 +2888,17 @@ namespace soplex
             _realLP = new (_realLP) SPxLPReal(_solver);
             _isRealLPLoaded = false;
          }
-         ///@todo maybe this should move closer to the actual solving routine
-         else if( _hasBasisReal )
-         {
-            assert(_solver.basis().status() >= SPxBasis::REGULAR);
 
-            _basisStatusRowsReal.reSize(numRowsReal());
-            _basisStatusColsReal.reSize(numColsReal());
-            _solver.getBasis(_basisStatusRowsReal.get_ptr(), _basisStatusColsReal.get_ptr());
-         }
+         /// Why do we need this? It leeds to problems after a restart in SCIP.
+         ///@todo maybe this should move closer to the actual solving routine
+//          else if( _hasBasisReal )
+//          {
+//             assert(_solver.basis().status() >= SPxBasis::REGULAR);
+//
+//             _basisStatusRowsReal.reSize(numRowsReal());
+//             _basisStatusColsReal.reSize(numColsReal());
+//             _solver.getBasis(_basisStatusRowsReal.get_ptr(), _basisStatusColsReal.get_ptr());
+//          }
       }
       else
       {
