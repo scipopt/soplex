@@ -63,6 +63,11 @@ public:
    {
    }
 
+   Rational(const mpq_t& q)
+      : mpq_class(q)
+   {
+   }
+
    Rational(const long double& r)
       : mpq_class(double(r))
    {
