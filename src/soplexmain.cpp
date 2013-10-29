@@ -790,12 +790,11 @@ void print_solution_and_status(
 
          if( work.getPrimal(objx) != SPxSolver::ERROR )
          {
-            MSG_INFO1( spxout << std::endl << "Primal solution (name, id, value):" << std::endl; )
+            MSG_INFO1( spxout << std::endl << "Primal solution (name, value):" << std::endl; )
             for( int i = 0; i < work.nCols(); ++i )
             {
                if ( isNotZero( objx[i], 0.001 * work.feastol() ) )
                   MSG_INFO1( spxout << colnames[ work.cId(i) ] << "\t"
-                                    << i << "\t"
                                     << std::setw(17)
                                     << std::setprecision( precision )
                                     << objx[i] << std::endl; )
@@ -810,13 +809,12 @@ void print_solution_and_status(
 
          if( work.getDual(objy) != SPxSolver::ERROR )
          {
-            MSG_INFO1( spxout << std::endl << "Dual multipliers (name, id, value):" << std::endl; )
+            MSG_INFO1( spxout << std::endl << "Dual multipliers (name, value):" << std::endl; )
             for( int i = 0; i < work.nRows(); ++i )
             {
                if ( isNotZero( objy[i] , 0.001 * work.opttol() ) )
                {
                   MSG_INFO1( spxout << rownames[ work.rId(i) ] << "\t"
-                                    << i << "\t"
                                     << std::setw(17)
                                     << std::setprecision( precision )
                                     << objy[i] << std::endl; )
