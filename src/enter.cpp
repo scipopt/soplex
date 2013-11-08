@@ -289,7 +289,7 @@ void SPxSolver::updateTest()
 
    const IdxSet& idx = thePvec->idx();
    const SPxBasis::Desc& ds = desc();
-   Real pricingTol = epsilon();
+   Real pricingTol = leavetol();
 
    int i;
    for (i = idx.size() - 1; i >= 0; --i)
@@ -322,7 +322,7 @@ void SPxSolver::updateCoTest()
 
    const IdxSet& idx = theCoPvec->idx();
    const SPxBasis::Desc& ds = desc();
-   Real pricingTol = epsilon();
+   Real pricingTol = leavetol();
 
    int i;
    for (i = idx.size() - 1; i >= 0; --i)
