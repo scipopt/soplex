@@ -1016,16 +1016,11 @@ bool SPxSolver::enter(SPxId& enterId)
 
       if( boundflips > 0 )
       {
-#if 1
          for( int i = coSolveVector3->dim()-1; i >= 0; --i)
          {
             if( fabs((*coSolveVector3)[i]) > epsilon() )
                (*thePvec).multAdd(-(*coSolveVector3)[i],(*thecovectors)[i]);
          }
-#else
-         // this yields the same result but may be more expensive to compute
-         computePvec();
-#endif
          // we need to update enterPric in case it was changed by bound flips
          if( enterId.isSPxColId() )
             enterPric = (*theCoPvec)[number(SPxColId(enterId))];
