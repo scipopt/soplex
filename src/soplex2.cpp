@@ -1259,7 +1259,11 @@ namespace soplex
       assert(_realLP != 0);
       _realLP->addRow(id, lprow);
 
-      if( _hasBasisReal && !_isRealLPLoaded )
+      if( _isRealLPLoaded )
+      {
+         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasisReal )
          _basisStatusRowsReal.append(SPxSolver::BASIC);
 
       _invalidateSolutionReal();
@@ -1273,7 +1277,11 @@ namespace soplex
       assert(_realLP != 0);
       _realLP->addRows(lprowset);
 
-      if( _hasBasisReal && !_isRealLPLoaded )
+      if( _isRealLPLoaded )
+      {
+         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasisReal )
          _basisStatusRowsReal.append(lprowset.num(), SPxSolver::BASIC);
 
       _invalidateSolutionReal();
@@ -1287,7 +1295,11 @@ namespace soplex
       assert(_realLP != 0);
       _realLP->addRows(id, lprowset);
 
-      if( _hasBasisReal && !_isRealLPLoaded )
+      if( _isRealLPLoaded )
+      {
+         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasisReal )
          _basisStatusRowsReal.append(lprowset.num(), SPxSolver::BASIC);
 
       _invalidateSolutionReal();
@@ -1310,7 +1322,11 @@ namespace soplex
       assert(_realLP != 0);
       _realLP->addCol(id, lpcol);
 
-      if( _hasBasisReal && !_isRealLPLoaded )
+      if( _isRealLPLoaded )
+      {
+         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasisReal )
       {
          if( lpcol.lower() > -realParam(SoPlex2::INFTY) )
             _basisStatusColsReal.append(SPxSolver::ON_LOWER);
@@ -1331,7 +1347,11 @@ namespace soplex
       assert(_realLP != 0);
       _realLP->addCols(lpcolset);
 
-      if( _hasBasisReal && !_isRealLPLoaded )
+      if( _isRealLPLoaded )
+      {
+         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasisReal )
       {
          for( int i = 0; i < lpcolset.num(); i++ )
          {
@@ -1355,7 +1375,11 @@ namespace soplex
       assert(_realLP != 0);
       _realLP->addCols(id, lpcolset);
 
-      if( _hasBasisReal && !_isRealLPLoaded )
+      if( _isRealLPLoaded )
+      {
+         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasisReal )
       {
          for( int i = 0; i < lpcolset.num(); i++ )
          {
@@ -1379,7 +1403,11 @@ namespace soplex
       assert(_realLP != 0);
       _realLP->changeRow(i, lprow);
 
-      if( _hasBasisReal && !_isRealLPLoaded )
+      if( _isRealLPLoaded )
+      {
+         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasisReal )
       {
          if( _basisStatusRowsReal[i] != SPxSolver::BASIC )
             _hasBasisReal = false;
@@ -1408,7 +1436,11 @@ namespace soplex
       assert(_realLP != 0);
       _realLP->changeLhs(lhs);
 
-      if( _hasBasisReal && !_isRealLPLoaded )
+      if( _isRealLPLoaded )
+      {
+         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasisReal )
       {
          for( int i = numRowsReal() - 1; i >= 0; i-- )
          {
@@ -1428,7 +1460,11 @@ namespace soplex
       assert(_realLP != 0);
       _realLP->changeLhs(i, lhs);
 
-      if( _hasBasisReal && !_isRealLPLoaded && _basisStatusRowsReal[i] == SPxSolver::ON_LOWER && lhs <= -realParam(SoPlex2::INFTY) )
+      if( _isRealLPLoaded )
+      {
+         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasisReal && _basisStatusRowsReal[i] == SPxSolver::ON_LOWER && lhs <= -realParam(SoPlex2::INFTY) )
          _basisStatusRowsReal[i] = (rhsReal(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
 
       _invalidateSolutionReal();
@@ -1450,7 +1486,11 @@ namespace soplex
       assert(_realLP != 0);
       _realLP->changeRhs(rhs);
 
-      if( _hasBasisReal && !_isRealLPLoaded )
+      if( _isRealLPLoaded )
+      {
+         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasisReal )
       {
          for( int i = numRowsReal() - 1; i >= 0; i-- )
          {
@@ -1470,7 +1510,11 @@ namespace soplex
       assert(_realLP != 0);
       _realLP->changeRhs(i, rhs);
 
-      if( _hasBasisReal && !_isRealLPLoaded && _basisStatusRowsReal[i] == SPxSolver::ON_UPPER && rhs >= realParam(SoPlex2::INFTY) )
+      if( _isRealLPLoaded )
+      {
+         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasisReal && _basisStatusRowsReal[i] == SPxSolver::ON_UPPER && rhs >= realParam(SoPlex2::INFTY) )
          _basisStatusRowsReal[i] = (lhsReal(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
 
       _invalidateSolutionReal();
@@ -1492,7 +1536,11 @@ namespace soplex
       assert(_realLP != 0);
       _realLP->changeRange(lhs, rhs);
 
-      if( _hasBasisReal && !_isRealLPLoaded )
+      if( _isRealLPLoaded )
+      {
+         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasisReal )
       {
          for( int i = numRowsReal() - 1; i >= 0; i-- )
          {
@@ -1514,7 +1562,11 @@ namespace soplex
       assert(_realLP != 0);
       _realLP->changeRange(i, lhs, rhs);
 
-      if( _hasBasisReal && !_isRealLPLoaded )
+      if( _isRealLPLoaded )
+      {
+         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasisReal )
       {
          if( _basisStatusRowsReal[i] == SPxSolver::ON_LOWER && lhs <= -realParam(SoPlex2::INFTY) )
             _basisStatusRowsReal[i] = (rhs < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
@@ -1541,7 +1593,11 @@ namespace soplex
       assert(_realLP != 0);
       _realLP->changeCol(i, lpcol);
 
-      if( _hasBasisReal && !_isRealLPLoaded )
+      if( _isRealLPLoaded )
+      {
+         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasisReal )
       {
          if( _basisStatusColsReal[i] == SPxSolver::BASIC )
             _hasBasisReal = false;
@@ -1570,7 +1626,11 @@ namespace soplex
       assert(_realLP != 0);
       _realLP->changeLower(lower);
 
-      if( _hasBasisReal && !_isRealLPLoaded )
+      if( _isRealLPLoaded )
+      {
+         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasisReal )
       {
          for( int i = numColsReal() - 1; i >= 0; i-- )
          {
@@ -1590,7 +1650,11 @@ namespace soplex
       assert(_realLP != 0);
       _realLP->changeLower(i, lower);
 
-      if( _hasBasisReal && !_isRealLPLoaded && _basisStatusColsReal[i] == SPxSolver::ON_LOWER && lower <= -realParam(SoPlex2::INFTY) )
+      if( _isRealLPLoaded )
+      {
+         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasisReal && _basisStatusColsReal[i] == SPxSolver::ON_LOWER && lower <= -realParam(SoPlex2::INFTY) )
          _basisStatusColsReal[i] = (upperReal(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
 
       _invalidateSolutionReal();
@@ -1612,7 +1676,11 @@ namespace soplex
       assert(_realLP != 0);
       _realLP->changeUpper(upper);
 
-      if( _hasBasisReal && !_isRealLPLoaded )
+      if( _isRealLPLoaded )
+      {
+         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasisReal )
       {
          for( int i = numColsReal() - 1; i >= 0; i-- )
          {
@@ -1632,7 +1700,11 @@ namespace soplex
       assert(_realLP != 0);
       _realLP->changeUpper(i, upper);
 
-      if( _hasBasisReal && !_isRealLPLoaded &&  _basisStatusColsReal[i] == SPxSolver::ON_UPPER && upper >= realParam(SoPlex2::INFTY) )
+      if( _isRealLPLoaded )
+      {
+         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasisReal &&  _basisStatusColsReal[i] == SPxSolver::ON_UPPER && upper >= realParam(SoPlex2::INFTY) )
          _basisStatusColsReal[i] = (lowerReal(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
 
       _invalidateSolutionReal();
@@ -1654,7 +1726,11 @@ namespace soplex
       assert(_realLP != 0);
       _realLP->changeBounds(lower, upper);
 
-      if( _hasBasisReal && !_isRealLPLoaded )
+      if( _isRealLPLoaded )
+      {
+         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasisReal )
       {
          for( int i = numColsReal() - 1; i >= 0; i-- )
          {
@@ -1676,7 +1752,11 @@ namespace soplex
       assert(_realLP != 0);
       _realLP->changeBounds(i, lower, upper);
 
-      if( _hasBasisReal && !_isRealLPLoaded )
+      if( _isRealLPLoaded )
+      {
+         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasisReal )
       {
          if( _basisStatusColsReal[i] == SPxSolver::ON_LOWER && lower <= -realParam(SoPlex2::INFTY) )
             _basisStatusColsReal[i] = (upper < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
@@ -1736,7 +1816,11 @@ namespace soplex
       assert(_realLP != 0);
       _realLP->changeElement(i, j, val);
 
-      if( _hasBasisReal && !_isRealLPLoaded )
+      if( _isRealLPLoaded )
+      {
+         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasisReal )
       {
          if( _basisStatusRowsReal[i] != SPxSolver::BASIC && _basisStatusColsReal[i] == SPxSolver::BASIC )
             _hasBasisReal = false;
@@ -1761,7 +1845,11 @@ namespace soplex
       assert(_realLP != 0);
       _realLP->removeRow(i);
 
-      if( _hasBasisReal && !_isRealLPLoaded )
+      if( _isRealLPLoaded )
+      {
+         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasisReal )
       {
          if( _basisStatusRowsReal[i] != SPxSolver::BASIC )
             _hasBasisReal = false;
@@ -1793,7 +1881,11 @@ namespace soplex
       assert(_realLP != 0);
       _realLP->removeRows(perm);
 
-      if( _hasBasisReal && !_isRealLPLoaded )
+      if( _isRealLPLoaded )
+      {
+         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasisReal )
       {
          for( int i = numRowsReal() - 1; i >= 0 && _hasBasisReal; i-- )
          {
@@ -1880,7 +1972,11 @@ namespace soplex
       assert(_realLP != 0);
       _realLP->removeCol(i);
 
-      if( _hasBasisReal && !_isRealLPLoaded )
+      if( _isRealLPLoaded )
+      {
+         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasisReal )
       {
          if( _basisStatusColsReal[i] == SPxSolver::BASIC )
             _hasBasisReal = false;
@@ -1912,7 +2008,11 @@ namespace soplex
       assert(_realLP != 0);
       _realLP->removeCols(perm);
 
-      if( _hasBasisReal && !_isRealLPLoaded )
+      if( _isRealLPLoaded )
+      {
+         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasisReal )
       {
          for( int i = numColsReal() - 1; i >= 0 && _hasBasisReal; i-- )
          {
