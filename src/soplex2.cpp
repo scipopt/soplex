@@ -563,65 +563,11 @@ namespace soplex
 
 
 
-   /// returns row identifier for row \p i
-   SPxRowId SoPlex2::rowIdReal(int i) const
-   {
-      assert(_realLP != 0);
-      return _realLP->rId(i);
-   }
-
-
-
-   /// returns column identifier for column \p i
-   SPxColId SoPlex2::colIdReal(int i) const
-   {
-      assert(_realLP != 0);
-      return _realLP->cId(i);
-   }
-
-
-
-   /// returns index of the row with identifier \p id
-   int SoPlex2::idxReal(const SPxRowId& id) const
-   {
-      assert(_realLP != 0);
-      return _realLP->number(id);
-   }
-
-
-
-   /// returns index of the column with identifier \p id
-   int SoPlex2::idxReal(const SPxColId& id) const
-   {
-      assert(_realLP != 0);
-      return _realLP->number(id);
-   }
-
-
-
-   /// returns index of the row or column with identifier \p id
-   int SoPlex2::idxReal(const SPxId& id) const
-   {
-      assert(_realLP != 0);
-      return _realLP->number(id);
-   }
-
-
-
    /// gets row \p i
    void SoPlex2::getRowReal(int i, LPRowReal& lprow) const
    {
       assert(_realLP != 0);
       _realLP->getRow(i, lprow);
-   }
-
-
-
-   /// gets row with identifier \p id
-   void SoPlex2::getRowReal(const SPxRowId& id, LPRowReal& lprow) const
-   {
-      assert(_realLP != 0);
-      _realLP->getRow(id, lprow);
    }
 
 
@@ -644,15 +590,6 @@ namespace soplex
 
 
 
-   /// returns vector of row with identifier \p id
-   const SVectorReal& SoPlex2::rowVectorReal(const SPxRowId& id) const
-   {
-      assert(_realLP != 0);
-      return _realLP->rowVector(id);
-   }
-
-
-
    /// returns right-hand side vector
    const VectorReal& SoPlex2::rhsReal() const
    {
@@ -667,15 +604,6 @@ namespace soplex
    {
       assert(_realLP != 0);
       return _realLP->rhs(i);
-   }
-
-
-
-   /// returns right-hand side of row with identifier \p id
-   Real SoPlex2::rhsReal(const SPxRowId& id) const
-   {
-      assert(_realLP != 0);
-      return _realLP->rhs(id);
    }
 
 
@@ -698,15 +626,6 @@ namespace soplex
 
 
 
-   /// returns left-hand side of row with identifier \p id
-   Real SoPlex2::lhsReal(const SPxRowId& id) const
-   {
-      assert(_realLP != 0);
-      return _realLP->lhs(id);
-   }
-
-
-
    /// returns inequality type of row \p i
    LPRowReal::Type SoPlex2::rowTypeReal(int i) const
    {
@@ -716,29 +635,11 @@ namespace soplex
 
 
 
-   /// returns inequality type of row with identifier \p id
-   LPRowReal::Type SoPlex2::rowTypeReal(const SPxRowId& id) const
-   {
-      assert(_realLP != 0);
-      return _realLP->rowType(id);
-   }
-
-
-
    /// gets column \p i
    void SoPlex2::getColReal(int i, LPColReal& lpcol) const
    {
       assert(_realLP != 0);
       return _realLP->getCol(i, lpcol);
-   }
-
-
-
-   /// gets column with identifier \p id.
-   void SoPlex2::getColReal(const SPxColId& id, LPColReal& lpcol) const
-   {
-      assert(_realLP != 0);
-      return _realLP->getCol(id, lpcol);
    }
 
 
@@ -761,15 +662,6 @@ namespace soplex
 
 
 
-   /// returns vector of column with identifier \p id
-   const SVectorReal& SoPlex2::colVectorReal(const SPxColId& id) const
-   {
-      assert(_realLP != 0);
-      return _realLP->colVector(id);
-   }
-
-
-
    /// returns upper bound vector
    const VectorReal& SoPlex2::upperReal() const
    {
@@ -784,15 +676,6 @@ namespace soplex
    {
       assert(_realLP != 0);
       return _realLP->upper(i);
-   }
-
-
-
-   /// returns upper bound of column with identifier \p id
-   Real SoPlex2::upperReal(const SPxColId& id) const
-   {
-      assert(_realLP != 0);
-      return _realLP->upper(id);
    }
 
 
@@ -815,15 +698,6 @@ namespace soplex
 
 
 
-   /// returns lower bound of column with identifier \p id
-   Real SoPlex2::lowerReal(const SPxColId& id) const
-   {
-      assert(_realLP != 0);
-      return _realLP->lower(id);
-   }
-
-
-
    /// gets objective function vector
    void SoPlex2::getObjReal(VectorReal& obj) const
    {
@@ -838,15 +712,6 @@ namespace soplex
    {
       assert(_realLP != 0);
       return _realLP->obj(i);
-   }
-
-
-
-   /// returns objective value of column with identifier \p id
-   Real SoPlex2::objReal(const SPxColId& id) const
-   {
-      assert(_realLP != 0);
-      return _realLP->obj(id);
    }
 
 
@@ -867,16 +732,6 @@ namespace soplex
    {
       assert(_realLP != 0);
       return _realLP->maxObj(i);
-   }
-
-
-
-   /// returns objective value of column with identifier \p id after transformation to a maximization problem; since
-   /// this is how it is stored internally, this is generally faster
-   Real SoPlex2::maxObjReal(const SPxColId& id) const
-   {
-      assert(_realLP != 0);
-      return _realLP->maxObj(id);
    }
 
 
@@ -926,65 +781,11 @@ namespace soplex
 
 
 
-   /// returns row identifier for row \p i
-   SPxRowId SoPlex2::rowIdRational(int i) const
-   {
-      assert(_rationalLP != 0);
-      return _rationalLP->rId(i);
-   }
-
-
-
-   /// returns column identifier for column \p i
-   SPxColId SoPlex2::colIdRational(int i) const
-   {
-      assert(_rationalLP != 0);
-      return _rationalLP->cId(i);
-   }
-
-
-
-   /// returns index of the row with identifier \p id
-   int SoPlex2::idxRational(const SPxRowId& id) const
-   {
-      assert(_rationalLP != 0);
-      return _rationalLP->number(id);
-   }
-
-
-
-   /// returns index of the column with identifier \p id
-   int SoPlex2::idxRational(const SPxColId& id) const
-   {
-      assert(_rationalLP != 0);
-      return _rationalLP->number(id);
-   }
-
-
-
-   /// returns index of the row or column with identifier \p id
-   int SoPlex2::idxRational(const SPxId& id) const
-   {
-      assert(_rationalLP != 0);
-      return _rationalLP->number(id);
-   }
-
-
-
    /// gets row \p i
    void SoPlex2::getRowRational(int i, LPRowRational& lprow) const
    {
       assert(_rationalLP != 0);
       _rationalLP->getRow(i, lprow);
-   }
-
-
-
-   /// gets row with identifier \p id
-   void SoPlex2::getRowRational(const SPxRowId& id, LPRowRational& lprow) const
-   {
-      assert(_rationalLP != 0);
-      _rationalLP->getRow(id, lprow);
    }
 
 
@@ -1007,15 +808,6 @@ namespace soplex
 
 
 
-   /// returns vector of row with identifier \p id
-   const SVectorRational& SoPlex2::rowVectorRational(const SPxRowId& id) const
-   {
-      assert(_rationalLP != 0);
-      return _rationalLP->rowVector(id);
-   }
-
-
-
    /// returns right-hand side vector
    const VectorRational& SoPlex2::rhsRational() const
    {
@@ -1030,15 +822,6 @@ namespace soplex
    {
       assert(_rationalLP != 0);
       return _rationalLP->rhs(i);
-   }
-
-
-
-   /// returns right-hand side of row with identifier \p id
-   Rational SoPlex2::rhsRational(const SPxRowId& id) const
-   {
-      assert(_rationalLP != 0);
-      return _rationalLP->rhs(id);
    }
 
 
@@ -1061,15 +844,6 @@ namespace soplex
 
 
 
-   /// returns left-hand side of row with identifier \p id
-   Rational SoPlex2::lhsRational(const SPxRowId& id) const
-   {
-      assert(_rationalLP != 0);
-      return _rationalLP->lhs(id);
-   }
-
-
-
    /// returns inequality type of row \p i
    LPRowRational::Type SoPlex2::rowTypeRational(int i) const
    {
@@ -1079,29 +853,11 @@ namespace soplex
 
 
 
-   /// returns inequality type of row with identifier \p id
-   LPRowRational::Type SoPlex2::rowTypeRational(const SPxRowId& id) const
-   {
-      assert(_rationalLP != 0);
-      return _rationalLP->rowType(id);
-   }
-
-
-
    /// gets column \p i
    void SoPlex2::getColRational(int i, LPColRational& lpcol) const
    {
       assert(_rationalLP != 0);
       return _rationalLP->getCol(i, lpcol);
-   }
-
-
-
-   /// gets column with identifier \p id.
-   void SoPlex2::getColRational(const SPxColId& id, LPColRational& lpcol) const
-   {
-      assert(_rationalLP != 0);
-      return _rationalLP->getCol(id, lpcol);
    }
 
 
@@ -1124,15 +880,6 @@ namespace soplex
 
 
 
-   /// returns vector of column with identifier \p id
-   const SVectorRational& SoPlex2::colVectorRational(const SPxColId& id) const
-   {
-      assert(_rationalLP != 0);
-      return _rationalLP->colVector(id);
-   }
-
-
-
    /// returns upper bound vector
    const VectorRational& SoPlex2::upperRational() const
    {
@@ -1147,15 +894,6 @@ namespace soplex
    {
       assert(_rationalLP != 0);
       return _rationalLP->upper(i);
-   }
-
-
-
-   /// returns upper bound of column with identifier \p id
-   Rational SoPlex2::upperRational(const SPxColId& id) const
-   {
-      assert(_rationalLP != 0);
-      return _rationalLP->upper(id);
    }
 
 
@@ -1178,15 +916,6 @@ namespace soplex
 
 
 
-   /// returns lower bound of column with identifier \p id
-   Rational SoPlex2::lowerRational(const SPxColId& id) const
-   {
-      assert(_rationalLP != 0);
-      return _rationalLP->lower(id);
-   }
-
-
-
    /// gets objective function vector
    void SoPlex2::getObjRational(VectorRational& obj) const
    {
@@ -1201,15 +930,6 @@ namespace soplex
    {
       assert(_rationalLP != 0);
       return _rationalLP->obj(i);
-   }
-
-
-
-   /// returns objective value of column with identifier \p id
-   Rational SoPlex2::objRational(const SPxColId& id) const
-   {
-      assert(_rationalLP != 0);
-      return _rationalLP->obj(id);
    }
 
 
@@ -1234,30 +954,11 @@ namespace soplex
 
 
 
-   /// returns objective value of column with identifier \p id after transformation to a maximization problem; since
-   /// this is how it is stored internally, this is generally faster
-   Rational SoPlex2::maxObjRational(const SPxColId& id) const
-   {
-      assert(_rationalLP != 0);
-      return _rationalLP->maxObj(id);
-   }
-
-
-
    /// adds a single row
    void SoPlex2::addRowReal(const LPRowReal& lprow)
    {
-      SPxRowId id;
-      SoPlex2::addRowReal(id, lprow);
-   }
-
-
-
-   /// adds a single row and gets its \p id
-   void SoPlex2::addRowReal(SPxRowId& id, const LPRowReal& lprow)
-   {
       assert(_realLP != 0);
-      _realLP->addRow(id, lprow);
+      _realLP->addRow(lprow);
 
       if( _isRealLPLoaded )
       {
@@ -1289,38 +990,11 @@ namespace soplex
 
 
 
-   /// adds multiple rows and gets an array of their \p id 's
-   void SoPlex2::addRowsReal(SPxRowId id[], const LPRowSetReal& lprowset)
-   {
-      assert(_realLP != 0);
-      _realLP->addRows(id, lprowset);
-
-      if( _isRealLPLoaded )
-      {
-         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-      }
-      else if( _hasBasisReal )
-         _basisStatusRowsReal.append(lprowset.num(), SPxSolver::BASIC);
-
-      _invalidateSolutionReal();
-   }
-
-
-
    /// adds a single column
    void SoPlex2::addColReal(const LPColReal& lpcol)
    {
-      SPxColId id;
-      SoPlex2::addColReal(id, lpcol);
-   }
-
-
-
-   /// adds a single column and gets its \p id
-   void SoPlex2::addColReal(SPxColId& id, const LPColReal& lpcol)
-   {
       assert(_realLP != 0);
-      _realLP->addCol(id, lpcol);
+      _realLP->addCol(lpcol);
 
       if( _isRealLPLoaded )
       {
@@ -1369,34 +1043,6 @@ namespace soplex
 
 
 
-   /// adds multiple columns and gets an array of their \p id 's
-   void SoPlex2::addColsReal(SPxColId id[], const LPColSetReal& lpcolset)
-   {
-      assert(_realLP != 0);
-      _realLP->addCols(id, lpcolset);
-
-      if( _isRealLPLoaded )
-      {
-         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-      }
-      else if( _hasBasisReal )
-      {
-         for( int i = 0; i < lpcolset.num(); i++ )
-         {
-            if( lpcolset.lower(i) > -realParam(SoPlex2::INFTY) )
-               _basisStatusColsReal.append(SPxSolver::ON_LOWER);
-            else if( lpcolset.upper(i) < realParam(SoPlex2::INFTY) )
-               _basisStatusColsReal.append(SPxSolver::ON_UPPER);
-            else
-               _basisStatusColsReal.append(SPxSolver::ZERO);
-         }
-      }
-
-      _invalidateSolutionReal();
-   }
-
-
-
    /// replaces row \p i with \p lprow
    void SoPlex2::changeRowReal(int i, const LPRowReal& lprow)
    {
@@ -1418,14 +1064,6 @@ namespace soplex
       }
 
       _invalidateSolutionReal();
-   }
-
-
-
-   /// replaces row with identifier \p id with \p lprow
-   void SoPlex2::changeRowReal(SPxRowId id, const LPRowReal& lprow)
-   {
-      SoPlex2::changeRowReal(idxReal(id), lprow);
    }
 
 
@@ -1472,14 +1110,6 @@ namespace soplex
 
 
 
-   /// changes left-hand side of row with identifier \p id to \p lhs
-   void SoPlex2::changeLhsReal(SPxRowId id, Real lhs)
-   {
-      SoPlex2::changeLhsReal(idxReal(id), lhs);
-   }
-
-
-
    /// changes right-hand side vector to \p rhs
    void SoPlex2::changeRhsReal(const VectorReal& rhs)
    {
@@ -1518,14 +1148,6 @@ namespace soplex
          _basisStatusRowsReal[i] = (lhsReal(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
 
       _invalidateSolutionReal();
-   }
-
-
-
-   /// changes right-hand of row with identifier \p id to \p rhs
-   void SoPlex2::changeRhsReal(SPxRowId id, Real rhs)
-   {
-      SoPlex2::changeRhsReal(idxReal(id), rhs);
    }
 
 
@@ -1579,14 +1201,6 @@ namespace soplex
 
 
 
-   /// changes left- and right-hand side of row with identifier \p id
-   void SoPlex2::changeRangeReal(SPxRowId id, Real lhs, Real rhs)
-   {
-      SoPlex2::changeRangeReal(idxReal(id), lhs, rhs);
-   }
-
-
-
    /// replaces column \p i with \p lpcol
    void SoPlex2::changeColReal(int i, const LPColReal& lpcol)
    {
@@ -1608,14 +1222,6 @@ namespace soplex
       }
 
       _invalidateSolutionReal();
-   }
-
-
-
-   /// replaces column with identifier \p id with \p lpcol
-   void SoPlex2::changeColReal(SPxColId id, const LPColReal& lpcol)
-   {
-      SoPlex2::changeColReal(idxReal(id), lpcol);
    }
 
 
@@ -1662,14 +1268,6 @@ namespace soplex
 
 
 
-   /// changes lower bound of column with identifier \p id to \p lower
-   void SoPlex2::changeLowerReal(SPxColId id, Real lower)
-   {
-      SoPlex2::changeLowerReal(idxReal(id), lower);
-   }
-
-
-
    /// changes vector of upper bounds to \p upper
    void SoPlex2::changeUpperReal(const VectorReal& upper)
    {
@@ -1708,14 +1306,6 @@ namespace soplex
          _basisStatusColsReal[i] = (lowerReal(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
 
       _invalidateSolutionReal();
-   }
-
-
-
-   /// changes upper bound of column with identifier \p id to \p upper
-   void SoPlex2::changeUpperReal(SPxColId id, Real upper)
-   {
-      SoPlex2::changeUpperReal(idxReal(id), upper);
    }
 
 
@@ -1769,14 +1359,6 @@ namespace soplex
 
 
 
-   /// changes bounds of column with identifier \p id to \p lower and \p upper
-   void SoPlex2::changeBoundsReal(SPxColId id, Real lower, Real upper)
-   {
-      SoPlex2::changeBoundsReal(idxReal(id), lower, upper);
-   }
-
-
-
    /// changes objective function vector to \p obj
    void SoPlex2::changeObjReal(const VectorReal& obj)
    {
@@ -1793,17 +1375,6 @@ namespace soplex
    {
       assert(_realLP != 0);
       _realLP->changeObj(i, obj);
-
-      _invalidateSolutionReal();
-   }
-
-
-
-   /// changes objective coefficient of column with identifier \p id to \p obj
-   void SoPlex2::changeObjReal(SPxColId id, Real obj)
-   {
-      assert(_realLP != 0);
-      _realLP->changeObj(id, obj);
 
       _invalidateSolutionReal();
    }
@@ -1831,14 +1402,6 @@ namespace soplex
 
 
 
-   /// changes matrix entry identified by (\p rowid, \p colid) to \p val
-   void SoPlex2::changeElementReal(SPxRowId rowid, SPxColId colid, Real val)
-   {
-      SoPlex2::changeElementReal(idxReal(rowid), idxReal(colid), val);
-   }
-
-
-
    /// removes row \p i
    void SoPlex2::removeRowReal(int i)
    {
@@ -1861,14 +1424,6 @@ namespace soplex
       }
 
       _invalidateSolutionReal();
-   }
-
-
-
-   /// removes row with identifier \p id
-   void SoPlex2::removeRowReal(SPxRowId id)
-   {
-      SoPlex2::removeRowReal(idxReal(id));
    }
 
 
@@ -1905,25 +1460,6 @@ namespace soplex
       }
 
       _invalidateSolutionReal();
-   }
-
-
-
-   /// remove all rows with identifier in array \p id of size \p n; an array \p perm of size #numRowsReal() may be
-   /// passed as buffer memory
-   void SoPlex2::removeRowsReal(SPxRowId id[], int n, int perm[])
-   {
-      if( perm == 0 )
-      {
-         DataArray< int > p(numRowsReal());
-         _idToPerm((SPxId*)id, n, p.get_ptr(), numRowsReal());
-         SoPlex2::removeRowsReal(p.get_ptr());
-      }
-      else
-      {
-         _idToPerm((SPxId*)id, n, perm, numRowsReal());
-         SoPlex2::removeRowsReal(perm);
-      }
    }
 
 
@@ -1992,14 +1528,6 @@ namespace soplex
 
 
 
-   /// removes column with identifier \p id
-   void SoPlex2::removeColReal(SPxColId id)
-   {
-      SoPlex2::removeColReal(idxReal(id));
-   }
-
-
-
    /// removes all columns with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
    /// new index where column \p i has been moved to; note that \p perm must point to an array of size at least
    /// #numColsReal()
@@ -2032,25 +1560,6 @@ namespace soplex
       }
 
       _invalidateSolutionReal();
-   }
-
-
-
-   /// remove all columns with identifier in array \p id of size \p n; an array \p perm of size #numColsReal() may be
-   /// passed as buffer memory
-   void SoPlex2::removeColsReal(SPxColId id[], int n, int perm[])
-   {
-      if( perm == 0 )
-      {
-         DataArray< int > p(numColsReal());
-         _idToPerm((SPxId*)id, n, p.get_ptr(), numColsReal());
-         SoPlex2::removeColsReal(p.get_ptr());
-      }
-      else
-      {
-         _idToPerm((SPxId*)id, n, perm, numColsReal());
-         SoPlex2::removeColsReal(perm);
-      }
    }
 
 
@@ -2151,17 +1660,8 @@ namespace soplex
    /// adds a single row
    void SoPlex2::addRowRational(const LPRowRational& lprow)
    {
-      SPxRowId id;
-      SoPlex2::addRowRational(id, lprow);
-   }
-
-
-
-   /// adds a single row and gets its \p id
-   void SoPlex2::addRowRational(SPxRowId& id, const LPRowRational& lprow)
-   {
       assert(_rationalLP != 0);
-      _rationalLP->addRow(id, lprow);
+      _rationalLP->addRow(lprow);
 
       if( _hasBasisRational )
          _basisStatusRowsRational.append(SPxSolver::BASIC);
@@ -2185,34 +1685,11 @@ namespace soplex
 
 
 
-   /// adds multiple rows and gets an array of their \p id 's
-   void SoPlex2::addRowsRational(SPxRowId id[], const LPRowSetRational& lprowset)
-   {
-      assert(_rationalLP != 0);
-      _rationalLP->addRows(id, lprowset);
-
-      if( _hasBasisRational )
-         _basisStatusRowsRational.append(lprowset.num(), SPxSolver::BASIC);
-
-      _invalidateSolutionRational();
-   }
-
-
-
    /// adds a single column
    void SoPlex2::addColRational(const LPColRational& lpcol)
    {
-      SPxColId id;
-      SoPlex2::addColRational(id, lpcol);
-   }
-
-
-
-   /// adds a single column and gets its \p id
-   void SoPlex2::addColRational(SPxColId& id, const LPColRational& lpcol)
-   {
       assert(_rationalLP != 0);
-      _rationalLP->addCol(id, lpcol);
+      _rationalLP->addCol(lpcol);
 
       if( _hasBasisRational )
       {
@@ -2253,30 +1730,6 @@ namespace soplex
 
 
 
-   /// adds multiple columns and gets an array of their \p id 's
-   void SoPlex2::addColsRational(SPxColId id[], const LPColSetRational& lpcolset)
-   {
-      assert(_rationalLP != 0);
-      _rationalLP->addCols(id, lpcolset);
-
-      if( _hasBasisRational )
-      {
-         for( int i = 0; i < lpcolset.num(); i++ )
-         {
-            if( lpcolset.lower(i) > double(-realParam(SoPlex2::INFTY)) )
-               _basisStatusColsRational.append(SPxSolver::ON_LOWER);
-            else if( lpcolset.upper(i) < double(realParam(SoPlex2::INFTY)) )
-               _basisStatusColsRational.append(SPxSolver::ON_UPPER);
-            else
-               _basisStatusColsRational.append(SPxSolver::ZERO);
-         }
-      }
-
-      _invalidateSolutionRational();
-   }
-
-
-
    /// replaces row \p i with \p lprow
    void SoPlex2::changeRowRational(int i, const LPRowRational& lprow)
    {
@@ -2294,14 +1747,6 @@ namespace soplex
       }
 
       _invalidateSolutionRational();
-   }
-
-
-
-   /// replaces row with identifier \p id with \p lprow
-   void SoPlex2::changeRowRational(SPxRowId id, const LPRowRational& lprow)
-   {
-      SoPlex2::changeRowRational(idxRational(id), lprow);
    }
 
 
@@ -2340,14 +1785,6 @@ namespace soplex
 
 
 
-   /// changes left-hand side of row with identifier \p id to \p lhs
-   void SoPlex2::changeLhsRational(SPxRowId id, Rational lhs)
-   {
-      SoPlex2::changeLhsRational(idxRational(id), lhs);
-   }
-
-
-
    /// changes right-hand side vector to \p rhs
    void SoPlex2::changeRhsRational(const VectorRational& rhs)
    {
@@ -2378,14 +1815,6 @@ namespace soplex
          _basisStatusRowsRational[i] = (lhsRational(i) > double(-realParam(SoPlex2::INFTY))) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
 
       _invalidateSolutionRational();
-   }
-
-
-
-   /// changes right-hand of row with identifier \p id to \p rhs
-   void SoPlex2::changeRhsRational(SPxRowId id, Rational rhs)
-   {
-      SoPlex2::changeRhsRational(idxRational(id), rhs);
    }
 
 
@@ -2431,14 +1860,6 @@ namespace soplex
 
 
 
-   /// changes left- and right-hand side of row with identifier \p id
-   void SoPlex2::changeRangeRational(SPxRowId id, Rational lhs, Rational rhs)
-   {
-      SoPlex2::changeRangeRational(idxRational(id), lhs, rhs);
-   }
-
-
-
    /// replaces column \p i with \p lpcol
    void SoPlex2::changeColRational(int i, const LPColRational& lpcol)
    {
@@ -2456,14 +1877,6 @@ namespace soplex
       }
 
       _invalidateSolutionRational();
-   }
-
-
-
-   /// replaces column with identifier \p id with \p lpcol
-   void SoPlex2::changeColRational(SPxColId id, const LPColRational& lpcol)
-   {
-      SoPlex2::changeColRational(idxRational(id), lpcol);
    }
 
 
@@ -2502,14 +1915,6 @@ namespace soplex
 
 
 
-   /// changes lower bound of column with identifier \p id to \p lower
-   void SoPlex2::changeLowerRational(SPxColId id, Rational lower)
-   {
-      SoPlex2::changeLowerRational(idxRational(id), lower);
-   }
-
-
-
    /// changes vector of upper bounds to \p upper
    void SoPlex2::changeUpperRational(const VectorRational& upper)
    {
@@ -2540,14 +1945,6 @@ namespace soplex
          _basisStatusColsRational[i] = (lowerRational(i) > double(-realParam(SoPlex2::INFTY))) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
 
       _invalidateSolutionRational();
-   }
-
-
-
-   /// changes upper bound of column with identifier \p id to \p upper
-   void SoPlex2::changeUpperRational(SPxColId id, Rational upper)
-   {
-      SoPlex2::changeUpperRational(idxRational(id), upper);
    }
 
 
@@ -2593,14 +1990,6 @@ namespace soplex
 
 
 
-   /// changes bounds of column with identifier \p id to \p lower and \p upper
-   void SoPlex2::changeBoundsRational(SPxColId id, Rational lower, Rational upper)
-   {
-      SoPlex2::changeBoundsRational(idxRational(id), lower, upper);
-   }
-
-
-
    /// changes objective function vector to \p obj
    void SoPlex2::changeObjRational(const VectorRational& obj)
    {
@@ -2617,17 +2006,6 @@ namespace soplex
    {
       assert(_rationalLP != 0);
       _rationalLP->changeObj(i, obj);
-
-      _invalidateSolutionRational();
-   }
-
-
-
-   /// changes objective coefficient of column with identifier \p id to \p obj
-   void SoPlex2::changeObjRational(SPxColId id, Rational obj)
-   {
-      assert(_rationalLP != 0);
-      _rationalLP->changeObj(id, obj);
 
       _invalidateSolutionRational();
    }
@@ -2651,14 +2029,6 @@ namespace soplex
 
 
 
-   /// changes matrix entry identified by (\p rowid, \p colid) to \p val
-   void SoPlex2::changeElementRational(SPxRowId rowid, SPxColId colid, Rational val)
-   {
-      SoPlex2::changeElementRational(idxRational(rowid), idxRational(colid), val);
-   }
-
-
-
    /// removes row \p i
    void SoPlex2::removeRowRational(int i)
    {
@@ -2677,14 +2047,6 @@ namespace soplex
       }
 
       _invalidateSolutionRational();
-   }
-
-
-
-   /// removes row with identifier \p id
-   void SoPlex2::removeRowRational(SPxRowId id)
-   {
-      SoPlex2::removeRowRational(idxRational(id));
    }
 
 
@@ -2717,25 +2079,6 @@ namespace soplex
       }
 
       _invalidateSolutionRational();
-   }
-
-
-
-   /// remove all rows with identifier in array \p id of size \p n; an array \p perm of size #numRowsRational() may be
-   /// passed as buffer memory
-   void SoPlex2::removeRowsRational(SPxRowId id[], int n, int perm[])
-   {
-      if( perm == 0 )
-      {
-         DataArray< int > p(numRowsRational());
-         _idToPerm((SPxId*)id, n, p.get_ptr(), numRowsRational());
-         SoPlex2::removeRowsRational(p.get_ptr());
-      }
-      else
-      {
-         _idToPerm((SPxId*)id, n, perm, numRowsRational());
-         SoPlex2::removeRowsRational(perm);
-      }
    }
 
 
@@ -2800,14 +2143,6 @@ namespace soplex
 
 
 
-   /// removes column with identifier \p id
-   void SoPlex2::removeColRational(SPxColId id)
-   {
-      SoPlex2::removeColRational(idxRational(id));
-   }
-
-
-
    /// removes all columns with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
    /// new index where column \p i has been moved to; note that \p perm must point to an array of size at least
    /// #numColsRational()
@@ -2836,25 +2171,6 @@ namespace soplex
       }
 
       _invalidateSolutionRational();
-   }
-
-
-
-   /// remove all columns with identifier in array \p id of size \p n; an array \p perm of size #numColsRational() may
-   /// be passed as buffer memory
-   void SoPlex2::removeColsRational(SPxColId id[], int n, int perm[])
-   {
-      if( perm == 0 )
-      {
-         DataArray< int > p(numColsRational());
-         _idToPerm((SPxId*)id, n, p.get_ptr(), numColsRational());
-         SoPlex2::removeColsRational(p.get_ptr());
-      }
-      else
-      {
-         _idToPerm((SPxId*)id, n, perm, numColsRational());
-         SoPlex2::removeColsRational(perm);
-      }
    }
 
 
@@ -3095,14 +2411,6 @@ namespace soplex
       }
       else
          return -realParam(SoPlex2::INFTY) * intParam(SoPlex2::OBJSENSE);
-   }
-
-
-
-   /// returns the termination value
-   Real SoPlex2::terminationValueReal() const
-   {
-      return _solver.terminationValue();
    }
 
 
@@ -3657,14 +2965,6 @@ namespace soplex
 
 
 
-   /// returns basis status for a single row
-   SPxSolver::VarStatus SoPlex2::basisRowStatusReal(const SPxRowId& id) const
-   {
-      return basisRowStatusReal(idxReal(id));
-   }
-
-
-
    /// returns basis status for a single column
    SPxSolver::VarStatus SoPlex2::basisColStatusReal(int col) const
    {
@@ -3692,14 +2992,6 @@ namespace soplex
          assert(col < _basisStatusColsReal.size());
          return _basisStatusColsReal[col];
       }
-   }
-
-
-
-   /// returns basis status for a single column
-   SPxSolver::VarStatus SoPlex2::basisColStatusReal(const SPxColId& id) const
-   {
-      return basisColStatusReal(idxReal(id));
    }
 
 
@@ -3812,14 +3104,6 @@ namespace soplex
 
 
 
-   /// returns basis status for a single row
-   SPxSolver::VarStatus SoPlex2::basisRowStatusRational(const SPxRowId& id) const
-   {
-      return basisRowStatusRational(idxRational(id));
-   }
-
-
-
    /// returns basis status for a single column
    SPxSolver::VarStatus SoPlex2::basisColStatusRational(int col) const
    {
@@ -3841,14 +3125,6 @@ namespace soplex
          assert(col < _basisStatusColsRational.size());
          return _basisStatusColsRational[col];
       }
-   }
-
-
-
-   /// returns basis status for a single column
-   SPxSolver::VarStatus SoPlex2::basisColStatusRational(const SPxColId& id) const
-   {
-      return basisColStatusRational(idxRational(id));
    }
 
 
@@ -3913,6 +3189,7 @@ namespace soplex
 
 
    /// returns the indices of the basic columns and rows; basic column n gives value n, basic row m gives value -1-m
+   ///@todo this only works if basis is in LP - extend!
    void SoPlex2::getBasisInd(int* bind)
    {
       assert(hasBasisReal());
@@ -4466,6 +3743,7 @@ namespace soplex
    bool SoPlex2::readBasisFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames)
    {
       assert(filename != 0);
+      assert(_rationalLP != 0);
 
       // start timing
       _statistics->readingTime.start();
@@ -4494,8 +3772,7 @@ namespace soplex
          for( int j = 0; j < numCols; ++j )
          {
             name << "x" << j;
-            DataKey key = colIdRational(j);
-            tmpColNames->add(key, name.str().c_str());
+            tmpColNames->add(name.str().c_str());
          }
 
          colNamesPtr = tmpColNames;
@@ -4515,8 +3792,7 @@ namespace soplex
          for( int i = 0; i < numRows; ++i )
          {
             name << "C" << i;
-            DataKey key = rowIdRational(i);
-            tmpRowNames->add(key, name.str().c_str());
+            tmpRowNames->add(name.str().c_str());
          }
 
          rowNamesPtr = tmpRowNames;
@@ -4625,6 +3901,7 @@ namespace soplex
    bool SoPlex2::writeBasisFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames)
    {
       assert(filename != 0);
+      assert(_rationalLP != 0);
 
       std::ofstream file(filename);
       if( file == 0 )
@@ -4664,14 +3941,14 @@ namespace soplex
             file << (_basisStatusRowsRational[row] == SPxSolver::ON_UPPER ? " XU " : " XL ");
 
             file << std::setw(8);
-            if( colNames != 0 && colNames->has(colIdRational(col)) )
-               file << (*colNames)[colIdRational(col)];
+            if( colNames != 0 && colNames->has(col) )
+               file << (*colNames)[col];
             else
                file << "x" << col;
 
             file << "       ";
-            if( rowNames != 0 && rowNames->has(rowIdRational(row)) )
-               file << (*rowNames)[rowIdRational(row)];
+            if( rowNames != 0 && rowNames->has(row) )
+               file << (*rowNames)[row];
             else
                file << "C" << row;
 
@@ -4685,8 +3962,8 @@ namespace soplex
                file << " UL ";
 
                file << std::setw(8);
-               if( colNames != 0 && colNames->has(colIdRational(col)) )
-                  file << (*colNames)[colIdRational(col)];
+               if( colNames != 0 && colNames->has(col) )
+                  file << (*colNames)[col];
                else
                   file << "x" << col;
 
@@ -5367,27 +4644,6 @@ namespace soplex
       }
 
       os << "\n";
-   }
-
-
-
-   /// creates a permutation for removing rows/columns from an array of IDs
-   void SoPlex2::_idToPerm(SPxId* id, int idSize, int* perm, int permSize) const
-   {
-      assert(id != 0);
-      assert(idSize >= 0);
-      assert(perm != 0);
-      assert(permSize >= 0);
-
-      for( int i = 0; i < permSize; i++ )
-         perm[i] = i;
-
-      for( int i = 0; i < idSize; i++ )
-      {
-         assert(idxReal(id[i]) >= 0);
-         assert(idxReal(id[i]) < permSize);
-         perm[idxReal(id[i])] = -1;
-      }
    }
 
 

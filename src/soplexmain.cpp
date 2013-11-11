@@ -656,7 +656,7 @@ void printSolutionAndStatusReal(
             for( int i = 0; i < SoPlexShell.numColsReal(); ++i )
             {
                if( isNotZero( objx[i], 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) ) )
-                  MSG_INFO1( spxout << colnames[ SoPlexShell.colIdReal(i) ] << "\t"
+                  MSG_INFO1( spxout << colnames[i] << "\t"
                                     << i << "\t"
                                     << std::setw(17)
                                     << std::setprecision( precision )
@@ -677,7 +677,7 @@ void printSolutionAndStatusReal(
             {
                if( isNotZero(objy[i] , 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::OPTTOL))) )
                {
-                  MSG_INFO1( spxout << rownames[ SoPlexShell.rowIdReal(i) ] << "\t"
+                  MSG_INFO1( spxout << rownames[i] << "\t"
                                     << i << "\t"
                                     << std::setw(17)
                                     << std::setprecision( precision )
@@ -725,7 +725,7 @@ void printSolutionAndStatusReal(
             for( int i = 0; i < SoPlexShell.numColsReal(); ++i )
             {
                if( isNotZero( objx[i], 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) ) )
-                  MSG_INFO1( spxout << colnames[ SoPlexShell.colIdReal(i) ] << "\t"
+                  MSG_INFO1( spxout << colnames[i] << "\t"
                                     << i << "\t"
                                     << std::setw(17)
                                     << std::setprecision( precision )
@@ -749,7 +749,7 @@ void printSolutionAndStatusReal(
                {
                   rayobjval += ray[i] * objcoef[i];
 
-                  MSG_INFO1( spxout << colnames[ SoPlexShell.colIdReal(i) ] << "\t"
+                  MSG_INFO1( spxout << colnames[i] << "\t"
                                     << i << "\t"
                                     << std::setw(17)
                                     << std::setprecision( precision )
@@ -783,7 +783,7 @@ void printSolutionAndStatusReal(
             {
                if ( isNotZero( farkasx[i], 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::OPTTOL)) ) )
                {
-                  MSG_INFO1( spxout << rownames[ SoPlexShell.rowIdReal(i) ] << "\t"
+                  MSG_INFO1( spxout << rownames[i] << "\t"
                                     << i << "\t"
                                     << std::setw(16)
                                     << std::setprecision( precision )
@@ -802,7 +802,7 @@ void printSolutionAndStatusReal(
                      }
                      MSG_INFO1( spxout
                         << row.rowVector().value(j) << " "
-                        << colnames[ SoPlexShell.colIdReal(row.rowVector().index(j)) ]
+                        << colnames[row.rowVector().index(j)]
                         << " "; );
                   }
                   if( row.rhs() < soplex::infinity )
@@ -839,7 +839,7 @@ void printSolutionAndStatusReal(
                   {
                      MSG_INFO1( spxout << "+"; )
                   }
-                  MSG_INFO1( spxout << proofvec[i] << " " << colnames[ SoPlexShell.colIdReal(i) ] << " "; )
+                  MSG_INFO1( spxout << proofvec[i] << " " << colnames[i] << " "; )
                   nonzerofound = true;
                }
             }
@@ -932,7 +932,7 @@ void printSolutionAndStatusRational(
             for( int i = 0; i < SoPlexShell.numColsRational(); ++i )
             {
                if( isNotZero( Real(objx[i]), 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) ) )
-                  MSG_INFO1( spxout << colnames[ SoPlexShell.colIdRational(i) ] << "\t"
+                  MSG_INFO1( spxout << colnames[i] << "\t"
                                     << i << "\t"
                                     << std::setw(17)
                                     << std::setprecision( precision )
@@ -953,7 +953,7 @@ void printSolutionAndStatusRational(
             {
                if( isNotZero( Real(objy[i]), 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::OPTTOL))) )
                {
-                  MSG_INFO1( spxout << rownames[ SoPlexShell.rowIdRational(i) ] << "\t"
+                  MSG_INFO1( spxout << rownames[i] << "\t"
                                     << i << "\t"
                                     << std::setw(17)
                                     << std::setprecision( precision )
@@ -1001,7 +1001,7 @@ void printSolutionAndStatusRational(
             for( int i = 0; i < SoPlexShell.numColsRational(); ++i )
             {
                if( isNotZero( Real(objx[i]), 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) ) )
-                  MSG_INFO1( spxout << colnames[ SoPlexShell.colIdRational(i) ] << "\t"
+                  MSG_INFO1( spxout << colnames[i] << "\t"
                                     << i << "\t"
                                     << std::setw(17)
                                     << std::setprecision( precision )
@@ -1025,7 +1025,7 @@ void printSolutionAndStatusRational(
                {
                   rayobjval += ray[i] * objcoef[i];
 
-                  MSG_INFO1( spxout << colnames[ SoPlexShell.colIdRational(i) ] << "\t"
+                  MSG_INFO1( spxout << colnames[i] << "\t"
                                     << i << "\t"
                                     << std::setw(17)
                                     << std::setprecision( precision )
@@ -1059,7 +1059,7 @@ void printSolutionAndStatusRational(
             {
                if ( isNotZero( Real(farkasx[i]), 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::OPTTOL)) ) )
                {
-                  MSG_INFO1( spxout << rownames[ SoPlexShell.rowIdRational(i) ] << "\t"
+                  MSG_INFO1( spxout << rownames[i] << "\t"
                                     << i << "\t"
                                     << std::setw(16)
                                     << std::setprecision( precision )
@@ -1078,7 +1078,7 @@ void printSolutionAndStatusRational(
                      }
                      MSG_INFO1( spxout
                         << rationalToString(row.rowVector().value(j)) << " "
-                        << colnames[ SoPlexShell.colIdRational(row.rowVector().index(j)) ]
+                        << colnames[row.rowVector().index(j)]
                         << " "; );
                   }
                   if( row.rhs() < double(soplex::infinity) )
@@ -1115,7 +1115,7 @@ void printSolutionAndStatusRational(
                   {
                      MSG_INFO1( spxout << "+"; )
                   }
-                  MSG_INFO1( spxout << rationalToString(proofvec[i]) << " " << colnames[ SoPlexShell.colIdRational(i) ] << " "; )
+                  MSG_INFO1( spxout << rationalToString(proofvec[i]) << " " << colnames[i] << " "; )
                   nonzerofound = true;
                }
             }

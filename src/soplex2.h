@@ -119,26 +119,8 @@ public:
    /// returns biggest non-zero element in absolute value
    Real maxAbsNonzeroReal() const;
 
-   /// returns row identifier for row \p i
-   SPxRowId rowIdReal(int i) const;
-
-   /// returns column identifier for column \p i
-   SPxColId colIdReal(int i) const;
-
-   /// returns index of the row with identifier \p id
-   int idxReal(const SPxRowId& id) const;
-
-   /// returns index of the column with identifier \p id
-   int idxReal(const SPxColId& id) const;
-
-   /// returns index of the row or column with identifier \p id
-   int idxReal(const SPxId& id) const;
-
    /// gets row \p i
    void getRowReal(int i, LPRowReal& lprow) const;
-
-   /// gets row with identifier \p id
-   void getRowReal(const SPxRowId& id, LPRowReal& lprow) const;
 
    /// gets rows \p start, ..., \p end.
    void getRowsReal(int start, int end, LPRowSetReal& lprowset) const;
@@ -146,17 +128,11 @@ public:
    /// returns vector of row \p i
    const SVectorReal& rowVectorReal(int i) const;
 
-   /// returns vector of row with identifier \p id
-   const SVectorReal& rowVectorReal(const SPxRowId& id) const;
-
    /// returns right-hand side vector
    const VectorReal& rhsReal() const;
 
    /// returns right-hand side of row \p i
    Real rhsReal(int i) const;
-
-   /// returns right-hand side of row with identifier \p id
-   Real rhsReal(const SPxRowId& id) const;
 
    /// returns left-hand side vector
    const VectorReal& lhsReal() const;
@@ -164,20 +140,11 @@ public:
    /// returns left-hand side of row \p i
    Real lhsReal(int i) const;
 
-   /// returns left-hand side of row with identifier \p id
-   Real lhsReal(const SPxRowId& id) const;
-
    /// returns inequality type of row \p i
    LPRowReal::Type rowTypeReal(int i) const;
 
-   /// returns inequality type of row with identifier \p id
-   LPRowReal::Type rowTypeReal(const SPxRowId& id) const;
-
    /// gets column \p i
    void getColReal(int i, LPColReal& lpcol) const;
-
-   /// gets column with identifier \p id.
-   void getColReal(const SPxColId& id, LPColReal& lpcol) const;
 
    /// gets columns \p start, ..., \p end
    void getColsReal(int start, int end, LPColSetReal& lpcolset) const;
@@ -185,17 +152,11 @@ public:
    /// returns vector of column \p i
    const SVectorReal& colVectorReal(int i) const;
 
-   /// returns vector of column with identifier \p id
-   const SVectorReal& colVectorReal(const SPxColId& id) const;
-
    /// returns upper bound vector
    const VectorReal& upperReal() const;
 
    /// returns upper bound of column \p i
    Real upperReal(int i) const;
-
-   /// returns upper bound of column with identifier \p id
-   Real upperReal(const SPxColId& id) const;
 
    /// returns lower bound vector
    const VectorReal& lowerReal() const;
@@ -203,17 +164,11 @@ public:
    /// returns lower bound of column \p i
    Real lowerReal(int i) const;
 
-   /// returns lower bound of column with identifier \p id
-   Real lowerReal(const SPxColId& id) const;
-
    /// gets objective function vector
    void getObjReal(VectorReal& obj) const;
 
    /// returns objective value of column \p i
    Real objReal(int i) const;
-
-   /// returns objective value of column with identifier \p id
-   Real objReal(const SPxColId& id) const;
 
    /// returns objective function vector after transformation to a maximization problem; since this is how it is stored
    /// internally, this is generally faster
@@ -222,10 +177,6 @@ public:
    /// returns objective value of column \p i after transformation to a maximization problem; since this is how it is
    /// stored internally, this is generally faster
    Real maxObjReal(int i) const;
-
-   /// returns objective value of column with identifier \p id after transformation to a maximization problem; since
-   /// this is how it is stored internally, this is generally faster
-   Real maxObjReal(const SPxColId& id) const;
 
    //@}
 
@@ -248,26 +199,8 @@ public:
    /// returns biggest non-zero element in absolute value
    Rational maxAbsNonzeroRational() const;
 
-   /// returns row identifier for row \p i
-   SPxRowId rowIdRational(int i) const;
-
-   /// returns column identifier for column \p i
-   SPxColId colIdRational(int i) const;
-
-   /// returns index of the row with identifier \p id
-   int idxRational(const SPxRowId& id) const;
-
-   /// returns index of the column with identifier \p id
-   int idxRational(const SPxColId& id) const;
-
-   /// returns index of the row or column with identifier \p id
-   int idxRational(const SPxId& id) const;
-
    /// gets row \p i
    void getRowRational(int i, LPRowRational& lprow) const;
-
-   /// gets row with identifier \p id
-   void getRowRational(const SPxRowId& id, LPRowRational& lprow) const;
 
    /// gets rows \p start, ..., \p end.
    void getRowsRational(int start, int end, LPRowSetRational& lprowset) const;
@@ -275,17 +208,11 @@ public:
    /// returns vector of row \p i
    const SVectorRational& rowVectorRational(int i) const;
 
-   /// returns vector of row with identifier \p id
-   const SVectorRational& rowVectorRational(const SPxRowId& id) const;
-
    /// returns right-hand side vector
    const VectorRational& rhsRational() const;
 
    /// returns right-hand side of row \p i
    Rational rhsRational(int i) const;
-
-   /// returns right-hand side of row with identifier \p id
-   Rational rhsRational(const SPxRowId& id) const;
 
    /// returns left-hand side vector
    const VectorRational& lhsRational() const;
@@ -293,20 +220,11 @@ public:
    /// returns left-hand side of row \p i
    Rational lhsRational(int i) const;
 
-   /// returns left-hand side of row with identifier \p id
-   Rational lhsRational(const SPxRowId& id) const;
-
    /// returns inequality type of row \p i
    LPRowRational::Type rowTypeRational(int i) const;
 
-   /// returns inequality type of row with identifier \p id
-   LPRowRational::Type rowTypeRational(const SPxRowId& id) const;
-
    /// gets column \p i
    void getColRational(int i, LPColRational& lpcol) const;
-
-   /// gets column with identifier \p id.
-   void getColRational(const SPxColId& id, LPColRational& lpcol) const;
 
    /// gets columns \p start, ..., \p end
    void getColsRational(int start, int end, LPColSetRational& lpcolset) const;
@@ -314,17 +232,11 @@ public:
    /// returns vector of column \p i
    const SVectorRational& colVectorRational(int i) const;
 
-   /// returns vector of column with identifier \p id
-   const SVectorRational& colVectorRational(const SPxColId& id) const;
-
    /// returns upper bound vector
    const VectorRational& upperRational() const;
 
    /// returns upper bound of column \p i
    Rational upperRational(int i) const;
-
-   /// returns upper bound of column with identifier \p id
-   Rational upperRational(const SPxColId& id) const;
 
    /// returns lower bound vector
    const VectorRational& lowerRational() const;
@@ -332,17 +244,11 @@ public:
    /// returns lower bound of column \p i
    Rational lowerRational(int i) const;
 
-   /// returns lower bound of column with identifier \p id
-   Rational lowerRational(const SPxColId& id) const;
-
    /// gets objective function vector
    void getObjRational(VectorRational& obj) const;
 
    /// returns objective value of column \p i
    Rational objRational(int i) const;
-
-   /// returns objective value of column with identifier \p id
-   Rational objRational(const SPxColId& id) const;
 
    /// returns objective function vector after transformation to a maximization problem; since this is how it is stored
    /// internally, this is generally faster
@@ -351,10 +257,6 @@ public:
    /// returns objective value of column \p i after transformation to a maximization problem; since this is how it is
    /// stored internally, this is generally faster
    Rational maxObjRational(int i) const;
-
-   /// returns objective value of column with identifier \p id after transformation to a maximization problem; since
-   /// this is how it is stored internally, this is generally faster
-   Rational maxObjRational(const SPxColId& id) const;
 
    //@}
 
@@ -365,32 +267,17 @@ public:
    /// adds a single row
    void addRowReal(const LPRowReal& lprow);
 
-   /// adds a single row and gets its \p id
-   void addRowReal(SPxRowId& id, const LPRowReal& lprow);
-
    /// adds multiple rows
    void addRowsReal(const LPRowSetReal& lprowset);
-
-   /// adds multiple rows and gets an array of their \p id 's
-   void addRowsReal(SPxRowId id[], const LPRowSetReal& lprowset);
 
    /// adds a single column
    void addColReal(const LPCol& lpcol);
 
-   /// adds a single column and gets its \p id
-   void addColReal(SPxColId& id, const LPCol& lpcol);
-
    /// adds multiple columns
    void addColsReal(const LPColSetReal& lpcolset);
 
-   /// adds multiple columns and gets an array of their \p id 's
-   void addColsReal(SPxColId id[], const LPColSetReal& lpcolset);
-
    /// replaces row \p i with \p lprow
    void changeRowReal(int i, const LPRowReal& lprow);
-
-   /// replaces row with identifier \p id with \p lprow
-   void changeRowReal(SPxRowId id, const LPRowReal& lprow);
 
    /// changes left-hand side vector for constraints to \p lhs
    void changeLhsReal(const VectorReal& lhs);
@@ -398,17 +285,11 @@ public:
    /// changes left-hand side of row \p i to \p lhs
    void changeLhsReal(int i, Real lhs);
 
-   /// changes left-hand side of row with identifier \p id to \p lhs
-   void changeLhsReal(SPxRowId id, Real lhs);
-
    /// changes right-hand side vector to \p rhs
    void changeRhsReal(const VectorReal& rhs);
 
    /// changes right-hand side of row \p i to \p rhs
    void changeRhsReal(int i, Real rhs);
-
-   /// changes right-hand of row with identifier \p id to \p rhs
-   void changeRhsReal(SPxRowId id, Real rhs);
 
    /// changes left- and right-hand side vectors
    void changeRangeReal(const VectorReal& lhs, const VectorReal& rhs);
@@ -416,14 +297,8 @@ public:
    /// changes left- and right-hand side of row \p i
    void changeRangeReal(int i, Real lhs, Real rhs);
 
-   /// changes left- and right-hand side of row with identifier \p id
-   void changeRangeReal(SPxRowId id, Real lhs, Real rhs);
-
    /// replaces column \p i with \p lpcol
    void changeColReal(int i, const LPColReal& lpcol);
-
-   /// replaces column with identifier \p id with \p lpcol
-   void changeColReal(SPxColId id, const LPColReal& lpcol);
 
    /// changes vector of lower bounds to \p lower
    void changeLowerReal(const VectorReal& lower);
@@ -431,17 +306,11 @@ public:
    /// changes lower bound of column i to \p lower
    void changeLowerReal(int i, Real lower);
 
-   /// changes lower bound of column with identifier \p id to \p lower
-   void changeLowerReal(SPxColId id, Real lower);
-
    /// changes vector of upper bounds to \p upper
    void changeUpperReal(const VectorReal& upper);
 
    /// changes \p i 'th upper bound to \p upper
    void changeUpperReal(int i, Real upper);
-
-   /// changes upper bound of column with identifier \p id to \p upper
-   void changeUpperReal(SPxColId id, Real upper);
 
    /// changes vectors of column bounds to \p lower and \p upper
    void changeBoundsReal(const VectorReal& lower, const VectorReal& upper);
@@ -449,38 +318,22 @@ public:
    /// changes bounds of column \p i to \p lower and \p upper
    void changeBoundsReal(int i, Real lower, Real upper);
 
-   /// changes bounds of column with identifier \p id to \p lower and \p upper
-   void changeBoundsReal(SPxColId id, Real lower, Real upper);
-
    /// changes objective function vector to \p obj
    void changeObjReal(const VectorReal& obj);
 
    /// changes objective coefficient of column i to \p obj
    void changeObjReal(int i, Real obj);
 
-   /// changes objective coefficient of column with identifier \p id to \p obj
-   void changeObjReal(SPxColId id, Real obj);
-
    /// changes matrix entry in row \p i and column \p j to \p val
    void changeElementReal(int i, int j, Real val);
 
-   /// changes matrix entry identified by (\p rowid, \p colid) to \p val
-   void changeElementReal(SPxRowId rowid, SPxColId colid, Real val);
-
    /// removes row \p i
    void removeRowReal(int i);
-
-   /// removes row with identifier \p id
-   void removeRowReal(SPxRowId id);
 
    /// removes all rows with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
    /// new index where row \p i has been moved to; note that \p perm must point to an array of size at least
    /// #numRowsReal()
    void removeRowsReal(int perm[]);
-
-   /// remove all rows with identifier in array \p id of size \p n; an array \p perm of size #numRowsReal() may be
-   /// passed as buffer memory
-   void removeRowsReal(SPxRowId id[], int n, int perm[] = 0);
 
    /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsReal() may be passed
    /// as buffer memory
@@ -493,17 +346,10 @@ public:
    /// removes column i
    void removeColReal(int i);
 
-   /// removes column with identifier \p id
-   void removeColReal(SPxColId id);
-
    /// removes all columns with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
    /// new index where column \p i has been moved to; note that \p perm must point to an array of size at least
    /// #numColsReal()
    void removeColsReal(int perm[]);
-
-   /// remove all columns with identifier in array \p id of size \p n; an array \p perm of size #numColsReal() may be
-   /// passed as buffer memory
-   void removeColsReal(SPxColId id[], int n, int perm[] = 0);
 
    /// remove all columns with indices in array \p idx of size \p n; an array \p perm of size #numColsReal() may be
    /// passed as buffer memory
@@ -528,32 +374,17 @@ public:
    /// adds a single row
    void addRowRational(const LPRowRational& lprow);
 
-   /// adds a single row and gets its \p id
-   void addRowRational(SPxRowId& id, const LPRowRational& lprow);
-
    /// adds multiple rows
    void addRowsRational(const LPRowSetRational& lprowset);
-
-   /// adds multiple rows and gets an array of their \p id 's
-   void addRowsRational(SPxRowId id[], const LPRowSetRational& lprowset);
 
    /// adds a single column
    void addColRational(const LPColRational& lpcol);
 
-   /// adds a single column and gets its \p id
-   void addColRational(SPxColId& id, const LPColRational& lpcol);
-
    /// adds multiple columns
    void addColsRational(const LPColSetRational& lpcolset);
 
-   /// adds multiple columns and gets an array of their \p id 's
-   void addColsRational(SPxColId id[], const LPColSetRational& lpcolset);
-
    /// replaces row \p i with \p lprow
    void changeRowRational(int i, const LPRowRational& lprow);
-
-   /// replaces row with identifier \p id with \p lprow
-   void changeRowRational(SPxRowId id, const LPRowRational& lprow);
 
    /// changes left-hand side vector for constraints to \p lhs
    void changeLhsRational(const VectorRational& lhs);
@@ -561,17 +392,11 @@ public:
    /// changes left-hand side of row \p i to \p lhs
    void changeLhsRational(int i, Rational lhs);
 
-   /// changes left-hand side of row with identifier \p id to \p lhs
-   void changeLhsRational(SPxRowId id, Rational lhs);
-
    /// changes right-hand side vector to \p rhs
    void changeRhsRational(const VectorRational& rhs);
 
    /// changes right-hand side of row \p i to \p rhs
    void changeRhsRational(int i, Rational rhs);
-
-   /// changes right-hand of row with identifier \p id to \p rhs
-   void changeRhsRational(SPxRowId id, Rational rhs);
 
    /// changes left- and right-hand side vectors
    void changeRangeRational(const VectorRational& lhs, const VectorRational& rhs);
@@ -579,14 +404,8 @@ public:
    /// changes left- and right-hand side of row \p i
    void changeRangeRational(int i, Rational lhs, Rational rhs);
 
-   /// changes left- and right-hand side of row with identifier \p id
-   void changeRangeRational(SPxRowId id, Rational lhs, Rational rhs);
-
    /// replaces column \p i with \p lpcol
    void changeColRational(int i, const LPColRational& lpcol);
-
-   /// replaces column with identifier \p id with \p lpcol
-   void changeColRational(SPxColId id, const LPColRational& lpcol);
 
    /// changes vector of lower bounds to \p lower
    void changeLowerRational(const VectorRational& lower);
@@ -594,17 +413,11 @@ public:
    /// changes lower bound of column i to \p lower
    void changeLowerRational(int i, Rational lower);
 
-   /// changes lower bound of column with identifier \p id to \p lower
-   void changeLowerRational(SPxColId id, Rational lower);
-
    /// changes vector of upper bounds to \p upper
    void changeUpperRational(const VectorRational& upper);
 
    /// changes \p i 'th upper bound to \p upper
    void changeUpperRational(int i, Rational upper);
-
-   /// changes upper bound of column with identifier \p id to \p upper
-   void changeUpperRational(SPxColId id, Rational upper);
 
    /// changes vectors of column bounds to \p lower and \p upper
    void changeBoundsRational(const VectorRational& lower, const VectorRational& upper);
@@ -612,38 +425,22 @@ public:
    /// changes bounds of column \p i to \p lower and \p upper
    void changeBoundsRational(int i, Rational lower, Rational upper);
 
-   /// changes bounds of column with identifier \p id to \p lower and \p upper
-   void changeBoundsRational(SPxColId id, Rational lower, Rational upper);
-
    /// changes objective function vector to \p obj
    void changeObjRational(const VectorRational& obj);
 
    /// changes objective coefficient of column i to \p obj
    void changeObjRational(int i, Rational obj);
 
-   /// changes objective coefficient of column with identifier \p id to \p obj
-   void changeObjRational(SPxColId id, Rational obj);
-
    /// changes matrix entry in row \p i and column \p j to \p val
    void changeElementRational(int i, int j, Rational val);
 
-   /// changes matrix entry identified by (\p rowid, \p colid) to \p val
-   void changeElementRational(SPxRowId rowid, SPxColId colid, Rational val);
-
    /// removes row \p i
    void removeRowRational(int i);
-
-   /// removes row with identifier \p id
-   void removeRowRational(SPxRowId id);
 
    /// removes all rows with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the new
    /// index where row \p i has been moved to; note that \p perm must point to an array of size at least
    /// #numRowsRational()
    void removeRowsRational(int perm[]);
-
-   /// remove all rows with identifier in array \p id of size \p n; an array \p perm of size #numRowsRational() may be
-   /// passed as buffer memory
-   void removeRowsRational(SPxRowId id[], int n, int perm[] = 0);
 
    /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsRational() may be
    /// passed as buffer memory
@@ -656,17 +453,10 @@ public:
    /// removes column i
    void removeColRational(int i);
 
-   /// removes column with identifier \p id
-   void removeColRational(SPxColId id);
-
    /// removes all columns with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
    /// new index where column \p i has been moved to; note that \p perm must point to an array of size at least
    /// #numColsRational()
    void removeColsRational(int perm[]);
-
-   /// remove all columns with identifier in array \p id of size \p n; an array \p perm of size #numColsRational() may be
-   /// passed as buffer memory
-   void removeColsRational(SPxColId id[], int n, int perm[] = 0);
 
    /// remove all columns with indices in array \p idx of size \p n; an array \p perm of size #numColsRational() may be
    /// passed as buffer memory
@@ -699,9 +489,6 @@ public:
 
    /// returns the objective value if a primal solution is available
    Real objValueReal() const;
-
-   /// returns the termination value
-   Real terminationValueReal() const;
 
    /// is a primal feasible solution available?
    bool hasPrimalReal() const;
@@ -820,14 +607,8 @@ public:
    /// returns basis status for a single row
    SPxSolver::VarStatus basisRowStatusReal(int row) const;
 
-   /// returns basis status for a single row
-   SPxSolver::VarStatus basisRowStatusReal(const SPxRowId& id) const;
-
    /// returns basis status for a single column
    SPxSolver::VarStatus basisColStatusReal(int col) const;
-
-   /// returns basis status for a single column
-   SPxSolver::VarStatus basisColStatusReal(const SPxColId& id) const;
 
    /// gets current basis
    void getBasisReal(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const;
@@ -850,14 +631,8 @@ public:
    /// returns basis status for a single row
    SPxSolver::VarStatus basisRowStatusRational(int row) const;
 
-   /// returns basis status for a single row
-   SPxSolver::VarStatus basisRowStatusRational(const SPxRowId& id) const;
-
    /// returns basis status for a single column
    SPxSolver::VarStatus basisColStatusRational(int col) const;
-
-   /// returns basis status for a single column
-   SPxSolver::VarStatus basisColStatusRational(const SPxColId& id) const;
 
    /// gets current basis
    void getBasisRational(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const;
@@ -1413,9 +1188,6 @@ private:
 
    //**@name Constant helper methods */
    //@{
-
-   /// creates a permutation for removing rows/columns from an array of IDs
-   void _idToPerm(SPxId* id, int idSize, int* perm, int permSize) const;
 
    /// creates a permutation for removing rows/columns from an array of indices
    void _idxToPerm(int* idx, int idxSize, int* perm, int permSize) const;
