@@ -213,7 +213,7 @@ public:
    /** No nonzero with index \p i must exist in the SSVectorBase. */
    void add(int i, R x)
    {
-      assert(VectorBase<R>::val[i] == 0);
+      assert(VectorBase<R>::val[i] == R(0));
       assert(number(i) < 0);
 
       addIdx(i);
@@ -235,7 +235,7 @@ public:
             if( abs(x) > epsilon )
                IdxSet::add(1, &i);
          }
-         else if( x == 0 )
+         else if( x == R(0) )
             clearNum(n);
       }
 

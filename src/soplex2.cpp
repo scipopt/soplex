@@ -161,7 +161,7 @@ namespace soplex
 
             // type of simplifier
             _intParamName[SoPlex2::SIMPLIFIER] = "simplifier";
-            _intParamDescription[SoPlex2::SIMPLIFIER] = "simplifier (0 - off, 1 - auto)";
+            _intParamDescription[SoPlex2::SIMPLIFIER] = "simplifier (-1 - off, 0 - auto)";
             _intParamDefault[SoPlex2::SIMPLIFIER] = SoPlex2::SIMPLIFIER_AUTO;
 
             // type of scaler
@@ -183,6 +183,16 @@ namespace soplex
             _intParamName[SoPlex2::RATIOTESTER] = "ratiotester";
             _intParamDescription[SoPlex2::RATIOTESTER] = "method for ratio test (0 - textbook, 1 - harris, 2 - fast, 3 - boundflipping)";
             _intParamDefault[SoPlex2::RATIOTESTER] = SoPlex2::RATIOTESTER_FAST;
+
+            // mode for synchronizing real and rational LP
+            _intParamName[SoPlex2::SYNCMODE] = "syncmode";
+            _intParamDescription[SoPlex2::SYNCMODE] = "mode for synchronizing real and rational LP (-1 - store only real LP, 0 - auto, 1 - manual)";
+            _intParamDefault[SoPlex2::SYNCMODE] = SoPlex2::SYNCMODE_ONLYREAL;
+
+            // mode for iterative refinement strategy
+            _intParamName[SoPlex2::SOLVEMODE] = "solvemode";
+            _intParamDescription[SoPlex2::SOLVEMODE] = "mode for iterative refinement strategy (-1 - floating-point solve, 0 - auto, 1 - force iterative refinement)";
+            _intParamDefault[SoPlex2::SOLVEMODE] = SoPlex2::SOLVEMODE_REAL;
 
             ///@todo define suitable values depending on Real type
             // general zero tolerance
@@ -373,25 +383,18 @@ namespace soplex
       , _simplifier(0)
       , _scaler(0)
       , _starter(0)
-      , _statusReal(SPxSolver::UNKNOWN)
-      , _hasBasisReal(false)
-      , _hasPrimalReal(false)
-      , _hasPrimalrayReal(false)
-      , _hasDualReal(false)
-      , _hasDualfarkasReal(false)
-      , _statusRational(SPxSolver::UNKNOWN)
-      , _hasBasisRational(false)
+      , _status(SPxSolver::UNKNOWN)
+      , _hasBasis(false)
+      , _hasSolReal(false)
+      , _hasSolRational(false)
    {
       // give lu factorization to solver
       _solver.setSolver(&_slufactor);
 
-      // the real LP is initially stored in the solver
+      // the real LP is initially stored in the solver; the rational LP is constructed, when the parameter SYNCMODE is
+      // initialized in setSettings() below
       _realLP = &_solver;
       _isRealLPLoaded = true;
-
-      // construct the rational LP
-      spx_alloc(_rationalLP);
-      _rationalLP = new (_rationalLP) SPxLPRational();
 
       // initialize statistics
       spx_alloc(_statistics);
@@ -410,8 +413,6 @@ namespace soplex
    /// assignment operator
    SoPlex2& SoPlex2::operator=(const SoPlex2& rhs)
    {
-      assert(rhs._rationalLP != 0);
-
       if( this != &rhs )
       {
          // copy statistics
@@ -442,11 +443,16 @@ namespace soplex
          _ratiotesterFast = rhs._ratiotesterFast;
          _ratiotesterBoundFlipping = rhs._ratiotesterBoundFlipping;
 
-         // copy basis
-         _basisStatusRowsReal = rhs._basisStatusRowsReal;
-         _basisStatusColsReal = rhs._basisStatusColsReal;
-         _basisStatusRowsRational = rhs._basisStatusRowsRational;
-         _basisStatusColsRational = rhs._basisStatusColsRational;
+         // copy solution data
+         _status = rhs._status;
+         _basisStatusRows = rhs._basisStatusRows;
+         _basisStatusCols = rhs._basisStatusCols;
+
+         if( rhs._hasSolReal )
+            _solReal = rhs._solReal;
+
+         if( rhs._hasSolRational )
+            _solRational = rhs._solRational;
 
          // initialize pointers for simplifier, scaler, and starter
          setIntParam(SoPlex2::SIMPLIFIER, intParam(SoPlex2::SIMPLIFIER), true, true);
@@ -464,14 +470,24 @@ namespace soplex
             _realLP = &_solver;
 
          // copy rational LP
-         _rationalLP = 0;
-         spx_alloc(_rationalLP);
-         _rationalLP = new (_rationalLP) SPxLPRational(*rhs._rationalLP);
+         if( rhs._rationalLP == 0 )
+         {
+            assert(intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL);
+            _rationalLP = 0;
+         }
+         else
+         {
+            assert(intParam(SoPlex2::SYNCMODE) != SYNCMODE_ONLYREAL);
+            _rationalLP = 0;
+            spx_alloc(_rationalLP);
+            _rationalLP = new (_rationalLP) SPxLPRational(*rhs._rationalLP);
+         }
 
          // copy boolean flags
          _isRealLPLoaded = rhs._isRealLPLoaded;
-         _hasBasisReal = rhs._hasBasisReal;
-         _hasBasisRational = rhs._hasBasisRational;
+         _hasSolReal = rhs._hasSolReal;
+         _hasSolRational = rhs._hasSolRational;
+         _hasBasis = rhs._hasBasis;
       }
 
       assert(_isConsistent());
@@ -493,8 +509,7 @@ namespace soplex
    /// destructor
    SoPlex2::~SoPlex2()
    {
-      assert(_realLP != 0);
-      assert(_rationalLP != 0);
+      assert(_isConsistent());
 
       // free settings
       _currentSettings->~Settings();
@@ -505,6 +520,7 @@ namespace soplex
       spx_free(_statistics);
 
       // free real LP if different from the LP in the solver
+      assert(_realLP != 0);
       if( _realLP != &_solver )
       {
          _realLP->~SPxLPReal();
@@ -512,8 +528,11 @@ namespace soplex
       }
 
       // free rational LP
-      _rationalLP->~SPxLPRational();
-      spx_free(_rationalLP);
+      if( _rationalLP != 0 )
+      {
+         _rationalLP->~SPxLPRational();
+         spx_free(_rationalLP);
+      }
    }
 
 
@@ -958,16 +977,13 @@ namespace soplex
    void SoPlex2::addRowReal(const LPRowReal& lprow)
    {
       assert(_realLP != 0);
-      _realLP->addRow(lprow);
 
-      if( _isRealLPLoaded )
-      {
-         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-      }
-      else if( _hasBasisReal )
-         _basisStatusRowsReal.append(SPxSolver::BASIC);
+      _addRowReal(lprow);
 
-      _invalidateSolutionReal();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+        _rationalLP->addRow(lprow);
+
+      _invalidateSolution();
    }
 
 
@@ -976,16 +992,13 @@ namespace soplex
    void SoPlex2::addRowsReal(const LPRowSetReal& lprowset)
    {
       assert(_realLP != 0);
-      _realLP->addRows(lprowset);
 
-      if( _isRealLPLoaded )
-      {
-         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-      }
-      else if( _hasBasisReal )
-         _basisStatusRowsReal.append(lprowset.num(), SPxSolver::BASIC);
+      _addRowsReal(lprowset);
 
-      _invalidateSolutionReal();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _rationalLP->addRows(lprowset);
+
+      _invalidateSolution();
    }
 
 
@@ -994,23 +1007,13 @@ namespace soplex
    void SoPlex2::addColReal(const LPColReal& lpcol)
    {
       assert(_realLP != 0);
-      _realLP->addCol(lpcol);
 
-      if( _isRealLPLoaded )
-      {
-         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-      }
-      else if( _hasBasisReal )
-      {
-         if( lpcol.lower() > -realParam(SoPlex2::INFTY) )
-            _basisStatusColsReal.append(SPxSolver::ON_LOWER);
-         else if( lpcol.upper() < realParam(SoPlex2::INFTY) )
-            _basisStatusColsReal.append(SPxSolver::ON_UPPER);
-         else
-            _basisStatusColsReal.append(SPxSolver::ZERO);
-      }
+      _addColReal(lpcol);
 
-      _invalidateSolutionReal();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _rationalLP->addCol(lpcol);
+
+      _invalidateSolution();
    }
 
 
@@ -1019,26 +1022,13 @@ namespace soplex
    void SoPlex2::addColsReal(const LPColSetReal& lpcolset)
    {
       assert(_realLP != 0);
-      _realLP->addCols(lpcolset);
 
-      if( _isRealLPLoaded )
-      {
-         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-      }
-      else if( _hasBasisReal )
-      {
-         for( int i = 0; i < lpcolset.num(); i++ )
-         {
-            if( lpcolset.lower(i) > -realParam(SoPlex2::INFTY) )
-               _basisStatusColsReal.append(SPxSolver::ON_LOWER);
-            else if( lpcolset.upper(i) < realParam(SoPlex2::INFTY) )
-               _basisStatusColsReal.append(SPxSolver::ON_UPPER);
-            else
-               _basisStatusColsReal.append(SPxSolver::ZERO);
-         }
-      }
+      _addColsReal(lpcolset);
 
-      _invalidateSolutionReal();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _rationalLP->addCols(lpcolset);
+
+      _invalidateSolution();
    }
 
 
@@ -1047,23 +1037,13 @@ namespace soplex
    void SoPlex2::changeRowReal(int i, const LPRowReal& lprow)
    {
       assert(_realLP != 0);
-      _realLP->changeRow(i, lprow);
 
-      if( _isRealLPLoaded )
-      {
-         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-      }
-      else if( _hasBasisReal )
-      {
-         if( _basisStatusRowsReal[i] != SPxSolver::BASIC )
-            _hasBasisReal = false;
-         else if( _basisStatusRowsReal[i] == SPxSolver::ON_LOWER && lprow.lhs() <= -realParam(SoPlex2::INFTY) )
-            _basisStatusRowsReal[i] = (lprow.rhs() < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
-         else if( _basisStatusRowsReal[i] == SPxSolver::ON_UPPER && lprow.rhs() >= realParam(SoPlex2::INFTY) )
-            _basisStatusRowsReal[i] = (lprow.lhs() > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
-      }
+      _changeRowReal(i, lprow);
 
-      _invalidateSolutionReal();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _rationalLP->changeRow(i, lprow);
+
+      _invalidateSolution();
    }
 
 
@@ -1072,22 +1052,13 @@ namespace soplex
    void SoPlex2::changeLhsReal(const VectorReal& lhs)
    {
       assert(_realLP != 0);
-      _realLP->changeLhs(lhs);
 
-      if( _isRealLPLoaded )
-      {
-         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-      }
-      else if( _hasBasisReal )
-      {
-         for( int i = numRowsReal() - 1; i >= 0; i-- )
-         {
-            if( _basisStatusRowsReal[i] == SPxSolver::ON_LOWER && lhs[i] <= -realParam(SoPlex2::INFTY) )
-               _basisStatusRowsReal[i] = (rhsReal(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
-         }
-      }
+      _changeLhsReal(lhs);
 
-      _invalidateSolutionReal();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _rationalLP->changeLhs(DVectorRational(lhs));
+
+      _invalidateSolution();
    }
 
 
@@ -1096,16 +1067,13 @@ namespace soplex
    void SoPlex2::changeLhsReal(int i, Real lhs)
    {
       assert(_realLP != 0);
-      _realLP->changeLhs(i, lhs);
 
-      if( _isRealLPLoaded )
-      {
-         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-      }
-      else if( _hasBasisReal && _basisStatusRowsReal[i] == SPxSolver::ON_LOWER && lhs <= -realParam(SoPlex2::INFTY) )
-         _basisStatusRowsReal[i] = (rhsReal(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+      _changeLhsReal(i, lhs);
 
-      _invalidateSolutionReal();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _rationalLP->changeLhs(i, lhs);
+
+      _invalidateSolution();
    }
 
 
@@ -1114,22 +1082,13 @@ namespace soplex
    void SoPlex2::changeRhsReal(const VectorReal& rhs)
    {
       assert(_realLP != 0);
-      _realLP->changeRhs(rhs);
 
-      if( _isRealLPLoaded )
-      {
-         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-      }
-      else if( _hasBasisReal )
-      {
-         for( int i = numRowsReal() - 1; i >= 0; i-- )
-         {
-            if( _basisStatusRowsReal[i] == SPxSolver::ON_UPPER && rhs[i] >= realParam(SoPlex2::INFTY) )
-               _basisStatusRowsReal[i] = (lhsReal(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
-         }
-      }
+      _changeRhsReal(rhs);
 
-      _invalidateSolutionReal();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _rationalLP->changeRhs(DVectorRational(rhs));
+
+      _invalidateSolution();
    }
 
 
@@ -1138,16 +1097,13 @@ namespace soplex
    void SoPlex2::changeRhsReal(int i, Real rhs)
    {
       assert(_realLP != 0);
-      _realLP->changeRhs(i, rhs);
 
-      if( _isRealLPLoaded )
-      {
-         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-      }
-      else if( _hasBasisReal && _basisStatusRowsReal[i] == SPxSolver::ON_UPPER && rhs >= realParam(SoPlex2::INFTY) )
-         _basisStatusRowsReal[i] = (lhsReal(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+      _changeRhsReal(i, rhs);
 
-      _invalidateSolutionReal();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _rationalLP->changeRhs(i, rhs);
+
+      _invalidateSolution();
    }
 
 
@@ -1156,24 +1112,13 @@ namespace soplex
    void SoPlex2::changeRangeReal(const VectorReal& lhs, const VectorReal& rhs)
    {
       assert(_realLP != 0);
-      _realLP->changeRange(lhs, rhs);
 
-      if( _isRealLPLoaded )
-      {
-         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-      }
-      else if( _hasBasisReal )
-      {
-         for( int i = numRowsReal() - 1; i >= 0; i-- )
-         {
-            if( _basisStatusRowsReal[i] == SPxSolver::ON_LOWER && lhs[i] <= -realParam(SoPlex2::INFTY) )
-               _basisStatusRowsReal[i] = (rhs[i] < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
-            else if( _basisStatusRowsReal[i] == SPxSolver::ON_UPPER && rhs[i] >= realParam(SoPlex2::INFTY) )
-               _basisStatusRowsReal[i] = (lhs[i] > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
-         }
-      }
+      _changeRangeReal(lhs, rhs);
 
-      _invalidateSolutionReal();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _rationalLP->changeRange(DVectorRational(lhs), DVectorRational(rhs));
+
+      _invalidateSolution();
    }
 
 
@@ -1182,21 +1127,13 @@ namespace soplex
    void SoPlex2::changeRangeReal(int i, Real lhs, Real rhs)
    {
       assert(_realLP != 0);
-      _realLP->changeRange(i, lhs, rhs);
 
-      if( _isRealLPLoaded )
-      {
-         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-      }
-      else if( _hasBasisReal )
-      {
-         if( _basisStatusRowsReal[i] == SPxSolver::ON_LOWER && lhs <= -realParam(SoPlex2::INFTY) )
-            _basisStatusRowsReal[i] = (rhs < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
-         else if( _basisStatusRowsReal[i] == SPxSolver::ON_UPPER && rhs >= realParam(SoPlex2::INFTY) )
-            _basisStatusRowsReal[i] = (lhs > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
-      }
+      _changeRangeReal(i,lhs, rhs);
 
-      _invalidateSolutionReal();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _rationalLP->changeRange(i, lhs, rhs);
+
+      _invalidateSolution();
    }
 
 
@@ -1205,23 +1142,13 @@ namespace soplex
    void SoPlex2::changeColReal(int i, const LPColReal& lpcol)
    {
       assert(_realLP != 0);
-      _realLP->changeCol(i, lpcol);
 
-      if( _isRealLPLoaded )
-      {
-         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-      }
-      else if( _hasBasisReal )
-      {
-         if( _basisStatusColsReal[i] == SPxSolver::BASIC )
-            _hasBasisReal = false;
-         else if( _basisStatusColsReal[i] == SPxSolver::ON_LOWER && lpcol.lower() <= -realParam(SoPlex2::INFTY) )
-            _basisStatusColsReal[i] = (lpcol.upper() < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
-         else if( _basisStatusColsReal[i] == SPxSolver::ON_UPPER && lpcol.upper() >= realParam(SoPlex2::INFTY) )
-            _basisStatusColsReal[i] = (lpcol.lower() > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
-      }
+      _changeColReal(i, lpcol);
 
-      _invalidateSolutionReal();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _rationalLP->changeCol(i, lpcol);
+
+      _invalidateSolution();
    }
 
 
@@ -1230,22 +1157,13 @@ namespace soplex
    void SoPlex2::changeLowerReal(const VectorReal& lower)
    {
       assert(_realLP != 0);
-      _realLP->changeLower(lower);
 
-      if( _isRealLPLoaded )
-      {
-         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-      }
-      else if( _hasBasisReal )
-      {
-         for( int i = numColsReal() - 1; i >= 0; i-- )
-         {
-            if( _basisStatusColsReal[i] == SPxSolver::ON_LOWER && lower[i] <= -realParam(SoPlex2::INFTY) )
-               _basisStatusColsReal[i] = (upperReal(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
-         }
-      }
+      _changeLowerReal(lower);
 
-      _invalidateSolutionReal();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _rationalLP->changeLower(DVectorRational(lower));
+
+      _invalidateSolution();
    }
 
 
@@ -1254,16 +1172,13 @@ namespace soplex
    void SoPlex2::changeLowerReal(int i, Real lower)
    {
       assert(_realLP != 0);
-      _realLP->changeLower(i, lower);
 
-      if( _isRealLPLoaded )
-      {
-         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-      }
-      else if( _hasBasisReal && _basisStatusColsReal[i] == SPxSolver::ON_LOWER && lower <= -realParam(SoPlex2::INFTY) )
-         _basisStatusColsReal[i] = (upperReal(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+      _changeLowerReal(i, lower);
 
-      _invalidateSolutionReal();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _rationalLP->changeLower(i, lower);
+
+      _invalidateSolution();
    }
 
 
@@ -1272,22 +1187,13 @@ namespace soplex
    void SoPlex2::changeUpperReal(const VectorReal& upper)
    {
       assert(_realLP != 0);
-      _realLP->changeUpper(upper);
 
-      if( _isRealLPLoaded )
-      {
-         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-      }
-      else if( _hasBasisReal )
-      {
-         for( int i = numColsReal() - 1; i >= 0; i-- )
-         {
-            if( _basisStatusColsReal[i] == SPxSolver::ON_UPPER && upper[i] >= realParam(SoPlex2::INFTY) )
-               _basisStatusColsReal[i] = (lowerReal(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
-         }
-      }
+      _changeUpperReal(upper);
 
-      _invalidateSolutionReal();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _rationalLP->changeUpper(DVectorRational(upper));
+
+      _invalidateSolution();
    }
 
 
@@ -1296,16 +1202,13 @@ namespace soplex
    void SoPlex2::changeUpperReal(int i, Real upper)
    {
       assert(_realLP != 0);
-      _realLP->changeUpper(i, upper);
 
-      if( _isRealLPLoaded )
-      {
-         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-      }
-      else if( _hasBasisReal &&  _basisStatusColsReal[i] == SPxSolver::ON_UPPER && upper >= realParam(SoPlex2::INFTY) )
-         _basisStatusColsReal[i] = (lowerReal(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+      _changeUpperReal(i, upper);
 
-      _invalidateSolutionReal();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _rationalLP->changeUpper(i, upper);
+
+      _invalidateSolution();
    }
 
 
@@ -1314,24 +1217,13 @@ namespace soplex
    void SoPlex2::changeBoundsReal(const VectorReal& lower, const VectorReal& upper)
    {
       assert(_realLP != 0);
-      _realLP->changeBounds(lower, upper);
 
-      if( _isRealLPLoaded )
-      {
-         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-      }
-      else if( _hasBasisReal )
-      {
-         for( int i = numColsReal() - 1; i >= 0; i-- )
-         {
-            if( _basisStatusColsReal[i] == SPxSolver::ON_LOWER && lower[i] <= -realParam(SoPlex2::INFTY) )
-               _basisStatusColsReal[i] = (upper[i] < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
-            else if( _basisStatusColsReal[i] == SPxSolver::ON_UPPER && upper[i] >= realParam(SoPlex2::INFTY) )
-               _basisStatusColsReal[i] = (lower[i] > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
-         }
-      }
+      _changeBoundsReal(lower, upper);
 
-      _invalidateSolutionReal();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _rationalLP->changeBounds(DVectorRational(lower), DVectorRational(upper));
+
+      _invalidateSolution();
    }
 
 
@@ -1340,21 +1232,13 @@ namespace soplex
    void SoPlex2::changeBoundsReal(int i, Real lower, Real upper)
    {
       assert(_realLP != 0);
-      _realLP->changeBounds(i, lower, upper);
 
-      if( _isRealLPLoaded )
-      {
-         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-      }
-      else if( _hasBasisReal )
-      {
-         if( _basisStatusColsReal[i] == SPxSolver::ON_LOWER && lower <= -realParam(SoPlex2::INFTY) )
-            _basisStatusColsReal[i] = (upper < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
-         else if( _basisStatusColsReal[i] == SPxSolver::ON_UPPER && upper >= realParam(SoPlex2::INFTY) )
-            _basisStatusColsReal[i] = (lower > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
-      }
+      _changeBoundsReal(i, lower, upper);
 
-      _invalidateSolutionReal();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _rationalLP->changeBounds(i, lower, upper);
+
+      _invalidateSolution();
    }
 
 
@@ -1363,9 +1247,13 @@ namespace soplex
    void SoPlex2::changeObjReal(const VectorReal& obj)
    {
       assert(_realLP != 0);
+
       _realLP->changeObj(obj);
 
-      _invalidateSolutionReal();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _rationalLP->changeObj(DVectorRational(obj));
+
+      _invalidateSolution();
    }
 
 
@@ -1374,9 +1262,13 @@ namespace soplex
    void SoPlex2::changeObjReal(int i, Real obj)
    {
       assert(_realLP != 0);
+
       _realLP->changeObj(i, obj);
 
-      _invalidateSolutionReal();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _rationalLP->changeObj(i, obj);
+
+      _invalidateSolution();
    }
 
 
@@ -1385,19 +1277,13 @@ namespace soplex
    void SoPlex2::changeElementReal(int i, int j, Real val)
    {
       assert(_realLP != 0);
-      _realLP->changeElement(i, j, val);
 
-      if( _isRealLPLoaded )
-      {
-         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-      }
-      else if( _hasBasisReal )
-      {
-         if( _basisStatusRowsReal[i] != SPxSolver::BASIC && _basisStatusColsReal[i] == SPxSolver::BASIC )
-            _hasBasisReal = false;
-      }
+      _changeElementReal(i, j, val);
 
-      _invalidateSolutionReal();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _rationalLP->changeElement(i, j, val);
+
+      _invalidateSolution();
    }
 
 
@@ -1406,24 +1292,13 @@ namespace soplex
    void SoPlex2::removeRowReal(int i)
    {
       assert(_realLP != 0);
-      _realLP->removeRow(i);
 
-      if( _isRealLPLoaded )
-      {
-         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-      }
-      else if( _hasBasisReal )
-      {
-         if( _basisStatusRowsReal[i] != SPxSolver::BASIC )
-            _hasBasisReal = false;
-         else
-         {
-            _basisStatusRowsReal[i] = _basisStatusRowsReal[_basisStatusRowsReal.size() - 1];
-            _basisStatusRowsReal.removeLast();
-         }
-      }
+      _removeRowReal(i);
 
-      _invalidateSolutionReal();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _rationalLP->removeRow(i);
+
+      _invalidateSolution();
    }
 
 
@@ -1434,32 +1309,13 @@ namespace soplex
    void SoPlex2::removeRowsReal(int perm[])
    {
       assert(_realLP != 0);
-      _realLP->removeRows(perm);
 
-      if( _isRealLPLoaded )
-      {
-         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-      }
-      else if( _hasBasisReal )
-      {
-         for( int i = numRowsReal() - 1; i >= 0 && _hasBasisReal; i-- )
-         {
-            if( perm[i] < 0 && _basisStatusRowsReal[i] != SPxSolver::BASIC )
-               _hasBasisReal = false;
-            else if( perm[i] >= 0 && perm[i] != i )
-            {
-               assert(perm[i] < numRowsReal());
-               assert(perm[perm[i]] < 0);
+      _removeRowsReal(perm);
 
-               _basisStatusRowsReal[perm[i]] = _basisStatusRowsReal[i];
-            }
-         }
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _rationalLP->removeRows(perm);
 
-         if( _hasBasisReal )
-            _basisStatusRowsReal.reSize(numRowsReal());
-      }
-
-      _invalidateSolutionReal();
+      _invalidateSolution();
    }
 
 
@@ -1506,24 +1362,13 @@ namespace soplex
    void SoPlex2::removeColReal(int i)
    {
       assert(_realLP != 0);
-      _realLP->removeCol(i);
 
-      if( _isRealLPLoaded )
-      {
-         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-      }
-      else if( _hasBasisReal )
-      {
-         if( _basisStatusColsReal[i] == SPxSolver::BASIC )
-            _hasBasisReal = false;
-         else
-         {
-            _basisStatusColsReal[i] = _basisStatusColsReal[_basisStatusColsReal.size() - 1];
-            _basisStatusColsReal.removeLast();
-         }
-      }
+      _removeColReal(i);
 
-      _invalidateSolutionReal();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _rationalLP->removeCol(i);
+
+      _invalidateSolution();
    }
 
 
@@ -1534,32 +1379,13 @@ namespace soplex
    void SoPlex2::removeColsReal(int perm[])
    {
       assert(_realLP != 0);
-      _realLP->removeCols(perm);
 
-      if( _isRealLPLoaded )
-      {
-         _hasBasisReal = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-      }
-      else if( _hasBasisReal )
-      {
-         for( int i = numColsReal() - 1; i >= 0 && _hasBasisReal; i-- )
-         {
-            if( perm[i] < 0 && _basisStatusColsReal[i] == SPxSolver::BASIC )
-               _hasBasisReal = false;
-            else if( perm[i] >= 0 && perm[i] != i )
-            {
-               assert(perm[i] < numColsReal());
-               assert(perm[perm[i]] < 0);
+      _removeColsReal(perm);
 
-               _basisStatusColsReal[perm[i]] = _basisStatusColsReal[i];
-            }
-         }
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _rationalLP->removeCols(perm);
 
-         if( _hasBasisReal )
-            _basisStatusColsReal.reSize(numColsReal());
-      }
-
-      _invalidateSolutionReal();
+      _invalidateSolution();
    }
 
 
@@ -1608,51 +1434,23 @@ namespace soplex
       assert(_realLP != 0);
 
       _realLP->clear();
-      _hasBasisReal = false;
+      _hasBasis = false;
 
-      _invalidateSolutionReal();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _rationalLP->clear();
+
+      _invalidateSolution();
    }
 
 
 
-   /// synchronizes real LP with rational LP
-   void SoPlex2::syncRealLP()
+   /// synchronizes real LP with rational LP, i.e., copies (rounded) rational LP into real LP, if sync mode is manual
+   void SoPlex2::syncLPReal()
    {
       assert(_isConsistent());
 
-      // start timing
-      _statistics->syncTime.start();
-
-      // copy LP
-      if( _isRealLPLoaded )
-         _solver.loadLP((SPxLPReal)(*_rationalLP));
-      else
-         *_realLP = *_rationalLP;
-
-      // load basis if available
-      if( _hasBasisRational )
-      {
-         assert(_basisStatusRowsRational.size() == numRowsReal());
-         assert(_basisStatusColsRational.size() == numColsReal());
-
-         if( _isRealLPLoaded )
-            _solver.setBasis(_basisStatusRowsRational.get_ptr(), _basisStatusColsRational.get_ptr());
-         else
-         {
-            _basisStatusRowsReal = _basisStatusRowsRational;
-            _basisStatusColsReal = _basisStatusColsRational;
-         }
-
-         _hasBasisReal = true;
-      }
-      else
-         _hasBasisReal = false;
-
-      // invalidate solution
-      _invalidateSolutionReal();
-
-      // stop timing
-      _statistics->syncTime.stop();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_MANUAL )
+         _syncLPReal();
    }
 
 
@@ -1661,12 +1459,16 @@ namespace soplex
    void SoPlex2::addRowRational(const LPRowRational& lprow)
    {
       assert(_rationalLP != 0);
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
       _rationalLP->addRow(lprow);
 
-      if( _hasBasisRational )
-         _basisStatusRowsRational.append(SPxSolver::BASIC);
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _addRowReal(lprow);
 
-      _invalidateSolutionRational();
+      _invalidateSolution();
    }
 
 
@@ -1675,12 +1477,16 @@ namespace soplex
    void SoPlex2::addRowsRational(const LPRowSetRational& lprowset)
    {
       assert(_rationalLP != 0);
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
       _rationalLP->addRows(lprowset);
 
-      if( _hasBasisRational )
-         _basisStatusRowsRational.append(lprowset.num(), SPxSolver::BASIC);
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _addRowsReal(lprowset);
 
-      _invalidateSolutionRational();
+      _invalidateSolution();
    }
 
 
@@ -1689,19 +1495,16 @@ namespace soplex
    void SoPlex2::addColRational(const LPColRational& lpcol)
    {
       assert(_rationalLP != 0);
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
       _rationalLP->addCol(lpcol);
 
-      if( _hasBasisRational )
-      {
-         if( lpcol.lower() > double(-realParam(SoPlex2::INFTY)) )
-            _basisStatusColsRational.append(SPxSolver::ON_LOWER);
-         else if( lpcol.upper() < double(realParam(SoPlex2::INFTY)) )
-            _basisStatusColsRational.append(SPxSolver::ON_UPPER);
-         else
-            _basisStatusColsRational.append(SPxSolver::ZERO);
-      }
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _addColReal(lpcol);
 
-      _invalidateSolutionRational();
+      _invalidateSolution();
    }
 
 
@@ -1710,22 +1513,16 @@ namespace soplex
    void SoPlex2::addColsRational(const LPColSetRational& lpcolset)
    {
       assert(_rationalLP != 0);
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
       _rationalLP->addCols(lpcolset);
 
-      if( _hasBasisRational )
-      {
-         for( int i = 0; i < lpcolset.num(); i++ )
-         {
-            if( lpcolset.lower(i) > double(-realParam(SoPlex2::INFTY)) )
-               _basisStatusColsRational.append(SPxSolver::ON_LOWER);
-            else if( lpcolset.upper(i) < double(realParam(SoPlex2::INFTY)) )
-               _basisStatusColsRational.append(SPxSolver::ON_UPPER);
-            else
-               _basisStatusColsRational.append(SPxSolver::ZERO);
-         }
-      }
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _addColsReal(lpcolset);
 
-      _invalidateSolutionRational();
+      _invalidateSolution();
    }
 
 
@@ -1734,19 +1531,16 @@ namespace soplex
    void SoPlex2::changeRowRational(int i, const LPRowRational& lprow)
    {
       assert(_rationalLP != 0);
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
       _rationalLP->changeRow(i, lprow);
 
-      if( _hasBasisRational )
-      {
-         if( _basisStatusRowsRational[i] != SPxSolver::BASIC )
-            _hasBasisRational = false;
-         else if( _basisStatusRowsRational[i] == SPxSolver::ON_LOWER && lprow.lhs() <= double(-realParam(SoPlex2::INFTY)) )
-            _basisStatusRowsRational[i] = (lprow.rhs() < double(realParam(SoPlex2::INFTY))) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
-         else if( _basisStatusRowsRational[i] == SPxSolver::ON_UPPER && lprow.rhs() >= double(realParam(SoPlex2::INFTY)) )
-            _basisStatusRowsRational[i] = (lprow.lhs() > double(-realParam(SoPlex2::INFTY))) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
-      }
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _changeRowReal(i, lprow);
 
-      _invalidateSolutionRational();
+      _invalidateSolution();
    }
 
 
@@ -1755,18 +1549,16 @@ namespace soplex
    void SoPlex2::changeLhsRational(const VectorRational& lhs)
    {
       assert(_rationalLP != 0);
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
       _rationalLP->changeLhs(lhs);
 
-      if( _hasBasisRational )
-      {
-         for( int i = numRowsRational() - 1; i >= 0; i-- )
-         {
-            if( _basisStatusRowsRational[i] == SPxSolver::ON_LOWER && lhs[i] <= double(-realParam(SoPlex2::INFTY)) )
-               _basisStatusRowsRational[i] = (rhsRational(i) < double(realParam(SoPlex2::INFTY))) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
-         }
-      }
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _changeLhsReal(DVectorReal(lhs));
 
-      _invalidateSolutionRational();
+      _invalidateSolution();
    }
 
 
@@ -1775,12 +1567,16 @@ namespace soplex
    void SoPlex2::changeLhsRational(int i, Rational lhs)
    {
       assert(_rationalLP != 0);
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
       _rationalLP->changeLhs(i, lhs);
 
-      if( _hasBasisRational && _basisStatusRowsRational[i] == SPxSolver::ON_LOWER && lhs <= double(-realParam(SoPlex2::INFTY)) )
-         _basisStatusRowsRational[i] = (rhsRational(i) < double(realParam(SoPlex2::INFTY))) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _changeLhsReal(i, Real(lhs));
 
-      _invalidateSolutionRational();
+      _invalidateSolution();
    }
 
 
@@ -1789,18 +1585,16 @@ namespace soplex
    void SoPlex2::changeRhsRational(const VectorRational& rhs)
    {
       assert(_rationalLP != 0);
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
       _rationalLP->changeRhs(rhs);
 
-      if( _hasBasisRational )
-      {
-         for( int i = numRowsRational() - 1; i >= 0; i-- )
-         {
-            if( _basisStatusRowsRational[i] == SPxSolver::ON_UPPER && rhs[i] >= double(realParam(SoPlex2::INFTY)) )
-               _basisStatusRowsRational[i] = (lhsRational(i) > double(-realParam(SoPlex2::INFTY))) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
-         }
-      }
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _changeRhsReal(DVectorReal(rhs));
 
-      _invalidateSolutionRational();
+      _invalidateSolution();
    }
 
 
@@ -1809,12 +1603,16 @@ namespace soplex
    void SoPlex2::changeRhsRational(int i, Rational rhs)
    {
       assert(_rationalLP != 0);
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
       _rationalLP->changeRhs(i, rhs);
 
-      if( _hasBasisRational && _basisStatusRowsRational[i] == SPxSolver::ON_UPPER && rhs >= double(realParam(SoPlex2::INFTY)) )
-         _basisStatusRowsRational[i] = (lhsRational(i) > double(-realParam(SoPlex2::INFTY))) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _changeRhsReal(i, Real(rhs));
 
-      _invalidateSolutionRational();
+      _invalidateSolution();
    }
 
 
@@ -1823,20 +1621,16 @@ namespace soplex
    void SoPlex2::changeRangeRational(const VectorRational& lhs, const VectorRational& rhs)
    {
       assert(_rationalLP != 0);
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
       _rationalLP->changeRange(lhs, rhs);
 
-      if( _hasBasisRational )
-      {
-         for( int i = numRowsRational() - 1; i >= 0; i-- )
-         {
-            if( _basisStatusRowsRational[i] == SPxSolver::ON_LOWER && lhs[i] <= double(-realParam(SoPlex2::INFTY)) )
-               _basisStatusRowsRational[i] = (rhs[i] < double(realParam(SoPlex2::INFTY))) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
-            else if( _basisStatusRowsRational[i] == SPxSolver::ON_UPPER && rhs[i] >= double(realParam(SoPlex2::INFTY)) )
-               _basisStatusRowsRational[i] = (lhs[i] > double(-realParam(SoPlex2::INFTY))) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
-         }
-      }
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _changeRangeReal(DVectorReal(lhs), DVectorReal(rhs));
 
-      _invalidateSolutionRational();
+      _invalidateSolution();
    }
 
 
@@ -1845,17 +1639,16 @@ namespace soplex
    void SoPlex2::changeRangeRational(int i, Rational lhs, Rational rhs)
    {
       assert(_rationalLP != 0);
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
       _rationalLP->changeRange(i, lhs, rhs);
 
-      if( _hasBasisRational )
-      {
-         if( _basisStatusRowsRational[i] == SPxSolver::ON_LOWER && lhs <= double(-realParam(SoPlex2::INFTY)) )
-            _basisStatusRowsRational[i] = (rhs < double(realParam(SoPlex2::INFTY))) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
-         else if( _basisStatusRowsRational[i] == SPxSolver::ON_UPPER && rhs >= double(realParam(SoPlex2::INFTY)) )
-            _basisStatusRowsRational[i] = (lhs > double(-realParam(SoPlex2::INFTY))) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
-      }
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _changeRangeReal(i, Real(lhs), Real(rhs));
 
-      _invalidateSolutionRational();
+      _invalidateSolution();
    }
 
 
@@ -1864,19 +1657,16 @@ namespace soplex
    void SoPlex2::changeColRational(int i, const LPColRational& lpcol)
    {
       assert(_rationalLP != 0);
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
       _rationalLP->changeCol(i, lpcol);
 
-      if( _hasBasisRational )
-      {
-         if( _basisStatusColsRational[i] == SPxSolver::BASIC )
-            _hasBasisRational = false;
-         else if( _basisStatusColsRational[i] == SPxSolver::ON_LOWER && lpcol.lower() <= double(-realParam(SoPlex2::INFTY)) )
-            _basisStatusColsRational[i] = (lpcol.upper() < double(realParam(SoPlex2::INFTY))) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
-         else if( _basisStatusColsRational[i] == SPxSolver::ON_UPPER && lpcol.upper() >= double(realParam(SoPlex2::INFTY)) )
-            _basisStatusColsRational[i] = (lpcol.lower() > double(-realParam(SoPlex2::INFTY))) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
-      }
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _changeColReal(i, lpcol);
 
-      _invalidateSolutionRational();
+      _invalidateSolution();
    }
 
 
@@ -1885,18 +1675,16 @@ namespace soplex
    void SoPlex2::changeLowerRational(const VectorRational& lower)
    {
       assert(_rationalLP != 0);
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
       _rationalLP->changeLower(lower);
 
-      if( _hasBasisRational )
-      {
-         for( int i = numColsRational() - 1; i >= 0; i-- )
-         {
-            if( _basisStatusColsRational[i] == SPxSolver::ON_LOWER && lower[i] <= double(-realParam(SoPlex2::INFTY)) )
-               _basisStatusColsRational[i] = (upperRational(i) < double(realParam(SoPlex2::INFTY))) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
-         }
-      }
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _changeLowerReal(DVectorReal(lower));
 
-      _invalidateSolutionRational();
+      _invalidateSolution();
    }
 
 
@@ -1905,12 +1693,16 @@ namespace soplex
    void SoPlex2::changeLowerRational(int i, Rational lower)
    {
       assert(_rationalLP != 0);
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
       _rationalLP->changeLower(i, lower);
 
-      if( _hasBasisRational && _basisStatusColsRational[i] == SPxSolver::ON_LOWER && lower <= double(-realParam(SoPlex2::INFTY)) )
-         _basisStatusColsRational[i] = (upperRational(i) < double(realParam(SoPlex2::INFTY))) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _changeLowerReal(i, Real(lower));
 
-      _invalidateSolutionRational();
+      _invalidateSolution();
    }
 
 
@@ -1919,18 +1711,16 @@ namespace soplex
    void SoPlex2::changeUpperRational(const VectorRational& upper)
    {
       assert(_rationalLP != 0);
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
       _rationalLP->changeUpper(upper);
 
-      if( _hasBasisRational )
-      {
-         for( int i = numColsRational() - 1; i >= 0; i-- )
-         {
-            if( _basisStatusColsRational[i] == SPxSolver::ON_UPPER && upper[i] >= double(realParam(SoPlex2::INFTY)) )
-               _basisStatusColsRational[i] = (lowerRational(i) > double(-realParam(SoPlex2::INFTY))) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
-         }
-      }
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _changeUpperReal(DVectorReal(upper));
 
-      _invalidateSolutionRational();
+      _invalidateSolution();
    }
 
 
@@ -1939,12 +1729,16 @@ namespace soplex
    void SoPlex2::changeUpperRational(int i, Rational upper)
    {
       assert(_rationalLP != 0);
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
       _rationalLP->changeUpper(i, upper);
 
-      if( _hasBasisRational &&  _basisStatusColsRational[i] == SPxSolver::ON_UPPER && upper >= double(realParam(SoPlex2::INFTY)) )
-         _basisStatusColsRational[i] = (lowerRational(i) > double(-realParam(SoPlex2::INFTY))) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _changeUpperReal(i, Real(upper));
 
-      _invalidateSolutionRational();
+      _invalidateSolution();
    }
 
 
@@ -1953,20 +1747,16 @@ namespace soplex
    void SoPlex2::changeBoundsRational(const VectorRational& lower, const VectorRational& upper)
    {
       assert(_rationalLP != 0);
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
       _rationalLP->changeBounds(lower, upper);
 
-      if( _hasBasisRational )
-      {
-         for( int i = numColsRational() - 1; i >= 0; i-- )
-         {
-            if( _basisStatusColsRational[i] == SPxSolver::ON_LOWER && lower[i] <= double(-realParam(SoPlex2::INFTY)) )
-               _basisStatusColsRational[i] = (upper[i] < double(realParam(SoPlex2::INFTY))) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
-            else if( _basisStatusColsRational[i] == SPxSolver::ON_UPPER && upper[i] >= double(realParam(SoPlex2::INFTY)) )
-               _basisStatusColsRational[i] = (lower[i] > double(-realParam(SoPlex2::INFTY))) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
-         }
-      }
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _changeBoundsReal(DVectorReal(lower), DVectorReal(upper));
 
-      _invalidateSolutionRational();
+      _invalidateSolution();
    }
 
 
@@ -1975,17 +1765,16 @@ namespace soplex
    void SoPlex2::changeBoundsRational(int i, Rational lower, Rational upper)
    {
       assert(_rationalLP != 0);
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
       _rationalLP->changeBounds(i, lower, upper);
 
-      if( _hasBasisRational )
-      {
-         if( _basisStatusColsRational[i] == SPxSolver::ON_LOWER && lower <= double(-realParam(SoPlex2::INFTY)) )
-            _basisStatusColsRational[i] = (upper < double(realParam(SoPlex2::INFTY))) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
-         else if( _basisStatusColsRational[i] == SPxSolver::ON_UPPER && upper >= double(realParam(SoPlex2::INFTY)) )
-            _basisStatusColsRational[i] = (lower > double(-realParam(SoPlex2::INFTY))) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
-      }
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _changeBoundsReal(i, Real(lower), Real(upper));
 
-      _invalidateSolutionRational();
+      _invalidateSolution();
    }
 
 
@@ -1994,9 +1783,16 @@ namespace soplex
    void SoPlex2::changeObjRational(const VectorRational& obj)
    {
       assert(_rationalLP != 0);
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
       _rationalLP->changeObj(obj);
 
-      _invalidateSolutionRational();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _realLP->changeObj(DVectorReal(obj));
+
+      _invalidateSolution();
    }
 
 
@@ -2005,9 +1801,16 @@ namespace soplex
    void SoPlex2::changeObjRational(int i, Rational obj)
    {
       assert(_rationalLP != 0);
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
       _rationalLP->changeObj(i, obj);
 
-      _invalidateSolutionRational();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _realLP->changeObj(i, Real(obj));
+
+      _invalidateSolution();
    }
 
 
@@ -2016,15 +1819,16 @@ namespace soplex
    void SoPlex2::changeElementRational(int i, int j, Rational val)
    {
       assert(_rationalLP != 0);
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
       _rationalLP->changeElement(i, j, val);
 
-      if( _hasBasisRational )
-      {
-         if( _basisStatusRowsRational[i] != SPxSolver::BASIC && _basisStatusColsRational[i] == SPxSolver::BASIC )
-            _hasBasisRational = false;
-      }
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _changeElementReal(i, j, Real(val));
 
-      _invalidateSolutionRational();
+      _invalidateSolution();
    }
 
 
@@ -2033,20 +1837,16 @@ namespace soplex
    void SoPlex2::removeRowRational(int i)
    {
       assert(_rationalLP != 0);
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
       _rationalLP->removeRow(i);
 
-      if( _hasBasisRational )
-      {
-         if( _basisStatusRowsRational[i] != SPxSolver::BASIC )
-            _hasBasisRational = false;
-         else
-         {
-            _basisStatusRowsRational[i] = _basisStatusRowsRational[_basisStatusRowsRational.size() - 1];
-            _basisStatusRowsRational.removeLast();
-         }
-      }
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _removeRowReal(i);
 
-      _invalidateSolutionRational();
+      _invalidateSolution();
    }
 
 
@@ -2057,28 +1857,16 @@ namespace soplex
    void SoPlex2::removeRowsRational(int perm[])
    {
       assert(_rationalLP != 0);
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
       _rationalLP->removeRows(perm);
 
-      if( _hasBasisRational )
-      {
-         for( int i = numRowsRational() - 1; i >= 0 && _hasBasisRational; i-- )
-         {
-            if( perm[i] < 0 && _basisStatusRowsRational[i] != SPxSolver::BASIC )
-               _hasBasisRational = false;
-            else if( perm[i] >= 0 && perm[i] != i )
-            {
-               assert(perm[i] < numRowsRational());
-               assert(perm[perm[i]] < 0);
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _removeRowsReal(perm);
 
-               _basisStatusRowsRational[perm[i]] = _basisStatusRowsRational[i];
-            }
-         }
-
-         if( _hasBasisRational )
-            _basisStatusRowsRational.reSize(numRowsRational());
-      }
-
-      _invalidateSolutionRational();
+      _invalidateSolution();
    }
 
 
@@ -2125,20 +1913,16 @@ namespace soplex
    void SoPlex2::removeColRational(int i)
    {
       assert(_rationalLP != 0);
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
       _rationalLP->removeCol(i);
 
-      if( _hasBasisRational )
-      {
-         if( _basisStatusColsRational[i] == SPxSolver::BASIC )
-            _hasBasisRational = false;
-         else
-         {
-            _basisStatusColsRational[i] = _basisStatusColsRational[_basisStatusColsRational.size() - 1];
-            _basisStatusColsRational.removeLast();
-         }
-      }
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _removeColReal(i);
 
-      _invalidateSolutionRational();
+      _invalidateSolution();
    }
 
 
@@ -2149,28 +1933,16 @@ namespace soplex
    void SoPlex2::removeColsRational(int perm[])
    {
       assert(_rationalLP != 0);
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
       _rationalLP->removeCols(perm);
 
-      if( _hasBasisRational )
-      {
-         for( int i = numColsRational() - 1; i >= 0 && _hasBasisRational; i-- )
-         {
-            if( perm[i] < 0 && _basisStatusColsRational[i] == SPxSolver::BASIC )
-               _hasBasisRational = false;
-            else if( perm[i] >= 0 && perm[i] != i )
-            {
-               assert(perm[i] < numColsRational());
-               assert(perm[perm[i]] < 0);
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+         _removeColsReal(perm);
 
-               _basisStatusColsRational[perm[i]] = _basisStatusColsRational[i];
-            }
-         }
-
-         if( _hasBasisRational )
-            _basisStatusColsRational.reSize(numColsRational());
-      }
-
-      _invalidateSolutionRational();
+      _invalidateSolution();
    }
 
 
@@ -2218,229 +1990,144 @@ namespace soplex
    {
       assert(_rationalLP != 0);
 
-      _rationalLP->clear();
-      _hasBasisRational = false;
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
 
-      _invalidateSolutionRational();
+      _rationalLP->clear();
+
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+      {
+         _realLP->clear();
+         _hasBasis = false;
+      }
+
+      _invalidateSolution();
    }
 
 
 
-   /// synchronizes rational LP with real LP
-   void SoPlex2::syncRationalLP()
+   /// synchronizes rational LP with real LP, i.e., copies real LP to rational LP, if sync mode is manual
+   void SoPlex2::syncLPRational()
    {
       assert(_isConsistent());
 
-      // start timing
-      _statistics->syncTime.start();
-
-      // copy LP
-      *_rationalLP = *_realLP;
-
-      // load basis if available
-      if( _hasBasisReal )
-      {
-         assert(_basisStatusRowsReal.size() == numRowsRational());
-         assert(_basisStatusColsReal.size() == numColsRational());
-
-         _basisStatusRowsRational = _basisStatusRowsReal;
-         _basisStatusColsRational = _basisStatusColsReal;
-
-         _hasBasisRational = true;
-      }
-      else
-         _hasBasisRational = false;
-
-      // invalidate solution
-      _invalidateSolutionRational();
-
-      // stop timing
-      _statistics->syncTime.stop();
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_MANUAL )
+         _syncLPRational();
    }
 
 
 
-   /// solves real LP
-   SPxSolver::Status SoPlex2::solveReal()
+   /// solves the LP
+   SPxSolver::Status SoPlex2::solve()
    {
       assert(_isConsistent());
 
       // clear statistics
       _statistics->clearSolvingData();
 
-      // start timing
-      _statistics->solvingTime.start();
-
       // the solution is no longer valid
-      _invalidateSolutionReal();
+      _invalidateSolution();
 
-      // will preprocessing be applied? (only if no basis is available)
-      bool applyPreprocessing = !_hasBasisReal;
-
-      if( applyPreprocessing )
+      // decide whether to solve the rational LP with iterative refinement or call the standard floating-point solver
+      if( intParam(SoPlex2::SOLVEMODE) == SOLVEMODE_REAL || (intParam(SoPlex2::SOLVEMODE) == SOLVEMODE_AUTO
+            && GE(Real(rationalParam(SoPlex2::FEASTOL)), 1e-9) && GE(Real(rationalParam(SoPlex2::OPTTOL)), 1e-9)) )
       {
-         _enableSimplifierAndScaler();
-         _solver.setTerminationValue(realParam(SoPlex2::INFTY));
+         _solveReal();
+      }
+      else if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+      {
+         _syncLPRational();
+         _solveRational();
+      }
+      else if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_MANUAL )
+      {
+         ///@todo add (partial) checks that LPs are in sync
+
+         _solveRational();
+
+         ///@todo ensure that _realLP is restored exactly as before the rational solve
       }
       else
       {
-         _disableSimplifierAndScaler();
-         ///@todo implement for both objective senses
-         _solver.setTerminationValue(intParam(SoPlex2::OBJSENSE) == SoPlex2::OBJSENSE_MINIMIZE
-            ? realParam(SoPlex2::OBJLIMIT_UPPER) : realParam(SoPlex2::INFTY));
+         ///@todo add (partial) checks that LPs are in sync
+
+         _solveRational();
       }
 
-      if( _isRealLPLoaded )
-      {
-         assert(_realLP == &_solver);
-         assert(!applyPreprocessing || !_hasBasisReal);
-
-         // preprocessing is always applied to the LP in the solver; hence we have to create a copy of the original LP
-         // if preprocessing is turned on
-         if( applyPreprocessing )
-         {
-            _realLP = 0;
-            spx_alloc(_realLP);
-            _realLP = new (_realLP) SPxLPReal(_solver);
-            _isRealLPLoaded = false;
-         }
-
-         /// Why do we need this? It leeds to problems after a restart in SCIP.
-         ///@todo maybe this should move closer to the actual solving routine
-//          else if( _hasBasisReal )
-//          {
-//             assert(_solver.basis().status() >= SPxBasis::REGULAR);
-//
-//             _basisStatusRowsReal.reSize(numRowsReal());
-//             _basisStatusColsReal.reSize(numColsReal());
-//             _solver.getBasis(_basisStatusRowsReal.get_ptr(), _basisStatusColsReal.get_ptr());
-//          }
-      }
-      else
-      {
-         assert(_realLP != &_solver);
-         assert(!applyPreprocessing || !_hasBasisReal);
-
-         // ensure that the solver has the original problem
-         _solver.loadLP(*_realLP);
-
-         // load basis if available
-         if( _hasBasisReal )
-         {
-            assert(_basisStatusRowsReal.size() == numRowsReal());
-            assert(_basisStatusColsReal.size() == numColsReal());
-
-            ///@todo this should not fail even if the basis is invalid (wrong dimension or wrong number of basic
-            ///      entries); fix either in SPxSolver or in SPxBasis
-            _solver.setBasis(_basisStatusRowsReal.get_const_ptr(), _basisStatusColsReal.get_const_ptr());
-         }
-
-         // if there is no preprocessing, then the original and the transformed problem are identical and it is more
-         // memory-efficient to keep only the problem in the solver
-         if( !applyPreprocessing )
-         {
-            _realLP->~SPxLPReal();
-            spx_free(_realLP);
-            _realLP = &_solver;
-            _isRealLPLoaded = true;
-         }
-      }
-
-      // assert that we have two problems if and only if we apply preprocessing
-      assert(_realLP == &_solver || applyPreprocessing);
-      assert(_realLP != &_solver || !applyPreprocessing);
-
-      // apply problem simplification
-      SPxSimplifier::Result simplificationStatus = SPxSimplifier::OKAY;
-      if( _simplifier != 0 )
-      {
-         simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlex2::EPSILON_ZERO), Real(rationalParam(SoPlex2::FEASTOL)), Real(rationalParam(SoPlex2::OPTTOL)));
-      }
-
-      // apply scaling after the simplification
-      if( _scaler != 0 && simplificationStatus == SPxSimplifier::OKAY )
-         _scaler->scale(_solver);
-
-      // run the simplex method if problem has not been solved by the simplifier
-      if( simplificationStatus == SPxSimplifier::OKAY )
-      {
-         ///@todo this should be a separate method implementing starter, auto pricing, and recovery mechanisms
-         _solver.solve();
-      }
-
-      // evaluate status flag
-      assert(_statusReal == SPxSolver::UNKNOWN);
-      _evaluateSolutionStatusReal(simplificationStatus);
-
-      // stop timing
-      _statistics->solvingTime.stop();
-
-      return statusReal();
-   }
+      return status();
+   };
 
 
 
-   /// returns the current status
-   SPxSolver::Status SoPlex2::statusReal() const
+   /// returns the current solver status
+   SPxSolver::Status SoPlex2::status() const
    {
-      return _statusReal;
-   }
-
-
-
-   /// returns the current basis status
-   SPxBasis::SPxStatus SoPlex2::basisStatusReal() const
-   {
-      return _solver.basis().status();
-   }
-
-
-
-   /// returns the objective value if a primal solution is available
-   Real SoPlex2::objValueReal() const
-   {
-      assert(OBJSENSE_MAXIMIZE == 1);
-      assert(OBJSENSE_MINIMIZE == -1);
-
-      if( hasPrimalReal() )
-      {
-         ///@todo remember if computed once
-         DVectorReal primal(numColsReal());
-         getPrimalReal(primal);
-         return (primal * maxObjReal()) * intParam(SoPlex2::OBJSENSE);
-      }
-      else
-         return -realParam(SoPlex2::INFTY) * intParam(SoPlex2::OBJSENSE);
+      return _status;
    }
 
 
 
    /// is a primal feasible solution available?
-   bool SoPlex2::hasPrimalReal() const
+   bool SoPlex2::hasPrimal() const
    {
-      return _hasPrimalReal;
+      return (_hasSolReal && _solReal.hasPrimal()) || (_hasSolRational && _solRational.hasPrimal());
+   }
+
+
+
+   /// is a primal unbounded ray available?
+   bool SoPlex2::hasPrimalRay() const
+   {
+      return (_hasSolReal && _solReal.hasPrimalRay()) || (_hasSolRational && _solRational.hasPrimalRay());
+   }
+
+
+
+   /// is a dual feasible solution available?
+   bool SoPlex2::hasDual() const
+   {
+      return (_hasSolReal && _solReal.hasDual()) || (_hasSolRational && _solRational.hasDual());
+   }
+
+
+
+   /// is Farkas proof of infeasibility available?
+   bool SoPlex2::hasDualFarkas() const
+   {
+      return (_hasSolReal && _solReal.hasDualFarkas()) || (_hasSolRational && _solRational.hasDualFarkas());
+   }
+
+
+
+   /// returns the objective value if a primal solution is available
+   ///@todo buffer objective value if computed once
+   Real SoPlex2::objValueReal()
+   {
+      assert(OBJSENSE_MAXIMIZE == 1);
+      assert(OBJSENSE_MINIMIZE == -1);
+
+      if( status() == SPxSolver::UNBOUNDED )
+         return realParam(SoPlex2::INFTY) * intParam(SoPlex2::OBJSENSE);
+      else if( status() == SPxSolver::INFEASIBLE )
+         return -realParam(SoPlex2::INFTY) * intParam(SoPlex2::OBJSENSE);
+      else if( hasPrimal() )
+      {
+         _syncRealSolution();
+         return (_solReal._primal * maxObjReal()) * intParam(SoPlex2::OBJSENSE);
+      }
+      else
+         return 0;
    }
 
 
 
    /// gets the primal solution vector if available; returns true on success
-   bool SoPlex2::getPrimalReal(VectorReal& vector) const
+   bool SoPlex2::getPrimalReal(VectorReal& vector)
    {
-      if( hasPrimalReal() )
+      if( hasPrimal() && vector.dim() >= numColsReal() )
       {
-         if( _simplifier != 0 )
-         {
-            assert(_simplifier->isUnsimplified());
-            vector = _simplifier->unsimplifiedPrimal();
-         }
-         else
-         {
-            _solver.getPrimal(vector);
-
-            if( _scaler != 0 )
-               _scaler->unscalePrimal(vector);
-         }
-
+         _syncRealSolution();
+         _solReal.getPrimal(vector);
          return true;
       }
       else
@@ -2450,49 +2137,27 @@ namespace soplex
 
 
    /// gets the vector of slack values if available; returns true on success
-   bool SoPlex2::getSlacksReal(VectorReal& vector) const
+   bool SoPlex2::getSlacksReal(VectorReal& vector)
    {
-      if( hasPrimalReal() )
+      if( hasPrimal() && vector.dim() >= numRowsReal() )
       {
-         if( _simplifier != 0 )
-         {
-            assert(_simplifier->isUnsimplified());
-            vector = _simplifier->unsimplifiedSlacks();
-         }
-         else
-         {
-            _solver.getSlacks(vector);
-
-            if( _scaler != 0 )
-               _scaler->unscaleSlacks(vector);
-         }
-
+         _syncRealSolution();
+         _solReal.getSlacks(vector);
          return true;
       }
       else
          return false;
-   }
-
-
-
-   /// is a primal unbounded ray available?
-   bool SoPlex2::hasPrimalrayReal() const
-   {
-      return _hasPrimalrayReal;
    }
 
 
 
    /// gets the primal ray if available; returns true on success
-   bool SoPlex2::getPrimalrayReal(VectorReal& vector) const
+   bool SoPlex2::getPrimalRayReal(VectorReal& vector)
    {
-      if( hasPrimalrayReal() )
+      if( hasPrimalRay() && vector.dim() >= numColsReal() )
       {
-         _solver.getPrimalray(vector);
-
-         if( _scaler != 0 )
-            _scaler->unscalePrimal(vector);
-
+         _syncRealSolution();
+         _solReal.getPrimalRay(vector);
          return true;
       }
       else
@@ -2501,32 +2166,13 @@ namespace soplex
 
 
 
-   /// is a dual feasible solution available?
-   bool SoPlex2::hasDualReal() const
-   {
-      return _hasDualReal;
-   }
-
-
-
    /// gets the dual solution vector if available; returns true on success
-   bool SoPlex2::getDualReal(VectorReal& vector) const
+   bool SoPlex2::getDualReal(VectorReal& vector)
    {
-      if( hasDualReal() )
+      if( hasDual() && vector.dim() >= numRowsReal() )
       {
-         if( _simplifier != 0 )
-         {
-            assert(_simplifier->isUnsimplified());
-            vector = _simplifier->unsimplifiedDual();
-         }
-         else
-         {
-            _solver.getDual(vector);
-
-            if( _scaler != 0 )
-               _scaler->unscaleDual(vector);
-         }
-
+         _syncRealSolution();
+         _solReal.getDual(vector);
          return true;
       }
       else
@@ -2536,23 +2182,12 @@ namespace soplex
 
 
    /// gets the vector of reduced cost values if available; returns true on success
-   bool SoPlex2::getRedcostReal(VectorReal& vector) const
+   bool SoPlex2::getRedCostReal(VectorReal& vector)
    {
-      if( hasDualReal() )
+      if( hasDual() && vector.dim() >= numColsReal() )
       {
-         if( _simplifier != 0 )
-         {
-            assert(_simplifier->isUnsimplified());
-            vector = _simplifier->unsimplifiedRedCost();
-         }
-         else
-         {
-            _solver.getRedCost(vector);
-
-            if( _scaler != 0 )
-               _scaler->unscaleRedCost(vector);
-         }
-
+         _syncRealSolution();
+         _solReal.getRedCost(vector);
          return true;
       }
       else
@@ -2561,24 +2196,13 @@ namespace soplex
 
 
 
-   /// is Farkas proof of infeasibility available?
-   bool SoPlex2::hasDualfarkasReal() const
-   {
-      return _hasDualfarkasReal;
-   }
-
-
-
    /// gets the Farkas proof if available; returns true on success
-   bool SoPlex2::getDualfarkasReal(VectorReal& vector) const
+   bool SoPlex2::getDualFarkasReal(VectorReal& vector)
    {
-      if( hasDualfarkasReal() )
+      if( hasDualFarkas() && vector.dim() >= numRowsReal() )
       {
-         _solver.getDualfarkas(vector);
-
-         if( _scaler != 0 )
-            _scaler->unscaleDual(vector);
-
+         _syncRealSolution();
+         _solReal.getDualFarkas(vector);
          return true;
       }
       else
@@ -2591,6 +2215,13 @@ namespace soplex
    void SoPlex2::getBoundViolationReal(VectorReal& primal, Real& maxviol, Real& sumviol) const
    {
       assert(primal.dim() >= numColsReal());
+
+      if( primal.dim() < numColsReal() )
+      {
+         maxviol = realParam(SoPlex2::INFTY);
+         sumviol = realParam(SoPlex2::INFTY);
+         return;
+      }
 
       maxviol = 0.0;
       sumviol = 0.0;
@@ -2617,45 +2248,19 @@ namespace soplex
 
 
 
-   /// gets internal violation of bounds by given primal solution
-   void SoPlex2::getInternalBoundViolationReal(Real& maxviol, Real& sumviol) const
-   {
-      maxviol = 0.0;
-      sumviol = 0.0;
-
-      DVectorReal primal(_solver.nCols());
-
-      _solver.getPrimal(primal);
-
-      for( int i = _solver.nCols() - 1; i >= 0; i-- )
-      {
-         Real viol = _solver.lower(i) - primal[i];
-         if( viol > 0.0 )
-         {
-            sumviol += viol;
-            if( viol > maxviol )
-               maxviol = viol;
-         }
-
-         viol = primal[i] - _solver.upper(i);
-         if( viol > 0.0 )
-         {
-            sumviol += viol;
-            if( viol > maxviol )
-               maxviol = viol;
-         }
-      }
-   }
-
-
-
    /// gets violation of constraints
    void SoPlex2::getConstraintViolationReal(VectorReal& primal, Real& maxviol, Real& sumviol) const
    {
       assert(primal.dim() >= numColsReal());
 
-      DVectorReal activity = _realLP->computePrimalActivity(primal);
+      if( primal.dim() < numColsReal() )
+      {
+         maxviol = realParam(SoPlex2::INFTY);
+         sumviol = realParam(SoPlex2::INFTY);
+         return;
+      }
 
+      DVectorReal activity = _realLP->computePrimalActivity(primal);
       maxviol = 0.0;
       sumviol = 0.0;
 
@@ -2681,172 +2286,133 @@ namespace soplex
 
 
 
-   /// gets internal violation of constraints
-   void SoPlex2::getInternalConstraintViolationReal(Real& maxviol, Real& sumviol) const
-   {
-      _solver.qualConstraintViolation(maxviol, sumviol);
-   }
-
-
-
    /// gets violation of slacks
+   ///@todo implement
    void SoPlex2::getSlackViolationReal(Real& maxviol, Real& sumviol) const
    {
-      _solver.qualSlackViolation(maxviol, sumviol);
+      maxviol = 0.0;
+      sumviol = 0.0;
    }
 
 
 
    /// gets violation of reduced costs
+   ///@todo implement
    void SoPlex2::getRedCostViolationReal(Real& maxviol, Real& sumviol) const
    {
-      _solver.qualRedCostViolation(maxviol, sumviol);
-   }
-
-
-
-   /// synchronizes LPs, clears statistics, and solves rational LP
-   SPxSolver::Status SoPlex2::solveRational()
-   {
-      assert(_isConsistent());
-      assert(_statistics != 0);
-
-      // clear statistics
-      _statistics->clearSolvingData();
-
-      // start timing
-      _statistics->solvingTime.start();
-
-#if 1
-      // copy rounded rational LP to real LP
-      syncRealLP();
-
-      // call rational solving routine
-      _solveRational();
-#else
-      // copy rounded rational LP to real LP
-      syncRealLP();
-
-      // solve floating-point LP
-      _statusRational = solveReal();
-
-      // store real as rational solution
-      _syncRationalSolution(true, true, true);
-#endif
-
-      // stop timing
-      _statistics->solvingTime.stop();
-
-      return _statusRational;
-   }
-
-
-
-   /// returns the current status
-   SPxSolver::Status SoPlex2::statusRational() const
-   {
-      return _statusRational;
+      maxviol = 0.0;
+      sumviol = 0.0;
    }
 
 
 
    /// returns the objective value if a primal solution is available
-   Rational SoPlex2::objValueRational() const
+   Rational SoPlex2::objValueRational()
    {
       assert(OBJSENSE_MAXIMIZE == 1);
       assert(OBJSENSE_MINIMIZE == -1);
 
-      if( hasPrimalrayRational() )
+      if( status() == SPxSolver::UNBOUNDED )
+         return Rational(realParam(SoPlex2::INFTY) * intParam(SoPlex2::OBJSENSE));
+      else if( status() == SPxSolver::INFEASIBLE )
+         return Rational(-realParam(SoPlex2::INFTY) * intParam(SoPlex2::OBJSENSE));
+      else if( hasPrimal() )
       {
-         return realParam(SoPlex2::INFTY) * intParam(SoPlex2::OBJSENSE);
-      }
-      else if( hasPrimalRational() )
-      {
-         ///@todo remember if computed once
-         DVectorRational primal(numColsRational());
-         getPrimalRational(primal);
-         return (primal * maxObjRational()) * (Rational)intParam(SoPlex2::OBJSENSE);
+         _syncRationalSolution();
+         return (_solRational._primal * maxObjRational()) * intParam(SoPlex2::OBJSENSE);
       }
       else
-         return -realParam(SoPlex2::INFTY) * intParam(SoPlex2::OBJSENSE);
-   }
-
-
-
-   /// is a primal feasible solution available?
-   bool SoPlex2::hasPrimalRational() const
-   {
-      return _solRational.hasPrimal();
+         return 0;
    }
 
 
 
    /// gets the primal solution vector if available; returns true on success
-   bool SoPlex2::getPrimalRational(VectorRational& vector) const
+   bool SoPlex2::getPrimalRational(VectorRational& vector)
    {
-      return _solRational.getPrimal(vector);
+      if( hasPrimal() && vector.dim() >= numColsRational() )
+      {
+         _syncRationalSolution();
+         _solRational.getPrimal(vector);
+         return true;
+      }
+      else
+         return false;
    }
 
 
 
    /// gets the vector of slack values if available; returns true on success
-   bool SoPlex2::getSlacksRational(VectorRational& vector) const
+   bool SoPlex2::getSlacksRational(VectorRational& vector)
    {
-      return _solRational.getSlacks(vector);
-   }
-
-
-
-   /// is a primal unbounded ray available?
-   bool SoPlex2::hasPrimalrayRational() const
-   {
-      return _solRational.hasPrimalray();
+      if( hasPrimal() && vector.dim() >= numRowsRational() )
+      {
+         _syncRationalSolution();
+         _solRational.getSlacks(vector);
+         return true;
+      }
+      else
+         return false;
    }
 
 
 
    /// gets the primal ray if LP is unbounded; returns true on success
-   bool SoPlex2::getPrimalrayRational(VectorRational& vector) const
+   bool SoPlex2::getPrimalRayRational(VectorRational& vector)
    {
-      return _solRational.getPrimalray(vector);
-   }
-
-
-
-   /// is a dual feasible solution available?
-   bool SoPlex2::hasDualRational() const
-   {
-      return _solRational.hasDual();
+      if( hasPrimalRay() && vector.dim() >= numColsRational() )
+      {
+         _syncRationalSolution();
+         _solRational.getPrimalRay(vector);
+         return true;
+      }
+      else
+         return false;
    }
 
 
 
    /// gets the dual solution vector if available; returns true on success
-   bool SoPlex2::getDualRational(VectorRational& vector) const
+   bool SoPlex2::getDualRational(VectorRational& vector)
    {
-      return _solRational.getDual(vector);
+      if( hasDual() && vector.dim() >= numRowsRational() )
+      {
+         _syncRationalSolution();
+         _solRational.getDual(vector);
+         return true;
+      }
+      else
+         return false;
    }
 
 
 
    /// gets the vector of reduced cost values if available; returns true on success
-   bool SoPlex2::getRedcostRational(VectorRational& vector) const
+   bool SoPlex2::getRedCostRational(VectorRational& vector)
    {
-      return _solRational.getRedcost(vector);
+      if( hasDual() && vector.dim() >= numColsRational() )
+      {
+         _syncRationalSolution();
+         _solRational.getRedCost(vector);
+         return true;
+      }
+      else
+         return false;
    }
 
 
-
-   /// is Farkas proof of infeasibility available?
-   bool SoPlex2::hasDualfarkasRational() const
-   {
-      return _solRational.hasDualfarkas();
-   }
 
    /// gets the Farkas proof if LP is infeasible; returns true on success
-   bool SoPlex2::getDualfarkasRational(VectorRational& vector) const
+   bool SoPlex2::getDualFarkasRational(VectorRational& vector)
    {
-      return _solRational.getDualfarkas(vector);
+      if( hasDualFarkas() && vector.dim() >= numRowsRational() )
+      {
+         _syncRationalSolution();
+         _solRational.getDualFarkas(vector);
+         return true;
+      }
+      else
+         return false;
    }
 
 
@@ -2855,6 +2421,13 @@ namespace soplex
    void SoPlex2::getBoundViolationRational(VectorRational& primal, Rational& maxviol, Rational& sumviol) const
    {
       assert(primal.dim() >= numColsRational());
+
+      if( primal.dim() < numColsRational() )
+      {
+         maxviol = Rational(realParam(SoPlex2::INFTY));
+         sumviol = Rational(realParam(SoPlex2::INFTY));
+         return;
+      }
 
       maxviol = 0;
       sumviol = 0;
@@ -2886,8 +2459,14 @@ namespace soplex
    {
       assert(primal.dim() >= numColsRational());
 
-      DVectorRational activity = _rationalLP->computePrimalActivity(primal);
+      if( primal.dim() < numColsRational() )
+      {
+         maxviol = Rational(realParam(SoPlex2::INFTY));
+         sumviol = Rational(realParam(SoPlex2::INFTY));
+         return;
+      }
 
+      DVectorRational activity = _rationalLP->computePrimalActivity(primal);
       maxviol = 0;
       sumviol = 0;
 
@@ -2914,9 +2493,9 @@ namespace soplex
 
 
    /// gets violation of slacks
+   ///@todo implement
    void SoPlex2::getSlackViolationRational(Rational& maxviol, Rational& sumviol) const
    {
-      ///@todo implement
       maxviol = 0;
       sumviol = 0;
    }
@@ -2924,9 +2503,9 @@ namespace soplex
 
 
    /// gets violation of reduced costs
+   ///@todo implement
    void SoPlex2::getRedCostViolationRational(Rational& maxviol, Rational& sumviol) const
    {
-      ///@todo implement
       maxviol = 0;
       sumviol = 0;
    }
@@ -2934,45 +2513,73 @@ namespace soplex
 
 
    /// is an advanced starting basis available?
-   bool SoPlex2::hasBasisReal() const
+   bool SoPlex2::hasBasis() const
    {
-      return _hasBasisReal;
+      return _hasBasis;
+   }
+
+
+
+   /// returns the current basis status
+   SPxBasis::SPxStatus SoPlex2::basisStatus() const
+   {
+      if( !hasBasis() )
+         return SPxBasis::NO_PROBLEM;
+      else if( status() == SPxSolver::OPTIMAL )
+         return SPxBasis::OPTIMAL;
+      else if( status() == SPxSolver::UNBOUNDED )
+         return SPxBasis::UNBOUNDED;
+      else if( status() == SPxSolver::INFEASIBLE )
+         return SPxBasis::INFEASIBLE;
+      else if( hasPrimal() )
+         return SPxBasis::PRIMAL;
+      else if( hasDual() )
+         return SPxBasis::DUAL;
+      else
+         return SPxBasis::REGULAR;
    }
 
 
 
    /// returns basis status for a single row
-   SPxSolver::VarStatus SoPlex2::basisRowStatusReal(int row) const
+   SPxSolver::VarStatus SoPlex2::basisRowStatus(int row) const
    {
       assert(row >= 0);
       assert(row < numRowsReal());
 
-      // if no basis is available, return slack basis
-      if( !_hasBasisReal )
+      // if no basis is available, return slack basis; if index is out of range, return basic status as for a newly
+      // added row
+      if( !hasBasis() || row < 0 || row >= numRowsReal() )
          return SPxSolver::BASIC;
+      // if the real LP is loaded, ask solver
       else if( _isRealLPLoaded )
       {
          assert(_simplifier == 0);
-         assert(row < _solver.nRows());
          return _solver.getBasisRowStatus(row);
       }
+      // if the real LP is not loaded, the basis is stored in the basis arrays of this class
       else
       {
-         assert(row < _basisStatusRowsReal.size());
-         return _basisStatusRowsReal[row];
+         assert(row < _basisStatusRows.size());
+         return _basisStatusRows[row];
       }
    }
 
 
 
    /// returns basis status for a single column
-   SPxSolver::VarStatus SoPlex2::basisColStatusReal(int col) const
+   SPxSolver::VarStatus SoPlex2::basisColStatus(int col) const
    {
       assert(col >= 0);
       assert(col < numColsReal());
 
+      // if index is out of range, return nonbasic status as for a newly added unbounded column
+      if( col < 0 || col >= numColsReal() )
+      {
+         return SPxSolver::ZERO;
+      }
       // if no basis is available, return slack basis
-      if( !_hasBasisReal )
+      else if( !hasBasis() )
       {
          if( lowerReal(col) > -realParam(SoPlex2::INFTY) )
             return SPxSolver::ON_LOWER;
@@ -2981,26 +2588,27 @@ namespace soplex
          else
             return SPxSolver::ZERO;
       }
+      // if the real LP is loaded, ask solver
       else if( _isRealLPLoaded )
       {
          assert(_simplifier == 0);
-         assert(col < _solver.nCols());
          return _solver.getBasisColStatus(col);
       }
+      // if the real LP is not loaded, the basis is stored in the basis arrays of this class
       else
       {
-         assert(col < _basisStatusColsReal.size());
-         return _basisStatusColsReal[col];
+         assert(col < _basisStatusCols.size());
+         return _basisStatusCols[col];
       }
    }
 
 
 
    /// gets current basis
-   void SoPlex2::getBasisReal(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const
+   void SoPlex2::getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const
    {
       // if no basis is available, return slack basis
-      if( !_hasBasisReal )
+      if( !hasBasis() )
       {
          for( int i = numRowsReal() - 1; i >= 0; i-- )
             rows[i] = SPxSolver::BASIC;
@@ -3015,212 +2623,99 @@ namespace soplex
                cols[i] = SPxSolver::ZERO;
          }
       }
+      // if the real LP is loaded, ask solver
       else if( _isRealLPLoaded )
       {
          assert(_simplifier == 0);
-         assert(numRowsReal() == _solver.nRows());
-         assert(numColsReal() == _solver.nCols());
-
          (void)_solver.getBasis(rows, cols);
       }
+      // if the real LP is not loaded, the basis is stored in the basis arrays of this class
       else
       {
-         assert(numRowsReal() == _basisStatusRowsReal.size());
-         assert(numColsReal() == _basisStatusColsReal.size());
+         assert(numRowsReal() == _basisStatusRows.size());
+         assert(numColsReal() == _basisStatusCols.size());
 
          for( int i = numRowsReal() - 1; i >= 0; i-- )
-            rows[i] = _basisStatusRowsReal[i];
+            rows[i] = _basisStatusRows[i];
 
          for( int i = numColsReal() - 1; i >= 0; i-- )
-            cols[i] = _basisStatusColsReal[i];
+            cols[i] = _basisStatusCols[i];
       }
-   }
-
-
-
-   /// sets starting basis via arrays of statuses
-   void SoPlex2::setBasisReal(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[])
-   {
-      if( _isRealLPLoaded )
-      {
-         assert(numRowsReal() == _solver.nRows());
-         assert(numColsReal() == _solver.nCols());
-
-         ///@todo check whether this has been successful and adjust _hasBasisReal accordingly
-         _solver.setBasis(rows, cols);
-      }
-      else
-      {
-         _basisStatusRowsReal.reSize(numRowsReal());
-         _basisStatusColsReal.reSize(numColsReal());
-
-         for( int i = numRowsReal() - 1; i >= 0; i-- )
-            _basisStatusRowsReal[i] = rows[i];
-
-         for( int i = numColsReal() - 1; i >= 0; i-- )
-            _basisStatusColsReal[i] = cols[i];
-
-      }
-
-      _hasBasisReal = true;
-   }
-
-
-
-   /// clears starting basis
-   void SoPlex2::clearBasisReal()
-   {
-      if( _isRealLPLoaded )
-         _solver.reLoad();
-
-      _hasBasisReal = false;
-   }
-
-
-
-   /// is an advanced starting basis available?
-   bool SoPlex2::hasBasisRational() const
-   {
-      return _hasBasisRational;
-   }
-
-
-
-   /// returns basis status for a single row
-   SPxSolver::VarStatus SoPlex2::basisRowStatusRational(int row) const
-   {
-      assert(row >= 0);
-      assert(row < numRowsRational());
-
-      // if no basis is available, return slack basis
-      if( !_hasBasisRational )
-         return SPxSolver::BASIC;
-      else
-      {
-         assert(row < _basisStatusRowsRational.size());
-         return _basisStatusRowsRational[row];
-      }
-   }
-
-
-
-   /// returns basis status for a single column
-   SPxSolver::VarStatus SoPlex2::basisColStatusRational(int col) const
-   {
-      assert(col >= 0);
-      assert(col < numColsRational());
-
-      // if no basis is available, return slack basis
-      if( !_hasBasisRational )
-      {
-         if( lowerRational(col) > double(-realParam(SoPlex2::INFTY)) )
-            return SPxSolver::ON_LOWER;
-         else if( upperRational(col) < double(realParam(SoPlex2::INFTY)) )
-            return SPxSolver::ON_UPPER;
-         else
-            return SPxSolver::ZERO;
-      }
-      else
-      {
-         assert(col < _basisStatusColsRational.size());
-         return _basisStatusColsRational[col];
-      }
-   }
-
-
-
-   /// gets current basis
-   void SoPlex2::getBasisRational(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const
-   {
-      // if no basis is available, return slack basis
-      if( !_hasBasisRational )
-      {
-         for( int i = numRowsRational() - 1; i >= 0; i-- )
-            rows[i] = SPxSolver::BASIC;
-
-         for( int i = numColsRational() - 1; i >= 0; i-- )
-         {
-            if( lowerRational(i) > double(-realParam(SoPlex2::INFTY)) )
-               cols[i] = SPxSolver::ON_LOWER;
-            else if( upperRational(i) < double(realParam(SoPlex2::INFTY)) )
-               cols[i] = SPxSolver::ON_UPPER;
-            else
-               cols[i] = SPxSolver::ZERO;
-         }
-      }
-      else
-      {
-         assert(numRowsRational() == _basisStatusRowsRational.size());
-         assert(numColsRational() == _basisStatusColsRational.size());
-
-         for( int i = numRowsRational() - 1; i >= 0; i-- )
-            rows[i] = _basisStatusRowsRational[i];
-
-         for( int i = numColsRational() - 1; i >= 0; i-- )
-            cols[i] = _basisStatusColsRational[i];
-      }
-   }
-
-
-
-   /// sets starting basis via arrays of statuses
-   void SoPlex2::setBasisRational(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[])
-   {
-      _basisStatusRowsRational.reSize(numRowsRational());
-      _basisStatusColsRational.reSize(numColsRational());
-
-      for( int i = numRowsRational() - 1; i >= 0; i-- )
-         _basisStatusRowsRational[i] = rows[i];
-
-      for( int i = numColsRational() - 1; i >= 0; i-- )
-         _basisStatusColsRational[i] = cols[i];
-
-      _hasBasisRational = true;
-   }
-
-
-
-   /// clears starting basis
-   void SoPlex2::clearBasisRational()
-   {
-      _hasBasisRational = false;
    }
 
 
 
    /// returns the indices of the basic columns and rows; basic column n gives value n, basic row m gives value -1-m
-   ///@todo this only works if basis is in LP - extend!
    void SoPlex2::getBasisInd(int* bind)
    {
-      assert(hasBasisReal());
+      // if no basis is available, return slack basis
+      if( !hasBasis() )
+      {
+         for( int i = 0; i < numRowsReal(); ++i )
+            bind[i] = -1 - i;
+      }
+      // if the real LP is not loaded, the basis is stored in the basis arrays of this class
+      else if( !_isRealLPLoaded )
+      {
+         int k = 0;
 
-      /* for column representation, return the basis */
-      if( intParam(SoPlex2::REPRESENTATION) == SoPlex2::REPRESENTATION_COLUMN )
+         assert(numRowsReal() == _basisStatusRows.size());
+         assert(numColsReal() == _basisStatusCols.size());
+
+         for( int i = 0; i < numRowsReal(); ++i )
+         {
+            if( _basisStatusRows[i] == SPxSolver::BASIC )
+            {
+               bind[k] = -1 - i;
+               k++;
+            }
+         }
+
+         for( int j = 0; j < numColsReal(); ++j )
+         {
+            if( _basisStatusCols[j] == SPxSolver::BASIC )
+            {
+               bind[k] = j;
+               k++;
+            }
+         }
+
+         assert(k == numRowsReal());
+      }
+      // if the real LP is loaded, the basis is stored in the solver and we need to distinguish between column and row
+      // representation; ask the solver itself which representation it has, since the REPRESENTATION parameter of this
+      // class might be set to automatic
+      else if( _solver.rep() == SPxSolver::COLUMN )
       {
          for( int i = 0; i < numRowsReal(); ++i )
          {
             SPxId id = _solver.basis().baseId(i);
-
             bind[i] = (id.isSPxColId() ? _solver.number(id) : - 1 - _solver.number(id));
          }
       }
-      /* for row representation, return the complement of the basis; for this, we need to loop through all rows and columns */
+      // for row representation, return the complement of the basis; for this, we need to loop through all rows and columns
       else
       {
-         int k = 0;
+         assert(_solver.rep() == SPxSolver::ROW);
 
-         assert(intParam(SoPlex2::REPRESENTATION) == SPxSolver::ROW);
+         int k = 0;
 
          for( int i = 0; i < numRowsReal(); ++i )
          {
             if( !_solver.isRowBasic(i) )
-               bind[k++] = -1 - i;
+            {
+               bind[k] = -1 - i;
+               k++;
+            }
          }
 
          for( int j = 0; j < numColsReal(); ++j )
          {
             if( !_solver.isColBasic(j) )
-               bind[k++] = j;
+            {
+               bind[k] = j;
+               k++;
+            }
          }
 
          assert(k == numRowsReal());
@@ -3230,21 +2725,32 @@ namespace soplex
 
 
    /// returns row r of basis inverse
-   void SoPlex2::getBasisInverseRow(int r, Real* coef)
+   ///@todo use VectorReal for coef
+   void SoPlex2::getBasisInverseRowReal(int r, Real* coef)
    {
       assert(r >= 0);
       assert(r < numRowsReal());
       assert(coef != 0);
 
-      if( intParam(REPRESENTATION) == REPRESENTATION_COLUMN )
+      if( !hasBasis() || r < 0 || r >= numRowsReal() )
+         return;
+
+      _ensureRealLPLoaded();
+
+      if( !_isRealLPLoaded )
+         return;
+
+      // we need to distinguish between column and row representation; ask the solver itself which representation it
+      // has, since the REPRESENTATION parameter of this class might be set to automatic
+      if( _solver.rep() == SPxSolver::COLUMN )
       {
-         SSVectorBase< Real > x(numRowsReal());
+         SSVectorReal x(numRowsReal());
          _solver.basis().coSolve(x, _solver.unitVector(r));
          coef = x.altValues();
       }
       else
       {
-         assert(intParam(REPRESENTATION) == REPRESENTATION_ROW);
+         assert(_solver.rep() == SPxSolver::ROW);
 
          // @todo should rhs be a reference?
          DSVector rhs(numColsReal());
@@ -3321,25 +2827,36 @@ namespace soplex
 
 
    /// returns column c of basis inverse
-   void SoPlex2::getBasisInverseCol(int c, Real* coef)
+   ///@todo use VectorReal for coef
+   void SoPlex2::getBasisInverseColReal(int c, Real* coef)
    {
       assert(c >= 0);
       assert(c < numRowsReal());
       assert(coef != 0);
 
-      if( intParam(REPRESENTATION) == REPRESENTATION_COLUMN )
+      if( !hasBasis() || c < 0 || c >= numRowsReal() )
+         return;
+
+      _ensureRealLPLoaded();
+
+      if( !_isRealLPLoaded )
+         return;
+
+      // we need to distinguish between column and row representation; ask the solver itself which representation it
+      // has, since the REPRESENTATION parameter of this class might be set to automatic
+      if( _solver.rep() == SPxSolver::COLUMN )
       {
-         SSVectorBase< Real > x(numRowsReal());
+         SSVectorReal x(numRowsReal());
          _solver.basis().solve(x, _solver.unitVector(c));
          coef = x.altValues();
       }
       else
       {
-         assert(intParam(REPRESENTATION) == REPRESENTATION_ROW);
+         assert(_solver.rep() == SPxSolver::ROW);
 
          // @todo should rhs be a reference?
-         DSVector rhs(numColsReal());
-         SSVector y(numColsReal());
+         DSVectorReal rhs(numColsReal());
+         SSVectorReal y(numColsReal());
          int* bind;
          int index;
 
@@ -3412,23 +2929,34 @@ namespace soplex
 
 
    /// get dense solution of basis matrix B * sol = rhs
-   void SoPlex2::getBasisInverseTimesVec(Real* rhs, Real* sol)
+   ///@todo use VectorReal for rhs and sol
+   void SoPlex2::getBasisInverseTimesVecReal(Real* rhs, Real* sol)
    {
-      Vector v(numRowsReal(), rhs);
-      Vector x(numRowsReal(), sol);
+      VectorReal v(numRowsReal(), rhs);
+      VectorReal x(numRowsReal(), sol);
 
-      // in the column case use the existing factorization
-      if( intParam(SoPlex2::REPRESENTATION) == SoPlex2::REPRESENTATION_COLUMN )
+      if( !hasBasis() )
+         return;
+
+      _ensureRealLPLoaded();
+
+      if( !_isRealLPLoaded )
+         return;
+
+      // we need to distinguish between column and row representation; ask the solver itself which representation it
+      // has, since the REPRESENTATION parameter of this class might be set to automatic; in the column case we can use
+      // the existing factorization
+      if( _solver.rep() == SPxSolver::COLUMN )
       {
          // solve system "x = B^-1 * A_c" to get c'th column of B^-1 * A
          _solver.basis().solve(x, v);
       }
       else
       {
-         assert(intParam(SoPlex2::REPRESENTATION) == SoPlex2::REPRESENTATION_ROW);
+         assert(_solver.rep() == SPxSolver::ROW);
 
-         DSVector rowrhs(numColsReal());
-         SSVector y(numColsReal());
+         DSVectorReal rowrhs(numColsReal());
+         SSVectorReal y(numColsReal());
          int* bind;
 
          // get ordering of column basis matrix
@@ -3491,6 +3019,46 @@ namespace soplex
    }
 
 
+
+   /// sets starting basis via arrays of statuses
+   void SoPlex2::setBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[])
+   {
+      if( _isRealLPLoaded )
+      {
+         assert(numRowsReal() == _solver.nRows());
+         assert(numColsReal() == _solver.nCols());
+
+         _solver.setBasis(rows, cols);
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else
+      {
+         _basisStatusRows.reSize(numRowsReal());
+         _basisStatusCols.reSize(numColsReal());
+
+         for( int i = numRowsReal() - 1; i >= 0; i-- )
+            _basisStatusRows[i] = rows[i];
+
+         for( int j = numColsReal() - 1; j >= 0; j-- )
+            _basisStatusCols[j] = cols[j];
+
+         _hasBasis = true;
+      }
+   }
+
+
+
+   /// clears starting basis
+   void SoPlex2::clearBasis()
+   {
+      if( _isRealLPLoaded )
+         _solver.reLoad();
+
+      _hasBasis = false;
+   }
+
+
+
 #if 0
    /// time spent in factorizations
    Real SoPlex2::factorTime() const
@@ -3528,10 +3096,10 @@ namespace soplex
 
 
 
-   ///
+   /// time spent in last call to solve
    Real SoPlex2::solveTime() const
    {
-       return _solver.time();
+       return _statistics->solvingTime.userTime();
    }
 
 
@@ -3602,16 +3170,30 @@ namespace soplex
       // clear statistics
       _statistics->clearAllData();
 
+      // update status
+      _status = SPxSolver::UNKNOWN;
+      _invalidateSolution();
+      _hasBasis = false;
+
       // start timing
       _statistics->readingTime.start();
 
       // read
       bool success = _realLP->readFile(filename, rowNames, colNames, intVars);
       setIntParam(SoPlex2::OBJSENSE, (_realLP->spxSense() == SPxLPReal::MAXIMIZE ? SoPlex2::OBJSENSE_MAXIMIZE : SoPlex2::OBJSENSE_MINIMIZE), true, true);
-      _hasBasisReal = false;
 
       // stop timing
       _statistics->readingTime.stop();
+
+      if( success )
+      {
+         // if sync mode is auto, we have to copy the (rounded) real LP to the rational LP; this is counted to sync time
+         // and not to reading time
+         if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+            _syncLPRational();
+      }
+      else
+         clearLPReal();
 
       return success;
    }
@@ -3630,10 +3212,78 @@ namespace soplex
 
 
 
+   /// reads rational LP in LP or MPS format from file and returns true on success; gets row names, column names, and
+   /// integer variables if desired
+   bool SoPlex2::readFileRational(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
+   {
+      assert(_rationalLP != 0);
+
+      // clear statistics
+      _statistics->clearAllData();
+
+      // start timing
+      _statistics->readingTime.start();
+
+      // update status
+      _status = SPxSolver::UNKNOWN;
+      _invalidateSolution();
+      _hasBasis = false;
+
+      // read
+      _ensureRationalLP();
+      bool success = _rationalLP->readFile(filename, rowNames, colNames, intVars);
+      setIntParam(SoPlex2::OBJSENSE, (_rationalLP->spxSense() == SPxLPRational::MAXIMIZE ? SoPlex2::OBJSENSE_MAXIMIZE : SoPlex2::OBJSENSE_MINIMIZE), true, true);
+
+      // stop timing
+      _statistics->readingTime.stop();
+
+      if( success )
+      {
+         // if sync mode is auto, we have to copy the (rounded) real LP to the rational LP; this is counted to sync time
+         // and not to reading time
+         if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+            _syncLPReal();
+         // if a rational LP file is read, but only the (rounded) real LP should be kept, we have to free the rational LP
+         else if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         {
+            _syncLPReal();
+            _rationalLP->~SPxLPRational();
+            spx_free(_rationalLP);
+         }
+      }
+      else
+         clearLPRational();
+
+      return success;
+   }
+
+
+
+   /// writes rational LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
+   /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
+   /// marked as integer; returns true on success
+   bool SoPlex2::writeFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars) const
+   {
+      if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return false;
+      else
+      {
+         assert(_rationalLP != 0);
+         _rationalLP->writeFile(filename, rowNames, colNames, intVars);
+
+         ///@todo implement return value
+         return true;
+      }
+   }
+
+
+
    /// reads basis information from \p filename and returns true on success; if \p rowNames and \p colNames are \c NULL,
    /// default names are assumed; returns true on success
-   bool SoPlex2::readBasisFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames)
+   bool SoPlex2::readBasisFile(const char* filename, const NameSet* rowNames, const NameSet* colNames)
    {
+#if 1
+      assert(filename != 0);
       assert(_realLP != 0);
 
       // start timing
@@ -3650,100 +3300,16 @@ namespace soplex
          _realLP = &_solver;
          _isRealLPLoaded = true;
       }
-      _hasBasisReal = _solver.readBasisFile(filename, rowNames, colNames);
+      _hasBasis = _solver.readBasisFile(filename, rowNames, colNames);
+      assert(_hasBasis == (_solver.basis().status() > SPxBasis::NO_PROBLEM));
 
       // stop timing
       _statistics->readingTime.stop();
 
-      return _hasBasisReal;
-   }
-
-
-
-   /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used;
-   /// returns true on success
-   bool SoPlex2::writeBasisFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames)
-   {
-      if( !_isRealLPLoaded )
-      {
-         assert(_realLP != &_solver);
-
-         _solver.loadLP(*_realLP);
-         _realLP->~SPxLPReal();
-         spx_free(_realLP);
-         _realLP = &_solver;
-         _isRealLPLoaded = true;
-
-         if( _hasBasisReal )
-         {
-            assert(_basisStatusRowsReal.size() == numRowsReal());
-            assert(_basisStatusColsReal.size() == numColsReal());
-
-            ///@todo this should not fail even if the basis is invalid (wrong dimension or wrong number of basic
-            ///      entries); fix either in SPxSolver or in SPxBasis
-            _solver.setBasis(_basisStatusRowsReal.get_const_ptr(), _basisStatusColsReal.get_const_ptr());
-         }
-      }
-
-      return _solver.writeBasisFile(filename, rowNames, colNames);
-   }
-
-
-
-   /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
-   /// default names are used
-   void SoPlex2::writeStateReal(const char* filename, const NameSet* rowNames, const NameSet* colNames)
-   {
-      writeFileReal(filename);
-      writeBasisFileReal(filename);
-      // @todo write settings file
-   }
-
-
-
-   /// reads rational LP in LP or MPS format from file and returns true on success; gets row names, column names, and
-   /// integer variables if desired
-   bool SoPlex2::readFileRational(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
-   {
-      assert(_rationalLP != 0);
-
-      // clear statistics
-      _statistics->clearAllData();
-
-      // start timing
-      _statistics->readingTime.start();
-
-      // read
-      bool success = _rationalLP->readFile(filename, rowNames, colNames, intVars);
-      setIntParam(SoPlex2::OBJSENSE, (_rationalLP->spxSense() == SPxLPRational::MAXIMIZE ? SoPlex2::OBJSENSE_MAXIMIZE : SoPlex2::OBJSENSE_MINIMIZE), true, true);
-      _hasBasisRational = false;
-
-      // stop timing
-      _statistics->readingTime.stop();
-
-      return success;
-   }
-
-
-
-   /// writes rational LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
-   /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
-   /// marked as integer; returns true on success
-   bool SoPlex2::writeFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars) const
-   {
-      ///@todo implement return value
-      _rationalLP->writeFile(filename, rowNames, colNames, intVars);
-      return true;
-   }
-
-
-
-   /// reads basis information from \p filename and returns true on success; if \p rowNames and \p colNames are \c NULL,
-   /// default names are assumed; returns true on success
-   bool SoPlex2::readBasisFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames)
-   {
+      return _hasBasis;
+#else
+      // this is alternative code for reading bases without the SPxSolver class
       assert(filename != 0);
-      assert(_rationalLP != 0);
 
       // start timing
       _statistics->readingTime.start();
@@ -3755,8 +3321,8 @@ namespace soplex
          return false;
 
       // get problem size
-      int numRows = numRowsRational();
-      int numCols = numColsRational();
+      int numRows = numRowsReal();
+      int numCols = numColsReal();
 
       // prepare column names
       const NameSet* colNamesPtr = colNames;
@@ -3799,22 +3365,22 @@ namespace soplex
       }
 
       // initialize with default slack basis
-      _basisStatusRowsRational.reSize(numRows);
-      _basisStatusColsRational.reSize(numCols);
+      _basisStatusRows.reSize(numRows);
+      _basisStatusCols.reSize(numCols);
 
       for( int i = 0; i < numRows; i++ )
-         _basisStatusRowsRational[i] = SPxSolver::BASIC;
+         _basisStatusRows[i] = SPxSolver::BASIC;
 
       for( int i = 0; i < numCols; i++ )
       {
-         if( lowerRational(i) == upperRational(i) )
-            _basisStatusColsRational[i] = SPxSolver::FIXED;
-         else if( lowerRational(i) <= double(-realParam(SoPlex2::INFTY)) && upperRational(i) >= double(realParam(SoPlex2::INFTY)) )
-            _basisStatusColsRational[i] = SPxSolver::ZERO;
-         else if( lowerRational(i) <= double(-realParam(SoPlex2::INFTY)) )
-            _basisStatusColsRational[i] = SPxSolver::ON_UPPER;
+         if( lowerReal(i) == upperReal(i) )
+            _basisStatusCols[i] = SPxSolver::FIXED;
+         else if( lowerReal(i) <= double(-realParam(SoPlex2::INFTY)) && upperReal(i) >= double(realParam(SoPlex2::INFTY)) )
+            _basisStatusCols[i] = SPxSolver::ZERO;
+         else if( lowerReal(i) <= double(-realParam(SoPlex2::INFTY)) )
+            _basisStatusCols[i] = SPxSolver::ON_UPPER;
          else
-            _basisStatusColsRational[i] = SPxSolver::ON_LOWER;
+            _basisStatusCols[i] = SPxSolver::ON_LOWER;
       }
 
       // read basis
@@ -3846,25 +3412,25 @@ namespace soplex
 
             if( !strcmp(mps.field1(), "XU") )
             {
-               _basisStatusColsRational[c] = SPxSolver::BASIC;
-               _basisStatusRowsRational[r] = (lhsRational(r) == rhsRational(r))
+               _basisStatusCols[c] = SPxSolver::BASIC;
+               _basisStatusRows[r] = (lhsReal(r) == rhsReal(r))
                   ? SPxSolver::FIXED
                   : SPxSolver::ON_UPPER;
             }
             else if( !strcmp(mps.field1(), "XL") )
             {
-               _basisStatusColsRational[c] = SPxSolver::BASIC;
-               _basisStatusRowsRational[r] = (lhsRational(r) == rhsRational(r))
+               _basisStatusCols[c] = SPxSolver::BASIC;
+               _basisStatusRows[r] = (lhsReal(r) == rhsReal(r))
                   ? SPxSolver::FIXED
                   : SPxSolver::ON_LOWER;
             }
             else if( !strcmp(mps.field1(), "UL") )
             {
-               _basisStatusColsRational[c] = SPxSolver::ON_UPPER;
+               _basisStatusCols[c] = SPxSolver::ON_UPPER;
             }
             else if( !strcmp(mps.field1(), "LL") )
             {
-               _basisStatusColsRational[c] = SPxSolver::ON_LOWER;
+               _basisStatusCols[c] = SPxSolver::ON_LOWER;
             }
             else
             {
@@ -3886,22 +3452,29 @@ namespace soplex
          spx_free(tmpColNames);
       }
 
-      _hasBasisRational = !mps.hasError();
+      _hasBasis = !mps.hasError();
 
       // stop timing
       _statistics->readingTime.stop();
 
-      return _hasBasisRational;
+      return _hasBasis;
+#endif
    }
 
 
 
    /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used;
    /// returns true on success
-   bool SoPlex2::writeBasisFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames)
+   bool SoPlex2::writeBasisFile(const char* filename, const NameSet* rowNames, const NameSet* colNames)
    {
+#if 1
       assert(filename != 0);
-      assert(_rationalLP != 0);
+
+      _ensureRealLPLoaded();
+      return _solver.writeBasisFile(filename, rowNames, colNames);
+#else
+      // this is alternative code for writing bases directly from the basis arrays without the SPxSolver class
+      assert(filename != 0);
 
       std::ofstream file(filename);
       if( file == 0 )
@@ -3911,34 +3484,34 @@ namespace soplex
       file << "NAME  " << filename << "\n";
 
       // do not write basis if there is none
-      if( !_hasBasisRational )
+      if( !_hasBasis )
       {
          file << "ENDATA\n";
          return true;
       }
 
       // start writing
-      int numRows = _basisStatusRowsRational.size();
-      int numCols = _basisStatusColsRational.size();
+      int numRows = _basisStatusRows.size();
+      int numCols = _basisStatusCols.size();
       int row = 0;
 
       for( int col = 0; col < numCols; col++ )
       {
-         assert(_basisStatusColsRational[col] != SPxSolver::UNDEFINED);
+         assert(_basisStatusCols[col] != SPxSolver::UNDEFINED);
 
-         if( _basisStatusColsRational[col] == SPxSolver::BASIC )
+         if( _basisStatusCols[col] == SPxSolver::BASIC )
          {
             // find nonbasic row
             for( ; row < numRows; row++ )
             {
-               assert(_basisStatusRowsRational[row] != SPxSolver::UNDEFINED);
-               if( _basisStatusRowsRational[row] != SPxSolver::BASIC )
+               assert(_basisStatusRows[row] != SPxSolver::UNDEFINED);
+               if( _basisStatusRows[row] != SPxSolver::BASIC )
                   break;
             }
 
             assert(row != numRows);
 
-            file << (_basisStatusRowsRational[row] == SPxSolver::ON_UPPER ? " XU " : " XL ");
+            file << (_basisStatusRows[row] == SPxSolver::ON_UPPER ? " XU " : " XL ");
 
             file << std::setw(8);
             if( colNames != 0 && colNames->has(col) )
@@ -3957,7 +3530,7 @@ namespace soplex
          }
          else
          {
-            if( _basisStatusColsRational[col] == SPxSolver::ON_UPPER )
+            if( _basisStatusCols[col] == SPxSolver::ON_UPPER )
             {
                file << " UL ";
 
@@ -3978,11 +3551,23 @@ namespace soplex
       // check that the remaining rows are basic
       for( ; row < numRows; row++ )
       {
-         assert(_basisStatusRowsRational[row] == SPxSolver::BASIC);
+         assert(_basisStatusRows[row] == SPxSolver::BASIC);
       }
 #endif
 
       return true;
+#endif
+   }
+
+
+
+   /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
+   /// default names are used
+   void SoPlex2::writeStateReal(const char* filename, const NameSet* rowNames, const NameSet* colNames)
+   {
+      writeFileReal(filename);
+      writeBasisFile(filename);
+      // @todo write settings file
    }
 
 
@@ -4089,9 +3674,9 @@ namespace soplex
          if( value != SoPlex2::OBJSENSE_MAXIMIZE && value != SoPlex2::OBJSENSE_MINIMIZE )
             return false;
          _realLP->changeSense(value == SoPlex2::OBJSENSE_MAXIMIZE ? SPxLPReal::MAXIMIZE : SPxLPReal::MINIMIZE);
-         _rationalLP->changeSense(value == SoPlex2::OBJSENSE_MAXIMIZE ? SPxLPRational::MAXIMIZE : SPxLPRational::MINIMIZE);
-         _invalidateSolutionReal();
-         _invalidateSolutionRational();
+         if( _rationalLP != 0 )
+            _rationalLP->changeSense(value == SoPlex2::OBJSENSE_MAXIMIZE ? SPxLPRational::MAXIMIZE : SPxLPRational::MINIMIZE);
+         _invalidateSolution();
          break;
 
       // type of computational form, i.e., column or row representation
@@ -4236,6 +3821,42 @@ namespace soplex
             break;
          case PRICER_HYBRID:
             _solver.setPricer(&_pricerHybrid);
+            break;
+         default:
+            return false;
+         }
+         break;
+
+      // mode for synchronizing real and rational LP
+      case SoPlex2::SYNCMODE:
+         switch( value )
+         {
+         case SYNCMODE_ONLYREAL:
+            if( _rationalLP != 0 )
+            {
+               _rationalLP->~SPxLPRational();
+               spx_free(_rationalLP);
+            }
+            break;
+         case SYNCMODE_AUTO:
+            if( intParam(param) == SYNCMODE_ONLYREAL )
+               _syncLPRational();
+            break;
+         case SYNCMODE_MANUAL:
+            _ensureRationalLP();
+            break;
+         default:
+            return false;
+         }
+         break;
+
+      // mode for iterative refinement strategy; nothing to do but change the value if valid
+      case SoPlex2::SOLVEMODE:
+         switch( value )
+         {
+         case SOLVEMODE_REAL:
+         case SOLVEMODE_AUTO:
+         case SOLVEMODE_RATIONAL:
             break;
          default:
             return false;
@@ -4551,7 +4172,7 @@ namespace soplex
    {
       os << std::setprecision(2);
 
-      printStatus(os, _statusReal);
+      printStatus(os, _status);
 
       os << "Rational LP        : \n"
          << "  Objective sense  : " << (intParam(SoPlex2::OBJSENSE) == SoPlex2::OBJSENSE_MINIMIZE ? "minimize\n" : "maximize\n");
@@ -4569,7 +4190,7 @@ namespace soplex
    {
       os << std::setprecision(2);
 
-      printStatus(os, _statusRational);
+      printStatus(os, _status);
 
       os << "Rational LP        : \n"
          << "  Objective sense  : " << (intParam(SoPlex2::OBJSENSE) == SoPlex2::OBJSENSE_MINIMIZE ? "minimize\n" : "maximize\n");
@@ -4688,214 +4309,15 @@ namespace soplex
       assert(_currentSettings != 0);
 
       assert(_realLP != 0);
-      assert(_rationalLP != 0);
+      assert(_rationalLP != 0 || intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL);
 
       assert(_realLP != &_solver || _isRealLPLoaded);
       assert(_realLP == &_solver || !_isRealLPLoaded);
 
-      assert(!_hasBasisReal || _isRealLPLoaded || _basisStatusRowsReal.size() == numRowsReal());
-      assert(!_hasBasisReal || _isRealLPLoaded || _basisStatusColsReal.size() == numColsReal());
-      assert(!_hasBasisRational || _basisStatusRowsRational.size() == numRowsRational());
-      assert(!_hasBasisRational || _basisStatusColsRational.size() == numColsRational());
-
-#if 0
-      // this is not required since within _solveRational() we currently transform to minimization
-      assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MAXIMIZE || _realLP->spxSense() == SPxLPReal::MAXIMIZE);
-      assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MINIMIZE || _realLP->spxSense() == SPxLPReal::MINIMIZE);
-      assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MAXIMIZE || _rationalLP->spxSense() == SPxLPRational::MAXIMIZE);
-      assert(intParam(SoPlex2::OBJSENSE) != SoPlex2::OBJSENSE_MINIMIZE || _rationalLP->spxSense() == SPxLPRational::MINIMIZE);
-#endif
+      assert(!_hasBasis || _isRealLPLoaded || _basisStatusRows.size() == numRowsReal());
+      assert(!_hasBasis || _isRealLPLoaded || _basisStatusCols.size() == numColsReal());
 
       return true;
-   }
-
-
-
-   /// check simplification and solution status and clean up data
-   void SoPlex2::_evaluateSolutionStatusReal( SPxSimplifier::Result simplificationStatus )
-   {
-      if( simplificationStatus == SPxSimplifier::INFEASIBLE )
-         _statusReal = SPxSolver::INFEASIBLE;
-      else if( simplificationStatus == SPxSimplifier::DUAL_INFEASIBLE )
-         _statusReal = SPxSolver::INForUNBD;
-      else if( simplificationStatus == SPxSimplifier::UNBOUNDED )
-         _statusReal = SPxSolver::UNBOUNDED;
-      else if( simplificationStatus == SPxSimplifier::VANISHED )
-         _statusReal = SPxSolver::OPTIMAL;
-      else if( simplificationStatus == SPxSimplifier::OKAY )
-         _statusReal = _solver.status();
-
-      // evaluate solution flags
-      _evaluateSolutionFlags();
-
-      ///@todo move to private helper methods
-      // process result
-      switch( statusReal() )
-      {
-         case SPxSolver::OPTIMAL:
-            // unsimplify if simplifier is active and LP is solved to optimality; this must be done here and not at solution
-            // query, because we want to have the basis for the original problem
-            if( _simplifier != 0 )
-            {
-               assert(!_simplifier->isUnsimplified());
-               assert(simplificationStatus == SPxSimplifier::VANISHED || simplificationStatus == SPxSimplifier::OKAY);
-               assert(!_hasBasisReal);
-
-               bool vanished = simplificationStatus == SPxSimplifier::VANISHED;
-
-               // get solution vectors for transformed problem
-               DVectorReal primal(vanished ? 0 : _solver.nCols());
-               DVectorReal slacks(vanished ? 0 : _solver.nRows());
-               DVectorReal dual(vanished ? 0 : _solver.nRows());
-               DVectorReal redcost(vanished ? 0 : _solver.nCols());
-
-               _basisStatusRowsReal.reSize(numRowsReal());
-               _basisStatusColsReal.reSize(numColsReal());
-               assert(vanished || _basisStatusRowsReal.size() >= _solver.nRows());
-               assert(vanished || _basisStatusColsReal.size() >= _solver.nCols());
-
-               if( !vanished )
-               {
-                  assert(_solver.status() == SPxSolver::OPTIMAL);
-
-                  _solver.getPrimal(primal);
-                  _solver.getSlacks(slacks);
-                  _solver.getDual(dual);
-                  _solver.getRedCost(redcost);
-
-                  // unscale vectors
-                  if( _scaler != 0 )
-                  {
-                     _scaler->unscalePrimal(primal);
-                     _scaler->unscaleSlacks(slacks);
-                     _scaler->unscaleDual(dual);
-                     _scaler->unscaleRedCost(redcost);
-                  }
-
-                  // get basis of transformed problem
-                  _solver.getBasis(_basisStatusRowsReal.get_ptr(), _basisStatusColsReal.get_ptr());
-               }
-
-               ///@todo catch exception
-               _simplifier->unsimplify(primal, dual, slacks, redcost, _basisStatusRowsReal.get_ptr(), _basisStatusColsReal.get_ptr());
-
-               // store basis for original problem
-               _simplifier->getBasis(_basisStatusRowsReal.get_ptr(), _basisStatusColsReal.get_ptr());
-
-               //
-               _solver.loadLP(*_realLP);
-               _solver.setBasis(_basisStatusRowsReal.get_ptr(), _basisStatusColsReal.get_ptr());
-               _solver.solve();
-               //                _isRealLPLoaded = true;
-               //                _hasBasisReal = true;
-            }
-            // if the original problem is not in the solver because of scaling, we also need to store the basis
-            else if( !_isRealLPLoaded )
-            {
-               _basisStatusRowsReal.reSize(numRowsReal());
-               _basisStatusColsReal.reSize(numColsReal());
-               assert(_basisStatusRowsReal.size() == _solver.nRows());
-               assert(_basisStatusColsReal.size() == _solver.nCols());
-
-               _solver.getBasis(_basisStatusRowsReal.get_ptr(), _basisStatusColsReal.get_ptr());
-               //                std::cout << "before: " << _solver.nCols() << " " << _solver.nRows() <<std::endl;
-               //                _solver.loadLP(*_realLP);
-               //                std::cout << "after: " << _solver.nCols() << " " << _solver.nRows() <<std::endl;
-               //                _solver.setBasis(_basisStatusRowsReal.get_ptr(), _basisStatusColsReal.get_ptr());
-               //                _solver.solve();
-               //                _isRealLPLoaded = true;
-               //                _hasBasisReal = true;
-            }
-
-            // in all cases we have a basis for warmstarting
-            _hasBasisReal = true;
-
-            break;
-
-            case SPxSolver::ABORT_CYCLING:
-            case SPxSolver::ABORT_TIME:
-            case SPxSolver::ABORT_ITER:
-            case SPxSolver::ABORT_VALUE:
-            case SPxSolver::REGULAR:
-            case SPxSolver::RUNNING:
-            case SPxSolver::UNBOUNDED:
-            case SPxSolver::INFEASIBLE:
-            case SPxSolver::INForUNBD:
-               // store basis if it is regular and the original problem is not in the solver because of scaling
-               if( _simplifier == 0 && !_isRealLPLoaded )
-               {
-                  _basisStatusRowsReal.reSize(numRowsReal());
-                  _basisStatusColsReal.reSize(numColsReal());
-                  assert(_basisStatusRowsReal.size() == _solver.nRows());
-                  assert(_basisStatusColsReal.size() == _solver.nCols());
-
-                  _solver.getBasis(_basisStatusRowsReal.get_ptr(), _basisStatusColsReal.get_ptr());
-                  _hasBasisReal = true;
-               }
-               // non-optimal basis should currently not be unsimplified
-               else
-                  _hasBasisReal = false;
-               break;
-
-            case SPxSolver::SINGULAR:
-               // if there was a regular starting basis and the original problem is in the solver, load the basis
-               if( _hasBasisReal && _isRealLPLoaded )
-               {
-                  assert(_simplifier == 0);
-                  assert(_basisStatusRowsReal.size() == _solver.nRows());
-                  assert(_basisStatusColsReal.size() == _solver.nCols());
-                  _solver.setBasis(_basisStatusRowsReal.get_ptr(), _basisStatusColsReal.get_ptr());
-               }
-               break;
-
-            default:
-               _hasBasisReal = false;
-               break;
-      }
-   }
-
-
-
-   /// evaluate solution flags
-   void SoPlex2::_evaluateSolutionFlags()
-   {
-      assert(!_hasPrimalReal);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::ERROR);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::NO_RATIOTESTER);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::NO_PRICER);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::NO_SOLVER);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::NOT_INIT);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::SINGULAR);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::NO_PROBLEM);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::UNBOUNDED);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || statusReal() != SPxSolver::INFEASIBLE);
-      assert(_solver.basis().status() != SPxBasis::UNBOUNDED || statusReal() == SPxSolver::UNBOUNDED);
-      assert(_solver.basis().status() == SPxBasis::UNBOUNDED || _solver.basis().status() == SPxBasis::NO_PROBLEM || statusReal() != SPxSolver::UNBOUNDED);
-      _hasPrimalReal = (statusReal() == SPxSolver::OPTIMAL || (_simplifier == 0 &&
-      (_solver.basis().status() == SPxBasis::PRIMAL || _solver.basis().status() == SPxBasis::UNBOUNDED) &&
-      _solver.shift() < 10.0 * realParam(SoPlex2::EPSILON_ZERO)));
-
-      assert(!_hasPrimalrayReal);
-      _hasPrimalrayReal = (statusReal() == SPxSolver::UNBOUNDED && _simplifier == 0);
-
-      assert(!_hasDualReal);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::ERROR);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::NO_RATIOTESTER);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::NO_PRICER);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::NO_SOLVER);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::NOT_INIT);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::SINGULAR);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::NO_PROBLEM);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::UNBOUNDED);
-      assert(_solver.basis().status() != SPxBasis::DUAL || statusReal() != SPxSolver::INFEASIBLE);
-      assert(_solver.basis().status() != SPxBasis::INFEASIBLE || statusReal() == SPxSolver::INFEASIBLE);
-      assert(_solver.basis().status() == SPxBasis::INFEASIBLE || _solver.basis().status() == SPxBasis::NO_PROBLEM || statusReal() != SPxSolver::INFEASIBLE);
-      _hasDualReal = (statusReal() == SPxSolver::OPTIMAL || (_simplifier == 0 &&
-      (_solver.basis().status() == SPxBasis::DUAL || _solver.basis().status() == SPxBasis::INFEASIBLE) &&
-      _solver.shift() < 10.0 * realParam(SoPlex2::EPSILON_ZERO)));
-
-      assert(!_hasDualfarkasReal);
-      _hasDualfarkasReal = (statusReal() == SPxSolver::INFEASIBLE && _simplifier == 0);
    }
 
 
@@ -5131,23 +4553,531 @@ namespace soplex
 
 
 
-   /// invalidates real solution
-   void SoPlex2::_invalidateSolutionReal()
+   /// adds a single row to the real LP and adjusts basis
+   void SoPlex2::_addRowReal(const LPRowReal& lprow)
    {
-      _statusReal = SPxSolver::UNKNOWN;
-      _hasPrimalReal = false;
-      _hasPrimalrayReal = false;
-      _hasDualReal = false;
-      _hasDualfarkasReal = false;
+      assert(_realLP != 0);
+
+      _realLP->addRow(lprow);
+
+      if( _isRealLPLoaded )
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      else if( _hasBasis )
+         _basisStatusRows.append(SPxSolver::BASIC);
    }
 
 
 
-   /// invalidates rational solution
-   void SoPlex2::_invalidateSolutionRational()
+   /// adds multiple rows to the real LP and adjusts basis
+   void SoPlex2::_addRowsReal(const LPRowSetReal& lprowset)
    {
-      _statusRational = SPxSolver::UNKNOWN;
-      _solRational._invalidate();
+      assert(_realLP != 0);
+
+      _realLP->addRows(lprowset);
+
+      if( _isRealLPLoaded )
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      else if( _hasBasis )
+         _basisStatusRows.append(lprowset.num(), SPxSolver::BASIC);
+   }
+
+
+   /// adds a single column to the real LP and adjusts basis
+   void SoPlex2::_addColReal(const LPColReal& lpcol)
+   {
+      assert(_realLP != 0);
+
+      _realLP->addCol(lpcol);
+
+      if( _isRealLPLoaded )
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      else if( _hasBasis )
+      {
+         if( lpcol.lower() > -realParam(SoPlex2::INFTY) )
+            _basisStatusCols.append(SPxSolver::ON_LOWER);
+         else if( lpcol.upper() < realParam(SoPlex2::INFTY) )
+            _basisStatusCols.append(SPxSolver::ON_UPPER);
+         else
+            _basisStatusCols.append(SPxSolver::ZERO);
+      }
+   }
+
+
+
+   /// adds multiple columns to the real LP and adjusts basis
+   void SoPlex2::_addColsReal(const LPColSetReal& lpcolset)
+   {
+      assert(_realLP != 0);
+
+      _realLP->addCols(lpcolset);
+
+      if( _isRealLPLoaded )
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      else if( _hasBasis )
+      {
+         for( int i = 0; i < lpcolset.num(); i++ )
+         {
+            if( lpcolset.lower(i) > -realParam(SoPlex2::INFTY) )
+               _basisStatusCols.append(SPxSolver::ON_LOWER);
+            else if( lpcolset.upper(i) < realParam(SoPlex2::INFTY) )
+               _basisStatusCols.append(SPxSolver::ON_UPPER);
+            else
+               _basisStatusCols.append(SPxSolver::ZERO);
+         }
+      }
+   }
+
+
+   /// replaces row \p i with \p lprow and adjusts basis
+   void SoPlex2::_changeRowReal(int i, const LPRowReal& lprow)
+   {
+      assert(_realLP != 0);
+
+      _realLP->changeRow(i, lprow);
+
+      if( _isRealLPLoaded )
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      else if( _hasBasis )
+      {
+         if( _basisStatusRows[i] != SPxSolver::BASIC )
+            _hasBasis = false;
+         else if( _basisStatusRows[i] == SPxSolver::ON_LOWER && lprow.lhs() <= -realParam(SoPlex2::INFTY) )
+            _basisStatusRows[i] = (lprow.rhs() < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+         else if( _basisStatusRows[i] == SPxSolver::ON_UPPER && lprow.rhs() >= realParam(SoPlex2::INFTY) )
+            _basisStatusRows[i] = (lprow.lhs() > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+      }
+   }
+
+
+
+   /// changes left-hand side vector for constraints to \p lhs and adjusts basis
+   void SoPlex2::_changeLhsReal(const VectorReal& lhs)
+   {
+      assert(_realLP != 0);
+
+      _realLP->changeLhs(lhs);
+
+      if( _isRealLPLoaded )
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      else if( _hasBasis )
+      {
+         for( int i = numRowsReal() - 1; i >= 0; i-- )
+         {
+            if( _basisStatusRows[i] == SPxSolver::ON_LOWER && lhs[i] <= -realParam(SoPlex2::INFTY) )
+               _basisStatusRows[i] = (rhsReal(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+         }
+      }
+   }
+
+
+
+   /// changes left-hand side of row \p i to \p lhs and adjusts basis
+   void SoPlex2::_changeLhsReal(int i, Real lhs)
+   {
+      assert(_realLP != 0);
+
+      _realLP->changeLhs(i, lhs);
+
+      if( _isRealLPLoaded )
+      {
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasis && _basisStatusRows[i] == SPxSolver::ON_LOWER && lhs <= -realParam(SoPlex2::INFTY) )
+         _basisStatusRows[i] = (rhsReal(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+
+   }
+
+
+
+   /// changes right-hand side vector to \p rhs and adjusts basis
+   void SoPlex2::_changeRhsReal(const VectorReal& rhs)
+   {
+      assert(_realLP != 0);
+
+      _realLP->changeRhs(rhs);
+
+      if( _isRealLPLoaded )
+      {
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasis )
+      {
+         for( int i = numRowsReal() - 1; i >= 0; i-- )
+         {
+            if( _basisStatusRows[i] == SPxSolver::ON_UPPER && rhs[i] >= realParam(SoPlex2::INFTY) )
+               _basisStatusRows[i] = (lhsReal(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+         }
+      }
+   }
+
+
+
+   /// changes right-hand side of row \p i to \p rhs and adjusts basis
+   void SoPlex2::_changeRhsReal(int i, Real rhs)
+   {
+      assert(_realLP != 0);
+
+      _realLP->changeRhs(i, rhs);
+
+      if( _isRealLPLoaded )
+      {
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasis && _basisStatusRows[i] == SPxSolver::ON_UPPER && rhs >= realParam(SoPlex2::INFTY) )
+         _basisStatusRows[i] = (lhsReal(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+   }
+
+
+
+   /// changes left- and right-hand side vectors and adjusts basis
+   void SoPlex2::_changeRangeReal(const VectorReal& lhs, const VectorReal& rhs)
+   {
+      assert(_realLP != 0);
+
+      _realLP->changeRange(lhs, rhs);
+
+      if( _isRealLPLoaded )
+      {
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasis )
+      {
+         for( int i = numRowsReal() - 1; i >= 0; i-- )
+         {
+            if( _basisStatusRows[i] == SPxSolver::ON_LOWER && lhs[i] <= -realParam(SoPlex2::INFTY) )
+               _basisStatusRows[i] = (rhs[i] < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+            else if( _basisStatusRows[i] == SPxSolver::ON_UPPER && rhs[i] >= realParam(SoPlex2::INFTY) )
+               _basisStatusRows[i] = (lhs[i] > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+         }
+      }
+   }
+
+
+
+   /// changes left- and right-hand side of row \p i and adjusts basis
+   void SoPlex2::_changeRangeReal(int i, Real lhs, Real rhs)
+   {
+      assert(_realLP != 0);
+
+      _realLP->changeRange(i, lhs, rhs);
+
+      if( _isRealLPLoaded )
+      {
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasis )
+      {
+         if( _basisStatusRows[i] == SPxSolver::ON_LOWER && lhs <= -realParam(SoPlex2::INFTY) )
+            _basisStatusRows[i] = (rhs < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+         else if( _basisStatusRows[i] == SPxSolver::ON_UPPER && rhs >= realParam(SoPlex2::INFTY) )
+            _basisStatusRows[i] = (lhs > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+      }
+   }
+
+
+
+   /// replaces column \p i with \p lpcol and adjusts basis
+   void SoPlex2::_changeColReal(int i, const LPColReal& lpcol)
+   {
+      assert(_realLP != 0);
+
+      _realLP->changeCol(i, lpcol);
+
+      if( _isRealLPLoaded )
+      {
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasis )
+      {
+         if( _basisStatusCols[i] == SPxSolver::BASIC )
+            _hasBasis = false;
+         else if( _basisStatusCols[i] == SPxSolver::ON_LOWER && lpcol.lower() <= -realParam(SoPlex2::INFTY) )
+            _basisStatusCols[i] = (lpcol.upper() < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+         else if( _basisStatusCols[i] == SPxSolver::ON_UPPER && lpcol.upper() >= realParam(SoPlex2::INFTY) )
+            _basisStatusCols[i] = (lpcol.lower() > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+      }
+   }
+
+
+
+   /// changes vector of lower bounds to \p lower and adjusts basis
+   void SoPlex2::_changeLowerReal(const VectorReal& lower)
+   {
+      assert(_realLP != 0);
+
+      _realLP->changeLower(lower);
+
+      if( _isRealLPLoaded )
+      {
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasis )
+      {
+         for( int i = numColsReal() - 1; i >= 0; i-- )
+         {
+            if( _basisStatusCols[i] == SPxSolver::ON_LOWER && lower[i] <= -realParam(SoPlex2::INFTY) )
+               _basisStatusCols[i] = (upperReal(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+         }
+      }
+   }
+
+
+
+   /// changes lower bound of column i to \p lower and adjusts basis
+   void SoPlex2::_changeLowerReal(int i, Real lower)
+   {
+      assert(_realLP != 0);
+
+      _realLP->changeLower(i, lower);
+
+      if( _isRealLPLoaded )
+      {
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasis && _basisStatusCols[i] == SPxSolver::ON_LOWER && lower <= -realParam(SoPlex2::INFTY) )
+         _basisStatusCols[i] = (upperReal(i) < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+   }
+
+
+
+   /// changes vector of upper bounds to \p upper and adjusts basis
+   void SoPlex2::_changeUpperReal(const VectorReal& upper)
+   {
+      assert(_realLP != 0);
+
+      _realLP->changeUpper(upper);
+
+      if( _isRealLPLoaded )
+      {
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasis )
+      {
+         for( int i = numColsReal() - 1; i >= 0; i-- )
+         {
+            if( _basisStatusCols[i] == SPxSolver::ON_UPPER && upper[i] >= realParam(SoPlex2::INFTY) )
+               _basisStatusCols[i] = (lowerReal(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+         }
+      }
+   }
+
+
+
+   /// changes \p i 'th upper bound to \p upper and adjusts basis
+   void SoPlex2::_changeUpperReal(int i, Real upper)
+   {
+      assert(_realLP != 0);
+
+      _realLP->changeUpper(i, upper);
+
+      if( _isRealLPLoaded )
+      {
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasis &&  _basisStatusCols[i] == SPxSolver::ON_UPPER && upper >= realParam(SoPlex2::INFTY) )
+         _basisStatusCols[i] = (lowerReal(i) > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+   }
+
+
+
+   /// changes vectors of column bounds to \p lower and \p upper and adjusts basis
+   void SoPlex2::_changeBoundsReal(const VectorReal& lower, const VectorReal& upper)
+   {
+      assert(_realLP != 0);
+
+      _realLP->changeBounds(lower, upper);
+
+      if( _isRealLPLoaded )
+      {
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasis )
+      {
+         for( int i = numColsReal() - 1; i >= 0; i-- )
+         {
+            if( _basisStatusCols[i] == SPxSolver::ON_LOWER && lower[i] <= -realParam(SoPlex2::INFTY) )
+               _basisStatusCols[i] = (upper[i] < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+            else if( _basisStatusCols[i] == SPxSolver::ON_UPPER && upper[i] >= realParam(SoPlex2::INFTY) )
+               _basisStatusCols[i] = (lower[i] > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+         }
+      }
+   }
+
+
+
+   /// changes bounds of column \p i to \p lower and \p upper and adjusts basis
+   void SoPlex2::_changeBoundsReal(int i, Real lower, Real upper)
+   {
+      assert(_realLP != 0);
+
+      _realLP->changeBounds(i, lower, upper);
+
+      if( _isRealLPLoaded )
+      {
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasis )
+      {
+         if( _basisStatusCols[i] == SPxSolver::ON_LOWER && lower <= -realParam(SoPlex2::INFTY) )
+            _basisStatusCols[i] = (upper < realParam(SoPlex2::INFTY)) ? SPxSolver::ON_UPPER : SPxSolver::ZERO;
+         else if( _basisStatusCols[i] == SPxSolver::ON_UPPER && upper >= realParam(SoPlex2::INFTY) )
+            _basisStatusCols[i] = (lower > -realParam(SoPlex2::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
+      }
+   }
+
+
+
+   /// changes matrix entry in row \p i and column \p j to \p val and adjusts basis
+   void SoPlex2::_changeElementReal(int i, int j, Real val)
+   {
+      assert(_realLP != 0);
+
+      _realLP->changeElement(i, j, val);
+
+      if( _isRealLPLoaded )
+      {
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasis )
+      {
+         if( _basisStatusRows[i] != SPxSolver::BASIC && _basisStatusCols[i] == SPxSolver::BASIC )
+            _hasBasis = false;
+      }
+   }
+
+
+
+   /// removes row \p i and adjusts basis
+   void SoPlex2::_removeRowReal(int i)
+   {
+      assert(_realLP != 0);
+
+      _realLP->removeRow(i);
+
+      if( _isRealLPLoaded )
+      {
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasis )
+      {
+         if( _basisStatusRows[i] != SPxSolver::BASIC )
+            _hasBasis = false;
+         else
+         {
+            _basisStatusRows[i] = _basisStatusRows[_basisStatusRows.size() - 1];
+            _basisStatusRows.removeLast();
+         }
+      }
+   }
+
+
+
+   /// removes all rows with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
+   /// new index where row \p i has been moved to; note that \p perm must point to an array of size at least
+   /// #numRowsReal()
+   void SoPlex2::_removeRowsReal(int perm[])
+   {
+      assert(_realLP != 0);
+
+      _realLP->removeRows(perm);
+
+      if( _isRealLPLoaded )
+      {
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasis )
+      {
+         for( int i = numRowsReal() - 1; i >= 0 && _hasBasis; i-- )
+         {
+            if( perm[i] < 0 && _basisStatusRows[i] != SPxSolver::BASIC )
+               _hasBasis = false;
+            else if( perm[i] >= 0 && perm[i] != i )
+            {
+               assert(perm[i] < numRowsReal());
+               assert(perm[perm[i]] < 0);
+
+               _basisStatusRows[perm[i]] = _basisStatusRows[i];
+            }
+         }
+
+         if( _hasBasis )
+            _basisStatusRows.reSize(numRowsReal());
+      }
+   }
+
+
+
+   /// removes column i
+   void SoPlex2::_removeColReal(int i)
+   {
+      assert(_realLP != 0);
+
+      _realLP->removeCol(i);
+
+      if( _isRealLPLoaded )
+      {
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasis )
+      {
+         if( _basisStatusCols[i] == SPxSolver::BASIC )
+            _hasBasis = false;
+         else
+         {
+            _basisStatusCols[i] = _basisStatusCols[_basisStatusCols.size() - 1];
+            _basisStatusCols.removeLast();
+         }
+      }
+   }
+
+
+
+   /// removes all columns with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
+   /// new index where column \p i has been moved to; note that \p perm must point to an array of size at least
+   /// #numColsReal()
+   void SoPlex2::_removeColsReal(int perm[])
+   {
+      assert(_realLP != 0);
+
+      _realLP->removeCols(perm);
+
+      if( _isRealLPLoaded )
+      {
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else if( _hasBasis )
+      {
+         for( int i = numColsReal() - 1; i >= 0 && _hasBasis; i-- )
+         {
+            if( perm[i] < 0 && _basisStatusCols[i] == SPxSolver::BASIC )
+               _hasBasis = false;
+            else if( perm[i] >= 0 && perm[i] != i )
+            {
+               assert(perm[i] < numColsReal());
+               assert(perm[perm[i]] < 0);
+
+               _basisStatusCols[perm[i]] = _basisStatusCols[i];
+            }
+         }
+
+         if( _hasBasis )
+            _basisStatusCols.reSize(numColsReal());
+      }
+   }
+
+
+
+   /// invalidates solution
+   void SoPlex2::_invalidateSolution()
+   {
+      ///@todo maybe this should be done individually at the places when this method is called
+      _status = SPxSolver::UNKNOWN;
+
+      _solReal.invalidate();
+      _hasSolReal = false;
+
+      _solRational.invalidate();
+      _hasSolRational = false;
    }
 
 
@@ -5203,66 +5133,122 @@ namespace soplex
 
 
 
-   /// synchronizes rational solution with real solution
-   void SoPlex2::_syncRationalSolution(bool snycPrimal, bool syncDual, bool syncBasis)
+   /// ensures that the rational LP is available; performs no sync
+   void SoPlex2::_ensureRationalLP()
    {
-      DVectorReal buffer;
-      _solRational._invalidate();
-
-      if( hasPrimalReal() )
+      if( _rationalLP == 0 )
       {
-         _solRational._hasPrimal = true;
-
-         buffer.reDim(numColsReal());
-         getPrimalReal(buffer);
-         _solRational._primal = buffer;
-
-         buffer.reDim(numRowsReal());
-         getSlacksReal(buffer);
-         _solRational._slacks = buffer;
+         spx_alloc(_rationalLP);
+         _rationalLP = new (_rationalLP) SPxLPRational();
       }
+   }
 
-      if( hasPrimalrayReal() )
+
+
+   /// ensures that the real LP and the basis are loaded in the solver; performs no sync
+   void SoPlex2::_ensureRealLPLoaded()
+   {
+      if( !_isRealLPLoaded )
       {
-         _solRational._hasPrimalray = true;
+         assert(_realLP != &_solver);
 
-         buffer.reDim(numColsReal());
-         getPrimalrayReal(buffer);
-         _solRational._primalray = buffer;
+         _solver.loadLP(*_realLP);
+         _realLP->~SPxLPReal();
+         spx_free(_realLP);
+         _realLP = &_solver;
+         _isRealLPLoaded = true;
+
+         if( _hasBasis )
+         {
+            ///@todo this should not fail even if the basis is invalid (wrong dimension or wrong number of basic
+            ///      entries); fix either in SPxSolver or in SPxBasis
+            assert(_basisStatusRows.size() == numRowsReal());
+            assert(_basisStatusCols.size() == numColsReal());
+            _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+            _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+         }
       }
+   }
 
-      if( hasDualReal() )
-      {
-         _solRational._hasDual = true;
 
-         buffer.reDim(numRowsReal());
-         getDualReal(buffer);
-         _solRational._dual = buffer;
 
-         buffer.reDim(numColsReal());
-         getRedcostReal(buffer);
-         _solRational._redcost = buffer;
-      }
+   /// call floating-point solver and update statistics on iterations etc.
+   void SoPlex2::_solveRealLPAndRecordStatistics()
+   {
+      // call floating-point solver
+      _solver.solve();
 
-      if( hasDualfarkasReal() )
-      {
-         _solRational._hasDualfarkas = true;
+      // record statistics
+      _statistics->iterations += _solver.iterations();
+   }
 
-         buffer.reDim(numRowsReal());
-         getDualfarkasReal(buffer);
-         _solRational._dualfarkas = buffer;
-      }
 
-      if( hasBasisReal() )
-      {
-         _hasBasisRational = true;
 
-         _basisStatusRowsRational.reSize(numRowsReal());
-         _basisStatusColsRational.reSize(numColsReal());
-         getBasisReal(_basisStatusRowsRational.get_ptr(), _basisStatusColsRational.get_ptr());
-      }
+   /// synchronizes real LP with rational LP, i.e., copies (rounded) rational LP into real LP, without looking at the sync mode
+   void SoPlex2::_syncLPReal()
+   {
+      // start timing
+      _statistics->syncTime.start();
+
+      // copy LP
+      if( _isRealLPLoaded )
+         _solver.loadLP((SPxLPReal)(*_rationalLP));
       else
-         _hasBasisRational = false;
+         *_realLP = *_rationalLP;
+
+      ///@todo try loading old basis
+      _hasBasis = false;
+
+      // invalidate real solution
+      _solReal.invalidate();
+      _hasSolReal = false;
+
+      // stop timing
+      _statistics->syncTime.stop();
+   }
+
+
+
+   /// synchronizes rational LP with real LP, i.e., copies real LP to rational LP, without looking at the sync mode
+   void SoPlex2::_syncLPRational()
+   {
+      // start timing
+      _statistics->syncTime.start();
+
+      // copy LP
+      _ensureRationalLP();
+      *_rationalLP = *_realLP;
+
+      // invalidate rational solution
+      _solRational.invalidate();
+      _hasSolRational = false;
+
+      // stop timing
+      _statistics->syncTime.stop();
+   }
+
+
+
+   /// synchronizes real solution with rational solution, i.e., copies real solution to rational solution
+   void SoPlex2::_syncRealSolution()
+   {
+      if( _hasSolRational && !_hasSolReal )
+      {
+         _solReal = _solRational;
+         _hasSolReal = true;
+      }
+   }
+
+
+
+   /// synchronizes rational solution with real solution, i.e., copies (rounded) rational solution to real solution
+   void SoPlex2::_syncRationalSolution()
+   {
+      if( _hasSolReal && !_hasSolRational )
+      {
+         _solRational = _solReal;
+         _hasSolRational = true;
+      }
    }
 } // namespace soplex
 

@@ -44,6 +44,8 @@ namespace soplex
 template < class R >
 class LPColBase
 {
+   template < class S > friend class LPColBase;
+
 private:
 
    // ------------------------------------------------------------------------------------------------------------------
@@ -84,6 +86,14 @@ public:
 
    /// Copy constructor.
    LPColBase<R>(const LPColBase<R>& old)
+      : up(old.up), low(old.low), object(old.object), vec(old.vec)
+   {
+      assert(isConsistent());
+   }
+
+   /// Copy constructor.
+   template < class S >
+   LPColBase<R>(const LPColBase<S>& old)
       : up(old.up), low(old.low), object(old.object), vec(old.vec)
    {
       assert(isConsistent());

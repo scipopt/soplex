@@ -23,6 +23,7 @@
 
 ///@todo SoPlex2 should also have an spxout object to avoid using a global one
 #include "spxdefines.h"
+#include "basevectors.h"
 #include "spxsolver.h"
 #include "slufactor.h"
 
@@ -362,8 +363,8 @@ public:
    /// clears the LP
    void clearLPReal();
 
-   /// synchronizes real LP with rational LP
-   void syncRealLP();
+   /// synchronizes real LP with rational LP, i.e., copies (rounded) rational LP into real LP, if sync mode is manual
+   void syncLPReal();
 
    //@}
 
@@ -469,68 +470,65 @@ public:
    /// clears the LP
    void clearLPRational();
 
-   /// synchronizes rational LP with real LP
-   void syncRationalLP();
+   /// synchronizes rational LP with real LP, i.e., copies real LP to rational LP, if sync mode is manual
+   void syncLPRational();
 
    //@}
 
 
-   //**@name Solving and solution query for the real LP */
+   //**@name Solving and general solution query */
    //@{
 
-   /// solves real LP
-   SPxSolver::Status solveReal();
+   /// solves the LP
+   SPxSolver::Status solve();
 
-   /// returns the current status
-   SPxSolver::Status statusReal() const;
-
-   /// returns the current basis status
-   SPxBasis::SPxStatus basisStatusReal() const;
-
-   /// returns the objective value if a primal solution is available
-   Real objValueReal() const;
+   /// returns the current solver status
+   SPxSolver::Status status() const;
 
    /// is a primal feasible solution available?
-   bool hasPrimalReal() const;
-
-   /// gets the primal solution vector if available; returns true on success
-   bool getPrimalReal(VectorReal& vector) const;
-
-   /// gets the vector of slack values if available; returns true on success
-   bool getSlacksReal(VectorReal& vector) const;
+   bool hasPrimal() const;
 
    /// is a primal unbounded ray available?
-   bool hasPrimalrayReal() const;
-
-   /// gets the primal ray if available; returns true on success
-   bool getPrimalrayReal(VectorReal& vector) const;
+   bool hasPrimalRay() const;
 
    /// is a dual feasible solution available?
-   bool hasDualReal() const;
-
-   /// gets the dual solution vector if available; returns true on success
-   bool getDualReal(VectorReal& vector) const;
-
-   /// gets the vector of reduced cost values if available; returns true on success
-   bool getRedcostReal(VectorReal& vector) const;
+   bool hasDual() const;
 
    /// is Farkas proof of infeasibility available?
-   bool hasDualfarkasReal() const;
+   bool hasDualFarkas() const;
+
+   //@}
+
+
+   //**@name Query for the real solution data */
+   //@{
+
+   /// returns the objective value if a primal solution is available
+   Real objValueReal();
+
+   /// gets the primal solution vector if available; returns true on success
+   bool getPrimalReal(VectorReal& vector);
+
+   /// gets the vector of slack values if available; returns true on success
+   bool getSlacksReal(VectorReal& vector);
+
+   /// gets the primal ray if available; returns true on success
+   bool getPrimalRayReal(VectorReal& vector);
+
+   /// gets the dual solution vector if available; returns true on success
+   bool getDualReal(VectorReal& vector);
+
+   /// gets the vector of reduced cost values if available; returns true on success
+   bool getRedCostReal(VectorReal& vector);
 
    /// gets the Farkas proof if available; returns true on success
-   bool getDualfarkasReal(VectorReal& vector) const;
+   bool getDualFarkasReal(VectorReal& vector);
 
    /// gets violation of bounds by given primal solution
    void getBoundViolationReal(VectorReal& primal, Real& maxviol, Real& sumviol) const;
 
-   /// gets violation of bounds by given primal solution
-   void getInternalBoundViolationReal(Real& maxviol, Real& sumviol) const;
-
    /// gets violation of constraints by given primal solution
    void getConstraintViolationReal(VectorReal& primal, Real& maxviol, Real& sumviol) const;
-
-   /// gets violation of constraints by given primal solution
-   void getInternalConstraintViolationReal(Real& maxviol, Real& sumviol) const;
 
    /// gets violation of slacks
    void getSlackViolationReal(Real& maxviol, Real& sumviol) const;
@@ -541,47 +539,29 @@ public:
    //@}
 
 
-   //**@name Solving and solution query for the rational LP */
+   //**@name Query for the rational solution data */
    //@{
 
-   /// synchronizes LPs, clears statistics, and solves rational LP
-   SPxSolver::Status solveRational();
-
-   /// returns the current status
-   SPxSolver::Status statusRational() const;
-
    /// returns the objective value if a primal solution is available
-   Rational objValueRational() const;
-
-   /// is a primal feasible solution available?
-   bool hasPrimalRational() const;
+   Rational objValueRational();
 
    /// gets the primal solution vector if available; returns true on success
-   bool getPrimalRational(VectorRational& vector) const;
+   bool getPrimalRational(VectorRational& vector);
 
    /// gets the vector of slack values if available; returns true on success
-   bool getSlacksRational(VectorRational& vector) const;
-
-   /// is a primal unbounded ray available?
-   bool hasPrimalrayRational() const;
+   bool getSlacksRational(VectorRational& vector);
 
    /// gets the primal ray if LP is unbounded; returns true on success
-   bool getPrimalrayRational(VectorRational& vector) const;
-
-   /// is a dual feasible solution available?
-   bool hasDualRational() const;
+   bool getPrimalRayRational(VectorRational& vector);
 
    /// gets the dual solution vector if available; returns true on success
-   bool getDualRational(VectorRational& vector) const;
+   bool getDualRational(VectorRational& vector);
 
    /// gets the vector of reduced cost values if available; returns true on success
-   bool getRedcostRational(VectorRational& vector) const;
-
-   /// is Farkas proof of infeasibility available?
-   bool hasDualfarkasRational() const;
+   bool getRedCostRational(VectorRational& vector);
 
    /// gets the Farkas proof if LP is infeasible; returns true on success
-   bool getDualfarkasRational(VectorRational& vector) const;
+   bool getDualFarkasRational(VectorRational& vector);
 
    /// gets violation of bounds by given primal solution
    void getBoundViolationRational(VectorRational& primal, Rational& maxviol, Rational& sumviol) const;
@@ -598,63 +578,44 @@ public:
    //@}
 
 
-   //**@name Basis information for the real LP */
+   //**@name Access and modification of basis information */
    //@{
 
    /// is an advanced starting basis available?
-   bool hasBasisReal() const;
+   bool hasBasis() const;
+
+   /// returns the current basis status
+   SPxBasis::SPxStatus basisStatus() const;
 
    /// returns basis status for a single row
-   SPxSolver::VarStatus basisRowStatusReal(int row) const;
+   SPxSolver::VarStatus basisRowStatus(int row) const;
 
    /// returns basis status for a single column
-   SPxSolver::VarStatus basisColStatusReal(int col) const;
+   SPxSolver::VarStatus basisColStatus(int col) const;
 
-   /// gets current basis
-   void getBasisReal(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const;
+   /// gets current basis via arrays of statuses
+   void getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const;
 
-   /// sets starting basis via arrays of statuses
-   void setBasisReal(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]);
-
-   /// clears starting basis
-   void clearBasisReal();
-
-   //@}
-
-
-   //**@name Basis information for the rational LP */
-   //@{
-
-   /// is an advanced starting basis available?
-   bool hasBasisRational() const;
-
-   /// returns basis status for a single row
-   SPxSolver::VarStatus basisRowStatusRational(int row) const;
-
-   /// returns basis status for a single column
-   SPxSolver::VarStatus basisColStatusRational(int col) const;
-
-   /// gets current basis
-   void getBasisRational(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const;
-
-   /// sets starting basis via arrays of statuses
-   void setBasisRational(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]);
-
-   /// clears starting basis
-   void clearBasisRational();
-
-   /// returns the indices of the basic columns and rows; basic column n gives value n, basic row m gives value -1-m
+   /// gets the indices of the basic columns and rows; basic column n gives value n, basic row m gives value -1-m
    void getBasisInd(int* bind);
-   //@}
 
    /// returns row r of basis inverse
-   void getBasisInverseRow(int r, Real* coef);
+   void getBasisInverseRowReal(int r, Real* coef);
 
    /// returns column c of basis inverse
-   void getBasisInverseCol(int c, Real* coef);
+   void getBasisInverseColReal(int c, Real* coef);
 
    /// get dense solution of basis matrix B * sol = rhs
-   void getBasisInverseTimesVec(Real* rhs, Real* sol);
+   void getBasisInverseTimesVecReal(Real* rhs, Real* sol);
+
+   /// sets starting basis via arrays of statuses
+   void setBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]);
+
+   /// clears starting basis
+   void clearBasis();
+
+   //@}
+
 
    //**@name Statistical information */
    //@{
@@ -699,7 +660,7 @@ public:
    //@}
 
 
-   //**@name I/O for the real LP */
+   //**@name File I/O */
    //@{
 
    /// reads real LP in LP or MPS format from file and returns true on success; gets row names, column names, and
@@ -710,24 +671,6 @@ public:
    /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
    /// marked as integer; returns true on success
    bool writeFileReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0) const;
-
-   /// reads basis information from \p filename and returns true on success; if \p rowNames and \p colNames are \c NULL,
-   /// default names are assumed; returns true on success
-   bool readBasisFileReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0);
-
-   /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used;
-   /// returns true on success
-   bool writeBasisFileReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0);
-
-   /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
-   /// default names are used
-   void writeStateReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0);
-
-   //@}
-
-
-   //**@name I/O for the rational LP */
-   //@{
 
    /// reads rational LP in LP or MPS format from file and returns true on success; gets row names, column names, and
    /// integer variables if desired
@@ -740,11 +683,15 @@ public:
 
    /// reads basis information from \p filename and returns true on success; if \p rowNames and \p colNames are \c NULL,
    /// default names are assumed; returns true on success
-   bool readBasisFileRational(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0);
+   bool readBasisFile(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0);
 
    /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used;
    /// returns true on success
-   bool writeBasisFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames);
+   bool writeBasisFile(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0);
+
+   /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
+   /// default names are used
+   void writeStateReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0);
 
 #if 0
    /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
@@ -819,8 +766,14 @@ public:
       /// type of ratio test
       RATIOTESTER = 14,
 
+      /// mode for synchronizing real and rational LP
+      SYNCMODE = 15,
+
+      /// mode for iterative refinement strategy
+      SOLVEMODE = 16,
+
       /// number of integer parameters
-      INTPARAM_COUNT = 15
+      INTPARAM_COUNT = 17
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -889,10 +842,10 @@ public:
    enum
    {
       /// no simplifier
-      SIMPLIFIER_OFF = 0,
+      SIMPLIFIER_OFF = -1,
 
       /// automatic choice
-      SIMPLIFIER_AUTO = 1
+      SIMPLIFIER_AUTO = 0
    };
 
    /// values for parameter SCALER
@@ -970,6 +923,32 @@ public:
 
       /// bound flipping ratio test for long steps in the dual simplex
       RATIOTESTER_BOUNDFLIPPING = 3
+   };
+
+   /// values for parameter SYNCMODE
+   enum
+   {
+      /// store only real LP
+      SYNCMODE_ONLYREAL = -1,
+
+      /// automatic sync of real and rational LP
+      SYNCMODE_AUTO = 0,
+
+      /// user sync of real and rational LP
+      SYNCMODE_MANUAL = 1
+   };
+
+   /// values for parameter SOLVEMODE
+   enum
+   {
+      /// apply standard floating-point algorithm
+      SOLVEMODE_REAL = -1,
+
+      /// decide depending on tolerances whether to apply iterative refinement
+      SOLVEMODE_AUTO = 0,
+
+      /// force iterative refinement
+      SOLVEMODE_RATIONAL = 1
    };
 
    /// real parameters
@@ -1144,16 +1123,7 @@ private:
    SPxScaler* _scaler;
    SPxStarter* _starter;
 
-   DataArray< SPxSolver::VarStatus > _basisStatusRowsReal;
-   DataArray< SPxSolver::VarStatus > _basisStatusColsReal;
-
-   SPxSolver::Status _statusReal;
    bool _isRealLPLoaded;
-   bool _hasBasisReal;
-   bool _hasPrimalReal;
-   bool _hasPrimalrayReal;
-   bool _hasDualReal;
-   bool _hasDualfarkasReal;
 
    //@}
 
@@ -1162,15 +1132,6 @@ private:
    //@{
 
    SPxLPRational* _rationalLP;
-   SolRational _solRational;
-
-   ///@todo this is still a bit of a hack: the _solRational stores only the numerical solution values, while the basis
-   ///      is stored in the arrays _basisStatusRowsRational and _basisStatusColsRational
-   DataArray< SPxSolver::VarStatus > _basisStatusRowsRational;
-   DataArray< SPxSolver::VarStatus > _basisStatusColsRational;
-
-   SPxSolver::Status _statusRational;
-   bool _hasBasisRational;
 
    LPColSetRational _slackCols;
    DVectorRational _unboundedLower;
@@ -1182,6 +1143,24 @@ private:
    DVectorRational _feasUpper;
    int _beforeLiftRows;
    int _beforeLiftCols;
+
+   //@}
+
+
+   //**@name Solution data */
+   //@{
+
+   SPxSolver::Status _status;
+
+   DataArray< SPxSolver::VarStatus > _basisStatusRows;
+   DataArray< SPxSolver::VarStatus > _basisStatusCols;
+
+   SolReal _solReal;
+   SolRational _solRational;
+
+   bool _hasBasis;
+   bool _hasSolReal;
+   bool _hasSolRational;
 
    //@}
 
@@ -1198,12 +1177,6 @@ private:
    /// checks consistency
    bool _isConsistent() const;
 
-   /// check simplification and solution status and clean up data
-   void _evaluateSolutionStatusReal(SPxSimplifier::Result simplificationStatus);
-
-   /// evaluate solution flags
-   void _evaluateSolutionFlags();
-
    /// should solving process be stopped?
    bool _isSolveStopped() const;
 
@@ -1216,11 +1189,97 @@ private:
    //**@name Non-constant helper methods */
    //@{
 
-   /// invalidates real solution
-   void _invalidateSolutionReal();
+   /// adds a single row to the real LP and adjusts basis
+   void _addRowReal(const LPRowReal& lprow);
 
-   /// invalidates rational solution
-   void _invalidateSolutionRational();
+   /// adds multiple rows to the real LP and adjusts basis
+   void _addRowsReal(const LPRowSetReal& lprowset);
+
+   /// adds a single column to the real LP and adjusts basis
+   void _addColReal(const LPColReal& lpcol);
+
+   /// adds multiple columns to the real LP and adjusts basis
+   void _addColsReal(const LPColSetReal& lpcolset);
+
+   /// replaces row \p i with \p lprow and adjusts basis
+   void _changeRowReal(int i, const LPRowReal& lprow);
+
+   /// changes left-hand side vector for constraints to \p lhs and adjusts basis
+   void _changeLhsReal(const VectorReal& lhs);
+
+   /// changes left-hand side of row \p i to \p lhs and adjusts basis
+   void _changeLhsReal(int i, Real lhs);
+
+   /// changes right-hand side vector to \p rhs and adjusts basis
+   void _changeRhsReal(const VectorReal& rhs);
+
+   /// changes right-hand side of row \p i to \p rhs and adjusts basis
+   void _changeRhsReal(int i, Real rhs);
+
+   /// changes left- and right-hand side vectors and adjusts basis
+   void _changeRangeReal(const VectorReal& lhs, const VectorReal& rhs);
+
+   /// changes left- and right-hand side of row \p i and adjusts basis
+   void _changeRangeReal(int i, Real lhs, Real rhs);
+
+   /// replaces column \p i with \p lpcol and adjusts basis
+   void _changeColReal(int i, const LPColReal& lpcol);
+
+   /// changes vector of lower bounds to \p lower and adjusts basis
+   void _changeLowerReal(const VectorReal& lower);
+
+   /// changes lower bound of column i to \p lower and adjusts basis
+   void _changeLowerReal(int i, Real lower);
+
+   /// changes vector of upper bounds to \p upper and adjusts basis
+   void _changeUpperReal(const VectorReal& upper);
+
+   /// changes \p i 'th upper bound to \p upper and adjusts basis
+   void _changeUpperReal(int i, Real upper);
+
+   /// changes vectors of column bounds to \p lower and \p upper and adjusts basis
+   void _changeBoundsReal(const VectorReal& lower, const VectorReal& upper);
+
+   /// changes bounds of column \p i to \p lower and \p upper and adjusts basis
+   void _changeBoundsReal(int i, Real lower, Real upper);
+
+   /// changes matrix entry in row \p i and column \p j to \p val and adjusts basis
+   void _changeElementReal(int i, int j, Real val);
+
+   /// removes row \p i and adjusts basis
+   void _removeRowReal(int i);
+
+   /// removes all rows with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
+   /// new index where row \p i has been moved to; note that \p perm must point to an array of size at least
+   /// #numRowsReal()
+   void _removeRowsReal(int perm[]);
+
+   /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsReal() may be passed
+   /// as buffer memory
+   void _removeRowsReal(int idx[], int n, int perm[]);
+
+   /// removes rows \p start to \p end including both; an array \p perm of size #numRowsReal() may be passed as buffer
+   /// memory
+   void _removeRowRangeReal(int start, int end, int perm[]);
+
+   /// removes column i
+   void _removeColReal(int i);
+
+   /// removes all columns with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
+   /// new index where column \p i has been moved to; note that \p perm must point to an array of size at least
+   /// #numColsReal()
+   void _removeColsReal(int perm[]);
+
+   /// remove all columns with indices in array \p idx of size \p n; an array \p perm of size #numColsReal() may be
+   /// passed as buffer memory
+   void _removeColsReal(int idx[], int n, int perm[]);
+
+   /// removes columns \p start to \p end including both; an array \p perm of size #numColsReal() may be passed as
+   /// buffer memory
+   void _removeColRangeReal(int start, int end, int perm[]);
+
+   /// invalidates solution
+   void _invalidateSolution();
 
    /// enables simplifier and scaler according to current parameters
    void _enableSimplifierAndScaler();
@@ -1228,8 +1287,27 @@ private:
    /// disables simplifier and scaler
    void _disableSimplifierAndScaler();
 
-   /// synchronizes rational solution with real solution
-   void _syncRationalSolution(bool snycPrimal, bool syncDual, bool syncBasis);
+   /// ensures that the rational LP is available; performs no sync
+   void _ensureRationalLP();
+
+   /// ensures that the real LP and the basis are loaded in the solver; performs no sync
+   void _ensureRealLPLoaded();
+
+   /// call floating-point solver and update statistics on iterations etc.
+   void _solveRealLPAndRecordStatistics();
+
+   /// synchronizes real LP with rational LP, i.e., copies (rounded) rational LP into real LP, without looking at the sync mode
+   void _syncLPReal();
+
+   /// synchronizes rational LP with real LP, i.e., copies real LP to rational LP, without looking at the sync mode
+   void _syncLPRational();
+
+   /// synchronizes real solution with rational solution, i.e., copies real solution to rational solution
+   void _syncRealSolution();
+
+   /// synchronizes rational solution with real solution, i.e., copies (rounded) rational solution to real solution
+   void _syncRationalSolution();
+
    //@}
 
 
@@ -1246,7 +1324,7 @@ private:
    void _performUnboundedIRStable(SolRational& sol, bool& hasUnboundedRay, bool& stopped, bool& error);
 
    /// performs iterative refinement on the auxiliary problem for testing feasibility
-   void _performFeasIRStable(SolRational& sol, bool& hasDualfarkas, bool& stopped, bool& error);
+   void _performFeasIRStable(SolRational& sol, bool& hasDualFarkas, bool& stopped, bool& error);
 
    /// reduces matrix coefficient in absolute value by the lifting procedure of Thiele et al. 2013
    void _lift();
@@ -1303,17 +1381,36 @@ private:
    /// Set transformed to true if this method is called after _transformFeasibility().
    void _computeInfeasBox(SolRational& sol, bool transformed);
 
+   /// solves real LP during iterative refinement
+   SPxSolver::Status _solveRealForRational(bool fromscratch, VectorReal& primal, VectorReal& dual,
+                                           DataArray< SPxSolver::VarStatus >& basisStatusRows,
+                                           DataArray< SPxSolver::VarStatus >& basisStatusCols);
+
+   /// solves real LP with recovery mechanism
+   SPxSolver::Status _solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual,
+                                      DataArray< SPxSolver::VarStatus >& basisStatusRows,
+                                      DataArray< SPxSolver::VarStatus >& basisStatusCols);
+
    //@}
 
 
    //**@name Private solving methods implemented in solvereal.cpp */
    //@{
 
-   /// solves real LP with recovery mechanism
-   SPxSolver::Status _solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols);
-
    /// solves real LP
-   SPxSolver::Status _solveReal(bool fromscratch, VectorReal& primal, VectorReal& dual, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols);
+   void _solveReal();
+
+   /// checks result of the solving process and solves again without preprocessing if necessary
+   void _evaluateSolutionReal(SPxSimplifier::Result simplificationStatus);
+
+   /// solves real LP with/without preprocessing
+   void _preprocessAndSolveReal(bool applyPreprocessing);
+
+   /// loads original problem into solver and solves again after it has been solved to optimality with preprocessing
+   void _resolveWithoutPreprocessing(SPxSimplifier::Result simplificationStatus);
+
+   /// stores solution of the real LP; before calling this, the real LP must be loaded in the solver and solved (again)
+   void _storeSolutionReal();
 
    //@}
 };

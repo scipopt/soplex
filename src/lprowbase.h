@@ -44,6 +44,8 @@ namespace soplex
 template < class R >
 class LPRowBase
 {
+   template < class S > friend class LPRowBase;
+
 private:
 
    // ------------------------------------------------------------------------------------------------------------------

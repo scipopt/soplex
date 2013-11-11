@@ -283,7 +283,7 @@ public:
    template < class S >
    VectorBase<R>& operator/=(S x)
    {
-      assert(x != 0);
+      assert(x != R(0));
 
       for( int i = 0; i < dim(); i++ )
          val[i] /= x;
@@ -326,7 +326,7 @@ public:
             maxi = x;
       }
 
-      assert(maxi >= 0);
+      assert(maxi >= R(0));
 
       return maxi;
    }
@@ -347,7 +347,7 @@ public:
             mini = x;
       }
 
-      assert(mini >= 0);
+      assert(mini >= R(0));
 
       return mini;
    }

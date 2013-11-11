@@ -28,7 +28,8 @@ namespace soplex
       bool infeasibilityNotCertified = false;
       bool unboundednessNotCertified = false;
 
-      _statusRational = SPxSolver::UNKNOWN;
+      // start timing
+      _statistics->solvingTime.start();
 
       // ensure that the solver has the original problem
       if( !_isRealLPLoaded )
@@ -39,6 +40,16 @@ namespace soplex
          spx_free(_realLP);
          _realLP = &_solver;
          _isRealLPLoaded = true;
+
+         if( _hasBasis )
+         {
+            ///@todo this should not fail even if the basis is invalid (wrong dimension or wrong number of basic
+            ///      entries); fix either in SPxSolver or in SPxBasis
+            assert(_basisStatusRows.size() == numRowsReal());
+            assert(_basisStatusCols.size() == numColsReal());
+            _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+            _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+         }
       }
 
       // deactivate objective limit in floating-point solver
@@ -72,13 +83,13 @@ namespace soplex
          // case: an unrecoverable error occured
          if( error )
          {
-            _statusRational = SPxSolver::ERROR;
+            _status = SPxSolver::ERROR;
             break;
          }
          // case: stopped due to some limit
          else if( stopped )
          {
-            _statusRational = SPxSolver::ABORT_TIME;
+            _status = SPxSolver::ABORT_TIME;
             break;
          }
          // case: unboundedness detected for the first time
@@ -88,13 +99,13 @@ namespace soplex
 
             _performUnboundedIRStable(solUnbounded, hasUnboundedRay, stopped, error);
 
-            assert(!hasUnboundedRay || solUnbounded.hasPrimalray());
-            assert(!solUnbounded.hasPrimalray() || hasUnboundedRay);
+            assert(!hasUnboundedRay || solUnbounded.hasPrimalRay());
+            assert(!solUnbounded.hasPrimalRay() || hasUnboundedRay);
 
             if( error )
             {
                MSG_INFO1( spxout << "Error while testing for unboundedness.\n" );
-               _statusRational = SPxSolver::ERROR;
+               _status = SPxSolver::ERROR;
                break;
             }
 
@@ -111,7 +122,7 @@ namespace soplex
 
             if( stopped )
             {
-               _statusRational = SPxSolver::ABORT_TIME;
+               _status = SPxSolver::ABORT_TIME;
                break;
             }
 
@@ -119,31 +130,31 @@ namespace soplex
 
             if( hasUnboundedRay )
             {
-               _solRational._primalray = solUnbounded._primalray;
-               _solRational._hasPrimalray = true;
+               _solRational._primalRay = solUnbounded._primalRay;
+               _solRational._hasPrimalRay = true;
             }
 
             if( error )
             {
                MSG_INFO1( spxout << "Error while testing for feasibility.\n" );
-               _statusRational = SPxSolver::ERROR;
+               _status = SPxSolver::ERROR;
                break;
             }
             else if( stopped )
             {
-               _statusRational = SPxSolver::ABORT_TIME;
+               _status = SPxSolver::ABORT_TIME;
                break;
             }
             else if( infeasible )
             {
                MSG_INFO1( spxout << "Primal infeasible.  Dual Farkas ray available.\n" );
-               _statusRational = SPxSolver::INFEASIBLE;
+               _status = SPxSolver::INFEASIBLE;
                break;
             }
             else if( hasUnboundedRay )
             {
                MSG_INFO1( spxout << "Primal feasible and unbounded.\n" );
-               _statusRational = SPxSolver::UNBOUNDED;
+               _status = SPxSolver::UNBOUNDED;
                break;
             }
             else
@@ -160,7 +171,7 @@ namespace soplex
             if( error )
             {
                MSG_INFO1( spxout << "Error while testing for infeasibility.\n" );
-               _statusRational = SPxSolver::ERROR;
+               _status = SPxSolver::ERROR;
                break;
             }
 
@@ -168,19 +179,19 @@ namespace soplex
 
             if( stopped )
             {
-               _statusRational = SPxSolver::ABORT_TIME;
+               _status = SPxSolver::ABORT_TIME;
                break;
             }
             else if( infeasible )
             {
                MSG_INFO1( spxout << "Primal infeasible.  Dual Farkas ray available.\n" );
-               _statusRational = SPxSolver::INFEASIBLE;
+               _status = SPxSolver::INFEASIBLE;
                break;
             }
             else if( hasUnboundedRay )
             {
                MSG_INFO1( spxout << "Primal feasible and unbounded.\n" );
-               _statusRational = SPxSolver::UNBOUNDED;
+               _status = SPxSolver::UNBOUNDED;
                break;
             }
             else
@@ -192,7 +203,7 @@ namespace soplex
          else if( primalFeasible && dualFeasible )
          {
             MSG_INFO1( spxout << "Solved to optimality.\n" );
-            _statusRational = SPxSolver::OPTIMAL;
+            _status = SPxSolver::OPTIMAL;
             break;
          }
          else
@@ -203,10 +214,12 @@ namespace soplex
       }
       while( !_isSolveStopped() );
 
-      if( _isSolveStopped() )
-         _statusRational = SPxSolver::ABORT_TIME;
-
       ///@todo set status to ABORT_VALUE if optimal solution exceeds objective limit
+      if( _isSolveStopped() )
+         _status = SPxSolver::ABORT_TIME;
+
+      if( _status == SPxSolver::OPTIMAL || _status == SPxSolver::INFEASIBLE || _status == SPxSolver::UNBOUNDED )
+         _hasSolRational = true;
 
       // undo lifting
       if( boolParam(SoPlex2::LIFTING) )
@@ -215,11 +228,14 @@ namespace soplex
       // if the problem has been found to be infeasible and an approximate Farkas proof is available, we compute a
       // scaled unit box around the origin that provably contains no feasible solution; this currently only works for
       // equality form
-      if( _solRational.hasDualfarkas() )
+      if( _solRational.hasDualFarkas() )
          _computeInfeasBox(_solRational, false);
 
       // restore original problem
       _untransformEquality(_solRational);
+
+      // stop timing
+      _statistics->solvingTime.stop();
    }
 
 
@@ -248,12 +264,12 @@ namespace soplex
       DVectorReal primalReal(numColsRational());
       DVectorReal dualReal(numRowsRational());
 
-      _basisStatusRowsRational.reSize(numRowsRational());
-      _basisStatusColsRational.reSize(numColsRational());
+      _basisStatusRows.reSize(numRowsRational());
+      _basisStatusCols.reSize(numColsRational());
 
       Rational boundsViolation;
       Rational sideViolation;
-      Rational redcostViolation;
+      Rational redCostViolation;
       Rational primalScale;
       Rational dualScale;
       Rational maxScale;
@@ -267,10 +283,10 @@ namespace soplex
       if( realParam(SoPlex2::TIMELIMIT) < realParam(SoPlex2::INFTY) )
          _solver.setTerminationTime(realParam(SoPlex2::TIMELIMIT) - _statistics->solvingTime.userTime());
 
-      if( _hasBasisRational )
-         _solver.setBasis(_basisStatusRowsRational.get_const_ptr(), _basisStatusColsRational.get_const_ptr());
+      if( _hasBasis )
+         _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
 
-      result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRowsRational, _basisStatusColsRational);
+      result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
 
       _solver.setTerminationTime(realParam(SoPlex2::TIMELIMIT));
       _solver.setTerminationIter(intParam(SoPlex2::ITERLIMIT));
@@ -283,8 +299,8 @@ namespace soplex
          break;
       case SPxSolver::INFEASIBLE:
          MSG_INFO1( spxout << "Floating-point infeasible.\n" );
-         sol._dualfarkas = dualReal;
-         sol._hasDualfarkas = true;
+         sol._dualFarkas = dualReal;
+         sol._hasDualFarkas = true;
          infeasible = true;
          return;
       case SPxSolver::UNBOUNDED:
@@ -306,11 +322,11 @@ namespace soplex
       sol._hasPrimal = true;
 
       sol._dual = dualReal;
-      sol._redcost = _rationalLP->computeDualActivity(sol._dual) + _rationalLP->maxObj();
-      sol._redcost *= -1;
+      sol._redCost = _rationalLP->computeDualActivity(sol._dual) + _rationalLP->maxObj();
+      sol._redCost *= -1;
       sol._hasDual = true;
 
-      _hasBasisRational = true;
+      _hasBasis = true;
 
       // initial scaling factors are one
       primalScale = 1;
@@ -369,31 +385,31 @@ namespace soplex
 
          // compute reduced costs and reduced cost violation
          modObj = _rationalLP->computeDualActivity(sol._dual);
-         redcostViolation = 0;
+         redCostViolation = 0;
 
          for( int c = numColsRational() - 1; c >= 0; c-- )
          {
             modObj[c] *= -1;
             modObj[c] += objRational(c);
 
-            SPxSolver::VarStatus basisStatus = _basisStatusColsRational[c];
+            SPxSolver::VarStatus basisStatus = _basisStatusCols[c];
 
-            if( basisStatus != SPxSolver::ON_UPPER && basisStatus != SPxSolver::FIXED && modObj[c] < -redcostViolation )
-               redcostViolation = -modObj[c];
+            if( basisStatus != SPxSolver::ON_UPPER && basisStatus != SPxSolver::FIXED && modObj[c] < -redCostViolation )
+               redCostViolation = -modObj[c];
 
-            if( basisStatus != SPxSolver::ON_LOWER && basisStatus != SPxSolver::FIXED && modObj[c] > redcostViolation )
-               redcostViolation = modObj[c];
+            if( basisStatus != SPxSolver::ON_LOWER && basisStatus != SPxSolver::FIXED && modObj[c] > redCostViolation )
+               redCostViolation = modObj[c];
          }
 
          // output violations; the reduced cost violations for artificially introduced slack columns are actually violations of the dual multipliers
          MSG_INFO1( spxout
             << "Max. bound violation = " << rationalToString(boundsViolation) << "\n"
             << "Max. row violation = " << rationalToString(sideViolation) << "\n"
-            << "Max. dual violation = " << rationalToString(redcostViolation) << "\n" );
+            << "Max. dual violation = " << rationalToString(redCostViolation) << "\n" );
 
          // terminate if tolerances are satisfied
          primalFeasible = (boundsViolation <= rationalParam(SoPlex2::FEASTOL) && sideViolation <= rationalParam(SoPlex2::FEASTOL));
-         dualFeasible = (redcostViolation <= rationalParam(SoPlex2::OPTTOL));
+         dualFeasible = (redCostViolation <= rationalParam(SoPlex2::OPTTOL));
          if( primalFeasible && dualFeasible )
          {
             if( minRounds < 0 )
@@ -415,7 +431,7 @@ namespace soplex
          }
 
          // check progress
-         Rational sumMaxViolation = boundsViolation + sideViolation + redcostViolation;
+         Rational sumMaxViolation = boundsViolation + sideViolation + redCostViolation;
          if( double(sumMaxViolation) > double(0.9 * bestViolation) )
          {
             MSG_INFO2( spxout << "Refinement failed to reduce violation significantly.\n" );
@@ -441,9 +457,9 @@ namespace soplex
          maxScale = primalScale * Rational(realParam(SoPlex2::MAXSCALEINCR));
 
          primalScale = boundsViolation > sideViolation ? boundsViolation : sideViolation;
-         assert(primalScale >= 0);
+         assert(primalScale >= Rational(0));
 
-         if( primalScale > 0 )
+         if( primalScale > Rational(0) )
          {
             primalScale = Rational(1) / primalScale;
             if( primalScale > maxScale )
@@ -452,7 +468,7 @@ namespace soplex
          else
             primalScale = maxScale;
 
-         if( primalScale < 1 )
+         if( primalScale < Rational(1) )
             primalScale = 1;
 
          MSG_INFO2( spxout << "Scaling primal by " << rationalToString(primalScale) << ".\n" );
@@ -460,10 +476,10 @@ namespace soplex
          // compute dual scaling factor; limit increase in scaling by tolerance used in floating point solve
          maxScale = dualScale * Rational(realParam(SoPlex2::MAXSCALEINCR));
 
-         dualScale = redcostViolation;
-         assert(dualScale >= 0);
+         dualScale = redCostViolation;
+         assert(dualScale >= Rational(0));
 
-         if( dualScale > 0 )
+         if( dualScale > Rational(0) )
          {
             dualScale = Rational(1) / dualScale;
             if( dualScale > maxScale )
@@ -472,7 +488,7 @@ namespace soplex
          else
             dualScale = maxScale;
 
-         if( dualScale < 1 )
+         if( dualScale < Rational(1) )
             dualScale = 1;
 
          MSG_INFO2( spxout << "Scaling dual by " << rationalToString(dualScale) << ".\n" );
@@ -491,7 +507,7 @@ namespace soplex
          MSG_INFO1( spxout << "Refined floating-point solve . . .\n" );
 
          // load basis
-         _solver.setBasis(_basisStatusRowsRational.get_const_ptr(), _basisStatusColsRational.get_const_ptr());
+         _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
 
          // solve modified problem
          if( intParam(SoPlex2::ITERLIMIT) >= 0 )
@@ -500,7 +516,7 @@ namespace soplex
          if( realParam(SoPlex2::TIMELIMIT) < realParam(SoPlex2::INFTY) )
             _solver.setTerminationTime(realParam(SoPlex2::TIMELIMIT) - _statistics->solvingTime.userTime());
 
-         result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRowsRational, _basisStatusColsRational);
+         result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
 
          _solver.setTerminationTime(realParam(SoPlex2::TIMELIMIT));
          _solver.setTerminationIter(intParam(SoPlex2::ITERLIMIT));
@@ -517,8 +533,8 @@ namespace soplex
             break;
          case SPxSolver::INFEASIBLE:
             MSG_INFO1( spxout << "Floating-point infeasible.\n" );
-            sol._dualfarkas = dualReal;
-            sol._hasDualfarkas = true;
+            sol._dualFarkas = dualReal;
+            sol._hasDualFarkas = true;
             infeasible = true;
             return;
          case SPxSolver::UNBOUNDED:
@@ -543,7 +559,7 @@ namespace soplex
             sol._primal[c] += Rational(primalReal[c]) / primalScale;
 
             // force values of nonbasic variables to bounds
-            SPxSolver::VarStatus basisStatus = _basisStatusColsRational[c];
+            SPxSolver::VarStatus basisStatus = _basisStatusCols[c];
 
             if( basisStatus == SPxSolver::ON_LOWER && sol._primal[c] != lowerRational(c) )
             {
@@ -565,7 +581,7 @@ namespace soplex
                   numAdjustedBounds++;
                }
             }
-            else if( basisStatus == SPxSolver::ZERO && sol._primal[c] != 0 )
+            else if( basisStatus == SPxSolver::ZERO && sol._primal[c] != Rational(0) )
             {
                sol._primal[c] = 0;
                numAdjustedBounds++;
@@ -582,8 +598,8 @@ namespace soplex
 
          // recompute slack and reduced cost values
          sol._slacks = _rationalLP->computePrimalActivity(sol._primal);
-         sol._redcost = _rationalLP->computeDualActivity(sol._dual) + _rationalLP->maxObj();
-         sol._redcost *= -1;
+         sol._redCost = _rationalLP->computeDualActivity(sol._dual) + _rationalLP->maxObj();
+         sol._redCost *= -1;
 
          assert(sol._hasPrimal);
          assert(sol._hasDual);
@@ -614,7 +630,7 @@ namespace soplex
       _transformUnbounded();
 
       // invalidate solution
-      sol._invalidate();
+      sol.invalidate();
 
       // perform iterative refinement
       _performOptIRStable(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
@@ -622,7 +638,7 @@ namespace soplex
       // the unbounded problem should always be solved to optimality
       if( error || unbounded || infeasible || !primalFeasible || !dualFeasible )
       {
-         sol._invalidate();
+         sol.invalidate();
          hasUnboundedRay = false;
          stopped = false;
          error = true;
@@ -630,7 +646,7 @@ namespace soplex
       // or stopped due to some limit
       else if( stopped )
       {
-         sol._invalidate();
+         sol.invalidate();
          hasUnboundedRay = false;
          error = false;
       }
@@ -640,15 +656,15 @@ namespace soplex
 
          MSG_DEBUG( spxout << "tau = " << tau << " (roughly " << rationalToString(tau) << ")\n" );
 
-         assert(tau <= 1 + 2 * rationalParam(SoPlex2::FEASTOL));
+         assert(tau <= Rational(1) + Rational(2) * rationalParam(SoPlex2::FEASTOL));
          assert(tau >= -rationalParam(SoPlex2::FEASTOL));
 
          // because the right-hand side and all bounds (but tau's upper bound) are zero, tau should be approximately
          // zero if basic; otherwise 0 or 1
-         error = !(tau >= 1 || tau < rationalParam(SoPlex2::FEASTOL));
+         error = !(tau >= Rational(1) || tau < rationalParam(SoPlex2::FEASTOL));
          assert(!error);
 
-         hasUnboundedRay = (tau >= 1);
+         hasUnboundedRay = (tau >= Rational(1));
 
          sol._hasDual = false;
          if( !hasUnboundedRay )
@@ -662,7 +678,7 @@ namespace soplex
 
 
    /// performs iterative refinement on the auxiliary problem for testing feasibility
-   void SoPlex2::_performFeasIRStable(SolRational& sol, bool& hasDualfarkas, bool& stopped, bool& error)
+   void SoPlex2::_performFeasIRStable(SolRational& sol, bool& hasDualFarkas, bool& stopped, bool& error)
    {
       bool primalFeasible;
       bool dualFeasible;
@@ -679,7 +695,7 @@ namespace soplex
       _transformFeasibility();
 
       // invalidate solution
-      sol._invalidate();
+      sol.invalidate();
 
       do
       {
@@ -689,16 +705,16 @@ namespace soplex
          // the feasibility problem should always be solved to optimality
          if( error || unbounded || infeasible || !primalFeasible || !dualFeasible )
          {
-            sol._invalidate();
-            hasDualfarkas = false;
+            sol.invalidate();
+            hasDualFarkas = false;
             stopped = false;
             error = true;
          }
          // or stopped due to some limit
          else if( stopped )
          {
-            sol._invalidate();
-            hasDualfarkas = false;
+            sol.invalidate();
+            hasDualFarkas = false;
             error = false;
          }
          // else we should have either a refined Farkas proof or an approximate feasible solution to the original
@@ -709,12 +725,12 @@ namespace soplex
             MSG_DEBUG( spxout << "tau = " << tau << " (roughly " << rationalToString(tau) << ")\n" );
 
             assert(tau >= -rationalParam(SoPlex2::FEASTOL));
-            assert(tau <= 1 + rationalParam(SoPlex2::FEASTOL));
+            assert(tau <= Rational(1) + rationalParam(SoPlex2::FEASTOL));
 
-            error = (tau < -rationalParam(SoPlex2::FEASTOL) || tau > 1 + rationalParam(SoPlex2::FEASTOL));
-            hasDualfarkas = (tau < 1); ///@todo shouldn't this use a tolerance? like (tau < 1-eps)? or even (tau <1/2)?
+            error = (tau < -rationalParam(SoPlex2::FEASTOL) || tau > Rational(1) + rationalParam(SoPlex2::FEASTOL));
+            hasDualFarkas = (tau < Rational(1)); ///@todo shouldn't this use a tolerance? like (tau < 1-eps)? or even (tau <1/2)?
 
-            if( hasDualfarkas )
+            if( hasDualFarkas )
             {
                // check if we can compute sufficiently large Farkas box
                _computeInfeasBox(_solRational, true);
@@ -734,7 +750,7 @@ namespace soplex
       while(!error && !success);
 
       // restore problem
-      _untransformFeasibility(sol, hasDualfarkas);
+      _untransformFeasibility(sol, hasDualFarkas);
    }
 
 
@@ -891,13 +907,13 @@ namespace soplex
       }
 
       // adjust basis
-      if( _hasBasisRational )
+      if( _hasBasis )
       {
          assert(numColsRational() >= _beforeLiftCols);
          assert(numRowsRational() >= _beforeLiftRows);
 
-         _basisStatusColsRational.append(numColsRational() - _beforeLiftCols, SPxSolver::BASIC);
-         _basisStatusRowsRational.append(numRowsRational() - _beforeLiftRows, SPxSolver::FIXED);
+         _basisStatusCols.append(numColsRational() - _beforeLiftCols, SPxSolver::BASIC);
+         _basisStatusRows.append(numRowsRational() - _beforeLiftRows, SPxSolver::FIXED);
       }
 
       MSG_DEBUG( _realLP->writeFile("afterLift.lp", 0, 0, 0) );
@@ -941,9 +957,9 @@ namespace soplex
          sol._slacks.reDim(_beforeLiftRows);
       }
 
-      if( sol.hasPrimalray() )
+      if( sol.hasPrimalRay() )
       {
-         sol._primalray.reDim(_beforeLiftCols);
+         sol._primalRay.reDim(_beforeLiftCols);
       }
 
       ///@todo if we know the mapping between original and lifting columns, we simply need to add the reduced cost of
@@ -953,7 +969,7 @@ namespace soplex
 
       for( int i = _beforeLiftCols; i < numColsRational() && sol._hasDual; i++ )
       {
-         if( abs(maxValue * sol._redcost[i]) > rationalParam(SoPlex2::OPTTOL) )
+         if( abs(maxValue * sol._redCost[i]) > rationalParam(SoPlex2::OPTTOL) )
          {
             MSG_INFO1( spxout << "Warning: lost dual solution during project phase.\n" );
             sol._hasDual = false;
@@ -962,38 +978,38 @@ namespace soplex
 
       if( sol.hasDual() )
       {
-         sol._redcost.reDim(_beforeLiftCols);
+         sol._redCost.reDim(_beforeLiftCols);
          sol._dual.reDim(_beforeLiftRows);
       }
 
-      if( sol.hasDualfarkas() )
+      if( sol.hasDualFarkas() )
       {
-         sol._dualfarkas.reDim(_beforeLiftRows);
+         sol._dualFarkas.reDim(_beforeLiftRows);
       }
 
       // adjust basis
-      for( int i = _beforeLiftCols; i < numColsRational() && _hasBasisRational; i++ )
+      for( int i = _beforeLiftCols; i < numColsRational() && _hasBasis; i++ )
       {
-         if( _basisStatusColsRational[i] != SPxSolver::BASIC )
+         if( _basisStatusCols[i] != SPxSolver::BASIC )
          {
             MSG_INFO1( spxout << "Warning: lost basis during project phase because of nonbasic lifting column.\n" );
-            _hasBasisRational = false;
+            _hasBasis = false;
          }
       }
 
-      for( int i = _beforeLiftRows; i < numRowsRational() && _hasBasisRational; i++ )
+      for( int i = _beforeLiftRows; i < numRowsRational() && _hasBasis; i++ )
       {
-         if( _basisStatusRowsRational[i] == SPxSolver::BASIC )
+         if( _basisStatusRows[i] == SPxSolver::BASIC )
          {
             MSG_INFO1( spxout << "Warning: lost basis during project phase because of basic lifting row.\n" );
-            _hasBasisRational = false;
+            _hasBasis = false;
          }
       }
 
-      if( _hasBasisRational )
+      if( _hasBasis )
       {
-         _basisStatusColsRational.reSize(_beforeLiftCols);
-         _basisStatusRowsRational.reSize(_beforeLiftRows);
+         _basisStatusCols.reSize(_beforeLiftCols);
+         _basisStatusRows.reSize(_beforeLiftRows);
       }
 
       // print LP if in debug mode
@@ -1047,7 +1063,7 @@ namespace soplex
       _realLP->addCols(_slackCols);
 
       // adjust basis
-      if( _hasBasisRational )
+      if( _hasBasis )
       {
          for( int i = 0; i < _slackCols.num(); i++ )
          {
@@ -1057,22 +1073,22 @@ namespace soplex
             assert(row >= 0);
             assert(row < numRowsRational());
 
-            switch( _basisStatusRowsRational[row] )
+            switch( _basisStatusRows[row] )
             {
             case SPxSolver::ON_LOWER:
-               _basisStatusColsRational.append(SPxSolver::ON_UPPER);
+               _basisStatusCols.append(SPxSolver::ON_UPPER);
                break;
             case SPxSolver::ON_UPPER:
-               _basisStatusColsRational.append(SPxSolver::ON_LOWER);
+               _basisStatusCols.append(SPxSolver::ON_LOWER);
                break;
             case SPxSolver::BASIC:
             case SPxSolver::FIXED:
             default:
-               _basisStatusColsRational.append(_basisStatusRowsRational[row]);
+               _basisStatusCols.append(_basisStatusRows[row]);
                break;
             }
 
-            _basisStatusRowsRational[row] = SPxSolver::FIXED;
+            _basisStatusRows[row] = SPxSolver::FIXED;
          }
       }
 
@@ -1118,18 +1134,18 @@ namespace soplex
          sol._primal.reDim(numOrigCols);
       }
 
-      if( sol.hasPrimalray() )
+      if( sol.hasPrimalRay() )
       {
-         sol._primalray.reDim(numOrigCols);
+         sol._primalRay.reDim(numOrigCols);
       }
 
       if( sol.hasDual() )
       {
-         sol._redcost.reDim(numOrigCols);
+         sol._redCost.reDim(numOrigCols);
       }
 
       // adjust basis
-      if( _hasBasisRational )
+      if( _hasBasis )
       {
          for( int i = 0; i < _slackCols.num(); i++ )
          {
@@ -1138,28 +1154,28 @@ namespace soplex
 
             assert(row >= 0);
             assert(row < numRowsRational());
-            assert(_basisStatusRowsRational[row] == SPxSolver::FIXED || _basisStatusRowsRational[row] == SPxSolver::BASIC);
+            assert(_basisStatusRows[row] == SPxSolver::FIXED || _basisStatusRows[row] == SPxSolver::BASIC);
 
-            if( _basisStatusRowsRational[row] == SPxSolver::FIXED )
+            if( _basisStatusRows[row] == SPxSolver::FIXED )
             {
-               switch( _basisStatusColsRational[col] )
+               switch( _basisStatusCols[col] )
                {
                case SPxSolver::ON_LOWER:
-                  _basisStatusRowsRational[row] = SPxSolver::ON_UPPER;
+                  _basisStatusRows[row] = SPxSolver::ON_UPPER;
                   break;
                case SPxSolver::ON_UPPER:
-                  _basisStatusRowsRational[row] = SPxSolver::ON_LOWER;
+                  _basisStatusRows[row] = SPxSolver::ON_LOWER;
                   break;
                case SPxSolver::BASIC:
                case SPxSolver::FIXED:
                default:
-                  _basisStatusRowsRational[row] = _basisStatusColsRational[col];
+                  _basisStatusRows[row] = _basisStatusCols[col];
                   break;
                }
             }
          }
 
-         _basisStatusColsRational.reSize(numOrigCols);
+         _basisStatusCols.reSize(numOrigCols);
       }
 
       // restore sides and remove slack columns
@@ -1272,10 +1288,10 @@ namespace soplex
       }
 
       // adjust basis
-      if( _hasBasisRational )
+      if( _hasBasis )
       {
-         _basisStatusColsRational.append(SPxSolver::ON_UPPER);
-         _basisStatusRowsRational.append(SPxSolver::BASIC);
+         _basisStatusCols.append(SPxSolver::ON_UPPER);
+         _basisStatusRows.append(SPxSolver::BASIC);
       }
 
       // print LP if in debug mode
@@ -1302,27 +1318,27 @@ namespace soplex
       // adjust solution and basis
       if( unbounded )
       {
-         assert(sol._primal[numOrigCols] >= 1);
+         assert(sol._primal[numOrigCols] >= Rational(1));
 
          sol._hasPrimal = false;
-         sol._hasPrimalray = true;
+         sol._hasPrimalRay = true;
          sol._hasDual = false;
-         sol._hasDualfarkas = false;
+         sol._hasDualFarkas = false;
 
-         if( sol._primal[numOrigCols] != 1 )
+         if( sol._primal[numOrigCols] != Rational(1) )
             sol._primal /= sol._primal[numOrigCols];
 
-         sol._primalray = sol._primal;
-         sol._primalray.reDim(numOrigCols);
+         sol._primalRay = sol._primal;
+         sol._primalRay.reDim(numOrigCols);
 
-         _hasBasisRational = (_basisStatusColsRational[numOrigCols] != SPxSolver::BASIC && _basisStatusRowsRational[numOrigRows] == SPxSolver::BASIC);
-         _basisStatusColsRational.reSize(numOrigCols);
-         _basisStatusColsRational.reSize(numOrigRows);
+         _hasBasis = (_basisStatusCols[numOrigCols] != SPxSolver::BASIC && _basisStatusRows[numOrigRows] == SPxSolver::BASIC);
+         _basisStatusCols.reSize(numOrigCols);
+         _basisStatusCols.reSize(numOrigRows);
       }
       else
       {
-         sol._invalidate();
-         _hasBasisRational = false;
+         sol.invalidate();
+         _hasBasis = false;
       }
 
       // restore objective function
@@ -1401,13 +1417,13 @@ namespace soplex
          _rationalLP->changeObj(c, 0);
          _realLP->changeObj(c, 0.0);
 
-         if( lowerRational(c) > 0 )
+         if( lowerRational(c) > Rational(0) )
          {
             shiftedSide -= (colVectorRational(c) * lowerRational(c));
             _rationalLP->changeBounds(c, 0, double(upperRational(c)) < double(realParam(SoPlex2::INFTY)) ? upperRational(c) - lowerRational(c) : upperRational(c));
             _realLP->changeBounds(c, 0.0, (Real)upperRational(c));
          }
-         else if( upperRational(c) < 0 )
+         else if( upperRational(c) < Rational(0) )
          {
             shiftedSide -= (colVectorRational(c) * upperRational(c));
             _rationalLP->changeBounds(c, double(lowerRational(c)) > double(-realParam(SoPlex2::INFTY)) ? lowerRational(c) - upperRational(c) : lowerRational(c), 0);
@@ -1434,9 +1450,9 @@ namespace soplex
       }
 
       // adjust basis
-      if( _hasBasisRational )
+      if( _hasBasis )
       {
-         _basisStatusColsRational.append(SPxSolver::ON_UPPER);
+         _basisStatusCols.append(SPxSolver::ON_UPPER);
       }
 
       // print LP if in debug mode
@@ -1463,34 +1479,34 @@ namespace soplex
       if( infeasible )
       {
          assert(sol._hasDual);
-         assert(sol._primal[numOrigCols] < 1);
+         assert(sol._primal[numOrigCols] < Rational(1));
 
          sol._hasPrimal = false;
-         sol._hasPrimalray = false;
+         sol._hasPrimalRay = false;
          sol._hasDual = false;
-         sol._hasDualfarkas = true;
+         sol._hasDualFarkas = true;
 
-         sol._dualfarkas = sol._dual;
+         sol._dualFarkas = sol._dual;
 
-         _hasBasisRational = false;
-         _basisStatusColsRational.reSize(numOrigCols);
+         _hasBasis = false;
+         _basisStatusCols.reSize(numOrigCols);
       }
       else if( sol._hasPrimal )
       {
-         assert(sol._primal[numOrigCols] >= 1);
+         assert(sol._primal[numOrigCols] >= Rational(1));
 
-         sol._hasPrimalray = false;
+         sol._hasPrimalRay = false;
          sol._hasDual = false;
-         sol._hasDualfarkas = false;
+         sol._hasDualFarkas = false;
 
-         if( sol._primal[numOrigCols] != 1 )
+         if( sol._primal[numOrigCols] != Rational(1) )
             sol._primal /= sol._primal[numOrigCols];
 
          sol._primal.reDim(numOrigCols);
          sol._slacks -= _rationalLP->colVector(numOrigCols);
 
-         _hasBasisRational = (_basisStatusColsRational[numOrigCols] != SPxSolver::BASIC);
-         _basisStatusColsRational.reSize(numOrigCols);
+         _hasBasis = (_basisStatusCols[numOrigCols] != SPxSolver::BASIC);
+         _basisStatusCols.reSize(numOrigCols);
       }
 
       // unshift primal space and restore objective coefficients
@@ -1556,13 +1572,13 @@ namespace soplex
    /// Set transformed to true if this method is called after _transformFeasibility().
    void SoPlex2::_computeInfeasBox(SolRational& sol, bool transformed)
    {
-      assert(sol.hasDualfarkas());
+      assert(sol.hasDualFarkas());
 
       const VectorRational& lower = transformed ? _feasLower : lowerRational();
       const VectorRational& upper = transformed ? _feasUpper : upperRational();
       const VectorRational& lhs = transformed ? _feasSide : lhsRational();
       const VectorRational& rhs = transformed ? _feasSide : rhsRational();
-      const VectorRational& y = sol._dualfarkas;
+      const VectorRational& y = sol._dualFarkas;
 
       const int numRows = numRowsRational();
       const int numCols = transformed ? numColsRational() - 1 : numColsRational();
@@ -1582,7 +1598,7 @@ namespace soplex
       for( int r = 0; r < numRows; r++ )
       {
          ytransA += y[r] * _rationalLP->rowVector(r);
-         ytransb += y[r] * (y[r] > 0 ? lhs[r] : rhs[r]);
+         ytransb += y[r] * (y[r] > Rational(0) ? lhs[r] : rhs[r]);
       }
 
       // if we work on the feasibility problem, we ignore the last column
@@ -1600,14 +1616,14 @@ namespace soplex
       {
          const Rational& minusRedCost = ytransA[c];
 
-         if( minusRedCost > 0 )
+         if( minusRedCost > Rational(0) )
          {
             if( double(upper[c]) < double(realParam(SoPlex2::INFTY)) )
                temp += minusRedCost * upper[c];
             else
                isTempFinite = false;
          }
-         else if( minusRedCost < 0 )
+         else if( minusRedCost < Rational(0) )
          {
             if( double(lower[c]) > double(-realParam(SoPlex2::INFTY)) )
                temp += minusRedCost * lower[c];
@@ -1631,17 +1647,17 @@ namespace soplex
       ytransA.setup();
 
       // if ytransb is negative, try to make it zero by including a positive lower bound or a negative upper bound
-      if( ytransb < 0 )
+      if( ytransb < Rational(0) )
       {
          for( int c = 0; c < numCols; c++ )
          {
-            if( lower[c] > 0 )
+            if( lower[c] > Rational(0) )
             {
                ytransA.setValue(c, ytransA[c] - ytransb / lower[c]);
                ytransb = 0;
                break;
             }
-            else if( upper[c] < 0 )
+            else if( upper[c] < Rational(0) )
             {
                ytransA.setValue(c, ytransA[c] - ytransb / upper[c]);
                ytransb = 0;
@@ -1652,7 +1668,7 @@ namespace soplex
 
       // if ytransb is still zero then the zero solution is inside the bounds and cannot be cut off by the Farkas
       // constraint; in this case, we cannot compute a Farkas box
-      if( ytransb < 0 )
+      if( ytransb < Rational(0) )
       {
          MSG_INFO1( spxout << "Approximate Farkas proof to weak.  Could not compute Farkas box. (1)\n" );
          return;
@@ -1665,7 +1681,7 @@ namespace soplex
          temp += abs(ytransA.value(n));
 
       // if the one norm is zero then ytransA is zero the Farkas proof should have been verified above
-      assert(temp !=0);
+      assert(temp != Rational(0));
 
       // initialize variables in loop: size of Farkas box B, flag whether B has been increased, and number of current
       // nonzero in ytransA
@@ -1675,7 +1691,7 @@ namespace soplex
 
       // loop through nonzeros of ytransA
       MSG_DEBUG( spxout << "B = " << rationalToString(B) << "\n" );
-      assert(ytransb >= 0);
+      assert(ytransb >= Rational(0));
 
       while( true )
       {
@@ -1695,26 +1711,26 @@ namespace soplex
 
          // if the multiplier is positive we inspect the lower bound: if it is finite and within the Farkas box, we can
          // increase B by including it in the Farkas proof
-         if( minusRedCost < 0 && lower[colIdx] > -B && double(lower[colIdx]) > double(-realParam(SoPlex2::INFTY)) )
+         if( minusRedCost < Rational(0) && lower[colIdx] > -B && double(lower[colIdx]) > double(-realParam(SoPlex2::INFTY)) )
          {
             ytransA.clearNum(n);
             ytransb -= minusRedCost * lower[colIdx];
             temp += minusRedCost;
 
-            assert(ytransb >= 0);
-            assert(temp >= 0);
-            assert(temp == 0 || ytransb / temp > B);
+            assert(ytransb >= Rational(0));
+            assert(temp >= Rational(0));
+            assert(temp == Rational(0) || ytransb / temp > B);
 
             // if ytransA and ytransb are zero, we have 0^T x >= 0 and cannot compute a Farkas box
-            if( temp == 0 && ytransb == 0 )
+            if( temp == Rational(0) && ytransb == Rational(0) )
             {
                MSG_INFO1( spxout << "Approximate Farkas proof to weak.  Could not compute Farkas box. (2)\n" );
                return;
             }
             // if ytransb is positive and ytransA is zero, we have 0^T x > 0, proving infeasibility
-            else if( temp == 0 )
+            else if( temp == Rational(0) )
             {
-               assert(ytransb > 0);
+               assert(ytransb > Rational(0));
                MSG_INFO1( spxout << "Farkas infeasibility proof verified exactly. (2)\n" );
                return;
             }
@@ -1728,26 +1744,26 @@ namespace soplex
          }
          // if the multiplier is negative we inspect the upper bound: if it is finite and within the Farkas box, we can
          // increase B by including it in the Farkas proof
-         else if( minusRedCost > 0 && upper[colIdx] < B && double(upper[colIdx]) < double(realParam(SoPlex2::INFTY)) )
+         else if( minusRedCost > Rational(0) && upper[colIdx] < B && double(upper[colIdx]) < double(realParam(SoPlex2::INFTY)) )
          {
             ytransA.clearNum(n);
             ytransb -= minusRedCost * upper[colIdx];
             temp -= minusRedCost;
 
-            assert(ytransb >= 0);
-            assert(temp >= 0);
-            assert(temp == 0 || ytransb / temp > B);
+            assert(ytransb >= Rational(0));
+            assert(temp >= Rational(0));
+            assert(temp == Rational(0) || ytransb / temp > B);
 
             // if ytransA and ytransb are zero, we have 0^T x >= 0 and cannot compute a Farkas box
-            if( temp == 0 && ytransb == 0 )
+            if( temp == Rational(0) && ytransb == Rational(0) )
             {
                MSG_INFO1( spxout << "Approximate Farkas proof to weak.  Could not compute Farkas box. (2)\n" );
                return;
             }
             // if ytransb is positive and ytransA is zero, we have 0^T x > 0, proving infeasibility
-            else if( temp == 0 )
+            else if( temp == Rational(0) )
             {
-               assert(ytransb > 0);
+               assert(ytransb > Rational(0));
                MSG_INFO1( spxout << "Farkas infeasibility proof verified exactly. (2)\n" );
                return;
             }
@@ -1760,7 +1776,7 @@ namespace soplex
             success = true;
          }
          // the multiplier is zero, we can ignore the bound constraints on this variable
-         else if( minusRedCost == 0 )
+         else if( minusRedCost == Rational(0) )
             ytransA.clearNum(n);
          // currently this bound cannot be used to increase B; we will check it again in the next round, because B might
          // have increased by then
@@ -1768,11 +1784,407 @@ namespace soplex
             n++;
       }
 
-      if( B > 0 )
+      if( B > Rational(0) )
       {
          MSG_INFO1( spxout << "Computed Farkas box: provably no feasible solutions with components less than "
             << rationalToString(B) << " in absolute value.\n" );
       }
+   }
+
+
+
+   /// solves real LP during iterative refinement
+   SPxSolver::Status SoPlex2::_solveRealForRational(bool fromscratch, VectorReal& primal, VectorReal& dual, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols)
+   {
+      assert(_isConsistent());
+
+      assert(_solver.nRows() == numRowsRational());
+      assert(_solver.nCols() == numColsRational());
+      assert(primal.dim() == numColsRational());
+      assert(dual.dim() == numRowsRational());
+
+      SPxSolver::Status result = SPxSolver::UNKNOWN;
+
+      if( fromscratch || !_hasBasis )
+      {
+         _enableSimplifierAndScaler();
+         _solver.setTerminationValue(realParam(SoPlex2::INFTY));
+      }
+      else
+      {
+         _disableSimplifierAndScaler();
+         ///@todo implement for both objective senses
+         _solver.setTerminationValue(intParam(SoPlex2::OBJSENSE) == SoPlex2::OBJSENSE_MINIMIZE
+            ? realParam(SoPlex2::OBJLIMIT_UPPER) : realParam(SoPlex2::INFTY));
+      }
+
+      // start timing
+      _statistics->syncTime.start();
+
+      SPxLPRational rationalLP(_solver);
+
+      // stop timing
+      _statistics->syncTime.stop();
+
+      try
+      {
+         // apply problem simplification
+         SPxSimplifier::Result simplificationStatus = SPxSimplifier::OKAY;
+         if( _simplifier != 0 )
+         {
+            simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlex2::EPSILON_ZERO), realParam(SoPlex2::FPFEASTOL), realParam(SoPlex2::FPOPTTOL));
+         }
+
+         // apply scaling after the simplification
+         if( _scaler != 0 && simplificationStatus == SPxSimplifier::OKAY )
+            _scaler->scale(_solver);
+
+         // run the simplex method if problem has not been solved by the simplifier
+         if( simplificationStatus == SPxSimplifier::OKAY )
+         {
+            MSG_INFO1( spxout << std::endl );
+
+            _solveRealLPAndRecordStatistics();
+
+            MSG_INFO1( spxout << std::endl );
+         }
+
+         ///@todo move to private helper methods
+         // evaluate status flag
+         if( simplificationStatus == SPxSimplifier::INFEASIBLE )
+            result = SPxSolver::INFEASIBLE;
+         else if( simplificationStatus == SPxSimplifier::DUAL_INFEASIBLE )
+            result = SPxSolver::INForUNBD;
+         else if( simplificationStatus == SPxSimplifier::UNBOUNDED )
+            result = SPxSolver::UNBOUNDED;
+         else if( simplificationStatus == SPxSimplifier::VANISHED || simplificationStatus == SPxSimplifier::OKAY )
+         {
+            result = simplificationStatus == SPxSimplifier::VANISHED ? SPxSolver::OPTIMAL : _solver.status();
+
+            ///@todo move to private helper methods
+            // process result
+            switch( result )
+            {
+            case SPxSolver::OPTIMAL:
+               // unsimplify if simplifier is active and LP is solved to optimality; this must be done here and not at solution
+               // query, because we want to have the basis for the original problem
+               if( _simplifier != 0 )
+               {
+                  assert(!_simplifier->isUnsimplified());
+                  assert(simplificationStatus == SPxSimplifier::VANISHED || simplificationStatus == SPxSimplifier::OKAY);
+
+                  bool vanished = simplificationStatus == SPxSimplifier::VANISHED;
+
+                  // get solution vectors for transformed problem
+                  DVectorReal tmpPrimal(vanished ? 0 : _solver.nCols());
+                  DVectorReal tmpSlacks(vanished ? 0 : _solver.nRows());
+                  DVectorReal tmpDual(vanished ? 0 : _solver.nRows());
+                  DVectorReal tmpRedCost(vanished ? 0 : _solver.nCols());
+
+                  if( !vanished )
+                  {
+                     assert(_solver.status() == SPxSolver::OPTIMAL);
+
+                     _solver.getPrimal(tmpPrimal);
+                     _solver.getSlacks(tmpSlacks);
+                     _solver.getDual(tmpDual);
+                     _solver.getRedCost(tmpRedCost);
+
+                     // unscale vectors
+                     if( _scaler != 0 )
+                     {
+                        _scaler->unscalePrimal(tmpPrimal);
+                        _scaler->unscaleSlacks(tmpSlacks);
+                        _scaler->unscaleDual(tmpDual);
+                        _scaler->unscaleRedCost(tmpRedCost);
+                     }
+
+                     // get basis of transformed problem
+                     _basisStatusRows.reSize(_solver.nRows());
+                     _basisStatusCols.reSize(_solver.nCols());
+                     _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
+                  }
+
+                  ///@todo catch exception
+                  _simplifier->unsimplify(tmpPrimal, tmpDual, tmpSlacks, tmpRedCost, _basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
+
+                  // store basis for original problem
+                  _simplifier->getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr());
+
+                  primal = _simplifier->unsimplifiedPrimal();
+                  dual = _simplifier->unsimplifiedDual();
+               }
+               // if the original problem is not in the solver because of scaling, we also need to store the basis
+               else
+               {
+                  _solver.getPrimal(primal);
+                  _solver.getDual(dual);
+
+                  // unscale vectors
+                  if( _scaler != 0 )
+                  {
+                     _scaler->unscalePrimal(primal);
+                     _scaler->unscaleDual(dual);
+                  }
+
+                  // get basis of transformed problem
+                  _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr());
+               }
+               break;
+
+            case SPxSolver::ABORT_CYCLING:
+            case SPxSolver::ABORT_TIME:
+            case SPxSolver::ABORT_ITER:
+            case SPxSolver::ABORT_VALUE:
+            case SPxSolver::REGULAR:
+            case SPxSolver::RUNNING:
+            case SPxSolver::UNBOUNDED:
+            case SPxSolver::INFEASIBLE:
+               // if simplifier is active we cannot return a Farkas ray currently
+               if( _simplifier != 0 )
+                  break;
+
+               // return Farkas ray as dual solution
+               _solver.getDualfarkas(dual);
+
+               // unscale vectors
+               if( _scaler != 0 )
+                  _scaler->unscaleDual(dual);
+
+               // if the original problem is not in the solver because of scaling, we also need to store the basis
+               _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr());
+
+               break;
+
+            case SPxSolver::INForUNBD:
+            case SPxSolver::SINGULAR:
+            default:
+               _hasBasis = false;
+               break;
+            }
+         }
+      }
+      catch( ... )
+      {
+         MSG_INFO1( spxout << "Exception thrown during floating-point solve.\n" );
+         result = SPxSolver::ERROR;
+      }
+
+      if( result == SPxSolver::OPTIMAL )
+      {
+         // check violation in rational LP
+         DVectorRational primalRational(primal);
+         DVectorRational activity = rationalLP.computePrimalActivity(primalRational);
+         Rational maxBoundViolation = 0;
+         Rational maxConstraintViolation = 0;
+
+         for( int i = rationalLP.nCols() - 1; i >= 0; i-- )
+         {
+            Rational viol = rationalLP.lower(i) - primalRational[i];
+            if( viol > maxBoundViolation )
+               maxBoundViolation = viol;
+
+            viol = primalRational[i] - rationalLP.upper(i);
+            if( viol > maxBoundViolation )
+               maxBoundViolation = viol;
+         }
+
+         for( int i = rationalLP.nRows() - 1; i >= 0; i-- )
+         {
+            Rational viol = rationalLP.lhs(i) - activity[i];
+            if( viol > maxConstraintViolation )
+               maxConstraintViolation = viol;
+
+            viol = activity[i] - rationalLP.rhs(i);
+            if( viol > maxConstraintViolation )
+               maxConstraintViolation = viol;
+         }
+
+         Rational violation = (maxBoundViolation > maxConstraintViolation ? maxBoundViolation : maxConstraintViolation);
+
+         if( violation > double(realParam(SoPlex2::FPFEASTOL)) )
+         {
+            MSG_INFO1( spxout << "Warning: Floating-point solution violates bounds and rows by up to " << rationalToString(violation) << ".\n" );
+         }
+      }
+
+      // copy rounded rational LP to real LP
+      if( _simplifier != 0 || _scaler != 0 )
+         _solver.loadLP((SPxLPReal)(rationalLP));
+
+      return result;
+   }
+
+
+
+   /// solves real LP with recovery mechanism
+   SPxSolver::Status SoPlex2::_solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols)
+   {
+      SPxSolver::Status result = SPxSolver::UNKNOWN;
+
+      bool fromScratch = false;
+      bool solved = false;
+      bool solvedFromScratch = false;
+      bool initialSolve = true;
+      bool increasedMarkowitz = false;
+      bool relaxedTolerances = false;
+      bool tightenedTolerances = false;
+      bool switchedScaler = false;
+      bool switchedSimplifier = false;
+      bool switchedRatiotester = false;
+      bool switchedPricer = false;
+
+      int ratiotester = intParam(SoPlex2::RATIOTESTER);
+      int pricer = intParam(SoPlex2::PRICER);
+      int simplifier = intParam(SoPlex2::SIMPLIFIER);
+      int scaler = intParam(SoPlex2::SCALER);
+
+      setIntParam(SoPlex2::SIMPLIFIER, SoPlex2::SIMPLIFIER_OFF);
+
+      while( !_isSolveStopped() )
+      {
+         assert(!increasedMarkowitz || GE(_slufactor.markowitz(), 0.9));
+
+         result = _solveRealForRational(fromScratch, primal, dual, basisStatusRows, basisStatusCols);
+
+         solved = (result == SPxSolver::OPTIMAL)
+            || (result == SPxSolver::INFEASIBLE && acceptInfeasible)
+            || (result == SPxSolver::UNBOUNDED && acceptUnbounded);
+
+         if( solved )
+            break;
+
+         if( initialSolve )
+         {
+            MSG_INFO1( spxout << "Numerical troubles during floating-point solve." << std::endl );
+            initialSolve = false;
+         }
+
+         if( !increasedMarkowitz )
+         {
+            MSG_INFO1( spxout << "Increasing Markowitz threshold." << std::endl );
+
+            _slufactor.setMarkowitz(0.9);
+            increasedMarkowitz = true;
+            try
+            {
+               _solver.factorize();
+               continue;
+            }
+            catch( ... )
+            {
+               MSG_DEBUG( spxout << std::endl << "Factorization failed." << std::endl );
+            }
+         }
+
+         if( !solvedFromScratch )
+         {
+            MSG_INFO1( spxout << "Solving from scratch." << std::endl );
+
+            fromScratch = true;
+            _solver.reLoad();
+
+            solvedFromScratch = true;
+            continue;
+         }
+
+         setIntParam(SoPlex2::RATIOTESTER, ratiotester);
+         setIntParam(SoPlex2::PRICER, pricer);
+
+         if( !switchedScaler )
+         {
+            MSG_INFO1( spxout << "Switching scaling." << std::endl );
+
+            if( scaler == int(SoPlex2::SCALER_OFF) )
+               setIntParam(SoPlex2::SCALER, SoPlex2::SCALER_BIEQUI);
+            else
+               setIntParam(SoPlex2::SCALER, SoPlex2::SCALER_OFF);
+
+            fromScratch = true;
+            _solver.reLoad();
+
+            solvedFromScratch = true;
+            switchedScaler = true;
+            continue;
+         }
+
+         if( !switchedSimplifier )
+         {
+            MSG_INFO1( spxout << "Switching simplification." << std::endl );
+
+            if( simplifier == int(SoPlex2::SIMPLIFIER_OFF) )
+               setIntParam(SoPlex2::SIMPLIFIER, SoPlex2::SIMPLIFIER_AUTO);
+            else
+               setIntParam(SoPlex2::SIMPLIFIER, SoPlex2::SIMPLIFIER_OFF);
+
+            fromScratch = true;
+            _solver.reLoad();
+
+            solvedFromScratch = true;
+            switchedSimplifier = true;
+            continue;
+         }
+
+         setIntParam(SoPlex2::SIMPLIFIER, SoPlex2::SIMPLIFIER_OFF);
+
+         if( !relaxedTolerances )
+         {
+            MSG_INFO1( spxout << "Relaxing tolerances." << std::endl );
+
+            _solver.setType(_solver.rep() == SPxSolver::COLUMN ? SPxSolver::ENTER : SPxSolver::LEAVE);
+            _solver.setDelta(_solver.feastol() * 1e3 > 1e-3 ? 1e-3 : _solver.feastol() * 1e3);
+            relaxedTolerances = _solver.feastol() >= 1e-3;
+            solvedFromScratch = false;
+            continue;
+         }
+
+         if( !tightenedTolerances && result != SPxSolver::INFEASIBLE )
+         {
+            MSG_INFO1( spxout << "Tightening tolerances." << std::endl );
+
+            _solver.setType(_solver.rep() == SPxSolver::COLUMN ? SPxSolver::LEAVE : SPxSolver::ENTER);
+            _solver.setDelta(_solver.feastol() * 1e-3 < 1e-9 ? 1e-9 : _solver.feastol() * 1e-3);
+            tightenedTolerances = _solver.feastol() <= 1e-9;
+            solvedFromScratch = false;
+            continue;
+         }
+
+         if( !switchedRatiotester )
+         {
+            MSG_INFO1( spxout << "Switching ratio test." << std::endl );
+
+            _solver.setType(_solver.type() == SPxSolver::LEAVE ? SPxSolver::ENTER : SPxSolver::LEAVE);
+            _solver.setTester(_solver.ratiotester() != (SPxRatioTester*)&_ratiotesterTextbook ? (SPxRatioTester*)&_ratiotesterTextbook : (SPxRatioTester*)&_ratiotesterFast);
+            switchedRatiotester = true;
+            solvedFromScratch = false;
+            continue;
+         }
+
+         if( !switchedPricer )
+         {
+            MSG_INFO1( spxout << "Switching pricer." << std::endl );
+
+            _solver.setType(_solver.type() == SPxSolver::LEAVE ? SPxSolver::ENTER : SPxSolver::LEAVE);
+            _solver.setPricer(_solver.pricer() != (SPxPricer*)&_pricerDevex ? (SPxPricer*)&_pricerDevex : (SPxPricer*)&_pricerSteep);
+            switchedPricer = true;
+            solvedFromScratch = false;
+            continue;
+         }
+
+         MSG_INFO1( spxout << "Giving up." << std::endl );
+
+         break;
+      }
+
+      _solver.setFeastol(realParam(SoPlex2::FPFEASTOL));
+      _solver.setOpttol(realParam(SoPlex2::FPOPTTOL));
+
+      setIntParam(SoPlex2::RATIOTESTER, ratiotester);
+      setIntParam(SoPlex2::PRICER, pricer);
+      setIntParam(SoPlex2::SIMPLIFIER, simplifier);
+      setIntParam(SoPlex2::SCALER, scaler);
+
+      return result;
    }
 } // namespace soplex
 

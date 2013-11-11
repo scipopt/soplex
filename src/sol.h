@@ -25,7 +25,8 @@
 
 namespace soplex
 {
-typedef SolBase< Rational > SolRational;
+   typedef SolBase<Real> SolReal;
+   typedef SolBase<Rational> SolRational;
 } // namespace soplex
 #endif // _SOL_H_
 

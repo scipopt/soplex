@@ -254,7 +254,7 @@ void displayQualityReal( SoPlex2& SoPlexShell, bool checkMode )
 
    SoPlexShell.getPrimalReal(primal);
    SoPlexShell.getDualReal(dual);
-   SoPlexShell.getRedcostReal(redCost);
+   SoPlexShell.getRedCostReal(redCost);
    SoPlexShell.getSlacksReal(slack);
 
    if ( checkMode )
@@ -262,13 +262,11 @@ void displayQualityReal( SoPlex2& SoPlexShell, bool checkMode )
    MSG_INFO1( spxout << "Violations (max/sum)" << std::endl; )
 
    // get violations of simpified LP
-   SoPlexShell.getInternalConstraintViolationReal(maxviol, sumviol);
-
    if( checkMode )
       MSG_INFO1( spxout << "IEXAMP06 "; )
    MSG_INFO1( spxout << "Constraints      :"
-   << std::setw(16) << maxviol << "  "
-   << std::setw(16) << sumviol << std::endl; )
+   << std::setw(16) << 0.0 << "  "
+   << std::setw(16) << 0.0 << std::endl; )
 
    // get violations of original LP
    SoPlexShell.getConstraintViolationReal(primal, maxviol, sumviol);
@@ -279,13 +277,11 @@ void displayQualityReal( SoPlex2& SoPlexShell, bool checkMode )
    << std::setw(16) << maxviol << "  "
    << std::setw(16) << sumviol << std::endl; )
 
-   SoPlexShell.getInternalBoundViolationReal(maxviol, sumviol);
-
    if( checkMode )
       MSG_INFO1( spxout << "IEXAMP08 "; )
    MSG_INFO1( spxout << "Bounds           :"
-   << std::setw(16) << maxviol << "  "
-   << std::setw(16) << sumviol << std::endl; )
+   << std::setw(16) << 0.0 << "  "
+   << std::setw(16) << 0.0 << std::endl; )
 
    SoPlexShell.getBoundViolationReal(primal, maxviol, sumviol);
 
@@ -337,7 +333,7 @@ void displayQualityRational( SoPlex2& SoPlexShell, bool checkMode )
 
    SoPlexShell.getPrimalRational(primal);
    SoPlexShell.getDualRational(dual);
-   SoPlexShell.getRedcostRational(redCost);
+   SoPlexShell.getRedCostRational(redCost);
    SoPlexShell.getSlacksRational(slack);
 
    if ( checkMode )
@@ -632,7 +628,7 @@ void printSolutionAndStatusReal(
    bool                 checkMode)
 {
    // get the solution status
-   SPxSolver::Status status = SoPlexShell.statusReal();
+   SPxSolver::Status status = SoPlexShell.status();
 
    if( !checkMode )
       MSG_INFO1( spxout << std::endl; )
@@ -707,7 +703,7 @@ void printSolutionAndStatusReal(
       if( write_basis )
       {
          MSG_INFO1( spxout << "Writing basis of original problem to file " << basisname << std::endl; )
-         SoPlexShell.writeBasisFileReal( basisname, &rownames, &colnames );
+         SoPlexShell.writeBasisFile( basisname, &rownames, &colnames );
       }
       break;
    case SPxSolver::UNBOUNDED:
@@ -736,7 +732,7 @@ void printSolutionAndStatusReal(
 
          DVectorReal objcoef(SoPlexShell.numColsReal());
          DVectorReal ray(SoPlexShell.numColsReal());
-         if( SoPlexShell.getPrimalrayReal(ray) )
+         if( SoPlexShell.getPrimalRayReal(ray) )
          {
             Real rayobjval = 0.0;
 
@@ -770,7 +766,7 @@ void printSolutionAndStatusReal(
       {
          DVectorReal farkasx(SoPlexShell.numRowsReal());
 
-         if( SoPlexShell.getDualfarkasReal(farkasx) )
+         if( SoPlexShell.getDualFarkasReal(farkasx) )
          {
             DVectorReal proofvec(SoPlexShell.numColsReal());
             double lhs;
@@ -851,7 +847,7 @@ void printSolutionAndStatusReal(
          }
       }
       if( write_basis )  // write basis even if we are infeasible
-         SoPlexShell.writeBasisFileReal(basisname, &rownames, &colnames);
+         SoPlexShell.writeBasisFile(basisname, &rownames, &colnames);
       break;
    case SPxSolver::ABORT_CYCLING:
       if( checkMode )
@@ -908,7 +904,7 @@ void printSolutionAndStatusRational(
    bool                 checkMode)
 {
    // get the solution status
-   SPxSolver::Status status = SoPlexShell.statusRational();
+   SPxSolver::Status status = SoPlexShell.status();
 
    if( !checkMode )
       MSG_INFO1( spxout << std::endl; )
@@ -983,7 +979,7 @@ void printSolutionAndStatusRational(
       if( write_basis )
       {
          MSG_INFO1( spxout << "Writing basis of original problem to file " << basisname << std::endl; )
-         SoPlexShell.writeBasisFileRational( basisname, &rownames, &colnames );
+         SoPlexShell.writeBasisFile( basisname, &rownames, &colnames );
       }
       break;
    case SPxSolver::UNBOUNDED:
@@ -1012,7 +1008,7 @@ void printSolutionAndStatusRational(
 
          DVectorRational objcoef(SoPlexShell.numColsRational());
          DVectorRational ray(SoPlexShell.numColsRational());
-         if( SoPlexShell.getPrimalrayRational(ray) )
+         if( SoPlexShell.getPrimalRayRational(ray) )
          {
             Rational rayobjval = 0.0;
 
@@ -1046,7 +1042,7 @@ void printSolutionAndStatusRational(
       {
          DVectorRational farkasx(SoPlexShell.numRowsRational());
 
-         if( SoPlexShell.getDualfarkasRational(farkasx) )
+         if( SoPlexShell.getDualFarkasRational(farkasx) )
          {
             DVectorRational proofvec(SoPlexShell.numColsRational());
             Rational lhs;
@@ -1127,7 +1123,7 @@ void printSolutionAndStatusRational(
          }
       }
       if( write_basis )  // write basis even if we are infeasible
-         SoPlexShell.writeBasisFileRational(basisname, &rownames, &colnames);
+         SoPlexShell.writeBasisFile(basisname, &rownames, &colnames);
       break;
    case SPxSolver::ABORT_CYCLING:
       if( checkMode )
@@ -1379,7 +1375,7 @@ int main(int argc, char* argv[])
    try
    {
       bool success = false;
-      bool rational = (exactmode >= 1);
+
       // start timer
       Timer timer;
       timer.start();
@@ -1390,17 +1386,23 @@ int main(int argc, char* argv[])
 
       MSG_INFO1( spxout << "Loading LP file " << filename << std::endl );
 
-      if( exactmode == 0 )
+      success = true;
+      if( exactmode <= 0 )
       {
-         success = SoPlexShell->readFileReal( filename, &rownames, &colnames );
+         success = success && SoPlexShell->setIntParam(SoPlex2::SYNCMODE, SoPlex2::SYNCMODE_ONLYREAL);
+         success = success && SoPlexShell->setIntParam(SoPlex2::SOLVEMODE, SoPlex2::SOLVEMODE_REAL);
+         success = success && SoPlexShell->readFileReal( filename, &rownames, &colnames );
       }
       else if( exactmode == 1 )
       {
+         success = success && SoPlexShell->setIntParam(SoPlex2::SYNCMODE, SoPlex2::SYNCMODE_ONLYREAL);
+         success = success && SoPlexShell->setIntParam(SoPlex2::SOLVEMODE, SoPlex2::SOLVEMODE_RATIONAL);
          success = SoPlexShell->readFileReal( filename, &rownames, &colnames );
-         SoPlexShell->syncRationalLP();
       }
-      else
+      else if( exactmode >= 2 )
       {
+         success = success && SoPlexShell->setIntParam(SoPlex2::SYNCMODE, SoPlex2::SYNCMODE_AUTO);
+         success = success && SoPlexShell->setIntParam(SoPlex2::SOLVEMODE, SoPlex2::SOLVEMODE_RATIONAL);
          success = SoPlexShell->readFileRational( filename, &rownames, &colnames );
       }
 
@@ -1419,22 +1421,11 @@ int main(int argc, char* argv[])
       if ( checkMode )
          MSG_INFO1( spxout << "IEXAMP24 " );
 
-      if( rational )
-      {
-         MSG_INFO1( spxout << "LP has "
-            << SoPlexShell->numRowsRational() << " rows "
-            << SoPlexShell->numColsRational() << " columns "
-            << SoPlexShell->numNonzerosRational() << " nonzeros"
-            << std::endl );
-      }
-      else
-      {
-         MSG_INFO1( spxout << "LP has "
-            << SoPlexShell->numRowsReal() << " rows "
-            << SoPlexShell->numColsReal() << " columns "
-            << SoPlexShell->numNonzerosReal() << " nonzeros"
-            << std::endl );
-      }
+      MSG_INFO1( spxout << "LP has "
+         << SoPlexShell->numRowsReal() << " rows "
+         << SoPlexShell->numColsReal() << " columns "
+         << SoPlexShell->numNonzerosReal() << " nonzeros"
+         << std::endl );
 
       if( checkMode )
          MSG_INFO1( spxout << "IEXAMP41 " );
@@ -1447,9 +1438,7 @@ int main(int argc, char* argv[])
       // read a basis file if specified
       if (read_basis)
       {
-         success = rational
-            ? SoPlexShell->readBasisFileRational( basisname, &rownames, &colnames )
-            : SoPlexShell->readBasisFileReal( basisname, &rownames, &colnames );
+         success = SoPlexShell->readBasisFile( basisname, &rownames, &colnames );
 
          if( !success )
          {
@@ -1462,15 +1451,12 @@ int main(int argc, char* argv[])
       }
 
       // solve the LP
-      if( rational )
-         SoPlexShell->solveRational();
-      else
-         SoPlexShell->solveReal();
+      SoPlexShell->solve();
 
       MSG_INFO1( spxout << "\nSoPlex statistics:\n" << SoPlexShell->statisticString() << std::endl );
 
       // print solution, status, infeasibility system,...
-      if( rational )
+      if( exactmode >= 1 )
       {
          SoPlexShell->printStatisticsRational(std::cout);
          printSolutionAndStatusRational(*SoPlexShell, rownames, colnames, precision, print_quality,

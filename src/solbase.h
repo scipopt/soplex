@@ -38,6 +38,7 @@ template< class R >
 class SolBase
 {
    friend class SoPlex2;
+   template < class S > friend class SolBase;
 
 public:
    /// is a primal feasible solution available?
@@ -65,18 +66,18 @@ public:
    }
 
    /// is a primal unbounded ray available?
-   bool hasPrimalray() const
+   bool hasPrimalRay() const
    {
-      return _hasPrimalray;
+      return _hasPrimalRay;
    }
 
    /// gets the primal unbounded ray if available; returns true on success
-   bool getPrimalray(VectorBase<R>& vector) const
+   bool getPrimalRay(VectorBase<R>& vector) const
    {
-      if( _hasPrimalray )
-         vector = _primalray;
+      if( _hasPrimalRay )
+         vector = _primalRay;
 
-      return _hasPrimalray;
+      return _hasPrimalRay;
    }
 
    /// is a dual solution available?
@@ -95,78 +96,116 @@ public:
    }
 
    /// gets the vector of reduced cost values if available; returns true on success
-   bool getRedcost(VectorBase<R>& vector) const
+   bool getRedCost(VectorBase<R>& vector) const
    {
       if( _hasDual )
-         vector = _redcost;
+         vector = _redCost;
 
       return _hasDual;
    }
 
    /// is a dual farkas ray available?
-   bool hasDualfarkas() const
+   bool hasDualFarkas() const
    {
-      return _hasDualfarkas;
+      return _hasDualFarkas;
    }
 
    /// gets the Farkas proof if available; returns true on success
-   bool getDualfarkas(VectorBase<R>& vector) const
+   bool getDualFarkas(VectorBase<R>& vector) const
    {
-      if( _hasDualfarkas )
-         vector = _dualfarkas;
+      if( _hasDualFarkas )
+         vector = _dualFarkas;
 
-      return _hasDualfarkas;
+      return _hasDualFarkas;
    }
 
-   /// is basis information available?
-   bool hasBasis() const
+   /// invalidate solution
+   void invalidate()
    {
-      return _hasBasis;
-   }
-
-   /// gets basis information if available; returns true on success
-   bool getBasis(DataArray<SPxSolver::VarStatus> rows, DataArray<SPxSolver::VarStatus> cols) const
-   {
-      if( _hasBasis )
-      {
-         rows = _basisStatusRows;
-         cols = _basisStatusCols;
-      }
-
-      return _hasBasis;
+      _hasPrimal = false;
+      _hasPrimalRay = false;
+      _hasDual = false;
+      _hasDualFarkas = false;
    }
 
 private:
    DVectorBase<R> _primal;
    DVectorBase<R> _slacks;
-   DVectorBase<R> _primalray;
+   DVectorBase<R> _primalRay;
    DVectorBase<R> _dual;
-   DVectorBase<R> _redcost;
-   DVectorBase<R> _dualfarkas;
-
-   DataArray< SPxSolver::VarStatus > _basisStatusRows;
-   DataArray< SPxSolver::VarStatus > _basisStatusCols;
+   DVectorBase<R> _redCost;
+   DVectorBase<R> _dualFarkas;
 
    unsigned int _hasPrimal:1;
-   unsigned int _hasPrimalray:1;
+   unsigned int _hasPrimalRay:1;
    unsigned int _hasDual:1;
-   unsigned int _hasDualfarkas:1;
-   unsigned int _hasBasis:1;
+   unsigned int _hasDualFarkas:1;
 
    /// default constructor only for friends
    SolBase<R>()
    {
-      _invalidate();
+      invalidate();
    }
 
-   /// invalidate solution
-   void _invalidate()
+   /// assignment operator only for friends
+   SolBase<R>& operator=(const SolBase<R>& sol)
    {
-      _hasPrimal = false;
-      _hasPrimalray = false;
-      _hasDual = false;
-      _hasDualfarkas = false;
-      _hasBasis = false;
+      if( this != &sol )
+      {
+
+         _hasPrimal = sol._hasPrimal;
+         if( _hasPrimal )
+         {
+            _primal = sol._primal;
+            _slacks = sol._slacks;
+         }
+
+         _hasPrimalRay = sol._hasPrimalRay;
+         if( _hasPrimalRay )
+            _primalRay = sol._primalRay;
+
+         _hasDual = sol._hasDual;
+         if( _hasDual )
+         {
+            _dual = sol._dual;
+            _redCost = sol._redCost;
+         }
+
+         _hasDualFarkas = sol._hasDualFarkas;
+         if( _hasDualFarkas )
+            _dualFarkas = sol._dualFarkas;
+      }
+   }
+
+   /// assignment operator only for friends
+   template < class S >
+   SolBase<R>& operator=(const SolBase<S>& sol)
+   {
+      if( (SolBase<S>*)this != &sol )
+      {
+
+         _hasPrimal = sol._hasPrimal;
+         if( _hasPrimal )
+         {
+            _primal = sol._primal;
+            _slacks = sol._slacks;
+         }
+
+         _hasPrimalRay = sol._hasPrimalRay;
+         if( _hasPrimalRay )
+            _primalRay = sol._primalRay;
+
+         _hasDual = sol._hasDual;
+         if( _hasDual )
+         {
+            _dual = sol._dual;
+            _redCost = sol._redCost;
+         }
+
+         _hasDualFarkas = sol._hasDualFarkas;
+         if( _hasDualFarkas )
+            _dualFarkas = sol._dualFarkas;
+      }
    }
 };
 } // namespace soplex
