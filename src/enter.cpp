@@ -964,6 +964,7 @@ bool SPxSolver::enter(SPxId& enterId)
 
    Real leaveVal = -enterMax;
 
+   boundflips = 0;
    int leaveIdx = theratiotester->selectLeave(leaveVal, enterTest);
 
    /* in row representation, fixed columns and rows should not leave the basis */
@@ -1030,7 +1031,6 @@ bool SPxSolver::enter(SPxId& enterId)
          << "breakpoints passed / bounds flipped = " << boundflips
          << std::endl; )
          totalboundflips += boundflips;
-         boundflips = 0;
       }
 
       (*theCoPrhs)[leaveIdx] = enterRO;
