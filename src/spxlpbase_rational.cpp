@@ -17,7 +17,7 @@
  * @brief Saving LPs with Rational values in a form suitable for SoPlex.
  */
 
-#ifdef SOPLEX_WITH_GMP
+
 
 #include <assert.h>
 #include <stdio.h>
@@ -2290,7 +2290,7 @@ template class SPxLPBase < Rational >;
 
 } // namespace soplex
 
-#endif
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Emacs Local Variables:

@@ -26,136 +26,226 @@
 
 #include "spxdefines.h"
 
-
-
-#ifdef SOPLEX_WITH_GMP
-#include "gmp.h"
-#include "gmpxx.h"
-#endif
-
 namespace soplex
 {
 /**@brief   Wrapper for GMP type mpq_class.
  * @ingroup Algebra
  *
- * We wrap mpq_class so that we can replace it by SoPlex's normal Real type if GMP is not available.
+ * We wrap mpq_class so that we can replace it by a double type if GMP is not available.
  */
-#ifdef SOPLEX_WITH_GMP
 
 /// If compiled with GMP support, Rational is defined as mpq_class.
-class Rational : public mpq_class
-{
-public:
-
-   Rational()
-      : mpq_class()
+   class Rational
    {
-   }
+   private:
+      class Private;
+      Private* dpointer;
 
-   Rational(const Rational& r)
-      : mpq_class()
-   {
-      *this = r;
-   }
+   public:
+      /// default constructor
+      Rational();
 
-   Rational(const mpq_class& q)
-      : mpq_class(q)
-   {
-   }
+      /// copy constructor
+      Rational(const Rational& r);
 
-   Rational(const mpq_t& q)
-      : mpq_class(q)
-   {
-   }
+      /// copy assignment operator
+      Rational& operator=(const Rational&);
 
-   Rational(const long double& r)
-      : mpq_class(double(r))
-   {
-   }
+      /// constructor from long double
+      Rational(const long double& r);
 
-   Rational(const double& r)
-      : mpq_class(r)
-   {
-   }
+      /// constructor from double
+      Rational(const double& r);
 
-   Rational(const int& i)
-      : mpq_class(i)
-   {
-   }
+      ///constructor from int
+      Rational(const int& i);
 
-   explicit operator Real() const
-   {
-      return this->get_d();
-   }
+#if 0 /// not currently working
 
-   Rational operator+(const Rational& r) const
-   {
-      Rational retval = *this;
-      retval += r;
-      return retval;
-   }
+      /// constructor from mpq_class
+      Rational(const mpq_class& q);
 
-   Rational operator-(const Rational& r) const
-   {
-      Rational retval = *this;
-      retval -= r;
-      return retval;
-   }
-
-   Rational operator*(const Rational& r) const
-   {
-      Rational retval = *this;
-      retval *= r;
-      return retval;
-   }
-
-   Rational operator/(const Rational& r) const
-   {
-      Rational retval = *this;
-      retval /= r;
-      return retval;
-   }
-
-   /// read Rational from string
-   bool readString(const char* s);
-};
-
-/// return whether Rational provides exact arithmetic
-#define RationalIsExact() (true)
-
-inline static Rational abs(const Rational& r)
-{
-   Rational res = r;
-
-   if( r < 0 )
-      res *= -1;
-
-   return res;
-}
-
-/// print Rational
-std::ostream& operator<<(std::ostream& os, const Rational& q);
-
-/// Negation.
-Rational operator-(const Rational& q);
-
-#else
-
-/// If compiled without GMP support, Rational is defined as SoPlex's normal Real.
-typedef Real Rational;
-
-/// return whether Rational provides exact arithmetic
-#define RationalIsExact() (false)
+      /// constructor from mpq_t
+      Rational(const mpq_t& q);
 
 #endif
 
-/// convert rational number to string
-std::string rationalToString(const Rational& r, const bool asfloat = true);
+      /// typecasts Rational to double (only allows explicit typecasting)
+      explicit operator double() const;
 
-/// read Rational from string
-bool readStringRational(const char* s, Rational& value);
+      /// addition operator
+      Rational operator+(const Rational& r) const;
+
+      /// addition assignment operator
+      Rational operator+=(const Rational& r) const;
+
+      /// addition operator for doubles
+      Rational operator+(const double& r) const;
+
+      /// addition assignment operator  for doubles
+      Rational operator+=(const double& r) const;
+
+      /// subtraction operator
+      Rational operator-(const Rational& r) const;
+
+      /// subtraction assignment operator
+      Rational operator-=(const Rational& r) const;
+
+      /// subtraction operator for doubles
+      Rational operator-(const double& r) const;
+
+      /// subtraction assignment operator for doubles
+      Rational operator-=(const double& r) const;
+
+      /// multiplication operator
+      Rational operator*(const Rational& r) const;
+
+      /// multiplication assignment operator operator
+      Rational operator*=(const Rational& r) const;
+
+      /// multiplication operator for doubles
+      Rational operator*(const double& r) const;
+
+      /// multiplication assignment operator for doubles
+      Rational operator*=(const double& r) const;
+
+      /// division operator
+      Rational operator/(const Rational& r) const;
+
+      /// division assignment operator
+      Rational operator/=(const Rational& r) const;
+
+      /// division operator for doubles
+      Rational operator/(const double& r) const;
+
+      /// division assignment operator for doubles
+      Rational operator/=(const double& r) const;
+
+      /// read Rational from string
+      bool readString(const char* s);
+
+      /// TODO: Place "#define RationalIsExact() (true/false)" in .cpp
+
+      friend std::string rationalToString(const Rational& r, const bool asfloat);
+      friend bool readStringRational(const char* s, Rational& value);
+      friend Rational abs(const Rational& r);
+      friend std::ostream& operator<<(std::ostream& os, const Rational& q);
+      friend Rational operator-(const Rational& q);
+      friend bool operator!=(const Rational& r, const Rational& s);
+      friend bool operator==(const Rational& r, const Rational& s);
+      friend bool operator<(const Rational& r, const Rational& s);
+      friend bool operator<=(const Rational& r, const Rational& s);
+      friend bool operator>(const Rational& r, const Rational& s);
+      friend bool operator>=(const Rational& r, const Rational& s);
+
+      friend bool operator!=(const Rational& r, const double& s);
+      friend bool operator==(const Rational& r, const double& s);
+      friend bool operator<(const Rational& r, const double& s);
+      friend bool operator<=(const Rational& r, const double& s);
+      friend bool operator>(const Rational& r, const double& s);
+      friend bool operator>=(const Rational& r, const double& s);
+
+      friend bool operator!=(const double& r, const Rational& s);
+      friend bool operator==(const double& r, const Rational& s);
+      friend bool operator<(const double& r, const Rational& s);
+      friend bool operator<=(const double& r, const Rational& s);
+      friend bool operator>(const double& r, const Rational& s);
+      friend bool operator>=(const double& r, const Rational& s);
+
+      friend Rational operator+(const double& d, const Rational& r);
+      friend Rational operator-(const double& d, const Rational& r);
+      friend Rational operator*(const double& d, const Rational& r);
+      friend Rational operator/(const double& d, const Rational& r);
+   };
+
+   /// convert rational number to string
+   std::string rationalToString(const Rational& r, const bool asfloat = true);
+
+   /// read Rational from string
+   bool readStringRational(const char* s, Rational& value);
+
+   /// absolute function
+   Rational abs(const Rational& r);
+
+   /// print Rational
+   std::ostream& operator<<(std::ostream& os, const Rational& q);
+
+   /// Negation.
+   Rational operator-(const Rational& q);
+
+   /// equality operator
+   bool operator==(const Rational& r, const Rational& s);
+
+   /// inequality operator
+   bool operator!=(const Rational& r, const Rational& s);
+
+   /// less than operator
+   bool operator<(const Rational& r, const Rational& s);
+
+   /// less than or equal to operator
+   bool operator<=(const Rational& r, const Rational& s);
+
+   /// greater than operator
+   bool operator>(const Rational& r, const Rational& s);
+
+   /// greater than or equal to operator
+   bool operator>=(const Rational& r, const Rational& s);
+
+
+
+   /// equality operator for Rational and double
+   bool operator==(const Rational& r, const double& s);
+
+   /// inequality operator for Rational and double
+   bool operator!=(const Rational& r, const double& s);
+
+   /// less than operator for Rational and double
+   bool operator<(const Rational& r, const double& s);
+
+   /// less than or equal to operator for Rational and double
+   bool operator<=(const Rational& r, const double& s);
+
+   /// greater than operator for Rational and double
+   bool operator>(const Rational& r, const double& s);
+
+   /// greater than or equal to operator for Rational and double
+   bool operator>=(const Rational& r, const double& s);
+
+
+
+   /// equality operator for double and Rational
+   bool operator==(const double& r, const Rational& s);
+
+   /// inequality operator for double and Rational
+   bool operator!=(const double& r, const Rational& s);
+
+   /// less than operator for double and Rational
+   bool operator<(const double& r, const Rational& s);
+
+   /// less than or equal to operator for double and Rational
+   bool operator<=(const double& r, const Rational& s);
+
+   /// greater than operator for double and Rational
+   bool operator>(const double& r, const Rational& s);
+
+   /// greater than or equal to operator for double and Rational
+   bool operator>=(const double& r, const Rational& s);
+
+
+   /// addition operator for double and Rational
+   Rational operator+(const double& d, const Rational& r);
+
+   /// addition operator for double and Rational
+   Rational operator+(const double& d, const Rational& r);
+
+   /// addition operator for double and Rational
+   Rational operator+(const double& d, const Rational& r);
+
+   /// addition operator for double and Rational
+   Rational operator+(const double& d, const Rational& r);
 
 } // namespace soplex
+
 #endif // _RATIONAL_H_
 
 //-----------------------------------------------------------------------------
