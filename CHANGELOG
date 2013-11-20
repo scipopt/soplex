@@ -32,6 +32,7 @@ fixed bugs:
 - throw exception if immediately after a restart the basis matrix is infeasible
 - restore slack basis if a basis with too many or too few basic entries is loaded
 - higher precison when writing .lp or .mps files, similar to SCIP standards
+- correct update of infeasibilities after dual bound flips
 
 04 Jan 2013 - Release 1.7.1
 ===========================
