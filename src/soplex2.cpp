@@ -3413,9 +3413,6 @@ namespace soplex
       // copy rounded rational LP to real LP
       syncRealLP();
 
-      _realLP->writeFile("real.lp",0,0,0);
-      _rationalLP->writeFile("rational.lp",0,0,0);
-
       // call rational solving routine
       _solveRational();
 #else
