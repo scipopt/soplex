@@ -46,7 +46,7 @@ class SVSet;
    Note that due to arithmetic operation, zeros can slip in, i.e., it is only
    guaranteed that at least every non-zero is in the IdxSet.
 */
-class SSVector : protected DVector, protected IdxSet
+class SSVector : public DVector, protected IdxSet
 {
 private:
 

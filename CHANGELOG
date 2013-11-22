@@ -14,6 +14,7 @@ code quality & new features:
 - refinement step to improve feasibility/optimality also for steep pricer (was devex only)
 - own objective sense enumerator in MPS parser
 - keep relevant bounds if bound flipping ratio test is used and display performed flips in summary
+- new method to calculate the condition number of the current basis matrix (2-norm, estimate)
 
 interface:
 - renamed class MpqReal to Rational

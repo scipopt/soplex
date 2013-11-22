@@ -943,6 +943,73 @@ Vector& SPxBasis::multBaseWith(Vector& x) const
    return x;
 }
 
+/* compute an estimated condition number for the current basis matrix
+ * by computing estimates of the norms of B and B^-1 using the power method.
+ * maxiters and tolerance control the accuracy of the estimate.
+ */
+Real SPxBasis::condition(int maxiters, Real tolerance)
+{
+   int dimension = matrix.size();
+   int i;
+   int c;
+   Real norm;
+   Real norminv;
+   Real norm1;
+   Real norm2;
+
+   SSVector x(dimension);
+   SSVector y(dimension);
+
+   // initialize vectors
+   norm1 = 1.0 / (Real) dimension;
+   for( i = 0; i < dimension; i++ )
+      x.add(i, norm1);
+   y = x;
+
+   // compute norm of B
+   for( c = 0; c < maxiters; ++c )
+   {
+      norm2 = norm1;
+      // y = B*x
+      y = *matrix[0];
+      y *= x[0];
+      for( i = 1; i < dimension; ++i )
+         y.multAdd(x[i], (*matrix[i]));
+      norm1 = y.length();
+      // stop if converged
+      if( abs(norm1 - norm2) < tolerance * norm1 )
+         break;
+      // x = B^T*y
+      x.setValue(0, (*matrix[0]) * y);
+      for( i = 1; i < dimension; ++i )
+         x.setValue(i, (*matrix[i]) * y);
+      x *= 1.0 / x.length();
+   }
+   norm = norm1;
+
+   // reinitialize vectors
+   norm1 = 1.0 / (Real) dimension;
+   for( i = 0; i < dimension; i++ )
+      x.setValue(i, norm1);
+   y = x;
+
+   // compute norm of B^-1
+   for( c = 0; c < maxiters; ++c )
+   {
+      norm2 = norm1;
+      factor->solveRight(x, y);
+      norm1 = x.length();
+      // stop if converged
+      if( abs(norm1 - norm2) < tolerance * norm1 )
+         break;
+      factor->solveLeft(y, x);
+      y *= 1.0 / y.length();
+   }
+   norminv = norm1;
+
+   return norm * norminv;
+}
+
 void SPxBasis::dump()
 {
    METHOD( "SPxBasis::dump()" );
