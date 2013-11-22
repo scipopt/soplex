@@ -309,6 +309,43 @@ public:
       }
       return x;
    }
+
+   /// inner product for sparse vectors
+   Real operator*(const SVector& w) const
+   {
+      Real x = 0;
+      int i;
+      int j;
+      int n = size();
+      int m = w.size();
+
+      Element* e = m_elem;
+      Element wj = w.element(0);
+
+      for( i = 0, j = 0; i < n || j < m; ++i, ++j )
+      {
+
+         if( e->idx == wj.idx )
+         {
+            x += e->val * wj.val;
+            e++;
+            ++i;
+            ++j;
+            wj = w.element(j);
+         }
+         else if( e->idx < wj.idx )
+         {
+            e++;
+            i++;
+         }
+         else if( e->idx > wj.idx )
+         {
+            j++;
+            wj = w.element(j);
+         }
+      }
+      return x;
+   }
    //@}
 
    //-------------------------------------------

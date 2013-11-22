@@ -318,6 +318,35 @@ SSVector& SSVector::operator*=(Real x)
    return *this;
 }
 
+Real SSVector::operator*(const SSVector& w)
+{
+   Real x = 0;
+   int i;
+   int j;
+   int n = size();
+   int m = w.size();
+   int vi = index(i);
+   int wj = w.index(j);
+
+   for( i = 0, j = 0; i < n && j < m; )
+   {
+      if( vi == wj )
+      {
+         x += val[vi] * w.val[wj];
+         ++i;
+         ++j;
+         vi = index(i);
+         wj = w.index(j);
+      }
+      else if( vi < wj )
+         vi = index(++i);
+      else if( vi > wj )
+         wj = w.index(++j);
+   }
+   return x;
+}
+
+
 Real SSVector::maxAbs() const
 {
    if (isSetup())

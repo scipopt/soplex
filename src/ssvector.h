@@ -277,6 +277,9 @@ public:
    /// vector scaling.
    SSVector& operator*=(Real x);
 
+   /// sparse inner product
+   Real operator*(const SSVector& w);
+
    ///
    //SSVector& multAdd(Real x, const SSVector& vec);
    ///
