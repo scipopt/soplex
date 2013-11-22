@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION="1.7.0.4"
+VERSION="1.7.0.5"
 NAME="soplex-$VERSION"
 rm -f $NAME
 ln -s . $NAME
