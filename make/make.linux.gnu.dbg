@@ -1,2 +1,2 @@
 CPPFLAGS	+=
-CXXFLAGS	+=	-O0 -g -mtune=native -fomit-frame-pointer # -malign-double -ffast-math
+CXXFLAGS	+=	-O0 -g -fomit-frame-pointer # -malign-double -ffast-math
