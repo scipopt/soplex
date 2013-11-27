@@ -334,7 +334,7 @@ namespace soplex
             // lower bound
             modLower[c] = lowerRational(c);
 
-            if( modLower[c] > double(-realParam(SoPlex2::INFTY)) )
+            if( double(modLower[c]) > double(-realParam(SoPlex2::INFTY)) )
                modLower[c] -= sol._primal[c];
 
             if( modLower[c] > boundsViolation )
@@ -343,7 +343,7 @@ namespace soplex
             // upper bound
             modUpper[c] = upperRational(c);
 
-            if( modUpper[c] < double(realParam(SoPlex2::INFTY)) )
+            if( double(modUpper[c]) < double(realParam(SoPlex2::INFTY)) )
                modUpper[c] -= sol._primal[c];
 
             if( modUpper[c] < -boundsViolation )
@@ -416,13 +416,13 @@ namespace soplex
 
          // check progress
          Rational sumMaxViolation = boundsViolation + sideViolation + redcostViolation;
-         if( sumMaxViolation > double(0.9 * bestViolation) )
+         if( double(sumMaxViolation) > double(0.9 * bestViolation) )
          {
             MSG_INFO2( spxout << "Refinement failed to reduce violation significantly.\n" );
             numFailedRefinements++;
          }
 
-         if( sumMaxViolation < double(bestViolation) )
+         if( double(sumMaxViolation) < double(bestViolation) )
             bestViolation = Real(sumMaxViolation);
 
          if( numFailedRefinements >= 15 )
@@ -1258,13 +1258,13 @@ namespace soplex
          _rationalLP->changeObj(c, 0);
          _realLP->changeObj(c, 0.0);
 
-         if( lowerRational(c) > double(-realParam(SoPlex2::INFTY)) )
+         if( double(lowerRational(c)) > double(-realParam(SoPlex2::INFTY)) )
          {
             _rationalLP->changeLower(c, 0);
             _realLP->changeLower(c, 0.0);
          }
 
-         if( upperRational(c) < double(realParam(SoPlex2::INFTY)) )
+         if( double(upperRational(c)) < double(realParam(SoPlex2::INFTY)) )
          {
             _rationalLP->changeUpper(c, 0);
             _realLP->changeUpper(c, 0.0);
@@ -1404,13 +1404,13 @@ namespace soplex
          if( lowerRational(c) > 0 )
          {
             shiftedSide -= (colVectorRational(c) * lowerRational(c));
-            _rationalLP->changeBounds(c, 0, upperRational(c) < double(realParam(SoPlex2::INFTY)) ? upperRational(c) - lowerRational(c) : upperRational(c));
+            _rationalLP->changeBounds(c, 0, double(upperRational(c)) < double(realParam(SoPlex2::INFTY)) ? upperRational(c) - lowerRational(c) : upperRational(c));
             _realLP->changeBounds(c, 0.0, (Real)upperRational(c));
          }
          else if( upperRational(c) < 0 )
          {
             shiftedSide -= (colVectorRational(c) * upperRational(c));
-            _rationalLP->changeBounds(c, lowerRational(c) > double(-realParam(SoPlex2::INFTY)) ? lowerRational(c) - upperRational(c) : lowerRational(c), 0);
+            _rationalLP->changeBounds(c, double(lowerRational(c)) > double(-realParam(SoPlex2::INFTY)) ? lowerRational(c) - upperRational(c) : lowerRational(c), 0);
             _realLP->changeBounds(c, (Real)lowerRational(c), 0.0);
          }
          else
@@ -1498,7 +1498,7 @@ namespace soplex
 
       for( int c = numOrigCols - 1; c >= 0; c-- )
       {
-         assert(upperRational(c) >= double(realParam(SoPlex2::INFTY)) || lowerRational(c) <= double(-realParam(SoPlex2::INFTY))
+         assert(double(upperRational(c)) >= double(realParam(SoPlex2::INFTY)) || double(lowerRational(c)) <= double(-realParam(SoPlex2::INFTY))
             || _feasLower[c] - lowerRational(c) == _feasUpper[c] - upperRational(c));
 
          _rationalLP->changeBounds(c, _feasLower[c], _feasUpper[c]);
@@ -1602,14 +1602,14 @@ namespace soplex
 
          if( minusRedCost > 0 )
          {
-            if( upper[c] < double(realParam(SoPlex2::INFTY)) )
+            if( double(upper[c]) < double(realParam(SoPlex2::INFTY)) )
                temp += minusRedCost * upper[c];
             else
                isTempFinite = false;
          }
          else if( minusRedCost < 0 )
          {
-            if( lower[c] > double(-realParam(SoPlex2::INFTY)) )
+            if( double(lower[c]) > double(-realParam(SoPlex2::INFTY)) )
                temp += minusRedCost * lower[c];
             else
                isTempFinite = false;
@@ -1695,7 +1695,7 @@ namespace soplex
 
          // if the multiplier is positive we inspect the lower bound: if it is finite and within the Farkas box, we can
          // increase B by including it in the Farkas proof
-         if( minusRedCost < 0 && lower[colIdx] > -B && lower[colIdx] > double(-realParam(SoPlex2::INFTY)) )
+         if( minusRedCost < 0 && lower[colIdx] > -B && double(lower[colIdx]) > double(-realParam(SoPlex2::INFTY)) )
          {
             ytransA.clearNum(n);
             ytransb -= minusRedCost * lower[colIdx];
@@ -1728,7 +1728,7 @@ namespace soplex
          }
          // if the multiplier is negative we inspect the upper bound: if it is finite and within the Farkas box, we can
          // increase B by including it in the Farkas proof
-         else if( minusRedCost > 0 && upper[colIdx] < B && upper[colIdx] < double(realParam(SoPlex2::INFTY)) )
+         else if( minusRedCost > 0 && upper[colIdx] < B && double(upper[colIdx]) < double(realParam(SoPlex2::INFTY)) )
          {
             ytransA.clearNum(n);
             ytransb -= minusRedCost * upper[colIdx];
