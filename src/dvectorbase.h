@@ -174,7 +174,7 @@ public:
    /// Assignment operator.
    DVectorBase<R>& operator=(const DVectorBase<R>& vec)
    {
-      if( (void*)this != (void*)&vec )
+      if( this != &vec )
       {
          if( vec.dim() != VectorBase<R>::dim() )
             reDim(vec.dim());
