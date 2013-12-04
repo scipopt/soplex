@@ -105,6 +105,9 @@ public:
    }
 
    /// Copy constructor.
+   /** The redundancy with the copy constructor below is necessary since otherwise the compiler doesn't realize that it
+    *  could use the more general one with S = R and generates a shallow copy constructor.
+    */
    DSVectorBase<R>(const DSVectorBase<R>& old)
       : SVectorBase<R>()
       , theelem(0)
@@ -278,6 +281,42 @@ public:
    //@}
 };
 
+
+
+/// Allocate memory for \p n nonzeros (specialization for Real).
+template<>
+inline void DSVectorBase<Real>::allocMem(int n)
+{
+   spx_alloc(theelem, n);
+   SVectorBase<Real>::setMem(n, theelem);
+}
+
+
+
+/// Destructor (specialization for Real).
+template<>
+inline DSVectorBase<Real>::~DSVectorBase()
+{
+   if( theelem )
+      spx_free(theelem);
+}
+
+
+
+/// Reset nonzero memory to >= \p newmax.
+/** This methods resets the memory consumption to \p newmax. However, if \p newmax < size(), it is
+ *  reset to size() only (specialization for Real).
+ */
+template<>
+inline void DSVectorBase<Real>::setMax(int newmax)
+{
+   int siz = size();
+   int len = (newmax < siz) ? siz : newmax;
+
+   spx_realloc(theelem, len);
+   setMem (len, theelem);
+   set_size( siz );
+}
 } // namespace soplex
 #endif // _DSVECTORBASE_H_
 

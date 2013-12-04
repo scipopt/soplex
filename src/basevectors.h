@@ -14,7 +14,7 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file  vectors.h
+/**@file  basevectors.h
  * @brief Collection of dense, sparse, and semi-sparse vectors.
  */
 #ifndef _BASEVECTORS_H_
@@ -77,7 +77,7 @@ VectorBase<R>& VectorBase<R>::assign(const SVectorBase<S>& vec)
  */
 template < class R >
 template < class S >
-VectorBase<R>& VectorBase<R>::operator=(const SSVectorBase<S>& vec)
+inline VectorBase<R>& VectorBase<R>::operator=(const SSVectorBase<S>& vec)
 {
    if( vec.isSetup() )
    {
@@ -129,6 +129,27 @@ VectorBase<R>& VectorBase<R>::operator+=(const SVectorBase<S>& vec)
    return *this;
 }
 
+/// Addition.
+template < class R >
+template < class S >
+VectorBase<R>& VectorBase<R>::operator+=(const SSVectorBase<S>& vec)
+{
+   assert(dim() == vec.dim());
+
+   if ( vec.isSetup() )
+   {
+      for( int i = 0; i < vec.size() ; i++ )
+         val[vec.index(i)] += vec.value(i);
+   }
+   else
+   {
+      for( int i = 0; i < dim(); i++ )
+         val[i] += vec[i];
+   }
+
+   return *this;
+}
+
 /// Subtraction.
 template < class R >
 template < class S >
@@ -151,15 +172,23 @@ VectorBase<R>& VectorBase<R>::operator-=(const SSVectorBase<S>& vec)
 {
    assert(dim() == vec.dim());
 
-   for( int i = 0; i < dim(); i++ )
-      val[i] -= vec[i];
+   if ( vec.isSetup() )
+   {
+      for( int i = 0; i < vec.size() ; i++ )
+         val[vec.index(i)] -= vec.value(i);
+   }
+   else
+   {
+      for( int i = 0; i < dim(); i++ )
+         val[i] -= vec[i];
+   }
 
    return *this;
 }
 
 /// Inner product.
 template < class R >
-R VectorBase<R>::operator*(const SVectorBase<R>& vec) const
+inline R VectorBase<R>::operator*(const SVectorBase<R>& vec) const
 {
    assert(dim() >= vec.dim());
 
@@ -173,7 +202,7 @@ R VectorBase<R>::operator*(const SVectorBase<R>& vec) const
 
 /// Inner product.
 template < class R >
-R VectorBase<R>::operator*(const SSVectorBase<R>& vec) const
+inline R VectorBase<R>::operator*(const SSVectorBase<R>& vec) const
 {
    assert(dim() == vec.dim());
 
@@ -198,7 +227,7 @@ R VectorBase<R>::operator*(const SSVectorBase<R>& vec) const
 /// Addition of scaled vector.
 template < class R >
 template < class S, class T >
-VectorBase<R>& VectorBase<R>::multAdd(S x, const SVectorBase<T>& vec)
+inline VectorBase<R>& VectorBase<R>::multAdd(S x, const SVectorBase<T>& vec)
 {
    for( int i = 0; i < vec.size(); i++ )
    {

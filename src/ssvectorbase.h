@@ -488,6 +488,12 @@ public:
       return x;
    }
 
+   /// Floating point approximation of euclidian norm (without any approximation guarantee).
+   Real length() const
+   {
+      return sqrt((Real)length2());
+   }
+
    //@}
 
    // ------------------------------------------------------------------------------------------------------------------
@@ -621,6 +627,9 @@ public:
    }
 
    /// Copy constructor.
+   /** The redundancy with the copy constructor below is necessary since otherwise the compiler doesn't realize that it
+    *  could use the more general one with S = R and generates a shallow copy constructor.
+    */
    SSVectorBase<R>(const SSVectorBase<R>& vec)
       : DVectorBase<R>(vec)
       , IdxSet()

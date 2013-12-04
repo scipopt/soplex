@@ -104,6 +104,9 @@ public:
    }
 
    /// Copy constructor.
+   /** The redundancy with the copy constructor below is necessary since otherwise the compiler doesn't realize that it
+    *  could use the more general one with S = R and generates a shallow copy constructor.
+    */
    DVectorBase<R>(const DVectorBase<R>& old)
       : VectorBase<R>(0, 0)
       , mem(0)
@@ -287,16 +290,80 @@ public:
          return MSGinconsistent("DVectorBase");
 
       return VectorBase<R>::isConsistent();
-#endif
-
+#else
       return true;
+#endif
    }
 
    //@}
 };
 
+
+
+/// Resets \ref soplex::DVectorBase "DVectorBase"'s memory size to \p newsize (specialization for Real).
+template<>
+inline void DVectorBase<Real>::reSize(int newsize)
+{
+   assert(newsize >= dim());
+
+   spx_realloc(mem, newsize);
+
+   val = mem;
+   memsize = newsize;
+}
+
+
+
+/// Default constructor with \p d as the initial dimension (specialization for Real).
+template<>
+inline DVectorBase<Real>::DVectorBase(int d)
+   : VectorBase<Real>(0, 0)
+   , mem(0)
+{
+   memsize = (d > 0) ? d : 4;
+   spx_alloc(mem, memsize);
+   val = mem;
+   dimen = d;
+
+   assert(DVectorBase<Real>::isConsistent());
+}
+
+
+
+/// Copy constructor (specialization for Real).
+template<>
+template<>
+inline DVectorBase<Real>::DVectorBase(const VectorBase<Real>& old)
+   : VectorBase<Real>(0, 0)
+   , mem( 0 )
+{
+   dimen = old.dim();
+   memsize = dimen;
+   spx_alloc(mem, memsize);
+   val = mem;
+   *this = old;
+
+   assert(DVectorBase<Real>::isConsistent());
+}
+
+
+
+/// Copy constructor (specialization for Real).
+template<>
+inline DVectorBase<Real>::DVectorBase(const DVectorBase<Real>& old)
+   : VectorBase<Real>(0, 0)
+   , mem(0)
+{
+   dimen = old.dim();
+   memsize = old.memsize;
+   spx_alloc(mem, memsize);
+   val = mem;
+   *this = old;
+
+   assert(DVectorBase<Real>::isConsistent());
+}
 } // namespace soplex
-#endif // _DVECTOR_H_
+#endif // _DVECTORBASE_H_
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:

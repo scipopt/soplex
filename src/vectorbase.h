@@ -242,6 +242,10 @@ public:
    template < class S >
    VectorBase<R>& operator+=(const SVectorBase<S>& vec);
 
+   /// Addition.
+   template < class S >
+   VectorBase<R>& operator+=(const SSVectorBase<S>& vec);
+
    /// Subtraction.
    template < class S >
    VectorBase<R>& operator-=(const VectorBase<S>& vec)
@@ -432,6 +436,33 @@ private:
 
    //@}
 };
+
+
+
+/// Assignment operator (specialization for Real).
+template <>
+inline VectorBase<Real>& VectorBase<Real>::operator=(const VectorBase<Real>& vec)
+{
+   if( this != &vec )
+   {
+      assert(dim() == vec.dim());
+
+      memcpy(val, vec.val, dimen*sizeof(Real));
+
+      assert(isConsistent());
+   }
+   return *this;
+}
+
+
+
+/// Set vector to 0 (specialization for Real).
+template<>
+inline void VectorBase<Real>::clear()
+{
+   if( dimen > 0 )
+      memset(val, 0, dimen * sizeof(Real));
+}
 
 } // namespace soplex
 #endif // _VECTORBASE_H_

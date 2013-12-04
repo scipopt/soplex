@@ -287,6 +287,9 @@ public:
    {
       assert(n + size() <= max());
 
+      if( n <= 0 )
+         return;
+
       Nonzero<R>* e = m_elem + size();
 
       set_size( size() + n );
@@ -302,6 +305,9 @@ public:
    void add(int n, const Nonzero<R> e[])
    {
       assert(n + size() <= max());
+
+      if( n <= 0 )
+         return;
 
       Nonzero<R>* ee = m_elem + size();
 
