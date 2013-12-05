@@ -26,6 +26,15 @@
 
 #include "spxdefines.h"
 
+#ifdef SOPLEX_WITH_GMP
+#include "gmp.h"
+#endif
+
+#ifdef SOPLEX_WITH_GMPXX
+#include "gmp.h"
+#include "gmpxx.h"
+#endif
+
 namespace soplex
 {
 /**@brief   Wrapper for GMP type mpq_class.
@@ -42,6 +51,10 @@ namespace soplex
       Private* dpointer;
 
    public:
+
+      //**@name Construction and destruction */
+      //@{
+
       /// default constructor
       Rational();
 
@@ -60,18 +73,39 @@ namespace soplex
       ///constructor from int
       Rational(const int& i);
 
-#if 0 /// not currently working
-
-      /// constructor from mpq_class
-      Rational(const mpq_class& q);
+#if SOPLEX_WITH_GMP
 
       /// constructor from mpq_t
       Rational(const mpq_t& q);
 
 #endif
 
+#ifdef SOPLEX_WITH_GMPXX
+
+      /// constructor from mpq_class
+      Rational(const mpq_class& q);
+
+      /// constructor from mpq_t
+      Rational(const mpq_t& q);
+#endif
+
+      /// destructor
+      ~Rational();
+
+      //@}
+
+
+      //**@name Typecasts */
+      //@{
+
       /// typecasts Rational to double (only allows explicit typecasting)
       explicit operator double() const;
+
+      //@}
+
+
+      //**@name Arithmetic operators */
+      //@{
 
       /// addition operator
       Rational operator+(const Rational& r) const;
@@ -121,16 +155,19 @@ namespace soplex
       /// division assignment operator for doubles
       Rational operator/=(const double& r) const;
 
+      //@}
+
+
+      //**@name Conversion from and to String */
+      //@{
+
       /// read Rational from string
       bool readString(const char* s);
 
-      /// TODO: Place "#define RationalIsExact() (true/false)" in .cpp
-
       friend std::string rationalToString(const Rational& r, const bool asfloat);
       friend bool readStringRational(const char* s, Rational& value);
-      friend Rational abs(const Rational& r);
       friend std::ostream& operator<<(std::ostream& os, const Rational& q);
-      friend Rational operator-(const Rational& q);
+
       friend bool operator!=(const Rational& r, const Rational& s);
       friend bool operator==(const Rational& r, const Rational& s);
       friend bool operator<(const Rational& r, const Rational& s);
@@ -156,6 +193,10 @@ namespace soplex
       friend Rational operator-(const double& d, const Rational& r);
       friend Rational operator*(const double& d, const Rational& r);
       friend Rational operator/(const double& d, const Rational& r);
+
+      friend Rational abs(const Rational& r);
+      friend int sign(const Rational& r);
+      friend Rational operator-(const Rational& q);
    };
 
    /// convert rational number to string
@@ -164,14 +205,14 @@ namespace soplex
    /// read Rational from string
    bool readStringRational(const char* s, Rational& value);
 
-   /// absolute function
-   Rational abs(const Rational& r);
-
    /// print Rational
-   std::ostream& operator<<(std::ostream& os, const Rational& q);
+   std::ostream& operator<<(std::ostream& os, const Rational& r);
 
-   /// Negation.
-   Rational operator-(const Rational& q);
+   //@}
+
+
+   //**@name Relational operators */
+   //@{
 
    /// equality operator
    bool operator==(const Rational& r, const Rational& s);
@@ -231,6 +272,11 @@ namespace soplex
    /// greater than or equal to operator for double and Rational
    bool operator>=(const double& r, const Rational& s);
 
+   //@}
+
+
+   //**@name Non-member arithmetic operators and functions */
+   //@{
 
    /// addition operator for double and Rational
    Rational operator+(const double& d, const Rational& r);
@@ -243,6 +289,17 @@ namespace soplex
 
    /// addition operator for double and Rational
    Rational operator+(const double& d, const Rational& r);
+
+   /// absolute function
+   Rational abs(const Rational& r);
+
+   /// Sign function; returns 1 if r > 0, 0 if r = 0, and -1 if r < 0.
+   int sign(const Rational& r);
+
+   /// Negation.
+   Rational operator-(const Rational& r);
+
+   //@}
 
 } // namespace soplex
 

@@ -1053,14 +1053,14 @@ template class SVectorBase < Real >;
 template class DSVectorBase < Real >;
 template class SVSetBase < Real >;
 
-#ifdef SOPLEX_WITH_GMP
+
 template class VectorBase < Rational >;
 template class DVectorBase < Rational >;
 template class SVectorBase < Rational >;
 template class DSVectorBase < Rational >;
 template class SSVectorBase < Rational >;
 template class SVSetBase < Rational >;
-#endif
+
 
 }
 

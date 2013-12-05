@@ -16,7 +16,7 @@
 /**@file  ratrecon.h
  * @brief Rational reconstruction of solution vector
  */
-#ifdef SOPLEX_WITH_GMP
+
 
 #ifndef _RATRECON_H_
 #define _RATRECON_H_
@@ -41,7 +41,7 @@ namespace soplex
 
 } // namespace soplex
 #endif // _RATRECON_H_
-#endif // SOPLEX_WITH_GMP
+
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:
 //Emacs mode:c++

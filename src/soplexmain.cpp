@@ -144,15 +144,17 @@ void printVersionInfo( bool checkMode)
 #endif
              << "]";
 
-   std::cout << "[SOPLEX_WITH_GMP:"
+std::cout << "[RATIONAL:"
 #ifdef SOPLEX_WITH_GMP
-             << "YES"
+             << "GMP"
+#elif SOPLEX_WITH_GMPXX
+             << "GMPXX"
 #else
-             << "NO"
+             << "DOUBLE"
 #endif
              << "]" << std::endl;
 
-   std::cout << std::endl;
+std::cout << std::endl;
 }
 
 #if 0

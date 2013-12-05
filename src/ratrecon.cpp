@@ -13,7 +13,7 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#ifdef SOPLEX_WITH_GMP
+
 
 #include <iostream>
 #include <assert.h>
@@ -298,7 +298,7 @@ namespace soplex
 
 } // namespace soplex
 
-#endif // SOPLEX_WITH_GMP
+
 
 //-----------------------------------------------------------------------------
 //Emacs Local Variables:
