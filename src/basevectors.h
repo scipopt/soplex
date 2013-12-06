@@ -40,6 +40,9 @@ namespace soplex
 /** Assigning an SVectorBase to a VectorBase using operator=() will set all values to 0 except the nonzeros of \p vec.
  *  This is diffent in method assign().
  */
+
+
+
 template < class R >
 template < class S >
 inline VectorBase<R>& VectorBase<R>::operator=(const SVectorBase<S>& vec)
@@ -57,6 +60,8 @@ inline VectorBase<R>& VectorBase<R>::operator=(const SVectorBase<S>& vec)
    return *this;
 }
 
+
+
 /// Assign values of \p vec.
 /** Assigns all nonzeros of \p vec to the vector.  All other values remain unchanged. */
 template < class R >
@@ -70,6 +75,8 @@ VectorBase<R>& VectorBase<R>::assign(const SVectorBase<S>& vec)
 
    return *this;
 }
+
+
 
 /// Assignment operator.
 /** Assigning an SSVectorBase to a VectorBase using operator=() will set all values to 0 except the nonzeros of \p vec.
@@ -89,6 +96,8 @@ inline VectorBase<R>& VectorBase<R>::operator=(const SSVectorBase<S>& vec)
 
    return *this;
 }
+
+
 
 /// Assign values of \p vec.
 /** Assigns all nonzeros of \p vec to the vector.  All other values remain unchanged. */
@@ -114,6 +123,8 @@ inline VectorBase<R>& VectorBase<R>::assign(const SSVectorBase<S>& vec)
    return *this;
 }
 
+
+
 /// Addition.
 template < class R >
 template < class S >
@@ -128,6 +139,8 @@ VectorBase<R>& VectorBase<R>::operator+=(const SVectorBase<S>& vec)
 
    return *this;
 }
+
+
 
 /// Addition.
 template < class R >
@@ -150,6 +163,8 @@ VectorBase<R>& VectorBase<R>::operator+=(const SSVectorBase<S>& vec)
    return *this;
 }
 
+
+
 /// Subtraction.
 template < class R >
 template < class S >
@@ -164,6 +179,8 @@ VectorBase<R>& VectorBase<R>::operator-=(const SVectorBase<S>& vec)
 
    return *this;
 }
+
+
 
 /// Subtraction.
 template < class R >
@@ -186,6 +203,8 @@ VectorBase<R>& VectorBase<R>::operator-=(const SSVectorBase<S>& vec)
    return *this;
 }
 
+
+
 /// Inner product.
 template < class R >
 inline R VectorBase<R>::operator*(const SVectorBase<R>& vec) const
@@ -199,6 +218,8 @@ inline R VectorBase<R>::operator*(const SVectorBase<R>& vec) const
 
    return x;
 }
+
+
 
 /// Inner product.
 template < class R >
@@ -224,6 +245,8 @@ inline R VectorBase<R>::operator*(const SSVectorBase<R>& vec) const
       return operator*(static_cast<const VectorBase<R>&>(vec));
 }
 
+
+
 /// Addition of scaled vector.
 template < class R >
 template < class S, class T >
@@ -237,6 +260,8 @@ inline VectorBase<R>& VectorBase<R>::multAdd(S x, const SVectorBase<T>& vec)
 
    return *this;
 }
+
+
 
 /// Addition of scaled vector.
 template < class R >
@@ -263,9 +288,13 @@ inline VectorBase<R>& VectorBase<R>::multAdd(S x, const SSVectorBase<T>& vec)
    return *this;
 }
 
+
+
 // ---------------------------------------------------------------------------------------------------------------------
 //  Methods of DVectorBase
 // ---------------------------------------------------------------------------------------------------------------------
+
+
 
 /// Assignment operator.
 template < class R >
@@ -282,9 +311,13 @@ DVectorBase<R>& DVectorBase<R>::operator=(const SVectorBase<S>& vec)
    return *this;
 }
 
+
+
 // ---------------------------------------------------------------------------------------------------------------------
 // Methods of SSVectorBase
 // ---------------------------------------------------------------------------------------------------------------------
+
+
 
 /// Addition.
 template < class R >
@@ -302,6 +335,8 @@ SSVectorBase<R>& SSVectorBase<R>::operator+=(const SVectorBase<S>& vec)
    return *this;
 }
 
+
+
 /// Subtraction.
 template < class R >
 template < class S >
@@ -317,6 +352,8 @@ SSVectorBase<R>& SSVectorBase<R>::operator-=(const SVectorBase<S>& vec)
 
    return *this;
 }
+
+
 
 /// Addition of a scaled vector.
 ///@todo SSVectorBase::multAdd() should be rewritten without pointer arithmetic.
@@ -383,6 +420,8 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
    return *this;
 }
 
+
+
 /// Assigns \f$x^T \cdot A\f$ to SSVectorBase.
 template < class R >
 template < class S, class T >
@@ -409,6 +448,8 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product(const SSVectorBase<S>& x, const
 
    return *this;
 }
+
+
 
 /// Assigns SSVectorBase to \f$A \cdot x\f$ for a setup \p x.
 #define shortProductFactor 0.5
@@ -441,6 +482,8 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product4setup(const SVSetBase<S>& A, co
    return *this;
 }
 
+
+
 /// Assignment helper.
 template < class R >
 template < class S, class T >
@@ -472,6 +515,8 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product1(const SVSetBase<S>& A, const S
 
    return *this;
 }
+
+
 
 /// Assignment helper.
 template < class R >
@@ -581,6 +626,8 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
    return *this;
 }
 
+
+
 /// Assignment helper.
 template < class R >
 template < class S, class T >
@@ -620,6 +667,8 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productFull(const SVSetBase<S>& A, cons
 
    return *this;
 }
+
+
 
 /// Assigns SSVectorBase to \f$A \cdot x\f$ thereby setting up \p x.
 template < class R >
@@ -676,6 +725,8 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productAndSetup(const SVSetBase<S>& A, 
    return *this;
 }
 
+
+
 /// Assigns only the elements of \p rhs.
 template < class R >
 template < class S >
@@ -707,6 +758,8 @@ SSVectorBase<R>& SSVectorBase<R>::assign(const SVectorBase<S>& rhs)
    return *this;
 }
 
+
+
 /// Assignment operator.
 template < class R >
 template < class S >
@@ -717,9 +770,13 @@ SSVectorBase<R>& SSVectorBase<R>::operator=(const SVectorBase<S>& rhs)
    return assign(rhs);
 }
 
+
+
 // ---------------------------------------------------------------------------------------------------------------------
 //  Methods of SVectorBase
 // ---------------------------------------------------------------------------------------------------------------------
+
+
 
 /// Assignment operator.
 template < class R >
@@ -750,6 +807,8 @@ SVectorBase<R>& SVectorBase<R>::operator=(const VectorBase<S>& vec)
    return *this;
 }
 
+
+
 /// Assignment operator.
 template < class R >
 template < class S >
@@ -772,6 +831,8 @@ SVectorBase<R>& SVectorBase<R>::operator=(const SSVectorBase<S>& sv)
    return *this;
 }
 
+
+
 /// Inner product.
 template < class R >
 R SVectorBase<R>::operator*(const VectorBase<R>& w) const
@@ -789,9 +850,13 @@ R SVectorBase<R>::operator*(const VectorBase<R>& w) const
    return x;
 }
 
+
+
 // ---------------------------------------------------------------------------------------------------------------------
 //  Methods of DSVectorBase
 // ---------------------------------------------------------------------------------------------------------------------
+
+
 
 /// Copy constructor.
 template < class R >
@@ -805,6 +870,8 @@ DSVectorBase<R>::DSVectorBase(const VectorBase<S>& vec)
    assert(isConsistent());
 }
 
+
+
 /// Copy constructor.
 template < class R >
 template < class S >
@@ -816,6 +883,8 @@ DSVectorBase<R>::DSVectorBase(const SSVectorBase<S>& old)
 
    assert(isConsistent());
 }
+
+
 
 /// Assignment operator.
 template < class R >
@@ -833,6 +902,8 @@ DSVectorBase<R>& DSVectorBase<R>::operator=(const VectorBase<S>& vec)
    return *this;
 }
 
+
+
 /// Assignment operator.
 template < class R >
 template < class S >
@@ -847,9 +918,13 @@ DSVectorBase<R>& DSVectorBase<R>::operator=(const SSVectorBase<S>& vec)
    return *this;
 }
 
+
+
 // ---------------------------------------------------------------------------------------------------------------------
 //  Operators
 // ---------------------------------------------------------------------------------------------------------------------
+
+
 
 /// Output operator.
 template < class R >
@@ -867,6 +942,8 @@ std::ostream& operator<<(std::ostream& s, const VectorBase<R>& vec)
    return s;
 }
 
+
+
 /// Negation.
 template < class R >
 DVectorBase<R> operator-(const VectorBase<R>& vec)
@@ -878,6 +955,8 @@ DVectorBase<R> operator-(const VectorBase<R>& vec)
 
    return res;
 }
+
+
 
 /// Addition.
 template < class R >
@@ -893,6 +972,8 @@ DVectorBase<R> operator+(const VectorBase<R>& v, const VectorBase<R>& w)
    return res;
 }
 
+
+
 /// Addition.
 template < class R >
 DVectorBase<R> operator+(const VectorBase<R>& v, const SVectorBase<R>& w)
@@ -904,12 +985,16 @@ DVectorBase<R> operator+(const VectorBase<R>& v, const SVectorBase<R>& w)
    return res;
 }
 
+
+
 /// Addition.
 template < class R >
 DVectorBase<R> operator+(const SVectorBase<R>& v, const VectorBase<R>& w)
 {
    return w + v;
 }
+
+
 
 /// Subtraction.
 template < class R >
@@ -925,6 +1010,8 @@ DVectorBase<R> operator-(const VectorBase<R>& v, const VectorBase<R>& w)
    return res;
 }
 
+
+
 /// Subtraction.
 template < class R >
 DVectorBase<R> operator-(const VectorBase<R>& v, const SVectorBase<R>& w)
@@ -935,6 +1022,8 @@ DVectorBase<R> operator-(const VectorBase<R>& v, const SVectorBase<R>& w)
 
    return res;
 }
+
+
 
 /// Subtraction.
 template < class R >
@@ -950,6 +1039,8 @@ DVectorBase<R> operator-(const SVectorBase<R>& v, const VectorBase<R>& w)
    return res;
 }
 
+
+
 /// Scaling.
 template < class R >
 DVectorBase<R> operator*(const VectorBase<R>& v, R x)
@@ -962,12 +1053,16 @@ DVectorBase<R> operator*(const VectorBase<R>& v, R x)
    return res;
 }
 
+
+
 /// Scaling.
 template < class R >
 DVectorBase<R> operator*(R x, const VectorBase<R>& v)
 {
    return v * x;
 }
+
+
 
 /// Scaling.
 template < class R >
@@ -981,12 +1076,16 @@ DSVectorBase<R> operator*(const SVectorBase<R>& v, R x)
    return res;
 }
 
+
+
 /// Scaling.
 template < class R >
 DSVectorBase<R> operator*(R x, const SVectorBase<R>& v)
 {
    return v * x;
 }
+
+
 
 /// Input operator.
 template < class R >
@@ -1035,6 +1134,8 @@ std::istream& operator>>(std::istream& s, DVectorBase<R>& vec)
    return s;
 }
 
+
+
 /// Output operator.
 template < class R >
 std::ostream& operator<<(std::ostream& os, const SVectorBase<R>& v)
@@ -1061,6 +1162,8 @@ std::ostream& operator<<(std::ostream& os, const SVectorBase<R>& v)
    return os;
 }
 
+
+
 /// Output operator.
 template < class R >
 std::ostream& operator<<(std::ostream& os, const SVSetBase<R>& s)
@@ -1071,9 +1174,13 @@ std::ostream& operator<<(std::ostream& os, const SVSetBase<R>& s)
    return os;
 }
 
+
+
 // ---------------------------------------------------------------------------------------------------------------------
 //  Explicit instantiations
 // ---------------------------------------------------------------------------------------------------------------------
+
+
 
 template class VectorBase < Real >;
 template class DVectorBase < Real >;
@@ -1083,12 +1190,15 @@ template class DSVectorBase < Real >;
 template class SVSetBase < Real >;
 
 
+
+
 template class VectorBase < Rational >;
 template class DVectorBase < Rational >;
 template class SVectorBase < Rational >;
 template class DSVectorBase < Rational >;
 template class SSVectorBase < Rational >;
 template class SVSetBase < Rational >;
+
 
 
 }
