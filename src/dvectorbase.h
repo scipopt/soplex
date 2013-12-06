@@ -302,7 +302,8 @@ public:
 
 /// Resets \ref soplex::DVectorBase "DVectorBase"'s memory size to \p newsize (specialization for Real).
 template<>
-inline void DVectorBase<Real>::reSize(int newsize)
+inline
+void DVectorBase<Real>::reSize(int newsize)
 {
    assert(newsize >= dim());
 
@@ -316,7 +317,8 @@ inline void DVectorBase<Real>::reSize(int newsize)
 
 /// Default constructor with \p d as the initial dimension (specialization for Real).
 template<>
-inline DVectorBase<Real>::DVectorBase(int d)
+inline
+DVectorBase<Real>::DVectorBase(int d)
    : VectorBase<Real>(0, 0)
    , mem(0)
 {
@@ -333,7 +335,8 @@ inline DVectorBase<Real>::DVectorBase(int d)
 /// Copy constructor (specialization for Real).
 template<>
 template<>
-inline DVectorBase<Real>::DVectorBase(const VectorBase<Real>& old)
+inline
+DVectorBase<Real>::DVectorBase(const VectorBase<Real>& old)
    : VectorBase<Real>(0, 0)
    , mem( 0 )
 {
@@ -350,7 +353,8 @@ inline DVectorBase<Real>::DVectorBase(const VectorBase<Real>& old)
 
 /// Copy constructor (specialization for Real).
 template<>
-inline DVectorBase<Real>::DVectorBase(const DVectorBase<Real>& old)
+inline
+DVectorBase<Real>::DVectorBase(const DVectorBase<Real>& old)
    : VectorBase<Real>(0, 0)
    , mem(0)
 {

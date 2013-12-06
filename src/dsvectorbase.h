@@ -285,7 +285,8 @@ public:
 
 /// Allocate memory for \p n nonzeros (specialization for Real).
 template<>
-inline void DSVectorBase<Real>::allocMem(int n)
+inline
+void DSVectorBase<Real>::allocMem(int n)
 {
    spx_alloc(theelem, n);
    SVectorBase<Real>::setMem(n, theelem);
@@ -295,7 +296,8 @@ inline void DSVectorBase<Real>::allocMem(int n)
 
 /// Destructor (specialization for Real).
 template<>
-inline DSVectorBase<Real>::~DSVectorBase()
+inline
+DSVectorBase<Real>::~DSVectorBase()
 {
    if( theelem )
       spx_free(theelem);
@@ -308,7 +310,8 @@ inline DSVectorBase<Real>::~DSVectorBase()
  *  reset to size() only (specialization for Real).
  */
 template<>
-inline void DSVectorBase<Real>::setMax(int newmax)
+inline
+void DSVectorBase<Real>::setMax(int newmax)
 {
    int siz = size();
    int len = (newmax < siz) ? siz : newmax;

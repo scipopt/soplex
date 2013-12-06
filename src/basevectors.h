@@ -45,7 +45,8 @@ namespace soplex
 
 template < class R >
 template < class S >
-inline VectorBase<R>& VectorBase<R>::operator=(const SVectorBase<S>& vec)
+inline
+VectorBase<R>& VectorBase<R>::operator=(const SVectorBase<S>& vec)
 {
    clear();
 
@@ -66,6 +67,7 @@ inline VectorBase<R>& VectorBase<R>::operator=(const SVectorBase<S>& vec)
 /** Assigns all nonzeros of \p vec to the vector.  All other values remain unchanged. */
 template < class R >
 template < class S >
+inline
 VectorBase<R>& VectorBase<R>::assign(const SVectorBase<S>& vec)
 {
    for( int i = vec.size(); i-- > 0; )
@@ -84,7 +86,8 @@ VectorBase<R>& VectorBase<R>::assign(const SVectorBase<S>& vec)
  */
 template < class R >
 template < class S >
-inline VectorBase<R>& VectorBase<R>::operator=(const SSVectorBase<S>& vec)
+inline
+VectorBase<R>& VectorBase<R>::operator=(const SSVectorBase<S>& vec)
 {
    if( vec.isSetup() )
    {
@@ -103,7 +106,8 @@ inline VectorBase<R>& VectorBase<R>::operator=(const SSVectorBase<S>& vec)
 /** Assigns all nonzeros of \p vec to the vector.  All other values remain unchanged. */
 template < class R >
 template < class S >
-inline VectorBase<R>& VectorBase<R>::assign(const SSVectorBase<S>& vec)
+inline
+VectorBase<R>& VectorBase<R>::assign(const SSVectorBase<S>& vec)
 {
    assert(vec.dim() <= dim());
 
@@ -128,6 +132,7 @@ inline VectorBase<R>& VectorBase<R>::assign(const SSVectorBase<S>& vec)
 /// Addition.
 template < class R >
 template < class S >
+inline
 VectorBase<R>& VectorBase<R>::operator+=(const SVectorBase<S>& vec)
 {
    for( int i = 0; i < vec.size(); i++ )
@@ -145,6 +150,7 @@ VectorBase<R>& VectorBase<R>::operator+=(const SVectorBase<S>& vec)
 /// Addition.
 template < class R >
 template < class S >
+inline
 VectorBase<R>& VectorBase<R>::operator+=(const SSVectorBase<S>& vec)
 {
    assert(dim() == vec.dim());
@@ -168,6 +174,7 @@ VectorBase<R>& VectorBase<R>::operator+=(const SSVectorBase<S>& vec)
 /// Subtraction.
 template < class R >
 template < class S >
+inline
 VectorBase<R>& VectorBase<R>::operator-=(const SVectorBase<S>& vec)
 {
    for( int i = 0; i < vec.size() ; i++ )
@@ -185,6 +192,7 @@ VectorBase<R>& VectorBase<R>::operator-=(const SVectorBase<S>& vec)
 /// Subtraction.
 template < class R >
 template < class S >
+inline
 VectorBase<R>& VectorBase<R>::operator-=(const SSVectorBase<S>& vec)
 {
    assert(dim() == vec.dim());
@@ -207,7 +215,8 @@ VectorBase<R>& VectorBase<R>::operator-=(const SSVectorBase<S>& vec)
 
 /// Inner product.
 template < class R >
-inline R VectorBase<R>::operator*(const SVectorBase<R>& vec) const
+inline
+R VectorBase<R>::operator*(const SVectorBase<R>& vec) const
 {
    assert(dim() >= vec.dim());
 
@@ -223,7 +232,8 @@ inline R VectorBase<R>::operator*(const SVectorBase<R>& vec) const
 
 /// Inner product.
 template < class R >
-inline R VectorBase<R>::operator*(const SSVectorBase<R>& vec) const
+inline
+R VectorBase<R>::operator*(const SSVectorBase<R>& vec) const
 {
    assert(dim() == vec.dim());
 
@@ -250,7 +260,8 @@ inline R VectorBase<R>::operator*(const SSVectorBase<R>& vec) const
 /// Addition of scaled vector.
 template < class R >
 template < class S, class T >
-inline VectorBase<R>& VectorBase<R>::multAdd(S x, const SVectorBase<T>& vec)
+inline
+VectorBase<R>& VectorBase<R>::multAdd(S x, const SVectorBase<T>& vec)
 {
    for( int i = 0; i < vec.size(); i++ )
    {
@@ -266,7 +277,8 @@ inline VectorBase<R>& VectorBase<R>::multAdd(S x, const SVectorBase<T>& vec)
 /// Addition of scaled vector.
 template < class R >
 template < class S, class T >
-inline VectorBase<R>& VectorBase<R>::multAdd(S x, const SSVectorBase<T>& vec)
+inline
+VectorBase<R>& VectorBase<R>::multAdd(S x, const SSVectorBase<T>& vec)
 {
    assert(vec.dim() <= dim());
 
@@ -299,6 +311,7 @@ inline VectorBase<R>& VectorBase<R>::multAdd(S x, const SSVectorBase<T>& vec)
 /// Assignment operator.
 template < class R >
 template < class S >
+inline
 DVectorBase<R>& DVectorBase<R>::operator=(const SVectorBase<S>& vec)
 {
    if( vec.dim() != VectorBase<R>::dim() )
@@ -322,6 +335,7 @@ DVectorBase<R>& DVectorBase<R>::operator=(const SVectorBase<S>& vec)
 /// Addition.
 template < class R >
 template < class S >
+inline
 SSVectorBase<R>& SSVectorBase<R>::operator+=(const SVectorBase<S>& vec)
 {
    VectorBase<R>::operator+=(vec);
@@ -340,6 +354,7 @@ SSVectorBase<R>& SSVectorBase<R>::operator+=(const SVectorBase<S>& vec)
 /// Subtraction.
 template < class R >
 template < class S >
+inline
 SSVectorBase<R>& SSVectorBase<R>::operator-=(const SVectorBase<S>& vec)
 {
    VectorBase<R>::operator-=(vec);
@@ -359,6 +374,7 @@ SSVectorBase<R>& SSVectorBase<R>::operator-=(const SVectorBase<S>& vec)
 ///@todo SSVectorBase::multAdd() should be rewritten without pointer arithmetic.
 template < class R >
 template < class S, class T >
+inline
 SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
 {
    if( isSetup() )
@@ -425,6 +441,7 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
 /// Assigns \f$x^T \cdot A\f$ to SSVectorBase.
 template < class R >
 template < class S, class T >
+inline
 SSVectorBase<R>& SSVectorBase<R>::assign2product(const SSVectorBase<S>& x, const SVSetBase<T>& A)
 {
    assert(A.num() == dim());
@@ -455,6 +472,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product(const SSVectorBase<S>& x, const
 #define shortProductFactor 0.5
 template < class R >
 template < class S, class T >
+inline
 SSVectorBase<R>& SSVectorBase<R>::assign2product4setup(const SVSetBase<S>& A, const SSVectorBase<T>& x)
 {
    assert(A.num() == x.dim());
@@ -487,6 +505,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product4setup(const SVSetBase<S>& A, co
 /// Assignment helper.
 template < class R >
 template < class S, class T >
+inline
 SSVectorBase<R>& SSVectorBase<R>::assign2product1(const SVSetBase<S>& A, const SSVectorBase<T>& x)
 {
    assert(x.isSetup());
@@ -521,6 +540,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product1(const SVSetBase<S>& A, const S
 /// Assignment helper.
 template < class R >
 template < class S, class T >
+inline
 SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, const SSVectorBase<T>& x)
 {
    assert(x.isSetup());
@@ -631,6 +651,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
 /// Assignment helper.
 template < class R >
 template < class S, class T >
+inline
 SSVectorBase<R>& SSVectorBase<R>::assign2productFull(const SVSetBase<S>& A, const SSVectorBase<T>& x)
 {
    assert(x.isSetup());
@@ -673,6 +694,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productFull(const SVSetBase<S>& A, cons
 /// Assigns SSVectorBase to \f$A \cdot x\f$ thereby setting up \p x.
 template < class R >
 template < class S, class T >
+inline
 SSVectorBase<R>& SSVectorBase<R>::assign2productAndSetup(const SVSetBase<S>& A, SSVectorBase<T>& x)
 {
    if( x.isSetup() )
@@ -730,6 +752,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productAndSetup(const SVSetBase<S>& A, 
 /// Assigns only the elements of \p rhs.
 template < class R >
 template < class S >
+inline
 SSVectorBase<R>& SSVectorBase<R>::assign(const SVectorBase<S>& rhs)
 {
    assert(rhs.dim() <= VectorBase<R>::dim());
@@ -763,6 +786,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign(const SVectorBase<S>& rhs)
 /// Assignment operator.
 template < class R >
 template < class S >
+inline
 SSVectorBase<R>& SSVectorBase<R>::operator=(const SVectorBase<S>& rhs)
 {
    clear();
@@ -781,6 +805,7 @@ SSVectorBase<R>& SSVectorBase<R>::operator=(const SVectorBase<S>& rhs)
 /// Assignment operator.
 template < class R >
 template < class S >
+inline
 SVectorBase<R>& SVectorBase<R>::operator=(const VectorBase<S>& vec)
 {
    int n = 0;
@@ -812,6 +837,7 @@ SVectorBase<R>& SVectorBase<R>::operator=(const VectorBase<S>& vec)
 /// Assignment operator.
 template < class R >
 template < class S >
+inline
 SVectorBase<R>& SVectorBase<R>::operator=(const SSVectorBase<S>& sv)
 {
    assert(max() >= sv.size());
@@ -835,6 +861,7 @@ SVectorBase<R>& SVectorBase<R>::operator=(const SSVectorBase<S>& sv)
 
 /// Inner product.
 template < class R >
+inline
 R SVectorBase<R>::operator*(const VectorBase<R>& w) const
 {
    R x = 0;
@@ -861,6 +888,7 @@ R SVectorBase<R>::operator*(const VectorBase<R>& w) const
 /// Copy constructor.
 template < class R >
 template < class S >
+inline
 DSVectorBase<R>::DSVectorBase(const VectorBase<S>& vec)
    : theelem(0)
 {
@@ -875,6 +903,7 @@ DSVectorBase<R>::DSVectorBase(const VectorBase<S>& vec)
 /// Copy constructor.
 template < class R >
 template < class S >
+inline
 DSVectorBase<R>::DSVectorBase(const SSVectorBase<S>& old)
    : theelem(0)
 {
@@ -889,6 +918,7 @@ DSVectorBase<R>::DSVectorBase(const SSVectorBase<S>& old)
 /// Assignment operator.
 template < class R >
 template < class S >
+inline
 DSVectorBase<R>& DSVectorBase<R>::operator=(const VectorBase<S>& vec)
 {
    assert(this != (DSVectorBase<R>*)(&vec));
@@ -907,6 +937,7 @@ DSVectorBase<R>& DSVectorBase<R>::operator=(const VectorBase<S>& vec)
 /// Assignment operator.
 template < class R >
 template < class S >
+inline
 DSVectorBase<R>& DSVectorBase<R>::operator=(const SSVectorBase<S>& vec)
 {
    assert(this != &vec);
@@ -928,6 +959,7 @@ DSVectorBase<R>& DSVectorBase<R>::operator=(const SSVectorBase<S>& vec)
 
 /// Output operator.
 template < class R >
+inline
 std::ostream& operator<<(std::ostream& s, const VectorBase<R>& vec)
 {
    int i;
@@ -946,6 +978,7 @@ std::ostream& operator<<(std::ostream& s, const VectorBase<R>& vec)
 
 /// Negation.
 template < class R >
+inline
 DVectorBase<R> operator-(const VectorBase<R>& vec)
 {
    DVectorBase<R> res(vec.dim());
@@ -960,6 +993,7 @@ DVectorBase<R> operator-(const VectorBase<R>& vec)
 
 /// Addition.
 template < class R >
+inline
 DVectorBase<R> operator+(const VectorBase<R>& v, const VectorBase<R>& w)
 {
    assert(v.dim() == w.dim());
@@ -976,6 +1010,7 @@ DVectorBase<R> operator+(const VectorBase<R>& v, const VectorBase<R>& w)
 
 /// Addition.
 template < class R >
+inline
 DVectorBase<R> operator+(const VectorBase<R>& v, const SVectorBase<R>& w)
 {
    DVectorBase<R> res(v);
@@ -989,6 +1024,7 @@ DVectorBase<R> operator+(const VectorBase<R>& v, const SVectorBase<R>& w)
 
 /// Addition.
 template < class R >
+inline
 DVectorBase<R> operator+(const SVectorBase<R>& v, const VectorBase<R>& w)
 {
    return w + v;
@@ -998,6 +1034,7 @@ DVectorBase<R> operator+(const SVectorBase<R>& v, const VectorBase<R>& w)
 
 /// Subtraction.
 template < class R >
+inline
 DVectorBase<R> operator-(const VectorBase<R>& v, const VectorBase<R>& w)
 {
    assert(v.dim() == w.dim());
@@ -1014,6 +1051,7 @@ DVectorBase<R> operator-(const VectorBase<R>& v, const VectorBase<R>& w)
 
 /// Subtraction.
 template < class R >
+inline
 DVectorBase<R> operator-(const VectorBase<R>& v, const SVectorBase<R>& w)
 {
    DVectorBase<R> res(v);
@@ -1027,6 +1065,7 @@ DVectorBase<R> operator-(const VectorBase<R>& v, const SVectorBase<R>& w)
 
 /// Subtraction.
 template < class R >
+inline
 DVectorBase<R> operator-(const SVectorBase<R>& v, const VectorBase<R>& w)
 {
    DVectorBase<R> res(w.dim());
@@ -1043,6 +1082,7 @@ DVectorBase<R> operator-(const SVectorBase<R>& v, const VectorBase<R>& w)
 
 /// Scaling.
 template < class R >
+inline
 DVectorBase<R> operator*(const VectorBase<R>& v, R x)
 {
    DVectorBase<R> res(v.dim());
@@ -1057,6 +1097,7 @@ DVectorBase<R> operator*(const VectorBase<R>& v, R x)
 
 /// Scaling.
 template < class R >
+inline
 DVectorBase<R> operator*(R x, const VectorBase<R>& v)
 {
    return v * x;
@@ -1066,6 +1107,7 @@ DVectorBase<R> operator*(R x, const VectorBase<R>& v)
 
 /// Scaling.
 template < class R >
+inline
 DSVectorBase<R> operator*(const SVectorBase<R>& v, R x)
 {
    DSVectorBase<R> res(v.size());
@@ -1080,6 +1122,7 @@ DSVectorBase<R> operator*(const SVectorBase<R>& v, R x)
 
 /// Scaling.
 template < class R >
+inline
 DSVectorBase<R> operator*(R x, const SVectorBase<R>& v)
 {
    return v * x;
@@ -1089,6 +1132,7 @@ DSVectorBase<R> operator*(R x, const SVectorBase<R>& v)
 
 /// Input operator.
 template < class R >
+inline
 std::istream& operator>>(std::istream& s, DVectorBase<R>& vec)
 {
    char c;
@@ -1138,6 +1182,7 @@ std::istream& operator>>(std::istream& s, DVectorBase<R>& vec)
 
 /// Output operator.
 template < class R >
+inline
 std::ostream& operator<<(std::ostream& os, const SVectorBase<R>& v)
 {
    for( int i = 0, j = 0; i < v.size(); ++i )
@@ -1166,6 +1211,7 @@ std::ostream& operator<<(std::ostream& os, const SVectorBase<R>& v)
 
 /// Output operator.
 template < class R >
+inline
 std::ostream& operator<<(std::ostream& os, const SVSetBase<R>& s)
 {
    for( int i = 0; i < s.num(); i++ )

@@ -171,7 +171,7 @@ public:
    //@{
 
    /// Dimension of vector.
-   inline int dim() const
+   int dim() const
    {
       return dimen;
    }
@@ -441,7 +441,8 @@ private:
 
 /// Assignment operator (specialization for Real).
 template <>
-inline VectorBase<Real>& VectorBase<Real>::operator=(const VectorBase<Real>& vec)
+inline
+VectorBase<Real>& VectorBase<Real>::operator=(const VectorBase<Real>& vec)
 {
    if( this != &vec )
    {
@@ -458,7 +459,8 @@ inline VectorBase<Real>& VectorBase<Real>::operator=(const VectorBase<Real>& vec
 
 /// Set vector to 0 (specialization for Real).
 template<>
-inline void VectorBase<Real>::clear()
+inline
+void VectorBase<Real>::clear()
 {
    if( dimen > 0 )
       memset(val, 0, dimen * sizeof(Real));
