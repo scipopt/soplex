@@ -2041,11 +2041,29 @@ namespace soplex
       }
       else if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_MANUAL )
       {
-         ///@todo add (partial) checks that LPs are in sync
+         ///@todo add checks that LPs are in sync
 
+         // store current real LP
+         SPxLPReal realLP(*_realLP);
+
+         // call rational LP solving with iterative refinement
          _solveRational();
 
-         ///@todo ensure that _realLP is restored exactly as before the rational solve
+         // restore real LP in order to ensure that we use the same rounding
+         assert(_isRealLPLoaded);
+         if( _hasBasis )
+         {
+            assert(_solver.basis().status() > SPxBasis::NO_PROBLEM);
+            _basisStatusRows.reSize(_solver.nRows());
+            _basisStatusCols.reSize(_solver.nCols());
+            _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
+         }
+
+         _solver.loadLP(realLP);
+
+         if( _hasBasis )
+            _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
       }
       else
       {

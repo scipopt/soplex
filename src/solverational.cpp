@@ -234,6 +234,15 @@ namespace soplex
       // restore original problem
       _untransformEquality(_solRational);
 
+      // since the real LP is loaded in the solver, we need to also pass the basis information to the solver if
+      // available
+      if( _hasBasis )
+      {
+         assert(_isRealLPLoaded);
+         _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+
       // stop timing
       _statistics->solvingTime.stop();
    }
