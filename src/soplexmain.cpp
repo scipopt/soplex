@@ -1458,15 +1458,15 @@ int main(int argc, char* argv[])
       // print solution, status, infeasibility system,...
       if( exactmode >= 1 )
       {
-         SoPlexShell->printStatisticsRational(std::cout);
          printSolutionAndStatusRational(*SoPlexShell, rownames, colnames, precision, print_quality,
             print_solution, print_dual, write_basis, basisname, checkMode);
+         SoPlexShell->printStatisticsRational(std::cout);
       }
       else
       {
-         SoPlexShell->printStatisticsReal(std::cout);
          printSolutionAndStatusReal(*SoPlexShell, rownames, colnames, precision, print_quality,
             print_solution, print_dual, write_basis, basisname, checkMode);
+         SoPlexShell->printStatisticsReal(std::cout);
       }
 
       // clean up
