@@ -217,7 +217,8 @@ void printUsage( const char* const argv[] )
       " -v        set verbosity Level: from 0 (ERROR) to 5 (INFO3), default 3 (INFO1)\n"
       " -V        show program version\n"
       " -C        check mode (for check scripts)\n"
-      " -h        show this help\n\n"
+      " -h        show this help\n"
+      " --[parameter]=[value]      sets the parameter to value (overwrites the one from default.set or soplex.set)\n"
       "\n"
       "Precision:\n"
       " -X0       read and solve LP in real arithmetic (default)\n"
@@ -1202,13 +1203,34 @@ int main(int argc, char* argv[])
    int                       precision;
    int                       optidx;
 
+   // write default settings file
+   MSG_INFO1( spxout << "Saving default parameters to settings file <default.set> . . .\n" );
+   SoPlexShell->saveSettingsFile("default.set");
+
+   // read soplex.set if available
+   spxifstream file("soplex.set");
+   if( !file )
+   {
+      MSG_INFO1( spxout << "User settings file <soplex.set> not found.  Using default parameters.\n" );
+   }
+   else
+   {
+      SoPlexShell->loadSettingsFile("soplex.set");
+   }
+
+   // read arguments from command line
    for(optidx = 1; optidx < argc; optidx++)
    {
-      if (*argv[optidx] != '-')
+      if( *argv[optidx] != '-' )
          break;
 
       switch(argv[optidx][1])
       {
+         case '-' :
+            checkParameter(argv[optidx][2], argv);
+            if( !SoPlexShell->parseSettingsString(&argv[optidx][2]) )
+               printUsage(argv);
+            break;
          case 'X' :
             checkParameter(argv[optidx][2], argv); // use -X[0-2], not -X
             exactmode = atoi(&argv[optidx][2]);
@@ -1356,19 +1378,6 @@ int main(int argc, char* argv[])
    std::ofstream  myinfostream( "infos.txt" );
    redirectOutput(myerrstream, myinfostream);
 #endif
-
-   // write default settings file
-   MSG_INFO1( spxout << "Saving default parameters to settings file <default.set> . . .\n" );
-   SoPlexShell->saveSettingsFile("default.set");
-
-   // read soplex.set if available
-   spxifstream file("soplex.set");
-   if( !file )
-   {
-      MSG_INFO1( spxout << "User settings file <soplex.set> not found.  Using default parameters.\n" );
-   }
-   else
-      SoPlexShell->loadSettingsFile("soplex.set");
 
    printAlgorithmParameters( *SoPlexShell, checkMode );
 

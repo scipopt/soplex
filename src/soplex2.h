@@ -1031,6 +1031,9 @@ public:
    /// reads settings file; returns true on success
    bool loadSettingsFile(const char* filename);
 
+   /// parses one setting string and returns true on success; note that string is modified
+   bool parseSettingsString(char* line);
+
    //@}
 
 
@@ -1165,7 +1168,7 @@ private:
    /// should solving process be stopped?
    bool _isSolveStopped() const;
 
-   /// parses one line in a settings file; returns true on success
+   /// parses one line in a settings file and returns true on success; note that the string is modified
    bool _parseSettingsLine(char* line, const int lineNumber);
 
    //@}
