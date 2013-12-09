@@ -77,16 +77,21 @@ namespace soplex
          << "  Column rep.      : " << "?" << " (?%)\n"
          << "  Row rep.         : " << "?" << " (?%)\n";
 
-      os << "LU                 : " << "\n"
-         << "  Factorizations   : " << luFactorizations << "\n"
+      os << "LU factorizations  : " << luFactorizations << "\n"
          << "  Factor. frequency: ";
       if( luFactorizations > 0 )
          os << double(iterations) / double(luFactorizations) << " iterations per factorization\n";
       else
          os << "-\n";
-      os << "  Factor. time     : " << luFactorizationTime << " seconds\n"
-         << "  Solves           : " << luSolves << "\n"
-         << "  Solve time       : " << luSolveTime << " seconds\n";
+      os << "  Factor. time     : " << luFactorizationTime << " seconds\n";
+
+      os << "LU solves          : " << luSolves << "\n"
+         << "  Solve frequency  : ";
+      if( luSolves > 0 )
+         os << double(luSolves) / double(iterations) << " solves per iteration\n";
+      else
+         os << "-\n";
+      os << "  Solve time       : " << luSolveTime << " seconds\n";
    }
 } // namespace soplex
 
