@@ -620,19 +620,6 @@ public:
    //**@name Statistical information */
    //@{
 
-#if 0
-   /// time spent in factorizations
-   Real factorTime() const;
-
-   /// number of factorizations performed
-   int factorCount() const;
-
-   /// time spent in solves
-   Real luSolveTime() const;
-
-   /// number of solves performed
-   int luSolveCount() const;
-#endif
    /// number of iterations since last call to solve
    int numIterations() const;
 

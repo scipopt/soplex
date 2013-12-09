@@ -3077,35 +3077,6 @@ namespace soplex
 
 
 
-#if 0
-   /// time spent in factorizations
-   Real SoPlex2::factorTime() const
-   {
-   }
-
-
-
-   /// number of factorizations performed
-   int SoPlex2::factorCount() const
-   {
-   }
-
-
-
-   /// time spent in solves
-   Real SoPlex2::luSolveTime() const
-   {
-   }
-
-
-
-   /// number of solves performed
-   int SoPlex2::luSolveCount() const
-   {
-   }
-#endif
-
-
    /// number of iterations since last call to solve
    int SoPlex2::numIterations() const
    {
@@ -3125,7 +3096,15 @@ namespace soplex
    /// statistical information in form of a string
    std::string SoPlex2::statisticString() const
    {
-      return _solver.statistics();
+      std::stringstream s;
+      s  << "Factorizations     : " << std::setw(10) << _statistics->luFactorizations << std::endl
+         << "  Time spent       : " << std::setw(10) << std::fixed << std::setprecision(2) << _statistics->luFactorizationTime << std::endl
+         << "Solves             : " << std::setw(10) << _statistics->luSolves << std::endl
+         << "  Time spent       : " << std::setw(10) << _statistics->luSolveTime << std::endl
+         << "Solution time      : " << std::setw(10) << std::fixed << std::setprecision(2) << solveTime() << std::endl
+         << "Iterations         : " << std::setw(10) << numIterations() << std::endl;
+
+      return s.str();
    }
 
 
@@ -4152,7 +4131,8 @@ namespace soplex
    /// prints statistics on real solution
    void SoPlex2::printSolutionStatisticsReal(std::ostream& os)
    {
-      os << "Solution           : \n"
+      os << std::scientific << std::setprecision(8)
+         << "Solution           : \n"
          << "  Value            : " << objValueReal() << "\n"
          << "  Proven primal    : " << "?\n"
          << "  Proven dual      : " << "?\n";
@@ -5198,6 +5178,10 @@ namespace soplex
 
       // record statistics
       _statistics->iterations += _solver.iterations();
+      _statistics->luFactorizationTime += _slufactor.getFactorTime();
+      _statistics->luSolveTime += _slufactor.getSolveTime();
+      _statistics->luFactorizations += _slufactor.getFactorCount();
+      _statistics->luSolves += _slufactor.getSolveCount();
    }
 
 

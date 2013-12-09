@@ -39,7 +39,11 @@ namespace soplex
       solvingTime.reset();
       syncTime.reset();
       transformTime.reset();
+      luFactorizationTime = 0.0;
+      luSolveTime = 0.0;
       iterations = 0;
+      luFactorizations = 0;
+      luSolves = 0;
       refinements = 0;
       stallRefinements = 0;
    }
@@ -51,7 +55,9 @@ namespace soplex
       Real totTime = readingTime.userTime() + solTime;
       Real otherTime = solTime - syncTime.userTime() - transformTime.userTime();
 
-      os << "Total time (sec)   : " << totTime << "\n"
+      os << std::fixed << std::setprecision(2);
+
+      os << "Total time         : " << totTime << " seconds\n"
          << "  Reading          : " << readingTime.userTime() << "\n"
          << "  Solving          : " << solTime << "\n"
          << "  Preprocessing    : " << "?" << " (?% of solving time)\n"
@@ -71,14 +77,16 @@ namespace soplex
          << "  Column rep.      : " << "?" << " (?%)\n"
          << "  Row rep.         : " << "?" << " (?%)\n";
 
-      os << "Factorizations     : " << "?\n"
-         << "  Rate             : " << "? iterations per factorization\n"
-         << "  Time (sec)       : " << "?\n";
-
-      os << "Solves             : " << "?\n"
-         << "  Forward solves   : " << "?\n"
-         << "  Backward solves  : " << "?\n"
-         << "  Time (sec)       : " << "?\n";
+      os << "LU                 : " << "\n"
+         << "  Factorizations   : " << luFactorizations << "\n"
+         << "  Factor. frequency: ";
+      if( luFactorizations > 0 )
+         os << double(iterations) / double(luFactorizations) << " iterations per factorization\n";
+      else
+         os << "-\n";
+      os << "  Factor. time     : " << luFactorizationTime << " seconds\n"
+         << "  Solves           : " << luSolves << "\n"
+         << "  Solve time       : " << luSolveTime << " seconds\n";
    }
 } // namespace soplex
 
