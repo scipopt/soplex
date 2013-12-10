@@ -2041,7 +2041,11 @@ namespace soplex
       }
       else if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_MANUAL )
       {
-         ///@todo add checks that LPs are in sync
+#ifdef ENABLE_ADDITIONAL_CHECKS
+         assert(isInSync(true, true, false));
+#else
+         assert(isInSync(true, false, false));
+#endif
 
          // store current real LP
          SPxLPReal realLP(*_realLP);
@@ -2067,7 +2071,11 @@ namespace soplex
       }
       else
       {
-         ///@todo add (partial) checks that LPs are in sync
+#ifdef ENABLE_ADDITIONAL_CHECKS
+         assert(isInSync(true, true, false));
+#else
+         assert(isInSync(true, false, false));
+#endif
 
          _solveRational();
       }
@@ -4495,6 +4503,257 @@ namespace soplex
       }
 
       os << "\n";
+   }
+
+
+   /// checks if real LP and rational LP are in sync; dimensions will always be compared,
+   /// vector and matrix values only if the respective parameter is set to true.
+   /// If quiet is set to true the function will only display which vectors are different.
+   bool SoPlex2::areLPsInSync(const bool checkVecVals, const bool checkMatVals, const bool quiet) const
+   {
+      bool result = true;
+      bool nRowsMatch = true;
+      bool nColsMatch = true;
+      bool rhsDimMatch = true;
+      bool lhsDimMatch = true;
+      bool maxObjDimMatch = true;
+      bool upperDimMatch = true;
+      bool lowerDimMatch = true;
+
+      // compare number of Rows
+      if( _realLP->nRows() != _rationalLP->nRows() )
+      {
+         MSG_ERROR( spxout << "The number of Rows in the Real LP does not match the one in the Rational LP."
+               << " Real LP: " << _realLP->nRows() << "  Rational LP: " << _rationalLP->nRows() << std::endl);
+         result = false;
+         nRowsMatch = false;
+      }
+
+      // compare number of Columns
+      if( _realLP->nCols() != _rationalLP->nCols() )
+      {
+         MSG_ERROR( spxout << "The number of Columns in the Real LP does not match the one in the Rational LP."
+               << " Real LP: " << _realLP->nCols() << "  Rational LP: " << _rationalLP->nCols() << std::endl);
+         result = false;
+         nColsMatch = false;
+      }
+
+      // compare number of nonZeros
+      if( _realLP->nNzos() != _rationalLP->nNzos() )
+      {
+         MSG_ERROR( spxout << "The number of nonZeros in the Real LP does not match the one in the Rational LP."
+               << " Real LP: " << _realLP->nNzos() << "  Rational LP: " << _rationalLP->nNzos() << std::endl);
+         result = false;
+      }
+
+      // compare the dimensions of the right hand side vectors
+      if( _realLP->rhs().dim() != _rationalLP->rhs().dim() )
+      {
+         MSG_ERROR( spxout << "The dimension of the right hand side vector of the Real LP does not match the one of the Rational LP."
+               << " Real LP: " << _realLP->rhs().dim() << "  Rational LP: " << _rationalLP->rhs().dim() << std::endl);
+         result = false;
+         rhsDimMatch = false;
+
+      }
+
+      // compare the dimensions of the left hand side vectors
+      if( _realLP->lhs().dim() != _rationalLP->lhs().dim() )
+      {
+         MSG_ERROR( spxout << "The dimension of the left hand side vector of the Real LP does not match the one of the Rational LP."
+               << " Real LP: " << _realLP->lhs().dim() << "  Rational LP: " << _rationalLP->lhs().dim() << std::endl);
+         result = false;
+         lhsDimMatch = false;
+      }
+
+      // compare the dimensions of the objective function vectors
+      if( _realLP->maxObj().dim() != _rationalLP->maxObj().dim() )
+      {
+         MSG_ERROR( spxout << "The dimension of the objective function vector of the Real LP does not match the one of the Rational LP."
+               << " Real LP: " << _realLP->maxObj().dim() << "  Rational LP: " << _rationalLP->maxObj().dim() << std::endl);
+         result = false;
+         maxObjDimMatch = false;
+      }
+
+      // compare the sense
+      if( (int)_realLP->spxSense() != (int)_rationalLP->spxSense() )
+         {
+            MSG_ERROR( spxout << "The objective function sense of the Real LP does not match the one of the Rational LP."
+                  << " Real LP: " << _realLP->spxSense() << "  Rational LP: " << _rationalLP->spxSense() << std::endl);
+            result = false;
+         }
+
+      // compare the dimensions of upper bound vectors
+      if( _realLP->upper().dim() != _rationalLP->upper().dim() )
+      {
+         MSG_ERROR( spxout << "The dimension of the upper bound vector of the Real LP does not match the one of the Rational LP."
+               << " Real LP: " << _realLP->upper().dim() << "  Rational LP: " << _rationalLP->upper().dim() << std::endl);
+         result = false;
+         upperDimMatch = false;
+      }
+
+      // compare the dimensions of the objective function vectors
+      if( _realLP->lower().dim() != _rationalLP->lower().dim() )
+      {
+         MSG_ERROR( spxout << "The dimension of the lower bound vector of the Real LP does not match the one of the Rational LP."
+               << " Real LP: " << _realLP->lower().dim() << "  Rational LP: " << _rationalLP->lower().dim() << std::endl);
+         result = false;
+         lowerDimMatch = false;
+      }
+
+      // compares the values of the rhs, lhs, maxObj, upper, lower vectors
+      if( checkVecVals )
+      {
+         bool rhsValMatch = true;
+         bool lhsValMatch = true;
+         bool maxObjValMatch = true;
+         bool upperValMatch = true;
+         bool lowerValMatch = true;
+
+         // compares the values of the right hand side vectors
+         if( rhsDimMatch )
+         {
+            for( int i = 0; i < _realLP->rhs().dim(); i++ )
+            {
+               if( !_rationalLP->rhs()[i].isAdjacentTo(_realLP->rhs()[i]) )
+               {
+                  if( !quiet )
+                  {
+                     MSG_ERROR( spxout << "Entries number " << i << " of the right hand side vectors don't match."
+                           << " Real LP: " << _realLP->rhs()[i] << "  Rational LP: " << _rationalLP->rhs()[i] << std::endl);
+                  }
+                  rhsValMatch = false;
+                  result = false;
+               }
+            }
+
+            if( !rhsValMatch && quiet )
+            {
+               MSG_ERROR( spxout << "The values of the right hand side vectors don't match." << std::endl );
+            }
+         }
+
+         // compares the values of the left hand side vectors
+         if( lhsDimMatch )
+         {
+            for( int i = 0; i < _realLP->lhs().dim(); i++ )
+            {
+               if( !_rationalLP->lhs()[i].isAdjacentTo(_realLP->lhs()[i]) )
+               {
+                  if( !quiet )
+                  {
+                     MSG_ERROR( spxout << "Entries number " << i << " of the left hand side vectors don't match."
+                           << " Real LP: " << _realLP->lhs()[i] << "  Rational LP: " << _rationalLP->lhs()[i] << std::endl);
+                  }
+                  lhsValMatch = false;
+                  result = false;
+               }
+            }
+
+            if( !lhsValMatch && quiet )
+            {
+               MSG_ERROR( spxout << "The values of the left hand side vectors don't match." << std::endl );
+            }
+         }
+
+         // compares the values of the objective function vectors
+         if( maxObjDimMatch )
+         {
+            for( int i = 0; i < _realLP->maxObj().dim(); i++ )
+            {
+               if( !_rationalLP->maxObj()[i].isAdjacentTo(_realLP->maxObj()[i]) )
+               {
+                  if( !quiet )
+                  {
+                     MSG_ERROR( spxout << "Entries number " << i << " of the objective function vectors don't match."
+                           << " Real LP: " << _realLP->maxObj()[i] << "  Rational LP: " << _rationalLP->maxObj()[i] << std::endl);
+                  }
+                  maxObjValMatch = false;
+                  result = false;
+               }
+            }
+
+            if( !maxObjValMatch && quiet )
+            {
+               MSG_ERROR( spxout << "The values of the objective function vectors don't match." << std::endl );
+            }
+         }
+
+         // compares the values of the upper bound vectors
+         if( upperDimMatch )
+         {
+            for( int i = 0; i < _realLP->upper().dim(); i++ )
+            {
+               if( !_rationalLP->upper()[i].isAdjacentTo(_realLP->upper()[i]) )
+               {
+                  if( !quiet )
+                  {
+                     MSG_ERROR( spxout << "Entries number " << i << " of the upper bound vectors don't match."
+                           << " Real LP: " << _realLP->upper()[i] << "  Rational LP: " << _rationalLP->upper()[i] << std::endl);
+                  }
+                  upperValMatch = false;
+                  result = false;
+               }
+            }
+
+            if( !upperValMatch && quiet )
+            {
+               MSG_ERROR( spxout << "The values of the upper bound vectors don't match." << std::endl );
+            }
+         }
+
+         // compares the values of the lower bound vectors
+         if( lowerDimMatch )
+         {
+            for( int i = 0; i < _realLP->lower().dim(); i++ )
+            {
+               if( !_rationalLP->lower()[i].isAdjacentTo(_realLP->lower()[i]) )
+               {
+                  if( !quiet )
+                  {
+                     MSG_ERROR( spxout << "Entries number " << i << " of the lower bound vectors don't match."
+                           << " Real LP: " << _realLP->lower()[i] << "  Rational LP: " << _rationalLP->lower()[i] << std::endl);
+                  }
+                  lowerValMatch = false;
+                  result = false;
+               }
+            }
+
+            if( !lowerValMatch && quiet )
+            {
+               MSG_ERROR( spxout << "The values of the lower bound vectors don't match." << std::endl );
+            }
+         }
+      }
+
+      // compare the values of the matrix
+      if( checkMatVals && nRowsMatch && nColsMatch )
+      {
+         bool matrixValMatch = true;
+
+         for( int i = 0; i < _realLP->nCols() ; i++ )
+         {
+            for( int j = 0;j < _realLP->nRows() ; j++ )
+            {
+               if( !_rationalLP->colVector(i)[j].isAdjacentTo(_realLP->colVector(i)[j]) )
+               {
+                  if( !quiet )
+                  {
+                     MSG_ERROR( spxout << "Entries number " << j << " of column number " << i << " don't match."
+                           << " Real LP: " << _realLP->colVector(i)[j] << "  Rational LP: " << _rationalLP->colVector(i)[j] << std::endl);
+                  }
+                  matrixValMatch = false;
+                  result = false;
+               }
+            }
+         }
+
+         if( !matrixValMatch && quiet )
+         {
+            MSG_ERROR( spxout << "The values of the matrices don't match." << std::endl );
+         }
+      }
+
+      return result;
    }
 
 

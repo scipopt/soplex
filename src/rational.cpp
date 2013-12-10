@@ -381,6 +381,70 @@ Rational Rational::operator/=(const double& d) const
 
 
 
+/// checks if d is the closest possible double
+bool Rational::isNextTo(const double& d)
+{
+   // get intervall [a,b] of doubles that the Rational is in
+   double x = mpq_get_d(this->dpointer->privatevalue);
+   double a;
+   double b;
+
+   if( x < *this )
+   {
+      a = x;
+      b = nextafter(a, infinity);
+   }
+   else
+   {
+      b = x;
+      a = nextafter(b, -infinity);
+   }
+
+   // check if d equals the closer end of the intervall
+   bool result = (abs(*this - a) < abs(*this - b))
+      ? (d == a)
+      : (d == b);
+
+   return result;
+}
+
+
+
+/// checks if d is exactly equal to the Rational and if not, if it is one of the two adjacent doubles
+bool Rational::isAdjacentTo(const double& d)
+{
+   double x = mpq_get_d(this->dpointer->privatevalue);
+   double a;
+   double b;
+   mpq_t tmp;
+
+   mpq_init(tmp);
+   mpq_set_d(tmp, x);
+
+   int cmp = mpq_cmp(tmp, this->dpointer->privatevalue);
+   mpq_clear(tmp);
+
+   // the rounded value is smaller than the rational value
+   if( cmp < 0 )
+   {
+      a = x;
+      b = nextafter(a, infinity);
+   }
+   // the rounded value is larger than the rational value
+   else if( cmp > 0 )
+   {
+      b = x;
+      a = nextafter(b, -infinity);
+   }
+   // the rational value is representable in double precision
+   else
+      return (x == d);
+
+   return ((a == d) || (b == d));
+}
+
+
+
 #define MAX_STR_LEN 10000
 /// read Rational from string
 bool Rational::readString(const char* s)
@@ -1343,6 +1407,70 @@ Rational Rational::operator/=(const double& d) const
 
 
 
+/// checks if d is the closest possible double
+bool Rational::isNextTo(const double& d)
+{
+   // get intervall [a,b] of doubles that the Rational is in
+   double x = double(*this);
+   double a;
+   double b;
+
+   if( x < *this )
+   {
+      a = x;
+      b = nextafter(a, infinity);
+   }
+   else
+   {
+      b = x;
+      a = nextafter(b, -infinity);
+   }
+
+   // check if d equals the closer end of the intervall
+   bool result = (abs(*this - a) < abs(*this - b))
+      ? (d == a)
+      : (d == b);
+
+   return result;
+}
+
+
+
+/// checks if d is exactly equal to the Rational and if not, if it is one of the two adjacent doubles
+bool Rational::isAdjacentTo(const double& d)
+{
+   double x = double(*this);
+   double a;
+   double b;
+   mpq_t tmp;
+
+   mpq_init(tmp);
+   mpq_set_d(tmp, x);
+
+   int cmp = mpq_cmp(tmp, this->dpointer->get_mpq_t());
+   mpq_clear(tmp);
+
+   // the rounded value is smaller than the rational value
+   if( cmp < 0 )
+   {
+      a = x;
+      b = nextafter(a, infinity);
+   }
+   // the rounded value is larger than the rational value
+   else if( cmp > 0 )
+   {
+      b = x;
+      a = nextafter(b, -infinity);
+   }
+   // the rational is representable in double precision
+   else
+      return (x == d);
+
+   return ((a == d) || (b == d));
+}
+
+
+
 #define MAX_STR_LEN 10000
 /// read Rational from string
 bool Rational::readString(const char* s)
@@ -2193,6 +2321,22 @@ Rational Rational::operator/=(const double& d) const
 {
    this->dpointer->privatevalue /= d;
    return *this;
+}
+
+
+
+/// checks if d is the closest possible double
+bool Rational::isNextTo(const double& d)
+{
+   return (this->dpointer->privatevalue == d);
+}
+
+
+
+/// checks if d is exactly equal to the Rational and if not, if it is one of the two adjacent doubles
+bool Rational::isAdjacentTo(const double& d)
+{
+   return (this->dpointer->privatevalue == d);
 }
 
 

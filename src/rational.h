@@ -158,6 +158,18 @@ namespace soplex
       //@}
 
 
+      //**@name Methods for checking exactness of doubles  */
+      //@{
+
+      /// checks if \p d is the closest number that can be represented by double
+      bool isNextTo(const double& d);
+
+      /// checks if \p d is exactly equal to the Rational and if not, if it is one of the two adjacent doubles
+      bool isAdjacentTo(const double& d);
+
+      //@}
+
+
       //**@name Conversion from and to String */
       //@{
 

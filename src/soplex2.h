@@ -1060,6 +1060,17 @@ public:
 
    //@}
 
+
+   //**@name Miscellaneous */
+   //@{
+
+   /// checks if real LP and rational LP are in sync; dimensions will always be compared,
+   /// vector and matrix values only if the respective parameter is set to true.
+   /// If quiet is set to true the function will only display which vectors are different.
+   bool areLPsInSync(const bool checkVecVals = true, const bool checkMatVals = false, const bool quiet = false) const;
+
+   //@}
+
 private:
 
    //**@name Statistics on solving process */
