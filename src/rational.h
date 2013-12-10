@@ -73,7 +73,7 @@ namespace soplex
       ///constructor from int
       Rational(const int& i);
 
-#if SOPLEX_WITH_GMP
+#ifdef SOPLEX_WITH_GMP
 
       /// constructor from mpq_t
       Rational(const mpq_t& q);
