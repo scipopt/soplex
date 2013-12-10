@@ -3462,74 +3462,50 @@ namespace soplex
 
    /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used;
    /// returns true on success
-   bool SoPlex2::writeBasisFile(const char* filename, const NameSet* rowNames, const NameSet* colNames)
+   bool SoPlex2::writeBasisFile(const char* filename, const NameSet* rowNames, const NameSet* colNames) const
    {
-#if 1
       assert(filename != 0);
 
-      _ensureRealLPLoaded();
-      return _solver.writeBasisFile(filename, rowNames, colNames);
-#else
-      // this is alternative code for writing bases directly from the basis arrays without the SPxSolver class
-      assert(filename != 0);
-
-      std::ofstream file(filename);
-      if( file == 0 )
-         return false;
-
-      file.setf(std::ios::left);
-      file << "NAME  " << filename << "\n";
-
-      // do not write basis if there is none
-      if( !_hasBasis )
+      if( _isRealLPLoaded )
+         return _solver.writeBasisFile(filename, rowNames, colNames);
+      else
       {
-         file << "ENDATA\n";
-         return true;
-      }
+         std::ofstream file(filename);
+         if( file == 0 )
+            return false;
 
-      // start writing
-      int numRows = _basisStatusRows.size();
-      int numCols = _basisStatusCols.size();
-      int row = 0;
+         file.setf(std::ios::left);
+         file << "NAME  " << filename << "\n";
 
-      for( int col = 0; col < numCols; col++ )
-      {
-         assert(_basisStatusCols[col] != SPxSolver::UNDEFINED);
-
-         if( _basisStatusCols[col] == SPxSolver::BASIC )
+         // do not write basis if there is none
+         if( !_hasBasis )
          {
-            // find nonbasic row
-            for( ; row < numRows; row++ )
-            {
-               assert(_basisStatusRows[row] != SPxSolver::UNDEFINED);
-               if( _basisStatusRows[row] != SPxSolver::BASIC )
-                  break;
-            }
-
-            assert(row != numRows);
-
-            file << (_basisStatusRows[row] == SPxSolver::ON_UPPER ? " XU " : " XL ");
-
-            file << std::setw(8);
-            if( colNames != 0 && colNames->has(col) )
-               file << (*colNames)[col];
-            else
-               file << "x" << col;
-
-            file << "       ";
-            if( rowNames != 0 && rowNames->has(row) )
-               file << (*rowNames)[row];
-            else
-               file << "C" << row;
-
-            file << "\n";
-            row++;
+            file << "ENDATA\n";
+            return true;
          }
-         else
+
+         // start writing
+         int numRows = _basisStatusRows.size();
+         int numCols = _basisStatusCols.size();
+         int row = 0;
+
+         for( int col = 0; col < numCols; col++ )
          {
-            if( _basisStatusCols[col] == SPxSolver::ON_UPPER )
+            assert(_basisStatusCols[col] != SPxSolver::UNDEFINED);
+
+            if( _basisStatusCols[col] == SPxSolver::BASIC )
             {
-               file << " UL ";
+               // find nonbasic row
+               for( ; row < numRows; row++ )
+               {
+                  assert(_basisStatusRows[row] != SPxSolver::UNDEFINED);
+                  if( _basisStatusRows[row] != SPxSolver::BASIC )
+                     break;
+               }
+
+               assert(row != numRows);
+
+               file << (_basisStatusRows[row] == SPxSolver::ON_UPPER ? " XU " : " XL ");
 
                file << std::setw(8);
                if( colNames != 0 && colNames->has(col) )
@@ -3537,45 +3513,87 @@ namespace soplex
                else
                   file << "x" << col;
 
+               file << "       ";
+               if( rowNames != 0 && rowNames->has(row) )
+                  file << (*rowNames)[row];
+               else
+                  file << "C" << row;
+
                file << "\n";
+               row++;
+            }
+            else
+            {
+               if( _basisStatusCols[col] == SPxSolver::ON_UPPER )
+               {
+                  file << " UL ";
+
+                  file << std::setw(8);
+                  if( colNames != 0 && colNames->has(col) )
+                     file << (*colNames)[col];
+                  else
+                     file << "x" << col;
+
+                  file << "\n";
+               }
             }
          }
-      }
 
-      file << "ENDATA\n";
+         file << "ENDATA\n";
 
 #ifndef NDEBUG
-      // check that the remaining rows are basic
-      for( ; row < numRows; row++ )
-      {
-         assert(_basisStatusRows[row] == SPxSolver::BASIC);
-      }
+         // check that the remaining rows are basic
+         for( ; row < numRows; row++ )
+         {
+            assert(_basisStatusRows[row] == SPxSolver::BASIC);
+         }
 #endif
 
-      return true;
-#endif
+         return true;
+      }
    }
 
 
 
    /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
    /// default names are used
-   void SoPlex2::writeStateReal(const char* filename, const NameSet* rowNames, const NameSet* colNames)
+   void SoPlex2::writeStateReal(const char* filename, const NameSet* rowNames, const NameSet* colNames) const
    {
-      writeFileReal(filename);
-      writeBasisFile(filename);
-      // @todo write settings file
+      std::string ofname;
+
+      // write parameter settings
+      ofname = std::string(filename) + ".set";
+      saveSettingsFile(ofname.c_str());
+
+      // write problem in MPS format
+      ofname = std::string(filename) + ".mps";
+      writeFileReal(ofname.c_str(), rowNames, colNames, 0);
+
+      // write basis
+      ofname = std::string(filename) + ".bas";
+      writeBasisFile(ofname.c_str(), rowNames, colNames);
    }
 
 
 
-#if 0
    /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
    /// default names are used
    void SoPlex2::writeStateRational(const char* filename, const NameSet* rowNames, const NameSet* colNames) const
    {
+      std::string ofname;
+
+      // write parameter settings
+      ofname = std::string(filename) + ".set";
+      saveSettingsFile(ofname.c_str());
+
+      // write problem in MPS format
+      ofname = std::string(filename) + ".mps";
+      writeFileRational(ofname.c_str(), rowNames, colNames, 0);
+
+      // write basis
+      ofname = std::string(filename) + ".bas";
+      writeBasisFile(ofname.c_str(), rowNames, colNames);
    }
-#endif
 
 
 
