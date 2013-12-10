@@ -28,8 +28,7 @@
 
 #include "rational.h"
 #include "spxalloc.h"
-
-#define EPSRAT 1e-6
+#include "spxdefines.h"
 
 #ifdef SOPLEX_WITH_GMP
 #include "gmp.h"
@@ -1738,14 +1737,14 @@ bool operator>=(const Rational& r, const Rational& s)
 /// equality operator for Rational and double
 bool operator==(const Rational& r, const double& s)
 {
-   return (abs(*(r.dpointer) - s) < EPSRAT);
+   return (*(r.dpointer) == s);
 }
 
 
 /// inequality operator for Rational and double
 bool operator!=(const Rational& r, const double& s)
 {
-   return (abs(*(r.dpointer) - s) >= EPSRAT);
+   return (*(r.dpointer) != s);
 }
 
 
@@ -1785,7 +1784,7 @@ bool operator>=(const Rational& r, const double& s)
 /// equality operator for double and Rational
 bool operator==(const double& r, const Rational& s)
 {
-   return (abs(r - *(s.dpointer)) < EPSRAT);
+   return (r == *(s.dpointer));
 }
 
 
@@ -1793,7 +1792,7 @@ bool operator==(const double& r, const Rational& s)
 /// inequality operator double and Rational
 bool operator!=(const double& r, const Rational& s)
 {
-   return (abs(r - *(s.dpointer)) >= EPSRAT);
+   return (r != *(s.dpointer));
 }
 
 
@@ -2285,7 +2284,7 @@ bool operator>=(const Rational& r, const Rational& s)
 /// equality operator for Rational and double
 bool operator==(const Rational& r, const double& s)
 {
-   return (abs(r.dpointer->privatevalue - s) < EPSRAT);
+   return (abs(r.dpointer->privatevalue - s) < DEFAULT_EPS_ZERO);
 }
 
 
@@ -2293,7 +2292,7 @@ bool operator==(const Rational& r, const double& s)
 /// inequality operator for Rational and double
 bool operator!=(const Rational& r, const double& s)
 {
-   return (abs(r.dpointer->privatevalue - s) >= EPSRAT);
+   return (abs(r.dpointer->privatevalue - s) >= DEFAULT_EPS_ZERO);
 }
 
 
@@ -2333,7 +2332,7 @@ bool operator>=(const Rational& r, const double& s)
 /// equality operator for double and Rational
 bool operator==(const double& r, const Rational& s)
 {
-   return (abs(r - s.dpointer->privatevalue) < EPSRAT);
+   return (abs(r - s.dpointer->privatevalue) < DEFAULT_EPS_ZERO);
 }
 
 
@@ -2341,7 +2340,7 @@ bool operator==(const double& r, const Rational& s)
 /// inequality operator double and Rational
 bool operator!=(const double& r, const Rational& s)
 {
-   return (abs(r - s.dpointer->privatevalue) >= EPSRAT);
+   return (abs(r - s.dpointer->privatevalue) >= DEFAULT_EPS_ZERO);
 }
 
 
