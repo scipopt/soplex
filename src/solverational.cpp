@@ -1819,17 +1819,9 @@ namespace soplex
       SPxSolver::Status result = SPxSolver::UNKNOWN;
 
       if( fromscratch || !_hasBasis )
-      {
          _enableSimplifierAndScaler();
-         _solver.setTerminationValue(realParam(SoPlex2::INFTY));
-      }
       else
-      {
          _disableSimplifierAndScaler();
-         ///@todo implement for both objective senses
-         _solver.setTerminationValue(intParam(SoPlex2::OBJSENSE) == SoPlex2::OBJSENSE_MINIMIZE
-            ? realParam(SoPlex2::OBJLIMIT_UPPER) : realParam(SoPlex2::INFTY));
-      }
 
       // start timing
       _statistics->syncTime.start();
