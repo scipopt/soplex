@@ -2572,7 +2572,6 @@ namespace soplex
       // if the real LP is loaded, ask solver
       else if( _isRealLPLoaded )
       {
-         assert(_simplifier == 0);
          return _solver.getBasisRowStatus(row);
       }
       // if the real LP is not loaded, the basis is stored in the basis arrays of this class
@@ -2609,7 +2608,6 @@ namespace soplex
       // if the real LP is loaded, ask solver
       else if( _isRealLPLoaded )
       {
-         assert(_simplifier == 0);
          return _solver.getBasisColStatus(col);
       }
       // if the real LP is not loaded, the basis is stored in the basis arrays of this class
@@ -2644,7 +2642,6 @@ namespace soplex
       // if the real LP is loaded, ask solver
       else if( _isRealLPLoaded )
       {
-         assert(_simplifier == 0);
          (void)_solver.getBasis(rows, cols);
       }
       // if the real LP is not loaded, the basis is stored in the basis arrays of this class

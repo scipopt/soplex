@@ -40,16 +40,13 @@ namespace soplex
          spx_free(_realLP);
          _realLP = &_solver;
          _isRealLPLoaded = true;
-
-         if( _hasBasis )
-         {
-            ///@todo this should not fail even if the basis is invalid (wrong dimension or wrong number of basic
-            ///      entries); fix either in SPxSolver or in SPxBasis
-            assert(_basisStatusRows.size() == numRowsReal());
-            assert(_basisStatusCols.size() == numColsReal());
-            _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
-            _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-         }
+      }
+      // during the rational solve, we always store basis information in the basis arrays
+      else if( _hasBasis )
+      {
+         _basisStatusRows.reSize(numRowsReal());
+         _basisStatusCols.reSize(numColsReal());
+         _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
       }
 
       // deactivate objective limit in floating-point solver
@@ -273,9 +270,6 @@ namespace soplex
       DVectorReal primalReal(numColsRational());
       DVectorReal dualReal(numRowsRational());
 
-      _basisStatusRows.reSize(numRowsRational());
-      _basisStatusCols.reSize(numColsRational());
-
       Rational boundsViolation;
       Rational sideViolation;
       Rational redCostViolation;
@@ -293,7 +287,12 @@ namespace soplex
          _solver.setTerminationTime(realParam(SoPlex2::TIMELIMIT) - _statistics->solvingTime.userTime());
 
       if( _hasBasis )
+      {
+         assert(_basisStatusRows.size() == numRowsRational());
+         assert(_basisStatusCols.size() == numColsRational());
          _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
 
       result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
 
@@ -741,6 +740,9 @@ namespace soplex
 
             if( hasDualFarkas )
             {
+               _solRational._hasDualFarkas = true;
+               _solRational._dualFarkas = _solRational._dual;
+
                // check if we can compute sufficiently large Farkas box
                _computeInfeasBox(_solRational, true);
                if( true )//@todo check if computeInfeasBox found a sufficient box
@@ -1517,6 +1519,8 @@ namespace soplex
          _hasBasis = (_basisStatusCols[numOrigCols] != SPxSolver::BASIC);
          _basisStatusCols.reSize(numOrigCols);
       }
+      else
+         _hasBasis = false;
 
       // unshift primal space and restore objective coefficients
       const SVectorRational& colVector = _rationalLP->colVector(numOrigCols);
@@ -1918,6 +1922,8 @@ namespace soplex
                   _simplifier->unsimplify(tmpPrimal, tmpDual, tmpSlacks, tmpRedCost, _basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
 
                   // store basis for original problem
+                  _basisStatusRows.reSize(numRowsReal());
+                  _basisStatusCols.reSize(numColsReal());
                   _simplifier->getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr());
 
                   primal = _simplifier->unsimplifiedPrimal();
@@ -1937,6 +1943,8 @@ namespace soplex
                   }
 
                   // get basis of transformed problem
+                  _basisStatusRows.reSize(_solver.nRows());
+                  _basisStatusCols.reSize(_solver.nCols());
                   _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr());
                }
                break;
@@ -1948,6 +1956,7 @@ namespace soplex
             case SPxSolver::REGULAR:
             case SPxSolver::RUNNING:
             case SPxSolver::UNBOUNDED:
+               break;
             case SPxSolver::INFEASIBLE:
                // if simplifier is active we cannot return a Farkas ray currently
                if( _simplifier != 0 )
@@ -1961,6 +1970,8 @@ namespace soplex
                   _scaler->unscaleDual(dual);
 
                // if the original problem is not in the solver because of scaling, we also need to store the basis
+               _basisStatusRows.reSize(_solver.nRows());
+               _basisStatusCols.reSize(_solver.nCols());
                _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr());
 
                break;
