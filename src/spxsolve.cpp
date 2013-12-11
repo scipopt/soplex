@@ -170,6 +170,7 @@ SPxSolver::Status SPxSolver::solve()
    bool stop  = terminate();
    leaveCount = 0;
    enterCount = 0;
+   primalCount = 0;
    boundflips = 0;
    totalboundflips = 0;
 
@@ -873,6 +874,10 @@ SPxSolver::Status SPxSolver::solve()
       }
    }
 #endif  // ENABLE_ADDITIONAL_CHECKS
+
+   primalCount = ( rep() == SPxSolver::COLUMN )
+     ? enterCount
+     : leaveCount;
 
    return status();
 }

@@ -57,11 +57,15 @@ namespace soplex
 
       Timer readingTime; ///< reading time not included in solving time
       Timer solvingTime; ///< solving time
+      Timer preprocessingTime; ///< preprocessing time
+      Timer simplexTime; ///< simplex time
       Timer syncTime; ///< time for synchronization between real and rational LP (included in solving time)
       Timer transformTime; ///< time for transforming LPs (included in solving time)
       Real luFactorizationTime; ///< time for factorizing bases matrices
       Real luSolveTime; ///< time for solving linear systems
       int iterations; ///< number of iterations/pivots
+      int iterationsPrimal; ///< number of iterations with Primal
+      int iterationsFromBasis; ///< number of iterations from Basis
       int luFactorizations; ///< number of basis matrix factorizations
       int luSolves; ///< number of (forward and backward) solves with basis matrix
       int refinements; ///< number of refinement steps

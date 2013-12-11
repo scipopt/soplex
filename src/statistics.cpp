@@ -37,6 +37,8 @@ namespace soplex
    void SoPlex2::Statistics::clearSolvingData()
    {
       solvingTime.reset();
+      preprocessingTime.reset();
+      simplexTime.reset();
       syncTime.reset();
       transformTime.reset();
       luFactorizationTime = 0.0;
@@ -53,29 +55,27 @@ namespace soplex
    {
       Real solTime = solvingTime.userTime();
       Real totTime = readingTime.userTime() + solTime;
-      Real otherTime = solTime - syncTime.userTime() - transformTime.userTime();
+      Real otherTime = solTime - syncTime.userTime() - transformTime.userTime() - preprocessingTime.userTime() - simplexTime.userTime();
 
       os << std::fixed << std::setprecision(2);
 
       os << "Total time         : " << totTime << " seconds\n"
          << "  Reading          : " << readingTime.userTime() << "\n"
          << "  Solving          : " << solTime << "\n"
-         << "  Preprocessing    : " << "?" << " (?% of solving time)\n"
-         << "  Simplex          : " << "?" << " (?% of solving time)\n"
-         << "  Synchronization  : " << syncTime.userTime() << " (" << syncTime.userTime() / solTime << "% of solving time)\n"
-         << "  Transformation   : " << transformTime.userTime() << " (" << transformTime.userTime() / solTime << "% of solving time)\n"
-         << "  Other            : " << otherTime << " (" << otherTime / solTime << "% of solving time)\n";
+         << "  Preprocessing    : " << preprocessingTime.userTime() << " (" << 100 * (preprocessingTime.userTime() / solTime) << "% of solving time)\n"
+         << "  Simplex          : " << simplexTime.userTime() << " (" << 100 * (simplexTime.userTime() / solTime) << "% of solving time)\n"
+         << "  Synchronization  : " << syncTime.userTime() << " (" << 100 * (syncTime.userTime() / solTime) << "% of solving time)\n"
+         << "  Transformation   : " << transformTime.userTime() << " (" << 100*transformTime.userTime() / solTime << "% of solving time)\n"
+         << "  Other            : " << otherTime << " (" << 100*otherTime / solTime << "% of solving time)\n";
 
       os << "Refinements        : " << refinements << "\n"
          << "  Stalling         : " << stallRefinements << "\n";
 
       os << "Iterations         : " << iterations << "\n"
-         << "  From scratch     : " << "?" << " (?%)\n"
-         << "  From basis       : " << "?" << " (?%)\n"
-         << "  Primal           : " << "?" << " (?%)\n"
-         << "  Dual             : " << "?" << " (?%)\n"
-         << "  Column rep.      : " << "?" << " (?%)\n"
-         << "  Row rep.         : " << "?" << " (?%)\n";
+         << "  From scratch     : " << iterations - iterationsFromBasis << " (" << 100*double((iterations - iterationsFromBasis))/double(iterations) << "%)\n"
+         << "  From basis       : " << iterationsFromBasis << " (" << 100*double(iterationsFromBasis)/double(iterations) << "%)\n"
+         << "  Primal           : " << iterationsPrimal << " (" << 100*double(iterationsPrimal)/double(iterations) << "%)\n"
+         << "  Dual             : " << iterations - iterationsPrimal << " (" << 100*double((iterations - iterationsPrimal))/double(iterations) << "%)\n";
 
       os << "LU factorizations  : " << luFactorizations << "\n"
          << "  Factor. frequency: ";

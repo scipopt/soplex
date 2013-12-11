@@ -30,6 +30,7 @@ namespace soplex
 
       // start timing
       _statistics->solvingTime.start();
+      _statistics->preprocessingTime.start();
 
       // ensure that the solver has the original problem
       if( !_isRealLPLoaded )
@@ -63,6 +64,8 @@ namespace soplex
       // apply lifting to reduce range of nonzero matrix coefficients
       if( boolParam(SoPlex2::LIFTING) )
          _lift();
+
+      _statistics->preprocessingTime.stop();
 
       do
       {

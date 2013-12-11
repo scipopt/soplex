@@ -309,6 +309,7 @@ protected:
 
    int             leaveCount;    ///< number of LEAVE iterations
    int             enterCount;    ///< number of ENTER iterations
+   int             primalCount;   ///< number of primal iterations
    
    int             boundflips;          ///< number of performed bound flips
    int             totalboundflips;     ///< total number of bound flips
@@ -1795,6 +1796,19 @@ public:
    int iterations() const
    {
       return basis().iteration();
+   }
+
+   /// return number of iterations done with primal algorithm
+   int primalIterations()
+   {
+      assert(iterations() == 0 || primalCount <= iterations());
+      return (iterations() == 0) ? 0 : primalCount;
+   }
+
+   /// return number of iterations done with primal algorithm
+   int dualIterations()
+   {
+      return iterations() - primalIterations();
    }
 
    /// time spent in last call to method solve().

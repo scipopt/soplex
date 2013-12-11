@@ -5664,11 +5664,18 @@ namespace soplex
    /// call floating-point solver and update statistics on iterations etc.
    void SoPlex2::_solveRealLPAndRecordStatistics()
    {
+      bool _hadBasis = _hasBasis;
+
+      _statistics->simplexTime.start();
+
       // call floating-point solver
       _solver.solve();
 
       // record statistics
+      _statistics->simplexTime.stop();
       _statistics->iterations += _solver.iterations();
+      _statistics->iterationsPrimal += _solver.primalIterations();
+      _statistics->iterationsFromBasis += _hadBasis ? _solver.iterations() : 0;
       _statistics->luFactorizationTime += _slufactor.getFactorTime();
       _statistics->luSolveTime += _slufactor.getSolveTime();
       _statistics->luFactorizations += _slufactor.getFactorCount();

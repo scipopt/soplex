@@ -133,6 +133,8 @@ namespace soplex
    /// solves real LP with/without preprocessing
    void SoPlex2::_preprocessAndSolveReal(bool applyPreprocessing)
    {
+      _statistics->preprocessingTime.start();
+
       if( applyPreprocessing )
       {
          _enableSimplifierAndScaler();
@@ -201,6 +203,8 @@ namespace soplex
       {
          simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlex2::EPSILON_ZERO), Real(rationalParam(SoPlex2::FEASTOL)), Real(rationalParam(SoPlex2::OPTTOL)));
       }
+
+      _statistics->preprocessingTime.stop();
 
       // run the simplex method if problem has not been solved by the simplifier
       if( simplificationStatus == SPxSimplifier::OKAY )
