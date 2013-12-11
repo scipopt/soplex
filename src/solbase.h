@@ -175,6 +175,8 @@ private:
          if( _hasDualFarkas )
             _dualFarkas = sol._dualFarkas;
       }
+
+      return *this;
    }
 
    /// assignment operator only for friends
@@ -206,6 +208,8 @@ private:
          if( _hasDualFarkas )
             _dualFarkas = sol._dualFarkas;
       }
+
+      return *this;
    }
 };
 } // namespace soplex
