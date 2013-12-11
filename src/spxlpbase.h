@@ -781,16 +781,74 @@ public:
    /** prints problem statistics */
    void printProblemStatistics(std::ostream& os)
    {
+      int countLower = 0;
+      int countUpper = 0;
+      int countBoxed = 0;
+      int countFreeCol = 0;
+
+      int countLhs = 0;
+      int countRhs = 0;
+      int countRanged = 0;
+      int countFreeRow = 0;
+
+      for( int i = 0; i < nCols(); i++ )
+      {
+         bool hasLower = false;
+         bool hasUpper = false;
+
+         if( lower(i) > -infinity )
+         {
+            countLower++;
+            hasLower = true;
+         }
+
+         if( upper(i) < infinity )
+         {
+            countUpper++;
+            hasUpper = true;
+         }
+
+         if( hasUpper && hasLower )
+            countBoxed++;
+
+         if( !hasUpper && !hasLower )
+            countFreeCol++;
+      }
+
+      for( int i = 0; i < nRows(); i++)
+      {
+         bool hasRhs = false;
+         bool hasLhs = false;
+
+         if( lhs(i) > -infinity )
+         {
+            countLhs++;
+            hasLhs = true;
+         }
+
+         if( rhs(i) < infinity )
+         {
+            countRhs++;
+            hasRhs = true;
+         }
+
+         if( hasRhs && hasLhs )
+            countRanged++;
+
+         if( !hasRhs && !hasLhs )
+            countFreeRow++;
+      }
+
       os << "  Columns          : " << nCols() << "\n"
-         << "             boxed : " << "?\n"
-         << "       lower bound : " << "?\n"
-         << "       upper bound : " << "?\n"
-         << "              free : " << "?\n"
+         << "             boxed : " << countBoxed << "\n"
+         << "       lower bound : " << countLower << "\n"
+         << "       upper bound : " << countUpper << "\n"
+         << "              free : " << countFreeCol << "\n"
          << "  Rows             : " << nRows() << "\n"
-         << "            ranged : " << "?\n"
-         << "               lhs : " << "?\n"
-         << "               rhs : " << "?\n"
-         << "              free : " << "?\n"
+         << "            ranged : " << countRanged << "\n"
+         << "               lhs : " << countLhs << "\n"
+         << "               rhs : " << countRhs << "\n"
+         << "              free : " << countFreeRow << "\n"
          << "  Nonzeros         : " << nNzos() << "\n"
          << "        per column : " << Real(nNzos()) / Real(nCols()) << "\n"
          << "           per row : " << Real(nNzos()) / Real(nRows()) << "\n"
