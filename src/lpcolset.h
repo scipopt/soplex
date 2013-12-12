@@ -20,7 +20,7 @@
 #define _LPCOLSET_H_
 
 #include "spxdefines.h"
-#include "lpcolset.h"
+#include "lpcolsetbase.h"
 
 namespace soplex
 {

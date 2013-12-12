@@ -115,12 +115,6 @@ class SVectorBase
 {
    template < class S > friend class SVectorBase;
 
-#if 0 // needed?
-   friend class VectorBase;
-   friend class SSVector;
-   friend std::ostream& operator<<(std::ostream& os, const SVectorBase<R>& v);
-#endif
-
 private:
 
    // ------------------------------------------------------------------------------------------------------------------
@@ -433,7 +427,7 @@ public:
    /// Squared norm.
    R length2() const
    {
-      R x = 0;
+      R x = R(0);
       int n = size();
       const Nonzero<R>* e = m_elem;
 
@@ -463,6 +457,43 @@ public:
 
    /// Inner product.
    R operator*(const VectorBase<R>& w) const;
+
+   /// inner product for sparse vectors
+   template < class S >
+   R operator*(const SVectorBase<S>& w) const
+   {
+      R x = R(0);
+      int i = 0;
+      int j = 0;
+      Element* e = m_elem;
+      typename SVectorBase<S>::Element wj = w.element(j);
+      int n = size();
+      int m = w.size();
+
+      for( ; i < n || j < m; ++i, ++j )
+      {
+         if( e->idx == wj.idx )
+         {
+            x += e->val * R(wj.val);
+            e++;
+            i++;
+            j++;
+            wj = w.element(j);
+         }
+         else if( e->idx < wj.idx )
+         {
+            e++;
+            i++;
+         }
+         else
+         {
+            j++;
+            wj = w.element(j);
+         }
+      }
+
+      return x;
+   }
 
    //@}
 

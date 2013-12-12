@@ -251,6 +251,9 @@ SPxSolver::Status SoPlex::solve()
    // working LP
    SPxLP work(*this);
 
+   // keep useful bounds for bfrt
+   bool keepbounds = (!strcmp(m_solver.ratiotester()->getName(), "Bound Flipping"));
+
    // should the LP be scaled
    if (m_preScaler != 0)
       m_preScaler->scale(work);
@@ -258,7 +261,7 @@ SPxSolver::Status SoPlex::solve()
    // should the LP be simplified ?
    if (m_simplifier != 0)
    {
-      switch(m_simplifier->simplify(work, m_solver.epsilon(), m_solver.feastol(), m_solver.opttol()))
+      switch(m_simplifier->simplify(work, m_solver.epsilon(), m_solver.feastol(), m_solver.opttol(), keepbounds))
       {
       case SPxSimplifier::UNBOUNDED :
          m_solver.setBasisStatus(SPxBasis::UNBOUNDED);

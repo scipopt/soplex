@@ -1607,10 +1607,18 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
    int remNzos = 0;
    int chgLRhs = 0;
    int chgBnds = 0;
+   int keptBnds = 0;
+   int keptLRhs = 0;
+
+   bool redundantLower;
+   bool redundantUpper;
+   bool redundantLhs;
+   bool redundantRhs;
 
    for(int i = lp.nRows()-1; i >= 0; --i)
    {
       const SVector& row = lp.rowVector(i);
+
 
       // compute bounds on constraint value
       Real lhsBnd = 0.0; // minimal activity (finite summands)
@@ -1660,6 +1668,9 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
             Real aij = row.value(k);
             int  j   = row.index(k);
 
+            redundantLower = false;
+            redundantUpper = false;
+
             ASSERT_WARN( "WMAISM12", isNotZero(aij) );
 
             if (aij > 0.0)
@@ -1697,12 +1708,9 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                                        << " (" << lp.lower(j)
                                        << ")" << std::endl; )
 
-                     ++lhsCnt;
-                     lhsBnd -= aij * lp.lower(j);
-
-                     lp.changeLower(j, -infinity);
-                     ++chgBnds;
+                     redundantLower = true;
                   }
+
                }
                if (lp.rhs(i) < infinity && lp.upper(j) < infinity && lhsCnt <= 1 && NErel(lp.rhs(i), lhsBnd, feastol())
                   // do not perform if strongly different orders of magnitude occur
@@ -1737,12 +1745,36 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                                        << " (" << lp.upper(j)
                                        << ")" << std::endl; )
 
+                     redundantUpper = true;
+                  }
+               }
+               if (redundantLower)
+               {
+                  // no upper bound on x_j OR redundant upper bound
+                  if ((lp.upper(j) >= infinity) || redundantUpper || (!m_keepbounds))
+                  {
+                     ++lhsCnt;
+                     lhsBnd -= aij * lp.lower(j);
+
+                     lp.changeLower(j, -infinity);
+                     ++chgBnds;
+                  }
+                  else
+                     ++keptBnds;
+               }
+               if (redundantUpper)
+               {
+                  // no lower bound on x_j OR redundant lower bound
+                  if ((lp.lower(j) <= -infinity) || redundantLower || (!m_keepbounds))
+                  {
                      ++rhsCnt;
                      rhsBnd -= aij * lp.upper(j);
 
                      lp.changeUpper(j, infinity);
                      ++chgBnds;
                   }
+                  else
+                     ++keptBnds;
                }
             }
             else if (aij < 0.0)
@@ -1780,11 +1812,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                                        << " (" << lp.upper(j)
                                        << ")" << std::endl; )
 
-                     ++lhsCnt;
-                     lhsBnd -= aij * lp.upper(j);
-
-                     lp.changeUpper(j, infinity);
-                     ++chgBnds;
+                     redundantUpper = true;
                   }
                }
                if (lp.rhs(i) < infinity && lp.lower(j) > -infinity && lhsCnt <= 1 && NErel(lp.rhs(i), lhsBnd, feastol())
@@ -1820,12 +1848,36 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                                        << " (" << lp.lower(j)
                                        << ")" << std::endl; )
 
+                     redundantLower = true;
+                  }
+               }
+               if (redundantUpper)
+               {
+                  // no lower bound on x_j OR redundant lower bound
+                  if ((lp.lower(j) <= -infinity) || redundantLower || (!m_keepbounds))
+                  {
+                     ++lhsCnt;
+                     lhsBnd -= aij * lp.upper(j);
+
+                     lp.changeUpper(j, infinity);
+                     ++chgBnds;
+                  }
+                  else
+                     ++keptBnds;
+               }
+               if (redundantLower)
+               {
+                  // no upper bound on x_j OR redundant upper bound
+                  if ((lp.upper(j) >= infinity) || redundantUpper || (!m_keepbounds))
+                  {
                      ++rhsCnt;
                      rhsBnd -= aij * lp.lower(j);
 
                      lp.changeLower(j, -infinity);
                      ++chgBnds;
                   }
+                  else
+                     ++keptBnds;
                }
             }
          }
@@ -1833,6 +1885,10 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
 #endif
 
 #if FREE_LHS_RHS
+
+      redundantLhs = false;
+      redundantRhs = false;
+
       // 2. detect implied free constraints
       if (lp.lhs(i) > -infinity && lhsCnt == 0 && GErel(lhsBnd, lp.lhs(i), feastol()))
       {
@@ -1841,8 +1897,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                            << " lhs=" << lp.lhs(i)
                            << std::endl; )
 
-         lp.changeLhs(i, -infinity);
-         ++chgLRhs;
+         redundantLhs = true;
       }
       if (lp.rhs(i) <  infinity && rhsCnt == 0 && LErel(rhsBnd, lp.rhs(i), feastol()))
       {
@@ -1851,8 +1906,29 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                            << " rhs=" << lp.rhs(i)
                            << std::endl; )
 
-         lp.changeRhs(i, infinity);
-         ++chgLRhs;
+         redundantRhs = true;
+      }
+      if (redundantLhs)
+      {
+         // no rhs for constraint i OR redundant rhs
+         if ((lp.rhs(i) >= infinity) || redundantRhs || (!m_keepbounds))
+         {
+            lp.changeLhs(i, -infinity);
+            ++chgLRhs;
+         }
+         else
+            ++keptLRhs;
+      }
+      if (redundantRhs)
+      {
+         // no lhs for constraint i OR redundant lhs
+         if ((lp.lhs(i) <= -infinity) || redundantLhs || (!m_keepbounds))
+         {
+            lp.changeRhs(i, infinity);
+            ++chgLRhs;
+         }
+         else
+            ++keptLRhs;
       }
 #endif
 
@@ -2028,12 +2104,16 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
       m_remNzos += remNzos;
       m_chgLRhs += chgLRhs;
       m_chgBnds += chgBnds;
+      m_keptBnds += keptBnds;
+      m_keptLRhs += keptLRhs;
 
       MSG_INFO2( spxout << "IMAISM28 Main simplifier (rows) removed "
                         << remRows << " rows, "
                         << remNzos << " non-zeros, "
                         << chgBnds << " col bounds, "
-                        << chgLRhs << " row bounds"
+                        << chgLRhs << " row bounds; kept "
+                        << keptBnds << " column bounds, "
+                        << keptLRhs << " row bounds"
                         << std::endl; )
 
    }
@@ -3634,7 +3714,7 @@ void SPxMainSM::fixColumn(SPxLP& lp, int j, bool correctIdx)
    m_hist.append(new (FixVariablePSptr) FixVariablePS(lp, *this, j, lp.lower(j), correctIdx));
 }
 
-SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real feastol, Real opttol)
+SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real feastol, Real opttol, bool keepbounds)
 {
    METHOD( "SPxMainSM::simplify()" );
 
@@ -3647,9 +3727,13 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real feastol, Rea
    m_remNzos = 0;
    m_chgBnds = 0;
    m_chgLRhs = 0;
+   m_keptBnds = 0;
+   m_keptLRhs = 0;
 
    m_result     = OKAY;
    bool   again = true;
+   int numRangedRows = 0;
+   int numBoxedCols = 0;
 
    m_prim.reDim(lp.nCols());
    m_slack.reDim(lp.nRows());
@@ -3661,6 +3745,8 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real feastol, Rea
 
    m_cIdx.reSize(lp.nCols());
    m_rIdx.reSize(lp.nRows());
+
+   m_keepbounds = keepbounds;
 
    if(m_hist.size() > 0)
    {
@@ -3690,10 +3776,25 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real feastol, Rea
    m_opttol = opttol;
 
    for(int i = 0; i < lp.nRows(); ++i)
+   {
       m_rIdx[i] = i;
 
+      if (lp.lhs(i) > -infinity && lp.rhs(i) < infinity)
+         ++numRangedRows;
+   }
+
    for(int j = 0; j < lp.nCols(); ++j)
+   {
       m_cIdx[j] = j;
+
+      if (lp.lower(j) > -infinity && lp.upper(j) < infinity)
+         ++numBoxedCols;
+   }
+
+   MSG_INFO2( spxout << "IMAISM82 LP has "
+                     << numRangedRows << " ranged rows, "
+                     << numBoxedCols << " boxed columns"
+                     << std::endl; )
 
    m_stat.reSize(15);
 
@@ -3748,10 +3849,33 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real feastol, Rea
                      << m_chgLRhs << " row bounds"
                      << std::endl; )
 
+   if (keepbounds)
+      MSG_INFO2( spxout << "IMAISM81 Main simplifier kept "
+                        << m_keptBnds << " column bounds, "
+                        << m_keptLRhs << " row bounds"
+                        << std::endl; )
+
    MSG_INFO1( spxout << "IMAISM74 Reduced LP has "
                      << lp.nRows() << " rows "
                      << lp.nCols() << " columns "
                      << lp.nNzos() << " nonzeros"
+                     << std::endl; )
+
+   // reset counter
+   numRangedRows = 0;
+   numBoxedCols  = 0;
+
+   for(int i = 0; i < lp.nRows(); ++i)
+      if (lp.lhs(i) > -infinity && lp.rhs(i) < infinity)
+         ++numRangedRows;
+
+   for(int j = 0; j < lp.nCols(); ++j)
+      if (lp.lower(j) > -infinity && lp.upper(j) < infinity)
+         ++numBoxedCols;
+
+   MSG_INFO2( spxout << "IMAISM83 Reduced LP has "
+                     << numRangedRows << " ranged rows, "
+                     << numBoxedCols << " boxed columns"
                      << std::endl; )
 
    if (lp.nCols() == 0 && lp.nRows() == 0)

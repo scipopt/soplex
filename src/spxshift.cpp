@@ -262,7 +262,7 @@ void SPxSolver::perturbMax(
       x = upd[i];
       u = p_up[i];
       l = p_low[i];
-      if (x > epsilon())
+      if (x > eps)
       {
          if (u != l && vec[i] >= u - eps)
          {
@@ -270,7 +270,7 @@ void SPxSolver::perturbMax(
             theShift += p_up[i] - u;
          }
       }
-      else if (x < epsilon())
+      else if (x < -eps)
       {
          if (u != l && vec[i] <= l + eps)
          {
@@ -349,7 +349,7 @@ Real SPxSolver::perturbMin(
       x = upd[i];
       u = p_up[i];
       l = p_low[i];
-      if (x < eps)
+      if (x < -eps)
       {
          if (u != l && vec[i] >= u - eps && rep()*stat[i] < 0)
          {
@@ -425,7 +425,7 @@ Real SPxSolver::perturbMax(
             l_theShift += p_up[i] - u;
          }
       }
-      else if (x < eps)
+      else if (x < -eps)
       {
          if (u != l && vec[i] <= l + eps && rep()*stat[i] < 0)
          {

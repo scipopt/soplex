@@ -288,7 +288,7 @@ void SPxSolver::updateTest()
 
    const IdxSet& idx = thePvec->idx();
    const SPxBasis::Desc& ds = desc();
-   Real pricingTol = epsilon();
+   Real pricingTol = leavetol();
 
    int i;
    for (i = idx.size() - 1; i >= 0; --i)
@@ -321,7 +321,7 @@ void SPxSolver::updateCoTest()
 
    const IdxSet& idx = theCoPvec->idx();
    const SPxBasis::Desc& ds = desc();
-   Real pricingTol = epsilon();
+   Real pricingTol = leavetol();
 
    int i;
    for (i = idx.size() - 1; i >= 0; --i)
@@ -963,6 +963,7 @@ bool SPxSolver::enter(SPxId& enterId)
 
    Real leaveVal = -enterMax;
 
+   boundflips = 0;
    int leaveIdx = theratiotester->selectLeave(leaveVal, enterTest);
 
    /* in row representation, fixed columns and rows should not leave the basis */
@@ -1015,16 +1016,11 @@ bool SPxSolver::enter(SPxId& enterId)
 
       if( boundflips > 0 )
       {
-#if 1
          for( int i = coSolveVector3->dim()-1; i >= 0; --i)
          {
             if( fabs((*coSolveVector3)[i]) > epsilon() )
                (*thePvec).multAdd(-(*coSolveVector3)[i],(*thecovectors)[i]);
          }
-#else
-         // this yields the same result but may be more expensive to compute
-         computePvec();
-#endif
          // we need to update enterPric in case it was changed by bound flips
          if( enterId.isSPxColId() )
             enterPric = (*theCoPvec)[number(SPxColId(enterId))];
@@ -1034,7 +1030,6 @@ bool SPxSolver::enter(SPxId& enterId)
          << "breakpoints passed / bounds flipped = " << boundflips
          << std::endl; )
          totalboundflips += boundflips;
-         boundflips = 0;
       }
 
       (*theCoPrhs)[leaveIdx] = enterRO;

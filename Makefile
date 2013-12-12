@@ -24,7 +24,7 @@ include make/make.detecthost
 
 
 #-----------------------------------------------------------------------------
-VERSION		:=	1.8.0.1
+VERSION		:=	1.7.2.6
 
 VERBOSE		=	false
 SHARED		=	false
@@ -36,6 +36,11 @@ EXEEXTENSION	=
 TEST		=	quick
 ALGO		=	1 2 3 4
 LIMIT		=	#
+
+#these variables are needed for cluster runs
+TIME		=	3600
+MEM		=	6144
+CONTINUE	=	false
 
 INSTALLDIR	=	#
 
@@ -76,6 +81,7 @@ ARFLAGS		=	cr
 DFLAGS		=	-MM
 VFLAGS		=	--tool=memcheck --leak-check=yes --show-reachable=yes #--gen-suppressions=yes
 
+SOPLEXDIR	=	$(realpath .)
 SRCDIR		=	src
 BINDIR		=	bin
 LIBDIR		=	lib
@@ -180,14 +186,14 @@ EXAMPLESRC	=	$(addprefix $(SRCDIR)/,$(EXAMPLEOBJ:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
 LIBSRCHEADER	=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.h))
 
-RATIONALDEP		:=	$(SRCDIR)/depend.rational
-RATIONALSRC		:=	$(shell cat $(RATIONALDEP))
+RATIONALDEP	:=	$(SRCDIR)/depend.rational
+RATIONALSRC	:=	$(shell cat $(RATIONALDEP))
 ifeq ($(RATIONAL),gmp)
-CPPFLAGS		+=	-DSOPLEX_WITH_GMP
+CPPFLAGS	+=	-DSOPLEX_WITH_GMP
 LDFLAGS		+=	-lgmp
 else
 ifeq ($(RATIONAL),gmpxx)
-CPPFLAGS		+=	-DSOPLEX_WITH_GMPXX
+CPPFLAGS	+=	-DSOPLEX_WITH_GMPXX
 LDFLAGS		+=	-lgmpxx -lgmp
 endif
 endif
@@ -239,6 +245,8 @@ $(LIBFILE):	$(LIBDIR) $(LIBOBJDIR) touchexternal $(LIBOBJFILES)
 ifneq ($(RANLIB),)
 		$(RANLIB) $@
 endif
+
+-include make/local/make.targets
 
 .PHONY: lint
 lint:		$(BINSRC) $(LIBSRC)

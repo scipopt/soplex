@@ -118,6 +118,27 @@ void SPxSolver::updateFtest()
          }
       }
    }
+   // if boundflips were performed, we need to update these indices as well
+   if( boundflips > 0 )
+   {
+      Real eps = epsilon();
+      for( int i = 0; i < solveVector3->dim(); ++i )
+      {
+         if( (*solveVector3)[i] > eps || (*solveVector3)[i] < -eps )
+         {
+            ftest[i] = ((*theFvec)[i] > theUBbound[i]) ? theUBbound[i] - (*theFvec)[i] : (*theFvec)[i] - theLBbound[i];
+            if( sparsePricingLeave && ftest[i] < -theeps )
+            {
+               assert(remainingRoundsLeave == 0);
+               if( !isInfeasible[i] )
+               {
+                  infeasibilities.addIdx(i);
+                  isInfeasible[i] = true;
+               }
+            }
+         }
+      }
+   }
 }
 
 
@@ -609,6 +630,7 @@ bool SPxSolver::leave(int leaveIdx)
    for(;;)
    {
       Real enterVal = leaveMax;
+      boundflips = 0;
       SPxId enterId = theratiotester->selectEnter(enterVal, leaveIdx);
 
       assert(!enterId.isValid() || !isBasic(enterId));
@@ -721,7 +743,6 @@ bool SPxSolver::leave(int leaveIdx)
                                  << "breakpoints passed / bounds flipped = " << boundflips
                                  << std::endl; )
                totalboundflips += boundflips;
-               boundflips = 0;
             }
             else if( solveVector2 != NULL )
             {
@@ -749,7 +770,6 @@ bool SPxSolver::leave(int leaveIdx)
                                  << "breakpoints passed / bounds flipped = " << boundflips
                                  << std::endl; )
                totalboundflips += boundflips;
-               boundflips = 0;
             }
             else
                SPxBasis::solve4update (theFvec->delta(), newVector);

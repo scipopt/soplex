@@ -135,7 +135,7 @@ template < class S >
 inline
 VectorBase<R>& VectorBase<R>::operator+=(const SVectorBase<S>& vec)
 {
-   for( int i = 0; i < vec.size(); i++ )
+   for( int i = vec.size() - 1; i >= 0; --i )
    {
       assert(vec.index(i) >= 0);
       assert(vec.index(i) < dim());
@@ -177,7 +177,7 @@ template < class S >
 inline
 VectorBase<R>& VectorBase<R>::operator-=(const SVectorBase<S>& vec)
 {
-   for( int i = 0; i < vec.size() ; i++ )
+   for( int i = vec.size() - 1; i >= 0; i-- )
    {
       assert(vec.index(i) >= 0);
       assert(vec.index(i) < dim());
@@ -199,12 +199,12 @@ VectorBase<R>& VectorBase<R>::operator-=(const SSVectorBase<S>& vec)
 
    if ( vec.isSetup() )
    {
-      for( int i = 0; i < vec.size() ; i++ )
+      for( int i = vec.size() - 1; i >= 0; i-- )
          val[vec.index(i)] -= vec.value(i);
    }
    else
    {
-      for( int i = 0; i < dim(); i++ )
+      for( int i = dim() - 1; i >= 0; i-- )
          val[i] -= vec[i];
    }
 

@@ -25,7 +25,7 @@ BEGIN {
    print "";
    line = "-----------------------------------------------------------------------------------------------------------------------------\n";
    printf(line);
-   printf("Name         Rows   Cols Type   Iter     Time Objective        relErr   maxVCons sumVCons maxVBoun sumVBoun maxVRedc sumVRedc\n");
+   printf("Name         Rows   Cols Type   Iter   Flips     Time Objective        relErr   maxVCons sumVCons maxVBoun sumVBoun maxVRedc sumVRedc\n");
 
    obj      = "error";
 }
@@ -35,6 +35,7 @@ BEGIN {
 /IEXAMP24/       { rows = $4; cols = $6; }
 /Solution time/  { time = $4; } 
 /Iterations/     { iter = $3; }
+/ISOLVE02/       { flips = $8; }
 /IEXAMP29/       { obj  = $5; }
 /IEXAMP31/       { unbd = 1 ; }
 /IEXAMP32/       { infeas = 1; }
@@ -56,6 +57,10 @@ BEGIN {
    split(a[n], b, ".");
    name = b[1];
 
+   m = split(flips, c, "=");
+   split(c[m], d, ",");
+   numflips = d[1];
+
    if (sol[name] == "")
       print name, "nicht gefunden";
    else
@@ -67,7 +72,7 @@ BEGIN {
 	 printf(line);
 	 printf("%-10s %6d %6d ", name, rows, cols);
       }
-      printf("%-3s %7d %8.2f ", type, iter, time);
+      printf("%-3s %7d %7d %8.2f ", type, iter, numflips, time);
 
       if (infeas)
 	 printf("%-14s", "infeasible");
@@ -108,6 +113,7 @@ BEGIN {
 	       pass[type]++;
 	       relerrsum[type] += relerr;
 	       passes++;
+          flipsum[type] += numflips;
 	    }
 	    else
 	    {
@@ -163,12 +169,12 @@ BEGIN {
 END {
    print "";
    printf(line);
-   printf("Alg            Cnt  Pass  Fail       Time                      relErr   maxVCons sumVCons maxVBoun sumVBoun maxVRedc sumVRedc\n");
+   printf("Alg            Cnt  Pass  Fail   Flips       Time                      relErr   maxVCons sumVCons maxVBoun sumVBoun maxVRedc sumVRedc\n");
    printf(line);
    for(i in sum)
    {
-      printf("%-12s %5d %5d %5d %10.2f                     ",
-	     i, cnt[i], pass[i], fail[i], sum[i]);
+      printf("%-12s %5d %5d %5d %7d %10.2f                     ",
+	     i, cnt[i], pass[i], fail[i], flipsum[i], sum[i]);
       printviol(relerrsum[i]);
       printviol(cvmax[i]);
       printviol(cvsum[i]);
@@ -179,6 +185,7 @@ END {
       print "";
 
       relerrsumsum += relerrsum[i];
+      flipsumsum += flipsum[i];
       cvmaxsum += cvmax[i];
       cvsumsum += cvsum[i];
       bvmaxsum += bvmax[i];
@@ -187,8 +194,8 @@ END {
       rcsumsum += rcsum[i];
    }
    printf(line);
-   printf("%-12s %5d %5d %5d %10.2f                     ",
-	  "Sum", counts, passes, fails, times);
+   printf("%-12s %5d %5d %5d %7d %10.2f                     ",
+	  "Sum", counts, passes, fails, flipsumsum, times);
 
    printviol(relerrsumsum);
    printviol(cvmaxsum);

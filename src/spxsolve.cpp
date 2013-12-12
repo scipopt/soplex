@@ -20,7 +20,6 @@
 
 #include "spxdefines.h"
 #include "rational.h"
-#include "dvector_exact.h"
 #include "spxsolver.h"
 #include "spxpricer.h"
 #include "spxratiotester.h"
@@ -876,6 +875,77 @@ SPxSolver::Status SPxSolver::solve()
 #endif  // ENABLE_ADDITIONAL_CHECKS
 
    return status();
+}
+
+void SPxSolver::testVecs()
+{
+   METHOD( "SPxSolver::testVecs()" );
+
+   assert(SPxBasis::status() > SPxBasis::SINGULAR);
+
+   DVector tmp(dim());
+
+   tmp = *theCoPvec;
+   multWithBase(tmp);
+   tmp -= *theCoPrhs;
+   if (tmp.length() > leavetol())
+   {
+      MSG_INFO3( spxout << "ISOLVE93 " << iteration() << ":\tcoP error = \t"
+                        << tmp.length() << std::endl; )
+
+      tmp.clear();
+      SPxBasis::coSolve(tmp, *theCoPrhs);
+      multWithBase(tmp);
+      tmp -= *theCoPrhs;
+      MSG_INFO3( spxout << "ISOLVE94\t\t" << tmp.length() << std::endl; )
+
+      tmp.clear();
+      SPxBasis::coSolve(tmp, *theCoPrhs);
+      tmp -= *theCoPvec;
+      MSG_INFO3( spxout << "ISOLVE95\t\t" << tmp.length() << std::endl; )
+   }
+
+   tmp = *theFvec;
+   multBaseWith(tmp);
+   tmp -= *theFrhs;
+   if (tmp.length() > entertol())
+   {
+      MSG_INFO3( spxout << "ISOLVE96 " << iteration() << ":\t  F error = \t"
+                           << tmp.length() << std::endl; )
+
+      tmp.clear();
+      SPxBasis::solve(tmp, *theFrhs);
+      tmp -= *theFvec;
+      MSG_INFO3( spxout << "ISOLVE97\t\t" << tmp.length() << std::endl; )
+   }
+
+   if (type() == ENTER)
+   {
+      for (int i = 0; i < dim(); ++i)
+      {
+         if (theCoTest[i] < -leavetol() && isCoBasic(i))
+         {
+            /// @todo Error message "this shalt not be": shalt this be an assert (also below)?
+            MSG_ERROR( spxout << "ESOLVE98 testVecs: theCoTest: this shalt not be!"
+                              << std::endl
+                              << "  i=" << i
+                              << ", theCoTest[i]=" << theCoTest[i]
+                              << ", leavetol()=" << leavetol() << std::endl; )
+         }
+      }
+
+      for (int i = 0; i < coDim(); ++i)
+      {
+         if (theTest[i] < -leavetol() && isBasic(i))
+         {
+            MSG_ERROR( spxout << "ESOLVE99 testVecs: theTest: this shalt not be!"
+                              << std::endl
+                              << "  i=" << i
+                              << ", theTest[i]=" << theTest[i]
+                              << ", leavetol()=" << leavetol() << std::endl; )
+         }
+      }
+   }
 }
 
 bool SPxSolver::terminate()

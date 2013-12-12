@@ -561,6 +561,12 @@ public:
     */
    Vector& multWithBase(Vector& x) const;
 
+   /* compute an estimated condition number for the current basis matrix
+    * by computing estimates of the norms of B and B^-1 using the power method.
+    * maxiters and tolerance control the accuracy of the estimate.
+    */
+   Real condition(int maxiters = 10, Real tolerance = 1e-6);
+
    /// returns the stability of the basis matrix.
    Real stability() const
    {

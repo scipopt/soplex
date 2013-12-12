@@ -925,12 +925,11 @@ void printSolutionAndStatusRational(
 
          if( SoPlexShell.getPrimalRational(objx) )
          {
-            MSG_INFO1( spxout << std::endl << "Primal solution (name, id, value):" << std::endl; )
+            MSG_INFO1( spxout << std::endl << "Primal solution (name, value):" << std::endl; )
             for( int i = 0; i < SoPlexShell.numColsRational(); ++i )
             {
                if( isNotZero( Real(objx[i]), 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) ) )
                   MSG_INFO1( spxout << colnames[i] << "\t"
-                                    << i << "\t"
                                     << std::setw(17)
                                     << std::setprecision( precision )
                                     << rationalToString(objx[i]) << std::endl; )
@@ -945,13 +944,12 @@ void printSolutionAndStatusRational(
 
          if( SoPlexShell.getDualRational(objy) )
          {
-            MSG_INFO1( spxout << std::endl << "Dual multipliers (name, id, value):" << std::endl; )
+            MSG_INFO1( spxout << std::endl << "Dual multipliers (name, value):" << std::endl; )
             for( int i = 0; i < SoPlexShell.numRowsRational(); ++i )
             {
                if( isNotZero( Real(objy[i]), 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::OPTTOL))) )
                {
                   MSG_INFO1( spxout << rownames[i] << "\t"
-                                    << i << "\t"
                                     << std::setw(17)
                                     << std::setprecision( precision )
                                     << rationalToString(objy[i]) << std::endl; )

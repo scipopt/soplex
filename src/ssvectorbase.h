@@ -45,17 +45,15 @@ template < class R > class SVSetBase;
  *  only guaranteed that at least every non-zero is in the IdxSet.
  */
 template < class R >
-class SSVectorBase : protected DVectorBase<R>, protected IdxSet
+class SSVectorBase : public DVectorBase<R>, protected IdxSet
 {
 private:
 
-#if 1
    friend class DVectorBase<R>;
    friend class VectorBase<R>;
    template < class S > friend class DVectorBase;
    template < class S > friend class VectorBase;
    template < class S > friend class DSVectorBase;
-#endif
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Data */
@@ -417,6 +415,39 @@ public:
       return *this;
    }
 
+   // Inner product.
+   template < class S >
+   R operator*(const SSVectorBase<S>& w)
+   {
+      setup();
+
+      R x = R(0);
+      int i = 0;
+      int j = 0;
+      int vi = index(i);
+      int wj = w.index(j);
+      int n = size();
+      int m = w.size();
+
+      while( i < n && j < m )
+      {
+         if( vi == wj )
+         {
+            x += VectorBase<R>::val[vi] * R(w.val[wj]);
+            ++i;
+            ++j;
+            vi = index(i);
+            wj = w.index(j);
+         }
+         else if( vi < wj )
+            vi = index(++i);
+         else
+            wj = w.index(++j);
+      }
+
+      return x;
+   }
+
    /// Addition of a scaled vector.
    ///@todo SSVectorBase::multAdd() should be rewritten without pointer arithmetic.
    template < class S, class T >
@@ -774,7 +805,7 @@ public:
          {
             IdxSet::operator=(rhs);
 
-            for( int i = 0; i < size(); ++i )
+            for( int i = size() - 1; i >= 0; --i )
             {
                int j = index(i);
                VectorBase<R>::val[j] = rhs.val[j];

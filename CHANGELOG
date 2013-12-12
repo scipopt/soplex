@@ -13,6 +13,8 @@ code quality & new features:
     instances, or instances, that spend much time in pricing. Partial pricing is likely to increase the number of iterations.
 - refinement step to improve feasibility/optimality also for steep pricer (was devex only)
 - own objective sense enumerator in MPS parser
+- keep relevant bounds if bound flipping ratio test is used and display performed flips in summary
+- new method to calculate the condition number of the current basis matrix (2-norm, estimate)
 
 interface:
 - renamed class MpqReal to Rational
@@ -32,6 +34,9 @@ fixed bugs:
 - do a better check in precisionReached() by first recomputing correct test/coTest/fTest values
 - fixed MSG system to prevent unnecessary executions/operations in non-printed calls
 - throw exception if immediately after a restart the basis matrix is infeasible
+- restore slack basis if a basis with too many or too few basic entries is loaded
+- higher precison when writing .lp or .mps files, similar to SCIP standards
+- correct update of infeasibilities after dual bound flips
 
 performance:
 - potentially faster loops in vector classes

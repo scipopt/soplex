@@ -804,7 +804,7 @@ void SPxSolver::setFeastol(Real d)
    METHOD( "SPxSolver::setFeastol()" );
 
    if( d <= 0.0 )
-      throw SPxInterfaceException("XSOLVE30 Cannot set negative feastol.");
+      throw SPxInterfaceException("XSOLVE30 Cannot set feastol less than or equal to zero.");
 
    if( theRep == COLUMN )
       m_entertol = d;
@@ -817,7 +817,7 @@ void SPxSolver::setOpttol(Real d)
    METHOD( "SPxSolver::setOpttol()" );
 
    if( d <= 0.0 )
-      throw SPxInterfaceException("XSOLVE31 Cannot set negative opttol.");
+      throw SPxInterfaceException("XSOLVE31 Cannot set opttol less than or equal to zero.");
 
    if( theRep == COLUMN )
       m_leavetol = d;
@@ -830,7 +830,7 @@ void SPxSolver::setDelta(Real d)
    METHOD( "SPxSolver::setDelta()" );
 
    if( d <= 0.0 )
-      throw SPxInterfaceException("XSOLVE32 Cannot set negative delta.");
+      throw SPxInterfaceException("XSOLVE32 Cannot set delta less than or equal to zero.");
 
    m_entertol = d;
    m_leavetol = d;

@@ -30,7 +30,6 @@
 #include "sol.h"
 #include "spxdefines.h"
 #include "basevectors.h"
-#include "vector_exact.h"
 #include "gmp.h"
 #include "gmpxx.h"
 

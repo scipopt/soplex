@@ -1876,6 +1876,7 @@ void SPxLPBase<Real>::writeLPF(
 {
    METHOD("writeLPF");
 
+   p_output << std::setprecision(15);
    LPFwriteObjective(*this, p_output, p_cnames);
    LPFwriteRows(*this, p_output, p_rnames, p_cnames);
    LPFwriteBounds(*this, p_output, p_cnames);
@@ -1907,12 +1908,12 @@ static void MPSwriteRecord(
 
    if( name1 != 0 )
    {
-      sprintf(buf, "  %-8.8s  %12.9" REAL_FORMAT, name1, value1);
+      sprintf(buf, "  %-8.8s  %.15g" REAL_FORMAT, name1, value1);
       os << buf;
 
       if( name2 != 0 )
       {
-         sprintf(buf, "   %-8.8s  %12.9" REAL_FORMAT, name2, value2);
+         sprintf(buf, "   %-8.8s  %.15" REAL_FORMAT, name2, value2);
          os << buf;
       }
    }
