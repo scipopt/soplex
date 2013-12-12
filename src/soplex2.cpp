@@ -2042,9 +2042,9 @@ namespace soplex
       else if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_MANUAL )
       {
 #ifdef ENABLE_ADDITIONAL_CHECKS
-         assert(isInSync(true, true, false));
+         assert(areLPsInSync(true, true, false));
 #else
-         assert(isInSync(true, false, false));
+         assert(areLPsInSync(true, false, false));
 #endif
 
          // store current real LP
@@ -2072,9 +2072,9 @@ namespace soplex
       else
       {
 #ifdef ENABLE_ADDITIONAL_CHECKS
-         assert(isInSync(true, true, false));
+         assert(areLPsInSync(true, true, false));
 #else
-         assert(isInSync(true, false, false));
+         assert(areLPsInSync(true, false, false));
 #endif
 
          _solveRational();
