@@ -27,16 +27,10 @@ namespace soplex
       // start timing
       _statistics->solvingTime.start();
 
-      try
-      {
-         _preprocessAndSolveReal(!_hasBasis);
-         _storeSolutionReal();
-      }
-      catch( ... )
-      {
-         MSG_ERROR( spxout << "Exception thrown while solving real LP.\n" );
-         _status = SPxSolver::ERROR;
-      }
+      // solve and store solution; if we have a starting basis, do not apply preprocessing; if we are solving from
+      // scratch, apply preprocessing according to parameter settings
+      _preprocessAndSolveReal(!_hasBasis);
+      _storeSolutionReal();
 
       // stop timing
       _statistics->solvingTime.stop();
@@ -272,14 +266,17 @@ namespace soplex
          try
          {
             _simplifier->unsimplify(primal, dual, slacks, redCost, _basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
-
-            // store basis for original problem
             _simplifier->getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
             _hasBasis = true;
          }
+         catch( SPxException E )
+         {
+            MSG_ERROR( spxout << "Caught exception <" << E.what() << "> during unsimplification. Resolving without simplifier and scaler.\n" );
+         }
          catch( ... )
          {
-            MSG_INFO1( spxout << "Exception thrown during unsimplification. Resolving without simplifier and scaler.\n" );
+            MSG_ERROR( spxout << "Caught unknown exception during unsimplification. Resolving without simplifier and scaler.\n" );
+            _status = SPxSolver::ERROR;
          }
       }
       // if the original problem is not in the solver because of scaling, we also need to store the basis

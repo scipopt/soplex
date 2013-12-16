@@ -5668,11 +5668,24 @@ namespace soplex
 
       _statistics->simplexTime.start();
 
-      // call floating-point solver
-      _solver.solve();
+      // call floating-point solver and catch exceptions
+      try
+      {
+         _solver.solve();
+      }
+      catch( SPxException E )
+      {
+         MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while solving real LP.\n" );
+      }
+      catch( ... )
+      {
+         MSG_ERROR( spxout << "Caught unknown exception while solving real LP.\n" );
+         _status = SPxSolver::ERROR;
+      }
+
+      _statistics->simplexTime.stop();
 
       // record statistics
-      _statistics->simplexTime.stop();
       _statistics->iterations += _solver.iterations();
       _statistics->iterationsPrimal += _solver.primalIterations();
       _statistics->iterationsFromBasis += _hadBasis ? _solver.iterations() : 0;
