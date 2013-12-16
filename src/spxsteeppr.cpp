@@ -351,6 +351,8 @@ int SPxSteepPR::selectLeavePart(Real tol)
    int lastIdx = -1;
    int count = 0;
    int dim = thesolver->dim();
+   if( dim == 0 )
+      goto TERMINATE;
    int oldstart = startpricing % dim; // within SCIP, dimensions may change
    int end = dim;
 
