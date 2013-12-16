@@ -301,8 +301,6 @@ namespace soplex
    /// stores solution of the real LP; before calling this, the real LP must be loaded in the solver and solved (again)
    void SoPlex2::_storeSolutionReal()
    {
-      assert(_isRealLPLoaded);
-
       assert(_solver.basis().status() != SPxBasis::PRIMAL || status() != SPxSolver::ERROR);
       assert(_solver.basis().status() != SPxBasis::PRIMAL || status() != SPxSolver::NO_RATIOTESTER);
       assert(_solver.basis().status() != SPxBasis::PRIMAL || status() != SPxSolver::NO_PRICER);
@@ -320,6 +318,7 @@ namespace soplex
             && _solver.shift() < 10.0 * realParam(SoPlex2::EPSILON_ZERO)));
       if( _solReal._hasPrimal )
       {
+         assert(_isRealLPLoaded);
          _solReal._primal.reDim(_solver.nCols());
          _solReal._slacks.reDim(_solver.nRows());
          _solver.getPrimal(_solReal._primal);
@@ -329,6 +328,7 @@ namespace soplex
       _solReal._hasPrimalRay = (status() == SPxSolver::UNBOUNDED);
       if( _solReal._hasPrimalRay )
       {
+         assert(_isRealLPLoaded);
          _solReal._primalRay.reDim(_solver.nCols());
          _solver.getPrimalray(_solReal._primalRay);
       }
@@ -350,6 +350,7 @@ namespace soplex
             && _solver.shift() < 10.0 * realParam(SoPlex2::EPSILON_ZERO)));
       if( _solReal._hasDual )
       {
+         assert(_isRealLPLoaded);
          _solReal._dual.reDim(_solver.nRows());
          _solReal._redCost.reDim(_solver.nCols());
          _solver.getDual(_solReal._dual);
@@ -359,6 +360,7 @@ namespace soplex
       _solReal._hasDualFarkas = (status() == SPxSolver::INFEASIBLE && _simplifier == 0);
       if( _solReal._hasDualFarkas )
       {
+         assert(_isRealLPLoaded);
          _solReal._dualFarkas.reDim(_solver.nRows());
          _solver.getDualfarkas(_solReal._dualFarkas);
       }
