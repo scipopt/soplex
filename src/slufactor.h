@@ -215,6 +215,11 @@ public:
    {
       return factorTime.userTime();
    }
+   /// reset FactorTime
+   void resetFactorTime()
+   {
+      factorTime.reset();
+   }
    /// number of factorizations performed
    int getFactorCount() const
    {
@@ -224,6 +229,11 @@ public:
    Real getSolveTime() const
    {
       return solveTime.userTime();
+   }
+   /// reset SolveTime
+   void resetSolveTime()
+   {
+      solveTime.reset();
    }
    /// number of solves performed
    int getSolveCount() const
