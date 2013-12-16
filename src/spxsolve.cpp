@@ -176,6 +176,10 @@ SPxSolver::Status SPxSolver::solve()
 
    stallNumRecovers = 0;
 
+   /* if we run into a singular basis, we will retry from regulardesc with tighter tolerance in the ratio test */
+   SPxSolver::Type tightenedtype = type();
+   bool tightened = false;
+
    while (!stop)
    {
       const SPxBasis::Desc regulardesc = desc();
@@ -185,6 +189,9 @@ SPxSolver::Status SPxSolver::solve()
       solveVector3 = 0;
       coSolveVector2 = 0;
       coSolveVector3 = 0;
+
+      try
+      {
 
       if (type() == ENTER)
       {
@@ -797,6 +804,94 @@ SPxSolver::Status SPxSolver::solve()
          }
       }
       assert(m_status != SINGULAR);
+
+      }
+      catch( SPxException E )
+      {
+         // if we stopped due to a singular basis, we reload the original basis and try again with tighter
+         // tolerance (only once)
+         if (m_status == SINGULAR && !tightened)
+         {
+            tightenedtype = type();
+
+            if( tightenedtype == ENTER )
+            {
+               m_entertol = 0.01 * m_entertol;
+
+               MSG_INFO2( spxout << "ISOLVE26e basis singular: reloading basis and solving with tighter ratio test tolerance " << m_entertol << std::endl; )
+            }
+            else
+            {
+               m_leavetol = 0.01 * m_leavetol;
+
+               MSG_INFO2( spxout << "ISOLVE26l basis singular: reloading basis and solving with tighter ratio test tolerance " << m_leavetol << std::endl; )
+            }
+
+            // load original basis
+            int niters = iterations();
+            loadBasis(regulardesc);
+
+            // remember iteration count
+            iterCount = niters;
+
+            // try initializing basis (might fail if starting basis was already singular)
+            try
+            {
+               init();
+               theratiotester->setType(type());
+            }
+            catch( SPxException Ex )
+            {
+               MSG_INFO2( spxout << "ISOLVE27 reloaded basis singular, resetting original tolerances" << std::endl; )
+
+               if( tightenedtype == ENTER )
+                  m_entertol = 100.0 * m_entertol;
+               else
+                  m_leavetol = 100.0 * m_leavetol;
+
+               theratiotester->setType(type());
+
+               throw Ex;
+            }
+
+            // reset status and counters
+            m_status = RUNNING;
+            m_numCycle = 0;
+            leaveCount = 0;
+            enterCount = 0;
+            stallNumRecovers = 0;
+
+            // continue
+            stop = false;
+            tightened = true;
+         }
+         // reset tolerance to its original value and pass on the exception
+         else if (tightened)
+         {
+            if( tightenedtype == ENTER )
+               m_entertol = 100.0 * m_entertol;
+            else
+               m_leavetol = 100.0 * m_leavetol;
+
+            theratiotester->setType(type());
+
+            throw E;
+         }
+         // pass on the exception
+         else
+            throw E;
+      }
+   }
+
+   // reset tolerance to its original value
+   if (tightened)
+   {
+      if( tightenedtype == ENTER )
+         m_entertol = 100.0 * m_entertol;
+      else
+         m_leavetol = 100.0 * m_leavetol;
+
+      theratiotester->setType(type());
    }
 
    theTime.stop();
