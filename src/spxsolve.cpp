@@ -386,11 +386,12 @@ SPxSolver::Status SPxSolver::solve()
             thepricer->entered4(lastEntered(), lastIndex());
             stop = terminate();
             clearUpdateVecs();
-            if( lastEntered().isValid() ) /* either a successful pivot was performed or a nonbasic variable flipped to the other bound */
-            {
-               enterCount++;
+
+            /* if a successful pivot was performed or a nonbasic variable was flipped to its other bound, we reset the
+             * cycle counter
+             */
+            if( lastEntered().isValid() )
                enterCycleCount = 0;
-            }
             else
             {
                enterCycleCount++;
@@ -401,6 +402,15 @@ SPxSolver::Status SPxSolver::solve()
                   m_status = ABORT_CYCLING;
                   stop = true;
                }
+            }
+
+            /* only if the basis has really changed, we increase the iterations counter; this is not the case when only
+             * a nonbasic variable was flipped to its other bound
+             */
+            if( lastIndex() >= 0 )
+            {
+               enterCount++;
+               assert(lastEntered().isValid());
             }
 
             /* check every MAXSTALLS iterations whether shift and objective value have not changed */
@@ -648,11 +658,12 @@ SPxSolver::Status SPxSolver::solve()
             thepricer->left4(lastIndex(), lastLeft());
             stop = terminate();
             clearUpdateVecs();
-            if( lastIndex() >= 0 ) /* either a successful pivot was performed or a nonbasic variable flipped to the other bound */
-            {
-               leaveCount++;
+
+            /* if a successful pivot was performed or a nonbasic variable was flipped to its other bound, we reset the
+             * cycle counter
+             */
+            if( lastIndex() >= 0 )
                leaveCycleCount = 0;
-            }
             else
             {
                leaveCycleCount++;
@@ -662,6 +673,15 @@ SPxSolver::Status SPxSolver::solve()
                   m_status = ABORT_CYCLING;
                   stop = true;
                }
+            }
+
+            /* only if the basis has really changed, we increase the iterations counter; this is not the case when only
+             * a nonbasic variable was flipped to its other bound
+             */
+            if( lastEntered().isValid() )
+            {
+               leaveCount++;
+               assert(lastIndex() >= 0);
             }
 
             /* check every MAXSTALLS iterations whether shift and objective value have not changed */
