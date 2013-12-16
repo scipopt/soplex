@@ -1031,6 +1031,14 @@ bool SPxSolver::terminate()
          unShift();
    }
 
+   // check time limit and objective limit only for non-terminal bases
+   if( SPxBasis::status() >= SPxBasis::OPTIMAL  ||
+       SPxBasis::status() <= SPxBasis::SINGULAR )
+   {
+      m_status = UNKNOWN;
+      return true;
+   }
+
    if ( maxTime >= 0 && maxTime < infinity && time() >= maxTime )
    {
       MSG_INFO2( spxout << "ISOLVE54 Timelimit (" << maxTime
@@ -1082,12 +1090,6 @@ bool SPxSolver::terminate()
       }
    }
 
-   if( SPxBasis::status() >= SPxBasis::OPTIMAL  ||
-       SPxBasis::status() <= SPxBasis::SINGULAR )
-   {
-      m_status = UNKNOWN;
-      return true;
-   }
    return false;
 }
 
