@@ -24,6 +24,7 @@
 #include <string>
 #include <sstream>
 #include <cstring>
+#include <limits.h>
 
 
 #include "rational.h"
@@ -42,7 +43,6 @@
 namespace soplex
 {
 #ifdef SOPLEX_WITH_GMP
-#define RationalIsExact() (true)
 
 /// Defines the "Pimpl"-class Private
 class Rational::Private
@@ -450,6 +450,14 @@ bool Rational::isAdjacentTo(const double& d)
       return (x == d);
 
    return ((a == d) || (b == d));
+}
+
+
+
+/// returns precision of Rational implementation, i.e., number of bits used to store Rational numbers (INT_MAX if exact)
+int Rational::precision()
+{
+   return INT_MAX;
 }
 
 
@@ -1098,7 +1106,6 @@ Rational operator-(const Rational& r)
 
 
 #elif SOPLEX_WITH_GMPXX
-#define RationalIsExact() (true)
 
 /// Defines the "Pimpl"-class Private
 class Rational::Private : public mpq_class
@@ -1484,6 +1491,14 @@ bool Rational::isAdjacentTo(const double& d)
       return (x == d);
 
    return ((a == d) || (b == d));
+}
+
+
+
+/// returns precision of Rational implementation, i.e., number of bits used to store Rational numbers (INT_MAX if exact)
+int Rational::precision()
+{
+   return INT_MAX;
 }
 
 
@@ -2046,7 +2061,6 @@ Rational operator-(const Rational& r)
 
 
 #else
-#define RationalIsExact() (false)
 
 
 
@@ -2363,6 +2377,14 @@ bool Rational::isNextTo(const double& d)
 bool Rational::isAdjacentTo(const double& d)
 {
    return (this->dpointer->privatevalue == d);
+}
+
+
+
+/// returns precision of Rational implementation, i.e., number of bits used to store Rational numbers (INT_MAX if exact)
+int Rational::precision()
+{
+   return sizeof(this->dpointer->privatevalue);
 }
 
 

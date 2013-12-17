@@ -173,6 +173,15 @@ namespace soplex
       //@}
 
 
+      //**@name Static methods  */
+      //@{
+
+      /// returns precision of Rational implementation, i.e., number of bits used to store Rational numbers (INT_MAX if exact)
+      static int precision();
+
+      //@}
+
+
       //**@name Conversion from and to String */
       //@{
 
