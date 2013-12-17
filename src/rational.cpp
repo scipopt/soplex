@@ -214,6 +214,14 @@ Rational::operator double() const
 
 
 
+/// typecasts Rational to long double (allows only explicit typecast)
+Rational::operator long double() const
+{
+   return (long double)mpq_get_d(this->dpointer->privatevalue);
+}
+
+
+
 /// addition operator
 Rational Rational::operator+(const Rational& r) const
 {
@@ -1256,6 +1264,14 @@ Rational::operator double() const
 
 
 
+/// typecasts Rational to long double (allows only explicit typecast)
+Rational::operator long double() const
+{
+   return (long double)this->dpointer->get_d();
+}
+
+
+
 /// addition operator
 Rational Rational::operator+(const Rational& r) const
 {
@@ -2170,6 +2186,15 @@ Rational::operator double() const
 
 {
    return this->dpointer->privatevalue;
+}
+
+
+
+/// typecasts Rational to long double (allows only explicit typecast)
+Rational::operator long double() const
+
+{
+   return (long double)this->dpointer->privatevalue;
 }
 
 

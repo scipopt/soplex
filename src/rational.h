@@ -101,6 +101,9 @@ namespace soplex
       /// typecasts Rational to double (only allows explicit typecasting)
       explicit operator double() const;
 
+      /// typecasts Rational to long double (only allows explicit typecasting)
+      explicit operator long double() const;
+
       //@}
 
 
