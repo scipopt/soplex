@@ -2073,7 +2073,7 @@ public:
 
 
    /// value
-   double privatevalue;
+   long double privatevalue;
 
 
 
@@ -2199,7 +2199,7 @@ Rational::~Rational()
 Rational::operator double() const
 
 {
-   return this->dpointer->privatevalue;
+   return (double)this->dpointer->privatevalue;
 }
 
 
@@ -2208,7 +2208,7 @@ Rational::operator double() const
 Rational::operator long double() const
 
 {
-   return (long double)this->dpointer->privatevalue;
+   return this->dpointer->privatevalue;
 }
 
 
@@ -2392,7 +2392,7 @@ int Rational::precision()
 /// read Rational from string
 bool Rational::readString(const char* s)
 {
-   return (sscanf(s, "%" REAL_FORMAT, &this->dpointer->privatevalue) == 1 );
+   return (sscanf(s, "%Lf", &this->dpointer->privatevalue) == 1 );
 }
 
 
@@ -2411,7 +2411,7 @@ std::string rationalToString(const Rational& r, const bool asfloat)
 /// read Rational from string
 bool readStringRational(const char* s, Rational& value)
 {
-   return (sscanf(s, "%" REAL_FORMAT, &value.dpointer->privatevalue) == 1);
+   return (sscanf(s, "%Lf", &value.dpointer->privatevalue) == 1);
 }
 
 
