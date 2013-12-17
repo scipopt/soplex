@@ -2767,9 +2767,12 @@ namespace soplex
       // has, since the REPRESENTATION parameter of this class might be set to automatic
       if( _solver.rep() == SPxSolver::COLUMN )
       {
-         SSVectorReal x(numRowsReal());
-         _solver.basis().coSolve(x, _solver.unitVector(r));
-         coef = x.altValues();
+         ///@todo better use sparse vectors
+         VectorReal x(numRowsReal(), coef);
+         DVectorReal e(numRowsReal());
+         e.clear();
+         e[r] = 1.0;
+         _solver.basis().coSolve(x, e);
       }
       else
       {
@@ -2869,9 +2872,12 @@ namespace soplex
       // has, since the REPRESENTATION parameter of this class might be set to automatic
       if( _solver.rep() == SPxSolver::COLUMN )
       {
-         SSVectorReal x(numRowsReal());
-         _solver.basis().solve(x, _solver.unitVector(c));
-         coef = x.altValues();
+         ///@todo better use sparse vectors
+         VectorReal x(numColsReal(), coef);
+         DVectorReal e(numColsReal());
+         e.clear();
+         e[c] = 1.0;
+         _solver.basis().solve(x, e);
       }
       else
       {
