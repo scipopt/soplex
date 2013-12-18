@@ -2384,7 +2384,7 @@ bool Rational::isAdjacentTo(const double& d)
 /// returns precision of Rational implementation, i.e., number of bits used to store Rational numbers (INT_MAX if exact)
 int Rational::precision()
 {
-   return sizeof(this->dpointer->privatevalue);
+   return sizeof(dpointer->privatevalue);
 }
 
 
