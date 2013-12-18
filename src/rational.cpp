@@ -186,6 +186,7 @@ Rational::Rational(const int& i)
 }
 
 
+
 /// constructor from mpq_t
 Rational::Rational(const mpq_t& q)
 {
@@ -389,7 +390,7 @@ bool Rational::isNextTo(const double& d)
    double a;
    double b;
 
-   if( x < *this )
+   if( Rational(x) < *this )
    {
       a = x;
       b = nextafter(a, infinity);

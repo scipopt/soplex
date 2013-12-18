@@ -146,7 +146,7 @@ public:
             mini = m;
       }
 
-      assert(mini >= 0.0);
+      assert(mini >= R(0));
 
       return mini;
    }
@@ -156,7 +156,7 @@ public:
    {
       METHOD( "SPxLPBase::maxAbsNzo()" );
 
-      R maxi = 0.0;
+      R maxi = R(0);
 
       for( int i = 0; i < nCols(); ++i )
       {
@@ -166,7 +166,7 @@ public:
             maxi = m;
       }
 
-      assert(maxi >= 0.0);
+      assert(maxi >= R(0));
 
       return maxi;
    }
@@ -1123,7 +1123,7 @@ public:
       SVectorBase<R>& row = rowVector_w(i);
       SVectorBase<R>& col = colVector_w(j);
 
-      if( val != 0.0 )
+      if( val != R(0) )
       {
          if( row.number(j) >= 0 )
          {

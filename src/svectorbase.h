@@ -389,7 +389,7 @@ public:
    /// Maximum absolute value, i.e., infinity norm.
    R maxAbs() const
    {
-      R maxi = 0.0;
+      R maxi = R(0);
 
       for( int i = size() - 1; i >= 0; --i )
       {
@@ -397,7 +397,7 @@ public:
             maxi = abs(m_elem[i].val);
       }
 
-      assert(maxi >= 0.0);
+      assert(maxi >= R(0));
 
       return maxi;
    }
@@ -413,7 +413,7 @@ public:
             mini = abs(m_elem[i].val);
       }
 
-      assert(mini >= 0.0);
+      assert(mini >= R(0));
 
       return mini;
    }
@@ -627,7 +627,7 @@ public:
             for( int j = 0; j < i; ++j )
             {
                // allow trailing zeros
-               if( m_elem[i].idx == m_elem[j].idx && m_elem[i].val != 0.0 )
+               if( m_elem[i].idx == m_elem[j].idx && m_elem[i].val != R(0) )
                   return MSGinconsistent("SVectorBase");
             }
          }

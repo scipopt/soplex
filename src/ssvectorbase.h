@@ -144,10 +144,10 @@ public:
 
          for( int i = 0; i < d; ++i )
          {
-            if( VectorBase<R>::val[i] != 0.0 )
+            if( VectorBase<R>::val[i] != R(0) )
             {
                if( abs(VectorBase<R>::val[i]) <= epsilon )
-                  VectorBase<R>::val[i] = 0.0;
+                  VectorBase<R>::val[i] = R(0);
                else
                {
                   idx[num] = i;

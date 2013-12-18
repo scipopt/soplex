@@ -816,7 +816,7 @@ SVectorBase<R>& SVectorBase<R>::operator=(const VectorBase<S>& vec)
 
    while( i-- )
    {
-      if( vec[i] != 0 )
+      if( vec[i] != S(0) )
       {
          assert(n < max());
 
