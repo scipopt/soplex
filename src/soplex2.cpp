@@ -20,6 +20,7 @@
 #include "spxfileio.h"
 #include "statistics.h"
 #include "mpsinput.h"
+#include "limits.h"
 
 /// maximum length of lines in settings file
 #define SET_MAX_LINE_LEN 500
@@ -2029,9 +2030,12 @@ namespace soplex
       _invalidateSolution();
 
       // decide whether to solve the rational LP with iterative refinement or call the standard floating-point solver
-      if( intParam(SoPlex2::SOLVEMODE) == SOLVEMODE_REAL || (intParam(SoPlex2::SOLVEMODE) == SOLVEMODE_AUTO
+      if( Rational::precision() < INT_MAX
+          || intParam(SoPlex2::SOLVEMODE) == SOLVEMODE_REAL || (intParam(SoPlex2::SOLVEMODE) == SOLVEMODE_AUTO
             && GE(Real(rationalParam(SoPlex2::FEASTOL)), 1e-9) && GE(Real(rationalParam(SoPlex2::OPTTOL)), 1e-9)) )
       {
+         ///@todo make sure that tolerances are not too small
+
          _solveReal();
       }
       else if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
