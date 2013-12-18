@@ -2147,7 +2147,7 @@ namespace soplex
             MSG_INFO1( spxout << "Relaxing tolerances." << std::endl );
 
             _solver.setType(_solver.rep() == SPxSolver::COLUMN ? SPxSolver::ENTER : SPxSolver::LEAVE);
-            _solver.setDelta(_solver.feastol() * 1e3 > 1e-3 ? 1e-3 : _solver.feastol() * 1e3);
+            _solver.setDelta((_solver.feastol() * 1e3 > 1e-3) ? 1e-3 : (_solver.feastol() * 1e3));
             relaxedTolerances = _solver.feastol() >= 1e-3;
             solvedFromScratch = false;
             continue;
