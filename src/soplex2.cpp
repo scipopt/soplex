@@ -2753,30 +2753,37 @@ namespace soplex
 
    /// returns row r of basis inverse
    ///@todo use VectorReal for coef
-   void SoPlex2::getBasisInverseRowReal(int r, Real* coef)
+   bool SoPlex2::getBasisInverseRowReal(int r, Real* coef)
    {
       assert(r >= 0);
       assert(r < numRowsReal());
       assert(coef != 0);
 
       if( !hasBasis() || r < 0 || r >= numRowsReal() )
-         return;
+         return false;
 
       _ensureRealLPLoaded();
 
       if( !_isRealLPLoaded )
-         return;
+         return false;
 
       // we need to distinguish between column and row representation; ask the solver itself which representation it
       // has, since the REPRESENTATION parameter of this class might be set to automatic
       if( _solver.rep() == SPxSolver::COLUMN )
       {
-         ///@todo better use sparse vectors
-         VectorReal x(numRowsReal(), coef);
-         DVectorReal e(numRowsReal());
-         e.clear();
-         e[r] = 1.0;
-         _solver.basis().coSolve(x, e);
+         SSVectorReal x(numRowsReal());
+         try
+         {
+            _solver.basis().coSolve(x, _solver.unitVector(r));
+         }
+         catch( SPxException E )
+         {
+            MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while computing basis inverse row.\n" );
+            return false;
+         }
+         // copy sparse data to dense result vector based on coef array
+         VectorReal y(numRowsReal(), coef);
+         y = x;
       }
       else
       {
@@ -2822,7 +2829,15 @@ namespace soplex
          }
 
          // solve system "y B = rhs", where B is the row basis matrix
-         _solver.basis().solve(y, rhs);
+         try
+         {
+            _solver.basis().solve(y, rhs);
+         }
+         catch( SPxException E )
+         {
+            MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while computing basis inverse row.\n" );
+            return false;
+         }
 
          // initialize result vector x as zero
          memset(coef, 0, numRowsReal() * sizeof(Real));
@@ -2851,6 +2866,8 @@ namespace soplex
 
          // free memory
          spx_free(bind);
+
+         return true;
       }
    }
 
@@ -2858,30 +2875,37 @@ namespace soplex
 
    /// returns column c of basis inverse
    ///@todo use VectorReal for coef
-   void SoPlex2::getBasisInverseColReal(int c, Real* coef)
+   bool SoPlex2::getBasisInverseColReal(int c, Real* coef)
    {
       assert(c >= 0);
       assert(c < numRowsReal());
       assert(coef != 0);
 
       if( !hasBasis() || c < 0 || c >= numRowsReal() )
-         return;
+         return false;
 
       _ensureRealLPLoaded();
 
       if( !_isRealLPLoaded )
-         return;
+         return false;
 
       // we need to distinguish between column and row representation; ask the solver itself which representation it
       // has, since the REPRESENTATION parameter of this class might be set to automatic
       if( _solver.rep() == SPxSolver::COLUMN )
       {
-         ///@todo better use sparse vectors
-         VectorReal x(numColsReal(), coef);
-         DVectorReal e(numColsReal());
-         e.clear();
-         e[c] = 1.0;
-         _solver.basis().solve(x, e);
+         SSVectorReal x(numColsReal());
+         try
+         {
+            _solver.basis().solve(x, _solver.unitVector(c));
+         }
+         catch( SPxException E )
+         {
+            MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while computing basis inverse row.\n" );
+            return false;
+         }
+         // copy sparse data to dense result vector based on coef array
+         VectorReal y(numColsReal(), coef);
+         y = x;
       }
       else
       {
@@ -2927,7 +2951,15 @@ namespace soplex
          }
 
          // solve system "y B = rhs", where B is the row basis matrix
-         _solver.basis().coSolve(y, rhs);
+         try
+         {
+            _solver.basis().coSolve(y, rhs);
+         }
+         catch( SPxException E )
+         {
+            MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while computing basis inverse row.\n" );
+            return false;
+         }
 
          // initialize result vector x as zero
          memset(coef, 0, numRowsReal() * sizeof(Real));
@@ -2956,6 +2988,8 @@ namespace soplex
 
          // free memory
          spx_free(bind);
+
+         return true;
       }
    }
 

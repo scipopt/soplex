@@ -600,10 +600,10 @@ public:
    void getBasisInd(int* bind);
 
    /// returns row r of basis inverse
-   void getBasisInverseRowReal(int r, Real* coef);
+   bool getBasisInverseRowReal(int r, Real* coef);
 
    /// returns column c of basis inverse
-   void getBasisInverseColReal(int c, Real* coef);
+   bool getBasisInverseColReal(int c, Real* coef);
 
    /// get dense solution of basis matrix B * sol = rhs
    void getBasisInverseTimesVecReal(Real* rhs, Real* sol);
