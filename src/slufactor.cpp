@@ -1022,18 +1022,24 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
       spx_realloc(l.row,   l.startSize);
       spx_realloc(l.start, l.startSize);
    }
+   // the last factorization was reasonably stable, so we decrease the Markowitz threshold (stored in lastThreshold) in
+   // order favour sparsity
    else if (lastStability > 2.0 * minStability)
    {
+      // we reset lastThreshold to its previous value in the sequence minThreshold, betterThreshold(minThreshold),
+      // betterThreshold(betterThreshold(minThreshold)), ...
       Real last   = minThreshold;
       Real better = betterThreshold(last);
-
       while (better < lastThreshold)
       {
          last   = better;
          better = betterThreshold(last);
       }
-      minStability  = 2 * MINSTABILITY;
       lastThreshold = last;
+
+      // we reset the minimum stability (which might have been decreased below) to ensure that the increased sparsity
+      // does not hurt the stability
+      minStability  = 2 * MINSTABILITY;
    }
 
    u.row.list.idx      = thedim;
@@ -1048,22 +1054,29 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
 
    for (;;)
    {
+      ///@todo if the factorization fails with stat = SINGULAR, distinuish between proven singularity (e.g., because of
+      ///an empty column) and singularity due to numerics, that could be avoided by changing minStability and
+      ///lastThreshold; in the first case, we want to abort, otherwise change the numerics
       stat = OK;
       factor(matrix, lastThreshold, epsilon);
+
+      // finish if the factorization is stable
       if (stability() >= minStability)
          break;
 
+      // otherwise, we increase the Markowitz threshold
       Real x = lastThreshold;
-
       lastThreshold = betterThreshold(lastThreshold);
 
+      // until it doesn't change anymore at its maximum value
       if (EQ(x, lastThreshold))
          break;
 
+      // we relax the stability requirement
+      minStability /= 2.0;
+
       MSG_INFO3( spxout << "ISLUFA01 refactorizing with increased Markowitz threshold: "
                         << lastThreshold << std::endl; )
-
-      minStability /= 2.0;
    }
    MSG_DEBUG( spxout << "DSLUFA02 threshold = " << lastThreshold
                      << "\tstability = " << stability()
