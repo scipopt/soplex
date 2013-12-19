@@ -136,6 +136,8 @@ int SPxDevexPR::selectLeavePart(Real feastol)
    int bstI = -1;
    int dim = coPenalty.dim();
    int count = 0;
+   if( dim == 0 )
+      return bstI;
    int oldstart = startpricing % dim; // within SCIP, dimensions may change
    int end = dim;
 
