@@ -59,20 +59,23 @@ void SPxEquiliSC::scale(SPxLP& lp)
 
    setup(lp);
 
-   /* We want to do that direction first, with the lower ratio.
-    * Reason:           
-    *                               Rowratio
-    *            0.04  0.02  0.01      4
-    *            4000    20  1000    200
-    * Colratio    1e5   1e3   1e5
+   /* We want to do the direction first, which has a lower maximal ratio,
+    * since the lowest value in the scaled matrix is bounded from below by
+    * the inverse of the maximum ratio of the direction that is done first
+    * Example:
+    *                     Rowratio
+    *            0.1  1   10
+    *            10   1   10
     *
-    * Row first =>                  Col next =>
-    *               1   0.5  0.25         1   1   1 
-    *               1   0.05 0.25         1  0.1  1
+    * Colratio   100  1
     *
-    * Col first =>                  Row next =>
-    *            1e-5  1e-3  1e-5        0.01  1  0.01
-    *               1     1     1          1   1    1
+    * Row first =>         Col next =>
+    *            0.1  1          0.1  1
+    *            1    0.1        1    0.1
+    *
+    * Col first =>         Row next =>
+    *            0.01 1          0.01 1
+    *            1    1          1    1
     *
     */
    Real colratio = maxColRatio(lp);
