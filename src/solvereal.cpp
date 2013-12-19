@@ -85,13 +85,6 @@ namespace soplex
             _preprocessAndSolveReal(false);
             return;
          }
-         // if there was a regular starting basis and the original problem is in the solver, load the basis
-         else if( _hasBasis )
-         {
-            assert(_basisStatusRows.size() == _solver.nRows());
-            assert(_basisStatusCols.size() == _solver.nCols());
-            _solver.setBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
-         }
          break;
 
       case SPxSolver::ABORT_CYCLING:
