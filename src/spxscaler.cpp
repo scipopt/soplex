@@ -189,21 +189,19 @@ void SPxScaler::applyScaling(SPxLP& lp)
       SVector& vec = lp.rowVector_w(i);
 #ifdef BITSHIFTSCALING
       int exp1,exp2;
+      frexp(m_rowscale[i], &exp2);
       for( int j = 0; j < vec.size(); ++j)
       {
          frexp(m_colscale[vec.index(j)], &exp1);
-         frexp(m_rowscale[i], &exp2);
          vec.value(j) = ldexp(vec.value(j), exp1 + exp2 - 2);
       }
       if (lp.rhs(i) < infinity)
       {
-         frexp(m_rowscale[i], &exp1);
-         lp.rhs_w(i) = ldexp(lp.rhs_w(i), exp1 - 1);
+         lp.rhs_w(i) = ldexp(lp.rhs_w(i), exp2 - 1);
       }
       if (lp.lhs(i) > -infinity)
       {
-         frexp(m_rowscale[i], &exp1);
-         lp.lhs_w(i) = ldexp(lp.lhs_w(i), exp1 - 1);
+         lp.lhs_w(i) = ldexp(lp.lhs_w(i), exp2 - 1);
       }
 #else
       for( int j = 0; j < vec.size(); ++j)
@@ -220,25 +218,22 @@ void SPxScaler::applyScaling(SPxLP& lp)
       SVector& vec = lp.colVector_w(i);
 #ifdef BITSHIFTSCALING
       int exp1,exp2;
+      frexp(m_colscale[i], &exp2);
       for( int j = 0; j < vec.size(); ++j)
       {
          frexp(m_rowscale[vec.index(j)], &exp1);
-         frexp(m_colscale[i], &exp2);
          vec.value(j) = ldexp(vec.value(j), exp1 + exp2 - 2);
       }
 
-      frexp(m_colscale[i], &exp1);
-      lp.maxObj_w(i) = ldexp(lp.maxObj_w(i), exp1 - 1);
+      lp.maxObj_w(i) = ldexp(lp.maxObj_w(i), exp2 - 1);
 
       if (lp.upper(i) < infinity)
       {
-         frexp(m_colscale[i], &exp1);
-         lp.upper_w(i) = ldexp(lp.upper_w(i), -exp1 + 1);
+         lp.upper_w(i) = ldexp(lp.upper_w(i), -exp2 + 1);
       }
       if (lp.lower(i) > -infinity)
       {
-         frexp(m_colscale[i], &exp1);
-         lp.lower_w(i) = ldexp(lp.lower_w(i), -exp1 + 1);
+         lp.lower_w(i) = ldexp(lp.lower_w(i), -exp2 + 1);
       }
 #else
       for( int j = 0; j < vec.size(); ++j)
