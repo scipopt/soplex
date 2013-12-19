@@ -88,6 +88,13 @@ namespace soplex
          break;
 
       case SPxSolver::ABORT_CYCLING:
+         // if preprocessing was applied, try to run again without to avoid cycling
+         if( !_isRealLPLoaded )
+         {
+            _preprocessAndSolveReal(false);
+            return;
+         }
+         // else fallthrough
       case SPxSolver::ABORT_TIME:
       case SPxSolver::ABORT_ITER:
       case SPxSolver::ABORT_VALUE:
