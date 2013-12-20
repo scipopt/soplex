@@ -2866,9 +2866,9 @@ namespace soplex
 
          // free memory
          spx_free(bind);
-
-         return true;
       }
+
+      return true;
    }
 
 
@@ -2988,9 +2988,9 @@ namespace soplex
 
          // free memory
          spx_free(bind);
-
-         return true;
       }
+
+      return true;
    }
 
 
