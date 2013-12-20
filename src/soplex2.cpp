@@ -2997,18 +2997,18 @@ namespace soplex
 
    /// get dense solution of basis matrix B * sol = rhs
    ///@todo use VectorReal for rhs and sol
-   void SoPlex2::getBasisInverseTimesVecReal(Real* rhs, Real* sol)
+   bool SoPlex2::getBasisInverseTimesVecReal(Real* rhs, Real* sol)
    {
       VectorReal v(numRowsReal(), rhs);
       VectorReal x(numRowsReal(), sol);
 
       if( !hasBasis() )
-         return;
+         return false;
 
       _ensureRealLPLoaded();
 
       if( !_isRealLPLoaded )
-         return;
+         return false;
 
       // we need to distinguish between column and row representation; ask the solver itself which representation it
       // has, since the REPRESENTATION parameter of this class might be set to automatic; in the column case we can use
@@ -3016,7 +3016,15 @@ namespace soplex
       if( _solver.rep() == SPxSolver::COLUMN )
       {
          // solve system "x = B^-1 * A_c" to get c'th column of B^-1 * A
-         _solver.basis().solve(x, v);
+         try
+         {
+            _solver.basis().solve(x, v);
+         }
+         catch( SPxException E )
+         {
+            MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while solving with basis matrix.\n" );
+            return false;
+         }
       }
       else
       {
@@ -3049,7 +3057,15 @@ namespace soplex
          }
 
          // solve system "B y = rowrhs", where B is the row basis matrix
-         _solver.basis().coSolve(y, rowrhs);
+         try
+         {
+            _solver.basis().coSolve(y, rowrhs);
+         }
+         catch( SPxException E )
+         {
+            MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while solving with basis matrix.\n" );
+            return false;
+         }
 
          // fill result w.r.t. order given by bind
          for( int i = 0; i < numRowsReal(); ++i )
@@ -3083,6 +3099,7 @@ namespace soplex
          // free memory
          spx_free(bind);
       }
+      return true;
    }
 
 

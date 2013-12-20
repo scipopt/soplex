@@ -599,14 +599,14 @@ public:
    /// gets the indices of the basic columns and rows; basic column n gives value n, basic row m gives value -1-m
    void getBasisInd(int* bind);
 
-   /// returns row r of basis inverse
+   /// computes row r of basis inverse, returns false in case of a problem
    bool getBasisInverseRowReal(int r, Real* coef);
 
-   /// returns column c of basis inverse
+   /// computes column c of basis inverse, returns false in case of a problem
    bool getBasisInverseColReal(int c, Real* coef);
 
-   /// get dense solution of basis matrix B * sol = rhs
-   void getBasisInverseTimesVecReal(Real* rhs, Real* sol);
+   /// computes dense solution of basis matrix B * sol = rhs, returns false in case of a problem
+   bool getBasisInverseTimesVecReal(Real* rhs, Real* sol);
 
    /// sets starting basis via arrays of statuses
    void setBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]);
