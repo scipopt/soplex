@@ -1908,7 +1908,7 @@ static void MPSwriteRecord(
 
    if( name1 != 0 )
    {
-      sprintf(buf, "  %-8.8s  %.15g" REAL_FORMAT, name1, value1);
+      sprintf(buf, "  %-8.8s  %.15" REAL_FORMAT, name1, value1);
       os << buf;
 
       if( name2 != 0 )
