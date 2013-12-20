@@ -346,7 +346,7 @@ Real SPxScaler::minAbsColscale() const
 #ifdef BITSHIFTSCALING
    int exp;
    frexp(mini, &exp);
-   mini = ldexp(2, exp - 1);
+   mini = ldexp(2.0, exp - 1);
 #endif
    return mini;
 }
@@ -364,7 +364,7 @@ Real SPxScaler::maxAbsColscale() const
 #ifdef BITSHIFTSCALING
    int exp;
    frexp(maxi, &exp);
-   maxi = ldexp(2, exp - 1);
+   maxi = ldexp(2.0, exp - 1);
 #endif
    return maxi;
 }
@@ -381,7 +381,7 @@ Real SPxScaler::minAbsRowscale() const
 #ifdef BITSHIFTSCALING
    int exp;
    frexp(mini, &exp);
-   mini = ldexp(2, exp - 1);
+   mini = ldexp(2.0, exp - 1);
 #endif
    return mini;
 }
@@ -398,7 +398,7 @@ Real SPxScaler::maxAbsRowscale() const
 #ifdef BITSHIFTSCALING
    int exp;
    frexp(maxi, &exp);
-   maxi = ldexp(2, exp - 1);
+   maxi = ldexp(2.0, exp - 1);
 #endif
    return maxi;
 }

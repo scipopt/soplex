@@ -25,6 +25,10 @@
 /// maximum length of lines in settings file
 #define SET_MAX_LINE_LEN 500
 
+#ifdef _MSC_VER
+#define strncasecmp strnicmp
+#endif
+
 namespace soplex
 {
    /// class of parameter settings
