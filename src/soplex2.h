@@ -774,11 +774,14 @@ public:
    /// values for parameter REPRESENTATION
    enum
    {
-      /// column representation Ax - s = 0, lower <= x <= upper, lhs <= s <= rhs
-      REPRESENTATION_COLUMN = 0,
-
       /// row representation (lower,lhs) <= (x,Ax) <= (upper,rhs)
-      REPRESENTATION_ROW = 1
+      REPRESENTATION_ROW = -1,
+
+      /// automatic choice according to number of rows and columns
+      REPRESENTATION_AUTO = 0,
+
+      /// column representation Ax - s = 0, lower <= x <= upper, lhs <= s <= rhs
+      REPRESENTATION_COLUMN = 1
    };
 
    /// values for parameter ALGORITHM

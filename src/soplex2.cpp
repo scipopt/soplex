@@ -120,8 +120,8 @@ namespace soplex
 
             // type of computational form, i.e., column or row representation
             _intParamName[SoPlex2::REPRESENTATION] = "representation";
-            _intParamDescription[SoPlex2::REPRESENTATION] = "type of computational form (0 - column representation, 1 - row representation)";
-            _intParamDefault[SoPlex2::REPRESENTATION] = SoPlex2::REPRESENTATION_COLUMN;
+            _intParamDescription[SoPlex2::REPRESENTATION] = "type of computational form (-1 - row representation, 0 - auto, 1 - column representation)";
+            _intParamDefault[SoPlex2::REPRESENTATION] = SoPlex2::REPRESENTATION_AUTO;
 
             // type of algorithm, i.e., enter or leave
             _intParamName[SoPlex2::ALGORITHM] = "algorithm";
@@ -3764,9 +3764,8 @@ namespace soplex
 
       // type of computational form, i.e., column or row representation
       case SoPlex2::REPRESENTATION:
-         if( value != SoPlex2::REPRESENTATION_COLUMN && value != SoPlex2::REPRESENTATION_ROW )
+         if( value != SoPlex2::REPRESENTATION_COLUMN && value != SoPlex2::REPRESENTATION_ROW && value != SoPlex2::REPRESENTATION_AUTO )
             return false;
-         _solver.setRep(value == SoPlex2::REPRESENTATION_COLUMN ? SPxSolver::COLUMN : SPxSolver::ROW);
          break;
 
       // type of algorithm, i.e., enter or leave
@@ -5736,6 +5735,20 @@ namespace soplex
          _solver.setFeastol(1e-12);
       if( _solver.opttol() < 1e-12 )
          _solver.setOpttol(1e-12);
+
+      // set correct representation
+      if( (intParam(SoPlex2::REPRESENTATION) == SoPlex2::REPRESENTATION_COLUMN
+            || (intParam(SoPlex2::REPRESENTATION) == SoPlex2::REPRESENTATION_AUTO && _solver.nCols() > _solver.nRows())
+            && _solver.rep() != SPxSolver::COLUMN) )
+      {
+         _solver.setRep(SPxSolver::COLUMN);
+      }
+      else if( (intParam(SoPlex2::REPRESENTATION) == SoPlex2::REPRESENTATION_ROW
+            || (intParam(SoPlex2::REPRESENTATION) == SoPlex2::REPRESENTATION_AUTO && _solver.nCols() < _solver.nRows())
+            && _solver.rep() != SPxSolver::ROW) )
+      {
+         _solver.setRep(SPxSolver::ROW);
+      }
 
       // call floating-point solver and catch exceptions
       _statistics->simplexTime.start();
