@@ -283,12 +283,6 @@ namespace soplex
       // solve original LP
       MSG_INFO1( spxout << "Initial floating-point solve . . .\n" );
 
-      if( intParam(SoPlex2::ITERLIMIT) >= 0 )
-         _solver.setTerminationIter(intParam(SoPlex2::ITERLIMIT) - _statistics->iterations);
-
-      if( realParam(SoPlex2::TIMELIMIT) < realParam(SoPlex2::INFTY) )
-         _solver.setTerminationTime(realParam(SoPlex2::TIMELIMIT) - _statistics->solvingTime.userTime());
-
       if( _hasBasis )
       {
          assert(_basisStatusRows.size() == numRowsRational());
@@ -298,9 +292,6 @@ namespace soplex
       }
 
       result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
-
-      _solver.setTerminationTime(realParam(SoPlex2::TIMELIMIT));
-      _solver.setTerminationIter(intParam(SoPlex2::ITERLIMIT));
 
       // evaluate result
       switch( result )
@@ -521,16 +512,7 @@ namespace soplex
          _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
 
          // solve modified problem
-         if( intParam(SoPlex2::ITERLIMIT) >= 0 )
-            _solver.setTerminationIter(intParam(SoPlex2::ITERLIMIT) - _statistics->iterations);
-
-         if( realParam(SoPlex2::TIMELIMIT) < realParam(SoPlex2::INFTY) )
-            _solver.setTerminationTime(realParam(SoPlex2::TIMELIMIT) - _statistics->solvingTime.userTime());
-
          result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
-
-         _solver.setTerminationTime(realParam(SoPlex2::TIMELIMIT));
-         _solver.setTerminationIter(intParam(SoPlex2::ITERLIMIT));
 
          // remember whether we moved to a new basis
          if( _solver.iterations() == 0 )

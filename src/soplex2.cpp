@@ -3800,10 +3800,7 @@ namespace soplex
          if( value < -1 )
             return false;
          else
-         {
-            _solver.setTerminationIter(value);
             break;
-         }
 
       // display frequency
       case SoPlex2::DISPLAYFREQ:
@@ -4015,7 +4012,6 @@ namespace soplex
 
       // time limit in seconds (INFTY if unlimited)
       case SoPlex2::TIMELIMIT:
-         _solver.setTerminationTime(value);
          break;
 
       // lower limit on objective value is set in solveReal()
@@ -5730,6 +5726,12 @@ namespace soplex
    void SoPlex2::_solveRealLPAndRecordStatistics()
    {
       bool _hadBasis = _hasBasis;
+
+      if( intParam(SoPlex2::ITERLIMIT) >= 0 )
+         _solver.setTerminationIter(intParam(SoPlex2::ITERLIMIT) - _statistics->iterations);
+
+      if( realParam(SoPlex2::TIMELIMIT) < realParam(SoPlex2::INFTY) )
+         _solver.setTerminationTime(realParam(SoPlex2::TIMELIMIT) - _statistics->solvingTime.userTime());
 
       _statistics->simplexTime.start();
 
