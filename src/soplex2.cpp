@@ -2038,8 +2038,6 @@ namespace soplex
           || intParam(SoPlex2::SOLVEMODE) == SOLVEMODE_REAL || (intParam(SoPlex2::SOLVEMODE) == SOLVEMODE_AUTO
             && GE(Real(rationalParam(SoPlex2::FEASTOL)), 1e-9) && GE(Real(rationalParam(SoPlex2::OPTTOL)), 1e-9)) )
       {
-         ///@todo make sure that tolerances are not too small
-
          _solveReal();
       }
       else if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
@@ -5727,15 +5725,20 @@ namespace soplex
    {
       bool _hadBasis = _hasBasis;
 
+      // set time and iteration limit
       if( intParam(SoPlex2::ITERLIMIT) >= 0 )
          _solver.setTerminationIter(intParam(SoPlex2::ITERLIMIT) - _statistics->iterations);
-
       if( realParam(SoPlex2::TIMELIMIT) < realParam(SoPlex2::INFTY) )
          _solver.setTerminationTime(realParam(SoPlex2::TIMELIMIT) - _statistics->solvingTime.userTime());
 
-      _statistics->simplexTime.start();
+      // ensure that tolerances are not too small
+      if( _solver.feastol() < 1e-12 )
+         _solver.setFeastol(1e-12);
+      if( _solver.opttol() < 1e-12 )
+         _solver.setOpttol(1e-12);
 
       // call floating-point solver and catch exceptions
+      _statistics->simplexTime.start();
       try
       {
          _solver.solve();
@@ -5749,7 +5752,6 @@ namespace soplex
          MSG_ERROR( spxout << "Caught unknown exception while solving real LP.\n" );
          _status = SPxSolver::ERROR;
       }
-
       _statistics->simplexTime.stop();
 
       // record statistics
