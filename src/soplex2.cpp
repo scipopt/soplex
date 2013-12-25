@@ -2794,7 +2794,7 @@ namespace soplex
          // @todo should rhs be a reference?
          DSVector rhs(numColsReal());
          SSVector y(numColsReal());
-         int* bind;
+         int* bind = 0;
          int index;
 
          // get ordering of column basis matrix
@@ -2916,7 +2916,7 @@ namespace soplex
          // @todo should rhs be a reference?
          DSVectorReal rhs(numColsReal());
          SSVectorReal y(numColsReal());
-         int* bind;
+         int* bind = 0;
          int index;
 
          // get ordering of column basis matrix
