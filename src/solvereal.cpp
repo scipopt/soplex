@@ -100,9 +100,11 @@ namespace soplex
       case SPxSolver::ABORT_VALUE:
       case SPxSolver::REGULAR:
       case SPxSolver::RUNNING:
+         if( _isRealLPLoaded )
+            _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
          // store regular basis if there is no simplifier and the original problem is not in the solver because of
          // scaling; non-optimal bases should currently not be unsimplified
-         if( _simplifier == 0 && !_isRealLPLoaded && _solver.basis().status() > SPxBasis::NO_PROBLEM )
+         else if( _simplifier == 0 && _solver.basis().status() > SPxBasis::NO_PROBLEM )
          {
             _basisStatusRows.reSize(numRowsReal());
             _basisStatusCols.reSize(numColsReal());
