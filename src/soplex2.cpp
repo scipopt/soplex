@@ -2675,7 +2675,7 @@ namespace soplex
 
 
    /// returns the indices of the basic columns and rows; basic column n gives value n, basic row m gives value -1-m
-   void SoPlex2::getBasisInd(int* bind)
+   void SoPlex2::getBasisInd(int* bind) const
    {
       // if no basis is available, return slack basis
       if( !hasBasis() )

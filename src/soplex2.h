@@ -597,7 +597,7 @@ public:
    void getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const;
 
    /// gets the indices of the basic columns and rows; basic column n gives value n, basic row m gives value -1-m
-   void getBasisInd(int* bind);
+   void getBasisInd(int* bind) const;
 
    /// computes row r of basis inverse, returns false in case of a problem
    bool getBasisInverseRowReal(int r, Real* coef);
