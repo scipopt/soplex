@@ -5738,14 +5738,14 @@ namespace soplex
 
       // set correct representation
       if( (intParam(SoPlex2::REPRESENTATION) == SoPlex2::REPRESENTATION_COLUMN
-            || (intParam(SoPlex2::REPRESENTATION) == SoPlex2::REPRESENTATION_AUTO && _solver.nCols() > _solver.nRows())
-            && _solver.rep() != SPxSolver::COLUMN) )
+            || (intParam(SoPlex2::REPRESENTATION) == SoPlex2::REPRESENTATION_AUTO && _solver.nCols() > _solver.nRows()))
+            && _solver.rep() != SPxSolver::COLUMN )
       {
          _solver.setRep(SPxSolver::COLUMN);
       }
       else if( (intParam(SoPlex2::REPRESENTATION) == SoPlex2::REPRESENTATION_ROW
-            || (intParam(SoPlex2::REPRESENTATION) == SoPlex2::REPRESENTATION_AUTO && _solver.nCols() < _solver.nRows())
-            && _solver.rep() != SPxSolver::ROW) )
+            || (intParam(SoPlex2::REPRESENTATION) == SoPlex2::REPRESENTATION_AUTO && _solver.nCols() < _solver.nRows()))
+            && _solver.rep() != SPxSolver::ROW )
       {
          _solver.setRep(SPxSolver::ROW);
       }
