@@ -599,13 +599,16 @@ public:
    /// gets the indices of the basic columns and rows; basic column n gives value n, basic row m gives value -1-m
    void getBasisInd(int* bind) const;
 
-   /// computes row r of basis inverse, returns false in case of a problem
+   /// computes an estimated condition number for the current basis matrix using the power method; returns true on success
+   bool getEstimatedCondition(int maxiter, Real tolerance, Real& condition);
+
+   /// computes row r of basis inverse; returns true on success
    bool getBasisInverseRowReal(int r, Real* coef);
 
-   /// computes column c of basis inverse, returns false in case of a problem
+   /// computes column c of basis inverse; returns true on success
    bool getBasisInverseColReal(int c, Real* coef);
 
-   /// computes dense solution of basis matrix B * sol = rhs, returns false in case of a problem
+   /// computes dense solution of basis matrix B * sol = rhs; returns true on success
    bool getBasisInverseTimesVecReal(Real* rhs, Real* sol);
 
    /// sets starting basis via arrays of statuses

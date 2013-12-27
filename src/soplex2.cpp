@@ -2753,7 +2753,28 @@ namespace soplex
 
 
 
-   /// returns row r of basis inverse
+   /// computes an estimated condition number for the current basis matrix using the power method; returns true on success
+   bool SoPlex2::getEstimatedCondition(int maxiter, Real tolerance, Real& condition)
+   {
+      assert(maxiter >= 1);
+      assert(tolerance > 0.0);
+
+      if( maxiter <= 0 || tolerance <= 0.0 )
+         return false;
+
+      _ensureRealLPLoaded();
+      if( !_isRealLPLoaded )
+         return false;
+
+      if( _solver.basis().status() == SPxBasis::NO_PROBLEM )
+         return false;
+
+      condition = _solver.basis().condition(maxiter, tolerance);
+
+      return true;
+   }
+
+   /// computes row r of basis inverse; returns true on success
    ///@todo use VectorReal for coef
    bool SoPlex2::getBasisInverseRowReal(int r, Real* coef)
    {
@@ -2875,7 +2896,7 @@ namespace soplex
 
 
 
-   /// returns column c of basis inverse
+   /// computes column c of basis inverse; returns true on success
    ///@todo use VectorReal for coef
    bool SoPlex2::getBasisInverseColReal(int c, Real* coef)
    {
@@ -2997,7 +3018,7 @@ namespace soplex
 
 
 
-   /// get dense solution of basis matrix B * sol = rhs
+   /// computes dense solution of basis matrix B * sol = rhs; returns true on success
    ///@todo use VectorReal for rhs and sol
    bool SoPlex2::getBasisInverseTimesVecReal(Real* rhs, Real* sol)
    {
