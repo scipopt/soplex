@@ -220,7 +220,7 @@ R VectorBase<R>::operator*(const SVectorBase<R>& vec) const
 {
    assert(dim() >= vec.dim());
 
-   R x = 0;
+   R x(0);
 
    for( int i = vec.size(); i > 0; i-- )
       x += val[vec.index(i)] * vec.value(i);
@@ -241,7 +241,7 @@ R VectorBase<R>::operator*(const SSVectorBase<R>& vec) const
    {
       const int* idx = vec.indexMem();
 
-      R x = 0;
+      R x(0);
 
       for( int i = vec.size(); i > 0; i-- )
       {
@@ -388,7 +388,7 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
       {
          j = vec.index(i);
 
-         if( v[j] != 0 )
+         if( v[j] != R(0) )
          {
             x = v[j] + xx * vec.value(i);
             if( isNotZero(x, epsilon) )
@@ -422,7 +422,7 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
             if( isNotZero(x, epsilon) )
                *iiptr++ = *iptr;
             else
-               v[*iptr] = 0;
+               v[*iptr] = R(0);
          }
 
          num = int(iiptr - idx);
@@ -577,7 +577,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
          VectorBase<R>::val[elt.idx] = product;
 
          // count only non-zero values; not 'isNotZero(product, epsilon)'
-         if( product != 0 )
+         if( product != R(0) )
             ++nonzero_idx;
       }
    }
@@ -604,7 +604,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
             // It will be used now (either by a new nonzero or by a MARKER),
             // so increase the counter. If oldval != 0, we just
             // change an existing NZ-element, so don't increase the counter.
-            if( oldval == 0 )
+            if( oldval == R(0) )
                ++nonzero_idx;
 
             // Add the current product x[i] * A[i][j]; if oldval was
@@ -614,7 +614,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
             // If the new value is exactly 0, mark the index as used
             // by setting a value which is nearly 0; otherwise, store
             // the value. Values below epsilon will be removed later.
-            if( oldval == 0 )
+            if( oldval == R(0) )
                VectorBase<R>::val[elt.idx] = MARKER;
             else
                VectorBase<R>::val[elt.idx] = oldval;
@@ -631,7 +631,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
       curidx = idx[i];
 
       if( isZero( VectorBase<R>::val[curidx], epsilon ) )
-         VectorBase<R>::val[curidx] = 0;
+         VectorBase<R>::val[curidx] = R(0);
       else
       {
          idx[nz_counter] = curidx;
@@ -716,7 +716,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productAndSetup(const SVSetBase<S>& A, 
          // advance to the next element != 0
          T& xval = x.val[i];
 
-         if( xval != 0 )
+         if( xval != T(0) )
          {
             // If x[i] is really nonzero, compute A[i] * x[i] and adapt x.idx,
             // otherwise set x[i] to 0.
@@ -732,7 +732,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productAndSetup(const SVSetBase<S>& A, 
                }
             }
             else
-               xval = 0;
+               xval = T(0);
          }
       }
 
@@ -766,7 +766,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign(const SVectorBase<S>& rhs)
       S v = rhs.value(i);
 
       if( isZero(v, epsilon) )
-         VectorBase<R>::val[k] = 0;
+         VectorBase<R>::val[k] = R(0);
       else
       {
          VectorBase<R>::val[k] = v;
@@ -1189,7 +1189,7 @@ std::ostream& operator<<(std::ostream& os, const SVectorBase<R>& v)
    {
       if( j )
       {
-         if( v.value(i) < 0 )
+         if( v.value(i) < R(0) )
             os << " - " << -v.value(i);
          else
             os << " + " << v.value(i);
