@@ -381,7 +381,7 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
    {
       R* v = VectorBase<R>::val;
       R x;
-      int adjust = 0;
+      bool adjust = false;
       int j;
 
       for( int i = vec.size() - 1; i >= 0; --i )
@@ -395,7 +395,7 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
                v[j] = x;
             else
             {
-               adjust = 1;
+               adjust = true;
                v[j] = MARKER;
             }
          }
