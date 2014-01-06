@@ -2754,14 +2754,8 @@ namespace soplex
 
 
    /// computes an estimated condition number for the current basis matrix using the power method; returns true on success
-   bool SoPlex2::getEstimatedCondition(int maxiter, Real tolerance, Real& condition)
+   bool SoPlex2::getEstimatedCondition(Real& condition)
    {
-      assert(maxiter >= 1);
-      assert(tolerance > 0.0);
-
-      if( maxiter <= 0 || tolerance <= 0.0 )
-         return false;
-
       _ensureRealLPLoaded();
       if( !_isRealLPLoaded )
          return false;
@@ -2769,7 +2763,7 @@ namespace soplex
       if( _solver.basis().status() == SPxBasis::NO_PROBLEM )
          return false;
 
-      condition = _solver.basis().condition(maxiter, tolerance);
+      condition = _solver.basis().getEstimatedCondition();
 
       return true;
    }

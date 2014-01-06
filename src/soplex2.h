@@ -600,7 +600,7 @@ public:
    void getBasisInd(int* bind) const;
 
    /// computes an estimated condition number for the current basis matrix using the power method; returns true on success
-   bool getEstimatedCondition(int maxiter, Real tolerance, Real& condition);
+   bool getEstimatedCondition(Real& condition);
 
    /// computes row r of basis inverse; returns true on success
    bool getBasisInverseRowReal(int r, Real* coef);

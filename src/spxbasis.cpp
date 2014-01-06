@@ -960,6 +960,10 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
    SSVector x(dimension);
    SSVector y(dimension);
 
+   // check whether a regular basis matrix is available
+   if( !matrixIsSetup || status() < REGULAR )
+      return 0;
+
    // initialize vectors
    norm1 = 1.0 / (Real) dimension;
    for( i = 0; i < dimension; i++ )

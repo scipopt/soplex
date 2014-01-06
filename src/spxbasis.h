@@ -567,6 +567,18 @@ public:
     */
    Real condition(int maxiters = 10, Real tolerance = 1e-6);
 
+   /* wrapper to compute an estimate of the condition number of the current basis matrix */
+   Real getEstimatedCondition()
+   {
+      return condition(20, 1e-6);
+   }
+
+   /* wrapper to compute the exact condition number of the current basis matrix */
+   Real getExactCondition()
+   {
+      return condition(1000, 1e-9);
+   }
+
    /// returns the stability of the basis matrix.
    Real stability() const
    {
