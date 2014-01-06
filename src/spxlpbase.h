@@ -42,6 +42,7 @@
 #include "nameset.h"
 #include "didxset.h"
 #include "spxfileio.h"
+#include "spxscaler.h"
 
 namespace soplex
 {
@@ -105,14 +106,26 @@ private:
 
    SPxSense thesense;   ///< optimization sense.
    R offset;            ///< offset computed, e.g., in simplification step
+   bool isScaled;       ///< true, if scaling has been performed
+   SPxScaler* lp_scaler;///< points to the scaler is the lp has been scaled, to 0 otherwise
 
    //@}
 
 public:
 
    // ------------------------------------------------------------------------------------------------------------------
+
+
+   void applyScaler(SPxScaler* scaler);
+
    /**@name Inquiry */
    //@{
+
+   /// Returns true if the LP is scaled
+   bool isLpScaled() const
+   {
+      return isScaled;
+   }
 
    /// Returns number of rows in LP.
    int nRows() const
@@ -996,6 +1009,8 @@ public:
       LPColSetBase<R>::clear();
       thesense = MAXIMIZE;
       offset = 0;
+      isScaled = false;
+      lp_scaler = 0;
    }
 
    //@}
@@ -2308,6 +2323,8 @@ public:
       , LPColSetBase<R>(old)
       , thesense(old.thesense)
       , offset(old.offset)
+      , isScaled(old.isScaled)
+      , lp_scaler(old.lp_scaler)
    {
       assert(isConsistent());
    }
@@ -2319,6 +2336,8 @@ public:
       , LPColSetBase<R>(old)
       , thesense(old.thesense == SPxLPBase<S>::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE)
       , offset(old.offset)
+      , isScaled(old.isScaled)
+      , lp_scaler(old.lp_scaler)
    {
       assert(isConsistent());
    }
@@ -2332,6 +2351,8 @@ public:
          LPColSetBase<R>::operator=(old);
          thesense = old.thesense;
          offset = old.offset;
+         isScaled = old.isScaled;
+         lp_scaler = old.lp_scaler;
 
          assert(isConsistent());
       }
@@ -2349,6 +2370,8 @@ public:
          LPColSetBase<R>::operator=(old);
          thesense = (old.thesense) == SPxLPBase<S>::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE;
          offset = R(old.offset);
+         isScaled = old.isScaled;
+         lp_scaler = old.lp_scaler;
 
          assert(isConsistent());
       }

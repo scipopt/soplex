@@ -20,6 +20,7 @@
 
 #include "spxgeometsc.h"
 #include "spxout.h"
+#include "spxlpbase.h"
 
 namespace soplex
 {
@@ -57,7 +58,7 @@ Real SPxGeometSC::computeScale(Real mini, Real maxi) const
    return sqrt(mini * maxi);
 }
 
-void SPxGeometSC::scale(SPxLP& lp) 
+void SPxGeometSC::scale(SPxLPBase<Real>& lp)
 {
 
    MSG_INFO1( spxout << "Geometric scaling LP" << std::endl; )

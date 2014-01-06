@@ -27,9 +27,20 @@
 #include "spxout.h"
 #include "mpsinput.h"
 #include "exceptions.h"
+#include "spxscaler.h"
 
 namespace soplex
 {
+
+template<>
+void SPxLPBase<Real>::applyScaler(SPxScaler* scaler)
+{
+   assert( scaler != 0 );
+   lp_scaler = scaler;
+   lp_scaler->scale(*this);
+   isScaled = true;
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 //  Specialization for reading LP format
 // ---------------------------------------------------------------------------------------------------------------------

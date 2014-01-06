@@ -23,10 +23,16 @@
 
 #include "spxdefines.h"
 #include "dataarray.h"
-#include "spxlp.h"
+#include "vector.h"
+#include "svector.h"
+#include "svset.h"
+#include "dsvector.h"
 
 namespace soplex
 {
+
+template < class R >
+class SPxLPBase;
 /**@brief   LP scaler abstract base class.
    @ingroup Algo
 
@@ -54,7 +60,7 @@ protected:
    /**@name Protected helpers */
    //@{
    /// setup scale array for the LP.
-   virtual void setup(SPxLP& lp);
+   virtual void setup(SPxLPBase<Real>& lp);
    /// computes scaling value for a minimum and maximum pair.
    virtual Real computeScale(Real mini, Real maxi) const;
    /// iterates through vecset and calls computeScale() for each vector.
@@ -64,7 +70,7 @@ protected:
                                     const DataArray<Real>& coScaleval, 
                                     DataArray<Real>& scaleval );
    /// applies m_colscale and m_rowscale to the \p lp.
-   virtual void applyScaling(SPxLP& lp);
+   virtual void applyScaling(SPxLPBase<Real>& lp);
    //@}
 
 public:
@@ -101,7 +107,7 @@ public:
    /**@name Scaling */
    //@{
    /// scale SPxLP. 
-   virtual void scale(SPxLP& lp) = 0;
+   virtual void scale(SPxLPBase<Real>& lp) = 0;
    /// unscale dense primal solution vector given in \p x. 
    virtual void unscalePrimal(Vector& x) const;
    /// unscale dense slack vector given in \p s.
@@ -120,9 +126,9 @@ public:
    /// absolute biggest row scaling factor
    virtual Real maxAbsRowscale() const;
    /// maximum ratio between absolute biggest and smallest element in any column.
-   virtual Real maxColRatio(const SPxLP& lp) const;
+   virtual Real maxColRatio(const SPxLPBase<Real>& lp) const;
    /// maximum ratio between absolute biggest and smallest element in any row.
-   virtual Real maxRowRatio(const SPxLP& lp) const;
+   virtual Real maxRowRatio(const SPxLPBase<Real>& lp) const;
    //@}
 
    //-------------------------------------

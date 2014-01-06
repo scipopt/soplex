@@ -218,7 +218,10 @@ namespace soplex
       if( simplificationStatus == SPxSimplifier::OKAY )
       {
          if( _scaler != 0 )
-            _scaler->scale(_solver);
+         {
+            _solver.applyScaler(_scaler);
+            //_scaler->scale(_solver);
+         }
 
          _solveRealLPAndRecordStatistics();
       }

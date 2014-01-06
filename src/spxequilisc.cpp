@@ -20,6 +20,7 @@
 
 #include "spxequilisc.h"
 #include "spxout.h"
+#include "spxlpbase.h"
 
 namespace soplex
 {
@@ -52,7 +53,7 @@ Real SPxEquiliSC::computeScale(Real /*mini*/, Real maxi) const
    return maxi;
 }
 
-void SPxEquiliSC::scale(SPxLP& lp) 
+void SPxEquiliSC::scale(SPxLPBase<Real>& lp)
 {
 
    MSG_INFO1( spxout << "Equilibrium scaling LP" << std::endl; )

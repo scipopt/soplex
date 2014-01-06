@@ -28,6 +28,7 @@
 
 #include "spxscaler.h"
 #include "spxlp.h"
+#include "dsvector.h"
 
 namespace soplex
 {
