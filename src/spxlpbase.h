@@ -155,15 +155,6 @@ public:
    {
 
       R mini = infinity;
-      R mini2 = infinity;
-
-      for( int i = 0; i < nCols(); ++i )
-      {
-         R m = colVector(i).minAbs();
-
-         if( m < mini )
-            mini = m;
-      }
 
       if( isScaled )
       {
@@ -173,8 +164,18 @@ public:
          {
             R m = lp_scaler->returnUnscaledColumn(*this, i).minAbs();
 
-            if( m < mini2 )
-               mini2 = m;
+            if( m < mini )
+               mini = m;
+         }
+      }
+      else
+      {
+         for( int i = 0; i < nCols(); ++i )
+         {
+            R m = colVector(i).minAbs();
+
+            if( m < mini )
+               mini = m;
          }
       }
 
@@ -209,12 +210,27 @@ public:
 
       R maxi = R(0);
 
-      for( int i = 0; i < nCols(); ++i )
+      if( isScaled )
       {
-         R m = colVector(i).maxAbs();
+         assert(lp_scaler != 0);
 
-         if( m > maxi )
-            maxi = m;
+         for( int i = 0; i < nCols(); ++i )
+         {
+            R m = lp_scaler->returnUnscaledColumn(*this, i).maxAbs();
+
+            if( m > maxi )
+               maxi = m;
+         }
+      }
+      else
+      {
+         for( int i = 0; i < nCols(); ++i )
+         {
+            R m = colVector(i).maxAbs();
+
+            if( m > maxi )
+               maxi = m;
+         }
       }
 
       assert(maxi >= R(0));
