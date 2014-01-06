@@ -155,6 +155,7 @@ public:
    {
 
       R mini = infinity;
+      R mini2 = infinity;
 
       for( int i = 0; i < nCols(); ++i )
       {
@@ -163,6 +164,39 @@ public:
          if( m < mini )
             mini = m;
       }
+
+      if( isScaled )
+      {
+         assert(lp_scaler != 0);
+
+         for( int i = 0; i < nCols(); ++i )
+         {
+            R m = lp_scaler->returnUnscaledColumn(*this, i).minAbs();
+
+            if( m < mini2 )
+               mini2 = m;
+         }
+      }
+
+      // might be faster
+      /*if( isScaled )
+      {
+         int exp1;
+         int exp2;
+         for( int i = 0; i < nCols(); ++i )
+         {
+            frexp(lp_scaler->getColScale(i), &exp1);
+            for( int j = 0; j < colVector(i).size(); j++)
+            {
+               frexp(lp_scaler->getRowScale(colVector(i).index(j)), &exp2);
+
+               R m = ldexp((double)colVector(i).value(j), -exp1 - exp2  + 2);
+
+               if( m < mini2 )
+                  mini2 = m;
+            }
+         }
+      }*/
 
       assert(mini >= R(0));
 

@@ -108,6 +108,12 @@ public:
    //@{
    /// scale SPxLP. 
    virtual void scale(SPxLPBase<Real>& lp) = 0;
+   /// returns scaling factor for column \p i
+   virtual Real getColScale(int i);
+   /// returns scaling factor for row \p i
+   virtual Real getRowScale(int i);
+   /// Returns unscaled Column \p i of LP \p lp
+   virtual DSVector returnUnscaledColumn(const SPxLPBase<Real>& lp, int i) const;
    /// unscale dense primal solution vector given in \p x. 
    virtual void unscalePrimal(Vector& x) const;
    /// unscale dense slack vector given in \p s.

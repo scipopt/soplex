@@ -251,6 +251,39 @@ void SPxScaler::applyScaling(SPxLP& lp)
    assert(lp.isConsistent());
 }
 
+/// returns scaling factor for column \p i
+Real SPxScaler::getColScale(int i)
+{
+   return m_colscale[i];
+}
+
+/// returns scaling factor for row \p i
+Real SPxScaler::getRowScale(int i)
+{
+   return m_rowscale[i];
+}
+
+/// Returns unscaled Column \p i
+DSVector SPxScaler::returnUnscaledColumn(const SPxLP& lp, int i) const
+{
+   assert(i <= lp.nCols());
+   //assert(lp.isLpScaled() == true);
+
+   DSVector result;
+   result = lp.colVector(i);
+
+   int exp1;
+   frexp(m_colscale[i], &exp1);
+   int exp2;
+   for( int j = 0; j < result.size(); j++ )
+   {
+      frexp(m_rowscale[result.index(j)], &exp2);
+      result.value(j) = ldexp(result.value(j), -exp1 - exp2 + 2);
+   }
+
+   return result;
+}
+
 void SPxScaler::unscalePrimal(Vector& x) const
 {
 
