@@ -550,6 +550,9 @@ public:
     */
    Vector& multBaseWith(Vector& x) const;
 
+   /// Basis-vector product
+   void multBaseWith(SSVector& x, SSVector& result) const;
+
    /// Vector-basis product.
    /** Depending on the representation, for a #SPxBasis B,
        B.multWithBase(x) computes
@@ -560,6 +563,9 @@ public:
        a vector \p x aligned the same way as the \em covectors of \p B.
     */
    Vector& multWithBase(Vector& x) const;
+
+   /// Vector-basis product
+   void multWithBase(SSVector& x, SSVector& result) const;
 
    /* compute an estimated condition number for the current basis matrix
     * by computing estimates of the norms of B and B^-1 using the power method.

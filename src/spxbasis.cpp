@@ -919,6 +919,24 @@ Vector& SPxBasis::multWithBase(Vector& x) const
    return x;
 }
 
+void SPxBasis::multWithBase(SSVector& x, SSVector& result) const
+{
+   assert(status() > SINGULAR);
+   assert(theLP->dim() == x.dim());
+   assert(x.dim() == result.dim());
+
+   if (!matrixIsSetup)
+      (const_cast<SPxBasis*>(this))->loadDesc(thedesc);
+
+   assert(matrixIsSetup);
+
+   for( int i = 0; i < x.dim(); ++i )
+      result.setValue(i, (*matrix[i]) * x);
+
+   return;
+}
+
+
 Vector& SPxBasis::multBaseWith(Vector& x) const
 {
    METHOD( "SPxBasis::multBaseWith()" );
@@ -943,6 +961,26 @@ Vector& SPxBasis::multBaseWith(Vector& x) const
    return x;
 }
 
+void SPxBasis::multBaseWith(SSVector& x, SSVector& result) const
+{
+   assert(status() > SINGULAR);
+   assert(theLP->dim() == x.dim());
+   assert(x.dim() == result.dim());
+
+   if (!matrixIsSetup)
+      (const_cast<SPxBasis*>(this))->loadDesc(thedesc);
+
+   assert(matrixIsSetup);
+
+   result.clear();
+   for( int i = 0; i < x.size(); ++i )
+   {
+      result.multAdd(x[i], (*matrix[i]));
+   }
+
+   return;
+}
+
 /* compute an estimated condition number for the current basis matrix
  * by computing estimates of the norms of B and B^-1 using the power method.
  * maxiters and tolerance control the accuracy of the estimate.
@@ -961,8 +999,11 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
    SSVector y(dimension);
 
    // check whether a regular basis matrix is available
-   if( !matrixIsSetup || status() < REGULAR )
+   if( status() < REGULAR )
       return 0;
+
+   if (!matrixIsSetup)
+      (const_cast<SPxBasis*>(this))->loadDesc(thedesc);
 
    // initialize vectors
    norm1 = 1.0 / (Real) dimension;
@@ -976,30 +1017,15 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
       norm2 = norm1;
 
       // y = B*x
-      if( x[0] == 0 )
-         y.clear();
-      else
-      {
-         y = *matrix[0];
-         y *= x[0];
-      }
-      for( i = 1; i < dimension; ++i )
-      {
-         assert(y.isConsistent());
-         y.multAdd(x[i], (*matrix[i]));
-      }
+      multBaseWith(x, y);
       norm1 = y.length();
 
       // stop if converged
       if( abs(norm1 - norm2) < tolerance * norm1 )
          break;
 
-      // x = B^T*y
-      x.setValue(0, (*matrix[0]) * y);
-      for( i = 1; i < dimension; ++i )
-         x.setValue(i, (*matrix[i]) * y);
-
-      // normalize x
+      // x = B^T*y and normalize
+      multWithBase(y, x);
       x *= 1.0 / x.length();
    }
    norm = norm1;
@@ -1014,11 +1040,16 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
    for( c = 0; c < maxiters; ++c )
    {
       norm2 = norm1;
+
+      // y = B^-1*x
       factor->solveRight(x, y);
       norm1 = x.length();
+
       // stop if converged
       if( abs(norm1 - norm2) < tolerance * norm1 )
          break;
+
+      // x = B^-T*y and normalize
       factor->solveLeft(y, x);
       y *= 1.0 / y.length();
    }
