@@ -112,8 +112,18 @@ public:
    virtual Real getColScale(int i);
    /// returns scaling factor for row \p i
    virtual Real getRowScale(int i);
-   /// Returns unscaled Column \p i of LP \p lp
-   virtual DSVector returnUnscaledColumn(const SPxLPBase<Real>& lp, int i) const;
+   /// returns unscaled Column \p i of LP \p lp
+   virtual DSVector returnUnscaledColumnVector(const SPxLPBase<Real>& lp, int i) const;
+   /// returns unscaled upper bound \p i of LP \lp
+   virtual Real returnUnscaledUpper(const SPxLPBase<Real>& lp, int i) const;
+   /// returns unscaled lower bound \p i of LP \lp
+   virtual Real returnUnscaledLower(const SPxLPBase<Real>& lp, int i) const;
+   /// returns unscaled Row \p i of LP \p lp
+   virtual DSVector returnUnscaledRowVector(const SPxLPBase<Real>& lp, int i) const;
+   /// returns unscaled right hand side \p i of LP \lp
+   virtual Real returnUnscaledRhs(const SPxLPBase<Real>& lp, int i) const;
+   /// returns unscaled left hand side \p i of LP \lp
+   virtual Real returnUnscaledLhs(const SPxLPBase<Real>& lp, int i) const;
    /// unscale dense primal solution vector given in \p x. 
    virtual void unscalePrimal(Vector& x) const;
    /// unscale dense slack vector given in \p s.

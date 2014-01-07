@@ -162,7 +162,7 @@ public:
 
          for( int i = 0; i < nCols(); ++i )
          {
-            R m = lp_scaler->returnUnscaledColumn(*this, i).minAbs();
+            R m = lp_scaler->returnUnscaledColumnVector(*this, i).minAbs();
 
             if( m < mini )
                mini = m;
@@ -216,7 +216,7 @@ public:
 
          for( int i = 0; i < nCols(); ++i )
          {
-            R m = lp_scaler->returnUnscaledColumn(*this, i).maxAbs();
+            R m = lp_scaler->returnUnscaledColumnVector(*this, i).maxAbs();
 
             if( m > maxi )
                maxi = m;
