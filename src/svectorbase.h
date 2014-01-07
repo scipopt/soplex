@@ -446,6 +446,8 @@ public:
       int n = size();
       Nonzero<R>* e = m_elem;
 
+      assert(x != R(0));
+
       while( n-- )
       {
          e->val *= x;

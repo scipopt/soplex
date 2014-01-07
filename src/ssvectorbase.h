@@ -406,6 +406,7 @@ public:
    SSVectorBase<R>& operator*=(S x)
    {
       assert(isSetup());
+      assert(x != S(0));
 
       for( int i = size() - 1; i >= 0; --i )
          VectorBase<R>::val[index(i)] *= x;

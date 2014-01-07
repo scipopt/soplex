@@ -974,19 +974,32 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
    for( c = 0; c < maxiters; ++c )
    {
       norm2 = norm1;
+
       // y = B*x
-      y = *matrix[0];
-      y *= x[0];
+      if( x[0] == 0 )
+         y.clear();
+      else
+      {
+         y = *matrix[0];
+         y *= x[0];
+      }
       for( i = 1; i < dimension; ++i )
+      {
+         assert(y.isConsistent());
          y.multAdd(x[i], (*matrix[i]));
+      }
       norm1 = y.length();
+
       // stop if converged
       if( abs(norm1 - norm2) < tolerance * norm1 )
          break;
+
       // x = B^T*y
       x.setValue(0, (*matrix[0]) * y);
       for( i = 1; i < dimension; ++i )
          x.setValue(i, (*matrix[i]) * y);
+
+      // normalize x
       x *= 1.0 / x.length();
    }
    norm = norm1;
