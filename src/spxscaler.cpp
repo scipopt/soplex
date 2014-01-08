@@ -319,6 +319,17 @@ Real SPxScaler::returnUnscaledLower(const SPxLPBase<Real>& lp, int i) const
    }
 }
 
+/// returns unscaled objective function coefficient of \p i of LP \lp
+Real SPxScaler::returnUnscaledObj(const SPxLPBase<Real>& lp, int i) const
+{
+   assert(i <= lp.nCols());
+
+   int exp;
+   frexp(m_colscale[i], &exp);
+
+   return ldexp(lp.maxObj(i) , -exp + 1);
+}
+
 /// Returns unscaled Row \p i
 DSVector SPxScaler::returnUnscaledRowVector(const SPxLP& lp, int i) const
 {

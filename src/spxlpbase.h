@@ -286,6 +286,8 @@ public:
       }
    }
 
+   //todo: following methods need version to return unscaled information
+
    /// Gets row vector of row \p i.
    const SVectorBase<R>& rowVector(int i) const
    {
@@ -394,10 +396,20 @@ public:
    void getCol(int i, LPColBase<R>& col) const
    {
 
-      col.setUpper(upper(i));
-      col.setLower(lower(i));
-      col.setObj(obj(i));
-      col.setColVector(colVector(i));
+      if( isScaled )
+      {
+         col.setUpper(lp_scaler->returnUnscaledUpper(*this, i));
+         col.setLower(lp_scaler->returnUnscaledLower(*this, i));
+         col.setObj(lp_scaler->returnUnscaledObj(*this, i));
+         col.setColVector(lp_scaler->returnUnscaledColumnVector(*this, i));
+      }
+      else
+      {
+         col.setUpper(upper(i));
+         col.setLower(lower(i));
+         col.setObj(obj(i));
+         col.setColVector(colVector(i));
+      }
    }
 
    /// Gets column with identifier \p id.
@@ -410,9 +422,23 @@ public:
    void getCols(int start, int end, LPColSetBase<R>& set) const
    {
 
-      set.clear();
-      for( int i = start; i <= end; i++ )
-         set.add(obj(i), lower(i), colVector(i), upper(i));
+      if( isScaled)
+      {
+         LPColBase<R> lpcol;
+
+         for( int i = start; i <= end; i++ )
+         {
+            getCol(i, lpcol);
+            set.add(lpcol);
+         }
+
+      }
+      else
+      {
+         set.clear();
+         for( int i = start; i <= end; i++ )
+            set.add(obj(i), lower(i), colVector(i), upper(i));
+      }
    }
 
    /// Returns column vector of column \p i.
