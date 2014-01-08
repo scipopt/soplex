@@ -602,6 +602,9 @@ public:
    /// computes an estimated condition number for the current basis matrix using the power method; returns true on success
    bool getEstimatedCondition(Real& condition);
 
+   /// computes the exact condition number for the current basis matrix using the power method; returns true on success
+   bool getExactCondition(Real& condition);
+
    /// computes row r of basis inverse; returns true on success
    bool getBasisInverseRowReal(int r, Real* coef);
 

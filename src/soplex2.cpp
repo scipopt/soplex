@@ -2768,6 +2768,21 @@ namespace soplex
       return true;
    }
 
+   /// computes the exact condition number for the current basis matrix using the power method; returns true on success
+   bool SoPlex2::getExactCondition(Real& condition)
+   {
+      _ensureRealLPLoaded();
+      if( !_isRealLPLoaded )
+         return false;
+
+      if( _solver.basis().status() == SPxBasis::NO_PROBLEM )
+         return false;
+
+      condition = _solver.basis().getExactCondition();
+
+      return true;
+   }
+
    /// computes row r of basis inverse; returns true on success
    ///@todo use VectorReal for coef
    bool SoPlex2::getBasisInverseRowReal(int r, Real* coef)
