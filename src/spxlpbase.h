@@ -241,10 +241,20 @@ public:
    /// Gets \p i 'th row.
    void getRow(int i, LPRowBase<R>& row) const
    {
-      row.setLhs(lhs(i));
-      row.setRhs(rhs(i));
-      row.setObj(rowObj(i));
-      row.setRowVector(DSVectorBase<R>(rowVector(i)));
+      if( isScaled )
+      {
+         row.setLhs(lp_scaler->returnUnscaledLhs(*this, i));
+         row.setRhs(lp_scaler->returnUnscaledRhs(*this, i));
+         ///@todo row.setObj(lp_scaler->returnUnscaledObj(*this, i));
+         row.setRowVector(lp_scaler->returnUnscaledRowVector(*this, i));
+      }
+      else
+      {
+         row.setLhs(lhs(i));
+         row.setRhs(rhs(i));
+         row.setObj(rowObj(i));
+         row.setRowVector(DSVectorBase<R>(rowVector(i)));
+      }
    }
 
    /// Gets row with identifier \p id.
@@ -258,8 +268,22 @@ public:
    {
 
       set.clear();
-      for( int i = start; i <= end; i++ )
-         set.add(lhs(i), rowVector(i), rhs(i), rowObj(i));
+
+      if( isScaled )
+      {
+         LPRowBase<R> lprow;
+
+         for( int i = start; i <= end; i++ )
+         {
+            getRow(i, lprow);
+            set.add(lprow);
+         }
+      }
+      else
+      {
+         for( int i = start; i <= end; i++ )
+            set.add(lhs(i), rowVector(i), rhs(i), rowObj(i));
+      }
    }
 
    /// Gets row vector of row \p i.
