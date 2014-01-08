@@ -4485,7 +4485,7 @@ namespace soplex
 
       printStatus(os, _status);
 
-      os << "Rational LP        : \n"
+      os << "Real LP            : \n"
          << "  Objective sense  : " << (intParam(SoPlex2::OBJSENSE) == SoPlex2::OBJSENSE_MINIMIZE ? "minimize\n" : "maximize\n");
       _realLP->printProblemStatistics(os);
 
