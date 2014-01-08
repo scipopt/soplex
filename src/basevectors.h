@@ -522,7 +522,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product1(const SVSetBase<S>& A, const S
    else
    {
       num = Ai.size();
-      for( register int j = 0; j < num; j++ )
+      for( int j = 0; j < num; j++ )
       {
          const Nonzero<S>& Aij = Ai.element(j);
          idx[j] = Aij.idx;
@@ -567,7 +567,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
    }
    else
    {
-      for( register int j = 0; j < num; ++j )
+      for( int j = 0; j < num; ++j )
       {
          const Nonzero<S>& elt = A0.element(j);
          const R product = x0 * elt.val;
@@ -583,7 +583,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
    }
 
    // Compute the other x[i] * A[i] and add them to the existing vector.
-   for( register int i = 1; i < xsize; ++i )
+   for( int i = 1; i < xsize; ++i )
    {
       curidx = x.idx[i];
       const T xi     = x.val[curidx];
@@ -594,7 +594,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
       if ( isNotZero(xi, epsilon) || Aisize == 0 )
       {
          // Compute x[i] * A[i] and add it to the existing vector.
-         for( register int j = 0; j < Aisize; ++j )
+         for( int j = 0; j < Aisize; ++j )
          {
             const Nonzero<S>& elt = Ai.element(j);
             idx[nonzero_idx] = elt.idx;
@@ -626,7 +626,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
    // zeroing all values which are nearly 0, and setting #num# appropriately.
    int nz_counter = 0;
 
-   for( register int i = 0; i < nonzero_idx; ++i )
+   for( int i = 0; i < nonzero_idx; ++i )
    {
       curidx = idx[i];
 
@@ -676,7 +676,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productFull(const SVSetBase<S>& A, cons
       if( A_is_zero && Aisize > 0 )
          A_is_zero = false;
 
-      for( register int j = 0; j < Aisize; ++j )
+      for( int j = 0; j < Aisize; ++j )
       {
          const Nonzero<S>& elt = Ai.element(j);
          VectorBase<R>::val[elt.idx] += xi * elt.val;
