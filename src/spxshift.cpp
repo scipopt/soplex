@@ -26,7 +26,6 @@ namespace soplex
 {
 void SPxSolver::shiftFvec()
 {
-   METHOD( "SPxSolver::shiftFvec()" );
 
    /* the allowed tolerance is (rep() == COLUMN) ? feastol() : opttol() because theFvec is the primal vector in COLUMN
     * and the dual vector in ROW representation; this is equivalent to entertol()
@@ -80,7 +79,6 @@ void SPxSolver::shiftFvec()
  */
 void SPxSolver::shiftPvec()
 {
-   METHOD( "SPxSolver::shiftPvec()" );
 
    /* the allowed tolerance is (rep() == ROW) ? feastol() : opttol() because thePvec is the primal vector in ROW and the
     * dual vector in COLUMN representation; this is equivalent to leavetol()
@@ -158,7 +156,6 @@ void SPxSolver::perturbMin(
    int start,
    int incr)
 {
-   METHOD( "SPxSolver::perturbMin()" );
    assert(uvec.dim() == p_low.dim());
    assert(uvec.dim() == p_up.dim());
 
@@ -226,7 +223,6 @@ void SPxSolver::perturbMax(
    int start,
    int incr) 
 {
-   METHOD( "SPxSolver::perturbMax()" );
    assert(uvec.dim() == p_low.dim());
    assert(uvec.dim() == p_up.dim());
 
@@ -284,7 +280,6 @@ void SPxSolver::perturbMax(
 
 void SPxSolver::perturbMinEnter(void)
 {
-   METHOD( "SPxSolver::perturbMinEnter()" );
    MSG_DEBUG( spxout << "DSHIFT03 iteration= " << iteration() << ": perturbing " << shift(); )
    fVec().delta().setup();
    perturbMin(fVec(), lbBound(), ubBound(), epsilon(), entertol());
@@ -294,7 +289,6 @@ void SPxSolver::perturbMinEnter(void)
 
 void SPxSolver::perturbMaxEnter(void)
 {
-   METHOD( "SPxSolver::perturbMaxEnter()" );
    MSG_DEBUG( spxout << "DSHIFT04 iteration= " << iteration() << ": perturbing " << shift(); )
    fVec().delta().setup();
    perturbMax(fVec(), lbBound(), ubBound(), epsilon(), entertol());
@@ -312,7 +306,6 @@ Real SPxSolver::perturbMin(
    int start,
    int incr) const
 {
-   METHOD( "SPxSolver::perturbMin()" );
    assert(uvec.dim() == p_low.dim());
    assert(uvec.dim() == p_up.dim());
 
@@ -380,7 +373,6 @@ Real SPxSolver::perturbMax(
    int start,
    int incr) const
 {
-   METHOD( "SPxSolver::perturbMax()" );
    assert(uvec.dim() == p_low.dim());
    assert(uvec.dim() == p_up.dim());
 
@@ -441,7 +433,6 @@ Real SPxSolver::perturbMax(
 
 void SPxSolver::perturbMinLeave(void)
 {
-   METHOD( "SPxSolver::perturbMinLeave()" );
    MSG_DEBUG( spxout << "DSHIFT05 iteration= " << iteration() << ": perturbing " << shift(); )
    pVec().delta().setup();
    coPvec().delta().setup();
@@ -455,7 +446,6 @@ void SPxSolver::perturbMinLeave(void)
 
 void SPxSolver::perturbMaxLeave(void)
 {
-   METHOD( "SPxSolver::perturbMaxLeave()" );
    MSG_DEBUG( spxout << "DSHIFT06 iteration= " << iteration() << ": perturbing " << shift(); )
    pVec().delta().setup();
    coPvec().delta().setup();
@@ -469,7 +459,6 @@ void SPxSolver::perturbMaxLeave(void)
 
 void SPxSolver::unShift(void)
 {
-   METHOD( "SPxSolver::unShift()" );
    MSG_INFO3( spxout << "DSHIFT07 = " << "unshifting ..." << std::endl; );
 
    if (isInitialized())

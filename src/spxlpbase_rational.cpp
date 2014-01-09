@@ -1734,7 +1734,6 @@ static void LPFwriteSVector(
    const NameSet*           p_cnames,   ///< column names
    const SVectorBase<Rational>& p_svec )    ///< vector to write
 {
-   METHOD("LPFwriteSVector");
 
    char name[16];
    int num_coeffs = 0;
@@ -1787,7 +1786,6 @@ static void LPFwriteObjective(
    const NameSet*         p_cnames    ///< column names
    )
 {
-   METHOD("writeObjective");
 
    const int sense = p_lp.spxSense();
 
@@ -1814,7 +1812,6 @@ static void LPFwriteRow(
    const Rational&              p_rhs       ///< rhs of the row
    )
 {
-   METHOD("writeRow");
 
    long long pos;
    pos = p_output.tellp();
@@ -1864,7 +1861,6 @@ static void LPFwriteRows(
    const NameSet*         p_cnames   ///< column names
    )
 {
-   METHOD("writeRows");
 
    char name[16];
 
@@ -1903,7 +1899,6 @@ static void LPFwriteBounds(
    const NameSet*           p_cnames    ///< column names
    )
 {
-   METHOD("writeBounds");
 
    char name[16];
    long long pos;
@@ -1966,7 +1961,6 @@ static void LPFwriteGenerals(
    const DIdxSet*           p_intvars     ///< integer variables
    )
 {
-   METHOD("writeGenerals");
 
    char name[16];
 
@@ -1991,7 +1985,6 @@ void SPxLPBase<Rational>::writeLPF(
    const DIdxSet* p_intvars          ///< integer variables
    ) const
 {
-   METHOD("writeLPF");
 
    LPFwriteObjective(*this, p_output, p_cnames);
    LPFwriteRows(*this, p_output, p_rnames, p_cnames);
@@ -2098,7 +2091,6 @@ void SPxLPBase<Rational>::writeMPS(
    const DIdxSet* p_intvars          ///< integer variables.
    ) const
 {
-   METHOD("writeMPS");
 
    const char*    indicator;
    char           name [16];

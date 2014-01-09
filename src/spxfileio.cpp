@@ -28,7 +28,6 @@ bool SPxSolver::readBasisFile(
    const NameSet* rowNames,
    const NameSet* colNames)
 {
-   METHOD( "SPxSolver::readBasisFile()" );
 
    spxifstream file(filename);
 
@@ -43,7 +42,6 @@ bool SPxSolver::writeBasisFile
      const NameSet* rowNames,
      const NameSet* colNames ) const
 {
-   METHOD( "SPxSolver::writeBasisFile()" );
    std::ofstream file(filename);
 
    if (!file)

@@ -63,7 +63,6 @@ all $j \ne i^*$ $f^{(i^*)}_j$ remains within its bounds $l_j$ and $u_j$.
  */
 Real SPxSolver::test(int i, SPxBasis::Desc::Status stat) const
 {
-   METHOD( "SPxSolver::test()" );
    assert(type() == ENTER);
    assert(!isBasic(stat));
 
@@ -103,7 +102,6 @@ Real SPxSolver::test(int i, SPxBasis::Desc::Status stat) const
 
 void SPxSolver::computeTest()
 {
-   METHOD( "SPxSolver::computeTest()" );
 
    const SPxBasis::Desc& ds = desc();
    Real pricingTol = leavetol();
@@ -164,14 +162,12 @@ void SPxSolver::computeTest()
 
 Real SPxSolver::computePvec(int i)
 {
-   METHOD( "SPxSolver::computePvec()" );
 
    return (*thePvec)[i] = vector(i) * (*theCoPvec);
 }
 
 Real SPxSolver::computeTest(int i)
 {
-   METHOD( "SPxSolver::computeTest()" );
    SPxBasis::Desc::Status stat = desc().status(i);
    if (isBasic(stat))
       return theTest[i] = 0;
@@ -185,7 +181,6 @@ Real SPxSolver::computeTest(int i)
  */
 Real SPxSolver::coTest(int i, SPxBasis::Desc::Status stat) const
 {
-   METHOD( "SPxSolver::coTest()" );
    assert(type() == ENTER);
    assert(!isBasic(stat));
 
@@ -222,7 +217,6 @@ Real SPxSolver::coTest(int i, SPxBasis::Desc::Status stat) const
 
 void SPxSolver::computeCoTest()
 {
-   METHOD( "SPxSolver::computeCoTest()" );
    int i;
    Real pricingTol = leavetol();
    infeasibilities.clear();
@@ -283,7 +277,6 @@ void SPxSolver::computeCoTest()
  */
 void SPxSolver::updateTest()
 {
-   METHOD( "SPxSolver::updateTest()" );
    thePvec->delta().setup();
 
    const IdxSet& idx = thePvec->idx();
@@ -316,7 +309,6 @@ void SPxSolver::updateTest()
 
 void SPxSolver::updateCoTest()
 {
-   METHOD( "SPxSolver::updateCoTest()" );
    theCoPvec->delta().setup();
 
    const IdxSet& idx = theCoPvec->idx();
@@ -366,7 +358,6 @@ void SPxSolver::getEnterVals
    Real& enterRO
 )
 {
-   METHOD( "SPxSolver::getEnterVals()" );
    int enterIdx;
    SPxBasis::Desc& ds = desc();
 
@@ -644,7 +635,6 @@ void SPxSolver::getEnterVals2
    Real& leavebound
 )
 {
-   METHOD( "SPxSolver::getEnterVals2()" );
    int idx;
    SPxBasis::Desc& ds = desc();
    SPxId leftId = baseId(leaveIdx);
@@ -841,7 +831,6 @@ SPxSolver::ungetEnterVal(
    const SVector& vec
 )
 {
-   METHOD( "SPxSolver::ungetEnterVal()" );
    int enterIdx;
    SPxBasis::Desc& ds = desc();
 
@@ -876,7 +865,6 @@ void SPxSolver::rejectEnter(
    SPxBasis::Desc::Status enterStat
 )
 {
-   METHOD( "SPxSolver::rejectEnter()" );
    int enterIdx = number(enterId);
    if (isId(enterId))
    {
@@ -892,7 +880,6 @@ void SPxSolver::rejectEnter(
 
 bool SPxSolver::enter(SPxId& enterId)
 {
-   METHOD( "SPxSolver::enter()" );
    assert(enterId.isValid());
    assert(type() == ENTER);
    assert(initialized);

@@ -28,7 +28,6 @@ namespace soplex
 
 void SPxBasis::reDim()
 {
-   METHOD( "SPxBasis::reDim()" );
 
    assert(theLP != 0);
 
@@ -61,7 +60,6 @@ void SPxBasis::reDim()
 
 void SPxBasis::addedRows(int n)
 {
-   METHOD( "SPxBasis::addedRows()" );
 
    assert(theLP != 0);
 
@@ -128,7 +126,6 @@ void SPxBasis::addedRows(int n)
 
 void SPxBasis::removedRow(int i)
 {
-   METHOD( "SPxBasis::removedRow()" );
 
    assert(status() >  NO_PROBLEM);
    assert(theLP    != 0);
@@ -175,7 +172,6 @@ void SPxBasis::removedRow(int i)
 
 void SPxBasis::removedRows(const int perm[])
 {
-   METHOD( "SPxBasis::removedRows()" );
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
 
@@ -265,7 +261,6 @@ primalColStatus(int i, const SPxLP* theLP)
 
 void SPxBasis::addedCols(int n)
 {
-   METHOD( "SPxBasis::addedCols()" );
    assert(theLP != 0);
 
    if( n > 0 )
@@ -330,7 +325,6 @@ void SPxBasis::addedCols(int n)
 
 void SPxBasis::removedCol(int i)
 {
-   METHOD( "SPxBasis::removedCol()" );
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
 
@@ -369,7 +363,6 @@ void SPxBasis::removedCol(int i)
 
 void SPxBasis::removedCols(const int perm[])
 {
-   METHOD( "SPxBasis::removedCols()" );
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
 
@@ -416,7 +409,6 @@ void SPxBasis::removedCols(const int perm[])
  */
 void SPxBasis::invalidate()
 {
-   METHOD( "SPxBasis::invalidate()" );
 
    MSG_INFO3( spxout << "ICHBAS09 explicit invalidation of factorization" 
                         << std::endl; )
@@ -432,7 +424,6 @@ void SPxBasis::invalidate()
 */
 void SPxBasis::restoreInitialBasis()
 {
-   METHOD( "SPxBasis::restoreInitialBasis()" );
 
    assert( !matrixIsSetup && !factorized );
 
@@ -491,7 +482,6 @@ void SPxBasis::restoreInitialBasis()
  */
 void SPxBasis::changedRow(int /*row*/)
 {
-   METHOD( "SPxBasis::changedRow()" );
    invalidate();
    restoreInitialBasis();
 }
@@ -500,7 +490,6 @@ void SPxBasis::changedRow(int /*row*/)
  */
 void SPxBasis::changedCol(int /*col*/)
 {
-   METHOD( "SPxBasis::changedCol()" );
    invalidate();
    restoreInitialBasis();
 }
@@ -509,7 +498,6 @@ void SPxBasis::changedCol(int /*col*/)
  */
 void SPxBasis::changedElement(int /*row*/, int /*col*/)
 {
-   METHOD( "SPxBasis::changedElement()" );
    invalidate();
    restoreInitialBasis();
 }

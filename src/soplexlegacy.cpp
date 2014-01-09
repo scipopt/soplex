@@ -184,7 +184,6 @@ SoPlexLegacy::SoPlexLegacy(const SoPlexLegacy& old)
 
 void SoPlexLegacy::setPreScaler(SPxScaler* x, const bool destroy)
 {
-   METHOD( "SoPlexLegacy::setPreScaler()" );
 
    assert(!m_freePreScaler || m_preScaler != 0);
 
@@ -199,7 +198,6 @@ void SoPlexLegacy::setPreScaler(SPxScaler* x, const bool destroy)
 
 void SoPlexLegacy::setPostScaler(SPxScaler* x, const bool destroy)
 {
-   METHOD( "SoPlexLegacy::setPostScaler()" );
 
    assert(!m_freePostScaler || m_postScaler != 0);
 
@@ -214,7 +212,6 @@ void SoPlexLegacy::setPostScaler(SPxScaler* x, const bool destroy)
 
 void SoPlexLegacy::setSimplifier(SPxSimplifier* x, const bool destroy)
 {
-   METHOD( "SoPlexLegacy::setSimplifier()" );
 
    assert(!m_freeSimplifier || m_simplifier != 0);
 
@@ -229,7 +226,6 @@ void SoPlexLegacy::setSimplifier(SPxSimplifier* x, const bool destroy)
 
 Real SoPlexLegacy::objValue() const
 {
-   METHOD( "SoPlexLegacy::value()" );
 
    DVector x(nCols());
 
@@ -240,7 +236,6 @@ Real SoPlexLegacy::objValue() const
 
 SPxSolver::Status SoPlexLegacy::solve()
 {
-   METHOD( "SoPlexLegacy::solve()" );
 
    if (nRows() <= 0 && nCols() <= 0) // no problem loaded
       throw SPxStatusException("XSOLVR01 No Problem loaded");
@@ -315,7 +310,6 @@ SPxSolver::Status SoPlexLegacy::solve()
 
 SPxSolver::Status SoPlexLegacy::getPrimal(Vector& x) const
 {
-   METHOD( "SoPlexLegacy::getPrimal()" );
 
    if (has_simplifier())
    {
@@ -350,7 +344,6 @@ SPxSolver::Status SoPlexLegacy::getPrimal(Vector& x) const
 
 SPxSolver::Status SoPlexLegacy::getSlacks(Vector& s) const
 {
-   METHOD( "SoPlexLegacy::getSlacks()" );
 
    if (has_simplifier())
    {
@@ -385,7 +378,6 @@ SPxSolver::Status SoPlexLegacy::getSlacks(Vector& s) const
 
 SPxSolver::Status SoPlexLegacy::getDual(Vector& pi) const
 {
-   METHOD( "SoPlexLegacy::getDual()" );
 
    if (has_simplifier())
    {
@@ -420,7 +412,6 @@ SPxSolver::Status SoPlexLegacy::getDual(Vector& pi) const
 
 SPxSolver::Status SoPlexLegacy::getRedCost(Vector& rdcost) const
 {
-   METHOD( "SoPlexLegacy::getRedCost()" );
 
    if (has_simplifier())
    {
@@ -718,7 +709,6 @@ bool SoPlexLegacy::writeState(
    const NameSet* rowNames,
    const NameSet* colNames ) const
 {
-   METHOD( "SoPlexLegacy::writeState()" );
 
    return m_solver.writeState(filename, rowNames, colNames);
 }

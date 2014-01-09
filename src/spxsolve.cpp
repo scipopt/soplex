@@ -79,7 +79,6 @@ bool SPxSolver::precisionReached(Real& newpricertol) const
 
 SPxSolver::Status SPxSolver::solve()
 {
-   METHOD( "SPxSolver::solve()" );
 
    SPxId enterId;
    int   leaveNum;
@@ -999,7 +998,6 @@ SPxSolver::Status SPxSolver::solve()
 
 void SPxSolver::testVecs()
 {
-   METHOD( "SPxSolver::testVecs()" );
 
    assert(SPxBasis::status() > SPxBasis::SINGULAR);
 
@@ -1070,7 +1068,6 @@ void SPxSolver::testVecs()
 
 bool SPxSolver::terminate()
 {
-   METHOD( "SPxSolver::terminate()" );
 #ifdef ENABLE_ADDITIONAL_CHECKS
    if (SPxBasis::status() > SPxBasis::SINGULAR)
       testVecs();
@@ -1190,7 +1187,6 @@ bool SPxSolver::terminate()
 
 SPxSolver::Status SPxSolver::getPrimal (Vector& p_vector) const
 {
-   METHOD( "SPxSolver::getPrimal()" );
 
    if (!isInitialized())
    {
@@ -1240,7 +1236,6 @@ SPxSolver::Status SPxSolver::getPrimal (Vector& p_vector) const
 
 SPxSolver::Status SPxSolver::getDual (Vector& p_vector) const
 {
-   METHOD( "SPxSolver::getDual()" );
 
    assert(isInitialized());
 
@@ -1272,7 +1267,6 @@ SPxSolver::Status SPxSolver::getDual (Vector& p_vector) const
 
 SPxSolver::Status SPxSolver::getRedCost (Vector& p_vector) const
 {
-   METHOD( "SPxSolver::getRedCost()" );
 
    assert(isInitialized());
 
@@ -1316,7 +1310,6 @@ SPxSolver::Status SPxSolver::getRedCost (Vector& p_vector) const
 
 SPxSolver::Status SPxSolver::getPrimalray (Vector& p_vector) const
 {
-   METHOD( "SPxSolver::getPrimalray()" );
 
    assert(isInitialized());
 
@@ -1335,7 +1328,6 @@ SPxSolver::Status SPxSolver::getPrimalray (Vector& p_vector) const
 
 SPxSolver::Status SPxSolver::getDualfarkas (Vector& p_vector) const
 {
-   METHOD( "SPxSolver::getDualfarkas()" );
 
    assert(isInitialized());
 
@@ -1354,7 +1346,6 @@ SPxSolver::Status SPxSolver::getDualfarkas (Vector& p_vector) const
 
 SPxSolver::Status SPxSolver::getSlacks (Vector& p_vector) const
 {
-   METHOD( "SPxSolver::getSlacks()" );
 
    assert(isInitialized());
 
@@ -1406,7 +1397,6 @@ SPxSolver::Status SPxSolver::getSlacks (Vector& p_vector) const
 
 void SPxSolver::setPrimal(Vector& p_vector)
 {
-   METHOD( "SPxSolver::setPrimal()" );
 
    if (!isInitialized())
    {
@@ -1427,7 +1417,6 @@ void SPxSolver::setPrimal(Vector& p_vector)
 
 void SPxSolver::setDual(Vector& p_vector)
 {
-   METHOD( "SPxSolver::setDual()" );
 
    assert(isInitialized());
 
@@ -1459,7 +1448,6 @@ void SPxSolver::setDual(Vector& p_vector)
 
 void SPxSolver::setRedCost(Vector& p_vector)
 {
-   METHOD( "SPxSolver::setRedCost()" );
 
    assert(isInitialized());
 
@@ -1494,7 +1482,6 @@ void SPxSolver::setRedCost(Vector& p_vector)
 
 void SPxSolver::setSlacks(Vector& p_vector)
 {
-   METHOD( "SPxSolver::getSlacks()" );
 
    assert(isInitialized());
 
@@ -1517,7 +1504,6 @@ void SPxSolver::setSlacks(Vector& p_vector)
 
 SPxSolver::Status SPxSolver::status() const
 {
-   METHOD( "SPxSolver::status()" );
    switch( m_status )
    {
    case UNKNOWN :      
@@ -1569,7 +1555,6 @@ SPxSolver::Status SPxSolver::getResult(
    Vector* p_dual,
    Vector* reduCosts) const
 {
-   METHOD( "SPxSolver::getResult()" );
    if (p_value)
       *p_value = this->value();
    if (p_primal)

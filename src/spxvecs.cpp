@@ -41,7 +41,6 @@ namespace soplex
  */
 void SPxSolver::computeFrhs()
 {
-   METHOD( "SPxSolver::computeFrhs()" );
 
    if (rep() == COLUMN)
    {
@@ -111,7 +110,6 @@ void SPxSolver::computeFrhs()
 
 void SPxSolver::computeFrhsXtra()
 {
-   METHOD( "SPxSolver::computeFrhsXtra()" );
 
    assert(rep()  == COLUMN);
    assert(type() == LEAVE);
@@ -164,7 +162,6 @@ void SPxSolver::computeFrhs1(
    const Vector& ufb,    ///< upper feasibility bound for variables
    const Vector& lfb)    ///< lower feasibility bound for variables
 {
-   METHOD( "SPxSolver::computeFrhs1()" );
 
    const SPxBasis::Desc& ds = desc();
 
@@ -221,7 +218,6 @@ void SPxSolver::computeFrhs2(
    const Vector& coufb,   ///< upper feasibility bound for covariables
    const Vector& colfb)   ///< lower feasibility bound for covariables
 {
-   METHOD( "SPxSolver::computeFrhs2()" );
    const SPxBasis::Desc& ds = desc();
 
    for(int i = 0; i < dim(); ++i)
@@ -295,7 +291,6 @@ void SPxSolver::computeFrhs2(
 */
 void SPxSolver::computeEnterCoPrhs4Row(int i, int n)
 {
-   METHOD( "SPxSolver::computeEnterCoPrhs4Row()" );
    assert(baseId(i).isSPxRowId());
    assert(number(SPxRowId(baseId(i))) == n);
 
@@ -327,7 +322,6 @@ void SPxSolver::computeEnterCoPrhs4Row(int i, int n)
 
 void SPxSolver::computeEnterCoPrhs4Col(int i, int n)
 {
-   METHOD( "SPxSolver::computeEnterCoPrhs4Col()" );
    assert(baseId(i).isSPxColId());
    assert(number(SPxColId(baseId(i))) == n);
    switch (desc().colStatus(n))
@@ -366,7 +360,6 @@ void SPxSolver::computeEnterCoPrhs4Col(int i, int n)
 
 void SPxSolver::computeEnterCoPrhs()
 {
-   METHOD( "SPxSolver::computeEnterCoPrhs()" );
    assert(type() == ENTER);
 
    for (int i = dim() - 1; i >= 0; --i)
@@ -381,7 +374,6 @@ void SPxSolver::computeEnterCoPrhs()
 
 void SPxSolver::computeLeaveCoPrhs4Row(int i, int n)
 {
-   METHOD( "SPxSolver::computeLeaveCoPrhs4Row()" );
    assert(baseId(i).isSPxRowId());
    assert(number(SPxRowId(baseId(i))) == n);
    switch (desc().rowStatus(n))
@@ -411,7 +403,6 @@ void SPxSolver::computeLeaveCoPrhs4Row(int i, int n)
 
 void SPxSolver::computeLeaveCoPrhs4Col(int i, int n)
 {
-   METHOD( "SPxSolver::computeLeaveCoPrhs4Col()" );
    assert(baseId(i).isSPxColId());
    assert(number(SPxColId(baseId(i))) == n);
    switch (desc().colStatus(n))
@@ -442,7 +433,6 @@ void SPxSolver::computeLeaveCoPrhs4Col(int i, int n)
 
 void SPxSolver::computeLeaveCoPrhs()
 {
-   METHOD( "SPxSolver::computeLeaveCoPrhs()" );
    assert(type() == LEAVE);
 
    for (int i = dim() - 1; i >= 0; --i)
@@ -463,7 +453,6 @@ void SPxSolver::computeLeaveCoPrhs()
  */
 void SPxSolver::computePvec()
 {
-   METHOD( "SPxSolver::computePvec()" );
    int i;
 
    for (i = coDim() - 1; i >= 0; --i)
@@ -472,7 +461,6 @@ void SPxSolver::computePvec()
 
 void SPxSolver::setupPupdate(void)
 {
-   METHOD( "SPxSolver::setupPupdate()" );
    SSVector& p = thePvec->delta();
    SSVector& c = theCoPvec->delta();
 
@@ -493,7 +481,6 @@ void SPxSolver::setupPupdate(void)
 
 void SPxSolver::doPupdate(void)
 {
-   METHOD( "SPxSolver::doPupdate()" );
    theCoPvec->update();
    if (pricing() == FULL)
    {

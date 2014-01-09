@@ -48,14 +48,12 @@ SPxEquiliSC& SPxEquiliSC::operator=(const SPxEquiliSC& rhs)
 
 Real SPxEquiliSC::computeScale(Real /*mini*/, Real maxi) const
 {
-   METHOD( "SPxEquiliSC::computeScale()" );
 
    return maxi;
 }
 
 void SPxEquiliSC::scale(SPxLP& lp) 
 {
-   METHOD( "SPxEquiliSC::scale()" );
 
    MSG_INFO1( spxout << "IEQUSC01 Equilibrium scaling LP" << std::endl; )
 

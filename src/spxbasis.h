@@ -414,7 +414,6 @@ public:
    /// sets basis SPxStatus to \p stat.
    void setStatus(SPxStatus stat)
    {
-      METHOD( "SPxBasis::setStatus()" );
 
       if( thestatus != stat )
       {
@@ -593,7 +592,6 @@ public:
    ///
    void solve(Vector& x, const Vector& rhs)
    {
-      METHOD( "SPxBasis::solve()" );
       if (!factorized) 
          SPxBasis::factorize();
       factor->solveRight(x, rhs);
@@ -601,7 +599,6 @@ public:
    ///
    void solve(SSVector& x, const SVector& rhs)
    {
-      METHOD( "SPxBasis::solve()" );
       if (!factorized) 
          SPxBasis::factorize();
       factor->solveRight(x, rhs);
@@ -618,7 +615,6 @@ public:
     */
    void solve4update(SSVector& x, const SVector& rhs)
    {
-      METHOD( "SPxBasis::solve4update()" );
       if (!factorized) 
          SPxBasis::factorize();
       factor->solveRight4update(x, rhs);
@@ -626,7 +622,6 @@ public:
    /// solves two systems in one call.
    void solve4update(SSVector& x, Vector& y, const SVector& rhsx, SSVector& rhsy)
    {
-      METHOD( "SPxBasis::solve4update()" );
       if (!factorized) 
          SPxBasis::factorize();
       factor->solve2right4update(x, y, rhsx, rhsy);
@@ -635,7 +630,6 @@ public:
    void solve4update(SSVector& x, Vector& y, Vector& y2,
                      const SVector& rhsx, SSVector& rhsy, SSVector& rhsy2)
    {
-      METHOD( "SPxBasis::solve4update()" );
       if (!factorized) 
          SPxBasis::factorize();
       assert(rhsy.isSetup());
@@ -655,7 +649,6 @@ public:
     */
    void coSolve(Vector& x, const Vector& rhs)
    {
-      METHOD( "SPxBasis::coSolve()" );
       if (!factorized) 
          SPxBasis::factorize();
       factor->solveLeft(x, rhs);
@@ -663,7 +656,6 @@ public:
    ///
    void coSolve(SSVector& x, const SVector& rhs)
    {
-      METHOD( "SPxBasis::coSolve()" );
       if (!factorized) 
          SPxBasis::factorize();
       factor->solveLeft(x, rhs);
@@ -671,7 +663,6 @@ public:
    /// solves two systems in one call.
    void coSolve(SSVector& x, Vector& y, const SVector& rhsx, SSVector& rhsy)
    {
-      METHOD( "SPxBasis::coSolve()" );
       if (!factorized) 
          SPxBasis::factorize();
       factor->solveLeft(x, y, rhsx, rhsy);
@@ -679,7 +670,6 @@ public:
    /// solves three systems in one call. May be improved by using just one pass through the basis.
    void coSolve(SSVector& x, Vector& y, Vector& z, const SVector& rhsx, SSVector& rhsy, SSVector& rhsz)
    {
-      METHOD( "SPxBasis::coSolve()" );
       if (!factorized)
          SPxBasis::factorize();
       factor->solveLeft(x, y, z, rhsx, rhsy, rhsz);
@@ -789,7 +779,6 @@ public:
    /// unloads the LP from the basis.
    virtual void unLoad()
    {
-      METHOD( "SPxBasis::unLoad()" );
       theLP = 0;
       setStatus(NO_PROBLEM);
    }

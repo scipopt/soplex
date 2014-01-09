@@ -100,7 +100,7 @@ LIBOBJ		= 	changesoplex.o clufactor.o didxset.o \
 			spxstarter.o spxsteeppr.o spxsumst.o spxvecs.o \
 			spxvectorst.o spxweightpr.o spxweightst.o spxwritestate.o \
 			statistics.o \
-			timer.o tracemethod.o unitvector.o updatevector.o \
+			timer.o unitvector.o updatevector.o \
 			gzstream.o
 BINOBJ		=	soplexmain.o
 EXAMPLEOBJ	=	simpleexample.o

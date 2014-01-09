@@ -33,7 +33,6 @@ bool SPxSolver::writeState(
    const NameSet* rowNames,
    const NameSet* colNames ) const
 {
-   METHOD( "SPxSolver::writeState()" );
 
    std::string ofname;
    std::ofstream ofs;

@@ -96,7 +96,6 @@ SPxBasis::Desc& SPxBasis::Desc::operator=(const SPxBasis::Desc& rhs)
 
 void SPxBasis::Desc::reSize(int rowDim, int colDim)
 {
-   METHOD( "SPxBasis::Desc::reSize()" );
 
    assert(rowDim >= 0);
    assert(colDim >= 0);
@@ -116,7 +115,6 @@ void SPxBasis::Desc::reSize(int rowDim, int colDim)
 
 void SPxBasis::Desc::dump() const
 {
-   METHOD( "SPxBasis::Desc::dump()" );
    int i;
 
    // Dump regardless of the verbosity level if this method is called.
@@ -138,7 +136,6 @@ void SPxBasis::Desc::dump() const
 bool SPxBasis::Desc::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-   METHOD( "SPxBasis::Desc::isConsistent()" );
    return rowstat.isConsistent() && colstat.isConsistent();
 #else
    return true;

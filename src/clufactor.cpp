@@ -254,7 +254,6 @@ CLUFactor::Temp::~Temp()
 /************************************************************/
 void CLUFactor::initPerm()
 {
-   METHOD( "CLUFactor::initPerm()" );
 
    for ( int i = 0; i < thedim; ++i )
       row.orig[i] = row.perm[i] = col.orig[i] = col.perm[i] = -1;
@@ -267,7 +266,6 @@ void CLUFactor::setPivot( const int p_stage,
                           const int p_row,
                           const Real val )
 {
-   METHOD( "CLUFactor::setPivot()" );
    assert( row.perm[p_row] < 0 );
    assert( col.perm[p_col] < 0 );
 
@@ -287,7 +285,6 @@ void CLUFactor::setPivot( const int p_stage,
  */
 void CLUFactor::packRows()
 {
-   METHOD( "CLUFactor::packRows()" );
    int n, i, j, l_row;
    Dring *ring, *list;
 
@@ -346,7 +343,6 @@ terminatePackRows:
  */
 void CLUFactor::forestPackColumns()
 {
-   METHOD( "CLUFactor::forestPackColumns()" );
    int n, i, j, colno;
    Dring *ring, *list;
 
@@ -402,7 +398,6 @@ terminatePackColumns :
  */
 void CLUFactor::remaxRow( int p_row, int len )
 {
-   METHOD( "CLUFactor::remaxRow()" );
    assert( u.row.max[p_row] < len );
 
    if ( u.row.elem[p_row].next == &( u.row.list ) ) /* last in row file */
@@ -481,7 +476,6 @@ void CLUFactor::remaxRow( int p_row, int len )
  */
 void CLUFactor::packColumns()
 {
-   METHOD( "CLUFactor::packColumns()" );
    int n, i, j, l_col;
    Dring *ring, *list;
 
@@ -533,7 +527,6 @@ terminatePackColumns :
  */
 void CLUFactor::remaxCol( int p_col, int len )
 {
-   METHOD( "CLUFactor::remaxCol()" );
    assert( u.col.max[p_col] < len );
 
    if ( u.col.elem[p_col].next == &( u.col.list ) ) /* last in column file */
@@ -603,7 +596,6 @@ void CLUFactor::remaxCol( int p_col, int len )
  */
 void CLUFactor::forestReMaxCol( int p_col, int len )
 {
-   METHOD( "CLUFactor::forestReMaxCol()" );
    assert( u.col.max[p_col] < len );
 
    if ( u.col.elem[p_col].next == &( u.col.list ) ) /* last in column file */
@@ -703,7 +695,6 @@ void CLUFactor::forestReMaxCol( int p_col, int len )
 
 void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
 {
-   METHOD( "CLUFactor::forestUpdate()" );
    int i, j, k, h, m, n;
    int ll, c, r, rowno;
    Real x;
@@ -1270,7 +1261,6 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
 
 void CLUFactor::update( int p_col, Real* p_work, const int* p_idx, int num )
 {
-   METHOD( "CLUFactor::update()" );
    int ll, i, j;
    int* lidx;
    Real* lval;
@@ -1319,7 +1309,6 @@ void CLUFactor::updateNoClear(
    const int* p_idx,
    int num )
 {
-   METHOD( "CLUFactor::updateNoClear()" );
    int ll, i, j;
    int* lidx;
    Real* lval;
@@ -1386,7 +1375,6 @@ void CLUFactor::updateNoClear(
  */
 void CLUFactor::initFactorMatrix( const SVector** vec, const Real eps )
 {
-   METHOD( "CLUFactor::initFactorMatrix()" );
 
    Real x;
    int m;
@@ -1615,7 +1603,6 @@ void CLUFactor::initFactorMatrix( const SVector** vec, const Real eps )
 
 void CLUFactor::colSingletons()
 {
-   METHOD( "CLUFactor::colSingletons()" );
    int i, j, k, n;
    int len;
    int p_col, p_row, newrow;
@@ -1709,7 +1696,6 @@ void CLUFactor::colSingletons()
  */
 void CLUFactor::rowSingletons()
 {
-   METHOD( "CLUFactor::rowSingletons()" );
    Real pval;
    int i, j, k, ll, r;
    int p_row, p_col, len, rs, lk;
@@ -1805,7 +1791,6 @@ void CLUFactor::rowSingletons()
 
 void CLUFactor::initFactorRings()
 {
-   METHOD( "CLUFactor::initFactorRings()" );
    int i;
    int *rperm = row.perm;
    int *cperm = col.perm;
@@ -1859,7 +1844,6 @@ void CLUFactor::initFactorRings()
 
 void CLUFactor::freeFactorRings( void )
 {
-   METHOD( "CLUFactor::freeFactorRings()" );
 
    if ( temp.pivot_col )
       spx_free( temp.pivot_col );
@@ -1881,7 +1865,6 @@ void CLUFactor::freeFactorRings( void )
  */
 void CLUFactor::eliminateRowSingletons()
 {
-   METHOD( "CLUFactor::eliminateRowSingletons()" );
    int i, j, k, ll, r;
    int len, lk;
    int pcol, prow;
@@ -2003,7 +1986,6 @@ void CLUFactor::eliminateRowSingletons()
  */
 void CLUFactor::eliminateColSingletons()
 {
-   METHOD( "CLUFactor::eliminateColSingletons()" );
    int i, j, k, m, c;
    int pcol, prow;
    CLUFactor::Pring *sing;
@@ -2081,7 +2063,6 @@ void CLUFactor::eliminateColSingletons()
  */
 void CLUFactor::selectPivots( Real threshold )
 {
-   METHOD( "CLUFactor::selectPivots()" );
    int ii;
    int i;
    int j;
@@ -2307,7 +2288,6 @@ int CLUFactor::updateRow( int r,
                           Real pval,
                           Real eps )
 {
-   METHOD( "CLUFactor::updateRow()" );
    int fill;
    Real x, lx;
    int c, i, j, k, ll, m, n;
@@ -2439,7 +2419,6 @@ int CLUFactor::updateRow( int r,
  */
 void CLUFactor::eliminatePivot( int prow, int pos, Real eps )
 {
-   METHOD( "CLUFactor::eliminatePivot()" );
    int i, j, k, m = -1;
    int lv = -1;  // This value should never be used.
    int pcol;
@@ -2537,7 +2516,6 @@ void CLUFactor::eliminatePivot( int prow, int pos, Real eps )
 void CLUFactor::eliminateNucleus( const Real eps,
                                   const Real threshold )
 {
-   METHOD( "CLUFactor::eliminateNucleus()" );
    int r, c;
    CLUFactor::Pring *pivot;
 
@@ -2613,7 +2591,6 @@ void CLUFactor::eliminateNucleus( const Real eps,
 
 int CLUFactor::setupColVals()
 {
-   METHOD( "CLUFactor::setupColVals()" );
    int i;
    int n = thedim;
 
@@ -2669,7 +2646,6 @@ int CLUFactor::setupColVals()
 #ifdef WITH_L_ROWS
 void CLUFactor::setupRowVals()
 {
-   METHOD( "CLUFactor::setupRowVals()" );
    int   i, j, k, m;
    int   vecs, mem;
    int*  l_row;
@@ -2783,7 +2759,6 @@ void CLUFactor::factor( const SVector** vec,         ///< Array of column vector
                         Real            threshold,    ///< pivoting threshold
                         Real            eps )         ///< epsilon for zero detection
 {
-   METHOD( "CLUFactor::factor()" );
 
    factorTime.start();
 
@@ -2839,7 +2814,6 @@ TERMINATE:
 
 void CLUFactor::dump() const
 {
-   METHOD( "CLUFactor::dump()" );
    int i, j, k;
 
    // Dump regardless of the verbosity level if this method is called;
@@ -2891,7 +2865,6 @@ void CLUFactor::dump() const
  */
 void CLUFactor::minRowMem( int size )
 {
-   METHOD( "CLUFactor::minRowMem()" );
 
    if ( u.row.size < size )
    {
@@ -2907,7 +2880,6 @@ void CLUFactor::minRowMem( int size )
  */
 void CLUFactor::minColMem( int size )
 {
-   METHOD( "CLUFactor::minColMem()" );
 
    if ( u.col.size < size )
    {
@@ -2918,7 +2890,6 @@ void CLUFactor::minColMem( int size )
 
 void CLUFactor::forestMinColMem( int size )
 {
-   METHOD( "CLUFactor::forestMinColMem()" );
 
    if ( u.col.size < size )
    {
@@ -2930,7 +2901,6 @@ void CLUFactor::forestMinColMem( int size )
 
 void CLUFactor::minLMem( int size )
 {
-   METHOD( "CLUFactor::minLMem()" );
 
    if ( size > l.size )
    {
@@ -2943,7 +2913,6 @@ void CLUFactor::minLMem( int size )
 
 int CLUFactor::makeLvec( int p_len, int p_row )
 {
-   METHOD( "CLUFactor::makeLvec()" );
 
    if ( l.firstUnused >= l.startSize )
    {
@@ -2973,7 +2942,6 @@ int CLUFactor::makeLvec( int p_len, int p_row )
 bool CLUFactor::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-   METHOD( "CLUFactor::isConsistent()" );
    int              i, j, k, ll;
    Dring            *ring;
    CLUFactor::Pring *pring;
@@ -3133,7 +3101,6 @@ bool CLUFactor::isConsistent() const
 
 void CLUFactor::solveUright( Real* wrk, Real* vec ) const
 {
-   METHOD( "CLUFactor::solveUright()" );
 
    for ( int i = thedim - 1; i >= 0; i-- )
    {
@@ -3154,7 +3121,6 @@ void CLUFactor::solveUright( Real* wrk, Real* vec ) const
 
 int CLUFactor::solveUrightEps( Real* vec, int* nonz, Real eps, Real* rhs )
 {
-   METHOD( "CLUFactor::solveUrightEps()" );
    int i, j, r, c, n;
    int *rorig, *corig;
    int *cidx, *clen, *cbeg;
@@ -3199,7 +3165,6 @@ int CLUFactor::solveUrightEps( Real* vec, int* nonz, Real eps, Real* rhs )
 void CLUFactor::solveUright2(
    Real* p_work1, Real* vec1, Real* p_work2, Real* vec2 )
 {
-   METHOD( "CLUFactor::solveUright2()" );
    int i, j, r, c;
    int *rorig, *corig;
    int *cidx, *clen, *cbeg;
@@ -3264,7 +3229,6 @@ int CLUFactor::solveUright2eps(
    Real* p_work1, Real* vec1, Real* p_work2, Real* vec2,
    int* nonz, Real eps )
 {
-   METHOD( "CLUFactor::solveUright2eps()" );
    int i, j, r, c, n;
    int *rorig, *corig;
    int *cidx, *clen, *cbeg;
@@ -3345,7 +3309,6 @@ int CLUFactor::solveUright2eps(
 
 void CLUFactor::solveLright( Real* vec )
 {
-   METHOD( "CLUFactor::solveLright()" );
    int i, j, k;
    int end;
    Real x;
@@ -3405,7 +3368,6 @@ void CLUFactor::solveLright( Real* vec )
 
 void CLUFactor::solveLright2( Real* vec1, Real* vec2 )
 {
-   METHOD( "CLUFactor::solveLright2()" );
    int i, j, k;
    int end;
    Real x2;
@@ -3487,7 +3449,6 @@ void CLUFactor::solveLright2( Real* vec1, Real* vec2 )
 
 void CLUFactor::solveUpdateRight( Real* vec )
 {
-   METHOD( "CLUFactor::solveUpdateRight()" );
    int i, j, k;
    int end;
    Real x;
@@ -3520,7 +3481,6 @@ void CLUFactor::solveUpdateRight( Real* vec )
 
 void CLUFactor::solveUpdateRight2( Real* vec1, Real* vec2 )
 {
-   METHOD( "CLUFactor::solveUpdateRight2()" );
    int i, j, k;
    int end;
    Real x1, x2;
@@ -3583,7 +3543,6 @@ void CLUFactor::solveUpdateRight2( Real* vec1, Real* vec2 )
 int CLUFactor::solveRight4update( Real* vec, int* nonz, Real eps,
                                   Real* rhs, Real* forest, int* forestNum, int* forestIdx )
 {
-   METHOD( "CLUFactor::solveRight4update()" );
    solveLright( rhs );
 
    if ( forest )
@@ -3612,7 +3571,6 @@ int CLUFactor::solveRight4update( Real* vec, int* nonz, Real eps,
 
 void CLUFactor::solveRight( Real* vec, Real* rhs )
 {
-   METHOD( "CLUFactor::solveRight()" );
    solveLright( rhs );
    solveUright( vec, rhs );
 
@@ -3630,7 +3588,6 @@ int CLUFactor::solveRight2update( Real* vec1,
                                   int* forestNum,
                                   int* forestIdx )
 {
-   METHOD( "CLUFactor::solveRight2update()" );
    solveLright2( rhs1, rhs2 );
 
    if ( forest )
@@ -3663,7 +3620,6 @@ void CLUFactor::solveRight2(
    Real* rhs1,
    Real* rhs2 )
 {
-   METHOD( "CLUFactor::solveRight2()" );
    solveLright2( rhs1, rhs2 );
 
    if ( l.updateType )           /* Forest-Tomlin Updates */
@@ -3679,7 +3635,6 @@ void CLUFactor::solveRight2(
 #if 0
 void CLUFactor::solveUleft( Real* p_work, Real* vec )
 {
-   METHOD( "CLUFactor::solveUleft()" );
    Real x;
    int i, k, r, c;
    int *rorig, *corig;
@@ -3718,7 +3673,6 @@ void CLUFactor::solveUleft( Real* p_work, Real* vec )
 #else
 void CLUFactor::solveUleft( Real* p_work, Real* vec )
 {
-   METHOD( "CLUFactor::solveUleft()" );
 #if 0
 
    for ( int i = 0; i < thedim; ++i )
@@ -3783,7 +3737,6 @@ void CLUFactor::solveUleft( Real* p_work, Real* vec )
 void CLUFactor::solveUleft2(
    Real* p_work1, Real* vec1, Real* p_work2, Real* vec2 )
 {
-   METHOD( "CLUFactor::solveUleft2()" );
    Real x1;
    Real x2;
    int i, k, r, c;
@@ -3856,7 +3809,6 @@ int CLUFactor::solveLleft2forest(
    Real* vec2,
    Real /* eps */ )
 {
-   METHOD( "CLUFactor::solveLleft2forest()" );
    int i;
    int j;
    int k;
@@ -3924,7 +3876,6 @@ void CLUFactor::solveLleft2(
    Real* vec2,
    Real /* eps */ )
 {
-   METHOD( "CLUFactor::solveLleft2()" );
    int i, j, k, r;
    int x1not0, x2not0;
    Real x1, x2;
@@ -4024,7 +3975,6 @@ void CLUFactor::solveLleft2(
 
 int CLUFactor::solveLleftForest( Real* vec, int* /* nonz */, Real /* eps */ )
 {
-   METHOD( "CLUFactor::solveLleftForest()" );
    int i, j, k, end;
    Real x;
    Real *val, *lval;
@@ -4055,7 +4005,6 @@ int CLUFactor::solveLleftForest( Real* vec, int* /* nonz */, Real /* eps */ )
 
 void CLUFactor::solveLleft( Real* vec ) const
 {
-   METHOD( "CLUFactor::solveLleft()" );
 
 #ifndef WITH_L_ROWS
    int*  idx;
@@ -4102,7 +4051,6 @@ void CLUFactor::solveLleft( Real* vec ) const
 
 int CLUFactor::solveLleftEps( Real* vec, int* nonz, Real eps )
 {
-   METHOD( "CLUFactor::solveLleftEps()" );
    int i, j, k, n;
    int r;
    Real x;
@@ -4167,7 +4115,6 @@ int CLUFactor::solveLleftEps( Real* vec, int* nonz, Real eps )
 
 void CLUFactor::solveUpdateLeft( Real* vec )
 {
-   METHOD( "CLUFactor::solveUpdateLeft()" );
    int i, j, k, end;
    Real x;
    Real *lval, *val;
@@ -4199,7 +4146,6 @@ void CLUFactor::solveUpdateLeft( Real* vec )
 
 void CLUFactor::solveUpdateLeft2( Real* vec1, Real* vec2 )
 {
-   METHOD( "CLUFactor::solveUpdateLeft2()" );
    int i, j, k, end;
    Real x1, x2;
    Real *lval, *val;
@@ -4237,7 +4183,6 @@ void CLUFactor::solveUpdateLeft2( Real* vec1, Real* vec2 )
 
 int CLUFactor::solveUpdateLeft( Real eps, Real* vec, int* nonz, int n )
 {
-   METHOD( "CLUFactor::solveUpdateLeft()" );
    int i, j, k, end;
    Real x, y;
    Real *lval, *val;
@@ -4293,7 +4238,6 @@ int CLUFactor::solveUpdateLeft( Real eps, Real* vec, int* nonz, int n )
 
 void CLUFactor::solveLeft( Real* vec, Real* rhs )
 {
-   METHOD( "CLUFactor::solveLeft()" );
 
    if ( !l.updateType )          /* no Forest-Tomlin Updates */
    {
@@ -4312,7 +4256,6 @@ void CLUFactor::solveLeft( Real* vec, Real* rhs )
 
 int CLUFactor::solveLeftEps( Real* vec, Real* rhs, int* nonz, Real eps )
 {
-   METHOD( "CLUFactor::solveLeftEps()" );
 
    if ( !l.updateType )          /* no Forest-Tomlin Updates */
    {
@@ -4336,7 +4279,6 @@ int CLUFactor::solveLeft2(
    Real* rhs1,
    Real* rhs2 )
 {
-   METHOD( "CLUFactor::solveLeft2()" );
 
    if ( !l.updateType )          /* no Forest-Tomlin Updates */
    {
@@ -4358,7 +4300,6 @@ int CLUFactor::solveUleft( Real eps,
                            Real* vec, int* vecidx,
                            Real* rhs, int* rhsidx, int rhsn )
 {
-   METHOD( "CLUFactor::solveUleft()" );
    Real x, y;
    int i, j, k, n, r, c;
    int *rorig, *corig, *cperm;
@@ -4438,7 +4379,6 @@ int CLUFactor::solveUleft( Real eps,
 void CLUFactor::solveUleftNoNZ( Real eps, Real* vec,
                                 Real* rhs, int* rhsidx, int rhsn )
 {
-   METHOD( "CLUFactor::solveUleftNoNZ()" );
    Real x, y;
    int i, j, k, r, c;
    int *rorig, *corig, *cperm;
@@ -4512,7 +4452,6 @@ void CLUFactor::solveUleftNoNZ( Real eps, Real* vec,
 
 int CLUFactor::solveLleftForest( Real eps, Real* vec, int* nonz, int n )
 {
-   METHOD( "CLUFactor::solveLleftForest()" );
    int i, j, k, end;
    Real x, y;
    Real *val, *lval;
@@ -4566,7 +4505,6 @@ int CLUFactor::solveLleftForest( Real eps, Real* vec, int* nonz, int n )
 
 void CLUFactor::solveLleftForestNoNZ( Real* vec )
 {
-   METHOD( "CLUFactor::solveLleftForestNoNZ()" );
    int i, j, k, end;
    Real x;
    Real *val, *lval;
@@ -4600,7 +4538,6 @@ void CLUFactor::solveLleftForestNoNZ( Real* vec )
 
 int CLUFactor::solveLleft( Real eps, Real* vec, int* nonz, int rn )
 {
-   METHOD( "CLUFactor::solveLleft()" );
    int i, j, k, n;
    int r;
    Real x, y;
@@ -4699,7 +4636,6 @@ int CLUFactor::solveLleft( Real eps, Real* vec, int* nonz, int rn )
 
 void CLUFactor::solveLleftNoNZ( Real* vec )
 {
-   METHOD( "CLUFactor::solveLleftNoNZ()" );
    int i, j, k;
    int r;
    Real x;
@@ -4765,7 +4701,6 @@ void CLUFactor::solveLleftNoNZ( Real* vec )
 
 int CLUFactor::vSolveLright( Real* vec, int* ridx, int rn, Real eps )
 {
-   METHOD( "CLUFactor::vSolveLright()" );
    int i, j, k, n;
    int end;
    Real x;
@@ -4833,7 +4768,6 @@ void CLUFactor::vSolveLright2(
    Real* vec, int* ridx, int* rnptr, Real eps,
    Real* vec2, int* ridx2, int* rn2ptr, Real eps2 )
 {
-   METHOD( "CLUFactor::vSolveLright2()" );
    int i, j, k, n;
    int end;
    Real x, y;
@@ -4951,7 +4885,6 @@ void CLUFactor::vSolveLright3(
    Real* vec2, int* ridx2, int* rn2ptr, Real eps2,
    Real* vec3, int* ridx3, int* rn3ptr, Real eps3 )
 {
-   METHOD( "CLUFactor::vSolveLright3()" );
    int i, j, k, n;
    int end;
    Real x, y;
@@ -5158,7 +5091,6 @@ void CLUFactor::vSolveLright3(
 int CLUFactor::vSolveUright( Real* vec, int* vidx,
                              Real* rhs, int* ridx, int rn, Real eps )
 {
-   METHOD( "CLUFactor::vSolveUright()" );
    int i, j, k, r, c, n;
    int *rorig, *corig;
    int *rperm;
@@ -5266,7 +5198,6 @@ int CLUFactor::vSolveUright( Real* vec, int* vidx,
 void CLUFactor::vSolveUrightNoNZ( Real* vec,
                                   Real* rhs, int* ridx, int rn, Real eps )
 {
-   METHOD( "CLUFactor::vSolveUrightNoNZ()" );
    int i, j, k, r, c;
    int *rorig, *corig;
    int *rperm;
@@ -5371,7 +5302,6 @@ int CLUFactor::vSolveUright2(
    Real* vec, int* vidx, Real* rhs, int* ridx, int rn, Real eps,
    Real* vec2, Real* rhs2, int* ridx2, int rn2, Real eps2 )
 {
-   METHOD( "CLUFactor::vSolveUright2()" );
    int i, j, k, r, c, n;
    int *rorig, *corig;
    int *rperm;
@@ -5615,7 +5545,6 @@ int CLUFactor::vSolveUright2(
 
 int CLUFactor::vSolveUpdateRight( Real* vec, int* ridx, int n, Real eps )
 {
-   METHOD( "CLUFactor::vSolveUpdateRight()" );
    int i, j, k;
    int end;
    Real x, y;
@@ -5660,7 +5589,6 @@ int CLUFactor::vSolveUpdateRight( Real* vec, int* ridx, int n, Real eps )
 
 void CLUFactor::vSolveUpdateRightNoNZ( Real* vec, Real /*eps*/ )
 {
-   METHOD( "CLUFactor::vSolveUpdateRightNoNZ()" );
    int i, j, k;
    int end;
    Real x;
@@ -5702,7 +5630,6 @@ int CLUFactor::vSolveRight4update( Real eps,
                                    Real* rhs, int* ridx, int rn,              /* rhs    */
                                    Real* forest, int* forestNum, int* forestIdx )
 {
-   METHOD( "CLUFactor::vSolveRight4update()" );
    rn = vSolveLright( rhs, ridx, rn, eps );
 
    /*  turn index list into a heap
@@ -5772,7 +5699,6 @@ int CLUFactor::vSolveRight4update2( Real eps,
                                     Real* rhs2, int* ridx2, int rn2,      /* rhs2    */
                                     Real* forest, int* forestNum, int* forestIdx )
 {
-   METHOD( "CLUFactor::vSolveRight4update2()" );
    /*
     *  rn  = vSolveLright(rhs,  ridx,  rn,  eps);
     *  rn2 = vSolveLright(rhs2, ridx2, rn2, eps2);
@@ -5898,7 +5824,6 @@ int CLUFactor::vSolveRight4update3( Real eps,
                                     Real* rhs3, int* ridx3, int rn3,     /* rhs3    */
                                     Real* forest, int* forestNum, int* forestIdx )
 {
-   METHOD( "CLUFactor::vSolveRight4update3()" );
 
    vSolveLright3( rhs, ridx, &rn, eps, rhs2, ridx2, &rn2, eps2, rhs3, ridx3, &rn3, eps3 );
    assert( rn >= 0 && rn <= thedim );
@@ -6044,7 +5969,6 @@ void CLUFactor::vSolveRightNoNZ(
    Real* vec2, Real eps2,              /* result2 */
    Real* rhs2, int* ridx2, int rn2 )   /* rhs2    */
 {
-   METHOD( "CLUFactor::vSolveRightNoNZ()" );
    rn2 = vSolveLright( rhs2, ridx2, rn2, eps2 );
    assert( rn2 >= 0 && rn2 <= thedim );
 
@@ -6098,7 +6022,6 @@ int CLUFactor::vSolveLeft( Real eps,
                            Real* vec, int* idx,                       /* result */
                            Real* rhs, int* ridx, int rn )           /* rhs    */
 {
-   METHOD( "CLUFactor::vSolveLeft()" );
 
    if ( !l.updateType )          /* no Forest-Tomlin Updates */
    {
@@ -6126,7 +6049,6 @@ int CLUFactor::vSolveLeft2( Real eps,
                             Real* vec2,                               /* result2 */
                             Real* rhs2, int* ridx2, int rn2 )       /* rhs2    */
 {
-   METHOD( "CLUFactor::vSolveLeft2()" );
 
    if ( !l.updateType )          /* no Forest-Tomlin Updates */
    {
@@ -6158,7 +6080,6 @@ int CLUFactor::vSolveLeft3( Real eps,
                             Real* vec3,                               /* result3 */
                             Real* rhs3, int* ridx3, int rn3 )         /* rhs3    */
 {
-   METHOD( "CLUFactor::vSolveLeft2()" );
 
    if ( !l.updateType )          /* no Forest-Tomlin Updates */
    {
@@ -6191,7 +6112,6 @@ void CLUFactor::vSolveLeftNoNZ( Real eps,
                                 Real* vec2,                            /* result2 */
                                 Real* rhs2, int* ridx2, int rn2 )    /* rhs2    */
 {
-   METHOD( "CLUFactor::vSolveLeftNoNZ()" );
 
    if ( !l.updateType )          /* no Forest-Tomlin Updates */
    {

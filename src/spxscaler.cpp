@@ -92,28 +92,24 @@ SPxScaler& SPxScaler::operator=(const SPxScaler& rhs)
 
 const char* SPxScaler::getName() const
 {
-   METHOD( "SPxScaler::getName()" );
 
    return m_name;
 }
 
 void SPxScaler::setOrder(bool colFirst)
 {
-   METHOD( "SPxScaler::setOrder()" );
 
    m_colFirst = colFirst;
 }
 
 void SPxScaler::setBoth(bool both)
 {
-   METHOD( "SPxScaler::setBoth()" );
 
    m_doBoth = both;
 }
 
 void SPxScaler::setup(SPxLP& lp)
 {
-   METHOD( "SPxScaler::setup()" );
 
    assert(lp.isConsistent());
 
@@ -133,7 +129,6 @@ void SPxScaler::setup(SPxLP& lp)
  */
 Real SPxScaler::computeScale(Real /*mini*/, Real /*maxi*/) const
 {
-   METHOD( "SPxScaler::computeScale" );
 
    return 1.0;
 }
@@ -143,7 +138,6 @@ Real SPxScaler::computeScalingVecs(
    const DataArray<Real>& coScaleval, 
    DataArray<Real>&       scaleval) 
 {
-   METHOD( "SPxScaler::computeScalingVecs()" );
 
    Real pmax = 0.0;
 
@@ -187,7 +181,6 @@ Real SPxScaler::computeScalingVecs(
 
 void SPxScaler::applyScaling(SPxLP& lp)
 {
-   METHOD( "SPxScaler::applyScaling()" );
 
    int i;
 
@@ -264,7 +257,6 @@ void SPxScaler::applyScaling(SPxLP& lp)
 
 void SPxScaler::unscalePrimal(Vector& x) const
 {
-   METHOD( "SPxScaler::unscalePrimal()" );
 
    assert(x.dim() == m_colscale.size());
 #ifdef BITSHIFTSCALING
@@ -282,7 +274,6 @@ void SPxScaler::unscalePrimal(Vector& x) const
 
 void SPxScaler::unscaleSlacks(Vector& s) const
 {
-   METHOD( "SPxScaler::unscaleSlacks()" );
 
    assert(s.dim() == m_rowscale.size());
 #ifdef BITSHIFTSCALING
@@ -300,7 +291,6 @@ void SPxScaler::unscaleSlacks(Vector& s) const
 
 void SPxScaler::unscaleDual(Vector& pi) const
 {
-   METHOD( "SPxScaler::unscaleDual()" );
 
    assert(pi.dim() == m_rowscale.size());
 #ifdef BITSHIFTSCALING
@@ -318,7 +308,6 @@ void SPxScaler::unscaleDual(Vector& pi) const
 
 void SPxScaler::unscaleRedCost(Vector& r) const
 {
-   METHOD( "SPxScaler::unscaleRedCost()" );
 
    assert(r.dim() == m_colscale.size());
 #ifdef BITSHIFTSCALING
@@ -336,7 +325,6 @@ void SPxScaler::unscaleRedCost(Vector& r) const
 
 Real SPxScaler::minAbsColscale() const
 {
-   METHOD( "SPxScaler::minAbsColscale()" );
 
    Real mini = infinity;
 
@@ -353,7 +341,6 @@ Real SPxScaler::minAbsColscale() const
 
 Real SPxScaler::maxAbsColscale() const
 {
-   METHOD( "SPxScaler::maxAbsColscale()" );
 
    Real maxi = 0.0;
 
@@ -371,7 +358,6 @@ Real SPxScaler::maxAbsColscale() const
 
 Real SPxScaler::minAbsRowscale() const
 {
-   METHOD( "SPxScaler::minAbsRowscale()" );
 
    Real mini = infinity;
 
@@ -388,7 +374,6 @@ Real SPxScaler::minAbsRowscale() const
 
 Real SPxScaler::maxAbsRowscale() const
 {
-   METHOD( "SPxScaler::maxAbsRowscale()" );
 
    Real maxi = 0.0;
 
@@ -409,7 +394,6 @@ Real SPxScaler::maxAbsRowscale() const
  */
 Real SPxScaler::maxColRatio(const SPxLP& lp) const
 {
-   METHOD( "SPxScaler::maxColRatio()" );
 
    Real pmax = 0.0;
 
@@ -442,7 +426,6 @@ Real SPxScaler::maxColRatio(const SPxLP& lp) const
  */
 Real SPxScaler::maxRowRatio(const SPxLP& lp) const
 {
-   METHOD( "SPxScaler::maxRowRatio()" );
 
    Real pmax = 0.0;
 
@@ -472,7 +455,6 @@ Real SPxScaler::maxRowRatio(const SPxLP& lp) const
 bool SPxScaler::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-   METHOD( "SPxScaler::isConsistent()" );
 
    return m_colscale.isConsistent() && m_rowscale.isConsistent();
 #else

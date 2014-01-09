@@ -53,14 +53,12 @@ SPxGeometSC& SPxGeometSC::operator=(const SPxGeometSC& rhs)
 
 Real SPxGeometSC::computeScale(Real mini, Real maxi) const
 {
-   METHOD( "SPxGeometSC::computeScale()" );
 
    return sqrt(mini * maxi);
 }
 
 void SPxGeometSC::scale(SPxLP& lp) 
 {
-   METHOD( "SPxGeometSC::scale()" );
 
    MSG_INFO1( spxout << "IGEOSC01 Geometric scaling LP" << std::endl; )
 
