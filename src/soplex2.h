@@ -14,8 +14,9 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /**@file  soplex2.h
- * @brief preconfigured \ref soplex::SoPlex "SoPlex" LP-solver.
+ * @brief Preconfigured SoPlex LP solver
  */
+
 #ifndef _SOPLEX2_H_
 #define _SOPLEX2_H_
 
@@ -1066,6 +1067,9 @@ public:
 
    /// prints statistics on solving process
    void printSolvingStatistics(std::ostream& os);
+
+   /// prints short statistics
+   void printShortStatistics(std::ostream& os);
 
    /// prints complete real statistics
    void printStatisticsReal(std::ostream& os);

@@ -13,6 +13,10 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+/**@file  soplex2.cpp
+ * @brief Preconfigured SoPlex LP solver
+ */
+
 #include <iostream>
 #include <assert.h>
 
@@ -2090,6 +2094,10 @@ namespace soplex
 
          _solveRational();
       }
+
+      MSG_INFO1( spxout << "\n" );
+      printShortStatistics(spxout.getStream(SPxOut::INFO1));
+      MSG_INFO1( spxout << "\n" );
 
       return status();
    };
@@ -4442,6 +4450,17 @@ namespace soplex
    {
       assert(_statistics != 0);
       _statistics->print(os);
+   }
+
+
+
+   /// prints short statistics
+   void SoPlex2::printShortStatistics(std::ostream& os)
+   {
+      printStatus(os, _status);
+      os << "Solving time (sec) : " << std::fixed << std::setprecision(2) << _statistics->solvingTime.userTime() << "\n"
+         << "Iterations         : " << _statistics->iterations << "\n"
+         << "Objective value    : " << objValueReal() << "\n";
    }
 
 
