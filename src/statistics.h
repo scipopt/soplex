@@ -21,7 +21,7 @@
 
 #include <iostream>
 
-#include "soplex2.h"
+#include "soplex.h"
 #include "timer.h"
 
 namespace soplex
@@ -30,7 +30,7 @@ namespace soplex
     * @brief   Class for collecting statistical information
     * @ingroup Algo
     */
-   class SoPlex2::Statistics
+   class SoPlex::Statistics
    {
    public:
 

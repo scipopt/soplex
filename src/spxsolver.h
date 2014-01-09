@@ -76,7 +76,7 @@ class SPxStarter;
 */
 class SPxSolver : public SPxLP, protected SPxBasis
 {
-   friend class SoPlex2;
+   friend class SoPlex;
    friend class SPxFastRT;
    friend class SPxBoundFlippingRT;
 

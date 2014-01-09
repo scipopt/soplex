@@ -16,13 +16,13 @@
 #include <iostream>
 #include <assert.h>
 
-#include "soplex2.h"
+#include "soplex.h"
 #include "statistics.h"
 
 namespace soplex
 {
    /// solves real LP
-   void SoPlex2::_solveReal()
+   void SoPlex::_solveReal()
    {
       // start timing
       _statistics->solvingTime.start();
@@ -39,7 +39,7 @@ namespace soplex
 
 
    /// checks result of the solving process and solves again without preprocessing if necessary
-   void SoPlex2::_evaluateSolutionReal(SPxSimplifier::Result simplificationStatus)
+   void SoPlex::_evaluateSolutionReal(SPxSimplifier::Result simplificationStatus)
    {
       if( simplificationStatus == SPxSimplifier::INFEASIBLE )
          _status = SPxSolver::INFEASIBLE;
@@ -127,21 +127,21 @@ namespace soplex
 
 
    /// solves real LP with/without preprocessing
-   void SoPlex2::_preprocessAndSolveReal(bool applyPreprocessing)
+   void SoPlex::_preprocessAndSolveReal(bool applyPreprocessing)
    {
       _statistics->preprocessingTime.start();
 
       if( applyPreprocessing )
       {
          _enableSimplifierAndScaler();
-         _solver.setTerminationValue(realParam(SoPlex2::INFTY));
+         _solver.setTerminationValue(realParam(SoPlex::INFTY));
       }
       else
       {
          _disableSimplifierAndScaler();
          ///@todo implement for both objective senses
-         _solver.setTerminationValue(intParam(SoPlex2::OBJSENSE) == SoPlex2::OBJSENSE_MINIMIZE
-            ? realParam(SoPlex2::OBJLIMIT_UPPER) : realParam(SoPlex2::INFTY));
+         _solver.setTerminationValue(intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE
+            ? realParam(SoPlex::OBJLIMIT_UPPER) : realParam(SoPlex::INFTY));
       }
 
       applyPreprocessing = (_simplifier != 0 || _scaler != 0);
@@ -197,7 +197,7 @@ namespace soplex
       SPxSimplifier::Result simplificationStatus = SPxSimplifier::OKAY;
       if( _simplifier != 0 )
       {
-         simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlex2::EPSILON_ZERO), Real(rationalParam(SoPlex2::FEASTOL)), Real(rationalParam(SoPlex2::OPTTOL)));
+         simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlex::EPSILON_ZERO), Real(rationalParam(SoPlex::FEASTOL)), Real(rationalParam(SoPlex::OPTTOL)));
       }
 
       _statistics->preprocessingTime.stop();
@@ -218,7 +218,7 @@ namespace soplex
 
 
    /// loads original problem into solver and solves again after it has been solved to optimality with preprocessing
-   void SoPlex2::_resolveWithoutPreprocessing(SPxSimplifier::Result simplificationStatus)
+   void SoPlex::_resolveWithoutPreprocessing(SPxSimplifier::Result simplificationStatus)
    {
       assert(!_isRealLPLoaded);
       assert(_simplifier != 0 || _scaler != 0);
@@ -301,7 +301,7 @@ namespace soplex
 
 
    /// stores solution of the real LP; before calling this, the real LP must be loaded in the solver and solved (again)
-   void SoPlex2::_storeSolutionReal()
+   void SoPlex::_storeSolutionReal()
    {
       assert(status() != SPxSolver::OPTIMAL || _isRealLPLoaded);
 
@@ -319,7 +319,7 @@ namespace soplex
 
       _solReal._hasPrimal = (status() == SPxSolver::OPTIMAL
          || ((_solver.basis().status() == SPxBasis::PRIMAL || _solver.basis().status() == SPxBasis::UNBOUNDED)
-            && _solver.shift() < 10.0 * realParam(SoPlex2::EPSILON_ZERO))) && _isRealLPLoaded;
+            && _solver.shift() < 10.0 * realParam(SoPlex::EPSILON_ZERO))) && _isRealLPLoaded;
       if( _solReal._hasPrimal )
       {
          _solReal._primal.reDim(_solver.nCols());
@@ -349,7 +349,7 @@ namespace soplex
 
       _solReal._hasDual = (status() == SPxSolver::OPTIMAL
          || ((_solver.basis().status() == SPxBasis::DUAL || _solver.basis().status() == SPxBasis::INFEASIBLE)
-            && _solver.shift() < 10.0 * realParam(SoPlex2::EPSILON_ZERO))) && _isRealLPLoaded;
+            && _solver.shift() < 10.0 * realParam(SoPlex::EPSILON_ZERO))) && _isRealLPLoaded;
       if( _solReal._hasDual )
       {
          _solReal._dual.reDim(_solver.nRows());

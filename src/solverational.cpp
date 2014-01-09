@@ -16,13 +16,13 @@
 #include <iostream>
 #include <assert.h>
 
-#include "soplex2.h"
+#include "soplex.h"
 #include "statistics.h"
 
 namespace soplex
 {
    /// solves rational LP
-   void SoPlex2::_solveRational()
+   void SoPlex::_solveRational()
    {
       bool hasUnboundedRay = false;
       bool infeasibilityNotCertified = false;
@@ -51,18 +51,18 @@ namespace soplex
       }
 
       // deactivate objective limit in floating-point solver
-      if( realParam(SoPlex2::OBJLIMIT_LOWER) > -realParam(SoPlex2::INFTY) || realParam(SoPlex2::OBJLIMIT_UPPER) < realParam(SoPlex2::INFTY) )
+      if( realParam(SoPlex::OBJLIMIT_LOWER) > -realParam(SoPlex::INFTY) || realParam(SoPlex::OBJLIMIT_UPPER) < realParam(SoPlex::INFTY) )
       {
          MSG_INFO2( spxout << "Deactivating objective limit.\n" );
       }
 
-      _solver.setTerminationValue(realParam(SoPlex2::INFTY));
+      _solver.setTerminationValue(realParam(SoPlex::INFTY));
 
       // introduce slack variables to transform inequality constraints into equations
       _transformEquality();
 
       // apply lifting to reduce range of nonzero matrix coefficients
-      if( boolParam(SoPlex2::LIFTING) )
+      if( boolParam(SoPlex::LIFTING) )
          _lift();
 
       _statistics->preprocessingTime.stop();
@@ -222,7 +222,7 @@ namespace soplex
          _hasSolRational = true;
 
       // undo lifting
-      if( boolParam(SoPlex2::LIFTING) )
+      if( boolParam(SoPlex::LIFTING) )
          _project(_solRational);
 
       // if the problem has been found to be infeasible and an approximate Farkas proof is available, we compute a
@@ -250,7 +250,7 @@ namespace soplex
 
 
    /// solves current problem with iterative refinement and recovery mechanism
-   void SoPlex2::_performOptIRStable(SolRational& sol, bool acceptUnbounded, bool acceptInfeasible, int minRounds, bool& primalFeasible, bool& dualFeasible, bool& infeasible, bool& unbounded, bool& stopped, bool& error)
+   void SoPlex::_performOptIRStable(SolRational& sol, bool acceptUnbounded, bool acceptInfeasible, int minRounds, bool& primalFeasible, bool& dualFeasible, bool& infeasible, bool& unbounded, bool& stopped, bool& error)
    {
       primalFeasible = false;
       dualFeasible = false;
@@ -260,8 +260,8 @@ namespace soplex
       error = false;
 
       // set working tolerances in floating-point solver
-      _solver.setFeastol(realParam(SoPlex2::FPFEASTOL));
-      _solver.setOpttol(realParam(SoPlex2::FPOPTTOL));
+      _solver.setFeastol(realParam(SoPlex::FPFEASTOL));
+      _solver.setOpttol(realParam(SoPlex::FPOPTTOL));
 
       // declare vectors and variables
       SPxSolver::Status result = SPxSolver::UNKNOWN;
@@ -335,7 +335,7 @@ namespace soplex
       dualScale = 1;
 
       // control progress
-      Real bestViolation = realParam(SoPlex2::INFTY);
+      Real bestViolation = realParam(SoPlex::INFTY);
       int numFailedRefinements = 0;
 
       // refinement loop
@@ -352,7 +352,7 @@ namespace soplex
             // lower bound
             modLower[c] = lowerRational(c);
 
-            if( double(modLower[c]) > double(-realParam(SoPlex2::INFTY)) )
+            if( double(modLower[c]) > double(-realParam(SoPlex::INFTY)) )
                modLower[c] -= sol._primal[c];
 
             if( modLower[c] > boundsViolation )
@@ -361,7 +361,7 @@ namespace soplex
             // upper bound
             modUpper[c] = upperRational(c);
 
-            if( double(modUpper[c]) < double(realParam(SoPlex2::INFTY)) )
+            if( double(modUpper[c]) < double(realParam(SoPlex::INFTY)) )
                modUpper[c] -= sol._primal[c];
 
             if( modUpper[c] < -boundsViolation )
@@ -410,8 +410,8 @@ namespace soplex
             << "Max. dual violation = " << rationalToString(redCostViolation) << "\n" );
 
          // terminate if tolerances are satisfied
-         primalFeasible = (boundsViolation <= rationalParam(SoPlex2::FEASTOL) && sideViolation <= rationalParam(SoPlex2::FEASTOL));
-         dualFeasible = (redCostViolation <= rationalParam(SoPlex2::OPTTOL));
+         primalFeasible = (boundsViolation <= rationalParam(SoPlex::FEASTOL) && sideViolation <= rationalParam(SoPlex::FEASTOL));
+         dualFeasible = (redCostViolation <= rationalParam(SoPlex::OPTTOL));
          if( primalFeasible && dualFeasible )
          {
             if( minRounds < 0 )
@@ -456,7 +456,7 @@ namespace soplex
          _statistics->refinements++;
 
          // compute primal scaling factor; limit increase in scaling by tolerance used in floating point solve
-         maxScale = primalScale * Rational(realParam(SoPlex2::MAXSCALEINCR));
+         maxScale = primalScale * Rational(realParam(SoPlex::MAXSCALEINCR));
 
          primalScale = boundsViolation > sideViolation ? boundsViolation : sideViolation;
          assert(primalScale >= Rational(0));
@@ -476,7 +476,7 @@ namespace soplex
          MSG_INFO2( spxout << "Scaling primal by " << rationalToString(primalScale) << ".\n" );
 
          // compute dual scaling factor; limit increase in scaling by tolerance used in floating point solve
-         maxScale = dualScale * Rational(realParam(SoPlex2::MAXSCALEINCR));
+         maxScale = dualScale * Rational(realParam(SoPlex::MAXSCALEINCR));
 
          dualScale = redCostViolation;
          assert(dualScale >= Rational(0));
@@ -605,14 +605,14 @@ namespace soplex
       while( true );
 
       // reset tolerances in floating-point solver
-      _solver.setFeastol(Real(rationalParam(SoPlex2::FEASTOL)));
-      _solver.setOpttol(Real(rationalParam(SoPlex2::OPTTOL)));
+      _solver.setFeastol(Real(rationalParam(SoPlex::FEASTOL)));
+      _solver.setOpttol(Real(rationalParam(SoPlex::OPTTOL)));
    }
 
 
 
    /// performs iterative refinement on the auxiliary problem for testing unboundedness
-   void SoPlex2::_performUnboundedIRStable(SolRational& sol, bool& hasUnboundedRay, bool& stopped, bool& error)
+   void SoPlex::_performUnboundedIRStable(SolRational& sol, bool& hasUnboundedRay, bool& stopped, bool& error)
    {
       bool primalFeasible;
       bool dualFeasible;
@@ -649,12 +649,12 @@ namespace soplex
 
          MSG_DEBUG( spxout << "tau = " << tau << " (roughly " << rationalToString(tau) << ")\n" );
 
-         assert(tau <= Rational(1) + Rational(2) * rationalParam(SoPlex2::FEASTOL));
-         assert(tau >= -rationalParam(SoPlex2::FEASTOL));
+         assert(tau <= Rational(1) + Rational(2) * rationalParam(SoPlex::FEASTOL));
+         assert(tau >= -rationalParam(SoPlex::FEASTOL));
 
          // because the right-hand side and all bounds (but tau's upper bound) are zero, tau should be approximately
          // zero if basic; otherwise 0 or 1
-         error = !(tau >= Rational(1) || tau < rationalParam(SoPlex2::FEASTOL));
+         error = !(tau >= Rational(1) || tau < rationalParam(SoPlex::FEASTOL));
          assert(!error);
 
          hasUnboundedRay = (tau >= Rational(1));
@@ -671,7 +671,7 @@ namespace soplex
 
 
    /// performs iterative refinement on the auxiliary problem for testing feasibility
-   void SoPlex2::_performFeasIRStable(SolRational& sol, bool& hasDualFarkas, bool& stopped, bool& error)
+   void SoPlex::_performFeasIRStable(SolRational& sol, bool& hasDualFarkas, bool& stopped, bool& error)
    {
       bool primalFeasible;
       bool dualFeasible;
@@ -717,10 +717,10 @@ namespace soplex
 
             MSG_DEBUG( spxout << "tau = " << tau << " (roughly " << rationalToString(tau) << ")\n" );
 
-            assert(tau >= -rationalParam(SoPlex2::FEASTOL));
-            assert(tau <= Rational(1) + rationalParam(SoPlex2::FEASTOL));
+            assert(tau >= -rationalParam(SoPlex::FEASTOL));
+            assert(tau <= Rational(1) + rationalParam(SoPlex::FEASTOL));
 
-            error = (tau < -rationalParam(SoPlex2::FEASTOL) || tau > Rational(1) + rationalParam(SoPlex2::FEASTOL));
+            error = (tau < -rationalParam(SoPlex::FEASTOL) || tau > Rational(1) + rationalParam(SoPlex::FEASTOL));
             hasDualFarkas = (tau < Rational(1)); ///@todo shouldn't this use a tolerance? like (tau < 1-eps)? or even (tau <1/2)?
 
             if( hasDualFarkas )
@@ -752,7 +752,7 @@ namespace soplex
 
 
    /// reduces matrix coefficient in absolute value by the lifting procedure of Thiele et al. 2013
-   void SoPlex2::_lift()
+   void SoPlex::_lift()
    {
       MSG_DEBUG( spxout << "Reducing matrix coefficients by lifting.\n" );
 
@@ -771,7 +771,7 @@ namespace soplex
       SVectorRational liftingRowVector(2, liftingRowMem);
 
       // search each column for large nonzeros entries
-      const Rational maxValue = realParam(SoPlex2::LIFTMAXVAL);
+      const Rational maxValue = realParam(SoPlex::LIFTMAXVAL);
 
       for( int i = 0; i < numColsRational(); i++ )
       {
@@ -809,8 +809,8 @@ namespace soplex
                   assert(liftingColumnIndex == numColsRational() - 1);
                   assert(liftingColumnIndex == numColsReal() - 1);
 
-                  _rationalLP->changeBounds(liftingColumnIndex, -realParam(SoPlex2::INFTY), realParam(SoPlex2::INFTY));
-                  _realLP->changeBounds(liftingColumnIndex, -realParam(SoPlex2::INFTY), realParam(SoPlex2::INFTY));
+                  _rationalLP->changeBounds(liftingColumnIndex, -realParam(SoPlex::INFTY), realParam(SoPlex::INFTY));
+                  _realLP->changeBounds(liftingColumnIndex, -realParam(SoPlex::INFTY), realParam(SoPlex::INFTY));
 
                   liftingRowVector.clear();
                   addedLiftingRow = true;
@@ -837,7 +837,7 @@ namespace soplex
       }
 
       // search each column for small nonzeros entries
-      const Rational minValue = realParam(SoPlex2::LIFTMINVAL);
+      const Rational minValue = realParam(SoPlex::LIFTMINVAL);
 
       for( int i = 0; i < numColsRational(); i++ )
       {
@@ -875,8 +875,8 @@ namespace soplex
                   assert(liftingColumnIndex == numColsRational() - 1);
                   assert(liftingColumnIndex == numColsReal() - 1);
 
-                  _rationalLP->changeBounds(liftingColumnIndex, -realParam(SoPlex2::INFTY), realParam(SoPlex2::INFTY));
-                  _realLP->changeBounds(liftingColumnIndex, -realParam(SoPlex2::INFTY), realParam(SoPlex2::INFTY));
+                  _rationalLP->changeBounds(liftingColumnIndex, -realParam(SoPlex::INFTY), realParam(SoPlex::INFTY));
+                  _realLP->changeBounds(liftingColumnIndex, -realParam(SoPlex::INFTY), realParam(SoPlex::INFTY));
 
                   liftingRowVector.clear();
                   addedLiftingRow = true;
@@ -927,7 +927,7 @@ namespace soplex
 
 
    /// undoes lifting
-   void SoPlex2::_project(SolRational& sol)
+   void SoPlex::_project(SolRational& sol)
    {
       // start timing
       _statistics->transformTime.start();
@@ -961,11 +961,11 @@ namespace soplex
       ///@todo if we know the mapping between original and lifting columns, we simply need to add the reduced cost of
       ///      the lifting column to the reduced cost of the original column; this is not implemented now, because for
       ///      optimal solutions the reduced costs of the lifting columns are zero
-      const Rational maxValue = realParam(SoPlex2::LIFTMAXVAL);
+      const Rational maxValue = realParam(SoPlex::LIFTMAXVAL);
 
       for( int i = _beforeLiftCols; i < numColsRational() && sol._hasDual; i++ )
       {
-         if( abs(maxValue * sol._redCost[i]) > rationalParam(SoPlex2::OPTTOL) )
+         if( abs(maxValue * sol._redCost[i]) > rationalParam(SoPlex::OPTTOL) )
          {
             MSG_INFO1( spxout << "Warning: lost dual solution during project phase.\n" );
             sol._hasDual = false;
@@ -1019,7 +1019,7 @@ namespace soplex
 
    /// introduces slack variables to transform inequality constraints into equations for both rational and real LP,
    /// which should be in sync
-   void SoPlex2::_transformEquality()
+   void SoPlex::_transformEquality()
    {
       MSG_DEBUG( spxout << "Transforming rows to equation form.\n" );
 
@@ -1029,7 +1029,7 @@ namespace soplex
       MSG_DEBUG( _realLP->writeFile("beforeTransEqu.lp", 0, 0, 0) );
 
       // transform LP to minimization problem
-      if( intParam(SoPlex2::OBJSENSE) == SoPlex2::OBJSENSE_MAXIMIZE )
+      if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MAXIMIZE )
       {
          assert(_rationalLP->spxSense() == SPxLPRational::MAXIMIZE);
          assert(_realLP->spxSense() == SPxLPReal::MAXIMIZE);
@@ -1102,7 +1102,7 @@ namespace soplex
 
 
    /// restores original problem
-   void SoPlex2::_untransformEquality(SolRational& sol)
+   void SoPlex::_untransformEquality(SolRational& sol)
    {
       // start timing
       _statistics->transformTime.start();
@@ -1187,7 +1187,7 @@ namespace soplex
       _realLP->removeColRange(numOrigCols, numCols - 1);
 
       // restore original objective sense
-      if( intParam(SoPlex2::OBJSENSE) == SoPlex2::OBJSENSE_MAXIMIZE )
+      if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MAXIMIZE )
       {
          assert(_rationalLP->spxSense() == SPxLPRational::MINIMIZE);
          assert(_realLP->spxSense() == SPxLPReal::MINIMIZE);
@@ -1221,7 +1221,7 @@ namespace soplex
 
    /// transforms LP to unboundedness problem by moving the objective function to the constraints, changing right-hand
    /// side and bounds to zero, and adding an auxiliary variable for the decrease in the objective function
-   void SoPlex2::_transformUnbounded()
+   void SoPlex::_transformUnbounded()
    {
       assert(_rationalLP->spxSense() == SPxLPRational::MINIMIZE);
       assert(_realLP->spxSense() == SPxLPReal::MINIMIZE);
@@ -1270,13 +1270,13 @@ namespace soplex
          _rationalLP->changeObj(c, 0);
          _realLP->changeObj(c, 0.0);
 
-         if( double(lowerRational(c)) > double(-realParam(SoPlex2::INFTY)) )
+         if( double(lowerRational(c)) > double(-realParam(SoPlex::INFTY)) )
          {
             _rationalLP->changeLower(c, 0);
             _realLP->changeLower(c, 0.0);
          }
 
-         if( double(upperRational(c)) < double(realParam(SoPlex2::INFTY)) )
+         if( double(upperRational(c)) < double(realParam(SoPlex::INFTY)) )
          {
             _rationalLP->changeUpper(c, 0);
             _realLP->changeUpper(c, 0.0);
@@ -1300,7 +1300,7 @@ namespace soplex
 
 
    /// undoes transformation to unboundedness problem
-   void SoPlex2::_untransformUnbounded(SolRational& sol, bool unbounded)
+   void SoPlex::_untransformUnbounded(SolRational& sol, bool unbounded)
    {
       // start timing
       _statistics->transformTime.start();
@@ -1382,7 +1382,7 @@ namespace soplex
 
    /// transforms LP to feasibility problem by removing the objective function, shifting variables, and homogenizing the
    /// right-hand side
-   void SoPlex2::_transformFeasibility()
+   void SoPlex::_transformFeasibility()
    {
       assert(_rationalLP->spxSense() == SPxLPRational::MINIMIZE);
       assert(_realLP->spxSense() == SPxLPReal::MINIMIZE);
@@ -1416,13 +1416,13 @@ namespace soplex
          if( lowerRational(c) > Rational(0) )
          {
             shiftedSide -= (colVectorRational(c) * lowerRational(c));
-            _rationalLP->changeBounds(c, 0, double(upperRational(c)) < double(realParam(SoPlex2::INFTY)) ? upperRational(c) - lowerRational(c) : upperRational(c));
+            _rationalLP->changeBounds(c, 0, double(upperRational(c)) < double(realParam(SoPlex::INFTY)) ? upperRational(c) - lowerRational(c) : upperRational(c));
             _realLP->changeBounds(c, 0.0, (Real)upperRational(c));
          }
          else if( upperRational(c) < Rational(0) )
          {
             shiftedSide -= (colVectorRational(c) * upperRational(c));
-            _rationalLP->changeBounds(c, double(lowerRational(c)) > double(-realParam(SoPlex2::INFTY)) ? lowerRational(c) - upperRational(c) : lowerRational(c), 0);
+            _rationalLP->changeBounds(c, double(lowerRational(c)) > double(-realParam(SoPlex::INFTY)) ? lowerRational(c) - upperRational(c) : lowerRational(c), 0);
             _realLP->changeBounds(c, (Real)lowerRational(c), 0.0);
          }
          else
@@ -1461,7 +1461,7 @@ namespace soplex
 
 
    /// undoes transformation to feasibility problem
-   void SoPlex2::_untransformFeasibility(SolRational& sol, bool infeasible)
+   void SoPlex::_untransformFeasibility(SolRational& sol, bool infeasible)
    {
       // start timing
       _statistics->transformTime.start();
@@ -1512,7 +1512,7 @@ namespace soplex
 
       for( int c = numOrigCols - 1; c >= 0; c-- )
       {
-         assert(double(upperRational(c)) >= double(realParam(SoPlex2::INFTY)) || double(lowerRational(c)) <= double(-realParam(SoPlex2::INFTY))
+         assert(double(upperRational(c)) >= double(realParam(SoPlex::INFTY)) || double(lowerRational(c)) <= double(-realParam(SoPlex::INFTY))
             || _feasLower[c] - lowerRational(c) == _feasUpper[c] - upperRational(c));
 
          _rationalLP->changeBounds(c, _feasLower[c], _feasUpper[c]);
@@ -1568,7 +1568,7 @@ namespace soplex
    /// Sec. 4 of Neumaier and Shcherbina, Mathematical Programming A, 2004.
    ///
    /// Set transformed to true if this method is called after _transformFeasibility().
-   void SoPlex2::_computeInfeasBox(SolRational& sol, bool transformed)
+   void SoPlex::_computeInfeasBox(SolRational& sol, bool transformed)
    {
       assert(sol.hasDualFarkas());
 
@@ -1616,14 +1616,14 @@ namespace soplex
 
          if( minusRedCost > Rational(0) )
          {
-            if( double(upper[c]) < double(realParam(SoPlex2::INFTY)) )
+            if( double(upper[c]) < double(realParam(SoPlex::INFTY)) )
                temp += minusRedCost * upper[c];
             else
                isTempFinite = false;
          }
          else if( minusRedCost < Rational(0) )
          {
-            if( double(lower[c]) > double(-realParam(SoPlex2::INFTY)) )
+            if( double(lower[c]) > double(-realParam(SoPlex::INFTY)) )
                temp += minusRedCost * lower[c];
             else
                isTempFinite = false;
@@ -1709,7 +1709,7 @@ namespace soplex
 
          // if the multiplier is positive we inspect the lower bound: if it is finite and within the Farkas box, we can
          // increase B by including it in the Farkas proof
-         if( minusRedCost < Rational(0) && lower[colIdx] > -B && double(lower[colIdx]) > double(-realParam(SoPlex2::INFTY)) )
+         if( minusRedCost < Rational(0) && lower[colIdx] > -B && double(lower[colIdx]) > double(-realParam(SoPlex::INFTY)) )
          {
             ytransA.clearNum(n);
             ytransb -= minusRedCost * lower[colIdx];
@@ -1742,7 +1742,7 @@ namespace soplex
          }
          // if the multiplier is negative we inspect the upper bound: if it is finite and within the Farkas box, we can
          // increase B by including it in the Farkas proof
-         else if( minusRedCost > Rational(0) && upper[colIdx] < B && double(upper[colIdx]) < double(realParam(SoPlex2::INFTY)) )
+         else if( minusRedCost > Rational(0) && upper[colIdx] < B && double(upper[colIdx]) < double(realParam(SoPlex::INFTY)) )
          {
             ytransA.clearNum(n);
             ytransb -= minusRedCost * upper[colIdx];
@@ -1792,7 +1792,7 @@ namespace soplex
 
 
    /// solves real LP during iterative refinement
-   SPxSolver::Status SoPlex2::_solveRealForRational(bool fromscratch, VectorReal& primal, VectorReal& dual, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols)
+   SPxSolver::Status SoPlex::_solveRealForRational(bool fromscratch, VectorReal& primal, VectorReal& dual, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols)
    {
       assert(_isConsistent());
 
@@ -1822,7 +1822,7 @@ namespace soplex
          SPxSimplifier::Result simplificationStatus = SPxSimplifier::OKAY;
          if( _simplifier != 0 )
          {
-            simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlex2::EPSILON_ZERO), realParam(SoPlex2::FPFEASTOL), realParam(SoPlex2::FPOPTTOL));
+            simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlex::EPSILON_ZERO), realParam(SoPlex::FPFEASTOL), realParam(SoPlex::FPOPTTOL));
          }
 
          // apply scaling after the simplification
@@ -1999,7 +1999,7 @@ namespace soplex
 
          Rational violation = (maxBoundViolation > maxConstraintViolation ? maxBoundViolation : maxConstraintViolation);
 
-         if( violation > double(realParam(SoPlex2::FPFEASTOL)) )
+         if( violation > double(realParam(SoPlex::FPFEASTOL)) )
          {
             MSG_INFO1( spxout << "Warning: Floating-point solution violates bounds and rows by up to " << rationalToString(violation) << ".\n" );
          }
@@ -2015,7 +2015,7 @@ namespace soplex
 
 
    /// solves real LP with recovery mechanism
-   SPxSolver::Status SoPlex2::_solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols)
+   SPxSolver::Status SoPlex::_solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols)
    {
       SPxSolver::Status result = SPxSolver::UNKNOWN;
 
@@ -2031,12 +2031,12 @@ namespace soplex
       bool switchedRatiotester = false;
       bool switchedPricer = false;
 
-      int ratiotester = intParam(SoPlex2::RATIOTESTER);
-      int pricer = intParam(SoPlex2::PRICER);
-      int simplifier = intParam(SoPlex2::SIMPLIFIER);
-      int scaler = intParam(SoPlex2::SCALER);
+      int ratiotester = intParam(SoPlex::RATIOTESTER);
+      int pricer = intParam(SoPlex::PRICER);
+      int simplifier = intParam(SoPlex::SIMPLIFIER);
+      int scaler = intParam(SoPlex::SCALER);
 
-      setIntParam(SoPlex2::SIMPLIFIER, SoPlex2::SIMPLIFIER_OFF);
+      setIntParam(SoPlex::SIMPLIFIER, SoPlex::SIMPLIFIER_OFF);
 
       while( !_isSolveStopped() )
       {
@@ -2085,17 +2085,17 @@ namespace soplex
             continue;
          }
 
-         setIntParam(SoPlex2::RATIOTESTER, ratiotester);
-         setIntParam(SoPlex2::PRICER, pricer);
+         setIntParam(SoPlex::RATIOTESTER, ratiotester);
+         setIntParam(SoPlex::PRICER, pricer);
 
          if( !switchedScaler )
          {
             MSG_INFO1( spxout << "Switching scaling." << std::endl );
 
-            if( scaler == int(SoPlex2::SCALER_OFF) )
-               setIntParam(SoPlex2::SCALER, SoPlex2::SCALER_BIEQUI);
+            if( scaler == int(SoPlex::SCALER_OFF) )
+               setIntParam(SoPlex::SCALER, SoPlex::SCALER_BIEQUI);
             else
-               setIntParam(SoPlex2::SCALER, SoPlex2::SCALER_OFF);
+               setIntParam(SoPlex::SCALER, SoPlex::SCALER_OFF);
 
             fromScratch = true;
             _solver.reLoad();
@@ -2109,10 +2109,10 @@ namespace soplex
          {
             MSG_INFO1( spxout << "Switching simplification." << std::endl );
 
-            if( simplifier == int(SoPlex2::SIMPLIFIER_OFF) )
-               setIntParam(SoPlex2::SIMPLIFIER, SoPlex2::SIMPLIFIER_AUTO);
+            if( simplifier == int(SoPlex::SIMPLIFIER_OFF) )
+               setIntParam(SoPlex::SIMPLIFIER, SoPlex::SIMPLIFIER_AUTO);
             else
-               setIntParam(SoPlex2::SIMPLIFIER, SoPlex2::SIMPLIFIER_OFF);
+               setIntParam(SoPlex::SIMPLIFIER, SoPlex::SIMPLIFIER_OFF);
 
             fromScratch = true;
             _solver.reLoad();
@@ -2122,7 +2122,7 @@ namespace soplex
             continue;
          }
 
-         setIntParam(SoPlex2::SIMPLIFIER, SoPlex2::SIMPLIFIER_OFF);
+         setIntParam(SoPlex::SIMPLIFIER, SoPlex::SIMPLIFIER_OFF);
 
          if( !relaxedTolerances )
          {
@@ -2173,13 +2173,13 @@ namespace soplex
          break;
       }
 
-      _solver.setFeastol(realParam(SoPlex2::FPFEASTOL));
-      _solver.setOpttol(realParam(SoPlex2::FPOPTTOL));
+      _solver.setFeastol(realParam(SoPlex::FPFEASTOL));
+      _solver.setOpttol(realParam(SoPlex::FPOPTTOL));
 
-      setIntParam(SoPlex2::RATIOTESTER, ratiotester);
-      setIntParam(SoPlex2::PRICER, pricer);
-      setIntParam(SoPlex2::SIMPLIFIER, simplifier);
-      setIntParam(SoPlex2::SCALER, scaler);
+      setIntParam(SoPlex::RATIOTESTER, ratiotester);
+      setIntParam(SoPlex::PRICER, pricer);
+      setIntParam(SoPlex::SIMPLIFIER, simplifier);
+      setIntParam(SoPlex::SCALER, scaler);
 
       return result;
    }

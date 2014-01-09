@@ -37,7 +37,7 @@ namespace soplex
 template< class R >
 class SolBase
 {
-   friend class SoPlex2;
+   friend class SoPlex;
    template < class S > friend class SolBase;
 
 public:

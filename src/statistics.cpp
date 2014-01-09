@@ -21,20 +21,20 @@
 namespace soplex
 {
    /// default constructor
-   SoPlex2::Statistics::Statistics()
+   SoPlex::Statistics::Statistics()
    {
       clearAllData();
    }
 
    /// clears all statistics
-   void SoPlex2::Statistics::clearAllData()
+   void SoPlex::Statistics::clearAllData()
    {
       readingTime.reset();
       clearSolvingData();
    }
 
    /// clears statistics on solving process
-   void SoPlex2::Statistics::clearSolvingData()
+   void SoPlex::Statistics::clearSolvingData()
    {
       solvingTime.reset();
       preprocessingTime.reset();
@@ -51,7 +51,7 @@ namespace soplex
    }
 
    /// prints statistics
-   void SoPlex2::Statistics::print(std::ostream& os)
+   void SoPlex::Statistics::print(std::ostream& os)
    {
       Real solTime = solvingTime.userTime();
       Real totTime = readingTime.userTime() + solTime;
