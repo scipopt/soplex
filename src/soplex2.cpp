@@ -194,6 +194,11 @@ namespace soplex
             _intParamDescription[SoPlex2::SYNCMODE] = "mode for synchronizing real and rational LP (0 - store only real LP, 1 - auto, 2 - manual)";
             _intParamDefault[SoPlex2::SYNCMODE] = SoPlex2::SYNCMODE_ONLYREAL;
 
+            // mode for reading LP files
+            _intParamName[SoPlex2::READMODE] = "readmode";
+            _intParamDescription[SoPlex2::READMODE] = "mode for reading LP files (0 - floating-point, 1 - rational)";
+            _intParamDefault[SoPlex2::READMODE] = SoPlex2::READMODE_REAL;
+
             // mode for iterative refinement strategy
             _intParamName[SoPlex2::SOLVEMODE] = "solvemode";
             _intParamDescription[SoPlex2::SOLVEMODE] = "mode for iterative refinement strategy (0 - floating-point solve, 1 - auto, 2 - force iterative refinement)";
@@ -3953,6 +3958,18 @@ namespace soplex
             break;
          case SYNCMODE_MANUAL:
             _ensureRationalLP();
+            break;
+         default:
+            return false;
+         }
+         break;
+
+      // mode for reading LP files; nothing to do but change the value if valid
+      case SoPlex2::READMODE:
+         switch( value )
+         {
+         case READMODE_REAL:
+         case READMODE_RATIONAL:
             break;
          default:
             return false;

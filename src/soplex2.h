@@ -760,11 +760,14 @@ public:
       /// mode for synchronizing real and rational LP
       SYNCMODE = 15,
 
+      /// mode for reading LP files
+      READMODE = 16,
+
       /// mode for iterative refinement strategy
-      SOLVEMODE = 16,
+      SOLVEMODE = 17,
 
       /// number of integer parameters
-      INTPARAM_COUNT = 17
+      INTPARAM_COUNT = 18
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -943,6 +946,16 @@ public:
 
       /// force iterative refinement
       SOLVEMODE_RATIONAL = 2
+   };
+
+   /// values for parameter READMODE
+   enum
+   {
+      /// standard floating-point parsing
+      READMODE_REAL = 0,
+
+      /// rational parsing
+      READMODE_RATIONAL = 1
    };
 
    /// real parameters
