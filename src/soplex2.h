@@ -696,14 +696,11 @@ public:
    /// boolean parameters
    typedef enum
    {
-      /// should partial pricing be used?
-      PARTIAL_PRICING = 0,
-
       /// should lifting be used to reduce range of nonzero matrix coefficients?
-      LIFTING = 1,
+      LIFTING = 0,
 
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 2
+      BOOLPARAM_COUNT = 1
    } BoolParam;
 
    /// integer parameters
@@ -897,10 +894,7 @@ public:
       PRICER_QUICKSTEEP = 4,
 
       /// steepest edge pricer with exact initialization of norms
-      PRICER_STEEP = 5,
-
-      /// hyprid pricer choosing between quicksteep and partial multiple pricer
-      PRICER_HYBRID = 6
+      PRICER_STEEP = 5
    };
 
    /// values for parameter RATIOTESTER
@@ -1133,7 +1127,6 @@ private:
    SPxDevexPR _pricerDevex;
    SPxSteepPR _pricerQuickSteep;
    SPxSteepExPR _pricerSteep;
-   SPxHybridPR _pricerHybrid;
    SPxDefaultRT _ratiotesterTextbook;
    SPxHarrisRT _ratiotesterHarris;
    SPxFastRT _ratiotesterFast;

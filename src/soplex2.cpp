@@ -107,11 +107,6 @@ namespace soplex
       {
          if( !_defaultsAndBoundsInitialized )
          {
-            // should partial pricing be used?
-            _boolParamName[SoPlex2::PARTIAL_PRICING] = "partial_pricing";
-            _boolParamDescription[SoPlex2::PARTIAL_PRICING] = "should partial pricing be used?";
-            _boolParamDefault[SoPlex2::PARTIAL_PRICING] = false;
-
             // should lifting be used to reduce range of nonzero matrix coefficients?
             _boolParamName[SoPlex2::LIFTING] = "lifting";
             _boolParamDescription[SoPlex2::LIFTING] = "should lifting be used to reduce range of nonzero matrix coefficients?";
@@ -185,8 +180,8 @@ namespace soplex
 
             // type of pricer
             _intParamName[SoPlex2::PRICER] = "pricer";
-            _intParamDescription[SoPlex2::PRICER] = "pricing method (0 - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - hybrid quicksteep/parmult)";
-            _intParamDefault[SoPlex2::PRICER] = SoPlex2::PRICER_QUICKSTEEP;
+            _intParamDescription[SoPlex2::PRICER] = "pricing method (0 - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)";
+            _intParamDefault[SoPlex2::PRICER] = SoPlex2::PRICER_AUTO;
 
             // type of ratio test
             _intParamName[SoPlex2::RATIOTESTER] = "ratiotester";
@@ -451,7 +446,6 @@ namespace soplex
          _pricerDevex = rhs._pricerDevex;
          _pricerQuickSteep = rhs._pricerQuickSteep;
          _pricerSteep = rhs._pricerSteep;
-         _pricerHybrid = rhs._pricerHybrid;
          _ratiotesterTextbook = rhs._ratiotesterTextbook;
          _ratiotesterHarris = rhs._ratiotesterHarris;
          _ratiotesterFast = rhs._ratiotesterFast;
@@ -3692,9 +3686,6 @@ namespace soplex
 
       switch( param )
       {
-      case PARTIAL_PRICING:
-         ///@todo activate partial pricing
-         break;
       case LIFTING:
          break;
       default:
@@ -3864,9 +3855,6 @@ namespace soplex
             break;
          case PRICER_STEEP:
             _solver.setPricer(&_pricerSteep);
-            break;
-         case PRICER_HYBRID:
-            _solver.setPricer(&_pricerHybrid);
             break;
          default:
             return false;
