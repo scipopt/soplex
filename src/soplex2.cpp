@@ -3261,44 +3261,15 @@ namespace soplex
 
 
 
-   /// reads real LP in LP or MPS format from file and returns true on success; gets row names, column names, and
-   /// integer variables if desired
-   bool SoPlex2::readFileReal(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
+   /// reads LP file in LP or MPS format according to READMODE parameter; gets row names, column names, and
+   /// integer variables if desired; returns true on success
+   bool SoPlex2::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
    {
-      assert(_realLP != 0);
-
-      // clear statistics
-      _statistics->clearAllData();
-
-      // update status
-      _status = SPxSolver::UNKNOWN;
-      _invalidateSolution();
-      _hasBasis = false;
-
-      // start timing
-      _statistics->readingTime.start();
-
-      // read
-      bool success = _realLP->readFile(filename, rowNames, colNames, intVars);
-      setIntParam(SoPlex2::OBJSENSE, (_realLP->spxSense() == SPxLPReal::MAXIMIZE ? SoPlex2::OBJSENSE_MAXIMIZE : SoPlex2::OBJSENSE_MINIMIZE), true, true);
-
-      // stop timing
-      _statistics->readingTime.stop();
-
-      if( success )
-      {
-         // if sync mode is auto, we have to copy the (rounded) real LP to the rational LP; this is counted to sync time
-         // and not to reading time
-         if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
-            _syncLPRational();
-      }
+      if( intParam(SoPlex2::READMODE) == READMODE_REAL )
+         return _readFileReal(filename, rowNames, colNames, intVars);
       else
-         clearLPReal();
-
-      return success;
+         return _readFileRational(filename, rowNames, colNames, intVars);
    }
-
-
 
    /// writes real LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
    /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
@@ -3308,53 +3279,6 @@ namespace soplex
       ///@todo implement return value
       _realLP->writeFile(filename, rowNames, colNames, intVars);
       return true;
-   }
-
-
-
-   /// reads rational LP in LP or MPS format from file and returns true on success; gets row names, column names, and
-   /// integer variables if desired
-   bool SoPlex2::readFileRational(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
-   {
-      assert(_rationalLP != 0);
-
-      // clear statistics
-      _statistics->clearAllData();
-
-      // start timing
-      _statistics->readingTime.start();
-
-      // update status
-      _status = SPxSolver::UNKNOWN;
-      _invalidateSolution();
-      _hasBasis = false;
-
-      // read
-      _ensureRationalLP();
-      bool success = _rationalLP->readFile(filename, rowNames, colNames, intVars);
-      setIntParam(SoPlex2::OBJSENSE, (_rationalLP->spxSense() == SPxLPRational::MAXIMIZE ? SoPlex2::OBJSENSE_MAXIMIZE : SoPlex2::OBJSENSE_MINIMIZE), true, true);
-
-      // stop timing
-      _statistics->readingTime.stop();
-
-      if( success )
-      {
-         // if sync mode is auto, we have to copy the (rounded) real LP to the rational LP; this is counted to sync time
-         // and not to reading time
-         if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
-            _syncLPReal();
-         // if a rational LP file is read, but only the (rounded) real LP should be kept, we have to free the rational LP
-         else if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
-         {
-            _syncLPReal();
-            _rationalLP->~SPxLPRational();
-            spx_free(_rationalLP);
-         }
-      }
-      else
-         clearLPRational();
-
-      return success;
    }
 
 
@@ -5836,6 +5760,92 @@ namespace soplex
       _slufactor.resetSolveTime();
       _statistics->luFactorizations += _slufactor.getFactorCount();
       _statistics->luSolves += _slufactor.getSolveCount();
+   }
+
+
+
+   /// reads real LP in LP or MPS format from file and returns true on success; gets row names, column names, and
+   /// integer variables if desired
+   bool SoPlex2::_readFileReal(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
+   {
+      assert(_realLP != 0);
+
+      // clear statistics
+      _statistics->clearAllData();
+
+      // update status
+      _status = SPxSolver::UNKNOWN;
+      _invalidateSolution();
+      _hasBasis = false;
+
+      // start timing
+      _statistics->readingTime.start();
+
+      // read
+      bool success = _realLP->readFile(filename, rowNames, colNames, intVars);
+      setIntParam(SoPlex2::OBJSENSE, (_realLP->spxSense() == SPxLPReal::MAXIMIZE ? SoPlex2::OBJSENSE_MAXIMIZE : SoPlex2::OBJSENSE_MINIMIZE), true, true);
+
+      // stop timing
+      _statistics->readingTime.stop();
+
+      if( success )
+      {
+         // if sync mode is auto, we have to copy the (rounded) real LP to the rational LP; this is counted to sync time
+         // and not to reading time
+         if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+            _syncLPRational();
+      }
+      else
+         clearLPReal();
+
+      return success;
+   }
+
+
+
+   /// reads rational LP in LP or MPS format from file and returns true on success; gets row names, column names, and
+   /// integer variables if desired
+   bool SoPlex2::_readFileRational(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
+   {
+      assert(_rationalLP != 0);
+
+      // clear statistics
+      _statistics->clearAllData();
+
+      // start timing
+      _statistics->readingTime.start();
+
+      // update status
+      _status = SPxSolver::UNKNOWN;
+      _invalidateSolution();
+      _hasBasis = false;
+
+      // read
+      _ensureRationalLP();
+      bool success = _rationalLP->readFile(filename, rowNames, colNames, intVars);
+      setIntParam(SoPlex2::OBJSENSE, (_rationalLP->spxSense() == SPxLPRational::MAXIMIZE ? SoPlex2::OBJSENSE_MAXIMIZE : SoPlex2::OBJSENSE_MINIMIZE), true, true);
+
+      // stop timing
+      _statistics->readingTime.stop();
+
+      if( success )
+      {
+         // if sync mode is auto, we have to copy the (rounded) real LP to the rational LP; this is counted to sync time
+         // and not to reading time
+         if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_AUTO )
+            _syncLPReal();
+         // if a rational LP file is read, but only the (rounded) real LP should be kept, we have to free the rational LP
+         else if( intParam(SoPlex2::SYNCMODE) == SYNCMODE_ONLYREAL )
+         {
+            _syncLPReal();
+            _rationalLP->~SPxLPRational();
+            spx_free(_rationalLP);
+         }
+      }
+      else
+         clearLPRational();
+
+      return success;
    }
 
 
