@@ -282,15 +282,3 @@ SPxId SPxDantzigPR::selectEnterDenseCoDim(Real& best,SPxId& enterId)
 }
 
 } // namespace soplex
-
-//-----------------------------------------------------------------------------
-//Emacs Local Variables:
-//Emacs mode:c++
-//Emacs c-basic-offset:3
-//Emacs tab-width:8
-//Emacs indent-tabs-mode:nil
-//Emacs End:
-//-----------------------------------------------------------------------------
-
-
-

@@ -30,12 +30,3 @@ typedef DVectorBase< Real > DVectorReal;
 typedef DVectorBase< Rational > DVectorRational;
 } // namespace soplex
 #endif // _DVECTOR_H_
-
-//-----------------------------------------------------------------------------
-//Emacs Local Variables:
-//Emacs mode:c++
-//Emacs c-basic-offset:3
-//Emacs tab-width:8
-//Emacs indent-tabs-mode:nil
-//Emacs End:
-//-----------------------------------------------------------------------------

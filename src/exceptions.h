@@ -138,4 +138,3 @@ namespace soplex
 } //namespace soplex
 
 #endif // _EXCEPTIONS_H_
-

@@ -403,15 +403,3 @@ inline bool GErel(Real a, Real b, Real eps = Param::epsilon())
 
 } // namespace soplex
 #endif // _SPXDEFINES_H_
-
-//-----------------------------------------------------------------------------
-//Emacs Local Variables:
-//Emacs mode:c++
-//Emacs c-basic-offset:3
-//Emacs tab-width:8
-//Emacs indent-tabs-mode:nil
-//Emacs End:
-//-----------------------------------------------------------------------------
-
-
-

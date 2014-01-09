@@ -31,12 +31,3 @@ typedef LPColBase< Real > LPColReal;
 typedef LPColBase< Rational > LPColRational;
 } // namespace soplex
 #endif // _LPCOL_H_
-
-//-----------------------------------------------------------------------------
-//Emacs Local Variables:
-//Emacs mode:c++
-//Emacs c-basic-offset:3
-//Emacs tab-width:8
-//Emacs indent-tabs-mode:nil
-//Emacs End:
-//-----------------------------------------------------------------------------

@@ -2289,14 +2289,3 @@ void SPxLPBase<Rational>::writeMPS(
 template class SPxLPBase < Rational >;
 
 } // namespace soplex
-
-
-
-// ---------------------------------------------------------------------------------------------------------------------
-// Emacs Local Variables:
-// Emacs mode:c++
-// Emacs c-basic-offset:3
-// Emacs tab-width:8
-// Emacs indent-tabs-mode:nil
-// Emacs End:
-// ---------------------------------------------------------------------------------------------------------------------
