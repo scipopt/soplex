@@ -1,4 +1,4 @@
-$(BINOBJDIR)/soplexmain.o: src/soplexmain.cpp src/spxdefines.h src/soplex2.h \
+$(BINOBJDIR)/soplexmain.o: src/soplexmain.cpp src/soplex2.h src/spxdefines.h \
  src/basevectors.h src/rational.h src/vectorbase.h src/dvectorbase.h \
  src/spxalloc.h src/spxout.h src/exceptions.h src/ssvectorbase.h \
  src/idxset.h src/svectorbase.h src/dsvectorbase.h src/svsetbase.h \
@@ -17,7 +17,7 @@ $(BINOBJDIR)/soplexmain.o: src/soplexmain.cpp src/spxdefines.h src/soplex2.h \
  src/spxsteeppr.h src/spxsteepexpr.h src/spxhybridpr.h \
  src/spxratiotester.h src/spxdefaultrt.h src/spxharrisrt.h \
  src/spxfastrt.h src/spxboundflippingrt.h src/sol.h src/solbase.h \
- src/spxgithash.h src/spxweightpr.h
+ src/spxgithash.h
 $(BINOBJDIR)/simpleexample.o: src/simpleexample.cpp src/soplex.h src/spxsolver.h \
  src/spxdefines.h src/timer.h src/spxlp.h src/spxlpbase.h \
  src/basevectors.h src/rational.h src/vectorbase.h src/dvectorbase.h \

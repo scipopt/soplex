@@ -1,1 +1,1 @@
-src/gzstream.cpp src/gzstream.h src/spxfileio.h
+src/gzstream.cpp src/gzstream.h src/soplexmain.cpp src/spxfileio.h
