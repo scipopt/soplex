@@ -4312,12 +4312,20 @@ namespace soplex
             }
             else if( strncmp(paramName, _currentSettings->_boolParamName[param].c_str(), SET_MAX_LINE_LEN) == 0 )
             {
-               if( strncasecmp(paramValueString, "true", 4) == 0 )
+               if( strncasecmp(paramValueString, "true", 4) == 0
+                  || strncasecmp(paramValueString, "TRUE", 4) == 0
+                  || strncasecmp(paramValueString, "t", 4) == 0
+                  || strncasecmp(paramValueString, "T", 4) == 0
+                  || strtol(paramValueString, NULL, 4) == 1 )
                {
                   setBoolParam((SoPlex2::BoolParam)param, true);
                   break;
                }
-               else if( strncasecmp(paramValueString, "false", 5) == 0 )
+               else if( strncasecmp(paramValueString, "false", 5) == 0
+                  || strncasecmp(paramValueString, "FALSE", 5) == 0
+                  || strncasecmp(paramValueString, "f", 5) == 0
+                  || strncasecmp(paramValueString, "F", 5) == 0
+                  || strtol(paramValueString, NULL, 5) == 0 )
                {
                   setBoolParam((SoPlex2::BoolParam)param, false);
                   break;
@@ -4998,12 +5006,20 @@ namespace soplex
             }
             else if( strncmp(paramName, _currentSettings->_boolParamName[param].c_str(), SET_MAX_LINE_LEN) == 0 )
             {
-               if( strncasecmp(paramValueString, "true", 4) == 0 )
+               if( strncasecmp(paramValueString, "true", 4) == 0
+                  || strncasecmp(paramValueString, "TRUE", 4) == 0
+                  || strncasecmp(paramValueString, "t", 4) == 0
+                  || strncasecmp(paramValueString, "T", 4) == 0
+                  || strtol(paramValueString, NULL, 4) == 1 )
                {
                   setBoolParam((SoPlex2::BoolParam)param, true);
                   break;
                }
-               else if( strncasecmp(paramValueString, "false", 5) == 0 )
+               else if( strncasecmp(paramValueString, "false", 5) == 0
+                  || strncasecmp(paramValueString, "FALSE", 5) == 0
+                  || strncasecmp(paramValueString, "f", 5) == 0
+                  || strncasecmp(paramValueString, "F", 5) == 0
+                  || strtol(paramValueString, NULL, 5) == 0 )
                {
                   setBoolParam((SoPlex2::BoolParam)param, false);
                   break;
