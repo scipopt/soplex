@@ -5847,8 +5847,6 @@ namespace soplex
    /// integer variables if desired
    bool SoPlex2::_readFileRational(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
    {
-      assert(_rationalLP != 0);
-
       // clear statistics
       _statistics->clearAllData();
 
