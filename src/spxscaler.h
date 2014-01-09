@@ -117,8 +117,12 @@ public:
    virtual DSVector returnUnscaledColumnVector(const SPxLPBase<Real>& lp, int i) const;
    /// returns unscaled upper bound \p i of LP \lp
    virtual Real returnUnscaledUpper(const SPxLPBase<Real>& lp, int i) const;
+   /// returns unscaled upper bound vector of LP \lp
+   virtual DVector returnUnscaledUpperVector(const SPxLPBase<Real>& lp) const;
    /// returns unscaled lower bound \p i of LP \lp
    virtual Real returnUnscaledLower(const SPxLPBase<Real>& lp, int i) const;
+   /// returns unscaled lower bound vector of LP \lp
+   virtual DVector returnUnscaledLowerVector(const SPxLPBase<Real>& lp) const;
    /// returns unscaled objective function coefficient of \p i of LP \lp
    virtual Real returnUnscaledObj(const SPxLPBase<Real>& lp, int i) const;
    /// returns unscaled objective function of LP \p lp
@@ -127,8 +131,12 @@ public:
    virtual DSVector returnUnscaledRowVector(const SPxLPBase<Real>& lp, int i) const;
    /// returns unscaled right hand side \p i of LP \lp
    virtual Real returnUnscaledRhs(const SPxLPBase<Real>& lp, int i) const;
+   /// returns unscaled right hand side vector of LP \lp
+   virtual DVector returnUnscaledRhsVector(const SPxLPBase<Real>& lp) const;
    /// returns unscaled left hand side \p i of LP \lp
    virtual Real returnUnscaledLhs(const SPxLPBase<Real>& lp, int i) const;
+   /// returns unscaled left hand side vector of LP \lp
+   virtual DVector returnUnscaledLhsVector(const SPxLPBase<Real>& lp) const;
    /// unscale dense primal solution vector given in \p x. 
    virtual void unscalePrimal(Vector& x) const;
    /// unscale dense slack vector given in \p s.
