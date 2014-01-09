@@ -83,8 +83,6 @@ int SPxDevexPR::selectLeave()
 
    if (thesolver->sparsePricingLeave)
       retid = selectLeaveSparse(theeps);
-   else if (thesolver->partialPricing)
-      retid = selectLeavePart(theeps);
    else
       retid = selectLeaveX(theeps);
 
@@ -123,82 +121,6 @@ int SPxDevexPR::selectLeaveX(Real feastol, int start, int incr)
          }
       }
    }
-   return bstI;
-}
-
-int SPxDevexPR::selectLeavePart(Real feastol)
-{
-   Real x;
-
-   const Real* fTest = thesolver->fTest().get_const_ptr();
-   const Real* cpen = coPenalty.get_const_ptr();
-   Real best = 0;
-   int bstI = -1;
-   int dim = coPenalty.dim();
-   int count = 0;
-   if( dim == 0 )
-      return bstI;
-   int oldstart = startpricing % dim; // within SCIP, dimensions may change
-   int end = dim;
-
-   for (int i = oldstart; i < dim; ++i)
-   {
-      Real fTesti = fTest[i];
-      if (fTesti < -feastol)
-      {
-         Real cpeni = cpen[i];
-         x = fTesti * fTesti / cpeni;
-         if (x > best * IMPROVEMENT_THRESHOLD)
-         {
-            best = x;
-            bstI = i;
-            last = cpeni;
-            end = i + IMPROVEMENT_STEPLENGTH;
-            if (count == 0)
-               startpricing = i;
-            ++count;
-         }
-      }
-      if (i >= end || count >= MAX_PRICING_CANDIDATES)
-         break;
-   }
-
-   if (end < dim || count >= MAX_PRICING_CANDIDATES)
-   {
-      assert(best != 0);
-      return bstI;
-   }
-   else
-   {
-      assert(end >= dim);
-      if( count == 0 )
-         end = oldstart;
-      else
-         end -= dim;
-   }
-
-   for (int i = 0; i < oldstart; ++i)
-   {
-      Real fTesti = fTest[i];
-      if (fTesti < -feastol)
-      {
-         Real cpeni = cpen[i];
-         x = fTesti * fTesti / cpeni;
-         if (x > best * IMPROVEMENT_THRESHOLD)
-         {
-            best = x;
-            bstI = i;
-            last = cpeni;
-            end = i + IMPROVEMENT_STEPLENGTH;
-            if (count == 0)
-               startpricing = i;
-            ++count;
-         }
-      }
-      if (i >= end || count >= MAX_PRICING_CANDIDATES)
-         break;
-   }
-
    return bstI;
 }
 

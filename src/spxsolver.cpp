@@ -874,7 +874,6 @@ SPxSolver::SPxSolver(
    , remainingRoundsLeave(0)
    , remainingRoundsEnter(0)
    , remainingRoundsEnterCo(0)
-   , partialPricing(false)
 {
    METHOD( "SPxSolver::SPxSolver()" );
 

@@ -356,8 +356,6 @@ public:
    int      sparsityThresholdEnter;    ///< maximum number of infeasibilities that is considered sparse for entering Simplex (dim)
    int      sparsityThresholdEnterCo;  ///< maximum number of infeasibilities that is considered sparse for entering Simplex (coDim)
 
-   bool     partialPricing;            ///< enables partial (= incomplete) pricing in leaving Simplex
-
    //-----------------------------
    /**@name Access */
    //@{
@@ -669,11 +667,6 @@ public:
    void setOpttol(Real d);
    /// set parameter \p delta, i.e., set \p feastol and \p opttol to same value.
    void setDelta(Real d);
-   /// enable or disable partial pricing
-   void setPartialPricing( bool p )
-   {
-      partialPricing = p;
-   }
 
    /** SPxSolver considers a Simplex step as degenerate if the
     *  steplength does not exceed #epsilon(). Cycling occurs if only

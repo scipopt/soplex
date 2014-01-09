@@ -234,11 +234,6 @@ public:
    {
       m_solver.setDelta(d);
    }
-   /// enable or disable partial pricing
-   void setPartialPricing( bool p )
-   {
-      m_solver.setPartialPricing(p);
-   }
    //@}
 
    //---------------------------------------

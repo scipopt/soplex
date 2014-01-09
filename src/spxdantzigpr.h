@@ -40,8 +40,6 @@ class SPxDantzigPR : public SPxPricer
 private:
    int                   start;              /**< index where the search starts */
 
-   int                   selectLeavePart();  /**< partial pricing method, define
-                                              *   PARTIAL_PRICING to use */
    int                   selectLeaveSparse();/**< sparse pricing method for leaving Simplex */
 
    SPxId                 selectEnterX();                                /**< choose the best entering index among columns and rows but prefer sparsity */

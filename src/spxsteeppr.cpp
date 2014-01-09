@@ -269,8 +269,6 @@ int SPxSteepPR::selectLeave()
 
    if (thesolver->sparsePricingLeave)
       retid = selectLeaveSparse(theeps);
-   else if (thesolver->partialPricing)
-      retid = selectLeavePart(theeps);
    else
       retid = selectLeaveX(theeps);
 
@@ -334,98 +332,6 @@ int SPxSteepPR::selectLeaveX(Real tol)
       }
    }
 
-   return lastIdx;
-}
-
-int SPxSteepPR::selectLeavePart(Real tol)
-{
-   const Real* coPenalty_ptr = coPenalty.get_const_ptr();
-   const Real* fTest         = thesolver->fTest().get_const_ptr();
-   //    const Real* low     = thesolver->lbBound();
-   //    const Real* up      = thesolver->ubBound();
-   const Real* p             = leavePref.get_const_ptr();
-
-   Real best = -infinity;
-   Real x;
-
-   int lastIdx = -1;
-   int count = 0;
-   int dim = thesolver->dim();
-   if( dim == 0 )
-      return lastIdx;
-   int oldstart = startpricing % dim; // within SCIP, dimensions may change
-   int end = dim;
-
-   for (int i = oldstart; i < dim; ++i)
-   {
-      x = fTest[i];
-
-      if (x < -tol)
-      {
-         if( coPenalty_ptr[i] < tol )
-         {
-#ifdef ENABLE_ADDITIONAL_CHECKS
-            MSG_WARNING( spxout << "WSTEEP02 SPxSteepPR::selectLeavePart(): coPenalty too small ("
-                                << coPenalty_ptr[i] << "), assuming epsilon (" << tol << ")!" << std::endl; )
-#endif
-
-            x = x * x / tol * p[i];
-         }
-         else
-            x = x * x / coPenalty_ptr[i] * p[i];
-
-         if (x > best * IMPROVEMENT_THRESHOLD)
-         {
-            if( count == 0 )
-               startpricing = (i + 1) % dim;
-            best = x;
-            lastIdx = i;
-            ++count;
-            end = i + IMPROVEMENT_STEPLENGTH;
-         }
-      }
-      if( i >= end || count >= MAX_PRICING_CANDIDATES )
-         goto TERMINATE;
-   }
-   assert(end >= dim);
-
-   if( count == 0 )
-      end = oldstart;
-   else
-      end -= dim;
-
-   for (int i = 0; i < oldstart; ++i)
-   {
-      x = fTest[i];
-
-      if (x < -tol)
-      {
-         if( coPenalty_ptr[i] < tol )
-         {
-#ifdef ENABLE_ADDITIONAL_CHECKS
-            MSG_WARNING( spxout << "WSTEEP02 SPxSteepPR::selectLeavePart(): coPenalty too small ("
-                                << coPenalty_ptr[i] << "), assuming epsilon (" << tol << ")!" << std::endl; )
-#endif
-            x = x * x / tol * p[i];
-         }
-         else
-            x = x * x / coPenalty_ptr[i] * p[i];
-
-         if (x > best * IMPROVEMENT_THRESHOLD)
-         {
-            if( count == 0 )
-               startpricing = (i + 1) % dim;
-            best = x;
-            lastIdx = i;
-            ++count;
-            end = i + IMPROVEMENT_STEPLENGTH;
-         }
-      }
-      if( i >= end || count >= MAX_PRICING_CANDIDATES )
-         goto TERMINATE;
-   }
-
-TERMINATE:
    return lastIdx;
 }
 

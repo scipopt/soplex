@@ -83,8 +83,6 @@ private:
    DataArray < Real > leavePref;
    /// setup type.
    Setup setup;
-   /// index at which partial pricing should start
-   int startpricing;
    /// has a refinement step already been tried?
    bool refined;
    //@}
@@ -101,8 +99,6 @@ private:
    //-------------------------------------
    /// implementation of full pricing
    int selectLeaveX(Real tol);
-   /// implementation of partial pricing
-   int selectLeavePart(Real tol);
    /// implementation of sparse pricing in the leaving Simplex
    int selectLeaveSparse(Real tol);
    /// choose the best entering index among columns and rows but prefer sparsity
@@ -126,7 +122,6 @@ public:
       : SPxPricer(name)
       , workRhs (0, 1e-16)
       , setup (mode)
-      , startpricing(0)
    {
       assert(isConsistent());
    }
@@ -143,7 +138,6 @@ public:
       , pref(old.pref)
       , leavePref(old.leavePref)
       , setup(old.setup)
-      , startpricing(old.startpricing)
    {
       assert(isConsistent());
    }
@@ -163,7 +157,6 @@ public:
          pref = rhs.pref;
          leavePref = rhs.leavePref;
          setup = rhs.setup;
-         startpricing = rhs.startpricing;
 
          assert(isConsistent());
       }

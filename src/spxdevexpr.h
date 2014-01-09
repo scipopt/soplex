@@ -51,7 +51,6 @@ private:
    DVector penalty;      ///< vector of pricing penalties.
    DVector coPenalty;    ///< vector of pricing penalties.
    bool refined;         ///< has a refinement step already been tried?
-   int startpricing;     ///< index at which partial pricing should start
    ///@}
 
    //-------------------------------------
@@ -61,8 +60,6 @@ private:
    void init(SPxSolver::Type);
    /// internal implementation of SPxPricer::selectLeave()
    int selectLeaveX(Real feastol, int start = 0, int incr = 1);
-   /// implementation of partial pricing
-   int selectLeavePart(Real feastol);
    /// implementation of sparse pricing in the leaving Simplex
    int selectLeaveSparse(Real feastol);
    /// internal implementation of SPxPricer::left4()
@@ -89,7 +86,6 @@ public:
    /// default constructor
    SPxDevexPR() 
       : SPxPricer("Devex")
-      , startpricing(0)
    {}
    /// copy constructor
    SPxDevexPR( const SPxDevexPR& old)
@@ -97,7 +93,6 @@ public:
       , last(old.last)
       , penalty(old.penalty)
       , coPenalty(old.coPenalty)
-      ,startpricing(old.startpricing)
    {}
    /// assignment operator
    SPxDevexPR& operator=( const SPxDevexPR& rhs)
@@ -108,7 +103,6 @@ public:
          last = rhs.last;
          penalty = rhs.penalty;
          coPenalty = rhs.coPenalty;
-         startpricing = rhs.startpricing;
       }
 
       return *this;
