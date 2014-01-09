@@ -457,7 +457,18 @@ public:
    void getObj(VectorBase<R>& pobj) const
    {
 
-      pobj = LPColSetBase<R>::maxObj();
+      if( isScaled )
+      {
+         for( int i = 0; i < pobj.dim(); i++ )
+         {
+            pobj[i] = lp_scaler->returnUnscaledObjVector(*this)[i];
+         }
+      }
+      else
+      {
+         pobj = LPColSetBase<R>::maxObj();
+      }
+
       if( spxSense() == MINIMIZE )
          pobj *= -1.0;
    }
@@ -465,7 +476,17 @@ public:
    /// Returns objective value of column \p i.
    R obj(int i) const
    {
-      R res = maxObj(i);
+      R res;
+
+      if( isScaled )
+      {
+         res = lp_scaler->returnUnscaledObj(*this, i);
+      }
+      else
+      {
+         res = maxObj(i);
+      }
+
       if( spxSense() == MINIMIZE )
          res *= -1;
       return res;
@@ -474,10 +495,7 @@ public:
    /// Returns objective value of column with identifier \p id.
    R obj(const SPxColId& id) const
    {
-      R res = maxObj(id);
-      if( spxSense() == MINIMIZE )
-         res *= -1;
-      return res;
+      return obj(number(id));
    }
 
    /// Returns objective vector for maximization problem.
@@ -499,7 +517,7 @@ public:
    /// Returns objective value of column with identifier \p id for maximization problem.
    const R& maxObj(const SPxColId& id) const
    {
-      return LPColSetBase<R>::maxObj(id);
+      return maxObj(number(id));
    }
 
    /// Returns upper bound vector.
