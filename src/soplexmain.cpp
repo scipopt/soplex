@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -57,7 +57,7 @@ void printVersionInfo()
 #endif
       << " [githash: " << std::setw(13) << std::setiosflags(std::ios::left) << getGitHash() << "]\n" );
 
-   MSG_INFO1( spxout << "Copyright (c) 1996-2013 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)\n\n" );
+   MSG_INFO1( spxout << "Copyright (c) 1996-2014 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)\n\n" );
 }
 
 // prints usage and command line options
