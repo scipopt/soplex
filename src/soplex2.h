@@ -1035,7 +1035,7 @@ public:
    bool setSettings(const Settings& settings, const bool quiet = false, const bool init = false);
 
    /// writes settings file; returns true on success
-   bool saveSettingsFile(const char* filename) const;
+   bool saveSettingsFile(const char* filename, const bool onlyChanged = false) const;
 
    /// reads settings file; returns true on success
    bool loadSettingsFile(const char* filename);

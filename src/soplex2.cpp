@@ -4143,7 +4143,7 @@ namespace soplex
 
 
    /// writes settings file; returns true on success
-   bool SoPlex2::saveSettingsFile(const char* filename) const
+   bool SoPlex2::saveSettingsFile(const char* filename, const bool onlyChanged) const
    {
       assert(filename != 0);
 
@@ -4156,6 +4156,9 @@ namespace soplex
 
       for( int i = 0; i < SoPlex2::BOOLPARAM_COUNT; i++ )
       {
+         if( onlyChanged && _currentSettings->_boolParamValues[i] == _currentSettings->_boolParamDefault[i] )
+            continue;
+
          file << "\n";
          file << "# " << _currentSettings->_boolParamDescription[i] << "\n";
          file << "# range {true, false}, default " << (_currentSettings->_boolParamDefault[i] ? "true\n" : "false\n");
@@ -4164,6 +4167,9 @@ namespace soplex
 
       for( int i = 0; i < SoPlex2::INTPARAM_COUNT; i++ )
       {
+         if( onlyChanged && _currentSettings->_intParamValues[i] == _currentSettings->_intParamDefault[i] )
+            continue;
+
          file << "\n";
          file << "# " << _currentSettings->_intParamDescription[i] << "\n";
          file << "# range [-2147483648,2147483647], default " << _currentSettings->_intParamDefault[i] << "\n";
@@ -4172,6 +4178,9 @@ namespace soplex
 
       for( int i = 0; i < SoPlex2::REALPARAM_COUNT; i++ )
       {
+         if( onlyChanged && _currentSettings->_realParamValues[i] == _currentSettings->_realParamDefault[i] )
+            continue;
+
          file << "\n";
          file << "# " << _currentSettings->_realParamDescription[i] << "\n";
          file << "# range [" << _currentSettings->_realParamLower[i] << "," << _currentSettings->_realParamLower[i]
@@ -4181,6 +4190,9 @@ namespace soplex
 
       for( int i = 0; i < SoPlex2::RATIONALPARAM_COUNT; i++ )
       {
+         if( onlyChanged && _currentSettings->_rationalParamValues[i] == _currentSettings->_rationalParamDefault[i] )
+            continue;
+
          file << "\n";
          file << "# " << _currentSettings->_rationalParamDescription[i] << "\n";
          file << "# range [" << _currentSettings->_rationalParamLower[i] << "," << _currentSettings->_rationalParamLower[i]
