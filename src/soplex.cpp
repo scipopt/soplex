@@ -2089,9 +2089,9 @@ namespace soplex
          _solveRational();
       }
 
-      MSG_INFO1( spxout << "\n" );
-      printShortStatistics(spxout.getStream(SPxOut::INFO1));
-      MSG_INFO1( spxout << "\n" );
+      MSG_INFO1( spxout << "\n";
+         printShortStatistics(spxout.getStream(SPxOut::INFO1));
+         spxout << "\n" );
 
       return status();
    };
