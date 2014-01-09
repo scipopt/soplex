@@ -29,6 +29,7 @@
 #include "spxscaler.h"
 #include "spxlp.h"
 #include "dsvector.h"
+#include "dvector.h"
 
 namespace soplex
 {
@@ -269,7 +270,7 @@ DSVector SPxScaler::returnUnscaledColumnVector(const SPxLP& lp, int i) const
    assert(i <= lp.nCols());
 
    DSVector result;
-   result = lp.colVector(i);
+   result = lp.LPColSet::colVector(i);
 
    int exp1;
    frexp(m_colscale[i], &exp1);
@@ -291,13 +292,13 @@ Real SPxScaler::returnUnscaledUpper(const SPxLPBase<Real>& lp, int i) const
    int exp;
    frexp(m_colscale[i], &exp);
 
-   if( lp.upper(i) < infinity )
+   if( lp.LPColSet::upper(i) < infinity )
    {
-      return ldexp(lp.upper(i) , exp - 1);
+      return ldexp(lp.LPColSet::upper(i) , exp - 1);
    }
    else
    {
-      return lp.upper(i);
+      return lp.LPColSet::upper(i);
    }
 }
 
@@ -309,13 +310,13 @@ Real SPxScaler::returnUnscaledLower(const SPxLPBase<Real>& lp, int i) const
    int exp;
    frexp(m_colscale[i], &exp);
 
-   if( lp.lower(i) > -infinity )
+   if( lp.LPColSet::lower(i) > -infinity )
    {
-      return ldexp(lp.lower(i) , exp - 1);
+      return ldexp(lp.LPColSet::lower(i) , exp - 1);
    }
    else
    {
-      return lp.lower(i);
+      return lp.LPColSet::lower(i);
    }
 }
 
@@ -327,7 +328,22 @@ Real SPxScaler::returnUnscaledObj(const SPxLPBase<Real>& lp, int i) const
    int exp;
    frexp(m_colscale[i], &exp);
 
-   return ldexp(lp.maxObj(i) , -exp + 1);
+   return ldexp(lp.LPColSet::maxObj(i) , -exp + 1);
+}
+
+/// returns unscaled objective function coefficient of \p i of LP \lp
+DVector SPxScaler::returnUnscaledObjVector(const SPxLPBase<Real>& lp) const
+{
+   int exp;
+   DVector result(lp.LPColSet::maxObj().dim());
+
+   for( int i = 0; i < lp.LPColSet::maxObj().dim(); i++)
+   {
+      frexp(m_colscale[i], &exp);
+      result[i] = ldexp(lp.LPColSet::maxObj()[i], -exp + 1);
+   }
+
+   return result;
 }
 
 /// Returns unscaled Row \p i
@@ -336,7 +352,7 @@ DSVector SPxScaler::returnUnscaledRowVector(const SPxLP& lp, int i) const
    assert(i <= lp.nRows());
 
    DSVector result;
-   result = lp.rowVector(i);
+   result = lp.LPRowSet::rowVector(i);
 
    int exp1;
    frexp(m_rowscale[i], &exp1);
@@ -358,13 +374,13 @@ Real SPxScaler::returnUnscaledRhs(const SPxLPBase<Real>& lp, int i) const
    int exp;
    frexp(m_rowscale[i], &exp);
 
-   if( lp.rhs(i) < infinity )
+   if( lp.LPRowSet::rhs(i) < infinity )
    {
-      return ldexp(lp.rhs(i) , -exp + 1);
+      return ldexp(lp.LPRowSet::rhs(i) , -exp + 1);
    }
    else
    {
-      return lp.rhs(i);
+      return lp.LPRowSet::rhs(i);
    }
 }
 
@@ -376,13 +392,13 @@ Real SPxScaler::returnUnscaledLhs(const SPxLPBase<Real>& lp, int i) const
    int exp;
    frexp(m_rowscale[i], &exp);
 
-   if( lp.lhs(i) > -infinity )
+   if( lp.LPRowSet::lhs(i) > -infinity )
    {
-      return ldexp(lp.lhs(i) , -exp + 1);
+      return ldexp(lp.LPRowSet::lhs(i) , -exp + 1);
    }
    else
    {
-      return lp.lhs(i);
+      return lp.LPRowSet::lhs(i);
    }
 }
 

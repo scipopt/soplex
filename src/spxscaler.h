@@ -27,6 +27,7 @@
 #include "svector.h"
 #include "svset.h"
 #include "dsvector.h"
+#include "dvector.h"
 
 namespace soplex
 {
@@ -120,6 +121,8 @@ public:
    virtual Real returnUnscaledLower(const SPxLPBase<Real>& lp, int i) const;
    /// returns unscaled objective function coefficient of \p i of LP \lp
    virtual Real returnUnscaledObj(const SPxLPBase<Real>& lp, int i) const;
+   /// returns unscaled objective function of LP \p lp
+   virtual DVector returnUnscaledObjVector(const SPxLPBase<Real>& lp) const;
    /// returns unscaled Row \p i of LP \p lp
    virtual DSVector returnUnscaledRowVector(const SPxLPBase<Real>& lp, int i) const;
    /// returns unscaled right hand side \p i of LP \lp
