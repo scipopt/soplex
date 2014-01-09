@@ -4186,10 +4186,15 @@ namespace soplex
          if( !readError )
             parseError = !_parseSettingsLine(line, lineNumber);
       }
+      readError = readError && !file.eof();
 
       if( readError && strlen(line) == SET_MAX_LINE_LEN - 1 )
       {
          MSG_ERROR( spxout << "Error reading settings file: line " << lineNumber << " in settings file exceeds " << SET_MAX_LINE_LEN - 2 << " characters.\n" );
+      }
+      else if( readError )
+      {
+         MSG_ERROR( spxout << "Error reading settings file: line " << lineNumber << ".\n" );
       }
 
       // stop timing
