@@ -780,14 +780,14 @@ public:
    /// values for parameter REPRESENTATION
    enum
    {
-      /// row representation (lower,lhs) <= (x,Ax) <= (upper,rhs)
-      REPRESENTATION_ROW = -1,
-
       /// automatic choice according to number of rows and columns
       REPRESENTATION_AUTO = 0,
 
       /// column representation Ax - s = 0, lower <= x <= upper, lhs <= s <= rhs
-      REPRESENTATION_COLUMN = 1
+      REPRESENTATION_COLUMN = 1,
+
+      /// row representation (lower,lhs) <= (x,Ax) <= (upper,rhs)
+      REPRESENTATION_ROW = 2
    };
 
    /// values for parameter ALGORITHM
@@ -836,10 +836,10 @@ public:
    enum
    {
       /// no simplifier
-      SIMPLIFIER_OFF = -1,
+      SIMPLIFIER_OFF = 0,
 
       /// automatic choice
-      SIMPLIFIER_AUTO = 0
+      SIMPLIFIER_AUTO = 1
    };
 
    /// values for parameter SCALER
@@ -923,26 +923,26 @@ public:
    enum
    {
       /// store only real LP
-      SYNCMODE_ONLYREAL = -1,
+      SYNCMODE_ONLYREAL = 0,
 
       /// automatic sync of real and rational LP
-      SYNCMODE_AUTO = 0,
+      SYNCMODE_AUTO = 1,
 
       /// user sync of real and rational LP
-      SYNCMODE_MANUAL = 1
+      SYNCMODE_MANUAL = 2
    };
 
    /// values for parameter SOLVEMODE
    enum
    {
       /// apply standard floating-point algorithm
-      SOLVEMODE_REAL = -1,
+      SOLVEMODE_REAL = 0,
 
       /// decide depending on tolerances whether to apply iterative refinement
-      SOLVEMODE_AUTO = 0,
+      SOLVEMODE_AUTO = 1,
 
       /// force iterative refinement
-      SOLVEMODE_RATIONAL = 1
+      SOLVEMODE_RATIONAL = 2
    };
 
    /// real parameters

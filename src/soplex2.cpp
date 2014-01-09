@@ -120,7 +120,7 @@ namespace soplex
 
             // type of computational form, i.e., column or row representation
             _intParamName[SoPlex2::REPRESENTATION] = "representation";
-            _intParamDescription[SoPlex2::REPRESENTATION] = "type of computational form (-1 - row representation, 0 - auto, 1 - column representation)";
+            _intParamDescription[SoPlex2::REPRESENTATION] = "type of computational form (0 - auto, 1 - column representation, 2 - row representation)";
             _intParamDefault[SoPlex2::REPRESENTATION] = SoPlex2::REPRESENTATION_AUTO;
 
             // type of algorithm, i.e., enter or leave
@@ -166,7 +166,7 @@ namespace soplex
 
             // type of simplifier
             _intParamName[SoPlex2::SIMPLIFIER] = "simplifier";
-            _intParamDescription[SoPlex2::SIMPLIFIER] = "simplifier (-1 - off, 0 - auto)";
+            _intParamDescription[SoPlex2::SIMPLIFIER] = "simplifier (0 - off, 1 - auto)";
             _intParamDefault[SoPlex2::SIMPLIFIER] = SoPlex2::SIMPLIFIER_AUTO;
 
             // type of scaler
@@ -191,12 +191,12 @@ namespace soplex
 
             // mode for synchronizing real and rational LP
             _intParamName[SoPlex2::SYNCMODE] = "syncmode";
-            _intParamDescription[SoPlex2::SYNCMODE] = "mode for synchronizing real and rational LP (-1 - store only real LP, 0 - auto, 1 - manual)";
+            _intParamDescription[SoPlex2::SYNCMODE] = "mode for synchronizing real and rational LP (0 - store only real LP, 1 - auto, 2 - manual)";
             _intParamDefault[SoPlex2::SYNCMODE] = SoPlex2::SYNCMODE_ONLYREAL;
 
             // mode for iterative refinement strategy
             _intParamName[SoPlex2::SOLVEMODE] = "solvemode";
-            _intParamDescription[SoPlex2::SOLVEMODE] = "mode for iterative refinement strategy (-1 - floating-point solve, 0 - auto, 1 - force iterative refinement)";
+            _intParamDescription[SoPlex2::SOLVEMODE] = "mode for iterative refinement strategy (0 - floating-point solve, 1 - auto, 2 - force iterative refinement)";
             _intParamDefault[SoPlex2::SOLVEMODE] = SoPlex2::SOLVEMODE_REAL;
 
             ///@todo define suitable values depending on Real type
