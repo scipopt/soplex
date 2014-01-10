@@ -440,9 +440,9 @@ int main(int argc, char* argv[])
 
       // read LP from input file
       lpfilename = argv[optidx];
-      MSG_INFO1( spxout << "Reading LP file <" << lpfilename << "> "
+      MSG_INFO1( spxout << "Reading "
          << (soplex.intParam(SoPlex::READMODE) == SoPlex::READMODE_REAL ? "(real)" : "(rational)")
-         << " . . .\n" );
+         << " LP file <" << lpfilename << "> . . .\n" );
 
       if( !soplex.readFile(lpfilename, &rownames, &colnames) )
       {
@@ -495,11 +495,8 @@ int main(int argc, char* argv[])
 
       if( displayStatistics )
       {
-         if( soplex.intParam(SoPlex::READMODE) == SoPlex::READMODE_REAL )
-            soplex.printStatisticsReal(std::cout);
-         else
-            soplex.printStatisticsRational(std::cout);
-
+         MSG_INFO1( spxout << "Statistics\n==========\n\n" );
+         soplex.printStatistics(spxout.getStream(SPxOut::INFO1));
          MSG_INFO1( spxout << "\n" );
       }
 

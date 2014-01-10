@@ -525,17 +525,17 @@ public:
    /// gets the Farkas proof if available; returns true on success
    bool getDualFarkasReal(VectorReal& vector);
 
-   /// gets violation of bounds by given primal solution
-   void getBoundViolationReal(VectorReal& primal, Real& maxviol, Real& sumviol) const;
+   /// gets violation of bounds; returns true on success
+   bool getBoundViolationReal(Real& maxviol, Real& sumviol);
 
-   /// gets violation of constraints by given primal solution
-   void getConstraintViolationReal(VectorReal& primal, Real& maxviol, Real& sumviol) const;
+   /// gets violation of constraints; returns true on success
+   bool getRowViolationReal(Real& maxviol, Real& sumviol);
 
-   /// gets violation of slacks
-   void getSlackViolationReal(Real& maxviol, Real& sumviol) const;
+   /// gets violation of reduced costs; returns true on success
+   bool getRedCostViolationReal(Real& maxviol, Real& sumviol);
 
-   /// gets violation of reduced costs
-   void getRedCostViolationReal(Real& maxviol, Real& sumviol) const;
+   /// gets violation of dual multipliers; returns true on success
+   bool getDualViolationReal(Real& maxviol, Real& sumviol);
 
    //@}
 
@@ -564,17 +564,17 @@ public:
    /// gets the Farkas proof if LP is infeasible; returns true on success
    bool getDualFarkasRational(VectorRational& vector);
 
-   /// gets violation of bounds by given primal solution
-   void getBoundViolationRational(VectorRational& primal, Rational& maxviol, Rational& sumviol) const;
+   /// gets violation of bounds; returns true on success
+   bool getBoundViolationRational(Rational& maxviol, Rational& sumviol);
 
-   /// gets violation of constraints by given primal solution
-   void getConstraintViolationRational(VectorRational& primal, Rational& maxviol, Rational& sumviol) const;
+   /// gets violation of constraints; returns true on success
+   bool getRowViolationRational(Rational& maxviol, Rational& sumviol);
 
-   /// gets violation of slacks
-   void getSlackViolationRational(Rational& maxviol, Rational& sumviol) const;
+   /// gets violation of reduced costs; returns true on success
+   bool getRedCostViolationRational(Rational& maxviol, Rational& sumviol);
 
-   /// gets violation of reduced costs
-   void getRedCostViolationRational(Rational& maxviol, Rational& sumviol) const;
+   /// gets violation of dual multipliers; returns true on success
+   bool getDualViolationRational(Rational& maxviol, Rational& sumviol);
 
    //@}
 
@@ -1069,11 +1069,8 @@ public:
    //**@name Statistics */
    //@{
 
-   /// prints statistics on real solution
-   void printSolutionStatisticsReal(std::ostream& os);
-
-   /// prints statistics on rational solution
-   void printSolutionStatisticsRational(std::ostream& os);
+   /// prints solution statistics
+   void printSolutionStatistics(std::ostream& os);
 
    /// prints statistics on solving process
    void printSolvingStatistics(std::ostream& os);
@@ -1081,13 +1078,10 @@ public:
    /// prints short statistics
    void printShortStatistics(std::ostream& os);
 
-   /// prints complete real statistics
-   void printStatisticsReal(std::ostream& os);
+   /// prints complete statistics
+   void printStatistics(std::ostream& os);
 
-   /// prints complete rational statistics
-   void printStatisticsRational(std::ostream& os);
-
-   /// prints rational status
+   /// prints status
    void printStatus(std::ostream& os, SPxSolver::Status status);
 
    //@}

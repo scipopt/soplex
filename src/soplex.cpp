@@ -2256,17 +2256,15 @@ namespace soplex
 
 
 
-   /// gets violation of bounds by given primal solution
-   void SoPlex::getBoundViolationReal(VectorReal& primal, Real& maxviol, Real& sumviol) const
+   /// gets violation of bounds; returns true on success
+   bool SoPlex::getBoundViolationReal(Real& maxviol, Real& sumviol)
    {
-      assert(primal.dim() >= numColsReal());
+      if( !hasPrimal() )
+         return false;
 
-      if( primal.dim() < numColsReal() )
-      {
-         maxviol = realParam(SoPlex::INFTY);
-         sumviol = realParam(SoPlex::INFTY);
-         return;
-      }
+      _syncRealSolution();
+      VectorReal& primal = _solReal._primal;
+      assert(primal.dim() == numColsReal());
 
       maxviol = 0.0;
       sumviol = 0.0;
@@ -2289,21 +2287,21 @@ namespace soplex
                maxviol = viol;
          }
       }
+
+      return true;
    }
 
 
 
-   /// gets violation of constraints
-   void SoPlex::getConstraintViolationReal(VectorReal& primal, Real& maxviol, Real& sumviol) const
+   /// gets violation of constraints; returns true on success
+   bool SoPlex::getRowViolationReal(Real& maxviol, Real& sumviol)
    {
-      assert(primal.dim() >= numColsReal());
+      if( !hasPrimal() )
+         return false;
 
-      if( primal.dim() < numColsReal() )
-      {
-         maxviol = realParam(SoPlex::INFTY);
-         sumviol = realParam(SoPlex::INFTY);
-         return;
-      }
+      _syncRealSolution();
+      VectorReal& primal = _solReal._primal;
+      assert(primal.dim() == numColsReal());
 
       DVectorReal activity = _realLP->computePrimalActivity(primal);
       maxviol = 0.0;
@@ -2327,26 +2325,116 @@ namespace soplex
                maxviol = viol;
          }
       }
+
+      return true;
    }
 
 
 
-   /// gets violation of slacks
-   ///@todo implement
-   void SoPlex::getSlackViolationReal(Real& maxviol, Real& sumviol) const
+   /// gets violation of reduced costs; returns true on success
+   bool SoPlex::getRedCostViolationReal(Real& maxviol, Real& sumviol)
    {
+      if( !hasDual() || !hasBasis() )
+         return false;
+
+      _syncRealSolution();
+      VectorReal& redcost = _solReal._redCost;
+      assert(redcost.dim() == numColsReal());
+
       maxviol = 0.0;
       sumviol = 0.0;
+
+      for( int c = numColsReal() - 1; c >= 0; c-- )
+      {
+         SPxSolver::VarStatus basisStatus = basisColStatus(c);
+
+         if( intParam(SoPlex::OBJSENSE) == OBJSENSE_MINIMIZE )
+         {
+            if( basisStatus != SPxSolver::ON_UPPER && basisStatus != SPxSolver::FIXED && redcost[c] < 0.0 )
+            {
+               sumviol += -redcost[c];
+               if( redcost[c] < -maxviol )
+                  maxviol = -redcost[c];
+            }
+            if( basisStatus != SPxSolver::ON_LOWER && basisStatus != SPxSolver::FIXED && redcost[c] > 0.0 )
+            {
+               sumviol += redcost[c];
+               if( redcost[c] > maxviol )
+                  maxviol = redcost[c];
+            }
+         }
+         else
+         {
+            if( basisStatus != SPxSolver::ON_UPPER && basisStatus != SPxSolver::FIXED && redcost[c] > 0.0 )
+            {
+               sumviol += redcost[c];
+               if( redcost[c] > maxviol )
+                  maxviol = redcost[c];
+            }
+            if( basisStatus != SPxSolver::ON_LOWER && basisStatus != SPxSolver::FIXED && redcost[c] < 0.0 )
+            {
+               sumviol += -redcost[c];
+               if( redcost[c] < -maxviol )
+                  maxviol = -redcost[c];
+            }
+         }
+      }
+
+      return true;
    }
 
 
 
-   /// gets violation of reduced costs
-   ///@todo implement
-   void SoPlex::getRedCostViolationReal(Real& maxviol, Real& sumviol) const
+   /// gets violation of dual multipliers; returns true on success
+   bool SoPlex::getDualViolationReal(Real& maxviol, Real& sumviol)
    {
+      if( !hasDual() || !hasBasis() )
+         return false;
+
+      _syncRealSolution();
+      VectorReal& dual = _solReal._dual;
+      assert(dual.dim() == numRowsReal());
+
       maxviol = 0.0;
       sumviol = 0.0;
+
+      for( int r = numRowsReal() - 1; r >= 0; r-- )
+      {
+         SPxSolver::VarStatus basisStatus = basisRowStatus(r);
+
+         if( intParam(SoPlex::OBJSENSE) == OBJSENSE_MINIMIZE )
+         {
+            if( basisStatus != SPxSolver::ON_UPPER && basisStatus != SPxSolver::FIXED && dual[r] < 0.0 )
+            {
+               sumviol += -dual[r];
+               if( dual[r] < -maxviol )
+                  maxviol = -dual[r];
+            }
+            if( basisStatus != SPxSolver::ON_LOWER && basisStatus != SPxSolver::FIXED && dual[r] > 0.0 )
+            {
+               sumviol += dual[r];
+               if( dual[r] > maxviol )
+                  maxviol = dual[r];
+            }
+         }
+         else
+         {
+            if( basisStatus != SPxSolver::ON_UPPER && basisStatus != SPxSolver::FIXED && dual[r] > 0.0 )
+            {
+               sumviol += dual[r];
+               if( dual[r] > maxviol )
+                  maxviol = dual[r];
+            }
+            if( basisStatus != SPxSolver::ON_LOWER && basisStatus != SPxSolver::FIXED && dual[r] < 0.0 )
+            {
+               sumviol += -dual[r];
+               if( dual[r] < -maxviol )
+                  maxviol = -dual[r];
+            }
+         }
+      }
+
+      return true;
    }
 
 
@@ -2462,17 +2550,19 @@ namespace soplex
 
 
 
-   /// gets violation of bounds by given primal solution
-   void SoPlex::getBoundViolationRational(VectorRational& primal, Rational& maxviol, Rational& sumviol) const
+   /// gets violation of bounds; returns true on success
+   bool SoPlex::getBoundViolationRational(Rational& maxviol, Rational& sumviol)
    {
-      assert(primal.dim() >= numColsRational());
+      if( !hasPrimal() )
+         return false;
 
-      if( primal.dim() < numColsRational() )
-      {
-         maxviol = Rational(realParam(SoPlex::INFTY));
-         sumviol = Rational(realParam(SoPlex::INFTY));
-         return;
-      }
+      // if we have to synchronize, we do not measure time, because this would affect the solving statistics
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_ONLYREAL )
+         _syncLPRational(false);
+
+      _syncRationalSolution();
+      VectorRational& primal = _solRational._primal;
+      assert(primal.dim() == numColsRational());
 
       maxviol = 0;
       sumviol = 0;
@@ -2499,17 +2589,19 @@ namespace soplex
 
 
 
-   /// gets violation of constraints
-   void SoPlex::getConstraintViolationRational(VectorRational& primal, Rational& maxviol, Rational& sumviol) const
+   /// gets violation of constraints; returns true on success
+   bool SoPlex::getRowViolationRational(Rational& maxviol, Rational& sumviol)
    {
-      assert(primal.dim() >= numColsRational());
+      if( !hasPrimal() )
+         return false;
 
-      if( primal.dim() < numColsRational() )
-      {
-         maxviol = Rational(realParam(SoPlex::INFTY));
-         sumviol = Rational(realParam(SoPlex::INFTY));
-         return;
-      }
+      // if we have to synchronize, we do not measure time, because this would affect the solving statistics
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_ONLYREAL )
+         _syncLPRational(false);
+
+      _syncRationalSolution();
+      VectorRational& primal = _solRational._primal;
+      assert(primal.dim() == numColsRational());
 
       DVectorRational activity = _rationalLP->computePrimalActivity(primal);
       maxviol = 0;
@@ -2537,22 +2629,118 @@ namespace soplex
 
 
 
-   /// gets violation of slacks
-   ///@todo implement
-   void SoPlex::getSlackViolationRational(Rational& maxviol, Rational& sumviol) const
+   /// gets violation of reduced costs; returns true on success
+   bool SoPlex::getRedCostViolationRational(Rational& maxviol, Rational& sumviol)
    {
+      if( !hasDual() || !hasBasis() )
+         return false;
+
+      // if we have to synchronize, we do not measure time, because this would affect the solving statistics
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_ONLYREAL )
+         _syncLPRational(false);
+
+      _syncRationalSolution();
+      VectorRational& redcost = _solRational._redCost;
+      assert(redcost.dim() == numColsRational());
+
       maxviol = 0;
       sumviol = 0;
+
+      for( int c = numColsReal() - 1; c >= 0; c-- )
+      {
+         SPxSolver::VarStatus basisStatus = basisColStatus(c);
+
+         if( intParam(SoPlex::OBJSENSE) == OBJSENSE_MINIMIZE )
+         {
+            if( basisStatus != SPxSolver::ON_UPPER && basisStatus != SPxSolver::FIXED && redcost[c] < 0 )
+            {
+               sumviol += -redcost[c];
+               if( redcost[c] < -maxviol )
+                  maxviol = -redcost[c];
+            }
+            if( basisStatus != SPxSolver::ON_LOWER && basisStatus != SPxSolver::FIXED && redcost[c] > 0 )
+            {
+               sumviol += redcost[c];
+               if( redcost[c] > maxviol )
+                  maxviol = redcost[c];
+            }
+         }
+         else
+         {
+            if( basisStatus != SPxSolver::ON_UPPER && basisStatus != SPxSolver::FIXED && redcost[c] > 0 )
+            {
+               sumviol += redcost[c];
+               if( redcost[c] > maxviol )
+                  maxviol = redcost[c];
+            }
+            if( basisStatus != SPxSolver::ON_LOWER && basisStatus != SPxSolver::FIXED && redcost[c] < 0 )
+            {
+               sumviol += -redcost[c];
+               if( redcost[c] < -maxviol )
+                  maxviol = -redcost[c];
+            }
+         }
+      }
+
+      return true;
    }
 
 
 
-   /// gets violation of reduced costs
-   ///@todo implement
-   void SoPlex::getRedCostViolationRational(Rational& maxviol, Rational& sumviol) const
+   /// gets violation of dual multipliers; returns true on success
+   bool SoPlex::getDualViolationRational(Rational& maxviol, Rational& sumviol)
    {
+      if( !hasDual() || !hasBasis() )
+         return false;
+
+      // if we have to synchronize, we do not measure time, because this would affect the solving statistics
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_ONLYREAL )
+         _syncLPRational(false);
+
+      _syncRationalSolution();
+      VectorRational& dual = _solRational._dual;
+      assert(dual.dim() == numRowsRational());
+
       maxviol = 0;
       sumviol = 0;
+
+      for( int r = numRowsReal() - 1; r >= 0; r-- )
+      {
+         SPxSolver::VarStatus basisStatus = basisRowStatus(r);
+
+         if( intParam(SoPlex::OBJSENSE) == OBJSENSE_MINIMIZE )
+         {
+            if( basisStatus != SPxSolver::ON_UPPER && basisStatus != SPxSolver::FIXED && dual[r] < 0 )
+            {
+               sumviol += -dual[r];
+               if( dual[r] < -maxviol )
+                  maxviol = -dual[r];
+            }
+            if( basisStatus != SPxSolver::ON_LOWER && basisStatus != SPxSolver::FIXED && dual[r] > 0 )
+            {
+               sumviol += dual[r];
+               if( dual[r] > maxviol )
+                  maxviol = dual[r];
+            }
+         }
+         else
+         {
+            if( basisStatus != SPxSolver::ON_UPPER && basisStatus != SPxSolver::FIXED && dual[r] > 0 )
+            {
+               sumviol += dual[r];
+               if( dual[r] > maxviol )
+                  maxviol = dual[r];
+            }
+            if( basisStatus != SPxSolver::ON_LOWER && basisStatus != SPxSolver::FIXED && dual[r] < 0 )
+            {
+               sumviol += -dual[r];
+               if( dual[r] < -maxviol )
+                  maxviol = -dual[r];
+            }
+         }
+      }
+
+      return true;
    }
 
 
@@ -4437,30 +4625,79 @@ namespace soplex
 
 
 
-   /// prints statistics on real solution
-   void SoPlex::printSolutionStatisticsReal(std::ostream& os)
+   /// prints solution statistics
+   void SoPlex::printSolutionStatistics(std::ostream& os)
    {
-      os << std::scientific << std::setprecision(8)
-         << "Solution           : \n"
-         << "  Value            : " << objValueReal() << "\n"
-         << "  Proven primal    : " << "?\n"
-         << "  Proven dual      : " << "?\n";
-   }
+      if( _lastSolveMode == SOLVEMODE_REAL )
+      {
+         os << std::scientific << std::setprecision(8)
+            << "Solution (real)    : \n"
+            << "  Value            : " << objValueReal() << "\n"
+            << "  Proven primal    : " << "?\n"
+            << "  Proven dual      : " << "?\n";
+      }
+      else if( _lastSolveMode == SOLVEMODE_RATIONAL )
+      {
+         os << "Solution (rational): \n"
+            << "  Objective value  : " << rationalToString(objValueRational()) << "\n"
+            << "  Proven primal    : " << "?\n"
+            << "  Proven dual      : " << "?\n";
+      }
+      else
+      {
+         os << "Solution           : \n"
+            << "  Objective value  : -\n"
+            << "  Proven primal    : -\n"
+            << "  Proven dual      : -\n";
+      }
 
+      if( intParam(SoPlex::CHECKMODE) == CHECKMODE_RATIONAL
+         || (intParam(SoPlex::CHECKMODE) == CHECKMODE_AUTO && intParam(SoPlex::READMODE) == READMODE_RATIONAL) )
+      {
+         Rational maxviol;
+         Rational sumviol;
 
+         os << "Violations (rational): \n";
+         if( getBoundViolationRational(maxviol, sumviol) )
+            os << "  Max/sum bound    : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+         else
+            os << "  Max/sum bound    : - / -\n";
+         if( getRowViolationRational(maxviol, sumviol) )
+            os << "  Max/sum row      : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+         else
+            os << "  Max/sum bound    : - / -\n";
+         if( getRedCostViolationRational(maxviol, sumviol) )
+            os << "  Max/sum redcost  : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+         else
+            os << "  Max/sum bound    : - / -\n";
+         if( getDualViolationRational(maxviol, sumviol) )
+            os << "  Max/sum dual     : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+         else
+            os << "  Max/sum bound    : - / -\n";
+      }
+      else
+      {
+         Real maxviol;
+         Real sumviol;
 
-   /// prints statistics on rational solution
-   void SoPlex::printSolutionStatisticsRational(std::ostream& os)
-   {
-      os << "Solution           : \n"
-         << "  Objective value  : " << rationalToString(objValueRational()) << "\n"
-         << "  Proven primal    : " << "?\n"
-         << "  Proven dual      : " << "?\n";
-
-      os << "Violations         : \n"
-         << "  Max. bound       : " << "?\n"
-         << "  Max. row         : " << "?\n"
-         << "  Max. dual        : " << "?\n";
+         os << "Violations (real)  : \n";
+         if( getBoundViolationReal(maxviol, sumviol) )
+            os << "  Max/sum bound    : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+         else
+            os << "  Max/sum bound    : - / -\n";
+         if( getRowViolationReal(maxviol, sumviol) )
+            os << "  Max/sum row      : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+         else
+            os << "  Max/sum bound    : - / -\n";
+         if( getRedCostViolationReal(maxviol, sumviol) )
+            os << "  Max/sum redcost  : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+         else
+            os << "  Max/sum bound    : - / -\n";
+         if( getDualViolationReal(maxviol, sumviol) )
+            os << "  Max/sum dual     : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+         else
+            os << "  Max/sum bound    : - / -\n";
+      }
    }
 
 
@@ -4485,37 +4722,21 @@ namespace soplex
 
 
 
-   /// prints complete real statistics
-   void SoPlex::printStatisticsReal(std::ostream& os)
+   /// prints complete statistics
+   void SoPlex::printStatistics(std::ostream& os)
    {
       os << std::setprecision(2);
 
       printStatus(os, _status);
 
-      os << "Real LP            : \n"
-         << "  Objective sense  : " << (intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE ? "minimize\n" : "maximize\n");
-      _realLP->printProblemStatistics(os);
+      os << "Original problem   : \n";
+      if( intParam(SoPlex::READMODE) == READMODE_REAL )
+         _realLP->printProblemStatistics(os);
+      else
+         _rationalLP->printProblemStatistics(os);
+      os << "  Objective sense  : " << (intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE ? "minimize\n" : "maximize\n");
 
-      printSolutionStatisticsReal(os);
-
-      printSolvingStatistics(os);
-   }
-
-
-
-   /// prints complete rational statistics
-   void SoPlex::printStatisticsRational(std::ostream& os)
-   {
-      os << std::setprecision(2);
-
-      printStatus(os, _status);
-
-      os << "Rational LP        : \n"
-         << "  Objective sense  : " << (intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE ? "minimize\n" : "maximize\n");
-      _rationalLP->printProblemStatistics(os);
-
-      printSolutionStatisticsRational(os);
-
+      printSolutionStatistics(os);
       printSolvingStatistics(os);
    }
 
