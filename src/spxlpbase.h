@@ -286,8 +286,6 @@ public:
       }
    }
 
-   //todo: following methods need version to return unscaled information
-
    /// Gets row vector of row \p i.
    const SVectorBase<R>& rowVector(int i) const
    {
@@ -300,22 +298,62 @@ public:
       return LPRowSetBase<R>::rowVector(id);
    }
 
+   /// Gets unscaled row vector of row \p i.
+   DSVectorBase<R> rowVectorUnscaled(int i) const
+   {
+      if( isScaled )
+         return lp_scaler->returnUnscaledRowVector(*this, i);
+      else
+         return DSVectorBase<R>(LPRowSetBase<R>::rowVector(i));
+   }
+
+   /// Gets unscaled row vector of row with identifier \p id.
+   DSVectorBase<R> rowVectorUnscaled(const SPxRowId& id) const
+   {
+      return rowVectorUnscaled(number(id));
+   }
+
    /// Returns right hand side vector.
    const VectorBase<R>& rhs() const
    {
       return LPRowSetBase<R>::rhs();
    }
 
-   ///
+   /// Returns right hand side of row number \p i.
    const R& rhs(int i) const
    {
       return LPRowSetBase<R>::rhs(i);
    }
 
+
    /// Returns right hand side of row with identifier \p id.
    const R& rhs(const SPxRowId& id) const
    {
       return LPRowSetBase<R>::rhs(id);
+   }
+
+   /// Returns unscaled right hand side vector.
+   DVectorBase<R> rhsUnscaled() const
+   {
+      if( isScaled )
+         return lp_scaler->returnUnscaledRhsVector(*this);
+      else
+         return DVectorBase<R>(LPRowSetBase<R>::rhs());
+   }
+
+   /// Returns unscaled right hand side of row number \p i.
+   R rhsUnscaled(int i) const
+   {
+      if( isScaled )
+         return lp_scaler->returnUnscaledRhs(*this, i);
+      else
+         return LPRowSetBase<R>::rhs(i);
+   }
+
+   /// Returns unscaled right hand side of row with identifier \p id.
+   R rhsUnscaled(const SPxRowId& id) const
+   {
+      return rhsUnscaled(number(id));
    }
 
    /// Returns left hand side vector.
@@ -324,7 +362,7 @@ public:
       return LPRowSetBase<R>::lhs();
    }
 
-   ///
+   /// Returns left hand side of row number \p i.
    const R& lhs(int i) const
    {
       return LPRowSetBase<R>::lhs(i);
@@ -378,6 +416,30 @@ public:
    const R& maxRowObj(const SPxRowId& id) const
    {
       return LPRowSetBase<R>::obj(id);
+   }
+
+   /// Returns unscaled left hand side vector.
+   DVectorBase<R> lhsUnscaled() const
+   {
+      if( isScaled )
+         return lp_scaler->returnUnscaledLhsVector(*this);
+      else
+         return DVectorBase<R>(LPRowSetBase<R>::lhs());
+   }
+
+   /// Returns unscaled left hand side of row number \p i.
+   R lhsUnscaled(int i) const
+   {
+      if( isScaled )
+         return lp_scaler->returnUnscaledLhs(*this,i);
+      else
+         return LPRowSetBase<R>::lhs(i);
+   }
+
+   /// Returns left hand side of row with identifier \p id.
+   R lhsUnscaled(const SPxRowId& id) const
+   {
+      return lhsUnscaled(number(id));
    }
 
    /// Returns the inequality type of the \p i'th LPRow.
@@ -453,6 +515,21 @@ public:
       return LPColSetBase<R>::colVector(id);
    }
 
+   /// Returns column vector of column \p i.
+   DSVectorBase<R> colVectorUnscaled(int i) const
+   {
+      if( isScaled )
+         return lp_scaler->returnUnscaledColumnVector(*this, i);
+      else
+         return DSVectorBase<R>(LPColSetBase<R>::colVector(i));
+   }
+
+   /// Returns column vector of column with identifier \p id.
+   DSVectorBase<R> colVectorUnscaled(const SPxColId& id) const
+   {
+      return colVectorUnscaled(number(id));
+   }
+
    /// Gets objective vector.
    void getObj(VectorBase<R>& pobj) const
    {
@@ -520,6 +597,30 @@ public:
       return maxObj(number(id));
    }
 
+   /// Returns unscaled objective vector for maximization problem.
+   DVectorBase<R> maxObjUnscaled() const
+   {
+      if( isScaled )
+         return lp_scaler->returnUnscaledObjVector(*this);
+      else
+         return DVectorBase<R>(LPColSetBase<R>::maxObj());
+   }
+
+   /// Returns unscaled objective value of column \p i for maximization problem.
+   R maxObjUnscaled(int i) const
+   {
+      if( isScaled )
+         return lp_scaler->returnUnscaledObj(*this, i);
+      else
+         return LPColSetBase<R>::maxObj(i);
+   }
+
+   /// Returns unscaled objective value of column with identifier \p id for maximization problem.
+   R maxObjUnscaled(const SPxColId& id) const
+   {
+      return maxObjUnscaled(number(id));
+   }
+
    /// Returns upper bound vector.
    const VectorBase<R>& upper() const
    {
@@ -536,6 +637,29 @@ public:
    const R& upper(const SPxColId& id) const
    {
       return LPColSetBase<R>::upper(id);
+   }
+   /// Returns unscaled upper bound vector.
+   DVectorBase<R> upperUnscaled() const
+   {
+      if( isScaled )
+         return lp_scaler->returnUnscaledUpperVector(*this);
+      else
+         return DVector(LPColSetBase<R>::upper());
+   }
+
+   /// Returns unscaled upper bound of column \p i.
+   R upperUnscaled(int i) const
+   {
+      if( isScaled )
+         return lp_scaler->returnUnscaledUpper(*this, i);
+      else
+         return LPColSetBase<R>::upper(i);
+   }
+
+   /// Returns unscaled upper bound of column with identifier \p id.
+   R upperUnscaled(const SPxColId& id) const
+   {
+      return upperUnscaled(number(id));
    }
 
    /// Returns lower bound vector.
@@ -554,6 +678,30 @@ public:
    const R& lower(const SPxColId& id) const
    {
       return LPColSetBase<R>::lower(id);
+   }
+
+   /// Returns unscaled lower bound vector.
+   DVectorBase<R> lowerUnscaled() const
+   {
+      if( isScaled )
+         return lp_scaler->returnUnscaledLowerVector(*this);
+      else
+         return DVector(LPColSetBase<R>::lower());
+   }
+
+   /// Returns unscaled lower bound of column \p i.
+   R lowerUnscaled(int i) const
+   {
+      if( isScaled )
+         return lp_scaler->returnUnscaledLower(*this, i);
+      else
+         return LPColSetBase<R>::lower(i);
+   }
+
+   /// Returns unscaled lower bound of column with identifier \p id.
+   R lowerUnscaled(const SPxColId& id) const
+   {
+      return lowerUnscaled(number(id));
    }
 
    /// Returns the optimization sense.
