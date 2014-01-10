@@ -459,6 +459,7 @@ namespace soplex
 
          // copy solution data
          _status = rhs._status;
+         _lastSolveMode = rhs._lastSolveMode;
          _basisStatusRows = rhs._basisStatusRows;
          _basisStatusCols = rhs._basisStatusCols;
 
@@ -512,9 +513,14 @@ namespace soplex
 
 
    /// copy constructor
+   ///@todo improve performance by implementing a separate copy constructor
    SoPlex::SoPlex(const SoPlex& rhs)
    {
-      ///@todo improve performance by implementing a separate copy constructor
+      // allocate memory as in default constructor
+      spx_alloc(_statistics);
+      spx_alloc(_currentSettings);
+
+      // call assignment operator
       *this = rhs;
    }
 
