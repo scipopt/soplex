@@ -413,6 +413,7 @@ namespace soplex
       spx_alloc(_currentSettings);
       _currentSettings = new (_currentSettings) Settings();
       setSettings(*_currentSettings, true, true);
+      _lastSolveMode = intParam(SoPlex::SOLVEMODE);
 
       assert(_isConsistent());
    }

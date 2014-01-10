@@ -27,6 +27,9 @@ namespace soplex
       // start timing
       _statistics->solvingTime.start();
 
+      // remember that last solve was in floating-point
+      _lastSolveMode = SOLVEMODE_REAL;
+
       // solve and store solution; if we have a starting basis, do not apply preprocessing; if we are solving from
       // scratch, apply preprocessing according to parameter settings
       _preprocessAndSolveReal(!_hasBasis);

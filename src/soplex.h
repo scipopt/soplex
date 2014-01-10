@@ -1165,6 +1165,7 @@ private:
    //@{
 
    SPxSolver::Status _status;
+   int _lastSolveMode;
 
    DataArray< SPxSolver::VarStatus > _basisStatusRows;
    DataArray< SPxSolver::VarStatus > _basisStatusCols;

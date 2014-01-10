@@ -32,6 +32,9 @@ namespace soplex
       _statistics->solvingTime.start();
       _statistics->preprocessingTime.start();
 
+      // remember that last solve was rational
+      _lastSolveMode = SOLVEMODE_RATIONAL;
+
       // ensure that the solver has the original problem
       if( !_isRealLPLoaded )
       {
