@@ -49,20 +49,14 @@ class Rational::Private
 {
 public:
 
-
-
    /// actual value of the Rational object
    mpq_t privatevalue;
-
-
 
    /// default constructor
    Private()
    {
       mpq_init(privatevalue);
    }
-
-
 
    /// copy constructor
    Private(const Private& p)
@@ -71,16 +65,12 @@ public:
       mpq_set(this->privatevalue, p.privatevalue);
    }
 
-
-
    /// copy assignment operator
    Private& operator=(const Private& p)
    {
       mpq_set(this->privatevalue, p.privatevalue);
       return *this;
    }
-
-
 
    /// constructor from long double
    Private(const long double& r)
@@ -89,16 +79,12 @@ public:
       mpq_set_d(privatevalue, double(r));
    }
 
-
-
    /// constructor from double
    Private(const double& r)
    {
       mpq_init(privatevalue);
       mpq_set_d(privatevalue, r);
    }
-
-
 
    /// constructor from int
    Private(const int& i)
@@ -107,8 +93,6 @@ public:
       mpq_set_d(privatevalue, i);
    }
 
-
-
    /// constructor from mpq_t
    Private(const mpq_t& q)
    {
@@ -116,14 +100,11 @@ public:
       mpq_set(privatevalue, q);
    }
 
-
-
    /// destructor
    ~Private()
    {
       mpq_clear(privatevalue);
    }
-
 };
 
 
@@ -1118,8 +1099,6 @@ public:
    {
    }
 
-
-
    /// copy constructor
    Private(const Private& p)
       : mpq_class()
@@ -1127,15 +1106,11 @@ public:
       *this = p;
    }
 
-
-
    /// constructor from long double
    Private(const long double& r)
       : mpq_class(double(r))
    {
    }
-
-
 
    /// constructor from double
    Private(const double& r)
@@ -1143,21 +1118,17 @@ public:
    {
    }
 
-
-
    /// constructor from int
    Private(const int& i)
       : mpq_class(i)
    {
    }
 
-
    /// constructor from mpq_class
    Private(const mpq_class& q)
       : mpq_class(q)
    {
    }
-
 
    /// constructor from mpq_t
    Private(const mpq_t& q)
@@ -1171,7 +1142,6 @@ public:
       ~__gmp_expr();
    }
    */
-
 };
 
 
@@ -2070,12 +2040,8 @@ class Rational::Private
 
 public:
 
-
-
    /// value
    long double privatevalue;
-
-
 
    /// default constructor
    Private()
@@ -2083,15 +2049,11 @@ public:
       privatevalue = 0;
    }
 
-
-
    /// copy constructor
    Private(const Private& p)
    {
       *this = p;
    }
-
-
 
    /// copy assignment operator
    Private& operator=(const Private& p)
@@ -2100,23 +2062,17 @@ public:
       return *this;
    }
 
-
-
    /// constructor from long double
    Private(const long double& r)
    {
       privatevalue = r;
    }
 
-
-
    /// constructor from double
    Private(const double& r)
    {
       privatevalue = r;
    }
-
-
 
    /// constructor from int
    Private(const int& i)
@@ -2197,7 +2153,6 @@ Rational::~Rational()
 
 /// typecasts Rational to double (allows only explicit typecast)
 Rational::operator double() const
-
 {
    return (double)this->dpointer->privatevalue;
 }
