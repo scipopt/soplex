@@ -203,6 +203,11 @@ namespace soplex
             _intParamDescription[SoPlex::SOLVEMODE] = "mode for iterative refinement strategy (0 - floating-point solve, 1 - auto, 2 - force iterative refinement)";
             _intParamDefault[SoPlex::SOLVEMODE] = SoPlex::SOLVEMODE_REAL;
 
+            // mode for iterative refinement strategy
+            _intParamName[SoPlex::CHECKMODE] = "checkmode";
+            _intParamDescription[SoPlex::CHECKMODE] = "mode for a posteriori feasibility checks (0 - floating-point check, 1 - auto, 2 - rational check)";
+            _intParamDefault[SoPlex::CHECKMODE] = SoPlex::CHECKMODE_RATIONAL;
+
             ///@todo define suitable values depending on Real type
             // general zero tolerance
             _realParamName[SoPlex::EPSILON_ZERO] = "epsilon_zero";
@@ -3904,6 +3909,19 @@ namespace soplex
          case SOLVEMODE_REAL:
          case SOLVEMODE_AUTO:
          case SOLVEMODE_RATIONAL:
+            break;
+         default:
+            return false;
+         }
+         break;
+
+      // mode for a posteriori feasibility checks; nothing to do but change the value if valid
+      case SoPlex::CHECKMODE:
+         switch( value )
+         {
+         case CHECKMODE_REAL:
+         case CHECKMODE_AUTO:
+         case CHECKMODE_RATIONAL:
             break;
          default:
             return false;

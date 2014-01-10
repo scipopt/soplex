@@ -760,8 +760,11 @@ public:
       /// mode for iterative refinement strategy
       SOLVEMODE = 17,
 
+      /// mode for a posteriori feasibility checks
+      CHECKMODE = 18,
+
       /// number of integer parameters
-      INTPARAM_COUNT = 18
+      INTPARAM_COUNT = 19
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -926,6 +929,16 @@ public:
       SYNCMODE_MANUAL = 2
    };
 
+   /// values for parameter READMODE
+   enum
+   {
+      /// standard floating-point parsing
+      READMODE_REAL = 0,
+
+      /// rational parsing
+      READMODE_RATIONAL = 1
+   };
+
    /// values for parameter SOLVEMODE
    enum
    {
@@ -939,14 +952,17 @@ public:
       SOLVEMODE_RATIONAL = 2
    };
 
-   /// values for parameter READMODE
+   /// values for parameter CHECKMODE
    enum
    {
-      /// standard floating-point parsing
-      READMODE_REAL = 0,
+      /// floating-point check
+      CHECKMODE_REAL = 0,
 
-      /// rational parsing
-      READMODE_RATIONAL = 1
+      /// decide according to READMODE
+      CHECKMODE_AUTO = 1,
+
+      /// rational check
+      CHECKMODE_RATIONAL = 2
    };
 
    /// real parameters
