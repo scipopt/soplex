@@ -141,6 +141,128 @@ void freeStrings(char*& s1, char*& s2, char*& s3, char*& s4, char*& s5)
    }
 }
 
+/// performs external feasibility check with real type
+///@todo implement external check; currently we use the internal methods for convenience
+static
+void checkSolutionReal(SoPlex& soplex)
+{
+   if( soplex.hasPrimal() )
+   {
+      Real boundviol;
+      Real rowviol;
+      Real sumviol;
+
+      if( soplex.getBoundViolationReal(boundviol, sumviol) && soplex.getRowViolationReal(rowviol, sumviol) )
+      {
+         Real maxviol = boundviol > rowviol ? boundviol : rowviol;
+         bool feasible = maxviol < soplex.rationalParam(SoPlex::FEASTOL);
+         MSG_INFO1( spxout << "Primal solution " << (feasible ? "feasible" : "infeasible")
+            << " in original problem (max. violation = " << maxviol << ").\n" );
+      }
+      else
+      {
+         MSG_INFO1( spxout << "Could not check primal solution.\n" );
+      }
+   }
+   else
+   {
+      MSG_INFO1( spxout << "No primal solution available.\n" );
+   }
+
+   if( soplex.hasDual() )
+   {
+      Real redcostviol;
+      Real dualviol;
+      Real sumviol;
+
+      if( soplex.getRedCostViolationReal(redcostviol, sumviol) && soplex.getDualViolationReal(dualviol, sumviol) )
+      {
+         Real maxviol = redcostviol > dualviol ? redcostviol : dualviol;
+         bool feasible = maxviol < soplex.rationalParam(SoPlex::OPTTOL);
+         MSG_INFO1( spxout << "Dual solution " << (feasible ? "feasible" : "infeasible")
+            << " in original problem (max. violation = " << maxviol << ").\n" );
+      }
+      else
+      {
+         MSG_INFO1( spxout << "Could not check dual solution.\n" );
+      }
+   }
+   else
+   {
+      MSG_INFO1( spxout << "No dual solution available.\n" );
+   }
+}
+
+/// performs external feasibility check with rational type
+///@todo implement external check; currently we use the internal methods for convenience
+static
+void checkSolutionRational(SoPlex& soplex)
+{
+   if( soplex.hasPrimal() )
+   {
+      Rational boundviol;
+      Rational rowviol;
+      Rational sumviol;
+
+      if( soplex.getBoundViolationRational(boundviol, sumviol) && soplex.getRowViolationRational(rowviol, sumviol) )
+      {
+         Rational maxviol = boundviol > rowviol ? boundviol : rowviol;
+         bool feasible = maxviol < soplex.rationalParam(SoPlex::FEASTOL);
+         MSG_INFO1( spxout << "Primal solution " << (feasible ? "feasible" : "infeasible")
+            << " in original problem (max. violation = " << maxviol << ").\n" );
+      }
+      else
+      {
+         MSG_INFO1( spxout << "Could not check primal solution.\n" );
+      }
+   }
+   else
+   {
+      MSG_INFO1( spxout << "No primal solution available.\n" );
+   }
+
+   if( soplex.hasDual() )
+   {
+      Rational redcostviol;
+      Rational dualviol;
+      Rational sumviol;
+
+      if( soplex.getRedCostViolationRational(redcostviol, sumviol) && soplex.getDualViolationRational(dualviol, sumviol) )
+      {
+         Rational maxviol = redcostviol > dualviol ? redcostviol : dualviol;
+         bool feasible = maxviol < soplex.rationalParam(SoPlex::OPTTOL);
+         MSG_INFO1( spxout << "Dual solution " << (feasible ? "feasible" : "infeasible")
+            << " in original problem (max. violation = " << maxviol << ").\n" );
+      }
+      else
+      {
+         MSG_INFO1( spxout << "Could not check dual solution.\n" );
+      }
+   }
+   else
+   {
+      MSG_INFO1( spxout << "No dual solution available.\n" );
+   }
+}
+
+/// performs external feasibility check according to check mode
+static
+void checkSolution(SoPlex& soplex)
+{
+   if( soplex.intParam(SoPlex::CHECKMODE) == SoPlex::CHECKMODE_RATIONAL
+      || (soplex.intParam(SoPlex::CHECKMODE) == SoPlex::CHECKMODE_AUTO
+         && soplex.intParam(SoPlex::READMODE) == SoPlex::READMODE_RATIONAL) )
+   {
+      checkSolutionRational(soplex);
+   }
+   else
+   {
+      checkSolutionReal(soplex);
+   }
+
+   MSG_INFO1( spxout << "\n" );
+}
+
 /// runs SoPlex command line
 int main(int argc, char* argv[])
 {
@@ -489,15 +611,12 @@ int main(int argc, char* argv[])
       }
 
       if( checkSol )
-      {
-         ///@todo
-      }
+         checkSolution(soplex);
 
       if( displayStatistics )
       {
          MSG_INFO1( spxout << "Statistics\n==========\n\n" );
          soplex.printStatistics(spxout.getStream(SPxOut::INFO1));
-         MSG_INFO1( spxout << "\n" );
       }
 
       // write basis file if specified

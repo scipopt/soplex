@@ -2591,6 +2591,8 @@ namespace soplex
                maxviol = viol;
          }
       }
+
+      return true;
    }
 
 
@@ -2631,6 +2633,8 @@ namespace soplex
                maxviol = viol;
          }
       }
+
+      return true;
    }
 
 
