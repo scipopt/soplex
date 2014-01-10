@@ -1336,10 +1336,10 @@ private:
    bool _readFileRational(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
 
    /// synchronizes real LP with rational LP, i.e., copies (rounded) rational LP into real LP, without looking at the sync mode
-   void _syncLPReal();
+   void _syncLPReal(bool time = true);
 
    /// synchronizes rational LP with real LP, i.e., copies real LP to rational LP, without looking at the sync mode
-   void _syncLPRational();
+   void _syncLPRational(bool time = true);
 
    /// synchronizes real solution with rational solution, i.e., copies real solution to rational solution
    void _syncRealSolution();

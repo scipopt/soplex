@@ -5896,10 +5896,11 @@ namespace soplex
 
 
    /// synchronizes real LP with rational LP, i.e., copies (rounded) rational LP into real LP, without looking at the sync mode
-   void SoPlex::_syncLPReal()
+   void SoPlex::_syncLPReal(bool time)
    {
       // start timing
-      _statistics->syncTime.start();
+      if( time )
+         _statistics->syncTime.start();
 
       // copy LP
       if( _isRealLPLoaded )
@@ -5915,16 +5916,18 @@ namespace soplex
       _hasSolReal = false;
 
       // stop timing
-      _statistics->syncTime.stop();
+      if( time )
+         _statistics->syncTime.stop();
    }
 
 
 
    /// synchronizes rational LP with real LP, i.e., copies real LP to rational LP, without looking at the sync mode
-   void SoPlex::_syncLPRational()
+   void SoPlex::_syncLPRational(bool time)
    {
       // start timing
-      _statistics->syncTime.start();
+      if( time )
+         _statistics->syncTime.start();
 
       // copy LP
       _ensureRationalLP();
@@ -5935,7 +5938,8 @@ namespace soplex
       _hasSolRational = false;
 
       // stop timing
-      _statistics->syncTime.stop();
+      if( time )
+         _statistics->syncTime.stop();
    }
 
 
