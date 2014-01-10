@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -414,7 +414,6 @@ public:
    /// sets basis SPxStatus to \p stat.
    void setStatus(SPxStatus stat)
    {
-      METHOD( "SPxBasis::setStatus()" );
 
       if( thestatus != stat )
       {
@@ -550,6 +549,9 @@ public:
     */
    Vector& multBaseWith(Vector& x) const;
 
+   /// Basis-vector product
+   void multBaseWith(SSVector& x, SSVector& result) const;
+
    /// Vector-basis product.
    /** Depending on the representation, for a #SPxBasis B,
        B.multWithBase(x) computes
@@ -561,11 +563,26 @@ public:
     */
    Vector& multWithBase(Vector& x) const;
 
+   /// Vector-basis product
+   void multWithBase(SSVector& x, SSVector& result) const;
+
    /* compute an estimated condition number for the current basis matrix
     * by computing estimates of the norms of B and B^-1 using the power method.
     * maxiters and tolerance control the accuracy of the estimate.
     */
    Real condition(int maxiters = 10, Real tolerance = 1e-6);
+
+   /* wrapper to compute an estimate of the condition number of the current basis matrix */
+   Real getEstimatedCondition()
+   {
+      return condition(20, 1e-6);
+   }
+
+   /* wrapper to compute the exact condition number of the current basis matrix */
+   Real getExactCondition()
+   {
+      return condition(1000, 1e-9);
+   }
 
    /// returns the stability of the basis matrix.
    Real stability() const
@@ -575,7 +592,6 @@ public:
    ///
    void solve(Vector& x, const Vector& rhs)
    {
-      METHOD( "SPxBasis::solve()" );
       if (!factorized) 
          SPxBasis::factorize();
       factor->solveRight(x, rhs);
@@ -583,7 +599,6 @@ public:
    ///
    void solve(SSVector& x, const SVector& rhs)
    {
-      METHOD( "SPxBasis::solve()" );
       if (!factorized) 
          SPxBasis::factorize();
       factor->solveRight(x, rhs);
@@ -600,7 +615,6 @@ public:
     */
    void solve4update(SSVector& x, const SVector& rhs)
    {
-      METHOD( "SPxBasis::solve4update()" );
       if (!factorized) 
          SPxBasis::factorize();
       factor->solveRight4update(x, rhs);
@@ -608,7 +622,6 @@ public:
    /// solves two systems in one call.
    void solve4update(SSVector& x, Vector& y, const SVector& rhsx, SSVector& rhsy)
    {
-      METHOD( "SPxBasis::solve4update()" );
       if (!factorized) 
          SPxBasis::factorize();
       factor->solve2right4update(x, y, rhsx, rhsy);
@@ -617,7 +630,6 @@ public:
    void solve4update(SSVector& x, Vector& y, Vector& y2,
                      const SVector& rhsx, SSVector& rhsy, SSVector& rhsy2)
    {
-      METHOD( "SPxBasis::solve4update()" );
       if (!factorized) 
          SPxBasis::factorize();
       assert(rhsy.isSetup());
@@ -637,7 +649,6 @@ public:
     */
    void coSolve(Vector& x, const Vector& rhs)
    {
-      METHOD( "SPxBasis::coSolve()" );
       if (!factorized) 
          SPxBasis::factorize();
       factor->solveLeft(x, rhs);
@@ -645,7 +656,6 @@ public:
    ///
    void coSolve(SSVector& x, const SVector& rhs)
    {
-      METHOD( "SPxBasis::coSolve()" );
       if (!factorized) 
          SPxBasis::factorize();
       factor->solveLeft(x, rhs);
@@ -653,7 +663,6 @@ public:
    /// solves two systems in one call.
    void coSolve(SSVector& x, Vector& y, const SVector& rhsx, SSVector& rhsy)
    {
-      METHOD( "SPxBasis::coSolve()" );
       if (!factorized) 
          SPxBasis::factorize();
       factor->solveLeft(x, y, rhsx, rhsy);
@@ -661,7 +670,6 @@ public:
    /// solves three systems in one call. May be improved by using just one pass through the basis.
    void coSolve(SSVector& x, Vector& y, Vector& z, const SVector& rhsx, SSVector& rhsy, SSVector& rhsz)
    {
-      METHOD( "SPxBasis::coSolve()" );
       if (!factorized)
          SPxBasis::factorize();
       factor->solveLeft(x, y, z, rhsx, rhsy, rhsz);
@@ -771,7 +779,6 @@ public:
    /// unloads the LP from the basis.
    virtual void unLoad()
    {
-      METHOD( "SPxBasis::unLoad()" );
       theLP = 0;
       setStatus(NO_PROBLEM);
    }
@@ -875,12 +882,3 @@ std::ostream& operator<<( std::ostream& os,
 
 } // namespace soplex
 #endif // _SPXBASIS_H_
-
-//-----------------------------------------------------------------------------
-//Emacs Local Variables:
-//Emacs mode:c++
-//Emacs c-basic-offset:3
-//Emacs tab-width:8
-//Emacs indent-tabs-mode:nil
-//Emacs End:
-//-----------------------------------------------------------------------------

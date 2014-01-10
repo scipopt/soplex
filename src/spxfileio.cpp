@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -28,7 +28,6 @@ bool SPxSolver::readBasisFile(
    const NameSet* rowNames,
    const NameSet* colNames)
 {
-   METHOD( "SPxSolver::readBasisFile()" );
 
    spxifstream file(filename);
 
@@ -43,7 +42,6 @@ bool SPxSolver::writeBasisFile
      const NameSet* rowNames,
      const NameSet* colNames ) const
 {
-   METHOD( "SPxSolver::writeBasisFile()" );
    std::ofstream file(filename);
 
    if (!file)
@@ -55,12 +53,3 @@ bool SPxSolver::writeBasisFile
 }
 
 } // namespace soplex
-
-//-----------------------------------------------------------------------------
-//Emacs Local Variables:
-//Emacs mode:c++
-//Emacs c-basic-offset:3
-//Emacs tab-width:8
-//Emacs indent-tabs-mode:nil
-//Emacs End:
-//-----------------------------------------------------------------------------

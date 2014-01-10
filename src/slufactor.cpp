@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -42,7 +42,6 @@ namespace soplex
  
 void SLUFactor::solveRight(Vector& x, const Vector& b) //const
 {
-   METHOD( "SLUFactor::solveRight()" );
 
    solveTime.start();
 
@@ -55,7 +54,6 @@ void SLUFactor::solveRight(Vector& x, const Vector& b) //const
 
 void SLUFactor::solveRight(SSVector& x, const SVector& b) //const
 {
-   METHOD( "SLUFactor::solveRight()" );
 
    solveTime.start();
 
@@ -69,7 +67,6 @@ void SLUFactor::solveRight(SSVector& x, const SVector& b) //const
 
 void SLUFactor::solveRight4update(SSVector& x, const SVector& b)
 {
-   METHOD( "SLUFactor::solveRight4update()" );
 
    solveTime.start();
 
@@ -112,7 +109,6 @@ void SLUFactor::solve2right4update(
    const SVector& b,
    SSVector&      rhs)
 {
-   METHOD( "SLUFactor::solve2right4update()" );
 
    solveTime.start();
 
@@ -164,7 +160,6 @@ void SLUFactor::solve3right4update(
    SSVector&      rhs,
    SSVector&      rhs2)
 {
-   METHOD( "SLUFactor::solve3right4update()" );
 
    solveTime.start();
 
@@ -216,7 +211,6 @@ void SLUFactor::solve3right4update(
 
 void SLUFactor::solveLeft(Vector& x, const Vector& b) //const
 {
-   METHOD( "SLUFactor::solveLeft()" );
 
    solveTime.start();
 
@@ -231,7 +225,6 @@ void SLUFactor::solveLeft(Vector& x, const Vector& b) //const
 
 void SLUFactor::solveLeft(SSVector& x, const SVector& b) //const
 {
-   METHOD( "SLUFactor::solveLeft()" );
 
    solveTime.start();
 
@@ -263,7 +256,6 @@ void SLUFactor::solveLeft(
    const SVector& rhs1,
    SSVector&      rhs2) //const
 {
-   METHOD( "SLUFactor::solveLeft()" );
 
    solveTime.start();
 
@@ -304,7 +296,6 @@ void SLUFactor::solveLeft(
    SSVector&      rhs2,
    SSVector&      rhs3)
 {
-   METHOD( "SLUFactor::solveLeft()" );
 
    solveTime.start();
 
@@ -337,7 +328,6 @@ void SLUFactor::solveLeft(
 
 Real SLUFactor::stability() const
 {
-   METHOD( "SLUFactor::stability()" );
 
    if (status() != OK)
       return 0;
@@ -361,7 +351,6 @@ std::string SLUFactor::statistics() const
 
 void SLUFactor::changeEta(int idx, SSVector& et)
 {
-   METHOD( "SLUFactor::changeEta()" );
 
    int es = et.size(); // see altValues()
    update(idx, et.altValues(), et.altIndexMem(), es);
@@ -374,7 +363,6 @@ SLUFactor::Status SLUFactor::change(
    const SVector&  subst,
    const SSVector* e)
 {
-   METHOD( "SLUFactor::change()" );
 
    // BH 2005-08-23: The boolean usetup indicates that an "update vector" 
    // has been set up. I suppose that SSVector forest is this
@@ -435,7 +423,6 @@ SLUFactor::Status SLUFactor::change(
 
 void SLUFactor::clear()
 {
-   METHOD( "SLUFactor::clear()" );
 
    rowMemMult    = 5;          /* factor of minimum Memory * #of nonzeros */
    colMemMult    = 5;          /* factor of minimum Memory * #of nonzeros */
@@ -515,7 +502,6 @@ void SLUFactor::clear()
  */
 void SLUFactor::assign(const SLUFactor& old)
 {
-   METHOD( "SLUFactor::operator=()" );
 
    // slufactor
    uptype        = old.uptype;
@@ -709,7 +695,6 @@ void SLUFactor::assign(const SLUFactor& old)
 
 SLUFactor& SLUFactor::operator=(const SLUFactor& old)
 {
-   METHOD( "SLUFactor::operator=()" );
 
    if (this != &old)
    {
@@ -745,7 +730,6 @@ SLUFactor::SLUFactor()
    , forest (1)
    , minThreshold (0.01)
 {
-   METHOD( "SLUFactor::SLUFactor()" );
    row.perm    = 0;
    row.orig    = 0;
    col.perm    = 0;
@@ -918,7 +902,6 @@ SLUFactor::SLUFactor(const SLUFactor& old)
 
 void SLUFactor::freeAll()
 {
-   METHOD( "SLUFactor::freeAll()" );
 
    if(row.perm) spx_free(row.perm);
    if(row.orig) spx_free(row.orig);
@@ -954,7 +937,6 @@ void SLUFactor::freeAll()
 
 SLUFactor::~SLUFactor()
 {
-   METHOD( "SLUFactor::~SLUFactor()" );
    freeAll();
 }
 
@@ -976,7 +958,6 @@ static Real betterThreshold(Real th)
 
 SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
 {
-   METHOD( "SLUFactor::Status()" );
    assert(dm     >= 0);
    assert(matrix != 0);
 
@@ -1110,7 +1091,6 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
 bool SLUFactor::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-   METHOD( "SLUFactor::isConsistent()" );
    return CLUFactor::isConsistent();
 #else
    return true;
@@ -1119,16 +1099,6 @@ bool SLUFactor::isConsistent() const
 
 void SLUFactor::dump() const
 {
-   METHOD( "SLUFactor::dump()" );
    CLUFactor::dump();
 }
 } // namespace soplex
-
-//-----------------------------------------------------------------------------
-//Emacs Local Variables:
-//Emacs mode:c++
-//Emacs c-basic-offset:3
-//Emacs tab-width:8
-//Emacs indent-tabs-mode:nil
-//Emacs End:
-//-----------------------------------------------------------------------------

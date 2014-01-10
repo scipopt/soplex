@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -33,7 +33,6 @@ namespace soplex
  */
 void SPxSolver::setPrimalBounds()
 {
-   METHOD( "SPxSolver::setPrimalBounds()" );
 
    theUCbound = SPxLP::upper();
    theLCbound = SPxLP::lower();
@@ -81,7 +80,6 @@ void SPxSolver::clearDualBounds(
    Real&                  upp,
    Real&                  lw) const
 {
-   METHOD( "SPxSolver::clearDualBounds()" );
 
    switch (stat)
    {
@@ -106,7 +104,6 @@ void SPxSolver::clearDualBounds(
 
 void SPxSolver::setDualColBounds()
 {
-   METHOD( "SPxSolver::setDualColBounds()" );
 
    assert(rep() == COLUMN);
 
@@ -137,7 +134,6 @@ void SPxSolver::setDualColBounds()
 
 void SPxSolver::setDualRowBounds()
 {
-   METHOD( "SPxSolver::setDualRowBounds()" );
 
    assert(rep() == ROW);
 
@@ -170,7 +166,6 @@ void SPxSolver::setDualRowBounds()
  */
 void SPxSolver::setEnterBound4Row(int i, int n)
 {
-   METHOD( "SPxSolver::setEnterBound4Row()" );
    assert(baseId(i).isSPxRowId());
    assert(number(SPxRowId(baseId(i))) == n);
    switch (desc().rowStatus(n))
@@ -193,7 +188,6 @@ void SPxSolver::setEnterBound4Row(int i, int n)
 
 void SPxSolver::setEnterBound4Col(int i, int n)
 {
-   METHOD( "SPxSolver::setEnterBound4Col()" );
    assert(baseId(i).isSPxColId());
    assert(number(SPxColId(baseId(i))) == n);
    switch (desc().colStatus(n))
@@ -216,7 +210,6 @@ void SPxSolver::setEnterBound4Col(int i, int n)
 
 void SPxSolver::setEnterBounds()
 {
-   METHOD( "SPxSolver::setEnterBounds()" );
 
    for (int i = 0; i < dim(); ++i)
    {
@@ -237,7 +230,6 @@ void SPxSolver::setEnterBounds()
  */
 void SPxSolver::setLeaveBound4Row(int i, int n)
 {
-   METHOD( "SPxSolver::setLeaveBound4Row()" );
    assert(baseId(i).isSPxRowId());
    assert(number(SPxRowId(baseId(i))) == n);
    switch (desc().rowStatus(n))
@@ -269,7 +261,6 @@ void SPxSolver::setLeaveBound4Row(int i, int n)
 
 void SPxSolver::setLeaveBound4Col(int i, int n)
 {
-   METHOD( "SPxSolver::setLeaveBound4Col()" );
 
    assert(baseId(i).isSPxColId());
    assert(number(SPxColId(baseId(i))) == n);
@@ -301,7 +292,6 @@ void SPxSolver::setLeaveBound4Col(int i, int n)
 
 void SPxSolver::setLeaveBounds()
 {
-   METHOD( "SPxSolver::setLeaveBounds()" );
 
    for (int i = 0; i < dim(); ++i)
    {
@@ -316,7 +306,6 @@ void SPxSolver::setLeaveBounds()
 
 void SPxSolver::testBounds() const
 {
-   METHOD( "SPxSolver::testBounds()" );
 
    if (type() == ENTER)
    {
@@ -412,12 +401,3 @@ void SPxSolver::testBounds() const
    }
 }
 } // namespace soplex
-
-//-----------------------------------------------------------------------------
-//Emacs Local Variables:
-//Emacs mode:c++
-//Emacs c-basic-offset:3
-//Emacs tab-width:8
-//Emacs indent-tabs-mode:nil
-//Emacs End:
-//-----------------------------------------------------------------------------

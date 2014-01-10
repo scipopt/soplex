@@ -19,7 +19,7 @@ echo "LASTYEAR = $LASTYEAR"
 
 DIRECTORIES=(check doc src tests extra)
 EXTENSIONS=(sh awk h c hpp cpp)
-EXTRAFILES=(Makefile INSTALL extra/lpconv.cpp extra/lpstat.cpp)
+EXTRAFILES=(Makefile INSTALL make/make.install make/make.detecthost)
 
 for DIRECTORY in ${DIRECTORIES[@]}
 do
@@ -32,7 +32,7 @@ do
     do
       if test -f $FILE
       then
-	  # check if the file has a correct old copyright 
+	  # check if the file has a correct old copyright
 	  COUNT=`grep -c 1997- $FILE`
 
 	  if test "$COUNT" != 0
@@ -43,7 +43,7 @@ do
 	      continue
 	  fi
 
-	  # check if the file has already the new copyright 
+	  # check if the file has already the new copyright
 	  COUNT1=`grep -c "1996\-$NEWYEAR" $FILE`
 	  COUNT2=`grep -c "1996\-$LASTYEAR" $FILE`
 
@@ -55,10 +55,8 @@ do
 	      else
 		  echo "- $FILE updated"
 	      fi
-  
-	      mv $FILE $FILE.olddate
-	      sed 's!1996-'$LASTYEAR'!1996-'$NEWYEAR'!g' $FILE.olddate > $FILE
-	      rm $FILE.olddate
+
+	      sed -i 's!1996-'$LASTYEAR'!1996-'$NEWYEAR'!g' $FILE
 	  else
 	      echo "- $FILE already up to date"
 	      continue
@@ -68,3 +66,41 @@ do
   done
 done
 
+echo ""
+echo "Updating additional files.."
+
+for FILE in ${EXTRAFILES[@]}
+do
+  if test -f $FILE
+  then
+      # check if the file has a correct old copyright
+      COUNT=`grep -c 1997- $FILE`
+
+      if test "$COUNT" != 0
+      then
+         # post those files which have a wrong old copyright
+         echo "COPYRIGHT ERROR --------------------> $FILE"
+         grep "1997-" $FILE
+         continue
+      fi
+
+      # check if the file has already the new copyright
+      COUNT1=`grep -c "1996\-$NEWYEAR" $FILE`
+      COUNT2=`grep -c "1996\-$LASTYEAR" $FILE`
+
+      if test "$COUNT2" != 0
+      then
+         if test "$COUNT1" == "$COUNT2"
+         then
+            echo "- $FILE PARTIALLY UP TO DATE, updating completely"
+         else
+            echo "- $FILE updated"
+         fi
+
+         sed -i 's!1996-'$LASTYEAR'!1996-'$NEWYEAR'!g' $FILE
+      else
+         echo "- $FILE already up to date"
+         continue
+      fi
+  fi
+done

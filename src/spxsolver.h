@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -76,7 +76,7 @@ class SPxStarter;
 */
 class SPxSolver : public SPxLP, protected SPxBasis
 {
-   friend class SoPlex2;
+   friend class SoPlex;
    friend class SPxFastRT;
    friend class SPxBoundFlippingRT;
 
@@ -355,8 +355,6 @@ public:
    int      sparsityThresholdLeave;    ///< maximum number of infeasibilities that is considered sparse for leaving Simplex
    int      sparsityThresholdEnter;    ///< maximum number of infeasibilities that is considered sparse for entering Simplex (dim)
    int      sparsityThresholdEnterCo;  ///< maximum number of infeasibilities that is considered sparse for entering Simplex (coDim)
-
-   bool     partialPricing;            ///< enables partial (= incomplete) pricing in leaving Simplex
 
    //-----------------------------
    /**@name Access */
@@ -669,11 +667,6 @@ public:
    void setOpttol(Real d);
    /// set parameter \p delta, i.e., set \p feastol and \p opttol to same value.
    void setDelta(Real d);
-   /// enable or disable partial pricing
-   void setPartialPricing( bool p )
-   {
-      partialPricing = p;
-   }
 
    /** SPxSolver considers a Simplex step as degenerate if the
     *  steplength does not exceed #epsilon(). Cycling occurs if only
@@ -1942,12 +1935,3 @@ std::ostream& operator<<( std::ostream& os,
 
 } // namespace soplex
 #endif // _SPXSOLVER_H_
-
-//-----------------------------------------------------------------------------
-//Emacs Local Variables:
-//Emacs mode:c++
-//Emacs c-basic-offset:3
-//Emacs tab-width:8
-//Emacs indent-tabs-mode:nil
-//Emacs End:
-//-----------------------------------------------------------------------------

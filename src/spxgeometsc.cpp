@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -53,14 +53,12 @@ SPxGeometSC& SPxGeometSC::operator=(const SPxGeometSC& rhs)
 
 Real SPxGeometSC::computeScale(Real mini, Real maxi) const
 {
-   METHOD( "SPxGeometSC::computeScale()" );
 
    return sqrt(mini * maxi);
 }
 
 void SPxGeometSC::scale(SPxLP& lp) 
 {
-   METHOD( "SPxGeometSC::scale()" );
 
    MSG_INFO1( spxout << "IGEOSC01 Geometric scaling LP" << std::endl; )
 
@@ -148,15 +146,3 @@ void SPxGeometSC::scale(SPxLP& lp)
 }
 
 } // namespace soplex
-
-//-----------------------------------------------------------------------------
-//Emacs Local Variables:
-//Emacs mode:c++
-//Emacs c-basic-offset:3
-//Emacs tab-width:8
-//Emacs indent-tabs-mode:nil
-//Emacs End:
-//-----------------------------------------------------------------------------
-
-
-

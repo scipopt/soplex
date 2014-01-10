@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -20,7 +20,7 @@
 #include <sstream>
 
 #include "spxdefines.h"
-#include "soplex2.h"
+#include "soplex.h"
 #include "spxpricer.h"
 #include "spxratiotester.h"
 #include "spxstarter.h"
@@ -34,7 +34,6 @@ namespace soplex
 bool SPxSolver::read(std::istream& in, NameSet* rowNames, 
                   NameSet* colNames, DIdxSet* intVars)
 {
-   METHOD( "SPxSolver::read()" );
    clear();
    unInit();
    unLoad();
@@ -55,7 +54,6 @@ bool SPxSolver::read(std::istream& in, NameSet* rowNames,
 
 void SPxSolver::reLoad()
 {
-   METHOD( "SPxSolver::reLoad()" );
    unInit();
    unLoad();
    theLP = this;
@@ -67,7 +65,6 @@ void SPxSolver::reLoad()
 
 void SPxSolver::loadLP(const SPxLP& lp)
 {
-   METHOD( "SPxSolver::loadLP()" );
    clear();
    unInit();
    unLoad();
@@ -82,13 +79,11 @@ void SPxSolver::loadLP(const SPxLP& lp)
 
 void SPxSolver::setSolver(SLinSolver* slu, const bool destroy)
 {
-   METHOD( "SPxSolver::setSolver()" );
    SPxBasis::loadSolver(slu, destroy);
 }
 
 void SPxSolver::loadBasis(const SPxBasis::Desc& p_desc)
 {
-   METHOD( "SPxSolver::loadBasis()" );
    unInit();
    if (SPxBasis::status() == SPxBasis::NO_PROBLEM)
       SPxBasis::load(this);
@@ -98,7 +93,6 @@ void SPxSolver::loadBasis(const SPxBasis::Desc& p_desc)
 
 void SPxSolver::setPricer(SPxPricer* x, const bool destroy)
 {
-   METHOD( "SPxSolver::setPricer()" );
    
    assert(!freePricer || thepricer != 0);
 
@@ -126,7 +120,6 @@ void SPxSolver::setPricer(SPxPricer* x, const bool destroy)
 
 void SPxSolver::setTester(SPxRatioTester* x, const bool destroy)
 {
-   METHOD( "SPxSolver::setTester()" );
 
    assert(!freeRatioTester || theratiotester != 0);
 
@@ -153,7 +146,6 @@ void SPxSolver::setTester(SPxRatioTester* x, const bool destroy)
 
 void SPxSolver::setStarter(SPxStarter* x, const bool destroy)
 {
-   METHOD( "SPxSolver::setStarter()" );
 
    assert(!freeStarter || thestarter != 0);
 
@@ -169,7 +161,6 @@ void SPxSolver::setStarter(SPxStarter* x, const bool destroy)
 
 void SPxSolver::setType(Type tp)
 {
-   METHOD( "SPxSolver::setType()" );
 
    if (theType != tp)
    {
@@ -197,7 +188,6 @@ void SPxSolver::setType(Type tp)
 
 void SPxSolver::initRep(Representation p_rep)
 {
-   METHOD( "SPxSolver::initRep()" );
 
    theRep = p_rep;
 
@@ -254,7 +244,6 @@ void SPxSolver::initRep(Representation p_rep)
 
 void SPxSolver::setRep(Representation p_rep)
 {
-   METHOD( "SPxSolver::setRep()" );
 
    if (p_rep != theRep)
       initRep(p_rep);
@@ -263,7 +252,6 @@ void SPxSolver::setRep(Representation p_rep)
 // needed for strongbranching. use carefully
 void SPxSolver::reinitializeVecs()
 {
-   METHOD( "SPxSolver::reinitializeVecs" );
    
    initialized = true;
 
@@ -310,7 +298,6 @@ void SPxSolver::reinitializeVecs()
 
 void SPxSolver::init()
 {
-   METHOD( "SPxSolver::init()" );
 
    assert(thepricer      != 0);
    assert(theratiotester != 0);
@@ -422,7 +409,6 @@ void SPxSolver::init()
 
 void SPxSolver::setPricing(Pricing pr)
 {
-   METHOD( "SPxSolver::setPricing()" );
    thePricing = pr;
    if (initialized && type() == ENTER)
    {
@@ -438,7 +424,6 @@ void SPxSolver::setPricing(Pricing pr)
  */
 void SPxSolver::reDim()
 {
-   METHOD( "SPxSolver::reDim()" );
 
    int newsize = SPxLP::nCols() > SPxLP::nRows() ? SPxLP::nCols() : SPxLP::nRows();
 
@@ -473,7 +458,6 @@ void SPxSolver::reDim()
 
 void SPxSolver::clear()
 {
-   METHOD( "SPxSolver::clear()" );
    unitVecs.reSize(0);
 
    dualRhs.clear();
@@ -501,7 +485,6 @@ void SPxSolver::clear()
 
 void SPxSolver::clearUpdateVecs(void)
 {
-   METHOD( "SPxSolver::clearUpdateVecs()" );
    theFvec->clearUpdate();
    thePvec->clearUpdate();
    theCoPvec->clearUpdate();
@@ -517,7 +500,6 @@ void SPxSolver::clearUpdateVecs(void)
  */
 void SPxSolver::factorize()
 {
-   METHOD( "SPxSolver::factorize()" );
 
    MSG_INFO1( spxout << "ISOLVE01 " 
                      << "iteration = "    << std::setw(8) << basis().iteration() 
@@ -625,7 +607,6 @@ void SPxSolver::factorize()
    computed. In the row/leave or column/enter algorithm the primal feasibility is checked. */
 Real SPxSolver::maxInfeas() const
 {
-   METHOD( "SPxSolver::maxInfeas()" );
    Real inf = 0.0;
 
    if (type() == ENTER)
@@ -663,7 +644,6 @@ Real SPxSolver::maxInfeas() const
 
 Real SPxSolver::nonbasicValue() const
 {
-   METHOD( "SPxSolver::nonbasicValue()" );
 
    int i;
    Real val = 0;
@@ -777,7 +757,6 @@ Real SPxSolver::nonbasicValue() const
 
 Real SPxSolver::value() const
 {
-   METHOD( "SPxSolver::value()" );
    Real x;
 
    assert(isInitialized());
@@ -801,7 +780,6 @@ Real SPxSolver::value() const
 
 void SPxSolver::setFeastol(Real d)
 {
-   METHOD( "SPxSolver::setFeastol()" );
 
    if( d <= 0.0 )
       throw SPxInterfaceException("XSOLVE30 Cannot set feastol less than or equal to zero.");
@@ -814,7 +792,6 @@ void SPxSolver::setFeastol(Real d)
 
 void SPxSolver::setOpttol(Real d)
 {
-   METHOD( "SPxSolver::setOpttol()" );
 
    if( d <= 0.0 )
       throw SPxInterfaceException("XSOLVE31 Cannot set opttol less than or equal to zero.");
@@ -827,7 +804,6 @@ void SPxSolver::setOpttol(Real d)
 
 void SPxSolver::setDelta(Real d)
 {
-   METHOD( "SPxSolver::setDelta()" );
 
    if( d <= 0.0 )
       throw SPxInterfaceException("XSOLVE32 Cannot set delta less than or equal to zero.");
@@ -874,9 +850,7 @@ SPxSolver::SPxSolver(
    , remainingRoundsLeave(0)
    , remainingRoundsEnter(0)
    , remainingRoundsEnterCo(0)
-   , partialPricing(false)
 {
-   METHOD( "SPxSolver::SPxSolver()" );
 
    setDelta(DEFAULT_BND_VIOL);
 
@@ -915,7 +889,6 @@ SPxSolver::~SPxSolver()
 
 SPxSolver& SPxSolver::operator=(const SPxSolver& base)
 {
-   METHOD( "SPxSolver::operator=(const SPxSolver&base)"  );
    if(this != &base)
    {
       SPxLP::operator=(base);
@@ -1132,7 +1105,6 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , sparsityThresholdEnter(base.sparsityThresholdEnter)
    , sparsityThresholdEnterCo(base.sparsityThresholdEnterCo)
 {
-   METHOD( "SPxSolver::SPxSolver(const SPxSolver&base)"  );
 
    if (base.theRep == COLUMN)
    {
@@ -1214,7 +1186,6 @@ SPxSolver::SPxSolver(const SPxSolver& base)
 bool SPxSolver::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-   METHOD( "SPxSolver::isConsistent()" );
    if (epsilon() < 0)
       return MSGinconsistent("SPxSolver");
 
@@ -1321,7 +1292,6 @@ bool SPxSolver::isConsistent() const
 
 void SPxSolver::setTerminationTime(Real p_time)
 {
-   METHOD( "SPxSolver::setTerminationTime()" );
    if( p_time < 0.0 )
       p_time = infinity;
    maxTime = p_time;
@@ -1329,13 +1299,11 @@ void SPxSolver::setTerminationTime(Real p_time)
 
 Real SPxSolver::terminationTime() const
 {
-   METHOD( "SPxSolver::terminationTime()" );
    return maxTime;
 }
 
 void SPxSolver::setTerminationIter(int p_iteration)
 {
-   METHOD( "SPxSolver::setTerminationIter()" );
    if( p_iteration < 0 )
       p_iteration = -1;
    maxIters = p_iteration;
@@ -1343,7 +1311,6 @@ void SPxSolver::setTerminationIter(int p_iteration)
 
 int SPxSolver::terminationIter() const
 {
-   METHOD( "SPxSolver::terminationIter()" );
    return maxIters;
 }
 
@@ -1355,20 +1322,17 @@ int SPxSolver::terminationIter() const
  */
 void SPxSolver::setTerminationValue(Real p_value)
 {
-   METHOD( "SPxSolver::setTerminationValue()" );
    objLimit = p_value;
 }
 
 Real SPxSolver::terminationValue() const
 {
-   METHOD( "SPxSolver::terminationValue()" );
    return objLimit;
 }
    
 SPxSolver::VarStatus
 SPxSolver::basisStatusToVarStatus( SPxBasis::Desc::Status stat ) const
 {
-   METHOD( "SPxSolver::VarStatus()" );
    VarStatus vstat;
 
    switch( stat )
@@ -1403,7 +1367,6 @@ SPxSolver::basisStatusToVarStatus( SPxBasis::Desc::Status stat ) const
 SPxBasis::Desc::Status
 SPxSolver::varStatusToBasisStatusRow( int row, SPxSolver::VarStatus stat ) const
 {
-   METHOD( "SPxSolver::varStatusToBasisStatusRow()" );
    SPxBasis::Desc::Status rstat;
 
    switch( stat )
@@ -1463,7 +1426,6 @@ SPxSolver::varStatusToBasisStatusRow( int row, SPxSolver::VarStatus stat ) const
 SPxBasis::Desc::Status 
 SPxSolver::varStatusToBasisStatusCol( int col, SPxSolver::VarStatus stat ) const
 {
-   METHOD( "SPxSolver::varStatusToBasisStatusCol()" );
    SPxBasis::Desc::Status cstat;
 
    switch( stat )
@@ -1528,21 +1490,18 @@ SPxSolver::varStatusToBasisStatusCol( int col, SPxSolver::VarStatus stat ) const
 
 SPxSolver::VarStatus SPxSolver::getBasisRowStatus( int row ) const
 {
-   METHOD( "SPxSolver::VarStatus()" );
    assert( 0 <= row && row < nRows() );
    return basisStatusToVarStatus( desc().rowStatus( row ) );
 }
 
 SPxSolver::VarStatus SPxSolver::getBasisColStatus( int col ) const
 {
-   METHOD( "SPxSolver::VarStatus()" );
    assert( 0 <= col && col < nCols() );
    return basisStatusToVarStatus( desc().colStatus( col ) );
 }
 
 SPxSolver::Status SPxSolver::getBasis(VarStatus row[], VarStatus col[]) const
 {
-   METHOD( "SPxSolver::Status()" );
    const SPxBasis::Desc& d = desc();
    int i;
 
@@ -1559,7 +1518,6 @@ SPxSolver::Status SPxSolver::getBasis(VarStatus row[], VarStatus col[]) const
 
 bool SPxSolver::isBasisValid(DataArray<VarStatus> p_rows, DataArray<VarStatus> p_cols)
 {
-   METHOD( "SPxSolver::isBasisValid()" );
 
    int basisdim;
 
@@ -1614,7 +1572,6 @@ bool SPxSolver::isBasisValid(DataArray<VarStatus> p_rows, DataArray<VarStatus> p
 
 void SPxSolver::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
 {
-   METHOD( "SPxSolver::setBasis()" );
 
    if (SPxBasis::status() == SPxBasis::NO_PROBLEM)
       SPxBasis::load(this);
@@ -1770,12 +1727,3 @@ std::ostream& operator<<( std::ostream& os,
 
 
 } // namespace soplex
-
-//-----------------------------------------------------------------------------
-//Emacs Local Variables:
-//Emacs mode:c++
-//Emacs c-basic-offset:3
-//Emacs tab-width:8
-//Emacs indent-tabs-mode:nil
-//Emacs End:
-//-----------------------------------------------------------------------------

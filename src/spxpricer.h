@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -24,10 +24,6 @@
 
 #include "spxdefines.h"
 #include "spxsolver.h"
-
-#define MAX_PRICING_CANDIDATES   8
-#define IMPROVEMENT_STEPLENGTH  20
-#define IMPROVEMENT_THRESHOLD    1
 
 namespace soplex
 {
@@ -266,12 +262,3 @@ public:
 
 } // namespace soplex
 #endif // _SPXPRICER_H_
-
-//-----------------------------------------------------------------------------
-//Emacs Local Variables:
-//Emacs mode:c++
-//Emacs c-basic-offset:3
-//Emacs tab-width:8
-//Emacs indent-tabs-mode:nil
-//Emacs End:
-//-----------------------------------------------------------------------------

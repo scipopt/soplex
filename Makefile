@@ -3,7 +3,7 @@
 #*                  This file is part of the class library                   *#
 #*       SoPlex --- the Sequential object-oriented simPlex.                  *#
 #*                                                                           *#
-#*    Copyright (C) 1996-2012 Konrad-Zuse-Zentrum                            *#
+#*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            *#
 #*                            fuer Informationstechnik Berlin                *#
 #*                                                                           *#
 #*  SoPlex is distributed under the terms of the ZIB Academic Licence.       *#
@@ -89,7 +89,7 @@ INCLUDEDIR	=	include
 NAME		=	soplex
 LIBOBJ		= 	changesoplex.o clufactor.o didxset.o \
 			enter.o idxset.o leave.o rational.o mpsinput.o nameset.o \
-			slufactor.o solverational.o solvereal.o soplex.o soplex2.o \
+			slufactor.o solverational.o solvereal.o soplex.o soplexlegacy.o \
 			spxbasis.o spxbounds.o spxboundflippingrt.o spxchangebasis.o \
 			spxequilisc.o spxdantzigpr.o spxdefaultrt.o \
 			spxdefines.o spxdesc.o spxdevexpr.o \
@@ -100,7 +100,7 @@ LIBOBJ		= 	changesoplex.o clufactor.o didxset.o \
 			spxstarter.o spxsteeppr.o spxsumst.o spxvecs.o \
 			spxvectorst.o spxweightpr.o spxweightst.o spxwritestate.o \
 			statistics.o \
-			timer.o tracemethod.o unitvector.o updatevector.o \
+			timer.o unitvector.o updatevector.o \
 			gzstream.o
 BINOBJ		=	soplexmain.o
 EXAMPLEOBJ	=	simpleexample.o

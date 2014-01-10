@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -69,8 +69,13 @@ private:
    /// Ensure there is room for \p n new nonzeros.
    void makeMem(int n)
    {
+      assert(n >= 0);
+
       if( SVectorBase<R>::max() - SVectorBase<R>::size() < n )
+      {
+         assert(SVectorBase<R>::size() + n > 0);
          setMax(SVectorBase<R>::size() + n);
+      }
    }
 
    //@}
@@ -317,17 +322,9 @@ void DSVectorBase<Real>::setMax(int newmax)
    int len = (newmax < siz) ? siz : newmax;
 
    spx_realloc(theelem, len);
-   setMem (len, theelem);
+   setMem(len, theelem);
+   // reset 'size' to old size since the above call to setMem() sets 'size' to 0
    set_size( siz );
 }
 } // namespace soplex
 #endif // _DSVECTORBASE_H_
-
-//-----------------------------------------------------------------------------
-//Emacs Local Variables:
-//Emacs mode:c++
-//Emacs c-basic-offset:3
-//Emacs tab-width:8
-//Emacs indent-tabs-mode:nil
-//Emacs End:
-//-----------------------------------------------------------------------------

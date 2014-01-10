@@ -4,7 +4,7 @@
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1996      Roland Wunderling                              */
-/*                  1996-2013 Konrad-Zuse-Zentrum                            */
+/*                  1996-2014 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -37,7 +37,7 @@ namespace soplex
 template< class R >
 class SolBase
 {
-   friend class SoPlex2;
+   friend class SoPlex;
    template < class S > friend class SolBase;
 
 public:
@@ -214,12 +214,3 @@ private:
 };
 } // namespace soplex
 #endif // _SOLBASE_H_
-
-// ---------------------------------------------------------------------------------------------------------------------
-// Emacs Local Variables:
-// Emacs mode:c++
-// Emacs c-basic-offset:3
-// Emacs tab-width:8
-// Emacs indent-tabs-mode:nil
-// Emacs End:
-// ---------------------------------------------------------------------------------------------------------------------

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -30,7 +30,6 @@ namespace soplex
 #if 0
 void SPxSolver::localAddRows(int start)
 {
-   METHOD( "SPxSolver::localAddRows()" );
    assert( start <= SPxLP::nRows() );
 
    /**@todo This method seems to be called, to update
@@ -176,7 +175,6 @@ void SPxSolver::localAddRows(int start)
 
 void SPxSolver::addedRows(int n)
 {
-   METHOD( "SPxSolver::addedRows()" );
 
    SPxLP::addedRows(n);
 
@@ -208,7 +206,6 @@ void SPxSolver::addedRows(int n)
 
 void SPxSolver::addedRows(int n)
 {
-   METHOD( "SPxSolver::addedRows()" );
 
    if( n > 0 )
    {
@@ -227,7 +224,6 @@ void SPxSolver::addedRows(int n)
 #if 0
 void SPxSolver::localAddCols(int start)
 {
-   METHOD( "SPxSolver::localAddCols()" );
    assert( start <= SPxLP::nCols() );
 
    /**@todo This method seems to be called, to update
@@ -394,7 +390,6 @@ void SPxSolver::localAddCols(int start)
 
 void SPxSolver::addedCols(int n)
 {
-   METHOD( "SPxSolver::addedCols()" );
    SPxLP::addedCols(n);
 
    if( n > 0 )
@@ -422,7 +417,6 @@ void SPxSolver::addedCols(int n)
 
 void SPxSolver::addedCols(int n)
 {
-   METHOD( "SPxSolver::addedCols()" );
 
    if( n > 0 )
    {
@@ -440,7 +434,6 @@ void SPxSolver::addedCols(int n)
    
 void SPxSolver::doRemoveRow(int i)
 {
-   METHOD( "SPxSolver::doRemoveRow()" );
 
    SPxLP::doRemoveRow(i);
 
@@ -491,7 +484,6 @@ void SPxSolver::doRemoveRow(int i)
 
 void SPxSolver::doRemoveRows(int perm[])
 {
-   METHOD( "SPxSolver::doRemoveRows()" );
 
    SPxLP::doRemoveRows(perm);
 
@@ -555,7 +547,6 @@ void SPxSolver::doRemoveRows(int perm[])
 
 void SPxSolver::doRemoveCol(int i)
 {
-   METHOD( "SPxSolver::doRemoveCol()" );
 
    SPxLP::doRemoveCol(i);
 
@@ -604,7 +595,6 @@ void SPxSolver::doRemoveCol(int i)
 
 void SPxSolver::doRemoveCols(int perm[])
 {
-   METHOD( "SPxSolver::doRemoveCols()" );
 
    SPxLP::doRemoveCols(perm);
 
@@ -669,7 +659,6 @@ void SPxSolver::doRemoveCols(int perm[])
 
 void SPxSolver::changeObj(const Vector& newObj)
 {
-   METHOD( "SPxSolver::changeObj()" );
 
    SPxLP::changeObj(newObj);
 
@@ -681,7 +670,6 @@ void SPxSolver::changeObj(const Vector& newObj)
 
 void SPxSolver::changeObj(int i, Real newVal)
 {
-   METHOD( "SPxSolver::changeObj()" );
 
    SPxLP::changeObj(i, newVal);
 
@@ -736,7 +724,6 @@ static void changeLowerStatus(
 
 void SPxSolver::changeLower(const Vector& newLower)
 {
-   METHOD( "SPxSolver::changeLower()" );
 
    SPxLP::changeLower(newLower);
 
@@ -751,7 +738,6 @@ void SPxSolver::changeLower(const Vector& newLower)
 
 void SPxSolver::changeLower(int i, Real newLower)
 {
-   METHOD( "SPxSolver::changeLower()" );
 
    if (newLower != lower(i))
    {
@@ -812,7 +798,6 @@ static void changeUpperStatus(
 
 void SPxSolver::changeUpper(const Vector& newUpper)
 {
-   METHOD( "SPxSolver::changeUpper()" );
 
    SPxLP::changeUpper(newUpper);
 
@@ -827,7 +812,6 @@ void SPxSolver::changeUpper(const Vector& newUpper)
 
 void SPxSolver::changeUpper(int i, Real newUpper)
 {
-   METHOD( "SPxSolver::changeUpper()" );
 
    if (newUpper != upper(i))
    {
@@ -843,7 +827,6 @@ void SPxSolver::changeUpper(int i, Real newUpper)
 
 void SPxSolver::changeBounds(const Vector& newLower, const Vector& newUpper)
 {
-   METHOD( "SPxSolver::changeBounds()" );
 
    changeLower(newLower);
    changeUpper(newUpper);
@@ -851,7 +834,6 @@ void SPxSolver::changeBounds(const Vector& newLower, const Vector& newUpper)
 
 void SPxSolver::changeBounds(int i, Real newLower, Real newUpper)
 {
-   METHOD( "SPxSolver::changeBounds()" );
 
    changeLower(i, newLower);
    changeUpper(i, newUpper);
@@ -903,7 +885,6 @@ static void changeLhsStatus(
 
 void SPxSolver::changeLhs(const Vector& newLhs)
 {
-   METHOD( "SPxSolver::changeLhs()" );
 
    SPxLP::changeLhs(newLhs);
 
@@ -918,7 +899,6 @@ void SPxSolver::changeLhs(const Vector& newLhs)
 
 void SPxSolver::changeLhs(int i, Real newLhs)
 {
-   METHOD( "SPxSolver::changeLhs()" );
 
    SPxLP::changeLhs(i, newLhs);
 
@@ -974,7 +954,6 @@ static void changeRhsStatus(
 
 void SPxSolver::changeRhs(const Vector& newRhs)
 {
-   METHOD( "SPxSolver::changeRhs()" );
 
    SPxLP::changeRhs(newRhs);
 
@@ -988,7 +967,6 @@ void SPxSolver::changeRhs(const Vector& newRhs)
 
 void SPxSolver::changeRhs(int i, Real newRhs)
 {
-   METHOD( "SPxSolver::changeRhs()" );
 
    SPxLP::changeRhs(i, newRhs);
 
@@ -1001,7 +979,6 @@ void SPxSolver::changeRhs(int i, Real newRhs)
 
 void SPxSolver::changeRange(const Vector& newLhs, const Vector& newRhs)
 {
-   METHOD( "SPxSolver::changeRange()" );
    SPxLP::changeLhs(newLhs);
    SPxLP::changeRhs(newRhs);
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
@@ -1017,7 +994,6 @@ void SPxSolver::changeRange(const Vector& newLhs, const Vector& newRhs)
 
 void SPxSolver::changeRange(int i, Real newLhs, Real newRhs)
 {
-   METHOD( "SPxSolver::changeRange()" );
 
    SPxLP::changeLhs(i, newLhs);
    SPxLP::changeRhs(i, newRhs);
@@ -1032,7 +1008,6 @@ void SPxSolver::changeRange(int i, Real newLhs, Real newRhs)
 
 void SPxSolver::changeRow(int i, const LPRow& newRow)
 {
-   METHOD( "SPxSolver::changeRow()" );
 
    SPxLP::changeRow(i, newRow);
    if ( SPxBasis::status() > SPxBasis::NO_PROBLEM )
@@ -1042,7 +1017,6 @@ void SPxSolver::changeRow(int i, const LPRow& newRow)
 
 void SPxSolver::changeCol(int i, const LPCol& newCol)
 {
-   METHOD( "SPxSolver::changeCol()" );
 
    SPxLP::changeCol(i, newCol);
    if ( SPxBasis::status() > SPxBasis::NO_PROBLEM )
@@ -1052,7 +1026,6 @@ void SPxSolver::changeCol(int i, const LPCol& newCol)
 
 void SPxSolver::changeElement(int i, int j, Real val)
 {
-   METHOD( "SPxSolver::changeElement()" );
 
    SPxLP::changeElement(i, j, val);
    if ( SPxBasis::status() > SPxBasis::NO_PROBLEM )
@@ -1062,18 +1035,8 @@ void SPxSolver::changeElement(int i, int j, Real val)
 
 void SPxSolver::changeSense(SPxSense sns)
 {
-   METHOD( "SPxSolver::changeSense()" );
 
    SPxLP::changeSense(sns);
    unInit();
 }
 } // namespace soplex
-
-//-----------------------------------------------------------------------------
-//Emacs Local Variables:
-//Emacs mode:c++
-//Emacs c-basic-offset:3
-//Emacs tab-width:8
-//Emacs indent-tabs-mode:nil
-//Emacs End:
-//-----------------------------------------------------------------------------

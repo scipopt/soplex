@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -122,7 +122,6 @@ public:
    /// Returns number of nonzeros in LP.
    int nNzos() const
    {
-      METHOD( "SPxLPBase::nNzos()" );
 
       int n = 0;
       for( int i = 0; i < nCols(); ++i )
@@ -134,7 +133,6 @@ public:
    /// Absolute smallest non-zero element in LP.
    R minAbsNzo() const
    {
-      METHOD( "SPxLPBase::minAbsNzo()" );
 
       R mini = infinity;
 
@@ -154,7 +152,6 @@ public:
    /// Absolute biggest non-zero element in LP.
    R maxAbsNzo() const
    {
-      METHOD( "SPxLPBase::maxAbsNzo()" );
 
       R maxi = R(0);
 
@@ -174,7 +171,6 @@ public:
    /// Gets \p i 'th row.
    void getRow(int i, LPRowBase<R>& row) const
    {
-      METHOD( "SPxLPBase::getRow()" );
 
       row.setLhs(lhs(i));
       row.setRhs(rhs(i));
@@ -190,7 +186,6 @@ public:
    /// Gets rows \p start, ... \p end.
    void getRows(int start, int end, LPRowSetBase<R>& set) const
    {
-      METHOD( "SPxLPBase::getRows()" );
 
       set.clear();
       for( int i = start; i <= end; i++ )
@@ -260,7 +255,6 @@ public:
    /// Gets \p i 'th column.
    void getCol(int i, LPColBase<R>& col) const
    {
-      METHOD( "SPxLPBase::getCol()" );
 
       col.setUpper(upper(i));
       col.setLower(lower(i));
@@ -277,7 +271,6 @@ public:
    /// Gets columns \p start, ..., \p end.
    void getCols(int start, int end, LPColSetBase<R>& set) const
    {
-      METHOD( "SPxLPBase::getCols()" );
 
       set.clear();
       for( int i = start; i <= end; i++ )
@@ -299,7 +292,6 @@ public:
    /// Gets objective vector.
    void getObj(VectorBase<R>& pobj) const
    {
-      METHOD( "SPxLPBase::getObj()" );
 
       pobj = LPColSetBase<R>::maxObj();
       if( spxSense() == MINIMIZE )
@@ -448,7 +440,6 @@ public:
    /// adds all LPRowBase%s of \p pset to LPRowSetBase.
    virtual void addRows(SPxRowId id[], const LPRowSetBase<R>& set)
    {
-      METHOD( "SPxLPBase::addRows()" );
 
       int i = nRows();
       addRows(set);
@@ -478,7 +469,6 @@ public:
    /// Adds all LPColBase%s of \p set to LPColSetBase.
    virtual void addCols(SPxColId id[], const LPColSetBase<R>& set)
    {
-      METHOD( "SPxLPBase::addCols()" );
 
       int i = nCols();
       addCols(set);
@@ -517,7 +507,6 @@ public:
    ///
    virtual void removeRows(SPxRowId id[], int n, int perm[] = 0)
    {
-      METHOD( "SPxLPBase::removeRows()" );
 
       if( perm == 0 )
       {
@@ -543,7 +532,6 @@ public:
     */
    virtual void removeRows(int nums[], int n, int perm[] = 0)
    {
-      METHOD( "SPxLPBase::removeRows()" );
 
       if( perm == 0 )
       {
@@ -564,7 +552,6 @@ public:
    /// Removes rows from \p start to \p end (including both).
    virtual void removeRowRange(int start, int end, int perm[] = 0)
    {
-      METHOD( "SPxLPBase::removeRowRange()" );
 
       if( perm == 0 )
       {
@@ -614,7 +601,6 @@ public:
    ///
    virtual void removeCols(SPxColId id[], int n, int perm[] = 0)
    {
-      METHOD( "SPxLPBase::removeCols()" );
 
       if( perm == 0 )
       {
@@ -640,7 +626,6 @@ public:
     */
    virtual void removeCols(int nums[], int n, int perm[] = 0)
    {
-      METHOD( "SPxLPBase::removeCols()" );
 
       if( perm == 0 )
       {
@@ -661,7 +646,6 @@ public:
    /// Removes columns from \p start to \p end (including both).
    virtual void removeColRange(int start, int end, int perm[] = 0)
    {
-      METHOD( "SPxLPBase::removeColRange()" );
 
       if( perm == 0 )
       {
@@ -689,7 +673,6 @@ public:
    /// clears the LP.
    virtual void clear()
    {
-      METHOD( "SPxLPBase::clear()" );
 
       LPRowSetBase<R>::clear();
       LPColSetBase<R>::clear();
@@ -741,7 +724,6 @@ public:
    /// Reads LP from a file.
    virtual bool readFile(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0)
    {
-      METHOD( "SPxLPBase::readFile()" );
 
       spxifstream file(filename);
 
@@ -763,7 +745,6 @@ public:
    /// Write loaded LP to \p filename.
    virtual void writeFile(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* p_intvars = 0) const
    {
-      METHOD( "SPxLPBase::writeFile()" );
 
       std::ofstream tmp(filename);
       size_t len_f = strlen(filename);
@@ -866,7 +847,6 @@ public:
    /// Changes objective vector to \p newObj.
    virtual void changeObj(const VectorBase<R>& newObj)
    {
-      METHOD( "SPxLPBase::changeObj()" );
 
       assert(maxObj().dim() == newObj.dim());
       LPColSetBase<R>::maxObj_w() = newObj;
@@ -877,7 +857,6 @@ public:
    /// changes \p i 'th objective vector element to \p newVal.
    virtual void changeObj(int i, R newVal)
    {
-      METHOD( "SPxLPBase::changeObj()" );
 
       newVal *= R(spxSense() == MINIMIZE ? -1 : 1);
       LPColSetBase<R>::maxObj_w(i) = newVal;
@@ -893,7 +872,6 @@ public:
    /// Changes vector of lower bounds to \p newLower.
    virtual void changeLower(const VectorBase<R>& newLower)
    {
-      METHOD( "SPxLPBase::changeLower()" );
 
       assert(lower().dim() == newLower.dim());
       LPColSetBase<R>::lower_w() = newLower;
@@ -903,7 +881,6 @@ public:
    /// changes \p i 'th lower bound to \p newLower.
    virtual void changeLower(int i, R newLower)
    {
-      METHOD( "SPxLPBase::changeLower()" );
 
       LPColSetBase<R>::lower_w(i) = newLower;
       assert(isConsistent());
@@ -918,7 +895,6 @@ public:
    /// Changes vector of upper bounds to \p newUpper.
    virtual void changeUpper(const VectorBase<R>& newUpper)
    {
-      METHOD( "SPxLPBase::changeUpper()" );
 
       assert(upper().dim() == newUpper.dim());
       LPColSetBase<R>::upper_w() = newUpper;
@@ -928,7 +904,6 @@ public:
    /// Changes \p i 'th upper bound to \p newUpper.
    virtual void changeUpper(int i, R newUpper)
    {
-      METHOD( "SPxLPBase::changeUpper()" );
 
       LPColSetBase<R>::upper_w(i) = newUpper;
       assert(isConsistent());
@@ -943,7 +918,6 @@ public:
    /// Changes variable bounds to \p newLower and \p newUpper.
    virtual void changeBounds(const VectorBase<R>& newLower, const VectorBase<R>& newUpper)
    {
-      METHOD( "SPxLPBase::changeBounds()" );
 
       changeLower(newLower);
       changeUpper(newUpper);
@@ -953,7 +927,6 @@ public:
    /// Changes bounds of column \p i to \p newLower and \p newUpper.
    virtual void changeBounds(int i, R newLower, R newUpper)
    {
-      METHOD( "SPxLPBase::changeBounds()" );
 
       changeLower(i, newLower);
       changeUpper(i, newUpper);
@@ -969,7 +942,6 @@ public:
    /// Changes left hand side vector for constraints to \p newLhs.
    virtual void changeLhs(const VectorBase<R>& newLhs)
    {
-      METHOD( "SPxLPBase::changeLhs()" );
 
       assert(lhs().dim() == newLhs.dim());
       LPRowSetBase<R>::lhs_w() = newLhs;
@@ -979,7 +951,6 @@ public:
    /// Changes \p i 'th left hand side value to \p newLhs.
    virtual void changeLhs(int i, R newLhs)
    {
-      METHOD( "SPxLPBase::changeLhs()" );
 
       LPRowSetBase<R>::lhs_w(i) = newLhs;
       assert(isConsistent());
@@ -994,7 +965,6 @@ public:
    /// Changes right hand side vector for constraints to \p newRhs.
    virtual void changeRhs(const VectorBase<R>& newRhs)
    {
-      METHOD( "SPxLPBase<R>::changeRhs()" );
 
       assert(rhs().dim() == newRhs.dim());
       LPRowSetBase<R>::rhs_w() = newRhs;
@@ -1004,7 +974,6 @@ public:
    /// Changes \p i 'th right hand side value to \p newRhs.
    virtual void changeRhs(int i, R newRhs)
    {
-      METHOD( "SPxLPBase::changeRhs()" );
 
       LPRowSetBase<R>::rhs_w(i) = newRhs;
       assert(isConsistent());
@@ -1019,7 +988,6 @@ public:
    /// Changes left and right hand side vectors.
    virtual void changeRange(const VectorBase<R>& newLhs, const VectorBase<R>& newRhs)
    {
-      METHOD( "SPxLPBase::changeRange()" );
 
       changeLhs(newLhs);
       changeRhs(newRhs);
@@ -1029,7 +997,6 @@ public:
    /// Changes left and right hand side of row \p i.
    virtual void changeRange(int i, R newLhs, R newRhs)
    {
-      METHOD( "SPxLPBase::changeRange()" );
 
       changeLhs(i, newLhs);
       changeRhs(i, newRhs);
@@ -1045,7 +1012,6 @@ public:
    /// Replaces \p i 'th row of LP with \p newRow.
    virtual void changeRow(int n, const LPRowBase<R>& newRow)
    {
-      METHOD( "SPxLPBase<R>::changeRow()" );
 
       int j;
       SVectorBase<R>& row = rowVector_w(n);
@@ -1081,7 +1047,6 @@ public:
    /// Replaces \p i 'th column of LP with \p newCol.
    virtual void changeCol(int n, const LPColBase<R>& newCol)
    {
-      METHOD( "SPxLPBase::changeCol()" );
 
       int j;
       SVectorBase<R>& col = colVector_w(n);
@@ -1118,7 +1083,6 @@ public:
    /// Changes LP element (\p i, \p j) to \p val.
    virtual void changeElement(int i, int j, R val)
    {
-      METHOD( "SPxLPBase::changeElement()" );
 
       SVectorBase<R>& row = rowVector_w(i);
       SVectorBase<R>& col = colVector_w(j);
@@ -1163,7 +1127,6 @@ public:
    /// @throw SPxInternalCodeException if dimension of primal vector does not match number of columns
    virtual DVectorBase<R> computePrimalActivity(const VectorBase<R>& primal) const
    {
-      METHOD( "SPxLPBase::computePrimalActivity()" );
 
       if( primal.dim() != nCols() )
       {
@@ -1184,7 +1147,6 @@ public:
    /// @throw SPxInternalCodeException if dimension of dual vector does not match number of rows
    virtual DVectorBase<R> computeDualActivity(const VectorBase<R>& dual) const
    {
-      METHOD( "SPxLPBase::computeDualActivity()" );
 
       if( dual.dim() != nRows() )
       {
@@ -1211,7 +1173,6 @@ public:
    bool isConsistent() const
    {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-      METHOD( "SPxLPBase::isConsistent()" );
 
       for( int i = nCols() - 1; i >= 0; --i )
       {
@@ -1312,7 +1273,6 @@ protected:
    /// Internal helper method.
    virtual void doRemoveRow(int j)
    {
-      METHOD( "SPxLPBase::doRemoveRow()" );
 
       const SVectorBase<R>& vec = rowVector(j);
 
@@ -1341,7 +1301,6 @@ protected:
    /// Internal helper method.
    virtual void doRemoveRows(int perm[])
    {
-      METHOD( "SPxLPBase::doRemoveRows()" );
 
       int j = nCols();
 
@@ -1364,7 +1323,6 @@ protected:
    /// Internal helper method.
    virtual void doRemoveCol(int j)
    {
-      METHOD( "SPxLPBase::doRemoveCol()" );
 
       const SVectorBase<R>& vec = colVector(j);
       int i;
@@ -1394,7 +1352,6 @@ protected:
    /// Internal helper method.
    virtual void doRemoveCols(int perm[])
    {
-      METHOD( "SPxLPBase::doRemoveCols()" );
 
       int j = nRows();
 
@@ -1426,7 +1383,6 @@ protected:
    ///
    void added2Set(SVSetBase<R>& set, const SVSetBase<R>& addset, int n)
    {
-      METHOD( "SPxLPBase::added2Set()" );
 
       if( n == 0 )
          return;
@@ -1499,7 +1455,6 @@ private:
    ///
    void doAddRow (const LPRowBase<R>& row)
    {
-      METHOD( "SPxLPBase::doAddRow()" );
 
       int idx = nRows();
       int oldColNumber = nCols();
@@ -1532,7 +1487,6 @@ private:
    ///
    void doAddRows(const LPRowSetBase<R>& set)
    {
-      METHOD( "SPxLPBase::doAddRows()" );
 
       int i, j, k, ii, idx;
       SVectorBase<R>* col;
@@ -1620,7 +1574,6 @@ private:
    ///
    void doAddCol (const LPColBase<R>& col)
    {
-      METHOD( "SPxLPBase::doAddCol()" );
 
       int idx = nCols();
       int oldRowNumber = nRows();
@@ -1654,7 +1607,6 @@ private:
    ///
    void doAddCols(const LPColSetBase<R>& set)
    {
-      METHOD( "SPxLPBase::doAddCols()" );
 
       int i, j;
       int oldColNumber = nCols();
@@ -1812,12 +1764,3 @@ public:
 
 } // namespace soplex
 #endif // _SPXLPBASE_H_
-
-// ---------------------------------------------------------------------------------------------------------------------
-// Emacs Local Variables:
-// Emacs mode:c++
-// Emacs c-basic-offset:3
-// Emacs tab-width:8
-// Emacs indent-tabs-mode:nil
-// Emacs End:
-// ---------------------------------------------------------------------------------------------------------------------

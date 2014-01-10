@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SsoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -38,7 +38,6 @@ static const Real reject_leave_tol = 1e-10; // = LOWSTAB as defined in spxfastrt
  */
 void SPxSolver::computeFtest()
 {
-   METHOD( "SPxSolver::computeFtest()" );
 
    assert(type() == LEAVE);
 
@@ -93,7 +92,6 @@ void SPxSolver::computeFtest()
 
 void SPxSolver::updateFtest()
 {
-   METHOD( "SPxSolver::updateFtest()" );
    const IdxSet& idx = theFvec->idx();
    Vector& ftest = theCoTest;      // |== fTest()|
    assert(&ftest == &fTest());
@@ -154,7 +152,6 @@ void SPxSolver::getLeaveVals(
    Real& leavebound,
    int& leaveNum)
 {
-   METHOD( "SPxSolver::getLeaveVals()" );
    SPxBasis::Desc& ds = desc();
    leaveId = baseId(leaveIdx);
 
@@ -324,7 +321,6 @@ void SPxSolver::getLeaveVals2(
    Real& newCoPrhs
 )
 {
-   METHOD( "SPxSolver::getLeaveVals2()" );
    SPxBasis::Desc& ds = desc();
 
    enterBound = 0;
@@ -533,7 +529,6 @@ void SPxSolver::rejectLeave(
    const SVector* //newVec
 )
 {
-   METHOD( "SPxSolver::rejectLeave()" );
    SPxBasis::Desc& ds = desc();
    if (leaveId.isSPxRowId())
    {
@@ -570,7 +565,6 @@ void SPxSolver::rejectLeave(
 
 bool SPxSolver::leave(int leaveIdx)
 {
-   METHOD( "SPxSolver::leave()" );
    assert(leaveIdx < dim() && leaveIdx >= 0);
    assert(type() == LEAVE);
    assert(initialized);
@@ -986,12 +980,3 @@ bool SPxSolver::leave(int leaveIdx)
    }
 }
 } // namespace soplex
-
-//-----------------------------------------------------------------------------
-//Emacs Local Variables:
-//Emacs mode:c++
-//Emacs c-basic-offset:3
-//Emacs tab-width:8
-//Emacs indent-tabs-mode:nil
-//Emacs End:
-//-----------------------------------------------------------------------------

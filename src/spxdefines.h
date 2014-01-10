@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -23,8 +23,6 @@
  * If \c NDEBUG is not defined, the code within #TRACE is used.
  * If \c DEBUGGING is defined, the code within
  * \ref soplex::SPxOut::DEBUG "DEBUG" is also used.
- * If \c TRACE_METHOD is defined, the method tracing with #METHOD is
- * activated.
  *
  * If \c WITH_LONG_DOUBLE is defined, all Real numbers are of type
  * long double instead of just double.
@@ -33,11 +31,6 @@
 #define _SPXDEFINES_H_
 
 #include <math.h>
-
-#ifdef TRACE_METHOD
-#include "tracemethod.h"
-#endif
-
 
 
 
@@ -133,26 +126,11 @@ extern bool msginconsistent(const char* name, const char* file, int line);
 #define MSG_DEBUG(x) /**/
 #endif //!DEBUGGING
 
-#if defined(TRACE_METHOD)
-// print output in any case, regardless of Param::verbose():
-// NB: We cannot use DO_WITH_TMP_VERBOSITY since it wraps its argument in an
-//     own block to avoid name clashes. This, however, keeps the indentation
-//     at 0, destroying the call tree information.
-#define METHOD(x) \
-   const SPxOut::Verbosity  method_old_verbosity = spxout.getVerbosity();      \
-      spxout.setVerbosity( SPxOut::ERROR );                             \
-      soplex::TraceMethod _trace_method_(x, __FILE__, __LINE__);        \
-      spxout.setVerbosity( method_old_verbosity );
-#else
-#define METHOD(x) /**/
-#endif // !TRACE_METHOD
 
 /*-----------------------------------------------------------------------------
  * Long double support, Parameters and Epsilons
  *-----------------------------------------------------------------------------
  */
-
-
 
 #ifdef WITH_LONG_DOUBLE
 
@@ -403,15 +381,3 @@ inline bool GErel(Real a, Real b, Real eps = Param::epsilon())
 
 } // namespace soplex
 #endif // _SPXDEFINES_H_
-
-//-----------------------------------------------------------------------------
-//Emacs Local Variables:
-//Emacs mode:c++
-//Emacs c-basic-offset:3
-//Emacs tab-width:8
-//Emacs indent-tabs-mode:nil
-//Emacs End:
-//-----------------------------------------------------------------------------
-
-
-

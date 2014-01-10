@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -48,14 +48,12 @@ SPxEquiliSC& SPxEquiliSC::operator=(const SPxEquiliSC& rhs)
 
 Real SPxEquiliSC::computeScale(Real /*mini*/, Real maxi) const
 {
-   METHOD( "SPxEquiliSC::computeScale()" );
 
    return maxi;
 }
 
 void SPxEquiliSC::scale(SPxLP& lp) 
 {
-   METHOD( "SPxEquiliSC::scale()" );
 
    MSG_INFO1( spxout << "IEQUSC01 Equilibrium scaling LP" << std::endl; )
 
@@ -120,17 +118,3 @@ void SPxEquiliSC::scale(SPxLP& lp)
 }
 
 } // namespace soplex
-
-//-----------------------------------------------------------------------------
-//Emacs Local Variables:
-//Emacs mode:c++
-//Emacs c-basic-offset:3
-//Emacs tab-width:8
-//Emacs indent-tabs-mode:nil
-//Emacs End:
-//-----------------------------------------------------------------------------
-
-
-
-
-

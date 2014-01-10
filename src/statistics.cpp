@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -21,20 +21,20 @@
 namespace soplex
 {
    /// default constructor
-   SoPlex2::Statistics::Statistics()
+   SoPlex::Statistics::Statistics()
    {
       clearAllData();
    }
 
    /// clears all statistics
-   void SoPlex2::Statistics::clearAllData()
+   void SoPlex::Statistics::clearAllData()
    {
       readingTime.reset();
       clearSolvingData();
    }
 
    /// clears statistics on solving process
-   void SoPlex2::Statistics::clearSolvingData()
+   void SoPlex::Statistics::clearSolvingData()
    {
       solvingTime.reset();
       preprocessingTime.reset();
@@ -51,7 +51,7 @@ namespace soplex
    }
 
    /// prints statistics
-   void SoPlex2::Statistics::print(std::ostream& os)
+   void SoPlex::Statistics::print(std::ostream& os)
    {
       Real solTime = solvingTime.userTime();
       Real totTime = readingTime.userTime() + solTime;
@@ -112,12 +112,3 @@ namespace soplex
       os << "  Solve time       : " << luSolveTime << "\n";
    }
 } // namespace soplex
-
-//-----------------------------------------------------------------------------
-//Emacs Local Variables:
-//Emacs mode:c++
-//Emacs c-basic-offset:3
-//Emacs tab-width:8
-//Emacs indent-tabs-mode:nil
-//Emacs End:
-//-----------------------------------------------------------------------------

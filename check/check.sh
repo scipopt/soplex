@@ -90,7 +90,7 @@ do
 	23) echo =type= R3
 	    opt="-X2 -d1e-250 -R1e-6 -e" ;;
         esac
-        $2 $opt -C -q $4 $i 2>>$ERRFILE
+        $2 $opt -c -q $4 $i 2>>$ERRFILE
         echo =ready=
     done
 done | tee -a $OUTFILE

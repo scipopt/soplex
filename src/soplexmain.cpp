@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -13,1479 +13,638 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+/**@file  soplexmain.cpp
+ * @brief Command line interface of SoPlex LP solver
+ */
+
 #include <assert.h>
 #include <math.h>
 #include <string.h>
+
 #include <iostream>
 #include <iomanip>
 #include <fstream>
 
-#include "spxdefines.h"
-#include "soplex2.h"
-#include "spxsolver.h"
-
-#include "timer.h"
+#include "soplex.h"
 #include "spxgithash.h"
-#include "spxpricer.h"
-#include "spxdantzigpr.h"
-#include "spxparmultpr.h"
-#include "spxdevexpr.h"
-#include "spxhybridpr.h"
-#include "spxsteeppr.h"
-#include "spxsteepexpr.h"
-#include "spxweightpr.h"
-#include "spxratiotester.h"
-#include "spxharrisrt.h"
-#include "spxdefaultrt.h"
-#include "spxfastrt.h"
-#include "spxboundflippingrt.h"
-#include "spxsimplifier.h"
-#include "spxmainsm.h"
-#include "spxscaler.h"
-#include "spxequilisc.h"
-#include "spxgeometsc.h"
-#include "spxsumst.h"
-#include "spxweightst.h"
-#include "spxvectorst.h"
-#include "slufactor.h"
-#include "spxout.h"
+#include "timer.h"
 
 using namespace soplex;
 
-//------------------------------------------------------------------------
-//    Helpers
-//------------------------------------------------------------------------
 
+/// prints version and compilation options
 static
-void printVersionInfo( bool checkMode)
+void printVersionInfo()
 {
-   const char* banner1 =
-   "************************************************************************\n"
-   "*                                                                      *\n"
-   "*       SoPlex --- the Sequential object-oriented simPlex.             *\n"
-   ;
-
-   const char* banner2 =
-   "*                                                                      *\n"
-   "*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                       *\n"
-   "*                            fuer Informationstechnik Berlin           *\n"
-   "*                                                                      *\n"
-   "*  SoPlex is distributed under the terms of the ZIB Academic Licence.  *\n"
-   "*  You should have received a copy of the ZIB Academic License         *\n"
-   "*  along with SoPlex; If not email to soplex@zib.de.                   *\n"
-   "*                                                                      *\n"
-   "************************************************************************\n"
-   ;
-
-   if( !checkMode )
-      std::cout << banner1;
-
-#if (SOPLEX_SUBVERSION > 0)
-   if( !checkMode )
-      std::cout <<    "*                  Version ";
-   else
-      std::cout << "SoPlex version ";
-   std::cout << SOPLEX_VERSION/100 << "."
-             << (SOPLEX_VERSION % 100)/10 << "."
-             << SOPLEX_VERSION % 10 << "."
-             << SOPLEX_SUBVERSION
-             << " - Githash "
-             << std::setw(13) << std::setiosflags(std::ios::left) << getGitHash();
-   if( !checkMode )
-      std::cout << "             *\n" << banner2 << std::endl;
-   else
-      std::cout << "\n";
-#else
-   if( !checkMode )
-      std::cout <<    "*                  Release ";
-   else
-      std::cout << "SoPlex release ";
-   std::cout << SOPLEX_VERSION/100 << "."
-             << (SOPLEX_VERSION % 100)/10 << "."
-             << SOPLEX_VERSION % 10
-             << " - Githash "
-             << std::setw(13) << std::setiosflags(std::ios::left) << getGitHash();
-   if( !checkMode )
-      std::cout << "               *\n" << banner2 << std::endl;
-   else
-      std::cout << "\n";
+   MSG_INFO1( spxout << "SoPlex version " << SOPLEX_VERSION/100
+      << "." << (SOPLEX_VERSION % 100)/10
+      << "." << SOPLEX_VERSION % 10
+#if SOPLEX_SUBVERSION > 0
+      << "." << SOPLEX_SUBVERSION
 #endif
-
-   /// The following code block is tests and shows compilation parameters.
-   std::cout << "[NDEBUG:"
-#ifdef NDEBUG
-             << "YES"
+#ifndef NDEBUG
+      << " [mode: debug]"
 #else
-             << "NO"
+      << " [mode: optimized]"
 #endif
-             << "]";
-
-   std::cout << "[WITH_WARNINGS:"
-#ifdef WITH_WARNINGS
-             << "YES"
-#else
-             << "NO"
-#endif
-             << "]";
-
-   std::cout << "[ENABLE_ADDITIONAL_CHECKS:"
-#ifdef ENABLE_ADDITIONAL_CHECKS
-             << "YES"
-#else
-             << "NO"
-#endif
-             << "]";
-
-   std::cout << "[ENABLE_CONSISTENCY_CHECKS:"
-#ifdef ENABLE_CONSISTENCY_CHECKS
-             << "YES"
-#else
-             << "NO"
-#endif
-             << "]";
-
-std::cout << "[RATIONAL:"
+      << " [precision: " << (int)sizeof(Real) << " byte]"
 #ifdef SOPLEX_WITH_GMP
-             << "GMP"
+      << " [rational: gmp]"
 #elif SOPLEX_WITH_GMPXX
-             << "GMPXX"
+      << " [rational: gmpxx]"
 #else
-             << "DOUBLE"
+      << " [rational: long double]"
 #endif
-             << "]" << std::endl;
+      << " [githash: " << getGitHash() << "]\n" );
 
-std::cout << std::endl;
+   MSG_INFO1( spxout << "Copyright (c) 1996-2014 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)\n\n" );
 }
 
-#if 0
+// prints usage and command line options
 static
-void print_short_version_info()
-{
-   const char* banner1 =
-   "************************************************************************\n"
-   "* SoPlex --- the Sequential object-oriented simPlex. ";
-   const char* banner2 =
-   "* Copyright (C)  1996-2013 Zuse Institute Berlin                       *\n"
-   "************************************************************************\n";
-
-   std::cout << banner1;
-#if (SOPLEX_SUBVERSION > 0)
-   std::cout <<    "Version "
-             << SOPLEX_VERSION/100 << "."
-             << (SOPLEX_VERSION % 100)/10 << "."
-             << SOPLEX_VERSION % 10 << "."
-             << SOPLEX_SUBVERSION
-             << "   *\n";
-#else
-   std::cout <<    "Release "
-             << SOPLEX_VERSION/100 << "."
-             << (SOPLEX_VERSION % 100)/10 << "."
-             << SOPLEX_VERSION % 10
-             << "     *\n";
-#endif
-   std::cout << banner2 << std::endl;
-}
-#endif
-
-//------------------------------------------------------------------------
-static
-void printUsage( const char* const argv[] )
+void printUsage(const char* const argv[], int idx)
 {
    const char* usage =
-      "[options] LPfile [Basfile]\n\n"
-      "          LPfile can be either in MPS or LPF format\n\n"
-      "options:  (*) indicates default\n"
-      "          (!) indicates experimental features which may give wrong results\n"
-      " -e        select entering algorithm (default is leaving)\n"
-      " -r        select row wise representation (default is column)\n"
-      " -i        select Eta-update (default is Forest-Tomlin)\n"
-      " -x        output solution vector\n"
-      " -y        output dual multipliers\n"
-      " -q        display solution quality\n"
-      " -br       read file with starting basis from Basfile\n"
-      " -bw       write file with optimal basis to Basfile\n"
-      " -l        set time limit in seconds\n"
-      " -L        set iteration limit\n"
-      " -f        set primal feasibility tolerance\n"
-      " -o        set optimality, i.e., dual feasibility tolerance\n"
-      " -d        set primal and dual feasibility tolerance to same value\n"
-      " -R        set working tolerance for floating-point solves during iterative refinement\n"
-      " -zz       set general zero tolerance\n"
-      " -zf       set factorization zero tolerance\n"
-      " -zu       set update zero tolerance\n"
-      " -P        enable partial (= incomplete) pricing for leaving algorithm\n"
-      " -v        set verbosity Level: from 0 (ERROR) to 5 (INFO3), default 3 (INFO1)\n"
-      " -V        show program version\n"
-      " -C        check mode (for check scripts)\n"
-      " -h        show this help\n"
-      " --[parameter]=[value]      sets the parameter to value (overwrites the one from default.set or soplex.set)\n"
+      "general options:\n"
+      "  --readbas=<basfile>    read starting basis from file\n"
+      "  --writebas=<basfile>   write terminal basis to file\n"
+      "  --<type>:<name>=<val>  change parameter value using syntax of settings file entries\n"
+      "  --loadset=<setfile>    load parameters from settings file (overruled by command line parameters)\n"
+      "  --saveset=<setfile>    save parameters to settings file\n"
+      "  --diffset=<setfile>    save modified parameters to settings file\n"
       "\n"
-      "Precision:\n"
-      " -X0       read and solve LP in real arithmetic (default)\n"
-      " -X1       read LP in real precision and solve LP in rational arithmetic\n"
-      " -X2       read and solve LP in rational arithmetic\n"
+      "limits and tolerances:\n"
+      "  -t<s>                  set time limit to <s> seconds\n"
+      "  -i<n>                  set iteration limit to <n>\n"
+      "  -f<eps>                set primal feasibility tolerance to <eps>\n"
+      "  -o<eps>                set dual feasibility (optimality) tolerance to <eps>\n"
       "\n"
-      "Simplifier:  Scaler:           Starter:    Pricer:        Ratiotester:\n"
-      " -s0 none     -g0 none          -c0 none*   -p0 Textbook   -t0 Textbook\n"
-      " -s1 Main*    -g1 uni-Equi      -c1 Weight  -p1 ParMult    -t1 Harris\n"
-      "              -g2 bi-Equi*      -c2 Sum     -p2 Devex      -t2 Fast*\n"
-      "              -g3 Geo1          -c3 Vector  -p3 Hybrid!    -t3 Bound Flipping\n"
-      "              -g4 Geo8                      -p4 Steep*\n"
-      "                                            -p5 Weight\n"
-      "                                            -p6 SteepExactSetup\n"
-      ;
+      "algorithmic settings (* indicates default):\n"
+      "  --readmode=<value>     choose reading mode for <lpfile> (0* - floating-point, 1 - rational)\n"
+      "  --solvemode=<value>    choose solving mode (0* - floating-point solve, 1 - auto, 2 - force iterative refinement)\n"
+      "  -s<value>              choose simplifier/presolver (0 - off, 1* - auto)\n"
+      "  -g<value>              choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric)\n"
+      "  -p<value>              choose pricing (0* - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)\n"
+      "\n"
+      "display options:\n"
+      "  -v<level>              set verbosity to <level> (0 - error, 3 - normal, 5 - high)\n"
+      "  -x                     print primal solution\n"
+      "  -y                     print dual multipliers\n"
+      "  -q                     display detailed statistics\n"
+      "  -c                     perform final check of optimal solution in original problem\n"
+      "\n";
 
-   std::cerr << "usage: " << argv[0] << " " << usage << std::endl;
-   exit(0);
-}
+   if( idx <= 0 )
+      std::cerr << "missing input file\n\n";
+   else
+      std::cerr << "invalid option \"" << argv[idx] << "\"\n\n";
 
-static
-void displayQualityReal( SoPlex2& SoPlexShell, bool checkMode )
-{
-
-   /// @todo needs more functionality from soplex2 regarding original/simplified LP
-
-   Real maxviol;
-   Real sumviol;
-
-   DVectorReal primal(SoPlexShell.numColsReal());
-   DVectorReal dual(SoPlexShell.numRowsReal());
-   DVectorReal redCost(SoPlexShell.numColsReal());
-   DVectorReal slack(SoPlexShell.numRowsReal());
-
-   SoPlexShell.getPrimalReal(primal);
-   SoPlexShell.getDualReal(dual);
-   SoPlexShell.getRedCostReal(redCost);
-   SoPlexShell.getSlacksReal(slack);
-
-   if ( checkMode )
-      MSG_INFO1( spxout << "IEXAMP05 "; )
-   MSG_INFO1( spxout << "Violations (max/sum)" << std::endl; )
-
-   // get violations of simpified LP
-   if( checkMode )
-      MSG_INFO1( spxout << "IEXAMP06 "; )
-   MSG_INFO1( spxout << "Constraints      :"
-   << std::setw(16) << 0.0 << "  "
-   << std::setw(16) << 0.0 << std::endl; )
-
-   // get violations of original LP
-   SoPlexShell.getConstraintViolationReal(primal, maxviol, sumviol);
-
-   if( checkMode )
-      MSG_INFO1( spxout << "IEXAMP07 "; )
-   MSG_INFO1( spxout << "      (unscaled) :"
-   << std::setw(16) << maxviol << "  "
-   << std::setw(16) << sumviol << std::endl; )
-
-   if( checkMode )
-      MSG_INFO1( spxout << "IEXAMP08 "; )
-   MSG_INFO1( spxout << "Bounds           :"
-   << std::setw(16) << 0.0 << "  "
-   << std::setw(16) << 0.0 << std::endl; )
-
-   SoPlexShell.getBoundViolationReal(primal, maxviol, sumviol);
-
-   if( checkMode )
-      MSG_INFO1( spxout << "IEXAMP09 "; )
-   MSG_INFO1( spxout << "      (unscaled) :"
-   << std::setw(16) << maxviol << "  "
-   << std::setw(16) << sumviol << std::endl; )
-
-//    if ( !m_vanished)
-//       {
-   SoPlexShell.getSlackViolationReal(maxviol, sumviol);
-
-   if( checkMode )
-      MSG_INFO1( spxout << "IEXAMP10 "; )
-   MSG_INFO1( spxout << "Slacks           :"
-   << std::setw(16) << maxviol << "  "
-   << std::setw(16) << sumviol << std::endl; )
-
-   SoPlexShell.getRedCostViolationReal(maxviol, sumviol);
-
-   if( checkMode )
-      MSG_INFO1( spxout << "IEXAMP11 "; )
-   MSG_INFO1( spxout << "Reduced costs    :"
-   << std::setw(16) << maxviol << "  "
-   << std::setw(16) << sumviol << std::endl; )
-#if 0
-   MSG_INFO1( spxout << "IEXAMP12 Proven dual bound:"
-   << std::setw(20)
-   << std::setprecision(20)
-   << m_solver.provedDualbound() << std::endl; )
+   std::cerr << "usage: " << argv[0] << " " << "[options] <lpfile>\n"
+#ifdef WITH_ZLIB
+             << "  <lpfile>               linear program as .mps[.gz] or .lp[.gz] file\n\n"
+#else
+             << "  <lpfile>               linear program as .mps or .lp file\n\n"
 #endif
-// }
+             << usage;
+
+   exit(1);
 }
 
+// cleans up C strings
 static
-void displayQualityRational( SoPlex2& SoPlexShell, bool checkMode )
+void freeStrings(char*& s1, char*& s2, char*& s3, char*& s4, char*& s5)
 {
-
-   /// @todo needs more functionality from soplex2 regarding original/simplified LP
-
-   Rational maxviol;
-   Rational sumviol;
-
-   DVectorRational primal(SoPlexShell.numColsRational());
-   DVectorRational dual(SoPlexShell.numRowsRational());
-   DVectorRational redCost(SoPlexShell.numColsRational());
-   DVectorRational slack(SoPlexShell.numRowsRational());
-
-   SoPlexShell.getPrimalRational(primal);
-   SoPlexShell.getDualRational(dual);
-   SoPlexShell.getRedCostRational(redCost);
-   SoPlexShell.getSlacksRational(slack);
-
-   if ( checkMode )
-      MSG_INFO1( spxout << "IEXAMP05 "; )
-   MSG_INFO1( spxout << "Violations (max/sum)" << std::endl; )
-
-   // get constraint violations of rational LP
-   SoPlexShell.getConstraintViolationRational(primal, maxviol, sumviol);
-
-   if( checkMode )
-      MSG_INFO1( spxout << "IEXAMP06 "; )
-
-   MSG_INFO1( spxout << "Constraints      : "
-      << std::setw(16) << rationalToString(maxviol) << "  "
-      << std::setw(16) << rationalToString(sumviol) << std::endl );
-
-   if( checkMode )
-      MSG_INFO1( spxout << "IEXAMP07 "; )
-
-   MSG_INFO1( spxout << "      (unscaled) : "
-      << std::setw(16) << rationalToString(maxviol) << "  "
-      << std::setw(16) << rationalToString(sumviol) << std::endl );
-
-   // get bound violations of rational LP
-   SoPlexShell.getBoundViolationRational(primal, maxviol, sumviol);
-
-   if( checkMode )
-      MSG_INFO1( spxout << "IEXAMP08 "; )
-
-   MSG_INFO1( spxout << "Bounds           : "
-      << std::setw(16) << rationalToString(maxviol) << "  "
-      << std::setw(16) << rationalToString(sumviol) << std::endl );
-
-   if( checkMode )
-      MSG_INFO1( spxout << "IEXAMP09 " );
-
-   MSG_INFO1( spxout << "      (unscaled) : "
-      << std::setw(16) << rationalToString(maxviol) << "  "
-      << std::setw(16) << rationalToString(sumviol) << std::endl );
-
-   // get slack violations of rational LP
-   SoPlexShell.getSlackViolationRational(maxviol, sumviol);
-
-   if( checkMode )
-      MSG_INFO1( spxout << "IEXAMP10 "; )
-
-   MSG_INFO1( spxout << "Slacks           : "
-      << std::setw(16) << rationalToString(maxviol) << "  "
-      << std::setw(16) << rationalToString(sumviol) << std::endl );
-
-   // get reduced cost violations of rational LP
-   SoPlexShell.getRedCostViolationRational(maxviol, sumviol);
-
-   if( checkMode )
-      MSG_INFO1( spxout << "IEXAMP11 "; )
-
-   MSG_INFO1( spxout << "Reduced costs    : "
-      << std::setw(16) << rationalToString(maxviol) << "  "
-      << std::setw(16) << rationalToString(sumviol) << std::endl );
-}
-
-//------------------------------------------------------------------------
-static
-void checkParameter(const char param, const char* const argv[])
-{
-   if (param == '\0')
-      printUsage( argv );
-}
-
-//------------------------------------------------------------------------
-static
-void printAlgorithmParameters(
-   SoPlex2& SoPlexShell,
-   bool checkMode)
-{
-   if( checkMode )
+   if( s1 != 0 )
    {
-      MSG_INFO1( spxout << std::endl
-         << "SoPlex parameters: " << std::endl
-         << "IEXAMP12 Feastol        = "
-         << std::setw(16) << rationalToString(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) << std::endl
-         << "IEXAMP52 Opttol         = "
-         << std::setw(16) << rationalToString(SoPlexShell.rationalParam(SoPlex2::OPTTOL)) << std::endl
-         << "IEXAMP53 FPFEASTOL      = "
-         << std::setw(16) << SoPlexShell.realParam(SoPlex2::FPFEASTOL) << std::endl
-         << "IEXAMP53 FPOPTTOL       = "
-         << std::setw(16) << SoPlexShell.realParam(SoPlex2::FPOPTTOL) << std::endl
-         << "IEXAMP13 Epsilon Zero   = "
-         << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_ZERO) << std::endl
-         << "IEXAMP37 Epsilon Factor = "
-         << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_FACTORIZATION) << std::endl
-         << "IEXAMP38 Epsilon Update = "
-         << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_UPDATE) << std::endl
-         << "IEXAMP14 "
-         << (SoPlexShell.intParam(SoPlex2::ALGORITHM) == SoPlex2::ALGORITHM_ENTER ? "Entering" : "Leaving")
-         << " algorithm" << std::endl
-         << "IEXAMP15 "
-         << (SoPlexShell.intParam(SoPlex2::REPRESENTATION) == SoPlex2::REPRESENTATION_ROW ? "Row" : "Column")
-         << " representation" << std::endl
-         << "IEXAMP16 "
-         << (SoPlexShell.intParam(SoPlex2::FACTOR_UPDATE_TYPE) == SoPlex2::FACTOR_UPDATE_TYPE_ETA ? "Eta" : "Forest-Tomlin")
-         << " update" << std::endl; )
+      delete [] s1;
+      s1 = 0;
+   }
+   if( s2 != 0 )
+   {
+      delete [] s2;
+      s2 = 0;
+   }
+   if( s3 != 0 )
+   {
+      delete [] s3;
+      s3 = 0;
+   }
+   if( s4 != 0 )
+   {
+      delete [] s4;
+      s4 = 0;
+   }
+   if( s5 != 0 )
+   {
+      delete [] s5;
+      s5 = 0;
+   }
+}
+
+/// performs external feasibility check with real type
+///@todo implement external check; currently we use the internal methods for convenience
+static
+void checkSolutionReal(SoPlex& soplex)
+{
+   if( soplex.hasPrimal() )
+   {
+      Real boundviol;
+      Real rowviol;
+      Real sumviol;
+
+      if( soplex.getBoundViolationReal(boundviol, sumviol) && soplex.getRowViolationReal(rowviol, sumviol) )
+      {
+         Real maxviol = boundviol > rowviol ? boundviol : rowviol;
+         bool feasible = maxviol < soplex.rationalParam(SoPlex::FEASTOL);
+         MSG_INFO1( spxout << "Primal solution " << (feasible ? "feasible" : "infeasible")
+            << " in original problem (max. violation = " << maxviol << ").\n" );
+      }
+      else
+      {
+         MSG_INFO1( spxout << "Could not check primal solution.\n" );
+      }
    }
    else
    {
-      MSG_INFO1( spxout << std::endl
-         << "SoPlex parameters: " << std::endl
-         << "Feastol        = "
-         << std::setw(16) << rationalToString(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) << std::endl
-         << "Opttol         = "
-         << std::setw(16) << rationalToString(SoPlexShell.rationalParam(SoPlex2::OPTTOL)) << std::endl
-         << "FPFEASTOL      = "
-         << std::setw(16) << SoPlexShell.realParam(SoPlex2::FPFEASTOL) << std::endl
-         << "FPOPTTOL       = "
-         << std::setw(16) << SoPlexShell.realParam(SoPlex2::FPOPTTOL) << std::endl
-         << "Epsilon Zero   = "
-         << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_ZERO) << std::endl
-         << "Epsilon Factor = "
-         << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_FACTORIZATION) << std::endl
-         << "Epsilon Update = "
-         << std::setw(16) << SoPlexShell.realParam(SoPlex2::EPSILON_UPDATE) << std::endl
-         << std::endl
-         << "algorithm      = " << (SoPlexShell.intParam(SoPlex2::ALGORITHM) == SoPlex2::ALGORITHM_ENTER ? "Entering" : "Leaving")
-         << std::endl
-         << "representation = " << (SoPlexShell.intParam(SoPlex2::REPRESENTATION) == SoPlex2::REPRESENTATION_ROW ? "Row" : "Column")
-         << std::endl
-         << "update         = " << (SoPlexShell.intParam(SoPlex2::FACTOR_UPDATE_TYPE) == SoPlex2::FACTOR_UPDATE_TYPE_ETA ? "Eta" : "Forest-Tomlin")
-         << std::endl; )
+      MSG_INFO1( spxout << "No primal solution available.\n" );
    }
 
-   // @todo do we need checkMode keys for these lines?
-   MSG_INFO1( spxout
-      << "pricer         = " << SoPlexShell.getPricerName()
-      << std::endl
-      << "starter        = " << SoPlexShell.getStarterName()
-      << std::endl
-      << "simplifier     = " << SoPlexShell.getSimplifierName()
-      << std::endl
-      << "ratiotest      = " << SoPlexShell.getRatiotesterName()
-      << std::endl
-      << "scaling        = " << SoPlexShell.getScalerName()
-      << std::endl
-      << std::endl; )
-}
-
-//------------------------------------------------------------------------
-static
-void setPricer(
-   SoPlex2& SoPlexShell,
-   const int pricing)
-{
-   /// @todo weight and partial pricers are not available
-   switch(pricing)
+   if( soplex.hasDual() )
    {
-   case 6 :
-      SoPlexShell.setIntParam(SoPlex2::PRICER, SoPlex2::PRICER_STEEP);
-      break;
-   case 5 :
-      SoPlexShell.setIntParam(SoPlex2::PRICER, SoPlex2::PRICER_AUTO);
-      break;
-   case 4 :
-      SoPlexShell.setIntParam(SoPlex2::PRICER, SoPlex2::PRICER_QUICKSTEEP);
-      break;
-   case 3 :
-      SoPlexShell.setIntParam(SoPlex2::PRICER, SoPlex2::PRICER_HYBRID);
-      break;
-   case 2 :
-      SoPlexShell.setIntParam(SoPlex2::PRICER, SoPlex2::PRICER_DEVEX);
-      break;
-   case 1 :
-      SoPlexShell.setIntParam(SoPlex2::PRICER, SoPlex2::PRICER_PARMULT);
-      break;
-   case 0 :
-      SoPlexShell.setIntParam(SoPlex2::PRICER, SoPlex2::PRICER_DANTZIG);
-      break;
-      /*FALLTHROUGH*/
-   default :
-      SoPlexShell.setIntParam(SoPlex2::PRICER, SoPlex2::PRICER_AUTO);
-      break;
-   }
-}
+      Real redcostviol;
+      Real dualviol;
+      Real sumviol;
 
-//------------------------------------------------------------------------
-static
-void setRatiotester(
-   SoPlex2& SoPlexShell,
-   const int ratiotest)
-{
-   switch(ratiotest)
+      if( soplex.getRedCostViolationReal(redcostviol, sumviol) && soplex.getDualViolationReal(dualviol, sumviol) )
+      {
+         Real maxviol = redcostviol > dualviol ? redcostviol : dualviol;
+         bool feasible = maxviol < soplex.rationalParam(SoPlex::OPTTOL);
+         MSG_INFO1( spxout << "Dual solution " << (feasible ? "feasible" : "infeasible")
+            << " in original problem (max. violation = " << maxviol << ").\n" );
+      }
+      else
+      {
+         MSG_INFO1( spxout << "Could not check dual solution.\n" );
+      }
+   }
+   else
    {
-   case 3 :
-      SoPlexShell.setIntParam(SoPlex2::RATIOTESTER, SoPlex2::RATIOTESTER_BOUNDFLIPPING);
-      break;
-   case 2 :
-      SoPlexShell.setIntParam(SoPlex2::RATIOTESTER, SoPlex2::RATIOTESTER_FAST);
-      break;
-   case 1 :
-      SoPlexShell.setIntParam(SoPlex2::RATIOTESTER, SoPlex2::RATIOTESTER_HARRIS);
-      break;
-   case 0 :
-      /*FALLTHROUGH*/
-   default:
-      SoPlexShell.setIntParam(SoPlex2::RATIOTESTER, SoPlex2::RATIOTESTER_TEXTBOOK);
-      break;
+      MSG_INFO1( spxout << "No dual solution available.\n" );
    }
 }
 
-//------------------------------------------------------------------------
+/// performs external feasibility check with rational type
+///@todo implement external check; currently we use the internal methods for convenience
 static
-void setScaler(
-   SoPlex2&    SoPlexShell,
-   const int   scaling)
+void checkSolutionRational(SoPlex& soplex)
 {
-   switch(scaling)
+   if( soplex.hasPrimal() )
    {
-   case 4:
-      SoPlexShell.setIntParam(SoPlex2::SCALER, SoPlex2::SCALER_GEO8);
-      break;
-   case 3:
-      SoPlexShell.setIntParam(SoPlex2::SCALER, SoPlex2::SCALER_GEO1);
-      break;
-   case 2 :
-      SoPlexShell.setIntParam(SoPlex2::SCALER, SoPlex2::SCALER_BIEQUI);
-      break;
-   case 1 :
-      SoPlexShell.setIntParam(SoPlex2::SCALER, SoPlex2::SCALER_UNIEQUI);
-      break;
-   case 0 :
-      /*FALLTHROUGH*/
-   default :
-      SoPlexShell.setIntParam(SoPlex2::SCALER, SoPlex2::SCALER_OFF);
-      break;
-   }
-}
+      Rational boundviol;
+      Rational rowviol;
+      Rational sumviol;
 
-//------------------------------------------------------------------------
-static
-void setStarter(
-   SoPlex2& SoPlexShell,
-   const int starting)
-{
-   switch(starting)
+      if( soplex.getBoundViolationRational(boundviol, sumviol) && soplex.getRowViolationRational(rowviol, sumviol) )
+      {
+         Rational maxviol = boundviol > rowviol ? boundviol : rowviol;
+         bool feasible = maxviol < soplex.rationalParam(SoPlex::FEASTOL);
+         MSG_INFO1( spxout << "Primal solution " << (feasible ? "feasible" : "infeasible")
+            << " in original problem (max. violation = " << maxviol << ").\n" );
+      }
+      else
+      {
+         MSG_INFO1( spxout << "Could not check primal solution.\n" );
+      }
+   }
+   else
    {
-   case 3 :
-      SoPlexShell.setIntParam(SoPlex2::STARTER, SoPlex2::STARTER_VECTOR);
-      break;
-   case 2 :
-      SoPlexShell.setIntParam(SoPlex2::STARTER, SoPlex2::STARTER_SUM);
-      break;
-   case 1 :
-      SoPlexShell.setIntParam(SoPlex2::STARTER, SoPlex2::STARTER_WEIGHT);
-      break;
-   case 0 :
-      /*FALLTHROUGH*/
-   default :
-      SoPlexShell.setIntParam(SoPlex2::STARTER, SoPlex2::STARTER_OFF);
-      break;
+      MSG_INFO1( spxout << "No primal solution available.\n" );
    }
-}
 
-//------------------------------------------------------------------------
-#ifdef SEND_ALL_OUTPUT_TO_FILES
-static
-void redirectOutput(
-   std::ostream&  myerrstream,
-   std::ostream&  myinfostream
-   )
-{
-   myerrstream .setf( std::ios::scientific | std::ios::showpoint );
-   myinfostream.setf( std::ios::scientific | std::ios::showpoint );
-   spxout.setStream( SPxOut::ERROR,    myerrstream );
-   spxout.setStream( SPxOut::WARNING,  myerrstream );
-   spxout.setStream( SPxOut::INFO1,    myinfostream );
-   spxout.setStream( SPxOut::INFO2,    myinfostream );
-   spxout.setStream( SPxOut::INFO3,    myinfostream );
-   spxout.setStream( SPxOut::DEBUG,    myinfostream );
-}
-#endif
-
-//------------------------------------------------------------------------
-static
-void printSolutionAndStatusReal(
-   SoPlex2&             SoPlexShell,
-   const NameSet&       rownames,
-   const NameSet&       colnames,
-   const int            precision,
-   const bool           print_quality,
-   const bool           print_solution,
-   const bool           print_dual,
-   const bool           write_basis,
-   const char*          basisname,
-   bool                 checkMode)
-{
-   // get the solution status
-   SPxSolver::Status status = SoPlexShell.status();
-
-   if( !checkMode )
-      MSG_INFO1( spxout << std::endl; )
-   switch (status)
+   if( soplex.hasDual() )
    {
-   case SPxSolver::OPTIMAL:
-      if( checkMode )
-         MSG_INFO1( spxout << "IEXAMP29 "; )
-            MSG_INFO1( spxout << "Solution value is: " << std::setprecision( precision ) << SoPlexShell.objValueReal() << std::endl << std::endl );
+      Rational redcostviol;
+      Rational dualviol;
+      Rational sumviol;
 
-      if( print_quality )
-         displayQualityReal( SoPlexShell, checkMode );
-
-      if( print_solution )
+      if( soplex.getRedCostViolationRational(redcostviol, sumviol) && soplex.getDualViolationRational(dualviol, sumviol) )
       {
-         DVectorReal objx(SoPlexShell.numColsReal());
-
-         if( SoPlexShell.getPrimalReal(objx) )
-         {
-            MSG_INFO1( spxout << std::endl << "Primal solution (name, id, value):" << std::endl; )
-            for( int i = 0; i < SoPlexShell.numColsReal(); ++i )
-            {
-               if( isNotZero( objx[i], 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) ) )
-                  MSG_INFO1( spxout << colnames[i] << "\t"
-                                    << i << "\t"
-                                    << std::setw(17)
-                                    << std::setprecision( precision )
-                                    << objx[i] << std::endl; )
-            }
-            MSG_INFO1( spxout << "All other variables are zero (within " << std::setprecision(1) << 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) << ")." << std::endl; )
-         }
+         Rational maxviol = redcostviol > dualviol ? redcostviol : dualviol;
+         bool feasible = maxviol < soplex.rationalParam(SoPlex::OPTTOL);
+         MSG_INFO1( spxout << "Dual solution " << (feasible ? "feasible" : "infeasible")
+            << " in original problem (max. violation = " << maxviol << ").\n" );
       }
-      if( print_dual )
+      else
       {
-         DVectorReal objy( SoPlexShell.numRowsReal() );
-         bool allzero = true;
-
-         if( SoPlexShell.getDualReal(objy) )
-         {
-            MSG_INFO1( spxout << std::endl << "Dual multipliers (name, id, value):" << std::endl; )
-            for( int i = 0; i < SoPlexShell.numRowsReal(); ++i )
-            {
-               if( isNotZero(objy[i] , 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::OPTTOL))) )
-               {
-                  MSG_INFO1( spxout << rownames[i] << "\t"
-                                    << i << "\t"
-                                    << std::setw(17)
-                                    << std::setprecision( precision )
-                                    << objy[i] << std::endl; )
-                  allzero = false;
-               }
-            }
-
-            MSG_INFO1( spxout << "All " << (allzero ? "" : "other ") << "dual values are zero (within "
-               << std::setprecision(1) << 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::OPTTOL)) << ")." << std::endl );
-
-            if( !allzero )
-            {
-               if( SoPlexShell.intParam(SoPlex2::OBJSENSE) == SoPlex2::OBJSENSE_MINIMIZE )
-               {
-                  MSG_INFO1( spxout << "Minimizing: a positive/negative value corresponds to left-hand (>=) resp. right-hand (<=) side."
-                                    << std::endl; )
-               }
-               else
-               {
-                  MSG_INFO1( spxout << "Maximizing: a positive/negative value corresponds to right-hand (<=) resp. left-hand (>=) side."
-                                    << std::endl; )
-               }
-            }
-         }
+         MSG_INFO1( spxout << "Could not check dual solution.\n" );
       }
-      if( write_basis )
-      {
-         MSG_INFO1( spxout << "Writing basis of original problem to file " << basisname << std::endl; )
-         SoPlexShell.writeBasisFile( basisname, &rownames, &colnames );
-      }
-      break;
-   case SPxSolver::UNBOUNDED:
-      if( checkMode )
-    MSG_INFO1( spxout << "IEXAMP31 LP is unbounded" << std::endl; )
-      else
-    MSG_INFO1( spxout << "LP is unbounded" << std::endl; )
-
-      if( print_solution )
-      {
-         DVectorReal objx(SoPlexShell.numColsReal());
-         if( SoPlexShell.getPrimalReal(objx) )
-         {
-            MSG_INFO1( spxout << std::endl << "Primal solution (name, id, value):" << std::endl; )
-            for( int i = 0; i < SoPlexShell.numColsReal(); ++i )
-            {
-               if( isNotZero( objx[i], 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) ) )
-                  MSG_INFO1( spxout << colnames[i] << "\t"
-                                    << i << "\t"
-                                    << std::setw(17)
-                                    << std::setprecision( precision )
-                                    << objx[i] << std::endl; )
-            }
-            MSG_INFO1( spxout << "All other variables are zero (within " << std::setprecision(1) << 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) << ")." << std::endl );
-         }
-
-         DVectorReal objcoef(SoPlexShell.numColsReal());
-         DVectorReal ray(SoPlexShell.numColsReal());
-         if( SoPlexShell.getPrimalRayReal(ray) )
-         {
-            Real rayobjval = 0.0;
-
-            SoPlexShell.getObjReal(objcoef);
-
-            MSG_INFO1( spxout << std::endl << "Primal ray (name, id, value):" << std::endl; )
-            for( int i = 0; i < SoPlexShell.numColsReal(); ++i )
-            {
-               if ( isNotZero( ray[i], 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) ) )
-               {
-                  rayobjval += ray[i] * objcoef[i];
-
-                  MSG_INFO1( spxout << colnames[i] << "\t"
-                                    << i << "\t"
-                                    << std::setw(17)
-                                    << std::setprecision( precision )
-                                    << ray[i] << std::endl; )
-               }
-            }
-            MSG_INFO1( spxout << "All other variables have zero value (within " << std::setprecision(1) << 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) << ")." << std::endl );
-            MSG_INFO1( spxout << "Objective change per unit along primal ray is " << rayobjval << "." << std::endl; )
-         }
-      }
-      break;
-   case SPxSolver::INFEASIBLE:
-      if ( checkMode )
-    MSG_INFO1( spxout << "IEXAMP32 LP is infeasible" << std::endl; )
-      else
-    MSG_INFO1( spxout << "LP is infeasible" << std::endl; )
-      if ( print_solution )
-      {
-         DVectorReal farkasx(SoPlexShell.numRowsReal());
-
-         if( SoPlexShell.getDualFarkasReal(farkasx) )
-         {
-            DVectorReal proofvec(SoPlexShell.numColsReal());
-            double lhs;
-            double rhs;
-
-            lhs = 0.0;
-            rhs = 0.0;
-            proofvec.clear();
-            for( int i = 0; i < SoPlexShell.numRowsReal(); ++i )
-            {
-               if ( isNotZero( farkasx[i], 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::OPTTOL)) ) )
-               {
-                  MSG_INFO1( spxout << rownames[i] << "\t"
-                                    << i << "\t"
-                                    << std::setw(16)
-                                    << std::setprecision( precision )
-                                    << farkasx[i] << "\t"; )
-                  LPRowReal row;
-                  SoPlexShell.getRowReal(i, row);
-                  if( row.lhs() > -soplex::infinity )
-                  {
-                     MSG_INFO1( spxout << row.lhs() << " <= "; );
-                  }
-                  for( int j = 0; j < row.rowVector().size(); ++j )
-                  {
-                     if( row.rowVector().value(j) > 0 )
-                     {
-                        MSG_INFO1( spxout << "+"; )
-                     }
-                     MSG_INFO1( spxout
-                        << row.rowVector().value(j) << " "
-                        << colnames[row.rowVector().index(j)]
-                        << " "; );
-                  }
-                  if( row.rhs() < soplex::infinity )
-                  {
-                     MSG_INFO1( spxout << "<= " << row.rhs(); );
-                  }
-                  MSG_INFO1( spxout << std::endl; )
-                  if( farkasx[i] > 0.0 )
-                  {
-                     lhs += farkasx[i] * row.lhs();
-                     rhs += farkasx[i] * row.rhs();
-                  }
-                  else
-                  {
-                     lhs += farkasx[i] * row.rhs();
-                     rhs += farkasx[i] * row.lhs();
-                  }
-                  SVectorReal vec(row.rowVector());
-                  vec *= farkasx[i];
-                  proofvec += vec;
-               }
-            }
-
-            MSG_INFO1( spxout << "All other row multipliers are zero (within " << std::setprecision(1) << 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::OPTTOL)) << ")." << std::endl );
-            MSG_INFO1( spxout << "Farkas infeasibility proof: \t"; )
-            MSG_INFO1( spxout << lhs << " <= "; )
-
-            bool nonzerofound = false;
-            for( int i = 0; i < SoPlexShell.numColsReal(); ++i )
-            {
-               if ( isNotZero( proofvec[i], 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::OPTTOL)) ) )
-               {
-                  if( proofvec[i] > 0 )
-                  {
-                     MSG_INFO1( spxout << "+"; )
-                  }
-                  MSG_INFO1( spxout << proofvec[i] << " " << colnames[i] << " "; )
-                  nonzerofound = true;
-               }
-            }
-            if( !nonzerofound )
-            {
-               MSG_INFO1( spxout << "0 "; );
-            }
-            MSG_INFO1( spxout << "<= " << rhs << std::endl; );
-         }
-      }
-      if( write_basis )  // write basis even if we are infeasible
-         SoPlexShell.writeBasisFile(basisname, &rownames, &colnames);
-      break;
-   case SPxSolver::ABORT_CYCLING:
-      if( checkMode )
-    MSG_INFO1( spxout << "EEXAMP40 aborted due to cycling" << std::endl; )
-      else
-    MSG_INFO1( spxout << "Aborted due to cycling" << std::endl; )
-      break;
-   case SPxSolver::ABORT_TIME:
-      if( checkMode )
-    MSG_INFO1( spxout << "IEXAMP33 aborted due to time limit" << std::endl; )
-      else
-    MSG_INFO1( spxout << "Aborted due to time limit" << std::endl; )
-      break;
-   case SPxSolver::ABORT_ITER:
-      if( checkMode )
-    MSG_INFO1( spxout << "IEXAMP34 aborted due to iteration limit" << std::endl; )
-      else
-    MSG_INFO1( spxout << "Aborted due to iteration limit" << std::endl; )
-      break;
-   case SPxSolver::ABORT_VALUE:
-      if( checkMode )
-    MSG_INFO1( spxout << "IEXAMP35 aborted due to objective value limit" << std::endl; )
-      else
-    MSG_INFO1( spxout << "Aborted due to objective value limit" << std::endl; )
-      break;
-   case SPxSolver::SINGULAR:
-      if( checkMode )
-    MSG_INFO1( spxout << "EEXAMP39 basis is singular" << std::endl; )
-      else
-    MSG_INFO1( spxout << "Basis is singular" << std::endl; )
-      break;
-   default:
-      if( checkMode )
-    MSG_INFO1( spxout << "EEXAMP36 An error occurred during " << "the solution process" << std::endl; )
-      else
-    MSG_INFO1( spxout << "An error occurred during " << "the solution process" << std::endl; )
-      break;
    }
-   MSG_INFO1( spxout << std::endl; )
-}
-
-//------------------------------------------------------------------------
-static
-void printSolutionAndStatusRational(
-   SoPlex2&             SoPlexShell,
-   const NameSet&       rownames,
-   const NameSet&       colnames,
-   const int            precision,
-   const bool           print_quality,
-   const bool           print_solution,
-   const bool           print_dual,
-   const bool           write_basis,
-   const char*          basisname,
-   bool                 checkMode)
-{
-   // get the solution status
-   SPxSolver::Status status = SoPlexShell.status();
-
-   if( !checkMode )
-      MSG_INFO1( spxout << std::endl; )
-   switch (status)
+   else
    {
-   case SPxSolver::OPTIMAL:
-      if( checkMode )
-         MSG_INFO1( spxout << "IEXAMP29 "; )
-            MSG_INFO1( spxout << "Solution value is: " << std::setprecision( precision ) << rationalToString(SoPlexShell.objValueRational()) << std::endl << std::endl );
-
-      if( print_quality )
-         displayQualityRational( SoPlexShell, checkMode );
-
-      if( print_solution )
-      {
-         DVectorRational objx(SoPlexShell.numColsRational());
-
-         if( SoPlexShell.getPrimalRational(objx) )
-         {
-            MSG_INFO1( spxout << std::endl << "Primal solution (name, value):" << std::endl; )
-            for( int i = 0; i < SoPlexShell.numColsRational(); ++i )
-            {
-               if( isNotZero( Real(objx[i]), 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) ) )
-                  MSG_INFO1( spxout << colnames[i] << "\t"
-                                    << std::setw(17)
-                                    << std::setprecision( precision )
-                                    << rationalToString(objx[i]) << std::endl; )
-            }
-            MSG_INFO1( spxout << "All other variables are zero (within " << std::setprecision(1) << 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) << ")." << std::endl; )
-         }
-      }
-      if( print_dual )
-      {
-         DVectorRational objy( SoPlexShell.numRowsRational() );
-         bool allzero = true;
-
-         if( SoPlexShell.getDualRational(objy) )
-         {
-            MSG_INFO1( spxout << std::endl << "Dual multipliers (name, value):" << std::endl; )
-            for( int i = 0; i < SoPlexShell.numRowsRational(); ++i )
-            {
-               if( isNotZero( Real(objy[i]), 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::OPTTOL))) )
-               {
-                  MSG_INFO1( spxout << rownames[i] << "\t"
-                                    << std::setw(17)
-                                    << std::setprecision( precision )
-                                    << rationalToString(objy[i]) << std::endl; )
-                  allzero = false;
-               }
-            }
-
-            MSG_INFO1( spxout << "All " << (allzero ? "" : "other ") << "dual values are zero (within "
-               << std::setprecision(1) << 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::OPTTOL)) << ")." << std::endl );
-
-            if( !allzero )
-            {
-               if( SoPlexShell.intParam(SoPlex2::OBJSENSE) == SoPlex2::OBJSENSE_MINIMIZE )
-               {
-                  MSG_INFO1( spxout << "Minimizing: a positive/negative value corresponds to left-hand (>=) resp. right-hand (<=) side."
-                                    << std::endl; )
-               }
-               else
-               {
-                  MSG_INFO1( spxout << "Maximizing: a positive/negative value corresponds to right-hand (<=) resp. left-hand (>=) side."
-                                    << std::endl; )
-               }
-            }
-         }
-      }
-      if( write_basis )
-      {
-         MSG_INFO1( spxout << "Writing basis of original problem to file " << basisname << std::endl; )
-         SoPlexShell.writeBasisFile( basisname, &rownames, &colnames );
-      }
-      break;
-   case SPxSolver::UNBOUNDED:
-      if( checkMode )
-    MSG_INFO1( spxout << "IEXAMP31 LP is unbounded" << std::endl; )
-      else
-    MSG_INFO1( spxout << "LP is unbounded" << std::endl; )
-
-      if( print_solution )
-      {
-         DVectorRational objx(SoPlexShell.numColsRational());
-         if( SoPlexShell.getPrimalRational(objx) )
-         {
-            MSG_INFO1( spxout << std::endl << "Primal solution (name, id, value):" << std::endl; )
-            for( int i = 0; i < SoPlexShell.numColsRational(); ++i )
-            {
-               if( isNotZero( Real(objx[i]), 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) ) )
-                  MSG_INFO1( spxout << colnames[i] << "\t"
-                                    << i << "\t"
-                                    << std::setw(17)
-                                    << std::setprecision( precision )
-                                    << rationalToString(objx[i]) << std::endl; )
-            }
-            MSG_INFO1( spxout << "All other variables are zero (within " << std::setprecision(1) << 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) << ")." << std::endl );
-         }
-
-         DVectorRational objcoef(SoPlexShell.numColsRational());
-         DVectorRational ray(SoPlexShell.numColsRational());
-         if( SoPlexShell.getPrimalRayRational(ray) )
-         {
-            Rational rayobjval = 0.0;
-
-            SoPlexShell.getObjRational(objcoef);
-
-            MSG_INFO1( spxout << std::endl << "Primal ray (name, id, value):" << std::endl; )
-            for( int i = 0; i < SoPlexShell.numColsRational(); ++i )
-            {
-               if ( isNotZero( Real(ray[i]), 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) ) )
-               {
-                  rayobjval += ray[i] * objcoef[i];
-
-                  MSG_INFO1( spxout << colnames[i] << "\t"
-                                    << i << "\t"
-                                    << std::setw(17)
-                                    << std::setprecision( precision )
-                                    << rationalToString(ray[i]) << std::endl; )
-               }
-            }
-            MSG_INFO1( spxout << "All other variables have zero value (within " << std::setprecision(1) << 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::FEASTOL)) << ")." << std::endl );
-            MSG_INFO1( spxout << "Objective change per unit along primal ray is " << rationalToString(rayobjval) << "." << std::endl; )
-         }
-      }
-      break;
-   case SPxSolver::INFEASIBLE:
-      if ( checkMode )
-    MSG_INFO1( spxout << "IEXAMP32 LP is infeasible" << std::endl; )
-      else
-    MSG_INFO1( spxout << "LP is infeasible" << std::endl; )
-      if ( print_solution )
-      {
-         DVectorRational farkasx(SoPlexShell.numRowsRational());
-
-         if( SoPlexShell.getDualFarkasRational(farkasx) )
-         {
-            DVectorRational proofvec(SoPlexShell.numColsRational());
-            Rational lhs;
-            Rational rhs;
-
-            lhs = 0.0;
-            rhs = 0.0;
-            proofvec.clear();
-            for( int i = 0; i < SoPlexShell.numRowsRational(); ++i )
-            {
-               if ( isNotZero( Real(farkasx[i]), 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::OPTTOL)) ) )
-               {
-                  MSG_INFO1( spxout << rownames[i] << "\t"
-                                    << i << "\t"
-                                    << std::setw(16)
-                                    << std::setprecision( precision )
-                                    << rationalToString(farkasx[i]) << "\t"; )
-                  LPRowRational row;
-                  SoPlexShell.getRowRational(i, row);
-                  if( row.lhs() > double(-soplex::infinity) )
-                  {
-                     MSG_INFO1( spxout << row.lhs() << " <= "; );
-                  }
-                  for( int j = 0; j < row.rowVector().size(); ++j )
-                  {
-                     if( row.rowVector().value(j) > 0 )
-                     {
-                        MSG_INFO1( spxout << "+"; )
-                     }
-                     MSG_INFO1( spxout
-                        << rationalToString(row.rowVector().value(j)) << " "
-                        << colnames[row.rowVector().index(j)]
-                        << " "; );
-                  }
-                  if( row.rhs() < double(soplex::infinity) )
-                  {
-                     MSG_INFO1( spxout << "<= " << row.rhs(); );
-                  }
-                  MSG_INFO1( spxout << std::endl; )
-                  if( farkasx[i] > 0.0 )
-                  {
-                     lhs += farkasx[i] * row.lhs();
-                     rhs += farkasx[i] * row.rhs();
-                  }
-                  else
-                  {
-                     lhs += farkasx[i] * row.rhs();
-                     rhs += farkasx[i] * row.lhs();
-                  }
-                  SVectorRational vec(row.rowVector());
-                  vec *= farkasx[i];
-                  proofvec += vec;
-               }
-            }
-
-            MSG_INFO1( spxout << "All other row multipliers are zero (within " << std::setprecision(1) << 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::OPTTOL)) << ")." << std::endl );
-            MSG_INFO1( spxout << "Farkas infeasibility proof: \t"; )
-            MSG_INFO1( spxout << rationalToString(lhs) << " <= "; )
-
-            bool nonzerofound = false;
-            for( int i = 0; i < SoPlexShell.numColsRational(); ++i )
-            {
-               if ( isNotZero( Real(proofvec[i]), 0.001 * Real(SoPlexShell.rationalParam(SoPlex2::OPTTOL)) ) )
-               {
-                  if( proofvec[i] > 0 )
-                  {
-                     MSG_INFO1( spxout << "+"; )
-                  }
-                  MSG_INFO1( spxout << rationalToString(proofvec[i]) << " " << colnames[i] << " "; )
-                  nonzerofound = true;
-               }
-            }
-            if( !nonzerofound )
-            {
-               MSG_INFO1( spxout << "0 "; );
-            }
-            MSG_INFO1( spxout << "<= " << rationalToString(rhs) << std::endl; );
-         }
-      }
-      if( write_basis )  // write basis even if we are infeasible
-         SoPlexShell.writeBasisFile(basisname, &rownames, &colnames);
-      break;
-   case SPxSolver::ABORT_CYCLING:
-      if( checkMode )
-    MSG_INFO1( spxout << "EEXAMP40 aborted due to cycling" << std::endl; )
-      else
-    MSG_INFO1( spxout << "Aborted due to cycling" << std::endl; )
-      break;
-   case SPxSolver::ABORT_TIME:
-      if( checkMode )
-    MSG_INFO1( spxout << "IEXAMP33 aborted due to time limit" << std::endl; )
-      else
-    MSG_INFO1( spxout << "Aborted due to time limit" << std::endl; )
-      break;
-   case SPxSolver::ABORT_ITER:
-      if( checkMode )
-    MSG_INFO1( spxout << "IEXAMP34 aborted due to iteration limit" << std::endl; )
-      else
-    MSG_INFO1( spxout << "Aborted due to iteration limit" << std::endl; )
-      break;
-   case SPxSolver::ABORT_VALUE:
-      if( checkMode )
-    MSG_INFO1( spxout << "IEXAMP35 aborted due to objective value limit" << std::endl; )
-      else
-    MSG_INFO1( spxout << "Aborted due to objective value limit" << std::endl; )
-      break;
-   case SPxSolver::SINGULAR:
-      if( checkMode )
-    MSG_INFO1( spxout << "EEXAMP39 basis is singular" << std::endl; )
-      else
-    MSG_INFO1( spxout << "Basis is singular" << std::endl; )
-      break;
-   default:
-      if( checkMode )
-    MSG_INFO1( spxout << "EEXAMP36 An error occurred during " << "the solution process" << std::endl; )
-      else
-    MSG_INFO1( spxout << "An error occurred during " << "the solution process" << std::endl; )
-      break;
+      MSG_INFO1( spxout << "No dual solution available.\n" );
    }
-   MSG_INFO1( spxout << std::endl; )
 }
 
-//------------------------------------------------------------------------
-//    main program
-//------------------------------------------------------------------------
+/// performs external feasibility check according to check mode
+static
+void checkSolution(SoPlex& soplex)
+{
+   if( soplex.intParam(SoPlex::CHECKMODE) == SoPlex::CHECKMODE_RATIONAL
+      || (soplex.intParam(SoPlex::CHECKMODE) == SoPlex::CHECKMODE_AUTO
+         && soplex.intParam(SoPlex::READMODE) == SoPlex::READMODE_RATIONAL) )
+   {
+      checkSolutionRational(soplex);
+   }
+   else
+   {
+      checkSolutionReal(soplex);
+   }
 
+   MSG_INFO1( spxout << "\n" );
+}
+
+/// runs SoPlex command line
 int main(int argc, char* argv[])
 {
-   SoPlex2*                  SoPlexShell    = new SoPlex2();
-   const char*               filename;
-   char*                     basisname      = 0;
+   SoPlex soplex;
+   NameSet rownames;
+   NameSet colnames;
+   Timer readingTimer;
+   int optidx;
 
-   NameSet                   rownames;
-   NameSet                   colnames;
-   int                       exactmode      = 0;
-   int                       starting       = 0;
-   int                       pricing        = 4;
-   int                       ratiotest      = 2;
-   int                       scaling        = 2;
-   int                       simplifying    = 1;
-   int                       iterlimit      = -1;
-   Real                      timelimit      = -1.0;
-   Real                      delta          = DEFAULT_BND_VIOL;
-   Real                      feastol        = DEFAULT_BND_VIOL;
-   Real                      opttol         = DEFAULT_BND_VIOL;
-   Real                      irthreshold    = DEFAULT_BND_VIOL * 1e-6;
-   Real                      epsilon        = DEFAULT_EPS_ZERO;
-   Real                      epsilon_factor = DEFAULT_EPS_FACTOR;
-   Real                      epsilon_update = DEFAULT_EPS_UPDATE;
-   int                       verbose        = SPxOut::INFO1;
-   bool                      print_solution = false;
-   bool                      print_dual     = false;
-   bool                      print_quality  = false;
-   bool                      read_basis     = false;
-   bool                      write_basis    = false;
-   bool                      checkMode      = false;
-   int                       precision;
-   int                       optidx;
+   const char* lpfilename;
+   char* readbasname = 0;
+   char* writebasname = 0;
+   char* loadsetname = 0;
+   char* savesetname = 0;
+   char* diffsetname = 0;
+   bool printPrimal = false;
+   bool printDual = false;
+   bool displayStatistics = false;
+   bool checkSol = false;
 
-   // write default settings file
-   MSG_INFO1( spxout << "Saving default parameters to settings file <default.set> . . .\n" );
-   SoPlexShell->saveSettingsFile("default.set");
-
-   // read soplex.set if available
-   spxifstream file("soplex.set");
-   if( !file )
-   {
-      MSG_INFO1( spxout << "User settings file <soplex.set> not found.  Using default parameters.\n" );
-   }
-   else
-   {
-      SoPlexShell->loadSettingsFile("soplex.set");
-   }
-
-   // read arguments from command line
-   for(optidx = 1; optidx < argc; optidx++)
-   {
-      if( *argv[optidx] != '-' )
-         break;
-
-      switch(argv[optidx][1])
-      {
-         case '-' :
-            checkParameter(argv[optidx][2], argv);
-            if( !SoPlexShell->parseSettingsString(&argv[optidx][2]) )
-               printUsage(argv);
-            break;
-         case 'X' :
-            checkParameter(argv[optidx][2], argv); // use -X[0-2], not -X
-            exactmode = atoi(&argv[optidx][2]);
-            break;
-         case 'b' :
-            checkParameter(argv[optidx][2], argv); // use -b{r,w}, not -b
-            if (argv[optidx][2] == 'r')
-               read_basis = true;
-            if (argv[optidx][2] == 'w')
-               write_basis = true;
-            break;
-         case 'c' :
-            checkParameter(argv[optidx][2], argv); // use -c[0-3], not -c
-            setStarter( *SoPlexShell, atoi(&argv[optidx][2]) );
-            break;
-         case 'd' :
-            checkParameter(argv[optidx][2], argv); // use -dx, not -d
-            SoPlexShell->setRationalParam( SoPlex2::FEASTOL, atof(&argv[optidx][2]) );
-            SoPlexShell->setRationalParam( SoPlex2::OPTTOL, atof(&argv[optidx][2]) );
-            break;
-         case 'f' :
-            checkParameter(argv[optidx][2], argv); // use -fx, not -f
-            SoPlexShell->setRationalParam( SoPlex2::FEASTOL, atof(&argv[optidx][2]) );
-            break;
-         case 'o' :
-            checkParameter(argv[optidx][2], argv); // use -ox, not -o
-            SoPlexShell->setRationalParam( SoPlex2::OPTTOL, atof(&argv[optidx][2]) );
-            break;
-         case 'R' :
-            checkParameter(argv[optidx][2], argv); // use -Rx, not -R
-            SoPlexShell->setRealParam( SoPlex2::FPFEASTOL, atof(&argv[optidx][2]) );
-            SoPlexShell->setRealParam( SoPlex2::FPOPTTOL, atof(&argv[optidx][2]) );
-            break;
-         case 'e':
-            SoPlexShell->setIntParam( SoPlex2::ALGORITHM, SoPlex2::ALGORITHM_ENTER );
-            break;
-         case 'g' :
-            checkParameter(argv[optidx][2], argv); // use -g[0-5], not -g
-            scaling = atoi(&argv[optidx][2]);
-            setScaler( *SoPlexShell, scaling );
-            break;
-         case 'i' :
-            SoPlexShell->setIntParam( SoPlex2::FACTOR_UPDATE_TYPE, SoPlex2::FACTOR_UPDATE_TYPE_ETA );
-            break;
-         case 'l' :
-            checkParameter(argv[optidx][2], argv); // use -lx, not -l
-            SoPlexShell->setRealParam( SoPlex2::TIMELIMIT, atoi(&argv[optidx][2]) );
-            break;
-         case 'L' :
-            checkParameter(argv[optidx][2], argv); // use -Lx, not -L
-            SoPlexShell->setIntParam( SoPlex2::ITERLIMIT, atoi(&argv[optidx][2]) );
-            break;
-         case 'p' :
-            checkParameter(argv[optidx][2], argv); // use -p[0-5], not -p
-            setPricer( *SoPlexShell, atoi(&argv[optidx][2]) );
-            break;
-         case 'P' :
-            SoPlexShell->setBoolParam(SoPlex2::PARTIAL_PRICING, true);
-            break;
-         case 'q' :
-            print_quality = true;
-            break;
-         case 'r' :
-            SoPlexShell->setIntParam( SoPlex2::REPRESENTATION, SoPlex2::REPRESENTATION_ROW );
-            break;
-         case 's' :
-            checkParameter(argv[optidx][2], argv); // use -s[0-1], not -s
-            if (argv[optidx][2] >= '0' && argv[optidx][2] <= '9')
-               SoPlexShell->setIntParam( SoPlex2::SIMPLIFIER, argv[optidx][2] - '0');
-            break;
-         case 't' :
-            checkParameter(argv[optidx][2], argv); // use -r[0-2], not -r
-            setRatiotester( *SoPlexShell, atoi(&argv[optidx][2]) );
-            break;
-         case 'v' :
-            checkParameter(argv[optidx][2], argv); // use -v[0-5], not -v
-            if (argv[optidx][2] >= '0' && argv[optidx][2] <= '9')
-            {
-               verbose = argv[optidx][2] - '0';
-               Param::setVerbose( verbose );
-            }
-            break;
-         case 'V' :
-            printVersionInfo(checkMode);
-            exit(0);
-         case 'x' :
-            print_solution = true;
-            break;
-         case 'y' :
-            print_dual = true;
-            break;
-         case 'z' :
-            checkParameter(argv[optidx][2], argv); // must not be empty
-            checkParameter(argv[optidx][3], argv); // must not be empty
-            switch(argv[optidx][2])
-            {
-            case 'z' :
-               SoPlexShell->setRealParam( SoPlex2::EPSILON_ZERO, atof(&argv[optidx][3]) );
-               break;
-            case 'f' :
-               SoPlexShell->setRealParam( SoPlex2::EPSILON_FACTORIZATION, atof(&argv[optidx][3]) );
-               break;
-            case 'u' :
-               SoPlexShell->setRealParam( SoPlex2::EPSILON_UPDATE, atof(&argv[optidx][3]) );
-               break;
-            default :
-               printUsage( argv );
-            }
-            break;
-         case 'C' :
-            checkMode = true;
-            break;
-         case 'h' :
-         case '?' :
-            printVersionInfo(checkMode);
-            //lint -fallthrough
-         default :
-            printUsage( argv );
-      }
-   }
-
-   // print version
-   printVersionInfo(checkMode);
-
-   // enough arguments?
-   if ((argc - optidx) < 1 + (read_basis ? 1 : 0) + (write_basis ? 1 : 0))
-      printUsage( argv );
-   filename  = argv[optidx];
-
-   ++optidx;
-
-   if ( read_basis || write_basis )
-      basisname = strcpy( new char[strlen(argv[optidx]) + 1], argv[optidx] );
-
-   // Set the output precision.
-   precision = int(-log10(std::min(feastol, opttol))) + 1;
-
-   std::cout.setf( std::ios::scientific | std::ios::showpoint );
-   std::cerr.setf( std::ios::scientific | std::ios::showpoint );
-
-#ifdef SEND_ALL_OUTPUT_TO_FILES
-   // Example of redirecting output to different files.
-   // Default is cerr for errors and warnings, cout for everything else.
-   std::ofstream  myerrstream ( "errwarn.txt" );
-   std::ofstream  myinfostream( "infos.txt" );
-   redirectOutput(myerrstream, myinfostream);
-#endif
-
-   printAlgorithmParameters( *SoPlexShell, checkMode );
+   printVersionInfo();
 
    try
    {
-      bool success = false;
+      // no options were given
+      if( argc <= 1 )
+         printUsage(argv, 0);
 
-      // start timer
-      Timer timer;
-      timer.start();
-
-      // read the LP from an input file (.lp or .mps)
-      if ( checkMode )
-         MSG_INFO1( spxout << "IEXAMP22 " );
-
-      MSG_INFO1( spxout << "Loading LP file " << filename << std::endl );
-
-      success = true;
-      if( exactmode <= 0 )
+      // read arguments from command line
+      for( optidx = 1; optidx < argc; optidx++ )
       {
-         success = success && SoPlexShell->setIntParam(SoPlex2::SYNCMODE, SoPlex2::SYNCMODE_ONLYREAL);
-         success = success && SoPlexShell->setIntParam(SoPlex2::SOLVEMODE, SoPlex2::SOLVEMODE_REAL);
-         success = success && SoPlexShell->readFileReal( filename, &rownames, &colnames );
+         char* option = argv[optidx];
+
+         // we reached <lpfile>
+         if( option[0] != '-' )
+            break;
+
+         // option string must start with '-', must contain at least two characters, and exactly two characters if and
+         // only if it is -x, -y, -q, or -c
+         if( option[0] != '-' || option[1] == '\0'
+            || ((option[2] == '\0') != (option[1] == 'x' || option[1] == 'y' || option[1] == 'q' || option[1] == 'c')) )
+         {
+            freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
+            printUsage(argv, optidx);
+         }
+
+         switch( option[1] )
+         {
+         case '-' :
+            {
+               option = &option[2];
+
+               // --readbas=<basfile> : read starting basis from file
+               if( strncmp(option, "readbas=", 8) == 0 )
+               {
+                  if( readbasname == 0 )
+                  {
+                     char* filename = &option[8];
+                     readbasname = strcpy(new char[strlen(filename) + 1], filename);
+                  }
+               }
+               // --writebas=<basfile> : write terminal basis to file
+               else if( strncmp(option, "writebas=", 9) == 0 )
+               {
+                  if( writebasname == 0 )
+                  {
+                     char* filename = &option[9];
+                     writebasname = strcpy(new char[strlen(filename) + 1], filename);
+                  }
+               }
+               // --loadset=<setfile> : load parameters from settings file
+               else if( strncmp(option, "loadset=", 8) == 0 )
+               {
+                  if( loadsetname == 0 )
+                  {
+                     char* filename = &option[8];
+                     loadsetname = strcpy(new char[strlen(filename) + 1], filename);
+                     if( !soplex.loadSettingsFile(loadsetname) )
+                     {
+                        freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
+                        printUsage(argv, optidx);
+                     }
+                     else
+                     {
+                        // we need to start parsing again because some command line parameters might have been overwritten
+                        optidx = 0;
+                     }
+                  }
+               }
+               // --saveset=<setfile> : save parameters to settings file
+               else if( strncmp(option, "saveset=", 8) == 0 )
+               {
+                  if( savesetname == 0 )
+                  {
+                     char* filename = &option[8];
+                     savesetname = strcpy(new char[strlen(filename) + 1], filename);
+                  }
+               }
+               // --diffset=<setfile> : save modified parameters to settings file
+               else if( strncmp(option, "diffset=", 8) == 0 )
+               {
+                  if( diffsetname == 0 )
+                  {
+                     char* filename = &option[8];
+                     diffsetname = strcpy(new char[strlen(filename) + 1], filename);
+                  }
+               }
+               // --readmode=<value> : choose reading mode for <lpfile> (0* - floating-point, 1 - rational)
+               else if( strncmp(option, "readmode=", 9) == 0 )
+               {
+                  if( !soplex.setIntParam(SoPlex::READMODE, option[9] - '0') )
+                  {
+                     freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
+                     printUsage(argv, optidx);
+                  }
+                  // if the LP is parsed rationally and might be solved rationally, we choose automatic syncmode such that
+                  // the rational LP is kept after reading
+                  else if( soplex.intParam(SoPlex::READMODE) == SoPlex::READMODE_RATIONAL
+                     && soplex.intParam(SoPlex::SOLVEMODE) != SoPlex::SOLVEMODE_REAL )
+                  {
+                     soplex.setIntParam(SoPlex::SYNCMODE, SoPlex::SYNCMODE_AUTO);
+                  }
+               }
+               // --solvemode=<value> : choose solving mode (0* - floating-point solve, 1 - auto, 2 - force iterative refinement)
+               else if( strncmp(option, "solvemode=", 10) == 0 )
+               {
+                  if( !soplex.setIntParam(SoPlex::SOLVEMODE, option[10] - '0') )
+                  {
+                     freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
+                     printUsage(argv, optidx);
+                  }
+                  // if the LP is parsed rationally and might be solved rationally, we choose automatic syncmode such that
+                  // the rational LP is kept after reading
+                  else if( soplex.intParam(SoPlex::READMODE) == SoPlex::READMODE_RATIONAL
+                     && soplex.intParam(SoPlex::SOLVEMODE) != SoPlex::SOLVEMODE_REAL )
+                  {
+                     soplex.setIntParam(SoPlex::SYNCMODE, SoPlex::SYNCMODE_AUTO);
+                  }
+               }
+               // --<type>:<name>=<val> :  change parameter value using syntax of settings file entries
+               else if( !soplex.parseSettingsString(option) )
+               {
+                  freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
+                  printUsage(argv, optidx);
+               }
+               break;
+            }
+
+         case 't' :
+            // -t<s> : set time limit to <s> seconds
+            if( !soplex.setRealParam(SoPlex::TIMELIMIT, atoi(&option[2])) )
+            {
+               freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
+               printUsage(argv, optidx);
+            }
+            break;
+
+         case 'i' :
+            // -i<n> : set iteration limit to <n>
+            if( !soplex.setIntParam(SoPlex::ITERLIMIT, atoi(&option[2])) )
+            {
+               freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
+               printUsage(argv, optidx);
+            }
+            break;
+
+         case 'f' :
+            // -f<eps> : set primal feasibility tolerance to <eps>
+            if( !soplex.setRationalParam(SoPlex::FEASTOL, atof(&option[2])) )
+            {
+               freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
+               printUsage(argv, optidx);
+            }
+            break;
+
+         case 'o' :
+            // -o<eps> : set dual feasibility (optimality) tolerance to <eps>
+            if( !soplex.setRationalParam(SoPlex::OPTTOL, atof(&option[2])) )
+            {
+               freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
+               printUsage(argv, optidx);
+            }
+            break;
+
+         case 's' :
+            // -s<value> : choose simplifier/presolver (0 - off, 1* - auto)
+            if( !soplex.setIntParam(SoPlex::SIMPLIFIER, option[2] - '0') )
+            {
+               freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
+               printUsage(argv, optidx);
+            }
+            break;
+
+         case 'g' :
+            // -g<value> : choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric)
+            if( !soplex.setIntParam(SoPlex::SCALER, option[2] - '0') )
+            {
+               freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
+               printUsage(argv, optidx);
+            }
+            break;
+
+         case 'p' :
+            // -p<value> : choose pricing (0* - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)
+            if( !soplex.setIntParam(SoPlex::PRICER, option[2] - '0') )
+            {
+               freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
+               printUsage(argv, optidx);
+            }
+            break;
+
+         case 'v' :
+            // -v<level> : set verbosity to <level> (0 - error, 3 - normal, 5 - high)
+            if( !soplex.setIntParam(SoPlex::VERBOSITY, option[2] - '0') )
+            {
+               freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
+               printUsage(argv, optidx);
+            }
+            break;
+
+         case 'x' :
+            // -x : print primal solution
+            printPrimal = true;
+            break;
+
+         case 'y' :
+            // -y : print dual multipliers
+            printDual = true;
+            break;
+
+         case 'q' :
+            // -q : display detailed statistics
+            displayStatistics = true;
+            break;
+
+         case 'c' :
+            // -c : perform final check of optimal solution in original problem
+            checkSol = true;
+            break;
+
+            //lint -fallthrough
+         default :
+            {
+               freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
+               printUsage(argv, optidx);
+            }
+         }
       }
-      else if( exactmode == 1 )
+
+      // no LP file was given and no settings files are written
+      if( optidx >= argc && savesetname == 0 && diffsetname == 0 )
       {
-         success = success && SoPlexShell->setIntParam(SoPlex2::SYNCMODE, SoPlex2::SYNCMODE_ONLYREAL);
-         success = success && SoPlexShell->setIntParam(SoPlex2::SOLVEMODE, SoPlex2::SOLVEMODE_RATIONAL);
-         success = SoPlexShell->readFileReal( filename, &rownames, &colnames );
-      }
-      else if( exactmode >= 2 )
-      {
-         success = success && SoPlexShell->setIntParam(SoPlex2::SYNCMODE, SoPlex2::SYNCMODE_AUTO);
-         success = success && SoPlexShell->setIntParam(SoPlex2::SOLVEMODE, SoPlex2::SOLVEMODE_RATIONAL);
-         success = SoPlexShell->readFileRational( filename, &rownames, &colnames );
+         freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
+         printUsage(argv, 0);
       }
 
-      if( !success )
+      // ensure that syncmode is not manual
+      if( soplex.intParam(SoPlex::SYNCMODE) == SoPlex::SYNCMODE_MANUAL )
       {
-         if ( checkMode )
-            MSG_INFO1( spxout << "EEXAMP23 " );
-
-         MSG_INFO1( spxout << "error while reading file \""  << filename << "\"" << std::endl );
+         MSG_ERROR( spxout << "Error: manual synchronization is invalid on command line.  Change parameter int:syncmode.\n" );
+         freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
          exit(1);
       }
 
-      // stop timer
-      timer.stop();
-
-      if ( checkMode )
-         MSG_INFO1( spxout << "IEXAMP24 " );
-
-      MSG_INFO1( spxout << "LP has "
-         << SoPlexShell->numRowsReal() << " rows "
-         << SoPlexShell->numColsReal() << " columns "
-         << SoPlexShell->numNonzerosReal() << " nonzeros"
-         << std::endl );
-
-      if( checkMode )
-         MSG_INFO1( spxout << "IEXAMP41 " );
-
-      MSG_INFO1( std::streamsize prec = spxout.precision();
-         spxout << "LP reading time: "
-         << std::fixed << std::setprecision(2) << timer.userTime()
-         << std::scientific << std::setprecision(int(prec)) << std::endl << std::endl );
-
-      // read a basis file if specified
-      if (read_basis)
+      // save settings files
+      if( savesetname != 0 )
       {
-         success = SoPlexShell->readBasisFile( basisname, &rownames, &colnames );
-
-         if( !success )
+         MSG_INFO1( spxout << "Saving parameters to settings file <" << savesetname << "> . . .\n" );
+         if( !soplex.saveSettingsFile(savesetname, false) )
          {
-            if ( checkMode )
-               MSG_INFO1( spxout << "EEXAMP25 " );
+            MSG_ERROR( spxout << "Error writing parameters to file <" << savesetname << ">\n" );
+         }
+      }
+      if( diffsetname != 0 )
+      {
+         MSG_INFO1( spxout << "Saving modified parameters to settings file <" << diffsetname << "> . . .\n" );
+         if( !soplex.saveSettingsFile(diffsetname, true) )
+         {
+            MSG_ERROR( spxout << "Error writing modified parameters to file <" << diffsetname << ">\n" );
+         }
+      }
 
-            MSG_INFO1( spxout << "error while reading file \""  << basisname << "\"" << std::endl );
+      // no LP file given: exit after saving settings
+      if( optidx >= argc )
+      {
+         if( loadsetname != 0 || savesetname != 0 || diffsetname != 0 )
+         {
+            MSG_INFO1( spxout << "\n" );
+         }
+
+         freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
+         exit(0);
+      }
+
+      // measure time for reading LP file and basis file
+      readingTimer.start();
+
+      // read LP from input file
+      lpfilename = argv[optidx];
+      MSG_INFO1( spxout << "Reading "
+         << (soplex.intParam(SoPlex::READMODE) == SoPlex::READMODE_REAL ? "(real)" : "(rational)")
+         << " LP file <" << lpfilename << "> . . .\n" );
+
+      if( !soplex.readFile(lpfilename, &rownames, &colnames) )
+      {
+         MSG_ERROR( spxout << "Error while reading file <" << lpfilename << ">.\n" );
+         freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
+         exit(1);
+      }
+
+      // read basis file if specified
+      if( readbasname != 0 )
+      {
+         MSG_INFO1( spxout << "Reading basis file <" << readbasname << "> . . . " );
+         if( !soplex.readBasisFile(readbasname, &rownames, &colnames) )
+         {
+            MSG_ERROR( spxout << "Error while reading file <" << readbasname << ">.\n" );
+            freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
             exit(1);
          }
       }
 
+      readingTimer.stop();
+
+      MSG_INFO1( std::streamsize prec = spxout.precision();
+         spxout << "Reading took "
+         << std::fixed << std::setprecision(2) << readingTimer.userTime()
+         << std::scientific << std::setprecision(int(prec))
+         << " seconds.\n\n" );
+
+      MSG_INFO1( spxout << "LP has " << soplex.numRowsReal() << " rows "
+         << soplex.numColsReal() << " columns and " << soplex.numNonzerosReal() << " nonzeros.\n\n" );
+
       // solve the LP
-      SoPlexShell->solve();
+      soplex.solve();
 
-      MSG_INFO1( spxout << "\nSoPlex statistics:\n" << SoPlexShell->statisticString() << std::endl );
-
-      // print solution, status, infeasibility system,...
-      if( exactmode >= 1 )
+      // print solution, check solution, and display statistics
+      if( printPrimal )
       {
-         printSolutionAndStatusRational(*SoPlexShell, rownames, colnames, precision, print_quality,
-            print_solution, print_dual, write_basis, basisname, checkMode);
-         SoPlexShell->printStatisticsRational(std::cout);
-      }
-      else
-      {
-         printSolutionAndStatusReal(*SoPlexShell, rownames, colnames, precision, print_quality,
-            print_solution, print_dual, write_basis, basisname, checkMode);
-         SoPlexShell->printStatisticsReal(std::cout);
+         ///@todo
       }
 
-      // clean up
-      delete [] basisname;
-      delete SoPlexShell;
+      if( printDual )
+      {
+         ///@todo
+      }
 
-      return 0;
+      if( checkSol )
+         checkSolution(soplex);
+
+      if( displayStatistics )
+      {
+         MSG_INFO1( spxout << "Statistics\n==========\n\n" );
+         soplex.printStatistics(spxout.getStream(SPxOut::INFO1));
+      }
+
+      // write basis file if specified
+      if( writebasname != 0 )
+      {
+         if( !soplex.hasBasis() )
+         {
+            MSG_WARNING( spxout << "No basis information available.  Could not write file <" << writebasname << ">\n\n" );
+         }
+         else if( !soplex.writeBasisFile(writebasname, &rownames, &colnames) )
+         {
+            MSG_ERROR( spxout << "Error while writing file <" << writebasname << ">.\n\n" );
+            freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
+            exit(1);
+         }
+         else
+         {
+            MSG_INFO1( spxout << "Written basis information to file <" << writebasname << ">.\n\n" );
+         }
+      }
    }
-   catch(SPxException& x)
+   catch( SPxException& x )
    {
-      std::cout << "exception caught : " << x.what() << std::endl;
-      delete [] basisname;
-      delete SoPlexShell;
+      MSG_ERROR( spxout << "Exception caught: " << x.what() << "\n" );
+      freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
+      exit(1);
    }
+
+   freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
+   exit(0);
 }

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -30,8 +30,6 @@ int SPxDantzigPR::selectLeave()
 
    if( thesolver->sparsePricingLeave )
       return selectLeaveSparse();
-   else if (thesolver->partialPricing)
-      return selectLeavePart();
 
    //    const Real* up  = thesolver->ubBound();
    //    const Real* low = thesolver->lbBound();
@@ -50,53 +48,6 @@ int SPxDantzigPR::selectLeave()
          {
             n    = i;
             best = x;
-         }
-      }
-   }
-   return n;
-}
-
-int SPxDantzigPR::selectLeavePart()
-{
-   assert(thesolver != 0);
-   Real best = -theeps;
-   Real x;
-   int n = -1;
-   int dim = thesolver->dim();
-   int count = 0;
-   int oldstart = start;
-
-   for(int i = oldstart; i < dim; ++i)
-   {
-      x = thesolver->fTest()[i];
-      if (x < -theeps)
-      {
-         if (x < best)
-         {
-            if( count == 0 )
-               start = (i + 1) % dim;
-            n = i;
-            best = x;
-            ++count;
-            if (count >= MAX_PRICING_CANDIDATES)
-               return n;
-         }
-      }
-   }
-   for(int i = 0; i < oldstart; ++i)
-   {
-      x = thesolver->fTest()[i];
-      if (x < -theeps)
-      {
-         if (x < best)
-         {
-            if( count == 0 )
-               start = (i + 1) % dim;
-            n = i;
-            best = x;
-            ++count;
-            if (count >= MAX_PRICING_CANDIDATES)
-               return n;
          }
       }
    }
@@ -282,15 +233,3 @@ SPxId SPxDantzigPR::selectEnterDenseCoDim(Real& best,SPxId& enterId)
 }
 
 } // namespace soplex
-
-//-----------------------------------------------------------------------------
-//Emacs Local Variables:
-//Emacs mode:c++
-//Emacs c-basic-offset:3
-//Emacs tab-width:8
-//Emacs indent-tabs-mode:nil
-//Emacs End:
-//-----------------------------------------------------------------------------
-
-
-

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -35,21 +35,18 @@ namespace soplex
 SPxBasis::Desc::Status
 SPxBasis::dualStatus(const SPxColId& id) const
 {
-   METHOD( "SPxBasis::dualStatus()" );
    return dualColStatus(static_cast<SPxLP*>(theLP)->number(id));
 }
 
 SPxBasis::Desc::Status
 SPxBasis::dualStatus(const SPxRowId& id) const
 {
-   METHOD( "SPxBasis::dualStatus()" );
    return dualRowStatus((static_cast<SPxLP*>(theLP))->number(id));
 }
 
 SPxBasis::Desc::Status
 SPxBasis::dualRowStatus(int i) const
 {
-   METHOD( "SPxBasis::dualRowStatus()" );
    assert(theLP != 0);
 
    if (theLP->rhs(i) < infinity)
@@ -73,7 +70,6 @@ SPxBasis::dualRowStatus(int i) const
 SPxBasis::Desc::Status
 SPxBasis::dualColStatus(int i) const
 {
-   METHOD( "SPxBasis::dualColStatus()" );
    assert(theLP != 0);
 
    if (theLP->SPxLP::upper(i) < infinity)
@@ -96,7 +92,6 @@ SPxBasis::dualColStatus(int i) const
 
 void SPxBasis::loadMatrixVecs()
 {
-   METHOD( "SPxBasis::loadMatrixVecs()" );
    assert(theLP != 0);
    assert(theLP->dim() == matrix.size());
 
@@ -118,7 +113,6 @@ void SPxBasis::loadMatrixVecs()
 
 bool SPxBasis::isDescValid(const Desc& ds)
 {
-   METHOD( "SPxBasis::isDescValid()" );
 
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
@@ -196,7 +190,6 @@ bool SPxBasis::isDescValid(const Desc& ds)
  */
 void SPxBasis::loadDesc(const Desc& ds)
 {
-   METHOD( "SPxBasis::loadDesc()" );
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
    assert(ds.nRows() == theLP->nRows());
@@ -298,7 +291,6 @@ void SPxBasis::loadDesc(const Desc& ds)
 
 void SPxBasis::setRep()
 {
-   METHOD( "SPxBasis::setRep()" );
    assert(theLP != 0);
 
    reDim();
@@ -318,7 +310,6 @@ void SPxBasis::setRep()
 
 void SPxBasis::load(SPxSolver* lp)
 {
-   METHOD( "SPxBasis::load()" );
    assert(lp != 0);
    theLP = lp;
 
@@ -334,7 +325,6 @@ void SPxBasis::load(SPxSolver* lp)
 
 void SPxBasis::loadSolver(SLinSolver* p_solver, const bool destroy)
 {
-   METHOD( "SPxBasis::loadSolver()" );
 
    assert(!freeSlinSolver || factor != 0);
 
@@ -389,7 +379,6 @@ bool SPxBasis::readBasis(
    const NameSet* rowNames, 
    const NameSet* colNames)
 {
-   METHOD( "SPxBasis::readBasis()" );
    assert(theLP != 0);
 
    /* prepare names */
@@ -604,7 +593,6 @@ void SPxBasis::writeBasis(
    const NameSet* colNames 
    ) const
 {
-   METHOD( "SPxBasis::writeBasis()" );
    assert(theLP != 0);
 
    os.setf(std::ios::left);
@@ -680,7 +668,6 @@ void SPxBasis::writeBasis(
 
 void SPxBasis::printMatrix() const
 {
-   METHOD( "SPxBasis::printMatrix()" );
 
    assert(matrixIsSetup);
 
@@ -727,7 +714,6 @@ void SPxBasis::change(
    const SVector* enterVec,
    const SSVector* eta)
 {
-   METHOD( "SPxBasis::change()" );
 
    assert(matrixIsSetup);
    assert(!id.isValid() || (enterVec != 0));
@@ -854,7 +840,6 @@ void SPxBasis::change(
 
 void SPxBasis::factorize()
 {
-   METHOD( "SPxBasis::factorize()" );
 
    assert(factor != 0);
 
@@ -901,7 +886,6 @@ void SPxBasis::factorize()
 
 Vector& SPxBasis::multWithBase(Vector& x) const
 {
-   METHOD( "SPxBasis::multWithBase()" );
    assert(status() > SINGULAR);
    assert(theLP->dim() == x.dim());
 
@@ -919,9 +903,26 @@ Vector& SPxBasis::multWithBase(Vector& x) const
    return x;
 }
 
+void SPxBasis::multWithBase(SSVector& x, SSVector& result) const
+{
+   assert(status() > SINGULAR);
+   assert(theLP->dim() == x.dim());
+   assert(x.dim() == result.dim());
+
+   if (!matrixIsSetup)
+      (const_cast<SPxBasis*>(this))->loadDesc(thedesc);
+
+   assert(matrixIsSetup);
+
+   for( int i = 0; i < x.dim(); ++i )
+      result.setValue(i, (*matrix[i]) * x);
+
+   return;
+}
+
+
 Vector& SPxBasis::multBaseWith(Vector& x) const
 {
-   METHOD( "SPxBasis::multBaseWith()" );
    assert(status() > SINGULAR);
    assert(theLP->dim() == x.dim());
 
@@ -943,6 +944,26 @@ Vector& SPxBasis::multBaseWith(Vector& x) const
    return x;
 }
 
+void SPxBasis::multBaseWith(SSVector& x, SSVector& result) const
+{
+   assert(status() > SINGULAR);
+   assert(theLP->dim() == x.dim());
+   assert(x.dim() == result.dim());
+
+   if (!matrixIsSetup)
+      (const_cast<SPxBasis*>(this))->loadDesc(thedesc);
+
+   assert(matrixIsSetup);
+
+   result.clear();
+   for( int i = 0; i < x.size(); ++i )
+   {
+      result.multAdd(x[i], (*matrix[i]));
+   }
+
+   return;
+}
+
 /* compute an estimated condition number for the current basis matrix
  * by computing estimates of the norms of B and B^-1 using the power method.
  * maxiters and tolerance control the accuracy of the estimate.
@@ -960,6 +981,13 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
    SSVector x(dimension);
    SSVector y(dimension);
 
+   // check whether a regular basis matrix is available
+   if( status() < REGULAR )
+      return 0;
+
+   if (!matrixIsSetup)
+      (const_cast<SPxBasis*>(this))->loadDesc(thedesc);
+
    // initialize vectors
    norm1 = 1.0 / (Real) dimension;
    for( i = 0; i < dimension; i++ )
@@ -970,19 +998,17 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
    for( c = 0; c < maxiters; ++c )
    {
       norm2 = norm1;
+
       // y = B*x
-      y = *matrix[0];
-      y *= x[0];
-      for( i = 1; i < dimension; ++i )
-         y.multAdd(x[i], (*matrix[i]));
+      multBaseWith(x, y);
       norm1 = y.length();
+
       // stop if converged
       if( abs(norm1 - norm2) < tolerance * norm1 )
          break;
-      // x = B^T*y
-      x.setValue(0, (*matrix[0]) * y);
-      for( i = 1; i < dimension; ++i )
-         x.setValue(i, (*matrix[i]) * y);
+
+      // x = B^T*y and normalize
+      multWithBase(y, x);
       x *= 1.0 / x.length();
    }
    norm = norm1;
@@ -997,11 +1023,16 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
    for( c = 0; c < maxiters; ++c )
    {
       norm2 = norm1;
+
+      // y = B^-1*x
       factor->solveRight(x, y);
       norm1 = x.length();
+
       // stop if converged
       if( abs(norm1 - norm2) < tolerance * norm1 )
          break;
+
+      // x = B^-T*y and normalize
       factor->solveLeft(y, x);
       y *= 1.0 / y.length();
    }
@@ -1012,7 +1043,6 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
 
 void SPxBasis::dump()
 {
-   METHOD( "SPxBasis::dump()" );
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
    assert(thedesc.nRows() == theLP->nRows());
@@ -1060,7 +1090,6 @@ void SPxBasis::dump()
 bool SPxBasis::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-   METHOD( "SPxBasis::isConsistent()" );
    int primals = 0;
    int i;
 
@@ -1120,7 +1149,6 @@ SPxBasis::SPxBasis()
    , thestatus (NO_PROBLEM)
    , freeSlinSolver(false)
 {
-   METHOD( "SPxBasis::SPxBasis()" );
 
    // info: is not consistent at this moment, e.g. because theLP == 0
 }
@@ -1151,7 +1179,6 @@ SPxBasis::SPxBasis(const SPxBasis& old)
    , thestatus(old.thestatus)
    , thedesc(old.thedesc)
 {
-   METHOD( "SPxBasis::SPxBasis()" );
 
    this->factor = old.factor->clone();
    freeSlinSolver = true;
@@ -1161,7 +1188,6 @@ SPxBasis::SPxBasis(const SPxBasis& old)
 
 SPxBasis::~SPxBasis()
 {
-   METHOD( "SPxBasis::~SPxBasis()" );
 
    assert(!freeSlinSolver || factor != 0);
 
@@ -1178,7 +1204,6 @@ SPxBasis::~SPxBasis()
  */
 SPxBasis& SPxBasis::operator=(const SPxBasis& rhs)
 {
-   METHOD( "SPxBasis::operator=()" );
 
    assert(!freeSlinSolver || factor != 0);
 
@@ -1262,12 +1287,3 @@ std::ostream& operator<<( std::ostream& os,
 
 
 } // namespace soplex
-
-//-----------------------------------------------------------------------------
-//Emacs Local Variables:
-//Emacs mode:c++
-//Emacs c-basic-offset:3
-//Emacs tab-width:8
-//Emacs indent-tabs-mode:nil
-//Emacs End:
-//-----------------------------------------------------------------------------

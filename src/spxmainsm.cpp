@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2013 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -1218,7 +1218,6 @@ void SPxMainSM::DuplicateColsPS::execute(DVector& x,
 
 void SPxMainSM::handleExtremes(SPxLP& lp)
 {
-   METHOD( "SPxMainSM::handleExtremes" );
 
    // This method handles extreme value of the given LP by
    //
@@ -1408,7 +1407,6 @@ void SPxMainSM::handleExtremes(SPxLP& lp)
 
 SPxSimplifier::Result SPxMainSM::removeEmpty(SPxLP& lp)
 {
-   METHOD( "SPxMainSM::removeEmpty" );
 
    // This method removes empty rows and columns from the LP.
 
@@ -1590,7 +1588,6 @@ SPxSimplifier::Result SPxMainSM::removeRowSingleton(SPxLP& lp, const SVector& ro
 
 SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
 {
-   METHOD( "SPxMainSM::simplifyRows" );
 
    // This method simplifies the rows of the LP.
    //
@@ -2122,7 +2119,6 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
 
 SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
 {
-   METHOD( "SPxMainSM::simplifyCols" );
 
    // This method simplifies the columns of the LP.
    //
@@ -2646,7 +2642,6 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
 
 SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
 {
-   METHOD( "SPxMainSM::simplifyDual" );
 
    // This method simplifies LP using the following dual structures:
    //
@@ -2897,7 +2892,6 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
 
 SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
 {
-   METHOD( "SPxMainSM::duplicateRows" );
 
    // This method simplifies the LP by removing duplicate rows
    // Duplicates are detected using the algorithm of Bixby and Wagner [1987]
@@ -3253,7 +3247,6 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
 
 SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
 {
-   METHOD( "SPxMainSM::duplicateCols" );
 
    // This method simplifies the LP by removing duplicate columns
    // Duplicates are detected using the algorithm of Bixby and Wagner [1987]
@@ -3639,7 +3632,6 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
 
 void SPxMainSM::fixColumn(SPxLP& lp, int j, bool correctIdx)
 {
-   METHOD( "SPxMainSM::fixColumn" );
 
    assert(EQrel(lp.lower(j), lp.upper(j), feastol()));
 
@@ -3716,7 +3708,6 @@ void SPxMainSM::fixColumn(SPxLP& lp, int j, bool correctIdx)
 
 SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real feastol, Real opttol, bool keepbounds)
 {
-   METHOD( "SPxMainSM::simplify()" );
 
    m_thesense = lp.spxSense();
    m_timeUsed.reset();
@@ -3915,7 +3906,6 @@ void SPxMainSM::unsimplify(const Vector& x, const Vector& y, const Vector& s, co
    assert(x.dim() == r.dim());
    assert(y.dim() == s.dim());
 
-   METHOD( "SPxMainSM::unsimplify()" );
 
    // assign values of variables in reduced LP
    // NOTE: for maximization problems, we have to switch signs of dual and reduced cost values,
@@ -3977,13 +3967,3 @@ void SPxMainSM::unsimplify(const Vector& x, const Vector& y, const Vector& s, co
    m_postsolved = true;
 }
 } //namespace soplex
-
-//-----------------------------------------------------------------------------
-//Emacs Local Variables:
-//Emacs mode:c++
-//Emacs c-basic-offset:3
-//Emacs tab-width:8
-//Emacs indent-tabs-mode:nil
-//Emacs End:
-//-----------------------------------------------------------------------------
-
