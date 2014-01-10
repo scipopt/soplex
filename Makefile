@@ -34,11 +34,11 @@ SHAREDLIBEXT	=	so
 LIBEXT		=	$(STATICLIBEXT)
 EXEEXTENSION	=	
 TEST		=	quick
-ALGO		=	1 2 3 4
-LIMIT		=	#
+SETTINGS	=	default
+TIME		=	3600
+
 
 #these variables are needed for cluster runs
-TIME		=	3600
 MEM		=	6144
 CONTINUE	=	false
 
@@ -258,20 +258,20 @@ doc:
 		cd doc; $(DOXY) $(NAME).dxy
 
 .PHONY: test
-test:		check
-
+test:		#$(BINFILE)
+		cd check; ./test.sh $(TEST) ../$(BINFILE) $(SETTINGS) $(TIME)
 .PHONY: check
 check:		#$(BINFILE)
-		cd check; ./check.sh $(TEST).test ../$(BINFILE) '$(ALGO)' $(LIMIT)
+		cd check; ./check.sh ../$(BINFILE)
 
 valgrind-check:	$(BINFILE)
 		cd check; \
-		./valgrind.sh $(TEST).test ../$(BINFILE) '$(ALGO)' '$(LIMIT)' \
+		./valgrind.sh $(TEST).test ../$(BINFILE) $(LIMIT) \
 		"$(VALGRIND) $(VFLAGS)" $(VSUPPNAME)
 
 memory_exception_test: $(BINFILE)
 		cd check; \
-		./exception.sh $(TEST).test ../$(BINFILE) '$(ALGO)' '$(LIMIT)' \
+		./exception.sh $(TEST).test ../$(BINFILE) $(LIMIT) \
 		"$(VALGRIND) $(VFLAGS)" $(VSUPPNAME)
 
 .PHONY: cleanbin
