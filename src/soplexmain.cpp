@@ -55,7 +55,7 @@ void printVersionInfo()
 #else
       << " [rational: long double]"
 #endif
-      << " [githash: " << std::setw(13) << std::setiosflags(std::ios::left) << getGitHash() << "]\n" );
+      << " [githash: " << getGitHash() << "]\n" );
 
    MSG_INFO1( spxout << "Copyright (c) 1996-2014 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)\n\n" );
 }
