@@ -24,6 +24,9 @@ ERRFILE=results/check.$TEST.$BINNAME.$SETTINGS.err
 RESFILE=results/check.$TEST.$BINNAME.$SETTINGS.res
 SETFILE=results/check.$TEST.$BINNAME.$SETTINGS.set
 
+# Create results directory
+mkdir -p results
+
 # Abort if files are missing
 if ! test -f $SETTINGSFILE
 then
