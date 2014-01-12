@@ -42,6 +42,7 @@
 #include "spxvectorst.h"
 
 #include "spxpricer.h"
+#include "spxautopr.h"
 #include "spxdantzigpr.h"
 #include "spxparmultpr.h"
 #include "spxdevexpr.h"
@@ -1151,6 +1152,7 @@ private:
    SPxWeightST _starterWeight;
    SPxSumST _starterSum;
    SPxVectorST _starterVector;
+   SPxAutoPR _pricerAuto;
    SPxDantzigPR _pricerDantzig;
    SPxParMultPR _pricerParMult;
    SPxDevexPR _pricerDevex;

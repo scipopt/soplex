@@ -90,7 +90,7 @@ NAME		=	soplex
 LIBOBJ		= 	changesoplex.o clufactor.o didxset.o \
 			enter.o idxset.o leave.o rational.o mpsinput.o nameset.o \
 			slufactor.o solverational.o solvereal.o soplex.o soplexlegacy.o \
-			spxbasis.o spxbounds.o spxboundflippingrt.o spxchangebasis.o \
+			spxautopr.o spxbasis.o spxbounds.o spxboundflippingrt.o spxchangebasis.o \
 			spxequilisc.o spxdantzigpr.o spxdefaultrt.o \
 			spxdefines.o spxdesc.o spxdevexpr.o \
 			spxfastrt.o spxfileio.o spxgeometsc.o spxgithash.o\

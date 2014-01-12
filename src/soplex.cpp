@@ -459,6 +459,7 @@ namespace soplex
          _starterWeight = rhs._starterWeight;
          _starterSum = rhs._starterSum;
          _starterVector = rhs._starterVector;
+         _pricerAuto = rhs._pricerAuto;
          _pricerDantzig = rhs._pricerDantzig;
          _pricerParMult = rhs._pricerParMult;
          _pricerDevex = rhs._pricerDevex;
@@ -4059,8 +4060,7 @@ namespace soplex
          switch( value )
          {
          case PRICER_AUTO:
-            ///@todo implement in the solve routine
-            _solver.setPricer(&_pricerQuickSteep);
+            _solver.setPricer(&_pricerAuto);
             break;
          case PRICER_DANTZIG:
             _solver.setPricer(&_pricerDantzig);

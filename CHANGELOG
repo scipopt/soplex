@@ -18,6 +18,7 @@ code quality & new features:
 - keep relevant bounds if bound flipping ratio test is used and display performed flips in summary
 - new method to calculate the condition number of the current basis matrix (2-norm, estimate)
 - parameter for controlling when to use sparse pricing
+- implement auto pricing (switch from devex to steep after a set number of iterations)
 
 interface:
 - renamed class MpqReal to Rational
