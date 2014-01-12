@@ -24,6 +24,7 @@
 
 #include "spxdefines.h"
 #include "spxsolver.h"
+#include "sorter.h"
 
 namespace soplex
 {
@@ -57,7 +58,44 @@ protected:
    Real        theeps;
    //@}
 
+
+   struct IdxElement
+   {
+      int idx;
+      Real val;
+   };
+
+   /// Compare class to sort idx/val pairs, used for hypersparse pricing leaving
+   struct IdxCompare
+   {
+   public:
+      /// constructor
+      IdxCompare()
+      : elements(0)
+      {}
+
+      const IdxElement*  elements;
+
+      Real operator() (
+         IdxElement      a,
+         IdxElement      b
+      ) const
+      {
+         return b.val - a.val;
+      }
+   };
+
+   IdxCompare compare;
+
 public:
+
+   // violation types used for (hyper) sparse pricing
+   enum ViolationType
+   {
+      NOT_VIOLATED         = 0,
+      VIOLATED             = 1,
+      VIOLATED_AND_CHECKED = 2
+   };
 
    //-------------------------------------
    /**@name Initialization */

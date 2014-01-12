@@ -763,8 +763,11 @@ public:
       /// mode for a posteriori feasibility checks
       CHECKMODE = 18,
 
+      /// mode for hyper sparse pricing
+      HYPER_PRICING = 19,
+
       /// number of integer parameters
-      INTPARAM_COUNT = 19
+      INTPARAM_COUNT = 20
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -965,6 +968,19 @@ public:
       CHECKMODE_RATIONAL = 2
    };
 
+   /// values for parameter HYPER_PRICING
+   enum
+   {
+      /// never
+      HYPER_PRICING_OFF = 0,
+
+      /// decide according to problem size
+      HYPER_PRICING_AUTO = 1,
+
+      /// always
+      HYPER_PRICING_ON = 2
+   };
+
    /// real parameters
    typedef enum
    {
@@ -1004,8 +1020,11 @@ public:
       /// upper threshold in lifting (nonzero matrix coefficients with larger absolute value will be reformulated)
       LIFTMAXVAL = 11,
 
+      /// sparse pricing threshold (#violations < dimension * SPARSITY_THRESHOLD activates sparse pricing)
+      SPARSITY_THRESHOLD = 12,
+
       /// number of real parameters
-      REALPARAM_COUNT = 12
+      REALPARAM_COUNT = 13
    } RealParam;
 
    /// rational parameters

@@ -339,8 +339,7 @@ void SPxSolver::init()
       infeasibilitiesCo.setMax(coDim());
       isInfeasible.reSize(dim());
       isInfeasibleCo.reSize(coDim());
-      sparsityThresholdEnter = (int) (dim() * SPARSITYTHRESHOLD);
-      sparsityThresholdEnterCo = (int) (coDim() * SPARSITYTHRESHOLD);
+
       theratiotester->setDelta(entertol());
    }
    else
@@ -361,6 +360,13 @@ void SPxSolver::init()
       infeasibilities.setMax(dim());
       isInfeasible.reSize(dim());
       sparsityThresholdLeave = (int) (dim() * SPARSITYTHRESHOLD);
+
+      if( dim() > HYPERPRICINGFACTOR * getMaxUpdates() )
+      {
+         hyperPricingLeave = true;
+         updateViols.setMax(dim());
+      }
+
       theratiotester->setDelta(leavetol());
    }
 
@@ -812,6 +818,24 @@ void SPxSolver::setDelta(Real d)
    m_leavetol = d;
 }
 
+void SPxSolver::setSparsePricingThreshold(Real st)
+{
+   sparsityThresholdLeave = (int) (dim() * st);
+   sparsityThresholdEnter = (int) (dim() * st);
+   sparsityThresholdEnterCo = (int) (coDim() * st);
+}
+
+void SPxSolver::hyperPricing(bool h)
+{
+   hyperPricingEnter = h;
+   hyperPricingLeave = h;
+   if( h )
+   {
+      updateViols.setMax(dim());
+      updateViolsCo.setMax(coDim());
+   }
+}
+
 SPxSolver::SPxSolver(
    Type            p_type, 
    Representation  p_rep )
@@ -847,6 +871,8 @@ SPxSolver::SPxSolver(
    , sparsePricingLeave(false)
    , sparsePricingEnter(false)
    , sparsePricingEnterCo(false)
+   , hyperPricingLeave(false)
+   , hyperPricingEnter(false)
    , remainingRoundsLeave(0)
    , remainingRoundsEnter(0)
    , remainingRoundsEnterCo(0)
@@ -938,6 +964,8 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       sparsePricingLeave = base.sparsePricingLeave;
       sparsePricingEnter = base.sparsePricingEnter;
       sparsePricingEnterCo = base.sparsePricingEnterCo;
+      hyperPricingLeave = base.hyperPricingLeave;
+      hyperPricingEnter = base.hyperPricingEnter;
       remainingRoundsLeave = base.remainingRoundsLeave;
       remainingRoundsEnter = base.remainingRoundsEnter;
       remainingRoundsEnterCo = base.remainingRoundsEnterCo;
@@ -1098,6 +1126,8 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , sparsePricingLeave(base.sparsePricingLeave)
    , sparsePricingEnter(base.sparsePricingEnter)
    , sparsePricingEnterCo(base.sparsePricingEnterCo)
+   , hyperPricingLeave(base.hyperPricingLeave)
+   , hyperPricingEnter(base.hyperPricingEnter)
    , remainingRoundsLeave(base.remainingRoundsLeave)
    , remainingRoundsEnter(base.remainingRoundsEnter)
    , remainingRoundsEnterCo(base.remainingRoundsEnterCo)

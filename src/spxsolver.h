@@ -33,8 +33,9 @@
 #include "unitvector.h"
 #include "updatevector.h"
 
-#define SPARSITYTHRESHOLD        0.5      /**< percentage of infeasibilities that is considered sparse */
-#define DENSEROUNDS               5       /**< number of refactorization until sparsity is tested again */
+#define HYPERPRICINGFACTOR       10       /**< do hyper pricing only if problem size is larger than HYPERPRICINGFACTOR * maxUpdates */
+#define SPARSITYTHRESHOLD        0.6      /**< percentage of infeasibilities that is considered sparse */
+#define DENSEROUNDS               5       /**< number of refactorizations until sparsity is tested again */
 #define SPARSITY_TRADEOFF        0.8      /**< threshold to decide whether Ids or coIds are preferred to enter the basis;
                                            * coIds are more likely to enter if SPARSITY_TRADEOFF is close to 0
                                            */
@@ -79,6 +80,8 @@ class SPxSolver : public SPxLP, protected SPxBasis
    friend class SoPlex;
    friend class SPxFastRT;
    friend class SPxBoundFlippingRT;
+   friend class SPxSteepPR;  // this is necessary to make getMaxUpdates() accessible
+   friend class SPxDevexPR;  //
 
 public:
 
@@ -336,17 +339,23 @@ public:
     */
    DIdxSet infeasibilitiesCo;
 
+   /// store indices that were changed in the previous iteration and must be checked in hyper pricing
+   DIdxSet updateViols;
+   DIdxSet updateViolsCo;
+
    /** Binary vectors to store whether basic indices are infeasible
     *  the i-th entry equals false, if the i-th basic variable is not infeasible
     *  the i-th entry equals true, if the i-th basic variable is infeasible
     */
-   DataArray<bool> isInfeasible;           ///< belongs to \ref soplex::SPxSolver::infeasibilities "infeasibilities" in the leaving and entering Simplex
-   DataArray<bool> isInfeasibleCo;         ///< belongs to \ref soplex::SPxSolver::infeasibilitiesCo "infeasibilitiesCo" in the entering Simplex
+   DataArray<int> isInfeasible;           ///< 0: index not violated, 1: index violated, 2: index violated and among candidate list
+   DataArray<int> isInfeasibleCo;         ///< 0: index not violated, 1: index violated, 2: index violated and among candidate list
 
    /// These values enable or disable sparse pricing
    bool     sparsePricingLeave;        ///< true if sparsePricing is turned on in the leaving Simplex
    bool     sparsePricingEnter;        ///< true if sparsePricing is turned on in the entering Simplex for slack variables
    bool     sparsePricingEnterCo;      ///< true if sparsePricing is turned on in the entering Simplex
+   bool     hyperPricingLeave;         ///< true if hyper sparse pricing is turned on in the leaving Simplex
+   bool     hyperPricingEnter;         ///< true if hyper sparse pricing is turned on in the entering Simplex
 
    int      remainingRoundsLeave;      ///< number of dense rounds/refactorizations until sparsePricing is enabled again
    int      remainingRoundsEnter;
@@ -667,6 +676,10 @@ public:
    void setOpttol(Real d);
    /// set parameter \p delta, i.e., set \p feastol and \p opttol to same value.
    void setDelta(Real d);
+   /// set sparsity threshold for pricing
+   void setSparsePricingThreshold(Real st);
+   /// enable or disable hyper sparse pricing
+   void hyperPricing(bool h);
 
    /** SPxSolver considers a Simplex step as degenerate if the
     *  steplength does not exceed #epsilon(). Cycling occurs if only

@@ -76,6 +76,14 @@ int:readmode = 0
 # range [-2147483648,2147483647], default 0
 int:solvemode = 0
 
+# mode for a posteriori feasibility checks (0 - floating-point check, 1 - auto, 2 - rational check)
+# range [-2147483648,2147483647], default 2
+int:checkmode = 2
+
+# mode for hyper sparse pricing (0 - off, 1 - auto, 2 - always)
+# range [-2147483648,2147483647], default 1
+int:hyperpricing = 1
+
 # general zero tolerance
 # range [1e-16,1e-16], default 1e-16
 real:epsilon_zero = 1e-16
@@ -124,10 +132,14 @@ real:liftminval = 0.000976562
 # range [10,10], default 1024
 real:liftmaxval = 1024
 
+# sparse pricing threshold (#violations < dimension * SPARSITY_THRESHOLD activates sparse pricing)
+# range [0,0], default 0.6
+real:sparsity_threshold = 0.6
+
 # primal feasibility tolerance
-# range [0,0], default 1e-06
-rational:feastol = 1e-06
+# range [0,0], default 1/1000000
+rational:feastol = 1/1000000
 
 # dual feasibility tolerance
-# range [0,0], default 1e-06
-rational:opttol = 1e-06
+# range [0,0], default 1/1000000
+rational:opttol = 1/1000000

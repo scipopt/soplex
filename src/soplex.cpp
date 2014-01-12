@@ -208,6 +208,11 @@ namespace soplex
             _intParamDescription[SoPlex::CHECKMODE] = "mode for a posteriori feasibility checks (0 - floating-point check, 1 - auto, 2 - rational check)";
             _intParamDefault[SoPlex::CHECKMODE] = SoPlex::CHECKMODE_RATIONAL;
 
+            // mode for hyper sparse pricing
+            _intParamName[SoPlex::HYPER_PRICING] = "hyperpricing";
+            _intParamDescription[SoPlex::HYPER_PRICING] = "mode for hyper sparse pricing (0 - off, 1 - auto, 2 - always)";
+            _intParamDefault[SoPlex::HYPER_PRICING] = SoPlex::HYPER_PRICING_OFF;
+
             ///@todo define suitable values depending on Real type
             // general zero tolerance
             _realParamName[SoPlex::EPSILON_ZERO] = "epsilon_zero";
@@ -295,6 +300,13 @@ namespace soplex
             _realParamLower[SoPlex::LIFTMAXVAL] = 10.0;
             _realParamUpper[SoPlex::LIFTMAXVAL] = DEFAULT_INFINITY;
             _realParamDefault[SoPlex::LIFTMAXVAL] = 1024.0;
+
+            // threshold for using sparse pricing (no. of violations need to be smaller than threshold * dimension of problem)
+            _realParamName[SoPlex::SPARSITY_THRESHOLD] = "sparsity_threshold";
+            _realParamDescription[SoPlex::SPARSITY_THRESHOLD] = "sparse pricing threshold (#violations < dimension * SPARSITY_THRESHOLD activates sparse pricing)";
+            _realParamLower[SoPlex::SPARSITY_THRESHOLD] = 0.0;
+            _realParamUpper[SoPlex::SPARSITY_THRESHOLD] = 1.0;
+            _realParamDefault[SoPlex::SPARSITY_THRESHOLD] = 0.6;
 
             // primal feasibility tolerance
             _rationalParamName[SoPlex::FEASTOL] = "feastol";
@@ -6015,6 +6027,16 @@ namespace soplex
       {
          _solver.setRep(SPxSolver::ROW);
       }
+
+      // set pricing modes
+      // @todo parameterize threshold? (currently 10)
+      _solver.setSparsePricingThreshold(realParam(SoPlex::SPARSITY_THRESHOLD));
+      if( (intParam(SoPlex::HYPER_PRICING) == SoPlex::HYPER_PRICING_ON)
+            || (intParam(SoPlex::HYPER_PRICING) == SoPlex::HYPER_PRICING_AUTO)
+            && (_solver.nRows() > 10 * _solver.basis().getMaxUpdates()) )
+         _solver.hyperPricing(true);
+      else if( intParam(SoPlex::HYPER_PRICING) == SoPlex::HYPER_PRICING_OFF )
+         _solver.hyperPricing(false);
 
       // call floating-point solver and catch exceptions
       _statistics->simplexTime.start();

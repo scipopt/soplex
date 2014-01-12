@@ -21,6 +21,7 @@
 #include <stdio.h>
 
 #include "spxdefines.h"
+#include "spxpricer.h"
 #include "spxsolver.h"
 #include "spxratiotester.h"
 #include "spxout.h"
@@ -55,13 +56,12 @@ void SPxSolver::computeFtest()
       {
          if( theCoTest[i] < -theeps )
          {
-            assert(infeasibilities.size() < infeasibilities.max());
             infeasibilities.addIdx(i);
-            isInfeasible[i] = true;
+            isInfeasible[i] = SPxPricer::VIOLATED;
             ++ninfeasibilities;
          }
          else
-            isInfeasible[i] = false;
+            isInfeasible[i] = SPxPricer::NOT_VIOLATED;
          if( ninfeasibilities > sparsityThresholdLeave )
          {
             MSG_INFO2( spxout << "ILEAVE05 too many infeasibilities for sparse pricing"
@@ -98,6 +98,7 @@ void SPxSolver::updateFtest()
 
    assert(type() == LEAVE);
 
+   updateViols.clear();
    Real theeps = entertol();
    for (int j = idx.size() - 1; j >= 0; --j)
    {
@@ -109,11 +110,16 @@ void SPxSolver::updateFtest()
       if( sparsePricingLeave && ftest[i] < -theeps )
       {
          assert(remainingRoundsLeave == 0);
-         if( !isInfeasible[i] )
+         if( isInfeasible[i] == SPxPricer::NOT_VIOLATED )
          {
+            // this can cause problems - we cannot keep on adding indeces to infeasibilities,
+            // because they are not deleted in hyper mode...
+//             if( !hyperPricingLeave )
             infeasibilities.addIdx(i);
-            isInfeasible[i] = true;
+            isInfeasible[i] = SPxPricer::VIOLATED;
          }
+         if( hyperPricingLeave )
+            updateViols.addIdx(i);
       }
    }
    // if boundflips were performed, we need to update these indices as well

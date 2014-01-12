@@ -13,8 +13,11 @@ code quality & new features:
     instances, or instances, that spend much time in pricing. Partial pricing is likely to increase the number of iterations.
 - refinement step to improve feasibility/optimality also for steep pricer (was devex only)
 - own objective sense enumerator in MPS parser
+- implemented hyper sparse spricing (reduces the length of the 'for'-loops in pricing by only checking a
+  short list of good pricing candidates and all updates/changes introduced with the previous iteration)
 - keep relevant bounds if bound flipping ratio test is used and display performed flips in summary
 - new method to calculate the condition number of the current basis matrix (2-norm, estimate)
+- parameter for controlling when to use sparse pricing
 
 interface:
 - renamed class MpqReal to Rational

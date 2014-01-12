@@ -21,6 +21,7 @@
 
 #include "spxdefines.h"
 #include "spxratiotester.h"
+#include "spxpricer.h"
 #include "spxout.h"
 #include "exceptions.h"
 
@@ -116,7 +117,7 @@ void SPxSolver::computeTest()
       {
          theTest[i] = 0.0;
          if( remainingRoundsEnterCo == 0 )
-            isInfeasibleCo[i] = false;
+            isInfeasibleCo[i] = SPxPricer::NOT_VIOLATED;
       }
       else
       {
@@ -129,11 +130,11 @@ void SPxSolver::computeTest()
             {
                assert(infeasibilitiesCo.size() < infeasibilitiesCo.max());
                infeasibilitiesCo.addIdx(i);
-               isInfeasibleCo[i] = true;
+               isInfeasibleCo[i] = SPxPricer::VIOLATED;
                ++ninfeasibilities;
             }
             else
-               isInfeasibleCo[i] = false;
+               isInfeasibleCo[i] = SPxPricer::NOT_VIOLATED;
             if( ninfeasibilities > sparsityThresholdEnterCo )
             {
                MSG_INFO2( spxout << "IENTER04 too many infeasibilities for sparse pricing"
@@ -230,7 +231,7 @@ void SPxSolver::computeCoTest()
       {
          theCoTest[i] = 0;
          if( remainingRoundsEnter == 0 )
-            isInfeasible[i] = false;
+            isInfeasible[i] = SPxPricer::NOT_VIOLATED;
       }
       else
       {
@@ -241,11 +242,11 @@ void SPxSolver::computeCoTest()
             {
                assert(infeasibilities.size() < infeasibilities.max());
                infeasibilities.addIdx(i);
-               isInfeasible[i] = true;
+               isInfeasible[i] = SPxPricer::VIOLATED;
                ++ninfeasibilities;
             }
             else
-               isInfeasible[i] = false;
+               isInfeasible[i] = SPxPricer::NOT_VIOLATED;
             if( ninfeasibilities > sparsityThresholdEnter )
             {
                MSG_INFO2( spxout << "IENTER06 too many infeasibilities for sparse pricing"
@@ -284,6 +285,7 @@ void SPxSolver::updateTest()
    Real pricingTol = leavetol();
 
    int i;
+   updateViolsCo.clear();
    for (i = idx.size() - 1; i >= 0; --i)
    {
       int j = idx.index(i);
@@ -292,18 +294,30 @@ void SPxSolver::updateTest()
       {
          theTest[j] = test(j, stat);
 
-         if( sparsePricingEnterCo && theTest[j] < -pricingTol )
+         if( sparsePricingEnterCo )
          {
-            assert(remainingRoundsEnterCo == 0);
-            if( !isInfeasibleCo[j] )
+            if( theTest[j] < -pricingTol )
             {
-               infeasibilitiesCo.addIdx(j);
-               isInfeasibleCo[j] = true;
+               assert(remainingRoundsEnterCo == 0);
+               if( isInfeasibleCo[j] == SPxPricer::NOT_VIOLATED )
+               {
+                  infeasibilitiesCo.addIdx(j);
+                  isInfeasibleCo[j] = SPxPricer::VIOLATED;
+               }
+               if( hyperPricingEnter )
+                  updateViolsCo.addIdx(j);
+            }
+            else
+            {
+               isInfeasibleCo[j] = SPxPricer::NOT_VIOLATED;
             }
          }
       }
       else
+      {
+         isInfeasibleCo[j] = SPxPricer::NOT_VIOLATED;
          theTest[j] = 0;
+      }
    }
 }
 
@@ -316,6 +330,7 @@ void SPxSolver::updateCoTest()
    Real pricingTol = leavetol();
 
    int i;
+   updateViols.clear();
    for (i = idx.size() - 1; i >= 0; --i)
    {
       int j = idx.index(i);
@@ -324,18 +339,32 @@ void SPxSolver::updateCoTest()
       {
          theCoTest[j] = coTest(j, stat);
 
-         if( sparsePricingEnter && theCoTest[j] < -pricingTol )
+         if( sparsePricingEnter )
          {
-            assert(remainingRoundsEnter == 0);
-            if( !isInfeasible[j] )
+            if( theCoTest[j] < -pricingTol )
             {
-               infeasibilities.addIdx(j);
-               isInfeasible[j] = true;
+               assert(remainingRoundsEnter == 0);
+               if( isInfeasible[j] == SPxPricer::NOT_VIOLATED )
+               {
+                  //                if( !hyperPricingEnter )
+                  infeasibilities.addIdx(j);
+                  isInfeasible[j] = SPxPricer::VIOLATED;
+               }
+               if( hyperPricingEnter )
+                  updateViols.addIdx(j);
+            }
+            else
+            {
+               // @todo do we need to remove index j from infeasibilitiesCo?
+               isInfeasible[j] = SPxPricer::NOT_VIOLATED;
             }
          }
       }
       else
+      {
+         isInfeasible[j] = SPxPricer::NOT_VIOLATED;
          theCoTest[j] = 0;
+      }
    }
 }
 
@@ -854,9 +883,15 @@ SPxSolver::ungetEnterVal(
       (*theFrhs)[enterIdx] += leaveVal;
    }
    if (isId(enterId))
+   {
       theTest[enterIdx] = 0;
+      isInfeasibleCo[enterIdx] = SPxPricer::NOT_VIOLATED;
+   }
    else
+   {
       theCoTest[enterIdx] = 0;
+      isInfeasible[enterIdx] = SPxPricer::NOT_VIOLATED;
+   }
 }
 
 void SPxSolver::rejectEnter(

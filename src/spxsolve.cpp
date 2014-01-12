@@ -259,20 +259,24 @@ SPxSolver::Status SPxSolver::solve()
                   if( rep() == COLUMN )
                   {
                      theTest[idx] = instableEnterVal;
-                     if( sparsePricingEnterCo && isInfeasibleCo[idx] == false )
+                     if( sparsePricingEnterCo && isInfeasibleCo[idx] == SPxPricer::NOT_VIOLATED )
                      {
                         infeasibilitiesCo.addIdx(idx);
-                        isInfeasibleCo[idx] = true;
+                        isInfeasibleCo[idx] = SPxPricer::VIOLATED;
                      }
+                     if( hyperPricingEnter )
+                        updateViolsCo.addIdx(idx);
                   }
                   else
                   {
                      theCoTest[idx] = instableEnterVal;
-                     if( sparsePricingEnter && isInfeasible[idx] == false )
+                     if( sparsePricingEnter && isInfeasible[idx] == SPxPricer::NOT_VIOLATED )
                      {
                         infeasibilities.addIdx(idx);
-                        isInfeasible[idx] = true;
+                        isInfeasible[idx] = SPxPricer::VIOLATED;
                      }
+                     if( hyperPricingEnter )
+                        updateViols.addIdx(idx);
                   }
                }
                else
@@ -281,20 +285,24 @@ SPxSolver::Status SPxSolver::solve()
                   if( rep() == COLUMN )
                   {
                      theCoTest[idx] = instableEnterVal;
-                     if( sparsePricingEnter && isInfeasible[idx] == false )
+                     if( sparsePricingEnter && isInfeasible[idx] == SPxPricer::NOT_VIOLATED )
                      {
                         infeasibilities.addIdx(idx);
-                        isInfeasible[idx] = true;
+                        isInfeasible[idx] = SPxPricer::VIOLATED;
                      }
+                     if( hyperPricingEnter )
+                        updateViols.addIdx(idx);
                   }
                   else
                   {
                      theTest[idx] = instableEnterVal;
-                     if( sparsePricingEnterCo && isInfeasibleCo[idx] == false )
+                     if( sparsePricingEnterCo && isInfeasibleCo[idx] == SPxPricer::NOT_VIOLATED )
                      {
                         infeasibilitiesCo.addIdx(idx);
-                        isInfeasibleCo[idx] = true;
+                        isInfeasibleCo[idx] = SPxPricer::VIOLATED;
                      }
+                     if( hyperPricingEnter )
+                        updateViolsCo.addIdx(idx);
                   }
                }
             }
@@ -565,10 +573,16 @@ SPxSolver::Status SPxSolver::solve()
                // we also need to reset the fTest() value for getLeaveVals()
                assert(instableLeaveVal < 0);
                theCoTest[instableLeaveNum] = instableLeaveVal;
-               if( sparsePricingLeave && isInfeasible[instableLeaveNum] == false )
+
+               if ( sparsePricingLeave )
                {
-                  infeasibilities.addIdx(instableLeaveNum);
-                  isInfeasible[instableLeaveNum] = true;
+                  if ( isInfeasible[instableLeaveNum] == SPxPricer::NOT_VIOLATED )
+                  {
+                     infeasibilities.addIdx(instableLeaveNum);
+                     isInfeasible[instableLeaveNum] = SPxPricer::VIOLATED;
+                  }
+                  if( hyperPricingLeave )
+                     updateViols.addIdx(instableLeaveNum);
                }
             }
             else
