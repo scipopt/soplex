@@ -20,11 +20,16 @@
 #-----------------------------------------------------------------------------
 # detect host architecture
 #-----------------------------------------------------------------------------
+
 include make/make.detecthost
 
 
 #-----------------------------------------------------------------------------
+# default settings
+#-----------------------------------------------------------------------------
+
 VERSION		:=	1.7.2.7
+SPXGITHASH	=
 
 VERBOSE		=	false
 SHARED		=	false
@@ -158,6 +163,9 @@ ifeq ($(PARASCIP),true)
 CPPFLAGS	+=	-DDISABLE_VERBOSITY
 endif
 
+
+#-----------------------------------------------------------------------------
+# Main Program
 #-----------------------------------------------------------------------------
 
 BINNAME		=	$(NAME)-$(VERSION).$(BASE)
@@ -186,6 +194,11 @@ EXAMPLESRC	=	$(addprefix $(SRCDIR)/,$(EXAMPLEOBJ:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
 LIBSRCHEADER	=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.h))
 
+
+#-----------------------------------------------------------------------------
+# External Libraries
+#-----------------------------------------------------------------------------
+
 GMPDEP	:=	$(SRCDIR)/depend.gmp
 GMPSRC	:=	$(shell cat $(GMPDEP))
 ifeq ($(GMP),true)
@@ -204,16 +217,17 @@ LDFLAGS		+=	$(ZLIB_LDFLAGS)
 endif
 
 
+#-----------------------------------------------------------------------------
+# Rules
+#-----------------------------------------------------------------------------
+
 ifeq ($(VERBOSE),false)
 .SILENT:	$(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK) $(BINFILE) $(EXAMPLEFILE) $(EXAMPLEOBJFILES) $(LIBFILE) $(BINOBJFILES) $(LIBOBJFILES)
 endif
 
-all:		githash $(LIBFILE) $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
+all:		$(LIBFILE) $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
 
 simpleexample:	$(LIBFILE) $(EXAMPLEFILE) $(LIBLINK) $(LIBSHORTLINK)
-
-# include install targets
--include make/make.install
 
 $(LIBLINK) $(LIBSHORTLINK):	$(LIBFILE)
 		@rm -f $@
@@ -241,7 +255,17 @@ ifneq ($(RANLIB),)
 		$(RANLIB) $@
 endif
 
+# include target to detect the current git hash
+-include make/local/make.detectgithash
+
+# this empty target is needed for the SoPlex release versions
+githash::	# do not remove the double-colon
+
+# include local targets 
 -include make/local/make.targets
+
+# include install targets
+-include make/make.install
 
 .PHONY: lint
 lint:		$(BINSRC) $(LIBSRC)
@@ -349,6 +373,9 @@ $(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 
 .PHONY: touchexternal
 touchexternal:	$(GMPDEP) $(ZLIBDEP)
+ifneq ($(SPXGITHASH),$(LAST_SPXGITHASH))
+		@-$(MAKE) githash
+endif
 ifneq ($(GMP),$(LAST_GMP))
 		@-touch $(GMPSRC)
 endif
@@ -364,14 +391,11 @@ ifneq ($(USRCXXFLAGS),$(LAST_USRCXXFLAGS))
 		@-touch $(BINSRC)
 endif
 		@-rm -f $(LASTSETTINGS)
+		@echo "LAST_SPXGITHASH=$(SPXGITHASH)" >> $(LASTSETTINGS)
 		@echo "LAST_GMP=$(GMP)" >> $(LASTSETTINGS)
 		@echo "LAST_ZLIB=$(ZLIB)" >> $(LASTSETTINGS)
 		@echo "LAST_SHARED=$(SHARED)" >> $(LASTSETTINGS)
 		@echo "LAST_USRCXXFLAGS=$(USRCXXFLAGS)" >> $(LASTSETTINGS)
-
--include make/local/make.detectgithash
-# this empty target is needed for the SoPlex release versions
-githash::	# do not remove the double-colon
 
 # --- EOF ---------------------------------------------------------------------
 # DO NOT DELETE
