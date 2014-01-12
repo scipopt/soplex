@@ -108,7 +108,7 @@ LIBOBJ		= 	changesoplex.o clufactor.o didxset.o \
 			timer.o unitvector.o updatevector.o \
 			gzstream.o
 BINOBJ		=	soplexmain.o
-EXAMPLEOBJ	=	simpleexample.o
+EXAMPLEOBJ	=	example.o
 REPOSIT		=	# template repository, explicitly empty  #spxproof.o 
 
 BASE		=	$(OSTYPE).$(ARCH).$(COMP).$(OPT)
@@ -169,7 +169,7 @@ endif
 #-----------------------------------------------------------------------------
 
 BINNAME		=	$(NAME)-$(VERSION).$(BASE)
-EXAMPLENAME	=	simpleexample.$(BASE)
+EXAMPLENAME	=	example.$(BASE)
 LIBNAME		=	$(NAME)-$(VERSION).$(BASE)
 BINFILE		=	$(BINDIR)/$(BINNAME)$(EXEEXTENSION)
 EXAMPLEFILE	=	$(BINDIR)/$(EXAMPLENAME)
@@ -222,12 +222,11 @@ endif
 #-----------------------------------------------------------------------------
 
 ifeq ($(VERBOSE),false)
-.SILENT:	$(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK) $(BINFILE) $(EXAMPLEFILE) $(EXAMPLEOBJFILES) $(LIBFILE) $(BINOBJFILES) $(LIBOBJFILES)
+.SILENT:	$(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK) $(BINFILE) example $(EXAMPLEOBJFILES) $(LIBFILE) $(BINOBJFILES) $(LIBOBJFILES)
 endif
 
+.PHONY: all
 all:		makelibfile $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
-
-simpleexample:	$(LIBFILE) $(EXAMPLEFILE) $(LIBLINK) $(LIBSHORTLINK)
 
 $(LIBLINK) $(LIBSHORTLINK):	$(LIBFILE)
 		@rm -f $@
@@ -242,10 +241,11 @@ $(BINFILE):	$(LIBOBJFILES) $(BINOBJFILES) | $(BINDIR) $(BINOBJDIR)
 		$(LINKCXX) $(BINOBJFILES) $(LIBOBJFILES) \
 		$(LDFLAGS) $(LINKCXX_o)$@
 
-$(EXAMPLEFILE):	$(LIBOBJFILES) $(EXAMPLEOBJFILES) | $(BINDIR) $(EXAMPLEOBJDIR)
-		@echo "-> linking $@"
+.PHONY: example
+example:	$(LIBOBJFILES) $(EXAMPLEOBJFILES) | $(BINDIR) $(EXAMPLEOBJDIR)
+		@echo "-> linking $(EXAMPLEFILE)"
 		$(LINKCXX) $(EXAMPLEOBJFILES) $(LIBOBJFILES) \
-		$(LDFLAGS) $(LINKCXX_o)$@
+		$(LDFLAGS) $(LINKCXX_o)$(EXAMPLEFILE)
 
 .PHONY: makelibfile
 makelibfile:	touchexternal | $(LIBDIR) $(LIBOBJDIR)
