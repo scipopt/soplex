@@ -225,7 +225,7 @@ ifeq ($(VERBOSE),false)
 .SILENT:	$(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK) $(BINFILE) $(EXAMPLEFILE) $(EXAMPLEOBJFILES) $(LIBFILE) $(BINOBJFILES) $(LIBOBJFILES)
 endif
 
-all:		$(LIBFILE) $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
+all:		makelibfile $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
 
 simpleexample:	$(LIBFILE) $(EXAMPLEFILE) $(LIBLINK) $(LIBSHORTLINK)
 
@@ -237,17 +237,20 @@ $(BINLINK) $(BINSHORTLINK):	$(BINFILE)
 		@rm -f $@
 		cd $(dir $@) && $(LN_s) $(notdir $(BINFILE)) $(notdir $@)
 
-$(BINFILE):	$(BINDIR) $(BINOBJDIR) $(LIBOBJFILES) $(BINOBJFILES)
+$(BINFILE):	$(LIBOBJFILES) $(BINOBJFILES) | $(BINDIR) $(BINOBJDIR)
 		@echo "-> linking $@"
 		$(LINKCXX) $(BINOBJFILES) $(LIBOBJFILES) \
 		$(LDFLAGS) $(LINKCXX_o)$@
 
-$(EXAMPLEFILE):	$(BINDIR) $(EXAMPLEOBJDIR) $(LIBOBJFILES) $(EXAMPLEOBJFILES)
+$(EXAMPLEFILE):	$(LIBOBJFILES) $(EXAMPLEOBJFILES) | $(BINDIR) $(EXAMPLEOBJDIR)
 		@echo "-> linking $@"
 		$(LINKCXX) $(EXAMPLEOBJFILES) $(LIBOBJFILES) \
 		$(LDFLAGS) $(LINKCXX_o)$@
 
-$(LIBFILE):	$(LIBDIR) $(LIBOBJDIR) touchexternal $(LIBOBJFILES)
+.PHONY: makelibfile
+makelibfile:	touchexternal | $(LIBDIR) $(LIBOBJDIR)
+
+$(LIBFILE):	$(LIBOBJFILES)
 		@echo "-> generating library $@"
 		-rm -f $(LIBFILE)
 		$(LIBBUILD) $(LIBBUILDFLAGS) $(LIBBUILD_o)$@ $(LIBOBJFILES) $(REPOSIT)
@@ -294,17 +297,17 @@ memory_exception_test: $(BINFILE)
 		"$(VALGRIND) $(VFLAGS)" $(VSUPPNAME)
 
 .PHONY: cleanbin
-cleanbin:       $(BINDIR)
+cleanbin:	| $(BINDIR)
 		@echo "remove binary $(BINFILE)"
 		@-rm -f $(BINFILE) $(BINLINK) $(BINSHORTLINK)
 
 .PHONY: cleanlib
-cleanlib:       $(LIBDIR)
+cleanlib:	| $(LIBDIR)
 		@echo "remove library $(LIBFILE)" 
 		@-rm -f $(LIBFILE) $(LIBLINK) $(LIBSHORTLINK)
 
 .PHONY: clean
-clean:          cleanlib cleanbin $(LIBOBJDIR) $(BINOBJDIR) $(OBJDIR)
+clean:          cleanlib cleanbin | $(LIBOBJDIR) $(BINOBJDIR) $(OBJDIR)
 		@echo "remove objective files" 
 ifneq ($(LIBOBJDIR),)
 		@-rm -f $(LIBOBJDIR)/*.o && rmdir $(LIBOBJDIR)
@@ -327,10 +330,10 @@ etags:
 $(OBJDIR):	
 		@-mkdir -p $(OBJDIR)
 
-$(BINOBJDIR):	$(OBJDIR)
+$(BINOBJDIR):	| $(OBJDIR)
 		@-mkdir -p $(BINOBJDIR)
 
-$(LIBOBJDIR):	$(OBJDIR)
+$(LIBOBJDIR):	| $(OBJDIR)
 		@-mkdir -p $(LIBOBJDIR)
 
 $(BINDIR):
