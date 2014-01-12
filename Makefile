@@ -47,7 +47,7 @@ INSTALLDIR	=	#
 #will this be compiled for PARASCIP? (disables output because it uses global variables)
 PARASCIP	=	false
 
-RATIONAL	=	double
+GMP		=	false
 ZLIB		=	true
 
 COMP		=	gnu
@@ -186,16 +186,11 @@ EXAMPLESRC	=	$(addprefix $(SRCDIR)/,$(EXAMPLEOBJ:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
 LIBSRCHEADER	=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.h))
 
-RATIONALDEP	:=	$(SRCDIR)/depend.rational
-RATIONALSRC	:=	$(shell cat $(RATIONALDEP))
-ifeq ($(RATIONAL),gmp)
+GMPDEP	:=	$(SRCDIR)/depend.gmp
+GMPSRC	:=	$(shell cat $(GMPDEP))
+ifeq ($(GMP),true)
 CPPFLAGS	+=	-DSOPLEX_WITH_GMP
 LDFLAGS		+=	-lgmp
-else
-ifeq ($(RATIONAL),gmpxx)
-CPPFLAGS	+=	-DSOPLEX_WITH_GMPXX
-LDFLAGS		+=	-lgmpxx -lgmp
-endif
 endif
 
 ZLIBDEP		:=	$(SRCDIR)/depend.zlib
@@ -334,7 +329,7 @@ depend:
 		$(LIBSRC:.o=.cpp) \
 		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(LIBOBJDIR\)/\1.o|g'\'' \
 		>>$(DEPEND)'
-		@echo `grep -l "SOPLEX_WITH_GMP" $(SRCDIR)/*` >$(RATIONALDEP)
+		@echo `grep -l "SOPLEX_WITH_GMP" $(SRCDIR)/*` >$(GMPDEP)
 		@echo `grep -l "WITH_ZLIB" $(SRCDIR)/*` >$(ZLIBDEP)
 
 -include	$(DEPEND)
@@ -353,9 +348,9 @@ $(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 -include $(LASTSETTINGS)
 
 .PHONY: touchexternal
-touchexternal:	$(RATIONALDEP) $(ZLIBDEP)
-ifneq ($(RATIONAL),$(LAST_RATIONAL))
-		@-touch $(RATIONALSRC)
+touchexternal:	$(GMPDEP) $(ZLIBDEP)
+ifneq ($(GMP),$(LAST_GMP))
+		@-touch $(GMPSRC)
 endif
 ifneq ($(ZLIB),$(LAST_ZLIB))
 		@-touch $(ZLIBSRC)
@@ -369,7 +364,7 @@ ifneq ($(USRCXXFLAGS),$(LAST_USRCXXFLAGS))
 		@-touch $(BINSRC)
 endif
 		@-rm -f $(LASTSETTINGS)
-		@echo "LAST_RATIONAL=$(RATIONAL)" >> $(LASTSETTINGS)
+		@echo "LAST_GMP=$(GMP)" >> $(LASTSETTINGS)
 		@echo "LAST_ZLIB=$(ZLIB)" >> $(LASTSETTINGS)
 		@echo "LAST_SHARED=$(SHARED)" >> $(LASTSETTINGS)
 		@echo "LAST_USRCXXFLAGS=$(USRCXXFLAGS)" >> $(LASTSETTINGS)
