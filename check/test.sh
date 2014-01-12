@@ -76,4 +76,4 @@ do
 done | tee -a $OUTFILE
 date >>$OUTFILE
 date >>$ERRFILE
-evaluation.py $SOLUNAME $TESTSET $OUTFILE | tee $RESFILE
+./evaluation.py $SOLUNAME $TESTSET $OUTFILE | tee $RESFILE
