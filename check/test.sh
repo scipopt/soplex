@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # solve a given testset with given settings and time limit
 # parameters:
