@@ -517,8 +517,13 @@ namespace soplex
    SoPlex::SoPlex(const SoPlex& rhs)
    {
       // allocate memory as in default constructor
+      _statistics = 0;
       spx_alloc(_statistics);
+      _statistics = new (_statistics) Statistics();
+
+      _currentSettings = 0;
       spx_alloc(_currentSettings);
+      _currentSettings = new (_currentSettings) Settings();
 
       // call assignment operator
       *this = rhs;

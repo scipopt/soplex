@@ -112,13 +112,6 @@ extern bool msginconsistent(const char* name, const char* file, int line);
 
 #define MSGinconsistent(name) msginconsistent(name, __FILE__, __LINE__)
 
-#ifndef NDEBUG
-// print output in any case, regardless of Param::verbose():
-#define TRACE(x) { DO_WITH_TMP_VERBOSITY( SPxOut::ERROR, x ) }
-#else
-#define TRACE(x) /**/
-#endif //!NDEBUG
-
 #if defined(DEBUGGING)
 // print output in any case, regardless of Param::verbose():
 #define MSG_DEBUG(x) { DO_WITH_TMP_VERBOSITY( SPxOut::DEBUG, x ) }
