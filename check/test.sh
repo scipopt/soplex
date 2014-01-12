@@ -19,13 +19,15 @@ SETTINGSFILE=../settings/$SETTINGS.set
 
 TIME=$4
 
-OUTFILE=results/check.$TEST.$BINNAME.$SETTINGS.out
-ERRFILE=results/check.$TEST.$BINNAME.$SETTINGS.err
-RESFILE=results/check.$TEST.$BINNAME.$SETTINGS.res
-SETFILE=results/check.$TEST.$BINNAME.$SETTINGS.set
+RESDIR=$5
 
-# Create results directory
-mkdir -p results
+OUTFILE=$RESDIR/check.$TEST.$BINNAME.$SETTINGS.out
+ERRFILE=$RESDIR/check.$TEST.$BINNAME.$SETTINGS.err
+RESFILE=$RESDIR/check.$TEST.$BINNAME.$SETTINGS.res
+SETFILE=$RESDIR/check.$TEST.$BINNAME.$SETTINGS.set
+
+# create results directory
+mkdir -p $RESDIR
 
 # Abort if files are missing
 if ! test -f $SETTINGSFILE

@@ -36,7 +36,7 @@ EXEEXTENSION	=
 TEST		=	quick
 SETTINGS	=	default
 TIME		=	3600
-
+RESDIR	=	results
 
 #these variables are needed for cluster runs
 MEM		=	6144
@@ -259,10 +259,10 @@ doc:
 
 .PHONY: test
 test:		#$(BINFILE)
-		cd check; ./test.sh $(TEST) ../$(BINFILE) $(SETTINGS) $(TIME)
+		cd check; ./test.sh $(TEST) ../$(BINFILE) $(SETTINGS) $(TIME) $(RESDIR)
 .PHONY: check
 check:		#$(BINFILE)
-		cd check; ./check.sh ../$(BINFILE)
+		cd check; ./check.sh ../$(BINFILE) $(RESDIR)
 
 valgrind-check:	$(BINFILE)
 		cd check; \
