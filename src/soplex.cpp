@@ -399,8 +399,7 @@ namespace soplex
 
    /// default constructor
    SoPlex::SoPlex()
-      : _rationalLP(0)
-      , _statistics(0)
+      : _statistics(0)
       , _currentSettings(0)
       , _scalerUniequi(false)
       , _scalerBiequi(true)
@@ -409,6 +408,7 @@ namespace soplex
       , _simplifier(0)
       , _scaler(0)
       , _starter(0)
+      , _rationalLP(0)
       , _status(SPxSolver::UNKNOWN)
       , _hasBasis(false)
       , _hasSolReal(false)
@@ -2124,7 +2124,7 @@ namespace soplex
          spxout << "\n" );
 
       return status();
-   };
+   }
 
 
 
@@ -2370,17 +2370,17 @@ namespace soplex
 
       for( int c = numColsReal() - 1; c >= 0; c-- )
       {
-         SPxSolver::VarStatus basisStatus = basisColStatus(c);
+         SPxSolver::VarStatus colStatus = basisColStatus(c);
 
          if( intParam(SoPlex::OBJSENSE) == OBJSENSE_MINIMIZE )
          {
-            if( basisStatus != SPxSolver::ON_UPPER && basisStatus != SPxSolver::FIXED && redcost[c] < 0.0 )
+            if( colStatus != SPxSolver::ON_UPPER && colStatus != SPxSolver::FIXED && redcost[c] < 0.0 )
             {
                sumviol += -redcost[c];
                if( redcost[c] < -maxviol )
                   maxviol = -redcost[c];
             }
-            if( basisStatus != SPxSolver::ON_LOWER && basisStatus != SPxSolver::FIXED && redcost[c] > 0.0 )
+            if( colStatus != SPxSolver::ON_LOWER && colStatus != SPxSolver::FIXED && redcost[c] > 0.0 )
             {
                sumviol += redcost[c];
                if( redcost[c] > maxviol )
@@ -2389,13 +2389,13 @@ namespace soplex
          }
          else
          {
-            if( basisStatus != SPxSolver::ON_UPPER && basisStatus != SPxSolver::FIXED && redcost[c] > 0.0 )
+            if( colStatus != SPxSolver::ON_UPPER && colStatus != SPxSolver::FIXED && redcost[c] > 0.0 )
             {
                sumviol += redcost[c];
                if( redcost[c] > maxviol )
                   maxviol = redcost[c];
             }
-            if( basisStatus != SPxSolver::ON_LOWER && basisStatus != SPxSolver::FIXED && redcost[c] < 0.0 )
+            if( colStatus != SPxSolver::ON_LOWER && colStatus != SPxSolver::FIXED && redcost[c] < 0.0 )
             {
                sumviol += -redcost[c];
                if( redcost[c] < -maxviol )
@@ -2424,17 +2424,17 @@ namespace soplex
 
       for( int r = numRowsReal() - 1; r >= 0; r-- )
       {
-         SPxSolver::VarStatus basisStatus = basisRowStatus(r);
+         SPxSolver::VarStatus rowStatus = basisRowStatus(r);
 
          if( intParam(SoPlex::OBJSENSE) == OBJSENSE_MINIMIZE )
          {
-            if( basisStatus != SPxSolver::ON_UPPER && basisStatus != SPxSolver::FIXED && dual[r] < 0.0 )
+            if( rowStatus != SPxSolver::ON_UPPER && rowStatus != SPxSolver::FIXED && dual[r] < 0.0 )
             {
                sumviol += -dual[r];
                if( dual[r] < -maxviol )
                   maxviol = -dual[r];
             }
-            if( basisStatus != SPxSolver::ON_LOWER && basisStatus != SPxSolver::FIXED && dual[r] > 0.0 )
+            if( rowStatus != SPxSolver::ON_LOWER && rowStatus != SPxSolver::FIXED && dual[r] > 0.0 )
             {
                sumviol += dual[r];
                if( dual[r] > maxviol )
@@ -2443,13 +2443,13 @@ namespace soplex
          }
          else
          {
-            if( basisStatus != SPxSolver::ON_UPPER && basisStatus != SPxSolver::FIXED && dual[r] > 0.0 )
+            if( rowStatus != SPxSolver::ON_UPPER && rowStatus != SPxSolver::FIXED && dual[r] > 0.0 )
             {
                sumviol += dual[r];
                if( dual[r] > maxviol )
                   maxviol = dual[r];
             }
-            if( basisStatus != SPxSolver::ON_LOWER && basisStatus != SPxSolver::FIXED && dual[r] < 0.0 )
+            if( rowStatus != SPxSolver::ON_LOWER && rowStatus != SPxSolver::FIXED && dual[r] < 0.0 )
             {
                sumviol += -dual[r];
                if( dual[r] < -maxviol )
@@ -2676,17 +2676,17 @@ namespace soplex
 
       for( int c = numColsReal() - 1; c >= 0; c-- )
       {
-         SPxSolver::VarStatus basisStatus = basisColStatus(c);
+         SPxSolver::VarStatus colStatus = basisColStatus(c);
 
          if( intParam(SoPlex::OBJSENSE) == OBJSENSE_MINIMIZE )
          {
-            if( basisStatus != SPxSolver::ON_UPPER && basisStatus != SPxSolver::FIXED && redcost[c] < 0 )
+            if( colStatus != SPxSolver::ON_UPPER && colStatus != SPxSolver::FIXED && redcost[c] < 0 )
             {
                sumviol += -redcost[c];
                if( redcost[c] < -maxviol )
                   maxviol = -redcost[c];
             }
-            if( basisStatus != SPxSolver::ON_LOWER && basisStatus != SPxSolver::FIXED && redcost[c] > 0 )
+            if( colStatus != SPxSolver::ON_LOWER && colStatus != SPxSolver::FIXED && redcost[c] > 0 )
             {
                sumviol += redcost[c];
                if( redcost[c] > maxviol )
@@ -2695,13 +2695,13 @@ namespace soplex
          }
          else
          {
-            if( basisStatus != SPxSolver::ON_UPPER && basisStatus != SPxSolver::FIXED && redcost[c] > 0 )
+            if( colStatus != SPxSolver::ON_UPPER && colStatus != SPxSolver::FIXED && redcost[c] > 0 )
             {
                sumviol += redcost[c];
                if( redcost[c] > maxviol )
                   maxviol = redcost[c];
             }
-            if( basisStatus != SPxSolver::ON_LOWER && basisStatus != SPxSolver::FIXED && redcost[c] < 0 )
+            if( colStatus != SPxSolver::ON_LOWER && colStatus != SPxSolver::FIXED && redcost[c] < 0 )
             {
                sumviol += -redcost[c];
                if( redcost[c] < -maxviol )
@@ -2734,17 +2734,17 @@ namespace soplex
 
       for( int r = numRowsReal() - 1; r >= 0; r-- )
       {
-         SPxSolver::VarStatus basisStatus = basisRowStatus(r);
+         SPxSolver::VarStatus rowStatus = basisRowStatus(r);
 
          if( intParam(SoPlex::OBJSENSE) == OBJSENSE_MINIMIZE )
          {
-            if( basisStatus != SPxSolver::ON_UPPER && basisStatus != SPxSolver::FIXED && dual[r] < 0 )
+            if( rowStatus != SPxSolver::ON_UPPER && rowStatus != SPxSolver::FIXED && dual[r] < 0 )
             {
                sumviol += -dual[r];
                if( dual[r] < -maxviol )
                   maxviol = -dual[r];
             }
-            if( basisStatus != SPxSolver::ON_LOWER && basisStatus != SPxSolver::FIXED && dual[r] > 0 )
+            if( rowStatus != SPxSolver::ON_LOWER && rowStatus != SPxSolver::FIXED && dual[r] > 0 )
             {
                sumviol += dual[r];
                if( dual[r] > maxviol )
@@ -2753,13 +2753,13 @@ namespace soplex
          }
          else
          {
-            if( basisStatus != SPxSolver::ON_UPPER && basisStatus != SPxSolver::FIXED && dual[r] > 0 )
+            if( rowStatus != SPxSolver::ON_UPPER && rowStatus != SPxSolver::FIXED && dual[r] > 0 )
             {
                sumviol += dual[r];
                if( dual[r] > maxviol )
                   maxviol = dual[r];
             }
-            if( basisStatus != SPxSolver::ON_LOWER && basisStatus != SPxSolver::FIXED && dual[r] < 0 )
+            if( rowStatus != SPxSolver::ON_LOWER && rowStatus != SPxSolver::FIXED && dual[r] < 0 )
             {
                sumviol += -dual[r];
                if( dual[r] < -maxviol )
@@ -4286,13 +4286,13 @@ namespace soplex
 
 
    /// sets parameter settings; returns true on success
-   bool SoPlex::setSettings(const Settings& settings, const bool quiet, const bool init)
+   bool SoPlex::setSettings(const Settings& newSettings, const bool quiet, const bool init)
    {
       assert(init || _isConsistent());
 
       bool success = true;
 
-      *_currentSettings = settings;
+      *_currentSettings = newSettings;
 
       for( int i = 0; i < SoPlex::BOOLPARAM_COUNT; i++ )
          success &= setBoolParam((BoolParam)i, _currentSettings->_boolParamValues[i], quiet, init);
@@ -4770,11 +4770,11 @@ namespace soplex
 
 
    /// prints status
-   void SoPlex::printStatus(std::ostream& os, SPxSolver::Status status)
+   void SoPlex::printStatus(std::ostream& os, SPxSolver::Status stat)
    {
       os << "SoPlex status      : ";
 
-      switch( status )
+      switch( stat )
       {
       case SPxSolver::ERROR:
          os << "error [unspecified]";
@@ -4906,7 +4906,8 @@ namespace soplex
       if( (int)_realLP->spxSense() != (int)_rationalLP->spxSense() )
          {
             MSG_ERROR( spxout << "The objective function sense of the Real LP does not match the one of the Rational LP."
-                  << " Real LP: " << _realLP->spxSense() << "  Rational LP: " << _rationalLP->spxSense() << std::endl);
+               << " Real LP: " << (_realLP->spxSense() == SPxLPReal::MINIMIZE ? "MIN" : "MAX")
+               << "  Rational LP: " << (_rationalLP->spxSense() == SPxLPRational::MINIMIZE ? "MIN" : "MAX") << std::endl);
             result = false;
          }
 

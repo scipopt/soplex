@@ -1196,10 +1196,10 @@ bool SPxSolver::enter(SPxId& enterId)
 
          for( int j = 0; j < fVec().delta().size(); ++j )
          {
-            SPxId id = baseId(fVec().idx().index(j));
+            SPxId spxid = baseId(fVec().idx().index(j));
 
-            if( id.isSPxRowId() )
-               dualFarkas.add(number(SPxRowId(id)), sign * fVec().delta().value(j));
+            if( spxid.isSPxRowId() )
+               dualFarkas.add(number(SPxRowId(spxid)), sign * fVec().delta().value(j));
          }
 
          if( enterId.isSPxRowId() )

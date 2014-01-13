@@ -921,7 +921,7 @@ template < class S >
 inline
 DSVectorBase<R>& DSVectorBase<R>::operator=(const VectorBase<S>& vec)
 {
-   assert(this != (DSVectorBase<R>*)(&vec));
+   assert(this != (const DSVectorBase<R>*)(&vec));
 
    SVectorBase<R>::clear();
    setMax(vec.dim());

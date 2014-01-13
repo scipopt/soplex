@@ -17,7 +17,7 @@
  * @brief Wrapper for GMP types.
  */
 
-#include <math.h>
+#include <cmath>
 #include <stdlib.h>
 #include <stdio.h>
 #include <iomanip>
@@ -468,9 +468,11 @@ bool Rational::readString(const char* s)
    }
 
    // otherwise we analyze the string
-   bool has_digits = false;
+#ifndef NDEBUG
    bool has_exponent = false;
    bool has_dot = false;
+#endif
+   bool has_digits = false;
    bool has_emptyexponent = false;
    long int exponent = 0;
    long int decshift = 0;
@@ -497,7 +499,9 @@ bool Rational::readString(const char* s)
    // 3. Decimal dot
    if( *pos == '.' )
    {
+#ifndef NDEBUG
       has_dot = true;
+#endif
       pos++;
 
       // 4. If there was a dot, possible digit behind it
@@ -511,7 +515,9 @@ bool Rational::readString(const char* s)
    // 5. Exponent
    if( tolower(*pos) == 'e' )
    {
+#ifndef NDEBUG
       has_exponent = true;
+#endif
       has_emptyexponent = true;
       pos++;
 
@@ -530,7 +536,7 @@ bool Rational::readString(const char* s)
    if( has_emptyexponent || !has_digits )
       return false;
 
-   assert( has_exponent || has_dot);
+   assert(has_exponent || has_dot);
 
    //read up to dot recording digits
    t = tmp;
@@ -661,9 +667,11 @@ bool readStringRational(const char* s, Rational& value)
    }
 
    // otherwise we analyze the string
-   bool has_digits = false;
+#ifndef NDEBUG
    bool has_exponent = false;
    bool has_dot = false;
+#endif
+   bool has_digits = false;
    bool has_emptyexponent = false;
    long int exponent = 0;
    long int decshift = 0;
@@ -690,7 +698,9 @@ bool readStringRational(const char* s, Rational& value)
    // 3. Decimal dot
    if( *pos == '.' )
    {
+#ifndef NDEBUG
       has_dot = true;
+#endif
       pos++;
 
       // 4. If there was a dot, possible digit behind it
@@ -704,7 +714,9 @@ bool readStringRational(const char* s, Rational& value)
    // 5. Exponent
    if( tolower(*pos) == 'e' )
    {
+#ifndef NDEBUG
       has_exponent = true;
+#endif
       has_emptyexponent = true;
       pos++;
 
@@ -723,7 +735,7 @@ bool readStringRational(const char* s, Rational& value)
    if( has_emptyexponent || !has_digits )
       return false;
 
-   assert( has_exponent || has_dot);
+   assert(has_exponent || has_dot);
 
    // read up to dot recording digits
    t = tmp;
@@ -1086,7 +1098,7 @@ Rational operator-(const Rational& r)
 
 
 
-#elif SOPLEX_WITH_GMPXX
+#elif defined(SOPLEX_WITH_GMPXX)
 
 /// Defines the "Pimpl"-class Private
 class Rational::Private : public mpq_class
@@ -1498,9 +1510,11 @@ bool Rational::readString(const char* s)
    }
 
    // otherwise we analyze the string
-   bool has_digits = false;
+#ifndef NDEBUG
    bool has_exponent = false;
    bool has_dot = false;
+#endif
+   bool has_digits = false;
    bool has_emptyexponent = false;
    long int exponent = 0;
    long int decshift = 0;
@@ -1524,7 +1538,9 @@ bool Rational::readString(const char* s)
    // 3. Decimal dot
    if( *pos == '.' )
    {
+#ifndef NDEBUG
       has_dot = true;
+#endif
       pos++;
 
       // 4. If there was a dot, possible digit behind it
@@ -1538,7 +1554,9 @@ bool Rational::readString(const char* s)
    // 5. Exponent
    if( tolower(*pos) == 'e' )
    {
+#ifndef NDEBUG
       has_exponent = true;
+#endif
       has_emptyexponent = true;
       pos++;
 
@@ -1557,7 +1575,7 @@ bool Rational::readString(const char* s)
    if( has_emptyexponent || !has_digits )
       return false;
 
-   assert( has_exponent || has_dot);
+   assert(has_exponent || has_dot);
 
    //read up to dot recording digits
    t = tmp;
@@ -1683,9 +1701,11 @@ bool readStringRational(const char* s, Rational& value)
    }
 
    // otherwise we analyze the string
-   bool has_digits = false;
+#ifndef NDEBUG
    bool has_exponent = false;
    bool has_dot = false;
+#endif
+   bool has_digits = false;
    bool has_emptyexponent = false;
    long int exponent = 0;
    long int decshift = 0;
@@ -1709,7 +1729,9 @@ bool readStringRational(const char* s, Rational& value)
    // 3. Decimal dot
    if( *pos == '.' )
    {
+#ifndef NDEBUG
       has_dot = true;
+#endif
       pos++;
 
       // 4. If there was a dot, possible digit behind it
@@ -1723,7 +1745,9 @@ bool readStringRational(const char* s, Rational& value)
    // 5. Exponent
    if( tolower(*pos) == 'e' )
    {
+#ifndef NDEBUG
       has_exponent = true;
+#endif
       has_emptyexponent = true;
       pos++;
 
@@ -1742,7 +1766,7 @@ bool readStringRational(const char* s, Rational& value)
    if( has_emptyexponent || !has_digits )
       return false;
 
-   assert( has_exponent || has_dot);
+   assert(has_exponent || has_dot);
 
    // read up to dot recording digits
    t = tmp;
@@ -2431,7 +2455,8 @@ bool operator>=(const Rational& r, const Rational& s)
 /// equality operator for Rational and double
 bool operator==(const Rational& r, const double& s)
 {
-   return (abs(r.dpointer->privatevalue - s) < DEFAULT_EPS_ZERO);
+   return (r.dpointer->privatevalue > s - DEFAULT_EPS_ZERO)
+      && (r.dpointer->privatevalue < s + DEFAULT_EPS_ZERO);
 }
 
 
@@ -2439,7 +2464,8 @@ bool operator==(const Rational& r, const double& s)
 /// inequality operator for Rational and double
 bool operator!=(const Rational& r, const double& s)
 {
-   return (abs(r.dpointer->privatevalue - s) >= DEFAULT_EPS_ZERO);
+   return (r.dpointer->privatevalue <= s - DEFAULT_EPS_ZERO)
+      || (r.dpointer->privatevalue >= s + DEFAULT_EPS_ZERO);
 }
 
 
@@ -2479,7 +2505,8 @@ bool operator>=(const Rational& r, const double& s)
 /// equality operator for double and Rational
 bool operator==(const double& r, const Rational& s)
 {
-   return (abs(r - s.dpointer->privatevalue) < DEFAULT_EPS_ZERO);
+   return (s.dpointer->privatevalue > r - DEFAULT_EPS_ZERO)
+      && (s.dpointer->privatevalue < r + DEFAULT_EPS_ZERO);
 }
 
 
@@ -2487,7 +2514,8 @@ bool operator==(const double& r, const Rational& s)
 /// inequality operator double and Rational
 bool operator!=(const double& r, const Rational& s)
 {
-   return (abs(r - s.dpointer->privatevalue) >= DEFAULT_EPS_ZERO);
+   return (s.dpointer->privatevalue <= r - DEFAULT_EPS_ZERO)
+      || (s.dpointer->privatevalue >= r + DEFAULT_EPS_ZERO);
 }
 
 

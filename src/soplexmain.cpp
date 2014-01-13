@@ -36,28 +36,36 @@ using namespace soplex;
 static
 void printVersionInfo()
 {
+   // do not use preprocessor directives within the MSG_INFO1 macro
+#if (SOPLEX_SUBVERSION > 0)
    MSG_INFO1( spxout << "SoPlex version " << SOPLEX_VERSION/100
       << "." << (SOPLEX_VERSION % 100)/10
       << "." << SOPLEX_VERSION % 10
-#if SOPLEX_SUBVERSION > 0
-      << "." << SOPLEX_SUBVERSION
-#endif
-#ifndef NDEBUG
-      << " [mode: debug]"
+      << "." << SOPLEX_SUBVERSION );
 #else
-      << " [mode: optimized]"
+   MSG_INFO1( spxout << "SoPlex version " << SOPLEX_VERSION/100
+      << "." << (SOPLEX_VERSION % 100)/10
+      << "." << SOPLEX_VERSION % 10 );
 #endif
-      << " [precision: " << (int)sizeof(Real) << " byte]"
-#ifdef SOPLEX_WITH_GMP
-      << " [rational: gmp]"
-#elif SOPLEX_WITH_GMPXX
-      << " [rational: gmpxx]"
-#else
-      << " [rational: long double]"
-#endif
-      << " [githash: " << getGitHash() << "]\n" );
 
-   MSG_INFO1( spxout << "Copyright (c) 1996-2014 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)\n\n" );
+#ifndef NDEBUG
+   MSG_INFO1( spxout << " [mode: debug]" );
+#else
+   MSG_INFO1( spxout << " [mode: optimized]" );
+#endif
+
+   MSG_INFO1( spxout << " [precision: " << (int)sizeof(Real) << " byte]" );
+
+#ifdef SOPLEX_WITH_GMP
+   MSG_INFO1( spxout << " [rational: gmp]" );
+#elif defined(SOPLEX_WITH_GMPXX)
+   MSG_INFO1( spxout << " [rational: gmpxx]" );
+#else
+   MSG_INFO1( spxout << " [rational: long double]" );
+#endif
+
+   MSG_INFO1( spxout << " [githash: " << getGitHash() << "]\n"
+      "Copyright (c) 1996-2014 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)\n\n" );
 }
 
 // prints usage and command line options

@@ -901,7 +901,7 @@ public:
    template < class S >
    SVSetBase<R>& operator=(const SVSetBase<S>& rhs)
    {
-      if( this != (SVSetBase<R>*)(&rhs) )
+      if( this != (const SVSetBase<R>*)(&rhs) )
       {
          clear();
 

@@ -56,7 +56,7 @@
 
 
 #ifndef NDEBUG
-#define CHECK_BASIC_DIM         1
+#define CHECK_BASIC_DIM
 #endif  // NDEBUG
 
 namespace soplex
@@ -102,7 +102,7 @@ void SPxMainSM::FreeConstraintPS::execute(DVector& x, DVector& y, DVector& s, DV
    // basis:
    rStatus[m_i] = SPxSolver::BASIC;
 
-#if CHECK_BASIC_DIM
+#ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
    {
        throw SPxInternalCodeException("XMAISM15 Dimension doesn't match after this step.");
@@ -128,7 +128,7 @@ void SPxMainSM::EmptyConstraintPS::execute(DVector&, DVector& y, DVector& s, DVe
    // basis:
    rStatus[m_i] = SPxSolver::BASIC;
 
-#if CHECK_BASIC_DIM
+#ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
    {
        throw SPxInternalCodeException("XMAISM16 Dimension doesn't match after this step.");
@@ -157,22 +157,22 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
       if (m_col.index(k) != m_i)
          val -= m_col.value(k) * y[m_col.index(k)];
 
-   Real m_newLo = (aij > 0) ? m_lhs/aij : m_rhs/aij;  // implicit lhs
-   Real m_newUp = (aij > 0) ? m_rhs/aij : m_lhs/aij;  // implicit rhs
+   Real newLo = (aij > 0) ? m_lhs/aij : m_rhs/aij;  // implicit lhs
+   Real newUp = (aij > 0) ? m_rhs/aij : m_lhs/aij;  // implicit rhs
 
    switch(cStatus[m_j])
    {
    case SPxSolver::FIXED:
-      if(m_newLo <= m_oldLo && m_newUp >= m_oldUp)
+      if(newLo <= m_oldLo && newUp >= m_oldUp)
       {
          // this row is totally redundant, has not changed bound of xj
          rStatus[m_i] = SPxSolver::BASIC;
          y[m_i] = 0.0;
       }
-      else if(EQrel(m_newLo, m_newUp, eps()))
+      else if(EQrel(newLo, newUp, eps()))
       {
          // row is in the type  aij * xj = b
-         assert(EQrel(m_newLo, x[m_j], eps()));
+         assert(EQrel(newLo, x[m_j], eps()));
 
          if(EQrel(m_oldLo, m_oldUp, eps()))
          {
@@ -201,7 +201,7 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
             r[m_j] = val;
          }
       }
-      else if(EQrel(m_newLo, m_oldUp, eps()))
+      else if(EQrel(newLo, m_oldUp, eps()))
       {
          // row is in the type  xj >= b/aij, try to set xj on upper
          if(r[m_j] >= eps())
@@ -224,7 +224,7 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
             r[m_j] = val;
          }
       }
-      else if(EQrel(m_newUp, m_oldLo, eps()))
+      else if(EQrel(newUp, m_oldLo, eps()))
       {
          // row is in the type  xj <= b/aij, try to set xj on lower
          if(r[m_j] <= -eps())
@@ -301,7 +301,7 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
       break;
    }
 
-#if CHECK_BASIC_DIM
+#ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
    {
        throw SPxInternalCodeException("XMAISM17 Dimension doesn't match after this step.");
@@ -402,7 +402,7 @@ void SPxMainSM::ForceConstraintPS::execute(DVector& x, DVector& y, DVector& s, D
       y[m_i] = 0.0;
    }
 
-#if CHECK_BASIC_DIM
+#ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
    {
        throw SPxInternalCodeException("XMAISM18 Dimension doesn't match after this step.");
@@ -450,7 +450,7 @@ void SPxMainSM::FixVariablePS::execute(DVector& x, DVector& y, DVector& s, DVect
       cStatus[m_j] = EQrel(m_val, m_lower) ? SPxSolver::ON_LOWER : (EQrel(m_val, m_upper) ? SPxSolver::ON_UPPER : SPxSolver::ZERO);
    }
 
-#if CHECK_BASIC_DIM
+#ifdef CHECK_BASIC_DIM
    if(m_correctIdx)
    {
       if (!checkBasisDim(rStatus, cStatus))
@@ -608,7 +608,7 @@ void SPxMainSM::FreeZeroObjVariablePS::execute(DVector& x, DVector& y, DVector& 
          cStatus[m_j] = SPxSolver::ON_LOWER;
    }
 
-#if CHECK_BASIC_DIM
+#ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
    {
        throw SPxInternalCodeException("XMAISM20 Dimension doesn't match after this step.");
@@ -744,7 +744,7 @@ void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& 
 
    assert(cStatus[m_j] != SPxSolver::BASIC || isZero(r[m_j], eps()));
 
-#if CHECK_BASIC_DIM
+#ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
    {
        throw SPxInternalCodeException("XMAISM21 Dimension doesn't match after this step.");
@@ -802,7 +802,7 @@ void SPxMainSM::FreeColSingletonPS::execute(DVector& x, DVector& y, DVector& s, 
    else
       rStatus[m_i] = SPxSolver::ON_UPPER;
 
-#if CHECK_BASIC_DIM
+#ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
    {
        throw SPxInternalCodeException("XMAISM22 Dimension doesn't match after this step.");
@@ -868,7 +868,7 @@ void SPxMainSM::DoubletonEquationPS::execute(DVector&, DVector& y, DVector&, DVe
              (cStatus[m_j] == SPxSolver::FIXED));
    }
 
-#if CHECK_BASIC_DIM
+#ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
    {
        throw SPxInternalCodeException("XMAISM23 Dimension doesn't match after this step.");
@@ -973,7 +973,7 @@ void SPxMainSM::DuplicateRowsPS::execute(DVector&, DVector& y, DVector& s, DVect
       }
    }
 
-#if CHECK_BASIC_DIM
+#ifdef CHECK_BASIC_DIM
    if(m_isFirst && !checkBasisDim(rStatus, cStatus))
    {
       throw SPxInternalCodeException("XMAISM24 Dimension doesn't match after this step.");
@@ -993,7 +993,7 @@ void SPxMainSM::DuplicateColsPS::execute(DVector& x,
 
    if(m_isFirst)
    {
-#if CHECK_BASIC_DIM
+#ifdef CHECK_BASIC_DIM
       if (!checkBasisDim(rStatus, cStatus))
       {
          throw SPxInternalCodeException("XMAISM25 Dimension doesn't match after this step.");
@@ -3706,7 +3706,7 @@ void SPxMainSM::fixColumn(SPxLP& lp, int j, bool correctIdx)
    m_hist.append(new (FixVariablePSptr) FixVariablePS(lp, *this, j, lp.lower(j), correctIdx));
 }
 
-SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real feastol, Real opttol, bool keepbounds)
+SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real otol, bool keepbounds)
 {
 
    m_thesense = lp.spxSense();
@@ -3756,15 +3756,15 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real feastol, Rea
    if( eps < 0.0 )
       throw SPxInterfaceException("XMAISM30 Cannot use negative epsilon in simplify().");
 
-   if( feastol < 0.0 )
+   if( ftol < 0.0 )
       throw SPxInterfaceException("XMAISM31 Cannot use negative feastol in simplify().");
 
-   if( opttol < 0.0 )
+   if( otol < 0.0 )
       throw SPxInterfaceException("XMAISM32 Cannot use negative opttol in simplify().");
 
    m_epsilon = eps;
-   m_feastol = feastol;
-   m_opttol = opttol;
+   m_feastol = ftol;
+   m_opttol = otol;
 
    for(int i = 0; i < lp.nRows(); ++i)
    {
@@ -3943,7 +3943,7 @@ void SPxMainSM::unsimplify(const Vector& x, const Vector& y, const Vector& s, co
          m_dual[i] = -m_dual[i];
    }
 
-#if CHECK_BASIC_DIM
+#ifdef CHECK_BASIC_DIM
    int numBasis = 0;
    for(int rs = 0; rs < m_rBasisStat.size(); ++rs)
    {

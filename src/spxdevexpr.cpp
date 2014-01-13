@@ -100,7 +100,6 @@ int SPxDevexPR::buildBestPriceVectorLeave( Real feastol )
    int idx;
    int nsorted;
    Real fTesti;
-   Real coPeni;
    const Real* fTest = thesolver->fTest().get_const_ptr();
    const Real* cpen = coPenalty.get_const_ptr();
    IdxElement price;
@@ -669,14 +668,13 @@ SPxId SPxDevexPR::selectEnterSparseDim(Real& best, Real feastol)
 {
    const Real* cTest = thesolver->coTest().get_const_ptr();
    const Real* cpen = coPenalty.get_const_ptr();
-   int end = coPenalty.dim();
    int enterIdx = -1;
    int idx;
    Real coTesti;
    Real coPeni;
    Real x;
 
-   assert(end == thesolver->coTest().dim());
+   assert(coPenalty.dim() == thesolver->coTest().dim());
    for(int i = thesolver->infeasibilities.size() -1; i >= 0; --i)
    {
       idx = thesolver->infeasibilities.index(i);
@@ -709,14 +707,13 @@ SPxId SPxDevexPR::selectEnterSparseCoDim(Real& best, Real feastol)
 {
    const Real* test = thesolver->test().get_const_ptr();
    const Real* pen = penalty.get_const_ptr();
-   int end = penalty.dim();
    int enterIdx = -1;
    int idx;
    Real testi;
    Real peni;
    Real x;
 
-   assert(end == thesolver->test().dim());
+   assert(penalty.dim() == thesolver->test().dim());
    for (int i = thesolver->infeasibilitiesCo.size() -1; i >= 0; --i)
    {
       idx = thesolver->infeasibilitiesCo.index(i);

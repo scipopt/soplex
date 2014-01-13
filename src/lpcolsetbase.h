@@ -558,7 +558,7 @@ public:
    template < class S >
    LPColSetBase<R>& operator=(const LPColSetBase<S>& rs)
    {
-      if( this != (LPColSetBase<R>*)(&rs) )
+      if( this != (const LPColSetBase<R>*)(&rs) )
       {
          SVSetBase<R>::operator=(rs);
          low = rs.low;

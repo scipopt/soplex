@@ -194,7 +194,7 @@ public:
    template < class S >
    DVectorBase<R>& operator=(const DVectorBase<S>& vec)
    {
-      if( this != (DVectorBase<R>*)&vec )
+      if( this != (const DVectorBase<R>*)&vec )
       {
          if( vec.dim() != VectorBase<R>::dim() )
             reDim(vec.dim());

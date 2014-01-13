@@ -120,15 +120,18 @@ LASTSETTINGS	=	$(OBJDIR)/make.lastsettings
 #--- NOTHING TO CHANGE FROM HERE ON -------------------------------------------
 #------------------------------------------------------------------------------
 
-GCCWARN		=	-Wall -W -Wpointer-arith -Wno-unknown-pragmas \
-			-Wcast-align -Wwrite-strings -Wconversion \
+GCCWARN		=	-pedantic -Wall -W -Wpointer-arith -Wcast-align -Wwrite-strings \
+			-Wconversion -Wsign-compare -Wshadow \
+			-Wredundant-decls -Wdisabled-optimization \
 			-Wctor-dtor-privacy -Wnon-virtual-dtor -Wreorder \
 			-Woverloaded-virtual -Wsign-promo -Wsynth -Wundef \
-			-Wcast-qual -Wold-style-cast -Wshadow 
-#			-Weffc++ -Wredundant-decls    
-# gcc 2.xx -Wmissing-declarations -Wbad-function-cast 
+			-Wcast-qual \
+			-Wmissing-declarations \
+			-Wno-unused-parameter -Wno-strict-overflow -Wno-long-long
+#			-Wold-style-cast
+#			-Weffc++
 
-#GCCWARN =
+
 #-----------------------------------------------------------------------------
 include make/make.$(BASE)
 -include make/local/make.$(HOSTNAME)

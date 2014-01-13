@@ -2210,9 +2210,9 @@ void SPxLPBase<Rational>::writeMPS(
       {
          if( (double(lhs(i)) > -double(infinity)) && (double(rhs(i)) < double(infinity)) )
          {
-            Rational value = rhs(i);
-            value -= lhs(i);
-            MPSwriteRecord(p_output, "", "RANGE", MPSgetRowName(*this, i, p_rnames, name1), value);
+            Rational range = rhs(i);
+            range -= lhs(i);
+            MPSwriteRecord(p_output, "", "RANGE", MPSgetRowName(*this, i, p_rnames, name1), range);
          }
       }
    }

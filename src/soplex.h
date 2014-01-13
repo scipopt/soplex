@@ -1072,7 +1072,7 @@ public:
    bool setRationalParam(const RationalParam param, const Rational value, const bool quiet = false, const bool init = false);
 
    /// sets parameter settings; returns true on success
-   bool setSettings(const Settings& settings, const bool quiet = false, const bool init = false);
+   bool setSettings(const Settings& newSettings, const bool quiet = false, const bool init = false);
 
    /// writes settings file; returns true on success
    bool saveSettingsFile(const char* filename, const bool onlyChanged = false) const;
@@ -1378,7 +1378,7 @@ private:
    void _performUnboundedIRStable(SolRational& sol, bool& hasUnboundedRay, bool& stopped, bool& error);
 
    /// performs iterative refinement on the auxiliary problem for testing feasibility
-   void _performFeasIRStable(SolRational& sol, bool& hasDualFarkas, bool& stopped, bool& error);
+   void _performFeasIRStable(SolRational& sol, bool& withDualFarkas, bool& stopped, bool& error);
 
    /// reduces matrix coefficient in absolute value by the lifting procedure of Thiele et al. 2013
    void _lift();

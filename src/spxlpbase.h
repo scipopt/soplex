@@ -1747,7 +1747,7 @@ public:
    template < class S >
    SPxLPBase<R>& operator=(const SPxLPBase<S>& old)
    {
-      if( this != (SPxLPBase<R>*)(&old) )
+      if( this != (const SPxLPBase<R>*)(&old) )
       {
          LPRowSetBase<R>::operator=(old);
          LPColSetBase<R>::operator=(old);

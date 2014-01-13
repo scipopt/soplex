@@ -283,12 +283,10 @@ int SPxSteepPR::buildBestPriceVectorLeave( Real feastol )
 {
    int idx;
    int nsorted;
-   Real fTesti;
-   Real coPeni;
    Real x;
    const Real* fTest = thesolver->fTest().get_const_ptr();
    const Real* cpen = coPenalty.get_const_ptr();
-   const Real* pref = leavePref.get_const_ptr();
+   const Real* prefPtr = leavePref.get_const_ptr();
    IdxElement price;
    prices.clear();
    bestPrices.clear();
@@ -301,9 +299,9 @@ int SPxSteepPR::buildBestPriceVectorLeave( Real feastol )
       if (x < -feastol)
       {
          if( cpen[idx] < feastol )
-            x = x * x / feastol * pref[idx];
+            x = x * x / feastol * prefPtr[idx];
          else
-            x = x * x / cpen[idx] * pref[idx];
+            x = x * x / cpen[idx] * prefPtr[idx];
          price.val = x;
          price.idx = idx;
          prices.append(price);
@@ -461,7 +459,7 @@ int SPxSteepPR::selectLeaveHyper(Real tol)
 {
    const Real* coPen = coPenalty.get_const_ptr();
    const Real* fTest = thesolver->fTest().get_const_ptr();
-   const Real* pref  = leavePref.get_const_ptr();
+   const Real* prefPtr  = leavePref.get_const_ptr();
 
    Real leastBest = infinity;
    Real best = -infinity;
@@ -484,10 +482,10 @@ int SPxSteepPR::selectLeaveHyper(Real tol)
             MSG_WARNING( spxout << "WSTEEP02 SPxSteepPR::selectLeaveSparse(): coPenalty too small ("
                                 << coPenalty_ptr[idx] << "), assuming epsilon (" << tol << ")!" << std::endl; )
 #endif
-            x = x * x / tol * pref[idx];
+            x = x * x / tol * prefPtr[idx];
          }
          else
-            x = x * x / coPen[idx] * pref[idx];
+            x = x * x / coPen[idx] * prefPtr[idx];
 
          if( x > best )
          {
@@ -526,10 +524,10 @@ int SPxSteepPR::selectLeaveHyper(Real tol)
             MSG_WARNING( spxout << "WSTEEP02 SPxSteepPR::selectLeaveSparse(): coPenalty too small ("
                                 << coPenalty_ptr[idx] << "), assuming epsilon (" << tol << ")!" << std::endl; )
 #endif
-            x = x * x / tol * pref[idx];
+            x = x * x / tol * prefPtr[idx];
          }
          else
-            x = x * x / coPen[idx] * pref[idx];
+            x = x * x / coPen[idx] * prefPtr[idx];
 
          if( x > leastBest )
          {
@@ -957,7 +955,7 @@ SPxId SPxSteepPR::selectEnterSparseDim(Real& best, Real tol)
    int idx;
    Real x;
    Real coPen;
-   Real coPref;
+   Real coPrefValue;
 
    for (int i = thesolver->infeasibilities.size() -1; i >= 0; --i)
    {
@@ -968,8 +966,8 @@ SPxId SPxSteepPR::selectEnterSparseDim(Real& best, Real tol)
       {
          coPen = coPenalty_ptr[idx];
          x = x * x / coPen;
-         coPref = cp[idx];
-         x = x * coPref;
+         coPrefValue = cp[idx];
+         x = x * coPrefValue;
          // x *= 1 + cp[i];
          if (x > best)
          {
@@ -996,7 +994,7 @@ SPxId SPxSteepPR::selectEnterSparseCoDim(Real& best, Real tol)
    int idx;
    Real x;
    Real pen;
-   Real pref;
+   Real prefValue;
 
    for (int i = thesolver->infeasibilitiesCo.size() -1; i >= 0; --i)
    {
@@ -1007,8 +1005,8 @@ SPxId SPxSteepPR::selectEnterSparseCoDim(Real& best, Real tol)
       {
          pen = penalty_ptr[idx];
          x = x * x / pen;
-         pref = p[idx];
-         x = x * pref;
+         prefValue = p[idx];
+         x = x * prefValue;
          // x *= 1 + p[i];
          if (x > best)
          {
