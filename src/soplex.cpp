@@ -4164,6 +4164,19 @@ namespace soplex
          }
          break;
 
+      // mode of hyper pricing
+      case SoPlex::HYPER_PRICING:
+         switch( value )
+         {
+         case HYPER_PRICING_OFF:
+         case HYPER_PRICING_AUTO:
+         case HYPER_PRICING_ON:
+            break;
+         default:
+            return false;
+         }
+         break;
+
       default:
          return false;
       }

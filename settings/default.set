@@ -81,8 +81,8 @@ int:solvemode = 0
 int:checkmode = 2
 
 # mode for hyper sparse pricing (0 - off, 1 - auto, 2 - always)
-# range [-2147483648,2147483647], default 1
-int:hyperpricing = 1
+# range [-2147483648,2147483647], default 0
+int:hyperpricing = 0
 
 # general zero tolerance
 # range [1e-16,1e-16], default 1e-16

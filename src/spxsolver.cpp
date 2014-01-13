@@ -339,7 +339,6 @@ void SPxSolver::init()
       infeasibilitiesCo.setMax(coDim());
       isInfeasible.reSize(dim());
       isInfeasibleCo.reSize(coDim());
-
       theratiotester->setDelta(entertol());
    }
    else
@@ -359,14 +358,6 @@ void SPxSolver::init()
       // prepare support vectors for sparse pricing
       infeasibilities.setMax(dim());
       isInfeasible.reSize(dim());
-      sparsityThresholdLeave = (int) (dim() * SPARSITYTHRESHOLD);
-
-      if( dim() > HYPERPRICINGFACTOR * getMaxUpdates() )
-      {
-         hyperPricingLeave = true;
-         updateViols.setMax(dim());
-      }
-
       theratiotester->setDelta(leavetol());
    }
 
