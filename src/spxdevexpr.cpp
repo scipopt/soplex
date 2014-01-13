@@ -551,9 +551,9 @@ SPxId SPxDevexPR::selectEnterHyperDim(Real& best, Real feastol)
       // only look at indeces that were not checked already
       if( thesolver->isInfeasible[idx] == VIOLATED )
       {
+         coTesti = cTest[idx];
          if( coTesti < -feastol )
          {
-            coTesti = cTest[idx];
             coPeni = cpen[idx];
             x = coTesti * coTesti / coPeni;
             if(x > leastBest)
@@ -632,9 +632,9 @@ SPxId SPxDevexPR::selectEnterHyperCoDim(Real& best, Real feastol)
       // only look at indeces that were not checked already
       if( thesolver->isInfeasibleCo[idx] == VIOLATED )
       {
+         testi = test[idx];
          if( testi < -feastol )
          {
-            testi = test[idx];
             peni = pen[idx];
             x = testi * testi / peni;
             if(x > leastBest)
