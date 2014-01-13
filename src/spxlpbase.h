@@ -820,22 +820,22 @@ public:
             countFreeRow++;
       }
 
-      os << "  Columns          : " << nCols() << "\n"
-         << "             boxed : " << countBoxed << "\n"
-         << "       lower bound : " << countLower << "\n"
-         << "       upper bound : " << countUpper << "\n"
-         << "              free : " << countFreeCol << "\n"
-         << "  Rows             : " << nRows() << "\n"
-         << "            ranged : " << countRanged << "\n"
-         << "               lhs : " << countLhs << "\n"
-         << "               rhs : " << countRhs << "\n"
-         << "              free : " << countFreeRow << "\n"
-         << "  Nonzeros         : " << nNzos() << "\n"
-         << "        per column : " << Real(nNzos()) / Real(nCols()) << "\n"
-         << "           per row : " << Real(nNzos()) / Real(nRows()) << "\n"
-         << "          sparsity : " << Real(nNzos()) / Real(nCols()) / Real(nRows()) << "\n"
-         << "   min. abs. value : " << Real(minAbsNzo()) << "\n"
-         << "   max. abs. value : " << Real(maxAbsNzo()) << "\n";
+      os << "  Columns           : " << nCols() << "\n"
+         << "              boxed : " << countBoxed << "\n"
+         << "        lower bound : " << countLower << "\n"
+         << "        upper bound : " << countUpper << "\n"
+         << "               free : " << countFreeCol << "\n"
+         << "  Rows              : " << nRows() << "\n"
+         << "             ranged : " << countRanged << "\n"
+         << "                lhs : " << countLhs << "\n"
+         << "                rhs : " << countRhs << "\n"
+         << "               free : " << countFreeRow << "\n"
+         << "  Nonzeros          : " << nNzos() << "\n"
+         << "         per column : " << Real(nNzos()) / Real(nCols()) << "\n"
+         << "            per row : " << Real(nNzos()) / Real(nRows()) << "\n"
+         << "           sparsity : " << Real(nNzos()) / Real(nCols()) / Real(nRows()) << "\n"
+         << "    min. abs. value : " << Real(minAbsNzo()) << "\n"
+         << "    max. abs. value : " << Real(maxAbsNzo()) << "\n";
    }
 
    //@}

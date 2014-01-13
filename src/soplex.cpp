@@ -4658,24 +4658,18 @@ namespace soplex
       if( _lastSolveMode == SOLVEMODE_REAL )
       {
          os << std::scientific << std::setprecision(8)
-            << "Solution (real)    : \n"
-            << "  Value            : " << objValueReal() << "\n"
-            << "  Proven primal    : " << "?\n"
-            << "  Proven dual      : " << "?\n";
+            << "Solution (real)     : \n"
+            << "  Value             : " << objValueReal() << "\n";
       }
       else if( _lastSolveMode == SOLVEMODE_RATIONAL )
       {
-         os << "Solution (rational): \n"
-            << "  Objective value  : " << rationalToString(objValueRational()) << "\n"
-            << "  Proven primal    : " << "?\n"
-            << "  Proven dual      : " << "?\n";
+         os << "Solution (rational) : \n"
+            << "  Objective value   : " << rationalToString(objValueRational()) << "\n";
       }
       else
       {
-         os << "Solution           : \n"
-            << "  Objective value  : -\n"
-            << "  Proven primal    : -\n"
-            << "  Proven dual      : -\n";
+         os << "Solution            : \n"
+            << "  Objective value   : -\n";
       }
 
       if( intParam(SoPlex::CHECKMODE) == CHECKMODE_RATIONAL
@@ -4684,46 +4678,46 @@ namespace soplex
          Rational maxviol;
          Rational sumviol;
 
-         os << "Violations (rational): \n";
+         os << "Violation (rational): \n";
          if( getBoundViolationRational(maxviol, sumviol) )
-            os << "  Max/sum bound    : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+            os << "  Max/sum bound     : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
          else
-            os << "  Max/sum bound    : - / -\n";
+            os << "  Max/sum bound     : - / -\n";
          if( getRowViolationRational(maxviol, sumviol) )
-            os << "  Max/sum row      : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+            os << "  Max/sum row       : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
          else
-            os << "  Max/sum bound    : - / -\n";
+            os << "  Max/sum bound     : - / -\n";
          if( getRedCostViolationRational(maxviol, sumviol) )
-            os << "  Max/sum redcost  : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+            os << "  Max/sum redcost   : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
          else
-            os << "  Max/sum bound    : - / -\n";
+            os << "  Max/sum bound     : - / -\n";
          if( getDualViolationRational(maxviol, sumviol) )
-            os << "  Max/sum dual     : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+            os << "  Max/sum dual      : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
          else
-            os << "  Max/sum bound    : - / -\n";
+            os << "  Max/sum bound     : - / -\n";
       }
       else
       {
          Real maxviol;
          Real sumviol;
 
-         os << "Violations (real)  : \n";
+         os << "Violations (real)   : \n";
          if( getBoundViolationReal(maxviol, sumviol) )
-            os << "  Max/sum bound    : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+            os << "  Max/sum bound     : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
          else
-            os << "  Max/sum bound    : - / -\n";
+            os << "  Max/sum bound     : - / -\n";
          if( getRowViolationReal(maxviol, sumviol) )
-            os << "  Max/sum row      : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+            os << "  Max/sum row       : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
          else
-            os << "  Max/sum bound    : - / -\n";
+            os << "  Max/sum bound     : - / -\n";
          if( getRedCostViolationReal(maxviol, sumviol) )
-            os << "  Max/sum redcost  : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+            os << "  Max/sum redcost   : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
          else
-            os << "  Max/sum bound    : - / -\n";
+            os << "  Max/sum bound     : - / -\n";
          if( getDualViolationReal(maxviol, sumviol) )
-            os << "  Max/sum dual     : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+            os << "  Max/sum dual      : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
          else
-            os << "  Max/sum bound    : - / -\n";
+            os << "  Max/sum bound     : - / -\n";
       }
    }
 
@@ -4742,9 +4736,9 @@ namespace soplex
    void SoPlex::printShortStatistics(std::ostream& os)
    {
       printStatus(os, _status);
-      os << "Solving time (sec) : " << std::fixed << std::setprecision(2) << _statistics->solvingTime.userTime() << "\n"
-         << "Iterations         : " << _statistics->iterations << "\n"
-         << "Objective value    : " << objValueReal() << "\n";
+      os << "Solving time (sec)  : " << std::fixed << std::setprecision(2) << _statistics->solvingTime.userTime() << "\n"
+         << "Iterations          : " << _statistics->iterations << "\n"
+         << "Objective value     : " << objValueReal() << "\n";
    }
 
 
@@ -4756,13 +4750,13 @@ namespace soplex
 
       printStatus(os, _status);
 
-      os << "Original problem   : \n";
+      os << "Original problem    : \n";
       if( intParam(SoPlex::READMODE) == READMODE_REAL )
          _realLP->printProblemStatistics(os);
       else
          _rationalLP->printProblemStatistics(os);
-      os << "  Objective sense  : " << (intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE ? "minimize\n" : "maximize\n");
 
+      os << "Objective sense     : " << (intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE ? "minimize\n" : "maximize\n");
       printSolutionStatistics(os);
       printSolvingStatistics(os);
    }
@@ -4772,7 +4766,7 @@ namespace soplex
    /// prints status
    void SoPlex::printStatus(std::ostream& os, SPxSolver::Status stat)
    {
-      os << "SoPlex status      : ";
+      os << "SoPlex status       : ";
 
       switch( stat )
       {
