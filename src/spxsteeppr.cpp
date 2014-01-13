@@ -849,7 +849,7 @@ SPxId SPxSteepPR::selectEnterHyperDim(Real& best, Real tol)
                   enterIdx = idx;
                }
                // put index into candidate list
-               thesolver->isInfeasible[idx] == VIOLATED_AND_CHECKED;
+               thesolver->isInfeasible[idx] = VIOLATED_AND_CHECKED;
                bestPrices.addIdx(idx);
             }
          }
@@ -929,7 +929,7 @@ SPxId SPxSteepPR::selectEnterHyperCoDim(Real& best, Real tol)
                   enterIdx = idx;
                }
                // put index into candidate list
-               thesolver->isInfeasibleCo[idx] == VIOLATED_AND_CHECKED;
+               thesolver->isInfeasibleCo[idx] = VIOLATED_AND_CHECKED;
                bestPricesCo.addIdx(idx);
             }
          }
