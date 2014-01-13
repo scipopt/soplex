@@ -6033,8 +6033,8 @@ namespace soplex
       // @todo parameterize threshold? (currently 10)
       _solver.setSparsePricingThreshold(realParam(SoPlex::SPARSITY_THRESHOLD));
       if( (intParam(SoPlex::HYPER_PRICING) == SoPlex::HYPER_PRICING_ON)
-            || (intParam(SoPlex::HYPER_PRICING) == SoPlex::HYPER_PRICING_AUTO)
-            && (_solver.nRows() > 10 * _solver.basis().getMaxUpdates()) )
+            || ((intParam(SoPlex::HYPER_PRICING) == SoPlex::HYPER_PRICING_AUTO)
+            && (_solver.nRows() > 10 * _solver.basis().getMaxUpdates())) )
          _solver.hyperPricing(true);
       else if( intParam(SoPlex::HYPER_PRICING) == SoPlex::HYPER_PRICING_OFF )
          _solver.hyperPricing(false);
