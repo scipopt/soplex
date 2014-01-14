@@ -34,20 +34,23 @@ namespace soplex
 bool SPxSolver::read(std::istream& in, NameSet* rowNames, 
                   NameSet* colNames, DIdxSet* intVars)
 {
-   clear();
-   unInit();
+   if( initialized )
+   {
+      clear();
+      unInit();
+
+      if (thepricer)
+         thepricer->clear();
+
+      if (theratiotester)
+         theratiotester->clear();
+   }
+
    unLoad();
-
-   if (thepricer)
-      thepricer->clear();
-
-   if (theratiotester)
-      theratiotester->clear();
-
    if (!SPxLP::read(in, rowNames, colNames, intVars))
       return false;
 
-   SPxBasis::load(this);
+   theLP = this;
 
    return true;
 }
