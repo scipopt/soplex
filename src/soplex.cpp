@@ -3967,11 +3967,8 @@ namespace soplex
       case SoPlex::FACTOR_UPDATE_MAX:
          if( value <= 1 )
             return false;
-         else
-         {
-            ///@todo set value in factorization
-            break;
-         }
+         _solver.basis().setMaxUpdates(value);
+         break;
 
       // iteration limit (-1 if unlimited)
       case SoPlex::ITERLIMIT:
