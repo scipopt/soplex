@@ -62,7 +62,7 @@ int SPxAutoPR::selectLeave()
    {
       assert(activepricer == &devex);
       activepricer = &steep;
-      MSG_INFO1( spxout << "Switching to " << activepricer->getName() << std::endl; )
+      MSG_INFO1( spxout << " --- switching to " << activepricer->getName() << " pricer" << std::endl; )
       activepricer->setType(SPxSolver::LEAVE);
    }
    return activepricer->selectLeave();
@@ -79,7 +79,7 @@ SPxId SPxAutoPR::selectEnter()
    {
       assert(activepricer == &devex);
       activepricer = &steep;
-      MSG_INFO1( spxout << "Switching to " << activepricer->getName() << std::endl; )
+      MSG_INFO1( spxout << " --- switching to " << activepricer->getName() << " pricer" << std::endl; )
       activepricer->setType(SPxSolver::ENTER);
    }
    return activepricer->selectEnter();

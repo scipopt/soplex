@@ -231,12 +231,6 @@ SPxSolver::Status SPxSolver::solve()
 
          do
          {
-            MSG_INFO3(
-               if( iteration() % iterationInterval == 0 )
-                  spxout << "ISOLVE74 Enter iteration: " << iteration()
-                         << ", Value = " << value()
-                         << ", Shift = " << shift() << std::endl;
-            )
             enterId = thepricer->selectEnter();
 
             if (!enterId.isValid() && instableEnterId.isValid() && lastUpdate() == 0)
@@ -549,13 +543,6 @@ SPxSolver::Status SPxSolver::solve()
 
          do
          {
-            MSG_INFO3(
-               if( iteration() % iterationInterval == 0 )
-                  spxout << "ISOLVE80 Leave Iteration: " << iteration()
-                         << ", Value = " << value()
-                         << ", Shift = " << shift() << std::endl;
-            )
-            
             leaveNum = thepricer->selectLeave();
 
             if (leaveNum < 0 && instableLeaveNum >= 0 && lastUpdate() == 0)
@@ -916,8 +903,8 @@ SPxSolver::Status SPxSolver::solve()
       throw SPxStatusException("XSOLVE05 Status is still RUNNING when it shouldn't be");
    }
 
-   MSG_INFO1(
-      spxout << "ISOLVE02 Finished solving (status=" << status()
+   MSG_INFO3(
+      spxout << "Finished solving (status=" << status()
              << ", iters=" << iterCount
              << ", leave=" << leaveCount
              << ", enter=" << enterCount
@@ -1087,6 +1074,23 @@ bool SPxSolver::terminate()
       testVecs();
 #endif
 
+   MSG_INFO1(
+      if( iteration() % (displayFreq*20) == 0 )
+      {
+         // spxout << "+----+---------+---------------+------------+\n";
+         spxout << "Type |  Iters  |     Value     |    Shift\n";
+         // spxout << "+----+---------+---------------+------------+\n";
+      }
+      if( iteration() % displayFreq == 0 )
+      {
+         (type() == LEAVE) ? spxout << "  L  |" : spxout << "  E  |";
+         spxout << std::setw(8) << iteration() << " | "
+         << value() << " | "
+         << shift()
+         << std::endl;
+      }
+   );
+
    int redo = dim();
 
    if (redo < 1000)
@@ -1147,7 +1151,7 @@ bool SPxSolver::terminate()
 
    if ( maxTime >= 0 && maxTime < infinity && time() >= maxTime )
    {
-      MSG_INFO2( spxout << "ISOLVE54 Timelimit (" << maxTime
+      MSG_INFO2( spxout << " --- timelimit (" << maxTime
                         << ") reached" << std::endl; )
       m_status = ABORT_TIME;
       return true;   
@@ -1179,10 +1183,10 @@ bool SPxSolver::terminate()
          // SPxSense::MINIMIZE == -1, so we have sign = 1 on minimizing
          if( spxSense() * value() <= spxSense() * objLimit ) 
          {
-            MSG_INFO2( spxout << "ISOLVE55 Objective value limit (" << objLimit
+            MSG_INFO2( spxout << " --- objective value limit (" << objLimit
                << ") reached" << std::endl; )
             MSG_DEBUG(
-               spxout << "DSOLVE56 Objective value limit reached" << std::endl
+               spxout << " --- objective value limit reached" << std::endl
                       << " (value: " << value()
                       << ", limit: " << objLimit << ")" << std::endl
                       << " (spxSense: " << int(spxSense())

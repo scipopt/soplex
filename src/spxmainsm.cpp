@@ -1395,7 +1395,7 @@ void SPxMainSM::handleExtremes(SPxLP& lp)
       m_chgLRhs += chgLRhs;
       m_chgBnds += chgBnds;
 
-      MSG_INFO2( spxout << "IMAISM06 Main simplifier (extremes) removed "
+      MSG_INFO2( spxout << "Simplifier (extremes) removed "
                         << remRows << " rows, "
                         << remNzos << " non-zeros, "
                         << chgBnds << " col bounds, "
@@ -1504,7 +1504,7 @@ SPxSimplifier::Result SPxMainSM::removeEmpty(SPxLP& lp)
       m_remRows += remRows;
       m_remCols += remCols;
 
-      MSG_INFO2( spxout << "IMAISM10 Main simplifier (empty rows/colums) removed "
+      MSG_INFO2( spxout << "Simplifier (empty rows/colums) removed "
                         << remRows << " rows, "
                         << remCols << " cols"
                         << std::endl; )
@@ -2104,7 +2104,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
       m_keptBnds += keptBnds;
       m_keptLRhs += keptLRhs;
 
-      MSG_INFO2( spxout << "IMAISM28 Main simplifier (rows) removed "
+      MSG_INFO2( spxout << "Simplifier (rows) removed "
                         << remRows << " rows, "
                         << remNzos << " non-zeros, "
                         << chgBnds << " col bounds, "
@@ -2630,7 +2630,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
       m_remNzos += remNzos;
       m_chgBnds += chgBnds;
 
-      MSG_INFO2( spxout << "IMAISM42 Main simplifier (columns) removed "
+      MSG_INFO2( spxout << "Simplifier (columns) removed "
                         << remRows << " rows, "
                         << remCols << " cols, "
                         << remNzos << " non-zeros, "
@@ -2881,7 +2881,7 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
       m_remCols += remCols;
       m_remNzos += remNzos;
 
-      MSG_INFO2( spxout << "IMAISM51 Main simplifier (dual) removed "
+      MSG_INFO2( spxout << "Simplifier (dual) removed "
                         << remRows << " rows, "
                         << remCols << " cols, "
                         << remNzos << " non-zeros"
@@ -2922,7 +2922,7 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
 
    if (rs_remRows > 0)
    {
-      MSG_INFO2( spxout << "IMAISM79 Main simplifier duplicate rows (row singleton stage) removed "
+      MSG_INFO2( spxout << "Simplifier duplicate rows (row singleton stage) removed "
                         << rs_remRows << " rows, "
                         << rs_remRows << " non-zeros"
                         << std::endl; )
@@ -3237,7 +3237,7 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
       m_remRows += remRows;
       m_remNzos += remNzos;
 
-      MSG_INFO2( spxout << "IMAISM56 Main simplifier (duplicate rows) removed "
+      MSG_INFO2( spxout << "Simplifier (duplicate rows) removed "
                         << remRows << " rows, "
                         << remNzos << " non-zeros"
                         << std::endl; )
@@ -3622,7 +3622,7 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
       m_remCols += remCols;
       m_remNzos += remNzos;
 
-      MSG_INFO2( spxout << "IMAISM65 Main simplifier (duplicate columns) removed "
+      MSG_INFO2( spxout << "Simplifier (duplicate columns) removed "
                         << remCols << " cols, "
                         << remNzos << " non-zeros"
                         << std::endl; )
@@ -3832,7 +3832,7 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
    if (m_result != OKAY)
       return m_result;
 
-   MSG_INFO1( spxout << "IMAISM69 Main simplifier removed "
+   MSG_INFO1( spxout << "Simplifier removed "
                      << m_remRows << " rows, "
                      << m_remCols << " columns, "
                      << m_remNzos << " nonzeros, "
@@ -3841,12 +3841,12 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
                      << std::endl; )
 
    if (keepbounds)
-      MSG_INFO2( spxout << "IMAISM81 Main simplifier kept "
+      MSG_INFO2( spxout << "Simplifier kept "
                         << m_keptBnds << " column bounds, "
                         << m_keptLRhs << " row bounds"
                         << std::endl; )
 
-   MSG_INFO1( spxout << "IMAISM74 Reduced LP has "
+   MSG_INFO1( spxout << "Reduced LP has "
                      << lp.nRows() << " rows "
                      << lp.nCols() << " columns "
                      << lp.nNzos() << " nonzeros"
@@ -3864,18 +3864,18 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
       if (lp.lower(j) > -infinity && lp.upper(j) < infinity)
          ++numBoxedCols;
 
-   MSG_INFO2( spxout << "IMAISM83 Reduced LP has "
+   MSG_INFO2( spxout << "Reduced LP has "
                      << numRangedRows << " ranged rows, "
                      << numBoxedCols << " boxed columns"
                      << std::endl; )
 
    if (lp.nCols() == 0 && lp.nRows() == 0)
    {
-      MSG_INFO1( spxout << "IMAISM70 Main simplifier removed all rows and columns" << std::endl; )
+      MSG_INFO1( spxout << "Simplifier removed all rows and columns" << std::endl; )
       m_result = VANISHED;
    }
 
-   MSG_INFO2( spxout << "\nIMAISM71 Main simplifier performed:\n"
+   MSG_INFO2( spxout << "\nSimplifier performed:\n"
                      << m_stat[EMPTY_ROW]            << " empty rows\n"
                      << m_stat[FREE_ROW]             << " free rows\n"
                      << m_stat[SINGLETON_ROW]        << " singleton rows\n"

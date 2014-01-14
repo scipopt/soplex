@@ -61,6 +61,7 @@ namespace soplex
       case SPxSolver::OPTIMAL:
          if( !_isRealLPLoaded )
          {
+            MSG_INFO1( spxout << " --- transforming basis into original space" << std::endl; )
             _resolveWithoutPreprocessing(simplificationStatus);
             return;
          }

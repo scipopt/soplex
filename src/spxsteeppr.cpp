@@ -117,7 +117,7 @@ void SPxSteepPR::setupWeights(SPxSolver::Type type)
    }
    else
    {
-      MSG_INFO1( spxout << "ISTEEP01 initializing steepest edge multipliers" << std::endl; )
+      MSG_INFO1( spxout << " --- initializing steepest edge multipliers" << std::endl; )
 
       if (type == SPxSolver::ENTER)
       {

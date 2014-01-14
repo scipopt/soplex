@@ -256,6 +256,8 @@ private:
    SPxId          instableEnterId;
    bool           instableEnter;
    Real           instableEnterVal;
+
+   int            displayFreq;
    //@}
 
 protected:
@@ -676,6 +678,11 @@ public:
    void setOpttol(Real d);
    /// set parameter \p delta, i.e., set \p feastol and \p opttol to same value.
    void setDelta(Real d);
+   /// set display frequency
+   void setDisplayFreq(int freq)
+   {
+      displayFreq = freq;
+   }
    /// set sparsity threshold for pricing
    void setSparsePricingThreshold(Real st);
    /// enable or disable hyper sparse pricing

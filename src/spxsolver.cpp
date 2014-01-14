@@ -182,7 +182,7 @@ void SPxSolver::setType(Type tp)
       factorized = false;
       m_numCycle = 0;
 #endif
-      MSG_INFO1( spxout << "ISOLVE20 switching to "
+      MSG_INFO3( spxout << "Switching to "
                         << static_cast<const char*>((tp == LEAVE)
                            ? "leaving" : "entering")
                         << " algorithm" << std::endl; )
@@ -501,11 +501,7 @@ void SPxSolver::clearUpdateVecs(void)
 void SPxSolver::factorize()
 {
 
-   MSG_INFO1( spxout << "ISOLVE01 " 
-                     << "iteration = "    << std::setw(8) << basis().iteration() 
-                     << "\tlastUpdate = " << std::setw(4) << basis().lastUpdate()
-                     << "\tvalue = "      << (initialized ? value() : 0.0)
-                     << std::endl; )
+   MSG_INFO2( spxout << " --- refactorizing basis matrix" << std::endl; )
 
    try
    {

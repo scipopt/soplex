@@ -157,7 +157,7 @@ namespace soplex
             // display frequency
             _intParamName[SoPlex::DISPLAYFREQ] = "displayfreq";
             _intParamDescription[SoPlex::DISPLAYFREQ] = "display frequency";
-            _intParamDefault[SoPlex::DISPLAYFREQ] = 100;
+            _intParamDefault[SoPlex::DISPLAYFREQ] = 200;
 
             // verbosity level
             _intParamName[SoPlex::VERBOSITY] = "verbosity";
@@ -3971,18 +3971,14 @@ namespace soplex
       case SoPlex::ITERLIMIT:
          if( value < -1 )
             return false;
-         else
-            break;
+         break;
 
       // display frequency
       case SoPlex::DISPLAYFREQ:
          if( value <= 0 )
             return false;
-         else
-         {
-            ///@todo set value in solver
-            break;
-         }
+         _solver.setDisplayFreq(value);
+         break;
 
       // verbosity level
       case SoPlex::VERBOSITY:
