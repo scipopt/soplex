@@ -3014,7 +3014,6 @@ namespace soplex
    }
 
    /// computes row r of basis inverse; returns true on success
-   ///@todo use VectorReal for coef
    bool SoPlex::getBasisInverseRowReal(int r, Real* coef)
    {
       assert(r >= 0);
@@ -3136,7 +3135,6 @@ namespace soplex
 
 
    /// computes column c of basis inverse; returns true on success
-   ///@todo use VectorReal for coef
    bool SoPlex::getBasisInverseColReal(int c, Real* coef)
    {
       assert(c >= 0);
@@ -3258,7 +3256,6 @@ namespace soplex
 
 
    /// computes dense solution of basis matrix B * sol = rhs; returns true on success
-   ///@todo use VectorReal for rhs and sol
    bool SoPlex::getBasisInverseTimesVecReal(Real* rhs, Real* sol)
    {
       VectorReal v(numRowsReal(), rhs);

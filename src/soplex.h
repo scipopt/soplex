@@ -881,7 +881,6 @@ public:
       STARTER_VECTOR = 3
    };
 
-   ///@todo is the order different than usual on purpose?
    /// values for parameter PRICER
    enum
    {
