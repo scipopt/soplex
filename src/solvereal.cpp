@@ -62,6 +62,7 @@ namespace soplex
          if( !_isRealLPLoaded )
          {
             MSG_INFO1( spxout << " --- transforming basis into original space" << std::endl; )
+            _solver.setObjoffset(0.0);
             _resolveWithoutPreprocessing(simplificationStatus);
             return;
          }
@@ -75,6 +76,7 @@ namespace soplex
          // in case of infeasibility or unboundedness, we currently can not unsimplify, but have to solve the original LP again
          if( !_isRealLPLoaded )
          {
+            _solver.setObjoffset(0.0);
             _preprocessAndSolveReal(false);
             return;
          }
@@ -86,6 +88,7 @@ namespace soplex
          // if preprocessing was applied, try to run again without to avoid singularity
          if( !_isRealLPLoaded )
          {
+            _solver.setObjoffset(0.0);
             _preprocessAndSolveReal(false);
             return;
          }
@@ -95,6 +98,7 @@ namespace soplex
          // if preprocessing was applied, try to run again without to avoid cycling
          if( !_isRealLPLoaded )
          {
+            _solver.setObjoffset(0.0);
             _preprocessAndSolveReal(false);
             return;
          }
@@ -202,6 +206,7 @@ namespace soplex
       if( _simplifier != 0 )
       {
          simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlex::EPSILON_ZERO), Real(rationalParam(SoPlex::FEASTOL)), Real(rationalParam(SoPlex::OPTTOL)));
+         _solver.setObjoffset(_simplifier->getObjoffset());
       }
 
       _statistics->preprocessingTime.stop();

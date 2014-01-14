@@ -1082,7 +1082,7 @@ bool SPxSolver::terminate()
       {
          (type() == LEAVE) ? spxout << "  L  |" : spxout << "  E  |";
          spxout << std::setw(8) << iteration() << " | "
-         << value() << " | "
+         << value() + objOffset << " | "
          << shift()
          << std::endl;
       }
