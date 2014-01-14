@@ -32,42 +32,6 @@
 using namespace soplex;
 
 
-/// prints version and compilation options
-static
-void printVersionInfo()
-{
-   // do not use preprocessor directives within the MSG_INFO1 macro
-#if (SOPLEX_SUBVERSION > 0)
-   MSG_INFO1( spxout << "SoPlex version " << SOPLEX_VERSION/100
-      << "." << (SOPLEX_VERSION % 100)/10
-      << "." << SOPLEX_VERSION % 10
-      << "." << SOPLEX_SUBVERSION );
-#else
-   MSG_INFO1( spxout << "SoPlex version " << SOPLEX_VERSION/100
-      << "." << (SOPLEX_VERSION % 100)/10
-      << "." << SOPLEX_VERSION % 10 );
-#endif
-
-#ifndef NDEBUG
-   MSG_INFO1( spxout << " [mode: debug]" );
-#else
-   MSG_INFO1( spxout << " [mode: optimized]" );
-#endif
-
-   MSG_INFO1( spxout << " [precision: " << (int)sizeof(Real) << " byte]" );
-
-#ifdef SOPLEX_WITH_GMP
-   MSG_INFO1( spxout << " [rational: gmp]" );
-#elif defined(SOPLEX_WITH_GMPXX)
-   MSG_INFO1( spxout << " [rational: gmpxx]" );
-#else
-   MSG_INFO1( spxout << " [rational: long double]" );
-#endif
-
-   MSG_INFO1( spxout << " [githash: " << getGitHash() << "]\n"
-      "Copyright (c) 1996-2014 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)\n\n" );
-}
-
 // prints usage and command line options
 static
 void printUsage(const char* const argv[], int idx)
@@ -291,7 +255,8 @@ int main(int argc, char* argv[])
    bool displayStatistics = false;
    bool checkSol = false;
 
-   printVersionInfo();
+   soplex.printVersion();
+   MSG_INFO1( spxout << "Copyright (c) 1996-2014 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)\n\n" );
 
    try
    {

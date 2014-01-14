@@ -17,14 +17,15 @@
  * @brief Preconfigured SoPlex LP solver
  */
 
-#include <iostream>
 #include <assert.h>
+#include "limits.h"
+#include <iostream>
 
 #include "soplex.h"
 #include "spxfileio.h"
+#include "spxgithash.h"
 #include "statistics.h"
 #include "mpsinput.h"
-#include "limits.h"
 
 /// maximum length of lines in settings file
 #define SET_MAX_LINE_LEN 500
@@ -4839,6 +4840,43 @@ namespace soplex
 
       os << "\n";
    }
+
+
+
+   /// prints version and compilation options
+   void SoPlex::printVersion() const
+   {
+      // do not use preprocessor directives within the MSG_INFO1 macro
+#if (SOPLEX_SUBVERSION > 0)
+      MSG_INFO1( spxout << "SoPlex version " << SOPLEX_VERSION/100
+         << "." << (SOPLEX_VERSION % 100)/10
+         << "." << SOPLEX_VERSION % 10
+         << "." << SOPLEX_SUBVERSION );
+#else
+      MSG_INFO1( spxout << "SoPlex version " << SOPLEX_VERSION/100
+         << "." << (SOPLEX_VERSION % 100)/10
+         << "." << SOPLEX_VERSION % 10 );
+#endif
+
+#ifndef NDEBUG
+      MSG_INFO1( spxout << " [mode: debug]" );
+#else
+      MSG_INFO1( spxout << " [mode: optimized]" );
+#endif
+
+      MSG_INFO1( spxout << " [precision: " << (int)sizeof(Real) << " byte]" );
+
+#ifdef SOPLEX_WITH_GMP
+      MSG_INFO1( spxout << " [rational: gmp]" );
+#elif defined(SOPLEX_WITH_GMPXX)
+      MSG_INFO1( spxout << " [rational: gmpxx]" );
+#else
+      MSG_INFO1( spxout << " [rational: long double]" );
+#endif
+
+      MSG_INFO1( spxout << " [githash: " << getGitHash() << "]\n" );
+   }
+
 
 
    /// checks if real LP and rational LP are in sync; dimensions will always be compared,

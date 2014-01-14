@@ -1110,6 +1110,9 @@ public:
    //**@name Miscellaneous */
    //@{
 
+   /// prints version and compilation options
+   void printVersion() const;
+
    /// checks if real LP and rational LP are in sync; dimensions will always be compared,
    /// vector and matrix values only if the respective parameter is set to true.
    /// If quiet is set to true the function will only display which vectors are different.
