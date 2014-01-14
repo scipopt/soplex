@@ -700,7 +700,7 @@ void SPxBasis::printMatrixMTX(int number)
       {
          int idx = baseVec(i).index(j);
          Real val = baseVec(i).value(j);
-         fprintf(basisfile, "%d %d %.13" REAL_FORMAT "\n",i+1,idx+1,val);
+         fprintf(basisfile, "%d %d %.13" "f" "\n",i+1,idx+1,val);
       }
    }
    fclose (basisfile);
