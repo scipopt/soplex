@@ -36,9 +36,6 @@
 namespace soplex
 {
 
-/// Interval for displaying iteration information.
-long iterationInterval = 100;
-
 /**@todo check separately for ENTER and LEAVE algorithm */
 bool SPxSolver::precisionReached(Real& newpricertol) const
 {
@@ -1078,7 +1075,7 @@ bool SPxSolver::terminate()
       if( iteration() % (displayFreq*20) == 0 )
       {
          // spxout << "+----+---------+---------------+------------+\n";
-         spxout << "Type |  Iters  |     Value     |    Shift\n";
+         spxout << "Type |  Iters  |     Value    |    Shift\n";
          // spxout << "+----+---------+---------------+------------+\n";
       }
       if( iteration() % displayFreq == 0 )
