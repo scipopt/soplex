@@ -220,7 +220,6 @@ private:
    int            maxIters;    ///< maximum allowed iterations.
    Real           maxTime;     ///< maximum allowed time.
    Real           objLimit;    ///< objective value limit.
-   Real           objOffset;   ///< objective value offset from simplification step
    Status         m_status;    ///< status of algorithm.
 
    Real           m_entertol;  ///< feasibility tolerance maintained during entering algorithm
@@ -514,11 +513,6 @@ public:
     *         (see #getPrimal()).
     */
    virtual Real value() const;
-
-   void setObjoffset(Real offset)
-   {
-      objOffset = offset;
-   }
 
 #if 0
    /// returns dualsol^T b + min{(objvec^T - dualsol^T A) x} calculated in interval arithmetics

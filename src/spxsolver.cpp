@@ -835,7 +835,6 @@ SPxSolver::SPxSolver(
    , maxIters (-1)
    , maxTime (infinity)
    , objLimit(infinity)
-   , objOffset(0.0)
    , m_status(UNKNOWN)
    , theShift (0)
    , m_maxCycle(100)

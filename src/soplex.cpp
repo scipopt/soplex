@@ -6124,6 +6124,7 @@ namespace soplex
       // read
       bool success = _realLP->readFile(filename, rowNames, colNames, intVars);
       setIntParam(SoPlex::OBJSENSE, (_realLP->spxSense() == SPxLPReal::MAXIMIZE ? SoPlex::OBJSENSE_MAXIMIZE : SoPlex::OBJSENSE_MINIMIZE), true, true);
+      _realLP->changeObjOffset(0.0);
 
       // stop timing
       _statistics->readingTime.stop();
@@ -6162,6 +6163,7 @@ namespace soplex
       _ensureRationalLP();
       bool success = _rationalLP->readFile(filename, rowNames, colNames, intVars);
       setIntParam(SoPlex::OBJSENSE, (_rationalLP->spxSense() == SPxLPRational::MAXIMIZE ? SoPlex::OBJSENSE_MAXIMIZE : SoPlex::OBJSENSE_MINIMIZE), true, true);
+      _rationalLP->changeObjOffset(0.0);
 
       // stop timing
       _statistics->readingTime.stop();

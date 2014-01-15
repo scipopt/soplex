@@ -99,6 +99,8 @@ private:
 
    SPxSense thesense;   ///< optimization sense.
 
+   Real offset;      ///< offset computed in simplification step
+
    //@}
 
 public:
@@ -378,6 +380,12 @@ public:
    SPxSense spxSense() const
    {
       return thesense;
+   }
+
+   /// Returns the objective function value offset
+   Real objOffset() const
+   {
+      return offset;
    }
 
    /// Returns the row number of the row with identifier \p id.
@@ -677,6 +685,7 @@ public:
       LPRowSetBase<R>::clear();
       LPColSetBase<R>::clear();
       thesense = MAXIMIZE;
+      offset = 0.0;
    }
 
    //@}
@@ -1121,6 +1130,11 @@ public:
       if( sns != thesense )
          LPColSetBase<R>::maxObj_w() *= -1.0;
       thesense = sns;
+   }
+
+   virtual void changeObjOffset(Real o)
+   {
+      offset = o;
    }
 
    /// Computes activity of the rows for a given primal vector.
@@ -1714,6 +1728,7 @@ public:
       : LPRowSetBase<R>(old)
       , LPColSetBase<R>(old)
       , thesense(old.thesense)
+      , offset(old.offset)
    {
       assert(isConsistent());
    }
@@ -1724,6 +1739,7 @@ public:
       : LPRowSetBase<R>(old)
       , LPColSetBase<R>(old)
       , thesense(old.thesense == SPxLPBase<S>::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE)
+      , offset(old.offset)
    {
       assert(isConsistent());
    }
@@ -1736,6 +1752,7 @@ public:
          LPRowSetBase<R>::operator=(old);
          LPColSetBase<R>::operator=(old);
          thesense = old.thesense;
+         offset = old.offset;
 
          assert(isConsistent());
       }
@@ -1752,6 +1769,7 @@ public:
          LPRowSetBase<R>::operator=(old);
          LPColSetBase<R>::operator=(old);
          thesense = (old.thesense) == SPxLPBase<S>::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE;
+         offset = old.offset;
 
          assert(isConsistent());
       }
