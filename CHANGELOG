@@ -20,6 +20,7 @@ code quality & new features:
 - parameter for controlling when to use sparse pricing
 - implement auto pricing (switch from devex to steep after a set number of iterations)
 - fixed make install for older Mac systems where install command does not have option -t
+- fixed installation of headers by make install
 
 interface:
 - renamed class MpqReal to Rational

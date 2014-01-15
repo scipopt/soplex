@@ -92,21 +92,144 @@ BINDIR		=	bin
 LIBDIR		=	lib
 INCLUDEDIR	=	include
 NAME		=	soplex
-LIBOBJ		= 	changesoplex.o clufactor.o didxset.o \
-			enter.o idxset.o leave.o rational.o mpsinput.o nameset.o \
-			slufactor.o solverational.o solvereal.o soplex.o soplexlegacy.o \
-			spxautopr.o spxbasis.o spxbounds.o spxboundflippingrt.o spxchangebasis.o \
-			spxequilisc.o spxdantzigpr.o spxdefaultrt.o \
-			spxdefines.o spxdesc.o spxdevexpr.o \
-			spxfastrt.o spxfileio.o spxgeometsc.o spxgithash.o\
-			spxharrisrt.o spxhybridpr.o spxid.o spxlpbase_real.o spxlpbase_rational.o \
-			spxmainsm.o spxout.o spxparmultpr.o spxquality.o \
-			spxscaler.o spxshift.o spxsolver.o spxsolve.o \
-			spxstarter.o spxsteeppr.o spxsumst.o spxvecs.o \
-			spxvectorst.o spxweightpr.o spxweightst.o spxwritestate.o \
+LIBHEADER	=	array.h \
+			basevectors.h \
+			classarray.h \
+			clufactor.h \
+			cring.h \
+			dataarray.h \
+			datahashtable.h \
+			datakey.h \
+			dataset.h \
+			didxset.h \
+			dsvectorbase.h \
+			dsvector.h \
+			dvectorbase.h \
+			dvector.h \
+			exceptions.h \
+			gzstream.h \
+			idlist.h \
+			idxset.h \
+			islist.h \
+			lpcolbase.h \
+			lpcol.h \
+			lpcolsetbase.h \
+			lpcolset.h \
+			lprowbase.h \
+			lprow.h \
+			lprowsetbase.h \
+			lprowset.h \
+			mpsinput.h \
+			nameset.h \
+			random.h \
+			rational.h \
+			slinsolver.h \
+			slufactor.h \
+			solbase.h \
+			sol.h \
+			soplex.h \
+			soplexlegacy.h \
+			sorter.h \
+			spxalloc.h \
+			spxautopr.h \
+			spxbasis.h \
+			spxboundflippingrt.h \
+			spxdantzigpr.h \
+			spxdefaultrt.h \
+			spxdefines.h \
+			spxdevexpr.h \
+			spxequilisc.h \
+			spxfastrt.h \
+			spxfileio.h \
+			spxgeometsc.h \
+			spxgithash.h \
+			spxharrisrt.h \
+			spxhybridpr.h \
+			spxid.h \
+			spxlpbase.h \
+			spxlp.h \
+			spxmainsm.h \
+			spxout.h \
+			spxparmultpr.h \
+			spxpricer.h \
+			spxratiotester.h \
+			spxscaler.h \
+			spxsimplifier.h \
+			spxsolver.h \
+			spxstarter.h \
+			spxsteepexpr.h \
+			spxsteeppr.h \
+			spxsumst.h \
+			spxvectorst.h \
+			spxweightpr.h \
+			spxweightst.h \
+			ssvectorbase.h \
+			ssvector.h \
+			statistics.h \
+			svectorbase.h \
+			svector.h \
+			svsetbase.h \
+			svset.h \
+			timer.h \
+			unitvector.h \
+			updatevector.h \
+			vectorbase.h \
+			vector.h
+LIBOBJ		= 	changesoplex.o \
+			clufactor.o \
+			didxset.o \
+			enter.o \
+			gzstream.o \
+			idxset.o \
+			leave.o \
+			mpsinput.o \
+			nameset.o \
+			rational.o \
+			slufactor.o \
+			solverational.o \
+			solvereal.o \
+			soplex.o \
+			soplexlegacy.o \
+			spxautopr.o \
+			spxbasis.o \
+			spxboundflippingrt.o \
+			spxbounds.o \
+			spxchangebasis.o \
+			spxdantzigpr.o \
+			spxdefaultrt.o \
+			spxdefines.o \
+			spxdesc.o \
+			spxdevexpr.o \
+			spxequilisc.o \
+			spxfastrt.o \
+			spxfileio.o \
+			spxgeometsc.o \
+			spxgithash.o \
+			spxharrisrt.o \
+			spxhybridpr.o \
+			spxid.o \
+			spxlpbase_rational.o \
+			spxlpbase_real.o \
+			spxmainsm.o \
+			spxout.o \
+			spxparmultpr.o \
+			spxquality.o \
+			spxscaler.o \
+			spxshift.o \
+			spxsolve.o \
+			spxsolver.o \
+			spxstarter.o \
+			spxsteeppr.o \
+			spxsumst.o \
+			spxvecs.o \
+			spxvectorst.o \
+			spxweightpr.o \
+			spxweightst.o \
+			spxwritestate.o \
 			statistics.o \
-			timer.o unitvector.o updatevector.o \
-			gzstream.o
+			timer.o \
+			unitvector.o \
+			updatevector.o
 BINOBJ		=	soplexmain.o
 EXAMPLEOBJ	=	example.o
 REPOSIT		=	# template repository, explicitly empty  #spxproof.o 
@@ -195,8 +318,7 @@ LIBOBJFILES	=	$(addprefix $(LIBOBJDIR)/,$(LIBOBJ))
 BINSRC		=	$(addprefix $(SRCDIR)/,$(BINOBJ:.o=.cpp))
 EXAMPLESRC	=	$(addprefix $(SRCDIR)/,$(EXAMPLEOBJ:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
-LIBSRCHEADER	=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.h))
-
+LIBSRCHEADER	=	$(addprefix $(SRCDIR)/,$(LIBHEADER))
 
 #-----------------------------------------------------------------------------
 # External Libraries

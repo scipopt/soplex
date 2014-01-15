@@ -29,7 +29,7 @@ installheader:
 ifneq ($(INSTALLDIR),)
 		@echo "-> install SoPlex headers into INSTALLDIR <$(INSTALLDIR)>"
 		@-install -m 755 -d $(INSTALLDIR)/$(INCLUDEDIR)/
-		@-install -m 644 -p $(SRCDIR)/$(LIBSRCHEADER) $(INSTALLDIR)/$(INCLUDEDIR)/
+		@-install -m 644 -p $(LIBSRCHEADER) $(INSTALLDIR)/$(INCLUDEDIR)/
 else
 		@echo "no installation directory specified - use make install INSTALLDIR=<dir>, e.g., make install INSTALLDIR=/usr/local"
 endif
