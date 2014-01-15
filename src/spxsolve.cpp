@@ -1075,7 +1075,7 @@ bool SPxSolver::terminate()
       if( iteration() % (displayFreq*20) == 0 )
       {
          // spxout << "+----+---------+---------------+------------+\n";
-         spxout << "Type |  Iters  |     Value    |    Shift\n";
+         spxout << "type |  iters  |     value    |    shift\n";
          // spxout << "+----+---------+---------------+------------+\n";
       }
       if( iteration() % displayFreq == 0 )
