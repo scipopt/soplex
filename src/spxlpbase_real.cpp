@@ -881,7 +881,7 @@ bool SPxLPBase<Real>::readLPF(
 syntax_error:
    if( finished )
    {
-      MSG_INFO2( spxout << "ILPFRD14 Finished reading " << lineno << " lines" << std::endl; )
+      MSG_INFO2( spxout << "Finished reading " << lineno << " lines" << std::endl; )
    }
    else
       MSG_ERROR( spxout << "ELPFRD15 Syntax error in line " << lineno << std::endl; )

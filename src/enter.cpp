@@ -137,7 +137,7 @@ void SPxSolver::computeTest()
                isInfeasibleCo[i] = SPxPricer::NOT_VIOLATED;
             if( ninfeasibilities > sparsityThresholdEnterCo )
             {
-               MSG_INFO2( spxout << "IENTER04 too many infeasibilities for sparse pricing"
+               MSG_INFO2( spxout << " --- using dense pricing"
                                  << std::endl; )
                remainingRoundsEnterCo = DENSEROUNDS;
                sparsePricingEnterCo = false;
@@ -151,7 +151,7 @@ void SPxSolver::computeTest()
    else if( ninfeasibilities <= sparsityThresholdEnterCo && !sparsePricingEnterCo )
    {
       std::streamsize prec = spxout.precision();
-      MSG_INFO2( spxout << "IENTER03 sparse pricing active, "
+      MSG_INFO2( spxout << " --- using sparse pricing, "
                         << "sparsity: "
                         << std::setw(6) << std::fixed << std::setprecision(4)
                         << (Real) ninfeasibilities/coDim()
@@ -249,7 +249,7 @@ void SPxSolver::computeCoTest()
                isInfeasible[i] = SPxPricer::NOT_VIOLATED;
             if( ninfeasibilities > sparsityThresholdEnter )
             {
-               MSG_INFO2( spxout << "IENTER06 too many infeasibilities for sparse pricing"
+               MSG_INFO2( spxout << " --- using dense pricing"
                                  << std::endl; )
                remainingRoundsEnter = DENSEROUNDS;
                sparsePricingEnter = false;
@@ -262,7 +262,7 @@ void SPxSolver::computeCoTest()
       --remainingRoundsEnter;
    else if( ninfeasibilities <= sparsityThresholdEnter && !sparsePricingEnter )
    {
-      MSG_INFO2( spxout << "IENTER05 sparse pricing active, "
+      MSG_INFO2( spxout << " --- using sparse pricing, "
                         << "sparsity: "
                         << std::setw(6) << std::fixed << std::setprecision(4)
                         << (Real) ninfeasibilities/dim()

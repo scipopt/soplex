@@ -64,7 +64,7 @@ void SPxSolver::computeFtest()
             isInfeasible[i] = SPxPricer::NOT_VIOLATED;
          if( ninfeasibilities > sparsityThresholdLeave )
          {
-            MSG_INFO2( spxout << "ILEAVE05 too many infeasibilities for sparse pricing"
+            MSG_INFO2( spxout << " --- using dense pricing"
                               << std::endl; )
             remainingRoundsLeave = DENSEROUNDS;
             sparsePricingLeave = false;
@@ -80,7 +80,7 @@ void SPxSolver::computeFtest()
    else if( ninfeasibilities <= sparsityThresholdLeave && !sparsePricingLeave )
    {
       std::streamsize prec = spxout.precision();
-      MSG_INFO2( spxout << "ILEAVE04 sparse pricing active, "
+      MSG_INFO2( spxout << " --- using sparse pricing, "
                         << "sparsity: "
                         << std::setw(6) << std::fixed << std::setprecision(4)
                         << (Real) ninfeasibilities/dim()

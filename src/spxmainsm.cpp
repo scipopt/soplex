@@ -3782,7 +3782,7 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
          ++numBoxedCols;
    }
 
-   MSG_INFO2( spxout << "IMAISM82 LP has "
+   MSG_INFO2( spxout << "LP has "
                      << numRangedRows << " ranged rows, "
                      << numBoxedCols << " boxed columns"
                      << std::endl; )

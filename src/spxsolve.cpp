@@ -57,8 +57,7 @@ bool SPxSolver::precisionReached(Real& newpricertol) const
    {
       newpricertol = thepricer->epsilon() / 10.0;
 
-      MSG_INFO3( spxout << "ISOLVE71 "
-                           << "Precision not reached: Pricer tolerance = "
+      MSG_INFO3( spxout << "Precision not reached: Pricer tolerance = "
                            << thepricer->epsilon()
                            << " new tolerance = " << newpricertol
                            << std::endl
@@ -155,8 +154,8 @@ SPxSolver::Status SPxSolver::solve()
    theratiotester->setType(type());
 
    MSG_INFO3(
-      spxout << "ISOLVE72 starting value = " << value() << std::endl;
-      spxout << "ISOLVE73 starting shift = " << shift() << std::endl; 
+      spxout << "starting value = " << value() << std::endl;
+      spxout << "starting shift = " << shift() << std::endl;
    )
 
    if (SPxBasis::status() == SPxBasis::OPTIMAL)
@@ -237,7 +236,7 @@ SPxSolver::Status SPxSolver::solve()
                   instableEnterId and SPxFastRT::selectEnter shall accept even an instable
                   leaving variable. */
                MSG_INFO3(
-                  spxout << "ISOLVE99 Trying instable enter iteration" << std::endl;
+                  spxout << " --- trying instable enter iteration" << std::endl;
                   )
 
                enterId = instableEnterId;
@@ -312,7 +311,7 @@ SPxSolver::Status SPxSolver::solve()
                {
                   Real newpricertol = minpricertol;
 
-                  MSG_INFO2( spxout << "ISOLVE75e check feasibility/optimality\n")
+                  MSG_INFO2( spxout << " --- checking feasibility and optimality\n")
                   computeTest();
                   computeCoTest();
 
@@ -327,7 +326,7 @@ SPxSolver::Status SPxSolver::solve()
 
                      thepricer->setEpsilon(newpricertol);
 
-                     MSG_INFO2( spxout << "ISOLVE75 Setting pricer tolerance = "
+                     MSG_INFO2( spxout << " --- setting pricer tolerance to "
                                           << thepricer->epsilon()
                                           << std::endl; )
                   }
@@ -345,7 +344,7 @@ SPxSolver::Status SPxSolver::solve()
                      break;
                   }
                }
-               MSG_INFO3( spxout << "ISOLVE76 solve(enter) triggers refactorization" << std::endl; )
+               MSG_INFO3( spxout << " --- solve(enter) triggers refactorization" << std::endl; )
 
                // if the factorization is not fresh, we better refactorize and call the pricer again; however, this can
                // create cycling, so it is performed only a limited number of times per ENTER round
@@ -356,7 +355,7 @@ SPxSolver::Status SPxSolver::solve()
                   // if the factorization was found out to be singular, we have to quit
                   if( SPxBasis::status() < SPxBasis::REGULAR )
                   {
-                     MSG_ERROR( spxout << "ESOLVE09 something wrong with factorization, Basis status: " << SPxBasis::status() << std::endl; )
+                     MSG_ERROR( spxout << "Something wrong with factorization, Basis status: " << SPxBasis::status() << std::endl; )
                      stop = true;
                      break;
                   }
@@ -379,7 +378,7 @@ SPxSolver::Status SPxSolver::solve()
             /* check if we have iterations left */
             if (maxIters >= 0 && iterations() >= maxIters)
             {
-               MSG_INFO2( spxout << "ISOLVE53e Maximum number of iterations (" << maxIters
+               MSG_INFO2( spxout << " --- maximum number of iterations (" << maxIters
                                  << ") reached" << std::endl; )
                m_status = ABORT_ITER;
                stop = true;
@@ -402,7 +401,7 @@ SPxSolver::Status SPxSolver::solve()
                enterCycleCount++;
                if( enterCycleCount > MAXCYCLES )
                {
-                  MSG_INFO2( spxout << "ISOLVE77 Abort solving due to cycling in "
+                  MSG_INFO2( spxout << " --- abort solving due to cycling in "
                                        << "entering algorithm" << std::endl; );
                   m_status = ABORT_CYCLING;
                   stop = true;
@@ -426,7 +425,7 @@ SPxSolver::Status SPxSolver::solve()
                   if( stallNumRecovers < MAXSTALLRECOVERS )
                   {
                      /* try to recover by unshifting/switching algorithm up to MAXSTALLRECOVERS times (just a number picked) */
-                     MSG_INFO3( spxout << "ISOLVE21 Stalling detected - trying to recover by switching to LEAVING algorithm." << std::endl; )
+                     MSG_INFO3( spxout << " --- stalling detected - trying to recover by switching to LEAVING algorithm." << std::endl; )
 
                      ++stallNumRecovers;
                      break;
@@ -434,7 +433,7 @@ SPxSolver::Status SPxSolver::solve()
                   else
                   {
                      /* giving up */
-                     MSG_INFO2( spxout << "ISOLVE22 Abort solving due to stalling in entering algorithm." << std::endl; );
+                     MSG_INFO2( spxout << " --- abort solving due to stalling in entering algorithm." << std::endl; );
 
                      m_status = ABORT_CYCLING;
                      stop = true;
@@ -454,7 +453,7 @@ SPxSolver::Status SPxSolver::solve()
          while (!stop);
 
          MSG_INFO3(
-            spxout << "ISOLVE78 Enter finished. iteration: " << iteration() 
+            spxout << " --- enter finished. iteration: " << iteration()
                    << ", value: " << value()
                    << ", shift: " << shift()
                    << ", epsilon: " << epsilon()
@@ -481,7 +480,7 @@ SPxSolver::Status SPxSolver::solve()
                Real maxinfeas = maxInfeas();
 
                MSG_INFO3(
-                  spxout << "ISOLVE79 maxInfeas: " << maxinfeas
+                  spxout << " --- maxInfeas: " << maxinfeas
                          << ", shift: " << shift()
                          << ", entertol: " << entertol() << std::endl;
                )
@@ -549,7 +548,7 @@ SPxSolver::Status SPxSolver::solve()
                   instableLeaveNum and SPxFastRT::selectEnter shall accept even an instable
                   entering variable. */
                MSG_INFO3(
-                  spxout << "ISOLVE98 Trying instable leave iteration" << std::endl;
+                  spxout << " --- trying instable leave iteration" << std::endl;
                )
             
                leaveNum = instableLeaveNum;
@@ -584,7 +583,7 @@ SPxSolver::Status SPxSolver::solve()
                {
                   Real newpricertol = minpricertol;
 
-                  MSG_INFO2( spxout << "ISOLVE75l check feasibility/optimality\n")
+                  MSG_INFO2( spxout << " --- checking feasibility and optimality\n")
                   computeFtest();
 
                   // is the solution good enough ?
@@ -598,7 +597,7 @@ SPxSolver::Status SPxSolver::solve()
 
                      thepricer->setEpsilon(newpricertol);
 
-                     MSG_INFO2( spxout << "ISOLVE81 Setting pricer tolerance = "
+                     MSG_INFO2( spxout << " --- setting pricer tolerance to "
                                           << thepricer->epsilon()
                                           << std::endl; );
                   }
@@ -616,7 +615,7 @@ SPxSolver::Status SPxSolver::solve()
                      break;
                   }
                }
-               MSG_INFO3( spxout << "ISOLVE82 solve(leave) triggers refactorization" << std::endl; )
+               MSG_INFO3( spxout << " --- solve(leave) triggers refactorization" << std::endl; )
 
                // if the factorization is not fresh, we better refactorize and call the pricer again; however, this can
                // create cycling, so it is performed only a limited number of times per LEAVE round
@@ -627,7 +626,7 @@ SPxSolver::Status SPxSolver::solve()
                   // Inna/Tobi: if the factorization was found out to be singular, we have to quit
                   if (SPxBasis::status() < SPxBasis::REGULAR)
                   {
-                     MSG_ERROR( spxout << "ESOLVE10 something wrong with factorization, Basis status: " << SPxBasis::status() << std::endl; )
+                     MSG_ERROR( spxout << "Something wrong with factorization, Basis status: " << SPxBasis::status() << std::endl; )
                      stop = true;
                      break;
                   }
@@ -650,7 +649,7 @@ SPxSolver::Status SPxSolver::solve()
             /* check if we have iterations left */
             if (maxIters >= 0 && iterations() >= maxIters)
             {
-               MSG_INFO2( spxout << "ISOLVE53l Maximum number of iterations (" << maxIters
+               MSG_INFO2( spxout << " --- maximum number of iterations (" << maxIters
                                  << ") reached" << std::endl; )
                m_status = ABORT_ITER;
                stop = true;
@@ -673,7 +672,7 @@ SPxSolver::Status SPxSolver::solve()
                leaveCycleCount++;
                if( leaveCycleCount > MAXCYCLES )
                {
-                  MSG_INFO2( spxout << "ISOLVE83 Abort solving due to cycling in leaving algorithm" << std::endl; );
+                  MSG_INFO2( spxout << " --- abort solving due to cycling in leaving algorithm" << std::endl; );
                   m_status = ABORT_CYCLING;
                   stop = true;
                }
@@ -696,7 +695,7 @@ SPxSolver::Status SPxSolver::solve()
                   if( stallNumRecovers < MAXSTALLRECOVERS )
                   {
                      /* try to recover by switching algorithm up to MAXSTALLRECOVERS times */
-                     MSG_INFO3( spxout << "ISOLVE24 Stalling detected - trying to recover by switching to ENTERING algorithm." << std::endl; )
+                     MSG_INFO3( spxout << " --- stalling detected - trying to recover by switching to ENTERING algorithm." << std::endl; )
 
                      ++stallNumRecovers;
                      break;
@@ -704,7 +703,7 @@ SPxSolver::Status SPxSolver::solve()
                   else
                   {
                      /* giving up */
-                     MSG_INFO2( spxout << "ISOLVE25 Abort solving due to stalling in leaving algorithm" << std::endl; );
+                     MSG_INFO2( spxout << " --- abort solving due to stalling in leaving algorithm" << std::endl; );
 
                      m_status = ABORT_CYCLING;
                      stop = true;
@@ -724,7 +723,7 @@ SPxSolver::Status SPxSolver::solve()
          while (!stop);
 
          MSG_INFO3(
-            spxout << "ISOLVE84 Leave finished. iteration: " << iteration() 
+            spxout << " --- leave finished. iteration: " << iteration()
                    << ", value: " << value()
                    << ", shift: " << shift()
                    << ", epsilon: " << epsilon()
@@ -752,7 +751,7 @@ SPxSolver::Status SPxSolver::solve()
                   throw SPxStatusException("XSOLVE13 Abort solving due to cycling");
                }
                MSG_INFO3(
-                  spxout << "ISOLVE86 maxInfeas: " << maxInfeas()
+                  spxout << " --- maxInfeas: " << maxInfeas()
                          << ", shift: " << shift()
                          << ", leavetol: " << leavetol()
                          << ", cycle count: " << cycleCount << std::endl;
@@ -773,7 +772,7 @@ SPxSolver::Status SPxSolver::solve()
                Real maxinfeas = maxInfeas();
 
                MSG_INFO3(
-                  spxout << "ISOLVE87 maxInfeas: " << maxinfeas
+                  spxout << " --- maxInfeas: " << maxinfeas
                          << ", shift: " << shift()
                          << ", leavetol: " << leavetol() << std::endl;
                )
@@ -815,13 +814,13 @@ SPxSolver::Status SPxSolver::solve()
             {
                m_entertol = 0.01 * m_entertol;
 
-               MSG_INFO2( spxout << "ISOLVE26e basis singular: reloading basis and solving with tighter ratio test tolerance " << m_entertol << std::endl; )
+               MSG_INFO2( spxout << " --- basis singular: reloading basis and solving with tighter ratio test tolerance " << m_entertol << std::endl; )
             }
             else
             {
                m_leavetol = 0.01 * m_leavetol;
 
-               MSG_INFO2( spxout << "ISOLVE26l basis singular: reloading basis and solving with tighter ratio test tolerance " << m_leavetol << std::endl; )
+               MSG_INFO2( spxout << " --- basis singular: reloading basis and solving with tighter ratio test tolerance " << m_leavetol << std::endl; )
             }
 
             // load original basis
@@ -839,7 +838,7 @@ SPxSolver::Status SPxSolver::solve()
             }
             catch( SPxException Ex )
             {
-               MSG_INFO2( spxout << "ISOLVE27 reloaded basis singular, resetting original tolerances" << std::endl; )
+               MSG_INFO2( spxout << " --- reloaded basis singular, resetting original tolerances" << std::endl; )
 
                if( tightenedtype == ENTER )
                   m_entertol = 100.0 * m_entertol;
@@ -1074,9 +1073,9 @@ bool SPxSolver::terminate()
    MSG_INFO1(
       if( iteration() % (displayFreq*30) == 0 )
       {
-         // spxout << "+----+---------+---------------+------------+\n";
+         // spxout << "+----+---------+-------+--------------+------------+\n";
          spxout << "type |  iters  | facts |     shift    |    value\n";
-         // spxout << "+----+---------+---------------+------------+\n";
+         // spxout << "+----+---------+-------+--------------+------------+\n";
       }
       if( iteration() % displayFreq == 0 )
       {
@@ -1121,7 +1120,7 @@ bool SPxSolver::terminate()
 
       if (updateCount > 1)
       {
-         MSG_INFO3( spxout << "ISOLVE52 terminate triggers refactorization" 
+         MSG_INFO3( spxout << " --- terminate triggers refactorization"
                            << std::endl; )
          factorize();
       }

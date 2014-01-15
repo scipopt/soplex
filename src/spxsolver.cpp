@@ -501,7 +501,7 @@ void SPxSolver::clearUpdateVecs(void)
 void SPxSolver::factorize()
 {
 
-   MSG_INFO2( spxout << " --- refactorizing basis matrix" << std::endl; )
+   MSG_INFO3( spxout << " --- refactorizing basis matrix" << std::endl; )
 
    try
    {
@@ -512,7 +512,7 @@ void SPxSolver::factorize()
       assert(SPxBasis::status() == SPxBasis::SINGULAR);
       m_status = SINGULAR;
       std::stringstream s;
-      s << "XSOLVE21 Basis is singular (numerical troubles, feastol = " << feastol() << ", opttol = " << opttol() << ")";
+      s << "Basis is singular (numerical troubles, feastol = " << feastol() << ", opttol = " << opttol() << ")";
       throw SPxStatusException(s.str());
    }
 
