@@ -251,7 +251,7 @@ example:	$(LIBOBJFILES) $(EXAMPLEOBJFILES) | $(BINDIR) $(EXAMPLEOBJDIR)
 		$(LDFLAGS) $(LINKCXX_o)$(EXAMPLEFILE)
 
 .PHONY: makelibfile
-makelibfile:	touchexternal | $(LIBDIR) $(LIBOBJDIR)
+makelibfile:	checkdefines touchexternal | $(LIBDIR) $(LIBOBJDIR)
 
 $(LIBFILE):	$(LIBOBJFILES)
 		@echo "-> generating library $@"
@@ -402,6 +402,19 @@ endif
 		@echo "LAST_ZLIB=$(ZLIB)" >> $(LASTSETTINGS)
 		@echo "LAST_SHARED=$(SHARED)" >> $(LASTSETTINGS)
 		@echo "LAST_USRCXXFLAGS=$(USRCXXFLAGS)" >> $(LASTSETTINGS)
+
+.PHONY: checkdefines
+checkdefines:
+ifneq ($(GMP),true)
+ifneq ($(GMP),false)
+		$(error invalid GMP flag selected: GMP=$(GMP). Possible options are: true false)
+endif
+endif
+ifneq ($(ZLIB),true)
+ifneq ($(ZLIB),false)
+		$(error invalid ZLIB flag selected: ZLIB=$(ZLIB). Possible options are: true false)
+endif
+endif
 
 # --- EOF ---------------------------------------------------------------------
 # DO NOT DELETE
