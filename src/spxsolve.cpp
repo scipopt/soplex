@@ -1072,18 +1072,19 @@ bool SPxSolver::terminate()
 #endif
 
    MSG_INFO1(
-      if( iteration() % (displayFreq*20) == 0 )
+      if( iteration() % (displayFreq*30) == 0 )
       {
          // spxout << "+----+---------+---------------+------------+\n";
-         spxout << "type |  iters  |     value    |    shift\n";
+         spxout << "type |  iters  | facts |     shift    |    value\n";
          // spxout << "+----+---------+---------------+------------+\n";
       }
       if( iteration() % displayFreq == 0 )
       {
          (type() == LEAVE) ? spxout << "  L  |" : spxout << "  E  |";
          spxout << std::setw(8) << iteration() << " | "
-         << value() + objOffset() << " | "
-         << shift()
+         << std::setw(5) << slinSolver()->getFactorCount() << " | "
+         << shift() << " | "
+         << value() + objOffset()
          << std::endl;
       }
    );

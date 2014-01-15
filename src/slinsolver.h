@@ -108,6 +108,9 @@ public:
 
    /// consistency check.
    virtual bool isConsistent() const = 0;
+
+   /// get number of factorizations
+   virtual int getFactorCount() const = 0;
    //@}
 
 
