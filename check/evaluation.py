@@ -2,10 +2,8 @@
 # -*- coding: iso-8859-15 -*-
 
 import sys
-import os
 import math
 import pandas as pd
-from decimal import Decimal
 
 # this function checks for the type of parsed string
 def typeofvalue(text):
@@ -23,13 +21,19 @@ def typeofvalue(text):
 
     return str
 
-soluname = sys.argv[1]
-testname = sys.argv[2]
-outname = sys.argv[3]
+if not len(sys.argv) == 2:
+    print 'usage: '+sys.argv[0]+' <soplex_test_run>.out'
+    quit()
+
+outname = sys.argv[1]
 
 outfile = open(outname,'r')
 outlines = outfile.readlines()
 outfile.close()
+
+testset = outname.split('/')[-1].split('.')[1]
+testname = 'testset/'+testset+'.test'
+soluname = 'testset/'+testset+'.solu'
 
 # print identifier
 print
@@ -113,33 +117,41 @@ for idx, outline in enumerate(outlines):
         instances[instancename]['status'] = 'fail'
         fail = fail + 1
 
-# parse data from solufile
-solufile = open(soluname,'r')
+# try parsing solution file
+check_solu = False
+try:
+    with open(soluname):
+        check_solu = True
+except IOError:
+    print 'No solution file found to check objective values.'
+    print
 
-for soluline in solufile:
-    solu = soluline.split()
-    tag = solu[0]
-    name = solu[1]
-    if len(solu) == 3:
-        value = solu[2]
-        if typeofvalue(value) in [int,float]:
-            value = float(value)
-    else:
-        if tag == '=inf=':
-            value = 'infeasible'
+if check_solu:
+    solufile = open(soluname,'r')
+    for soluline in solufile:
+        solu = soluline.split()
+        tag = solu[0]
+        name = solu[1]
+        if len(solu) == 3:
+            value = solu[2]
+            if typeofvalue(value) in [int,float]:
+                value = float(value)
         else:
-            value = 'unknown'
-    if name in instances:
-        instances[name]['soluval'] = value
-        # check solution status
-        if value in ['infeasible', 'unbounded']:
-            if not instances[name]['status'] == value:
-                instances[name]['status'] = 'fail'
-        else:
-            if (abs(instances[name]['value'] - value))/max(abs(instances[name]['value']),abs(value)) > tolerance:
-                instances[name]['status'] = '('+str(value)+') inconsistent'
+            if tag == '=inf=':
+                value = 'infeasible'
+            else:
+                value = 'unknown'
+        if name in instances:
+            instances[name]['soluval'] = value
+            # check solution status
+            if value in ['infeasible', 'unbounded']:
+                if not instances[name]['status'] == value:
+                    instances[name]['status'] = 'fail'
+            else:
+                if (abs(instances[name]['value'] - value))/max(abs(instances[name]['value']),abs(value)) > tolerance:
+                    instances[name]['status'] = '('+str(value)+') inconsistent'
+    solufile.close()
 
-solufile.close()
 
 df = pd.DataFrame(instances).T
 
@@ -153,20 +165,29 @@ print
 print 'Results: (testset '+testname.split('/')[-1].split('.')[-2]+', settings '+outname.split('/')[-1].split('.')[-2]+'):'
 print '{} total, {} optimal, {} fails, {} timeouts, {} infeasible'.format(len(instances),optimal,fails,timeouts,infeasible)
 
-# check for missing files
-testfile = open(testname,'r')
+# try to check for missing files
+check_test = False
+try:
+    with open(testname):
+        check_test = True
+except IOError:
+    print 'No testset file found to check run for completeness.'
 
-for testline in testfile:
-    linesplit = testline.split('/')
-    linesplit = linesplit[len(linesplit) - 1].rstrip(' \n').rstrip('.gz').rstrip('.GZ').rstrip('.z').rstrip('.Z')
-    linesplit = linesplit.split('.')
-    instancename = linesplit[0]
-    for i in range(1, len(linesplit)-1):
-        instancename = instancename + '.' + linesplit[i]
-    length = len(instancename)
-    if length > namelength:
-        instancename = instancename[length-namelength-2:length-2]
-    if not instancename in instances:
-        print 'mssing instance: '+instancename
+if check_test:
 
-testfile.close()
+    testfile = open(testname,'r')
+
+    for testline in testfile:
+        linesplit = testline.split('/')
+        linesplit = linesplit[len(linesplit) - 1].rstrip(' \n').rstrip('.gz').rstrip('.GZ').rstrip('.z').rstrip('.Z')
+        linesplit = linesplit.split('.')
+        instancename = linesplit[0]
+        for i in range(1, len(linesplit)-1):
+            instancename = instancename + '.' + linesplit[i]
+        length = len(instancename)
+        if length > namelength:
+            instancename = instancename[length-namelength-2:length-2]
+        if not instancename in instances:
+            print 'mssing instance: '+instancename
+
+    testfile.close()
