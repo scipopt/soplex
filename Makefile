@@ -241,17 +241,19 @@ $(BINLINK) $(BINSHORTLINK):	$(BINFILE)
 
 $(BINFILE):	$(LIBOBJFILES) $(BINOBJFILES) | $(BINDIR) $(BINOBJDIR)
 		@echo "-> linking $@"
-		$(LINKCXX) $(BINOBJFILES) $(LIBOBJFILES) \
-		$(LDFLAGS) $(LINKCXX_o)$@
+		-$(LINKCXX) $(BINOBJFILES) $(LIBOBJFILES) \
+		$(LDFLAGS) $(LINKCXX_o)$@ \
+		|| ($(MAKE) errorhints && false)
 
 .PHONY: example
 example:	$(LIBOBJFILES) $(EXAMPLEOBJFILES) | $(BINDIR) $(EXAMPLEOBJDIR)
 		@echo "-> linking $(EXAMPLEFILE)"
-		$(LINKCXX) $(EXAMPLEOBJFILES) $(LIBOBJFILES) \
-		$(LDFLAGS) $(LINKCXX_o)$(EXAMPLEFILE)
+		-$(LINKCXX) $(EXAMPLEOBJFILES) $(LIBOBJFILES) \
+		$(LDFLAGS) $(LINKCXX_o)$(EXAMPLEFILE) \
+		|| ($(MAKE) errorhints && false)
 
 .PHONY: makelibfile
-makelibfile:	touchexternal | $(LIBDIR) $(LIBOBJDIR)
+makelibfile:	checkdefines touchexternal | $(LIBDIR) $(LIBOBJDIR)
 
 $(LIBFILE):	$(LIBOBJFILES)
 		@echo "-> generating library $@"
@@ -402,6 +404,32 @@ endif
 		@echo "LAST_ZLIB=$(ZLIB)" >> $(LASTSETTINGS)
 		@echo "LAST_SHARED=$(SHARED)" >> $(LASTSETTINGS)
 		@echo "LAST_USRCXXFLAGS=$(USRCXXFLAGS)" >> $(LASTSETTINGS)
+
+.PHONY: checkdefines
+checkdefines:
+ifneq ($(GMP),true)
+ifneq ($(GMP),false)
+		$(error invalid GMP flag selected: GMP=$(GMP). Possible options are: true false)
+endif
+endif
+ifneq ($(ZLIB),true)
+ifneq ($(ZLIB),false)
+		$(error invalid ZLIB flag selected: ZLIB=$(ZLIB). Possible options are: true false)
+endif
+endif
+
+.PHONY: errorhints
+errorhints:
+		@echo
+		@echo "build failed"
+ifeq ($(ZLIB),true)
+		@echo "- you used ZLIB=true: if zlib is not available, try building with ZLIB=false"
+endif
+ifeq ($(GMP),true)
+		@echo "- you used GMP=true: if gmp is not available, try building with GMP=false (note that this will deactivate iterative refinement)"
+endif
+		@echo "for help on building SoPlex consult the INSTALL file"
+		@echo
 
 # --- EOF ---------------------------------------------------------------------
 # DO NOT DELETE
