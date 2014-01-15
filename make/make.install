@@ -29,7 +29,9 @@ installheader:
 ifneq ($(INSTALLDIR),)
 		@echo "-> install SoPlex headers into INSTALLDIR <$(INSTALLDIR)>"
 		@-install -m 755 -d $(INSTALLDIR)/$(INCLUDEDIR)/
-		@-install -m 644 -p -t $(INSTALLDIR)/$(INCLUDEDIR)/ $(SRCDIR)/$(LIBSRCHEADER) 
+		@-install -m 644 -p $(SRCDIR)/$(LIBSRCHEADER) $(INSTALLDIR)/$(INCLUDEDIR)/
+else
+		@echo "no installation directory specified - use make install INSTALLDIR=<dir>, e.g., make install INSTALLDIR=/usr/local"
 endif
 
 # installs the libraries into the INSTALL directory
@@ -38,7 +40,9 @@ installlibs:	all
 ifneq ($(INSTALLDIR),)
 		@echo "-> install SoPlex libraries into INSTALLDIR <$(INSTALLDIR)>"
 		@-install -m 755 -d $(INSTALLDIR)/$(LIBDIR)/
-		@-install -m 644 -p -t $(INSTALLDIR)/$(LIBDIR)/ $(LIBFILE) $(LIBLINK) $(LIBSHORTLINK)
+		@-install -m 644 -p $(LIBFILE) $(LIBLINK) $(LIBSHORTLINK) $(INSTALLDIR)/$(LIBDIR)/
+else
+		@echo "no installation directory specified - use make install INSTALLDIR=<dir>, e.g., make install INSTALLDIR=/usr/local"
 endif
 
 # installs the binary into the INSTALL directory
@@ -47,5 +51,7 @@ installbinary:	all
 ifneq ($(INSTALLDIR),)
 		@echo "-> install SoPlex binary into INSTALLDIR <$(INSTALLDIR)>"
 		@-install -m 755 -d $(INSTALLDIR)/$(BINDIR)/
-		@-install -m 755 -p -t $(INSTALLDIR)/$(BINDIR)/ $(BINFILE) $(BINLINK) $(BINSHORTLINK)
+		@-install -m 755 -p $(BINFILE) $(BINLINK) $(BINSHORTLINK) $(INSTALLDIR)/$(BINDIR)/
+else
+		@echo "no installation directory specified - use make install INSTALLDIR=<dir>, e.g., make install INSTALLDIR=/usr/local"
 endif

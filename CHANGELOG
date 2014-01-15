@@ -19,6 +19,7 @@ code quality & new features:
 - new method to calculate the condition number of the current basis matrix (2-norm, estimate)
 - parameter for controlling when to use sparse pricing
 - implement auto pricing (switch from devex to steep after a set number of iterations)
+- fixed make install for older Mac systems where install command does not have option -t
 
 interface:
 - renamed class MpqReal to Rational
