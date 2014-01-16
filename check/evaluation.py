@@ -3,7 +3,7 @@
 
 import sys
 import math
-import pandas as pd
+import json
 
 # this function checks for the type of parsed string
 def typeofvalue(text):
@@ -26,7 +26,7 @@ if not len(sys.argv) == 2:
     quit()
 
 outname = sys.argv[1]
-dataname = outname.replace('.out','.sav')
+dataname = outname.replace('.out','.json')
 
 outfile = open(outname,'r')
 outlines = outfile.readlines()
@@ -149,14 +149,12 @@ if check_solu:
                     instances[name]['status'] = 'fail'
             else:
                 if (abs(instances[name]['value'] - value))/max(abs(instances[name]['value']),abs(value)) > tolerance:
-                    instances[name]['status'] = '('+str(value)+') inconsistent'
+                    instances[name]['status'] = 'inconsistent'
     solufile.close()
 
-
-df = pd.DataFrame(instances).T
-
-# save DataFrame for later use in compare script
-df.save(dataname)
+# save dictionary to file later use in compare script
+with open(dataname, 'w') as f:
+    json.dump(instances, f)
 
 # count solution status
 fails = sum(1 for name in instances if instances[name]['status'] == 'fail')
@@ -164,7 +162,29 @@ timeouts = sum(1 for name in instances if instances[name]['status'] == 'timeout'
 infeasible = sum(1 for name in instances if instances[name]['status'] == 'infeasible')
 optimal = sum(1 for name in instances if instances[name]['status'] == 'optimal')
 
-print df[['rows','cols','primalviol','dualviol','iters','time','value','status']].to_string(float_format=lambda x:"%6.9g"%(x))
+# specify columnn names
+columns = ['rows','cols','primalviol','dualviol','iters','time','value','status']
+length = []
+
+output = 'name'.ljust(namelength)
+# calculate maximum width of each column
+for i,c in enumerate(columns):
+    length.append(len(c))
+    for name in instances:
+        length[i] = max(length[i],len(str(instances[name][c])))
+    output = output + ' ' + c.rjust(length[i] + 1)
+
+# print column header
+print output
+print '-'*len(output)
+
+# print data for all instances with the computed length
+for name in sorted(instances):
+    output = name.ljust(namelength)
+    for i,c in enumerate(columns):
+        output = output + ' ' + str(instances[name][c]).rjust(length[i] + 1)
+    print output
+
 print
 print 'Results: (testset '+testname.split('/')[-1].split('.')[-2]+', settings '+outname.split('/')[-1].split('.')[-2]+'):'
 print '{} total, {} optimal, {} fails, {} timeouts, {} infeasible'.format(len(instances),optimal,fails,timeouts,infeasible)
