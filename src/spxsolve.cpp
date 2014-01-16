@@ -1073,13 +1073,13 @@ bool SPxSolver::terminate()
    MSG_INFO1(
       if( iteration() % (displayFreq*30) == 0 )
       {
-         spxout << "type |   time |   iters | facts |    shift     |    value\n";
+         spxout << "type |   time |   iters | facts |  shift   |    value\n";
       }
       if( iteration() % displayFreq == 0 )
       {
          (type() == LEAVE) ? spxout << "  L  |" : spxout << "  E  |";
          spxout << std::fixed << std::setw(7) << std::setprecision(1) << time() << " |";
-         spxout << std::scientific << std::setprecision(6);
+         spxout << std::scientific << std::setprecision(2);
          spxout << std::setw(8) << iteration() << " | "
          << std::setw(5) << slinSolver()->getFactorCount() << " | "
          << shift() << " | "
