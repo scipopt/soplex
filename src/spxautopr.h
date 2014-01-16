@@ -46,6 +46,8 @@ private:
    SPxDevexPR     devex;         ///< internal Devex pricer
    SPxSteepPR     steep;         ///< internal Steepest edge pricer
 
+   bool setActivePricer(SPxSolver::Type type);          ///< switches active pricing method
+
 public:
 
    //-------------------------------------

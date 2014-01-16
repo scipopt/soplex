@@ -56,15 +56,32 @@ void SPxAutoPR::setRep(SPxSolver::Representation rep)
    devex.setRep(rep);
 }
 
+bool SPxAutoPR::setActivePricer(SPxSolver::Type type)
+{
+   // switch to steep as soon as switchIters is reached
+   if( activepricer == &devex && thesolver->iterations() >= switchIters )
+   {
+      activepricer = &steep;
+      activepricer->setType(type);
+      return true;
+   }
+
+   // use devex for the iterations < switchIters
+   else if( activepricer == &steep && thesolver->iterations() < switchIters  )
+   {
+      activepricer = &devex;
+      activepricer->setType(type);
+      return true;
+   }
+
+   return false;
+}
+
 int SPxAutoPR::selectLeave()
 {
-   if( thesolver->iterations() == switchIters )
-   {
-      assert(activepricer == &devex);
-      activepricer = &steep;
-      MSG_INFO1( spxout << " --- switching to " << activepricer->getName() << " pricer" << std::endl; )
-      activepricer->setType(SPxSolver::LEAVE);
-   }
+   if( setActivePricer(SPxSolver::LEAVE) )
+      MSG_INFO1( spxout << " --- active pricer: " << activepricer->getName() << std::endl; )
+
    return activepricer->selectLeave();
 }
 
@@ -75,13 +92,9 @@ void SPxAutoPR::left4(int n, SPxId id)
 
 SPxId SPxAutoPR::selectEnter()
 {
-   if( thesolver->iterations() == switchIters )
-   {
-      assert(activepricer == &devex);
-      activepricer = &steep;
-      MSG_INFO1( spxout << " --- switching to " << activepricer->getName() << " pricer" << std::endl; )
-      activepricer->setType(SPxSolver::ENTER);
-   }
+   if( setActivePricer(SPxSolver::ENTER) )
+      MSG_INFO1( spxout << " --- active pricer: " << activepricer->getName() << std::endl; )
+
    return activepricer->selectEnter();
 }
 
