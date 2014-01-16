@@ -25,6 +25,9 @@ if not len(sys.argv) == 2:
     print 'usage: '+sys.argv[0]+' <soplex_test_run>.out'
     quit()
 
+# specify columns for the output (can be modified)
+columns = ['rows','cols','primalviol','dualviol','iters','flips','time','value','status']
+
 outname = sys.argv[1]
 dataname = outname.replace('.out','.json')
 
@@ -47,20 +50,6 @@ namelength = 18
 tolerance = 1e-6
 
 instances = {}
-data = {'status': 'unknown',
-        'value': '',
-        'rows': '',
-        'cols': '',
-        'presolrows': '',
-        'presolcols': '',
-        'iters': '',
-        'primaliters': '',
-        'dualiters': '',
-        'time': '',
-        'primalviol': '',
-        'dualviol': '',
-        'solustat': '',
-        'soluval': ''}
 
 for idx, outline in enumerate(outlines):
     if outline.startswith('@01'):
@@ -75,8 +64,8 @@ for idx, outline in enumerate(outlines):
         if length > namelength:
             instancename = instancename[length-namelength-2:length-2]
 
-        # initialize empty entry
-        instances[instancename] = {key:val for key,val in data.iteritems()}
+        # initialize new data set
+        instances[instancename] = {}
 
     # invalidate instancename
     elif outline.startswith('=ready='):
@@ -100,6 +89,9 @@ for idx, outline in enumerate(outlines):
 
     elif outline.startswith('  Dual'):
         instances[instancename]['dualiters'] = int(outline.split()[-2])
+
+    elif outline.startswith('  Bound flips'):
+        instances[instancename]['flips'] = int(outline.split()[-1])
 
     elif outline.startswith('Total time'):
         instances[instancename]['time'] = float(outline.split()[-1])
@@ -162,8 +154,6 @@ timeouts = sum(1 for name in instances if instances[name]['status'] == 'timeout'
 infeasible = sum(1 for name in instances if instances[name]['status'] == 'infeasible')
 optimal = sum(1 for name in instances if instances[name]['status'] == 'optimal')
 
-# specify columnn names
-columns = ['rows','cols','primalviol','dualviol','iters','time','value','status']
 length = []
 
 output = 'name'.ljust(namelength)
