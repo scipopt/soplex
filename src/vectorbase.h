@@ -448,7 +448,7 @@ VectorBase<Real>& VectorBase<Real>::operator=(const VectorBase<Real>& vec)
    {
       assert(dim() == vec.dim());
 
-      memcpy(val, vec.val, dimen*sizeof(Real));
+      memcpy(val, vec.val, (unsigned int)dimen*sizeof(Real));
 
       assert(isConsistent());
    }
@@ -463,7 +463,7 @@ inline
 void VectorBase<Real>::clear()
 {
    if( dimen > 0 )
-      memset(val, 0, dimen * sizeof(Real));
+      memset(val, 0, (unsigned int)dimen * sizeof(Real));
 }
 
 } // namespace soplex

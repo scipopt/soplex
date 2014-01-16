@@ -3101,7 +3101,7 @@ namespace soplex
          }
 
          // initialize result vector x as zero
-         memset(coef, 0, numRowsReal() * sizeof(Real));
+         memset(coef, 0, (unsigned int)numRowsReal() * sizeof(Real));
 
          // add nonzero entries
          for( int i = 0; i < numColsReal(); ++i )
@@ -3222,7 +3222,7 @@ namespace soplex
          }
 
          // initialize result vector x as zero
-         memset(coef, 0, numRowsReal() * sizeof(Real));
+         memset(coef, 0, (unsigned int)numRowsReal() * sizeof(Real));
 
          // add nonzero entries
          for( int i = 0; i < numColsReal(); ++i )

@@ -775,7 +775,7 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
       {
          i = nonz[j];
          x = p_work[i];
-         p_work[i] = 0;
+         p_work[i] = 0.0;
 
          if ( isNotZero( x, Param::epsilonUpdate() ) )
          {
@@ -829,7 +829,7 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
       for ( i = 0; i < dim; ++i )
       {
          x = p_work[i];
-         p_work[i] = 0;
+         p_work[i] = 0.0;
 
          if ( isNotZero( x, Param::epsilonUpdate() ) )
          {
@@ -895,7 +895,7 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
       // memmove is more efficient than a for loop
       // for ( i = c; i < r; ++i )
       //    rorig[i] = rorig[i + 1];
-      memmove(&rorig[c], &rorig[c + 1], (r - c) * sizeof(int));
+      memmove(&rorig[c], &rorig[c + 1], (unsigned int)(r - c) * sizeof(int));
 
       rorig[r] = j;
 
@@ -907,7 +907,7 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
       // memmove is more efficient than a for loop
       // for ( i = c; i < r; ++i )
       //    corig[i] = corig[i + 1];
-      memmove(&corig[c], &corig[c + 1], (r - c) * sizeof(int));
+      memmove(&corig[c], &corig[c + 1], (unsigned int)(r - c) * sizeof(int));
 
       corig[r] = j;
 
@@ -993,7 +993,7 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
 
             lval[ll] = x;
 
-            p_work[k] = 0;
+            p_work[k] = 0.0;
 
             ll++;
 
@@ -1036,7 +1036,7 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
 
          x = p_work[k];
          diag[rowno] = 1 / x;
-         p_work[k] = 0;
+         p_work[k] = 0.0;
 
 
          /*  make row large enough to fit all nonzeros.
@@ -1076,7 +1076,7 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
 
                rval[n] = x;
 
-               p_work[j] = 0;
+               p_work[j] = 0.0;
 
                ++n;
 
@@ -1126,13 +1126,13 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
          {
             k = corig[i];
 
-            if ( p_work[k] )
+            if ( p_work[k] != 0.0 )
             {
                n = rorig[i];
                x = p_work[k] * diag[n];
                lidx[ll] = n;
                lval[ll] = x;
-               p_work[k] = 0;
+               p_work[k] = 0.0;
                ll++;
 
                if ( fabs( x ) > l_maxabs )
@@ -1168,7 +1168,7 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
 
          diag[rowno] = 1 / x;
 
-         p_work[k] = 0;
+         p_work[k] = 0.0;
 
 
          /*  count remaining nonzeros in work and make row large enough
@@ -1208,7 +1208,7 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
 
                rval[n] = x;
 
-               p_work[j] = 0;
+               p_work[j] = 0.0;
 
                ++n;
 
@@ -1266,9 +1266,9 @@ void CLUFactor::update( int p_col, Real* p_work, const int* p_idx, int num )
    Real* lval;
    Real x, rezi;
 
-   assert( p_work[p_col] != 0 );
+   assert( p_work[p_col] != 0.0 );
    rezi = 1 / p_work[p_col];
-   p_work[p_col] = 0;
+   p_work[p_col] = 0.0;
 
    ll = makeLvec( num, p_col );
    //   ll = fac->makeLvec(num, col);
@@ -1279,7 +1279,7 @@ void CLUFactor::update( int p_col, Real* p_work, const int* p_idx, int num )
    {
       lidx[ll] = j;
       lval[ll] = rezi * p_work[j];
-      p_work[j] = 0;
+      p_work[j] = 0.0;
       ++ll;
    }
 
@@ -1293,7 +1293,7 @@ void CLUFactor::update( int p_col, Real* p_work, const int* p_idx, int num )
       j = p_idx[i];
       lidx[ll] = j;
       lval[ll] = x = rezi * p_work[j];
-      p_work[j] = 0;
+      p_work[j] = 0.0;
       ++ll;
 
       if ( fabs( x ) > maxabs )
@@ -1314,7 +1314,7 @@ void CLUFactor::updateNoClear(
    Real* lval;
    Real x, rezi;
 
-   assert( p_work[p_col] != 0 );
+   assert( p_work[p_col] != 0.0 );
    rezi = 1 / p_work[p_col];
    ll = makeLvec( num, p_col );
    //ll = fac->makeLvec(num, col);
@@ -3276,7 +3276,7 @@ int CLUFactor::solveUright2eps(
       else
          if ( notzero1 )
          {
-            p_work2[c] = 0;
+            p_work2[c] = 0.0;
             *nonz++ = c;
             n++;
             val = &cval[cbeg[c]];
@@ -3289,7 +3289,7 @@ int CLUFactor::solveUright2eps(
          else
             if ( notzero2 )
             {
-               p_work1[c] = 0;
+               p_work1[c] = 0.0;
                val = &cval[cbeg[c]];
                idx = &cidx[cbeg[c]];
                j = clen[c];
@@ -3299,8 +3299,8 @@ int CLUFactor::solveUright2eps(
             }
             else
             {
-               p_work1[c] = 0;
-               p_work2[c] = 0;
+               p_work1[c] = 0.0;
+               p_work2[c] = 0.0;
             }
    }
 

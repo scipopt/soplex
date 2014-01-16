@@ -1350,7 +1350,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
             }
 
             // EQ
-            if( (double(rset.lhs(idx)) > -double(infinity)) && double((rset.rhs_w(idx)) <  double(infinity)) )
+            if( (double(rset.lhs(idx)) > -double(infinity)) && (double(rset.rhs_w(idx)) < double(infinity)) )
             {
                assert(rset.lhs(idx) == rset.rhs(idx));
 
@@ -1819,7 +1819,7 @@ static void LPFwriteRow(
    LPFwriteSVector(p_lp, p_output, p_cnames, p_svec);
 
    long long sidelen;
-   sidelen = (p_lhs == p_rhs || double(p_lhs) <= double(-infinity)) ? rationalToString(p_rhs, false).length() : rationalToString(p_lhs, false).length();
+   sidelen = (p_lhs == p_rhs || double(p_lhs) <= double(-infinity)) ? (long long)rationalToString(p_rhs, false).length() : (long long)rationalToString(p_lhs, false).length();
 
    // insert a line break if max line length is in danger of being exceeded
    if( (long long)(p_output.tellp()) - pos + sidelen + (long long)100 > MAX_LINE_WRITE_LEN )

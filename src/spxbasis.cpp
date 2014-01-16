@@ -937,7 +937,7 @@ Vector& SPxBasis::multBaseWith(Vector& x) const
    x.clear();
    for (i = x.dim() - 1; i >= 0; --i)
    {
-      if (tmp[i])
+      if (tmp[i] != 0.0)
          x.multAdd(tmp[i], *(matrix[i]));
    }
 
