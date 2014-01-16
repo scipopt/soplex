@@ -3720,7 +3720,7 @@ namespace soplex
       else
       {
          std::ofstream file(filename);
-         if( file == 0 )
+         if( !file.good() )
             return false;
 
          file.setf(std::ios::left);
@@ -4323,7 +4323,7 @@ namespace soplex
       assert(filename != 0);
 
       std::ofstream file(filename);
-      if( file == 0 )
+      if( !file.good() )
          return false;
 
       file.setf(std::ios::left);
