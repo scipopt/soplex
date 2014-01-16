@@ -94,6 +94,7 @@ namespace soplex
       os << "\n  Dual              : " << iterations - iterationsPrimal;
       if( iterations > 0 )
          os << " (" << 100*double((iterations - iterationsPrimal))/double(iterations) << "%)";
+      os << "\n  Bound flips       : " << iterationsBoundFlip;
 
       os << "\nLU factorizations   : " << luFactorizations << "\n"
          << "  Factor. frequency : ";
