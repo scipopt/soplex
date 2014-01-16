@@ -252,6 +252,55 @@ void SPxScaler::applyScaling(SPxLP& lp)
    assert(lp.isConsistent());
 }
 
+/// unscale SPxLP
+void SPxScaler::unscale(SPxLPBase<Real>& lp)
+{
+   for( int i = 0; i < lp.nRows(); ++i )
+   {
+      SVector& vec = lp.rowVector_w(i);
+
+      int exp1,exp2;
+      frexp(m_rowscale[i], &exp2);
+      for( int j = 0; j < vec.size(); ++j)
+      {
+         frexp(m_colscale[vec.index(j)], &exp1);
+         vec.value(j) = ldexp(vec.value(j), -exp1 - exp2 + 2);
+      }
+      if (lp.rhs(i) < infinity)
+      {
+         lp.rhs_w(i) = ldexp(lp.rhs_w(i), -exp2 + 1);
+      }
+      if (lp.lhs(i) > -infinity)
+      {
+         lp.lhs_w(i) = ldexp(lp.lhs_w(i), -exp2 + 1);
+      }
+   }
+   for( int i = 0; i < lp.nCols(); ++i )
+   {
+      SVector& vec = lp.colVector_w(i);
+
+      int exp1,exp2;
+      frexp(m_colscale[i], &exp2);
+      for( int j = 0; j < vec.size(); ++j)
+      {
+         frexp(m_rowscale[vec.index(j)], &exp1);
+         vec.value(j) = ldexp(vec.value(j), -exp1 - exp2 + 2);
+      }
+
+      lp.maxObj_w(i) = ldexp(lp.maxObj_w(i), -exp2 + 1);
+
+      if (lp.upper(i) < infinity)
+      {
+         lp.upper_w(i) = ldexp(lp.upper_w(i), exp2 - 1);
+      }
+      if (lp.lower(i) > -infinity)
+      {
+         lp.lower_w(i) = ldexp(lp.lower_w(i), exp2 - 1);
+      }
+   }
+   assert(lp.isConsistent());
+}
+
 /// returns scaling factor for column \p i
 Real SPxScaler::getColScale(int i)
 {

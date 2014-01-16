@@ -109,6 +109,8 @@ public:
    //@{
    /// scale SPxLP. 
    virtual void scale(SPxLPBase<Real>& lp) = 0;
+   /// unscale SPxLP
+   virtual void unscale(SPxLPBase<Real>& lp);
    /// returns scaling factor for column \p i
    virtual Real getColScale(int i);
    /// returns scaling factor for row \p i

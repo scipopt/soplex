@@ -1863,14 +1863,22 @@ public:
          return;
       }
 
-      activity = colVector(c);
+      if( isScaled )
+         activity = lp_scaler->returnUnscaledColumnVector(*this, c);
+      else
+         activity = colVector(c);
       activity *= primal[c];
       c++;
 
       for( ; c < nCols(); c++ )
       {
          if( primal[c] != 0 )
-            activity.multAdd(primal[c], colVector(c));
+         {
+            if( isScaled )
+               activity.multAdd(primal[c], lp_scaler->returnUnscaledColumnVector(*this, c));
+            else
+               activity.multAdd(primal[c], colVector(c));
+         }
       }
    }
 
@@ -1917,14 +1925,22 @@ public:
          return;
       }
 
-      activity = rowVector(r);
+      if( isScaled )
+         activity = lp_scaler->returnUnscaledRowVector(*this, r);
+      else
+         activity = rowVector(r);
       activity *= dual[r];
       r++;
 
       for( ; r < nRows(); r++ )
       {
          if( dual[r] != 0 )
-            activity.multAdd(dual[r], rowVector(r));
+         {
+            if( isScaled )
+               activity.multAdd(dual[r], lp_scaler->returnUnscaledRowVector(*this, r));
+            else
+               activity.multAdd(dual[r], rowVector(r));
+         }
       }
    }
 
