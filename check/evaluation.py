@@ -26,6 +26,7 @@ if not len(sys.argv) == 2:
     quit()
 
 outname = sys.argv[1]
+dataname = outname.replace('.out','.sav')
 
 outfile = open(outname,'r')
 outlines = outfile.readlines()
@@ -123,8 +124,7 @@ try:
     with open(soluname):
         check_solu = True
 except IOError:
-    print 'No solution file found to check objective values.'
-    print
+    check_solu = False
 
 if check_solu:
     solufile = open(soluname,'r')
@@ -155,6 +155,10 @@ if check_solu:
 
 df = pd.DataFrame(instances).T
 
+# save DataFrame for later use in compare script
+df.save(dataname)
+
+# count solution status
 fails = sum(1 for name in instances if instances[name]['status'] == 'fail')
 timeouts = sum(1 for name in instances if instances[name]['status'] == 'timeout')
 infeasible = sum(1 for name in instances if instances[name]['status'] == 'infeasible')
@@ -172,6 +176,9 @@ try:
         check_test = True
 except IOError:
     print 'No testset file found to check run for completeness.'
+
+if not check_solu:
+    print 'No solution file found to check objective values.'
 
 if check_test:
 
