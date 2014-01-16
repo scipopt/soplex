@@ -36,8 +36,6 @@ namespace soplex
    // destructor
    SPxOut::~SPxOut()
    {
-      for( int i = DEBUG; i <= INFO3; i++ )
-         m_streams[i]->~basic_ostream();
       spx_free(m_streams);
    }
 
