@@ -71,7 +71,7 @@ for idx, outline in enumerate(outlines):
     elif outline.startswith('=ready='):
         instancename = ''
 
-    elif outline.startswith('SoPlex status'):
+    elif outline.startswith('SoPlex status') and ('status' not in instances[instancename]):
         instances[instancename]['status'] = outline.split()[-1].strip('[]')
 
     elif outline.startswith('Solution'):
@@ -108,7 +108,6 @@ for idx, outline in enumerate(outlines):
 
     elif outline.startswith('Primal solution infeasible') or outline.startswith('Dual solution infeasible'):
         instances[instancename]['status'] = 'fail'
-        fail = fail + 1
 
 # try parsing solution file
 check_solu = False
