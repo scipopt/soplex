@@ -4857,9 +4857,17 @@ namespace soplex
       MSG_INFO1( spxout << " [precision: " << (int)sizeof(Real) << " byte]" );
 
 #ifdef SOPLEX_WITH_GMP
+#ifdef mpir_version
+      MSG_INFO1( spxout << " [rational: mpir]" );
+#else
       MSG_INFO1( spxout << " [rational: gmp]" );
+#endif
 #elif defined(SOPLEX_WITH_GMPXX)
+#ifdef mpir_version
+      MSG_INFO1( spxout << " [rational: mpirxx]" );
+#else
       MSG_INFO1( spxout << " [rational: gmpxx]" );
+#endif
 #else
       MSG_INFO1( spxout << " [rational: long double]" );
 #endif
