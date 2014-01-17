@@ -1811,7 +1811,13 @@ namespace soplex
       // start timing
       _statistics->syncTime.start();
 
-      SPxLPRational rationalLP(_solver);
+      // if preprocessing is applied, we need to restore the original LP at the end
+      SPxLPRational* rationalLP = 0;
+      if( _simplifier != 0 || _scaler != 0 )
+      {
+         spx_alloc(rationalLP);
+         rationalLP = new (rationalLP) SPxLPRational(_solver);
+      }
 
       // stop timing
       _statistics->syncTime.stop();
@@ -1967,47 +1973,14 @@ namespace soplex
          result = SPxSolver::ERROR;
       }
 
-      if( result == SPxSolver::OPTIMAL )
-      {
-         // check violation in rational LP
-         DVectorRational primalRational(primal);
-         DVectorRational activity = rationalLP.computePrimalActivity(primalRational);
-         Rational maxBoundViolation = 0;
-         Rational maxConstraintViolation = 0;
-
-         for( int i = rationalLP.nCols() - 1; i >= 0; i-- )
-         {
-            Rational viol = rationalLP.lower(i) - primalRational[i];
-            if( viol > maxBoundViolation )
-               maxBoundViolation = viol;
-
-            viol = primalRational[i] - rationalLP.upper(i);
-            if( viol > maxBoundViolation )
-               maxBoundViolation = viol;
-         }
-
-         for( int i = rationalLP.nRows() - 1; i >= 0; i-- )
-         {
-            Rational viol = rationalLP.lhs(i) - activity[i];
-            if( viol > maxConstraintViolation )
-               maxConstraintViolation = viol;
-
-            viol = activity[i] - rationalLP.rhs(i);
-            if( viol > maxConstraintViolation )
-               maxConstraintViolation = viol;
-         }
-
-         Rational violation = (maxBoundViolation > maxConstraintViolation ? maxBoundViolation : maxConstraintViolation);
-
-         if( violation > double(realParam(SoPlex::FPFEASTOL)) )
-         {
-            MSG_INFO1( spxout << "Warning: Floating-point solution violates bounds and rows by up to " << rationalToString(violation) << ".\n" );
-         }
-      }
-
-      // copy rounded rational LP to real LP
+      // restore original LP if necessary
       if( _simplifier != 0 || _scaler != 0 )
-         _solver.loadLP((SPxLPReal)(rationalLP));
+      {
+         assert(rationalLP != 0);
+         _solver.loadLP((SPxLPReal)(*rationalLP));
+         rationalLP->~SPxLPRational();
+         spx_free(rationalLP);
+      }
 
       return result;
    }
