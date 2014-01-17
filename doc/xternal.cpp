@@ -222,8 +222,7 @@
  */
 //-----------------------------------------------------------------------------
 /**@page FAQ Frequently Asked Questions
- * \htmlinclude faq.inc
- * \htmlinclude faqcss.inc
+ * \htmlinclude faq_new.inc
  */           
 //-----------------------------------------------------------------------------
 /**@page FLAGS How to use the flags in the example program
