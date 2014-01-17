@@ -1550,8 +1550,8 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
  *
  *  @return true if the file was read correctly.
  */
-#define INIT_COLS 10000 ///< initialy allocated columns.
-#define INIT_NZOS 100000 ///< initialy allocated non zeros.
+#define INIT_COLS 1000 ///< initialy allocated columns.
+#define INIT_NZOS 5000 ///< initialy allocated non zeros.
 template <>
 bool SPxLPBase<Rational>::readMPS(
    std::istream& p_input,           ///< input stream.
