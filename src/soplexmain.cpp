@@ -78,8 +78,6 @@ void printUsage(const char* const argv[], int idx)
              << "  <lpfile>               linear program as .mps or .lp file\n\n"
 #endif
              << usage;
-
-   exit(1);
 }
 
 // cleans up C strings
@@ -262,7 +260,10 @@ int main(int argc, char* argv[])
    {
       // no options were given
       if( argc <= 1 )
+      {
          printUsage(argv, 0);
+         return 1;
+      }
 
       // read arguments from command line
       for( optidx = 1; optidx < argc; optidx++ )
@@ -280,6 +281,7 @@ int main(int argc, char* argv[])
          {
             freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
             printUsage(argv, optidx);
+            return 1;
          }
 
          switch( option[1] )
@@ -317,6 +319,7 @@ int main(int argc, char* argv[])
                      {
                         freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                         printUsage(argv, optidx);
+                        return 1;
                      }
                      else
                      {
@@ -350,6 +353,7 @@ int main(int argc, char* argv[])
                   {
                      freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                      printUsage(argv, optidx);
+                     return 1;
                   }
                   // if the LP is parsed rationally and might be solved rationally, we choose automatic syncmode such that
                   // the rational LP is kept after reading
@@ -366,6 +370,7 @@ int main(int argc, char* argv[])
                   {
                      freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                      printUsage(argv, optidx);
+                     return 1;
                   }
                   // if the LP is parsed rationally and might be solved rationally, we choose automatic syncmode such that
                   // the rational LP is kept after reading
@@ -380,6 +385,7 @@ int main(int argc, char* argv[])
                {
                   freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                   printUsage(argv, optidx);
+                  return 1;
                }
                break;
             }
@@ -390,6 +396,7 @@ int main(int argc, char* argv[])
             {
                freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
+               return 1;
             }
             break;
 
@@ -399,6 +406,7 @@ int main(int argc, char* argv[])
             {
                freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
+               return 1;
             }
             break;
 
@@ -408,6 +416,7 @@ int main(int argc, char* argv[])
             {
                freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
+               return 1;
             }
             break;
 
@@ -417,6 +426,7 @@ int main(int argc, char* argv[])
             {
                freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
+               return 1;
             }
             break;
 
@@ -426,6 +436,7 @@ int main(int argc, char* argv[])
             {
                freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
+               return 1;
             }
             break;
 
@@ -435,6 +446,7 @@ int main(int argc, char* argv[])
             {
                freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
+               return 1;
             }
             break;
 
@@ -444,6 +456,7 @@ int main(int argc, char* argv[])
             {
                freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
+               return 1;
             }
             break;
 
@@ -453,6 +466,7 @@ int main(int argc, char* argv[])
             {
                freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
+               return 1;
             }
             break;
 
@@ -481,6 +495,7 @@ int main(int argc, char* argv[])
             {
                freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
+               return 1;
             }
          }
       }
@@ -490,6 +505,7 @@ int main(int argc, char* argv[])
       {
          freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
          printUsage(argv, 0);
+         return 1;
       }
 
       // ensure that syncmode is not manual
@@ -497,7 +513,7 @@ int main(int argc, char* argv[])
       {
          MSG_ERROR( spxout << "Error: manual synchronization is invalid on command line.  Change parameter int:syncmode.\n" );
          freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
-         exit(1);
+         return 1;
       }
 
       // save settings files
@@ -527,7 +543,7 @@ int main(int argc, char* argv[])
          }
 
          freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
-         exit(0);
+         return 0;
       }
 
       // measure time for reading LP file and basis file
@@ -543,7 +559,7 @@ int main(int argc, char* argv[])
       {
          MSG_ERROR( spxout << "Error while reading file <" << lpfilename << ">.\n" );
          freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
-         exit(1);
+         return 1;
       }
 
       // read basis file if specified
@@ -554,7 +570,7 @@ int main(int argc, char* argv[])
          {
             MSG_ERROR( spxout << "Error while reading file <" << readbasname << ">.\n" );
             freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
-            exit(1);
+            return 1;
          }
       }
 
@@ -603,7 +619,7 @@ int main(int argc, char* argv[])
          {
             MSG_ERROR( spxout << "Error while writing file <" << writebasname << ">.\n\n" );
             freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
-            exit(1);
+            return 1;
          }
          else
          {
@@ -615,9 +631,9 @@ int main(int argc, char* argv[])
    {
       MSG_ERROR( spxout << "Exception caught: " << x.what() << "\n" );
       freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
-      exit(1);
+      return 1;
    }
 
    freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
-   exit(0);
+   return 0;
 }
