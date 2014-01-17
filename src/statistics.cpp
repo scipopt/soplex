@@ -46,6 +46,7 @@ namespace soplex
       iterations = 0;
       iterationsPrimal = 0;
       iterationsFromBasis = 0;
+      iterationsBoundFlip = 0;
       luFactorizations = 0;
       luSolves = 0;
       refinements = 0;
