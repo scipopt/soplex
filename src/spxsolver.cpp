@@ -808,13 +808,6 @@ void SPxSolver::setDelta(Real d)
    m_leavetol = d;
 }
 
-void SPxSolver::setSparsePricingThreshold(Real st)
-{
-   sparsityThresholdLeave = (int) (dim() * st);
-   sparsityThresholdEnter = (int) (dim() * st);
-   sparsityThresholdEnterCo = (int) (coDim() * st);
-}
-
 void SPxSolver::hyperPricing(bool h)
 {
    hyperPricingEnter = h;
@@ -847,6 +840,8 @@ SPxSolver::SPxSolver(
    , freePricer (false)
    , freeRatioTester (false)
    , freeStarter (false)
+   , displayFreq (200)
+   , sparsePricingFactor(SPARSITYFACTOR)
    , unitVecs (0)
    , primVec (0, Param::epsilon())
    , dualVec (0, Param::epsilon())
@@ -928,6 +923,8 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       instableLeave = base.instableLeave;
       instableEnterId = base.instableEnterId;
       instableEnter = base.instableEnter;
+      displayFreq = base.displayFreq;
+      sparsePricingFactor = base.sparsePricingFactor;
       unitVecs = base.unitVecs;
       primRhs = base.primRhs;
       primVec = base.primVec;
@@ -954,14 +951,12 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       sparsePricingLeave = base.sparsePricingLeave;
       sparsePricingEnter = base.sparsePricingEnter;
       sparsePricingEnterCo = base.sparsePricingEnterCo;
+      sparsePricingFactor = base.sparsePricingFactor;
       hyperPricingLeave = base.hyperPricingLeave;
       hyperPricingEnter = base.hyperPricingEnter;
       remainingRoundsLeave = base.remainingRoundsLeave;
       remainingRoundsEnter = base.remainingRoundsEnter;
       remainingRoundsEnterCo = base.remainingRoundsEnterCo;
-      sparsityThresholdLeave = base.sparsityThresholdLeave;
-      sparsityThresholdEnter = base.sparsityThresholdEnter;
-      sparsityThresholdEnterCo = base.sparsityThresholdEnterCo;
 
       if (base.theRep == COLUMN)
       {
@@ -1091,6 +1086,8 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , instableLeave(base.instableLeave)
    , instableEnterId(base.instableEnterId)
    , instableEnter(base.instableEnter)
+   , displayFreq(base.displayFreq)
+   , sparsePricingFactor(base.sparsePricingFactor)
    , unitVecs(base.unitVecs)
    , primRhs(base.primRhs)
    , primVec(base.primVec)
@@ -1121,9 +1118,6 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , remainingRoundsLeave(base.remainingRoundsLeave)
    , remainingRoundsEnter(base.remainingRoundsEnter)
    , remainingRoundsEnterCo(base.remainingRoundsEnterCo)
-   , sparsityThresholdLeave(base.sparsityThresholdLeave)
-   , sparsityThresholdEnter(base.sparsityThresholdEnter)
-   , sparsityThresholdEnterCo(base.sparsityThresholdEnterCo)
 {
 
    if (base.theRep == COLUMN)

@@ -45,6 +45,7 @@ void SPxSolver::computeFtest()
    Real theeps = entertol();
    infeasibilities.clear();
    int ninfeasibilities = 0;
+   int sparsitythreshold = (int) (sparsePricingFactor * dim());
 
    for( int i = 0; i < dim(); ++i )
    {
@@ -62,7 +63,7 @@ void SPxSolver::computeFtest()
          }
          else
             isInfeasible[i] = SPxPricer::NOT_VIOLATED;
-         if( ninfeasibilities > sparsityThresholdLeave )
+         if( ninfeasibilities > sparsitythreshold )
          {
             MSG_INFO2( spxout << " --- using dense pricing"
                               << std::endl; )
@@ -77,15 +78,20 @@ void SPxSolver::computeFtest()
    {
       --remainingRoundsLeave;
    }
-   else if( ninfeasibilities <= sparsityThresholdLeave && !sparsePricingLeave )
+   else if( ninfeasibilities <= sparsitythreshold && !sparsePricingLeave )
    {
       std::streamsize prec = spxout.precision();
-      MSG_INFO2( spxout << " --- using sparse pricing, "
-                        << "sparsity: "
-                        << std::setw(6) << std::fixed << std::setprecision(4)
-                        << (Real) ninfeasibilities/dim()
-                        << std::scientific << std::setprecision(int(prec))
-                        << std::endl; )
+      MSG_INFO2(
+         if( hyperPricingLeave )
+            spxout << " --- using hypersparse pricing, ";
+         else
+            spxout << " --- using sparse pricing, ";
+         spxout << "sparsity: "
+                << std::setw(6) << std::fixed << std::setprecision(4)
+                << (Real) ninfeasibilities/dim()
+                << std::scientific << std::setprecision(int(prec))
+                << std::endl;
+      )
       sparsePricingLeave = true;
    }
 }

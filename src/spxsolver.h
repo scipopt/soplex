@@ -34,7 +34,7 @@
 #include "updatevector.h"
 
 #define HYPERPRICINGFACTOR       10       /**< do hyper pricing only if problem size is larger than HYPERPRICINGFACTOR * maxUpdates */
-#define SPARSITYTHRESHOLD        0.6      /**< percentage of infeasibilities that is considered sparse */
+#define SPARSITYFACTOR           0.6      /**< percentage of infeasibilities that is considered sparse */
 #define DENSEROUNDS               5       /**< number of refactorizations until sparsity is tested again */
 #define SPARSITY_TRADEOFF        0.8      /**< threshold to decide whether Ids or coIds are preferred to enter the basis;
                                            * coIds are more likely to enter if SPARSITY_TRADEOFF is close to 0
@@ -258,6 +258,7 @@ private:
    Real           instableEnterVal;
 
    int            displayFreq;
+   Real           sparsePricingFactor; ///< enable sparse pricing when viols < factor * dim()
    //@}
 
 protected:
@@ -362,10 +363,6 @@ public:
    int      remainingRoundsLeave;      ///< number of dense rounds/refactorizations until sparsePricing is enabled again
    int      remainingRoundsEnter;
    int      remainingRoundsEnterCo;
-
-   int      sparsityThresholdLeave;    ///< maximum number of infeasibilities that is considered sparse for leaving Simplex
-   int      sparsityThresholdEnter;    ///< maximum number of infeasibilities that is considered sparse for entering Simplex (dim)
-   int      sparsityThresholdEnterCo;  ///< maximum number of infeasibilities that is considered sparse for entering Simplex (coDim)
 
    //-----------------------------
    /**@name Access */
@@ -683,8 +680,11 @@ public:
    {
       displayFreq = freq;
    }
-   /// set sparsity threshold for pricing
-   void setSparsePricingThreshold(Real st);
+   // enable sparse pricing when viols < fac * dim()
+   void setSparsePricingFactor(Real fac)
+   {
+      sparsePricingFactor = fac;
+   }
    /// enable or disable hyper sparse pricing
    void hyperPricing(bool h);
 
