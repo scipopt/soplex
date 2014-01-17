@@ -46,7 +46,7 @@ namespace soplex
       iterations = 0;
       iterationsPrimal = 0;
       iterationsFromBasis = 0;
-      iterationsBoundFlip = 0;
+      boundflips = 0;
       luFactorizations = 0;
       luSolves = 0;
       refinements = 0;
@@ -97,7 +97,7 @@ namespace soplex
       os << "\n  Dual              : " << iterations - iterationsPrimal;
       if( iterations > 0 )
          os << " (" << 100*double((iterations - iterationsPrimal))/double(iterations) << "%)";
-      os << "\n  Bound flips       : " << iterationsBoundFlip;
+      os << "\n  Bound flips       : " << boundflips;
 
       os << "\nLU factorizations   : " << luFactorizations << "\n"
          << "  Factor. frequency : ";

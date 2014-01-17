@@ -6095,7 +6095,7 @@ namespace soplex
       _statistics->iterations += _solver.iterations();
       _statistics->iterationsPrimal += _solver.primalIterations();
       _statistics->iterationsFromBasis += _hadBasis ? _solver.iterations() : 0;
-      _statistics->iterationsBoundFlip += _solver.totalboundflips;
+      _statistics->boundflips += _solver.totalboundflips;
       _statistics->luFactorizationTime += _slufactor.getFactorTime();
       _statistics->luSolveTime += _slufactor.getSolveTime();
       _statistics->luFactorizations += _slufactor.getFactorCount();
