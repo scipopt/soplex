@@ -603,10 +603,21 @@ public:
    }
 
    /// Removes all SVectorBase%s from %set.
-   void clear()
+   void clear(int minNewSize = -1)
    {
       SVSetBaseArray::clear();
-      SVSetBaseArray::reMax(10000);
+
+      if( minNewSize <= 0 )
+      {
+         if( SVSetBaseArray::max() > 10000 )
+            SVSetBaseArray::reMax(10000);
+      }
+      else
+      {
+         if( SVSetBaseArray::max() > minNewSize + 10000 )
+            SVSetBaseArray::reMax(minNewSize);
+      }
+
       set.clear();
       list.clear();
       unusedMem = 0;
@@ -867,7 +878,7 @@ public:
    {
       if( this != &rhs )
       {
-         clear();
+         clear(rhs.size());
 
          if( rhs.size() > 0 )
          {
@@ -903,7 +914,7 @@ public:
    {
       if( this != (const SVSetBase<R>*)(&rhs) )
       {
-         clear();
+         clear(rhs.size());
 
          if( rhs.size() > 0 )
             this->add(rhs);
