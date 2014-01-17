@@ -44,6 +44,8 @@ namespace soplex
       luFactorizationTime = 0.0;
       luSolveTime = 0.0;
       iterations = 0;
+      iterationsPrimal = 0;
+      iterationsFromBasis = 0;
       luFactorizations = 0;
       luSolves = 0;
       refinements = 0;
