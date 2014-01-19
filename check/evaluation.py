@@ -78,27 +78,58 @@ for idx, outline in enumerate(outlines):
         instances[instancename]['value'] = float(outlines[idx+1].split()[-1])
 
     elif outline.startswith('Original problem'):
-        instances[instancename]['cols'] = int(outlines[idx+1].split()[-1])
-        instances[instancename]['rows'] = int(outlines[idx+6].split()[-1])
+        instances[instancename]['cols'] = int(outlines[idx+1].split()[2])
+        instances[instancename]['boxedcols'] = int(outlines[idx+2].split()[2])
+        instances[instancename]['lbcols'] = int(outlines[idx+3].split()[3])
+        instances[instancename]['ubcols'] = int(outlines[idx+4].split()[3])
+        instances[instancename]['freecols'] = int(outlines[idx+5].split()[2])
+        instances[instancename]['rows'] = int(outlines[idx+6].split()[2])
+        instances[instancename]['rangedrows'] = int(outlines[idx+7].split()[2])
+        instances[instancename]['lhsrows'] = int(outlines[idx+8].split()[2])
+        instances[instancename]['rhsrows'] = int(outlines[idx+9].split()[2])
+        instances[instancename]['freerows'] = int(outlines[idx+10].split()[2])
+        instances[instancename]['nonzeros'] = int(outlines[idx+11].split()[2])
+        instances[instancename]['colnonzeros'] = float(outlines[idx+12].split()[3])
+        instances[instancename]['rownonzeros'] = float(outlines[idx+13].split()[3])
+        instances[instancename]['sparsity'] = float(outlines[idx+14].split()[2])
+        instances[instancename]['minabsval'] = float(outlines[idx+15].split()[4])
+        instances[instancename]['maxabsval'] = float(outlines[idx+16].split()[4])
 
     elif outline.startswith('Iterations'):
-        instances[instancename]['iters'] = int(outline.split()[-1])
+        instances[instancename]['iters'] = int(outline.split()[2])
+
+    elif outline.startswith('From scratch'):
+        instances[instancename]['scratchiters'] = int(outline.split()[3])
+
+    elif outline.startswith('From basis'):
+        instances[instancename]['basisiters'] = int(outline.split()[3])
 
     elif outline.startswith('  Primal'):
-        instances[instancename]['primaliters'] = int(outline.split()[-2])
+        instances[instancename]['primaliters'] = int(outline.split()[2])
 
     elif outline.startswith('  Dual'):
-        instances[instancename]['dualiters'] = int(outline.split()[-2])
+        instances[instancename]['dualiters'] = int(outline.split()[2])
 
     elif outline.startswith('  Bound flips'):
-        instances[instancename]['flips'] = int(outline.split()[-1])
+        instances[instancename]['flips'] = int(outline.split()[3])
 
     elif outline.startswith('Total time'):
-        instances[instancename]['time'] = float(outline.split()[-1])
+        instances[instancename]['time'] = float(outline.split()[3])
+        instances[instancename]['readtime'] = float(outlines[idx+1].split()[2])
+        instances[instancename]['solvetime'] = float(outlines[idx+2].split()[2])
+        instances[instancename]['preproctime'] = float(outlines[idx+3].split()[2])
+        instances[instancename]['simplextime'] = float(outlines[idx+4].split()[2])
+        instances[instancename]['synctime'] = float(outlines[idx+5].split()[2])
+        instances[instancename]['transformtime'] = float(outlines[idx+6].split()[2])
+        instances[instancename]['othertime'] = float(outlines[idx+7].split()[2])
+
+    elif outline.startswith('Refinements'):
+        instances[instancename]['refinements'] = int(outline.split()[2])
+        instances[instancename]['stalling'] = int(outlines[idx+1].split()[2])
 
     elif outline.startswith('Violation'):
-        primviol = outlines[idx+2].split()[-3]
-        dualviol = outlines[idx+3].split()[-3]
+        primviol = outlines[idx+2].split()[3]
+        dualviol = outlines[idx+3].split()[3]
         if typeofvalue(primviol) in [int,float] and typeofvalue(dualviol) in [int,float]:
             instances[instancename]['primalviol'] = float(primviol)
             instances[instancename]['dualviol'] = float(dualviol)
@@ -108,6 +139,14 @@ for idx, outline in enumerate(outlines):
 
     elif outline.startswith('Primal solution infeasible') or outline.startswith('Dual solution infeasible'):
         instances[instancename]['status'] = 'fail'
+
+    elif outline.startswith('LU factorizations'):
+        instances[instancename]['lufacts'] = int(outline.split()[3])
+        instances[instancename]['factortime'] = float(outlines[idx+2].split()[3])
+
+    elif outline.startswith('LU solves'):
+        instances[instancename]['lusolves'] = int(outline.split()[3])
+        instances[instancename]['solvetime'] = float(outlines[idx+2].split()[3])
 
 # try parsing solution file
 check_solu = False
