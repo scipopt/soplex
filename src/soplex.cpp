@@ -4429,10 +4429,17 @@ namespace soplex
       return !readError && !parseError;
    }
 
-   /// parses one setting string and returns true on success; note that string is modified
-   bool SoPlex::parseSettingsString(char* line)
+   /// parses one setting string and returns true on success
+   bool SoPlex::parseSettingsString(char* string)
    {
-      assert(line != 0);
+      assert(string != 0);
+      if( string == 0 )
+         return false;
+
+      char parseString[SET_MAX_LINE_LEN];
+      strncpy(parseString, string, SET_MAX_LINE_LEN);
+
+      char* line = parseString;
 
       // find the start of the parameter type
       while( *line == ' ' || *line == '\t' || *line == '\r' )
