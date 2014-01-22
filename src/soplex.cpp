@@ -31,7 +31,7 @@
 #define SET_MAX_LINE_LEN 500
 
 #ifdef _MSC_VER
-#define strncasecmp strnicmp
+#define strncasecmp _strnicmp
 #endif
 
 namespace soplex
