@@ -993,38 +993,41 @@ public:
       /// zero tolerance used in update of the factorization
       EPSILON_UPDATE = 2,
 
+      /// pivot zero tolerance used in factorization
+      EPSILON_PIVOT = 3,
+
       /// infinity threshold
-      INFTY = 3,
+      INFTY = 4,
 
       /// time limit in seconds (INFTY if unlimited)
-      TIMELIMIT = 4,
+      TIMELIMIT = 5,
 
       /// lower limit on objective value
-      OBJLIMIT_LOWER = 5,
+      OBJLIMIT_LOWER = 6,
 
       /// upper limit on objective value
-      OBJLIMIT_UPPER = 6,
+      OBJLIMIT_UPPER = 7,
 
       /// working tolerance for feasibility in floating-point solver during iterative refinement
-      FPFEASTOL = 7,
+      FPFEASTOL = 8,
 
       /// working tolerance for optimality in floating-point solver during iterative refinement
-      FPOPTTOL = 8,
+      FPOPTTOL = 9,
 
       /// maximum increase of scaling factors between refinements
-      MAXSCALEINCR = 9,
+      MAXSCALEINCR = 10,
 
       /// lower threshold in lifting (nonzero matrix coefficients with smaller absolute value will be reformulated)
-      LIFTMINVAL = 10,
+      LIFTMINVAL = 11,
 
       /// upper threshold in lifting (nonzero matrix coefficients with larger absolute value will be reformulated)
-      LIFTMAXVAL = 11,
+      LIFTMAXVAL = 12,
 
       /// sparse pricing threshold (#violations < dimension * SPARSITY_THRESHOLD activates sparse pricing)
-      SPARSITY_THRESHOLD = 12,
+      SPARSITY_THRESHOLD = 13,
 
       /// number of real parameters
-      REALPARAM_COUNT = 13
+      REALPARAM_COUNT = 14
    } RealParam;
 
    /// rational parameters

@@ -239,6 +239,14 @@ namespace soplex
             _realParamDefault[SoPlex::EPSILON_UPDATE] = DEFAULT_EPS_UPDATE;
 
             ///@todo define suitable values depending on Real type
+            // pivot zero tolerance used in factorization
+            _realParamName[SoPlex::EPSILON_PIVOT] = "epsilon_pivot";
+            _realParamDescription[SoPlex::EPSILON_PIVOT] = "pivot zero tolerance used in factorization";
+            _realParamLower[SoPlex::EPSILON_PIVOT] = DEFAULT_EPS_PIVOT;
+            _realParamUpper[SoPlex::EPSILON_PIVOT] = DEFAULT_EPS_PIVOT;
+            _realParamDefault[SoPlex::EPSILON_PIVOT] = DEFAULT_EPS_PIVOT;
+
+            ///@todo define suitable values depending on Real type
             // infinity threshold
             _realParamName[SoPlex::INFTY] = "infty";
             _realParamDescription[SoPlex::INFTY] = "infinity threshold";
@@ -4206,6 +4214,11 @@ namespace soplex
       // zero tolerance used in update of the factorization
       case SoPlex::EPSILON_UPDATE:
          Param::setEpsilonUpdate(value);
+         break;
+
+      // pivot zero tolerance used in factorization (declare numerical singularity for small LU pivots)
+      case SoPlex::EPSILON_PIVOT:
+         Param::setEpsilonPivot(value);
          break;
 
       // infinity threshold

@@ -274,6 +274,13 @@ void CLUFactor::setPivot( const int p_stage,
    row.perm[p_row]   = p_stage;
    col.perm[p_col]   = p_stage;
    diag[p_row]       = REAL( 1.0 ) / val;
+   if( fabs(val) < Param::epsilonPivot() )
+   {
+      MSG_WARNING(
+         spxout << "LU pivot element is almost zero (< " << Param::epsilonPivot() << ") - Basis is numerically singular" << std::endl;
+      )
+      stat = SLinSolver::SINGULAR;
+   }
 
    if ( fabs( diag[p_row] ) > maxabs )
       maxabs = fabs( diag[p_row] );
