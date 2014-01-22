@@ -193,12 +193,12 @@ private:
    }
 
    /// Provides enough nonzero memory for \p n more Nonzero%s.
-   void ensureMem(int n)
+   void ensureMem(int n, bool shortenLast = true)
    {
       if( memSize() + n <= memMax() )
          return;
 
-      if( list.last() )
+      if( list.last() && shortenLast )
       {
          // get last vector and compute its unused memory
          DLPSV* ps = list.last();
@@ -399,7 +399,13 @@ public:
       ensureMem(idxmax);
 
       // resize the data array
+#ifndef NDEBUG
+      Nonzero<R>* olddata = SVSetBaseArray::data;
       SVSetBaseArray::reSize(memSize() + idxmax);
+      assert(olddata == SVSetBaseArray::data);
+#else
+      SVSetBaseArray::reSize(memSize() + idxmax);
+#endif
 
       ensurePSVec(1);
       ps = set.create();
@@ -438,8 +444,16 @@ public:
 
          if( ps == list.last() )
          {
-            ensureMem(newmax - ps->max());
+            // because we want to extend the last vector we must not shrink its max memory usage
+            // in order to ensure the missing memory
+            ensureMem(newmax - ps->max(), false);
+#ifndef NDEBUG
+            Nonzero<R>* olddata = SVSetBaseArray::data;
             SVSetBaseArray::insert(memSize(), newmax - ps->max());
+            assert(olddata == SVSetBaseArray::data);
+#else
+            SVSetBaseArray::insert(memSize(), newmax - ps->max());
+#endif
 
             // decrease counter of unused memory (assume that new entries will be used)
             MSG_DEBUG( spxout << "xtend (1), this = " << (void*)this << ": updateUnusedMemEstimation -= " << ps->max() - sz << "\n" );
@@ -452,7 +466,14 @@ public:
          {
             ensureMem(newmax);
             SVectorBase<R> newps(newmax, &SVSetBaseArray::last() + 1);
+#ifndef NDEBUG
+            Nonzero<R>* olddata = SVSetBaseArray::data;
             SVSetBaseArray::insert(memSize(), newmax);
+            assert(olddata == SVSetBaseArray::data);
+#else
+            SVSetBaseArray::insert(memSize(), newmax);
+#endif
+
             newps = svec;
 
             if( ps != list.first() )
@@ -806,7 +827,13 @@ public:
       MSG_DEBUG( spxout << "counting unused memory (unusedMem = " << unusedMem << ", numUnusedMemUpdates = " << numUnusedMemUpdates << ", this = " << (void*)this << ")\n" );
       MSG_DEBUG( spxout << "               --> NEW: unusedMem = " << memSize() - used << ", zero after memPack() at memMax() = "<< memMax() << "\n" );
 
+#ifndef NDEBUG
+      Nonzero<R>* olddata = SVSetBaseArray::data;
       SVSetBaseArray::reSize(used);
+      assert(olddata == SVSetBaseArray::data);
+#else
+      SVSetBaseArray::reSize(used);
+#endif
 
       unusedMem = 0;
       numUnusedMemUpdates = 0;

@@ -54,7 +54,7 @@ namespace soplex
 template < class T >
 class ClassArray
 {
-private:
+protected:
    int thesize;           ///< number of used elements in array data
    int themax;            ///< the length of array data and
    T*  data;              ///< the array of elements
