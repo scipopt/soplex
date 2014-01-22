@@ -811,7 +811,7 @@ bool SPxSolver::leave(int leaveIdx)
                   /**@todo if shift() is not zero we must not conclude unboundedness */
                   if (rep() == ROW)
                   {
-                     int sign;
+                     Real sign;
 
                      primalRay.clear();
                      primalRay.setMax(coPvec().delta().size());
@@ -824,7 +824,7 @@ bool SPxSolver::leave(int leaveIdx)
                   }
                   else
                   {
-                     int sign;
+                     Real sign;
                      int i;
 
                      dualFarkas.clear();
