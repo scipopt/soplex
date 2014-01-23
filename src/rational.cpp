@@ -869,7 +869,7 @@ bool operator==(const Rational& r, const double& s)
    mpq_t exactDouble;
    mpq_init(exactDouble);
    mpq_set_d(exactDouble, s);
-   res = mpq_equal(r.dpointer->privatevalue, exactDouble);
+   res = (mpq_equal(r.dpointer->privatevalue, exactDouble) != 0);
    mpq_clear(exactDouble);
    return res;
 }
@@ -883,7 +883,7 @@ bool operator!=(const Rational& r, const double& s)
    mpq_t exactDouble;
    mpq_init(exactDouble);
    mpq_set_d(exactDouble, s);
-   res = !mpq_equal(r.dpointer->privatevalue, exactDouble);
+   res = (mpq_equal(r.dpointer->privatevalue, exactDouble) == 0);
    mpq_clear(exactDouble);
    return res;
 }
@@ -953,7 +953,7 @@ bool operator==(const double& r, const Rational& s)
    mpq_t exactDouble;
    mpq_init(exactDouble);
    mpq_set_d(exactDouble, r);
-   res = mpq_equal(exactDouble, s.dpointer->privatevalue);
+   res = (mpq_equal(exactDouble, s.dpointer->privatevalue) != 0);
    mpq_clear(exactDouble);
    return res;
 }
@@ -967,7 +967,7 @@ bool operator!=(const double& r, const Rational& s)
    mpq_t exactDouble;
    mpq_init(exactDouble);
    mpq_set_d(exactDouble, r);
-   res = !mpq_equal(exactDouble, s.dpointer->privatevalue);
+   res = (mpq_equal(exactDouble, s.dpointer->privatevalue) == 0);
    mpq_clear(exactDouble);
    return res;
 }
