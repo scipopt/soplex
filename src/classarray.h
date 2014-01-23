@@ -264,19 +264,24 @@ public:
          return 0;
       }
 
-      /* allocate and initialize new memory */
+      /* allocate new memory */
       T* newMem = 0;
       spx_alloc(newMem, newMax);
-      newMem = new (newMem) T[newMax]();
 
-      for( int i = 0; i < size() && i < newMax; i++ )
-         newMem[i] = data[i];
+      /* call copy constructor for first elements */
+      int i;
+      for( i = 0; i < size() && i < newSize; i++ )
+         new (&(newMem[i])) T(data[i]);
+
+      /* call default constructor for remaining elements */
+      for( ; i < newMax; i++ )
+         new (&(newMem[i])) T();
 
       /* compute pointer difference */
       ptrdiff_t pshift = reinterpret_cast<char*>(newMem) - reinterpret_cast<char*>(data);
 
       /* free old memory */
-      for( int i = themax-1; i >= 0; i-- )
+      for( i = themax-1; i >= 0; i-- )
          data[i].~T();
 
       spx_free(data);
@@ -326,11 +331,17 @@ public:
       , data(0)
       , memFactor(old.memFactor)
    {
+      /* allocate memory */
       spx_alloc(data, max());
-      data = new (data) T[max()]();
 
-      for( int i = 0; i < size(); i++ )
-         data[i] = old.data[i];
+      /* call copy constructor for first elements */
+      int i;
+      for( i = 0; i < size(); i++ )
+         new (&(data[i])) T(old.data[i]);
+
+      /* call default constructor for remaining elements */
+      for( ; i < max(); i++ )
+         new (&(data[i])) T();
 
       assert(isConsistent());
    }
@@ -355,7 +366,10 @@ public:
          themax = (thesize == 0) ? 1 : thesize;
 
       spx_alloc(data, max());
-      data = new (data) T[max()]();
+
+      /* call default constructor for each element */
+      for( int i = 0; i < max(); i++ )
+         new (&(data[i])) T();
 
       assert(isConsistent());
    }

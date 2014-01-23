@@ -77,7 +77,8 @@ public:
       memsize = (d > 0) ? d : 4;
 
       spx_alloc(mem, memsize);
-      mem = new (mem) R[memsize]();
+      for( int i = 0; i < memsize; i++ )
+         new (&(mem[i])) R();
 
       VectorBase<R>::val = mem;
       VectorBase<R>::dimen = d;
@@ -95,7 +96,10 @@ public:
       memsize = VectorBase<R>::dimen;
 
       spx_alloc(mem, memsize);
-      mem = new (mem) R[memsize]();
+
+      ///@todo improve efficiency by using copy constructor here instead of assignment below
+      for( int i = 0; i < memsize; i++ )
+         new (&(mem[i])) R();
 
       VectorBase<R>::val = mem;
       *this = old;
@@ -115,7 +119,10 @@ public:
       memsize = old.memsize;
 
       spx_alloc(mem, memsize);
-      mem = new (mem) R[memsize]();
+
+      ///@todo improve efficiency by using copy constructor here instead of assignment below
+      for( int i = 0; i < memsize; i++ )
+         new (&(mem[i])) R();
 
       VectorBase<R>::val = mem;
       *this = old;
@@ -133,7 +140,10 @@ public:
       memsize = old.memsize;
 
       spx_alloc(mem, memsize);
-      mem = new (mem) R[memsize]();
+
+      ///@todo improve efficiency by using copy constructor here instead of assignment below
+      for( int i = 0; i < memsize; i++ )
+         new (&(mem[i])) R();
 
       VectorBase<R>::val = mem;
       *this = old;
@@ -254,18 +264,21 @@ public:
    {
       assert(newsize > VectorBase<R>::dim());
 
+      /* allocate new memory */
       R* newmem = 0;
-
-      /* allocate and initialize new memory */
       spx_alloc(newmem, newsize);
-      newmem = new (newmem) R[newsize]();
 
-      for( int i = 0; i < VectorBase<R>::dim(); i++ )
-         newmem[i] = mem[i];
+      /* call copy constructor for first elements */
+      int i;
+      for( i = 0; i < VectorBase<R>::dim(); i++ )
+         new (&(newmem[i])) R(mem[i]);
 
+      /* call default constructor for remaining elements */
+      for( ; i < newsize; i++ )
+         new (&(newmem[i])) R();
 
       /* free old memory */
-      for( int i = memsize-1; i >= 0; i-- )
+      for( i = memsize-1; i >= 0; i-- )
          mem[i].~R();
 
       spx_free(mem);
