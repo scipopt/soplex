@@ -296,7 +296,7 @@ int main(int argc, char* argv[])
                   if( readbasname == 0 )
                   {
                      char* filename = &option[8];
-                     readbasname = strcpy(new char[strlen(filename) + 1], filename);
+                     readbasname = strncpy(new char[strlen(filename) + 1], filename, strlen(filename) + 1);
                   }
                }
                // --writebas=<basfile> : write terminal basis to file
@@ -305,7 +305,7 @@ int main(int argc, char* argv[])
                   if( writebasname == 0 )
                   {
                      char* filename = &option[9];
-                     writebasname = strcpy(new char[strlen(filename) + 1], filename);
+                     writebasname = strncpy(new char[strlen(filename) + 1], filename, strlen(filename) + 1);
                   }
                }
                // --loadset=<setfile> : load parameters from settings file
@@ -314,7 +314,7 @@ int main(int argc, char* argv[])
                   if( loadsetname == 0 )
                   {
                      char* filename = &option[8];
-                     loadsetname = strcpy(new char[strlen(filename) + 1], filename);
+                     loadsetname = strncpy(new char[strlen(filename) + 1], filename, strlen(filename) + 1);
                      if( !soplex.loadSettingsFile(loadsetname) )
                      {
                         freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
@@ -334,7 +334,7 @@ int main(int argc, char* argv[])
                   if( savesetname == 0 )
                   {
                      char* filename = &option[8];
-                     savesetname = strcpy(new char[strlen(filename) + 1], filename);
+                     savesetname = strncpy(new char[strlen(filename) + 1], filename, strlen(filename) + 1);
                   }
                }
                // --diffset=<setfile> : save modified parameters to settings file
@@ -343,7 +343,7 @@ int main(int argc, char* argv[])
                   if( diffsetname == 0 )
                   {
                      char* filename = &option[8];
-                     diffsetname = strcpy(new char[strlen(filename) + 1], filename);
+                     diffsetname = strncpy(new char[strlen(filename) + 1], filename, strlen(filename) + 1);
                   }
                }
                // --readmode=<value> : choose reading mode for <lpfile> (0* - floating-point, 1 - rational)
