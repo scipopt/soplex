@@ -475,7 +475,9 @@ void SPxSolver::clear()
    unInit();
    SPxLP::clear();
    setBasisStatus(SPxBasis::NO_PROBLEM);
-   SPxBasis::reDim();
+   // clear the basis only when theLP is present, because LP data (nrows, ncols) is used in reDim()
+   if( theLP != 0 )
+      SPxBasis::reDim();
 
    infeasibilities.clear();
    infeasibilitiesCo.clear();
