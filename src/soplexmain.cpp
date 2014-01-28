@@ -591,12 +591,42 @@ int main(int argc, char* argv[])
       // print solution, check solution, and display statistics
       if( printPrimal )
       {
-         ///@todo
+         DVector primal(soplex.numColsReal());
+         if( soplex.getPrimalReal(primal) )
+         {
+            MSG_INFO1( spxout << "\nPrimal solution (name, value):\n"; )
+            for( int i = 0; i < soplex.numColsReal(); ++i )
+            {
+               if ( isNotZero( primal[i] ) )
+                  MSG_INFO1( spxout << colnames[i] << "\t"
+                                    << std::setw(17)
+                                    << std::setprecision(9)
+                                    << primal[i] << std::endl; )
+            }
+            MSG_INFO1( spxout << "All other variables are zero (within " << std::setprecision(1) << std::scientific << Param::epsilon() << ")." << std::endl; )
+         }
+         else
+            MSG_INFO1( spxout << "No primal solution available.")
       }
 
       if( printDual )
       {
-         ///@todo
+         DVector dual(soplex.numRowsReal());
+         if( soplex.getDualReal(dual) )
+         {
+            MSG_INFO1( spxout << "\nDual multipliers (name, value):\n"; )
+            for( int i = 0; i < soplex.numRowsReal(); ++i )
+            {
+               if ( isNotZero( dual[i] ) )
+                  MSG_INFO1( spxout << rownames[i] << "\t"
+                                    << std::setw(17)
+                                    << std::setprecision(9)
+                                    << dual[i] << std::endl; )
+            }
+            MSG_INFO1( spxout << "All other dual values are zero (within " << std::setprecision(1) << std::scientific << Param::epsilon() << ")." << std::endl; )
+         }
+         else
+            MSG_INFO1( spxout << "No dual solution available.")
       }
 
       if( checkSol )
