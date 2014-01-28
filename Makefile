@@ -20,11 +20,16 @@
 #-----------------------------------------------------------------------------
 # detect host architecture
 #-----------------------------------------------------------------------------
+
 include make/make.detecthost
 
 
 #-----------------------------------------------------------------------------
-VERSION		:=	1.7.2.7
+# default settings
+#-----------------------------------------------------------------------------
+
+VERSION		:=	1.7.2.8
+SPXGITHASH	=
 
 VERBOSE		=	false
 SHARED		=	false
@@ -87,23 +92,146 @@ BINDIR		=	bin
 LIBDIR		=	lib
 INCLUDEDIR	=	include
 NAME		=	soplex
-LIBOBJ		= 	changesoplex.o clufactor.o didxset.o \
-			enter.o idxset.o leave.o rational.o mpsinput.o nameset.o \
-			slufactor.o solverational.o solvereal.o soplex.o soplexlegacy.o \
-			spxbasis.o spxbounds.o spxboundflippingrt.o spxchangebasis.o \
-			spxequilisc.o spxdantzigpr.o spxdefaultrt.o \
-			spxdefines.o spxdesc.o spxdevexpr.o \
-			spxfastrt.o spxfileio.o spxgeometsc.o spxgithash.o\
-			spxharrisrt.o spxhybridpr.o spxid.o spxlpbase_real.o spxlpbase_rational.o \
-			spxmainsm.o spxout.o spxparmultpr.o spxquality.o \
-			spxscaler.o spxshift.o spxsolver.o spxsolve.o \
-			spxstarter.o spxsteeppr.o spxsumst.o spxvecs.o \
-			spxvectorst.o spxweightpr.o spxweightst.o spxwritestate.o \
+LIBHEADER	=	array.h \
+			basevectors.h \
+			classarray.h \
+			clufactor.h \
+			cring.h \
+			dataarray.h \
+			datahashtable.h \
+			datakey.h \
+			dataset.h \
+			didxset.h \
+			dsvectorbase.h \
+			dsvector.h \
+			dvectorbase.h \
+			dvector.h \
+			exceptions.h \
+			gzstream.h \
+			idlist.h \
+			idxset.h \
+			islist.h \
+			lpcolbase.h \
+			lpcol.h \
+			lpcolsetbase.h \
+			lpcolset.h \
+			lprowbase.h \
+			lprow.h \
+			lprowsetbase.h \
+			lprowset.h \
+			mpsinput.h \
+			nameset.h \
+			random.h \
+			rational.h \
+			slinsolver.h \
+			slufactor.h \
+			solbase.h \
+			sol.h \
+			soplex.h \
+			soplexlegacy.h \
+			sorter.h \
+			spxalloc.h \
+			spxautopr.h \
+			spxbasis.h \
+			spxboundflippingrt.h \
+			spxdantzigpr.h \
+			spxdefaultrt.h \
+			spxdefines.h \
+			spxdevexpr.h \
+			spxequilisc.h \
+			spxfastrt.h \
+			spxfileio.h \
+			spxgeometsc.h \
+			spxgithash.h \
+			spxharrisrt.h \
+			spxhybridpr.h \
+			spxid.h \
+			spxlpbase.h \
+			spxlp.h \
+			spxmainsm.h \
+			spxout.h \
+			spxparmultpr.h \
+			spxpricer.h \
+			spxratiotester.h \
+			spxscaler.h \
+			spxsimplifier.h \
+			spxsolver.h \
+			spxstarter.h \
+			spxsteepexpr.h \
+			spxsteeppr.h \
+			spxsumst.h \
+			spxvectorst.h \
+			spxweightpr.h \
+			spxweightst.h \
+			ssvectorbase.h \
+			ssvector.h \
+			statistics.h \
+			svectorbase.h \
+			svector.h \
+			svsetbase.h \
+			svset.h \
+			timer.h \
+			unitvector.h \
+			updatevector.h \
+			vectorbase.h \
+			vector.h
+LIBOBJ		= 	changesoplex.o \
+			clufactor.o \
+			didxset.o \
+			enter.o \
+			gzstream.o \
+			idxset.o \
+			leave.o \
+			mpsinput.o \
+			nameset.o \
+			rational.o \
+			slufactor.o \
+			solverational.o \
+			solvereal.o \
+			soplex.o \
+			soplexlegacy.o \
+			spxautopr.o \
+			spxbasis.o \
+			spxboundflippingrt.o \
+			spxbounds.o \
+			spxchangebasis.o \
+			spxdantzigpr.o \
+			spxdefaultrt.o \
+			spxdefines.o \
+			spxdesc.o \
+			spxdevexpr.o \
+			spxequilisc.o \
+			spxfastrt.o \
+			spxfileio.o \
+			spxgeometsc.o \
+			spxgithash.o \
+			spxharrisrt.o \
+			spxhybridpr.o \
+			spxid.o \
+			spxlpbase_rational.o \
+			spxlpbase_real.o \
+			spxmainsm.o \
+			spxout.o \
+			spxparmultpr.o \
+			spxquality.o \
+			spxscaler.o \
+			spxshift.o \
+			spxsolve.o \
+			spxsolver.o \
+			spxstarter.o \
+			spxsteeppr.o \
+			spxsumst.o \
+			spxvecs.o \
+			spxvectorst.o \
+			spxweightpr.o \
+			spxweightst.o \
+			spxwritestate.o \
 			statistics.o \
-			timer.o unitvector.o updatevector.o \
-			gzstream.o
+			timer.o \
+			unitvector.o \
+			updatevector.o
 BINOBJ		=	soplexmain.o
-EXAMPLEOBJ	=	simpleexample.o
+EXAMPLEOBJ	=	example.o
 REPOSIT		=	# template repository, explicitly empty  #spxproof.o 
 
 BASE		=	$(OSTYPE).$(ARCH).$(COMP).$(OPT)
@@ -115,15 +243,18 @@ LASTSETTINGS	=	$(OBJDIR)/make.lastsettings
 #--- NOTHING TO CHANGE FROM HERE ON -------------------------------------------
 #------------------------------------------------------------------------------
 
-GCCWARN		=	-Wall -W -Wpointer-arith -Wno-unknown-pragmas \
-			-Wcast-align -Wwrite-strings -Wconversion \
+GCCWARN		=	-pedantic -Wall -W -Wpointer-arith -Wcast-align -Wwrite-strings \
+			-Wconversion -Wsign-compare -Wshadow \
+			-Wredundant-decls -Wdisabled-optimization \
 			-Wctor-dtor-privacy -Wnon-virtual-dtor -Wreorder \
 			-Woverloaded-virtual -Wsign-promo -Wsynth -Wundef \
-			-Wcast-qual -Wold-style-cast -Wshadow 
-#			-Weffc++ -Wredundant-decls    
-# gcc 2.xx -Wmissing-declarations -Wbad-function-cast 
+			-Wcast-qual \
+			-Wmissing-declarations \
+			-Wno-unused-parameter -Wno-strict-overflow -Wno-long-long
+#			-Wold-style-cast
+#			-Weffc++
 
-#GCCWARN =
+
 #-----------------------------------------------------------------------------
 include make/make.$(BASE)
 -include make/local/make.$(HOSTNAME)
@@ -158,13 +289,16 @@ ifeq ($(PARASCIP),true)
 CPPFLAGS	+=	-DDISABLE_VERBOSITY
 endif
 
+
+#-----------------------------------------------------------------------------
+# Main Program
 #-----------------------------------------------------------------------------
 
 BINNAME		=	$(NAME)-$(VERSION).$(BASE)
-EXAMPLENAME	=	simpleexample.$(BASE)
+EXAMPLENAME	=	example.$(BASE)
 LIBNAME		=	$(NAME)-$(VERSION).$(BASE)
 BINFILE		=	$(BINDIR)/$(BINNAME)$(EXEEXTENSION)
-EXAMPLEFILE	=	$(BINDIR)/$(EXAMPLENAME)
+EXAMPLEFILE	=	$(BINDIR)/$(EXAMPLENAME)$(EXEEXTENSION)
 LIBFILE		=	$(LIBDIR)/lib$(LIBNAME).$(LIBEXT)
 LIBSHORTLINK	=	$(LIBDIR)/lib$(NAME).$(LIBEXT)
 LIBLINK		=	$(LIBDIR)/lib$(NAME).$(BASE).$(LIBEXT)
@@ -184,7 +318,11 @@ LIBOBJFILES	=	$(addprefix $(LIBOBJDIR)/,$(LIBOBJ))
 BINSRC		=	$(addprefix $(SRCDIR)/,$(BINOBJ:.o=.cpp))
 EXAMPLESRC	=	$(addprefix $(SRCDIR)/,$(EXAMPLEOBJ:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
-LIBSRCHEADER	=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.h))
+LIBSRCHEADER	=	$(addprefix $(SRCDIR)/,$(LIBHEADER))
+
+#-----------------------------------------------------------------------------
+# External Libraries
+#-----------------------------------------------------------------------------
 
 GMPDEP	:=	$(SRCDIR)/depend.gmp
 GMPSRC	:=	$(shell cat $(GMPDEP))
@@ -204,16 +342,16 @@ LDFLAGS		+=	$(ZLIB_LDFLAGS)
 endif
 
 
+#-----------------------------------------------------------------------------
+# Rules
+#-----------------------------------------------------------------------------
+
 ifeq ($(VERBOSE),false)
-.SILENT:	$(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK) $(BINFILE) $(EXAMPLEFILE) $(EXAMPLEOBJFILES) $(LIBFILE) $(BINOBJFILES) $(LIBOBJFILES)
+.SILENT:	$(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK) $(BINFILE) example $(EXAMPLEOBJFILES) $(LIBFILE) $(BINOBJFILES) $(LIBOBJFILES)
 endif
 
-all:		githash $(LIBFILE) $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
-
-simpleexample:	$(LIBFILE) $(EXAMPLEFILE) $(LIBLINK) $(LIBSHORTLINK)
-
-# include install targets
--include make/make.install
+.PHONY: all
+all:		makelibfile $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
 
 $(LIBLINK) $(LIBSHORTLINK):	$(LIBFILE)
 		@rm -f $@
@@ -223,17 +361,23 @@ $(BINLINK) $(BINSHORTLINK):	$(BINFILE)
 		@rm -f $@
 		cd $(dir $@) && $(LN_s) $(notdir $(BINFILE)) $(notdir $@)
 
-$(BINFILE):	$(BINDIR) $(BINOBJDIR) $(LIBOBJFILES) $(BINOBJFILES)
+$(BINFILE):	$(LIBOBJFILES) $(BINOBJFILES) | $(BINDIR) $(BINOBJDIR)
 		@echo "-> linking $@"
-		$(LINKCXX) $(BINOBJFILES) $(LIBOBJFILES) \
-		$(LDFLAGS) $(LINKCXX_o)$@
+		-$(LINKCXX) $(BINOBJFILES) $(LIBOBJFILES) \
+		$(LDFLAGS) $(LINKCXX_o)$@ \
+		|| ($(MAKE) errorhints && false)
 
-$(EXAMPLEFILE):	$(BINDIR) $(EXAMPLEOBJDIR) $(LIBOBJFILES) $(EXAMPLEOBJFILES)
-		@echo "-> linking $@"
-		$(LINKCXX) $(EXAMPLEOBJFILES) $(LIBOBJFILES) \
-		$(LDFLAGS) $(LINKCXX_o)$@
+.PHONY: example
+example:	$(LIBOBJFILES) $(EXAMPLEOBJFILES) | $(BINDIR) $(EXAMPLEOBJDIR)
+		@echo "-> linking $(EXAMPLEFILE)"
+		-$(LINKCXX) $(EXAMPLEOBJFILES) $(LIBOBJFILES) \
+		$(LDFLAGS) $(LINKCXX_o)$(EXAMPLEFILE) \
+		|| ($(MAKE) errorhints && false)
 
-$(LIBFILE):	$(LIBDIR) $(LIBOBJDIR) touchexternal $(LIBOBJFILES)
+.PHONY: makelibfile
+makelibfile:	checkdefines touchexternal | $(LIBDIR) $(LIBOBJDIR)
+
+$(LIBFILE):	$(LIBOBJFILES)
 		@echo "-> generating library $@"
 		-rm -f $(LIBFILE)
 		$(LIBBUILD) $(LIBBUILDFLAGS) $(LIBBUILD_o)$@ $(LIBOBJFILES) $(REPOSIT)
@@ -241,7 +385,17 @@ ifneq ($(RANLIB),)
 		$(RANLIB) $@
 endif
 
+# include target to detect the current git hash
+-include make/local/make.detectgithash
+
+# this empty target is needed for the SoPlex release versions
+githash::	# do not remove the double-colon
+
+# include local targets 
 -include make/local/make.targets
+
+# include install targets
+-include make/make.install
 
 .PHONY: lint
 lint:		$(BINSRC) $(LIBSRC)
@@ -270,17 +424,17 @@ memory_exception_test: $(BINFILE)
 		"$(VALGRIND) $(VFLAGS)" $(VSUPPNAME)
 
 .PHONY: cleanbin
-cleanbin:       $(BINDIR)
+cleanbin:	| $(BINDIR)
 		@echo "remove binary $(BINFILE)"
 		@-rm -f $(BINFILE) $(BINLINK) $(BINSHORTLINK)
 
 .PHONY: cleanlib
-cleanlib:       $(LIBDIR)
+cleanlib:	| $(LIBDIR)
 		@echo "remove library $(LIBFILE)" 
 		@-rm -f $(LIBFILE) $(LIBLINK) $(LIBSHORTLINK)
 
 .PHONY: clean
-clean:          cleanlib cleanbin $(LIBOBJDIR) $(BINOBJDIR) $(OBJDIR)
+clean:          cleanlib cleanbin | $(LIBOBJDIR) $(BINOBJDIR) $(OBJDIR)
 		@echo "remove objective files" 
 ifneq ($(LIBOBJDIR),)
 		@-rm -f $(LIBOBJDIR)/*.o && rmdir $(LIBOBJDIR)
@@ -303,10 +457,10 @@ etags:
 $(OBJDIR):	
 		@-mkdir -p $(OBJDIR)
 
-$(BINOBJDIR):	$(OBJDIR)
+$(BINOBJDIR):	| $(OBJDIR)
 		@-mkdir -p $(BINOBJDIR)
 
-$(LIBOBJDIR):	$(OBJDIR)
+$(LIBOBJDIR):	| $(OBJDIR)
 		@-mkdir -p $(LIBOBJDIR)
 
 $(BINDIR):
@@ -348,7 +502,10 @@ $(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 -include $(LASTSETTINGS)
 
 .PHONY: touchexternal
-touchexternal:	$(GMPDEP) $(ZLIBDEP)
+touchexternal:	$(GMPDEP) $(ZLIBDEP) | $(OBJDIR)
+ifneq ($(SPXGITHASH),$(LAST_SPXGITHASH))
+		@-$(MAKE) githash
+endif
 ifneq ($(GMP),$(LAST_GMP))
 		@-touch $(GMPSRC)
 endif
@@ -364,14 +521,37 @@ ifneq ($(USRCXXFLAGS),$(LAST_USRCXXFLAGS))
 		@-touch $(BINSRC)
 endif
 		@-rm -f $(LASTSETTINGS)
+		@echo "LAST_SPXGITHASH=$(SPXGITHASH)" >> $(LASTSETTINGS)
 		@echo "LAST_GMP=$(GMP)" >> $(LASTSETTINGS)
 		@echo "LAST_ZLIB=$(ZLIB)" >> $(LASTSETTINGS)
 		@echo "LAST_SHARED=$(SHARED)" >> $(LASTSETTINGS)
 		@echo "LAST_USRCXXFLAGS=$(USRCXXFLAGS)" >> $(LASTSETTINGS)
 
--include make/local/make.detectgithash
-# this empty target is needed for the SoPlex release versions
-githash::	# do not remove the double-colon
+.PHONY: checkdefines
+checkdefines:
+ifneq ($(GMP),true)
+ifneq ($(GMP),false)
+		$(error invalid GMP flag selected: GMP=$(GMP). Possible options are: true false)
+endif
+endif
+ifneq ($(ZLIB),true)
+ifneq ($(ZLIB),false)
+		$(error invalid ZLIB flag selected: ZLIB=$(ZLIB). Possible options are: true false)
+endif
+endif
+
+.PHONY: errorhints
+errorhints:
+		@echo
+		@echo "build failed"
+ifeq ($(ZLIB),true)
+		@echo "- you used ZLIB=true: if zlib is not available, try building with ZLIB=false"
+endif
+ifeq ($(GMP),true)
+		@echo "- you used GMP=true: if gmp is not available, try building with GMP=false (note that this will deactivate iterative refinement)"
+endif
+		@echo "for help on building SoPlex consult the INSTALL file"
+		@echo
 
 # --- EOF ---------------------------------------------------------------------
 # DO NOT DELETE

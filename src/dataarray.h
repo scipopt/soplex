@@ -150,7 +150,7 @@ public:
 
       /// move \p n elements in memory from insert position \p i to the back
       if( j > i )
-         memmove(&(data[i+n]), &(data[i]), j - i);
+         memmove(&(data[i+n]), &(data[i]), (unsigned int) (j - i));
    }
 
    /// insert \p n elements with value \p t before \p i 'the element.
@@ -170,7 +170,7 @@ public:
       if (n > 0)
       {
          insert(i, n);
-         memcpy(&(data[i]), t, n*sizeof(T));
+         memcpy(&(data[i]), t, (unsigned int) n * sizeof(T));
       }
    }
 
@@ -180,7 +180,7 @@ public:
       if (t.size())
       {
          insert(i, t.size());
-         memcpy(&(data[i]), t.data, t.size()*sizeof(T));
+         memcpy(&(data[i]), t.data, (unsigned int)t.size() * sizeof(T));
       }
    }
 
@@ -190,7 +190,7 @@ public:
       assert(n < size() && n >= 0);
       /* use memmove instead of memcopy because the destination and the source might overlap */
       if (n + m < size())
-         memmove(&(data[n]), &(data[n + m]), (size() - (n + m)) * sizeof(T));
+         memmove(&(data[n]), &(data[n + m]), (unsigned int)(size() - (n + m)) * sizeof(T));
       else
          m = size() - n;
       thesize -= m;
@@ -282,7 +282,7 @@ public:
       if (this != &rhs)
       {
          reSize(rhs.size());
-         memcpy(data, rhs.data, size() * sizeof(T));
+         memcpy(data, rhs.data, (unsigned int) size() * sizeof(T));
 
          assert(isConsistent());
       }
@@ -313,8 +313,10 @@ public:
    {
       spx_alloc(data, max());
 
+      assert(thesize >= 0);
+
       if (thesize)
-         memcpy(data, old.data, thesize * sizeof(T));
+         memcpy(data, old.data, (unsigned int)thesize * sizeof(T));
 
       assert(isConsistent());
    }

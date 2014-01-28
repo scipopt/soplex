@@ -38,8 +38,6 @@ namespace soplex
 class SPxDantzigPR : public SPxPricer
 {
 private:
-   int                   start;              /**< index where the search starts */
-
    int                   selectLeaveSparse();/**< sparse pricing method for leaving Simplex */
 
    SPxId                 selectEnterX();                                /**< choose the best entering index among columns and rows but prefer sparsity */
@@ -55,12 +53,10 @@ public:
    /// default constructor
    SPxDantzigPR() 
       : SPxPricer("Dantzig")
-      , start(0)
    {} 
    /// copy constructor
    SPxDantzigPR(const SPxDantzigPR& old ) 
       : SPxPricer(old)
-      , start(old.start)
    {}
    /// assignment operator
    SPxDantzigPR& operator=( const SPxDantzigPR& rhs)
@@ -68,7 +64,6 @@ public:
       if(this != &rhs)
       {
          SPxPricer::operator=(rhs);
-         start = rhs.start;
       }
 
       return *this;

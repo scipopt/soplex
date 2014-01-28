@@ -700,7 +700,7 @@ void SPxBasis::printMatrixMTX(int number)
       {
          int idx = baseVec(i).index(j);
          Real val = baseVec(i).value(j);
-         fprintf(basisfile, "%d %d %.13" REAL_FORMAT "\n",i+1,idx+1,val);
+         fprintf(basisfile, "%d %d %.13" "f" "\n",i+1,idx+1,val);
       }
    }
    fclose (basisfile);
@@ -937,7 +937,7 @@ Vector& SPxBasis::multBaseWith(Vector& x) const
    x.clear();
    for (i = x.dim() - 1; i >= 0; --i)
    {
-      if (tmp[i])
+      if (tmp[i] != 0.0)
          x.multAdd(tmp[i], *(matrix[i]));
    }
 

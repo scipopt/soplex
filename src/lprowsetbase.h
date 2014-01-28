@@ -574,7 +574,7 @@ public:
    template < class S >
    LPRowSetBase<R>& operator=(const LPRowSetBase<S>& rs)
    {
-      if( this != (LPRowSetBase<R>*)(&rs) )
+      if( this != (const LPRowSetBase<R>*)(&rs) )
       {
          SVSetBase<R>::operator=(rs);
          left = rs.left;

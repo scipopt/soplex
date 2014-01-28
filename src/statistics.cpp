@@ -44,6 +44,9 @@ namespace soplex
       luFactorizationTime = 0.0;
       luSolveTime = 0.0;
       iterations = 0;
+      iterationsPrimal = 0;
+      iterationsFromBasis = 0;
+      boundflips = 0;
       luFactorizations = 0;
       luSolves = 0;
       refinements = 0;
@@ -59,56 +62,57 @@ namespace soplex
 
       os << std::fixed << std::setprecision(2);
 
-      os << "Total time         : " << totTime << "\n"
-         << "  Reading          : " << readingTime.userTime() << "\n"
-         << "  Solving          : " << solTime << "\n"
-         << "  Preprocessing    : " << preprocessingTime.userTime();
+      os << "Total time          : " << totTime << "\n"
+         << "  Reading           : " << readingTime.userTime() << "\n"
+         << "  Solving           : " << solTime << "\n"
+         << "  Preprocessing     : " << preprocessingTime.userTime();
       if( solTime > 0 )
          os << " (" << 100 * (preprocessingTime.userTime() / solTime) << "% of solving time)";
-      os << "\n  Simplex          : " << simplexTime.userTime();
+      os << "\n  Simplex           : " << simplexTime.userTime();
       if( solTime > 0 )
          os << " (" << 100 * (simplexTime.userTime() / solTime) << "% of solving time)";
-      os << "\n  Synchronization  : " << syncTime.userTime();
+      os << "\n  Synchronization   : " << syncTime.userTime();
       if( solTime > 0 )
          os << " (" << 100 * (syncTime.userTime() / solTime) << "% of solving time)";
-      os << "\n  Transformation   : " << transformTime.userTime();
+      os << "\n  Transformation    : " << transformTime.userTime();
       if( solTime > 0 )
          os << " (" << 100*transformTime.userTime() / solTime << "% of solving time)";
-      os << "\n  Other            : " << otherTime;
+      os << "\n  Other             : " << otherTime;
       if( solTime > 0  )
          os << " (" << 100*otherTime / solTime << "% of solving time)";
 
-      os << "\nRefinements        : " << refinements << "\n"
-         << "  Stalling         : " << stallRefinements << "\n";
+      os << "\nRefinements         : " << refinements << "\n"
+         << "  Stalling          : " << stallRefinements << "\n";
 
-      os << "Iterations         : " << iterations << "\n"
-         << "  From scratch     : " << iterations - iterationsFromBasis;
+      os << "Iterations          : " << iterations << "\n"
+         << "  From scratch      : " << iterations - iterationsFromBasis;
       if( iterations > 0 )
          os << " (" << 100*double((iterations - iterationsFromBasis))/double(iterations) << "%)";
-      os << "\n  From basis       : " << iterationsFromBasis;
+      os << "\n  From basis        : " << iterationsFromBasis;
       if( iterations > 0 )
          os << " (" << 100*double(iterationsFromBasis)/double(iterations) << "%)";
-      os << "\n  Primal           : " << iterationsPrimal;
+      os << "\n  Primal            : " << iterationsPrimal;
       if( iterations > 0 )
          os << " (" << 100*double(iterationsPrimal)/double(iterations) << "%)";
-      os << "\n  Dual             : " << iterations - iterationsPrimal;
+      os << "\n  Dual              : " << iterations - iterationsPrimal;
       if( iterations > 0 )
          os << " (" << 100*double((iterations - iterationsPrimal))/double(iterations) << "%)";
+      os << "\n  Bound flips       : " << boundflips;
 
-      os << "\nLU factorizations  : " << luFactorizations << "\n"
-         << "  Factor. frequency: ";
+      os << "\nLU factorizations   : " << luFactorizations << "\n"
+         << "  Factor. frequency : ";
       if( luFactorizations > 0 )
          os << double(iterations) / double(luFactorizations) << " iterations per factorization\n";
       else
          os << "-\n";
-      os << "  Factor. time     : " << luFactorizationTime << "\n";
+      os << "  Factor. time      : " << luFactorizationTime << "\n";
 
-      os << "LU solves          : " << luSolves << "\n"
-         << "  Solve frequency  : ";
+      os << "LU solves           : " << luSolves << "\n"
+         << "  Solve frequency   : ";
       if( luSolves > 0 )
          os << double(luSolves) / double(iterations) << " solves per iteration\n";
       else
          os << "-\n";
-      os << "  Solve time       : " << luSolveTime << "\n";
+      os << "  Solve time        : " << luSolveTime << "\n";
    }
 } // namespace soplex

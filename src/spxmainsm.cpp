@@ -56,7 +56,7 @@
 
 
 #ifndef NDEBUG
-#define CHECK_BASIC_DIM         1
+#define CHECK_BASIC_DIM
 #endif  // NDEBUG
 
 namespace soplex
@@ -102,7 +102,7 @@ void SPxMainSM::FreeConstraintPS::execute(DVector& x, DVector& y, DVector& s, DV
    // basis:
    rStatus[m_i] = SPxSolver::BASIC;
 
-#if CHECK_BASIC_DIM
+#ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
    {
        throw SPxInternalCodeException("XMAISM15 Dimension doesn't match after this step.");
@@ -128,7 +128,7 @@ void SPxMainSM::EmptyConstraintPS::execute(DVector&, DVector& y, DVector& s, DVe
    // basis:
    rStatus[m_i] = SPxSolver::BASIC;
 
-#if CHECK_BASIC_DIM
+#ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
    {
        throw SPxInternalCodeException("XMAISM16 Dimension doesn't match after this step.");
@@ -157,22 +157,22 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
       if (m_col.index(k) != m_i)
          val -= m_col.value(k) * y[m_col.index(k)];
 
-   Real m_newLo = (aij > 0) ? m_lhs/aij : m_rhs/aij;  // implicit lhs
-   Real m_newUp = (aij > 0) ? m_rhs/aij : m_lhs/aij;  // implicit rhs
+   Real newLo = (aij > 0) ? m_lhs/aij : m_rhs/aij;  // implicit lhs
+   Real newUp = (aij > 0) ? m_rhs/aij : m_lhs/aij;  // implicit rhs
 
    switch(cStatus[m_j])
    {
    case SPxSolver::FIXED:
-      if(m_newLo <= m_oldLo && m_newUp >= m_oldUp)
+      if(newLo <= m_oldLo && newUp >= m_oldUp)
       {
          // this row is totally redundant, has not changed bound of xj
          rStatus[m_i] = SPxSolver::BASIC;
          y[m_i] = 0.0;
       }
-      else if(EQrel(m_newLo, m_newUp, eps()))
+      else if(EQrel(newLo, newUp, eps()))
       {
          // row is in the type  aij * xj = b
-         assert(EQrel(m_newLo, x[m_j], eps()));
+         assert(EQrel(newLo, x[m_j], eps()));
 
          if(EQrel(m_oldLo, m_oldUp, eps()))
          {
@@ -201,7 +201,7 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
             r[m_j] = val;
          }
       }
-      else if(EQrel(m_newLo, m_oldUp, eps()))
+      else if(EQrel(newLo, m_oldUp, eps()))
       {
          // row is in the type  xj >= b/aij, try to set xj on upper
          if(r[m_j] >= eps())
@@ -224,7 +224,7 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
             r[m_j] = val;
          }
       }
-      else if(EQrel(m_newUp, m_oldLo, eps()))
+      else if(EQrel(newUp, m_oldLo, eps()))
       {
          // row is in the type  xj <= b/aij, try to set xj on lower
          if(r[m_j] <= -eps())
@@ -301,7 +301,7 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
       break;
    }
 
-#if CHECK_BASIC_DIM
+#ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
    {
        throw SPxInternalCodeException("XMAISM17 Dimension doesn't match after this step.");
@@ -402,7 +402,7 @@ void SPxMainSM::ForceConstraintPS::execute(DVector& x, DVector& y, DVector& s, D
       y[m_i] = 0.0;
    }
 
-#if CHECK_BASIC_DIM
+#ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
    {
        throw SPxInternalCodeException("XMAISM18 Dimension doesn't match after this step.");
@@ -450,7 +450,7 @@ void SPxMainSM::FixVariablePS::execute(DVector& x, DVector& y, DVector& s, DVect
       cStatus[m_j] = EQrel(m_val, m_lower) ? SPxSolver::ON_LOWER : (EQrel(m_val, m_upper) ? SPxSolver::ON_UPPER : SPxSolver::ZERO);
    }
 
-#if CHECK_BASIC_DIM
+#ifdef CHECK_BASIC_DIM
    if(m_correctIdx)
    {
       if (!checkBasisDim(rStatus, cStatus))
@@ -608,7 +608,7 @@ void SPxMainSM::FreeZeroObjVariablePS::execute(DVector& x, DVector& y, DVector& 
          cStatus[m_j] = SPxSolver::ON_LOWER;
    }
 
-#if CHECK_BASIC_DIM
+#ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
    {
        throw SPxInternalCodeException("XMAISM20 Dimension doesn't match after this step.");
@@ -630,6 +630,9 @@ void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& 
 
    if (isZero(s[m_i], 1e-6))
       s[m_i] = 0.0;
+   else if (s[m_i] >= soplex::infinity)
+      // this is a fix for a highly ill conditioned instance that is "solved" in presolving (ilaser0 from MINLP, mittelmann)
+      throw SPxException("Simplifier: scaling factor is too big - aborting unsimplification");
 
    Real scale1 = maxAbs(m_lhs, s[m_i]);
    Real scale2 = maxAbs(m_rhs, s[m_i]);
@@ -744,7 +747,7 @@ void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& 
 
    assert(cStatus[m_j] != SPxSolver::BASIC || isZero(r[m_j], eps()));
 
-#if CHECK_BASIC_DIM
+#ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
    {
        throw SPxInternalCodeException("XMAISM21 Dimension doesn't match after this step.");
@@ -802,7 +805,7 @@ void SPxMainSM::FreeColSingletonPS::execute(DVector& x, DVector& y, DVector& s, 
    else
       rStatus[m_i] = SPxSolver::ON_UPPER;
 
-#if CHECK_BASIC_DIM
+#ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
    {
        throw SPxInternalCodeException("XMAISM22 Dimension doesn't match after this step.");
@@ -868,7 +871,7 @@ void SPxMainSM::DoubletonEquationPS::execute(DVector&, DVector& y, DVector&, DVe
              (cStatus[m_j] == SPxSolver::FIXED));
    }
 
-#if CHECK_BASIC_DIM
+#ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
    {
        throw SPxInternalCodeException("XMAISM23 Dimension doesn't match after this step.");
@@ -973,7 +976,7 @@ void SPxMainSM::DuplicateRowsPS::execute(DVector&, DVector& y, DVector& s, DVect
       }
    }
 
-#if CHECK_BASIC_DIM
+#ifdef CHECK_BASIC_DIM
    if(m_isFirst && !checkBasisDim(rStatus, cStatus))
    {
       throw SPxInternalCodeException("XMAISM24 Dimension doesn't match after this step.");
@@ -993,7 +996,7 @@ void SPxMainSM::DuplicateColsPS::execute(DVector& x,
 
    if(m_isFirst)
    {
-#if CHECK_BASIC_DIM
+#ifdef CHECK_BASIC_DIM
       if (!checkBasisDim(rStatus, cStatus))
       {
          throw SPxInternalCodeException("XMAISM25 Dimension doesn't match after this step.");
@@ -1395,7 +1398,7 @@ void SPxMainSM::handleExtremes(SPxLP& lp)
       m_chgLRhs += chgLRhs;
       m_chgBnds += chgBnds;
 
-      MSG_INFO2( spxout << "IMAISM06 Main simplifier (extremes) removed "
+      MSG_INFO2( spxout << "Simplifier (extremes) removed "
                         << remRows << " rows, "
                         << remNzos << " non-zeros, "
                         << chgBnds << " col bounds, "
@@ -1504,7 +1507,7 @@ SPxSimplifier::Result SPxMainSM::removeEmpty(SPxLP& lp)
       m_remRows += remRows;
       m_remCols += remCols;
 
-      MSG_INFO2( spxout << "IMAISM10 Main simplifier (empty rows/colums) removed "
+      MSG_INFO2( spxout << "Simplifier (empty rows/colums) removed "
                         << remRows << " rows, "
                         << remCols << " cols"
                         << std::endl; )
@@ -2104,7 +2107,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
       m_keptBnds += keptBnds;
       m_keptLRhs += keptLRhs;
 
-      MSG_INFO2( spxout << "IMAISM28 Main simplifier (rows) removed "
+      MSG_INFO2( spxout << "Simplifier (rows) removed "
                         << remRows << " rows, "
                         << remNzos << " non-zeros, "
                         << chgBnds << " col bounds, "
@@ -2630,7 +2633,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
       m_remNzos += remNzos;
       m_chgBnds += chgBnds;
 
-      MSG_INFO2( spxout << "IMAISM42 Main simplifier (columns) removed "
+      MSG_INFO2( spxout << "Simplifier (columns) removed "
                         << remRows << " rows, "
                         << remCols << " cols, "
                         << remNzos << " non-zeros, "
@@ -2881,7 +2884,7 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
       m_remCols += remCols;
       m_remNzos += remNzos;
 
-      MSG_INFO2( spxout << "IMAISM51 Main simplifier (dual) removed "
+      MSG_INFO2( spxout << "Simplifier (dual) removed "
                         << remRows << " rows, "
                         << remCols << " cols, "
                         << remNzos << " non-zeros"
@@ -2922,7 +2925,7 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
 
    if (rs_remRows > 0)
    {
-      MSG_INFO2( spxout << "IMAISM79 Main simplifier duplicate rows (row singleton stage) removed "
+      MSG_INFO2( spxout << "Simplifier duplicate rows (row singleton stage) removed "
                         << rs_remRows << " rows, "
                         << rs_remRows << " non-zeros"
                         << std::endl; )
@@ -3237,7 +3240,7 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
       m_remRows += remRows;
       m_remNzos += remNzos;
 
-      MSG_INFO2( spxout << "IMAISM56 Main simplifier (duplicate rows) removed "
+      MSG_INFO2( spxout << "Simplifier (duplicate rows) removed "
                         << remRows << " rows, "
                         << remNzos << " non-zeros"
                         << std::endl; )
@@ -3622,7 +3625,7 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
       m_remCols += remCols;
       m_remNzos += remNzos;
 
-      MSG_INFO2( spxout << "IMAISM65 Main simplifier (duplicate columns) removed "
+      MSG_INFO2( spxout << "Simplifier (duplicate columns) removed "
                         << remCols << " cols, "
                         << remNzos << " non-zeros"
                         << std::endl; )
@@ -3706,7 +3709,7 @@ void SPxMainSM::fixColumn(SPxLP& lp, int j, bool correctIdx)
    m_hist.append(new (FixVariablePSptr) FixVariablePS(lp, *this, j, lp.lower(j), correctIdx));
 }
 
-SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real feastol, Real opttol, bool keepbounds)
+SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real otol, bool keepbounds)
 {
 
    m_thesense = lp.spxSense();
@@ -3756,15 +3759,15 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real feastol, Rea
    if( eps < 0.0 )
       throw SPxInterfaceException("XMAISM30 Cannot use negative epsilon in simplify().");
 
-   if( feastol < 0.0 )
+   if( ftol < 0.0 )
       throw SPxInterfaceException("XMAISM31 Cannot use negative feastol in simplify().");
 
-   if( opttol < 0.0 )
+   if( otol < 0.0 )
       throw SPxInterfaceException("XMAISM32 Cannot use negative opttol in simplify().");
 
    m_epsilon = eps;
-   m_feastol = feastol;
-   m_opttol = opttol;
+   m_feastol = ftol;
+   m_opttol = otol;
 
    for(int i = 0; i < lp.nRows(); ++i)
    {
@@ -3782,7 +3785,7 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real feastol, Rea
          ++numBoxedCols;
    }
 
-   MSG_INFO2( spxout << "IMAISM82 LP has "
+   MSG_INFO2( spxout << "LP has "
                      << numRangedRows << " ranged rows, "
                      << numBoxedCols << " boxed columns"
                      << std::endl; )
@@ -3832,7 +3835,7 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real feastol, Rea
    if (m_result != OKAY)
       return m_result;
 
-   MSG_INFO1( spxout << "IMAISM69 Main simplifier removed "
+   MSG_INFO1( spxout << "Simplifier removed "
                      << m_remRows << " rows, "
                      << m_remCols << " columns, "
                      << m_remNzos << " nonzeros, "
@@ -3841,12 +3844,12 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real feastol, Rea
                      << std::endl; )
 
    if (keepbounds)
-      MSG_INFO2( spxout << "IMAISM81 Main simplifier kept "
+      MSG_INFO2( spxout << "Simplifier kept "
                         << m_keptBnds << " column bounds, "
                         << m_keptLRhs << " row bounds"
                         << std::endl; )
 
-   MSG_INFO1( spxout << "IMAISM74 Reduced LP has "
+   MSG_INFO1( spxout << "Reduced LP has "
                      << lp.nRows() << " rows "
                      << lp.nCols() << " columns "
                      << lp.nNzos() << " nonzeros"
@@ -3864,18 +3867,18 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real feastol, Rea
       if (lp.lower(j) > -infinity && lp.upper(j) < infinity)
          ++numBoxedCols;
 
-   MSG_INFO2( spxout << "IMAISM83 Reduced LP has "
+   MSG_INFO2( spxout << "Reduced LP has "
                      << numRangedRows << " ranged rows, "
                      << numBoxedCols << " boxed columns"
                      << std::endl; )
 
    if (lp.nCols() == 0 && lp.nRows() == 0)
    {
-      MSG_INFO1( spxout << "IMAISM70 Main simplifier removed all rows and columns" << std::endl; )
+      MSG_INFO1( spxout << "Simplifier removed all rows and columns" << std::endl; )
       m_result = VANISHED;
    }
 
-   MSG_INFO2( spxout << "\nIMAISM71 Main simplifier performed:\n"
+   MSG_INFO2( spxout << "\nSimplifier performed:\n"
                      << m_stat[EMPTY_ROW]            << " empty rows\n"
                      << m_stat[FREE_ROW]             << " free rows\n"
                      << m_stat[SINGLETON_ROW]        << " singleton rows\n"
@@ -3943,7 +3946,7 @@ void SPxMainSM::unsimplify(const Vector& x, const Vector& y, const Vector& s, co
          m_dual[i] = -m_dual[i];
    }
 
-#if CHECK_BASIC_DIM
+#ifdef CHECK_BASIC_DIM
    int numBasis = 0;
    for(int rs = 0; rs < m_rBasisStat.size(); ++rs)
    {

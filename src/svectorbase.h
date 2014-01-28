@@ -545,7 +545,7 @@ public:
    template < class S >
    SVectorBase<R>& operator=(const SVectorBase<S>& sv)
    {
-      if( this != (SVectorBase<R>*)(&sv) )
+      if( this != (const SVectorBase<R>*)(&sv) )
       {
          assert(max() >= sv.size());
 

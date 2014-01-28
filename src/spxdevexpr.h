@@ -50,6 +50,10 @@ private:
    Real  last;           ///< penalty, selected at last iteration.
    DVector penalty;      ///< vector of pricing penalties.
    DVector coPenalty;    ///< vector of pricing penalties.
+   DataArray<IdxElement> prices;   ///< temporary array of precomputed pricing values
+   DataArray<IdxElement> pricesCo; ///< temporary array of precomputed pricing values
+   DIdxSet bestPrices;   ///< set of best pricing candidates
+   DIdxSet bestPricesCo; ///< set of best pricing candidates
    bool refined;         ///< has a refinement step already been tried?
    ///@}
 
@@ -58,12 +62,19 @@ private:
    //@{
    /// set entering/leaving algorithm
    void init(SPxSolver::Type);
+   /// build up vector of pricing values for later use
+   int buildBestPriceVectorLeave(Real feastol);
    /// internal implementation of SPxPricer::selectLeave()
    int selectLeaveX(Real feastol, int start = 0, int incr = 1);
    /// implementation of sparse pricing in the leaving Simplex
    int selectLeaveSparse(Real feastol);
+   /// implementation of hyper sparse pricing in the leaving Simplex
+   int selectLeaveHyper(Real feastol);
    /// internal implementation of SPxPricer::left4()
    void left4X(int n, const SPxId& id, int start, int incr);
+   /// build up vector of pricing values for later use
+   SPxId buildBestPriceVectorEnterDim(Real& best, Real feastol);
+   SPxId buildBestPriceVectorEnterCoDim(Real& best, Real feastol);
    /// choose the best entering index among columns and rows but prefer sparsity
    SPxId selectEnterX(Real tol);
    /// implementation of sparse pricing in the entering Simplex (slack variables)
@@ -74,6 +85,10 @@ private:
    SPxId selectEnterDenseDim(Real& best, Real feastol, int start = 0, int incr = 1);
    /// SPxPricer::selectEnter() in dense case
    SPxId selectEnterDenseCoDim(Real& best, Real feastol, int start = 0, int incr = 1);
+   /// implementation of hyper sparse pricing in the entering Simplex
+   SPxId selectEnterHyperDim(Real& best, Real feastol);
+   /// implementation of hyper sparse pricing in the entering Simplex
+   SPxId selectEnterHyperCoDim(Real& best, Real feastol);
    /// internal implementation of SPxPricer::entered4()
    void entered4X(SPxId id, int n, int start1, int incr1, int start2, int incr2);
    //@}

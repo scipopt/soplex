@@ -42,6 +42,7 @@
 #include "spxvectorst.h"
 
 #include "spxpricer.h"
+#include "spxautopr.h"
 #include "spxdantzigpr.h"
 #include "spxparmultpr.h"
 #include "spxdevexpr.h"
@@ -763,8 +764,11 @@ public:
       /// mode for a posteriori feasibility checks
       CHECKMODE = 18,
 
+      /// mode for hyper sparse pricing
+      HYPER_PRICING = 19,
+
       /// number of integer parameters
-      INTPARAM_COUNT = 19
+      INTPARAM_COUNT = 20
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -877,7 +881,6 @@ public:
       STARTER_VECTOR = 3
    };
 
-   ///@todo is the order different than usual on purpose?
    /// values for parameter PRICER
    enum
    {
@@ -965,61 +968,82 @@ public:
       CHECKMODE_RATIONAL = 2
    };
 
+   /// values for parameter HYPER_PRICING
+   enum
+   {
+      /// never
+      HYPER_PRICING_OFF = 0,
+
+      /// decide according to problem size
+      HYPER_PRICING_AUTO = 1,
+
+      /// always
+      HYPER_PRICING_ON = 2
+   };
+
    /// real parameters
    typedef enum
    {
+      /// primal feasibility tolerance
+      FEASTOL = 0,
+
+      /// dual feasibility tolerance
+      OPTTOL = 1,
+
       /// general zero tolerance
-      EPSILON_ZERO = 0,
+      EPSILON_ZERO = 2,
 
       /// zero tolerance used in factorization
-      EPSILON_FACTORIZATION = 1,
+      EPSILON_FACTORIZATION = 3,
 
       /// zero tolerance used in update of the factorization
-      EPSILON_UPDATE = 2,
+      EPSILON_UPDATE = 4,
+
+      /// pivot zero tolerance used in factorization
+      EPSILON_PIVOT = 5,
 
       /// infinity threshold
-      INFTY = 3,
+      INFTY = 6,
 
       /// time limit in seconds (INFTY if unlimited)
-      TIMELIMIT = 4,
+      TIMELIMIT = 7,
 
       /// lower limit on objective value
-      OBJLIMIT_LOWER = 5,
+      OBJLIMIT_LOWER = 8,
 
       /// upper limit on objective value
-      OBJLIMIT_UPPER = 6,
+      OBJLIMIT_UPPER = 9,
 
       /// working tolerance for feasibility in floating-point solver during iterative refinement
-      FPFEASTOL = 7,
+      FPFEASTOL = 10,
 
       /// working tolerance for optimality in floating-point solver during iterative refinement
-      FPOPTTOL = 8,
+      FPOPTTOL = 11,
 
       /// maximum increase of scaling factors between refinements
-      MAXSCALEINCR = 9,
+      MAXSCALEINCR = 12,
 
       /// lower threshold in lifting (nonzero matrix coefficients with smaller absolute value will be reformulated)
-      LIFTMINVAL = 10,
+      LIFTMINVAL = 13,
 
       /// upper threshold in lifting (nonzero matrix coefficients with larger absolute value will be reformulated)
-      LIFTMAXVAL = 11,
+      LIFTMAXVAL = 14,
+
+      /// sparse pricing threshold (#violations < dimension * SPARSITY_THRESHOLD activates sparse pricing)
+      SPARSITY_THRESHOLD = 15,
 
       /// number of real parameters
-      REALPARAM_COUNT = 12
+      REALPARAM_COUNT = 16
    } RealParam;
 
+#ifdef SOPLEX_WITH_RATIONALPARAM
    /// rational parameters
    typedef enum
    {
-      /// primal feasibility tolerance
-      FEASTOL,
-
-      /// dual feasibility tolerance
-      OPTTOL,
-
       /// number of rational parameters
-      RATIONALPARAM_COUNT = 2
+      RATIONALPARAM_COUNT = 0
    } RationalParam;
+#endif
 
    /// class of parameter settings
    class Settings;
@@ -1033,8 +1057,10 @@ public:
    /// returns real parameter value
    Real realParam(const RealParam param) const;
 
+#ifdef SOPLEX_WITH_RATIONALPARAM
    /// returns rational parameter value
    Rational rationalParam(const RationalParam param) const;
+#endif
 
    /// returns current parameter settings
    const Settings& settings() const;
@@ -1048,11 +1074,13 @@ public:
    /// sets real parameter value; returns true on success
    bool setRealParam(const RealParam param, const Real value, const bool quiet = false, const bool init = false);
 
+#ifdef SOPLEX_WITH_RATIONALPARAM
    /// sets rational parameter value; returns true on success
    bool setRationalParam(const RationalParam param, const Rational value, const bool quiet = false, const bool init = false);
+#endif
 
    /// sets parameter settings; returns true on success
-   bool setSettings(const Settings& settings, const bool quiet = false, const bool init = false);
+   bool setSettings(const Settings& newSettings, const bool quiet = false, const bool init = false);
 
    /// writes settings file; returns true on success
    bool saveSettingsFile(const char* filename, const bool onlyChanged = false) const;
@@ -1089,6 +1117,9 @@ public:
 
    //**@name Miscellaneous */
    //@{
+
+   /// prints version and compilation options
+   void printVersion() const;
 
    /// checks if real LP and rational LP are in sync; dimensions will always be compared,
    /// vector and matrix values only if the respective parameter is set to true.
@@ -1132,6 +1163,7 @@ private:
    SPxWeightST _starterWeight;
    SPxSumST _starterSum;
    SPxVectorST _starterVector;
+   SPxAutoPR _pricerAuto;
    SPxDantzigPR _pricerDantzig;
    SPxParMultPR _pricerParMult;
    SPxDevexPR _pricerDevex;
@@ -1357,7 +1389,7 @@ private:
    void _performUnboundedIRStable(SolRational& sol, bool& hasUnboundedRay, bool& stopped, bool& error);
 
    /// performs iterative refinement on the auxiliary problem for testing feasibility
-   void _performFeasIRStable(SolRational& sol, bool& hasDualFarkas, bool& stopped, bool& error);
+   void _performFeasIRStable(SolRational& sol, bool& withDualFarkas, bool& stopped, bool& error);
 
    /// reduces matrix coefficient in absolute value by the lifting procedure of Thiele et al. 2013
    void _lift();

@@ -152,7 +152,7 @@ void SPxSolver::perturbMin(
    Vector& p_low,
    Vector& p_up,
    Real eps,
-   Real delta,
+   Real p_delta,
    int start,
    int incr)
 {
@@ -162,12 +162,12 @@ void SPxSolver::perturbMin(
    const Real* vec = uvec.get_const_ptr();
    const Real* upd = uvec.delta().values();
    const IdxSet& idx = uvec.delta().indices();
-   Random mult(10.0 * delta, 100.0 * delta);
+   Random mult(10.0 * p_delta, 100.0 * p_delta);
    Real x, l, u;
    int i, j;
 
 #ifdef  FULL_SHIFT
-   eps = delta;
+   eps = p_delta;
 
    for (i = uvec.dim() - start - 1; i >= 0; i -= incr)
    {
@@ -219,7 +219,7 @@ void SPxSolver::perturbMax(
    Vector& p_low,
    Vector& p_up,
    Real eps,
-   Real delta,
+   Real p_delta,
    int start,
    int incr) 
 {
@@ -229,12 +229,12 @@ void SPxSolver::perturbMax(
    const Real* vec = uvec.get_const_ptr();
    const Real* upd = uvec.delta().values();
    const IdxSet& idx = uvec.delta().indices();
-   Random mult(10.0 * delta, 100.0 * delta);
+   Random mult(10.0 * p_delta, 100.0 * p_delta);
    Real x, l, u;
    int i, j;
 
 #ifdef  FULL_SHIFT
-   eps = delta;
+   eps = p_delta;
    for (i = uvec.dim() - start - 1; i >= 0; i -= incr)
    {
       u = p_up[i];

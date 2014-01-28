@@ -37,7 +37,7 @@
 namespace soplex
 {
 #define SOPLEX_VERSION         172
-#define SOPLEX_SUBVERSION        7
+#define SOPLEX_SUBVERSION        8
 
 /*-----------------------------------------------------------------------------
  * Assertion Macros etc.
@@ -150,6 +150,9 @@ typedef long double Real;
 #ifndef DEFAULT_EPS_UPDATE
 #define DEFAULT_EPS_UPDATE 1e-26
 #endif
+#ifndef DEFAULT_EPS_PIVOT
+#define DEFAULT_EPS_PIVOT 1e-20
+#endif
 ///
 #define DEFAULT_INFINITY   1e100
 
@@ -178,6 +181,9 @@ typedef float Real;
 #ifndef DEFAULT_EPS_UPDATE
 #define DEFAULT_EPS_UPDATE 1e-6
 #endif
+#ifndef DEFAULT_EPS_PIVOT
+#define DEFAULT_EPS_PIVOT 1e-6
+#endif
 #define DEFAULT_INFINITY   1e100
 
 
@@ -203,6 +209,9 @@ typedef double Real;
 #ifndef DEFAULT_EPS_UPDATE
 #define DEFAULT_EPS_UPDATE 1e-16
 #endif
+#ifndef DEFAULT_EPS_PIVOT
+#define DEFAULT_EPS_PIVOT 1e-10
+#endif
 #define DEFAULT_INFINITY   1e100
 
 
@@ -227,6 +236,8 @@ private:
    static Real s_epsilon_factorization;
    /// epsilon for factorization update
    static Real s_epsilon_update;
+   /// epsilon for pivot zero tolerance in factorization
+   static Real s_epsilon_pivot;
    /// verbosity level
    static int  s_verbose;
    //@}
@@ -257,6 +268,13 @@ public:
    }
    ///
    static void setEpsilonUpdate(Real eps);
+   ///
+   inline static Real epsilonPivot()
+      {
+         return s_epsilon_pivot;
+      }
+      ///
+   static void setEpsilonPivot(Real eps);
    /// returns verbosity level
    inline static int verbose()
    {

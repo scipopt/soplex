@@ -994,12 +994,12 @@ int SPxBoundFlippingRT::selectLeave(
          sorted = SPxQuicksortPart(breakpoints.get_ptr(), compare, sorted + 1, nBp, sortsize);
       }
       assert( breakpoints[npassedBp].src == FVEC );
-      int idx = breakpoints[npassedBp].idx;
+      int breakpointidx = breakpoints[npassedBp].idx;
       // compute new slope
       Real upper;
       Real lower;
-      Real absupd = fabs(upd[idx]);
-      SPxId baseId = thesolver->baseId(idx);
+      Real absupd = fabs(upd[breakpointidx]);
+      SPxId baseId = thesolver->baseId(breakpointidx);
       int i = thesolver->number(baseId);
       if( baseId.isSPxColId() )
       {
@@ -1050,13 +1050,13 @@ int SPxBoundFlippingRT::selectLeave(
       {
          sorted = SPxQuicksortPart(breakpoints.get_ptr(), compare, sorted + 1, nBp, sortsize);
       }
-      int idx = breakpoints[stableBp].idx;
+      int breakpointidx = breakpoints[stableBp].idx;
       assert( breakpoints[stableBp].src == FVEC );
-      Real x = upd[idx];
+      Real x = upd[breakpointidx];
       if( fabs(x) > moststable )
       {
-         stableDelta = (x > 0.0) ? ub[idx] : lb[idx];
-         stableDelta = (stableDelta - vec[idx]) / x;
+         stableDelta = (x > 0.0) ? ub[breakpointidx] : lb[breakpointidx];
+         stableDelta = (stableDelta - vec[breakpointidx]) / x;
 
          if( stableDelta <= bestDelta)
          {
@@ -1083,9 +1083,9 @@ int SPxBoundFlippingRT::selectLeave(
       if( moststable > stab )
       {
          // stability requirements are satisfied
-         int idx = breakpoints[bestBp].idx;
-         assert(idx >= 0);
-         foundStable = getData(val, leaveIdx, idx, moststable, degeneps, upd, vec, lb, ub, FVEC, max);
+         int breakpointidx = breakpoints[bestBp].idx;
+         assert(breakpointidx >= 0);
+         foundStable = getData(val, leaveIdx, breakpointidx, moststable, degeneps, upd, vec, lb, ub, FVEC, max);
       }
    }
 
@@ -1094,12 +1094,12 @@ int SPxBoundFlippingRT::selectLeave(
       // scan passed breakpoints from back to front and stop as soon as a good one is found
       while( !foundStable && npassedBp >= 0 )
       {
-         int idx = breakpoints[npassedBp].idx;
+         int breakpointidx = breakpoints[npassedBp].idx;
 
          // only look for non-basic variables
-         if( idx >= 0 )
+         if( breakpointidx >= 0 )
          {
-            foundStable = getData(val, leaveIdx, idx, moststable, degeneps, upd, vec, lb, ub, FVEC, max);
+            foundStable = getData(val, leaveIdx, breakpointidx, moststable, degeneps, upd, vec, lb, ub, FVEC, max);
          }
          --npassedBp;
       }

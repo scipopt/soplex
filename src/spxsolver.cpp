@@ -34,20 +34,23 @@ namespace soplex
 bool SPxSolver::read(std::istream& in, NameSet* rowNames, 
                   NameSet* colNames, DIdxSet* intVars)
 {
-   clear();
-   unInit();
+   if( initialized )
+   {
+      clear();
+      unInit();
+
+      if (thepricer)
+         thepricer->clear();
+
+      if (theratiotester)
+         theratiotester->clear();
+   }
+
    unLoad();
-
-   if (thepricer)
-      thepricer->clear();
-
-   if (theratiotester)
-      theratiotester->clear();
-
    if (!SPxLP::read(in, rowNames, colNames, intVars))
       return false;
 
-   SPxBasis::load(this);
+   theLP = this;
 
    return true;
 }
@@ -179,7 +182,7 @@ void SPxSolver::setType(Type tp)
       factorized = false;
       m_numCycle = 0;
 #endif
-      MSG_INFO1( spxout << "ISOLVE20 switching to "
+      MSG_INFO3( spxout << "Switching to "
                         << static_cast<const char*>((tp == LEAVE)
                            ? "leaving" : "entering")
                         << " algorithm" << std::endl; )
@@ -339,8 +342,6 @@ void SPxSolver::init()
       infeasibilitiesCo.setMax(coDim());
       isInfeasible.reSize(dim());
       isInfeasibleCo.reSize(coDim());
-      sparsityThresholdEnter = (int) (dim() * SPARSITYTHRESHOLD);
-      sparsityThresholdEnterCo = (int) (coDim() * SPARSITYTHRESHOLD);
       theratiotester->setDelta(entertol());
    }
    else
@@ -360,7 +361,6 @@ void SPxSolver::init()
       // prepare support vectors for sparse pricing
       infeasibilities.setMax(dim());
       isInfeasible.reSize(dim());
-      sparsityThresholdLeave = (int) (dim() * SPARSITYTHRESHOLD);
       theratiotester->setDelta(leavetol());
    }
 
@@ -501,11 +501,7 @@ void SPxSolver::clearUpdateVecs(void)
 void SPxSolver::factorize()
 {
 
-   MSG_INFO1( spxout << "ISOLVE01 " 
-                     << "iteration = "    << std::setw(8) << basis().iteration() 
-                     << "\tlastUpdate = " << std::setw(4) << basis().lastUpdate()
-                     << "\tvalue = "      << (initialized ? value() : 0.0)
-                     << std::endl; )
+   MSG_INFO3( spxout << " --- refactorizing basis matrix" << std::endl; )
 
    try
    {
@@ -516,7 +512,7 @@ void SPxSolver::factorize()
       assert(SPxBasis::status() == SPxBasis::SINGULAR);
       m_status = SINGULAR;
       std::stringstream s;
-      s << "XSOLVE21 Basis is singular (numerical troubles, feastol = " << feastol() << ", opttol = " << opttol() << ")";
+      s << "Basis is singular (numerical troubles, feastol = " << feastol() << ", opttol = " << opttol() << ")";
       throw SPxStatusException(s.str());
    }
 
@@ -812,6 +808,17 @@ void SPxSolver::setDelta(Real d)
    m_leavetol = d;
 }
 
+void SPxSolver::hyperPricing(bool h)
+{
+   hyperPricingEnter = h;
+   hyperPricingLeave = h;
+   if( h )
+   {
+      updateViols.setMax(dim());
+      updateViolsCo.setMax(coDim());
+   }
+}
+
 SPxSolver::SPxSolver(
    Type            p_type, 
    Representation  p_rep )
@@ -833,6 +840,8 @@ SPxSolver::SPxSolver(
    , freePricer (false)
    , freeRatioTester (false)
    , freeStarter (false)
+   , displayFreq (200)
+   , sparsePricingFactor(SPARSITYFACTOR)
    , unitVecs (0)
    , primVec (0, Param::epsilon())
    , dualVec (0, Param::epsilon())
@@ -847,6 +856,8 @@ SPxSolver::SPxSolver(
    , sparsePricingLeave(false)
    , sparsePricingEnter(false)
    , sparsePricingEnterCo(false)
+   , hyperPricingLeave(false)
+   , hyperPricingEnter(false)
    , remainingRoundsLeave(0)
    , remainingRoundsEnter(0)
    , remainingRoundsEnterCo(0)
@@ -912,6 +923,8 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       instableLeave = base.instableLeave;
       instableEnterId = base.instableEnterId;
       instableEnter = base.instableEnter;
+      displayFreq = base.displayFreq;
+      sparsePricingFactor = base.sparsePricingFactor;
       unitVecs = base.unitVecs;
       primRhs = base.primRhs;
       primVec = base.primVec;
@@ -938,12 +951,12 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       sparsePricingLeave = base.sparsePricingLeave;
       sparsePricingEnter = base.sparsePricingEnter;
       sparsePricingEnterCo = base.sparsePricingEnterCo;
+      sparsePricingFactor = base.sparsePricingFactor;
+      hyperPricingLeave = base.hyperPricingLeave;
+      hyperPricingEnter = base.hyperPricingEnter;
       remainingRoundsLeave = base.remainingRoundsLeave;
       remainingRoundsEnter = base.remainingRoundsEnter;
       remainingRoundsEnterCo = base.remainingRoundsEnterCo;
-      sparsityThresholdLeave = base.sparsityThresholdLeave;
-      sparsityThresholdEnter = base.sparsityThresholdEnter;
-      sparsityThresholdEnterCo = base.sparsityThresholdEnterCo;
 
       if (base.theRep == COLUMN)
       {
@@ -1073,6 +1086,8 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , instableLeave(base.instableLeave)
    , instableEnterId(base.instableEnterId)
    , instableEnter(base.instableEnter)
+   , displayFreq(base.displayFreq)
+   , sparsePricingFactor(base.sparsePricingFactor)
    , unitVecs(base.unitVecs)
    , primRhs(base.primRhs)
    , primVec(base.primVec)
@@ -1098,12 +1113,11 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , sparsePricingLeave(base.sparsePricingLeave)
    , sparsePricingEnter(base.sparsePricingEnter)
    , sparsePricingEnterCo(base.sparsePricingEnterCo)
+   , hyperPricingLeave(base.hyperPricingLeave)
+   , hyperPricingEnter(base.hyperPricingEnter)
    , remainingRoundsLeave(base.remainingRoundsLeave)
    , remainingRoundsEnter(base.remainingRoundsEnter)
    , remainingRoundsEnterCo(base.remainingRoundsEnterCo)
-   , sparsityThresholdLeave(base.sparsityThresholdLeave)
-   , sparsityThresholdEnter(base.sparsityThresholdEnter)
-   , sparsityThresholdEnterCo(base.sparsityThresholdEnterCo)
 {
 
    if (base.theRep == COLUMN)

@@ -32,34 +32,6 @@
 using namespace soplex;
 
 
-/// prints version and compilation options
-static
-void printVersionInfo()
-{
-   MSG_INFO1( spxout << "SoPlex version " << SOPLEX_VERSION/100
-      << "." << (SOPLEX_VERSION % 100)/10
-      << "." << SOPLEX_VERSION % 10
-#if SOPLEX_SUBVERSION > 0
-      << "." << SOPLEX_SUBVERSION
-#endif
-#ifndef NDEBUG
-      << " [mode: debug]"
-#else
-      << " [mode: optimized]"
-#endif
-      << " [precision: " << (int)sizeof(Real) << " byte]"
-#ifdef SOPLEX_WITH_GMP
-      << " [rational: gmp]"
-#elif SOPLEX_WITH_GMPXX
-      << " [rational: gmpxx]"
-#else
-      << " [rational: long double]"
-#endif
-      << " [githash: " << getGitHash() << "]\n" );
-
-   MSG_INFO1( spxout << "Copyright (c) 1996-2014 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)\n\n" );
-}
-
 // prints usage and command line options
 static
 void printUsage(const char* const argv[], int idx)
@@ -106,8 +78,6 @@ void printUsage(const char* const argv[], int idx)
              << "  <lpfile>               linear program as .mps or .lp file\n\n"
 #endif
              << usage;
-
-   exit(1);
 }
 
 // cleans up C strings
@@ -155,7 +125,7 @@ void checkSolutionReal(SoPlex& soplex)
       if( soplex.getBoundViolationReal(boundviol, sumviol) && soplex.getRowViolationReal(rowviol, sumviol) )
       {
          Real maxviol = boundviol > rowviol ? boundviol : rowviol;
-         bool feasible = maxviol < soplex.rationalParam(SoPlex::FEASTOL);
+         bool feasible = maxviol < soplex.realParam(SoPlex::FEASTOL);
          MSG_INFO1( spxout << "Primal solution " << (feasible ? "feasible" : "infeasible")
             << " in original problem (max. violation = " << maxviol << ").\n" );
       }
@@ -178,7 +148,7 @@ void checkSolutionReal(SoPlex& soplex)
       if( soplex.getRedCostViolationReal(redcostviol, sumviol) && soplex.getDualViolationReal(dualviol, sumviol) )
       {
          Real maxviol = redcostviol > dualviol ? redcostviol : dualviol;
-         bool feasible = maxviol < soplex.rationalParam(SoPlex::OPTTOL);
+         bool feasible = maxviol < soplex.realParam(SoPlex::OPTTOL);
          MSG_INFO1( spxout << "Dual solution " << (feasible ? "feasible" : "infeasible")
             << " in original problem (max. violation = " << maxviol << ").\n" );
       }
@@ -207,7 +177,7 @@ void checkSolutionRational(SoPlex& soplex)
       if( soplex.getBoundViolationRational(boundviol, sumviol) && soplex.getRowViolationRational(rowviol, sumviol) )
       {
          Rational maxviol = boundviol > rowviol ? boundviol : rowviol;
-         bool feasible = maxviol < soplex.rationalParam(SoPlex::FEASTOL);
+         bool feasible = maxviol < soplex.realParam(SoPlex::FEASTOL);
          MSG_INFO1( spxout << "Primal solution " << (feasible ? "feasible" : "infeasible")
             << " in original problem (max. violation = " << maxviol << ").\n" );
       }
@@ -230,7 +200,7 @@ void checkSolutionRational(SoPlex& soplex)
       if( soplex.getRedCostViolationRational(redcostviol, sumviol) && soplex.getDualViolationRational(dualviol, sumviol) )
       {
          Rational maxviol = redcostviol > dualviol ? redcostviol : dualviol;
-         bool feasible = maxviol < soplex.rationalParam(SoPlex::OPTTOL);
+         bool feasible = maxviol < soplex.realParam(SoPlex::OPTTOL);
          MSG_INFO1( spxout << "Dual solution " << (feasible ? "feasible" : "infeasible")
             << " in original problem (max. violation = " << maxviol << ").\n" );
       }
@@ -283,13 +253,17 @@ int main(int argc, char* argv[])
    bool displayStatistics = false;
    bool checkSol = false;
 
-   printVersionInfo();
+   soplex.printVersion();
+   MSG_INFO1( spxout << "Copyright (c) 1996-2014 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)\n\n" );
 
    try
    {
       // no options were given
       if( argc <= 1 )
+      {
          printUsage(argv, 0);
+         return 1;
+      }
 
       // read arguments from command line
       for( optidx = 1; optidx < argc; optidx++ )
@@ -307,6 +281,7 @@ int main(int argc, char* argv[])
          {
             freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
             printUsage(argv, optidx);
+            return 1;
          }
 
          switch( option[1] )
@@ -321,7 +296,7 @@ int main(int argc, char* argv[])
                   if( readbasname == 0 )
                   {
                      char* filename = &option[8];
-                     readbasname = strcpy(new char[strlen(filename) + 1], filename);
+                     readbasname = strncpy(new char[strlen(filename) + 1], filename, strlen(filename) + 1);
                   }
                }
                // --writebas=<basfile> : write terminal basis to file
@@ -330,7 +305,7 @@ int main(int argc, char* argv[])
                   if( writebasname == 0 )
                   {
                      char* filename = &option[9];
-                     writebasname = strcpy(new char[strlen(filename) + 1], filename);
+                     writebasname = strncpy(new char[strlen(filename) + 1], filename, strlen(filename) + 1);
                   }
                }
                // --loadset=<setfile> : load parameters from settings file
@@ -339,11 +314,12 @@ int main(int argc, char* argv[])
                   if( loadsetname == 0 )
                   {
                      char* filename = &option[8];
-                     loadsetname = strcpy(new char[strlen(filename) + 1], filename);
+                     loadsetname = strncpy(new char[strlen(filename) + 1], filename, strlen(filename) + 1);
                      if( !soplex.loadSettingsFile(loadsetname) )
                      {
                         freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                         printUsage(argv, optidx);
+                        return 1;
                      }
                      else
                      {
@@ -358,7 +334,7 @@ int main(int argc, char* argv[])
                   if( savesetname == 0 )
                   {
                      char* filename = &option[8];
-                     savesetname = strcpy(new char[strlen(filename) + 1], filename);
+                     savesetname = strncpy(new char[strlen(filename) + 1], filename, strlen(filename) + 1);
                   }
                }
                // --diffset=<setfile> : save modified parameters to settings file
@@ -367,7 +343,7 @@ int main(int argc, char* argv[])
                   if( diffsetname == 0 )
                   {
                      char* filename = &option[8];
-                     diffsetname = strcpy(new char[strlen(filename) + 1], filename);
+                     diffsetname = strncpy(new char[strlen(filename) + 1], filename, strlen(filename) + 1);
                   }
                }
                // --readmode=<value> : choose reading mode for <lpfile> (0* - floating-point, 1 - rational)
@@ -377,6 +353,7 @@ int main(int argc, char* argv[])
                   {
                      freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                      printUsage(argv, optidx);
+                     return 1;
                   }
                   // if the LP is parsed rationally and might be solved rationally, we choose automatic syncmode such that
                   // the rational LP is kept after reading
@@ -393,6 +370,7 @@ int main(int argc, char* argv[])
                   {
                      freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                      printUsage(argv, optidx);
+                     return 1;
                   }
                   // if the LP is parsed rationally and might be solved rationally, we choose automatic syncmode such that
                   // the rational LP is kept after reading
@@ -407,6 +385,7 @@ int main(int argc, char* argv[])
                {
                   freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                   printUsage(argv, optidx);
+                  return 1;
                }
                break;
             }
@@ -417,6 +396,7 @@ int main(int argc, char* argv[])
             {
                freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
+               return 1;
             }
             break;
 
@@ -426,24 +406,27 @@ int main(int argc, char* argv[])
             {
                freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
+               return 1;
             }
             break;
 
          case 'f' :
             // -f<eps> : set primal feasibility tolerance to <eps>
-            if( !soplex.setRationalParam(SoPlex::FEASTOL, atof(&option[2])) )
+            if( !soplex.setRealParam(SoPlex::FEASTOL, atof(&option[2])) )
             {
                freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
+               return 1;
             }
             break;
 
          case 'o' :
             // -o<eps> : set dual feasibility (optimality) tolerance to <eps>
-            if( !soplex.setRationalParam(SoPlex::OPTTOL, atof(&option[2])) )
+            if( !soplex.setRealParam(SoPlex::OPTTOL, atof(&option[2])) )
             {
                freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
+               return 1;
             }
             break;
 
@@ -453,6 +436,7 @@ int main(int argc, char* argv[])
             {
                freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
+               return 1;
             }
             break;
 
@@ -462,6 +446,7 @@ int main(int argc, char* argv[])
             {
                freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
+               return 1;
             }
             break;
 
@@ -471,6 +456,7 @@ int main(int argc, char* argv[])
             {
                freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
+               return 1;
             }
             break;
 
@@ -480,6 +466,7 @@ int main(int argc, char* argv[])
             {
                freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
+               return 1;
             }
             break;
 
@@ -508,6 +495,7 @@ int main(int argc, char* argv[])
             {
                freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
+               return 1;
             }
          }
       }
@@ -517,6 +505,7 @@ int main(int argc, char* argv[])
       {
          freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
          printUsage(argv, 0);
+         return 1;
       }
 
       // ensure that syncmode is not manual
@@ -524,7 +513,7 @@ int main(int argc, char* argv[])
       {
          MSG_ERROR( spxout << "Error: manual synchronization is invalid on command line.  Change parameter int:syncmode.\n" );
          freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
-         exit(1);
+         return 1;
       }
 
       // save settings files
@@ -554,7 +543,7 @@ int main(int argc, char* argv[])
          }
 
          freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
-         exit(0);
+         return 0;
       }
 
       // measure time for reading LP file and basis file
@@ -570,7 +559,7 @@ int main(int argc, char* argv[])
       {
          MSG_ERROR( spxout << "Error while reading file <" << lpfilename << ">.\n" );
          freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
-         exit(1);
+         return 1;
       }
 
       // read basis file if specified
@@ -581,7 +570,7 @@ int main(int argc, char* argv[])
          {
             MSG_ERROR( spxout << "Error while reading file <" << readbasname << ">.\n" );
             freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
-            exit(1);
+            return 1;
          }
       }
 
@@ -630,7 +619,7 @@ int main(int argc, char* argv[])
          {
             MSG_ERROR( spxout << "Error while writing file <" << writebasname << ">.\n\n" );
             freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
-            exit(1);
+            return 1;
          }
          else
          {
@@ -642,9 +631,9 @@ int main(int argc, char* argv[])
    {
       MSG_ERROR( spxout << "Exception caught: " << x.what() << "\n" );
       freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
-      exit(1);
+      return 1;
    }
 
    freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
-   exit(0);
+   return 0;
 }

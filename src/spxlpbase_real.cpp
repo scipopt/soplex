@@ -881,7 +881,7 @@ bool SPxLPBase<Real>::readLPF(
 syntax_error:
    if( finished )
    {
-      MSG_INFO2( spxout << "ILPFRD14 Finished reading " << lineno << " lines" << std::endl; )
+      MSG_INFO2( spxout << "Finished reading " << lineno << " lines" << std::endl; )
    }
    else
       MSG_ERROR( spxout << "ELPFRD15 Syntax error in line " << lineno << std::endl; )
@@ -1901,12 +1901,12 @@ static void MPSwriteRecord(
 
    if( name1 != 0 )
    {
-      sprintf(buf, "  %-8.8s  %.15" REAL_FORMAT, name1, value1);
+      sprintf(buf, "  %-8.8s  %.15" "f", name1, value1);
       os << buf;
 
       if( name2 != 0 )
       {
-         sprintf(buf, "   %-8.8s  %.15" REAL_FORMAT, name2, value2);
+         sprintf(buf, "   %-8.8s  %.15" "f", name2, value2);
          os << buf;
       }
    }

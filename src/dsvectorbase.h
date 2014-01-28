@@ -62,7 +62,8 @@ private:
    void allocMem(int n)
    {
       spx_alloc(theelem, n);
-      theelem = new (theelem) Nonzero<R>[n]();
+      for( int i = 0; i < n; i++ )
+         new (&(theelem[i])) Nonzero<R>();
       SVectorBase<R>::setMem(n, theelem);
    }
 
@@ -247,15 +248,20 @@ public:
 
       Nonzero<R>* newmem = 0;
 
-      /* allocate and initialize new memory */
+      /* allocate new memory */
       spx_alloc(newmem, len);
-      newmem = new (newmem) Nonzero<R>[len]();
 
-      for( int i = 0; i < siz; i++ )
-         newmem[i] = theelem[i];
+      /* call copy constructor for first elements */
+      int i;
+      for( i = 0; i < siz; i++ )
+         new ((&newmem[i])) Nonzero<R>(theelem[i]);
+
+      /* call default constructor for remaining elements */
+      for( ; i < len; i++ )
+         new ((&newmem[i])) Nonzero<R>();
 
       /* free old memory */
-      for( int i = SVectorBase<R>::max()-1; i >= 0; i-- )
+      for( i = SVectorBase<R>::max()-1; i >= 0; i-- )
          theelem[i].~Nonzero<R>();
 
       spx_free(theelem);

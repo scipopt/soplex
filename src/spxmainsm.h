@@ -1200,7 +1200,7 @@ public:
       return simplify(lp, eps, delta, delta);
    }
    /// simplify SPxLP \p lp with independent primal and dual feasibility tolerance.
-   virtual Result simplify(SPxLP& lp, Real eps, Real feastol, Real opttol, bool keepbounds = false);
+   virtual Result simplify(SPxLP& lp, Real eps, Real ftol, Real otol, bool keepbounds = false);
 
    /// reconstructs an optimal solution for the unsimplified LP.
    virtual void unsimplify(const Vector& x, const Vector& y, const Vector& s, const Vector& r,

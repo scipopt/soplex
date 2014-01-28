@@ -21,6 +21,7 @@
 
 #include "spxdefines.h"
 #include "spxratiotester.h"
+#include "spxpricer.h"
 #include "spxout.h"
 #include "exceptions.h"
 
@@ -107,6 +108,7 @@ void SPxSolver::computeTest()
    Real pricingTol = leavetol();
    infeasibilitiesCo.clear();
    int ninfeasibilities = 0;
+   int sparsitythreshold = (int) (sparsePricingFactor * coDim());
 
    for(int i = 0; i < coDim(); ++i)
    {
@@ -116,7 +118,7 @@ void SPxSolver::computeTest()
       {
          theTest[i] = 0.0;
          if( remainingRoundsEnterCo == 0 )
-            isInfeasibleCo[i] = false;
+            isInfeasibleCo[i] = SPxPricer::NOT_VIOLATED;
       }
       else
       {
@@ -129,14 +131,14 @@ void SPxSolver::computeTest()
             {
                assert(infeasibilitiesCo.size() < infeasibilitiesCo.max());
                infeasibilitiesCo.addIdx(i);
-               isInfeasibleCo[i] = true;
+               isInfeasibleCo[i] = SPxPricer::VIOLATED;
                ++ninfeasibilities;
             }
             else
-               isInfeasibleCo[i] = false;
-            if( ninfeasibilities > sparsityThresholdEnterCo )
+               isInfeasibleCo[i] = SPxPricer::NOT_VIOLATED;
+            if( ninfeasibilities > sparsitythreshold)
             {
-               MSG_INFO2( spxout << "IENTER04 too many infeasibilities for sparse pricing"
+               MSG_INFO2( spxout << " --- using dense pricing"
                                  << std::endl; )
                remainingRoundsEnterCo = DENSEROUNDS;
                sparsePricingEnterCo = false;
@@ -147,15 +149,20 @@ void SPxSolver::computeTest()
    }
    if( ninfeasibilities == 0 && !sparsePricingEnterCo )
       --remainingRoundsEnterCo;
-   else if( ninfeasibilities <= sparsityThresholdEnterCo && !sparsePricingEnterCo )
+   else if( ninfeasibilities <= sparsitythreshold && !sparsePricingEnterCo )
    {
       std::streamsize prec = spxout.precision();
-      MSG_INFO2( spxout << "IENTER03 sparse pricing active, "
-                        << "sparsity: "
-                        << std::setw(6) << std::fixed << std::setprecision(4)
-                        << (Real) ninfeasibilities/coDim()
-                        << std::scientific << std::setprecision(int(prec))
-                        << std::endl; )
+      MSG_INFO2(
+         if( hyperPricingEnter )
+            spxout << " --- using hypersparse pricing, ";
+         else
+            spxout << " --- using sparse pricing, ";
+         spxout << "sparsity: "
+                << std::setw(6) << std::fixed << std::setprecision(4)
+                << (Real) ninfeasibilities/coDim()
+                << std::scientific << std::setprecision(int(prec))
+                << std::endl;
+      )
       sparsePricingEnterCo = true;
    }
 }
@@ -221,6 +228,7 @@ void SPxSolver::computeCoTest()
    Real pricingTol = leavetol();
    infeasibilities.clear();
    int ninfeasibilities = 0;
+   int sparsitythreshold = (int) (sparsePricingFactor * dim());
    const SPxBasis::Desc& ds = desc();
 
    for (i = dim() - 1; i >= 0; --i)
@@ -230,7 +238,7 @@ void SPxSolver::computeCoTest()
       {
          theCoTest[i] = 0;
          if( remainingRoundsEnter == 0 )
-            isInfeasible[i] = false;
+            isInfeasible[i] = SPxPricer::NOT_VIOLATED;
       }
       else
       {
@@ -241,14 +249,14 @@ void SPxSolver::computeCoTest()
             {
                assert(infeasibilities.size() < infeasibilities.max());
                infeasibilities.addIdx(i);
-               isInfeasible[i] = true;
+               isInfeasible[i] = SPxPricer::VIOLATED;
                ++ninfeasibilities;
             }
             else
-               isInfeasible[i] = false;
-            if( ninfeasibilities > sparsityThresholdEnter )
+               isInfeasible[i] = SPxPricer::NOT_VIOLATED;
+            if( ninfeasibilities > sparsitythreshold )
             {
-               MSG_INFO2( spxout << "IENTER06 too many infeasibilities for sparse pricing"
+               MSG_INFO2( spxout << " --- using dense pricing"
                                  << std::endl; )
                remainingRoundsEnter = DENSEROUNDS;
                sparsePricingEnter = false;
@@ -259,13 +267,20 @@ void SPxSolver::computeCoTest()
    }
    if( ninfeasibilities == 0 && !sparsePricingEnter )
       --remainingRoundsEnter;
-   else if( ninfeasibilities <= sparsityThresholdEnter && !sparsePricingEnter )
+   else if( ninfeasibilities <= sparsitythreshold && !sparsePricingEnter )
    {
-      MSG_INFO2( spxout << "IENTER05 sparse pricing active, "
-                        << "sparsity: "
-                        << std::setw(6) << std::fixed << std::setprecision(4)
-                        << (Real) ninfeasibilities/dim()
-                        << std::endl; )
+      std::streamsize prec = spxout.precision();
+      MSG_INFO2(
+         if( hyperPricingEnter )
+            spxout << " --- using hypersparse pricing, ";
+         else
+            spxout << " --- using sparse pricing, ";
+         spxout << "sparsity: "
+                << std::setw(6) << std::fixed << std::setprecision(4)
+                << (Real) ninfeasibilities/dim()
+                << std::scientific << std::setprecision(int(prec))
+                << std::endl;
+      )
       sparsePricingEnter = true;
    }
 }
@@ -284,6 +299,7 @@ void SPxSolver::updateTest()
    Real pricingTol = leavetol();
 
    int i;
+   updateViolsCo.clear();
    for (i = idx.size() - 1; i >= 0; --i)
    {
       int j = idx.index(i);
@@ -292,18 +308,30 @@ void SPxSolver::updateTest()
       {
          theTest[j] = test(j, stat);
 
-         if( sparsePricingEnterCo && theTest[j] < -pricingTol )
+         if( sparsePricingEnterCo )
          {
-            assert(remainingRoundsEnterCo == 0);
-            if( !isInfeasibleCo[j] )
+            if( theTest[j] < -pricingTol )
             {
-               infeasibilitiesCo.addIdx(j);
-               isInfeasibleCo[j] = true;
+               assert(remainingRoundsEnterCo == 0);
+               if( isInfeasibleCo[j] == SPxPricer::NOT_VIOLATED )
+               {
+                  infeasibilitiesCo.addIdx(j);
+                  isInfeasibleCo[j] = SPxPricer::VIOLATED;
+               }
+               if( hyperPricingEnter )
+                  updateViolsCo.addIdx(j);
+            }
+            else
+            {
+               isInfeasibleCo[j] = SPxPricer::NOT_VIOLATED;
             }
          }
       }
       else
+      {
+         isInfeasibleCo[j] = SPxPricer::NOT_VIOLATED;
          theTest[j] = 0;
+      }
    }
 }
 
@@ -316,6 +344,7 @@ void SPxSolver::updateCoTest()
    Real pricingTol = leavetol();
 
    int i;
+   updateViols.clear();
    for (i = idx.size() - 1; i >= 0; --i)
    {
       int j = idx.index(i);
@@ -324,18 +353,32 @@ void SPxSolver::updateCoTest()
       {
          theCoTest[j] = coTest(j, stat);
 
-         if( sparsePricingEnter && theCoTest[j] < -pricingTol )
+         if( sparsePricingEnter )
          {
-            assert(remainingRoundsEnter == 0);
-            if( !isInfeasible[j] )
+            if( theCoTest[j] < -pricingTol )
             {
-               infeasibilities.addIdx(j);
-               isInfeasible[j] = true;
+               assert(remainingRoundsEnter == 0);
+               if( isInfeasible[j] == SPxPricer::NOT_VIOLATED )
+               {
+                  //                if( !hyperPricingEnter )
+                  infeasibilities.addIdx(j);
+                  isInfeasible[j] = SPxPricer::VIOLATED;
+               }
+               if( hyperPricingEnter )
+                  updateViols.addIdx(j);
+            }
+            else
+            {
+               // @todo do we need to remove index j from infeasibilitiesCo?
+               isInfeasible[j] = SPxPricer::NOT_VIOLATED;
             }
          }
       }
       else
+      {
+         isInfeasible[j] = SPxPricer::NOT_VIOLATED;
          theCoTest[j] = 0;
+      }
    }
 }
 
@@ -854,9 +897,15 @@ SPxSolver::ungetEnterVal(
       (*theFrhs)[enterIdx] += leaveVal;
    }
    if (isId(enterId))
+   {
       theTest[enterIdx] = 0;
+      isInfeasibleCo[enterIdx] = SPxPricer::NOT_VIOLATED;
+   }
    else
+   {
       theCoTest[enterIdx] = 0;
+      isInfeasible[enterIdx] = SPxPricer::NOT_VIOLATED;
+   }
 }
 
 void SPxSolver::rejectEnter(
@@ -1161,10 +1210,10 @@ bool SPxSolver::enter(SPxId& enterId)
 
          for( int j = 0; j < fVec().delta().size(); ++j )
          {
-            SPxId id = baseId(fVec().idx().index(j));
+            SPxId spxid = baseId(fVec().idx().index(j));
 
-            if( id.isSPxRowId() )
-               dualFarkas.add(number(SPxRowId(id)), sign * fVec().delta().value(j));
+            if( spxid.isSPxRowId() )
+               dualFarkas.add(number(SPxRowId(spxid)), sign * fVec().delta().value(j));
          }
 
          if( enterId.isSPxRowId() )

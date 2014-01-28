@@ -190,7 +190,7 @@ int SPxFastRT::maxDelta(
       for (i = 0; uval < uend; ++uval, ++i)
       {
          x = *uval;
-         if (x)
+         if (x != 0.0)
          {
             if (x >= -epsilon && x <= epsilon)
             {
@@ -345,7 +345,7 @@ int SPxFastRT::minDelta(
       {
          x = *uval;
 
-         if (x)
+         if (x != 0.0)
          {
             if (x >= -epsilon && x <= epsilon)
             {

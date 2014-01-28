@@ -71,6 +71,14 @@ private:
    DVector workVec;
    /// working vector
    SSVector workRhs;
+   /// temporary array of precomputed pricing values
+   DataArray<IdxElement> prices;
+   /// temporary array of precomputed pricing values
+   DataArray<IdxElement> pricesCo;
+   /// array of best pricing candidates
+   DIdxSet bestPrices;
+   /// array of best pricing candidates
+   DIdxSet bestPricesCo;
    ///
    Real pi_p;
    ///
@@ -97,10 +105,17 @@ private:
    //@}
 
    //-------------------------------------
+   /// prepare data structures for hyper sparse pricing
+   int buildBestPriceVectorLeave( Real feastol );
    /// implementation of full pricing
    int selectLeaveX(Real tol);
    /// implementation of sparse pricing in the leaving Simplex
    int selectLeaveSparse(Real tol);
+   /// implementation of hyper sparse pricing in the leaving Simplex
+   int selectLeaveHyper(Real tol);
+   /// build up vector of pricing values for later use
+   SPxId buildBestPriceVectorEnterDim(Real& best, Real feastol);
+   SPxId buildBestPriceVectorEnterCoDim(Real& best, Real feastol);
    /// choose the best entering index among columns and rows but prefer sparsity
    SPxId selectEnterX(Real tol);
    /// implementation of sparse pricing for the entering Simplex (slack variables)
@@ -111,6 +126,10 @@ private:
    SPxId selectEnterDenseDim(Real& best, Real tol);
    /// implementation of selectEnter() in dense case
    SPxId selectEnterDenseCoDim(Real& best, Real tol);
+   /// implementation of hyper sparse pricing in the entering Simplex
+   SPxId selectEnterHyperDim(Real& best, Real feastol);
+   /// implementation of hyper sparse pricing in the entering Simplex
+   SPxId selectEnterHyperCoDim(Real& best, Real feastol);
 
 public:
 

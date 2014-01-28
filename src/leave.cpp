@@ -21,6 +21,7 @@
 #include <stdio.h>
 
 #include "spxdefines.h"
+#include "spxpricer.h"
 #include "spxsolver.h"
 #include "spxratiotester.h"
 #include "spxout.h"
@@ -44,6 +45,7 @@ void SPxSolver::computeFtest()
    Real theeps = entertol();
    infeasibilities.clear();
    int ninfeasibilities = 0;
+   int sparsitythreshold = (int) (sparsePricingFactor * dim());
 
    for( int i = 0; i < dim(); ++i )
    {
@@ -55,16 +57,15 @@ void SPxSolver::computeFtest()
       {
          if( theCoTest[i] < -theeps )
          {
-            assert(infeasibilities.size() < infeasibilities.max());
             infeasibilities.addIdx(i);
-            isInfeasible[i] = true;
+            isInfeasible[i] = SPxPricer::VIOLATED;
             ++ninfeasibilities;
          }
          else
-            isInfeasible[i] = false;
-         if( ninfeasibilities > sparsityThresholdLeave )
+            isInfeasible[i] = SPxPricer::NOT_VIOLATED;
+         if( ninfeasibilities > sparsitythreshold )
          {
-            MSG_INFO2( spxout << "ILEAVE05 too many infeasibilities for sparse pricing"
+            MSG_INFO2( spxout << " --- using dense pricing"
                               << std::endl; )
             remainingRoundsLeave = DENSEROUNDS;
             sparsePricingLeave = false;
@@ -77,15 +78,20 @@ void SPxSolver::computeFtest()
    {
       --remainingRoundsLeave;
    }
-   else if( ninfeasibilities <= sparsityThresholdLeave && !sparsePricingLeave )
+   else if( ninfeasibilities <= sparsitythreshold && !sparsePricingLeave )
    {
       std::streamsize prec = spxout.precision();
-      MSG_INFO2( spxout << "ILEAVE04 sparse pricing active, "
-                        << "sparsity: "
-                        << std::setw(6) << std::fixed << std::setprecision(4)
-                        << (Real) ninfeasibilities/dim()
-                        << std::scientific << std::setprecision(int(prec))
-                        << std::endl; )
+      MSG_INFO2(
+         if( hyperPricingLeave )
+            spxout << " --- using hypersparse pricing, ";
+         else
+            spxout << " --- using sparse pricing, ";
+         spxout << "sparsity: "
+                << std::setw(6) << std::fixed << std::setprecision(4)
+                << (Real) ninfeasibilities/dim()
+                << std::scientific << std::setprecision(int(prec))
+                << std::endl;
+      )
       sparsePricingLeave = true;
    }
 }
@@ -98,6 +104,7 @@ void SPxSolver::updateFtest()
 
    assert(type() == LEAVE);
 
+   updateViols.clear();
    Real theeps = entertol();
    for (int j = idx.size() - 1; j >= 0; --j)
    {
@@ -109,11 +116,16 @@ void SPxSolver::updateFtest()
       if( sparsePricingLeave && ftest[i] < -theeps )
       {
          assert(remainingRoundsLeave == 0);
-         if( !isInfeasible[i] )
+         if( isInfeasible[i] == SPxPricer::NOT_VIOLATED )
          {
+            // this can cause problems - we cannot keep on adding indeces to infeasibilities,
+            // because they are not deleted in hyper mode...
+//             if( !hyperPricingLeave )
             infeasibilities.addIdx(i);
-            isInfeasible[i] = true;
+            isInfeasible[i] = SPxPricer::VIOLATED;
          }
+         if( hyperPricingLeave )
+            updateViols.addIdx(i);
       }
    }
    // if boundflips were performed, we need to update these indices as well
@@ -799,7 +811,7 @@ bool SPxSolver::leave(int leaveIdx)
                   /**@todo if shift() is not zero we must not conclude unboundedness */
                   if (rep() == ROW)
                   {
-                     int sign;
+                     Real sign;
 
                      primalRay.clear();
                      primalRay.setMax(coPvec().delta().size());
@@ -812,7 +824,7 @@ bool SPxSolver::leave(int leaveIdx)
                   }
                   else
                   {
-                     int sign;
+                     Real sign;
                      int i;
 
                      dualFarkas.clear();

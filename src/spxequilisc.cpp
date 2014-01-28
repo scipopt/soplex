@@ -55,7 +55,7 @@ Real SPxEquiliSC::computeScale(Real /*mini*/, Real maxi) const
 void SPxEquiliSC::scale(SPxLP& lp) 
 {
 
-   MSG_INFO1( spxout << "IEQUSC01 Equilibrium scaling LP" << std::endl; )
+   MSG_INFO1( spxout << "Equilibrium scaling LP" << std::endl; )
 
    setup(lp);
 
@@ -80,7 +80,7 @@ void SPxEquiliSC::scale(SPxLP& lp)
 
    bool colFirst = colratio < rowratio;
 
-   MSG_INFO2( spxout << "IEQUSC02 LP scaling statistics:" 
+   MSG_INFO2( spxout << "LP scaling statistics:"
                         << " min= " << lp.minAbsNzo()
                         << " max= " << lp.maxAbsNzo()
                         << " col-ratio= " << colratio 
@@ -102,14 +102,14 @@ void SPxEquiliSC::scale(SPxLP& lp)
    }
    applyScaling(lp);
 
-   MSG_INFO3( spxout << "IEQUSC03 \tRow scaling min= " << minAbsRowscale()
+   MSG_INFO3( spxout << "Row scaling min= " << minAbsRowscale()
                         << " max= " << maxAbsRowscale()
                         << std::endl
                         << "\tCol scaling min= " << minAbsColscale()
                         << " max= " << maxAbsColscale()
                         << std::endl; )
 
-   MSG_INFO2( spxout << "IEQUSC04 LP scaling statistics:" 
+   MSG_INFO2( spxout << "LP scaling statistics:"
                         << " min= " << lp.minAbsNzo()
                         << " max= " << lp.maxAbsNzo()
                         << " col-ratio= " << maxColRatio(lp) 

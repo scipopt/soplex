@@ -240,6 +240,14 @@ public:
    {
       return solveCount;
    }
+   /// reset timers and counters
+   void resetCounters()
+   {
+      factorTime.reset();
+      solveTime.reset();
+      factorCount = 0;
+      solveCount = 0;
+   }
    /// prints the LU factorization to stdout.
    void dump() const;
 

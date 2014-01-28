@@ -189,10 +189,10 @@ static int NameSetNameHashFunction(const NameSet::Name* str)
    while(*sptr != '\0')
    {
       res *= 65;
-      res += *sptr++ - int('0');
+      res += (unsigned int) (*sptr++ - int('0'));
       res %= 0x0fffffff;
    }
-   return res;
+   return ((int) res);
 }
 
 #if 0

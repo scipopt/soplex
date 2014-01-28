@@ -28,6 +28,7 @@ const Real infinity                 = DEFAULT_INFINITY;
 Real Param::s_epsilon               = DEFAULT_EPS_ZERO;
 Real Param::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
 Real Param::s_epsilon_update        = DEFAULT_EPS_UPDATE;
+Real Param::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
 int  Param::s_verbose               = 1;
 
 bool msginconsistent(const char* name, const char* file, int line)
@@ -55,6 +56,11 @@ void Param::setEpsilonFactorization(Real eps)
 void Param::setEpsilonUpdate(Real eps)
 {
    s_epsilon_update = eps;
+}
+
+void Param::setEpsilonPivot(Real eps)
+{
+   s_epsilon_pivot = eps;
 }
 
 void Param::setVerbose(int p_verbose)

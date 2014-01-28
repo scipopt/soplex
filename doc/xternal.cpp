@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 /**@mainpage Overview
-   @version  1.7.2.7
+   @version  1.7.2.8
    @author   Roland Wunderling
    @author   Tobias Achterberg
    @author   Timo Berthold
@@ -222,8 +222,7 @@
  */
 //-----------------------------------------------------------------------------
 /**@page FAQ Frequently Asked Questions
- * \htmlinclude faq.inc
- * \htmlinclude faqcss.inc
+ * \htmlinclude faq_new.inc
  */           
 //-----------------------------------------------------------------------------
 /**@page FLAGS How to use the flags in the example program

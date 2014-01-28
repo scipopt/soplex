@@ -78,8 +78,8 @@ int SPxDantzigPR::selectLeaveSparse()
       else
       {
          thesolver->infeasibilities.remove(i);
-         assert(thesolver->isInfeasible[index]);
-         thesolver->isInfeasible[index] = false;
+         assert(thesolver->isInfeasible[index] > 0);
+         thesolver->isInfeasible[index] = 0;
       }
    }
    return n;
@@ -145,7 +145,7 @@ SPxId SPxDantzigPR::selectEnterSparseDim(Real& best,SPxId& enterId)
          thesolver->infeasibilities.remove(i);
 
          assert(thesolver->isInfeasible[idx]);
-         thesolver->isInfeasible[idx] = false;
+         thesolver->isInfeasible[idx] = 0;
       }
    }
    return enterId;
@@ -176,9 +176,8 @@ SPxId SPxDantzigPR::selectEnterSparseCoDim(Real& best,SPxId& enterId)
       else
       {
          thesolver->infeasibilitiesCo.remove(i);
-
-         assert(thesolver->isInfeasibleCo[idx]);
-         thesolver->isInfeasibleCo[idx] = false;
+         assert(thesolver->isInfeasibleCo[idx] > 0);
+         thesolver->isInfeasibleCo[idx] = 0;
       }
    }
    return enterId;

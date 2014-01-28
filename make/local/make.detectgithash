@@ -4,7 +4,7 @@
 #*       SoPlex --- the Sequential object-oriented simPlex.                  */
 #*                                                                           */
 #*    Copyright (C) 1997-1999 Roland Wunderling                              */
-#*                  1997-2011 Konrad-Zuse-Zentrum                            */
+#*                  1997-2014 Konrad-Zuse-Zentrum                            */
 #*                            fuer Informationstechnik Berlin                */
 #*                                                                           */
 #*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -20,11 +20,8 @@
 
 
 SPXGITHASHFILE = $(SRCDIR)/git_hash.cpp
-SPXGITHASH = $(shell git describe --always --dirty)
+SPXGITHASH = $(shell git describe --always --dirty  | sed 's/^.*-g//')
 
 .PHONY: githash
 githash:: # do not remove the double-colon
 	    @echo "#define SPX_GITHASH \"$(SPXGITHASH)\"" > $(SPXGITHASHFILE)
-
-# rule for generating the git_hash.cpp
-$(SPXGITHASHFILE): githash

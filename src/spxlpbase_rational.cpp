@@ -915,7 +915,7 @@ bool SPxLPBase<Rational>::readLPF(
 syntax_error:
    if( finished )
    {
-      MSG_INFO2( spxout << "ILPFRD14 Finished reading " << lineno << " lines" << std::endl; )
+      MSG_INFO2( spxout << "Finished reading " << lineno << " lines" << std::endl; )
    }
    else
       MSG_ERROR( spxout << "ELPFRD15 Syntax error in line " << lineno << std::endl; )
@@ -1350,7 +1350,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
             }
 
             // EQ
-            if( (double(rset.lhs(idx)) > -double(infinity)) && double((rset.rhs_w(idx)) <  double(infinity)) )
+            if( (double(rset.lhs(idx)) > -double(infinity)) && (double(rset.rhs_w(idx)) < double(infinity)) )
             {
                assert(rset.lhs(idx) == rset.rhs(idx));
 
@@ -1550,8 +1550,8 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
  *
  *  @return true if the file was read correctly.
  */
-#define INIT_COLS 10000 ///< initialy allocated columns.
-#define INIT_NZOS 100000 ///< initialy allocated non zeros.
+#define INIT_COLS 1000 ///< initialy allocated columns.
+#define INIT_NZOS 5000 ///< initialy allocated non zeros.
 template <>
 bool SPxLPBase<Rational>::readMPS(
    std::istream& p_input,           ///< input stream.
@@ -1819,7 +1819,7 @@ static void LPFwriteRow(
    LPFwriteSVector(p_lp, p_output, p_cnames, p_svec);
 
    long long sidelen;
-   sidelen = (p_lhs == p_rhs || double(p_lhs) <= double(-infinity)) ? rationalToString(p_rhs, false).length() : rationalToString(p_lhs, false).length();
+   sidelen = (p_lhs == p_rhs || double(p_lhs) <= double(-infinity)) ? (long long)rationalToString(p_rhs, false).length() : (long long)rationalToString(p_lhs, false).length();
 
    // insert a line break if max line length is in danger of being exceeded
    if( (long long)(p_output.tellp()) - pos + sidelen + (long long)100 > MAX_LINE_WRITE_LEN )
@@ -2210,9 +2210,9 @@ void SPxLPBase<Rational>::writeMPS(
       {
          if( (double(lhs(i)) > -double(infinity)) && (double(rhs(i)) < double(infinity)) )
          {
-            Rational value = rhs(i);
-            value -= lhs(i);
-            MPSwriteRecord(p_output, "", "RANGE", MPSgetRowName(*this, i, p_rnames, name1), value);
+            Rational range = rhs(i);
+            range -= lhs(i);
+            MPSwriteRecord(p_output, "", "RANGE", MPSgetRowName(*this, i, p_rnames, name1), range);
          }
       }
    }

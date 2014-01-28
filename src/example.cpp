@@ -30,24 +30,24 @@ int main()
    SoPlex mysoplex;
 
    /* set the objective sense */
-   mysoplex.changeSense(SPxLP::MINIMIZE);
+   mysoplex.setIntParam(SoPlex::OBJSENSE, SoPlex::OBJSENSE_MINIMIZE);
 
    /* we first add variables */
    DSVector dummycol(0);
-   mysoplex.addCol(LPCol(2.0, dummycol, infinity, 15.0));
-   mysoplex.addCol(LPCol(3.0, dummycol, infinity, 20.0));
+   mysoplex.addColReal(LPCol(2.0, dummycol, infinity, 15.0));
+   mysoplex.addColReal(LPCol(3.0, dummycol, infinity, 20.0));
 
    /* then constraints one by one */
    DSVector row1(2);
    row1.add(0, 1.0);
    row1.add(1, 5.0);
-   mysoplex.addRow(LPRow(100.0, row1, infinity));
+   mysoplex.addRowReal(LPRow(100.0, row1, infinity));
 
    /* NOTE: alternatively, we could have added the matrix nonzeros in dummycol already; nonexisting rows are then
     * automatically created. */
 
    /* write LP in .lp format */
-   mysoplex.writeFile("dump.lp", NULL, NULL, NULL);
+   mysoplex.writeFileReal("dump.lp", NULL, NULL, NULL);
 
    /* solve LP */
    SPxSolver::Status stat;
@@ -58,10 +58,10 @@ int main()
    /* get solution */
    if( stat == SPxSolver::OPTIMAL )
    {
-      mysoplex.getPrimal(prim);
-      mysoplex.getDual(dual);
+      mysoplex.getPrimalReal(prim);
+      mysoplex.getDualReal(dual);
       std::cout << "LP solved to optimality.\n";
-      std::cout << "Objective value is " << mysoplex.objValue() << ".\n";
+      std::cout << "Objective value is " << mysoplex.objValueReal() << ".\n";
       std::cout << "Primal solution is [" << prim[0] << ", " << prim[1] << "].\n";
       std::cout << "Dual solution is [" << dual[0] << "].\n";
    }
