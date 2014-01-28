@@ -49,8 +49,10 @@ namespace soplex
       /// array of names for real parameters
       static std::string _realParamName[SoPlex::REALPARAM_COUNT];
 
+#ifdef SOPLEX_WITH_RATIONALPARAM
       /// array of names for rational parameters
       static std::string _rationalParamName[SoPlex::RATIONALPARAM_COUNT];
+#endif
 
       /// array of descriptions for boolean parameters
       static std::string _boolParamDescription[SoPlex::BOOLPARAM_COUNT];
@@ -61,8 +63,10 @@ namespace soplex
       /// array of descriptions for real parameters
       static std::string _realParamDescription[SoPlex::REALPARAM_COUNT];
 
+#ifdef SOPLEX_WITH_RATIONALPARAM
       /// array of descriptions for rational parameters
       static std::string _rationalParamDescription[SoPlex::RATIONALPARAM_COUNT];
+#endif
 
       /// array of default values for boolean parameters
       static bool _boolParamDefault[SoPlex::BOOLPARAM_COUNT];
@@ -73,8 +77,10 @@ namespace soplex
       /// array of default values for real parameters
       static Real _realParamDefault[SoPlex::REALPARAM_COUNT];
 
+#ifdef SOPLEX_WITH_RATIONALPARAM
       /// array of default values for rational parameters
       static Rational _rationalParamDefault[SoPlex::RATIONALPARAM_COUNT];
+#endif
 
       /// array of lower bounds for real parameter values
       static Real _realParamLower[SoPlex::REALPARAM_COUNT];
@@ -82,11 +88,13 @@ namespace soplex
       /// array of upper bounds for real parameter values
       static Real _realParamUpper[SoPlex::REALPARAM_COUNT];
 
+#ifdef SOPLEX_WITH_RATIONALPARAM
       /// array of lower bounds for rational parameter values
       static Rational _rationalParamLower[SoPlex::RATIONALPARAM_COUNT];
 
       /// array of upper bounds for rational parameter values
       static Rational _rationalParamUpper[SoPlex::RATIONALPARAM_COUNT];
+#endif
 
       /// have static arrays been initialized?
       static bool _defaultsAndBoundsInitialized;
@@ -100,8 +108,10 @@ namespace soplex
       /// array of current real parameter values
       Real _realParamValues[SoPlex::REALPARAM_COUNT];
 
+#ifdef SOPLEX_WITH_RATIONALPARAM
       /// array of current rational parameter values
       Rational _rationalParamValues[SoPlex::RATIONALPARAM_COUNT];
+#endif
 
       /// default constructor initializing default settings
       Settings()
@@ -214,6 +224,20 @@ namespace soplex
             _intParamDescription[SoPlex::HYPER_PRICING] = "mode for hyper sparse pricing (0 - off, 1 - auto, 2 - always)";
             _intParamDefault[SoPlex::HYPER_PRICING] = SoPlex::HYPER_PRICING_OFF;
 
+            // primal feasibility tolerance
+            _realParamName[SoPlex::FEASTOL] = "feastol";
+            _realParamDescription[SoPlex::FEASTOL] = "primal feasibility tolerance";
+            _realParamLower[SoPlex::FEASTOL] = 0.0;
+            _realParamUpper[SoPlex::FEASTOL] = 1.0;
+            _realParamDefault[SoPlex::FEASTOL] = 1e-6;
+
+            // dual feasibility tolerance
+            _realParamName[SoPlex::OPTTOL] = "opttol";
+            _realParamDescription[SoPlex::OPTTOL] = "dual feasibility tolerance";
+            _realParamLower[SoPlex::OPTTOL] = 0.0;
+            _realParamUpper[SoPlex::OPTTOL] = 1.0;
+            _realParamDefault[SoPlex::OPTTOL] = 1e-6;
+
             ///@todo define suitable values depending on Real type
             // general zero tolerance
             _realParamName[SoPlex::EPSILON_ZERO] = "epsilon_zero";
@@ -317,20 +341,6 @@ namespace soplex
             _realParamUpper[SoPlex::SPARSITY_THRESHOLD] = 1.0;
             _realParamDefault[SoPlex::SPARSITY_THRESHOLD] = 0.6;
 
-            // primal feasibility tolerance
-            _rationalParamName[SoPlex::FEASTOL] = "feastol";
-            _rationalParamDescription[SoPlex::FEASTOL] = "primal feasibility tolerance";
-            _rationalParamLower[SoPlex::FEASTOL] = 0.0;
-            _rationalParamUpper[SoPlex::FEASTOL] = 1.0;
-            _rationalParamDefault[SoPlex::FEASTOL] = Rational(1)/Rational(1000000);
-
-            // dual feasibility tolerance
-            _rationalParamName[SoPlex::OPTTOL] = "opttol";
-            _rationalParamDescription[SoPlex::OPTTOL] = "dual feasibility tolerance";
-            _rationalParamLower[SoPlex::OPTTOL] = 0.0;
-            _rationalParamUpper[SoPlex::OPTTOL] = 1.0;
-            _rationalParamDefault[SoPlex::OPTTOL] = Rational(1)/Rational(1000000);
-
             _defaultsAndBoundsInitialized = true;
          }
 
@@ -343,8 +353,10 @@ namespace soplex
          for( int i = 0; i < SoPlex::REALPARAM_COUNT; i++ )
             _realParamValues[i] = _realParamDefault[i];
 
+#ifdef SOPLEX_WITH_RATIONALPARAM
          for( int i = 0; i < SoPlex::RATIONALPARAM_COUNT; i++ )
             _rationalParamValues[i] = _rationalParamDefault[i];
+#endif
       }
 
       /// copy constructor
@@ -365,8 +377,10 @@ namespace soplex
          for( int i = 0; i < SoPlex::REALPARAM_COUNT; i++ )
             _realParamValues[i] = settings._realParamValues[i];
 
+#ifdef SOPLEX_WITH_RATIONALPARAM
          for( int i = 0; i < SoPlex::RATIONALPARAM_COUNT; i++ )
             _rationalParamValues[i] = settings._rationalParamValues[i];
+#endif
 
          return *this;
       }
@@ -398,11 +412,13 @@ namespace soplex
 
 
 
+#ifdef SOPLEX_WITH_RATIONALPARAM
    std::string SoPlex::Settings::_rationalParamName[SoPlex::RATIONALPARAM_COUNT];
    std::string SoPlex::Settings::_rationalParamDescription[SoPlex::RATIONALPARAM_COUNT];
    Rational SoPlex::Settings::_rationalParamLower[SoPlex::RATIONALPARAM_COUNT];
    Rational SoPlex::Settings::_rationalParamUpper[SoPlex::RATIONALPARAM_COUNT];
    Rational SoPlex::Settings::_rationalParamDefault[SoPlex::RATIONALPARAM_COUNT];
+#endif
 
 
 
@@ -2078,7 +2094,7 @@ namespace soplex
       // decide whether to solve the rational LP with iterative refinement or call the standard floating-point solver
       if( Rational::precision() < INT_MAX
           || intParam(SoPlex::SOLVEMODE) == SOLVEMODE_REAL || (intParam(SoPlex::SOLVEMODE) == SOLVEMODE_AUTO
-            && GE(Real(rationalParam(SoPlex::FEASTOL)), 1e-9) && GE(Real(rationalParam(SoPlex::OPTTOL)), 1e-9)) )
+             && GE(realParam(SoPlex::FEASTOL), 1e-9) && GE(realParam(SoPlex::OPTTOL), 1e-9)) )
       {
          _solveReal();
       }
@@ -3884,6 +3900,7 @@ namespace soplex
 
 
 
+#ifdef SOPLEX_WITH_RATIONALPARAM
    /// returns rational parameter value
    Rational SoPlex::rationalParam(const RationalParam param) const
    {
@@ -3891,6 +3908,7 @@ namespace soplex
       assert(param < RATIONALPARAM_COUNT);
       return _currentSettings->_rationalParamValues[param];
    }
+#endif
 
 
 
@@ -4201,6 +4219,16 @@ namespace soplex
 
       switch( param )
       {
+      // primal feasibility tolerance
+      case SoPlex::FEASTOL:
+         _solver.setFeastol(value);
+         break;
+
+      // dual feasibility tolerance
+      case SoPlex::OPTTOL:
+         _solver.setOpttol(value);
+         break;
+
       // general zero tolerance
       case SoPlex::EPSILON_ZERO:
          Param::setEpsilon(value);
@@ -4267,6 +4295,7 @@ namespace soplex
 
 
 
+#ifdef SOPLEX_WITH_RATIONALPARAM
    /// sets rational parameter value; returns true on success
    bool SoPlex::setRationalParam(const RationalParam param, const Rational value, const bool quiet, const bool init)
    {
@@ -4282,23 +4311,15 @@ namespace soplex
 
       switch( param )
       {
-      // primal feasibility tolerance
-      case SoPlex::FEASTOL:
-         _solver.setFeastol(Real(value));
-         break;
-
-      // dual feasibility tolerance
-      case SoPlex::OPTTOL:
-         _solver.setOpttol(Real(value));
-         break;
-
       default:
+         // currently, there are no rational-valued parameters
          return false;
       }
 
       _currentSettings->_rationalParamValues[param] = value;
       return true;
    }
+#endif
 
 
 
@@ -4320,8 +4341,10 @@ namespace soplex
       for( int i = 0; i < SoPlex::REALPARAM_COUNT; i++ )
          success &= setRealParam((RealParam)i, _currentSettings->_realParamValues[i], quiet, init);
 
+#ifdef SOPLEX_WITH_RATIONALPARAM
       for( int i = 0; i < SoPlex::RATIONALPARAM_COUNT; i++ )
          success &= setRationalParam((RationalParam)i, _currentSettings->_rationalParamValues[i], quiet, init);
+#endif
 
       assert(_isConsistent());
 
@@ -4376,6 +4399,7 @@ namespace soplex
          file << "real:" << _currentSettings->_realParamName[i] << " = " << _currentSettings->_realParamValues[i] << "\n";
       }
 
+#ifdef SOPLEX_WITH_RATIONALPARAM
       for( int i = 0; i < SoPlex::RATIONALPARAM_COUNT; i++ )
       {
          if( onlyChanged && _currentSettings->_rationalParamValues[i] == _currentSettings->_rationalParamDefault[i] )
@@ -4387,6 +4411,7 @@ namespace soplex
             << "], default " << _currentSettings->_rationalParamDefault[i] << "\n";
          file << "rational:" << _currentSettings->_rationalParamName[i] << " = " << _currentSettings->_rationalParamValues[i] << "\n";
       }
+#endif
 
       return true;
    }
@@ -4641,6 +4666,7 @@ namespace soplex
          return true;
       }
 
+#ifdef SOPLEX_WITH_RATIONALPARAM
       // check whether we have a rational parameter
       if( strncmp(paramTypeString, "rational", 8) == 0 )
       {
@@ -4667,6 +4693,7 @@ namespace soplex
 
          return true;
       }
+#endif
 
       MSG_ERROR( spxout << "Error parsing setting string: invalid parameter type <" << paramTypeString << "> for parameter <" << paramName << ">.\n" );
 
@@ -5408,6 +5435,7 @@ namespace soplex
          return true;
       }
 
+#ifdef SOPLEX_WITH_RATIONALPARAM
       // check whether we have a rational parameter
       if( strncmp(paramTypeString, "rational", 8) == 0 )
       {
@@ -5434,6 +5462,7 @@ namespace soplex
 
          return true;
       }
+#endif
 
       MSG_ERROR( spxout << "Error parsing settings file: invalid parameter type <" << paramTypeString << "> for parameter <" << paramName << "> in line " << lineNumber << ".\n" );
 

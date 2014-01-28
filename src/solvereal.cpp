@@ -205,7 +205,7 @@ namespace soplex
       SPxSimplifier::Result simplificationStatus = SPxSimplifier::OKAY;
       if( _simplifier != 0 )
       {
-         simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlex::EPSILON_ZERO), Real(rationalParam(SoPlex::FEASTOL)), Real(rationalParam(SoPlex::OPTTOL)));
+         simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlex::EPSILON_ZERO), realParam(SoPlex::FEASTOL), realParam(SoPlex::OPTTOL));
          _solver.changeObjOffset(_simplifier->getObjoffset());
       }
 

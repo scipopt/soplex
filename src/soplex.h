@@ -984,64 +984,66 @@ public:
    /// real parameters
    typedef enum
    {
+      /// primal feasibility tolerance
+      FEASTOL = 0,
+
+      /// dual feasibility tolerance
+      OPTTOL = 1,
+
       /// general zero tolerance
-      EPSILON_ZERO = 0,
+      EPSILON_ZERO = 2,
 
       /// zero tolerance used in factorization
-      EPSILON_FACTORIZATION = 1,
+      EPSILON_FACTORIZATION = 3,
 
       /// zero tolerance used in update of the factorization
-      EPSILON_UPDATE = 2,
+      EPSILON_UPDATE = 4,
 
       /// pivot zero tolerance used in factorization
-      EPSILON_PIVOT = 3,
+      EPSILON_PIVOT = 5,
 
       /// infinity threshold
-      INFTY = 4,
+      INFTY = 6,
 
       /// time limit in seconds (INFTY if unlimited)
-      TIMELIMIT = 5,
+      TIMELIMIT = 7,
 
       /// lower limit on objective value
-      OBJLIMIT_LOWER = 6,
+      OBJLIMIT_LOWER = 8,
 
       /// upper limit on objective value
-      OBJLIMIT_UPPER = 7,
+      OBJLIMIT_UPPER = 9,
 
       /// working tolerance for feasibility in floating-point solver during iterative refinement
-      FPFEASTOL = 8,
+      FPFEASTOL = 10,
 
       /// working tolerance for optimality in floating-point solver during iterative refinement
-      FPOPTTOL = 9,
+      FPOPTTOL = 11,
 
       /// maximum increase of scaling factors between refinements
-      MAXSCALEINCR = 10,
+      MAXSCALEINCR = 12,
 
       /// lower threshold in lifting (nonzero matrix coefficients with smaller absolute value will be reformulated)
-      LIFTMINVAL = 11,
+      LIFTMINVAL = 13,
 
       /// upper threshold in lifting (nonzero matrix coefficients with larger absolute value will be reformulated)
-      LIFTMAXVAL = 12,
+      LIFTMAXVAL = 14,
 
       /// sparse pricing threshold (#violations < dimension * SPARSITY_THRESHOLD activates sparse pricing)
-      SPARSITY_THRESHOLD = 13,
+      SPARSITY_THRESHOLD = 15,
 
       /// number of real parameters
-      REALPARAM_COUNT = 14
+      REALPARAM_COUNT = 16
    } RealParam;
 
+#ifdef SOPLEX_WITH_RATIONALPARAM
    /// rational parameters
    typedef enum
    {
-      /// primal feasibility tolerance
-      FEASTOL,
-
-      /// dual feasibility tolerance
-      OPTTOL,
-
       /// number of rational parameters
-      RATIONALPARAM_COUNT = 2
+      RATIONALPARAM_COUNT = 0
    } RationalParam;
+#endif
 
    /// class of parameter settings
    class Settings;
@@ -1055,8 +1057,10 @@ public:
    /// returns real parameter value
    Real realParam(const RealParam param) const;
 
+#ifdef SOPLEX_WITH_RATIONALPARAM
    /// returns rational parameter value
    Rational rationalParam(const RationalParam param) const;
+#endif
 
    /// returns current parameter settings
    const Settings& settings() const;
@@ -1070,8 +1074,10 @@ public:
    /// sets real parameter value; returns true on success
    bool setRealParam(const RealParam param, const Real value, const bool quiet = false, const bool init = false);
 
+#ifdef SOPLEX_WITH_RATIONALPARAM
    /// sets rational parameter value; returns true on success
    bool setRationalParam(const RationalParam param, const Rational value, const bool quiet = false, const bool init = false);
+#endif
 
    /// sets parameter settings; returns true on success
    bool setSettings(const Settings& newSettings, const bool quiet = false, const bool init = false);
