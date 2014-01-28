@@ -4789,7 +4789,7 @@ namespace soplex
       printStatus(os, _status);
       os << "Solving time (sec)  : " << std::fixed << std::setprecision(2) << _statistics->solvingTime.userTime() << "\n"
          << "Iterations          : " << _statistics->iterations << "\n"
-         << "Objective value     : " << std::scientific << objValueReal() << std::fixed << "\n";
+         << "Objective value     : " << std::scientific << std::setprecision(8) << objValueReal() << std::fixed << "\n";
    }
 
 

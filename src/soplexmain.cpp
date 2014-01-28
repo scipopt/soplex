@@ -603,7 +603,9 @@ int main(int argc, char* argv[])
                                     << std::setprecision(9)
                                     << primal[i] << std::endl; )
             }
-            MSG_INFO1( spxout << "All other variables are zero (within " << std::setprecision(1) << std::scientific << Param::epsilon() << ")." << std::endl; )
+            MSG_INFO1( spxout << "All other variables are zero (within "
+                              << std::setprecision(1) << std::scientific << Param::epsilon()
+                              << std::setprecision(8) << std::fixed << ")." << std::endl; )
          }
          else
             MSG_INFO1( spxout << "No primal solution available.")
@@ -623,7 +625,9 @@ int main(int argc, char* argv[])
                                     << std::setprecision(9)
                                     << dual[i] << std::endl; )
             }
-            MSG_INFO1( spxout << "All other dual values are zero (within " << std::setprecision(1) << std::scientific << Param::epsilon() << ")." << std::endl; )
+            MSG_INFO1( spxout << "All other dual values are zero (within "
+                              << std::setprecision(1) << std::scientific << Param::epsilon()
+                              << std::setprecision(8) << std::fixed << ")." << std::endl; )
          }
          else
             MSG_INFO1( spxout << "No dual solution available.")
