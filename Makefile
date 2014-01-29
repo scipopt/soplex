@@ -238,6 +238,7 @@ BASE		=	$(OSTYPE).$(ARCH).$(COMP).$(OPT)
 
 LASTSETTINGS	=	$(OBJDIR)/make.lastsettings
 
+SPXGITHASHFILE	=	$(SRCDIR)/git_hash.cpp
 
 #------------------------------------------------------------------------------
 #--- NOTHING TO CHANGE FROM HERE ON -------------------------------------------
@@ -506,6 +507,11 @@ touchexternal:	$(GMPDEP) $(ZLIBDEP) | $(OBJDIR)
 ifneq ($(SPXGITHASH),$(LAST_SPXGITHASH))
 		@-$(MAKE) githash
 endif
+		@$(SHELL) -ec 'if test ! -e $(SPXGITHASHFILE) ; \
+			then \
+				echo "-> generating $(SPXGITHASHFILE)" ; \
+				@-$(MAKE) githash ; \
+			fi'
 ifneq ($(GMP),$(LAST_GMP))
 		@-touch $(GMPSRC)
 endif
