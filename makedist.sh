@@ -28,6 +28,10 @@ $NAME/COPYING \
 $NAME/INSTALL \
 $NAME/CHANGELOG \
 $NAME/Makefile \
+$NAME/check/check.sh \
+$NAME/check/evaluation.py \
+$NAME/check/instances/* \
+$NAME/check/test.sh \
 $NAME/check/testset/netlib.test \
 $NAME/check/testset/quick.test \
 $NAME/check/testset/mittelmann.test \
@@ -36,9 +40,6 @@ $NAME/check/testset/netlib.solu \
 $NAME/check/testset/quick.solu \
 $NAME/check/testset/mittelmann.solu \
 $NAME/check/testset/infeas.solu \
-$NAME/check/test.sh \
-$NAME/check/evaluation.py \
-$NAME/check/instances/* \
 $NAME/doc/soplex.dxy \
 $NAME/doc/soplex.css \
 $NAME/doc/soplexfooter.html \
