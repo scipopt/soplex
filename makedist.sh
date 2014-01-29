@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION="1.7.2.8"
+VERSION="2.0.0a"
 NAME="soplex-$VERSION"
 rm -f $NAME
 ln -s . $NAME
@@ -56,10 +56,11 @@ $NAME/src/*cpp
 rm -f $NAME
 
 echo ""
-echo "check version numbers in src/spxdefines.h, doc/xternal.cpp, Makefile and makedist.sh ($VERSION):"
+echo "check version numbers in src/spxdefines.h, doc/xternal.cpp, Makefile, Makefile.nmake, and makedist.sh ($VERSION):"
 grep "VERSION" src/spxdefines.h
 grep "@version" doc/xternal.cpp
 grep "^VERSION" Makefile
+grep "^VERSION" Makefile.nmake
 grep "^VERSION" makedist.sh
 echo "check copyright info in doxygen documentation:"
 grep "2003" doc/soplexfooter.html
