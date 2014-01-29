@@ -27,16 +27,16 @@ $NAME/COPYING \
 $NAME/INSTALL \
 $NAME/CHANGELOG \
 $NAME/Makefile \
-$NAME/check/netlib.test \
-$NAME/check/quick.test \
-$NAME/check/mittelmann.test \
-$NAME/check/infeas.test \
-$NAME/check/netlib.solu \
-$NAME/check/quick.solu \
-$NAME/check/mittelmann.solu \
-$NAME/check/infeas.solu \
-$NAME/check/check.sh \
-$NAME/check/check.awk \
+$NAME/check/testset/netlib.test \
+$NAME/check/testset/quick.test \
+$NAME/check/testset/mittelmann.test \
+$NAME/check/testset/infeas.test \
+$NAME/check/testset/netlib.solu \
+$NAME/check/testset/quick.solu \
+$NAME/check/testset/mittelmann.solu \
+$NAME/check/testset/infeas.solu \
+$NAME/check/test.sh \
+$NAME/check/evaluation.py \
 $NAME/check/instances/* \
 $NAME/doc/soplex.dxy \
 $NAME/doc/soplex.css \
@@ -47,6 +47,9 @@ $NAME/doc/xternal.cpp \
 $NAME/doc/inc/faq.inc \
 $NAME/doc/inc/faqcss.inc \
 $NAME/make/make* \
+$NAME/settings/default.set \
+$NAME/settings/devex.set \
+$NAME/settings/steep.set \
 $NAME/src/depend* \
 $NAME/src/*h \
 $NAME/src/*cpp
