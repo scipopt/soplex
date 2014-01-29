@@ -115,8 +115,11 @@ public:
 
    // ------------------------------------------------------------------------------------------------------------------
 
-
+   /// applies given scaler to the lp
    void applyScaler(SPxScaler* scaler);
+
+   /// unscales the lp and clears basis
+   void unscaleLP();
 
    /**@name Inquiry */
    //@{

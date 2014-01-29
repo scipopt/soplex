@@ -78,6 +78,19 @@ namespace soplex
          if( !_isRealLPLoaded )
          {
             _solver.changeObjOffset(0.0);
+
+            if( _scaler != 0 )
+            {
+               _solver.unscaleLPandClearBasis();
+               _hasBasis = false;
+            }
+            _preprocessAndSolveReal(false);
+            return;
+         }
+         else if( _scaler != 0 )
+         {
+            _solver.unscaleLPandClearBasis();
+            _hasBasis = false;
             _preprocessAndSolveReal(false);
             return;
          }
@@ -90,6 +103,19 @@ namespace soplex
          if( !_isRealLPLoaded )
          {
             _solver.changeObjOffset(0.0);
+
+            if( _scaler != 0 )
+            {
+               _solver.unscaleLPandClearBasis();
+               _hasBasis = false;
+            }
+            _preprocessAndSolveReal(false);
+            return;
+         }
+         else if( _scaler != 0 )
+         {
+            _solver.unscaleLPandClearBasis();
+            _hasBasis = false;
             _preprocessAndSolveReal(false);
             return;
          }
@@ -100,6 +126,19 @@ namespace soplex
          if( !_isRealLPLoaded )
          {
             _solver.changeObjOffset(0.0);
+
+            if( _scaler != 0 )
+            {
+               _solver.unscaleLPandClearBasis();
+               _hasBasis = false;
+            }
+            _preprocessAndSolveReal(false);
+            return;
+         }
+         else if( _scaler != 0 )
+         {
+            _solver.unscaleLPandClearBasis();
+            _hasBasis = false;
             _preprocessAndSolveReal(false);
             return;
          }
@@ -153,15 +192,15 @@ namespace soplex
             ? realParam(SoPlex::OBJLIMIT_UPPER) : realParam(SoPlex::INFTY));
       }
 
-      applyPreprocessing = (_simplifier != 0 || _scaler != 0);
+      bool applySimplifier= (_simplifier != 0);
 
       if( _isRealLPLoaded )
       {
          assert(_realLP == &_solver);
 
          // preprocessing is always applied to the LP in the solver; hence we have to create a copy of the original LP
-         // if preprocessing is turned on
-         if( applyPreprocessing )
+         // if simplifier is turned on
+         if( applySimplifier)
          {
             _realLP = 0;
             spx_alloc(_realLP);
@@ -187,9 +226,9 @@ namespace soplex
             _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
          }
 
-         // if there is no preprocessing, then the original and the transformed problem are identical and it is more
+         // if there is no simplifier, then the original and the transformed problem are identical and it is more
          // memory-efficient to keep only the problem in the solver
-         if( !applyPreprocessing )
+         if( !applySimplifier )
          {
             _realLP->~SPxLPReal();
             spx_free(_realLP);
@@ -198,9 +237,9 @@ namespace soplex
          }
       }
 
-      // assert that we have two problems if and only if we apply preprocessing
-      assert(_realLP == &_solver || applyPreprocessing);
-      assert(_realLP != &_solver || !applyPreprocessing);
+      // assert that we have two problems if and only if we apply the simplifier
+      assert(_realLP == &_solver || applySimplifier);
+      assert(_realLP != &_solver || !applySimplifier);
 
       // apply problem simplification
       SPxSimplifier::Result simplificationStatus = SPxSimplifier::OKAY;
@@ -220,7 +259,6 @@ namespace soplex
          if( _scaler != 0 )
          {
             _solver.applyScaler(_scaler);
-            //_scaler->scale(_solver);
          }
 
          _solveRealLPAndRecordStatistics();
@@ -235,7 +273,7 @@ namespace soplex
    /// loads original problem into solver and solves again after it has been solved to optimality with preprocessing
    void SoPlex::_resolveWithoutPreprocessing(SPxSimplifier::Result simplificationStatus)
    {
-      assert(!_isRealLPLoaded);
+      assert(!_isRealLPLoaded || _scaler != 0);
       assert(_simplifier != 0 || _scaler != 0);
       assert(simplificationStatus == SPxSimplifier::VANISHED
          || (simplificationStatus == SPxSimplifier::OKAY && _solver.status() == SPxSolver::OPTIMAL));

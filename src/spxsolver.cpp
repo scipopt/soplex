@@ -491,6 +491,14 @@ void SPxSolver::clear()
    isInfeasibleCo.clear();
 }
 
+void SPxSolver::unscaleLPandClearBasis()
+{
+   unscaleLP();
+   setBasisStatus(SPxBasis::NO_PROBLEM);
+   SPxBasis::reDim();
+   return;
+}
+
 void SPxSolver::clearUpdateVecs(void)
 {
    theFvec->clearUpdate();

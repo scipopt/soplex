@@ -41,6 +41,18 @@ void SPxLPBase<Real>::applyScaler(SPxScaler* scaler)
    isScaled = true;
 }
 
+template<>
+void SPxLPBase<Real>::unscaleLP()
+{
+   if( isScaled )
+   {
+      lp_scaler->unscale(*this);
+      isScaled = false;
+   }
+
+   return;
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 //  Specialization for reading LP format
 // ---------------------------------------------------------------------------------------------------------------------
