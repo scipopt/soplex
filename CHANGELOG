@@ -1,8 +1,8 @@
 (maintain each list from top to bottom)
 
 
-Developer version
-=================
+Release Candidate 2.0
+=====================
 
 code quality & new features:
 - new/delete calls are modified to channel memory (de)allocation through spx_alloc calls (-> "placement new")
@@ -35,17 +35,24 @@ fixed bugs:
 - (co)solve calls in SPxBasis do not trigger factorization() of SPxSolver but of SPxBasis
 - fixed bug in unShift(): shifted bounds were not set to their original value even if the corresponding value was within
   the original bounds (feasibility tolerance was checked in wrong direction)
-- fixed minor bug in SVSet::add()
 - fixed behaviour in instable leave/enter: pricing values are now restored, before the instable pivot is performed
 - do a better check in precisionReached() by first recomputing correct test/coTest/fTest values
 - fixed MSG system to prevent unnecessary executions/operations in non-printed calls
 - throw exception if immediately after a restart the basis matrix is infeasible
-- restore slack basis if a basis with too many or too few basic entries is loaded
-- higher precison when writing .lp or .mps files, similar to SCIP standards
 - correct update of infeasibilities after dual bound flips
 
 performance:
 - potentially faster loops in vector classes
+
+
+
+16 Oct 2013 - Release 1.7.2
+===========================
+
+fixed bugs:
+- fixed minor bug in SVSet::add()
+- restore slack basis if a basis with too many or too few basic entries is loaded
+- higher precison when writing .lp or .mps files, similar to SCIP standards
 
 
 
