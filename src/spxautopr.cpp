@@ -43,6 +43,7 @@ void SPxAutoPR::setEpsilon(Real eps)
 {
    steep.setEpsilon(eps);
    devex.setEpsilon(eps);
+   theeps = eps;
 }
 
 void SPxAutoPR::setType(SPxSolver::Type tp)
