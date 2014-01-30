@@ -4737,15 +4737,15 @@ namespace soplex
          if( getRowViolationRational(maxviol, sumviol) )
             os << "  Max/sum row       : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
          else
-            os << "  Max/sum bound     : - / -\n";
+            os << "  Max/sum row       : - / -\n";
          if( getRedCostViolationRational(maxviol, sumviol) )
             os << "  Max/sum redcost   : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
          else
-            os << "  Max/sum bound     : - / -\n";
+            os << "  Max/sum redcost   : - / -\n";
          if( getDualViolationRational(maxviol, sumviol) )
             os << "  Max/sum dual      : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
          else
-            os << "  Max/sum bound     : - / -\n";
+            os << "  Max/sum dual      : - / -\n";
       }
       else
       {
@@ -4760,15 +4760,15 @@ namespace soplex
          if( getRowViolationReal(maxviol, sumviol) )
             os << "  Max/sum row       : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
          else
-            os << "  Max/sum bound     : - / -\n";
+            os << "  Max/sum row       : - / -\n";
          if( getRedCostViolationReal(maxviol, sumviol) )
             os << "  Max/sum redcost   : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
          else
-            os << "  Max/sum bound     : - / -\n";
+            os << "  Max/sum redcost   : - / -\n";
          if( getDualViolationReal(maxviol, sumviol) )
             os << "  Max/sum dual      : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
          else
-            os << "  Max/sum bound     : - / -\n";
+            os << "  Max/sum dual      : - / -\n";
       }
    }
 
