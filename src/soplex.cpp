@@ -242,40 +242,40 @@ namespace soplex
             // general zero tolerance
             _realParamName[SoPlex::EPSILON_ZERO] = "epsilon_zero";
             _realParamDescription[SoPlex::EPSILON_ZERO] = "general zero tolerance";
-            _realParamLower[SoPlex::EPSILON_ZERO] = DEFAULT_EPS_ZERO;
-            _realParamUpper[SoPlex::EPSILON_ZERO] = DEFAULT_EPS_ZERO;
+            _realParamLower[SoPlex::EPSILON_ZERO] = 0.0;
+            _realParamUpper[SoPlex::EPSILON_ZERO] = 1.0;
             _realParamDefault[SoPlex::EPSILON_ZERO] = DEFAULT_EPS_ZERO;
 
             ///@todo define suitable values depending on Real type
             // zero tolerance used in factorization
             _realParamName[SoPlex::EPSILON_FACTORIZATION] = "epsilon_factorization";
             _realParamDescription[SoPlex::EPSILON_FACTORIZATION] = "zero tolerance used in factorization";
-            _realParamLower[SoPlex::EPSILON_FACTORIZATION] = DEFAULT_EPS_FACTOR;
-            _realParamUpper[SoPlex::EPSILON_FACTORIZATION] = DEFAULT_EPS_FACTOR;
+            _realParamLower[SoPlex::EPSILON_FACTORIZATION] = 0.0;
+            _realParamUpper[SoPlex::EPSILON_FACTORIZATION] = 1.0;
             _realParamDefault[SoPlex::EPSILON_FACTORIZATION] = DEFAULT_EPS_FACTOR;
 
             ///@todo define suitable values depending on Real type
             // zero tolerance used in update of the factorization
             _realParamName[SoPlex::EPSILON_UPDATE] = "epsilon_update";
             _realParamDescription[SoPlex::EPSILON_UPDATE] = "zero tolerance used in update of the factorization";
-            _realParamLower[SoPlex::EPSILON_UPDATE] = DEFAULT_EPS_UPDATE;
-            _realParamUpper[SoPlex::EPSILON_UPDATE] = DEFAULT_EPS_UPDATE;
+            _realParamLower[SoPlex::EPSILON_UPDATE] = 0.0;
+            _realParamUpper[SoPlex::EPSILON_UPDATE] = 1.0;
             _realParamDefault[SoPlex::EPSILON_UPDATE] = DEFAULT_EPS_UPDATE;
 
             ///@todo define suitable values depending on Real type
             // pivot zero tolerance used in factorization
             _realParamName[SoPlex::EPSILON_PIVOT] = "epsilon_pivot";
             _realParamDescription[SoPlex::EPSILON_PIVOT] = "pivot zero tolerance used in factorization";
-            _realParamLower[SoPlex::EPSILON_PIVOT] = DEFAULT_EPS_PIVOT;
-            _realParamUpper[SoPlex::EPSILON_PIVOT] = DEFAULT_EPS_PIVOT;
+            _realParamLower[SoPlex::EPSILON_PIVOT] = 0.0;
+            _realParamUpper[SoPlex::EPSILON_PIVOT] = 1.0;
             _realParamDefault[SoPlex::EPSILON_PIVOT] = DEFAULT_EPS_PIVOT;
 
             ///@todo define suitable values depending on Real type
             // infinity threshold
             _realParamName[SoPlex::INFTY] = "infty";
             _realParamDescription[SoPlex::INFTY] = "infinity threshold";
-            _realParamLower[SoPlex::INFTY] = DEFAULT_INFINITY;
-            _realParamUpper[SoPlex::INFTY] = DEFAULT_INFINITY;
+            _realParamLower[SoPlex::INFTY] = 1e10;
+            _realParamUpper[SoPlex::INFTY] = 1e100;
             _realParamDefault[SoPlex::INFTY] = DEFAULT_INFINITY;
 
             // time limit in seconds (INFTY if unlimited)
