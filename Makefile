@@ -338,7 +338,7 @@ ifeq ($(ZLIB_LDFLAGS),)
 ZLIB		=	false
 endif
 ifeq ($(ZLIB),true)
-CPPFLAGS	+=	-DWITH_ZLIB $(ZLIB_FLAGS)
+CPPFLAGS	+=	-DSOPLEX_WITH_ZLIB $(ZLIB_FLAGS)
 LDFLAGS		+=	$(ZLIB_LDFLAGS)
 endif
 
@@ -485,7 +485,7 @@ depend:
 		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(LIBOBJDIR\)/\1.o|g'\'' \
 		>>$(DEPEND)'
 		@echo `grep -l "SOPLEX_WITH_GMP" $(SRCDIR)/*` >$(GMPDEP)
-		@echo `grep -l "WITH_ZLIB" $(SRCDIR)/*` >$(ZLIBDEP)
+		@echo `grep -l "SOPLEX_WITH_ZLIB" $(SRCDIR)/*` >$(ZLIBDEP)
 
 -include	$(DEPEND)
 

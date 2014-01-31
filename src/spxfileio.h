@@ -31,17 +31,17 @@
  * compressed file support
  *-----------------------------------------------------------------------------
  */
-#ifdef WITH_ZLIB
+#ifdef SOPLEX_WITH_ZLIB
 #include "gzstream.h"
 #endif // WITH_GSZSTREAM
 
 namespace soplex
 {
-#ifdef WITH_ZLIB
+#ifdef SOPLEX_WITH_ZLIB
    typedef gzstream::igzstream spxifstream;
 #else
    typedef std::ifstream spxifstream;
-#endif // WITH_ZLIB
+#endif // SOPLEX_WITH_ZLIB
 
 } // namespace soplex
 #endif // _SPXFILEIO_H_

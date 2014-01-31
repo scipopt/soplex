@@ -165,7 +165,7 @@ LIBS		=	$(LIBS) lib\libmpir.$(ARCH).opt.lib
 !endif
 
 !if $(ZLIB) == 1
-CPPFLAGS	=	$(CPPFLAGS) /Ilib\zlib /DWITH_ZLIB
+CPPFLAGS	=	$(CPPFLAGS) /Ilib\zlib /DSOPLEX_WITH_ZLIB
 LIBS		=	$(LIBS) lib\libz.$(ARCH).opt.lib
 LDFLAGS		=	$(LDFLAGS) /NODEFAULTLIB:LIBCMT /NODEFAULTLIB:LIBCMTD
 !endif

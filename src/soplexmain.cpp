@@ -72,7 +72,7 @@ void printUsage(const char* const argv[], int idx)
       std::cerr << "invalid option \"" << argv[idx] << "\"\n\n";
 
    std::cerr << "usage: " << argv[0] << " " << "[options] <lpfile>\n"
-#ifdef WITH_ZLIB
+#ifdef SOPLEX_WITH_ZLIB
              << "  <lpfile>               linear program as .mps[.gz] or .lp[.gz] file\n\n"
 #else
              << "  <lpfile>               linear program as .mps or .lp file\n\n"

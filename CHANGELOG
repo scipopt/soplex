@@ -21,6 +21,7 @@ code quality & new features:
 - implement auto pricing (switch from devex to steep after a set number of iterations)
 - fixed make install for older Mac systems where install command does not have option -t
 - fixed installation of headers by make install
+- replaced preprocessor define WITH_ZLIB by SOPLEX_WITH_ZLIB
 
 interface:
 - renamed class MpqReal to Rational

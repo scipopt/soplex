@@ -1,4 +1,4 @@
-#ifdef WITH_ZLIB
+#ifdef SOPLEX_WITH_ZLIB
 
 // ============================================================================
 // gzstream, C++ iostream classes wrapping the zlib compression library.
