@@ -80,8 +80,8 @@ void SPxSolver::computeFtest()
    }
    else if( ninfeasibilities <= sparsitythreshold && !sparsePricingLeave )
    {
-      std::streamsize prec = spxout.precision();
       MSG_INFO2(
+         std::streamsize prec = spxout.precision();
          if( hyperPricingLeave )
             spxout << " --- using hypersparse pricing, ";
          else

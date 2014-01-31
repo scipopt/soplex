@@ -151,8 +151,8 @@ void SPxSolver::computeTest()
       --remainingRoundsEnterCo;
    else if( ninfeasibilities <= sparsitythreshold && !sparsePricingEnterCo )
    {
-      std::streamsize prec = spxout.precision();
       MSG_INFO2(
+         std::streamsize prec = spxout.precision();
          if( hyperPricingEnter )
             spxout << " --- using hypersparse pricing, ";
          else
@@ -269,8 +269,8 @@ void SPxSolver::computeCoTest()
       --remainingRoundsEnter;
    else if( ninfeasibilities <= sparsitythreshold && !sparsePricingEnter )
    {
-      std::streamsize prec = spxout.precision();
       MSG_INFO2(
+         std::streamsize prec = spxout.precision();
          if( hyperPricingEnter )
             spxout << " --- using hypersparse pricing, ";
          else
