@@ -32,8 +32,8 @@ namespace soplex
  *  Class LPColBase provides a datatype for storing the column of an LP a the form similar to
  *  \f[
  *     \begin{array}{rl}
- *        \hbox{max}  & c^T x         \         \
- *        \hbox{s.t.} & Ax \le b      \         \
+ *        \hbox{max}  & c^T x         \\
+ *        \hbox{s.t.} & Ax \le b      \\
  *                    & l \le x \le u
  *     \end{array}
  *  \f]

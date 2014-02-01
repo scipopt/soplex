@@ -13,7 +13,7 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file   simpleexample.cpp
+/**@file   example.cpp
  * @brief  simple example of how to build up and solve an lp using the SoPlex callable library
  *
  * @author Ambros Gleixner
