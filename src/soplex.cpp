@@ -288,16 +288,16 @@ namespace soplex
             // lower limit on objective value
             _realParamName[SoPlex::OBJLIMIT_LOWER] = "objlimit_lower";
             _realParamDescription[SoPlex::OBJLIMIT_LOWER] = "lower limit on objective value";
-            _realParamLower[SoPlex::OBJLIMIT_LOWER] = -_realParamLower[SoPlex::INFTY];
-            _realParamUpper[SoPlex::OBJLIMIT_LOWER] = _realParamLower[SoPlex::INFTY];
-            _realParamDefault[SoPlex::OBJLIMIT_LOWER] = -_realParamLower[SoPlex::INFTY];
+            _realParamLower[SoPlex::OBJLIMIT_LOWER] = -DEFAULT_INFINITY;
+            _realParamUpper[SoPlex::OBJLIMIT_LOWER] = DEFAULT_INFINITY;
+            _realParamDefault[SoPlex::OBJLIMIT_LOWER] = -DEFAULT_INFINITY;
 
             // upper limit on objective value
             _realParamName[SoPlex::OBJLIMIT_UPPER] = "objlimit_upper";
             _realParamDescription[SoPlex::OBJLIMIT_UPPER] = "upper limit on objective value";
-            _realParamLower[SoPlex::OBJLIMIT_UPPER] = -_realParamLower[SoPlex::INFTY];
-            _realParamUpper[SoPlex::OBJLIMIT_UPPER] = _realParamLower[SoPlex::INFTY];
-            _realParamDefault[SoPlex::OBJLIMIT_UPPER] = _realParamLower[SoPlex::INFTY];
+            _realParamLower[SoPlex::OBJLIMIT_UPPER] = -DEFAULT_INFINITY;
+            _realParamUpper[SoPlex::OBJLIMIT_UPPER] = DEFAULT_INFINITY;
+            _realParamDefault[SoPlex::OBJLIMIT_UPPER] = DEFAULT_INFINITY;
 
             // working tolerance for feasibility in floating-point solver during iterative refinement
             _realParamName[SoPlex::FPFEASTOL] = "fpfeastol";
