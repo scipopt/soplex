@@ -33,15 +33,16 @@
 TSTNAME=$1
 BINNAME=$2
 BINID=$3
-TIMELIMIT=$4
-MEMLIMIT=$5
-CONTINUE=$6
-QUEUETYPE=$7
-QUEUE=$8
-PPN=$9
-CLIENTTMPDIR=${10}
-NOWAITCLUSTER=${11}
-EXCLUSIVE=${12}
+SETTINGS=$4
+TIMELIMIT=$5
+MEMLIMIT=$6
+CONTINUE=$7
+QUEUETYPE=$8
+QUEUE=$9
+PPN=${10}
+CLIENTTMPDIR=${11}
+NOWAITCLUSTER=${12}
+EXCLUSIVE=${13}
 
 
 # check whether all variables are defined
@@ -50,7 +51,6 @@ then
     echo Skipping test since variable EXCLUSIVE is not defined.
     exit 1;
 fi
-
 
 # get current SOPLEX path
 SOPLEXPATH=`pwd`
@@ -126,39 +126,39 @@ else
     TMP=`expr $HARDTIMELIMIT / 60`
     if test "$TMP" != "0"
     then
-	MYMINUTES=`expr $TMP % 60`
-	TMP=`expr $TMP / 60`
-	if test "$TMP" != "0"
-	then
-	    MYHOURS=`expr $TMP % 24`
-	    MYDAYS=`expr $TMP / 24`
-	fi
-   fi
+        MYMINUTES=`expr $TMP % 60`
+        TMP=`expr $TMP / 60`
+        if test "$TMP" != "0"
+        then
+            MYHOURS=`expr $TMP % 24`
+            MYDAYS=`expr $TMP / 24`
+        fi
+    fi
     #format seconds to have two characters
     if test ${MYSECONDS} -lt 10
     then
-	MYSECONDS=0${MYSECONDS}
+        MYSECONDS=0${MYSECONDS}
     fi
     #format minutes to have two characters
     if test ${MYMINUTES} -lt 10
     then
-	MYMINUTES=0${MYMINUTES}
+        MYMINUTES=0${MYMINUTES}
     fi
     #format hours to have two characters
     if test ${MYHOURS} -lt 10
     then
-	MYHOURS=0${MYHOURS}
+        MYHOURS=0${MYHOURS}
     fi
     #format HARDTIMELIMT
     if test ${MYDAYS} = "0"
     then
-	HARDTIMELIMIT=${MYHOURS}:${MYMINUTES}:${MYSECONDS}
+        HARDTIMELIMIT=${MYHOURS}:${MYMINUTES}:${MYSECONDS}
     else
-	HARDTIMELIMIT=${MYDAYS}-${MYHOURS}:${MYMINUTES}:${MYSECONDS}
+        HARDTIMELIMIT=${MYDAYS}-${MYHOURS}:${MYMINUTES}:${MYSECONDS}
     fi
 fi
 
-EVALFILE=$SOPLEXPATH/results/check.$TSTNAME.$BINID.$QUEUE.eval
+EVALFILE=$SOPLEXPATH/results/check.$TSTNAME.$BINID.$QUEUE.$SETTINGS.eval
 echo > $EVALFILE
 
 
@@ -188,74 +188,78 @@ fi
 # counter to define file names for a test set uniquely
 COUNT=0
 
-for i in `cat $SOPLEXPATH/$TSTNAME.test`
+for i in `cat $SOPLEXPATH/testset/$TSTNAME.test`
 do
-  if test "$i" = "DONE"
-      then
-      break
-  fi
+    if test "$i" = "DONE"
+        then
+        break
+    fi
 
-  # increase the index for the inctance tried to solve, even if the filename does not exist
-  COUNT=`expr $COUNT + 1`
+    # increase the index for the inctance tried to solve, even if the filename does not exist
+    COUNT=`expr $COUNT + 1`
 
-  # check if problem instance exists
-  if test -f $SOPLEXPATH/$i
-  then
+    # check if problem instance exists
+    if test -f $SOPLEXPATH/$i
+    then
 
-      # the cluster queue has an upper bound of 2000 jobs; if this limit is
-      # reached the submitted jobs are dumped; to avoid that we check the total
-      # load of the cluster and wait until it is save (total load not more than
-      # 1900 jobs) to submit the next job.
-      if test "$NOWAITCLUSTER" != "1"
-      then
-	  if test  "$QUEUETYPE" != "qsub"
-	  then
-	      echo "waitcluster does not work on slurm cluster"
-	  fi
-	  ./waitcluster.sh 1600 $QUEUE 200
-      fi
+        # the cluster queue has an upper bound of 2000 jobs; if this limit is
+        # reached the submitted jobs are dumped; to avoid that we check the total
+        # load of the cluster and wait until it is save (total load not more than
+        # 1900 jobs) to submit the next job.
+        if test "$NOWAITCLUSTER" != "1"
+        then
+            if test  "$QUEUETYPE" != "qsub"
+            then
+                echo "waitcluster does not work on slurm cluster"
+            fi
+            ./waitcluster.sh 1600 $QUEUE 200
+        fi
 
-      SHORTFILENAME=`basename $i .gz`
-      SHORTFILENAME=`basename $SHORTFILENAME .mps`
-      SHORTFILENAME=`basename $SHORTFILENAME .lp`
-      SHORTFILENAME=`basename $SHORTFILENAME .opb`
+        SHORTFILENAME=`basename $i .gz`
+        SHORTFILENAME=`basename $SHORTFILENAME .mps`
+        SHORTFILENAME=`basename $SHORTFILENAME .lp`
+        SHORTFILENAME=`basename $SHORTFILENAME .opb`
 
-      FILENAME=$USER.$TSTNAME.$COUNT"_"$SHORTFILENAME.$BINID.$QUEUE
-      BASENAME=$SOPLEXPATH/results/$FILENAME
+        FILENAME=$USER.$TSTNAME.$COUNT"_"$SHORTFILENAME.$BINID.$QUEUE.$SETTINGS
+        BASENAME=$SOPLEXPATH/results/$FILENAME
 
-      TMPFILE=$BASENAME.tmp
-      SETFILE=$BASENAME.set
+        TMPFILE=$BASENAME.tmp
+        SETFILE=$BASENAME.set
 
-      echo $BASENAME >> $EVALFILE
+        echo $BASENAME >> $EVALFILE
 
-      # in case we want to continue we check if the job was already performed
-      if test "$CONTINUE" != "false"
-      then
-	  if test -e results/$FILENAME.out
-	  then
-	      echo skipping file $i due to existing output file $FILENAME.out
-	      continue
-	  fi
-      fi
+        # in case we want to continue we check if the job was already performed
+        if test "$CONTINUE" != "false"
+        then
+            if test -e results/$FILENAME.out
+            then
+                echo skipping file $i due to existing output file $FILENAME.out
+                continue
+            fi
+        fi
 
-      # additional environment variables needed by runcluster.sh
-      export SOLVERPATH=$SOPLEXPATH
-      export EXECNAME=$SOPLEXPATH/../$BINNAME
-      export BASENAME=$FILENAME
-      export FILENAME=$i
-      export TIMELIMIT=$TIMELIMIT
-      export INSTANCE=$SOPLEXPATH/$i
-      export CLIENTTMPDIR=$CLIENTTMPDIR
+        # additional environment variables needed by runcluster.sh
+        export SOLVERPATH=$SOPLEXPATH
+        export EXECNAME=$SOPLEXPATH/../$BINNAME
+        export BASENAME=$FILENAME
+        export FILENAME=$i
+        export TIMELIMIT=$TIMELIMIT
+        export SETTINGS=$SETTINGS
+        export INSTANCE=$SOPLEXPATH/$i
+        export CLIENTTMPDIR=$CLIENTTMPDIR
 
-      # check queue type
-      if test  "$QUEUETYPE" = "srun"
-      then
-         sbatch --job-name=SoPlex-$SHORTFILENAME --mem=$HARDMEMLIMIT -p $CLUSTERQUEUE -A $ACCOUNT --time=${HARDTIMELIMIT} ${NICE} ${EXCLUSIVE} --output=/dev/null runcluster.sh
-      else
-          # -V to copy all environment variables
-          qsub -l walltime=$HARDTIMELIMIT -l mem=$HARDMEMLIMIT -l nodes=1:ppn=$PPN -N SOPLEX$SHORTFILENAME -V -q $CLUSTERQUEUE -o /dev/null -e /dev/null runcluster.sh
-      fi
-  else
-      echo "input file "$SOPLEXPATH/$i" not found!"
-  fi
+        # Create testset, without printing output
+        $EXECNAME --loadset=$SOLVERPATH/../settings/$SETTINGS.set -t$TIME --saveset=$SOLVERPATH/results/$BASENAME.set > /dev/null
+
+        # check queue type
+        if test  "$QUEUETYPE" = "srun"
+        then
+            sbatch --job-name=SPX-$SHORTFILENAME --mem=$HARDMEMLIMIT -p $CLUSTERQUEUE -A $ACCOUNT --time=${HARDTIMELIMIT} ${NICE} ${EXCLUSIVE} --output=/dev/null runcluster.sh
+        else
+            # -V to copy all environment variables
+            qsub -l walltime=$HARDTIMELIMIT -l mem=$HARDMEMLIMIT -l nodes=1:ppn=$PPN -N SOPLEX$SHORTFILENAME -V -q $CLUSTERQUEUE -o /dev/null -e /dev/null runcluster.sh
+        fi
+    else
+        echo "input file "$SOPLEXPATH/$i" not found!"
+    fi
 done

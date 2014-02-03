@@ -39,10 +39,6 @@ testset = outname.split('/')[-1].split('.')[1]
 testname = 'testset/'+testset+'.test'
 soluname = 'testset/'+testset+'.solu'
 
-# print identifier
-print
-print outlines[2]
-
 # maximum length of instance names
 namelength = 18
 
@@ -51,12 +47,18 @@ tolerance = 1e-6
 
 instances = {}
 stats = False
+printedIdentifier = False
 
 for idx, outline in enumerate(outlines):
+    # print identifier
+    if not printedIdentifier and outline.startswith('SoPlex version'):
+        printedIdentifier = True
+        print
+        print outline
     if outline.startswith('@01'):
         # convert line to used instance name
         linesplit = outline.split('/')
-        linesplit = linesplit[len(linesplit) - 1].rstrip(' \n').rstrip('.gz').rstrip('.GZ').rstrip('.z').rstrip('.Z')
+        linesplit = linesplit[-1].rstrip(' \n').rstrip('.gz').rstrip('.GZ').rstrip('.z').rstrip('.Z')
         linesplit = linesplit.split('.')
         instancename = linesplit[0]
         for i in range(1, len(linesplit)-1):
@@ -232,9 +234,8 @@ if not check_solu:
     print 'No solution file found to check objective values.'
 
 if check_test:
-
     testfile = open(testname,'r')
-
+    printedMissing = False
     for testline in testfile:
         linesplit = testline.split('/')
         linesplit = linesplit[len(linesplit) - 1].rstrip(' \n').rstrip('.gz').rstrip('.GZ').rstrip('.z').rstrip('.Z')
@@ -246,6 +247,9 @@ if check_test:
         if length > namelength:
             instancename = instancename[length-namelength-2:length-2]
         if not instancename in instances:
-            print 'mssing instance: '+instancename
+            if not printedMissing:
+                print
+            print 'missing instance: '+instancename
+            printedMissing = True
 
     testfile.close()
