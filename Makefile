@@ -277,6 +277,7 @@ ARFLAGS		=
 RANLIB		=
 endif
 
+CPPFLAGS	+=	$(USRCPPFLAGS)
 CXXFLAGS	+=	$(USRCXXFLAGS)
 LDFLAGS		+=	$(USRLDFLAGS)
 ARFLAGS		+=	$(USRARFLAGS)
@@ -526,12 +527,17 @@ ifneq ($(USRCXXFLAGS),$(LAST_USRCXXFLAGS))
 		@-touch $(LIBSRC)
 		@-touch $(BINSRC)
 endif
+ifneq ($(USRCPPFLAGS),$(LAST_USRCPPFLAGS))
+		@-touch $(LIBSRC)
+		@-touch $(BINSRC)
+endif
 		@-rm -f $(LASTSETTINGS)
 		@echo "LAST_SPXGITHASH=$(SPXGITHASH)" >> $(LASTSETTINGS)
 		@echo "LAST_GMP=$(GMP)" >> $(LASTSETTINGS)
 		@echo "LAST_ZLIB=$(ZLIB)" >> $(LASTSETTINGS)
 		@echo "LAST_SHARED=$(SHARED)" >> $(LASTSETTINGS)
 		@echo "LAST_USRCXXFLAGS=$(USRCXXFLAGS)" >> $(LASTSETTINGS)
+		@echo "LAST_USRCPPFLAGS=$(USRCPPFLAGS)" >> $(LASTSETTINGS)
 
 .PHONY: checkdefines
 checkdefines:
