@@ -1,5 +1,4 @@
-CPPFLAGS        +=      -I/sw/include
-LDFLAGS		+=	-lm -L/sw/lib
+LDFLAGS		+=	-lm
 ARFLAGS		=	crs
 ZLIB_FLAGS	=
 ZLIB_LDFLAGS 	=	-lz
