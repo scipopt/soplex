@@ -70,6 +70,9 @@
         For more help on using iterative refinement, see the section in the
         Doxygen documentation available online at http://soplex.zib.de/.
 
+        On some MAC systems, GMP is installed under /sw/include and /sw/lib.  If
+        these are not contained in the library and include paths, you have to add
+        them explicitly.
 
 4.      Compiling SoPlex for usage in SCIP
 
