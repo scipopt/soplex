@@ -4394,7 +4394,7 @@ namespace soplex
 
          file << "\n";
          file << "# " << _currentSettings->_realParamDescription[i] << "\n";
-         file << "# range [" << _currentSettings->_realParamLower[i] << "," << _currentSettings->_realParamLower[i]
+         file << "# range [" << _currentSettings->_realParamLower[i] << "," << _currentSettings->_realParamUpper[i]
             << "], default " << _currentSettings->_realParamDefault[i] << "\n";
          file << "real:" << _currentSettings->_realParamName[i] << " = " << _currentSettings->_realParamValues[i] << "\n";
       }
@@ -4407,7 +4407,7 @@ namespace soplex
 
          file << "\n";
          file << "# " << _currentSettings->_rationalParamDescription[i] << "\n";
-         file << "# range [" << _currentSettings->_rationalParamLower[i] << "," << _currentSettings->_rationalParamLower[i]
+         file << "# range [" << _currentSettings->_rationalParamLower[i] << "," << _currentSettings->_rationalParamUpper[i]
             << "], default " << _currentSettings->_rationalParamDefault[i] << "\n";
          file << "rational:" << _currentSettings->_rationalParamName[i] << " = " << _currentSettings->_rationalParamValues[i] << "\n";
       }
