@@ -511,7 +511,7 @@ endif
 		@$(SHELL) -ec 'if test ! -e $(SPXGITHASHFILE) ; \
 			then \
 				echo "-> generating $(SPXGITHASHFILE)" ; \
-				@-$(MAKE) githash ; \
+				$(MAKE) githash ; \
 			fi'
 ifneq ($(GMP),$(LAST_GMP))
 		@-touch $(GMPSRC)
