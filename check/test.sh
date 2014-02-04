@@ -6,6 +6,7 @@
 # 2: path to soplex executable
 # 3: name of settings (has to be in settings)
 # 4: time limit
+# 5: results directory
 
 TEST=$1
 TESTSET=testset/$TEST.test
@@ -13,6 +14,10 @@ SOLUNAME=testset/$TEST.solu
 
 BINFILE=$2
 BINNAME=`basename $2`
+
+# get host name
+HOST=`uname -n | sed 's/\(.zib.de\)//g'`
+BINNAME=$BINNAME.$HOST
 
 SETTINGS=$3
 SETTINGSFILE=../settings/$SETTINGS.set

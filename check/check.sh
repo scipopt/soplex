@@ -4,6 +4,8 @@
 
 BINFILE=$1
 BINNAME=`basename $BINFILE`
+HOST=`uname -n | sed 's/\(.zib.de\)//g'`
+BINNAME=$BINNAME.$HOST
 
 RESDIR=results/quick
 
