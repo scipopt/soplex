@@ -1082,6 +1082,9 @@ public:
    /// sets parameter settings; returns true on success
    bool setSettings(const Settings& newSettings, const bool quiet = false, const bool init = false);
 
+   /// print non-default parameter values
+   void printUserSettings();
+
    /// writes settings file; returns true on success
    bool saveSettingsFile(const char* filename, const bool onlyChanged = false) const;
 

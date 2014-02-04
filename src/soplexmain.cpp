@@ -504,6 +504,8 @@ int main(int argc, char* argv[])
          }
       }
 
+      soplex.printUserSettings();
+
       // no LP file was given and no settings files are written
       if( optidx >= argc && savesetname == 0 && diffsetname == 0 )
       {
