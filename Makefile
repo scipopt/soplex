@@ -41,10 +41,10 @@ EXEEXTENSION	=
 TEST		=	quick
 SETTINGS	=	default
 TIME		=	3600
-RESDIR	=	results
+RESDIR		=	results
 
 #these variables are needed for cluster runs
-MEM		=	6144
+MEM		=	2000
 CONTINUE	=	false
 
 INSTALLDIR	=	#

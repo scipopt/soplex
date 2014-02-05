@@ -249,7 +249,7 @@ do
         export CLIENTTMPDIR=$CLIENTTMPDIR
 
         # Create testset, without printing output
-        $EXECNAME --loadset=$SOLVERPATH/../settings/$SETTINGS.set -t$TIME --saveset=$SOLVERPATH/results/$BASENAME.set > /dev/null
+        $EXECNAME --loadset=$SOLVERPATH/../settings/$SETTINGS.set -t$TIMELIMIT --saveset=$SOLVERPATH/results/$BASENAME.set > /dev/null
 
         # check queue type
         if test  "$QUEUETYPE" = "srun"
