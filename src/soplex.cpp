@@ -4337,6 +4337,10 @@ namespace soplex
       case SoPlex::LIFTMAXVAL:
          break;
 
+      // threshold for sparse pricing
+      case SoPlex::SPARSITY_THRESHOLD:
+         break;
+
       default:
          return false;
       }
