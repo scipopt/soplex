@@ -51,10 +51,6 @@ printedIdentifier = False
 
 for idx, outline in enumerate(outlines):
     # print identifier
-    if not printedIdentifier and outline.startswith('SoPlex version'):
-        printedIdentifier = True
-        print
-        print outline
     if outline.startswith('@01'):
         # convert line to used instance name
         linesplit = outline.split('/')
@@ -69,10 +65,15 @@ for idx, outline in enumerate(outlines):
 
         # initialize new data set
         instances[instancename] = {}
-        instances[instancename]['hash'] = outlines[idx+1].split()[-1].rstrip(']')[0:8]
         instances[instancename]['status'] = 'abort'
         # wait for statistics block
         stats = False
+    elif outline.startswith('SoPlex version'):
+        instances[instancename]['hash'] = outline.split()[-1].rstrip(']')[0:9]
+        if not printedIdentifier:
+            printedIdentifier = True
+            print
+            print outline
 
     # invalidate instancename
     elif outline.startswith('=ready='):
@@ -182,7 +183,7 @@ if check_solu:
                 if value in ['infeasible', 'unbounded']:
                     if not instances[name]['status'] == value:
                         instances[name]['status'] = 'fail'
-                else:
+                elif instances[name]['value'] == 'optimal':
                     if (abs(instances[name]['value'] - value))/max(abs(instances[name]['value']),abs(value)) > tolerance:
                         instances[name]['status'] = 'inconsistent'
     solufile.close()
