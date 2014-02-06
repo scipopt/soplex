@@ -436,7 +436,7 @@ public:
    }
 
    /// returns maximum number of updates before a refactorization is performed
-   int getMaxUpdates()
+   int getMaxUpdates() const
    {
       return maxUpdates;
    }

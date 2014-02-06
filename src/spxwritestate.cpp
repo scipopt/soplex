@@ -43,71 +43,41 @@ bool SPxSolver::writeState(
    if (!ofs)
       return false;
 
-   std::stringstream table, commandline;
-   table
-      << "Delta            = " << std::setw(8) << delta()
-      << std::endl
-      << "Epsilon Zero     = " << std::setw(8) << Param::epsilon()
-      << std::endl
-      << "Epsilon Factor   = " << std::setw(8) << Param::epsilonFactorization()
-      << std::endl
-      << "Epsilon Update   = " << std::setw(8) << Param::epsilonUpdate()
-      << std::endl
-      << "Verbosity        = " << std::setw(8) << Param::verbose()
-      << std::endl << std::endl
-      << "Algorithm        = " << (type() == SPxSolver::ENTER ? "Entering" : "Leaving")
-      << std::endl
-      << "Representation   = " << (rep() == SPxSolver::ROW ? "Row" : "Column")
-      << std::endl
-      << "Update           = " << slinSolver()->getName()
-      << std::endl
-      << "Pricer           = " << pricer()->getName()
-      << std::endl
-      << "Starter          = " << ((starter() == 0) ? "no" : starter()->getName())
-      << std::endl
-      << "Ratiotest        = " << ratiotester()->getName()
-      << std::endl << std::endl;
-
-   commandline
-      << "bin/soplex -g0 -s0"
-      << " -f" << feastol()
-      << " -o" << opttol()
-      << (type() == SPxSolver::ENTER ? " -e" : "")
-      << (rep()  == SPxSolver::ROW   ? " -r" : "")
-      << (!strcmp(slinSolver()->getName(), "SLU-Eta") ? " -i" : "");
-   if (!strcmp(pricer()->getName(), "Dantzig"))
-      commandline << " -p0";
-   else if (!strcmp(pricer()->getName(), "ParMult"))
-      commandline << " -p1";
+   ofs << "# SoPlex version " << SOPLEX_VERSION / 100
+       << "." << (SOPLEX_VERSION / 10) % 10
+       << "." << SOPLEX_VERSION % 10
+       << "." << SOPLEX_SUBVERSION << std::endl << std::endl;
+   ofs << "# run SoPlex as follows:" << std::endl;
+   ofs << "# bin/soplex --loadset=spxcheck.set --readbas=spxcheck.bas spxcheck.mps\n" << std::endl;
+   ofs << "int:factor_update_max = " << basis().getMaxUpdates() << std::endl;
+   ofs << "int:pricer = ";
+   if (!strcmp(pricer()->getName(), "Auto"))
+      ofs << " 0";
+   else if (!strcmp(pricer()->getName(), "Dantzig"))
+      ofs << "1" << std::endl;
    else if (!strcmp(pricer()->getName(), "Devex"))
-      commandline << " -p2";
-   else if (!strcmp(pricer()->getName(), "Hybrid"))
-      commandline << " -p3";
+      ofs << "2" << std::endl;
+   else if (!strcmp(pricer()->getName(), "ParMult"))
+      ofs << "3" << std::endl;
+   else if (!strcmp(pricer()->getName(), "Devex"))
+      ofs << "4" << std::endl;
    else if (!strcmp(pricer()->getName(), "Steep"))
-      commandline << " -p4";
-   else if (!strcmp(pricer()->getName(), "Weight"))
-      commandline << " -p5";
+      ofs << "5" << std::endl;
    else if (!strcmp(pricer()->getName(), "SteepEx"))
-      commandline << " -p6";
-   if (starter() != 0)
-   {
-      if (!strcmp(starter()->getName(), "Weight"))
-         commandline << " -s1";
-      else if (!strcmp(starter()->getName(), "Sum"))
-         commandline << " -s2";
-      else if (!strcmp(starter()->getName(), "Vector"))
-         commandline << " -s3";
-   }
+      ofs << "6" << std::endl;
+   ofs << "int:ratiotester = ";
    if (!strcmp(ratiotester()->getName(), "Default"))
-      commandline << " -t0";
+      ofs << "0" << std::endl;
    else if (!strcmp(ratiotester()->getName(), "Harris"))
-      commandline << " -t1";
+      ofs << "1" << std::endl;
    else if (!strcmp(ratiotester()->getName(), "Fast"))
-      commandline << " -t2";
+      ofs << "2" << std::endl;
    else if (!strcmp(ratiotester()->getName(), "Bound Flipping"))
-      commandline << " -t3";
-   commandline  << " -br " << filename << ".mps " << filename << ".bas";
-   ofs << "SoPlex Parameters:\n\n"  << table.str() << "Command line     > " << commandline.str();
+      ofs << "3" << std::endl;
+   ofs << "real:feastol = " << feastol() << std::endl;
+   ofs << "real:opttol = " << opttol() << std::endl;
+   ofs << "real:epsilon_zero = " << epsilon() << std::endl;
+   ofs << "real:infty = " << infinity << std::endl;
    ofs.close();
 
    // write LP
