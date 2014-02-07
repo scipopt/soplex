@@ -197,6 +197,7 @@ fails = sum(1 for name in instances if instances[name]['status'] == 'fail')
 timeouts = sum(1 for name in instances if instances[name]['status'] == 'timeout')
 infeasible = sum(1 for name in instances if instances[name]['status'] == 'infeasible')
 optimal = sum(1 for name in instances if instances[name]['status'] == 'optimal')
+aborts = sum(1 for name in instances if instances[name]['status'] == 'abort')
 
 length = []
 
@@ -205,7 +206,7 @@ output = 'name'.ljust(namelength)
 for i,c in enumerate(columns):
     length.append(len(c))
     for name in instances:
-        length[i] = max(length[i],len(str(instances[name][c])))
+        length[i] = max(length[i],len(str(instances[name].get(c,''))))
     output = output + ' ' + c.rjust(length[i] + 1)
 
 # print column header
@@ -216,12 +217,12 @@ print '-'*len(output)
 for name in sorted(instances):
     output = name.ljust(namelength)
     for i,c in enumerate(columns):
-        output = output + ' ' + str(instances[name][c]).rjust(length[i] + 1)
+        output = output + ' ' + str(instances[name].get(c, '--')).rjust(length[i] + 1)
     print output
 
 print
-print 'Results: (testset '+testname.split('/')[-1].split('.')[-2]+', settings '+outname.split('/')[-1].split('.')[-2]+'):'
-print '{} total, {} optimal, {} fails, {} timeouts, {} infeasible'.format(len(instances),optimal,fails,timeouts,infeasible)
+print 'Results (testset '+testname.split('/')[-1].split('.')[-2]+', settings '+outname.split('/')[-1].split('.')[-2]+'):'
+print '{} total: {} optimal, {} fails, {} timeouts, {} infeasible, {} aborts'.format(len(instances),optimal,fails,timeouts,infeasible,aborts)
 
 # try to check for missing files
 check_test = False

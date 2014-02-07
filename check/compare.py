@@ -47,17 +47,25 @@ def printHeader():
     print output2
     print border
 
-runs = len(sys.argv)
-if runs < 2:
-    print 'usage: '+sys.argv[0]+' <soplex_test_run1>.json [<soplex_test_run2>.json ...]'
+if len(sys.argv) < 2:
+    print 'compare several runs of the same testset'
+    print 'usage: '+sys.argv[0]+' [ignore=<instance1>,<instance2>,...] <soplex_test_run1>.json [<soplex_test_run2>.json ...]'
     quit()
 
 # set compare values, used to identify the values from computeFactor
 compareValues = ['time','iters']
 
+# look for instances to ignore
+ignore = []
+for a in sys.argv[1:]:
+    if a.startswith('ignore='):
+        ignore = a.lstrip('ignore=').split(',')
+        sys.argv.remove(a)
+
 # parse testset from first file
 testset = sys.argv[1].split('/')[-1].split('.')[1]
 
+runs = len(sys.argv)
 results = {}
 factors = {}
 settings = []
@@ -84,13 +92,6 @@ for run in range(1,runs):
 # set default setting to compare with
 default = settings[0]
 
-# compute all the comparison factors
-for c in compareValues:
-    factors[c] = {}
-    for s in settings:
-        factors[c][s] = {}
-        computeFactor(c, default, s)
-
 # extract instance names
 instances = results[default].keys()
 namelength = 12
@@ -100,6 +101,22 @@ for i in instances:
 # extract git hashes
 for s in settings:
     hash.append(results[s][instances[0]]['hash'])
+
+# check all settings for aborts or instances to ignore and remove them
+aborts = ''
+for s in settings:
+    for i in instances:
+        if results[s][i]['status'] == 'abort' or i in ignore:
+            aborts = aborts + i + '\n'
+            instances.remove(i)
+            del results[s][i]
+
+# compute all the comparison factors
+for c in compareValues:
+    factors[c] = {}
+    for s in settings:
+        factors[c][s] = {}
+        computeFactor(c, default, s)
 
 namelength = namelength + 1
 timelength = 6
@@ -175,3 +192,8 @@ for idx, s in enumerate(settings[1:]):
 print output1
 print output2
 print output3
+
+# print aborted and ignored instances
+if not aborts == '':
+    print '\naborted and ignored instances:'
+    print aborts
