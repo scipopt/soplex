@@ -268,7 +268,7 @@ namespace soplex
             _intParamDescription[SoPlex::HYPER_PRICING] = "mode for hyper sparse pricing (0 - off, 1 - auto, 2 - always)";
             _intParamLower[SoPlex::HYPER_PRICING] = 0;
             _intParamUpper[SoPlex::HYPER_PRICING] = 2;
-            _intParamDefault[SoPlex::HYPER_PRICING] = SoPlex::HYPER_PRICING_OFF;
+            _intParamDefault[SoPlex::HYPER_PRICING] = SoPlex::HYPER_PRICING_AUTO;
 
             // primal feasibility tolerance
             _realParamName[SoPlex::FEASTOL] = "feastol";
