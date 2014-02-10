@@ -2701,8 +2701,7 @@ namespace soplex
       VectorRational& primal = _solRational._primal;
       assert(primal.dim() == numColsRational());
 
-      DVectorRational activity = _solRational._slacks;
-      assert(activity == _rationalLP->computePrimalActivity(primal));
+      DVectorRational activity = _rationalLP->computePrimalActivity(primal);
       maxviol = 0;
       sumviol = 0;
 
