@@ -360,13 +360,6 @@ int main(int argc, char* argv[])
                      printUsage(argv, optidx);
                      return 1;
                   }
-                  // if the LP is parsed rationally and might be solved rationally, we choose automatic syncmode such that
-                  // the rational LP is kept after reading
-                  else if( soplex.intParam(SoPlex::READMODE) == SoPlex::READMODE_RATIONAL
-                     && soplex.intParam(SoPlex::SOLVEMODE) != SoPlex::SOLVEMODE_REAL )
-                  {
-                     soplex.setIntParam(SoPlex::SYNCMODE, SoPlex::SYNCMODE_AUTO);
-                  }
                }
                // --solvemode=<value> : choose solving mode (0* - floating-point solve, 1 - auto, 2 - force iterative refinement)
                else if( strncmp(option, "solvemode=", 10) == 0 )
@@ -565,6 +558,14 @@ int main(int argc, char* argv[])
 
       // measure time for reading LP file and basis file
       readingTimer.start();
+
+      // if the LP is parsed rationally and might be solved rationally, we choose automatic syncmode such that
+      // the rational LP is kept after reading
+      if( soplex.intParam(SoPlex::READMODE) == SoPlex::READMODE_RATIONAL
+         && soplex.intParam(SoPlex::SOLVEMODE) != SoPlex::SOLVEMODE_REAL )
+      {
+         soplex.setIntParam(SoPlex::SYNCMODE, SoPlex::SYNCMODE_AUTO);
+      }
 
       // read LP from input file
       lpfilename = argv[optidx];
