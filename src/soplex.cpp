@@ -6366,10 +6366,6 @@ namespace soplex
       ///@todo try loading old basis
       _hasBasis = false;
 
-      // invalidate real solution
-      _solReal.invalidate();
-      _hasSolReal = false;
-
       // stop timing
       if( time )
          _statistics->syncTime.stop();
@@ -6387,10 +6383,6 @@ namespace soplex
       // copy LP
       _ensureRationalLP();
       *_rationalLP = *_realLP;
-
-      // invalidate rational solution
-      _solRational.invalidate();
-      _hasSolRational = false;
 
       // stop timing
       if( time )
