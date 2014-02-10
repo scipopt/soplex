@@ -1234,13 +1234,14 @@ template class SVSetBase < Real >;
 
 
 
-
+#ifndef SOPLEX_LEGACY
 template class VectorBase < Rational >;
 template class DVectorBase < Rational >;
 template class SVectorBase < Rational >;
 template class DSVectorBase < Rational >;
 template class SSVectorBase < Rational >;
 template class SVSetBase < Rational >;
+#endif
 
 
 

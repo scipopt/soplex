@@ -17,6 +17,7 @@
  * @brief Wrapper for GMP types.
  */
 
+#ifndef SOPLEX_LEGACY
 #include <cmath>
 #include <stdlib.h>
 #include <stdio.h>
@@ -2620,6 +2621,6 @@ Rational operator-(const Rational& r)
    res.dpointer->privatevalue *= -1;
    return res;
 }
-
 #endif // SOPLEX_WITH_GMP
 } // namespace soplex
+#endif

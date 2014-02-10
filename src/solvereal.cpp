@@ -13,6 +13,7 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+#ifndef SOPLEX_LEGACY
 #include <iostream>
 #include <assert.h>
 
@@ -377,3 +378,4 @@ namespace soplex
       _hasSolReal = true;
    }
 } // namespace soplex
+#endif
