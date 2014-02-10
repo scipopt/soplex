@@ -231,8 +231,10 @@ namespace soplex
       // if the problem has been found to be infeasible and an approximate Farkas proof is available, we compute a
       // scaled unit box around the origin that provably contains no feasible solution; this currently only works for
       // equality form
+#if 0
       if( _solRational.hasDualFarkas() )
          _computeInfeasBox(_solRational, false);
+#endif
 
       // restore original problem
       _untransformEquality(_solRational);
@@ -683,9 +685,11 @@ namespace soplex
       bool success = false;
       error = false;
 
+#if 0
       ///@todo check whether approximate Farkas proof can be used
       _computeInfeasBox(_solRational, false);
       ///@todo if approx Farkas proof is good enough then exit without doing any transformation
+#endif
 
       // remove objective function, shift, homogenize
       _transformFeasibility();
@@ -731,10 +735,13 @@ namespace soplex
                _solRational._hasDualFarkas = true;
                _solRational._dualFarkas = _solRational._dual;
 
+#if 0
                // check if we can compute sufficiently large Farkas box
                _computeInfeasBox(_solRational, true);
+#endif
                if( true )//@todo check if computeInfeasBox found a sufficient box
                {
+
                   success = true;
                   sol._hasPrimal = false;
                }
