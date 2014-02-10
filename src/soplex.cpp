@@ -175,7 +175,7 @@ namespace soplex
             // refinement limit (-1 if unlimited)
             _intParamName[SoPlex::REFLIMIT] = "reflimit";
             _intParamDescription[SoPlex::REFLIMIT] = "refinement limit (-1 - no limit)";
-            _intParamLower[SoPlex::REFLIMIT] = -1;
+            _intParamLower[SoPlex::REFLIMIT] = 100;
             _intParamUpper[SoPlex::REFLIMIT] = INT_MAX;
             _intParamDefault[SoPlex::REFLIMIT] = -1;
 
@@ -254,7 +254,7 @@ namespace soplex
             _intParamDescription[SoPlex::SOLVEMODE] = "mode for iterative refinement strategy (0 - floating-point solve, 1 - auto, 2 - force iterative refinement)";
             _intParamLower[SoPlex::SOLVEMODE] = 0;
             _intParamUpper[SoPlex::SOLVEMODE] = 2;
-            _intParamDefault[SoPlex::SOLVEMODE] = SoPlex::SOLVEMODE_REAL;
+            _intParamDefault[SoPlex::SOLVEMODE] = SoPlex::SOLVEMODE_AUTO;
 
             // mode for iterative refinement strategy
             _intParamName[SoPlex::CHECKMODE] = "checkmode";
@@ -2140,8 +2140,7 @@ namespace soplex
       _invalidateSolution();
 
       // decide whether to solve the rational LP with iterative refinement or call the standard floating-point solver
-      if( Rational::precision() < INT_MAX
-          || intParam(SoPlex::SOLVEMODE) == SOLVEMODE_REAL || (intParam(SoPlex::SOLVEMODE) == SOLVEMODE_AUTO
+      if( intParam(SoPlex::SOLVEMODE) == SOLVEMODE_REAL || (intParam(SoPlex::SOLVEMODE) == SOLVEMODE_AUTO
              && GE(realParam(SoPlex::FEASTOL), 1e-9) && GE(realParam(SoPlex::OPTTOL), 1e-9)) )
       {
          _solveReal();

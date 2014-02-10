@@ -53,7 +53,7 @@ void printUsage(const char* const argv[], int idx)
       "\n"
       "algorithmic settings (* indicates default):\n"
       "  --readmode=<value>     choose reading mode for <lpfile> (0* - floating-point, 1 - rational)\n"
-      "  --solvemode=<value>    choose solving mode (0* - floating-point solve, 1 - auto, 2 - force iterative refinement)\n"
+      "  --solvemode=<value>    choose solving mode (0 - floating-point solve, 1* - auto, 2 - force iterative refinement)\n"
       "  -s<value>              choose simplifier/presolver (0 - off, 1* - auto)\n"
       "  -g<value>              choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric)\n"
       "  -p<value>              choose pricing (0* - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)\n"
