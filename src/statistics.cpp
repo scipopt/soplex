@@ -13,6 +13,7 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+#ifndef SOPLEX_LEGACY
 #include <iostream>
 #include <assert.h>
 
@@ -116,3 +117,4 @@ namespace soplex
       os << "  Solve time        : " << luSolveTime << "\n";
    }
 } // namespace soplex
+#endif

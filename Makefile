@@ -52,6 +52,9 @@ INSTALLDIR	=	#
 #will this be compiled for PARASCIP? (disables output because it uses global variables)
 PARASCIP	=	false
 
+#will this be compiled with the 1.x interface
+LEGACY		=	false
+
 GMP		=	true
 ZLIB		=	true
 
@@ -291,6 +294,13 @@ ifeq ($(PARASCIP),true)
 CPPFLAGS	+=	-DDISABLE_VERBOSITY
 endif
 
+#-----------------------------------------------------------------------------
+# LEGACY
+#-----------------------------------------------------------------------------
+
+ifeq ($(LEGACY),true)
+CPPFLAGS	+=	-DSOPLEX_LEGACY
+endif
 
 #-----------------------------------------------------------------------------
 # Main Program
@@ -329,8 +339,10 @@ LIBSRCHEADER	=	$(addprefix $(SRCDIR)/,$(LIBHEADER))
 GMPDEP	:=	$(SRCDIR)/depend.gmp
 GMPSRC	:=	$(shell cat $(GMPDEP))
 ifeq ($(GMP),true)
+ifeq ($(LEGACY),false)
 CPPFLAGS	+=	-DSOPLEX_WITH_GMP
 LDFLAGS		+=	-lgmp
+endif
 endif
 
 ZLIBDEP		:=	$(SRCDIR)/depend.zlib

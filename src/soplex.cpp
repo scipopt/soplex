@@ -17,6 +17,7 @@
  * @brief Preconfigured SoPlex LP solver
  */
 
+#ifndef SOPLEX_LEGACY
 #include <assert.h>
 #include "limits.h"
 #include <iostream>
@@ -6254,7 +6255,7 @@ namespace soplex
       _statistics->iterations += _solver.iterations();
       _statistics->iterationsPrimal += _solver.primalIterations();
       _statistics->iterationsFromBasis += _hadBasis ? _solver.iterations() : 0;
-      _statistics->boundflips += _solver.totalboundflips;
+      _statistics->boundflips += _solver.boundFlips();
       _statistics->luFactorizationTime += _slufactor.getFactorTime();
       _statistics->luSolveTime += _slufactor.getSolveTime();
       _statistics->luFactorizations += _slufactor.getFactorCount();
@@ -6413,3 +6414,4 @@ namespace soplex
       }
    }
 } // namespace soplex
+#endif

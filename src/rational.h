@@ -19,6 +19,7 @@
 #ifndef _RATIONAL_H_
 #define _RATIONAL_H_
 
+#ifndef SOPLEX_LEGACY
 #include <math.h>
 #include <assert.h>
 #include <iostream>
@@ -326,5 +327,10 @@ namespace soplex
    //@}
 
 } // namespace soplex
-
+#else
+namespace soplex
+{
+   typedef Real Rational;
+}
+#endif
 #endif // _RATIONAL_H_

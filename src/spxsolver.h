@@ -77,7 +77,7 @@ class SPxStarter;
 */
 class SPxSolver : public SPxLP, protected SPxBasis
 {
-   friend class SoPlex;
+   friend class SoPlexLegacy;
    friend class SPxFastRT;
    friend class SPxBoundFlippingRT;
    friend class SPxSteepPR;  // this is necessary to make getMaxUpdates() accessible
@@ -1548,7 +1548,6 @@ public:
       return theratiotester;
    }
 
-protected:
    /// Factorize basis matrix.
    /// @throw SPxStatusException if loaded matrix is singular
    virtual void factorize();
@@ -1803,6 +1802,12 @@ public:
    void resetCumulativeTime()
    {
       theCumulativeTime = 0.0;
+   }
+
+   /// get number of bound flips.
+   int boundFlips() const
+   {
+      return totalboundflips;
    }
 
    /// get number of iterations of current solution.
