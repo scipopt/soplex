@@ -26,7 +26,7 @@ if not len(sys.argv) == 2:
     quit()
 
 # specify columns for the output (can be modified)
-columns = ['rows','cols','primalviol','dualviol','iters','flips','time','value','status']
+columns = ['rows','cols','primalviol','dualviol','iters','flips','solvetime','value','status']
 
 outname = sys.argv[1]
 dataname = outname.replace('.out','.json')
@@ -151,7 +151,7 @@ for idx, outline in enumerate(outlines):
 
         elif outline.startswith('LU solves'):
             instances[instancename]['lusolves'] = int(outline.split()[3])
-            instances[instancename]['solvetime'] = float(outlines[idx+2].split()[3])
+            instances[instancename]['lusolvetime'] = float(outlines[idx+2].split()[3])
 
 # try parsing solution file
 check_solu = False

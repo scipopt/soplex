@@ -53,7 +53,7 @@ if len(sys.argv) < 2:
     quit()
 
 # set compare values, used to identify the values from computeFactor
-compareValues = ['time','iters']
+compareValues = ['solvetime','iters']
 
 # look for instances to ignore
 ignore = []
@@ -123,7 +123,7 @@ timelength = 6
 iterlength = 6
 for s in settings:
     for i in instances:
-        timelength = max(len(str(results[s][i]['time'])), timelength)
+        timelength = max(len(str(results[s][i]['solvetime'])), timelength)
         iterlength = max(len(str(results[s][i]['iters'])), iterlength)
 
 timelength = timelength + 2
@@ -145,7 +145,7 @@ count = 0
 # print data for all instances with the computed length
 for i in sorted(instances):
     count = count + 1
-    time = results[default][i]['time']
+    time = results[default][i]['solvetime']
     iter = results[default][i]['iters']
     sumtime[0] = sumtime[0] + time
     sumiter[0] = sumiter[0] + iter
@@ -159,7 +159,7 @@ for i in sorted(instances):
     output = output + '{0:{width}.2f}'.format(time, width=timelength)
     # print results of remaining settings
     for idx, s in enumerate(settings[1:]):
-        time = results[s][i]['time']
+        time = results[s][i]['solvetime']
         iter = results[s][i]['iters']
         sumiter[idx+1] = sumiter[idx+1] + iter
         sumtime[idx+1] = sumtime[idx+1] + time
@@ -170,7 +170,7 @@ for i in sorted(instances):
         output = output + '{0:{width}d}'.format(iter, width=iterlength+2)
         output = output + '{0:{width}.2f}'.format(time, width=timelength)
         output = output + '{0:{width}.2f}'.format(factors['iters'][s][i], width=factorlength)
-        output = output + '{0:{width}.2f}'.format(factors['time'][s][i], width=factorlength)
+        output = output + '{0:{width}.2f}'.format(factors['solvetime'][s][i], width=factorlength)
     print output
 
 printHeader()
