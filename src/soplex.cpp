@@ -2241,8 +2241,7 @@ namespace soplex
 
 
 
-   /// returns the objective value if a primal solution is available
-   ///@todo buffer objective value if computed once
+   /// returns the objective value if a primal or dual solution is available
    Real SoPlex::objValueReal()
    {
       assert(OBJSENSE_MAXIMIZE == 1);
@@ -2255,10 +2254,15 @@ namespace soplex
       else if( hasPrimal() )
       {
          _syncRealSolution();
-         return (_solReal._primal * maxObjReal()) * intParam(SoPlex::OBJSENSE);
+         return _solReal._primalObjVal;
+      }
+      else if( hasDual() )
+      {
+         _syncRealSolution();
+         return _solReal._dualObjVal;
       }
       else
-         return 0;
+         return 0.0;
    }
 
 
@@ -2536,7 +2540,7 @@ namespace soplex
 
 
 
-   /// returns the objective value if a primal solution is available
+   /// returns the objective value if a primal or dual solution is available
    Rational SoPlex::objValueRational()
    {
       assert(OBJSENSE_MAXIMIZE == 1);
@@ -2549,7 +2553,12 @@ namespace soplex
       else if( hasPrimal() )
       {
          _syncRationalSolution();
-         return (_solRational._primal * maxObjRational()) * intParam(SoPlex::OBJSENSE);
+         return _solRational._primalObjVal;
+      }
+      else if( hasDual() )
+      {
+         _syncRationalSolution();
+         return _solRational._dualObjVal;
       }
       else
          return 0;

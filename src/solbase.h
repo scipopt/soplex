@@ -136,6 +136,9 @@ private:
    DVectorBase<R> _redCost;
    DVectorBase<R> _dualFarkas;
 
+   R _primalObjVal;
+   R _dualObjVal;
+
    unsigned int _hasPrimal:1;
    unsigned int _hasPrimalRay:1;
    unsigned int _hasDual:1;
@@ -158,6 +161,7 @@ private:
          {
             _primal = sol._primal;
             _slacks = sol._slacks;
+            _primalObjVal = sol._primalObjVal;
          }
 
          _hasPrimalRay = sol._hasPrimalRay;
@@ -169,6 +173,7 @@ private:
          {
             _dual = sol._dual;
             _redCost = sol._redCost;
+            _dualObjVal = sol._dualObjVal;
          }
 
          _hasDualFarkas = sol._hasDualFarkas;
@@ -191,6 +196,7 @@ private:
          {
             _primal = sol._primal;
             _slacks = sol._slacks;
+            _primalObjVal = R(sol._primalObjVal);
          }
 
          _hasPrimalRay = sol._hasPrimalRay;
@@ -202,6 +208,7 @@ private:
          {
             _dual = sol._dual;
             _redCost = sol._redCost;
+            _dualObjVal = R(sol._dualObjVal);
          }
 
          _hasDualFarkas = sol._hasDualFarkas;

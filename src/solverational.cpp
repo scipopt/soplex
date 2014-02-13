@@ -324,15 +324,18 @@ namespace soplex
          return;
       }
 
-      // store floating-point solution of original LP as current rational solution
+      // store floating-point solution of original LP as current rational solution; make sure that the primal obj value
+      // corresponds to a minimization problem
       sol._primal = primalReal;
       sol._slacks = _rationalLP->computePrimalActivity(sol._primal);
       sol._hasPrimal = true;
+      sol._primalObjVal = (sol._primal * _rationalLP->maxObj()) * -1;
 
       sol._dual = dualReal;
       sol._redCost = _rationalLP->computeDualActivity(sol._dual) + _rationalLP->maxObj();
       sol._redCost *= -1;
       sol._hasDual = true;
+      sol._dualObjVal = sol._primalObjVal;
 
       _hasBasis = true;
 
@@ -609,6 +612,14 @@ namespace soplex
          }
       }
       while( true );
+
+      // compute objective values
+      assert(sol._hasPrimal == sol._hasDual);
+      if( sol._hasPrimal )
+      {
+         sol._primalObjVal = (sol._primal * _rationalLP->maxObj()) * -1;
+         sol._dualObjVal = sol._primalObjVal;
+      }
 
       // reset tolerances in floating-point solver
       _solver.setFeastol(realParam(SoPlex::FEASTOL));
@@ -1205,6 +1216,9 @@ namespace soplex
          _rationalLP->changeObj(_rationalLP->maxObj());
          _rationalLP->changeSense(SPxLPRational::MAXIMIZE);
          _realLP->changeSense(SPxLPReal::MAXIMIZE);
+
+         sol._primalObjVal *= -1;
+         sol._dualObjVal *= -1;
       }
 
       // restore bounds and objective coefficients in real LP

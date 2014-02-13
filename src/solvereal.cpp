@@ -336,6 +336,7 @@ namespace soplex
          _solReal._slacks.reDim(_solver.nRows());
          _solver.getPrimal(_solReal._primal);
          _solver.getSlacks(_solReal._slacks);
+         _solReal._primalObjVal = _solver.objValue();
       }
 
       _solReal._hasPrimalRay = (status() == SPxSolver::UNBOUNDED && _isRealLPLoaded);
@@ -366,6 +367,7 @@ namespace soplex
          _solReal._redCost.reDim(_solver.nCols());
          _solver.getDual(_solReal._dual);
          _solver.getRedCost(_solReal._redCost);
+         _solReal._dualObjVal = ( _solReal._hasPrimal ? _solReal._primalObjVal : _solver.objValue() );
       }
 
       _solReal._hasDualFarkas = (status() == SPxSolver::INFEASIBLE && _isRealLPLoaded);
