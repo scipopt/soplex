@@ -290,6 +290,9 @@ DFLAGS		+=	$(USRDFLAGS)
 # PARASCIP
 #-----------------------------------------------------------------------------
 
+PARASCIPDEP	:=	$(SRCDIR)/depend.parascip
+PARASCIPSRC	:=	$(shell cat $(PARASCIPDEP))
+
 ifeq ($(PARASCIP),true)
 CPPFLAGS	+=	-DDISABLE_VERBOSITY
 endif
@@ -297,6 +300,9 @@ endif
 #-----------------------------------------------------------------------------
 # LEGACY
 #-----------------------------------------------------------------------------
+
+LEGACYDEP	:=	$(SRCDIR)/depend.legacy
+LEGACYSRC	:=	$(shell cat $(LEGACYDEP))
 
 ifeq ($(LEGACY),true)
 CPPFLAGS	+=	-DSOPLEX_LEGACY
@@ -354,7 +360,6 @@ ifeq ($(ZLIB),true)
 CPPFLAGS	+=	-DSOPLEX_WITH_ZLIB $(ZLIB_FLAGS)
 LDFLAGS		+=	$(ZLIB_LDFLAGS)
 endif
-
 
 #-----------------------------------------------------------------------------
 # Rules
@@ -499,6 +504,8 @@ depend:
 		>>$(DEPEND)'
 		@echo `grep -l "SOPLEX_WITH_GMP" $(SRCDIR)/*` >$(GMPDEP)
 		@echo `grep -l "SOPLEX_WITH_ZLIB" $(SRCDIR)/*` >$(ZLIBDEP)
+		@echo `grep -l "SOPLEX_LEGACY" $(SRCDIR)/*` >$(LEGACYDEP)
+		@echo `grep -l "DISABLE_VERBOSITY" $(SRCDIR)/*` >$(PARASCIPDEP)
 
 -include	$(DEPEND)
 
@@ -516,7 +523,7 @@ $(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 -include $(LASTSETTINGS)
 
 .PHONY: touchexternal
-touchexternal:	$(GMPDEP) $(ZLIBDEP) | $(OBJDIR)
+touchexternal:	$(GMPDEP) $(ZLIBDEP) $(PARASCIPDEP) $(LEGACYDEP) | $(OBJDIR)
 ifneq ($(SPXGITHASH),$(LAST_SPXGITHASH))
 		@-$(MAKE) githash
 endif
@@ -531,6 +538,12 @@ endif
 ifneq ($(ZLIB),$(LAST_ZLIB))
 		@-touch $(ZLIBSRC)
 endif
+ifneq ($(PARASCIP),$(LAST_PARASCIP))
+		@-touch $(PARASCIPSRC)
+endif
+ifneq ($(LEGACY),$(LAST_LEGACY))
+		@-touch $(LEGACYSRC)
+endif
 ifneq ($(SHARED),$(LAST_SHARED))
 		@-touch $(LIBSRC)
 		@-touch $(BINSRC)
@@ -543,13 +556,24 @@ ifneq ($(USRCPPFLAGS),$(LAST_USRCPPFLAGS))
 		@-touch $(LIBSRC)
 		@-touch $(BINSRC)
 endif
+ifneq ($(USRLDFLAGS),$(LAST_USRLDFLAGS))
+		@-touch -c $(EXAMPLEOBJFILES) $(BINOBJFILES) $(LIBOBJFILES)
+endif
+ifneq ($(USRARFLAGS),$(LAST_USRARFLAGS))
+		@-touch -c $(EXAMPLEOBJFILES) $(BINOBJFILES) $(LIBOBJFILES)
+endif
 		@-rm -f $(LASTSETTINGS)
 		@echo "LAST_SPXGITHASH=$(SPXGITHASH)" >> $(LASTSETTINGS)
 		@echo "LAST_GMP=$(GMP)" >> $(LASTSETTINGS)
 		@echo "LAST_ZLIB=$(ZLIB)" >> $(LASTSETTINGS)
+		@echo "LAST_PARASCIP=$(PARASCIP)" >> $(LASTSETTINGS)
+		@echo "LAST_LEGACY=$(LEGACY)" >> $(LASTSETTINGS)
 		@echo "LAST_SHARED=$(SHARED)" >> $(LASTSETTINGS)
 		@echo "LAST_USRCXXFLAGS=$(USRCXXFLAGS)" >> $(LASTSETTINGS)
 		@echo "LAST_USRCPPFLAGS=$(USRCPPFLAGS)" >> $(LASTSETTINGS)
+		@echo "LAST_USRLDFLAGS=$(USRLDFLAGS)" >> $(LASTSETTINGS)
+		@echo "LAST_USRARFLAGS=$(USRARFLAGS)" >> $(LASTSETTINGS)
+		@echo "LAST_USRDFLAGS=$(USRDFLAGS)" >> $(LASTSETTINGS)
 
 .PHONY: checkdefines
 checkdefines:
@@ -563,19 +587,25 @@ ifneq ($(ZLIB),false)
 		$(error invalid ZLIB flag selected: ZLIB=$(ZLIB). Possible options are: true false)
 endif
 endif
+ifneq ($(PARASCIP),true)
+ifneq ($(PARASCIP),false)
+		$(error invalid PARASCIP flag selected: PARASCIP=$(PARASCIP). Possible options are: true false)
+endif
+endif
+ifneq ($(LEGACY),true)
+ifneq ($(LEGACY),false)
+		$(error invalid LEGACY flag selected: LEGACY=$(LEGACY). Possible options are: true false)
+endif
+endif
 
 .PHONY: errorhints
 errorhints:
-		@echo
-		@echo "build failed"
 ifeq ($(ZLIB),true)
-		@echo "- you used ZLIB=true: if zlib is not available, try building with ZLIB=false"
+		@echo "build failed with ZLIB=true: if ZLIB is not available, try building with ZLIB=false"
 endif
 ifeq ($(GMP),true)
-		@echo "- you used GMP=true: if gmp is not available, try building with GMP=false (note that this will deactivate iterative refinement)"
+		@echo "build failed with GMP=true: if GMP is not available, try building with GMP=false"
 endif
-		@echo "for help on building SoPlex consult the INSTALL file"
-		@echo
 
 # --- EOF ---------------------------------------------------------------------
 # DO NOT DELETE
