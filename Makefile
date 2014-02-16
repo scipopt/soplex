@@ -367,10 +367,16 @@ endif
 
 ifeq ($(VERBOSE),false)
 .SILENT:	$(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK) $(BINFILE) example $(EXAMPLEOBJFILES) $(LIBFILE) $(BINOBJFILES) $(LIBOBJFILES)
+MAKE		+= -s
 endif
 
 .PHONY: all
-all:		makelibfile $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
+all:		makelibfile
+		@-$(MAKE) $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
+
+.PHONY: preprocess
+preprocess:	checkdefines
+		@-$(MAKE) touchexternal
 
 $(LIBLINK) $(LIBSHORTLINK):	$(LIBFILE)
 		@rm -f $@
@@ -394,9 +400,10 @@ example:	$(LIBOBJFILES) $(EXAMPLEOBJFILES) | $(BINDIR) $(EXAMPLEOBJDIR)
 		|| ($(MAKE) errorhints && false)
 
 .PHONY: makelibfile
-makelibfile:	checkdefines touchexternal | $(LIBDIR) $(LIBOBJDIR)
+makelibfile:	preprocess
+		@-$(MAKE) $(LIBFILE)
 
-$(LIBFILE):	$(LIBOBJFILES)
+$(LIBFILE):	$(LIBOBJFILES) | $(LIBDIR) $(LIBOBJDIR)
 		@echo "-> generating library $@"
 		-rm -f $(LIBFILE)
 		$(LIBBUILD) $(LIBBUILDFLAGS) $(LIBBUILD_o)$@ $(LIBOBJFILES) $(REPOSIT)
