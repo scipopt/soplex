@@ -42,7 +42,7 @@
         Then type make COMP=<as before> OPT=<as before> test.
         This should report no fails.  (Requires a basic Python installation.)
 
-        IF ZLIB is not available, building may fail.  In this case try
+        If ZLIB is not available, building may fail.  In this case try
 
         make COMP=<as before> OPT=<as before> ZLIB=false
 
@@ -83,8 +83,8 @@
         If these are not contained in your library and include paths, you have
         to add them explicitly.
 
-        Note for building SCPI with SoPlex:  If SoPlex was built with GMP=true,
-        then SCIP also needs to be built with the same option GMP=true.
+        Note for building SCIP with SoPlex:  If SoPlex was built with GMP=true,
+        then SCIP also needs to be built with the same option GMP=true (default).
 
 
 5.1     Using SoPlex standalone
