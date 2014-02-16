@@ -31,9 +31,7 @@
 
         For the impatient:
 
-        On systems with GNU gcc4.2
-        and greater               :  make COMP=gnu OPT=opt-gcc42
-        On systems with GNU g++   :  make COMP=gnu OPT=opt
+        On systems with GNU g++   :  make COMP=gnu OPT=opt (default)
         Linux/x86 with Intel C++  :  make COMP=intel OPT=opt
         Tru64 with Compaq C++     :  make COMP=compaq OPT=opt
         Solaris with SUN Forte C++:  make COMP=sun OPT=opt
@@ -41,15 +39,29 @@
         HP-UX with HP aCC         :  make COMP=hp OPT=opt
         AIX with VisualAge C++    :  make COMP=ibm OPT=opt
 
-        Then get and unpack in the check directory the Netlib testset from
-        http://soplex.zib.de/download.shtml
-        and say make COMP=<as before> OPT=<as before> check
-        This should report no fails.
+        Then type make COMP=<as before> OPT=<as before> test.
+        This should report no fails.  (Requires a basic Python installation.)
 
-        Now read the documentation!
+        IF ZLIB is not available, building may fail.  In this case try
+
+        make COMP=<as before> OPT=<as before> ZLIB=false
+
+        which will deactivate the possibility to read gzipped LP and MPS files.
 
 
-3.      Compiling SoPlex with GMP to use iterative refinement
+3.      Working with the 1.x interface / Compiling without the new C++11 standard
+
+        We use the feature of explicit conversion operators introduced by the
+        new C++11 standard.  If your compiler does not support this, or if for other
+        reasons you wish to use the old SoPlex 1.x interface, you can build with
+
+        make COMP=<as before> OPT=<as before> LEGACY=true
+
+        or define "SOPLEX_LEGACY" for the compiler preprocessor.  Note that this will
+        deactivate iterative refinement, see point 4.
+
+
+4.      Compiling SoPlex with GMP
 
         From version 1.7 on, SoPlex provides the new feature iterative
         refinement to compute extended-precision solutions. For details,
@@ -57,39 +69,22 @@
 
         http://opus4.kobv.de/opus4-zib/frontdoor/index/index/docId/1545
 
-        This feature is still in development and deactivated by default.
-        To enable iterative refinement, SoPlex requires the GNU Multiple
-        Precision library (http://www.gmplib.org/) and must be compiled with
-        option GMP=true, e.g., make COMP=<as before> OPT=<as before> GMP=true.
+        This feature works best with rational arithmetic.  We use the GNU
+        Multiple Precision library (http://www.gmplib.org/) for this.  If GMP
+        is not available, you can deactivate it by building with
 
-        If you use a different build system than the provided Makefile, you need
-        to add the define "-DSOPLEX_WITH_GMP" and link with flags "-lgmp -lgmpxx".
-        Note that SoPlex uses the C++ interface of GMP, hence the C library libgmp
-        is not sufficient.
+        make COMP=<as before> OPT=<as before> GMP=false.
 
-        For more help on using iterative refinement, see the section in the
-        Doxygen documentation available online at http://soplex.zib.de/.
+        If you use a different build system than the provided Makefile and
+        want to build with GMP support, you need to define "SOPLEX_WITH_GMP"
+        for the preprocessor and link with the GMP callable library.
 
-        On some MAC systems, GMP is installed under /sw/include and /sw/lib.  If
-        these are not contained in the library and include paths, you have to add
-        them explicitly.
+        On some MAC systems, GMP is installed under /sw/include and /sw/lib.
+        If these are not contained in your library and include paths, you have
+        to add them explicitly.
 
-4.      Compiling SoPlex for usage in SCIP
-
-	In general, in order to use SoPlex as LP solver in SCIP, i.e., to build
-        SCIP with make LPS=spx [...], SoPlex should simply have been built
-        using the same make options [...] as in SCIP.
-
-        However, care must be taken with GMP support: The new iterative
-        refinement feature in SoPlex is still in development and most SCIP
-        users will not want to activate it.  They should compile SoPlex without
-        GMP, which is the default, see Point 3 above, and SCIP with GMP included
-        or not, as wished.
-
-        If SoPlex was built with GMP, then it requires GMP's C++ interface
-        library libgmpxx. In this case, if building SCIP with SoPlex, the
-        linker flag "-lgmpxx" must be appended to USRLDFLAGS, i.e., SCIP must
-        be built with make LPS=spx USRLDFLAGS=-lgmpxx [...].
+        Note for building SCPI with SoPlex:  If SoPlex was built with GMP=true,
+        then SCIP also needs to be built with the same option GMP=true.
 
 
 5.1     Using SoPlex standalone
@@ -99,14 +94,14 @@
 
 5.2     Using the library
 
-        Examples on how to use the SoPlex library is provided in the files
-        'src/soplexmain.cpp' and 'src/simpleexample.cpp'.
+        Examples on how to use the SoPlex library are provided in the files
+        'src/soplexmain.cpp' and 'src/example.cpp'.
 
 
 6.      Bug reports
 
-        If you find any bugs, or LP-files were SoPlex fails to find the
-        optimal solution, please report to koch@zib.de.
+        If you find any bugs, or LP-files where SoPlex fails to find the
+        optimal solution, please report to {gleixner,miltenberger,koch}@zib.de.
 
 
 7.      Publications
