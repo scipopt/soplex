@@ -13,7 +13,7 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file  spxlpbase.cpp
+/**@file  spxlpbase_rational.cpp
  * @brief Saving LPs with Rational values in a form suitable for SoPlex.
  */
 

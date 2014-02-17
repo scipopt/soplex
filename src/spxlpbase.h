@@ -701,7 +701,7 @@ public:
    virtual bool readMPS(std::istream& in, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
 
    /// Reads LP in LP or MPS format from input stream \p in.
-   /**@param is       input stream.
+   /**@param in       input stream.
     * @param rowNames contains after the call the names of the constraints (rows) in the same order as the rows in the
     *                 LP.  Constraints without a name (only possible with LPF files) are automatically assigned a name.
     *                 Maybe 0 if the names are not needed.

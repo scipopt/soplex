@@ -20,7 +20,7 @@
  * \ref soplex::SPxOut::INFO1 "INFO1",
  * \ref soplex::SPxOut::INFO2 "INFO2", and
  * \ref soplex::SPxOut::INFO3 "INFO3" are set.
- * If \c NDEBUG is not defined, the code within #TRACE is used.
+ * If \c NDEBUG is not defined, the code within \#TRACE is used.
  * If \c DEBUGGING is defined, the code within
  * \ref soplex::SPxOut::DEBUG "DEBUG" is also used.
  *

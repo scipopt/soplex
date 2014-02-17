@@ -13,7 +13,7 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file  spxlpbase.cpp
+/**@file  spxlpbase_real.cpp
  * @brief Saving LPs with Real values in a form suitable for SoPlex.
  */
 

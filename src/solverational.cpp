@@ -1564,32 +1564,33 @@ namespace soplex
       assert(!sol._hasPrimal || sol._slacks == _rationalLP->computePrimalActivity(sol._primal));
    }
 
-   /// computes radius of infeasibility box implied by an approximate Farkas' proof
-   ///
-   /// Given constraints of the form \f$ lhs <= Ax <= rhs \f$, a farkas proof y should satisfy \f$ y^T A = 0 \f$ and \f$
-   /// y_+^T lhs - y_-^T rhs > 0 \f$, where \f$ y_+, y_- \f$ denote the positive and negative parts of \f$ y \f$.  If
-   /// \f$ y \f$ is approximate, it may not satisfy \f$y^T A = 0 \f$ exactly, but the proof is still valid as long as
-   /// the following holds for all potentially feasible \f$ x \f$:
-   ///
-   /// \f[
-   ///    y^T Ax < (y_+^T lhs - y_-^T rhs)              (*)
-   /// \f]
-   ///
-   /// we may therefore calculate \f$ y^T A \f$ and \f$ (y_+^T lhs - y_-^T rhs) exactly and check if the upper and lower
-   /// bounds on \f$ x \f$ imply that all feasible \f$ x \f$ satisfy (*), and if not then compute bounds on \f$ x \f$ to
-   /// guarantee (*).  The simplest way to do this is to compute
-   ///
-   /// \f[
-   ///    B = (y_+^T lhs - y_-^T rhs) / \sum_i(|(y^T A)_i|)
-   /// \f]
-   ///
-   /// noting that if every component of \f$ x \f$ has \f$ |x_i| < B \f$, then (*) holds.
-   ///
-   /// \f$ B \f$ can be increased by iteratively including variable bounds smaller than \f$ B \f$.  The speed of this
-   /// method can be further improved by using interval arithmetic for all computations.  For related information see
-   /// Sec. 4 of Neumaier and Shcherbina, Mathematical Programming A, 2004.
-   ///
-   /// Set transformed to true if this method is called after _transformFeasibility().
+   /** computes radius of infeasibility box implied by an approximate Farkas' proof
+
+    Given constraints of the form \f$ lhs <= Ax <= rhs \f$, a farkas proof y should satisfy \f$ y^T A = 0 \f$ and
+    \f$ y_+^T lhs - y_-^T rhs > 0 \f$, where \f$ y_+, y_- \f$ denote the positive and negative parts of \f$ y \f$.
+    If \f$ y \f$ is approximate, it may not satisfy \f$ y^T A = 0 \f$ exactly, but the proof is still valid as long
+    as the following holds for all potentially feasible \f$ x \f$:
+
+    \f[
+       y^T Ax < (y_+^T lhs - y_-^T rhs)              (*)
+    \f]
+
+    we may therefore calculate \f$ y^T A \f$ and \f$ y_+^T lhs - y_-^T rhs \f$ exactly and check if the upper and lower
+    bounds on \f$ x \f$ imply that all feasible \f$ x \f$ satisfy (*), and if not then compute bounds on \f$ x \f$ to
+    guarantee (*).  The simplest way to do this is to compute
+
+    \f[
+       B = (y_+^T lhs - y_-^T rhs) / \sum_i(|(y^T A)_i|)
+    \f]
+
+    noting that if every component of \f$ x \f$ has \f$ |x_i| < B \f$, then (*) holds.
+
+    \f$ B \f$ can be increased by iteratively including variable bounds smaller than \f$ B \f$.  The speed of this
+    method can be further improved by using interval arithmetic for all computations.  For related information see
+    Sec. 4 of Neumaier and Shcherbina, Mathematical Programming A, 2004.
+
+    Set transformed to true if this method is called after _transformFeasibility().
+   */
    void SoPlex::_computeInfeasBox(SolRational& sol, bool transformed)
    {
       assert(sol.hasDualFarkas());
