@@ -1216,35 +1216,6 @@ std::ostream& operator<<(std::ostream& os, const SVSetBase<R>& s)
 
    return os;
 }
-
-
-
-// ---------------------------------------------------------------------------------------------------------------------
-//  Explicit instantiations
-// ---------------------------------------------------------------------------------------------------------------------
-
-
-
-template class VectorBase < Real >;
-template class DVectorBase < Real >;
-template class SSVectorBase < Real >;
-template class SVectorBase < Real >;
-template class DSVectorBase < Real >;
-template class SVSetBase < Real >;
-
-
-
-#ifndef SOPLEX_LEGACY
-template class VectorBase < Rational >;
-template class DVectorBase < Rational >;
-template class SVectorBase < Rational >;
-template class DSVectorBase < Rational >;
-template class SSVectorBase < Rational >;
-template class SVSetBase < Rational >;
-#endif
-
-
-
 }
 
 #endif // _BASEVECTORS_H_
