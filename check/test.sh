@@ -85,4 +85,11 @@ do
 done | tee -a $OUTFILE
 date >>$OUTFILE
 date >>$ERRFILE
-./evaluation.py $OUTFILE | tee $RESFILE
+
+# check whether python is available
+if command -v python >/dev/null 2>&1
+then
+	./evaluation.py $OUTFILE | tee $RESFILE
+else
+	./evaluation.sh $OUTFILE | tee $RESFILE
+fi
