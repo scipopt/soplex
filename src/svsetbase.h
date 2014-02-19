@@ -606,11 +606,12 @@ public:
       remove(perm);
    }
 
-   /// Removes \p n SVectorBase%s from %set.
-   /** @pre \p perm must be at least of size num()
-    *  @pre \p nums must be at least of size \p n @return \p perm is the permutations resulting from this removal: \p
-    *          perm[i] < 0 indicates, that the element to index \c i has been removed. Otherwise, \p perm[i] is the new
-    *          index of the element with index \c i before the removal.
+   /** Removes \p n SVectorBase%s from %set.
+    * @pre    \p nums must be at least of size \p n
+    * @pre    \p perm must be at least of size num()
+    * @return \p perm is the permutations resulting from this removal: \p perm[i] < 0 indicates
+    *   that the element to index \p i has been removed. Otherwise, \p perm[i] is the new
+    *   index of the element with index \p i before the removal.
     */
    void remove(const int nums[], int n, int* perm)
    {
