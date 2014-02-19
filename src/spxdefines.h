@@ -286,13 +286,13 @@ public:
 };
 
 /// returns |a|
-inline static Real abs(Real a)
+inline Real abs(Real a)
 {
    return fabs(a);
 }
 
 /// returns max(|a|,|b|)
-inline static Real maxAbs(Real a, Real b)
+inline Real maxAbs(Real a, Real b)
 {
    const Real absa = fabs(a);
    const Real absb = fabs(b);
@@ -301,7 +301,7 @@ inline static Real maxAbs(Real a, Real b)
 }
 
 /// returns (a-b) / max(|a|,|b|,1.0)
-inline static Real relDiff(Real a, Real b)
+inline Real relDiff(Real a, Real b)
 {
    return (a - b) / (maxAbs(a, b) > 1.0 ? maxAbs(a, b) : 1.0);
 }
