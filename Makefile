@@ -39,6 +39,8 @@ SHAREDLIBEXT	=	so
 LIBEXT		=	$(STATICLIBEXT)
 EXEEXTENSION	=	
 TEST		=	quick
+ALGO		=  1 2 3 4
+LIMIT		=  #
 SETTINGS	=	default
 TIME		=	3600
 RESDIR		=	results
@@ -434,10 +436,20 @@ doc:
 
 .PHONY: test
 test:		#$(BINFILE)
+ifeq ($(LEGACY),false)
 		cd check; ./test.sh $(TEST) ../$(BINFILE) $(SETTINGS) $(TIME) $(RESDIR)
+endif
+ifeq ($(LEGACY),true)
+		cd check; ./check_legacy.sh $(TEST).test ../$(BINFILE) '$(ALGO)' $(LIMIT)
+endif
 .PHONY: check
-check:		#$(BINFILE)
+check:	#$(BINFILE)
+ifeq ($(LEGACY),false)
 		cd check; ./check.sh ../$(BINFILE) $(RESDIR)
+endif
+ifeq ($(LEGACY),true)
+		cd check; ./check_legacy.sh $(TEST).test ../$(BINFILE) '$(ALGO)' $(LIMIT)
+endif
 
 valgrind-check:	$(BINFILE)
 		cd check; \

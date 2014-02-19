@@ -19,12 +19,11 @@ done
 
 echo
 echo 'Summary:'
-echo
 for SETTINGS in ${SETTINGSLIST[@]}
 do
-    echo 'check/'$RESDIR'/check.quick.'$BINNAME'.'$SETTINGS'.res'
-    grep 'Results:' -A1 $RESDIR'/check.quick.'$BINNAME'.'$SETTINGS'.res'
     echo
+    grep 'Results' -A1 $RESDIR'/check.quick.'$BINNAME'.'$SETTINGS'.res'
+    echo 'check/'$RESDIR'/check.quick.'$BINNAME'.'$SETTINGS'.res'
 done
 
 

@@ -8,6 +8,8 @@
 # 4: time limit
 # 5: results directory
 
+# TODO handle case when python is not available
+
 TEST=$1
 TESTSET=testset/$TEST.test
 SOLUNAME=testset/$TEST.solu
