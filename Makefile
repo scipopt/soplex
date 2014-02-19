@@ -427,8 +427,12 @@ githash::	# do not remove the double-colon
 
 .PHONY: lint
 lint:		$(BINSRC) $(LIBSRC)
-		$(LINT) lint/$(NAME).lnt -os\(lint.out\) \
-		$(CPPFLAGS) -UNDEBUG $^
+		-rm -f lint.out
+ifeq ($(FILES),)
+		$(LINT) lint/$(NAME).lnt +os\(lint.out\) -u -zero -Isrc -e322 -UNDEBUG $^
+else
+		$(LINT) lint/$(NAME).lnt +os\(lint.out\) -u -zero -Isrc -e322 -UNDEBUG $(FILES)
+endif
 
 .PHONY: doc
 doc:		
