@@ -429,9 +429,9 @@ githash::	# do not remove the double-colon
 lint:		$(BINSRC) $(LIBSRC)
 		-rm -f lint.out
 ifeq ($(FILES),)
-		$(LINT) lint/$(NAME).lnt +os\(lint.out\) -u -zero -Isrc -e322 -UNDEBUG $^
+		$(LINT) lint/$(NAME).lnt +os\(lint.out\) -u -zero -Isrc -I/usr/include -e322 -UNDEBUG $^
 else
-		$(LINT) lint/$(NAME).lnt +os\(lint.out\) -u -zero -Isrc -e322 -UNDEBUG $(FILES)
+		$(LINT) lint/$(NAME).lnt +os\(lint.out\) -u -zero -Isrc -I/usr/include -e322 -UNDEBUG $(FILES)
 endif
 
 .PHONY: doc
