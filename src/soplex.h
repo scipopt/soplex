@@ -21,7 +21,7 @@
 #define _SOPLEX_H_
 
 #ifndef SOPLEX_LEGACY
-#include <string>
+#include <string.h>
 
 ///@todo SoPlex should also have an spxout object to avoid using a global one
 #include "spxdefines.h"

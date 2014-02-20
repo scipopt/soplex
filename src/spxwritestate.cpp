@@ -15,7 +15,7 @@
 
 #include <iostream>
 #include <fstream>
-#include <string>
+#include <string.h>
 #include <sstream>
 
 #include "spxdefines.h"

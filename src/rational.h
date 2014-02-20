@@ -22,8 +22,8 @@
 #ifndef SOPLEX_LEGACY
 #include <math.h>
 #include <assert.h>
+#include <string.h>
 #include <iostream>
-#include <string>
 
 #include "spxdefines.h"
 

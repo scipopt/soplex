@@ -19,7 +19,7 @@
 #ifndef _EXCEPTIONS_H_
 #define _EXCEPTIONS_H_
 
-#include <string>
+#include <string.h>
 
 namespace soplex
 {

@@ -21,8 +21,8 @@
 #include <cmath>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <iomanip>
-#include <string>
 #include <sstream>
 #include <cstring>
 #include <limits.h>

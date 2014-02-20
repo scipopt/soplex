@@ -20,7 +20,7 @@
 #define _SOPLEXLEGACY_H_
 
 #include <assert.h>
-#include <string>
+#include <string.h>
 
 #include "spxsolver.h"
 #include "spxscaler.h"
