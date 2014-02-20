@@ -20,6 +20,7 @@
 #define _IDLIST_H_
 
 #include <assert.h>
+#include <stddef.h>
 
 #include "spxdefines.h"
 #include "islist.h"
@@ -340,12 +341,11 @@ public:
        successor of \p first.
     */
    explicit
-   IdList(T* pfirst = 0, T* plast = 0)
-      : IsList<T>(pfirst, plast)
+   IdList(T* pfirst = 0, T* plast = 0, bool pDestroyElements = false)
+      : IsList<T>(pfirst, plast, pDestroyElements)
    {
       assert(isConsistent());  
    }
-
    //@}
 };
 

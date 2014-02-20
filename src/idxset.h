@@ -49,7 +49,7 @@ namespace soplex
    user has to provide an adequate buffer to the constructor.
 
    An IdxSet cannot be extended to fit more than max() elements. If
-   neccessary, the user must explicitely provide the IdxSet with a
+   necessary, the user must explicitely provide the IdxSet with a
    suitable memory. Alternatively, one can use \ref DIdxSet "DIdxSets" 
    which provide the required memory managemant.
 */

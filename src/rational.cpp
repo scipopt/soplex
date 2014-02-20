@@ -37,40 +37,46 @@
 #endif
 
 
+
 namespace soplex
 {
 #ifdef SOPLEX_WITH_GMP
+
+/// list of unused Private objects
+IdList< Rational::Private > Rational::unusedPrivateList(0, 0, true);
 
 /// Defines the "Pimpl"-class Private
 class Rational::Private
 {
 public:
 
-   /// actual value of the Rational object
-   mpq_t privatevalue;
+   mpq_t privatevalue;  ///< actual value of the Rational object
+   Private* theprev;    ///< pointer to the previous element in the list
+   Private* thenext;    ///< pointer to the next element in the list
 
    /// default constructor
    Private()
+      : theprev(0)
+      , thenext(0)
    {
       mpq_init(privatevalue);
    }
 
    /// copy constructor
    Private(const Private& p)
+      : theprev(0)
+      , thenext(0)
    {
+      // a newly constructed element is not in any list, even if the original element (p) is; hence we initialize
+      // theprev and thenext to zero
       mpq_init(privatevalue);
       mpq_set(this->privatevalue, p.privatevalue);
    }
 
-   /// copy assignment operator
-   Private& operator=(const Private& p)
-   {
-      mpq_set(this->privatevalue, p.privatevalue);
-      return *this;
-   }
-
    /// constructor from long double
    Private(const long double& r)
+      : theprev(0)
+      , thenext(0)
    {
       mpq_init(privatevalue);
       mpq_set_d(privatevalue, double(r));
@@ -78,6 +84,8 @@ public:
 
    /// constructor from double
    Private(const double& r)
+      : theprev(0)
+      , thenext(0)
    {
       mpq_init(privatevalue);
       mpq_set_d(privatevalue, r);
@@ -85,6 +93,8 @@ public:
 
    /// constructor from int
    Private(const int& i)
+      : theprev(0)
+      , thenext(0)
    {
       mpq_init(privatevalue);
       mpq_set_d(privatevalue, i);
@@ -92,6 +102,8 @@ public:
 
    /// constructor from mpq_t
    Private(const mpq_t& q)
+      : theprev(0)
+      , thenext(0)
    {
       mpq_init(privatevalue);
       mpq_set(privatevalue, q);
@@ -102,6 +114,48 @@ public:
    {
       mpq_clear(privatevalue);
    }
+
+   /// assignment operator
+   Private& operator=(const Private& p)
+   {
+      // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
+      mpq_set(this->privatevalue, p.privatevalue);
+      return *this;
+   }
+
+   /// assignment operator from long double
+   Private& operator=(const long double& r)
+   {
+      // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
+      mpq_set_d(this->privatevalue, double(r));
+      return *this;
+   }
+
+   ///@todo add assignment operators for double, int, mpq_t
+
+   /// previous Private element
+   Private*& prev()
+   {
+      return theprev;
+   }
+
+   /// previous Private element
+   Private* const& prev() const
+   {
+      return theprev;
+   }
+
+   /// next Private element
+   Private*& next()
+   {
+      return thenext;
+   }
+
+   /// next Private element
+   Private* const& next() const
+   {
+      return thenext;
+   }
 };
 
 
@@ -109,9 +163,21 @@ public:
 /// default constructor
 Rational::Rational()
 {
-   dpointer = 0;
-   spx_alloc(dpointer);
-   dpointer = new (dpointer) Private();
+   dpointer = unusedPrivateList.last();
+
+   if( dpointer != 0 )
+   {
+      assert(unusedPrivateList.first() != 0);
+      unusedPrivateList.remove(dpointer);
+   }
+   else
+   {
+      assert(unusedPrivateList.first() == 0);
+      spx_alloc(dpointer);
+      new (dpointer) Private();
+   }
+
+   assert(dpointer != 0);
 }
 
 
@@ -119,14 +185,131 @@ Rational::Rational()
 /// copy constructor
 Rational::Rational(const Rational& r)
 {
-   dpointer = 0;
-   spx_alloc(dpointer);
-   dpointer = new (dpointer) Private(*(r.dpointer));
+   dpointer = unusedPrivateList.last();
+
+   if( dpointer != 0 )
+   {
+      assert(unusedPrivateList.first() != 0);
+      unusedPrivateList.remove(dpointer);
+      *dpointer = *(r.dpointer);
+   }
+   else
+   {
+      assert(unusedPrivateList.first() == 0);
+      spx_alloc(dpointer);
+      new (dpointer) Private(*(r.dpointer));
+   }
+
+   assert(dpointer != 0);
 }
 
 
 
-/// copy assignment operator
+/// constructor from long double
+Rational::Rational(const long double& r)
+{
+   dpointer = unusedPrivateList.last();
+
+   if( dpointer != 0 )
+   {
+      assert(unusedPrivateList.first() != 0);
+      unusedPrivateList.remove(dpointer);
+      *dpointer = r;
+   }
+   else
+   {
+      assert(unusedPrivateList.first() == 0);
+      spx_alloc(dpointer);
+      new (dpointer) Private(r);
+   }
+
+   assert(dpointer != 0);
+}
+
+
+
+/// constructor from double
+Rational::Rational(const double& r)
+{
+   dpointer = unusedPrivateList.last();
+
+   if( dpointer != 0 )
+   {
+      assert(unusedPrivateList.first() != 0);
+      unusedPrivateList.remove(dpointer);
+      *dpointer = r;
+   }
+   else
+   {
+      assert(unusedPrivateList.first() == 0);
+      spx_alloc(dpointer);
+      new (dpointer) Private(r);
+   }
+
+   assert(dpointer != 0);
+}
+
+
+
+/// constructor from int
+Rational::Rational(const int& i)
+{
+   dpointer = unusedPrivateList.last();
+
+   if( dpointer != 0 )
+   {
+      assert(unusedPrivateList.first() != 0);
+      unusedPrivateList.remove(dpointer);
+      *dpointer = i;
+   }
+   else
+   {
+      assert(unusedPrivateList.first() == 0);
+      spx_alloc(dpointer);
+      new (dpointer) Private(i);
+   }
+
+   assert(dpointer != 0);
+}
+
+
+
+/// constructor from mpq_t
+Rational::Rational(const mpq_t& q)
+{
+   dpointer = unusedPrivateList.last();
+
+   if( dpointer != 0 )
+   {
+      assert(unusedPrivateList.first() != 0);
+      unusedPrivateList.remove(dpointer);
+      *dpointer = q;
+   }
+   else
+   {
+      assert(unusedPrivateList.first() == 0);
+      spx_alloc(dpointer);
+      new (dpointer) Private(q);
+   }
+
+   assert(dpointer != 0);
+}
+
+
+
+/// destructor
+Rational::~Rational()
+{
+   // for memory efficiency, we could free the Private object (or even more Private objects from the list of unused
+   // elements) if there are much more unused than used Private objects; this requires counting the used Private
+   // objects, though; we do not implement this currently, because we have not encountered memory problems, so far, and
+   // because freeing costs time
+   unusedPrivateList.append(dpointer);
+}
+
+
+
+/// assignment operator
 Rational& Rational::operator=(const Rational &r)
 {
    *(this->dpointer) = *(r.dpointer);
@@ -135,52 +318,16 @@ Rational& Rational::operator=(const Rational &r)
 
 
 
-/// constructor from long double
-Rational::Rational(const long double& r)
+/// assignment operator from long double
+Rational& Rational::operator=(const long double &r)
 {
-   dpointer = 0;
-   spx_alloc(dpointer);
-   dpointer = new (dpointer) Private(r);
+   *(this->dpointer) = r;
+   return *this;
 }
 
 
 
-/// constructor from double
-Rational::Rational(const double& r)
-{
-   dpointer = 0;
-   spx_alloc(dpointer);
-   dpointer = new (dpointer) Private(r);
-}
-
-
-
-/// constructor from int
-Rational::Rational(const int& i)
-{
-   dpointer = 0;
-   spx_alloc(dpointer);
-   dpointer = new (dpointer) Private(i);
-}
-
-
-
-/// constructor from mpq_t
-Rational::Rational(const mpq_t& q)
-{
-   dpointer = 0;
-   spx_alloc(dpointer);
-   dpointer = new (dpointer) Private(q);
-}
-
-
-
-/// destructor
-Rational::~Rational()
-{
-   dpointer->~Private();
-   spx_free(dpointer);
-}
+///@todo implement assignment operators from double, int, mpq_t
 
 
 

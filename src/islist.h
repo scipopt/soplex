@@ -20,6 +20,7 @@
 #define _ISLIST_H_
 
 #include <assert.h>
+#include <stddef.h>
 #include <iostream>
 
 
@@ -70,15 +71,18 @@ public:
    //------------------------------------
    /**@name Constructors / destructors */
    //@{
+
    /// default constructor.
    IsElement()
    {}
+
    ///
    explicit
    IsElement(const T& old)
       : T(old)
          , the_next(0)
    {}
+
    /// copy constructor.
    /** Only the element itself is copied, while the link to the next list
        element is set to a zero pointer.
@@ -87,7 +91,6 @@ public:
       : T(old)
       , the_next(0)
    {}
-
 };
 
 //---------------------------------------------------------------------
@@ -111,6 +114,8 @@ class IsList
 protected:
    T* the_first;   ///< the first element in the IsList.
    T* the_last;    ///< the last element in the IsList.
+   bool destroyElements;
+                   ///< should the destructor be called for each element when the list is destroyed?
 
 public:
    typedef IsElement<T> Element;
@@ -413,8 +418,10 @@ public:
        successor of \p first.
    */
    explicit
-   IsList(T* pfirst = 0, T* plast = 0)
-      : the_first(pfirst), the_last(plast)
+   IsList(T* pfirst = 0, T* plast = 0, bool pDestroyElements = false)
+      : the_first(pfirst)
+      , the_last(plast)
+      , destroyElements(pDestroyElements)
    {
       if (pfirst)
       {
@@ -423,6 +430,21 @@ public:
       }
 
       assert(isConsistent());
+   }
+
+   /// destructor
+   ~IsList()
+   {
+      if( destroyElements )
+      {
+         T* nextElement;
+	 for( T* it = the_first; it; it = nextElement )
+         {
+            nextElement = next(it);
+            it->~T();
+            spx_free(it);
+         }
+      }
    }
    //@}
 };

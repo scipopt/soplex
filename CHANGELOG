@@ -1,5 +1,12 @@
 (maintain each list from top to bottom)
 
+Bugfix version
+==============
+
+performance:
+- more efficient memory allocation of elements of class Rational
+
+
 
 27 Feb 2014 - Release 2.0.0
 ===========================

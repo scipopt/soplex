@@ -26,6 +26,7 @@
 #include <iostream>
 
 #include "spxdefines.h"
+#include "idlist.h"
 
 #ifdef SOPLEX_WITH_GMP
 #include "gmp.h"
@@ -47,6 +48,8 @@ namespace soplex
       class Private;
       Private* dpointer;
 
+      static IdList< Private > unusedPrivateList;
+
    public:
 
       //**@name Construction and destruction */
@@ -57,9 +60,6 @@ namespace soplex
 
       /// copy constructor
       Rational(const Rational& r);
-
-      /// copy assignment operator
-      Rational& operator=(const Rational&);
 
       /// constructor from long double
       Rational(const long double& r);
@@ -79,6 +79,12 @@ namespace soplex
 
       /// destructor
       ~Rational();
+
+      /// assignment operator
+      Rational& operator=(const Rational&);
+
+      /// assignment operator from long double
+      Rational& operator=(const long double &r);
 
       //@}
 
