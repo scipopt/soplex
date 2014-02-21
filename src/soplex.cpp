@@ -262,7 +262,7 @@ namespace soplex
             _intParamDescription[SoPlex::CHECKMODE] = "mode for a posteriori feasibility checks (0 - floating-point check, 1 - auto, 2 - rational check)";
             _intParamLower[SoPlex::CHECKMODE] = 0;
             _intParamUpper[SoPlex::CHECKMODE] = 2;
-            _intParamDefault[SoPlex::CHECKMODE] = SoPlex::CHECKMODE_RATIONAL;
+            _intParamDefault[SoPlex::CHECKMODE] = SoPlex::CHECKMODE_AUTO;
 
             // mode for hyper sparse pricing
             _intParamName[SoPlex::HYPER_PRICING] = "hyperpricing";
