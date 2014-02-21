@@ -5,6 +5,7 @@
    @author   Tobias Achterberg
    @author   Timo Berthold
    @author   Andreas Bley
+   @author   Dennis Elbrächter
    @author   Ambros Gleixner
    @author   Wei Huang
    @author   Benjamin Hiller
