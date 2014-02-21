@@ -122,7 +122,7 @@
 //-----------------------------------------------------------------------------
 /**@page LIB How to use SoPlex as a callable library
 
-   The main interface is given by the class \ref SoPlex, which handles the
+   The main interface is given by the class \ref soplex::SoPlex, which handles the
    construction and modification of an LP, the solving process, allows to
    access and change parameters, and retrive solution information.
 
