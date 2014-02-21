@@ -1,0 +1,15 @@
+Notes for SoPlex Release 1.7.1
+
+What's new
+----------
+
+ - new features for row representation: 
+    - Farkas ray for infeasible LPs and primal ray for unbounded LPs
+    - writing of basis file
+
+ - many bugfixes especially for row representation
+
+ - code reorganization to unify methods of CLUFactor
+
+
+For details seee the CHANGELOG file and the Doxygen documentation.

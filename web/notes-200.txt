@@ -1,0 +1,28 @@
+Notes for SoPlex Release 2.0.0
+
+New interface class SoPlex
+--------------------------
+
+ - (optional) handling of rational LP data: exact parsing, extended-precision
+   solutions, exact computation of violations
+
+ - improved iterative refinement algorithm handling unbounded and infeasible LPs
+
+ - new command line interface
+
+ - customization via parameter system
+
+ - compatibility mode: old class SoPlex available as SoPlexLegacy
+
+
+Further news
+------------
+
+ - improved pricers: hyper sparse pricing and auto pricing
+
+ - bound flipping ratio test for row representation
+
+ - new method to calculate the condition number of the current basis matrix
+
+
+For details see the CHANGELOG file and the Doxygen documentation.
