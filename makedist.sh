@@ -31,6 +31,7 @@ $NAME/CHANGELOG \
 $NAME/Makefile \
 $NAME/check/check.sh \
 $NAME/check/evaluation.py \
+$NAME/check/evaluation.sh \
 $NAME/check/instances/* \
 $NAME/check/test.sh \
 $NAME/check/testset/netlib.test \
