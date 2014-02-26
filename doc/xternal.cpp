@@ -1,21 +1,6 @@
 //-----------------------------------------------------------------------------
 /**@mainpage Overview
    @version  2.0.0
-   @author   Roland Wunderling
-   @author   Tobias Achterberg
-   @author   Timo Berthold
-   @author   Andreas Bley
-   @author   Dennis Elbrächter
-   @author   Ambros Gleixner
-   @author   Wei Huang
-   @author   Benjamin Hiller
-   @author   Thorsten Koch
-   @author   Matthias Miltenberger
-   @author   Sebastian Orlowski
-   @author   Marc Pfetsch
-   @author   Eva Ramlow
-   @author   Daniel Steffy
-   @author   Andreas Tuchscherer
 
    @section Main The Sequential object-oriented simplex class library.
 
@@ -24,7 +9,7 @@
    which can be found at http://www.zib.de/PaperWeb/abstracts/TR-96-09
    (in German).
 
-   SoPlex is part of the SCIP Optmization Suite.  A tutorial article for
+   SoPlex is part of the SCIP Optimization Suite.  A tutorial article for
    getting started with the SCIP Optimization Suite is available as ZIB
    technical report 12-27 <a href="http://scip.zib.de/doc/ZR-12-27.pdf">here</a>.
 
@@ -41,6 +26,23 @@
    - \ref LIB      "How to use SoPlex as a callable library"
 
    - \ref PROG     "Programming with SoPlex"
+
+   @author   Roland Wunderling
+   @author   Tobias Achterberg
+   @author   Timo Berthold
+   @author   Andreas Bley
+   @author   Dennis Elbrächter
+   @author   Ambros Gleixner
+   @author   Wei Huang
+   @author   Benjamin Hiller
+   @author   Thorsten Koch
+   @author   Matthias Miltenberger
+   @author   Sebastian Orlowski
+   @author   Marc Pfetsch
+   @author   Eva Ramlow
+   @author   Daniel Steffy
+   @author   Andreas Tuchscherer
+
 */
 //-----------------------------------------------------------------------------
 /**@namespace soplex
@@ -103,7 +105,7 @@
  */
 //-----------------------------------------------------------------------------
 /**@page FAQ Frequently Asked Questions
- * \htmlinclude faq_new.inc
+ * \htmlinclude faq.inc
  */           
 //-----------------------------------------------------------------------------
 /**@page SHELL How to use the SoPlex command line

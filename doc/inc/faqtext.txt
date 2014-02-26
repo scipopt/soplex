@@ -5,7 +5,7 @@ SECTION:Frequently asked questions about SoPlex
     ANSWER:
     <p>
         Please report
-        <a href="bugs.html">bugs and problems</a>.<br/>
+        <a href="http://soplex.zib.de/#bugs">bugs and problems</a>.<br/>
 
         In fact, a couple of improvements of SoPlex are
         possible. If you are interested in helping please contact
@@ -90,7 +90,7 @@ SECTION:Frequently asked questions about SoPlex
         as a subroutine and do some kind of Branch-and-Bound. For
         instance, you can use  SCIP (Solving Constraint Integer Programs)
         together with SoPlex to solve IPs.  SCIP can be obtained at
-        <a href="http://scip.zib.de/">http://scip.zib.de/</a> and is
+        <a href="http://scip.zib.de/">here</a> and is
         distributed under the ZIB academic license, like SoPlex.
     </p>
 
@@ -166,7 +166,7 @@ SECTION:Frequently asked questions about SoPlex
     ANSWER:
     <p>
         Yes, the binary version allows to read and write basis files using the
-        options <code>-br</code> and <code>-bw</code>, respectively. The library
+        options <code>--readbas=</code> and <code>writebas=</code>, respectively. The library
         version allows to read or write a basis file from within the code as well.
         This can be useful for debugging. If you cannot reconstruct an error occurring
         in the library code with the binary version, try to save a basis and try again.
