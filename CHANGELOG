@@ -1,7 +1,7 @@
 (maintain each list from top to bottom)
 
 
-21 Feb 2014 - Release 2.0.0
+27 Feb 2014 - Release 2.0.0
 ===========================
 
 new interface class SoPlex:
