@@ -1,6 +1,22 @@
 <!-- this file is used to generate the local doxygen documentation -->
 <!-- using make doc from within scip or soplex -->
 
+<style>
+.reveal:hover {
+    text-shadow: 1px 1px 1px #777;
+}
+.reveal {
+    color:#06c;
+    padding-top: 1em;
+    cursor: pointer;
+    margin: 5px 0;
+}
+.answer {
+    background-color: #fff;
+    padding-left:   1em;
+}
+</style>
+
 <h4>Frequently asked questions about SoPlex</h4><ol>  <li>
     <div id="howtocontribute" class="reveal">
       How can I contribute?    </div>
