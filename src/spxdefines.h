@@ -20,7 +20,7 @@
  * \ref soplex::SPxOut::INFO1 "INFO1",
  * \ref soplex::SPxOut::INFO2 "INFO2", and
  * \ref soplex::SPxOut::INFO3 "INFO3" are set.
- * If \c NDEBUG is not defined, the code within #TRACE is used.
+ * If \c NDEBUG is not defined, the code within \#TRACE is used.
  * If \c DEBUGGING is defined, the code within
  * \ref soplex::SPxOut::DEBUG "DEBUG" is also used.
  *
@@ -36,8 +36,8 @@
 
 namespace soplex
 {
-#define SOPLEX_VERSION         172
-#define SOPLEX_SUBVERSION        8
+#define SOPLEX_VERSION         200
+#define SOPLEX_SUBVERSION        0
 
 /*-----------------------------------------------------------------------------
  * Assertion Macros etc.
@@ -286,13 +286,13 @@ public:
 };
 
 /// returns |a|
-inline static Real abs(Real a)
+inline Real abs(Real a)
 {
    return fabs(a);
 }
 
 /// returns max(|a|,|b|)
-inline static Real maxAbs(Real a, Real b)
+inline Real maxAbs(Real a, Real b)
 {
    const Real absa = fabs(a);
    const Real absb = fabs(b);
@@ -301,7 +301,7 @@ inline static Real maxAbs(Real a, Real b)
 }
 
 /// returns (a-b) / max(|a|,|b|,1.0)
-inline static Real relDiff(Real a, Real b)
+inline Real relDiff(Real a, Real b)
 {
    return (a - b) / (maxAbs(a, b) > 1.0 ? maxAbs(a, b) : 1.0);
 }

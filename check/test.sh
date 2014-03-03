@@ -6,6 +6,9 @@
 # 2: path to soplex executable
 # 3: name of settings (has to be in settings)
 # 4: time limit
+# 5: results directory
+
+# TODO handle case when python is not available
 
 TEST=$1
 TESTSET=testset/$TEST.test
@@ -13,6 +16,10 @@ SOLUNAME=testset/$TEST.solu
 
 BINFILE=$2
 BINNAME=`basename $2`
+
+# get host name
+HOST=`uname -n | sed 's/\(.zib.de\)//g'`
+BINNAME=$BINNAME.$HOST
 
 SETTINGS=$3
 SETTINGSFILE=../settings/$SETTINGS.set
@@ -78,4 +85,11 @@ do
 done | tee -a $OUTFILE
 date >>$OUTFILE
 date >>$ERRFILE
-./evaluation.py $OUTFILE | tee $RESFILE
+
+# check whether python is available
+if command -v python >/dev/null 2>&1
+then
+	./evaluation.py $OUTFILE | tee $RESFILE
+else
+	./evaluation.sh $OUTFILE | tee $RESFILE
+fi

@@ -1,6 +1,6 @@
 CXX	=	g++
 CPPFLAGS=	-Isrc -DNDEBUG 
-CXXFLAGS=	-O3 -ffast-math -fforce-addr -funroll-loops
+CXXFLAGS=	-O3 -ffast-math -funroll-loops
 LDFLAGS	=	-lm # -static
 ARFLAGS	=	crs
 ZLIB_FLAGS	=

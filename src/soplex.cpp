@@ -17,6 +17,7 @@
  * @brief Preconfigured SoPlex LP solver
  */
 
+#ifndef SOPLEX_LEGACY
 #include <assert.h>
 #include "limits.h"
 #include <iostream>
@@ -82,6 +83,12 @@ namespace soplex
       static Rational _rationalParamDefault[SoPlex::RATIONALPARAM_COUNT];
 #endif
 
+      /// array of lower bounds for int parameter values
+      static int _intParamLower[SoPlex::INTPARAM_COUNT];
+
+      /// array of upper bounds for int parameter values
+      static int _intParamUpper[SoPlex::INTPARAM_COUNT];
+
       /// array of lower bounds for real parameter values
       static Real _realParamLower[SoPlex::REALPARAM_COUNT];
 
@@ -126,103 +133,143 @@ namespace soplex
             // objective sense
             _intParamName[SoPlex::OBJSENSE] = "objsense";
             _intParamDescription[SoPlex::OBJSENSE] = "objective sense (-1 - minimize, +1 - maximize)";
+            _intParamLower[SoPlex::OBJSENSE] = -1;
+            _intParamUpper[SoPlex::OBJSENSE] = 1;
             _intParamDefault[SoPlex::OBJSENSE] = SoPlex::OBJSENSE_MAXIMIZE;
 
             // type of computational form, i.e., column or row representation
             _intParamName[SoPlex::REPRESENTATION] = "representation";
             _intParamDescription[SoPlex::REPRESENTATION] = "type of computational form (0 - auto, 1 - column representation, 2 - row representation)";
+            _intParamLower[SoPlex::REPRESENTATION] = 0;
+            _intParamUpper[SoPlex::REPRESENTATION] = 2;
             _intParamDefault[SoPlex::REPRESENTATION] = SoPlex::REPRESENTATION_AUTO;
 
             // type of algorithm, i.e., enter or leave
             _intParamName[SoPlex::ALGORITHM] = "algorithm";
             _intParamDescription[SoPlex::ALGORITHM] = "type of algorithm (0 - enter, 1 - leave)";
+            _intParamLower[SoPlex::ALGORITHM] = 0;
+            _intParamUpper[SoPlex::ALGORITHM] = 1;
             _intParamDefault[SoPlex::ALGORITHM] = SoPlex::ALGORITHM_LEAVE;
 
             // type of LU update
             _intParamName[SoPlex::FACTOR_UPDATE_TYPE] = "factor_update_type";
             _intParamDescription[SoPlex::FACTOR_UPDATE_TYPE] = "type of LU update (0 - eta update, 1 - Forrest-Tomlin update)";
+            _intParamLower[SoPlex::FACTOR_UPDATE_TYPE] = 0;
+            _intParamUpper[SoPlex::FACTOR_UPDATE_TYPE] = 1;
             _intParamDefault[SoPlex::FACTOR_UPDATE_TYPE] = SoPlex::FACTOR_UPDATE_TYPE_FT;
 
             ///@todo which value?
             // maximum number of updates without fresh factorization
             _intParamName[SoPlex::FACTOR_UPDATE_MAX] = "factor_update_max";
             _intParamDescription[SoPlex::FACTOR_UPDATE_MAX] = "maximum number of LU updates without fresh factorization";
+            _intParamLower[SoPlex::FACTOR_UPDATE_MAX] = 0;
+            _intParamUpper[SoPlex::FACTOR_UPDATE_MAX] = INT_MAX;
             _intParamDefault[SoPlex::FACTOR_UPDATE_MAX] = 200;
 
             // iteration limit (-1 if unlimited)
             _intParamName[SoPlex::ITERLIMIT] = "iterlimit";
             _intParamDescription[SoPlex::ITERLIMIT] = "iteration limit (-1 - no limit)";
+            _intParamLower[SoPlex::ITERLIMIT] = -1;
+            _intParamUpper[SoPlex::ITERLIMIT] = INT_MAX;
             _intParamDefault[SoPlex::ITERLIMIT] = -1;
 
             // refinement limit (-1 if unlimited)
             _intParamName[SoPlex::REFLIMIT] = "reflimit";
             _intParamDescription[SoPlex::REFLIMIT] = "refinement limit (-1 - no limit)";
+            _intParamLower[SoPlex::REFLIMIT] = 100;
+            _intParamUpper[SoPlex::REFLIMIT] = INT_MAX;
             _intParamDefault[SoPlex::REFLIMIT] = -1;
 
             // stalling refinement limit (-1 if unlimited)
             _intParamName[SoPlex::STALLREFLIMIT] = "stallreflimit";
             _intParamDescription[SoPlex::STALLREFLIMIT] = "stalling refinement limit (-1 - no limit)";
+            _intParamLower[SoPlex::STALLREFLIMIT] = -1;
+            _intParamUpper[SoPlex::STALLREFLIMIT] = INT_MAX;
             _intParamDefault[SoPlex::STALLREFLIMIT] = -1;
 
             // display frequency
             _intParamName[SoPlex::DISPLAYFREQ] = "displayfreq";
             _intParamDescription[SoPlex::DISPLAYFREQ] = "display frequency";
+            _intParamLower[SoPlex::DISPLAYFREQ] = 1;
+            _intParamUpper[SoPlex::DISPLAYFREQ] = INT_MAX;
             _intParamDefault[SoPlex::DISPLAYFREQ] = 200;
 
             // verbosity level
             _intParamName[SoPlex::VERBOSITY] = "verbosity";
             _intParamDescription[SoPlex::VERBOSITY] = "verbosity level (0 - error, 1 - warning, 2 - debug, 3 - normal, 4 - high, 5 - full)";
+            _intParamLower[SoPlex::VERBOSITY] = 0;
+            _intParamUpper[SoPlex::VERBOSITY] = 5;
             _intParamDefault[SoPlex::VERBOSITY] = SoPlex::VERBOSITY_NORMAL;
 
             // type of simplifier
             _intParamName[SoPlex::SIMPLIFIER] = "simplifier";
             _intParamDescription[SoPlex::SIMPLIFIER] = "simplifier (0 - off, 1 - auto)";
+            _intParamLower[SoPlex::SIMPLIFIER] = 0;
+            _intParamUpper[SoPlex::SIMPLIFIER] = 1;
             _intParamDefault[SoPlex::SIMPLIFIER] = SoPlex::SIMPLIFIER_AUTO;
 
             // type of scaler
             _intParamName[SoPlex::SCALER] = "scaler";
             _intParamDescription[SoPlex::SCALER] = "scaling (0 - off, 1 - uni-equilibrium, 2 - bi-equilibrium, 3 - geometric, 4 - iterated geometric)";
+            _intParamLower[SoPlex::SCALER] = 0;
+            _intParamUpper[SoPlex::SCALER] = 4;
             _intParamDefault[SoPlex::SCALER] = SoPlex::SCALER_BIEQUI;
 
             // type of starter used to create crash basis
             _intParamName[SoPlex::STARTER] = "starter";
             _intParamDescription[SoPlex::STARTER] = "crash basis generated when starting from scratch (0 - none, 1 - weight, 2 - sum, 3 - vector)";
+            _intParamLower[SoPlex::STARTER] = 0;
+            _intParamUpper[SoPlex::STARTER] = 3;
             _intParamDefault[SoPlex::STARTER] = SoPlex::STARTER_OFF;
 
             // type of pricer
             _intParamName[SoPlex::PRICER] = "pricer";
             _intParamDescription[SoPlex::PRICER] = "pricing method (0 - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)";
+            _intParamLower[SoPlex::PRICER] = 0;
+            _intParamUpper[SoPlex::PRICER] = 5;
             _intParamDefault[SoPlex::PRICER] = SoPlex::PRICER_AUTO;
 
             // type of ratio test
             _intParamName[SoPlex::RATIOTESTER] = "ratiotester";
             _intParamDescription[SoPlex::RATIOTESTER] = "method for ratio test (0 - textbook, 1 - harris, 2 - fast, 3 - boundflipping)";
+            _intParamLower[SoPlex::RATIOTESTER] = 0;
+            _intParamUpper[SoPlex::RATIOTESTER] = 3;
             _intParamDefault[SoPlex::RATIOTESTER] = SoPlex::RATIOTESTER_FAST;
 
             // mode for synchronizing real and rational LP
             _intParamName[SoPlex::SYNCMODE] = "syncmode";
             _intParamDescription[SoPlex::SYNCMODE] = "mode for synchronizing real and rational LP (0 - store only real LP, 1 - auto, 2 - manual)";
+            _intParamLower[SoPlex::SYNCMODE] = 0;
+            _intParamUpper[SoPlex::SYNCMODE] = 2;
             _intParamDefault[SoPlex::SYNCMODE] = SoPlex::SYNCMODE_ONLYREAL;
 
             // mode for reading LP files
             _intParamName[SoPlex::READMODE] = "readmode";
             _intParamDescription[SoPlex::READMODE] = "mode for reading LP files (0 - floating-point, 1 - rational)";
+            _intParamLower[SoPlex::READMODE] = 0;
+            _intParamUpper[SoPlex::READMODE] = 1;
             _intParamDefault[SoPlex::READMODE] = SoPlex::READMODE_REAL;
 
             // mode for iterative refinement strategy
             _intParamName[SoPlex::SOLVEMODE] = "solvemode";
             _intParamDescription[SoPlex::SOLVEMODE] = "mode for iterative refinement strategy (0 - floating-point solve, 1 - auto, 2 - force iterative refinement)";
-            _intParamDefault[SoPlex::SOLVEMODE] = SoPlex::SOLVEMODE_REAL;
+            _intParamLower[SoPlex::SOLVEMODE] = 0;
+            _intParamUpper[SoPlex::SOLVEMODE] = 2;
+            _intParamDefault[SoPlex::SOLVEMODE] = SoPlex::SOLVEMODE_AUTO;
 
             // mode for iterative refinement strategy
             _intParamName[SoPlex::CHECKMODE] = "checkmode";
             _intParamDescription[SoPlex::CHECKMODE] = "mode for a posteriori feasibility checks (0 - floating-point check, 1 - auto, 2 - rational check)";
-            _intParamDefault[SoPlex::CHECKMODE] = SoPlex::CHECKMODE_RATIONAL;
+            _intParamLower[SoPlex::CHECKMODE] = 0;
+            _intParamUpper[SoPlex::CHECKMODE] = 2;
+            _intParamDefault[SoPlex::CHECKMODE] = SoPlex::CHECKMODE_AUTO;
 
             // mode for hyper sparse pricing
             _intParamName[SoPlex::HYPER_PRICING] = "hyperpricing";
             _intParamDescription[SoPlex::HYPER_PRICING] = "mode for hyper sparse pricing (0 - off, 1 - auto, 2 - always)";
-            _intParamDefault[SoPlex::HYPER_PRICING] = SoPlex::HYPER_PRICING_OFF;
+            _intParamLower[SoPlex::HYPER_PRICING] = 0;
+            _intParamUpper[SoPlex::HYPER_PRICING] = 2;
+            _intParamDefault[SoPlex::HYPER_PRICING] = SoPlex::HYPER_PRICING_AUTO;
 
             // primal feasibility tolerance
             _realParamName[SoPlex::FEASTOL] = "feastol";
@@ -242,40 +289,40 @@ namespace soplex
             // general zero tolerance
             _realParamName[SoPlex::EPSILON_ZERO] = "epsilon_zero";
             _realParamDescription[SoPlex::EPSILON_ZERO] = "general zero tolerance";
-            _realParamLower[SoPlex::EPSILON_ZERO] = DEFAULT_EPS_ZERO;
-            _realParamUpper[SoPlex::EPSILON_ZERO] = DEFAULT_EPS_ZERO;
+            _realParamLower[SoPlex::EPSILON_ZERO] = 0.0;
+            _realParamUpper[SoPlex::EPSILON_ZERO] = 1.0;
             _realParamDefault[SoPlex::EPSILON_ZERO] = DEFAULT_EPS_ZERO;
 
             ///@todo define suitable values depending on Real type
             // zero tolerance used in factorization
             _realParamName[SoPlex::EPSILON_FACTORIZATION] = "epsilon_factorization";
             _realParamDescription[SoPlex::EPSILON_FACTORIZATION] = "zero tolerance used in factorization";
-            _realParamLower[SoPlex::EPSILON_FACTORIZATION] = DEFAULT_EPS_FACTOR;
-            _realParamUpper[SoPlex::EPSILON_FACTORIZATION] = DEFAULT_EPS_FACTOR;
+            _realParamLower[SoPlex::EPSILON_FACTORIZATION] = 0.0;
+            _realParamUpper[SoPlex::EPSILON_FACTORIZATION] = 1.0;
             _realParamDefault[SoPlex::EPSILON_FACTORIZATION] = DEFAULT_EPS_FACTOR;
 
             ///@todo define suitable values depending on Real type
             // zero tolerance used in update of the factorization
             _realParamName[SoPlex::EPSILON_UPDATE] = "epsilon_update";
             _realParamDescription[SoPlex::EPSILON_UPDATE] = "zero tolerance used in update of the factorization";
-            _realParamLower[SoPlex::EPSILON_UPDATE] = DEFAULT_EPS_UPDATE;
-            _realParamUpper[SoPlex::EPSILON_UPDATE] = DEFAULT_EPS_UPDATE;
+            _realParamLower[SoPlex::EPSILON_UPDATE] = 0.0;
+            _realParamUpper[SoPlex::EPSILON_UPDATE] = 1.0;
             _realParamDefault[SoPlex::EPSILON_UPDATE] = DEFAULT_EPS_UPDATE;
 
             ///@todo define suitable values depending on Real type
             // pivot zero tolerance used in factorization
             _realParamName[SoPlex::EPSILON_PIVOT] = "epsilon_pivot";
             _realParamDescription[SoPlex::EPSILON_PIVOT] = "pivot zero tolerance used in factorization";
-            _realParamLower[SoPlex::EPSILON_PIVOT] = DEFAULT_EPS_PIVOT;
-            _realParamUpper[SoPlex::EPSILON_PIVOT] = DEFAULT_EPS_PIVOT;
+            _realParamLower[SoPlex::EPSILON_PIVOT] = 0.0;
+            _realParamUpper[SoPlex::EPSILON_PIVOT] = 1.0;
             _realParamDefault[SoPlex::EPSILON_PIVOT] = DEFAULT_EPS_PIVOT;
 
             ///@todo define suitable values depending on Real type
             // infinity threshold
             _realParamName[SoPlex::INFTY] = "infty";
             _realParamDescription[SoPlex::INFTY] = "infinity threshold";
-            _realParamLower[SoPlex::INFTY] = DEFAULT_INFINITY;
-            _realParamUpper[SoPlex::INFTY] = DEFAULT_INFINITY;
+            _realParamLower[SoPlex::INFTY] = 1e10;
+            _realParamUpper[SoPlex::INFTY] = 1e100;
             _realParamDefault[SoPlex::INFTY] = DEFAULT_INFINITY;
 
             // time limit in seconds (INFTY if unlimited)
@@ -288,16 +335,16 @@ namespace soplex
             // lower limit on objective value
             _realParamName[SoPlex::OBJLIMIT_LOWER] = "objlimit_lower";
             _realParamDescription[SoPlex::OBJLIMIT_LOWER] = "lower limit on objective value";
-            _realParamLower[SoPlex::OBJLIMIT_LOWER] = -_realParamLower[SoPlex::INFTY];
-            _realParamUpper[SoPlex::OBJLIMIT_LOWER] = _realParamLower[SoPlex::INFTY];
-            _realParamDefault[SoPlex::OBJLIMIT_LOWER] = -_realParamLower[SoPlex::INFTY];
+            _realParamLower[SoPlex::OBJLIMIT_LOWER] = -DEFAULT_INFINITY;
+            _realParamUpper[SoPlex::OBJLIMIT_LOWER] = DEFAULT_INFINITY;
+            _realParamDefault[SoPlex::OBJLIMIT_LOWER] = -DEFAULT_INFINITY;
 
             // upper limit on objective value
             _realParamName[SoPlex::OBJLIMIT_UPPER] = "objlimit_upper";
             _realParamDescription[SoPlex::OBJLIMIT_UPPER] = "upper limit on objective value";
-            _realParamLower[SoPlex::OBJLIMIT_UPPER] = -_realParamLower[SoPlex::INFTY];
-            _realParamUpper[SoPlex::OBJLIMIT_UPPER] = _realParamLower[SoPlex::INFTY];
-            _realParamDefault[SoPlex::OBJLIMIT_UPPER] = _realParamLower[SoPlex::INFTY];
+            _realParamLower[SoPlex::OBJLIMIT_UPPER] = -DEFAULT_INFINITY;
+            _realParamUpper[SoPlex::OBJLIMIT_UPPER] = DEFAULT_INFINITY;
+            _realParamDefault[SoPlex::OBJLIMIT_UPPER] = DEFAULT_INFINITY;
 
             // working tolerance for feasibility in floating-point solver during iterative refinement
             _realParamName[SoPlex::FPFEASTOL] = "fpfeastol";
@@ -400,6 +447,8 @@ namespace soplex
 
    std::string SoPlex::Settings::_intParamName[SoPlex::INTPARAM_COUNT];
    std::string SoPlex::Settings::_intParamDescription[SoPlex::INTPARAM_COUNT];
+   int SoPlex::Settings::_intParamLower[SoPlex::INTPARAM_COUNT];
+   int SoPlex::Settings::_intParamUpper[SoPlex::INTPARAM_COUNT];
    int SoPlex::Settings::_intParamDefault[SoPlex::INTPARAM_COUNT];
 
 
@@ -2092,8 +2141,7 @@ namespace soplex
       _invalidateSolution();
 
       // decide whether to solve the rational LP with iterative refinement or call the standard floating-point solver
-      if( Rational::precision() < INT_MAX
-          || intParam(SoPlex::SOLVEMODE) == SOLVEMODE_REAL || (intParam(SoPlex::SOLVEMODE) == SOLVEMODE_AUTO
+      if( intParam(SoPlex::SOLVEMODE) == SOLVEMODE_REAL || (intParam(SoPlex::SOLVEMODE) == SOLVEMODE_AUTO
              && GE(realParam(SoPlex::FEASTOL), 1e-9) && GE(realParam(SoPlex::OPTTOL), 1e-9)) )
       {
          _solveReal();
@@ -2193,8 +2241,7 @@ namespace soplex
 
 
 
-   /// returns the objective value if a primal solution is available
-   ///@todo buffer objective value if computed once
+   /// returns the objective value if a primal or dual solution is available
    Real SoPlex::objValueReal()
    {
       assert(OBJSENSE_MAXIMIZE == 1);
@@ -2207,10 +2254,15 @@ namespace soplex
       else if( hasPrimal() )
       {
          _syncRealSolution();
-         return (_solReal._primal * maxObjReal()) * intParam(SoPlex::OBJSENSE);
+         return _solReal._primalObjVal;
+      }
+      else if( hasDual() )
+      {
+         _syncRealSolution();
+         return _solReal._dualObjVal;
       }
       else
-         return 0;
+         return 0.0;
    }
 
 
@@ -2488,7 +2540,7 @@ namespace soplex
 
 
 
-   /// returns the objective value if a primal solution is available
+   /// returns the objective value if a primal or dual solution is available
    Rational SoPlex::objValueRational()
    {
       assert(OBJSENSE_MAXIMIZE == 1);
@@ -2501,7 +2553,12 @@ namespace soplex
       else if( hasPrimal() )
       {
          _syncRationalSolution();
-         return (_solRational._primal * maxObjRational()) * intParam(SoPlex::OBJSENSE);
+         return _solRational._primalObjVal;
+      }
+      else if( hasDual() )
+      {
+         _syncRationalSolution();
+         return _solRational._dualObjVal;
       }
       else
          return 0;
@@ -3954,6 +4011,10 @@ namespace soplex
       if( !init && value == intParam(param) )
          return true;
 
+      // check for a valid parameter value wrt bounds
+      if( value < _currentSettings->_intParamLower[param] || value > _currentSettings->_intParamUpper[param] )
+         return false;
+
       switch( param )
       {
       // objective sense
@@ -4285,6 +4346,10 @@ namespace soplex
       case SoPlex::LIFTMAXVAL:
          break;
 
+      // threshold for sparse pricing
+      case SoPlex::SPARSITY_THRESHOLD:
+         break;
+
       default:
          return false;
       }
@@ -4353,6 +4418,54 @@ namespace soplex
 
 
 
+   /// print non-default parameter values
+   void SoPlex::printUserSettings()
+   {
+      bool printedValue = false;
+
+      for( int i = 0; i < SoPlex::BOOLPARAM_COUNT; i++ )
+      {
+         if( _currentSettings->_boolParamValues[i] == _currentSettings->_boolParamDefault[i] )
+            continue;
+
+         spxout << "bool:" << _currentSettings->_boolParamName[i] << " = " << (_currentSettings->_boolParamValues[i] ? "true\n" : "false\n");
+         printedValue = true;
+      }
+
+      for( int i = 0; i < SoPlex::INTPARAM_COUNT; i++ )
+      {
+         if( _currentSettings->_intParamValues[i] == _currentSettings->_intParamDefault[i] )
+            continue;
+
+         spxout << "int:" << _currentSettings->_intParamName[i] << " = " << _currentSettings->_intParamValues[i] << "\n";
+         printedValue = true;
+      }
+
+      for( int i = 0; i < SoPlex::REALPARAM_COUNT; i++ )
+      {
+         if( _currentSettings->_realParamValues[i] == _currentSettings->_realParamDefault[i] )
+            continue;
+
+         spxout << "real:" << _currentSettings->_realParamName[i] << " = " << _currentSettings->_realParamValues[i] << "\n";
+         printedValue = true;
+      }
+
+#ifdef SOPLEX_WITH_RATIONALPARAM
+      for( int i = 0; i < SoPlex::RATIONALPARAM_COUNT; i++ )
+      {
+         if( _currentSettings->_rationalParamValues[i] == _currentSettings->_rationalParamDefault[i] )
+            continue;
+
+         spxout << "rational:" << _currentSettings->_rationalParamName[i] << " = " << _currentSettings->_rationalParamValues[i] << "\n";
+         printedValue = true;
+      }
+#endif
+      if( printedValue )
+         spxout << std::endl;
+   }
+
+
+
    /// writes settings file; returns true on success
    bool SoPlex::saveSettingsFile(const char* filename, const bool onlyChanged) const
    {
@@ -4394,7 +4507,7 @@ namespace soplex
 
          file << "\n";
          file << "# " << _currentSettings->_realParamDescription[i] << "\n";
-         file << "# range [" << _currentSettings->_realParamLower[i] << "," << _currentSettings->_realParamLower[i]
+         file << "# range [" << _currentSettings->_realParamLower[i] << "," << _currentSettings->_realParamUpper[i]
             << "], default " << _currentSettings->_realParamDefault[i] << "\n";
          file << "real:" << _currentSettings->_realParamName[i] << " = " << _currentSettings->_realParamValues[i] << "\n";
       }
@@ -4407,7 +4520,7 @@ namespace soplex
 
          file << "\n";
          file << "# " << _currentSettings->_rationalParamDescription[i] << "\n";
-         file << "# range [" << _currentSettings->_rationalParamLower[i] << "," << _currentSettings->_rationalParamLower[i]
+         file << "# range [" << _currentSettings->_rationalParamLower[i] << "," << _currentSettings->_rationalParamUpper[i]
             << "], default " << _currentSettings->_rationalParamDefault[i] << "\n";
          file << "rational:" << _currentSettings->_rationalParamName[i] << " = " << _currentSettings->_rationalParamValues[i] << "\n";
       }
@@ -4737,15 +4850,15 @@ namespace soplex
          if( getRowViolationRational(maxviol, sumviol) )
             os << "  Max/sum row       : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
          else
-            os << "  Max/sum bound     : - / -\n";
+            os << "  Max/sum row       : - / -\n";
          if( getRedCostViolationRational(maxviol, sumviol) )
             os << "  Max/sum redcost   : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
          else
-            os << "  Max/sum bound     : - / -\n";
+            os << "  Max/sum redcost   : - / -\n";
          if( getDualViolationRational(maxviol, sumviol) )
             os << "  Max/sum dual      : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
          else
-            os << "  Max/sum bound     : - / -\n";
+            os << "  Max/sum dual      : - / -\n";
       }
       else
       {
@@ -4760,15 +4873,15 @@ namespace soplex
          if( getRowViolationReal(maxviol, sumviol) )
             os << "  Max/sum row       : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
          else
-            os << "  Max/sum bound     : - / -\n";
+            os << "  Max/sum row       : - / -\n";
          if( getRedCostViolationReal(maxviol, sumviol) )
             os << "  Max/sum redcost   : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
          else
-            os << "  Max/sum bound     : - / -\n";
+            os << "  Max/sum redcost   : - / -\n";
          if( getDualViolationReal(maxviol, sumviol) )
             os << "  Max/sum dual      : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
          else
-            os << "  Max/sum bound     : - / -\n";
+            os << "  Max/sum dual      : - / -\n";
       }
    }
 
@@ -4789,7 +4902,7 @@ namespace soplex
       printStatus(os, _status);
       os << "Solving time (sec)  : " << std::fixed << std::setprecision(2) << _statistics->solvingTime.userTime() << "\n"
          << "Iterations          : " << _statistics->iterations << "\n"
-         << "Objective value     : " << std::scientific << objValueReal() << std::fixed << "\n";
+         << "Objective value     : " << std::scientific << std::setprecision(8) << objValueReal() << std::fixed << "\n";
    }
 
 
@@ -6151,7 +6264,7 @@ namespace soplex
       _statistics->iterations += _solver.iterations();
       _statistics->iterationsPrimal += _solver.primalIterations();
       _statistics->iterationsFromBasis += _hadBasis ? _solver.iterations() : 0;
-      _statistics->boundflips += _solver.totalboundflips;
+      _statistics->boundflips += _solver.boundFlips();
       _statistics->luFactorizationTime += _slufactor.getFactorTime();
       _statistics->luSolveTime += _slufactor.getSolveTime();
       _statistics->luFactorizations += _slufactor.getFactorCount();
@@ -6263,10 +6376,6 @@ namespace soplex
       ///@todo try loading old basis
       _hasBasis = false;
 
-      // invalidate real solution
-      _solReal.invalidate();
-      _hasSolReal = false;
-
       // stop timing
       if( time )
          _statistics->syncTime.stop();
@@ -6284,10 +6393,6 @@ namespace soplex
       // copy LP
       _ensureRationalLP();
       *_rationalLP = *_realLP;
-
-      // invalidate rational solution
-      _solRational.invalidate();
-      _hasSolRational = false;
 
       // stop timing
       if( time )
@@ -6318,3 +6423,4 @@ namespace soplex
       }
    }
 } // namespace soplex
+#endif

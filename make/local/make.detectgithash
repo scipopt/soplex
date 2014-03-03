@@ -19,7 +19,6 @@
 #@author  Matthias Miltenberger
 
 
-SPXGITHASHFILE = $(SRCDIR)/git_hash.cpp
 SPXGITHASH = $(shell git describe --always --dirty  | sed 's/^.*-g//')
 
 .PHONY: githash

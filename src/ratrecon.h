@@ -24,7 +24,7 @@
 #include <math.h>
 #include <assert.h>
 #include <iostream>
-#include <string>
+#include <string.h>
 
 #include "rational.h"
 #include "sol.h"

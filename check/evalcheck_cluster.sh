@@ -22,115 +22,114 @@ FILES=""
 
 for i in $@
 do
-  if test ! -e $i
-  then
-      if test "$i" = "-r"
-      then
-	  REMOVE=1
-      else
-	  AWKARGS="$AWKARGS $i"
-      fi
-  else
-      FILES="$FILES $i"
-  fi
+    if test ! -e $i
+    then
+        if test "$i" = "-r"
+        then
+            REMOVE=1
+        else
+            AWKARGS="$AWKARGS $i"
+        fi
+    else
+        FILES="$FILES $i"
+    fi
 done
 
 for FILE in $FILES
 do
+    DIR=`dirname $FILE`
+    EVALFILE=`basename $FILE .eval`
+    EVALFILE=`basename $EVALFILE .out`
 
-  DIR=`dirname $FILE`
-  EVALFILE=`basename $FILE .eval`
-  EVALFILE=`basename $EVALFILE .out`
+    OUTFILE=$DIR/$EVALFILE.out
+    ERRFILE=$DIR/$EVALFILE.err
+    RESFILE=$DIR/$EVALFILE.res
 
-  OUTFILE=$DIR/$EVALFILE.out
-  ERRFILE=$DIR/$EVALFILE.err
-  RESFILE=$DIR/$EVALFILE.res
+    # check if the eval file exists; if this is the case construct the overall solution files
+    if test -e $DIR/$EVALFILE.eval
+    then
+        # in case an output file exists, copy it away to save the results
+        DATEINT=`date +"%s"`
+        if test -e $OUTFILE
+        then
+            cp $OUTFILE $OUTFILE.old-$DATEINT
+        fi
+        if test -e $ERRFILE
+        then
+            cp $ERRFILE $ERRFILE.old-$DATEINT
+        fi
 
-  # check if the eval file exists; if this is the case construct the overall solution files
-  if test -e $DIR/$EVALFILE.eval
-  then
-      # in case an output file exists, copy it away to save the results
-      DATEINT=`date +"%s"`
-      if test -e $OUTFILE
-      then
-	  cp $OUTFILE $OUTFILE.old-$DATEINT
-      fi
-      if test -e $ERRFILE
-      then
-	  cp $ERRFILE $ERRFILE.old-$DATEINT
-      fi
+        echo > $OUTFILE
+        echo > $ERRFILE
+        echo create overall output and error file for $EVALFILE
 
-      echo > $OUTFILE
-      echo > $ERRFILE
-      echo create overall output and error file for $EVALFILE
+        for i in `cat $DIR/$EVALFILE.eval` DONE
+            do
+            if test "$i" = "DONE"
+            then
+                break
+            fi
 
-      for i in `cat $DIR/$EVALFILE.eval` DONE
-	do
-	if test "$i" = "DONE"
-	then
-	    break
-	fi
+            FILE=$i.out
+            if test -e $FILE
+            then
+                cat $FILE >> $OUTFILE
+                if test "$REMOVE" = "1"
+                then
+                    rm -f $FILE
+                fi
+            else
+                echo Missing $i
+            fi
 
-	FILE=$i.out
-	if test -e $FILE
-	then
-	    cat $FILE >> $OUTFILE
-	    if test "$REMOVE" = "1"
-	    then
-		rm -f $FILE
-	    fi
-	else
-	    echo Missing $i
-	fi
+            FILE=$i.err
+            if test -e $FILE
+            then
+                cat $FILE >> $ERRFILE
+                if test "$REMOVE" = "1"
+                then
+                    rm -f $FILE
+                fi
+            fi
 
-	FILE=$i.err
-	if test -e $FILE
-	then
-	    cat $FILE >> $ERRFILE
-	    if test "$REMOVE" = "1"
-	    then
-		rm -f $FILE
-	    fi
-	fi
+        done
 
-      done
+        if test "$REMOVE" = "1"
+        then
+            rm -f $DIR/$EVALFILE.eval
+        fi
+    fi
 
-      if test "$REMOVE" = "1"
-      then
-	  rm -f $DIR/$EVALFILE.eval
-      fi
-  fi
+    # check if the out file exists
+    if test -e $DIR/$EVALFILE.out
+    then
+        echo create results for $EVALFILE
 
-  # check if the out file exists
-  if test -e $DIR/$EVALFILE.out
-  then
-      echo create results for $EVALFILE
+        # detect test set
+        TSTNAME=`echo $EVALFILE | sed 's/check.\([a-zA-Z0-9_-]*\).*/\1/g'`
 
-      # detect test set
-      TSTNAME=`echo $EVALFILE | sed 's/check.\([a-zA-Z0-9_-]*\).*/\1/g'`
+        echo "Testset " $TSTNAME
 
-      echo "Testset " $TSTNAME
+        if test -f $TSTNAME.test
+        then
+            TESTFILE=$TSTNAME.test
+        else
+            TESTFILE=""
+        fi
 
-      if test -f $TSTNAME.test
-      then
-	  TESTFILE=$TSTNAME.test
-      else
-	  TESTFILE=""
-      fi
+        if test -f $TSTNAME.solu
+        then
+            SOLUFILE=$TSTNAME.solu
+        else
+            if test -f all.solu
+            then
+                SOLUFILE=all.solu
+            else
+                SOLUFILE=""
+            fi
+        fi
 
-      if test -f $TSTNAME.solu
-      then
-	  SOLUFILE=$TSTNAME.solu
-      else
-	  if test -f all.solu
-	  then
-	      SOLUFILE=all.solu
-	  else
-	      SOLUFILE=""
-	  fi
-      fi
+        ./evaluation.py $OUTFILE | tee $RESFILE
 
-      awk -f check.awk $AWKARGS $SOLUFILE $OUTFILE | tee $RESFILE
-
-  fi
+    fi
 done

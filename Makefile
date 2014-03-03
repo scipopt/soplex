@@ -28,7 +28,7 @@ include make/make.detecthost
 # default settings
 #-----------------------------------------------------------------------------
 
-VERSION		:=	1.7.2.8
+VERSION		:=	2.0.0
 SPXGITHASH	=
 
 VERBOSE		=	false
@@ -39,18 +39,23 @@ SHAREDLIBEXT	=	so
 LIBEXT		=	$(STATICLIBEXT)
 EXEEXTENSION	=	
 TEST		=	quick
+ALGO		=  1 2 3 4
+LIMIT		=  #
 SETTINGS	=	default
 TIME		=	3600
-RESDIR	=	results
+RESDIR		=	results
 
 #these variables are needed for cluster runs
-MEM		=	6144
+MEM		=	2000
 CONTINUE	=	false
 
 INSTALLDIR	=	#
 
 #will this be compiled for PARASCIP? (disables output because it uses global variables)
 PARASCIP	=	false
+
+#will this be compiled with the 1.x interface
+LEGACY		=	false
 
 GMP		=	true
 ZLIB		=	true
@@ -238,6 +243,7 @@ BASE		=	$(OSTYPE).$(ARCH).$(COMP).$(OPT)
 
 LASTSETTINGS	=	$(OBJDIR)/make.lastsettings
 
+SPXGITHASHFILE	=	$(SRCDIR)/git_hash.cpp
 
 #------------------------------------------------------------------------------
 #--- NOTHING TO CHANGE FROM HERE ON -------------------------------------------
@@ -276,6 +282,7 @@ ARFLAGS		=
 RANLIB		=
 endif
 
+CPPFLAGS	+=	$(USRCPPFLAGS)
 CXXFLAGS	+=	$(USRCXXFLAGS)
 LDFLAGS		+=	$(USRLDFLAGS)
 ARFLAGS		+=	$(USRARFLAGS)
@@ -285,10 +292,23 @@ DFLAGS		+=	$(USRDFLAGS)
 # PARASCIP
 #-----------------------------------------------------------------------------
 
+PARASCIPDEP	:=	$(SRCDIR)/depend.parascip
+PARASCIPSRC	:=	$(shell cat $(PARASCIPDEP))
+
 ifeq ($(PARASCIP),true)
 CPPFLAGS	+=	-DDISABLE_VERBOSITY
 endif
 
+#-----------------------------------------------------------------------------
+# LEGACY
+#-----------------------------------------------------------------------------
+
+LEGACYDEP	:=	$(SRCDIR)/depend.legacy
+LEGACYSRC	:=	$(shell cat $(LEGACYDEP))
+
+ifeq ($(LEGACY),true)
+CPPFLAGS	+=	-DSOPLEX_LEGACY
+endif
 
 #-----------------------------------------------------------------------------
 # Main Program
@@ -327,8 +347,10 @@ LIBSRCHEADER	=	$(addprefix $(SRCDIR)/,$(LIBHEADER))
 GMPDEP	:=	$(SRCDIR)/depend.gmp
 GMPSRC	:=	$(shell cat $(GMPDEP))
 ifeq ($(GMP),true)
+ifeq ($(LEGACY),false)
 CPPFLAGS	+=	-DSOPLEX_WITH_GMP
 LDFLAGS		+=	-lgmp
+endif
 endif
 
 ZLIBDEP		:=	$(SRCDIR)/depend.zlib
@@ -337,10 +359,9 @@ ifeq ($(ZLIB_LDFLAGS),)
 ZLIB		=	false
 endif
 ifeq ($(ZLIB),true)
-CPPFLAGS	+=	-DWITH_ZLIB $(ZLIB_FLAGS)
+CPPFLAGS	+=	-DSOPLEX_WITH_ZLIB $(ZLIB_FLAGS)
 LDFLAGS		+=	$(ZLIB_LDFLAGS)
 endif
-
 
 #-----------------------------------------------------------------------------
 # Rules
@@ -348,10 +369,16 @@ endif
 
 ifeq ($(VERBOSE),false)
 .SILENT:	$(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK) $(BINFILE) example $(EXAMPLEOBJFILES) $(LIBFILE) $(BINOBJFILES) $(LIBOBJFILES)
+MAKE		+= -s
 endif
 
 .PHONY: all
-all:		makelibfile $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
+all:		makelibfile
+		@-$(MAKE) $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
+
+.PHONY: preprocess
+preprocess:	checkdefines
+		@-$(MAKE) touchexternal
 
 $(LIBLINK) $(LIBSHORTLINK):	$(LIBFILE)
 		@rm -f $@
@@ -375,9 +402,10 @@ example:	$(LIBOBJFILES) $(EXAMPLEOBJFILES) | $(BINDIR) $(EXAMPLEOBJDIR)
 		|| ($(MAKE) errorhints && false)
 
 .PHONY: makelibfile
-makelibfile:	checkdefines touchexternal | $(LIBDIR) $(LIBOBJDIR)
+makelibfile:	preprocess
+		@-$(MAKE) $(LIBFILE)
 
-$(LIBFILE):	$(LIBOBJFILES)
+$(LIBFILE):	$(LIBOBJFILES) | $(LIBDIR) $(LIBOBJDIR)
 		@echo "-> generating library $@"
 		-rm -f $(LIBFILE)
 		$(LIBBUILD) $(LIBBUILDFLAGS) $(LIBBUILD_o)$@ $(LIBOBJFILES) $(REPOSIT)
@@ -399,8 +427,12 @@ githash::	# do not remove the double-colon
 
 .PHONY: lint
 lint:		$(BINSRC) $(LIBSRC)
-		$(LINT) lint/$(NAME).lnt -os\(lint.out\) \
-		$(CPPFLAGS) -UNDEBUG $^
+		-rm -f lint.out
+ifeq ($(FILES),)
+		$(LINT) lint/$(NAME).lnt +os\(lint.out\) -u -zero -Isrc -I/usr/include -e322 -UNDEBUG $^
+else
+		$(LINT) lint/$(NAME).lnt +os\(lint.out\) -u -zero -Isrc -I/usr/include -e322 -UNDEBUG $(FILES)
+endif
 
 .PHONY: doc
 doc:		
@@ -408,10 +440,20 @@ doc:
 
 .PHONY: test
 test:		#$(BINFILE)
+ifeq ($(LEGACY),false)
 		cd check; ./test.sh $(TEST) ../$(BINFILE) $(SETTINGS) $(TIME) $(RESDIR)
+endif
+ifeq ($(LEGACY),true)
+		cd check; ./check_legacy.sh $(TEST).test ../$(BINFILE) '$(ALGO)' $(LIMIT)
+endif
 .PHONY: check
-check:		#$(BINFILE)
+check:	#$(BINFILE)
+ifeq ($(LEGACY),false)
 		cd check; ./check.sh ../$(BINFILE) $(RESDIR)
+endif
+ifeq ($(LEGACY),true)
+		cd check; ./check_legacy.sh $(TEST).test ../$(BINFILE) '$(ALGO)' $(LIMIT)
+endif
 
 valgrind-check:	$(BINFILE)
 		cd check; \
@@ -484,7 +526,9 @@ depend:
 		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(LIBOBJDIR\)/\1.o|g'\'' \
 		>>$(DEPEND)'
 		@echo `grep -l "SOPLEX_WITH_GMP" $(SRCDIR)/*` >$(GMPDEP)
-		@echo `grep -l "WITH_ZLIB" $(SRCDIR)/*` >$(ZLIBDEP)
+		@echo `grep -l "SOPLEX_WITH_ZLIB" $(SRCDIR)/*` >$(ZLIBDEP)
+		@echo `grep -l "SOPLEX_LEGACY" $(SRCDIR)/*` >$(LEGACYDEP)
+		@echo `grep -l "DISABLE_VERBOSITY" $(SRCDIR)/*` >$(PARASCIPDEP)
 
 -include	$(DEPEND)
 
@@ -502,15 +546,26 @@ $(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 -include $(LASTSETTINGS)
 
 .PHONY: touchexternal
-touchexternal:	$(GMPDEP) $(ZLIBDEP) | $(OBJDIR)
+touchexternal:	$(GMPDEP) $(ZLIBDEP) $(PARASCIPDEP) $(LEGACYDEP) | $(OBJDIR)
 ifneq ($(SPXGITHASH),$(LAST_SPXGITHASH))
 		@-$(MAKE) githash
 endif
+		@$(SHELL) -ec 'if test ! -e $(SPXGITHASHFILE) ; \
+			then \
+				echo "-> generating $(SPXGITHASHFILE)" ; \
+				$(MAKE) githash ; \
+			fi'
 ifneq ($(GMP),$(LAST_GMP))
 		@-touch $(GMPSRC)
 endif
 ifneq ($(ZLIB),$(LAST_ZLIB))
 		@-touch $(ZLIBSRC)
+endif
+ifneq ($(PARASCIP),$(LAST_PARASCIP))
+		@-touch $(PARASCIPSRC)
+endif
+ifneq ($(LEGACY),$(LAST_LEGACY))
+		@-touch $(LEGACYSRC)
 endif
 ifneq ($(SHARED),$(LAST_SHARED))
 		@-touch $(LIBSRC)
@@ -520,12 +575,28 @@ ifneq ($(USRCXXFLAGS),$(LAST_USRCXXFLAGS))
 		@-touch $(LIBSRC)
 		@-touch $(BINSRC)
 endif
+ifneq ($(USRCPPFLAGS),$(LAST_USRCPPFLAGS))
+		@-touch $(LIBSRC)
+		@-touch $(BINSRC)
+endif
+ifneq ($(USRLDFLAGS),$(LAST_USRLDFLAGS))
+		@-touch -c $(EXAMPLEOBJFILES) $(BINOBJFILES) $(LIBOBJFILES)
+endif
+ifneq ($(USRARFLAGS),$(LAST_USRARFLAGS))
+		@-touch -c $(EXAMPLEOBJFILES) $(BINOBJFILES) $(LIBOBJFILES)
+endif
 		@-rm -f $(LASTSETTINGS)
 		@echo "LAST_SPXGITHASH=$(SPXGITHASH)" >> $(LASTSETTINGS)
 		@echo "LAST_GMP=$(GMP)" >> $(LASTSETTINGS)
 		@echo "LAST_ZLIB=$(ZLIB)" >> $(LASTSETTINGS)
+		@echo "LAST_PARASCIP=$(PARASCIP)" >> $(LASTSETTINGS)
+		@echo "LAST_LEGACY=$(LEGACY)" >> $(LASTSETTINGS)
 		@echo "LAST_SHARED=$(SHARED)" >> $(LASTSETTINGS)
 		@echo "LAST_USRCXXFLAGS=$(USRCXXFLAGS)" >> $(LASTSETTINGS)
+		@echo "LAST_USRCPPFLAGS=$(USRCPPFLAGS)" >> $(LASTSETTINGS)
+		@echo "LAST_USRLDFLAGS=$(USRLDFLAGS)" >> $(LASTSETTINGS)
+		@echo "LAST_USRARFLAGS=$(USRARFLAGS)" >> $(LASTSETTINGS)
+		@echo "LAST_USRDFLAGS=$(USRDFLAGS)" >> $(LASTSETTINGS)
 
 .PHONY: checkdefines
 checkdefines:
@@ -539,19 +610,25 @@ ifneq ($(ZLIB),false)
 		$(error invalid ZLIB flag selected: ZLIB=$(ZLIB). Possible options are: true false)
 endif
 endif
+ifneq ($(PARASCIP),true)
+ifneq ($(PARASCIP),false)
+		$(error invalid PARASCIP flag selected: PARASCIP=$(PARASCIP). Possible options are: true false)
+endif
+endif
+ifneq ($(LEGACY),true)
+ifneq ($(LEGACY),false)
+		$(error invalid LEGACY flag selected: LEGACY=$(LEGACY). Possible options are: true false)
+endif
+endif
 
 .PHONY: errorhints
 errorhints:
-		@echo
-		@echo "build failed"
 ifeq ($(ZLIB),true)
-		@echo "- you used ZLIB=true: if zlib is not available, try building with ZLIB=false"
+		@echo "build failed with ZLIB=true: if ZLIB is not available, try building with ZLIB=false"
 endif
 ifeq ($(GMP),true)
-		@echo "- you used GMP=true: if gmp is not available, try building with GMP=false (note that this will deactivate iterative refinement)"
+		@echo "build failed with GMP=true: if GMP is not available, try building with GMP=false"
 endif
-		@echo "for help on building SoPlex consult the INSTALL file"
-		@echo
 
 # --- EOF ---------------------------------------------------------------------
 # DO NOT DELETE

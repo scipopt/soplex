@@ -13,6 +13,7 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+#ifndef SOPLEX_LEGACY
 #include <iostream>
 #include <assert.h>
 
@@ -231,8 +232,10 @@ namespace soplex
       // if the problem has been found to be infeasible and an approximate Farkas proof is available, we compute a
       // scaled unit box around the origin that provably contains no feasible solution; this currently only works for
       // equality form
+#if 0
       if( _solRational.hasDualFarkas() )
          _computeInfeasBox(_solRational, false);
+#endif
 
       // restore original problem
       _untransformEquality(_solRational);
@@ -321,15 +324,18 @@ namespace soplex
          return;
       }
 
-      // store floating-point solution of original LP as current rational solution
+      // store floating-point solution of original LP as current rational solution; make sure that the primal obj value
+      // corresponds to a minimization problem
       sol._primal = primalReal;
       sol._slacks = _rationalLP->computePrimalActivity(sol._primal);
       sol._hasPrimal = true;
+      sol._primalObjVal = (sol._primal * _rationalLP->maxObj()) * -1;
 
       sol._dual = dualReal;
       sol._redCost = _rationalLP->computeDualActivity(sol._dual) + _rationalLP->maxObj();
       sol._redCost *= -1;
       sol._hasDual = true;
+      sol._dualObjVal = sol._primalObjVal;
 
       _hasBasis = true;
 
@@ -607,6 +613,14 @@ namespace soplex
       }
       while( true );
 
+      // compute objective values
+      assert(sol._hasPrimal == sol._hasDual);
+      if( sol._hasPrimal )
+      {
+         sol._primalObjVal = (sol._primal * _rationalLP->maxObj()) * -1;
+         sol._dualObjVal = sol._primalObjVal;
+      }
+
       // reset tolerances in floating-point solver
       _solver.setFeastol(realParam(SoPlex::FEASTOL));
       _solver.setOpttol(realParam(SoPlex::OPTTOL));
@@ -683,9 +697,11 @@ namespace soplex
       bool success = false;
       error = false;
 
+#if 0
       ///@todo check whether approximate Farkas proof can be used
       _computeInfeasBox(_solRational, false);
       ///@todo if approx Farkas proof is good enough then exit without doing any transformation
+#endif
 
       // remove objective function, shift, homogenize
       _transformFeasibility();
@@ -731,10 +747,13 @@ namespace soplex
                _solRational._hasDualFarkas = true;
                _solRational._dualFarkas = _solRational._dual;
 
+#if 0
                // check if we can compute sufficiently large Farkas box
                _computeInfeasBox(_solRational, true);
+#endif
                if( true )//@todo check if computeInfeasBox found a sufficient box
                {
+
                   success = true;
                   sol._hasPrimal = false;
                }
@@ -1197,6 +1216,9 @@ namespace soplex
          _rationalLP->changeObj(_rationalLP->maxObj());
          _rationalLP->changeSense(SPxLPRational::MAXIMIZE);
          _realLP->changeSense(SPxLPReal::MAXIMIZE);
+
+         sol._primalObjVal *= -1;
+         sol._dualObjVal *= -1;
       }
 
       // restore bounds and objective coefficients in real LP
@@ -1542,25 +1564,33 @@ namespace soplex
       assert(!sol._hasPrimal || sol._slacks == _rationalLP->computePrimalActivity(sol._primal));
    }
 
-   /// computes radius of infeasibility box implied by an approximate Farkas' proof
-   ///
-   /// Given constraints of the form \f$ lhs \leq Ax \leq rhs \f$, a farkas proof \f$ y \f$ should satisfy \f$ y^T A = 0 \f$ and
-   /// \f$ y_+^T lhs - y_-^T rhs > 0 \f$, where \f$ y_+, y_- \f$ denote the positive and negative parts of \f$ y \f$.  If
-   /// \f$ y \f$ is approximate, it may not satisfy \f$ y^T A = 0 \f$ exactly, but the proof is still valid as long as
-   /// the following holds for all potentially feasible \f$ x \f$:
-   /// \f[  y^T Ax < (y_+^T lhs - y_-^T rhs)  \mbox{(*)} \f]
-   ///
-   /// We may therefore calculate \f$ y^T A \f$ and \f$ (y_+^T lhs - y_-^T rhs) \f$ exactly and check if the upper and lower
-   /// bounds on \f$ x \f$ imply that all feasible \f$ x \f$ satisfy (*), and if not then compute bounds on \f$ x \f$ to
-   /// guarantee (*).  The simplest way to do this is to compute
-   /// \f[  B = (y_+^T lhs - y_-^T rhs) / \sum_i(|(y^T A)_i|) \f]
-   /// noting that if every component of \f$ x \f$ has \f$ |x_i| < B \f$, then (*) holds.
-   ///
-   /// \f$ B \f$ can be increased by iteratively including variable bounds smaller than \f$ B \f$.  The speed of this
-   /// method can be further improved by using interval arithmetic for all computations.  For related information see
-   /// Sec. 4 of Neumaier and Shcherbina, Mathematical Programming A, 2004.
-   ///
-   /// Set transformed to true if this method is called after _transformFeasibility().
+   /** computes radius of infeasibility box implied by an approximate Farkas' proof
+
+    Given constraints of the form \f$ lhs <= Ax <= rhs \f$, a farkas proof y should satisfy \f$ y^T A = 0 \f$ and
+    \f$ y_+^T lhs - y_-^T rhs > 0 \f$, where \f$ y_+, y_- \f$ denote the positive and negative parts of \f$ y \f$.
+    If \f$ y \f$ is approximate, it may not satisfy \f$ y^T A = 0 \f$ exactly, but the proof is still valid as long
+    as the following holds for all potentially feasible \f$ x \f$:
+
+    \f[
+       y^T Ax < (y_+^T lhs - y_-^T rhs)              (*)
+    \f]
+
+    we may therefore calculate \f$ y^T A \f$ and \f$ y_+^T lhs - y_-^T rhs \f$ exactly and check if the upper and lower
+    bounds on \f$ x \f$ imply that all feasible \f$ x \f$ satisfy (*), and if not then compute bounds on \f$ x \f$ to
+    guarantee (*).  The simplest way to do this is to compute
+
+    \f[
+       B = (y_+^T lhs - y_-^T rhs) / \sum_i(|(y^T A)_i|)
+    \f]
+
+    noting that if every component of \f$ x \f$ has \f$ |x_i| < B \f$, then (*) holds.
+
+    \f$ B \f$ can be increased by iteratively including variable bounds smaller than \f$ B \f$.  The speed of this
+    method can be further improved by using interval arithmetic for all computations.  For related information see
+    Sec. 4 of Neumaier and Shcherbina, Mathematical Programming A, 2004.
+
+    Set transformed to true if this method is called after _transformFeasibility().
+   */
    void SoPlex::_computeInfeasBox(SolRational& sol, bool transformed)
    {
       assert(sol.hasDualFarkas());
@@ -2149,3 +2179,4 @@ namespace soplex
       return result;
    }
 } // namespace soplex
+#endif

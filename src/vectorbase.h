@@ -41,7 +41,7 @@ template < class R > class SSVectorBase;
  *  qchecking of array bound when accessing elements with the subscript operator[]() (only when compiled without \c
  *  -DNDEBUG).
  *
- *  A VectorBase is distinguished from a simple array of #Real%s or #Rational%s by providing a set of mathematical
+ *  A VectorBase is distinguished from a simple array of %Reals or %Rationals by providing a set of mathematical
  *  operations.  Since VectorBase does not provide any memory management features, no operations are available that would
  *  require allocation of temporary memory space.
  *

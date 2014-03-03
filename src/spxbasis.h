@@ -22,7 +22,7 @@
 #include <assert.h>
 #include <iostream>
 #include <iomanip>
-#include <string>
+#include <string.h>
 #include <sstream>
 
 #include "spxdefines.h"
@@ -436,7 +436,7 @@ public:
    }
 
    /// returns maximum number of updates before a refactorization is performed
-   int getMaxUpdates()
+   int getMaxUpdates() const
    {
       return maxUpdates;
    }

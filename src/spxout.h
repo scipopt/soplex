@@ -21,8 +21,9 @@
 
 #include <iostream>
 #include <iomanip>
+#include <assert.h>
+
 #include "spxdefines.h"
-#include "assert.h"
 
 // ----------------------------------------------------------------------
 //    class SPxOut

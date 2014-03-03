@@ -21,7 +21,7 @@
 
 
 #include <assert.h>
-#include <string>
+#include <string.h>
 
 #include "spxdefines.h"
 #include "svector.h"

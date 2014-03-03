@@ -1,8 +1,23 @@
+/* style for FAQ reveals */
+
+.reveal:hover {
+    color:blue;
+}
+.reveal {
+    padding-top: 1em;
+    cursor: pointer;
+    margin: 5px 0;
+}
+
+.answer {
+    padding-left:   1em;
+}
+
 /* The standard CSS for doxygen */
 
 body, div {
   color:            black;
-  background-color: #fff0f0;
+  background-color: #eee;
   font-size: 12pt;
   font-family: sans-serif;
 }
