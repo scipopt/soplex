@@ -31,10 +31,6 @@
 #include "gmp.h"
 #endif
 
-#ifdef SOPLEX_WITH_GMPXX
-#include "gmp.h"
-#include "gmpxx.h"
-#endif
 
 namespace soplex
 {
@@ -79,15 +75,6 @@ namespace soplex
       /// constructor from mpq_t
       Rational(const mpq_t& q);
 
-#endif
-
-#ifdef SOPLEX_WITH_GMPXX
-
-      /// constructor from mpq_class
-      Rational(const mpq_class& q);
-
-      /// constructor from mpq_t
-      Rational(const mpq_t& q);
 #endif
 
       /// destructor

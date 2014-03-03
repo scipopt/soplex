@@ -5022,12 +5022,6 @@ namespace soplex
 #else
       MSG_INFO1( spxout << " [rational: gmp]" );
 #endif
-#elif defined(SOPLEX_WITH_GMPXX)
-#ifdef mpir_version
-      MSG_INFO1( spxout << " [rational: mpirxx]" );
-#else
-      MSG_INFO1( spxout << " [rational: gmpxx]" );
-#endif
 #else
       MSG_INFO1( spxout << " [rational: long double]" );
 #endif

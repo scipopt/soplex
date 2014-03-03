@@ -31,7 +31,6 @@
 #include "spxdefines.h"
 #include "basevectors.h"
 #include "gmp.h"
-#include "gmpxx.h"
 
 namespace soplex
 {
