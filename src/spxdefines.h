@@ -36,7 +36,7 @@
 
 namespace soplex
 {
-#define SOPLEX_VERSION         200
+#define SOPLEX_VERSION         201
 #define SOPLEX_SUBVERSION        0
 
 /*-----------------------------------------------------------------------------
