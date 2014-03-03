@@ -71,10 +71,8 @@ namespace soplex
       Rational(const int& i);
 
 #ifdef SOPLEX_WITH_GMP
-
       /// constructor from mpq_t
       Rational(const mpq_t& q);
-
 #endif
 
       /// destructor
@@ -85,6 +83,17 @@ namespace soplex
 
       /// assignment operator from long double
       Rational& operator=(const long double &r);
+
+      /// assignment operator from double
+      Rational& operator=(const double &r);
+
+      /// assignment operator from int
+      Rational& operator=(const int &i);
+
+#ifdef SOPLEX_WITH_GMP
+      /// assignment operator from mpq_t
+      Rational& operator=(const mpq_t &q);
+#endif
 
       //@}
 

@@ -131,7 +131,29 @@ public:
       return *this;
    }
 
-   ///@todo add assignment operators for double, int, mpq_t
+   /// assignment operator from double
+   Private& operator=(const double& r)
+   {
+      // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
+      mpq_set_d(this->privatevalue, r);
+      return *this;
+   }
+
+   /// assignment operator from int
+   Private& operator=(const int& i)
+   {
+      // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
+      mpq_set_d(this->privatevalue, i);
+      return *this;
+   }
+
+   /// assignment operator from mpq_t
+   Private& operator=(const mpq_t& q)
+   {
+      // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
+      mpq_set(this->privatevalue, q);
+      return *this;
+   }
 
    /// previous Private element
    Private*& prev()
@@ -327,7 +349,30 @@ Rational& Rational::operator=(const long double &r)
 
 
 
-///@todo implement assignment operators from double, int, mpq_t
+/// assignment operator from double
+Rational& Rational::operator=(const double &r)
+{
+   *(this->dpointer) = r;
+   return *this;
+}
+
+
+
+/// assignment operator from int
+Rational& Rational::operator=(const int &i)
+{
+   *(this->dpointer) = i;
+   return *this;
+}
+
+
+
+/// assignment operator from mpq_t
+Rational& Rational::operator=(const mpq_t &q)
+{
+   *(this->dpointer) = q;
+   return *this;
+}
 
 
 
@@ -1267,13 +1312,6 @@ public:
       *this = p;
    }
 
-   /// copy assignment operator
-   Private& operator=(const Private& p)
-   {
-      this->privatevalue = p.privatevalue;
-      return *this;
-   }
-
    /// constructor from long double
    Private(const long double& r)
    {
@@ -1292,6 +1330,33 @@ public:
       privatevalue = i;
    }
 
+   /// assignment operator
+   Private& operator=(const Private& p)
+   {
+      this->privatevalue = p.privatevalue;
+      return *this;
+   }
+
+   /// assignment operator from long double
+   Private& operator=(const long double& r)
+   {
+      this->privatevalue = r;
+      return *this;
+   }
+
+   /// assignment operator from double
+   Private& operator=(const double& r)
+   {
+      this->privatevalue = (long double)(r);
+      return *this;
+   }
+
+   /// assignment operator from int
+   Private& operator=(const int& i)
+   {
+      this->privatevalue = (long double)(i);
+      return *this;
+   }
 };
 
 
@@ -1312,15 +1377,6 @@ Rational::Rational(const Rational& r)
    dpointer = 0;
    spx_alloc(dpointer);
    dpointer = new (dpointer) Private(*(r.dpointer));
-}
-
-
-
-/// copy assignment operator
-Rational& Rational::operator=(const Rational &r)
-{
-   *(this->dpointer) = *(r.dpointer);
-   return *this;
 }
 
 
@@ -1359,6 +1415,42 @@ Rational::Rational(const int& i)
 Rational::~Rational()
 {
    spx_free(dpointer);
+}
+
+
+
+/// assignment operator
+Rational& Rational::operator=(const Rational &r)
+{
+   *dpointer = *(r.dpointer);
+   return *this;
+}
+
+
+
+/// assignment operator from long double
+Rational& Rational::operator=(const long double &r)
+{
+   *dpointer = r;
+   return *this;
+}
+
+
+
+/// assignment operator from double
+Rational& Rational::operator=(const double &r)
+{
+   *dpointer = r;
+   return *this;
+}
+
+
+
+/// assignment operator from int
+Rational& Rational::operator=(const int &i)
+{
+   *dpointer = i;
+   return *this;
 }
 
 
