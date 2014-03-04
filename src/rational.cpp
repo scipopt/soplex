@@ -1635,7 +1635,7 @@ bool Rational::isNextTo(const double& d)
 /// checks if d is exactly equal to the Rational and if not, if it is one of the two adjacent doubles
 bool Rational::isAdjacentTo(const double& d)
 {
-   return (this->dpointer->privatevalue == d);
+   return (double(this->dpointer->privatevalue) == d);
 }
 
 

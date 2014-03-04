@@ -7,6 +7,9 @@ performance:
 - more efficient memory allocation of elements of class Rational
 - more efficient assignment operators for class Rational
 
+fixed bugs:
+- fix Rational::isAdjacentTo() when GMP=false
+
 
 
 27 Feb 2014 - Release 2.0.0
