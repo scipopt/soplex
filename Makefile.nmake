@@ -39,6 +39,9 @@ EXEEXT      =	exe
 # will this be compiled for PARASCIP? (disables output because it uses global variables)
 PARASCIP	=	0
 
+# old 1.x interface?
+LEGACY	=	0
+
 GMP			=	1
 ZLIB		=	1
 
@@ -140,6 +143,14 @@ CPPFLAGS	=	$(CPPFLAGS) /DDISABLE_VERBOSITY
 !endif
 
 #-----------------------------------------------------------------------------
+# LEGACY
+#-----------------------------------------------------------------------------
+
+!if $(LEGACY) == 1
+CPPFLAGS	=	$(CPPFLAGS) /DSOPLEX_LEGACY
+!endif
+
+#-----------------------------------------------------------------------------
 # Main Program
 #-----------------------------------------------------------------------------
 
@@ -149,7 +160,7 @@ LIBNAME		=	$(NAME)-$(VERSION).$(BASE)
 BINFILE		=	$(BINDIR)\$(BINNAME).$(EXEEXT)
 EXAMPLEFILE	=	$(BINDIR)\$(EXAMPLENAME).$(EXEEXT)
 LIBFILE		=	$(LIBDIR)\lib$(LIBNAME).$(LIBEXT)
-DEPEND		=	src\depend.nmake
+DEPEND		=	src\depend
 
 OBJDIR		=	obj\O.$(BASE)
 BINOBJDIR	=	$(OBJDIR)\bin
@@ -160,13 +171,13 @@ LIBOBJDIR	=	$(OBJDIR)\lib
 #-----------------------------------------------------------------------------
 
 !if $(GMP) == 1
-CPPFLAGS	=	$(CPPFLAGS) /Ilib\mpir.$(ARCH).opt /DSOPLEX_WITH_GMP
-LIBS		=	$(LIBS) lib\libmpir.$(ARCH).opt.lib
+CPPFLAGS	=	$(CPPFLAGS) /Ilib\mpir.$(ARCH) /DSOPLEX_WITH_GMP
+LIBS		=	$(LIBS) lib\libmpir.$(ARCH).lib
 !endif
 
 !if $(ZLIB) == 1
 CPPFLAGS	=	$(CPPFLAGS) /Ilib\zlib /DSOPLEX_WITH_ZLIB
-LIBS		=	$(LIBS) lib\libz.$(ARCH).opt.lib
+LIBS		=	$(LIBS) lib\libz.$(ARCH).lib
 LDFLAGS		=	$(LDFLAGS) /NODEFAULTLIB:LIBCMT /NODEFAULTLIB:LIBCMTD
 !endif
 
