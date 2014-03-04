@@ -98,8 +98,7 @@ private:
    //@{
 
    SPxSense thesense;   ///< optimization sense.
-
-   Real offset;      ///< offset computed in simplification step
+   R offset;            ///< offset computed, e.g., in simplification step
 
    //@}
 
@@ -383,7 +382,7 @@ public:
    }
 
    /// Returns the objective function value offset
-   Real objOffset() const
+   R objOffset() const
    {
       return offset;
    }
@@ -685,7 +684,7 @@ public:
       LPRowSetBase<R>::clear();
       LPColSetBase<R>::clear();
       thesense = MAXIMIZE;
-      offset = 0.0;
+      offset = 0;
    }
 
    //@}
@@ -1132,7 +1131,7 @@ public:
       thesense = sns;
    }
 
-   virtual void changeObjOffset(Real o)
+   virtual void changeObjOffset(const R& o)
    {
       offset = o;
    }
@@ -1769,7 +1768,7 @@ public:
          LPRowSetBase<R>::operator=(old);
          LPColSetBase<R>::operator=(old);
          thesense = (old.thesense) == SPxLPBase<S>::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE;
-         offset = old.offset;
+         offset = R(old.offset);
 
          assert(isConsistent());
       }
