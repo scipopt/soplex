@@ -6,6 +6,7 @@ Bugfix version
 performance:
 - more efficient memory allocation of elements of class Rational
 - more efficient assignment operators for class Rational
+- return computed primal and dual activities by reference
 
 fixed bugs:
 - fix Rational::isAdjacentTo() when GMP=false

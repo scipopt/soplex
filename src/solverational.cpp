@@ -327,12 +327,13 @@ namespace soplex
       // store floating-point solution of original LP as current rational solution; make sure that the primal obj value
       // corresponds to a minimization problem
       sol._primal = primalReal;
-      sol._slacks = _rationalLP->computePrimalActivity(sol._primal);
+      _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
       sol._hasPrimal = true;
       sol._primalObjVal = (sol._primal * _rationalLP->maxObj()) * -1;
 
       sol._dual = dualReal;
-      sol._redCost = _rationalLP->computeDualActivity(sol._dual) + _rationalLP->maxObj();
+      _rationalLP->computeDualActivity(sol._dual, sol._redCost);
+      sol._redCost += _rationalLP->maxObj();
       sol._redCost *= -1;
       sol._hasDual = true;
       sol._dualObjVal = sol._primalObjVal;
@@ -395,7 +396,7 @@ namespace soplex
          }
 
          // compute reduced costs and reduced cost violation
-         modObj = _rationalLP->computeDualActivity(sol._dual);
+         _rationalLP->computeDualActivity(sol._dual, modObj);
          redCostViolation = 0;
 
          for( int c = numColsRational() - 1; c >= 0; c-- )
@@ -599,8 +600,9 @@ namespace soplex
          }
 
          // recompute slack and reduced cost values
-         sol._slacks = _rationalLP->computePrimalActivity(sol._primal);
-         sol._redCost = _rationalLP->computeDualActivity(sol._dual) + _rationalLP->maxObj();
+         _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
+         _rationalLP->computeDualActivity(sol._dual, sol._redCost);
+         sol._redCost += _rationalLP->maxObj();
          sol._redCost *= -1;
 
          assert(sol._hasPrimal);
@@ -1561,7 +1563,14 @@ namespace soplex
       // stop timing
       _statistics->transformTime.stop();
 
-      assert(!sol._hasPrimal || sol._slacks == _rationalLP->computePrimalActivity(sol._primal));
+#ifndef NDEBUG
+      if( sol._hasPrimal )
+      {
+         DVectorRational activity;
+         _rationalLP->computePrimalActivity(sol._primal, activity);
+         assert(sol._slacks == activity);
+      }
+#endif
    }
 
    /** computes radius of infeasibility box implied by an approximate Farkas' proof
