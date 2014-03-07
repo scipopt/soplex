@@ -1176,7 +1176,7 @@ namespace soplex
 
 
    /// changes left-hand side of row \p i to \p lhs
-   void SoPlex::changeLhsReal(int i, Real lhs)
+   void SoPlex::changeLhsReal(int i, const Real& lhs)
    {
       assert(_realLP != 0);
 
@@ -1206,7 +1206,7 @@ namespace soplex
 
 
    /// changes right-hand side of row \p i to \p rhs
-   void SoPlex::changeRhsReal(int i, Real rhs)
+   void SoPlex::changeRhsReal(int i, const Real& rhs)
    {
       assert(_realLP != 0);
 
@@ -1236,7 +1236,7 @@ namespace soplex
 
 
    /// changes left- and right-hand side of row \p i
-   void SoPlex::changeRangeReal(int i, Real lhs, Real rhs)
+   void SoPlex::changeRangeReal(int i, const Real& lhs, const Real& rhs)
    {
       assert(_realLP != 0);
 
@@ -1281,7 +1281,7 @@ namespace soplex
 
 
    /// changes lower bound of column i to \p lower
-   void SoPlex::changeLowerReal(int i, Real lower)
+   void SoPlex::changeLowerReal(int i, const Real& lower)
    {
       assert(_realLP != 0);
 
@@ -1311,7 +1311,7 @@ namespace soplex
 
 
    /// changes \p i 'th upper bound to \p upper
-   void SoPlex::changeUpperReal(int i, Real upper)
+   void SoPlex::changeUpperReal(int i, const Real& upper)
    {
       assert(_realLP != 0);
 
@@ -1341,7 +1341,7 @@ namespace soplex
 
 
    /// changes bounds of column \p i to \p lower and \p upper
-   void SoPlex::changeBoundsReal(int i, Real lower, Real upper)
+   void SoPlex::changeBoundsReal(int i, const Real& lower, const Real& upper)
    {
       assert(_realLP != 0);
 
@@ -1371,7 +1371,7 @@ namespace soplex
 
 
    /// changes objective coefficient of column i to \p obj
-   void SoPlex::changeObjReal(int i, Real obj)
+   void SoPlex::changeObjReal(int i, const Real& obj)
    {
       assert(_realLP != 0);
 
@@ -1386,7 +1386,7 @@ namespace soplex
 
 
    /// changes matrix entry in row \p i and column \p j to \p val
-   void SoPlex::changeElementReal(int i, int j, Real val)
+   void SoPlex::changeElementReal(int i, int j, const Real& val)
    {
       assert(_realLP != 0);
 
@@ -1676,7 +1676,7 @@ namespace soplex
 
 
    /// changes left-hand side of row \p i to \p lhs
-   void SoPlex::changeLhsRational(int i, Rational lhs)
+   void SoPlex::changeLhsRational(int i, const Rational& lhs)
    {
       assert(_rationalLP != 0);
 
@@ -1712,7 +1712,7 @@ namespace soplex
 
 
    /// changes right-hand side of row \p i to \p rhs
-   void SoPlex::changeRhsRational(int i, Rational rhs)
+   void SoPlex::changeRhsRational(int i, const Rational& rhs)
    {
       assert(_rationalLP != 0);
 
@@ -1748,7 +1748,7 @@ namespace soplex
 
 
    /// changes left- and right-hand side of row \p i
-   void SoPlex::changeRangeRational(int i, Rational lhs, Rational rhs)
+   void SoPlex::changeRangeRational(int i, const Rational& lhs, const Rational& rhs)
    {
       assert(_rationalLP != 0);
 
@@ -1802,7 +1802,7 @@ namespace soplex
 
 
    /// changes lower bound of column i to \p lower
-   void SoPlex::changeLowerRational(int i, Rational lower)
+   void SoPlex::changeLowerRational(int i, const Rational& lower)
    {
       assert(_rationalLP != 0);
 
@@ -1838,7 +1838,7 @@ namespace soplex
 
 
    /// changes \p i 'th upper bound to \p upper
-   void SoPlex::changeUpperRational(int i, Rational upper)
+   void SoPlex::changeUpperRational(int i, const Rational& upper)
    {
       assert(_rationalLP != 0);
 
@@ -1874,7 +1874,7 @@ namespace soplex
 
 
    /// changes bounds of column \p i to \p lower and \p upper
-   void SoPlex::changeBoundsRational(int i, Rational lower, Rational upper)
+   void SoPlex::changeBoundsRational(int i, const Rational& lower, const Rational& upper)
    {
       assert(_rationalLP != 0);
 
@@ -1910,7 +1910,7 @@ namespace soplex
 
 
    /// changes objective coefficient of column i to \p obj
-   void SoPlex::changeObjRational(int i, Rational obj)
+   void SoPlex::changeObjRational(int i, const Rational& obj)
    {
       assert(_rationalLP != 0);
 
@@ -1928,7 +1928,7 @@ namespace soplex
 
 
    /// changes matrix entry in row \p i and column \p j to \p val
-   void SoPlex::changeElementRational(int i, int j, Rational val)
+   void SoPlex::changeElementRational(int i, int j, const Rational& val)
    {
       assert(_rationalLP != 0);
 
@@ -5699,7 +5699,7 @@ namespace soplex
 
 
    /// changes left-hand side of row \p i to \p lhs and adjusts basis
-   void SoPlex::_changeLhsReal(int i, Real lhs)
+   void SoPlex::_changeLhsReal(int i, const Real& lhs)
    {
       assert(_realLP != 0);
 
@@ -5740,7 +5740,7 @@ namespace soplex
 
 
    /// changes right-hand side of row \p i to \p rhs and adjusts basis
-   void SoPlex::_changeRhsReal(int i, Real rhs)
+   void SoPlex::_changeRhsReal(int i, const Real& rhs)
    {
       assert(_realLP != 0);
 
@@ -5782,7 +5782,7 @@ namespace soplex
 
 
    /// changes left- and right-hand side of row \p i and adjusts basis
-   void SoPlex::_changeRangeReal(int i, Real lhs, Real rhs)
+   void SoPlex::_changeRangeReal(int i, const Real& lhs, const Real& rhs)
    {
       assert(_realLP != 0);
 
@@ -5851,7 +5851,7 @@ namespace soplex
 
 
    /// changes lower bound of column i to \p lower and adjusts basis
-   void SoPlex::_changeLowerReal(int i, Real lower)
+   void SoPlex::_changeLowerReal(int i, const Real& lower)
    {
       assert(_realLP != 0);
 
@@ -5891,7 +5891,7 @@ namespace soplex
 
 
    /// changes \p i 'th upper bound to \p upper and adjusts basis
-   void SoPlex::_changeUpperReal(int i, Real upper)
+   void SoPlex::_changeUpperReal(int i, const Real& upper)
    {
       assert(_realLP != 0);
 
@@ -5933,7 +5933,7 @@ namespace soplex
 
 
    /// changes bounds of column \p i to \p lower and \p upper and adjusts basis
-   void SoPlex::_changeBoundsReal(int i, Real lower, Real upper)
+   void SoPlex::_changeBoundsReal(int i, const Real& lower, const Real& upper)
    {
       assert(_realLP != 0);
 
@@ -5955,7 +5955,7 @@ namespace soplex
 
 
    /// changes matrix entry in row \p i and column \p j to \p val and adjusts basis
-   void SoPlex::_changeElementReal(int i, int j, Real val)
+   void SoPlex::_changeElementReal(int i, int j, const Real& val)
    {
       assert(_realLP != 0);
 

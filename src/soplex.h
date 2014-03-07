@@ -287,19 +287,19 @@ public:
    void changeLhsReal(const VectorReal& lhs);
 
    /// changes left-hand side of row \p i to \p lhs
-   void changeLhsReal(int i, Real lhs);
+   void changeLhsReal(int i, const Real& lhs);
 
    /// changes right-hand side vector to \p rhs
    void changeRhsReal(const VectorReal& rhs);
 
    /// changes right-hand side of row \p i to \p rhs
-   void changeRhsReal(int i, Real rhs);
+   void changeRhsReal(int i, const Real& rhs);
 
    /// changes left- and right-hand side vectors
    void changeRangeReal(const VectorReal& lhs, const VectorReal& rhs);
 
    /// changes left- and right-hand side of row \p i
-   void changeRangeReal(int i, Real lhs, Real rhs);
+   void changeRangeReal(int i, const Real& lhs, const Real& rhs);
 
    /// replaces column \p i with \p lpcol
    void changeColReal(int i, const LPColReal& lpcol);
@@ -308,28 +308,28 @@ public:
    void changeLowerReal(const VectorReal& lower);
 
    /// changes lower bound of column i to \p lower
-   void changeLowerReal(int i, Real lower);
+   void changeLowerReal(int i, const Real& lower);
 
    /// changes vector of upper bounds to \p upper
    void changeUpperReal(const VectorReal& upper);
 
    /// changes \p i 'th upper bound to \p upper
-   void changeUpperReal(int i, Real upper);
+   void changeUpperReal(int i, const Real& upper);
 
    /// changes vectors of column bounds to \p lower and \p upper
    void changeBoundsReal(const VectorReal& lower, const VectorReal& upper);
 
    /// changes bounds of column \p i to \p lower and \p upper
-   void changeBoundsReal(int i, Real lower, Real upper);
+   void changeBoundsReal(int i, const Real& lower, const Real& upper);
 
    /// changes objective function vector to \p obj
    void changeObjReal(const VectorReal& obj);
 
    /// changes objective coefficient of column i to \p obj
-   void changeObjReal(int i, Real obj);
+   void changeObjReal(int i, const Real& obj);
 
    /// changes matrix entry in row \p i and column \p j to \p val
-   void changeElementReal(int i, int j, Real val);
+   void changeElementReal(int i, int j, const Real& val);
 
    /// removes row \p i
    void removeRowReal(int i);
@@ -394,19 +394,19 @@ public:
    void changeLhsRational(const VectorRational& lhs);
 
    /// changes left-hand side of row \p i to \p lhs
-   void changeLhsRational(int i, Rational lhs);
+   void changeLhsRational(int i, const Rational& lhs);
 
    /// changes right-hand side vector to \p rhs
    void changeRhsRational(const VectorRational& rhs);
 
    /// changes right-hand side of row \p i to \p rhs
-   void changeRhsRational(int i, Rational rhs);
+   void changeRhsRational(int i, const Rational& rhs);
 
    /// changes left- and right-hand side vectors
    void changeRangeRational(const VectorRational& lhs, const VectorRational& rhs);
 
    /// changes left- and right-hand side of row \p i
-   void changeRangeRational(int i, Rational lhs, Rational rhs);
+   void changeRangeRational(int i, const Rational& lhs, const Rational& rhs);
 
    /// replaces column \p i with \p lpcol
    void changeColRational(int i, const LPColRational& lpcol);
@@ -415,28 +415,28 @@ public:
    void changeLowerRational(const VectorRational& lower);
 
    /// changes lower bound of column i to \p lower
-   void changeLowerRational(int i, Rational lower);
+   void changeLowerRational(int i, const Rational& lower);
 
    /// changes vector of upper bounds to \p upper
    void changeUpperRational(const VectorRational& upper);
 
    /// changes \p i 'th upper bound to \p upper
-   void changeUpperRational(int i, Rational upper);
+   void changeUpperRational(int i, const Rational& upper);
 
    /// changes vectors of column bounds to \p lower and \p upper
    void changeBoundsRational(const VectorRational& lower, const VectorRational& upper);
 
    /// changes bounds of column \p i to \p lower and \p upper
-   void changeBoundsRational(int i, Rational lower, Rational upper);
+   void changeBoundsRational(int i, const Rational& lower, const Rational& upper);
 
    /// changes objective function vector to \p obj
    void changeObjRational(const VectorRational& obj);
 
    /// changes objective coefficient of column i to \p obj
-   void changeObjRational(int i, Rational obj);
+   void changeObjRational(int i, const Rational& obj);
 
    /// changes matrix entry in row \p i and column \p j to \p val
-   void changeElementRational(int i, int j, Rational val);
+   void changeElementRational(int i, int j, const Rational& val);
 
    /// removes row \p i
    void removeRowRational(int i);
@@ -1269,19 +1269,19 @@ private:
    void _changeLhsReal(const VectorReal& lhs);
 
    /// changes left-hand side of row \p i to \p lhs and adjusts basis
-   void _changeLhsReal(int i, Real lhs);
+   void _changeLhsReal(int i, const Real& lhs);
 
    /// changes right-hand side vector to \p rhs and adjusts basis
    void _changeRhsReal(const VectorReal& rhs);
 
    /// changes right-hand side of row \p i to \p rhs and adjusts basis
-   void _changeRhsReal(int i, Real rhs);
+   void _changeRhsReal(int i, const Real& rhs);
 
    /// changes left- and right-hand side vectors and adjusts basis
    void _changeRangeReal(const VectorReal& lhs, const VectorReal& rhs);
 
    /// changes left- and right-hand side of row \p i and adjusts basis
-   void _changeRangeReal(int i, Real lhs, Real rhs);
+   void _changeRangeReal(int i, const Real& lhs, const Real& rhs);
 
    /// replaces column \p i with \p lpcol and adjusts basis
    void _changeColReal(int i, const LPColReal& lpcol);
@@ -1290,22 +1290,22 @@ private:
    void _changeLowerReal(const VectorReal& lower);
 
    /// changes lower bound of column i to \p lower and adjusts basis
-   void _changeLowerReal(int i, Real lower);
+   void _changeLowerReal(int i, const Real& lower);
 
    /// changes vector of upper bounds to \p upper and adjusts basis
    void _changeUpperReal(const VectorReal& upper);
 
    /// changes \p i 'th upper bound to \p upper and adjusts basis
-   void _changeUpperReal(int i, Real upper);
+   void _changeUpperReal(int i, const Real& upper);
 
    /// changes vectors of column bounds to \p lower and \p upper and adjusts basis
    void _changeBoundsReal(const VectorReal& lower, const VectorReal& upper);
 
    /// changes bounds of column \p i to \p lower and \p upper and adjusts basis
-   void _changeBoundsReal(int i, Real lower, Real upper);
+   void _changeBoundsReal(int i, const Real& lower, const Real& upper);
 
    /// changes matrix entry in row \p i and column \p j to \p val and adjusts basis
-   void _changeElementReal(int i, int j, Real val);
+   void _changeElementReal(int i, int j, const Real& val);
 
    /// removes row \p i and adjusts basis
    void _removeRowReal(int i);
