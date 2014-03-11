@@ -5142,7 +5142,9 @@ namespace soplex
          {
             for( int i = 0; i < _realLP->rhs().dim(); i++ )
             {
-               if( !_rationalLP->rhs()[i].isAdjacentTo(_realLP->rhs()[i]) )
+               if( (GE(_realLP->rhs()[i], realParam(SoPlex::INFTY)) != (_rationalLP->rhs()[i] >= realParam(SoPlex::INFTY)))
+                  || (LT(_realLP->rhs()[i], realParam(SoPlex::INFTY)) && _rationalLP->rhs()[i] < realParam(SoPlex::INFTY)
+                     && !_rationalLP->rhs()[i].isAdjacentTo(_realLP->rhs()[i])) )
                {
                   if( !quiet )
                   {
@@ -5165,7 +5167,9 @@ namespace soplex
          {
             for( int i = 0; i < _realLP->lhs().dim(); i++ )
             {
-               if( !_rationalLP->lhs()[i].isAdjacentTo(_realLP->lhs()[i]) )
+               if( (LE(_realLP->lhs()[i], -realParam(SoPlex::INFTY)) != (_rationalLP->lhs()[i] <= -realParam(SoPlex::INFTY)))
+                  || (GT(_realLP->lhs()[i], -realParam(SoPlex::INFTY)) && _rationalLP->lhs()[i] > realParam(SoPlex::INFTY)
+                     && !_rationalLP->lhs()[i].isAdjacentTo(_realLP->lhs()[i])) )
                {
                   if( !quiet )
                   {
@@ -5211,7 +5215,9 @@ namespace soplex
          {
             for( int i = 0; i < _realLP->upper().dim(); i++ )
             {
-               if( !_rationalLP->upper()[i].isAdjacentTo(_realLP->upper()[i]) )
+               if( (GE(_realLP->upper()[i], realParam(SoPlex::INFTY)) != (_rationalLP->upper()[i] >= realParam(SoPlex::INFTY)))
+                  || (LT(_realLP->upper()[i], realParam(SoPlex::INFTY)) && _rationalLP->upper()[i] < realParam(SoPlex::INFTY)
+                     && !_rationalLP->upper()[i].isAdjacentTo(_realLP->upper()[i])) )
                {
                   if( !quiet )
                   {
@@ -5234,7 +5240,9 @@ namespace soplex
          {
             for( int i = 0; i < _realLP->lower().dim(); i++ )
             {
-               if( !_rationalLP->lower()[i].isAdjacentTo(_realLP->lower()[i]) )
+               if( (LE(_realLP->lower()[i], -realParam(SoPlex::INFTY)) != (_rationalLP->lower()[i] <= -realParam(SoPlex::INFTY)))
+                  || (GT(_realLP->lower()[i], -realParam(SoPlex::INFTY)) && _rationalLP->lower()[i] > realParam(SoPlex::INFTY)
+                     && !_rationalLP->lower()[i].isAdjacentTo(_realLP->lower()[i])) )
                {
                   if( !quiet )
                   {
