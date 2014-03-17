@@ -351,18 +351,19 @@ namespace soplex
       // refinement loop
       do
       {
-         minRounds--;//decrement minRounds counter
+         // decrement minRounds counter
+         minRounds--;
+
          MSG_DEBUG( spxout << "Computing violations.\n" );
 
          // compute violation of bounds
          boundsViolation = 0;
-
          for( int c = numColsRational() - 1; c >= 0; c-- )
          {
             // lower bound
             modLower[c] = lowerRational(c);
 
-            if( double(modLower[c]) > double(-realParam(SoPlex::INFTY)) )
+            if( modLower[c] > -realParam(SoPlex::INFTY) )
                modLower[c] -= sol._primal[c];
 
             if( modLower[c] > boundsViolation )
@@ -371,7 +372,7 @@ namespace soplex
             // upper bound
             modUpper[c] = upperRational(c);
 
-            if( double(modUpper[c]) < double(realParam(SoPlex::INFTY)) )
+            if( modUpper[c] < realParam(SoPlex::INFTY) )
                modUpper[c] -= sol._primal[c];
 
             if( modUpper[c] < -boundsViolation )
@@ -469,9 +470,9 @@ namespace soplex
          maxScale = primalScale * Rational(realParam(SoPlex::MAXSCALEINCR));
 
          primalScale = boundsViolation > sideViolation ? boundsViolation : sideViolation;
-         assert(primalScale >= Rational(0));
+         assert(primalScale >= 0);
 
-         if( primalScale > Rational(0) )
+         if( primalScale > 0 )
          {
             primalScale = Rational(1) / primalScale;
             if( primalScale > maxScale )
@@ -480,7 +481,7 @@ namespace soplex
          else
             primalScale = maxScale;
 
-         if( primalScale < Rational(1) )
+         if( primalScale < 1 )
             primalScale = 1;
 
          MSG_INFO2( spxout << "Scaling primal by " << rationalToString(primalScale) << ".\n" );
@@ -491,7 +492,7 @@ namespace soplex
          dualScale = redCostViolation;
          assert(dualScale >= Rational(0));
 
-         if( dualScale > Rational(0) )
+         if( dualScale > 0 )
          {
             dualScale = Rational(1) / dualScale;
             if( dualScale > maxScale )
@@ -500,7 +501,7 @@ namespace soplex
          else
             dualScale = maxScale;
 
-         if( dualScale < Rational(1) )
+         if( dualScale < 1 )
             dualScale = 1;
 
          MSG_INFO2( spxout << "Scaling dual by " << rationalToString(dualScale) << ".\n" );
@@ -584,7 +585,7 @@ namespace soplex
                   numAdjustedBounds++;
                }
             }
-            else if( basisStatusCol == SPxSolver::ZERO && sol._primal[c] != Rational(0) )
+            else if( basisStatusCol == SPxSolver::ZERO && sol._primal[c] != 0 )
             {
                sol._primal[c] = 0;
                numAdjustedBounds++;
