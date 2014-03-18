@@ -324,21 +324,80 @@ namespace soplex
          return;
       }
 
-      // store floating-point solution of original LP as current rational solution; make sure that the primal obj value
-      // corresponds to a minimization problem
+      // store floating-point solution of original LP as current rational solution
       sol._primal = primalReal;
-      _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
-      sol._hasPrimal = true;
-      sol._primalObjVal = (sol._primal * _rationalLP->maxObj()) * -1;
-
       sol._dual = dualReal;
+      sol._hasPrimal = true;
+      sol._hasDual = true;
+      _hasBasis = true;
+
+      // align primal solution with basis
+      int numAdjustedBounds = 0;
+      for( int c = numColsRational() - 1; c >= 0; c-- )
+      {
+         SPxSolver::VarStatus basisStatusCol = _basisStatusCols[c];
+
+         if( basisStatusCol == SPxSolver::ON_LOWER && sol._primal[c] != lowerRational(c) )
+         {
+            sol._primal[c] = lowerRational(c);
+            numAdjustedBounds++;
+         }
+         else if( basisStatusCol == SPxSolver::ON_UPPER && sol._primal[c] != upperRational(c) )
+         {
+            sol._primal[c] = upperRational(c);
+            numAdjustedBounds++;
+         }
+         else if( basisStatusCol == SPxSolver::FIXED )
+         {
+            assert(lowerRational(c) == upperRational(c));
+
+            if( sol._primal[c] != lowerRational(c) )
+            {
+               sol._primal[c] = lowerRational(c);
+               numAdjustedBounds++;
+            }
+         }
+         else if( basisStatusCol == SPxSolver::ZERO && sol._primal[c] != 0 )
+         {
+            sol._primal[c] = 0;
+            numAdjustedBounds++;
+         }
+      }
+
+      // align dual solution with basis
+      int numAdjustedDuals = 0;
+      for( int r = numRowsRational() - 1; r >= 0; r-- )
+      {
+         SPxSolver::VarStatus basisStatusRow = _basisStatusRows[r];
+
+         if( (basisStatusRow == SPxSolver::ON_LOWER && sol._dual[r] < 0)
+            || (basisStatusRow == SPxSolver::ON_UPPER && sol._dual[r] > 0)
+            || (basisStatusRow == SPxSolver::ZERO && sol._dual[r] != 0)
+            || (basisStatusRow == SPxSolver::BASIC && sol._dual[r] != 0) )
+         {
+            sol._dual[r] = 0;
+            numAdjustedDuals++;
+         }
+         else if( basisStatusRow == SPxSolver::FIXED )
+         {
+            assert(lhsRational(r) == rhsRational(r));
+         }
+      }
+
+      if( numAdjustedBounds + numAdjustedDuals > 0 )
+      {
+         MSG_INFO2( spxout << "Adjusted " << numAdjustedBounds << " nonbasic variables to bounds and " << numAdjustedDuals << " duals to zero.\n" );
+      }
+
+      // compute slacks, dual activity, and reduced cost values
+      _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
       _rationalLP->computeDualActivity(sol._dual, sol._redCost);
       sol._redCost += _rationalLP->maxObj();
       sol._redCost *= -1;
-      sol._hasDual = true;
-      sol._dualObjVal = sol._primalObjVal;
 
-      _hasBasis = true;
+      // compute objective value
+      sol._primalObjVal = (sol._primal * _rationalLP->maxObj()) * -1;
+      sol._dualObjVal = sol._primalObjVal;
 
       // initial scaling factors are one
       primalScale = 1;
@@ -554,10 +613,10 @@ namespace soplex
             return;
          }
 
-         // correct primal solution
+         // correct primal solution and align with basis
          MSG_DEBUG( spxout << "Correcting primal solution.\n" );
 
-         int numAdjustedBounds = 0;
+         numAdjustedBounds = 0;
          for( int c = numColsRational() - 1; c >= 0; c-- )
          {
             sol._primal[c] += Rational(primalReal[c]) / primalScale;
@@ -592,12 +651,33 @@ namespace soplex
             }
          }
 
-         // correct dual solution
+         // correct dual solution and align with basis
          MSG_DEBUG( spxout << "Correcting dual solution.\n" );
 
+         numAdjustedDuals = 0;
          for( int r = numRowsRational() - 1; r >= 0; r-- )
          {
             sol._dual[r] += Rational(dualReal[r]) / dualScale;
+
+            SPxSolver::VarStatus basisStatusRow = _basisStatusRows[r];
+
+            if( (basisStatusRow == SPxSolver::ON_LOWER && sol._dual[r] < 0)
+               || (basisStatusRow == SPxSolver::ON_UPPER && sol._dual[r] > 0)
+               || (basisStatusRow == SPxSolver::ZERO && sol._dual[r] != 0)
+               || (basisStatusRow == SPxSolver::BASIC && sol._dual[r] != 0) )
+            {
+               sol._dual[r] = 0;
+               numAdjustedDuals++;
+            }
+            else if( basisStatusRow == SPxSolver::FIXED )
+            {
+               assert(lhsRational(r) == rhsRational(r));
+            }
+         }
+
+         if( numAdjustedBounds + numAdjustedDuals > 0 )
+         {
+            MSG_INFO2( spxout << "Adjusted " << numAdjustedBounds << " nonbasic variables to bounds and " << numAdjustedDuals << " duals to zero.\n" );
          }
 
          // recompute slack and reduced cost values
@@ -605,14 +685,6 @@ namespace soplex
          _rationalLP->computeDualActivity(sol._dual, sol._redCost);
          sol._redCost += _rationalLP->maxObj();
          sol._redCost *= -1;
-
-         assert(sol._hasPrimal);
-         assert(sol._hasDual);
-
-         if( numAdjustedBounds > 0 )
-         {
-            MSG_INFO2( spxout << "Adjusted " << numAdjustedBounds << " nonbasic variables to bounds.\n" );
-         }
       }
       while( true );
 
