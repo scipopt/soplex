@@ -18,6 +18,18 @@
 </style>
 
 <h4>Frequently asked questions about SoPlex</h4><ol>  <li>
+    <div id="installationproblems" class="reveal">
+      I have installation problems. What can I do?    </div>
+    <div id="installationproblems_ans" class="answer">
+       <p>
+Please have a look at the <code>INSTALL</code> file. If you are using SoPlex
+version 2.0.0 or higher you should try to recompile with <code>LEGACY=true</code>.
+This will restore the previous command line interface and disable some new
+features like iterative refinement with rational arithmetic.
+</p>
+    </div>
+  </li>
+    <li>
     <div id="howtocontribute" class="reveal">
       How can I contribute?    </div>
     <div id="howtocontribute_ans" class="answer">

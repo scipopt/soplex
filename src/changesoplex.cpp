@@ -668,7 +668,7 @@ void SPxSolver::changeObj(const Vector& newObj)
    unInit();
 }
 
-void SPxSolver::changeObj(int i, Real newVal)
+void SPxSolver::changeObj(int i, const Real& newVal)
 {
 
    SPxLP::changeObj(i, newVal);
@@ -736,7 +736,7 @@ void SPxSolver::changeLower(const Vector& newLower)
    }
 }
 
-void SPxSolver::changeLower(int i, Real newLower)
+void SPxSolver::changeLower(int i, const Real& newLower)
 {
 
    if (newLower != lower(i))
@@ -810,7 +810,7 @@ void SPxSolver::changeUpper(const Vector& newUpper)
    }
 }
 
-void SPxSolver::changeUpper(int i, Real newUpper)
+void SPxSolver::changeUpper(int i, const Real& newUpper)
 {
 
    if (newUpper != upper(i))
@@ -832,7 +832,7 @@ void SPxSolver::changeBounds(const Vector& newLower, const Vector& newUpper)
    changeUpper(newUpper);
 }
 
-void SPxSolver::changeBounds(int i, Real newLower, Real newUpper)
+void SPxSolver::changeBounds(int i, const Real& newLower, const Real& newUpper)
 {
 
    changeLower(i, newLower);
@@ -897,7 +897,7 @@ void SPxSolver::changeLhs(const Vector& newLhs)
    }
 }
 
-void SPxSolver::changeLhs(int i, Real newLhs)
+void SPxSolver::changeLhs(int i, const Real& newLhs)
 {
 
    SPxLP::changeLhs(i, newLhs);
@@ -965,7 +965,7 @@ void SPxSolver::changeRhs(const Vector& newRhs)
    }
 }
 
-void SPxSolver::changeRhs(int i, Real newRhs)
+void SPxSolver::changeRhs(int i, const Real& newRhs)
 {
 
    SPxLP::changeRhs(i, newRhs);
@@ -992,7 +992,7 @@ void SPxSolver::changeRange(const Vector& newLhs, const Vector& newRhs)
    }
 }
 
-void SPxSolver::changeRange(int i, Real newLhs, Real newRhs)
+void SPxSolver::changeRange(int i, const Real& newLhs, const Real& newRhs)
 {
 
    SPxLP::changeLhs(i, newLhs);
@@ -1024,7 +1024,7 @@ void SPxSolver::changeCol(int i, const LPCol& newCol)
    unInit();
 }
 
-void SPxSolver::changeElement(int i, int j, Real val)
+void SPxSolver::changeElement(int i, int j, const Real& val)
 {
 
    SPxLP::changeElement(i, j, val);

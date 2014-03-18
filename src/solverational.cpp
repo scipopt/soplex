@@ -327,12 +327,13 @@ namespace soplex
       // store floating-point solution of original LP as current rational solution; make sure that the primal obj value
       // corresponds to a minimization problem
       sol._primal = primalReal;
-      sol._slacks = _rationalLP->computePrimalActivity(sol._primal);
+      _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
       sol._hasPrimal = true;
       sol._primalObjVal = (sol._primal * _rationalLP->maxObj()) * -1;
 
       sol._dual = dualReal;
-      sol._redCost = _rationalLP->computeDualActivity(sol._dual) + _rationalLP->maxObj();
+      _rationalLP->computeDualActivity(sol._dual, sol._redCost);
+      sol._redCost += _rationalLP->maxObj();
       sol._redCost *= -1;
       sol._hasDual = true;
       sol._dualObjVal = sol._primalObjVal;
@@ -350,18 +351,19 @@ namespace soplex
       // refinement loop
       do
       {
-         minRounds--;//decrement minRounds counter
+         // decrement minRounds counter
+         minRounds--;
+
          MSG_DEBUG( spxout << "Computing violations.\n" );
 
          // compute violation of bounds
          boundsViolation = 0;
-
          for( int c = numColsRational() - 1; c >= 0; c-- )
          {
             // lower bound
             modLower[c] = lowerRational(c);
 
-            if( double(modLower[c]) > double(-realParam(SoPlex::INFTY)) )
+            if( modLower[c] > -realParam(SoPlex::INFTY) )
                modLower[c] -= sol._primal[c];
 
             if( modLower[c] > boundsViolation )
@@ -370,7 +372,7 @@ namespace soplex
             // upper bound
             modUpper[c] = upperRational(c);
 
-            if( double(modUpper[c]) < double(realParam(SoPlex::INFTY)) )
+            if( modUpper[c] < realParam(SoPlex::INFTY) )
                modUpper[c] -= sol._primal[c];
 
             if( modUpper[c] < -boundsViolation )
@@ -395,7 +397,7 @@ namespace soplex
          }
 
          // compute reduced costs and reduced cost violation
-         modObj = _rationalLP->computeDualActivity(sol._dual);
+         _rationalLP->computeDualActivity(sol._dual, modObj);
          redCostViolation = 0;
 
          for( int c = numColsRational() - 1; c >= 0; c-- )
@@ -468,9 +470,9 @@ namespace soplex
          maxScale = primalScale * Rational(realParam(SoPlex::MAXSCALEINCR));
 
          primalScale = boundsViolation > sideViolation ? boundsViolation : sideViolation;
-         assert(primalScale >= Rational(0));
+         assert(primalScale >= 0);
 
-         if( primalScale > Rational(0) )
+         if( primalScale > 0 )
          {
             primalScale = Rational(1) / primalScale;
             if( primalScale > maxScale )
@@ -479,7 +481,7 @@ namespace soplex
          else
             primalScale = maxScale;
 
-         if( primalScale < Rational(1) )
+         if( primalScale < 1 )
             primalScale = 1;
 
          MSG_INFO2( spxout << "Scaling primal by " << rationalToString(primalScale) << ".\n" );
@@ -490,7 +492,7 @@ namespace soplex
          dualScale = redCostViolation;
          assert(dualScale >= Rational(0));
 
-         if( dualScale > Rational(0) )
+         if( dualScale > 0 )
          {
             dualScale = Rational(1) / dualScale;
             if( dualScale > maxScale )
@@ -499,7 +501,7 @@ namespace soplex
          else
             dualScale = maxScale;
 
-         if( dualScale < Rational(1) )
+         if( dualScale < 1 )
             dualScale = 1;
 
          MSG_INFO2( spxout << "Scaling dual by " << rationalToString(dualScale) << ".\n" );
@@ -583,7 +585,7 @@ namespace soplex
                   numAdjustedBounds++;
                }
             }
-            else if( basisStatusCol == SPxSolver::ZERO && sol._primal[c] != Rational(0) )
+            else if( basisStatusCol == SPxSolver::ZERO && sol._primal[c] != 0 )
             {
                sol._primal[c] = 0;
                numAdjustedBounds++;
@@ -599,8 +601,9 @@ namespace soplex
          }
 
          // recompute slack and reduced cost values
-         sol._slacks = _rationalLP->computePrimalActivity(sol._primal);
-         sol._redCost = _rationalLP->computeDualActivity(sol._dual) + _rationalLP->maxObj();
+         _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
+         _rationalLP->computeDualActivity(sol._dual, sol._redCost);
+         sol._redCost += _rationalLP->maxObj();
          sol._redCost *= -1;
 
          assert(sol._hasPrimal);
@@ -1561,7 +1564,14 @@ namespace soplex
       // stop timing
       _statistics->transformTime.stop();
 
-      assert(!sol._hasPrimal || sol._slacks == _rationalLP->computePrimalActivity(sol._primal));
+#ifndef NDEBUG
+      if( sol._hasPrimal )
+      {
+         DVectorRational activity;
+         _rationalLP->computePrimalActivity(sol._primal, activity);
+         assert(sol._slacks == activity);
+      }
+#endif
    }
 
    /** computes radius of infeasibility box implied by an approximate Farkas' proof

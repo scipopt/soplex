@@ -756,65 +756,65 @@ public:
    ///
    virtual void changeObj(const Vector& newObj);
    ///
-   virtual void changeObj(int i, Real newVal);
+   virtual void changeObj(int i, const Real& newVal);
    ///
-   virtual void changeObj(SPxColId p_id, Real p_newVal)
+   virtual void changeObj(SPxColId p_id, const Real& p_newVal)
    {
       changeObj(number(p_id), p_newVal);
    }
    ///
    virtual void changeLower(const Vector& newLower);
    ///
-   virtual void changeLower(int i, Real newLower);
+   virtual void changeLower(int i, const Real& newLower);
    ///
-   virtual void changeLower(SPxColId p_id, Real p_newLower)
+   virtual void changeLower(SPxColId p_id, const Real& p_newLower)
    {
       changeLower(number(p_id), p_newLower);
    }
    ///
    virtual void changeUpper(const Vector& newUpper);
    ///
-   virtual void changeUpper(int i, Real newUpper);
+   virtual void changeUpper(int i, const Real& newUpper);
    ///
-   virtual void changeUpper(SPxColId p_id, Real p_newUpper)
+   virtual void changeUpper(SPxColId p_id, const Real& p_newUpper)
    {
       changeUpper(number(p_id), p_newUpper);
    }
    ///
    virtual void changeBounds(const Vector& newLower, const Vector& newUpper);
    ///
-   virtual void changeBounds(int i, Real newLower, Real newUpper);
+   virtual void changeBounds(int i, const Real& newLower, const Real& newUpper);
    ///
    virtual void changeBounds(
-      SPxColId p_id, Real p_newLower, Real p_newUpper)
+      SPxColId p_id, const Real& p_newLower, const Real& p_newUpper)
    {
       changeBounds(number(p_id), p_newLower, p_newUpper);
    }
    ///
    virtual void changeLhs(const Vector& newLhs);
    ///
-   virtual void changeLhs(int i, Real newLhs);
+   virtual void changeLhs(int i, const Real& newLhs);
    ///
-   virtual void changeLhs(SPxRowId p_id, Real p_newLhs)
+   virtual void changeLhs(SPxRowId p_id, const Real& p_newLhs)
    {
       changeLhs(number(p_id), p_newLhs);
    }
    ///
    virtual void changeRhs(const Vector& newRhs);
    ///
-   virtual void changeRhs(int i, Real newRhs);
+   virtual void changeRhs(int i, const Real& newRhs);
    ///
-   virtual void changeRhs(SPxRowId p_id, Real p_newRhs)
+   virtual void changeRhs(SPxRowId p_id, const Real& p_newRhs)
    {
       changeRhs(number(p_id), p_newRhs);
    }
    ///
    virtual void changeRange(const Vector& newLhs, const Vector& newRhs);
    ///
-   virtual void changeRange(int i, Real newLhs, Real newRhs);
+   virtual void changeRange(int i, const Real& newLhs, const Real& newRhs);
    ///
    virtual void changeRange(
-      SPxRowId p_id, Real p_newLhs, Real p_newRhs)
+      SPxRowId p_id, const Real& p_newLhs, const Real& p_newRhs)
    {
       changeRange(number(p_id), p_newLhs, p_newRhs);
    }
@@ -833,10 +833,10 @@ public:
       changeCol(number(p_id), p_newCol);
    }
    ///
-   virtual void changeElement(int i, int j, Real val);
+   virtual void changeElement(int i, int j, const Real& val);
    ///
    virtual void changeElement(
-      SPxRowId rid, SPxColId cid, Real val)
+      SPxRowId rid, SPxColId cid, const Real& val)
    {
       changeElement(number(rid), number(cid), val);
    }

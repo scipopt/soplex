@@ -36,45 +36,47 @@
 #include "gmp.h"
 #endif
 
-#ifdef SOPLEX_WITH_GMPXX
-#include "gmp.h"
-#include "gmpxx.h"
-#endif
+
 
 namespace soplex
 {
 #ifdef SOPLEX_WITH_GMP
+
+/// list of unused Private objects
+IdList< Rational::Private > Rational::unusedPrivateList(0, 0, true);
 
 /// Defines the "Pimpl"-class Private
 class Rational::Private
 {
 public:
 
-   /// actual value of the Rational object
-   mpq_t privatevalue;
+   mpq_t privatevalue;  ///< actual value of the Rational object
+   Private* theprev;    ///< pointer to the previous element in the list
+   Private* thenext;    ///< pointer to the next element in the list
 
    /// default constructor
    Private()
+      : theprev(0)
+      , thenext(0)
    {
       mpq_init(privatevalue);
    }
 
    /// copy constructor
    Private(const Private& p)
+      : theprev(0)
+      , thenext(0)
    {
+      // a newly constructed element is not in any list, even if the original element (p) is; hence we initialize
+      // theprev and thenext to zero
       mpq_init(privatevalue);
       mpq_set(this->privatevalue, p.privatevalue);
    }
 
-   /// copy assignment operator
-   Private& operator=(const Private& p)
-   {
-      mpq_set(this->privatevalue, p.privatevalue);
-      return *this;
-   }
-
    /// constructor from long double
    Private(const long double& r)
+      : theprev(0)
+      , thenext(0)
    {
       mpq_init(privatevalue);
       mpq_set_d(privatevalue, double(r));
@@ -82,6 +84,8 @@ public:
 
    /// constructor from double
    Private(const double& r)
+      : theprev(0)
+      , thenext(0)
    {
       mpq_init(privatevalue);
       mpq_set_d(privatevalue, r);
@@ -89,6 +93,8 @@ public:
 
    /// constructor from int
    Private(const int& i)
+      : theprev(0)
+      , thenext(0)
    {
       mpq_init(privatevalue);
       mpq_set_d(privatevalue, i);
@@ -96,6 +102,8 @@ public:
 
    /// constructor from mpq_t
    Private(const mpq_t& q)
+      : theprev(0)
+      , thenext(0)
    {
       mpq_init(privatevalue);
       mpq_set(privatevalue, q);
@@ -106,6 +114,70 @@ public:
    {
       mpq_clear(privatevalue);
    }
+
+   /// assignment operator
+   Private& operator=(const Private& p)
+   {
+      // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
+      mpq_set(this->privatevalue, p.privatevalue);
+      return *this;
+   }
+
+   /// assignment operator from long double
+   Private& operator=(const long double& r)
+   {
+      // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
+      mpq_set_d(this->privatevalue, double(r));
+      return *this;
+   }
+
+   /// assignment operator from double
+   Private& operator=(const double& r)
+   {
+      // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
+      mpq_set_d(this->privatevalue, r);
+      return *this;
+   }
+
+   /// assignment operator from int
+   Private& operator=(const int& i)
+   {
+      // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
+      mpq_set_d(this->privatevalue, i);
+      return *this;
+   }
+
+   /// assignment operator from mpq_t
+   Private& operator=(const mpq_t& q)
+   {
+      // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
+      mpq_set(this->privatevalue, q);
+      return *this;
+   }
+
+   /// previous Private element
+   Private*& prev()
+   {
+      return theprev;
+   }
+
+   /// previous Private element
+   Private* const& prev() const
+   {
+      return theprev;
+   }
+
+   /// next Private element
+   Private*& next()
+   {
+      return thenext;
+   }
+
+   /// next Private element
+   Private* const& next() const
+   {
+      return thenext;
+   }
 };
 
 
@@ -113,9 +185,21 @@ public:
 /// default constructor
 Rational::Rational()
 {
-   dpointer = 0;
-   spx_alloc(dpointer);
-   dpointer = new (dpointer) Private();
+   dpointer = unusedPrivateList.last();
+
+   if( dpointer != 0 )
+   {
+      assert(unusedPrivateList.first() != 0);
+      unusedPrivateList.remove(dpointer);
+   }
+   else
+   {
+      assert(unusedPrivateList.first() == 0);
+      spx_alloc(dpointer);
+      new (dpointer) Private();
+   }
+
+   assert(dpointer != 0);
 }
 
 
@@ -123,14 +207,131 @@ Rational::Rational()
 /// copy constructor
 Rational::Rational(const Rational& r)
 {
-   dpointer = 0;
-   spx_alloc(dpointer);
-   dpointer = new (dpointer) Private(*(r.dpointer));
+   dpointer = unusedPrivateList.last();
+
+   if( dpointer != 0 )
+   {
+      assert(unusedPrivateList.first() != 0);
+      unusedPrivateList.remove(dpointer);
+      *dpointer = *(r.dpointer);
+   }
+   else
+   {
+      assert(unusedPrivateList.first() == 0);
+      spx_alloc(dpointer);
+      new (dpointer) Private(*(r.dpointer));
+   }
+
+   assert(dpointer != 0);
 }
 
 
 
-/// copy assignment operator
+/// constructor from long double
+Rational::Rational(const long double& r)
+{
+   dpointer = unusedPrivateList.last();
+
+   if( dpointer != 0 )
+   {
+      assert(unusedPrivateList.first() != 0);
+      unusedPrivateList.remove(dpointer);
+      *dpointer = r;
+   }
+   else
+   {
+      assert(unusedPrivateList.first() == 0);
+      spx_alloc(dpointer);
+      new (dpointer) Private(r);
+   }
+
+   assert(dpointer != 0);
+}
+
+
+
+/// constructor from double
+Rational::Rational(const double& r)
+{
+   dpointer = unusedPrivateList.last();
+
+   if( dpointer != 0 )
+   {
+      assert(unusedPrivateList.first() != 0);
+      unusedPrivateList.remove(dpointer);
+      *dpointer = r;
+   }
+   else
+   {
+      assert(unusedPrivateList.first() == 0);
+      spx_alloc(dpointer);
+      new (dpointer) Private(r);
+   }
+
+   assert(dpointer != 0);
+}
+
+
+
+/// constructor from int
+Rational::Rational(const int& i)
+{
+   dpointer = unusedPrivateList.last();
+
+   if( dpointer != 0 )
+   {
+      assert(unusedPrivateList.first() != 0);
+      unusedPrivateList.remove(dpointer);
+      *dpointer = i;
+   }
+   else
+   {
+      assert(unusedPrivateList.first() == 0);
+      spx_alloc(dpointer);
+      new (dpointer) Private(i);
+   }
+
+   assert(dpointer != 0);
+}
+
+
+
+/// constructor from mpq_t
+Rational::Rational(const mpq_t& q)
+{
+   dpointer = unusedPrivateList.last();
+
+   if( dpointer != 0 )
+   {
+      assert(unusedPrivateList.first() != 0);
+      unusedPrivateList.remove(dpointer);
+      *dpointer = q;
+   }
+   else
+   {
+      assert(unusedPrivateList.first() == 0);
+      spx_alloc(dpointer);
+      new (dpointer) Private(q);
+   }
+
+   assert(dpointer != 0);
+}
+
+
+
+/// destructor
+Rational::~Rational()
+{
+   // for memory efficiency, we could free the Private object (or even more Private objects from the list of unused
+   // elements) if there are much more unused than used Private objects; this requires counting the used Private
+   // objects, though; we do not implement this currently, because we have not encountered memory problems, so far, and
+   // because freeing costs time
+   unusedPrivateList.append(dpointer);
+}
+
+
+
+/// assignment operator
 Rational& Rational::operator=(const Rational &r)
 {
    *(this->dpointer) = *(r.dpointer);
@@ -139,51 +340,38 @@ Rational& Rational::operator=(const Rational &r)
 
 
 
-/// constructor from long double
-Rational::Rational(const long double& r)
+/// assignment operator from long double
+Rational& Rational::operator=(const long double &r)
 {
-   dpointer = 0;
-   spx_alloc(dpointer);
-   dpointer = new (dpointer) Private(r);
+   *(this->dpointer) = r;
+   return *this;
 }
 
 
 
-/// constructor from double
-Rational::Rational(const double& r)
+/// assignment operator from double
+Rational& Rational::operator=(const double &r)
 {
-   dpointer = 0;
-   spx_alloc(dpointer);
-   dpointer = new (dpointer) Private(r);
+   *(this->dpointer) = r;
+   return *this;
 }
 
 
 
-/// constructor from int
-Rational::Rational(const int& i)
+/// assignment operator from int
+Rational& Rational::operator=(const int &i)
 {
-   dpointer = 0;
-   spx_alloc(dpointer);
-   dpointer = new (dpointer) Private(i);
+   *(this->dpointer) = i;
+   return *this;
 }
 
 
 
-/// constructor from mpq_t
-Rational::Rational(const mpq_t& q)
+/// assignment operator from mpq_t
+Rational& Rational::operator=(const mpq_t &q)
 {
-   dpointer = 0;
-   spx_alloc(dpointer);
-   dpointer = new (dpointer) Private(q);
-}
-
-
-
-/// destructor
-Rational::~Rational()
-{
-   dpointer->~Private();
-   spx_free(dpointer);
+   *(this->dpointer) = q;
+   return *this;
 }
 
 
@@ -1099,962 +1287,6 @@ Rational operator-(const Rational& r)
 
 
 
-#elif defined(SOPLEX_WITH_GMPXX)
-
-/// Defines the "Pimpl"-class Private
-class Rational::Private : public mpq_class
-{
-public:
-
-   /// default constructor
-   Private()
-      : mpq_class()
-   {
-   }
-
-   /// copy constructor
-   Private(const Private& p)
-      : mpq_class()
-   {
-      *this = p;
-   }
-
-   /// constructor from long double
-   Private(const long double& r)
-      : mpq_class(double(r))
-   {
-   }
-
-   /// constructor from double
-   Private(const double& r)
-      : mpq_class(r)
-   {
-   }
-
-   /// constructor from int
-   Private(const int& i)
-      : mpq_class(i)
-   {
-   }
-
-   /// constructor from mpq_class
-   Private(const mpq_class& q)
-      : mpq_class(q)
-   {
-   }
-
-   /// constructor from mpq_t
-   Private(const mpq_t& q)
-      : mpq_class(q)
-   {
-   }
-
-   /* destructor -- could be directly called but it is an internal GMP function and subject to change in further releases.
-   ~Private()
-   {
-      ~__gmp_expr();
-   }
-   */
-};
-
-
-
-/// default constructor
-Rational::Rational()
-{
-   dpointer = 0;
-   spx_alloc(dpointer);
-   dpointer = new (dpointer) Private();
-}
-
-
-
-/// copy constructor
-Rational::Rational(const Rational& r)
-{
-   dpointer = 0;
-   spx_alloc(dpointer);
-   dpointer = new (dpointer) Private(*(r.dpointer));
-}
-
-
-
-/// copy assignment operator
-Rational& Rational::operator=(const Rational &r)
-{
-   *(this->dpointer) = *(r.dpointer);
-   return *this;
-}
-
-
-
-/// constructor from long double
-Rational::Rational(const long double& r)
-{
-   dpointer = 0;
-   spx_alloc(dpointer);
-   dpointer = new (dpointer) Private(r);
-}
-
-
-
-/// constructor from double
-Rational::Rational(const double& r)
-{
-   dpointer = 0;
-   spx_alloc(dpointer);
-   dpointer = new (dpointer) Private(r);
-}
-
-
-
-/// constructor from int
-Rational::Rational(const int& i)
-{
-   dpointer = 0;
-   spx_alloc(dpointer);
-   dpointer = new (dpointer) Private(i);
-}
-
-
-/// constructor from mpq_class
-Rational::Rational(const mpq_class& q)
-{
-   dpointer = 0;
-   spx_alloc(dpointer);
-   dpointer = new (dpointer) Private(q);
-}
-
-
-
-/// constructor from mpq_t
-Rational::Rational(const mpq_t& q)
-{
-   dpointer = 0;
-   spx_alloc(dpointer);
-   dpointer = new (dpointer) Private(q);
-}
-
-
-
-/// destructor
-Rational::~Rational()
-{
-   dpointer->~Private();
-   spx_free(dpointer);
-}
-
-
-
-/// typecasts Rational to double (allows only explicit typecast)
-Rational::operator double() const
-{
-   return this->dpointer->get_d();
-}
-
-
-
-/// typecasts Rational to long double (allows only explicit typecast)
-Rational::operator long double() const
-{
-   return (long double)this->dpointer->get_d();
-}
-
-
-
-/// addition operator
-Rational Rational::operator+(const Rational& r) const
-{
-   Rational retval = *this;
-   *(retval.dpointer) += *(r.dpointer);
-   return retval;
-}
-
-
-
-/// addition assignment operator
-Rational Rational::operator+=(const Rational& r) const
-{
-   *(this->dpointer) += *(r.dpointer);
-   return *this;
-}
-
-
-
-/// addition operator for doubles
-Rational Rational::operator+(const double& d) const
-{
-   Rational retval = *this;
-   *(retval.dpointer) += d;
-   return retval;
-}
-
-
-
-/// addition assignment operator for doubles
-Rational Rational::operator+=(const double& d) const
-{
-   *(this->dpointer) += d;
-   return *this;
-}
-
-
-
-/// subtraction operator
-Rational Rational::operator-(const Rational& r) const
-{
-   Rational retval = *this;
-   *(retval.dpointer) -= *(r.dpointer);
-   return retval;
-}
-
-
-
-/// subtraction assignment operator
-Rational Rational::operator-=(const Rational& r) const
-{
-   *(this->dpointer) -= *(r.dpointer);
-   return *this;
-}
-
-
-
-/// subtraction operator for doubles
-Rational Rational::operator-(const double& d) const
-{
-   Rational retval = *this;
-   *(retval.dpointer) -= d;
-   return retval;
-}
-
-
-
-/// subtraction assignment operator for doubles
-Rational Rational::operator-=(const double& d) const
-{
-   *(this->dpointer) -= d;
-   return *this;
-}
-
-
-
-/// multiplication operator
-Rational Rational::operator*(const Rational& r) const
-{
-   Rational retval = *this;
-   *(retval.dpointer) *= *(r.dpointer);
-   return retval;
-}
-
-
-
-/// multiplication assignment operator
-Rational Rational::operator*=(const Rational& r) const
-{
-   *(this->dpointer) *= *(r.dpointer);
-   return *this;
-}
-
-
-
-/// multiplication operator for doubles
-Rational Rational::operator*(const double& d) const
-{
-   Rational retval = *this;
-   *(retval.dpointer) *= d;
-   return retval;
-}
-
-
-
-/// multiplication assignment operator for doubles
-Rational Rational::operator*=(const double& d) const
-{
-   *(this->dpointer) *= d;
-   return *this;
-}
-
-
-
-/// division operator
-Rational Rational::operator/(const Rational& r) const
-{
-   Rational retval = *this;
-   *(retval.dpointer) /= *(r.dpointer);
-   return retval;
-}
-
-
-
-/// division assignment operator
-Rational Rational::operator/=(const Rational& r) const
-{
-   *(this->dpointer) /= *(r.dpointer);
-   return *this;
-}
-
-
-
-/// division operator for doubles
-Rational Rational::operator/(const double& d) const
-{
-   Rational retval = *this;
-   *(retval.dpointer) /= d;
-   return retval;
-}
-
-
-
-/// division assignment operator for doubles
-Rational Rational::operator/=(const double& d) const
-{
-   *(this->dpointer) /= d;
-   return *this;
-}
-
-
-
-/// checks if d is the closest possible double
-bool Rational::isNextTo(const double& d)
-{
-   // get intervall [a,b] of doubles that the Rational is in
-   double x = double(*this);
-   double a;
-   double b;
-
-   if( x < *this )
-   {
-      a = x;
-      b = nextafter(a, infinity);
-   }
-   else
-   {
-      b = x;
-      a = nextafter(b, -infinity);
-   }
-
-   // check if d equals the closer end of the intervall
-   bool result = (abs(*this - a) < abs(*this - b))
-      ? (d == a)
-      : (d == b);
-
-   return result;
-}
-
-
-
-/// checks if d is exactly equal to the Rational and if not, if it is one of the two adjacent doubles
-bool Rational::isAdjacentTo(const double& d)
-{
-   double x = double(*this);
-   double a;
-   double b;
-   mpq_t tmp;
-
-   mpq_init(tmp);
-   mpq_set_d(tmp, x);
-
-   int cmp = mpq_cmp(tmp, this->dpointer->get_mpq_t());
-   mpq_clear(tmp);
-
-   // the rounded value is smaller than the rational value
-   if( cmp < 0 )
-   {
-      a = x;
-      b = nextafter(a, infinity);
-   }
-   // the rounded value is larger than the rational value
-   else if( cmp > 0 )
-   {
-      b = x;
-      a = nextafter(b, -infinity);
-   }
-   // the rational is representable in double precision
-   else
-      return (x == d);
-
-   return ((a == d) || (b == d));
-}
-
-
-
-/// returns precision of Rational implementation, i.e., number of bits used to store Rational numbers (INT_MAX if exact)
-int Rational::precision()
-{
-   return INT_MAX;
-}
-
-
-
-#define MAX_STR_LEN 10000
-/// read Rational from string
-bool Rational::readString(const char* s)
-{
-   assert(s != 0);
-   assert(strlen(s) <= MAX_STR_LEN);
-   Rational value;
-   const char* pos;
-
-   // if there is a slash or there is no dot and exponent (i.e. we
-   // have an integer), we may simply call GMP's string reader
-   if( strchr(s, '/') != 0 || strpbrk(s, ".eE") == 0 )
-   {
-      pos = (*s == '+') ? s + 1 : s;
-      if( value.dpointer->set_str(pos, 10) == 0 )
-      {
-         value.dpointer->canonicalize();
-         *(this->dpointer) = *(value.dpointer);
-         return true;
-      }
-      else
-         return false;
-   }
-
-   // otherwise we analyze the string
-#ifndef NDEBUG
-   bool has_exponent = false;
-   bool has_dot = false;
-#endif
-   bool has_digits = false;
-   bool has_emptyexponent = false;
-   long int exponent = 0;
-   long int decshift = 0;
-   mpz_class shiftpower;
-   char* t;
-   char tmp[MAX_STR_LEN];
-
-   pos = s;
-
-   // 1. sign
-   if( (*pos == '+') || (*pos == '-') )
-      pos++;
-
-   // 2. Digits before the decimal dot
-   while( (*pos >= '0') && (*pos <= '9') )
-   {
-      has_digits = true;
-      pos++;
-   }
-
-   // 3. Decimal dot
-   if( *pos == '.' )
-   {
-#ifndef NDEBUG
-      has_dot = true;
-#endif
-      pos++;
-
-      // 4. If there was a dot, possible digit behind it
-      while( (*pos >= '0') && (*pos <= '9') )
-      {
-         has_digits = true;
-         pos++;
-      }
-   }
-
-   // 5. Exponent
-   if( tolower(*pos) == 'e' )
-   {
-#ifndef NDEBUG
-      has_exponent = true;
-#endif
-      has_emptyexponent = true;
-      pos++;
-
-      // 6. Exponent sign
-      if( (*pos == '+') || (*pos == '-') )
-         pos++;
-
-      // 7. Exponent digits
-      while( (*pos >= '0') && (*pos <= '9') )
-      {
-         has_emptyexponent = false;
-         pos++;
-      }
-   }
-
-   if( has_emptyexponent || !has_digits )
-      return false;
-
-   assert(has_exponent || has_dot);
-
-   //read up to dot recording digits
-   t = tmp;
-   pos = s;
-
-   if( *pos == '+' )
-      pos++;
-
-   while( ((*pos >= '0') && (*pos <= '9') ) || *pos == '+' || *pos == '-'  )
-   {
-      *t++ = *pos;
-      pos++;
-   }
-   //record digits after dot, recording positions
-   decshift = 0;
-   if( *pos == '.' )
-   {
-      assert(has_dot);
-      pos++;
-      while( (*pos >= '0') && (*pos <= '9') )
-      {
-         *t++ = *pos;
-         decshift++;
-         pos++;
-      }
-   }
-   *t = '\0';
-
-   if( value.dpointer->set_str(tmp, 10) != 0)
-      return false;
-   value.dpointer->canonicalize();
-
-   //record exponent and update final result
-   exponent = -decshift;
-   if( tolower(*pos) == 'e' )
-   {
-      pos++;
-      assert(has_exponent);
-      for( t = tmp; *pos != '\0'; pos++ )
-         *t++ = *pos;
-      *t = '\0';
-      exponent += atol(tmp);
-   }
-   if( exponent > 0 )
-   {
-      mpz_ui_pow_ui(shiftpower.get_mpz_t(), 10, exponent);
-      *(value.dpointer) *= shiftpower;
-   }
-   else if( exponent < 0 )
-   {
-      mpz_ui_pow_ui(shiftpower.get_mpz_t(), 10, -exponent);
-      *(value.dpointer) /= shiftpower;
-   }
-
-   value.dpointer->canonicalize();
-   *(this->dpointer) = *(value.dpointer);
-   return true;
-}
-
-
-
-/// convert rational number to string
-std::string rationalToString(const Rational& r, const bool asfloat)
-{
-   std::stringstream sstream;
-
-   sstream << r;
-   if( !asfloat )
-      return sstream.str();
-   else
-   {
-      sstream.str("");
-      sstream << std::setprecision(20) << double(r);
-      return sstream.str();
-   }
-
-   ///@todo the following code creates a string of the form 1.333...e-06; this would be nice for human readable output,
-   ///      because it indicates that precision may have been lost, however, this cannot be parsed by our awk evaluation
-   ///      scripts; we should think about how this could be useful
-#if 0
-   sstream.str("");
-   sstream << mpf_class(r);
-   std::string origstring = sstream.str();
-   sstream.str("");
-
-   size_t epos = origstring.find("e");
-
-   sstream << origstring.substr(0, epos);
-
-   if( origstring.find(".") == std::string::npos )
-      sstream << ".0";
-
-   sstream << "...";
-
-   if( epos != std::string::npos )
-      sstream << origstring.substr(origstring.find("e"));
-
-   return sstream.str();
-#endif
-}
-
-
-
-/// read Rational from string
-bool readStringRational(const char* s, Rational& value)
-{
-   assert(s != 0);
-   assert(strlen(s) <= MAX_STR_LEN);
-   const char* pos;
-
-   // if there is a slash or there is no dot and exponent (i.e. we
-   // have an integer), we may simply call GMP's string reader
-   if( strchr(s, '/') != 0 || strpbrk(s, ".eE") == 0 )
-   {
-      pos = (*s == '+') ? s + 1 : s;
-      if( value.dpointer->set_str(pos, 10) == 0 )
-      {
-         value.dpointer->canonicalize();
-         return true;
-      }
-      else
-         return false;
-   }
-
-   // otherwise we analyze the string
-#ifndef NDEBUG
-   bool has_exponent = false;
-   bool has_dot = false;
-#endif
-   bool has_digits = false;
-   bool has_emptyexponent = false;
-   long int exponent = 0;
-   long int decshift = 0;
-   mpz_class shiftpower;
-   char* t;
-   char tmp[MAX_STR_LEN];
-
-   pos = s;
-
-   // 1. sign
-   if( (*pos == '+') || (*pos == '-') )
-      pos++;
-
-   // 2. Digits before the decimal dot
-   while( (*pos >= '0') && (*pos <= '9') )
-   {
-      has_digits = true;
-      pos++;
-   }
-
-   // 3. Decimal dot
-   if( *pos == '.' )
-   {
-#ifndef NDEBUG
-      has_dot = true;
-#endif
-      pos++;
-
-      // 4. If there was a dot, possible digit behind it
-      while( (*pos >= '0') && (*pos <= '9') )
-      {
-         has_digits = true;
-         pos++;
-      }
-   }
-
-   // 5. Exponent
-   if( tolower(*pos) == 'e' )
-   {
-#ifndef NDEBUG
-      has_exponent = true;
-#endif
-      has_emptyexponent = true;
-      pos++;
-
-      // 6. Exponent sign
-      if( (*pos == '+') || (*pos == '-') )
-         pos++;
-
-      // 7. Exponent digits
-      while( (*pos >= '0') && (*pos <= '9') )
-      {
-         has_emptyexponent = false;
-         pos++;
-      }
-   }
-
-   if( has_emptyexponent || !has_digits )
-      return false;
-
-   assert(has_exponent || has_dot);
-
-   // read up to dot recording digits
-   t = tmp;
-   pos = s;
-
-   if( *pos == '+' )
-      pos++;
-
-   while( ((*pos >= '0') && (*pos <= '9') ) || *pos == '+' || *pos == '-'  )
-   {
-      *t++ = *pos;
-      pos++;
-   }
-   // record digits after dot, recording positions
-   decshift = 0;
-   if( *pos == '.' )
-   {
-      assert(has_dot);
-      pos++;
-      while( (*pos >= '0') && (*pos <= '9') )
-      {
-         *t++ = *pos;
-         decshift++;
-         pos++;
-      }
-   }
-   *t = '\0';
-
-   if( value.dpointer->set_str(tmp, 10) != 0)
-      return false;
-
-   value.dpointer->canonicalize();
-
-   // record exponent and update final result
-   exponent = -decshift;
-   if( tolower(*pos) == 'e' )
-   {
-      pos++;
-      assert(has_exponent);
-      for( t = tmp; *pos != '\0'; pos++ )
-         *t++ = *pos;
-      *t = '\0';
-      exponent += atol(tmp);
-   }
-   if( exponent > 0 )
-   {
-      mpz_ui_pow_ui(shiftpower.get_mpz_t(), 10, exponent);
-      *(value.dpointer) *= shiftpower;
-   }
-   else if( exponent < 0 )
-   {
-      mpz_ui_pow_ui(shiftpower.get_mpz_t(), 10, -exponent);
-      *(value.dpointer) /= shiftpower;
-   }
-
-   value.dpointer->canonicalize();
-   return true;
-}
-
-
-
-/// print Rational
-std::ostream& operator<<(std::ostream& os, const Rational& r)
-{
-   char* buffer;
-   buffer = (char*) malloc (mpz_sizeinbase(mpq_numref(r.dpointer->get_mpq_t()), 10) + mpz_sizeinbase(mpq_denref(r.dpointer->get_mpq_t()), 10) + 3);
-   os << mpq_get_str(buffer, 10, r.dpointer->get_mpq_t());
-   free(buffer);
-   return os;
-}
-
-
-
-/// equality operator
-bool operator==(const Rational& r, const Rational& s)
-{
-   return (*(r.dpointer) == *(s.dpointer));
-}
-
-
-
-/// inequality operator
-bool operator!=(const Rational& r, const Rational& s)
-{
-   return (*(r.dpointer) != *(s.dpointer));
-}
-
-
-
-/// less than operator
-bool operator<(const Rational& r, const Rational& s)
-{
-   return (*(r.dpointer) < *(s.dpointer));
-}
-
-
-
-/// less than or equal to operator
-bool operator<=(const Rational& r, const Rational& s)
-{
-   return (*(r.dpointer) <= *(s.dpointer));
-}
-
-
-
-/// greater than operator
-bool operator>(const Rational& r, const Rational& s)
-{
-   return (*(r.dpointer) > *(s.dpointer));
-}
-
-
-
-/// greater than or equal to operator
-bool operator>=(const Rational& r, const Rational& s)
-{
-   return (*(r.dpointer) >= *(s.dpointer));
-}
-
-
-
-/// equality operator for Rational and double
-bool operator==(const Rational& r, const double& s)
-{
-   return (*(r.dpointer) == s);
-}
-
-
-/// inequality operator for Rational and double
-bool operator!=(const Rational& r, const double& s)
-{
-   return (*(r.dpointer) != s);
-}
-
-
-
-/// less than operator for Rational and double
-bool operator<(const Rational& r, const double& s)
-{
-   return (*(r.dpointer) < s);
-}
-
-
-
-/// less than or equal to operator for Rational and double
-bool operator<=(const Rational& r, const double& s)
-{
-   return (*(r.dpointer) <= s);
-}
-
-
-
-/// greater than operator for Rational and double
-bool operator>(const Rational& r, const double& s)
-{
-   return (*(r.dpointer) > s);
-}
-
-
-
-/// greater than or equal to operator for Rational and double
-bool operator>=(const Rational& r, const double& s)
-{
-   return (*(r.dpointer) >= s);
-}
-
-
-
-/// equality operator for double and Rational
-bool operator==(const double& r, const Rational& s)
-{
-   return (r == *(s.dpointer));
-}
-
-
-
-/// inequality operator double and Rational
-bool operator!=(const double& r, const Rational& s)
-{
-   return (r != *(s.dpointer));
-}
-
-
-
-/// less than operator double and Rational
-bool operator<(const double& r, const Rational& s)
-{
-   return (r < *(s.dpointer));
-}
-
-
-
-/// less than or equal to operator double and Rational
-bool operator<=(const double& r, const Rational& s)
-{
-   return (r <= *(s.dpointer));
-}
-
-
-
-/// greater than operator double and Rational
-bool operator>(const double& r, const Rational& s)
-{
-   return (r > *(s.dpointer));
-}
-
-
-
-/// greater than or equal to operator double and Rational
-bool operator>=(const double& r, const Rational& s)
-{
-   return (r >= *(s.dpointer));
-}
-
-
-
-/// addition operator for double and Rational
-Rational operator+(const double& d, const Rational& r)
-{
-   Rational retval(d);
-   *(retval.dpointer) += *(r.dpointer);
-   return retval;
-}
-
-
-
-/// subtraction operator for double and Rational
-Rational operator-(const double& d, const Rational& r)
-{
-   Rational retval(d);
-   *(retval.dpointer) -= *(r.dpointer);
-   return retval;
-}
-
-
-
-/// multiplication operator for double and Rational
-Rational operator*(const double& d, const Rational& r)
-{
-   Rational retval(d);
-   *(retval.dpointer) *= *(r.dpointer);
-   return retval;
-}
-
-
-
-/// division operator for double and Rational
-Rational operator/(const double& d, const Rational& r)
-{
-   Rational retval(d);
-   *(retval.dpointer) /= *(r.dpointer);
-   return retval;
-}
-
-
-
-/// Absolute.
-Rational abs(const Rational& r)
-{
-   Rational res = r;
-
-   if( *(res.dpointer) < 0 )
-      *(res.dpointer) *= -1;
-
-   return res;
-}
-
-
-
-/// Sign function; returns 1 if r > 0, 0 if r = 0, and -1 if r < 0.
-int sign(const Rational& r)
-{
-      return sgn(*(r.dpointer));
-}
-
-
-
-/// Negation
-Rational operator-(const Rational& r)
-{
-   Rational res = r;
-   *(res.dpointer) *= -1;
-   return res;
-}
-
-
-
 #else
 
 
@@ -2080,13 +1312,6 @@ public:
       *this = p;
    }
 
-   /// copy assignment operator
-   Private& operator=(const Private& p)
-   {
-      this->privatevalue = p.privatevalue;
-      return *this;
-   }
-
    /// constructor from long double
    Private(const long double& r)
    {
@@ -2105,6 +1330,33 @@ public:
       privatevalue = i;
    }
 
+   /// assignment operator
+   Private& operator=(const Private& p)
+   {
+      this->privatevalue = p.privatevalue;
+      return *this;
+   }
+
+   /// assignment operator from long double
+   Private& operator=(const long double& r)
+   {
+      this->privatevalue = r;
+      return *this;
+   }
+
+   /// assignment operator from double
+   Private& operator=(const double& r)
+   {
+      this->privatevalue = (long double)(r);
+      return *this;
+   }
+
+   /// assignment operator from int
+   Private& operator=(const int& i)
+   {
+      this->privatevalue = (long double)(i);
+      return *this;
+   }
 };
 
 
@@ -2125,15 +1377,6 @@ Rational::Rational(const Rational& r)
    dpointer = 0;
    spx_alloc(dpointer);
    dpointer = new (dpointer) Private(*(r.dpointer));
-}
-
-
-
-/// copy assignment operator
-Rational& Rational::operator=(const Rational &r)
-{
-   *(this->dpointer) = *(r.dpointer);
-   return *this;
 }
 
 
@@ -2172,6 +1415,42 @@ Rational::Rational(const int& i)
 Rational::~Rational()
 {
    spx_free(dpointer);
+}
+
+
+
+/// assignment operator
+Rational& Rational::operator=(const Rational &r)
+{
+   *dpointer = *(r.dpointer);
+   return *this;
+}
+
+
+
+/// assignment operator from long double
+Rational& Rational::operator=(const long double &r)
+{
+   *dpointer = r;
+   return *this;
+}
+
+
+
+/// assignment operator from double
+Rational& Rational::operator=(const double &r)
+{
+   *dpointer = r;
+   return *this;
+}
+
+
+
+/// assignment operator from int
+Rational& Rational::operator=(const int &i)
+{
+   *dpointer = i;
+   return *this;
 }
 
 
@@ -2356,7 +1635,7 @@ bool Rational::isNextTo(const double& d)
 /// checks if d is exactly equal to the Rational and if not, if it is one of the two adjacent doubles
 bool Rational::isAdjacentTo(const double& d)
 {
-   return (this->dpointer->privatevalue == d);
+   return (double(this->dpointer->privatevalue) == d);
 }
 
 

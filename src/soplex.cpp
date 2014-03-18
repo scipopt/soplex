@@ -1176,7 +1176,7 @@ namespace soplex
 
 
    /// changes left-hand side of row \p i to \p lhs
-   void SoPlex::changeLhsReal(int i, Real lhs)
+   void SoPlex::changeLhsReal(int i, const Real& lhs)
    {
       assert(_realLP != 0);
 
@@ -1206,7 +1206,7 @@ namespace soplex
 
 
    /// changes right-hand side of row \p i to \p rhs
-   void SoPlex::changeRhsReal(int i, Real rhs)
+   void SoPlex::changeRhsReal(int i, const Real& rhs)
    {
       assert(_realLP != 0);
 
@@ -1236,7 +1236,7 @@ namespace soplex
 
 
    /// changes left- and right-hand side of row \p i
-   void SoPlex::changeRangeReal(int i, Real lhs, Real rhs)
+   void SoPlex::changeRangeReal(int i, const Real& lhs, const Real& rhs)
    {
       assert(_realLP != 0);
 
@@ -1281,7 +1281,7 @@ namespace soplex
 
 
    /// changes lower bound of column i to \p lower
-   void SoPlex::changeLowerReal(int i, Real lower)
+   void SoPlex::changeLowerReal(int i, const Real& lower)
    {
       assert(_realLP != 0);
 
@@ -1311,7 +1311,7 @@ namespace soplex
 
 
    /// changes \p i 'th upper bound to \p upper
-   void SoPlex::changeUpperReal(int i, Real upper)
+   void SoPlex::changeUpperReal(int i, const Real& upper)
    {
       assert(_realLP != 0);
 
@@ -1341,7 +1341,7 @@ namespace soplex
 
 
    /// changes bounds of column \p i to \p lower and \p upper
-   void SoPlex::changeBoundsReal(int i, Real lower, Real upper)
+   void SoPlex::changeBoundsReal(int i, const Real& lower, const Real& upper)
    {
       assert(_realLP != 0);
 
@@ -1371,7 +1371,7 @@ namespace soplex
 
 
    /// changes objective coefficient of column i to \p obj
-   void SoPlex::changeObjReal(int i, Real obj)
+   void SoPlex::changeObjReal(int i, const Real& obj)
    {
       assert(_realLP != 0);
 
@@ -1386,7 +1386,7 @@ namespace soplex
 
 
    /// changes matrix entry in row \p i and column \p j to \p val
-   void SoPlex::changeElementReal(int i, int j, Real val)
+   void SoPlex::changeElementReal(int i, int j, const Real& val)
    {
       assert(_realLP != 0);
 
@@ -1676,7 +1676,7 @@ namespace soplex
 
 
    /// changes left-hand side of row \p i to \p lhs
-   void SoPlex::changeLhsRational(int i, Rational lhs)
+   void SoPlex::changeLhsRational(int i, const Rational& lhs)
    {
       assert(_rationalLP != 0);
 
@@ -1712,7 +1712,7 @@ namespace soplex
 
 
    /// changes right-hand side of row \p i to \p rhs
-   void SoPlex::changeRhsRational(int i, Rational rhs)
+   void SoPlex::changeRhsRational(int i, const Rational& rhs)
    {
       assert(_rationalLP != 0);
 
@@ -1748,7 +1748,7 @@ namespace soplex
 
 
    /// changes left- and right-hand side of row \p i
-   void SoPlex::changeRangeRational(int i, Rational lhs, Rational rhs)
+   void SoPlex::changeRangeRational(int i, const Rational& lhs, const Rational& rhs)
    {
       assert(_rationalLP != 0);
 
@@ -1802,7 +1802,7 @@ namespace soplex
 
 
    /// changes lower bound of column i to \p lower
-   void SoPlex::changeLowerRational(int i, Rational lower)
+   void SoPlex::changeLowerRational(int i, const Rational& lower)
    {
       assert(_rationalLP != 0);
 
@@ -1838,7 +1838,7 @@ namespace soplex
 
 
    /// changes \p i 'th upper bound to \p upper
-   void SoPlex::changeUpperRational(int i, Rational upper)
+   void SoPlex::changeUpperRational(int i, const Rational& upper)
    {
       assert(_rationalLP != 0);
 
@@ -1874,7 +1874,7 @@ namespace soplex
 
 
    /// changes bounds of column \p i to \p lower and \p upper
-   void SoPlex::changeBoundsRational(int i, Rational lower, Rational upper)
+   void SoPlex::changeBoundsRational(int i, const Rational& lower, const Rational& upper)
    {
       assert(_rationalLP != 0);
 
@@ -1910,7 +1910,7 @@ namespace soplex
 
 
    /// changes objective coefficient of column i to \p obj
-   void SoPlex::changeObjRational(int i, Rational obj)
+   void SoPlex::changeObjRational(int i, const Rational& obj)
    {
       assert(_rationalLP != 0);
 
@@ -1928,7 +1928,7 @@ namespace soplex
 
 
    /// changes matrix entry in row \p i and column \p j to \p val
-   void SoPlex::changeElementRational(int i, int j, Rational val)
+   void SoPlex::changeElementRational(int i, int j, const Rational& val)
    {
       assert(_rationalLP != 0);
 
@@ -2178,7 +2178,30 @@ namespace soplex
          _solver.loadLP(realLP);
 
          if( _hasBasis )
+         {
+            // in manual sync mode, if the right-hand side of an equality constraint is not floating-point
+            // representable, the user might have constructed the constraint in the real LP by rounding down the
+            // left-hand side and rounding up the right-hand side; if the basis status is fixed, we need to adjust it
+            for( int i = 0; i < _solver.nRows(); i++ )
+            {
+               if( _basisStatusRows[i] == SPxSolver::FIXED && _solver.lhs(i) != _solver.rhs(i) )
+               {
+                  assert(_solver.rhs(i) == nextafter(_solver.lhs(i), infinity));
+                  if( _hasSolRational && _solRational.hasDual()
+                     && ((intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MAXIMIZE && _solRational._dual[i] > 0)
+                        || (intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE && _solRational._dual[i] < 0)) )
+                  {
+                     _basisStatusRows[i] = SPxSolver::ON_UPPER;
+                  }
+                  else
+                  {
+                     _basisStatusRows[i] = SPxSolver::ON_LOWER;
+                  }
+               }
+            }
+
             _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+         }
          _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
       }
       else
@@ -2404,7 +2427,8 @@ namespace soplex
       VectorReal& primal = _solReal._primal;
       assert(primal.dim() == numColsReal());
 
-      DVectorReal activity = _realLP->computePrimalActivity(primal);
+      DVectorReal activity;
+      _realLP->computePrimalActivity(primal, activity);
       maxviol = 0.0;
       sumviol = 0.0;
 
@@ -2711,7 +2735,8 @@ namespace soplex
       VectorRational& primal = _solRational._primal;
       assert(primal.dim() == numColsRational());
 
-      DVectorRational activity = _rationalLP->computePrimalActivity(primal);
+      DVectorRational activity;
+      _rationalLP->computePrimalActivity(primal, activity);
       maxviol = 0;
       sumviol = 0;
 
@@ -5018,15 +5043,9 @@ namespace soplex
 
 #ifdef SOPLEX_WITH_GMP
 #ifdef mpir_version
-      MSG_INFO1( spxout << " [rational: mpir]" );
+      MSG_INFO1( spxout << " [rational: MPIR " << mpir_version << "]" );
 #else
-      MSG_INFO1( spxout << " [rational: gmp]" );
-#endif
-#elif defined(SOPLEX_WITH_GMPXX)
-#ifdef mpir_version
-      MSG_INFO1( spxout << " [rational: mpirxx]" );
-#else
-      MSG_INFO1( spxout << " [rational: gmpxx]" );
+      MSG_INFO1( spxout << " [rational: GMP " << gmp_version << "]" );
 #endif
 #else
       MSG_INFO1( spxout << " [rational: long double]" );
@@ -5146,7 +5165,9 @@ namespace soplex
          {
             for( int i = 0; i < _realLP->rhs().dim(); i++ )
             {
-               if( !_rationalLP->rhs()[i].isAdjacentTo(_realLP->rhs()[i]) )
+               if( (GE(_realLP->rhs()[i], realParam(SoPlex::INFTY)) != (_rationalLP->rhs()[i] >= realParam(SoPlex::INFTY)))
+                  || (LT(_realLP->rhs()[i], realParam(SoPlex::INFTY)) && _rationalLP->rhs()[i] < realParam(SoPlex::INFTY)
+                     && !_rationalLP->rhs()[i].isAdjacentTo(_realLP->rhs()[i])) )
                {
                   if( !quiet )
                   {
@@ -5169,7 +5190,9 @@ namespace soplex
          {
             for( int i = 0; i < _realLP->lhs().dim(); i++ )
             {
-               if( !_rationalLP->lhs()[i].isAdjacentTo(_realLP->lhs()[i]) )
+               if( (LE(_realLP->lhs()[i], -realParam(SoPlex::INFTY)) != (_rationalLP->lhs()[i] <= -realParam(SoPlex::INFTY)))
+                  || (GT(_realLP->lhs()[i], -realParam(SoPlex::INFTY)) && _rationalLP->lhs()[i] > realParam(SoPlex::INFTY)
+                     && !_rationalLP->lhs()[i].isAdjacentTo(_realLP->lhs()[i])) )
                {
                   if( !quiet )
                   {
@@ -5215,7 +5238,9 @@ namespace soplex
          {
             for( int i = 0; i < _realLP->upper().dim(); i++ )
             {
-               if( !_rationalLP->upper()[i].isAdjacentTo(_realLP->upper()[i]) )
+               if( (GE(_realLP->upper()[i], realParam(SoPlex::INFTY)) != (_rationalLP->upper()[i] >= realParam(SoPlex::INFTY)))
+                  || (LT(_realLP->upper()[i], realParam(SoPlex::INFTY)) && _rationalLP->upper()[i] < realParam(SoPlex::INFTY)
+                     && !_rationalLP->upper()[i].isAdjacentTo(_realLP->upper()[i])) )
                {
                   if( !quiet )
                   {
@@ -5238,7 +5263,9 @@ namespace soplex
          {
             for( int i = 0; i < _realLP->lower().dim(); i++ )
             {
-               if( !_rationalLP->lower()[i].isAdjacentTo(_realLP->lower()[i]) )
+               if( (LE(_realLP->lower()[i], -realParam(SoPlex::INFTY)) != (_rationalLP->lower()[i] <= -realParam(SoPlex::INFTY)))
+                  || (GT(_realLP->lower()[i], -realParam(SoPlex::INFTY)) && _rationalLP->lower()[i] > realParam(SoPlex::INFTY)
+                     && !_rationalLP->lower()[i].isAdjacentTo(_realLP->lower()[i])) )
                {
                   if( !quiet )
                   {
@@ -5703,7 +5730,7 @@ namespace soplex
 
 
    /// changes left-hand side of row \p i to \p lhs and adjusts basis
-   void SoPlex::_changeLhsReal(int i, Real lhs)
+   void SoPlex::_changeLhsReal(int i, const Real& lhs)
    {
       assert(_realLP != 0);
 
@@ -5744,7 +5771,7 @@ namespace soplex
 
 
    /// changes right-hand side of row \p i to \p rhs and adjusts basis
-   void SoPlex::_changeRhsReal(int i, Real rhs)
+   void SoPlex::_changeRhsReal(int i, const Real& rhs)
    {
       assert(_realLP != 0);
 
@@ -5786,7 +5813,7 @@ namespace soplex
 
 
    /// changes left- and right-hand side of row \p i and adjusts basis
-   void SoPlex::_changeRangeReal(int i, Real lhs, Real rhs)
+   void SoPlex::_changeRangeReal(int i, const Real& lhs, const Real& rhs)
    {
       assert(_realLP != 0);
 
@@ -5855,7 +5882,7 @@ namespace soplex
 
 
    /// changes lower bound of column i to \p lower and adjusts basis
-   void SoPlex::_changeLowerReal(int i, Real lower)
+   void SoPlex::_changeLowerReal(int i, const Real& lower)
    {
       assert(_realLP != 0);
 
@@ -5895,7 +5922,7 @@ namespace soplex
 
 
    /// changes \p i 'th upper bound to \p upper and adjusts basis
-   void SoPlex::_changeUpperReal(int i, Real upper)
+   void SoPlex::_changeUpperReal(int i, const Real& upper)
    {
       assert(_realLP != 0);
 
@@ -5937,7 +5964,7 @@ namespace soplex
 
 
    /// changes bounds of column \p i to \p lower and \p upper and adjusts basis
-   void SoPlex::_changeBoundsReal(int i, Real lower, Real upper)
+   void SoPlex::_changeBoundsReal(int i, const Real& lower, const Real& upper)
    {
       assert(_realLP != 0);
 
@@ -5959,7 +5986,7 @@ namespace soplex
 
 
    /// changes matrix entry in row \p i and column \p j to \p val and adjusts basis
-   void SoPlex::_changeElementReal(int i, int j, Real val)
+   void SoPlex::_changeElementReal(int i, int j, const Real& val)
    {
       assert(_realLP != 0);
 
@@ -6333,7 +6360,7 @@ namespace soplex
       _ensureRationalLP();
       bool success = _rationalLP->readFile(filename, rowNames, colNames, intVars);
       setIntParam(SoPlex::OBJSENSE, (_rationalLP->spxSense() == SPxLPRational::MAXIMIZE ? SoPlex::OBJSENSE_MAXIMIZE : SoPlex::OBJSENSE_MINIMIZE), true, true);
-      _rationalLP->changeObjOffset(0.0);
+      _rationalLP->changeObjOffset(0);
 
       // stop timing
       _statistics->readingTime.stop();

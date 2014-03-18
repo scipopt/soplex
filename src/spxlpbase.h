@@ -98,8 +98,7 @@ private:
    //@{
 
    SPxSense thesense;   ///< optimization sense.
-
-   Real offset;      ///< offset computed in simplification step
+   R offset;            ///< offset computed, e.g., in simplification step
 
    //@}
 
@@ -383,7 +382,7 @@ public:
    }
 
    /// Returns the objective function value offset
-   Real objOffset() const
+   R objOffset() const
    {
       return offset;
    }
@@ -685,7 +684,7 @@ public:
       LPRowSetBase<R>::clear();
       LPColSetBase<R>::clear();
       thesense = MAXIMIZE;
-      offset = 0.0;
+      offset = 0;
    }
 
    //@}
@@ -864,16 +863,14 @@ public:
    }
 
    /// changes \p i 'th objective vector element to \p newVal.
-   virtual void changeObj(int i, R newVal)
+   virtual void changeObj(int i, const R& newVal)
    {
-
-      newVal *= R(spxSense() == MINIMIZE ? -1 : 1);
-      LPColSetBase<R>::maxObj_w(i) = newVal;
+      LPColSetBase<R>::maxObj_w(i) = (spxSense() == MINIMIZE) ? -newVal : newVal;
       assert(isConsistent());
    }
 
    /// Changes objective value of column with identifier \p id to \p newVal.
-   virtual void changeObj(SPxColId id, R newVal)
+   virtual void changeObj(SPxColId id, const R& newVal)
    {
       changeObj(number(id), newVal);
    }
@@ -888,7 +885,7 @@ public:
    }
 
    /// changes \p i 'th lower bound to \p newLower.
-   virtual void changeLower(int i, R newLower)
+   virtual void changeLower(int i, const R& newLower)
    {
 
       LPColSetBase<R>::lower_w(i) = newLower;
@@ -896,7 +893,7 @@ public:
    }
 
    /// changes lower bound of column with identifier \p id to \p newLower.
-   virtual void changeLower(SPxColId id, R newLower)
+   virtual void changeLower(SPxColId id, const R& newLower)
    {
       changeLower(number(id), newLower);
    }
@@ -911,7 +908,7 @@ public:
    }
 
    /// Changes \p i 'th upper bound to \p newUpper.
-   virtual void changeUpper(int i, R newUpper)
+   virtual void changeUpper(int i, const R& newUpper)
    {
 
       LPColSetBase<R>::upper_w(i) = newUpper;
@@ -919,7 +916,7 @@ public:
    }
 
    /// Changes upper bound of column with identifier \p id to \p newLower.
-   virtual void changeUpper(SPxColId id, R newUpper)
+   virtual void changeUpper(SPxColId id, const R& newUpper)
    {
       changeUpper(number(id), newUpper);
    }
@@ -934,7 +931,7 @@ public:
    }
 
    /// Changes bounds of column \p i to \p newLower and \p newUpper.
-   virtual void changeBounds(int i, R newLower, R newUpper)
+   virtual void changeBounds(int i, const R& newLower, const R& newUpper)
    {
 
       changeLower(i, newLower);
@@ -943,7 +940,7 @@ public:
    }
 
    /// Changes bounds of column with identifier \p id.
-   virtual void changeBounds(SPxColId id, R newLower, R newUpper)
+   virtual void changeBounds(SPxColId id, const R& newLower, const R& newUpper)
    {
       changeBounds(number(id), newLower, newUpper);
    }
@@ -958,7 +955,7 @@ public:
    }
 
    /// Changes \p i 'th left hand side value to \p newLhs.
-   virtual void changeLhs(int i, R newLhs)
+   virtual void changeLhs(int i, const R& newLhs)
    {
 
       LPRowSetBase<R>::lhs_w(i) = newLhs;
@@ -966,7 +963,7 @@ public:
    }
 
    /// Changes left hand side value for row with identifier \p id.
-   virtual void changeLhs(SPxRowId id, R newLhs)
+   virtual void changeLhs(SPxRowId id, const R& newLhs)
    {
       changeLhs(number(id), newLhs);
    }
@@ -981,7 +978,7 @@ public:
    }
 
    /// Changes \p i 'th right hand side value to \p newRhs.
-   virtual void changeRhs(int i, R newRhs)
+   virtual void changeRhs(int i, const R& newRhs)
    {
 
       LPRowSetBase<R>::rhs_w(i) = newRhs;
@@ -989,7 +986,7 @@ public:
    }
 
    /// Changes right hand side value for row with identifier \p id.
-   virtual void changeRhs(SPxRowId id, R newRhs)
+   virtual void changeRhs(SPxRowId id, const R& newRhs)
    {
       changeRhs(number(id), newRhs);
    }
@@ -1004,7 +1001,7 @@ public:
    }
 
    /// Changes left and right hand side of row \p i.
-   virtual void changeRange(int i, R newLhs, R newRhs)
+   virtual void changeRange(int i, const R& newLhs, const R& newRhs)
    {
 
       changeLhs(i, newLhs);
@@ -1013,7 +1010,7 @@ public:
    }
 
    /// Changes left and right hand side of row with identifier \p id.
-   virtual void changeRange(SPxRowId id, R newLhs, R newRhs)
+   virtual void changeRange(SPxRowId id, const R& newLhs, const R& newRhs)
    {
       changeRange(number(id), newLhs, newRhs);
    }
@@ -1090,7 +1087,7 @@ public:
    }
 
    /// Changes LP element (\p i, \p j) to \p val.
-   virtual void changeElement(int i, int j, R val)
+   virtual void changeElement(int i, int j, const R& val)
    {
 
       SVectorBase<R>& row = rowVector_w(i);
@@ -1119,7 +1116,7 @@ public:
    }
 
    /// Changes LP element identified by (\p rid, \p cid) to \p val.
-   virtual void changeElement(SPxRowId rid, SPxColId cid, R val)
+   virtual void changeElement(SPxRowId rid, SPxColId cid, const R& val)
    {
       changeElement(number(rid), number(cid), val);
    }
@@ -1132,49 +1129,43 @@ public:
       thesense = sns;
    }
 
-   virtual void changeObjOffset(Real o)
+   virtual void changeObjOffset(const R& o)
    {
       offset = o;
    }
 
    /// Computes activity of the rows for a given primal vector.
    /// @throw SPxInternalCodeException if dimension of primal vector does not match number of columns
-   virtual DVectorBase<R> computePrimalActivity(const VectorBase<R>& primal) const
+   virtual void computePrimalActivity(const VectorBase<R>& primal, DVectorBase<R>& activity) const
    {
-
       if( primal.dim() != nCols() )
       {
          throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
       }
 
-      DVectorBase<R> activity(nRows());
+      activity.reDim(nRows());
 
       activity.clear();
 
       for( int c = 0; c < nCols(); c++ )
          activity.multAdd(primal[c], colVector(c));
-
-      return activity;
    }
 
    /// Computes "dual" activity of the columns for a given dual vector, i.e., y^T A.
    /// @throw SPxInternalCodeException if dimension of dual vector does not match number of rows
-   virtual DVectorBase<R> computeDualActivity(const VectorBase<R>& dual) const
+   virtual void computeDualActivity(const VectorBase<R>& dual, DVectorBase<R>& activity) const
    {
-
       if( dual.dim() != nRows() )
       {
          throw SPxInternalCodeException("XSPXLP02 Dual vector for computing activity has wrong dimension");
       }
 
-      DVectorBase<R> activity(nCols());
+      activity.reDim(nCols());
 
       activity.clear();
 
       for( int r = 0; r < nRows(); r++ )
          activity.multAdd(dual[r], rowVector(r));
-
-      return activity;
    }
 
    //@}
@@ -1769,7 +1760,7 @@ public:
          LPRowSetBase<R>::operator=(old);
          LPColSetBase<R>::operator=(old);
          thesense = (old.thesense) == SPxLPBase<S>::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE;
-         offset = old.offset;
+         offset = R(old.offset);
 
          assert(isConsistent());
       }

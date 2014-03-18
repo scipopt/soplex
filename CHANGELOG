@@ -1,5 +1,18 @@
 (maintain each list from top to bottom)
 
+Bugfix version
+==============
+
+performance:
+- more efficient memory allocation of elements of class Rational
+- more efficient assignment operators for class Rational
+- return computed primal and dual activities by reference
+- Real and Rational arguments passed by reference in changexyz methods
+
+fixed bugs:
+- fix Rational::isAdjacentTo() when GMP=false
+
+
 
 27 Feb 2014 - Release 2.0.0
 ===========================
