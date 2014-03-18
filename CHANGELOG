@@ -6,6 +6,9 @@ Developer version
 performance:
 - iterative refinement for ranged rows, making the transformation to equality form unnecessary
 
+interface & parameters:
+- new parameter bool:eqtrans to control transformation to equality form before rational solving
+
 
 
 Bugfix version

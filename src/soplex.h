@@ -701,8 +701,11 @@ public:
       /// should lifting be used to reduce range of nonzero matrix coefficients?
       LIFTING = 0,
 
+      /// should LP be transformed to equality form before a rational solve?
+      EQTRANS = 1,
+
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 1
+      BOOLPARAM_COUNT = 2
    } BoolParam;
 
    /// integer parameters

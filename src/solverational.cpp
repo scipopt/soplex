@@ -62,12 +62,26 @@ namespace soplex
 
       _solver.setTerminationValue(realParam(SoPlex::INFTY));
 
-      // introduce slack variables to transform inequality constraints into equations
-      _transformEquality();
+      // transform LP to minimization problem
+      if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MAXIMIZE )
+      {
+         assert(_rationalLP->spxSense() == SPxLPRational::MAXIMIZE);
+         assert(_realLP->spxSense() == SPxLPReal::MAXIMIZE);
+
+         _rationalLP->changeObj(-(_rationalLP->maxObj()));
+         _rationalLP->changeSense(SPxLPRational::MINIMIZE);
+
+         _realLP->changeObj(-(_realLP->maxObj()));
+         _realLP->changeSense(SPxLPReal::MINIMIZE);
+      }
 
       // apply lifting to reduce range of nonzero matrix coefficients
       if( boolParam(SoPlex::LIFTING) )
          _lift();
+
+      // introduce slack variables to transform inequality constraints into equations
+      if( boolParam(SoPlex::EQTRANS) )
+         _transformEquality();
 
       _statistics->preprocessingTime.stop();
 
@@ -225,20 +239,27 @@ namespace soplex
       if( _status == SPxSolver::OPTIMAL || _status == SPxSolver::INFEASIBLE || _status == SPxSolver::UNBOUNDED )
          _hasSolRational = true;
 
+      // restore original problem
+      if( boolParam(SoPlex::EQTRANS) )
+         _untransformEquality(_solRational);
+
       // undo lifting
       if( boolParam(SoPlex::LIFTING) )
          _project(_solRational);
 
-      // if the problem has been found to be infeasible and an approximate Farkas proof is available, we compute a
-      // scaled unit box around the origin that provably contains no feasible solution; this currently only works for
-      // equality form
-#if 0
-      if( _solRational.hasDualFarkas() )
-         _computeInfeasBox(_solRational, false);
-#endif
+      // restore original objective sense
+      if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MAXIMIZE )
+      {
+         assert(_rationalLP->spxSense() == SPxLPRational::MINIMIZE);
+         assert(_realLP->spxSense() == SPxLPReal::MINIMIZE);
 
-      // restore original problem
-      _untransformEquality(_solRational);
+         _rationalLP->changeObj(_rationalLP->maxObj());
+         _rationalLP->changeSense(SPxLPRational::MAXIMIZE);
+         _realLP->changeSense(SPxLPReal::MAXIMIZE);
+
+         _solRational._primalObjVal *= -1;
+         _solRational._dualObjVal *= -1;
+      }
 
       // since the real LP is loaded in the solver, we need to also pass the basis information to the solver if
       // available
@@ -790,6 +811,11 @@ namespace soplex
       bool infeasible;
       bool unbounded;
 
+      // introduce slack variables to transform inequality constraints into equations if this has not been done, because
+      // we still need to implement this method to inequalities
+      if( !boolParam(SoPlex::EQTRANS) )
+         _transformEquality();
+
       // move objective function to constraints and adjust sides and bounds
       _transformUnbounded();
 
@@ -837,6 +863,10 @@ namespace soplex
 
       // restore problem
       _untransformUnbounded(sol, hasUnboundedRay);
+
+      // restore original problem
+      if( !boolParam(SoPlex::EQTRANS) )
+         _untransformEquality(sol);
    }
 
 
@@ -851,7 +881,15 @@ namespace soplex
       bool success = false;
       error = false;
 
+      // introduce slack variables to transform inequality constraints into equations if this has not been done, because
+      // we still need to implement this method to inequalities
+      if( !boolParam(SoPlex::EQTRANS) )
+         _transformEquality();
+
 #if 0
+      // if the problem has been found to be infeasible and an approximate Farkas proof is available, we compute a
+      // scaled unit box around the origin that provably contains no feasible solution; this currently only works for
+      // equality form
       ///@todo check whether approximate Farkas proof can be used
       _computeInfeasBox(_solRational, false);
       ///@todo if approx Farkas proof is good enough then exit without doing any transformation
@@ -923,6 +961,10 @@ namespace soplex
 
       // restore problem
       _untransformFeasibility(sol, withDualFarkas);
+
+      // restore original problem
+      if( !boolParam(SoPlex::EQTRANS) )
+         _untransformEquality(sol);
    }
 
 
@@ -1204,19 +1246,6 @@ namespace soplex
 
       MSG_DEBUG( _realLP->writeFile("beforeTransEqu.lp", 0, 0, 0) );
 
-      // transform LP to minimization problem
-      if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MAXIMIZE )
-      {
-         assert(_rationalLP->spxSense() == SPxLPRational::MAXIMIZE);
-         assert(_realLP->spxSense() == SPxLPReal::MAXIMIZE);
-
-         _rationalLP->changeObj(-(_rationalLP->maxObj()));
-         _rationalLP->changeSense(SPxLPRational::MINIMIZE);
-
-         _realLP->changeObj(-(_realLP->maxObj()));
-         _realLP->changeSense(SPxLPReal::MINIMIZE);
-      }
-
       // clear array of slack columns
       _slackCols.clear();
 
@@ -1360,20 +1389,6 @@ namespace soplex
 
       _rationalLP->removeColRange(numOrigCols, numCols - 1);
       _realLP->removeColRange(numOrigCols, numCols - 1);
-
-      // restore original objective sense
-      if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MAXIMIZE )
-      {
-         assert(_rationalLP->spxSense() == SPxLPRational::MINIMIZE);
-         assert(_realLP->spxSense() == SPxLPReal::MINIMIZE);
-
-         _rationalLP->changeObj(_rationalLP->maxObj());
-         _rationalLP->changeSense(SPxLPRational::MAXIMIZE);
-         _realLP->changeSense(SPxLPReal::MAXIMIZE);
-
-         sol._primalObjVal *= -1;
-         sol._dualObjVal *= -1;
-      }
 
       // restore bounds and objective coefficients in real LP
       for( int c = numColsRational() - 1; c >= 0; c-- )

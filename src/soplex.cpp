@@ -130,6 +130,11 @@ namespace soplex
             _boolParamDescription[SoPlex::LIFTING] = "should lifting be used to reduce range of nonzero matrix coefficients?";
             _boolParamDefault[SoPlex::LIFTING] = false;
 
+            // should LP be transformed to equality form before a rational solve?
+            _boolParamName[SoPlex::EQTRANS] = "eqtrans";
+            _boolParamDescription[SoPlex::EQTRANS] = "should LP be transformed to equality form before a rational solve?";
+            _boolParamDefault[SoPlex::EQTRANS] = true;
+
             // objective sense
             _intParamName[SoPlex::OBJSENSE] = "objsense";
             _intParamDescription[SoPlex::OBJSENSE] = "objective sense (-1 - minimize, +1 - maximize)";
@@ -4015,6 +4020,8 @@ namespace soplex
       switch( param )
       {
       case LIFTING:
+         break;
+      case EQTRANS:
          break;
       default:
          return false;
