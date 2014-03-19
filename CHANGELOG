@@ -4,7 +4,8 @@ Bugfix version
 ==============
 
 performance:
-- more efficient memory allocation of elements of class Rational
+- more efficient memory allocation of elements of class Rational (can be deactivated by defining
+  SOPLEX_NOLISTMEM when looking for memory errors)
 - more efficient assignment operators for class Rational
 - return computed primal and dual activities by reference
 - Real and Rational arguments passed by reference in changexyz methods

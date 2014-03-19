@@ -185,6 +185,7 @@ public:
 /// default constructor
 Rational::Rational()
 {
+#ifndef SOPLEX_NOLISTMEM
    dpointer = unusedPrivateList.last();
 
    if( dpointer != 0 )
@@ -198,6 +199,11 @@ Rational::Rational()
       spx_alloc(dpointer);
       new (dpointer) Private();
    }
+#else
+   dpointer = 0;
+   spx_alloc(dpointer);
+   new (dpointer) Private();
+#endif
 
    assert(dpointer != 0);
 }
@@ -207,6 +213,7 @@ Rational::Rational()
 /// copy constructor
 Rational::Rational(const Rational& r)
 {
+#ifndef SOPLEX_NOLISTMEM
    dpointer = unusedPrivateList.last();
 
    if( dpointer != 0 )
@@ -221,6 +228,11 @@ Rational::Rational(const Rational& r)
       spx_alloc(dpointer);
       new (dpointer) Private(*(r.dpointer));
    }
+#else
+   dpointer = 0;
+   spx_alloc(dpointer);
+   new (dpointer) Private(*(r.dpointer));
+#endif
 
    assert(dpointer != 0);
 }
@@ -230,6 +242,7 @@ Rational::Rational(const Rational& r)
 /// constructor from long double
 Rational::Rational(const long double& r)
 {
+#ifndef SOPLEX_NOLISTMEM
    dpointer = unusedPrivateList.last();
 
    if( dpointer != 0 )
@@ -244,6 +257,11 @@ Rational::Rational(const long double& r)
       spx_alloc(dpointer);
       new (dpointer) Private(r);
    }
+#else
+   dpointer = 0;
+   spx_alloc(dpointer);
+   new (dpointer) Private(r);
+#endif
 
    assert(dpointer != 0);
 }
@@ -253,6 +271,7 @@ Rational::Rational(const long double& r)
 /// constructor from double
 Rational::Rational(const double& r)
 {
+#ifndef SOPLEX_NOLISTMEM
    dpointer = unusedPrivateList.last();
 
    if( dpointer != 0 )
@@ -267,6 +286,11 @@ Rational::Rational(const double& r)
       spx_alloc(dpointer);
       new (dpointer) Private(r);
    }
+#else
+   dpointer = 0;
+   spx_alloc(dpointer);
+   new (dpointer) Private(r);
+#endif
 
    assert(dpointer != 0);
 }
@@ -276,6 +300,7 @@ Rational::Rational(const double& r)
 /// constructor from int
 Rational::Rational(const int& i)
 {
+#ifndef SOPLEX_NOLISTMEM
    dpointer = unusedPrivateList.last();
 
    if( dpointer != 0 )
@@ -290,6 +315,11 @@ Rational::Rational(const int& i)
       spx_alloc(dpointer);
       new (dpointer) Private(i);
    }
+#else
+   dpointer = 0;
+   spx_alloc(dpointer);
+   new (dpointer) Private(i);
+#endif
 
    assert(dpointer != 0);
 }
@@ -299,6 +329,7 @@ Rational::Rational(const int& i)
 /// constructor from mpq_t
 Rational::Rational(const mpq_t& q)
 {
+#ifndef SOPLEX_NOLISTMEM
    dpointer = unusedPrivateList.last();
 
    if( dpointer != 0 )
@@ -313,6 +344,11 @@ Rational::Rational(const mpq_t& q)
       spx_alloc(dpointer);
       new (dpointer) Private(q);
    }
+#else
+   dpointer = 0;
+   spx_alloc(dpointer);
+   new (dpointer) Private(q);
+#endif
 
    assert(dpointer != 0);
 }
@@ -322,11 +358,16 @@ Rational::Rational(const mpq_t& q)
 /// destructor
 Rational::~Rational()
 {
+#ifndef SOPLEX_NOLISTMEM
    // for memory efficiency, we could free the Private object (or even more Private objects from the list of unused
    // elements) if there are much more unused than used Private objects; this requires counting the used Private
    // objects, though; we do not implement this currently, because we have not encountered memory problems, so far, and
    // because freeing costs time
    unusedPrivateList.append(dpointer);
+#else
+   dpointer->~Private();
+   spx_free(dpointer);
+#endif
 }
 
 
