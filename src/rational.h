@@ -78,6 +78,13 @@ namespace soplex
       /// destructor
       ~Rational();
 
+      /// frees the unused rational elements in the memory list
+      /** this can be useful when you want to save memory or needed when working with a GMP memory manager like the one
+       *  in EGlib that frees GMP memory before the destructor of the static memory list is called; in most cases this
+       *  method is optional; note that this does not free the Rational elements that are currently in use
+       */
+      static void freeListMem();
+
       /// assignment operator
       Rational& operator=(const Rational&);
 

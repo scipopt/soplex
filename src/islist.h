@@ -280,8 +280,19 @@ public:
    }
 
    /// removes all elements from an IsList.
-   void clear()
+   void clear(bool pDestroyElements = false)
    {
+      if( pDestroyElements )
+      {
+         T* nextElement;
+         for( T* it = the_first; it; it = nextElement )
+         {
+            nextElement = next(it);
+            it->~T();
+            spx_free(it);
+         }
+      }
+
       the_first = the_last = 0;
    }
    //@}
@@ -435,16 +446,7 @@ public:
    /// destructor
    ~IsList()
    {
-      if( destroyElements )
-      {
-         T* nextElement;
-	 for( T* it = the_first; it; it = nextElement )
-         {
-            nextElement = next(it);
-            it->~T();
-            spx_free(it);
-         }
-      }
+      clear(destroyElements);
    }
    //@}
 };

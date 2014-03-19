@@ -10,6 +10,9 @@ performance:
 - return computed primal and dual activities by reference
 - Real and Rational arguments passed by reference in changexyz methods
 
+interface:
+- new method Rational::freeListMem() to free unused GMP memory manually (usage optional)
+
 fixed bugs:
 - fix Rational::isAdjacentTo() when GMP=false
 
