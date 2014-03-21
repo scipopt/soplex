@@ -15,10 +15,14 @@ Bugfix version
 ==============
 
 performance:
-- more efficient memory allocation of elements of class Rational
+- more efficient memory allocation of elements of class Rational (can be deactivated at compile time by defining
+  SOPLEX_NOLISTMEM or by Rational::disableListMem() at run time)
 - more efficient assignment operators for class Rational
 - return computed primal and dual activities by reference
 - Real and Rational arguments passed by reference in changexyz methods
+
+interface:
+- new method Rational::freeListMem() to free unused GMP memory manually (usage optional)
 
 fixed bugs:
 - fix Rational::isAdjacentTo() when GMP=false

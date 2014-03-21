@@ -40,10 +40,21 @@
 
 namespace soplex
 {
-#ifdef SOPLEX_WITH_GMP
-
 /// list of unused Private objects
 IdList< Rational::Private > Rational::unusedPrivateList(0, 0, true);
+
+
+
+/// should list memory be used?
+#ifdef SOPLEX_NOLISTMEM
+bool Rational::useListMem = false;
+#else
+bool Rational::useListMem = true;
+#endif
+
+
+
+#ifdef SOPLEX_WITH_GMP
 
 /// Defines the "Pimpl"-class Private
 class Rational::Private
@@ -185,16 +196,26 @@ public:
 /// default constructor
 Rational::Rational()
 {
-   dpointer = unusedPrivateList.last();
-
-   if( dpointer != 0 )
+   if( Rational::useListMem )
    {
-      assert(unusedPrivateList.first() != 0);
-      unusedPrivateList.remove(dpointer);
+      dpointer = unusedPrivateList.last();
+
+      if( dpointer != 0 )
+      {
+         assert(unusedPrivateList.first() != 0);
+         unusedPrivateList.remove(dpointer);
+      }
+      else
+      {
+         assert(unusedPrivateList.first() == 0);
+         spx_alloc(dpointer);
+         new (dpointer) Private();
+      }
    }
    else
    {
-      assert(unusedPrivateList.first() == 0);
+      assert(unusedPrivateList.length() == 0);
+      dpointer = 0;
       spx_alloc(dpointer);
       new (dpointer) Private();
    }
@@ -207,17 +228,27 @@ Rational::Rational()
 /// copy constructor
 Rational::Rational(const Rational& r)
 {
-   dpointer = unusedPrivateList.last();
-
-   if( dpointer != 0 )
+   if( Rational::useListMem )
    {
-      assert(unusedPrivateList.first() != 0);
-      unusedPrivateList.remove(dpointer);
-      *dpointer = *(r.dpointer);
+      dpointer = unusedPrivateList.last();
+
+      if( dpointer != 0 )
+      {
+         assert(unusedPrivateList.first() != 0);
+         unusedPrivateList.remove(dpointer);
+         *dpointer = *(r.dpointer);
+      }
+      else
+      {
+         assert(unusedPrivateList.first() == 0);
+         spx_alloc(dpointer);
+         new (dpointer) Private(*(r.dpointer));
+      }
    }
    else
    {
-      assert(unusedPrivateList.first() == 0);
+      assert(unusedPrivateList.length() == 0);
+      dpointer = 0;
       spx_alloc(dpointer);
       new (dpointer) Private(*(r.dpointer));
    }
@@ -230,17 +261,27 @@ Rational::Rational(const Rational& r)
 /// constructor from long double
 Rational::Rational(const long double& r)
 {
-   dpointer = unusedPrivateList.last();
-
-   if( dpointer != 0 )
+   if( Rational::useListMem )
    {
-      assert(unusedPrivateList.first() != 0);
-      unusedPrivateList.remove(dpointer);
-      *dpointer = r;
+      dpointer = unusedPrivateList.last();
+
+      if( dpointer != 0 )
+      {
+         assert(unusedPrivateList.first() != 0);
+         unusedPrivateList.remove(dpointer);
+         *dpointer = r;
+      }
+      else
+      {
+         assert(unusedPrivateList.first() == 0);
+         spx_alloc(dpointer);
+         new (dpointer) Private(r);
+      }
    }
    else
    {
-      assert(unusedPrivateList.first() == 0);
+      assert(unusedPrivateList.length() == 0);
+      dpointer = 0;
       spx_alloc(dpointer);
       new (dpointer) Private(r);
    }
@@ -253,17 +294,27 @@ Rational::Rational(const long double& r)
 /// constructor from double
 Rational::Rational(const double& r)
 {
-   dpointer = unusedPrivateList.last();
-
-   if( dpointer != 0 )
+   if( Rational::useListMem )
    {
-      assert(unusedPrivateList.first() != 0);
-      unusedPrivateList.remove(dpointer);
-      *dpointer = r;
+      dpointer = unusedPrivateList.last();
+
+      if( dpointer != 0 )
+      {
+         assert(unusedPrivateList.first() != 0);
+         unusedPrivateList.remove(dpointer);
+         *dpointer = r;
+      }
+      else
+      {
+         assert(unusedPrivateList.first() == 0);
+         spx_alloc(dpointer);
+         new (dpointer) Private(r);
+      }
    }
    else
    {
-      assert(unusedPrivateList.first() == 0);
+      assert(unusedPrivateList.length() == 0);
+      dpointer = 0;
       spx_alloc(dpointer);
       new (dpointer) Private(r);
    }
@@ -276,17 +327,27 @@ Rational::Rational(const double& r)
 /// constructor from int
 Rational::Rational(const int& i)
 {
-   dpointer = unusedPrivateList.last();
-
-   if( dpointer != 0 )
+   if( Rational::useListMem )
    {
-      assert(unusedPrivateList.first() != 0);
-      unusedPrivateList.remove(dpointer);
-      *dpointer = i;
+      dpointer = unusedPrivateList.last();
+
+      if( dpointer != 0 )
+      {
+         assert(unusedPrivateList.first() != 0);
+         unusedPrivateList.remove(dpointer);
+         *dpointer = i;
+      }
+      else
+      {
+         assert(unusedPrivateList.first() == 0);
+         spx_alloc(dpointer);
+         new (dpointer) Private(i);
+      }
    }
    else
    {
-      assert(unusedPrivateList.first() == 0);
+      assert(unusedPrivateList.length() == 0);
+      dpointer = 0;
       spx_alloc(dpointer);
       new (dpointer) Private(i);
    }
@@ -299,17 +360,27 @@ Rational::Rational(const int& i)
 /// constructor from mpq_t
 Rational::Rational(const mpq_t& q)
 {
-   dpointer = unusedPrivateList.last();
-
-   if( dpointer != 0 )
+   if( Rational::useListMem )
    {
-      assert(unusedPrivateList.first() != 0);
-      unusedPrivateList.remove(dpointer);
-      *dpointer = q;
+      dpointer = unusedPrivateList.last();
+
+      if( dpointer != 0 )
+      {
+         assert(unusedPrivateList.first() != 0);
+         unusedPrivateList.remove(dpointer);
+         *dpointer = q;
+      }
+      else
+      {
+         assert(unusedPrivateList.first() == 0);
+         spx_alloc(dpointer);
+         new (dpointer) Private(q);
+      }
    }
    else
    {
-      assert(unusedPrivateList.first() == 0);
+      assert(unusedPrivateList.length() == 0);
+      dpointer = 0;
       spx_alloc(dpointer);
       new (dpointer) Private(q);
    }
@@ -322,11 +393,52 @@ Rational::Rational(const mpq_t& q)
 /// destructor
 Rational::~Rational()
 {
-   // for memory efficiency, we could free the Private object (or even more Private objects from the list of unused
-   // elements) if there are much more unused than used Private objects; this requires counting the used Private
-   // objects, though; we do not implement this currently, because we have not encountered memory problems, so far, and
-   // because freeing costs time
-   unusedPrivateList.append(dpointer);
+   if( Rational::useListMem )
+   {
+      // for memory efficiency, we could free the Private object (or even more Private objects from the list of unused
+      // elements) if there are much more unused than used Private objects; this requires counting the used Private
+      // objects, though; we do not implement this currently, because we have not encountered memory problems, so far, and
+      // because freeing costs time
+      unusedPrivateList.append(dpointer);
+   }
+   else
+   {
+      assert(unusedPrivateList.length() == 0);
+      dpointer->~Private();
+      spx_free(dpointer);
+   }
+}
+
+
+
+/// enables list memory
+void Rational::enableListMem()
+{
+   assert(Rational::useListMem || unusedPrivateList.length() == 0);
+   Rational::useListMem = true;
+}
+
+
+
+/// frees the unused rational elements in the memory list
+/// frees the unused rational elements in the memory list
+/** this can be useful when you want to save memory or needed when working with a GMP memory manager like the one
+ *  in EGlib that frees GMP memory before the destructor of the static memory list is called; in most cases this
+ *  method is optional; note that this does not free the Rational elements that are currently in use
+ */
+void Rational::freeListMem()
+{
+   unusedPrivateList.clear(true);
+   assert(unusedPrivateList.length() == 0);
+}
+
+
+
+/// disables list memory
+void Rational::disableListMem()
+{
+   Rational::freeListMem();
+   Rational::useListMem = false;
 }
 
 
@@ -1415,6 +1527,34 @@ Rational::Rational(const int& i)
 Rational::~Rational()
 {
    spx_free(dpointer);
+}
+
+
+
+/// enables list memory
+void Rational::enableListMem()
+{
+   // because list memory is not used when SOPLEX_WITH_GMP is not defined, there is nothing to do here
+}
+
+
+
+/// frees the unused rational elements in the memory list
+/** this can be useful when you want to save memory or needed when working with a GMP memory manager like the one
+ *  in EGlib that frees GMP memory before the destructor of the static memory list is called; in most cases this
+ *  method is optional; note that this does not free the Rational elements that are currently in use
+ */
+void Rational::freeListMem()
+{
+   // because list memory is not used when SOPLEX_WITH_GMP is not defined, there is nothing to do here
+}
+
+
+
+/// disables list memory
+void Rational::disableListMem()
+{
+   // because list memory is not used when SOPLEX_WITH_GMP is not defined, there is nothing to do here
 }
 
 
