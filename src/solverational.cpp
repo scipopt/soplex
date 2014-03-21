@@ -811,11 +811,6 @@ namespace soplex
       bool infeasible;
       bool unbounded;
 
-      // introduce slack variables to transform inequality constraints into equations if this has not been done, because
-      // we still need to implement this method to inequalities
-      if( !boolParam(SoPlex::EQTRANS) )
-         _transformEquality();
-
       // move objective function to constraints and adjust sides and bounds
       _transformUnbounded();
 
@@ -863,10 +858,6 @@ namespace soplex
 
       // restore problem
       _untransformUnbounded(sol, hasUnboundedRay);
-
-      // restore original problem
-      if( !boolParam(SoPlex::EQTRANS) )
-         _untransformEquality(sol);
    }
 
 
@@ -1428,15 +1419,25 @@ namespace soplex
       MSG_DEBUG( _realLP->writeFile("beforeTransUnbounded.lp", 0, 0, 0) );
 
       // store right-hand side and bounds
-      _unboundedSide = _rationalLP->rhs();
+      _unboundedLhs = _rationalLP->lhs();
+      _unboundedRhs = _rationalLP->rhs();
       _unboundedLower = _rationalLP->lower();
       _unboundedUpper = _rationalLP->upper();
 
       // make right-hand side zero
       for( int r = numRowsRational() - 1; r >= 0; r-- )
       {
-         _rationalLP->changeRange(r, 0, 0);
-         _realLP->changeRange(r, 0.0, 0.0);
+         if( lhsRational(r) > -realParam(SoPlex::INFTY) )
+         {
+            _rationalLP->changeLhs(r, 0);
+            _realLP->changeLhs(r, 0.0);
+         }
+
+         if( rhsRational(r) < realParam(SoPlex::INFTY) )
+         {
+            _rationalLP->changeRhs(r, 0);
+            _realLP->changeRhs(r, 0.0);
+         }
       }
 
       // transform objective function to constraint and add auxiliary variable
@@ -1463,13 +1464,13 @@ namespace soplex
          _rationalLP->changeObj(c, 0);
          _realLP->changeObj(c, 0.0);
 
-         if( double(lowerRational(c)) > double(-realParam(SoPlex::INFTY)) )
+         if( lowerRational(c) > -realParam(SoPlex::INFTY) )
          {
             _rationalLP->changeLower(c, 0);
             _realLP->changeLower(c, 0.0);
          }
 
-         if( double(upperRational(c)) < double(realParam(SoPlex::INFTY)) )
+         if( upperRational(c) < realParam(SoPlex::INFTY) )
          {
             _rationalLP->changeUpper(c, 0);
             _realLP->changeUpper(c, 0.0);
@@ -1549,12 +1550,14 @@ namespace soplex
       _rationalLP->removeCol(numOrigCols);
       _realLP->removeCol(numOrigCols);
 
-      // restore right-hand side and bounds
-      DVectorReal vectorReal(_unboundedSide);
+      // restore sides and bounds
+      DVectorReal vectorReal(_unboundedLhs);
+      _rationalLP->changeLhs(_unboundedLhs);
+      _realLP->changeLhs(vectorReal);
 
-      vectorReal = _unboundedSide;
-      _rationalLP->changeRange(_unboundedSide, _unboundedSide);
-      _realLP->changeRange(vectorReal, vectorReal);
+      vectorReal = _unboundedRhs;
+      _rationalLP->changeRhs(_unboundedRhs);
+      _realLP->changeRhs(vectorReal);
 
       vectorReal = _unboundedLower;
       _rationalLP->changeLower(_unboundedLower);

@@ -1199,7 +1199,8 @@ private:
    LPColSetRational _slackCols;
    DVectorRational _unboundedLower;
    DVectorRational _unboundedUpper;
-   DVectorRational _unboundedSide;
+   DVectorRational _unboundedLhs;
+   DVectorRational _unboundedRhs;
    DVectorRational _feasObj;
    DVectorRational _feasSide;
    DVectorRational _feasLower;
