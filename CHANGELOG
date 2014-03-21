@@ -1,5 +1,13 @@
 (maintain each list from top to bottom)
 
+Developer version
+=================
+
+performance:
+- iterative refinement for ranged rows, making the transformation to equality form unnecessary
+
+
+
 Bugfix version
 ==============
 

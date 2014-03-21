@@ -274,7 +274,8 @@ namespace soplex
 
       DVectorRational modLower(numColsRational());
       DVectorRational modUpper(numColsRational());
-      DVectorRational modSide(numRowsRational());
+      DVectorRational modLhs(numRowsRational());
+      DVectorRational modRhs(numRowsRational());
       DVectorRational modObj(numColsRational());
       DVectorReal primalReal(numColsRational());
       DVectorReal dualReal(numRowsRational());
@@ -389,16 +390,6 @@ namespace soplex
          MSG_INFO2( spxout << "Adjusted " << numAdjustedBounds << " nonbasic variables to bounds and " << numAdjustedDuals << " duals to zero.\n" );
       }
 
-      // compute slacks, dual activity, and reduced cost values
-      _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
-      _rationalLP->computeDualActivity(sol._dual, sol._redCost);
-      sol._redCost += _rationalLP->maxObj();
-      sol._redCost *= -1;
-
-      // compute objective value
-      sol._primalObjVal = (sol._primal * _rationalLP->maxObj()) * -1;
-      sol._dualObjVal = sol._primalObjVal;
-
       // initial scaling factors are one
       primalScale = 1;
       dualScale = 1;
@@ -406,6 +397,7 @@ namespace soplex
       // control progress
       Real bestViolation = realParam(SoPlex::INFTY);
       int numFailedRefinements = 0;
+      bool restrictInequalities = true;
 
       // refinement loop
       do
@@ -439,45 +431,97 @@ namespace soplex
          }
 
          // compute violation of sides
-         modSide = sol._slacks;
+         _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
          sideViolation = 0;
-
          for( int r = numRowsRational() - 1; r >= 0; r-- )
          {
-            assert(lhsRational(r) == rhsRational(r));
+            // left-hand side
+            modLhs[r] = lhsRational(r);
 
-            modSide[r] *= -1;
-            modSide[r] += rhsRational(r);
+            if( modLhs[r] > -realParam(SoPlex::INFTY) )
+               modLhs[r] -= sol._slacks[r];
 
-            if( modSide[r] > sideViolation )
-               sideViolation = modSide[r];
-            else if( modSide[r] < -sideViolation )
-               sideViolation = -modSide[r];
+            if( modLhs[r] > sideViolation )
+               sideViolation = modLhs[r];
+
+            // right-hand side
+            modRhs[r] = rhsRational(r);
+
+            if( modRhs[r] < realParam(SoPlex::INFTY) )
+               modRhs[r] -= sol._slacks[r];
+
+            if( modRhs[r] < -sideViolation )
+               sideViolation = -modRhs[r];
          }
 
          // compute reduced costs and reduced cost violation
-         _rationalLP->computeDualActivity(sol._dual, modObj);
+         _rationalLP->computeDualActivity(sol._dual, sol._redCost);
+         sol._redCost += _rationalLP->maxObj();
+         sol._redCost *= -1;
          redCostViolation = 0;
-
          for( int c = numColsRational() - 1; c >= 0; c-- )
          {
-            modObj[c] *= -1;
-            modObj[c] += objRational(c);
-
             SPxSolver::VarStatus basisStatusCol = _basisStatusCols[c];
 
-            if( basisStatusCol != SPxSolver::ON_UPPER && basisStatusCol != SPxSolver::FIXED && modObj[c] < -redCostViolation )
-               redCostViolation = -modObj[c];
+            if( basisStatusCol != SPxSolver::ON_UPPER && basisStatusCol != SPxSolver::FIXED && sol._redCost[c] < -redCostViolation )
+               redCostViolation = -sol._redCost[c];
 
-            if( basisStatusCol != SPxSolver::ON_LOWER && basisStatusCol != SPxSolver::FIXED && modObj[c] > redCostViolation )
-               redCostViolation = modObj[c];
+            if( basisStatusCol != SPxSolver::ON_LOWER && basisStatusCol != SPxSolver::FIXED && sol._redCost[c] > redCostViolation )
+               redCostViolation = sol._redCost[c];
          }
+
+         // compute modified objective function
+         modObj = sol._redCost;
+
+         // fix inequality constraints if this has not lead to an infeasibility during the last floating-point solve
+         if( restrictInequalities )
+         {
+            for( int r = numRowsRational() - 1; r >= 0; r-- )
+            {
+               SPxSolver::VarStatus basisStatusRow = _basisStatusRows[r];
+
+               // because of the dual adjustment, the dual multipliers should be fully feasible
+               assert(basisStatusRow == SPxSolver::ON_UPPER || basisStatusRow == SPxSolver::FIXED || sol._dual[r] >= 0);
+               assert(basisStatusRow == SPxSolver::ON_LOWER || basisStatusRow == SPxSolver::FIXED || sol._dual[r] <= 0);
+
+               if( sol._dual[r] != 0 && lhsRational(r) != rhsRational(r) )
+               {
+                  assert(basisStatusRow == SPxSolver::ON_LOWER || basisStatusRow == SPxSolver::ON_UPPER);
+
+                  if( basisStatusRow == SPxSolver::ON_LOWER )
+                  {
+                     assert(sol._dual[r] > 0);
+                     modRhs[r] = modLhs[r];
+                  }
+                  else
+                  {
+                     assert(sol._dual[r] < 0);
+                     modLhs[r] = modRhs[r];
+                  }
+
+                  // do not change the basis status to FIXED, since this would invalidate the basis for the original LP
+               }
+            }
+         }
+#ifndef NDEBUG
+         else
+         {
+            for( int r = numRowsRational() - 1; r >= 0; r-- )
+            {
+               SPxSolver::VarStatus basisStatusRow = _basisStatusRows[r];
+
+               assert(basisStatusRow == SPxSolver::ON_UPPER || basisStatusRow == SPxSolver::FIXED || sol._dual[r] >= 0);
+               assert(basisStatusRow == SPxSolver::ON_LOWER || basisStatusRow == SPxSolver::FIXED || sol._dual[r] <= 0);
+               assert(sol._dual[r] == 0 || lhsRational(r) == rhsRational(r));
+            }
+         }
+#endif
 
          // output violations; the reduced cost violations for artificially introduced slack columns are actually violations of the dual multipliers
          MSG_INFO1( spxout
             << "Max. bound violation = " << rationalToString(boundsViolation) << "\n"
             << "Max. row violation = " << rationalToString(sideViolation) << "\n"
-            << "Max. dual violation = " << rationalToString(redCostViolation) << "\n" );
+            << "Max. reduced cost violation = " << rationalToString(redCostViolation) << "\n" );
 
          // terminate if tolerances are satisfied
          primalFeasible = (boundsViolation <= realParam(SoPlex::FEASTOL) && sideViolation <= realParam(SoPlex::FEASTOL));
@@ -522,8 +566,7 @@ namespace soplex
 
          ///@todo try rational reconstruction at geometric frequency
 
-         // otherwise start refinement
-         _statistics->refinements++;
+         // start refinement
 
          // compute primal scaling factor; limit increase in scaling by tolerance used in floating point solve
          maxScale = primalScale * Rational(realParam(SoPlex::MAXSCALEINCR));
@@ -549,7 +592,7 @@ namespace soplex
          maxScale = dualScale * Rational(realParam(SoPlex::MAXSCALEINCR));
 
          dualScale = redCostViolation;
-         assert(dualScale >= Rational(0));
+         assert(dualScale >= 0);
 
          if( dualScale > 0 )
          {
@@ -568,12 +611,13 @@ namespace soplex
          // perform primal and dual scaling
          modLower *= primalScale;
          modUpper *= primalScale;
-         modSide *= primalScale;
+         modLhs *= primalScale;
+         modRhs *= primalScale;
          modObj *= dualScale;
 
          // apply scaled bounds, side, and objective function
          _solver.changeBounds(DVectorReal(modLower), DVectorReal(modUpper));
-         _solver.changeRange(DVectorReal(modSide), DVectorReal(modSide));
+         _solver.changeRange(DVectorReal(modLhs), DVectorReal(modRhs));
          _solver.changeObj(DVectorReal(modObj));
 
          MSG_INFO1( spxout << "Refined floating-point solve . . .\n" );
@@ -582,9 +626,28 @@ namespace soplex
          _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
 
          // solve modified problem
-         result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
+         if( restrictInequalities )
+         {
+            result = _solveRealStable(acceptUnbounded, true, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
+            if( result != SPxSolver::OPTIMAL )
+            {
+               restrictInequalities = false;
+               for( int r = numRowsRational() - 1; r >= 0; r-- )
+               {
+                  if( lhsRational(r) != rhsRational(r) )
+                     sol._dual[r] = 0;
+               }
 
-         // remember whether we moved to a new basis
+               continue;
+            }
+         }
+         else
+         {
+            result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
+         }
+
+         // count refinements and remember whether we moved to a new basis
+         _statistics->refinements++;
          if( _solver.iterations() == 0 )
             _statistics->stallRefinements++;
 
@@ -657,9 +720,28 @@ namespace soplex
          numAdjustedDuals = 0;
          for( int r = numRowsRational() - 1; r >= 0; r-- )
          {
-            sol._dual[r] += Rational(dualReal[r]) / dualScale;
+            SPxSolver::VarStatus& basisStatusRow = _basisStatusRows[r];
 
-            SPxSolver::VarStatus basisStatusRow = _basisStatusRows[r];
+            assert(lhsRational(r) != rhsRational(r) || modLhs[r] == modRhs[r]);
+
+            if( lhsRational(r) != rhsRational(r) )
+            {
+               assert(sol._dual[r] == 0 || modLhs[r] == modRhs[r]);
+               assert(sol._dual[r] != 0 || modLhs[r] != modRhs[r]);
+
+               // the inequality was fixed to the left-hand side
+               if( sol._dual[r] > 0 && (basisStatusRow == SPxSolver::ON_UPPER || basisStatusRow == SPxSolver::FIXED) )
+               {
+                  basisStatusRow = SPxSolver::ON_LOWER;
+               }
+               // the inequality was fixed to the right-hand side
+               else if( sol._dual[r] < 0 && (basisStatusRow == SPxSolver::ON_UPPER || basisStatusRow == SPxSolver::FIXED) )
+               {
+                  basisStatusRow = SPxSolver::ON_UPPER;
+               }
+            }
+
+            sol._dual[r] += Rational(dualReal[r]) / dualScale;
 
             if( (basisStatusRow == SPxSolver::ON_LOWER && sol._dual[r] < 0)
                || (basisStatusRow == SPxSolver::ON_UPPER && sol._dual[r] > 0)
@@ -680,15 +762,12 @@ namespace soplex
             MSG_INFO2( spxout << "Adjusted " << numAdjustedBounds << " nonbasic variables to bounds and " << numAdjustedDuals << " duals to zero.\n" );
          }
 
-         // recompute slack and reduced cost values
-         _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
-         _rationalLP->computeDualActivity(sol._dual, sol._redCost);
-         sol._redCost += _rationalLP->maxObj();
-         sol._redCost *= -1;
+         // refinement was successful; try with fixed inequalities during next run
+         restrictInequalities = true;
       }
       while( true );
 
-      // compute objective values
+      // compute objective function values
       assert(sol._hasPrimal == sol._hasDual);
       if( sol._hasPrimal )
       {
