@@ -92,3 +92,13 @@
 =opt= vtp-base         0.1298314624613613657395984384889e6
 =opt= wood1p           0.14429024115734092400010936668043e1
 =opt= woodw            0.1304476333084229269005552085566e1
+=opt= gas11            unbounded
+=opt= bgetam           infeasible
+=opt= box1             infeasible
+=opt= ex72a            infeasible
+=opt= forest6          infeasible
+=opt= galenet          infeasible
+=opt= gams10am         infeasible
+=opt= klein1           infeasible
+=opt= refinery         infeasible
+=opt= woodinfe         infeasible

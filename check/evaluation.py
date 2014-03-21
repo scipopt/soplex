@@ -196,6 +196,7 @@ with open(dataname, 'w') as f:
 fails = sum(1 for name in instances if instances[name]['status'] == 'fail')
 timeouts = sum(1 for name in instances if instances[name]['status'] == 'timeout')
 infeasible = sum(1 for name in instances if instances[name]['status'] == 'infeasible')
+unbounded = sum(1 for name in instances if instances[name]['status'] == 'unbounded')
 optimal = sum(1 for name in instances if instances[name]['status'] == 'optimal')
 aborts = sum(1 for name in instances if instances[name]['status'] == 'abort')
 
@@ -222,7 +223,7 @@ for name in sorted(instances):
 
 print
 print 'Results (testset '+testname.split('/')[-1].split('.')[-2]+', settings '+outname.split('/')[-1].split('.')[-2]+'):'
-print '{} total: {} optimal, {} fails, {} timeouts, {} infeasible, {} aborts'.format(len(instances),optimal,fails,timeouts,infeasible,aborts)
+print '{} total: {} optimal, {} infeasible, {} unbounded, {} timeouts, {} fails, {} aborts'.format(len(instances),optimal,infeasible,unbounded,timeouts,fails,aborts)
 
 # try to check for missing files
 check_test = False
